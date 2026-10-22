@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
-> **Status:** Initial design draft (pre-production)  
-> **Design revision:** 0.1  
+> **Status:** Comprehensive pre-production specification (not implemented)  
+> **Design revision:** 0.2  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -13,6 +13,9 @@
 - **Confirmed:** Established in the project concept handoff or later design discussions. Preserve unless explicitly revised.
 - **Proposed:** A design recommendation for evaluation and playtesting, **not** an approved requirement.
 - **Open:** A decision required before the relevant system is implemented.
+- **Working default:** A coherent starting rule for prototyping, not yet approved by the design owner.
+
+**New confirmed direction (2026-10-21):** Resources carried safely through an extraction can fund special crafting outside an island run. Some eligible extracted items can be transformed into an expensive **Permanent** item type using hard-to-get ingredients. The transformation capability is Confirmed; exact death, transfer, recovery, slot, durability and trading rules are Open. All numerical costs below are illustrative hypotheses.
 - Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
@@ -52,7 +55,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 4. **Take a risk:** Explore the Inner Ring, contest broadcast events, raid exposed bases, or challenge the Center Crater boss.
 5. **Carry the prize:** Valuable items physically occupy the player's carried inventory; rare/event loot exposes a visual trail.
 6. **Extract:** Reach a rune or portal and complete extraction to transfer eligible carried rewards to an unraidable persistent vault.
-7. **Repeat:** Redeploy with a new plan and optional equipment drawn from the vault (withdrawal rules still **Open**).
+7. **Build long-term power:** Spend extracted ingredients on special recipes or save for costly Permanent conversions (confirmed mechanic; specific recipes proposed).
+8. **Repeat:** Redeploy with ordinary at-risk gear and any allowed bound items, following the still-open deployment rules.
 
 ### 2.2 Loss and persistence contract
 
@@ -60,13 +64,15 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | --- | --- | --- |
 | On-person inventory | Drops on death and can be claimed by others | **Confirmed** |
 | Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
+| Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
+| Converted Permanent equipment | Conversion is available; death, recovery and deployment rules are not yet finalized | **Confirmed capability / Open mechanics** |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
 | Gear withdrawn from vault for deployment | Exact redeployment and loss rules | **Open** |
 | Player progress (recipes, cosmetics, reputation, etc.) | Whether and what persists | **Open** |
 | Bases across sessions/server shutdowns | Session-only, timed-wipe, or persistent-world model | **Open** |
 | Disconnects during combat/extraction | Anti-combat-log and reconnection policy | **Open** |
 
-**Proposed consistency rule:** Once a vault item is withdrawn into a live run, it is at risk like any other carried item. This preserves extraction stakes, but requires a fair reconnect/disconnect policy.
+**Working default:** Ordinary vaulted items become droppable if withdrawn for a live run. Separately, some converted **Permanent** items may retain account ownership after death under a bound-gear recovery model (see §15–21). This does not protect newly gathered materials or ordinary carried items. A fair reconnect/combat-log policy is still required.
 
 ## 3. World — The Shattered Crater
 
@@ -143,7 +149,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 4.4 Crafting questions — Open
 
-Recipe discovery/unlocks; durability/repair; encumbrance; resource stack sizes; ammo recovery; equipment weight and stamina; whether magic requires a dedicated catalyst; item binding/trading; and whether equipment or crafted material can be permanently withdrawn/deployed from the vault.
+**Confirmed:** Extracted materials are used in secure-hub special crafting and in expensive eligible-item Permanent conversions. **Open:** Recipe discovery, durability and repair, encumbrance, stack sizes, ammunition recovery, magic catalysts, Permanent equipment binding, cooldown, trade and deployment specifics. See §15–28.
 
 ## 5. Combat and PvP
 
@@ -278,7 +284,7 @@ Treat extract, death, disconnect, and item pickup as competing server-authoritat
 
 ### 9.5 Extraction decisions — Open
 
-Channel duration and interrupt rules, portal reveal/rotation, exact valuation formula, party extraction and distribution, partial vs full backpack extraction, how extracted materials are used, vault capacity/organization, lobby experience, reconnect behavior, and whether the central portal is usable while the boss is alive.
+Channel duration and interrupt rules, portal reveal/rotation, exact valuation formula, party extraction and distribution, partial vs full backpack extraction, vault capacity/organization, lobby experience, reconnect behavior, and whether the central portal is usable while the boss is alive. **Confirmed:** Extracted materials fuel special crafts and Permanent conversion, as developed in §15–28.
 
 ## 10. Economy, stakes and balancing
 
@@ -291,7 +297,7 @@ Channel duration and interrupt rules, portal reveal/rotation, exact valuation fo
 | **Persistent vault** | Secure | Only confirmed safe store for successful extraction |
 
 **Confirmed:** Event materials, crafted weapons, raiding resources, and boss loot form the world economy.  
-**Open:** Trading/market systems, vault withdrawals, currency definitions, sink mechanisms, recipe costs and rarity curves.
+**Confirmed:** Special crafting, extracted-material sinks and expensive Permanent conversion. **Open:** Trading/market systems, withdrawals, currency, exact sink magnitudes, recipe costs, Permanent ownership restrictions and rarity curves.
 
 ### 10.2 Balance hypotheses — Proposed
 
@@ -338,8 +344,8 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 1. No client-created rare items or client-declared combat hits without server validation.
 2. No player-built structure can exist within an extraction no-build zone.
-3. An item cannot simultaneously exist in world loot, carried inventory, and permanent vault.
-4. Extraction has an explicit persisted success/failure outcome; retries cannot duplicate items.
+3. An item cannot simultaneously exist as world loot, carried inventory, vault inventory, Forge-reserved input and account-owned Permanent equipment. A deployed bound manifestation references one canonical record; it is never a second tradable item.
+4. Extraction **and Permanent conversion** have explicit persisted success/failure states; retries cannot duplicate items or double-charge ingredients.
 5. Boss Legendary release at 25% occurs at most once per encounter.
 6. Only `main` may trigger production publishing workflows; development branches never publish.
 
@@ -360,13 +366,14 @@ The first milestone should prove the **risk → loot → extraction → vault** 
 | **A. Gather/craft** | Small outer-rim test arena; wood/stone; axe/spear; basic inventory | A new player can gather, craft and equip without admin commands |
 | **B. Fight/lose** | Primitive PvE enemy; basic PvP; dropped backpack/loot | Death drops correct eligible items; server rejects invalid combat/inventory requests |
 | **C. Extract/secure** | One minor rune; channel; persistent vault | Extracted loot survives rejoin; interrupted extracts do not grant loot; retries do not duplicate |
+| **C2. Permanent Forge prototype** | One ordinary special recipe and one eligible source-to-Permanent conversion | Ingredients charged once, converted source retired, owned Permanent record survives test death/rejoin, other carried loot still drops |
 | **D. Build/raid** | Foundations/walls/door/stash; damage and breaching; no-build aura | Another player can attack/loot stash; portal cannot be blocked |
 | **E. Contest** | One broadcast cache or alpha event; beacon; rare item carrying effect | Competing players can find, fight over and extract the objective |
 | **F. Center encounter** | Boss prototype with pillars, attack cycle, 25% drop, central portal | Mid-fight Legendary appears once; boss structures cannot cheese; relic must be extracted |
 
 ### 13.1 Explicit non-goals for the first slice
 
-Full island art, every biome, elaborate weather, large equipment catalog, trading/auction house, polished monetization, cross-server base persistence, advanced tribe diplomacy, and every elemental school.
+Full island art, every biome, elaborate weather, large equipment catalog, trading/auction house, polished monetization, cross-server base persistence, advanced tribe diplomacy, and every elemental school. The minimal Forge conversion proof **is included** in the first playable slice, as a core loop.
 
 ### 13.2 Documentation validation checklist
 
@@ -376,6 +383,8 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 - [x] Mega-Boss cadence, 3-minute alert, three phases and 25% drop recorded.
 - [x] All portals covered by the 50-meter no-build rule.
 - [x] Proposed mechanics explicitly differentiated from confirmed design.
+- [x] Extracted-material special crafting and costly Permanent conversion documented as Confirmed concepts.
+- [ ] Permanent death rules, recipes, costs and caps approved and validated in gameplay.
 - [ ] Prototype tests and runtime/CI validation — **not applicable yet; no game source exists**.
 - [ ] Design-owner decisions for outstanding systems — **pending**.
 
@@ -383,7 +392,8 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 | Priority | Decision | Why it matters |
 | --- | --- | --- |
-| **P0** | Run/session model, vault withdrawal and what persists between servers | Inventory authority, saved data, base lifecycle, player stakes |
+| **P0** | Run/session model, vault withdrawal, Permanent ownership after death and what persists between servers | Inventory authority, saved data, base lifecycle, player stakes |
+| **P0** | Permanent conversion eligibility, irreversible ingredient usage, binding/slot/recovery | Avoid trivial risk bypass and item-duplication pathways |
 | **P0** | Death, disconnect, reconnect and combat-logging policy | Exploit resistance and player trust |
 | **P0** | Portal activation/interrupt logic and multiplier definition | Core extraction risk and economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
@@ -391,15 +401,245 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 | **P1** | Build/raid costs, protected zones, raid time and structure upkeep | Base fairness and grief prevention |
 | **P1** | Event schedule/loot tables, boss loot distribution and reset logic | Server pacing and endgame |
 | **P1** | Biomes, distances, terrain elevation, portals and spawn points | World prototyping and movement |
-| **P2** | Progression unlocks, repair/durability, currency and trading | Long-term item economy |
+| **P1** | Special Forge recipe unlocks, rare source costs, repair/durability and material sinks | Core cross-run progression and balance |
+| **P2** | Currency, optional trading and cosmetic mastery | Long-term economic depth |
 | **P2** | UI art direction, onboarding and optional cosmetics | Presentation and retention |
 
-## 15. Design change log
+## 15. Cross-run special crafting and the Permanent item class
+
+> **Confirmed:** The player can spend successfully extracted materials to craft special items. Some eligible items brought back alive can be converted to a **Permanent** type by spending scarce, expensive ingredients. This is a central cross-run progression pillar.
+>
+> **Working default — awaiting approval:** Permanent means durable *account ownership* of one converted gear instance through ordinary death, raid and island wipes. A deployed manifestation disappears on death and returns to the owner's protected armory with a repair/recovery cost. This interpretation is proposed, not yet a confirmed specification.
+
+### 15.1 The three interlocking loops
+
+1. **Moment-to-moment:** Gather stone, wood, flora, bone and ore; fight with weapons and elemental magic; build and raid tactical shelters; collect unsecured loot.
+2. **Expedition:** Decide between pursuing a richer portal or safely carrying the prize to a minor rune. Dying before a completed extraction drops carried ordinary loot.
+3. **Between expeditions:** Deposit extracted materials, select secure Forge recipes, create special ordinary equipment and slowly earn the ingredients to convert a prized eligible item into a Permanent one.
+
+Extraction is **not** conversion: securing a legendary boss drop only places an ordinary, high-value item in the vault. Converting it requires a separate recipe, material sacrifice and server-side commit. A player can prefer immediately redeploying the risky Legendary instead of waiting to convert it.
+
+### 15.2 Item taxonomy and risk
+
+| Class | Ownership and source | In-run risk | Fate at death | Secure-hub behavior |
+| --- | --- | --- | --- | --- |
+| Unsecured materials | Fresh gathering, events, dead players or raided base | Carried or base-stashed | Drops / remains lootable | No access until extraction |
+| Ordinary vaulted stacks | Extracted wood, ore, jade, cores, etc. | Becomes unsecured if withdrawn | Dropped if carried | Protected and usable by Forge |
+| Ordinary vaulted gear | Extracted or special-crafted gear | Becomes unsecured if withdrawn | Dropped if carried | Can be stored or consumed as source |
+| Special ordinary gear | Secure Forge recipe using vault inputs | Droppable on deployment | Drops if carried | Safe only while stored in vault |
+| Permanent converted item | Single eligible vaulted source + conversion recipe | Bound manifestation, limited slot | Manifestation vanishes; owned original survives (**Proposed**) | Protected account armory and recovery |
+| Recipe knowledge | Earned milestones / discoveries | No physical item | Persists (**Proposed**) | Unlocks future recipes |
+
+**Vocabulary requirement:** "Secured" or "Vaulted" means safely stored outside a run. "Permanent" describes a specific conversion class. An item is not Permanent just because it is in persistent storage.
+
+### 15.3 Eligibility and source consumption — Proposed
+
+- A Permanent conversion targets a specific, uniquely identified **extracted gear instance**, not an abstract catalog item or arbitrary stack.
+- Eligible item families initially include weapons, select armor and a restricted set of tools. Exclude raw materials, currency, siege charges, structures, ammunition, potions, vault keys and anything creating limitless economic output.
+- The source item must be owned by the player, present in a secure vault, unlocked for the chosen recipe, not currently equipped in another active session and not already bound.
+- Converting **transforms/consumes** the source instance; it does not create both an ordinary tradeable source and a new Permanent copy.
+- Source item attributes (quality, rarity roll, enchantment, crafted name) can be preserved as a defined snapshot if eligible; never claim affix preservation without recipe specification.
+- No client can submit a chosen output rarity, free ingredient amounts, owner ID or arbitrary "Permanent" flag.
+- The confirmed 25%-HP boss Legendary remains ordinary world loot until a player takes it to a rune and extracts. It cannot be made Permanent instantly in the crater.
+
+### 15.4 Alternative interpretations still open
+
+| Model | Ownership after death | Strength | Risk |
+| --- | --- | --- | --- |
+| **Bound gear + recovery (Working default)** | Retained by account | Earned, tangible, reliable long-term reward | Strong persistent player advantage must be capped |
+| **Permanent blueprint** | Blueprint retained, gear rebuilt for a smaller cost | Strong replenishment sink | Can feel misleading if called Permanent |
+| **Permanent cosmetic variant** | Appearance retained, ordinary gear still lost | High competitive fairness | Too weak to fulfill "Permanent item" ambition |
+| Infinite spawnable copies | Unlimited copies | None | **Rejected proposal:** trivial duplication / economy collapse |
+
+Do not select an option silently. The first row is an internally consistent working specification, not design-owner approval.
+
+## 16. The Ancestral Forge: crafting outside the run
+
+### 16.1 Two crafting domains
+
+| Characteristic | Island field crafting | Secure Ancestral Forge |
+| --- | --- | --- |
+| Place | Island workbench/backpack | Protected lobby/hub or dedicated secure menu |
+| Inputs | Live at-risk backpack / raidable station stock | Successfully extracted resources and vaulted gear only |
+| Outputs | Field tools, armor, arrows, structures, raiding equipment | Rare special gear, enchantments, conversion reagents, Permanent gear |
+| Conflict | Vulnerable to PvP, raids, weather and events | Not raid-able, but all writes server-authoritative |
+| Persistence | Crafted item must still be extracted | Committed output stays in vault/armory until deployed |
+| Main purpose | Survive next minutes | Grow player account over many expeditions |
+
+The hub location and station names are **Proposed**, not mandated. A single Roblox place with distinct panels is acceptable if it reduces loading and engineering scope.
+
+### 16.2 Proposed stations and recipe categories
+
+- **Stonecarver's Table:** Refined flint, bone, resin and early special tools; introductory secure-crafting tutorial.
+- **Tribal Smithy:** Iron, obsidian, higher-grade blades, shields, utility armor and repairs.
+- **Rune Altar:** Charge cores, imbuements, elemental catalysts, jade wards and magic resistance.
+- **Eternal Anvil:** Permanent transformations requiring a validated source instance, scarce Keystone and multiple rare materials.
+- **Vault Ledger:** Material balance, pinned blueprints, provenance, missing-ingredient list, operation history and safe-ownership receipts.
+
+### 16.3 Exact crafting UX contract
+
+1. Successful extraction produces an authoritative **vault receipt** (items + amounts + extracted portal and payout).
+2. Show the player which recipes gained progress from that haul. Merely landing near a rune or dying in its channel cannot count.
+3. Player chooses a special recipe, source weapon if relevant, and confirms material requirements displayed as **Owned / Needed**.
+4. Server checks recipe unlock, source instance, remaining stacks, vault capacity, session ownership, selected affixes and balance version.
+5. For irreversible conversion, explicit confirmation names the exact sacrificed weapon and its permanent bound restrictions.
+6. Forge operation is reserved under a unique ID. Both target gear and consumed ingredient stacks must be unavailable to simultaneous requests.
+7. On successful durable commit, source and costs disappear **exactly once**, and resulting output is created **exactly once**.
+8. UI presents a verified receipt, not an optimistic client-granted item. Failed or pending operations reconcile before retrying.
+9. Ordinary special crafts go to the vault; Permanent conversion goes to the separate armory. Both are tracked in the player's persistent profile.
+
+### 16.4 Crafting principles — Proposed
+
+- No random recipe-failure chance that destroys expensive ingredients and a Legendary. **Default: 100% conversion if valid and fully funded**.
+- Recipes should encourage players to seek *different* objectives (ore + alpha component + meteor resource), not repeatedly grind a single trivial node.
+- Rare enchantments modify normal spears, bows, axes, clubs and shields; no guns, machine guns or automatic firearm analogues.
+- Recipe discovery is achievement-based or material-discovery-based, with clear reveal paths. Avoid forcing players to consult external guides.
+- Multiple viable weapon archetypes prevent a single mandatory optimal Permanent item.
+- Crafts that consume an item must use a unique instance ID; stacks use bounded positive integers and no fractional duplication.
+- Recipe versions are immutable for active transactions so a live balance patch cannot alter an operation halfway through.
+
+## 17. Permanent gear operational rules
+
+### 17.1 Bound armory / manifestation — Working default
+
+- **Canonical record:** Permanent gear exists once in a protected account armory; it owns a fixed ID, quality, permitted enchantments, durability and provenance.
+- **Manifestation:** When a player deploys, server creates a temporary bound representation of the canonical record. The representation is not a tradeable second item.
+- **Death:** The active copy vanishes and yields no transferable loot; regular backpack and ordinary equipped gear still drop. Permanent ownership enters **Recovery Needed**.
+- **Recovery:** The player pays a lesser repair/rearm resource sink or observes a cooldown at the hub; exact delay and materials remain Open.
+- **Withdraw/drop/trade:** Player can unequip the bound record to the armory, but cannot trade, drop, store in a raidable base or hand it to a different account.
+- **Disconnect:** Combat logging cannot bypass active-run death. Bound recovery follows the server-owned outcome, not client disconnect timing.
+- **Persistence:** Island server closure and scheduled base wipes never erase verified armory ownership.
+- **Double deployment:** One bound item cannot be active in two servers at once. Equip/deploy requires a profile/session lease.
+- **Repair insolvency:** Item remains owned even if unusable until repair; it must not be permanently deleted for insufficient materials.
+
+### 17.2 Hard boundaries for balance — Proposed
+
+- Start with **one bound weapon OR one bound armor piece** deployable per run. More slots require testing, not early monetization.
+- Temporary high-risk Legendary gear may have stronger peak stats than a safer bound counterpart; earned long-term equipment must not invalidate event risk.
+- Permanent tools cannot passively duplicate mining outputs or bypass resource/raid permissions.
+- Bound weapons still pay stamina, draw time, arrow/ammo consumption and enchantment charges. Firearms remain excluded.
+- Add optional wear and repair rather than a no-cost infinite-use weapon. All sinks should be visible before conversion.
+- Cap crowd-control durations, automatic status procs and stacked elemental synergies; PvP must retain readable defenses.
+- Bound items still occupy carry/equip slots and have normal weight/mobility tradeoffs.
+- Rare-carrying glow and extraction risk apply to **new event loot** even when carrier uses permanent weapons.
+- Neither the main crater portal nor any minor rune can grant free Permanent status as a multiplier.
+
+### 17.3 Approval questions — P0
+
+**Before code:** Is account-retained bound gear on death correct, or should the account receive only a rebuild blueprint? Is Permanent transferable? What exact recovery cost/cooldown applies? What item families can be Permanent? How many bound slots per run? Does use degrade durability? Can a converted Legendary keep its affixes? No answer is presumed approved beyond the user's confirmed conversion concept.
+
+## 18. Resource tiers, economy and acquisition sources
+
+### 18.1 Proposed material families
+
+| Acquisition | Region/event | Examples (working names) | Special craft function |
+| --- | --- | --- | --- |
+| Common harvest | Outer Rim | Wood, Stone, Plant Fiber, Rawhide | Starter recipes, repair kits, field equipment |
+| Uncommon harvest | Outer caves/Inner trails | Flint, Bone, Resin, Copper Ore | Beginner Forge, bow/spear component upgrades |
+| Rare harvest | Inner jungle/volcanic slope | Iron Bloom, Obsidian, Jade, Dire Hide | Metal weapons, defensive wards, special armor |
+| Elite creatures | Alpha Mob + protective pack | Charged Core, Glow-Fur, Ancient Binding | Elemental upgrades and conversion gates |
+| Ancient caches | Timed 60-second unlocking | Finished weapons, Ashen Oil, Siege Resin | Prepared gear, raids, rare catalytic components |
+| Tier-5 Resource Crash | Prolonged contested meteor interaction | Abyssal Shard, Emberglass | Endgame reinforcement and multiple conversion inputs |
+| Mega-Boss / Guardian | Crater's three-stage challenge | Guardian Heart, Crown Ash, one mid-fight Legendary | Extreme-tier conversion and prestige rewards |
+
+**Known facts:** Jade and Obsidian come from the Inner Ring; alpha drops support modifiers; meteor supplies rare reinforcement; cache unlock is 60 continuous seconds; the Legendary appears mid-boss-fight at 25%. The specific additional names, quantities, sources and probabilities above are **Proposed**.
+
+### 18.2 Scarcity design — Proposed
+
+- Base recipe costing on **materials successfully extracted per player-hour**, not simply how often a mob is killed.
+- Multiple extraction successes should be needed for a meaningful conversion; a single lucky Tier-5 harvest should not mint several Permanent weapons.
+- Ingredients can compete between building reinforcement, enchantments and long-term binding for real opportunity cost.
+- Favor several different event sources for advanced recipes so an elite group cannot monopolize one boss and control every equipment path.
+- Maintain a viable solo/midgame route to an early Permanent item, even if rarest Guardian conversion takes coordinated PvPvE activity.
+- Vault contents are never raid-able; run bases and carried resources are, giving extraction its reason to exist.
+- Portal multiplier should affect valuation/payout, **not duplicate unique gear, crafting inputs, Keystone, or Guardian drops** (Proposed).
+- No pay-to-win Permanent catalysts or Robux-bought combat power.
+
+### 18.3 Material sink model — Proposed
+
+Resources exit the economy through (a) field supply/ammunition/raids, (b) secure special crafting, (c) consumed source equipment, (d) Permanent conversion, and (e) repairs/recovery. Track acquisition and sinks separately by material source; adjust source drop rates only after observing actual extracts, loss, and monopolization. Never apply arbitrary hidden wipes to the protected Permanent armory.
+
+## 19. Special recipe examples — proposed balancing placeholders
+
+**All quantities below are intentionally provisional.** Nothing in this table is a live drop promise; exact recipe materials, unlocks, rates and costs require simulation/playtests. An input gear instance must already be owned and vaulted.
+
+| Output | Station | Consumed secured inputs | Role |
+| --- | --- | --- | --- |
+| Flint Hunter Spear | Stonecarver | Flint ×12, Bone ×6, Fiber ×10 | Reach-oriented low-cost weapon |
+| Tidewoven Cloak | Stonecarver | Rawhide ×18, Resin ×8, Fiber ×20 | Light armor, mobility |
+| Ironroot War Axe | Tribal Smithy | Iron Bloom ×24, Dire Hide ×6, Resin ×10 | Heavy stagger, slow recovery |
+| Obsidian Fang | Tribal Smithy | Obsidian ×18, Bone ×16, Iron Bloom ×10 | Short-range cutting and bleeding |
+| Jade Bulwark | Rune Altar | Jade ×15, Iron Bloom ×16, Resin ×15 | Defensive ward shield |
+| Ember-Touched Spear | Rune Altar | Vaulted Metal Spear ×1, Emberglass ×6, Charged Core ×1 | Finite burn charges |
+| Stormstring Bow | Rune Altar | Vaulted Reinforced Bow ×1, Charged Core ×2, Glow-Fur ×8 | Charged bow shots with cooldown |
+| Frostwoven Mantle | Rune Altar | Tidewoven Cloak ×1, Jade ×14, Ancient Binding ×2 | Brief frost resistance |
+| Ashen Breach Pot | Smithy | Emberglass ×5, Resin ×9, Obsidian ×4 | **Ordinary consumable**, never Permanent |
+| Guardian Ward | Rune Altar | Jade ×25, Crown Ash ×2, Ancient Binding ×3 | Defensive magic skill |
+
+### 19.1 Permanent conversion examples — more expensive than ordinary crafting
+
+| New Permanent record | Required eligible extracted source | Additional secured inputs | Gate / tradeoff |
+| --- | --- | --- | --- |
+| **Eternal Hunter Spear** | Flint Hunter Spear ×1 | Abyssal Shard ×2, Jade ×30, Ancient Binding ×5, Keystone ×1 | Early aspirational bound melee build |
+| **Bound Ironroot Axe** | Ironroot War Axe ×1 | Abyssal Shard ×3, Obsidian ×30, Charged Core ×3, Keystone ×1 | Costly high-impact melee identity |
+| **Everjade Ward** | Jade Bulwark ×1 | Jade ×50, Glow-Fur ×18, Guardian Heart ×1, Keystone ×1 | Defensive specialist, boss component |
+| **Runebound Stormstring** | Stormstring Bow ×1 | Charged Core ×6, Emberglass ×20, Crown Ash ×4, Keystone ×1 | Costly bow mastery, finite charges |
+| **Oath of the Guardian** | Eligible vaulted Guardian Legendary ×1 | Guardian Heart ×2, Abyssal Shard ×8, Crown Ash ×10, Keystone ×2 | Prestige goal, strict PvP power cap |
+
+**Keystone** is a *placeholder* for the signature conversion reagent; working source concept is combining Keystone Fragments from multiple high-risk event types. Avoid impossible single-source monopolies. The 25%-boss-health Legendary is the **unconverted source**, not the free recipe result. Specific recipes are proposed examples, not confirmed craft specifications.
+
+### 19.2 Upgrade and rarity guardrails
+
+- Do not make highest rarity automatically best for every encounter: reach, weight, attack wind-up, status resistance and counterplay should matter.
+- Permanent binding should not raise damage without clear statistical budgeting. Binding itself is a long-term utility advantage.
+- If recipe affix rerolling is later considered, publish chances and safeguard ownership; **no hidden destruction chances by default**.
+- Test whether a permanent tool grants unfairly rapid initial re-gearing. A recovery cost and loadout cap may be required.
+- Material inflation, hoarding and recipe dominance should be measured by event/region, account tenure and solo/tribe cohort.
+
+## 20. Detailed player journeys
+
+### 20.1 New player, safe first extraction
+
+Spawn on Outer Rim; gather wood and stone; craft a crude spear; fight a small hostile; find a hidden minor rune; extract uncommon ingredients for a modest payout. At the secure hub, receive an unmistakable **Vaulted** receipt and the first special Forge recipe preview. The player cannot convert the spear immediately; they need several further extractions. A failed first run drops carried loot but does not erase earlier vault progress. Goal: teach risk, safety, and long-term crafting in one sequence.
+
+### 20.2 Solo scavenger, long-term progress without boss domination
+
+Explore Inner Ring at quieter times, hunt smaller elites, withdraw only inexpensive vaulted gear, and extract Jade and occasional Charged Cores through variable rune routes. Build an ordinary special spear. Pin its Permanent recipe, deliberately choose a risky meteor run for the missing reagent, and eventually convert one signature weapon. This path must not require joining a dominant tribe. Endgame Guardian permanence can still require tougher objectives.
+
+### 20.3 Rival tribes, betrayal and raid
+
+Two tribes contest the Guardian's energy pillars as the Horn of War countdown ends. At 25% HP, a Legendary drops **before** boss death. A carrier grabs it and emits the high-value glow. A rival team ambushes and takes it. Meanwhile another squad raids the carrier's unguarded FOB and steals stored ordinary resources. Only a successful portal extraction secures loot; neither a base nor a bound weapon makes the Legendary safe. The tribe that escapes can later consider a very expensive Permanent conversion.
+
+### 20.4 Death while wearing Permanent gear
+
+A veteran equips one recovered bound sword plus ordinary armor, potions, arrows and newly gathered Obsidian. An enemy kills the veteran. The sword's manifested copy vanishes and enters armory recovery (**Working default**); everything else carried drops and can be claimed. The opponent earns real loot without creating a duplicate bound sword. The veteran must pay recovery/repair requirements before redeployment but never needs to win the sword from the boss again. This illustrates both long-term reward and continuing high-stakes risk.
+
+## 21. Combat, progression and acquisition balance
+
+### 21.1 Weapon-archetype vocabulary — Proposed
+
+- **Spears/javelins:** Reach, spacing and thrusts; countered by inside-close movement and shield timing.
+- **Clubs/axes/mauls:** High stagger/armor pressure, slow recovery and stamina cost; effective raiding preparation.
+- **Blades/daggers:** Speed and flank pressure, weaker frontal guard break.
+- **Bows/slings:** Draw commitments, projectile arcs, retrievable/consumed ammo, imperfect mobile aim assistance, countered by cover/rush.
+- **Shields:** Facing-dependent protection, guard stamina and heavy-break counters.
+- **Ember/frost/storm/earth magic:** Distinct status utility with telegraphs, charges and PvP control-duration caps, never machine-gun analogues.
+
+### 21.2 Encounter difficulty
+
+Starter wildlife teaches timing; Inner Ring fauna pressures mobility and counterattack; Alpha packs require kiting/positioning; Guardian requires shield-pillar coordination and telegraphed lethal abilities. The three-phase boss and 15–20-minute event cadence remain fixed from the concept, while damage, health, aggro, PvP contribution and loot counts are Open. Ordinary gear should be a viable counter to Permanent gear within reasonable tier/skill ranges.
+
+### 21.3 Power-progression economy
+
+Player strength comes from execution, temporary risked gear, group tactics and optionally limited long-term bound choices. Bound equipment should be **sidegrades or bounded advantages**, not a full gear set guaranteeing victory. Track win rates against account age and equipped item types; explicitly support solo extracts and stealthy base raids as alternatives to head-on crater fights.
+
+## 29. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
 | **0.1** | 2026-10-21 | Created Flintborn GDD from the original primitive extraction handoff; recorded primitive-fantasy/no-firearms direction; added proposed systems, technical guardrails, vertical slice and decision backlog. |
+| **0.2** | 2026-10-21 | Added confirmed extracted-material special crafting and expensive eligible-item Permanent conversion; expanded item taxonomy, Forge design, working death/recovery policy, resource/recipe catalog, cross-run economy and player journeys. Further implementation details in §22–28. |
 
 ---
 
-**Working principle:** Protect the identity of Flintborn: **primitive survival + raidable preparation + contested world events + visible high-value loot + manual extraction + persistent secure vault**. Proposed features are not final decisions until approved and tested.
+**Working principle:** Protect the identity of Flintborn: **primitive survival + raidable preparation + contested world events + visible high-value loot + manual extraction + persistent secure vault + rare, expensive cross-run special crafting and Permanent conversion**. Proposed features are not final decisions until approved and tested.
