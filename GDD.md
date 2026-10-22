@@ -264,14 +264,16 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Farming:** Players can plant and grow crops/trees and harvest products. Farming continues **while owner is away** if the **public server remains populated and running**, subject to server-side growth timestamps. After world empties, farms reset with all other world content.
 - **Open:** Which seeds, tree crops and growth times are included, whether harvested crops can be replanted endlessly, farm area limits and effects of other players harvesting owner-grown plants.
 
-### 6.2 Tribe claim totems and unclaimed decay (Q113–114)
+### 6.2 Material-upgradeable totems, overlap and full unclaimed decay — Confirmed Q144–146
 
-- **Confirmed:** Player-built bases persist in the populated public world after owners leave and can be taken over, until the entire instance becomes empty. A valid tribe claim totem within range protects **nearby player-built structures** from natural decay only; it never prevents PvP/raiding.
-- **Totem influence radius depends on eventual map scale**; no fixed numerical radius yet. **Totem claim zones are allowed to overlap**, including zones belonging to different tribes. The **priority, ownership attribution and access/conflict resolution** for overlapping areas remain Open; do not silently disallow overlap.
-- **Confirmed unclaimed decay target:** If a structure has no valid protecting tribe totem nearby, it **fully decays over approximately 5 minutes with ±1-minute random variation**, i.e. **4–6 minutes** as an initial proposed time-to-destruction window. If the user intends this as a *damage tick interval* rather than whole destruction, clarify before final numerical implementation; initial working interpretation is **total unclaimed lifespan**.
-- **Proposed engineering:** On becoming unclaimed, assign a server-authoritative decay deadline in the 4–6-minute range. Restoring valid totem coverage pauses/cancels decay according to a clearly tested rule; loss of coverage begins/resumes it. Do not let rapid placement/remove instantly reset endlessly or create negative health.
-- Tribes may claim **their own built structures** only; **server-generated events/ruins cannot be claimed**. Any physically reachable storage remains openable by anyone; totems do not lock chests.
-- **Open:** Totem radius, max totems, overlapping ownership priority, whether reclaiming unclaimed/abandoned bases grants new ownership, exact decay distribution, material-tier decay effect and structural repair mechanisms.
+- **Totem starting coverage:** A basic tribe claim totem protects roughly **a small hut-size footprint**. Players can spend **appropriate harvested/crafted materials to upgrade its influence radius** for compounds and later larger bases. Numeric radii, upgrade tiers/prices and map-scale relationship remain Open.
+- **Totem regions can overlap**, including rival tribes. **Ownership stays with the ORIGINAL builder/tribe until a valid takeover** — a new overlapping claim alone does **not** overwrite it. Exact takeover trigger, transfer procedure, capture time and whether structures may be contested simultaneously remain Open.
+- **Totem function:** Protects nearby **player-built** structures from natural decay, never from combat damage; no tribe can claim **server-generated buildings**. Storage is openable by anyone who can physically reach it.
+- **Confirmed Q146:** An unclaimed building **completely disappears within 4–6 minutes** after becoming unprotected, not a decay-damage tick every 4–6 minutes. The timer uses **5 minutes ± one minute** as an initial random total lifetime. Properly claimed pieces persist while server lives, but may be raided normally.
+- **Proposed state handling:** On loss of totem coverage, server assigns per-structure random expiration deadline of 240–360 seconds; replacing/upgrading/reclaiming totem protection stops decay and resolves old timer without duplication or perpetual flicker. Actual paused vs restarted behavior remains Open.
+- **Original ownership:** Survives user leaving while world populated; a new group can use open storage, fight through walls and **take over** buildings via a specific approved mechanic, rather than an overlap magically reassigning ownership. World still completely resets once last player leaves.
+- **Anti-exploit:** Prevent cheap totem placement near boss/portal no-build zones, negative-price radius upgrades, claim ownership spoofing and repeated decay-timer resets.
+
 
 
 ### 6.3 Always-on raiding, no special tools
@@ -290,16 +292,26 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 > **Confirmed:** The event director operates through **weighted rarity selection on recurring server ticks**. At each event check, an event **may or may not occur** based on its weight and eligibility. This includes all **non-Guardian events**, meaning world events *other than the main central Guardian*: rare shrubs, trees, deposits, special mobs, event bosses, meteors, supply caches and generated raidable structures. **All events are announced publicly.** Rare resource sites spawn at **random valid positions inside their relevant biome**.
 
-### 7.1 Event generation and broadcast sequence
+### 7.1 Independent weighted event categories and rarity waterfall — Confirmed Q140–143
 
-1. When the public island is active, a **server-authoritative event scheduler tick** evaluates whether the server should spawn a new event and which type. **Weights** define relative rarity, possibly including a "no event" result.
-2. Filter events by valid biome, existing encounter limits and event category availability, then pick using server RNG and versioned probability tables.
-3. Spawn event at a **random feasible location within the appropriate biome**, checking terrain, other structures, accessible pathing and protected interaction points.
-4. **Publicly announce every event** to the server with audiovisual notification. **Open:** whether all have exact map icons/beacons or some only offer a public biome hint; *announcement itself is confirmed* for all.
-5. Players may compete for event loot, even when the encounter has hostile mobs. Reward items are ordinary at-risk physical loot until extraction and can be stolen.
-6. Once resolved, expire the event and restore capacity for future weighted checks. Do not have players directly request weighted rolls.
+**Server tick:** Approximately every **five minutes**, non-Guardian event scheduling performs **separate rolls for each eligible event category** (rare vegetation, ore, NPC encounter, cache, meteor, generated ruin/structure, event boss, etc.). Multiple distinct category events can succeed in the same tick.
 
-**Confirmed Q111 target:** The weighted **non-Guardian** scheduler checks for an eligible event **approximately every 5 minutes** (tunable target), and **multiple events may coexist**, provided the server validates a **minimum separation / no overlap** between their active footprints. Roll may legitimately select no event; exact probability weights and separation radius remain Open. **Guardian** keeps its distinct established ~15–20-minute cadence and 3-minute announcement unless separately changed (§8).
+**Q140 proposed baseline:** Each eligible category rolls a **25% trigger chance**. On success, that category then evaluates descending event rarities rather than sampling one flat combined weighted list:
+
+1. **Secret** example: **0.1% conditional chance** (tentative, not a fixed rare loot probability); if this rarity roll fails, try the next lower tier.
+2. **Mythic / Legendary / Epic / Rare / Uncommon** (and other configured applicable tiers) are checked highest-first according to explicit rarity weights; precise percentages are **Open**.
+3. If no tier above **Common** succeeds, **use the Common event for that category as fallback**, provided the category has an eligible common event.
+4. Once a rarity tier succeeds, choose a random eligible event **within that category and tier** (e.g. rare flora Secret or rare mob Secret). One category may yield a distinct event from another in the same tick.
+5. Validate appropriate biome, navigability, legal spawn zone, **spatial footprint separation** from any active event, and runtime NPC/asset budget. If invalid, retry a safe different location or defer/skip this category rather than overlapping worlds.
+6. **Announce every actual event publicly**, including common resources and flora. Players contend for physical rewards.
+
+**No fixed simultaneous-event count cap** is wanted (Q142) **as long as server performance and footprint spacing permit**. The server may enforce adaptive entity/event budgets for safety; this is a **performance guard**, not an arbitrary game-rule limit of 3 or 5 events. Small shrubs can be much closer together than boss/meteor footprints. The minimum valid distance depends on **both active and candidate event footprints**, not one global number.
+
+**Critical clarification:** Q141 specifies **separate event-category rolls**, not a single roll that selects one category after success. The illustrative **25% category trigger × 0.1% first Secret attempt** implies a raw ~0.025% Secret chance **per eligible category per tick** before other gating, not a promised 0.1% global spawn probability. Exact categories, rarity eligibility and how to resolve multiple successful rolls remain configurable. Category events that have no Common variant must use explicit fallback or skip, not invent a Common boss.
+
+**Guardian exemption:** The central Guardian retains its distinct ~15–20-minute schedule, 3-minute warning and 25%-HP Legendary physical drop. Ritual-initiated and structure-triggered bosses follow their own eligible triggers rather than being randomly rolled by every category.
+
+
 
 ### 7.2 Event catalog and three boss sources
 
@@ -368,11 +380,15 @@ Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons,
 - **PvP and loot:** The whole game is PvP-first. **No automatic boss rewards** should make secured loot immune to rival players. Physical reward objects stay contested/unsecured until successful extraction; whether some participants receive XP or recipe discovery progress is Open.
 - **Anti-exploit:** Scaling must not respond instantly to players dropping their high-tier gear, artificially changing server membership or cycling in a low-level alternate account.
 
-### 8.3 Baseline-plus-scaling boss difficulty (Q115)
+### 8.3 Fixed boss baseline plus combined level-and-gear scaling — Confirmed Q147–148
 
-**Confirmed:** Every boss archetype has its own **defined baseline level/difficulty**. An additional difficulty scaling component adjusts challenge using eligible active-server population strength, but the **formula and signal are intentionally unresolved**.
+- **Baseline:** Every boss has **fixed authored base health, damage and encounter difficulty/level** (Q147). These are the minimum design reference and vary by boss archetype. Actual baseline stat numbers remain Open.
+- **Additional scaling:** Use **C, a combined signal of player account level AND equipped gear strength** (Q148). Neither an exclusively level-only nor solely gear-based model is selected.
+- **Recommended engineering interpretation (Proposed):** Snapshot both player-level and gear-score distribution for eligible active-world population **when the boss spawns**; derive a weighted normalized score, clamp scaling relative to boss baseline, and resist gear removal / low-level alt joining exploits. Exact weighting, population eligibility, clamping, max boost and boss health/damage formula are **Open**.
+- **Spawn-type reset:** Event bosses reset according to event rules, ritual bosses to ritual rules, generated-structure bosses to structure scripts, and Guardian keeps its established cycle. No automatically granted protected PvE arena; loot stays contested.
+- **No player-cast spells at launch:** Elemental bosses/NPCs can still exist; Guardian's pillar shielding remains NPC-only.
 
-**Open candidates:** Average server player level, average equipped gear score, a blended metric, and whether party or engaged participant count matters. Scale-at-spawn vs live updates also remains Open. **Proposed working safeguard:** Snapshot a validated population metric at spawn (rather than reacting to rapid unequipping or alternate account joins). Prevent boss difficulty reduction when an attacker removes armor after initiating a fight. Respect world-event, ritual and structure boss-specific reset rules; central Guardian retains its separate cadence.
+
 
 ### 8.4 Future boss design questions — Open
 
@@ -669,6 +685,10 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 
 ### 16.8 Ordinary crafting locations and quality rolls (Confirmed Q103/Q105)
 
+**Confirmed Q138:** Each rolled gear instance can deviate **up to ±5% from its catalog default/base stats**, while its rarity classification remains fixed. This is a small quality roll and **does not create new rarity tiers**. Lobby-crafted advanced gear stays at **exactly default/base quality**; qualified world workbenches roll in permitted quality range. Better crafting mastery improves the best-roll chance.
+
+**Q139 probability clarification:** The best-roll probability receives a **+5% *relative* boost per Crafting mastery level**, additive on the original probability multiplier, rather than +5 percentage points. With base chance **1.00%**, level 1 gives **1.05%**, level 10 gives **1.50%**: `p(level) = min(1, p_base × (1 + 0.05 × masteryLevel))`. The example 1% base chance remains a working roll-table input; server-owned catalog roll ranges determine actual chances. This formula must not be implemented as `p_base + 0.05` (which would jump to 6% at level 1).
+
 - **Basic recipes** work **anywhere**, without a station; the first useful equipment set should take **10 minutes or less** in a normal initial expedition, using a few harvested ingredients. What constitutes the “first set” is Open.
 - **Advanced gear** requires **workbenches**. Craft in the **dangerous public world** for an opportunity at **slightly better quality/stat rolls** (enhanced by higher Crafting mastery), or use **secure lobby workbenches** for the **default item quality**, without the dangerous field station's roll bonus.
 - Each piece has an **immutable catalog rarity**, not a randomly chosen rarity. Minor **quality rolls vary between separate instances of the exact same item**, even if they have the same item name/rarity.
@@ -781,6 +801,8 @@ Resources exit the economy through (a) field supply/ammunition/raids, (b) secure
 - Example source: designated iron weapon + suitable extracted common materials + reagent from a rare mob/tree/meteor event. Material counts, recipes and eligible catalog entries remain Open.
 - No field crafting of Permanent gear is implied; the protected hub forge is still the conversion destination.
 
+
+**Q149 starting Permanent item:** A **basic pickaxe** is the preferred **first Permanent-conversion candidate**, after roughly a couple of successful extractions plus one qualifying rare event for its recipe resources. Although a pickaxe is a harvesting **tool**, not a combat weapon, designer-designated tools can be Permanents under the same single-instance, death-retained, manually droppable/tradeable ownership rules. This pickaxe is a **candidate**, not automatic eligibility for every pickaxe or tool. Mining benefits and resource-yield perks remain separate from Permanent status; converting does **not** give extra mining stats beyond its original rolled attributes.
 
 ## 20. Detailed player journeys
 
