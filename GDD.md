@@ -804,12 +804,12 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 
 ### 21.1 Combat vocabulary — Confirmed / Proposed stats
 
-- **Click melee:** Initial rock attack **5 raw damage per hit** with relatively high cadence; **wooden spear ~15**, **stone spear ~25** per hit, slower but with longer reach. Spear numbers remain tentative balance targets. Combat animations and precise rates/reach are Open. **Melee consumes no stamina.**
-- **Bows:** Physical arrow projectiles with **deliberately slower visible travel**, craftable finite arrows and server-authoritative collision. **Shooting consumes no stamina.** Exact speed, gravity and falloff TBD.
+- **Click melee:** Raw hit damage starting points remain rock **5**, wooden spear **~15**, stone spear **~25**, prior to armor. **Q133 provisional attack cooldowns:** Rock **0.3s**, Dagger **0.4s**, Sword **0.7s**, Spear **0.9s**. These cadence numbers were accepted as approximate, not per-archetype locked; exact reach/animation windows, dagger/sword damage and stone-vs-wood spear differences remain Open. Melee spends no stamina.
+- **Bows:** **Both bow and arrow tier contribute to arrow damage**. Projectile is deliberately slow and follows a **slight gravity arc**. Holding fire **pulls back/charges the bow animation**, increasing arrow launch strength/range with longer held duration; **damage stays unchanged at any draw duration**. Shorter holds result in less travel distance, not reduced damage. Exact hold minimum/maximum, launch speed/flight distance formula, bow+arrow damage combination, arrow count and client/mobile input remain Open. Shooting consumes no stamina.
 - **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; regen delay/partial-sprint behavior, pace and speed remain Open.
 - **Crouching:** Low profile/stealth/movement choice; does not consume stamina. Sprinting and crouch interactions are implementation choices.
-- **Medicine:** Basic **+10 HP**, advanced **+25 HP**, potion **+50 HP**, applied immediately up to the player's gear/upgrade-modified max HP; **tier-varying post-heal animation** enforces reuse cooldown. Cannot stack through repeated/parallel remotes; duration per tier remains Open.
-- **Food:** Full meter decays in **5 minutes**; strictly **below 25%** gives a **10% movement-speed penalty**. Food heals different HP totals over **10 seconds**; each hit halves remaining heal, and if post-hit remainder ≤10 HP, cancel the remainder.
+- **Medicine:** Basic **+10 HP** with **0.5s animation**, advanced **+25 HP** with **1.0s animation**, potion **+50 HP** with **1.5s animation**. Healing applies **immediately**, then the animation is the **ONLY cooldown**; another medical use is prohibited until animation completes. The server blocks replayed/parallel remotes, including latency abuse. No additional hidden cooldown.
+- **Food:** Full meter decays in **5 minutes**; below **25%** gives **−10% speed**. **Accepted starter food examples (Q137):** Berries replenish **10% of hunger and heal 10 HP over 10 seconds**; Cooked Meat replenishes **35% hunger and heals 30 HP over 10 seconds**. Actual launch recipe/catalog still subject to naming. Each damaging hit halves pending food healing; if new remaining heal ≤10 HP, cancel it entirely.
 - **Armor:** Armor modifies **effective HP (EHP)** using a multiplier, not direct flat damage reduction: **EHP = current HP × armor factor** and damage applies to EHP; convert back to displayed actual HP (§21.5). Early armor multipliers are slightly different but visibly useful. Equipment remains indefinitely durable; magical/special resistance is future-only.
 - **No player magic/shields:** Skeletons, elementals and other mythical adversaries remain enemy content; magic attacks, magical barriers and dodge/stamina combos are out of launch scope.
 
@@ -831,24 +831,29 @@ Measure melee duel duration, arrow velocity readability, damage accuracy under m
 
 
 
-### 21.5 Effective-health armor mathematics — Confirmed model / Open armor values
+### 21.5 Additive piece-based EHP armor — Confirmed Q132/Q136
 
-**Confirmed intention (Q67):** Armor scales the amount of **effective HP** rather than subtracting a fixed damage-reduction value on every attack. Base player max HP is **100**, and upgrades/gear may increase maximum HP. Initial armor tiers provide only **small multiplier differences** so each upgrade feels worthwhile without overwhelming primitive weapon damage.
+**Confirmed EHP targets for FULL THREE-PIECE matching sets** (Head + Chest + Legs/Boots), based on 100 base HP:
 
-Define:
+| Armor set | Full-set EHP factor | Base-HP EHP | Increment vs unarmored |
+| --- | --- | --- | --- |
+| Unarmored | **×1.00** | 100 | 0 |
+| Hide | **×1.20** | 120 | +20% |
+| Wood | **×1.50** | 150 | +50% |
+| Stone | **×1.80** | 180 | +80% |
+| Iron | **×2.00** | 200 | +100% |
 
-- \(H\) = actual current HP (maximum \(H_{\max}\); base \(H_{\max}=100\)).
-- \(A\) = final armor **EHP multiplier**, with unarmored baseline \(A=1.0\). Values for hide, wood, stone and iron armor are **Open**, and \(A\) must be a finite, server-authorized positive number.
-- \(E = H\times A\) = effective HP remaining. \(E_{\max}=H_{\max}\times A\) is effective maximum HP.
-- Incoming raw damage \(D\) reduces effective HP: \(E'=\max(0,E-D)\).
-- Convert back to actual HP: \(H'=\max(0,E'/A)\), equivalently \(H'=\max(0,H-D/A)\), and clamp to \(H_{\max}\).
-- **Downed** uses the same \(A\) with a separate initial \(H_{\mathrm{down}}=20\) HP pool: attacks consume effective downed health using \(D/A\), without resetting normal HP.
+**Pieces add their armor factor contributions**, rather than multiplying each other. Let each worn head/chest/combined-legs piece have server-catalog armor increment \(a_i\) above the unarmored baseline; \(A = 1 + a_{\mathrm{head}} + a_{\mathrm{chest}} + a_{\mathrm{legs}}\). For a complete matching set, contributions add to **0.20, 0.50, 0.80 or 1.00** respectively. **Open:** Allocation across the three pieces (equal shares, chest-weighted or another distribution) and mixed-tier piece stats. Never apply the full-set ×2 Iron factor to each separate Iron piece.
 
-**Illustrative math, *not* finalized armor tier balance:** At 100 HP and hypothetical \(A=1.2\), the player has 120 EHP. A raw 24-damage hit leaves 96 EHP and **80 actual HP**, not 96 actual HP. If downed at 20 HP with that same armor, the downed character has 24 EHP and needs 24 total raw damage (absent other effects) to be finished.
+For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\max(0,E-D)\) and **actual HP \(H'=\max(0,E'/A)\)**, clamped to current valid maximum HP. This is armor-scaled EHP, not a per-hit flat defense stat.
 
-**Important clarification:** The shorthand “armor × health = EHP; EHP − damage = HP after damage” mixes effective and actual HP units. The design uses exactly the requested **armor-scaled EHP** while converting back by dividing by \(A\); otherwise HP UI, healing and lethal/downed thresholds would be inconsistent. An armor value can be displayed as a factor or stat points converted into \(A\), but that mapping, additive/multiplicative composition and early-tier values remain Open.
+**Revival Q136:** The revived player receives **10% of their current maximum EHP**, not 10% of a fixed 100. Compute \(E_{\mathrm{revive}}=0.10 (H_{\max} A)\) and convert back to displayed actual HP as \(H_{\mathrm{revive}}=E_{\mathrm{revive}}/A = 0.10 H_{\max}\). Example: 100 max HP with full Iron (A=2) → 200 maximum EHP → 20 revived EHP → **10 actual HP**. Upgraded max HP 150 with Iron → 300 EHP → 30 EHP → **15 actual HP**. This avoids inadvertently granting extra armor-multiplied healing twice.
 
-**Potential health-upgrade interaction:** Increasing \(H_{\max}\) and increasing \(A\) are separate advantages and multiplicatively improve survivability. Max limits, round-to-display precision, fractional HP, armor swaps during combat, stacking mastery/rebirth health buffs, food healing with raised max HP and damage floors must be specified before launch.
+**Downed state unchanged:** At normal 0 HP, tribe member enters separate **20 downed actual HP**, armor still applies. Enemies can finish downed players by consuming its EHP; 10-second valid revive pauses the 60-second bleed-out timer. No invulnerability assumed after revival.
+
+**Open:** Piece weighting, armor mitigation from mixed sets, decimals/UI rounding, health upgrades and mastery buffs, temporary armor swaps during PvP, equipment roll ±5% application to EHP and per-hit minimum raw damage.
+
+
 
 ## 22. Detailed inventory, extraction and death state transitions
 
