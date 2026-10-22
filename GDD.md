@@ -14,9 +14,9 @@
 - **Proposed:** A design recommendation for evaluation and playtesting, **not** an approved requirement.
 - **Open:** A decision required before the relevant system is implemented.
 - **Working default:** A coherent starting rule for prototyping, not yet approved by the design owner.
+- Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
 **New confirmed direction (2026-10-21):** Resources carried safely through an extraction can fund special crafting outside an island run. Some eligible extracted items can be transformed into an expensive **Permanent** item type using hard-to-get ingredients. The transformation capability is Confirmed; exact death, transfer, recovery, slot, durability and trading rules are Open. All numerical costs below are illustrative hypotheses.
-- Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
