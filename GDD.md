@@ -149,17 +149,17 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Worked metal | Iron/available ore, processed hide | Iron axe, blade, spear, metal armor and stronger bow | Higher material investment and better combat tools |
 | High rarity | Rare monster parts, meteors and boss/structure loot | Special **nonmagical** crafted gear and conversion-eligible items | Risk-driven loot and rare Permanent conversion |
 
-**Confirmed:** Resource families added over time can extend gear and building progression, but initial construction progression is **wood → stone → iron**. The example weapons and precise stats remain Proposed. Rare crafting is independent of playable spellcasting.
+**Confirmed:** Keep **a small starting resource catalog** (candidate wood, stone, iron, fiber, food, hides and rare event drops) and expand later. Initial construction tiers remain **wood → stone → iron**. Exact sources/numbers are Proposed. No player magic at launch.
 
 ### 4.2 Initial item families
 
 | Family | Examples / rule |
 | --- | --- |
 | Harvesting tools | Axe, pickaxe, sickle; server validates harvest ranges and legitimate node yields |
-| Melee weapons | Spears, clubs, axes, swords, daggers; **simple click-to-attack** at launch |
-| Ranged weapons | At least bows; other ranged families (slings, javelins, crossbows) are possible future content, not all confirmed for launch |
-| Ammunition | **Arrows must be crafted** and occupy a finite resource/inventory supply; projectile speed is deliberately slow and visible |
-| Armor | Nonmagical protective clothing/leather/iron; **lasts indefinitely** rather than breaking or needing durability repairs |
+| Launch melee weapons | **Spears, daggers and swords**; basic rock/tool attacks remain possible. Clubs, combat axes and other weapon families are future options |
+| Launch ranged weapons | **Bows**, with slow visible projectiles; slings, javelins and crossbows not committed at launch |
+| Ammunition | **Every arrow recipe crafts 10 arrows**, with better material tiers optionally increasing damage; slow physical projectiles |
+| Armor | **Head**, **Chest** and combined **Legs/Boots** are the only three armor slots; gear lasts indefinitely, no shields |
 | Medical items | Basic **+10 HP**, advanced **+25 HP**, potion **+50 HP** immediately (capped at current max), followed by varying animation durations as the reuse cooldown |
 | Food | Food meter drains from full to zero in **5 minutes**; below **25%** slows movement **10%**. Eating produces food-dependent healing over **10 seconds**, halved on hits, with small remainder cutoff |
 | Utility | Torches, storage supplies, farm tools, primitive traps and other nonmagical gear |
@@ -659,6 +659,15 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 - Crafts that consume an item must use a unique instance ID; stacks use bounded positive integers and no fractional duplication.
 - Recipe versions are immutable for active transactions so a live balance patch cannot alter an operation halfway through.
 
+### 16.8 Ordinary crafting locations and quality rolls (Confirmed Q103/Q105)
+
+- **Basic recipes** work **anywhere**, without a station; the first useful equipment set should take **10 minutes or less** in a normal initial expedition, using a few harvested ingredients. What constitutes the “first set” is Open.
+- **Advanced gear** requires **workbenches**. Craft in the **dangerous public world** for an opportunity at **slightly better quality/stat rolls** (enhanced by higher Crafting mastery), or use **secure lobby workbenches** for the **default item quality**, without the dangerous field station's roll bonus.
+- Each piece has an **immutable catalog rarity**, not a randomly chosen rarity. Minor **quality rolls vary between separate instances of the exact same item**, even if they have the same item name/rarity.
+- Server validates station, recipe, input provenance, allowed quality stat variance and the player's mastery; never trust client-selected stats. Raw materials remain at risk in the active world.
+- **Ten arrows per craft**; upgraded arrows use higher-tier inputs and may deal more damage. Exact ingredients/range/damage and inventory constraints remain Open.
+- **Permanent conversion** still requires designated eligible gear and expensive **extracted vault inputs**; binding preserves whatever small stat roll the original item had, and adds no new damage multiplier.
+
 ## 17. Permanent gear: death protection and ownership transfer
 
 > **Confirmed:** Certain **designated** extracted item types may be made Permanent using costly materials from **multiple** sources and recipes gated by player leveling and discoveries. Permanent conversion **does not modify combat stats** relative to the selected source gear. A Permanent item **survives its owner's death**, but if the owner **deliberately drops it** and another player collects it, it changes owner. Permanent items can also be **traded**. Neither dropping nor trading creates a duplicate.
@@ -730,45 +739,39 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 
 Resources exit the economy through (a) field supply/ammunition/raids, (b) secure special crafting, (c) consumed source equipment, (d) Permanent conversion, and (e) repairs/recovery. Track acquisition and sinks separately by material source; adjust source drop rates only after observing actual extracts, loss, and monopolization. Never apply arbitrary hidden wipes to the protected Permanent armory.
 
-## 19. Nonmagical special crafting and Permanent conversion examples
+## 19. Launch equipment, starter crafting and Permanent eligibility
 
-All examples in this section are **Proposed balance data**, not finalized recipes, quantities, loot guarantees or launch catalog entries. **No launch recipe may grant player magic, enchantment attacks, infinite healing or shield equipment.** The Ancestral Forge uses materials **successfully extracted into the protected vault**, not gear sitting in raidable field storage. Player recipe discoveries and levels can gate each recipe.
+### 19.1 Confirmed equipment families and slots (Q100–104)
 
-### 19.1 Ordinary special recipes — nonmagical launch direction
+- **Four weapon families for launch:** **Spears, Daggers, Swords and Bows**, along with basic harvesting tools/rock attacks. No shields or player-cast magic.
+- **Three armor slots:** Head, Chest, combined Legs/Boots. The armor EHP calculation and indefinite equipment lifespan remain intact (§21.5).
+- **Small resource catalog first:** Wood, stone, iron, fiber, hides, food/herbs and a small roster of creature/event ingredients are candidate starters; the actual launch item/material list and biome sources require approval.
+- **Fixed rarity by item type**, e.g. “Rare Iron Sword” vs “Common Stone Sword”; no random Rare/Epic roll of the same sword. Instances of an exact archetype may roll **small quality/stat variations**.
+- **Basic items are craftable anywhere**; advanced equipment uses a workbench. World workbenches offer **better minor quality-roll chances** at higher Crafting mastery; lobby workbenches use default quality.
+- **Every arrow recipe yields 10 arrows**. Stronger arrow recipes may require stronger materials and deliver increased damage.
+- **Starter pace:** A few raw materials per beginner recipe, **approximately ten minutes or less to craft the first gear set**. Exact contents/costs remain Open.
 
-| Sample output | Input sources / items (provisional) | Station | Core use |
-| --- | --- | --- | --- |
-| **Flint Hunter Spear** | Extracted flint, bone, fiber | Stonecarver | Reach-oriented ordinary melee weapon |
-| **Ironroot War Axe** | Iron ore, hide, hard resin | Smithy | High-cost heavy axe; slower normal attack |
-| **Reinforced Bow** | Rare tough wood, fiber, horn | Bowyer/Smithy | Improved bow with **slow physical arrows**, no special energy shots |
-| **Iron Arrows** | Extracted iron/wood/fiber | Bowyer/Smithy | Finite craftable arrow stack, ordinary projectile |
-| **Hunter's Field Kit** | Herb bundles, hide, cloth | Medical table | Several **single-use** medical items; each applies immediate healing |
-| **Restorative Tonic** | Herbs, purified ingredients, rare creature gland | Medical table | Immediate medical heal followed by visible animation cooldown |
-| **Long-Keeping Rations** | Farm-grown crops, preserved herbs | Cookfire/medical table | Food supply; gives **healing over time** |
-| **Stonework Reinforcement Pack** | Stone, iron fittings, resin | Smithy | Build/repair supplies; not a player shield |
-| **Tribe Claim Totem** | Wood, stone, crafted symbol | Field workbench | Claims nearby player-built structures for **decay protection only** |
-| **Rare Harvesting Pick** | Iron, rare ore and beast parts | Smithy | Nonmagical resource harvesting; indefinite item lifespan |
+### 19.2 Sample nonmagical recipes — costs Proposed
 
-Exact counts, material names, unlock conditions, output stats and station placement are **Open**. The item names above are illustrative. Rare plants, meteors, creatures, rituals and raidable structure events feed different recipes without requiring playable spellcasting.
+| Recipe | Illustrative ingredients | Confirmed constraints |
+| --- | --- | --- |
+| Basic Wood Spear | Wood, fiber | Simple any-location starter craft |
+| Stone Spear | Stone, wood, fiber | Ordinary melee equipment, playtest ~25 raw hit damage |
+| Stone Dagger | Stone, fiber | Fast short melee family |
+| Common Stone Sword | Stone, wood/fiber | Catalog rarity stays Common |
+| Basic Bow | Wood, fiber | Slow physical arrow projectiles |
+| Arrow Bundle | Wood + fiber (improved versions use upgraded tips) | **Output exactly 10 arrows** |
+| Rare Iron Sword | Iron, wood, refined materials | Separate defined Rare catalog archetype, small quality rolls at eligible field station |
+| Iron Helmet / Chest / Legs-Boots | Iron, hide, fiber | Three separate armor slots, EHP multipliers Open |
+| Basic / Advanced / Potion | Gathered herbs, prepared resources | Immediate HP +10 / +25 / +50, then animation cooldown |
 
-### 19.2 Costly Permanent conversions — illustrative
+### 19.3 Permanent conversion prototype — Confirmed pacing direction
 
-| Permanent conversion | Eligible securely extracted source | Additional scarce resources (example families) | Confirmed limitations |
-| --- | --- | --- | --- |
-| **Permanent Flint Hunter Spear** | Designer-designated Flint Hunter Spear | Rare flora component + meteor stone + boss/elite reagent | **Same source stats**, retains owner on death, manually droppable/tradeable |
-| **Permanent Ironroot Axe** | Designer-designated Ironroot War Axe | High-grade iron + unique resource + multiple event reagents | Same stats; requires costly multi-source extraction |
-| **Permanent Reinforced Bow** | Designer-designated Reinforced Bow | Rare tree wood + metal + hostile structure reward | Same bow velocity/damage properties; arrows remain craftable and consumable |
-| **Permanent Iron Armor** | Eligible designated iron armor piece | Rare metal + creature hide + boss/ritual material | Armor itself persists, but **no extra magical resistances** |
-| **Permanent Guardian Relic Weapon** | Eligible extracted Guardian weapon | Multiple scarce boss/event/resource materials | Not automatically permanent just because it dropped at 25% HP |
-
-**Confirmed:** Only specifically designated source items can be converted, conversion changes **death/ownership behavior but not stats**, Permanent gear may be **dropped, taken and traded**, and ingredient costs should be expensive and require multiple source families.
-
-**Open:** Exact amounts, first accessible conversion tier, post-death material upkeep/rearming (not durability), Permanent simultaneous equipment limits, future weapon eligibility, conversion source-affix preservation and drop/trade escrow UX.
-
-### 19.3 No launch enchantment system
-
-Earlier example recipes such as elemental storm bows, fire-infused spears, frost mantles or defensive wards are **archived concepts for potential future updates**, not requirements for the first playable game. **Elemental/skeleton/mythological enemy types remain permitted.** A ritual used to summon a world boss is a **resource interaction**, not player-cast combat magic.
-
+- **Only a designer-selected allowlist of item archetypes** can ever be Permanent converted. Some special items qualify; other special items **never qualify**. Rarity alone grants no eligibility.
+- Early conversion should plausibly need **a couple of successful extractions plus one rare public event**, not a guaranteed two-extraction unlock. This is the **first conversion progression target**; the rarest Permanent recipes remain substantially harder and depend on contested advanced encounters.
+- Converts one eligible **vaulted gear instance** using securely extracted reagents and Forge requirements. The exact **source roll/stats are preserved**. Permanent status protects ownership on death but permits intentional dropping/theft/trading, as confirmed.
+- Example source: designated iron weapon + suitable extracted common materials + reagent from a rare mob/tree/meteor event. Material counts, recipes and eligible catalog entries remain Open.
+- No field crafting of Permanent gear is implied; the protected hub forge is still the conversion destination.
 
 
 ## 20. Detailed player journeys
