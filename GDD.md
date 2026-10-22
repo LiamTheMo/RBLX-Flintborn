@@ -90,7 +90,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Gear withdrawn from vault for deployment | Extracted items and materials may be withdrawn, becoming ordinary at-risk gear on successful active Play admission | **Confirmed**; loadout limits Open |
 | Player progression | Player **levels** and recipe **discovery** both exist | **Confirmed**; exact XP curve/unlock combinations Open |
 | Bases and public world resets | On empty server **only world state resets**; **all already vaulted equipment/materials persist** | **Confirmed — Q3 clarified** |
-| Public world playstyles | Permanent skill mastery milestones give modest resource/other buffs and cosmetics across farming, PvP, building, crafting, hunting and exploration | **Confirmed**; exact buff caps Open |
+| Public world playstyles | **Exactly five mastery tracks:** Mining, Woodcutting, Farming, Crafting and PvP, capped at 10 with a buff each milestone level. Cosmetics persist. Other activities still grant XP/quests but no separate mastery track | **Confirmed Q71–80**; thresholds and stat caps Open |
 | Account currencies | Persistent **Coins** and premium-leaning but earnable **Gems**; player XP/levels, crafting mastery and rebirth tokens | **Confirmed**; rates/prices Open |
 | Trading | **Direct player trades only**; raw materials tradable only if catalog-designated rare/Exclusive; Permanent items remain tradeable | **Confirmed**; catalog/trade policy specifics Open |
 | Rarity ladder | Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive | **Confirmed** |
@@ -456,7 +456,7 @@ These are the official labels **in this order**. Specific colors, drop probabili
 - **Levels/XP:** Persistent player levels, no skill tree; some recipes unlock by level and discovery.
 - **Crafting mastery:** Repeated meaningful crafting yields its own long-term mastery milestones, recipe/efficiency benefits (exact values Open).
 - **Five confirmed masteries only:** Mining, Woodcutting, Farming, Crafting and PvP. Each has a **level-10 cap** and **buff every milestone level**; relevant resource yield has a starting **+1% per level**. Crafting covers efficiency/batch/speed/recipes, PvP both combat and noncombat, with permanent cosmetics and lobby visibility. All other activities may give general XP/quests but are not separate mastery tracks.
-- **Rebirth:** Completing a future defined rebirth condition grants **tokens** that can be spent on **perks**. This is a perk store/loadout rather than a branching skill tree. What resets, token amounts, whether perks are permanent and how perks stack are Open.
+- **Rebirth:** Requires **general level requirement AND endgame challenge**, with progressively higher costs. **Resets general level to 1**, preserving secure vault and protected progress. Tokens buy **permanently active**, sometimes multirank perks; no slots or skill trees. **Respec with earned Gems, Robux or promo codes.** Token quantities, thresholds and perk caps Open.
 - **Balance:** Resource yield perks **may stack with central 2× material extraction**, which also doubles rare crafting ingredient quantities. Model that intentionally. Small permanent buffs should support endgame optimization without removing the cost of rare objectives.
 - **High-end gate:** The **rarest Permanent equipment cannot be obtained solely through farming or building**; certain high-tier recipes/material sources require high-risk bosses/PvP-contested events or equivalent specified encounters. Standard playstyle masteries remain available to peaceful gatherers/builders.
 - **Currency sinks (Proposed):** Vault upgrades, food/medicine/arrows, visual items, conveniences, service fees and cosmetic/economy vendors. Do not infer raw-material player trading from NPC currency exchanges.
@@ -1528,7 +1528,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 ### 35.5 Decisions still open after questions 25–48
 
-**High priority for implementation:** (1) food HoT cancellation amount/duration, (2) medical animation cooldown, (3) revive hold/finish rules, (4) melee/projectile speed, (5) totem radius/decay/house takeover, (6) PvP-safe POIs, (7) event weights/timing, (8) player-level-vs-gear boss scaling, (9) Permanent recovery and slots, (10) Coin/Gem earn rates, mastery stacking, rebirth resets/token perks and premium feature parity. **Vault persistence and Center 2× material/XP are Confirmed**, not Open.
+**Retrospective Q25–48 note — superseded in part by Q61–89:** Food HoT is now **10 seconds**, hit halves pending healing with ≤10 HP cutoff, and tribe revival is **10 seconds**, after 20 armor-protected downed HP. Five level-10 mastery tracks and a rebirth level-1 reset are confirmed. **Still Open:** medical animation lengths, post-revive HP, attack speeds, armor tier multipliers, totem decay/claims, safe POIs, event weights, boss scaling, Permanent costs/slots, Coin/Gem rates, mastery milestones, rebirth perks and platform entitlement mapping.
 
 **Owner questions 49–60 were answered on 2026-10-22**; see §36 for confirmed account economy, rarity, permanent mastery/XP, appearance, onboarding and accessible monetization. Precise numeric tuning and platform-native purchasing mechanics remain Open.
 
@@ -1547,14 +1547,14 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **50** | Trade mode | **Direct player-to-player trading only**, not marketplace or auction | Venue, item/currency eligibility and safe transfer |
 | **51** | Rarity | **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive** | Drop odds, visuals, Exclusive availability |
 | **52** | Player advancement | **XP, levels and crafting mastery; NO skill trees** | XP thresholds, mastery awards, level gates |
-| **53** | Playstyle growth | **Permanent masteries** with modest milestone buffs/cosmetics; later **only Mining, Woodcutting, Farming, Crafting and PvP** are selected | Q71–80 later fixed five tracks, max level 10 and per-level buffs |
-| **54** | Mastery duration | Mastery buffs are **permanent account progression** | Interaction with voluntary rebirth resets |
+| **53** | Playstyle growth | **Five permanent mastery tracks**: Mining, Woodcutting, Farming, Crafting, PvP; level-10 cap, per-level buff, cosmetics | **Confirmed Q71–80**; milestone thresholds/effects Open |
+| **54** | Mastery duration | Buffs are **permanent account progression retained after rebirth** | **Confirmed Q82**; no rebirth wipe of intended protected masteries |
 | **55** | Farmer/builder progression | **Cannot earn the very rarest Permanent gear solely by farming/building** | Which high-tier encounter ingredients/requirements apply |
 | **56** | Material sourcing and trades | Materials **mainly mined/gathered**, with **quests and world events**; no general raw-material trading, **except specific designer-eligible rare or Exclusive materials** | Eligible item allowlist, source/quest rewards |
 | **57** | Art | **Primitive, blocky Booga Booga look** with more detail in **map, structures and equipment** | Exact style bible, palette, asset budget |
 | **58** | Camera | **Adjustable camera** | Zoom limits, first-person toggle and PvP fairness |
 | **59** | Onboarding | **Tutorial and guided quests** for stronger first-player impression | Skippable vs forced, quest rewards, safety |
-| **60** | Monetization/rebirth | Cosmetics, passes, premium conveniences, private-server-style options and more; **every monetized benefit must also be obtainable with sufficient playtime and earned currency/resources**. **Rebirth grants tokens spent on perks.** | Store catalog, tokens and reset semantics, platform compliance, perk balance |
+| **60** | Monetization/rebirth | All monetized benefits have earnable alternatives; rebirth requires level and challenge, increases in cost, resets general level to 1 and grants tokens for **permanently active** perks | Actual tokens, thresholds, respec fees, platform billing and numeric perk caps Open |
 
 ### 36.2 Coins, Gems, offers and purchasing parity
 
@@ -1616,7 +1616,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 6. Show the secure lobby vault and reassure that **all deposited gear/materials stay saved**, then preview Coins/Gems, XP/levels, eight rarity tiers, masteries and rebirth token perks.
 7. Offer guided quests with early but balanced progression; exact quests, skips, rewards, tutorial location and whether new players get PvP protection remain Open.
 
-### 36.6 Acceptance tests for GDD v0.8
+### 36.6 Acceptance tests: v0.8 baseline updated by Q61–89
 
 1. Empty world wipes **all temporary live-world state** but preserves **ordinary/rare vault items, Permanent gear, currencies, XP, mastery and entitlements**.
 2. Center extraction of 1 rare ore/reagent banks **2** and awards **2× XP**. Repeated requests/reconnections **never repeat** this bonus.
@@ -1635,9 +1635,9 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 - **Confirmed:** Center 2× applies to **all current-run player XP and mastery XP**, including XP saved before extraction; ordinary death preserves base progress. **Open:** Whether Coins/Gems also multiply, exact XP multiplier stacking and bonus interaction with other earned XP modifiers.
 - Vault overflow handling when bonus stacks legitimately double and capacity is upgradeable.
-- Rebirth eligibility, exact voluntary reset/retention policy, token amounts and perk catalog/caps.
+- **Confirmed rebirth rules:** General level and completed challenge required, progressively harder/costlier; general level resets to **1**, protected vault/masteries/owned perks preserved. **Open:** threshold, challenge, cost curve, tokens per rebirth, optional effects on Coins/Gems and perk balance.
 - Detailed Coin/Gem sources, premium earn rates, entitlement equivalence and platform purchase feasibility.
-- Mastery level curves, perk stat caps, buff stacking and endgame item acquisition through trade.
+- **Confirmed mastery rules:** Exactly five milestone-based level-10 tracks, buffs every level, baseline +1% per level to applicable resource yields and both additive/multiplicative modifier types. **Open:** action-count milestones, PvP/other perk caps, crafting allocation and top-tier gear trade restrictions.
 - Which exact rare/Exclusive raw materials may be traded, and whether currencies may be offered in direct trades.
 - Secret and Exclusive acquisition rules, drop rates, cosmetic rarity presentation.
 - Tutorial structure, safe training environment versus live-world risk, and adjustable camera bounds.
@@ -1764,4 +1764,4 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 
 ---
 
-**Working principle:** Flintborn combines **protected pre-spawn Play**, death-triggered lobby ejection, random map spawning, **open PvP** with explicitly safe POIs, primitive click melee and slow crafted-arrow bows, **health/food/sprint-only stamina**, instant medicine and food HoT, **60-second tribe revives**, 8-member tribes, Booga Booga-style totem-protected but always-raidable bases, weighted publicly announced rare events, server-shared 120-second extraction (or rare 30-second anywhere rune), secure vault crafting and transferable death-retained Permanent gear. **No playable magic, firearms, shields or equipment durability wear at launch.** Proposed rates, metrics and future features require approval.
+**Working principle:** Flintborn has protected Play admission, open-world PvP with rare safe POIs, random map spawn and death-triggered lobby ejection. Launch combat starts at **100 base HP** with effective-HP armor; rock 5 / wooden spear ~15 / stone spear ~25 raw hit targets, **3-second sprint / 5-second recovery**, five-minute food depletion, instant medical heals of **10/25/50 HP** and food healing over 10 seconds. Tribe members have **20 downed HP, a 60-second timer and 10-second revives**. Five permanent masteries cap at level 10, with a buff at each level. Rebirth resets general level to 1 and grants tokens for permanently active perks. Public islands have raidable totem-based buildings, weighted announced events and server-shared **120-second fixed extraction** or rare **30-second portable rune**. Center exit gives **2× materials and all current-run XP**, while all successfully vaulted gear remains saved across world resets. No player magic, firearms, shields or gear durability at launch. Remaining balances are Open.
