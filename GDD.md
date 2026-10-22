@@ -788,20 +788,20 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 
 ### 21.1 Combat vocabulary — Confirmed / Proposed stats
 
-- **Click melee:** Simple, readable hit animations using valid equipped spears, swords, clubs or axes; attack speed, recovery and reach are item stats to be balanced. **Melee consumes no stamina.**
+- **Click melee:** Initial rock attack **5 raw damage per hit** with relatively high cadence; **wooden spear ~15**, **stone spear ~25** per hit, slower but with longer reach. Spear numbers remain tentative balance targets. Combat animations and precise rates/reach are Open. **Melee consumes no stamina.**
 - **Bows:** Physical arrow projectiles with **deliberately slower visible travel**, craftable finite arrows and server-authoritative collision. **Shooting consumes no stamina.** Exact speed, gravity and falloff TBD.
-- **Sprinting:** Drains stamina until fatigued, then stamina regenerates according to a tuned rule. **Only sprinting uses stamina**.
+- **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; regen delay/partial-sprint behavior, pace and speed remain Open.
 - **Crouching:** Low profile/stealth/movement choice; does not consume stamina. Sprinting and crouch interactions are implementation choices.
-- **Medicine:** Instant HP restoration, then cooldown expressed through the animation duration. Cannot stack instant heals through repeated/parallel RemoteEvents.
-- **Food:** Food item heals over time; incoming damage partially interrupts remaining healing, exact amount Open.
-- **Armor:** Ordinary physical damage protection; armor items remain usable indefinitely with **no degradation/breaking**. Rare specialized defenses are a *future-update idea*, not a launch mechanic.
+- **Medicine:** Basic **+10 HP**, advanced **+25 HP**, potion **+50 HP**, applied immediately up to the player's gear/upgrade-modified max HP; **tier-varying post-heal animation** enforces reuse cooldown. Cannot stack through repeated/parallel remotes; duration per tier remains Open.
+- **Food:** Full meter decays in **5 minutes**; strictly **below 25%** gives a **10% movement-speed penalty**. Food heals different HP totals over **10 seconds**; each hit halves remaining heal, and if post-hit remainder ≤10 HP, cancel the remainder.
+- **Armor:** Armor modifies **effective HP (EHP)** using a multiplier, not direct flat damage reduction: **EHP = current HP × armor factor** and damage applies to EHP; convert back to displayed actual HP (§21.5). Early armor multipliers are slightly different but visibly useful. Equipment remains indefinitely durable; magical/special resistance is future-only.
 - **No player magic/shields:** Skeletons, elementals and other mythical adversaries remain enemy content; magic attacks, magical barriers and dodge/stamina combos are out of launch scope.
 
 ### 21.2 Downed and revival tactical balance
 
 - A **solo non-tribe** character reaching lethal HP dies and is ejected to lobby; their body remains on the island 10 minutes.
 - A **tribe member** receives a **60-second** downed window. A valid tribe revive interaction **pauses** this timer; cancellation **resumes remaining time**. Death/ejection occurs if unpaused time is exhausted.
-- Revive time, restored HP, reviver interruption on incoming damage, execution/finish mechanics and one-member-only eligible tribes need balancing. No revives of already-dead/ejected characters in the same world.
+- **Confirmed:** Revive takes **10 continuous seconds**, which pauses the **60-second bleed-out timer**; interruption resumes time remaining. Tribe character has **20 downed HP** at normal 0 HP; enemies can **finish at any moment**, requiring armor-adjusted damage sufficient to exhaust that pool. **Open:** normal HP restored on revival, reviver interruption/crawl/finishing UI. No revival after final death/ejection in same world.
 - Tribe cap is **8** and all worlds remain PvP-enabled except explicitly protected POIs. No respawn in the same world, including from beds.
 - Social implications: tribe members must eventually extract and return to lobby to regroup with a dead comrade. There is no short death → sprint back → corpse-loot loop in that instance.
 
@@ -814,6 +814,25 @@ High-value gear improves outcomes through ordinary damage/range/armor/rarity dif
 Measure melee duel duration, arrow velocity readability, damage accuracy under mobile latency, sprint duration, medicine-use cadence, food HoT completion after repeated attacks, successful revives (incl. paused timers), tribe versus solo survivability, raid time against wood/stone/iron and event reward extraction rates. Bosses scale by an average **player level or gear level** population signal, with anti-exploit normalization yet to be designed. The Guardian's original 15–20-minute timing stays as a separate established concept.
 
 
+
+### 21.5 Effective-health armor mathematics — Confirmed model / Open armor values
+
+**Confirmed intention (Q67):** Armor scales the amount of **effective HP** rather than subtracting a fixed damage-reduction value on every attack. Base player max HP is **100**, and upgrades/gear may increase maximum HP. Initial armor tiers provide only **small multiplier differences** so each upgrade feels worthwhile without overwhelming primitive weapon damage.
+
+Define:
+
+- \(H\) = actual current HP (maximum \(H_{\max}\); base \(H_{\max}=100\)).
+- \(A\) = final armor **EHP multiplier**, with unarmored baseline \(A=1.0\). Values for hide, wood, stone and iron armor are **Open**, and \(A\) must be a finite, server-authorized positive number.
+- \(E = H\times A\) = effective HP remaining. \(E_{\max}=H_{\max}\times A\) is effective maximum HP.
+- Incoming raw damage \(D\) reduces effective HP: \(E'=\max(0,E-D)\).
+- Convert back to actual HP: \(H'=\max(0,E'/A)\), equivalently \(H'=\max(0,H-D/A)\), and clamp to \(H_{\max}\).
+- **Downed** uses the same \(A\) with a separate initial \(H_{\mathrm{down}}=20\) HP pool: attacks consume effective downed health using \(D/A\), without resetting normal HP.
+
+**Illustrative math, *not* finalized armor tier balance:** At 100 HP and hypothetical \(A=1.2\), the player has 120 EHP. A raw 24-damage hit leaves 96 EHP and **80 actual HP**, not 96 actual HP. If downed at 20 HP with that same armor, the downed character has 24 EHP and needs 24 total raw damage (absent other effects) to be finished.
+
+**Important clarification:** The shorthand “armor × health = EHP; EHP − damage = HP after damage” mixes effective and actual HP units. The design uses exactly the requested **armor-scaled EHP** while converting back by dividing by \(A\); otherwise HP UI, healing and lethal/downed thresholds would be inconsistent. An armor value can be displayed as a factor or stat points converted into \(A\), but that mapping, additive/multiplicative composition and early-tier values remain Open.
+
+**Potential health-upgrade interaction:** Increasing \(H_{\max}\) and increasing \(A\) are separate advantages and multiplicatively improve survivability. Max limits, round-to-display precision, fractional HP, armor swaps during combat, stacking mastery/rebirth health buffs, food healing with raised max HP and damage floors must be specified before launch.
 
 ## 22. Detailed inventory, extraction and death state transitions
 
