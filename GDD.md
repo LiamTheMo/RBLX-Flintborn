@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.3  
+> **Design revision:** 1.4  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -30,12 +30,14 @@
 
 **Owner answers Q154–158 (2026-10-22):** **Anything over a capacity limit is deleted** (material units above 1,000 per secure stack and incoming items beyond the 50-slot lobby backpack). **Pressing Play deploys every unvaulted lobby backpack/hotbar item into the run.** Permanent items **stay in the owner's backpack/hotbar on death** with no reclaim step or fee, players may own/carry **unlimited** Permanent items, and a dropped Permanent item left on the ground when the world resets is **lost**. **Any logout during active play forfeits carried items**; a whole-server crash mid-fight should return items where technically possible. **Strangers may share an extraction**, the activator's death does not affect it, zone radius is authored per site, a portable rune extracts **everyone who fits in its zone**, may be placed anywhere **except inside structures**, and **never grants the Center 2× bonus**. See §41.
 
+**Owner answers Q159–161 (2026-10-22):** Totems upgrade through **three levels with 500 → 1,000 → 2,500 HP** and a growing radius; **no structure can be taken over while a covering tribe totem stands**. **Anyone can revive** a downed player, **one reviver at a time**, and **damage to the reviver does not stop the revive**; downed players **crawl very slowly and cannot heal**; **no protection after revive**. **No friendly fire** and **no spawn protection**, but spawns must be **away from other players**. **0% food has no extra effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Safe POIs are specific locations to be designed later. Event items are handled **per item**, marked with an **"event" tag**. **Admin kick commands only ever perform a safe kick.** A dead player cannot rejoin that server, so the **whole tribe extracts, parties up in the lobby and starts a new run**. See §42.
+
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
 ### Document navigation
 
 - **Gameplay foundation:** [Core loop](#2-core-run-structure), [Shattered Crater](#3-world--the-shattered-crater), [survival/equipment](#4-primitive-progression-resource-gathering-and-food), [combat/revival](#5-combat-movement-tribes-and-revival), [bases](#6-booga-booga-style-construction-claims-farms-and-raids).
-- **Contested objectives:** [Category event director](#7-weighted-world-event-system-and-public-announcements), [Guardian/boss scaling](#8-guardian-mega-boss-and-scalable-encounters), [extraction and custody](#9-extraction-and-permanent-vault), [Coins/Gems, shops, trades](#10-coin-shops-extraction-resale-economy-currencies-and-storage), [Q116–150 ledger](#39-owner-approved-questions-116150-october-22-2026), [Q154–158 answers](#41-owner-answers-q154158-overflow-deployment-permanent-retention-logout-and-extraction).
+- **Contested objectives:** [Category event director](#7-weighted-world-event-system-and-public-announcements), [Guardian/boss scaling](#8-guardian-mega-boss-and-scalable-encounters), [extraction and custody](#9-extraction-and-permanent-vault), [Coins/Gems, shops, trades](#10-coin-shops-extraction-resale-economy-currencies-and-storage), [Q116–150 ledger](#39-owner-approved-questions-116150-october-22-2026), [Q154–158 answers](#41-owner-answers-q154158-overflow-deployment-permanent-retention-logout-and-extraction), [Q159–161 answers](#42-owner-answers-q159161-totems-revives-pvp-food-event-items-kicks-and-regrouping).
 - **Long-term progression:** [Special crafting / Permanent](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent ownership](#17-permanent-gear-death-protection-and-ownership-transfer), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [nonmagical recipes](#19-launch-equipment-starter-crafting-and-permanent-eligibility), [persistent masteries](#33-five-permanent-masteries-levels-and-milestone-buffs).
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
 - **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-five-permanent-masteries-levels-and-milestone-buffs), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
@@ -116,7 +118,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 3.1 Spatial rules — Confirmed
 
-- After successful Play admission, the first risk-bearing character **spawns at a randomly selected valid location anywhere on the map**, not automatically on the outskirts. The protected loading menu remains loss-free. Precise spawn validation and whether designated safe-zone POIs may host spawns are Open.
+- After successful Play admission, the first risk-bearing character **spawns at a randomly selected valid location anywhere on the map**, not automatically on the outskirts. The protected loading menu remains loss-free. **Confirmed Q160:** there is **no spawn protection**, but the spawn picker must place players **away from other players**; the minimum distance and whether safe-zone POIs may host spawns are Open.
 - Rare objectives and high-value extraction routes increasingly expose players to conflict.
 - A **50-meter no-build Holy Aura** protects **all extraction portals/runes** from player construction that would enclose or obstruct them.
 - The Mega-Boss can destroy player-built structures near its arena, preventing structure-based fight exploits.
@@ -176,7 +178,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
 - **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. Whether recovery pauses on renewed sprint or begins after sprint ends, sprint speed and stamina UI granularity remain Open.
-- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. Drain modifiers, refill quantities and zero-food additional penalties are Open.
+- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
 ### 4.4 Recipes and Permanent equipment
@@ -198,7 +200,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 **Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement lock/speed during the animation remains Open.
 
-**Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. Stacking several food heals, pause/tick timing and whether the duration resets on hit are still Open.
+**Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. **Confirmed Q160:** several food heals **may run at the same time**, and alongside instant medicine. Pause/tick timing and whether the duration resets on hit are still Open.
 
 **Potential item names** (Fiber Bandage, Herbal Poultice, Restorative Tonic, Healing Potion) and ingredients are examples, not official content. Unlimited-use medical gear and Permanent-converted healing consumables are excluded.
 
@@ -213,7 +215,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Confirmed:** No usable shield, blocking/guard-meter combat mechanic, player-cast magic or magical attacks for launch. Advanced weapon combos and alternate ranged families remain possible future decisions.
 - **Confirmed:** PvP is enabled **everywhere in the active play world except clearly designated safe-zone POIs**. Random world spawning must honor safe player-admission initialization but does not automatically guarantee PvP immunity.
 - **Proposed:** All damage and hit detection are server-validated with bounded latency compensation, distance/arc checks and rate limits. Different ordinary weapons may vary in reach, cadence or damage without needing complicated launch combat.
-- **Open:** Friendly fire within a tribe and across alliances, spawn invulnerability if any, safe-zone list/boundaries, projectile travel speed, aim support on controller/mobile and damage scaling.
+- **Confirmed Q160:** **No friendly fire** and **no spawn invulnerability**; spawns are placed away from other players. Safe-zone POIs are specific locations to be designed later.
+- **Open:** Whether allied tribes are also covered by no-friendly-fire, safe-zone list/boundaries, projectile travel speed, aim support on controller/mobile and damage scaling.
 
 ### 5.2 Tribe membership and social functions
 
@@ -228,13 +231,13 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 1. **Solo non-tribe character:** Ordinary HP reaching **0** means immediate death. Ordinary items transfer to a 10-minute lootable body, and the character is **ejected to the separate lobby**, with no same-world respawn.
 2. **Tribe member:** When normal HP reaches **0**, enter the **Downed** state with a separate **20-HP downed pool**, and start the existing **60-second unpaused rescue window**. These 20 points apply *after* the normal health bar hits zero, not as extra regular HP before downing.
 3. **Finishing attacks are permitted immediately.** The downed player remains damageable; opponents can kill them by exhausting the **20 downed HP** even before the 60-second window expires. **Armor protection continues to apply**, using the same EHP calculation (§21.5), including during revival.
-4. A valid tribe member starts a revive that needs **10 continuous seconds**. While an eligible revive is actively running, **pause** the remaining 60-second downed timer. This pause **does not make the downed player invulnerable**.
+4. **Any player** may start a revive (Q159) that needs **10 continuous seconds**. **Only one reviver at a time**; damage to the reviver **does not** stop it. While an eligible revive is actively running, **pause** the remaining 60-second downed timer. This pause **does not make the downed player invulnerable**.
 5. If the revive cancels, is interrupted or becomes invalid, the rescue timer **resumes from its exact remaining duration** (not 60 fresh seconds). Only validated active revivers may hold the pause; disconnected or distant actors cannot freeze it indefinitely.
 6. After **10 uninterrupted valid revive seconds**, return to ActiveRun without corpse or new-world spawn. **Normal HP restored on revival is Open**; never infer that the 20 downed HP automatically becomes post-revive HP.
 7. Death occurs if the 20 downed HP reach zero after armor-adjusted damage, **or** 60 seconds of *unpaused* downed time elapse. Generate one lootable body (600-second TTL), eject to lobby and apply same-JobId rejoin denial. An attack can finish the downed person **while another person is reviving them**.
 8. The **8-player maximum tribe** and no same-world respawns (including beds) remain. Downed players do **not** qualify as alive for portal extraction until successfully revived.
 
-**Confirmed:** Downed health **20**, revive **10 seconds**, rescue timer **60 unpaused seconds**, valid revive pauses timer, cancelled revive resumes it, opponents may finish immediately, and armor affects damage while downed. **Open:** Post-revive normal HP, allied-versus-tribe reviver eligibility, whether incoming damage interrupts *the reviver's* action, whether downed players crawl or can heal, multiple reviver behavior and any temporary protection after revival.
+**Confirmed:** Downed health **20**, revive **10 seconds**, rescue timer **60 unpaused seconds**, valid revive pauses timer, cancelled revive resumes it, opponents may finish immediately, and armor affects damage while downed. **Post-revive HP resolved by Q136** (10% of max EHP). **Confirmed Q159:** anyone can revive; one reviver at a time; damage to the reviver does not interrupt; downed players **crawl very slowly** and **cannot heal**; **no protection after revive**. **Open:** crawl speed and revive range.
 
 
 ### 5.4 Medicine, food and sprint timing
@@ -242,7 +245,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
 - **Food:** Every food grants its item-specific healing total over **10 seconds**; each damaging hit halves the *remaining unapplied* healing, cancelling it if the post-hit remainder is **≤10 HP**. Previously healed HP is not taken away by this cancellation rule.
 - **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **5 minutes** to go from full to empty; below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
-- **Downed:** Pending revive and death rules supersede medical-use/attack inputs while downed (exact allowed downed actions still Open).
+- **Downed (Q159):** Players may only **crawl very slowly**; no medicine, food or other healing. Pending revive and death rules supersede all other inputs.
 
 ### 5.5 Combat integrity and spawn safety
 
@@ -270,8 +273,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 6.2 Material-upgradeable totems, overlap and full unclaimed decay — Confirmed Q144–146
 
-- **Totem starting coverage:** A basic tribe claim totem protects roughly **a small hut-size footprint**. Players can spend **appropriate harvested/crafted materials to upgrade its influence radius** for compounds and later larger bases. Numeric radii, upgrade tiers/prices and map-scale relationship remain Open.
-- **Totem regions can overlap**, including rival tribes. **Ownership stays with the ORIGINAL builder/tribe until a valid takeover** — a new overlapping claim alone does **not** overwrite it. Exact takeover trigger, transfer procedure, capture time and whether structures may be contested simultaneously remain Open.
+- **Totem starting coverage:** A basic tribe claim totem protects roughly **a small hut-size footprint**. Players can spend **appropriate harvested/crafted materials to upgrade its influence radius** for compounds and later larger bases. **Confirmed Q159:** the totem has **three levels with 500 → 1,000 → 2,500 HP**, and its radius **grows with each upgrade**. Numeric radii, upgrade prices and map-scale relationship remain Open.
+- **Totem regions can overlap**, including rival tribes. **Ownership stays with the ORIGINAL builder/tribe until a valid takeover** — a new overlapping claim alone does **not** overwrite it. **Confirmed Q159:** **no structure can be taken over while a covering tribe totem stands**, so takeover first requires destroying that totem. The procedure after the totem falls remains Open.
 - **Totem function:** Protects nearby **player-built** structures from natural decay, never from combat damage; no tribe can claim **server-generated buildings**. Storage is openable by anyone who can physically reach it.
 - **Confirmed Q146:** An unclaimed building **completely disappears within 4–6 minutes** after becoming unprotected, not a decay-damage tick every 4–6 minutes. The timer uses **5 minutes ± one minute** as an initial random total lifetime. Properly claimed pieces persist while server lives, but may be raided normally.
 - **Proposed state handling:** On loss of totem coverage, server assigns per-structure random expiration deadline of 240–360 seconds; replacing/upgrading/reclaiming totem protection stops decay and resolves old timer without duplication or perpetual flicker. Actual paused vs restarted behavior remains Open.
@@ -842,8 +845,8 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 ### 21.2 Downed and revival tactical balance
 
 - A **solo non-tribe** character reaching lethal HP dies and is ejected to lobby; their body remains on the island 10 minutes.
-- A **tribe member** receives a **60-second** downed window. A valid tribe revive interaction **pauses** this timer; cancellation **resumes remaining time**. Death/ejection occurs if unpaused time is exhausted.
-- **Confirmed:** Revive takes **10 continuous seconds**, which pauses the **60-second bleed-out timer**; interruption resumes time remaining. Tribe character has **20 downed HP** at normal 0 HP; enemies can **finish at any moment**, requiring armor-adjusted damage sufficient to exhaust that pool. **Open:** normal HP restored on revival, reviver interruption/crawl/finishing UI. No revival after final death/ejection in same world.
+- A **tribe member** receives a **60-second** downed window. A valid revive interaction by **any player** (Q159) **pauses** this timer; cancellation **resumes remaining time**. Death/ejection occurs if unpaused time is exhausted.
+- **Confirmed:** Revive takes **10 continuous seconds**, which pauses the **60-second bleed-out timer**; interruption resumes time remaining. Tribe character has **20 downed HP** at normal 0 HP; enemies can **finish at any moment**, requiring armor-adjusted damage sufficient to exhaust that pool. Revive restores 10% max EHP (Q136); damage to the reviver does not interrupt, one reviver at a time, downed players crawl slowly and cannot heal, no post-revive protection (Q159). **Open:** finishing UI and crawl speed. No revival after final death/ejection in same world.
 - Tribe cap is **8** and all worlds remain PvP-enabled except explicitly protected POIs. No respawn in the same world, including from beds.
 - Social implications: tribe members must eventually extract and return to lobby to regroup with a dead comrade. There is no short death → sprint back → corpse-loot loop in that instance.
 
@@ -1177,7 +1180,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 4. **Confirmed:** Permanent equipment can transfer through deliberate ground drop/pickup or **direct player-to-player trade**. No auction/global market. **Open:** Gift UI, trade safeguards and unclaimed drop fate.
 5. Ordinary vaulted item withdrawal and reconnection handling.
 6. Item-instance provenance, cross-server session locking and operation journal semantics.
-7. How event-critical unique items are represented and multiplied/valued on extraction.
+7. **Confirmed Q161:** Event items are handled **per item** in the catalog (stackable material vs unique instance decides whether the center 2× applies), and carry an **"event" tag**.
 
 **P1 — can remain proposed through first prototype, then tune:**
 
@@ -1267,7 +1270,7 @@ Administrators need commands to remove players **without losing their items when
 ### 30.3 Permission, grief and abuse safeguards
 
 - Authorize commands using server-held administrator IDs/roles and restricted command dispatch; never trust client-provided permission tags or arbitrary RemoteEvent requests.
-- **Proposed:** Separate ordinary moderation kick (may exclude rejoin) from audited **safe-update kick** (preserves items and notifies player). Exact command names and treatment of punitive kicks remain **Open**.
+- **Confirmed Q161:** Admin kick commands are wanted, but **every kick command only performs a safe kick** that preserves items and notifies the player. There is no item-forfeiting moderation kick. Exact command names remain **Open**.
 - Update shutdown should safely process all active player snapshots; pre-spawn menu players never had risky inventory so retain their reserved loadouts without world body creation.
 - Record initiator, timestamp, update version, server job/run ID, affected sessions, escrow operation IDs and success/error status.
 - Never allow players to spoof a maintenance kick with a client disconnect, intentionally triggering a crash, or asking a player-owned NPC to end the session.
@@ -1386,7 +1389,7 @@ The event director **ticks periodically** and uses **weighted rarity** to decide
 **Confirmed:** Booga Booga-inspired placement; wood → stone → iron initial structure tiers; farms, chests, workstations, furniture, beds and other functional objects are desirable. Player bases remain for others after owners leave, subject to **unclaimed decay**, and are **raidable around the clock** with ordinary weapons/tools.
 
 - **Tribe claim totems:** Nearby player-built structures resist natural decay, not raids. **Totem areas can overlap**; radius depends on map size. Without valid totem, full decay takes **~4–6 minutes** under Q114 working interpretation; conflict priority/duration semantics Open.
-- **Takeover:** A deserted base may be occupied by a different group even if its original owners left. Replacing/destroying claim totems and transferring structural ownership need a ruleset; unclaimed storage is already accessible to anyone.
+- **Takeover:** A deserted base may be occupied by a different group even if its original owners left. **Q159:** no takeover is possible while a covering tribe totem stands; the totem (500/1,000/2,500 HP by level) must be destroyed first. Unclaimed storage is already accessible to anyone.
 - **Storage:** **All players can access world storage** once they can reach it. A locked chest concept must not override this rule. Terrain/building walls may prevent physical access until raided.
 - **Farms:** Crops and planted trees grow **as long as that server is populated**, even after the farmer leaves. When the world empties, plants, buildings and all other world state disappear.
 - **Structure sources:** Server-generated ruins, outposts and structures remain world-owned, **never** claimable through a tribe totem. They may be raided and looted.
@@ -1536,7 +1539,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **30** | Medicine and food | **Medical items and potions heal instantly on use; the following animation is the cooldown**. **Food grants healing over time; taking damage partially interrupts HoT**. | Instant heal size; animation lengths; precise damage interruption amount |
 | **31** | Gear wear and defenses | **Equipment lasts indefinitely**, with no equipment durability wear/breaks. Special defensive traits can be a future update. | Baseline armor mitigation (Permanent recovery cost rejected, Q156) |
 | **32** | Tribal down/revive | Tribe members have **60 seconds** of unpaused downed time; valid revive pauses countdown, cancel resumes; solo players die immediately | **Later Q68 confirmed:** revive 10 seconds, 20 downed HP, armor still applies and enemies can finish; post-revive HP Open |
-| **33** | PvP and spawn | **Random spawn location anywhere on the map**; PvP enabled **everywhere**, except designated POIs with explicit safe zones | Spawn candidate validation, safe-zone list, friendly fire, spawn damage timing |
+| **33** | PvP and spawn | **Random spawn location anywhere on the map**; PvP enabled **everywhere**, except designated POIs with explicit safe zones | **Q160:** no friendly fire, no spawn protection, spawn away from others; safe POIs designed later |
 
 **PvP state semantics:** A living active player can be damaged inside almost any world zone, including while raiding, farming or handling extraction. Protected pre-spawn menus and post-extraction animation remain exceptions. A safe POI, if one exists, must be explicitly mapped and server-enforced; a private base/totem never creates a safe zone.
 
@@ -1551,13 +1554,13 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **36** | Material tiers | **Wood → stone → iron** for initial building; later tiers follow actual material additions | Structure stats and prices |
 | **37** | Bases and decay | Owner-away bases remain live; totem claim regions may overlap and protect against decay. **Unclaimed structures expire in ~4–6 minutes** as initial full-lifespan interpretation | Radius, ownership conflict, decay timing details Open |
 | **38** | Raiding | **Any time**, including absent owners; **no specialized raid tools required**. | Damage values and raid pacing |
-| **39** | Tribe rules | Maximum **8** players; invite, kick, alliances. Tribes claim **only player-built** structures, **not generated structures**. **World storage can be opened by anyone**. | Leader succession, alliance FF, access through doors and exact claim rules |
-| **40** | Respawn and regroup | **No respawn in same server**. Death sends player to **lobby**, and they must **wait for their tribe to return to lobby** to play again with that tribe's expedition. | Queuing/new-world invite and session transfer interface |
+| **39** | Tribe rules | Maximum **8** players; invite, kick, alliances. Tribes claim **only player-built** structures, **not generated structures**. **World storage can be opened by anyone**. | Leader succession, alliance FF, access through doors (**Q159:** no takeover while a totem stands) |
+| **40** | Respawn and regroup | **No respawn in same server**. Death sends player to **lobby**, and they must **wait for their tribe to return to lobby** to play again with that tribe's expedition. | **Q161:** whole tribe extracts, parties up in lobby and starts again; party UI Open |
 | **41** | Farming | **Yes** to planting/cultivating trees and crops; may continue growing while farmer is away if public server remains active | Growth cycles, plant categories, grief/crop harvesting |
 
 **Totem versus vault:** A tribe totem is a **structural claim/anti-decay mechanism**, not secure storage, raid immunity or a place to revive dead players. Ordinary storage is public-accessible if reachable. Server-generated structures remain world-owned and cannot be claimed.
 
-**Takeover:** An unguarded house does not vanish just because its owner leaves. Another player/tribe may enter, use accessible inventory and potentially take control. Exact claim-transfer procedure must be designed without violating the existing public-build and no-scheduled-wipe rules. As soon as the last player leaves the world, the entire temporary world resets, regardless of totems.
+**Takeover:** An unguarded house does not vanish just because its owner leaves. Another player/tribe may enter, use accessible inventory and potentially take control. **Q159:** no takeover while a covering tribe totem stands. The procedure after the totem falls must be designed without violating the existing public-build and no-scheduled-wipe rules. As soon as the last player leaves the world, the entire temporary world resets, regardless of totems.
 
 ### 35.3 Weighted events, mobs and bosses (42–48)
 
@@ -1729,7 +1732,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **65** | Food HoT | Food-dependent total healing **over 10 seconds**. On each damage event, remaining HoT cut by **50%**; if *post-cut remainder ≤10 HP*, clear it completely | Food catalog/totals, overlapping food HoTs, tick granularity |
 | **66** | Early melee | **Rock 5 raw damage per hit with high attack speed**; **wooden spear ~15** slower/longer range; **stone spear ~25** | Spear values are tentative, precise attack speed and reach Open |
 | **67** | Armor | **Effective-HP multiplier (EHP)** rather than fixed reduction; early armor levels have modest but noticeable upgrades | Armor multiplier tier table, composition, max EHP |
-| **68** | Revives | Tribe player downed at **0 normal HP** enters **20 downed HP** with armor retained; enemies can finish with enough damage; **10 seconds to revive**, pauses **60-second bleed-out** while actively reviving | HP after revive, revive interruption/crawling |
+| **68** | Revives | Tribe player downed at **0 normal HP** enters **20 downed HP** with armor retained; enemies can finish with enough damage; **10 seconds to revive**, pauses **60-second bleed-out** while actively reviving | **Resolved Q136/Q159:** 10% max EHP; reviver damage doesn't interrupt; slow crawl, no healing |
 | **69** | Center XP | **2× ALL XP legitimately earned in that expedition** on center extraction, not just end extraction XP | Stacking with XP perks and action milestone progression |
 | **70** | XP and mastery | **Always saved immediately as earned**, including when player dies; no successful extraction requirement | Save batching/technical availability (must meet durability) |
 
@@ -1809,10 +1812,10 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 ### 37.5 Remaining numerical decisions
 
 - Each basic/advanced/potion **animation duration**, and whether use animation alters movement.
-- Post-revive ordinary HP; reviver range, interruptions and multiple concurrent revivers.
+- ~~Post-revive HP, interruptions, multiple revivers~~ (resolved Q136/Q159); reviver range remains Open.
 - Precise wooden/stone spear attack speeds and ranges, arrow damage, enemy damage and armor tier **EHP multipliers**.
-- Whether food replenishes hunger meter immediately and by what percentages; additional effects at **0% food**.
-- Food HoT stacking, server tick resolution, exact application of repeated hits and whether remaining heal duration changes.
+- Whether food replenishes hunger meter immediately and by what percentages (**0% food has no extra effect**, Q160).
+- Server tick resolution (food HoTs stack, Q160), exact application of repeated hits and whether remaining heal duration changes.
 - Exact five mastery milestone targets for levels 1–10; category-specific yield buffs, combat perk cap and crafting milestone allocation.
 - Rebirth general level and challenge threshold, increasing resource/currency costs, token awards and multirank perk catalog.
 - Gem/Robux respec price, how codes are granted and what constitutes a valid refund/respec.
@@ -1962,7 +1965,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | **142** | **No fixed event-count cap**, provided server can handle workload | Dynamic performance budget |
 | **143** | Minimum event separation depends on **footprints** | Actual distances |
 | **144** | Totem starts **small hut-size**, material upgrades increase claim radius | Upgrade recipes, radii and tiers |
-| **145** | With overlapping claims, **original builder retains ownership until takeover** | Takeover procedure |
+| **145** | With overlapping claims, **original builder retains ownership until takeover** | **Q159:** no takeover while the totem stands; procedure after it falls Open |
 | **146** | Unclaimed structure **fully disappears within 4–6 minutes**, not decay tick | Reclaim pause/reset logic |
 | **147** | Every boss has **fixed baseline difficulty** | Base HP/damage per archetype |
 | **148** | **Combined player level + equipped gear strength** scaling (**option C**) | Weights, snapshot timing and caps |
@@ -2034,8 +2037,8 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 3. ~~**Permanent gear**~~ — **Answered Q156:** no reclaim fee, unlimited Permanent items, dropped items lost on world reset. Remaining: ownership-transfer edge cases are covered by §17.
 4. **Recovery** — **Answered Q157 in principle:** any active-play logout forfeits; a server crash should return items where possible. Remaining: the crash-recovery mechanism and anti-abuse boundaries.
 5. **Extraction** — **Answered Q158:** strangers allowed, activator death irrelevant, per-site zone radius, portable rune extracts everyone who fits, no placement inside structures, no portable 2×. Remaining: portal cooldown and rune zone size.
-6. **Tribes/buildings:** Totem upgrade tiers and radius, takeover initiation/validation, multiple revivers, whether damage interrupts active revival.
-7. **PvP/survival:** Exact approved safe POIs, food at 0%, multiple food HoT and item-swap/cooldown rules.
+6. **Tribes/buildings** — **Answered Q159:** three totem levels (500/1,000/2,500 HP) with growing radius, no takeover while a totem stands, anyone revives, one reviver, reviver damage doesn't interrupt, slow crawl, no healing, no post-revive protection. Remaining: radii, upgrade costs, procedure after a totem falls.
+7. **PvP/survival** — **Answered Q160:** safe POIs designed later, no friendly fire, no spawn protection, spawn away from others, 0% food adds nothing, food heals stack. Remaining: minimum spawn distance and item-swap rules.
 
 **Progression and monetization**
 
@@ -2094,13 +2097,64 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 
 ### 41.4 Still Open after Q154–158
 
-- **Blockers (§40.3 #6–7):** totem upgrade tiers/radius and takeover; reviver eligibility (tribe vs ally), multiple revivers, damage interrupting the reviver, downed crawling/healing; safe POIs, tribe/alliance friendly fire, post-Play spawn protection, 0% food effects and food HoT stacking.
+- ~~**Blockers (§40.3 #6–7)**~~ — answered by Q159–160 (§42).
 - **Extraction details:** portal re-activation cooldown, portable rune zone size/consumption/announcement, any no-build aura around a placed rune.
 - **Crash recovery:** the concrete mechanism behind Q157's "return items if possible".
-- **Other P0 items:** representation and value of event-critical unique items on extraction (§27.3 #7), moderation kick versus audited safe-update kick, and the post-death tribe regroup flow (Q40).
+- ~~**Other P0 items**~~ — answered by Q161 (§42).
 
 
-## 42. Design change log
+## 42. Owner answers Q159–161: totems, revives, PvP, food, event items, kicks and regrouping
+
+> **Confirmed on 2026-10-22.** These answers resolve §40.3 blockers 6–7 and the remaining P0 items in §41.4, and supersede earlier wording where they conflict.
+
+### 42.1 Owner answers
+
+| # | Confirmed decision | Implementation consequence |
+| --- | --- | --- |
+| **159a** | Tribe totems **upgrade**, and their **radius grows** with each level. Totem HP: **500 → 1,000 → 2,500** by level. | Three totem levels. Radii and upgrade costs Open. Totems are raidable like other structures. |
+| **159b** | **As long as a tribe totem stands, no structure can be taken over.** | Takeover requires destroying the covering totem first. |
+| **159c** | **Anyone can revive** a downed player, no matter what. | Revive is not limited to tribe members or allies. |
+| **159d** | **Only one reviver** at a time. | A second player cannot start a revive while one is active. |
+| **159e** | **Damage to the reviver does not stop** the revive. | The revive still ends if the reviver cancels, leaves range, is downed or dies, or the downed player dies. |
+| **159f** | Downed players **crawl very slowly** and **cannot heal**. **No protection after revive.** | Downed players cannot use medicine or food. Revived players are immediately damageable at 10% max EHP (Q136). |
+| **160a** | Safe POIs are **specific locations to be made later**. | Content task, not an implementation blocker. |
+| **160b** | **No friendly fire. No spawn protection.** Players must be **spawned away from others**. | Spawn picker enforces a minimum distance from other living players (value Open). |
+| **160c** | **0% food does nothing** beyond the slow movement speed. | Only the below-25% −10% speed penalty applies; no starvation damage. |
+| **160d** | **Food heals stack**, with each other and with instant heals. | Several food HoTs may run at once alongside medicine. |
+| **161a** | Event-critical items are **item specific**, with tags such as **"event"**. | Each catalog entry decides whether it is a stackable material (center 2× applies) or a unique instance (stays single). The tag supports UI, announcements and analytics. |
+| **161b** | Kick commands are wanted but must **only trigger a safe kick**. | Every admin kick preserves items and notifies the player (§30). No item-forfeiting moderation kick. |
+| **161c** | A dead player **cannot rejoin the same server**; the **whole tribe extracts, returns to the lobby, parties up and starts again**. | The lobby needs a party/tribe queue that sends the group into a new server together. |
+
+### 42.2 Interpretations recorded for owner confirmation
+
+1. **Takeover after the totem falls:** Once the covering totem is destroyed, the structures become unclaimed (4–6-minute decay, Q146) and another tribe may claim them by placing its own totem.
+2. **Who can be downed:** "Anyone can revive" changes who can revive, not who gets downed. Solo non-tribe players still die immediately; tribe members still enter the 20-HP downed state. Enemies are also allowed to revive.
+3. **No healing while downed:** Any food HoT still running when a player is downed is cleared.
+4. **Friendly fire:** No friendly fire between tribe members. Whether allied tribes are also protected is Open.
+5. **Stacked food HoTs:** Each damaging hit halves the remaining amount of **each** active food HoT separately, with the ≤10 HP cutoff applied per HoT. Medicine keeps its own animation cooldown.
+
+### 42.3 Acceptance tests
+
+1. Totems have 500/1,000/2,500 HP at levels 1–3 and a larger radius at each level; no structure inside a standing totem's radius can be taken over.
+2. Any player, including a stranger, can revive a downed player; a second reviver is rejected while one is active.
+3. Damaging the reviver does not cancel the revive; cancelling, leaving range or the reviver being downed does.
+4. Downed players crawl at the configured slow speed and cannot use medicine or food.
+5. A revived player has no damage protection.
+6. Tribe members cannot damage each other.
+7. A new spawn is never placed within the configured minimum distance of another living player, and has no invulnerability.
+8. At 0% food the player takes no damage and only has the −10% speed penalty.
+9. Two food HoTs and an instant medicine heal can apply at the same time, capped at max HP.
+10. Every admin kick command preserves the kicked player's items and shows the update/saved-inventory notice.
+11. A dead player cannot join the same server again; a lobby party can queue into a new server together.
+
+### 42.4 Still Open after Q159–161
+
+- **Tuning:** totem radii and upgrade costs, crawl speed, revive range, minimum spawn distance.
+- **Design:** takeover procedure after a totem falls (see interpretation 1), alliance friendly fire, safe POI list, lobby party UI.
+- **Carried over from §41.4:** portal cooldown, portable rune zone size/consumption/announcement and no-build aura, crash-recovery mechanism.
+
+
+## 43. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -2117,6 +2171,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.1** | 2026-10-22 | Recorded owner answers Q116–150: Coin NPC shop brainstorm, 250/1000/3000 quest bands, no extraction Coin bonus, fixed merchant values, ~25 Gem grants, constant-price +25 vault upgrades, protected lobby Gem trade restrictions, 9 hotbar/50 backpack with one ordinary resource per slot and ~1000 material capacity, regular material auto-bank but manual equipment/special material vault; full armor EHP sets ×1.2/1.5/1.8/2.0 additive across 3 pieces, basic attack cadence, bow draw affects range not damage, animation-only heals .5/1/1.5 sec, 10%-EHP revival, food examples, ±5% rolls and 5% relative increase in best-roll chance per mastery level; independent event-category 25% rolls, descending rarity and Common fallback, no absolute event cap, upgradeable hut totems with original owner retention, complete 4–6-min decay, fixed-plus-level/gear boss scaling, basic pickaxe Permanent candidate and optional all-user XP boosters alongside Premium +25%. Added §39 and regression QA. |
 | **1.2** | 2026-10-22 | Finalized Q151–153: material vault holds **1,000 units per individual material stack**, cross-session persistence of **unvaulted extracted protected lobby backpack**, and Premium +25% base XP **stacks with** earned temporary XP boosters. Reconciled previous Q128/Q129/Q150, persistence/services, saved-item examples and QA; introduced §40 with implementation-ready decision backlog and explicit loss-free overflow and XP stacking test boundaries. |
 | **1.3** | 2026-10-22 | Recorded owner answers Q154–158: capacity overflow (secure stacks above 1,000 units, lobby items beyond 50 slots) is **deleted**, replacing the v1.2 protected-overflow invariant; Play deploys every unvaulted lobby item; Permanent items stay in backpack/hotbar on death with no reclaim fee or slot cap and are lost if left dropped at world reset; any active-play logout forfeits while crash recovery returns items where possible; strangers share extractions, activator death is irrelevant, per-site zone radius, portable runes extract everyone in their zone, cannot be placed inside structures and never grant 2×. Added §41, reconciled affected sections, fixed two broken navigation links and two malformed Q90/Q119 table rows. |
+| **1.4** | 2026-10-22 | Recorded owner answers Q159–161: three totem levels (500/1,000/2,500 HP) with growing radius and no takeover while a totem stands; anyone may revive, one reviver at a time, reviver damage does not interrupt, slow crawl and no healing while downed, no post-revive protection; no friendly fire, no spawn protection but spawns away from others, 0% food adds nothing, food heals stack; safe POIs designed later; per-item event handling with "event" tags; admin kicks are always safe kicks; dead players regroup with their tribe in the lobby. Added §42 and reconciled affected sections. |
 
 ---
 
