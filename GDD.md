@@ -1891,7 +1891,112 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-source weighting; qualified item and rare-material trade allowlists; Premium vs Plus qualification and earnable XP equivalent; minute-to-Gem tuning per monetized feature; fixed hotbar/backpack sizes, stack limit and vault overflow; precise gear catalog/quality-roll range; mastery craft roll tables; ordinary/rare respawn spatial limits; overlapping totem ownership rules and whether ~5-minute decay means full disappearance or tick; boss scaling source/curve.
 
 
-## 39. Design change log
+## 39. Owner-approved questions 116–150 (October 22, 2026)
+
+> **Status:** Confirmed mechanics below supersede contradictory earlier proposals. Tentative numeric examples and unresolved details remain explicitly Open. See §§6–10, 16, 19, 21–23 for detailed implementation guidance.
+
+### 39.1 Coin sinks, quest rewards and Gem trading (116–125)
+
+| # | Confirmed owner answer | Open details |
+| --- | --- | --- |
+| **116** | Coins definitely buy **NPC shop items**. Brainstorm more Coin uses. | Actual store assortment and price tiers |
+| **117** | Starting quest Coin targets: **easy 250, normal 1,000, difficult 3,000** | Quest restrictions, repeatability |
+| **118** | **No Coin extraction bonus**. Extract materials and sell them for value. Consider auto-selling otherwise-useless resources. | Auto-sell item allowlist, consent and settlement |
+| **119** | Center extraction **doubles materials and XP only**, no Coin bonus | Material overflow |
+| **120** | Fixed NPC merchant sell prices | Item-specific table |
+| **121** | **~25 Gems** is a good starting reward number, varying by activity | Gem payouts by quest/milestone/event |
+| **122** | **Same Gem cost** for each **+25 vault item-slot upgrade**, not escalating | Exact Gem and Robux prices |
+| **123** | Accepted time/value-based purchase pacing with **~10 hours for meaningful upgrades** | Exact SKU-specific targets |
+| **124** | Coin → Gem exchange **put aside/undecided** | Whether it should ever launch |
+| **125** | Gem trade restraints **yes** for safety | Level minimum, trade limits and/or fees |
+
+**Coin-shop proposals — not yet confirmed:** Starter medical/food/ammo supplies, modest gear/tools, basic seeds, cosmetic dyes, tribe banners, decorative structures, limited mapping/scouting utilities and noncombat hub crafting services. Do not price these so high that Coin income (~10,000/hour target) becomes pointless. Selling rare materials to NPCs is allowed; this **does not** override restricted player-to-player raw material trading.
+
+**Important auto-sell boundary:** The owner said “maybe” and “some materials that have no use.” Auto-selling materials is an **unconfirmed candidate**, never a default rule. If implemented, require an explicit server catalog allowlist, safe player notice/consent and reversible/traceable item-to-Coin receipt so no useful ingredient is destroyed.
+
+### 39.2 Inventory and extraction custody (126–131)
+
+| # | Confirmed owner answer | Open details |
+| --- | --- | --- |
+| **126** | **Nine fixed hotbar slots** | Control bindings, quick-swap UX |
+| **127** | **50 starting backpack slots** | Whether later backpack upgrades exist |
+| **128** | **One ordinary material type = one backpack slot**. Secure vault material allowance roughly **1,000 (near-unlimited)**. | Whether 1,000 means per-resource quantity, total units, or slots |
+| **129** | **Ordinary materials automatically vault after extraction**, while **other items, weapons, tools and special materials remain in protected lobby backpack** and can be manually vaulted. | Cross-session safety of unvaulted backpack, overflow |
+| **130** | **Only designated/eligible items may be player-traded** | Catalog allowlist |
+| **131** | Carry **any types and combinations of weapons**, within physical inventory slot limits | Equipped versus backpack switch flow |
+
+**Routing example:** Successful Center Crater extraction with 30 Stone, 1 special material reagent and 1 unique Sword generates **60 Stone deposited into material vault**, **2 special reagents in protected lobby backpack** and **one Sword in lobby backpack**. The player decides whether to vault reagent and sword. **No Coin extraction award.** The existing 2× rule covers all actual materials regardless of routing; unique equipment instances are never silently cloned.
+
+**Security:** Extracted assets must be protected from animation start, including disconnects or DataStore errors. A 50-slot backpack, 25+25 item vault and near-1,000 material allowance are distinct capacities. If receiving gear/stack quantity would exceed any limit, keep a protected owed-items claim/pending receipt rather than deleting goods. A lobby backpack is protected during staging but **unvaulted persistence across logout has not yet been confirmed**.
+
+### 39.3 Combat, armor, medicines, food and equipment quality (132–139)
+
+| # | Confirmed owner answer | Open details |
+| --- | --- | --- |
+| **132** | Full matching armor-set EHP multipliers: **Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0**. Pieces **add**, not multiply. | Head/Chest/Legs contribution split and mixed tiers |
+| **133** | Accepted approximate attack cooldowns **Rock 0.3s, Dagger 0.4s, Sword 0.7s, Spear 0.9s** | Precise timings per weapon archetype |
+| **134** | Bow and arrow both set damage; slow projectile in slight arc; longer bow hold increases **range** through draw animation, not damage. | Draw limits and speed/arc function |
+| **135** | Medical animation is **ONLY cooldown**: basic **0.5s**, advanced **1.0s**, potion **1.5s** | Movement constraints while animating |
+| **136** | Revived ally gets **10% of maximum EHP** | UI rounding, max-HP gear changes |
+| **137** | Food examples accepted: **Berries +10% hunger/+10 HP**, **Cooked Meat +35% hunger/+30 HP**, food heals over existing 10 seconds | Other food catalog and recipes |
+| **138** | Same-archetype equipment quality rolls **±5% stats** | Affected stats, exact distribution |
+| **139** | Best-roll chance increases **5% relative to base chance per Crafting mastery level** | Real default odds per item |
+
+**Armor implementation clarification:** At modified actual max HP Hmax, per-piece armor contributions form A = 1 + sum(piece armor contributions), not a product. Full matching sets have their prescribed EHP factors. Upon revive grant **10% of max EHP** then convert back into actual health by dividing by A. At 100 HP and full Iron: max EHP 200, revived EHP 20, displayed actual HP **10**. Armor retains its effect on subsequent hits.
+
+**Quality roll example:** For a base **1.00% best-roll probability**, at Crafting mastery 1 it is **1.05%**, mastery 10 it is **1.50%**. Relative linear factor = 1 + 0.05 × mastery level; not +5 **percentage points** and not geometric compounding. The archetype rarity is fixed independently of minor ±5% stat variance. Lobby workbenches produce default quality.
+
+### 39.4 Events, totems and boss scaling (140–149)
+
+| # | Confirmed owner answer | Open details |
+| --- | --- | --- |
+| **140** | Trigger attempt around **25%** for an event category, then descend rarities highest first; **Secret ~0.1%** as example, Common fallback | Exact rarity percentages |
+| **141** | **Independent event roll for each category**, each selecting rarity and eligible event | Per-category probabilities and availability |
+| **142** | **No fixed event-count cap**, provided server can handle workload | Dynamic performance budget |
+| **143** | Minimum event separation depends on **footprints** | Actual distances |
+| **144** | Totem starts **small hut-size**, material upgrades increase claim radius | Upgrade recipes, radii and tiers |
+| **145** | With overlapping claims, **original builder retains ownership until takeover** | Takeover procedure |
+| **146** | Unclaimed structure **fully disappears within 4–6 minutes**, not decay tick | Reclaim pause/reset logic |
+| **147** | Every boss has **fixed baseline difficulty** | Base HP/damage per archetype |
+| **148** | **Combined player level + equipped gear strength** scaling (**option C**) | Weights, snapshot timing and caps |
+| **149** | **Basic pickaxe** preferred initial Permanent-conversion item | Item instance/recipe selection |
+
+**Event rarity waterfall:** On each approximate five-minute scheduler cycle, roll **each eligible category independently**. Category succeeds at ~25% baseline, then attempts top rarity (Secret candidate ~0.1%) followed by each lower supported rarity. On an unsuccessful rare sequence, launch **Common event if the category supports one**. Within successful category+rarity, pick a random eligible event. Every generated event is publicly announced. No absolute simultaneous count cap, but spatial overlap and server performance must be validated.
+
+**Boss exception:** Guardian's previously established ~15–20-minute cadence/3-minute announcement and 25%-HP Legendary release are preserved. Boss baseline is fixed; level-plus-gear scaling is Confirmed, but its formula/snapshot policy remains Open.
+
+### 39.5 Premium membership and boosters (150)
+
+**Confirmed:** Eligible Roblox Premium subscribers get **+25% ongoing XP** while entitled; all players, Premium or non-Premium, may obtain **temporary consumable XP boosters**, including through earned in-game routes. Non-Premium users do not receive the member's base +25% simply for being free users.
+
+**Open:** Exact booster magnitude, duration, earning/purchase source, general versus mastery XP, Premium-versus-consumable stacking or exclusivity, and additive/multiplicative layering with center's 2× earned-run XP. Answer 150 **did not choose a stacking formula**, so keep it unset.
+
+### 39.6 v1.1 acceptance/regression cases
+
+1. Quests pay their configured 250/1000/3000 Coin bands once, merchant sales credit fixed server quotes, and no direct Coins are issued simply for extracting or doubled centrally.
+2. Gem grants average around the chosen 25 baseline by source; trade safety checks, no Coin trade, protection through death and empty-world resets.
+3. 9-slot hotbar and 50-slot backpack remain bounded; each ordinary material type displays one consolidated row/slot, while unique gear can have its own roll and instance ID.
+4. Vault item capacity starts 25 and upgrades +25 at **constant Gems per tier**; material allowance is separate and configurable pending the meaning of ~1,000.
+5. Extracted ordinary material auto-banks; extracted unique gear/tools and special materials stay protected in lobby backpack until manually deposited, with one-time central material ×2 and no data loss/duplication.
+6. Full matching armor sets produce 120/150/180/200 EHP for 100 base HP. Piece modifiers add. Revive restores 10% modified maximum EHP converted into actual HP.
+7. Rock/dagger/sword/spear approximate cadence constraints are enforced; bow draw changes range not bow+arrow damage; medicine gives immediate HP then only 0.5/1.0/1.5s animation lock.
+8. Berry and cooked-meat hunger/heal totals match configured examples and 10-second food HoT interruption rules.
+9. Gear roll stays within ±5% catalog stat variation. If example best-roll probability base is 1%, Crafting mastery 1 and 10 yield 1.05% and 1.50% respectively.
+10. Every eligible category runs an independent ~25% event trigger attempt on scheduler tick, then descending rarity checks; supported Common fallback is not blocked by higher-tier miss. Public announcement occurs for every actual spawn.
+11. Multiple events can coexist without fixed maximum but must satisfy footprint separation and server performance.
+12. Upgradeable totems begin hut-sized; overlapping radius never automatically steals another tribe's pieces; owner changes only via validated takeover.
+13. Unclaimed buildings disappear within 240–360 seconds unless properly reclaimed; ordinary raids remain unrestricted.
+14. Boss baseline fixed and player-level-plus-gear-score scaling combined; same-world rare loot still contested.
+15. Approved basic pickaxe Permanent candidate follows all designated-item conversion and extraction requirements; no bonus rolled stats from Permanent conversion itself.
+16. Premium member XP baseline and everyone-available temporary boosters are separately controlled; do not accidentally assume stacking or permanent free-user baseline.
+17. All confirmed older rules (protected world staging, 120-second fixed/30-second portable extraction, death/corpse, all vaulted items forever saved, five permanent level-10 masteries) remain intact.
+
+### 39.7 Next unresolved precision decisions
+
+NPC shop stock/prices, auto-sell opt-in/filter and safe settlement; Gem trade account levels/daily caps/fees; Gem price of constant +25 vault tiers; exact material storage meaning of ~1,000; persistence and overflow of unvaulted extracted lobby gear; armor head/chest/legs contributions; bow range/velocity curve; per-category event rarity tables/footprint requirements; totem upgrade/takeover details; combined boss scaling formula; first Permanent pickaxe recipe; Premium +25% and booster stacking.
+
+
+## 40. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1905,6 +2010,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | **0.8** | 2026-10-22 | Resolved Q3 (all vault items permanently saved) and Q23 (center extraction **2× all material stacks including rare resources and 2× XP**). Confirmed Q49–60: persistent Coins/Gems, direct trading with rare/Exclusive material exceptions, eight rarity classifications, XP/levels/crafting mastery, small permanent playstyle mastery buffs/cosmetics, rarest Permanent gear requiring advanced contested resources, enhanced primitive Booga Booga art, adjustable camera, tutorial/guided quests, gameplay-earnable parity for all monetized features, and rebirth tokens spent on perks. Added §36 on technical/economic design and QA. |
 | **0.9** | 2026-10-22 | Incorporated Q61–70: 100 base HP with gear/upgrade max, 3s sprint/5s recovery, five-minute food depletion and −10% speed below 25%, immediate medicine heals 10/25/50, 10s food HoT halved by hits with ≤10 HP cutoff, rock 5/wood spear ~15/stone spear ~25 raw damage targets, EHP multiplier armor, 20-HP downed tribe members, 10s revives and armor-based finishing, immediate persistence of XP/mastery on death and center 2× all current-run XP. Incorporated Q71–89: five milestone-based level-10 permanent masteries, per-level buffs (+1% resource yield baseline), combat/noncombat PvP and all four crafting benefit types, additive/multiplicative perk stacking and lobby visibility, increasing-cost level+challenge rebirth with general level reset to 1, permanently active one-time/multirank token perks and Gem/Robux/code respec. Added §37 and verification matrix. |
 | **1.0** | 2026-10-22 | Recorded Q90–115: Coin/Gem earning targets/sources, death-safe balances, NPC sales, lobby Gem/item trades/no Coins, +25 slot vault upgrades by Gems/Robux, ~10-hour significant-offer benchmark, Premium +25% XP and no paid combat advantage; four launch weapons, three armor slots, fixed archetype rarity, small crafted quality rolls favoring unsafe workbenches/masters, 10 arrows, fixed inventory and early Permanent pacing; ~5-minute event rolls/multiple spatially separate events, ~2-minute ordinary node regen, one-time rare resources, overlapping totems, 4–6-minute unclaimed decay and base-plus-scaling bosses. Added §38 implementation and QA with platform policy citations. |
+| **1.1** | 2026-10-22 | Recorded owner answers Q116–150: Coin NPC shop brainstorm, 250/1000/3000 quest bands, no extraction Coin bonus, fixed merchant values, ~25 Gem grants, constant-price +25 vault upgrades, protected lobby Gem trade restrictions, 9 hotbar/50 backpack with one ordinary resource per slot and ~1000 material capacity, regular material auto-bank but manual equipment/special material vault; full armor EHP sets ×1.2/1.5/1.8/2.0 additive across 3 pieces, basic attack cadence, bow draw affects range not damage, animation-only heals .5/1/1.5 sec, 10%-EHP revival, food examples, ±5% rolls and 5% relative increase in best-roll chance per mastery level; independent event-category 25% rolls, descending rarity and Common fallback, no absolute event cap, upgradeable hut totems with original owner retention, complete 4–6-min decay, fixed-plus-level/gear boss scaling, basic pickaxe Permanent candidate and optional all-user XP boosters alongside Premium +25%. Added §39 and regression QA. |
 
 ---
 
