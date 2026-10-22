@@ -471,7 +471,7 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 > **Confirmed:** The player can spend successfully extracted materials to craft special items. Some eligible items brought back alive can be converted to a **Permanent** type by spending scarce, expensive ingredients. This is a central cross-run progression pillar.
 >
-> **Working default — awaiting approval:** Permanent means durable *account ownership* of one converted gear instance through ordinary death, raid and island wipes. A deployed manifestation disappears on death and returns to the owner's protected armory with a repair/recovery cost. This interpretation is proposed, not yet a confirmed specification.
+> **Confirmed:** Permanent equipment persists through death, but can be intentionally dropped, picked up and stolen, or traded. Binding does not raise its combat stats; only designated source items are convertible. Post-death maintenance costs, gear limits and unclaimed dropped-item fate remain **Open**.
 
 ### 15.1 The three interlocking loops
 
@@ -489,7 +489,7 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 | Ordinary vaulted stacks | Extracted wood, ore, jade, cores, etc. | Becomes unsecured if withdrawn | Dropped if carried | Protected and usable by Forge |
 | Ordinary vaulted gear | Extracted or special-crafted gear | Becomes unsecured if withdrawn | Dropped if carried | Can be stored or consumed as source |
 | Special ordinary gear | Secure Forge recipe using vault inputs | Droppable on deployment | Drops if carried | Safe only while stored in vault |
-| Permanent converted item | Single eligible vaulted source + conversion recipe | Bound manifestation, limited slot | Manifestation vanishes; owned original survives (**Proposed**) | Protected account armory and recovery |
+| Permanent converted item | Designated vaulted source + costly recipe | Owner retains through death; may voluntarily drop/trade | Retained by owner if held; may be stolen through deliberate drop | Single secure canonical record, transferable |
 | Recipe knowledge | Earned milestones / discoveries | No physical item | Persists (**Proposed**) | Unlocks future recipes |
 
 **Vocabulary requirement:** "Secured" or "Vaulted" means safely stored outside a run. "Permanent" describes a specific conversion class. An item is not Permanent just because it is in persistent storage.
@@ -504,16 +504,9 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 - No client can submit a chosen output rarity, free ingredient amounts, owner ID or arbitrary "Permanent" flag.
 - The confirmed 25%-HP boss Legendary remains ordinary world loot until a player takes it to a rune and extracts. It cannot be made Permanent instantly in the crater.
 
-### 15.4 Alternative interpretations still open
+### 15.4 Confirmed Permanent definition (replaces earlier proposals)
 
-| Model | Ownership after death | Strength | Risk |
-| --- | --- | --- | --- |
-| **Bound gear + recovery (Working default)** | Retained by account | Earned, tangible, reliable long-term reward | Strong persistent player advantage must be capped |
-| **Permanent blueprint** | Blueprint retained, gear rebuilt for a smaller cost | Strong replenishment sink | Can feel misleading if called Permanent |
-| **Permanent cosmetic variant** | Appearance retained, ordinary gear still lost | High competitive fairness | Too weak to fulfill "Permanent item" ambition |
-| Infinite spawnable copies | Unlimited copies | None | **Rejected proposal:** trivial duplication / economy collapse |
-
-Do not select an option silently. The first row is an internally consistent working specification, not design-owner approval.
+**Permanent gear survives the current owner's death**, retains **exactly the source item's combat stats**, and is **transferable** through deliberate ground dropping (and another player taking it) or voluntary trading. Only approved extracted items are eligible. A Permanent gear instance is not an infinite number of freely spawnable copies and never appears as loot **just because its wearer dies**. The earlier **nontradeable, account-bound manifestation** proposal is superseded by these confirmed decisions. See §17 for the single-instance transferable model. Post-death repair costs and item/slot caps remain Open.
 
 ## 16. The Ancestral Forge: crafting outside the run
 
@@ -560,35 +553,45 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 - Crafts that consume an item must use a unique instance ID; stacks use bounded positive integers and no fractional duplication.
 - Recipe versions are immutable for active transactions so a live balance patch cannot alter an operation halfway through.
 
-## 17. Permanent gear operational rules
+## 17. Permanent gear: death protection and ownership transfer
 
-### 17.1 Bound armory / manifestation — Working default
+> **Confirmed:** Certain **designated** extracted item types may be made Permanent using costly materials from **multiple** sources and recipes gated by player leveling and discoveries. Permanent conversion **does not modify combat stats** relative to the selected source gear. A Permanent item **survives its owner's death**, but if the owner **deliberately drops it** and another player collects it, it changes owner. Permanent items can also be **traded**. Neither dropping nor trading creates a duplicate.
+>
+> **Open:** Possible post-death material costs/repairs, simultaneous Permanent gear limit, trade venue/fees, exact eligible list, what happens to an unclaimed dropped Permanent item if it expires or the world resets, and whether items can be sold through a marketplace.
 
-- **Canonical record:** Permanent gear exists once in a protected account armory; it owns a fixed ID, quality, permitted enchantments, durability and provenance.
-- **Manifestation:** When a player deploys, server creates a temporary bound representation of the canonical record. The representation is not a tradeable second item.
-- **Death:** The active copy vanishes and yields no transferable loot; regular backpack and ordinary equipped gear still drop. Permanent ownership enters **Recovery Needed**.
-- **Recovery:** The player pays a lesser repair/rearm resource sink or observes a cooldown at the hub; exact delay and materials remain Open.
-- **Withdraw/drop/trade:** Player can unequip the bound record to the armory, but cannot trade, drop, store in a raidable base or hand it to a different account.
-- **Disconnect:** Combat logging cannot bypass active-run death. Bound recovery follows the server-owned outcome, not client disconnect timing.
-- **Persistence:** Island server closure and scheduled base wipes never erase verified armory ownership.
-- **Double deployment:** One bound item cannot be active in two servers at once. Equip/deploy requires a profile/session lease.
-- **Repair insolvency:** Item remains owned even if unusable until repair; it must not be permanently deleted for insufficient materials.
+### 17.1 Single persistent but transferable item instance
 
-### 17.2 Hard boundaries for balance — Proposed
+- A Permanent weapon/armor piece has **one unique canonical instance ID**, original stats, owner/location and provenance. It can exist in account-safe armory/vault, equipped in active world, dropped on the ground, or escrowed for an agreed trade — never multiple at once.
+- **Death / ordinary active departure:** The owner retains the Permanent gear instance; the server returns it to their secure armory or a proposed recovery-pending state. All ordinary unsecured gear follows the corpse-drop rules.
+- **Intentional drop:** The item leaves the owner's possession and becomes a physical pickup. If another player validly picks it up, **the ownership is transferred** and the original owner cannot retrieve it through death protection or a duplicate armory record.
+- **Trading:** A direct exchange is permitted in principle. Trade transfers both sides' item IDs atomically/idempotently through server validation; no client-side grant or forged accept.
+- **No death-based trade exploit:** A thief cannot take a Permanent item solely by killing its wearer. They must obtain it through its legitimate **manual drop / pickup**, explicit trade, or a separately approved mechanic.
+- **Normal stats:** No automatic rarity/damage/speed bonus for becoming Permanent. The privilege is death-retention and long-term ownership only.
+- **World reset:** Owned Permanent items survive. **Unclaimed manually dropped Permanent gear** needs a specific expiry/reset policy; no assumption that ground items auto-return was approved.
+- **Maintenance and teleport:** Protected staging, update kick and extraction animation preserve whatever canonical Permanent items the player still legitimately owns, respecting prior transfers.
 
-- Start with **one bound weapon OR one bound armor piece** deployable per run. More slots require testing, not early monetization.
-- Temporary high-risk Legendary gear may have stronger peak stats than a safer bound counterpart; earned long-term equipment must not invalidate event risk.
-- Permanent tools cannot passively duplicate mining outputs or bypass resource/raid permissions.
-- Bound weapons still pay stamina, draw time, arrow/ammo consumption and enchantment charges. Firearms remain excluded.
-- Add optional wear and repair rather than a no-cost infinite-use weapon. All sinks should be visible before conversion.
-- Cap crowd-control durations, automatic status procs and stacked elemental synergies; PvP must retain readable defenses.
-- Bound items still occupy carry/equip slots and have normal weight/mobility tradeoffs.
-- Rare-carrying glow and extraction risk apply to **new event loot** even when carrier uses permanent weapons.
-- Neither the main crater portal nor any minor rune can grant free Permanent status as a multiplier.
+### 17.2 Ownership state safety — Proposed
 
-### 17.3 Approval questions — P0
+| Operation | Validation | Expected single result |
+| --- | --- | --- |
+| Convert designated saved gear | Owner, source instance, recipe unlock by discovery/level, rare inputs | Source transformed once into exactly one Permanent item |
+| Die wearing Permanent gear | Run death and prior item owner | Ordinary loot drops; single Permanent instance safely retained |
+| Manually drop Permanent gear | Owner, equip state, permitted proximity, authoritative input | One active pickup item; it is no longer simultaneously in armory |
+| Another player picks up drop | Drop exists, player can reach it, not previously claimed | One canonical ownership transfer |
+| Trade Permanent gear | Players and gear valid, both confirm, trade escrow exists | Single atomic transfer; no dupe from cancel/disconnect |
+| Owner reconnects after theft | Authoritative latest owner record and claim history | Former owner cannot reclaim stolen gear |
+| World empties | Last-player exit and active world cleanup | Persistent owned items survive; unresolved ground-item loss rule flagged |
+| Repair/rearm | Cost/rules not yet approved | No invented mandatory cooldown or irreversible gear wipe |
 
-**Before code:** Is account-retained bound gear on death correct, or should the account receive only a rebuild blueprint? Is Permanent transferable? What exact recovery cost/cooldown applies? What item families can be Permanent? How many bound slots per run? Does use degrade durability? Can a converted Legendary keep its affixes? No answer is presumed approved beyond the user's confirmed conversion concept.
+**Design challenge:** Transferable death-protected items are unusually sensitive to **drop/loot ordering** and cross-server ownership. Server IDs and write-ahead receipts must prevent a voluntary drop followed by a disconnect from giving the original owner a restored copy. Logs must identify which user owns the one real item after every valid pickup or trade.
+
+### 17.3 Balance remaining undecided
+
+1. **Post-death cost:** Material repair/recovery may restrain indefinite reuse. Its existence and price are not final.
+2. **Slot cap:** The number of simultaneously equipped Permanent weapons, armor or tools remains genuinely undecided; do not hardcode one item as Confirmed.
+3. **Eligibility catalog:** Only designer-flagged items may be converted; categories/rarities are to be chosen.
+4. **Affixes:** Binding adds no stats, but whether a source's existing roll/affixes are preserved or re-rolled needs explicit agreement.
+5. **Trade paths:** Safe lobby exchange, ground-drop transfer and possible market are distinct UX/safety mechanics. Ground dropping and trading are Confirmed; trade channel/currency remain Open.
 
 ## 18. Resource tiers, economy and acquisition sources
 
