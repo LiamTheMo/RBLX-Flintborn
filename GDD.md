@@ -16,9 +16,9 @@
 - **Working default:** A coherent starting rule for prototyping, not yet approved by the design owner.
 - Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
-**New confirmed direction (2026-10-21):** Resources carried safely through an extraction can fund special crafting outside an island run. Some eligible extracted items can be transformed into an expensive **Permanent** item type using hard-to-get ingredients. The transformation capability is Confirmed; exact death, transfer, recovery, slot, durability and trading rules are Open. All numerical costs below are illustrative hypotheses.
+**New confirmed direction (2026-10-21):** Extracted resources enable special crafting and expensive eligible-item Permanent conversion. **Confirmed after later clarification:** Permanent gear survives owner death, stays at the **same stats** as its source and may be manually dropped, stolen or traded. Gear does **not** wear/break, and exact Permanent recovery material fee and active-slot limit remain Open. All numerical costs are illustrative.
 
-**Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
+**Confirmed combat clarification (2026-10-21, extended 2026-10-22):** No player-usable shields, firearms or playable magic for launch. Medical consumables heal **immediately**, animation then prevents immediate repeat use; food heals over time with partial interruption on damage. The Guardian's shield-pillar boss phase remains unchanged.
 
 **Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§34).
 
@@ -236,7 +236,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - Validate safe POI boundaries server-side, including projectile origin and impact handling; exact outward/inward protection semantics remain Open.
 - Protected play-world menu and unsuccessful Play admission remain safe; **successful spawn selects any valid random map location**, not necessarily the Outer Rim (§3).
 - Same world death is terminal even for a tribe member who was not successfully revived. The body lasts **600 seconds**, and the server enforces same-JobId exclusion.
-- **Proposed:** Rejoin after an accidental disconnect is possible if user was not killed/ejected and world remains active; ordinary carried loot forfeited under existing active-quit rule.
+- **Proposed:** Eligible players may rejoin a still-running world after an ordinary accidental disconnect if they were not killed/ejected; unsecured carried loot still stays in their forfeited 10-minute body.
 
 
 
@@ -432,7 +432,7 @@ First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extra
 - **Crafting/building:** Recipe requirements, arrows and medicine crafting, intuitive placeable preview, structure health, **totem claim radius** and **unclaimed decay**. Weapons/armor have no durability wear.
 - **Event UI:** Clear announcement, direction/search radius, beacon color and event time state.
 - **Boss UI:** Three-phase status, 3-minute warning, pillar progress and readable 25% phase transition.
-- **Extraction UI:** Site name, projected bonus, **shared fixed-portal 120-second countdown** (or rare portable 30 seconds), audible/visual cue and small *must-be-here-at-zero* area boundary; explicit animation-start safety and verified receipt.
+- **Extraction UI:** Site name, projected bonus, shared fixed-portal 120-second countdown (or rare portable 30 seconds), audiovisual alert and small must-be-here-at-zero area; explicit animation-start protection and verified receipt.
 - **Death UI:** Clear loss summary plus next-run action.
 
 Make major cues redundant across color, icon, words and sound. Provide comfortable interactions on Roblox mobile, desktop and controller; avoid interactions that require precise cursor control.
@@ -557,7 +557,7 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 - Eligible item families initially include weapons, select armor and a restricted set of tools. Exclude raw materials, currency, siege charges, structures, ammunition, potions, vault keys and anything creating limitless economic output.
 - The specific source must be owned and vaulted, eligible under the designer catalog, unlocked through applicable **level/discovery requirements**, not deployed elsewhere and not already Permanent.
 - Converting **transforms/consumes** the source instance; it does not create both an ordinary tradeable source and a new Permanent copy.
-- Source item attributes (quality, rarity roll, enchantment, crafted name) can be preserved as a defined snapshot if eligible; never claim affix preservation without recipe specification.
+- Source attributes (quality, rarity roll, source crafting identity) should be preserved where eligible. **No player magical/enchantment combat affixes at launch**; any future special-roll support requires explicit item catalog/versioning.
 - No client can submit a chosen output rarity, free ingredient amounts, owner ID or arbitrary "Permanent" flag.
 - The confirmed 25%-HP boss Legendary remains ordinary world loot until a player takes it to a rune and extracts. It cannot be made Permanent instantly in the crater.
 
@@ -726,7 +726,7 @@ Earlier example recipes such as elemental storm bows, fire-infused spears, frost
 
 ### 20.1 New player, safe first extraction
 
-The new player first arrives in the play-world **protected main menu** while assets and profile load, then explicitly presses **Play** to spawn safely into an active Outer Rim run. Gather wood and stone; craft a crude spear; fight a small hostile; find a hidden minor rune; defend its **120-second** contested countdown (audio/visual signals attract rivals), then receive the invulnerable animation and extract uncommon ingredients for a modest payout. At the secure hub, receive an unmistakable **Vaulted** receipt and the first special Forge recipe preview. The player cannot convert the spear immediately; they need several further extractions. A failed first run drops carried loot but does not erase earlier vault progress. Goal: teach risk, safety, and long-term crafting in one sequence.
+The new player arrives in the play-world **protected main menu** while assets/profile load, then explicitly presses **Play** to spawn at a **random valid map location**, which need not be the Outer Rim. Harvest nearby wood/stone/iron or food ingredients according to biome, craft click-attack melee gear and crafted arrows, and learn basic medical/food healing. Activate an available fixed rune's **shared 120-second countdown**; hide/fight/heal and return to the small zone in time to qualify for invulnerable animation and extract. All event alerts remain public. At the secure hub, receive an unmistakable **Vaulted** receipt and the first special Forge recipe preview. The player cannot convert the spear immediately; they need several further extractions. A failed first run drops carried loot but does not erase earlier vault progress. Goal: teach risk, safety, and long-term crafting in one sequence.
 
 ### 20.2 Solo scavenger, long-term progress without boss domination
 
@@ -767,7 +767,7 @@ High-value gear improves outcomes through ordinary damage/range/armor/rarity dif
 
 ### 21.4 Encounters and balance telemetry
 
-Measure melee duel duration, arrow velocity readability, damage accuracy under mobile latency, sprint duration, medicine-use cadence, food HoT completion after repeated attacks, successful revives (incl. paused timers), tribe versus solo survivability, raid time against wood/stone/iron and event reward extraction rates. Bosss scale by an average **player level or gear level** population signal, with anti-exploit normalization yet to be designed. The Guardian's original 15–20-minute timing stays as a separate established concept.
+Measure melee duel duration, arrow velocity readability, damage accuracy under mobile latency, sprint duration, medicine-use cadence, food HoT completion after repeated attacks, successful revives (incl. paused timers), tribe versus solo survivability, raid time against wood/stone/iron and event reward extraction rates. Bosses scale by an average **player level or gear level** population signal, with anti-exploit normalization yet to be designed. The Guardian's original 15–20-minute timing stays as a separate established concept.
 
 
 
@@ -914,7 +914,7 @@ Show (a) rune/portal and completed status, (b) vaulted materials by exact quanti
 
 ### 25.3 Forge recipe browser and permanent conversion confirmation
 
-- Filters for tools, weapons, armor, enchantments, consumables and Permanent recipes.
+- Filters for tools, ordinary weapons, armor, **food and medical consumables**, construction parts and Permanent recipes. **No launch enchantment category**.
 - Crafting detail includes **Owned/Required** stacks, region/event sources for scarce ingredients, recipe/level unlock, source/result stats and consumed crafting materials; **weapons and armor do not wear or break**.
 - Permanent conversion displays the exact source instance that will disappear, a preview of bound restrictions, recovery costs (if any), and *confirm/cancel* with deliberate focus for touch and controller.
 - Show recipe progress in percentage only when genuinely derived from verified vault stack totals; do not count unextracted backpack materials.
@@ -983,22 +983,22 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
 13. Portal payout never duplicates unique materials, Keystone, Legendary source instances or crafting outputs.
 14. Cache requires a continuous 60-second unlock under specified interruption rules; event UI and world beacon agree.
-15. Invalid melee reach, firing interval, elemental effect spam, hit provenance and malicious client remote sequences are rejected.
+15. Invalid click melee reach/rate, forged **slow physical bow projectile** or crafted-arrow count, healing replay, food HoT tampering, and malicious client remote sequences are rejected. No player-cast elemental effects in launch builds.
 16. DataStore throttle, teleport failure, competing sessions, server shutdown and stale revision rejoin retain safe state integrity.
 17. Mobile and controller players can navigate Forge and extraction without mouse-only precision.
 18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
 19. No deployment or publishing workflows target temporary/version branches; only main may publish.
 20. Deployed Roblox place testing is **not applicable until source/place credentials are connected**.
-29. Joining a play-world place creates no active avatar/loot risk before loading and explicit Play; a failed teleport, profile load, kick or character spawn from that state cannot delete gear.
-30. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
-21. Ordinary **active-run** departure (not a protected world main-menu leave) produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
-22. Safe lobby exit, loading-screen quit, world main-menu quit, failed teleport and unsuccessful Play admission never create a loot body or forfeit inventory.
-23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier), shows player update/saved-inventory notification and allows continued use on next Play; forged client admin flags and duplicate restore requests fail.
-24. Clicking an available fixed rune broadcasts large-radius audio/visual cues and starts **one server-shared 120-second event**; players may leave the area, fight and heal, and qualify only by being alive **inside it at expiry**. Rare portable runes use 30 seconds.
-25. At valid animation-start threshold, damage and disconnect cannot cause item loss; idempotent locked receipt settles exactly once, even after DataStore fault.
-26. Corpse-versus-extract and corpse-versus-maintenance races never grant double inventory or lose protected items.
-27. Rare plants/materials, elite mobs/bosses, raid structures and meteors have finite rewards and tier-appropriate announcements.
-28. Activity rewards are validated across PvP, farming and building and resist AFK/idle/server-hopping exploits.
+21. Joining a play-world place creates no active avatar/loot risk before loading and explicit Play; a failed teleport, profile load, kick or character spawn from that state cannot delete gear.
+22. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
+23. Ordinary **active-run** departure (not a protected world main-menu leave) produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
+24. Safe lobby exit, loading-screen quit, world main-menu quit, failed teleport and unsuccessful Play admission never create a loot body or forfeit inventory.
+25. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier), shows player update/saved-inventory notification and allows continued use on next Play; forged client admin flags and duplicate restore requests fail.
+26. Clicking an available fixed rune broadcasts large-radius audio/visual cues and starts **one server-shared 120-second event**; players may leave the area, fight and heal, and qualify only by being alive **inside it at expiry**. Rare portable runes use 30 seconds.
+27. At valid animation-start threshold, damage and disconnect cannot cause item loss; idempotent locked receipt settles exactly once, even after DataStore fault.
+28. Corpse-versus-extract and corpse-versus-maintenance races never grant double inventory or lose protected items.
+29. Rare plants/materials, elite mobs/bosses, raid structures and meteors have finite rewards and tier-appropriate announcements.
+30. Activity rewards are validated across PvP, farming and building and resist AFK/idle/server-hopping exploits.
 
 ### 27.2 Manual playtests — Requires Manual Validation
 
@@ -1028,8 +1028,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 8. Recipe resource quantities, sources and rarity names, Keystone path, unlock milestone requirements.
 9. **Confirmed:** Permanent conversion gives **no extra combat stats** compared with source equipment. **Open:** PvP source item and repair balance.
-10. Enchantment affix preservation and charge/repair rules.
-11. **Confirmed:** Vault has **upgradeable capacity**, players may withdraw stored contents. **Open:** Upgrade prices, tier ceilings, stack weights, durability.
+10. **Open future-only:** Whether enchantment affixes or specialized defenses should be introduced in an update. No launch item durability repair/charge mechanic.
+11. **Confirmed:** Vault has upgradeable capacity and withdrawal. Ordinary gear lasts indefinitely without durability wear. **Open:** Upgrade prices, tiers and carrying stack weights.
 12. Boss clear rewards beyond the confirmed mid-fight Legendary.
 13. **Confirmed:** Provisional 30-player instances wipe **when empty only**; fixed exit countdown 120 seconds (zone check only at expiry), portable 30 seconds; exact travel/raid/party balance Open.
 14. Cosmetic monetization, tutorial content, achievement rewards and hub architecture.
@@ -1048,7 +1048,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | 8. Economy alpha | Recipes, conversions, activity rewards, economy telemetry and sinks | Solo/farmer/builder/PvPer progression viable, no AFK exploits or observed dupes |
 | 9. Launch readiness | Full server profiling, accessibility, persistence faults, anti-exploit | Reviewed CI, manual playtests and publish-from-main gates |
 
-**Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Recipe prices and operational policies are hypotheses until explicit approval, simulation and testing.
+**Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Costs, health/food/stamina tuning, revival mechanics, damage/protection boundaries and weighted event probabilities need implementation and playtest validation.
 
 ## 29. Ordinary departure, death and lootable bodies
 
