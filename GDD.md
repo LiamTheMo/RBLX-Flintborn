@@ -20,7 +20,7 @@
 
 **Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
 
-**Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§§34–35).
+**Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§34).
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -706,10 +706,10 @@ Player strength comes from execution, temporary risked gear, group tactics and o
 | Authoritative state | Legal next state(s) | Notes |
 | --- | --- | --- |
 | **WorldSpawned** | Carried, despawned | Unique drop instance, distance and pickup validated by server |
-| **Carried** | WorldDropped, BaseStored, Consumed, ExtractionPending | All ordinary inventory remains at risk |
+| **Carried** | WorldDropped, BaseStored, Consumed, QualifiedAtDeadline | Ordinary gear remains at risk during shared extraction timer; only qualifying alive/in-zone players become protected |
 | **BaseStored** | Carried, WorldDropped, Consumed | Raiding, door permissions and destruction rules apply |
 | **ExtractionEventActive** | QualifiedAtDeadline, MissedDeadline, Death | Shared event timer is independent of player position/damage until a one-time alive/in-zone check at expiry |
-| **ExtractionCommitting** | Vaulted (commit), retry pending | Item cannot simultaneously be dropped as corpse loot |
+| **QualifiedAtDeadline / ExtractionProtected** | Vaulted (commit), retry pending | Server-authorized animation begins invulnerability and locks the participant's own exact inventory snapshot |
 | **Vaulted** | Carried (withdraw), ForgeReserved | A safe storage location, *not* permanent status |
 | **ForgeReserved** | Vaulted (cancel/rollback), Consumed / PermanentOwned (commit) | Reservation tied to idempotent operation ID |
 | **PermanentOwned** | PermanentEquipped, PermanentVaulted, PermanentWorldDropped, PermanentTradeEscrow, PermanentRecovery | Canonical equipment has one *current owner*; death retains it but deliberate drop/trade can transfer it |
