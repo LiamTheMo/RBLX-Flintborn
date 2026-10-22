@@ -455,7 +455,7 @@ These are the official labels **in this order**. Specific colors, drop probabili
 
 - **Levels/XP:** Persistent player levels, no skill tree; some recipes unlock by level and discovery.
 - **Crafting mastery:** Repeated meaningful crafting yields its own long-term mastery milestones, recipe/efficiency benefits (exact values Open).
-- **Playstyle masteries:** Farmers, miners, builders, hunters, PvPers, explorers, gatherers and other activities have permanent, small milestone buffs, some of which increase yield; cosmetics can also be granted.
+- **Five confirmed masteries only:** Mining, Woodcutting, Farming, Crafting and PvP. Each has a **level-10 cap** and **buff every milestone level**; relevant resource yield has a starting **+1% per level**. Crafting covers efficiency/batch/speed/recipes, PvP both combat and noncombat, with permanent cosmetics and lobby visibility. All other activities may give general XP/quests but are not separate mastery tracks.
 - **Rebirth:** Completing a future defined rebirth condition grants **tokens** that can be spent on **perks**. This is a perk store/loadout rather than a branching skill tree. What resets, token amounts, whether perks are permanent and how perks stack are Open.
 - **Balance:** Resource yield perks **may stack with central 2× material extraction**, which also doubles rare crafting ingredient quantities. Model that intentionally. Small permanent buffs should support endgame optimization without removing the cost of rare objectives.
 - **High-end gate:** The **rarest Permanent equipment cannot be obtained solely through farming or building**; certain high-tier recipes/material sources require high-risk bosses/PvP-contested events or equivalent specified encounters. Standard playstyle masteries remain available to peaceful gatherers/builders.
@@ -1464,7 +1464,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **29** | Magic | **No player magic for now**; future release possibility, not launch | Whether/when added; enemy elementals allowed |
 | **30** | Medicine and food | **Medical items and potions heal instantly on use; the following animation is the cooldown**. **Food grants healing over time; taking damage partially interrupts HoT**. | Instant heal size; animation lengths; precise damage interruption amount |
 | **31** | Gear wear and defenses | **Equipment lasts indefinitely**, with no equipment durability wear/breaks. Special defensive traits can be a future update. | Baseline armor mitigation; optional separate Permanent recovery cost |
-| **32** | Tribal down/revive | Tribe members can be **downed for 60 seconds**. When a valid tribe member starts revival, the timer **pauses**; on cancel it **resumes from remaining time**. Non-tribe solo players **die immediately**. | Revive channel length, HP restored, finishing downed enemies, allied vs tribe-only |
+| **32** | Tribal down/revive | Tribe members have **60 seconds** of unpaused downed time; valid revive pauses countdown, cancel resumes; solo players die immediately | **Later Q68 confirmed:** revive 10 seconds, 20 downed HP, armor still applies and enemies can finish; post-revive HP Open |
 | **33** | PvP and spawn | **Random spawn location anywhere on the map**; PvP enabled **everywhere**, except designated POIs with explicit safe zones | Spawn candidate validation, safe-zone list, friendly fire, spawn damage timing |
 
 **PvP state semantics:** A living active player can be damaged inside almost any world zone, including while raiding, farming or handling extraction. Protected pre-spawn menus and post-extraction animation remain exceptions. A safe POI, if one exists, must be explicitly mapped and server-enforced; a private base/totem never creates a safe zone.
@@ -1542,12 +1542,12 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | # | Subject | Confirmed choice | Still Open |
 | --- | --- | --- | --- |
 | **3** | World resets | **ALL previously vaulted materials and equipment are ALWAYS saved**, ordinary or Permanent. Only the live island resets on empty. | Vault capacity/overflow mechanics |
-| **23** | Center extraction | **2× all material stacks including rare ingredients, and 2× XP** | Whether all session XP qualifies, and whether Coins/Gems or unique gear multiply |
+| **23** | Center extraction | **2× all material stacks including rare ingredients, and 2× XP** | **Later Q69 confirms all current-run XP** (not just exit XP); whether Coins/Gems and unique gear multiply remains Open |
 | **49** | Currency | **Persistent Coins and Gems**; Gems feel more premium but are **earned through gameplay too** | Drop rates, sinks, vendor prices |
 | **50** | Trade mode | **Direct player-to-player trading only**, not marketplace or auction | Venue, item/currency eligibility and safe transfer |
 | **51** | Rarity | **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive** | Drop odds, visuals, Exclusive availability |
 | **52** | Player advancement | **XP, levels and crafting mastery; NO skill trees** | XP thresholds, mastery awards, level gates |
-| **53** | Playstyle growth | **Permanent masteries** for many activities; milestones award **small buffs**, including some resource bonuses, and **cosmetics** | Exact bonuses, cap, milestones, categories |
+| **53** | Playstyle growth | **Permanent masteries** with modest milestone buffs/cosmetics; later **only Mining, Woodcutting, Farming, Crafting and PvP** are selected | Q71–80 later fixed five tracks, max level 10 and per-level buffs |
 | **54** | Mastery duration | Mastery buffs are **permanent account progression** | Interaction with voluntary rebirth resets |
 | **55** | Farmer/builder progression | **Cannot earn the very rarest Permanent gear solely by farming/building** | Which high-tier encounter ingredients/requirements apply |
 | **56** | Material sourcing and trades | Materials **mainly mined/gathered**, with **quests and world events**; no general raw-material trading, **except specific designer-eligible rare or Exclusive materials** | Eligible item allowlist, source/quest rewards |
