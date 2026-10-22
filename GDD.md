@@ -494,11 +494,11 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 
 **Vocabulary requirement:** "Secured" or "Vaulted" means safely stored outside a run. "Permanent" describes a specific conversion class. An item is not Permanent just because it is in persistent storage.
 
-### 15.3 Eligibility and source consumption — Proposed
+### 15.3 Eligibility and source consumption — Confirmed constraints / Proposed catalog
 
-- A Permanent conversion targets a specific, uniquely identified **extracted gear instance**, not an abstract catalog item or arbitrary stack.
+- **Confirmed:** Only designated extracted gear may be Permanent-converted. The source is a unique, server-validated vaulted instance, not an arbitrary inventory stack.
 - Eligible item families initially include weapons, select armor and a restricted set of tools. Exclude raw materials, currency, siege charges, structures, ammunition, potions, vault keys and anything creating limitless economic output.
-- The source item must be owned by the player, present in a secure vault, unlocked for the chosen recipe, not currently equipped in another active session and not already bound.
+- The specific source must be owned and vaulted, eligible under the designer catalog, unlocked through applicable **level/discovery requirements**, not deployed elsewhere and not already Permanent.
 - Converting **transforms/consumes** the source instance; it does not create both an ordinary tradeable source and a new Permanent copy.
 - Source item attributes (quality, rarity roll, enchantment, crafted name) can be preserved as a defined snapshot if eligible; never claim affix preservation without recipe specification.
 - No client can submit a chosen output rarity, free ingredient amounts, owner ID or arbitrary "Permanent" flag.
@@ -1018,13 +1018,13 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 - If a player leaves after the protected extraction animation started, the protection outcome wins regardless of whether they see the final vault-receipt screen.
 - Safe administrator maintenance removal is authorized by the server, not by a client flag or mere kick reason string.
 - A duplicated character session must not generate repeated bodies or recall items that others already looted.
-- **Proposed:** On rejoin after actual **ActiveRun** forfeiture, present a concise summary explaining lost unsecured items. A pre-spawn failure may never display an inventory-loss summary or suggest a death occurred.
+- **Confirmed / Proposed UX:** An active-run disconnect forfeits ordinary unsecured gear; the player may **rejoin that still-running world** if they were not killed/forcibly excluded, but does not regain lost items. A **death** ejects them to reduce corpse retrieval chances, with a same-world admission restriction to implement. Pre-spawn failure never counts as death or item loss.
 
 ## 30. Administrator update kicks and maintenance-safe preservation
 
 ### 30.1 Confirmed product requirement
 
-Administrators need commands to remove players **without losing their items when updating the game**. This is a privileged exception to ordinary active-world departure, not an extraction or a free return to vault. It must also work if a player is in the extraction hold. A player in the protected pre-spawn menu is already loss-free and requires no special inventory-forfeiture bypass.
+Administrators need commands to remove players **without losing their items when updating the game**. The next protected menu **notifies them of the update kick and saved held inventory**, which they resume on next successful Play. This is a privileged exception to ordinary active-world departure, not extraction or free vault deposit. It also works during an extraction timer; players still on pre-spawn menu are already safe.
 
 ### 30.2 Proposed safe-removal protocol
 
@@ -1033,14 +1033,14 @@ Administrators need commands to remove players **without losing their items when
 3. Record the **exact ordinary gear/material/consumable snapshot** under a unique maintenance-recovery operation ID. This is **unsecured preserved carryover**, not a successful extraction. Do not apply portal bonuses or make it usable for the protected Forge while in recovery.
 4. Persist the snapshot in an access-controlled, retry-safe recovery state and prevent the same world inventory from also becoming a corpse.
 5. Only after recovery entitlement is established, perform the safe kick/server restart; if persistent storage fails, do not falsely promise safe removal. Retry/defer shutdown as supported and surface the operational error.
-6. At the player's next safe lobby/pre-spawn admission, explain why the prior equipment was preserved; provide a protected path to resume the equipment as active at **the next explicit Play**. Exact restoration destination is **Open** (recommended: next expedition loadout, not permanent vault).
+6. At the player's next lobby/pre-spawn admission, **explicitly notify them of the admin game-update kick and their saved inventory**. **Confirmed:** They resume with the exact previously held items after the next explicit successful Play; these have **not** been extracted or made Forge-safe.
 7. Each maintenance operation can be consumed/resumed once. New active server session IDs and item IDs prevent concurrent duplicated restorations; audited administrators cannot silently create a second equipment set.
 8. **If a valid extraction animation already started first**, honor extraction snapshot ownership rather than also granting a maintenance escrow copy.
 
 ### 30.3 Permission, grief and abuse safeguards
 
 - Authorize commands using server-held administrator IDs/roles and restricted command dispatch; never trust client-provided permission tags or arbitrary RemoteEvent requests.
-- **Proposed:** Two distinct commands/actions: ordinary moderation kick, and audited **safe-update kick**. Only the latter preserves active inventory. Exact admin UX and whether normal moderation kicks forfeit gear are **Open**.
+- **Proposed:** Separate ordinary moderation kick (may exclude rejoin) from audited **safe-update kick** (preserves items and notifies player). Exact command names and treatment of punitive kicks remain **Open**.
 - Update shutdown should safely process all active player snapshots; pre-spawn menu players never had risky inventory so retain their reserved loadouts without world body creation.
 - Record initiator, timestamp, update version, server job/run ID, affected sessions, escrow operation IDs and success/error status.
 - Never allow players to spoof a maintenance kick with a client disconnect, intentionally triggering a crash, or asking a player-owned NPC to end the session.
@@ -1069,7 +1069,7 @@ Administrators need commands to remove players **without losing their items when
 | **ExtractionHolding** | Yes | No, normal leave drops loot | Yes on death/ordinary departure | ActiveRun on cancel, or ExtractionProtected |
 | **ExtractionProtected** (animation has begun) | **No, invulnerable** | **Yes** | No for locked loot | Persistent receipt reconciliation / LobbySafe |
 | **MaintenancePreserved** | No | Yes | No | Recoverable safe staging / explicit future Play |
-| **Dead / BodyLootable** | Not a living player | N/A | Yes, exactly 600-second expiration | Return to safe menu/lobby as applicable |
+| **Dead / BodyLootable** | Not a living player | N/A | Yes, exactly 600-second expiration | **Kick/eject player from that play-world instance**; mark same-world rejoin ineligible until instance ends |
 
 **Nonnegotiable boundary:** Being inside a play-world Roblox place is not synonymous with **ActiveRun**. All death-drop, logout penalty, body-spawn and loot-loss actions must check authoritative ActiveRun/ExtractionHolding state and **must not execute** for loading, menu, failed admission, protected extraction or maintenance-preserved states.
 
@@ -1107,6 +1107,8 @@ Administrators need commands to remove players **without losing their items when
 | Duplicate Play requests | Exactly one successful spawn/admission; no duplicated equipment |
 | Character cannot spawn or is destroyed before successful admission | Return safely to menu; zero combat death/loot drop |
 | Server admits player and they enter active gameplay | Risk starts, with explicit gameplay HUD/transition |
+| Active player dies | Corpse appears for 600 seconds, player is **kicked out of the play world**, and same-world rejoin gate rejects that user while this instance exists |
+| Eligible active player leaves but has not died/kicked | Ordinary carried items are forfeited to corpse; they may rejoin the same running server if eligible but previous items are not restored |
 | Player deliberately quits after becoming ActiveRun | One lootable body; 600-second unclaimed loot expiry |
 | Player quits with 15 seconds left on extraction hold | Ordinary body; no extraction |
 | Player closes client one frame after protected animation begins | Safe; locked loot reconciles to vault |
@@ -1164,7 +1166,7 @@ Beyond the original Abyssal Meteor, 60-second Ancient Cache and Alpha Mob events
 - **Event structures:** NPC/event-generated raidable outposts are not player-owned Permanent vaults. Use separate spawn caps, encounter IDs, loot rights and despawn rules.
 - **Performance:** Cap player pieces per zone/tribe and placeable interactive objects; avoid physics-heavy collapses that overload mobile devices and full public servers.
 
-**Open:** Whether player bases persist across all server restarts, whether forests/farms regenerate while owners are offline, upkeep/decay, offline raiding fairness, claim limits, raid alert range, safe storage capacity and structure despawn rules.
+**Confirmed:** All bases, farms and other live island state end when the instance becomes empty, not on a fixed timed wipe. **Open:** Decay and upkeep while populated, offline raiding while other players remain, claim limits, raid alert range and structure caps. See §34 for reset/vault scope.
 
 ## 33. Public-world playstyle rewards and engagement design
 
