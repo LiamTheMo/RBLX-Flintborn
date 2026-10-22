@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.2  
+> **Design revision:** 0.3  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -17,6 +17,8 @@
 - Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
 **New confirmed direction (2026-10-21):** Resources carried safely through an extraction can fund special crafting outside an island run. Some eligible extracted items can be transformed into an expensive **Permanent** item type using hard-to-get ingredients. The transformation capability is Confirmed; exact death, transfer, recovery, slot, durability and trading rules are Open. All numerical costs below are illustrative hypotheses.
+
+**Confirmed combat clarification (2026-10-21):** No player-usable shields, shield-based recipes, shield equip slots or guard-blocking mechanics. Combat sustain is based on healing items. The Guardian's **Phase I: The Shield** (energy pillars and invulnerability) is unchanged.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -43,7 +45,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 2. **Ordinary carried loot is at stake.** On death, the character drops ordinary gear and harvested items; only successfully extracted contents **while still in the vault** are protected. The proposed Permanent equipment class is a deliberately rare, expensive exception to ordinary carried-gear loss, whose death semantics remain unapproved (§15–17).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
 4. **The world creates PvPvE conflicts.** Announced resource crashes, caches, elite creatures, and a recurring central boss drive player movement.
-5. **Primitive fantasy, not military extraction.** No firearms at any equipment tier. Magic supplements, rather than replaces, primitive weapons.
+5. **Primitive fantasy, not military extraction.** No firearms or player-usable shields at any tier. Magic supplements primitive weapons and consumable healing.
 6. **Multiple paths to value.** Hunting, harvesting, ambushing, participating in events, and raiding undefended bases must all remain legitimate options.
 
 ### 1.2 Design guardrails — Proposed
@@ -119,16 +121,16 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ## 4. Primitive-fantasy progression
 
-**Confirmed:** Progression begins with stone/wood and expands into metal, tribal equipment, enchanted arms, and elemental magic. **No firearms.**
+**Confirmed:** Progression starts with stone/wood and expands to metal, tribal gear, enchanted arms, elemental magic and **finite healing consumables**. **No firearms or player-usable shields.**
 
 ### 4.1 Candidate gear ladder — Proposed, subject to balance
 
 | Stage | Theme | Example materials | Example equipment | Acquisition emphasis |
 | --- | --- | --- | --- | --- |
 | Starter | Wood, stone, fiber | Wood, stone, vines, hide | Stone axe, wooden spear, sling, rough hide tunic | Outer Rim gathering |
-| Early | Flint and bone | Flint, bone, leather | Flint knife, reinforced club, shortbow, hide shield | Crafting and low-tier enemies |
+| Early | Flint and bone | Flint, bone, leather | Flint knife, reinforced club, shortbow, herbal bandage | Crafting and low-tier enemies |
 | Mid | Worked metals | Copper/bronze/iron (exact metallurgy TBD) | Metal spear, sword, axe, chain or scale armor | Deeper mining and workshops |
-| Advanced | Volcanic and rare minerals | Obsidian, jade, special beast components | Obsidian blade, jade ward, heavy tribal armor | Inner Ring and alpha encounters |
+| Advanced | Volcanic and rare minerals | Obsidian, jade, special beast components | Obsidian blade, jade-treated armor, advanced restorative tonic | Inner Ring and alpha encounters |
 | Endgame | Elemental / relic-infused | Abyssal meteor material, charged cores, boss relics | Ember spear, storm bow, runic armor, legendary relic | Broadcast events, raids, Mega-Boss |
 
 **Important:** Stage labels are illustrative, **not** five confirmed tiers. Resource Crash explicitly uses a rare **Tier-5** resource; the complete item-tier taxonomy is **Open**.
@@ -140,8 +142,9 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Gathering | Stone axe, pickaxe, reinforced pick, sickle | Resource acquisition and contested harvest efficiency |
 | Melee | Spear, club, knife, sword, war axe, hammer | Different reach, tempo, stagger, armor penetration |
 | Ranged | Sling, bow, longbow, throwing spear, javelin | Mid-range pressure with recoverable/consumable ammunition |
-| Defensive | Buckler, hide shield, tower shield, light/heavy tribal armor | Block, positioning, durability and stamina tradeoffs |
-| Utility | Torch, rope, traps, healing wrap, smoke bundle | Survival, stealth, escape, siege and counterplay |
+| Armor | Hide clothing, bone-mail, metal and runic armor | Passive resistance at durability, weight and mobility cost; **no shields** |
+| Healing consumables | Fiber bandage, herbal poultice, restorative tonic, antidote | Finite health recovery/selected ailment cleansing; tactical application windows and costs |
+| Utility | Torch, rope, traps, herbal satchel, smoke bundle | Survival, stealth, escape, siege and counterplay |
 | Magic | Ember, frost, shock, nature/earth imbues | Status effects and tactical utility, never gun-like firearms |
 | Construction | Walls, foundations, roofs, doors, gates, storage, workstations | Temporary strongholds and protected resource staging |
 | Siege | Primitive breaching charges, fire pots, rams (TBD) | Counterplay to fortifications with clear costs and warning |
@@ -150,8 +153,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Ember:** Damage-over-time/burning; countered by cleansing/water or positioning.
 - **Frost:** Slow or brief control; control durations tightly capped in PvP.
-- **Storm:** Chain/interrupt or shield-pressure, with explicit target limits.
-- **Earth/Nature:** Defensive wards or situational terrain/poison effects.
+- **Storm:** Chain effects and brief attack interruption with explicit target limits, not shield pressure.
+- **Earth/Nature:** Nature-based restorative items, cleansing or situational terrain/poison effects; no magical shield barriers.
 - Enchanted power should have cooldown, durability, stamina/mana cost, charge limit, or a comparable tradeoff.
 - Make all status effects legible on Roblox-scale characters and mobile screens.
 - Rare enchantments modify how primitive weapons are used; they should not turn combat into sustained automatic projectile fire.
@@ -160,14 +163,29 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 **Confirmed:** Extracted materials are used in secure-hub special crafting and in expensive eligible-item Permanent conversions. **Open:** Recipe discovery, durability and repair, encumbrance, stack sizes, ammunition recovery, magic catalysts, Permanent equipment binding, cooldown, trade and deployment specifics. See §15–28.
 
+### 4.5 Healing items and special recipes — Confirmed direction / Proposed specifics
+
+**Confirmed:** Player-usable shields do not exist. Healing items provide health recovery; armor, evasion, cover and movement also contribute to survival. Boss shield pillars in §8 are an **enemy invulnerability mechanic** and unaffected by this rule.
+
+| Progression stage | Sample item | Candidate materials / source | Function (proposed) |
+| --- | --- | --- | --- |
+| Starter | **Fiber Bandage** | Outer Rim fiber, basic herbs | Small recovery, easy field craft |
+| Early | **Herbal Poultice** | Herbs, clean cloth, resin | Gradual healing after a vulnerable application |
+| Mid | **Restorative Tonic** | Rare plants, purified mineral catalyst | More efficient single-use recovery |
+| Advanced | **Antidote Draught** | Jungle flora, beast glands | Removes specified poison/burning effects, limited or no direct heal |
+| High rarity | **Guardian Renewal Draught** | Securely extracted Guardian/Alpha reagents | Expensive single-use emergency heal/cleanse; never unlimited |
+
+**Open:** Actual heal amount, use duration, speed penalty, stack sizes, cooldown, whether damage interrupts, cleanse rules and whether healing can occur during portal activation. Names and numbers above are design examples. Higher-tier special healing recipes can use **extracted materials** at the Ancestral Forge; healing stacks brought into a run remain vulnerable, drop on death and **cannot be made Permanent**, avoiding infinite free healing.
+
 ## 5. Combat and PvP
 
 ### 5.1 Intended combat identity — Confirmed / Proposed
 
-- **Confirmed:** Combat relies on primitive melee, bows, thrown weapons, armor, and elemental effects; encounters combine hostile fauna/bosses with player competition.
-- **Proposed:** Readable melee arcs, directional/blockable attacks, brief commitment/recovery windows, sprint/dodge or sidestep movement, and distinct weapon reach.
+- **Confirmed:** Combat uses primitive melee, bows, thrown weapons, armor, elemental effects and **healing consumables**, without player-usable shields; encounters mix PvE and PvP.
+- **Proposed:** Readable melee arcs, attack commitment and recovery, sprint/dodge or sidestep movement, and distinct reach. No shield blocking, parrying or guard-meter system.
 - **Proposed:** Skill and positioning should matter even when equipment tiers differ. High-tier gear gives advantage, not unconditional wins.
-- **Proposed:** Armor carries mobility/stamina tradeoffs. Shields counter some frontal threats, flanking and heavy attacks counter shields.
+- **Confirmed:** **Healing items** replace usable shields as the active recovery option; armor, cover, spacing and evasion remain relevant.
+- **Proposed:** Armor has mobility/stamina tradeoffs; healing exposes a vulnerable application window instead of granting invulnerability.
 
 ### 5.2 Tribes and social systems — Open
 
@@ -175,10 +193,23 @@ Tribe size cap, friendly fire, invitations, permissions, loot rights, tribe base
 
 ### 5.3 Fair-play requirements — Proposed
 
-- Server-authoritative health/damage, loot ownership and drops, crafting costs, durability, building, event rewards and extraction outcomes.
+- Server-authoritative damage, health, healing consume/cooldowns, interruption, loot ownership and drops, crafting costs, durability, building, event rewards and extraction.
 - Validate attack distance, timings, rate limits, line-of-sight where relevant, inventory changes and tool provenance.
 - Design anti-spawn-camp protections without creating exploitable invulnerability near valuable objectives.
 - Offer solo players stealth, speed, traps or alternate extraction paths rather than requiring a large tribe.
+
+### 5.4 Healing combat contract — Proposed implementation
+
+1. Alive player selects a healing item; quick slot shows stack count, expected recovery, animation and use window.
+2. Client requests to start use with item/slot and operation nonce. **Server** checks ownership, remaining stack, cooldown, health state and eligibility.
+3. Player performs a clear treatment/drinking animation, remaining vulnerable; a proposed slow or movement restriction creates a tactical choice.
+4. Damage, sprinting, weapon switching or leaving the allowed state **may interrupt** the attempt; exact interruption conditions remain Open.
+5. On validated completion, server deducts **exactly one** unit, heals up to max health or applies its cleanse. Cancelled use must not grant health or consume materials unless a published partial-use rule says otherwise.
+6. Server publishes health/stack delta. Repeated remotes and disconnects cannot apply multiple heals or consume repeatedly.
+
+**Balance constraints:** No equipable shield, guard meter, free temporary barrier, auto-regeneration exploit, full-HP panic button or bottomless consumable. Limit repeated sustain by inventory weight/stack cap, application time and shared cooldown. Effective healing rates must allow committed enemies to finish fights; solo players should still access affordable early healing. Enchantments may modify individual crafted healing effects, never create a reusable unlimited-health source.
+
+**QA:** Test damage interruption, concurrent use, latency, repeated remotes, negative stack attempts, healing at max health, death while channeling, zero-stack requests, use during extraction, controller/touch accessibility, trade/drop interactions and no Permanent healing-stacks path. Mark precise timings and values Open until playtest.
 
 ## 6. Building, FOBs, and raiding
 
@@ -326,7 +357,7 @@ First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extra
 **Required design surfaces — Proposed (not implemented):**
 
 - **Lobby / vault:** Vault inventory, loadout/deployment decisions, run results and risk explanation.
-- **In-world HUD:** Health, stamina, equipped primitive weapon, inventory burden, compass/minimap, extraction information and event markers.
+- **In-world HUD:** Health, stamina, equipped weapon, healing quick slots/use timer, inventory burden, compass/minimap, extraction and event markers.
 - **Crafting/building:** Recipe requirements, snap previews, construction restrictions and durability.
 - **Event UI:** Clear announcement, direction/search radius, beacon color and event time state.
 - **Boss UI:** Three-phase status, 3-minute warning, pillar progress and readable 25% phase transition.
@@ -372,8 +403,8 @@ The first milestone should prove the **risk → loot → extraction → vault** 
 
 | Slice increment | Included | Acceptance criteria |
 | --- | --- | --- |
-| **A. Gather/craft** | Small outer-rim test arena; wood/stone; axe/spear; basic inventory | A new player can gather, craft and equip without admin commands |
-| **B. Fight/lose** | Primitive PvE enemy; basic PvP; dropped backpack/loot | Death drops correct eligible items; server rejects invalid combat/inventory requests |
+| **A. Gather/craft** | Outer-rim test arena; wood/stone/herbs; axe/spear; inventory and bandage | A new player can gather, craft a weapon and healing item, and use both without admin commands |
+| **B. Fight/lose** | Primitive PvE/PvP, healing use and interruption, dropped backpack/loot | Death drops ordinary loot; server rejects invalid damage/heal/consume attempts |
 | **C. Extract/secure** | One minor rune; channel; persistent vault | Extracted loot survives rejoin; interrupted extracts do not grant loot; retries do not duplicate |
 | **C2. Permanent Forge prototype** | One ordinary special recipe and one eligible source-to-Permanent conversion | Ingredients charged once, converted source retired, owned Permanent record survives test death/rejoin, other carried loot still drops |
 | **D. Build/raid** | Foundations/walls/door/stash; damage and breaching; no-build aura | Another player can attack/loot stash; portal cannot be blocked |
@@ -386,7 +417,7 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 ### 13.2 Documentation validation checklist
 
-- [x] Project title is Flintborn; primitive-fantasy equipment; no firearms.
+- [x] Flintborn primitive fantasy equipment explicitly excludes **firearms and player shields**; healing uses finite items.
 - [x] Full run loop, three world zones and vault/death stakes documented.
 - [x] Three event families and exact known 60-second cache rule recorded.
 - [x] Mega-Boss cadence, 3-minute alert, three phases and 25% drop recorded.
@@ -406,7 +437,7 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 | **P0** | Death, disconnect, reconnect and combat-logging policy | Exploit resistance and player trust |
 | **P0** | Portal activation/interrupt logic and multiplier definition | Core extraction risk and economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
-| **P1** | Weapons, stamina/blocking, hit detection, magic resources | Combat feel and network design |
+| **P1** | Weapons, dodge/movement, healing timings and interruptions, hit detection, magic resources | Combat feel and network design without shields/guard meters |
 | **P1** | Build/raid costs, protected zones, raid time and structure upkeep | Base fairness and grief prevention |
 | **P1** | Event schedule/loot tables, boss loot distribution and reset logic | Server pacing and endgame |
 | **P1** | Biomes, distances, terrain elevation, portals and spawn points | World prototyping and movement |
@@ -480,8 +511,8 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 ### 16.2 Proposed stations and recipe categories
 
 - **Stonecarver's Table:** Refined flint, bone, resin and early special tools; introductory secure-crafting tutorial.
-- **Tribal Smithy:** Iron, obsidian, higher-grade blades, shields, utility armor and repairs.
-- **Rune Altar:** Charge cores, imbuements, elemental catalysts, jade wards and magic resistance.
+- **Tribal Smithy:** Iron, obsidian, blades, wearable armor and repairs (**no shields**).
+- **Rune Altar:** Charged cores, imbuements, restorative elixirs, antidotes and elemental resistance, never protective barriers.
 - **Eternal Anvil:** Permanent transformations requiring a validated source instance, scarce Keystone and multiple rare materials.
 - **Vault Ledger:** Material balance, pinned blueprints, provenance, missing-ingredient list, operation history and safe-ownership receipts.
 
@@ -501,7 +532,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 
 - No random recipe-failure chance that destroys expensive ingredients and a Legendary. **Default: 100% conversion if valid and fully funded**.
 - Recipes should encourage players to seek *different* objectives (ore + alpha component + meteor resource), not repeatedly grind a single trivial node.
-- Rare enchantments modify normal spears, bows, axes, clubs and shields; no guns, machine guns or automatic firearm analogues.
+- Rare enchantments modify spears, bows, axes, clubs and armor; nature magic can modify **single-use** healing items. No guns or automatic firearm analogues.
 - Recipe discovery is achievement-based or material-discovery-based, with clear reveal paths. Avoid forcing players to consult external guides.
 - Multiple viable weapon archetypes prevent a single mandatory optimal Permanent item.
 - Crafts that consume an item must use a unique instance ID; stacks use bounded positive integers and no fractional duplication.
@@ -545,7 +576,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 | --- | --- | --- | --- |
 | Common harvest | Outer Rim | Wood, Stone, Plant Fiber, Rawhide | Starter recipes, repair kits, field equipment |
 | Uncommon harvest | Outer caves/Inner trails | Flint, Bone, Resin, Copper Ore | Beginner Forge, bow/spear component upgrades |
-| Rare harvest | Inner jungle/volcanic slope | Iron Bloom, Obsidian, Jade, Dire Hide | Metal weapons, defensive wards, special armor |
+| Rare harvest | Inner jungle/volcanic slope | Iron Bloom, Obsidian, Jade, Dire Hide, rare herbs | Metal weapons, healing mixtures, resistances and special armor |
 | Elite creatures | Alpha Mob + protective pack | Charged Core, Glow-Fur, Ancient Binding | Elemental upgrades and conversion gates |
 | Ancient caches | Timed 60-second unlocking | Finished weapons, Ashen Oil, Siege Resin | Prepared gear, raids, rare catalytic components |
 | Tier-5 Resource Crash | Prolonged contested meteor interaction | Abyssal Shard, Emberglass | Endgame reinforcement and multiple conversion inputs |
@@ -578,12 +609,12 @@ Resources exit the economy through (a) field supply/ammunition/raids, (b) secure
 | Tidewoven Cloak | Stonecarver | Rawhide ×18, Resin ×8, Fiber ×20 | Light armor, mobility |
 | Ironroot War Axe | Tribal Smithy | Iron Bloom ×24, Dire Hide ×6, Resin ×10 | Heavy stagger, slow recovery |
 | Obsidian Fang | Tribal Smithy | Obsidian ×18, Bone ×16, Iron Bloom ×10 | Short-range cutting and bleeding |
-| Jade Bulwark | Rune Altar | Jade ×15, Iron Bloom ×16, Resin ×15 | Defensive ward shield |
+| Jadeweave Vest | Rune Altar | Jade ×15, Iron Bloom ×16, Resin ×15 | Torso armor with modest elemental resistance and a weight tradeoff; no shield effect |
 | Ember-Touched Spear | Rune Altar | Vaulted Metal Spear ×1, Emberglass ×6, Charged Core ×1 | Finite burn charges |
 | Stormstring Bow | Rune Altar | Vaulted Reinforced Bow ×1, Charged Core ×2, Glow-Fur ×8 | Charged bow shots with cooldown |
 | Frostwoven Mantle | Rune Altar | Tidewoven Cloak ×1, Jade ×14, Ancient Binding ×2 | Brief frost resistance |
 | Ashen Breach Pot | Smithy | Emberglass ×5, Resin ×9, Obsidian ×4 | **Ordinary consumable**, never Permanent |
-| Guardian Ward | Rune Altar | Jade ×25, Crown Ash ×2, Ancient Binding ×3 | Defensive magic skill |
+| Guardian Renewal Draught | Rune Altar | Jade ×25, Crown Ash ×2, Ancient Binding ×3 | Rare single-use heal or cleanse; **not Permanent** |
 
 ### 19.1 Permanent conversion examples — more expensive than ordinary crafting
 
@@ -591,7 +622,7 @@ Resources exit the economy through (a) field supply/ammunition/raids, (b) secure
 | --- | --- | --- | --- |
 | **Eternal Hunter Spear** | Flint Hunter Spear ×1 | Abyssal Shard ×2, Jade ×30, Ancient Binding ×5, Keystone ×1 | Early aspirational bound melee build |
 | **Bound Ironroot Axe** | Ironroot War Axe ×1 | Abyssal Shard ×3, Obsidian ×30, Charged Core ×3, Keystone ×1 | Costly high-impact melee identity |
-| **Everjade Ward** | Jade Bulwark ×1 | Jade ×50, Glow-Fur ×18, Guardian Heart ×1, Keystone ×1 | Defensive specialist, boss component |
+| **Everjade Vestments** | Jadeweave Vest ×1 | Jade ×50, Glow-Fur ×18, Guardian Heart ×1, Keystone ×1 | Permanent torso armor with bounded passive resistance, no shield or free healing |
 | **Runebound Stormstring** | Stormstring Bow ×1 | Charged Core ×6, Emberglass ×20, Crown Ash ×4, Keystone ×1 | Costly bow mastery, finite charges |
 | **Oath of the Guardian** | Eligible vaulted Guardian Legendary ×1 | Guardian Heart ×2, Abyssal Shard ×8, Crown Ash ×10, Keystone ×2 | Prestige goal, strict PvP power cap |
 
@@ -627,11 +658,12 @@ A veteran equips one recovered bound sword plus ordinary armor, potions, arrows 
 
 ### 21.1 Weapon-archetype vocabulary — Proposed
 
-- **Spears/javelins:** Reach, spacing and thrusts; countered by inside-close movement and shield timing.
+- **Spears/javelins:** Reach and committed thrusts; countered by lateral movement, inside-close pressure and punishing misses.
 - **Clubs/axes/mauls:** High stagger/armor pressure, slow recovery and stamina cost; effective raiding preparation.
-- **Blades/daggers:** Speed and flank pressure, weaker frontal guard break.
+- **Blades/daggers:** Speed and flanking; shorter reach and weaker stagger against durable armor.
 - **Bows/slings:** Draw commitments, projectile arcs, retrievable/consumed ammo, imperfect mobile aim assistance, countered by cover/rush.
-- **Shields:** Facing-dependent protection, guard stamina and heavy-break counters.
+- **Healing consumables:** Finite recovery with telegraphed use, potential interruption and cooldown. Consumables are never convertible to reusable Permanent sources.
+- **Armor:** Passive mitigation and elemental resistance with mobility/weight tradeoffs, no blocking button.
 - **Ember/frost/storm/earth magic:** Distinct status utility with telegraphs, charges and PvP control-duration caps, never machine-gun analogues.
 
 ### 21.2 Encounter difficulty
@@ -702,7 +734,7 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **PermanentArmoryService** | Permanent canonical records, loadout lease, death recovery | Bound armory, recovery conditions, slot occupancy |
 | **LoadoutService** | Ordinary equipment withdrawal, bound caps, deployment preparation | Risk labels and confirmed slots |
 | **ExtractionService** | Portal channel, area/survival validation, deposit operation | Timer, interruption, final receipt |
-| **CombatService** | Validated hits, shields, enchantment procs, PvP cooldowns | Health/status animations, hit feedback |
+| **CombatService** | Validated hits, movement/dodge, healing consume and interruption, enchantment procs, PvP cooldowns | Health/status animations, healing progress and hit feedback |
 | **BuildingService** | Snapping rules, ownership, no-build geometry, raid/stash damage | Build previews, repairs, access errors |
 | **EventDirector** | Meteor/cache/alpha spawn and broadcast, rewards | Announcements, objective markers, beacon state |
 | **BossService** | Horn, timer, shield pillars, HP phases, once-only Legendary drop | Boss warnings, phase UI, rewards at risk |
@@ -899,7 +931,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | 1. Design agreement | Choose Permanent death model, rarity/eligibility and vault semantics | Explicit signed-off GDD decisions (not just proposed paragraphs) |
 | 2. Risk loop vertical slice | Gather, craft spear, hostile, drop on death, minor rune, vault | In Studio: reward-loss-extract tested, persisted after rejoin |
 | 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
-| 4. Social / PvP slice | Spear, bow, shield, one elemental effect, solo/tribe safeguards | Playtest viability across skill and gear tiers |
+| 4. Social / PvP slice | Spear, bow, **healing consumables**, one elemental effect, solo/tribe safeguards | Test sustained damage vs healing rates, interruption and escape; no player shield equipment |
 | 5. World + raids | Outer/Inner prototypes, structures, 50-meter exclusion, stash raids | Raiding works without portal obstruction |
 | 6. Broadcast event | Alpha/cache/meteor preview, beacon, rare carry burden | Rewards contestable and remain unsecured until extracted |
 | 7. Crater Guardian | 15–20-minute cadence, horn, pillars, fight, 25%-HP drop | One mid-fight Legendary and accurate telegraphs; no auto-vault |
@@ -917,4 +949,4 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 ---
 
-**Working principle:** Protect the identity of Flintborn: **primitive survival + raidable preparation + contested world events + visible high-value loot + manual extraction + persistent secure vault + rare, expensive cross-run special crafting and Permanent conversion**. Proposed features are not final decisions until approved and tested.
+**Working principle:** Protect the identity of Flintborn: **primitive survival, no firearms or player shields, healing supplies, raidable preparation, contested events, visible rare loot, manual extraction, safe vault, rare special crafting and costly Permanent conversion**. Proposed features are not final decisions until approved and tested.
