@@ -707,28 +707,30 @@ Player strength comes from execution, temporary risked gear, group tactics and o
 
 **Invariant:** Each ordinary instance occupies **one** authoritative world/inventory/vault/escrow location. A bound manifestation is an active *reference*, not a second owned transferable item. Stack totals are bounded integers and can be split only through server-validated operations.
 
-### 22.2 Extraction channel and irreversible commit — Proposed
+### 22.2 Two-minute hold, protected animation and vault ledger — Confirmed / Proposed engineering
 
-1. Client requests portal interaction. Server verifies character alive, actual radius/line-of-sight policy, portal status, channel concurrency, active item ownership and anti-combat-log state.
-2. Server begins authoritative timer, displays channel bar and makes the attempt contestable. Exact channel duration/interrupt conditions remain Open.
-3. Movement out of zone, death, relevant damage or portal closure interrupts according to configured rules. No stored progress unless explicitly designed.
-4. When valid timer completes, server locks eligible carried items into one pending extraction operation with a **unique receipt ID**.
-5. A durable profile deposit must reconcile correctly before showing success or unloading character. Do not create a vault item in the UI and later hope the save succeeds.
-6. If death races extraction, one terminal outcome wins: committed safe ownership **or** at-risk corpse loot, never both.
-7. Client receives committed summary with item IDs/quantities, bonus *valuation*, new vault totals and Forge recipe progress.
-8. On reconnect, unresolved pending receipt is verified and replayed idempotently. Never process the same rare item as newly extracted twice.
+1. Client clicks the extraction rune. Server validates player, position, alive status and portal eligibility, sends audible/visual alerts to other players and starts the **120-second** countdown.
+2. Server continuously confirms that the player remains within the marked area. Player is vulnerable to PvP and creature damage during the countdown. Exiting the area invalidates the attempt; restarting rather than pausing is proposed.
+3. If death or an ordinary world departure occurs during the hold, there is no extraction. Instead the ordinary lootable-body rules apply.
+4. After 120 valid seconds, an authoritative **ExtractionAnimationStarted** transition locks the exact eligible inventory snapshot and grants **invulnerability and safe disconnect at the moment animation begins**.
+5. An immutable operation/receipt ID protects that locked inventory even if the player quits, teleports, loses connection or a DataStore write is still retrying. The backend must eventually reconcile the snapshot to the vault without forfeiture or duplication.
+6. The animation communicates safety; only the server may authorize that state. An untrusted client's animation cannot grant or spoof protection.
+7. Once the durable vault receipt is confirmed, show success and transfer to lobby. Until then, UI may show **Protected — Saving**; it must never claim final saved status prematurely.
+8. Race resolution: death/ordinary leave before animation => single lootable body; server-authorized animation before death/leave => no body for committed items. Maintenance safe-kick uses a distinct audited exemption.
 
-**Critical distinction:** The Center Crater portal's larger multiplier is not permission to multiply unique instances or scarce conversion materials. A consistent payout currency/valuation model should be defined before implementing bonuses.
+**Engineering invariant:** The user-facing animation start is the protection threshold, not the animation end or return-to-lobby transition. It requires a recoverable extraction entitlement so item safety is guaranteed while eventual storage may be pending.
 
-### 22.3 Disconnect, shutdown and concurrent sessions — Open / Proposed
+### 22.3 Disconnect, shutdown and concurrent sessions — Confirmed / Proposed engineering
 
-- **Working default:** On combat disconnect, the avatar remains vulnerable for a short server-owned window; if it dies during that window, regular loot drops. Exact timing is Open and must be communicated.
-- Keep a player profile session lease so two overlapping servers cannot both mutate the same vault/armory. Leases require expiry/recovery policy for crashed servers.
-- During DataStore throttling, show **pending confirmation**, preserve unresolved operation journal and retry with backoff/budget constraints. Never label pending extraction a success.
-- Player joins a different server with a stale profile: reject writes or reconcile from most recent committed revision; do not overwrite a newer Forge transaction.
-- A game shutdown does **not** safely auto-extract every carrier. Resolve according to a published server-close policy after persistence engineering is proven.
-- Failed Forge operation may stay pending, but it must not consume ingredients without an eventual durable output or safe rollback.
-- Test teleports/hub transitions with network loss; Roblox platform writes are not a database transaction across unrelated DataStores.
+- **Confirmed:** Ordinary player departure from anywhere outside the lobby — voluntary quit or lost connection — leaves a single lootable character body in the active server and forfeits carried ordinary loot. **Body and unclaimed loot disappear after 10 minutes / 600 seconds.**
+- **Confirmed:** Disconnect is safe once the valid protected extraction animation begins, even before it finishes. The player must receive their locked extracted contents once persistence reconciles.
+- **Confirmed:** Authorized administrator update/removal commands safely kick players without losing held items. The server must preserve them separately from successful extraction and not grant extraction bonuses/Forge eligibility; see §30.
+- **Proposed:** Unexpected entire-server crash cannot keep a corpse in a server that no longer exists. Deliberate admin maintenance and platform failure require different audited state/recovery policies.
+- Keep a per-account/profile session lease so two concurrent servers cannot both withdraw, restore or mint the same item.
+- Under DataStore throttling, preserve pending operation receipts and retry within budgets; never silently mark a pending write successful or forfeit protected holdings.
+- Block stale profile writes during reconnect or fast teleport; do not let an old server overwrite newer inventory, Permanent conversion or maintenance restoration.
+- Do not auto-extract everyone when a server restarts. Authorized maintenance preserves unsecured holdings without granting payout. Unexpected failures need a separately defined and tested fairness policy.
+- A failed Forge operation must not consume ingredients permanently without an eventual committed output or safe rollback; shutdown must also preserve that consistency.
 
 ### 22.4 Base raid and protection boundary
 
@@ -740,19 +742,20 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 
 | System | Server responsibility | Client-facing information |
 | --- | --- | --- |
-| **ProfileService** | Profile locks, schema upgrades, revision numbers, saving, recovery | Loaded/pending/error status, safe profile view |
+| **ProfileService** | Session locks, schema upgrades, revisions, protected extraction and maintenance recovery | Saved/pending/recovery status and safe profile view |
 | **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
 | **InventoryService** | Transfer/drop/pickup, stack accounting, world provenance | Inventory and equip deltas |
 | **VaultService** | Safe storage/withdrawal, capacity and extraction receipt application | Vault tabs, item detail, secure totals |
 | **ForgeService** | Recipe eligibility, ingredient reservation, output issuance, commit | Preview, costs, progress, authoritative receipts |
 | **PermanentArmoryService** | Permanent canonical records, loadout lease, death recovery | Bound armory, recovery conditions, slot occupancy |
 | **LoadoutService** | Ordinary equipment withdrawal, bound caps, deployment preparation | Risk labels and confirmed slots |
-| **ExtractionService** | Portal channel, area/survival validation, deposit operation | Timer, interruption, final receipt |
+| **ExtractionService** | Exactly 120-second in-area hold, alerts, animation-start invulnerability, vault receipt | Countdown/boundary, opponent alerts, protection and verified receipt |
 | **CombatService** | Validated hits, movement/dodge, healing consume and interruption, enchantment procs, PvP cooldowns | Health/status animations, healing progress and hit feedback |
-| **BuildingService** | Snapping rules, ownership, no-build geometry, raid/stash damage | Build previews, repairs, access errors |
-| **EventDirector** | Meteor/cache/alpha spawn and broadcast, rewards | Announcements, objective markers, beacon state |
+| **BuildingService** | Booga Booga-style placement, rotation/snap, ownership, exclusions, raids and stash damage | Responsive build previews, repair and access errors |
+| **EventDirector** | Meteor/cache/alpha, rare flora, deposits, regional bosses and raidable structures | Tiered alerts, discovery markers and beacons |
 | **BossService** | Horn, timer, shield pillars, HP phases, once-only Legendary drop | Boss warnings, phase UI, rewards at risk |
-| **AnalyticsService** | Server-owned events, economic flow, dupe/failure counters | None beyond optional diagnostics |
+| **AnalyticsService** | Economy, public-world activities, participation, reward abuse, dupes/failures | Verified activity rewards/diagnostics |
+| **DepartureService** | Normal non-lobby body + 600-second TTL, lobby exit, protected extraction exit and maintenance exception | Risk warning, body/despawn and restoration statuses |
 
 All persistent crafting and extraction grants happen on the **server**. Client may request an action but cannot dictate rarity, cost, exact output, reward source, success flag, or timestamp.
 
@@ -903,6 +906,14 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
 19. No deployment or publishing workflows target temporary/version branches; only main may publish.
 20. Deployed Roblox place testing is **not applicable until source/place credentials are connected**.
+21. Ordinary non-lobby departure produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
+22. Lobby exit never creates a loot body or forfeits inventory.
+23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier); forged client admin flags and duplicate restore requests fail.
+24. Rune click broadcasts audible/visual cues; countdown takes exactly 120 continuous in-area seconds, validated by server; dying, quitting or exiting area early cannot extract.
+25. At valid animation-start threshold, damage and disconnect cannot cause item loss; idempotent locked receipt settles exactly once, even after DataStore fault.
+26. Corpse-versus-extract and corpse-versus-maintenance races never grant double inventory or lose protected items.
+27. Rare plants/materials, elite mobs/bosses, raid structures and meteors have finite rewards and tier-appropriate announcements.
+28. Activity rewards are validated across PvP, farming and building and resist AFK/idle/server-hopping exploits.
 
 ### 27.2 Manual playtests — Requires Manual Validation
 
@@ -943,13 +954,13 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | Step | Scope | Completion evidence |
 | --- | --- | --- |
 | 1. Design agreement | Choose Permanent death model, rarity/eligibility and vault semantics | Explicit signed-off GDD decisions (not just proposed paragraphs) |
-| 2. Risk loop vertical slice | Gather, craft spear, hostile, drop on death, minor rune, vault | In Studio: reward-loss-extract tested, persisted after rejoin |
+| 2. Risk loop vertical slice | Gather, heal, fight, death/leave corpse, extract by 120-second hold and protected animation | Body expires at 600 seconds; alarm, safe disconnect and eventual vault receipt validated |
 | 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
 | 4. Social / PvP slice | Spear, bow, **healing consumables**, one elemental effect, solo/tribe safeguards | Test sustained damage vs healing rates, interruption and escape; no player shield equipment |
-| 5. World + raids | Outer/Inner prototypes, structures, 50-meter exclusion, stash raids | Raiding works without portal obstruction |
-| 6. Broadcast event | Alpha/cache/meteor preview, beacon, rare carry burden | Rewards contestable and remain unsecured until extracted |
+| 5. World + raids | Outer/Inner biome, Booga Booga-like structures, 50-meter exclusions and stash raids | Quick placement, raidable storage and no portal obstruction |
+| 6. Broadcast event | Rare plants/materials, mob/boss events, raidable structures, meteor, beacon and rare carry burden | Varied events and playstyles, with loot requiring extraction |
 | 7. Crater Guardian | 15–20-minute cadence, horn, pillars, fight, 25%-HP drop | One mid-fight Legendary and accurate telegraphs; no auto-vault |
-| 8. Economy alpha | Multiple recipes, advanced conversions, telemetry and sinks | Progression feasible solo, scarce resources meaningful, no observed dupes |
+| 8. Economy alpha | Recipes, conversions, activity rewards, economy telemetry and sinks | Solo/farmer/builder/PvPer progression viable, no AFK exploits or observed dupes |
 | 9. Launch readiness | Full server profiling, accessibility, persistence faults, anti-exploit | Reviewed CI, manual playtests and publish-from-main gates |
 
 **Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Recipe prices and operational policies are hypotheses until explicit approval, simulation and testing.
