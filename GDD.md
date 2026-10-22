@@ -20,7 +20,7 @@
 
 **Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
 
-**Confirmed public-world/extraction decisions (2026-10-21):** Normal leave outside lobby creates an in-world body, forfeits carried ordinary items, and despawns after 10 minutes; privileged admin update kick preserves items. Extraction emits audio/visual cues, takes 120 seconds within the required area, and grants invulnerability and disconnect safety once the animation begins. More events (rare flora, materials, mobs, bosses, raidable structures, meteors), Booga Booga-style building and sustained public-world playstyle rewards are intended. See §29–33.
+**Confirmed public-world and loading decisions (2026-10-21):** Players arrive at the play-world server into a **safe pre-spawn main menu**. No gear is ever lost during loading, failed teleport, main-menu departure or failed spawn. Only a completed **Play → server-confirmed character spawn → ActiveRun** transition begins loot risk. Active world death/ordinary departure leaves a lootable body, expiring after **10 minutes**. Authorized update kicks preserve held gear. Extraction sends audio/visual signals and requires a **120-second vulnerable in-zone hold**; its animation then grants invulnerability and safe disconnect immediately. Rare flora, materials, mobs, bosses, raidable structures and meteors, Booga Booga-style building and rewards for engaged public-world playstyles remain in scope (§29–33).
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -35,7 +35,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ## 1. High concept
 
-**Pitch:** Spawn at the edge of a fractured island with almost nothing. Gather, craft, establish a raidable tribal stronghold, and venture deeper to fight rival players and ancient monsters for enchanted loot. Carry your prizes to a dangerous extraction rune to secure them in a permanent vault. Fail, and others take what you carried.
+**Pitch:** Arrive in a protected play-world main menu, wait for loading, then explicitly press **Play** to spawn on the edge of a fractured island with almost nothing and activate inventory risk. Gather, craft, establish a raidable tribal stronghold, and venture deeper to fight rival players and ancient monsters for enchanted loot. Carry your prizes to a dangerous extraction rune to secure them in a permanent vault. Fail, and others take what you carried.
 
 **Unique proposition:** The strategic tension of an extraction game **without firearms**: stone and metal arms, spears, bows, tribal equipment, enchanted blades, and elemental magic. Combat, transport, raiding, and map control all happen in a primitive-fantasy setting.
 
@@ -44,7 +44,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 1.1 Design pillars — Confirmed
 
 1. **Risk is voluntary but meaningful.** Safer outer routes provide a viable exit; deeper objectives pay more and attract other players.
-2. **Ordinary loot is at risk.** On death or ordinary departure outside the lobby, a lootable body remains in the server for **10 minutes**, with any unclaimed items despawning at expiry. The player loses carried ordinary loot. The protected extraction animation and authorized game-update kicks are exceptions (§29–30); Permanent gear recovery is still Open (§15–17).
+2. **Risk begins only after successful Play admission.** Loading, teleport failures and the protected in-world main menu are loss-free. Once server-confirmed active gameplay starts, ordinary gear drops on death/leave as a **10-minute corpse**. Protected extraction and authorized update kicks are exceptions (§29–31); Permanent recovery remains Open (§15–17).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
 4. **The world creates diverse PvPvE opportunities.** Meteors, rare shrubs/trees and material nodes, raidable structures, unusual mob and boss spawns, caches and the Guardian move players across the island.
 5. **Primitive fantasy, not military extraction.** No firearms or player-usable shields at any tier. Magic supplements primitive weapons and consumable healing.
@@ -62,21 +62,22 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 2.1 Primary loop — Confirmed
 
-1. **Deploy:** Enter an active island session at the low-risk Outer Rim with minimal equipment.
+1. **Prepare safely:** Travel to a play-world server and wait at its protected main menu until profile/assets are ready. **Explicitly click Play**; the server confirms a successful character spawn before making equipped ordinary gear at risk. Teleport/load/spawn failures never forfeit items.
 2. **Scavenge:** Gather wood, stone, flora, and other materials; create tools, weapons, shelter, and supplies.
 3. **Prepare:** Craft/upgrade gear; optionally join a tribe and establish a forward operating base (FOB).
 4. **Take a risk:** Explore the Inner Ring, contest broadcast events, raid exposed bases, or challenge the Center Crater boss.
 5. **Carry the prize:** Valuable items physically occupy the player's carried inventory; rare/event loot exposes a visual trail.
 6. **Extract:** Reach a rune or portal and complete extraction to transfer eligible carried rewards to an unraidable persistent vault.
 7. **Build long-term power:** Spend extracted ingredients on special recipes or save for costly Permanent conversions (confirmed mechanic; specific recipes proposed).
-8. **Continue or extract:** Remain in a public world to pursue farming/building/PvP, or complete a telegraphed **120-second in-area extraction hold** to enter the protected animation. Simply leaving the world forfeits ordinary carried gear.
+8. **Continue or extract:** Once admitted into active gameplay, remain in a public world for farming/building/PvP, or complete a signaled **120-second in-area extraction hold** to enter the protected animation. Leaving while actually active forfeits ordinary carried gear; leaving the **pre-spawn menu** is always safe.
 
 ### 2.2 Loss and persistence contract
 
 | Domain | Established behavior | Design status |
 | --- | --- | --- |
-| On-person inventory | Drops on death or ordinary non-lobby departure with lootable **10-minute body** | **Confirmed** |
-| Lobby departure | Can safely leave from the lobby | **Confirmed** |
+| On-person active-run inventory | Drops on death or ordinary departure **after successful Play admission**, leaving lootable **10-minute body** | **Confirmed** |
+| Lobby or world main-menu departure | Safe regardless of teleport/load failures or pre-spawn kick | **Confirmed** |
+| World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
 | Protected extraction | Requires **120 seconds inside designated area** and audio/visual cues; animation then grants invulnerability and disconnect safety | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
 | Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
@@ -87,9 +88,9 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Player progress (recipes, cosmetics, reputation, etc.) | Whether and what persists | **Open** |
 | Bases across sessions/server shutdowns | Session-only, timed-wipe, or persistent-world model | **Open** |
 | Public world playstyles | Benefits for engaged PvPers, base-builders, farmers and other active playstyles | **Confirmed direction**; specific rewards Proposed |
-| Disconnects during combat/extraction | Ordinary non-lobby disconnect leaves a lootable body; once protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
+| Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
-**Working default:** Ordinary vaulted items become unsecured after deployment. Converted Permanent equipment may retain ownership subject to still-open rules. **Confirmed:** A normal non-lobby departure creates a lootable 10-minute body, not a safe logout. Animation-start protection and authorized update kicks are exceptions, and must be implemented without duplication (§29–30).
+**Working default:** Ordinary vaulted gear remains safe in profile/transit reservation while the play-world main menu loads. It becomes at risk **only when Play completes authoritative active spawn**; converted Permanent equipment follows still-open ownership rules. Ordinary departure during an active run produces a 10-minute body. Protected extraction, update maintenance and pre-spawn staging are safe exceptions (§29–31).
 
 ## 3. World — The Shattered Crater
 
@@ -103,7 +104,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 3.1 Spatial rules — Confirmed
 
-- Players begin at the outskirts rather than in the center.
+- After the in-world pre-spawn menu completes and the player explicitly presses **Play**, the first risk-bearing character spawn occurs on the outskirts rather than in the center. Loading into the server alone does not spawn a vulnerable character.
 - Rare objectives and high-value extraction routes increasingly expose players to conflict.
 - A **50-meter no-build Holy Aura** protects **all extraction portals/runes** from player construction that would enclose or obstruct them.
 - The Mega-Boss can destroy player-built structures near its arena, preventing structure-based fight exploits.
@@ -368,7 +369,8 @@ First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extra
 
 **Required design surfaces — Proposed (not implemented):**
 
-- **Lobby / vault:** Vault inventory, loadout/deployment decisions, run results and risk explanation.
+- **Lobby / vault:** Vault inventory, protected loadout/transit reservation, deployment decisions, run results and risk explanation.
+- **Play-world pre-spawn main menu:** Mandatory protected loading/status, Play enablement only after readiness, safe leave/retry and explicit risk transition after successful spawn (§31).
 - **In-world HUD:** Health, stamina, equipped weapon, healing quick slots/use timer, inventory burden, compass/minimap, extraction and event markers.
 - **Crafting/building:** Recipe requirements, snap previews, construction restrictions and durability.
 - **Event UI:** Clear announcement, direction/search radius, beacon color and event time state.
@@ -384,8 +386,8 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 ### 12.1 Authority boundaries
 
-- **Client:** Input, animations, local UI, prediction, non-authoritative audiovisual effects. Client never decides what was securely extracted, what is bound, or whether crafting succeeded.
-- **Server:** Damage and status, material grants, inventory ownership, loot drops, structure placement/health, crafting, events, boss state, portal eligibility, extraction transactions, vault writes.
+- **Client:** Input, animations, protected pre-spawn menu, local UI, prediction and non-authoritative effects. Client never decides risk activation, successful character admission, extracted/bound ownership or crafting success.
+- **Server:** Player-session state, readiness/admission/spawning, damage, healing, inventory drops/ownership, structure placement, crafting, events/bosses, portals, extraction and vault writes. A place ID or untrusted client loading-complete flag cannot trigger risk.
 - **Shared definitions:** Typed item catalog, tags, combat/status definitions, event/biome IDs, validated protocol shapes and tunable balance values.
 
 ### 12.2 Candidate service boundaries
@@ -394,14 +396,15 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 **Important invariants for code review:**
 
-1. No client-created rare items or client-declared combat hits without server validation.
+1. No client-created rare items, client-declared combat hits, or client-asserted successful Play admission without server validation.
 2. No player-built structure can exist within an extraction no-build zone.
 3. An item cannot simultaneously exist as world loot, carried inventory, vault inventory, Forge-reserved input and account-owned Permanent equipment. A deployed bound manifestation references one canonical record; it is never a second tradable item.
 4. Extraction **and Permanent conversion** have explicit persisted success/failure states; retries cannot duplicate items or double-charge ingredients.
 5. A valid **120-second in-zone hold** gates protected animation; invulnerability and disconnect safety begin at server-authorized animation start with an immutable inventory snapshot.
-6. Ordinary departure outside lobby creates a single lootable body expiring after 600 seconds; authorized maintenance removal preserves holdings without auto-extraction.
-7. Boss Legendary release at 25% occurs at most once per encounter.
-8. Only `main` may trigger production publishing workflows; development branches never publish.
+6. **Only a confirmed ActiveRun/ExtractionHolding** departure creates a lootable body expiring after 600 seconds; loading/pre-spawn menus and failed teleports never drop gear. Authorized maintenance removal preserves holdings without auto-extraction.
+7. In-world menu loading/PlayRequested cannot start active combat until successful server-controlled spawn and inventory risk transition.
+8. Boss Legendary release at 25% occurs at most once per encounter.
+9. Only `main` may trigger production publishing workflows; development branches never publish.
 
 ### 12.3 Platform and performance considerations — Proposed
 
@@ -417,8 +420,8 @@ The first milestone should prove the **risk → loot → extraction → vault** 
 
 | Slice increment | Included | Acceptance criteria |
 | --- | --- | --- |
-| **A. Gather/craft** | Outer-rim test arena; wood/stone/herbs; axe/spear; inventory and bandage | A new player can gather, craft a weapon and healing item, and use both without admin commands |
-| **B. Fight/lose** | Primitive combat, healing, ordinary non-lobby leave, body looting | Body persists for 10 minutes; death and ordinary leave forfeit items exactly once |
+| **A. Safe staging + gather/craft** | In-world main menu and loading gate, then Outer Rim wood/stone/herbs, spear and bandage | No avatar at risk before successful explicit Play; failed teleport/spawn preserves inventory; active player can gather, craft and heal |
+| **B. Fight/lose** | Primitive combat, healing, active-run exit/death and body looting | Risk exists only after Play admission; 10-minute corpse on active death/leave; loading/menu failure never drops gear |
 | **C. Extract/secure** | One rune; audio/visual alarm; **120-second hold** then protected extraction animation and vault | Defend inside region; animation makes invulnerable and disconnect-safe; no duplicates or premature protection |
 | **C2. Permanent Forge prototype** | One ordinary special recipe and one eligible source-to-Permanent conversion | Ingredients charged once, converted source retired, owned Permanent record survives test death/rejoin, other carried loot still drops |
 | **D. Build/raid** | Accessible Booga Booga-like construction, foundations/walls/doors/stash, raid damage | Quick placement and raidable storage, with protected extraction auras |
@@ -431,7 +434,8 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 ### 13.2 Documentation validation checklist
 
-- [x] Flintborn primitive fantasy equipment explicitly excludes **firearms and player shields**; healing uses finite items.
+- [x] Flintborn primitive fantasy equipment excludes firearms and player shields; finite healing items are used.
+- [x] **Play-world pre-spawn main menu** required; failed teleport, loading, kick or spawn before Play admission is loss-free.
 - [x] Full run loop, three world zones and vault/death stakes documented.
 - [x] Three event families and exact known 60-second cache rule recorded.
 - [x] Mega-Boss cadence, 3-minute alert, three phases and 25% drop recorded.
@@ -446,9 +450,9 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 | Priority | Decision | Why it matters |
 | --- | --- | --- |
-| **P0** | Run/session model, vault withdrawal, Permanent ownership after death and what persists between servers | Inventory authority, saved data, base lifecycle, player stakes |
+| **P0** | Run/session model, protected loadout reservation, active admission risk threshold, Permanent death ownership, base lifecycle | Inventory authority, teleport safety and player stakes |
 | **P0** | Permanent conversion eligibility, irreversible ingredient usage, binding/slot/recovery | Avoid trivial risk bypass and item-duplication pathways |
-| **P0** | Death, disconnect, reconnect and combat-logging policy | Exploit resistance and player trust |
+| **P0** | Protected pre-spawn world main menu, explicit Play readiness/spawn risk boundary, loss-free teleport errors and active-only body/drop rules | Avoid gear loss from failed loading and prevent combat-logging exploits |
 | **P0** | Portal activation/interrupt logic and multiplier definition | Core extraction risk and economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
 | **P1** | Weapons, dodge/movement, healing timings and interruptions, hit detection, magic resources | Combat feel and network design without shields/guard meters |
@@ -722,7 +726,7 @@ Player strength comes from execution, temporary risked gear, group tactics and o
 
 ### 22.3 Disconnect, shutdown and concurrent sessions — Confirmed / Proposed engineering
 
-- **Confirmed:** Ordinary player departure from anywhere outside the lobby — voluntary quit or lost connection — leaves a single lootable character body in the active server and forfeits carried ordinary loot. **Body and unclaimed loot disappear after 10 minutes / 600 seconds.**
+- **Confirmed:** Ordinary voluntary quit or lost connection **after the server has admitted/spawned the player into ActiveRun or ExtractionHolding** creates one lootable character body, forfeiting carried ordinary loot. **Body and unclaimed loot disappear after 10 minutes / 600 seconds.** Pre-spawn menu/loading departure is safe even though it happens inside a play-world place.
 - **Confirmed:** Disconnect is safe once the valid protected extraction animation begins, even before it finishes. The player must receive their locked extracted contents once persistence reconciles.
 - **Confirmed:** Authorized administrator update/removal commands safely kick players without losing held items. The server must preserve them separately from successful extraction and not grant extraction bonuses/Forge eligibility; see §30.
 - **Proposed:** Unexpected entire-server crash cannot keep a corpse in a server that no longer exists. Deliberate admin maintenance and platform failure require different audited state/recovery policies.
@@ -748,14 +752,15 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **VaultService** | Safe storage/withdrawal, capacity and extraction receipt application | Vault tabs, item detail, secure totals |
 | **ForgeService** | Recipe eligibility, ingredient reservation, output issuance, commit | Preview, costs, progress, authoritative receipts |
 | **PermanentArmoryService** | Permanent canonical records, loadout lease, death recovery | Bound armory, recovery conditions, slot occupancy |
-| **LoadoutService** | Ordinary equipment withdrawal, bound caps, deployment preparation | Risk labels and confirmed slots |
+| **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, bound caps and validation | Safe menu equipment preview and active risk labels |
 | **ExtractionService** | Exactly 120-second in-area hold, alerts, animation-start invulnerability, vault receipt | Countdown/boundary, opponent alerts, protection and verified receipt |
 | **CombatService** | Validated hits, movement/dodge, healing consume and interruption, enchantment procs, PvP cooldowns | Health/status animations, healing progress and hit feedback |
 | **BuildingService** | Booga Booga-style placement, rotation/snap, ownership, exclusions, raids and stash damage | Responsive build previews, repair and access errors |
 | **EventDirector** | Meteor/cache/alpha, rare flora, deposits, regional bosses and raidable structures | Tiered alerts, discovery markers and beacons |
 | **BossService** | Horn, timer, shield pillars, HP phases, once-only Legendary drop | Boss warnings, phase UI, rewards at risk |
 | **AnalyticsService** | Economy, public-world activities, participation, reward abuse, dupes/failures | Verified activity rewards/diagnostics |
-| **DepartureService** | Normal non-lobby body + 600-second TTL, lobby exit, protected extraction exit and maintenance exception | Risk warning, body/despawn and restoration statuses |
+| **DepartureService** | Active-run departure/body + 600-second TTL, safe lobby/pre-spawn menu, protected extraction and maintenance exemption | Risk warnings, safe pre-spawn state, body and recovery status |
+| **WorldAdmissionService** | Protected loading/menu, profile/world readiness, safe transit reservation, successful Play/spawn risk activation | Play/loading status, retry/return, clear risk transition |
 
 All persistent crafting and extraction grants happen on the **server**. Client may request an action but cannot dictate rarity, cost, exact output, reward source, success flag, or timestamp.
 
@@ -1005,7 +1010,7 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 - If a player leaves after the protected extraction animation started, the protection outcome wins regardless of whether they see the final vault-receipt screen.
 - Safe administrator maintenance removal is authorized by the server, not by a client flag or mere kick reason string.
 - A duplicated character session must not generate repeated bodies or recall items that others already looted.
-- **Proposed:** On rejoin after active forfeiture, present a concise run-result summary: ordinary carried items were left on the corpse, with no automatic free restoration.
+- **Proposed:** On rejoin after actual **ActiveRun** forfeiture, present a concise summary explaining lost unsecured items. A pre-spawn failure may never display an inventory-loss summary or suggest a death occurred.
 
 ## 30. Administrator update kicks and maintenance-safe preservation
 
