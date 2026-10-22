@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.5  
+> **Design revision:** 0.6  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -20,7 +20,7 @@
 
 **Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
 
-**Confirmed public-world and loading decisions (2026-10-21):** Players arrive at the play-world server into a **safe pre-spawn main menu**. No gear is ever lost during loading, failed teleport, main-menu departure or failed spawn. Only a completed **Play → server-confirmed character spawn → ActiveRun** transition begins loot risk. Active world death/ordinary departure leaves a lootable body, expiring after **10 minutes**. Authorized update kicks preserve held gear. Extraction sends audio/visual signals and requires a **120-second vulnerable in-zone hold**; its animation then grants invulnerability and safe disconnect immediately. Rare flora, materials, mobs, bosses, raidable structures and meteors, Booga Booga-style building and rewards for engaged public-world playstyles remain in scope (§29–33).
+**Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§34).
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -68,9 +68,9 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 3. **Prepare:** Craft/upgrade gear; optionally join a tribe and establish a forward operating base (FOB).
 4. **Take a risk:** Explore the Inner Ring, contest broadcast events, raid exposed bases, or challenge the Center Crater boss.
 5. **Carry the prize:** Valuable items physically occupy the player's carried inventory; rare/event loot exposes a visual trail.
-6. **Extract:** Reach a rune or portal and complete extraction to transfer eligible carried rewards to an unraidable persistent vault.
+6. **Extract:** Activate a fixed exit's shared 120-second server timer (or a rare portable rune's 30-second timer), then be alive and within its zone **when it ends** to enter the protected animation and bank loot.
 7. **Build long-term power:** Spend extracted ingredients on special recipes or save for costly Permanent conversions (confirmed mechanic; specific recipes proposed).
-8. **Continue or extract:** Once admitted into active gameplay, remain in a public world for farming/building/PvP, or complete a signaled **120-second in-area extraction hold** to enter the protected animation. Leaving while actually active forfeits ordinary carried gear; leaving the **pre-spawn menu** is always safe.
+8. **Continue or extract:** Stay in the public world to build/farm/fight, or wait nearby for an extraction timer to end while you stand inside the small exit zone. Hiding, healing and fighting are allowed before the deadline. Active-world quits forfeit ordinary items; pre-spawn menu quits are safe.
 
 ### 2.2 Loss and persistence contract
 
@@ -79,19 +79,19 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | On-person active-run inventory | Drops on death or ordinary departure **after successful Play admission**, leaving lootable **10-minute body** | **Confirmed** |
 | Lobby or world main-menu departure | Safe regardless of teleport/load failures or pre-spawn kick | **Confirmed** |
 | World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
-| Protected extraction | Requires **120 seconds inside designated area** and audio/visual cues; animation then grants invulnerability and disconnect safety | **Confirmed** |
+| Protected extraction | **120-second shared fixed-site countdown** with large-radius cues; living players must be **inside zone only at completion**, not throughout. Portable runes use 30 seconds; invulnerability begins at animation start. | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
 | Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
-| Converted Permanent equipment | Conversion is available; death, recovery and deployment rules are not yet finalized | **Confirmed capability / Open mechanics** |
+| Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; recovery cost/slot cap Open |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
-| Gear withdrawn from vault for deployment | Exact redeployment and loss rules | **Open** |
-| Player progress (recipes, cosmetics, reputation, etc.) | Whether and what persists | **Open** |
-| Bases across sessions/server shutdowns | Session-only, timed-wipe, or persistent-world model | **Open** |
+| Gear withdrawn from vault for deployment | Extracted items and materials may be withdrawn, becoming ordinary at-risk gear on successful active Play admission | **Confirmed**; loadout limits Open |
+| Player progression | Player **levels** and recipe **discovery** both exist | **Confirmed**; exact XP curve/unlock combinations Open |
+| Bases and public world resets | Server resets its complete **in-world state only after it becomes empty** | **Confirmed**; scope of ordinary extracted vault storage needs clarification |
 | Public world playstyles | Benefits for engaged PvPers, base-builders, farmers and other active playstyles | **Confirmed direction**; specific rewards Proposed |
 | Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
-**Working default:** Ordinary vaulted gear remains safe in profile/transit reservation while the play-world main menu loads. It becomes at risk **only when Play completes authoritative active spawn**; converted Permanent equipment follows still-open ownership rules. Ordinary departure during an active run produces a 10-minute body. Protected extraction, update maintenance and pre-spawn staging are safe exceptions (§29–31).
+**Confirmed and clarification pending:** Ordinary vaulted items may be withdrawn and become at risk only when active play begins. Converted Permanent equipment remains with the owner on death, but deliberate drop or trade can transfer ownership. The **secure vault has upgradeable capacity**. Empty-server resets definitely erase live-world builds and materials. Whether they also erase ordinary **previously extracted** vault items is ambiguous and therefore still Open (§34.2); original cross-session secure-vault behavior remains the provisional interpretation.
 
 ## 3. World — The Shattered Crater
 
@@ -120,12 +120,14 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - Clearly visualize the no-build aura while the build tool is equipped.
 - Avoid automatic zone-wide PvP immunity unless a future decision explicitly calls for it; “low risk” is not “safe.”
 
-### 3.3 Map decisions — Open
+### 3.3 Public-world capacity, lifetime and POIs — Confirmed / Open
 
-- Island scale, Roblox studs-to-meters convention, desired traversal times, biome count, verticality, water travel, and player capacity.
-- Fixed versus rotating extraction locations; whether map markers initially reveal minor runes.
-- Respawn distribution, spawn protection, and anti-camping enforcement.
-- Structures-per-area caps and construction proximity rules beyond extraction auras.
+- **Confirmed provisional limit:** 30 players per island, reconsidered after mapping and performance validation.
+- **Confirmed world lifetime:** A public world persists while **any players remain**. When the last player leaves, that instance resets/ends; all bases, raidable structures, world loot, nodes, mobs and other live-world changes disappear. New servers initialize clean worlds.
+- **Confirmed extraction POIs:** Candidate locations are fixed and recognizable across maps, but only a server-specific subset has an available extraction in each instance.
+- **Confirmed same-world rejoin:** Players can return to their earlier still-running public instance if they have **not died and been kicked/excluded** and the server remains open/capacity permits. Ordinary active disconnect still leaves a 10-minute corpse and forfeits unsecured items; rejoining must not restore them.
+- **Open:** Map size and travel times, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
+- **Ambiguity:** The user said “everything disappears, only Permanent items survive” on world reset. Live-world state clearly wipes; whether this also overrides the previously confirmed secure-vault persistence for ordinary extracted materials needs confirmation (§34.2).
 
 ## 4. Primitive-fantasy progression
 
@@ -302,31 +304,31 @@ Boss identity, scaling with player count, target priority, contribution rewards,
 
 ## 9. Extraction and permanent vault
 
-### 9.1 Confirmed extraction contract
+### 9.1 Extraction mechanics — Confirmed
 
-- Players must **physically transport carried loot** to extraction runes/portals.
-- Activating an extraction rune starts an **exact 2-minute / 120-second countdown** while the player remains in the specified extraction area. The attempt sends **audible and visual cues** to other players so it can be contested.
-- The player is vulnerable during the countdown. **Once the extraction animation begins**, the player is invulnerable, safe from loot theft and safe to disconnect, even if the animation is not finished.
-- Leaving **after entering ActiveRun** but before the protected animation (without an authorized maintenance exemption) counts as ordinary active-world departure, leaving a lootable body for 10 minutes. The world main menu and pre-spawn loading state are still safe (§31).
-- Extraction transfers eligible items into a **persistent, unraidable vault** outside the live island run.
-- Outer hidden Minor Extraction Runes offer a lower-risk escape with **modest value multipliers**.
-- The Center Crater's main Permanent Extraction Portal offers the **highest value multiplier**.
-- Death before successful extraction drops carried items for looting.
-- All extraction sites have **50-meter no-build auras**.
-- Carriers of event-exclusive resources/legendary boss gear reveal themselves through embers, shadow trails or similar visible particles (**Burden of Wealth**).
+- **Fixed sites:** Known POIs can have a portal, but which candidate POIs contain **available** portals differs by public server. Their positions are fixed, not freely rotated after map creation.
+- **Start:** Clicking an available portal begins **one server-shared 120-second countdown for that portal event**, not a per-client timer.
+- **Telegraph:** Audible and visual extraction alerts are perceptible within a **large radius** so attackers may challenge departing players. Exact radius and VFX are still Open.
+- **Move freely:** Players **do not** need to stay inside the capture area while the timer runs. They may hide, travel nearby, fight and heal. **Taking damage does not reset or pause the event timer**.
+- **Deadline:** At the exact expiry, every **living, eligible participant physically inside the relatively small capture area** is eligible for the protected extraction animation; anyone outside misses the extraction. This applies to groups and tribes on the same server event. Whether non-group strangers can join the same extraction is Open; public participation is the working default.
+- **Safety boundary:** The instant a qualified player's **server-authorized extraction animation starts**, they are invulnerable and safe to disconnect. Prior death/quit leaves the normal 10-minute loot body.
+- **Rare portable rune:** An extremely rare reward/drop enables a player to **choose an extraction location anywhere** and starts a **30-second countdown**. Portable-rune consumption, participant capacity, zone radius, announcements and anti-placement exploits are Open. Do not weaken the confirmed wherever/30-second feature without design approval.
+- **Destination:** Successfully extracted players transfer to the separate secure **lobby**, not the play-world loading menu.
+- **Stakes:** Active fixed portals retain the 50-meter no-build rule. A portable rune is a separate dynamic object whose exclusion/placement details are Open.
+- **Payout:** Main Center Crater portal has greater value incentive than lesser fixed portals, but the precise meaning of that multiplier has not been chosen (§9.3).
+- **Loot:** Safely extracted materials feed crafting; extraction does not automatically mint Permanent item ownership or extra Legendary copies.
 
-### 9.2 Confirmed timing and proposed server implementation
+### 9.2 Server-shared timer and qualifying snapshot — Confirmed / Proposed engineering
 
-1. Player activates portal while alive and in the designated area; server validates the attempt and broadcasts **audio/visual extraction cues**.
-2. Server starts a **120-second** countdown; player must remain in the specified area throughout. Normal PvP and damage remain possible. Whether taking damage alone interrupts the countdown is **Open**.
-3. If the player leaves the area or dies before completion, the attempt fails. **Proposed:** leaving the boundary cancels and requires full restart (rather than pausing). Ordinary departure during this stage creates a lootable body.
-4. After 120 valid seconds, server authorizes **ExtractionAnimationStarted**, locks the exact carried-item snapshot, and grants **invulnerability and safe disconnect immediately upon animation start**. Other players can no longer loot that snapshot.
-5. Server establishes a recoverable extraction receipt/entitlement as part of the protected transition; vault persistence may finish after animation or player disconnect, but the locked loot must never be forfeited or duplicated.
-6. After verified commit, show the secure-vault receipt and return to protected lobby. A pending backend write must be shown as pending, not falsely settled.
+1. Server validates an activation and reserves **one** event at the available site, with its own start/end timestamps. For a regular fixed exit, expiry is **120 seconds** later; for a rare portable rune it is **30 seconds** later.
+2. The server emits the audible and visible alert. The clock continues independently of player proximity, combat, deaths or healing.
+3. Players may leave the capture area and return as often as desired. No continuous stay counter exists. An alive character may also arrive late and qualify if physically inside at the exact finish.
+4. At expiry, server captures the set of eligible **alive characters inside the defined zone** and grants protected animation to each, including multiple group/tribe members using the same timer. No late entry after the snapshot.
+5. Each eligible player gets an individual locked inventory and extraction receipt; the portal event has one shared unique ID. No player can claim someone else's items, join twice or receive two extracts from the same event.
+6. At the animation transition, the player's invulnerability and safe-disconnect guarantees take effect; individual loot snapshots settle idempotently to secure vault.
+7. Successful players go to lobby after persistence confirms. Unqualified players remain vulnerable and gain no automatic protection; the shared event ends.
 
-**Critical boundary:** Protection begins when the **server-authorized animation** begins, not when the animation ends. A client-only visual effect cannot mint items or assert protected state.
-
-**Proposed anti-camping protections:** Multiple minor extraction locations and readable approach paths; **the 120-second hold stays risky** and the post-hold animation is invulnerable. The marked hold area needs clear world geometry/UI.
+**Open behavior:** Whether anyone may start another countdown on the same site immediately, whether the activator's death cancels the event (working default: **no**), whether enemies can intentionally use an opponent-triggered extraction (working default: **yes**), the minimum participant distance, visual radius and portable-rune interactions. All are design choices; the freedom to leave the area and fight/heal is already Confirmed.
 
 ### 9.3 Value multiplier guardrail — Proposed
 
@@ -336,9 +338,9 @@ Multipliers should apply to **valuation/payout**, not produce copies of unique l
 
 Treat extraction hold, protected animation, death, ordinary leave, maintenance kick and item pickup as competing **server-authoritative** transitions. Lock exact item IDs at animation start and create a recoverable receipt before allowing safe disconnect. The server decides the protected animation state; a client-side animation alone is not proof of successful extraction.
 
-### 9.5 Extraction decisions — Open
+### 9.5 Remaining extraction questions — Open
 
-**Confirmed:** 120-second stay-in-zone hold, audio/visual warning to other players, animation-start invulnerability/disconnect safety, 10-minute loot bodies on ordinary departure, maintenance kicks preserving holdings, and extracted materials for special crafts. **Open:** Exact area geometry, exit reset mechanics, damage interruption, alert range, simultaneous attempts, portal availability, value multipliers, party rules, lobby return and crash recovery.
+**Confirmed:** 120-second shared timer per fixed exit, free movement/combat/healing during countdown, living-in-zone check **only at expiry**, large-radius cues, multi-player/group eligibility, 30-second portable anywhere rune, animation-start protection and lobby return. **Open:** Actual capture radius, notification radius, public stranger eligibility, activator-death behavior, site reuse and cooldown, portal population per server, portable rune consumption and temporary boundary, party admission, value/multiplier formula, full vs partial carried-inventory banking, portal existence during Guardian encounter, and crash-recovery implementation.
 
 ## 10. Economy, stakes and balancing
 
@@ -376,7 +378,7 @@ First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extra
 - **Crafting/building:** Recipe requirements, snap previews, construction restrictions and durability.
 - **Event UI:** Clear announcement, direction/search radius, beacon color and event time state.
 - **Boss UI:** Three-phase status, 3-minute warning, pillar progress and readable 25% phase transition.
-- **Extraction UI:** Site name, projected bonus, **120-second hold timer and boundary**, audible/visual alert to nearby rivals, vulnerability during hold, explicit animation-start protection and verified receipt.
+- **Extraction UI:** Site name, projected bonus, **shared fixed-portal 120-second countdown** (or rare portable 30 seconds), audible/visual cue and small *must-be-here-at-zero* area boundary; explicit animation-start safety and verified receipt.
 - **Death UI:** Clear loss summary plus next-run action.
 
 Make major cues redundant across color, icon, words and sound. Provide comfortable interactions on Roblox mobile, desktop and controller; avoid interactions that require precise cursor control.
@@ -399,9 +401,9 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 1. No client-created rare items, client-declared combat hits, or client-asserted successful Play admission without server validation.
 2. No player-built structure can exist within an extraction no-build zone.
-3. An item cannot simultaneously exist as world loot, carried inventory, vault inventory, Forge-reserved input and account-owned Permanent equipment. A deployed bound manifestation references one canonical record; it is never a second tradable item.
+3. Every unique item, including **tradeable Permanent equipment**, exists at exactly one authoritative location/owner. A deliberate drop/trade transfers the one canonical instance; death retains Permanent items still legitimately owned.
 4. Extraction **and Permanent conversion** have explicit persisted success/failure states; retries cannot duplicate items or double-charge ingredients.
-5. A valid **120-second in-zone hold** gates protected animation; invulnerability and disconnect safety begin at server-authorized animation start with an immutable inventory snapshot.
+5. A valid **120-second shared fixed-site timer** (or 30-second portable one) evaluates the **alive/in-zone roster at deadline**; each eligible character then begins invulnerable, disconnect-safe animation with locked inventory.
 6. **Only a confirmed ActiveRun/ExtractionHolding** departure creates a lootable body expiring after 600 seconds; loading/pre-spawn menus and failed teleports never drop gear. Authorized maintenance removal preserves holdings without auto-extraction.
 7. In-world menu loading/PlayRequested cannot start active combat until successful server-controlled spawn and inventory risk transition.
 8. Boss Legendary release at 25% occurs at most once per encounter.
@@ -423,7 +425,7 @@ The first milestone should prove the **risk → loot → extraction → vault** 
 | --- | --- | --- |
 | **A. Safe staging + gather/craft** | In-world main menu and loading gate, then Outer Rim wood/stone/herbs, spear and bandage | No avatar at risk before successful explicit Play; failed teleport/spawn preserves inventory; active player can gather, craft and heal |
 | **B. Fight/lose** | Primitive combat, healing, active-run exit/death and body looting | Risk exists only after Play admission; 10-minute corpse on active death/leave; loading/menu failure never drops gear |
-| **C. Extract/secure** | One rune; audio/visual alarm; **120-second hold** then protected extraction animation and vault | Defend inside region; animation makes invulnerable and disconnect-safe; no duplicates or premature protection |
+| **C. Extract/secure** | One fixed portal with shared server **120-second clock**, large-radius alert, deadline-only presence check and protected animation | Player may roam/fight/heal until expiry; only living characters in zone at finish extract; no duplicates |
 | **C2. Permanent Forge prototype** | One ordinary special recipe and one eligible source-to-Permanent conversion | Ingredients charged once, converted source retired, owned Permanent record survives test death/rejoin, other carried loot still drops |
 | **D. Build/raid** | Accessible Booga Booga-like construction, foundations/walls/doors/stash, raid damage | Quick placement and raidable storage, with protected extraction auras |
 | **E. Contest** | Rare herb/tree, mob, meteor or raidable structure event; beacons and rare carrier | Varied activities are contestable; valuable rewards still need extraction |
@@ -469,7 +471,7 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 
 > **Confirmed:** The player can spend successfully extracted materials to craft special items. Some eligible items brought back alive can be converted to a **Permanent** type by spending scarce, expensive ingredients. This is a central cross-run progression pillar.
 >
-> **Working default — awaiting approval:** Permanent means durable *account ownership* of one converted gear instance through ordinary death, raid and island wipes. A deployed manifestation disappears on death and returns to the owner's protected armory with a repair/recovery cost. This interpretation is proposed, not yet a confirmed specification.
+> **Confirmed:** Permanent equipment persists through death, but can be intentionally dropped, picked up and stolen, or traded. Binding does not raise its combat stats; only designated source items are convertible. Post-death maintenance costs, gear limits and unclaimed dropped-item fate remain **Open**.
 
 ### 15.1 The three interlocking loops
 
@@ -487,31 +489,24 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 | Ordinary vaulted stacks | Extracted wood, ore, jade, cores, etc. | Becomes unsecured if withdrawn | Dropped if carried | Protected and usable by Forge |
 | Ordinary vaulted gear | Extracted or special-crafted gear | Becomes unsecured if withdrawn | Dropped if carried | Can be stored or consumed as source |
 | Special ordinary gear | Secure Forge recipe using vault inputs | Droppable on deployment | Drops if carried | Safe only while stored in vault |
-| Permanent converted item | Single eligible vaulted source + conversion recipe | Bound manifestation, limited slot | Manifestation vanishes; owned original survives (**Proposed**) | Protected account armory and recovery |
+| Permanent converted item | Designated vaulted source + costly recipe | Owner retains through death; may voluntarily drop/trade | Retained by owner if held; may be stolen through deliberate drop | Single secure canonical record, transferable |
 | Recipe knowledge | Earned milestones / discoveries | No physical item | Persists (**Proposed**) | Unlocks future recipes |
 
 **Vocabulary requirement:** "Secured" or "Vaulted" means safely stored outside a run. "Permanent" describes a specific conversion class. An item is not Permanent just because it is in persistent storage.
 
-### 15.3 Eligibility and source consumption — Proposed
+### 15.3 Eligibility and source consumption — Confirmed constraints / Proposed catalog
 
-- A Permanent conversion targets a specific, uniquely identified **extracted gear instance**, not an abstract catalog item or arbitrary stack.
+- **Confirmed:** Only designated extracted gear may be Permanent-converted. The source is a unique, server-validated vaulted instance, not an arbitrary inventory stack.
 - Eligible item families initially include weapons, select armor and a restricted set of tools. Exclude raw materials, currency, siege charges, structures, ammunition, potions, vault keys and anything creating limitless economic output.
-- The source item must be owned by the player, present in a secure vault, unlocked for the chosen recipe, not currently equipped in another active session and not already bound.
+- The specific source must be owned and vaulted, eligible under the designer catalog, unlocked through applicable **level/discovery requirements**, not deployed elsewhere and not already Permanent.
 - Converting **transforms/consumes** the source instance; it does not create both an ordinary tradeable source and a new Permanent copy.
 - Source item attributes (quality, rarity roll, enchantment, crafted name) can be preserved as a defined snapshot if eligible; never claim affix preservation without recipe specification.
 - No client can submit a chosen output rarity, free ingredient amounts, owner ID or arbitrary "Permanent" flag.
 - The confirmed 25%-HP boss Legendary remains ordinary world loot until a player takes it to a rune and extracts. It cannot be made Permanent instantly in the crater.
 
-### 15.4 Alternative interpretations still open
+### 15.4 Confirmed Permanent definition (replaces earlier proposals)
 
-| Model | Ownership after death | Strength | Risk |
-| --- | --- | --- | --- |
-| **Bound gear + recovery (Working default)** | Retained by account | Earned, tangible, reliable long-term reward | Strong persistent player advantage must be capped |
-| **Permanent blueprint** | Blueprint retained, gear rebuilt for a smaller cost | Strong replenishment sink | Can feel misleading if called Permanent |
-| **Permanent cosmetic variant** | Appearance retained, ordinary gear still lost | High competitive fairness | Too weak to fulfill "Permanent item" ambition |
-| Infinite spawnable copies | Unlimited copies | None | **Rejected proposal:** trivial duplication / economy collapse |
-
-Do not select an option silently. The first row is an internally consistent working specification, not design-owner approval.
+**Permanent gear survives the current owner's death**, retains **exactly the source item's combat stats**, and is **transferable** through deliberate ground dropping (and another player taking it) or voluntary trading. Only approved extracted items are eligible. A Permanent gear instance is not an infinite number of freely spawnable copies and never appears as loot **just because its wearer dies**. The earlier **nontradeable, account-bound manifestation** proposal is superseded by these confirmed decisions. See §17 for the single-instance transferable model. Post-death repair costs and item/slot caps remain Open.
 
 ## 16. The Ancestral Forge: crafting outside the run
 
@@ -558,35 +553,45 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 - Crafts that consume an item must use a unique instance ID; stacks use bounded positive integers and no fractional duplication.
 - Recipe versions are immutable for active transactions so a live balance patch cannot alter an operation halfway through.
 
-## 17. Permanent gear operational rules
+## 17. Permanent gear: death protection and ownership transfer
 
-### 17.1 Bound armory / manifestation — Working default
+> **Confirmed:** Certain **designated** extracted item types may be made Permanent using costly materials from **multiple** sources and recipes gated by player leveling and discoveries. Permanent conversion **does not modify combat stats** relative to the selected source gear. A Permanent item **survives its owner's death**, but if the owner **deliberately drops it** and another player collects it, it changes owner. Permanent items can also be **traded**. Neither dropping nor trading creates a duplicate.
+>
+> **Open:** Possible post-death material costs/repairs, simultaneous Permanent gear limit, trade venue/fees, exact eligible list, what happens to an unclaimed dropped Permanent item if it expires or the world resets, and whether items can be sold through a marketplace.
 
-- **Canonical record:** Permanent gear exists once in a protected account armory; it owns a fixed ID, quality, permitted enchantments, durability and provenance.
-- **Manifestation:** When a player deploys, server creates a temporary bound representation of the canonical record. The representation is not a tradeable second item.
-- **Death:** The active copy vanishes and yields no transferable loot; regular backpack and ordinary equipped gear still drop. Permanent ownership enters **Recovery Needed**.
-- **Recovery:** The player pays a lesser repair/rearm resource sink or observes a cooldown at the hub; exact delay and materials remain Open.
-- **Withdraw/drop/trade:** Player can unequip the bound record to the armory, but cannot trade, drop, store in a raidable base or hand it to a different account.
-- **Disconnect:** Combat logging cannot bypass active-run death. Bound recovery follows the server-owned outcome, not client disconnect timing.
-- **Persistence:** Island server closure and scheduled base wipes never erase verified armory ownership.
-- **Double deployment:** One bound item cannot be active in two servers at once. Equip/deploy requires a profile/session lease.
-- **Repair insolvency:** Item remains owned even if unusable until repair; it must not be permanently deleted for insufficient materials.
+### 17.1 Single persistent but transferable item instance
 
-### 17.2 Hard boundaries for balance — Proposed
+- A Permanent weapon/armor piece has **one unique canonical instance ID**, original stats, owner/location and provenance. It can exist in account-safe armory/vault, equipped in active world, dropped on the ground, or escrowed for an agreed trade — never multiple at once.
+- **Death / ordinary active departure:** The owner retains the Permanent gear instance; the server returns it to their secure armory or a proposed recovery-pending state. All ordinary unsecured gear follows the corpse-drop rules.
+- **Intentional drop:** The item leaves the owner's possession and becomes a physical pickup. If another player validly picks it up, **the ownership is transferred** and the original owner cannot retrieve it through death protection or a duplicate armory record.
+- **Trading:** A direct exchange is permitted in principle. Trade transfers both sides' item IDs atomically/idempotently through server validation; no client-side grant or forged accept.
+- **No death-based trade exploit:** A thief cannot take a Permanent item solely by killing its wearer. They must obtain it through its legitimate **manual drop / pickup**, explicit trade, or a separately approved mechanic.
+- **Normal stats:** No automatic rarity/damage/speed bonus for becoming Permanent. The privilege is death-retention and long-term ownership only.
+- **World reset:** Owned Permanent items survive. **Unclaimed manually dropped Permanent gear** needs a specific expiry/reset policy; no assumption that ground items auto-return was approved.
+- **Maintenance and teleport:** Protected staging, update kick and extraction animation preserve whatever canonical Permanent items the player still legitimately owns, respecting prior transfers.
 
-- Start with **one bound weapon OR one bound armor piece** deployable per run. More slots require testing, not early monetization.
-- Temporary high-risk Legendary gear may have stronger peak stats than a safer bound counterpart; earned long-term equipment must not invalidate event risk.
-- Permanent tools cannot passively duplicate mining outputs or bypass resource/raid permissions.
-- Bound weapons still pay stamina, draw time, arrow/ammo consumption and enchantment charges. Firearms remain excluded.
-- Add optional wear and repair rather than a no-cost infinite-use weapon. All sinks should be visible before conversion.
-- Cap crowd-control durations, automatic status procs and stacked elemental synergies; PvP must retain readable defenses.
-- Bound items still occupy carry/equip slots and have normal weight/mobility tradeoffs.
-- Rare-carrying glow and extraction risk apply to **new event loot** even when carrier uses permanent weapons.
-- Neither the main crater portal nor any minor rune can grant free Permanent status as a multiplier.
+### 17.2 Ownership state safety — Proposed
 
-### 17.3 Approval questions — P0
+| Operation | Validation | Expected single result |
+| --- | --- | --- |
+| Convert designated saved gear | Owner, source instance, recipe unlock by discovery/level, rare inputs | Source transformed once into exactly one Permanent item |
+| Die wearing Permanent gear | Run death and prior item owner | Ordinary loot drops; single Permanent instance safely retained |
+| Manually drop Permanent gear | Owner, equip state, permitted proximity, authoritative input | One active pickup item; it is no longer simultaneously in armory |
+| Another player picks up drop | Drop exists, player can reach it, not previously claimed | One canonical ownership transfer |
+| Trade Permanent gear | Players and gear valid, both confirm, trade escrow exists | Single atomic transfer; no dupe from cancel/disconnect |
+| Owner reconnects after theft | Authoritative latest owner record and claim history | Former owner cannot reclaim stolen gear |
+| World empties | Last-player exit and active world cleanup | Persistent owned items survive; unresolved ground-item loss rule flagged |
+| Repair/rearm | Cost/rules not yet approved | No invented mandatory cooldown or irreversible gear wipe |
 
-**Before code:** Is account-retained bound gear on death correct, or should the account receive only a rebuild blueprint? Is Permanent transferable? What exact recovery cost/cooldown applies? What item families can be Permanent? How many bound slots per run? Does use degrade durability? Can a converted Legendary keep its affixes? No answer is presumed approved beyond the user's confirmed conversion concept.
+**Design challenge:** Transferable death-protected items are unusually sensitive to **drop/loot ordering** and cross-server ownership. Server IDs and write-ahead receipts must prevent a voluntary drop followed by a disconnect from giving the original owner a restored copy. Logs must identify which user owns the one real item after every valid pickup or trade.
+
+### 17.3 Balance remaining undecided
+
+1. **Post-death cost:** Material repair/recovery may restrain indefinite reuse. Its existence and price are not final.
+2. **Slot cap:** The number of simultaneously equipped Permanent weapons, armor or tools remains genuinely undecided; do not hardcode one item as Confirmed.
+3. **Eligibility catalog:** Only designer-flagged items may be converted; categories/rarities are to be chosen.
+4. **Affixes:** Binding adds no stats, but whether a source's existing roll/affixes are preserved or re-rolled needs explicit agreement.
+5. **Trade paths:** Safe lobby exchange, ground-drop transfer and possible market are distinct UX/safety mechanics. Ground dropping and trading are Confirmed; trade channel/currency remain Open.
 
 ## 18. Resource tiers, economy and acquisition sources
 
@@ -701,30 +706,29 @@ Player strength comes from execution, temporary risked gear, group tactics and o
 | Authoritative state | Legal next state(s) | Notes |
 | --- | --- | --- |
 | **WorldSpawned** | Carried, despawned | Unique drop instance, distance and pickup validated by server |
-| **Carried** | WorldDropped, BaseStored, Consumed, ExtractionPending | All ordinary inventory remains at risk |
+| **Carried** | WorldDropped, BaseStored, Consumed, QualifiedAtDeadline | Ordinary gear remains at risk during shared extraction timer; only qualifying alive/in-zone players become protected |
 | **BaseStored** | Carried, WorldDropped, Consumed | Raiding, door permissions and destruction rules apply |
-| **ExtractionPending** | Carried (interrupt/death), ExtractionCommitting | Channel server-time and portal-zone checks |
-| **ExtractionCommitting** | Vaulted (commit), retry pending | Item cannot simultaneously be dropped as corpse loot |
+| **ExtractionEventActive** | QualifiedAtDeadline, MissedDeadline, Death | Shared event timer is independent of player position/damage until a one-time alive/in-zone check at expiry |
+| **QualifiedAtDeadline / ExtractionProtected** | Vaulted (commit), retry pending | Server-authorized animation begins invulnerability and locks the participant's own exact inventory snapshot |
 | **Vaulted** | Carried (withdraw), ForgeReserved | A safe storage location, *not* permanent status |
 | **ForgeReserved** | Vaulted (cancel/rollback), Consumed / PermanentOwned (commit) | Reservation tied to idempotent operation ID |
-| **PermanentOwned** | ArmoryRecovery, ArmoryAvailable, BoundActive | One immutable canonical account-owned instance |
-| **BoundActive** | ArmoryRecovery, ArmoryAvailable | Temporary representation, never tradeable or duplicated |
+| **PermanentOwned** | PermanentEquipped, PermanentVaulted, PermanentWorldDropped, PermanentTradeEscrow, PermanentRecovery | Canonical equipment has one *current owner*; death retains it but deliberate drop/trade can transfer it |
+| **PermanentEquipped** | PermanentVaulted, PermanentWorldDropped, PermanentTradeEscrow, PermanentRecovery | One canonical transferable ID, retained on death, manually droppable |
 | **Consumed** | Terminal | No replayable recreation without new server reward grant |
 
-**Invariant:** Each ordinary instance occupies **one** authoritative world/inventory/vault/escrow location. A bound manifestation is an active *reference*, not a second owned transferable item. Stack totals are bounded integers and can be split only through server-validated operations.
+**Invariant:** Each gear instance, including transferable Permanent equipment, has exactly **one** authoritative current owner/location and cannot simultaneously be in an armory, active inventory, world drop or trade escrow. Stack totals use bounded integers and server-validated transfers.
 
-### 22.2 Two-minute hold, protected animation and vault ledger — Confirmed / Proposed engineering
+### 22.2 Shared extraction event and protected animation — Confirmed / Proposed engineering
 
-1. Client clicks the extraction rune. Server validates player, position, alive status and portal eligibility, sends audible/visual alerts to other players and starts the **120-second** countdown.
-2. Server continuously confirms that the player remains within the marked area. Player is vulnerable to PvP and creature damage during the countdown. Exiting the area invalidates the attempt; restarting rather than pausing is proposed.
-3. If death or an ordinary world departure occurs during the hold, there is no extraction. Instead the ordinary lootable-body rules apply.
-4. After 120 valid seconds, an authoritative **ExtractionAnimationStarted** transition locks the exact eligible inventory snapshot and grants **invulnerability and safe disconnect at the moment animation begins**.
-5. An immutable operation/receipt ID protects that locked inventory even if the player quits, teleports, loses connection or a DataStore write is still retrying. The backend must eventually reconcile the snapshot to the vault without forfeiture or duplication.
-6. The animation communicates safety; only the server may authorize that state. An untrusted client's animation cannot grant or spoof protection.
-7. Once the durable vault receipt is confirmed, show success and transfer to lobby. Until then, UI may show **Protected — Saving**; it must never claim final saved status prematurely.
-8. Race resolution: death/ordinary leave before animation => single lootable body; server-authorized animation before death/leave => no body for committed items. Maintenance safe-kick uses a distinct audited exemption.
+1. Server accepts activation at an available known-POI exit and creates **one event timer ending 120 seconds later**, or creates an eligible portable rune's temporary **30-second** event at the selected location.
+2. Broadcast a large-radius audiovisual warning. Countdown continues regardless of whether the activator runs away, dies, gets hit or heals. It is a **server timer**, not a channel owned by one player or tribe.
+3. At the precise expiry, the server builds the **one-time qualifying set** of alive players actually inside the small exit volume. All eligible members of groups/tribes can use the same event; strangers are Open.
+4. Every eligible player transitions into server-authorized protected animation, immediately becomes invulnerable and may safely disconnect, and receives **their own** locked inventory snapshot, operation ID and recoverable vault entitlement.
+5. Dead players, characters outside the area and anyone arriving after the snapshot receive no protection or vault receipt. Active death/quit still follows the ordinary body rules.
+6. Retry/rejoin/teleport and DataStore failures reconcile each player's snapshot exactly once; never let the event timer generate duplicate items or a group member extract items owned by someone else.
+7. Successfully settled players go to the separate lobby. A pending durable write remains protected and marked pending; it cannot be treated as a normal active logout.
 
-**Engineering invariant:** The user-facing animation start is the protection threshold, not the animation end or return-to-lobby transition. It requires a recoverable extraction entitlement so item safety is guaranteed while eventual storage may be pending.
+**Important:** The previous continuous **stay-in-zone for two minutes** proposal is revoked. There is no area-exit timer reset or interrupt-on-damage mechanic; presence matters **only at the deadline**. Implementation must respect the confirmed portable-rune freedom while evaluating anti-cheat and server placement safeguards separately.
 
 ### 22.3 Disconnect, shutdown and concurrent sessions — Confirmed / Proposed engineering
 
@@ -753,9 +757,9 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **InventoryService** | Transfer/drop/pickup, stack accounting, world provenance | Inventory and equip deltas |
 | **VaultService** | Safe storage/withdrawal, capacity and extraction receipt application | Vault tabs, item detail, secure totals |
 | **ForgeService** | Recipe eligibility, ingredient reservation, output issuance, commit | Preview, costs, progress, authoritative receipts |
-| **PermanentArmoryService** | Permanent canonical records, loadout lease, death recovery | Bound armory, recovery conditions, slot occupancy |
-| **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, bound caps and validation | Safe menu equipment preview and active risk labels |
-| **ExtractionService** | Exactly 120-second in-area hold, alerts, animation-start invulnerability, vault receipt | Countdown/boundary, opponent alerts, protection and verified receipt |
+| **PermanentEquipmentService** | One canonical owner, death retention, manual drops, theft pickup, trade escrow and optional recovery | Current owner, transfer receipt, tentative repair/slot status |
+| **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, configurable Permanent slot limits and validation | Safe menu equipment preview and risk labels |
+| **ExtractionService** | Server-shared 120s fixed or 30s portable timer; end-of-timer presence snapshot, alerts and protected animation | Shared countdown, deadline zone and verified individual receipt |
 | **CombatService** | Validated hits, movement/dodge, healing consume and interruption, enchantment procs, PvP cooldowns | Health/status animations, healing progress and hit feedback |
 | **BuildingService** | Booga Booga-style placement, rotation/snap, ownership, exclusions, raids and stash damage | Responsive build previews, repair and access errors |
 | **EventDirector** | Meteor/cache/alpha, rare flora, deposits, regional bosses and raidable structures | Tiered alerts, discovery markers and beacons |
@@ -773,7 +777,7 @@ All persistent crafting and extraction grants happen on the **server**. Client m
 | Profile envelope | schemaVersion, profileRevision, sessionLease, lastCommittedOperationId | Migration/backward compatibility and stale-write checks |
 | Vault stacks | itemCatalogId → safe integer quantity | Nonnegative, bounded, server-calculated |
 | Vault instances | instanceId → catalogId, quality, rolls, wear, acquisition ID | Unique IDs and verified provenance |
-| Permanent armory | instanceId, catalogId, boundOwnerId, affixes, recovery, deployLease | No trade/drop path, no duplicate manifestations |
+| Permanent equipment | instanceId, catalogId, **currentOwnerId**, location, affixes, recovery, activeLease, ownershipVersion | Death-protected while held, but transferable by intentional drop/pickup or validated trade; no duplicates |
 | Recipe unlocks | recipeId, unlockSource, unlockedAt | Server-derived achievements |
 | Crafting operations | operationId, recipeVersion, status, sourceId, inputs, outputId | Pending/committed/failed reconciliations |
 | Extraction receipts | receiptId, runId, portalId, items, valuation, status | Retry-safe source item accounting |
@@ -814,7 +818,7 @@ Large histories may need compaction and retention limits to fit Roblox data budg
 | Client manipulates ingredient count | Never trust client quantities or balance changes |
 | Forge item created but source not deducted | One logical transaction / repairable pending operation |
 | Rarity changed in client preview | Immutable server recipe version and source attribute snapshot |
-| Permanent item dropped/traded to alternate account | No bound trade, world-drop or base-stash transfer endpoint |
+| Permanent item dropped or traded to another account | **Allow** valid server-authoritative single-instance ownership transfer; reject duplicate pickups, forged trade acceptance or stale owner restores |
 | Second instance manifested on another server | Server-held active lease; reconnect resolution |
 | Dead player extracts and also drops loot | Exclusive death vs extraction commit state gate |
 | Portal multiplier mints extra rare resources | Portal bonus applies only to designated payout value |
@@ -901,8 +905,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 6. Insufficient ingredient quantity, invalid unlock, stale recipe version, malformed requests and negative values cannot forge gear.
 7. Two simultaneous conversion calls targeting same weapon: only one can commit.
 8. Retry after timeout before/after a durable write yields the same final state; no missing weapon or duplicated result.
-9. Bound item on death disappears from field and resolves to recovery while ordinary carried materials still drop.
-10. Bound items cannot be looted, traded, hidden in chests, duplicated by rejoin or equipped in two Roblox servers simultaneously.
+9. Permanent item **still owned** at death remains with owner with unchanged stats (recovery material cost Open); ordinary items go to corpse. No second Permanent instance minted.
+10. Permanent items can be **manually dropped, stolen by valid pickup, and traded**, but cannot be duplicated, forged, double-claimed from one ground drop or simultaneously equipped on multiple servers.
 11. Guardian Legendary spawns once per encounter at 25%; killing boss is not automatic extraction or conversion.
 12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
 13. Portal payout never duplicates unique materials, Keystone, Legendary source instances or crafting outputs.
@@ -917,8 +921,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 30. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
 21. Ordinary **active-run** departure (not a protected world main-menu leave) produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
 22. Safe lobby exit, loading-screen quit, world main-menu quit, failed teleport and unsuccessful Play admission never create a loot body or forfeit inventory.
-23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier); forged client admin flags and duplicate restore requests fail.
-24. Rune click broadcasts audible/visual cues; countdown takes exactly 120 continuous in-area seconds, validated by server; dying, quitting or exiting area early cannot extract.
+23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier), shows player update/saved-inventory notification and allows continued use on next Play; forged client admin flags and duplicate restore requests fail.
+24. Clicking an available fixed rune broadcasts large-radius audio/visual cues and starts **one server-shared 120-second event**; players may leave the area, fight and heal, and qualify only by being alive **inside it at expiry**. Rare portable runes use 30 seconds.
 25. At valid animation-start threshold, damage and disconnect cannot cause item loss; idempotent locked receipt settles exactly once, even after DataStore fault.
 26. Corpse-versus-extract and corpse-versus-maintenance races never grant double inventory or lose protected items.
 27. Rare plants/materials, elite mobs/bosses, raid structures and meteors have finite rewards and tier-appropriate announcements.
@@ -940,10 +944,10 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 **P0 — must explicitly decide before implementing persistence or permanent systems:**
 
-1. What exactly does Permanent retain through death: bound gear itself or a rebuildable blueprint?
+1. **Confirmed:** A specific Permanent equipment instance survives death, but legitimate deliberate ground-drop pickup or trade **transfers ownership**. Engineering must prevent double restoring the former owner.
 2. Recovery payment/delay and whether bound gear can wear out permanently.
-3. Bound equipment slot cap and compatible archetypes.
-4. Account binding vs trading/gifting (default: no trade).
+3. **Open:** Permanent equipment slot cap and archetypes (no hardcoded final number).
+4. **Confirmed:** Permanent equipment is transferable by deliberate ground drop/pickup or valid trade. **Open:** Gifting, market mechanics, safeguards and post-drop unclaimed item fate.
 5. Ordinary vaulted item withdrawal and reconnection handling.
 6. Item-instance provenance, cross-server session locking and operation journal semantics.
 7. How event-critical unique items are represented and multiplied/valued on extraction.
@@ -951,11 +955,11 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 **P1 — can remain proposed through first prototype, then tune:**
 
 8. Recipe resource quantities, sources and rarity names, Keystone path, unlock milestone requirements.
-9. Permanent damage/power cap relative to consumable top-tier gear.
+9. **Confirmed:** Permanent conversion gives **no extra combat stats** compared with source equipment. **Open:** PvP source item and repair balance.
 10. Enchantment affix preservation and charge/repair rules.
-11. Vault capacity, material stack weights, equipment durability.
+11. **Confirmed:** Vault has **upgradeable capacity**, players may withdraw stored contents. **Open:** Upgrade prices, tier ceilings, stack weights, durability.
 12. Boss clear rewards beyond the confirmed mid-fight Legendary.
-13. Map size, portal timing/camping protection, tribe capacities and wipe schedule.
+13. **Confirmed:** Provisional 30-player instances wipe **when empty only**; fixed exit countdown 120 seconds (zone check only at expiry), portable 30 seconds; exact travel/raid/party balance Open.
 14. Cosmetic monetization, tutorial content, achievement rewards and hub architecture.
 
 ## 28. Production milestones and documentation maintenance
@@ -963,7 +967,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | Step | Scope | Completion evidence |
 | --- | --- | --- |
 | 1. Design agreement | Choose Permanent death model, rarity/eligibility, vault semantics and precise ActiveRun admission authority | Explicit signed-off GDD decisions (not just proposed paragraphs); confirmed pre-spawn safety preserved |
-| 2. Risk loop vertical slice | Protected in-world menu and Play/spawn readiness, then gather, heal, fight, active death/leave corpse and 120-second hold/animation | Teleport/initialization failures safe; Play starts risk only on completed spawn; corpse expires at 600 seconds; extraction alarm/protection/receipt validated |
+| 2. Risk loop vertical slice | Protected world menu/Play readiness, then gather, fight/heal, corpse, shared 120s timer and protected animation | Teleport failures safe; death kicks/ejects; corpse 600s; roaming countdown and deadline-only zone qualification; individual protected receipts |
 | 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
 | 4. Social / PvP slice | Spear, bow, **healing consumables**, one elemental effect, solo/tribe safeguards | Test sustained damage vs healing rates, interruption and escape; no player shield equipment |
 | 5. World + raids | Outer/Inner biome, Booga Booga-like structures, 50-meter exclusions and stash raids | Quick placement, raidable storage and no portal obstruction |
@@ -988,12 +992,12 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 | Destination play-world server, pre-spawn loading or main menu | No | **No** | Reserved loadout retained in recoverable safe state |
 | Play clicked but server has not successfully admitted/spawned character | No | **No** | Play reservation rolled back or safely retried |
 | Active play-world character | **Yes**, 600-second corpse | **Yes**, regular carried gear/resources | No extraction or vault payout |
-| Active 120-second extraction hold | **Yes**, if player leaves/dies before animation | **Yes** | Cancel/no extraction |
+| Active 120-second extraction countdown | **Yes**, if player quits/dies before qualifying and protected animation | **Yes** | Shared event timer keeps running; no extraction for dead/out-of-zone characters at deadline |
 | Server-authorized protected extraction animation | No loot corpse for locked items | **No** | Locked extraction entitlement reconciles to vault |
 | Authorized administrator update safe-kick | No loot corpse | **No** | Held inventory preserved in maintenance-recovery escrow |
 | Platform failure terminating the entire server | Cannot maintain body after the instance ends | No automatic extraction | **Open:** explicitly designed crash recovery (not normal leave) |
 
-**Permanent item exception:** Rare converted gear's death/manifestation policy remains a Working default (§17); the ordinary loot/body system must not mint a lootable tradeable copy of any bound item.
+**Permanent item exception:** It **stays with its rightful current owner** on death, with no corpse copy. It **can** appear as a lootable ground item when *intentionally dropped* and then ownership legitimately transfers to the picker (§17); the previous nontradeable model is superseded.
 
 ### 29.2 Body creation and looting — Confirmed behavior / Proposed implementation
 
@@ -1014,13 +1018,13 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 - If a player leaves after the protected extraction animation started, the protection outcome wins regardless of whether they see the final vault-receipt screen.
 - Safe administrator maintenance removal is authorized by the server, not by a client flag or mere kick reason string.
 - A duplicated character session must not generate repeated bodies or recall items that others already looted.
-- **Proposed:** On rejoin after actual **ActiveRun** forfeiture, present a concise summary explaining lost unsecured items. A pre-spawn failure may never display an inventory-loss summary or suggest a death occurred.
+- **Confirmed / Proposed UX:** An active-run disconnect forfeits ordinary unsecured gear; the player may **rejoin that still-running world** if they were not killed/forcibly excluded, but does not regain lost items. A **death** ejects them to reduce corpse retrieval chances, with a same-world admission restriction to implement. Pre-spawn failure never counts as death or item loss.
 
 ## 30. Administrator update kicks and maintenance-safe preservation
 
 ### 30.1 Confirmed product requirement
 
-Administrators need commands to remove players **without losing their items when updating the game**. This is a privileged exception to ordinary active-world departure, not an extraction or a free return to vault. It must also work if a player is in the extraction hold. A player in the protected pre-spawn menu is already loss-free and requires no special inventory-forfeiture bypass.
+Administrators need commands to remove players **without losing their items when updating the game**. The next protected menu **notifies them of the update kick and saved held inventory**, which they resume on next successful Play. This is a privileged exception to ordinary active-world departure, not extraction or free vault deposit. It also works during an extraction timer; players still on pre-spawn menu are already safe.
 
 ### 30.2 Proposed safe-removal protocol
 
@@ -1029,14 +1033,14 @@ Administrators need commands to remove players **without losing their items when
 3. Record the **exact ordinary gear/material/consumable snapshot** under a unique maintenance-recovery operation ID. This is **unsecured preserved carryover**, not a successful extraction. Do not apply portal bonuses or make it usable for the protected Forge while in recovery.
 4. Persist the snapshot in an access-controlled, retry-safe recovery state and prevent the same world inventory from also becoming a corpse.
 5. Only after recovery entitlement is established, perform the safe kick/server restart; if persistent storage fails, do not falsely promise safe removal. Retry/defer shutdown as supported and surface the operational error.
-6. At the player's next safe lobby/pre-spawn admission, explain why the prior equipment was preserved; provide a protected path to resume the equipment as active at **the next explicit Play**. Exact restoration destination is **Open** (recommended: next expedition loadout, not permanent vault).
+6. At the player's next lobby/pre-spawn admission, **explicitly notify them of the admin game-update kick and their saved inventory**. **Confirmed:** They resume with the exact previously held items after the next explicit successful Play; these have **not** been extracted or made Forge-safe.
 7. Each maintenance operation can be consumed/resumed once. New active server session IDs and item IDs prevent concurrent duplicated restorations; audited administrators cannot silently create a second equipment set.
 8. **If a valid extraction animation already started first**, honor extraction snapshot ownership rather than also granting a maintenance escrow copy.
 
 ### 30.3 Permission, grief and abuse safeguards
 
 - Authorize commands using server-held administrator IDs/roles and restricted command dispatch; never trust client-provided permission tags or arbitrary RemoteEvent requests.
-- **Proposed:** Two distinct commands/actions: ordinary moderation kick, and audited **safe-update kick**. Only the latter preserves active inventory. Exact admin UX and whether normal moderation kicks forfeit gear are **Open**.
+- **Proposed:** Separate ordinary moderation kick (may exclude rejoin) from audited **safe-update kick** (preserves items and notifies player). Exact command names and treatment of punitive kicks remain **Open**.
 - Update shutdown should safely process all active player snapshots; pre-spawn menu players never had risky inventory so retain their reserved loadouts without world body creation.
 - Record initiator, timestamp, update version, server job/run ID, affected sessions, escrow operation IDs and success/error status.
 - Never allow players to spoof a maintenance kick with a client disconnect, intentionally triggering a crash, or asking a player-owned NPC to end the session.
@@ -1065,7 +1069,7 @@ Administrators need commands to remove players **without losing their items when
 | **ExtractionHolding** | Yes | No, normal leave drops loot | Yes on death/ordinary departure | ActiveRun on cancel, or ExtractionProtected |
 | **ExtractionProtected** (animation has begun) | **No, invulnerable** | **Yes** | No for locked loot | Persistent receipt reconciliation / LobbySafe |
 | **MaintenancePreserved** | No | Yes | No | Recoverable safe staging / explicit future Play |
-| **Dead / BodyLootable** | Not a living player | N/A | Yes, exactly 600-second expiration | Return to safe menu/lobby as applicable |
+| **Dead / BodyLootable** | Not a living player | N/A | Yes, exactly 600-second expiration | **Kick/eject player from that play-world instance**; mark same-world rejoin ineligible until instance ends |
 
 **Nonnegotiable boundary:** Being inside a play-world Roblox place is not synonymous with **ActiveRun**. All death-drop, logout penalty, body-spawn and loot-loss actions must check authoritative ActiveRun/ExtractionHolding state and **must not execute** for loading, menu, failed admission, protected extraction or maintenance-preserved states.
 
@@ -1103,8 +1107,10 @@ Administrators need commands to remove players **without losing their items when
 | Duplicate Play requests | Exactly one successful spawn/admission; no duplicated equipment |
 | Character cannot spawn or is destroyed before successful admission | Return safely to menu; zero combat death/loot drop |
 | Server admits player and they enter active gameplay | Risk starts, with explicit gameplay HUD/transition |
+| Active player dies | Corpse appears for 600 seconds, player is **kicked out of the play world**, and same-world rejoin gate rejects that user while this instance exists |
+| Eligible active player leaves but has not died/kicked | Ordinary carried items are forfeited to corpse; they may rejoin the same running server if eligible but previous items are not restored |
 | Player deliberately quits after becoming ActiveRun | One lootable body; 600-second unclaimed loot expiry |
-| Player quits with 15 seconds left on extraction hold | Ordinary body; no extraction |
+| Player quits with 15 seconds left on shared extraction countdown | Ordinary body; may not extract even if others qualify when timer expires |
 | Player closes client one frame after protected animation begins | Safe; locked loot reconciles to vault |
 | Update admin safe-kicks an ActiveRun player | Preserve held gear in maintenance escrow; no body or free extract |
 | Entire Roblox instance crashes | Must define crash recovery separately; no fake corpse timer in destroyed server |
@@ -1160,7 +1166,7 @@ Beyond the original Abyssal Meteor, 60-second Ancient Cache and Alpha Mob events
 - **Event structures:** NPC/event-generated raidable outposts are not player-owned Permanent vaults. Use separate spawn caps, encounter IDs, loot rights and despawn rules.
 - **Performance:** Cap player pieces per zone/tribe and placeable interactive objects; avoid physics-heavy collapses that overload mobile devices and full public servers.
 
-**Open:** Whether player bases persist across all server restarts, whether forests/farms regenerate while owners are offline, upkeep/decay, offline raiding fairness, claim limits, raid alert range, safe storage capacity and structure despawn rules.
+**Confirmed:** All bases, farms and other live island state end when the instance becomes empty, not on a fixed timed wipe. **Open:** Decay and upkeep while populated, offline raiding while other players remain, claim limits, raid alert range and structure caps. See §34 for reset/vault scope.
 
 ## 33. Public-world playstyle rewards and engagement design
 
@@ -1197,8 +1203,8 @@ Remaining active in a shared **public world** should be useful even without cont
 - Never grant Permanent gear merely for idling a specified time in a public world. Expensive Secure Forge conversion continues to require actual extracted rare materials and eligible gear.
 - An ordinary logout **after ActiveRun admission** still drops the body; the world main-menu/loading state remains exempt even though the player occupies the game server. Account progress/cosmetics never make carried loot safe.
 - Rewards earned while inside protected pre-spawn menu/loading **do not count as active public-world play**.
-- When an extraction hold completes, protected animation begins; stop earning live-world combat/gathering rewards for that session.
-- Proposed builder/farmer benefits must not enable invulnerable farming enclosures or permanent structures around protected portals.
+- When a **shared extraction timer ends**, only qualifying alive players **inside the area** begin protected animation; stop earning live-world combat/gathering rewards for **those extracted players**, not everyone around the rune.
+- Proposed builder/farmer benefits must not enable invulnerable farming enclosures or permanent structures around protected **fixed** portals. Temporary portable rune interaction with buildings remains Open.
 - PvP rewards should value real combat/contested outcomes, not repetitive farming of a cooperative alternate account.
 - Telemetry should compare retention, solo success, conflict rates and material supply across playstyles before any direct resource multiplier is locked.
 
@@ -1211,7 +1217,83 @@ Remaining active in a shared **public world** should be useful even without cont
 - Track metrics by playstyle, gear tier and group size; maintain viable solo-player paths.
 - Owner approval is required for exact award types, reward cadence, session persistence, and whether any benefits reset per server.
 
-## 34. Design change log
+
+## 34. Owner-approved answers 1–24 (2026-10-21)
+
+These answers supersede earlier proposals where conflicting. Specific balancing values and ambiguities explicitly left undecided are **Open**, not silently decided.
+
+### 34.1 Server, world and death (1–7)
+
+| Number | Owner decision | Status and necessary detail |
+| --- | --- | --- |
+| 1 | Target **30 players** per island | Provisional; refine based on map size and performance |
+| 2 | A public world **resets only after its final player leaves** | Confirmed; no scheduled wipe while populated |
+| 3 | **Everything in live world disappears** on reset; only Permanent gear survives | Confirmed for island structures/loot; possible contradiction with **ordinary extracted vault** is Open (§34.5) |
+| 4 | Surviving, non-kicked players can return to the **same active world** | Confirmed, capacity permitting; an active ordinary quit still forfeits unsecured carried gear |
+| 5 | On death, **kick/eject player from play world** to impede body retrieval | Confirmed; block immediate same-world rejoin via server admission as technical recommendation |
+| 6 | Unexpected full-server crash should **safely restore active items** if feasible, or use special recovery | Confirmed preference; feasibility and fraud-proof implementation Open |
+| 7 | Authorized update kicks **preserve precise carried items** and notify players of inventory preservation | Confirmed; player resumes with held items at next Play, not free extraction |
+
+**Proposed Roblox rejoin implementation:** Separate start-place lobby and play-world place, configure play-world place **Secure within universe only** for server-initiated teleport access, and enforce a per-JobId death/kick exclusion in lobby matchmaking **and** play-world server admission. Killed players may join **different** worlds, not their previous world. This is not a universal setting to disable all friend-joining; Roblox user privacy/visibility is separately controlled. Roblox documentation: https://create.roblox.com/docs/projects/teleport and https://create.roblox.com/docs/matchmaking/scoring .
+
+**Crash policy:** A whole-instance crash cannot leave a corpse behind for 600 seconds if the server no longer exists. Provide separately audited recovery/escrow, distinguish an involuntary server outage from an ordinary single-player connection loss, preserve latest actual owner and prevent restoration if a gear instance was already looted or traded. This is an engineering requirement, not a tested existing guarantee.
+
+### 34.2 Permanent equipment, crafting and vault (8–16)
+
+| Number | Owner decision | Status |
+| --- | --- | --- |
+| 8 | Permanent gear **survives death**, but manually dropping it lets others take it | Confirmed; stolen item is transferred, not cloned |
+| 9 | Recovery/repair **material costs may apply** | **Open**: balancing option, not requirement |
+| 10 | Maximum simultaneous Permanent equipment | **Open**; no default cap approved |
+| 11 | Converted Permanent item has **same combat stats** as source | Confirmed; no automatic power increase |
+| 12 | **Designated equipment only** is eligible for conversion | Confirmed; catalog not finalized |
+| 13 | Permanent items **can be traded** | Confirmed; exact trade UI, fees and safeguards Open |
+| 14 | Extracted gear/materials can be **withdrawn**; vault size is **upgradeable** | Confirmed; slot and cost curve Open |
+| 15 | Recipes obtained through **discovery and player leveling** | Confirmed; precise levels/XP/requirements Open |
+| 16 | High-tier recipes require materials from **multiple activities/sources** | Confirmed; exact drops and numbers Open |
+
+**Non-duplication policy:** One transferable Permanent item exists at any moment: in a player's safe collection, equipped, on the ground after intentional drop, or in trade escrow. Death returns a currently owned item to its owner; an item already **manually dropped and legitimately claimed by another player** cannot return to its former owner. Ground-item expiration when unclaimed remains Open.
+
+**Critical clarification of answer 3:** Earlier GDD versions confirmed that successfully **extracted ordinary materials and gear** live permanently in an unraidable account vault so they can pay for later special crafting. “Everything disappears; only Permanent items survive” was stated about **empty-world resets**, so the **working interpretation** is that the live island resets but already vaulted items remain saved. If the user instead wants all ordinary **previously vaulted** resources to disappear too, that would radically change the core extraction/Forge economy and needs explicit approval. This question remains **Open** rather than treated as answered.
+
+### 34.3 Extraction, portals and return (17–24)
+
+| Number | Owner decision | Status |
+| --- | --- | --- |
+| 17 | Players may move **outside** the zone during countdown; must be **inside only at the exact end** | Confirmed; small extraction area |
+| 18 | Timer does not pause/reset on zone exit | Confirmed consequence of shared timer |
+| 19 | Combat, healing and being hit are permitted without cancelling countdown; dead players do not qualify | Confirmed |
+| 20 | Large-radius audio and visual warnings alert nearby players | Confirmed; radius/VFX Open |
+| 21 | A **single timer on server** applies to an extraction event; groups/tribes can share it | Confirmed; unrelated strangers using same event Open |
+| 22 | Known candidate extraction POIs; **different active subsets per server**; extremely rare portable rune gives **30-second anywhere** extraction | Confirmed; item consumption, alert radius, temporary zone and abuse protections Open |
+| 23 | Central portal higher-value multiplier | **Open** — owner requested explanation; cannot select a reward type |
+| 24 | Successful extraction returns players to the **separate secure lobby** | Confirmed; not the play-world pre-spawn menu |
+
+**Important revision:** The original “remain within extraction region for the entire 120-second hold” mechanic is **replaced**. On click a fixed portal starts its own countdown; the initiating player can hide nearby or fight, heal, leave and re-enter at will. At expiry the server collects every **alive and eligible character currently inside the region** for protected animation. A character outside by even a short distance at the finish misses the event. Damage does not reset it. Each qualifying character receives their **own** idempotent vault receipt; the portal's timer belongs to the server, not one player.
+
+**Portable rune:** Extremely scarce one-use rewards/drops can provide a fast **30-second** exit at a player-chosen location, including locations outside predetermined POIs. Exact beneficiary group size, placement conflicts, interaction with building/raid mechanics, destruction rules and no-build restrictions need future decisions; “anywhere” and 30 seconds are Confirmed.
+
+**What question 23 means:** Imagine extracting 10 rare ore and one Legendary with a hypothetical 2× center bonus. Possible designs: **20 ore**, or **10 ore and the same Legendary plus bonus currency/experience/score**. Neither is approved. The recommendation is to reward added currency/experience/score, **not duplicate** conversion catalysts or Legendary equipment, but await the owner's choice.
+
+### 34.4 New acceptance tests
+
+1. Servers support a provisional capacity target of 30 and preserve live world state while populated; an empty server resets temporary world structures/resources on the next instance.
+2. Dead player is ejected and same-JobId rejoin denied, while an eligible survivor may return to that server if not full; prior voluntary quit forfeiture is never undone.
+3. Staff safe-update command preserves actual current holdings and gives a clear **game update / inventory saved** notification when the player resumes.
+4. A full-instance crash follows recovery rather than being falsely treated as a voluntary single-player quit; item ownership cannot be duplicated.
+5. Permanent gear retains baseline stats and remains owned through death; intentional drop/pickup or confirmed trade changes current owner once, with previous owner unable to reclaim it.
+6. Recipe unlocks combine level progress and discoveries, allow only designated items, and use real successfully extracted materials from different sources.
+7. Upgradeable vault capacity is enforced: upgrade increases capacity; insufficient room never deletes stored items.
+8. Two activators at the same fixed exit create **one shared 120-second event**, not parallel client countdowns.
+9. A player can move out, hide, fight and heal, and still qualify by being alive **inside at exactly 120 seconds**. A player outside at the end does not qualify regardless of prior time inside.
+10. Entire parties/tribes can leave using that one timer with separate non-duplicated saved inventories.
+11. Different public worlds activate different subsets of the same known extraction POIs.
+12. Rare portable rune initiates an authorized **30-second** temporary extraction at a chosen location without generating extra runes or duplicated vault awards.
+13. Successfully protected extraction animation is safe to disconnect and transfers to separate lobby; game does not reroute to unsafe world menu.
+14. Vault wipe interpretation and center multiplier stay marked **Open** until explicitly confirmed.
+
+
+## 35. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1220,6 +1302,7 @@ Remaining active in a shared **public world** should be useful even without cont
 | **0.3** | 2026-10-21 | Removed player-usable shields and added consumable healing progression, recipes and PvP interruption rules; kept Guardian shield-pillar boss mechanics. |
 | **0.4** | 2026-10-21 | Confirmed 120-second telegraphed extraction hold, invulnerable and disconnect-safe animation, 600-second lootable bodies after active exit, admin update preservation, rare events, accessible building and diverse playstyle incentives. |
 | **0.5** | 2026-10-21 | Established the mandatory **protected play-world loading/main menu** with explicit Play-to-spawn risk activation. Teleport, loading, pre-spawn kick, and failed admission cannot forfeit items. Added full state machine, recovery flows, detailed QA and cross-references in §29–33. |
+| **0.6** | 2026-10-21 | Recorded answers 1–24: 30-player world target, empty-server reset, same-world rejoin/death kick, crash/update recovery, transferable same-stat Permanent items, vault upgrades and levels, server-shared 120-second end-only extraction, rare portable 30-second anywhere rune, and lobby return. Clarified unresolved reset-vault and payout semantics. |
 
 ---
 
