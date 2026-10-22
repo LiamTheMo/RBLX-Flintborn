@@ -304,31 +304,31 @@ Boss identity, scaling with player count, target priority, contribution rewards,
 
 ## 9. Extraction and permanent vault
 
-### 9.1 Confirmed extraction contract
+### 9.1 Extraction mechanics — Confirmed
 
-- Players must **physically transport carried loot** to extraction runes/portals.
-- Activating an extraction rune starts an **exact 2-minute / 120-second countdown** while the player remains in the specified extraction area. The attempt sends **audible and visual cues** to other players so it can be contested.
-- The player is vulnerable during the countdown. **Once the extraction animation begins**, the player is invulnerable, safe from loot theft and safe to disconnect, even if the animation is not finished.
-- Leaving **after entering ActiveRun** but before the protected animation (without an authorized maintenance exemption) counts as ordinary active-world departure, leaving a lootable body for 10 minutes. The world main menu and pre-spawn loading state are still safe (§31).
-- Extraction transfers eligible items into a **persistent, unraidable vault** outside the live island run.
-- Outer hidden Minor Extraction Runes offer a lower-risk escape with **modest value multipliers**.
-- The Center Crater's main Permanent Extraction Portal offers the **highest value multiplier**.
-- Death before successful extraction drops carried items for looting.
-- All extraction sites have **50-meter no-build auras**.
-- Carriers of event-exclusive resources/legendary boss gear reveal themselves through embers, shadow trails or similar visible particles (**Burden of Wealth**).
+- **Fixed sites:** Known POIs can have a portal, but which candidate POIs contain **available** portals differs by public server. Their positions are fixed, not freely rotated after map creation.
+- **Start:** Clicking an available portal begins **one server-shared 120-second countdown for that portal event**, not a per-client timer.
+- **Telegraph:** Audible and visual extraction alerts are perceptible within a **large radius** so attackers may challenge departing players. Exact radius and VFX are still Open.
+- **Move freely:** Players **do not** need to stay inside the capture area while the timer runs. They may hide, travel nearby, fight and heal. **Taking damage does not reset or pause the event timer**.
+- **Deadline:** At the exact expiry, every **living, eligible participant physically inside the relatively small capture area** is eligible for the protected extraction animation; anyone outside misses the extraction. This applies to groups and tribes on the same server event. Whether non-group strangers can join the same extraction is Open; public participation is the working default.
+- **Safety boundary:** The instant a qualified player's **server-authorized extraction animation starts**, they are invulnerable and safe to disconnect. Prior death/quit leaves the normal 10-minute loot body.
+- **Rare portable rune:** An extremely rare reward/drop enables a player to **choose an extraction location anywhere** and starts a **30-second countdown**. Portable-rune consumption, participant capacity, zone radius, announcements and anti-placement exploits are Open. Do not weaken the confirmed wherever/30-second feature without design approval.
+- **Destination:** Successfully extracted players transfer to the separate secure **lobby**, not the play-world loading menu.
+- **Stakes:** Active fixed portals retain the 50-meter no-build rule. A portable rune is a separate dynamic object whose exclusion/placement details are Open.
+- **Payout:** Main Center Crater portal has greater value incentive than lesser fixed portals, but the precise meaning of that multiplier has not been chosen (§9.3).
+- **Loot:** Safely extracted materials feed crafting; extraction does not automatically mint Permanent item ownership or extra Legendary copies.
 
-### 9.2 Confirmed timing and proposed server implementation
+### 9.2 Server-shared timer and qualifying snapshot — Confirmed / Proposed engineering
 
-1. Player activates portal while alive and in the designated area; server validates the attempt and broadcasts **audio/visual extraction cues**.
-2. Server starts a **120-second** countdown; player must remain in the specified area throughout. Normal PvP and damage remain possible. Whether taking damage alone interrupts the countdown is **Open**.
-3. If the player leaves the area or dies before completion, the attempt fails. **Proposed:** leaving the boundary cancels and requires full restart (rather than pausing). Ordinary departure during this stage creates a lootable body.
-4. After 120 valid seconds, server authorizes **ExtractionAnimationStarted**, locks the exact carried-item snapshot, and grants **invulnerability and safe disconnect immediately upon animation start**. Other players can no longer loot that snapshot.
-5. Server establishes a recoverable extraction receipt/entitlement as part of the protected transition; vault persistence may finish after animation or player disconnect, but the locked loot must never be forfeited or duplicated.
-6. After verified commit, show the secure-vault receipt and return to protected lobby. A pending backend write must be shown as pending, not falsely settled.
+1. Server validates an activation and reserves **one** event at the available site, with its own start/end timestamps. For a regular fixed exit, expiry is **120 seconds** later; for a rare portable rune it is **30 seconds** later.
+2. The server emits the audible and visible alert. The clock continues independently of player proximity, combat, deaths or healing.
+3. Players may leave the capture area and return as often as desired. No continuous stay counter exists. An alive character may also arrive late and qualify if physically inside at the exact finish.
+4. At expiry, server captures the set of eligible **alive characters inside the defined zone** and grants protected animation to each, including multiple group/tribe members using the same timer. No late entry after the snapshot.
+5. Each eligible player gets an individual locked inventory and extraction receipt; the portal event has one shared unique ID. No player can claim someone else's items, join twice or receive two extracts from the same event.
+6. At the animation transition, the player's invulnerability and safe-disconnect guarantees take effect; individual loot snapshots settle idempotently to secure vault.
+7. Successful players go to lobby after persistence confirms. Unqualified players remain vulnerable and gain no automatic protection; the shared event ends.
 
-**Critical boundary:** Protection begins when the **server-authorized animation** begins, not when the animation ends. A client-only visual effect cannot mint items or assert protected state.
-
-**Proposed anti-camping protections:** Multiple minor extraction locations and readable approach paths; **the 120-second hold stays risky** and the post-hold animation is invulnerable. The marked hold area needs clear world geometry/UI.
+**Open behavior:** Whether anyone may start another countdown on the same site immediately, whether the activator's death cancels the event (working default: **no**), whether enemies can intentionally use an opponent-triggered extraction (working default: **yes**), the minimum participant distance, visual radius and portable-rune interactions. All are design choices; the freedom to leave the area and fight/heal is already Confirmed.
 
 ### 9.3 Value multiplier guardrail — Proposed
 
@@ -338,9 +338,9 @@ Multipliers should apply to **valuation/payout**, not produce copies of unique l
 
 Treat extraction hold, protected animation, death, ordinary leave, maintenance kick and item pickup as competing **server-authoritative** transitions. Lock exact item IDs at animation start and create a recoverable receipt before allowing safe disconnect. The server decides the protected animation state; a client-side animation alone is not proof of successful extraction.
 
-### 9.5 Extraction decisions — Open
+### 9.5 Remaining extraction questions — Open
 
-**Confirmed:** 120-second stay-in-zone hold, audio/visual warning to other players, animation-start invulnerability/disconnect safety, 10-minute loot bodies on ordinary departure, maintenance kicks preserving holdings, and extracted materials for special crafts. **Open:** Exact area geometry, exit reset mechanics, damage interruption, alert range, simultaneous attempts, portal availability, value multipliers, party rules, lobby return and crash recovery.
+**Confirmed:** 120-second shared timer per fixed exit, free movement/combat/healing during countdown, living-in-zone check **only at expiry**, large-radius cues, multi-player/group eligibility, 30-second portable anywhere rune, animation-start protection and lobby return. **Open:** Actual capture radius, notification radius, public stranger eligibility, activator-death behavior, site reuse and cooldown, portal population per server, portable rune consumption and temporary boundary, party admission, value/multiplier formula, full vs partial carried-inventory banking, portal existence during Guardian encounter, and crash-recovery implementation.
 
 ## 10. Economy, stakes and balancing
 
