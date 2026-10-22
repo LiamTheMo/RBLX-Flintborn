@@ -2,7 +2,7 @@
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
 > **Design revision:** 0.7  
-> **Last updated:** 2026-10-21  
+> **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
