@@ -275,65 +275,86 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 
 
-## 7. Dynamic server-wide events
+## 7. Weighted world-event system and public announcements
 
-**Confirmed high-impact event presentation (meteor, cache, Alpha and Guardian-class announcements).** Smaller rare flora, deposits and creature sightings may use localized discovery cues as a proposed extension (§32):
+> **Confirmed:** The event director operates through **weighted rarity selection on recurring server ticks**. At each event check, an event **may or may not occur** based on its weight and eligibility. This includes all **non-Guardian events**, meaning world events *other than the main central Guardian*: rare shrubs, trees, deposits, special mobs, event bosses, meteors, supply caches and generated raidable structures. **All events are announced publicly.** Rare resource sites spawn at **random valid positions inside their relevant biome**.
 
-1. Server-wide stylized banner announces the event.
-2. HUD/minimap marker shows a location or search radius.
-3. Large colored beam or comparable world beacon marks the location.
-4. Rare rewards and required interaction time create contestable objectives.
+### 7.1 Event generation and broadcast sequence
 
-| Event | Confirmed encounter | Confirmed reward concept | Tactical tension |
+1. When the public island is active, a **server-authoritative event scheduler tick** evaluates whether the server should spawn a new event and which type. **Weights** define relative rarity, possibly including a "no event" result.
+2. Filter events by valid biome, existing encounter limits and event category availability, then pick using server RNG and versioned probability tables.
+3. Spawn event at a **random feasible location within the appropriate biome**, checking terrain, other structures, accessible pathing and protected interaction points.
+4. **Publicly announce every event** to the server with audiovisual notification. **Open:** whether all have exact map icons/beacons or some only offer a public biome hint; *announcement itself is confirmed* for all.
+5. Players may compete for event loot, even when the encounter has hostile mobs. Reward items are ordinary at-risk physical loot until extraction and can be stolen.
+6. Once resolved, expire the event and restore capacity for future weighted checks. Do not have players directly request weighted rolls.
+
+**Design flexibility:** Tick interval, event-type weights, cooldowns, concurrency and "nothing happens" probability are **Open**; they are not fixed every X minutes. **The existing Guardian concept's approximately 15–20-minute cadence and 3-minute warning are preserved as a distinct established rule** until a later decision explicitly changes it (§8).
+
+### 7.2 Event catalog and three boss sources
+
+| Family | Trigger | Spawn style | Player interest |
 | --- | --- | --- | --- |
-| **Resource Crash / Abyssal Meteor** | Limited Tier-5 event node requiring sustained/special mining interaction | Rare reinforcement material for endgame bases | A miner is vulnerable while allies screen attackers |
-| **Ancient Supply Cache** | Chest drops/arrives, requires **60 continuous seconds** to unlock | Pre-crafted high-tier weapons and raiding explosives | Area control and interruption under attack |
-| **Alpha Mob** | Shadow Panther / Crystal Golem-style elite with protective pack | Glow-Fur, Charged Cores, magical modifiers | PvPvE hunt with third-party ambush risk |
+| Rare shrubs/herbs/trees | Weighted event tick | Random suitable spot within its biome | Farming, healing supplies, prized wood |
+| Rare stone/ore/minerals | Weighted event tick | Random biome-valid node | Mining, iron and advanced recipes |
+| Rare hostile mobs | Weighted event tick | Randomized biome encounter | Ancient, mythological and creature reagent hunting |
+| **World-event boss** | Weighted rare boss event | Random eligible region/arena | Contested rare gear or ritual materials |
+| **Ritual boss** | **Player places/consumes designated ritual materials** | Valid ritual location/arena | Player-planned summoning at risk of third-party interference |
+| **Structure boss** | Player enters/engages eligible generated structure | Event outpost, ruin, dungeon or defended camp | Combat and raiding interlock |
+| Meteor/resource crash | Weighted event tick | Random permitted impact area | Scarce minerals, prolonged contested harvesting |
+| Ancient Supply Cache | Weighted event tick | Contested marked drop site | High-tier ordinary equipment and resource loot |
+| Raidable generated structures | Weighted event tick | Abandoned fort, hostile NPC outpost or ruin | All three environmental structure varieties are confirmed |
 
-**Interpretation note:** The handoff calls the meteor “un-mineable” yet also requires prolonged mining. This draft interprets it as **not harvestable by ordinary instant mining**, but harvestable through a special contested interaction. Exact tool and harvest requirements remain **Open**.
+**Ritual summoning is a material-based world interaction, not the player casting a magic combat spell.** It does not violate the launch no-magic rule.
 
-### 7.1 Event scheduler — Proposed
+### 7.3 Enemy faction palette — Confirmed
 
-- Use a centrally controlled schedule with randomized locations and sufficient notice to rotate players across the map.
-- Avoid excessive overlaps that spread the server too thin or conflict with the recurring Mega-Boss.
-- Make rewards and ownership server-authoritative, resilient to repeated remote calls and reconnects.
-- When interacting, show progress and interruption clearly. The Supply Cache unlock requires a continuous 60-second attempt; interruption should require a new uninterrupted attempt unless changed by design.
+Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons, elemental monsters, evil hostile NPCs, and mythological beings**. Elemental *enemies* do not imply player spellcasting. Individual enemy species, weapons, loot distribution, animation and artificial intelligence are content proposals.
 
-### 7.2 Event questions — Open
+### 7.4 Existing event mechanics retained
 
-Spawn intervals, coexistence limits, reward quantity, whether players can steal progress, rarity distribution, event expiration, sound accessibility, exact-vs-radius disclosure, and whether a single tribe can repeatedly monopolize spawns.
+- **Resource Crash / Abyssal Meteor:** Event resource that requires a special, lengthy contestable harvesting/mining interaction rather than ordinary instant mining; potential Tier-5 reinforcement components.
+- **Ancient Supply Cache:** Requires **60 continuous seconds** of valid interaction to unlock. A disrupted channel restarts as already established. Can provide strong equipment and **optional** siege equipment; siege gear is **never mandatory** to raid ordinary player bases.
+- **Alpha Mob:** Rare elite creature (e.g., Shadow Panther or Crystal Golem concept) with protective enemies; physical ingredient/reward examples are proposed.
+- **Generated raidable structure:** May be abandoned and lootable, defended by enemy NPCs, or a ruin. All are **not claimable by player tribes**. Appropriate for world events, not persistent tribe structures.
 
-## 8. Mega-Boss — The Guardian Awakening
+### 7.5 Server implementation and remaining questions
 
-**Confirmed:** A premier world event in the central caldera approximately **every 15–20 minutes**, contested by top-geared players and rival tribes.
+- Seed random spawn positions by authorized server decision; use biome/terrain checks and avoid inaccessibly clipped shrines/trees.
+- Cap concurrent events, spawned NPCs, generated structures and rare-node density for a 30-player target (tune through performance tests).
+- Event weights and rewards should be visible in balance configuration, with analytics tracking actual spawn frequency and **successful extractions** of their loot.
+- Public announcement must reach clients with UI/sound accessibility support; alert destination accuracy and radius are **Open**, but no secret unannounced rare event should contradict this design.
+- A full 30-player server and a low-population server may require different cooldown/budget controls, but reward rates and spawn rarity must stay fair.
+- **Open:** Tick interval, chance of no event, weight tables, overlap limits, per-biome valid spawn positions, discovery of ritual recipes, summoned boss cancellation, NPC/ruin despawn, whether raid damage persists until world empties, and special event-level loot rights.
 
-### 8.1 Start sequence — Confirmed
 
-- “Horn of War” broadcasts island-wide.
-- Sky turns crimson; an audible horn signals danger.
-- A **3-minute warning** leads into the boss emergence.
-- Boss AoE can destroy player-built defenses near the arena.
+## 8. Guardian mega-boss and scalable encounters
 
-### 8.2 Three-phase design — Confirmed
+> **Confirmed retained Guardian concept:** Center-caldera boss appears approximately **every 15–20 minutes** with **3-minute Horn of War** advance announcement, a pillar-based first stage and an unusually valuable **Legendary item dropped at 25% health**, *before death*. Its timed cadence remains the existing special case; weighted event spawning governs other event types unless the owner explicitly changes the Guardian schedule.
 
-| Phase | Trigger | Boss behavior | Player decision |
+### 8.1 Guardian encounter and phase rules
+
+| Phase | Trigger | Mechanic | Public-world tension |
 | --- | --- | --- | --- |
-| **I — The Shield** | Boss appears | Boss is invulnerable while external energy pillars survive | Split to destroy pillars while managing rival players |
-| **II — The Gauntlet** | Pillars destroyed | Lethal melee, ranged and AoE mechanics | Commit damage, revive/retreat where supported, fight or evade opponents |
-| **III — The Betrayal** | Boss at **25% health** | Primary **Legendary item drops during the fight**, before boss death | Compete for the relic, defend the carrier, or finish the boss |
+| I — Shield pillars | Guardian appears | Invulnerable **NPC boss** until external energy pillars are destroyed | Attack pillars while vulnerable to hostile players |
+| II — Gauntlet | Pillars broken | Boss melee, slow projectile/AoE and timed attacks | Teams fight while rivals contest them |
+| III — Betrayal | At **25% HP** | Mid-fight **physical Legendary item** is released | Looting, ambushing, escorting and extraction before boss death |
 
-### 8.3 Boss-fight proposals
+**Guardian energy-pillar shielding is a boss-only invulnerability phase, not equippable player shields**. The Guardian is fully contested by players at all stages; it is not an isolated private PvE room.
 
-- Telegraph lethal AoE with clear ground effects, animation anticipation and sound; avoid unexplained instant deaths.
-- Keep a believable exit path, but make retreat cost time and risk.
-- Separate **mid-fight Legendary drop** from potential boss-clear rewards to make the 25% betrayal meaningful.
-- Prevent construction, pathfinding exploits, aggro dragging, and safe-distance projectile cheese.
-- Use server-side unique reward IDs and item grant/drop records to prevent duplication.
-- Do not award a participant automatic vault loot: players must still physically escape and extract.
+### 8.2 Boss spawning categories and reset
 
-### 8.4 Boss decisions — Open
+- **World-event bosses:** Scheduled/weighted world event creates one encounter. Reset rules depend on that event's individual spawn/despawn definition.
+- **Ritual-summoned bosses:** A player initiates via designated rare ritual materials. Players may still fight over this encounter and its loot. Reset/cancellation depends on validity of ritual site, available server state and encounter type.
+- **Structure-only bosses:** Bosses exist or activate at designated generated structures; their reset may depend on structure state or next event refresh.
+- **Guardian:** Keeps its previously confirmed approximate 15–20 minute cadence for now. Exact timer anchor (start vs defeat), leashing, per-world active cap and post-defeat cooldown are Open.
+- **Confirmed scaling direction:** Scale a boss according to **average player level or average gear level** of the active server/lobby/world population. Exact choice, sampling window, formula, min/max and fairness safeguards remain **Open**. Since the user describes average *lobby level or gear level*, document it as candidate measurement of eligible active population rather than assuming the protected hub's unrelated population.
+- **PvP and loot:** The whole game is PvP-first. **No automatic boss rewards** should make secured loot immune to rival players. Physical reward objects stay contested/unsecured until successful extraction; whether some participants receive XP or recipe discovery progress is Open.
+- **Anti-exploit:** Scaling must not respond instantly to players dropping their high-tier gear, artificially changing server membership or cycling in a low-level alternate account.
 
-Boss identity, scaling with player count, target priority, contribution rewards, reset/leash, encounter timeout, PvP friendly-fire effects, whether the Legendary drops once per encounter, and whether the timer resets from spawn or defeat.
+### 8.3 Future boss design questions — Open
+
+Exact boss health/stat formulas, average **account level vs equipped gear score vs blended score**, timing of stat capture, downed tribe revive access inside boss arena, mechanics per boss family, guardians' timer semantics, damage contribution accounting and loot roll tables. None alter the specified 60-second tribe downed window or 25%-HP Guardian Legendary release.
+
 
 ## 9. Extraction and permanent vault
 
