@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.4  
+> **Design revision:** 0.5  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -30,6 +30,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Contested objectives:** [Server-wide events](#7-dynamic-server-wide-events), [Mega-Boss](#8-mega-boss--the-guardian-awakening), [extraction and vault](#9-extraction-and-permanent-vault).
 - **Long-term progression:** [Special crafting / Permanent rules](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent gear policy](#17-permanent-gear-operational-rules), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [recipe examples](#19-special-recipe-examples--proposed-balancing-placeholders).
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
+- **Critical onboarding and live-world systems:** [10-minute lootable bodies](#29-ordinary-departure-death-and-lootable-bodies), [administrator safe updates](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected in-world Play menu and teleport safety](#31-protected-play-world-main-menu-and-teleport-safety-design), [events and building](#32-expanded-public-world-content-and-booga-booga-style-construction), [public-world playstyle rewards](#33-public-world-playstyle-rewards-and-engagement-design).
 
 **Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
 
@@ -306,7 +307,7 @@ Boss identity, scaling with player count, target priority, contribution rewards,
 - Players must **physically transport carried loot** to extraction runes/portals.
 - Activating an extraction rune starts an **exact 2-minute / 120-second countdown** while the player remains in the specified extraction area. The attempt sends **audible and visual cues** to other players so it can be contested.
 - The player is vulnerable during the countdown. **Once the extraction animation begins**, the player is invulnerable, safe from loot theft and safe to disconnect, even if the animation is not finished.
-- Leaving before the protected animation (without an authorized maintenance exemption) counts as an ordinary non-lobby departure, leaving a lootable body for 10 minutes.
+- Leaving **after entering ActiveRun** but before the protected animation (without an authorized maintenance exemption) counts as ordinary active-world departure, leaving a lootable body for 10 minutes. The world main menu and pre-spawn loading state are still safe (§31).
 - Extraction transfers eligible items into a **persistent, unraidable vault** outside the live island run.
 - Outer hidden Minor Extraction Runes offer a lower-risk escape with **modest value multipliers**.
 - The Center Crater's main Permanent Extraction Portal offers the **highest value multiplier**.
@@ -345,7 +346,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 | Location | Risk profile | Meaning |
 | --- | --- | --- |
-| **Carried inventory** | Highest until protected extraction | Death or ordinary non-lobby departure leaves lootable body for 10 minutes; animation-start locks items against loss |
+| **Active-run carried inventory** | Highest until protected extraction | Death/ordinary active departure yields 10-minute lootable body; staging/menu loadout stays safe until successful Play admission |
 | **In-world base stash** | Raid risk | Can stage larger expeditions but opponents can breach and steal |
 | **Persistent vault** | Secure | Only confirmed safe store for successful extraction |
 
@@ -453,6 +454,7 @@ Full island art, every biome, elaborate weather, large equipment catalog, tradin
 | **P0** | Run/session model, protected loadout reservation, active admission risk threshold, Permanent death ownership, base lifecycle | Inventory authority, teleport safety and player stakes |
 | **P0** | Permanent conversion eligibility, irreversible ingredient usage, binding/slot/recovery | Avoid trivial risk bypass and item-duplication pathways |
 | **P0** | Protected pre-spawn world main menu, explicit Play readiness/spawn risk boundary, loss-free teleport errors and active-only body/drop rules | Avoid gear loss from failed loading and prevent combat-logging exploits |
+| **P0** | Authenticated maintenance safe-kick inventory recovery and two-minute contested extraction handoff into disconnect-safe animation | Preserve loot across planned updates and protect extraction without duplication |
 | **P0** | Portal activation/interrupt logic and multiplier definition | Core extraction risk and economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
 | **P1** | Weapons, dodge/movement, healing timings and interruptions, hit detection, magic resources | Combat feel and network design without shields/guard meters |
@@ -658,7 +660,7 @@ Resources exit the economy through (a) field supply/ammunition/raids, (b) secure
 
 ### 20.1 New player, safe first extraction
 
-Spawn on Outer Rim; gather wood and stone; craft a crude spear; fight a small hostile; find a hidden minor rune; extract uncommon ingredients for a modest payout. At the secure hub, receive an unmistakable **Vaulted** receipt and the first special Forge recipe preview. The player cannot convert the spear immediately; they need several further extractions. A failed first run drops carried loot but does not erase earlier vault progress. Goal: teach risk, safety, and long-term crafting in one sequence.
+The new player first arrives in the play-world **protected main menu** while assets and profile load, then explicitly presses **Play** to spawn safely into an active Outer Rim run. Gather wood and stone; craft a crude spear; fight a small hostile; find a hidden minor rune; defend its **120-second** contested countdown (audio/visual signals attract rivals), then receive the invulnerable animation and extract uncommon ingredients for a modest payout. At the secure hub, receive an unmistakable **Vaulted** receipt and the first special Forge recipe preview. The player cannot convert the spear immediately; they need several further extractions. A failed first run drops carried loot but does not erase earlier vault progress. Goal: teach risk, safety, and long-term crafting in one sequence.
 
 ### 20.2 Solo scavenger, long-term progress without boss domination
 
@@ -911,8 +913,10 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
 19. No deployment or publishing workflows target temporary/version branches; only main may publish.
 20. Deployed Roblox place testing is **not applicable until source/place credentials are connected**.
-21. Ordinary non-lobby departure produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
-22. Lobby exit never creates a loot body or forfeits inventory.
+20a. Joining play-world place creates no active avatar/loot-risk before loading and explicit Play; a failed teleport, profile load, kick or character spawn from that state cannot delete gear.
+20b. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
+21. Ordinary **active-run** departure (not a protected world main-menu leave) produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
+22. Safe lobby exit, loading-screen quit, world main-menu quit, failed teleport and unsuccessful Play admission never create a loot body or forfeit inventory.
 23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier); forged client admin flags and duplicate restore requests fail.
 24. Rune click broadcasts audible/visual cues; countdown takes exactly 120 continuous in-area seconds, validated by server; dying, quitting or exiting area early cannot extract.
 25. At valid animation-start threshold, damage and disconnect cannot cause item loss; idempotent locked receipt settles exactly once, even after DataStore fault.
@@ -958,8 +962,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 | Step | Scope | Completion evidence |
 | --- | --- | --- |
-| 1. Design agreement | Choose Permanent death model, rarity/eligibility and vault semantics | Explicit signed-off GDD decisions (not just proposed paragraphs) |
-| 2. Risk loop vertical slice | Gather, heal, fight, death/leave corpse, extract by 120-second hold and protected animation | Body expires at 600 seconds; alarm, safe disconnect and eventual vault receipt validated |
+| 1. Design agreement | Choose Permanent death model, rarity/eligibility, vault semantics and precise ActiveRun admission authority | Explicit signed-off GDD decisions (not just proposed paragraphs); confirmed pre-spawn safety preserved |
+| 2. Risk loop vertical slice | Protected in-world menu and Play/spawn readiness, then gather, heal, fight, active death/leave corpse and 120-second hold/animation | Teleport/initialization failures safe; Play starts risk only on completed spawn; corpse expires at 600 seconds; extraction alarm/protection/receipt validated |
 | 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
 | 4. Social / PvP slice | Spear, bow, **healing consumables**, one elemental effect, solo/tribe safeguards | Test sustained damage vs healing rates, interruption and escape; no player shield equipment |
 | 5. World + raids | Outer/Inner biome, Booga Booga-like structures, 50-meter exclusions and stash raids | Quick placement, raidable storage and no portal obstruction |
@@ -1191,7 +1195,7 @@ Remaining active in a shared **public world** should be useful even without cont
 ### 33.4 Economy and integrity constraints
 
 - Never grant Permanent gear merely for idling a specified time in a public world. Expensive Secure Forge conversion continues to require actual extracted rare materials and eligible gear.
-- An ordinary logout outside the lobby **still drops the body**; account progress/cosmetic unlocks must not falsely make carried loot safe.
+- An ordinary logout **after ActiveRun admission** still drops the body; the world main-menu/loading state remains exempt even though the player occupies the game server. Account progress/cosmetics never make carried loot safe.
 - Rewards earned while inside protected pre-spawn menu/loading **do not count as active public-world play**.
 - When an extraction hold completes, protected animation begins; stop earning live-world combat/gathering rewards for that session.
 - Proposed builder/farmer benefits must not enable invulnerable farming enclosures or permanent structures around protected portals.
@@ -1213,7 +1217,10 @@ Remaining active in a shared **public world** should be useful even without cont
 | --- | --- | --- |
 | **0.1** | 2026-10-21 | Created Flintborn GDD from the original primitive extraction handoff; recorded primitive-fantasy/no-firearms direction; added proposed systems, technical guardrails, vertical slice and decision backlog. |
 | **0.2** | 2026-10-21 | Added confirmed extracted-material special crafting and expensive eligible-item Permanent conversion; expanded item taxonomy, Forge design, working death/recovery policy, resource/recipe catalog, cross-run economy and player journeys. Further implementation details in §22–28. |
+| **0.3** | 2026-10-21 | Removed player-usable shields and added consumable healing progression, recipes and PvP interruption rules; kept Guardian shield-pillar boss mechanics. |
+| **0.4** | 2026-10-21 | Confirmed 120-second telegraphed extraction hold, invulnerable and disconnect-safe animation, 600-second lootable bodies after active exit, admin update preservation, rare events, accessible building and diverse playstyle incentives. |
+| **0.5** | 2026-10-21 | Established the mandatory **protected play-world loading/main menu** with explicit Play-to-spawn risk activation. Teleport, loading, pre-spawn kick, and failed admission cannot forfeit items. Added full state machine, recovery flows, detailed QA and cross-references in §29–33. |
 
 ---
 
-**Working principle:** Protect the identity of Flintborn: **primitive survival, no firearms or player shields, healing supplies, raidable preparation, contested events, visible rare loot, manual extraction, safe vault, rare special crafting and costly Permanent conversion**. Proposed features are not final decisions until approved and tested.
+**Working principle:** Protect the identity of Flintborn: **protected pre-spawn entry, player-chosen risk activation, primitive survival without guns or player shields, finite healing supplies, raidable construction, contested public-world events, visible rare loot, a 120-second vulnerable extraction hold, safe extraction animation, secure vault, costly special crafting and rare Permanent conversions**. Proposed mechanics remain unapproved until explicitly agreed and tested.
