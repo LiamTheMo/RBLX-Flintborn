@@ -467,7 +467,7 @@ Compare baseline vs center extracted materials including rare ingredients, XP ea
 
 **Required design surfaces — Proposed (not implemented):**
 
-- **Lobby / vault:** Vault inventory, protected loadout/transit reservation, deployment decisions, run results and risk explanation.
+- **Lobby / vault:** Always-persistent vault inventory/capacity, Coins/Gems, XP/levels, **all eight rarity labels**, masteries, cosmetic rewards, direct trade, rebirth tokens/perks, protected loadout/transit reservation, extraction results and risk explanation.
 - **Play-world pre-spawn main menu:** Mandatory protected loading/status, Play enablement only after readiness, safe leave/retry and explicit risk transition after successful spawn (§31).
 - **In-world HUD:** Health, sprint-only stamina, food, equipment and crafted-arrow count, medical-item **post-heal animation cooldown**, food heal-over-time status, 60-second downed timer/revive interaction for tribe members, inventory burden, compass/map, extraction and announced events.
 - **Crafting/building:** Recipe requirements, arrows and medicine crafting, intuitive placeable preview, structure health, **totem claim radius** and **unclaimed decay**. Weapons/armor have no durability wear.
@@ -865,10 +865,10 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 
 | System | Server responsibility | Client-facing information |
 | --- | --- | --- |
-| **ProfileService** | Session locks, schema upgrades, revisions, protected extraction and maintenance recovery | Saved/pending/recovery status and safe profile view |
+| **ProfileService** | Session locks, schema upgrades, revisions, **persistent vault/Coins/Gems/XP/masteries/rebirth entitlements**, protected extraction and maintenance recovery | Saved/pending/recovery status, currency, level and perk state |
 | **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
 | **InventoryService** | Transfer/drop/pickup, stack accounting, world provenance | Inventory and equip deltas |
-| **VaultService** | Safe storage/withdrawal, capacity and extraction receipt application | Vault tabs, item detail, secure totals |
+| **VaultService** | **Always-persistent** stacks/items across instance wipes, capacity upgrades, withdrawals and extraction receipts including **2× Center material bonus** | Vault tabs, item detail, bonus quantities and secure totals |
 | **ForgeService** | Recipe eligibility, ingredient reservation, output issuance, commit | Preview, costs, progress, authoritative receipts |
 | **PermanentEquipmentService** | One canonical owner, death retention, manual drops, theft pickup, trade escrow and optional recovery | Current owner, transfer receipt, tentative repair/slot status |
 | **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, configurable Permanent slot limits and validation | Safe menu equipment preview and risk labels |
@@ -877,7 +877,11 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **BuildingService** | Booga Booga construction; wood/stone/iron tier, **tribe totem claim**, unclaimed decay, accessible storage and any-time ordinary-tool raids | Build previews, visible totem coverage, structure HP/decay |
 | **EventDirector** | **Weighted ticking**, announced events, random biome-appropriate flora/ores/NPCs, meteor/cache/raid structures | **Every event announced publicly**, with appropriate markers/cues |
 | **BossService** | Guardian phases and timed drop; weighted/ritual/structure bosses; average server player-level/gear-score scaling | Announcements, boss phase UI, contested drops |
-| **AnalyticsService** | Economy, public-world activities, participation, reward abuse, dupes/failures | Verified activity rewards/diagnostics |
+| **AnalyticsService** | Currency faucets/sinks, mastery milestones, rebirth token spend, paid/free entitlement parity, rarity sources, rare 2× extraction and abuse counters | Verified activity rewards and progression diagnostics |
+| **ProgressionService** | Validated XP/level, **permanent mastery milestone buffs**, small bonus stacking, achievement/cosmetic unlocks | General XP, mastery progress, bonus/perk summary |
+| **CurrencyService** | Persistent Coins and gameplay-earnable Gems, purchases, refunds and vendor entitlements | Account currency totals and earn/purchase routes |
+| **DirectTradeService** | Two-party offer escrow, **designer-flagged rare/Exclusive material allowlist**, item/currency eligibility, Permanent owner transfer | Locked two-party confirmation and committed trade receipt |
+| **RebirthPerkService** | Server-validated rebirth preview/commit, **token grants, perk purchases** and exact authorized reset terms | Rebirth overview, token balance, perk costs and caps |
 | **DepartureService** | Active-run departure/body + 600-second TTL, safe lobby/pre-spawn menu, protected extraction and maintenance exemption | Risk warnings, safe pre-spawn state, body and recovery status |
 | **WorldAdmissionService** | Protected loading/menu, profile/world readiness, safe transit reservation, successful Play/spawn risk activation | Play/loading status, retry/return, clear risk transition |
 
@@ -893,8 +897,13 @@ All persistent crafting and extraction grants happen on the **server**. Client m
 | Permanent equipment | instanceId, catalogId, **currentOwnerId**, location, affixes, recovery, activeLease, ownershipVersion | Death-protected while held, but transferable by intentional drop/pickup or validated trade; no duplicates |
 | Recipe unlocks | recipeId, unlockSource, unlockedAt | Server-derived achievements |
 | Crafting operations | operationId, recipeVersion, status, sourceId, inputs, outputId | Pending/committed/failed reconciliations |
-| Extraction receipts | receiptId, runId, portalId, items, valuation, status | Retry-safe source item accounting |
-| Player choices | pinnedRecipeIds, safe loadout settings, cosmetic choice | Untrusted display choices validated when used |
+| Extraction receipts | receiptId, runId, portalId, baseMaterialStacks, **centerMultiplier=2**, bonusStacks, baseXP, awardedXP, status | Per-player receipt, 2× center stack and XP grants **exactly once**, including rare mats; no unique gear copy |
+| Player choices | pinnedRecipeIds, safe loadout, cosmetic choice, camera preferences | Client preferences validated; camera settings do not override server PvP or teleport rules |
+| Persistent currency | coins, gems, currencyGrantLedger, purchaseEntitlements | Account-bound, earnable Gems; idempotent paid and in-game grants, no unauthorized balances |
+| Progression | level, xp, masteryTracks, appliedMilestones, permanentModifiers | Validated XP/milestone grants, bounded stacking and world-reset retention |
+| Rebirth/perks | rebirthCount, rebirthTokens, ownedPerks, committedRebirthOps | Explicit owner-approved reset policy, unique token/perk operation IDs and anti-double-grant |
+| Trade records | directTradeId, participants, lockedOffers, eligibilitySnapshot, outcome | Two-player atomic intent and idempotent cross-profile settlement with compensation/recovery |
+| Rarity catalog | Common, Uncommon, Rare, Epic, Legendary, Mythic, Secret, Exclusive; tradeEligible flag | Rarity does not implicitly authorize rare-material trade |
 | Metrics | run counts, secure extracts, deaths, event participation | Bounded and versionable counters |
 
 Large histories may need compaction and retention limits to fit Roblox data budgets. Use separate identifiers for **item instance**, **boss encounter reward grant**, **extraction receipt**, and **Forge operation**; never reuse one ID as every concept.
@@ -934,7 +943,12 @@ Large histories may need compaction and retention limits to fit Roblox data budg
 | Permanent item dropped or traded to another account | **Allow** valid server-authoritative single-instance ownership transfer; reject duplicate pickups, forged trade acceptance or stale owner restores |
 | Second instance manifested on another server | Server-held active lease; reconnect resolution |
 | Dead player extracts and also drops loot | Exclusive death vs extraction commit state gate |
-| Central bonus creates intended extra rare materials | **Allow exactly one 2× award per qualifying receipt** (including rare crafting reagents); reject any extra duplicate grants from retries |
+| Central bonus creates intended extra rare materials | **Allow exactly one 2× award per qualifying receipt** (including rare crafting reagents) and **2× XP**; reject further grants from retry |
+| Direct trade attempts non-eligible common raw material | Reject server-side even if both players confirm; only catalog-approved rare/Exclusive resources trade |
+| Direct trade interrupted between two players' writes | Trade escrow and compensating state must recover to one settled ownership outcome, no double item/currency grant |
+| Currency purchase and milestone double submit | Unique grant/purchase operation, authoritative persistent Coins/Gems/XP/mastery balances and once-only rewards |
+| Rebirth grants repeat tokens or resets stored gear without approval | Idempotent rebirth transaction and explicitly previewed reset policy; no accidental vault deletion |
+| User must pay Robux for promised earnable feature | Equivalent in-game Coin/Gem/resource entitlement or platform-compliant game-managed access path must exist before release |
 | Boss health crosses 25% multiple times | Encounter-scoped once-only Legendary grant |
 | Crafted item with negative/overflowed quantities | Positive bounded integer validation and inventory caps |
 | Shutdown/data budget exhausted | Pending receipts, retry/backoff and explicit non-success states |
@@ -971,9 +985,9 @@ Show (a) rune/portal and completion, (b) **base material stacks + legitimate 2×
 - On death, categorize **Dropped and lootable**, **Safe in Vault**, and **Bound armory recovery** separately.
 - On mobile, minimize precision drag requirements for recipe source selection and field base placement.
 
-### 25.5 First-session tutorial beats — Proposed
+### 25.5 First-session tutorial beats — Confirmed direction / Proposed sequence
 
-Teach gathering/crafting; light PvE combat; a visible stash risk warning; successful minor rune extraction; secure vault contents; a preview of a special recipe; a clear example of how a rare ingredient later converts a specific piece of gear into Permanent. Never grant free Permanent gear merely as a tutorial completion shortcut.
+**Confirmed:** Tutorial and guided quests are required as the first-player introduction, along with user-adjustable camera. Proposed learning order: random-map spawning and safe pre-spawn Play → health/food/sprint stamina → gathering and craftable arrows → instant medicine/food HoT → tribe revives/raid risk → weighted public event cues → shared 120-second extraction (center grants **2× all materials/XP**) → always-saved vault → Coins/Gems, rarity, special recipes, mastery and later rebirth tokens. Never hand out free Permanent gear merely for opening tutorial. Exact rewards/skippability/Open PvP-safe training design remain Open.
 
 ## 26. Quantitative tuning and live analytics plan
 
@@ -1040,6 +1054,13 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 28. Corpse-versus-extract and corpse-versus-maintenance races never grant double inventory or lose protected items.
 29. Rare plants/materials, elite mobs/bosses, raid structures and meteors have finite rewards and tier-appropriate announcements.
 30. Activity rewards are validated across PvP, farming and building and resist AFK/idle/server-hopping exploits.
+31. After public world becomes empty, **all securely vaulted ordinary/rare items and earned Coin/Gem/XP/mastery/perk records remain unchanged**.
+32. A central receipt of N rare materials grants **2N material stacks** and **2× eligible XP once**; normal or portable exit does not silently inherit the center bonus.
+33. Coin and Gem amounts cannot be forged; earned Gems, cosmetics and entitlements survive world reset.
+34. Direct trades reject ineligible common materials, exchange allowed designated rare/Exclusive materials and Permanent gear once, and survive disconnect/timeouts safely.
+35. Mastery milestone bonuses and cosmetics are permanent, bounded, once-only and not earnable indefinitely through idling, alt fights or craft-cancel spam.
+36. Rebirth token grants/purchases require validated eligibility/confirmed reset semantics and idempotent commit; no unapproved vault wipe.
+37. First-time guided tutorial and adjustable camera work for keyboard/touch/controller and unpredictable random world spawn; paid offers have gameplay-earned equivalents.
 
 ### 27.2 Manual playtests — Requires Manual Validation
 
