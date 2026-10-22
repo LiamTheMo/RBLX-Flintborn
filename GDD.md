@@ -1643,7 +1643,112 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 - Tutorial structure, safe training environment versus live-world risk, and adjustable camera bounds.
 
 
-## 37. Design change log
+## 37. Owner-approved Q61–89: launch combat numbers, five masteries and rebirth
+
+> **Status (2026-10-22):** This chapter is the normative owner-decision record for questions **61–89**. Values identified as tentative remain playtest starting points; exact unspecified durations and costs remain **Open**, not made-up defaults.
+
+### 37.1 Core survival and fight balance (61–70)
+
+| # | Topic | Owner-approved baseline | Open detail |
+| --- | --- | --- | --- |
+| **61** | Health | **100 base max HP**; equipment and approved upgrades can raise max HP | Bonus source/stat caps and gear interactions |
+| **62** | Sprint | **3 seconds sprint on full bar; 5 seconds recovery from empty to full**; stamina used only for sprint | Regen delay, rates after partial sprint, actual sprint speed |
+| **63** | Food | Full food meter **100% → 0% in 5 minutes**; **below 25% food** gives **−10% movement speed** | Refills, exact drain exceptions, zero-food additional effects |
+| **64** | Instant medicine | **Basic +10 HP**, **advanced +25 HP**, **potion +50 HP**; immediately applied, then varying animation cooldowns | Each animation length, mobility during cooldown |
+| **65** | Food HoT | Food-dependent total healing **over 10 seconds**. On each damage event, remaining HoT cut by **50%**; if *post-cut remainder ≤10 HP*, clear it completely | Food catalog/totals, overlapping food HoTs, tick granularity |
+| **66** | Early melee | **Rock 5 raw damage per hit with high attack speed**; **wooden spear ~15** slower/longer range; **stone spear ~25** | Spear values are tentative, precise attack speed and reach Open |
+| **67** | Armor | **Effective-HP multiplier (EHP)** rather than fixed reduction; early armor levels have modest but noticeable upgrades | Armor multiplier tier table, composition, max EHP |
+| **68** | Revives | Tribe player downed at **0 normal HP** enters **20 downed HP** with armor retained; enemies can finish with enough damage; **10 seconds to revive**, pauses **60-second bleed-out** while actively reviving | HP after revive, revive interruption/crawling |
+| **69** | Center XP | **2× ALL XP legitimately earned in that expedition** on center extraction, not just end extraction XP | Stacking with XP perks and action milestone progression |
+| **70** | XP and mastery | **Always saved immediately as earned**, including when player dies; no successful extraction requirement | Save batching/technical availability (must meet durability) |
+
+#### Food interruption examples — Confirmed rule / illustrative amounts
+
+For an active food HoT with **40 HP remaining to be applied**, taking an attack leaves **20 pending HP**; a second attack halves the pending amount to **10 HP**, which reaches the **≤10 cutoff**, and so **no further food healing occurs**. This rule does not undo HP already restored; enemy attacks separately deal their normal armor-adjusted damage. Food healing is capped at the player's current maximum health (100 base, with valid gear/upgrade additions).
+
+The word *overheal* in the user's description is interpreted as **unapplied remaining food regeneration**, not a shield or permission to exceed max HP. The total healing per food item varies; **every food HoT completes in 10 seconds absent interruptions**.
+
+#### Armor mathematics — Confirmed intent with corrected units
+
+Let the current actual health be H, and let A be the valid positive effective-HP armor factor (unarmored baseline A = 1). Then **EHP = H × A**; incoming raw attack D reduces effective health to max(0, EHP − D). **Actual HP after hit = max(0, (EHP − D)/A)**. This respects the requested EHP-based damage system while ensuring displayed/used HP units stay consistent. The downed **20-HP** pool receives the same armor factor. Hypothetical A=1.2 gives 100 HP = **120 EHP**, or 20 downed HP = **24 EHP**. This multiplier is an example, not the iron armor value.
+
+#### XP on death versus center extraction — Confirmed / implementation rule
+
+**Always credit base general XP and verified mastery progress as earned**, even during an at-risk run. The **center portal awards an additional bonus equal to the total legitimate XP earned within that current run**; this produces **2× current-run XP** overall without subtracting/regranting progress and without replaying milestone rewards. A failed extraction or death only forfeits ordinary **physical items**, not XP/mastery already stored.
+
+**Confirmed later Q72:** The five mastery tracks advance on meaningful **milestone action criteria**. The center's XP doubling does **not** double the underlying number of actual mined nodes, chopped trees, crafted items, harvested crops or valid PvP encounters. If the internal economy awards *mastery XP* separately, its XP value may double but its effect on action-based milestone thresholds must be explicitly specified rather than assumed.
+
+### 37.2 Five mastery systems and milestones (71–80)
+
+| # | Topic | Confirmed response | Open |
+| --- | --- | --- | --- |
+| **71** | Mastery categories | **Mining, Woodcutting, Farming, Crafting and PvP** only | Future expansion beyond five |
+| **72** | Advancement | **Milestones / meaningful action counters**, not time played | Threshold values and reward table |
+| **73** | Level cap | **10 mastery levels per track** for now | Future expansion and exact starting level |
+| **74** | Buff cadence | **Every mastery level** grants a buff | Per-level mapping |
+| **75** | Resource benefits | **+1% yield per applicable mastery level** as starting balance | Which drop/resource classes apply and rounding |
+| **76** | PvP mastery | **Both combat and noncombat rewards** | Power caps, PvP reward types |
+| **77** | Crafting mastery | **All four:** material discounts, output/batch increases, crafting speed, recipe unlocks | Buff rates and individual levels |
+| **78** | Modifier operations | **Specific additive and multiplicative multipliers** coexist | Each modifier's type and caps |
+| **79** | Cosmetics | **Yes** to titles, cosmetics, animations and building decorations as milestone rewards | Exact milestones and content |
+| **80** | Social display | Mastery levels/titles **may be visible in lobby** | Inspection/badges/privacy options |
+
+**Numeric starting interpretation:** If a resource-specific buff is +1% per earned mastery level, achieving level 10 gives **+10%** from that mastery before permitted additive/multiplicative stacking. This is not a blanket claim that every PvP/combat perk grants 10% extra damage. Crafting mastery benefits may be different effect types and use server-authorized per-level configurations.
+
+### 37.3 Rebirth and perk details (81–89)
+
+| # | Topic | Confirmed response | Open |
+| --- | --- | --- | --- |
+| **81** | Eligibility | **Both general player-level requirement AND endgame challenge** | Level number and challenge details |
+| **82** | Rebirth reset | **General level resets to 1**; already protected progression remains preserved | Coins/Gems and stored total XP treatment beyond the level reset |
+| **83** | Rebirth payment | **Yes**, requires increasingly costly resources/currency/materials or ritual requirements | Exactly which and how much per rebirth |
+| **84** | Token amount | Later rebirths **could grant additional tokens** | Whether token amount increases and its rate |
+| **85** | Rebirth difficulty | **Progressively more expensive and harder** | Curve and maximum count |
+| **86** | Perk examples | **XP, rare-drop luck, drop quantity, improved water walking speed**, plus possible others | Each rank/bonus/cost |
+| **87** | Perk state | **Permanently active** once owned; no loadout slots required | Respec consequences |
+| **88** | Multi-rank perks | **Some perks can have upgrades/ranks**; others one-time | Rank limits/prices |
+| **89** | Respec payments | Can buy respec with **earned Gems, Robux, or redemption codes** | Cost, cooldown, refund mapping, code eligibility |
+
+**Rebirth-preservation boundary:** Secure vault contents (including ordinary vaulted resources), legitimately owned Permanent gear, unlocked mastery milestone buffs and cosmetics remain **safe as intended**. The only explicitly confirmed rebirth reset is **general level → 1**. Rebirth should not silently destroy Coins/Gems, token purchases or account entitlements without later approval.
+
+**No skill trees:** A rebirth token **perk catalog/shop** is confirmed, but it is not a branching prerequisite talent tree. Perks are permanently active, not slotted. Some have several upgrade ranks. Each effect must be classified **additive or multiplicative** so it stacks deterministically with mastery buffs and the center 2× material and XP bonuses.
+
+**Respec parity:** Respec via Robux is permissible because an equivalent respec is obtainable using **gameplay-earned Gems** (and occasionally valid codes). Roblox purchase receipts and promo-code consumption must be idempotent. No respec may conjure extra perk tokens.
+
+### 37.4 Verification and anti-exploit cases
+
+1. Full HP defaults to **100**, but valid account/gear upgrades raise maximum HP; medicine cannot exceed the current modified max HP.
+2. Full sprint runs **3 seconds**, stamina from empty fully returns in **5 seconds**; combat/crouching/gathering spend no stamina.
+3. At food exactly 25%, the **below-25%** speed penalty has not yet triggered; 24.99% triggers **10% movement slow**; full meter empties in **300 seconds**.
+4. Basic medicine immediately heals **10**, advanced **25**, potion **50**, followed by tier-specific animation/reuse lock. Spammed remotes do not repeat healing.
+5. Food HoT completes after **10 seconds** absent hits, with food-dependent total. A hit halves remaining heal, and if post-hit remainder ≤10 HP, cancel rest, without retroactive health loss.
+6. Rock deals **5 raw damage**, tentative wooden spear **~15** and stone spear **~25**; armor multiplies EHP rather than flat damage reduction. Actual HP/EHP conversion remains consistent for attack, heal and downed finishes.
+7. Tribe character enters downed with **20 HP** at zero ordinary health. The 60-second bleed-out pauses during a valid **10-second** revive; enemies can finish through armor while revival is ongoing.
+8. Revival cancellation resumes the old timer and does not reset 60 seconds. Solo players still die immediately with a 10-minute corpse and lobby ejection.
+9. Legitimately earned general XP and mastery milestones persist **even after death**, while an unextracted material stack does not. No XP progress rolled back with lost loot.
+10. Center extraction pays **exactly one additional set of current-run XP grants** and double materials; it does not retroactively double prior runs or invent extra milestone action counters.
+11. UI and persisted schema contain **only five active mastery tracks**, each capped at **level 10**, with one-time buff at **every mastery level** and cosmetic milestones; lobby can show progress/titles.
+12. Resource mastery +1% increments stack with catalog-classified **additive/multiplicative modifiers** in a deterministic order. Combat and noncombat PvP mastery bonuses are bounded and tested.
+13. Crafting mastery supports ingredient savings, output batch, crafting speed and unlock milestones without allowing zero-cost infinite crafts.
+14. Rebirth requires both level and completed challenge, increases future costs, sets **general level 1** but retains vault, Permanent equipment and permanent mastery/owned perks.
+15. Rebirth perk purchases are permanently active; some perks have ranks, and their XP/luck/drop-volume/water movement effects cannot be client-forged.
+16. Each Gem, Robux-receipted or redemption-code respec is a once-only entitlement. Player cannot duplicate tokens or avoid valid charges by disconnecting.
+17. All new XP/mastery progress and stored items survive empty-world reset and unauthorized player teleport failures.
+
+### 37.5 Remaining numerical decisions
+
+- Each basic/advanced/potion **animation duration**, and whether use animation alters movement.
+- Post-revive ordinary HP; reviver range, interruptions and multiple concurrent revivers.
+- Precise wooden/stone spear attack speeds and ranges, arrow damage, enemy damage and armor tier **EHP multipliers**.
+- Whether food replenishes hunger meter immediately and by what percentages; additional effects at **0% food**.
+- Food HoT stacking, server tick resolution, exact application of repeated hits and whether remaining heal duration changes.
+- Exact five mastery milestone targets for levels 1–10; category-specific yield buffs, combat perk cap and crafting milestone allocation.
+- Rebirth general level and challenge threshold, increasing resource/currency costs, token awards and multirank perk catalog.
+- Gem/Robux respec price, how codes are granted and what constitutes a valid refund/respec.
+- Detailed buff additive/multiplicative ordering and caps, including XP stacking/center extraction.
+
+
+## 38. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1655,6 +1760,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **0.6** | 2026-10-21 | Recorded answers 1–24: 30-player world target, empty-server reset, same-world rejoin/death kick, crash/update recovery, transferable same-stat Permanent items, vault upgrades and levels, server-shared 120-second end-only extraction, rare portable 30-second anywhere rune, and lobby return. Clarified unresolved reset-vault and payout semantics. |
 | **0.7** | 2026-10-22 | Confirmed questions 25–48: health/stamina/food only; click melee and craft-arrow slow bows; sprint/crouch, no player magic or equipment wear; instant medical healing with post-use animation cooldown, food HoT partially interrupted by damage; 60-second pauseable tribe revives, solo immediate death and lobby ejection; random map spawns, PvP with designated safe-POI exceptions; 8-member tribes, totem-based structure decay, public storage, any-time normal-tool raids, wood/stone/iron, persistent-in-live-world farming/takeovers; weighted publicly announced events, biome-random rare nodes, three boss sources and level/gear-based scaling. Added §35 and revised affected launch/QA/technical sections. |
 | **0.8** | 2026-10-22 | Resolved Q3 (all vault items permanently saved) and Q23 (center extraction **2× all material stacks including rare resources and 2× XP**). Confirmed Q49–60: persistent Coins/Gems, direct trading with rare/Exclusive material exceptions, eight rarity classifications, XP/levels/crafting mastery, small permanent playstyle mastery buffs/cosmetics, rarest Permanent gear requiring advanced contested resources, enhanced primitive Booga Booga art, adjustable camera, tutorial/guided quests, gameplay-earnable parity for all monetized features, and rebirth tokens spent on perks. Added §36 on technical/economic design and QA. |
+| **0.9** | 2026-10-22 | Incorporated Q61–70: 100 base HP with gear/upgrade max, 3s sprint/5s recovery, five-minute food depletion and −10% speed below 25%, immediate medicine heals 10/25/50, 10s food HoT halved by hits with ≤10 HP cutoff, rock 5/wood spear ~15/stone spear ~25 raw damage targets, EHP multiplier armor, 20-HP downed tribe members, 10s revives and armor-based finishing, immediate persistence of XP/mastery on death and center 2× all current-run XP. Incorporated Q71–89: five milestone-based level-10 permanent masteries, per-level buffs (+1% resource yield baseline), combat/noncombat PvP and all four crafting benefit types, additive/multiplicative perk stacking and lobby visibility, increasing-cost level+challenge rebirth with general level reset to 1, permanently active one-time/multirank token perks and Gem/Robux/code respec. Added §37 and verification matrix. |
 
 ---
 
