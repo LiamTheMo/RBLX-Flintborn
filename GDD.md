@@ -1495,7 +1495,105 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 **Owner questions 49–60 were answered on 2026-10-22**; see §36 for confirmed account economy, rarity, permanent mastery/XP, appearance, onboarding and accessible monetization. Precise numeric tuning and platform-native purchasing mechanics remain Open.
 
 
-## 36. Design change log
+## 36. Owner-approved economy, appearance and monetization decisions (Q3, Q23, Q49–60)
+
+> **Confirmed by owner (2026-10-22):** This completes all numbered concept questions 1–60 at the feature-direction level. Numerical tuning, technical enforcement, platform purchases and specific reward catalogs remain **Open**.
+
+### 36.1 Complete decision registry
+
+| # | Subject | Confirmed choice | Still Open |
+| --- | --- | --- | --- |
+| **3** | World resets | **ALL previously vaulted materials and equipment are ALWAYS saved**, ordinary or Permanent. Only the live island resets on empty. | Vault capacity/overflow mechanics |
+| **23** | Center extraction | **2× all material stacks including rare ingredients, and 2× XP** | Whether all session XP qualifies, and whether Coins/Gems or unique gear multiply |
+| **49** | Currency | **Persistent Coins and Gems**; Gems feel more premium but are **earned through gameplay too** | Drop rates, sinks, vendor prices |
+| **50** | Trade mode | **Direct player-to-player trading only**, not marketplace or auction | Venue, item/currency eligibility and safe transfer |
+| **51** | Rarity | **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive** | Drop odds, visuals, Exclusive availability |
+| **52** | Player advancement | **XP, levels and crafting mastery; NO skill trees** | XP thresholds, mastery awards, level gates |
+| **53** | Playstyle growth | **Permanent masteries** for many activities; milestones award **small buffs**, including some resource bonuses, and **cosmetics** | Exact bonuses, cap, milestones, categories |
+| **54** | Mastery duration | Mastery buffs are **permanent account progression** | Interaction with voluntary rebirth resets |
+| **55** | Farmer/builder progression | **Cannot earn the very rarest Permanent gear solely by farming/building** | Which high-tier encounter ingredients/requirements apply |
+| **56** | Material sourcing and trades | Materials **mainly mined/gathered**, with **quests and world events**; no general raw-material trading, **except specific designer-eligible rare or Exclusive materials** | Eligible item allowlist, source/quest rewards |
+| **57** | Art | **Primitive, blocky Booga Booga look** with more detail in **map, structures and equipment** | Exact style bible, palette, asset budget |
+| **58** | Camera | **Adjustable camera** | Zoom limits, first-person toggle and PvP fairness |
+| **59** | Onboarding | **Tutorial and guided quests** for stronger first-player impression | Skippable vs forced, quest rewards, safety |
+| **60** | Monetization/rebirth | Cosmetics, passes, premium conveniences, private-server-style options and more; **every monetized benefit must also be obtainable with sufficient playtime and earned currency/resources**. **Rebirth grants tokens spent on perks.** | Store catalog, tokens and reset semantics, platform compliance, perk balance |
+
+### 36.2 Coins, Gems, offers and purchasing parity
+
+- **Coins:** Core persistent currency. Candidate purchases include vault upgrades, cosmetic skins, common services and optional convenience. Actual catalog/prices and rates require approval.
+- **Gems:** Higher-premium persistent currency, but **always earnable in-game** rather than solely sold for Robux. Earning rate can be slower, but the route must be achievable given sufficient playtime.
+- **Purchasing-parity rule — Confirmed:** Every monetized benefit must have an **earnable currency/resource route to the same or equivalent functional benefit**, so a paying player can gain convenience faster without making essential content permanently unobtainable for a non-paying player.
+- **Candidate offer families:** Cosmetics, cosmetic packs, non-exclusive conveniences, entitlement-style passes, premium memberships/features, private-session/server access and additional owner-approved categories. These are **possible offerings**, not a finalized SKU list.
+- **Technical gate:** Roblox-native game passes, subscriptions and paid private servers may have platform-specific purchase/ownership restrictions. Do **not** assume Coins/Gems can literally buy a platform-native Robux entitlement. Confirm the platform rules, and if necessary implement **game-managed equivalent access** bought with earned currency to meet the gameplay requirement. No claim of implementation has been made.
+- **Fairness question:** The owner allowed additional monetization beyond cosmetics. How combat-oriented perks or progression accelerators coexist with full PvP and rare contested gear must be decided; the free equivalent and bounded power are important balancing goals, not evidence that a specific paid item is approved.
+
+### 36.3 Rebirth tokens and perk shop — Confirmed concept, Open numerical rules
+
+**Confirmed:** Rebirths exist as long-term progression and provide **tokens**, which can be **spent on perks**. They are separate from a skill tree (no skill trees). Precise perk choices, reset behavior and currency costs remain Open.
+
+**Proposed transaction and UI contract:**
+1. At a defined rebirth eligibility milestone, show an explicit preview of **what resets and what remains**, especially vault contents, levels, mastery buffs, currencies, gear and cosmetics.
+2. Request confirmation; validate all conditions and save one server-authoritative rebirth operation ID.
+3. Deduct/reset only specifically approved state and grant the configured number of **rebirth tokens exactly once**. Never reset the always-secure vault silently.
+4. The perk shop displays each token price, magnitude, perk cap, stacking logic and purchase confirmation. Token spending and ownership are persistent and server-validated.
+5. Perks may support long-term specialty optimization. **No automatic skill tree**; a selectable perk catalog or perk loadout is an appropriate direction.
+6. If any token/perk acceleration is monetized, the **same gameplay perk must remain obtainable by play-earned tokens/currency/resources** under the parity requirement.
+
+**High-priority Open questions:** How many levels or accomplishments are needed to rebirth, whether leveling restarts, what happens to earned masteries/Coins/Gems/gear after voluntary rebirth, tokens per rebirth, whether rebirths can repeat, token/perk caps, respec and token trading, whether perks affect resource yield/PvP and how mastery/perk bonuses stack with central 2× extraction.
+
+### 36.4 Permanent mastery and rarity economy
+
+- **General XP/level** is persistent, earns unlocks and helps gate rare crafting recipes.
+- **Crafting mastery** is a distinct specialization track, not a skill tree. Other tracks include farming, mining, hunting, raiding/PvP, building, harvesting, exploration and tribe support. Actual categories are flexible.
+- **Milestone perks are small and permanent**, potentially affecting resource yield, efficiency or other bounded specializations. Cosmetic milestone rewards also persist. Exact effects are still Open and require balancing across different experience levels.
+- **Stacking needs explicit tests:** Mastery yield buffs, rebirth perks and central 2× material/XP payout could compound. Center's bonus **does double even rare extracted materials**, and no older proposal may negate this rule.
+- **Rarest Permanent gear gate:** Farmers/builders alone cannot get the very top conversion rewards; top-end recipes depend on specific high-risk boss, rare ritual, contested PvP event or similarly approved scarce-source materials. Ordinary activity should still feel worthwhile.
+- **Trading loophole Open:** A player may trade existing Permanent gear under the previous confirmed rules. Should a farm-only player be able to acquire the very rarest item **through trade**, despite not personally completing high-risk requirements? Clarify before imposing unapproved equip/ownership restrictions.
+- **Rarity vs Permanence:** Common through Exclusive is rarity. Permanent is a separate conversion/ownership designation; Secret/Exclusive does not automatically mean Permanent, nontradeable or Robux-only.
+
+### 36.5 Primitive art, adjustable camera and guided tutorials
+
+**Art direction — Confirmed:** Retain the readable **blocky, primitive Booga Booga character and building language** while improving **environmental/map detail, structures, equipment and biomes**. Avoid visual clutter masking PvP projectiles, gathering nodes, totem influence, rare loot or extraction signals. Final palette/shape language, texture density, low-poly budget and reference art are Open.
+
+**Camera — Confirmed:** The camera is **adjustable** by the user. Proposed options include third-person zoom and possibly first-person; exact boundaries, input mappings and fairness against corner-peeking in PvP are Open. Design mobile and controller affordances early.
+
+**Tutorial and guided quests — Confirmed:** First-time users should receive a coherent tutorial and guided objectives. It must work with **random valid map spawning** and the **protected world main menu**, without quietly putting a loading avatar in danger. Suggested learning sequence:
+1. Explain Health/Food/Sprint Stamina and movement/camera, then gathering wood, stone, iron and herbs.
+2. Guide simple click melee, **slow craftable arrows**, instant medicine/post-heal cooldown and food healing-over-time.
+3. Demonstrate structure placement, wood/stone/iron upgrades, tribe totems preventing decay and **publicly openable storage**; explain raids are possible any time.
+4. Introduce tribe invites and the **60-second pauseable revive** for tribe members versus solo immediate death and lobby return.
+5. Teach publicly announced weighted events, visible dangerous rare carrying, fixed extraction points, shared **120-second timer**, end-only small-area check and protected extraction animation.
+6. Show the secure lobby vault and reassure that **all deposited gear/materials stay saved**, then preview Coins/Gems, XP/levels, eight rarity tiers, masteries and rebirth token perks.
+7. Offer guided quests with early but balanced progression; exact quests, skips, rewards, tutorial location and whether new players get PvP protection remain Open.
+
+### 36.6 Acceptance tests for GDD v0.8
+
+1. Empty world wipes **all temporary live-world state** but preserves **ordinary/rare vault items, Permanent gear, currencies, XP, mastery and entitlements**.
+2. Center extraction of 1 rare ore/reagent banks **2** and awards **2× XP**. Repeated requests/reconnections **never repeat** this bonus.
+3. One unique Legendary **equipment instance** remains one item, unless distinct future approval explicitly permits unique-gear multiplication.
+4. Coins and Gems are saved persistently; Gems have an achievable in-game earn path.
+5. In direct trade, ordinary raw material without the specific rare/Exclusive trade-eligible flag is blocked. A catalog-authorized special material and Permanent gear can transfer exactly once.
+6. Each of the **eight ordered rarity classifications** appears correctly in inventory/UI/catalog where appropriate.
+7. General XP and crafting/activity mastery advance separately. Reaching a legitimate milestone grants a **modest persistent buff/cosmetic exactly once**, remaining after death and world reset.
+8. Farm/build mastery alone cannot manufacture the **rarest** Permanent conversion source requirements.
+9. A rebirth displays an explicit state-reset preview and grants **one** verified token award; perk purchases consume tokens once, and no unapproved vault deletion is allowed.
+10. Every monetized benefit has a discoverable **in-game currency/resource equivalent**. Roblox-native entitlement mappings and storefront requirements are reviewed before implementation.
+11. Primitive low-poly artwork remains readable; camera is adjustable; first-use guided quests work across a randomized spawn, touch/controller and risky PvP world.
+12. Admin safe-kicks, protected world admission, tribe revival, rare runes and ordinary extraction remain unaffected by the new account economy.
+
+### 36.7 Remaining precise choices
+
+- Center 2× XP scope (end-of-run award versus all earned XP), and whether Coins/Gems multiply.
+- Vault overflow handling when bonus stacks legitimately double and capacity is upgradeable.
+- Rebirth eligibility, exact voluntary reset/retention policy, token amounts and perk catalog/caps.
+- Detailed Coin/Gem sources, premium earn rates, entitlement equivalence and platform purchase feasibility.
+- Mastery level curves, perk stat caps, buff stacking and endgame item acquisition through trade.
+- Which exact rare/Exclusive raw materials may be traded, and whether currencies may be offered in direct trades.
+- Secret and Exclusive acquisition rules, drop rates, cosmetic rarity presentation.
+- Tutorial structure, safe training environment versus live-world risk, and adjustable camera bounds.
+
+
+## 37. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1506,6 +1604,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **0.5** | 2026-10-21 | Established the mandatory **protected play-world loading/main menu** with explicit Play-to-spawn risk activation. Teleport, loading, pre-spawn kick, and failed admission cannot forfeit items. Added full state machine, recovery flows, detailed QA and cross-references in §29–33. |
 | **0.6** | 2026-10-21 | Recorded answers 1–24: 30-player world target, empty-server reset, same-world rejoin/death kick, crash/update recovery, transferable same-stat Permanent items, vault upgrades and levels, server-shared 120-second end-only extraction, rare portable 30-second anywhere rune, and lobby return. Clarified unresolved reset-vault and payout semantics. |
 | **0.7** | 2026-10-22 | Confirmed questions 25–48: health/stamina/food only; click melee and craft-arrow slow bows; sprint/crouch, no player magic or equipment wear; instant medical healing with post-use animation cooldown, food HoT partially interrupted by damage; 60-second pauseable tribe revives, solo immediate death and lobby ejection; random map spawns, PvP with designated safe-POI exceptions; 8-member tribes, totem-based structure decay, public storage, any-time normal-tool raids, wood/stone/iron, persistent-in-live-world farming/takeovers; weighted publicly announced events, biome-random rare nodes, three boss sources and level/gear-based scaling. Added §35 and revised affected launch/QA/technical sections. |
+| **0.8** | 2026-10-22 | Resolved Q3 (all vault items permanently saved) and Q23 (center extraction **2× all material stacks including rare resources and 2× XP**). Confirmed Q49–60: persistent Coins/Gems, direct trading with rare/Exclusive material exceptions, eight rarity classifications, XP/levels/crafting mastery, small permanent playstyle mastery buffs/cosmetics, rarest Permanent gear requiring advanced contested resources, enhanced primitive Booga Booga art, adjustable camera, tutorial/guided quests, gameplay-earnable parity for all monetized features, and rebirth tokens spent on perks. Added §36 on technical/economic design and QA. |
 
 ---
 
