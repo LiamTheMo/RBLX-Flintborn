@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.8  
+> **Design revision:** 0.9  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -55,7 +55,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 1.2 Design guardrails — Proposed
 
-- Survival meters at launch are **health, stamina and food only**; do **not** add thirst, temperature or weather-exposure survival meters by default. Exact food depletion/penalty rates remain Open.
+- Survival meters at launch are **health, stamina and food only**. **Base maximum HP: 100** (can increase through approved upgrades/gear). **Full sprint duration: 3 seconds**, then **5 seconds for full stamina recovery**. **Full food meter depletes to empty in 5 minutes** (baseline), and food **below 25% slows movement by 10%**. No thirst, temperature or weather-exposure survival meters.
 - Avoid a “rich get richer” lockout where fresh spawns cannot make progress.
 - Prioritize readable telegraphs and counterplay over surprise one-hit kills.
 - **Confirmed monetization rule:** All paid benefits must have an **earnable in-game currency/resource path** given enough playtime, even if monetization goes beyond cosmetics/convenience. Avoid unbounded pay-to-win advantage, and preserve contested rare-item gameplay; exact perk caps and native Roblox purchase feasibility are Open.
@@ -160,17 +160,17 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Ranged weapons | At least bows; other ranged families (slings, javelins, crossbows) are possible future content, not all confirmed for launch |
 | Ammunition | **Arrows must be crafted** and occupy a finite resource/inventory supply; projectile speed is deliberately slow and visible |
 | Armor | Nonmagical protective clothing/leather/iron; **lasts indefinitely** rather than breaking or needing durability repairs |
-| Medical items | Bandages, medical supplies and potions **restore health immediately on validated use**, then an animation imposes the usage cooldown |
-| Food | Food meter exists; eating provides **healing over time**, partially interrupted by damage; exact food-drain rates, food list and effect sizes Open |
+| Medical items | Basic **+10 HP**, advanced **+25 HP**, potion **+50 HP** immediately (capped at current max), followed by varying animation durations as the reuse cooldown |
+| Food | Food meter drains from full to zero in **5 minutes**; below **25%** slows movement **10%**. Eating produces food-dependent healing over **10 seconds**, halved on hits, with small remainder cutoff |
 | Utility | Torches, storage supplies, farm tools, primitive traps and other nonmagical gear |
 | Building | Placeable shelters/doors/storage/totems/farms and functional stations; initial wood, stone and iron tiers |
 | Future (not launch) | Elemental spells, enchanted combat weapons, special defensive resistances and any charge/mana subsystem |
 
 ### 4.3 Survival attributes — Confirmed and Open
 
-- **Health:** Damage removes HP; medical items restore HP **immediately** (subject to max-health cap). Death/downed behavior depends on tribe membership (§5).
-- **Stamina:** **Only limits how long the player can sprint.** Melee attacks, crouching, gathering, bow shots, raiding and standard movement **do not consume stamina**. Stamina regen duration, sprint speed and UI thresholds are Open.
-- **Food:** An active food system is included; **food consumption grants health regeneration over time**. Incoming damage **partially interrupts** that healing, but does not necessarily erase the whole effect. Exact interruption fraction, food meter depletion rate and starvation effects are Open.
+- **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
+- **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. Whether recovery pauses on renewed sprint or begins after sprint ends, sprint speed and stamina UI granularity remain Open.
+- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. Drain modifiers, refill quantities and zero-food additional penalties are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
 ### 4.4 Recipes and Permanent equipment
@@ -185,13 +185,14 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 | Item type | Server-side trigger | When HP changes | After-use behavior |
 | --- | --- | --- | --- |
-| Bandage / medical kit | Valid inventory item selected and consumed | **Immediately** at use activation | Play medical animation; block re-use during its duration |
-| Potion | Valid single-use item selected and consumed | **Immediately** at use activation | Potion-drink animation acts as cooldown *after the heal* |
-| Food | Valid edible consumed | **Over time** after eating | Food HoT ticks over a configured duration; damage partially interrupts active healing |
+| Basic medicine | Valid stack and cooldown checked, then one unit consumed | **Immediately +10 HP** (up to current max HP) | Visible animation after healing; blocks another medical use until duration finishes |
+| Advanced medicine | Valid item consumed | **Immediately +25 HP** (up to current max HP) | Tier-specific animation/reuse cooldown; exact duration Open |
+| Potion | Valid item consumed | **Immediately +50 HP** (up to current max HP) | Tier-specific after-heal animation/reuse cooldown; exact duration Open |
+| Food | Valid edible consumed | **Over 10 seconds** after eating; amount depends on food | Each hit halves unapplied remaining heal; if post-hit remainder ≤10 HP, cancel remainder completely |
 
 **Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement lock/speed during the animation remains Open.
 
-**Food interruption working interpretation (Proposed):** If hit while food HoT is active, reduce the remaining scheduled healing rather than cancelling all future food healing. The precise percentage/duration behavior remains Open. Health cannot exceed its defined maximum without a separately approved rule.
+**Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. Stacking several food heals, pause/tick timing and whether the duration resets on hit are still Open.
 
 **Potential item names** (Fiber Bandage, Herbal Poultice, Restorative Tonic, Healing Potion) and ingredients are examples, not official content. Unlimited-use medical gear and Permanent-converted healing consumables are excluded.
 
