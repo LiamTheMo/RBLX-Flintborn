@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.1  
+> **Design revision:** 1.2  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -25,6 +25,8 @@
 **Confirmed economy/persistence history (2026-10-22):** **All items actually deposited into secure vault storage stay saved forever across world resets**, including ordinary and rare items. **Q129 later specifies** that extraction auto-vaults *ordinary materials only*, while gear, tools, other items and special materials stay protected in the lobby backpack until the user manually vaults them. Center extraction doubles ordinary/special material quantities plus all earned run XP, not Coins/Gems. Coins/Gems persist and never drop. Player trading is lobby-only using eligible items/Gems, no Coins; raw material trades need rare/Exclusive catalog permission. Rarity: **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**. Five level-10 permanent masteries, level-reset rebirth with token perks, enhanced primitive Booga Booga art, adjustable camera, guided tutorial/quests and earned-path monetization are Confirmed. See §§10, 36 and 39.
 
 **Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar**, **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **~1,000 secure material allowance** (unit semantics Open). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
+
+**Clarifications Q151–153 (2026-10-22):** Secure-vault material storage is **1,000 units PER material stack** (not 1,000 globally). **Unvaulted extracted gear/tools/other items/special materials persist in the protected lobby backpack across logout, rejoin and world resets**; vault deposits remain optional until the user deliberately redeploys gear into risk. **Premium +25% base XP and temporary consumable XP boosters stack**, while additive/multiplicative math and duration remain Open. See §40.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -477,12 +479,12 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 ### 10.3 Backpack, post-extraction settlement, vault — Confirmed Q122/Q126–129
 
-- **Hotbar exactly 9 slots. Backpack starts with 50 slots.** Each ordinary material type occupies **one logical backpack slot**, irrespective of its consolidated count (numerical quantity cap remains Open).
+- **Hotbar exactly 9 slots. Backpack initially 50 slots.** Each ordinary material type occupies one logical backpack slot. **Secure vault** materials have **1,000 units per material stack** (Q151); the live backpack numerical stack limit and whether extra secure stacks are used for overflow remain Open.
 - Secure **item/equipment vault starts with 25 slots**, +25 per upgrade, at a **constant Gem price per upgrade tier** (amount not chosen), or equivalent Robux upgrade. Robux cost constancy remains Open.
-- **Secure material vault allowance ~1,000 (near-unlimited relative to backpack)**, separate from 25 equipment slots; unclear whether **1,000 total units**, **units per material**, or **material storage entries**. Keep implementation configurable and mark the precise interpretation Open.
+- **Confirmed Q151:** Secure-vault material limit is **1,000 units per material stack**, not 1,000 units across all stored resources. Units in other material stacks are separate. Any legitimately extracted quantity beyond a stack's capacity must be tracked without item loss. Whether it may create additional stacks or remain in protected overflow escrow is **Open**.
 - **On successful extraction:** Regular **ordinary materials automatically transfer to safe material vault storage**, with center portal's valid ×2 quantity. **Weapons, tools, other items and special materials remain in a protected lobby backpack**, where the player may manually deposit desired items into the safe vault.
 - **Important:** Center 2× applies to extracted **special materials** even when those remain in lobby backpack awaiting a manual vault deposit. Distinguish material bonus computation from automatic deposit destination.
-- **Open:** Exact item categories automatically banked, handling of capped backpack/material vault or overlarge 2× award, whether unvaulted lobby backpack survives account logout and across subsequent re-entries, and how the player is prompted to store risky items before their next expedition.
+- **Confirmed Q152:** Unvaulted gear/tools/other items and special materials in the **protected lobby backpack DO persist across logout, reconnect, lobby-server changes and world resets**, despite not being manually deposited in vault. On authorized redeployment into an active world, ordinary gear/materials become at-risk again. **Open:** precise catalog routing/overflow when 50 backpack slots are full.
 - **Strong engineering requirement:** No successfully extracted item should disappear due to full vault or a failed settlement. Server-owned inventory receipts reserve item IDs/stack credits, temporary pending escrow and user-visible recovery state; no duplicated accounts/loot on retry.
 - **Account-safe vault always persists** across world wipes. A lobby backpack is only definitely **protected while in secure lobby**, not a substitute for the explicit vault forever under an unapproved policy.
 
@@ -491,7 +493,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 - Meaningful premium-equivalent purchase can take roughly **10 active gameplay hours** of currency/material earning; scale shorter for small beginner cosmetics and longer for major prestige offers. Test actual player retention, don't force a single price.
 - Robux offers **only quality-of-life or faster progression**, never sell direct PvP attack/armor/health benefits. Every paid feature has a gameplay-earned route.
 - **Premium subscriber base +25% XP** is persistent while status is valid; **non-Premium players have no innate subscription XP baseline**.
-- **Consumable temporary XP boosters are available to ALL players**, Premium and non-Premium, via the earned-gameplay economy. Whether Premium boosts **stack** with consumables and how additive/multiplicative ordering applies is **Open**; Q150 does not explicitly settle stacking.
+- **Confirmed Q153:** Temporary consumable XP boosters remain earnable by **all players** and **DO STACK** with eligible Premium subscribers' +25% baseline XP. Non-Premium users have no free subscription baseline. **Open:** additive vs multiplicative formula, XP categories affected, duration/cost, booster cap and whether multiple boosters stack with each other.
 - Exact booster strength/duration/cost, affected XP category and entitlement distinction (Premium vs other paid membership systems) still Open. Check current Roblox entitlements and paid-random-item policies before implementing Robux-supported RNG.
 
 
@@ -902,7 +904,7 @@ For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\ma
 - **All units of the same resource type appear as one logical consolidated stack** in the backpack UI (e.g., one Stone entry with a single quantity) for simplicity, rather than dozens of duplicated Stone icons. Exact underlying maximum quantity, whether hidden sub-stacks are required for implementation, carry limits, and over-capacity behavior are Open.
 - Weapons, tools, armor and other **unique gear instances remain individually distinguishable** because their rarity/catalog types and minor quality rolls may differ. Consolidated raw material stack behavior must **not** merge differently rolled swords or duplicate Permanent instances.
 - **Three equipped armor slots:** Head, Chest and combined Legs/Boots. **No shields**.
-- **Vault has 25 initial equipment/item slots**, +25 per tier for an **unchanging Gem cost** (price Open), or equivalent Robux purchase. **Material storage capacity intended ~1,000** with specific total/per-type units Open; it is a different capacity from equipment slots and live backpack.
+- **Vault has 25 initial equipment/item slots**, +25 per tier at constant Gem price (price Open), optionally Robux. Its **separate material storage supports 1,000 units per material stack**, not globally. Surplus from center's 2× bonus must remain owner-protected in overflow until legally stored.
 - **Coin and Gem balances are account UI balances, not world inventory slots**; they do not drop at death and Coins are not player-tradeable.
 
 ### 22.2 Shared extraction event and protected animation — Confirmed / Proposed engineering
@@ -941,8 +943,8 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | --- | --- | --- |
 | **ProfileService** | Session locks, schema upgrades, revisions, **persistent vault/Coins/Gems/XP/masteries/rebirth entitlements**, protected extraction and maintenance recovery | Saved/pending/recovery status, currency, level and perk state |
 | **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
-| **InventoryService** | **9-slot hotbar, 50-slot backpack**, one ordinary resource-type entry per slot, separately tracked special materials/gear, protected post-extraction lobby inventory and at-risk world ownership | Hotbar, protected lobby backpack/manual vault controls, three armor slots |
-| **VaultService** | **25+25 item-slot upgrades at constant Gem tier price**, separately **~1000 material allowance** (semantics Open), **automatic ordinary-material deposits** and deliberate special-item/gear deposits | Two vault capacities, manual move, overflow/pending recovery and 2× Center receipts |
+| **InventoryService** | 9-slot hotbar/50-slot backpack, one ordinary material type per logical entry, **persist extracted unvaulted lobby backpack items across logout/server changes** | Risk on redeployment, safe staging and manually triggered vault deposit |
+| **VaultService** | 25+25 item-slot upgrades with constant Gem tier price, **1,000 units per secure material stack**, auto-bank ordinary materials, manual equipment/special material deposits | Always-persistent holdings and overflow reconciliation |
 | **ForgeService** | Craft ±5% stat quality range on eligible field gear, fixed baseline lobby gear, **5% relative best-roll probability increase per Crafting mastery level**, ten arrows/craft and catalog-eligible first Permanent pickaxe | Server-authorized quality chances and item stats, no false rarity roll |
 | **PermanentEquipmentService** | One canonical owner, death retention, manual drops, theft pickup, trade escrow and optional recovery | Current owner, transfer receipt, tentative repair/slot status |
 | **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, configurable Permanent slot limits and validation | Safe menu equipment preview and risk labels |
@@ -952,7 +954,7 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **EventDirector** | **~5-minute independent category trigger rolls**, baseline 25% per category, descending Secret (~0.1% illustrative) to Common event fallback, no fixed concurrency cap with footprint/performance validation | All successfully spawned categories publicly announced, proper biome placement |
 | **BossService** | **Fixed boss baseline plus combined account-level and equipped gear-score scaling**; snapshot timing formula Open; Guardian retains independent schedule | Boss difficulty UI and contested physical loot |
 | **AnalyticsService** | Currency faucets/sinks, mastery milestones, rebirth token spend, paid/free entitlement parity, rarity sources, rare 2× extraction and abuse counters | Verified activity rewards and progression diagnostics |
-| **ProgressionService** | **Persist general and mastery XP immediately as earned**, per-run grant ledger, death-proof progress, milestones and idempotent center run-XP bonus | Live XP/mastery, center bonus and saved account state |
+| **ProgressionService** | Persistent general/mastery XP, center 2×, **Premium baseline +25% stacks with everyone-available temporary XP boosters** | Validated bonus entitlements and configurable stacking function |
 | **CurrencyService** | **Coins from quests and fixed-price NPC sales, NEVER directly from extraction**; Gems from quests/milestones/achievements/rebirth/rare events/Robux; no Coin multiplier; death-safe currencies | Wallet, Coin shops, merchant buy quotes, Gem/Robux upgrade choices |
 | **DirectTradeService** | **Protected-lobby-only** atomic trades, **eligible items and Gems only; reject Coins**, specific rare/Exclusive material allowlist, Permanent owner transfer | Two-party locked confirmation; allowed item/Gem-only offer |
 | **RebirthPerkService** | Server-validated rebirth preview/commit, **token grants, perk purchases** and exact authorized reset terms | Rebirth overview, token balance, perk costs and caps |
