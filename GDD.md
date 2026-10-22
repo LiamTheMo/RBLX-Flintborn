@@ -1790,7 +1790,86 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 - Detailed buff additive/multiplicative ordering and caps, including XP stacking/center extraction.
 
 
-## 38. Design change log
+## 38. Owner-approved Q90–115: economy, equipment and world balance (2026-10-22)
+
+> These numbered answers supersede earlier proposed or Open design where contradictory. Approximate values are **playtest targets**, not hardcoded guarantees; unspecified details remain Open. Systems above (§§4, 6–10, 16, 19, 22–25) provide their implementation contracts.
+
+### 38.1 Currency, merchants and trading (Q90–99)
+
+| # | Owner answer — Confirmed except where marked tentative | Open details |
+| --- | --- | --- |
+| **90** | **Coins** primarily from quests, selling materials/items to NPC merchants and extracting | Individual rewards and merchant prices |
+| **91** | **Gems** from quests, milestones, achievements, rebirths, rare enemies/resources and optional Robux | Earn rates by activity |
+| **92** | **~10,000 Coins/hour** and **~100 Gems/hour** of active play (initial targets) | Player distribution and inflation |
+| **93** | **Coin → Gem conversion undecided**; do not create a rate yet | Whether conversion exists |
+| **94** | **Neither currency EVER drops on death**; account-safe | Physical currency tokens if separately approved |
+| **95** | **NPC merchants buy materials, monster drops and crafted gear, including rare materials** | Quotes/locations and rare-sale confirmation |
+| **96** | **25 starting vault slots**; buy **+25 slots per upgrade**, with **Robux or earned Gems** | Prices, cap, stack semantics, overflow |
+| **97** | **~10 hours** to earn an equivalent to a *valuable* paid offer (adjust by strength) | Value per feature and starting offers |
+| **98** | **Only lobby trades**; **eligible items + Gems** may trade; **Coins NEVER** | Eligible ordinary items, fraud controls |
+| **99** | **No direct Robux-paid combat advantage**, only **progression acceleration/QoL**; **Roblox Premium +25% XP** proposed | Earnable parity XP perk, exact stacking, eligibility |
+
+**10-hour economy appraisal:** Ten active hours is a defensible **mid/high-value purchase benchmark to playtest**, not a recommended minimum for every minor cosmetic or starter vault upgrade. At target **100 earned Gems/hour**, that represents **~1,000 Gems** before spending, **not** a finalized universal price. Test newcomer access and the earned-vs-paid benefit parity requirement.
+
+**Roblox API/policy notes:** Detect eligible Premium membership using verified server-side player membership state, not a client claim. **+25% XP is a Flintborn benefit, not an automatic Roblox payout**; offer an earnable equivalent. Roblox-native Robux passes/products cannot literally be purchased with Gems; offer equivalent game-managed unlocks where appropriate. If purchased Gems or Robux-linked bonuses can affect randomized quality rolls, drops or luck, review Roblox's **paid random items** guidelines and regional eligibility/odds rules before launch. Official references: https://create.roblox.com/docs/reference/engine/enums/MembershipType ; https://create.roblox.com/docs/production/monetization ; https://create.roblox.com/docs/production/monetization/paid-random-items .
+
+### 38.2 Launch items, crafting and carry capacity (Q100–110)
+
+| # | Owner answer | Open |
+| --- | --- | --- |
+| **100** | Launch **Spears, Daggers, Swords and Bows** | Exact archetypes/speeds |
+| **101** | Armor slots **Head, Chest, combined Legs/Boots**; **NO shields** | EHP values |
+| **102** | Rarity is **fixed per item archetype** (e.g. Rare Iron Sword, Common Stone Sword), not randomly changed on identical named gear | Item rarity assignment |
+| **103** | Same-named gear may have **small individual quality/stat rolls**; high crafting mastery improves favorable field-craft rolls | Numerical ranges and odds |
+| **104** | **Small starter resource catalog** then grow with updates | Exact catalog |
+| **105** | Basic gear **craftable anywhere**; advanced workbench needed; **public-world workbenches may yield better rolls**, lobby workbenches use **default quality** | Station tiers and RNG |
+| **106** | **Few harvested materials**; **first gear set ~10 minutes or less** | Recipe counts, starter-set contents |
+| **107** | **10 arrows per crafting recipe**, upgraded material arrow types can deal more damage | Ingredient inputs and power |
+| **108** | **Fixed hotbar and fixed backpack slot counts**; **one consolidated resource stack/row per resource type** | Slot counts, quantity caps |
+| **109** | **Only specifically designated gear** becomes Permanent; some special gear qualifies, other special gear cannot | Item allowlist |
+| **110** | First Permanent conversion ≈ **a couple of successful extractions plus one rare event** | Exact materials/recipe/unlock |
+
+**Catalog and quality invariant:** Item rarity is an immutable archetype property, but each *instance* can roll minimal stat variance. World workbench crafting can improve eligible rolls as Crafting mastery rises; **safe lobby crafting has baseline/default stats**. Permanent conversion preserves the source instance's rolled stats and grants no additional power. Only approved catalog entries are convertible, independent of rarity. Do not randomize rarity on every Iron Sword.
+
+**Inventory invariant:** Same-type materials consolidate into one logical backpack entry; swords/gear with different rolls remain separate uniquely identified instances. Backpack/hotbar fixed capacity is separate from **vault's 25+25 slots**. Numeric stack maxima/overflow remain Open.
+
+### 38.3 Events, totems, decay and scaling (Q111–115)
+
+| # | Owner answer | Open |
+| --- | --- | --- |
+| **111** | Weighted non-Guardian event checks **about every 5 minutes**, **multiple events can coexist** if far enough apart | Weights, min distance, concurrency |
+| **112** | Ordinary trees/stone/ore **~2-minute regrowth**; rare event resources spawn **once** until another event | Variation, exact implementation |
+| **113** | **Totem radius depends on map size**, **totem areas may overlap** | Radius and claim conflict/priority |
+| **114** | Unclaimed structures decay in **~5 minutes with ±1-minute randomness**. Working interpretation: fully expire in **4–6 minutes** | Confirm full lifetime versus decay tick semantics |
+| **115** | Bosses start at an archetype **base level/difficulty plus scaling** | Input (player level/gear), curve and limits |
+
+**Guardian special case:** Prior **15–20-minute** center Guardian schedule and **3-minute warning** are retained; Q111 applies to weighted *other* events. Guardian's physical Legendary loot at **25% HP** remains contested.
+
+### 38.4 Acceptance and regression requirements
+
+1. Coin sources are quests, NPC selling and successful extractions. Gems derive from all listed reward sources. Both persist and **neither appears in corpses**.
+2. Target one-hour earning analytics separately for **10k Coins** and **100 Gems**, excluding AFK and fraudulent repeated sales.
+3. NPC vendors may legitimately buy rare ingredients; restricted raw resource **player trading** remains blocked except catalog allowlist.
+4. **Lobby-only** two-party trade permits Gems and eligible items but rejects Coins, forged world trades, stale owners and duplicate receipts.
+5. Vault starts at **25 slots** and each correctly confirmed Gem/Robux purchase adds **exactly 25**, with idempotent payment/entitlement settlement.
+6. Robux offers provide QoL/progression, not direct PvP damage/health/armor advantages; all paid benefits have earned-currency equivalents.
+7. A valid Roblox Premium player receives intended **+25% XP**; server verifies status, free-play equivalent exists, center 2× XP receipt cannot be replayed.
+8. Weapon family and armor slot catalog reflect launch decisions; no shield or player-magic items.
+9. Same item type keeps its rarity while unique instances may have small quality rolls. In-world mastery crafting can favor small improvements; lobby crafting baseline does not.
+10. Basic recipes craft anywhere with inexpensive inputs; first useful gear set targets **≤10 minutes**, arrow craft yields **10**.
+11. Fixed hotbar/backpack obey capacity; identical raw material types aggregate; vault capacity is a separate property.
+12. Permanent conversion checks catalog eligibility and vaulted inputs; starter conversion balances against a few extractions plus one rare event; ineligible special items fail.
+13. Weighted event checks roughly every five minutes; multi-event spatial validator prevents too-close overlapping encounters, with public announcements.
+14. Ordinary resources regrow in about **120 seconds**; rare nodes require a **new separate event**.
+15. Totem influence areas can overlap. A structure with no valid totem decays in approximately **4–6 minutes** unless decay interpretation changes; raiding remains unrestricted.
+16. Boss strength uses valid baseline plus an eventually defined scaling formula; cannot be made trivially easier by equipment swaps/alt joins.
+
+### 38.5 Remaining targeted decisions
+
+Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-source weighting; qualified item and rare-material trade allowlists; Premium vs Plus qualification and earnable XP equivalent; minute-to-Gem tuning per monetized feature; fixed hotbar/backpack sizes, stack limit and vault overflow; precise gear catalog/quality-roll range; mastery craft roll tables; ordinary/rare respawn spatial limits; overlapping totem ownership rules and whether ~5-minute decay means full disappearance or tick; boss scaling source/curve.
+
+
+## 39. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1803,6 +1882,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 | **0.7** | 2026-10-22 | Confirmed questions 25–48: health/stamina/food only; click melee and craft-arrow slow bows; sprint/crouch, no player magic or equipment wear; instant medical healing with post-use animation cooldown, food HoT partially interrupted by damage; 60-second pauseable tribe revives, solo immediate death and lobby ejection; random map spawns, PvP with designated safe-POI exceptions; 8-member tribes, totem-based structure decay, public storage, any-time normal-tool raids, wood/stone/iron, persistent-in-live-world farming/takeovers; weighted publicly announced events, biome-random rare nodes, three boss sources and level/gear-based scaling. Added §35 and revised affected launch/QA/technical sections. |
 | **0.8** | 2026-10-22 | Resolved Q3 (all vault items permanently saved) and Q23 (center extraction **2× all material stacks including rare resources and 2× XP**). Confirmed Q49–60: persistent Coins/Gems, direct trading with rare/Exclusive material exceptions, eight rarity classifications, XP/levels/crafting mastery, small permanent playstyle mastery buffs/cosmetics, rarest Permanent gear requiring advanced contested resources, enhanced primitive Booga Booga art, adjustable camera, tutorial/guided quests, gameplay-earnable parity for all monetized features, and rebirth tokens spent on perks. Added §36 on technical/economic design and QA. |
 | **0.9** | 2026-10-22 | Incorporated Q61–70: 100 base HP with gear/upgrade max, 3s sprint/5s recovery, five-minute food depletion and −10% speed below 25%, immediate medicine heals 10/25/50, 10s food HoT halved by hits with ≤10 HP cutoff, rock 5/wood spear ~15/stone spear ~25 raw damage targets, EHP multiplier armor, 20-HP downed tribe members, 10s revives and armor-based finishing, immediate persistence of XP/mastery on death and center 2× all current-run XP. Incorporated Q71–89: five milestone-based level-10 permanent masteries, per-level buffs (+1% resource yield baseline), combat/noncombat PvP and all four crafting benefit types, additive/multiplicative perk stacking and lobby visibility, increasing-cost level+challenge rebirth with general level reset to 1, permanently active one-time/multirank token perks and Gem/Robux/code respec. Added §37 and verification matrix. |
+| **1.0** | 2026-10-22 | Recorded Q90–115: Coin/Gem earning targets/sources, death-safe balances, NPC sales, lobby Gem/item trades/no Coins, +25 slot vault upgrades by Gems/Robux, ~10-hour significant-offer benchmark, Premium +25% XP and no paid combat advantage; four launch weapons, three armor slots, fixed archetype rarity, small crafted quality rolls favoring unsafe workbenches/masters, 10 arrows, fixed inventory and early Permanent pacing; ~5-minute event rolls/multiple spatially separate events, ~2-minute ordinary node regen, one-time rare resources, overlapping totems, 4–6-minute unclaimed decay and base-plus-scaling bosses. Added §38 implementation and QA with platform policy citations. |
 
 ---
 
