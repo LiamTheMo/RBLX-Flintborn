@@ -28,11 +28,11 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### Document navigation
 
-- **Gameplay foundation:** [Core loop](#2-core-run-structure), [Shattered Crater map](#3-world--the-shattered-crater), [equipment](#4-primitive-fantasy-progression), [combat](#5-combat-and-pvp), [bases and raids](#6-building-fobs-and-raiding).
-- **Contested objectives:** [Server-wide events](#7-dynamic-server-wide-events), [Mega-Boss](#8-mega-boss--the-guardian-awakening), [extraction and vault](#9-extraction-and-permanent-vault).
-- **Long-term progression:** [Special crafting / Permanent rules](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent gear policy](#17-permanent-gear-operational-rules), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [recipe examples](#19-special-recipe-examples--proposed-balancing-placeholders).
+- **Gameplay foundation:** [Core loop](#2-core-run-structure), [Shattered Crater](#3-world--the-shattered-crater), [survival/equipment](#4-primitive-progression-resource-gathering-and-food), [combat/revival](#5-combat-movement-tribes-and-revival), [bases](#6-booga-booga-style-construction-claims-farms-and-raids).
+- **Contested objectives:** [Weighted events](#7-weighted-world-event-system-and-public-announcements), [Guardian](#8-guardian-mega-boss-and-scalable-encounters), [extraction/vault](#9-extraction-and-permanent-vault), [currencies/trading/rarity](#10-persistent-currencies-resource-economy-trading-and-rarity).
+- **Long-term progression:** [Special crafting / Permanent](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent ownership](#17-permanent-gear-death-protection-and-ownership-transfer), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [nonmagical recipes](#19-nonmagical-special-crafting-and-permanent-conversion-examples), [persistent masteries](#33-permanent-playstyle-masteries-milestones-and-world-engagement).
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
-- **Critical onboarding and live-world systems:** [10-minute lootable bodies](#29-ordinary-departure-death-and-lootable-bodies), [administrator safe updates](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected in-world Play menu and teleport safety](#31-protected-play-world-main-menu-and-teleport-safety-design), [events and building](#32-expanded-public-world-content-and-booga-booga-style-construction), [public-world playstyle rewards](#33-public-world-playstyle-rewards-and-engagement-design).
+- **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-permanent-playstyle-masteries-milestones-and-world-engagement), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
 
 **Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
 
@@ -555,14 +555,14 @@ Full island art, every biome, weather, extensive equipment and premium offers, *
 | **P0** | Permanent conversion eligibility, irreversible ingredient usage, binding/slot/recovery | Avoid trivial risk bypass and item-duplication pathways |
 | **P0** | Protected pre-spawn world main menu, explicit Play readiness/spawn risk boundary, loss-free teleport errors and active-only body/drop rules | Avoid gear loss from failed loading and prevent combat-logging exploits |
 | **P0** | Authenticated maintenance safe-kick inventory recovery and two-minute contested extraction handoff into disconnect-safe animation | Preserve loot across planned updates and protect extraction without duplication |
-| **P0** | Portal activation/interrupt logic and multiplier definition | Core extraction risk and economy correctness |
+| **P0** | Center extraction **2× all materials and XP** with idempotent receipts, correct vault capacity and shared 120s timing | Core extraction risk and rare material economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
 | **P1** | Click melee, slow bow projectiles and crafted arrows, sprint-only stamina, crouch, instant medical cooldown, partial food HoT interruption | Launch PvP readability and mobile input; **no player magic, dodge-roll or gear wear in MVP** |
 | **P1** | Totem radius/decay, accessible storage, wood/stone/iron construction, all-time tool raiding and takeover permissions | Claimed buildings avoid decay without becoming raid-immune; all owners absent does not delete structure in populated instance |
 | **P1** | Weighted event tick/rarity, public announcements, biome-random spawns, ritual/event/structure boss resets and level/gear scaling | Event variety, server fairness, contestable loot, scalable performance |
 | **P1** | Biomes, distances, terrain elevation, portals and spawn points | World prototyping and movement |
 | **P1** | Special Forge levels/discoveries, rare material sources, medical/food/arrow crafting and post-death Permanent upkeep if adopted | Cross-run progression with **indefinite ordinary equipment lifespan** |
-| **P2** | Currency, optional trading and cosmetic mastery | Long-term economic depth |
+| **P1** | Persistent Coins/Gems, eight rarity tiers, direct-only item trading, permanent mastery buffs and rebirth tokens/perks | Account progression and fair earnable premium choices; balance Open |
 | **P2** | UI art direction, onboarding and optional cosmetics | Presentation and retention |
 
 ## 15. Cross-run special crafting and the Permanent item class
@@ -655,7 +655,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 
 > **Confirmed:** Certain **designated** extracted item types may be made Permanent using costly materials from **multiple** sources and recipes gated by player leveling and discoveries. Permanent conversion **does not modify combat stats** relative to the selected source gear. A Permanent item **survives its owner's death**, but if the owner **deliberately drops it** and another player collects it, it changes owner. Permanent items can also be **traded**. Neither dropping nor trading creates a duplicate.
 >
-> **Open:** Possible post-death material costs/repairs, simultaneous Permanent gear limit, trade venue/fees, exact eligible list, what happens to an unclaimed dropped Permanent item if it expires or the world resets, and whether items can be sold through a marketplace.
+> **Open:** Possible post-death material costs, simultaneous Permanent gear limit, **direct trade** venue/fees, eligible catalog and fate of unclaimed dropped Permanent gear. **Global marketplace or auction is excluded**.
 
 ### 17.1 Single persistent but transferable item instance
 
@@ -689,7 +689,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 2. **Slot cap:** The number of simultaneously equipped Permanent weapons, armor or tools remains genuinely undecided; do not hardcode one item as Confirmed.
 3. **Eligibility catalog:** Only designer-flagged items may be converted; categories/rarities are to be chosen.
 4. **Affixes:** Binding adds no stats, but whether a source's existing roll/affixes are preserved or re-rolled needs explicit agreement.
-5. **Trade paths:** Safe lobby exchange, ground-drop transfer and possible market are distinct UX/safety mechanics. Ground dropping and trading are Confirmed; trade channel/currency remain Open.
+5. **Trade paths:** Direct player-to-player exchange and intentional world dropping are confirmed. **No global marketplace/auction**; venue, fees and currency offers in direct trade remain Open.
 
 ## 18. Resource tiers, economy and acquisition sources
 
@@ -715,7 +715,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 - Favor several different event sources for advanced recipes so an elite group cannot monopolize one boss and control every equipment path.
 - Maintain a viable solo/midgame route to an early Permanent item, even if rarest Guardian conversion takes coordinated PvPvE activity.
 - Vault contents are never raid-able; run bases and carried resources are, giving extraction its reason to exist.
-- Portal multiplier should affect valuation/payout, **not duplicate unique gear, crafting inputs, Keystone, or Guardian drops** (Proposed).
+- **Confirmed revised rule:** The central portal grants **2× every material stack including rare/Keystone-type ingredients** and 2× XP. Unique equipment items/Legendary weapons remain single instances unless separately approved.
 - **Confirmed entitlement parity:** No purchased advantage, item, cosmetic, private-session feature or rebirth/perk benefit should require Robux exclusively; players must be able to obtain the equivalent through earned in-game currencies/resources given sufficient time. **Open:** Which advantages are sold, their earnable pricing and how to map Roblox-native passes/private-server subscriptions to game-controlled equivalents without violating platform requirements.
 
 ### 18.3 Material sink model — Proposed
@@ -934,7 +934,7 @@ Large histories may need compaction and retention limits to fit Roblox data budg
 | Permanent item dropped or traded to another account | **Allow** valid server-authoritative single-instance ownership transfer; reject duplicate pickups, forged trade acceptance or stale owner restores |
 | Second instance manifested on another server | Server-held active lease; reconnect resolution |
 | Dead player extracts and also drops loot | Exclusive death vs extraction commit state gate |
-| Portal multiplier mints extra rare resources | Portal bonus applies only to designated payout value |
+| Central bonus creates intended extra rare materials | **Allow exactly one 2× award per qualifying receipt** (including rare crafting reagents); reject any extra duplicate grants from retries |
 | Boss health crosses 25% multiple times | Encounter-scoped once-only Legendary grant |
 | Crafted item with negative/overflowed quantities | Positive bounded integer validation and inventory caps |
 | Shutdown/data budget exhausted | Pending receipts, retry/backoff and explicit non-success states |
@@ -1022,7 +1022,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 10. Permanent items can be **manually dropped, stolen by valid pickup, and traded**, but cannot be duplicated, forged, double-claimed from one ground drop or simultaneously equipped on multiple servers.
 11. Guardian Legendary spawns once per encounter at 25%; killing boss is not automatic extraction or conversion.
 12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
-13. Portal payout never duplicates unique materials, Keystone, Legendary source instances or crafting outputs.
+13. Center Crater payout **intentionally doubles all extracted material amounts**, including rare/Keystone-type materials and 2× XP; retries cannot multiply again. Unique equipment instances remain single.
 14. Cache requires a continuous 60-second unlock under specified interruption rules; event UI and world beacon agree.
 15. Invalid click melee reach/rate, forged **slow physical bow projectile** or crafted-arrow count, healing replay, food HoT tampering, and malicious client remote sequences are rejected. No player-cast elemental effects in launch builds.
 16. DataStore throttle, teleport failure, competing sessions, server shutdown and stale revision rejoin retain safe state integrity.
@@ -1060,7 +1060,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 1. **Confirmed:** A specific Permanent equipment instance survives death, but legitimate deliberate ground-drop pickup or trade **transfers ownership**. Engineering must prevent double restoring the former owner.
 2. Recovery payment/delay and whether bound gear can wear out permanently.
 3. **Open:** Permanent equipment slot cap and archetypes (no hardcoded final number).
-4. **Confirmed:** Permanent equipment is transferable by deliberate ground drop/pickup or valid trade. **Open:** Gifting, market mechanics, safeguards and post-drop unclaimed item fate.
+4. **Confirmed:** Permanent equipment can transfer through deliberate ground drop/pickup or **direct player-to-player trade**. No auction/global market. **Open:** Gift UI, trade safeguards and unclaimed drop fate.
 5. Ordinary vaulted item withdrawal and reconnection handling.
 6. Item-instance provenance, cross-server session locking and operation journal semantics.
 7. How event-critical unique items are represented and multiplied/valued on extraction.
@@ -1073,7 +1073,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 11. **Confirmed:** Vault has upgradeable capacity and withdrawal. Ordinary gear lasts indefinitely without durability wear. **Open:** Upgrade prices, tiers and carrying stack weights.
 12. Boss clear rewards beyond the confirmed mid-fight Legendary.
 13. **Confirmed:** Provisional 30-player instances wipe **when empty only**; fixed exit countdown 120 seconds (zone check only at expiry), portable 30 seconds; exact travel/raid/party balance Open.
-14. Cosmetic monetization, tutorial content, achievement rewards and hub architecture.
+14. **Confirmed:** Guided tutorial/quests, adjustable camera, enhanced primitive visuals and in-game currency routes to all paid benefits. **Open:** Content, platform native offer mechanics and exact fees.
 
 ## 28. Production milestones and documentation maintenance
 
