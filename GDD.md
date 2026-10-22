@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.7  
+> **Design revision:** 0.8  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -21,6 +21,8 @@
 **Confirmed combat clarification (2026-10-21, extended 2026-10-22):** No player-usable shields, firearms or playable magic for launch. Medical consumables heal **immediately**, animation then prevents immediate repeat use; food heals over time with partial interruption on damage. The Guardian's shield-pillar boss phase remains unchanged.
 
 **Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§34).
+
+**Confirmed economic decisions (2026-10-22):** The secure vault **always retains ALL extracted items and materials**, across empty-world resets. **Center Crater extraction doubles every material stack quantity, including rare ingredients, and XP**; gear item instances are not necessarily materials. Coins and Gems are persistent; Gems are premium-leaning but earnable. Direct player trading exists (not auction/marketplace); raw materials may trade only if a specific rare/Exclusive type is designer-enabled. Rarity: **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**. Persistent account levels and crafting/activity mastery milestones grant modest permanent buffs/cosmetics. Top-tier Permanent gear requires contested high-end objectives; farming/building alone cannot yield the rarest. Booga Booga-inspired enhanced primitive visuals, adjustable camera, tutorial and guided quests. Monetization includes cosmetics, convenience, memberships/private-server-like access and rebirth tokens spent on perks; **every benefit must also be earnable through sufficient gameplay currency/resources**. Platform-native product restrictions remain to be validated. See §36.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -69,7 +71,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 4. **Take a risk:** Explore the Inner Ring, contest broadcast events, raid exposed bases, or challenge the Center Crater boss.
 5. **Carry the prize:** Valuable items physically occupy the player's carried inventory; rare/event loot exposes a visual trail.
 6. **Extract:** Activate a fixed exit's shared 120-second server timer (or a rare portable rune's 30-second timer), then be alive and within its zone **when it ends** to enter the protected animation and bank loot.
-7. **Build long-term power:** Spend extracted ingredients on special recipes or save for costly Permanent conversions (confirmed mechanic; specific recipes proposed).
+7. **Build permanent progression:** Save vault materials, craft designated Permanent equipment, upgrade vault capacity, gain **persistent Coins/Gems/XP and activity masteries**, earn small permanent buffs/cosmetics and eventually rebirth perk tokens. The **central portal doubles extracted material stack quantities and XP**.
 8. **Continue or extract:** Stay in the public world to build/farm/fight, or wait nearby for an extraction timer to end while you stand inside the small exit zone. Hiding, healing and fighting are allowed before the deadline. Active-world quits forfeit ordinary items; pre-spawn menu quits are safe.
 
 ### 2.2 Loss and persistence contract
@@ -81,17 +83,20 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
 | Protected extraction | **120-second shared fixed-site countdown** with large-radius cues; living players must be **inside zone only at completion**, not throughout. Portable runes use 30 seconds; invulnerability begins at animation start. | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
-| Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
+| Successfully extracted loot | **Always saved** in secure account vault across all world resets, including ordinary materials and gear | **Confirmed** |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
 | Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; recovery cost/slot cap Open |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
 | Gear withdrawn from vault for deployment | Extracted items and materials may be withdrawn, becoming ordinary at-risk gear on successful active Play admission | **Confirmed**; loadout limits Open |
 | Player progression | Player **levels** and recipe **discovery** both exist | **Confirmed**; exact XP curve/unlock combinations Open |
-| Bases and public world resets | Server resets its complete **in-world state only after it becomes empty** | **Confirmed**; scope of ordinary extracted vault storage needs clarification |
-| Public world playstyles | Benefits for engaged PvPers, base-builders, farmers and other active playstyles | **Confirmed direction**; specific rewards Proposed |
+| Bases and public world resets | On empty server **only world state resets**; **all already vaulted equipment/materials persist** | **Confirmed — Q3 clarified** |
+| Public world playstyles | Permanent skill mastery milestones give modest resource/other buffs and cosmetics across farming, PvP, building, crafting, hunting and exploration | **Confirmed**; exact buff caps Open |
+| Account currencies | Persistent **Coins** and premium-leaning but earnable **Gems**; player XP/levels, crafting mastery and rebirth tokens | **Confirmed**; rates/prices Open |
+| Trading | **Direct player trades only**; raw materials tradable only if catalog-designated rare/Exclusive; Permanent items remain tradeable | **Confirmed**; catalog/trade policy specifics Open |
+| Rarity ladder | Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive | **Confirmed** |
 | Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
-**Confirmed and clarification pending:** Ordinary vaulted items may be withdrawn and become at risk only when active play begins. Converted Permanent equipment remains with the owner on death, but deliberate drop or trade can transfer ownership. The **secure vault has upgradeable capacity**. Empty-server resets definitely erase live-world builds and materials. Whether they also erase ordinary **previously extracted** vault items is ambiguous and therefore still Open (§34.2); original cross-session secure-vault behavior remains the provisional interpretation.
+**Confirmed Q3 resolution:** **Every item and material deposited into the protected vault remains saved across world resets, ALWAYS**, regardless of rarity or Permanent status. Public worlds discard bases, loose resource nodes and world loot when empty; they **never wipe already vaulted inventory, account Coins/Gems, earned XP/levels or permanent mastery**. Vault capacity is upgradeable. Previously at-risk gear remains subject to death and disconnect loss before extraction.
 
 ## 3. World — The Shattered Crater
 
@@ -369,8 +374,8 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 - **Rare portable rune:** An extremely rare reward/drop enables a player to **choose an extraction location anywhere** and starts a **30-second countdown**. Portable-rune consumption, participant capacity, zone radius, announcements and anti-placement exploits are Open. Do not weaken the confirmed wherever/30-second feature without design approval.
 - **Destination:** Successfully extracted players transfer to the separate secure **lobby**, not the play-world loading menu.
 - **Stakes:** Active fixed portals retain the 50-meter no-build rule. A portable rune is a separate dynamic object whose exclusion/placement details are Open.
-- **Payout:** Main Center Crater portal has greater value incentive than lesser fixed portals, but the precise meaning of that multiplier has not been chosen (§9.3).
-- **Loot:** Safely extracted materials feed crafting; extraction does not automatically mint Permanent item ownership or extra Legendary copies.
+- **Payout:** The **Center Crater portal grants 2× all material stack quantities and 2× XP** to eligible extracted players, **including rare crafting materials** (§9.3). Coins/Gems and individual equipment copies were not explicitly specified as doubled.
+- **Loot:** Safely extracted material stacks feed crafting; the center bonus **legitimately adds material quantities** including rare catalysts but does **not** auto-convert equipment to Permanent. Unique gear instances are not presumed doubled.
 
 ### 9.2 Server-shared timer and qualifying snapshot — Confirmed / Proposed engineering
 
@@ -384,9 +389,24 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 
 **Open behavior:** Whether anyone may start another countdown on the same site immediately, whether the activator's death cancels the event (working default: **no**), whether enemies can intentionally use an opponent-triggered extraction (working default: **yes**), the minimum participant distance, visual radius and portable-rune interactions. All are design choices; the freedom to leave the area and fight/heal is already Confirmed.
 
-### 9.3 Value multiplier guardrail — Proposed
+### 9.3 Confirmed Center Crater bonus: 2× all materials and XP
 
-Multipliers should apply to **valuation/payout**, not produce copies of unique loot or quest-critical crafting materials. Define a stable base value and a bonus per portal type, then tune with data. Rare items should remain rare after extraction.
+**Confirmed Q23:** Successful **Center Crater portal extraction doubles every extracted material quantity**, including ordinary wood/stone, iron ore, rare crop/herb ingredients, scarce meteor resources and rare boss crafting catalysts. It also awards **twice the normal experience points** associated with the extraction.
+
+| Payload example | Regular extraction | Center Crater extraction |
+| --- | --- | --- |
+| 10 Stone | 10 Stone | **20 Stone** |
+| 3 rare ore | 3 rare ore | **6 rare ore** |
+| 1 rare boss crafting reagent (material) | 1 reagent | **2 reagents** |
+| 100 extraction XP | 100 XP | **200 XP** |
+| 1 individually unique Legendary sword (equipment) | 1 sword | **1 sword**, unless separately approved |
+
+**Important:** This is *real item stack duplication by design*, not merely display valuation or extra coins. Rare materials can double; do not reintroduce the older rule preventing rare reagent multiplication. **Only uniquely identified equipment items**, which are distinct from stackable materials, remain at one canonical instance unless the owner approves otherwise.
+
+**Open:** Whether doubling applies to XP earned throughout the entire session or only extraction-awarded XP; whether Coins/Gems double (not confirmed); how capacity/overflow works with 2× stacks; special multi-player grouping, portable rune bonus rules, unique item treatment and rounding for any noninteger inputs.
+
+**Engineering:** At the server-authorized protected animation transition, snapshot eligible stacks once, apply a recorded **2× center modifier**, and deposit only once per receipt with idempotent bonus grants. A repeated remote, reconnect or journal retry must never award a second doubling. Balance drops, recipe costs, mastery yield bonuses and vault capacity around this intentional material inflation.
+
 
 ### 9.4 Vault/transaction guardrail — Proposed
 
