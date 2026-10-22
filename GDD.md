@@ -179,7 +179,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - Recipes are acquired through a combination of **player levels and discovery**; high-tier special recipes use multiple resource and event types.
 - Weapons/armor **last indefinitely** through ordinary use. If Permanent ownership needs a post-death material payment for balance, that is a separate **Open recovery cost**, not wear-based durability.
 - All enchantments, rune combat effects and spell recipes proposed in older sections are **future-update candidates**. Any existing named magical recipes (§19) are conceptual content backlog and **not approved launch recipes**.
-- Exact item caps, inventory weight, crafting arrows per batch, crafting station limits and food-heal values remain Open.
+- Exact item caps, inventory weight, crafted arrow batches, crafting stations, **individual food item healing totals**, food refill amounts and tier-specific medical animation durations remain Open. Food healing **duration is fixed at 10 seconds**.
 
 ### 4.5 Medical items, healing and food — Confirmed / Proposed details
 
@@ -895,12 +895,12 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | **PermanentEquipmentService** | One canonical owner, death retention, manual drops, theft pickup, trade escrow and optional recovery | Current owner, transfer receipt, tentative repair/slot status |
 | **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, configurable Permanent slot limits and validation | Safe menu equipment preview and risk labels |
 | **ExtractionService** | Server-shared 120s fixed or 30s portable timer; end-of-timer presence snapshot, alerts and protected animation | Shared countdown, deadline zone and verified individual receipt |
-| **CombatService** | Validated click melee, slow bow projectiles and arrow spend, sprint-only stamina, medical instant heals/cooldown, food HoT | Health/stamina/food HUD, heal cooldown, validated hits |
+| **CombatService** | Rock/wooden spear/stone spear raw damage targets (5/~15/~25), server EHP/armor and variable max HP, 20 downed HP and armor-adjusted finishing, 10s tribe revive, crafted arrows, 3s sprint/5s recovery, 300s food drain/low-food slow, instant medicine 10/25/50 and 10s food HoT cutoff | HP, stamina/food, downed/revive UI, post-heal cooldown and hits |
 | **BuildingService** | Booga Booga construction; wood/stone/iron tier, **tribe totem claim**, unclaimed decay, accessible storage and any-time ordinary-tool raids | Build previews, visible totem coverage, structure HP/decay |
 | **EventDirector** | **Weighted ticking**, announced events, random biome-appropriate flora/ores/NPCs, meteor/cache/raid structures | **Every event announced publicly**, with appropriate markers/cues |
 | **BossService** | Guardian phases and timed drop; weighted/ritual/structure bosses; average server player-level/gear-score scaling | Announcements, boss phase UI, contested drops |
 | **AnalyticsService** | Currency faucets/sinks, mastery milestones, rebirth token spend, paid/free entitlement parity, rarity sources, rare 2× extraction and abuse counters | Verified activity rewards and progression diagnostics |
-| **ProgressionService** | Validated XP/level, **permanent mastery milestone buffs**, small bonus stacking, achievement/cosmetic unlocks | General XP, mastery progress, bonus/perk summary |
+| **ProgressionService** | **Persist general and mastery XP immediately as earned**, per-run grant ledger, death-proof progress, milestones and idempotent center run-XP bonus | Live XP/mastery, center bonus and saved account state |
 | **CurrencyService** | Persistent Coins and gameplay-earnable Gems, purchases, refunds and vendor entitlements | Account currency totals and earn/purchase routes |
 | **DirectTradeService** | Two-party offer escrow, **designer-flagged rare/Exclusive material allowlist**, item/currency eligibility, Permanent owner transfer | Locked two-party confirmation and committed trade receipt |
 | **RebirthPerkService** | Server-validated rebirth preview/commit, **token grants, perk purchases** and exact authorized reset terms | Rebirth overview, token balance, perk costs and caps |
@@ -919,10 +919,10 @@ All persistent crafting and extraction grants happen on the **server**. Client m
 | Permanent equipment | instanceId, catalogId, **currentOwnerId**, location, affixes, recovery, activeLease, ownershipVersion | Death-protected while held, but transferable by intentional drop/pickup or validated trade; no duplicates |
 | Recipe unlocks | recipeId, unlockSource, unlockedAt | Server-derived achievements |
 | Crafting operations | operationId, recipeVersion, status, sourceId, inputs, outputId | Pending/committed/failed reconciliations |
-| Extraction receipts | receiptId, runId, portalId, baseMaterialStacks, **centerMultiplier=2**, bonusStacks, baseXP, awardedXP, status | Per-player receipt, 2× center stack and XP grants **exactly once**, including rare mats; no unique gear copy |
+| Extraction receipts | receiptId, runId, portalId, baseMaterialStacks, **centerMultiplier=2**, bonusStacks, runGeneralXPEarned, runMasteryXPEarned, **centerBonusGeneralXP**, **centerBonusMasteryXP**, settlementStatus | One center bonus equal to current-run previously earned XP per category and double materials; no unique gear duplication |
 | Player choices | pinnedRecipeIds, safe loadout, cosmetic choice, camera preferences | Client preferences validated; camera settings do not override server PvP or teleport rules |
 | Persistent currency | coins, gems, currencyGrantLedger, purchaseEntitlements | Account-bound, earnable Gems; idempotent paid and in-game grants, no unauthorized balances |
-| Progression | level, xp, masteryTracks, appliedMilestones, permanentModifiers | Validated XP/milestone grants, bounded stacking and world-reset retention |
+| Progression | level, xp, masteryTracks, appliedMilestones, permanentModifiers, **xpGrantLedger(runId,grantId,category,amount)**, **perRunEarnedBaseTotals** | XP/mastery awards persist immediately, survive death and are matched by a once-only center bonus |
 | Rebirth/perks | rebirthCount, rebirthTokens, ownedPerks, committedRebirthOps | Explicit owner-approved reset policy, unique token/perk operation IDs and anti-double-grant |
 | Trade records | directTradeId, participants, lockedOffers, eligibilitySnapshot, outcome | Two-player atomic intent and idempotent cross-profile settlement with compensation/recovery |
 | Rarity catalog | Common, Uncommon, Rare, Epic, Legendary, Mythic, Secret, Exclusive; tradeEligible flag | Rarity does not implicitly authorize rare-material trade |
@@ -1046,7 +1046,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 ### 27.1 Automated functional test targets (when code exists)
 
-1. Secure extraction deposits correct resource stacks and unique gear once; death or interruption before commit deposits nothing.
+1. Secure extraction deposits correct material/equipment stacks once; death before protected animation deposits **no loot**, but **always retains legitimately earned general XP and mastery progress**.
 2. Partial network failure with a completed extraction commit shows the correct receipt after rejoin.
 3. Same extraction receipt replayed repeatedly does not credit double stacks or gear.
 4. Converting an eligible stored source charges each ingredient once, consumes the source and creates one bound record.
@@ -1058,9 +1058,9 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 10. Permanent items can be **manually dropped, stolen by valid pickup, and traded**, but cannot be duplicated, forged, double-claimed from one ground drop or simultaneously equipped on multiple servers.
 11. Guardian Legendary spawns once per encounter at 25%; killing boss is not automatic extraction or conversion.
 12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
-13. Center Crater payout **intentionally doubles all extracted material amounts**, including rare/Keystone-type materials and 2× XP; retries cannot multiply again. Unique equipment instances remain single.
+13. Center Crater payout intentionally doubles all extracted materials and awards **bonus general and mastery XP equal to all current-run base XP already saved**; death/ordinary leave retains those base XP records but no center bonus. Retries never double again; unique equipment instances stay single.
 14. Cache requires a continuous 60-second unlock under specified interruption rules; event UI and world beacon agree.
-15. Invalid click melee reach/rate, forged **slow physical bow projectile** or crafted-arrow count, healing replay, food HoT tampering, and malicious client remote sequences are rejected. No player-cast elemental effects in launch builds.
+15. Reject impossible melee reach/rate, forged slow bow/arrow counts, **wrong armor/EHP damage**, impossible medicine healing +10/+25/+50, food HoT 10s/cutoff exploits, forged revive and downed state, bogus food/stamina updates and malicious remotes; no player magic at launch.
 16. DataStore throttle, teleport failure, competing sessions, server shutdown and stale revision rejoin retain safe state integrity.
 17. Mobile and controller players can navigate Forge and extraction without mouse-only precision.
 18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
