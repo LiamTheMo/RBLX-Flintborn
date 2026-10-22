@@ -20,6 +20,15 @@
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
+### Document navigation
+
+- **Gameplay foundation:** [Core loop](#2-core-run-structure), [Shattered Crater map](#3-world--the-shattered-crater), [equipment](#4-primitive-fantasy-progression), [combat](#5-combat-and-pvp), [bases and raids](#6-building-fobs-and-raiding).
+- **Contested objectives:** [Server-wide events](#7-dynamic-server-wide-events), [Mega-Boss](#8-mega-boss--the-guardian-awakening), [extraction and vault](#9-extraction-and-permanent-vault).
+- **Long-term progression:** [Special crafting / Permanent rules](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent gear policy](#17-permanent-gear-operational-rules), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [recipe examples](#19-special-recipe-examples--proposed-balancing-placeholders).
+- **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
+
+**Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
+
 ## 1. High concept
 
 **Pitch:** Spawn at the edge of a fractured island with almost nothing. Gather, craft, establish a raidable tribal stronghold, and venture deeper to fight rival players and ancient monsters for enchanted loot. Carry your prizes to a dangerous extraction rune to secure them in a permanent vault. Fail, and others take what you carried.
@@ -31,7 +40,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 1.1 Design pillars — Confirmed
 
 1. **Risk is voluntary but meaningful.** Safer outer routes provide a viable exit; deeper objectives pay more and attract other players.
-2. **Everything carried is at stake.** On death, the character drops carried loot; only successfully extracted items are protected.
+2. **Ordinary carried loot is at stake.** On death, the character drops ordinary gear and harvested items; only successfully extracted contents **while still in the vault** are protected. The proposed Permanent equipment class is a deliberately rare, expensive exception to ordinary carried-gear loss, whose death semantics remain unapproved (§15–17).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
 4. **The world creates PvPvE conflicts.** Announced resource crashes, caches, elite creatures, and a recurring central boss drive player movement.
 5. **Primitive fantasy, not military extraction.** No firearms at any equipment tier. Magic supplements, rather than replaces, primitive weapons.
@@ -332,7 +341,7 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 ### 12.1 Authority boundaries
 
-- **Client:** Input, animations, local UI, prediction, non-authoritative audiovisual effects.
+- **Client:** Input, animations, local UI, prediction, non-authoritative audiovisual effects. Client never decides what was securely extracted, what is bound, or whether crafting succeeded.
 - **Server:** Damage and status, material grants, inventory ownership, loot drops, structure placement/health, crafting, events, boss state, portal eligibility, extraction transactions, vault writes.
 - **Shared definitions:** Typed item catalog, tags, combat/status definitions, event/biome IDs, validated protocol shapes and tunable balance values.
 
