@@ -262,14 +262,15 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Farming:** Players can plant and grow crops/trees and harvest products. Farming continues **while owner is away** if the **public server remains populated and running**, subject to server-side growth timestamps. After world empties, farms reset with all other world content.
 - **Open:** Which seeds, tree crops and growth times are included, whether harvested crops can be replanted endlessly, farm area limits and effects of other players harvesting owner-grown plants.
 
-### 6.2 Tribe claim totems and structure decay
+### 6.2 Tribe claim totems and unclaimed decay (Q113–114)
 
-- **Confirmed:** A tribe claim totem protects nearby **player-built** structures from the normal **unclaimed decay** mechanic. All structures **without a totem close enough decay over time**, even if their owner remains in-server.
-- **Proposed:** Totem has a clearly visible influence radius; nearby valid tribe-built pieces are registered to the totem's claim set. This is **decay protection and recognized ownership, not anti-raid immunity and not private chest permissions**.
-- **Proposed:** Destroying/removing the totem exposes the now-unclaimed pieces to the normal decay clock. Exact grace period, durability and repair/healing of structures remain Open.
-- **Confirmed house takeover design:** After owners leave, structures **remain standing**, items in reachable storage remain accessible and an opposing group can **occupy and reuse** the abandoned fortification. Whether an attacker may place a new totem to claim a captured base, and ownership-transfer rules, are **Open** and need a takeover design.
-- **Confirmed:** Generated event/ruin/outpost structures are **never tribe-claimable**, even when raided. Their scripted state remains owned by the world event system.
-- **Open:** Maximum totems per tribe, overlapping claim resolution, claim radius, decay speed, anti-spam safeguards, placement of totems inside contested POIs, tribe departure/dissolution behavior.
+- **Confirmed:** Player-built bases persist in the populated public world after owners leave and can be taken over, until the entire instance becomes empty. A valid tribe claim totem within range protects **nearby player-built structures** from natural decay only; it never prevents PvP/raiding.
+- **Totem influence radius depends on eventual map scale**; no fixed numerical radius yet. **Totem claim zones are allowed to overlap**, including zones belonging to different tribes. The **priority, ownership attribution and access/conflict resolution** for overlapping areas remain Open; do not silently disallow overlap.
+- **Confirmed unclaimed decay target:** If a structure has no valid protecting tribe totem nearby, it **fully decays over approximately 5 minutes with ±1-minute random variation**, i.e. **4–6 minutes** as an initial proposed time-to-destruction window. If the user intends this as a *damage tick interval* rather than whole destruction, clarify before final numerical implementation; initial working interpretation is **total unclaimed lifespan**.
+- **Proposed engineering:** On becoming unclaimed, assign a server-authoritative decay deadline in the 4–6-minute range. Restoring valid totem coverage pauses/cancels decay according to a clearly tested rule; loss of coverage begins/resumes it. Do not let rapid placement/remove instantly reset endlessly or create negative health.
+- Tribes may claim **their own built structures** only; **server-generated events/ruins cannot be claimed**. Any physically reachable storage remains openable by anyone; totems do not lock chests.
+- **Open:** Totem radius, max totems, overlapping ownership priority, whether reclaiming unclaimed/abandoned bases grants new ownership, exact decay distribution, material-tier decay effect and structural repair mechanisms.
+
 
 ### 6.3 Always-on raiding, no special tools
 
@@ -296,7 +297,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 5. Players may compete for event loot, even when the encounter has hostile mobs. Reward items are ordinary at-risk physical loot until extraction and can be stolen.
 6. Once resolved, expire the event and restore capacity for future weighted checks. Do not have players directly request weighted rolls.
 
-**Design flexibility:** Tick interval, event-type weights, cooldowns, concurrency and "nothing happens" probability are **Open**; they are not fixed every X minutes. **The existing Guardian concept's approximately 15–20-minute cadence and 3-minute warning are preserved as a distinct established rule** until a later decision explicitly changes it (§8).
+**Confirmed Q111 target:** The weighted **non-Guardian** scheduler checks for an eligible event **approximately every 5 minutes** (tunable target), and **multiple events may coexist**, provided the server validates a **minimum separation / no overlap** between their active footprints. Roll may legitimately select no event; exact probability weights and separation radius remain Open. **Guardian** keeps its distinct established ~15–20-minute cadence and 3-minute announcement unless separately changed (§8).
 
 ### 7.2 Event catalog and three boss sources
 
@@ -328,12 +329,18 @@ Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons,
 ### 7.5 Server implementation and remaining questions
 
 - Seed random spawn positions by authorized server decision; use biome/terrain checks and avoid inaccessibly clipped shrines/trees.
-- Cap concurrent events, spawned NPCs, generated structures and rare-node density for a 30-player target (tune through performance tests).
+- Allow **multiple simultaneous non-Guardian events**, constrained by spatial collision/separation, total NPC/structure budgets and 30-player server performance. A newly rolled event that would be too near an active one must relocate to a valid biome position or safely skip/defer, without spawning overlapping reward sources.
 - Event weights and rewards should be visible in balance configuration, with analytics tracking actual spawn frequency and **successful extractions** of their loot.
 - Public announcement must reach clients with UI/sound accessibility support; alert destination accuracy and radius are **Open**, but no secret unannounced rare event should contradict this design.
 - A full 30-player server and a low-population server may require different cooldown/budget controls, but reward rates and spawn rarity must stay fair.
-- **Open:** Tick interval, chance of no event, weight tables, overlap limits, per-biome valid spawn positions, discovery of ritual recipes, summoned boss cancellation, NPC/ruin despawn, whether raid damage persists until world empties, and special event-level loot rights.
+- **Confirmed:** Approximately **5-minute weighted event check**; rare event resource occurrences are **one-time** until an event of that type happens again; routine trees/rocks/ores regrow after **~2 minutes**. **Open:** Exact chance of no event, weight tables, spatial footprint distance/overlap limits, event concurrency/performance caps, ritual recipes, encounter cancellation, ruin despawn and special reward rights.
 
+
+### 7.6 Routine node respawning versus one-time event spawns (Q112)
+
+- **Ordinary trees, rocks and basic ore nodes:** Initial respawn target **~120 seconds** after harvesting/depletion, at a valid server-authoritative location/state (precise timing and spawn probability to be tuned).
+- **Rare event resource nodes/shrubs/trees:** **One spawn per event**, with **no ordinary two-minute regrowth**. Players must wait for a **future new weighted event** of that type, which may occur at a different valid biome location.
+- Respawned ordinary resources must not duplicate simultaneously via concurrent harvest requests, and repeated event callbacks must not re-award one-time rare drops.
 
 ## 8. Guardian mega-boss and scalable encounters
 
@@ -359,7 +366,13 @@ Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons,
 - **PvP and loot:** The whole game is PvP-first. **No automatic boss rewards** should make secured loot immune to rival players. Physical reward objects stay contested/unsecured until successful extraction; whether some participants receive XP or recipe discovery progress is Open.
 - **Anti-exploit:** Scaling must not respond instantly to players dropping their high-tier gear, artificially changing server membership or cycling in a low-level alternate account.
 
-### 8.3 Future boss design questions — Open
+### 8.3 Baseline-plus-scaling boss difficulty (Q115)
+
+**Confirmed:** Every boss archetype has its own **defined baseline level/difficulty**. An additional difficulty scaling component adjusts challenge using eligible active-server population strength, but the **formula and signal are intentionally unresolved**.
+
+**Open candidates:** Average server player level, average equipped gear score, a blended metric, and whether party or engaged participant count matters. Scale-at-spawn vs live updates also remains Open. **Proposed working safeguard:** Snapshot a validated population metric at spawn (rather than reacting to rapid unequipping or alternate account joins). Prevent boss difficulty reduction when an attacker removes armor after initiating a fight. Respect world-event, ritual and structure boss-specific reset rules; central Guardian retains its separate cadence.
+
+### 8.4 Future boss design questions — Open
 
 Exact boss health/stat formulas, average **account level vs equipped gear score vs blended score**, timing of stat capture, downed tribe revive access inside boss arena, mechanics per boss family, guardians' timer semantics, damage contribution accounting and loot roll tables. None alter the specified 60-second tribe downed window or 25%-HP Guardian Legendary release.
 
