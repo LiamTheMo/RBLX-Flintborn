@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.0  
+> **Design revision:** 1.1  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -23,6 +23,8 @@
 **Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§34).
 
 **Confirmed economic decisions (2026-10-22):** The secure vault **always retains ALL extracted items and materials**, across empty-world resets. **Center Crater extraction doubles every material stack quantity, including rare ingredients, and XP**; gear item instances are not necessarily materials. Coins and Gems are persistent; Gems are premium-leaning but earnable. Direct player trading exists (not auction/marketplace); raw materials may trade only if a specific rare/Exclusive type is designer-enabled. Rarity: **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**. Persistent account levels and crafting/activity mastery milestones grant modest permanent buffs/cosmetics. Top-tier Permanent gear requires contested high-end objectives; farming/building alone cannot yield the rarest. Booga Booga-inspired enhanced primitive visuals, adjustable camera, tutorial and guided quests. Monetization includes cosmetics, convenience, memberships/private-server-like access and rebirth tokens spent on perks; **every benefit must also be earnable through sufficient gameplay currency/resources**. Platform-native product restrictions remain to be validated. See §36.
+
+**Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar**, **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **~1,000 secure material allowance** (unit semantics Open). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -432,56 +434,49 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 **Confirmed:** 120-second shared timer per fixed exit; free combat/movement/healing during countdown; eligibility only at expiry; large-radius audiovisual alerts; group extraction, rare 30-second anywhere rune and protected animation/lobby return. **Center Crater extraction doubles every material stack (including rare reagents) AND all player/mastery XP earned in the current run**; XP and mastery earned before any extraction **remain saved even if the player dies**. **Open:** Radius, public stranger eligibility, activator-death effects, cooldown, active POIs, portable rune boundary, Coins/Gems multipliers, material overflow, partial banking, central portal during Guardian battle and crash recovery.
 
-## 10. Coins, Gems, merchants, direct trade and monetization
+## 10. Coin shops, extraction resale economy, currencies and storage
 
-### 10.1 Persistent balances and earning routes — Confirmed Q90–94
+### 10.1 Income and shops — Confirmed Q116–125
 
-| Type | Confirmed sources and baseline | Lifetime |
+| System | Decision | Remains Open |
 | --- | --- | --- |
-| **Coins** | Quests, selling materials/monster drops/crafted gear to **NPC merchants**, **successful extractions**; **~10,000 Coins per active hour** initial target | Persistent account balance; **NEVER drops on death** |
-| **Gems** | Quests, milestones, achievements, rebirths, rare enemies/resources, or optional Robux purchase; **~100 Gems per active hour** initial target | Persistent account balance; **NEVER drops on death** |
-| **Materials/gear** | Harvest/mining/quests/events/crafting, plus NPC merchant selling | Ordinary carried goods at risk; **ALL vaulted goods always saved** |
-| **XP/masteries** | Server-verified play; center extraction doubles all XP from that run | Base XP/progress saved immediately, including on death |
+| **Coin sinks** | **NPC shops must sell items**; consider food, medicine, seeds, arrows, beginner gear, cosmetics, maps and safe crafting services as *proposals only* | Actual catalog, prices, other Coin utilities |
+| **Coin quests** | Easy **250**, normal **1,000**, hard **3,000 Coins** as current initial targets | Quest repeatability and exact tuning |
+| **Extraction rewards** | **No Coins simply for extracting**; items/materials have **NPC sell value** | Potential opt-in auto-sale of useless materials |
+| **Center portal** | **2× eligible materials and run XP only**. **No Coins multiplied**; no Gem payout bonus | Material/XP eligibility/overflow |
+| **NPC merchants** | **Fixed sell quotes**, not dynamic market pricing; can buy common or rare materials, monster drops and crafted gear | Per-item prices and location |
+| **Gem rewards** | **~25 Gems** as a starting point for a meaningful quest/milestone/achievement/rare encounter grant; actual amounts vary | Tables by source |
+| **Coin-to-Gem exchange** | **Undetermined**; reconsider after Coin sinks/Gem acquisition are balanced | Existence and conversion rate |
+| **Currencies** | Coins/Gems **persist and never drop**; active-hour target remains **~10k Coins and ~100 Gems**, not passive wages | Inflation and realized earnings |
 
-The rates are **starting player-earnings targets**, not automatic hourly grants: analyze median and percentile outcomes for active players. **Coin-to-Gem exchange remains Open (Q93)**; do not implement until chosen.
+**Possible auto-sell:** Only explicitly flagged **otherwise-unused** materials might be automatically sold on extraction, with clear user permission and settlement receipts. **This is Proposed, not yet enabled**. Normal extracts must not pay extra Coins nor unexpectedly delete rare conversion reagents.
 
-### 10.2 Merchants and direct trades — Confirmed Q95/Q98
+**NPC shop Coin ideas to evaluate:** (1) essential first-run food/medical/arrow restocks, (2) basic seeds and farm supplies, (3) cheap tools/entry-level equipment, (4) aesthetic decorations and tribe banners, (5) optional world-navigation aids/crafting service charges, (6) cosmetic dye and personalization. Pricing should avoid making harvesting/crafting irrelevant or introducing direct Robux combat power.
 
-- NPC merchants **buy gathered materials, mob drops and crafted gear**; **rare materials may also be sold**. Selling a rare material to an NPC is distinct from trading it to a player.
-- **Player-to-player trades exist ONLY in the separate protected lobby**. **Gems and catalog-eligible items may be traded; Coins may NEVER be traded**.
-- **Ordinary materials cannot generally be player-traded**. Only certain individually catalog-authorized **rare or Exclusive** material types are exceptions. Permanent gear remains tradeable. Other ordinary gear trading eligibility is Open.
-- There is **no auction house or automated marketplace**. The server must escrow validated two-party offers, block swaps after acceptance, validate current owner and Gem amount, and settle exactly once across disconnects.
-- Open: NPC buy prices, whether field or lobby NPC merchants exist, min trading level, trade fees and rare-material allowlist.
+### 10.2 Gem trading and player safety
 
-### 10.3 Rarity versus item quality — Confirmed Q102–103
+- Direct trade **only in protected lobby**: designer-eligible items and **Gems**, **never Coins**. Basic materials cannot trade except flagged rare/Exclusive types. Permanent items can trade.
+- **Q125 confirms restrictions** on Gem trading, potentially involving minimum level, limits and/or transaction fees; exact combination and values **Open**. Block alt-account laundering/scams and use server-owned escrow with two-party confirmation.
+- NPC selling is not direct player trading; merchants may buy common and rare materials under fixed catalog prices.
 
-**Official rarity order:** Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive.
+### 10.3 Backpack, post-extraction settlement, vault — Confirmed Q122/Q126–129
 
-- Item rarity is an **archetype/catalog attribute**: a Rare Iron Sword and a Common Stone Sword are separate items, rather than the same Iron Sword randomly appearing in several rarity colors.
-- **Instances of one exact item may receive very small quality/stat roll variations**, independently of their fixed catalog rarity.
-- Higher **Crafting mastery** can increase chances of better rolls for eligible equipment made at an **in-world advanced workbench**. **Lobby workbench output uses default-quality stats/rolls**, not the enhanced world crafting outcomes.
-- Rarity does not automatically impose a universal damage multiplier; a Common higher-tier sword may outperform a Rare lower-tier one. Exact stat roll ranges/drop rates remain Open.
-- Permanent conversion changes loss rules **without changing the actual stats of the source instance**, including any pre-existing minor quality roll.
+- **Hotbar exactly 9 slots. Backpack starts with 50 slots.** Each ordinary material type occupies **one logical backpack slot**, irrespective of its consolidated count (numerical quantity cap remains Open).
+- Secure **item/equipment vault starts with 25 slots**, +25 per upgrade, at a **constant Gem price per upgrade tier** (amount not chosen), or equivalent Robux upgrade. Robux cost constancy remains Open.
+- **Secure material vault allowance ~1,000 (near-unlimited relative to backpack)**, separate from 25 equipment slots; unclear whether **1,000 total units**, **units per material**, or **material storage entries**. Keep implementation configurable and mark the precise interpretation Open.
+- **On successful extraction:** Regular **ordinary materials automatically transfer to safe material vault storage**, with center portal's valid ×2 quantity. **Weapons, tools, other items and special materials remain in a protected lobby backpack**, where the player may manually deposit desired items into the safe vault.
+- **Important:** Center 2× applies to extracted **special materials** even when those remain in lobby backpack awaiting a manual vault deposit. Distinguish material bonus computation from automatic deposit destination.
+- **Open:** Exact item categories automatically banked, handling of capped backpack/material vault or overlarge 2× award, whether unvaulted lobby backpack survives account logout and across subsequent re-entries, and how the player is prompted to store risky items before their next expedition.
+- **Strong engineering requirement:** No successfully extracted item should disappear due to full vault or a failed settlement. Server-owned inventory receipts reserve item IDs/stack credits, temporary pending escrow and user-visible recovery state; no duplicated accounts/loot on retry.
+- **Account-safe vault always persists** across world wipes. A lobby backpack is only definitely **protected while in secure lobby**, not a substitute for the explicit vault forever under an unapproved policy.
 
-### 10.4 Vault expansion — Confirmed Q96
+### 10.4 Monetization and Premium XP — Confirmed Q123/Q150
 
-- **Default vault capacity: 25 slots. Each purchased tier adds +25 slots** (25, 50, 75, 100 …) until a later approved cap.
-- **Either Gems (earned in game) or Robux** can purchase an identical slot upgrade. Gem purchases deduct exactly once; Robux purchases require receipt-validated persistent entitlement granting.
-- **Open:** Price per tier, total maximum, exact slot/stack behavior, inventory/vault overflow from a 2× Center Crater deposit and how to handle capacity exhaustion safely.
-- Account vault capacity upgrades and previously vaulted goods **never wipe** when a public world ends.
-
-### 10.5 Monetization: speed/QoL only — Confirmed Q97/Q99
-
-- **No direct combat advantages purchasable via Robux**. Do not sell direct damage, armor, maximum HP, attack speed, invulnerability or equivalent PvP-exclusive strength. Paid offers may **accelerate progression, improve quality-of-life or provide cosmetics**.
-- **Every paid benefit also has a reachable earned-currency/resource equivalent**. Roughly **10 active gameplay hours** for a **substantial** premium-equivalent purchase is a **provisional target**, varying by benefit. It is not appropriate as one rigid requirement for every cosmetic or basic vault upgrade.
-- At the provisional **100 Gems/hour**, ten hours corresponds to **~1,000 Gems** before spending, a pacing illustration **not** a confirmed price.
-- **Roblox Premium members receive a proposed +25% XP gain benefit (Q99)**. Entitlement must be validated on the server, not via client input. An **earnable equivalent XP boost** must also be obtainable to uphold purchase parity. Whether this applies to mastery XP and the order of stacking with Center 2× and rebirth perks remains Open.
-- Roblox passes, private servers, developer products and subscriptions are native Robux/payment products; if native entitlements cannot be purchased with Gems, offer a **game-managed equivalent** earned by play. The exact implementation must comply with current platform rules.
-- **Open:** Which Premium product applies (original Roblox Premium versus newer Roblox Plus), exact entitlement detection, price/benefit catalog, earned XP-equivalent acquisition cost, repeated purchases and anti-pay-to-win limits.
-
-### 10.6 Economy telemetry and abuse controls
-
-Track active Coins/Gems per hour, merchant sales, rare material sinks, direct Gem trade volume, vault tier adoption, center 2× material/XP inflation, mastery resource yield, free-player Premium-equivalent unlock affordability and first-session value. Prevent client-forged currency, replayed merchant sells, duplicate Robux receipts, negative trade balances, counterfeit quality rolls and accidental deletion of already-vaulted inventory.
+- Meaningful premium-equivalent purchase can take roughly **10 active gameplay hours** of currency/material earning; scale shorter for small beginner cosmetics and longer for major prestige offers. Test actual player retention, don't force a single price.
+- Robux offers **only quality-of-life or faster progression**, never sell direct PvP attack/armor/health benefits. Every paid feature has a gameplay-earned route.
+- **Premium subscriber base +25% XP** is persistent while status is valid; **non-Premium players have no innate subscription XP baseline**.
+- **Consumable temporary XP boosters are available to ALL players**, Premium and non-Premium, via the earned-gameplay economy. Whether Premium boosts **stack** with consumables and how additive/multiplicative ordering applies is **Open**; Q150 does not explicitly settle stacking.
+- Exact booster strength/duration/cost, affected XP category and entitlement distinction (Premium vs other paid membership systems) still Open. Check current Roblox entitlements and paid-random-item policies before implementing Robux-supported RNG.
 
 
 ## 11. Player-facing interface and accessibility
