@@ -633,6 +633,272 @@ Starter wildlife teaches timing; Inner Ring fauna pressures mobility and counter
 
 Player strength comes from execution, temporary risked gear, group tactics and optionally limited long-term bound choices. Bound equipment should be **sidegrades or bounded advantages**, not a full gear set guaranteeing victory. Track win rates against account age and equipped item types; explicitly support solo extracts and stealthy base raids as alternatives to head-on crater fights.
 
+## 22. Detailed inventory, extraction and death state transitions
+
+### 22.1 Canonical item-location state machine — Proposed
+
+| Authoritative state | Legal next state(s) | Notes |
+| --- | --- | --- |
+| **WorldSpawned** | Carried, despawned | Unique drop instance, distance and pickup validated by server |
+| **Carried** | WorldDropped, BaseStored, Consumed, ExtractionPending | All ordinary inventory remains at risk |
+| **BaseStored** | Carried, WorldDropped, Consumed | Raiding, door permissions and destruction rules apply |
+| **ExtractionPending** | Carried (interrupt/death), ExtractionCommitting | Channel server-time and portal-zone checks |
+| **ExtractionCommitting** | Vaulted (commit), retry pending | Item cannot simultaneously be dropped as corpse loot |
+| **Vaulted** | Carried (withdraw), ForgeReserved | A safe storage location, *not* permanent status |
+| **ForgeReserved** | Vaulted (cancel/rollback), Consumed / PermanentOwned (commit) | Reservation tied to idempotent operation ID |
+| **PermanentOwned** | ArmoryRecovery, ArmoryAvailable, BoundActive | One immutable canonical account-owned instance |
+| **BoundActive** | ArmoryRecovery, ArmoryAvailable | Temporary representation, never tradeable or duplicated |
+| **Consumed** | Terminal | No replayable recreation without new server reward grant |
+
+**Invariant:** Each ordinary instance occupies **one** authoritative world/inventory/vault/escrow location. A bound manifestation is an active *reference*, not a second owned transferable item. Stack totals are bounded integers and can be split only through server-validated operations.
+
+### 22.2 Extraction channel and irreversible commit — Proposed
+
+1. Client requests portal interaction. Server verifies character alive, actual radius/line-of-sight policy, portal status, channel concurrency, active item ownership and anti-combat-log state.
+2. Server begins authoritative timer, displays channel bar and makes the attempt contestable. Exact channel duration/interrupt conditions remain Open.
+3. Movement out of zone, death, relevant damage or portal closure interrupts according to configured rules. No stored progress unless explicitly designed.
+4. When valid timer completes, server locks eligible carried items into one pending extraction operation with a **unique receipt ID**.
+5. A durable profile deposit must reconcile correctly before showing success or unloading character. Do not create a vault item in the UI and later hope the save succeeds.
+6. If death races extraction, one terminal outcome wins: committed safe ownership **or** at-risk corpse loot, never both.
+7. Client receives committed summary with item IDs/quantities, bonus *valuation*, new vault totals and Forge recipe progress.
+8. On reconnect, unresolved pending receipt is verified and replayed idempotently. Never process the same rare item as newly extracted twice.
+
+**Critical distinction:** The Center Crater portal's larger multiplier is not permission to multiply unique instances or scarce conversion materials. A consistent payout currency/valuation model should be defined before implementing bonuses.
+
+### 22.3 Disconnect, shutdown and concurrent sessions — Open / Proposed
+
+- **Working default:** On combat disconnect, the avatar remains vulnerable for a short server-owned window; if it dies during that window, regular loot drops. Exact timing is Open and must be communicated.
+- Keep a player profile session lease so two overlapping servers cannot both mutate the same vault/armory. Leases require expiry/recovery policy for crashed servers.
+- During DataStore throttling, show **pending confirmation**, preserve unresolved operation journal and retry with backoff/budget constraints. Never label pending extraction a success.
+- Player joins a different server with a stale profile: reject writes or reconcile from most recent committed revision; do not overwrite a newer Forge transaction.
+- A game shutdown does **not** safely auto-extract every carrier. Resolve according to a published server-close policy after persistence engineering is proven.
+- Failed Forge operation may stay pending, but it must not consume ingredients without an eventual durable output or safe rollback.
+- Test teleports/hub transitions with network loss; Roblox platform writes are not a database transaction across unrelated DataStores.
+
+### 22.4 Base raid and protection boundary
+
+Vault and Permanent armory are outside the island and cannot be directly raided. Players may steal **only items that are actually unsecured and present** in the world (carried gear, raidable containers, physical drops, unlocked cached supplies). Building a base does not grant secure ownership; nothing in a tribe chest gains Permanent status. The 50-meter portal no-build rule remains enforced on the server, including overlapping piece geometry, not just its center point.
+
+## 23. Proposed Roblox Luau services and persistence model
+
+### 23.1 Service contracts
+
+| System | Server responsibility | Client-facing information |
+| --- | --- | --- |
+| **ProfileService** | Profile locks, schema upgrades, revision numbers, saving, recovery | Loaded/pending/error status, safe profile view |
+| **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
+| **InventoryService** | Transfer/drop/pickup, stack accounting, world provenance | Inventory and equip deltas |
+| **VaultService** | Safe storage/withdrawal, capacity and extraction receipt application | Vault tabs, item detail, secure totals |
+| **ForgeService** | Recipe eligibility, ingredient reservation, output issuance, commit | Preview, costs, progress, authoritative receipts |
+| **PermanentArmoryService** | Permanent canonical records, loadout lease, death recovery | Bound armory, recovery conditions, slot occupancy |
+| **LoadoutService** | Ordinary equipment withdrawal, bound caps, deployment preparation | Risk labels and confirmed slots |
+| **ExtractionService** | Portal channel, area/survival validation, deposit operation | Timer, interruption, final receipt |
+| **CombatService** | Validated hits, shields, enchantment procs, PvP cooldowns | Health/status animations, hit feedback |
+| **BuildingService** | Snapping rules, ownership, no-build geometry, raid/stash damage | Build previews, repairs, access errors |
+| **EventDirector** | Meteor/cache/alpha spawn and broadcast, rewards | Announcements, objective markers, beacon state |
+| **BossService** | Horn, timer, shield pillars, HP phases, once-only Legendary drop | Boss warnings, phase UI, rewards at risk |
+| **AnalyticsService** | Server-owned events, economic flow, dupe/failure counters | None beyond optional diagnostics |
+
+All persistent crafting and extraction grants happen on the **server**. Client may request an action but cannot dictate rarity, cost, exact output, reward source, success flag, or timestamp.
+
+### 23.2 Versioned profile structure — Proposed
+
+| Field group | Representative fields | Constraints |
+| --- | --- | --- |
+| Profile envelope | schemaVersion, profileRevision, sessionLease, lastCommittedOperationId | Migration/backward compatibility and stale-write checks |
+| Vault stacks | itemCatalogId → safe integer quantity | Nonnegative, bounded, server-calculated |
+| Vault instances | instanceId → catalogId, quality, rolls, wear, acquisition ID | Unique IDs and verified provenance |
+| Permanent armory | instanceId, catalogId, boundOwnerId, affixes, recovery, deployLease | No trade/drop path, no duplicate manifestations |
+| Recipe unlocks | recipeId, unlockSource, unlockedAt | Server-derived achievements |
+| Crafting operations | operationId, recipeVersion, status, sourceId, inputs, outputId | Pending/committed/failed reconciliations |
+| Extraction receipts | receiptId, runId, portalId, items, valuation, status | Retry-safe source item accounting |
+| Player choices | pinnedRecipeIds, safe loadout settings, cosmetic choice | Untrusted display choices validated when used |
+| Metrics | run counts, secure extracts, deaths, event participation | Bounded and versionable counters |
+
+Large histories may need compaction and retention limits to fit Roblox data budgets. Use separate identifiers for **item instance**, **boss encounter reward grant**, **extraction receipt**, and **Forge operation**; never reuse one ID as every concept.
+
+### 23.3 Operation transaction sketch — Proposed
+
+- **Forge request:** (player, recipeId, selected vaulted sourceId, requestNonce).
+- **Reserve:** Acquire serialized profile mutation; validate stored quantities and source; record exact recipe version and input snapshot; escrow/lock inputs.
+- **Commit:** Mark all inputs consumed and create exactly one ordinary output or Permanent armory record in the same logical profile update where possible.
+- **Acknowledge:** Return committed operation ID, authoritative output identity and new balances only after durable state.
+- **Retry:** Query same nonce/operation; if already committed, return prior receipt; if pending, reconcile; never repeat grants or charges.
+- **Audit:** Log status changes and unusual repeated attempts without dumping sensitive player information.
+
+**Implementation caution:** A DataStore update is not a general distributed transaction across player profiles, world-drop actors and other stores. Prefer coherent single-profile atomic mutation for Secure Forge and carefully documented protocols for run-to-vault handoff. Do not promise true multi-store atomicity without building and load-testing reconciliation.
+
+### 23.4 Recommended module boundaries and content definitions
+
+- Shared typed definitions: item archetypes, tiers, stats, recipes, event types, magic schools, damage/status tags, portal definitions, validation schemas and tuning constants.
+- Server-only domain actions: validated combat, event reward creation, world loot, binding/withdrawal, conversion, anti-grief structure placement and DataStore handling.
+- Client-only UI and effects: input mapping (mouse/touch/gamepad), preview/animation, inventory panels, rarity icons, world beacons and visual Burden of Wealth.
+- Build a short integration test environment for all state-changing remotes with synthetic invalid/duplicate requests before adding production recipes.
+- Use Rojo-local workflow where applicable, but **publishing only from main**. No code or deployments are implied by this GDD revision.
+
+## 24. Economy abuse cases and anti-duplication tests
+
+| Threat / fault | Required prevention |
+| --- | --- |
+| Client sends invented Permanent equipment ID | Output resolved only from server catalog and validated recipe |
+| Player converts item still in active island | Only eligible secure-vault source instance can be escrowed |
+| Reuse of source in two Forge requests | Source reservation and per-player serialization |
+| Repeat same request from lag or macro | Idempotency key returns one durable result |
+| Two devices simultaneously crafting | Session lease, profile revision and per-profile mutation queue |
+| Teleport during consumption | Recoverable journal with stable operation and committed output IDs |
+| Client manipulates ingredient count | Never trust client quantities or balance changes |
+| Forge item created but source not deducted | One logical transaction / repairable pending operation |
+| Rarity changed in client preview | Immutable server recipe version and source attribute snapshot |
+| Permanent item dropped/traded to alternate account | No bound trade, world-drop or base-stash transfer endpoint |
+| Second instance manifested on another server | Server-held active lease; reconnect resolution |
+| Dead player extracts and also drops loot | Exclusive death vs extraction commit state gate |
+| Portal multiplier mints extra rare resources | Portal bonus applies only to designated payout value |
+| Boss health crosses 25% multiple times | Encounter-scoped once-only Legendary grant |
+| Crafted item with negative/overflowed quantities | Positive bounded integer validation and inventory caps |
+| Shutdown/data budget exhausted | Pending receipts, retry/backoff and explicit non-success states |
+| Raiding vault from physical island structure | Vault and Permanent armory have no in-world raid surface |
+| Building piece overlaps portal aura | Validate full geometry overlap within 50-meter world-rule zone |
+
+Create security-oriented automated tests for each abuse case before release. Admin repair/restoration procedures require audited permission boundaries and a unique restoration ID, so support tools cannot unintentionally duplicate Permanent equipment.
+
+## 25. UX specifications and interface inventory
+
+### 25.1 Lobby / hub navigation
+
+The persistent hub should offer **Deploy**, **Secure Vault**, **Permanent Armory**, **Special Forge**, **Recipe Tracker**, and **Recent Extractions**. Display safe/protected versus risked status using words and distinct iconography; do not rely on rare colors alone. A permanent item in recovery is shown as **Owned — Recovery Needed**, not missing from inventory.
+
+### 25.2 Post-extraction receipt
+
+Show (a) rune/portal and completed status, (b) vaulted materials by exact quantities, (c) unique extracted gear, (d) valuation/multiplier breakdown without fabricating extra item copies, (e) craft milestones and newly available recipes, and (f) next step. If the write is still pending, state that unambiguously rather than playing a success animation.
+
+### 25.3 Forge recipe browser and permanent conversion confirmation
+
+- Filters for tools, weapons, armor, enchantments, consumables and Permanent recipes.
+- Crafting detail includes **Owned/Required** stacks, region/event sources for missing rare reagents, recipe unlock status, source gear stats, result stats, durability and material loss.
+- Permanent conversion displays the exact source instance that will disappear, a preview of bound restrictions, recovery costs (if any), and *confirm/cancel* with deliberate focus for touch and controller.
+- Show recipe progress in percentage only when genuinely derived from verified vault stack totals; do not count unextracted backpack materials.
+- "Craft" button disabled when there is an unresolved conflicting Forge operation, invalid source, not enough resources or capacity failure.
+- On successful commit, animate the transformed source becoming a **single** Permanent armory record. Backend confirmation precedes celebration.
+
+### 25.4 In-world HUD / inventory
+
+- Weapon slot labels indicate **At Risk / Drops on Death** versus **Bound / Armory Recovery on Death** under chosen policy.
+- Rune activation shows name, portal valuation bonus, time/channel progress, interruptions and nearby threat cues.
+- When special event loot is carried, server triggers visible burden VFX and explains that it increases ambush risk.
+- Map and alert cues combine icon, text, motion and sound for accessibility. The 3-minute Guardian countdown remains distinct from ordinary cache beacons.
+- On death, categorize **Dropped and lootable**, **Safe in Vault**, and **Bound armory recovery** separately.
+- On mobile, minimize precision drag requirements for recipe source selection and field base placement.
+
+### 25.5 First-session tutorial beats — Proposed
+
+Teach gathering/crafting; light PvE combat; a visible stash risk warning; successful minor rune extraction; secure vault contents; a preview of a special recipe; a clear example of how a rare ingredient later converts a specific piece of gear into Permanent. Never grant free Permanent gear merely as a tutorial completion shortcut.
+
+## 26. Quantitative tuning and live analytics plan
+
+### 26.1 Balancing equations
+
+- **Secured output per run** = opportunities × average item drop quantity × pickup share × successful-extraction probability.
+- **Time to ordinary recipe** = recipe cost ÷ safe acquisition rate, accounting for competing uses and deaths.
+- **Time to Permanent** = expected runs required across multiple rare input sources + original gear acquisition + requisite crafting mastery.
+- **Net supply** = extracted supply − regular crafts − Permanent crafts − field usage − repairs/recovery.
+- **Risk-adjusted central portal value** = (probability of escaping center × payout) − (expected loss of carried kit and materials). This should sometimes be inferior to the minor-rune strategy, depending on run circumstances.
+
+Never tune crafting only from nominal boss drop rates. If most boss loot is stolen or lost before extraction, vault acquisition rates are dramatically lower.
+
+### 26.2 Starting success criteria — proposed directions, not fixed thresholds
+
+| Observable | Healthy signal | Warning |
+| --- | --- | --- |
+| First extraction | A solo novice can finish one in early play | Every rune is permanently camped |
+| First special craft | Realistic after several cautious successful expeditions | Forge appears unreachable or gives instant best gear |
+| First Permanent craft | Aspirational across multiple runs | Single event trivially completes recipe, or only largest tribe can qualify |
+| Endgame Permanent acquisition | Hard, multisource progression | Forced repetitive boss monopoly |
+| Bound vs ordinary PvP | Real counterplay at similar skill/tier | New players have zero credible chance |
+| Center portal | Sometimes worth extra danger | Always optimal with no tradeoff |
+| Base raiding | Cost and risk balanced against accessible stash loot | Free endless structure destruction |
+| Resource sinks | Saved rare materials remain valuable | Hoarding inflates or repair consumes everything |
+| Persistence | Zero observed dupes and unexplained committed losses | Rejoining duplicates bound gear or deletes inventory |
+| Solo vs tribe | Multiple viable routes and extraction patterns | Players need a dominant clan for every conversion |
+
+### 26.3 Telemetry schema proposals
+
+Record server-side structured events for: run start/end, first harvest/craft, ordinary item death drop, unique loot pickup/stolen, meteor mine, cache channel, alpha reward, boss phase and 25% drop, portal start/interrupted/committed, vault receipt, recipe preview, Forge reserved/committed/reconciled, Permanent equip/death recovery, stash raid, and repair/sink. Segment anonymously by solo/tribe, gear band, portal tier, event source and account tenure. Audit economy by item/source category, not by treating every drop as banked.
+
+## 27. Detailed verification matrix and QA plan
+
+### 27.1 Automated functional test targets (when code exists)
+
+1. Secure extraction deposits correct resource stacks and unique gear once; death or interruption before commit deposits nothing.
+2. Partial network failure with a completed extraction commit shows the correct receipt after rejoin.
+3. Same extraction receipt replayed repeatedly does not credit double stacks or gear.
+4. Converting an eligible stored source charges each ingredient once, consumes the source and creates one bound record.
+5. Reject conversion if source belongs to another player, is not vaulted, is already Permanent, is leased, or is ineligible.
+6. Insufficient ingredient quantity, invalid unlock, stale recipe version, malformed requests and negative values cannot forge gear.
+7. Two simultaneous conversion calls targeting same weapon: only one can commit.
+8. Retry after timeout before/after a durable write yields the same final state; no missing weapon or duplicated result.
+9. Bound item on death disappears from field and resolves to recovery while ordinary carried materials still drop.
+10. Bound items cannot be looted, traded, hidden in chests, duplicated by rejoin or equipped in two Roblox servers simultaneously.
+11. Guardian Legendary spawns once per encounter at 25%; killing boss is not automatic extraction or conversion.
+12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
+13. Portal payout never duplicates unique materials, Keystone, Legendary source instances or crafting outputs.
+14. Cache requires a continuous 60-second unlock under specified interruption rules; event UI and world beacon agree.
+15. Invalid melee reach, firing interval, elemental effect spam, hit provenance and malicious client remote sequences are rejected.
+16. DataStore throttle, teleport failure, competing sessions, server shutdown and stale revision rejoin retain safe state integrity.
+17. Mobile and controller players can navigate Forge and extraction without mouse-only precision.
+18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
+19. No deployment or publishing workflows target temporary/version branches; only main may publish.
+20. Deployed Roblox place testing is **not applicable until source/place credentials are connected**.
+
+### 27.2 Manual playtests — Requires Manual Validation
+
+- Fresh solo onboarding from beach through first secure extraction and first special recipe.
+- Two-to-four player contested alpha/cache interactions; 60-second cache stand-off tests.
+- Tribe FOB raid while defenders are away; stash loot/drop and structure limits.
+- PvP duels contrasting early, normal legendary and bound permanent builds.
+- Boss telegraph accessibility under particle-heavy full-server combat, including 25% betrayal.
+- Permanent crafting comprehension: can testers clearly explain the difference between **Vaulted** and **Permanent**?
+- Simulated poor mobile network, client close mid-portal channel and rejoin mid-Forge request.
+- Performance under many dropped items, structures, beacons and ability effects.
+- Event and recipe progression viability for solo players compared with large coordinated tribes.
+
+### 27.3 P0/P1 design review gates
+
+**P0 — must explicitly decide before implementing persistence or permanent systems:**
+
+1. What exactly does Permanent retain through death: bound gear itself or a rebuildable blueprint?
+2. Recovery payment/delay and whether bound gear can wear out permanently.
+3. Bound equipment slot cap and compatible archetypes.
+4. Account binding vs trading/gifting (default: no trade).
+5. Ordinary vaulted item withdrawal and reconnection handling.
+6. Item-instance provenance, cross-server session locking and operation journal semantics.
+7. How event-critical unique items are represented and multiplied/valued on extraction.
+
+**P1 — can remain proposed through first prototype, then tune:**
+
+8. Recipe resource quantities, sources and rarity names, Keystone path, unlock milestone requirements.
+9. Permanent damage/power cap relative to consumable top-tier gear.
+10. Enchantment affix preservation and charge/repair rules.
+11. Vault capacity, material stack weights, equipment durability.
+12. Boss clear rewards beyond the confirmed mid-fight Legendary.
+13. Map size, portal timing/camping protection, tribe capacities and wipe schedule.
+14. Cosmetic monetization, tutorial content, achievement rewards and hub architecture.
+
+## 28. Production milestones and documentation maintenance
+
+| Step | Scope | Completion evidence |
+| --- | --- | --- |
+| 1. Design agreement | Choose Permanent death model, rarity/eligibility and vault semantics | Explicit signed-off GDD decisions (not just proposed paragraphs) |
+| 2. Risk loop vertical slice | Gather, craft spear, hostile, drop on death, minor rune, vault | In Studio: reward-loss-extract tested, persisted after rejoin |
+| 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
+| 4. Social / PvP slice | Spear, bow, shield, one elemental effect, solo/tribe safeguards | Playtest viability across skill and gear tiers |
+| 5. World + raids | Outer/Inner prototypes, structures, 50-meter exclusion, stash raids | Raiding works without portal obstruction |
+| 6. Broadcast event | Alpha/cache/meteor preview, beacon, rare carry burden | Rewards contestable and remain unsecured until extracted |
+| 7. Crater Guardian | 15–20-minute cadence, horn, pillars, fight, 25%-HP drop | One mid-fight Legendary and accurate telegraphs; no auto-vault |
+| 8. Economy alpha | Multiple recipes, advanced conversions, telemetry and sinks | Progression feasible solo, scarce resources meaningful, no observed dupes |
+| 9. Launch readiness | Full server profiling, accessibility, persistence faults, anti-exploit | Reviewed CI, manual playtests and publish-from-main gates |
+
+**Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Recipe prices and operational policies are hypotheses until explicit approval, simulation and testing.
+
 ## 29. Design change log
 
 | Revision | Date | Change |
