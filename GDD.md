@@ -2002,7 +2002,59 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/limits/fees; price of constant +25 vault tiers; **representation of quantities above 1,000 per secure material stack**; full lobby backpack overflow (but **lobby items persist**); armor piece EHP weighting, bow projectile tuning, event category odds/footprints, totem upgrade/takeover, boss scaling, Permanent pickaxe recipe and **XP booster additive/multiplicative math (stacking itself Confirmed)**.
 
 
-## 40. Design change log
+## 40. Final persistence clarifications Q151–153 and implementation-ready decision backlog
+
+> **Confirmed on 2026-10-22.** These answers supersede older wording. All other undefined values remain Proposed/Open.
+
+### 40.1 Owner answers, final
+
+| Question | Confirmed decision | Exact implementation not yet chosen |
+| --- | --- | --- |
+| **151** | **Secure vault capacity is 1,000 units per material stack**, not 1,000 items globally and not 1,000 unique resource types. Each material stack is counted independently. | What happens to 1,001+ units of a material (split stacks/overflow escrow) |
+| **152** | **Unvaulted extracted items in the protected lobby backpack persist through logout, reconnect, lobby server migration and public-world reset.** No manual vault deposit is required for cross-session survival. They become at-risk only if actually redeployed into ActiveRun (subject to Permanent ownership rules). | How equipment is selected for deployment, full 50-slot overflow |
+| **153** | **Roblox Premium's +25% account XP baseline stacks with a temporary consumable XP booster**, available via gameplay to Premium and non-Premium alike. Non-Premium does not inherit the baseline. | Whether bonuses combine additively or multiplicatively, strength/duration, number of concurrent boosters, category scope and cap |
+
+### 40.2 Three non-negotiable persistence invariants
+
+1. **Vault stack bound:** Server rejects any single secure material stack whose quantity exceeds **1,000 units**. A 2× center payout creating a surplus (e.g., 600 of an item to 1,200) must use an **explicit protected, recoverable overflow representation**; the player always retains ownership of all 1,200. Whether second stacks exist is not approved. UI may still show one consolidated material **type** with quantity across actual storage records if designed accordingly.
+2. **Lobby backpack is durable:** After extraction, ordinary materials route to secure material storage; unique gear, tools and special materials route to persisted lobby backpack. The player may log out **without moving them manually** and find the same items on return. This does not allow lobby assets to be simultaneously deployed; moving selected items into an active risk run must be one server-validated transition.
+3. **XP stacks:** An eligible Premium player's **+25% ongoing baseline** and a currently active legitimate consumable booster both influence eligible XP. Rebirth perks may also influence XP. **Center 2× applies to total valid XP earned in that current expedition** through a once-only receipt. How the independent boost amounts compose is **Open**; ensure all eligible modifiers count once, with no boost replay or negative XP.
+
+### 40.3 Priority remaining implementation questions
+
+**Blockers — player custody, survival and world rules**
+
+1. **Overflow and backpack:** Represent more than 1,000 secure units of a material, or more than 50 incoming lobby items, without loss or unlimited account storage.
+2. **Run equipment selection:** Does the next Play deploy every unvaulted lobby item, or only player-selected loadout/withdrawals?
+3. **Permanent gear:** Allowable active Permanent pieces, any post-death reclaim fee, intentional-drop expiration and ownership transfer edge cases.
+4. **Recovery:** Unplanned server crash vs ordinary combat logout; safe escrow and anti-abuse boundaries.
+5. **Extraction:** Public stranger eligibility on shared portals, portable-rune participant count/placement, zone radius and portal cooldown.
+6. **Tribes/buildings:** Totem upgrade tiers and radius, takeover initiation/validation, multiple revivers, whether damage interrupts active revival.
+7. **PvP/survival:** Exact approved safe POIs, food at 0%, multiple food HoT and item-swap/cooldown rules.
+
+**Progression and monetization**
+
+8. **Rebirth:** Required player level and high-end challenge, escalating resource costs, token count per rebirth, eligible preserved Coin/Gem/XP histories.
+9. **Mastery:** Ten milestone thresholds per track and actual buffs/cosmetics for Mining, Woodcutting, Farming, Crafting and PvP.
+10. **Perks:** Defined permanent token perks/ranks, resource yield, loot luck, XP modifiers, water movement and balance caps.
+11. **XP boosters:** Strength/duration, maximum concurrent boosts, general vs mastery XP, Premium stacking operation and rebirth XP composition.
+12. **Coin shops:** Launch shop selection, prices, NPC fixed sale price list, optional auto-sell if any.
+13. **Vault/Gem trading:** Constant per-tier Gem price, Robux equivalent, trade level limits, Gem fraud caps/fees and item eligibility allowlists.
+14. **Rarity:** Secret/Exclusive acquisition, drop odds, event-specific probability ladders and item catalog rarity mapping.
+
+**Tunable balance and production data**
+
+15. **World layout:** Map scale, biome list and proportions, claim radius by totem tier, fixed portal POIs, traversal and safe zones.
+16. **Combat tables:** Actual head/chest/legs armor contribution, damage/reach/arrow velocity, enemy health, raid DPS and healing animation movement.
+17. **Bosses:** Fixed stat sheets, combined player-level/gear scoring formula, snapshot timing, spawn/reset/drop tables and rare-event parameters.
+18. **Recipes:** Launch materials, full crafting station map, skill-gated unlocks, special source items, initial Permanent pickaxe conversion costs.
+19. **Guided first session:** Tutorial protection/placement, first 2–3 quests, mobile/controller controls and profile/social visibility.
+20. **Analytics tests:** Player retention, Coin/Gem earning rates, 10-hour significant-offer target, exploit-resistant XP/mastery/trades and world performance under 30 players.
+
+**Design-note:** For numerical tuning not essential to state/persistence architecture, a documented **Proposed test default** is sufficient until actual Roblox playtests exist. The remaining architectural custody and irreversible loss/transaction issues require explicit rules before coding.
+
+
+## 41. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -2017,6 +2069,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **0.9** | 2026-10-22 | Incorporated Q61–70: 100 base HP with gear/upgrade max, 3s sprint/5s recovery, five-minute food depletion and −10% speed below 25%, immediate medicine heals 10/25/50, 10s food HoT halved by hits with ≤10 HP cutoff, rock 5/wood spear ~15/stone spear ~25 raw damage targets, EHP multiplier armor, 20-HP downed tribe members, 10s revives and armor-based finishing, immediate persistence of XP/mastery on death and center 2× all current-run XP. Incorporated Q71–89: five milestone-based level-10 permanent masteries, per-level buffs (+1% resource yield baseline), combat/noncombat PvP and all four crafting benefit types, additive/multiplicative perk stacking and lobby visibility, increasing-cost level+challenge rebirth with general level reset to 1, permanently active one-time/multirank token perks and Gem/Robux/code respec. Added §37 and verification matrix. |
 | **1.0** | 2026-10-22 | Recorded Q90–115: Coin/Gem earning targets/sources, death-safe balances, NPC sales, lobby Gem/item trades/no Coins, +25 slot vault upgrades by Gems/Robux, ~10-hour significant-offer benchmark, Premium +25% XP and no paid combat advantage; four launch weapons, three armor slots, fixed archetype rarity, small crafted quality rolls favoring unsafe workbenches/masters, 10 arrows, fixed inventory and early Permanent pacing; ~5-minute event rolls/multiple spatially separate events, ~2-minute ordinary node regen, one-time rare resources, overlapping totems, 4–6-minute unclaimed decay and base-plus-scaling bosses. Added §38 implementation and QA with platform policy citations. |
 | **1.1** | 2026-10-22 | Recorded owner answers Q116–150: Coin NPC shop brainstorm, 250/1000/3000 quest bands, no extraction Coin bonus, fixed merchant values, ~25 Gem grants, constant-price +25 vault upgrades, protected lobby Gem trade restrictions, 9 hotbar/50 backpack with one ordinary resource per slot and ~1000 material capacity, regular material auto-bank but manual equipment/special material vault; full armor EHP sets ×1.2/1.5/1.8/2.0 additive across 3 pieces, basic attack cadence, bow draw affects range not damage, animation-only heals .5/1/1.5 sec, 10%-EHP revival, food examples, ±5% rolls and 5% relative increase in best-roll chance per mastery level; independent event-category 25% rolls, descending rarity and Common fallback, no absolute event cap, upgradeable hut totems with original owner retention, complete 4–6-min decay, fixed-plus-level/gear boss scaling, basic pickaxe Permanent candidate and optional all-user XP boosters alongside Premium +25%. Added §39 and regression QA. |
+| **1.2** | 2026-10-22 | Finalized Q151–153: material vault holds **1,000 units per individual material stack**, cross-session persistence of **unvaulted extracted protected lobby backpack**, and Premium +25% base XP **stacks with** earned temporary XP boosters. Reconciled previous Q128/Q129/Q150, persistence/services, saved-item examples and QA; introduced §40 with implementation-ready decision backlog and explicit loss-free overflow and XP stacking test boundaries. |
 
 ---
 
