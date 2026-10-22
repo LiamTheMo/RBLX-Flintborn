@@ -202,7 +202,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 5.1 Launch combat baseline — Confirmed / Open
 
-- **Confirmed for current design:** Basic click-to-attack melee; bow shots with **slower, clearly visible physical projectiles** and **crafted arrows**. Exact hitboxes, attack interval, damage, ranged arc/velocity and ammunition counts remain Open.
+- **Confirmed:** Click-to-attack melee and slow crafted physical bow arrows. **Working Q66 damage baselines: rock hit 5 damage at high attack cadence; wooden spear ~15 at slower cadence and longer reach; stone spear ~25** before armor. Wooden/stone spear figures are **tentative playtest targets** (the owner said “maybe”), not locked final values. Attacks/second, precise reach, projectile damage/velocity and hitboxes remain Open.
 - **Confirmed:** Players can **sprint and crouch**. Stamina decreases **only while sprinting**; crouching and attacks do not require stamina. No dodge-roll or sliding system has been approved.
 - **Confirmed:** No usable shield, blocking/guard-meter combat mechanic, player-cast magic or magical attacks for launch. Advanced weapon combos and alternate ranged families remain possible future decisions.
 - **Confirmed:** PvP is enabled **everywhere in the active play world except clearly designated safe-zone POIs**. Random world spawning must honor safe player-admission initialization but does not automatically guarantee PvP immunity.
@@ -217,23 +217,25 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Open:** Alliance friendly-fire, whether rival access requires physically reaching/breaching a chest behind walls, tribe leadership transfer, exact totem claim radius and whether players can be in multiple alliances.
 - **Proposed:** Tribe roster, invite/kick/alliances and in-world permissions are enforced by server, never by local UI. Tribe membership is validated at the moment a player is downed.
 
-### 5.3 Downed, revive and death rules — Confirmed / Proposed mechanics
+### 5.3 Downed, 10-second revive and death — Confirmed / Open tuning
 
-1. **Non-tribe solo player:** Takes lethal damage → **immediate death**. Ordinary items move to the 10-minute lootable body; the player is **ejected to the lobby**. No same-world respawn.
-2. **Tribe member:** On would-be lethal damage, enters a **Downed** state instead of dying immediately. Start a **60-second rescue window** on a server-authoritative clock.
-3. A valid **tribe member** can start reviving the downed player. While a revive interaction is actively in progress, **pause the remaining 60-second downed timer**; it cannot expire mid-revive.
-4. If the revive interaction is **cancelled or interrupted**, resume the countdown from the **remaining time**, not from a new 60 seconds.
-5. On a successful revive, the downed character resumes active play without a new Play/world re-entry or item-drop corpse. Exact revived HP, time to complete interaction and invulnerability if any are Open.
-6. If 60 seconds of **unpaused** downed time elapse, or the downed player is finally eliminated through an approved mechanic, finish ordinary death/body creation and **send/eject them to the separate lobby**. There is **no respawn in the same world**.
-7. Once dead/ejected, the player must wait for their tribe to return to lobby (or find a new party) before rejoining that tribe's expedition. Same-server death rejoin restriction remains in force.
+1. **Solo non-tribe character:** Ordinary HP reaching **0** means immediate death. Ordinary items transfer to a 10-minute lootable body, and the character is **ejected to the separate lobby**, with no same-world respawn.
+2. **Tribe member:** When normal HP reaches **0**, enter the **Downed** state with a separate **20-HP downed pool**, and start the existing **60-second unpaused rescue window**. These 20 points apply *after* the normal health bar hits zero, not as extra regular HP before downing.
+3. **Finishing attacks are permitted immediately.** The downed player remains damageable; opponents can kill them by exhausting the **20 downed HP** even before the 60-second window expires. **Armor protection continues to apply**, using the same EHP calculation (§21.5), including during revival.
+4. A valid tribe member starts a revive that needs **10 continuous seconds**. While an eligible revive is actively running, **pause** the remaining 60-second downed timer. This pause **does not make the downed player invulnerable**.
+5. If the revive cancels, is interrupted or becomes invalid, the rescue timer **resumes from its exact remaining duration** (not 60 fresh seconds). Only validated active revivers may hold the pause; disconnected or distant actors cannot freeze it indefinitely.
+6. After **10 uninterrupted valid revive seconds**, return to ActiveRun without corpse or new-world spawn. **Normal HP restored on revival is Open**; never infer that the 20 downed HP automatically becomes post-revive HP.
+7. Death occurs if the 20 downed HP reach zero after armor-adjusted damage, **or** 60 seconds of *unpaused* downed time elapse. Generate one lootable body (600-second TTL), eject to lobby and apply same-JobId rejoin denial. An attack can finish the downed person **while another person is reviving them**.
+8. The **8-player maximum tribe** and no same-world respawns (including beds) remain. Downed players do **not** qualify as alive for portal extraction until successfully revived.
 
-**Critical abuse prevention:** Only server-validated, present and eligible tribe members can keep the revive timer paused. A disconnected/dead reviver, moved-out-of-range reviver or invalid/abandoned action cannot freeze a downed player indefinitely. Whether the downed person can crawl, be damaged/finished, consume healing items or be revived by an allied-but-not-same-tribe player remains **Open**. Never allow a downed body to extract simply because it lies in a portal zone.
+**Confirmed:** Downed health **20**, revive **10 seconds**, rescue timer **60 unpaused seconds**, valid revive pauses timer, cancelled revive resumes it, opponents may finish immediately, and armor affects damage while downed. **Open:** Post-revive normal HP, allied-versus-tribe reviver eligibility, whether incoming damage interrupts *the reviver's* action, whether downed players crawl or can heal, multiple reviver behavior and any temporary protection after revival.
+
 
 ### 5.4 Medicine, food and sprint timing
 
 - **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
-- **Food:** Eating grants a timed healing-over-time effect. Taking damage **partially interrupts remaining HoT** according to a to-be-balanced rule (e.g., trimming some pending ticks as a *proposal*). No retroactive cancellation of completed healing.
-- **Movement:** Sprint drains and is limited by stamina. Crouch does not, and stamina has **no melee/bow/building/harvesting cost**.
+- **Food:** Every food grants its item-specific healing total over **10 seconds**; each damaging hit halves the *remaining unapplied* healing, cancelling it if the post-hit remainder is **≤10 HP**. Previously healed HP is not taken away by this cancellation rule.
+- **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **5 minutes** to go from full to empty; below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
 - **Downed:** Pending revive and death rules supersede medical-use/attack inputs while downed (exact allowed downed actions still Open).
 
 ### 5.5 Combat integrity and spawn safety
