@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.5  
+> **Design revision:** 0.6  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -20,7 +20,7 @@
 
 **Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
 
-**Confirmed public-world and loading decisions (2026-10-21):** Players arrive at the play-world server into a **safe pre-spawn main menu**. No gear is ever lost during loading, failed teleport, main-menu departure or failed spawn. Only a completed **Play → server-confirmed character spawn → ActiveRun** transition begins loot risk. Active world death/ordinary departure leaves a lootable body, expiring after **10 minutes**. Authorized update kicks preserve held gear. Extraction sends audio/visual signals and requires a **120-second vulnerable in-zone hold**; its animation then grants invulnerability and safe disconnect immediately. Rare flora, materials, mobs, bosses, raidable structures and meteors, Booga Booga-style building and rewards for engaged public-world playstyles remain in scope (§29–33).
+**Confirmed decisions (2026-10-21):** Public island target **30 players**, adjusted for world size/performance; instance stays alive while populated and resets completely when empty. Death kicks the player from the world and is intended to prevent immediate same-world rejoining, while eligible surviving players may return to that running instance. Converted Permanent gear preserves original stats and survives death, but may be voluntarily dropped, stolen or traded. **Fixed extraction countdowns are shared server events** (120 seconds); eligible living players need to stand in a small exit zone **only at deadline**, free to hide, fight and heal beforehand. Alerts play audio/visual cues over a large radius. Active fixed extraction POIs vary by server; rare consumable runes enable **30-second anywhere** extractions. Extractions send players to the secure lobby. Protected pre-spawn menu, teleport safety, 10-minute corpses, no player shields and admin maintenance preservation remain confirmed (§§34–35).
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -79,19 +79,19 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | On-person active-run inventory | Drops on death or ordinary departure **after successful Play admission**, leaving lootable **10-minute body** | **Confirmed** |
 | Lobby or world main-menu departure | Safe regardless of teleport/load failures or pre-spawn kick | **Confirmed** |
 | World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
-| Protected extraction | Requires **120 seconds inside designated area** and audio/visual cues; animation then grants invulnerability and disconnect safety | **Confirmed** |
+| Protected extraction | **120-second shared fixed-site countdown** with large-radius cues; living players must be **inside zone only at completion**, not throughout. Portable runes use 30 seconds; invulnerability begins at animation start. | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
 | Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
-| Converted Permanent equipment | Conversion is available; death, recovery and deployment rules are not yet finalized | **Confirmed capability / Open mechanics** |
+| Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; recovery cost/slot cap Open |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
-| Gear withdrawn from vault for deployment | Exact redeployment and loss rules | **Open** |
-| Player progress (recipes, cosmetics, reputation, etc.) | Whether and what persists | **Open** |
-| Bases across sessions/server shutdowns | Session-only, timed-wipe, or persistent-world model | **Open** |
+| Gear withdrawn from vault for deployment | Extracted items and materials may be withdrawn, becoming ordinary at-risk gear on successful active Play admission | **Confirmed**; loadout limits Open |
+| Player progression | Player **levels** and recipe **discovery** both exist | **Confirmed**; exact XP curve/unlock combinations Open |
+| Bases and public world resets | Server resets its complete **in-world state only after it becomes empty** | **Confirmed**; scope of ordinary extracted vault storage needs clarification |
 | Public world playstyles | Benefits for engaged PvPers, base-builders, farmers and other active playstyles | **Confirmed direction**; specific rewards Proposed |
 | Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
-**Working default:** Ordinary vaulted gear remains safe in profile/transit reservation while the play-world main menu loads. It becomes at risk **only when Play completes authoritative active spawn**; converted Permanent equipment follows still-open ownership rules. Ordinary departure during an active run produces a 10-minute body. Protected extraction, update maintenance and pre-spawn staging are safe exceptions (§29–31).
+**Confirmed and clarification pending:** Ordinary vaulted items may be withdrawn and become at risk only when active play begins. Converted Permanent equipment remains with the owner on death, but deliberate drop or trade can transfer ownership. The **secure vault has upgradeable capacity**. Empty-server resets definitely erase live-world builds and materials. Whether they also erase ordinary **previously extracted** vault items is ambiguous and therefore still Open (§34.2); original cross-session secure-vault behavior remains the provisional interpretation.
 
 ## 3. World — The Shattered Crater
 
@@ -120,12 +120,14 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - Clearly visualize the no-build aura while the build tool is equipped.
 - Avoid automatic zone-wide PvP immunity unless a future decision explicitly calls for it; “low risk” is not “safe.”
 
-### 3.3 Map decisions — Open
+### 3.3 Public-world capacity, lifetime and POIs — Confirmed / Open
 
-- Island scale, Roblox studs-to-meters convention, desired traversal times, biome count, verticality, water travel, and player capacity.
-- Fixed versus rotating extraction locations; whether map markers initially reveal minor runes.
-- Respawn distribution, spawn protection, and anti-camping enforcement.
-- Structures-per-area caps and construction proximity rules beyond extraction auras.
+- **Confirmed provisional limit:** 30 players per island, reconsidered after mapping and performance validation.
+- **Confirmed world lifetime:** A public world persists while **any players remain**. When the last player leaves, that instance resets/ends; all bases, raidable structures, world loot, nodes, mobs and other live-world changes disappear. New servers initialize clean worlds.
+- **Confirmed extraction POIs:** Candidate locations are fixed and recognizable across maps, but only a server-specific subset has an available extraction in each instance.
+- **Confirmed same-world rejoin:** Players can return to their earlier still-running public instance if they have **not died and been kicked/excluded** and the server remains open/capacity permits. Ordinary active disconnect still leaves a 10-minute corpse and forfeits unsecured items; rejoining must not restore them.
+- **Open:** Map size and travel times, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
+- **Ambiguity:** The user said “everything disappears, only Permanent items survive” on world reset. Live-world state clearly wipes; whether this also overrides the previously confirmed secure-vault persistence for ordinary extracted materials needs confirmation (§34.2).
 
 ## 4. Primitive-fantasy progression
 
