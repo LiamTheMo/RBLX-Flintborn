@@ -242,7 +242,7 @@ Tribe size cap, friendly fire, invitations, permissions, loot rights, tribe base
 
 ## 7. Dynamic server-wide events
 
-**Confirmed shared event presentation:**
+**Confirmed high-impact event presentation (meteor, cache, Alpha and Guardian-class announcements).** Smaller rare flora, deposits and creature sightings may use localized discovery cues as a proposed extension (§32):
 
 1. Server-wide stylized banner announces the event.
 2. HUD/minimap marker shows a location or search radius.
@@ -913,8 +913,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 18. Recipe tracker reflects only safely extracted materials; death changes only at-risk inventory.
 19. No deployment or publishing workflows target temporary/version branches; only main may publish.
 20. Deployed Roblox place testing is **not applicable until source/place credentials are connected**.
-20a. Joining play-world place creates no active avatar/loot-risk before loading and explicit Play; a failed teleport, profile load, kick or character spawn from that state cannot delete gear.
-20b. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
+29. Joining a play-world place creates no active avatar/loot risk before loading and explicit Play; a failed teleport, profile load, kick or character spawn from that state cannot delete gear.
+30. Duplicate Play/forged remote cannot start combat, award an item or cause corpse loss; risk begins only after a successful server-controlled spawn/ActiveRun transition.
 21. Ordinary **active-run** departure (not a protected world main-menu leave) produces exactly one corpse for 600 seconds, with unclaimed loot despawning at expiry and claimed loot owned exclusively by looter.
 22. Safe lobby exit, loading-screen quit, world main-menu quit, failed teleport and unsuccessful Play admission never create a loot body or forfeit inventory.
 23. Authorized admin-update safe-kick preserves exact held items (no extract/multiplier); forged client admin flags and duplicate restore requests fail.
