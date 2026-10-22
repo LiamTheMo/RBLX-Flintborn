@@ -394,21 +394,21 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 
 ### 9.3 Confirmed Center Crater bonus: 2× all materials and XP
 
-**Confirmed Q23:** Successful **Center Crater portal extraction doubles every extracted material quantity**, including ordinary wood/stone, iron ore, rare crop/herb ingredients, scarce meteor resources and rare boss crafting catalysts. It also awards **twice the normal experience points** associated with the extraction.
+**Confirmed Q23 + Q69:** A successful **Center Crater portal** extraction doubles **every extracted material quantity** and **all XP earned during that expedition**, not merely the XP normally granted at extraction. This includes valid **general/player XP and mastery XP** awarded for the run's harvesting, crafting, events, PvP and quests; final extraction XP, if awarded, is included in that run ledger. **Confirmed Q70:** Base XP and mastery progress are saved **as earned before extraction** and **are not forfeited on death or unsuccessful exit**. Center extraction grants an additional amount equal to the total qualifying run XP already earned, one time.
 
 | Payload example | Regular extraction | Center Crater extraction |
 | --- | --- | --- |
 | 10 Stone | 10 Stone | **20 Stone** |
 | 3 rare ore | 3 rare ore | **6 rare ore** |
 | 1 rare boss crafting reagent (material) | 1 reagent | **2 reagents** |
-| 100 extraction XP | 100 XP | **200 XP** |
+| 100 XP earned during this run (already saved) | Keep **100 XP** | Keep original **100 XP** + **100 bonus XP** = **200 total** |
 | 1 individually unique Legendary sword (equipment) | 1 sword | **1 sword**, unless separately approved |
 
 **Important:** This is *real item stack duplication by design*, not merely display valuation or extra coins. Rare materials can double; do not reintroduce the older rule preventing rare reagent multiplication. **Only uniquely identified equipment items**, which are distinct from stackable materials, remain at one canonical instance unless the owner approves otherwise.
 
-**Open:** Whether doubling applies to XP earned throughout the entire session or only extraction-awarded XP; whether Coins/Gems double (not confirmed); how capacity/overflow works with 2× stacks; special multi-player grouping, portable rune bonus rules, unique item treatment and rounding for any noninteger inputs.
+**Confirmed Q69/Q70 XP boundary:** General/player XP **and mastery XP** are applied to persistent account records when legitimately earned during the active run, **without requiring an extraction**. A successful center extraction then grants **one additional full run's worth** of each XP category based on immutable run-specific earned-XP ledgers. Ordinary death/logout **does not delete previously earned XP or mastery progression**, but cannot receive the conditional center bonus. Prior run XP and unrelated lobby/Forge XP cannot be retroactively doubled. **Open:** Coins/Gems doubling (**not confirmed**); stacking of mastery/XP multipliers; material vault overflow, partial inventory, portable rune bonus and exact rounding rules.
 
-**Engineering:** At the server-authorized protected animation transition, snapshot eligible stacks once, apply a recorded **2× center modifier**, and deposit only once per receipt with idempotent bonus grants. A repeated remote, reconnect or journal retry must never award a second doubling. Balance drops, recipe costs, mastery yield bonuses and vault capacity around this intentional material inflation.
+**Engineering:** Validate and persist each legitimate XP grant **immediately** with an XP grant ID and run ID (two categories: player XP/mastery XP). Track cumulative **base XP earned in this run** separately from lifetime totals. At the server-authorized center animation transition, lock those run totals with the material snapshot and issue an idempotent receipt granting **bonus XP equal to already-earned run XP** for each category. If saving is delayed, protection and owed receipt still apply. A repeated remote, rejoin or journal retry never grants another center bonus; an ordinary exit/death still leaves earlier XP intact. Preserve XP milestones applied both before and after a center extraction; avoid double-awarding one-time milestone perks/cosmetics.
 
 
 ### 9.4 Vault/transaction guardrail — Proposed
@@ -417,7 +417,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 ### 9.5 Remaining extraction questions — Open
 
-**Confirmed:** 120-second shared timer per fixed exit; free movement/combat/healing during countdown; presence only at expiry; large-radius audiovisual alerts; group extraction; rare 30-second anywhere rune; safe animation and lobby return. **Center Crater extraction grants 2× every material stack and 2× XP, including rare reagents.** **Open:** Area/radius, stranger eligibility, activator-death behavior, cooldown, active POIs, portable rune consumption/boundary, whether Coins/Gems or entire-session XP are doubled, vault capacity/overflow, partial banking, central portal availability during Guardian battle, and crash recovery.
+**Confirmed:** 120-second shared timer per fixed exit; free combat/movement/healing during countdown; eligibility only at expiry; large-radius audiovisual alerts; group extraction, rare 30-second anywhere rune and protected animation/lobby return. **Center Crater extraction doubles every material stack (including rare reagents) AND all player/mastery XP earned in the current run**; XP and mastery earned before any extraction **remain saved even if the player dies**. **Open:** Radius, public stranger eligibility, activator-death effects, cooldown, active POIs, portable rune boundary, Coins/Gems multipliers, material overflow, partial banking, central portal during Guardian battle and crash recovery.
 
 ## 10. Persistent currencies, resource economy, trading and rarity
 
@@ -1357,7 +1357,7 @@ Players who meaningfully practice the parts of Flintborn they enjoy **accumulate
 1. A meaningful action is authenticated by the server and may grant **general XP**, **relevant mastery progress** and quest progression according to category-specific tables.
 2. Player levels and mastery tracks are **separate**; no branching skill tree exists. Crafting mastery is explicitly desirable.
 3. When verified mastery progress passes a configured milestone, unlock a **small persistent account buff** and/or a cosmetic. Milestones must not repeatedly pay when relogging or resubmitting the same action.
-4. Some buffs can increase resource quantities. The **center portal still doubles all material stacks and extraction XP** as confirmed; multiplicative vs additive stacking of mastery yield and the 2× payout must be defined before balance implementation.
+4. Resource-yield buffs affect valid harvesting and may therefore increase the amount of materials later doubled by the center portal. **Center extraction also grants one additional copy of ALL current-run general XP and mastery XP**, not only extraction-end XP. Base XP/mastery progress are already saved before extraction. Buff multiplier ordering still needs balancing.
 5. Masteries do not turn **unextracted inventory into secure vault** contents, protect a non-Permanent sword from loss, disable PvP or prevent normal extraction stakes.
 6. **Top-end eligibility limit:** A dedicated farmer/builder path alone **cannot grant the rarest Permanent item**, even at maximum mastery. Rare boss, ritual/structure, PvP-contested objective or specific high-end ingredient requirements still apply to designated highest-rarity conversions.
 7. Cosmetics unlocked through milestone progression should be retained across worlds. Whether temporary prestige visuals and seasonal mastery rewards also exist is Open.
@@ -1368,7 +1368,7 @@ Players who meaningfully practice the parts of Flintborn they enjoy **accumulate
 - Validate actual harvest/resource provenance, build piece lifecycle, real PvP opponents, contributing actions and unique discovery triggers.
 - Limit rewards from easy repeat loops, same-opponent kills, cooperative alt trades, rapid crafting/cancel/refund, exploitable structure repairs and farm harvest duplication.
 - Preserve fairness for smaller tribes and solo farmers while allowing dedicated PvP players to specialize. Keep permanent stat buffs **small** enough that earlier players do not become untouchable.
-- Progress earned from properly verified activity should **survive quitting**, even if the unextracted items from that run are lost. Whether run-specific mastery awards require successful extraction is Open; the confirmed principle is permanent progression.
+- **Confirmed Q70:** Every legitimately earned XP/mastery increment is persisted without requiring extraction and **survives death, ordinary quit and world reset**. Center extraction awards **additional bonus XP equal to earned current-run XP**, so no player can lose already-earned progression on a failed escape, but also cannot earn the optional extra bonus without reaching the center.
 
 ### 33.5 Session incentives within long-lived public worlds
 
@@ -1626,7 +1626,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 ### 36.7 Remaining precise choices
 
-- Center 2× XP scope (end-of-run award versus all earned XP), and whether Coins/Gems multiply.
+- **Confirmed:** Center 2× applies to **all current-run player XP and mastery XP**, including XP saved before extraction; ordinary death preserves base progress. **Open:** Whether Coins/Gems also multiply, exact XP multiplier stacking and bonus interaction with other earned XP modifiers.
 - Vault overflow handling when bonus stacks legitimately double and capacity is upgradeable.
 - Rebirth eligibility, exact voluntary reset/retention policy, token amounts and perk catalog/caps.
 - Detailed Coin/Gem sources, premium earn rates, entitlement equivalence and platform purchase feasibility.
