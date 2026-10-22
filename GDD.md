@@ -92,7 +92,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Bases and public world resets | On empty server **only world state resets**; **all already vaulted equipment/materials persist** | **Confirmed — Q3 clarified** |
 | Public world playstyles | **Exactly five mastery tracks:** Mining, Woodcutting, Farming, Crafting and PvP, capped at 10 with a buff each milestone level. Cosmetics persist. Other activities still grant XP/quests but no separate mastery track | **Confirmed Q71–80**; thresholds and stat caps Open |
 | Account currencies | Persistent **Coins** and premium-leaning but earnable **Gems**; player XP/levels, crafting mastery and rebirth tokens | **Confirmed**; rates/prices Open |
-| Trading | **Direct player trades only**; raw materials tradable only if catalog-designated rare/Exclusive; Permanent items remain tradeable | **Confirmed**; catalog/trade policy specifics Open |
+| Trading | **Lobby-only direct trades** with eligible items and **Gems only**, **NO Coins**; material types only if designer-enabled rare/Exclusive; Permanent items tradeable | **Confirmed Q98**; catalog/fraud controls Open |
 | Rarity ladder | Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive | **Confirmed** |
 | Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
@@ -579,7 +579,7 @@ Full island art, every biome, weather, extensive equipment and premium offers, *
 | **P0** | Center extraction **2× all materials and XP** with idempotent receipts, correct vault capacity and shared 120s timing | Core extraction risk and rare material economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
 | **P1** | Click melee, slow bow projectiles and crafted arrows, sprint-only stamina, crouch, instant medical cooldown, partial food HoT interruption | Launch PvP readability and mobile input; **no player magic, dodge-roll or gear wear in MVP** |
-| **P1** | Totem radius/decay, accessible storage, wood/stone/iron construction, all-time tool raiding and takeover permissions | Claimed buildings avoid decay without becoming raid-immune; all owners absent does not delete structure in populated instance |
+| **P1** | Totem radius/overlap ownership, ~4–6-minute unclaimed decay, accessible storage and any-time tool raids | Totem shields against decay only, never raids; radius/claim priority Open |
 | **P1** | Weighted event tick/rarity, public announcements, biome-random spawns, ritual/event/structure boss resets and level/gear scaling | Event variety, server fairness, contestable loot, scalable performance |
 | **P1** | Biomes, distances, terrain elevation, portals and spawn points | World prototyping and movement |
 | **P1** | Special Forge levels/discoveries, rare material sources, medical/food/arrow crafting and post-death Permanent upkeep if adopted | Cross-run progression with **indefinite ordinary equipment lifespan** |
@@ -719,7 +719,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 2. **Slot cap:** The number of simultaneously equipped Permanent weapons, armor or tools remains genuinely undecided; do not hardcode one item as Confirmed.
 3. **Eligibility catalog:** Only designer-flagged items may be converted; categories/rarities are to be chosen.
 4. **Affixes:** Binding adds no stats, but whether a source's existing roll/affixes are preserved or re-rolled needs explicit agreement.
-5. **Trade paths:** Direct player-to-player exchange and intentional world dropping are confirmed. **No global marketplace/auction**; venue, fees and currency offers in direct trade remain Open.
+5. **Trade paths:** **Lobby-only** direct trading allows **eligible items and Gems**, never Coins. Intentional ground drops in the active world are a separate physical looting/ownership path, not a trade UI. No global auction or market.
 
 ## 18. Resource tiers, economy and acquisition sources
 
@@ -1356,7 +1356,7 @@ The event director **ticks periodically** and uses **weighted rarity** to decide
 
 **Confirmed:** Booga Booga-inspired placement; wood → stone → iron initial structure tiers; farms, chests, workstations, furniture, beds and other functional objects are desirable. Player bases remain for others after owners leave, subject to **unclaimed decay**, and are **raidable around the clock** with ordinary weapons/tools.
 
-- **Tribe claim totems:** Nearby claimed **player-built** structures are protected from **natural decay only**, not damage/raiding. Without a nearby totem, each structure eventually decays. Radius and decay rate still need design.
+- **Tribe claim totems:** Nearby player-built structures resist natural decay, not raids. **Totem areas can overlap**; radius depends on map size. Without valid totem, full decay takes **~4–6 minutes** under Q114 working interpretation; conflict priority/duration semantics Open.
 - **Takeover:** A deserted base may be occupied by a different group even if its original owners left. Replacing/destroying claim totems and transferring structural ownership need a ruleset; unclaimed storage is already accessible to anyone.
 - **Storage:** **All players can access world storage** once they can reach it. A locked chest concept must not override this rule. Terrain/building walls may prevent physical access until raided.
 - **Farms:** Crops and planted trees grow **as long as that server is populated**, even after the farmer leaves. When the world empties, plants, buildings and all other world state disappear.
@@ -1520,7 +1520,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **34** | Construction interaction | **Booga Booga-style** accessible building | Exact snapping, rotation and costs |
 | **35** | Building objects | **Yes** to functional structures: storage, beds, workbenches, farms, traps, furnaces and core walls/floors/doors | Full launch content catalog |
 | **36** | Material tiers | **Wood → stone → iron** for initial building; later tiers follow actual material additions | Structure stats and prices |
-| **37** | Persistent bases and decay | Owner leaves -> **structures remain in populated public world** for takeover. **Without a nearby tribe totem, placed structures decay over time**; valid totem protects local player-built structures from natural decay. | Totem radius, decay speed, takeover/claim transfer |
+| **37** | Bases and decay | Owner-away bases remain live; totem claim regions may overlap and protect against decay. **Unclaimed structures expire in ~4–6 minutes** as initial full-lifespan interpretation | Radius, ownership conflict, decay timing details Open |
 | **38** | Raiding | **Any time**, including absent owners; **no specialized raid tools required**. | Damage values and raid pacing |
 | **39** | Tribe rules | Maximum **8** players; invite, kick, alliances. Tribes claim **only player-built** structures, **not generated structures**. **World storage can be opened by anyone**. | Leader succession, alliance FF, access through doors and exact claim rules |
 | **40** | Respawn and regroup | **No respawn in same server**. Death sends player to **lobby**, and they must **wait for their tribe to return to lobby** to play again with that tribe's expedition. | Queuing/new-world invite and session transfer interface |
@@ -1534,7 +1534,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 | # | Subject | Design-owner answer and confirmed rule | Remaining Open specifics |
 | --- | --- | --- | --- |
-| **42** | Event cadence | **Weighted event-rarity roll on server ticks**; an event **may** occur depending on the weights, not one fixed non-Guardian interval. "Non-Guardian" simply means **all events except the central Guardian boss**. | Tick interval, weights, overlap/cooldown, none outcome |
+| **42** | Event cadence | Non-Guardian **weighted rolls roughly every 5 minutes**, events publicly announced, multiple spatially separate events may coexist; Guardian remains on own schedule | Q111 confirmed approximate interval; weights/spacing/concurrency Open |
 | **43** | Event alerts | **All events are publicly announced**; no unannounced rare shrubs/trees/minerals | Whether every event gets exact marker vs regional hint |
 | **44** | Enemy themes | **Primitive, ancient, skeletal, elemental, evil NPC, mythological** and similar monsters | Full roster and behavior |
 | **45** | Boss entry method | Three variants: **player-ritual summoned** by materials, **event-only boss**, and **structure-only boss** | Ritual recipes, spawn/despawn, reward lists |
@@ -1886,4 +1886,4 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 ---
 
-**Working principle:** Flintborn has protected Play admission, open-world PvP with rare safe POIs, random map spawn and death-triggered lobby ejection. Launch combat starts at **100 base HP** with effective-HP armor; rock 5 / wooden spear ~15 / stone spear ~25 raw hit targets, **3-second sprint / 5-second recovery**, five-minute food depletion, instant medical heals of **10/25/50 HP** and food healing over 10 seconds. Tribe members have **20 downed HP, a 60-second timer and 10-second revives**. Five permanent masteries cap at level 10, with a buff at each level. Rebirth resets general level to 1 and grants tokens for permanently active perks. Public islands have raidable totem-based buildings, weighted announced events and server-shared **120-second fixed extraction** or rare **30-second portable rune**. Center exit gives **2× materials and all current-run XP**, while all successfully vaulted gear remains saved across world resets. No player magic, firearms, shields or gear durability at launch. Remaining balances are Open.
+**Working principle:** Flintborn has protected Play admission, open-world PvP with rare safe POIs, random map spawn and death-triggered lobby ejection. Launch combat starts at **100 base HP** with effective-HP armor; rock 5 / wooden spear ~15 / stone spear ~25 raw hit targets, **3-second sprint / 5-second recovery**, five-minute food depletion, instant medical heals of **10/25/50 HP** and food healing over 10 seconds. Tribe members have **20 downed HP, a 60-second timer and 10-second revives**. Five permanent masteries cap at level 10, with a buff at each level. Rebirth resets general level to 1 and grants tokens for permanently active perks. Currencies never drop. Coin routes are quests/merchant sales/extraction (**~10k/h**), Gem routes include rare play rewards and Robux (**~100/h**). Trades use only **eligible items/Gems in the lobby**, never Coins. Vault starts at **25 slots**, +25 per Gem/Robux upgrade. Launch weapons are spears/daggers/swords/bows and three armor slots, arrows craft in tens. Weighted events roll **~5 min**, routine nodes respawn **~2 min**, totems overlap and unclaimed structures decay **~4–6 min**. Public islands have raidable totem-based buildings, weighted announced events and server-shared **120-second fixed extraction** or rare **30-second portable rune**. Center exit gives **2× materials and all current-run XP**, while all successfully vaulted gear remains saved across world resets. No player magic, firearms, shields or gear durability at launch. Remaining balances are Open.
