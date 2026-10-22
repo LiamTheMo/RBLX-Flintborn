@@ -1285,54 +1285,55 @@ The event director **ticks periodically** and uses **weighted rarity** to decide
 Verify biome randomness, event public announcements, weighted distribution, 8-member tribe maximum, tribe claim scope excluding server-generated structures, decay start/stop based on totem proximity, persistent-in-live-world abandoned bases, no-respawn beds, accessible public storage, any-time ordinary-tool raids, and farming continuing after owner exit while other players keep server alive. All resets must discard temporary world objects once its last player departs.
 
 
-## 33. Public-world playstyle rewards and engagement design
+## 33. Permanent playstyle masteries, milestones and world engagement
 
-### 33.1 Confirmed intent
+### 33.1 Confirmed permanent mastery progression
 
-Remaining active in a shared **public world** should be useful even without continuously pursuing the Guardian or PvP. The system should recognize materially different contributions: **PvPers**, **base-builders**, **farmers/gatherers**, hunters and explorers. Rewards should create fresh reasons to stay in a populated world, engage in the local ecology, form rivalries and extract meaningful resources, without making idle time a dominant strategy.
+Players who meaningfully practice the parts of Flintborn they enjoy **accumulate permanent mastery** in many disciplines. Reaching **milestones grants small permanent buffs**, potentially including **resource-yield improvements**, plus cosmetic rewards. Masteries are a **min-max layer** for engaged long-term players, not a skill tree and not just temporary bonuses while staying in one public server.
 
-**Clarification:** Confirmed is the goal of rewards/benefits for sustained public-world participation, **not** passive cash paid per minute, guaranteed safe item drops, free vaulting or unlimited combat stat buffs. The proposed reward ideas below require tuning and owner approval.
+**Confirmed:** Buffs survive player death, logging out, server shutdown/empty-world wipe and extraction. They are part of **account progression**, not a resource stack or an object dropped by a dead avatar. Players still risk every ordinary item carried into a world.
 
-### 33.2 Candidate playstyle loops — Proposed
+### 33.2 Mastery families — Proposed content taxonomy
 
-| Identity | Meaningful in-world contribution | Example optional benefit | Exploit guardrail |
+| Mastery | Meaningful server-verified contributions | Example *small permanent* milestone perk (unapproved) | Anti-abuse requirement |
 | --- | --- | --- | --- |
-| **Farmer / herbalist** | Tend and harvest farm plots, locate rare shrubs and trees, transport supplies | Herbal medicine recipes, farming-oriented crafting proficiency or resource yield insight | Cap repeated identical plots; verify genuine growth and harvest intervals |
-| **Builder / engineer** | Construct, repair, reinforce and defend raidable FOBs | Alternate structure skins, repair efficiency or construction recipe progress | Prevent rapid place/destroy loops and worthless-structure spam |
-| **PvPer / raider** | Win meaningful hostile encounters, contest high-value objectives and loot enemy supplies | Cosmetic titles, tracked rivalries, raiding recipe discoveries | No rewards for alt kills, same-player kill trading or spawn farming |
-| **Hunter / boss challenger** | Track fauna, fight alphas and contest rare regional bosses | Hunting trophies, tracker utility, alpha-reagent craft unlocks | Server contribution checks; avoid merely tagging bosses |
-| **Explorer / scout** | Discover rare event spawn areas, new routes and extraction runes | Cartography discoveries, regional knowledge and exploration cosmetics | One-time/progression caps per genuine discovery |
-| **Tribe supporter** | Supply shared fortification and field expeditions | Tribe contribution records, cooperative craft objectives | Avoid permanent exclusive buffs for the largest tribes |
+| **Mining** | Harvest actual stone/ore nodes | Modest additional ore yield chance or mining efficiency | Per-node grants, no request spam |
+| **Woodcutting/foraging** | Gather distinct trees, rare shrubs, herbs and plants | Slight harvesting yield benefit | Biome/rarity and cooldown accounting |
+| **Farming** | Plant, maintain and harvest matured crops or trees | Small crop-yield bonus or plant management convenience | No harvest-replant loop exploits |
+| **Building/engineering** | Place useful structures, repair/upgrade real bases, interact with totems | Slight build resource savings or structure repair bonus | Prevent place/delete farming |
+| **Crafting** | Make valid nontrivial weapons, tools, food, arrows and equipment | Modest craft-efficiency bonus or recipe-progression benefit | Require consumed legitimate inputs |
+| **PvP/raiding** | Meaningful opponent encounters, lawful raids and objective contests | Modest progression or combat-related minor benefit | No alt kills, trade-kills or safe-zone abuse |
+| **Hunting/bossing** | Hunt real NPCs, contest rare mobs, contribute to bosses | Tracker utility or minor hunting/crafting outcome bonus | Server-side contribution checks |
+| **Exploration/scouting** | Discover distinct locations, extraction POIs and rare events | Small navigation/expedition utility | Unique location milestones, no hopping spam |
+| **Tribe teamwork** | Contribute resources, revives and field support | Tribe cosmetics or bounded personal teamwork benefit | Avoid large-tribe-only compounding advantage |
 
-### 33.3 Public-session progression proposal
+**Examples are not confirmed buff values or mandatory mastery categories**. The principle of diverse permanent mastery paths with buffs and cosmetics **is confirmed**. Actual milestone tiers, numeric effectiveness, activation rules and caps are Open.
 
-1. Track verified **active contribution** within one public server: unique harvests, completed gathering interactions, distinct building/repair tasks, legitimate hostile combat, boss assists and exploratory milestones.
-2. Award modest short-session milestones, achievements, recipe progress or discretionary **in-world** opportunities based on actual activity rather than time alone.
-3. If retention benefits exist, use a **session-engagement track** with varied objectives and transparent thresholds; no safety or loot guarantee merely for being present.
-4. Preserve competitive stakes: earned resources obtained in a public world remain **unsecured until successful extraction**, unless the benefit is an explicitly defined account-level knowledge/cosmetic unlock. No silent autopayout to vault.
-5. Allow players to pursue different tasks toward progression; farmers/builders should not have to win constant PvP, and PvPers should not be forced into excessive harvest grinding.
-6. Cap advantages by progression band and solo/tribe size; don't grant permanent stat boosts that only large organized tribes can stack indefinitely.
-7. Prevent AFK exploitation with actual action/contribution validation, distinct task caps, cooldowns and anti-collusion checks (not solely movement spam or time online).
-8. Visualize personal progress unobtrusively, without distracting players during combat or extraction.
+### 33.3 XP, mastery XP, buffs and item safety
 
-### 33.4 Economy and integrity constraints
+1. A meaningful action is authenticated by the server and may grant **general XP**, **relevant mastery progress** and quest progression according to category-specific tables.
+2. Player levels and mastery tracks are **separate**; no branching skill tree exists. Crafting mastery is explicitly desirable.
+3. When verified mastery progress passes a configured milestone, unlock a **small persistent account buff** and/or a cosmetic. Milestones must not repeatedly pay when relogging or resubmitting the same action.
+4. Some buffs can increase resource quantities. The **center portal still doubles all material stacks and extraction XP** as confirmed; multiplicative vs additive stacking of mastery yield and the 2× payout must be defined before balance implementation.
+5. Masteries do not turn **unextracted inventory into secure vault** contents, protect a non-Permanent sword from loss, disable PvP or prevent normal extraction stakes.
+6. **Top-end eligibility limit:** A dedicated farmer/builder path alone **cannot grant the rarest Permanent item**, even at maximum mastery. Rare boss, ritual/structure, PvP-contested objective or specific high-end ingredient requirements still apply to designated highest-rarity conversions.
+7. Cosmetics unlocked through milestone progression should be retained across worlds. Whether temporary prestige visuals and seasonal mastery rewards also exist is Open.
 
-- Never grant Permanent gear merely for idling a specified time in a public world. Expensive Secure Forge conversion continues to require actual extracted rare materials and eligible gear.
-- An ordinary logout **after ActiveRun admission** still drops the body; the world main-menu/loading state remains exempt even though the player occupies the game server. Account progress/cosmetics never make carried loot safe.
-- Rewards earned while inside protected pre-spawn menu/loading **do not count as active public-world play**.
-- When a **shared extraction timer ends**, only qualifying alive players **inside the area** begin protected animation; stop earning live-world combat/gathering rewards for **those extracted players**, not everyone around the rune.
-- Proposed builder/farmer benefits must not enable invulnerable farming enclosures or permanent structures around protected **fixed** portals. Temporary portable rune interaction with buildings remains Open.
-- PvP rewards should value real combat/contested outcomes, not repetitive farming of a cooperative alternate account.
-- Telemetry should compare retention, solo success, conflict rates and material supply across playstyles before any direct resource multiplier is locked.
+### 33.4 Anti-idle and anti-collusion
 
-### 33.5 First implementation and QA gates
+- Do not grant substantial mastery for just standing, idling or staying on a server; require meaningful, verified actions.
+- Validate actual harvest/resource provenance, build piece lifecycle, real PvP opponents, contributing actions and unique discovery triggers.
+- Limit rewards from easy repeat loops, same-opponent kills, cooperative alt trades, rapid crafting/cancel/refund, exploitable structure repairs and farm harvest duplication.
+- Preserve fairness for smaller tribes and solo farmers while allowing dedicated PvP players to specialize. Keep permanent stat buffs **small** enough that earlier players do not become untouchable.
+- Progress earned from properly verified activity should **survive quitting**, even if the unextracted items from that run are lost. Whether run-specific mastery awards require successful extraction is Open; the confirmed principle is permanent progression.
 
-- Build and instrument **one** meaningful active-world contribution path for farming, building and PvP in a prototype, without substantial permanent numerical rewards.
-- Evaluate whether players actually remain engaged within public worlds while extraction remains the primary safe banking mechanism.
-- Test idle player, automated gather loop, place/remove spam, same-tribe kill trading, repeated alt defeats and server-hopping; none should infinitely print account rewards.
-- Ensure pre-spawn menu waiting, loading delay, teleport retry and safe maintenance downtime do not count as active-game time.
-- Track metrics by playstyle, gear tier and group size; maintain viable solo-player paths.
-- Owner approval is required for exact award types, reward cadence, session persistence, and whether any benefits reset per server.
+### 33.5 Session incentives within long-lived public worlds
+
+Distinct ways to spend time in the same public world remain important for server retention and player interaction: farming a base, gathering ore, raiding, PvP fights, scouting or completing public events. **Permanent mastery advancement** is the preferred foundation. Optional session-only contracts, bonus objectives and server-specific cooperative challenges are Proposed, not confirmed and should not replace the permanent rewards.
+
+### 33.6 QA and balancing
+
+Test persistence across wipes, crashes, death, transfers and rebirth; milestone one-time awards; stacked center 2× rare materials with yield buffs; accidental duplicate mastery grants; caps across a 30-player world; PvP kill-trading; farming/crafting loops and progression for non-boss-oriented players without letting the rarest Permanent rewards bypass their high-end inputs.
 
 
 ## 34. Owner-approved answers 1–24 (2026-10-21)
