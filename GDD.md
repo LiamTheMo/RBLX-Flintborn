@@ -87,7 +87,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
 | Protected extraction | **120-second shared fixed-site countdown** with large-radius cues; living players must be **inside zone only at completion**, not throughout. Portable runes use 30 seconds; invulnerability begins at animation start. | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
-| Successfully extracted loot | **Ordinary materials auto-bank** to the always-persistent safe material vault. **Gear, tools, other items and special materials remain in the protected lobby backpack** until manually vaulted; already vaulted items always survive world resets. | **Confirmed Q129**; cross-session unvaulted lobby backpack policy Open |
+| Successfully extracted loot | **Ordinary materials auto-bank. Gear/tools/other items/special materials remain in the protected lobby backpack, which PERSISTS across logout, rejoin and server resets until redeployment or manually vaulted.** | **Confirmed Q129/Q152**; over-capacity receipt UX Open |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
 | Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; recovery cost/slot cap Open |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
@@ -486,7 +486,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 - **Important:** Center 2× applies to extracted **special materials** even when those remain in lobby backpack awaiting a manual vault deposit. Distinguish material bonus computation from automatic deposit destination.
 - **Confirmed Q152:** Unvaulted gear/tools/other items and special materials in the **protected lobby backpack DO persist across logout, reconnect, lobby-server changes and world resets**, despite not being manually deposited in vault. On authorized redeployment into an active world, ordinary gear/materials become at-risk again. **Open:** precise catalog routing/overflow when 50 backpack slots are full.
 - **Strong engineering requirement:** No successfully extracted item should disappear due to full vault or a failed settlement. Server-owned inventory receipts reserve item IDs/stack credits, temporary pending escrow and user-visible recovery state; no duplicated accounts/loot on retry.
-- **Account-safe vault always persists** across world wipes. A lobby backpack is only definitely **protected while in secure lobby**, not a substitute for the explicit vault forever under an unapproved policy.
+- **Confirmed Q152:** Both the **secure vault and extracted unvaulted lobby backpack are durable persistent account inventory** across logout, reconnect, lobby server change and public-world reset. Only active-world redeployment exposes ordinary gear and consumables to death/quit risk. The secure vault remains a separate capacity/organization feature. Overflow settlement stays protected and idempotent.
 
 ### 10.4 Monetization and Premium XP — Confirmed Q123/Q150
 
@@ -1922,14 +1922,14 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | --- | --- | --- |
 | **126** | **Nine fixed hotbar slots** | Control bindings, quick-swap UX |
 | **127** | **50 starting backpack slots** | Whether later backpack upgrades exist |
-| **128** | **One ordinary material type = one backpack slot**. Secure vault material allowance roughly **1,000 (near-unlimited)**. | Whether 1,000 means per-resource quantity, total units, or slots |
-| **129** | **Ordinary materials automatically vault after extraction**, while **other items, weapons, tools and special materials remain in protected lobby backpack** and can be manually vaulted. | Cross-session safety of unvaulted backpack, overflow |
+| **128** | One ordinary material type occupies one backpack slot; **secure material stack stores exactly up to 1,000 units** | **Clarified Q151:** 1,000 is **per material stack**, not global; excess storage representation Open |
+| **129** | Ordinary materials auto-vault; equipment/tools/other items and special materials remain in **persistent protected lobby backpack** for later optional vault deposit | **Clarified Q152:** persists across logout/reconnect/world wipes; excess slots still Open |
 | **130** | **Only designated/eligible items may be player-traded** | Catalog allowlist |
 | **131** | Carry **any types and combinations of weapons**, within physical inventory slot limits | Equipped versus backpack switch flow |
 
 **Routing example:** Successful Center Crater extraction with 30 Stone, 1 special material reagent and 1 unique Sword generates **60 Stone deposited into material vault**, **2 special reagents in protected lobby backpack** and **one Sword in lobby backpack**. The player decides whether to vault reagent and sword. **No Coin extraction award.** The existing 2× rule covers all actual materials regardless of routing; unique equipment instances are never silently cloned.
 
-**Security:** Extracted assets must be protected from animation start, including disconnects or DataStore errors. A 50-slot backpack, 25+25 item vault and near-1,000 material allowance are distinct capacities. If receiving gear/stack quantity would exceed any limit, keep a protected owed-items claim/pending receipt rather than deleting goods. A lobby backpack is protected during staging but **unvaulted persistence across logout has not yet been confirmed**.
+**Security:** Extracted assets must be protected from animation start, including disconnects or DataStore errors. A 50-slot backpack, 25+25 item vault and near-1,000 material allowance are distinct capacities. If receiving gear/stack quantity would exceed any limit, keep a protected owed-items claim/pending receipt rather than deleting goods. **Confirmed Q152:** Unvaulted extracted lobby inventory persists across logout/reconnect/world resets; outstanding overflow remains in protected owed-item escrow rather than being lost.
 
 ### 39.3 Combat, armor, medicines, food and equipment quality (132–139)
 
@@ -1971,18 +1971,18 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 | # | Confirmed owner answer | Remains Open |
 | --- | --- | --- |
-| **150** | **Premium users retain baseline +25% XP; everyone may use earned temporary consumable XP boosters; non-Premium users have no subscription base boost** | Whether boosts stack, duration, multiplier and eligible XP categories |
+| **150** | Premium +25% baseline XP **stacks with** universally available temporary consumable XP boosters; non-Premium accounts have no free subscription baseline | **Q153 confirmed stacking**, but magnitude/duration/formula/XP categories remain Open |
 
 **Confirmed:** Eligible Roblox Premium subscribers get **+25% ongoing XP** while entitled; all players, Premium or non-Premium, may obtain **temporary consumable XP boosters**, including through earned in-game routes. Non-Premium users do not receive the member's base +25% simply for being free users.
 
-**Open:** Exact booster magnitude, duration, earning/purchase source, general versus mastery XP, Premium-versus-consumable stacking or exclusivity, and additive/multiplicative layering with center's 2× earned-run XP. Answer 150 **did not choose a stacking formula**, so keep it unset.
+**Q153 Confirmed:** Premium baseline **stacks** with a consumable XP booster. **Open:** magnitude, duration, earning source, whether it boosts general or mastery XP, additive/multiplicative layering with other XP modifiers and center 2×, multiple simultaneous consumables, and total XP boost cap.
 
 ### 39.6 v1.1 acceptance/regression cases
 
 1. Quests pay their configured 250/1000/3000 Coin bands once, merchant sales credit fixed server quotes, and no direct Coins are issued simply for extracting or doubled centrally.
 2. Gem grants average around the chosen 25 baseline by source; trade safety checks, no Coin trade, protection through death and empty-world resets.
 3. 9-slot hotbar and 50-slot backpack remain bounded; each ordinary material type displays one consolidated row/slot, while unique gear can have its own roll and instance ID.
-4. Vault item capacity starts 25 and upgrades +25 at **constant Gems per tier**; material allowance is separate and configurable pending the meaning of ~1,000.
+4. Vault item capacity starts 25 and upgrades +25 at constant Gems per tier; material stacks are **limited to 1,000 units each**, not an account-wide material limit. Overflow is protected until legally stored.
 5. Extracted ordinary material auto-banks; extracted unique gear/tools and special materials stay protected in lobby backpack until manually deposited, with one-time central material ×2 and no data loss/duplication.
 6. Full matching armor sets produce 120/150/180/200 EHP for 100 base HP. Piece modifiers add. Revive restores 10% modified maximum EHP converted into actual HP.
 7. Rock/dagger/sword/spear approximate cadence constraints are enforced; bow draw changes range not bow+arrow damage; medicine gives immediate HP then only 0.5/1.0/1.5s animation lock.
@@ -1994,12 +1994,12 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 13. Unclaimed buildings disappear within 240–360 seconds unless properly reclaimed; ordinary raids remain unrestricted.
 14. Boss baseline fixed and player-level-plus-gear-score scaling combined; same-world rare loot still contested.
 15. Approved basic pickaxe Permanent candidate follows all designated-item conversion and extraction requirements; no bonus rolled stats from Permanent conversion itself.
-16. Premium member XP baseline and everyone-available temporary boosters are separately controlled; do not accidentally assume stacking or permanent free-user baseline.
+16. **Confirmed Q153:** Premium member baseline +25% XP and active consumable XP booster **stack** for eligible players; non-Premium users can also acquire boosters. Exact addition/multiplication remains Open.
 17. All confirmed older rules (protected world staging, 120-second fixed/30-second portable extraction, death/corpse, all vaulted items forever saved, five permanent level-10 masteries) remain intact.
 
 ### 39.7 Next unresolved precision decisions
 
-NPC shop stock/prices, auto-sell opt-in/filter and safe settlement; Gem trade account levels/daily caps/fees; Gem price of constant +25 vault tiers; exact material storage meaning of ~1,000; persistence and overflow of unvaulted extracted lobby gear; armor head/chest/legs contributions; bow range/velocity curve; per-category event rarity tables/footprint requirements; totem upgrade/takeover details; combined boss scaling formula; first Permanent pickaxe recipe; Premium +25% and booster stacking.
+NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/limits/fees; price of constant +25 vault tiers; **representation of quantities above 1,000 per secure material stack**; full lobby backpack overflow (but **lobby items persist**); armor piece EHP weighting, bow projectile tuning, event category odds/footprints, totem upgrade/takeover, boss scaling, Permanent pickaxe recipe and **XP booster additive/multiplicative math (stacking itself Confirmed)**.
 
 
 ## 40. Design change log
@@ -2020,4 +2020,4 @@ NPC shop stock/prices, auto-sell opt-in/filter and safe settlement; Gem trade ac
 
 ---
 
-**Working principle:** Flintborn is a Roblox primitive-fantasy, high-risk PvPvE extraction sandbox with protected Play admission, random map spawns, PvP outside rare safe POIs, 100 base HP, three additive EHP armor pieces and 60-second downed/10-second tribe revives. Rock/dagger/sword/spear attack cooldown targets .3/.4/.7/.9 seconds and slow arrow-arc bows use draw time for range only. Medicine heals instantly with .5/1/1.5-second animation reuse locks; food's 10-second HoT remains vulnerable to damage. Five permanent level-10 masteries and level-reset rebirth grant modest long-term buffs/perks. Public-world bases have upgradeable hut-size totems, protected ownership until takeover, unrestricted raids and 4–6-minute unclaimed full expiry. Category-specific non-Guardian events roll independently ~every five minutes with rarity waterfall and public announcement; bosses use authored baseline plus combined level/gear scaling. Extraction routes ordinary materials to **always-safe vault**, while equipment, tools and special materials remain in protected lobby backpack until manually vaulted. Center doubles all material quantities and earned run XP, **never Coins/Gems**. Coins come from quests/fixed NPC sale values, **not extracting**; Gems from earned rewards and optional Robux. Direct trade only in lobby. Hotbar is 9 slots, backpack starts 50; vault item slots start 25 with constant-cost +25 tiers, material storage allowance ~1000 with units still Open. No player shields, spells, guns or gear wear at launch.
+**Working principle:** Flintborn is a Roblox primitive-fantasy PvPvE extraction survival game with protected Play admission, 100 base HP, additive hide/wood/stone/iron EHP, 10-second tribe revives and permanent five-track masteries. Ordinary materials automatically bank on successful extraction; **the secure materials vault holds up to 1,000 units per stack, not 1,000 total**. Gear, tools, other items and special materials arrive in the **durable protected lobby backpack**, surviving logout/server resets until consciously redeployed or manually moved into the vault. Central extraction doubles *all* material quantities and earned-run XP, never Coins/Gems. Premium base +25% XP **stacks with** temporary boosters available to every player; multiplier arithmetic remains Open. Other confirmed mechanics include 9 hotbar/50 backpack, 25 vault item slots (+25 upgrades), restricted lobby Gem/item trading, raidable totem claims/4–6-minute decay, independent weighted server events, fixed baseline plus level/gear boss scaling, and a candidate first Permanent pickaxe. No firearms, usable shields, player-cast magic or durability at launch.
