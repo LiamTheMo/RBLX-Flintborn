@@ -332,7 +332,7 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 
 ### 12.2 Candidate service boundaries
 
-\`SessionService\` (deploy/reconnect), \`InventoryService\` (items, drops, transfer), \`VaultService\` (persistent stores), \`ExtractionService\` (portal state and atomic handoff), \`ResourceService\`, \`CraftingService\`, \`BuildingService\`, \`CombatService\`, \`TribeService\`, \`EventDirector\`, \`BossService\`, and \`WorldRulesService\`.
+`SessionService` (deploy/reconnect), `InventoryService` (items, drops, transfer), `VaultService` (persistent stores), `ExtractionService` (portal state and atomic handoff), `ResourceService`, `CraftingService`, `BuildingService`, `CombatService`, `TribeService`, `EventDirector`, `BossService`, and `WorldRulesService`.
 
 **Important invariants for code review:**
 
@@ -341,7 +341,7 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 3. An item cannot simultaneously exist in world loot, carried inventory, and permanent vault.
 4. Extraction has an explicit persisted success/failure outcome; retries cannot duplicate items.
 5. Boss Legendary release at 25% occurs at most once per encounter.
-6. Only \`main\` may trigger production publishing workflows; development branches never publish.
+6. Only `main` may trigger production publishing workflows; development branches never publish.
 
 ### 12.3 Platform and performance considerations — Proposed
 
