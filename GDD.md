@@ -1328,55 +1328,50 @@ The event director **ticks periodically** and uses **weighted rarity** to decide
 Verify biome randomness, event public announcements, weighted distribution, 8-member tribe maximum, tribe claim scope excluding server-generated structures, decay start/stop based on totem proximity, persistent-in-live-world abandoned bases, no-respawn beds, accessible public storage, any-time ordinary-tool raids, and farming continuing after owner exit while other players keep server alive. All resets must discard temporary world objects once its last player departs.
 
 
-## 33. Permanent playstyle masteries, milestones and world engagement
+## 33. Five permanent masteries, levels and milestone buffs
 
-### 33.1 Confirmed permanent mastery progression
+### 33.1 Five launch tracks — Confirmed (Q71–80)
 
-Players who meaningfully practice the parts of Flintborn they enjoy **accumulate permanent mastery** in many disciplines. Reaching **milestones grants small permanent buffs**, potentially including **resource-yield improvements**, plus cosmetic rewards. Masteries are a **min-max layer** for engaged long-term players, not a skill tree and not just temporary bonuses while staying in one public server.
+**Only five masteries:** **Mining, Woodcutting, Farming, Crafting and PvP**. Building, raiding, hunting, exploration and tribe support remain possible activities and quest/XP sources, but are **not independent mastery tracks** unless approved in a future update.
 
-**Confirmed:** Buffs survive player death, logging out, server shutdown/empty-world wipe and extraction. They are part of **account progression**, not a resource stack or an object dropped by a dead avatar. Players still risk every ordinary item carried into a world.
+| Mastery | Verified milestone activity (proposed counting details) | Buff direction and rewards |
+| --- | --- | --- |
+| **Mining** | Authentic ores/nodes mined and mining objectives | **+1% per mastery level** to suitable mining/resource yield; cosmetics |
+| **Woodcutting** | Trees legitimately chopped, varied wood harvested | **+1% per level** to suitable wood yield; cosmetics |
+| **Farming** | Crops planted, matured and harvested | **+1% per level** to eligible crop output; cosmetics |
+| **Crafting** | Legitimate completed crafting actions and achievements | **All of:** ingredient efficiency, craft output/batches, crafting speed and recipe unlocks, balanced by level |
+| **PvP** | Real opponent combat, kills and contested objectives | **Both** minor combat and noncombat perks (e.g. loot/coins/utility), plus cosmetics |
 
-### 33.2 Mastery families — Proposed content taxonomy
+**Confirmed:** Mastery level **cap is 10** for now. Each mastery level grants a **buff**, and the player advances through meaningful **milestones**, not merely passive hours logged in. **+1% per eligible level** is the baseline for resource-yield buffs (at ten earned +1% increments, an illustrative cap of **+10%**). This does **not** automatically mean +1% raw PvP damage or every crafting stat per level; precise perk catalogs, milestone thresholds and tier associations remain **Open**. Mastery levels, buffs and cosmetics remain **permanent account progress** across world reset, death and rebirth.
 
-| Mastery | Meaningful server-verified contributions | Example *small permanent* milestone perk (unapproved) | Anti-abuse requirement |
-| --- | --- | --- | --- |
-| **Mining** | Harvest actual stone/ore nodes | Modest additional ore yield chance or mining efficiency | Per-node grants, no request spam |
-| **Woodcutting/foraging** | Gather distinct trees, rare shrubs, herbs and plants | Slight harvesting yield benefit | Biome/rarity and cooldown accounting |
-| **Farming** | Plant, maintain and harvest matured crops or trees | Small crop-yield bonus or plant management convenience | No harvest-replant loop exploits |
-| **Building/engineering** | Place useful structures, repair/upgrade real bases, interact with totems | Slight build resource savings or structure repair bonus | Prevent place/delete farming |
-| **Crafting** | Make valid nontrivial weapons, tools, food, arrows and equipment | Modest craft-efficiency bonus or recipe-progression benefit | Require consumed legitimate inputs |
-| **PvP/raiding** | Meaningful opponent encounters, lawful raids and objective contests | Modest progression or combat-related minor benefit | No alt kills, trade-kills or safe-zone abuse |
-| **Hunting/bossing** | Hunt real NPCs, contest rare mobs, contribute to bosses | Tracker utility or minor hunting/crafting outcome bonus | Server-side contribution checks |
-| **Exploration/scouting** | Discover distinct locations, extraction POIs and rare events | Small navigation/expedition utility | Unique location milestones, no hopping spam |
-| **Tribe teamwork** | Contribute resources, revives and field support | Tribe cosmetics or bounded personal teamwork benefit | Avoid large-tribe-only compounding advantage |
+### 33.2 Milestone progression, XP and visibility
 
-**Examples are not confirmed buff values or mandatory mastery categories**. The principle of diverse permanent mastery paths with buffs and cosmetics **is confirmed**. Actual milestone tiers, numeric effectiveness, activation rules and caps are Open.
+1. Track verified milestone counters by category (ore mined, trees cut, crops harvested, items crafted, meaningful PvP). Milestones determine mastery levels 0–10. Exact counts and whether level starts at zero or one are Open.
+2. Apply **a permanent buff at each newly earned level**, with a once-only milestone entitlement ID. Cosmetics, titles, visual effects, animations and decorative structures can also be milestone rewards (Q79).
+3. **General XP and any independently awarded mastery XP** still save immediately, including on death; center extraction adds the run's XP again on success (Q69/Q70). **Doubled XP does not fabricate additional underlying mastery actions.** One mined ore stays one mined ore in the milestone counter, even if extracting centrally doubles XP.
+4. If milestone thresholds are ever implemented based on mastery XP rather than actions, the exact way center XP affects progression is **Open**. Confirmed preference remains *milestone progression* and **10 levels**.
+5. **Mastery levels/titles may be visible in the protected lobby** (Q80); exact profile/overhead UI and privacy options still need design.
+6. Prevent AFK progression, PvP alt-account farming, repeating refunded crafts, illegitimate harvests and bot-generated action floods; verify milestone triggers on the server.
+7. Farming/mining mastery may grant increased resource yield, yet even fully specialized peaceful play cannot itself craft **the rarest Permanent equipment** without high-risk ingredient requirements.
 
-### 33.3 XP, mastery XP, buffs and item safety
+### 33.3 Both additive and multiplicative buffs — Confirmed category distinction
 
-1. A meaningful action is authenticated by the server and may grant **general XP**, **relevant mastery progress** and quest progression according to category-specific tables.
-2. Player levels and mastery tracks are **separate**; no branching skill tree exists. Crafting mastery is explicitly desirable.
-3. When verified mastery progress passes a configured milestone, unlock a **small persistent account buff** and/or a cosmetic. Milestones must not repeatedly pay when relogging or resubmitting the same action.
-4. Resource-yield buffs affect valid harvesting and may therefore increase the amount of materials later doubled by the center portal. **Center extraction also grants one additional copy of ALL current-run general XP and mastery XP**, not only extraction-end XP. Base XP/mastery progress are already saved before extraction. Buff multiplier ordering still needs balancing.
-5. Masteries do not turn **unextracted inventory into secure vault** contents, protect a non-Permanent sword from loss, disable PvP or prevent normal extraction stakes.
-6. **Top-end eligibility limit:** A dedicated farmer/builder path alone **cannot grant the rarest Permanent item**, even at maximum mastery. Rare boss, ritual/structure, PvP-contested objective or specific high-end ingredient requirements still apply to designated highest-rarity conversions.
-7. Cosmetics unlocked through milestone progression should be retained across worlds. Whether temporary prestige visuals and seasonal mastery rewards also exist is Open.
+**Confirmed Q78:** The game includes **specific additive** and **specific multiplicative** modifiers. Each buff/perk must declare its operation, source, magnitude and stacking cap. Proposed general example:
 
-### 33.4 Anti-idle and anti-collusion
+    finalGatherYield = floor(baseGatherYield × (1 + sum(additiveBonuses)) × product(multiplicativeFactors))
 
-- Do not grant substantial mastery for just standing, idling or staying on a server; require meaningful, verified actions.
-- Validate actual harvest/resource provenance, build piece lifecycle, real PvP opponents, contributing actions and unique discovery triggers.
-- Limit rewards from easy repeat loops, same-opponent kills, cooperative alt trades, rapid crafting/cancel/refund, exploitable structure repairs and farm harvest duplication.
-- Preserve fairness for smaller tribes and solo farmers while allowing dedicated PvP players to specialize. Keep permanent stat buffs **small** enough that earlier players do not become untouchable.
-- **Confirmed Q70:** Every legitimately earned XP/mastery increment is persisted without requiring extraction and **survives death, ordinary quit and world reset**. Center extraction awards **additional bonus XP equal to earned current-run XP**, so no player can lose already-earned progression on a failed escape, but also cannot earn the optional extra bonus without reaching the center.
+For illustrative, unapproved perk values only: base 100, +10% mastery and ×1.2 rebirth perk means **132 gathered resources**. A subsequent **Center Crater extraction doubles the legitimately carried material stacks to 264**. These are examples of **ordering**, not approved rebirth multiplier stats or item outputs. Count the actual harvesting *action* once even if subsequent extraction doubles the carried stack.
 
-### 33.5 Session incentives within long-lived public worlds
+**Open:** Exactly which modifiers count as additive or multiplicative, rounding, max multiplier, PvP armor/attack stacking and whether XP buffs affect milestone progression.
 
-Distinct ways to spend time in the same public world remain important for server retention and player interaction: farming a base, gathering ore, raiding, PvP fights, scouting or completing public events. **Permanent mastery advancement** is the preferred foundation. Optional session-only contracts, bonus objectives and server-specific cooperative challenges are Proposed, not confirmed and should not replace the permanent rewards.
+### 33.4 Persistence and playtest tests
 
-### 33.6 QA and balancing
+- Verify five and only five launch mastery tabs, each cap level 10 and buff per level; permanent cosmetic entitlements and lobby display.
+- Simulate death, world wipe, safe maintenance kick, protected extraction, rebirth and server change; unlocked mastery buffs/cosmetics survive all of them.
+- Test exact 1%-per-level resource yield increments where relevant, +10% illustrative level-10 bonus, plus independent additive/multiplicative perk categories and center 2× materials/XP.
+- Test crafting mastery supports all four benefit families at catalog-chosen milestones; PvP mastery includes both bounded combat and noncombat progression.
+- Prevent replayed milestones and repeated resource/kill/XP awards; no bonus XP may silently mint twice as many verified tree cuts, PvP kills or harvested crops.
 
-Test persistence across wipes, crashes, death, transfers and rebirth; milestone one-time awards; stacked center 2× rare materials with yield buffs; accidental duplicate mastery grants; caps across a 30-player world; PvP kill-trading; farming/crafting loops and progression for non-boss-oriented players without letting the rarest Permanent rewards bypass their high-end inputs.
 
 
 ## 34. Owner-approved answers 1–24 (2026-10-21)
@@ -1570,29 +1565,41 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 - **Technical gate:** Roblox-native game passes, subscriptions and paid private servers may have platform-specific purchase/ownership restrictions. Do **not** assume Coins/Gems can literally buy a platform-native Robux entitlement. Confirm the platform rules, and if necessary implement **game-managed equivalent access** bought with earned currency to meet the gameplay requirement. No claim of implementation has been made.
 - **Fairness question:** The owner allowed additional monetization beyond cosmetics. How combat-oriented perks or progression accelerators coexist with full PvP and rare contested gear must be decided; the free equivalent and bounded power are important balancing goals, not evidence that a specific paid item is approved.
 
-### 36.3 Rebirth tokens and perk shop — Confirmed concept, Open numerical rules
+### 36.3 Increasing-cost rebirths and permanent token perks — Confirmed Q81–89
 
-**Confirmed:** Rebirths exist as long-term progression and provide **tokens**, which can be **spent on perks**. They are separate from a skill tree (no skill trees). Precise perk choices, reset behavior and currency costs remain Open.
+**Confirmed Q81–82:** Each rebirth requires **both a general-player-level threshold and an endgame challenge**; rebirthing **resets general player level to 1**, while systems intended to persist **remain preserved**. The secure vault, owned Permanent gear, five mastery tracks/buffs, cosmetics and already purchased permanent rebirth perks remain safe. Exact treatment of unspent currencies and XP totals is Open; preserve them by default rather than deleting silently.
 
-**Proposed transaction and UI contract:**
-1. At a defined rebirth eligibility milestone, show an explicit preview of **what resets and what remains**, especially vault contents, levels, mastery buffs, currencies, gear and cosmetics.
-2. Request confirmation; validate all conditions and save one server-authoritative rebirth operation ID.
-3. Deduct/reset only specifically approved state and grant the configured number of **rebirth tokens exactly once**. Never reset the always-secure vault silently.
-4. The perk shop displays each token price, magnitude, perk cap, stacking logic and purchase confirmation. Token spending and ownership are persistent and server-validated.
-5. Perks may support long-term specialty optimization. **No automatic skill tree**; a selectable perk catalog or perk loadout is an appropriate direction.
-6. If any token/perk acceleration is monetized, the **same gameplay perk must remain obtainable by play-earned tokens/currency/resources** under the parity requirement.
+**Confirmed Q83–85:** Rebirth requirements/costs become **progressively harder and more expensive**. Later rebirths **may award more tokens**; whether this happens, thresholds and exact amounts remain Open. Do not invent a fixed maximum rebirth count.
 
-**High-priority Open questions:** How many levels or accomplishments are needed to rebirth, whether leveling restarts, what happens to earned masteries/Coins/Gems/gear after voluntary rebirth, tokens per rebirth, whether rebirths can repeat, token/perk caps, respec and token trading, whether perks affect resource yield/PvP and how mastery/perk bonuses stack with central 2× extraction.
+**Confirmed Q86–88:** Rebirth tokens are spent on **specific always-active, permanent perks**, not equippable limited perk slots or a branching skill tree. Candidate perk types include **XP boosts, rare-drop luck/chance, loot/drop quantity and increased walking speed through water**. Some perks may have multiple upgrade ranks; others only one purchase. Item categories, caps, token costs, ranks, rarity interactions and additive-versus-multiplicative type remain Open.
 
-### 36.4 Permanent mastery and rarity economy
+**Confirmed Q89:** Players can **buy a perk respec** via **Gems, Robux, or a redemption code**. Gems are earned through play, preserving earnable parity. Exact Gem/Robux prices, code grants, refunds and Roblox native product fulfillment are Open.
 
-- **General XP/level** is persistent, earns unlocks and helps gate rare crafting recipes.
-- **Crafting mastery** is a distinct specialization track, not a skill tree. Other tracks include farming, mining, hunting, raiding/PvP, building, harvesting, exploration and tribe support. Actual categories are flexible.
-- **Milestone perks are small and permanent**, potentially affecting resource yield, efficiency or other bounded specializations. Cosmetic milestone rewards also persist. Exact effects are still Open and require balancing across different experience levels.
-- **Stacking needs explicit tests:** Mastery yield buffs, rebirth perks and central 2× material/XP payout could compound. Center's bonus **does double even rare extracted materials**, and no older proposal may negate this rule.
-- **Rarest Permanent gear gate:** Farmers/builders alone cannot get the very top conversion rewards; top-end recipes depend on specific high-risk boss, rare ritual, contested PvP event or similarly approved scarce-source materials. Ordinary activity should still feel worthwhile.
-- **Trading loophole Open:** A player may trade existing Permanent gear under the previous confirmed rules. Should a farm-only player be able to acquire the very rarest item **through trade**, despite not personally completing high-risk requirements? Clarify before imposing unapproved equip/ownership restrictions.
-- **Rarity vs Permanence:** Common through Exclusive is rarity. Permanent is a separate conversion/ownership designation; Secret/Exclusive does not automatically mean Permanent, nontradeable or Robux-only.
+**Proposed server transaction model:**
+1. Validate the current level, completed endgame challenge and rising rebirth costs. Preview exact reset and retained state. **General level resets to 1; protected progress is retained**.
+2. Persist one unique rebirth operation, spend approved costs, increment count and award configured tokens exactly once. Do not create double grants on retry.
+3. Token purchase grants one permanently active perk (or next rank if allowed), logging source and modifier type. Effects remain permanently active except for explicit valid respec.
+4. Respec route (Gem purchase, validated Robux purchase receipt or valid code) grants **one respec entitlement**. The actual respec atomically changes eligible perk selection/token balances, and cannot refund more than legitimately spent.
+5. For every paid respec, an achievable **earned-Gem path** remains. No client-controlled token balance, perk stat or promo code acceptance.
+6. Treat rebirth-perk modifiers as explicitly **additive or multiplicative**, with milestone mastery modifiers and the center's 2× payout composed via catalog-defined rules.
+
+**Still Open:** Rebirth target levels/challenges, costs, number of tokens per rebirth and scaling, upper limit, Coin/Gem effect, precise XP history, perk catalog/ranks/caps, Gem/Robux respec price, code redemption and refunded token handling, and PvP balance limits.
+
+
+
+### 36.4 Five-track mastery and rarity economy
+
+- **Confirmed tracks (Q71):** **Mining, Woodcutting, Farming, Crafting and PvP only**.
+- **Confirmed Q72–75:** Milestone-based mastery progression, **maximum level 10**, **one buff at every level**, baseline **+1% per eligible mastery level** for resource yield. Exact resource type and level thresholds are Open.
+- **Confirmed Q76:** PvP mastery includes **both combat and noncombat** advantages, bounded for fairness. Exact magnitude Open.
+- **Confirmed Q77:** Crafting mastery supports **all** proposed benefit types: ingredient savings, larger craft outputs, faster craft speeds and recipe unlocks; exact distribution Open.
+- **Confirmed Q78:** Specific buffs/perks are **additive** and others **multiplicative**. Catalog must explicitly classify each; center portal still doubles carried materials and all run XP. It does not duplicate counted milestone actions.
+- **Confirmed Q79–80:** Mastery milestones can grant cosmetics, titles and similar collectibles. **Mastery titles/levels may display in the lobby**; exact visibility layout Open.
+- **Confirmed Q81–89:** Rebirth resets general level to **1** after a level requirement and challenge, with progressively harder costs; permanent perk token purchases, possible multirank perks, and **Gem/Robux/code** respec. Other saved protected systems remain preserved.
+- **Rarity:** Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive. Permanent remains a separate transferable gear property.
+- **Rarest Permanent equipment:** Cannot be earned solely via passive farming/building. Rare boss/ritual/contested material sources remain gatekeepers. Acquisition through direct trade and possible special permissions stays Open.
+
+
 
 ### 36.5 Primitive art, adjustable camera and guided tutorials
 
