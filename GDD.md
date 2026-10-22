@@ -965,7 +965,244 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 
 **Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Recipe prices and operational policies are hypotheses until explicit approval, simulation and testing.
 
-## 29. Design change log
+## 29. Ordinary departure, death and lootable bodies
+
+### 29.1 Confirmed risk and loss boundary
+
+**Only an active, successfully spawned play-world character has inventory risk.** This is the latest confirmed design clarification. Merely connecting to a play-world server, loading assets, arriving via teleport, viewing its pre-spawn main menu, or pressing a Play button that has not successfully admitted/spawned the character **must never cause loss**. See §31.
+
+When an actually active character dies or voluntarily/involuntarily leaves the play world **before protected extraction**, that character leaves a **lootable body in the same active public server**. The player loses their unsecured ordinary carried items; nearby players may loot the body. The body **and any unclaimed remaining loot despawn after exactly 10 minutes (600 seconds)** from body creation. A successful extraction animation, an authorized maintenance safe-kick, and the protected pre-spawn menu are explicit exceptions. A character is never converted into loot merely because the Roblox client teleported into a new place and is still loading.
+
+| Player location/state when leaving | Body created? | Are unsecured held items lost? | Safe storage outcome |
+| --- | --- | --- | --- |
+| Secure lobby/hub | No | **No** | Existing vault/transit inventory preserved |
+| Destination play-world server, pre-spawn loading or main menu | No | **No** | Reserved loadout retained in recoverable safe state |
+| Play clicked but server has not successfully admitted/spawned character | No | **No** | Play reservation rolled back or safely retried |
+| Active play-world character | **Yes**, 600-second corpse | **Yes**, regular carried gear/resources | No extraction or vault payout |
+| Active 120-second extraction hold | **Yes**, if player leaves/dies before animation | **Yes** | Cancel/no extraction |
+| Server-authorized protected extraction animation | No loot corpse for locked items | **No** | Locked extraction entitlement reconciles to vault |
+| Authorized administrator update safe-kick | No loot corpse | **No** | Held inventory preserved in maintenance-recovery escrow |
+| Platform failure terminating the entire server | Cannot maintain body after the instance ends | No automatic extraction | **Open:** explicitly designed crash recovery (not normal leave) |
+
+**Permanent item exception:** Rare converted gear's death/manifestation policy remains a Working default (§17); the ordinary loot/body system must not mint a lootable tradeable copy of any bound item.
+
+### 29.2 Body creation and looting — Confirmed behavior / Proposed implementation
+
+1. Upon active character death or ordinary departure, freeze the inventory transfer and create **one** server-owned corpse/container with an immutable corpse ID, player/run ID, creation time and expiration time exactly **600 seconds later**.
+2. Place only eligible *unsecured* inventory into that corpse, once. Vault items, protected extraction snapshots, Forge reservations and Permanent armory canonical records are not valid corpse inputs.
+3. Other active characters may interact/pick up individual stacks and gear if server proximity and capacity requirements are met. For unique gear, one item instance can have only one owner/location.
+4. Loot remaining in the body at expiration is deleted from the active world, not returned to the disconnected player. Items successfully claimed before expiration remain with the looter, still unsecured until **their own extraction**.
+5. Expiration is server-authoritative and starts from body creation, not first discovery or first looting. The visual model must not remain as a separate loot source after its container is destroyed.
+6. **Proposed:** Show a readable world body and loot prompt, supported on mobile/controller, with a short decay/despawn indicator while interacting. Do not broadcast every death globally.
+7. On double death/disconnect callbacks or rejoin, idempotency keeps exactly one corpse/drop transfer. Client never specifies corpse contents or expiration.
+
+**Open:** Death animation/model, physics collision, whether gear equipped by the fallen player shows visually on the corpse, loot reservation rights and whether stacks dropped separately from the corpse. None may invalidate the confirmed 10-minute body TTL.
+
+### 29.3 Disconnect semantics
+
+- Ordinary network loss, rage quit or closing Roblox **after entering ACTIVE gameplay** is a forfeiture, even if no attacker is nearby.
+- The game must **not** infer Active from place ID alone. Pre-spawn main menu users remain safe despite physically occupying a play-world server (§31).
+- If a player leaves after the protected extraction animation started, the protection outcome wins regardless of whether they see the final vault-receipt screen.
+- Safe administrator maintenance removal is authorized by the server, not by a client flag or mere kick reason string.
+- A duplicated character session must not generate repeated bodies or recall items that others already looted.
+- **Proposed:** On rejoin after active forfeiture, present a concise run-result summary: ordinary carried items were left on the corpse, with no automatic free restoration.
+
+## 30. Administrator update kicks and maintenance-safe preservation
+
+### 30.1 Confirmed product requirement
+
+Administrators need commands to remove players **without losing their items when updating the game**. This is a privileged exception to ordinary active-world departure, not an extraction or a free return to vault. It must also work if a player is in the extraction hold. A player in the protected pre-spawn menu is already loss-free and requires no special inventory-forfeiture bypass.
+
+### 30.2 Proposed safe-removal protocol
+
+1. Authenticated, permissioned administrator issues a deliberate **maintenance-safe kick** or update shutdown through server-only administration tooling. An ordinary kick must not accidentally acquire safe privileges.
+2. Freeze the affected player's active inventory and turn off new loot pickup, transfers, crafting, drop and portal commit until the preservation outcome is resolved.
+3. Record the **exact ordinary gear/material/consumable snapshot** under a unique maintenance-recovery operation ID. This is **unsecured preserved carryover**, not a successful extraction. Do not apply portal bonuses or make it usable for the protected Forge while in recovery.
+4. Persist the snapshot in an access-controlled, retry-safe recovery state and prevent the same world inventory from also becoming a corpse.
+5. Only after recovery entitlement is established, perform the safe kick/server restart; if persistent storage fails, do not falsely promise safe removal. Retry/defer shutdown as supported and surface the operational error.
+6. At the player's next safe lobby/pre-spawn admission, explain why the prior equipment was preserved; provide a protected path to resume the equipment as active at **the next explicit Play**. Exact restoration destination is **Open** (recommended: next expedition loadout, not permanent vault).
+7. Each maintenance operation can be consumed/resumed once. New active server session IDs and item IDs prevent concurrent duplicated restorations; audited administrators cannot silently create a second equipment set.
+8. **If a valid extraction animation already started first**, honor extraction snapshot ownership rather than also granting a maintenance escrow copy.
+
+### 30.3 Permission, grief and abuse safeguards
+
+- Authorize commands using server-held administrator IDs/roles and restricted command dispatch; never trust client-provided permission tags or arbitrary RemoteEvent requests.
+- **Proposed:** Two distinct commands/actions: ordinary moderation kick, and audited **safe-update kick**. Only the latter preserves active inventory. Exact admin UX and whether normal moderation kicks forfeit gear are **Open**.
+- Update shutdown should safely process all active player snapshots; pre-spawn menu players never had risky inventory so retain their reserved loadouts without world body creation.
+- Record initiator, timestamp, update version, server job/run ID, affected sessions, escrow operation IDs and success/error status.
+- Never allow players to spoof a maintenance kick with a client disconnect, intentionally triggering a crash, or asking a player-owned NPC to end the session.
+- A platform outage is **not** implicitly a safe-update kick and cannot be treated as confirmed preservation without separately implemented crash recovery rules.
+
+## 31. Protected play-world main menu and teleport-safety design
+
+### 31.1 Confirmed user journey and safety invariant
+
+**The play-world server itself has a main menu.** Every arrival enters a **non-risk, pre-spawn staging state**, including first deployment, rejoin, returning from another place, and teleport retries. The server does not spawn a vulnerable player avatar merely because Roblox reports that the player joined. The player sees the menu while profile, loadout, scripts, UI and required world assets load.
+
+**Only when the player explicitly clicks Play, server readiness checks pass, and the character successfully spawns into gameplay is their inventory put at risk.** If anything fails before that authoritative activation — network timeout, kick, game closure, loading error, teleport failure, death-like automatic spawn failure, Roblox server rejection — **nothing can be looted or forfeited**. The admission state, not the physical server/place, defines risk. There is no "free death" on a loading screen.
+
+**Recommended engineering order:** Delay automatic character loading (for example, use server-controlled character spawning); do not create a vulnerable character while the loading menu is displayed. If the engine or character customizer requires a preview avatar, keep it isolated/invulnerable and **outside the actual run inventory system**. Begin risk only when a real play avatar is validated and activated.
+
+### 31.2 Server-authoritative player-session states
+
+| State | Can player take combat damage? | Can leave safely? | Has lootable body? | Exit/next transition |
+| --- | --- | --- | --- | --- |
+| **LobbySafe** | No | Yes | No | TeleportPending or stay |
+| **TeleportPending** (source lobby, in-flight) | No | Yes | No | StagingLoading, or safe return/retry on failure |
+| **StagingLoading** (inside world server) | No | Yes | No | WorldMainMenuReady; failure stays safe |
+| **WorldMainMenuReady** | No | Yes | No | PlayRequested only via Play button |
+| **PlayRequested / SpawnPreparing** | No | Yes | No | ActiveRun after server-confirmed successful spawn, or safe revert |
+| **ActiveRun** | Yes | **No**, normal leave drops loot | Yes on death/ordinary departure | ExtractionHolding, death/body, or authorized maintenance |
+| **ExtractionHolding** | Yes | No, normal leave drops loot | Yes on death/ordinary departure | ActiveRun on cancel, or ExtractionProtected |
+| **ExtractionProtected** (animation has begun) | **No, invulnerable** | **Yes** | No for locked loot | Persistent receipt reconciliation / LobbySafe |
+| **MaintenancePreserved** | No | Yes | No | Recoverable safe staging / explicit future Play |
+| **Dead / BodyLootable** | Not a living player | N/A | Yes, exactly 600-second expiration | Return to safe menu/lobby as applicable |
+
+**Nonnegotiable boundary:** Being inside a play-world Roblox place is not synonymous with **ActiveRun**. All death-drop, logout penalty, body-spawn and loot-loss actions must check authoritative ActiveRun/ExtractionHolding state and **must not execute** for loading, menu, failed admission, protected extraction or maintenance-preserved states.
+
+### 31.3 Main-menu loading, Play enablement and spawn protocol — Proposed
+
+1. Player joins the play-world server. Assign new session ID and set **StagingLoading** before any avatar can participate in combat. Disable normal spawns/physics-based world interactions.
+2. Load/verify account profile and secure loadout reservation, pending protected extraction receipts and maintenance carryover escrow. Lock profile against conflicting writes across simultaneous servers.
+3. Load required server-side world rules and the essential client interface/assets. Client may report its loading progress, but **server** must verify profile ownership, world readiness and final admission constraints. Never treat an untrusted "loaded=true" remote as the sole proof.
+4. Show menu with progress, connection status, Play button and clear text: **"You are safe until you enter the world."** While loading, Play is unavailable. A failed load offers retry/return; no item consumption or corpse.
+5. Once ready, enter **WorldMainMenuReady**. The character has **not** spawned into lethal gameplay. Allow menu exit or disconnection with no penalty.
+6. When player clicks **Play**, server validates ready state, intended loadout, one active session and valid available spawn. Repeated button clicks must be idempotent and must not spawn multiple characters.
+7. Prepare/spawn real character in a valid starting area **without exposing it to damage while incomplete**; only after initialization succeeds commit the **ActiveRun** state and release protection. **That successful admission is the inventory-risk threshold.**
+8. If profile/character/spawn placement/teleport handoff fails, revert to safe pre-spawn state with all reserved ordinary gear intact and zero corpse. Do not debit consumables, apply item wear or count deaths.
+9. On active death/ordinary leave, use §29's corpse rules; on valid extraction animation, use §9/§22's protected receipt rules; on authorized maintenance, use §30's preservation rules.
+
+### 31.4 Loadout and inventory escrow during teleport — Proposed
+
+- Before a lobby-to-world teleport, keep ordinary selected gear in the safe source profile or create **one** atomic/resumable transit reservation. The source never drops it just because a teleport was requested.
+- The destination must validate transfer/session identity and stage the chosen loadout while **not yet at risk**. A player leaving the destination main menu, erroring before Play, or failing an asset load recovers the selected gear exactly once, not duplicated into both destinations.
+- Withdrawn ordinary gear becomes **at risk only after ActiveRun successfully begins**. The word **Withdraw** in UI cannot override this server admission contract.
+- Inventory risk must not start at Play button press if the actual spawn/initialization never succeeds; preserve the user's intended "click Play to enter" experience with an atomic server acknowledgement.
+- Once ActiveRun was legitimately entered, a later unauthorized voluntary teleport or client exit must **not** bypass the normal death/body rule. The safe lobby-to-world handoff exemption is for *pre-run* staging, not an active combat escape hatch.
+- Pending Forge or extraction operations use their original durable receipt rules; do not let fast retries mint a second copy of consumables or bound gear.
+
+### 31.5 Failure/edge-case matrix
+
+| Failure or action | Required outcome |
+| --- | --- |
+| Teleport fails from lobby before world arrival | Player remains safe; selected gear still owned; no body |
+| Roblox client closes during teleport | Safe transit can reconcile on next join; no loss |
+| Client closes while pre-spawn menu is loading | No death, loot, corpse or inventory loss |
+| Client closes with main menu open | Same loss-free result |
+| World server kicks player before Play | Safe reserved inventory; no body, even if auto-character callback fires |
+| Profile DataStore timeout before Play | Remain safely loading/retry; Play unavailable |
+| Duplicate Play requests | Exactly one successful spawn/admission; no duplicated equipment |
+| Character cannot spawn or is destroyed before successful admission | Return safely to menu; zero combat death/loot drop |
+| Server admits player and they enter active gameplay | Risk starts, with explicit gameplay HUD/transition |
+| Player deliberately quits after becoming ActiveRun | One lootable body; 600-second unclaimed loot expiry |
+| Player quits with 15 seconds left on extraction hold | Ordinary body; no extraction |
+| Player closes client one frame after protected animation begins | Safe; locked loot reconciles to vault |
+| Update admin safe-kicks an ActiveRun player | Preserve held gear in maintenance escrow; no body or free extract |
+| Entire Roblox instance crashes | Must define crash recovery separately; no fake corpse timer in destroyed server |
+
+### 31.6 UX and accessibility rules
+
+- World main menu contains the game identity, **Play**, loading/connection status and optional tutorial/help/settings. Show risk explanation only as Play is enabled; do not force players to defend a loading screen.
+- The Play button must not accept input until critical loading completes; on invalid or duplicate press, keep a clear status rather than silently putting player into combat.
+- Transition animation must communicate **"Entering world — items are now at risk"** only when server confirms actual active spawn.
+- Once in active play, pause/menu UI is **not safe** by itself; opening a settings menu does not suspend risk.
+- Extraction explicitly changes from **"120-second danger"** to **"Protected: extracting"** at the server-authorized animation. Safe lobby/menu players cannot use the extraction-activation path without an active avatar.
+- For touch/controller, ensure accessible menu focus, large enough Play activation, visible loading failures and easy retry controls.
+
+### 31.7 Acceptance tests (P0)
+
+- Join into world 100+ times with delayed assets/profile; cannot spawn vulnerable or drop equipment before confirmed Play admission.
+- Simulate Roblox teleport failure, disabled network, character-loading failure, profile timeout and a kick from menu: each leaves identical safe inventory and no corpse.
+- Inject double Play and remote spoofing; one authoritative ActiveRun only.
+- Under lag, attempt to kill a pending character before admission: no valid CombatService damage; no loot/body.
+- Verify admission state transitions atomically with inventory transfer and player-session lease; crashing between stages cannot lose or duplicate gear.
+- Verify intentional active quit still creates a corpse, despite the world having a main menu feature.
+- Validate protected extraction/mid-animation disconnect and maintenance update overrides as separate states, not global safe logout.
+- Test resume/return after lobby, world, mobile and console teleport failures; no loss and accessible error presentation.
+
+## 32. Expanded public-world content and Booga Booga-style construction
+
+### 32.1 Confirmed content directions
+
+Beyond the original Abyssal Meteor, 60-second Ancient Cache and Alpha Mob events, the event director supports **rare creatures, additional boss spawns, rare shrubs, rare trees, exceptional ore/material deposits, raidable structures, and meteors**. The central Guardian remains the flagship event and still follows its 15–20-minute warning/cycle/phase concept.
+
+| Event family | Example encounter (Proposed) | Typical participants | Candidate material purpose |
+| --- | --- | --- | --- |
+| Rare flora | Glowbark tree, Moonleaf shrub | Farmers, scouts, small skirmish groups | Medicine, high-tier bow wood, dyes |
+| Rare mineral node | Stormstone deposit, Jade vein | Miners, escorts, opportunistic raiders | Forging, elemental infusions |
+| Rare hostile fauna | Emberstag, Ancient Boar | Hunters, small groups, ambushers | Unique hide, gland or catalyst |
+| Regional boss | Crystal Golem variation, forest ancient | PvPvE groups and solo opportunists | Specialized rare gear and high-tier reagents |
+| Raidable event structure | Ruined shrine, tribal supply fort | Siege specialists, raiders, defending tribes | Breach supplies, crafted gear, special materials |
+| Meteor variety | Abyssal, ember and jade meteors | Miners, PvPers, convoy escorts | Rare ores and reinforcement |
+| Existing Ancient Cache | Timed guarded cache (60 uninterrupted seconds) | Defenders, raiders, third parties | Ready-made gear and raid explosives |
+
+**Presentation hierarchy — Proposed:** Not all rare herbs should broadcast island-wide; retain full-screen announcement, minimap marker and tall sky beacon for large contested events. Use subtler regional hints, glows/sounds or environmental clues for minor rare-resource spawns. Balance frequency so players are not constantly redirected away from their chosen playstyle.
+
+### 32.2 Booga Booga-inspired building behavior — Confirmed direction / Proposed details
+
+**Confirmed:** Building should be approachable like Booga Booga and bases must remain raidable. This does not mandate copying another game's assets or code. **Proposed:** Use a simple handheld building tool and selectable piece palette (foundation/floor, wall, doorway/door, roof, storage, primitive workbench, optional traps). Placement creates a transparent preview, rotates/snaps and consumes harvested resources only on validated confirmation.
+
+- **Basic construction:** Small wood/thatch structures use common materials; reinforced stone/metal variants use higher tier and contestable material costs.
+- **Player onboarding:** Build a shelter in a few interactions, use simple snapping and repair UI; avoid complicated structural-engineering prerequisite systems.
+- **Utility:** Beds/respawn claims, farms, planters and crafting stations are proposed; their impacts on extraction/corpse risks are Open. No protected structure can act as a vault.
+- **Ownership:** Tribe permissions and raid access should be server validated; attackers can dismantle/breach destructible doors/walls to reach ordinary raidable storage.
+- **Raiding:** Primitive explosives from caches, fire pots and melee siege instruments can damage valid structures at meaningful cost. All claimed loot remains at risk until extracted.
+- **Placement restrictions:** Enforce the confirmed **50-meter extraction no-build aura**, plus boss protected interaction spaces; guard against large pieces overlapping aura boundaries.
+- **Event structures:** NPC/event-generated raidable outposts are not player-owned Permanent vaults. Use separate spawn caps, encounter IDs, loot rights and despawn rules.
+- **Performance:** Cap player pieces per zone/tribe and placeable interactive objects; avoid physics-heavy collapses that overload mobile devices and full public servers.
+
+**Open:** Whether player bases persist across all server restarts, whether forests/farms regenerate while owners are offline, upkeep/decay, offline raiding fairness, claim limits, raid alert range, safe storage capacity and structure despawn rules.
+
+## 33. Public-world playstyle rewards and engagement design
+
+### 33.1 Confirmed intent
+
+Remaining active in a shared **public world** should be useful even without continuously pursuing the Guardian or PvP. The system should recognize materially different contributions: **PvPers**, **base-builders**, **farmers/gatherers**, hunters and explorers. Rewards should create fresh reasons to stay in a populated world, engage in the local ecology, form rivalries and extract meaningful resources, without making idle time a dominant strategy.
+
+**Clarification:** Confirmed is the goal of rewards/benefits for sustained public-world participation, **not** passive cash paid per minute, guaranteed safe item drops, free vaulting or unlimited combat stat buffs. The proposed reward ideas below require tuning and owner approval.
+
+### 33.2 Candidate playstyle loops — Proposed
+
+| Identity | Meaningful in-world contribution | Example optional benefit | Exploit guardrail |
+| --- | --- | --- | --- |
+| **Farmer / herbalist** | Tend and harvest farm plots, locate rare shrubs and trees, transport supplies | Herbal medicine recipes, farming-oriented crafting proficiency or resource yield insight | Cap repeated identical plots; verify genuine growth and harvest intervals |
+| **Builder / engineer** | Construct, repair, reinforce and defend raidable FOBs | Alternate structure skins, repair efficiency or construction recipe progress | Prevent rapid place/destroy loops and worthless-structure spam |
+| **PvPer / raider** | Win meaningful hostile encounters, contest high-value objectives and loot enemy supplies | Cosmetic titles, tracked rivalries, raiding recipe discoveries | No rewards for alt kills, same-player kill trading or spawn farming |
+| **Hunter / boss challenger** | Track fauna, fight alphas and contest rare regional bosses | Hunting trophies, tracker utility, alpha-reagent craft unlocks | Server contribution checks; avoid merely tagging bosses |
+| **Explorer / scout** | Discover rare event spawn areas, new routes and extraction runes | Cartography discoveries, regional knowledge and exploration cosmetics | One-time/progression caps per genuine discovery |
+| **Tribe supporter** | Supply shared fortification and field expeditions | Tribe contribution records, cooperative craft objectives | Avoid permanent exclusive buffs for the largest tribes |
+
+### 33.3 Public-session progression proposal
+
+1. Track verified **active contribution** within one public server: unique harvests, completed gathering interactions, distinct building/repair tasks, legitimate hostile combat, boss assists and exploratory milestones.
+2. Award modest short-session milestones, achievements, recipe progress or discretionary **in-world** opportunities based on actual activity rather than time alone.
+3. If retention benefits exist, use a **session-engagement track** with varied objectives and transparent thresholds; no safety or loot guarantee merely for being present.
+4. Preserve competitive stakes: earned resources obtained in a public world remain **unsecured until successful extraction**, unless the benefit is an explicitly defined account-level knowledge/cosmetic unlock. No silent autopayout to vault.
+5. Allow players to pursue different tasks toward progression; farmers/builders should not have to win constant PvP, and PvPers should not be forced into excessive harvest grinding.
+6. Cap advantages by progression band and solo/tribe size; don't grant permanent stat boosts that only large organized tribes can stack indefinitely.
+7. Prevent AFK exploitation with actual action/contribution validation, distinct task caps, cooldowns and anti-collusion checks (not solely movement spam or time online).
+8. Visualize personal progress unobtrusively, without distracting players during combat or extraction.
+
+### 33.4 Economy and integrity constraints
+
+- Never grant Permanent gear merely for idling a specified time in a public world. Expensive Secure Forge conversion continues to require actual extracted rare materials and eligible gear.
+- An ordinary logout outside the lobby **still drops the body**; account progress/cosmetic unlocks must not falsely make carried loot safe.
+- Rewards earned while inside protected pre-spawn menu/loading **do not count as active public-world play**.
+- When an extraction hold completes, protected animation begins; stop earning live-world combat/gathering rewards for that session.
+- Proposed builder/farmer benefits must not enable invulnerable farming enclosures or permanent structures around protected portals.
+- PvP rewards should value real combat/contested outcomes, not repetitive farming of a cooperative alternate account.
+- Telemetry should compare retention, solo success, conflict rates and material supply across playstyles before any direct resource multiplier is locked.
+
+### 33.5 First implementation and QA gates
+
+- Build and instrument **one** meaningful active-world contribution path for farming, building and PvP in a prototype, without substantial permanent numerical rewards.
+- Evaluate whether players actually remain engaged within public worlds while extraction remains the primary safe banking mechanism.
+- Test idle player, automated gather loop, place/remove spam, same-tribe kill trading, repeated alt defeats and server-hopping; none should infinitely print account rewards.
+- Ensure pre-spawn menu waiting, loading delay, teleport retry and safe maintenance downtime do not count as active-game time.
+- Track metrics by playstyle, gear tier and group size; maintain viable solo-player paths.
+- Owner approval is required for exact award types, reward cadence, session persistence, and whether any benefits reset per server.
+
+## 34. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
