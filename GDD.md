@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.3  
+> **Design revision:** 0.4  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -18,7 +18,9 @@
 
 **New confirmed direction (2026-10-21):** Resources carried safely through an extraction can fund special crafting outside an island run. Some eligible extracted items can be transformed into an expensive **Permanent** item type using hard-to-get ingredients. The transformation capability is Confirmed; exact death, transfer, recovery, slot, durability and trading rules are Open. All numerical costs below are illustrative hypotheses.
 
-**Confirmed combat clarification (2026-10-21):** No player-usable shields, shield-based recipes, shield equip slots or guard-blocking mechanics. Combat sustain is based on healing items. The Guardian's **Phase I: The Shield** (energy pillars and invulnerability) is unchanged.
+**Confirmed combat clarification (2026-10-21):** No player-usable shields, shield recipes or guard-blocking mechanics. Healing items provide active recovery. The Guardian's Phase I shield pillars are unchanged.
+
+**Confirmed public-world/extraction decisions (2026-10-21):** Normal leave outside lobby creates an in-world body, forfeits carried ordinary items, and despawns after 10 minutes; privileged admin update kick preserves items. Extraction emits audio/visual cues, takes 120 seconds within the required area, and grants invulnerability and disconnect safety once the animation begins. More events (rare flora, materials, mobs, bosses, raidable structures, meteors), Booga Booga-style building and sustained public-world playstyle rewards are intended. See §29–33.
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
@@ -42,11 +44,11 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 1.1 Design pillars — Confirmed
 
 1. **Risk is voluntary but meaningful.** Safer outer routes provide a viable exit; deeper objectives pay more and attract other players.
-2. **Ordinary carried loot is at stake.** On death, the character drops ordinary gear and harvested items; only successfully extracted contents **while still in the vault** are protected. The proposed Permanent equipment class is a deliberately rare, expensive exception to ordinary carried-gear loss, whose death semantics remain unapproved (§15–17).
+2. **Ordinary loot is at risk.** On death or ordinary departure outside the lobby, a lootable body remains in the server for **10 minutes**, with any unclaimed items despawning at expiry. The player loses carried ordinary loot. The protected extraction animation and authorized game-update kicks are exceptions (§29–30); Permanent gear recovery is still Open (§15–17).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
-4. **The world creates PvPvE conflicts.** Announced resource crashes, caches, elite creatures, and a recurring central boss drive player movement.
+4. **The world creates diverse PvPvE opportunities.** Meteors, rare shrubs/trees and material nodes, raidable structures, unusual mob and boss spawns, caches and the Guardian move players across the island.
 5. **Primitive fantasy, not military extraction.** No firearms or player-usable shields at any tier. Magic supplements primitive weapons and consumable healing.
-6. **Multiple paths to value.** Hunting, harvesting, ambushing, participating in events, and raiding undefended bases must all remain legitimate options.
+6. **Multiple paths to value.** Hunting, farming, building, ambushing, events and base raiding are all legitimate playstyles. Engaged players who remain in the public world can earn activity-based benefits without promoting AFK waiting.
 
 ### 1.2 Design guardrails — Proposed
 
@@ -67,13 +69,16 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 5. **Carry the prize:** Valuable items physically occupy the player's carried inventory; rare/event loot exposes a visual trail.
 6. **Extract:** Reach a rune or portal and complete extraction to transfer eligible carried rewards to an unraidable persistent vault.
 7. **Build long-term power:** Spend extracted ingredients on special recipes or save for costly Permanent conversions (confirmed mechanic; specific recipes proposed).
-8. **Repeat:** Redeploy with ordinary at-risk gear and any allowed bound items, following the still-open deployment rules.
+8. **Continue or extract:** Remain in a public world to pursue farming/building/PvP, or complete a telegraphed **120-second in-area extraction hold** to enter the protected animation. Simply leaving the world forfeits ordinary carried gear.
 
 ### 2.2 Loss and persistence contract
 
 | Domain | Established behavior | Design status |
 | --- | --- | --- |
-| On-person inventory | Drops on death and can be claimed by others | **Confirmed** |
+| On-person inventory | Drops on death or ordinary non-lobby departure with lootable **10-minute body** | **Confirmed** |
+| Lobby departure | Can safely leave from the lobby | **Confirmed** |
+| Protected extraction | Requires **120 seconds inside designated area** and audio/visual cues; animation then grants invulnerability and disconnect safety | **Confirmed** |
+| Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
 | Successfully extracted loot | Secure in a permanent, unraidable out-of-game vault | **Confirmed** |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
 | Converted Permanent equipment | Conversion is available; death, recovery and deployment rules are not yet finalized | **Confirmed capability / Open mechanics** |
@@ -81,9 +86,10 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Gear withdrawn from vault for deployment | Exact redeployment and loss rules | **Open** |
 | Player progress (recipes, cosmetics, reputation, etc.) | Whether and what persists | **Open** |
 | Bases across sessions/server shutdowns | Session-only, timed-wipe, or persistent-world model | **Open** |
-| Disconnects during combat/extraction | Anti-combat-log and reconnection policy | **Open** |
+| Public world playstyles | Benefits for engaged PvPers, base-builders, farmers and other active playstyles | **Confirmed direction**; specific rewards Proposed |
+| Disconnects during combat/extraction | Ordinary non-lobby disconnect leaves a lootable body; once protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
 
-**Working default:** Ordinary vaulted items become droppable if withdrawn for a live run. Separately, some converted **Permanent** items may retain account ownership after death under a bound-gear recovery model (see §15–21). This does not protect newly gathered materials or ordinary carried items. A fair reconnect/combat-log policy is still required.
+**Working default:** Ordinary vaulted items become unsecured after deployment. Converted Permanent equipment may retain ownership subject to still-open rules. **Confirmed:** A normal non-lobby departure creates a lootable 10-minute body, not a safe logout. Animation-start protection and authorized update kicks are exceptions, and must be implemented without duplication (§29–30).
 
 ## 3. World — The Shattered Crater
 
@@ -213,7 +219,7 @@ Tribe size cap, friendly fire, invitations, permissions, loot rights, tribe base
 
 ## 6. Building, FOBs, and raiding
 
-**Confirmed:** Players can create modular Rust-like structures, from wooden beach huts to fortified stone towers. Bases hold loot and can be raided. An undefended FOB is a legitimate target while its owners chase events.
+**Confirmed:** Building is approachable and **Booga Booga-like**, using primitive placeable structures, modular foundations/walls, crafting benches and storage. Bases remain raidable, from small beach shelters to stone strongholds. Precise placement and upgrade proposals appear in §32.
 
 ### 6.1 Building loop — Proposed
 
@@ -228,7 +234,7 @@ Tribe size cap, friendly fire, invitations, permissions, loot rights, tribe base
 - **Confirmed:** No building within **50 meters** of any extraction portal/rune.
 - **Confirmed:** Mega-Boss area attacks can splinter nearby builds; do not permit wall-cheese against boss mechanics.
 - **Proposed:** Additional build exclusion at spawn areas, boss interaction objectives, and event interactables to prevent trapping.
-- **Proposed:** Access controls for tribe-owned doors/storage, plus bounded structure counts and physics complexity.
+- **Proposed:** Access controls for tribe-owned doors/storage, bounded structures/physics, rapid mobile-friendly placement, rotation/snap/repair and no-build protection around contested objectives.
 - **Proposed:** Breaching should cost resources and signal attackers; structural tiers should improve defense without making raids mathematically impossible.
 - **Open:** Structural decay/upkeep, base ownership after logout, server wipes, door locks, and whether a fully offline base can be raided.
 
@@ -297,6 +303,9 @@ Boss identity, scaling with player count, target priority, contribution rewards,
 ### 9.1 Confirmed extraction contract
 
 - Players must **physically transport carried loot** to extraction runes/portals.
+- Activating an extraction rune starts an **exact 2-minute / 120-second countdown** while the player remains in the specified extraction area. The attempt sends **audible and visual cues** to other players so it can be contested.
+- The player is vulnerable during the countdown. **Once the extraction animation begins**, the player is invulnerable, safe from loot theft and safe to disconnect, even if the animation is not finished.
+- Leaving before the protected animation (without an authorized maintenance exemption) counts as an ordinary non-lobby departure, leaving a lootable body for 10 minutes.
 - Extraction transfers eligible items into a **persistent, unraidable vault** outside the live island run.
 - Outer hidden Minor Extraction Runes offer a lower-risk escape with **modest value multipliers**.
 - The Center Crater's main Permanent Extraction Portal offers the **highest value multiplier**.
@@ -304,15 +313,18 @@ Boss identity, scaling with player count, target priority, contribution rewards,
 - All extraction sites have **50-meter no-build auras**.
 - Carriers of event-exclusive resources/legendary boss gear reveal themselves through embers, shadow trails or similar visible particles (**Burden of Wealth**).
 
-### 9.2 Proposed extraction interaction
+### 9.2 Confirmed timing and proposed server implementation
 
-1. Enter a clearly marked activation zone with carried items.
-2. Start a visible, interruptible channel (duration **TBD**).
-3. Defend or evade while nearby players can detect/contest the attempt (notification scope **TBD**).
-4. After server validation, atomically remove the successfully extracted items from the run and commit them to secure vault storage.
-5. Display a receipt/summary and return to the lobby or redeployment flow (destination **TBD**).
+1. Player activates portal while alive and in the designated area; server validates the attempt and broadcasts **audio/visual extraction cues**.
+2. Server starts a **120-second** countdown; player must remain in the specified area throughout. Normal PvP and damage remain possible. Whether taking damage alone interrupts the countdown is **Open**.
+3. If the player leaves the area or dies before completion, the attempt fails. **Proposed:** leaving the boundary cancels and requires full restart (rather than pausing). Ordinary departure during this stage creates a lootable body.
+4. After 120 valid seconds, server authorizes **ExtractionAnimationStarted**, locks the exact carried-item snapshot, and grants **invulnerability and safe disconnect immediately upon animation start**. Other players can no longer loot that snapshot.
+5. Server establishes a recoverable extraction receipt/entitlement as part of the protected transition; vault persistence may finish after animation or player disconnect, but the locked loot must never be forfeited or duplicated.
+6. After verified commit, show the secure-vault receipt and return to protected lobby. A pending backend write must be shown as pending, not falsely settled.
 
-**Proposed anti-camping protections:** Multiple minor exits, sightline design, disclosed activation windows, temporary portal downtime/rotation if required by testing. Do **not** make every portal permanently safe; risk is the point.
+**Critical boundary:** Protection begins when the **server-authorized animation** begins, not when the animation ends. A client-only visual effect cannot mint items or assert protected state.
+
+**Proposed anti-camping protections:** Multiple minor extraction locations and readable approach paths; **the 120-second hold stays risky** and the post-hold animation is invulnerable. The marked hold area needs clear world geometry/UI.
 
 ### 9.3 Value multiplier guardrail — Proposed
 
@@ -320,11 +332,11 @@ Multipliers should apply to **valuation/payout**, not produce copies of unique l
 
 ### 9.4 Vault/transaction guardrail — Proposed
 
-Treat extract, death, disconnect, and item pickup as competing server-authoritative state transitions. Give item instances unique IDs; use idempotent persistence/receipt processing and a transaction model that prevents either disappearing items or duplicate permanent inventory. A client UI animation must never be proof of successful extraction.
+Treat extraction hold, protected animation, death, ordinary leave, maintenance kick and item pickup as competing **server-authoritative** transitions. Lock exact item IDs at animation start and create a recoverable receipt before allowing safe disconnect. The server decides the protected animation state; a client-side animation alone is not proof of successful extraction.
 
 ### 9.5 Extraction decisions — Open
 
-Channel duration and interrupt rules, portal reveal/rotation, exact valuation formula, party extraction and distribution, partial vs full backpack extraction, vault capacity/organization, lobby experience, reconnect behavior, and whether the central portal is usable while the boss is alive. **Confirmed:** Extracted materials fuel special crafts and Permanent conversion, as developed in §15–28.
+**Confirmed:** 120-second stay-in-zone hold, audio/visual warning to other players, animation-start invulnerability/disconnect safety, 10-minute loot bodies on ordinary departure, maintenance kicks preserving holdings, and extracted materials for special crafts. **Open:** Exact area geometry, exit reset mechanics, damage interruption, alert range, simultaneous attempts, portal availability, value multipliers, party rules, lobby return and crash recovery.
 
 ## 10. Economy, stakes and balancing
 
@@ -332,7 +344,7 @@ Channel duration and interrupt rules, portal reveal/rotation, exact valuation fo
 
 | Location | Risk profile | Meaning |
 | --- | --- | --- |
-| **Carried inventory** | Highest | Active stakes; dropped on death |
+| **Carried inventory** | Highest until protected extraction | Death or ordinary non-lobby departure leaves lootable body for 10 minutes; animation-start locks items against loss |
 | **In-world base stash** | Raid risk | Can stage larger expeditions but opponents can breach and steal |
 | **Persistent vault** | Secure | Only confirmed safe store for successful extraction |
 
@@ -361,7 +373,7 @@ First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extra
 - **Crafting/building:** Recipe requirements, snap previews, construction restrictions and durability.
 - **Event UI:** Clear announcement, direction/search radius, beacon color and event time state.
 - **Boss UI:** Three-phase status, 3-minute warning, pillar progress and readable 25% phase transition.
-- **Extraction UI:** Site name, projected bonus, channel status, interrupt warning and final verified receipt.
+- **Extraction UI:** Site name, projected bonus, **120-second hold timer and boundary**, audible/visual alert to nearby rivals, vulnerability during hold, explicit animation-start protection and verified receipt.
 - **Death UI:** Clear loss summary plus next-run action.
 
 Make major cues redundant across color, icon, words and sound. Provide comfortable interactions on Roblox mobile, desktop and controller; avoid interactions that require precise cursor control.
@@ -386,8 +398,10 @@ This section records intent so later Luau/Rojo architecture serves the game rule
 2. No player-built structure can exist within an extraction no-build zone.
 3. An item cannot simultaneously exist as world loot, carried inventory, vault inventory, Forge-reserved input and account-owned Permanent equipment. A deployed bound manifestation references one canonical record; it is never a second tradable item.
 4. Extraction **and Permanent conversion** have explicit persisted success/failure states; retries cannot duplicate items or double-charge ingredients.
-5. Boss Legendary release at 25% occurs at most once per encounter.
-6. Only `main` may trigger production publishing workflows; development branches never publish.
+5. A valid **120-second in-zone hold** gates protected animation; invulnerability and disconnect safety begin at server-authorized animation start with an immutable inventory snapshot.
+6. Ordinary departure outside lobby creates a single lootable body expiring after 600 seconds; authorized maintenance removal preserves holdings without auto-extraction.
+7. Boss Legendary release at 25% occurs at most once per encounter.
+8. Only `main` may trigger production publishing workflows; development branches never publish.
 
 ### 12.3 Platform and performance considerations — Proposed
 
@@ -404,11 +418,11 @@ The first milestone should prove the **risk → loot → extraction → vault** 
 | Slice increment | Included | Acceptance criteria |
 | --- | --- | --- |
 | **A. Gather/craft** | Outer-rim test arena; wood/stone/herbs; axe/spear; inventory and bandage | A new player can gather, craft a weapon and healing item, and use both without admin commands |
-| **B. Fight/lose** | Primitive PvE/PvP, healing use and interruption, dropped backpack/loot | Death drops ordinary loot; server rejects invalid damage/heal/consume attempts |
-| **C. Extract/secure** | One minor rune; channel; persistent vault | Extracted loot survives rejoin; interrupted extracts do not grant loot; retries do not duplicate |
+| **B. Fight/lose** | Primitive combat, healing, ordinary non-lobby leave, body looting | Body persists for 10 minutes; death and ordinary leave forfeit items exactly once |
+| **C. Extract/secure** | One rune; audio/visual alarm; **120-second hold** then protected extraction animation and vault | Defend inside region; animation makes invulnerable and disconnect-safe; no duplicates or premature protection |
 | **C2. Permanent Forge prototype** | One ordinary special recipe and one eligible source-to-Permanent conversion | Ingredients charged once, converted source retired, owned Permanent record survives test death/rejoin, other carried loot still drops |
-| **D. Build/raid** | Foundations/walls/door/stash; damage and breaching; no-build aura | Another player can attack/loot stash; portal cannot be blocked |
-| **E. Contest** | One broadcast cache or alpha event; beacon; rare item carrying effect | Competing players can find, fight over and extract the objective |
+| **D. Build/raid** | Accessible Booga Booga-like construction, foundations/walls/doors/stash, raid damage | Quick placement and raidable storage, with protected extraction auras |
+| **E. Contest** | Rare herb/tree, mob, meteor or raidable structure event; beacons and rare carrier | Varied activities are contestable; valuable rewards still need extraction |
 | **F. Center encounter** | Boss prototype with pillars, attack cycle, 25% drop, central portal | Mid-fight Legendary appears once; boss structures cannot cheese; relic must be extracted |
 
 ### 13.1 Explicit non-goals for the first slice
