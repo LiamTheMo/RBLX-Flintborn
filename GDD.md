@@ -1967,6 +1967,10 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 ### 39.5 Premium membership and boosters (150)
 
+| # | Confirmed owner answer | Remains Open |
+| --- | --- | --- |
+| **150** | **Premium users retain baseline +25% XP; everyone may use earned temporary consumable XP boosters; non-Premium users have no subscription base boost** | Whether boosts stack, duration, multiplier and eligible XP categories |
+
 **Confirmed:** Eligible Roblox Premium subscribers get **+25% ongoing XP** while entitled; all players, Premium or non-Premium, may obtain **temporary consumable XP boosters**, including through earned in-game routes. Non-Premium users do not receive the member's base +25% simply for being free users.
 
 **Open:** Exact booster magnitude, duration, earning/purchase source, general versus mastery XP, Premium-versus-consumable stacking or exclusivity, and additive/multiplicative layering with center's 2× earned-run XP. Answer 150 **did not choose a stacking formula**, so keep it unset.
