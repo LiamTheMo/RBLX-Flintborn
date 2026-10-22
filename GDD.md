@@ -416,31 +416,52 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 **Confirmed:** 120-second shared timer per fixed exit, free movement/combat/healing during countdown, living-in-zone check **only at expiry**, large-radius cues, multi-player/group eligibility, 30-second portable anywhere rune, animation-start protection and lobby return. **Open:** Actual capture radius, notification radius, public stranger eligibility, activator-death behavior, site reuse and cooldown, portal population per server, portable rune consumption and temporary boundary, party admission, value/multiplier formula, full vs partial carried-inventory banking, portal existence during Guardian encounter, and crash-recovery implementation.
 
-## 10. Economy, stakes and balancing
+## 10. Persistent currencies, resource economy, trading and rarity
 
-### 10.1 Three economic locations
+### 10.1 Currency and account ownership — Confirmed
 
-| Location | Risk profile | Meaning |
+The game contains **two persistent currencies**: **Coins** as the main ordinary currency and **Gems** as a more premium currency that is also **obtainable through gameplay**. Both remain account-owned outside public server wipes. Exact sources, exchange rates, prices, balances and whether either can be risked in the world are **Open**; do not treat Coins/Gems as ordinary on-person drops without later authorization.
+
+| Economic location/class | Risk and lifetime | Uses |
 | --- | --- | --- |
-| **Active-run carried inventory** | Highest until protected extraction | Death/ordinary active departure yields 10-minute lootable body; staging/menu loadout stays safe until successful Play admission |
-| **In-world base stash** | Raid risk | Can stage larger expeditions but opponents can breach and steal |
-| **Persistent vault** | Secure | Only confirmed safe store for successful extraction |
+| Active player inventory | At risk on death/ordinary active leave | Weapons, crafted arrows, food, reagents, equipment |
+| World storage | Accessible to anyone who reaches it; reset with world | Farm/base materials and raid loot |
+| **Secure vault** | **Always saved**, even after world empties; size upgradeable | Previously extracted ordinary/rare materials, equipment, Forge inputs |
+| **Coins** | **Persistent** account currency | Proposed economy vendors, capacity upgrades, equipment/cosmetics |
+| **Gems** | **Persistent**, premium-leaning but **earnable** | Proposed higher-tier premium-style offers and cosmetics |
+| Player XP/levels | Persistent | General progression, recipes and potential rebirth eligibility |
+| Masteries/milestones | **Permanent progression** | Small specialization buffs and cosmetic milestones |
+| Rebirth tokens/perks | Token-based meta progression | Rebirth-earned tokens spent on selected perks; precise rebirth reset terms **Open** |
 
-**Confirmed:** Event materials, crafted weapons, raiding resources, and boss loot form the world economy.  
-**Confirmed:** Special crafting, extracted-material sinks and expensive Permanent conversion. **Open:** Trading/market systems, withdrawals, currency, exact sink magnitudes, recipe costs, Permanent ownership restrictions and rarity curves.
+### 10.2 Material acquisition and restricted player trading
 
-### 10.2 Balance hypotheses — Proposed
+- **Confirmed acquisition emphasis:** Raw materials primarily come from **mining, gathering, harvesting, farming and creatures**; guided quests and server events provide additional sources.
+- **Confirmed trading format:** **Direct player-to-player trades only.** No auction house, global marketplace or automated order book at launch.
+- **Confirmed material restriction:** Ordinary raw materials **cannot normally be traded**. Only **specifically designated rare or Exclusive materials** are eligible; the item catalog must explicitly flag allowable resources. Simply being Rare or Exclusive does not authorize transfer if not flagged.
+- **Confirmed:** Permanent items are tradeable as previously designed; their unique instance and canonical ownership must transfer atomically.
+- **Open:** Ordinary equipment trade eligibility, whether Coins/Gems may transfer through trade, safe-lobby-only vs in-world trading, trade fees, item-list validation and final acceptance UX. Marketplace listing is not implied by Direct Trade.
+- **Security proposal:** Both players review locked offer contents; one server-authorized atomic settlement changes current owner once. Disallow a post-confirmation item swap scam, stale profile/version, duplicate trade success or trading unextracted item types that violate catalog policy.
 
-- Outer Rim players should be able to complete a modest extract without needing a tribe or boss loot.
-- Inner Ring creates meaningful upgrades before requiring the Center Crater.
-- Event rewards should justify travel and exposure without being mandatory for every competitive build.
-- Raiding cost should scale with structure grade and target contents; avoid free repeated base destruction.
-- A visible rare-loot burden should create tension but not provide global wallhack-style tracking.
-- Repeated attempts should offer skill growth; the best strategy should not be idling safely until a dominant tribe wins.
+### 10.3 Eight rarity classifications — Confirmed
 
-### 10.3 Playtest measures
+**Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**
 
-First extraction rate/time; loss-on-death rate; success by solo/duo/tribe; extraction share by portal; median equipment gap in PvP; event contest rate; boss participation/clear rate; legendary secured-vs-dropped ratio; base raid profit/cost; time spent travelling, harvesting, fighting and waiting; new-player return rate.
+These are the official labels **in this order**. Specific colors, drop probabilities, UI effects, baseline power scaling and whether Exclusive is earned via seasonal quests or limited-time sources are **Open**. An **Exclusive** label is a rarity/acquisition classification, not proof of Robux-only availability and not automatic permission to trade. **Permanent** is a separate *conversion/ownership property*, not a ninth rarity tier.
+
+### 10.4 Long-term progression and currency sinks — Confirmed direction / Proposed economics
+
+- **Levels/XP:** Persistent player levels, no skill tree; some recipes unlock by level and discovery.
+- **Crafting mastery:** Repeated meaningful crafting yields its own long-term mastery milestones, recipe/efficiency benefits (exact values Open).
+- **Playstyle masteries:** Farmers, miners, builders, hunters, PvPers, explorers, gatherers and other activities have permanent, small milestone buffs, some of which increase yield; cosmetics can also be granted.
+- **Rebirth:** Completing a future defined rebirth condition grants **tokens** that can be spent on **perks**. This is a perk store/loadout rather than a branching skill tree. What resets, token amounts, whether perks are permanent and how perks stack are Open.
+- **Balance:** Resource yield perks **may stack with central 2× material extraction**, which also doubles rare crafting ingredient quantities. Model that intentionally. Small permanent buffs should support endgame optimization without removing the cost of rare objectives.
+- **High-end gate:** The **rarest Permanent equipment cannot be obtained solely through farming or building**; certain high-tier recipes/material sources require high-risk bosses/PvP-contested events or equivalent specified encounters. Standard playstyle masteries remain available to peaceful gatherers/builders.
+- **Currency sinks (Proposed):** Vault upgrades, food/medicine/arrows, visual items, conveniences, service fees and cosmetic/economy vendors. Do not infer raw-material player trading from NPC currency exchanges.
+
+### 10.5 Telemetry and economic integrity
+
+Compare baseline vs center extracted materials including rare ingredients, XP earned at different exits, Coin/Gem faucets/sinks, currency earned through play, gem affordability for free players, special-event participation, overall market supply, source rarity by category, direct trade volumes, Permanent trade/provenance, mastery buff stacking and rebirth perk use. Prevent idling/alt combat farming, double claiming and repeated server-hop rewards while avoiding silent confiscation of **always-secure vault** contents.
+
 
 ## 11. Player-facing interface and accessibility
 
