@@ -1217,7 +1217,83 @@ Remaining active in a shared **public world** should be useful even without cont
 - Track metrics by playstyle, gear tier and group size; maintain viable solo-player paths.
 - Owner approval is required for exact award types, reward cadence, session persistence, and whether any benefits reset per server.
 
-## 34. Design change log
+
+## 34. Owner-approved answers 1–24 (2026-10-21)
+
+These answers supersede earlier proposals where conflicting. Specific balancing values and ambiguities explicitly left undecided are **Open**, not silently decided.
+
+### 34.1 Server, world and death (1–7)
+
+| Number | Owner decision | Status and necessary detail |
+| --- | --- | --- |
+| 1 | Target **30 players** per island | Provisional; refine based on map size and performance |
+| 2 | A public world **resets only after its final player leaves** | Confirmed; no scheduled wipe while populated |
+| 3 | **Everything in live world disappears** on reset; only Permanent gear survives | Confirmed for island structures/loot; possible contradiction with **ordinary extracted vault** is Open (§34.5) |
+| 4 | Surviving, non-kicked players can return to the **same active world** | Confirmed, capacity permitting; an active ordinary quit still forfeits unsecured carried gear |
+| 5 | On death, **kick/eject player from play world** to impede body retrieval | Confirmed; block immediate same-world rejoin via server admission as technical recommendation |
+| 6 | Unexpected full-server crash should **safely restore active items** if feasible, or use special recovery | Confirmed preference; feasibility and fraud-proof implementation Open |
+| 7 | Authorized update kicks **preserve precise carried items** and notify players of inventory preservation | Confirmed; player resumes with held items at next Play, not free extraction |
+
+**Proposed Roblox rejoin implementation:** Separate start-place lobby and play-world place, configure play-world place **Secure within universe only** for server-initiated teleport access, and enforce a per-JobId death/kick exclusion in lobby matchmaking **and** play-world server admission. Killed players may join **different** worlds, not their previous world. This is not a universal setting to disable all friend-joining; Roblox user privacy/visibility is separately controlled. Roblox documentation: https://create.roblox.com/docs/projects/teleport and https://create.roblox.com/docs/matchmaking/scoring .
+
+**Crash policy:** A whole-instance crash cannot leave a corpse behind for 600 seconds if the server no longer exists. Provide separately audited recovery/escrow, distinguish an involuntary server outage from an ordinary single-player connection loss, preserve latest actual owner and prevent restoration if a gear instance was already looted or traded. This is an engineering requirement, not a tested existing guarantee.
+
+### 34.2 Permanent equipment, crafting and vault (8–16)
+
+| Number | Owner decision | Status |
+| --- | --- | --- |
+| 8 | Permanent gear **survives death**, but manually dropping it lets others take it | Confirmed; stolen item is transferred, not cloned |
+| 9 | Recovery/repair **material costs may apply** | **Open**: balancing option, not requirement |
+| 10 | Maximum simultaneous Permanent equipment | **Open**; no default cap approved |
+| 11 | Converted Permanent item has **same combat stats** as source | Confirmed; no automatic power increase |
+| 12 | **Designated equipment only** is eligible for conversion | Confirmed; catalog not finalized |
+| 13 | Permanent items **can be traded** | Confirmed; exact trade UI, fees and safeguards Open |
+| 14 | Extracted gear/materials can be **withdrawn**; vault size is **upgradeable** | Confirmed; slot and cost curve Open |
+| 15 | Recipes obtained through **discovery and player leveling** | Confirmed; precise levels/XP/requirements Open |
+| 16 | High-tier recipes require materials from **multiple activities/sources** | Confirmed; exact drops and numbers Open |
+
+**Non-duplication policy:** One transferable Permanent item exists at any moment: in a player's safe collection, equipped, on the ground after intentional drop, or in trade escrow. Death returns a currently owned item to its owner; an item already **manually dropped and legitimately claimed by another player** cannot return to its former owner. Ground-item expiration when unclaimed remains Open.
+
+**Critical clarification of answer 3:** Earlier GDD versions confirmed that successfully **extracted ordinary materials and gear** live permanently in an unraidable account vault so they can pay for later special crafting. “Everything disappears; only Permanent items survive” was stated about **empty-world resets**, so the **working interpretation** is that the live island resets but already vaulted items remain saved. If the user instead wants all ordinary **previously vaulted** resources to disappear too, that would radically change the core extraction/Forge economy and needs explicit approval. This question remains **Open** rather than treated as answered.
+
+### 34.3 Extraction, portals and return (17–24)
+
+| Number | Owner decision | Status |
+| --- | --- | --- |
+| 17 | Players may move **outside** the zone during countdown; must be **inside only at the exact end** | Confirmed; small extraction area |
+| 18 | Timer does not pause/reset on zone exit | Confirmed consequence of shared timer |
+| 19 | Combat, healing and being hit are permitted without cancelling countdown; dead players do not qualify | Confirmed |
+| 20 | Large-radius audio and visual warnings alert nearby players | Confirmed; radius/VFX Open |
+| 21 | A **single timer on server** applies to an extraction event; groups/tribes can share it | Confirmed; unrelated strangers using same event Open |
+| 22 | Known candidate extraction POIs; **different active subsets per server**; extremely rare portable rune gives **30-second anywhere** extraction | Confirmed; item consumption, alert radius, temporary zone and abuse protections Open |
+| 23 | Central portal higher-value multiplier | **Open** — owner requested explanation; cannot select a reward type |
+| 24 | Successful extraction returns players to the **separate secure lobby** | Confirmed; not the play-world pre-spawn menu |
+
+**Important revision:** The original “remain within extraction region for the entire 120-second hold” mechanic is **replaced**. On click a fixed portal starts its own countdown; the initiating player can hide nearby or fight, heal, leave and re-enter at will. At expiry the server collects every **alive and eligible character currently inside the region** for protected animation. A character outside by even a short distance at the finish misses the event. Damage does not reset it. Each qualifying character receives their **own** idempotent vault receipt; the portal's timer belongs to the server, not one player.
+
+**Portable rune:** Extremely scarce one-use rewards/drops can provide a fast **30-second** exit at a player-chosen location, including locations outside predetermined POIs. Exact beneficiary group size, placement conflicts, interaction with building/raid mechanics, destruction rules and no-build restrictions need future decisions; “anywhere” and 30 seconds are Confirmed.
+
+**What question 23 means:** Imagine extracting 10 rare ore and one Legendary with a hypothetical 2× center bonus. Possible designs: **20 ore**, or **10 ore and the same Legendary plus bonus currency/experience/score**. Neither is approved. The recommendation is to reward added currency/experience/score, **not duplicate** conversion catalysts or Legendary equipment, but await the owner's choice.
+
+### 34.4 New acceptance tests
+
+1. Servers support a provisional capacity target of 30 and preserve live world state while populated; an empty server resets temporary world structures/resources on the next instance.
+2. Dead player is ejected and same-JobId rejoin denied, while an eligible survivor may return to that server if not full; prior voluntary quit forfeiture is never undone.
+3. Staff safe-update command preserves actual current holdings and gives a clear **game update / inventory saved** notification when the player resumes.
+4. A full-instance crash follows recovery rather than being falsely treated as a voluntary single-player quit; item ownership cannot be duplicated.
+5. Permanent gear retains baseline stats and remains owned through death; intentional drop/pickup or confirmed trade changes current owner once, with previous owner unable to reclaim it.
+6. Recipe unlocks combine level progress and discoveries, allow only designated items, and use real successfully extracted materials from different sources.
+7. Upgradeable vault capacity is enforced: upgrade increases capacity; insufficient room never deletes stored items.
+8. Two activators at the same fixed exit create **one shared 120-second event**, not parallel client countdowns.
+9. A player can move out, hide, fight and heal, and still qualify by being alive **inside at exactly 120 seconds**. A player outside at the end does not qualify regardless of prior time inside.
+10. Entire parties/tribes can leave using that one timer with separate non-duplicated saved inventories.
+11. Different public worlds activate different subsets of the same known extraction POIs.
+12. Rare portable rune initiates an authorized **30-second** temporary extraction at a chosen location without generating extra runes or duplicated vault awards.
+13. Successfully protected extraction animation is safe to disconnect and transfers to separate lobby; game does not reroute to unsafe world menu.
+14. Vault wipe interpretation and center multiplier stay marked **Open** until explicitly confirmed.
+
+
+## 35. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -1226,6 +1302,7 @@ Remaining active in a shared **public world** should be useful even without cont
 | **0.3** | 2026-10-21 | Removed player-usable shields and added consumable healing progression, recipes and PvP interruption rules; kept Guardian shield-pillar boss mechanics. |
 | **0.4** | 2026-10-21 | Confirmed 120-second telegraphed extraction hold, invulnerable and disconnect-safe animation, 600-second lootable bodies after active exit, admin update preservation, rare events, accessible building and diverse playstyle incentives. |
 | **0.5** | 2026-10-21 | Established the mandatory **protected play-world loading/main menu** with explicit Play-to-spawn risk activation. Teleport, loading, pre-spawn kick, and failed admission cannot forfeit items. Added full state machine, recovery flows, detailed QA and cross-references in §29–33. |
+| **0.6** | 2026-10-21 | Recorded answers 1–24: 30-player world target, empty-server reset, same-world rejoin/death kick, crash/update recovery, transferable same-stat Permanent items, vault upgrades and levels, server-shared 120-second end-only extraction, rare portable 30-second anywhere rune, and lobby return. Clarified unresolved reset-vault and payout semantics. |
 
 ---
 
