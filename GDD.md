@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 0.6  
+> **Design revision:** 0.7  
 > **Last updated:** 2026-10-21  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -36,9 +36,9 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ## 1. High concept
 
-**Pitch:** Arrive in a protected play-world main menu, wait for loading, then explicitly press **Play** to spawn on the edge of a fractured island with almost nothing and activate inventory risk. Gather, craft, establish a raidable tribal stronghold, and venture deeper to fight rival players and ancient monsters for enchanted loot. Carry your prizes to a dangerous extraction rune to secure them in a permanent vault. Fail, and others take what you carried.
+**Pitch:** Arrive in a protected play-world menu, wait for loading, then press **Play** to spawn at a **random world location** and begin inventory risk. Harvest resources, craft primitive and metal gear, establish a raidable tribal base, fight other players and ancient creatures, and recover rare materials or relics. Extract via a contested server-wide countdown and return to the secure lobby; death sends the player back to the lobby with unsecured loot left behind.
 
-**Unique proposition:** The strategic tension of an extraction game **without firearms**: stone and metal arms, spears, bows, tribal equipment, enchanted blades, and elemental magic. Combat, transport, raiding, and map control all happen in a primitive-fantasy setting.
+**Unique proposition:** A primitive survival/extraction game **without firearms, player shields, or player-cast magic at launch**. The playable combat baseline is **click melee and slow, visible bow projectiles with crafted arrows**, supported by health, sprint-only stamina, food, instant medical heals and tribe revives. Ancient and elemental **enemies** can still fit the mythology.
 
 **Intended player fantasy:** “I started with stone tools, fought over a legendary relic, escaped a rival tribe, and brought it home.”
 
@@ -48,12 +48,12 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 2. **Risk begins only after successful Play admission.** Loading, teleport failures and the protected in-world main menu are loss-free. Once server-confirmed active gameplay starts, ordinary gear drops on death/leave as a **10-minute corpse**. Protected extraction and authorized update kicks are exceptions (§29–31); Permanent recovery remains Open (§15–17).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
 4. **The world creates diverse PvPvE opportunities.** Meteors, rare shrubs/trees and material nodes, raidable structures, unusual mob and boss spawns, caches and the Guardian move players across the island.
-5. **Primitive fantasy, not military extraction.** No firearms or player-usable shields at any tier. Magic supplements primitive weapons and consumable healing.
+5. **Primitive fantasy, not military extraction.** No firearms, equipable shields or playable magic at launch. Players wield melee weapons and crafted-arrow bows, survive using medicine and food, and build raidable bases with wood/stone/iron progression.
 6. **Multiple paths to value.** Hunting, farming, building, ambushing, events and base raiding are all legitimate playstyles. Engaged players who remain in the public world can earn activity-based benefits without promoting AFK waiting.
 
 ### 1.2 Design guardrails — Proposed
 
-- Avoid unavoidable busywork (extreme hunger/thirst upkeep, long empty travel, repeated re-crafting after every trivial mistake).
+- Survival meters at launch are **health, stamina and food only**; do **not** add thirst, temperature or weather-exposure survival meters by default. Exact food depletion/penalty rates remain Open.
 - Avoid a “rich get richer” lockout where fresh spawns cannot make progress.
 - Prioritize readable telegraphs and counterplay over surprise one-hit kills.
 - Never sell combat power or guaranteed extracted rare loot for Robux; cosmetics and convenience that does not influence outcomes are safer monetization directions.
@@ -105,7 +105,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 3.1 Spatial rules — Confirmed
 
-- After the in-world pre-spawn menu completes and the player explicitly presses **Play**, the first risk-bearing character spawn occurs on the outskirts rather than in the center. Loading into the server alone does not spawn a vulnerable character.
+- After successful Play admission, the first risk-bearing character **spawns at a randomly selected valid location anywhere on the map**, not automatically on the outskirts. The protected loading menu remains loss-free. Precise spawn validation and whether designated safe-zone POIs may host spawns are Open.
 - Rare objectives and high-value extraction routes increasingly expose players to conflict.
 - A **50-meter no-build Holy Aura** protects **all extraction portals/runes** from player construction that would enclose or obstruct them.
 - The Mega-Boss can destroy player-built structures near its arena, preventing structure-based fight exploits.
@@ -118,7 +118,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - Place hidden minor runes behind discoverable environmental cues; avoid putting every low-risk route on a single campable path.
 - Use landmarks (giant roots, ruins, monoliths, volcanic ridge) so orientation works even without a minimap.
 - Clearly visualize the no-build aura while the build tool is equipped.
-- Avoid automatic zone-wide PvP immunity unless a future decision explicitly calls for it; “low risk” is not “safe.”
+- **Confirmed:** PvP is enabled throughout the active world by default, including Outer Rim and random-spawn areas. **Only specifically designated POIs** may have a PvP safe zone; these must be visibly marked and server-enforced. The protected pre-spawn menu is not active gameplay.
 
 ### 3.3 Public-world capacity, lifetime and POIs — Confirmed / Open
 
@@ -129,118 +129,151 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Open:** Map size and travel times, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
 - **Ambiguity:** The user said “everything disappears, only Permanent items survive” on world reset. Live-world state clearly wipes; whether this also overrides the previously confirmed secure-vault persistence for ordinary extracted materials needs confirmation (§34.2).
 
-## 4. Primitive-fantasy progression
+## 4. Primitive progression, resource gathering and food
 
-**Confirmed:** Progression starts with stone/wood and expands to metal, tribal gear, enchanted arms, elemental magic and **finite healing consumables**. **No firearms or player-usable shields.**
+> **Confirmed launch constraints:** Primitive stone and metal weapons, crafted-arrow bows, nonmagical armor, healing medicines, food, and wood/stone/iron base building. **No player-cast magic, enchantment combat effects, firearms or player-usable shields at launch.** Supernatural enemies and rare ancient materials may exist; weapon magic is reserved as a **future-update possibility**, not an MVP system.
 
-### 4.1 Candidate gear ladder — Proposed, subject to balance
+### 4.1 Harvesting and equipment progression
 
-| Stage | Theme | Example materials | Example equipment | Acquisition emphasis |
-| --- | --- | --- | --- | --- |
-| Starter | Wood, stone, fiber | Wood, stone, vines, hide | Stone axe, wooden spear, sling, rough hide tunic | Outer Rim gathering |
-| Early | Flint and bone | Flint, bone, leather | Flint knife, reinforced club, shortbow, herbal bandage | Crafting and low-tier enemies |
-| Mid | Worked metals | Copper/bronze/iron (exact metallurgy TBD) | Metal spear, sword, axe, chain or scale armor | Deeper mining and workshops |
-| Advanced | Volcanic and rare minerals | Obsidian, jade, special beast components | Obsidian blade, jade-treated armor, advanced restorative tonic | Inner Ring and alpha encounters |
-| Endgame | Elemental / relic-infused | Abyssal meteor material, charged cores, boss relics | Ember spear, storm bow, runic armor, legendary relic | Broadcast events, raids, Mega-Boss |
+**Gathering** means acquiring world materials by interacting with resource nodes: **cutting down trees for wood, mining stone and iron ore, picking herbs/shrubs, harvesting plants and crops, and collecting creature-derived hides/bones**. Gathering is an economic action, **not** a fourth survival meter.
 
-**Important:** Stage labels are illustrative, **not** five confirmed tiers. Resource Crash explicitly uses a rare **Tier-5** resource; the complete item-tier taxonomy is **Open**.
-
-### 4.2 Initial item families — Proposed
-
-| Category | Examples | Design role |
-| --- | --- | --- |
-| Gathering | Stone axe, pickaxe, reinforced pick, sickle | Resource acquisition and contested harvest efficiency |
-| Melee | Spear, club, knife, sword, war axe, hammer | Different reach, tempo, stagger, armor penetration |
-| Ranged | Sling, bow, longbow, throwing spear, javelin | Mid-range pressure with recoverable/consumable ammunition |
-| Armor | Hide clothing, bone-mail, metal and runic armor | Passive resistance at durability, weight and mobility cost; **no shields** |
-| Healing consumables | Fiber bandage, herbal poultice, restorative tonic, antidote | Finite health recovery/selected ailment cleansing; tactical application windows and costs |
-| Utility | Torch, rope, traps, herbal satchel, smoke bundle | Survival, stealth, escape, siege and counterplay |
-| Magic | Ember, frost, shock, nature/earth imbues | Status effects and tactical utility, never gun-like firearms |
-| Construction | Walls, foundations, roofs, doors, gates, storage, workstations | Temporary strongholds and protected resource staging |
-| Siege | Primitive breaching charges, fire pots, rams (TBD) | Counterplay to fortifications with clear costs and warning |
-
-### 4.3 Enchantment principles — Proposed
-
-- **Ember:** Damage-over-time/burning; countered by cleansing/water or positioning.
-- **Frost:** Slow or brief control; control durations tightly capped in PvP.
-- **Storm:** Chain effects and brief attack interruption with explicit target limits, not shield pressure.
-- **Earth/Nature:** Nature-based restorative items, cleansing or situational terrain/poison effects; no magical shield barriers.
-- Enchanted power should have cooldown, durability, stamina/mana cost, charge limit, or a comparable tradeoff.
-- Make all status effects legible on Roblox-scale characters and mobile screens.
-- Rare enchantments modify how primitive weapons are used; they should not turn combat into sustained automatic projectile fire.
-
-### 4.4 Crafting questions — Open
-
-**Confirmed:** Extracted materials are used in secure-hub special crafting and in expensive eligible-item Permanent conversions. **Open:** Recipe discovery, durability and repair, encumbrance, stack sizes, ammunition recovery, magic catalysts, Permanent equipment binding, cooldown, trade and deployment specifics. See §15–28.
-
-### 4.5 Healing items and special recipes — Confirmed direction / Proposed specifics
-
-**Confirmed:** Player-usable shields do not exist. Healing items provide health recovery; armor, evasion, cover and movement also contribute to survival. Boss shield pillars in §8 are an **enemy invulnerability mechanic** and unaffected by this rule.
-
-| Progression stage | Sample item | Candidate materials / source | Function (proposed) |
+| Stage | Materials | Illustrative launch equipment | Gameplay function |
 | --- | --- | --- | --- |
-| Starter | **Fiber Bandage** | Outer Rim fiber, basic herbs | Small recovery, easy field craft |
-| Early | **Herbal Poultice** | Herbs, clean cloth, resin | Gradual healing after a vulnerable application |
-| Mid | **Restorative Tonic** | Rare plants, purified mineral catalyst | More efficient single-use recovery |
-| Advanced | **Antidote Draught** | Jungle flora, beast glands | Removes specified poison/burning effects, limited or no direct heal |
-| High rarity | **Guardian Renewal Draught** | Securely extracted Guardian/Alpha reagents | Expensive single-use emergency heal/cleanse; never unlimited |
+| Primitive | Wood, stone, fiber, common plant/animal drops | Stone axe, simple spear, simple bow, starter bandage | Cheap survival and resource harvesting |
+| Early | Flint, bone, hide, herbs | Improved club, spear, simple armor, better bow, medical supplies | Early crafting and first PvP choices |
+| Worked metal | Iron/available ore, processed hide | Iron axe, blade, spear, metal armor and stronger bow | Higher material investment and better combat tools |
+| High rarity | Rare monster parts, meteors and boss/structure loot | Special **nonmagical** crafted gear and conversion-eligible items | Risk-driven loot and rare Permanent conversion |
 
-**Open:** Actual heal amount, use duration, speed penalty, stack sizes, cooldown, whether damage interrupts, cleanse rules and whether healing can occur during portal activation. Names and numbers above are design examples. Higher-tier special healing recipes can use **extracted materials** at the Ancestral Forge; healing stacks brought into a run remain vulnerable, drop on death and **cannot be made Permanent**, avoiding infinite free healing.
+**Confirmed:** Resource families added over time can extend gear and building progression, but initial construction progression is **wood → stone → iron**. The example weapons and precise stats remain Proposed. Rare crafting is independent of playable spellcasting.
 
-## 5. Combat and PvP
+### 4.2 Initial item families
 
-### 5.1 Intended combat identity — Confirmed / Proposed
+| Family | Examples / rule |
+| --- | --- |
+| Harvesting tools | Axe, pickaxe, sickle; server validates harvest ranges and legitimate node yields |
+| Melee weapons | Spears, clubs, axes, swords, daggers; **simple click-to-attack** at launch |
+| Ranged weapons | At least bows; other ranged families (slings, javelins, crossbows) are possible future content, not all confirmed for launch |
+| Ammunition | **Arrows must be crafted** and occupy a finite resource/inventory supply; projectile speed is deliberately slow and visible |
+| Armor | Nonmagical protective clothing/leather/iron; **lasts indefinitely** rather than breaking or needing durability repairs |
+| Medical items | Bandages, medical supplies and potions **restore health immediately on validated use**, then an animation imposes the usage cooldown |
+| Food | Food meter exists; eating provides **healing over time**, partially interrupted by damage; exact food-drain rates, food list and effect sizes Open |
+| Utility | Torches, storage supplies, farm tools, primitive traps and other nonmagical gear |
+| Building | Placeable shelters/doors/storage/totems/farms and functional stations; initial wood, stone and iron tiers |
+| Future (not launch) | Elemental spells, enchanted combat weapons, special defensive resistances and any charge/mana subsystem |
 
-- **Confirmed:** Combat uses primitive melee, bows, thrown weapons, armor, elemental effects and **healing consumables**, without player-usable shields; encounters mix PvE and PvP.
-- **Proposed:** Readable melee arcs, attack commitment and recovery, sprint/dodge or sidestep movement, and distinct reach. No shield blocking, parrying or guard-meter system.
-- **Proposed:** Skill and positioning should matter even when equipment tiers differ. High-tier gear gives advantage, not unconditional wins.
-- **Confirmed:** **Healing items** replace usable shields as the active recovery option; armor, cover, spacing and evasion remain relevant.
-- **Proposed:** Armor has mobility/stamina tradeoffs; healing exposes a vulnerable application window instead of granting invulnerability.
+### 4.3 Survival attributes — Confirmed and Open
 
-### 5.2 Tribes and social systems — Open
+- **Health:** Damage removes HP; medical items restore HP **immediately** (subject to max-health cap). Death/downed behavior depends on tribe membership (§5).
+- **Stamina:** **Only limits how long the player can sprint.** Melee attacks, crouching, gathering, bow shots, raiding and standard movement **do not consume stamina**. Stamina regen duration, sprint speed and UI thresholds are Open.
+- **Food:** An active food system is included; **food consumption grants health regeneration over time**. Incoming damage **partially interrupts** that healing, but does not necessarily erase the whole effect. Exact interruption fraction, food meter depletion rate and starvation effects are Open.
+- **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
-Tribe size cap, friendly fire, invitations, permissions, loot rights, tribe base authorization, alliance rules, betrayal penalties (if any), and sharing rewards. Avoid designing core events assuming all players are in organized groups.
+### 4.4 Recipes and Permanent equipment
 
-### 5.3 Fair-play requirements — Proposed
+- Successfully **extracted** materials support special crafting; conversion targets only specifically designated equipment and **does not increase its stats**.
+- Recipes are acquired through a combination of **player levels and discovery**; high-tier special recipes use multiple resource and event types.
+- Weapons/armor **last indefinitely** through ordinary use. If Permanent ownership needs a post-death material payment for balance, that is a separate **Open recovery cost**, not wear-based durability.
+- All enchantments, rune combat effects and spell recipes proposed in older sections are **future-update candidates**. Any existing named magical recipes (§19) are conceptual content backlog and **not approved launch recipes**.
+- Exact item caps, inventory weight, crafting arrows per batch, crafting station limits and food-heal values remain Open.
 
-- Server-authoritative damage, health, healing consume/cooldowns, interruption, loot ownership and drops, crafting costs, durability, building, event rewards and extraction.
-- Validate attack distance, timings, rate limits, line-of-sight where relevant, inventory changes and tool provenance.
-- Design anti-spawn-camp protections without creating exploitable invulnerability near valuable objectives.
-- Offer solo players stealth, speed, traps or alternate extraction paths rather than requiring a large tribe.
+### 4.5 Medical items, healing and food — Confirmed / Proposed details
 
-### 5.4 Healing combat contract — Proposed implementation
+| Item type | Server-side trigger | When HP changes | After-use behavior |
+| --- | --- | --- | --- |
+| Bandage / medical kit | Valid inventory item selected and consumed | **Immediately** at use activation | Play medical animation; block re-use during its duration |
+| Potion | Valid single-use item selected and consumed | **Immediately** at use activation | Potion-drink animation acts as cooldown *after the heal* |
+| Food | Valid edible consumed | **Over time** after eating | Food HoT ticks over a configured duration; damage partially interrupts active healing |
 
-1. Alive player selects a healing item; quick slot shows stack count, expected recovery, animation and use window.
-2. Client requests to start use with item/slot and operation nonce. **Server** checks ownership, remaining stack, cooldown, health state and eligibility.
-3. Player performs a clear treatment/drinking animation, remaining vulnerable; a proposed slow or movement restriction creates a tactical choice.
-4. Damage, sprinting, weapon switching or leaving the allowed state **may interrupt** the attempt; exact interruption conditions remain Open.
-5. On validated completion, server deducts **exactly one** unit, heals up to max health or applies its cleanse. Cancelled use must not grant health or consume materials unless a published partial-use rule says otherwise.
-6. Server publishes health/stack delta. Repeated remotes and disconnects cannot apply multiple heals or consume repeatedly.
+**Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement lock/speed during the animation remains Open.
 
-**Balance constraints:** No equipable shield, guard meter, free temporary barrier, auto-regeneration exploit, full-HP panic button or bottomless consumable. Limit repeated sustain by inventory weight/stack cap, application time and shared cooldown. Effective healing rates must allow committed enemies to finish fights; solo players should still access affordable early healing. Enchantments may modify individual crafted healing effects, never create a reusable unlimited-health source.
+**Food interruption working interpretation (Proposed):** If hit while food HoT is active, reduce the remaining scheduled healing rather than cancelling all future food healing. The precise percentage/duration behavior remains Open. Health cannot exceed its defined maximum without a separately approved rule.
 
-**QA:** Test damage interruption, concurrent use, latency, repeated remotes, negative stack attempts, healing at max health, death while channeling, zero-stack requests, use during extraction, controller/touch accessibility, trade/drop interactions and no Permanent healing-stacks path. Mark precise timings and values Open until playtest.
+**Potential item names** (Fiber Bandage, Herbal Poultice, Restorative Tonic, Healing Potion) and ingredients are examples, not official content. Unlimited-use medical gear and Permanent-converted healing consumables are excluded.
 
-## 6. Building, FOBs, and raiding
 
-**Confirmed:** Building is approachable and **Booga Booga-like**, using primitive placeable structures, modular foundations/walls, crafting benches and storage. Bases remain raidable, from small beach shelters to stone strongholds. Precise placement and upgrade proposals appear in §32.
 
-### 6.1 Building loop — Proposed
+## 5. Combat, movement, tribes and revival
 
-1. Harvest building resources and craft a construction tool.
-2. Place snap-aligned foundations, walls, floors, roofs, doors, and storage.
-3. Upgrade structural materials, reinforce entrances, and place functional workstations.
-4. Establish a forward base near (but not inside) valuable zones.
-5. Defend against rival raids or abandon the base and extract before it falls.
+### 5.1 Launch combat baseline — Confirmed / Open
 
-### 6.2 Structural principles — Confirmed / Proposed
+- **Confirmed for current design:** Basic click-to-attack melee; bow shots with **slower, clearly visible physical projectiles** and **crafted arrows**. Exact hitboxes, attack interval, damage, ranged arc/velocity and ammunition counts remain Open.
+- **Confirmed:** Players can **sprint and crouch**. Stamina decreases **only while sprinting**; crouching and attacks do not require stamina. No dodge-roll or sliding system has been approved.
+- **Confirmed:** No usable shield, blocking/guard-meter combat mechanic, player-cast magic or magical attacks for launch. Advanced weapon combos and alternate ranged families remain possible future decisions.
+- **Confirmed:** PvP is enabled **everywhere in the active play world except clearly designated safe-zone POIs**. Random world spawning must honor safe player-admission initialization but does not automatically guarantee PvP immunity.
+- **Proposed:** All damage and hit detection are server-validated with bounded latency compensation, distance/arc checks and rate limits. Different ordinary weapons may vary in reach, cadence or damage without needing complicated launch combat.
+- **Open:** Friendly fire within a tribe and across alliances, spawn invulnerability if any, safe-zone list/boundaries, projectile travel speed, aim support on controller/mobile and damage scaling.
 
-- **Confirmed:** No building within **50 meters** of any extraction portal/rune.
-- **Confirmed:** Mega-Boss area attacks can splinter nearby builds; do not permit wall-cheese against boss mechanics.
-- **Proposed:** Additional build exclusion at spawn areas, boss interaction objectives, and event interactables to prevent trapping.
-- **Proposed:** Access controls for tribe-owned doors/storage, bounded structures/physics, rapid mobile-friendly placement, rotation/snap/repair and no-build protection around contested objectives.
-- **Proposed:** Breaching should cost resources and signal attackers; structural tiers should improve defense without making raids mathematically impossible.
-- **Open:** Structural decay/upkeep, base ownership after logout, server wipes, door locks, and whether a fully offline base can be raided.
+### 5.2 Tribe membership and social functions
+
+- **Confirmed:** A tribe has a maximum of **8 players**. Players can **invite, kick and form alliances**.
+- **Confirmed:** Tribes can establish claim ownership on **their own player-created structures** with totems; they **cannot claim server-generated structures**.
+- **Confirmed:** **Storage in active public worlds is accessible to anyone**, including unrelated players and enemy tribes. A tribe claim never acts as a secure vault or private chest lock.
+- **Open:** Alliance friendly-fire, whether rival access requires physically reaching/breaching a chest behind walls, tribe leadership transfer, exact totem claim radius and whether players can be in multiple alliances.
+- **Proposed:** Tribe roster, invite/kick/alliances and in-world permissions are enforced by server, never by local UI. Tribe membership is validated at the moment a player is downed.
+
+### 5.3 Downed, revive and death rules — Confirmed / Proposed mechanics
+
+1. **Non-tribe solo player:** Takes lethal damage → **immediate death**. Ordinary items move to the 10-minute lootable body; the player is **ejected to the lobby**. No same-world respawn.
+2. **Tribe member:** On would-be lethal damage, enters a **Downed** state instead of dying immediately. Start a **60-second rescue window** on a server-authoritative clock.
+3. A valid **tribe member** can start reviving the downed player. While a revive interaction is actively in progress, **pause the remaining 60-second downed timer**; it cannot expire mid-revive.
+4. If the revive interaction is **cancelled or interrupted**, resume the countdown from the **remaining time**, not from a new 60 seconds.
+5. On a successful revive, the downed character resumes active play without a new Play/world re-entry or item-drop corpse. Exact revived HP, time to complete interaction and invulnerability if any are Open.
+6. If 60 seconds of **unpaused** downed time elapse, or the downed player is finally eliminated through an approved mechanic, finish ordinary death/body creation and **send/eject them to the separate lobby**. There is **no respawn in the same world**.
+7. Once dead/ejected, the player must wait for their tribe to return to lobby (or find a new party) before rejoining that tribe's expedition. Same-server death rejoin restriction remains in force.
+
+**Critical abuse prevention:** Only server-validated, present and eligible tribe members can keep the revive timer paused. A disconnected/dead reviver, moved-out-of-range reviver or invalid/abandoned action cannot freeze a downed player indefinitely. Whether the downed person can crawl, be damaged/finished, consume healing items or be revived by an allied-but-not-same-tribe player remains **Open**. Never allow a downed body to extract simply because it lies in a portal zone.
+
+### 5.4 Medicine, food and sprint timing
+
+- **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
+- **Food:** Eating grants a timed healing-over-time effect. Taking damage **partially interrupts remaining HoT** according to a to-be-balanced rule (e.g., trimming some pending ticks as a *proposal*). No retroactive cancellation of completed healing.
+- **Movement:** Sprint drains and is limited by stamina. Crouch does not, and stamina has **no melee/bow/building/harvesting cost**.
+- **Downed:** Pending revive and death rules supersede medical-use/attack inputs while downed (exact allowed downed actions still Open).
+
+### 5.5 Combat integrity and spawn safety
+
+- Prohibit forged bow shots, impossible melee reach, modified projectile speed/hit position, zero-cost arrow duplication and replayed medical-use remotes.
+- Validate safe POI boundaries server-side, including projectile origin and impact handling; exact outward/inward protection semantics remain Open.
+- Protected play-world menu and unsuccessful Play admission remain safe; **successful spawn selects any valid random map location**, not necessarily the Outer Rim (§3).
+- Same world death is terminal even for a tribe member who was not successfully revived. The body lasts **600 seconds**, and the server enforces same-JobId exclusion.
+- **Proposed:** Rejoin after an accidental disconnect is possible if user was not killed/ejected and world remains active; ordinary carried loot forfeited under existing active-quit rule.
+
+
+
+## 6. Booga Booga-style construction, claims, farms and raids
+
+> **Confirmed:** Building behaves similarly to *Booga Booga*: fast, accessible placement of craftable primitive structures. A player's or tribe's base **stays in the public server after they leave**, allowing **other players to take it over**. Every placed structure **decays over time without a nearby active tribe claim totem**. Tribes can claim their own constructed structures but **never server-generated structures**. Raiding is legal **at any time**, with **no special siege equipment required**. All in-world storage is accessible to anyone able to reach it.
+
+### 6.1 Building materials and objects
+
+- **Initial progression:** **wood → stone → iron** for structural tiers, with further tiers added only as materials/content expand. Exact HP, harvest requirements, upgrade prices and damage resistances remain Open.
+- **Confirmed desired objects:** Walls, floors/foundations, doors, roofs, storage chests, farms/planters, beds, crafting/workbenches, traps, furnaces/smelters and functional structures as useful.
+- **Booga Booga-style usability:** Select a structure from simple craft/build palette, see placement preview, rotate/position quickly and place using owned materials (preview/snap requirements Proposed, but accessible building Confirmed).
+- **Beds:** Can be furniture/utility structures, **not same-world respawn points**. No respawn in the same public instance after death (§5).
+- **Storage:** Anyone in the public world can **open/access storage** once they can physically reach it. Walls and doors can still block movement but are raid-able. **No owner-only secure chest** in the island; only the out-of-world vault is safe.
+- **Farming:** Players can plant and grow crops/trees and harvest products. Farming continues **while owner is away** if the **public server remains populated and running**, subject to server-side growth timestamps. After world empties, farms reset with all other world content.
+- **Open:** Which seeds, tree crops and growth times are included, whether harvested crops can be replanted endlessly, farm area limits and effects of other players harvesting owner-grown plants.
+
+### 6.2 Tribe claim totems and structure decay
+
+- **Confirmed:** A tribe claim totem protects nearby **player-built** structures from the normal **unclaimed decay** mechanic. All structures **without a totem close enough decay over time**, even if their owner remains in-server.
+- **Proposed:** Totem has a clearly visible influence radius; nearby valid tribe-built pieces are registered to the totem's claim set. This is **decay protection and recognized ownership, not anti-raid immunity and not private chest permissions**.
+- **Proposed:** Destroying/removing the totem exposes the now-unclaimed pieces to the normal decay clock. Exact grace period, durability and repair/healing of structures remain Open.
+- **Confirmed house takeover design:** After owners leave, structures **remain standing**, items in reachable storage remain accessible and an opposing group can **occupy and reuse** the abandoned fortification. Whether an attacker may place a new totem to claim a captured base, and ownership-transfer rules, are **Open** and need a takeover design.
+- **Confirmed:** Generated event/ruin/outpost structures are **never tribe-claimable**, even when raided. Their scripted state remains owned by the world event system.
+- **Open:** Maximum totems per tribe, overlapping claim resolution, claim radius, decay speed, anti-spam safeguards, placement of totems inside contested POIs, tribe departure/dissolution behavior.
+
+### 6.3 Always-on raiding, no special tools
+
+- **Confirmed:** Any active opponent may raid **at any time**; there is no nighttime/offline raid protection or raid schedule.
+- **Confirmed:** **No special raid tools required.** Basic legitimate weapons/tools can damage a structure, with rates controlled by structure material and weapon damage.
+- **Proposed optional future:** Siege tools or explosives may accelerate raids, but cannot become a **mandatory prerequisite** for breaking wooden, stone or iron structures.
+- Raidables include player structures **and** special naturally generated abandoned/defended/ruined outposts (§7), but cannot claim generated structures as their own.
+- Base building cannot block fixed extraction 50-meter no-build zones; rare anywhere portable rune interactions remain separately Open.
+- Structures and farms persist as long as their public server runs; **all disappear when server becomes empty**. No persistent cross-server bases.
+- **Open:** Damage values, totem protection radius/health, offline-building grief mitigation, claim-transfer UI and tribe alliance raiding permissions.
+
+
 
 ## 7. Dynamic server-wide events
 
