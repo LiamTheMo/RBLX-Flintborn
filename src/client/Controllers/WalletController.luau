@@ -304,6 +304,15 @@ local function build()
 	end)
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function WalletController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	if ui.panel.Visible then
+		ui.status.Text = ""
+		render()
+	end
+end
+
 function WalletController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
@@ -314,11 +323,7 @@ function WalletController.Start()
 	player:GetAttributeChangedSignal("Gems"):Connect(updateWallet)
 	ContextActionService:BindAction("FlintbornMarket", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			if ui.panel.Visible then
-				ui.status.Text = ""
-				render()
-			end
+			WalletController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.M, Enum.KeyCode.ButtonL2)
