@@ -98,6 +98,9 @@ local function activateHotbar(index: number)
 		if not ok then
 			toast("Can't use that now (" .. tostring(reason) .. ")")
 		end
+	elseif def and def.placeable == "ExtractionRune" then
+		local ok, reason = invoke("PlaceRune", index)
+		toast(ok and "Rune placed: 30 s to extract." or ("Can't place a rune here (" .. tostring(reason) .. ")"))
 	elseif def and def.placeable then
 		local ok, reason = invoke("PlaceItem", index)
 		toast(ok and (def.name .. " placed.") or ("Can't place that here (" .. tostring(reason) .. ")"))
