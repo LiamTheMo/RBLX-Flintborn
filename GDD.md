@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.6  
+> **Design revision:** 1.7  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -1468,7 +1468,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | 6 | Unexpected full-server crash should **safely restore active items** if feasible, or use special recovery | Confirmed preference, **reconfirmed Q157**; feasibility and fraud-proof implementation Open |
 | 7 | Authorized update kicks **preserve precise carried items** and notify players of inventory preservation | Confirmed; player resumes with held items at next Play, not free extraction |
 
-**Proposed Roblox rejoin implementation:** Separate start-place lobby and play-world place, configure play-world place **Secure within universe only** for server-initiated teleport access, and enforce a per-JobId death/kick exclusion in lobby matchmaking **and** play-world server admission. Killed players may join **different** worlds, not their previous world. This is not a universal setting to disable all friend-joining; Roblox user privacy/visibility is separately controlled. Roblox documentation: https://create.roblox.com/docs/projects/teleport and https://create.roblox.com/docs/matchmaking/scoring .
+**Confirmed Q163 (2026-10-23):** Flintborn uses **two places** in one universe: a **lobby place** (start place) and a **play-world place**. **Proposed Roblox rejoin implementation:** Separate start-place lobby and play-world place, configure play-world place **Secure within universe only** for server-initiated teleport access, and enforce a per-JobId death/kick exclusion in lobby matchmaking **and** play-world server admission. Killed players may join **different** worlds, not their previous world. This is not a universal setting to disable all friend-joining; Roblox user privacy/visibility is separately controlled. Roblox documentation: https://create.roblox.com/docs/projects/teleport and https://create.roblox.com/docs/matchmaking/scoring .
 
 **Crash policy:** A whole-instance crash cannot leave a corpse behind for 600 seconds if the server no longer exists. Provide separately audited recovery/escrow, distinguish an involuntary server outage from an ordinary single-player connection loss, preserve latest actual owner and prevent restoration if a gear instance was already looted or traded. This is an engineering requirement, not a tested existing guarantee.
 
@@ -2178,6 +2178,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.4** | 2026-10-22 | Recorded owner answers Q159–161: three totem levels (500/1,000/2,500 HP) with growing radius and no takeover while a totem stands; anyone may revive, one reviver at a time, reviver damage does not interrupt, slow crawl and no healing while downed, no post-revive protection; no friendly fire, no spawn protection but spawns away from others, 0% food adds nothing, food heals stack; safe POIs designed later; per-item event handling with "event" tags; admin kicks are always safe kicks; dead players regroup with their tribe in the lobby. Added §42 and reconciled affected sections. |
 | **1.5** | 2026-10-22 | Owner confirmed all interpretations in §41.2 and §42.2 (capacity-only deletion, logout loss only after Play admission, Play item list, structures for rune placement, takeover by new totem after the old one falls, anyone revives but only tribe members are downed, downing clears food HoT, tribe-only no-friendly-fire, per-HoT hit halving). Replaced superseded Open labels for boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation. |
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
+| **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 
 ---
 
