@@ -1,9 +1,8 @@
 -- Wallet, shops, merchant, quests and offers (GDD §10, §25.4.1, §36). The lobby
--- shows Coins and Gems at all times; M (or ButtonL2) opens the market panel with
+-- shows Coins and Gems at all times; the Market key (M by default; ButtonL2) opens the market panel with
 -- tabs: Shop, Sell, Quests and Vault & offers. Every Robux offer shows its earnable
 -- equivalent next to it. Lobby place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
@@ -12,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local WalletController = {}
 
@@ -336,12 +336,12 @@ function WalletController.Start()
 	updateWallet()
 	player:GetAttributeChangedSignal("Coins"):Connect(updateWallet)
 	player:GetAttributeChangedSignal("Gems"):Connect(updateWallet)
-	ContextActionService:BindAction("FlintbornMarket", function(_, state)
+	Binds.Bind("Market", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			WalletController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.M, Enum.KeyCode.ButtonL2)
+	end)
 end
 
 return WalletController
