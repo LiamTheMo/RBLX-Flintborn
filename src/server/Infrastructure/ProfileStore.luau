@@ -77,6 +77,12 @@ function ProfileStore:Load(userId: number)
 	return stored, nil
 end
 
+-- Reads another player's last saved profile without leasing it (trade recovery).
+-- Returns (ok, profileOrNil).
+function ProfileStore:ReadStored(userId: number)
+	return self._gateway:Read(ProfileStore.KeyFor(userId))
+end
+
 function ProfileStore:Get(userId: number)
 	local entry = self._entries[userId]
 	return entry and not entry.lost and entry.profile or nil
