@@ -29,6 +29,7 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 local CraftingService = {}
 
 CraftingService.WORKBENCH_TAG = "Workbench"
+CraftingService.FURNACE_TAG = "Furnace"
 CraftingService.WORKBENCH_RANGE = 12
 CraftingService.REMEMBERED_REQUESTS = 32
 CraftingService.CRAFT_SECONDS = 1
@@ -42,12 +43,12 @@ local function rootOf(player: Player)
 	return character and character:FindFirstChild("HumanoidRootPart")
 end
 
-local function nearWorkbench(player: Player): boolean
+local function nearStation(player: Player, tag: string): boolean
 	local root = rootOf(player)
 	if root == nil then
 		return false
 	end
-	for _, bench in CollectionService:GetTagged(CraftingService.WORKBENCH_TAG) do
+	for _, bench in CollectionService:GetTagged(tag) do
 		if bench:IsA("BasePart") and (bench.Position - root.Position).Magnitude <= CraftingService.WORKBENCH_RANGE then
 			return true
 		end
@@ -94,8 +95,11 @@ local function craft(player: Player, requestId: any, recipeId: any)
 		return false, "NotInRun"
 	end
 	local station = QualityRoll.Stations.Anywhere
+	if recipe.station == Recipes.Furnace and not nearStation(player, CraftingService.FURNACE_TAG) then
+		return false, "NeedsFurnace"
+	end
 	if recipe.station == Recipes.Workbench then
-		if not nearWorkbench(player) then
+		if not nearStation(player, CraftingService.WORKBENCH_TAG) then
 			return false, "NeedsWorkbench"
 		end
 		station = QualityRoll.Stations.WorldWorkbench
