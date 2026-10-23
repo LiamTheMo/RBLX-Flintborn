@@ -39,6 +39,8 @@ ShopCatalog.MATERIAL_VALUES = {
 	Berries = 2,
 	Hide = 5,
 	Iron = 8,
+	Jade = 12,
+	Obsidian = 10,
 	AncientEmber = 300,
 }
 
