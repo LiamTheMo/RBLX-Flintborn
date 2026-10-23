@@ -98,3 +98,20 @@ Studio and live checks:
 - [ ] Looting a body takes items one by one; the body and anything left vanish exactly 10 minutes after the death.
 - [ ] A lobby party arrives in the world as one tribe; T opens the tribe panel; no friendly fire inside a tribe.
 - [ ] `/safekick` mid-fight: no body, a game-update notice appears, and the same items come back once on the next Play.
+
+## v0.08 — Extraction, lobby backpack and secure vault
+
+Automated: 12 specs cover deadline qualification (late arrivals in, early leavers and downed or dead players out), 120 s/30 s timers, Center-only 2× materials (never runes, never unique gear), 1,000-unit vault stacks and 50-slot backpack overflow deleted and listed on the receipt, receipt replay as a no-op, a failed settlement changing nothing, receipt retention, and manual vault deposits refused (never deleted) when full. Deployed and verified on both places (2026-10-23).
+
+Map hooks: parts tagged `PortalSite` with attributes `Kind` (`Fixed` or `Center`) and `ZoneRadius`; without them the server lays out placeholder portals (a Center at the origin and 2 of 6 ring sites). Runes are refused near parts tagged `Workbench` or `Structure`. Placeholders: 3 active portals (Center always on), zones 12/8/10 studs (fixed/Center/rune), 60 s portal cooldown, 3 s protected animation, built-in ping as the alert sound (400-stud roll-off). Studio runs start with one Portable Extraction Rune.
+
+Studio and live checks (two or more players):
+
+- [ ] Two players trigger the same portal: one shared countdown; a stranger inside the zone at zero extracts on an enemy's timer.
+- [ ] The activator dies or leaves the zone before zero; everyone else inside still extracts. Downed players inside do not.
+- [ ] At zero the HUD switches to "Protected: extracting"; disconnecting during the 3 s animation still settles the items.
+- [ ] Arriving in the lobby shows the receipt: materials banked to the vault, gear and special materials in the lobby backpack, overflow listed as deleted.
+- [ ] A Center extraction doubles materials but never a sword; a rune placed at the Center does not double.
+- [ ] A rune (hotbar) is refused next to a workbench and next to another running extraction; elsewhere it starts a 30 s countdown everyone can use.
+- [ ] G opens the vault in the lobby: deposit from the backpack, withdraw items and materials; a full vault refuses rather than deletes.
+- [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack into the next run.
