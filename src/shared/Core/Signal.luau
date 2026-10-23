@@ -24,10 +24,16 @@ function Signal.Connect(signal, fn: (...any) -> ())
 	return connection
 end
 
+-- Runs every handler in order. Each runs protected, so one failing listener can
+-- never stop the others (a broken handler must not skip a save or a body).
 function Signal:Fire(...: any)
 	for _, connection in ipairs(table.clone(self._connections)) do
 		if connection.Connected then
-			connection._fn(...)
+			local ok, err = pcall(connection._fn, ...)
+			if not ok then
+				local report = warn or print
+				report("[Signal] handler failed: " .. tostring(err))
+			end
 		end
 	end
 end

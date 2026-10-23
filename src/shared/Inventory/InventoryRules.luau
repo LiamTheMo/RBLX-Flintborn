@@ -40,6 +40,12 @@ local function isStack(entry): boolean
 	return entry.instanceId == nil
 end
 
+-- A whole slot number inside the area (rejects NaN, 0, negatives and fractions).
+local function validSlot(area: string, index: any): boolean
+	local size = SIZES[area]
+	return size ~= nil and type(index) == "number" and index % 1 == 0 and index >= 1 and index <= size
+end
+
 -- (area, index) of the slot holding a stackable type, if any.
 local function findStack(inventory: Inventory, catalogId: string)
 	for _, area in { "hotbar", "backpack" } do
@@ -144,7 +150,7 @@ end
 
 -- Removes and returns the entry in a hotbar or backpack slot, or nil.
 function InventoryRules.TakeAt(inventory: Inventory, area: string, index: number)
-	if SIZES[area] == nil or type(index) ~= "number" or index % 1 ~= 0 then
+	if not validSlot(area, index) then
 		return nil
 	end
 	local entry = inventory[area][index]
@@ -154,14 +160,7 @@ end
 
 -- Swaps two slots (either may be empty). Returns false for an invalid slot.
 function InventoryRules.Move(inventory: Inventory, fromArea: string, fromIndex: number, toArea: string, toIndex: number)
-	local fromSize, toSize = SIZES[fromArea], SIZES[toArea]
-	if fromSize == nil or toSize == nil then
-		return false
-	end
-	if fromIndex % 1 ~= 0 or toIndex % 1 ~= 0 then
-		return false
-	end
-	if fromIndex < 1 or fromIndex > fromSize or toIndex < 1 or toIndex > toSize then
+	if not validSlot(fromArea, fromIndex) or not validSlot(toArea, toIndex) then
 		return false
 	end
 	local moving = inventory[fromArea][fromIndex]
@@ -176,7 +175,7 @@ end
 -- Equips the armor piece at (area, index) into its slot. Any piece already worn
 -- there swaps back into the same inventory slot.
 function InventoryRules.EquipArmor(inventory: Inventory, area: string, index: number): boolean
-	if SIZES[area] == nil then
+	if not validSlot(area, index) then
 		return false
 	end
 	local entry = inventory[area][index]
@@ -224,7 +223,8 @@ function InventoryRules.Items(inventory: Inventory)
 	return items
 end
 
--- Builds an inventory from a flat list. Returns (inventory, items that did not fit).
+-- Builds an inventory from a flat list. Returns (inventory, items that did not fit);
+-- every leftover keeps its full record, so callers can return it intact.
 function InventoryRules.FromItems(items): (Inventory, { any })
 	local inventory = InventoryRules.New()
 	local leftovers = {}
@@ -232,7 +232,7 @@ function InventoryRules.FromItems(items): (Inventory, { any })
 		local copy = table.clone(item)
 		local remaining = InventoryRules.Add(inventory, copy)
 		if remaining > 0 then
-			if copy.instanceId ~= nil then
+			if copy.instanceId ~= nil or ItemCatalog.StackCap(copy.catalogId) == nil then
 				table.insert(leftovers, copy)
 			else
 				table.insert(leftovers, { catalogId = copy.catalogId, quantity = remaining })

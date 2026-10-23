@@ -37,9 +37,17 @@ WorldAdmissionService.Death = Signal.new()
 WorldAdmissionService.RunStarted = Signal.new()
 -- Fires (player, reason) when a run ends: "Died", "Left", "Extracted" or "Maintenance".
 WorldAdmissionService.RunEnded = Signal.new()
+-- Fires (player) when an at-risk player is removed during a graceful shutdown. That
+-- is not a logout (GDD §30.3): MaintenanceService escrows their items instead of
+-- a body. Anything it cannot escrow keeps its run checkpoint for crash recovery.
+WorldAdmissionService.ShutdownDeparture = Signal.new()
+
+WorldAdmissionService.SAFE_RETURN_MESSAGE =
+	"Could not return you to the lobby. Your saved items are safe — please rejoin."
 
 -- Studio sessions start runs with a few consumables so survival systems can be
--- tried before crafting exists (v0.05). Never used on live servers.
+-- tried before crafting exists (v0.05). Only with the in-memory store, so a Studio
+-- session with API access never mints items into live profiles.
 WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "BasicMedicine", quantity = 3 },
 	{ catalogId = "AdvancedMedicine", quantity = 2 },
@@ -55,6 +63,7 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 
 local states = {}
 local lastPlayRequest = {}
+local departed = {}
 
 function WorldAdmissionService.GetState(player: Player): string?
 	return states[player]
@@ -75,11 +84,21 @@ local function setState(player: Player, state: string)
 	end
 end
 
-local function sendToLobby(player: Player)
+-- Teleports one player to the lobby; if that fails, kicks them with `message`
+-- (their profile is released and saved as they leave).
+local function sendToLobby(player: Player, message: string?)
 	local ok, err = TravelService.ToLobby({ player })
 	if not ok and player.Parent then
-		player:Kick("Could not return you to the lobby (" .. tostring(err) .. "). Nothing was lost — please rejoin.")
+		player:Kick(
+			message
+				or ("Could not return you to the lobby (" .. tostring(err) .. "). Nothing was lost — please rejoin.")
+		)
 	end
+	return ok
+end
+
+function WorldAdmissionService.SendToLobby(player: Player, message: string?)
+	return sendToLobby(player, message or WorldAdmissionService.SAFE_RETURN_MESSAGE)
 end
 
 local function livingPositions(except: Player): { Vector3 }
@@ -101,13 +120,15 @@ local function onDied(player: Player)
 	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	setState(player, SessionStates.Dead)
-	-- A dead player may not rejoin this world (GDD Q5) and returns to the lobby.
-	MatchmakingService.Exclude(player.UserId)
+	-- The body and the run's end happen before anything that can yield.
 	WorldAdmissionService.Death:Fire(player, root and root.Position or nil)
 	WorldAdmissionService.RunEnded:Fire(player, "Died")
+	-- A dead player may not rejoin this world (GDD Q5) and returns to the lobby.
+	-- Exclude marks them at once and then reports to the registry (a yield).
+	task.spawn(MatchmakingService.Exclude, player.UserId)
 	task.delay(WorldAdmissionService.DEATH_RETURN_SECONDS, function()
 		if player.Parent then
-			sendToLobby(player)
+			sendToLobby(player, "Could not return you to the lobby after your death. Please rejoin.")
 		end
 	end)
 end
@@ -124,6 +145,9 @@ local function requestPlay(player: Player, requestId: any)
 	end
 	if state ~= SessionStates.WorldMainMenuReady then
 		return false, "NotReady"
+	end
+	if ProfileService.IsShuttingDown() then
+		return false, "ShuttingDown"
 	end
 	if lastPlayRequest[player] == requestId then
 		return false, "InProgress"
@@ -156,12 +180,28 @@ local function requestPlay(player: Player, requestId: any)
 	end
 	character:PivotTo(spawnAt)
 
-	-- The spawn is confirmed: consume the reservation and only then enter risk.
-	local consumed, items = LoadoutService.Consume(player)
+	-- The spawn is confirmed: consume the reservation (and any maintenance escrow),
+	-- save that, and only then enter risk (GDD §31.3).
+	local consumed, items, changed = LoadoutService.Consume(player)
 	if not consumed then
 		return fail("ReservationFailed")
 	end
-	if #items == 0 and RunService:IsStudio() then
+	if changed then
+		local saved = ProfileService.SaveNow(player)
+		local still = player.Parent ~= nil
+			and states[player] == SessionStates.PlayRequested
+			and player.Character == character
+			and humanoid.Health > 0
+			and not ProfileService.IsShuttingDown()
+		if not saved or not still then
+			-- Puts the reservation back exactly as it was (a no-op if the player
+			-- already left and BeforeRelease rolled it back).
+			LoadoutService.Rollback(player)
+			return fail(if saved then "Cancelled" else "SaveFailed")
+		end
+	end
+	LoadoutService.Confirm(player)
+	if #items == 0 and RunService:IsStudio() and ProfileService.IsUsingMemoryStore() then
 		items = table.clone(WorldAdmissionService.STUDIO_TEST_KIT)
 		for index, stack in items do
 			items[index] = table.clone(stack)
@@ -191,7 +231,8 @@ function WorldAdmissionService.Extract(player: Player)
 end
 
 -- Ends an at-risk run without a body for an authorized safe kick (GDD §30). The
--- caller must already have saved the held items to maintenance escrow.
+-- caller must already have written the held items to maintenance escrow, in the
+-- same synchronous step (MaintenanceService saves afterwards).
 function WorldAdmissionService.Preserve(player: Player)
 	if not WorldAdmissionService.IsAtRisk(player) then
 		return false
@@ -207,10 +248,32 @@ local function returnToLobby(player: Player)
 		return false, "NotInMenu"
 	end
 	LoadoutService.Rollback(player)
-	ProfileService.SaveNow(player)
+	-- Leave the menu before the save yields, so a Play request cannot slip in.
 	setState(player, SessionStates.LobbySafe)
+	ProfileService.SaveNow(player)
 	sendToLobby(player)
 	return true, nil
+end
+
+-- Settles a leaving player exactly once, before their release save (GDD §29.3,
+-- Q157): an at-risk logout forfeits carried items to a body; a graceful shutdown
+-- escrows them instead; anyone else (menu, loading, failed Play) is loss-free.
+local function settleDeparture(player: Player)
+	if departed[player] then
+		return
+	end
+	departed[player] = true
+	if not WorldAdmissionService.IsAtRisk(player) then
+		LoadoutService.Rollback(player)
+		return
+	end
+	if ProfileService.IsShuttingDown() then
+		WorldAdmissionService.ShutdownDeparture:Fire(player)
+		return
+	end
+	-- Any logout during active play forfeits carried items (GDD Q157).
+	WorldAdmissionService.ActiveDeparture:Fire(player)
+	WorldAdmissionService.RunEnded:Fire(player, "Left")
 end
 
 local function onPlayerAdded(player: Player)
@@ -244,17 +307,30 @@ function WorldAdmissionService.Start()
 	for _, player in Players:GetPlayers() do
 		task.spawn(onPlayerAdded, player)
 	end
+	-- Departure changes must land before the release save snapshots the profile.
+	ProfileService.BeforeRelease:Connect(settleDeparture)
 	Players.PlayerRemoving:Connect(function(player)
-		if WorldAdmissionService.IsAtRisk(player) then
-			-- Any logout during active play forfeits carried items (GDD Q157).
-			WorldAdmissionService.ActiveDeparture:Fire(player)
-			WorldAdmissionService.RunEnded:Fire(player, "Left")
-		else
-			-- Menu, loading or failed Play: loss-free.
-			LoadoutService.Rollback(player)
+		-- Deferred so BeforeRelease (fired from ProfileService's PlayerRemoving
+		-- handler) always sees the session state first.
+		task.defer(function()
+			settleDeparture(player)
+			states[player] = nil
+			lastPlayRequest[player] = nil
+			departed[player] = nil
+		end)
+	end)
+	-- A started teleport to the lobby that fails strands a player who is no longer
+	-- in a run or the menu: their items are already saved, so let them rejoin.
+	TravelService.TeleportFailed:Connect(function(player)
+		local state = states[player]
+		if
+			player.Parent
+			and state ~= nil
+			and not SessionStates.IsAtRisk(state)
+			and not SessionStates.ShowsWorldMenu(state)
+		then
+			player:Kick(WorldAdmissionService.SAFE_RETURN_MESSAGE)
 		end
-		states[player] = nil
-		lastPlayRequest[player] = nil
 	end)
 end
 

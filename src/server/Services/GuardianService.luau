@@ -2,9 +2,10 @@
 -- previous encounter ends, a Horn of War sounds 3 minutes ahead. Phase I: the
 -- Guardian is shielded until its energy pillars fall. Phase II: the gauntlet.
 -- Phase III: at 25% HP it releases one Legendary on the ground, once per
--- encounter, and whoever carries it is highlighted. Player structures near the
--- arena are destroyed so they cannot cheese it. Everything stays contested.
--- World place only.
+-- encounter, tagged with its encounter id, and whoever carries it is highlighted.
+-- Player structures near the arena are destroyed and the arena is a no-build
+-- aura while an encounter runs, so it cannot be cheesed. Everything stays
+-- contested. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -40,13 +41,21 @@ local function now(): number
 	return workspace:GetServerTimeNow()
 end
 
-local function arenaCenter(): Vector3?
+function GuardianService.ArenaCenter(): Vector3?
 	local tagged = CollectionService:GetTagged(GuardianService.ARENA_TAG)[1]
 	if tagged and tagged:IsA("BasePart") then
 		return tagged.Position
 	end
 	local hit = workspace:Raycast(Vector3.new(0, 1000, 0), Vector3.new(0, -2000, 0))
 	return hit and hit.Position or nil
+end
+
+local arenaCenter = GuardianService.ArenaCenter
+
+-- The arena as a no-build aura {center, radius} while an encounter runs, else nil.
+function GuardianService.ActiveArena()
+	local encounter = state.encounter
+	return encounter and { center = encounter.center, radius = GuardianService.ARENA_RADIUS } or nil
 end
 
 local function alert(payload)
@@ -126,6 +135,8 @@ local function releaseLegendary(encounter)
 		catalogId = encounter.boss.def.legendary,
 		qualityRoll = 0,
 		location = "WorldDropped",
+		-- Ties the Legendary to the encounter that released it (once per encounter).
+		guardianEncounterId = encounter.boss.id,
 	}, at)
 	BossService.SetPhase(encounter.boss, "Final")
 	alert({ kind = "Legendary", position = at })
@@ -236,6 +247,7 @@ function GuardianService.Start()
 		return
 	end
 	schedule(now())
+	BuildingService.AddAuraSource(GuardianService.ActiveArena)
 	-- A countdown already running is shown to late arrivals too.
 	Players.PlayerAdded:Connect(function(player)
 		if state.horn and now() >= state.horn.hornAt then

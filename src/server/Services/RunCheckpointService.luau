@@ -1,8 +1,10 @@
 -- Run checkpoints (GDD §29.1, §34.1, Q157). During an active run the server writes
 -- a compact snapshot of each player's carried items every 15 s and shortly after
 -- any inventory change, plus a heartbeat for this server. Every normal ending
--- (logout, death, extraction, planned shutdown) clears the checkpoint first, so
--- only a real crash leaves one behind. World place only.
+-- (logout, death, extraction, planned shutdown) writes an "Ended" crash receipt
+-- in its own profile operation; the checkpoint is deleted once that ending is
+-- saved, so a crash before the save still leaves it to be recovered, and a
+-- deletion that fails can never restore an ended run. World place only.
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,12 +22,63 @@ local RunCheckpointService = {}
 RunCheckpointService.INTERVAL = 15
 RunCheckpointService.DEBOUNCE = 1
 RunCheckpointService.HEARTBEAT = 30
+-- How long a cleared run waits for its ending to be saved before giving up (the
+-- Ended receipt then guards it, and the checkpoint expires on its own).
+RunCheckpointService.SAVE_WAIT_SECONDS = 600
+RunCheckpointService.CLEAR_ATTEMPTS = 5
+RunCheckpointService.CLEAR_RETRY_SECONDS = 2
 
 local runs = {}
+local clearing = {}
 local jobId = nil
 
 function RunCheckpointService.JobId(): string
 	return jobId
+end
+
+-- The run ID ProgressionService recorded for this run (the key of its receipt).
+local function currentRunId(player: Player): string?
+	local profile = ProfileService.GetProfile(player)
+	local current = profile and profile.progression.currentRun
+	return current and current.runId or nil
+end
+
+local function hasActiveRun(userId: number): boolean
+	for player in runs do
+		if player.UserId == userId then
+			return true
+		end
+	end
+	return false
+end
+
+-- Deletes the checkpoint once the profile has saved the run's ending, retrying a
+-- failed delete. One waiter per user at a time. A newer run of the same user
+-- (a rejoin) overwrites the checkpoint itself and must not lose it.
+local function clearWhenSaved(userId: number)
+	if clearing[userId] then
+		clearing[userId] = "again"
+		return
+	end
+	clearing[userId] = true
+	task.spawn(function()
+		repeat
+			clearing[userId] = true
+			local deadline = os.clock() + RunCheckpointService.SAVE_WAIT_SECONDS
+			while not ProfileService.IsSaved(userId) and os.clock() < deadline do
+				task.wait(1)
+			end
+			if ProfileService.IsSaved(userId) and not hasActiveRun(userId) then
+				for attempt = 1, RunCheckpointService.CLEAR_ATTEMPTS do
+					if CheckpointStore.Clear(userId) then
+						break
+					end
+					task.wait(RunCheckpointService.CLEAR_RETRY_SECONDS * attempt)
+				end
+			end
+		until clearing[userId] ~= "again"
+		clearing[userId] = nil
+	end)
 end
 
 local function write(player: Player)
@@ -39,13 +92,14 @@ local function write(player: Player)
 	end
 	run.writing = true
 	run.dirty = false
+	run.runId = run.runId or currentRunId(player) or HttpService:GenerateGUID(false)
 	local checkpoint =
 		CrashRecoveryRules.Checkpoint(run.runId, jobId, InventoryService.Items(player), run.transferred, os.time())
 	CheckpointStore.Write(player.UserId, checkpoint)
 	run.writing = false
 	-- The run may have ended while the write was in flight: clear again then.
 	if runs[player] ~= run then
-		CheckpointStore.Clear(player.UserId)
+		clearWhenSaved(player.UserId)
 	elseif run.dirty then
 		task.spawn(write, player)
 	end
@@ -68,18 +122,15 @@ function RunCheckpointService.Start()
 	end
 	jobId = if game.JobId ~= "" then game.JobId else ("studio-" .. HttpService:GenerateGUID(false))
 	WorldAdmissionService.RunStarted:Connect(function(player)
-		local profile = ProfileService.GetProfile(player)
-		local current = profile and profile.progression.currentRun
-		runs[player] = {
-			runId = current and current.runId or HttpService:GenerateGUID(false),
-			transferred = {},
-		}
+		-- The run ID is read again at the first write if ProgressionService has not
+		-- recorded it yet, so the checkpoint and the Ended receipt share one key.
+		runs[player] = { runId = currentRunId(player), transferred = {} }
 		schedule(player)
 	end)
-	-- Any ending other than a crash clears the checkpoint (Q157: logouts lose items).
+	-- Any ending other than a crash clears the checkpoint once it is saved (Q157).
 	WorldAdmissionService.RunEnded:Connect(function(player)
 		runs[player] = nil
-		task.spawn(CheckpointStore.Clear, player.UserId)
+		clearWhenSaved(player.UserId)
 	end)
 	InventoryService.Changed:Connect(schedule)
 	-- Items handed to the world or a chest are not restored after a crash.

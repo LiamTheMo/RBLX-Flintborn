@@ -151,8 +151,12 @@ local function admit(player: Player, name: string, ...): boolean
 	return true
 end
 
+-- Remotes this place has bound a server handler or listener to.
+local bound = {}
+
 -- Binds a RemoteFunction handler behind the guard.
 function Remotes.Handle(name: string, handler)
+	bound[name] = true
 	Remotes.Get(name).OnServerInvoke = function(player, ...)
 		if not admit(player, name, ...) then
 			return false, "Rejected"
@@ -163,11 +167,37 @@ end
 
 -- Connects a RemoteEvent listener behind the guard.
 function Remotes.Listen(name: string, listener)
+	bound[name] = true
 	return Remotes.Get(name).OnServerEvent:Connect(function(player, ...)
 		if admit(player, name, ...) then
 			listener(player, ...)
 		end
 	end)
+end
+
+-- Server: every remote nothing in this place listens to (server -> client
+-- remotes, or another place's) still gets a guarded no-op, so client spam is
+-- rate-limited, reported and dropped instead of queueing unread (GDD §24). Call
+-- once services have started; a later Listen/Handle on the same remote takes over.
+function Remotes.GuardUnused()
+	for name, className in DEFINITIONS do
+		if bound[name] then
+			continue
+		end
+		local remote = Remotes.Get(name)
+		if className == "RemoteEvent" then
+			remote.OnServerEvent:Connect(function(player, ...)
+				if not bound[name] then
+					admit(player, name, ...)
+				end
+			end)
+		else
+			remote.OnServerInvoke = function(player, ...)
+				admit(player, name, ...)
+				return false, "Unavailable"
+			end
+		end
+	end
 end
 
 return Remotes

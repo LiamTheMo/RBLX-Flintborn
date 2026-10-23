@@ -63,6 +63,11 @@ local function runCommand(admin: Player, text: string)
 		end
 	end
 	for _, target in targets do
+		if target == admin then
+			-- A safe kick escrows held items without a body: never a way out of a fight.
+			notify(admin, "You cannot safe-kick yourself; skipped.")
+			continue
+		end
 		if not AdminService.SafeKick(target) then
 			notify(admin, "Could not save " .. target.Name .. "'s items; they were not kicked.")
 		end

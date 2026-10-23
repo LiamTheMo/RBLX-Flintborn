@@ -3,10 +3,15 @@
 -- vanish when the world empties. Totems stop decay for their own tribe only and
 -- never stop raids. Uncovered structures get one 240–360 s lifetime and are then
 -- removed outright. Any at-risk player can damage another tribe's structures
--- with ordinary weapons and tools. World place only.
+-- with ordinary weapons and tools. A piece must stand in the open (not sunk into
+-- the ground or other world geometry), within the builder's sight, with no corner
+-- in a safe zone or no-build aura (portals, the Guardian arena mid-encounter);
+-- each owner keeps at most three totems. The original builder keeps control of
+-- pieces their solo key still owns after joining a tribe. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
@@ -15,6 +20,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local DownedService = require(script.Parent.DownedService)
 local ExtractionService = require(script.Parent.ExtractionService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -29,6 +35,11 @@ BuildingService.GENERATED_TAG = "GeneratedStructure"
 BuildingService.NO_BUILD_TAG = "NoBuildZone"
 BuildingService.MAX_PIECES_PER_OWNER = 300
 BuildingService.HIT_ALLOWANCE = 2
+BuildingService.FOLDER_NAME = "PlayerStructures"
+-- Extra slack between the live and the last validated root position for reach.
+BuildingService.VALIDATED_SLACK = 8
+-- Folders whose contents block placement even when they do not collide.
+BuildingService.BLOCKING_FOLDERS = { "EventEnemies", "Bosses", "WorldEvents", "ResourceNodes", "GuardianArena" }
 
 -- Fires (record) after a piece is placed and (record) just before it is removed.
 BuildingService.Placed = Signal.new()
@@ -42,7 +53,19 @@ local TIER_LOOK = {
 
 local records = {}
 local byPart = {}
+local totemSet = {}
+local auraSources = {}
+local folder = nil
 local rng = Random.new()
+
+local function structureFolder(): Folder
+	if folder == nil or folder.Parent == nil then
+		folder = Instance.new("Folder")
+		folder.Name = BuildingService.FOLDER_NAME
+		folder.Parent = workspace
+	end
+	return folder
+end
 
 local function now(): number
 	return workspace:GetServerTimeNow()
@@ -57,14 +80,37 @@ function BuildingService.Get(part: Instance?)
 	return part and byPart[part] or nil
 end
 
+-- True when `player` controls `record`: their owner key owns it, or they built it
+-- and the key they built it under still owns it (a solo builder who later joined
+-- a tribe keeps their doors and totems).
+function BuildingService.IsOwnedBy(player: Player, record): boolean
+	if BuildingService.OwnerKey(player) == record.ownerKey then
+		return true
+	end
+	return record.builderId == player.UserId and record.ownerKey == record.builderKey
+end
+
 local function totems()
 	local list = {}
-	for _, record in records do
-		if record.isTotem then
-			table.insert(list, record)
-		end
+	for record in totemSet do
+		table.insert(list, record)
 	end
 	return list
+end
+
+-- Standing totems as {position, radius, ownerKey} (event placement keeps clear).
+function BuildingService.Totems()
+	local list = {}
+	for record in totemSet do
+		table.insert(list, { position = record.position, radius = record.radius, ownerKey = record.ownerKey })
+	end
+	return list
+end
+
+-- Registers `source() -> {center, radius}?`, an extra no-build aura (the Guardian
+-- arena while an encounter runs).
+function BuildingService.AddAuraSource(source)
+	table.insert(auraSources, source)
 end
 
 local function canAct(player: Player): boolean
@@ -82,6 +128,12 @@ local function auras()
 			table.insert(list, { center = zone.Position, radius = zone:GetAttribute("Radius") or zone.Size.X / 2 })
 		end
 	end
+	for _, source in auraSources do
+		local aura = source()
+		if aura then
+			table.insert(list, aura)
+		end
+	end
 	return list
 end
 
@@ -96,16 +148,21 @@ local function publish(record)
 	end
 end
 
--- Re-applies cover to every structure after anything that changes it.
-local function reconcileAll()
+local function reconcile(record, standing, at: number)
+	local before = record.decayDeadline
+	BuildRules.Reconcile(record, standing, at, rng)
+	if record.decayDeadline ~= before then
+		publish(record)
+	end
+end
+
+-- Re-applies cover to the structures a change to `totem` can affect: only those
+-- inside its radius, not every record in the world.
+local function reconcileNear(totem)
 	local standing = totems()
 	local at = now()
-	for _, record in records do
-		local before = record.decayDeadline
-		BuildRules.Reconcile(record, standing, at, rng)
-		if record.decayDeadline ~= before then
-			publish(record)
-		end
+	for _, record in BuildRules.WithinTotem(records, totem) do
+		reconcile(record, standing, at)
 	end
 end
 
@@ -116,9 +173,10 @@ local function remove(record, reason: string)
 	BuildingService.Removing:Fire(record, reason)
 	records[record.id] = nil
 	byPart[record.part] = nil
+	totemSet[record] = nil
 	record.part:Destroy()
 	if record.isTotem then
-		reconcileAll()
+		reconcileNear(record)
 	end
 end
 
@@ -144,6 +202,93 @@ local function overlapsStructures(center: Vector3, half: Vector3): boolean
 		end
 	end
 	return false
+end
+
+local function isBody(part: BasePart): boolean
+	local model = part:FindFirstAncestorOfClass("Model")
+	return model ~= nil
+		and (Players:GetPlayerFromCharacter(model) ~= nil or model:FindFirstChildOfClass("Humanoid") ~= nil)
+end
+
+-- World geometry a piece may not overlap: anything solid (ground tiles, rocks,
+-- trees, ruins), characters and NPC bodies, resource nodes, event models and
+-- drops. Non-colliding markers and zone volumes do not count; structures are
+-- checked by overlapsStructures.
+local function blocksPlacement(part: BasePart): boolean
+	if part:IsA("Terrain") or CollectionService:HasTag(part, BuildingService.STRUCTURE_TAG) then
+		return false
+	end
+	if part.CanCollide or part.Name == "DroppedItem" or CollectionService:HasTag(part, "ResourceNode") then
+		return true
+	end
+	if isBody(part) then
+		return true
+	end
+	for _, name in BuildingService.BLOCKING_FOLDERS do
+		local container = workspace:FindFirstChild(name)
+		if container and part:IsDescendantOf(container) then
+			return true
+		end
+	end
+	return false
+end
+
+-- True when solid terrain fills any voxel whose centre lies in the box.
+local function terrainInside(boxCenter: Vector3, boxSize: Vector3): boolean
+	local low, high = boxCenter - boxSize / 2, boxCenter + boxSize / 2
+	local region = Region3.new(low, high):ExpandToGrid(4)
+	local materials, occupancies = workspace.Terrain:ReadVoxels(region, 4)
+	local size = materials.Size
+	local origin = region.CFrame.Position - region.Size / 2
+	for x = 1, size.X do
+		for y = 1, size.Y do
+			local voxelY = origin.Y + (y - 0.5) * 4
+			if voxelY >= low.Y and voxelY <= high.Y then
+				for z = 1, size.Z do
+					local material = materials[x][y][z]
+					if
+						material ~= Enum.Material.Air
+						and material ~= Enum.Material.Water
+						and occupancies[x][y][z] > 0.5
+					then
+						return true
+					end
+				end
+			end
+		end
+	end
+	return false
+end
+
+-- A piece must stand in the open: nothing solid may fill it above its bottom
+-- GROUND_ALLOWANCE studs (no totems buried in the ground or inside rocks).
+local function overlapsWorld(center: Vector3, half: Vector3): boolean
+	local boxCenter, boxSize = BuildRules.ClearanceBox(center, half)
+	for _, part in workspace:GetPartBoundsInBox(CFrame.new(boxCenter), boxSize) do
+		if blocksPlacement(part) then
+			return true
+		end
+	end
+	return terrainInside(boxCenter, boxSize)
+end
+
+-- The builder must see the spot: nothing solid between their head and the base.
+local function inSight(head: BasePart, base: Vector3, half: Vector3): boolean
+	local target = base + Vector3.new(0, math.min(0.5, half.Y), 0)
+	local ignore = {}
+	for _, other in Players:GetPlayers() do
+		if other.Character then
+			table.insert(ignore, other.Character)
+		end
+	end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = ignore
+	params.RespectCanCollide = true
+	params.IgnoreWater = true
+	local offset = target - head.Position
+	local hit = workspace:Raycast(head.Position, offset, params)
+	return BuildRules.InSight(hit and (hit.Position - head.Position).Magnitude, offset.Magnitude)
 end
 
 local function makePart(pieceId: string, tier: string, center: Vector3, half: Vector3)
@@ -177,7 +322,7 @@ local function ownerName(player: Player, ownerKey: string): string
 end
 
 local function canManage(player: Player, record): boolean
-	return canAct(player) and BuildingService.OwnerKey(player) == record.ownerKey
+	return canAct(player) and BuildingService.IsOwnedBy(player, record)
 end
 
 local function setupDoor(record)
@@ -238,8 +383,8 @@ local function setupTotem(record)
 		record.hp = level.hp * healthRatio
 		publish(record)
 		refreshPrompt()
-		BuildRules.Claim(records, record, totems())
-		reconcileAll()
+		BuildRules.Claim(BuildRules.WithinTotem(records, record), record, totems())
+		reconcileNear(record)
 		InventoryService.Notify(player, ("Totem upgraded to level %d."):format(record.level))
 	end)
 end
@@ -257,8 +402,14 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		return false, "NotInRun"
 	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	local head = player.Character and player.Character:FindFirstChild("Head")
 	local base = BuildRules.Snap(position)
-	if root == nil or (base - root.Position).Magnitude > BuildRules.REACH then
+	if root == nil or head == nil or (base - root.Position).Magnitude > BuildRules.REACH then
+		return false, "TooFar"
+	end
+	-- Reach also holds from where the server last validated the player.
+	local validated = AntiExploitService.ValidatedPosition(player)
+	if validated and (base - validated).Magnitude > BuildRules.REACH + BuildingService.VALIDATED_SLACK then
 		return false, "TooFar"
 	end
 	local half = BuildRules.HalfExtents(piece.size, steps)
@@ -266,15 +417,21 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 	if BuildRules.OverlapsAura(center, half, auras()) then
 		return false, "NoBuildZone"
 	end
-	if SafeZoneService.Contains(center) then
+	if SafeZoneService.OverlapsBox(center, half) then
 		return false, "SafeZone"
 	end
-	if overlapsStructures(center, half) then
+	if overlapsStructures(center, half) or overlapsWorld(center, half) then
 		return false, "Blocked"
+	end
+	if not inSight(head, base, half) then
+		return false, "NoLineOfSight"
 	end
 	local ownerKey = BuildingService.OwnerKey(player)
 	if countFor(ownerKey) >= BuildingService.MAX_PIECES_PER_OWNER then
 		return false, "PieceLimit"
+	end
+	if pieceId == "Totem" and BuildRules.TotemLimitReached(totems(), ownerKey) then
+		return false, "TotemLimit"
 	end
 	if not pay(stats) then
 		return false, "MissingMaterials"
@@ -290,6 +447,9 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		hp = level and level.hp or stats.hp,
 		maxHp = level and level.hp or stats.hp,
 		ownerKey = ownerKey,
+		-- The builder keeps control while the key they built under owns it.
+		builderId = player.UserId,
+		builderKey = ownerKey,
 		position = center,
 		half = half,
 		isTotem = isTotem,
@@ -305,12 +465,15 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 	elseif isTotem then
 		setupTotem(record)
 	end
-	record.part.Parent = workspace
+	record.part.Parent = structureFolder()
 	if isTotem then
+		totemSet[record] = true
 		-- A new totem claims structures nobody's totem still covers (§42.2 #1).
-		BuildRules.Claim(records, record, totems())
+		BuildRules.Claim(BuildRules.WithinTotem(records, record), record, totems())
+		reconcileNear(record)
+	else
+		reconcile(record, totems(), now())
 	end
-	reconcileAll()
 	publish(record)
 	BuildingService.Placed:Fire(record, player)
 	return true, nil
@@ -330,23 +493,39 @@ function BuildingService.PlaceFromItem(player: Player, pieceId: string, position
 end
 
 -- Melee hits on structures, called by CombatService when no player was hit.
--- Returns true when a structure took damage.
-function BuildingService.Hit(player: Player, origin: Vector3, aim: Vector3, reach: number, rawDamage: number)
-	local ownerKey = BuildingService.OwnerKey(player)
+-- Only pieces near the swing are considered (a spatial query, not every piece in
+-- the world); `canSee(part)` (optional) rejects pieces behind walls. Returns true
+-- when a structure took damage.
+function BuildingService.Hit(
+	player: Player,
+	origin: Vector3,
+	aim: Vector3,
+	reach: number,
+	rawDamage: number,
+	canSee: ((BasePart) -> boolean)?
+)
 	if SafeZoneService.Contains(origin) then
 		return false
 	end
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { structureFolder() }
+	-- Bounding boxes up to half.Y + 6 above or below the swing still count.
+	local radius = reach + BuildingService.HIT_ALLOWANCE + 6
 	local best, bestDistance = nil, math.huge
-	for part in byPart do
+	for _, part in workspace:GetPartBoundsInRadius(origin, radius, params) do
 		local record = byPart[part]
+		if record == nil or BuildingService.IsOwnedBy(player, record) then
+			continue
+		end
 		local distance = BuildRules.HorizontalDistance(origin, record.position, record.half)
 		local offset = record.position - origin
 		if
-			record.ownerKey ~= ownerKey
-			and distance <= reach + BuildingService.HIT_ALLOWANCE
+			distance <= reach + BuildingService.HIT_ALLOWANCE
 			and distance < bestDistance
 			and math.abs(offset.Y) <= record.half.Y + 6
 			and (distance < 1 or DamageRules.WithinArc(aim, Vector3.new(offset.X, 0, offset.Z), 120))
+			and (canSee == nil or canSee(part))
 		then
 			best, bestDistance = record, distance
 		end
@@ -397,6 +576,7 @@ function BuildingService.Start()
 	for _, part in CollectionService:GetTagged(BuildingService.GENERATED_TAG) do
 		part:SetAttribute("Generated", true)
 	end
+	structureFolder()
 	Remotes.Handle("Build", build)
 	Remotes.Handle("BuildInfo", info)
 	task.spawn(function()

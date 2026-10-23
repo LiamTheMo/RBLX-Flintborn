@@ -3,20 +3,24 @@
 -- population's level and gear. It hunts contesting players near its home with
 -- three attack patterns — Slam (melee), Bolt (slow projectile) and Quake
 -- (telegraphed area) — and resets by its source's rule when nobody contests it.
--- Loot spills on death as physical, contested drops. World place only.
+-- A hit from beyond aggro range provokes it: it stays leashed but answers the
+-- attacker with Bolts and Quakes (AggroRules). Players in safe zones are never
+-- targeted. Everyone who damaged it is in boss.contributors. It walks on the
+-- ground like other enemies. Loot spills on death as physical, contested drops.
+-- World place only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
 local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
 local BossScaling = require(ReplicatedStorage.Shared.Bosses.BossScaling)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
-local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local NpcService = require(script.Parent.NpcService)
@@ -37,18 +41,15 @@ BossService.BOLT_SPEED = 35
 BossService.BOLT_RADIUS = 4
 BossService.QUAKE_RADIUS = 12
 BossService.QUAKE_WARNING = 1.5
+-- A bolt flies at least this far, and far enough to reach a provoking attacker.
+BossService.BOLT_MIN_RANGE = BossService.BOLT_SPEED * 3
 
 local bosses = {}
 local folder = nil
 local rng = Random.new()
 
-local function canTarget(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
-end
+-- Living, at-risk, standing players outside safe zones (§3.2).
+local canTarget = NpcService.CanTarget
 
 local function rootOf(player: Player)
 	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -102,6 +103,7 @@ local function bolt(boss, targetPosition: Vector3)
 	if direction.Magnitude < 1 then
 		return
 	end
+	local range = math.max(BossService.BOLT_MIN_RANGE, direction.Magnitude + BossService.BOLT_RADIUS * 2)
 	direction = direction.Unit
 	local orb = Instance.new("Part")
 	orb.Name = "BossBolt"
@@ -122,7 +124,7 @@ local function bolt(boss, targetPosition: Vector3)
 	end
 	connection = RunService.Heartbeat:Connect(function(dt)
 		travelled += BossService.BOLT_SPEED * dt
-		if travelled > BossService.BOLT_SPEED * 3 then
+		if travelled > range then
 			stop()
 			return
 		end
@@ -234,15 +236,21 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 		lastContested = os.clock(),
 		phase = "Fight",
 		options = options,
+		-- Player -> true for everyone who damaged it (participation credit).
+		contributors = {},
 	}
 	boss.npc = NpcService.Register({
 		body = body,
 		name = def.name,
+		home = position,
 		health = health,
 		maxHealth = health,
 		invulnerable = options.shielded == true,
-		onDamaged = function(npc, amount)
+		onDamaged = function(npc, amount, attacker)
 			boss.lastContested = os.clock()
+			if attacker then
+				boss.contributors[attacker] = true
+			end
 			if options.onDamaged then
 				options.onDamaged(boss, npc.health + amount, npc.health)
 			end
@@ -269,8 +277,36 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 	return boss
 end
 
+local function groundParams()
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	local ignore = { folder }
+	-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
+	for _, name in { "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures" } do
+		local other = workspace:FindFirstChild(name)
+		if other then
+			table.insert(ignore, other)
+		end
+	end
+	for _, player in Players:GetPlayers() do
+		if player.Character then
+			table.insert(ignore, player.Character)
+		end
+	end
+	params.FilterDescendantsInstances = ignore
+	params.RespectCanCollide = true
+	return params
+end
+
+-- Bosses follow the terrain like other enemies.
+local function groundAt(position: Vector3, params): Vector3
+	local hit = workspace:Raycast(position + Vector3.new(0, 20, 0), Vector3.new(0, -60, 0), params)
+	return if hit then hit.Position else position
+end
+
 local function step(dt: number)
 	local now = os.clock()
+	local params = groundParams()
 	for _, boss in bosses do
 		local body = boss.npc.body
 		local position = body.Position
@@ -287,6 +323,13 @@ local function step(dt: number)
 				end
 			end
 		end
+		if target == nil then
+			-- Hit from beyond aggro range: answer the attacker from the arena.
+			local provoker, provokerRoot = NpcService.Provoker(boss.npc, BossService.LEASH, now)
+			if provoker then
+				target, best = provoker, (provokerRoot.Position - position).Magnitude
+			end
+		end
 		local action = BossRules.ResetAction(boss.source, {
 			idleSeconds = now - boss.lastContested,
 			eventExpired = boss.options.expired and boss.options.expired() or false,
@@ -298,7 +341,9 @@ local function step(dt: number)
 		elseif action == "Heal" and boss.npc.health < boss.npc.maxHealth then
 			BossService.Heal(boss)
 		end
-		local goal = if target then rootOf(target).Position else boss.home
+		-- Bosses never leave their leash, even to chase a provoking archer.
+		local goal =
+			AggroRules.ClampToLeash(boss.home, if target then rootOf(target).Position else boss.home, BossService.LEASH)
 		local flat = Vector3.new(goal.X - position.X, 0, goal.Z - position.Z)
 		if target and now - boss.lastAttack >= BossService.ATTACK_SECONDS then
 			boss.lastAttack = now
@@ -306,7 +351,8 @@ local function step(dt: number)
 		end
 		if flat.Magnitude > (if target then boss.reach * 0.8 else 2) then
 			local move = flat.Unit * math.min(boss.def.speed * dt, flat.Magnitude)
-			body.CFrame = CFrame.lookAt(position + move, position + move + flat.Unit)
+			local standing = groundAt(position + move, params) + Vector3.new(0, body.Size.Y / 2, 0)
+			body.CFrame = CFrame.lookAt(standing, standing + flat.Unit)
 		end
 	end
 end
@@ -322,6 +368,11 @@ function BossService.Start()
 	folder = Instance.new("Folder")
 	folder.Name = "Bosses"
 	folder.Parent = workspace
+	Players.PlayerRemoving:Connect(function(player)
+		for _, boss in bosses do
+			boss.contributors[player] = nil
+		end
+	end)
 	local elapsed = 0
 	RunService.Heartbeat:Connect(function(dt)
 		elapsed += dt

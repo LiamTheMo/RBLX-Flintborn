@@ -1,6 +1,10 @@
 -- In-world tribes (GDD §5.2, Q39, Q161c): create, invite, accept, leave, kick and
--- mutual alliances, up to 8 members. A lobby party arrives as one tribe. Members
--- carry a TribeId attribute that combat uses to block friendly fire. World only.
+-- mutual alliances, up to 8 members. A lobby party arrives as one tribe. Tribe IDs
+-- always start with "tribe:" so they never collide with BuildingService's
+-- "solo:<userId>" owner keys, and they never leave the server: clients (and the
+-- TribeId attribute combat uses to block friendly fire) only ever see a separate
+-- random handle per tribe, so a forged TeleportData partyId cannot target a tribe
+-- seen in-game. World only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -15,9 +19,47 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 local TribeService = {}
 
 TribeService.REQUEST_COOLDOWN_SECONDS = 0.25
+TribeService.PREFIX = "tribe:"
+TribeService.PARTY_PREFIX = "tribe:party:"
 
 local state = TribeRules.NewState()
 local lastRequest = {}
+-- Internal tribe id <-> the public handle clients see.
+local handleOf = {}
+local idOfHandle = {}
+
+-- Lobby party ids are server GUIDs; anything else in TeleportData is forged.
+function TribeService.ValidPartyId(partyId: any): boolean
+	return type(partyId) == "string"
+		and string.match(partyId, "^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$")
+			~= nil
+end
+
+local function handleFor(id: string): string
+	local handle = handleOf[id]
+	if handle == nil then
+		handle = HttpService:GenerateGUID(false)
+		handleOf[id] = handle
+		idOfHandle[handle] = id
+	end
+	return handle
+end
+
+-- The internal id behind a client-supplied handle, if it names a live tribe.
+local function idFromHandle(handle: any): string?
+	local id = Validation.IsId(handle) and idOfHandle[handle] or nil
+	return if id and state.tribes[id] then id else nil
+end
+
+-- Drops handles of tribes that no longer exist.
+local function pruneHandles()
+	for id, handle in handleOf do
+		if state.tribes[id] == nil then
+			handleOf[id] = nil
+			idOfHandle[handle] = nil
+		end
+	end
+end
 
 function TribeService.TribeIdOf(player: Player): string?
 	return state.memberOf[player.UserId]
@@ -42,25 +84,30 @@ local function viewFor(player: Player)
 		end
 		local allies = {}
 		for allyId in tribe.allies do
-			table.insert(allies, allyId)
+			local ally = state.tribes[allyId]
+			table.insert(allies, ally and nameOf(ally.leader) or "?")
 		end
-		view.tribe = { id = tribe.id, leader = tribe.leader, members = members, allies = allies }
+		view.tribe = { id = handleFor(tribe.id), leader = tribe.leader, members = members, allies = allies }
 	end
+	-- Other tribes appear by leader name and size; `tribeId` is only their public
+	-- handle, which is what accept and ally take.
 	for id, other in state.tribes do
 		if other.invites[player.UserId] then
-			table.insert(view.invites, { tribeId = id, from = nameOf(other.leader) })
+			table.insert(view.invites, { tribeId = handleFor(id), from = nameOf(other.leader) })
 		end
 		if tribe == nil or other.id ~= tribe.id then
-			table.insert(view.others, { tribeId = id, leader = nameOf(other.leader), size = #other.members })
+			table.insert(view.others, { tribeId = handleFor(id), leader = nameOf(other.leader), size = #other.members })
 		end
 	end
 	return view
 end
 
 local function broadcast()
+	pruneHandles()
 	local changed = Remotes.Get("TribeChanged")
 	for _, player in Players:GetPlayers() do
-		player:SetAttribute("TribeId", state.memberOf[player.UserId])
+		local id = state.memberOf[player.UserId]
+		player:SetAttribute("TribeId", id and handleFor(id) or nil)
 		changed:FireClient(player, viewFor(player))
 	end
 end
@@ -73,20 +120,20 @@ local function handle(player: Player, action: any, argument: any)
 	lastRequest[player] = now
 	local ok, reason
 	if action == "create" then
-		ok, reason = TribeRules.Create(state, player.UserId, HttpService:GenerateGUID(false))
+		ok, reason = TribeRules.Create(state, player.UserId, TribeService.PREFIX .. HttpService:GenerateGUID(false))
 	elseif action == "invite" and type(argument) == "number" then
 		if Players:GetPlayerByUserId(argument) == nil then
 			return false, "PlayerNotHere"
 		end
 		ok, reason = TribeRules.Invite(state, player.UserId, argument)
 	elseif action == "accept" and Validation.IsId(argument) then
-		ok, reason = TribeRules.Accept(state, player.UserId, argument)
+		ok, reason = TribeRules.Accept(state, player.UserId, idFromHandle(argument) or "")
 	elseif action == "leave" then
 		ok, reason = TribeRules.Leave(state, player.UserId)
 	elseif action == "kick" and type(argument) == "number" then
 		ok, reason = TribeRules.Kick(state, player.UserId, argument)
 	elseif action == "ally" and Validation.IsId(argument) then
-		ok, reason = TribeRules.Ally(state, player.UserId, argument)
+		ok, reason = TribeRules.Ally(state, player.UserId, idFromHandle(argument) or "")
 	else
 		return false, "BadRequest"
 	end
@@ -99,8 +146,10 @@ local function joinPartyTribe(player: Player)
 	local joinData = player:GetJoinData()
 	local data = joinData and joinData.TeleportData
 	local partyId = type(data) == "table" and data.partyId
-	if Validation.IsId(partyId) and state.memberOf[player.UserId] == nil then
-		TribeRules.JoinOrCreate(state, player.UserId, partyId)
+	if TribeService.ValidPartyId(partyId) and state.memberOf[player.UserId] == nil then
+		-- Party tribes live in their own namespace: a forged partyId can only ever
+		-- name another party tribe, never an in-world tribe or a "solo:" key.
+		TribeRules.JoinOrCreate(state, player.UserId, TribeService.PARTY_PREFIX .. partyId)
 		broadcast()
 	end
 end

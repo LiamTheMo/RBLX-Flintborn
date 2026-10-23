@@ -10,6 +10,9 @@ local DownedRules = {}
 
 DownedRules.REVIVE_RANGE = 8
 DownedRules.CRAWL_SPEED = 2
+-- A held prompt's release can reach the server a little before the server's own
+-- 10 s count completes (network latency); a hold that close counts as complete.
+DownedRules.HOLD_TOLERANCE = 0.5
 
 export type State = {
 	downedHealth: number,
@@ -42,6 +45,20 @@ function DownedRules.StopRevive(state: State, reviverId: number?)
 		state.reviverId = nil
 		state.reviveProgress = 0
 	end
+end
+
+-- The reviver released the hold. Returns "Revived" when their progress was within
+-- HOLD_TOLERANCE of a full revive; otherwise stops the revive and returns nil.
+-- A release by anyone but the current reviver changes nothing.
+function DownedRules.EndHold(state: State, reviverId: number): string?
+	if state.reviverId ~= reviverId then
+		return nil
+	end
+	if state.reviveProgress >= GameConstants.REVIVE_SECONDS - DownedRules.HOLD_TOLERANCE then
+		return "Revived"
+	end
+	DownedRules.StopRevive(state, reviverId)
+	return nil
 end
 
 -- Advances time. Returns "Revived", "BledOut" or nil.

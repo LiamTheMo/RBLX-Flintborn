@@ -1,7 +1,9 @@
 -- Server-authoritative combat (GDD §5.1, §5.5, §21.1, §21.5). Clients send attack
 -- intent (aim direction, draw time) with increasing sequence numbers; the server
--- picks targets from its own positions, enforces cadence, reach, arc, risk state,
--- friendly fire and safe zones, and applies damage through armor EHP. World only.
+-- picks targets from its own positions, enforces cadence, reach, arc, line of
+-- sight, risk state, friendly fire and safe zones, and applies damage through
+-- armor EHP. Nobody inside a safe zone deals damage to anything (§3.2). Arrows
+-- leave from the head, and draw time is capped at what the server saw. World only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -33,6 +35,8 @@ CombatService.Hurt = Signal.new()
 
 local lastAttack = {}
 local lastSequence = {}
+-- When each player's run began: the first draw cannot predate it.
+local runStartedAt = {}
 
 local function rootOf(player: Player)
 	local character = player.Character
@@ -135,13 +139,42 @@ local function readyToAttack(player: Player, cooldown: number): boolean
 	return true
 end
 
+-- Everything a line-of-sight ray ignores: characters never block a swing.
+local function characters()
+	local list = {}
+	for _, other in Players:GetPlayers() do
+		if other.Character then
+			table.insert(list, other.Character)
+		end
+	end
+	return list
+end
+
+-- True when nothing solid (structures, ground, terrain) lies between `from` and
+-- `to`, other than `target` itself.
+local function clearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = ignore
+	params.RespectCanCollide = true
+	params.IgnoreWater = true
+	local hit = workspace:Raycast(from, to - from, params)
+	return hit == nil or (target ~= nil and (hit.Instance == target or hit.Instance:IsDescendantOf(target)))
+end
+
+local function inSafeZone(player: Player): boolean
+	local root = rootOf(player)
+	return root ~= nil and SafeZoneService.Contains(root.Position)
+end
+
 local function melee(player: Player, sequence: any, direction: any)
 	local aim = validDirection(direction)
 	local root = rootOf(player)
-	if not acceptSequence(player, sequence) or aim == nil or root == nil or aliveHumanoid(player) == nil then
+	local head = player.Character and player.Character:FindFirstChild("Head")
+	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
 		return
 	end
-	if not WorldAdmissionService.IsAtRisk(player) then
+	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) or inSafeZone(player) then
 		return
 	end
 	local equipped = InventoryService.Equipped(player)
@@ -149,17 +182,26 @@ local function melee(player: Player, sequence: any, direction: any)
 	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end
+	local ignore = characters()
+	local function canSee(part: BasePart): boolean
+		return clearLine(head.Position, part.Position, ignore, part)
+	end
 	local flatAim = Vector3.new(aim.X, 0, aim.Z)
+	local attacker = actor(player)
 	local best, bestDistance = nil, math.huge
 	for _, other in Players:GetPlayers() do
 		local otherRoot = other ~= player and rootOf(other)
 		if otherRoot then
 			local offset = otherRoot.Position - root.Position
 			local distance = offset.Magnitude
+			-- Only targets this swing could actually hurt compete, so an untouchable
+			-- tribe-mate in front never absorbs a hit meant for an enemy.
 			if
 				distance < bestDistance
 				and DamageRules.WithinReach(distance, profile.reach)
 				and DamageRules.WithinArc(flatAim, Vector3.new(offset.X, 0, offset.Z), profile.arc)
+				and DamageRules.CanDamage(attacker, actor(other))
+				and canSee(otherRoot)
 			then
 				best, bestDistance = other, distance
 			end
@@ -168,9 +210,9 @@ local function melee(player: Player, sequence: any, direction: any)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
 	if best then
 		CombatService.ApplyHit(player, best, damage)
-	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage, player) then
+	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage, player, canSee) then
 		-- Raiding: the same swing damages another tribe's structures (GDD Q38).
-		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage)
+		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage, canSee)
 	end
 end
 
@@ -184,8 +226,12 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	if type(drawSeconds) ~= "number" or drawSeconds ~= drawSeconds or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
+	if inSafeZone(player) then
+		return
+	end
 	local equipped = InventoryService.Equipped(player)
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
+	local previous = lastAttack[player] or runStartedAt[player]
 	if profile.kind ~= "Bow" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end
@@ -195,8 +241,10 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 		return
 	end
 	local damage = DamageRules.ArrowDamage(profile, "Arrow", equipped.qualityRoll)
-	local origin = head.Position + aim * 2
-	ProjectileService.Fire(origin, aim * DamageRules.ArrowSpeed(drawSeconds), character, function(result)
+	-- The draw cannot have lasted longer than the server saw since the last attack.
+	local draw = DamageRules.ObservedDraw(drawSeconds, previous, lastAttack[player])
+	-- Launched from the head itself, so an arrow can never start beyond a wall.
+	ProjectileService.Fire(head.Position, aim * DamageRules.ArrowSpeed(draw), character, function(result)
 		local model = result.Instance:FindFirstAncestorOfClass("Model")
 		local target = model and Players:GetPlayerFromCharacter(model)
 		if target then
@@ -215,9 +263,13 @@ function CombatService.Start()
 	Remotes.Listen("Shoot", shoot)
 	-- Event creatures hurt players through the same safety rules as PvP.
 	NpcService.DamagePlayer = CombatService.ApplyEnvironmentHit
+	WorldAdmissionService.RunStarted:Connect(function(player)
+		runStartedAt[player] = os.clock()
+	end)
 	Players.PlayerRemoving:Connect(function(player)
 		lastAttack[player] = nil
 		lastSequence[player] = nil
+		runStartedAt[player] = nil
 	end)
 end
 
