@@ -213,6 +213,13 @@ function LobbyController.Start()
 		partyView = view
 		refreshParty()
 	end)
+	local function notice()
+		if player:GetAttribute("MaintenanceNotice") then
+			setStatus("Game update: your items were saved and return on your next Play.")
+		end
+	end
+	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(notice)
+	notice()
 	Players.PlayerAdded:Connect(refreshParty)
 	Players.PlayerRemoving:Connect(function()
 		task.defer(refreshParty)
