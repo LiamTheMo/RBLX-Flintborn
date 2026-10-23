@@ -24,7 +24,7 @@
 | v0.07 ✅ | Death, departure, tribes and revives | v0.06 | Corpses, logout loss, tribes, downed and revive, safe kicks |
 | v0.08 ✅ | Extraction, lobby backpack and secure vault | v0.07 | **First complete risk → loot → extract → vault loop** |
 | v0.09 ✅ | Ancestral Forge and Permanent items | v0.08 | Special recipes and the first Permanent pickaxe |
-| [v0.10](v0.10-building-totems-raiding-and-farming.md) | Building, totems, raiding and farming | v0.07 | Booga Booga bases, totems, decay, raids, crops |
+| v0.10 ✅ | Building, totems, raiding and farming | v0.07 | Booga Booga bases, totems, decay, raids, crops |
 | [v0.11](v0.11-world-event-director-and-rare-spawns.md) | World event director and rare spawns | v0.10 | Announced weighted events, rare nodes, ruins, caches |
 | [v0.12](v0.12-bosses-guardian-and-scaling.md) | Bosses: Guardian and scalable encounters | v0.11 | Center Guardian and event, ritual and structure bosses |
 | [v0.13](v0.13-account-progression-masteries-and-rebirth.md) | Account progression, masteries and rebirth | v0.08 | XP, levels, five masteries, rebirth tokens and perks |
