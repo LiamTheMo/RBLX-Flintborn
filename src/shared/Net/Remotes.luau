@@ -20,6 +20,12 @@ local DEFINITIONS = {
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
 	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld, crouching)
 	UseConsumable = "RemoteFunction", -- (requestId, catalogId) -> ok, reason
+	InventoryChanged = "RemoteEvent", -- server -> client: inventory snapshot
+	MoveItem = "RemoteFunction", -- (fromArea, fromIndex, toArea, toIndex) -> ok, reason
+	EquipSlot = "RemoteFunction", -- (hotbarIndex or nil) -> ok, reason
+	Craft = "RemoteFunction", -- (requestId, recipeId) -> ok, reason
+	PlaceItem = "RemoteFunction", -- (hotbarIndex) -> ok, reason
+	Notify = "RemoteEvent", -- server -> client: short message
 }
 
 local function folder()
