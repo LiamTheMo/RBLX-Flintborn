@@ -225,3 +225,18 @@ Studio and live checks:
 - [ ] N opens the map with regions, landmarks, camps, active portals and events; the compass follows the camera.
 - [ ] Zoom with wheel, pinch and right stick stays within 8–40 studs and is restored on the next spawn.
 - [ ] Traverse every ring on mobile and note travel times; 30-player performance on a mid-range phone.
+
+## v0.16 — Onboarding, UX and accessibility
+
+Automated: 4 specs cover the tutorial's learning order with a completion trigger per step, steps completing only in order and from their own trigger, rewards paid once (never after a skip or on replay, the safe Play step unskippable), and no step granting Permanent gear, more than 25 Gems or more than easy-tier Coins. Deployed and verified on both places (2026-10-23).
+
+Placeholders: ten steps (Play → Survive → Gather → Craft → Heal → Tribes → Events → Extract → Vault → Economy); rewards are a gathering XP grant and 250 Coins on the first extraction. Settings: UI scale 0.8–1.4, colour-blind (Okabe–Ito based) rarity palette, reduced motion, subtitles on by default. No new-player PvP protection (GDD Open, default none).
+
+Studio and live checks (desktop, touch and controller):
+
+- [ ] A fresh profile sees "Tutorial 1/10" in the world menu; each step advances only after doing it; "Got it" advances the explanation steps; Skip appears after the safe Play step.
+- [ ] The marker points at the nearest node, event or portal and does not bob with reduced motion on.
+- [ ] The first extraction pays 250 Coins once; replaying the tutorial from settings pays nothing again.
+- [ ] ⚙ / O opens settings: UI scale applies to every screen at once; the colour-blind palette changes rarity colours everywhere (names still shown); subtitles caption event, extraction and Guardian alerts; choices persist after rejoining.
+- [ ] The on-screen navigation bar opens every panel (vault, Forge, market, trade, progress in the lobby; backpack, craft, build, tribe, map, progress in a run) without a keyboard.
+- [ ] Testers can explain Vaulted vs Permanent; a colour-blind simulation pass over every screen.
