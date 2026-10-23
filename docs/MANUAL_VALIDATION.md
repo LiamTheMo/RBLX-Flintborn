@@ -68,3 +68,17 @@ Studio and live checks:
 - [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack; tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
+
+## v0.06 — Combat, armor and PvP rules
+
+Automated: 9 specs cover full-set EHP (120/150/180/200), additive mixed pieces and rolls, confirmed melee damage and cadence, cooldown enforcement, friendly fire / risk state / safe-zone gating, reach and arc, draw-independent bow damage, and wearing armor. Deployed and verified on both places (2026-10-23).
+
+Safe zones are parts tagged `SafeZone` (which POIs get them is map content for v0.15). Placeholder values in use: armor split Head 25% / Chest 45% / Legs 30%, dagger 9 / sword 18 / iron sword 26 damage, arrows 60–120 studs/s at 0.35× gravity, basic bow + arrow 12 damage, allied tribes not yet protected from each other.
+
+Studio and live checks (two players):
+
+- [ ] Duels with each weapon family: spears hit hardest and slowest, daggers fastest; spam-clicking never beats the cadence.
+- [ ] Arrows fly visibly slow on an arc, each shot uses one arrow, and a longer draw goes farther without hitting harder.
+- [ ] Wearing armor (select a piece in the backpack, tap its Head/Chest/Legs slot) noticeably lengthens fights; full iron roughly doubles effective health.
+- [ ] Nobody can hurt a player on the world menu, while spawning, or inside a `SafeZone` part; tribe members cannot hurt each other (tribes arrive in v0.07).
+- [ ] Combat feels fair on a throttled connection (Studio network simulation).
