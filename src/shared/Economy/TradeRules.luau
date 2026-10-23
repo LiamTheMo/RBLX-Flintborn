@@ -1,9 +1,10 @@
 -- Lobby trading (GDD §10.2, Q13, Q50, Q56, Q98, Q125, Q130). Two players in the
 -- same lobby trade designated items and Gems — never Coins. Raw materials trade
--- only when flagged rare or Exclusive. Gem trades need level 10, are capped per
--- UTC day and pay a 5% fee. Settlement writes the trade into both profiles as
--- pending; Reconcile later finalises it (both sides saved) or rolls one side back
--- (the other never saved), so a crash between the two writes leaves one outcome.
+-- only when flagged rare or Exclusive. Gem trades need level 10 on both sides, are
+-- capped per UTC day for sending and receiving, and pay a 5% fee. Settlement
+-- writes the trade into both profiles as pending; Reconcile later finalises it
+-- (the counterpart saved it too) or rolls one side back (the counterpart never
+-- saved it, or rolled back), and waits while the counterpart may still save.
 
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
@@ -14,7 +15,7 @@ TradeRules.MIN_GEM_LEVEL = 10
 TradeRules.DAILY_GEM_LIMIT = 2000
 TradeRules.GEM_FEE = 0.05
 TradeRules.MAX_ITEMS = 9
-TradeRules.HISTORY = 50
+TradeRules.HISTORY = 500
 
 local TRADEABLE_FAMILIES = { Tool = true, Weapon = true, Armor = true, Placeable = true }
 
@@ -43,6 +44,10 @@ end
 function TradeRules.ValidateOffer(profile, offer, now: number)
 	if offer.coins ~= nil and offer.coins ~= 0 then
 		return false, "CoinsNotTradeable"
+	end
+	-- A trade still awaiting its counterpart's save could yet be undone.
+	if next(profile.trades.pending) then
+		return false, "TradePending"
 	end
 	if #offer.items > TradeRules.MAX_ITEMS then
 		return false, "TooManyItems"
@@ -79,6 +84,22 @@ end
 
 function TradeRules.GemsAfterFee(gems: number): number
 	return math.floor(gems * (1 - TradeRules.GEM_FEE))
+end
+
+-- Checks that `profile` may receive `gems` (before the fee) today.
+function TradeRules.ValidateReceive(profile, gems: number, now: number)
+	if gems <= 0 then
+		return true, nil
+	end
+	if profile.progression.level < TradeRules.MIN_GEM_LEVEL then
+		return false, "PartnerGemLevel"
+	end
+	local currency = profile.currency
+	local receivedToday = if currency.gemReceiveDay == today(now) then currency.gemsReceivedToday else 0
+	if receivedToday + TradeRules.GemsAfterFee(gems) > TradeRules.DAILY_GEM_LIMIT then
+		return false, "PartnerGemDailyLimit"
+	end
+	return true, nil
 end
 
 -- Takes the offered items and Gems out of the giver. Returns what was taken.
@@ -122,7 +143,15 @@ local function give(profile, taken, receiverId: number, now: number)
 		-- Received items always land, even past 50 slots: a trade never deletes.
 		table.insert(profile.lobbyBackpack.slots, copy)
 	end
-	profile.currency.gems += TradeRules.GemsAfterFee(taken.gems)
+	local gems = TradeRules.GemsAfterFee(taken.gems)
+	if gems > 0 then
+		local currency = profile.currency
+		if currency.gemReceiveDay ~= today(now) then
+			currency.gemReceiveDay, currency.gemsReceivedToday = today(now), 0
+		end
+		currency.gemsReceivedToday += gems
+		currency.gems += gems
+	end
 end
 
 -- Settles a validated trade between two loaded profiles. Both get a pending record
@@ -156,47 +185,98 @@ function TradeRules.Finalize(profile, tradeId: string, now: number)
 	record(profile, tradeId, "Settled", now)
 end
 
--- Resolves a pending trade against the counterpart's saved profile: if the
--- counterpart also recorded it, it stands; otherwise this side is undone.
-function TradeRules.Reconcile(profile, tradeId: string, counterpartStored, now: number): string
-	local pending = profile.trades.pending[tradeId]
-	if pending == nil then
-		return "None"
+-- True while the counterpart's stored lease is unexpired and held by the server
+-- that settled the trade (or an unknown one): that server may still save it.
+function TradeRules.CounterpartMaySave(pending, counterpartStored, now: number): boolean
+	local lease = counterpartStored and counterpartStored.sessionLease
+	if lease == nil or lease.expiresAt <= now then
+		return false
 	end
-	local other = counterpartStored and counterpartStored.trades
-	if other and (other.pending[tradeId] or other.history[tradeId]) then
-		record(profile, tradeId, "Settled", now)
-		return "Settled"
-	end
-	-- Undo: remove what was received, restore what was given.
-	local slots = profile.lobbyBackpack.slots
-	for _, item in pending.received.items do
-		if item.permanent then
-			profile.permanentItems[item.instanceId] = nil
+	return pending.server == nil or lease.jobId == pending.server
+end
+
+-- Removes up to `quantity` of a stack from a list of slots. Returns what is left.
+local function takeStack(slots, catalogId: string, quantity: number): number
+	for index = #slots, 1, -1 do
+		local slot = slots[index]
+		if quantity <= 0 then
+			break
 		end
-		for index = #slots, 1, -1 do
-			local slot = slots[index]
-			local same = if item.instanceId
-				then slot.instanceId == item.instanceId
-				else slot.instanceId == nil and slot.catalogId == item.catalogId
-			if same then
-				if item.instanceId or slot.quantity <= item.quantity then
-					table.remove(slots, index)
-				else
-					slot.quantity -= item.quantity
-				end
-				break
+		if slot.instanceId == nil and slot.catalogId == catalogId then
+			local taken = math.min(quantity, slot.quantity)
+			slot.quantity -= taken
+			quantity -= taken
+			if slot.quantity <= 0 then
+				table.remove(slots, index)
 			end
 		end
 	end
+	return quantity
+end
+
+local function takeInstance(slots, instanceId: string): boolean
+	for index, slot in slots do
+		if slot.instanceId == instanceId then
+			table.remove(slots, index)
+			return true
+		end
+	end
+	return false
+end
+
+-- Claws a received item back from wherever it now sits: backpack, then vault.
+local function takeBack(profile, item)
+	if item.instanceId then
+		if item.permanent then
+			profile.permanentItems[item.instanceId] = nil
+		end
+		if not takeInstance(profile.lobbyBackpack.slots, item.instanceId) then
+			takeInstance(profile.vault.items, item.instanceId)
+		end
+		return
+	end
+	local left = takeStack(profile.lobbyBackpack.slots, item.catalogId, item.quantity or 0)
+	left = takeStack(profile.vault.items, item.catalogId, left)
+	local materials = profile.vault.materials
+	if left > 0 and materials[item.catalogId] then
+		local remaining = materials[item.catalogId] - left
+		materials[item.catalogId] = if remaining > 0 then remaining else nil
+	end
+end
+
+local function rollBack(profile, pending, now: number)
+	for _, item in pending.received.items do
+		takeBack(profile, item)
+	end
 	for _, item in pending.gave.items do
-		table.insert(slots, table.clone(item))
+		table.insert(profile.lobbyBackpack.slots, table.clone(item))
 		if item.permanent then
 			profile.permanentItems[item.instanceId] = PermanentRules.LedgerEntry(item, now)
 		end
 	end
 	local currency = profile.currency
 	currency.gems = math.max(0, currency.gems - TradeRules.GemsAfterFee(pending.received.gems) + pending.gave.gems)
+end
+
+-- Resolves a pending trade against the counterpart's saved profile. It stands if
+-- the counterpart has it pending or settled; it waits ("Deferred") while the
+-- counterpart's server may still save it; otherwise this side is undone. Returns
+-- "None", "Settled", "Deferred" or "RolledBack".
+function TradeRules.Reconcile(profile, tradeId: string, counterpartStored, now: number): string
+	local pending = profile.trades.pending[tradeId]
+	if pending == nil then
+		return "None"
+	end
+	local other = counterpartStored and counterpartStored.trades
+	local entry = other and other.history[tradeId]
+	if other and (other.pending[tradeId] or (entry and entry.outcome == "Settled")) then
+		record(profile, tradeId, "Settled", now)
+		return "Settled"
+	end
+	if entry == nil and TradeRules.CounterpartMaySave(pending, counterpartStored, now) then
+		return "Deferred"
+	end
+	rollBack(profile, pending, now)
 	record(profile, tradeId, "RolledBack", now)
 	return "RolledBack"
 end

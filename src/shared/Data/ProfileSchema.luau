@@ -46,8 +46,11 @@ function ProfileSchema.Default(now: number?)
 			gems = 0,
 			gemTradeDay = 0,
 			gemsTradedToday = 0,
+			gemReceiveDay = 0,
+			gemsReceivedToday = 0,
 			npcSaleReceipts = {},
 			purchaseEntitlements = {},
+			redeemedCodes = {},
 		},
 		quests = { progress = {} },
 		trades = { pending = {}, history = {} },
@@ -58,6 +61,7 @@ function ProfileSchema.Default(now: number?)
 			titles = {},
 			appliedMilestones = {},
 			currentRun = nil,
+			pvpCredits = {},
 		},
 		rebirth = { count = 0, tokens = 0, ownedPerks = {}, legendariesSinceRebirth = 0 },
 		boosters = { xpUntil = 0 },
@@ -72,7 +76,7 @@ function ProfileSchema.Default(now: number?)
 			reducedMotion = false,
 			subtitles = true,
 		},
-		tutorial = { step = 1, skipped = false, completedAt = nil, rewardsGranted = {} },
+		tutorial = { step = 1, skipped = false, everSkipped = false, completedAt = nil, rewardsGranted = {} },
 		metrics = { runs = 0, extractions = 0, deaths = 0 },
 	}
 end
