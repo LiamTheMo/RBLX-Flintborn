@@ -25,12 +25,13 @@ EventRules.MAX_EVENT_NPCS = 40
 EventRules.MAX_LARGE_EVENTS = 6
 EventRules.LARGE_FOOTPRINT = 80
 
--- Biome rings as fractions of the map radius until the island exists (v0.15).
+-- Regions as fractions of the map radius (Shattered Crater: crater 300, inner ring
+-- 750, outer rim 1,200 studs; v0.15).
 EventRules.BIOMES = {
-	Center = { 0, 0.3 },
-	InnerRing = { 0.3, 0.65 },
-	OuterRim = { 0.65, 0.95 },
-	Any = { 0, 0.95 },
+	Center = { 0.03, 0.22 },
+	InnerRing = { 0.28, 0.6 },
+	OuterRim = { 0.65, 0.9 },
+	Any = { 0.03, 0.9 },
 }
 
 local function has(entries, rarity: string): boolean
