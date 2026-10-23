@@ -5,6 +5,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 
@@ -75,9 +76,14 @@ local function refreshPreview()
 	if #items == 0 then
 		label("Nothing in your backpack will enter the run.", ui.preview)
 	else
-		label("⚠ These items go with you and can be lost:", ui.preview)
+		label("⚠ These items go with you; all but ★ Permanent ones can be lost:", ui.preview)
 		for _, item in items do
-			label("• " .. tostring(item.catalogId) .. (item.quantity and (" ×" .. item.quantity) or ""), ui.preview)
+			local def = ItemCatalog.Get(item.catalogId)
+			local name = def and def.name or tostring(item.catalogId)
+			label(
+				(item.permanent and "★ " or "• ") .. name .. (item.quantity and (" ×" .. item.quantity) or ""),
+				ui.preview
+			)
 		end
 	end
 	label("Items in your vault always stay safe.", ui.preview)

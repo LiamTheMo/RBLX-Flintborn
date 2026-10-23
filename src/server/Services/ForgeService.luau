@@ -1,0 +1,130 @@
+-- The Ancestral Forge (GDD §15–16, §25.3). Lobby only. Shows every recipe with
+-- vault-only Owned/Needed counts and its unlock state, and commits special crafts
+-- and Permanent conversions as exactly-once operations keyed by the client's nonce,
+-- so a retried request returns the first result instead of charging again.
+
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ForgeRecipes = require(ReplicatedStorage.Shared.Crafting.ForgeRecipes)
+local ForgeRules = require(ReplicatedStorage.Shared.Crafting.ForgeRules)
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local ProfileService = require(script.Parent.ProfileService)
+
+local ForgeService = {}
+
+local function nameOf(catalogId: string): string
+	local def = ItemCatalog.Get(catalogId)
+	return def and def.name or catalogId
+end
+
+local function requirementText(recipe): string
+	local parts = {}
+	if (recipe.unlock.extractions or 0) > 0 then
+		table.insert(parts, ("extract %d time(s)"):format(recipe.unlock.extractions))
+	end
+	for _, catalogId in recipe.unlock.discovered or {} do
+		table.insert(parts, "extract " .. nameOf(catalogId))
+	end
+	return if #parts > 0 then "Unlock: " .. table.concat(parts, ", ") else ""
+end
+
+local function snapshot(player: Player)
+	local profile = ProfileService.GetProfile(player)
+	if profile == nil then
+		return nil
+	end
+	if #ForgeRules.PendingUnlocks(profile) > 0 then
+		ProfileService.RunOperation(
+			player,
+			"unlock:" .. HttpService:GenerateGUID(false),
+			"RecipeUnlock",
+			function(working)
+				return ForgeRules.RefreshUnlocks(working, os.time())
+			end
+		)
+		profile = ProfileService.GetProfile(player)
+	end
+	local recipes = {}
+	for _, recipe in ForgeRecipes.List do
+		local inputs = {}
+		for catalogId, needed in recipe.inputs do
+			table.insert(inputs, {
+				catalogId = catalogId,
+				name = nameOf(catalogId),
+				owned = ForgeRules.Owned(profile, catalogId),
+				needed = needed,
+			})
+		end
+		table.sort(inputs, function(a, b)
+			return a.name < b.name
+		end)
+		local view = {
+			id = recipe.id,
+			kind = recipe.kind,
+			category = recipe.category,
+			name = (recipe.kind == ForgeRecipes.Kinds.Permanent and "Permanent " or "") .. nameOf(recipe.output),
+			quantity = recipe.quantity,
+			unlocked = ForgeRules.IsUnlocked(profile, recipe.id),
+			requirement = requirementText(recipe),
+			inputs = inputs,
+		}
+		if recipe.kind == ForgeRecipes.Kinds.Permanent then
+			view.sources = {}
+			for _, item in ForgeRules.Sources(profile, recipe, player.UserId) do
+				table.insert(view.sources, {
+					instanceId = item.instanceId,
+					name = nameOf(item.catalogId),
+					qualityRoll = item.qualityRoll,
+				})
+			end
+		end
+		table.insert(recipes, view)
+	end
+	return { recipes = recipes, categories = ForgeRecipes.Categories }
+end
+
+local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
+	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsId(nonce) or #nonce > 50 then
+		return false, "BadRequest"
+	end
+	if sourceId ~= nil and not Validation.IsId(sourceId) then
+		return false, "BadRequest"
+	end
+	local operationId = "forge:" .. nonce
+	local ok, result = ProfileService.RunOperation(player, operationId, "Forge", function(profile)
+		local now = os.time()
+		ForgeRules.RefreshUnlocks(profile, now)
+		local receipt, reason = ForgeRules.Craft(profile, {
+			recipeId = recipeId,
+			sourceId = sourceId,
+			ownerId = player.UserId,
+			operationId = operationId,
+			now = now,
+			newId = function()
+				return HttpService:GenerateGUID(false)
+			end,
+		})
+		if receipt == nil then
+			error(reason, 0)
+		end
+		return receipt
+	end)
+	if not ok then
+		return false, tostring(result)
+	end
+	return true, result
+end
+
+function ForgeService.Start()
+	if not PlaceConfig.IsLobby() then
+		return
+	end
+	Remotes.Get("ForgeSnapshot").OnServerInvoke = snapshot
+	Remotes.Get("ForgeCraft").OnServerInvoke = craft
+end
+
+return ForgeService

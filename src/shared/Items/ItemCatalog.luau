@@ -59,6 +59,16 @@ local entries = {
 	material("Fiber", "Plant Fiber"),
 	material("Herbs", "Herbs"),
 	material("Hide", "Hide"),
+	-- Special material: rare-event reagent (v0.11 events drop it). Special materials
+	-- wait in the lobby backpack after extraction instead of auto-banking (Q129).
+	{
+		id = "AncientEmber",
+		name = "Ancient Ember",
+		family = F.Material,
+		rarity = "Epic",
+		special = true,
+		tags = { "event" },
+	},
 
 	-- Tools
 	tool("StoneAxe", "Stone Axe", "Axe", 1),
