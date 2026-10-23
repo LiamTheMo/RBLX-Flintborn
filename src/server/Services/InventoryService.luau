@@ -32,6 +32,19 @@ local function snapshot(entry)
 			end
 		end
 	end
+	for index, slot in InventoryRules.ArmorSlots do
+		local item = entry.inventory.armor[slot]
+		if item then
+			table.insert(slots, {
+				area = "armor",
+				index = index,
+				slot = slot,
+				catalogId = item.catalogId,
+				instanceId = item.instanceId,
+				qualityRoll = item.qualityRoll,
+			})
+		end
+	end
 	return { slots = slots, equipped = entry.equipped }
 end
 
@@ -92,6 +105,22 @@ function InventoryService.EquippedTool(player: Player)
 	local item = InventoryService.Equipped(player)
 	local def = item and ItemCatalog.Get(item.catalogId)
 	return def and def.tool or nil
+end
+
+-- Worn armor as {tier, slot, qualityRoll} pieces for the EHP calculation.
+function InventoryService.ArmorPieces(player: Player)
+	local inventory = InventoryService.Get(player)
+	local pieces = {}
+	if inventory then
+		for _, slot in InventoryRules.ArmorSlots do
+			local item = inventory.armor[slot]
+			local def = item and ItemCatalog.Get(item.catalogId)
+			if def and def.armor then
+				table.insert(pieces, { tier = def.armor.tier, slot = def.armor.slot, qualityRoll = item.qualityRoll })
+			end
+		end
+	end
+	return pieces
 end
 
 -- Every carried item as a flat list (departure and extraction).
@@ -158,6 +187,28 @@ function InventoryService.Start()
 	-- No PlayerRemoving cleanup here: an at-risk departure fires ActiveDeparture
 	-- (which still needs the inventory) and then RunEnded, which clears it.
 	Remotes.Get("MoveItem").OnServerInvoke = move
+	Remotes.Get("EquipArmor").OnServerInvoke = function(player, area, index)
+		local entry = entries[player]
+		if entry == nil or type(area) ~= "string" or type(index) ~= "number" then
+			return false, "BadRequest"
+		end
+		if not InventoryRules.EquipArmor(entry.inventory, area, index) then
+			return false, "NotArmor"
+		end
+		InventoryService.Publish(player)
+		return true, nil
+	end
+	Remotes.Get("UnequipArmor").OnServerInvoke = function(player, slot)
+		local entry = entries[player]
+		if entry == nil or type(slot) ~= "string" then
+			return false, "BadRequest"
+		end
+		if not InventoryRules.UnequipArmor(entry.inventory, slot) then
+			return false, "NoRoom"
+		end
+		InventoryService.Publish(player)
+		return true, nil
+	end
 	Remotes.Get("EquipSlot").OnServerInvoke = equip
 end
 

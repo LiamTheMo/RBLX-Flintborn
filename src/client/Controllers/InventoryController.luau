@@ -24,7 +24,8 @@ InventoryController.Snapshot = { slots = {}, equipped = nil }
 
 local player = Players.LocalPlayer
 local ui = {}
-local slotButtons = { hotbar = {}, backpack = {} }
+local slotButtons = { hotbar = {}, backpack = {}, armor = {} }
+local ARMOR_SLOTS = { "Head", "Chest", "Legs" }
 local selected = nil
 
 local function make(className: string, props, parent)
@@ -105,7 +106,28 @@ local function activateHotbar(index: number)
 	end
 end
 
+local function onArmorClicked(index: number)
+	if selected then
+		local from = selected
+		selected = nil
+		local ok, reason = invoke("EquipArmor", from.area, from.index)
+		if not ok then
+			toast("Can't wear that (" .. tostring(reason) .. ")")
+		end
+		InventoryController.Render()
+	elseif slotAt("armor", index) then
+		local ok, reason = invoke("UnequipArmor", ARMOR_SLOTS[index])
+		if not ok then
+			toast("No room to take that off (" .. tostring(reason) .. ")")
+		end
+	end
+end
+
 local function onSlotClicked(area: string, index: number)
+	if area == "armor" then
+		onArmorClicked(index)
+		return
+	end
 	if selected then
 		local from = selected
 		selected = nil
@@ -144,10 +166,10 @@ local function makeSlot(area: string, index: number, parent)
 		Font = Enum.Font.GothamMedium,
 		TextSize = 11,
 	}, button)
-	if area == "hotbar" then
+	if area == "hotbar" or area == "armor" then
 		make("TextLabel", {
-			Text = tostring(index),
-			Size = UDim2.fromOffset(14, 14),
+			Text = area == "armor" and ARMOR_SLOTS[index] or tostring(index),
+			Size = UDim2.fromOffset(area == "armor" and 40 or 14, 14),
 			BackgroundTransparency = 1,
 			TextColor3 = Color3.fromRGB(200, 190, 170),
 			Font = Enum.Font.GothamBold,
@@ -179,7 +201,7 @@ function InventoryController.Render()
 			parts.button.BackgroundColor3 = isEquipped and Color3.fromRGB(78, 62, 40) or Color3.fromRGB(36, 31, 26)
 		end
 	end
-	ui.hint.Text = if selected then "Tap another slot to move or swap." else ""
+	ui.hint.Text = if selected then "Tap another slot to move or swap, or an armor slot to wear it." else ""
 end
 
 local function build()
@@ -218,6 +240,24 @@ local function build()
 	}, ui.backpack)
 	for index = 1, GameConstants.BACKPACK_SLOTS do
 		makeSlot("backpack", index, ui.backpack)
+	end
+
+	-- Worn armor (Head, Chest, Legs/Boots): select a piece, then tap its slot to wear it.
+	local armorRow = make("Frame", {
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -86 - (5 * 66 + 12) - 8),
+		Size = UDim2.fromOffset(3 * 66, 62),
+		BackgroundTransparency = 1,
+		Visible = false,
+	}, ui.root)
+	ui.armorRow = armorRow
+	make("UIGridLayout", {
+		CellSize = UDim2.fromOffset(60, 60),
+		CellPadding = UDim2.fromOffset(6, 0),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, armorRow)
+	for index = 1, #ARMOR_SLOTS do
+		makeSlot("armor", index, armorRow)
 	end
 
 	local toggle = make("TextButton", {
@@ -260,6 +300,7 @@ end
 
 function InventoryController.ToggleBackpack()
 	ui.backpack.Visible = not ui.backpack.Visible
+	ui.armorRow.Visible = ui.backpack.Visible
 	selected = nil
 	InventoryController.Render()
 end

@@ -1,7 +1,9 @@
 -- Fixed 9-slot hotbar and 50-slot backpack (GDD §22.1.1, Q108, Q126–128). Every
 -- stackable type (materials, ammo, consumables) lives in ONE slot with one
 -- quantity; tools, weapons and armor are unique instances in their own slots and
--- never merge. Pure functions over an inventory table, shared with specs.
+-- never merge. Three equipped armor slots (Head, Chest, Legs/Boots; Q101) hold
+-- carried armor that counts toward EHP. Pure functions over an inventory table,
+-- shared with specs.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
@@ -17,10 +19,12 @@ local SIZES = {
 }
 
 export type Stack = { catalogId: string, quantity: number }
-export type Inventory = { hotbar: { [number]: any }, backpack: { [number]: any } }
+export type Inventory = { hotbar: { [number]: any }, backpack: { [number]: any }, armor: { [string]: any } }
+
+InventoryRules.ArmorSlots = { "Head", "Chest", "Legs" }
 
 function InventoryRules.New(): Inventory
-	return { hotbar = {}, backpack = {} }
+	return { hotbar = {}, backpack = {}, armor = {} }
 end
 
 function InventoryRules.Size(area: string): number?
@@ -159,7 +163,39 @@ function InventoryRules.Move(inventory: Inventory, fromArea: string, fromIndex: 
 	return true
 end
 
--- Every entry as a flat list (for departure, extraction and display).
+-- Equips the armor piece at (area, index) into its slot. Any piece already worn
+-- there swaps back into the same inventory slot.
+function InventoryRules.EquipArmor(inventory: Inventory, area: string, index: number): boolean
+	if SIZES[area] == nil then
+		return false
+	end
+	local entry = inventory[area][index]
+	local def = entry and ItemCatalog.Get(entry.catalogId)
+	if def == nil or def.armor == nil then
+		return false
+	end
+	local slot = def.armor.slot
+	inventory[area][index] = inventory.armor[slot]
+	inventory.armor[slot] = entry
+	return true
+end
+
+-- Moves a worn piece back into the first empty slot (backpack first).
+function InventoryRules.UnequipArmor(inventory: Inventory, slot: string): boolean
+	local entry = inventory.armor[slot]
+	if entry == nil then
+		return false
+	end
+	local area, index = firstEmpty(inventory, false)
+	if area == nil then
+		return false
+	end
+	inventory[area][index] = entry
+	inventory.armor[slot] = nil
+	return true
+end
+
+-- Every entry as a flat list (for departure, extraction and display), worn armor included.
 function InventoryRules.Items(inventory: Inventory)
 	local items = {}
 	for _, area in { "hotbar", "backpack" } do
@@ -168,6 +204,11 @@ function InventoryRules.Items(inventory: Inventory)
 			if entry then
 				table.insert(items, entry)
 			end
+		end
+	end
+	for _, slot in InventoryRules.ArmorSlots do
+		if inventory.armor[slot] then
+			table.insert(items, inventory.armor[slot])
 		end
 	end
 	return items
