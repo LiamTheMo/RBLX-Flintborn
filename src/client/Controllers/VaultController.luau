@@ -1,6 +1,7 @@
 -- Lobby vault and lobby backpack (GDD §10.3, §25.2). G (or DPadRight) opens the
--- panel: click a backpack item to deposit it, a vault item to withdraw it, or a
--- material to withdraw 10. The latest extraction receipt shows on arrival.
+-- panel: click a backpack item to deposit it or a vault item to withdraw it.
+-- Vault materials are listed only: they never leave the lobby (GDD §45). The
+-- latest extraction receipt shows on arrival.
 -- Lobby place only.
 
 local ContextActionService = game:GetService("ContextActionService")
@@ -15,8 +16,6 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local VaultController = {}
-
-VaultController.MATERIAL_STEP = 10
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -58,7 +57,11 @@ local function row(parent, text: string, color: Color3, onClick)
 		TextSize = 13,
 	}, parent)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-	b.Activated:Connect(onClick)
+	if onClick then
+		b.Activated:Connect(onClick)
+	else
+		b.AutoButtonColor = false
+	end
 end
 
 local function itemText(item): string
@@ -97,15 +100,10 @@ function refresh()
 			act("VaultWithdrawItem", index)
 		end)
 	end
+	-- Materials stay in the vault for the Forge, the market and trades; they never
+	-- go back out into a run.
 	for _, material in view.materials do
-		local text = ("%s ×%d — withdraw %d"):format(
-			material.name,
-			material.quantity,
-			math.min(VaultController.MATERIAL_STEP, material.quantity)
-		)
-		row(ui.materials, text, Color3.fromRGB(230, 220, 200), function()
-			act("VaultWithdrawMaterial", material.catalogId, math.min(VaultController.MATERIAL_STEP, material.quantity))
-		end)
+		row(ui.materials, ("%s ×%d"):format(material.name, material.quantity), Color3.fromRGB(230, 220, 200), nil)
 	end
 end
 
@@ -173,7 +171,7 @@ local function build()
 	end)
 	ui.backpackTitle, ui.backpack = column(ui.panel, 0, "Lobby backpack")
 	ui.itemsTitle, ui.items = column(ui.panel, 1 / 3, "Vault items")
-	local _, materials = column(ui.panel, 2 / 3, "Vault materials — click to withdraw")
+	local _, materials = column(ui.panel, 2 / 3, "Vault materials (stay in the lobby)")
 	ui.materials = materials
 	ui.status = make("TextLabel", {
 		Text = "",

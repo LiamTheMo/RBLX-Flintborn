@@ -19,8 +19,8 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus. Which materials it may
--- double is tagged on the stacks themselves (InventoryRules `fromLobby`).
+-- Starts counting a new run's XP for the Center bonus. Materials never enter a
+-- run from the lobby, so every material it extracts was gathered in a run.
 function ProgressionRules.StartRun(profile, runId: string)
 	profile.progression.currentRun = {
 		runId = runId,

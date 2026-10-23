@@ -138,14 +138,6 @@ function VaultService.Start()
 			return VaultRules.WithdrawItem(profile, index)
 		end)
 	end)
-	Remotes.Handle("VaultWithdrawMaterial", function(player, catalogId, quantity)
-		if ItemCatalog.Get(catalogId) == nil or not Validation.IsQuantity(quantity, 1, 1000) then
-			return false, "BadRequest"
-		end
-		return operate(player, "VaultWithdrawMaterial", function(profile)
-			return VaultRules.WithdrawMaterial(profile, catalogId, quantity)
-		end)
-	end)
 end
 
 return VaultService

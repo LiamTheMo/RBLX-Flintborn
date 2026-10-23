@@ -63,7 +63,7 @@ end)
 
 test("deploy reserves every unvaulted item and consumes it exactly once", function()
 	local profile = ProfileSchema.Default(0)
-	profile.lobbyBackpack.slots = { { catalogId = "StoneSpear" }, { catalogId = "Wood", quantity = 40 } }
+	profile.lobbyBackpack.slots = { { catalogId = "StoneSpear" }, { catalogId = "Arrow", quantity = 40 } }
 	TransitRules.Reserve(profile, "res-1", 10)
 	expectEq(#profile.lobbyBackpack.slots, 0, "backpack emptied into transit")
 	expectEq(#profile.transit.items, 2, "both items reserved")
@@ -74,6 +74,35 @@ test("deploy reserves every unvaulted item and consumes it exactly once", functi
 	expectEq(#items, 2, "items enter the run")
 	expectEq(profile.transit, nil, "reservation cleared")
 	expect(not pcall(TransitRules.Consume, profile, "res-1"), "cannot consume twice")
+end)
+
+test("extracted materials never leave the lobby: a deploy leaves them behind", function()
+	local profile = ProfileSchema.Default(0)
+	profile.lobbyBackpack.slots = {
+		{ catalogId = "Wood", quantity = 40 },
+		{ instanceId = "spear-1", catalogId = "StoneSpear" },
+		{ catalogId = "AncientEmber", quantity = 2 },
+		{ catalogId = "Arrow", quantity = 20 },
+		{ catalogId = "Iron", quantity = 5 },
+	}
+	TransitRules.Reserve(profile, "res-m", 10)
+	expectEq(#profile.transit.items, 2, "only the spear and arrows are reserved")
+	for _, item in profile.transit.items do
+		expect(
+			item.catalogId == "StoneSpear" or item.catalogId == "Arrow",
+			"no material in transit: " .. item.catalogId
+		)
+	end
+	expectEq(#profile.lobbyBackpack.slots, 3, "every material stays in the backpack")
+	for _, item in profile.lobbyBackpack.slots do
+		expect(not TransitRules.Deployable(item), "only materials stayed: " .. item.catalogId)
+	end
+	expect(
+		TransitRules.Deployable({ instanceId = "x", catalogId = "Wood" }),
+		"a unique record is never a material stack"
+	)
+	TransitRules.Rollback(profile)
+	expectEq(#profile.lobbyBackpack.slots, 5, "a rollback returns the reserved items beside the materials")
 end)
 
 test("any failure before Play rolls every item back", function()
