@@ -50,6 +50,7 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "Stone", quantity = 20 },
 	{ catalogId = "Fiber", quantity = 20 },
 	{ catalogId = "ExtractionRune", quantity = 1 },
+	{ catalogId = "AncientEmber", quantity = 1 },
 }
 
 local states = {}

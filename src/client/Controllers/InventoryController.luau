@@ -70,7 +70,7 @@ end
 local function describe(slot)
 	local def = ItemCatalog.Get(slot.catalogId)
 	local name = def and def.name or slot.catalogId
-	local text = name .. (slot.quantity and (" ×" .. slot.quantity) or "")
+	local text = (slot.permanent and "★ " or "") .. name .. (slot.quantity and (" ×" .. slot.quantity) or "")
 	if slot.qualityRoll and slot.qualityRoll ~= 0 then
 		text ..= ("  (%+.1f%%)"):format(slot.qualityRoll * 100)
 	end
@@ -204,7 +204,9 @@ function InventoryController.Render()
 			parts.button.BackgroundColor3 = isEquipped and Color3.fromRGB(78, 62, 40) or Color3.fromRGB(36, 31, 26)
 		end
 	end
-	ui.hint.Text = if selected then "Tap another slot to move or swap, or an armor slot to wear it." else ""
+	ui.hint.Text = if selected
+		then "Tap another slot to move or swap, an armor slot to wear it, or Q to drop it."
+		else ""
 end
 
 local function build()
@@ -312,6 +314,7 @@ local function bindKeys(active: boolean)
 	if not active then
 		ContextActionService:UnbindAction("FlintbornHotbar")
 		ContextActionService:UnbindAction("FlintbornBackpack")
+		ContextActionService:UnbindAction("FlintbornDrop")
 		return
 	end
 	local keys = {
@@ -340,6 +343,25 @@ local function bindKeys(active: boolean)
 		end
 		return Enum.ContextActionResult.Sink
 	end, false, Enum.KeyCode.B, Enum.KeyCode.ButtonY)
+	-- Q drops the selected slot, or else the equipped hotbar item.
+	ContextActionService:BindAction("FlintbornDrop", function(_, state)
+		if state == Enum.UserInputState.Begin then
+			local target = selected
+				or (
+					InventoryController.Snapshot.equipped
+					and { area = "hotbar", index = InventoryController.Snapshot.equipped }
+				)
+			selected = nil
+			if target then
+				local ok, reason = invoke("DropItem", target.area, target.index)
+				if not ok then
+					toast("Can't drop that (" .. tostring(reason) .. ")")
+				end
+			end
+			InventoryController.Render()
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.KeyCode.Q, Enum.KeyCode.ButtonL1)
 end
 
 function InventoryController.Start()
