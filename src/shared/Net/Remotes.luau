@@ -26,6 +26,11 @@ local DEFINITIONS = {
 	Craft = "RemoteFunction", -- (requestId, recipeId) -> ok, reason
 	PlaceItem = "RemoteFunction", -- (hotbarIndex) -> ok, reason
 	Notify = "RemoteEvent", -- server -> client: short message
+	EquipArmor = "RemoteFunction", -- (area, index) -> ok, reason
+	UnequipArmor = "RemoteFunction", -- (slot) -> ok, reason
+	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection)
+	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
+	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount)
 }
 
 local function folder()
