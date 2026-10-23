@@ -44,6 +44,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
 - **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-five-permanent-masteries-levels-and-milestone-buffs), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
 
+**Development phases:** The GDD is split into ordered, buildable versions in [`docs/phases`](docs/phases/README.md) (`v0.01` → `v0.18`). The GDD stays the source of truth; when a phase document disagrees, the GDD wins.
+
 **Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
 
 ## 1. High concept
