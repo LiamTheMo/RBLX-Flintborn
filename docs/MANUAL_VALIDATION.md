@@ -113,7 +113,7 @@ Studio and live checks (two or more players):
 - [ ] Arriving in the lobby shows the receipt: every material (special ones included, Q164) banked to the vault, gear in the lobby backpack, overflow listed as deleted.
 - [ ] A Center extraction doubles materials but never a sword; a rune placed at the Center does not double.
 - [ ] A rune (hotbar) is refused next to a workbench and next to another running extraction; elsewhere it starts a 30 s countdown everyone can use.
-- [ ] G opens the vault in the lobby: deposit from the backpack and withdraw items; materials have no withdraw action (Q164); a full vault refuses rather than deletes.
+- [ ] The Vault button opens the vault in the lobby: deposit from the backpack and withdraw items; materials have no withdraw action (Q164); a full vault refuses rather than deletes.
 - [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack except materials into the next run.
 
 ## v0.09 — Ancestral Forge and Permanent items
@@ -124,7 +124,7 @@ Placeholders: Permanent archetypes are Basic Pickaxe, Stone Spear, Iron Sword an
 
 Studio and live checks:
 
-- [ ] Extract twice (once carrying the Studio Ancient Ember), vault the ember and a Basic Pickaxe, then F in the lobby: the Permanent pickaxe recipe is unlocked and counts only vaulted materials.
+- [ ] Extract twice (once carrying the Studio Ancient Ember), vault the ember and a Basic Pickaxe, then open the Forge in the lobby: the Permanent pickaxe recipe is unlocked and counts only vaulted materials.
 - [ ] The conversion dialog names the exact pickaxe and its quality roll, arms only after a short delay, and the vault then shows one ★ pickaxe with the same roll.
 - [ ] Die carrying several ★ items: all come back in the lobby backpack; ordinary items stay in the body.
 - [ ] Q drops a ★ item; a second player picks it up, is told they own it, and keeps it on death; the original owner cannot get it back after rejoining.
@@ -203,9 +203,9 @@ Placeholders: vault upgrade 500 Gems (max 8 tiers), respec 250 Gems, Gem trades 
 
 Studio and live checks (two accounts):
 
-- [ ] M opens the market: buy from the shop, sell to the merchant (a Forge reagent shows a warning), claim each quest tier once; the wallet updates; Coins and Gems never drop on death.
+- [ ] The Market button opens the market: buy from the shop, sell to the merchant (a Forge reagent shows a warning), claim each quest tier once; the wallet updates; Coins and Gems never drop on death.
 - [ ] Upgrade the vault with Gems; G shows 25 more slots. Redeem `FLINTBORN-RESPEC` once to refund perk tokens.
-- [ ] Y opens trading: invite, add a ★ item and Gems, lock, wait for the countdown, confirm; any change unlocks both sides; Coins are never offered.
+- [ ] The Trade button opens trading: invite, add a ★ item and Gems, lock, wait for the countdown, confirm; any change unlocks both sides; Coins are never offered.
 - [ ] Disconnect one player mid-trade: the trade closes and nothing changes hands. (Crash recovery between the two saves is covered by specs; a forced server kill is a live check.)
 - [ ] Once product IDs exist: buy a vault upgrade and a Gem pack with Robux in a test place; each purchase grants exactly once.
 - [ ] Review Roblox purchase policy (paid random items, Premium) before release.
@@ -350,24 +350,25 @@ Studio and live checks:
 
 ## Keyboard controls and rebinding
 
-Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop and E to interact or pick up, with every keyboard action rebindable in Settings.
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
 
-Automated (`keybinds.spec.luau`, 6 cases):
+Automated (`keybinds.spec.luau`, 7 cases):
 - The requested defaults, with every default allowed and unique.
 - Reserved keys (W A S D, Space, /, Esc, Enter, Backspace, function keys) and unknown actions are refused.
 - Rebinding to a used key swaps the two actions; keys equal to their default are not stored.
-- Tampered or conflicting saves resolve to the defaults.
+- Tampered saves resolve to the defaults. In a conflicting or older save, only the clashing rebind reverts and every other rebind is kept; removed lobby actions are dropped.
 - Hints name the bound key, and every tutorial token is a real action.
 
 Studio and live checks:
 
-- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–9 select hotbar slots, Q drops, and E picks up a dropped item, loots a body and harvests a node.
+- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–9 select hotbar slots, Q drops, and F picks up a dropped item, loots a body and harvests a node.
 - [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
-- [ ] Rebind Drop to E: Interact moves to Q, and prompts show and accept Q.
+- [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
 - [ ] Tab also toggles Roblox's player list: decide whether that's acceptable or the player list should move.
-- [ ] Planters still offer their three crops on E / R / F (the first follows Interact).
+- [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
+- [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
 - [ ] The tutorial hints name the current keys after a rebind.
 
