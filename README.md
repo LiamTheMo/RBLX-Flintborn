@@ -14,12 +14,12 @@
 
 | Path | Contents |
 | --- | --- |
-| `src/server` | Server entry point (`init.server.luau`) and `Services/` → `ServerScriptService.Server` |
+| `src/server` | Server entry point (`init.server.luau`), `Services/` and `Infrastructure/` (DataStore gateway, profile store, operation journal) → `ServerScriptService.Server` |
 | `src/client` | Client entry point (`init.client.luau`) and `Controllers/` → `StarterPlayer.StarterPlayerScripts.Client` |
-| `src/shared` | Shared modules (`Core/Loader`, `Core/Signal`, `GameConstants`) → `ReplicatedStorage.Shared` |
+| `src/shared` | Shared modules (`Core/Loader`, `Core/Signal`, `GameConstants`, `Data/` profile schema and validation) → `ReplicatedStorage.Shared` |
 | `src/assets` | Models and images → `ReplicatedStorage.Assets` |
 | `src/maps` | World layouts → `ServerStorage.Maps` |
-| `tests/luau` | Headless Luau specs for pure shared modules |
+| `tests/luau` | Headless Luau specs for shared modules and server modules with injected fakes |
 | `tests/test_cloud_live_publish.py` | Offline publish-safety tests |
 | `scripts/` | Open Cloud script mapping and live publishing |
 
