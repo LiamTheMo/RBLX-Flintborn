@@ -23,6 +23,10 @@ published Roblox place*. It does **not** upload a Rojo-generated whole place.
    instead of `ROBLOX_PLACE_ID` it uses `ROBLOX_MAIN_PLACE_ID` (play map) and
    `ROBLOX_LOBBY_PLACE_ID` (lobby). The deploy job publishes to each place in its
    own matrix job, and each place must be prepared once with Rojo (step 1).
+   Before publishing, the job writes `src/shared/Generated/PlaceIds.luau` from the
+   two place-ID secrets so each place knows whether it is the lobby or the play
+   map. The file is git-ignored; in Studio, set the workspace attribute
+   `FlintbornPlaceRole` to `Lobby` or `World` instead (default `World`).
 
 Publishing is always on: every validated push to `main` releases. Nothing
 else (pull requests, version branches, minor branches) ever publishes.
