@@ -18,6 +18,8 @@ local DEFINITIONS = {
 	-- World
 	RequestPlay = "RemoteFunction", -- (requestId) -> ok, reason
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
+	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld, crouching)
+	UseConsumable = "RemoteFunction", -- (requestId, catalogId) -> ok, reason
 }
 
 local function folder()
