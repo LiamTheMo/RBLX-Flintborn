@@ -15,20 +15,20 @@ TutorialSteps.Steps = {
 	{
 		id = "Survive",
 		title = "Health, food and stamina",
-		hint = "Health does not regenerate. Food drains over 5 minutes; under 30% you slow down. Hold Shift to sprint; stamina lasts 3 seconds.",
+		hint = "Health does not regenerate. Food drains over 5 minutes; under 30% you slow down. Hold {Sprint} to sprint; stamina lasts 3 seconds.",
 		trigger = "Ack",
 	},
 	{
 		id = "Gather",
 		title = "Gather materials",
-		hint = "Walk up to a tree, rock or plant and hold the prompt. Better tools gather more.",
+		hint = "Walk up to a tree, rock or plant and hold {Interact} at the prompt. Better tools gather more.",
 		trigger = "Harvest",
 		reward = { xp = "Harvest" },
 	},
 	{
 		id = "Craft",
 		title = "Craft arrows or a tool",
-		hint = "Press V to open crafting. Arrows come in tens and need wood and fiber.",
+		hint = "Press {Craft} to open crafting. Arrows come in tens and need wood and fiber.",
 		trigger = "Craft",
 	},
 	{
@@ -59,13 +59,13 @@ TutorialSteps.Steps = {
 	{
 		id = "Vault",
 		title = "The vault keeps everything",
-		hint = "In the lobby press G. Materials are already vaulted; deposit gear from your lobby backpack. Anything left in the backpack goes with you on Play.",
+		hint = "In the lobby press {Vault}. Materials are already vaulted; deposit gear from your lobby backpack. Anything left in the backpack goes with you on Play.",
 		trigger = "Vault",
 	},
 	{
 		id = "Economy",
 		title = "Coins, Gems, the Forge and progress",
-		hint = "M opens the shop, merchant and quests. F opens the Forge: Permanent items survive death. P shows your level, masteries and rebirth.",
+		hint = "{Market} opens the shop, merchant and quests. {Forge} opens the Forge: Permanent items survive death. {Progression} shows your level, masteries and rebirth.",
 		trigger = "Ack",
 	},
 }
