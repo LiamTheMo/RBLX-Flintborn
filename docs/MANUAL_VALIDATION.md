@@ -147,3 +147,19 @@ Studio and live checks (two tribes):
 - [ ] Only the owning tribe can open its doors. Traps hurt other tribes, not your own.
 - [ ] Plant Berries/Herbs/Sapling in a planter, walk away, return to harvest; a destroyed chest spills its items.
 - [ ] Empty the world: everything built is gone in the next world.
+
+## v0.11 — World event director and rare spawns
+
+Automated: 10 specs cover independent category rolls (several events per tick), the ~25% trigger rate, the waterfall from Secret (~0.025% per category per tick) down with Common fallback, categories without Common skipping, footprint separation, one-time claims (rare nodes never regrow), the full 60 s cache channel, budget caps, biome rings and catalog consistency (real items, real enemies, all six enemy themes, `event` tags). Deployed and verified on both places (2026-10-23).
+
+Placeholders: ticks every 300 s live and 45 s in Studio (override with the workspace attribute `FlintbornEventSeconds`); rarity weights Secret 0.1%, Mythic 0.5%, Legendary 1.5%, Epic 5%, Rare 12%, Uncommon 25%; biome rings Center < 30%, Inner 30–65%, Outer 65–95% of the map radius; budgets 40 event NPCs and 6 large events; rare nodes 10 min, ruins 15 min, caches 10 min; meteors 8 chunks × 30 s; portable rune in 1% of Rare+ cache rolls. Enemies are simple blocks with name plates until art arrives (v0.15).
+
+Studio and live checks:
+
+- [ ] Every spawned event shows a banner (icon, rarity colour and name, direction and distance) with a sound, a list entry with its timer, a faint area circle and a sky beacon that does not hide arrows or extraction beacons.
+- [ ] Events land across the outer, inner and centre rings, never overlapping each other.
+- [ ] A cache needs 60 s of holding; releasing it, walking away or being hit (by a player, trap or creature) restarts it. Loot spills on the ground for anyone.
+- [ ] Ore events need a pickaxe; rare nodes pay out once and vanish.
+- [ ] Wolves, skeletons and raiders chase at-risk players nearby, give up past their leash, and drop loot when killed; an elite has more health and a gold name.
+- [ ] Event loot is lost on death and only safe after extraction.
+- [ ] A full 30-player server stays smooth with several events running.

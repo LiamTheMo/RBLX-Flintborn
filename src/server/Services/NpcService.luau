@@ -54,6 +54,9 @@ local function groundAt(position: Vector3, params): Vector3
 end
 
 local function label(npc)
+	if npc.text == nil then
+		return
+	end
 	npc.text.Text = ("%s\n%d / %d"):format(npc.name, math.ceil(npc.health), npc.maxHealth)
 end
 
@@ -112,6 +115,16 @@ function NpcService.Spawn(enemyId: string, position: Vector3, elite: boolean?, e
 	return npc
 end
 
+-- Registers a body driven elsewhere (bosses, pillars) so weapons can hit it.
+-- `npc` = {body, name, health, maxHealth, invulnerable?, onDamaged(npc, amount)?,
+-- onKilled(npc)?}. NpcService never moves it.
+function NpcService.Register(npc)
+	npc.custom = true
+	npcs[npc] = true
+	byPart[npc.body] = npc
+	return npc
+end
+
 -- Removes an enemy without loot (its event ended).
 function NpcService.Despawn(npc)
 	if npcs[npc] then
@@ -131,10 +144,22 @@ local function kill(npc)
 end
 
 function NpcService.Damage(npc, amount: number)
-	if not npcs[npc] or amount <= 0 then
+	if not npcs[npc] or amount <= 0 or npc.invulnerable then
 		return
 	end
 	npc.health -= amount
+	if npc.custom then
+		if npc.onDamaged then
+			npc.onDamaged(npc, amount)
+		end
+		if npc.health <= 0 then
+			NpcService.Despawn(npc)
+			if npc.onKilled then
+				npc.onKilled(npc)
+			end
+		end
+		return
+	end
 	if npc.health <= 0 then
 		kill(npc)
 	else
@@ -187,6 +212,9 @@ local function step(dt: number)
 	local params = groundParams()
 	local now = os.clock()
 	for npc in npcs do
+		if npc.custom then
+			continue
+		end
 		local position = npc.body.Position
 		local target, targetRoot, best = nil, nil, EnemyCatalog.AGGRO
 		for _, player in Players:GetPlayers() do
