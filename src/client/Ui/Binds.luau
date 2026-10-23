@@ -113,15 +113,21 @@ function Binds.Map(): { [string]: string }
 	return table.clone(map)
 end
 
--- Only prompts authored on E (the Interact default) follow the Interact key; a
--- prompt offering a second choice on another key (a planter's other crops) keeps
--- its own.
+-- Prompts are authored on E (Roblox's default). Those follow the Interact key; a
+-- prompt offering a second choice on another key (a planter's other crops on R
+-- and F) keeps its own, unless that is the Interact key, in which case it takes
+-- E so the two never share a key.
 local function retargetPrompt(prompt: ProximityPrompt)
 	if authoredKeys[prompt] == nil then
 		authoredKeys[prompt] = prompt.KeyboardKeyCode
 	end
-	local key = Binds.Key("Interact")
-	if key and authoredKeys[prompt] == Enum.KeyCode.E and prompt.KeyboardKeyCode ~= key then
+	local interact = Binds.Key("Interact")
+	if interact == nil then
+		return
+	end
+	local authored = authoredKeys[prompt]
+	local key = if authored == Enum.KeyCode.E then interact elseif authored == interact then Enum.KeyCode.E else authored
+	if prompt.KeyboardKeyCode ~= key then
 		prompt.KeyboardKeyCode = key
 	end
 end

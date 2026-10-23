@@ -20,10 +20,11 @@ local function entries()
 	local controllers = script.Parent
 	if PlaceConfig.IsLobby() then
 		return {
-			{ "🔒 Vault", "Vault", require(controllers.VaultController).Toggle },
-			{ "🔥 Forge", "Forge", require(controllers.ForgeController).Toggle },
-			{ "🪙 Market", "Market", require(controllers.WalletController).Toggle },
-			{ "🤝 Trade", "Trade", require(controllers.TradeController).Toggle },
+			-- Lobby panels have no keyboard keys (GDD §46): these buttons open them.
+			{ "🔒 Vault", nil, require(controllers.VaultController).Toggle },
+			{ "🔥 Forge", nil, require(controllers.ForgeController).Toggle },
+			{ "🪙 Market", nil, require(controllers.WalletController).Toggle },
+			{ "🤝 Trade", nil, require(controllers.TradeController).Toggle },
 			{ "▲ Progress", "Progression", require(controllers.ProgressionController).Toggle },
 		}
 	end
@@ -74,7 +75,9 @@ function NavController.Start()
 	-- Each button names its keyboard key, which follows the player's rebinds.
 	local function relabel()
 		for _, item in labelled do
-			item.button.Text = ("%s (%s)"):format(item.text, Binds.Label(item.action))
+			item.button.Text = if item.action
+				then ("%s (%s)"):format(item.text, Binds.Label(item.action))
+				else item.text
 		end
 	end
 	relabel()

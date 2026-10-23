@@ -2,8 +2,10 @@
 -- rebind any of them in Settings and the choice saves to their profile. Only the
 -- keyboard key is rebindable; gamepad buttons stay fixed. Two actions never share
 -- a key: assigning a key that another action uses swaps the two. A profile only
--- stores the actions that differ from the default, and anything malformed falls
--- back to the defaults. Pure functions, shared by the client, the server and specs.
+-- stores the actions that differ from the default, and anything malformed or
+-- clashing falls back to the defaults. Lobby panels (vault, Forge, market, trade)
+-- have no keys: their navigation-bar buttons open them. Pure functions, shared by
+-- the client, the server and specs.
 
 local Keybinds = {}
 
@@ -12,7 +14,7 @@ local Keybinds = {}
 Keybinds.Actions = {
 	{ id = "Sprint", label = "Sprint (hold)", default = "LeftShift", gamepad = { "ButtonL3" }, hold = true },
 	{ id = "Crouch", label = "Crouch", default = "C", gamepad = { "ButtonR3" } },
-	{ id = "Interact", label = "Interact / pick up", default = "E", gamepad = {} },
+	{ id = "Interact", label = "Interact / pick up", default = "F", gamepad = {} },
 	{ id = "Backpack", label = "Backpack / inventory", default = "Tab", gamepad = { "ButtonY" } },
 	{ id = "Drop", label = "Drop item", default = "Q", gamepad = { "ButtonL1" } },
 	{ id = "Hotbar1", label = "Hotbar slot 1", default = "One", gamepad = {} },
@@ -30,10 +32,6 @@ Keybinds.Actions = {
 	{ id = "Tribe", label = "Tribe", default = "T", gamepad = { "DPadLeft" } },
 	{ id = "Map", label = "Map", default = "N", gamepad = { "DPadDown" } },
 	{ id = "Progression", label = "Progress", default = "P", gamepad = { "ButtonSelect" } },
-	{ id = "Vault", label = "Vault (lobby)", default = "G", gamepad = { "DPadRight" } },
-	{ id = "Forge", label = "Forge (lobby)", default = "F", gamepad = { "DPadDown" } },
-	{ id = "Market", label = "Market (lobby)", default = "M", gamepad = { "ButtonL2" } },
-	{ id = "Trade", label = "Trade (lobby)", default = "Y", gamepad = { "ButtonL1" } },
 	{ id = "Settings", label = "Settings", default = "O", gamepad = {} },
 }
 
@@ -144,8 +142,9 @@ function Keybinds.Display(key: string): string
 end
 
 -- The full action → key map: defaults overlaid with the valid saved overrides.
--- If the overrides would give two actions one key (a stale or tampered save),
--- every override is dropped and the defaults apply.
+-- Overrides for actions that no longer exist are ignored. If two actions would end
+-- up on one key (a save from before a default changed, or a tampered one), the
+-- clashing overrides fall back to their defaults and every other rebind is kept.
 function Keybinds.Resolve(overrides: any): { [string]: string }
 	local map = {}
 	for _, action in Keybinds.Actions do
@@ -159,15 +158,35 @@ function Keybinds.Resolve(overrides: any): { [string]: string }
 			map[id] = key
 		end
 	end
-	local used = {}
-	for _, action in Keybinds.Actions do
-		local key = map[action.id]
-		if used[key] then
-			return Keybinds.Resolve(nil)
+	-- Each pass reverts at least one override, so this settles within #Actions passes.
+	for _ = 1, #Keybinds.Actions do
+		local holders = {}
+		for _, action in Keybinds.Actions do
+			local key = map[action.id]
+			holders[key] = holders[key] or {}
+			table.insert(holders[key], action)
 		end
-		used[key] = true
+		local clashed = false
+		for _, list in holders do
+			if #list > 1 then
+				clashed = true
+				local reverted = false
+				for _, action in list do
+					if map[action.id] ~= action.default then
+						map[action.id] = action.default
+						reverted = true
+					end
+				end
+				if not reverted then
+					return Keybinds.Resolve(nil)
+				end
+			end
+		end
+		if not clashed then
+			return map
+		end
 	end
-	return map
+	return Keybinds.Resolve(nil)
 end
 
 -- The overrides worth storing: actions whose key differs from the default.
