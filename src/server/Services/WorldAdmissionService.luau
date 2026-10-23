@@ -28,6 +28,20 @@ WorldAdmissionService.DEATH_RETURN_SECONDS = 5
 -- Fires (player, runItems) when an at-risk player leaves the world without
 -- extracting. v0.07 turns this into a lootable body; until then the run ends.
 WorldAdmissionService.ActiveDeparture = Signal.new()
+-- Fires (player, character) once a player is confirmed in ActiveRun.
+WorldAdmissionService.RunStarted = Signal.new()
+-- Fires (player, reason) when a run ends: "Died" or "Left".
+WorldAdmissionService.RunEnded = Signal.new()
+
+-- Studio sessions start runs with a few consumables so survival systems can be
+-- tried before crafting exists (v0.05). Never used on live servers.
+WorldAdmissionService.STUDIO_TEST_KIT = {
+	{ catalogId = "BasicMedicine", quantity = 3 },
+	{ catalogId = "AdvancedMedicine", quantity = 2 },
+	{ catalogId = "Potion", quantity = 1 },
+	{ catalogId = "Berries", quantity = 5 },
+	{ catalogId = "CookedMeat", quantity = 2 },
+}
 
 local states = {}
 local runItems = {}
@@ -85,6 +99,7 @@ local function onDied(player: Player)
 	-- A dead player may not rejoin this world (GDD Q5) and returns to the lobby.
 	MatchmakingService.Exclude(player.UserId)
 	runItems[player] = nil
+	WorldAdmissionService.RunEnded:Fire(player, "Died")
 	task.delay(WorldAdmissionService.DEATH_RETURN_SECONDS, function()
 		if player.Parent then
 			sendToLobby(player)
@@ -141,11 +156,18 @@ local function requestPlay(player: Player, requestId: any)
 	if not consumed then
 		return fail("ReservationFailed")
 	end
+	if #items == 0 and RunService:IsStudio() then
+		items = table.clone(WorldAdmissionService.STUDIO_TEST_KIT)
+		for index, stack in items do
+			items[index] = table.clone(stack)
+		end
+	end
 	runItems[player] = items
 	setState(player, SessionStates.ActiveRun)
 	humanoid.Died:Connect(function()
 		onDied(player)
 	end)
+	WorldAdmissionService.RunStarted:Fire(player, character)
 	return true, nil
 end
 
@@ -196,6 +218,7 @@ function WorldAdmissionService.Start()
 		if WorldAdmissionService.IsAtRisk(player) then
 			-- Any logout during active play forfeits carried items (GDD Q157).
 			WorldAdmissionService.ActiveDeparture:Fire(player, runItems[player])
+			WorldAdmissionService.RunEnded:Fire(player, "Left")
 		else
 			-- Menu, loading or failed Play: loss-free.
 			LoadoutService.Rollback(player)

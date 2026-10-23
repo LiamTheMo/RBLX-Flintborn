@@ -1,0 +1,149 @@
+-- Survival meters as pure step functions (GDD §4.3–4.5, §5.4, Q61–65, Q135, Q160).
+-- Health, stamina and food only. Stamina and food are fractions in [0, 1]; health is
+-- in HP. The server owns the state; clients only send movement intent and use
+-- requests.
+
+local GameConstants = require(script.Parent.Parent.GameConstants)
+
+local SurvivalRules = {}
+
+-- Starting movement speeds in studs/s (GDD leaves exact speeds Open).
+SurvivalRules.WALK_SPEED = 16
+SurvivalRules.SPRINT_SPEED = 24
+SurvivalRules.CROUCH_SPEED = 8
+
+-- Meter values this close to an end are snapped to it, so float drift from many
+-- small ticks never leaves "almost empty" stamina that still allows a sprint.
+local EPSILON = 1e-6
+
+local function settle(value: number): number
+	if value < EPSILON then
+		return 0
+	elseif value > 1 - EPSILON then
+		return 1
+	end
+	return value
+end
+
+export type FoodHeal = { remaining: number, endsAt: number }
+export type State = {
+	stamina: number,
+	food: number,
+	sprintIntent: boolean,
+	crouching: boolean,
+	medicineLockUntil: number,
+	foodHeals: { FoodHeal },
+}
+
+function SurvivalRules.NewState(): State
+	return {
+		stamina = 1,
+		food = 1,
+		sprintIntent = false,
+		crouching = false,
+		medicineLockUntil = 0,
+		foodHeals = {},
+	}
+end
+
+-- Sprinting only happens while the player wants to, is moving, is not crouching
+-- and has stamina left. Only sprinting spends stamina (Q62).
+function SurvivalRules.IsSprinting(state: State, moving: boolean): boolean
+	return state.sprintIntent and moving and not state.crouching and state.stamina > 0
+end
+
+-- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62).
+function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean)
+	if SurvivalRules.IsSprinting(state, moving) then
+		state.stamina = settle(math.max(0, state.stamina - dt / GameConstants.SPRINT_SECONDS))
+	else
+		state.stamina = settle(math.min(1, state.stamina + dt / GameConstants.STAMINA_RECOVERY_SECONDS))
+	end
+end
+
+-- Full to empty in 300 s (Q63). 0% adds nothing beyond the slow (Q160c).
+function SurvivalRules.StepFood(state: State, dt: number)
+	state.food = settle(math.max(0, state.food - dt / GameConstants.FOOD_DRAIN_SECONDS))
+end
+
+function SurvivalRules.MoveSpeed(state: State, moving: boolean): number
+	local speed = SurvivalRules.WALK_SPEED
+	if state.crouching then
+		speed = SurvivalRules.CROUCH_SPEED
+	elseif SurvivalRules.IsSprinting(state, moving) then
+		speed = SurvivalRules.SPRINT_SPEED
+	end
+	if GameConstants.IsFoodSlowed(state.food) then
+		speed *= GameConstants.FOOD_SLOW_MULTIPLIER
+	end
+	return speed
+end
+
+function SurvivalRules.CanUseMedicine(state: State, now: number): boolean
+	return now >= state.medicineLockUntil
+end
+
+-- Immediate heal capped at max HP, then the animation locks further medicine (Q64,
+-- Q135). Returns the new health, or nil while locked (nothing is consumed).
+function SurvivalRules.UseMedicine(state: State, item, health: number, maxHealth: number, now: number): number?
+	if not SurvivalRules.CanUseMedicine(state, now) then
+		return nil
+	end
+	state.medicineLockUntil = now + item.animationSeconds
+	return math.min(maxHealth, health + item.heal)
+end
+
+-- Eating restores hunger at once and starts a 10 s heal. Heals stack (Q160d).
+function SurvivalRules.Eat(state: State, item, now: number)
+	state.food = math.min(1, state.food + (item.hunger or 0))
+	if item.heal and item.heal > 0 then
+		table.insert(state.foodHeals, {
+			remaining = item.heal,
+			endsAt = now + GameConstants.FOOD_HEAL_SECONDS,
+		})
+	end
+end
+
+-- Applies pending food healing for this tick. Each heal spreads what remains over
+-- the time it has left, so a halved heal still ends on schedule. Returns HP healed.
+function SurvivalRules.StepFoodHeals(state: State, now: number, dt: number): number
+	local healed = 0
+	for index = #state.foodHeals, 1, -1 do
+		local heal = state.foodHeals[index]
+		local timeLeft = heal.endsAt - now
+		local amount = if timeLeft <= dt then heal.remaining else heal.remaining * (dt / timeLeft)
+		heal.remaining -= amount
+		healed += amount
+		if heal.remaining <= 1e-9 or timeLeft <= dt then
+			table.remove(state.foodHeals, index)
+		end
+	end
+	return healed
+end
+
+-- A damaging hit halves every pending food heal and cancels any left at ≤10 HP (Q65).
+-- Already-applied healing is never taken back.
+function SurvivalRules.OnDamaged(state: State)
+	for index = #state.foodHeals, 1, -1 do
+		local heal = state.foodHeals[index]
+		heal.remaining = GameConstants.FoodHealAfterHit(heal.remaining)
+		if heal.remaining <= 0 then
+			table.remove(state.foodHeals, index)
+		end
+	end
+end
+
+-- Downed players cannot heal (Q159f): pending food healing is cleared.
+function SurvivalRules.OnDowned(state: State)
+	table.clear(state.foodHeals)
+end
+
+function SurvivalRules.PendingFoodHealing(state: State): number
+	local total = 0
+	for _, heal in state.foodHeals do
+		total += heal.remaining
+	end
+	return total
+end
+
+return SurvivalRules
