@@ -247,6 +247,15 @@ local function showReceipt(receipt)
 	ui.receipt.Visible = true
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function VaultController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	if ui.panel.Visible then
+		ui.status.Text = ""
+		refresh()
+	end
+end
+
 function VaultController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
@@ -255,11 +264,7 @@ function VaultController.Start()
 	Remotes.Get("ExtractionReceipt").OnClientEvent:Connect(showReceipt)
 	ContextActionService:BindAction("FlintbornVault", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			if ui.panel.Visible then
-				ui.status.Text = ""
-				refresh()
-			end
+			VaultController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.G, Enum.KeyCode.DPadRight)

@@ -179,6 +179,14 @@ local function build()
 	}, ui.map)
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function MapController.Toggle()
+	ui.map.Visible = not ui.map.Visible
+	if ui.map.Visible then
+		renderMarkers()
+	end
+end
+
 function MapController.Start()
 	if not PlaceConfig.IsWorld() then
 		return
@@ -198,10 +206,7 @@ function MapController.Start()
 	end)
 	ContextActionService:BindAction("FlintbornMap", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.map.Visible = not ui.map.Visible
-			if ui.map.Visible then
-				renderMarkers()
-			end
+			MapController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.N, Enum.KeyCode.DPadDown)

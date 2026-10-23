@@ -282,6 +282,16 @@ local function build()
 	no.ZIndex = 5
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function ForgeController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	ui.confirm.Visible = false
+	if ui.panel.Visible then
+		ui.status.Text = ""
+		refresh()
+	end
+end
+
 function ForgeController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
@@ -289,12 +299,7 @@ function ForgeController.Start()
 	build()
 	ContextActionService:BindAction("FlintbornForge", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			ui.confirm.Visible = false
-			if ui.panel.Visible then
-				ui.status.Text = ""
-				refresh()
-			end
+			ForgeController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.F, Enum.KeyCode.DPadDown)
