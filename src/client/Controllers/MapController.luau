@@ -1,10 +1,9 @@
 -- Compass, map and safe-zone notice (GDD §3, §25). A compass strip shows your
--- heading; N (or DPadDown) opens a top-down map of the Shattered Crater with its
+-- heading; the Map key (N by default; DPadDown) opens a top-down map of the Shattered Crater with its
 -- three regions, landmarks, safe camps, active portals, announced events and your
 -- position. Entering a safe camp shows a clear notice. World place only.
 
 local CollectionService = game:GetService("CollectionService")
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -15,6 +14,7 @@ local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local MapController = {}
 
@@ -238,12 +238,12 @@ function MapController.Start()
 			renderMarkers()
 		end
 	end)
-	ContextActionService:BindAction("FlintbornMap", function(_, state)
+	Binds.Bind("Map", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			MapController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.N, Enum.KeyCode.DPadDown)
+	end)
 	watchSafeZones()
 	RunService.RenderStepped:Connect(function(dt)
 		sinceSafeCheck += dt

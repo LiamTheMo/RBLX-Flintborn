@@ -1,11 +1,14 @@
--- Saved player choices (GDD §23.2, §25): the camera zoom preference, UI scale and
--- accessibility options (colour-blind palette, reduced motion, subtitles). The
--- server validates and stores them and hands them back as attributes on join.
+-- Saved player choices (GDD §23.2, §25, §46): the camera zoom preference, UI
+-- scale, accessibility options (colour-blind palette, reduced motion, subtitles)
+-- and keyboard rebinds. The server validates and stores them and hands them back
+-- as attributes on join.
 
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CameraRules = require(ReplicatedStorage.Shared.World.CameraRules)
+local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local ProfileService = require(script.Parent.ProfileService)
 
@@ -20,6 +23,8 @@ local function applyAttributes(player: Player, choices)
 	player:SetAttribute("ColourBlind", choices.colourBlindMode == true)
 	player:SetAttribute("ReducedMotion", choices.reducedMotion == true)
 	player:SetAttribute("Subtitles", choices.subtitles ~= false)
+	-- Attributes cannot hold tables, so the overrides travel as JSON.
+	player:SetAttribute("Keybinds", HttpService:JSONEncode(Keybinds.Sanitize(choices.keybinds)))
 end
 
 local lastSave = {}
@@ -46,6 +51,13 @@ function SettingsService.Start()
 			end
 			applyAttributes(player, choices)
 		end)
+	end)
+	Remotes.Listen("SaveKeybinds", function(player, overrides)
+		local clean = Keybinds.Sanitize(overrides)
+		ProfileService.Mutate(player, function(profile)
+			profile.choices.keybinds = clean
+		end)
+		player:SetAttribute("Keybinds", HttpService:JSONEncode(clean))
 	end)
 	Remotes.Listen("SaveCamera", function(player, zoom)
 		local now = os.clock()
