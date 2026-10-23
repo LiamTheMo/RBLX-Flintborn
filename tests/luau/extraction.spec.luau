@@ -92,18 +92,14 @@ test("manual vault deposits are refused, never deleted, when full", function()
 	expectEq(VaultRules.ItemCapacity(profile), 25, "25 starting slots")
 end)
 
-test("withdrawals move vault items and materials into the lobby backpack", function()
+test("withdrawals move vault items into the lobby backpack; materials stay vaulted", function()
 	local profile = ProfileSchema.Default(0)
 	profile.vault.items = { sword("a") }
 	profile.vault.materials.Iron = 40
 	expect(VaultRules.WithdrawItem(profile, 1), "withdraw sword")
 	expectEq(#profile.vault.items, 0, "vault emptied")
-	expect(VaultRules.WithdrawMaterial(profile, "Iron", 15), "withdraw iron")
-	expectEq(profile.vault.materials.Iron, 25, "25 left")
-	expect(not VaultRules.WithdrawMaterial(profile, "Iron", 99), "cannot overdraw")
-	expect(not VaultRules.WithdrawMaterial(profile, "Iron", 1.5), "whole numbers only")
-	expect(VaultRules.WithdrawMaterial(profile, "Iron", 25), "withdraw the rest")
-	expectEq(profile.vault.materials.Iron, nil, "empty stack removed")
+	expectEq(VaultRules.WithdrawMaterial, nil, "materials have no way back out of the vault")
+	expectEq(profile.vault.materials.Iron, 40, "iron untouched")
 end)
 
 test("replaying a settlement receipt never credits twice", function()

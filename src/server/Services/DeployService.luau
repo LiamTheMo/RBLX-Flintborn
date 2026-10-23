@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local TransitRules = require(ReplicatedStorage.Shared.Admission.TransitRules)
 local LoadoutService = require(script.Parent.LoadoutService)
 local MatchmakingService = require(script.Parent.MatchmakingService)
 local PartyService = require(script.Parent.PartyService)
@@ -106,7 +107,12 @@ function DeployService.Start()
 	Remotes.Handle("DeployPreview", function(player)
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
-			table.insert(items, { catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent })
+			table.insert(items, {
+				catalogId = item.catalogId,
+				quantity = item.quantity,
+				permanent = item.permanent,
+				staysInLobby = not TransitRules.Deployable(item),
+			})
 		end
 		return items
 	end)

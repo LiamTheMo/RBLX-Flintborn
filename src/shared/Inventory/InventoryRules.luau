@@ -4,12 +4,6 @@
 -- never merge. Three equipped armor slots (Head, Chest, Legs/Boots; Q101) hold
 -- carried armor that counts toward EHP. Pure functions over an inventory table,
 -- shared with specs.
---
--- A stack's optional `fromLobby` counts the units of it that were deployed from
--- the lobby, which the Center never doubles (GDD §9.3). The count travels with the
--- units through every move, split, merge, drop, body, chest and pickup, so handing
--- deployed materials to someone else never makes them doublable. Spending takes
--- gathered units first, and the count never exceeds the stack.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
@@ -24,7 +18,7 @@ local SIZES = {
 	backpack = GameConstants.BACKPACK_SLOTS,
 }
 
-export type Stack = { catalogId: string, quantity: number, fromLobby: number? }
+export type Stack = { catalogId: string, quantity: number }
 export type Inventory = { hotbar: { [number]: any }, backpack: { [number]: any }, armor: { [string]: any } }
 
 InventoryRules.ArmorSlots = { "Head", "Chest", "Legs" }
@@ -77,58 +71,7 @@ local function firstEmpty(inventory: Inventory, preferHotbar: boolean)
 	return nil, nil
 end
 
--- Units of a stack that were deployed from the lobby: a whole number from 0 to its
--- quantity, whatever the stored field holds.
-function InventoryRules.FromLobby(item): number
-	local quantity, tagged = item.quantity, item.fromLobby
-	if type(quantity) ~= "number" or type(tagged) ~= "number" or tagged ~= tagged or quantity ~= quantity then
-		return 0
-	end
-	return math.floor(math.clamp(tagged, 0, math.max(quantity, 0)))
-end
-
-local function setFromLobby(stack, amount: number)
-	stack.fromLobby = if amount > 0 then amount else nil
-end
-
--- Tags every stack in `items` as wholly deployed from the lobby (a run's start).
-function InventoryRules.MarkFromLobby(items)
-	for _, item in items do
-		if item.instanceId == nil then
-			item.fromLobby = nil
-			if type(item.quantity) == "number" and item.quantity > 0 then
-				setFromLobby(item, item.quantity)
-			end
-		end
-	end
-	return items
-end
-
--- Packs a deployed loadout into a run inventory, tagging every stack as lobby
--- units. Returns (inventory, leftovers). The single definition of what enters a
--- run, so crash recovery restores exactly what the run started with.
-function InventoryRules.Deploy(items)
-	return InventoryRules.FromItems(InventoryRules.MarkFromLobby(items))
-end
-
--- Moves `amount` units of the stack `item` onto `stack`, deployed units first.
--- `item` is left as it was; KeepRemainder gives it what stays behind.
-function InventoryRules.Merge(stack, item, amount: number)
-	local tagged = InventoryRules.FromLobby(stack) + math.min(InventoryRules.FromLobby(item), amount)
-	stack.quantity += amount
-	setFromLobby(stack, math.min(tagged, stack.quantity))
-end
-
--- Shrinks a stack to the `remaining` units that did not fit elsewhere, keeping
--- whatever deployed units Merge did not move.
-function InventoryRules.KeepRemainder(item, remaining: number)
-	local moved = (item.quantity or 0) - remaining
-	local tagged = math.max(0, InventoryRules.FromLobby(item) - moved)
-	item.quantity = remaining
-	setFromLobby(item, math.min(tagged, remaining))
-end
-
--- Adds a stack ({catalogId, quantity, fromLobby?}) or a unique instance record.
+-- Adds a stack ({catalogId, quantity}) or a unique instance record.
 -- Returns how much did not fit (0 when everything was added; 1 for a unique item
 -- that did not).
 function InventoryRules.Add(inventory: Inventory, item): number
@@ -155,7 +98,7 @@ function InventoryRules.Add(inventory: Inventory, item): number
 	end
 	local stack = inventory[area][index]
 	local added = math.min(quantity, cap - stack.quantity)
-	InventoryRules.Merge(stack, item, added)
+	stack.quantity += added
 	return quantity - added
 end
 
@@ -174,9 +117,7 @@ function InventoryRules.Remove(inventory: Inventory, catalogId: string, quantity
 	if stack.quantity < quantity then
 		return false
 	end
-	local tagged = InventoryRules.FromLobby(stack)
 	stack.quantity -= quantity
-	setFromLobby(stack, math.min(tagged, stack.quantity))
 	if stack.quantity == 0 then
 		inventory[area][index] = nil
 	end
@@ -196,9 +137,9 @@ function InventoryRules.RemoveAll(inventory: Inventory, costs: { [string]: numbe
 	return true
 end
 
--- RemoveAll that hands back what it removed, as stacks keeping their deployed
--- units (gathered units go first), so an offering that spills again is still
--- tagged. Returns nil, changing nothing, when anything is short.
+-- RemoveAll that hands back what it removed as stacks, so an interrupted ritual
+-- can spill exactly its offering. Returns nil, changing nothing, when anything is
+-- short.
 function InventoryRules.TakeAll(inventory: Inventory, costs: { [string]: number })
 	for catalogId, quantity in costs do
 		if InventoryRules.Count(inventory, catalogId) < quantity then
@@ -207,14 +148,8 @@ function InventoryRules.TakeAll(inventory: Inventory, costs: { [string]: number 
 	end
 	local taken = {}
 	for catalogId, quantity in costs do
-		local area, index = findStack(inventory, catalogId)
-		local source = area and inventory[area][index]
-		local stack = { catalogId = catalogId, quantity = quantity }
-		if source then
-			setFromLobby(stack, math.max(0, InventoryRules.FromLobby(source) - (source.quantity - quantity)))
-		end
 		InventoryRules.Remove(inventory, catalogId, quantity)
-		table.insert(taken, stack)
+		table.insert(taken, { catalogId = catalogId, quantity = quantity })
 	end
 	return taken
 end
@@ -315,7 +250,7 @@ function InventoryRules.Store(slots, item, maxSlots: number): boolean
 	if item.instanceId == nil and cap then
 		for _, slot in slots do
 			if slot.instanceId == nil and slot.catalogId == item.catalogId and slot.quantity + item.quantity <= cap then
-				InventoryRules.Merge(slot, item, item.quantity)
+				slot.quantity += item.quantity
 				return true
 			end
 		end
@@ -339,9 +274,7 @@ function InventoryRules.FromItems(items): (Inventory, { any })
 			if copy.instanceId ~= nil or ItemCatalog.StackCap(copy.catalogId) == nil then
 				table.insert(leftovers, copy)
 			else
-				local rest = { catalogId = copy.catalogId, quantity = copy.quantity, fromLobby = copy.fromLobby }
-				InventoryRules.KeepRemainder(rest, remaining)
-				table.insert(leftovers, rest)
+				table.insert(leftovers, { catalogId = copy.catalogId, quantity = remaining })
 			end
 		end
 	end

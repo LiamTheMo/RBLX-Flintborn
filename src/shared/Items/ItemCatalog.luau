@@ -64,8 +64,8 @@ local entries = {
 	-- Inner Ring materials (GDD §18.1).
 	material("Jade", "Jade", "Uncommon"),
 	material("Obsidian", "Obsidian", "Uncommon"),
-	-- Special material: rare-event reagent (v0.11 events drop it). Special materials
-	-- wait in the lobby backpack after extraction instead of auto-banking (Q129).
+	-- Special material: rare-event reagent (v0.11 events drop it). It banks into the
+	-- vault like every material but cannot be traded.
 	{
 		id = "AncientEmber",
 		name = "Ancient Ember",
@@ -153,13 +153,6 @@ end
 
 function ItemCatalog.IsStackable(catalogId: string): boolean
 	return ItemCatalog.StackCap(catalogId) ~= nil
-end
-
--- Ordinary materials auto-bank into the vault on extraction; special materials
--- (flagged `special`, e.g. event reagents) wait in the lobby backpack (Q129).
-function ItemCatalog.IsOrdinaryMaterial(catalogId: string): boolean
-	local item = ItemCatalog.Get(catalogId)
-	return item ~= nil and item.family == F.Material and not item.special
 end
 
 function ItemCatalog.IsMaterial(catalogId: string): boolean
