@@ -96,7 +96,7 @@ function TutorialService.Start()
 	VaultService.Deposited:Connect(function(player)
 		TutorialService.Observe(player, "Vault")
 	end)
-	Remotes.Get("TutorialAction").OnServerInvoke = function(player, action)
+	Remotes.Handle("TutorialAction", function(player, action)
 		if action == "Ack" then
 			TutorialService.Observe(player, "Ack")
 		elseif action == "Skip" then
@@ -112,7 +112,7 @@ function TutorialService.Start()
 		end
 		publish(player)
 		return true
-	end
+	end)
 end
 
 return TutorialService

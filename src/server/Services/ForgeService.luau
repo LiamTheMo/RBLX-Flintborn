@@ -135,8 +135,8 @@ function ForgeService.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	Remotes.Get("ForgeSnapshot").OnServerInvoke = snapshot
-	Remotes.Get("ForgeCraft").OnServerInvoke = craft
+	Remotes.Handle("ForgeSnapshot", snapshot)
+	Remotes.Handle("ForgeCraft", craft)
 end
 
 return ForgeService
