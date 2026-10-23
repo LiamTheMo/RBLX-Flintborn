@@ -76,6 +76,7 @@ local DEFINITIONS = {
 	TradeConfirm = "RemoteFunction", -- (sessionId) -> ok, reason
 	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
 	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
+	SaveCamera = "RemoteEvent", -- client -> server: (zoom) preference, throttled
 }
 
 local function folder()
