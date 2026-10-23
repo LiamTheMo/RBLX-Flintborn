@@ -28,6 +28,7 @@ local function snapshot(entry)
 					quantity = item.quantity,
 					instanceId = item.instanceId,
 					qualityRoll = item.qualityRoll,
+					permanent = item.permanent,
 				})
 			end
 		end
@@ -42,6 +43,7 @@ local function snapshot(entry)
 				catalogId = item.catalogId,
 				instanceId = item.instanceId,
 				qualityRoll = item.qualityRoll,
+				permanent = item.permanent,
 			})
 		end
 	end
@@ -92,6 +94,20 @@ function InventoryService.RemoveAll(player: Player, costs: { [string]: number })
 	end
 	InventoryService.Publish(player)
 	return true
+end
+
+-- Removes and returns the entry in a hotbar or backpack slot, unequipping it.
+function InventoryService.TakeAt(player: Player, area: string, index: number)
+	local entry = entries[player]
+	local item = entry and InventoryRules.TakeAt(entry.inventory, area, index)
+	if item == nil then
+		return nil
+	end
+	if area == InventoryRules.Hotbar and entry.equipped == index then
+		entry.equipped = nil
+	end
+	InventoryService.Publish(player)
+	return item
 end
 
 -- The item in the equipped hotbar slot, or nil.
