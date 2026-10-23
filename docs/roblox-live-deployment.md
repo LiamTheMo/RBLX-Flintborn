@@ -19,7 +19,9 @@ published Roblox place*. It does **not** upload a Rojo-generated whole place.
    **Luau execution session task write** permission
    (`universe.place.luau-execution-session:write`) for the precise experience.
 4. Set GitHub Actions secrets: `ROBLOX_API_KEY`, `ROBLOX_UNIVERSE_ID`,
-   `ROBLOX_PLACE_ID`. Never commit credentials.
+   `ROBLOX_PLACE_ID`. Never commit credentials. (Flintborn moves to two places in
+   v0.03: `ROBLOX_LOBBY_PLACE_ID` for the lobby and `ROBLOX_MAIN_PLACE_ID` for the
+   play map; see `docs/phases/v0.03-lobby-world-menu-and-play-admission.md`.)
 
 Publishing is always on: every validated push to `main` releases. Nothing
 else (pull requests, version branches, minor branches) ever publishes.
