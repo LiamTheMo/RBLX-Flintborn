@@ -8,7 +8,7 @@
 - **[Development phases (docs/phases)](docs/phases/README.md)** — the GDD split into ordered versions `v0.01` → `v0.18`, each with rules, modules, validation and exit criteria.
 - **[Roblox live deployment](docs/roblox-live-deployment.md)** and **[cloud sync safety](docs/ROBLOX_CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
 
-**Current phase:** [v0.08 — Extraction, lobby backpack and secure vault](docs/phases/v0.08-extraction-lobby-backpack-and-vault.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** [v0.09 — Ancestral Forge and Permanent items](docs/phases/v0.09-ancestral-forge-and-permanent-items.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 
