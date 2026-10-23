@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
+local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -329,6 +330,21 @@ local function placeRune(player: Player, hotbarIndex: any)
 		nil
 	)
 	return true, nil
+end
+
+-- No-build auras (GDD §3.1): every active fixed portal plus every running rune.
+function ExtractionService.Auras()
+	local radius = GameConstants.PORTAL_NO_BUILD_METERS * GameConstants.STUDS_PER_METER
+	local auras = {}
+	for _, site in sites do
+		table.insert(auras, { center = site.center, radius = radius })
+	end
+	for _, event in activeEvents do
+		if event.site == nil then
+			table.insert(auras, { center = event.center, radius = radius })
+		end
+	end
+	return auras
 end
 
 function ExtractionService.Start()
