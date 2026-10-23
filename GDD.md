@@ -1,12 +1,12 @@
 # Flintborn — Game Design Document
 
-> **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.7  
-> **Last updated:** 2026-10-22  
+> **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
+> **Design revision:** 1.8  
+> **Last updated:** 2026-10-23  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
-> **Implementation status:** Concept only. This document does not imply any features are implemented.
+> **Implementation status:** Every phase v0.01–v0.18 is implemented, CI-verified and deployed from `main`; the launch release checklist (`docs/RELEASE_CHECKLIST.md`) and manual Studio checks (`docs/MANUAL_VALIDATION.md`) remain before v1.00.
 
 ## Document conventions
 
@@ -2179,6 +2179,18 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.5** | 2026-10-22 | Owner confirmed all interpretations in §41.2 and §42.2 (capacity-only deletion, logout loss only after Play admission, Play item list, structures for rune placement, takeover by new totem after the old one falls, anyone revives but only tribe members are downed, downing clears food HoT, tribe-only no-friendly-fire, per-HoT hit halving). Replaced superseded Open labels for boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation. |
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
+| **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+
+## 44. Launch starting values (v0.18)
+
+Every number this document marks as a proposal or placeholder ships as a **deliberate starting value**, listed per phase under "Placeholders" in `docs/MANUAL_VALIDATION.md` and held in the shared catalogs (`src/shared/**/…Catalog.luau`, `GameConstants`, `EventRules`, `BossScaling`, `EconomyRules`, `TradeRules`). They stay until playtests or the owner change them; any change to a confirmed rule goes through this document first. Values the owner should confirm or replace before v1.00:
+
+- Developer product IDs for the four Robux offers (`OfferCatalog`) and the redemption codes (`src/server/Config/Codes.luau`).
+- Merchant and shop prices, quest roster and Gem trade limits (§10, §38–39).
+- Event weights, budgets and lifetimes; boss baselines and scaling (§7–8).
+- Mastery thresholds, XP per action, rebirth costs and perks (§33, §37).
+- The placeholder island layout and POI positions (§3), until the authored Shattered Crater replaces it.
+- Whether to reset the playtest profile DataStore at launch (by switching `ProfileService.STORE_NAME`, never by deleting data).
 
 ---
 

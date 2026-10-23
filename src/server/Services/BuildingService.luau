@@ -165,8 +165,9 @@ local function makePart(pieceId: string, tier: string, center: Vector3, half: Ve
 	part:SetAttribute("Piece", pieceId)
 	part:SetAttribute("Tier", tier)
 	CollectionService:AddTag(part, BuildingService.STRUCTURE_TAG)
-	if pieceId == "Workbench" then
-		CollectionService:AddTag(part, "Workbench")
+	if pieceId == "Workbench" or pieceId == "Furnace" then
+		-- Crafting stations (CraftingService): advanced gear and cooking.
+		CollectionService:AddTag(part, pieceId)
 	end
 	return part
 end
