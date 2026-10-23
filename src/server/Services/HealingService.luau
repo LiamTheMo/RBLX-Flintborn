@@ -51,6 +51,9 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 	if rules == nil or humanoid == nil or humanoid.Health <= 0 then
 		return false, "NotInRun"
 	end
+	if player:GetAttribute("Downed") then
+		return false, "Downed"
+	end
 	if not firstTime(player, requestId) then
 		return false, "Duplicate"
 	end

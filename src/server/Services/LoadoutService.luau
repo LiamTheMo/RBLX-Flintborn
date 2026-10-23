@@ -51,13 +51,59 @@ function LoadoutService.Rollback(player: Player)
 	return ok
 end
 
+-- Pending maintenance receipts (items saved by a safe kick, GDD §30).
+local function pendingMaintenance(profile)
+	local pending = {}
+	for operationId, receipt in profile.receipts.maintenance do
+		if receipt.status == "Pending" then
+			table.insert(pending, operationId)
+		end
+	end
+	table.sort(pending)
+	return pending
+end
+
+-- Returns items saved by earlier safe kicks, each receipt exactly once.
+local function restoreMaintenance(player: Player)
+	local profile = ProfileService.GetProfile(player)
+	local restored = {}
+	if profile == nil then
+		return restored
+	end
+	for _, operationId in pendingMaintenance(profile) do
+		local ok, items = ProfileService.RunOperation(
+			player,
+			"restore:" .. operationId,
+			"MaintenanceRestore",
+			function(working)
+				local receipt = working.receipts.maintenance[operationId]
+				if receipt == nil or receipt.status ~= "Pending" then
+					return {}
+				end
+				receipt.status = "Restored"
+				return receipt.items
+			end
+		)
+		if ok and type(items) == "table" then
+			for _, item in items do
+				table.insert(restored, item)
+			end
+		end
+	end
+	if #restored > 0 then
+		player:SetAttribute("MaintenanceNotice", nil)
+	end
+	return restored
+end
+
 -- Consumes this player's reservation on a confirmed spawn and returns the items
--- that enter the run (an empty list when they arrived without one).
+-- that enter the run: the reservation plus anything a safe kick saved earlier.
 function LoadoutService.Consume(player: Player)
+	local restored = restoreMaintenance(player)
 	local reservationId = arrivedWith[player]
 	local profile = ProfileService.GetProfile(player)
 	if reservationId == nil or profile == nil or profile.transit == nil then
-		return true, {}
+		return true, restored
 	end
 	local ok, items = ProfileService.RunOperation(
 		player,
@@ -68,6 +114,11 @@ function LoadoutService.Consume(player: Player)
 		end
 	)
 	arrivedWith[player] = nil
+	if ok then
+		for _, item in restored do
+			table.insert(items, item)
+		end
+	end
 	return ok, items
 end
 
@@ -88,6 +139,10 @@ end
 -- A reservation is only valid in the world it was made for. Anything else (the
 -- lobby after a teleport that never landed, or a mismatched ID) is rolled back.
 local function reconcile(player: Player, profile)
+	if #pendingMaintenance(profile) > 0 then
+		-- Tell the player their items survived a game update (GDD §30.2 #6).
+		player:SetAttribute("MaintenanceNotice", true)
+	end
 	if profile.transit == nil then
 		return
 	end
