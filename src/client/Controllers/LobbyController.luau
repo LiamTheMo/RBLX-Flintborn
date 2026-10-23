@@ -69,7 +69,8 @@ local function refreshPreview()
 		return Remotes.Get("DeployPreview"):InvokeServer()
 	end)
 	clear(ui.preview)
-	if not ok then
+	-- A guarded remote answers `false, reason` when rate-limited or not loaded.
+	if not ok or type(items) ~= "table" then
 		label("Could not read your backpack yet.", ui.preview)
 		return
 	end
@@ -88,6 +89,26 @@ local function refreshPreview()
 	end
 	label("Items in your vault always stay safe.", ui.preview)
 end
+
+-- Coalesces refresh requests: one fetch at a time, never on the caller's thread,
+-- with one more pass if something changed while a fetch was in flight.
+local previewBusy, previewAgain = false, false
+local function requestPreview()
+	if previewBusy then
+		previewAgain = true
+		return
+	end
+	previewBusy = true
+	task.spawn(function()
+		repeat
+			previewAgain = false
+			refreshPreview()
+		until not previewAgain
+		previewBusy = false
+	end)
+end
+
+LobbyController.PREVIEW_REFRESH_SECONDS = 30
 
 local function partyAction(action: string, argument)
 	local ok, success, reason = pcall(function()
@@ -150,20 +171,24 @@ local function deploy()
 		setStatus("Travelling to a world…")
 	else
 		setStatus("Deploy failed: " .. tostring(reason or success) .. ". Nothing was lost.")
-		refreshPreview()
+		requestPreview()
 	end
 end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Lobby", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Left of the navigation bar (140 px on the right edge), below the wallet and
+	-- code box, and never taller than the screen so Deploy stays on-screen.
 	local panel = make("Frame", {
-		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -16, 0.5, 0),
-		Size = UDim2.fromOffset(300, 460),
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(1, -164, 1, -12),
+		Size = UDim2.new(0, 300, 1, -100),
 		BackgroundColor3 = Color3.fromRGB(28, 24, 20),
 		BackgroundTransparency = 0.1,
+		Active = true,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(300, 460) }, panel)
 	make("UIPadding", {
 		PaddingTop = UDim.new(0, 12),
 		PaddingBottom = UDim.new(0, 12),
@@ -213,11 +238,21 @@ function LobbyController.Start()
 		return
 	end
 	build()
-	refreshPreview()
-	refreshParty()
 	Remotes.Get("PartyChanged").OnClientEvent:Connect(function(view)
 		partyView = view
 		refreshParty()
+	end)
+	refreshParty()
+	-- Never block later controllers' Start on a server round trip. The profile may
+	-- still be loading now, and every vault, shop or trade change marks a save, so
+	-- the save status changing is the cue to re-read; a slow timer backs it up.
+	requestPreview()
+	player:GetAttributeChangedSignal("SaveStatus"):Connect(requestPreview)
+	task.spawn(function()
+		while true do
+			task.wait(LobbyController.PREVIEW_REFRESH_SECONDS)
+			requestPreview()
+		end
 	end)
 	local function notice()
 		if player:GetAttribute("MaintenanceNotice") then

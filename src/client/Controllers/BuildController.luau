@@ -10,13 +10,13 @@ local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local InventoryController = require(script.Parent.InventoryController)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local BuildController = {}
 
@@ -28,6 +28,9 @@ local visuals = {}
 local renderConnection = nil
 
 local OK_COLOR = Color3.fromRGB(110, 220, 120)
+-- Six 70 px pieces per row fit the 444 px palette, so all 11 take two rows
+-- and never run under the tier buttons.
+local PIECE_WIDTH = 70
 local BAD_COLOR = Color3.fromRGB(230, 90, 80)
 
 local function make(className: string, props, parent)
@@ -100,7 +103,7 @@ end
 
 local function aimRay()
 	local camera = workspace.CurrentCamera
-	if UserInputService.MouseEnabled and not UserInputService.TouchEnabled then
+	if Theme.UsingMouse() then
 		local ray = camera:ScreenPointToRay(mouse.X, mouse.Y)
 		return ray.Origin, ray.Direction
 	end
@@ -210,7 +213,7 @@ function renderPalette()
 	for _, pieceId in StructureCatalog.ORDER do
 		local b = make("TextButton", {
 			Text = pieceId,
-			Size = UDim2.fromOffset(78, 26),
+			Size = UDim2.fromOffset(PIECE_WIDTH, 24),
 			BackgroundColor3 = if pieceId == state.piece
 				then Color3.fromRGB(110, 70, 30)
 				else Color3.fromRGB(46, 38, 30),
@@ -277,6 +280,8 @@ local function build()
 		Size = UDim2.fromOffset(460, 150),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
 		BackgroundTransparency = 0.1,
+		-- Active panels swallow clicks, so a tap on the panel never places behind it.
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
@@ -284,8 +289,13 @@ local function build()
 		Position = UDim2.fromOffset(8, 8),
 		Size = UDim2.new(1, -16, 0, 56),
 		BackgroundTransparency = 1,
+		Active = true,
 	}, ui.panel)
-	make("UIGridLayout", { CellSize = UDim2.fromOffset(78, 24), CellPadding = UDim2.fromOffset(4, 4) }, ui.pieces)
+	make(
+		"UIGridLayout",
+		{ CellSize = UDim2.fromOffset(PIECE_WIDTH, 24), CellPadding = UDim2.fromOffset(4, 4) },
+		ui.pieces
+	)
 	ui.tiers = {}
 	for index, tier in StructureCatalog.TIERS do
 		local b = make("TextButton", {
