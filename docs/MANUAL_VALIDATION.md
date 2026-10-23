@@ -115,3 +115,18 @@ Studio and live checks (two or more players):
 - [ ] A rune (hotbar) is refused next to a workbench and next to another running extraction; elsewhere it starts a 30 s countdown everyone can use.
 - [ ] G opens the vault in the lobby: deposit from the backpack, withdraw items and materials; a full vault refuses rather than deletes.
 - [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack into the next run.
+
+## v0.09 — Ancestral Forge and Permanent items
+
+Automated: 10 specs cover unlocks granted once (two extractions plus an extracted Ancient Ember for the Permanent pickaxe), conversion charging each input once and consuming the source in place with its quality roll kept, rejection of foreign, unvaulted, already Permanent, ineligible, invented or in-transit sources, one commit for two conversions of the same item, nonce retries returning the same receipt, refused (never deleted) special crafts when the lobby backpack is full, Permanent items surviving death (several at once), ownership transfer on pickup, and Permanent items never deleted by backpack overflow. Deployed and verified on both places (2026-10-23).
+
+Placeholders: Permanent archetypes are Basic Pickaxe, Stone Spear, Iron Sword and Iron armor. The Permanent pickaxe costs 150 Stone, 60 Wood, 20 Iron and 1 Ancient Ember (the rare-event reagent; events arrive in v0.11, Studio runs start with one). Special recipes are iron tools, weapons and armor, 50 arrows and potions. Ordinary drops vanish after 10 minutes; Permanent drops stay until the world resets.
+
+Studio and live checks:
+
+- [ ] Extract twice (once carrying the Studio Ancient Ember), vault the ember and a Basic Pickaxe, then F in the lobby: the Permanent pickaxe recipe is unlocked and counts only vaulted materials.
+- [ ] The conversion dialog names the exact pickaxe and its quality roll, arms only after a short delay, and the vault then shows one ★ pickaxe with the same roll.
+- [ ] Die carrying several ★ items: all come back in the lobby backpack; ordinary items stay in the body.
+- [ ] Q drops a ★ item; a second player picks it up, is told they own it, and keeps it on death; the original owner cannot get it back after rejoining.
+- [ ] A dropped ★ item left on the ground is gone after the world resets.
+- [ ] Special Forge crafts land in the lobby backpack with no quality roll; a full backpack refuses the craft.
