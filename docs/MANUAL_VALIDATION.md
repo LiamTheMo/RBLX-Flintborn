@@ -194,3 +194,18 @@ Studio and live checks:
 - [ ] Reaching mastery 5 grants its title once; the lobby name plate shows level and best title.
 - [ ] P opens the panel; in the lobby, rebirth shows Reset / Kept / Gained before confirming; buying a perk rank spends tokens once and its effect applies (e.g. Tidewalker in water).
 - [ ] A Premium test account sees "+25% XP" and earns 25% more.
+
+## v0.14 — Economy, shops, trading and monetization
+
+Automated: 12 specs cover the 250 / 1,000 / 3,000 quest bands, zero Coins and Gems from extraction (Center included), +25 vault slots per upgrade at the same Gem price, daily quests paying once, shop purchases into the lobby backpack, fixed merchant prices (crafted gear at 40% of materials, Forge-reagent warning, no Permanent sales), trade eligibility (Coins and raw materials refused; gear, flagged materials, Permanent items and Gems allowed; level 10 and 5% fee for Gems), settlement and crash reconciliation leaving one outcome, Permanent ownership moving with a trade, every Robux offer having an earnable route and no power, purchase receipts fulfilled once, and perk respec refunds. Deployed and verified on both places (2026-10-23).
+
+Placeholders: vault upgrade 500 Gems (max 8 tiers), respec 250 Gems, Gem trades 2,000/day, merchant Wood/Stone 2, Iron 8, Hide 5, Jade 12, Obsidian 10, Ancient Ember 300 Coins; shop Bandage 50, Berries ×5 40, Arrows ×10 60, seeds 25, tools 150, titles 2,000/8,000 Coins. Robux offers show "coming soon" until developer product IDs are set in `src/shared/Economy/OfferCatalog.luau`; codes live in `src/server/Config/Codes.luau`.
+
+Studio and live checks (two accounts):
+
+- [ ] M opens the market: buy from the shop, sell to the merchant (a Forge reagent shows a warning), claim each quest tier once; the wallet updates; Coins and Gems never drop on death.
+- [ ] Upgrade the vault with Gems; G shows 25 more slots. Redeem `FLINTBORN-RESPEC` once to refund perk tokens.
+- [ ] Y opens trading: invite, add a ★ item and Gems, lock, wait for the countdown, confirm; any change unlocks both sides; Coins are never offered.
+- [ ] Disconnect one player mid-trade: the trade closes and nothing changes hands. (Crash recovery between the two saves is covered by specs; a forced server kill is a live check.)
+- [ ] Once product IDs exist: buy a vault upgrade and a Gem pack with Robux in a test place; each purchase grants exactly once.
+- [ ] Review Roblox purchase policy (paid random items, Premium) before release.
