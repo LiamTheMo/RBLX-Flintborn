@@ -54,6 +54,7 @@ local DEFINITIONS = {
 	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
 	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
 	EventEnded = "RemoteEvent", -- server -> all: (eventId)
+	BossAlert = "RemoteEvent", -- server -> all: Guardian horn, phase, Legendary released, end
 }
 
 local function folder()

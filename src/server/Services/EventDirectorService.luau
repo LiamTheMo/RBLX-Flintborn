@@ -15,6 +15,7 @@ local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local AnnouncementService = require(script.Parent.AnnouncementService)
+local BossService = require(script.Parent.BossService)
 local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -82,6 +83,10 @@ local function finish(event)
 	events[event.id] = nil
 	for npc in event.npcs do
 		NpcService.Despawn(npc)
+	end
+	if event.boss then
+		-- Event and structure bosses leave with their event (Q46).
+		BossService.Despawn(event.boss, "EventEnded")
 	end
 	event.model:Destroy()
 	AnnouncementService.End(event.id)
@@ -173,6 +178,14 @@ local function spawnStructure(event, position: Vector3)
 	if entry.defenders then
 		spawnGroup(event, entry.defenders, position)
 	end
+	if entry.boss then
+		event.boss = BossService.Spawn(entry.boss, position + Vector3.new(0, 0, 6), {
+			source = "Structure",
+			structureGone = function()
+				return events[event.id] ~= event
+			end,
+		})
+	end
 end
 
 local function start(entry): boolean
@@ -216,6 +229,19 @@ local function start(entry): boolean
 		spawnGroup(event, entry.group, position)
 	elseif kind == EventCatalog.Kinds.Structure then
 		spawnStructure(event, position)
+	elseif kind == EventCatalog.Kinds.Boss then
+		event.boss = BossService.Spawn(entry.boss, position, {
+			source = "Event",
+			expired = function()
+				return events[event.id] ~= event
+			end,
+			onEnded = function(_, reason)
+				if reason == "Defeated" then
+					event.boss = nil
+					done()
+				end
+			end,
+		})
 	end
 	AnnouncementService.Announce({
 		id = event.id,
