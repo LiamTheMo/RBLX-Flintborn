@@ -249,6 +249,7 @@ function EconomyRules.Fulfil(profile, offer, now: number)
 		EconomyRules.AddBooster(profile, grant.boosterSeconds, now)
 	end
 	if grant.respec then
+		-- A paid respec with no perks to refund is worth its Gem price instead.
 		if not EconomyRules.Respec(profile) then
 			EconomyRules.Grant(profile, 0, EconomyRules.RESPEC_GEMS)
 		end
@@ -257,6 +258,38 @@ function EconomyRules.Fulfil(profile, offer, now: number)
 		EconomyRules.Grant(profile, 0, grant.gems)
 	end
 	return true, nil
+end
+
+-- Redeems a code once per player, ever (Q89): the record outlives the operation
+-- journal. A respec code with nothing to refund fails and grants nothing, so it
+-- stays usable for a later respec.
+function EconomyRules.RedeemCode(profile, code: string, grant, now: number)
+	local redeemed = profile.currency.redeemedCodes
+	if redeemed[code] then
+		return false, "AlreadyRedeemed"
+	end
+	local rest = table.clone(grant)
+	if rest.respec then
+		local ok, reason = EconomyRules.Respec(profile)
+		if not ok then
+			return false, reason
+		end
+		rest.respec = nil
+	end
+	redeemed[code] = true
+	return EconomyRules.Fulfil(profile, { grant = rest }, now)
+end
+
+-- Fulfils a Robux purchase once per purchase ID, ever: the entitlement record
+-- outlives the operation journal, so a late retry grants nothing.
+function EconomyRules.FulfilPurchase(profile, purchaseId: string, offer, productId: number, now: number)
+	local entitlements = profile.currency.purchaseEntitlements
+	if entitlements[purchaseId] then
+		return true, "AlreadyGranted"
+	end
+	local ok, reason = EconomyRules.Fulfil(profile, offer, now)
+	entitlements[purchaseId] = { offer = offer.id, at = now, productId = productId }
+	return ok, reason
 end
 
 return EconomyRules

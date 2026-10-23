@@ -1,6 +1,7 @@
 -- NPC shops, merchants, vault upgrades, respecs and codes (GDD §10, Q89, Q95–96,
 -- Q116–122). Lobby only. Every request is a once-only operation keyed by the
--- client's nonce; prices and sell values come from the server catalog.
+-- client's nonce; prices and sell values come from the server catalog. Buying and
+-- selling wait while the player is in an open trade (§10.2).
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,6 +16,7 @@ local Codes = require(script.Parent.Parent.Config.Codes)
 local CurrencyService = require(script.Parent.CurrencyService)
 local ProfileService = require(script.Parent.ProfileService)
 local ProgressionService = require(script.Parent.ProgressionService)
+local TradeService = require(script.Parent.TradeService)
 
 local ShopService = {}
 
@@ -91,6 +93,10 @@ function ShopService.Start()
 	end
 	Remotes.Handle("ShopView", view)
 	Remotes.Handle("ShopBuy", function(player, stockId, nonce)
+		-- Backpack changes wait until an open trade ends (its offers stay exact).
+		if TradeService.InSession(player) then
+			return false, "InTrade"
+		end
 		return CurrencyService.Run(player, "buy:", nonce, "ShopBuy", function(profile)
 			return EconomyRules.Buy(profile, stockId, function()
 				return HttpService:GenerateGUID(false)
@@ -106,6 +112,9 @@ function ShopService.Start()
 		end
 		if source == "vault" and ItemCatalog.Get(key) == nil then
 			return false, "BadRequest"
+		end
+		if TradeService.InSession(player) then
+			return false, "InTrade"
 		end
 		return CurrencyService.Run(player, "sell:", nonce, "MerchantSale", function(profile)
 			if profile.transit ~= nil then
@@ -137,14 +146,15 @@ function ShopService.Start()
 		if grant == nil then
 			return false, "UnknownCode"
 		end
-		-- One redemption per player: the code itself is the operation key.
+		-- One redemption per player, ever: the code is the operation key and is also
+		-- recorded permanently, since the journal forgets old operations.
 		local ok, result = CurrencyService.Run(
 			player,
 			"code:",
 			(code:gsub("[^%w%-_]", "")),
 			"CodeRedeem",
 			function(profile)
-				return EconomyRules.Fulfil(profile, { grant = grant }, os.time())
+				return EconomyRules.RedeemCode(profile, code, grant, os.time())
 			end
 		)
 		ProgressionService.Publish(player)

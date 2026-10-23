@@ -19,9 +19,33 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus.
-function ProgressionRules.StartRun(profile, runId: string)
-	profile.progression.currentRun = { runId = runId, general = 0, mastery = {}, settled = false }
+-- Starts counting a new run's XP for the Center bonus. `carriedIn` maps each
+-- material brought from the lobby to its quantity: the Center never doubles those.
+function ProgressionRules.StartRun(profile, runId: string, carriedIn: { [string]: number }?)
+	profile.progression.currentRun = {
+		runId = runId,
+		general = 0,
+		mastery = {},
+		carriedIn = carriedIn or {},
+		settled = false,
+	}
+end
+
+-- Material quantities among the items a run starts with (stacks only).
+function ProgressionRules.CarriedIn(items): { [string]: number }
+	local carried = {}
+	for _, item in items or {} do
+		if item.instanceId == nil and type(item.quantity) == "number" and item.quantity > 0 then
+			carried[item.catalogId] = (carried[item.catalogId] or 0) + item.quantity
+		end
+	end
+	return carried
+end
+
+-- What a Center extraction may still double for each material this run.
+function ProgressionRules.CarriedInFor(profile): { [string]: number }
+	local run = profile.progression.currentRun
+	return if run and not run.settled then table.clone(run.carriedIn or {}) else {}
 end
 
 local function runFor(profile)
@@ -111,6 +135,35 @@ function ProgressionRules.SettleRun(profile, receipt, kind: string)
 	end
 	receipt.centerBonusGeneralXP = general
 	receipt.centerBonusMasteryXP = masteryTotal
+end
+
+-- Credits a PvP kill unless this victim already credited this attacker within
+-- `window` seconds. Persisted per victim in a small bounded map, so rejoining or
+-- changing servers does not reset it.
+ProgressionRules.PVP_CREDIT_MEMORY = 50
+
+function ProgressionRules.CreditPvp(profile, victimId: number, now: number, window: number): boolean
+	local credits = profile.progression.pvpCredits
+	local key = tostring(victimId)
+	if credits[key] and now - credits[key] < window then
+		return false
+	end
+	credits[key] = now
+	local kept = {}
+	for id, at in credits do
+		if now - at >= window then
+			credits[id] = nil
+		else
+			table.insert(kept, id)
+		end
+	end
+	table.sort(kept, function(x, y)
+		return credits[x] < credits[y]
+	end)
+	for index = 1, #kept - ProgressionRules.PVP_CREDIT_MEMORY do
+		credits[kept[index]] = nil
+	end
+	return true
 end
 
 -- Legendary extractions the next rebirth needs: 1, 2, 3, 4, 6, … (×1.5 each).
