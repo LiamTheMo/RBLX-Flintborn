@@ -17,6 +17,7 @@ local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
+local NpcService = require(script.Parent.NpcService)
 local ProjectileService = require(script.Parent.ProjectileService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -25,6 +26,8 @@ local CombatService = {}
 
 -- Fires (attacker, targetPlayer, rawDamage, newHealth) after damage is applied.
 CombatService.Damaged = Signal.new()
+-- Fires (targetPlayer) whenever a player takes damage from anything.
+CombatService.Hurt = Signal.new()
 
 local lastAttack = {}
 local lastSequence = {}
@@ -51,6 +54,7 @@ end
 -- Applies armor-reduced damage, routing tribe members into the downed state.
 -- Returns the target's new health.
 local function applyDamage(target: Player, humanoid: Humanoid, rawDamage: number): number
+	CombatService.Hurt:Fire(target)
 	if DownedService.IsDowned(target) then
 		-- Finishing a downed player is allowed at any time, even mid-revive (Q68).
 		DownedService.DamageDowned(target, rawDamage)
@@ -86,7 +90,7 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 	return true
 end
 
--- Damage from the world (traps) under the same safety rules as player hits: only
+-- Damage from the world (traps, event creatures) under the same safety rules as player hits: only
 -- at-risk players outside safe zones can be hurt.
 function CombatService.ApplyEnvironmentHit(target: Player, rawDamage: number): boolean
 	local humanoid = aliveHumanoid(target)
@@ -160,7 +164,7 @@ local function melee(player: Player, sequence: any, direction: any)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
 	if best then
 		CombatService.ApplyHit(player, best, damage)
-	else
+	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage) then
 		-- Raiding: the same swing damages another tribe's structures (GDD Q38).
 		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage)
 	end
@@ -193,6 +197,8 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 		local target = model and Players:GetPlayerFromCharacter(model)
 		if target then
 			CombatService.ApplyHit(player, target, damage)
+		else
+			NpcService.HitPart(result.Instance, damage)
 		end
 	end)
 end
@@ -203,6 +209,8 @@ function CombatService.Start()
 	end
 	Remotes.Get("Attack").OnServerEvent:Connect(melee)
 	Remotes.Get("Shoot").OnServerEvent:Connect(shoot)
+	-- Event creatures hurt players through the same safety rules as PvP.
+	NpcService.DamagePlayer = CombatService.ApplyEnvironmentHit
 	Players.PlayerRemoving:Connect(function(player)
 		lastAttack[player] = nil
 		lastSequence[player] = nil
