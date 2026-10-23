@@ -47,7 +47,7 @@ Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the 
 
 Studio and live checks (until crafting arrives in v0.05, a Studio run starts with a test kit of medicine and food; live runs only carry what was in the lobby backpack):
 
-- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar refills in about 5 s; melee, crouching and standing still never drain it.
+- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee, crouching and standing still never drain it.
 - [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
 - [ ] Food drains to 0 in 5 minutes; below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
@@ -371,4 +371,23 @@ Studio and live checks:
 - [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
 - [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
 - [ ] The tutorial hints name the current keys after a rebind.
+
+## Stamina recovery delay and walk-after-sprint fix
+
+Owner decision and bug report (GDD §47): recovery stops when a sprint starts and resumes 3 s after it ends. Walking after releasing sprint no longer drains stamina.
+
+Automated (`survival.spec.luau`, `hardening_gameplay.spec.luau`, `review_gameplay.spec.luau`):
+- 3 s of sprint empties the bar, a 3 s pause follows, then it refills in 5 s.
+- A sprint during the pause restarts it.
+- 20 s of walking with uneven 0.2 s position samples (60–140 % of walk speed) after a sprint recovers and never drains.
+- Travel at sprint pace without a sprint request is still caught and drained; one sample, or a change of allowed speed, never judges a full window.
+
+Placeholders: recovery pause 3 s; pace window 1 s; sprint pace 1.25× walk speed (20 studs/s at the 16 / 24 starting speeds).
+
+Studio and live checks:
+
+- [ ] Hold Shift + W, release Shift and keep W held: the stamina bar stops falling at once, holds for 3 s, then refills.
+- [ ] Sprint briefly again during the pause: the 3 s restarts.
+- [ ] Walk normally on a laggy connection (Studio network simulation): stamina never drains.
+- [ ] A speed exploit without the sprint key still loses stamina (and is pulled back by movement checks).
 

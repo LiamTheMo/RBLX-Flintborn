@@ -33,6 +33,8 @@ export type State = {
 	crouching: boolean,
 	-- Set when a sprint empties the bar: no sprint until it is released or full.
 	exhausted: boolean?,
+	-- Seconds left before stamina may recover (reset by every sprinting step).
+	regenDelay: number?,
 	medicineLockUntil: number,
 	foodHeals: { FoodHeal },
 }
@@ -56,15 +58,60 @@ function SurvivalRules.IsSprinting(state: State, moving: boolean): boolean
 	return state.sprintIntent and moving and not state.crouching and state.stamina > 0 and not state.exhausted
 end
 
--- True when observed horizontal travel is clearly faster than walking (at
--- `walkSpeed`, default WALK_SPEED): the player is sprinting whatever their client
--- claims (GDD §24).
-function SurvivalRules.ObservedSprint(speed: number, walkSpeed: number?): boolean
-	return speed > (walkSpeed or SurvivalRules.WALK_SPEED) * 1.1
+-- Travel the server observes is judged over a whole window, so the uneven way
+-- character positions arrive over the network averages out.
+SurvivalRules.PACE_WINDOW_SECONDS = 1
+-- Pace above this multiple of walking counts as sprinting: halfway from walking
+-- (16) to sprinting (24), well clear of a walker's network jitter.
+SurvivalRules.SPRINT_PACE = 1.25
+
+export type Pace = { samples: { { distance: number, elapsed: number } }, allowed: number? }
+
+function SurvivalRules.NewPace(): Pace
+	return { samples = {}, allowed = nil }
 end
 
--- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62). `observedSprint`
--- drains it for travel at sprint pace even without a sprint request.
+-- Feeds one server sample of horizontal travel (`distance` studs over `elapsed`
+-- seconds) while the server allows `allowed` studs/s. A change of allowance (a
+-- sprint released, a crouch) restarts the window, so travel from just before it
+-- never counts. Returns true when a full window was clearly faster than walking
+-- at `walkPace` (default WALK_SPEED): the player is sprinting whatever their
+-- client claims (GDD §24).
+function SurvivalRules.ObservePace(
+	pace: Pace,
+	distance: number,
+	elapsed: number,
+	allowed: number,
+	walkPace: number?
+): boolean
+	if pace.allowed ~= allowed then
+		pace.allowed = allowed
+		table.clear(pace.samples)
+	end
+	if elapsed <= 0 then
+		return false
+	end
+	table.insert(pace.samples, { distance = distance, elapsed = elapsed })
+	local window = SurvivalRules.PACE_WINDOW_SECONDS
+	local total, travelled = 0, 0
+	for _, sample in pace.samples do
+		total += sample.elapsed
+		travelled += sample.distance
+	end
+	while #pace.samples > 1 and total - pace.samples[1].elapsed >= window do
+		local oldest = table.remove(pace.samples, 1)
+		total -= oldest.elapsed
+		travelled -= oldest.distance
+	end
+	if total < window then
+		return false
+	end
+	return travelled / total > (walkPace or SurvivalRules.WALK_SPEED) * SurvivalRules.SPRINT_PACE
+end
+
+-- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62). Recovery waits
+-- until 3 s after the last sprinting step (GDD §47). `observedSprint` drains it
+-- for travel at sprint pace even without a sprint request.
 function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean, observedSprint: boolean?)
 	if state.exhausted and (not state.sprintIntent or state.stamina >= 1) then
 		state.exhausted = false
@@ -76,6 +123,12 @@ function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean, ob
 		if state.stamina <= 0 then
 			state.exhausted = true
 		end
+		state.regenDelay = GameConstants.STAMINA_REGEN_DELAY_SECONDS
+	elseif (state.regenDelay or 0) > 0 then
+		-- Any of this step left after the pause ends already recovers.
+		local recover = math.max(0, dt - state.regenDelay)
+		state.regenDelay = math.max(0, state.regenDelay - dt)
+		state.stamina = settle(math.min(1, state.stamina + recover / GameConstants.STAMINA_RECOVERY_SECONDS))
 	else
 		state.stamina = settle(math.min(1, state.stamina + dt / GameConstants.STAMINA_RECOVERY_SECONDS))
 	end
