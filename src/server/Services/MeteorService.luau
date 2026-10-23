@@ -62,7 +62,7 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 			end
 			local at = chunk.Position
 			chunk:Destroy()
-			ProgressionService.GrantXp(player, ProgressionService.XP.MeteorChunk, entry.name)
+			ProgressionService.GrantXp(player, "MeteorChunk", entry.name)
 			for _, item in EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")) do
 				DropService.Spawn(item, at)
 			end

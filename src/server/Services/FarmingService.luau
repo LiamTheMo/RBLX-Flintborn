@@ -113,7 +113,7 @@ local function harvest(player: Player, planter)
 	if remaining > 0 then
 		DropService.Spawn({ catalogId = yield.catalogId, quantity = remaining }, planter.record.position)
 	end
-	ProgressionService.GrantXp(player, ProgressionService.XP.CropHarvest, "Harvest")
+	ProgressionService.GrantXp(player, "CropHarvest", "Harvest")
 	ProgressionService.GrantMastery(player, "Farming", 3)
 	refresh(planter)
 end

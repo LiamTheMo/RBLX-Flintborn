@@ -14,6 +14,7 @@ local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local BossService = require(script.Parent.BossService)
 local CombatService = require(script.Parent.CombatService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -154,8 +155,16 @@ function ProgressionService.Publish(player: Player)
 	end
 end
 
--- Grants general XP for a verified action, through the modifier pipeline.
-function ProgressionService.GrantXp(player: Player, base: number, reason: string)
+-- Fires (player, action, detail) for every verified action that grants XP; quests
+-- count progress from it. `action` is a key of ProgressionService.XP.
+ProgressionService.Acted = Signal.new()
+
+-- Grants general XP for a verified action (a key of ProgressionService.XP),
+-- through the modifier pipeline.
+function ProgressionService.GrantXp(player: Player, action: string, reason: string)
+	local base = ProgressionService.XP[action]
+	assert(base, "Unknown XP action " .. tostring(action))
+	ProgressionService.Acted:Fire(player, action, reason)
 	local amount = ModifierRules.Final(base, ModifierService.Get(player, "Xp"))
 	local gained = 0
 	if
@@ -198,7 +207,7 @@ local function creditKill(attacker: Player, victim: Player)
 		return
 	end
 	recentKills[key] = at
-	ProgressionService.GrantXp(attacker, ProgressionService.XP.PvpKill, "Player defeated")
+	ProgressionService.GrantXp(attacker, "PvpKill", "Player defeated")
 	ProgressionService.GrantMastery(attacker, "PvP", 1)
 end
 
@@ -234,18 +243,17 @@ function ProgressionService.Start()
 	NpcService.Died:Connect(function(npc)
 		local killer = npc.lastAttacker
 		if killer and killer.Parent then
-			local reward = if npc.elite then ProgressionService.XP.Elite else ProgressionService.XP.Enemy
-			ProgressionService.GrantXp(killer, reward, npc.name .. " defeated")
+			ProgressionService.GrantXp(killer, if npc.elite then "Elite" else "Enemy", npc.name .. " defeated")
 		end
 	end)
 	BossService.Defeated:Connect(function(boss)
-		local reward = if boss.source == "Guardian" then ProgressionService.XP.Guardian else ProgressionService.XP.Boss
+		local action = if boss.source == "Guardian" then "Guardian" else "Boss"
 		local at = boss.npc.body.Position
 		for _, player in Players:GetPlayers() do
 			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 			local near = root and (root.Position - at).Magnitude <= ProgressionService.BOSS_CREDIT_RADIUS
 			if near and WorldAdmissionService.IsAtRisk(player) then
-				ProgressionService.GrantXp(player, reward, boss.def.name .. " defeated")
+				ProgressionService.GrantXp(player, action, boss.def.name .. " defeated")
 			end
 		end
 	end)

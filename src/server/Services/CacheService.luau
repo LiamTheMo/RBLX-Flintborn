@@ -63,7 +63,7 @@ function CacheService.Spawn(entry, position: Vector3, parent: Instance, onOpened
 		end
 		prompt:Destroy()
 		part.Transparency = 0.6
-		ProgressionService.GrantXp(player, ProgressionService.XP.Cache, entry.name)
+		ProgressionService.GrantXp(player, "Cache", entry.name)
 		for _, item in EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")) do
 			DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
 		end
