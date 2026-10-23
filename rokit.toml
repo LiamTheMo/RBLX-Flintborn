@@ -1,0 +1,5 @@
+# Tools managed by Rokit for this repository.
+# Add a tool only when production or verification code actually consumes it.
+
+[tools]
+rojo = "rojo-rbx/rojo@7.7.0"
