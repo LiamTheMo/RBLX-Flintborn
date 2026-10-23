@@ -10,6 +10,7 @@ local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SurvivalRules = require(ReplicatedStorage.Shared.Survival.SurvivalRules)
+local ModifierService = require(script.Parent.ModifierService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local SurvivalService = {}
@@ -71,7 +72,10 @@ local function startRun(player: Player, character: Model)
 		lastHealth = humanoid.Health,
 		sprinting = false,
 		lastPublish = 0,
+		-- Snapshotted per run from masteries and perks (v0.13).
+		swimBonus = ModifierService.Sum(player, "SwimSpeed"),
 	}
+	entry.rules.staminaDrainScale = 1 / (1 + ModifierService.Sum(player, "SprintEfficiency"))
 	entries[player] = entry
 	humanoid.HealthChanged:Connect(function(health)
 		if entries[player] ~= entry then
@@ -105,6 +109,10 @@ local function step(dt: number)
 				SurvivalService.SetHealth(player, humanoid.Health + healed)
 			end
 			local speed = SurvivalRules.MoveSpeed(rules, moving)
+			if entry.swimBonus > 0 and humanoid:GetState() == Enum.HumanoidStateType.Swimming then
+				-- The Tidewalker perk: faster movement in water.
+				speed *= 1 + entry.swimBonus
+			end
 			if humanoid.WalkSpeed ~= speed then
 				humanoid.WalkSpeed = speed
 			end

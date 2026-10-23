@@ -109,12 +109,13 @@ function EventRules.NpcCount(group): number
 	return count
 end
 
--- Rolls a loot table into {catalogId, quantity} stacks.
-function EventRules.RollLoot(loot, rng)
+-- Rolls a loot table into {catalogId, quantity} stacks. `luck` (the Fortune
+-- perk) raises each row's chance relatively, never above certain.
+function EventRules.RollLoot(loot, rng, luck: number?)
 	local items = {}
 	for _, row in loot or {} do
 		local catalogId, low, high, chance = row[1], row[2], row[3], row[4]
-		if rng:NextNumber() < chance then
+		if rng:NextNumber() < math.min(1, chance * (1 + (luck or 0))) then
 			table.insert(items, { catalogId = catalogId, quantity = rng:NextInteger(low, high) })
 		end
 	end
