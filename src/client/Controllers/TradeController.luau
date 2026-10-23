@@ -1,7 +1,8 @@
--- Lobby trading (GDD §10.2, §25.4). Y (or ButtonL1) opens the trade panel: pick a
--- player in this lobby to invite. The trade window shows both offers, your
--- tradeable lobby-backpack items to add or remove, a Gem amount (never Coins), a
--- lock, a countdown and confirm. Any change unlocks both sides. Lobby only.
+-- Lobby trading (GDD §10.2, §25.4, §45). Y (or ButtonL1) opens the trade panel:
+-- pick a player in this lobby to invite. The trade window shows both offers, your
+-- tradeable lobby-backpack items to add or remove, your tradeable vault materials
+-- (+1, +10, all or remove), a Gem amount (never Coins), a lock, a countdown and
+-- confirm. Any change unlocks both sides. Lobby only.
 
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
@@ -9,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
@@ -87,18 +89,55 @@ local function button(text: string, enabled: boolean, onClick)
 	end
 end
 
-local render
-
-local function myKeys()
-	local keys = {}
-	for _, item in session.mine.items do
-		table.insert(keys, item.key)
+-- One row of small buttons: { {text, enabled, onClick}, ... }.
+local function buttonRow(specs)
+	local row = make("Frame", {
+		Size = UDim2.new(1, -8, 0, 28),
+		BackgroundTransparency = 1,
+		LayoutOrder = nextOrder(),
+	}, ui.list)
+	make("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		Padding = UDim.new(0, 4),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, row)
+	for index, spec in specs do
+		local text, enabled, onClick = spec[1], spec[2], spec[3]
+		local b = make("TextButton", {
+			Text = text,
+			Size = UDim2.new(1 / #specs, -4, 1, 0),
+			BackgroundColor3 = if enabled then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(50, 44, 38),
+			TextColor3 = if enabled then Color3.fromRGB(255, 240, 220) else Color3.fromRGB(140, 130, 120),
+			AutoButtonColor = enabled,
+			Font = Enum.Font.GothamBold,
+			TextSize = 13,
+			LayoutOrder = index,
+		}, row)
+		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
+		if enabled then
+			b.Activated:Connect(onClick)
+		end
 	end
-	return keys
 end
 
-local function sendOffer(keys, gems: number)
-	local ok, reason = invoke("TradeOffer", session.id, keys, gems)
+local render
+
+-- My current offer: backpack slot keys, and vault materials {[catalogId] = quantity}.
+local function myOffer()
+	local keys, materials = {}, {}
+	for _, item in session.mine.items do
+		local catalogId = TradeRules.MaterialOf(item.key)
+		if catalogId then
+			materials[catalogId] = item.quantity
+		else
+			table.insert(keys, item.key)
+		end
+	end
+	return keys, materials
+end
+
+local function sendOffer(keys, materials, gems: number)
+	local ok, reason = invoke("TradeOffer", session.id, keys, gems, materials)
 	if not ok then
 		ui.status.Text = "Offer refused: " .. Reasons.Text(reason)
 	end
@@ -157,28 +196,77 @@ function render()
 		),
 		TEXT
 	)
-	-- Tradeable items come from the lobby backpack view the vault panel uses.
+	-- Tradeable items come from the lobby backpack and vault views the vault panel
+	-- uses. Materials are offered only from the vault (GDD §45).
 	if type(view) == "table" then
 		line("Your tradeable lobby-backpack items (tap to add or remove):", GOLD)
-		local offered = myKeys()
+		local offered, offeredMaterials = myOffer()
 		for _, item in view.backpack do
 			local key = item.key
-			if key and item.tradeable then
+			if key and TradeRules.IsTradeableSlot(item) then
 				local inOffer = table.find(offered, key) ~= nil
 				local label = (inOffer and "✓ " or "+ ")
 					.. item.name
 					.. (item.quantity and (" ×" .. item.quantity) or "")
 				button(label, true, function()
-					local keys = myKeys()
+					local keys, materials = myOffer()
 					local index = table.find(keys, key)
 					if index then
 						table.remove(keys, index)
 					else
 						table.insert(keys, key)
 					end
-					sendOffer(keys, session.mine.gems)
+					sendOffer(keys, materials, session.mine.gems)
 				end)
 			end
+		end
+		local shown = false
+		for _, material in view.materials or {} do
+			local catalogId, stock = material.catalogId, material.quantity
+			if not TradeRules.IsTradeableMaterial(catalogId) then
+				continue
+			end
+			if not shown then
+				line("Your tradeable vault materials:", GOLD)
+				shown = true
+			end
+			local current = offeredMaterials[catalogId] or 0
+			line(("%s — %d in vault · offering %d"):format(material.name, stock, current), TEXT)
+			local function setQuantity(quantity: number)
+				local keys, materials = myOffer()
+				materials[catalogId] = if quantity > 0 then math.min(quantity, stock) else nil
+				sendOffer(keys, materials, session.mine.gems)
+			end
+			buttonRow({
+				{
+					"+1",
+					current < stock,
+					function()
+						setQuantity(current + 1)
+					end,
+				},
+				{
+					"+10",
+					current < stock,
+					function()
+						setQuantity(current + 10)
+					end,
+				},
+				{
+					"All",
+					current < stock,
+					function()
+						setQuantity(stock)
+					end,
+				},
+				{
+					"Remove",
+					current > 0,
+					function()
+						setQuantity(0)
+					end,
+				},
+			})
 		end
 	end
 	local now = workspace:GetServerTimeNow()
@@ -243,7 +331,8 @@ local function build()
 	ui.gems.FocusLost:Connect(function()
 		local gems = tonumber(ui.gems.Text)
 		if session and gems and gems >= 0 and gems % 1 == 0 then
-			sendOffer(myKeys(), gems)
+			local keys, materials = myOffer()
+			sendOffer(keys, materials, gems)
 		end
 	end)
 	ui.list = make("ScrollingFrame", {
