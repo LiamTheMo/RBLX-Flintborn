@@ -13,6 +13,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProjectileService = require(script.Parent.ProjectileService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
@@ -52,12 +53,27 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 		return false
 	end
 	local humanoid = aliveHumanoid(target)
-	if humanoid == nil or not DamageRules.CanDamage(actor(attacker), actor(target)) then
+	if humanoid == nil or DownedService.IsDowned(attacker) then
 		return false
 	end
-	local factor = ArmorRules.Factor(InventoryService.ArmorPieces(target))
-	local newHealth = GameConstants.ApplyDamage(humanoid.Health, factor, rawDamage)
-	humanoid.Health = newHealth
+	if not DamageRules.CanDamage(actor(attacker), actor(target)) then
+		return false
+	end
+	local newHealth
+	if DownedService.IsDowned(target) then
+		-- Finishing a downed player is allowed at any time, even mid-revive (Q68).
+		DownedService.DamageDowned(target, rawDamage)
+		newHealth = humanoid.Health
+	else
+		local factor = ArmorRules.Factor(InventoryService.ArmorPieces(target))
+		newHealth = GameConstants.ApplyDamage(humanoid.Health, factor, rawDamage)
+		if newHealth <= 0 and DownedService.TryDown(target) then
+			-- Tribe members go down instead of dying (GDD §5.3).
+			newHealth = humanoid.Health
+		else
+			humanoid.Health = newHealth
+		end
+	end
 	Remotes.Get("CombatFeedback"):FireClient(attacker, "Hit", math.round(rawDamage))
 	Remotes.Get("CombatFeedback"):FireClient(target, "Hurt", math.round(rawDamage))
 	CombatService.Damaged:Fire(attacker, target, rawDamage, newHealth)
@@ -103,7 +119,7 @@ local function melee(player: Player, sequence: any, direction: any)
 	end
 	local equipped = InventoryService.Equipped(player)
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
-	if profile.kind ~= "Melee" or not readyToAttack(player, profile.cooldown) then
+	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end
 	local flatAim = Vector3.new(aim.X, 0, aim.Z)
@@ -139,7 +155,7 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	end
 	local equipped = InventoryService.Equipped(player)
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
-	if profile.kind ~= "Bow" or not readyToAttack(player, profile.cooldown) then
+	if profile.kind ~= "Bow" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end
 	-- Each shot consumes one crafted arrow (GDD Q28).

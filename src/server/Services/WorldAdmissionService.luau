@@ -29,6 +29,9 @@ WorldAdmissionService.DEATH_RETURN_SECONDS = 5
 -- before RunEnded, so listeners can still read the run inventory. v0.07 turns
 -- this into a lootable body; until then the run simply ends.
 WorldAdmissionService.ActiveDeparture = Signal.new()
+-- Fires (player, position) when an at-risk player dies, before RunEnded, so the
+-- run inventory can still be read (it becomes a lootable body).
+WorldAdmissionService.Death = Signal.new()
 -- Fires (player, character, items) once a player is confirmed in ActiveRun;
 -- `items` are the reserved lobby items entering the run.
 WorldAdmissionService.RunStarted = Signal.new()
@@ -94,9 +97,11 @@ local function onDied(player: Player)
 	if states[player] ~= SessionStates.ActiveRun and states[player] ~= SessionStates.ExtractionHolding then
 		return
 	end
+	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	setState(player, SessionStates.Dead)
 	-- A dead player may not rejoin this world (GDD Q5) and returns to the lobby.
 	MatchmakingService.Exclude(player.UserId)
+	WorldAdmissionService.Death:Fire(player, root and root.Position or nil)
 	WorldAdmissionService.RunEnded:Fire(player, "Died")
 	task.delay(WorldAdmissionService.DEATH_RETURN_SECONDS, function()
 		if player.Parent then
@@ -166,6 +171,17 @@ local function requestPlay(player: Player, requestId: any)
 	end)
 	WorldAdmissionService.RunStarted:Fire(player, character, items)
 	return true, nil
+end
+
+-- Ends an at-risk run without a body for an authorized safe kick (GDD §30). The
+-- caller must already have saved the held items to maintenance escrow.
+function WorldAdmissionService.Preserve(player: Player)
+	if not WorldAdmissionService.IsAtRisk(player) then
+		return false
+	end
+	setState(player, SessionStates.MaintenancePreserved)
+	WorldAdmissionService.RunEnded:Fire(player, "Maintenance")
+	return true
 end
 
 -- Menu-only exit back to the lobby. Leaving the run itself needs an extraction.

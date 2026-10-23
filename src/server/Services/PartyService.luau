@@ -48,6 +48,12 @@ local function broadcast()
 	end
 end
 
+-- The party ID a deploy carries into the world, where the party becomes a tribe.
+function PartyService.PartyIdOf(player: Player): string?
+	local party = PartyRules.PartyOf(state, player.UserId)
+	return party and party.id or nil
+end
+
 -- Members who deploy with `player`: the whole party when they lead it, just them
 -- when they have no party. Returns (players) or (nil, reason).
 function PartyService.DeployGroup(player: Player)
