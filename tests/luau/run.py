@@ -24,6 +24,8 @@ HERE = Path(__file__).resolve().parent
 # instance path the game code sees.
 MOUNTS = {
     ("ReplicatedStorage", "Shared"): ROOT / "src" / "shared",
+    # Server modules are testable when their Roblox services are injected (fakes in specs).
+    ("ServerScriptService", "Server"): ROOT / "src" / "server",
 }
 
 
@@ -31,6 +33,9 @@ def module_entries():
     entries = []
     for prefix, folder in MOUNTS.items():
         for file in sorted(folder.rglob("*.luau")):
+            # Entry-point scripts (init.server/init.client) are not requirable modules.
+            if file.name.endswith((".server.luau", ".client.luau")):
+                continue
             rel = file.relative_to(folder).with_suffix("")
             parts = list(rel.parts)
             if parts[-1] == "init":
