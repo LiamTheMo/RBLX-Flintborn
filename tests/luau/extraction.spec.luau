@@ -74,13 +74,12 @@ test("items beyond 50 lobby backpack slots are deleted", function()
 	expectEq(receipt.deleted.StoneSword, 5, "5 deleted")
 end)
 
-test("manual vault deposits are refused, never deleted, when full", function()
+test("manual item deposits are refused, never deleted, when full", function()
 	local profile = ProfileSchema.Default(0)
 	profile.lobbyBackpack.slots = { sword("a"), { catalogId = "Stone", quantity = 300 } }
-	profile.vault.materials.Stone = 800
 	local ok, reason = VaultRules.Deposit(profile, 2)
-	expect(not ok and reason == "VaultStackFull", "800 + 300 would exceed 1,000")
-	expectEq(profile.lobbyBackpack.slots[2].quantity, 300, "nothing lost")
+	expect(not ok and reason == "MaterialsBankAutomatically", "a material never takes an item slot")
+	expectEq(#profile.vault.items, 0, "no material stack in the item slots")
 	expect(VaultRules.Deposit(profile, 1), "sword deposited")
 	expectEq(profile.vault.items[1].location, "Vault", "now vaulted")
 	for i = 2, 25 do
@@ -100,6 +99,32 @@ test("withdrawals move vault items into the lobby backpack; materials stay vault
 	expectEq(#profile.vault.items, 0, "vault emptied")
 	expectEq(VaultRules.WithdrawMaterial, nil, "materials have no way back out of the vault")
 	expectEq(profile.vault.materials.Iron, 40, "iron untouched")
+end)
+
+test("backpack materials bank into the vault at once; overflow is deleted", function()
+	local profile = ProfileSchema.Default(0)
+	profile.vault.materials.Stone = 800
+	profile.lobbyBackpack.slots = {
+		{ catalogId = "Stone", quantity = 300 },
+		sword("a"),
+		{ catalogId = "AncientEmber", quantity = 2 },
+		{ catalogId = "Arrow", quantity = 20 },
+		{ catalogId = "Stone", quantity = 50 },
+	}
+	local deleted = VaultRules.BankMaterials(profile, 77)
+	expectEq(profile.vault.materials.Stone, 1000, "Stone fills its vault capacity")
+	expectEq(deleted.Stone, 150, "800 + 350 leaves 150 to delete")
+	expectEq(profile.vault.materials.AncientEmber, 2, "special materials bank too")
+	expectEq(#profile.lobbyBackpack.slots, 2, "only the sword and arrows stay")
+	for _, item in profile.lobbyBackpack.slots do
+		expect(item.catalogId == "StoneSword" or item.catalogId == "Arrow", "non-material kept: " .. item.catalogId)
+	end
+	expectEq(profile.vault.lastOverflow.at, 77, "the loss is recorded")
+	expectEq(profile.vault.lastOverflow.deleted.Stone, 150, "with its amount")
+
+	local again = VaultRules.BankMaterials(profile, 78)
+	expectEq(next(again), nil, "nothing left to bank")
+	expectEq(profile.vault.lastOverflow.at, 77, "a sweep with no loss keeps the last notice")
 end)
 
 test("replaying a settlement receipt never credits twice", function()

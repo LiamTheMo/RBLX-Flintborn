@@ -327,18 +327,23 @@ Studio and live checks:
 
 ## Q164 — Materials stay in the lobby
 
-Owner decision (GDD §45): extracted materials never come back out into the play world, and the vault's material capacity alone decides what extraction overflow is deleted.
+Owner decisions (GDD §45, Q164/Q164a): extracted materials never come back out into the play world; any material that reaches the lobby backpack goes straight into the vault and cannot be taken out, and the vault's material capacity alone decides what is deleted.
 
 Automated:
 - A Deploy reserves gear, ammo and consumables but leaves every material (Wood, Iron, Ancient Ember) in the lobby backpack. A rollback returns the reserved items beside them.
 - The vault has no material withdrawal.
 - Extraction banks every material, special ones included, into the vault and doubles it at the Center.
 - With a full 50-slot backpack and 990 Stone in the vault, a Center extraction stores 1,000 and deletes 50, still vaults Ancient Ember, and deletes only the gear that overflows the backpack.
+- Backpack materials bank into the vault at once with overflow deleted and recorded; a material can't be deposited as an item.
+- Driving the real ProfileService: an old save with backpack Iron loads banked with the overflow deleted, and both an operation and a direct mutation that land materials in the backpack end with them banked.
+- Trades offer eligible materials (special or Exclusive) straight from the vault by quantity; backpack and ordinary materials are refused, the receiver's vault must have room, settlement and rollback move vault to vault exactly once (`trade_materials.spec.luau`, 16 cases).
 - The per-stack carried-in tagging and its specs are removed; the party-verification cases moved to `followup_party.spec.luau`.
 
 Studio and live checks:
 
-- [ ] With Wood and a spear in the lobby backpack, the Deploy list shows the spear going and the Wood staying behind; in the run only the spear arrives.
+- [ ] A profile saved before this change with materials in its backpack loads with them in the vault; anything over 1,000 shows as "Vault full — deleted" in the vault's materials column for a day.
+- [ ] Trade Ancient Ember from the vault with +1 / +10 / All / Remove: both players see the offer update, the Ember moves vault to vault, and the next Deploy brings only gear. A trade that would push the partner's vault past 1,000 is refused ("their vault has no room").
+- [ ] Rejoin after a crash mid-trade: a rolled-back Ember returns to the giver's vault.
 - [ ] Extract with Ancient Ember: the receipt shows it vaulted, and the vault's materials column shows it with no withdraw action.
 - [ ] Forge recipes that use Ancient Ember still work from the vault.
 - [ ] The shop no longer lists Herb seeds; planting Herbs uses Herbs gathered in the run.

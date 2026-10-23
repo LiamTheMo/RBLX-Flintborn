@@ -107,12 +107,12 @@ function DeployService.Start()
 	Remotes.Handle("DeployPreview", function(player)
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
-			table.insert(items, {
-				catalogId = item.catalogId,
-				quantity = item.quantity,
-				permanent = item.permanent,
-				staysInLobby = not TransitRules.Deployable(item),
-			})
+			if TransitRules.Deployable(item) then
+				table.insert(
+					items,
+					{ catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent }
+				)
+			end
 		end
 		return items
 	end)
