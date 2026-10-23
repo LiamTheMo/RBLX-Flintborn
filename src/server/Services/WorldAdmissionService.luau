@@ -25,10 +25,12 @@ WorldAdmissionService.PROFILE_WAIT_SECONDS = 60
 WorldAdmissionService.CHARACTER_WAIT_SECONDS = 15
 WorldAdmissionService.DEATH_RETURN_SECONDS = 5
 
--- Fires (player, runItems) when an at-risk player leaves the world without
--- extracting. v0.07 turns this into a lootable body; until then the run ends.
+-- Fires (player) when an at-risk player leaves the world without extracting,
+-- before RunEnded, so listeners can still read the run inventory. v0.07 turns
+-- this into a lootable body; until then the run simply ends.
 WorldAdmissionService.ActiveDeparture = Signal.new()
--- Fires (player, character) once a player is confirmed in ActiveRun.
+-- Fires (player, character, items) once a player is confirmed in ActiveRun;
+-- `items` are the reserved lobby items entering the run.
 WorldAdmissionService.RunStarted = Signal.new()
 -- Fires (player, reason) when a run ends: "Died" or "Left".
 WorldAdmissionService.RunEnded = Signal.new()
@@ -41,10 +43,12 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "Potion", quantity = 1 },
 	{ catalogId = "Berries", quantity = 5 },
 	{ catalogId = "CookedMeat", quantity = 2 },
+	{ catalogId = "Wood", quantity = 30 },
+	{ catalogId = "Stone", quantity = 20 },
+	{ catalogId = "Fiber", quantity = 20 },
 }
 
 local states = {}
-local runItems = {}
 local lastPlayRequest = {}
 
 function WorldAdmissionService.GetState(player: Player): string?
@@ -53,11 +57,6 @@ end
 
 function WorldAdmissionService.IsAtRisk(player: Player): boolean
 	return SessionStates.IsAtRisk(states[player])
-end
-
--- The items this player carries in the current run.
-function WorldAdmissionService.RunItems(player: Player)
-	return runItems[player]
 end
 
 local function setState(player: Player, state: string)
@@ -98,7 +97,6 @@ local function onDied(player: Player)
 	setState(player, SessionStates.Dead)
 	-- A dead player may not rejoin this world (GDD Q5) and returns to the lobby.
 	MatchmakingService.Exclude(player.UserId)
-	runItems[player] = nil
 	WorldAdmissionService.RunEnded:Fire(player, "Died")
 	task.delay(WorldAdmissionService.DEATH_RETURN_SECONDS, function()
 		if player.Parent then
@@ -162,12 +160,11 @@ local function requestPlay(player: Player, requestId: any)
 			items[index] = table.clone(stack)
 		end
 	end
-	runItems[player] = items
 	setState(player, SessionStates.ActiveRun)
 	humanoid.Died:Connect(function()
 		onDied(player)
 	end)
-	WorldAdmissionService.RunStarted:Fire(player, character)
+	WorldAdmissionService.RunStarted:Fire(player, character, items)
 	return true, nil
 end
 
@@ -217,14 +214,13 @@ function WorldAdmissionService.Start()
 	Players.PlayerRemoving:Connect(function(player)
 		if WorldAdmissionService.IsAtRisk(player) then
 			-- Any logout during active play forfeits carried items (GDD Q157).
-			WorldAdmissionService.ActiveDeparture:Fire(player, runItems[player])
+			WorldAdmissionService.ActiveDeparture:Fire(player)
 			WorldAdmissionService.RunEnded:Fire(player, "Left")
 		else
 			-- Menu, loading or failed Play: loss-free.
 			LoadoutService.Rollback(player)
 		end
 		states[player] = nil
-		runItems[player] = nil
 		lastPlayRequest[player] = nil
 	end)
 end

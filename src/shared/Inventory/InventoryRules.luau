@@ -1,0 +1,194 @@
+-- Fixed 9-slot hotbar and 50-slot backpack (GDD §22.1.1, Q108, Q126–128). Every
+-- stackable type (materials, ammo, consumables) lives in ONE slot with one
+-- quantity; tools, weapons and armor are unique instances in their own slots and
+-- never merge. Pure functions over an inventory table, shared with specs.
+
+local GameConstants = require(script.Parent.Parent.GameConstants)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+
+local InventoryRules = {}
+
+InventoryRules.Hotbar = "hotbar"
+InventoryRules.Backpack = "backpack"
+
+local SIZES = {
+	hotbar = GameConstants.HOTBAR_SLOTS,
+	backpack = GameConstants.BACKPACK_SLOTS,
+}
+
+export type Stack = { catalogId: string, quantity: number }
+export type Inventory = { hotbar: { [number]: any }, backpack: { [number]: any } }
+
+function InventoryRules.New(): Inventory
+	return { hotbar = {}, backpack = {} }
+end
+
+function InventoryRules.Size(area: string): number?
+	return SIZES[area]
+end
+
+function InventoryRules.At(inventory: Inventory, area: string, index: number)
+	local slots = inventory[area]
+	return slots and slots[index] or nil
+end
+
+local function isStack(entry): boolean
+	return entry.instanceId == nil
+end
+
+-- (area, index) of the slot holding a stackable type, if any.
+local function findStack(inventory: Inventory, catalogId: string)
+	for _, area in { "hotbar", "backpack" } do
+		for index = 1, SIZES[area] do
+			local entry = inventory[area][index]
+			if entry and isStack(entry) and entry.catalogId == catalogId then
+				return area, index
+			end
+		end
+	end
+	return nil, nil
+end
+
+local function firstEmpty(inventory: Inventory, preferHotbar: boolean)
+	local order = if preferHotbar then { "hotbar", "backpack" } else { "backpack", "hotbar" }
+	for _, area in order do
+		for index = 1, SIZES[area] do
+			if inventory[area][index] == nil then
+				return area, index
+			end
+		end
+	end
+	return nil, nil
+end
+
+-- Adds a stack ({catalogId, quantity}) or a unique instance record. Returns how
+-- much did not fit (0 when everything was added; 1 for a unique item that did not).
+function InventoryRules.Add(inventory: Inventory, item): number
+	local cap = ItemCatalog.StackCap(item.catalogId)
+	if item.instanceId ~= nil or cap == nil then
+		local area, index = firstEmpty(inventory, ItemCatalog.PrefersHotbar(item.catalogId))
+		if area == nil then
+			return 1
+		end
+		inventory[area][index] = item
+		return 0
+	end
+	local quantity = item.quantity or 0
+	if quantity <= 0 then
+		return 0
+	end
+	local area, index = findStack(inventory, item.catalogId)
+	if area == nil then
+		area, index = firstEmpty(inventory, ItemCatalog.PrefersHotbar(item.catalogId))
+		if area == nil then
+			return quantity
+		end
+		inventory[area][index] = { catalogId = item.catalogId, quantity = 0 }
+	end
+	local stack = inventory[area][index]
+	local added = math.min(quantity, cap - stack.quantity)
+	stack.quantity += added
+	return quantity - added
+end
+
+function InventoryRules.Count(inventory: Inventory, catalogId: string): number
+	local area, index = findStack(inventory, catalogId)
+	return area and inventory[area][index].quantity or 0
+end
+
+-- Removes `quantity` of a stackable type, all or nothing.
+function InventoryRules.Remove(inventory: Inventory, catalogId: string, quantity: number): boolean
+	local area, index = findStack(inventory, catalogId)
+	if area == nil or quantity <= 0 then
+		return false
+	end
+	local stack = inventory[area][index]
+	if stack.quantity < quantity then
+		return false
+	end
+	stack.quantity -= quantity
+	if stack.quantity == 0 then
+		inventory[area][index] = nil
+	end
+	return true
+end
+
+-- Removes several stackable types at once, all or nothing ({catalogId = quantity}).
+function InventoryRules.RemoveAll(inventory: Inventory, costs: { [string]: number }): boolean
+	for catalogId, quantity in costs do
+		if InventoryRules.Count(inventory, catalogId) < quantity then
+			return false
+		end
+	end
+	for catalogId, quantity in costs do
+		InventoryRules.Remove(inventory, catalogId, quantity)
+	end
+	return true
+end
+
+function InventoryRules.FindInstance(inventory: Inventory, instanceId: string)
+	for _, area in { "hotbar", "backpack" } do
+		for index = 1, SIZES[area] do
+			local entry = inventory[area][index]
+			if entry and entry.instanceId == instanceId then
+				return area, index
+			end
+		end
+	end
+	return nil, nil
+end
+
+-- Swaps two slots (either may be empty). Returns false for an invalid slot.
+function InventoryRules.Move(inventory: Inventory, fromArea: string, fromIndex: number, toArea: string, toIndex: number)
+	local fromSize, toSize = SIZES[fromArea], SIZES[toArea]
+	if fromSize == nil or toSize == nil then
+		return false
+	end
+	if fromIndex % 1 ~= 0 or toIndex % 1 ~= 0 then
+		return false
+	end
+	if fromIndex < 1 or fromIndex > fromSize or toIndex < 1 or toIndex > toSize then
+		return false
+	end
+	local moving = inventory[fromArea][fromIndex]
+	if moving == nil then
+		return false
+	end
+	inventory[fromArea][fromIndex] = inventory[toArea][toIndex]
+	inventory[toArea][toIndex] = moving
+	return true
+end
+
+-- Every entry as a flat list (for departure, extraction and display).
+function InventoryRules.Items(inventory: Inventory)
+	local items = {}
+	for _, area in { "hotbar", "backpack" } do
+		for index = 1, SIZES[area] do
+			local entry = inventory[area][index]
+			if entry then
+				table.insert(items, entry)
+			end
+		end
+	end
+	return items
+end
+
+-- Builds an inventory from a flat list. Returns (inventory, items that did not fit).
+function InventoryRules.FromItems(items): (Inventory, { any })
+	local inventory = InventoryRules.New()
+	local leftovers = {}
+	for _, item in items do
+		local copy = table.clone(item)
+		local remaining = InventoryRules.Add(inventory, copy)
+		if remaining > 0 then
+			if copy.instanceId ~= nil then
+				table.insert(leftovers, copy)
+			else
+				table.insert(leftovers, { catalogId = copy.catalogId, quantity = remaining })
+			end
+		end
+	end
+	return inventory, leftovers
+end
+
+return InventoryRules
