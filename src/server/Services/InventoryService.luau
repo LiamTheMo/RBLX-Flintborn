@@ -175,8 +175,6 @@ local function keepInLobby(player: Player, leftovers)
 				if item.instanceId then
 					item.location = "LobbyBackpack"
 				end
-				-- Back in the lobby the units are simply vault-side again.
-				item.fromLobby = nil
 				table.insert(profile.lobbyBackpack.slots, item)
 			end
 		end
@@ -195,9 +193,7 @@ local function keepInLobby(player: Player, leftovers)
 end
 
 local function startRun(player: Player, _character, items)
-	-- Every deployed stack is tagged as lobby units: the Center never doubles them,
-	-- in this inventory or anyone else's (GDD §9.3).
-	local inventory, leftovers = InventoryRules.Deploy(items or {})
+	local inventory, leftovers = InventoryRules.FromItems(items or {})
 	entries[player] = { inventory = inventory, equipped = nil }
 	if #leftovers > 0 then
 		keepInLobby(player, leftovers)

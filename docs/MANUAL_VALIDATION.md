@@ -110,11 +110,11 @@ Studio and live checks (two or more players):
 - [ ] Two players trigger the same portal: one shared countdown; a stranger inside the zone at zero extracts on an enemy's timer.
 - [ ] The activator dies or leaves the zone before zero; everyone else inside still extracts. Downed players inside do not.
 - [ ] At zero the HUD switches to "Protected: extracting"; disconnecting during the 3 s animation still settles the items.
-- [ ] Arriving in the lobby shows the receipt: materials banked to the vault, gear and special materials in the lobby backpack, overflow listed as deleted.
+- [ ] Arriving in the lobby shows the receipt: every material (special ones included, Q164) banked to the vault, gear in the lobby backpack, overflow listed as deleted.
 - [ ] A Center extraction doubles materials but never a sword; a rune placed at the Center does not double.
 - [ ] A rune (hotbar) is refused next to a workbench and next to another running extraction; elsewhere it starts a 30 s countdown everyone can use.
-- [ ] G opens the vault in the lobby: deposit from the backpack, withdraw items and materials; a full vault refuses rather than deletes.
-- [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack into the next run.
+- [ ] G opens the vault in the lobby: deposit from the backpack and withdraw items; materials have no withdraw action (Q164); a full vault refuses rather than deletes.
+- [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack except materials into the next run.
 
 ## v0.09 — Ancestral Forge and Permanent items
 
@@ -271,7 +271,7 @@ Automated: three rounds of independent review across economy, trading, progressi
 Closed in this pass:
 - **Economy and trades:**
   - Code reuse is closed, including codes redeemed before the redemption record existed.
-  - Center 2× no longer doubles lobby materials: the mark is on the item stack, so it holds through drops, bodies, chests, tribemates and rituals.
+  - Center 2× no longer doubles lobby materials (superseded by Q164 below: materials never enter a run from the lobby).
   - Trades are protected against bait-and-switch, and reconcile or roll back after a crash.
   - Selling, Forge crafts, Gem spending and Deploy are refused with "TradeSettling" while a trade can still roll back.
   - Purchase entitlements are checked.
@@ -323,5 +323,22 @@ Studio and live checks:
 - [ ] Kill a world server within a second of pressing Play: the loadout is restored once.
 - [ ] Shut down a server while a Play is loading: the loadout stays in the lobby. A `/safekick` whose save fails retries and kicks once saved.
 - [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
-- [ ] Center extraction after picking up someone's dropped lobby materials: those units are not doubled; materials you gathered are.
 - [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
+
+## Q164 — Materials stay in the lobby
+
+Owner decision (GDD §45): extracted materials never come back out into the play world, and the vault's material capacity alone decides what extraction overflow is deleted.
+
+Automated:
+- A Deploy reserves gear, ammo and consumables but leaves every material (Wood, Iron, Ancient Ember) in the lobby backpack. A rollback returns the reserved items beside them.
+- The vault has no material withdrawal.
+- Extraction banks every material, special ones included, into the vault and doubles it at the Center.
+- With a full 50-slot backpack and 990 Stone in the vault, a Center extraction stores 1,000 and deletes 50, still vaults Ancient Ember, and deletes only the gear that overflows the backpack.
+- The per-stack carried-in tagging and its specs are removed; the party-verification cases moved to `followup_party.spec.luau`.
+
+Studio and live checks:
+
+- [ ] With Wood and a spear in the lobby backpack, the Deploy list shows the spear going and the Wood staying behind; in the run only the spear arrives.
+- [ ] Extract with Ancient Ember: the receipt shows it vaulted, and the vault's materials column shows it with no withdraw action.
+- [ ] Forge recipes that use Ancient Ember still work from the vault.
+- [ ] The shop no longer lists Herb seeds; planting Herbs uses Herbs gathered in the run.
