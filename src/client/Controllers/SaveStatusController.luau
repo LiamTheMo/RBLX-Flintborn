@@ -34,9 +34,11 @@ function SaveStatusController.Start()
 
 	label = Instance.new("TextLabel")
 	label.Name = "Status"
-	label.AnchorPoint = Vector2.new(0, 1)
-	label.Position = UDim2.new(0, 12, 1, -12)
-	label.Size = UDim2.fromOffset(240, 24)
+	-- Bottom-right above the settings button: the XP bar owns the bottom-left.
+	label.AnchorPoint = Vector2.new(1, 1)
+	label.Position = UDim2.new(1, -12, 1, -84)
+	label.Size = UDim2.fromOffset(0, 24)
+	label.AutomaticSize = Enum.AutomaticSize.X
 	label.BackgroundTransparency = 0.4
 	label.BackgroundColor3 = Color3.fromRGB(20, 18, 16)
 	label.TextColor3 = Color3.fromRGB(240, 232, 220)
@@ -47,6 +49,7 @@ function SaveStatusController.Start()
 
 	local padding = Instance.new("UIPadding")
 	padding.PaddingLeft = UDim.new(0, 8)
+	padding.PaddingRight = UDim.new(0, 8)
 	padding.Parent = label
 
 	gui.Parent = player:WaitForChild("PlayerGui")

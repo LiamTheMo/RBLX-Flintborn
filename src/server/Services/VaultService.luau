@@ -1,6 +1,7 @@
 -- The lobby vault and lobby backpack (GDD §10.3, §25.2, Q96, Q129, Q151–152, Q155).
 -- Shows the latest extraction receipt on arrival, and handles manual deposits and
--- withdrawals through exactly-once profile operations. Lobby place only.
+-- withdrawals through exactly-once profile operations, refused during an open
+-- trade. Lobby place only.
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,6 +14,7 @@ local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local VaultRules = require(ReplicatedStorage.Shared.Extraction.VaultRules)
 local ProfileService = require(script.Parent.ProfileService)
+local TradeService = require(script.Parent.TradeService)
 
 local VaultService = {}
 
@@ -66,6 +68,10 @@ local function snapshot(player: Player)
 end
 
 local function operate(player: Player, kind: string, apply)
+	-- An open trade's offers must stay exactly as offered until it ends.
+	if TradeService.InSession(player) then
+		return false, "InTrade"
+	end
 	local ok, result = ProfileService.RunOperation(
 		player,
 		kind .. ":" .. HttpService:GenerateGUID(false),

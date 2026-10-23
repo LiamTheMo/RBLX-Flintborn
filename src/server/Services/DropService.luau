@@ -8,6 +8,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -137,7 +138,7 @@ function pickUp(player: Player, id: string)
 		return
 	end
 	if remaining > 0 then
-		drop.item.quantity = remaining
+		InventoryRules.KeepRemainder(drop.item, remaining)
 		drop.prompt.ObjectText = label(drop.item)
 		drops[id] = drop
 	else

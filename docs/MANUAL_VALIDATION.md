@@ -245,7 +245,7 @@ Studio and live checks (desktop, touch and controller):
 
 Automated: 4 crash-recovery specs (a crash with no heartbeat is eligible; logout and planned shutdown never are; items already dropped, stored or traded away are excluded; restored once even when retried) and 16 security specs, one per GDD §24 case: forged Permanent IDs, double Forge requests, simultaneous devices, teleport mid-operation, death vs extraction, Center bonus replays, ineligible trades, trade interruption, double purchase receipts, rebirth replays, repeated 25% boss grants, negative quantities, DataStore budget exhaustion, structures in portal auras, malformed remote arguments and floods, and impossible movement. The spec runner also fails on require cycles. Deployed and verified on both places (2026-10-23).
 
-Placeholders: remote limits 20 calls/s per remote per player (burst 40), arguments ≤ 8, strings ≤ 256, tables ≤ 64 entries and depth 2; flood kick at 150 violations per minute; checkpoints every 15 s plus 1 s after changes, 24 h expiry; server heartbeat every 30 s, stale after 90 s; recovery retries 3 × 100 s while the player stays; movement tolerance 1.6× sprint speed + 6 studs per 0.25 s sample, two strikes before a pull-back. Analytics flush every 60 s. MemoryStore outages mean a crash cannot be recovered (documented scope).
+Placeholders: remote limits 20 calls/s per remote per player (burst 40), arguments ≤ 8, strings ≤ 256, tables ≤ 64 entries and depth 2; flood kick at 150 violations per minute; checkpoints every 15 s plus 1 s after changes, 24 h expiry; server heartbeat every 30 s, stale after 90 s; recovery retries 3 × 100 s while the player stays; movement tolerance 1.6× sprint speed + 6 studs per 0.25 s sample, two strikes before a pull-back (tightened by the post-release hardening pass below). Analytics flush every 60 s. MemoryStore outages mean a crash cannot be recovered (documented scope).
 
 Studio and live checks:
 
@@ -263,3 +263,65 @@ Automated: 3 release specs cover loading a profile saved by the earliest phase i
 Everything still manual before `v1.00` is in [`docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).
 
 - [ ] Hunt a wolf or boar, build a Furnace (X), and cook Raw Meat into Cooked Meat (V, "furnace" recipes).
+
+## Post-release hardening (after v0.18)
+
+Automated: three rounds of independent review across economy, trading, progression, run lifecycle, persistence, crash recovery, combat, building, enemies and anti-cheat, plus the client. Each confirmed bug has a regression case. The new specs are `hardening_economy`, `hardening_lifecycle`, `hardening_gameplay`, `review_economy`, `review_lifecycle` (which runs the real server services against faked Roblox services), `review_gameplay`, `followup_recovery` and `followup_extraction`. The spec runner now covers 28 spec files.
+
+Closed in this pass:
+- **Economy and trades:**
+  - Code reuse is closed, including codes redeemed before the redemption record existed.
+  - Center 2× no longer doubles lobby materials: the mark is on the item stack, so it holds through drops, bodies, chests, tribemates and rituals.
+  - Trades are protected against bait-and-switch, and reconcile or roll back after a crash.
+  - Selling, Forge crafts, Gem spending and Deploy are refused with "TradeSettling" while a trade can still roll back.
+  - Purchase entitlements are checked.
+  - Rebirth credit counts only Guardian Fangs.
+- **Run lifecycle and crash recovery:**
+  - Shutdown, safekick and failed-save paths never lose or duplicate a loadout.
+  - Runs are recorded at Play, so a crash before the first checkpoint still restores the loadout.
+  - A new run can't overwrite an unrecovered crash checkpoint: Play is refused with "RecoveringItems" until it settles.
+  - Checkpoints are deleted only when they still belong to the same run.
+- **Combat:**
+  - Melee and arrows need line of sight and a server-validated position.
+  - Bow draw is measured by the server.
+  - Enemies and bosses respond to ranged attackers within their leash.
+  - Safe zones block attacks in both directions.
+- **Building and movement:**
+  - Buried or overlapping placements are rejected, totems are capped at 3 per owner, and a player who leaves a tribe loses control of its pieces.
+  - Movement uses a draining latency budget at 1.25× the server walk speed, and a large blink is pulled back at once.
+  - Sprint stops at empty stamina until the key is released or the bar is full again.
+- **Parties:** party tribes are verified through a server-written MemoryStore record instead of client teleport data.
+- **Client:**
+  - Touch controls are no longer scaled down.
+  - Panels block click-through.
+  - The new refusal reasons show friendly text.
+
+Placeholders:
+- **Movement:** tolerance is 1.25× the server-set WalkSpeed plus a draining 6-stud latency budget; a jump of more than 3× the limit is pulled back immediately.
+- **Combat:** melee and shots are refused when the root or head is more than 12 studs from the validated position. Provoked enemies hunt for 10 s within leash + 150 studs.
+- **Building:** at most 3 totems per owner; crop XP at most 6 grants per player per minute.
+- **Parties:** deploy records expire after 1 hour.
+- **Recovery:** recovery retries every 15 s while the player stays.
+
+Known limits, by design or deferred:
+- A trade rollback can't recover items the other player already spent before the guard existed.
+- The 1-unit crafting ingredient refund comes back unmarked, so at most 1 unit per craft could be doubled at the Center.
+- An old server that lost its lease but keeps heartbeating holds the RecoveringItems gate until it clears its checkpoint or shuts down.
+- Private survival attributes still replicate to all clients (low impact).
+
+Studio and live checks:
+
+- [ ] Sprint, crawl, fall and ride lag spikes on a real network without rubber-banding. Being pushed or sliding while downed doesn't trigger repeated pull-backs, and spawn or pull-back snaps aren't judged as teleports.
+- [ ] A speed or teleport exploit is pulled back; teleporting in, swinging and teleporting back does no damage.
+- [ ] Melee hits on stepped ground and point-blank; arrows don't pass through walls; bosses can reach players and don't climb onto pillars.
+- [ ] Building: roofing from outside a hut and placing a floor under your own feet behave sensibly; buried totems are refused; a fourth totem is refused.
+- [ ] A player kicked from a tribe can't open its doors or walk over its traps.
+- [ ] Chest reach works with tall avatar bodies.
+- [ ] Cache channel: the hold bar resets for an interrupted holder, and other holders keep their bars.
+- [ ] A party deploys from the lobby and forms its tribe right after Play. With MemoryStore unavailable, members arrive solo and the deploy still works.
+- [ ] Kill a world server mid-run, rejoin another world and press Play: "RecoveringItems" shows, then the items are restored once and Play works.
+- [ ] Kill a world server within a second of pressing Play: the loadout is restored once.
+- [ ] Shut down a server while a Play is loading: the loadout stays in the lobby. A `/safekick` whose save fails retries and kicks once saved.
+- [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
+- [ ] Center extraction after picking up someone's dropped lobby materials: those units are not doubled; materials you gathered are.
+- [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.

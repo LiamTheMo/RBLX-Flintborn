@@ -5,6 +5,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -18,6 +19,8 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 local StorageService = {}
 
 StorageService.REACH = 10
+-- How far the Head may be from the HumanoidRootPart on a real character.
+StorageService.HEAD_OFFSET = 3.5
 
 local chests = {}
 
@@ -36,20 +39,25 @@ local function view(chest)
 	return entries
 end
 
--- In reach and in sight: the first thing between the player's head and the chest
--- must be the chest itself.
+-- In reach and in sight: reach is measured from the HumanoidRootPart, the head
+-- must sit on the body (a client can move its own Head through a wall), and the
+-- first thing between the head and the chest must be the chest itself.
 local function canReach(player: Player, chest): boolean
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
+	local root = character and character:FindFirstChild("HumanoidRootPart")
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	if head == nil or humanoid == nil or humanoid.Health <= 0 or DownedService.IsDowned(player) then
+	if head == nil or root == nil or humanoid == nil or humanoid.Health <= 0 or DownedService.IsDowned(player) then
 		return false
 	end
 	if not WorldAdmissionService.IsAtRisk(player) then
 		return false
 	end
+	if (head.Position - root.Position).Magnitude > StorageService.HEAD_OFFSET then
+		return false
+	end
 	local part = chest.record.part
-	if (part.Position - head.Position).Magnitude > StorageService.REACH then
+	if (part.Position - root.Position).Magnitude > StorageService.REACH then
 		return false
 	end
 	local params = RaycastParams.new()
@@ -63,21 +71,10 @@ local function send(player: Player, id: string, chest)
 	Remotes.Get("ChestOpened"):FireClient(player, id, view(chest))
 end
 
+-- Merging keeps a stack's deployed-from-lobby count, so a chest never launders
+-- carried-in materials into doublable ones.
 local function store(chest, item): boolean
-	local cap = ItemCatalog.StackCap(item.catalogId)
-	if item.instanceId == nil and cap then
-		for _, slot in chest.slots do
-			if slot.instanceId == nil and slot.catalogId == item.catalogId and slot.quantity + item.quantity <= cap then
-				slot.quantity += item.quantity
-				return true
-			end
-		end
-	end
-	if #chest.slots >= StructureCatalog.CHEST_SLOTS then
-		return false
-	end
-	table.insert(chest.slots, item)
-	return true
+	return InventoryRules.Store(chest.slots, item, StructureCatalog.CHEST_SLOTS)
 end
 
 local function take(player: Player, id: any, index: any)
@@ -95,7 +92,7 @@ local function take(player: Player, id: any, index: any)
 		return false, "NoRoom"
 	end
 	if remaining > 0 then
-		entry.quantity = remaining
+		InventoryRules.KeepRemainder(entry, remaining)
 	else
 		table.remove(chest.slots, index)
 	end

@@ -1,7 +1,9 @@
 -- The Ancestral Forge (GDD §15–16, §25.3). Lobby only. Shows every recipe with
 -- vault-only Owned/Needed counts and its unlock state, and commits special crafts
 -- and Permanent conversions as exactly-once operations keyed by the client's nonce,
--- so a retried request returns the first result instead of charging again.
+-- so a retried request returns the first result instead of charging again. Crafts
+-- wait while the player is in an open trade, or while a settled trade may still
+-- roll back ("TradeSettling", ForgeRules).
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,6 +16,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local ProfileService = require(script.Parent.ProfileService)
 local ProgressionService = require(script.Parent.ProgressionService)
+local TradeService = require(script.Parent.TradeService)
 
 local ForgeService = {}
 
@@ -100,6 +103,9 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 	end
 	if sourceId ~= nil and not Validation.IsId(sourceId) then
 		return false, "BadRequest"
+	end
+	if TradeService.InSession(player) then
+		return false, "InTrade"
 	end
 	local operationId = "forge:" .. nonce
 	local ok, result, applied = ProfileService.RunOperation(player, operationId, "Forge", function(profile)

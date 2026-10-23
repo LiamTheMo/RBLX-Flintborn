@@ -67,14 +67,17 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Loot", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Sized to the screen (up to 340×320), so the ✕ stays reachable on phones.
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.45),
-		Size = UDim2.fromOffset(340, 320),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(0.9, 0, 1, -24),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(340, 320), MinSize = Vector2.new(260, 200) }, ui.panel)
 	make(
 		"UIPadding",
 		{ PaddingTop = UDim.new(0, 8), PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) },
@@ -119,6 +122,7 @@ local function build()
 		Size = UDim2.fromOffset(460, 110),
 		BackgroundColor3 = Color3.fromRGB(30, 22, 20),
 		BackgroundTransparency = 0.1,
+		Active = true,
 		TextColor3 = Color3.fromRGB(255, 236, 220),
 		TextWrapped = true,
 		Font = Enum.Font.GothamBold,

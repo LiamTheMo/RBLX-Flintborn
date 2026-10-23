@@ -1,9 +1,15 @@
 -- Lobby trading (GDD §10.2, Q13, Q50, Q98, Q125, Q130). Two players in the same
 -- lobby server exchange designated lobby-backpack items and Gems — never Coins.
--- Offers lock, a short countdown runs, and both confirm. Settlement changes both
--- profiles together, records the trade as pending on each, saves both, then
--- finalises. If the server dies between the two saves, the next load reconciles
--- against the counterpart's saved profile so exactly one outcome survives.
+-- An invite binds the target only once accepted, and the same pair waits a short
+-- cooldown between invites. Offers snapshot each slot and its quantity; any
+-- backpack change unlocks both sides, and settlement needs the exact snapshot.
+-- Vault, shop and Forge actions wait while a session is open. Settlement changes
+-- both profiles together (all or nothing), records the trade as pending on each,
+-- saves both, then finalises. If a save never lands, the next load (or a retry
+-- while the player stays) reconciles against the counterpart's saved profile so
+-- exactly one outcome survives. While pending, sales, Forge crafts, Gem spending
+-- and Deploy are refused ("TradeSettling"); Reconcile always ends it, at the latest
+-- once the counterpart's lease expires.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -11,6 +17,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local CurrencyService = require(script.Parent.CurrencyService)
@@ -20,21 +27,65 @@ local TradeService = {}
 
 TradeService.COUNTDOWN_SECONDS = 5
 TradeService.INVITE_SECONDS = 30
+TradeService.INVITE_COOLDOWN_SECONDS = 10
+TradeService.WATCH_SECONDS = 1
+TradeService.SAVE_ATTEMPTS = 3
+TradeService.SAVE_RETRY_SECONDS = 2
+TradeService.RECONCILE_RETRY_SECONDS = 60
+
+-- The profile groups a settlement touches, restored together if it fails.
+local SETTLED_GROUPS = { "lobbyBackpack", "permanentItems", "currency", "trades" }
+local SERVER = if game.JobId ~= "" then game.JobId else nil
 
 local sessions = {}
 local sessionOf = {}
+local lastInvite = {}
+local reconciling = {}
 
 -- A stable key for a backpack slot: its instance ID, or "stack:<catalogId>".
 local function keyOf(item): string
 	return item.instanceId or ("stack:" .. item.catalogId)
 end
 
-local function indexesFor(profile, keys)
-	local indexes = {}
+-- True while `player` is in an accepted trade session.
+function TradeService.InSession(player: Player): boolean
+	local session = sessionOf[player]
+	return session ~= nil and session.accepted
+end
+
+-- Snapshots the offered slots as {key, quantity}, or nil if one is missing.
+local function snapshotOffer(profile, keys)
+	local entries, used = {}, {}
 	for _, key in keys do
+		if type(key) ~= "string" or #key > 64 then
+			continue
+		end
 		local found = nil
 		for index, item in profile.lobbyBackpack.slots do
-			if keyOf(item) == key and not table.find(indexes, index) then
+			if not used[index] and keyOf(item) == key then
+				found = index
+				break
+			end
+		end
+		if found == nil then
+			return nil
+		end
+		used[found] = true
+		table.insert(entries, { key = key, quantity = profile.lobbyBackpack.slots[found].quantity })
+		if #entries > TradeRules.MAX_ITEMS then
+			break
+		end
+	end
+	return entries
+end
+
+-- Slot indexes matching every snapshot entry exactly, or nil if anything changed.
+local function indexesFor(profile, entries)
+	local indexes = {}
+	for _, entry in entries do
+		local found = nil
+		for index, item in profile.lobbyBackpack.slots do
+			if keyOf(item) == entry.key and item.quantity == entry.quantity and not table.find(indexes, index) then
 				found = index
 				break
 			end
@@ -47,20 +98,32 @@ local function indexesFor(profile, keys)
 	return indexes
 end
 
+local function fingerprint(player: Player): string
+	local profile = ProfileService.GetProfile(player)
+	if profile == nil then
+		return ""
+	end
+	local parts = {}
+	for _, item in profile.lobbyBackpack.slots do
+		table.insert(parts, keyOf(item) .. "x" .. tostring(item.quantity or 1))
+	end
+	return table.concat(parts, "|")
+end
+
 local function other(session, player: Player): Player
 	return if session.a == player then session.b else session.a
 end
 
 local function describe(profile, offer)
 	local list = {}
-	for _, key in offer.keys do
+	for _, entry in offer.items do
 		for _, item in profile.lobbyBackpack.slots do
-			if keyOf(item) == key then
+			if keyOf(item) == entry.key then
 				local def = ItemCatalog.Get(item.catalogId)
 				table.insert(list, {
-					key = key,
+					key = entry.key,
 					name = (item.permanent and "★ " or "") .. (def and def.name or item.catalogId),
-					quantity = item.quantity,
+					quantity = entry.quantity,
 				})
 				break
 			end
@@ -94,9 +157,138 @@ local function close(session, reason: string)
 	end
 	sessions[session.id] = nil
 	for _, player in { session.a, session.b } do
-		sessionOf[player] = nil
+		if sessionOf[player] == session then
+			sessionOf[player] = nil
+		end
 		if player.Parent then
 			Remotes.Get("TradeChanged"):FireClient(player, { kind = "Closed", id = session.id, reason = reason })
+		end
+	end
+end
+
+local function stamp(session)
+	session.prints = { [session.a] = fingerprint(session.a), [session.b] = fingerprint(session.b) }
+end
+
+-- Any change to either backpack unlocks both sides and updates both screens.
+-- Returns true when something changed.
+local function refresh(session): boolean
+	local changed = false
+	for _, player in { session.a, session.b } do
+		local now = fingerprint(player)
+		if now ~= session.prints[player] then
+			session.prints[player] = now
+			changed = true
+		end
+	end
+	if changed then
+		session.locked, session.confirmed, session.confirmAt = {}, {}, nil
+		push(session)
+	end
+	return changed
+end
+
+local function watch(session)
+	while sessions[session.id] == session do
+		task.wait(TradeService.WATCH_SECONDS)
+		if sessions[session.id] == session then
+			refresh(session)
+		end
+	end
+end
+
+-- On load (and every minute while deferred), settle or undo any trade an
+-- earlier session left pending.
+local function reconcile(player: Player)
+	if reconciling[player] then
+		return
+	end
+	reconciling[player] = true
+	while player.Parent do
+		local profile = ProfileService.GetProfile(player)
+		if profile == nil or next(profile.trades.pending) == nil then
+			break
+		end
+		local deferred = false
+		for tradeId, pending in table.clone(profile.trades.pending) do
+			local ok, stored = ProfileService.ReadStored(pending.counterpart)
+			local outcome = nil
+			if ok then
+				ProfileService.Mutate(player, function(live)
+					outcome = TradeRules.Reconcile(live, tradeId, stored, os.time())
+				end)
+			end
+			if outcome == "RolledBack" then
+				warn(("[TradeService] Trade %s for %d rolled back after a crash"):format(tradeId, player.UserId))
+			end
+			deferred = deferred or outcome == nil or outcome == "Deferred"
+		end
+		CurrencyService.Publish(player)
+		if not deferred then
+			break
+		end
+		task.wait(TradeService.RECONCILE_RETRY_SECONDS)
+	end
+	reconciling[player] = nil
+end
+
+-- Applies the trade to both profiles at once; on any error both are restored.
+local function transfer(tradeId: string, sides, now: number): boolean
+	local backups = {}
+	for _, side in sides do
+		local backup = {}
+		for _, group in SETTLED_GROUPS do
+			backup[group] = ProfileSchema.DeepCopy(side.profile[group])
+		end
+		backups[side] = backup
+	end
+	local ok, err = pcall(function()
+		TradeRules.Settle(tradeId, sides[1], sides[2], now)
+		for _, side in sides do
+			side.profile.trades.pending[tradeId].server = SERVER
+		end
+	end)
+	if not ok then
+		for side, backup in backups do
+			for group, value in backup do
+				side.profile[group] = value
+			end
+		end
+		warn(("[TradeService] Trade %s failed and was undone: %s"):format(tradeId, tostring(err)))
+	end
+	return ok
+end
+
+-- Saves both sides (retrying), and finalises only once both saves landed.
+local function finish(tradeId: string, players: { Player })
+	local saved = {}
+	for attempt = 1, TradeService.SAVE_ATTEMPTS do
+		local gone = false
+		for _, player in players do
+			if not saved[player] then
+				saved[player] = player.Parent ~= nil and ProfileService.SaveNow(player) == true
+				gone = gone or player.Parent == nil
+			end
+		end
+		if gone then
+			break
+		end
+		if saved[players[1]] and saved[players[2]] then
+			for _, player in players do
+				ProfileService.Mutate(player, function(profile)
+					TradeRules.Finalize(profile, tradeId, os.time())
+				end)
+			end
+			return
+		end
+		if attempt < TradeService.SAVE_ATTEMPTS then
+			task.wait(TradeService.SAVE_RETRY_SECONDS)
+		end
+	end
+	-- Unconfirmed: each side still here resolves it against the other's saved copy.
+	for _, player in players do
+		if player.Parent then
+			task.spawn(reconcile, player)
 		end
 	end
 end
@@ -109,59 +301,42 @@ local function settle(session)
 		return
 	end
 	local now = os.time()
-	local offerA = { items = indexesFor(pa, session.offers[a].keys), gems = session.offers[a].gems }
-	local offerB = { items = indexesFor(pb, session.offers[b].keys), gems = session.offers[b].gems }
+	local offerA = { items = indexesFor(pa, session.offers[a].items), gems = session.offers[a].gems }
+	local offerB = { items = indexesFor(pb, session.offers[b].items), gems = session.offers[b].gems }
 	if offerA.items == nil or offerB.items == nil then
 		close(session, "ItemsChanged")
 		return
 	end
 	-- Re-check both sides at the moment of settlement (§24): nothing ineligible
 	-- passes even if both players accepted.
-	local okA, reasonA = TradeRules.ValidateOffer(pa, offerA, now)
-	local okB, reasonB = TradeRules.ValidateOffer(pb, offerB, now)
-	if not okA or not okB then
-		close(session, reasonA or reasonB)
-		return
+	local checks = {
+		{ TradeRules.ValidateOffer(pa, offerA, now) },
+		{ TradeRules.ValidateOffer(pb, offerB, now) },
+		{ TradeRules.ValidateReceive(pb, offerA.gems, now) },
+		{ TradeRules.ValidateReceive(pa, offerB.gems, now) },
+	}
+	for _, check in checks do
+		if not check[1] then
+			close(session, check[2])
+			return
+		end
 	end
 	local tradeId = "trade:" .. HttpService:GenerateGUID(false)
 	-- Both profiles change together, with no yield in between.
-	ProfileService.Mutate(a, function()
-		TradeRules.Settle(tradeId, { profile = pa, userId = a.UserId, offer = offerA }, {
-			profile = pb,
-			userId = b.UserId,
-			offer = offerB,
-		}, now)
-	end)
+	local sides = {
+		{ profile = pa, userId = a.UserId, offer = offerA },
+		{ profile = pb, userId = b.UserId, offer = offerB },
+	}
+	if not transfer(tradeId, sides, now) then
+		close(session, "Failed")
+		return
+	end
+	ProfileService.Mutate(a, function() end)
 	ProfileService.Mutate(b, function() end)
 	close(session, "Completed")
-	local savedA = ProfileService.SaveNow(a)
-	local savedB = ProfileService.SaveNow(b)
-	if savedA and savedB then
-		for _, player in { a, b } do
-			ProfileService.Mutate(player, function(profile)
-				TradeRules.Finalize(profile, tradeId, os.time())
-			end)
-		end
-	end
 	CurrencyService.Publish(a)
 	CurrencyService.Publish(b)
-end
-
--- On load, settle or undo any trade an earlier session left pending.
-local function reconcile(player: Player, profile)
-	for tradeId, pending in profile.trades.pending do
-		local ok, stored = ProfileService.ReadStored(pending.counterpart)
-		if ok then
-			local outcome
-			ProfileService.Mutate(player, function(live)
-				outcome = TradeRules.Reconcile(live, tradeId, stored, os.time())
-			end)
-			if outcome == "RolledBack" then
-				warn(("[TradeService] Trade %s for %d rolled back after a crash"):format(tradeId, player.UserId))
-			end
-		end
-	end
-	CurrencyService.Publish(player)
+	task.spawn(finish, tradeId, { a, b })
 end
 
 local function sessionFor(player: Player, id: any)
@@ -174,23 +349,31 @@ end
 
 local function request(player: Player, targetUserId: any)
 	local target = type(targetUserId) == "number" and Players:GetPlayerByUserId(targetUserId)
-	if not target or target == player or sessionOf[player] or sessionOf[target] then
+	if not target or target == player or sessionOf[player] or TradeService.InSession(target) then
 		return false, "Unavailable"
 	end
 	if ProfileService.GetProfile(player) == nil or ProfileService.GetProfile(target) == nil then
 		return false, "Unavailable"
 	end
+	local pair = player.UserId .. ":" .. target.UserId
+	local now = os.clock()
+	if lastInvite[pair] and now - lastInvite[pair] < TradeService.INVITE_COOLDOWN_SECONDS then
+		return false, "Cooldown"
+	end
+	lastInvite[pair] = now
 	local session = {
 		id = HttpService:GenerateGUID(false),
 		a = player,
 		b = target,
 		accepted = false,
-		offers = { [player] = { keys = {}, gems = 0 }, [target] = { keys = {}, gems = 0 } },
+		offers = { [player] = { items = {}, gems = 0 }, [target] = { items = {}, gems = 0 } },
 		locked = {},
 		confirmed = {},
+		prints = {},
 	}
 	sessions[session.id] = session
-	sessionOf[player], sessionOf[target] = session, session
+	-- Only the inviter is bound now; the target is bound when they accept.
+	sessionOf[player] = session
 	Remotes.Get("TradeChanged"):FireClient(target, { kind = "Invite", id = session.id, from = player.DisplayName })
 	task.delay(TradeService.INVITE_SECONDS, function()
 		if sessions[session.id] == session and not session.accepted then
@@ -209,8 +392,19 @@ local function respond(player: Player, id: any, accept: any)
 		close(session, "Declined")
 		return true, nil
 	end
+	local current = sessionOf[player]
+	if current and current.accepted then
+		return false, "Unavailable"
+	end
+	if current then
+		-- Accepting replaces this player's own outgoing invite.
+		close(current, "Cancelled")
+	end
+	sessionOf[player] = session
 	session.accepted = true
+	stamp(session)
 	push(session)
+	task.spawn(watch, session)
 	return true, nil
 end
 
@@ -220,23 +414,26 @@ local function offer(player: Player, id: any, keys: any, gems: any)
 		return false, "BadRequest"
 	end
 	local profile = ProfileService.GetProfile(player)
-	local clean = {}
-	for _, key in keys do
-		if type(key) == "string" and #key <= 64 then
-			table.insert(clean, key)
-		end
+	local partner = ProfileService.GetProfile(other(session, player))
+	if profile == nil or partner == nil then
+		return false, "Unavailable"
 	end
-	local indexes = profile and indexesFor(profile, clean)
-	if indexes == nil then
+	local entries = snapshotOffer(profile, keys)
+	if entries == nil then
 		return false, "MissingItem"
 	end
-	local ok, reason = TradeRules.ValidateOffer(profile, { items = indexes, gems = gems }, os.time())
+	local now = os.time()
+	local ok, reason = TradeRules.ValidateOffer(profile, { items = indexesFor(profile, entries), gems = gems }, now)
+	if ok then
+		ok, reason = TradeRules.ValidateReceive(partner, gems, now)
+	end
 	if not ok then
 		return false, reason
 	end
-	session.offers[player] = { keys = clean, gems = gems }
+	session.offers[player] = { items = entries, gems = gems }
 	-- Any change unlocks both sides (cancel protection).
 	session.locked, session.confirmed, session.confirmAt = {}, {}, nil
+	stamp(session)
 	push(session)
 	return true, nil
 end
@@ -245,6 +442,10 @@ local function lock(player: Player, id: any)
 	local session = sessionFor(player, id)
 	if session == nil or not session.accepted then
 		return false, "BadRequest"
+	end
+	local profile = ProfileService.GetProfile(player)
+	if refresh(session) or profile == nil or indexesFor(profile, session.offers[player].items) == nil then
+		return false, "ItemsChanged"
 	end
 	session.locked[player] = true
 	if session.locked[session.a] and session.locked[session.b] then
@@ -259,6 +460,9 @@ local function confirm(player: Player, id: any)
 	if session == nil or session.confirmAt == nil or workspace:GetServerTimeNow() < session.confirmAt then
 		return false, "NotReady"
 	end
+	if refresh(session) then
+		return false, "ItemsChanged"
+	end
 	session.confirmed[player] = true
 	if session.confirmed[session.a] and session.confirmed[session.b] then
 		settle(session)
@@ -272,7 +476,7 @@ function TradeService.Start()
 	-- Recovery runs wherever a profile loads, since a crash can strike anywhere.
 	ProfileService.ProfileLoaded:Connect(function(player, profile)
 		if next(profile.trades.pending) then
-			task.spawn(reconcile, player, profile)
+			task.spawn(reconcile, player)
 		end
 	end)
 	if not PlaceConfig.IsLobby() then
@@ -291,9 +495,16 @@ function TradeService.Start()
 		return true, nil
 	end)
 	Players.PlayerRemoving:Connect(function(player)
-		local session = sessionOf[player]
-		if session then
-			close(session, "PartnerLeft")
+		for _, session in table.clone(sessions) do
+			if session.a == player or session.b == player then
+				close(session, "PartnerLeft")
+			end
+		end
+		local prefix, suffix = player.UserId .. ":", ":" .. player.UserId
+		for pair in table.clone(lastInvite) do
+			if pair:sub(1, #prefix) == prefix or pair:sub(-#suffix) == suffix then
+				lastInvite[pair] = nil
+			end
 		end
 	end)
 end

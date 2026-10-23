@@ -3,6 +3,7 @@
 -- move and equip goes through here and is replicated to the owner as a snapshot.
 -- World place only.
 
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
@@ -10,6 +11,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local InventoryService = {}
@@ -101,6 +103,16 @@ function InventoryService.RemoveAll(player: Player, costs: { [string]: number })
 	return true
 end
 
+-- Removes stackable items, all or nothing, and returns them as stacks (or nil).
+function InventoryService.TakeAll(player: Player, costs: { [string]: number })
+	local inventory = InventoryService.Get(player)
+	local taken = inventory and InventoryRules.TakeAll(inventory, costs)
+	if taken then
+		InventoryService.Publish(player)
+	end
+	return taken
+end
+
 -- Removes and returns the entry in a hotbar or backpack slot, unequipping it.
 function InventoryService.TakeAt(player: Player, area: string, index: number)
 	local entry = entries[player]
@@ -150,12 +162,46 @@ function InventoryService.Items(player: Player)
 	return inventory and InventoryRules.Items(inventory) or {}
 end
 
-local function startRun(player: Player, _character, items)
-	local inventory, leftovers = InventoryRules.FromItems(items or {})
-	if #leftovers > 0 then
-		warn(("[InventoryService] %d reserved items did not fit for %s"):format(#leftovers, player.Name))
+-- Items that do not fit the run inventory (a lobby backpack over 59 entries,
+-- Permanent items, trades, crash recovery or maintenance escrow on top) stay in
+-- the lobby backpack instead of entering the run. Nothing is ever deleted here.
+local function keepInLobby(player: Player, leftovers)
+	local ok, err = ProfileService.RunOperation(
+		player,
+		"overflow:" .. HttpService:GenerateGUID(false),
+		"RunOverflow",
+		function(profile)
+			for _, item in leftovers do
+				if item.instanceId then
+					item.location = "LobbyBackpack"
+				end
+				-- Back in the lobby the units are simply vault-side again.
+				item.fromLobby = nil
+				table.insert(profile.lobbyBackpack.slots, item)
+			end
+		end
+	)
+	if not ok then
+		warn(("[InventoryService] Could not return %d items for %s: %s"):format(#leftovers, player.Name, tostring(err)))
+		return
 	end
+	-- Saved at once: the consumed loadout is already saved out of the profile and
+	-- these items are in no run checkpoint, so a crash before the save loses them.
+	task.spawn(ProfileService.SaveNow, player)
+	InventoryService.Notify(
+		player,
+		("%d item stack(s) did not fit and stayed in your lobby backpack."):format(#leftovers)
+	)
+end
+
+local function startRun(player: Player, _character, items)
+	-- Every deployed stack is tagged as lobby units: the Center never doubles them,
+	-- in this inventory or anyone else's (GDD §9.3).
+	local inventory, leftovers = InventoryRules.Deploy(items or {})
 	entries[player] = { inventory = inventory, equipped = nil }
+	if #leftovers > 0 then
+		keepInLobby(player, leftovers)
+	end
 	InventoryService.Publish(player)
 end
 

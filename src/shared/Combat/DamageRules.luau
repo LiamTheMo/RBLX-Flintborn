@@ -61,4 +61,20 @@ function DamageRules.ArrowSpeed(drawSeconds: number): number
 	return WeaponCatalog.MIN_ARROW_SPEED + (WeaponCatalog.MAX_ARROW_SPEED - WeaponCatalog.MIN_ARROW_SPEED) * t
 end
 
+-- The draw time to honour: the client's claim, capped at how long the server saw
+-- since the previous attack (`previousAt`, nil before the first) at `now`.
+function DamageRules.ObservedDraw(claimed: number, previousAt: number?, now: number): number
+	local observed = if previousAt then now - previousAt else WeaponCatalog.FULL_DRAW_SECONDS
+	return math.clamp(math.min(claimed, observed), 0, WeaponCatalog.FULL_DRAW_SECONDS)
+end
+
+-- When the current draw could have begun at the earliest: the later of the last
+-- attack and the start of this run (an attack from an earlier run never counts).
+function DamageRules.DrawStart(lastAttackAt: number?, runStartedAt: number?): number?
+	if lastAttackAt == nil or (runStartedAt ~= nil and runStartedAt > lastAttackAt) then
+		return runStartedAt
+	end
+	return lastAttackAt
+end
+
 return DamageRules

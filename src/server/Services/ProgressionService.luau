@@ -42,9 +42,6 @@ ProgressionService.XP = {
 
 -- The same victim credits the same attacker at most once per window (alt farming).
 ProgressionService.PVP_REPEAT_SECONDS = 1800
-ProgressionService.BOSS_CREDIT_RADIUS = 120
-
-local recentKills = {}
 
 -- What the client shows: level bar, masteries with next milestones, rebirth state.
 function ProgressionService.Snapshot(player: Player)
@@ -200,13 +197,15 @@ function ProgressionService.GrantMastery(player: Player, track: string, actions:
 end
 
 -- A player kill: PvP mastery and XP, never twice for the same pair in the window.
+-- The window lives in the attacker's profile, so it survives server hops.
 local function creditKill(attacker: Player, victim: Player)
-	local key = attacker.UserId .. ":" .. victim.UserId
-	local at = os.clock()
-	if recentKills[key] and at - recentKills[key] < ProgressionService.PVP_REPEAT_SECONDS then
+	local credited = false
+	ProfileService.Mutate(attacker, function(profile)
+		credited = ProgressionRules.CreditPvp(profile, victim.UserId, os.time(), ProgressionService.PVP_REPEAT_SECONDS)
+	end)
+	if not credited then
 		return
 	end
-	recentKills[key] = at
 	ProgressionService.GrantXp(attacker, "PvpKill", "Player defeated")
 	ProgressionService.GrantMastery(attacker, "PvP", 1)
 end
@@ -234,10 +233,13 @@ function ProgressionService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	WorldAdmissionService.RunStarted:Connect(function(player)
-		local runId = HttpService:GenerateGUID(false)
+	WorldAdmissionService.RunStarted:Connect(function(player, _, _, runId)
 		ProfileService.Mutate(player, function(profile)
-			ProgressionRules.StartRun(profile, runId)
+			local run = profile.progression.currentRun
+			-- The Play's consume normally recorded this run already (crash recovery).
+			if run == nil or runId == nil or run.runId ~= runId then
+				ProgressionRules.StartRun(profile, runId or HttpService:GenerateGUID(false))
+			end
 		end)
 	end)
 	NpcService.Died:Connect(function(npc)
@@ -246,13 +248,13 @@ function ProgressionService.Start()
 			ProgressionService.GrantXp(killer, if npc.elite then "Elite" else "Enemy", npc.name .. " defeated")
 		end
 	end)
+	-- Only players who damaged the boss share its XP (and the quest progress it
+	-- counts); standing nearby earns nothing.
 	BossService.Defeated:Connect(function(boss)
 		local action = if boss.source == "Guardian" then "Guardian" else "Boss"
-		local at = boss.npc.body.Position
+		local contributors = boss.contributors or {}
 		for _, player in Players:GetPlayers() do
-			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-			local near = root and (root.Position - at).Magnitude <= ProgressionService.BOSS_CREDIT_RADIUS
-			if near and WorldAdmissionService.IsAtRisk(player) then
+			if contributors[player] and WorldAdmissionService.IsAtRisk(player) then
 				ProgressionService.GrantXp(player, action, boss.def.name .. " defeated")
 			end
 		end

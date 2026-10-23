@@ -31,6 +31,8 @@ export type State = {
 	food: number,
 	sprintIntent: boolean,
 	crouching: boolean,
+	-- Set when a sprint empties the bar: no sprint until it is released or full.
+	exhausted: boolean?,
 	medicineLockUntil: number,
 	foodHeals: { FoodHeal },
 }
@@ -47,17 +49,33 @@ function SurvivalRules.NewState(): State
 end
 
 -- Sprinting only happens while the player wants to, is moving, is not crouching
--- and has stamina left. Only sprinting spends stamina (Q62).
+-- and has stamina left. Only sprinting spends stamina (Q62). A sprint that empties
+-- the bar stays stopped until sprint is released or the bar is full again, so a
+-- held sprint does not restart on every sliver of recovered stamina.
 function SurvivalRules.IsSprinting(state: State, moving: boolean): boolean
-	return state.sprintIntent and moving and not state.crouching and state.stamina > 0
+	return state.sprintIntent and moving and not state.crouching and state.stamina > 0 and not state.exhausted
 end
 
--- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62).
-function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean)
-	if SurvivalRules.IsSprinting(state, moving) then
+-- True when observed horizontal travel is clearly faster than walking (at
+-- `walkSpeed`, default WALK_SPEED): the player is sprinting whatever their client
+-- claims (GDD §24).
+function SurvivalRules.ObservedSprint(speed: number, walkSpeed: number?): boolean
+	return speed > (walkSpeed or SurvivalRules.WALK_SPEED) * 1.1
+end
+
+-- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62). `observedSprint`
+-- drains it for travel at sprint pace even without a sprint request.
+function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean, observedSprint: boolean?)
+	if state.exhausted and (not state.sprintIntent or state.stamina >= 1) then
+		state.exhausted = false
+	end
+	if SurvivalRules.IsSprinting(state, moving) or (observedSprint and state.stamina > 0) then
 		-- PvP mastery's non-combat perk stretches the sprint (staminaDrainScale < 1).
 		local drain = dt * (state.staminaDrainScale or 1) / GameConstants.SPRINT_SECONDS
 		state.stamina = settle(math.max(0, state.stamina - drain))
+		if state.stamina <= 0 then
+			state.exhausted = true
+		end
 	else
 		state.stamina = settle(math.min(1, state.stamina + dt / GameConstants.STAMINA_RECOVERY_SECONDS))
 	end

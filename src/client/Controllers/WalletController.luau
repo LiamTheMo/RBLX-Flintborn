@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WalletController = {}
 
@@ -19,6 +20,8 @@ WalletController.SELL_STEP = 10
 local player = Players.LocalPlayer
 local ui = {}
 local tab = "Shop"
+-- Bumped by every render; a render that yielded and is no longer the latest drops.
+local renderToken = 0
 
 local TEXT = Color3.fromRGB(235, 226, 212)
 local GOLD = Color3.fromRGB(255, 214, 150)
@@ -38,7 +41,7 @@ local function invoke(name: string, ...)
 	if not ok then
 		return false, "Request failed"
 	end
-	return success, reason
+	return success, if success then reason else Reasons.Text(reason)
 end
 
 local function nonce(): string
@@ -94,13 +97,22 @@ local function updateWallet()
 end
 
 function render()
+	renderToken += 1
+	local token = renderToken
+	local shown = tab
+	-- Fetch first, then clear and rebuild without yielding, so overlapping renders
+	-- (a tab switch during a purchase) can't interleave and duplicate rows.
+	local data = invoke(if shown == "Quests" then "QuestView" else "ShopView")
+	if token ~= renderToken then
+		return
+	end
 	for _, child in ui.list:GetChildren() do
 		if not child:IsA("UIListLayout") then
 			child:Destroy()
 		end
 	end
 	for name, b in ui.tabs do
-		b.BackgroundColor3 = if name == tab then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(46, 38, 30)
+		b.BackgroundColor3 = if name == shown then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(46, 38, 30)
 	end
 	local order = 0
 	local function nextOrder()
@@ -108,8 +120,8 @@ function render()
 		return order
 	end
 	local coins = player:GetAttribute("Coins") or 0
-	if tab == "Quests" then
-		local quests = invoke("QuestView")
+	if shown == "Quests" then
+		local quests = data
 		if type(quests) ~= "table" then
 			line("Your data is still loading.", TEXT, nextOrder())
 			return
@@ -138,12 +150,12 @@ function render()
 		end
 		return
 	end
-	local view = invoke("ShopView")
+	local view = data
 	if type(view) ~= "table" then
 		line("Your data is still loading.", TEXT, nextOrder())
 		return
 	end
-	if tab == "Shop" then
+	if shown == "Shop" then
 		line("Purchases go to your lobby backpack.", TEXT, nextOrder())
 		for _, entry in view.stock do
 			local text = ("%s%s — %d Coins"):format(
@@ -159,7 +171,7 @@ function render()
 				end)
 			end
 		end
-	elseif tab == "Sell" then
+	elseif shown == "Sell" then
 		line("Merchants pay fixed prices. Vault materials sell 10 at a time.", TEXT, nextOrder())
 		for _, entry in view.sellable do
 			local quantity = if entry.source == "vault"
@@ -209,7 +221,9 @@ function render()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Wallet", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Above the always-open lobby panel.
+	local gui =
+		make("ScreenGui", { Name = "Wallet", ResetOnSpawn = false, DisplayOrder = 2 }, player:WaitForChild("PlayerGui"))
 	ui.wallet = make("TextLabel", {
 		AnchorPoint = Vector2.new(1, 0),
 		Position = UDim2.new(1, -12, 0, 12),
@@ -226,6 +240,7 @@ local function build()
 		Position = UDim2.fromScale(0.45, 0.5),
 		Size = UDim2.new(0.45, 0, 0.75, 0),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)

@@ -19,9 +19,15 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus.
+-- Starts counting a new run's XP for the Center bonus. Which materials it may
+-- double is tagged on the stacks themselves (InventoryRules `fromLobby`).
 function ProgressionRules.StartRun(profile, runId: string)
-	profile.progression.currentRun = { runId = runId, general = 0, mastery = {}, settled = false }
+	profile.progression.currentRun = {
+		runId = runId,
+		general = 0,
+		mastery = {},
+		settled = false,
+	}
 end
 
 local function runFor(profile)
@@ -111,6 +117,35 @@ function ProgressionRules.SettleRun(profile, receipt, kind: string)
 	end
 	receipt.centerBonusGeneralXP = general
 	receipt.centerBonusMasteryXP = masteryTotal
+end
+
+-- Credits a PvP kill unless this victim already credited this attacker within
+-- `window` seconds. Persisted per victim in a small bounded map, so rejoining or
+-- changing servers does not reset it.
+ProgressionRules.PVP_CREDIT_MEMORY = 50
+
+function ProgressionRules.CreditPvp(profile, victimId: number, now: number, window: number): boolean
+	local credits = profile.progression.pvpCredits
+	local key = tostring(victimId)
+	if credits[key] and now - credits[key] < window then
+		return false
+	end
+	credits[key] = now
+	local kept = {}
+	for id, at in credits do
+		if now - at >= window then
+			credits[id] = nil
+		else
+			table.insert(kept, id)
+		end
+	end
+	table.sort(kept, function(x, y)
+		return credits[x] < credits[y]
+	end)
+	for index = 1, #kept - ProgressionRules.PVP_CREDIT_MEMORY do
+		credits[kept[index]] = nil
+	end
+	return true
 end
 
 -- Legendary extractions the next rebirth needs: 1, 2, 3, 4, 6, … (×1.5 each).

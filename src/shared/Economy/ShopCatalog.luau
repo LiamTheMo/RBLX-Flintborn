@@ -15,7 +15,7 @@ ShopCatalog.Stock = {
 	{ id = "BerryPack", catalogId = "Berries", quantity = 5, price = 40, category = "Supplies" },
 	{ id = "ArrowBundle", catalogId = "Arrow", quantity = 10, price = 60, category = "Supplies" },
 	{ id = "HerbSeeds", catalogId = "Herbs", quantity = 2, price = 25, category = "Seeds" },
-	{ id = "BerrySeeds", catalogId = "Berries", quantity = 1, price = 25, category = "Seeds" },
+	{ id = "BerrySeeds", catalogId = "Berries", quantity = 2, price = 15, category = "Seeds" },
 	{ id = "StoneAxe", catalogId = "StoneAxe", quantity = 1, price = 150, category = "Tools" },
 	{ id = "BasicPickaxe", catalogId = "BasicPickaxe", quantity = 1, price = 150, category = "Tools" },
 	{ id = "Sickle", catalogId = "Sickle", quantity = 1, price = 150, category = "Tools" },

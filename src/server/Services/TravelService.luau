@@ -49,8 +49,9 @@ function TravelService.ReserveWorld()
 	return accessCode, privateServerId
 end
 
--- Sends players to a reserved world. Only references (reservation and party IDs)
--- travel in teleport data; the destination re-checks them against the profile.
+-- Sends players to a reserved world. Only references (reservation IDs and a party
+-- deploy token) travel in teleport data, which clients can edit; the destination
+-- re-checks them against the profile and the server-written party record.
 function TravelService.ToWorld(players: { Player }, accessCode: string, teleportData)
 	local placeIds = PlaceConfig.PlaceIds()
 	if placeIds == nil then

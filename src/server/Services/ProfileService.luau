@@ -30,9 +30,15 @@ ProfileService.ProfileLoaded = Signal.new()
 -- Fires once at graceful shutdown, before profiles are released, so held items can
 -- be written to profiles first. Handlers run to completion before releases start.
 ProfileService.BeforeShutdown = Signal.new()
+-- Fires (player) synchronously when a player leaves, before their release save
+-- snapshots the profile, so departure changes (Permanent items kept, transit
+-- rollback, escrow) are always part of the final write (GDD §29, §31.4).
+ProfileService.BeforeRelease = Signal.new()
 
 local store
 local scheduledSaves = {}
+local shuttingDown = false
+local usingMemoryStore = false
 
 local function setStatus(player: Player?)
 	if player and player.Parent then
@@ -90,8 +96,16 @@ end
 
 local function createGateway()
 	local studioProbe = nil
-	local dataStore = DataStoreService:GetDataStore(ProfileService.STORE_NAME)
-	if RunService:IsStudio() then
+	local opened, dataStore = pcall(function()
+		return DataStoreService:GetDataStore(ProfileService.STORE_NAME)
+	end)
+	if not opened and not RunService:IsStudio() then
+		error("[ProfileService] Could not open the profile DataStore: " .. tostring(dataStore))
+	end
+	if not opened then
+		-- Unpublished Studio places cannot even open a DataStore.
+		studioProbe = dataStore
+	elseif RunService:IsStudio() then
 		-- Studio without "Enable Studio Access to API Services" cannot reach DataStores.
 		local ok, err = pcall(function()
 			return dataStore:GetAsync("__probe")
@@ -106,6 +120,7 @@ local function createGateway()
 				.. tostring(studioProbe)
 				.. "); using an in-memory store. Data will not persist."
 		)
+		usingMemoryStore = true
 		return DataStoreGateway.new({ store = InMemoryDataStore.new() })
 	end
 	return DataStoreGateway.new({
@@ -120,11 +135,23 @@ end
 
 local function loadPlayer(player: Player)
 	local userId = player.UserId
-	if store:Status(userId) ~= nil then
-		-- Rejoined this server before an earlier release finished: this server still
-		-- holds the newest copy and its lease, so keep using it.
-		setStatus(player)
+	-- Rejoined while this server is still writing their release: wait for that
+	-- write, then look again (a finished release forgot the profile).
+	waitForSaveSlot(userId)
+	if not player.Parent then
 		return
+	end
+	local cached = store:Get(userId)
+	if cached ~= nil then
+		-- An earlier release failed: this server still holds the newest copy and its
+		-- lease, so keep using it.
+		setStatus(player)
+		ProfileService.ProfileLoaded:Fire(player, cached)
+		return
+	end
+	if store:Status(userId) ~= nil then
+		-- Lost its lease while the player was away: never reuse that copy.
+		store:Forget(userId)
 	end
 	player:SetAttribute(ProfileService.STATUS_ATTRIBUTE, ProfileStore.SaveState.Loading)
 	local lastReason = nil
@@ -170,11 +197,18 @@ end
 function ProfileService.Start()
 	Players.PlayerAdded:Connect(loadPlayer)
 	for _, player in Players:GetPlayers() do
-		task.spawn(loadPlayer, player)
+		-- Deferred so services that start after this one connect to ProfileLoaded first.
+		task.defer(loadPlayer, player)
 	end
 
 	Players.PlayerRemoving:Connect(function(player)
 		scheduledSaves[player] = nil
+		local ok, err = pcall(function()
+			ProfileService.BeforeRelease:Fire(player)
+		end)
+		if not ok then
+			warn("[ProfileService] BeforeRelease handler failed: " .. tostring(err))
+		end
 		save(player, true)
 	end)
 
@@ -191,6 +225,7 @@ function ProfileService.Start()
 	end)
 
 	game:BindToClose(function()
+		shuttingDown = true
 		local ok, err = pcall(function()
 			ProfileService.BeforeShutdown:Fire()
 		end)
@@ -270,6 +305,23 @@ end
 
 function ProfileService.SaveNow(player: Player)
 	return save(player, false)
+end
+
+-- True once a graceful shutdown began: removals from now on are not logouts.
+function ProfileService.IsShuttingDown(): boolean
+	return shuttingDown
+end
+
+-- True when profiles live only in server memory (Studio without API access).
+function ProfileService.IsUsingMemoryStore(): boolean
+	return usingMemoryStore
+end
+
+-- True when every change to this user's profile has been written (or it was
+-- released). Run checkpoints are deleted only after their ending is saved.
+function ProfileService.IsSaved(userId: number): boolean
+	local status = store and store:Status(userId)
+	return status == nil or status == ProfileStore.SaveState.Saved
 end
 
 return ProfileService

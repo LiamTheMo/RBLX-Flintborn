@@ -9,6 +9,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local TradeController = {}
 
@@ -16,6 +18,8 @@ local player = Players.LocalPlayer
 local ui = {}
 local session = nil
 local inviteId = nil
+-- Bumped by every render; a render that yielded and is no longer the latest drops.
+local renderToken = 0
 
 local TEXT = Color3.fromRGB(235, 226, 212)
 local GOLD = Color3.fromRGB(255, 214, 150)
@@ -52,7 +56,7 @@ local function nextOrder()
 end
 
 local function line(text: string, color: Color3?)
-	make("TextLabel", {
+	return make("TextLabel", {
 		Text = text,
 		Size = UDim2.new(1, -8, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
@@ -96,7 +100,7 @@ end
 local function sendOffer(keys, gems: number)
 	local ok, reason = invoke("TradeOffer", session.id, keys, gems)
 	if not ok then
-		ui.status.Text = "Offer refused: " .. tostring(reason)
+		ui.status.Text = "Offer refused: " .. Reasons.Text(reason)
 	end
 end
 
@@ -111,9 +115,25 @@ local function describe(offer): string
 	return if #parts > 0 then table.concat(parts, ", ") else "nothing yet"
 end
 
+local function countdownText(): string
+	local left = math.ceil(session.confirmAt - workspace:GetServerTimeNow())
+	return ("Both locked — confirm unlocks in %d s"):format(left)
+end
+
 function render()
+	renderToken += 1
+	local token = renderToken
+	local current = session
+	-- Fetch first, then clear and rebuild without yielding, so a TradeChanged push
+	-- during the round trip can't interleave and duplicate rows.
+	local view = if current then invoke("VaultSnapshot") else nil
+	if token ~= renderToken or session ~= current then
+		return
+	end
 	clear()
 	order = 0
+	ui.countdown = nil
+	ui.confirmReady = nil
 	ui.gems.Visible = session ~= nil
 	if session == nil then
 		line("Invite a player in this lobby to trade items and Gems (Coins can't be traded).", TEXT)
@@ -138,7 +158,6 @@ function render()
 		TEXT
 	)
 	-- Tradeable items come from the lobby backpack view the vault panel uses.
-	local view = invoke("VaultSnapshot")
 	if type(view) == "table" then
 		line("Your tradeable lobby-backpack items (tap to add or remove):", GOLD)
 		local offered = myKeys()
@@ -164,33 +183,33 @@ function render()
 	end
 	local now = workspace:GetServerTimeNow()
 	if session.confirmAt and now < session.confirmAt then
-		line(("Both locked — confirm unlocks in %d s"):format(math.ceil(session.confirmAt - now)), GOLD)
+		ui.countdown = line(countdownText(), GOLD)
 	end
 	button("Lock offer", not session.locked.mine, function()
 		invoke("TradeLock", session.id)
 	end)
-	button(
-		"Confirm trade",
-		session.confirmAt ~= nil and now >= session.confirmAt and not session.confirmed.mine,
-		function()
-			local ok, reason = invoke("TradeConfirm", session.id)
-			if not ok then
-				ui.status.Text = "Not yet: " .. tostring(reason)
-			end
+	ui.confirmReady = session.confirmAt ~= nil and now >= session.confirmAt
+	button("Confirm trade", ui.confirmReady and not session.confirmed.mine, function()
+		local ok, reason = invoke("TradeConfirm", session.id)
+		if not ok then
+			ui.status.Text = "Not yet: " .. Reasons.Text(reason)
 		end
-	)
+	end)
 	button("Cancel trade", true, function()
 		invoke("TradeCancel", session.id)
 	end)
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Trade", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Above the always-open lobby panel.
+	local gui =
+		make("ScreenGui", { Name = "Trade", ResetOnSpawn = false, DisplayOrder = 2 }, player:WaitForChild("PlayerGui"))
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.55, 0.5),
 		Size = UDim2.new(0.4, 0, 0.7, 0),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
@@ -249,12 +268,12 @@ local function build()
 	}, ui.panel)
 
 	ui.invite = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 60),
 		Size = UDim2.fromOffset(380, 70),
 		BackgroundColor3 = Color3.fromRGB(30, 26, 20),
+		Active = true,
+		LayoutOrder = Theme.TopOrder.TradeInvite,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.invite)
 	ui.inviteText = make("TextLabel", {
 		Position = UDim2.fromOffset(10, 4),
@@ -311,9 +330,8 @@ function TradeController.Start()
 			session = nil
 			ui.invite.Visible = false
 			ui.status.Text = "Trade " .. string.lower(payload.reason) .. "."
-			if ui.panel.Visible then
-				render()
-			end
+			-- Always re-render (cheap with no session) so an in-flight render drops.
+			render()
 		end
 	end)
 	ContextActionService:BindAction("FlintbornTrade", function(_, state)
@@ -322,12 +340,18 @@ function TradeController.Start()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.Y, Enum.KeyCode.ButtonL1)
-	-- The confirm countdown ticks while the window is open.
+	-- The confirm countdown ticks while the window is open: only its label changes,
+	-- plus one re-render when the Confirm button becomes available.
 	task.spawn(function()
 		while true do
 			task.wait(1)
 			if session and session.confirmAt and ui.panel.Visible then
-				render()
+				local ready = workspace:GetServerTimeNow() >= session.confirmAt
+				if ready ~= ui.confirmReady then
+					render()
+				elseif ui.countdown and ui.countdown.Parent then
+					ui.countdown.Text = countdownText()
+				end
 			end
 		end
 	end)

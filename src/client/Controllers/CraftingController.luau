@@ -70,23 +70,40 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Crafting", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Left of the navigation bar (140 px on the right edge), and never taller than
+	-- the screen so the first recipe stays reachable on phones.
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -16, 0.5, 0),
-		Size = UDim2.fromOffset(360, 480),
+		Position = UDim2.new(1, -164, 0.5, 0),
+		Size = UDim2.new(0, 360, 1, -24),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
 		BackgroundTransparency = 0.05,
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(360, 480) }, ui.panel)
 	make("UIPadding", {
 		PaddingTop = UDim.new(0, 10),
 		PaddingLeft = UDim.new(0, 10),
 		PaddingRight = UDim.new(0, 10),
 		PaddingBottom = UDim.new(0, 10),
 	}, ui.panel)
+	local close = make("TextButton", {
+		Text = "✕",
+		AnchorPoint = Vector2.new(1, 0),
+		Size = UDim2.fromOffset(28, 24),
+		Position = UDim2.fromScale(1, 0),
+		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
+		TextColor3 = Color3.fromRGB(245, 236, 222),
+		Font = Enum.Font.GothamBold,
+		TextSize = 14,
+	}, ui.panel)
+	close.Activated:Connect(function()
+		ui.panel.Visible = false
+	end)
 	ui.status = make("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 36),
+		Size = UDim2.new(1, -34, 0, 36),
 		BackgroundTransparency = 1,
 		Text = "Basic recipes work anywhere. Advanced ones need a workbench.",
 		TextWrapped = true,
@@ -108,6 +125,7 @@ local function build()
 		local row = make("Frame", {
 			Size = UDim2.new(1, -8, 0, 58),
 			BackgroundColor3 = Color3.fromRGB(38, 32, 26),
+			Active = true,
 			LayoutOrder = order,
 		}, list)
 		make("UICorner", { CornerRadius = UDim.new(0, 6) }, row)

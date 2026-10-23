@@ -65,6 +65,8 @@ local function setActive(node, active: boolean)
 	node.prompt.Enabled = active
 	node.part.Transparency = if active then 0 else 1
 	node.part.CanCollide = active
+	-- A depleted node is gone: no invisible blocker for rays or spatial queries.
+	node.part.CanQuery = active
 end
 
 local function harvest(player: Player, node)

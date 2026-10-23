@@ -1,26 +1,29 @@
 -- Maintenance-safe preservation (GDD §30, Q7, Q161b). Before an authorized safe kick
 -- or a graceful shutdown, an at-risk player's exact held items are written to a
--- maintenance receipt in their profile and saved. Only then does the run end,
--- without a body. The items come back once, on the player's next successful Play
--- (LoadoutService), and are never treated as extracted or Forge-safe.
+-- maintenance receipt in their profile and the run ends without a body, all
+-- without yielding, so the same items can never also become a body, a drop or an
+-- extraction (§30.2 #4, #8). The profile is saved afterwards; a failed save means
+-- no kick (§30.2 #5). The items come back once, on the player's next successful
+-- Play (LoadoutService), and are never treated as extracted or Forge-safe.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local MaintenanceService = {}
 
--- Saves the player's held items to escrow and ends their run without a body.
--- Returns false (and changes nothing) when the save fails: never promise a safe
--- removal that did not persist (GDD §30.2 #5).
-function MaintenanceService.Preserve(player: Player): boolean
-	if not PlaceConfig.IsWorld() or not WorldAdmissionService.IsAtRisk(player) then
+-- Writes the held items to escrow and ends the run, without yielding. Returns
+-- false (changing nothing) when the profile operation fails.
+function MaintenanceService.Escrow(player: Player): boolean
+	if not WorldAdmissionService.IsAtRisk(player) then
 		return true
 	end
 	local items = ProfileSchema.DeepCopy(InventoryService.Items(player))
@@ -31,8 +34,36 @@ function MaintenanceService.Preserve(player: Player): boolean
 			at = os.time(),
 			status = "Pending",
 		}
+		CrashRecoveryRules.MarkEnded(profile, os.time())
 	end)
 	if not ok then
+		warn("[MaintenanceService] Could not escrow items for " .. player.Name)
+		return false
+	end
+	WorldAdmissionService.Preserve(player)
+	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if root then
+		root.Anchored = true
+	end
+	return true
+end
+
+-- True once the player's run ended into escrow (the save may still be pending).
+function MaintenanceService.IsPreserved(player: Player): boolean
+	return WorldAdmissionService.GetState(player) == SessionStates.MaintenancePreserved
+end
+
+-- Escrows the player's held items, ends their run without a body and saves.
+-- Returns false when the escrow or its save failed: never promise a safe removal
+-- that did not persist (GDD §30.2 #5). Calling it again retries the save.
+function MaintenanceService.Preserve(player: Player): boolean
+	if not PlaceConfig.IsWorld() then
+		return true
+	end
+	if not MaintenanceService.IsPreserved(player) and not WorldAdmissionService.IsAtRisk(player) then
+		return true
+	end
+	if not MaintenanceService.Escrow(player) then
 		return false
 	end
 	local saved = ProfileService.SaveNow(player)
@@ -40,7 +71,6 @@ function MaintenanceService.Preserve(player: Player): boolean
 		warn("[MaintenanceService] Could not save maintenance escrow for " .. player.Name)
 		return false
 	end
-	WorldAdmissionService.Preserve(player)
 	return true
 end
 
@@ -48,15 +78,19 @@ function MaintenanceService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	-- A graceful shutdown (update or owner shutdown) preserves every active run.
+	-- A graceful shutdown (update or owner shutdown) preserves every active run at
+	-- once, with no yield in between; ProfileService then saves all profiles in
+	-- parallel as it releases them.
 	ProfileService.BeforeShutdown:Connect(function()
 		for _, player in Players:GetPlayers() do
-			local ok, err = pcall(MaintenanceService.Preserve, player)
+			local ok, err = pcall(MaintenanceService.Escrow, player)
 			if not ok then
 				warn("[MaintenanceService] Shutdown preserve failed: " .. tostring(err))
 			end
 		end
 	end)
+	-- Players removed while the server shuts down are escrowed the same way.
+	WorldAdmissionService.ShutdownDeparture:Connect(MaintenanceService.Escrow)
 end
 
 return MaintenanceService

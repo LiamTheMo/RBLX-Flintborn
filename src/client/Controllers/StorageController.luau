@@ -118,15 +118,17 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Storage", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Sized to the screen (up to 520×360), so the ✕ stays reachable on phones.
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.45),
-		Size = UDim2.fromOffset(520, 360),
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.new(0.9, 0, 1, -24),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(520, 360), MinSize = Vector2.new(300, 240) }, ui.panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(520, 360), MinSize = Vector2.new(300, 200) }, ui.panel)
 	make("TextLabel", {
 		Text = "Storage chest — public: anyone who reaches it can take items",
 		Position = UDim2.fromOffset(10, 6),
