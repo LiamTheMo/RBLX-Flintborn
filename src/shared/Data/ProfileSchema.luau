@@ -95,6 +95,25 @@ local function reconcile(data, defaults)
 	end
 end
 
+-- Codes redeemed before the permanent ledger existed are recorded only in the
+-- operation journal, which trims old entries: copy them into the ledger so a
+-- trimmed journal never makes a code redeemable again. Safe on every load, since
+-- only committed redemptions are journalled.
+local function backfillRedeemedCodes(profile)
+	local redeemed = profile.currency.redeemedCodes
+	for operationId, record in profile.operations.records do
+		if
+			type(operationId) == "string"
+			and string.sub(operationId, 1, 5) == "code:"
+			and type(record) == "table"
+			and record.kind == "CodeRedeem"
+			and record.status == "committed"
+		then
+			redeemed[string.sub(operationId, 6)] = true
+		end
+	end
+end
+
 -- Pure migrations: MIGRATIONS[n] upgrades a version-n profile to version n + 1.
 local MIGRATIONS: { [number]: (any) -> any } = {}
 
@@ -120,6 +139,7 @@ function ProfileSchema.Migrate(data: any, now: number?)
 		profile.schemaVersion += 1
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
+	backfillRedeemedCodes(profile)
 	return profile, nil
 end
 

@@ -31,10 +31,14 @@ local function viewportFactor(): number
 	return math.min(1, camera.ViewportSize.Y / SettingsController.DESIGN_HEIGHT)
 end
 
+-- Roblox's own touch controls (thumbstick, jump and action buttons) live in
+-- PlayerGui too; they size themselves for the screen and must not shrink.
+local UNSCALED = { TouchGui = true }
+
 local function applyScale()
 	local scale = (player:GetAttribute("UiScale") or 1) * viewportFactor()
 	for _, gui in playerGui:GetChildren() do
-		if gui:IsA("ScreenGui") then
+		if gui:IsA("ScreenGui") and not UNSCALED[gui.Name] then
 			local uiScale = gui:FindFirstChild("FlintbornScale") or make("UIScale", { Name = "FlintbornScale" }, gui)
 			uiScale.Scale = scale
 		end
