@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.11  
+> **Design revision:** 1.12  
 > **Last updated:** 2026-10-23  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2180,6 +2180,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.12** | 2026-10-23 | Owner changed Interact to **F** and removed the lobby panel keys (vault, Forge, market, trade): those panels open from the lobby navigation buttons. Updated §46. |
 | **1.11** | 2026-10-23 | Owner requested default key binds that players can change in Settings: hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop, E to interact or pick up. Added §46. |
 | **1.10** | 2026-10-23 | Owner decided Q164a: any material in the lobby backpack goes straight back into the vault and cannot be taken out; overflow beyond the vault's capacity is deleted. Trade-eligible materials are now offered from the vault. Updated §45. |
 | **1.9** | 2026-10-23 | Owner decided Q164: extracted materials can never come back out into the play world, and every extracted material (special ones included) banks into the vault, whose per-material capacity decides overflow deletion. Added §45 and marked the superseded routing in §9–10, §34, §39–41. |
@@ -2214,13 +2215,13 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 ## 46. Keyboard controls and rebinding (2026-10-23)
 
-**Owner request:** default key binds for every keyboard action, changeable by each player in Settings.
+**Owner request:** default key binds for every keyboard action, changeable by each player in Settings. Revised in 1.12: Interact on F, and no lobby panel keys.
 
 | Action | Default key | Gamepad (fixed) |
 | --- | --- | --- |
 | Sprint (hold) | Shift | L3 |
 | Crouch | C | R3 |
-| Interact / pick up (proximity prompts) | E | prompt default |
+| Interact / pick up (proximity prompts) | F | prompt default |
 | Backpack / inventory | Tab | Y |
 | Drop item | Q | L1 |
 | Hotbar slots 1–9 | 1–9 | — |
@@ -2229,19 +2230,19 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 | Tribe | T | D-pad left |
 | Map | N | D-pad down |
 | Progress | P | Select |
-| Vault, Forge, Market, Trade (lobby) | G, F, M, Y | D-pad right, D-pad down, L2, L1 |
 | Settings | O | ⚙ button |
 
 **Rules**
 
-1. Every keyboard action has the default above. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
+1. Every keyboard action has the default above. **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
 2. **No two actions share a key.** Choosing a key another action already uses swaps the two.
 3. **Reserved keys** stay with Roblox: W A S D and Space (movement), / (chat), Esc, Enter and Backspace. Function keys are not bindable.
 4. Choices save to the player's profile (only the keys that differ from the defaults) and follow them to every server and both places. The server validates every save; a malformed or conflicting save falls back to the defaults.
 5. Every on-screen hint names the player's current key: the navigation bar, the Backpack/Drop/Craft buttons, hotbar slot numbers and tutorial hints.
-6. **Interact** retargets every proximity prompt authored on E (gathering, pickups, chests, bodies, caches). A prompt that offers a second choice on another key (a planter's other crops on R and F) keeps that key.
+6. **Interact** retargets every proximity prompt authored on E, Roblox's default (gathering, pickups, chests, bodies, caches). A prompt that offers a second choice on another key keeps it, unless that is the Interact key, in which case it takes E: a planter's three crops read F / R / E with the default binds.
+7. A save made before a default changed keeps every rebind that still fits; only a rebind that now clashes with another action's key returns to its default.
 
-**QA:** fresh profiles get exactly the defaults above; rebinding Drop to E moves Interact to Q; a save naming W, an unknown action or two actions on one key is cleaned on the server; rebinding updates hint text without rejoining.
+**QA:** fresh profiles get exactly the defaults above; rebinding Drop to F moves Interact to Q; a save naming W, an unknown action or two actions on one key is cleaned on the server; rebinding updates hint text without rejoining.
 
 ---
 
