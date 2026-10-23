@@ -125,7 +125,9 @@ function RunCheckpointService.Start()
 		-- The run ID is read again at the first write if ProgressionService has not
 		-- recorded it yet, so the checkpoint and the Ended receipt share one key.
 		runs[player] = { runId = currentRunId(player), transferred = {} }
-		schedule(player)
+		-- Written at once, not debounced: the consumed loadout is already saved out
+		-- of the profile, so until this lands a crash would lose it.
+		task.spawn(write, player)
 	end)
 	-- Any ending other than a crash clears the checkpoint once it is saved (Q157).
 	WorldAdmissionService.RunEnded:Connect(function(player)
