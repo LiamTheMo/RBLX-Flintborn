@@ -44,7 +44,7 @@ function ProfileSchema.Default(now: number?)
 		currency = { coins = 0, gems = 0 },
 		progression = { level = 1, xp = 0, masteryTracks = defaultMasteries() },
 		rebirth = { count = 0, tokens = 0, ownedPerks = {} },
-		recipes = { unlocked = {} },
+		recipes = { unlocked = {}, discovered = {} },
 		receipts = { extraction = {}, forge = {}, maintenance = {}, crashRecovery = {} },
 		operations = { records = {}, order = {} },
 		choices = { camera = {}, hotbarBindings = {} },

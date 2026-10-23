@@ -60,7 +60,7 @@ local function row(parent, text: string, color: Color3, onClick)
 end
 
 local function itemText(item): string
-	return item.name .. (item.quantity and (" ×" .. item.quantity) or "")
+	return (item.permanent and "★ " or "") .. item.name .. (item.quantity and (" ×" .. item.quantity) or "")
 end
 
 local refresh
