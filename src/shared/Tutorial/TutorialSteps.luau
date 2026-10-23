@@ -59,13 +59,13 @@ TutorialSteps.Steps = {
 	{
 		id = "Vault",
 		title = "The vault keeps everything",
-		hint = "In the lobby press {Vault}. Materials are already vaulted; deposit gear from your lobby backpack. Anything left in the backpack goes with you on Play.",
+		hint = "In the lobby open the Vault. Materials are already vaulted; deposit gear from your lobby backpack. Anything left in the backpack goes with you on Play.",
 		trigger = "Vault",
 	},
 	{
 		id = "Economy",
 		title = "Coins, Gems, the Forge and progress",
-		hint = "{Market} opens the shop, merchant and quests. {Forge} opens the Forge: Permanent items survive death. {Progression} shows your level, masteries and rebirth.",
+		hint = "In the lobby, Market opens the shop, merchant and quests and the Forge makes Permanent items that survive death. {Progression} shows your level, masteries and rebirth.",
 		trigger = "Ack",
 	},
 }
