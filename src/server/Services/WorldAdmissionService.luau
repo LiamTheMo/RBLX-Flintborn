@@ -35,7 +35,7 @@ WorldAdmissionService.Death = Signal.new()
 -- Fires (player, character, items) once a player is confirmed in ActiveRun;
 -- `items` are the reserved lobby items entering the run.
 WorldAdmissionService.RunStarted = Signal.new()
--- Fires (player, reason) when a run ends: "Died" or "Left".
+-- Fires (player, reason) when a run ends: "Died", "Left", "Extracted" or "Maintenance".
 WorldAdmissionService.RunEnded = Signal.new()
 
 -- Studio sessions start runs with a few consumables so survival systems can be
@@ -49,6 +49,7 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "Wood", quantity = 30 },
 	{ catalogId = "Stone", quantity = 20 },
 	{ catalogId = "Fiber", quantity = 20 },
+	{ catalogId = "ExtractionRune", quantity = 1 },
 }
 
 local states = {}
@@ -171,6 +172,21 @@ local function requestPlay(player: Player, requestId: any)
 	end)
 	WorldAdmissionService.RunStarted:Fire(player, character, items)
 	return true, nil
+end
+
+-- Moves a qualified player into protected extraction (GDD §9.1): invulnerable and
+-- safe to disconnect from this moment. The caller has already settled their items.
+function WorldAdmissionService.Extract(player: Player)
+	local state = states[player]
+	if state ~= SessionStates.ActiveRun and state ~= SessionStates.ExtractionHolding then
+		return false
+	end
+	if state == SessionStates.ActiveRun then
+		setState(player, SessionStates.ExtractionHolding)
+	end
+	setState(player, SessionStates.ExtractionProtected)
+	WorldAdmissionService.RunEnded:Fire(player, "Extracted")
+	return true
 end
 
 -- Ends an at-risk run without a body for an authorized safe kick (GDD §30). The

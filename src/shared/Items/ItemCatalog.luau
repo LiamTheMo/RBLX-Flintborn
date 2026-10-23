@@ -94,6 +94,15 @@ local entries = {
 
 	-- Placeables
 	{ id = "Workbench", name = "Workbench", family = F.Placeable, rarity = "Common", placeable = "Workbench" },
+	-- Extremely rare portable extraction rune (GDD Q22, Q158): 30 s, anywhere but inside
+	-- structures, never the Center bonus.
+	{
+		id = "ExtractionRune",
+		name = "Portable Extraction Rune",
+		family = F.Placeable,
+		rarity = "Legendary",
+		placeable = "ExtractionRune",
+	},
 }
 
 -- Medicine and food come from the consumables catalog.
@@ -127,6 +136,18 @@ end
 
 function ItemCatalog.IsStackable(catalogId: string): boolean
 	return ItemCatalog.StackCap(catalogId) ~= nil
+end
+
+-- Ordinary materials auto-bank into the vault on extraction; special materials
+-- (flagged `special`, e.g. event reagents) wait in the lobby backpack (Q129).
+function ItemCatalog.IsOrdinaryMaterial(catalogId: string): boolean
+	local item = ItemCatalog.Get(catalogId)
+	return item ~= nil and item.family == F.Material and not item.special
+end
+
+function ItemCatalog.IsMaterial(catalogId: string): boolean
+	local item = ItemCatalog.Get(catalogId)
+	return item ~= nil and item.family == F.Material
 end
 
 -- Tools, weapons, consumables, ammo and placeables go to the hotbar first;
