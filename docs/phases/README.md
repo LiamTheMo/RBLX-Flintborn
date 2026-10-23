@@ -17,7 +17,7 @@
 | --- | --- | --- | --- |
 | v0.01 ✅ | Project foundation and deployment pipeline | — | Repository, Rojo layout, CI and `main`-only publishing |
 | v0.02 ✅ | Player data, persistence and session safety | v0.01 | Versioned profiles that save safely across servers |
-| [v0.03](v0.03-lobby-world-menu-and-play-admission.md) | Lobby, protected world menu and Play admission | v0.02 | Lobby → teleport → safe menu → Play → random spawn |
+| v0.03 ✅ | Lobby, protected world menu and Play admission | v0.02 | Lobby → teleport → safe menu → Play → random spawn |
 | [v0.04](v0.04-survival-core.md) | Survival core: health, stamina, food and healing | v0.03 | Sprint, hunger, medicine and food heals |
 | [v0.05](v0.05-gathering-inventory-and-field-crafting.md) | Gathering, inventory and field crafting | v0.04 | Harvest nodes, 9+50 inventory, craft first gear in ≤10 min |
 | [v0.06](v0.06-combat-armor-and-pvp-rules.md) | Combat, armor and PvP rules | v0.05 | Melee, bows, EHP armor, PvP everywhere |
