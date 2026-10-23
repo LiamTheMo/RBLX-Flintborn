@@ -10,7 +10,7 @@
 - **[Manual validation](docs/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
 - **[Release checklist](docs/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
 
-**Current phase:** [v0.17 — Live-ops hardening](docs/phases/v0.17-live-ops-hardening.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** [v0.18 — Release candidate and launch readiness](docs/phases/v0.18-release-candidate-and-launch-readiness.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 

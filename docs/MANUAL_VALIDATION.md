@@ -240,3 +240,18 @@ Studio and live checks (desktop, touch and controller):
 - [ ] ⚙ / O opens settings: UI scale applies to every screen at once; the colour-blind palette changes rarity colours everywhere (names still shown); subtitles caption event, extraction and Guardian alerts; choices persist after rejoining.
 - [ ] The on-screen navigation bar opens every panel (vault, Forge, market, trade, progress in the lobby; backpack, craft, build, tribe, map, progress in a run) without a keyboard.
 - [ ] Testers can explain Vaulted vs Permanent; a colour-blind simulation pass over every screen.
+
+## v0.17 — Live-ops hardening
+
+Automated: 4 crash-recovery specs (a crash with no heartbeat is eligible; logout and planned shutdown never are; items already dropped, stored or traded away are excluded; restored once even when retried) and 16 security specs, one per GDD §24 case: forged Permanent IDs, double Forge requests, simultaneous devices, teleport mid-operation, death vs extraction, Center bonus replays, ineligible trades, trade interruption, double purchase receipts, rebirth replays, repeated 25% boss grants, negative quantities, DataStore budget exhaustion, structures in portal auras, malformed remote arguments and floods, and impossible movement. The spec runner also fails on require cycles. Deployed and verified on both places (2026-10-23).
+
+Placeholders: remote limits 20 calls/s per remote per player (burst 40), arguments ≤ 8, strings ≤ 256, tables ≤ 64 entries and depth 2; flood kick at 150 violations per minute; checkpoints every 15 s plus 1 s after changes, 24 h expiry; server heartbeat every 30 s, stale after 90 s; recovery retries 3 × 100 s while the player stays; movement tolerance 1.6× sprint speed + 6 studs per 0.25 s sample, two strikes before a pull-back. Analytics flush every 60 s. MemoryStore outages mean a crash cannot be recovered (documented scope).
+
+Studio and live checks:
+
+- [ ] Kill a test world server mid-fight: on rejoin (after ~90 s) the lobby shows "Server crashed — your items were recovered" and the items return once.
+- [ ] Quit normally mid-fight: no recovery; a body is left. A `/safekick` or update shutdown restores through escrow instead.
+- [ ] Drop an item, then kill the server: that item is not restored (whoever picked it up keeps it).
+- [ ] A speed exploit or teleport is pulled back; normal sprinting, crawling and long falls are not.
+- [ ] Spamming any remote gets throttled without errors for honest play.
+- [ ] Creator Dashboard shows the custom and economy events; poor-network and client-close-mid-portal tests; load tests with many drops and structures; 30-player profiling on real devices.

@@ -31,7 +31,7 @@
 | v0.14 ✅ | Economy, shops, trading and monetization | v0.13 | Coins, Gems, NPC shops, quests, lobby trading, Premium |
 | v0.15 ✅ | Shattered Crater world, art direction and camera | v0.11 | Full island, biomes, POIs, art pass, adjustable camera |
 | v0.16 ✅ | Onboarding, UX and accessibility | v0.14 | Guided tutorial, quests, polished UI on every input |
-| [v0.17](v0.17-live-ops-hardening.md) | Live-ops hardening | v0.16 | Telemetry, anti-exploit, performance, crash recovery |
+| v0.17 ✅ | Live-ops hardening | v0.16 | Telemetry, anti-exploit, performance, crash recovery |
 | [v0.18](v0.18-release-candidate-and-launch-readiness.md) | Release candidate and launch readiness | v0.17 | Launch-ready build, promoted to v1.00 |
 
 Phases v0.10–v0.12 and v0.13–v0.14 depend only on the phases listed, so they may overlap in time if needed, but they are still merged in version order.
