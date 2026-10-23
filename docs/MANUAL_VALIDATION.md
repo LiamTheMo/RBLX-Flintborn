@@ -65,7 +65,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack; tap two slots to move or swap.
+- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -347,3 +347,27 @@ Studio and live checks:
 - [ ] Extract with Ancient Ember: the receipt shows it vaulted, and the vault's materials column shows it with no withdraw action.
 - [ ] Forge recipes that use Ancient Ember still work from the vault.
 - [ ] The shop no longer lists Herb seeds; planting Herbs uses Herbs gathered in the run.
+
+## Keyboard controls and rebinding
+
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop and E to interact or pick up, with every keyboard action rebindable in Settings.
+
+Automated (`keybinds.spec.luau`, 6 cases):
+- The requested defaults, with every default allowed and unique.
+- Reserved keys (W A S D, Space, /, Esc, Enter, Backspace, function keys) and unknown actions are refused.
+- Rebinding to a used key swaps the two actions; keys equal to their default are not stored.
+- Tampered or conflicting saves resolve to the defaults.
+- Hints name the bound key, and every tutorial token is a real action.
+
+Studio and live checks:
+
+- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–9 select hotbar slots, Q drops, and E picks up a dropped item, loots a body and harvests a node.
+- [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
+- [ ] Rebind Drop to E: Interact moves to Q, and prompts show and accept Q.
+- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
+- [ ] Pressing Tab while rebinding doesn't open the backpack.
+- [ ] Reset controls to defaults restores everything.
+- [ ] Tab also toggles Roblox's player list: decide whether that's acceptable or the player list should move.
+- [ ] Planters still offer their three crops on E / R / F (the first follows Interact).
+- [ ] The tutorial hints name the current keys after a rebind.
+

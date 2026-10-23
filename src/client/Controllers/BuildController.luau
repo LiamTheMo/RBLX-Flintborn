@@ -1,4 +1,4 @@
--- Build mode (GDD §6.1, §3.2, §25.4). X (or DPadRight) toggles it during a run.
+-- Build mode (GDD §6.1, §3.2, §25.4). The Build key (X by default; DPadRight) toggles it during a run.
 -- Pick a piece and tier from the palette; a ghost follows the aim point (mouse on
 -- desktop, screen centre on touch and controller), snaps to the grid and shows ✓/✕
 -- with colour. R / L2 / the Rotate button turns it; click, R1 or the Place button
@@ -17,6 +17,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local InventoryController = require(script.Parent.InventoryController)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local BuildController = {}
 
@@ -259,15 +260,15 @@ local function setActive(active: boolean)
 			end
 			return Enum.ContextActionResult.Sink
 		end, false, Enum.ContextActionPriority.High.Value, Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonR1)
-		ContextActionService:BindAction("FlintbornRotate", function(_, inputState)
+		Binds.Bind("Rotate", function(_, inputState)
 			if inputState == Enum.UserInputState.Begin then
 				rotate()
 			end
 			return Enum.ContextActionResult.Sink
-		end, false, Enum.KeyCode.R, Enum.KeyCode.ButtonL2)
+		end)
 	else
 		ContextActionService:UnbindAction("FlintbornPlace")
-		ContextActionService:UnbindAction("FlintbornRotate")
+		Binds.Unbind("Rotate")
 		clearVisuals()
 	end
 end
@@ -390,12 +391,12 @@ function BuildController.Start()
 		return
 	end
 	build()
-	ContextActionService:BindAction("FlintbornBuild", function(_, inputState)
+	Binds.Bind("Build", function(_, inputState)
 		if inputState == Enum.UserInputState.Begin then
 			BuildController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.X, Enum.KeyCode.DPadRight)
+	end)
 	player:GetAttributeChangedSignal("SessionState"):Connect(function()
 		if state.active and player:GetAttribute("SessionState") ~= "ActiveRun" then
 			setActive(false)

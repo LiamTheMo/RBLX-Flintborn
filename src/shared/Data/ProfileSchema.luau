@@ -71,6 +71,8 @@ function ProfileSchema.Default(now: number?)
 		choices = {
 			camera = {},
 			hotbarBindings = {},
+			-- Keyboard rebinds that differ from the defaults (Keybinds, GDD §46).
+			keybinds = {},
 			uiScale = 1,
 			colourBlindMode = false,
 			reducedMotion = false,
