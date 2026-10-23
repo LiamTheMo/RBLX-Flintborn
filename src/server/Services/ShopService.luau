@@ -89,15 +89,15 @@ function ShopService.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	Remotes.Get("ShopView").OnServerInvoke = view
-	Remotes.Get("ShopBuy").OnServerInvoke = function(player, stockId, nonce)
+	Remotes.Handle("ShopView", view)
+	Remotes.Handle("ShopBuy", function(player, stockId, nonce)
 		return CurrencyService.Run(player, "buy:", nonce, "ShopBuy", function(profile)
 			return EconomyRules.Buy(profile, stockId, function()
 				return HttpService:GenerateGUID(false)
 			end, player.UserId)
 		end)
-	end
-	Remotes.Get("MerchantSell").OnServerInvoke = function(player, source, key, quantity, nonce)
+	end)
+	Remotes.Handle("MerchantSell", function(player, source, key, quantity, nonce)
 		if source ~= "backpack" and source ~= "vault" then
 			return false, "BadRequest"
 		end
@@ -113,11 +113,11 @@ function ShopService.Start()
 			end
 			return EconomyRules.Sell(profile, source, key, quantity, "sale:" .. nonce, os.time())
 		end)
-	end
-	Remotes.Get("VaultUpgrade").OnServerInvoke = function(player, nonce)
+	end)
+	Remotes.Handle("VaultUpgrade", function(player, nonce)
 		return CurrencyService.Run(player, "vault:", nonce, "VaultUpgrade", EconomyRules.BuyVaultTier)
-	end
-	Remotes.Get("PerkRespec").OnServerInvoke = function(player, nonce)
+	end)
+	Remotes.Handle("PerkRespec", function(player, nonce)
 		local ok, result = CurrencyService.Run(player, "respec:", nonce, "PerkRespec", function(profile)
 			local spent, reason = EconomyRules.Spend(profile, 0, EconomyRules.RESPEC_GEMS)
 			if not spent then
@@ -127,8 +127,8 @@ function ShopService.Start()
 		end)
 		ProgressionService.Publish(player)
 		return ok, result
-	end
-	Remotes.Get("RedeemCode").OnServerInvoke = function(player, code)
+	end)
+	Remotes.Handle("RedeemCode", function(player, code)
 		if type(code) ~= "string" or #code > 40 then
 			return false, "BadRequest"
 		end
@@ -149,7 +149,7 @@ function ShopService.Start()
 		)
 		ProgressionService.Publish(player)
 		return ok, result
-	end
+	end)
 end
 
 return ShopService

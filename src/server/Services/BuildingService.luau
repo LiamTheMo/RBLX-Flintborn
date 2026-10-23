@@ -396,8 +396,8 @@ function BuildingService.Start()
 	for _, part in CollectionService:GetTagged(BuildingService.GENERATED_TAG) do
 		part:SetAttribute("Generated", true)
 	end
-	Remotes.Get("Build").OnServerInvoke = build
-	Remotes.Get("BuildInfo").OnServerInvoke = info
+	Remotes.Handle("Build", build)
+	Remotes.Handle("BuildInfo", info)
 	task.spawn(function()
 		while true do
 			task.wait(1)

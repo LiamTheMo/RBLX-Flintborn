@@ -13,12 +13,16 @@ local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local DropService = {}
+
+-- Fires (player, item) when a carried item is handed to the world or a chest.
+DropService.Released = Signal.new()
 
 DropService.ORDINARY_SECONDS = GameConstants.CORPSE_SECONDS
 
@@ -46,6 +50,7 @@ end
 -- Releasing a Permanent item gives up ownership until it is picked up again (Q13).
 function DropService.Release(player: Player, item, location: string)
 	item.location = location
+	DropService.Released:Fire(player, item)
 	if item.permanent then
 		updateLedger(player, "PermanentDropped", function(profile)
 			profile.permanentItems[item.instanceId] = nil
@@ -166,7 +171,7 @@ function DropService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("DropItem").OnServerInvoke = dropItem
+	Remotes.Handle("DropItem", dropItem)
 end
 
 return DropService

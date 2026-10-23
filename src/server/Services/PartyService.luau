@@ -103,7 +103,7 @@ function PartyService.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	Remotes.Get("PartyAction").OnServerInvoke = handle
+	Remotes.Handle("PartyAction", handle)
 	Players.PlayerAdded:Connect(function()
 		broadcast()
 	end)

@@ -109,7 +109,7 @@ function TribeService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("TribeAction").OnServerInvoke = handle
+	Remotes.Handle("TribeAction", handle)
 	WorldAdmissionService.RunStarted:Connect(joinPartyTribe)
 	Players.PlayerAdded:Connect(broadcast)
 	Players.PlayerRemoving:Connect(function(player)

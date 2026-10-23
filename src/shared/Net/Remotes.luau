@@ -5,6 +5,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local RemoteGuard = require(script.Parent.RemoteGuard)
+
 local Remotes = {}
 
 local FOLDER_NAME = "FlintbornRemotes"
@@ -80,6 +82,7 @@ local DEFINITIONS = {
 	SaveSettings = "RemoteEvent", -- client -> server: {uiScale, colourBlindMode, reducedMotion, subtitles}
 	TutorialChanged = "RemoteEvent", -- server -> client: current tutorial step
 	TutorialAction = "RemoteFunction", -- ("Ack" | "Skip" | "Replay") -> ok
+	Notice = "RemoteEvent", -- server -> client: {title, text} important one-off notice
 }
 
 local function folder()
@@ -116,6 +119,55 @@ function Remotes.Get(name: string)
 		return parent:FindFirstChild(name)
 	end
 	return parent:WaitForChild(name)
+end
+
+-- Server: guarded handlers. Every request passes the per-player rate limit and
+-- argument sanitising (RemoteGuard) before `handler(player, ...)` runs; rejects
+-- are reported to Remotes.OnViolation(player, name, reason).
+Remotes.OnViolation = function(_player: Player, _name: string, _reason: string) end
+
+local buckets = setmetatable({}, { __mode = "k" })
+
+local function admit(player: Player, name: string, ...): boolean
+	local perPlayer = buckets[player]
+	if perPlayer == nil then
+		perPlayer = {}
+		buckets[player] = perPlayer
+	end
+	local now = os.clock()
+	local bucket = perPlayer[name]
+	if bucket == nil then
+		bucket = RemoteGuard.NewBucket(now)
+		perPlayer[name] = bucket
+	end
+	if not RemoteGuard.Take(bucket, now) then
+		Remotes.OnViolation(player, name, "RateLimited")
+		return false
+	end
+	if not RemoteGuard.Check(table.pack(...)) then
+		Remotes.OnViolation(player, name, "MalformedArguments")
+		return false
+	end
+	return true
+end
+
+-- Binds a RemoteFunction handler behind the guard.
+function Remotes.Handle(name: string, handler)
+	Remotes.Get(name).OnServerInvoke = function(player, ...)
+		if not admit(player, name, ...) then
+			return false, "Rejected"
+		end
+		return handler(player, ...)
+	end
+end
+
+-- Connects a RemoteEvent listener behind the guard.
+function Remotes.Listen(name: string, listener)
+	return Remotes.Get(name).OnServerEvent:Connect(function(player, ...)
+		if admit(player, name, ...) then
+			listener(player, ...)
+		end
+	end)
 end
 
 return Remotes

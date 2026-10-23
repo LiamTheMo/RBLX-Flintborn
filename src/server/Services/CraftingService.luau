@@ -184,8 +184,8 @@ function CraftingService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("Craft").OnServerInvoke = craft
-	Remotes.Get("PlaceItem").OnServerInvoke = place
+	Remotes.Handle("Craft", craft)
+	Remotes.Handle("PlaceItem", place)
 	Players.PlayerRemoving:Connect(function(player)
 		seenRequests[player] = nil
 		lastCraft[player] = nil

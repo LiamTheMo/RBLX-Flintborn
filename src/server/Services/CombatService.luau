@@ -211,8 +211,8 @@ function CombatService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("Attack").OnServerEvent:Connect(melee)
-	Remotes.Get("Shoot").OnServerEvent:Connect(shoot)
+	Remotes.Listen("Attack", melee)
+	Remotes.Listen("Shoot", shoot)
 	-- Event creatures hurt players through the same safety rules as PvP.
 	NpcService.DamagePlayer = CombatService.ApplyEnvironmentHit
 	Players.PlayerRemoving:Connect(function(player)
