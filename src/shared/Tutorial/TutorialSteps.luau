@@ -126,6 +126,8 @@ end
 -- Replays from the start; rewards already paid stay paid (never twice), and a
 -- skip stays on record so a replay cannot unlock rewards.
 function TutorialSteps.Replay(state)
+	-- Saves from before skips were remembered carry only `skipped`.
+	state.everSkipped = state.everSkipped == true or state.skipped == true
 	state.step = 1
 	state.skipped = false
 	state.completedAt = nil
