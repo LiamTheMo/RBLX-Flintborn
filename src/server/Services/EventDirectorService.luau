@@ -20,7 +20,9 @@ local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local MeteorService = require(script.Parent.MeteorService)
+local ModifierService = require(script.Parent.ModifierService)
 local NpcService = require(script.Parent.NpcService)
+local ProgressionService = require(script.Parent.ProgressionService)
 
 local EventDirectorService = {}
 
@@ -92,8 +94,8 @@ local function finish(event)
 	AnnouncementService.End(event.id)
 end
 
-local function spill(loot, position: Vector3)
-	for _, item in EventRules.RollLoot(loot, rng) do
+local function spill(loot, position: Vector3, luck: number?)
+	for _, item in EventRules.RollLoot(loot, rng, luck) do
 		DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
 	end
 end
@@ -129,7 +131,8 @@ local function spawnNode(event, loot, position: Vector3, tool: string?, onClaime
 		end
 		if EventRules.Claim(site) then
 			part:Destroy()
-			spill(loot, position)
+			spill(loot, position, ModifierService.Sum(player, "Luck"))
+			ProgressionService.GrantXp(player, ProgressionService.XP.RareNode, event.entry.name)
 			onClaimed()
 		end
 	end)

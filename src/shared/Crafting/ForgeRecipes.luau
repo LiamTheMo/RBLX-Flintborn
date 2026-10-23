@@ -60,7 +60,7 @@ local list = {
 		quantity = 2,
 		category = "Supplies",
 		inputs = { Herbs = 20, Fiber = 4 },
-		unlock = { discovered = { "Herbs" } },
+		unlock = { discovered = { "Herbs" }, crafting = 3 },
 	},
 
 	-- Permanent conversions. The pickaxe is the first target: roughly two
@@ -76,31 +76,31 @@ local list = {
 		id = "PermanentStoneSpear",
 		source = "StoneSpear",
 		inputs = { Stone = 200, Wood = 120, Fiber = 60, AncientEmber = 2 },
-		unlock = { extractions = 4, discovered = { "AncientEmber" } },
+		unlock = { extractions = 4, discovered = { "AncientEmber" }, level = 10 },
 	},
 	{
 		id = "PermanentIronSword",
 		source = "IronSword",
 		inputs = { Iron = 120, Wood = 40, Hide = 20, AncientEmber = 3 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" } },
+		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
 	},
 	{
 		id = "PermanentIronHead",
 		source = "IronHead",
 		inputs = { Iron = 100, Hide = 20, AncientEmber = 2 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" } },
+		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
 	},
 	{
 		id = "PermanentIronChest",
 		source = "IronChest",
 		inputs = { Iron = 160, Hide = 30, AncientEmber = 3 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" } },
+		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
 	},
 	{
 		id = "PermanentIronLegs",
 		source = "IronLegs",
 		inputs = { Iron = 120, Hide = 24, AncientEmber = 2 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" } },
+		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
 	},
 }
 

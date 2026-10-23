@@ -13,6 +13,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local ProfileService = require(script.Parent.ProfileService)
+local ProgressionService = require(script.Parent.ProgressionService)
 
 local ForgeService = {}
 
@@ -28,6 +29,12 @@ local function requirementText(recipe): string
 	end
 	for _, catalogId in recipe.unlock.discovered or {} do
 		table.insert(parts, "extract " .. nameOf(catalogId))
+	end
+	if recipe.unlock.level then
+		table.insert(parts, ("reach level %d"):format(recipe.unlock.level))
+	end
+	if recipe.unlock.crafting then
+		table.insert(parts, ("Crafting mastery %d"):format(recipe.unlock.crafting))
 	end
 	return if #parts > 0 then "Unlock: " .. table.concat(parts, ", ") else ""
 end
@@ -95,7 +102,7 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 		return false, "BadRequest"
 	end
 	local operationId = "forge:" .. nonce
-	local ok, result = ProfileService.RunOperation(player, operationId, "Forge", function(profile)
+	local ok, result, applied = ProfileService.RunOperation(player, operationId, "Forge", function(profile)
 		local now = os.time()
 		ForgeRules.RefreshUnlocks(profile, now)
 		local receipt, reason = ForgeRules.Craft(profile, {
@@ -115,6 +122,11 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 	end)
 	if not ok then
 		return false, tostring(result)
+	end
+	if applied then
+		-- A retried nonce returns the same receipt without granting XP again.
+		ProgressionService.GrantXp(player, ProgressionService.XP.Forge, "Forging")
+		ProgressionService.GrantMastery(player, "Crafting", 2)
 	end
 	return true, result
 end

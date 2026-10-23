@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
@@ -17,6 +18,7 @@ local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
 local NpcService = require(script.Parent.NpcService)
 local ProjectileService = require(script.Parent.ProjectileService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
@@ -83,6 +85,8 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 	if not DamageRules.CanDamage(actor(attacker), actor(target)) then
 		return false
 	end
+	-- PvP mastery combat perk, bounded at +5% (Q76).
+	rawDamage = ModifierRules.Raw(rawDamage, ModifierService.Get(attacker, "PvpDamage"))
 	local newHealth = applyDamage(target, humanoid, rawDamage)
 	Remotes.Get("CombatFeedback"):FireClient(attacker, "Hit", math.round(rawDamage))
 	Remotes.Get("CombatFeedback"):FireClient(target, "Hurt", math.round(rawDamage))
@@ -164,7 +168,7 @@ local function melee(player: Player, sequence: any, direction: any)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
 	if best then
 		CombatService.ApplyHit(player, best, damage)
-	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage) then
+	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage, player) then
 		-- Raiding: the same swing damages another tribe's structures (GDD Q38).
 		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage)
 	end
@@ -198,7 +202,7 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 		if target then
 			CombatService.ApplyHit(player, target, damage)
 		else
-			NpcService.HitPart(result.Instance, damage)
+			NpcService.HitPart(result.Instance, damage, player)
 		end
 	end)
 end
