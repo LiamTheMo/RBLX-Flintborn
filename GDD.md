@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Comprehensive pre-production specification (not implemented)  
-> **Design revision:** 1.2  
+> **Design revision:** 1.5  
 > **Last updated:** 2026-10-22  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -16,7 +16,7 @@
 - **Working default:** A coherent starting rule for prototyping, not yet approved by the design owner.
 - Numerical values outside confirmed design are **starting hypotheses**, not final balance.
 
-**New confirmed direction (2026-10-21):** Extracted resources enable special crafting and expensive eligible-item Permanent conversion. **Confirmed after later clarification:** Permanent gear survives owner death, stays at the **same stats** as its source and may be manually dropped, stolen or traded. Gear does **not** wear/break, and exact Permanent recovery material fee and active-slot limit remain Open. All numerical costs are illustrative.
+**New confirmed direction (2026-10-21):** Extracted resources enable special crafting and expensive eligible-item Permanent conversion. **Confirmed after later clarification:** Permanent gear survives owner death, stays at the **same stats** as its source and may be manually dropped, stolen or traded. Gear does **not** wear/break. **Q156:** there is no Permanent recovery fee or reclaim step and no limit on how many Permanent items a player may own or carry. All numerical costs are illustrative.
 
 **Confirmed combat clarification (2026-10-21, extended 2026-10-22):** No player-usable shields, firearms or playable magic for launch. Medical consumables heal **immediately**, animation then prevents immediate repeat use; food heals over time with partial interruption on damage. The Guardian's shield-pillar boss phase remains unchanged.
 
@@ -24,19 +24,25 @@
 
 **Confirmed economy/persistence history (2026-10-22):** **All items actually deposited into secure vault storage stay saved forever across world resets**, including ordinary and rare items. **Q129 later specifies** that extraction auto-vaults *ordinary materials only*, while gear, tools, other items and special materials stay protected in the lobby backpack until the user manually vaults them. Center extraction doubles ordinary/special material quantities plus all earned run XP, not Coins/Gems. Coins/Gems persist and never drop. Player trading is lobby-only using eligible items/Gems, no Coins; raw material trades need rare/Exclusive catalog permission. Rarity: **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**. Five level-10 permanent masteries, level-reset rebirth with token perks, enhanced primitive Booga Booga art, adjustable camera, guided tutorial/quests and earned-path monetization are Confirmed. See §§10, 36 and 39.
 
-**Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar**, **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **1,000 units per secure material stack** (surplus representation Open). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
+**Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar**, **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **1,000 units per secure material stack** (surplus beyond the limit is **deleted**, Q154). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
 
 **Clarifications Q151–153 (2026-10-22):** Secure-vault material storage is **1,000 units PER material stack** (not 1,000 globally). **Unvaulted extracted gear/tools/other items/special materials persist in the protected lobby backpack across logout, rejoin and world resets**; vault deposits remain optional until the user deliberately redeploys gear into risk. **Premium +25% base XP and temporary consumable XP boosters stack**, while additive/multiplicative math and duration remain Open. See §40.
+
+**Owner answers Q154–158 (2026-10-22):** **Anything over a capacity limit is deleted** (material units above 1,000 per secure stack and incoming items beyond the 50-slot lobby backpack). **Pressing Play deploys every unvaulted lobby backpack/hotbar item into the run.** Permanent items **stay in the owner's backpack/hotbar on death** with no reclaim step or fee, players may own/carry **unlimited** Permanent items, and a dropped Permanent item left on the ground when the world resets is **lost**. **Any logout during active play forfeits carried items**; a whole-server crash mid-fight should return items where technically possible. **Strangers may share an extraction**, the activator's death does not affect it, zone radius is authored per site, a portable rune extracts **everyone who fits in its zone**, may be placed anywhere **except inside structures**, and **never grants the Center 2× bonus**. See §41.
+
+**Owner answers Q159–161 (2026-10-22):** Totems upgrade through **three levels with 500 → 1,000 → 2,500 HP** and a growing radius; **no structure can be taken over while a covering tribe totem stands**. **Anyone can revive** a downed player, **one reviver at a time**, and **damage to the reviver does not stop the revive**; downed players **crawl very slowly and cannot heal**; **no protection after revive**. **No friendly fire** and **no spawn protection**, but spawns must be **away from other players**. **0% food has no extra effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Safe POIs are specific locations to be designed later. Event items are handled **per item**, marked with an **"event" tag**. **Admin kick commands only ever perform a safe kick.** A dead player cannot rejoin that server, so the **whole tribe extracts, parties up in the lobby and starts a new run**. See §42.
+
+**Owner confirmation (2026-10-22):** All recorded interpretations in §41.2 and §42.2 are **Confirmed**, and later answers supersede the older "Open" labels they resolved (boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation).
 
 This GDD is the source of truth for gameplay intent. Engineering contracts, tuning tables, art briefs, and implementation tasks should reference it rather than silently changing its rules.
 
 ### Document navigation
 
 - **Gameplay foundation:** [Core loop](#2-core-run-structure), [Shattered Crater](#3-world--the-shattered-crater), [survival/equipment](#4-primitive-progression-resource-gathering-and-food), [combat/revival](#5-combat-movement-tribes-and-revival), [bases](#6-booga-booga-style-construction-claims-farms-and-raids).
-- **Contested objectives:** [Category event director](#7-weighted-world-event-system-and-public-announcements), [Guardian/boss scaling](#8-guardian-mega-boss-and-scalable-encounters), [extraction and custody](#9-extraction-and-permanent-vault), [Coins/Gems, shops, trades](#10-coin-shops-extraction-resale-economy-currencies-and-storage), [Q116–150 ledger](#39-owner-approved-questions-116150-october-22-2026).
-- **Long-term progression:** [Special crafting / Permanent](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent ownership](#17-permanent-gear-death-protection-and-ownership-transfer), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [nonmagical recipes](#19-nonmagical-special-crafting-and-permanent-conversion-examples), [persistent masteries](#33-permanent-playstyle-masteries-milestones-and-world-engagement).
+- **Contested objectives:** [Category event director](#7-weighted-world-event-system-and-public-announcements), [Guardian/boss scaling](#8-guardian-mega-boss-and-scalable-encounters), [extraction and custody](#9-extraction-and-permanent-vault), [Coins/Gems, shops, trades](#10-coin-shops-extraction-resale-economy-currencies-and-storage), [Q116–150 ledger](#39-owner-approved-questions-116150-october-22-2026), [Q154–158 answers](#41-owner-answers-q154158-overflow-deployment-permanent-retention-logout-and-extraction), [Q159–161 answers](#42-owner-answers-q159161-totems-revives-pvp-food-event-items-kicks-and-regrouping).
+- **Long-term progression:** [Special crafting / Permanent](#15-cross-run-special-crafting-and-the-permanent-item-class), [Ancestral Forge](#16-the-ancestral-forge-crafting-outside-the-run), [Permanent ownership](#17-permanent-gear-death-protection-and-ownership-transfer), [material sources](#18-resource-tiers-economy-and-acquisition-sources), [nonmagical recipes](#19-launch-equipment-starter-crafting-and-permanent-eligibility), [persistent masteries](#33-five-permanent-masteries-levels-and-milestone-buffs).
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
-- **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-permanent-playstyle-masteries-milestones-and-world-engagement), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
+- **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-five-permanent-masteries-levels-and-milestone-buffs), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
 
 **Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
 
@@ -51,7 +57,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 1.1 Design pillars — Confirmed
 
 1. **Risk is voluntary but meaningful.** Safer outer routes provide a viable exit; deeper objectives pay more and attract other players.
-2. **Risk begins only after successful Play admission.** Loading, teleport failures and the protected in-world main menu are loss-free. Once server-confirmed active gameplay starts, ordinary gear drops on death/leave as a **10-minute corpse**. Protected extraction and authorized update kicks are exceptions (§29–31); Permanent recovery remains Open (§15–17).
+2. **Risk begins only after successful Play admission.** Loading, teleport failures and the protected in-world main menu are loss-free. Once server-confirmed active gameplay starts, ordinary gear drops on death/leave as a **10-minute corpse**. Protected extraction and authorized update kicks are exceptions (§29–31); owned Permanent items simply stay with their owner, with no recovery fee (§17, §41).
 3. **Survival and crafting matter.** Players harvest, craft weapons and armor, build forward bases, and manage resources in the field.
 4. **The world creates diverse PvPvE opportunities.** Meteors, rare shrubs/trees and material nodes, raidable structures, unusual mob and boss spawns, caches and the Guardian move players across the island.
 5. **Primitive fantasy, not military extraction.** No firearms, equipable shields or playable magic at launch. Players wield melee weapons and crafted-arrow bows, survive using medicine and food, and build raidable bases with wood/stone/iron progression.
@@ -87,18 +93,18 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | World admission | Only successful explicit Play/ready/spawn transition activates carried inventory risk | **Confirmed** |
 | Protected extraction | **120-second shared fixed-site countdown** with large-radius cues; living players must be **inside zone only at completion**, not throughout. Portable runes use 30 seconds; invulnerability begins at animation start. | **Confirmed** |
 | Administrator maintenance kick | Safe removal for game updates without losing held items | **Confirmed**; escrow details Proposed |
-| Successfully extracted loot | **Ordinary materials auto-bank. Gear/tools/other items/special materials remain in the protected lobby backpack, which PERSISTS across logout, rejoin and server resets until redeployment or manually vaulted.** | **Confirmed Q129/Q152**; over-capacity receipt UX Open |
+| Successfully extracted loot | **Ordinary materials auto-bank. Gear/tools/other items/special materials remain in the protected lobby backpack, which PERSISTS across logout, rejoin and server resets until redeployment or manually vaulted.** | **Confirmed Q129/Q152**; **Q154:** anything beyond capacity is deleted and shown on the receipt |
 | Extracted crafting resources | Feed special recipes and costly permanent conversions | **Confirmed** |
-| Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; recovery cost/slot cap Open |
+| Converted Permanent equipment | Survives death, **same stats as source**; deliberate drop/loot and trade can change ownership; only designated items qualify | **Confirmed**; **Q156:** no recovery fee, no slot cap; stays in backpack/hotbar on death |
 | In-world base storage | Can be looted if opposing players raid the base | **Confirmed** |
-| Gear withdrawn from vault for deployment | Extracted items and materials may be withdrawn, becoming ordinary at-risk gear on successful active Play admission | **Confirmed**; loadout limits Open |
+| Gear deployed into a run | **Every unvaulted lobby backpack/hotbar item deploys on Play** and becomes at-risk on successful active Play admission; vault items may also be withdrawn. Only secure-vault contents stay behind | **Confirmed Q155** |
 | Player progression | Player **levels** and recipe **discovery** both exist | **Confirmed**; exact XP curve/unlock combinations Open |
 | Bases and public world resets | On empty server **only world state resets**; **all already vaulted equipment/materials persist** | **Confirmed — Q3 clarified** |
 | Public world playstyles | **Exactly five mastery tracks:** Mining, Woodcutting, Farming, Crafting and PvP, capped at 10 with a buff each milestone level. Cosmetics persist. Other activities still grant XP/quests but no separate mastery track | **Confirmed Q71–80**; thresholds and stat caps Open |
 | Account currencies | Persistent **Coins** and premium-leaning but earnable **Gems**; player XP/levels, crafting mastery and rebirth tokens | **Confirmed**; rates/prices Open |
 | Trading | **Lobby-only direct trades** with eligible items and **Gems only**, **NO Coins**; material types only if designer-enabled rare/Exclusive; Permanent items tradeable | **Confirmed Q98**; catalog/fraud controls Open |
 | Rarity ladder | Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive | **Confirmed** |
-| Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed**; crash reconciliation Open |
+| Disconnects during combat/extraction | Actual active-run disconnect leaves lootable body; **pre-spawn menu and loading are safe**; after protected extraction animation starts, disconnect is safe | **Confirmed Q157:** any logout during active play forfeits carried items; a whole-server crash should return items where possible (mechanism Open) |
 
 **Confirmed Q3 resolution:** **Every item and material deposited into the protected vault remains saved across world resets, ALWAYS**, regardless of rarity or Permanent status. Public worlds discard bases, loose resource nodes and world loot when empty; they **never wipe already vaulted inventory, account Coins/Gems, earned XP/levels or permanent mastery**. Vault capacity is upgradeable. Previously at-risk gear remains subject to death and disconnect loss before extraction.
 
@@ -114,7 +120,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 3.1 Spatial rules — Confirmed
 
-- After successful Play admission, the first risk-bearing character **spawns at a randomly selected valid location anywhere on the map**, not automatically on the outskirts. The protected loading menu remains loss-free. Precise spawn validation and whether designated safe-zone POIs may host spawns are Open.
+- After successful Play admission, the first risk-bearing character **spawns at a randomly selected valid location anywhere on the map**, not automatically on the outskirts. The protected loading menu remains loss-free. **Confirmed Q160:** there is **no spawn protection**, but the spawn picker must place players **away from other players**; the minimum distance and whether safe-zone POIs may host spawns are Open.
 - Rare objectives and high-value extraction routes increasingly expose players to conflict.
 - A **50-meter no-build Holy Aura** protects **all extraction portals/runes** from player construction that would enclose or obstruct them.
 - The Mega-Boss can destroy player-built structures near its arena, preventing structure-based fight exploits.
@@ -174,29 +180,29 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
 - **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. Whether recovery pauses on renewed sprint or begins after sprint ends, sprint speed and stamina UI granularity remain Open.
-- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. Drain modifiers, refill quantities and zero-food additional penalties are Open.
+- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
 ### 4.4 Recipes and Permanent equipment
 
 - Successfully **extracted** materials support special crafting; conversion targets only specifically designated equipment and **does not increase its stats**.
 - Recipes are acquired through a combination of **player levels and discovery**; high-tier special recipes use multiple resource and event types.
-- Weapons/armor **last indefinitely** through ordinary use. If Permanent ownership needs a post-death material payment for balance, that is a separate **Open recovery cost**, not wear-based durability.
+- Weapons/armor **last indefinitely** through ordinary use. **Q156:** Permanent ownership has **no post-death material payment or reclaim step**.
 - All enchantments, rune combat effects and spell recipes proposed in older sections are **future-update candidates**. Any existing named magical recipes (§19) are conceptual content backlog and **not approved launch recipes**.
-- Exact item caps, inventory weight, crafted arrow batches, crafting stations, **individual food item healing totals**, food refill amounts and tier-specific medical animation durations remain Open. Food healing **duration is fixed at 10 seconds**.
+- Exact item caps, inventory weight, crafted arrow batches, crafting stations, **individual food item healing totals**, and food refill amounts remain Open; medical animations are **0.5/1.0/1.5 s** (Q135). Food healing **duration is fixed at 10 seconds**.
 
 ### 4.5 Medical items, healing and food — Confirmed / Proposed details
 
 | Item type | Server-side trigger | When HP changes | After-use behavior |
 | --- | --- | --- | --- |
 | Basic medicine | Valid stack and cooldown checked, then one unit consumed | **Immediately +10 HP** (up to current max HP) | Visible animation after healing; blocks another medical use until duration finishes |
-| Advanced medicine | Valid item consumed | **Immediately +25 HP** (up to current max HP) | Tier-specific animation/reuse cooldown; exact duration Open |
-| Potion | Valid item consumed | **Immediately +50 HP** (up to current max HP) | Tier-specific after-heal animation/reuse cooldown; exact duration Open |
+| Advanced medicine | Valid item consumed | **Immediately +25 HP** (up to current max HP) | **1.0 s** animation is the only reuse cooldown (Q135) |
+| Potion | Valid item consumed | **Immediately +50 HP** (up to current max HP) | **1.5 s** after-heal animation is the only reuse cooldown (Q135) |
 | Food | Valid edible consumed | **Over 10 seconds** after eating; amount depends on food | Each hit halves unapplied remaining heal; if post-hit remainder ≤10 HP, cancel remainder completely |
 
 **Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement lock/speed during the animation remains Open.
 
-**Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. Stacking several food heals, pause/tick timing and whether the duration resets on hit are still Open.
+**Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. **Confirmed Q160:** several food heals **may run at the same time**, and alongside instant medicine. Pause/tick timing and whether the duration resets on hit are still Open.
 
 **Potential item names** (Fiber Bandage, Herbal Poultice, Restorative Tonic, Healing Potion) and ingredients are examples, not official content. Unlimited-use medical gear and Permanent-converted healing consumables are excluded.
 
@@ -206,12 +212,13 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 5.1 Launch combat baseline — Confirmed / Open
 
-- **Confirmed:** Click-to-attack melee and slow crafted physical bow arrows. **Working Q66 damage baselines: rock hit 5 damage at high attack cadence; wooden spear ~15 at slower cadence and longer reach; stone spear ~25** before armor. Wooden/stone spear figures are **tentative playtest targets** (the owner said “maybe”), not locked final values. Attacks/second, precise reach, projectile damage/velocity and hitboxes remain Open.
+- **Confirmed:** Click-to-attack melee and slow crafted physical bow arrows. **Working Q66 damage baselines: rock hit 5 damage at high attack cadence; wooden spear ~15 at slower cadence and longer reach; stone spear ~25** before armor. Wooden/stone spear figures are **tentative playtest targets** (the owner said “maybe”), not locked final values. Approximate attack cooldowns are rock **0.3 s**, dagger **0.4 s**, sword **0.7 s**, spear **0.9 s** (Q133). Precise reach, projectile damage/velocity and hitboxes remain Open.
 - **Confirmed:** Players can **sprint and crouch**. Stamina decreases **only while sprinting**; crouching and attacks do not require stamina. No dodge-roll or sliding system has been approved.
 - **Confirmed:** No usable shield, blocking/guard-meter combat mechanic, player-cast magic or magical attacks for launch. Advanced weapon combos and alternate ranged families remain possible future decisions.
 - **Confirmed:** PvP is enabled **everywhere in the active play world except clearly designated safe-zone POIs**. Random world spawning must honor safe player-admission initialization but does not automatically guarantee PvP immunity.
 - **Proposed:** All damage and hit detection are server-validated with bounded latency compensation, distance/arc checks and rate limits. Different ordinary weapons may vary in reach, cadence or damage without needing complicated launch combat.
-- **Open:** Friendly fire within a tribe and across alliances, spawn invulnerability if any, safe-zone list/boundaries, projectile travel speed, aim support on controller/mobile and damage scaling.
+- **Confirmed Q160:** **No friendly fire** and **no spawn invulnerability**; spawns are placed away from other players. Safe-zone POIs are specific locations to be designed later.
+- **Open:** Whether allied tribes are also covered by no-friendly-fire, safe-zone list/boundaries, projectile travel speed, aim support on controller/mobile and damage scaling.
 
 ### 5.2 Tribe membership and social functions
 
@@ -226,13 +233,13 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 1. **Solo non-tribe character:** Ordinary HP reaching **0** means immediate death. Ordinary items transfer to a 10-minute lootable body, and the character is **ejected to the separate lobby**, with no same-world respawn.
 2. **Tribe member:** When normal HP reaches **0**, enter the **Downed** state with a separate **20-HP downed pool**, and start the existing **60-second unpaused rescue window**. These 20 points apply *after* the normal health bar hits zero, not as extra regular HP before downing.
 3. **Finishing attacks are permitted immediately.** The downed player remains damageable; opponents can kill them by exhausting the **20 downed HP** even before the 60-second window expires. **Armor protection continues to apply**, using the same EHP calculation (§21.5), including during revival.
-4. A valid tribe member starts a revive that needs **10 continuous seconds**. While an eligible revive is actively running, **pause** the remaining 60-second downed timer. This pause **does not make the downed player invulnerable**.
+4. **Any player** may start a revive (Q159) that needs **10 continuous seconds**. **Only one reviver at a time**; damage to the reviver **does not** stop it. While an eligible revive is actively running, **pause** the remaining 60-second downed timer. This pause **does not make the downed player invulnerable**.
 5. If the revive cancels, is interrupted or becomes invalid, the rescue timer **resumes from its exact remaining duration** (not 60 fresh seconds). Only validated active revivers may hold the pause; disconnected or distant actors cannot freeze it indefinitely.
-6. After **10 uninterrupted valid revive seconds**, return to ActiveRun without corpse or new-world spawn. **Normal HP restored on revival is Open**; never infer that the 20 downed HP automatically becomes post-revive HP.
+6. After **10 uninterrupted valid revive seconds**, return to ActiveRun without corpse or new-world spawn. **Revival restores 10% of max EHP** (Q136); never infer that the 20 downed HP automatically becomes post-revive HP.
 7. Death occurs if the 20 downed HP reach zero after armor-adjusted damage, **or** 60 seconds of *unpaused* downed time elapse. Generate one lootable body (600-second TTL), eject to lobby and apply same-JobId rejoin denial. An attack can finish the downed person **while another person is reviving them**.
 8. The **8-player maximum tribe** and no same-world respawns (including beds) remain. Downed players do **not** qualify as alive for portal extraction until successfully revived.
 
-**Confirmed:** Downed health **20**, revive **10 seconds**, rescue timer **60 unpaused seconds**, valid revive pauses timer, cancelled revive resumes it, opponents may finish immediately, and armor affects damage while downed. **Open:** Post-revive normal HP, allied-versus-tribe reviver eligibility, whether incoming damage interrupts *the reviver's* action, whether downed players crawl or can heal, multiple reviver behavior and any temporary protection after revival.
+**Confirmed:** Downed health **20**, revive **10 seconds**, rescue timer **60 unpaused seconds**, valid revive pauses timer, cancelled revive resumes it, opponents may finish immediately, and armor affects damage while downed. **Post-revive HP resolved by Q136** (10% of max EHP). **Confirmed Q159:** anyone can revive; one reviver at a time; damage to the reviver does not interrupt; downed players **crawl very slowly** and **cannot heal**; **no protection after revive**. **Open:** crawl speed and revive range.
 
 
 ### 5.4 Medicine, food and sprint timing
@@ -240,7 +247,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
 - **Food:** Every food grants its item-specific healing total over **10 seconds**; each damaging hit halves the *remaining unapplied* healing, cancelling it if the post-hit remainder is **≤10 HP**. Previously healed HP is not taken away by this cancellation rule.
 - **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **5 minutes** to go from full to empty; below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
-- **Downed:** Pending revive and death rules supersede medical-use/attack inputs while downed (exact allowed downed actions still Open).
+- **Downed (Q159):** Players may only **crawl very slowly**; no medicine, food or other healing, and any running food HoT is cleared on downing. Pending revive and death rules supersede all other inputs.
 
 ### 5.5 Combat integrity and spawn safety
 
@@ -268,8 +275,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 6.2 Material-upgradeable totems, overlap and full unclaimed decay — Confirmed Q144–146
 
-- **Totem starting coverage:** A basic tribe claim totem protects roughly **a small hut-size footprint**. Players can spend **appropriate harvested/crafted materials to upgrade its influence radius** for compounds and later larger bases. Numeric radii, upgrade tiers/prices and map-scale relationship remain Open.
-- **Totem regions can overlap**, including rival tribes. **Ownership stays with the ORIGINAL builder/tribe until a valid takeover** — a new overlapping claim alone does **not** overwrite it. Exact takeover trigger, transfer procedure, capture time and whether structures may be contested simultaneously remain Open.
+- **Totem starting coverage:** A basic tribe claim totem protects roughly **a small hut-size footprint**. Players can spend **appropriate harvested/crafted materials to upgrade its influence radius** for compounds and later larger bases. **Confirmed Q159:** the totem has **three levels with 500 → 1,000 → 2,500 HP**, and its radius **grows with each upgrade**. Numeric radii, upgrade prices and map-scale relationship remain Open.
+- **Totem regions can overlap**, including rival tribes. **Ownership stays with the ORIGINAL builder/tribe until a valid takeover** — a new overlapping claim alone does **not** overwrite it. **Confirmed Q159:** **no structure can be taken over while a covering tribe totem stands**, so takeover first requires destroying that totem. **Confirmed:** once it falls, the structures become unclaimed (4–6-minute decay) and another tribe takes them over by placing its own totem.
 - **Totem function:** Protects nearby **player-built** structures from natural decay, never from combat damage; no tribe can claim **server-generated buildings**. Storage is openable by anyone who can physically reach it.
 - **Confirmed Q146:** An unclaimed building **completely disappears within 4–6 minutes** after becoming unprotected, not a decay-damage tick every 4–6 minutes. The timer uses **5 minutes ± one minute** as an initial random total lifetime. Properly claimed pieces persist while server lives, but may be raided normally.
 - **Proposed state handling:** On loss of totem coverage, server assigns per-structure random expiration deadline of 240–360 seconds; replacing/upgrading/reclaiming totem protection stops decay and resolves old timer without duplication or perpetual flicker. Actual paused vs restarted behavior remains Open.
@@ -284,7 +291,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Confirmed:** **No special raid tools required.** Basic legitimate weapons/tools can damage a structure, with rates controlled by structure material and weapon damage.
 - **Proposed optional future:** Siege tools or explosives may accelerate raids, but cannot become a **mandatory prerequisite** for breaking wooden, stone or iron structures.
 - Raidables include player structures **and** special naturally generated abandoned/defended/ruined outposts (§7), but cannot claim generated structures as their own.
-- Base building cannot block fixed extraction 50-meter no-build zones; rare anywhere portable rune interactions remain separately Open.
+- Base building cannot block fixed extraction 50-meter no-build zones. **Q158:** a portable rune cannot be placed inside structures; whether a placed rune gets its own no-build aura remains Open.
 - Structures and farms persist as long as their public server runs; **all disappear when server becomes empty**. No persistent cross-server bases.
 - **Open:** Damage values, totem protection radius/health, offline-building grief mitigation, claim-transfer UI and tribe alliance raiding permissions.
 
@@ -378,7 +385,7 @@ Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons,
 - **Ritual-summoned bosses:** A player initiates via designated rare ritual materials. Players may still fight over this encounter and its loot. Reset/cancellation depends on validity of ritual site, available server state and encounter type.
 - **Structure-only bosses:** Bosses exist or activate at designated generated structures; their reset may depend on structure state or next event refresh.
 - **Guardian:** Keeps its previously confirmed approximate 15–20 minute cadence for now. Exact timer anchor (start vs defeat), leashing, per-world active cap and post-defeat cooldown are Open.
-- **Confirmed scaling direction:** Scale a boss according to **average player level or average gear level** of the active server/lobby/world population. Exact choice, sampling window, formula, min/max and fairness safeguards remain **Open**. Since the user describes average *lobby level or gear level*, document it as candidate measurement of eligible active population rather than assuming the protected hub's unrelated population.
+- **Confirmed scaling direction (Q148):** Scale a boss using a **combined** signal of player level **and** equipped gear strength across the eligible active-world population (§8.3), not the protected hub's population. Sampling window, formula, min/max and fairness safeguards remain **Open**.
 - **PvP and loot:** The whole game is PvP-first. **No automatic boss rewards** should make secured loot immune to rival players. Physical reward objects stay contested/unsecured until successful extraction; whether some participants receive XP or recipe discovery progress is Open.
 - **Anti-exploit:** Scaling must not respond instantly to players dropping their high-tier gear, artificially changing server membership or cycling in a low-level alternate account.
 
@@ -394,7 +401,7 @@ Creature/NPC sets can feature **primitive animals, ancient creatures, skeletons,
 
 ### 8.4 Future boss design questions — Open
 
-Exact boss health/stat formulas, average **account level vs equipped gear score vs blended score**, timing of stat capture, downed tribe revive access inside boss arena, mechanics per boss family, guardians' timer semantics, damage contribution accounting and loot roll tables. None alter the specified 60-second tribe downed window or 25%-HP Guardian Legendary release.
+Exact boss health/stat formulas, weighting of the **combined level-and-gear score** (Q148), timing of stat capture, downed tribe revive access inside boss arena, mechanics per boss family, guardians' timer semantics, damage contribution accounting and loot roll tables. None alter the specified 60-second tribe downed window or 25%-HP Guardian Legendary release.
 
 
 ## 9. Extraction and permanent vault
@@ -405,12 +412,12 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 - **Start:** Clicking an available portal begins **one server-shared 120-second countdown for that portal event**, not a per-client timer.
 - **Telegraph:** Audible and visual extraction alerts are perceptible within a **large radius** so attackers may challenge departing players. Exact radius and VFX are still Open.
 - **Move freely:** Players **do not** need to stay inside the capture area while the timer runs. They may hide, travel nearby, fight and heal. **Taking damage does not reset or pause the event timer**.
-- **Deadline:** At the exact expiry, every **living, eligible participant physically inside the relatively small capture area** is eligible for the protected extraction animation; anyone outside misses the extraction. This applies to groups and tribes on the same server event. Whether non-group strangers can join the same extraction is Open; public participation is the working default.
+- **Deadline:** At the exact expiry, every **living, eligible participant physically inside the relatively small capture area** is eligible for the protected extraction animation; anyone outside misses the extraction. This applies to groups and tribes on the same server event. **Confirmed Q158:** unrelated strangers may also use the same extraction. **Capture-zone radius is authored per site** and may be big or small depending on the location.
 - **Safety boundary:** The instant a qualified player's **server-authorized extraction animation starts**, they are invulnerable and safe to disconnect. Prior death/quit leaves the normal 10-minute loot body.
-- **Rare portable rune:** An extremely rare reward/drop enables a player to **choose an extraction location anywhere** and starts a **30-second countdown**. Portable-rune consumption, participant capacity, zone radius, announcements and anti-placement exploits are Open. Do not weaken the confirmed wherever/30-second feature without design approval.
+- **Rare portable rune:** An extremely rare reward/drop enables a player to **choose an extraction location anywhere** and starts a **30-second countdown**. **Confirmed Q158:** every eligible living player who **fits inside the rune's zone** at expiry may extract with it (no separate headcount cap), and it may be placed **anywhere except inside structures**. Consumption, rune zone size, announcements and further anti-placement rules are Open. Do not weaken the confirmed wherever/30-second feature without design approval.
 - **Destination:** Successfully extracted players transfer to the separate secure **lobby**, not the play-world loading menu.
 - **Stakes:** Active fixed portals retain the 50-meter no-build rule. A portable rune is a separate dynamic object whose exclusion/placement details are Open.
-- **Payout:** Center Crater doubles **all material types (ordinary and special)** and the XP earned during the current run. **No center Coin or Gem multiplier**, no Coin reward simply for extraction. Unique equipment stays a single item instance (§9.3).
+- **Payout:** The fixed Center Crater portal doubles **all material types (ordinary and special)** and the XP earned during the current run. **Q158:** a portable rune **never** grants the 2× bonus, even when used inside the Center Crater. **No center Coin or Gem multiplier**, no Coin reward simply for extraction. Unique equipment stays a single item instance (§9.3).
 - **Loot:** Safely extracted material stacks feed crafting; the center bonus **legitimately adds material quantities** including rare catalysts but does **not** auto-convert equipment to Permanent. Unique gear instances are not presumed doubled.
 
 ### 9.2 Server-shared timer and qualifying snapshot — Confirmed / Proposed engineering
@@ -421,9 +428,9 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 4. At expiry, server captures the set of eligible **alive characters inside the defined zone** and grants protected animation to each, including multiple group/tribe members using the same timer. No late entry after the snapshot.
 5. Each eligible player gets an individual locked inventory and extraction receipt; the portal event has one shared unique ID. No player can claim someone else's items, join twice or receive two extracts from the same event.
 6. At animation start, player receives invulnerability and disconnect protection. Per-player receipt routes **ordinary materials to secure material storage**, while **unique gear/tools/nonmaterial items and special materials** resolve into **protected lobby-backpack escrow** for later optional manual vault deposit. Apply any center ×2 material award once, regardless of chosen destination.
-7. Qualified players arrive in the **separate protected lobby** with their securely banked ordinary materials and their remaining extracted inventory available in lobby backpack; **no automatic Coin extraction reward**. Unqualified players remain vulnerable; server event ends. Item or overflow settlement failures remain pending/protected, never silently forfeited.
+7. Qualified players arrive in the **separate protected lobby** with their securely banked ordinary materials and their remaining extracted inventory available in lobby backpack; **no automatic Coin extraction reward**. Unqualified players remain vulnerable; server event ends. Settlement failures (DataStore errors, disconnects, retries) remain pending/protected, never silently forfeited. **Q154:** capacity overflow is different: it is deleted once and listed on the receipt.
 
-**Open behavior:** Whether anyone may start another countdown on the same site immediately, whether the activator's death cancels the event (working default: **no**), whether enemies can intentionally use an opponent-triggered extraction (working default: **yes**), the minimum participant distance, visual radius and portable-rune interactions. All are design choices; the freedom to leave the area and fight/heal is already Confirmed.
+**Confirmed Q158:** The activator's death **does not** cancel or affect the event, and any eligible player, including strangers and enemies, may use an opponent-triggered extraction. **Open behavior:** Whether anyone may start another countdown on the same site immediately (portal cooldown), the minimum participant distance and alert visual radius. All are design choices; the freedom to leave the area and fight/heal is already Confirmed.
 
 ### 9.3 Confirmed Center Crater bonus: 2× all materials and XP
 
@@ -439,7 +446,7 @@ Exact boss health/stat formulas, average **account level vs equipped gear score 
 
 **Important:** This is *real item stack duplication by design*, not merely display valuation or extra coins. Rare materials can double; do not reintroduce the older rule preventing rare reagent multiplication. **Only uniquely identified equipment items**, which are distinct from stackable materials, remain at one canonical instance unless the owner approves otherwise.
 
-**Confirmed Q69/Q70 XP boundary:** General/player XP **and mastery XP** are applied to persistent account records when legitimately earned during the active run, **without requiring an extraction**. A successful center extraction then grants **one additional full run's worth** of each XP category based on immutable run-specific earned-XP ledgers. Ordinary death/logout **does not delete previously earned XP or mastery progression**, but cannot receive the conditional center bonus. Prior run XP and unrelated lobby/Forge XP cannot be retroactively doubled. **Confirmed Q119:** Neither Coins nor Gems are part of the **Center Crater multiplier**; Coins are not granted at all simply for extracting. **Open:** XP-booster stacking, material storage overflow, partial inventory and portable rune bonus rules.
+**Confirmed Q69/Q70 XP boundary:** General/player XP **and mastery XP** are applied to persistent account records when legitimately earned during the active run, **without requiring an extraction**. A successful center extraction then grants **one additional full run's worth** of each XP category based on immutable run-specific earned-XP ledgers. Ordinary death/logout **does not delete previously earned XP or mastery progression**, but cannot receive the conditional center bonus. Prior run XP and unrelated lobby/Forge XP cannot be retroactively doubled. **Confirmed Q119:** Neither Coins nor Gems are part of the **Center Crater multiplier**; Coins are not granted at all simply for extracting. **Q154:** material storage overflow beyond capacity is deleted. **Q158:** portable runes never grant the center bonus. **Open:** XP-booster arithmetic and partial inventory.
 
 **Engineering:** Immediately journal legitimate general/mastery XP grants by run ID, persisting base progress even on death. At center-protected animation, lock those totals and issue one idempotent extra bonus equal to current-run earned XP, plus **2× ordinary and special material quantities**. Route ordinary materials into material vault, special materials into protected lobby backpack escrow pending user deposit; equipment instances remain single. **No Coin/Gem multiplication or automatic extract Coin grant**. Pending DataStore settlement stays protected and reconcileable; no bonus replays or repeated milestone cosmetics.
 
@@ -450,7 +457,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 ### 9.5 Remaining extraction questions — Open
 
-**Confirmed:** Fixed exits use 120s shared countdown with end-only presence, rare portable rune uses 30s; eligible participants get invulnerable safe-disconnect animation and go to protected lobby. **Ordinary materials bank automatically; other gear/tools/special materials are protected in the lobby backpack pending manual vault**. Center applies 2× all material quantities and all run XP, **never Coins/Gems**. Base XP/masteries survive even failed exits/death. Open: exact event-zone size, stranger extraction eligibility, portable special rules, item overflow/cross-session lobby backpack retention and crash reconciliation.
+**Confirmed:** Fixed exits use 120s shared countdown with end-only presence, rare portable rune uses 30s; eligible participants get invulnerable safe-disconnect animation and go to protected lobby. **Ordinary materials bank automatically; other gear/tools/special materials are protected in the lobby backpack pending manual vault**. Center applies 2× all material quantities and all run XP, **never Coins/Gems**. Base XP/masteries survive even failed exits/death. **Resolved:** strangers may share extractions, activator death is irrelevant, portable runes extract everyone who fits in their zone, cannot be placed inside structures and never grant 2× (Q158); overflow is deleted (Q154); lobby backpack persists (Q152). Open: each site's authored zone size, portable rune zone size/consumption/announcement, portal cooldown and the crash-recovery mechanism (Q157).
 
 ## 10. Coin shops, extraction resale economy, currencies and storage
 
@@ -479,14 +486,14 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 ### 10.3 Backpack, post-extraction settlement, vault — Confirmed Q122/Q126–129
 
-- **Hotbar exactly 9 slots. Backpack initially 50 slots.** Each ordinary material type occupies one logical backpack slot. **Secure vault** materials have **1,000 units per material stack** (Q151); the live backpack numerical stack limit and whether extra secure stacks are used for overflow remain Open.
+- **Hotbar exactly 9 slots. Backpack initially 50 slots.** Each ordinary material type occupies one logical backpack slot. **Secure vault** materials have **1,000 units per material stack** (Q151); units beyond 1,000 are deleted (Q154). The live backpack numerical stack limit remains Open.
 - Secure **item/equipment vault starts with 25 slots**, +25 per upgrade, at a **constant Gem price per upgrade tier** (amount not chosen), or equivalent Robux upgrade. Robux cost constancy remains Open.
-- **Confirmed Q151:** Secure-vault material limit is **1,000 units per material stack**, not 1,000 units across all stored resources. Units in other material stacks are separate. Any legitimately extracted quantity beyond a stack's capacity must be tracked without item loss. Whether it may create additional stacks or remain in protected overflow escrow is **Open**.
+- **Confirmed Q151:** Secure-vault material limit is **1,000 units per material stack**, not 1,000 units across all stored resources. Units in other material stacks are separate. **Confirmed Q154:** There is no second stack and no overflow escrow. Any quantity beyond a stack's 1,000 units is **deleted** at settlement, and the receipt must show what was lost.
 - **On successful extraction:** Regular **ordinary materials automatically transfer to safe material vault storage**, with center portal's valid ×2 quantity. **Weapons, tools, other items and special materials remain in a protected lobby backpack**, where the player may manually deposit desired items into the safe vault.
 - **Important:** Center 2× applies to extracted **special materials** even when those remain in lobby backpack awaiting a manual vault deposit. Distinguish material bonus computation from automatic deposit destination.
-- **Confirmed Q152:** Unvaulted gear/tools/other items and special materials in the **protected lobby backpack DO persist across logout, reconnect, lobby-server changes and world resets**, despite not being manually deposited in vault. On authorized redeployment into an active world, ordinary gear/materials become at-risk again. **Open:** precise catalog routing/overflow when 50 backpack slots are full.
-- **Strong engineering requirement:** No successfully extracted item should disappear due to full vault or a failed settlement. Server-owned inventory receipts reserve item IDs/stack credits, temporary pending escrow and user-visible recovery state; no duplicated accounts/loot on retry.
-- **Confirmed Q152:** Both the **secure vault and extracted unvaulted lobby backpack are durable persistent account inventory** across logout, reconnect, lobby server change and public-world reset. Only active-world redeployment exposes ordinary gear and consumables to death/quit risk. The secure vault remains a separate capacity/organization feature. Overflow settlement stays protected and idempotent.
+- **Confirmed Q152:** Unvaulted gear/tools/other items and special materials in the **protected lobby backpack DO persist across logout, reconnect, lobby-server changes and world resets**, despite not being manually deposited in vault. On authorized redeployment into an active world, ordinary gear/materials become at-risk again. **Confirmed Q154:** incoming items beyond the 50 backpack slots are deleted. **Confirmed Q155:** pressing Play deploys **every** unvaulted lobby backpack/hotbar item into the run; to keep an item out of risk, the player must manually vault it first.
+- **Strong engineering requirement:** No successfully extracted item may disappear due to a failed settlement (DataStore error, disconnect, retry). Server-owned inventory receipts reserve item IDs/stack credits, temporary pending escrow and user-visible recovery state; no duplicated accounts/loot on retry. **Q154 exception:** capacity overflow is deliberately deleted, deterministically and exactly once, and listed on the receipt.
+- **Confirmed Q152:** Both the **secure vault and extracted unvaulted lobby backpack are durable persistent account inventory** across logout, reconnect, lobby server change and public-world reset. Only active-world redeployment exposes ordinary gear and consumables to death/quit risk. The secure vault remains a separate capacity/organization feature. Overflow beyond capacity is deleted (Q154); settlement stays idempotent.
 
 ### 10.4 Monetization and Premium XP — Confirmed Q123/Q150
 
@@ -603,7 +610,7 @@ Full island art, every biome, weather, extensive equipment and premium offers, *
 
 > **Confirmed:** The player can spend successfully extracted materials to craft special items. Some eligible items brought back alive can be converted to a **Permanent** type by spending scarce, expensive ingredients. This is a central cross-run progression pillar.
 >
-> **Confirmed:** Permanent equipment persists through death, but can be intentionally dropped, picked up and stolen, or traded. Binding does not raise its combat stats; only designated source items are convertible. Post-death maintenance costs, gear limits and unclaimed dropped-item fate remain **Open**.
+> **Confirmed:** Permanent equipment persists through death, but can be intentionally dropped, picked up and stolen, or traded. Binding does not raise its combat stats; only designated source items are convertible. **Confirmed Q156:** no post-death maintenance cost, no Permanent gear limit, and an unclaimed dropped Permanent item is lost when the world resets.
 
 ### 15.1 The three interlocking loops
 
@@ -638,7 +645,7 @@ Extraction is **not** conversion: securing a legendary boss drop only places an 
 
 ### 15.4 Confirmed Permanent definition (replaces earlier proposals)
 
-**Permanent gear survives the current owner's death**, retains **exactly the source item's combat stats**, and is **transferable** through deliberate ground dropping (and another player taking it) or voluntary trading. Only approved extracted items are eligible. A Permanent gear instance is not an infinite number of freely spawnable copies and never appears as loot **just because its wearer dies**. The earlier **nontradeable, account-bound manifestation** proposal is superseded by these confirmed decisions. See §17 for the single-instance transferable model. Post-death repair costs and item/slot caps remain Open.
+**Permanent gear survives the current owner's death**, retains **exactly the source item's combat stats**, and is **transferable** through deliberate ground dropping (and another player taking it) or voluntary trading. Only approved extracted items are eligible. A Permanent gear instance is not an infinite number of freely spawnable copies and never appears as loot **just because its wearer dies**. The earlier **nontradeable, account-bound manifestation** proposal is superseded by these confirmed decisions. See §17 for the single-instance transferable model. **Q156:** no post-death repair cost and no item/slot cap.
 
 ## 16. The Ancestral Forge: crafting outside the run
 
@@ -669,7 +676,7 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 2. Show the player which recipes gained progress from that haul. Merely landing near a rune or dying in its channel cannot count.
 3. Player chooses a special recipe, source weapon if relevant, and confirms material requirements displayed as **Owned / Needed**.
 4. Server checks recipe unlock, source instance, remaining stacks, vault capacity, session ownership, selected affixes and balance version.
-5. For irreversible conversion, explicit confirmation names the exact sacrificed weapon and its permanent bound restrictions.
+5. For irreversible conversion, explicit confirmation names the exact source item and its Permanent rules (kept on death; transferable by drop or trade).
 6. Forge operation is reserved under a unique ID. Both target gear and consumed ingredient stacks must be unavailable to simultaneous requests.
 7. On successful durable commit, source and costs disappear **exactly once**, and resulting output is created **exactly once**.
 8. UI presents a verified receipt, not an optimistic client-granted item. Failed or pending operations reconcile before retrying.
@@ -702,17 +709,17 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 
 > **Confirmed:** Certain **designated** extracted item types may be made Permanent using costly materials from **multiple** sources and recipes gated by player leveling and discoveries. Permanent conversion **does not modify combat stats** relative to the selected source gear. A Permanent item **survives its owner's death**, but if the owner **deliberately drops it** and another player collects it, it changes owner. Permanent items can also be **traded**. Neither dropping nor trading creates a duplicate.
 >
-> **Open:** Possible post-death material costs, simultaneous Permanent gear limit, **direct trade** venue/fees, eligible catalog and fate of unclaimed dropped Permanent gear. **Global marketplace or auction is excluded**.
+> **Confirmed Q156:** No post-death material cost or reclaim step; **no limit** on simultaneous Permanent gear; unclaimed dropped Permanent gear is **lost** when the world resets. **Open:** direct-trade fees and eligible catalog. **Global marketplace or auction is excluded**.
 
 ### 17.1 Single persistent but transferable item instance
 
 - A Permanent weapon/armor piece has **one unique canonical instance ID**, original stats, owner/location and provenance. It can exist in account-safe armory/vault, equipped in active world, dropped on the ground, or escrowed for an agreed trade — never multiple at once.
-- **Death / ordinary active departure:** The owner retains the Permanent gear instance; the server returns it to their secure armory or a proposed recovery-pending state. All ordinary unsecured gear follows the corpse-drop rules.
+- **Death / ordinary active departure:** The owner retains the Permanent gear instance. **Confirmed Q156:** it simply stays in their backpack/hotbar inventory and returns with them to the lobby, with no reclaim step or fee. All ordinary unsecured gear follows the corpse-drop rules.
 - **Intentional drop:** The item leaves the owner's possession and becomes a physical pickup. If another player validly picks it up, **the ownership is transferred** and the original owner cannot retrieve it through death protection or a duplicate armory record.
 - **Trading:** A direct exchange is permitted in principle. Trade transfers both sides' item IDs atomically/idempotently through server validation; no client-side grant or forged accept.
 - **No death-based trade exploit:** A thief cannot take a Permanent item solely by killing its wearer. They must obtain it through its legitimate **manual drop / pickup**, explicit trade, or a separately approved mechanic.
 - **Normal stats:** No automatic rarity/damage/speed bonus for becoming Permanent. The privilege is death-retention and long-term ownership only.
-- **World reset:** Owned Permanent items survive. **Unclaimed manually dropped Permanent gear** needs a specific expiry/reset policy; no assumption that ground items auto-return was approved.
+- **World reset:** Owned Permanent items survive. **Confirmed Q156:** **unclaimed manually dropped Permanent gear is lost** when the world resets; it never auto-returns to the former owner.
 - **Maintenance and teleport:** Protected staging, update kick and extraction animation preserve whatever canonical Permanent items the player still legitimately owns, respecting prior transfers.
 
 ### 17.2 Ownership state safety — Proposed
@@ -725,17 +732,17 @@ The hub location and station names are **Proposed**, not mandated. A single Robl
 | Another player picks up drop | Drop exists, player can reach it, not previously claimed | One canonical ownership transfer |
 | Trade Permanent gear | Players and gear valid, both confirm, trade escrow exists | Single atomic transfer; no dupe from cancel/disconnect |
 | Owner reconnects after theft | Authoritative latest owner record and claim history | Former owner cannot reclaim stolen gear |
-| World empties | Last-player exit and active world cleanup | Persistent owned items survive; unresolved ground-item loss rule flagged |
-| Repair/rearm | Cost/rules not yet approved | No invented mandatory cooldown or irreversible gear wipe |
+| World empties | Last-player exit and active world cleanup | Persistent owned items survive; unclaimed dropped Permanent items are deleted (Q156) |
+| Repair/rearm | None (Q156) | No reclaim fee, cooldown or irreversible gear wipe |
 
 **Design challenge:** Transferable death-protected items are unusually sensitive to **drop/loot ordering** and cross-server ownership. Server IDs and write-ahead receipts must prevent a voluntary drop followed by a disconnect from giving the original owner a restored copy. Logs must identify which user owns the one real item after every valid pickup or trade.
 
 ### 17.3 Balance remaining undecided
 
-1. **Post-death cost:** Material repair/recovery may restrain indefinite reuse. Its existence and price are not final.
-2. **Slot cap:** The number of simultaneously equipped Permanent weapons, armor or tools remains genuinely undecided; do not hardcode one item as Confirmed.
+1. **Post-death cost — Resolved Q156:** None. Permanent items stay in the owner's backpack/hotbar on death.
+2. **Slot cap — Resolved Q156:** None. Players may own and carry as many Permanent items as they want.
 3. **Eligibility catalog:** Only designer-flagged items may be converted; categories/rarities are to be chosen.
-4. **Affixes:** Binding adds no stats, but whether a source's existing roll/affixes are preserved or re-rolled needs explicit agreement.
+4. **Affixes — Confirmed:** Binding adds no stats, and the source's existing ±5% roll is **preserved**, never re-rolled.
 5. **Trade paths:** **Lobby-only** direct trading allows **eligible items and Gems**, never Coins. Intentional ground drops in the active world are a separate physical looting/ownership path, not a trade UI. No global auction or market.
 
 ## 18. Resource tiers, economy and acquisition sources
@@ -792,7 +799,7 @@ Resources exit the economy through (a) field supply/ammunition/raids, (b) secure
 | Basic Bow | Wood, fiber | Slow physical arrow projectiles |
 | Arrow Bundle | Wood + fiber (improved versions use upgraded tips) | **Output exactly 10 arrows** |
 | Rare Iron Sword | Iron, wood, refined materials | Separate defined Rare catalog archetype, small quality rolls at eligible field station |
-| Iron Helmet / Chest / Legs-Boots | Iron, hide, fiber | Three separate armor slots, EHP multipliers Open |
+| Iron Helmet / Chest / Legs-Boots | Iron, hide, fiber | Three separate armor slots; full Iron set ×2.0 EHP, pieces add (Q132) |
 | Basic / Advanced / Potion | Gathered herbs, prepared resources | Immediate HP +10 / +25 / +50, then animation cooldown |
 
 ### 19.3 Permanent conversion prototype — Confirmed pacing direction
@@ -822,7 +829,7 @@ Two tribes contest the Guardian's energy pillars as the Horn of War countdown en
 
 ### 20.4 Death while wearing Permanent gear
 
-A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-heal potions, crafted arrows and freshly harvested rare ore. Enemies defeat them: if a tribe member, the **60-second downed timer** begins and a teammate may pause it by starting revival; if revival fails, they are ejected to lobby, with their **ordinary** items left in a 10-minute corpse. The Permanent sword remains theirs and keeps the exact same combat stats; any post-death material rearm fee remains Open. If they had **manually dropped** that sword and a rival picked it up first, ownership would instead belong to the rival.
+A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-heal potions, crafted arrows and freshly harvested rare ore. Enemies defeat them: if a tribe member, the **60-second downed timer** begins and a teammate may pause it by starting revival; if revival fails, they are ejected to lobby, with their **ordinary** items left in a 10-minute corpse. The Permanent sword stays in their inventory and keeps the exact same combat stats; there is no rearm fee (Q156). If they had **manually dropped** that sword and a rival picked it up first, ownership would instead belong to the rival.
 
 ## 21. Launch combat balance and player activity
 
@@ -840,8 +847,8 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 ### 21.2 Downed and revival tactical balance
 
 - A **solo non-tribe** character reaching lethal HP dies and is ejected to lobby; their body remains on the island 10 minutes.
-- A **tribe member** receives a **60-second** downed window. A valid tribe revive interaction **pauses** this timer; cancellation **resumes remaining time**. Death/ejection occurs if unpaused time is exhausted.
-- **Confirmed:** Revive takes **10 continuous seconds**, which pauses the **60-second bleed-out timer**; interruption resumes time remaining. Tribe character has **20 downed HP** at normal 0 HP; enemies can **finish at any moment**, requiring armor-adjusted damage sufficient to exhaust that pool. **Open:** normal HP restored on revival, reviver interruption/crawl/finishing UI. No revival after final death/ejection in same world.
+- A **tribe member** receives a **60-second** downed window. A valid revive interaction by **any player** (Q159) **pauses** this timer; cancellation **resumes remaining time**. Death/ejection occurs if unpaused time is exhausted.
+- **Confirmed:** Revive takes **10 continuous seconds**, which pauses the **60-second bleed-out timer**; interruption resumes time remaining. Tribe character has **20 downed HP** at normal 0 HP; enemies can **finish at any moment**, requiring armor-adjusted damage sufficient to exhaust that pool. Revive restores 10% max EHP (Q136); damage to the reviver does not interrupt, one reviver at a time, downed players crawl slowly and cannot heal, no post-revive protection (Q159). **Open:** finishing UI and crawl speed. No revival after final death/ejection in same world.
 - Tribe cap is **8** and all worlds remain PvP-enabled except explicitly protected POIs. No respawn in the same world, including from beds.
 - Social implications: tribe members must eventually extract and return to lobby to regroup with a dead comrade. There is no short death → sprint back → corpse-loot loop in that instance.
 
@@ -851,7 +858,7 @@ High-value gear improves outcomes through ordinary damage/range/armor/rarity dif
 
 ### 21.4 Encounters and balance telemetry
 
-Measure melee duel duration, arrow velocity readability, damage accuracy under mobile latency, sprint duration, medicine-use cadence, food HoT completion after repeated attacks, successful revives (incl. paused timers), tribe versus solo survivability, raid time against wood/stone/iron and event reward extraction rates. Bosses scale by an average **player level or gear level** population signal, with anti-exploit normalization yet to be designed. The Guardian's original 15–20-minute timing stays as a separate established concept.
+Measure melee duel duration, arrow velocity readability, damage accuracy under mobile latency, sprint duration, medicine-use cadence, food HoT completion after repeated attacks, successful revives (incl. paused timers), tribe versus solo survivability, raid time against wood/stone/iron and event reward extraction rates. Bosses scale by a **combined player level and gear** population signal (Q148), with anti-exploit normalization yet to be designed. The Guardian's original 15–20-minute timing stays as a separate established concept.
 
 
 
@@ -892,8 +899,8 @@ For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\ma
 | **QualifiedAtDeadline / ExtractionProtected** | Vaulted (commit), retry pending | Server-authorized animation begins invulnerability and locks the participant's own exact inventory snapshot |
 | **Vaulted** | Carried (withdraw), ForgeReserved | A safe storage location, *not* permanent status |
 | **ForgeReserved** | Vaulted (cancel/rollback), Consumed / PermanentOwned (commit) | Reservation tied to idempotent operation ID |
-| **PermanentOwned** | PermanentEquipped, PermanentVaulted, PermanentWorldDropped, PermanentTradeEscrow, PermanentRecovery | Canonical equipment has one *current owner*; death retains it but deliberate drop/trade can transfer it |
-| **PermanentEquipped** | PermanentVaulted, PermanentWorldDropped, PermanentTradeEscrow, PermanentRecovery | One canonical transferable ID, retained on death, manually droppable |
+| **PermanentOwned** | PermanentEquipped, PermanentVaulted, PermanentCarried, PermanentWorldDropped, PermanentTradeEscrow | Canonical equipment has one *current owner*; death retains it but deliberate drop/trade can transfer it |
+| **PermanentEquipped** | PermanentVaulted, PermanentCarried, PermanentWorldDropped, PermanentTradeEscrow | One canonical transferable ID, retained in backpack/hotbar on death with no recovery state (Q156), manually droppable; unclaimed world drop is deleted at world reset |
 | **Consumed** | Terminal | No replayable recreation without new server reward grant |
 
 **Invariant:** Each gear instance, including transferable Permanent equipment, has exactly **one** authoritative current owner/location and cannot simultaneously be in an armory, active inventory, world drop or trade escrow. Stack totals use bounded integers and server-validated transfers.
@@ -904,14 +911,14 @@ For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\ma
 - **All units of the same resource type appear as one logical consolidated stack** in the backpack UI (e.g., one Stone entry with a single quantity) for simplicity, rather than dozens of duplicated Stone icons. Exact underlying maximum quantity, whether hidden sub-stacks are required for implementation, carry limits, and over-capacity behavior are Open.
 - Weapons, tools, armor and other **unique gear instances remain individually distinguishable** because their rarity/catalog types and minor quality rolls may differ. Consolidated raw material stack behavior must **not** merge differently rolled swords or duplicate Permanent instances.
 - **Three equipped armor slots:** Head, Chest and combined Legs/Boots. **No shields**.
-- **Vault has 25 initial equipment/item slots**, +25 per tier at constant Gem price (price Open), optionally Robux. Its **separate material storage supports 1,000 units per material stack**, not globally. Surplus from center's 2× bonus must remain owner-protected in overflow until legally stored.
+- **Vault has 25 initial equipment/item slots**, +25 per tier at constant Gem price (price Open), optionally Robux. Its **separate material storage supports 1,000 units per material stack**, not globally. Surplus beyond 1,000, including from the center's 2× bonus, is deleted (Q154).
 - **Coin and Gem balances are account UI balances, not world inventory slots**; they do not drop at death and Coins are not player-tradeable.
 
 ### 22.2 Shared extraction event and protected animation — Confirmed / Proposed engineering
 
 1. Server accepts activation at an available known-POI exit and creates **one event timer ending 120 seconds later**, or creates an eligible portable rune's temporary **30-second** event at the selected location.
 2. Broadcast a large-radius audiovisual warning. Countdown continues regardless of whether the activator runs away, dies, gets hit or heals. It is a **server timer**, not a channel owned by one player or tribe.
-3. At the precise expiry, the server builds the **one-time qualifying set** of alive players actually inside the small exit volume. All eligible members of groups/tribes can use the same event; strangers are Open.
+3. At the precise expiry, the server builds the **one-time qualifying set** of alive players actually inside the small exit volume. All eligible members of groups/tribes, and strangers (Q158), can use the same event.
 4. Every eligible player transitions into server-authorized protected animation, immediately becomes invulnerable and may safely disconnect, and receives **their own** locked inventory snapshot, operation ID and recoverable vault entitlement.
 5. Dead players, characters outside the area and anyone arriving after the snapshot receive no protection or vault receipt. Active death/quit still follows the ordinary body rules.
 6. Retry/rejoin/teleport and DataStore failures reconcile each player's snapshot exactly once; never let the event timer generate duplicate items or a group member extract items owned by someone else.
@@ -924,7 +931,7 @@ For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\ma
 - **Confirmed:** Ordinary voluntary quit or lost connection **after the server has admitted/spawned the player into ActiveRun or ExtractionHolding** creates one lootable character body, forfeiting carried ordinary loot. **Body and unclaimed loot disappear after 10 minutes / 600 seconds.** Pre-spawn menu/loading departure is safe even though it happens inside a play-world place.
 - **Confirmed:** Disconnect is safe once the valid protected extraction animation begins, even before it finishes. The player must receive their locked extracted contents once persistence reconciles.
 - **Confirmed:** Authorized administrator update/removal commands safely kick players without losing held items. The server must preserve them separately from successful extraction and not grant extraction bonuses/Forge eligibility; see §30.
-- **Proposed:** Unexpected entire-server crash cannot keep a corpse in a server that no longer exists. Deliberate admin maintenance and platform failure require different audited state/recovery policies.
+- **Confirmed Q157 preference:** A whole-server crash mid-fight should return players' carried items where technically possible; the mechanism is Open. **Proposed:** Unexpected entire-server crash cannot keep a corpse in a server that no longer exists. Deliberate admin maintenance and platform failure require different audited state/recovery policies.
 - Keep a per-account/profile session lease so two concurrent servers cannot both withdraw, restore or mint the same item.
 - Under DataStore throttling, preserve pending operation receipts and retry within budgets; never silently mark a pending write successful or forfeit protected holdings.
 - Block stale profile writes during reconnect or fast teleport; do not let an old server overwrite newer inventory, Permanent conversion or maintenance restoration.
@@ -943,11 +950,11 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | --- | --- | --- |
 | **ProfileService** | Session locks, schema upgrades, revisions, **persistent vault/Coins/Gems/XP/masteries/rebirth entitlements**, protected extraction and maintenance recovery | Saved/pending/recovery status, currency, level and perk state |
 | **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
-| **InventoryService** | 9-slot hotbar/50-slot backpack, one ordinary material type per logical entry, **persist extracted unvaulted lobby backpack items across logout/server changes** | Risk on redeployment, safe staging and manually triggered vault deposit |
-| **VaultService** | 25+25 item-slot upgrades with constant Gem tier price, **1,000 units per secure material stack**, auto-bank ordinary materials, manual equipment/special material deposits | Always-persistent holdings and overflow reconciliation |
+| **InventoryService** | 9-slot hotbar/50-slot backpack, one ordinary material type per logical entry, **persist extracted unvaulted lobby backpack items across logout/server changes** | **Q155:** all unvaulted items deploy on Play; safe staging and manually triggered vault deposit |
+| **VaultService** | 25+25 item-slot upgrades with constant Gem tier price, **1,000 units per secure material stack**, auto-bank ordinary materials, manual equipment/special material deposits | Always-persistent holdings; overflow beyond capacity deleted once and shown on receipt (Q154) |
 | **ForgeService** | Craft ±5% stat quality range on eligible field gear, fixed baseline lobby gear, **5% relative best-roll probability increase per Crafting mastery level**, ten arrows/craft and catalog-eligible first Permanent pickaxe | Server-authorized quality chances and item stats, no false rarity roll |
-| **PermanentEquipmentService** | One canonical owner, death retention, manual drops, theft pickup, trade escrow and optional recovery | Current owner, transfer receipt, tentative repair/slot status |
-| **LoadoutService** | Safe cross-place loadout reservation, active-only withdrawal, configurable Permanent slot limits and validation | Safe menu equipment preview and risk labels |
+| **PermanentEquipmentService** | One canonical owner, death retention in backpack/hotbar (no recovery fee, Q156), manual drops, theft pickup and trade escrow | Current owner, transfer receipt, tentative repair/slot status |
+| **LoadoutService** | Safe cross-place transit of the **whole unvaulted lobby backpack/hotbar** (Q155), no Permanent slot limit (Q156) and validation | Safe menu equipment preview and risk labels |
 | **ExtractionService** | Server-shared 120s fixed or 30s portable timer; end-of-timer presence snapshot, alerts and protected animation | Shared countdown, deadline zone and verified individual receipt |
 | **CombatService** | Full armor set EHP targets **Hide ×1.2/Wood ×1.5/Stone ×1.8/Iron ×2.0** with additive pieces; 10%-max-EHP revive, melee cooldowns rock .3/dagger .4/sword .7/spear .9s, bow draw determines range not damage, medicine animation only .5/1/1.5s, food examples | Combat/health UI, 9-slot hotbar, deterministic armor stats and draw/recovery animations |
 | **BuildingService** | Booga Booga construction; wood/stone/iron tier, **tribe totem claim**, unclaimed decay, accessible storage and any-time ordinary-tool raids | Build previews, visible totem coverage, structure HP/decay |
@@ -968,7 +975,7 @@ All persistent crafting and extraction grants happen on the **server**. Client m
 | Field group | Representative fields | Constraints |
 | --- | --- | --- |
 | Profile envelope | schemaVersion, profileRevision, sessionLease, lastCommittedOperationId | Migration/backward compatibility and stale-write checks |
-| Vault stacks | itemCatalogId → safe integer quantity, slotId | Nonnegative, server-calculated, **25 starting secure slots** with +25-tier upgrades and safe overflow reconciliation |
+| Vault stacks | itemCatalogId → safe integer quantity, slotId | Nonnegative, server-calculated, **25 starting secure slots** with +25-tier upgrades; deterministic once-only overflow deletion (Q154) |
 | Vault instances | instanceId → catalogId, catalogFixedRarity, **minorQualityRoll**, sourceStation, craftingMasterySnapshot, acquisitionId | Unique IDs, **no equipment wear**, tiny server-authorized quality changes within one archetype |
 | Permanent equipment | instanceId, catalogId, **currentOwnerId**, location, affixes, recovery, activeLease, ownershipVersion | Death-protected while held, but transferable by intentional drop/pickup or validated trade; no duplicates |
 | Recipe unlocks | recipeId, unlockSource, unlockedAt | Server-derived achievements |
@@ -1030,6 +1037,9 @@ Large histories may need compaction and retention limits to fit Roblox data budg
 | Shutdown/data budget exhausted | Pending receipts, retry/backoff and explicit non-success states |
 | Raiding vault from physical island structure | Vault and Permanent armory have no in-world raid surface |
 | Building piece overlaps portal aura | Validate full geometry overlap within 50-meter world-rule zone |
+| Center 2× pushes a material stack above 1,000 | Delete exactly the overflow once (Q154) and show it on the receipt; retries never delete more or restore it |
+| Portable rune used inside Center Crater claims 2× | Server grants center bonus only for the fixed Center portal (Q158) |
+| Portable rune placed inside or overlapping a structure | Reject placement server-side (Q158) |
 
 Create security-oriented automated tests for each abuse case before release. Admin repair/restoration procedures require audited permission boundaries and a unique restoration ID, so support tools cannot unintentionally duplicate Permanent equipment.
 
@@ -1037,35 +1047,35 @@ Create security-oriented automated tests for each abuse case before release. Adm
 
 ### 25.1 Lobby / hub navigation
 
-The persistent hub should offer **Deploy**, **Secure Vault**, **Permanent Armory**, **Special Forge**, **Recipe Tracker**, and **Recent Extractions**. Display safe/protected versus risked status using words and distinct iconography; do not rely on rare colors alone. A permanent item in recovery is shown as **Owned — Recovery Needed**, not missing from inventory.
+The persistent hub should offer **Deploy** (with a clear list of every unvaulted item that will enter the run, Q155), **Secure Vault**, **Permanent Armory**, **Special Forge**, **Recipe Tracker**, and **Recent Extractions**. Display safe/protected versus risked status using words and distinct iconography; do not rely on rare colors alone. A permanent item in recovery is shown as **Owned — Recovery Needed**, not missing from inventory.
 
 ### 25.2 Post-extraction receipt
 
-Show (a) rune/portal and completion, (b) **base material stacks + legitimate 2× Center Crater bonus quantities where applicable**, including rare materials, (c) unique equipment instances separately with no unapproved copies, (d) **base and doubled XP** breakdown, (e) recipe and mastery milestone progress, (f) next action. If persistence is pending, display pending, not saved.
+Show (a) rune/portal and completion, (b) **base material stacks + legitimate 2× Center Crater bonus quantities where applicable**, including rare materials, (c) unique equipment instances separately with no unapproved copies, (d) **base and doubled XP** breakdown, (e) recipe and mastery milestone progress, (f) any units/items **deleted for exceeding capacity** (Q154), (g) next action. If persistence is pending, display pending, not saved.
 
 ### 25.3 Forge recipe browser and permanent conversion confirmation
 
 - Filters for tools, ordinary weapons, armor, **food and medical consumables**, construction parts and Permanent recipes. **No launch enchantment category**.
 - Crafting detail includes **Owned/Required** stacks, region/event sources for scarce ingredients, recipe/level unlock, source/result stats and consumed crafting materials; **weapons and armor do not wear or break**.
-- Permanent conversion displays the exact source instance that will disappear, a preview of bound restrictions, recovery costs (if any), and *confirm/cancel* with deliberate focus for touch and controller.
+- Permanent conversion displays the exact source instance that will disappear, a preview of Permanent rules (kept on death, lost if dropped and taken or left at world reset), and *confirm/cancel* with deliberate focus for touch and controller.
 - Show recipe progress in percentage only when genuinely derived from verified vault stack totals; do not count unextracted backpack materials.
 - "Craft" button disabled when there is an unresolved conflicting Forge operation, invalid source, not enough resources or capacity failure.
 - On successful commit, animate the transformed source becoming a **single** Permanent armory record. Backend confirmation precedes celebration.
 
 ### 25.4 In-world HUD / inventory
 
-- Weapon slot labels indicate **At Risk / Drops on Death** versus **Bound / Armory Recovery on Death** under chosen policy.
+- Weapon slot labels indicate **At Risk / Drops on Death** versus **Permanent / Kept on Death** (Q156).
 - Rune activation shows name, portal valuation bonus, time/channel progress, interruptions and nearby threat cues.
 - When special event loot is carried, server triggers visible burden VFX and explains that it increases ambush risk.
 - Map and alert cues combine icon, text, motion and sound for accessibility. The 3-minute Guardian countdown remains distinct from ordinary cache beacons.
-- On death, categorize **Dropped and lootable**, **Safe in Vault**, and **Bound armory recovery** separately.
+- On death, categorize **Dropped and lootable**, **Safe in Vault**, and **Permanent — kept** separately.
 - On mobile, minimize precision drag requirements for recipe source selection and field base placement.
 
 ### 25.4.1 Updated inventory, merchants, world workbench and trading UX (Q90–110)
 
 - **Hotbar fixed-slot strip**, separately capped backpack grid, **one icon/entry per raw resource type with total owned count**, and visually separate individually rolled equipment.
 - Gear screen has **Head**, **Chest**, **Legs/Boots** armor slots and primary weapon families Spears, Daggers, Swords and Bows. Shield slot does not exist.
-- **Vault:** shows **25 starting slots** and each **+25 capacity upgrade**; present side-by-side earned-Gem and Robux choices, identical capacity effects, actual current server-trusted prices, safe overflow/pending states.
+- **Vault:** shows **25 starting slots** and each **+25 capacity upgrade**; present side-by-side earned-Gem and Robux choices, identical capacity effects, actual current server-trusted prices, overflow-deletion warnings and pending states.
 - **Lobby trading:** Gem wallet plus catalog-approved eligible items (including explicitly enabled rare/Exclusive materials). **Coin balance cannot be added** and no active-world trade button exists. Show both offers, confirmation and cancellation protections.
 - **NPC merchant:** show quote for materials, rare/event reagents, creature drops and crafted gear; rare ingredient sale should have a strong warning since it could be needed for Permanent crafting.
 - **Field vs hub workbench:** Default gear quality in lobby, chance of **small improved stat rolls** in unsafe world crafting; higher Crafting mastery modifies eligible chances. Preview probabilities if randomized products are indirectly purchasable using Robux-funded Gems, and validate current Roblox paid-random-item rules.
@@ -1120,7 +1130,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 6. Insufficient ingredient quantity, invalid unlock, stale recipe version, malformed requests and negative values cannot forge gear.
 7. Two simultaneous conversion calls targeting same weapon: only one can commit.
 8. Retry after timeout before/after a durable write yields the same final state; no missing weapon or duplicated result.
-9. Permanent item **still owned** at death remains with owner with unchanged stats (recovery material cost Open); ordinary items go to corpse. No second Permanent instance minted.
+9. Permanent item **still owned** at death remains in the owner's backpack/hotbar with unchanged stats (no recovery cost, Q156); ordinary items go to corpse. No second Permanent instance minted.
 10. Permanent items can be **manually dropped, stolen by valid pickup, and traded**, but cannot be duplicated, forged, double-claimed from one ground drop or simultaneously equipped on multiple servers.
 11. Guardian Legendary spawns once per encounter at 25%; killing boss is not automatic extraction or conversion.
 12. All rune auras reject new construction within 50 meters; externally anchored overlapping geometry cannot enclose portals.
@@ -1167,12 +1177,12 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 **P0 — must explicitly decide before implementing persistence or permanent systems:**
 
 1. **Confirmed:** A specific Permanent equipment instance survives death, but legitimate deliberate ground-drop pickup or trade **transfers ownership**. Engineering must prevent double restoring the former owner.
-2. Recovery payment/delay and whether bound gear can wear out permanently.
-3. **Open:** Permanent equipment slot cap and archetypes (no hardcoded final number).
+2. **Confirmed Q156:** No recovery payment or delay; gear never wears out.
+3. **Confirmed Q156:** No Permanent equipment slot cap. **Open:** eligible archetypes.
 4. **Confirmed:** Permanent equipment can transfer through deliberate ground drop/pickup or **direct player-to-player trade**. No auction/global market. **Open:** Gift UI, trade safeguards and unclaimed drop fate.
 5. Ordinary vaulted item withdrawal and reconnection handling.
 6. Item-instance provenance, cross-server session locking and operation journal semantics.
-7. How event-critical unique items are represented and multiplied/valued on extraction.
+7. **Confirmed Q161:** Event items are handled **per item** in the catalog (stackable material vs unique instance decides whether the center 2× applies), and carry an **"event" tag**.
 
 **P1 — can remain proposed through first prototype, then tune:**
 
@@ -1217,7 +1227,7 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 | Active 120-second extraction countdown | **Yes**, if player quits/dies before qualifying and protected animation | **Yes** | Shared event timer keeps running; no extraction for dead/out-of-zone characters at deadline |
 | Server-authorized protected extraction animation | No loot corpse for locked items | **No** | Locked extraction entitlement reconciles to vault |
 | Authorized administrator update safe-kick | No loot corpse | **No** | Held inventory preserved in maintenance-recovery escrow |
-| Platform failure terminating the entire server | Cannot maintain body after the instance ends | No automatic extraction | **Open:** explicitly designed crash recovery (not normal leave) |
+| Platform failure terminating the entire server | Cannot maintain body after the instance ends | No automatic extraction | **Q157:** return carried items where possible; recovery mechanism Open (not normal leave) |
 
 **Permanent item exception:** It **stays with its rightful current owner** on death, with no corpse copy. It **can** appear as a lootable ground item when *intentionally dropped* and then ownership legitimately transfers to the picker (§17); the previous nontradeable model is superseded.
 
@@ -1235,7 +1245,7 @@ When an actually active character dies or voluntarily/involuntarily leaves the p
 
 ### 29.3 Disconnect semantics
 
-- Ordinary network loss, rage quit or closing Roblox **after entering ACTIVE gameplay** is a forfeiture, even if no attacker is nearby.
+- Ordinary network loss, rage quit or closing Roblox **after entering ACTIVE gameplay** is a forfeiture, even if no attacker is nearby. **Reconfirmed Q157:** any kind of logout during active play loses carried items.
 - The game must **not** infer Active from place ID alone. Pre-spawn main menu users remain safe despite physically occupying a play-world server (§31).
 - If a player leaves after the protected extraction animation started, the protection outcome wins regardless of whether they see the final vault-receipt screen.
 - Safe administrator maintenance removal is authorized by the server, not by a client flag or mere kick reason string.
@@ -1262,7 +1272,7 @@ Administrators need commands to remove players **without losing their items when
 ### 30.3 Permission, grief and abuse safeguards
 
 - Authorize commands using server-held administrator IDs/roles and restricted command dispatch; never trust client-provided permission tags or arbitrary RemoteEvent requests.
-- **Proposed:** Separate ordinary moderation kick (may exclude rejoin) from audited **safe-update kick** (preserves items and notifies player). Exact command names and treatment of punitive kicks remain **Open**.
+- **Confirmed Q161:** Admin kick commands are wanted, but **every kick command only performs a safe kick** that preserves items and notifies the player. There is no item-forfeiting moderation kick. Exact command names remain **Open**.
 - Update shutdown should safely process all active player snapshots; pre-spawn menu players never had risky inventory so retain their reserved loadouts without world body creation.
 - Record initiator, timestamp, update version, server job/run ID, affected sessions, escrow operation IDs and success/error status.
 - Never allow players to spoof a maintenance kick with a client disconnect, intentionally triggering a crash, or asking a player-owned NPC to end the session.
@@ -1309,7 +1319,7 @@ Administrators need commands to remove players **without losing their items when
 
 ### 31.4 Loadout and inventory escrow during teleport — Proposed
 
-- Before a lobby-to-world teleport, keep ordinary selected gear in the safe source profile or create **one** atomic/resumable transit reservation. The source never drops it just because a teleport was requested.
+- **Q155:** The deployed set is **every unvaulted lobby backpack/hotbar item**, not a hand-picked loadout. Before a lobby-to-world teleport, keep that gear in the safe source profile or create **one** atomic/resumable transit reservation. The source never drops it just because a teleport was requested.
 - The destination must validate transfer/session identity and stage the chosen loadout while **not yet at risk**. A player leaving the destination main menu, erroring before Play, or failing an asset load recovers the selected gear exactly once, not duplicated into both destinations.
 - Withdrawn ordinary gear becomes **at risk only after ActiveRun successfully begins**. The word **Withdraw** in UI cannot override this server admission contract.
 - Inventory risk must not start at Play button press if the actual spawn/initialization never succeeds; preserve the user's intended "click Play to enter" experience with an atomic server acknowledgement.
@@ -1381,13 +1391,13 @@ The event director **ticks periodically** and uses **weighted rarity** to decide
 **Confirmed:** Booga Booga-inspired placement; wood → stone → iron initial structure tiers; farms, chests, workstations, furniture, beds and other functional objects are desirable. Player bases remain for others after owners leave, subject to **unclaimed decay**, and are **raidable around the clock** with ordinary weapons/tools.
 
 - **Tribe claim totems:** Nearby player-built structures resist natural decay, not raids. **Totem areas can overlap**; radius depends on map size. Without valid totem, full decay takes **~4–6 minutes** under Q114 working interpretation; conflict priority/duration semantics Open.
-- **Takeover:** A deserted base may be occupied by a different group even if its original owners left. Replacing/destroying claim totems and transferring structural ownership need a ruleset; unclaimed storage is already accessible to anyone.
+- **Takeover:** A deserted base may be occupied by a different group even if its original owners left. **Q159:** no takeover is possible while a covering tribe totem stands; the totem (500/1,000/2,500 HP by level) must be destroyed first. Unclaimed storage is already accessible to anyone.
 - **Storage:** **All players can access world storage** once they can reach it. A locked chest concept must not override this rule. Terrain/building walls may prevent physical access until raided.
 - **Farms:** Crops and planted trees grow **as long as that server is populated**, even after the farmer leaves. When the world empties, plants, buildings and all other world state disappear.
 - **Structure sources:** Server-generated ruins, outposts and structures remain world-owned, **never** claimable through a tribe totem. They may be raided and looted.
 - **Breach:** Standard weapons/tools can damage structures; rare siege tools may accelerate breaches but are **not required**.
 - **PvP:** Enabled everywhere except specifically designated safe POIs. Totems are not safe-zone anchors, and no ordinary player base grants PvP immunity.
-- **Build exclusions:** Keep confirmed fixed-extraction **50-meter no-build auras**. Portable-rune placement interactions remain a later balance decision.
+- **Build exclusions:** Keep confirmed fixed-extraction **50-meter no-build auras**. **Q158:** Portable runes may be placed anywhere except inside structures; any no-build aura around a placed rune remains Open.
 
 ### 32.3 QA gates
 
@@ -1453,7 +1463,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | 3 | Entire **live island** wipes when empty; **every item already deposited in the separate vault ALWAYS persists**, ordinary or Permanent | **Confirmed by later clarification**; no account-vault wipe |
 | 4 | Surviving, non-kicked players can return to the **same active world** | Confirmed, capacity permitting; an active ordinary quit still forfeits unsecured carried gear |
 | 5 | On death, **kick/eject player from play world** to impede body retrieval | Confirmed; block immediate same-world rejoin via server admission as technical recommendation |
-| 6 | Unexpected full-server crash should **safely restore active items** if feasible, or use special recovery | Confirmed preference; feasibility and fraud-proof implementation Open |
+| 6 | Unexpected full-server crash should **safely restore active items** if feasible, or use special recovery | Confirmed preference, **reconfirmed Q157**; feasibility and fraud-proof implementation Open |
 | 7 | Authorized update kicks **preserve precise carried items** and notify players of inventory preservation | Confirmed; player resumes with held items at next Play, not free extraction |
 
 **Proposed Roblox rejoin implementation:** Separate start-place lobby and play-world place, configure play-world place **Secure within universe only** for server-initiated teleport access, and enforce a per-JobId death/kick exclusion in lobby matchmaking **and** play-world server admission. Killed players may join **different** worlds, not their previous world. This is not a universal setting to disable all friend-joining; Roblox user privacy/visibility is separately controlled. Roblox documentation: https://create.roblox.com/docs/projects/teleport and https://create.roblox.com/docs/matchmaking/scoring .
@@ -1465,8 +1475,8 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | Number | Owner decision | Status |
 | --- | --- | --- |
 | 8 | Permanent gear **survives death**, but manually dropping it lets others take it | Confirmed; stolen item is transferred, not cloned |
-| 9 | Recovery/repair **material costs may apply** | **Open**: balancing option, not requirement |
-| 10 | Maximum simultaneous Permanent equipment | **Open**; no default cap approved |
+| 9 | Recovery/repair **material costs may apply** | **Superseded by Q156:** no recovery/repair cost |
+| 10 | Maximum simultaneous Permanent equipment | **Resolved Q156:** no cap |
 | 11 | Converted Permanent item has **same combat stats** as source | Confirmed; no automatic power increase |
 | 12 | **Designated equipment only** is eligible for conversion | Confirmed; catalog not finalized |
 | 13 | Permanent items **can be traded** | Confirmed; exact trade UI, fees and safeguards Open |
@@ -1474,7 +1484,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | 15 | Recipes obtained through **discovery and player leveling** | Confirmed; precise levels/XP/requirements Open |
 | 16 | High-tier recipes require materials from **multiple activities/sources** | Confirmed; exact drops and numbers Open |
 
-**Non-duplication policy:** One transferable Permanent item exists at any moment: in a player's safe collection, equipped, on the ground after intentional drop, or in trade escrow. Death returns a currently owned item to its owner; an item already **manually dropped and legitimately claimed by another player** cannot return to its former owner. Ground-item expiration when unclaimed remains Open.
+**Non-duplication policy:** One transferable Permanent item exists at any moment: in a player's safe collection, equipped, on the ground after intentional drop, or in trade escrow. Death returns a currently owned item to its owner; an item already **manually dropped and legitimately claimed by another player** cannot return to its former owner. **Q156:** an unclaimed dropped Permanent item is lost when the world resets.
 
 **Final Q3 clarification (2026-10-22):** **ALL materials and equipment successfully stored in the secure vault survive every world reset, ALWAYS**. The old “only Permanent items survive” statement applies to **ordinary carried equipment when players die**, not deletion of securely deposited inventory; empty-world wipes remove live bases, farms, corpses, loose resources and unextracted loot, not account vault holdings. This rule is Confirmed and is no longer Open.
 
@@ -1486,7 +1496,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | 18 | Timer does not pause/reset on zone exit | Confirmed consequence of shared timer |
 | 19 | Combat, healing and being hit are permitted without cancelling countdown; dead players do not qualify | Confirmed |
 | 20 | Large-radius audio and visual warnings alert nearby players | Confirmed; radius/VFX Open |
-| 21 | A **single timer on server** applies to an extraction event; groups/tribes can share it | Confirmed; unrelated strangers using same event Open |
+| 21 | A **single timer on server** applies to an extraction event; groups/tribes can share it | Confirmed; **Q158:** strangers may use the same event |
 | 22 | Known candidate extraction POIs; **different active subsets per server**; extremely rare portable rune gives **30-second anywhere** extraction | Confirmed; item consumption, alert radius, temporary zone and abuse protections Open |
 | 23 | **2× all extracted material stack quantities and 2× XP** at the Center Crater portal, **including rare boss/meteor crafting materials** | **Confirmed later**; unique gear/Coins/Gems not automatically multiplied |
 | 24 | Successful extraction returns players to the **separate secure lobby** | Confirmed; not the play-world pre-spawn menu |
@@ -1529,9 +1539,9 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **28** | Ranged gear | **Ranged weapons exist; arrows must be crafted**. Bow baseline; extra ranged archetypes not all confirmed | Arrow recipes, stack caps, projectile gravity/recovery |
 | **29** | Magic | **No player magic for now**; future release possibility, not launch | Whether/when added; enemy elementals allowed |
 | **30** | Medicine and food | **Medical items and potions heal instantly on use; the following animation is the cooldown**. **Food grants healing over time; taking damage partially interrupts HoT**. | Instant heal size; animation lengths; precise damage interruption amount |
-| **31** | Gear wear and defenses | **Equipment lasts indefinitely**, with no equipment durability wear/breaks. Special defensive traits can be a future update. | Baseline armor mitigation; optional separate Permanent recovery cost |
+| **31** | Gear wear and defenses | **Equipment lasts indefinitely**, with no equipment durability wear/breaks. Special defensive traits can be a future update. | Baseline armor mitigation (Permanent recovery cost rejected, Q156) |
 | **32** | Tribal down/revive | Tribe members have **60 seconds** of unpaused downed time; valid revive pauses countdown, cancel resumes; solo players die immediately | **Later Q68 confirmed:** revive 10 seconds, 20 downed HP, armor still applies and enemies can finish; post-revive HP Open |
-| **33** | PvP and spawn | **Random spawn location anywhere on the map**; PvP enabled **everywhere**, except designated POIs with explicit safe zones | Spawn candidate validation, safe-zone list, friendly fire, spawn damage timing |
+| **33** | PvP and spawn | **Random spawn location anywhere on the map**; PvP enabled **everywhere**, except designated POIs with explicit safe zones | **Q160:** no friendly fire, no spawn protection, spawn away from others; safe POIs designed later |
 
 **PvP state semantics:** A living active player can be damaged inside almost any world zone, including while raiding, farming or handling extraction. Protected pre-spawn menus and post-extraction animation remain exceptions. A safe POI, if one exists, must be explicitly mapped and server-enforced; a private base/totem never creates a safe zone.
 
@@ -1546,13 +1556,13 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **36** | Material tiers | **Wood → stone → iron** for initial building; later tiers follow actual material additions | Structure stats and prices |
 | **37** | Bases and decay | Owner-away bases remain live; totem claim regions may overlap and protect against decay. **Unclaimed structures expire in ~4–6 minutes** as initial full-lifespan interpretation | Radius, ownership conflict, decay timing details Open |
 | **38** | Raiding | **Any time**, including absent owners; **no specialized raid tools required**. | Damage values and raid pacing |
-| **39** | Tribe rules | Maximum **8** players; invite, kick, alliances. Tribes claim **only player-built** structures, **not generated structures**. **World storage can be opened by anyone**. | Leader succession, alliance FF, access through doors and exact claim rules |
-| **40** | Respawn and regroup | **No respawn in same server**. Death sends player to **lobby**, and they must **wait for their tribe to return to lobby** to play again with that tribe's expedition. | Queuing/new-world invite and session transfer interface |
+| **39** | Tribe rules | Maximum **8** players; invite, kick, alliances. Tribes claim **only player-built** structures, **not generated structures**. **World storage can be opened by anyone**. | Leader succession, alliance FF, access through doors (**Q159:** no takeover while a totem stands) |
+| **40** | Respawn and regroup | **No respawn in same server**. Death sends player to **lobby**, and they must **wait for their tribe to return to lobby** to play again with that tribe's expedition. | **Q161:** whole tribe extracts, parties up in lobby and starts again; party UI Open |
 | **41** | Farming | **Yes** to planting/cultivating trees and crops; may continue growing while farmer is away if public server remains active | Growth cycles, plant categories, grief/crop harvesting |
 
 **Totem versus vault:** A tribe totem is a **structural claim/anti-decay mechanism**, not secure storage, raid immunity or a place to revive dead players. Ordinary storage is public-accessible if reachable. Server-generated structures remain world-owned and cannot be claimed.
 
-**Takeover:** An unguarded house does not vanish just because its owner leaves. Another player/tribe may enter, use accessible inventory and potentially take control. Exact claim-transfer procedure must be designed without violating the existing public-build and no-scheduled-wipe rules. As soon as the last player leaves the world, the entire temporary world resets, regardless of totems.
+**Takeover:** An unguarded house does not vanish just because its owner leaves. Another player/tribe may enter, use accessible inventory and potentially take control. **Q159:** no takeover while a covering tribe totem stands; once it is destroyed, the structures become unclaimed and another tribe claims them by placing its own totem. As soon as the last player leaves the world, the entire temporary world resets, regardless of totems.
 
 ### 35.3 Weighted events, mobs and bosses (42–48)
 
@@ -1562,13 +1572,13 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **43** | Event alerts | **All events are publicly announced**; no unannounced rare shrubs/trees/minerals | Whether every event gets exact marker vs regional hint |
 | **44** | Enemy themes | **Primitive, ancient, skeletal, elemental, evil NPC, mythological** and similar monsters | Full roster and behavior |
 | **45** | Boss entry method | Three variants: **player-ritual summoned** by materials, **event-only boss**, and **structure-only boss** | Ritual recipes, spawn/despawn, reward lists |
-| **46** | Boss PvP and scaling | Fully contested **PvP loot**; bosses reset by **spawn type**; scaling uses **average server/lobby player level or gear level** | Exact metric, capture window, scaling formula, reward distribution |
+| **46** | Boss PvP and scaling | Fully contested **PvP loot**; bosses reset by **spawn type**; scaling uses player level or gear level (**superseded by Q148: combined**) | Exact metric, capture window, scaling formula, reward distribution |
 | **47** | Generated structures | **All three**: abandoned structures, actively NPC-defended camps and naturally generated ruins | Spawn types, raid loot amounts |
 | **48** | Rare resource locations | **Random valid locations within appropriate biomes** | Min spacing, node density, biome spawn pools |
 
 **Guardian distinction:** The original Guardian-specific cadence of approximately **15–20 minutes**, **3-minute warning**, shield-pillar encounter and **25%-HP Legendary world drop** remains in the GDD because answer 42 addresses weighted *non-Guardian* events. Any change to Guardian's dedicated cadence must be explicitly approved.
 
-**Boss combat scaling:** Average **player level** or **gear level** from active server population are candidate inputs. A blended score is an alternate **proposal**. Select which to use and define bounds without enabling manipulative “remove armor / connect alts” difficulty exploits.
+**Boss combat scaling (superseded by Q148):** A **combined** player-level and gear score from the active server population is Confirmed. Define bounds without enabling manipulative “remove armor / connect alts” difficulty exploits.
 
 ### 35.4 Acceptance and regression matrix — P0/P1
 
@@ -1588,13 +1598,13 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 14. Farms and planted trees progress while the owner is away, provided server remains active; world-empty wipe clears all world farms/structures.
 15. Event tick selects no event or a weighted eligible event; all actual spawns receive server-wide announcement. Resource nodes randomize **within appropriate biome** rather than deterministic fixed coordinates.
 16. Ritual items trigger boss spawns only in validated contexts; event bosses appear only through weighted event rules; structure bosses are tied to valid generated structures.
-17. Boss difficulty sampling uses a configured average level/gear value resistant to manipulation; NPC deaths/drop eligibility remain PvP-contested.
+17. Boss difficulty sampling uses a configured combined level-and-gear value (Q148) resistant to manipulation; NPC deaths/drop eligibility remain PvP-contested.
 18. Guardian special events keep their dedicated legacy design unless deliberately modified by a later owner decision.
 19. Secure vault, transferable Permanent item identity, maintenance recovery, shared 120-second extraction, rare portable 30-second rune and protected pre-spawn Play gate must not regress.
 
 ### 35.5 Decisions still open after questions 25–48
 
-**Retrospective Q25–48 note — superseded in part by Q61–89:** Food HoT is now **10 seconds**, hit halves pending healing with ≤10 HP cutoff, and tribe revival is **10 seconds**, after 20 armor-protected downed HP. Five level-10 mastery tracks and a rebirth level-1 reset are confirmed. **Still Open:** medical animation lengths, post-revive HP, attack speeds, armor tier multipliers, totem decay/claims, safe POIs, event weights, boss scaling, Permanent costs/slots, Coin/Gem rates, mastery milestones, rebirth perks and platform entitlement mapping.
+**Retrospective Q25–48 note — superseded in part by Q61–89:** Food HoT is now **10 seconds**, hit halves pending healing with ≤10 HP cutoff, and tribe revival is **10 seconds**, after 20 armor-protected downed HP. Five level-10 mastery tracks and a rebirth level-1 reset are confirmed. **Later resolved:** medical animation lengths (Q135), post-revive HP (Q136), attack speeds (Q133), armor multipliers (Q132), decay semantics (Q146), takeover (Q159), boss scaling direction (Q148) and Permanent costs/slots (Q156). **Still Open:** totem radii, safe POI list, event weights, boss formula, Coin/Gem rates, mastery milestones, rebirth perks and platform entitlement mapping.
 
 **Owner questions 49–60 were answered on 2026-10-22**; see §36 for confirmed account economy, rarity, permanent mastery/XP, appearance, onboarding and accessible monetization. Precise numeric tuning and platform-native purchasing mechanics remain Open.
 
@@ -1607,10 +1617,10 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 | # | Subject | Confirmed choice | Still Open |
 | --- | --- | --- | --- |
-| **3** | World resets | **ALL previously vaulted materials and equipment are ALWAYS saved**, ordinary or Permanent. Only the live island resets on empty. | Vault capacity/overflow mechanics |
-| **23** | Center extraction | **2× all material stacks including rare ingredients, and 2× XP** | **Later Q69 confirms all current-run XP** (not just exit XP); whether Coins/Gems and unique gear multiply remains Open |
+| **3** | World resets | **ALL previously vaulted materials and equipment are ALWAYS saved**, ordinary or Permanent. Only the live island resets on empty. | Vault capacity pricing (overflow deleted, Q154) |
+| **23** | Center extraction | **2× all material stacks including rare ingredients, and 2× XP** | **Later Q69 confirms all current-run XP** (not just exit XP); **Q119:** Coins/Gems never multiply; unique gear stays single |
 | **49** | Currency | **Persistent Coins and Gems**; Gems feel more premium but are **earned through gameplay too** | Drop rates, sinks, vendor prices |
-| **50** | Trade mode | **Direct player-to-player trading only**, not marketplace or auction | Venue, item/currency eligibility and safe transfer |
+| **50** | Trade mode | **Direct player-to-player trading only**, not marketplace or auction | **Q98:** lobby-only, eligible items and Gems, never Coins; safe transfer details Open |
 | **51** | Rarity | **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive** | Drop odds, visuals, Exclusive availability |
 | **52** | Player advancement | **XP, levels and crafting mastery; NO skill trees** | XP thresholds, mastery awards, level gates |
 | **53** | Playstyle growth | **Five permanent mastery tracks**: Mining, Woodcutting, Farming, Crafting, PvP; level-10 cap, per-level buff, cosmetics | **Confirmed Q71–80**; milestone thresholds/effects Open |
@@ -1699,12 +1709,12 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 
 ### 36.7 Remaining precise choices
 
-- **Confirmed:** Center 2× applies to **all current-run player XP and mastery XP**, including XP saved before extraction; ordinary death preserves base progress. **Open:** Whether Coins/Gems also multiply, exact XP multiplier stacking and bonus interaction with other earned XP modifiers.
-- Vault overflow handling when bonus stacks legitimately double and capacity is upgradeable.
+- **Confirmed:** Center 2× applies to **all current-run player XP and mastery XP**, including XP saved before extraction; ordinary death preserves base progress. **Q119:** Coins/Gems never multiply. **Open:** exact XP multiplier stacking and bonus interaction with other earned XP modifiers.
+- **Resolved Q154:** Overflow beyond capacity (including from a doubled bonus stack) is deleted.
 - **Confirmed rebirth rules:** General level and completed challenge required, progressively harder/costlier; general level resets to **1**, protected vault/masteries/owned perks preserved. **Open:** threshold, challenge, cost curve, tokens per rebirth, optional effects on Coins/Gems and perk balance.
 - Detailed Coin/Gem sources, premium earn rates, entitlement equivalence and platform purchase feasibility.
 - **Confirmed mastery rules:** Exactly five milestone-based level-10 tracks, buffs every level, baseline +1% per level to applicable resource yields and both additive/multiplicative modifier types. **Open:** action-count milestones, PvP/other perk caps, crafting allocation and top-tier gear trade restrictions.
-- Which exact rare/Exclusive raw materials may be traded, and whether currencies may be offered in direct trades.
+- Which exact rare/Exclusive raw materials may be traded (**Q98:** Gems may be traded, Coins never).
 - Secret and Exclusive acquisition rules, drop rates, cosmetic rarity presentation.
 - Tutorial structure, safe training environment versus live-world risk, and adjustable camera bounds.
 
@@ -1720,11 +1730,11 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | **61** | Health | **100 base max HP**; equipment and approved upgrades can raise max HP | Bonus source/stat caps and gear interactions |
 | **62** | Sprint | **3 seconds sprint on full bar; 5 seconds recovery from empty to full**; stamina used only for sprint | Regen delay, rates after partial sprint, actual sprint speed |
 | **63** | Food | Full food meter **100% → 0% in 5 minutes**; **below 25% food** gives **−10% movement speed** | Refills, exact drain exceptions, zero-food additional effects |
-| **64** | Instant medicine | **Basic +10 HP**, **advanced +25 HP**, **potion +50 HP**; immediately applied, then varying animation cooldowns | Each animation length, mobility during cooldown |
+| **64** | Instant medicine | **Basic +10 HP**, **advanced +25 HP**, **potion +50 HP**; immediately applied, then varying animation cooldowns | **Q135:** 0.5/1.0/1.5 s; mobility during cooldown Open |
 | **65** | Food HoT | Food-dependent total healing **over 10 seconds**. On each damage event, remaining HoT cut by **50%**; if *post-cut remainder ≤10 HP*, clear it completely | Food catalog/totals, overlapping food HoTs, tick granularity |
-| **66** | Early melee | **Rock 5 raw damage per hit with high attack speed**; **wooden spear ~15** slower/longer range; **stone spear ~25** | Spear values are tentative, precise attack speed and reach Open |
-| **67** | Armor | **Effective-HP multiplier (EHP)** rather than fixed reduction; early armor levels have modest but noticeable upgrades | Armor multiplier tier table, composition, max EHP |
-| **68** | Revives | Tribe player downed at **0 normal HP** enters **20 downed HP** with armor retained; enemies can finish with enough damage; **10 seconds to revive**, pauses **60-second bleed-out** while actively reviving | HP after revive, revive interruption/crawling |
+| **66** | Early melee | **Rock 5 raw damage per hit with high attack speed**; **wooden spear ~15** slower/longer range; **stone spear ~25** | Spear values tentative; cooldowns set by Q133; reach Open |
+| **67** | Armor | **Effective-HP multiplier (EHP)** rather than fixed reduction; early armor levels have modest but noticeable upgrades | **Q132:** Hide ×1.2 / Wood ×1.5 / Stone ×1.8 / Iron ×2.0, additive pieces; per-piece split Open |
+| **68** | Revives | Tribe player downed at **0 normal HP** enters **20 downed HP** with armor retained; enemies can finish with enough damage; **10 seconds to revive**, pauses **60-second bleed-out** while actively reviving | **Resolved Q136/Q159:** 10% max EHP; reviver damage doesn't interrupt; slow crawl, no healing |
 | **69** | Center XP | **2× ALL XP legitimately earned in that expedition** on center extraction, not just end extraction XP | Stacking with XP perks and action milestone progression |
 | **70** | XP and mastery | **Always saved immediately as earned**, including when player dies; no successful extraction requirement | Save batching/technical availability (must meet durability) |
 
@@ -1803,11 +1813,11 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 
 ### 37.5 Remaining numerical decisions
 
-- Each basic/advanced/potion **animation duration**, and whether use animation alters movement.
-- Post-revive ordinary HP; reviver range, interruptions and multiple concurrent revivers.
-- Precise wooden/stone spear attack speeds and ranges, arrow damage, enemy damage and armor tier **EHP multipliers**.
-- Whether food replenishes hunger meter immediately and by what percentages; additional effects at **0% food**.
-- Food HoT stacking, server tick resolution, exact application of repeated hits and whether remaining heal duration changes.
+- Whether use animation alters movement (durations set by Q135).
+- ~~Post-revive HP, interruptions, multiple revivers~~ (resolved Q136/Q159); reviver range remains Open.
+- Precise spear ranges, arrow damage and enemy damage (cadence Q133, armor multipliers Q132).
+- Whether food replenishes hunger meter immediately and by what percentages (**0% food has no extra effect**, Q160).
+- Server tick resolution (food HoTs stack, Q160), exact application of repeated hits and whether remaining heal duration changes.
 - Exact five mastery milestone targets for levels 1–10; category-specific yield buffs, combat perk cap and crafting milestone allocation.
 - Rebirth general level and challenge threshold, increasing resource/currency costs, token awards and multirank perk catalog.
 - Gem/Robux respec price, how codes are granted and what constitutes a valid refund/respec.
@@ -1822,7 +1832,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 
 | # | Owner answer — Confirmed except where marked tentative | Open details |
 | --- | --- | --- |
-| **90** | Coins | Quests, **fixed-price NPC selling** (original idea also mentioned extraction, **overridden by Q118: no direct extraction Coins**) | Coin shop/NPC prices and reward balancing |
+| **90** | **Coins** from quests and **fixed-price NPC selling** (original idea also mentioned extraction, **overridden by Q118: no direct extraction Coins**) | Coin shop/NPC prices and reward balancing |
 | **91** | **Gems** from quests, milestones, achievements, rebirths, rare enemies/resources and optional Robux | Earn rates by activity |
 | **92** | **~10,000 Coins/hour** and **~100 Gems/hour** of active play (initial targets) | Player distribution and inflation |
 | **93** | **Coin → Gem conversion undecided**; do not create a rate yet | Whether conversion exists |
@@ -1864,7 +1874,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 | **111** | Weighted non-Guardian event checks **about every 5 minutes**, **multiple events can coexist** if far enough apart | Weights, min distance, concurrency |
 | **112** | Ordinary trees/stone/ore **~2-minute regrowth**; rare event resources spawn **once** until another event | Variation, exact implementation |
 | **113** | **Totem radius depends on map size**, **totem areas may overlap** | Radius and claim conflict/priority |
-| **114** | Unclaimed structures decay in **~5 minutes with ±1-minute randomness**. Working interpretation: fully expire in **4–6 minutes** | Confirm full lifetime versus decay tick semantics |
+| **114** | Unclaimed structures decay in **~5 minutes with ±1-minute randomness**. Working interpretation: fully expire in **4–6 minutes** | **Resolved Q146:** full disappearance, not a tick |
 | **115** | Bosses start at an archetype **base level/difficulty plus scaling** | Input (player level/gear), curve and limits |
 
 **Guardian special case:** Prior **15–20-minute** center Guardian schedule and **3-minute warning** are retained; Q111 applies to weighted *other* events. Guardian's physical Legendary loot at **25% HP** remains contested.
@@ -1890,7 +1900,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 
 ### 38.5 Remaining targeted decisions
 
-Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-source weighting; qualified item and rare-material trade allowlists; Premium vs Plus qualification and earnable XP equivalent; minute-to-Gem tuning per monetized feature; fixed hotbar/backpack sizes, stack limit and vault overflow; precise gear catalog/quality-roll range; mastery craft roll tables; ordinary/rare respawn spatial limits; overlapping totem ownership rules and whether ~5-minute decay means full disappearance or tick; boss scaling source/curve.
+Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-source weighting; qualified item and rare-material trade allowlists; Premium vs Plus qualification and earnable XP equivalent; minute-to-Gem tuning per monetized feature; live backpack stack limit (hotbar/backpack sizes resolved Q126–127, vault overflow deleted Q154); precise gear catalog/quality-roll range; mastery craft roll tables; ordinary/rare respawn spatial limits; boss scaling curve (overlap ownership Q145/Q159, full-disappearance decay Q146 and combined scaling Q148 resolved).
 
 
 ## 39. Owner-approved questions 116–150 (October 22, 2026)
@@ -1904,7 +1914,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | **116** | Coins definitely buy **NPC shop items**. Brainstorm more Coin uses. | Actual store assortment and price tiers |
 | **117** | Starting quest Coin targets: **easy 250, normal 1,000, difficult 3,000** | Quest restrictions, repeatability |
 | **118** | **No Coin extraction bonus**. Extract materials and sell them for value. Consider auto-selling otherwise-useless resources. | Auto-sell item allowlist, consent and settlement |
-| **119** | Center portal Coins | **No center Coin or Gem multiplier**; doubled material quantities and run XP remain | No direct extraction Coin award per Q118 |
+| **119** | Center portal: **no center Coin or Gem multiplier**; doubled material quantities and run XP remain | No direct extraction Coin award per Q118 |
 | **120** | Fixed NPC merchant sell prices | Item-specific table |
 | **121** | **~25 Gems** is a good starting reward number, varying by activity | Gem payouts by quest/milestone/event |
 | **122** | **Same Gem cost** for each **+25 vault item-slot upgrade**, not escalating | Exact Gem and Robux prices |
@@ -1922,14 +1932,14 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | --- | --- | --- |
 | **126** | **Nine fixed hotbar slots** | Control bindings, quick-swap UX |
 | **127** | **50 starting backpack slots** | Whether later backpack upgrades exist |
-| **128** | One ordinary material type occupies one backpack slot; **secure material stack stores exactly up to 1,000 units** | **Clarified Q151:** 1,000 is **per material stack**, not global; excess storage representation Open |
-| **129** | Ordinary materials auto-vault; equipment/tools/other items and special materials remain in **persistent protected lobby backpack** for later optional vault deposit | **Clarified Q152:** persists across logout/reconnect/world wipes; excess slots still Open |
+| **128** | One ordinary material type occupies one backpack slot; **secure material stack stores exactly up to 1,000 units** | **Clarified Q151:** 1,000 is **per material stack**, not global; **Q154:** excess is deleted |
+| **129** | Ordinary materials auto-vault; equipment/tools/other items and special materials remain in **persistent protected lobby backpack** for later optional vault deposit | **Clarified Q152:** persists across logout/reconnect/world wipes; **Q154:** excess items deleted |
 | **130** | **Only designated/eligible items may be player-traded** | Catalog allowlist |
 | **131** | Carry **any types and combinations of weapons**, within physical inventory slot limits | Equipped versus backpack switch flow |
 
 **Routing example:** Successful Center Crater extraction with 30 Stone, 1 special material reagent and 1 unique Sword generates **60 Stone deposited into material vault**, **2 special reagents in protected lobby backpack** and **one Sword in lobby backpack**. The player decides whether to vault reagent and sword. **No Coin extraction award.** The existing 2× rule covers all actual materials regardless of routing; unique equipment instances are never silently cloned.
 
-**Security:** Extracted assets must be protected from animation start, including disconnects or DataStore errors. A 50-slot backpack, 25+25 item vault and near-1,000 material allowance are distinct capacities. If receiving gear/stack quantity would exceed any limit, keep a protected owed-items claim/pending receipt rather than deleting goods. **Confirmed Q152:** Unvaulted extracted lobby inventory persists across logout/reconnect/world resets; outstanding overflow remains in protected owed-item escrow rather than being lost.
+**Security:** Extracted assets must be protected from animation start, including disconnects or DataStore errors. A 50-slot backpack, 25+25 item vault and near-1,000 material allowance are distinct capacities. **Superseded by Q154:** If receiving gear/stack quantity would exceed any capacity limit, the excess is **deleted** and listed on the receipt; only settlement failures (not capacity) keep a protected pending receipt. **Confirmed Q152:** Unvaulted extracted lobby inventory persists across logout/reconnect/world resets.
 
 ### 39.3 Combat, armor, medicines, food and equipment quality (132–139)
 
@@ -1957,7 +1967,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 | **142** | **No fixed event-count cap**, provided server can handle workload | Dynamic performance budget |
 | **143** | Minimum event separation depends on **footprints** | Actual distances |
 | **144** | Totem starts **small hut-size**, material upgrades increase claim radius | Upgrade recipes, radii and tiers |
-| **145** | With overlapping claims, **original builder retains ownership until takeover** | Takeover procedure |
+| **145** | With overlapping claims, **original builder retains ownership until takeover** | **Q159:** no takeover while the totem stands; after it falls, claim by placing a new totem |
 | **146** | Unclaimed structure **fully disappears within 4–6 minutes**, not decay tick | Reclaim pause/reset logic |
 | **147** | Every boss has **fixed baseline difficulty** | Base HP/damage per archetype |
 | **148** | **Combined player level + equipped gear strength** scaling (**option C**) | Weights, snapshot timing and caps |
@@ -1982,7 +1992,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 1. Quests pay their configured 250/1000/3000 Coin bands once, merchant sales credit fixed server quotes, and no direct Coins are issued simply for extracting or doubled centrally.
 2. Gem grants average around the chosen 25 baseline by source; trade safety checks, no Coin trade, protection through death and empty-world resets.
 3. 9-slot hotbar and 50-slot backpack remain bounded; each ordinary material type displays one consolidated row/slot, while unique gear can have its own roll and instance ID.
-4. Vault item capacity starts 25 and upgrades +25 at constant Gems per tier; material stacks are **limited to 1,000 units each**, not an account-wide material limit. Overflow is protected until legally stored.
+4. Vault item capacity starts 25 and upgrades +25 at constant Gems per tier; material stacks are **limited to 1,000 units each**, not an account-wide material limit. Overflow is deleted exactly once and shown on the receipt (Q154).
 5. Extracted ordinary material auto-banks; extracted unique gear/tools and special materials stay protected in lobby backpack until manually deposited, with one-time central material ×2 and no data loss/duplication.
 6. Full matching armor sets produce 120/150/180/200 EHP for 100 base HP. Piece modifiers add. Revive restores 10% modified maximum EHP converted into actual HP.
 7. Rock/dagger/sword/spear approximate cadence constraints are enforced; bow draw changes range not bow+arrow damage; medicine gives immediate HP then only 0.5/1.0/1.5s animation lock.
@@ -1999,7 +2009,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 ### 39.7 Next unresolved precision decisions
 
-NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/limits/fees; price of constant +25 vault tiers; **representation of quantities above 1,000 per secure material stack**; full lobby backpack overflow (but **lobby items persist**); armor piece EHP weighting, bow projectile tuning, event category odds/footprints, totem upgrade/takeover, boss scaling, Permanent pickaxe recipe and **XP booster additive/multiplicative math (stacking itself Confirmed)**.
+NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/limits/fees; price of constant +25 vault tiers; ~~quantities above 1,000 per stack~~ and ~~full lobby backpack overflow~~ (**both deleted, Q154**); armor piece EHP weighting, bow projectile tuning, event category odds/footprints, totem upgrade/takeover, boss scaling, Permanent pickaxe recipe and **XP booster additive/multiplicative math (stacking itself Confirmed)**.
 
 
 ## 40. Final persistence clarifications Q151–153 and implementation-ready decision backlog
@@ -2010,27 +2020,27 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 
 | Question | Confirmed decision | Exact implementation not yet chosen |
 | --- | --- | --- |
-| **151** | **Secure vault capacity is 1,000 units per material stack**, not 1,000 items globally and not 1,000 unique resource types. Each material stack is counted independently. | What happens to 1,001+ units of a material (split stacks/overflow escrow) |
-| **152** | **Unvaulted extracted items in the protected lobby backpack persist through logout, reconnect, lobby server migration and public-world reset.** No manual vault deposit is required for cross-session survival. They become at-risk only if actually redeployed into ActiveRun (subject to Permanent ownership rules). | How equipment is selected for deployment, full 50-slot overflow |
+| **151** | **Secure vault capacity is 1,000 units per material stack**, not 1,000 items globally and not 1,000 unique resource types. Each material stack is counted independently. | **Answered Q154:** units beyond 1,000 are deleted |
+| **152** | **Unvaulted extracted items in the protected lobby backpack persist through logout, reconnect, lobby server migration and public-world reset.** No manual vault deposit is required for cross-session survival. They become at-risk only if actually redeployed into ActiveRun (subject to Permanent ownership rules). | **Answered Q155/Q154:** Play deploys every unvaulted item; items beyond 50 slots are deleted |
 | **153** | **Roblox Premium's +25% account XP baseline stacks with a temporary consumable XP booster**, available via gameplay to Premium and non-Premium alike. Non-Premium does not inherit the baseline. | Whether bonuses combine additively or multiplicatively, strength/duration, number of concurrent boosters, category scope and cap |
 
 ### 40.2 Three non-negotiable persistence invariants
 
-1. **Vault stack bound:** Server rejects any single secure material stack whose quantity exceeds **1,000 units**. A 2× center payout creating a surplus (e.g., 600 of an item to 1,200) must use an **explicit protected, recoverable overflow representation**; the player always retains ownership of all 1,200. Whether second stacks exist is not approved. UI may still show one consolidated material **type** with quantity across actual storage records if designed accordingly.
-2. **Lobby backpack is durable:** After extraction, ordinary materials route to secure material storage; unique gear, tools and special materials route to persisted lobby backpack. The player may log out **without moving them manually** and find the same items on return. This does not allow lobby assets to be simultaneously deployed; moving selected items into an active risk run must be one server-validated transition.
+1. **Vault stack bound (revised by Q154):** No secure material stack may exceed **1,000 units**. A 2× center payout creating a surplus (e.g., 600 of an item to 1,200) stores **1,000** and **deletes the other 200**. There are no second stacks or overflow escrow. Deletion happens exactly once per receipt, is listed on the receipt, and never happens because of a settlement failure.
+2. **Lobby backpack is durable:** After extraction, ordinary materials route to secure material storage; unique gear, tools and special materials route to persisted lobby backpack. The player may log out **without moving them manually** and find the same items on return. This does not allow lobby assets to be simultaneously deployed. **Q155:** pressing Play moves **every** unvaulted lobby backpack/hotbar item into the active risk run as one server-validated transition.
 3. **XP stacks:** An eligible Premium player's **+25% ongoing baseline** and a currently active legitimate consumable booster both influence eligible XP. Rebirth perks may also influence XP. **Center 2× applies to total valid XP earned in that current expedition** through a once-only receipt. How the independent boost amounts compose is **Open**; ensure all eligible modifiers count once, with no boost replay or negative XP.
 
 ### 40.3 Priority remaining implementation questions
 
 **Blockers — player custody, survival and world rules**
 
-1. **Overflow and backpack:** Represent more than 1,000 secure units of a material, or more than 50 incoming lobby items, without loss or unlimited account storage.
-2. **Run equipment selection:** Does the next Play deploy every unvaulted lobby item, or only player-selected loadout/withdrawals?
-3. **Permanent gear:** Allowable active Permanent pieces, any post-death reclaim fee, intentional-drop expiration and ownership transfer edge cases.
-4. **Recovery:** Unplanned server crash vs ordinary combat logout; safe escrow and anti-abuse boundaries.
-5. **Extraction:** Public stranger eligibility on shared portals, portable-rune participant count/placement, zone radius and portal cooldown.
-6. **Tribes/buildings:** Totem upgrade tiers and radius, takeover initiation/validation, multiple revivers, whether damage interrupts active revival.
-7. **PvP/survival:** Exact approved safe POIs, food at 0%, multiple food HoT and item-swap/cooldown rules.
+1. ~~**Overflow and backpack**~~ — **Answered Q154:** anything over the limit is deleted.
+2. ~~**Run equipment selection**~~ — **Answered Q155:** Play deploys every unvaulted lobby item.
+3. ~~**Permanent gear**~~ — **Answered Q156:** no reclaim fee, unlimited Permanent items, dropped items lost on world reset. Remaining: ownership-transfer edge cases are covered by §17.
+4. **Recovery** — **Answered Q157 in principle:** any active-play logout forfeits; a server crash should return items where possible. Remaining: the crash-recovery mechanism and anti-abuse boundaries.
+5. **Extraction** — **Answered Q158:** strangers allowed, activator death irrelevant, per-site zone radius, portable rune extracts everyone who fits, no placement inside structures, no portable 2×. Remaining: portal cooldown and rune zone size.
+6. **Tribes/buildings** — **Answered Q159:** three totem levels (500/1,000/2,500 HP) with growing radius, no takeover while a totem stands, anyone revives, one reviver, reviver damage doesn't interrupt, slow crawl, no healing, no post-revive protection. Remaining: radii and upgrade costs.
+7. **PvP/survival** — **Answered Q160:** safe POIs designed later, no friendly fire, no spawn protection, spawn away from others, 0% food adds nothing, food heals stack. Remaining: minimum spawn distance and item-swap rules.
 
 **Progression and monetization**
 
@@ -2054,7 +2064,99 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 **Design-note:** For numerical tuning not essential to state/persistence architecture, a documented **Proposed test default** is sufficient until actual Roblox playtests exist. The remaining architectural custody and irreversible loss/transaction issues require explicit rules before coding.
 
 
-## 41. Design change log
+## 41. Owner answers Q154–158: overflow, deployment, Permanent retention, logout and extraction
+
+> **Confirmed on 2026-10-22.** These answers resolve §40.3 blockers 1–5 and supersede earlier wording where they conflict, including the v1.2 protected-overflow invariant (§40.2 #1).
+
+### 41.1 Owner answers
+
+| # | Confirmed decision | Implementation consequence |
+| --- | --- | --- |
+| **154** | **Anything over the limit is deleted.** | Secure material units above **1,000 per stack** and incoming lobby items beyond the **50 backpack slots** are deleted at settlement. No second stacks, no overflow escrow. Example: 600 Stone at the Center portal becomes 1,200 → **1,000 stored, 200 deleted**. |
+| **155** | **Pressing Play deploys every unvaulted lobby item into the run.** | The lobby backpack/hotbar is the run inventory. Anything not manually deposited in the secure vault becomes at-risk on successful Play admission. |
+| **156** | **No reclaim.** Permanent items stay in the owner's backpack/hotbar on death. **No limit** on how many Permanent items a player may own or carry. A Permanent item that was dropped and is still on the ground when the world resets is **lost**. | No recovery fee, recovery state or slot cap. Death never moves a Permanent item to the corpse. Unclaimed ground Permanent items are deleted with the world. |
+| **157** | A **server crash mid-fight** should return items **if possible**. **Any kind of logout** in the play world means **loss of items**. | Disconnects, quits and network drops during active play all forfeit carried items to the 600-second body. Whole-server crash recovery remains an engineering goal with its mechanism Open. |
+| **158** | **Strangers** may use the same extraction. The **activator's death does not matter**. **Zone radius varies by site.** Everyone who **fits inside a portable rune's zone** may use it. Portable runes may be placed **anywhere except within structures**. A portable rune **never grants the 2× bonus**, even inside the Center Crater. | Per-site authored capture radius; no participant headcount cap on portable runes; server rejects placement inside/overlapping structures; center bonus only on the fixed Center portal. |
+
+### 41.2 Interpretations — Confirmed by owner
+
+1. **Q154 scope:** Deletion applies to **capacity overflow only**. Settlement failures (DataStore errors, disconnects, retries) still stay protected and reconcile once, so a technical fault never deletes items. The receipt lists deleted units/items. Manual vault deposits are simply blocked when the vault is full, so nothing is deleted there.
+2. **Q157 scope:** "Any logout in the play world" is read as any logout **after successful Play admission** (ActiveRun/ExtractionHolding). The previously Confirmed exceptions remain loss-free: the protected pre-spawn menu/loading (§31), the protected extraction animation (§9) and authorized admin update kicks (§30).
+3. **Q155 safety UX:** Because Play deploys everything unvaulted, the Deploy/Play flow lists every item about to become at-risk so players can vault items first.
+4. **Q158 placement:** "Within structures" covers both player-built and server-generated structures. Whether a placed portable rune also creates a no-build aura is Open.
+
+### 41.3 Acceptance tests
+
+1. A Center extraction of 600 units of a material already holding 0 stores exactly **1,000** and deletes **200** once; retries neither delete more nor restore the surplus; the receipt shows the deletion.
+2. Extracting 55 non-material items into an empty 50-slot lobby backpack keeps 50 and deletes 5 once, shown on the receipt.
+3. A DataStore failure during settlement never deletes items; it stays pending and reconciles exactly once.
+4. Pressing Play with unvaulted items in the lobby backpack/hotbar deploys all of them; vaulted items stay safe.
+5. A player who dies carrying several Permanent items keeps all of them in their backpack/hotbar with no fee; ordinary items go to the corpse.
+6. A dropped, unclaimed Permanent item is deleted when the world resets and never returns to its former owner.
+7. Quitting, closing Roblox or losing connection after Play admission creates one 600-second body; leaving from the pre-spawn menu does not.
+8. A stranger inside the zone at expiry extracts from another player's portal; the activator dying earlier does not cancel it.
+9. A portable rune extracts every eligible living player inside its zone at expiry, is rejected when placed inside a structure, and never grants 2× inside the Center Crater.
+
+### 41.4 Still Open after Q154–158
+
+- ~~**Blockers (§40.3 #6–7)**~~ — answered by Q159–160 (§42).
+- **Extraction details:** portal re-activation cooldown, portable rune zone size/consumption/announcement, any no-build aura around a placed rune.
+- **Crash recovery:** the concrete mechanism behind Q157's "return items if possible".
+- ~~**Other P0 items**~~ — answered by Q161 (§42).
+
+
+## 42. Owner answers Q159–161: totems, revives, PvP, food, event items, kicks and regrouping
+
+> **Confirmed on 2026-10-22.** These answers resolve §40.3 blockers 6–7 and the remaining P0 items in §41.4, and supersede earlier wording where they conflict.
+
+### 42.1 Owner answers
+
+| # | Confirmed decision | Implementation consequence |
+| --- | --- | --- |
+| **159a** | Tribe totems **upgrade**, and their **radius grows** with each level. Totem HP: **500 → 1,000 → 2,500** by level. | Three totem levels. Radii and upgrade costs Open. Totems are raidable like other structures. |
+| **159b** | **As long as a tribe totem stands, no structure can be taken over.** | Takeover requires destroying the covering totem first. |
+| **159c** | **Anyone can revive** a downed player, no matter what. | Revive is not limited to tribe members or allies. |
+| **159d** | **Only one reviver** at a time. | A second player cannot start a revive while one is active. |
+| **159e** | **Damage to the reviver does not stop** the revive. | The revive still ends if the reviver cancels, leaves range, is downed or dies, or the downed player dies. |
+| **159f** | Downed players **crawl very slowly** and **cannot heal**. **No protection after revive.** | Downed players cannot use medicine or food. Revived players are immediately damageable at 10% max EHP (Q136). |
+| **160a** | Safe POIs are **specific locations to be made later**. | Content task, not an implementation blocker. |
+| **160b** | **No friendly fire. No spawn protection.** Players must be **spawned away from others**. | Spawn picker enforces a minimum distance from other living players (value Open). |
+| **160c** | **0% food does nothing** beyond the slow movement speed. | Only the below-25% −10% speed penalty applies; no starvation damage. |
+| **160d** | **Food heals stack**, with each other and with instant heals. | Several food HoTs may run at once alongside medicine. |
+| **161a** | Event-critical items are **item specific**, with tags such as **"event"**. | Each catalog entry decides whether it is a stackable material (center 2× applies) or a unique instance (stays single). The tag supports UI, announcements and analytics. |
+| **161b** | Kick commands are wanted but must **only trigger a safe kick**. | Every admin kick preserves items and notifies the player (§30). No item-forfeiting moderation kick. |
+| **161c** | A dead player **cannot rejoin the same server**; the **whole tribe extracts, returns to the lobby, parties up and starts again**. | The lobby needs a party/tribe queue that sends the group into a new server together. |
+
+### 42.2 Interpretations — Confirmed by owner
+
+1. **Takeover after the totem falls:** Once the covering totem is destroyed, the structures become unclaimed (4–6-minute decay, Q146) and another tribe may claim them by placing its own totem.
+2. **Who can be downed:** "Anyone can revive" changes who can revive, not who gets downed. Solo non-tribe players still die immediately; tribe members still enter the 20-HP downed state. Enemies are also allowed to revive.
+3. **No healing while downed:** Any food HoT still running when a player is downed is cleared.
+4. **Friendly fire:** No friendly fire between tribe members. Whether allied tribes are also protected is Open.
+5. **Stacked food HoTs:** Each damaging hit halves the remaining amount of **each** active food HoT separately, with the ≤10 HP cutoff applied per HoT. Medicine keeps its own animation cooldown.
+
+### 42.3 Acceptance tests
+
+1. Totems have 500/1,000/2,500 HP at levels 1–3 and a larger radius at each level; no structure inside a standing totem's radius can be taken over.
+2. Any player, including a stranger, can revive a downed player; a second reviver is rejected while one is active.
+3. Damaging the reviver does not cancel the revive; cancelling, leaving range or the reviver being downed does.
+4. Downed players crawl at the configured slow speed and cannot use medicine or food.
+5. A revived player has no damage protection.
+6. Tribe members cannot damage each other.
+7. A new spawn is never placed within the configured minimum distance of another living player, and has no invulnerability.
+8. At 0% food the player takes no damage and only has the −10% speed penalty.
+9. Two food HoTs and an instant medicine heal can apply at the same time, capped at max HP.
+10. Every admin kick command preserves the kicked player's items and shows the update/saved-inventory notice.
+11. A dead player cannot join the same server again; a lobby party can queue into a new server together.
+
+### 42.4 Still Open after Q159–161
+
+- **Tuning:** totem radii and upgrade costs, crawl speed, revive range, minimum spawn distance.
+- **Design:** alliance friendly fire, safe POI list, lobby party UI.
+- **Carried over from §41.4:** portal cooldown, portable rune zone size/consumption/announcement and no-build aura, crash-recovery mechanism.
+
+
+## 43. Design change log
 
 | Revision | Date | Change |
 | --- | --- | --- |
@@ -2070,7 +2172,10 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.0** | 2026-10-22 | Recorded Q90–115: Coin/Gem earning targets/sources, death-safe balances, NPC sales, lobby Gem/item trades/no Coins, +25 slot vault upgrades by Gems/Robux, ~10-hour significant-offer benchmark, Premium +25% XP and no paid combat advantage; four launch weapons, three armor slots, fixed archetype rarity, small crafted quality rolls favoring unsafe workbenches/masters, 10 arrows, fixed inventory and early Permanent pacing; ~5-minute event rolls/multiple spatially separate events, ~2-minute ordinary node regen, one-time rare resources, overlapping totems, 4–6-minute unclaimed decay and base-plus-scaling bosses. Added §38 implementation and QA with platform policy citations. |
 | **1.1** | 2026-10-22 | Recorded owner answers Q116–150: Coin NPC shop brainstorm, 250/1000/3000 quest bands, no extraction Coin bonus, fixed merchant values, ~25 Gem grants, constant-price +25 vault upgrades, protected lobby Gem trade restrictions, 9 hotbar/50 backpack with one ordinary resource per slot and ~1000 material capacity, regular material auto-bank but manual equipment/special material vault; full armor EHP sets ×1.2/1.5/1.8/2.0 additive across 3 pieces, basic attack cadence, bow draw affects range not damage, animation-only heals .5/1/1.5 sec, 10%-EHP revival, food examples, ±5% rolls and 5% relative increase in best-roll chance per mastery level; independent event-category 25% rolls, descending rarity and Common fallback, no absolute event cap, upgradeable hut totems with original owner retention, complete 4–6-min decay, fixed-plus-level/gear boss scaling, basic pickaxe Permanent candidate and optional all-user XP boosters alongside Premium +25%. Added §39 and regression QA. |
 | **1.2** | 2026-10-22 | Finalized Q151–153: material vault holds **1,000 units per individual material stack**, cross-session persistence of **unvaulted extracted protected lobby backpack**, and Premium +25% base XP **stacks with** earned temporary XP boosters. Reconciled previous Q128/Q129/Q150, persistence/services, saved-item examples and QA; introduced §40 with implementation-ready decision backlog and explicit loss-free overflow and XP stacking test boundaries. |
+| **1.3** | 2026-10-22 | Recorded owner answers Q154–158: capacity overflow (secure stacks above 1,000 units, lobby items beyond 50 slots) is **deleted**, replacing the v1.2 protected-overflow invariant; Play deploys every unvaulted lobby item; Permanent items stay in backpack/hotbar on death with no reclaim fee or slot cap and are lost if left dropped at world reset; any active-play logout forfeits while crash recovery returns items where possible; strangers share extractions, activator death is irrelevant, per-site zone radius, portable runes extract everyone in their zone, cannot be placed inside structures and never grant 2×. Added §41, reconciled affected sections, fixed two broken navigation links and two malformed Q90/Q119 table rows. |
+| **1.4** | 2026-10-22 | Recorded owner answers Q159–161: three totem levels (500/1,000/2,500 HP) with growing radius and no takeover while a totem stands; anyone may revive, one reviver at a time, reviver damage does not interrupt, slow crawl and no healing while downed, no post-revive protection; no friendly fire, no spawn protection but spawns away from others, 0% food adds nothing, food heals stack; safe POIs designed later; per-item event handling with "event" tags; admin kicks are always safe kicks; dead players regroup with their tribe in the lobby. Added §42 and reconciled affected sections. |
+| **1.5** | 2026-10-22 | Owner confirmed all interpretations in §41.2 and §42.2 (capacity-only deletion, logout loss only after Play admission, Play item list, structures for rune placement, takeover by new totem after the old one falls, anyone revives but only tribe members are downed, downing clears food HoT, tribe-only no-friendly-fire, per-HoT hit halving). Replaced superseded Open labels for boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation. |
 
 ---
 
-**Working principle:** Flintborn is a Roblox primitive-fantasy PvPvE extraction survival game with protected Play admission, 100 base HP, additive hide/wood/stone/iron EHP, 10-second tribe revives and permanent five-track masteries. Ordinary materials automatically bank on successful extraction; **the secure materials vault holds up to 1,000 units per stack, not 1,000 total**. Gear, tools, other items and special materials arrive in the **durable protected lobby backpack**, surviving logout/server resets until consciously redeployed or manually moved into the vault. Central extraction doubles *all* material quantities and earned-run XP, never Coins/Gems. Premium base +25% XP **stacks with** temporary boosters available to every player; multiplier arithmetic remains Open. Other confirmed mechanics include 9 hotbar/50 backpack, 25 vault item slots (+25 upgrades), restricted lobby Gem/item trading, raidable totem claims/4–6-minute decay, independent weighted server events, fixed baseline plus level/gear boss scaling, and a candidate first Permanent pickaxe. No firearms, usable shields, player-cast magic or durability at launch.
+**Working principle:** Flintborn is a Roblox primitive-fantasy PvPvE extraction survival game with protected Play admission, 100 base HP, additive hide/wood/stone/iron EHP, 10-second tribe revives and permanent five-track masteries. Ordinary materials automatically bank on successful extraction; **the secure materials vault holds up to 1,000 units per stack, not 1,000 total**, and anything over a capacity limit is deleted. Gear, tools, other items and special materials arrive in the **durable protected lobby backpack**, surviving logout/server resets until manually moved into the vault; **pressing Play deploys every unvaulted item**. Central extraction doubles *all* material quantities and earned-run XP, never Coins/Gems. Premium base +25% XP **stacks with** temporary boosters available to every player; multiplier arithmetic remains Open. Other confirmed mechanics include 9 hotbar/50 backpack, 25 vault item slots (+25 upgrades), restricted lobby Gem/item trading, raidable totem claims/4–6-minute decay, independent weighted server events, fixed baseline plus level/gear boss scaling, and a candidate first Permanent pickaxe. No firearms, usable shields, player-cast magic or durability at launch.
