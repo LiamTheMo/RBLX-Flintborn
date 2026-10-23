@@ -14,12 +14,12 @@ NodeCatalog.HARVEST_INTERVAL = 0.4
 -- yields: per-hit amount by tool kind ("Hand" for no matching tool); a missing
 -- entry means that tool cannot harvest the node. minTier applies to tool yields.
 NodeCatalog.Nodes = {
-	Tree = { material = "Wood", hits = 5, yields = { Hand = 1, Axe = 3 } },
-	Rock = { material = "Stone", hits = 5, yields = { Hand = 1, Pickaxe = 2 } },
-	IronDeposit = { material = "Iron", hits = 6, yields = { Pickaxe = 1 } },
-	FiberPlant = { material = "Fiber", hits = 2, yields = { Hand = 2, Sickle = 3 } },
-	HerbShrub = { material = "Herbs", hits = 2, yields = { Hand = 1, Sickle = 2 } },
-	BerryBush = { material = "Berries", hits = 2, yields = { Hand = 1, Sickle = 2 } },
+	Tree = { material = "Wood", hits = 5, yields = { Hand = 1, Axe = 3 }, mastery = "Woodcutting" },
+	Rock = { material = "Stone", hits = 5, yields = { Hand = 1, Pickaxe = 2 }, mastery = "Mining" },
+	IronDeposit = { material = "Iron", hits = 6, yields = { Pickaxe = 1 }, mastery = "Mining" },
+	FiberPlant = { material = "Fiber", hits = 2, yields = { Hand = 2, Sickle = 3 }, mastery = "Farming" },
+	HerbShrub = { material = "Herbs", hits = 2, yields = { Hand = 1, Sickle = 2 }, mastery = "Farming" },
+	BerryBush = { material = "Berries", hits = 2, yields = { Hand = 1, Sickle = 2 }, mastery = "Farming" },
 }
 
 -- Amount one hit gives with the equipped tool ({kind, tier} or nil), or 0 when

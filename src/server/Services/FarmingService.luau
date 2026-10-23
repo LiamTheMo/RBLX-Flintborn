@@ -7,12 +7,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
+local ProgressionService = require(script.Parent.ProgressionService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local FarmingService = {}
@@ -24,6 +27,7 @@ local KEYS = {
 }
 
 local planters = {}
+local rng = Random.new()
 
 local function now(): number
 	return workspace:GetServerTimeNow()
@@ -103,10 +107,14 @@ local function harvest(player: Player, planter)
 	planter.cropId = nil
 	planter.plantedAt = nil
 	local yield = table.clone(crop.yield)
+	yield.quantity =
+		ModifierRules.RollYield(yield.quantity, ModifierService.Get(player, "FarmingYield", "DropQuantity"), rng)
 	local remaining = InventoryService.Add(player, yield)
 	if remaining > 0 then
 		DropService.Spawn({ catalogId = yield.catalogId, quantity = remaining }, planter.record.position)
 	end
+	ProgressionService.GrantXp(player, ProgressionService.XP.CropHarvest, "Harvest")
+	ProgressionService.GrantMastery(player, "Farming", 3)
 	refresh(planter)
 end
 

@@ -26,7 +26,7 @@
 | v0.09 ✅ | Ancestral Forge and Permanent items | v0.08 | Special recipes and the first Permanent pickaxe |
 | v0.10 ✅ | Building, totems, raiding and farming | v0.07 | Booga Booga bases, totems, decay, raids, crops |
 | v0.11 ✅ | World event director and rare spawns | v0.10 | Announced weighted events, rare nodes, ruins, caches |
-| [v0.12](v0.12-bosses-guardian-and-scaling.md) | Bosses: Guardian and scalable encounters | v0.11 | Center Guardian and event, ritual and structure bosses |
+| v0.12 ✅ | Bosses: Guardian and scalable encounters | v0.11 | Center Guardian and event, ritual and structure bosses |
 | [v0.13](v0.13-account-progression-masteries-and-rebirth.md) | Account progression, masteries and rebirth | v0.08 | XP, levels, five masteries, rebirth tokens and perks |
 | [v0.14](v0.14-economy-shops-trading-and-monetization.md) | Economy, shops, trading and monetization | v0.13 | Coins, Gems, NPC shops, quests, lobby trading, Premium |
 | [v0.15](v0.15-shattered-crater-world-art-and-camera.md) | Shattered Crater world, art direction and camera | v0.11 | Full island, biomes, POIs, art pass, adjustable camera |

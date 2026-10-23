@@ -55,7 +55,9 @@ end
 -- A full bar lasts 3 s of sprint; empty to full takes 5 s (Q62).
 function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean)
 	if SurvivalRules.IsSprinting(state, moving) then
-		state.stamina = settle(math.max(0, state.stamina - dt / GameConstants.SPRINT_SECONDS))
+		-- PvP mastery's non-combat perk stretches the sprint (staminaDrainScale < 1).
+		local drain = dt * (state.staminaDrainScale or 1) / GameConstants.SPRINT_SECONDS
+		state.stamina = settle(math.max(0, state.stamina - drain))
 	else
 		state.stamina = settle(math.min(1, state.stamina + dt / GameConstants.STAMINA_RECOVERY_SECONDS))
 	end

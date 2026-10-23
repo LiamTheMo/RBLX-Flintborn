@@ -9,6 +9,8 @@ local Channel = require(script.Parent.Parent.Infrastructure.Channel)
 local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
+local ProgressionService = require(script.Parent.ProgressionService)
 
 local MeteorService = {}
 
@@ -54,13 +56,14 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 		local site = {}
 		Channel.Attach(prompt, MeteorService.CHUNK_SECONDS, function(player)
 			return CacheService.CanInteract(player, chunk, MeteorService.REACH)
-		end, function()
+		end, function(player)
 			if not EventRules.Claim(site) then
 				return
 			end
 			local at = chunk.Position
 			chunk:Destroy()
-			for _, item in EventRules.RollLoot(entry.loot, rng) do
+			ProgressionService.GrantXp(player, ProgressionService.XP.MeteorChunk, entry.name)
+			for _, item in EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")) do
 				DropService.Spawn(item, at)
 			end
 			remaining -= 1
