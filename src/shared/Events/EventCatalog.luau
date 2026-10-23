@@ -6,9 +6,10 @@
 
 local EventCatalog = {}
 
-EventCatalog.Kinds = { Node = "Node", Npc = "Npc", Cache = "Cache", Meteor = "Meteor", Structure = "Structure" }
+EventCatalog.Kinds =
+	{ Node = "Node", Npc = "Npc", Cache = "Cache", Meteor = "Meteor", Structure = "Structure", Boss = "Boss" }
 
--- Every director category, in announcement order. Event bosses arrive in v0.12.
+-- Every director category, in announcement order.
 EventCatalog.Categories = { "Vegetation", "Ore", "Npc", "Cache", "Meteor", "Structure", "Boss" }
 
 local K = EventCatalog.Kinds
@@ -201,8 +202,43 @@ EventCatalog.Entries = {
 			cache = "AncientCache",
 			defenders = { { enemy = "Bandit", count = 3 } },
 		},
+		{
+			id = "WarlordsHold",
+			name = "Warlord's Hold",
+			rarity = "Epic",
+			kind = K.Structure,
+			style = "Fort",
+			biome = "Any",
+			footprint = 80,
+			lifetime = 900,
+			cache = "GildedCache",
+			boss = "RaiderWarlord",
+			defenders = { { enemy = "Bandit", count = 2 } },
+		},
 	},
-	Boss = {},
+	-- Event bosses (Q45). No Common entry: a missed roll spawns nothing.
+	Boss = {
+		{
+			id = "IronhideBehemothEvent",
+			name = "Ironhide Behemoth",
+			rarity = "Epic",
+			kind = K.Boss,
+			boss = "IronhideBehemoth",
+			biome = "InnerRing",
+			footprint = 150,
+			lifetime = 900,
+		},
+		{
+			id = "BoneColossusEvent",
+			name = "Bone Colossus",
+			rarity = "Legendary",
+			kind = K.Boss,
+			boss = "BoneColossus",
+			biome = "Any",
+			footprint = 150,
+			lifetime = 900,
+		},
+	},
 }
 
 EventCatalog.ById = {}
