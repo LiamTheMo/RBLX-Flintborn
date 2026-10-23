@@ -7,14 +7,12 @@
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local Receipts = require(script.Parent.Parent.Data.Receipts)
 
 local ExtractionRules = {}
 
 ExtractionRules.FIXED_SECONDS = GameConstants.FIXED_EXTRACTION_SECONDS
 ExtractionRules.PORTABLE_SECONDS = GameConstants.PORTABLE_EXTRACTION_SECONDS
-
--- Receipts kept per profile; older ones are trimmed to bound profile size.
-ExtractionRules.RECEIPT_RETENTION = 20
 
 ExtractionRules.Kinds = { Fixed = "Fixed", Center = "Center", Portable = "Portable" }
 
@@ -56,7 +54,8 @@ function ExtractionRules.AddToLobbyBackpack(slots, item): number
 		table.insert(slots, { catalogId = item.catalogId, quantity = added })
 		return quantity - added
 	end
-	if #slots >= GameConstants.BACKPACK_SLOTS then
+	-- Permanent items are never deleted for lack of room (Q156: no limit on them).
+	if #slots >= GameConstants.BACKPACK_SLOTS and not item.permanent then
 		return 1
 	end
 	item.location = "LobbyBackpack"
@@ -109,18 +108,11 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 			bump(receipt.deleted, catalogId, left)
 		end
 	end
-	local receipts = profile.receipts.extraction
-	receipts[receiptId] = receipt
-	local ids = {}
-	for id in receipts do
-		table.insert(ids, id)
+	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09).
+	for _, item in items do
+		profile.recipes.discovered[item.catalogId] = true
 	end
-	table.sort(ids, function(a, b)
-		return receipts[a].at < receipts[b].at
-	end)
-	for index = 1, #ids - ExtractionRules.RECEIPT_RETENTION do
-		receipts[ids[index]] = nil
-	end
+	Receipts.Store(profile.receipts.extraction, receiptId, receipt)
 	profile.metrics.extractions += 1
 	return receipt
 end

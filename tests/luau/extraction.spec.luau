@@ -4,6 +4,7 @@ local OperationJournal = require(Server.Infrastructure.OperationJournal)
 local ExtractionRules = require(Shared.Extraction.ExtractionRules)
 local VaultRules = require(Shared.Extraction.VaultRules)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
+local Receipts = require(Shared.Data.Receipts)
 
 local function sword(id)
 	return { instanceId = id, catalogId = "StoneSword", ownerId = 1, location = "Carried", qualityRoll = 0 }
@@ -142,14 +143,14 @@ end)
 
 test("only the newest receipts are kept", function()
 	local profile = ProfileSchema.Default(0)
-	for i = 1, ExtractionRules.RECEIPT_RETENTION + 5 do
+	for i = 1, Receipts.RETENTION + 5 do
 		ExtractionRules.Settle(profile, {}, "Fixed", "r" .. i, i)
 	end
 	local count = 0
 	for _ in profile.receipts.extraction do
 		count += 1
 	end
-	expectEq(count, ExtractionRules.RECEIPT_RETENTION, "trimmed")
+	expectEq(count, Receipts.RETENTION, "trimmed")
 	expectEq(profile.receipts.extraction.r1, nil, "oldest dropped")
-	expect(profile.receipts.extraction["r" .. (ExtractionRules.RECEIPT_RETENTION + 5)] ~= nil, "newest kept")
+	expect(profile.receipts.extraction["r" .. (Receipts.RETENTION + 5)] ~= nil, "newest kept")
 end)
