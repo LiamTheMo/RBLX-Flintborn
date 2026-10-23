@@ -2,7 +2,7 @@
 
 [`GDD.md`](../../GDD.md) is the source of truth for gameplay intent. These phase documents split it into ordered, buildable versions. Each phase names the GDD rules it implements, the code it adds, how it is validated, and what it deliberately leaves for later. If a phase document and the GDD disagree, the GDD wins and the phase document must be corrected.
 
-**Finished phases** are marked ✅. Their documents are deleted once the phase's CI, deployment and tests pass; any Studio checks still to run move to [`docs/MANUAL_VALIDATION.md`](../MANUAL_VALIDATION.md).
+**Finished phases** are marked ✅. Their documents are deleted once the phase's CI, deployment and tests pass; any Studio checks still to run move to [`docs/MANUAL_VALIDATION.md`](../MANUAL_VALIDATION.md). All 18 phases are shipped; promotion to `v1.00` follows [`docs/RELEASE_CHECKLIST.md`](../RELEASE_CHECKLIST.md).
 
 ## Branch and release model
 
@@ -32,7 +32,7 @@
 | v0.15 ✅ | Shattered Crater world, art direction and camera | v0.11 | Full island, biomes, POIs, art pass, adjustable camera |
 | v0.16 ✅ | Onboarding, UX and accessibility | v0.14 | Guided tutorial, quests, polished UI on every input |
 | v0.17 ✅ | Live-ops hardening | v0.16 | Telemetry, anti-exploit, performance, crash recovery |
-| [v0.18](v0.18-release-candidate-and-launch-readiness.md) | Release candidate and launch readiness | v0.17 | Launch-ready build, promoted to v1.00 |
+| v0.18 ✅ | Release candidate and launch readiness | v0.17 | Launch-ready build, promoted to v1.00 |
 
 Phases v0.10–v0.12 and v0.13–v0.14 depend only on the phases listed, so they may overlap in time if needed, but they are still merged in version order.
 

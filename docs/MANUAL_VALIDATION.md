@@ -255,3 +255,11 @@ Studio and live checks:
 - [ ] A speed exploit or teleport is pulled back; normal sprinting, crawling and long falls are not.
 - [ ] Spamming any remote gets throttled without errors for honest play.
 - [ ] Creator Dashboard shows the custom and economy events; poor-network and client-close-mid-portal tests; load tests with many drops and structures; 30-player profiling on real devices.
+
+## v0.18 — Release candidate and launch readiness
+
+Automated: 3 release specs cover loading a profile saved by the earliest phase into the final schema with every later group filled, refusing profiles from a newer schema, and catalog completeness (every item has a source; every weapon has combat stats — this found and fixed Cooked Meat having no source: creatures now drop Raw Meat, cooked at a built Furnace). The full CI suite (20 spec files including the §24 security suite) passes on `main`. Deployed and verified on both places (2026-10-23).
+
+Everything still manual before `v1.00` is in [`docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).
+
+- [ ] Hunt a wolf or boar, build a Furnace (X), and cook Raw Meat into Cooked Meat (V, "furnace" recipes).
