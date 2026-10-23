@@ -84,6 +84,8 @@ local entries = {
 	weapon("StoneSword", "Stone Sword", "Sword"),
 	weapon("IronSword", "Iron Sword", "Sword", "Rare"),
 	weapon("BasicBow", "Basic Bow", "Bow"),
+	-- The Guardian's once-per-encounter Legendary (GDD §8.1); ordinary world loot.
+	weapon("GuardianFang", "Guardian's Fang", "Sword", "Legendary"),
 
 	-- Armor (Q101: Head, Chest, Legs/Boots)
 	armor("Hide", "Head"),
