@@ -130,3 +130,20 @@ Studio and live checks:
 - [ ] Q drops a ★ item; a second player picks it up, is told they own it, and keeps it on death; the original owner cannot get it back after rejoining.
 - [ ] A dropped ★ item left on the ground is gone after the world resets.
 - [ ] Special Forge crafts land in the lobby backpack with no quality roll; a full backpack refuses the craft.
+
+## v0.10 — Building, totems, raiding and farming
+
+Automated: 7 specs cover the 50 m portal aura rejecting partial overlaps (whole footprint, rotation aware), totem HP 500 / 1,000 / 2,500 with growing radius, cover stopping decay and loss of cover assigning one 240–360 s deadline that never re-rolls, rival totems never covering or taking over while the owner's totem stands, takeover after it falls, server-generated structures never claimable or decaying, tool bonuses against materials, grid snapping and server-timed crops. Deployed and verified on both places (2026-10-23).
+
+Placeholders: 50 m = 178.6 studs (1 stud = 0.28 m); totem radius 15 / 35 / 70 studs; wall HP wood 300 / stone 800 / iron 1,600; tools hit 1.5× against their material (axe vs wood, pickaxe vs stone/iron); crops Berries 3 min, Herbs 5 min, Sapling 10 min; chests 20 slots; traps 15 damage per 2 s; 300 pieces per owner. Solo players own their pieces until they join a tribe. A crafted workbench is placed as an ordinary structure.
+
+Studio and live checks (two tribes):
+
+- [ ] X opens build mode: the ghost snaps, rotates (R / L2 / Rotate) and shows ✓ or ✕ with colour; Place works on touch and controller.
+- [ ] Building wood → stone → iron charges the shown costs; pieces near an extraction portal or rune are refused, including pieces whose edge crosses the red aura.
+- [ ] Without a totem a piece shows a decay timer and vanishes in 4–6 minutes; a totem stops it; upgrading the totem grows the radius and HP.
+- [ ] The owner leaves; the base stays. A raider breaks a wall with weapons/tools and opens a chest (public); a wall between the raider and the chest blocks it.
+- [ ] Destroy a rival totem, place your own, and their pieces become yours; while their totem stands nothing changes hands.
+- [ ] Only the owning tribe can open its doors. Traps hurt other tribes, not your own.
+- [ ] Plant Berries/Herbs/Sapling in a planter, walk away, return to harvest; a destroyed chest spills its items.
+- [ ] Empty the world: everything built is gone in the next world.

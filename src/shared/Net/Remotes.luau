@@ -52,6 +52,8 @@ local DEFINITIONS = {
 	ChestOpened = "RemoteEvent", -- server -> client: (chestId, contents)
 	ChestTake = "RemoteFunction", -- (chestId, index) -> ok, reason
 	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
+	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
+	EventEnded = "RemoteEvent", -- server -> all: (eventId)
 }
 
 local function folder()
