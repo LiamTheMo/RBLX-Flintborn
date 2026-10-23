@@ -94,6 +94,18 @@ function EventRules.Separated(position: Vector3, radius: number, active): boolea
 	return true
 end
 
+-- True when a footprint at `position` stays outside every zone {center, radius}
+-- (extraction auras, safe zones, the Guardian arena, totem cover).
+function EventRules.ClearOf(position: Vector3, radius: number, zones): boolean
+	for _, zone in zones do
+		local dx, dz = position.X - zone.center.X, position.Z - zone.center.Z
+		if math.sqrt(dx * dx + dz * dz) < radius + zone.radius then
+			return false
+		end
+	end
+	return true
+end
+
 -- Whether another event of `entry` fits the performance budget.
 function EventRules.WithinBudget(entry, activeLarge: number, activeNpcs: number, npcCount: number): boolean
 	if entry.footprint >= EventRules.LARGE_FOOTPRINT and activeLarge >= EventRules.MAX_LARGE_EVENTS then

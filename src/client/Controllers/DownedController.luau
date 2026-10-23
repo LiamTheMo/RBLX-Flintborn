@@ -7,25 +7,23 @@ local PlaceConfig = require(game:GetService("ReplicatedStorage").Shared.Config.P
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+local Theme = require(script.Parent.Parent.Ui.Theme)
+
 local DownedController = {}
 
 local player = Players.LocalPlayer
 local ui = {}
 
 local function build()
-	local gui = Instance.new("ScreenGui")
-	gui.Name = "Downed"
-	gui.ResetOnSpawn = false
-	gui.DisplayOrder = 15
-	gui.Parent = player:WaitForChild("PlayerGui")
+	-- Lives in the shared top-centre column so it never covers the other banners.
 	ui.frame = Instance.new("Frame")
-	ui.frame.AnchorPoint = Vector2.new(0.5, 0)
-	ui.frame.Position = UDim2.new(0.5, 0, 0, 60)
+	ui.frame.Name = "Downed"
+	ui.frame.LayoutOrder = Theme.TopOrder.Downed
 	ui.frame.Size = UDim2.fromOffset(420, 96)
 	ui.frame.BackgroundColor3 = Color3.fromRGB(80, 24, 20)
 	ui.frame.BackgroundTransparency = 0.15
 	ui.frame.Visible = false
-	ui.frame.Parent = gui
+	ui.frame.Parent = Theme.TopStack()
 	Instance.new("UICorner").Parent = ui.frame
 	ui.text = Instance.new("TextLabel")
 	ui.text.Size = UDim2.fromScale(1, 1)

@@ -46,8 +46,11 @@ function ProfileSchema.Default(now: number?)
 			gems = 0,
 			gemTradeDay = 0,
 			gemsTradedToday = 0,
+			gemReceiveDay = 0,
+			gemsReceivedToday = 0,
 			npcSaleReceipts = {},
 			purchaseEntitlements = {},
+			redeemedCodes = {},
 		},
 		quests = { progress = {} },
 		trades = { pending = {}, history = {} },
@@ -58,6 +61,7 @@ function ProfileSchema.Default(now: number?)
 			titles = {},
 			appliedMilestones = {},
 			currentRun = nil,
+			pvpCredits = {},
 		},
 		rebirth = { count = 0, tokens = 0, ownedPerks = {}, legendariesSinceRebirth = 0 },
 		boosters = { xpUntil = 0 },
@@ -72,7 +76,7 @@ function ProfileSchema.Default(now: number?)
 			reducedMotion = false,
 			subtitles = true,
 		},
-		tutorial = { step = 1, skipped = false, completedAt = nil, rewardsGranted = {} },
+		tutorial = { step = 1, skipped = false, everSkipped = false, completedAt = nil, rewardsGranted = {} },
 		metrics = { runs = 0, extractions = 0, deaths = 0 },
 	}
 end
@@ -87,6 +91,25 @@ local function reconcile(data, defaults)
 			data[key] = deepCopy(default)
 		elseif type(current) == "table" and type(default) == "table" then
 			reconcile(current, default)
+		end
+	end
+end
+
+-- Codes redeemed before the permanent ledger existed are recorded only in the
+-- operation journal, which trims old entries: copy them into the ledger so a
+-- trimmed journal never makes a code redeemable again. Safe on every load, since
+-- only committed redemptions are journalled.
+local function backfillRedeemedCodes(profile)
+	local redeemed = profile.currency.redeemedCodes
+	for operationId, record in profile.operations.records do
+		if
+			type(operationId) == "string"
+			and string.sub(operationId, 1, 5) == "code:"
+			and type(record) == "table"
+			and record.kind == "CodeRedeem"
+			and record.status == "committed"
+		then
+			redeemed[string.sub(operationId, 6)] = true
 		end
 	end
 end
@@ -116,6 +139,7 @@ function ProfileSchema.Migrate(data: any, now: number?)
 		profile.schemaVersion += 1
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
+	backfillRedeemedCodes(profile)
 	return profile, nil
 end
 

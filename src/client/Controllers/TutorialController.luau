@@ -16,6 +16,12 @@ local player = Players.LocalPlayer
 local ui = {}
 local state = nil
 local marker = nil
+local target = nil
+local sinceScan = math.huge
+
+-- Finding the nearest target walks folders, so it runs a few times a second;
+-- only the marker's bob runs every frame.
+TutorialController.SCAN_SECONDS = 0.3
 
 local make = Theme.Make
 
@@ -64,8 +70,15 @@ local function nearest(list)
 	return best
 end
 
-local function updateMarker()
-	local target = state and not state.done and not state.skipped and nearest(targets(state.id))
+local function updateMarker(dt: number)
+	sinceScan += dt
+	if sinceScan >= TutorialController.SCAN_SECONDS then
+		sinceScan = 0
+		target = state and not state.done and not state.skipped and nearest(targets(state.id)) or nil
+	end
+	if target ~= nil and target.Parent == nil then
+		target = nil
+	end
 	if target == nil then
 		if marker then
 			marker.Enabled = false
@@ -104,15 +117,17 @@ local function render()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Tutorial", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- In the shared top-centre column, so Got it / Skip stay on-screen on phones
+	-- and the card never overlaps other banners.
 	ui.card = make("Frame", {
-		Position = UDim2.fromOffset(12, 300),
 		Size = UDim2.fromOffset(330, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Theme.Colors.Card,
 		BackgroundTransparency = 0.1,
+		Active = true,
+		LayoutOrder = Theme.TopOrder.Tutorial,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.card)
 	make("UIPadding", {
 		PaddingTop = UDim.new(0, 8),
@@ -168,6 +183,7 @@ function TutorialController.Start()
 	build()
 	Remotes.Get("TutorialChanged").OnClientEvent:Connect(function(payload)
 		state = payload
+		sinceScan = math.huge
 		render()
 	end)
 	RunService.Heartbeat:Connect(updateMarker)

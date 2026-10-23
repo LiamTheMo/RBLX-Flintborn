@@ -9,6 +9,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local Theme = require(script.Parent.Parent.Ui.Theme)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WorldMenuController = {}
 
@@ -64,7 +66,7 @@ local function play()
 	end)
 	if not ok or not success then
 		ui.error.Text = "Could not enter the world ("
-			.. tostring(reason or success)
+			.. Reasons.Text(reason or success)
 			.. "). You are still safe — try again."
 	else
 		ui.error.Text = ""
@@ -93,6 +95,7 @@ local function build()
 	ui.menu = make("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.fromRGB(18, 15, 12),
+		Active = true,
 	}, gui)
 	local column = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -163,17 +166,17 @@ local function build()
 		LayoutOrder = 6,
 	}, column)
 
+	-- In the shared top-centre column with the other banners.
 	ui.transition = make("TextLabel", {
 		Text = "⚠ Entering world — items are now at risk",
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 80),
 		Size = UDim2.fromOffset(460, 44),
+		LayoutOrder = Theme.TopOrder.Transition,
 		BackgroundColor3 = Color3.fromRGB(120, 40, 30),
 		TextColor3 = Color3.fromRGB(255, 240, 230),
 		Font = Enum.Font.GothamBold,
 		TextSize = 18,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.transition)
 end
 

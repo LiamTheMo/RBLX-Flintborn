@@ -10,6 +10,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
@@ -17,10 +18,10 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
-local TravelService = require(script.Parent.TravelService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local ExtractionService = {}
@@ -34,6 +35,8 @@ ExtractionService.ANIMATION_SECONDS = 3
 ExtractionService.DEFAULT_MAP_RADIUS = 1000
 ExtractionService.ALERT_RADIUS = 400
 ExtractionService.ALERT_SOUND = "rbxasset://sounds/electronicpingshort.wav"
+ExtractionService.SAVE_RETRY_SECONDS = 5
+ExtractionService.SAVE_RETRY_MAX_SECONDS = 60
 
 local sites = {}
 local activeEvents = {}
@@ -103,6 +106,18 @@ local function beacon(position: Vector3, radius: number)
 	return model
 end
 
+-- Saves an extraction until it sticks: the run checkpoint is only cleared once the
+-- settlement is saved (RunCheckpointService), so nothing is lost meanwhile. Stops
+-- when the player left (their release save carries it from then on).
+local function saveUntilStored(player: Player)
+	local wait = ExtractionService.SAVE_RETRY_SECONDS
+	while player.Parent and not ProfileService.SaveNow(player) do
+		warn("[ExtractionService] Extraction save failed for " .. player.Name .. "; retrying")
+		task.wait(wait)
+		wait = math.min(wait * 2, ExtractionService.SAVE_RETRY_MAX_SECONDS)
+	end
+end
+
 -- Settles one qualified player: their items move into their profile exactly once,
 -- then they become protected and travel to the lobby.
 local function extractPlayer(player: Player, event)
@@ -117,6 +132,7 @@ local function extractPlayer(player: Player, event)
 	local ok, err = ProfileService.RunOperation(player, receiptId, "Extraction", function(profile)
 		local receipt = ExtractionRules.Settle(profile, items, event.kind, receiptId, os.time())
 		receipt.portal = event.name
+		CrashRecoveryRules.MarkEnded(profile, os.time())
 		return receipt
 	end)
 	if not ok then
@@ -129,10 +145,11 @@ local function extractPlayer(player: Player, event)
 	if root then
 		root.Anchored = true
 	end
-	ProfileService.SaveNow(player)
+	task.spawn(saveUntilStored, player)
 	task.delay(ExtractionService.ANIMATION_SECONDS, function()
 		if player.Parent then
-			TravelService.ToLobby({ player })
+			-- A failed teleport kicks with an "items saved" message instead.
+			WorldAdmissionService.SendToLobby(player)
 		end
 	end)
 end
@@ -145,11 +162,13 @@ local function resolve(event)
 	Remotes.Get("ExtractionEnded"):FireAllClients(event.id)
 	for _, player in Players:GetPlayers() do
 		local root = rootOf(player)
+		-- Presence counts at the last server-validated position, not a teleport.
+		local position = root and (AntiExploitService.ValidatedPosition(player) or root.Position)
 		local candidate = {
 			alive = aliveHumanoid(player) ~= nil,
 			downed = DownedService.IsDowned(player),
 			atRisk = WorldAdmissionService.IsAtRisk(player),
-			inZone = root ~= nil and ExtractionRules.InZone(root.Position, event.center, event.radius),
+			inZone = position ~= nil and ExtractionRules.InZone(position, event.center, event.radius),
 		}
 		if ExtractionRules.Qualifies(candidate) then
 			task.spawn(extractPlayer, player, event)
@@ -303,7 +322,10 @@ local function placeRune(player: Player, hotbarIndex: any)
 		return false, "NotARune"
 	end
 	local root = rootOf(player)
-	local ground = root and workspace:Raycast(root.Position, Vector3.new(0, -12, 0))
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { player.Character }
+	local ground = root and workspace:Raycast(root.Position, Vector3.new(0, -12, 0), params)
 	if ground == nil then
 		return false, "NoGround"
 	end

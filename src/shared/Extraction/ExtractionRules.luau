@@ -1,11 +1,14 @@
 -- Extraction qualification and settlement (GDD §9, §10.3, Q17–24, Q119, Q126–129,
 -- Q151–154, Q158). Presence counts only at the deadline. Only the fixed Center
--- portal doubles material quantities; portable runes never do. Ordinary materials
--- auto-bank into vault stacks of at most 1,000; everything else lands in the
--- durable 50-slot lobby backpack. Anything over a capacity limit is deleted and
--- listed on the receipt. Unique gear is never multiplied.
+-- portal doubles material quantities, and only what was gathered during a run:
+-- units deployed from the lobby stay tagged on their stack (InventoryRules
+-- `fromLobby`) whoever ends up carrying them; portable runes never double. Ordinary materials auto-bank into vault stacks of at
+-- most 1,000; everything else lands in the durable 50-slot lobby backpack.
+-- Anything over a capacity limit is deleted and listed on the receipt. Unique
+-- gear is never multiplied.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
@@ -70,6 +73,23 @@ local function bump(map, key: string, amount: number)
 	end
 end
 
+-- A material stack's settled quantity: the multiplier applies only to units
+-- gathered in a run, never to the ones it carries that were deployed from a lobby
+-- (by this player or anyone they took them from).
+local function multiplied(item, multiplier: number): number
+	local quantity = item.quantity or 0
+	local fromLobby = InventoryRules.FromLobby(item)
+	return fromLobby + (quantity - fromLobby) * multiplier
+end
+
+-- A Guardian Legendary counts toward the rebirth challenge on its first
+-- extraction only (v0.13); the stored copy is marked so trades and later
+-- extractions never count it again.
+local function creditsRebirth(item): boolean
+	local def = ItemCatalog.Get(item.catalogId)
+	return item.guardianEncounterId ~= nil and not item.rebirthCredited and def ~= nil and def.rarity == "Legendary"
+end
+
 -- Moves extracted items into the profile and returns the receipt. Runs inside a
 -- ProfileService operation, so it applies once per receipt ID.
 function ExtractionRules.Settle(profile, items, kind: string, receiptId: string, now: number)
@@ -87,7 +107,7 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 	for _, item in items do
 		local catalogId = item.catalogId
 		if item.instanceId == nil and ItemCatalog.IsMaterial(catalogId) then
-			local quantity = (item.quantity or 0) * multiplier
+			local quantity = multiplied(item, multiplier)
 			if ItemCatalog.IsOrdinaryMaterial(catalogId) then
 				local stored, deleted = GameConstants.SettleMaterialStack(materials[catalogId] or 0, quantity)
 				bump(receipt.vaulted, catalogId, stored - (materials[catalogId] or 0))
@@ -103,20 +123,19 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 			end
 		else
 			local copy = table.clone(item)
+			if creditsRebirth(copy) then
+				copy.rebirthCredited = true
+				profile.rebirth.legendariesSinceRebirth = (profile.rebirth.legendariesSinceRebirth or 0) + 1
+			end
 			local left = ExtractionRules.AddToLobbyBackpack(profile.lobbyBackpack.slots, copy)
 			local amount = copy.instanceId and 1 or (copy.quantity or 0)
 			bump(receipt.toBackpack, catalogId, amount - left)
 			bump(receipt.deleted, catalogId, left)
 		end
 	end
-	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09);
-	-- an extracted Guardian Legendary counts toward the rebirth challenge (v0.13).
+	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09).
 	for _, item in items do
 		profile.recipes.discovered[item.catalogId] = true
-		local def = ItemCatalog.Get(item.catalogId)
-		if def and def.rarity == "Legendary" and def.family == ItemCatalog.Families.Weapon then
-			profile.rebirth.legendariesSinceRebirth = (profile.rebirth.legendariesSinceRebirth or 0) + 1
-		end
 	end
 	ProgressionRules.SettleRun(profile, receipt, kind)
 	Receipts.Store(profile.receipts.extraction, receiptId, receipt)

@@ -85,7 +85,7 @@ test("rebirth resets only the general level and keeps everything else", function
 	expect(not ok and reason == "ChallengeIncomplete", "needs a Guardian Legendary extracted")
 	ExtractionRules.Settle(
 		profile,
-		{ { instanceId = "g1", catalogId = "GuardianFang", ownerId = 1 } },
+		{ { instanceId = "g1", catalogId = "GuardianFang", ownerId = 1, guardianEncounterId = "enc1" } },
 		"Fixed",
 		"r1",
 		1

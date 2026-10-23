@@ -92,6 +92,39 @@ function PartyRules.Leave(state: State, userId: number)
 	return true, nil
 end
 
+-- A deploy's party record (GDD Q161c). Invitees see a party's id, so the id alone
+-- never makes anyone a member in a world: the lobby writes who actually deployed
+-- under a fresh server token, and the world only trusts that record.
+PartyRules.DEPLOY_RECORD_SECONDS = 3600
+
+-- Lobby party ids and deploy tokens are server GUIDs.
+function PartyRules.IsGuid(value: any): boolean
+	return type(value) == "string"
+		and string.match(value, "^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$") ~= nil
+end
+
+function PartyRules.DeployRecord(partyId: string, userIds: { number }, worldId: string?, now: number)
+	return { partyId = partyId, members = table.clone(userIds), worldId = worldId, at = now }
+end
+
+-- The party `userId` deployed with into world `worldId`, or nil (solo) unless a
+-- fresh, well-formed record for that world lists them.
+function PartyRules.VerifiedPartyId(record: any, userId: number, worldId: string?, now: number): string?
+	if type(record) ~= "table" or not PartyRules.IsGuid(record.partyId) or type(record.members) ~= "table" then
+		return nil
+	end
+	if type(record.at) ~= "number" or now - record.at > PartyRules.DEPLOY_RECORD_SECONDS then
+		return nil
+	end
+	if record.worldId ~= nil and record.worldId ~= worldId then
+		return nil
+	end
+	if table.find(record.members, userId) == nil then
+		return nil
+	end
+	return record.partyId
+end
+
 -- Clears a player's pending invites everywhere (when they leave the lobby server).
 function PartyRules.Forget(state: State, userId: number)
 	PartyRules.Leave(state, userId)

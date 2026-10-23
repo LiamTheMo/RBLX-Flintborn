@@ -69,7 +69,10 @@ local function deploy(player: Player)
 		rollbackAll(group)
 		return false, problem
 	end
-	local teleportData = { reservations = reservations, partyId = PartyService.PartyIdOf(player) }
+	-- Only a token travels: the world checks it against the server-written record,
+	-- so editing teleport data cannot join anyone to a party they are not in.
+	local partyToken = PartyService.RecordDeploy(player, group, world.privateServerId)
+	local teleportData = { reservations = reservations, partyToken = partyToken }
 	local ok, err = TravelService.ToWorld(group, world.accessCode, teleportData)
 	if not ok then
 		rollbackAll(group)
@@ -103,7 +106,7 @@ function DeployService.Start()
 	Remotes.Handle("DeployPreview", function(player)
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
-			table.insert(items, { catalogId = item.catalogId, quantity = item.quantity })
+			table.insert(items, { catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent })
 		end
 		return items
 	end)

@@ -1,7 +1,8 @@
 -- Robux developer products (GDD §36, §38.1). ProcessReceipt fulfils each purchase
--- exactly once through an operation keyed by its PurchaseId, so retries and server
--- restarts never grant twice; it reports success only after the grant is
--- committed and saved. Every offer has an earnable route (OfferCatalog).
+-- exactly once through an operation keyed by its PurchaseId, backed by a permanent
+-- entitlement record, so retries and server restarts never grant twice; it
+-- reports success only after the grant is committed and saved. Every offer has an
+-- earnable route (OfferCatalog).
 
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
@@ -22,10 +23,7 @@ local function processReceipt(receipt)
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 	local ok = ProfileService.RunOperation(player, "purchase:" .. receipt.PurchaseId, "Purchase", function(profile)
-		local fulfilled = EconomyRules.Fulfil(profile, offer, os.time())
-		profile.currency.purchaseEntitlements[receipt.PurchaseId] =
-			{ offer = offer.id, at = os.time(), productId = receipt.ProductId }
-		return fulfilled
+		return EconomyRules.FulfilPurchase(profile, receipt.PurchaseId, offer, receipt.ProductId, os.time())
 	end)
 	if not ok then
 		return Enum.ProductPurchaseDecision.NotProcessedYet

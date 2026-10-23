@@ -1,12 +1,15 @@
 -- The world event director (GDD §7, Q42–48, Q111–112, Q140–143). About every five
 -- minutes each category rolls on its own; whatever triggers is placed at a random
--- valid spot in its biome, kept apart from other event footprints and inside the
--- server's budget, announced to everyone, and cleaned up when claimed or expired.
+-- valid spot in its biome — on the map's ground (never on a base or a player),
+-- kept apart from other event footprints, extraction auras, safe zones, the
+-- Guardian arena and totem-covered bases, and inside the server's budget —
+-- announced to everyone, and cleaned up when claimed or expired.
 -- Rare nodes pay out once and never regrow; generated ruins are never claimable.
 -- The Guardian keeps its own schedule (v0.12). World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -16,13 +19,17 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
+local BuildingService = require(script.Parent.BuildingService)
 local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
+local ExtractionService = require(script.Parent.ExtractionService)
+local GuardianService = require(script.Parent.GuardianService)
 local InventoryService = require(script.Parent.InventoryService)
 local MeteorService = require(script.Parent.MeteorService)
 local ModifierService = require(script.Parent.ModifierService)
 local NpcService = require(script.Parent.NpcService)
 local ProgressionService = require(script.Parent.ProgressionService)
+local SafeZoneService = require(script.Parent.SafeZoneService)
 
 local EventDirectorService = {}
 
@@ -32,6 +39,8 @@ EventDirectorService.PLACEMENT_ATTEMPTS = 10
 EventDirectorService.STUDIO_TICK_SECONDS = 45
 EventDirectorService.NODE_HARVEST_SECONDS = 3
 EventDirectorService.GENERATED_TAG = "GeneratedStructure"
+-- Extra distance kept from totem cover so events never land in a base.
+EventDirectorService.TOTEM_MARGIN = 20
 
 -- Spawn counts by category and rarity, for analytics in v0.17 (§7.5).
 EventDirectorService.Stats = {}
@@ -52,10 +61,29 @@ local function activeFootprints()
 	return list
 end
 
-local function groundAt(x: number, z: number): Vector3?
+-- Map ground only: structures, bodies, bosses and other events are see-through.
+local function groundParams()
+	local ignore = { folder }
+	for _, name in { BuildingService.FOLDER_NAME, "EventEnemies", "Bosses", "GuardianArena", "Arrows" } do
+		local other = workspace:FindFirstChild(name)
+		if other then
+			table.insert(ignore, other)
+		end
+	end
+	for _, player in Players:GetPlayers() do
+		if player.Character then
+			table.insert(ignore, player.Character)
+		end
+	end
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = { folder }
+	params.FilterDescendantsInstances = ignore
+	params.RespectCanCollide = true
+	return params
+end
+
+local function groundAt(x: number, z: number): Vector3?
+	local params = groundParams()
 	local hit = workspace:Raycast(Vector3.new(x, 1000, z), Vector3.new(0, -2000, 0), params)
 	if hit and hit.Material ~= Enum.Material.Water and hit.Position.Y > -50 then
 		return hit.Position
@@ -63,15 +91,37 @@ local function groundAt(x: number, z: number): Vector3?
 	return nil
 end
 
+-- Places an event must keep out of: extraction auras, safe zones, the Guardian
+-- arena and totem-covered bases.
+local function keepOut()
+	local zones = ExtractionService.Auras()
+	for _, zone in SafeZoneService.Circles() do
+		table.insert(zones, zone)
+	end
+	local arena = GuardianService.ArenaCenter()
+	if arena then
+		table.insert(zones, { center = arena, radius = GuardianService.ARENA_RADIUS })
+	end
+	for _, totem in BuildingService.Totems() do
+		table.insert(zones, { center = totem.position, radius = totem.radius + EventDirectorService.TOTEM_MARGIN })
+	end
+	return zones
+end
+
 -- A random spot in the entry's biome that keeps clear of other footprints.
 local function place(entry): Vector3?
 	local mapRadius = workspace:GetAttribute("FlintbornMapRadius") or EventDirectorService.DEFAULT_MAP_RADIUS
 	local footprints = activeFootprints()
+	local zones = keepOut()
 	for _ = 1, EventDirectorService.PLACEMENT_ATTEMPTS do
 		local angle = rng:NextNumber(0, math.pi * 2)
 		local distance = EventRules.BiomeDistance(entry.biome, rng) * mapRadius
 		local position = groundAt(math.cos(angle) * distance, math.sin(angle) * distance)
-		if position and EventRules.Separated(position, entry.footprint, footprints) then
+		if
+			position
+			and EventRules.Separated(position, entry.footprint, footprints)
+			and EventRules.ClearOf(position, entry.footprint, zones)
+		then
 			return position
 		end
 	end
