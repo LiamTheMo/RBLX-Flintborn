@@ -1,6 +1,6 @@
--- Saved player choices (GDD §23.2 choices): the camera zoom preference. Clients
--- report their zoom at most every few seconds; the server clamps and stores it
--- and hands it back on the next join as the CameraZoom attribute.
+-- Saved player choices (GDD §23.2, §25): the camera zoom preference, UI scale and
+-- accessibility options (colour-blind palette, reduced motion, subtitles). The
+-- server validates and stores them and hands them back as attributes on join.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,12 +12,40 @@ local ProfileService = require(script.Parent.ProfileService)
 local SettingsService = {}
 
 SettingsService.SAVE_INTERVAL = 5
+SettingsService.UI_SCALE = { min = 0.8, max = 1.4 }
+
+local function applyAttributes(player: Player, choices)
+	player:SetAttribute("CameraZoom", CameraRules.Clamp(choices.camera.zoom))
+	player:SetAttribute("UiScale", choices.uiScale or 1)
+	player:SetAttribute("ColourBlind", choices.colourBlindMode == true)
+	player:SetAttribute("ReducedMotion", choices.reducedMotion == true)
+	player:SetAttribute("Subtitles", choices.subtitles ~= false)
+end
 
 local lastSave = {}
 
 function SettingsService.Start()
 	ProfileService.ProfileLoaded:Connect(function(player, profile)
-		player:SetAttribute("CameraZoom", CameraRules.Clamp(profile.choices.camera.zoom))
+		applyAttributes(player, profile.choices)
+	end)
+	Remotes.Get("SaveSettings").OnServerEvent:Connect(function(player, settings)
+		if type(settings) ~= "table" then
+			return
+		end
+		local scale = tonumber(settings.uiScale)
+		ProfileService.Mutate(player, function(profile)
+			local choices = profile.choices
+			if scale and scale == scale then
+				choices.uiScale =
+					math.clamp(math.round(scale * 10) / 10, SettingsService.UI_SCALE.min, SettingsService.UI_SCALE.max)
+			end
+			for _, key in { "colourBlindMode", "reducedMotion", "subtitles" } do
+				if type(settings[key]) == "boolean" then
+					choices[key] = settings[key]
+				end
+			end
+			applyAttributes(player, choices)
+		end)
 	end)
 	Remotes.Get("SaveCamera").OnServerEvent:Connect(function(player, zoom)
 		local now = os.clock()

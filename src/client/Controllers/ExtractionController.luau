@@ -9,6 +9,7 @@ local RunService = game:GetService("RunService")
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local ExtractionController = {}
 
@@ -83,6 +84,10 @@ function ExtractionController.Start()
 	end
 	build()
 	Remotes.Get("ExtractionEvent").OnClientEvent:Connect(function(view)
+		if events[view.id] == nil then
+			-- The server plays a large-radius alert ping for every extraction start.
+			Theme.Subtitle("Extraction alert: " .. view.name)
+		end
 		events[view.id] = view
 	end)
 	Remotes.Get("ExtractionEnded").OnClientEvent:Connect(function(eventId)

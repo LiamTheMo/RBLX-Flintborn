@@ -77,6 +77,9 @@ local DEFINITIONS = {
 	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
 	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
 	SaveCamera = "RemoteEvent", -- client -> server: (zoom) preference, throttled
+	SaveSettings = "RemoteEvent", -- client -> server: {uiScale, colourBlindMode, reducedMotion, subtitles}
+	TutorialChanged = "RemoteEvent", -- server -> client: current tutorial step
+	TutorialAction = "RemoteFunction", -- ("Ack" | "Skip" | "Replay") -> ok
 }
 
 local function folder()
