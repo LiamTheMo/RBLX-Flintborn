@@ -42,9 +42,50 @@ local function updateLedger(player: Player, kind: string, apply)
 	ProfileService.RunOperation(player, kind .. ":" .. HttpService:GenerateGUID(false), kind, apply)
 end
 
+-- Lets go of an item someone carried (dropped or stored in a public chest).
+-- Releasing a Permanent item gives up ownership until it is picked up again (Q13).
+function DropService.Release(player: Player, item, location: string)
+	item.location = location
+	if item.permanent then
+		updateLedger(player, "PermanentDropped", function(profile)
+			profile.permanentItems[item.instanceId] = nil
+		end)
+	end
+end
+
+-- A copy of `item` as it would be once `player` claims it.
+function DropService.PrepareClaim(player: Player, item)
+	local copy = ProfileSchema.DeepCopy(item)
+	if copy.permanent then
+		PermanentRules.Transfer(copy, player.UserId)
+		if item.ownerId == player.UserId then
+			-- The owner took their own item back: no new owner, no version bump.
+			copy.ownershipVersion = item.ownershipVersion
+		end
+	elseif copy.instanceId then
+		copy.ownerId = player.UserId
+		copy.location = "Carried"
+	end
+	return copy
+end
+
+-- Records a claimed Permanent item in the new owner's ledger.
+function DropService.FinishClaim(player: Player, copy, previousOwnerId: number?)
+	if not copy.permanent then
+		return
+	end
+	updateLedger(player, "PermanentPickedUp", function(profile)
+		profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
+	end)
+	if previousOwnerId ~= player.UserId then
+		InventoryService.Notify(player, "You now own this Permanent " .. label(copy):gsub("^★ ", "") .. ".")
+	end
+end
+
 local pickUp
 
-local function spawnDrop(item, position: Vector3)
+-- Places an item on the ground until someone claims it.
+function DropService.Spawn(item, position: Vector3)
 	local id = HttpService:GenerateGUID(false)
 	local part = Instance.new("Part")
 	part.Name = "DroppedItem"
@@ -83,18 +124,7 @@ function pickUp(player: Player, id: string)
 	end
 	-- Claim first so a second, simultaneous pickup finds nothing.
 	drops[id] = nil
-	local copy = ProfileSchema.DeepCopy(drop.item)
-	local transferred = copy.permanent and copy.ownerId ~= player.UserId
-	if copy.permanent then
-		PermanentRules.Transfer(copy, player.UserId)
-		if not transferred then
-			-- The owner took their own item back: no new owner, no version bump.
-			copy.ownershipVersion = drop.item.ownershipVersion
-		end
-	elseif copy.instanceId then
-		copy.ownerId = player.UserId
-		copy.location = "Carried"
-	end
+	local copy = DropService.PrepareClaim(player, drop.item)
 	local remaining = InventoryService.Add(player, copy)
 	if remaining > 0 and (copy.instanceId or remaining == (drop.item.quantity or 1)) then
 		drops[id] = drop
@@ -108,14 +138,7 @@ function pickUp(player: Player, id: string)
 	else
 		drop.part:Destroy()
 	end
-	if copy.permanent then
-		updateLedger(player, "PermanentPickedUp", function(profile)
-			profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
-		end)
-		if transferred then
-			InventoryService.Notify(player, "You now own this Permanent " .. label(copy):gsub("^★ ", "") .. ".")
-		end
-	end
+	DropService.FinishClaim(player, copy, drop.item.ownerId)
 end
 
 local function dropItem(player: Player, area: any, index: any)
@@ -133,15 +156,9 @@ local function dropItem(player: Player, area: any, index: any)
 	if item == nil then
 		return false, "Empty"
 	end
-	item.location = "WorldDropped"
+	DropService.Release(player, item, "WorldDropped")
 	local ground = workspace:Raycast(root.Position + root.CFrame.LookVector * 3, Vector3.new(0, -12, 0))
-	spawnDrop(item, ground and ground.Position or (root.Position - Vector3.new(0, 2.5, 0)))
-	if item.permanent then
-		-- Dropping relinquishes it: whoever picks it up next owns it (Q13).
-		updateLedger(player, "PermanentDropped", function(profile)
-			profile.permanentItems[item.instanceId] = nil
-		end)
-	end
+	DropService.Spawn(item, ground and ground.Position or (root.Position - Vector3.new(0, 2.5, 0)))
 	return true, nil
 end
 
