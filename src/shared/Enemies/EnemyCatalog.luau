@@ -20,7 +20,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.2,
 		size = Vector3.new(2, 2.5, 4),
 		color = Color3.fromRGB(110, 110, 115),
-		drops = { { "Hide", 1, 2, 1 } },
+		drops = { { "Hide", 1, 2, 1 }, { "RawMeat", 1, 2, 1 } },
 	},
 	Boar = {
 		name = "Boar",
@@ -32,7 +32,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.4,
 		size = Vector3.new(2.5, 2.5, 4),
 		color = Color3.fromRGB(105, 76, 52),
-		drops = { { "Hide", 2, 3, 1 }, { "Berries", 1, 3, 0.4 } },
+		drops = { { "Hide", 2, 3, 1 }, { "RawMeat", 2, 3, 1 }, { "Berries", 1, 3, 0.4 } },
 	},
 	Sabertooth = {
 		name = "Sabertooth",
@@ -44,7 +44,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.3,
 		size = Vector3.new(3, 3.5, 6),
 		color = Color3.fromRGB(196, 150, 88),
-		drops = { { "Hide", 4, 6, 1 } },
+		drops = { { "Hide", 4, 6, 1 }, { "RawMeat", 3, 5, 1 } },
 	},
 	Skeleton = {
 		name = "Skeleton Warrior",
