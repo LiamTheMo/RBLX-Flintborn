@@ -163,3 +163,20 @@ Studio and live checks:
 - [ ] Wolves, skeletons and raiders chase at-risk players nearby, give up past their leash, and drop loot when killed; an elite has more health and a gold name.
 - [ ] Event loot is lost on death and only safe after extraction.
 - [ ] A full 30-player server stays smooth with several events running.
+
+## v0.12 — Bosses: Guardian and scalable encounters
+
+Automated: 7 specs cover the Guardian schedule (15–20 min after the last encounter, 3 min horn), the 25% Legendary released once per encounter ID (re-crossing cannot duplicate it), scaling clamped to 0.75×–2.0× and frozen at spawn (later gear removal and alt joins change nothing), gear scores, per-source resets (event bosses leave with their event, structure bosses heal when idle and leave with their hold, ritual bosses and the Guardian leave when uncontested) and catalog consistency. Deployed and verified on both places (2026-10-23).
+
+Placeholders: Guardian 25,000 HP with 4 pillars × 1,500 HP, arena radius 80 studs at the part tagged `GuardianArena` (else the map centre); scaling 0.75 + 0.25 × Σ(50% level/50 + 50% gear score) per at-risk player. Studio compresses the Guardian to a horn 30 s after start and a spawn 30 s later (override with the workspace attribute `FlintbornGuardianSeconds`). Ritual offering: 3 Ancient Ember + 50 Iron, 10 s summon. Event bosses: Ironhide Behemoth (Epic), Bone Colossus (Legendary); structure boss: Raider Warlord in Warlord's Hold. Bosses are blocks with phases shown in the boss bar until art arrives (v0.15).
+
+Studio and live checks (two tribes):
+
+- [ ] The Horn of War countdown appears 3 minutes ahead in a red style distinct from event banners; the Guardian rises shielded at the Center Crater.
+- [ ] Both tribes contest the pillars; when the last falls the shield drops ("Gauntlet") and the bar turns red.
+- [ ] Slams, slow bolts and red-circle quakes hurt players; standing outside the circle avoids the quake.
+- [ ] At 25% the "LEGENDARY RELEASED" cue shows and Guardian's Fang drops once; its carrier glows gold; it can be stolen and extracted.
+- [ ] Building within 80 studs of the arena is destroyed during the encounter.
+- [ ] A ritual summon is broken by a third party's hit and the offering spills; an uninterrupted summon brings the Ember Titan with a public announcement.
+- [ ] Event and structure bosses appear from the director and reset by their own rules.
+- [ ] A full server stays smooth during the Guardian fight.
