@@ -38,8 +38,7 @@ local function offeringText(): string
 	return table.concat(parts, ", ")
 end
 
--- The offering spills exactly as it was placed, deployed-from-lobby units still
--- tagged, so an interrupted ritual cannot launder them for the Center bonus.
+-- The offering spills exactly as it was placed.
 local function spill(site)
 	for _, stack in site.offering or {} do
 		DropService.Spawn(stack, site.position)

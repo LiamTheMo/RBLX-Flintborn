@@ -1,7 +1,8 @@
 -- The secure vault (GDD §10.3, Q96, Q122, Q151, Q154). 25 item slots (+25 per
 -- upgrade, v0.14) and material storage of up to 1,000 per stack. Deposits are
--- manual and are refused when there is no room, never deleted. Withdrawals go to
--- the lobby backpack, which deploys on the next Play (Q155).
+-- manual and are refused when there is no room, never deleted. Item withdrawals go
+-- to the lobby backpack, which deploys on the next Play (Q155); materials never
+-- leave the vault for a run.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
@@ -49,25 +50,6 @@ function VaultRules.WithdrawItem(profile, vaultIndex: number)
 		return false, "BackpackFull"
 	end
 	table.remove(profile.vault.items, vaultIndex)
-	return true, nil
-end
-
--- Moves `quantity` of a vaulted material into the lobby backpack, all or nothing.
-function VaultRules.WithdrawMaterial(profile, catalogId: string, quantity: number)
-	local current = profile.vault.materials[catalogId] or 0
-	if quantity <= 0 or quantity % 1 ~= 0 or quantity > current then
-		return false, "NotEnough"
-	end
-	local trial = table.clone(profile.lobbyBackpack.slots)
-	for index, slot in trial do
-		trial[index] = table.clone(slot)
-	end
-	if ExtractionRules.AddToLobbyBackpack(trial, { catalogId = catalogId, quantity = quantity }) > 0 then
-		return false, "BackpackFull"
-	end
-	profile.lobbyBackpack.slots = trial
-	local remaining = current - quantity
-	profile.vault.materials[catalogId] = if remaining > 0 then remaining else nil
 	return true, nil
 end
 
