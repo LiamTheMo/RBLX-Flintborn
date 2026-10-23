@@ -321,6 +321,16 @@ local function build()
 	end)
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function ProgressionController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	ui.confirm.Visible = false
+	if ui.panel.Visible then
+		ui.status.Text = ""
+		renderPanel()
+	end
+end
+
 function ProgressionController.Start()
 	build()
 	Remotes.Get("ProgressionChanged").OnClientEvent:Connect(function(snapshot)
@@ -340,12 +350,7 @@ function ProgressionController.Start()
 	end)
 	ContextActionService:BindAction("FlintbornProgression", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			ui.confirm.Visible = false
-			if ui.panel.Visible then
-				ui.status.Text = ""
-				renderPanel()
-			end
+			ProgressionController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.P, Enum.KeyCode.ButtonSelect)

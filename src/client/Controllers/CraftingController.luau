@@ -178,10 +178,15 @@ local function setInRun(inRun: boolean)
 	end
 	ContextActionService:BindAction("FlintbornCraft", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
+			CraftingController.Toggle()
 		end
 		return Enum.ContextActionResult.Sink
 	end, false, Enum.KeyCode.V, Enum.KeyCode.DPadUp)
+end
+
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function CraftingController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
 end
 
 function CraftingController.Start()

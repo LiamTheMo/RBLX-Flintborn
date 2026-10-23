@@ -10,6 +10,7 @@ local SoundService = game:GetService("SoundService")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local EventFeedController = {}
 
@@ -89,6 +90,7 @@ local function banner(view)
 		sound:Destroy()
 	end)
 	sound:Play()
+	Theme.Subtitle("Event alert: " .. view.rarity .. " " .. view.name)
 end
 
 local function refreshList()
