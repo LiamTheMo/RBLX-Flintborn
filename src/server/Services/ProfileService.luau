@@ -5,7 +5,10 @@
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 
 local DataStoreGateway = require(script.Parent.Parent.Infrastructure.DataStoreGateway)
 local InMemoryDataStore = require(script.Parent.Parent.Infrastructure.InMemoryDataStore)
@@ -21,6 +24,9 @@ ProfileService.SAVE_AFTER_CHANGE_SECONDS = 3
 ProfileService.LOAD_ATTEMPTS = 10
 ProfileService.LOAD_RETRY_SECONDS = 3
 ProfileService.SHUTDOWN_BUDGET_SECONDS = 25
+
+-- Fires (player, profile) once a player's profile is loaded and leased here.
+ProfileService.ProfileLoaded = Signal.new()
 
 local store
 local scheduledSaves = {}
@@ -131,6 +137,7 @@ local function loadPlayer(player: Player)
 				return
 			end
 			setStatus(player)
+			ProfileService.ProfileLoaded:Fire(player, profile)
 			return
 		end
 		lastReason = reason
