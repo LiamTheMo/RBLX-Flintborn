@@ -2,6 +2,8 @@
 
 [`GDD.md`](../../GDD.md) is the source of truth for gameplay intent. These phase documents split it into ordered, buildable versions. Each phase names the GDD rules it implements, the code it adds, how it is validated, and what it deliberately leaves for later. If a phase document and the GDD disagree, the GDD wins and the phase document must be corrected.
 
+**Finished phases** are marked ✅. Their documents are deleted once the phase's CI, deployment and tests pass; any Studio checks still to run move to [`docs/MANUAL_VALIDATION.md`](../MANUAL_VALIDATION.md).
+
 ## Branch and release model
 
 - Each phase is one **version branch** named after it (`v0.01`, `v0.02`, …). A version branch is kept permanently once complete.
@@ -13,7 +15,7 @@
 
 | Version | Phase | Builds on | Playable result |
 | --- | --- | --- | --- |
-| [v0.01](v0.01-project-foundation-and-deployment.md) | Project foundation and deployment pipeline | — | Repository, Rojo layout, CI and `main`-only publishing |
+| v0.01 ✅ | Project foundation and deployment pipeline | — | Repository, Rojo layout, CI and `main`-only publishing |
 | [v0.02](v0.02-player-data-persistence-and-session-safety.md) | Player data, persistence and session safety | v0.01 | Versioned profiles that save safely across servers |
 | [v0.03](v0.03-lobby-world-menu-and-play-admission.md) | Lobby, protected world menu and Play admission | v0.02 | Lobby → teleport → safe menu → Play → random spawn |
 | [v0.04](v0.04-survival-core.md) | Survival core: health, stamina, food and healing | v0.03 | Sprint, hunger, medicine and food heals |
