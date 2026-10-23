@@ -13,3 +13,6 @@ sourcemap.json
 build/
 __pycache__/
 *.pyc
+
+# Generated at deploy time from repository secrets
+src/shared/Generated/
