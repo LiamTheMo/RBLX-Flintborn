@@ -82,3 +82,19 @@ Studio and live checks (two players):
 - [ ] Wearing armor (select a piece in the backpack, tap its Head/Chest/Legs slot) noticeably lengthens fights; full iron roughly doubles effective health.
 - [ ] Nobody can hurt a player on the world menu, while spawning, or inside a `SafeZone` part; tribe members cannot hurt each other (tribes arrive in v0.07).
 - [ ] Combat feels fair on a throttled connection (Studio network simulation).
+
+## v0.07 — Death, departure, tribes and revives
+
+Automated: 8 specs cover the pausing 60 s bleed-out, the 10 s revive, single reviver, armored downed HP and mid-revive finishing, revived HP, tribe size/invite/kick/leadership, mutual alliances, and Permanent items never entering a 600 s body. Deployed and verified on both places (2026-10-23).
+
+Admins: the experience owner (or group ranks 254+) plus any user IDs in `src/server/Config/Admins.luau`. Command: `/safekick <name>` or `/safekick all` in chat. A graceful server shutdown also preserves every active run. Placeholders: crawl speed 2, revive range 8, alliances are labels only (allies can still hurt each other).
+
+Studio and live checks:
+
+- [ ] A solo player at 0 HP dies at once, leaves a body with their items, sees the death summary, returns to the lobby and cannot rejoin that world.
+- [ ] A tribe member at 0 HP goes down: crawls slowly, cannot heal, the 60 s timer runs; a stranger's 10 s hold revives them (timer shows "paused"); a second reviver is refused; hitting the reviver does not stop it; enemies can finish them mid-revive.
+- [ ] A revived player in full iron gets back 10 HP (at 100 max HP) and has no protection.
+- [ ] Quitting or disconnecting during a run leaves a body; leaving from the world menu does not.
+- [ ] Looting a body takes items one by one; the body and anything left vanish exactly 10 minutes after the death.
+- [ ] A lobby party arrives in the world as one tribe; T opens the tribe panel; no friendly fire inside a tribe.
+- [ ] `/safekick` mid-fight: no body, a game-update notice appears, and the same items come back once on the next Play.
