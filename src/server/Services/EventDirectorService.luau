@@ -132,7 +132,7 @@ local function spawnNode(event, loot, position: Vector3, tool: string?, onClaime
 		if EventRules.Claim(site) then
 			part:Destroy()
 			spill(loot, position, ModifierService.Sum(player, "Luck"))
-			ProgressionService.GrantXp(player, ProgressionService.XP.RareNode, event.entry.name)
+			ProgressionService.GrantXp(player, "RareNode", event.entry.name)
 			onClaimed()
 		end
 	end)

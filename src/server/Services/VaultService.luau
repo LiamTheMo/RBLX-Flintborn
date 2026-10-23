@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local VaultRules = require(ReplicatedStorage.Shared.Extraction.VaultRules)
 local ProfileService = require(script.Parent.ProfileService)
@@ -23,6 +24,9 @@ local function itemView(item)
 		quantity = item.quantity,
 		qualityRoll = item.qualityRoll,
 		permanent = item.permanent,
+		-- Trade offers name slots by this key (TradeService).
+		key = item.instanceId or ("stack:" .. item.catalogId),
+		tradeable = TradeRules.IsTradeable(item),
 	}
 end
 

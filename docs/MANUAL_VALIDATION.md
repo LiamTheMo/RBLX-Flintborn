@@ -180,3 +180,17 @@ Studio and live checks (two tribes):
 - [ ] A ritual summon is broken by a third party's hit and the offering spills; an uninterrupted summon brings the Ember Titan with a public announcement.
 - [ ] Event and structure bosses appear from the director and reset by their own rules.
 - [ ] A full server stays smooth during the Guardian fight.
+
+## v0.13 — Account progression, masteries and rebirth
+
+Automated: 8 specs cover XP saved when earned and kept through death, the 100 × n^1.5 curve capped at 50, the Center bonus equal to the run's XP once (mastery XP too, never action counts; runes never), exactly five tracks capped at 10 with titles, +1% yield per level (+10% at 10), the 132 ordering example and Premium + booster adding to +75%, rebirth resetting only the level (vault, Permanent items, masteries and perks kept; harder each time), and perk ranks spending tokens once. Deployed and verified on both places (2026-10-23).
+
+Placeholders: XP per action — gather 2, craft 5, crop 10, forge 15, chunk 15, creature 10 (elite 30), node 25, cache 40, player 20 (once per pair per 30 min), boss 100, Guardian 300. Mastery thresholds 25…3,000 actions; Crafting also gives ingredient savings (2%/level), larger stack outputs (+10% every third level), faster crafting (base 1 craft/s, +3%/level) and Forge recipe gates; PvP gives +0.5% damage per level (cap 5%) and +2% sprint per level. Rebirth needs level 50 and 1, 2, 3, 4, 6… Guardian Legendaries extracted since the last rebirth; tokens 3, +1 every third rebirth. Perks: Scholar (XP), Fortune (luck), Bounty (yield), Tidewalker (swim). Level gates now apply to Permanent spear (10) and iron gear (20), and Potions need Crafting 3.
+
+Studio and live checks:
+
+- [ ] Gathering, crafting and fighting show XP pop-ups; the level bar fills; dying keeps every point.
+- [ ] A Center extraction receipt shows the run XP and an equal bonus; a rune extraction shows no bonus.
+- [ ] Reaching mastery 5 grants its title once; the lobby name plate shows level and best title.
+- [ ] P opens the panel; in the lobby, rebirth shows Reset / Kept / Gained before confirming; buying a perk rank spends tokens once and its effect applies (e.g. Tidewalker in water).
+- [ ] A Premium test account sees "+25% XP" and earns 25% more.
