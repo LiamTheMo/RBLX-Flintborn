@@ -38,6 +38,7 @@ ShopCatalog.MATERIAL_VALUES = {
 	Herbs = 3,
 	Berries = 2,
 	Hide = 5,
+	RawMeat = 2,
 	Iron = 8,
 	Jade = 12,
 	Obsidian = 10,

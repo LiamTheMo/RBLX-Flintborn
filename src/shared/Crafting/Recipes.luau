@@ -8,6 +8,7 @@ local Recipes = {}
 
 Recipes.Anywhere = "Anywhere"
 Recipes.Workbench = "Workbench"
+Recipes.Furnace = "Furnace"
 
 local list = {
 	-- Basic, craftable anywhere: a first set in about ten minutes (Q106).
@@ -41,6 +42,9 @@ local list = {
 	{ id = "IronHead", station = "Workbench", inputs = { Iron = 8, Hide = 2, Fiber = 2 } },
 	{ id = "IronChest", station = "Workbench", inputs = { Iron = 14, Hide = 3, Fiber = 3 } },
 	{ id = "IronLegs", station = "Workbench", inputs = { Iron = 10, Hide = 2, Fiber = 2 } },
+
+	-- Cooking, at a built furnace.
+	{ id = "CookedMeat", station = "Furnace", inputs = { RawMeat = 1, Wood = 1 } },
 }
 
 Recipes.VERSION = 1
