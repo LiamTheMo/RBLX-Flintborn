@@ -11,8 +11,10 @@ local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProjectileService = require(script.Parent.ProjectileService)
@@ -46,6 +48,24 @@ local function actor(player: Player)
 	}
 end
 
+-- Applies armor-reduced damage, routing tribe members into the downed state.
+-- Returns the target's new health.
+local function applyDamage(target: Player, humanoid: Humanoid, rawDamage: number): number
+	if DownedService.IsDowned(target) then
+		-- Finishing a downed player is allowed at any time, even mid-revive (Q68).
+		DownedService.DamageDowned(target, rawDamage)
+		return humanoid.Health
+	end
+	local factor = ArmorRules.Factor(InventoryService.ArmorPieces(target))
+	local newHealth = GameConstants.ApplyDamage(humanoid.Health, factor, rawDamage)
+	if newHealth <= 0 and DownedService.TryDown(target) then
+		-- Tribe members go down instead of dying (GDD §5.3).
+		return humanoid.Health
+	end
+	humanoid.Health = newHealth
+	return newHealth
+end
+
 -- Applies raw damage from `attacker` to `target` if the rules allow it.
 -- Returns true when damage was applied.
 function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: number): boolean
@@ -59,24 +79,23 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 	if not DamageRules.CanDamage(actor(attacker), actor(target)) then
 		return false
 	end
-	local newHealth
-	if DownedService.IsDowned(target) then
-		-- Finishing a downed player is allowed at any time, even mid-revive (Q68).
-		DownedService.DamageDowned(target, rawDamage)
-		newHealth = humanoid.Health
-	else
-		local factor = ArmorRules.Factor(InventoryService.ArmorPieces(target))
-		newHealth = GameConstants.ApplyDamage(humanoid.Health, factor, rawDamage)
-		if newHealth <= 0 and DownedService.TryDown(target) then
-			-- Tribe members go down instead of dying (GDD §5.3).
-			newHealth = humanoid.Health
-		else
-			humanoid.Health = newHealth
-		end
-	end
+	local newHealth = applyDamage(target, humanoid, rawDamage)
 	Remotes.Get("CombatFeedback"):FireClient(attacker, "Hit", math.round(rawDamage))
 	Remotes.Get("CombatFeedback"):FireClient(target, "Hurt", math.round(rawDamage))
 	CombatService.Damaged:Fire(attacker, target, rawDamage, newHealth)
+	return true
+end
+
+-- Damage from the world (traps) under the same safety rules as player hits: only
+-- at-risk players outside safe zones can be hurt.
+function CombatService.ApplyEnvironmentHit(target: Player, rawDamage: number): boolean
+	local humanoid = aliveHumanoid(target)
+	local victim = actor(target)
+	if humanoid == nil or not SessionStates.IsAtRisk(victim.state) or victim.inSafeZone then
+		return false
+	end
+	applyDamage(target, humanoid, rawDamage)
+	Remotes.Get("CombatFeedback"):FireClient(target, "Hurt", math.round(rawDamage))
 	return true
 end
 
@@ -138,8 +157,12 @@ local function melee(player: Player, sequence: any, direction: any)
 			end
 		end
 	end
+	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
 	if best then
-		CombatService.ApplyHit(player, best, DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll))
+		CombatService.ApplyHit(player, best, damage)
+	else
+		-- Raiding: the same swing damages another tribe's structures (GDD Q38).
+		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage)
 	end
 end
 
