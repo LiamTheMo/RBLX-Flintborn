@@ -67,11 +67,17 @@ end)
 test("recipes are valid, arrows make exactly 10 and advanced gear needs a workbench", function()
 	for _, recipe in Recipes.List do
 		expect(ItemCatalog.Get(recipe.output) ~= nil, recipe.id .. " output exists")
-		expect(recipe.station == Recipes.Anywhere or recipe.station == Recipes.Workbench, recipe.id .. " station")
+		expect(
+			recipe.station == Recipes.Anywhere
+				or recipe.station == Recipes.Workbench
+				or recipe.station == Recipes.Furnace,
+			recipe.id .. " station"
+		)
 	end
 	expectEq(Recipes.Get("Arrow").quantity, 10, "10 arrows per craft")
 	expectEq(Recipes.Get("WoodenSpear").station, Recipes.Anywhere, "basic spear anywhere")
 	expectEq(Recipes.Get("IronSword").station, Recipes.Workbench, "iron sword needs a workbench")
+	expectEq(Recipes.Get("CookedMeat").station, Recipes.Furnace, "cooking needs a furnace")
 	expectEq(ItemCatalog.Get("IronSword").rarity, "Rare", "Rare Iron Sword")
 	expectEq(ItemCatalog.Get("StoneSword").rarity, "Common", "Common Stone Sword")
 	for id, item in ItemCatalog.Items do

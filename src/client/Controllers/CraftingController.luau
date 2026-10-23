@@ -44,6 +44,8 @@ local function craft(recipe)
 			.. (recipe.quantity > 1 and (" ×" .. recipe.quantity) or "")
 	elseif reason == "NeedsWorkbench" then
 		ui.status.Text = "Stand next to a workbench to craft that."
+	elseif reason == "NeedsFurnace" then
+		ui.status.Text = "Stand next to a furnace (build one with X) to cook that."
 	else
 		ui.status.Text = "Could not craft: " .. tostring(reason or success)
 	end
@@ -112,6 +114,8 @@ local function build()
 		local title = nameOf(recipe.output) .. (recipe.quantity > 1 and (" ×" .. recipe.quantity) or "")
 		if recipe.station == Recipes.Workbench then
 			title ..= "  · workbench"
+		elseif recipe.station == Recipes.Furnace then
+			title ..= "  · furnace"
 		end
 		make("TextLabel", {
 			Text = title,
