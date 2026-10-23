@@ -150,7 +150,7 @@ local function craft(player: Player, requestId: any, recipeId: any)
 	end
 	lastCraft[player] = now
 	InventoryService.Publish(player)
-	ProgressionService.GrantXp(player, ProgressionService.XP.Craft, "Crafting")
+	ProgressionService.GrantXp(player, "Craft", "Crafting")
 	ProgressionService.GrantMastery(player, "Crafting", 1)
 	return true, nil
 end

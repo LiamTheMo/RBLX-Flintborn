@@ -125,7 +125,7 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 	end
 	if applied then
 		-- A retried nonce returns the same receipt without granting XP again.
-		ProgressionService.GrantXp(player, ProgressionService.XP.Forge, "Forging")
+		ProgressionService.GrantXp(player, "Forge", "Forging")
 		ProgressionService.GrantMastery(player, "Crafting", 2)
 	end
 	return true, result

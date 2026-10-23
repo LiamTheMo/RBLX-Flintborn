@@ -12,6 +12,7 @@ services, or the network still needs a Studio playtest.
 """
 import json
 import shutil
+import re
 import subprocess
 import sys
 import tempfile
@@ -59,6 +60,34 @@ def build_bundle(spec: Path) -> str:
     return "\n".join(chunks)
 
 
+def require_cycles() -> list:
+    """Sibling services/controllers requiring each other in a loop deadlock at
+    runtime in Roblox, so the static graph must be acyclic."""
+    cycles = []
+    for folder in (ROOT / "src" / "server" / "Services", ROOT / "src" / "client" / "Controllers"):
+        graph = {
+            path.stem: re.findall(r"require\(script\.Parent\.(\w+)\)", path.read_text(encoding="utf-8"))
+            for path in folder.glob("*.luau")
+        }
+        state, stack = {}, []
+
+        def visit(name):
+            state[name] = 1
+            stack.append(name)
+            for nxt in graph.get(name, []):
+                if state.get(nxt) == 1:
+                    cycles.append(" -> ".join(stack[stack.index(nxt):] + [nxt]))
+                elif nxt not in state:
+                    visit(nxt)
+            stack.pop()
+            state[name] = 2
+
+        for name in graph:
+            if name not in state:
+                visit(name)
+    return cycles
+
+
 def main() -> int:
     luau = shutil.which("luau")
     if luau is None:
@@ -71,6 +100,9 @@ def main() -> int:
         return 1
 
     failed = 0
+    for cycle in require_cycles():
+        print(f"REQUIRE CYCLE: {cycle}")
+        failed += 1
     with tempfile.TemporaryDirectory() as tmp:
         for spec in specs:
             bundle = Path(tmp) / (spec.stem + ".bundle.luau")

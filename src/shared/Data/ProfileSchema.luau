@@ -41,7 +41,16 @@ function ProfileSchema.Default(now: number?)
 		lobbyBackpack = { slots = {} },
 		transit = nil,
 		permanentItems = {},
-		currency = { coins = 0, gems = 0 },
+		currency = {
+			coins = 0,
+			gems = 0,
+			gemTradeDay = 0,
+			gemsTradedToday = 0,
+			npcSaleReceipts = {},
+			purchaseEntitlements = {},
+		},
+		quests = { progress = {} },
+		trades = { pending = {}, history = {} },
 		progression = {
 			level = 1,
 			xp = 0,
