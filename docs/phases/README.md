@@ -20,7 +20,7 @@
 | v0.03 ✅ | Lobby, protected world menu and Play admission | v0.02 | Lobby → teleport → safe menu → Play → random spawn |
 | v0.04 ✅ | Survival core: health, stamina, food and healing | v0.03 | Sprint, hunger, medicine and food heals |
 | v0.05 ✅ | Gathering, inventory and field crafting | v0.04 | Harvest nodes, 9+50 inventory, craft first gear in ≤10 min |
-| [v0.06](v0.06-combat-armor-and-pvp-rules.md) | Combat, armor and PvP rules | v0.05 | Melee, bows, EHP armor, PvP everywhere |
+| v0.06 ✅ | Combat, armor and PvP rules | v0.05 | Melee, bows, EHP armor, PvP everywhere |
 | [v0.07](v0.07-death-departure-tribes-and-revives.md) | Death, departure, tribes and revives | v0.06 | Corpses, logout loss, tribes, downed and revive, safe kicks |
 | [v0.08](v0.08-extraction-lobby-backpack-and-vault.md) | Extraction, lobby backpack and secure vault | v0.07 | **First complete risk → loot → extract → vault loop** |
 | [v0.09](v0.09-ancestral-forge-and-permanent-items.md) | Ancestral Forge and Permanent items | v0.08 | Special recipes and the first Permanent pickaxe |
