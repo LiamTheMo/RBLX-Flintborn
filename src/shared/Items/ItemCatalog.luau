@@ -59,6 +59,8 @@ local entries = {
 	material("Fiber", "Plant Fiber"),
 	material("Herbs", "Herbs"),
 	material("Hide", "Hide"),
+	-- Dropped by hunted creatures; cooked at a furnace.
+	material("RawMeat", "Raw Meat"),
 	-- Inner Ring materials (GDD §18.1).
 	material("Jade", "Jade", "Uncommon"),
 	material("Obsidian", "Obsidian", "Uncommon"),

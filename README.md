@@ -7,8 +7,10 @@
 - **[Game Design Document (GDD.md)](GDD.md)** — the source of truth for gameplay intent: pillars, core loop, systems, owner decisions and change log.
 - **[Development phases (docs/phases)](docs/phases/README.md)** — the GDD split into ordered versions `v0.01` → `v0.18`, each with rules, modules, validation and exit criteria.
 - **[Roblox live deployment](docs/roblox-live-deployment.md)** and **[cloud sync safety](docs/ROBLOX_CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
+- **[Manual validation](docs/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
+- **[Release checklist](docs/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
 
-**Current phase:** [v0.15 — Shattered Crater world, art direction and camera](docs/phases/v0.15-shattered-crater-world-art-and-camera.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** [v0.18 — Release candidate and launch readiness](docs/phases/v0.18-release-candidate-and-launch-readiness.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 

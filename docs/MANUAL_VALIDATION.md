@@ -209,3 +209,49 @@ Studio and live checks (two accounts):
 - [ ] Disconnect one player mid-trade: the trade closes and nothing changes hands. (Crash recovery between the two saves is covered by specs; a forced server kill is a live check.)
 - [ ] Once product IDs exist: buy a vault upgrade and a Gem pack with Robux in a test place; each purchase grants exactly once.
 - [ ] Review Roblox purchase policy (paid random items, Premium) before release.
+
+## v0.15 — Shattered Crater world, art direction and camera
+
+Automated: 6 specs cover every portal POI having a zone radius inside its region (3 Outer + 1 hidden, 3 Inner, 1 Center), every biome having a resource pool with jade and obsidian only in the Inner Ring, safe camps with volumes in the Outer Rim, spawn candidates in all three regions, the island profile (sea, beach, a tall ridge with route gaps, an open caldera) and camera bounds. Deployed and verified on both places (2026-10-23).
+
+Placeholders: until an authored `ShatteredCrater` model is placed in the world place (Workspace or `ServerStorage.Maps`), the server builds a blocky placeholder island at start-up (radius 1,200 studs, 48-stud tiles, Outer Rim 750–1,200, Inner Ring 300–750, crater < 300, ridge at 300 with four route gaps) and removes the Studio `Baseplate` at runtime only. Set the workspace attribute `FlintbornGenerateIsland = false` to opt out. POIs and landmarks come from `src/shared/World/PoiCatalog.luau`. Camera zoom 8–40 studs.
+
+Studio and live checks:
+
+- [ ] The island loads with beaches, woodland, jungle, the ridge and caldera; landmarks (Giant Roots, Old Ruins, Monoliths, Jade Falls) are visible from a distance on low graphics.
+- [ ] Spawns land in all three regions, away from other players; extraction portals appear at named POIs with a different subset per server; the Center portal is in the crater.
+- [ ] The two safe camps show white-and-blue posts, a sign and a "safe: no damage here" notice; nobody can be hurt inside.
+- [ ] Jade and obsidian nodes appear only in the jungle and need a pickaxe.
+- [ ] N opens the map with regions, landmarks, camps, active portals and events; the compass follows the camera.
+- [ ] Zoom with wheel, pinch and right stick stays within 8–40 studs and is restored on the next spawn.
+- [ ] Traverse every ring on mobile and note travel times; 30-player performance on a mid-range phone.
+
+## v0.16 — Onboarding, UX and accessibility
+
+Automated: 4 specs cover the tutorial's learning order with a completion trigger per step, steps completing only in order and from their own trigger, rewards paid once (never after a skip or on replay, the safe Play step unskippable), and no step granting Permanent gear, more than 25 Gems or more than easy-tier Coins. Deployed and verified on both places (2026-10-23).
+
+Placeholders: ten steps (Play → Survive → Gather → Craft → Heal → Tribes → Events → Extract → Vault → Economy); rewards are a gathering XP grant and 250 Coins on the first extraction. Settings: UI scale 0.8–1.4, colour-blind (Okabe–Ito based) rarity palette, reduced motion, subtitles on by default. No new-player PvP protection (GDD Open, default none).
+
+Studio and live checks (desktop, touch and controller):
+
+- [ ] A fresh profile sees "Tutorial 1/10" in the world menu; each step advances only after doing it; "Got it" advances the explanation steps; Skip appears after the safe Play step.
+- [ ] The marker points at the nearest node, event or portal and does not bob with reduced motion on.
+- [ ] The first extraction pays 250 Coins once; replaying the tutorial from settings pays nothing again.
+- [ ] ⚙ / O opens settings: UI scale applies to every screen at once; the colour-blind palette changes rarity colours everywhere (names still shown); subtitles caption event, extraction and Guardian alerts; choices persist after rejoining.
+- [ ] The on-screen navigation bar opens every panel (vault, Forge, market, trade, progress in the lobby; backpack, craft, build, tribe, map, progress in a run) without a keyboard.
+- [ ] Testers can explain Vaulted vs Permanent; a colour-blind simulation pass over every screen.
+
+## v0.17 — Live-ops hardening
+
+Automated: 4 crash-recovery specs (a crash with no heartbeat is eligible; logout and planned shutdown never are; items already dropped, stored or traded away are excluded; restored once even when retried) and 16 security specs, one per GDD §24 case: forged Permanent IDs, double Forge requests, simultaneous devices, teleport mid-operation, death vs extraction, Center bonus replays, ineligible trades, trade interruption, double purchase receipts, rebirth replays, repeated 25% boss grants, negative quantities, DataStore budget exhaustion, structures in portal auras, malformed remote arguments and floods, and impossible movement. The spec runner also fails on require cycles. Deployed and verified on both places (2026-10-23).
+
+Placeholders: remote limits 20 calls/s per remote per player (burst 40), arguments ≤ 8, strings ≤ 256, tables ≤ 64 entries and depth 2; flood kick at 150 violations per minute; checkpoints every 15 s plus 1 s after changes, 24 h expiry; server heartbeat every 30 s, stale after 90 s; recovery retries 3 × 100 s while the player stays; movement tolerance 1.6× sprint speed + 6 studs per 0.25 s sample, two strikes before a pull-back. Analytics flush every 60 s. MemoryStore outages mean a crash cannot be recovered (documented scope).
+
+Studio and live checks:
+
+- [ ] Kill a test world server mid-fight: on rejoin (after ~90 s) the lobby shows "Server crashed — your items were recovered" and the items return once.
+- [ ] Quit normally mid-fight: no recovery; a body is left. A `/safekick` or update shutdown restores through escrow instead.
+- [ ] Drop an item, then kill the server: that item is not restored (whoever picked it up keeps it).
+- [ ] A speed exploit or teleport is pulled back; normal sprinting, crawling and long falls are not.
+- [ ] Spamming any remote gets throttled without errors for honest play.
+- [ ] Creator Dashboard shows the custom and economy events; poor-network and client-close-mid-portal tests; load tests with many drops and structures; 30-player profiling on real devices.
