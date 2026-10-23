@@ -19,7 +19,7 @@
 | v0.02 ✅ | Player data, persistence and session safety | v0.01 | Versioned profiles that save safely across servers |
 | v0.03 ✅ | Lobby, protected world menu and Play admission | v0.02 | Lobby → teleport → safe menu → Play → random spawn |
 | v0.04 ✅ | Survival core: health, stamina, food and healing | v0.03 | Sprint, hunger, medicine and food heals |
-| [v0.05](v0.05-gathering-inventory-and-field-crafting.md) | Gathering, inventory and field crafting | v0.04 | Harvest nodes, 9+50 inventory, craft first gear in ≤10 min |
+| v0.05 ✅ | Gathering, inventory and field crafting | v0.04 | Harvest nodes, 9+50 inventory, craft first gear in ≤10 min |
 | [v0.06](v0.06-combat-armor-and-pvp-rules.md) | Combat, armor and PvP rules | v0.05 | Melee, bows, EHP armor, PvP everywhere |
 | [v0.07](v0.07-death-departure-tribes-and-revives.md) | Death, departure, tribes and revives | v0.06 | Corpses, logout loss, tribes, downed and revive, safe kicks |
 | [v0.08](v0.08-extraction-lobby-backpack-and-vault.md) | Extraction, lobby backpack and secure vault | v0.07 | **First complete risk → loot → extract → vault loop** |
