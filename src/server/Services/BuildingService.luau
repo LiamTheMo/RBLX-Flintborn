@@ -73,21 +73,18 @@ end
 
 -- Structures belong to a tribe, or to a solo player until they join one.
 function BuildingService.OwnerKey(player: Player): string
-	return TribeService.TribeIdOf(player) or ("solo:" .. player.UserId)
+	return TribeService.TribeIdOf(player) or BuildRules.SoloKey(player.UserId)
 end
 
 function BuildingService.Get(part: Instance?)
 	return part and byPart[part] or nil
 end
 
--- True when `player` controls `record`: their owner key owns it, or they built it
--- and the key they built it under still owns it (a solo builder who later joined
--- a tribe keeps their doors and totems).
+-- True when `player` controls `record`: their owner key owns it, or their solo key
+-- still does (a solo builder who later joined a tribe keeps their doors and
+-- totems). A member who left or was kicked keeps nothing they built for the tribe.
 function BuildingService.IsOwnedBy(player: Player, record): boolean
-	if BuildingService.OwnerKey(player) == record.ownerKey then
-		return true
-	end
-	return record.builderId == player.UserId and record.ownerKey == record.builderKey
+	return BuildRules.Controls(BuildingService.OwnerKey(player), player.UserId, record.ownerKey)
 end
 
 local function totems()
@@ -447,9 +444,6 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		hp = level and level.hp or stats.hp,
 		maxHp = level and level.hp or stats.hp,
 		ownerKey = ownerKey,
-		-- The builder keeps control while the key they built under owns it.
-		builderId = player.UserId,
-		builderKey = ownerKey,
 		position = center,
 		half = half,
 		isTotem = isTotem,

@@ -57,6 +57,13 @@ function MovementRules.Plausible(from: Vector3, to: Vector3, dt: number, maxSpee
 	return horizontal(from, to) <= MovementRules.Limit(dt, maxSpeed)
 end
 
+-- True when a client-owned `live` position is horizontally within `slack` studs of
+-- the last server-validated one (nil: untracked, so nothing to compare). A client
+-- that teleports, acts and teleports back between two samples fails this.
+function MovementRules.NearValidated(live: Vector3, validated: Vector3?, slack: number): boolean
+	return validated == nil or horizontal(validated, live) <= slack
+end
+
 -- True for a move so far over the limit that it can only be a teleport ("blink").
 function MovementRules.Blink(from: Vector3, to: Vector3, dt: number, maxSpeed: number): boolean
 	return horizontal(from, to) > MovementRules.Limit(dt, maxSpeed) * MovementRules.BLINK_FACTOR

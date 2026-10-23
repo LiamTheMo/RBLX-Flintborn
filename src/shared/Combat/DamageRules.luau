@@ -68,4 +68,13 @@ function DamageRules.ObservedDraw(claimed: number, previousAt: number?, now: num
 	return math.clamp(math.min(claimed, observed), 0, WeaponCatalog.FULL_DRAW_SECONDS)
 end
 
+-- When the current draw could have begun at the earliest: the later of the last
+-- attack and the start of this run (an attack from an earlier run never counts).
+function DamageRules.DrawStart(lastAttackAt: number?, runStartedAt: number?): number?
+	if lastAttackAt == nil or (runStartedAt ~= nil and runStartedAt > lastAttackAt) then
+		return runStartedAt
+	end
+	return lastAttackAt
+end
+
 return DamageRules
