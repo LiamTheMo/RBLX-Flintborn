@@ -8,7 +8,7 @@
 - **[Development phases (docs/phases)](docs/phases/README.md)** — the GDD split into ordered versions `v0.01` → `v0.18`, each with rules, modules, validation and exit criteria.
 - **[Roblox live deployment](docs/roblox-live-deployment.md)** and **[cloud sync safety](docs/ROBLOX_CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
 
-**Current phase:** [v0.13 — Account progression, masteries and rebirth](docs/phases/v0.13-account-progression-masteries-and-rebirth.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** [v0.14 — Economy, shops, trading and monetization](docs/phases/v0.14-economy-shops-trading-and-monetization.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 
