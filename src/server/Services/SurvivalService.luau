@@ -79,6 +79,8 @@ local function startRun(player: Player, character: Model)
 		sprinting = false,
 		moving = false,
 		speed = 0,
+		pace = SurvivalRules.NewPace(),
+		observedSprint = false,
 		lastPublish = 0,
 		-- Snapshotted per run from masteries and perks (v0.13).
 		swimBonus = ModifierService.Sum(player, "SwimSpeed"),
@@ -98,23 +100,30 @@ local function startRun(player: Player, character: Model)
 	publish(player, entry)
 end
 
--- Moving, from horizontal root travel the server saw over the last window.
-local function observeMoving(player: Player, entry, time: number): boolean
+-- Moving, from horizontal root travel the server saw over the last window. Each
+-- sample also feeds the pace check that catches sprinting without a sprint
+-- request; it is judged against the walk speed the server currently allows.
+local function observeMoving(player: Player, entry, time: number, walkPace: number): boolean
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if root == nil then
 		entry.moving = false
+		entry.observedSprint = false
 		return false
 	end
 	local sample = entry.moveSample
 	if sample == nil or sample.root ~= root then
 		entry.moveSample = { root = root, position = root.Position, at = time }
+		entry.pace = SurvivalRules.NewPace()
 		return entry.moving
 	end
 	local elapsed = time - sample.at
 	if elapsed >= SurvivalService.MOVE_SAMPLE_SECONDS then
 		local offset = root.Position - sample.position
-		entry.speed = Vector3.new(offset.X, 0, offset.Z).Magnitude / elapsed
+		local distance = Vector3.new(offset.X, 0, offset.Z).Magnitude
+		entry.speed = distance / elapsed
 		entry.moving = entry.speed > SurvivalService.MOVING_SPEED
+		entry.observedSprint =
+			SurvivalRules.ObservePace(entry.pace, distance, elapsed, entry.humanoid.WalkSpeed, walkPace)
 		sample.position, sample.at = root.Position, time
 	end
 	return entry.moving
@@ -130,11 +139,11 @@ local function step(dt: number)
 				return
 			end
 			local rules = entry.rules
-			local moving = observeMoving(player, entry, time)
-			entry.sprinting = SurvivalRules.IsSprinting(rules, moving)
 			local swimming = humanoid:GetState() == Enum.HumanoidStateType.Swimming
 			local walkPace = SurvivalRules.WALK_SPEED * (if swimming then 1 + entry.swimBonus else 1)
-			SurvivalRules.StepStamina(rules, dt, moving, SurvivalRules.ObservedSprint(entry.speed, walkPace))
+			local moving = observeMoving(player, entry, time, walkPace)
+			entry.sprinting = SurvivalRules.IsSprinting(rules, moving)
+			SurvivalRules.StepStamina(rules, dt, moving, entry.observedSprint)
 			SurvivalRules.StepFood(rules, dt)
 			local healed = SurvivalRules.StepFoodHeals(rules, time, dt)
 			if healed > 0 then
