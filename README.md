@@ -16,7 +16,7 @@
 | --- | --- |
 | `src/server` | Server entry point (`init.server.luau`), `Services/` and `Infrastructure/` (DataStore gateway, profile store, operation journal) → `ServerScriptService.Server` |
 | `src/client` | Client entry point (`init.client.luau`) and `Controllers/` → `StarterPlayer.StarterPlayerScripts.Client` |
-| `src/shared` | Shared modules (`Core/Loader`, `Core/Signal`, `GameConstants`, `Data/` profile schema and validation) → `ReplicatedStorage.Shared` |
+| `src/shared` | Shared modules (`Core/Loader`, `Core/Signal`, `GameConstants`, `Data/` profile rules, `Admission/` session and travel rules, `Config/PlaceConfig`, `Net/Remotes`) → `ReplicatedStorage.Shared` |
 | `src/assets` | Models and images → `ReplicatedStorage.Assets` |
 | `src/maps` | World layouts → `ServerStorage.Maps` |
 | `tests/luau` | Headless Luau specs for shared modules and server modules with injected fakes |
