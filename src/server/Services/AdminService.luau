@@ -13,6 +13,10 @@ local AdminService = {}
 
 AdminService.KICK_MESSAGE =
 	"Game update: Flintborn is restarting for an update. Your items were saved and return on your next Play."
+AdminService.SAVE_RETRY_SECONDS = 10
+
+-- Targets whose escrow save is being retried before their kick.
+local retrying = {}
 
 local function notify(player: Player?, message: string)
 	if player then
@@ -35,9 +39,32 @@ function AdminService.IsAdmin(userId: number): boolean
 	return ok and rank >= Admins.MIN_GROUP_RANK
 end
 
--- Safely kicks one player. Returns false when their items could not be saved.
+-- Their run already ended into escrow but the save failed: they cannot play on
+-- (frozen, out of the run), so keep retrying the save and kick once it sticks.
+local function retryUntilSaved(target: Player)
+	if retrying[target] then
+		return
+	end
+	retrying[target] = true
+	task.spawn(function()
+		while target.Parent and MaintenanceService.IsPreserved(target) do
+			task.wait(AdminService.SAVE_RETRY_SECONDS)
+			if target.Parent and MaintenanceService.Preserve(target) then
+				target:Kick(AdminService.KICK_MESSAGE)
+				break
+			end
+		end
+		retrying[target] = nil
+	end)
+end
+
+-- Safely kicks one player. Returns false when their items could not be saved
+-- (yet: an escrow whose save failed is retried, and they are kicked once saved).
 function AdminService.SafeKick(target: Player): boolean
 	if not MaintenanceService.Preserve(target) then
+		if MaintenanceService.IsPreserved(target) then
+			retryUntilSaved(target)
+		end
 		return false
 	end
 	target:Kick(AdminService.KICK_MESSAGE)
@@ -63,8 +90,16 @@ local function runCommand(admin: Player, text: string)
 		end
 	end
 	for _, target in targets do
+		if target == admin then
+			-- A safe kick escrows held items without a body: never a way out of a fight.
+			notify(admin, "You cannot safe-kick yourself; skipped.")
+			continue
+		end
 		if not AdminService.SafeKick(target) then
-			notify(admin, "Could not save " .. target.Name .. "'s items; they were not kicked.")
+			local outcome = if MaintenanceService.IsPreserved(target)
+				then " yet; retrying, and they are kicked once it succeeds."
+				else "; they were not kicked."
+			notify(admin, "Could not save " .. target.Name .. "'s items" .. outcome)
 		end
 	end
 end

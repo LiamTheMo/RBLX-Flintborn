@@ -14,14 +14,19 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local MapController = {}
 
+-- The map's largest size; it shrinks to fit short screens (positions are scale-based).
 MapController.MAP_PIXELS = 420
+MapController.SAFE_CHECK_SECONDS = 0.25
 
 local player = Players.LocalPlayer
 local ui = {}
 local events = {}
+local safeZones = {}
+local sinceSafeCheck = math.huge
 
 local HEADINGS = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }
 
@@ -34,21 +39,18 @@ local function make(className: string, props, parent)
 	return instance
 end
 
--- World X/Z to map pixels (the island centre in the middle, -Z up as north).
+-- World X/Z to a map position (the island centre in the middle, -Z up as north).
 local function toMap(position: Vector3): UDim2
-	local scale = MapController.MAP_PIXELS / (BiomeCatalog.MAP_RADIUS * 2)
-	return UDim2.fromOffset(
-		MapController.MAP_PIXELS / 2 + position.X * scale,
-		MapController.MAP_PIXELS / 2 + position.Z * scale
-	)
+	local diameter = BiomeCatalog.MAP_RADIUS * 2
+	return UDim2.fromScale(0.5 + position.X / diameter, 0.5 + position.Z / diameter)
 end
 
 local function ring(radius: number, color: Color3)
-	local size = radius * 2 * MapController.MAP_PIXELS / (BiomeCatalog.MAP_RADIUS * 2)
+	local size = radius / BiomeCatalog.MAP_RADIUS
 	local circle = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(size, size),
+		Size = UDim2.fromScale(size, size),
 		BackgroundColor3 = color,
 	}, ui.map)
 	make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, circle)
@@ -101,7 +103,7 @@ local function headingText(): string
 end
 
 local function inSafeZone(position: Vector3): string?
-	for _, zone in CollectionService:GetTagged("SafeZone") do
+	for zone in safeZones do
 		if zone:IsA("BasePart") then
 			local localPoint = zone.CFrame:PointToObjectSpace(position)
 			local half = zone.Size / 2
@@ -122,26 +124,41 @@ local function update()
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if root then
 		ui.me.Position = toMap(root.Position)
-		local camp = inSafeZone(root.Position)
-		ui.safe.Visible = camp ~= nil
-		if camp then
-			ui.safe.Text = "🛡 " .. camp .. " — safe: no damage here"
+		if sinceSafeCheck >= MapController.SAFE_CHECK_SECONDS then
+			sinceSafeCheck = 0
+			local camp = inSafeZone(root.Position)
+			ui.safe.Visible = camp ~= nil
+			if camp then
+				ui.safe.Text = "🛡 " .. camp .. " — safe: no damage here"
+			end
 		end
 	end
+end
+
+-- Safe zones are cached from tag signals instead of queried every frame.
+local function watchSafeZones()
+	for _, zone in CollectionService:GetTagged("SafeZone") do
+		safeZones[zone] = true
+	end
+	CollectionService:GetInstanceAddedSignal("SafeZone"):Connect(function(zone)
+		safeZones[zone] = true
+	end)
+	CollectionService:GetInstanceRemovedSignal("SafeZone"):Connect(function(zone)
+		safeZones[zone] = nil
+	end)
 end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Map", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
 	ui.compass = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 2),
 		Size = UDim2.fromOffset(200, 18),
 		BackgroundTransparency = 0.5,
 		BackgroundColor3 = Color3.fromRGB(20, 18, 16),
 		TextColor3 = Color3.fromRGB(240, 230, 210),
 		Font = Enum.Font.GothamBold,
 		TextSize = 12,
-	}, gui)
+		LayoutOrder = Theme.TopOrder.Compass,
+	}, Theme.TopStack())
 	ui.safe = make("TextLabel", {
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.new(0.5, 0, 1, -150),
@@ -157,11 +174,28 @@ local function build()
 	ui.map = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(MapController.MAP_PIXELS, MapController.MAP_PIXELS),
+		Size = UDim2.fromScale(0.9, 0.9),
 		BackgroundColor3 = Color3.fromRGB(40, 90, 130),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 10) }, ui.map)
+	make("UIAspectRatioConstraint", { AspectRatio = 1 }, ui.map)
+	make("UISizeConstraint", { MaxSize = Vector2.new(MapController.MAP_PIXELS, MapController.MAP_PIXELS) }, ui.map)
+	local close = make("TextButton", {
+		Text = "✕",
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -6, 0, 6),
+		Size = UDim2.fromOffset(28, 24),
+		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
+		TextColor3 = Color3.fromRGB(245, 236, 222),
+		Font = Enum.Font.GothamBold,
+		TextSize = 14,
+		ZIndex = 5,
+	}, ui.map)
+	close.Activated:Connect(function()
+		ui.map.Visible = false
+	end)
 	ring(BiomeCatalog.Regions.OuterRim.outer, Color3.fromRGB(104, 150, 74))
 	ring(BiomeCatalog.Regions.InnerRing.outer, Color3.fromRGB(58, 112, 52))
 	ring(BiomeCatalog.Regions.CenterCrater.outer, Color3.fromRGB(70, 56, 52))
@@ -210,7 +244,11 @@ function MapController.Start()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.N, Enum.KeyCode.DPadDown)
-	RunService.RenderStepped:Connect(update)
+	watchSafeZones()
+	RunService.RenderStepped:Connect(function(dt)
+		sinceSafeCheck += dt
+		update()
+	end)
 end
 
 return MapController

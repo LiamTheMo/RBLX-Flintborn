@@ -27,7 +27,9 @@ local function onSprint(_, inputState)
 		sprintHeld = false
 		send()
 	end
-	return Enum.ContextActionResult.Pass
+	-- Sunk at high priority: Roblox's Shift Lock toggle also listens to LeftShift
+	-- (at medium priority), so sprinting no longer flips Shift Lock.
+	return Enum.ContextActionResult.Sink
 end
 
 local function onCrouch(_, inputState)
@@ -39,7 +41,14 @@ local function onCrouch(_, inputState)
 end
 
 local function bind()
-	ContextActionService:BindAction("FlintbornSprint", onSprint, true, Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL3)
+	ContextActionService:BindActionAtPriority(
+		"FlintbornSprint",
+		onSprint,
+		true,
+		Enum.ContextActionPriority.High.Value,
+		Enum.KeyCode.LeftShift,
+		Enum.KeyCode.ButtonL3
+	)
 	ContextActionService:SetTitle("FlintbornSprint", "Sprint")
 	ContextActionService:BindAction("FlintbornCrouch", onCrouch, true, Enum.KeyCode.C, Enum.KeyCode.ButtonR3)
 	ContextActionService:SetTitle("FlintbornCrouch", "Crouch")

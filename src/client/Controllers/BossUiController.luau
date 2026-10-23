@@ -2,6 +2,7 @@
 -- and remaining pillars, the Guardian's Horn of War countdown (styled apart from
 -- event and cache banners), and a clear "Legendary released" cue. World only.
 
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
@@ -45,9 +46,8 @@ local function cue(text: string, color: Color3)
 		end
 	end)
 	local sound = make("Sound", { SoundId = BossUiController.CUE_SOUND, Volume = 1, PlaybackSpeed = 0.7 }, SoundService)
-	sound.Ended:Connect(function()
-		sound:Destroy()
-	end)
+	-- Debris cleans up even when the asset fails to load and Ended never fires.
+	Debris:AddItem(sound, 5)
 	sound:Play()
 	Theme.Subtitle(text)
 end
@@ -105,14 +105,15 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "BossUi", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- The bar and the horn live in the shared top-centre column with the other banners.
+	local stack = Theme.TopStack()
 	ui.bar = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 104),
 		Size = UDim2.fromOffset(520, 38),
 		BackgroundColor3 = Color3.fromRGB(20, 16, 14),
 		BackgroundTransparency = 0.2,
+		LayoutOrder = Theme.TopOrder.BossBar,
 		Visible = false,
-	}, gui)
+	}, stack)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.bar)
 	local track = make("Frame", {
 		Position = UDim2.new(0, 8, 1, -12),
@@ -131,18 +132,23 @@ local function build()
 		TextSize = 14,
 	}, ui.bar)
 	ui.horn = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 20),
 		Size = UDim2.fromOffset(600, 36),
+		LayoutOrder = Theme.TopOrder.Horn,
+		TextWrapped = true,
 		BackgroundColor3 = Color3.fromRGB(90, 14, 14),
 		BackgroundTransparency = 0.1,
 		TextColor3 = Color3.fromRGB(255, 220, 200),
 		Font = Enum.Font.GothamBlack,
 		TextSize = 16,
 		Visible = false,
-	}, gui)
+	}, stack)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.horn)
-	make("UIStroke", { Color = Color3.fromRGB(255, 120, 80), Thickness = 2 }, ui.horn)
+	-- Border mode outlines the frame; the default (Contextual) would outline the text.
+	make(
+		"UIStroke",
+		{ Color = Color3.fromRGB(255, 120, 80), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border },
+		ui.horn
+	)
 	ui.cue = make("TextLabel", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.3),

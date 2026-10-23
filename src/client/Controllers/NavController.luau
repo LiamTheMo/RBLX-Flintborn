@@ -47,6 +47,7 @@ function NavController.Start()
 		Size = UDim2.fromOffset(140, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		Active = true,
 	}, gui)
 	make("UIListLayout", { Padding = UDim.new(0, 4), HorizontalAlignment = Enum.HorizontalAlignment.Right }, bar)
 	for _, entry in entries() do

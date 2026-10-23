@@ -128,8 +128,8 @@ function DownedService.TryDown(player: Player): boolean
 		end
 	end)
 	prompt.PromptButtonHoldEnded:Connect(function(reviver)
-		if downed[player] == entry then
-			DownedRules.StopRevive(entry.rules, reviver.UserId)
+		if downed[player] == entry and DownedRules.EndHold(entry.rules, reviver.UserId) == "Revived" then
+			revive(player)
 		end
 	end)
 	player:SetAttribute("Downed", true)

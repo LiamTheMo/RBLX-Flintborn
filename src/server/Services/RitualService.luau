@@ -38,10 +38,13 @@ local function offeringText(): string
 	return table.concat(parts, ", ")
 end
 
+-- The offering spills exactly as it was placed, deployed-from-lobby units still
+-- tagged, so an interrupted ritual cannot launder them for the Center bonus.
 local function spill(site)
-	for catalogId, quantity in BossCatalog.Ritual.offering do
-		DropService.Spawn({ catalogId = catalogId, quantity = quantity }, site.position)
+	for _, stack in site.offering or {} do
+		DropService.Spawn(stack, site.position)
 	end
+	site.offering = nil
 end
 
 local function summon(site)
@@ -76,10 +79,12 @@ local function begin(player: Player, site)
 		return
 	end
 	-- Consumed once, here, on the server.
-	if not InventoryService.RemoveAll(player, BossCatalog.Ritual.offering) then
+	local offering = InventoryService.TakeAll(player, BossCatalog.Ritual.offering)
+	if offering == nil then
 		InventoryService.Notify(player, "The ritual needs " .. offeringText() .. ".")
 		return
 	end
+	site.offering = offering
 	site.summoner = player
 	site.prompt.Enabled = false
 	site.part.Color = Color3.fromRGB(255, 110, 40)
@@ -100,6 +105,7 @@ local function begin(player: Player, site)
 		end
 		summoning[player] = nil
 		site.summoner = nil
+		site.offering = nil
 		site.part.Color = Color3.fromRGB(80, 60, 90)
 		summon(site)
 	end)

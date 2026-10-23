@@ -86,8 +86,8 @@ TutorialSteps.ACTION_TRIGGERS = {
 	Elite = "Event",
 }
 
--- Advances `state` ({step, rewardsGranted, skipped, completedAt}) when `trigger`
--- matches the current step. Returns the completed step, or nil.
+-- Advances `state` ({step, rewardsGranted, skipped, everSkipped, completedAt})
+-- when `trigger` matches the current step. Returns the completed step, or nil.
 function TutorialSteps.Advance(state, trigger: string, now: number)
 	if state.skipped or state.completedAt then
 		return nil
@@ -103,9 +103,10 @@ function TutorialSteps.Advance(state, trigger: string, now: number)
 	return step
 end
 
--- True the first time a step's reward may be paid (never after a skip).
+-- True the first time a step's reward may be paid (never after any skip, even
+-- one followed by a replay).
 function TutorialSteps.ClaimReward(state, step): boolean
-	if step.reward == nil or state.skipped or state.rewardsGranted[step.id] then
+	if step.reward == nil or state.skipped or state.everSkipped or state.rewardsGranted[step.id] then
 		return false
 	end
 	state.rewardsGranted[step.id] = true
@@ -118,11 +119,15 @@ function TutorialSteps.Skip(state): boolean
 		return false
 	end
 	state.skipped = true
+	state.everSkipped = true
 	return true
 end
 
--- Replays from the start; rewards already paid stay paid (never twice).
+-- Replays from the start; rewards already paid stay paid (never twice), and a
+-- skip stays on record so a replay cannot unlock rewards.
 function TutorialSteps.Replay(state)
+	-- Saves from before skips were remembered carry only `skipped`.
+	state.everSkipped = state.everSkipped == true or state.skipped == true
 	state.step = 1
 	state.skipped = false
 	state.completedAt = nil

@@ -9,6 +9,7 @@ local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
 local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
 local ForgeRecipes = require(script.Parent.ForgeRecipes)
+local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 
 local ForgeRules = {}
 
@@ -99,6 +100,10 @@ function ForgeRules.Craft(profile, request)
 	end
 	if profile.transit ~= nil then
 		return nil, "InTransit"
+	end
+	-- A trade that may still roll back could not reclaim consumed inputs.
+	if TradeRules.IsSettling(profile) then
+		return nil, TradeRules.SETTLING
 	end
 	if not ForgeRules.IsUnlocked(profile, recipe.id) then
 		return nil, "Locked"
