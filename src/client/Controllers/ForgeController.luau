@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local ForgeController = {}
 
@@ -37,7 +38,7 @@ local function invoke(name: string, ...)
 	if not ok then
 		return false, "Request failed"
 	end
-	return success, reason
+	return success, if success then reason else Reasons.Text(reason)
 end
 
 local function text(parent, value: string, color: Color3, size: number?, order: number?)
@@ -117,6 +118,7 @@ local function renderRecipe(recipe, order: number)
 		Size = UDim2.new(1, -8, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Color3.fromRGB(38, 32, 27),
+		Active = true,
 		LayoutOrder = order,
 	}, ui.list)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, card)
@@ -189,12 +191,15 @@ function refresh()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Forge", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Above the always-open lobby panel.
+	local gui =
+		make("ScreenGui", { Name = "Forge", ResetOnSpawn = false, DisplayOrder = 2 }, player:WaitForChild("PlayerGui"))
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.42, 0.5),
 		Size = UDim2.new(0.45, 0, 0.8, 0),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
@@ -252,6 +257,7 @@ local function build()
 		Size = UDim2.fromOffset(400, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Color3.fromRGB(40, 28, 18),
+		Active = true,
 		Visible = false,
 		ZIndex = 5,
 	}, gui)

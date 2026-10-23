@@ -1,8 +1,11 @@
 -- Planters and crops (GDD §6.1, Q41). Anyone can plant a crop in a planter by
 -- paying its seed cost, and anyone can harvest it once ripe: farms are as public
 -- as the rest of a base. Growth uses server timestamps, so crops keep growing while
--- their planter is unattended, for as long as the world exists. World place only.
+-- their planter is unattended, for as long as the world exists. Harvest XP and
+-- mastery are capped per player per minute (BuildRules.TakeCropCredit), so a field
+-- of hundreds of planters is not a progression farm. World place only.
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
@@ -27,6 +30,7 @@ local KEYS = {
 }
 
 local planters = {}
+local credits = {}
 local rng = Random.new()
 
 local function now(): number
@@ -113,8 +117,12 @@ local function harvest(player: Player, planter)
 	if remaining > 0 then
 		DropService.Spawn({ catalogId = yield.catalogId, quantity = remaining }, planter.record.position)
 	end
-	ProgressionService.GrantXp(player, "CropHarvest", "Harvest")
-	ProgressionService.GrantMastery(player, "Farming", 3)
+	local ledger = credits[player] or {}
+	credits[player] = ledger
+	if BuildRules.TakeCropCredit(ledger, now()) then
+		ProgressionService.GrantXp(player, "CropHarvest", "Harvest")
+		ProgressionService.GrantMastery(player, "Farming", 3)
+	end
 	refresh(planter)
 end
 
@@ -158,6 +166,9 @@ function FarmingService.Start()
 	end)
 	BuildingService.Removing:Connect(function(record)
 		planters[record.id] = nil
+	end)
+	Players.PlayerRemoving:Connect(function(player)
+		credits[player] = nil
 	end)
 	task.spawn(function()
 		while true do

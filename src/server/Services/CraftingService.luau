@@ -1,8 +1,10 @@
 -- Field crafting (GDD §16.8, §19.1, Q103–107). Basic recipes craft anywhere;
 -- advanced recipes need a nearby placed workbench, where gear rolls a small ±5%
 -- quality. Inputs are removed and the output created in one server step; a
--- repeated request ID is applied once, and nothing is charged if the output does
--- not fit. World place only.
+-- repeated request ID is applied once (a request refused as TooFast can be
+-- retried with the same ID), nothing is charged if the output does not fit, and
+-- downed players cannot craft. A saved ingredient that does not fit drops at the
+-- crafter's feet. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -20,6 +22,8 @@ local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local BuildingService = require(script.Parent.BuildingService)
+local DownedService = require(script.Parent.DownedService)
+local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
 local ProfileService = require(script.Parent.ProfileService)
@@ -90,6 +94,9 @@ local function craft(player: Player, requestId: any, recipeId: any)
 	if not WorldAdmissionService.IsAtRisk(player) then
 		return false, "NotInRun"
 	end
+	if DownedService.IsDowned(player) then
+		return false, "Downed"
+	end
 	local inventory = InventoryService.Get(player)
 	if inventory == nil then
 		return false, "NotInRun"
@@ -104,21 +111,23 @@ local function craft(player: Player, requestId: any, recipeId: any)
 		end
 		station = QualityRoll.Stations.WorldWorkbench
 	end
-	if not firstTime(player, requestId) then
-		return false, "Duplicate"
-	end
 	-- One craft per second, faster with Crafting mastery (Q77); also stops spam.
+	-- Checked before the request ID is recorded, so a retry is not a "Duplicate".
 	local cooldown = CraftingService.CRAFT_SECONDS / (1 + ModifierService.Sum(player, "CraftSpeed"))
 	local now = os.clock()
 	if lastCraft[player] and now - lastCraft[player] < cooldown then
 		return false, "TooFast"
 	end
+	if not firstTime(player, requestId) then
+		return false, "Duplicate"
+	end
 
 	-- Build the output, then check everything on a copy before touching the real inventory.
 	local output
 	if ItemCatalog.IsStackable(recipe.output) then
-		-- Larger outputs from Crafting mastery (every third level).
-		local quantity = ModifierRules.Final(recipe.quantity, ModifierService.Get(player, "CraftOutput"))
+		-- Larger outputs from Crafting mastery (every third level); the fraction pays
+		-- out by chance, so +30% still counts on a quantity-1 recipe.
+		local quantity = ModifierRules.RollYield(recipe.quantity, ModifierService.Get(player, "CraftOutput"), rng)
 		output = { catalogId = recipe.output, quantity = quantity }
 	else
 		output = ItemInstance.New(
@@ -150,7 +159,14 @@ local function craft(player: Player, requestId: any, recipeId: any)
 			table.insert(inputs, catalogId)
 		end
 		table.sort(inputs)
-		InventoryRules.Add(inventory, { catalogId = inputs[rng:NextInteger(1, #inputs)], quantity = 1 })
+		local refund = { catalogId = inputs[rng:NextInteger(1, #inputs)], quantity = 1 }
+		if InventoryRules.Add(inventory, table.clone(refund)) > 0 then
+			-- No room: the saved ingredient lands at the crafter's feet, not nowhere.
+			local root = rootOf(player)
+			if root then
+				DropService.Spawn(refund, root.Position - Vector3.new(0, 2.5, 0))
+			end
+		end
 	end
 	lastCraft[player] = now
 	InventoryService.Publish(player)

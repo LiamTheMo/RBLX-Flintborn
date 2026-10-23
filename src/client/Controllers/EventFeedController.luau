@@ -3,6 +3,7 @@
 -- sound. Running events stay listed with their time left, and each one's area is
 -- drawn as a faint circle on the ground. World place only.
 
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
@@ -86,9 +87,8 @@ local function banner(view)
 		end
 	end)
 	local sound = make("Sound", { SoundId = EventFeedController.ALERT_SOUND, Volume = 0.8 }, SoundService)
-	sound.Ended:Connect(function()
-		sound:Destroy()
-	end)
+	-- Debris cleans up even when the asset fails to load and Ended never fires.
+	Debris:AddItem(sound, 5)
 	sound:Play()
 	Theme.Subtitle("Event alert: " .. view.rarity .. " " .. view.name)
 end
@@ -110,17 +110,17 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "EventFeed", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- The banner lives in the shared top-centre column with the other banners.
 	ui.banner = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 64),
 		Size = UDim2.fromOffset(520, 34),
+		LayoutOrder = Theme.TopOrder.EventBanner,
 		BackgroundColor3 = Color3.fromRGB(20, 18, 16),
 		BackgroundTransparency = 0.15,
 		TextWrapped = true,
 		Font = Enum.Font.GothamBold,
 		TextSize = 16,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.banner)
 	ui.list = make("TextLabel", {
 		Position = UDim2.fromOffset(12, 120),

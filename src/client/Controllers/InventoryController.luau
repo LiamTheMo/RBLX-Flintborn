@@ -15,6 +15,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local InventoryController = {}
 
@@ -159,7 +160,12 @@ local function makeSlot(area: string, index: number, parent)
 		LayoutOrder = index,
 	}, parent)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
-	local stroke = make("UIStroke", { Thickness = 2, Color = Color3.fromRGB(70, 60, 50) }, button)
+	-- Border mode: the default (Contextual) strokes the button's empty text instead.
+	local stroke = make(
+		"UIStroke",
+		{ Thickness = 2, Color = Color3.fromRGB(70, 60, 50), ApplyStrokeMode = Enum.ApplyStrokeMode.Border },
+		button
+	)
 	local label = make("TextLabel", {
 		Size = UDim2.new(1, -6, 1, -6),
 		Position = UDim2.fromOffset(3, 3),
@@ -205,8 +211,26 @@ function InventoryController.Render()
 		end
 	end
 	ui.hint.Text = if selected
-		then "Tap another slot to move or swap, an armor slot to wear it, or Q to drop it."
+		then "Tap another slot to move or swap, an armor slot to wear it, or Drop (Q) to drop it."
 		else ""
+end
+
+-- Drops the selected slot, or else the equipped hotbar item (Q, L1 or the Drop button).
+local function dropSelected()
+	local target = selected
+		or (
+			InventoryController.Snapshot.equipped and { area = "hotbar", index = InventoryController.Snapshot.equipped }
+		)
+	selected = nil
+	if target then
+		local ok, reason = invoke("DropItem", target.area, target.index)
+		if not ok then
+			toast("Can't drop that (" .. tostring(reason) .. ")")
+		end
+	else
+		toast("Select a slot (or equip an item) to drop it.")
+	end
+	InventoryController.Render()
 end
 
 local function build()
@@ -218,6 +242,7 @@ local function build()
 		Position = UDim2.new(0.5, 0, 1, -12),
 		Size = UDim2.fromOffset(GameConstants.HOTBAR_SLOTS * 66, 62),
 		BackgroundTransparency = 1,
+		Active = true,
 	}, ui.root)
 	make("UIGridLayout", {
 		CellSize = UDim2.fromOffset(60, 60),
@@ -234,6 +259,7 @@ local function build()
 		Size = UDim2.fromOffset(10 * 66 + 12, 5 * 66 + 12),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
 		BackgroundTransparency = 0.1,
+		Active = true,
 		Visible = false,
 	}, ui.root)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.backpack)
@@ -248,28 +274,50 @@ local function build()
 	end
 
 	-- Worn armor (Head, Chest, Legs/Boots): select a piece, then tap its slot to wear it.
-	local armorRow = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -86 - (5 * 66 + 12) - 8),
-		Size = UDim2.fromOffset(3 * 66, 62),
+	-- A column beside the backpack (not above it), with the Drop button under it,
+	-- so it stays on-screen on short phone screens.
+	local side = make("Frame", {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(0.5, -(5 * 66 + 6) - 8, 1, -86),
+		Size = UDim2.fromOffset(62, 3 * 66 + 36),
 		BackgroundTransparency = 1,
+		Active = true,
 		Visible = false,
 	}, ui.root)
-	ui.armorRow = armorRow
+	ui.armorRow = side
+	local armorColumn = make("Frame", {
+		Size = UDim2.fromOffset(62, 3 * 66),
+		BackgroundTransparency = 1,
+		Active = true,
+	}, side)
 	make("UIGridLayout", {
 		CellSize = UDim2.fromOffset(60, 60),
-		CellPadding = UDim2.fromOffset(6, 0),
+		CellPadding = UDim2.fromOffset(0, 6),
 		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, armorRow)
+	}, armorColumn)
 	for index = 1, #ARMOR_SLOTS do
-		makeSlot("armor", index, armorRow)
+		makeSlot("armor", index, armorColumn)
 	end
+	-- Touch players have no Q key: this drops the selected (or equipped) item.
+	local drop = make("TextButton", {
+		Text = "Drop (Q)",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.fromOffset(62, 30),
+		BackgroundColor3 = Color3.fromRGB(120, 50, 40),
+		TextColor3 = Color3.fromRGB(245, 236, 222),
+		Font = Enum.Font.GothamBold,
+		TextSize = 12,
+	}, side)
+	make("UICorner", { CornerRadius = UDim.new(0, 6) }, drop)
+	drop.Activated:Connect(dropSelected)
 
+	-- Right of the hotbar, above the Craft button (the XP bar owns the bottom-left).
 	local toggle = make("TextButton", {
 		Text = "Backpack (B)",
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(0.5, -(GameConstants.HOTBAR_SLOTS * 33) - 8, 1, -12),
-		Size = UDim2.fromOffset(110, 30),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0.5, 8 + GameConstants.HOTBAR_SLOTS * 33, 1, -46),
+		Size = UDim2.fromOffset(100, 30),
 		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
 		TextColor3 = Color3.fromRGB(245, 236, 222),
 		Font = Enum.Font.GothamBold,
@@ -290,16 +338,15 @@ local function build()
 		TextSize = 13,
 	}, ui.root)
 	ui.toast = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 140),
 		Size = UDim2.fromOffset(420, 34),
+		LayoutOrder = Theme.TopOrder.Toast,
 		BackgroundColor3 = Color3.fromRGB(30, 26, 22),
 		BackgroundTransparency = 0.2,
 		TextColor3 = Color3.fromRGB(255, 236, 210),
 		Font = Enum.Font.GothamMedium,
 		TextSize = 15,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.toast)
 end
 
@@ -346,19 +393,7 @@ local function bindKeys(active: boolean)
 	-- Q drops the selected slot, or else the equipped hotbar item.
 	ContextActionService:BindAction("FlintbornDrop", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			local target = selected
-				or (
-					InventoryController.Snapshot.equipped
-					and { area = "hotbar", index = InventoryController.Snapshot.equipped }
-				)
-			selected = nil
-			if target then
-				local ok, reason = invoke("DropItem", target.area, target.index)
-				if not ok then
-					toast("Can't drop that (" .. tostring(reason) .. ")")
-				end
-			end
-			InventoryController.Render()
+			dropSelected()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.Q, Enum.KeyCode.ButtonL1)

@@ -9,6 +9,7 @@ local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Channel = require(script.Parent.Parent.Infrastructure.Channel)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local CombatService = require(script.Parent.CombatService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
@@ -21,20 +22,29 @@ local CacheService = {}
 
 CacheService.CHANNEL_SECONDS = 60
 CacheService.REACH = 10
+-- Extra slack for the last server-validated position, which lags a sample behind.
+CacheService.VALIDATED_SLACK = 8
 
 local rng = Random.new()
 
--- True for a living, at-risk, non-downed player within `reach` of `part`.
+-- True for a living, at-risk, non-downed player within `reach` of `part`, both
+-- where their character is and where the server last validated it (a teleport
+-- cannot hold a channel).
 function CacheService.CanInteract(player: Player, part: BasePart, reach: number): boolean
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	return root ~= nil
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
-		and (root.Position - part.Position).Magnitude <= reach
+	if root == nil or humanoid == nil or humanoid.Health <= 0 then
+		return false
+	end
+	if not WorldAdmissionService.IsAtRisk(player) or DownedService.IsDowned(player) then
+		return false
+	end
+	if part.Parent == nil or (root.Position - part.Position).Magnitude > reach then
+		return false
+	end
+	local validated = AntiExploitService.ValidatedPosition(player)
+	return validated == nil or (validated - part.Position).Magnitude <= reach + CacheService.VALIDATED_SLACK
 end
 
 -- Spawns a cache for `entry` (an EventCatalog cache) at `position`. `onOpened()`

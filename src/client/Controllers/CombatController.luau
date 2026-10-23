@@ -6,12 +6,12 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local CombatController = {}
 
@@ -35,7 +35,7 @@ end
 -- Aim from the head toward the mouse on desktop, or along the camera elsewhere.
 local function aimDirection(): Vector3
 	local head = player.Character and player.Character:FindFirstChild("Head")
-	if head and UserInputService.MouseEnabled and not UserInputService.TouchEnabled then
+	if head and Theme.UsingMouse() then
 		local direction = mouse.Hit.Position - head.Position
 		if direction.Magnitude > 0.5 then
 			return direction.Unit

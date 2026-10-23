@@ -3,14 +3,29 @@
 -- truth for the vault; falls back to server memory where MemoryStore is
 -- unavailable (Studio without API access, headless specs). Every call is guarded:
 -- a MemoryStore outage only means a crash cannot be recovered (documented).
+-- Deletes name the run they mean, so clearing one run never removes another's.
+
+local HttpService = game:GetService("HttpService")
 
 local CheckpointStore = {}
 
 CheckpointStore.CHECKPOINT_EXPIRY = 24 * 3600
 CheckpointStore.HEARTBEAT_EXPIRY = 90
+-- A cleared checkpoint leaves a short-lived marker (a delete cannot compare).
+CheckpointStore.CLEARED_EXPIRY = 60
 
 local fallback = { checkpoints = {}, heartbeats = {} }
 local maps = nil
+local jobId = nil
+
+-- This server's ID in checkpoints and heartbeats (a fixed one per Studio session).
+function CheckpointStore.JobId(): string
+	if jobId == nil then
+		local id = game.JobId
+		jobId = if type(id) == "string" and id ~= "" then id else ("studio-" .. HttpService:GenerateGUID(false))
+	end
+	return jobId
+end
 
 local function open()
 	if maps ~= nil then
@@ -64,14 +79,8 @@ local function get(kind: string, key: string)
 	return true, fallback[kind][key]
 end
 
-local function remove(kind: string, key: string)
-	fallback[kind][key] = nil
-	local store = open()
-	if store then
-		pcall(function()
-			store[kind]:RemoveAsync(key)
-		end)
-	end
+local function isRun(value, runId: string): boolean
+	return type(value) == "table" and value.runId == runId and not value.cleared
 end
 
 function CheckpointStore.Write(userId: number, checkpoint)
@@ -80,11 +89,38 @@ end
 
 -- Returns (ok, checkpointOrNil); ok is false when the store could not be read.
 function CheckpointStore.Read(userId: number)
-	return get("checkpoints", tostring(userId))
+	local ok, value = get("checkpoints", tostring(userId))
+	if type(value) == "table" and value.cleared then
+		value = nil
+	end
+	return ok, value
 end
 
-function CheckpointStore.Clear(userId: number)
-	remove("checkpoints", tostring(userId))
+-- Deletes the user's checkpoint only while it still belongs to `runId`: a newer
+-- run's checkpoint written meanwhile stays. Returns false when the shared store
+-- could not be reached (the caller retries).
+function CheckpointStore.Clear(userId: number, runId: string): boolean
+	local key = tostring(userId)
+	if isRun(fallback.checkpoints[key], runId) then
+		fallback.checkpoints[key] = nil
+	end
+	local store = open()
+	if not store then
+		return true
+	end
+	local ok, err = pcall(function()
+		store.checkpoints:UpdateAsync(key, function(old)
+			if not isRun(old, runId) then
+				-- Another run's checkpoint (or none): returning nil writes nothing.
+				return nil
+			end
+			return { runId = runId, cleared = true }
+		end, CheckpointStore.CLEARED_EXPIRY)
+	end)
+	if not ok then
+		warn(("[CheckpointStore] checkpoints clear failed: %s"):format(tostring(err)))
+	end
+	return ok
 end
 
 function CheckpointStore.Beat(jobId: string, now: number)

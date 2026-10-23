@@ -30,7 +30,7 @@ local function run(player: Player, prefix: string, nonce: any, kind: string, app
 	if not Validation.IsId(nonce) or #nonce > 50 then
 		return false, "BadRequest"
 	end
-	local ok, result = ProfileService.RunOperation(player, prefix .. nonce, kind, function(profile)
+	local ok, result, applied = ProfileService.RunOperation(player, prefix .. nonce, kind, function(profile)
 		local success, reason = apply(profile)
 		if not success then
 			error(reason, 0)
@@ -39,7 +39,10 @@ local function run(player: Player, prefix: string, nonce: any, kind: string, app
 	if not ok then
 		return false, tostring(result)
 	end
-	ProfileService.SaveNow(player)
+	-- A replayed nonce changed nothing, so it has nothing to save.
+	if applied then
+		ProfileService.SaveNow(player)
+	end
 	ProgressionService.Publish(player)
 	return true, nil
 end

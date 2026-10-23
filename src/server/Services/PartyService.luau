@@ -1,5 +1,8 @@
 -- Lobby parties (GDD Q161c): invite, accept, decline and leave, up to 8 players,
--- so a group deploys into the same world. Lobby place only.
+-- so a group deploys into the same world, where it starts as one tribe. Invitees
+-- see a party's id, so a deploy also writes who actually went to a short-lived
+-- MemoryStore record under a fresh token; the world trusts only that record and
+-- treats anything it cannot verify as solo. Party state is lobby only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -12,9 +15,12 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local PartyService = {}
 
 PartyService.REQUEST_COOLDOWN_SECONDS = 0.25
+PartyService.MAP_NAME = "FlintbornPartyDeploys"
+PartyService.STORE_ATTEMPTS = 2
 
 local state = PartyRules.NewState()
 local lastRequest = {}
+local deployMap = nil
 
 local function newPartyId()
 	return HttpService:GenerateGUID(false)
@@ -52,6 +58,73 @@ end
 function PartyService.PartyIdOf(player: Player): string?
 	local party = PartyRules.PartyOf(state, player.UserId)
 	return party and party.id or nil
+end
+
+-- The shared deploy-record map, or false where MemoryStore is unavailable.
+local function records()
+	if deployMap == nil then
+		local ok, map = pcall(function()
+			return game:GetService("MemoryStoreService"):GetHashMap(PartyService.MAP_NAME)
+		end)
+		deployMap = ok and map or false
+	end
+	return deployMap
+end
+
+-- Runs a MemoryStore call, retrying once. Returns (ok, result).
+local function tryStore(call)
+	local ok, result = false, nil
+	for attempt = 1, PartyService.STORE_ATTEMPTS do
+		ok, result = pcall(call)
+		if ok then
+			return true, result
+		end
+		if attempt < PartyService.STORE_ATTEMPTS then
+			task.wait(attempt)
+		end
+	end
+	warn("[PartyService] Deploy record unavailable: " .. tostring(result))
+	return false, nil
+end
+
+-- Lobby: records who deploys with `leader`'s party into `worldId` and returns the
+-- token their teleport data carries, or nil when they have no party or the record
+-- could not be written (they then arrive solo; the deploy itself goes ahead).
+function PartyService.RecordDeploy(leader: Player, group: { Player }, worldId: string?): string?
+	local party = PartyRules.PartyOf(state, leader.UserId)
+	local map = records()
+	if party == nil or not map then
+		return nil
+	end
+	local userIds = {}
+	for _, member in group do
+		table.insert(userIds, member.UserId)
+	end
+	local token = HttpService:GenerateGUID(false)
+	local record = PartyRules.DeployRecord(party.id, userIds, worldId, os.time())
+	local ok = tryStore(function()
+		map:SetAsync(token, record, PartyRules.DEPLOY_RECORD_SECONDS)
+	end)
+	return if ok then token else nil
+end
+
+-- World: the lobby party `player` verifiably deployed with into this world, or
+-- nil (solo). Yields for the MemoryStore read.
+function PartyService.VerifiedPartyId(player: Player): string?
+	local joinData = player:GetJoinData()
+	local data = joinData and joinData.TeleportData
+	local token = type(data) == "table" and data.partyToken or nil
+	local map = records()
+	if not PartyRules.IsGuid(token) or not map then
+		return nil
+	end
+	local ok, record = tryStore(function()
+		return map:GetAsync(token)
+	end)
+	if not ok then
+		return nil
+	end
+	return PartyRules.VerifiedPartyId(record, player.UserId, game.PrivateServerId, os.time())
 end
 
 -- Members who deploy with `player`: the whole party when they lead it, just them

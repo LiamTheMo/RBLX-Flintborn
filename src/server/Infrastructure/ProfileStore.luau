@@ -73,6 +73,7 @@ function ProfileStore:Load(userId: number)
 		changes = 0,
 		saving = false,
 		lost = false,
+		released = false,
 	}
 	return stored, nil
 end
@@ -131,7 +132,10 @@ function ProfileStore:Save(userId: number, release: boolean?)
 			reason = "Missing"
 			return nil
 		end
-		if not SessionLease.IsHeldBy(old.sessionLease, self._jobId) then
+		-- After a release whose snapshot missed later changes, the lease is already
+		-- clear; the revision check below still proves nobody else loaded since.
+		local released = entry.released and old.sessionLease == nil
+		if not released and not SessionLease.IsHeldBy(old.sessionLease, self._jobId) then
 			reason = "LeaseLost"
 			return nil
 		end
@@ -159,7 +163,13 @@ function ProfileStore:Save(userId: number, release: boolean?)
 	entry.revision = stored.profileRevision
 	entry.profile.profileRevision = stored.profileRevision
 	entry.profile.sessionLease = stored.sessionLease
-	if release then
+	entry.released = release == true
+	if release and entry.changes ~= snapshotChanges then
+		-- Something changed while the release was in flight (a departure, a refund):
+		-- write again rather than forget changes that were never saved.
+		entry.status = ProfileStore.SaveState.Pending
+		return self:Save(userId, true)
+	elseif release then
 		self._entries[userId] = nil
 	elseif entry.changes == snapshotChanges then
 		entry.status = ProfileStore.SaveState.Saved
