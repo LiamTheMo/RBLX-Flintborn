@@ -369,6 +369,12 @@ local function build()
 	}, billboard)
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function BuildController.Toggle()
+	local inRun = player:GetAttribute("SessionState") == "ActiveRun"
+	setActive(inRun and not state.active)
+end
+
 function BuildController.Start()
 	if not PlaceConfig.IsWorld() then
 		return
@@ -376,8 +382,7 @@ function BuildController.Start()
 	build()
 	ContextActionService:BindAction("FlintbornBuild", function(_, inputState)
 		if inputState == Enum.UserInputState.Begin then
-			local inRun = player:GetAttribute("SessionState") == "ActiveRun"
-			setActive(inRun and not state.active)
+			BuildController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.X, Enum.KeyCode.DPadRight)

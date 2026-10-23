@@ -64,7 +64,15 @@ function ProfileSchema.Default(now: number?)
 		recipes = { unlocked = {}, discovered = {} },
 		receipts = { extraction = {}, forge = {}, maintenance = {}, crashRecovery = {} },
 		operations = { records = {}, order = {} },
-		choices = { camera = {}, hotbarBindings = {} },
+		choices = {
+			camera = {},
+			hotbarBindings = {},
+			uiScale = 1,
+			colourBlindMode = false,
+			reducedMotion = false,
+			subtitles = true,
+		},
+		tutorial = { step = 1, skipped = false, completedAt = nil, rewardsGranted = {} },
 		metrics = { runs = 0, extractions = 0, deaths = 0 },
 	}
 end

@@ -8,12 +8,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local VaultRules = require(ReplicatedStorage.Shared.Extraction.VaultRules)
 local ProfileService = require(script.Parent.ProfileService)
 
 local VaultService = {}
+
+-- Fires (player) after a successful manual deposit.
+VaultService.Deposited = Signal.new()
 
 local function itemView(item)
 	local def = ItemCatalog.Get(item.catalogId)
@@ -112,9 +116,13 @@ function VaultService.Start()
 		if not Validation.IsQuantity(index, 1, 50) then
 			return false, "BadRequest"
 		end
-		return operate(player, "VaultDeposit", function(profile)
+		local ok, reason = operate(player, "VaultDeposit", function(profile)
 			return VaultRules.Deposit(profile, index)
 		end)
+		if ok then
+			VaultService.Deposited:Fire(player)
+		end
+		return ok, reason
 	end
 	Remotes.Get("VaultWithdrawItem").OnServerInvoke = function(player, index)
 		if not Validation.IsQuantity(index, 1, 1000) then

@@ -8,6 +8,7 @@ local SoundService = game:GetService("SoundService")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local BossUiController = {}
 
@@ -48,6 +49,7 @@ local function cue(text: string, color: Color3)
 		sound:Destroy()
 	end)
 	sound:Play()
+	Theme.Subtitle(text)
 end
 
 local function nearestBoss()

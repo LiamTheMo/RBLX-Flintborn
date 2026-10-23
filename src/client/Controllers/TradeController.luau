@@ -285,6 +285,14 @@ local function build()
 	end
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function TradeController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	if ui.panel.Visible then
+		render()
+	end
+end
+
 function TradeController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
@@ -310,10 +318,7 @@ function TradeController.Start()
 	end)
 	ContextActionService:BindAction("FlintbornTrade", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			if ui.panel.Visible then
-				render()
-			end
+			TradeController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
 	end, false, Enum.KeyCode.Y, Enum.KeyCode.ButtonL1)
