@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.9  
+> **Design revision:** 1.10  
 > **Last updated:** 2026-10-23  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2180,6 +2180,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.10** | 2026-10-23 | Owner decided Q164a: any material in the lobby backpack goes straight back into the vault and cannot be taken out; overflow beyond the vault's capacity is deleted. Trade-eligible materials are now offered from the vault. Updated §45. |
 | **1.9** | 2026-10-23 | Owner decided Q164: extracted materials can never come back out into the play world, and every extracted material (special ones included) banks into the vault, whose per-material capacity decides overflow deletion. Added §45 and marked the superseded routing in §9–10, §34, §39–41. |
 
 ## 44. Launch starting values (v0.18)
@@ -2198,16 +2199,17 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 | # | Decision | Consequences |
 | --- | --- | --- |
 | **164** | **Extracted materials can never come back out into the play world.** Every extracted material, special ones included, banks into the secure vault; the vault's material capacity (1,000 per type) alone decides what overflow is deleted. | Supersedes the special-material half of Q129 and narrows Q155. |
+| **164a** | **Any material in the lobby backpack goes straight back into the vault and cannot be taken out; overflow beyond the vault's capacity is deleted.** | The lobby backpack never holds a material. |
 
 **Rules**
 
-1. **Materials never deploy.** Pressing Play moves every unvaulted lobby backpack/hotbar item into the run *except* materials. This holds whatever route put a material in the lobby backpack (old saves, trades, crash recovery): it stays there until deposited, sold or traded.
-2. **No material withdrawal.** Vault materials serve the Forge, merchants and trades only; the vault has no "withdraw material" action. Gear and other items withdraw as before.
+1. **Materials never deploy, and never wait in the backpack (Q164a).** Any material that reaches the lobby backpack, by any route (an old save, a trade or its rollback, crash recovery, run-start overflow), banks into the vault in the same write; whatever exceeds the vault's capacity is deleted and shown in the vault for a day. Pressing Play therefore only ever deploys gear, ammunition, consumables and placeables (and still skips materials as a backstop).
+2. **No material withdrawal.** Vault materials serve the Forge, merchants and trades only (trade-eligible materials are offered straight from the vault); the vault has no "withdraw material" action and no manual material deposit. Gear and other items withdraw and deposit as before.
 3. **Extraction routing.** Every material settles into the material vault, with the Center ×2 applied once. Units above the 1,000-per-type capacity are deleted and listed on the receipt. A full lobby backpack never deletes materials. Gear, tools and other items still land in the 50-slot lobby backpack, where only a full backpack deletes (Q154).
 4. **Center 2× needs no carried-in tracking.** Since nothing material enters a run from the lobby, every material a run extracts was gathered (or looted) in a run, so the earlier per-stack carried-in tagging is removed.
 5. **In-world needs come from the world.** Farming seeds, ritual offerings and building costs are gathered in the run; the lobby shop no longer sells Herb seeds (Herbs are a material).
 
-**QA:** a Deploy with Wood, Ancient Ember, a spear and arrows in the backpack reserves only the spear and arrows; the Deploy list shows the materials as staying behind. A Center extraction into a vault already holding 990 Stone stores 1,000 and deletes 50, listed on the receipt, even when the lobby backpack is full.
+**QA:** a save holding 20 Iron in its backpack and 995 in the vault loads with 1,000 Iron vaulted, 15 deleted and shown, and an empty-of-materials backpack; a trade or crash recovery that delivers materials banks them in the same write; a Deploy only ever reserves non-materials. A Center extraction into a vault already holding 990 Stone stores 1,000 and deletes 50, listed on the receipt, even when the lobby backpack is full.
 
 ---
 

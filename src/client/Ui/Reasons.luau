@@ -6,6 +6,8 @@ local Reasons = {}
 local TEXT = {
 	RecoveringItems = "your items from a crashed server are still being recovered — try again in a minute",
 	TradeSettling = "a recent trade is still being saved — try again shortly",
+	PartnerVaultFull = "their vault has no room for that many",
+	BadQuantity = "that amount isn't allowed",
 }
 
 function Reasons.Text(code: any): string
