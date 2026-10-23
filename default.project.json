@@ -1,0 +1,39 @@
+{
+  "name": "RBLX-Flintborn",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "Assets": {
+        "$path": "src/assets"
+      }
+    },
+
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Maps": {
+        "$path": "src/maps"
+      }
+    },
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Server": {
+        "$path": "src/server"
+      }
+    },
+
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
