@@ -84,26 +84,35 @@ test("a purchase retried after the journal trims never grants twice", function()
 	expectEq(profile.currency.purchaseEntitlements.P1.offer, "GemPack", "entitlement kept")
 end)
 
-test("the Center doubles only materials gathered during the run", function()
+test("every extracted material banks into the vault, special ones included", function()
 	local profile = ProfileSchema.Default(0)
-	-- Deployed stacks carry their lobby units with them (InventoryRules.MarkFromLobby).
 	ProgressionRules.StartRun(profile, "run1")
-	ExtractionRules.Settle(profile, {
-		{ catalogId = "AncientEmber", quantity = 1, fromLobby = 1 },
-		{ catalogId = "Stone", quantity = 30, fromLobby = 10 },
+	local receipt = ExtractionRules.Settle(profile, {
+		{ catalogId = "AncientEmber", quantity = 1 },
+		{ catalogId = "Stone", quantity = 30 },
 	}, "Center", "r1", 1)
-	expectEq(profile.lobbyBackpack.slots[1].quantity, 1, "a deployed Ancient Ember comes back as 1")
-	expectEq(profile.vault.materials.Stone, 50, "10 carried + 20 gathered x2")
+	expectEq(profile.vault.materials.AncientEmber, 2, "Ancient Ember is vaulted and doubled")
+	expectEq(profile.vault.materials.Stone, 60, "gathered Stone doubled")
+	expectEq(#profile.lobbyBackpack.slots, 0, "no material lands in the lobby backpack")
+	expectEq(receipt.vaulted.AncientEmber, 2, "the receipt lists it as vaulted")
 end)
 
-test("carried-in stacks split across slots still double only once", function()
+test("the vault's material capacity, not the backpack, decides what is deleted", function()
 	local profile = ProfileSchema.Default(0)
-	ProgressionRules.StartRun(profile, "run1")
-	ExtractionRules.Settle(profile, {
-		{ catalogId = "Stone", quantity = 6, fromLobby = 6 },
-		{ catalogId = "Stone", quantity = 6, fromLobby = 4 },
+	for i = 1, 50 do
+		table.insert(profile.lobbyBackpack.slots, { instanceId = "s" .. i, catalogId = "StoneSpear" })
+	end
+	profile.vault.materials.Stone = 990
+	local receipt = ExtractionRules.Settle(profile, {
+		{ catalogId = "Stone", quantity = 30 },
+		{ catalogId = "AncientEmber", quantity = 3 },
+		{ instanceId = "late", catalogId = "StoneSpear" },
 	}, "Center", "r1", 1)
-	expectEq(profile.vault.materials.Stone, 14, "10 carried + 2 gathered x2")
+	expectEq(profile.vault.materials.Stone, 1000, "Stone fills the vault stack")
+	expectEq(receipt.vaulted.Stone, 10, "10 of 60 fit")
+	expectEq(receipt.deleted.Stone, 50, "the rest is deleted and listed")
+	expectEq(profile.vault.materials.AncientEmber, 6, "a full backpack never deletes materials")
+	expectEq(receipt.deleted.StoneSpear, 1, "gear still overflows the 50-slot backpack")
 end)
 
 test("a Guardian Legendary counts toward rebirth on its first extraction only", function()

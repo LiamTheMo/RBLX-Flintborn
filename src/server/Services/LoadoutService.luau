@@ -134,7 +134,7 @@ end
 -- What the run inventory will hold of `items`: the same packing InventoryService
 -- applies at run start, whose leftovers it saves back to the lobby backpack.
 local function carriedPart(items)
-	local inventory = InventoryRules.Deploy(ProfileSchema.DeepCopy(items))
+	local inventory = InventoryRules.FromItems(ProfileSchema.DeepCopy(items))
 	return InventoryRules.Items(inventory)
 end
 

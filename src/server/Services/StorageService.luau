@@ -92,7 +92,7 @@ local function take(player: Player, id: any, index: any)
 		return false, "NoRoom"
 	end
 	if remaining > 0 then
-		InventoryRules.KeepRemainder(entry, remaining)
+		entry.quantity = remaining
 	else
 		table.remove(chest.slots, index)
 	end
