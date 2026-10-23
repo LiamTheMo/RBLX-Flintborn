@@ -3,7 +3,8 @@
 -- picks targets from its own positions, enforces cadence, reach, arc, line of
 -- sight, risk state, friendly fire and safe zones, and applies damage through
 -- armor EHP. Nobody inside a safe zone deals damage to anything (§3.2). Arrows
--- leave from the head, and draw time is capped at what the server saw. World only.
+-- leave from the head, and draw time is capped at what the server saw. Swings and
+-- shots only count near the player's last server-validated position. World only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,11 +13,13 @@ local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
+local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -32,6 +35,9 @@ local CombatService = {}
 CombatService.Damaged = Signal.new()
 -- Fires (targetPlayer) whenever a player takes damage from anything.
 CombatService.Hurt = Signal.new()
+-- How far (horizontally) a swing's root may be from the last validated position:
+-- two samples of sprinting (one of them a forgiven overrun from jitter).
+CombatService.VALIDATED_SLACK = 12
 
 local lastAttack = {}
 local lastSequence = {}
@@ -177,6 +183,12 @@ local function melee(player: Player, sequence: any, direction: any)
 	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) or inSafeZone(player) then
 		return
 	end
+	-- Reach is measured from the client-owned root, so it must also sit near where
+	-- the server last validated the player (no teleport, swing, teleport back).
+	local validated = AntiExploitService.ValidatedPosition(player)
+	if not MovementRules.NearValidated(root.Position, validated, CombatService.VALIDATED_SLACK) then
+		return
+	end
 	local equipped = InventoryService.Equipped(player)
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
 	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
@@ -229,9 +241,14 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	if inSafeZone(player) then
 		return
 	end
+	-- The arrow leaves from the client-owned head: it must be near the validated spot.
+	local validated = AntiExploitService.ValidatedPosition(player)
+	if not MovementRules.NearValidated(head.Position, validated, CombatService.VALIDATED_SLACK) then
+		return
+	end
 	local equipped = InventoryService.Equipped(player)
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
-	local previous = lastAttack[player] or runStartedAt[player]
+	local previous = DamageRules.DrawStart(lastAttack[player], runStartedAt[player])
 	if profile.kind ~= "Bow" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end

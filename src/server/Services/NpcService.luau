@@ -264,7 +264,8 @@ local function step(dt: number)
 		local target, targetRoot, best = nil, nil, EnemyCatalog.AGGRO
 		for _, player in Players:GetPlayers() do
 			local root = rootOf(player)
-			if root and canTarget(player) and (root.Position - npc.home).Magnitude <= EnemyCatalog.LEASH then
+			-- The cheap leash test first: canTarget scans every safe zone.
+			if root and (root.Position - npc.home).Magnitude <= EnemyCatalog.LEASH and canTarget(player) then
 				local distance = (root.Position - position).Magnitude
 				if distance < best then
 					target, targetRoot, best = player, root, distance

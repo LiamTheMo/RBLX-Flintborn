@@ -101,6 +101,19 @@ function BuildRules.InSight(hitDistance: number?, targetDistance: number): boole
 	return hitDistance == nil or hitDistance >= targetDistance - BuildRules.SIGHT_TOLERANCE
 end
 
+-- The owner key of a player who is in no tribe.
+function BuildRules.SoloKey(userId: number): string
+	return "solo:" .. userId
+end
+
+-- True when a player (current owner key `playerKey`, `userId`) controls a structure
+-- owned by `ownerKey`: it is their current key's, or their own solo key still owns
+-- it (a solo builder who later joined a tribe keeps their doors and totems). Pieces
+-- built for a tribe stay the tribe's: a member who leaves or is kicked loses them.
+function BuildRules.Controls(playerKey: string, userId: number, ownerKey: string): boolean
+	return ownerKey == playerKey or ownerKey == BuildRules.SoloKey(userId)
+end
+
 -- True when `ownerKey` already has the maximum number of totems.
 function BuildRules.TotemLimitReached(totems, ownerKey: string): boolean
 	local count = 0
