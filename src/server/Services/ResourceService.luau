@@ -8,6 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
+local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local InventoryService = require(script.Parent.InventoryService)
@@ -36,6 +37,18 @@ local LOOKS = {
 	FiberPlant = { size = Vector3.new(2, 3, 2), color = Color3.fromRGB(130, 170, 80), shape = Enum.PartType.Block },
 	HerbShrub = { size = Vector3.new(3, 2, 3), color = Color3.fromRGB(70, 140, 90), shape = Enum.PartType.Ball },
 	BerryBush = { size = Vector3.new(3, 3, 3), color = Color3.fromRGB(150, 50, 80), shape = Enum.PartType.Ball },
+	JadeVein = {
+		size = Vector3.new(4, 5, 4),
+		color = Color3.fromRGB(70, 190, 130),
+		shape = Enum.PartType.Block,
+		material = Enum.Material.Glass,
+	},
+	ObsidianOutcrop = {
+		size = Vector3.new(5, 4, 5),
+		color = Color3.fromRGB(30, 26, 40),
+		shape = Enum.PartType.Block,
+		material = Enum.Material.Glass,
+	},
 }
 
 local nodes = {}
@@ -128,31 +141,65 @@ local function groundPoint(radius: number): Vector3?
 	return nil
 end
 
+local function makeNode(folder: Folder, nodeType: string, position: Vector3)
+	local look = LOOKS[nodeType]
+	local part = Instance.new("Part")
+	part.Name = nodeType
+	part.Anchored = true
+	part.Shape = look.shape
+	part.Size = look.size
+	part.Color = look.color
+	part.Material = look.material or Enum.Material.SmoothPlastic
+	part.CFrame = if look.shape == Enum.PartType.Cylinder
+		then CFrame.new(position + Vector3.new(0, look.size.Y / 2, 0)) * CFrame.Angles(0, 0, math.rad(90))
+		else CFrame.new(position + Vector3.new(0, look.size.Y / 2, 0))
+	if look.shape == Enum.PartType.Cylinder then
+		part.Size = Vector3.new(look.size.Y, look.size.X, look.size.Z)
+	end
+	part:SetAttribute("NodeType", nodeType)
+	part.Parent = folder
+	register(part, nodeType)
+end
+
+-- A ground point between two distances from the centre (uniform over the area).
+local function groundInBand(inner: number, outer: number): Vector3?
+	local angle = rng:NextNumber(0, math.pi * 2)
+	local distance = math.sqrt(rng:NextNumber() * (outer * outer - inner * inner) + inner * inner)
+	local origin = Vector3.new(math.cos(angle) * distance, 1000, math.sin(angle) * distance)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { workspace:FindFirstChild("ResourceNodes") }
+	local hit = workspace:Raycast(origin, Vector3.new(0, -2000, 0), params)
+	if hit and hit.Material ~= Enum.Material.Water and hit.Position.Y > -50 then
+		return hit.Position
+	end
+	return nil
+end
+
 local function scatter()
 	local folder = Instance.new("Folder")
 	folder.Name = "ResourceNodes"
 	folder.Parent = workspace
+	if workspace:GetAttribute("FlintbornIsland") then
+		-- The Shattered Crater: each biome has its own resource pool (GDD §3, §18.1).
+		for _, biome in BiomeCatalog.Biomes do
+			for nodeType, count in biome.resources do
+				for _ = 1, count do
+					local position = groundInBand(biome.inner, biome.outer)
+					if position then
+						makeNode(folder, nodeType, position)
+					end
+				end
+			end
+		end
+		return
+	end
 	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
 	for nodeType, count in ResourceService.SCATTER do
-		local look = LOOKS[nodeType]
 		for _ = 1, count do
 			local position = groundPoint(radius)
 			if position then
-				local part = Instance.new("Part")
-				part.Name = nodeType
-				part.Anchored = true
-				part.Shape = look.shape
-				part.Size = look.size
-				part.Color = look.color
-				part.CFrame = if look.shape == Enum.PartType.Cylinder
-					then CFrame.new(position + Vector3.new(0, look.size.Y / 2, 0)) * CFrame.Angles(0, 0, math.rad(90))
-					else CFrame.new(position + Vector3.new(0, look.size.Y / 2, 0))
-				if look.shape == Enum.PartType.Cylinder then
-					part.Size = Vector3.new(look.size.Y, look.size.X, look.size.Z)
-				end
-				part:SetAttribute("NodeType", nodeType)
-				part.Parent = folder
-				register(part, nodeType)
+				makeNode(folder, nodeType, position)
 			end
 		end
 	end
