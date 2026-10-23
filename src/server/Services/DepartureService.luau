@@ -161,7 +161,7 @@ function DepartureService.Start()
 		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 		depart(player, root and root.Position or nil)
 	end)
-	Remotes.Get("CorpseTake").OnServerInvoke = take
+	Remotes.Handle("CorpseTake", take)
 	local elapsed = 0
 	RunService.Heartbeat:Connect(function(dt)
 		elapsed += dt

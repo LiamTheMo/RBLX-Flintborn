@@ -160,8 +160,8 @@ function StorageService.Start()
 			DropService.Spawn(item, record.position)
 		end
 	end)
-	Remotes.Get("ChestTake").OnServerInvoke = take
-	Remotes.Get("ChestPut").OnServerInvoke = put
+	Remotes.Handle("ChestTake", take)
+	Remotes.Handle("ChestPut", put)
 end
 
 return StorageService

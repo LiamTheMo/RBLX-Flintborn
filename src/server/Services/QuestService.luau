@@ -31,8 +31,8 @@ function QuestService.Start()
 			record(player, "Extract")
 		end
 	end)
-	Remotes.Get("QuestView").OnServerInvoke = view
-	Remotes.Get("QuestClaim").OnServerInvoke = function(player, questId)
+	Remotes.Handle("QuestView", view)
+	Remotes.Handle("QuestClaim", function(player, questId)
 		local quest = QuestCatalog.Get(questId)
 		if quest == nil then
 			return false, "BadRequest"
@@ -43,7 +43,7 @@ function QuestService.Start()
 		end)
 		ProgressionService.Publish(player)
 		return ok, result
-	end
+	end)
 end
 
 return QuestService

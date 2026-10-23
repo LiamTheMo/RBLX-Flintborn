@@ -5,10 +5,15 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local ProfileService = require(script.Parent.ProfileService)
 
 local CurrencyService = {}
+
+-- Fires (player, kind, coinsDelta, gemsDelta, coins, gems) after a committed
+-- operation changes the wallet (faucets and sinks for analytics, §26.3).
+CurrencyService.Changed = Signal.new()
 
 function CurrencyService.Publish(player: Player)
 	local profile = ProfileService.GetProfile(player)
@@ -25,13 +30,29 @@ function CurrencyService.Run(player: Player, prefix: string, nonce: any, kind: s
 	if not Validation.IsId(nonce) or #nonce > 50 then
 		return false, "BadRequest"
 	end
-	local ok, result = ProfileService.RunOperation(player, prefix .. nonce, kind, function(profile)
+	local before = ProfileService.GetProfile(player)
+	local coins, gems = before and before.currency.coins or 0, before and before.currency.gems or 0
+	local ok, result, applied = ProfileService.RunOperation(player, prefix .. nonce, kind, function(profile)
 		local success, value = apply(profile)
 		if not success then
 			error(value, 0)
 		end
 		return value
 	end)
+	local after = ProfileService.GetProfile(player)
+	if applied and after then
+		local currency = after.currency
+		if currency.coins ~= coins or currency.gems ~= gems then
+			CurrencyService.Changed:Fire(
+				player,
+				kind,
+				currency.coins - coins,
+				currency.gems - gems,
+				currency.coins,
+				currency.gems
+			)
+		end
+	end
 	CurrencyService.Publish(player)
 	if not ok then
 		return false, tostring(result)

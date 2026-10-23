@@ -238,8 +238,8 @@ function WorldAdmissionService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("RequestPlay").OnServerInvoke = requestPlay
-	Remotes.Get("ReturnToLobby").OnServerInvoke = returnToLobby
+	Remotes.Handle("RequestPlay", requestPlay)
+	Remotes.Handle("ReturnToLobby", returnToLobby)
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	for _, player in Players:GetPlayers() do
 		task.spawn(onPlayerAdded, player)

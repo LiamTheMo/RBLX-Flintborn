@@ -278,18 +278,18 @@ function TradeService.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	Remotes.Get("TradeRequest").OnServerInvoke = request
-	Remotes.Get("TradeRespond").OnServerInvoke = respond
-	Remotes.Get("TradeOffer").OnServerInvoke = offer
-	Remotes.Get("TradeLock").OnServerInvoke = lock
-	Remotes.Get("TradeConfirm").OnServerInvoke = confirm
-	Remotes.Get("TradeCancel").OnServerInvoke = function(player, id)
+	Remotes.Handle("TradeRequest", request)
+	Remotes.Handle("TradeRespond", respond)
+	Remotes.Handle("TradeOffer", offer)
+	Remotes.Handle("TradeLock", lock)
+	Remotes.Handle("TradeConfirm", confirm)
+	Remotes.Handle("TradeCancel", function(player, id)
 		local session = sessionFor(player, id)
 		if session then
 			close(session, "Cancelled")
 		end
 		return true, nil
-	end
+	end)
 	Players.PlayerRemoving:Connect(function(player)
 		local session = sessionOf[player]
 		if session then

@@ -9,9 +9,13 @@ local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local InventoryService = {}
+
+-- Fires (player) after any change to a run inventory is published.
+InventoryService.Changed = Signal.new()
 
 local entries = {}
 
@@ -56,6 +60,7 @@ function InventoryService.Publish(player: Player)
 		Remotes.Get("InventoryChanged"):FireClient(player, snapshot(entry))
 		local equipped = entry.equipped and entry.inventory.hotbar[entry.equipped]
 		player:SetAttribute("EquippedItem", equipped and equipped.catalogId or nil)
+		InventoryService.Changed:Fire(player)
 	end
 end
 
@@ -202,8 +207,8 @@ function InventoryService.Start()
 	end)
 	-- No PlayerRemoving cleanup here: an at-risk departure fires ActiveDeparture
 	-- (which still needs the inventory) and then RunEnded, which clears it.
-	Remotes.Get("MoveItem").OnServerInvoke = move
-	Remotes.Get("EquipArmor").OnServerInvoke = function(player, area, index)
+	Remotes.Handle("MoveItem", move)
+	Remotes.Handle("EquipArmor", function(player, area, index)
 		local entry = entries[player]
 		if entry == nil or type(area) ~= "string" or type(index) ~= "number" then
 			return false, "BadRequest"
@@ -213,8 +218,8 @@ function InventoryService.Start()
 		end
 		InventoryService.Publish(player)
 		return true, nil
-	end
-	Remotes.Get("UnequipArmor").OnServerInvoke = function(player, slot)
+	end)
+	Remotes.Handle("UnequipArmor", function(player, slot)
 		local entry = entries[player]
 		if entry == nil or type(slot) ~= "string" then
 			return false, "BadRequest"
@@ -224,8 +229,8 @@ function InventoryService.Start()
 		end
 		InventoryService.Publish(player)
 		return true, nil
-	end
-	Remotes.Get("EquipSlot").OnServerInvoke = equip
+	end)
+	Remotes.Handle("EquipSlot", equip)
 end
 
 return InventoryService
