@@ -1,0 +1,65 @@
+name: Validate Rojo and sync existing Roblox scripts
+on:
+  pull_request:
+    branches: [main, 'v[0-9]*.[0-9][0-9]']
+  push:
+    branches: [main, 'v[0-9]*.[0-9][0-9]']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: roblox-script-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate local Rojo project (never publish)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check code-only target mappings
+        run: |
+          python3 scripts/roblox_cloud_sync.py --check
+          python3 scripts/roblox_live_publish.py --check
+      - name: Install Luau CLI and StyLua
+        run: |
+          cargo install luau-cli --version 0.739.0 --locked
+          cargo install stylua --version 2.6.0 --features luau --locked
+      - name: Check Luau formatting
+        run: stylua --check src tests/luau
+      - name: Run headless Luau specs and publish-safety tests
+        run: |
+          python3 tests/luau/run.py
+          python3 -m unittest discover -s tests -p 'test_cloud_live_publish.py' -v
+      - uses: CompeyDev/setup-rokit@v0.1.2
+        with:
+          version: v1.2.0
+      - name: Install tools and dependencies
+        run: |
+          rokit install --no-trust-check
+          if [ -f wally.toml ]; then wally install; fi
+      - name: Validate Rojo project without publishing
+        run: |
+          mkdir -p build
+          rojo build default.project.json --output build/validation.rbxlx
+          test -s build/validation.rbxlx
+
+  deploy:
+    name: Publish script sources from main (preserve Studio assets)
+    needs: validate
+    # Every validated push to main publishes; no other branch or event ever does.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Preflight and update existing script instances
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
+        run: python3 scripts/roblox_live_publish.py --deploy
