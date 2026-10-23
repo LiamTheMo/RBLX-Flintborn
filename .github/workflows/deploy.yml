@@ -48,11 +48,17 @@ jobs:
           test -s build/validation.rbxlx
 
   deploy:
-    name: Publish script sources from main (preserve Studio assets)
+    name: Publish script sources from main to the ${{ matrix.place }} place (preserve Studio assets)
     needs: validate
     # Every validated push to main publishes; no other branch or event ever does.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Two places in one universe (GDD Q163). Each publishes independently so a place
+    # that is not yet prepared with Rojo cannot block releases to the other.
+    strategy:
+      fail-fast: false
+      matrix:
+        place: [main, lobby]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,5 +67,15 @@ jobs:
         env:
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
           ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
-          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_PLACE_ID }}
-        run: python3 scripts/roblox_live_publish.py --deploy
+          TARGET_PLACE: ${{ matrix.place }}
+          ROBLOX_LOBBY_PLACE_ID: ${{ secrets.ROBLOX_LOBBY_PLACE_ID }}
+          ROBLOX_MAIN_PLACE_ID: ${{ secrets.ROBLOX_MAIN_PLACE_ID }}
+        # Pick the place ID explicitly: a missing secret stays empty and the publisher
+        # stops safely, instead of falling back to the other place.
+        run: |
+          if [ "$TARGET_PLACE" = "lobby" ]; then
+            export ROBLOX_PLACE_ID="$ROBLOX_LOBBY_PLACE_ID"
+          else
+            export ROBLOX_PLACE_ID="$ROBLOX_MAIN_PLACE_ID"
+          fi
+          python3 scripts/roblox_live_publish.py --deploy
