@@ -40,3 +40,16 @@ Live checks (GDD §31.7), all on the published places:
 - [ ] Double-click Play: one character only.
 - [ ] Joining the play-map place directly (not through the lobby) sends you back to the lobby.
 - [ ] Die in the world: you return to the lobby after ~5 s, and deploying again never puts you back in that same world while it runs.
+
+## v0.04 — Survival core: health, stamina, food and healing
+
+Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the strict-25% slow, crouch and sprint speeds, instant medicine with animation lock, 10 s food heals, hit halving with the ≤10 HP cutoff, stacking, and downed clearing. Deployed and verified on both places (2026-10-23).
+
+Studio and live checks (until crafting arrives in v0.05, a Studio run starts with a test kit of medicine and food; live runs only carry what was in the lobby backpack):
+
+- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar refills in about 5 s; melee, crouching and standing still never drain it.
+- [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
+- [ ] Food drains to 0 in 5 minutes; below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
+- [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
+- [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
+- [ ] The HUD is readable on desktop, touch and gamepad.
