@@ -70,14 +70,18 @@ test("an exhausted sprinter walks until they let go of sprint", function()
 		end
 	end
 	expectEq(sprintFrames, 0, "the walk speed never flickers back to sprint on an empty bar")
-	expect(state.stamina > 0, "walking still recovers while sprint is held")
+	expectEq(state.stamina, 0, "the 3 s recovery pause holds while sprint is held")
+	for _ = 1, 120 do
+		frame(state, 1 / 60)
+	end
+	expect(state.stamina > 0, "walking recovers once the pause ends, sprint still held")
 	state.sprintIntent = false
 	frame(state, 1 / 60)
 	state.sprintIntent = true
 	expectEq(frame(state, 1 / 60), SurvivalRules.SPRINT_SPEED, "pressing sprint again uses what recovered")
 	local held = SurvivalRules.NewState()
 	held.sprintIntent = true
-	for _ = 1, 600 do
+	for _ = 1, 720 do
 		frame(held, 1 / 60)
 	end
 	expect(SurvivalRules.IsSprinting(held, true), "a bar refilled while sprint stayed held sprints again")
