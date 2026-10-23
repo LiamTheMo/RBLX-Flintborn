@@ -69,7 +69,8 @@ local function deploy(player: Player)
 		rollbackAll(group)
 		return false, problem
 	end
-	local ok, err = TravelService.ToWorld(group, world.accessCode, { reservations = reservations })
+	local teleportData = { reservations = reservations, partyId = PartyService.PartyIdOf(player) }
+	local ok, err = TravelService.ToWorld(group, world.accessCode, teleportData)
 	if not ok then
 		rollbackAll(group)
 		return false, err
