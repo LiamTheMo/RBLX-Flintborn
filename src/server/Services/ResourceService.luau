@@ -7,9 +7,12 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
+local ProgressionService = require(script.Parent.ProgressionService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local ResourceService = {}
@@ -66,16 +69,21 @@ local function harvest(player: Player, node)
 	lastHit[player] = now
 
 	local def = NodeCatalog.Nodes[node.nodeType]
-	local amount = NodeCatalog.YieldFor(node.nodeType, InventoryService.EquippedTool(player))
-	if amount <= 0 then
+	local base = NodeCatalog.YieldFor(node.nodeType, InventoryService.EquippedTool(player))
+	if base <= 0 then
 		InventoryService.Notify(player, "You need a better tool for that.")
 		return
 	end
+	-- Mastery (+1% per level) and the Bounty perk stack through one pipeline.
+	local amount =
+		ModifierRules.RollYield(base, ModifierService.Get(player, def.mastery .. "Yield", "DropQuantity"), rng)
 	local remaining = InventoryService.Add(player, { catalogId = def.material, quantity = amount })
 	if remaining >= amount then
 		InventoryService.Notify(player, "No room for " .. def.material .. ".")
 		return
 	end
+	ProgressionService.GrantXp(player, ProgressionService.XP.Harvest, "Gathering")
+	ProgressionService.GrantMastery(player, def.mastery, 1)
 	node.hitsLeft -= 1
 	if node.hitsLeft <= 0 then
 		setActive(node, false)

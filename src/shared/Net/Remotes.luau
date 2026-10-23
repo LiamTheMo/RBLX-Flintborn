@@ -55,6 +55,12 @@ local DEFINITIONS = {
 	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
 	EventEnded = "RemoteEvent", -- server -> all: (eventId)
 	BossAlert = "RemoteEvent", -- server -> all: Guardian horn, phase, Legendary released, end
+	ProgressionChanged = "RemoteEvent", -- server -> client: level, masteries, rebirth state
+	XpGained = "RemoteEvent", -- server -> client: {amount, reason, levelUp}
+	ProgressionSnapshot = "RemoteFunction", -- () -> progression view
+	RebirthPreview = "RemoteFunction", -- () -> {reset, kept, gained, eligible, reason}
+	Rebirth = "RemoteFunction", -- (nonce) -> ok, reason
+	BuyPerk = "RemoteFunction", -- (perkId, nonce) -> ok, reason
 }
 
 local function folder()

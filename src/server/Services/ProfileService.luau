@@ -248,6 +248,21 @@ function ProfileService.RunOperation(player: Player, operationId: string, kind: 
 	return true, result, applied
 end
 
+-- Applies a small, naturally idempotent change in place (XP and mastery grants
+-- from server-verified actions) and schedules a save, without a journal entry.
+-- Returns false when the profile is not loaded.
+function ProfileService.Mutate(player: Player, apply: (any) -> ())
+	local profile = ProfileService.GetProfile(player)
+	if profile == nil then
+		return false
+	end
+	apply(profile)
+	store:MarkDirty(player.UserId)
+	setStatus(player)
+	scheduleSave(player)
+	return true
+end
+
 function ProfileService.SaveNow(player: Player)
 	return save(player, false)
 end

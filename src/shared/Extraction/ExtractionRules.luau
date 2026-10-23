@@ -7,6 +7,7 @@
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
 
 local ExtractionRules = {}
@@ -108,10 +109,16 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 			bump(receipt.deleted, catalogId, left)
 		end
 	end
-	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09).
+	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09);
+	-- an extracted Guardian Legendary counts toward the rebirth challenge (v0.13).
 	for _, item in items do
 		profile.recipes.discovered[item.catalogId] = true
+		local def = ItemCatalog.Get(item.catalogId)
+		if def and def.rarity == "Legendary" and def.family == ItemCatalog.Families.Weapon then
+			profile.rebirth.legendariesSinceRebirth = (profile.rebirth.legendariesSinceRebirth or 0) + 1
+		end
 	end
+	ProgressionRules.SettleRun(profile, receipt, kind)
 	Receipts.Store(profile.receipts.extraction, receiptId, receipt)
 	profile.metrics.extractions += 1
 	return receipt
