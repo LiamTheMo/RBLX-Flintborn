@@ -11,31 +11,14 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SurvivalRules = require(ReplicatedStorage.Shared.Survival.SurvivalRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local InventoryService = require(script.Parent.InventoryService)
 local SurvivalService = require(script.Parent.SurvivalService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local HealingService = {}
 
 HealingService.REMEMBERED_REQUESTS = 32
 
 local seenRequests = {}
-
-local function findStack(player: Player, catalogId: string)
-	for index, stack in WorldAdmissionService.RunItems(player) or {} do
-		if stack.catalogId == catalogId and (stack.quantity or 0) > 0 then
-			return stack, index
-		end
-	end
-	return nil, nil
-end
-
-local function consumeOne(player: Player, stack, index: number)
-	stack.quantity -= 1
-	if stack.quantity <= 0 then
-		table.remove(WorldAdmissionService.RunItems(player), index)
-	end
-	SurvivalService.PublishConsumables(player)
-end
 
 -- Remembers request IDs so a replayed or duplicated request is applied once.
 local function firstTime(player: Player, requestId: string): boolean
@@ -71,8 +54,7 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 	if not firstTime(player, requestId) then
 		return false, "Duplicate"
 	end
-	local stack, index = findStack(player, catalogId)
-	if stack == nil then
+	if InventoryService.Count(player, catalogId) < 1 then
 		return false, "NotCarried"
 	end
 
@@ -82,11 +64,11 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 		if health == nil then
 			return false, "Cooldown"
 		end
-		consumeOne(player, stack, index)
+		InventoryService.RemoveAll(player, { [catalogId] = 1 })
 		SurvivalService.SetHealth(player, health)
 	else
+		InventoryService.RemoveAll(player, { [catalogId] = 1 })
 		SurvivalRules.Eat(rules, item, now)
-		consumeOne(player, stack, index)
 	end
 	return true, nil
 end
