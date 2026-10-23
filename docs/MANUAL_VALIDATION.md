@@ -209,3 +209,19 @@ Studio and live checks (two accounts):
 - [ ] Disconnect one player mid-trade: the trade closes and nothing changes hands. (Crash recovery between the two saves is covered by specs; a forced server kill is a live check.)
 - [ ] Once product IDs exist: buy a vault upgrade and a Gem pack with Robux in a test place; each purchase grants exactly once.
 - [ ] Review Roblox purchase policy (paid random items, Premium) before release.
+
+## v0.15 — Shattered Crater world, art direction and camera
+
+Automated: 6 specs cover every portal POI having a zone radius inside its region (3 Outer + 1 hidden, 3 Inner, 1 Center), every biome having a resource pool with jade and obsidian only in the Inner Ring, safe camps with volumes in the Outer Rim, spawn candidates in all three regions, the island profile (sea, beach, a tall ridge with route gaps, an open caldera) and camera bounds. Deployed and verified on both places (2026-10-23).
+
+Placeholders: until an authored `ShatteredCrater` model is placed in the world place (Workspace or `ServerStorage.Maps`), the server builds a blocky placeholder island at start-up (radius 1,200 studs, 48-stud tiles, Outer Rim 750–1,200, Inner Ring 300–750, crater < 300, ridge at 300 with four route gaps) and removes the Studio `Baseplate` at runtime only. Set the workspace attribute `FlintbornGenerateIsland = false` to opt out. POIs and landmarks come from `src/shared/World/PoiCatalog.luau`. Camera zoom 8–40 studs.
+
+Studio and live checks:
+
+- [ ] The island loads with beaches, woodland, jungle, the ridge and caldera; landmarks (Giant Roots, Old Ruins, Monoliths, Jade Falls) are visible from a distance on low graphics.
+- [ ] Spawns land in all three regions, away from other players; extraction portals appear at named POIs with a different subset per server; the Center portal is in the crater.
+- [ ] The two safe camps show white-and-blue posts, a sign and a "safe: no damage here" notice; nobody can be hurt inside.
+- [ ] Jade and obsidian nodes appear only in the jungle and need a pickaxe.
+- [ ] N opens the map with regions, landmarks, camps, active portals and events; the compass follows the camera.
+- [ ] Zoom with wheel, pinch and right stick stays within 8–40 studs and is restored on the next spawn.
+- [ ] Traverse every ring on mobile and note travel times; 30-player performance on a mid-range phone.
