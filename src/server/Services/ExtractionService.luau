@@ -352,7 +352,7 @@ function ExtractionService.Start()
 		return
 	end
 	setupSites()
-	Remotes.Get("PlaceRune").OnServerInvoke = placeRune
+	Remotes.Handle("PlaceRune", placeRune)
 	-- Late joiners still see countdowns already running.
 	WorldAdmissionService.RunStarted:Connect(function(player)
 		for _, event in activeEvents do

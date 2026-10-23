@@ -28,7 +28,7 @@ function SettingsService.Start()
 	ProfileService.ProfileLoaded:Connect(function(player, profile)
 		applyAttributes(player, profile.choices)
 	end)
-	Remotes.Get("SaveSettings").OnServerEvent:Connect(function(player, settings)
+	Remotes.Listen("SaveSettings", function(player, settings)
 		if type(settings) ~= "table" then
 			return
 		end
@@ -47,7 +47,7 @@ function SettingsService.Start()
 			applyAttributes(player, choices)
 		end)
 	end)
-	Remotes.Get("SaveCamera").OnServerEvent:Connect(function(player, zoom)
+	Remotes.Listen("SaveCamera", function(player, zoom)
 		local now = os.clock()
 		if type(zoom) ~= "number" or (lastSave[player] and now - lastSave[player] < SettingsService.SAVE_INTERVAL) then
 			return

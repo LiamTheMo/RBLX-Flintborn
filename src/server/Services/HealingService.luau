@@ -85,7 +85,7 @@ function HealingService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	Remotes.Get("UseConsumable").OnServerInvoke = HealingService.Use
+	Remotes.Handle("UseConsumable", HealingService.Use)
 	Players.PlayerRemoving:Connect(function(player)
 		seenRequests[player] = nil
 	end)
