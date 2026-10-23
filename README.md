@@ -39,4 +39,4 @@ rojo build default.project.json --output build/validation.rbxlx
 ## Branches and deployment
 
 - `main` is the deployed state. Version branches (`v0.01`, `v0.02`, …) are permanent phase checkpoints. All work happens on short-lived branches merged into the active version branch, then into `main`.
-- `.github/workflows/deploy.yml` validates every pull request and every push to `main` or a version branch. **Only pushes to `main` publish**, using the `ROBLOX_API_KEY`, `ROBLOX_UNIVERSE_ID` and `ROBLOX_PLACE_ID` repository secrets.
+- `.github/workflows/deploy.yml` validates every pull request and every push to `main` or a version branch. **Only pushes to `main` publish**, to both places in the universe: the play map (`ROBLOX_MAIN_PLACE_ID`) and the lobby (`ROBLOX_LOBBY_PLACE_ID`), using the `ROBLOX_API_KEY` and `ROBLOX_UNIVERSE_ID` repository secrets.
