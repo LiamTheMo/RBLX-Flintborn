@@ -21,6 +21,8 @@ local VaultService = {}
 -- Fires (player) after a successful manual deposit.
 VaultService.Deposited = Signal.new()
 
+VaultService.OVERFLOW_NOTICE_SECONDS = 24 * 60 * 60
+
 local function itemView(item)
 	local def = ItemCatalog.Get(item.catalogId)
 	return {
@@ -50,10 +52,22 @@ local function snapshot(player: Player)
 	}
 	for catalogId, quantity in profile.vault.materials do
 		local def = ItemCatalog.Get(catalogId)
-		table.insert(
-			view.materials,
-			{ catalogId = catalogId, name = def and def.name or catalogId, quantity = quantity }
-		)
+		table.insert(view.materials, {
+			catalogId = catalogId,
+			name = def and def.name or catalogId,
+			quantity = quantity,
+			tradeable = TradeRules.IsTradeable({ catalogId = catalogId, quantity = quantity }),
+		})
+	end
+	-- Materials banked from the backpack outside an extraction (a trade, a crash
+	-- recovery) that the vault had no room for, shown for a day (GDD §45).
+	local overflow = profile.vault.lastOverflow
+	if type(overflow) == "table" and os.time() - (overflow.at or 0) < VaultService.OVERFLOW_NOTICE_SECONDS then
+		view.overflow = {}
+		for catalogId, quantity in overflow.deleted or {} do
+			local def = ItemCatalog.Get(catalogId)
+			table.insert(view.overflow, { name = def and def.name or catalogId, quantity = quantity })
+		end
 	end
 	table.sort(view.materials, function(a, b)
 		return a.name < b.name

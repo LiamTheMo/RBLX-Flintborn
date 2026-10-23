@@ -1,8 +1,10 @@
--- Lobby trading (GDD §10.2, Q13, Q50, Q98, Q125, Q130). Two players in the same
--- lobby server exchange designated lobby-backpack items and Gems — never Coins.
--- An invite binds the target only once accepted, and the same pair waits a short
--- cooldown between invites. Offers snapshot each slot and its quantity; any
--- backpack change unlocks both sides, and settlement needs the exact snapshot.
+-- Lobby trading (GDD §10.2, Q13, Q50, Q98, Q125, Q130, Q164). Two players in the
+-- same lobby server exchange designated lobby-backpack items, eligible vault
+-- materials and Gems — never Coins. An invite binds the target only once
+-- accepted, and the same pair waits a short cooldown between invites. Offers
+-- snapshot each slot and its quantity, and each vault material quantity; any
+-- backpack or vault material change unlocks both sides, and settlement needs the
+-- exact snapshot.
 -- Vault, shop and Forge actions wait while a session is open. Settlement changes
 -- both profiles together (all or nothing), records the trade as pending on each,
 -- saves both, then finalises. If a save never lands, the next load (or a retry
@@ -20,6 +22,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
+local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local CurrencyService = require(script.Parent.CurrencyService)
 local ProfileService = require(script.Parent.ProfileService)
 
@@ -34,7 +37,7 @@ TradeService.SAVE_RETRY_SECONDS = 2
 TradeService.RECONCILE_RETRY_SECONDS = 60
 
 -- The profile groups a settlement touches, restored together if it fails.
-local SETTLED_GROUPS = { "lobbyBackpack", "permanentItems", "currency", "trades" }
+local SETTLED_GROUPS = { "lobbyBackpack", "vault", "permanentItems", "currency", "trades" }
 local SERVER = if game.JobId ~= "" then game.JobId else nil
 
 local sessions = {}
@@ -53,11 +56,12 @@ function TradeService.InSession(player: Player): boolean
 	return session ~= nil and session.accepted
 end
 
--- Snapshots the offered slots as {key, quantity}, or nil if one is missing.
-local function snapshotOffer(profile, keys)
+-- Snapshots the offered slots and vault materials ({[catalogId] = quantity}) as
+-- {key, quantity}, or nil if a slot is missing. Material keys are "mat:<catalogId>".
+local function snapshotOffer(profile, keys, materials)
 	local entries, used = {}, {}
 	for _, key in keys do
-		if type(key) ~= "string" or #key > 64 then
+		if type(key) ~= "string" or #key > 64 or TradeRules.MaterialOf(key) then
 			continue
 		end
 		local found = nil
@@ -73,16 +77,32 @@ local function snapshotOffer(profile, keys)
 		used[found] = true
 		table.insert(entries, { key = key, quantity = profile.lobbyBackpack.slots[found].quantity })
 		if #entries > TradeRules.MAX_ITEMS then
+			return entries
+		end
+	end
+	for catalogId, quantity in materials do
+		table.insert(entries, { key = TradeRules.MaterialKey(catalogId), quantity = quantity })
+		if #entries > TradeRules.MAX_ITEMS then
 			break
 		end
 	end
 	return entries
 end
 
--- Slot indexes matching every snapshot entry exactly, or nil if anything changed.
-local function indexesFor(profile, entries)
-	local indexes = {}
+-- The TradeRules offer (slot indexes and vault materials) matching every snapshot
+-- entry exactly, or nil if anything changed.
+local function resolve(profile, entries, gems: number)
+	local indexes, materials = {}, {}
 	for _, entry in entries do
+		local catalogId = TradeRules.MaterialOf(entry.key)
+		if catalogId then
+			local total = (materials[catalogId] or 0) + entry.quantity
+			if (profile.vault.materials[catalogId] or 0) < total then
+				return nil
+			end
+			materials[catalogId] = total
+			continue
+		end
 		local found = nil
 		for index, item in profile.lobbyBackpack.slots do
 			if keyOf(item) == entry.key and item.quantity == entry.quantity and not table.find(indexes, index) then
@@ -95,7 +115,7 @@ local function indexesFor(profile, entries)
 		end
 		table.insert(indexes, found)
 	end
-	return indexes
+	return { items = indexes, materials = materials, gems = gems }
 end
 
 local function fingerprint(player: Player): string
@@ -103,11 +123,16 @@ local function fingerprint(player: Player): string
 	if profile == nil then
 		return ""
 	end
-	local parts = {}
+	local parts, stock = {}, {}
 	for _, item in profile.lobbyBackpack.slots do
 		table.insert(parts, keyOf(item) .. "x" .. tostring(item.quantity or 1))
 	end
-	return table.concat(parts, "|")
+	-- Vault materials too, since offers draw on them.
+	for catalogId, quantity in profile.vault.materials do
+		table.insert(stock, TradeRules.MaterialKey(catalogId) .. "x" .. tostring(quantity))
+	end
+	table.sort(stock)
+	return table.concat(parts, "|") .. "#" .. table.concat(stock, "|")
 end
 
 local function other(session, player: Player): Player
@@ -117,6 +142,12 @@ end
 local function describe(profile, offer)
 	local list = {}
 	for _, entry in offer.items do
+		local catalogId = TradeRules.MaterialOf(entry.key)
+		if catalogId then
+			local def = ItemCatalog.Get(catalogId)
+			table.insert(list, { key = entry.key, name = def and def.name or catalogId, quantity = entry.quantity })
+			continue
+		end
 		for _, item in profile.lobbyBackpack.slots do
 			if keyOf(item) == entry.key then
 				local def = ItemCatalog.Get(item.catalogId)
@@ -301,9 +332,9 @@ local function settle(session)
 		return
 	end
 	local now = os.time()
-	local offerA = { items = indexesFor(pa, session.offers[a].items), gems = session.offers[a].gems }
-	local offerB = { items = indexesFor(pb, session.offers[b].items), gems = session.offers[b].gems }
-	if offerA.items == nil or offerB.items == nil then
+	local offerA = resolve(pa, session.offers[a].items, session.offers[a].gems)
+	local offerB = resolve(pb, session.offers[b].items, session.offers[b].gems)
+	if offerA == nil or offerB == nil then
 		close(session, "ItemsChanged")
 		return
 	end
@@ -312,8 +343,8 @@ local function settle(session)
 	local checks = {
 		{ TradeRules.ValidateOffer(pa, offerA, now) },
 		{ TradeRules.ValidateOffer(pb, offerB, now) },
-		{ TradeRules.ValidateReceive(pb, offerA.gems, now) },
-		{ TradeRules.ValidateReceive(pa, offerB.gems, now) },
+		{ TradeRules.ValidateReceive(pb, offerA.gems, now, offerA.materials) },
+		{ TradeRules.ValidateReceive(pa, offerB.gems, now, offerB.materials) },
 	}
 	for _, check in checks do
 		if not check[1] then
@@ -408,9 +439,34 @@ local function respond(player: Player, id: any, accept: any)
 	return true, nil
 end
 
-local function offer(player: Player, id: any, keys: any, gems: any)
+-- Bounds a client's {[catalogId] = quantity} vault material offer, or nil.
+local function materialsArg(materials: any)
+	if materials == nil then
+		return {}
+	end
+	if type(materials) ~= "table" then
+		return nil
+	end
+	local count = 0
+	for catalogId, quantity in materials do
+		count += 1
+		if count > TradeRules.MAX_ITEMS or not Validation.IsId(catalogId) or not Validation.IsQuantity(quantity, 1) then
+			return nil
+		end
+	end
+	return materials
+end
+
+local function offer(player: Player, id: any, keys: any, gems: any, materials: any)
 	local session = sessionFor(player, id)
-	if session == nil or not session.accepted or type(keys) ~= "table" or type(gems) ~= "number" then
+	materials = materialsArg(materials)
+	if
+		session == nil
+		or not session.accepted
+		or type(keys) ~= "table"
+		or type(gems) ~= "number"
+		or materials == nil
+	then
 		return false, "BadRequest"
 	end
 	local profile = ProfileService.GetProfile(player)
@@ -418,14 +474,18 @@ local function offer(player: Player, id: any, keys: any, gems: any)
 	if profile == nil or partner == nil then
 		return false, "Unavailable"
 	end
-	local entries = snapshotOffer(profile, keys)
+	local entries = snapshotOffer(profile, keys, materials)
 	if entries == nil then
 		return false, "MissingItem"
 	end
 	local now = os.time()
-	local ok, reason = TradeRules.ValidateOffer(profile, { items = indexesFor(profile, entries), gems = gems }, now)
+	local resolved = resolve(profile, entries, gems)
+	if resolved == nil then
+		return false, "MissingItem"
+	end
+	local ok, reason = TradeRules.ValidateOffer(profile, resolved, now)
 	if ok then
-		ok, reason = TradeRules.ValidateReceive(partner, gems, now)
+		ok, reason = TradeRules.ValidateReceive(partner, gems, now, resolved.materials)
 	end
 	if not ok then
 		return false, reason
@@ -444,7 +504,7 @@ local function lock(player: Player, id: any)
 		return false, "BadRequest"
 	end
 	local profile = ProfileService.GetProfile(player)
-	if refresh(session) or profile == nil or indexesFor(profile, session.offers[player].items) == nil then
+	if refresh(session) or profile == nil or resolve(profile, session.offers[player].items, 0) == nil then
 		return false, "ItemsChanged"
 	end
 	session.locked[player] = true
