@@ -9,7 +9,7 @@ local function run(fn, seconds, dt)
 	end
 end
 
-test("a full stamina bar lasts 3 s of sprint and refills in 5 s", function()
+test("a full stamina bar lasts 3 s of sprint, pauses 3 s, then refills in 5 s", function()
 	local state = SurvivalRules.NewState()
 	state.sprintIntent = true
 	run(function(dt)
@@ -26,8 +26,86 @@ test("a full stamina bar lasts 3 s of sprint and refills in 5 s", function()
 	state.sprintIntent = false
 	run(function(dt)
 		SurvivalRules.StepStamina(state, dt, true)
+	end, 3, 0.1)
+	expectNear(state.stamina, 0, 1e-9, "no recovery for 3 s after the sprint ends")
+	run(function(dt)
+		SurvivalRules.StepStamina(state, dt, true)
 	end, 5, 0.1)
-	expectNear(state.stamina, 1, 1e-9, "full again after 5 s")
+	expectNear(state.stamina, 1, 1e-9, "full again 5 s after recovery starts")
+end)
+
+test("recovery stops the moment a sprint starts and waits 3 s after it ends", function()
+	local state = SurvivalRules.NewState()
+	state.stamina = 0.5
+	SurvivalRules.StepStamina(state, 1, true)
+	expectNear(state.stamina, 0.7, 1e-9, "walking recovers at the normal rate")
+	state.sprintIntent = true
+	SurvivalRules.StepStamina(state, 0.3, true)
+	expectNear(state.stamina, 0.6, 1e-9, "sprinting drains and does not recover")
+	state.sprintIntent = false
+	run(function(dt)
+		SurvivalRules.StepStamina(state, dt, true)
+	end, 2.9, 0.1)
+	expectNear(state.stamina, 0.6, 1e-9, "still paused 2.9 s after letting go")
+	state.sprintIntent = true
+	SurvivalRules.StepStamina(state, 0.3, true)
+	state.sprintIntent = false
+	run(function(dt)
+		SurvivalRules.StepStamina(state, dt, true)
+	end, 2.9, 0.1)
+	expectNear(state.stamina, 0.5, 1e-9, "a new sprint restarts the 3 s pause")
+	run(function(dt)
+		SurvivalRules.StepStamina(state, dt, true)
+	end, 1.1, 0.1)
+	expectNear(state.stamina, 0.5 + 1 / 5, 1e-9, "after the pause, recovery resumes at the normal rate")
+end)
+
+test("walking after letting go of sprint never drains stamina, whatever the network jitter", function()
+	local state = SurvivalRules.NewState()
+	local pace = SurvivalRules.NewPace()
+	-- One server sample every 0.2 s; positions arrive unevenly, so a walker at
+	-- 16 studs/s shows anywhere from 9.6 to 22.4 studs/s per sample.
+	local jitter = { 1.4, 0.6, 1.2, 0.8, 1.3, 0.7, 1.4, 0.6 }
+	local function sample(index: number, allowed: number, speed: number)
+		local factor = jitter[(index % #jitter) + 1]
+		local observed = SurvivalRules.ObservePace(pace, speed * 0.2 * factor, 0.2, allowed)
+		SurvivalRules.StepStamina(state, 0.2, true, observed)
+	end
+	state.sprintIntent = true
+	for index = 1, 5 do
+		sample(index, SurvivalRules.SPRINT_SPEED, SurvivalRules.SPRINT_SPEED)
+	end
+	local afterSprint = state.stamina
+	expect(afterSprint < 1, "the sprint itself drained")
+	state.sprintIntent = false
+	for index = 1, 100 do
+		sample(index, SurvivalRules.WALK_SPEED, SurvivalRules.WALK_SPEED)
+	end
+	expect(state.stamina > afterSprint, "20 s of walking recovered instead of draining")
+	expectNear(state.stamina, 1, 1e-9, "and refilled the bar")
+end)
+
+test("travel at sprint pace without a sprint request still drains", function()
+	local state = SurvivalRules.NewState()
+	local pace = SurvivalRules.NewPace()
+	local drained = false
+	for _ = 1, 10 do
+		local observed =
+			SurvivalRules.ObservePace(pace, SurvivalRules.SPRINT_SPEED * 0.2, 0.2, SurvivalRules.WALK_SPEED)
+		SurvivalRules.StepStamina(state, 0.2, true, observed)
+		drained = drained or observed
+	end
+	expect(drained, "a client claiming to walk at sprint pace is caught")
+	expect(state.stamina < 1, "and pays stamina for it")
+	local fresh = SurvivalRules.NewPace()
+	expect(
+		not SurvivalRules.ObservePace(fresh, 100, 0.2, SurvivalRules.WALK_SPEED),
+		"one sample is never a full window"
+	)
+	expect(
+		not SurvivalRules.ObservePace(fresh, 1000, 0.2, SurvivalRules.SPRINT_SPEED),
+		"a new allowance restarts the window"
+	)
 end)
 
 test("only sprinting spends stamina", function()
