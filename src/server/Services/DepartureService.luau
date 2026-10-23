@@ -8,6 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -120,7 +121,9 @@ local function take(looter: Player, bodyId: any, index: any)
 	return true, nil
 end
 
--- One body per run, whether the player died or left.
+-- One body per run, whether the player died or left. Kept Permanent items and
+-- the run's "Ended" crash receipt are written in one operation, synchronously,
+-- so a leaving player's release save always includes them.
 local function depart(player: Player, position: Vector3?)
 	if handled[player] then
 		return
@@ -128,20 +131,28 @@ local function depart(player: Player, position: Vector3?)
 	handled[player] = true
 	local items = ProfileSchema.DeepCopy(InventoryService.Items(player))
 	local bodyItems, kept = DeathRules.Split(items)
-	if #kept > 0 then
-		ProfileService.RunOperation(
-			player,
-			"kept:" .. HttpService:GenerateGUID(false),
-			"PermanentKept",
-			function(profile)
-				for _, item in kept do
-					table.insert(profile.lobbyBackpack.slots, item)
-				end
+	local ok, err = ProfileService.RunOperation(
+		player,
+		"depart:" .. HttpService:GenerateGUID(false),
+		"PermanentKept",
+		function(profile)
+			for _, item in kept do
+				item.location = "LobbyBackpack"
+				table.insert(profile.lobbyBackpack.slots, item)
 			end
-		)
+			CrashRecoveryRules.MarkEnded(profile, os.time())
+		end
+	)
+	if not ok then
+		warn(("[DepartureService] Could not settle departure for %s: %s"):format(player.Name, tostring(err)))
 	end
+	-- Never lose a body for lack of a position (a logout right after spawning).
 	local at = position or lastPositions[player]
-	if at and #bodyItems > 0 then
+	if at == nil then
+		warn("[DepartureService] No known position for " .. player.Name .. "; placing the body at the origin")
+		at = Vector3.new(0, 5, 0)
+	end
+	if #bodyItems > 0 then
 		createBody(at, bodyItems, player.DisplayName)
 	end
 	if player.Parent then
@@ -153,8 +164,10 @@ function DepartureService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	WorldAdmissionService.RunStarted:Connect(function(player)
+	WorldAdmissionService.RunStarted:Connect(function(player, character)
 		handled[player] = nil
+		-- The confirmed spawn point is the first known position of every run.
+		lastPositions[player] = character and character:GetPivot().Position or nil
 	end)
 	WorldAdmissionService.Death:Connect(depart)
 	WorldAdmissionService.ActiveDeparture:Connect(function(player)

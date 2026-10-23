@@ -3,6 +3,7 @@
 -- move and equip goes through here and is replicated to the owner as a snapshot.
 -- World place only.
 
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
@@ -10,6 +11,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local InventoryService = {}
@@ -150,12 +152,39 @@ function InventoryService.Items(player: Player)
 	return inventory and InventoryRules.Items(inventory) or {}
 end
 
+-- Items that do not fit the run inventory (a lobby backpack over 59 entries,
+-- Permanent items, trades, crash recovery or maintenance escrow on top) stay in
+-- the lobby backpack instead of entering the run. Nothing is ever deleted here.
+local function keepInLobby(player: Player, leftovers)
+	local ok, err = ProfileService.RunOperation(
+		player,
+		"overflow:" .. HttpService:GenerateGUID(false),
+		"RunOverflow",
+		function(profile)
+			for _, item in leftovers do
+				if item.instanceId then
+					item.location = "LobbyBackpack"
+				end
+				table.insert(profile.lobbyBackpack.slots, item)
+			end
+		end
+	)
+	if not ok then
+		warn(("[InventoryService] Could not return %d items for %s: %s"):format(#leftovers, player.Name, tostring(err)))
+		return
+	end
+	InventoryService.Notify(
+		player,
+		("%d item stack(s) did not fit and stayed in your lobby backpack."):format(#leftovers)
+	)
+end
+
 local function startRun(player: Player, _character, items)
 	local inventory, leftovers = InventoryRules.FromItems(items or {})
-	if #leftovers > 0 then
-		warn(("[InventoryService] %d reserved items did not fit for %s"):format(#leftovers, player.Name))
-	end
 	entries[player] = { inventory = inventory, equipped = nil }
+	if #leftovers > 0 then
+		keepInLobby(player, leftovers)
+	end
 	InventoryService.Publish(player)
 end
 

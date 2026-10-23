@@ -46,23 +46,41 @@ local function attempt(player: Player): string
 	if verdict ~= "Eligible" then
 		return verdict
 	end
-	local done, receipt = ProfileService.RunOperation(
+	local profile = ProfileService.GetProfile(player)
+	if profile == nil then
+		return "NoProfile"
+	end
+	if CrashRecoveryRules.IsSettled(profile, checkpoint.runId) then
+		-- The run ended normally (or was already restored); only its delete failed.
+		CheckpointStore.Clear(player.UserId)
+		return "AlreadySettled"
+	end
+	local done, result, applied = ProfileService.RunOperation(
 		player,
 		"crash:" .. checkpoint.runId,
 		"CrashRecovery",
-		function(profile)
-			local restored = CrashRecoveryRules.Restore(profile, checkpoint, os.time())
+		function(working)
+			local restored = CrashRecoveryRules.Restore(working, checkpoint, os.time())
 			if restored == nil then
 				error("AlreadyRestored", 0)
 			end
 			return restored
 		end
 	)
-	CheckpointStore.Clear(player.UserId)
-	if done then
-		ProfileService.SaveNow(player)
-		notify(player, receipt)
+	if not done and result ~= "AlreadyRestored" then
+		-- The profile could not take it (e.g. the player left mid-check): keep the
+		-- checkpoint so the next load tries again.
+		return "Failed"
 	end
+	if done and applied then
+		notify(player, result)
+		-- Delete the checkpoint only once the restore is saved: a crash before that
+		-- leaves both unchanged, so the run is still restored exactly once.
+		if not ProfileService.SaveNow(player) then
+			return "Restored"
+		end
+	end
+	CheckpointStore.Clear(player.UserId)
 	return "Restored"
 end
 

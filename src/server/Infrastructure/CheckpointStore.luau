@@ -64,14 +64,20 @@ local function get(kind: string, key: string)
 	return true, fallback[kind][key]
 end
 
-local function remove(kind: string, key: string)
+-- Returns false when the shared store could not be reached (the caller retries).
+local function remove(kind: string, key: string): boolean
 	fallback[kind][key] = nil
 	local store = open()
 	if store then
-		pcall(function()
+		local ok, err = pcall(function()
 			store[kind]:RemoveAsync(key)
 		end)
+		if not ok then
+			warn(("[CheckpointStore] %s remove failed: %s"):format(kind, tostring(err)))
+		end
+		return ok
 	end
+	return true
 end
 
 function CheckpointStore.Write(userId: number, checkpoint)
@@ -83,8 +89,8 @@ function CheckpointStore.Read(userId: number)
 	return get("checkpoints", tostring(userId))
 end
 
-function CheckpointStore.Clear(userId: number)
-	remove("checkpoints", tostring(userId))
+function CheckpointStore.Clear(userId: number): boolean
+	return remove("checkpoints", tostring(userId))
 end
 
 function CheckpointStore.Beat(jobId: string, now: number)

@@ -1,6 +1,9 @@
 -- Health, stamina and food for players in an active run (GDD §4.3, §5.4). One
 -- Heartbeat loop steps every meter on the server; clients only send sprint and
--- crouch intent. Meters are run state and reset on each spawn. World place only.
+-- crouch intent. Whether a player is moving (and so whether a sprint drains
+-- stamina) comes from server-observed root travel, never the client-replicated
+-- MoveDirection, and travel at sprint pace drains stamina even without a sprint
+-- request. Meters are run state and reset on each spawn. World place only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,6 +19,9 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 local SurvivalService = {}
 
 SurvivalService.PUBLISH_INTERVAL = 0.1
+-- Root travel is sampled over this window; faster than MOVING_SPEED counts as moving.
+SurvivalService.MOVE_SAMPLE_SECONDS = 0.2
+SurvivalService.MOVING_SPEED = 2
 
 local entries = {}
 
@@ -71,6 +77,8 @@ local function startRun(player: Player, character: Model)
 		humanoid = humanoid,
 		lastHealth = humanoid.Health,
 		sprinting = false,
+		moving = false,
+		speed = 0,
 		lastPublish = 0,
 		-- Snapshotted per run from masteries and perks (v0.13).
 		swimBonus = ModifierService.Sum(player, "SwimSpeed"),
@@ -90,6 +98,28 @@ local function startRun(player: Player, character: Model)
 	publish(player, entry)
 end
 
+-- Moving, from horizontal root travel the server saw over the last window.
+local function observeMoving(player: Player, entry, time: number): boolean
+	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if root == nil then
+		entry.moving = false
+		return false
+	end
+	local sample = entry.moveSample
+	if sample == nil or sample.root ~= root then
+		entry.moveSample = { root = root, position = root.Position, at = time }
+		return entry.moving
+	end
+	local elapsed = time - sample.at
+	if elapsed >= SurvivalService.MOVE_SAMPLE_SECONDS then
+		local offset = root.Position - sample.position
+		entry.speed = Vector3.new(offset.X, 0, offset.Z).Magnitude / elapsed
+		entry.moving = entry.speed > SurvivalService.MOVING_SPEED
+		sample.position, sample.at = root.Position, time
+	end
+	return entry.moving
+end
+
 local function step(dt: number)
 	local time = now()
 	for player, entry in entries do
@@ -100,16 +130,18 @@ local function step(dt: number)
 				return
 			end
 			local rules = entry.rules
-			local moving = humanoid.MoveDirection.Magnitude > 0.1
+			local moving = observeMoving(player, entry, time)
 			entry.sprinting = SurvivalRules.IsSprinting(rules, moving)
-			SurvivalRules.StepStamina(rules, dt, moving)
+			local swimming = humanoid:GetState() == Enum.HumanoidStateType.Swimming
+			local walkPace = SurvivalRules.WALK_SPEED * (if swimming then 1 + entry.swimBonus else 1)
+			SurvivalRules.StepStamina(rules, dt, moving, SurvivalRules.ObservedSprint(entry.speed, walkPace))
 			SurvivalRules.StepFood(rules, dt)
 			local healed = SurvivalRules.StepFoodHeals(rules, time, dt)
 			if healed > 0 then
 				SurvivalService.SetHealth(player, humanoid.Health + healed)
 			end
 			local speed = SurvivalRules.MoveSpeed(rules, moving)
-			if entry.swimBonus > 0 and humanoid:GetState() == Enum.HumanoidStateType.Swimming then
+			if entry.swimBonus > 0 and swimming then
 				-- The Tidewalker perk: faster movement in water.
 				speed *= 1 + entry.swimBonus
 			end

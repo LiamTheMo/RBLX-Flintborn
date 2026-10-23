@@ -1,6 +1,8 @@
 -- Event creatures and camp defenders (GDD §7.3, Q44). Simple server-driven
 -- enemies: idle near home, chase at-risk players who come within aggro range,
--- give up past the leash and walk home. Their attacks go through the same combat
+-- give up past the leash and walk home. A hit provokes them: they hunt their
+-- attacker even from bow range (AggroRules). Players in safe zones are never
+-- targeted and cannot hurt them (§3.2). Their attacks go through the same combat
 -- validation as PvP (injected by CombatService), and they drop physical,
 -- contested loot when killed. World place only.
 
@@ -8,6 +10,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
@@ -15,6 +18,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local SafeZoneService = require(script.Parent.SafeZoneService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local NpcService = {}
@@ -117,8 +121,8 @@ function NpcService.Spawn(enemyId: string, position: Vector3, elite: boolean?, e
 end
 
 -- Registers a body driven elsewhere (bosses, pillars) so weapons can hit it.
--- `npc` = {body, name, health, maxHealth, invulnerable?, onDamaged(npc, amount)?,
--- onKilled(npc)?}. NpcService never moves it.
+-- `npc` = {body, name, health, maxHealth, home?, invulnerable?,
+-- onDamaged(npc, amount, attacker?)?, onKilled(npc)?}. NpcService never moves it.
 function NpcService.Register(npc)
 	npc.custom = true
 	npcs[npc] = true
@@ -144,18 +148,32 @@ local function kill(npc)
 	NpcService.Died:Fire(npc)
 end
 
--- `attacker` (optional) is remembered for kill credit.
+local function rootOf(player: Player)
+	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+-- True when `player` stands inside a safe zone, where nobody deals damage.
+local function inSafeZone(player: Player): boolean
+	local root = rootOf(player)
+	return root ~= nil and SafeZoneService.Contains(root.Position)
+end
+
+-- `attacker` (optional) is remembered for kill credit and provokes the enemy.
 function NpcService.Damage(npc, amount: number, attacker: Player?)
 	if not npcs[npc] or amount <= 0 or npc.invulnerable then
 		return
 	end
 	if attacker then
+		if inSafeZone(attacker) then
+			return
+		end
 		npc.lastAttacker = attacker
+		npc.provokedAt = os.clock()
 	end
 	npc.health -= amount
 	if npc.custom then
 		if npc.onDamaged then
-			npc.onDamaged(npc, amount)
+			npc.onDamaged(npc, amount, attacker)
 		end
 		if npc.health <= 0 then
 			NpcService.Despawn(npc)
@@ -172,8 +190,16 @@ function NpcService.Damage(npc, amount: number, attacker: Player?)
 	end
 end
 
--- Melee against enemies, called by CombatService before structures.
-function NpcService.Hit(origin: Vector3, aim: Vector3, reach: number, rawDamage: number, attacker: Player?): boolean
+-- Melee against enemies, called by CombatService before structures. `canSee(part)`
+-- (optional) rejects enemies behind walls.
+function NpcService.Hit(
+	origin: Vector3,
+	aim: Vector3,
+	reach: number,
+	rawDamage: number,
+	attacker: Player?,
+	canSee: ((BasePart) -> boolean)?
+): boolean
 	local best, bestDistance = nil, math.huge
 	for npc in npcs do
 		local offset = npc.body.Position - origin
@@ -184,6 +210,7 @@ function NpcService.Hit(origin: Vector3, aim: Vector3, reach: number, rawDamage:
 			and distance <= reach + NpcService.HIT_ALLOWANCE
 			and math.abs(offset.Y) <= npc.body.Size.Y / 2 + 6
 			and (distance < 1 or DamageRules.WithinArc(aim, flat, 120))
+			and (canSee == nil or canSee(npc.body))
 		then
 			best, bestDistance = npc, distance
 		end
@@ -205,12 +232,25 @@ function NpcService.HitPart(part: Instance, rawDamage: number, attacker: Player?
 	return false
 end
 
-local function canTarget(player: Player): boolean
+-- Living, at-risk, standing players outside safe zones can be hunted.
+function NpcService.CanTarget(player: Player): boolean
 	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 	return humanoid ~= nil
 		and humanoid.Health > 0
 		and WorldAdmissionService.IsAtRisk(player)
 		and not DownedService.IsDowned(player)
+		and not inSafeZone(player)
+end
+local canTarget = NpcService.CanTarget
+
+-- The attacker a recent hit provoked `npc` into hunting, and their root, if any.
+function NpcService.Provoker(npc, leash: number, now: number)
+	local attacker = npc.lastAttacker
+	local root = attacker and rootOf(attacker)
+	if root and canTarget(attacker) and AggroRules.Provoked(npc.provokedAt, now, npc.home, root.Position, leash) then
+		return attacker, root
+	end
+	return nil, nil
 end
 
 local function step(dt: number)
@@ -223,13 +263,18 @@ local function step(dt: number)
 		local position = npc.body.Position
 		local target, targetRoot, best = nil, nil, EnemyCatalog.AGGRO
 		for _, player in Players:GetPlayers() do
-			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+			local root = rootOf(player)
 			if root and canTarget(player) and (root.Position - npc.home).Magnitude <= EnemyCatalog.LEASH then
 				local distance = (root.Position - position).Magnitude
 				if distance < best then
 					target, targetRoot, best = player, root, distance
 				end
 			end
+		end
+		if target == nil then
+			-- Hit from out of aggro range: go after the attacker.
+			target, targetRoot = NpcService.Provoker(npc, EnemyCatalog.LEASH, now)
+			best = if targetRoot then (targetRoot.Position - position).Magnitude else best
 		end
 		local goal = if targetRoot then targetRoot.Position else npc.home
 		local flat = Vector3.new(goal.X - position.X, 0, goal.Z - position.Z)
@@ -257,6 +302,15 @@ function NpcService.Start()
 	folder = Instance.new("Folder")
 	folder.Name = "EventEnemies"
 	folder.Parent = workspace
+	-- Kill credit and provocation must not keep departed players alive.
+	Players.PlayerRemoving:Connect(function(player)
+		for npc in npcs do
+			if npc.lastAttacker == player then
+				npc.lastAttacker = nil
+				npc.provokedAt = nil
+			end
+		end
+	end)
 	local elapsed = 0
 	RunService.Heartbeat:Connect(function(dt)
 		elapsed += dt
