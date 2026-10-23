@@ -36,6 +36,14 @@ local DEFINITIONS = {
 	CorpseOpened = "RemoteEvent", -- server -> client: (corpseId, contents)
 	CorpseTake = "RemoteFunction", -- (corpseId, index) -> ok, reason
 	DeathSummary = "RemoteEvent", -- server -> client: what dropped and what was kept
+	ExtractionEvent = "RemoteEvent", -- server -> all: an extraction countdown started
+	ExtractionEnded = "RemoteEvent", -- server -> all: (eventId)
+	PlaceRune = "RemoteFunction", -- (hotbarIndex) -> ok, reason
+	VaultSnapshot = "RemoteFunction", -- () -> vault and lobby backpack view
+	VaultDeposit = "RemoteFunction", -- (backpackIndex) -> ok, reason
+	VaultWithdrawItem = "RemoteFunction", -- (vaultIndex) -> ok, reason
+	VaultWithdrawMaterial = "RemoteFunction", -- (catalogId, quantity) -> ok, reason
+	ExtractionReceipt = "RemoteEvent", -- server -> client: the latest extraction receipt
 }
 
 local function folder()
