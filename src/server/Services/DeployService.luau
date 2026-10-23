@@ -108,7 +108,10 @@ function DeployService.Start()
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
 			if TransitRules.Deployable(item) then
-				table.insert(items, { catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent })
+				table.insert(
+					items,
+					{ catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent }
+				)
 			end
 		end
 		return items

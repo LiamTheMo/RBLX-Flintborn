@@ -104,12 +104,16 @@ test("trades reject Coins and raw materials and allow Gems, gear and Permanent i
 		{ catalogId = "AncientEmber", quantity = 2 },
 		sword("p1", { permanent = true }),
 	}
+	profile.vault.materials = { Stone = 50, AncientEmber = 2 }
 	expect(not TradeRules.ValidateOffer(profile, { items = {}, coins = 100 }, DAY), "Coins never")
-	local ok, reason = TradeRules.ValidateOffer(profile, { items = { 2 } }, DAY)
+	local ok, reason = TradeRules.ValidateOffer(profile, { items = {}, materials = { Stone = 5 } }, DAY)
 	expect(not ok and reason == "NotTradeable", "unflagged raw material")
+	-- Materials trade only from the vault (GDD §45), never from the backpack.
+	ok, reason = TradeRules.ValidateOffer(profile, { items = { 3 } }, DAY)
+	expect(not ok and reason == "NotTradeable", "no backpack material offers")
 	expect(
-		TradeRules.ValidateOffer(profile, { items = { 1, 3, 4 }, gems = 100 }, DAY),
-		"gear, rare material, Permanent and Gems"
+		TradeRules.ValidateOffer(profile, { items = { 1, 4 }, materials = { AncientEmber = 2 }, gems = 100 }, DAY),
+		"gear, rare vault material, Permanent and Gems"
 	)
 	profile.progression.level = 5
 	ok, reason = TradeRules.ValidateOffer(profile, { items = {}, gems = 10 }, DAY)

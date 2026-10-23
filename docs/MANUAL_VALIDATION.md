@@ -336,12 +336,14 @@ Automated:
 - With a full 50-slot backpack and 990 Stone in the vault, a Center extraction stores 1,000 and deletes 50, still vaults Ancient Ember, and deletes only the gear that overflows the backpack.
 - Backpack materials bank into the vault at once with overflow deleted and recorded; a material can't be deposited as an item.
 - Driving the real ProfileService: an old save with backpack Iron loads banked with the overflow deleted, and both an operation and a direct mutation that land materials in the backpack end with them banked.
+- Trades offer eligible materials (special or Exclusive) straight from the vault by quantity; backpack and ordinary materials are refused, the receiver's vault must have room, settlement and rollback move vault to vault exactly once (`trade_materials.spec.luau`, 16 cases).
 - The per-stack carried-in tagging and its specs are removed; the party-verification cases moved to `followup_party.spec.luau`.
 
 Studio and live checks:
 
 - [ ] A profile saved before this change with materials in its backpack loads with them in the vault; anything over 1,000 shows as "Vault full — deleted" in the vault's materials column for a day.
-- [ ] Receive a tradeable material in a trade: it appears in the vault, never in the backpack, and the next Deploy brings only gear.
+- [ ] Trade Ancient Ember from the vault with +1 / +10 / All / Remove: both players see the offer update, the Ember moves vault to vault, and the next Deploy brings only gear. A trade that would push the partner's vault past 1,000 is refused ("their vault has no room").
+- [ ] Rejoin after a crash mid-trade: a rolled-back Ember returns to the giver's vault.
 - [ ] Extract with Ancient Ember: the receipt shows it vaulted, and the vault's materials column shows it with no withdraw action.
 - [ ] Forge recipes that use Ancient Ember still work from the vault.
 - [ ] The shop no longer lists Herb seeds; planting Herbs uses Herbs gathered in the run.
