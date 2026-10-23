@@ -84,6 +84,12 @@ local function unconsume(player: Player)
 	return true
 end
 
+-- Undoes a Play that never entered the run but keeps the reservation, so the
+-- player can press Play again with the same loadout (GDD §31.3 #8).
+function LoadoutService.Restore(player: Player)
+	return unconsume(player)
+end
+
 -- Returns reserved items to the lobby backpack, first undoing a Play that never
 -- entered the run. Safe to call when nothing is reserved.
 function LoadoutService.Rollback(player: Player)
@@ -113,7 +119,7 @@ end
 -- earlier safe kicks escrowed, in ONE operation: maintenance receipts are marked
 -- restored only if the transit consume succeeds too. Returns (ok, items, changed);
 -- `changed` means the profile must be saved before the run starts. The caller
--- then calls Confirm once the run starts, or Rollback to put everything back.
+-- then calls Confirm once the run starts, or Restore to put everything back.
 function LoadoutService.Consume(player: Player)
 	local profile = ProfileService.GetProfile(player)
 	if profile == nil then
@@ -128,7 +134,8 @@ function LoadoutService.Consume(player: Player)
 		return true, {}, false
 	end
 	local items, taken = {}, nil
-	local operationId = "consume:" .. (reservationId or HttpService:GenerateGUID(false))
+	-- One ID per attempt: a restored reservation may be consumed again later.
+	local operationId = "consume:" .. HttpService:GenerateGUID(false)
 	local ok, _, applied = ProfileService.RunOperation(player, operationId, "TransitConsume", function(working)
 		items, taken = {}, { transit = nil, maintenance = {} }
 		if reservationId then
@@ -202,6 +209,14 @@ end
 
 function LoadoutService.Start()
 	ProfileService.ProfileLoaded:Connect(reconcile)
+	-- A graceful shutdown releases every profile without waiting for a Play that is
+	-- still saving its consume: put those back first, or the release would store
+	-- the consumed loadout and forget the profile before the Play could undo it.
+	ProfileService.BeforeShutdown:Connect(function()
+		for player in unconfirmed do
+			unconsume(player)
+		end
+	end)
 	TravelService.TeleportFailed:Connect(function(player)
 		if PlaceConfig.IsLobby() then
 			LoadoutService.Rollback(player)

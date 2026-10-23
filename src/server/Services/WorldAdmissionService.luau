@@ -178,6 +178,11 @@ local function requestPlay(player: Player, requestId: any)
 	if not loaded or humanoid == nil or not player.Parent then
 		return fail("SpawnFailed")
 	end
+	-- A shutdown that began while the character loaded is releasing this profile:
+	-- consuming now could be stored by that release with nothing left to undo it.
+	if ProfileService.IsShuttingDown() then
+		return fail("ShuttingDown")
+	end
 	character:PivotTo(spawnAt)
 
 	-- The spawn is confirmed: consume the reservation (and any maintenance escrow),
@@ -194,9 +199,10 @@ local function requestPlay(player: Player, requestId: any)
 			and humanoid.Health > 0
 			and not ProfileService.IsShuttingDown()
 		if not saved or not still then
-			-- Puts the reservation back exactly as it was (a no-op if the player
-			-- already left and BeforeRelease rolled it back).
-			LoadoutService.Rollback(player)
+			-- Puts the reservation back exactly as it was, still reserved, so the next
+			-- Play brings the same loadout (a no-op if the player already left and
+			-- BeforeRelease rolled it back).
+			LoadoutService.Restore(player)
 			return fail(if saved then "Cancelled" else "SaveFailed")
 		end
 	end
@@ -320,15 +326,11 @@ function WorldAdmissionService.Start()
 		end)
 	end)
 	-- A started teleport to the lobby that fails strands a player who is no longer
-	-- in a run or the menu: their items are already saved, so let them rejoin.
+	-- in a run or the menu: their items are already saved, so let them rejoin. That
+	-- includes arrivals redirected before staging (no state at all).
 	TravelService.TeleportFailed:Connect(function(player)
 		local state = states[player]
-		if
-			player.Parent
-			and state ~= nil
-			and not SessionStates.IsAtRisk(state)
-			and not SessionStates.ShowsWorldMenu(state)
-		then
+		if player.Parent and not SessionStates.IsAtRisk(state) and not SessionStates.ShowsWorldMenu(state) then
 			player:Kick(WorldAdmissionService.SAFE_RETURN_MESSAGE)
 		end
 	end)

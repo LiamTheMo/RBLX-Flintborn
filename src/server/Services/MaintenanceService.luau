@@ -48,6 +48,11 @@ function MaintenanceService.Escrow(player: Player): boolean
 	return true
 end
 
+-- True once the player's run ended into escrow (the save may still be pending).
+function MaintenanceService.IsPreserved(player: Player): boolean
+	return WorldAdmissionService.GetState(player) == SessionStates.MaintenancePreserved
+end
+
 -- Escrows the player's held items, ends their run without a body and saves.
 -- Returns false when the escrow or its save failed: never promise a safe removal
 -- that did not persist (GDD §30.2 #5). Calling it again retries the save.
@@ -55,8 +60,7 @@ function MaintenanceService.Preserve(player: Player): boolean
 	if not PlaceConfig.IsWorld() then
 		return true
 	end
-	local preserved = WorldAdmissionService.GetState(player) == SessionStates.MaintenancePreserved
-	if not preserved and not WorldAdmissionService.IsAtRisk(player) then
+	if not MaintenanceService.IsPreserved(player) and not WorldAdmissionService.IsAtRisk(player) then
 		return true
 	end
 	if not MaintenanceService.Escrow(player) then

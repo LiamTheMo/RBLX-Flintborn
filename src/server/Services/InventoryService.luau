@@ -173,6 +173,9 @@ local function keepInLobby(player: Player, leftovers)
 		warn(("[InventoryService] Could not return %d items for %s: %s"):format(#leftovers, player.Name, tostring(err)))
 		return
 	end
+	-- Saved at once: the consumed loadout is already saved out of the profile and
+	-- these items are in no run checkpoint, so a crash before the save loses them.
+	task.spawn(ProfileService.SaveNow, player)
 	InventoryService.Notify(
 		player,
 		("%d item stack(s) did not fit and stayed in your lobby backpack."):format(#leftovers)
