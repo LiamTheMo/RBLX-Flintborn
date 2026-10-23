@@ -99,14 +99,14 @@ function DeployService.Start()
 		end
 	end)
 
-	Remotes.Get("Deploy").OnServerInvoke = deploy
-	Remotes.Get("DeployPreview").OnServerInvoke = function(player)
+	Remotes.Handle("Deploy", deploy)
+	Remotes.Handle("DeployPreview", function(player)
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
 			table.insert(items, { catalogId = item.catalogId, quantity = item.quantity })
 		end
 		return items
-	end
+	end)
 end
 
 return DeployService

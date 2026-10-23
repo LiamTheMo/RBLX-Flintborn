@@ -212,7 +212,7 @@ local function creditKill(attacker: Player, victim: Player)
 end
 
 function ProgressionService.Start()
-	Remotes.Get("ProgressionSnapshot").OnServerInvoke = ProgressionService.Snapshot
+	Remotes.Handle("ProgressionSnapshot", ProgressionService.Snapshot)
 	ProfileService.ProfileLoaded:Connect(function(player)
 		ProgressionService.Publish(player)
 	end)

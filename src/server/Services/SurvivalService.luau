@@ -138,7 +138,7 @@ function SurvivalService.Start()
 	Players.PlayerRemoving:Connect(function(player)
 		entries[player] = nil
 	end)
-	Remotes.Get("SetMovement").OnServerEvent:Connect(function(player, sprintHeld, crouching)
+	Remotes.Listen("SetMovement", function(player, sprintHeld, crouching)
 		local entry = entries[player]
 		if entry == nil or type(sprintHeld) ~= "boolean" or type(crouching) ~= "boolean" then
 			return

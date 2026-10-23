@@ -111,8 +111,8 @@ function VaultService.Start()
 		return
 	end
 	ProfileService.ProfileLoaded:Connect(showReceipt)
-	Remotes.Get("VaultSnapshot").OnServerInvoke = snapshot
-	Remotes.Get("VaultDeposit").OnServerInvoke = function(player, index)
+	Remotes.Handle("VaultSnapshot", snapshot)
+	Remotes.Handle("VaultDeposit", function(player, index)
 		if not Validation.IsQuantity(index, 1, 50) then
 			return false, "BadRequest"
 		end
@@ -123,23 +123,23 @@ function VaultService.Start()
 			VaultService.Deposited:Fire(player)
 		end
 		return ok, reason
-	end
-	Remotes.Get("VaultWithdrawItem").OnServerInvoke = function(player, index)
+	end)
+	Remotes.Handle("VaultWithdrawItem", function(player, index)
 		if not Validation.IsQuantity(index, 1, 1000) then
 			return false, "BadRequest"
 		end
 		return operate(player, "VaultWithdraw", function(profile)
 			return VaultRules.WithdrawItem(profile, index)
 		end)
-	end
-	Remotes.Get("VaultWithdrawMaterial").OnServerInvoke = function(player, catalogId, quantity)
+	end)
+	Remotes.Handle("VaultWithdrawMaterial", function(player, catalogId, quantity)
 		if ItemCatalog.Get(catalogId) == nil or not Validation.IsQuantity(quantity, 1, 1000) then
 			return false, "BadRequest"
 		end
 		return operate(player, "VaultWithdrawMaterial", function(profile)
 			return VaultRules.WithdrawMaterial(profile, catalogId, quantity)
 		end)
-	end
+	end)
 end
 
 return VaultService

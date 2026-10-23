@@ -48,15 +48,15 @@ function RebirthService.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	Remotes.Get("RebirthPreview").OnServerInvoke = preview
-	Remotes.Get("Rebirth").OnServerInvoke = function(player, nonce)
+	Remotes.Handle("RebirthPreview", preview)
+	Remotes.Handle("Rebirth", function(player, nonce)
 		return run(player, "rebirth:", nonce, "Rebirth", ProgressionRules.Rebirth)
-	end
-	Remotes.Get("BuyPerk").OnServerInvoke = function(player, perkId, nonce)
+	end)
+	Remotes.Handle("BuyPerk", function(player, perkId, nonce)
 		return run(player, "perk:", nonce, "PerkPurchase", function(profile)
 			return ProgressionRules.BuyPerk(profile, perkId)
 		end)
-	end
+	end)
 end
 
 return RebirthService
