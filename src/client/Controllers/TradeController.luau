@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local TradeController = {}
 
@@ -99,7 +100,7 @@ end
 local function sendOffer(keys, gems: number)
 	local ok, reason = invoke("TradeOffer", session.id, keys, gems)
 	if not ok then
-		ui.status.Text = "Offer refused: " .. tostring(reason)
+		ui.status.Text = "Offer refused: " .. Reasons.Text(reason)
 	end
 end
 
@@ -191,7 +192,7 @@ function render()
 	button("Confirm trade", ui.confirmReady and not session.confirmed.mine, function()
 		local ok, reason = invoke("TradeConfirm", session.id)
 		if not ok then
-			ui.status.Text = "Not yet: " .. tostring(reason)
+			ui.status.Text = "Not yet: " .. Reasons.Text(reason)
 		end
 	end)
 	button("Cancel trade", true, function()

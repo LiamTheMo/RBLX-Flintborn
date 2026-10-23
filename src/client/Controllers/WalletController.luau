@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WalletController = {}
 
@@ -40,7 +41,7 @@ local function invoke(name: string, ...)
 	if not ok then
 		return false, "Request failed"
 	end
-	return success, reason
+	return success, if success then reason else Reasons.Text(reason)
 end
 
 local function nonce(): string

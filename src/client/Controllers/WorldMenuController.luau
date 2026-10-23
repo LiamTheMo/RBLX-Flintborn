@@ -10,6 +10,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WorldMenuController = {}
 
@@ -65,7 +66,7 @@ local function play()
 	end)
 	if not ok or not success then
 		ui.error.Text = "Could not enter the world ("
-			.. tostring(reason or success)
+			.. Reasons.Text(reason or success)
 			.. "). You are still safe — try again."
 	else
 		ui.error.Text = ""

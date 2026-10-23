@@ -3,15 +3,21 @@
 -- one transit reservation. Successful Play consumes it exactly once; any failure
 -- before that rolls it back. These functions run inside ProfileService operations.
 
+local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
+
 local TransitRules = {}
 
 TransitRules.Reserved = "Reserved"
 
 -- Moves all lobby backpack slots into a new reservation. Errors (changing nothing,
--- since operations run on a copy) if a reservation already exists.
+-- since operations run on a copy) if a reservation already exists, or while a
+-- trade settles (a rollback cannot reclaim items carried into a run).
 function TransitRules.Reserve(profile, reservationId: string, now: number)
 	if profile.transit ~= nil then
 		error("A transit reservation already exists")
+	end
+	if TradeRules.IsSettling(profile) then
+		error(TradeRules.SETTLING, 0)
 	end
 	profile.transit = {
 		reservationId = reservationId,

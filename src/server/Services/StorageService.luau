@@ -5,6 +5,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -70,21 +71,10 @@ local function send(player: Player, id: string, chest)
 	Remotes.Get("ChestOpened"):FireClient(player, id, view(chest))
 end
 
+-- Merging keeps a stack's deployed-from-lobby count, so a chest never launders
+-- carried-in materials into doublable ones.
 local function store(chest, item): boolean
-	local cap = ItemCatalog.StackCap(item.catalogId)
-	if item.instanceId == nil and cap then
-		for _, slot in chest.slots do
-			if slot.instanceId == nil and slot.catalogId == item.catalogId and slot.quantity + item.quantity <= cap then
-				slot.quantity += item.quantity
-				return true
-			end
-		end
-	end
-	if #chest.slots >= StructureCatalog.CHEST_SLOTS then
-		return false
-	end
-	table.insert(chest.slots, item)
-	return true
+	return InventoryRules.Store(chest.slots, item, StructureCatalog.CHEST_SLOTS)
 end
 
 local function take(player: Player, id: any, index: any)
@@ -102,7 +92,7 @@ local function take(player: Player, id: any, index: any)
 		return false, "NoRoom"
 	end
 	if remaining > 0 then
-		entry.quantity = remaining
+		InventoryRules.KeepRemainder(entry, remaining)
 	else
 		table.remove(chest.slots, index)
 	end

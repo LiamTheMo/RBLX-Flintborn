@@ -12,6 +12,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local VaultController = {}
 
@@ -68,7 +69,7 @@ local refresh
 
 local function act(name: string, ...)
 	local ok, reason = invoke(name, ...)
-	ui.status.Text = if ok then "Done." else ("Not possible: " .. tostring(reason))
+	ui.status.Text = if ok then "Done." else ("Not possible: " .. Reasons.Text(reason))
 	refresh()
 end
 
