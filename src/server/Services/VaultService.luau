@@ -22,6 +22,7 @@ local function itemView(item)
 		rarity = def and def.rarity or "Common",
 		quantity = item.quantity,
 		qualityRoll = item.qualityRoll,
+		permanent = item.permanent,
 	}
 end
 

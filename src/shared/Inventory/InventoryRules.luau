@@ -142,6 +142,16 @@ function InventoryRules.FindInstance(inventory: Inventory, instanceId: string)
 	return nil, nil
 end
 
+-- Removes and returns the entry in a hotbar or backpack slot, or nil.
+function InventoryRules.TakeAt(inventory: Inventory, area: string, index: number)
+	if SIZES[area] == nil or type(index) ~= "number" or index % 1 ~= 0 then
+		return nil
+	end
+	local entry = inventory[area][index]
+	inventory[area][index] = nil
+	return entry
+end
+
 -- Swaps two slots (either may be empty). Returns false for an invalid slot.
 function InventoryRules.Move(inventory: Inventory, fromArea: string, fromIndex: number, toArea: string, toIndex: number)
 	local fromSize, toSize = SIZES[fromArea], SIZES[toArea]
