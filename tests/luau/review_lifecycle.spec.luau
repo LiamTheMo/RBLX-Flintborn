@@ -431,6 +431,39 @@ test("items that do not fit the run are saved back to the lobby at once", functi
 	expectEq(#stored(105).lobbyBackpack.slots, 11, "the 11 overflow items are already stored")
 end)
 
+test("materials never stay in the lobby backpack: banked on load and after every write", function()
+	-- A save from before GDD §45 still holds materials in its backpack.
+	local legacy = ProfileSchema.Default(0)
+	legacy.vault.materials.Iron = 995
+	legacy.lobbyBackpack.slots = {
+		{ catalogId = "Iron", quantity = 20 },
+		{ instanceId = "spear-301", catalogId = "StoneSpear", ownerId = 1 },
+	}
+	backing._data[ProfileStore.KeyFor(301)] = legacy
+	local player = newPlayer(301, nil)
+	table.insert(Players._list, player)
+	Players.PlayerAdded:Fire(player)
+	advance(2)
+	local profile = ProfileService.GetProfile(player)
+	expectEq(profile.vault.materials.Iron, 1000, "legacy backpack Iron banked on load")
+	expectEq(profile.vault.lastOverflow.deleted.Iron, 15, "the overflow was deleted")
+	expectEq(#profile.lobbyBackpack.slots, 1, "only the spear stays in the backpack")
+
+	-- Any operation (a trade, a crash recovery, a rollback) that lands a material in
+	-- the backpack ends with it banked.
+	local ok = ProfileService.RunOperation(player, "test-bank-301", "Test", function(working)
+		table.insert(working.lobbyBackpack.slots, { catalogId = "AncientEmber", quantity = 3 })
+	end)
+	expect(ok, "operation committed")
+	expectEq(profile.vault.materials.AncientEmber, 3, "banked by the same write")
+	expectEq(#profile.lobbyBackpack.slots, 1, "still only the spear")
+	ProfileService.Mutate(player, function(live)
+		table.insert(live.lobbyBackpack.slots, { catalogId = "Wood", quantity = 4 })
+	end)
+	expectEq(profile.vault.materials.Wood, 4, "a direct mutation banks too")
+	expectEq(#profile.lobbyBackpack.slots, 1, "the backpack holds no material")
+end)
+
 test("a shutdown racing a Play never loses the reserved loadout", function()
 	-- X's character finishes loading while the shutdown release is being written;
 	-- Y consumed just before the shutdown while an earlier save held the slot.
