@@ -1,13 +1,13 @@
 -- Sprint (hold) and crouch (toggle) input on keyboard, gamepad and touch (GDD §5.1,
 -- Q27). Sends intent only; the server owns stamina and movement speed. World only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local MovementController = {}
 
@@ -41,22 +41,17 @@ local function onCrouch(_, inputState)
 end
 
 local function bind()
-	ContextActionService:BindActionAtPriority(
-		"FlintbornSprint",
+	Binds.Bind(
+		"Sprint",
 		onSprint,
-		true,
-		Enum.ContextActionPriority.High.Value,
-		Enum.KeyCode.LeftShift,
-		Enum.KeyCode.ButtonL3
+		{ priority = Enum.ContextActionPriority.High.Value, touchButton = true, title = "Sprint" }
 	)
-	ContextActionService:SetTitle("FlintbornSprint", "Sprint")
-	ContextActionService:BindAction("FlintbornCrouch", onCrouch, true, Enum.KeyCode.C, Enum.KeyCode.ButtonR3)
-	ContextActionService:SetTitle("FlintbornCrouch", "Crouch")
+	Binds.Bind("Crouch", onCrouch, { touchButton = true, title = "Crouch" })
 end
 
 local function unbind()
-	ContextActionService:UnbindAction("FlintbornSprint")
-	ContextActionService:UnbindAction("FlintbornCrouch")
+	Binds.Unbind("Sprint")
+	Binds.Unbind("Crouch")
 	sprintHeld, crouching = false, false
 end
 

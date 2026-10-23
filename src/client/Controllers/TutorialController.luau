@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local TutorialController = {}
@@ -111,7 +112,7 @@ local function render()
 		return
 	end
 	ui.title.Text = ("Tutorial %d/%d · %s"):format(state.index, state.total, state.title)
-	ui.hint.Text = state.hint
+	ui.hint.Text = Binds.Format(state.hint)
 	ui.ack.Visible = state.ack
 	ui.skip.Visible = state.index > 1
 end
@@ -187,6 +188,7 @@ function TutorialController.Start()
 		render()
 	end)
 	RunService.Heartbeat:Connect(updateMarker)
+	Binds.Changed:Connect(render)
 end
 
 return TutorialController

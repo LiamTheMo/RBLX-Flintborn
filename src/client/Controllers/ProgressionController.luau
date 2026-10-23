@@ -3,7 +3,6 @@
 -- titles, and in the lobby the rebirth screen (Reset / Kept / Gained in plain
 -- words before confirming) and the perk shop.
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,6 +11,7 @@ local PerkCatalog = require(ReplicatedStorage.Shared.Progression.PerkCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local ProgressionController = {}
 
@@ -356,12 +356,12 @@ function ProgressionController.Start()
 			updateBar()
 		end
 	end)
-	ContextActionService:BindAction("FlintbornProgression", function(_, state)
+	Binds.Bind("Progression", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			ProgressionController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.P, Enum.KeyCode.ButtonSelect)
+	end)
 end
 
 return ProgressionController
