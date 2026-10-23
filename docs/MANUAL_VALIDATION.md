@@ -53,3 +53,18 @@ Studio and live checks (until crafting arrives in v0.05, a Studio run starts wit
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
 - [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
 - [ ] The HUD is readable on desktop, touch and gamepad.
+
+## v0.05 — Gathering, inventory and field crafting
+
+Automated: 9 specs cover one-slot-per-type stacking and caps, unique items never merging, 9 + 50 capacity, all-or-nothing removal, slot moves, recipe validity and the 10-arrow craft, starter-set cost, ±5% rolls only at world workbenches, the relative best-roll chance, and tool-dependent node yields. Deployed and verified on both places (2026-10-23).
+
+Until the real map (v0.15), the play map scatters placeholder trees, rocks, iron, fiber, herbs and berry bushes within the map radius. Tag parts `ResourceNode` with a `NodeType` attribute to place them by hand instead.
+
+Studio and live checks:
+
+- [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
+- [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
+- [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
+- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack; tap two slots to move or swap.
+- [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
+- [ ] A full inventory refuses a craft or harvest without consuming anything.
