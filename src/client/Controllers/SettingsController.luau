@@ -19,8 +19,20 @@ local defaultRarity = table.clone(Rarity.Colors)
 
 local make = Theme.Make
 
+-- Small screens (phones are about 360 px tall) shrink the whole UI so fixed-size
+-- panels and their close buttons stay on-screen; the user's choice multiplies it.
+SettingsController.DESIGN_HEIGHT = 600
+
+local function viewportFactor(): number
+	local camera = workspace.CurrentCamera
+	if camera == nil or camera.ViewportSize.Y <= 1 then
+		return 1
+	end
+	return math.min(1, camera.ViewportSize.Y / SettingsController.DESIGN_HEIGHT)
+end
+
 local function applyScale()
-	local scale = player:GetAttribute("UiScale") or 1
+	local scale = (player:GetAttribute("UiScale") or 1) * viewportFactor()
 	for _, gui in playerGui:GetChildren() do
 		if gui:IsA("ScreenGui") then
 			local uiScale = gui:FindFirstChild("FlintbornScale") or make("UIScale", { Name = "FlintbornScale" }, gui)
@@ -101,6 +113,7 @@ local function build()
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromOffset(360, 330),
 		BackgroundColor3 = Theme.Colors.Panel,
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
@@ -172,6 +185,20 @@ function SettingsController.Start()
 		end
 	end)
 	player:GetAttributeChangedSignal("UiScale"):Connect(applyScale)
+	local viewportConnection = nil
+	local function watchCamera()
+		if viewportConnection then
+			viewportConnection:Disconnect()
+			viewportConnection = nil
+		end
+		local camera = workspace.CurrentCamera
+		if camera then
+			viewportConnection = camera:GetPropertyChangedSignal("ViewportSize"):Connect(applyScale)
+		end
+		applyScale()
+	end
+	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(watchCamera)
+	watchCamera()
 	player:GetAttributeChangedSignal("ColourBlind"):Connect(applyPalette)
 	ContextActionService:BindAction("FlintbornSettings", function(_, state)
 		if state == Enum.UserInputState.Begin then

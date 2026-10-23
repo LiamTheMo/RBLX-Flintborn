@@ -11,6 +11,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local VaultController = {}
 
@@ -132,16 +133,20 @@ local function column(parent, x: number, title: string)
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Vault", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- Above the always-open lobby panel.
+	local gui =
+		make("ScreenGui", { Name = "Vault", ResetOnSpawn = false, DisplayOrder = 2 }, player:WaitForChild("PlayerGui"))
+	-- Never taller than the screen, so the close button stays reachable on phones.
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.45, 0.5),
-		Size = UDim2.new(0.6, 0, 0, 420),
+		Size = UDim2.new(0.6, 0, 1, -24),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(820, 420), MinSize = Vector2.new(480, 300) }, ui.panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(820, 420), MinSize = Vector2.new(480, 240) }, ui.panel)
 	make("TextLabel", {
 		Text = "Secure Vault",
 		Position = UDim2.fromOffset(10, 6),
@@ -181,10 +186,10 @@ local function build()
 		TextSize = 13,
 	}, ui.panel)
 
+	-- In the shared top-centre column with the other banners.
 	ui.receipt = make("TextButton", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 16),
 		Size = UDim2.fromOffset(460, 0),
+		LayoutOrder = Theme.TopOrder.Receipt,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Color3.fromRGB(16, 38, 30),
 		BackgroundTransparency = 0.05,
@@ -193,7 +198,7 @@ local function build()
 		Font = Enum.Font.GothamMedium,
 		TextSize = 14,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.receipt)
 	make("UIPadding", { PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8) }, ui.receipt)
 	ui.receipt.Activated:Connect(function()

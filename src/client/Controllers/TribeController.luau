@@ -98,19 +98,34 @@ local function build()
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 16, 0.5, 0),
-		Size = UDim2.fromOffset(280, 360),
+		Size = UDim2.new(0, 280, 1, -24),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
 		BackgroundTransparency = 0.05,
+		Active = true,
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
+	make("UISizeConstraint", { MaxSize = Vector2.new(280, 360) }, ui.panel)
 	make("UIPadding", {
 		PaddingTop = UDim.new(0, 8),
 		PaddingLeft = UDim.new(0, 8),
 		PaddingRight = UDim.new(0, 8),
 	}, ui.panel)
+	local close = make("TextButton", {
+		Text = "✕",
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.fromScale(1, 0),
+		Size = UDim2.fromOffset(28, 24),
+		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
+		TextColor3 = Color3.fromRGB(245, 236, 222),
+		Font = Enum.Font.GothamBold,
+		TextSize = 14,
+	}, ui.panel)
+	close.Activated:Connect(function()
+		ui.panel.Visible = false
+	end)
 	ui.status = make("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 20),
+		Size = UDim2.new(1, -34, 0, 20),
 		BackgroundTransparency = 1,
 		TextColor3 = Color3.fromRGB(255, 220, 170),
 		Font = Enum.Font.GothamMedium,

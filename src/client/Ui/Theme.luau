@@ -4,6 +4,7 @@
 -- ReducedMotion and Subtitles.
 
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local Theme = {}
 
@@ -51,6 +52,62 @@ end
 
 function Theme.ReducedMotion(): boolean
 	return Theme.Option("ReducedMotion") == true
+end
+
+-- True when the player is aiming with a mouse right now. Touchscreen laptops have
+-- both a mouse and touch, so the last input decides, not the hardware list.
+function Theme.UsingMouse(): boolean
+	local last = UserInputService:GetLastInputType()
+	if last == Enum.UserInputType.Touch or string.find(last.Name, "Gamepad") then
+		return false
+	end
+	if string.find(last.Name, "Mouse") then
+		return true
+	end
+	-- Keyboard (or nothing yet): fall back to the hardware.
+	return UserInputService.MouseEnabled and (last == Enum.UserInputType.Keyboard or not UserInputService.TouchEnabled)
+end
+
+-- One shared top-centre column for banners from several controllers, so they
+-- stack instead of overlapping; hidden banners take no space.
+Theme.TopOrder = {
+	Compass = 1,
+	Transition = 2,
+	Horn = 3,
+	Downed = 4,
+	Extraction = 5,
+	BossBar = 6,
+	EventBanner = 7,
+	Receipt = 8,
+	TradeInvite = 9,
+	Toast = 10,
+	Tutorial = 11,
+}
+
+local topStack = nil
+
+function Theme.TopStack()
+	if topStack == nil then
+		local gui = Theme.Make(
+			"ScreenGui",
+			{ Name = "TopStack", ResetOnSpawn = false, DisplayOrder = 5 },
+			Players.LocalPlayer:WaitForChild("PlayerGui")
+		)
+		topStack = Theme.Make("Frame", {
+			Name = "Stack",
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.new(0.5, 0, 0, 2),
+			Size = UDim2.fromOffset(600, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+		}, gui)
+		Theme.Make("UIListLayout", {
+			Padding = UDim.new(0, 4),
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+		}, topStack)
+	end
+	return topStack
 end
 
 local subtitle = nil

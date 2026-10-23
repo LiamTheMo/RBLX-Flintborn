@@ -28,10 +28,10 @@ end
 
 local function build()
 	local gui = make("ScreenGui", { Name = "Extraction", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	-- The countdown list lives in the shared top-centre column with the other banners.
 	ui.list = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 0),
-		Position = UDim2.new(0.5, 0, 0, 12),
 		Size = UDim2.fromOffset(420, 0),
+		LayoutOrder = Theme.TopOrder.Extraction,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Color3.fromRGB(16, 30, 38),
 		BackgroundTransparency = 0.2,
@@ -40,7 +40,7 @@ local function build()
 		Font = Enum.Font.GothamBold,
 		TextSize = 15,
 		Visible = false,
-	}, gui)
+	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.list)
 	make("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 6) }, ui.list)
 	ui.protected = make("TextLabel", {
