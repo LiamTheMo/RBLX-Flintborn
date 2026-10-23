@@ -10,7 +10,7 @@
 - **[Manual validation](docs/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
 - **[Release checklist](docs/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
 
-**Current phase:** [v0.15 — Shattered Crater world, art direction and camera](docs/phases/v0.15-shattered-crater-world-art-and-camera.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** [v0.16 — Onboarding, UX and accessibility](docs/phases/v0.16-onboarding-ux-and-accessibility.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 

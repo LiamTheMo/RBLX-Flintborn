@@ -29,7 +29,7 @@
 | v0.12 ✅ | Bosses: Guardian and scalable encounters | v0.11 | Center Guardian and event, ritual and structure bosses |
 | v0.13 ✅ | Account progression, masteries and rebirth | v0.08 | XP, levels, five masteries, rebirth tokens and perks |
 | v0.14 ✅ | Economy, shops, trading and monetization | v0.13 | Coins, Gems, NPC shops, quests, lobby trading, Premium |
-| [v0.15](v0.15-shattered-crater-world-art-and-camera.md) | Shattered Crater world, art direction and camera | v0.11 | Full island, biomes, POIs, art pass, adjustable camera |
+| v0.15 ✅ | Shattered Crater world, art direction and camera | v0.11 | Full island, biomes, POIs, art pass, adjustable camera |
 | [v0.16](v0.16-onboarding-ux-and-accessibility.md) | Onboarding, UX and accessibility | v0.14 | Guided tutorial, quests, polished UI on every input |
 | [v0.17](v0.17-live-ops-hardening.md) | Live-ops hardening | v0.16 | Telemetry, anti-exploit, performance, crash recovery |
 | [v0.18](v0.18-release-candidate-and-launch-readiness.md) | Release candidate and launch readiness | v0.17 | Launch-ready build, promoted to v1.00 |
