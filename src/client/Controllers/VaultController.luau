@@ -105,6 +105,14 @@ function refresh()
 	for _, material in view.materials do
 		row(ui.materials, ("%s ×%d"):format(material.name, material.quantity), Color3.fromRGB(230, 220, 200), nil)
 	end
+	for _, lost in view.overflow or {} do
+		row(
+			ui.materials,
+			("Vault full — deleted %s ×%d"):format(lost.name, lost.quantity),
+			Color3.fromRGB(235, 120, 100),
+			nil
+		)
+	end
 end
 
 local function column(parent, x: number, title: string)

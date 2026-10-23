@@ -1,6 +1,8 @@
 -- Loads, autosaves and releases player profiles (GDD §23.1). Other services read
 -- profiles through GetProfile/WaitForProfile and change them only through
--- RunOperation, which makes every grant or charge exactly-once.
+-- RunOperation, which makes every grant or charge exactly-once. Every write (and
+-- every load) ends by banking any material in the lobby backpack into the vault,
+-- so materials never stay where a Deploy could take them (GDD §45).
 
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
@@ -9,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local VaultRules = require(ReplicatedStorage.Shared.Extraction.VaultRules)
 
 local DataStoreGateway = require(script.Parent.Parent.Infrastructure.DataStoreGateway)
 local InMemoryDataStore = require(script.Parent.Parent.Infrastructure.InMemoryDataStore)
@@ -133,6 +136,14 @@ local function createGateway()
 	})
 end
 
+-- Banks lobby backpack materials into the vault, deleting what exceeds its
+-- capacity. True when anything moved.
+local function bankMaterials(profile): boolean
+	local before = #profile.lobbyBackpack.slots
+	VaultRules.BankMaterials(profile, os.time())
+	return #profile.lobbyBackpack.slots ~= before
+end
+
 local function loadPlayer(player: Player)
 	local userId = player.UserId
 	-- Rejoined while this server is still writing their release: wait for that
@@ -145,6 +156,9 @@ local function loadPlayer(player: Player)
 	if cached ~= nil then
 		-- An earlier release failed: this server still holds the newest copy and its
 		-- lease, so keep using it.
+		if bankMaterials(cached) then
+			store:MarkDirty(userId)
+		end
 		setStatus(player)
 		ProfileService.ProfileLoaded:Fire(player, cached)
 		return
@@ -165,6 +179,10 @@ local function loadPlayer(player: Player)
 				-- Left while loading: hand the lease straight back.
 				saveUser(userId, true, nil)
 				return
+			end
+			-- Saves from before GDD §45 may hold materials in the backpack.
+			if bankMaterials(profile) then
+				store:MarkDirty(userId)
 			end
 			setStatus(player)
 			ProfileService.ProfileLoaded:Fire(player, profile)
@@ -271,7 +289,11 @@ function ProfileService.RunOperation(player: Player, operationId: string, kind: 
 	if profile == nil then
 		return false, "ProfileNotLoaded", false
 	end
-	local ok, result, applied = pcall(OperationJournal.Run, profile, operationId, kind, os.time(), apply)
+	local ok, result, applied = pcall(OperationJournal.Run, profile, operationId, kind, os.time(), function(working)
+		local value = apply(working)
+		bankMaterials(working)
+		return value
+	end)
 	if not ok then
 		return false, result, false
 	end
@@ -292,6 +314,7 @@ function ProfileService.Mutate(player: Player, apply: (any) -> ())
 		return false
 	end
 	apply(profile)
+	bankMaterials(profile)
 	store:MarkDirty(player.UserId)
 	setStatus(player)
 	scheduleSave(player)

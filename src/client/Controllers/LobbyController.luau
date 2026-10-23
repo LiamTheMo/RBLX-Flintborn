@@ -75,30 +75,20 @@ local function refreshPreview()
 		label("Could not read your backpack yet.", ui.preview)
 		return
 	end
-	local function line(item, marker: string)
-		local def = ItemCatalog.Get(item.catalogId)
-		local name = def and def.name or tostring(item.catalogId)
-		label(marker .. name .. (item.quantity and (" ×" .. item.quantity) or ""), ui.preview)
-	end
-	local going, staying = {}, {}
-	for _, item in items do
-		table.insert(if item.staysInLobby then staying else going, item)
-	end
-	if #going == 0 then
+	if #items == 0 then
 		label("Nothing in your backpack will enter the run.", ui.preview)
 	else
 		label("⚠ These items go with you; all but ★ Permanent ones can be lost:", ui.preview)
-		for _, item in going do
-			line(item, if item.permanent then "★ " else "• ")
+		for _, item in items do
+			local def = ItemCatalog.Get(item.catalogId)
+			local name = def and def.name or tostring(item.catalogId)
+			label(
+				(item.permanent and "★ " or "• ") .. name .. (item.quantity and (" ×" .. item.quantity) or ""),
+				ui.preview
+			)
 		end
 	end
-	if #staying > 0 then
-		label("Materials never leave the lobby; deposit these in your vault:", ui.preview)
-		for _, item in staying do
-			line(item, "• ")
-		end
-	end
-	label("Items in your vault always stay safe.", ui.preview)
+	label("Items in your vault always stay safe; materials always stay in the vault.", ui.preview)
 end
 
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,

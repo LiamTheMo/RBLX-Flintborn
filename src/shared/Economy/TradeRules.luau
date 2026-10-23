@@ -1,6 +1,8 @@
--- Lobby trading (GDD §10.2, Q13, Q50, Q56, Q98, Q125, Q130). Two players in the
--- same lobby trade designated items and Gems — never Coins. Raw materials trade
--- only when flagged rare or Exclusive. Gem trades need level 10 on both sides, are
+-- Lobby trading (GDD §10.2, Q13, Q50, Q56, Q98, Q125, Q130, Q164). Two players in
+-- the same lobby trade designated items and Gems — never Coins. Raw materials trade
+-- only when flagged rare or Exclusive, and only out of the vault, where every
+-- material lives; they land in the receiver's vault, so an offer needs room there
+-- and a trade never deletes. Gem trades need level 10 on both sides, are
 -- capped per UTC day for sending and receiving, and pay a 5% fee. Settlement
 -- writes the trade into both profiles as pending; Reconcile later finalises it
 -- (the counterpart saved it too) or rolls one side back (the counterpart never
@@ -8,8 +10,10 @@
 -- Until then the profile is "settling": nothing a rollback could not claw back
 -- (sales, Forge crafts, Gem spending, a Deploy) may consume what it received.
 
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
+local Validation = require(script.Parent.Parent.Data.Validation)
 
 local TradeRules = {}
 
@@ -20,6 +24,8 @@ TradeRules.MAX_ITEMS = 9
 TradeRules.HISTORY = 500
 -- Why a sale, craft, Gem spend or Deploy is refused while a trade may roll back.
 TradeRules.SETTLING = "TradeSettling"
+-- Offer key of a vault material: "mat:<catalogId>".
+TradeRules.MATERIAL_PREFIX = "mat:"
 
 local TRADEABLE_FAMILIES = { Tool = true, Weapon = true, Armor = true, Placeable = true }
 
@@ -39,6 +45,29 @@ function TradeRules.IsTradeable(item): boolean
 	return TRADEABLE_FAMILIES[def.family] == true
 end
 
+-- A lobby backpack slot that may be offered: never a material, which trades only
+-- from the vault (Q164).
+function TradeRules.IsTradeableSlot(item): boolean
+	return not ItemCatalog.IsMaterial(item.catalogId) and TradeRules.IsTradeable(item)
+end
+
+-- A vault material that may be offered: flagged rare or Exclusive (Q56).
+function TradeRules.IsTradeableMaterial(catalogId: any): boolean
+	return type(catalogId) == "string"
+		and ItemCatalog.IsMaterial(catalogId)
+		and TradeRules.IsTradeable({ catalogId = catalogId })
+end
+
+function TradeRules.MaterialKey(catalogId: string): string
+	return TradeRules.MATERIAL_PREFIX .. catalogId
+end
+
+-- The catalog ID a vault material offer key names, or nil for a backpack key.
+function TradeRules.MaterialOf(key: string): string?
+	local prefix = TradeRules.MATERIAL_PREFIX
+	return if key:sub(1, #prefix) == prefix then key:sub(#prefix + 1) else nil
+end
+
 -- True while a settled trade awaits its counterpart's save (Reconcile clears it).
 function TradeRules.IsSettling(profile): boolean
 	return next(profile.trades.pending) ~= nil
@@ -48,8 +77,9 @@ local function today(now: number): number
 	return now // 86400
 end
 
--- Checks one side's offer against its own profile. offer = {items = {instanceId
--- or catalogId keys of lobby backpack slots...}, gems, coins?}.
+-- Checks one side's offer against its own profile. offer = {items = {lobby
+-- backpack slot indexes...}, materials = {[catalogId] = vault quantity}?, gems,
+-- coins?}.
 function TradeRules.ValidateOffer(profile, offer, now: number)
 	if offer.coins ~= nil and offer.coins ~= 0 then
 		return false, "CoinsNotTradeable"
@@ -58,7 +88,11 @@ function TradeRules.ValidateOffer(profile, offer, now: number)
 	if TradeRules.IsSettling(profile) then
 		return false, "TradePending"
 	end
-	if #offer.items > TradeRules.MAX_ITEMS then
+	local count = #offer.items
+	for _ in offer.materials or {} do
+		count += 1
+	end
+	if count > TradeRules.MAX_ITEMS then
 		return false, "TooManyItems"
 	end
 	local seen = {}
@@ -68,8 +102,19 @@ function TradeRules.ValidateOffer(profile, offer, now: number)
 			return false, "MissingItem"
 		end
 		seen[index] = true
-		if not TradeRules.IsTradeable(item) then
+		if not TradeRules.IsTradeableSlot(item) then
 			return false, "NotTradeable"
+		end
+	end
+	for catalogId, quantity in offer.materials or {} do
+		if not Validation.IsQuantity(quantity, 1) then
+			return false, "BadQuantity"
+		end
+		if not TradeRules.IsTradeableMaterial(catalogId) then
+			return false, "NotTradeable"
+		end
+		if (profile.vault.materials[catalogId] or 0) < quantity then
+			return false, "MissingItem"
 		end
 	end
 	local gems = offer.gems or 0
@@ -95,8 +140,14 @@ function TradeRules.GemsAfterFee(gems: number): number
 	return math.floor(gems * (1 - TradeRules.GEM_FEE))
 end
 
--- Checks that `profile` may receive `gems` (before the fee) today.
-function TradeRules.ValidateReceive(profile, gems: number, now: number)
+-- Checks that `profile` may receive `gems` (before the fee) today, and has vault
+-- room for `materials` ({[catalogId] = quantity}): a trade never deletes.
+function TradeRules.ValidateReceive(profile, gems: number, now: number, materials: { [string]: number }?)
+	for catalogId, quantity in materials or {} do
+		if (profile.vault.materials[catalogId] or 0) + quantity > GameConstants.MATERIAL_STACK_MAX then
+			return false, "PartnerVaultFull"
+		end
+	end
 	if gems <= 0 then
 		return true, nil
 	end
@@ -111,7 +162,8 @@ function TradeRules.ValidateReceive(profile, gems: number, now: number)
 	return true, nil
 end
 
--- Takes the offered items and Gems out of the giver. Returns what was taken.
+-- Takes the offered items, vault materials and Gems out of the giver. Returns
+-- what was taken.
 local function takeOffer(profile, offer, now: number)
 	local indexes = table.clone(offer.items)
 	table.sort(indexes, function(a, b)
@@ -126,6 +178,14 @@ local function takeOffer(profile, offer, now: number)
 		end
 		table.insert(items, item)
 	end
+	local materials = {}
+	for catalogId, quantity in offer.materials or {} do
+		local left = (profile.vault.materials[catalogId] or 0) - quantity
+		-- Never give what is not there (the caller restores both profiles).
+		assert(left >= 0, "MissingMaterial")
+		profile.vault.materials[catalogId] = if left > 0 then left else nil
+		materials[catalogId] = quantity
+	end
 	local gems = offer.gems or 0
 	if gems > 0 then
 		local currency = profile.currency
@@ -135,7 +195,15 @@ local function takeOffer(profile, offer, now: number)
 		currency.gemsTradedToday += gems
 		currency.gems -= gems
 	end
-	return { items = items, gems = gems }
+	return { items = items, materials = materials, gems = gems }
+end
+
+-- Banks materials into a vault; anything over the capacity is deleted (Q154).
+local function bank(profile, materials)
+	for catalogId, quantity in materials or {} do
+		local stored = GameConstants.SettleMaterialStack(profile.vault.materials[catalogId] or 0, quantity)
+		profile.vault.materials[catalogId] = if stored > 0 then stored else nil
+	end
 end
 
 local function give(profile, taken, receiverId: number, now: number)
@@ -152,6 +220,8 @@ local function give(profile, taken, receiverId: number, now: number)
 		-- Received items always land, even past 50 slots: a trade never deletes.
 		table.insert(profile.lobbyBackpack.slots, copy)
 	end
+	-- ValidateReceive made room for them.
+	bank(profile, taken.materials)
 	local gems = TradeRules.GemsAfterFee(taken.gems)
 	if gems > 0 then
 		local currency = profile.currency
@@ -253,16 +323,30 @@ local function takeBack(profile, item)
 	end
 end
 
+-- Claws received vault materials back: vault first, then any backpack stack.
+local function takeMaterials(profile, materials)
+	local stock = profile.vault.materials
+	for catalogId, quantity in materials or {} do
+		local taken = math.min(quantity, stock[catalogId] or 0)
+		local remaining = (stock[catalogId] or 0) - taken
+		stock[catalogId] = if remaining > 0 then remaining else nil
+		takeStack(profile.lobbyBackpack.slots, catalogId, quantity - taken)
+	end
+end
+
 local function rollBack(profile, pending, now: number)
 	for _, item in pending.received.items do
 		takeBack(profile, item)
 	end
+	takeMaterials(profile, pending.received.materials)
 	for _, item in pending.gave.items do
 		table.insert(profile.lobbyBackpack.slots, table.clone(item))
 		if item.permanent then
 			profile.permanentItems[item.instanceId] = PermanentRules.LedgerEntry(item, now)
 		end
 	end
+	-- Given materials go back to the vault; past its capacity they are deleted.
+	bank(profile, pending.gave.materials)
 	local currency = profile.currency
 	currency.gems = math.max(0, currency.gems - TradeRules.GemsAfterFee(pending.received.gems) + pending.gave.gems)
 end
