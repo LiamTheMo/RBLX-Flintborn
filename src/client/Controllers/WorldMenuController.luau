@@ -37,6 +37,9 @@ local function refresh()
 	local state = player:GetAttribute(STATE_ATTRIBUTE)
 	ui.menu.Visible = SessionStates.ShowsWorldMenu(state)
 	ui.status.Text = STATUS_TEXT[state] or ""
+	if player:GetAttribute("MaintenanceNotice") then
+		ui.error.Text = "Game update: your items were saved and return when you press Play."
+	end
 	local ready = state == SessionStates.WorldMainMenuReady
 	ui.play.Active = ready
 	ui.play.AutoButtonColor = ready
@@ -180,6 +183,7 @@ function WorldMenuController.Start()
 	end
 	build()
 	player:GetAttributeChangedSignal(STATE_ATTRIBUTE):Connect(refresh)
+	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refresh)
 	refresh()
 end
 

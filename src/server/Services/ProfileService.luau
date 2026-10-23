@@ -27,6 +27,9 @@ ProfileService.SHUTDOWN_BUDGET_SECONDS = 25
 
 -- Fires (player, profile) once a player's profile is loaded and leased here.
 ProfileService.ProfileLoaded = Signal.new()
+-- Fires once at graceful shutdown, before profiles are released, so held items can
+-- be written to profiles first. Handlers run to completion before releases start.
+ProfileService.BeforeShutdown = Signal.new()
 
 local store
 local scheduledSaves = {}
@@ -188,6 +191,12 @@ function ProfileService.Start()
 	end)
 
 	game:BindToClose(function()
+		local ok, err = pcall(function()
+			ProfileService.BeforeShutdown:Fire()
+		end)
+		if not ok then
+			warn("[ProfileService] BeforeShutdown handler failed: " .. tostring(err))
+		end
 		local remaining = 0
 		for _, userId in store:LoadedUserIds() do
 			remaining += 1
