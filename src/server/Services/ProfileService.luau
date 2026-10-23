@@ -1,0 +1,239 @@
+-- Loads, autosaves and releases player profiles (GDD §23.1). Other services read
+-- profiles through GetProfile/WaitForProfile and change them only through
+-- RunOperation, which makes every grant or charge exactly-once.
+
+local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local DataStoreGateway = require(script.Parent.Parent.Infrastructure.DataStoreGateway)
+local InMemoryDataStore = require(script.Parent.Parent.Infrastructure.InMemoryDataStore)
+local OperationJournal = require(script.Parent.Parent.Infrastructure.OperationJournal)
+local ProfileStore = require(script.Parent.Parent.Infrastructure.ProfileStore)
+
+local ProfileService = {}
+
+ProfileService.STORE_NAME = "PlayerProfiles_v1"
+ProfileService.STATUS_ATTRIBUTE = "SaveStatus"
+ProfileService.AUTOSAVE_SECONDS = 60
+ProfileService.SAVE_AFTER_CHANGE_SECONDS = 3
+ProfileService.LOAD_ATTEMPTS = 10
+ProfileService.LOAD_RETRY_SECONDS = 3
+ProfileService.SHUTDOWN_BUDGET_SECONDS = 25
+
+local store
+local scheduledSaves = {}
+
+local function setStatus(player: Player?)
+	if player and player.Parent then
+		local status = store:Status(player.UserId)
+		if status then
+			player:SetAttribute(ProfileService.STATUS_ATTRIBUTE, status)
+		end
+	end
+end
+
+local function waitForSaveSlot(userId: number)
+	while store:IsSaving(userId) do
+		task.wait(0.1)
+	end
+end
+
+-- Saves one cached profile. `player` is nil when the player already left (a release
+-- that failed earlier is retried this way until it succeeds).
+local function saveUser(userId: number, release: boolean?, player: Player?)
+	waitForSaveSlot(userId)
+	if store:Status(userId) == nil then
+		return false, "NotLoaded"
+	end
+	local ok, reason = store:Save(userId, release)
+	if not ok then
+		warn(("[ProfileService] Save for %d failed: %s"):format(userId, tostring(reason)))
+		if reason == "LeaseLost" or reason == "StaleRevision" then
+			-- Another server now owns this profile; never write again from here.
+			store:Forget(userId)
+			if player and player.Parent then
+				player:Kick("Your Flintborn data was opened on another server. Please rejoin.")
+			end
+		end
+	end
+	setStatus(player)
+	return ok, reason
+end
+
+local function save(player: Player, release: boolean?)
+	return saveUser(player.UserId, release, player)
+end
+
+local function scheduleSave(player: Player)
+	if scheduledSaves[player] then
+		return
+	end
+	scheduledSaves[player] = true
+	task.delay(ProfileService.SAVE_AFTER_CHANGE_SECONDS, function()
+		scheduledSaves[player] = nil
+		if player.Parent then
+			save(player, false)
+		end
+	end)
+end
+
+local function createGateway()
+	local studioProbe = nil
+	local dataStore = DataStoreService:GetDataStore(ProfileService.STORE_NAME)
+	if RunService:IsStudio() then
+		-- Studio without "Enable Studio Access to API Services" cannot reach DataStores.
+		local ok, err = pcall(function()
+			return dataStore:GetAsync("__probe")
+		end)
+		if not ok then
+			studioProbe = err
+		end
+	end
+	if studioProbe then
+		warn(
+			"[ProfileService] DataStores unavailable in Studio ("
+				.. tostring(studioProbe)
+				.. "); using an in-memory store. Data will not persist."
+		)
+		return DataStoreGateway.new({ store = InMemoryDataStore.new() })
+	end
+	return DataStoreGateway.new({
+		store = dataStore,
+		waitForBudget = function()
+			while DataStoreService:GetRequestBudgetForRequestType(Enum.DataStoreRequestType.UpdateAsync) < 1 do
+				task.wait(1)
+			end
+		end,
+	})
+end
+
+local function loadPlayer(player: Player)
+	local userId = player.UserId
+	if store:Status(userId) ~= nil then
+		-- Rejoined this server before an earlier release finished: this server still
+		-- holds the newest copy and its lease, so keep using it.
+		setStatus(player)
+		return
+	end
+	player:SetAttribute(ProfileService.STATUS_ATTRIBUTE, ProfileStore.SaveState.Loading)
+	local lastReason = nil
+	for _ = 1, ProfileService.LOAD_ATTEMPTS do
+		if not player.Parent then
+			return
+		end
+		local profile, reason = store:Load(userId)
+		if profile then
+			if not player.Parent then
+				-- Left while loading: hand the lease straight back.
+				saveUser(userId, true, nil)
+				return
+			end
+			setStatus(player)
+			return
+		end
+		lastReason = reason
+		if reason ~= "LeaseHeld" then
+			break
+		end
+		task.wait(ProfileService.LOAD_RETRY_SECONDS)
+	end
+	warn(("[ProfileService] Could not load profile %d: %s"):format(userId, tostring(lastReason)))
+	if player.Parent then
+		player:SetAttribute(ProfileService.STATUS_ATTRIBUTE, ProfileStore.SaveState.Error)
+		local message = if lastReason == "LeaseHeld"
+			then "Your Flintborn data is still in use by another server. Nothing was lost — please rejoin in a minute."
+			else "Flintborn could not load your data safely. Nothing was lost — please rejoin."
+		player:Kick(message)
+	end
+end
+
+function ProfileService.Init()
+	local jobId = game.JobId
+	if jobId == "" then
+		jobId = "studio-" .. HttpService:GenerateGUID(false)
+	end
+	store = ProfileStore.new({ gateway = createGateway(), jobId = jobId, clock = os.time })
+end
+
+function ProfileService.Start()
+	Players.PlayerAdded:Connect(loadPlayer)
+	for _, player in Players:GetPlayers() do
+		task.spawn(loadPlayer, player)
+	end
+
+	Players.PlayerRemoving:Connect(function(player)
+		scheduledSaves[player] = nil
+		save(player, true)
+	end)
+
+	-- Autosave every cached profile, which also renews its lease. Profiles whose
+	-- player already left are released (retrying a release that failed earlier).
+	task.spawn(function()
+		while true do
+			task.wait(ProfileService.AUTOSAVE_SECONDS)
+			for _, userId in store:LoadedUserIds() do
+				local player = Players:GetPlayerByUserId(userId)
+				task.spawn(saveUser, userId, player == nil, player)
+			end
+		end
+	end)
+
+	game:BindToClose(function()
+		local remaining = 0
+		for _, userId in store:LoadedUserIds() do
+			remaining += 1
+			task.spawn(function()
+				saveUser(userId, true, Players:GetPlayerByUserId(userId))
+				remaining -= 1
+			end)
+		end
+		local deadline = os.clock() + ProfileService.SHUTDOWN_BUDGET_SECONDS
+		while remaining > 0 and os.clock() < deadline do
+			task.wait(0.1)
+		end
+	end)
+end
+
+-- The live profile, or nil while loading or after it was released.
+function ProfileService.GetProfile(player: Player)
+	return store and store:Get(player.UserId) or nil
+end
+
+function ProfileService.WaitForProfile(player: Player, timeoutSeconds: number?)
+	local deadline = os.clock() + (timeoutSeconds or 30)
+	while player.Parent and os.clock() < deadline do
+		local profile = ProfileService.GetProfile(player)
+		if profile then
+			return profile
+		end
+		task.wait(0.1)
+	end
+	return nil
+end
+
+-- Applies `apply(profile)` exactly once for `operationId`, then schedules a save.
+-- Returns (ok, result, applied). An error inside `apply` changes nothing.
+function ProfileService.RunOperation(player: Player, operationId: string, kind: string, apply: (any) -> any)
+	local profile = ProfileService.GetProfile(player)
+	if profile == nil then
+		return false, "ProfileNotLoaded", false
+	end
+	local ok, result, applied = pcall(OperationJournal.Run, profile, operationId, kind, os.time(), apply)
+	if not ok then
+		return false, result, false
+	end
+	if applied then
+		store:MarkDirty(player.UserId)
+		setStatus(player)
+		scheduleSave(player)
+	end
+	return true, result, applied
+end
+
+function ProfileService.SaveNow(player: Player)
+	return save(player, false)
+end
+
+return ProfileService
