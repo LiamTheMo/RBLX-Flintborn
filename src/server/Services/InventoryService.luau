@@ -103,6 +103,16 @@ function InventoryService.RemoveAll(player: Player, costs: { [string]: number })
 	return true
 end
 
+-- Removes stackable items, all or nothing, and returns them as stacks (or nil).
+function InventoryService.TakeAll(player: Player, costs: { [string]: number })
+	local inventory = InventoryService.Get(player)
+	local taken = inventory and InventoryRules.TakeAll(inventory, costs)
+	if taken then
+		InventoryService.Publish(player)
+	end
+	return taken
+end
+
 -- Removes and returns the entry in a hotbar or backpack slot, unequipping it.
 function InventoryService.TakeAt(player: Player, area: string, index: number)
 	local entry = entries[player]
@@ -165,6 +175,8 @@ local function keepInLobby(player: Player, leftovers)
 				if item.instanceId then
 					item.location = "LobbyBackpack"
 				end
+				-- Back in the lobby the units are simply vault-side again.
+				item.fromLobby = nil
 				table.insert(profile.lobbyBackpack.slots, item)
 			end
 		end
@@ -183,7 +195,9 @@ local function keepInLobby(player: Player, leftovers)
 end
 
 local function startRun(player: Player, _character, items)
-	local inventory, leftovers = InventoryRules.FromItems(items or {})
+	-- Every deployed stack is tagged as lobby units: the Center never doubles them,
+	-- in this inventory or anyone else's (GDD §9.3).
+	local inventory, leftovers = InventoryRules.Deploy(items or {})
 	entries[player] = { inventory = inventory, equipped = nil }
 	if #leftovers > 0 then
 		keepInLobby(player, leftovers)

@@ -6,8 +6,14 @@
 -- Deletion is best effort; the receipt is what guarantees that only a real crash
 -- is ever restored. Recovery then restores the checkpointed items once, minus
 -- anything already dropped, stored or traded away, into the lobby backpack.
+--
+-- The Play that starts a run records it in the profile together with the consume
+-- (its ID, its server and, until the first checkpoint, the loadout it carries in),
+-- so a crash before any checkpoint still restores the loadout, and a new run can
+-- start only once the previous one is settled (one checkpoint slot per user).
 
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
+local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 
 local CrashRecoveryRules = {}
 
@@ -26,11 +32,10 @@ function CrashRecoveryRules.Classify(checkpoint, heartbeatAt: number?, now: numb
 	return "Eligible"
 end
 
--- A compact checkpoint of the items a player carries right now.
-function CrashRecoveryRules.Checkpoint(runId: string, jobId: string, items, transferred, now: number)
-	local compact = {}
+local function compact(items)
+	local list = {}
 	for _, item in items do
-		table.insert(compact, {
+		table.insert(list, {
 			instanceId = item.instanceId,
 			catalogId = item.catalogId,
 			quantity = item.quantity,
@@ -40,11 +45,63 @@ function CrashRecoveryRules.Checkpoint(runId: string, jobId: string, items, tran
 			ownershipVersion = item.ownershipVersion,
 		})
 	end
+	return list
+end
+
+-- A compact checkpoint of the items a player carries right now.
+function CrashRecoveryRules.Checkpoint(runId: string, jobId: string, items, transferred, now: number)
 	local gone = {}
 	for instanceId in transferred do
 		table.insert(gone, instanceId)
 	end
-	return { runId = runId, jobId = jobId, at = now, items = compact, transferred = gone }
+	return { runId = runId, jobId = jobId, at = now, items = compact(items), transferred = gone }
+end
+
+-- Records the run a Play starts, inside its consume operation. `carried` are the
+-- consumed items that enter the run inventory (the rest stay in the lobby), kept
+-- until the first checkpoint.
+function CrashRecoveryRules.BeginRun(profile, runId: string, jobId: string, carried, now: number)
+	ProgressionRules.StartRun(profile, runId)
+	local run = profile.progression.currentRun
+	run.jobId = jobId
+	run.startedAt = now
+	run.loadout = if #carried > 0 then compact(carried) else nil
+end
+
+-- The run's first checkpoint was written (or tried): from now on only
+-- checkpoints recover it, so a MemoryStore outage never restores stale items.
+function CrashRecoveryRules.Checkpointed(profile, runId: string)
+	local run = profile.progression.currentRun
+	if run and run.runId == runId then
+		run.loadout = nil
+	end
+end
+
+-- The run this profile last started, while nothing settled it and it belongs to
+-- another server (or predates runs naming one). Holding the profile here means
+-- that server released it or is gone, so the run must be recovered before a new
+-- run replaces it. Nil when there is nothing to settle.
+function CrashRecoveryRules.Unsettled(profile, jobId: string)
+	local run = profile.progression.currentRun
+	if run == nil or type(run.runId) ~= "string" or run.jobId == jobId then
+		return nil
+	end
+	if profile.receipts.crashRecovery[run.runId] ~= nil then
+		return nil
+	end
+	return run
+end
+
+-- A checkpoint made from the loadout an unsettled run recorded at Play: what a
+-- run that crashed before its first checkpoint carried. Empty once checkpointed.
+function CrashRecoveryRules.LoadoutCheckpoint(run)
+	return {
+		runId = run.runId,
+		jobId = run.jobId,
+		at = run.startedAt or 0,
+		items = table.clone(run.loadout or {}),
+		transferred = {},
+	}
 end
 
 CrashRecoveryRules.Ended = "Ended"
@@ -79,6 +136,7 @@ function CrashRecoveryRules.MarkEnded(profile, now: number): string?
 	if receipts[runId] == nil then
 		receipts[runId] = { status = CrashRecoveryRules.Ended, at = now }
 	end
+	run.loadout = nil
 	return runId
 end
 
@@ -116,6 +174,7 @@ function CrashRecoveryRules.Restore(profile, checkpoint, now: number)
 	prune(receipts, now)
 	local receipt = { at = now, status = CrashRecoveryRules.Restored, restored = restored, shown = false }
 	receipts[checkpoint.runId] = receipt
+	CrashRecoveryRules.Checkpointed(profile, checkpoint.runId)
 	return receipt
 end
 

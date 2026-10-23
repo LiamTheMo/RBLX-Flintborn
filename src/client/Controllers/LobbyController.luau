@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local LobbyController = {}
 
@@ -170,7 +171,7 @@ local function deploy()
 	if ok and success then
 		setStatus("Travelling to a world…")
 	else
-		setStatus("Deploy failed: " .. tostring(reason or success) .. ". Nothing was lost.")
+		setStatus("Deploy failed: " .. Reasons.Text(reason or success) .. ". Nothing was lost.")
 		requestPreview()
 	end
 end

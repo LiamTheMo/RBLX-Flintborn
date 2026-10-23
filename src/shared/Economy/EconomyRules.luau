@@ -8,6 +8,7 @@ local PerkCatalog = require(script.Parent.Parent.Progression.PerkCatalog)
 local QuestCatalog = require(script.Parent.QuestCatalog)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
 local ShopCatalog = require(script.Parent.ShopCatalog)
+local TradeRules = require(script.Parent.TradeRules)
 
 local EconomyRules = {}
 
@@ -21,9 +22,13 @@ function EconomyRules.Grant(profile, coins: number?, gems: number?)
 	profile.currency.gems += math.max(0, gems or 0)
 end
 
--- Spends all or nothing. Returns (ok, reason).
+-- Spends all or nothing. Returns (ok, reason). Gems wait while a trade settles:
+-- its rollback could not take back Gems already spent.
 function EconomyRules.Spend(profile, coins: number?, gems: number?)
 	local currency = profile.currency
+	if (gems or 0) > 0 and TradeRules.IsSettling(profile) then
+		return false, TradeRules.SETTLING
+	end
 	if currency.coins < (coins or 0) then
 		return false, "NotEnoughCoins"
 	end
@@ -140,8 +145,12 @@ function EconomyRules.Quote(item, quantity: number?)
 end
 
 -- Sells from the lobby backpack (`source` = "backpack", key = slot index) or the
--- vault's materials ("vault", key = catalogId) at fixed prices.
+-- vault's materials ("vault", key = catalogId) at fixed prices. Waits while a
+-- trade settles: a rollback could not take back what was sold.
 function EconomyRules.Sell(profile, source: string, key: any, quantity: any, receiptId: string, now: number)
+	if TradeRules.IsSettling(profile) then
+		return false, TradeRules.SETTLING
+	end
 	local coins, reason
 	if source == "backpack" then
 		local item = profile.lobbyBackpack.slots[key]

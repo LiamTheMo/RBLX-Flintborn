@@ -19,33 +19,15 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus. `carriedIn` maps each
--- material brought from the lobby to its quantity: the Center never doubles those.
-function ProgressionRules.StartRun(profile, runId: string, carriedIn: { [string]: number }?)
+-- Starts counting a new run's XP for the Center bonus. Which materials it may
+-- double is tagged on the stacks themselves (InventoryRules `fromLobby`).
+function ProgressionRules.StartRun(profile, runId: string)
 	profile.progression.currentRun = {
 		runId = runId,
 		general = 0,
 		mastery = {},
-		carriedIn = carriedIn or {},
 		settled = false,
 	}
-end
-
--- Material quantities among the items a run starts with (stacks only).
-function ProgressionRules.CarriedIn(items): { [string]: number }
-	local carried = {}
-	for _, item in items or {} do
-		if item.instanceId == nil and type(item.quantity) == "number" and item.quantity > 0 then
-			carried[item.catalogId] = (carried[item.catalogId] or 0) + item.quantity
-		end
-	end
-	return carried
-end
-
--- What a Center extraction may still double for each material this run.
-function ProgressionRules.CarriedInFor(profile): { [string]: number }
-	local run = profile.progression.currentRun
-	return if run and not run.settled then table.clone(run.carriedIn or {}) else {}
 end
 
 local function runFor(profile)

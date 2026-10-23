@@ -86,15 +86,11 @@ end)
 
 test("the Center doubles only materials gathered during the run", function()
 	local profile = ProfileSchema.Default(0)
-	local carried = ProgressionRules.CarriedIn({
-		{ catalogId = "AncientEmber", quantity = 1 },
-		{ catalogId = "Stone", quantity = 10 },
-		sword("s1"),
-	})
-	ProgressionRules.StartRun(profile, "run1", carried)
+	-- Deployed stacks carry their lobby units with them (InventoryRules.MarkFromLobby).
+	ProgressionRules.StartRun(profile, "run1")
 	ExtractionRules.Settle(profile, {
-		{ catalogId = "AncientEmber", quantity = 1 },
-		{ catalogId = "Stone", quantity = 30 },
+		{ catalogId = "AncientEmber", quantity = 1, fromLobby = 1 },
+		{ catalogId = "Stone", quantity = 30, fromLobby = 10 },
 	}, "Center", "r1", 1)
 	expectEq(profile.lobbyBackpack.slots[1].quantity, 1, "a deployed Ancient Ember comes back as 1")
 	expectEq(profile.vault.materials.Stone, 50, "10 carried + 20 gathered x2")
@@ -102,10 +98,10 @@ end)
 
 test("carried-in stacks split across slots still double only once", function()
 	local profile = ProfileSchema.Default(0)
-	ProgressionRules.StartRun(profile, "run1", { Stone = 10 })
+	ProgressionRules.StartRun(profile, "run1")
 	ExtractionRules.Settle(profile, {
-		{ catalogId = "Stone", quantity = 6 },
-		{ catalogId = "Stone", quantity = 6 },
+		{ catalogId = "Stone", quantity = 6, fromLobby = 6 },
+		{ catalogId = "Stone", quantity = 6, fromLobby = 4 },
 	}, "Center", "r1", 1)
 	expectEq(profile.vault.materials.Stone, 14, "10 carried + 2 gathered x2")
 end)
@@ -130,7 +126,7 @@ test("Permanent items still land past 50 backpack slots on extraction", function
 	for index = 1, 50 do
 		table.insert(profile.lobbyBackpack.slots, sword("f" .. index))
 	end
-	ProgressionRules.StartRun(profile, "run1", {})
+	ProgressionRules.StartRun(profile, "run1")
 	local receipt =
 		ExtractionRules.Settle(profile, { sword("p1", { permanent = true }), sword("n1") }, "Center", "r1", 1)
 	expectEq(#profile.lobbyBackpack.slots, 51, "Permanent kept, ordinary deleted")

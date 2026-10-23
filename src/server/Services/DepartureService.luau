@@ -10,6 +10,7 @@ local RunService = game:GetService("RunService")
 
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
@@ -113,7 +114,7 @@ local function take(looter: Player, bodyId: any, index: any)
 		end
 		DeathRules.Take(body.contents, index)
 	elseif remaining > 0 then
-		entry.quantity = remaining
+		InventoryRules.KeepRemainder(entry, remaining)
 	else
 		DeathRules.Take(body.contents, index)
 	end

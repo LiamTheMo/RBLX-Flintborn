@@ -3,8 +3,9 @@
 -- always start with "tribe:" so they never collide with BuildingService's
 -- "solo:<userId>" owner keys, and they never leave the server: clients (and the
 -- TribeId attribute combat uses to block friendly fire) only ever see a separate
--- random handle per tribe, so a forged TeleportData partyId cannot target a tribe
--- seen in-game. World only.
+-- random handle per tribe. A party tribe is joined only on a party the lobby
+-- recorded this player deploying with (PartyService.VerifiedPartyId), never on
+-- anything a client can put in TeleportData. World only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -14,6 +15,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TribeRules = require(ReplicatedStorage.Shared.Admission.TribeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local PartyService = require(script.Parent.PartyService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local TribeService = {}
@@ -27,13 +29,9 @@ local lastRequest = {}
 -- Internal tribe id <-> the public handle clients see.
 local handleOf = {}
 local idOfHandle = {}
-
--- Lobby party ids are server GUIDs; anything else in TeleportData is forged.
-function TribeService.ValidPartyId(partyId: any): boolean
-	return type(partyId) == "string"
-		and string.match(partyId, "^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$")
-			~= nil
-end
+-- Each player's verified lobby party id, or false when they arrived solo.
+local partyOf = {}
+local lookingUp = {}
 
 local function handleFor(id: string): string
 	local handle = handleOf[id]
@@ -141,17 +139,31 @@ local function handle(player: Player, action: any, argument: any)
 	return ok, reason
 end
 
--- A lobby party deploys together and starts as one tribe.
+-- A lobby party deploys together and starts as one tribe once its run begins.
 local function joinPartyTribe(player: Player)
-	local joinData = player:GetJoinData()
-	local data = joinData and joinData.TeleportData
-	local partyId = type(data) == "table" and data.partyId
-	if TribeService.ValidPartyId(partyId) and state.memberOf[player.UserId] == nil then
-		-- Party tribes live in their own namespace: a forged partyId can only ever
-		-- name another party tribe, never an in-world tribe or a "solo:" key.
+	local partyId = partyOf[player]
+	if partyId and state.memberOf[player.UserId] == nil and WorldAdmissionService.IsAtRisk(player) then
+		-- Party tribes live in their own namespace, never an in-world tribe or a
+		-- "solo:" key.
 		TribeRules.JoinOrCreate(state, player.UserId, TribeService.PARTY_PREFIX .. partyId)
 		broadcast()
 	end
+end
+
+-- Verifies the player's lobby party once per visit (a MemoryStore read, started on
+-- arrival so it is usually done before Play), then joins if the run has begun.
+local function lookUpParty(player: Player)
+	if partyOf[player] ~= nil or lookingUp[player] then
+		return
+	end
+	lookingUp[player] = true
+	local partyId = PartyService.VerifiedPartyId(player)
+	lookingUp[player] = nil
+	if player.Parent == nil then
+		return
+	end
+	partyOf[player] = partyId or false
+	joinPartyTribe(player)
 end
 
 function TribeService.Start()
@@ -159,9 +171,20 @@ function TribeService.Start()
 		return
 	end
 	Remotes.Handle("TribeAction", handle)
-	WorldAdmissionService.RunStarted:Connect(joinPartyTribe)
-	Players.PlayerAdded:Connect(broadcast)
+	WorldAdmissionService.RunStarted:Connect(function(player)
+		if partyOf[player] == nil then
+			task.spawn(lookUpParty, player)
+		else
+			joinPartyTribe(player)
+		end
+	end)
+	Players.PlayerAdded:Connect(function(player)
+		task.spawn(lookUpParty, player)
+		broadcast()
+	end)
 	Players.PlayerRemoving:Connect(function(player)
+		partyOf[player] = nil
+		lookingUp[player] = nil
 		TribeRules.Leave(state, player.UserId)
 		for _, tribe in state.tribes do
 			tribe.invites[player.UserId] = nil

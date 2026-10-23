@@ -7,7 +7,9 @@
 -- both profiles together (all or nothing), records the trade as pending on each,
 -- saves both, then finalises. If a save never lands, the next load (or a retry
 -- while the player stays) reconciles against the counterpart's saved profile so
--- exactly one outcome survives.
+-- exactly one outcome survives. While pending, sales, Forge crafts, Gem spending
+-- and Deploy are refused ("TradeSettling"); Reconcile always ends it, at the latest
+-- once the counterpart's lease expires.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")

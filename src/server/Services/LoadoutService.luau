@@ -1,15 +1,19 @@
 -- Moves a player's unvaulted items in and out of transit (GDD §31.4, Q155). Deploy
 -- reserves every lobby backpack item; successful Play consumes the reservation once;
 -- any failure, menu exit or stale reservation rolls it back. Nothing is ever lost
--- before a confirmed spawn.
+-- before a confirmed spawn. The consume also records the new run (crash recovery),
+-- and no new run starts while an earlier one on another server is unsettled.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local TransitRules = require(ReplicatedStorage.Shared.Admission.TransitRules)
+local CheckpointStore = require(script.Parent.Parent.Infrastructure.CheckpointStore)
 local ProfileService = require(script.Parent.ProfileService)
 local TravelService = require(script.Parent.TravelService)
 
@@ -45,7 +49,8 @@ function LoadoutService.Reserve(player: Player)
 end
 
 -- Puts back what an unconfirmed Consume took: the reservation as it was and any
--- maintenance receipts as Pending again. Runs at most once per Consume.
+-- maintenance receipts as Pending again, and settles the run it recorded (it never
+-- started, so it must never be restored). Runs at most once per Consume.
 local function unconsume(player: Player)
 	local taken = unconfirmed[player]
 	if taken == nil then
@@ -71,6 +76,10 @@ local function unconsume(player: Player)
 				if receipt then
 					receipt.status = "Pending"
 				end
+			end
+			local run = profile.progression.currentRun
+			if run and run.runId == taken.runId then
+				CrashRecoveryRules.MarkEnded(profile, os.time())
 			end
 		end
 	)
@@ -115,29 +124,51 @@ local function pendingMaintenance(profile)
 	return pending
 end
 
+-- True while a run this profile started on another server is not yet settled:
+-- crash recovery must restore it before a new run may replace its record.
+function LoadoutService.RecoveryPending(player: Player): boolean
+	local profile = ProfileService.GetProfile(player)
+	return profile ~= nil and CrashRecoveryRules.Unsettled(profile, CheckpointStore.JobId()) ~= nil
+end
+
+-- What the run inventory will hold of `items`: the same packing InventoryService
+-- applies at run start, whose leftovers it saves back to the lobby backpack.
+local function carriedPart(items)
+	local inventory = InventoryRules.Deploy(ProfileSchema.DeepCopy(items))
+	return InventoryRules.Items(inventory)
+end
+
 -- Consumes this player's reservation on a confirmed spawn, together with anything
 -- earlier safe kicks escrowed, in ONE operation: maintenance receipts are marked
--- restored only if the transit consume succeeds too. Returns (ok, items, changed);
--- `changed` means the profile must be saved before the run starts. The caller
--- then calls Confirm once the run starts, or Restore to put everything back.
+-- restored only if the transit consume succeeds too. The same operation records
+-- the new run, so a crash before its first checkpoint can still restore the
+-- loadout. Returns (ok, items, changed, runId); `changed` means the profile must
+-- be saved before the run starts. The caller then calls Confirm once the run
+-- starts, or Restore to put everything back.
 function LoadoutService.Consume(player: Player)
 	local profile = ProfileService.GetProfile(player)
-	if profile == nil then
-		return false, {}, false
+	if profile == nil or LoadoutService.RecoveryPending(player) then
+		return false, {}, false, nil
 	end
+	local jobId = CheckpointStore.JobId()
+	local runId = HttpService:GenerateGUID(false)
 	local reservationId = arrivedWith[player]
 	if profile.transit == nil or profile.transit.reservationId ~= reservationId then
 		reservationId = nil
 	end
 	local pending = pendingMaintenance(profile)
 	if reservationId == nil and #pending == 0 then
-		return true, {}, false
+		-- Nothing to carry in or to lose: the run is still named for its receipts.
+		ProfileService.Mutate(player, function(working)
+			CrashRecoveryRules.BeginRun(working, runId, jobId, {}, os.time())
+		end)
+		return true, {}, false, runId
 	end
 	local items, taken = {}, nil
 	-- One ID per attempt: a restored reservation may be consumed again later.
 	local operationId = "consume:" .. HttpService:GenerateGUID(false)
 	local ok, _, applied = ProfileService.RunOperation(player, operationId, "TransitConsume", function(working)
-		items, taken = {}, { transit = nil, maintenance = {} }
+		items, taken = {}, { transit = nil, maintenance = {}, runId = runId }
 		if reservationId then
 			taken.transit = ProfileSchema.DeepCopy(working.transit)
 			for _, item in TransitRules.Consume(working, reservationId) do
@@ -154,18 +185,19 @@ function LoadoutService.Consume(player: Player)
 				end
 			end
 		end
-		return { reservationId = reservationId, restored = #taken.maintenance }
+		CrashRecoveryRules.BeginRun(working, runId, jobId, carriedPart(items), os.time())
+		return { reservationId = reservationId, restored = #taken.maintenance, runId = runId }
 	end)
 	-- An operation that was already committed hands nothing out a second time.
 	if not ok or not applied then
-		return false, {}, false
+		return false, {}, false, nil
 	end
 	arrivedWith[player] = nil
 	unconfirmed[player] = taken
 	if #taken.maintenance > 0 then
 		player:SetAttribute("MaintenanceNotice", nil)
 	end
-	return true, ProfileSchema.DeepCopy(items), true
+	return true, ProfileSchema.DeepCopy(items), true, runId
 end
 
 -- The consumed items have entered a run (they are at risk from now on).

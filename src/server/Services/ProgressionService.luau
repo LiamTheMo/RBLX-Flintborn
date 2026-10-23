@@ -233,11 +233,13 @@ function ProgressionService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	WorldAdmissionService.RunStarted:Connect(function(player, _, items)
-		local runId = HttpService:GenerateGUID(false)
-		local carriedIn = ProgressionRules.CarriedIn(items)
+	WorldAdmissionService.RunStarted:Connect(function(player, _, _, runId)
 		ProfileService.Mutate(player, function(profile)
-			ProgressionRules.StartRun(profile, runId, carriedIn)
+			local run = profile.progression.currentRun
+			-- The Play's consume normally recorded this run already (crash recovery).
+			if run == nil or runId == nil or run.runId ~= runId then
+				ProgressionRules.StartRun(profile, runId or HttpService:GenerateGUID(false))
+			end
 		end)
 	end)
 	NpcService.Died:Connect(function(npc)

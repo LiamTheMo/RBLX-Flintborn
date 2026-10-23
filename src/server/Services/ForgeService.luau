@@ -2,7 +2,8 @@
 -- vault-only Owned/Needed counts and its unlock state, and commits special crafts
 -- and Permanent conversions as exactly-once operations keyed by the client's nonce,
 -- so a retried request returns the first result instead of charging again. Crafts
--- wait while the player is in an open trade.
+-- wait while the player is in an open trade, or while a settled trade may still
+-- roll back ("TradeSettling", ForgeRules).
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

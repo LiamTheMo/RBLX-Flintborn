@@ -5,6 +5,8 @@
 -- writes the trade into both profiles as pending; Reconcile later finalises it
 -- (the counterpart saved it too) or rolls one side back (the counterpart never
 -- saved it, or rolled back), and waits while the counterpart may still save.
+-- Until then the profile is "settling": nothing a rollback could not claw back
+-- (sales, Forge crafts, Gem spending, a Deploy) may consume what it received.
 
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
@@ -16,6 +18,8 @@ TradeRules.DAILY_GEM_LIMIT = 2000
 TradeRules.GEM_FEE = 0.05
 TradeRules.MAX_ITEMS = 9
 TradeRules.HISTORY = 500
+-- Why a sale, craft, Gem spend or Deploy is refused while a trade may roll back.
+TradeRules.SETTLING = "TradeSettling"
 
 local TRADEABLE_FAMILIES = { Tool = true, Weapon = true, Armor = true, Placeable = true }
 
@@ -35,6 +39,11 @@ function TradeRules.IsTradeable(item): boolean
 	return TRADEABLE_FAMILIES[def.family] == true
 end
 
+-- True while a settled trade awaits its counterpart's save (Reconcile clears it).
+function TradeRules.IsSettling(profile): boolean
+	return next(profile.trades.pending) ~= nil
+end
+
 local function today(now: number): number
 	return now // 86400
 end
@@ -46,7 +55,7 @@ function TradeRules.ValidateOffer(profile, offer, now: number)
 		return false, "CoinsNotTradeable"
 	end
 	-- A trade still awaiting its counterpart's save could yet be undone.
-	if next(profile.trades.pending) then
+	if TradeRules.IsSettling(profile) then
 		return false, "TradePending"
 	end
 	if #offer.items > TradeRules.MAX_ITEMS then

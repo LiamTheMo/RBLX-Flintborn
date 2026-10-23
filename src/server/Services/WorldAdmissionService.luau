@@ -32,8 +32,9 @@ WorldAdmissionService.ActiveDeparture = Signal.new()
 -- Fires (player, position) when an at-risk player dies, before RunEnded, so the
 -- run inventory can still be read (it becomes a lootable body).
 WorldAdmissionService.Death = Signal.new()
--- Fires (player, character, items) once a player is confirmed in ActiveRun;
--- `items` are the reserved lobby items entering the run.
+-- Fires (player, character, items, runId) once a player is confirmed in ActiveRun;
+-- `items` are the reserved lobby items entering the run, `runId` the run the
+-- consume recorded in the profile.
 WorldAdmissionService.RunStarted = Signal.new()
 -- Fires (player, reason) when a run ends: "Died", "Left", "Extracted" or "Maintenance".
 WorldAdmissionService.RunEnded = Signal.new()
@@ -149,6 +150,11 @@ local function requestPlay(player: Player, requestId: any)
 	if ProfileService.IsShuttingDown() then
 		return false, "ShuttingDown"
 	end
+	-- A crashed run on another server must be restored before a new run replaces
+	-- its record (crash recovery retries on its own; the player presses Play again).
+	if LoadoutService.RecoveryPending(player) then
+		return false, "RecoveringItems"
+	end
 	if lastPlayRequest[player] == requestId then
 		return false, "InProgress"
 	end
@@ -187,7 +193,7 @@ local function requestPlay(player: Player, requestId: any)
 
 	-- The spawn is confirmed: consume the reservation (and any maintenance escrow),
 	-- save that, and only then enter risk (GDD §31.3).
-	local consumed, items, changed = LoadoutService.Consume(player)
+	local consumed, items, changed, runId = LoadoutService.Consume(player)
 	if not consumed then
 		return fail("ReservationFailed")
 	end
@@ -217,7 +223,7 @@ local function requestPlay(player: Player, requestId: any)
 	humanoid.Died:Connect(function()
 		onDied(player)
 	end)
-	WorldAdmissionService.RunStarted:Fire(player, character, items)
+	WorldAdmissionService.RunStarted:Fire(player, character, items, runId)
 	return true, nil
 end
 

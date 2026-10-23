@@ -1,12 +1,14 @@
 -- Extraction qualification and settlement (GDD §9, §10.3, Q17–24, Q119, Q126–129,
 -- Q151–154, Q158). Presence counts only at the deadline. Only the fixed Center
--- portal doubles material quantities, and only what was gathered during the run;
--- portable runes never do. Ordinary materials auto-bank into vault stacks of at
+-- portal doubles material quantities, and only what was gathered during a run:
+-- units deployed from the lobby stay tagged on their stack (InventoryRules
+-- `fromLobby`) whoever ends up carrying them; portable runes never double. Ordinary materials auto-bank into vault stacks of at
 -- most 1,000; everything else lands in the durable 50-slot lobby backpack.
 -- Anything over a capacity limit is deleted and listed on the receipt. Unique
 -- gear is never multiplied.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
@@ -71,11 +73,12 @@ local function bump(map, key: string, amount: number)
 	end
 end
 
--- A material stack's settled quantity: the multiplier applies only to what was
--- gathered this run, never to what the player carried in from the lobby.
-local function multiplied(carried, catalogId: string, quantity: number, multiplier: number): number
-	local fromLobby = math.min(quantity, carried[catalogId] or 0)
-	carried[catalogId] = (carried[catalogId] or 0) - fromLobby
+-- A material stack's settled quantity: the multiplier applies only to units
+-- gathered in a run, never to the ones it carries that were deployed from a lobby
+-- (by this player or anyone they took them from).
+local function multiplied(item, multiplier: number): number
+	local quantity = item.quantity or 0
+	local fromLobby = InventoryRules.FromLobby(item)
 	return fromLobby + (quantity - fromLobby) * multiplier
 end
 
@@ -91,7 +94,6 @@ end
 -- ProfileService operation, so it applies once per receipt ID.
 function ExtractionRules.Settle(profile, items, kind: string, receiptId: string, now: number)
 	local multiplier = ExtractionRules.Multiplier(kind)
-	local carried = ProgressionRules.CarriedInFor(profile)
 	local receipt = {
 		at = now,
 		kind = kind,
@@ -105,7 +107,7 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 	for _, item in items do
 		local catalogId = item.catalogId
 		if item.instanceId == nil and ItemCatalog.IsMaterial(catalogId) then
-			local quantity = multiplied(carried, catalogId, item.quantity or 0, multiplier)
+			local quantity = multiplied(item, multiplier)
 			if ItemCatalog.IsOrdinaryMaterial(catalogId) then
 				local stored, deleted = GameConstants.SettleMaterialStack(materials[catalogId] or 0, quantity)
 				bump(receipt.vaulted, catalogId, stored - (materials[catalogId] or 0))

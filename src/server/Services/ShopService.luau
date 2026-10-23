@@ -1,7 +1,8 @@
 -- NPC shops, merchants, vault upgrades, respecs and codes (GDD §10, Q89, Q95–96,
 -- Q116–122). Lobby only. Every request is a once-only operation keyed by the
 -- client's nonce; prices and sell values come from the server catalog. Buying and
--- selling wait while the player is in an open trade (§10.2).
+-- selling wait while the player is in an open trade (§10.2); selling and Gem
+-- spending also wait while a settled trade may still roll back ("TradeSettling").
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
