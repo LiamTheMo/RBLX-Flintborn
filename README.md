@@ -8,7 +8,7 @@
 - **[Development phases (docs/phases)](docs/phases/README.md)** — the GDD split into ordered versions `v0.01` → `v0.18`, each with rules, modules, validation and exit criteria.
 - **[Roblox live deployment](docs/roblox-live-deployment.md)** and **[cloud sync safety](docs/ROBLOX_CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
 
-**Current phase:** [v0.01 — Project foundation and deployment pipeline](docs/phases/v0.01-project-foundation-and-deployment.md).
+**Current phase:** [v0.02 — Player data, persistence and session safety](docs/phases/v0.02-player-data-persistence-and-session-safety.md). Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 
@@ -22,6 +22,13 @@
 | `tests/luau` | Headless Luau specs for pure shared modules |
 | `tests/test_cloud_live_publish.py` | Offline publish-safety tests |
 | `scripts/` | Open Cloud script mapping and live publishing |
+
+## Code conventions
+
+- One responsibility per Service (`src/server/Services/<Name>Service.luau`) and Controller (`src/client/Controllers/<Name>Controller.luau`). The Loader picks up every module in those folders, so adding one is just adding a file.
+- Pure rules and catalogs live in `src/shared` so the server, client and headless specs share one definition. Tunable values live in shared config modules, never scattered literals.
+- The server is authoritative (GDD §12.1). Clients send intent only and never decide risk, combat, inventory, crafting, extraction or persistence.
+- Format with StyLua (`stylua src tests/luau`). Selene uses the `roblox` standard library.
 
 ## Local development
 
