@@ -31,6 +31,11 @@ local DEFINITIONS = {
 	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection)
 	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
 	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount)
+	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
+	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
+	CorpseOpened = "RemoteEvent", -- server -> client: (corpseId, contents)
+	CorpseTake = "RemoteFunction", -- (corpseId, index) -> ok, reason
+	DeathSummary = "RemoteEvent", -- server -> client: what dropped and what was kept
 }
 
 local function folder()

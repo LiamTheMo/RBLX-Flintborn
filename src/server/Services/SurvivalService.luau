@@ -91,7 +91,8 @@ local function step(dt: number)
 	for player, entry in entries do
 		local ok, err = pcall(function()
 			local humanoid = entry.humanoid
-			if humanoid.Health <= 0 then
+			-- Downed players crawl at a fixed speed and cannot heal (Q159f).
+			if humanoid.Health <= 0 or player:GetAttribute("Downed") then
 				return
 			end
 			local rules = entry.rules
