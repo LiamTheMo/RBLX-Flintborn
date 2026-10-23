@@ -9,12 +9,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local SurvivalRules = require(ReplicatedStorage.Shared.Survival.SurvivalRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local InventoryService = require(script.Parent.InventoryService)
 local SurvivalService = require(script.Parent.SurvivalService)
 
 local HealingService = {}
+
+-- Fires (player, catalogId) after a medicine or food is used.
+HealingService.Used = Signal.new()
 
 HealingService.REMEMBERED_REQUESTS = 32
 
@@ -73,6 +77,7 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 		InventoryService.RemoveAll(player, { [catalogId] = 1 })
 		SurvivalRules.Eat(rules, item, now)
 	end
+	HealingService.Used:Fire(player, catalogId)
 	return true, nil
 end
 

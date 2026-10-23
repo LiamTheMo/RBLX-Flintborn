@@ -128,6 +128,12 @@ local function build()
 	make("UIListLayout", { Padding = UDim.new(0, 4) }, ui.list)
 end
 
+-- Opens or closes this panel (keys, and the on-screen navigation bar).
+function TribeController.Toggle()
+	ui.panel.Visible = not ui.panel.Visible
+	render()
+end
+
 function TribeController.Start()
 	if not PlaceConfig.IsWorld() then
 		return
@@ -139,8 +145,7 @@ function TribeController.Start()
 	end)
 	ContextActionService:BindAction("FlintbornTribe", function(_, state)
 		if state == Enum.UserInputState.Begin then
-			ui.panel.Visible = not ui.panel.Visible
-			render()
+			TribeController.Toggle()
 		end
 		return Enum.ContextActionResult.Sink
 	end, false, Enum.KeyCode.T, Enum.KeyCode.DPadLeft)
