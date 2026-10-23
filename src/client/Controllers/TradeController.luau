@@ -1,10 +1,9 @@
--- Lobby trading (GDD §10.2, §25.4, §45). Y (or ButtonL1) opens the trade panel:
+-- Lobby trading (GDD §10.2, §25.4, §45). The Trade key (Y by default; ButtonL1) opens the trade panel:
 -- pick a player in this lobby to invite. The trade window shows both offers, your
 -- tradeable lobby-backpack items to add or remove, your tradeable vault materials
 -- (+1, +10, all or remove), a Gem amount (never Coins), a lock, a countdown and
 -- confirm. Any change unlocks both sides. Lobby only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -13,6 +12,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local TradeController = {}
 
@@ -423,12 +423,12 @@ function TradeController.Start()
 			render()
 		end
 	end)
-	ContextActionService:BindAction("FlintbornTrade", function(_, state)
+	Binds.Bind("Trade", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			TradeController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Y, Enum.KeyCode.ButtonL1)
+	end)
 	-- The confirm countdown ticks while the window is open: only its label changes,
 	-- plus one re-render when the Confirm button becomes available.
 	task.spawn(function()

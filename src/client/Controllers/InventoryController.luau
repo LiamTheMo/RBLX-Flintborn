@@ -4,7 +4,6 @@
 -- to move or swap (no precise dragging). Server snapshots are the only truth.
 -- World place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,6 +15,7 @@ local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local InventoryController = {}
 
@@ -175,11 +175,14 @@ local function makeSlot(area: string, index: number, parent)
 		Font = Enum.Font.GothamMedium,
 		TextSize = 11,
 	}, button)
+	local keyLabel = nil
 	if area == "hotbar" or area == "armor" then
-		make("TextLabel", {
-			Text = area == "armor" and ARMOR_SLOTS[index] or tostring(index),
-			Size = UDim2.fromOffset(area == "armor" and 40 or 14, 14),
+		-- Hotbar slots show the key that selects them (rebindable, so kept current).
+		keyLabel = make("TextLabel", {
+			Text = area == "armor" and ARMOR_SLOTS[index] or Binds.Label("Hotbar" .. index),
+			Size = UDim2.fromOffset(40, 14),
 			BackgroundTransparency = 1,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = Color3.fromRGB(200, 190, 170),
 			Font = Enum.Font.GothamBold,
 			TextSize = 11,
@@ -188,7 +191,12 @@ local function makeSlot(area: string, index: number, parent)
 	button.Activated:Connect(function()
 		onSlotClicked(area, index)
 	end)
-	slotButtons[area][index] = { button = button, stroke = stroke, label = label }
+	slotButtons[area][index] = {
+		button = button,
+		stroke = stroke,
+		label = label,
+		keyLabel = if area == "hotbar" then keyLabel else nil,
+	}
 end
 
 function InventoryController.Render()
@@ -211,11 +219,13 @@ function InventoryController.Render()
 		end
 	end
 	ui.hint.Text = if selected
-		then "Tap another slot to move or swap, an armor slot to wear it, or Drop (Q) to drop it."
+		then ("Tap another slot to move or swap, an armor slot to wear it, or Drop (%s) to drop it."):format(
+			Binds.Label("Drop")
+		)
 		else ""
 end
 
--- Drops the selected slot, or else the equipped hotbar item (Q, L1 or the Drop button).
+-- Drops the selected slot, or else the equipped hotbar item (the Drop key, L1 or the Drop button).
 local function dropSelected()
 	local target = selected
 		or (
@@ -298,9 +308,9 @@ local function build()
 	for index = 1, #ARMOR_SLOTS do
 		makeSlot("armor", index, armorColumn)
 	end
-	-- Touch players have no Q key: this drops the selected (or equipped) item.
+	-- Touch players have no Drop key: this drops the selected (or equipped) item.
 	local drop = make("TextButton", {
-		Text = "Drop (Q)",
+		Text = "Drop",
 		AnchorPoint = Vector2.new(0, 1),
 		Position = UDim2.fromScale(0, 1),
 		Size = UDim2.fromOffset(62, 30),
@@ -314,7 +324,7 @@ local function build()
 
 	-- Right of the hotbar, above the Craft button (the XP bar owns the bottom-left).
 	local toggle = make("TextButton", {
-		Text = "Backpack (B)",
+		Text = "Backpack",
 		AnchorPoint = Vector2.new(0, 1),
 		Position = UDim2.new(0.5, 8 + GameConstants.HOTBAR_SLOTS * 33, 1, -46),
 		Size = UDim2.fromOffset(100, 30),
@@ -327,6 +337,18 @@ local function build()
 	toggle.Activated:Connect(function()
 		InventoryController.ToggleBackpack()
 	end)
+	-- Button and slot captions name the player's current keys.
+	local function relabel()
+		drop.Text = ("Drop (%s)"):format(Binds.Label("Drop"))
+		toggle.Text = ("Backpack (%s)"):format(Binds.Label("Backpack"))
+		for index, parts in slotButtons.hotbar do
+			if parts.keyLabel then
+				parts.keyLabel.Text = Binds.Label("Hotbar" .. index)
+			end
+		end
+	end
+	relabel()
+	Binds.Changed:Connect(relabel)
 
 	ui.hint = make("TextLabel", {
 		AnchorPoint = Vector2.new(0.5, 1),
@@ -359,44 +381,34 @@ end
 
 local function bindKeys(active: boolean)
 	if not active then
-		ContextActionService:UnbindAction("FlintbornHotbar")
-		ContextActionService:UnbindAction("FlintbornBackpack")
-		ContextActionService:UnbindAction("FlintbornDrop")
+		for index = 1, 9 do
+			Binds.Unbind("Hotbar" .. index)
+		end
+		Binds.Unbind("Backpack")
+		Binds.Unbind("Drop")
 		return
 	end
-	local keys = {
-		Enum.KeyCode.One,
-		Enum.KeyCode.Two,
-		Enum.KeyCode.Three,
-		Enum.KeyCode.Four,
-		Enum.KeyCode.Five,
-		Enum.KeyCode.Six,
-		Enum.KeyCode.Seven,
-		Enum.KeyCode.Eight,
-		Enum.KeyCode.Nine,
-	}
-	ContextActionService:BindAction("FlintbornHotbar", function(_, state, input)
-		if state == Enum.UserInputState.Begin then
-			local index = table.find(keys, input.KeyCode)
-			if index then
+	for index = 1, 9 do
+		Binds.Bind("Hotbar" .. index, function(_, state)
+			if state == Enum.UserInputState.Begin then
 				activateHotbar(index)
 			end
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, table.unpack(keys))
-	ContextActionService:BindAction("FlintbornBackpack", function(_, state)
+			return Enum.ContextActionResult.Pass
+		end)
+	end
+	Binds.Bind("Backpack", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			InventoryController.ToggleBackpack()
 		end
 		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.B, Enum.KeyCode.ButtonY)
-	-- Q drops the selected slot, or else the equipped hotbar item.
-	ContextActionService:BindAction("FlintbornDrop", function(_, state)
+	end)
+	-- Drop takes the selected slot, or else the equipped hotbar item.
+	Binds.Bind("Drop", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			dropSelected()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.Q, Enum.KeyCode.ButtonL1)
+	end)
 end
 
 function InventoryController.Start()

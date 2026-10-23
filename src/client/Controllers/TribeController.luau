@@ -1,13 +1,13 @@
 -- Tribe panel (GDD §5.2, Q39): create a tribe, invite nearby players, accept
--- invites, kick (leader), leave, and propose alliances. Toggle with T or the
+-- invites, kick (leader), leave, and propose alliances. Toggle with the Tribe key (T by default) or the
 -- Tribe button. World place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local TribeController = {}
 
@@ -158,12 +158,12 @@ function TribeController.Start()
 		view = snapshot
 		render()
 	end)
-	ContextActionService:BindAction("FlintbornTribe", function(_, state)
+	Binds.Bind("Tribe", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			TribeController.Toggle()
 		end
 		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.T, Enum.KeyCode.DPadLeft)
+	end)
 	render()
 end
 
