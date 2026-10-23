@@ -69,6 +69,8 @@ GameConstants.FIXED_EXTRACTION_SECONDS = 120
 GameConstants.PORTABLE_EXTRACTION_SECONDS = 30
 GameConstants.CENTER_MULTIPLIER = 2
 GameConstants.PORTAL_NO_BUILD_METERS = 50
+-- Roblox's standard character scale: 1 stud is 0.28 m.
+GameConstants.STUDS_PER_METER = 1 / 0.28
 
 -- Inventory and vault (GDD §10.3, Q126-129, Q151, Q154) ---------------------------
 

@@ -18,6 +18,7 @@ local QualityRoll = require(ReplicatedStorage.Shared.Crafting.QualityRoll)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local BuildingService = require(script.Parent.BuildingService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -149,20 +150,9 @@ local function place(player: Player, hotbarIndex: any)
 	if hit == nil then
 		return false, "NoGround"
 	end
-	if not InventoryService.RemoveAll(player, { [entry.catalogId] = 1 }) then
-		return false, "NotCarried"
-	end
-	local bench = Instance.new("Part")
-	bench.Name = "Workbench"
-	bench.Anchored = true
-	bench.Size = Vector3.new(5, 3, 3)
-	bench.Color = Color3.fromRGB(122, 86, 52)
-	bench.Material = Enum.Material.Wood
-	bench.CFrame = CFrame.new(hit.Position + Vector3.new(0, 1.5, 0)) * root.CFrame.Rotation
-	bench:SetAttribute("OwnerUserId", player.UserId)
-	CollectionService:AddTag(bench, CraftingService.WORKBENCH_TAG)
-	bench.Parent = workspace
-	return true, nil
+	-- A placed workbench is an ordinary structure: raidable, and it decays without
+	-- totem cover like everything else built in the world.
+	return BuildingService.PlaceFromItem(player, "Workbench", hit.Position, entry.catalogId)
 end
 
 function CraftingService.Start()
