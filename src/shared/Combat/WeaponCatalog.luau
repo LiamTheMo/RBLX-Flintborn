@@ -30,6 +30,7 @@ WeaponCatalog.Weapons = {
 	StoneDagger = { kind = "Melee", damage = 9, cooldown = melee.Dagger.cooldown, reach = 5, arc = 80 },
 	StoneSword = { kind = "Melee", damage = 18, cooldown = melee.Sword.cooldown, reach = 7, arc = 90 },
 	IronSword = { kind = "Melee", damage = 26, cooldown = melee.Sword.cooldown, reach = 7, arc = 90 },
+	GuardianFang = { kind = "Melee", damage = 34, cooldown = melee.Sword.cooldown, reach = 8, arc = 100 },
 	BasicBow = { kind = "Bow", bowDamage = 6, cooldown = 0.3 },
 }
 

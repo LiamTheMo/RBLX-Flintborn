@@ -364,6 +364,21 @@ function BuildingService.Hit(player: Player, origin: Vector3, aim: Vector3, reac
 	return true
 end
 
+-- Removes every player-built structure with any part inside `radius` of
+-- `center` (the Guardian clearing its arena, §3.1). Returns how many went.
+function BuildingService.ClearWithin(center: Vector3, radius: number): number
+	local doomed = {}
+	for _, record in records do
+		if BuildRules.HorizontalDistance(center, record.position, record.half) <= radius then
+			table.insert(doomed, record)
+		end
+	end
+	for _, record in doomed do
+		remove(record, "Guardian")
+	end
+	return #doomed
+end
+
 -- Building information the client needs for previews.
 local function info()
 	local list = {}
