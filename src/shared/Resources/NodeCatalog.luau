@@ -20,6 +20,9 @@ NodeCatalog.Nodes = {
 	FiberPlant = { material = "Fiber", hits = 2, yields = { Hand = 2, Sickle = 3 }, mastery = "Farming" },
 	HerbShrub = { material = "Herbs", hits = 2, yields = { Hand = 1, Sickle = 2 }, mastery = "Farming" },
 	BerryBush = { material = "Berries", hits = 2, yields = { Hand = 1, Sickle = 2 }, mastery = "Farming" },
+	-- Inner Ring only (GDD §18.1).
+	JadeVein = { material = "Jade", hits = 4, yields = { Pickaxe = 1 }, mastery = "Mining" },
+	ObsidianOutcrop = { material = "Obsidian", hits = 4, yields = { Pickaxe = 1 }, mastery = "Mining" },
 }
 
 -- Amount one hit gives with the equipped tool ({kind, tier} or nil), or 0 when

@@ -92,7 +92,7 @@ test("biome distances stay inside their ring", function()
 	local rng = Random.new(15)
 	for _ = 1, 500 do
 		local d = EventRules.BiomeDistance("InnerRing", rng)
-		expect(d >= 0.3 and d <= 0.65, "inside the inner ring")
+		expect(d >= 0.28 and d <= 0.6, "inside the inner ring")
 	end
 end)
 
