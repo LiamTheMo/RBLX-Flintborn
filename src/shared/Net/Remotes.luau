@@ -61,6 +61,21 @@ local DEFINITIONS = {
 	RebirthPreview = "RemoteFunction", -- () -> {reset, kept, gained, eligible, reason}
 	Rebirth = "RemoteFunction", -- (nonce) -> ok, reason
 	BuyPerk = "RemoteFunction", -- (perkId, nonce) -> ok, reason
+	ShopView = "RemoteFunction", -- () -> stock, sellables, offers, vault tier
+	ShopBuy = "RemoteFunction", -- (stockId, nonce) -> ok, reason
+	MerchantSell = "RemoteFunction", -- (source, key, quantity, nonce) -> ok, coinsOrReason
+	VaultUpgrade = "RemoteFunction", -- (nonce) -> ok, reason
+	PerkRespec = "RemoteFunction", -- (nonce) -> ok, reason
+	RedeemCode = "RemoteFunction", -- (code) -> ok, reason
+	QuestView = "RemoteFunction", -- () -> quests with progress
+	QuestClaim = "RemoteFunction", -- (questId) -> ok, reason
+	TradeRequest = "RemoteFunction", -- (targetUserId) -> ok, sessionIdOrReason
+	TradeRespond = "RemoteFunction", -- (sessionId, accept) -> ok, reason
+	TradeOffer = "RemoteFunction", -- (sessionId, itemKeys, gems) -> ok, reason
+	TradeLock = "RemoteFunction", -- (sessionId) -> ok, reason
+	TradeConfirm = "RemoteFunction", -- (sessionId) -> ok, reason
+	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
+	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
 }
 
 local function folder()

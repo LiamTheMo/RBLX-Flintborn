@@ -263,6 +263,11 @@ function ProfileService.Mutate(player: Player, apply: (any) -> ())
 	return true
 end
 
+-- Another player's last saved profile, read without a lease. Returns (ok, data).
+function ProfileService.ReadStored(userId: number)
+	return store:ReadStored(userId)
+end
+
 function ProfileService.SaveNow(player: Player)
 	return save(player, false)
 end

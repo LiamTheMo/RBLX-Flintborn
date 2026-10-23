@@ -82,7 +82,7 @@ local function harvest(player: Player, node)
 		InventoryService.Notify(player, "No room for " .. def.material .. ".")
 		return
 	end
-	ProgressionService.GrantXp(player, ProgressionService.XP.Harvest, "Gathering")
+	ProgressionService.GrantXp(player, "Harvest", "Gathering")
 	ProgressionService.GrantMastery(player, def.mastery, 1)
 	node.hitsLeft -= 1
 	if node.hitsLeft <= 0 then
