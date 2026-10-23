@@ -13,6 +13,8 @@ local CombatService = require(script.Parent.CombatService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
+local ProgressionService = require(script.Parent.ProgressionService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local CacheService = {}
@@ -55,13 +57,14 @@ function CacheService.Spawn(entry, position: Vector3, parent: Instance, onOpened
 	local site = {}
 	Channel.Attach(prompt, CacheService.CHANNEL_SECONDS, function(player)
 		return CacheService.CanInteract(player, part, CacheService.REACH)
-	end, function()
+	end, function(player)
 		if not EventRules.Claim(site) then
 			return
 		end
 		prompt:Destroy()
 		part.Transparency = 0.6
-		for _, item in EventRules.RollLoot(entry.loot, rng) do
+		ProgressionService.GrantXp(player, ProgressionService.XP.Cache, entry.name)
+		for _, item in EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")) do
 			DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
 		end
 		onOpened()
