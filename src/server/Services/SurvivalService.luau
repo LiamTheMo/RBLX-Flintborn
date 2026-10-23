@@ -2,7 +2,6 @@
 -- Heartbeat loop steps every meter on the server; clients only send sprint and
 -- crouch intent. Meters are run state and reset on each spawn. World place only.
 
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -42,17 +41,6 @@ function SurvivalService.SetHealth(player: Player, health: number)
 	local clamped = math.clamp(health, 0, entry.humanoid.MaxHealth)
 	entry.lastHealth = clamped
 	entry.humanoid.Health = clamped
-end
-
--- Summary of carried consumables for the HUD, until the inventory UI (v0.05).
-function SurvivalService.PublishConsumables(player: Player)
-	local counts = {}
-	for _, stack in WorldAdmissionService.RunItems(player) or {} do
-		if stack.catalogId and stack.quantity then
-			counts[stack.catalogId] = (counts[stack.catalogId] or 0) + stack.quantity
-		end
-	end
-	player:SetAttribute("RunConsumables", HttpService:JSONEncode(counts))
 end
 
 local function publish(player: Player, entry)
@@ -96,7 +84,6 @@ local function startRun(player: Player, character: Model)
 		entry.lastHealth = health
 	end)
 	publish(player, entry)
-	SurvivalService.PublishConsumables(player)
 end
 
 local function step(dt: number)
