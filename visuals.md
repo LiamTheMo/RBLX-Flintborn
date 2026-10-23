@@ -15,6 +15,8 @@ The latest mixed-landscape concept demonstrates that composition: substantial wo
 
 **Confirmed direction:** the style above, substantial water areas, large continuous forests and a varied, connected map. **Production guidance:** the modeling recipes, relative proportions, palette descriptions and review criteria below translate that direction into practical art decisions. They do not establish new gameplay mechanics, exact map dimensions, resource distributions, spawn rules or performance budgets.
 
+**Relationship to the GDD's Open art fields:** This guide supersedes the Open status of the exact style bible, broad shape language and visual reference direction recorded in GDD §36.1 (Q57) and §36.5. Those subjects are now established by the owner selections recorded above. Exact production color swatches, texture specifications, asset budgets and final map layout remain Open. The GDD continues to govern gameplay; this clarification does not supersede its region, encounter, resource or progression rules.
+
 Concept images establish visual intent, not surveyed geometry. Do not copy accidental bridges, resource locations, stairs, building placements or camera angles into gameplay requirements. This document is self-contained; it does not depend on temporary conversation image paths.
 
 ## 2. Core visual identity
