@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.10  
+> **Design revision:** 1.11  
 > **Last updated:** 2026-10-23  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -31,6 +31,8 @@
 **Owner answers Q154–158 (2026-10-22):** **Anything over a capacity limit is deleted** (material units above 1,000 per secure stack and incoming items beyond the 50-slot lobby backpack). **Pressing Play deploys every unvaulted lobby backpack/hotbar item into the run.** Permanent items **stay in the owner's backpack/hotbar on death** with no reclaim step or fee, players may own/carry **unlimited** Permanent items, and a dropped Permanent item left on the ground when the world resets is **lost**. **Any logout during active play forfeits carried items**; a whole-server crash mid-fight should return items where technically possible. **Strangers may share an extraction**, the activator's death does not affect it, zone radius is authored per site, a portable rune extracts **everyone who fits in its zone**, may be placed anywhere **except inside structures**, and **never grants the Center 2× bonus**. See §41.
 
 **Owner answers Q159–161 (2026-10-22):** Totems upgrade through **three levels with 500 → 1,000 → 2,500 HP** and a growing radius; **no structure can be taken over while a covering tribe totem stands**. **Anyone can revive** a downed player, **one reviver at a time**, and **damage to the reviver does not stop the revive**; downed players **crawl very slowly and cannot heal**; **no protection after revive**. **No friendly fire** and **no spawn protection**, but spawns must be **away from other players**. **0% food has no extra effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Safe POIs are specific locations to be designed later. Event items are handled **per item**, marked with an **"event" tag**. **Admin kick commands only ever perform a safe kick.** A dead player cannot rejoin that server, so the **whole tribe extracts, parties up in the lobby and starts a new run**. See §42.
+
+**Owner answers Q165–169 (2026-10-23):** The island is designed around **~2,400 studs across**. A lobby server holds **20 players**, a **hub menu opens any lobby station from anywhere**, **trades can be started anywhere** in the lobby, and **weapons work in the lobby but deal no damage: every lobby player is invulnerable**. Map designs live in [`docs/maps`](docs/maps/README.md). See §46.
 
 **Owner confirmation (2026-10-22):** All recorded interpretations in §41.2 and §42.2 are **Confirmed**, and later answers supersede the older "Open" labels they resolved (boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation).
 
@@ -143,7 +145,8 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Confirmed world lifetime:** A public world persists while **any players remain**. When the last player leaves, that instance resets/ends; all bases, raidable structures, world loot, nodes, mobs and other live-world changes disappear. New servers initialize clean worlds.
 - **Confirmed extraction POIs:** Candidate locations are fixed and recognizable across maps, but only a server-specific subset has an available extraction in each instance.
 - **Confirmed same-world rejoin:** Players can return to their earlier still-running public instance if they have **not died and been kicked/excluded** and the server remains open/capacity permits. Ordinary active disconnect still leaves a 10-minute corpse and forfeits unsecured items; rejoining must not restore them.
-- **Open:** Map size and travel times, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
+- **Confirmed Q165 (2026-10-23):** The island is designed around **~2,400 studs across** (`BiomeCatalog.MAP_RADIUS = 1200`), roughly 75 seconds of walking from the edge to the centre and 150 seconds across at Roblox's default 16 studs/s. Ring radii stay starting values. Map designs live in [`docs/maps`](docs/maps/README.md).
+- **Open:** Exact travel times after movement tuning, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
 - **Confirmed Q3 resolution:** When a world empties, **all temporary island objects reset**. **All previously extracted items/materials in the protected vault are ALWAYS saved**, no matter their rarity or Permanent status. Account currencies, levels/masteries and cosmetic entitlements are unaffected.
 
 ## 4. Primitive progression, resource gathering and food
@@ -2056,7 +2059,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 
 **Tunable balance and production data**
 
-15. **World layout:** Map scale, biome list and proportions, claim radius by totem tier, fixed portal POIs, traversal and safe zones.
+15. **World layout:** ~~Map scale~~ (**~2,400 studs across, Q165**), biome list and proportions, claim radius by totem tier, fixed portal POIs, traversal and safe zones.
 16. **Combat tables:** Actual head/chest/legs armor contribution, damage/reach/arrow velocity, enemy health, raid DPS and healing animation movement.
 17. **Bosses:** Fixed stat sheets, combined player-level/gear scoring formula, snapshot timing, spawn/reset/drop tables and rare-event parameters.
 18. **Recipes:** Launch materials, full crafting station map, skill-gated unlocks, special source items, initial Permanent pickaxe conversion costs.
@@ -2181,6 +2184,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
 | **1.10** | 2026-10-23 | Owner decided Q164a: any material in the lobby backpack goes straight back into the vault and cannot be taken out; overflow beyond the vault's capacity is deleted. Trade-eligible materials are now offered from the vault. Updated §45. |
+| **1.11** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §46, updated §3.3 and §40.3. |
 | **1.9** | 2026-10-23 | Owner decided Q164: extracted materials can never come back out into the play world, and every extracted material (special ones included) banks into the vault, whose per-material capacity decides overflow deletion. Added §45 and marked the superseded routing in §9–10, §34, §39–41. |
 
 ## 44. Launch starting values (v0.18)
@@ -2210,6 +2214,22 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 5. **In-world needs come from the world.** Farming seeds, ritual offerings and building costs are gathered in the run; the lobby shop no longer sells Herb seeds (Herbs are a material).
 
 **QA:** a save holding 20 Iron in its backpack and 995 in the vault loads with 1,000 Iron vaulted, 15 deleted and shown, and an empty-of-materials backpack; a trade or crash recovery that delivers materials banks them in the same write; a Deploy only ever reserves non-materials. A Center extraction into a vault already holding 990 Stone stores 1,000 and deletes 50, listed on the receipt, even when the lobby backpack is full.
+
+## 46. Owner answers Q165–169: map scale and lobby hub (2026-10-23)
+
+Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft is [`docs/maps/lobby-hub.md`](docs/maps/lobby-hub.md).
+
+| # | Decision | Consequences |
+| --- | --- | --- |
+| **165** | The Shattered Crater is designed around **~2,400 studs across**. | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
+| **166** | A lobby server holds **20 players**. | Set the lobby place's maximum players to 20 in the Creator Dashboard (a place setting, not code). Parties (up to 8) and trades need both players in the same lobby server. |
+| **167** | A **hub menu opens any station from anywhere** in the lobby. | Matches the shipped menu-driven lobby. Physical stations in the lobby map are landmarks and walk-up shortcuts to the same panels, never the only way in. |
+| **168** | **Trades can be started anywhere** in the lobby. | Matches the shipped trade flow (no range check). Q98 limits (eligible items and Gems, never Coins) still apply. |
+| **169** | **Weapons can be used in the lobby but deal no damage; every player is invulnerable.** | The shipped lobby does not let weapons be swung yet (combat input is world-only). Lobby swings and shots must play their animations and projectiles while the server applies no hit to any player, NPC or object. |
+
+**QA:** a 21st player joining a full lobby server is placed in another lobby server; every lobby station opens from the hub menu at any position; a trade request reaches any player in the same lobby server; a weapon swung or an arrow fired in the lobby damages nothing.
+
+**Still Open:** the lobby hub's setting and look (Q170, pending the owner's reference image) and the Deploy gate's form (Q171). See `docs/maps/lobby-hub.md`.
 
 ---
 
