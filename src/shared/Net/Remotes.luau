@@ -47,6 +47,11 @@ local DEFINITIONS = {
 	ForgeSnapshot = "RemoteFunction", -- () -> recipes with vault counts and unlock state
 	ForgeCraft = "RemoteFunction", -- (recipeId, sourceInstanceId?, nonce) -> ok, receipt or reason
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
+	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
+	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach
+	ChestOpened = "RemoteEvent", -- server -> client: (chestId, contents)
+	ChestTake = "RemoteFunction", -- (chestId, index) -> ok, reason
+	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
 }
 
 local function folder()
