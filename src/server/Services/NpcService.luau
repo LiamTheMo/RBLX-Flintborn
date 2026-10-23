@@ -97,6 +97,7 @@ function NpcService.Spawn(enemyId: string, position: Vector3, elite: boolean?, e
 	local npc = {
 		def = def,
 		name = (if elite then "Alpha " else "") .. def.name,
+		elite = elite == true,
 		body = body,
 		text = text,
 		health = health,
@@ -143,9 +144,13 @@ local function kill(npc)
 	NpcService.Died:Fire(npc)
 end
 
-function NpcService.Damage(npc, amount: number)
+-- `attacker` (optional) is remembered for kill credit.
+function NpcService.Damage(npc, amount: number, attacker: Player?)
 	if not npcs[npc] or amount <= 0 or npc.invulnerable then
 		return
+	end
+	if attacker then
+		npc.lastAttacker = attacker
 	end
 	npc.health -= amount
 	if npc.custom then
@@ -168,7 +173,7 @@ function NpcService.Damage(npc, amount: number)
 end
 
 -- Melee against enemies, called by CombatService before structures.
-function NpcService.Hit(origin: Vector3, aim: Vector3, reach: number, rawDamage: number): boolean
+function NpcService.Hit(origin: Vector3, aim: Vector3, reach: number, rawDamage: number, attacker: Player?): boolean
 	local best, bestDistance = nil, math.huge
 	for npc in npcs do
 		local offset = npc.body.Position - origin
@@ -184,17 +189,17 @@ function NpcService.Hit(origin: Vector3, aim: Vector3, reach: number, rawDamage:
 		end
 	end
 	if best then
-		NpcService.Damage(best, rawDamage)
+		NpcService.Damage(best, rawDamage, attacker)
 		return true
 	end
 	return false
 end
 
 -- Arrow hits: true when `part` belongs to an enemy.
-function NpcService.HitPart(part: Instance, rawDamage: number): boolean
+function NpcService.HitPart(part: Instance, rawDamage: number, attacker: Player?): boolean
 	local npc = byPart[part]
 	if npc then
-		NpcService.Damage(npc, rawDamage)
+		NpcService.Damage(npc, rawDamage, attacker)
 		return true
 	end
 	return false

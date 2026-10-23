@@ -22,6 +22,14 @@ function ForgeRules.RequirementsMet(profile, recipe): boolean
 	if profile.metrics.extractions < (unlock.extractions or 0) then
 		return false
 	end
+	-- Player level and Crafting mastery gates (Q15, Q77; v0.13).
+	if profile.progression.level < (unlock.level or 0) then
+		return false
+	end
+	local crafting = profile.progression.masteryTracks.Crafting
+	if (crafting and crafting.level or 0) < (unlock.crafting or 0) then
+		return false
+	end
 	for _, catalogId in unlock.discovered or {} do
 		if not profile.recipes.discovered[catalogId] then
 			return false

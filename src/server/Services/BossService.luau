@@ -15,6 +15,7 @@ local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
 local BossScaling = require(ReplicatedStorage.Shared.Bosses.BossScaling)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -23,6 +24,9 @@ local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local BossService = {}
+
+-- Fires (boss) when a boss is defeated (participation XP, telemetry).
+BossService.Defeated = Signal.new()
 
 BossService.STEP_SECONDS = 0.2
 BossService.ATTACK_SECONDS = 2.5
@@ -253,6 +257,7 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 			for _, item in EventRules.RollLoot(def.loot, rng) do
 				DropService.Spawn(item, at + Vector3.new(rng:NextNumber(-5, 5), 0, rng:NextNumber(-5, 5)))
 			end
+			BossService.Defeated:Fire(boss)
 			if options.onEnded then
 				options.onEnded(boss, "Defeated")
 			end

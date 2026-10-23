@@ -220,6 +220,25 @@ local function showReceipt(receipt)
 		"Banked to vault: " .. listOf(receipt.vaulted),
 		"Lobby backpack: " .. listOf(receipt.toBackpack),
 	}
+	if (receipt.runGeneralXPEarned or 0) > 0 or (receipt.runMasteryXPEarned or 0) > 0 then
+		-- Base XP was credited as it was earned; the Center bonus is the extra (§25.4.1).
+		table.insert(
+			lines,
+			("Run XP (already credited): %d · mastery %d"):format(
+				receipt.runGeneralXPEarned,
+				receipt.runMasteryXPEarned
+			)
+		)
+		if (receipt.centerBonusGeneralXP or 0) > 0 or (receipt.centerBonusMasteryXP or 0) > 0 then
+			table.insert(
+				lines,
+				("Center bonus: +%d XP · +%d mastery XP"):format(
+					receipt.centerBonusGeneralXP,
+					receipt.centerBonusMasteryXP
+				)
+			)
+		end
+	end
 	if next(receipt.deleted) then
 		table.insert(lines, "Deleted (no room): " .. listOf(receipt.deleted))
 	end

@@ -13,6 +13,7 @@ local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInstance = require(ReplicatedStorage.Shared.Data.ItemInstance)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local QualityRoll = require(ReplicatedStorage.Shared.Crafting.QualityRoll)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
@@ -20,7 +21,9 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local BuildingService = require(script.Parent.BuildingService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
 local ProfileService = require(script.Parent.ProfileService)
+local ProgressionService = require(script.Parent.ProgressionService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local CraftingService = {}
@@ -28,9 +31,11 @@ local CraftingService = {}
 CraftingService.WORKBENCH_TAG = "Workbench"
 CraftingService.WORKBENCH_RANGE = 12
 CraftingService.REMEMBERED_REQUESTS = 32
+CraftingService.CRAFT_SECONDS = 1
 
 local rng = Random.new()
 local seenRequests = {}
+local lastCraft = {}
 
 local function rootOf(player: Player)
 	local character = player.Character
@@ -98,11 +103,19 @@ local function craft(player: Player, requestId: any, recipeId: any)
 	if not firstTime(player, requestId) then
 		return false, "Duplicate"
 	end
+	-- One craft per second, faster with Crafting mastery (Q77); also stops spam.
+	local cooldown = CraftingService.CRAFT_SECONDS / (1 + ModifierService.Sum(player, "CraftSpeed"))
+	local now = os.clock()
+	if lastCraft[player] and now - lastCraft[player] < cooldown then
+		return false, "TooFast"
+	end
 
 	-- Build the output, then check everything on a copy before touching the real inventory.
 	local output
 	if ItemCatalog.IsStackable(recipe.output) then
-		output = { catalogId = recipe.output, quantity = recipe.quantity }
+		-- Larger outputs from Crafting mastery (every third level).
+		local quantity = ModifierRules.Final(recipe.quantity, ModifierService.Get(player, "CraftOutput"))
+		output = { catalogId = recipe.output, quantity = quantity }
 	else
 		output = ItemInstance.New(
 			function()
@@ -126,7 +139,19 @@ local function craft(player: Player, requestId: any, recipeId: any)
 
 	InventoryRules.RemoveAll(inventory, recipe.inputs)
 	InventoryRules.Add(inventory, output)
+	-- Ingredient savings: a chance to get one unit of one input back.
+	if rng:NextNumber() < ModifierService.Sum(player, "IngredientSave") then
+		local inputs = {}
+		for catalogId in recipe.inputs do
+			table.insert(inputs, catalogId)
+		end
+		table.sort(inputs)
+		InventoryRules.Add(inventory, { catalogId = inputs[rng:NextInteger(1, #inputs)], quantity = 1 })
+	end
+	lastCraft[player] = now
 	InventoryService.Publish(player)
+	ProgressionService.GrantXp(player, ProgressionService.XP.Craft, "Crafting")
+	ProgressionService.GrantMastery(player, "Crafting", 1)
 	return true, nil
 end
 
@@ -163,6 +188,7 @@ function CraftingService.Start()
 	Remotes.Get("PlaceItem").OnServerInvoke = place
 	Players.PlayerRemoving:Connect(function(player)
 		seenRequests[player] = nil
+		lastCraft[player] = nil
 	end)
 end
 
