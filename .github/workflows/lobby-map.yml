@@ -1,0 +1,71 @@
+name: Upload and place the lobby map
+# Manual only. Uploads the exported lobby map (art/roblox/lobby, written by
+# art/blender/scripts/export_lobby_roblox.py) and builds Workspace.LobbyMap in the
+# lobby place. Returns art/roblox/lobby/asset_ids.json as an artifact; a person
+# commits it through the normal branch -> version branch -> main flow.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "inspect = read-only report; upload = upload meshes and textures; place = build and save the map; all = upload then place"
+        type: choice
+        options: [inspect, upload, place, all]
+        default: inspect
+      creator:
+        description: "Who owns uploaded assets (must own the experience so the place can load them)"
+        type: choice
+        options: [group, user]
+        default: group
+
+permissions:
+  contents: read
+
+# Shares the script sync's lock for this branch, so a deploy and a map build
+# never save the lobby place at the same time.
+concurrency:
+  group: roblox-script-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lobby-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Lobby map
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_ASSETS_API_KEY || secrets.ROBLOX_API_KEY }}
+          PLACE_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ secrets.ROBLOX_LOBBY_PLACE_ID }}
+          GROUP_ID: ${{ secrets.ROBLOX_CREATOR_ID || secrets.ROBLOX_CREATOR_GROUP_ID || secrets.ROBLOX_CREATOR_USER_ID }}
+          USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
+          CREATOR: ${{ inputs.creator }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          python3 scripts/roblox_lobby_map.py --check
+          if [ "$CREATOR" = "group" ]; then
+            export ROBLOX_CREATOR_GROUP_ID="$GROUP_ID"
+          else
+            export ROBLOX_CREATOR_USER_ID="$USER_ID"
+          fi
+          if [ "$MODE" = "upload" ] || [ "$MODE" = "all" ]; then
+            python3 scripts/roblox_lobby_map.py --upload
+          fi
+          # Place tasks use the place-publishing key (Luau execution, save place).
+          export ROBLOX_API_KEY="$PLACE_KEY"
+          if [ "$MODE" = "inspect" ]; then
+            python3 scripts/roblox_lobby_map.py --inspect
+          fi
+          if [ "$MODE" = "place" ] || [ "$MODE" = "all" ]; then
+            python3 scripts/roblox_lobby_map.py --place
+          fi
+      - name: Return asset ids
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lobby-asset-ids
+          path: art/roblox/lobby/asset_ids.json
+          if-no-files-found: warn
