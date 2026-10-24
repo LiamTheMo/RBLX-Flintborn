@@ -9,7 +9,7 @@ on:
       mode:
         description: "inspect = read-only report; upload = upload meshes and textures; place = build and save the map; lighting = set and save the lobby lighting; all = upload, place, then lighting"
         type: choice
-        options: [inspect, upload, place, lighting, all]
+        options: [inspect, diagnose, upload, place, lighting, all]
         default: inspect
       creator:
         description: "Who owns uploaded assets (must own the experience so the place can load them)"
@@ -58,6 +58,9 @@ jobs:
           export ROBLOX_API_KEY="$PLACE_KEY"
           if [ "$MODE" = "inspect" ]; then
             python3 scripts/roblox_lobby_map.py --inspect
+          fi
+          if [ "$MODE" = "diagnose" ]; then
+            python3 scripts/roblox_lobby_map.py --diagnose
           fi
           if [ "$MODE" = "place" ] || [ "$MODE" = "all" ]; then
             python3 scripts/roblox_lobby_map.py --place
