@@ -1,7 +1,8 @@
 -- World event feed (GDD §7.1, §36.5). Every announced event shows a banner with an
 -- icon, its rarity (colour and name), its direction and distance, and plays a
 -- sound. Running events stay listed with their time left, and each one's area is
--- drawn as a faint circle on the ground. World place only.
+-- drawn as a faint circle on the ground. World place only. With the new HUD
+-- (HudMode) the running list is hidden; the world event panel reads ActiveViews().
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -11,6 +12,8 @@ local SoundService = game:GetService("SoundService")
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local EventFeedController = {}
@@ -32,6 +35,19 @@ local COMPASS = { "E", "NE", "N", "NW", "W", "SW", "S", "SE" }
 local player = Players.LocalPlayer
 local ui = {}
 local events = {}
+
+-- Fires whenever an announced event starts or ends.
+EventFeedController.Changed = Signal.new()
+
+-- The server views of every running event: {id, name, rarity, category, kind,
+-- position, radius, endsAt}.
+function EventFeedController.ActiveViews()
+	local views = {}
+	for _, event in events do
+		table.insert(views, event.view)
+	end
+	return views
+end
 
 local function make(className: string, props, parent)
 	local instance = Instance.new(className)
@@ -105,7 +121,7 @@ local function refreshList()
 	end
 	table.sort(lines)
 	ui.list.Text = table.concat(lines, "\n")
-	ui.list.Visible = #lines > 0
+	ui.list.Visible = #lines > 0 and not HudMode.ReplacesLegacy()
 end
 
 local function build()
@@ -158,6 +174,7 @@ function EventFeedController.Start()
 			banner(view)
 		end
 		refreshList()
+		EventFeedController.Changed:Fire()
 	end)
 	Remotes.Get("EventEnded").OnClientEvent:Connect(function(eventId)
 		local event = events[eventId]
@@ -165,6 +182,7 @@ function EventFeedController.Start()
 			events[eventId] = nil
 			event.circle:Destroy()
 			refreshList()
+			EventFeedController.Changed:Fire()
 		end
 	end)
 	task.spawn(function()

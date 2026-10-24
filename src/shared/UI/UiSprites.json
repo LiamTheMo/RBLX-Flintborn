@@ -1,0 +1,752 @@
+{
+  "button_add_friend": {
+    "h": 163,
+    "slice": null,
+    "w": 183
+  },
+  "button_back": {
+    "h": 163,
+    "slice": null,
+    "w": 183
+  },
+  "button_backpack": {
+    "h": 165,
+    "slice": null,
+    "w": 183
+  },
+  "button_check": {
+    "h": 164,
+    "slice": null,
+    "w": 184
+  },
+  "button_chest": {
+    "h": 165,
+    "slice": null,
+    "w": 183
+  },
+  "button_gear": {
+    "h": 166,
+    "slice": null,
+    "w": 180
+  },
+  "button_gift": {
+    "h": 166,
+    "slice": null,
+    "w": 184
+  },
+  "button_group": {
+    "h": 165,
+    "slice": null,
+    "w": 183
+  },
+  "button_help": {
+    "h": 164,
+    "slice": null,
+    "w": 180
+  },
+  "button_map": {
+    "h": 164,
+    "slice": null,
+    "w": 183
+  },
+  "button_scroll": {
+    "h": 165,
+    "slice": null,
+    "w": 183
+  },
+  "button_sound_on": {
+    "h": 164,
+    "slice": null,
+    "w": 179
+  },
+  "button_star": {
+    "h": 166,
+    "slice": null,
+    "w": 182
+  },
+  "button_swap": {
+    "h": 163,
+    "slice": null,
+    "w": 182
+  },
+  "button_tools": {
+    "h": 165,
+    "slice": null,
+    "w": 180
+  },
+  "button_x": {
+    "h": 164,
+    "slice": null,
+    "w": 184
+  },
+  "compass_marker": {
+    "h": 30,
+    "slice": null,
+    "w": 32
+  },
+  "fill_blue": {
+    "h": 45,
+    "slice": [
+      17,
+      15,
+      17,
+      14
+    ],
+    "w": 168
+  },
+  "fill_green": {
+    "h": 41,
+    "slice": [
+      19,
+      13,
+      16,
+      12
+    ],
+    "w": 168
+  },
+  "fill_orange_striped": {
+    "h": 43,
+    "slice": [
+      21,
+      14,
+      21,
+      14
+    ],
+    "w": 175
+  },
+  "fill_red": {
+    "h": 41,
+    "slice": [
+      18,
+      13,
+      17,
+      12
+    ],
+    "w": 168
+  },
+  "fill_track": {
+    "h": 46,
+    "slice": [
+      18,
+      15,
+      18,
+      14
+    ],
+    "w": 212
+  },
+  "fill_yellow": {
+    "h": 42,
+    "slice": [
+      17,
+      14,
+      17,
+      12
+    ],
+    "w": 168
+  },
+  "frame_badge": {
+    "h": 90,
+    "slice": [
+      39,
+      36,
+      38,
+      33
+    ],
+    "w": 191
+  },
+  "frame_bar": {
+    "h": 111,
+    "slice": [
+      48,
+      31,
+      47,
+      32
+    ],
+    "w": 425
+  },
+  "frame_bar_hollow": {
+    "h": 111,
+    "slice": [
+      48,
+      36,
+      47,
+      37
+    ],
+    "w": 425
+  },
+  "frame_compass": {
+    "h": 84,
+    "slice": [
+      59,
+      21,
+      60,
+      21
+    ],
+    "w": 729
+  },
+  "frame_panel_large": {
+    "h": 178,
+    "slice": [
+      43,
+      35,
+      44,
+      39
+    ],
+    "w": 338
+  },
+  "frame_panel_large_hollow": {
+    "h": 178,
+    "slice": [
+      46,
+      38,
+      46,
+      40
+    ],
+    "w": 338
+  },
+  "frame_panel_medium": {
+    "h": 110,
+    "slice": [
+      35,
+      22,
+      35,
+      21
+    ],
+    "w": 357
+  },
+  "frame_panel_wide": {
+    "h": 109,
+    "slice": [
+      35,
+      20,
+      35,
+      19
+    ],
+    "w": 421
+  },
+  "frame_prompt": {
+    "h": 118,
+    "slice": [
+      29,
+      21,
+      36,
+      20
+    ],
+    "w": 311
+  },
+  "frame_round": {
+    "h": 201,
+    "slice": null,
+    "w": 199
+  },
+  "frame_round_hollow": {
+    "h": 201,
+    "slice": null,
+    "w": 199
+  },
+  "frame_selected_hollow": {
+    "h": 152,
+    "slice": [
+      46,
+      48,
+      45,
+      48
+    ],
+    "w": 165
+  },
+  "frame_slot": {
+    "h": 145,
+    "slice": [
+      33,
+      37,
+      35,
+      34
+    ],
+    "w": 151
+  },
+  "frame_slot_selected": {
+    "h": 146,
+    "slice": [
+      35,
+      39,
+      37,
+      38
+    ],
+    "w": 152
+  },
+  "frame_square_hollow": {
+    "h": 135,
+    "slice": [
+      45,
+      46,
+      50,
+      45
+    ],
+    "w": 142
+  },
+  "frame_wide_hollow": {
+    "h": 130,
+    "slice": [
+      52,
+      38,
+      45,
+      42
+    ],
+    "w": 219
+  },
+  "icon_add_friend": {
+    "h": 112,
+    "slice": null,
+    "w": 125
+  },
+  "icon_anvil": {
+    "h": 112,
+    "slice": null,
+    "w": 171
+  },
+  "icon_axe": {
+    "h": 139,
+    "slice": null,
+    "w": 137
+  },
+  "icon_back": {
+    "h": 103,
+    "slice": null,
+    "w": 111
+  },
+  "icon_backpack": {
+    "h": 128,
+    "slice": null,
+    "w": 123
+  },
+  "icon_bell": {
+    "h": 114,
+    "slice": null,
+    "w": 105
+  },
+  "icon_bow": {
+    "h": 138,
+    "slice": null,
+    "w": 139
+  },
+  "icon_calendar": {
+    "h": 118,
+    "slice": null,
+    "w": 122
+  },
+  "icon_campfire": {
+    "h": 133,
+    "slice": null,
+    "w": 138
+  },
+  "icon_check": {
+    "h": 102,
+    "slice": null,
+    "w": 123
+  },
+  "icon_chest": {
+    "h": 115,
+    "slice": null,
+    "w": 157
+  },
+  "icon_coin": {
+    "h": 122,
+    "slice": null,
+    "w": 120
+  },
+  "icon_coin_bag": {
+    "h": 125,
+    "slice": null,
+    "w": 111
+  },
+  "icon_collapse": {
+    "h": 101,
+    "slice": null,
+    "w": 111
+  },
+  "icon_compass": {
+    "h": 133,
+    "slice": null,
+    "w": 118
+  },
+  "icon_crossed_swords": {
+    "h": 134,
+    "slice": null,
+    "w": 139
+  },
+  "icon_crown": {
+    "h": 127,
+    "slice": null,
+    "w": 145
+  },
+  "icon_down": {
+    "h": 78,
+    "slice": null,
+    "w": 113
+  },
+  "icon_exit": {
+    "h": 113,
+    "slice": null,
+    "w": 133
+  },
+  "icon_expand": {
+    "h": 106,
+    "slice": null,
+    "w": 120
+  },
+  "icon_eye": {
+    "h": 92,
+    "slice": null,
+    "w": 143
+  },
+  "icon_gear": {
+    "h": 126,
+    "slice": null,
+    "w": 128
+  },
+  "icon_gem": {
+    "h": 128,
+    "slice": null,
+    "w": 118
+  },
+  "icon_gift": {
+    "h": 126,
+    "slice": null,
+    "w": 128
+  },
+  "icon_group": {
+    "h": 115,
+    "slice": null,
+    "w": 157
+  },
+  "icon_hammer": {
+    "h": 129,
+    "slice": null,
+    "w": 128
+  },
+  "icon_hand": {
+    "h": 113,
+    "slice": null,
+    "w": 107
+  },
+  "icon_heart": {
+    "h": 113,
+    "slice": null,
+    "w": 125
+  },
+  "icon_help": {
+    "h": 123,
+    "slice": null,
+    "w": 124
+  },
+  "icon_hourglass": {
+    "h": 116,
+    "slice": null,
+    "w": 84
+  },
+  "icon_info": {
+    "h": 108,
+    "slice": null,
+    "w": 109
+  },
+  "icon_left": {
+    "h": 102,
+    "slice": null,
+    "w": 72
+  },
+  "icon_lightning": {
+    "h": 130,
+    "slice": null,
+    "w": 84
+  },
+  "icon_lock": {
+    "h": 118,
+    "slice": null,
+    "w": 90
+  },
+  "icon_lock_silver": {
+    "h": 142,
+    "slice": null,
+    "w": 113
+  },
+  "icon_map": {
+    "h": 119,
+    "slice": null,
+    "w": 148
+  },
+  "icon_meat": {
+    "h": 135,
+    "slice": null,
+    "w": 123
+  },
+  "icon_minus": {
+    "h": 46,
+    "slice": null,
+    "w": 111
+  },
+  "icon_more": {
+    "h": 45,
+    "slice": null,
+    "w": 131
+  },
+  "icon_mountain": {
+    "h": 99,
+    "slice": null,
+    "w": 158
+  },
+  "icon_music": {
+    "h": 103,
+    "slice": null,
+    "w": 94
+  },
+  "icon_pickaxe": {
+    "h": 133,
+    "slice": null,
+    "w": 134
+  },
+  "icon_plus": {
+    "h": 107,
+    "slice": null,
+    "w": 109
+  },
+  "icon_red_dot": {
+    "h": 79,
+    "slice": null,
+    "w": 80
+  },
+  "icon_refresh": {
+    "h": 106,
+    "slice": null,
+    "w": 110
+  },
+  "icon_right": {
+    "h": 104,
+    "slice": null,
+    "w": 74
+  },
+  "icon_run": {
+    "h": 128,
+    "slice": null,
+    "w": 124
+  },
+  "icon_scroll": {
+    "h": 125,
+    "slice": null,
+    "w": 147
+  },
+  "icon_search": {
+    "h": 114,
+    "slice": null,
+    "w": 119
+  },
+  "icon_shield": {
+    "h": 133,
+    "slice": null,
+    "w": 123
+  },
+  "icon_skull": {
+    "h": 110,
+    "slice": null,
+    "w": 107
+  },
+  "icon_sound_off": {
+    "h": 110,
+    "slice": null,
+    "w": 120
+  },
+  "icon_sound_on": {
+    "h": 105,
+    "slice": null,
+    "w": 123
+  },
+  "icon_spear": {
+    "h": 136,
+    "slice": null,
+    "w": 127
+  },
+  "icon_spinner": {
+    "h": 148,
+    "slice": null,
+    "w": 141
+  },
+  "icon_star": {
+    "h": 123,
+    "slice": null,
+    "w": 130
+  },
+  "icon_star_gold": {
+    "h": 124,
+    "slice": null,
+    "w": 130
+  },
+  "icon_stone_hammer": {
+    "h": 138,
+    "slice": null,
+    "w": 130
+  },
+  "icon_storm": {
+    "h": 122,
+    "slice": null,
+    "w": 115
+  },
+  "icon_swap": {
+    "h": 122,
+    "slice": null,
+    "w": 121
+  },
+  "icon_sword": {
+    "h": 138,
+    "slice": null,
+    "w": 135
+  },
+  "icon_tower": {
+    "h": 112,
+    "slice": null,
+    "w": 132
+  },
+  "icon_trophy": {
+    "h": 121,
+    "slice": null,
+    "w": 132
+  },
+  "icon_unlock": {
+    "h": 124,
+    "slice": null,
+    "w": 89
+  },
+  "icon_up": {
+    "h": 73,
+    "slice": null,
+    "w": 108
+  },
+  "icon_warning": {
+    "h": 100,
+    "slice": null,
+    "w": 112
+  },
+  "icon_waypoint": {
+    "h": 112,
+    "slice": null,
+    "w": 96
+  },
+  "icon_x": {
+    "h": 103,
+    "slice": null,
+    "w": 103
+  },
+  "keycap": {
+    "h": 148,
+    "slice": [
+      31,
+      41,
+      33,
+      39
+    ],
+    "w": 165
+  },
+  "nine_corner_bl": {
+    "h": 117,
+    "slice": null,
+    "w": 112
+  },
+  "nine_corner_br": {
+    "h": 116,
+    "slice": null,
+    "w": 113
+  },
+  "nine_corner_tl": {
+    "h": 115,
+    "slice": null,
+    "w": 108
+  },
+  "nine_corner_tr": {
+    "h": 115,
+    "slice": null,
+    "w": 107
+  },
+  "nine_edge_bottom": {
+    "h": 57,
+    "slice": null,
+    "w": 430
+  },
+  "nine_edge_left": {
+    "h": 153,
+    "slice": null,
+    "w": 54
+  },
+  "nine_edge_right": {
+    "h": 153,
+    "slice": null,
+    "w": 55
+  },
+  "nine_edge_top": {
+    "h": 56,
+    "slice": null,
+    "w": 430
+  },
+  "panel_dark": {
+    "h": 96,
+    "slice": [
+      16,
+      14,
+      14,
+      13
+    ],
+    "w": 223
+  },
+  "panel_dark_small": {
+    "h": 97,
+    "slice": [
+      14,
+      14,
+      13,
+      13
+    ],
+    "w": 106
+  },
+  "pill_dark": {
+    "h": 110,
+    "slice": [
+      38,
+      30,
+      37,
+      28
+    ],
+    "w": 194
+  },
+  "slot_broken": {
+    "h": 146,
+    "slice": null,
+    "w": 154
+  },
+  "slot_cooldown": {
+    "h": 92,
+    "slice": null,
+    "w": 92
+  },
+  "slot_cooldown_full": {
+    "h": 146,
+    "slice": null,
+    "w": 154
+  },
+  "slot_lock": {
+    "h": 69,
+    "slice": null,
+    "w": 54
+  },
+  "slot_lock_full": {
+    "h": 145,
+    "slice": null,
+    "w": 153
+  },
+  "stat_bar_empty": {
+    "h": 83,
+    "slice": [
+      34,
+      20,
+      35,
+      26
+    ],
+    "w": 430
+  }
+}

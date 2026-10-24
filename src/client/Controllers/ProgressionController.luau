@@ -1,7 +1,8 @@
 -- Progression UI (GDD §33, §37, §25.4). A level bar with XP pop-ups everywhere; P
 -- (or ButtonSelect) opens the panel: mastery tracks with their next milestone,
 -- titles, and in the lobby the rebirth screen (Reset / Kept / Gained in plain
--- words before confirming) and the perk shop.
+-- words before confirming) and the perk shop. In the world the new HUD (HudMode)
+-- draws the level bar from Changed/View() and hosts the pop-ups (MountPopups).
 
 local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
@@ -12,12 +13,40 @@ local PerkCatalog = require(ReplicatedStorage.Shared.Progression.PerkCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 
 local ProgressionController = {}
+
+-- Fires (view) with every new progression snapshot.
+ProgressionController.Changed = Signal.new()
 
 local player = Players.LocalPlayer
 local ui = {}
 local view = nil
+local popupHost = nil
+
+-- The latest progression snapshot {level, xp, xpToNext, ...}, or nil while loading.
+function ProgressionController.View()
+	return view
+end
+
+local function placePopups()
+	if ui.popups == nil or popupHost == nil then
+		return
+	end
+	ui.popups.AnchorPoint = Vector2.new(0, 1)
+	ui.popups.Position = UDim2.fromScale(0, 1)
+	ui.popups.Size = UDim2.fromScale(1, 1)
+	ui.popups.Parent = popupHost
+end
+
+-- Moves the XP pop-ups into `host`: the new HUD keeps them just above its XP bar,
+-- in a gui that stays enabled outside a run so no pop-up is missed.
+function ProgressionController.MountPopups(host: GuiObject)
+	popupHost = host
+	placePopups()
+end
 
 local TEXT = Color3.fromRGB(235, 226, 212)
 local GOLD = Color3.fromRGB(255, 214, 150)
@@ -75,6 +104,7 @@ local function updateBar()
 	if view == nil then
 		return
 	end
+	ProgressionController.Changed:Fire(view)
 	local fraction = if view.xpToNext then math.clamp(view.xp / view.xpToNext, 0, 1) else 1
 	ui.fill.Size = UDim2.fromScale(fraction, 1)
 	ui.barText.Text = if view.xpToNext
@@ -229,6 +259,14 @@ local function build()
 		BackgroundTransparency = 1,
 	}, gui)
 	make("UIListLayout", { VerticalAlignment = Enum.VerticalAlignment.Bottom, Padding = UDim.new(0, 2) }, ui.popups)
+	-- The new HUD replaces the level bar while it is on screen and hosts the
+	-- pop-ups; whenever it is hidden (world menu, protected, dead) this bar shows.
+	local function refreshBar()
+		ui.bar.Visible = not (HudMode.ReplacesLegacy() and HudMode.IsVisible())
+	end
+	HudMode.VisibilityChanged:Connect(refreshBar)
+	refreshBar()
+	placePopups()
 
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
