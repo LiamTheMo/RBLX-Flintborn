@@ -34,6 +34,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SPRITES = ROOT / "art" / "ui" / "sprites"
 MANIFEST = SPRITES / "manifest.json"
 IDS_FILE = ROOT / "src" / "shared" / "UI" / "UiAssetIds.json"
+# Decal ids of every uploaded sprite. Open Cloud uploads images as Decals; the HUD
+# needs the Image asset behind each one, which goes into IDS_FILE once resolved.
+DECALS_FILE = ROOT / "art" / "ui" / "uploaded_decals.json"
 SPRITES_FILE = ROOT / "src" / "shared" / "UI" / "UiSprites.json"
 
 ASSETS_URL = "https://apis.roblox.com/assets/v1/assets"
@@ -197,6 +200,8 @@ def main(argv=None):
     parser.add_argument("--only", default="", help="comma-separated sprite names to consider")
     parser.add_argument("--sprites", action="store_true", help="regenerate UiSprites.json from the manifest")
     parser.add_argument("--inspect", default="", help="print Open Cloud details for an asset id and exit")
+    parser.add_argument("--resolve", action="store_true",
+                        help="look up image ids for uploaded decals (needs the legacy-asset:manage scope)")
     args = parser.parse_args(argv)
 
     if args.inspect:
@@ -213,16 +218,28 @@ def main(argv=None):
     if args.sprites:
         sync_sprites()
 
+    if args.resolve:
+        key = os.environ.get("ROBLOX_API_KEY", "").strip()
+        if not key:
+            raise ValueError("ROBLOX_API_KEY is required for --resolve")
+        resolved, failed = resolve_decals(Cloud(key, None))
+        print(f"Resolved {resolved}; {failed} still need an image id")
+        return 0 if failed == 0 else 1
+
     only = {name.strip() for name in args.only.split(",") if name.strip()}
     files = sprite_files()
     ids = load_json(IDS_FILE)
-    todo = pending(files, ids, only)
+    decals = load_json(DECALS_FILE)
+    # A sprite counts as uploaded once its decal exists, even before the image id
+    # behind it is known; --resolve fills those in without uploading twice.
+    todo = pending(files, {**decals, **ids}, only)
     too_big = [f for f in todo if f.stat().st_size > MAX_BYTES]
     if too_big:
         raise ValueError("Over 20 MB: " + ", ".join(f.name for f in too_big))
 
     if not args.upload:
-        print(f"DRY RUN: {len(files)} sprites found, {len(ids)} already uploaded, {len(todo)} would upload")
+        print(f"DRY RUN: {len(files)} sprites found, {len({**decals, **ids})} already uploaded "
+              f"({len(ids)} with image ids), {len(todo)} would upload")
         for file in todo:
             print(f"  would upload {file.stem:28s} {file.stat().st_size:>8d} bytes")
         if not os.environ.get("ROBLOX_API_KEY"):
@@ -236,13 +253,38 @@ def main(argv=None):
     cloud = Cloud(key, creator_from_env())
     for index, file in enumerate(todo, 1):
         decal_id = cloud.wait(cloud.upload(file))
-        asset_id, how = cloud.image_id(decal_id)
-        ids[file.stem] = asset_id
+        decals[file.stem] = decal_id
         # Saved after every upload so an interrupted run never repeats one.
-        write_json(IDS_FILE, ids)
-        print(f"[{index}/{len(todo)}] {file.stem} -> rbxassetid://{asset_id} (decal {decal_id}: {how})")
-    print(f"Uploaded {len(todo)}; {IDS_FILE.relative_to(ROOT)} now lists {len(ids)} ids")
+        write_json(DECALS_FILE, decals)
+        print(f"[{index}/{len(todo)}] {file.stem} -> decal {decal_id}")
+    resolved, failed = resolve_decals(cloud)
+    print(f"Uploaded {len(todo)}; resolved {resolved} image ids, {failed} still need one "
+          f"(run --resolve once the key can use Asset Delivery)")
     return 0
+
+
+def resolve_decals(cloud):
+    """Fill UiAssetIds.json with the image id behind each uploaded decal.
+
+    Only real image ids go into UiAssetIds.json: a decal id there would show a
+    blank ImageLabel, while a missing id keeps UiAssets' styled-frame fallback.
+    """
+    ids = load_json(IDS_FILE)
+    decals = load_json(DECALS_FILE)
+    resolved = failed = 0
+    for name, decal_id in sorted(decals.items()):
+        if name in ids:
+            continue
+        image_id, how = cloud.image_id(decal_id)
+        if how in ("resolved from decal", "already an image"):
+            ids[name] = image_id
+            write_json(IDS_FILE, ids)
+            resolved += 1
+            print(f"  {name}: decal {decal_id} -> image {image_id}")
+        else:
+            failed += 1
+            print(f"  {name}: decal {decal_id} unresolved ({how.strip()[:160]})")
+    return resolved, failed
 
 
 if __name__ == "__main__":
