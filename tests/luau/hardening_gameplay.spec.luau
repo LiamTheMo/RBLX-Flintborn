@@ -57,14 +57,22 @@ test("sustained over-speed spends the latency budget; legal sprinting never does
 end)
 
 test("travel at sprint pace drains stamina without a sprint request", function()
+	local function observe(speed: number, walkPace: number?): boolean
+		local pace = SurvivalRules.NewPace()
+		local observed = false
+		for _ = 1, 5 do
+			observed = SurvivalRules.ObservePace(pace, speed * 0.2, 0.2, SurvivalRules.WALK_SPEED, walkPace)
+		end
+		return observed
+	end
 	local state = SurvivalRules.NewState()
-	SurvivalRules.StepStamina(state, 1, true, SurvivalRules.ObservedSprint(SurvivalRules.SPRINT_SPEED))
+	SurvivalRules.StepStamina(state, 1, true, observe(SurvivalRules.SPRINT_SPEED))
 	expect(state.stamina < 1, "no free sprint by never asking to")
 	local walker = SurvivalRules.NewState()
 	walker.stamina = 0.5
-	SurvivalRules.StepStamina(walker, 1, true, SurvivalRules.ObservedSprint(SurvivalRules.WALK_SPEED))
+	SurvivalRules.StepStamina(walker, 1, true, observe(SurvivalRules.WALK_SPEED))
 	expect(walker.stamina > 0.5, "walking still recovers")
-	expect(not SurvivalRules.ObservedSprint(20, SurvivalRules.WALK_SPEED * 1.5), "a fast swimmer is not sprinting")
+	expect(not observe(20, SurvivalRules.WALK_SPEED * 1.5), "a fast swimmer is not sprinting")
 end)
 
 -- Building ----------------------------------------------------------------------

@@ -3,7 +3,6 @@
 -- the ingredients are there. The server decides; this only sends the request.
 -- World place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,6 +13,7 @@ local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local InventoryController = require(script.Parent.InventoryController)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local CraftingController = {}
 
@@ -176,7 +176,7 @@ local function build()
 	end
 
 	ui.toggle = make("TextButton", {
-		Text = "Craft (V)",
+		Text = "Craft (" .. Binds.Label("Craft") .. ")",
 		AnchorPoint = Vector2.new(0, 1),
 		Position = UDim2.new(0.5, 8 + 9 * 33, 1, -12),
 		Size = UDim2.fromOffset(100, 30),
@@ -187,6 +187,9 @@ local function build()
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.toggle)
+	Binds.Changed:Connect(function()
+		ui.toggle.Text = "Craft (" .. Binds.Label("Craft") .. ")"
+	end)
 	ui.toggle.Activated:Connect(function()
 		ui.panel.Visible = not ui.panel.Visible
 	end)
@@ -197,15 +200,15 @@ local function setInRun(inRun: boolean)
 	ui.toggle.Visible = inRun and not HudMode.ReplacesLegacy()
 	if not inRun then
 		ui.panel.Visible = false
-		ContextActionService:UnbindAction("FlintbornCraft")
+		Binds.Unbind("Craft")
 		return
 	end
-	ContextActionService:BindAction("FlintbornCraft", function(_, state)
+	Binds.Bind("Craft", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			CraftingController.Toggle()
 		end
 		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.V, Enum.KeyCode.DPadUp)
+	end)
 end
 
 -- Opens or closes this panel (keys, and the on-screen navigation bar).

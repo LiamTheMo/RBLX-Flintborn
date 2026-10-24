@@ -47,7 +47,7 @@ Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the 
 
 Studio and live checks (until crafting arrives in v0.05, a Studio run starts with a test kit of medicine and food; live runs only carry what was in the lobby backpack):
 
-- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar refills in about 5 s; melee, crouching and standing still never drain it.
+- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee, crouching and standing still never drain it.
 - [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
 - [ ] Food drains to 0 in 5 minutes; below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
@@ -65,7 +65,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack; tap two slots to move or swap.
+- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -113,7 +113,7 @@ Studio and live checks (two or more players):
 - [ ] Arriving in the lobby shows the receipt: every material (special ones included, Q164) banked to the vault, gear in the lobby backpack, overflow listed as deleted.
 - [ ] A Center extraction doubles materials but never a sword; a rune placed at the Center does not double.
 - [ ] A rune (hotbar) is refused next to a workbench and next to another running extraction; elsewhere it starts a 30 s countdown everyone can use.
-- [ ] G opens the vault in the lobby: deposit from the backpack and withdraw items; materials have no withdraw action (Q164); a full vault refuses rather than deletes.
+- [ ] The Vault button opens the vault in the lobby: deposit from the backpack and withdraw items; materials have no withdraw action (Q164); a full vault refuses rather than deletes.
 - [ ] Lobby backpack and vault contents survive logout, rejoining another lobby server and a world reset; Deploy takes the whole backpack except materials into the next run.
 
 ## v0.09 — Ancestral Forge and Permanent items
@@ -124,7 +124,7 @@ Placeholders: Permanent archetypes are Basic Pickaxe, Stone Spear, Iron Sword an
 
 Studio and live checks:
 
-- [ ] Extract twice (once carrying the Studio Ancient Ember), vault the ember and a Basic Pickaxe, then F in the lobby: the Permanent pickaxe recipe is unlocked and counts only vaulted materials.
+- [ ] Extract twice (once carrying the Studio Ancient Ember), vault the ember and a Basic Pickaxe, then open the Forge in the lobby: the Permanent pickaxe recipe is unlocked and counts only vaulted materials.
 - [ ] The conversion dialog names the exact pickaxe and its quality roll, arms only after a short delay, and the vault then shows one ★ pickaxe with the same roll.
 - [ ] Die carrying several ★ items: all come back in the lobby backpack; ordinary items stay in the body.
 - [ ] Q drops a ★ item; a second player picks it up, is told they own it, and keeps it on death; the original owner cannot get it back after rejoining.
@@ -203,9 +203,9 @@ Placeholders: vault upgrade 500 Gems (max 8 tiers), respec 250 Gems, Gem trades 
 
 Studio and live checks (two accounts):
 
-- [ ] M opens the market: buy from the shop, sell to the merchant (a Forge reagent shows a warning), claim each quest tier once; the wallet updates; Coins and Gems never drop on death.
+- [ ] The Market button opens the market: buy from the shop, sell to the merchant (a Forge reagent shows a warning), claim each quest tier once; the wallet updates; Coins and Gems never drop on death.
 - [ ] Upgrade the vault with Gems; G shows 25 more slots. Redeem `FLINTBORN-RESPEC` once to refund perk tokens.
-- [ ] Y opens trading: invite, add a ★ item and Gems, lock, wait for the countdown, confirm; any change unlocks both sides; Coins are never offered.
+- [ ] The Trade button opens trading: invite, add a ★ item and Gems, lock, wait for the countdown, confirm; any change unlocks both sides; Coins are never offered.
 - [ ] Disconnect one player mid-trade: the trade closes and nothing changes hands. (Crash recovery between the two saves is covered by specs; a forced server kill is a live check.)
 - [ ] Once product IDs exist: buy a vault upgrade and a Gem pack with Robux in a test place; each purchase grants exactly once.
 - [ ] Review Roblox purchase policy (paid random items, Premium) before release.
@@ -347,3 +347,47 @@ Studio and live checks:
 - [ ] Extract with Ancient Ember: the receipt shows it vaulted, and the vault's materials column shows it with no withdraw action.
 - [ ] Forge recipes that use Ancient Ember still work from the vault.
 - [ ] The shop no longer lists Herb seeds; planting Herbs uses Herbs gathered in the run.
+
+## Keyboard controls and rebinding
+
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
+
+Automated (`keybinds.spec.luau`, 7 cases):
+- The requested defaults, with every default allowed and unique.
+- Reserved keys (W A S D, Space, /, Esc, Enter, Backspace, function keys) and unknown actions are refused.
+- Rebinding to a used key swaps the two actions; keys equal to their default are not stored.
+- Tampered saves resolve to the defaults. In a conflicting or older save, only the clashing rebind reverts and every other rebind is kept; removed lobby actions are dropped.
+- Hints name the bound key, and every tutorial token is a real action.
+
+Studio and live checks:
+
+- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–9 select hotbar slots, Q drops, and F picks up a dropped item, loots a body and harvests a node.
+- [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
+- [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
+- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
+- [ ] Pressing Tab while rebinding doesn't open the backpack.
+- [ ] Reset controls to defaults restores everything.
+- [ ] Tab also toggles Roblox's player list: decide whether that's acceptable or the player list should move.
+- [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
+- [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
+- [ ] The tutorial hints name the current keys after a rebind.
+
+## Stamina recovery delay and walk-after-sprint fix
+
+Owner decision and bug report (GDD §47): recovery stops when a sprint starts and resumes 3 s after it ends. Walking after releasing sprint no longer drains stamina.
+
+Automated (`survival.spec.luau`, `hardening_gameplay.spec.luau`, `review_gameplay.spec.luau`):
+- 3 s of sprint empties the bar, a 3 s pause follows, then it refills in 5 s.
+- A sprint during the pause restarts it.
+- 20 s of walking with uneven 0.2 s position samples (60–140 % of walk speed) after a sprint recovers and never drains.
+- Travel at sprint pace without a sprint request is still caught and drained; one sample, or a change of allowed speed, never judges a full window.
+
+Placeholders: recovery pause 3 s; pace window 1 s; sprint pace 1.25× walk speed (20 studs/s at the 16 / 24 starting speeds).
+
+Studio and live checks:
+
+- [ ] Hold Shift + W, release Shift and keep W held: the stamina bar stops falling at once, holds for 3 s, then refills.
+- [ ] Sprint briefly again during the pause: the 3 s restarts.
+- [ ] Walk normally on a laggy connection (Studio network simulation): stamina never drains.
+- [ ] A speed exploit without the sprint key still loses stamina (and is pulled back by movement checks).
+

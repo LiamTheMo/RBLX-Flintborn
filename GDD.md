@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.11  
+> **Design revision:** 1.14  
 > **Last updated:** 2026-10-23  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -32,7 +32,7 @@
 
 **Owner answers Q159–161 (2026-10-22):** Totems upgrade through **three levels with 500 → 1,000 → 2,500 HP** and a growing radius; **no structure can be taken over while a covering tribe totem stands**. **Anyone can revive** a downed player, **one reviver at a time**, and **damage to the reviver does not stop the revive**; downed players **crawl very slowly and cannot heal**; **no protection after revive**. **No friendly fire** and **no spawn protection**, but spawns must be **away from other players**. **0% food has no extra effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Safe POIs are specific locations to be designed later. Event items are handled **per item**, marked with an **"event" tag**. **Admin kick commands only ever perform a safe kick.** A dead player cannot rejoin that server, so the **whole tribe extracts, parties up in the lobby and starts a new run**. See §42.
 
-**Owner answers Q165–169 (2026-10-23):** The island is designed around **~2,400 studs across**. A lobby server holds **20 players**, a **hub menu opens any lobby station from anywhere**, **trades can be started anywhere** in the lobby, and **weapons work in the lobby but deal no damage: every lobby player is invulnerable**. Map designs live in [`docs/maps`](docs/maps/README.md). See §46.
+**Owner answers Q165–169 (2026-10-23):** The island is designed around **~2,400 studs across**. A lobby server holds **20 players**, a **hub menu opens any lobby station from anywhere**, **trades can be started anywhere** in the lobby, and **weapons work in the lobby but deal no damage: every lobby player is invulnerable**. Map designs live in [`docs/maps`](docs/maps/README.md). See §48.
 
 **Owner confirmation (2026-10-22):** All recorded interpretations in §41.2 and §42.2 are **Confirmed**, and later answers supersede the older "Open" labels they resolved (boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation).
 
@@ -184,7 +184,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 4.3 Survival attributes — Confirmed and Open
 
 - **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
-- **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. Whether recovery pauses on renewed sprint or begins after sprint ends, sprint speed and stamina UI granularity remain Open.
+- **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. **Recovery stops the moment a sprint starts and resumes 3 seconds after it ends (§47).** Sprint speed and stamina UI granularity remain Open.
 - **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
@@ -842,7 +842,7 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 
 - **Click melee:** Raw hit damage starting points remain rock **5**, wooden spear **~15**, stone spear **~25**, prior to armor. **Q133 provisional attack cooldowns:** Rock **0.3s**, Dagger **0.4s**, Sword **0.7s**, Spear **0.9s**. These cadence numbers were accepted as approximate, not per-archetype locked; exact reach/animation windows, dagger/sword damage and stone-vs-wood spear differences remain Open. Melee spends no stamina.
 - **Bows:** **Both bow and arrow tier contribute to arrow damage**. Projectile is deliberately slow and follows a **slight gravity arc**. Holding fire **pulls back/charges the bow animation**, increasing arrow launch strength/range with longer held duration; **damage stays unchanged at any draw duration**. Shorter holds result in less travel distance, not reduced damage. Exact hold minimum/maximum, launch speed/flight distance formula, bow+arrow damage combination, arrow count and client/mobile input remain Open. Shooting consumes no stamina.
-- **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; regen delay/partial-sprint behavior, pace and speed remain Open.
+- **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; **recovery waits 3 seconds after a sprint ends (§47)**; partial-sprint behavior, pace and speed remain Open.
 - **Crouching:** Low profile/stealth/movement choice; does not consume stamina. Sprinting and crouch interactions are implementation choices.
 - **Medicine:** Basic **+10 HP** with **0.5s animation**, advanced **+25 HP** with **1.0s animation**, potion **+50 HP** with **1.5s animation**. Healing applies **immediately**, then the animation is the **ONLY cooldown**; another medical use is prohibited until animation completes. The server blocks replayed/parallel remotes, including latency abuse. No additional hidden cooldown.
 - **Food:** Full meter decays in **5 minutes**; below **25%** gives **−10% speed**. **Accepted starter food examples (Q137):** Berries replenish **10% of hunger and heal 10 HP over 10 seconds**; Cooked Meat replenishes **35% hunger and heals 30 HP over 10 seconds**. Actual launch recipe/catalog still subject to naming. Each damaging hit halves pending food healing; if new remaining heal ≤10 HP, cancel it entirely.
@@ -2183,8 +2183,11 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
+| **1.13** | 2026-10-23 | Owner decided stamina recovery stops when a sprint starts and resumes 3 seconds after it ends, and reported walking after releasing sprint still draining stamina (fixed: pace is now judged over a full second against the allowed speed). Added §47. |
+| **1.12** | 2026-10-23 | Owner changed Interact to **F** and removed the lobby panel keys (vault, Forge, market, trade): those panels open from the lobby navigation buttons. Updated §46. |
+| **1.11** | 2026-10-23 | Owner requested default key binds that players can change in Settings: hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop, E to interact or pick up. Added §46. |
 | **1.10** | 2026-10-23 | Owner decided Q164a: any material in the lobby backpack goes straight back into the vault and cannot be taken out; overflow beyond the vault's capacity is deleted. Trade-eligible materials are now offered from the vault. Updated §45. |
-| **1.11** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §46, updated §3.3 and §40.3. |
 | **1.9** | 2026-10-23 | Owner decided Q164: extracted materials can never come back out into the play world, and every extracted material (special ones included) banks into the vault, whose per-material capacity decides overflow deletion. Added §45 and marked the superseded routing in §9–10, §34, §39–41. |
 
 ## 44. Launch starting values (v0.18)
@@ -2215,7 +2218,46 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 **QA:** a save holding 20 Iron in its backpack and 995 in the vault loads with 1,000 Iron vaulted, 15 deleted and shown, and an empty-of-materials backpack; a trade or crash recovery that delivers materials banks them in the same write; a Deploy only ever reserves non-materials. A Center extraction into a vault already holding 990 Stone stores 1,000 and deletes 50, listed on the receipt, even when the lobby backpack is full.
 
-## 46. Owner answers Q165–169: map scale and lobby hub (2026-10-23)
+## 46. Keyboard controls and rebinding (2026-10-23)
+
+**Owner request:** default key binds for every keyboard action, changeable by each player in Settings. Revised in 1.12: Interact on F, and no lobby panel keys.
+
+| Action | Default key | Gamepad (fixed) |
+| --- | --- | --- |
+| Sprint (hold) | Shift | L3 |
+| Crouch | C | R3 |
+| Interact / pick up (proximity prompts) | F | prompt default |
+| Backpack / inventory | Tab | Y |
+| Drop item | Q | L1 |
+| Hotbar slots 1–9 | 1–9 | — |
+| Crafting | V | D-pad up |
+| Build mode / rotate piece | X / R | D-pad right / L2 |
+| Tribe | T | D-pad left |
+| Map | N | D-pad down |
+| Progress | P | Select |
+| Settings | O | ⚙ button |
+
+**Rules**
+
+1. Every keyboard action has the default above. **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
+2. **No two actions share a key.** Choosing a key another action already uses swaps the two.
+3. **Reserved keys** stay with Roblox: W A S D and Space (movement), / (chat), Esc, Enter and Backspace. Function keys are not bindable.
+4. Choices save to the player's profile (only the keys that differ from the defaults) and follow them to every server and both places. The server validates every save; a malformed or conflicting save falls back to the defaults.
+5. Every on-screen hint names the player's current key: the navigation bar, the Backpack/Drop/Craft buttons, hotbar slot numbers and tutorial hints.
+6. **Interact** retargets every proximity prompt authored on E, Roblox's default (gathering, pickups, chests, bodies, caches). A prompt that offers a second choice on another key keeps it, unless that is the Interact key, in which case it takes E: a planter's three crops read F / R / E with the default binds.
+7. A save made before a default changed keeps every rebind that still fits; only a rebind that now clashes with another action's key returns to its default.
+
+**QA:** fresh profiles get exactly the defaults above; rebinding Drop to F moves Interact to Q; a save naming W, an unknown action or two actions on one key is cleaned on the server; rebinding updates hint text without rejoining.
+
+## 47. Owner answer: stamina recovery delay (2026-10-23)
+
+**Decision:** stamina recovery **stops the moment a sprint starts** and does **not resume until 3 seconds after the sprint ends**. Every sprinting moment restarts the 3-second pause. Then recovery runs at the confirmed rate (empty to full in 5 seconds), so a fully emptied bar is full again 8 seconds after the sprint stops.
+
+**Bug fixed with it:** after releasing sprint while still walking, stamina kept draining. The server's check for "moving at sprint pace without asking to sprint" (anti-cheat, §24) judged 0.2-second samples against 1.1× walking speed, and ordinary network jitter pushed walkers over it. Pace is now judged over a full 1-second window, only above 1.25× walking speed (halfway to sprint speed), and the window restarts whenever the server changes the player's allowed speed, so travel from a sprint just released never counts.
+
+**QA:** hold Shift and W, release Shift and keep walking: stamina stops draining at once, holds for 3 seconds, then refills; sprint briefly during the pause and it holds another 3 seconds; a client walking at sprint pace without a sprint request is still drained.
+
+## 48. Owner answers Q165–169: map scale and lobby hub (2026-10-23)
 
 Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft is [`docs/maps/lobby-hub.md`](docs/maps/lobby-hub.md).
 
@@ -2223,7 +2265,7 @@ Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft 
 | --- | --- | --- |
 | **165** | The Shattered Crater is designed around **~2,400 studs across**. | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
 | **166** | A lobby server holds **20 players**. | Set the lobby place's maximum players to 20 in the Creator Dashboard (a place setting, not code). Parties (up to 8) and trades need both players in the same lobby server. |
-| **167** | A **hub menu opens any station from anywhere** in the lobby. | Matches the shipped menu-driven lobby. Physical stations in the lobby map are landmarks and walk-up shortcuts to the same panels, never the only way in. |
+| **167** | A **hub menu opens any station from anywhere** in the lobby. | Matches the shipped menu-driven lobby: the lobby navigation buttons open every panel (lobby panels have no keys, §46). Physical stations in the lobby map are landmarks and walk-up shortcuts to the same panels, never the only way in. |
 | **168** | **Trades can be started anywhere** in the lobby. | Matches the shipped trade flow (no range check). Q98 limits (eligible items and Gems, never Coins) still apply. |
 | **169** | **Weapons can be used in the lobby but deal no damage; every player is invulnerable.** | The shipped lobby does not let weapons be swung yet (combat input is world-only). Lobby swings and shots must play their animations and projectiles while the server applies no hit to any player, NPC or object. |
 
