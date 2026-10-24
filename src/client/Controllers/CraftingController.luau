@@ -12,6 +12,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local InventoryController = require(script.Parent.InventoryController)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local CraftingController = {}
@@ -195,7 +196,8 @@ local function build()
 end
 
 local function setInRun(inRun: boolean)
-	ui.toggle.Visible = inRun
+	-- With the new HUD the hotbar spans this spot; the nav bar keeps a Craft button.
+	ui.toggle.Visible = inRun and not HudMode.ReplacesLegacy()
 	if not inRun then
 		ui.panel.Visible = false
 		Binds.Unbind("Craft")

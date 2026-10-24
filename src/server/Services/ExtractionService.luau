@@ -223,6 +223,8 @@ local function registerSite(position: Vector3, kind: string, radius: number, nam
 	portal.Size = Vector3.new(0.6, 6, 6)
 	portal.CFrame = CFrame.new(position + Vector3.new(0, 0.3, 0)) * CFrame.Angles(0, 0, math.rad(90))
 	portal:SetAttribute("PortalKind", kind)
+	-- The real zone radius, so the HUD can tell when a player has reached the site.
+	portal:SetAttribute("ZoneRadius", radius)
 	portal.Parent = workspace
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Start extraction"
