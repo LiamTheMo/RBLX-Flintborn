@@ -11,7 +11,8 @@ GameConstants.SPRINT_SECONDS = 3
 GameConstants.STAMINA_RECOVERY_SECONDS = 5
 -- Stamina stops recovering while sprinting and for this long after (owner, GDD §47).
 GameConstants.STAMINA_REGEN_DELAY_SECONDS = 3
-GameConstants.FOOD_DRAIN_SECONDS = 300
+-- A full food meter empties in 60 minutes (owner, GDD §49).
+GameConstants.FOOD_DRAIN_SECONDS = 3600
 -- Strictly below this fraction of food, movement is slowed. 0% adds nothing more (Q160).
 GameConstants.FOOD_SLOW_THRESHOLD = 0.25
 GameConstants.FOOD_SLOW_MULTIPLIER = 0.9

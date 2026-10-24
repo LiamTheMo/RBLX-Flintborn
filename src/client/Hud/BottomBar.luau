@@ -77,7 +77,8 @@ function BottomBar.new(parent: Instance, layout)
 		local slotRect = { 0, 0, slotWidth, slotHeight }
 		local frame = Widgets.Frame(hotbarCfg.frame, slotRect, slot, hotbarCfg.sliceScale, hotbarCfg.frameOutset)
 		frame.ZIndex = 2
-		local ring = Widgets.SelectionRing(cfg.selected, slot)
+		local ring = Widgets.SelectionRing(cfg.selected, hotbarCfg.slot, slot)
+		ring.ZIndex = 3
 		local number = Widgets.Text(cfg.slotNumber, {
 			Name = "Number",
 			Text = tostring(index),
