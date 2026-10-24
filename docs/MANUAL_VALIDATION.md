@@ -49,7 +49,7 @@ Studio and live checks (until crafting arrives in v0.05, a Studio run starts wit
 
 - [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee, crouching and standing still never drain it.
 - [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
-- [ ] Food drains to 0 in 5 minutes; below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
+- [ ] Food drains to 0 in 60 minutes (half after 30); below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
 - [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
 - [ ] The HUD is readable on desktop, touch and gamepad.

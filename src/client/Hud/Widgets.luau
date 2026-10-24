@@ -144,10 +144,6 @@ function Widgets.Frame(name: string, rect, parent: Instance, sliceScale: number?
 		Size = UDim2.fromOffset(width, height),
 		ZIndex = 3,
 	}, parent, sliceScale)
-	-- Rope art is tinted a little darker, towards the master's weathered brown.
-	if layout.frameTint and frame:IsA("ImageLabel") then
-		frame.ImageColor3 = Layout.Color(layout.frameTint)
-	end
 	return frame
 end
 
@@ -177,10 +173,16 @@ function Widgets.Panel(cfg, props, parent: Instance?): Frame
 	return holder :: Frame
 end
 
--- A solid rounded bar fill in a layout colour with a soft top highlight.
+-- A solid rounded bar fill in a layout colour with a soft top highlight. The
+-- gradient carries the colour over a white background: a UIGradient multiplies
+-- the background, so a coloured one would come out darker and oversaturated.
 function Widgets.Fill(colorKey: string, props, parent: Instance?): Frame
 	local color = Layout.Color(colorKey)
-	local fill = Widgets.Make("Frame", { Name = "Fill", BackgroundColor3 = color, BorderSizePixel = 0 }, parent)
+	local fill = Widgets.Make("Frame", {
+		Name = "Fill",
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		BorderSizePixel = 0,
+	}, parent)
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, fill)
 	Widgets.Make("UIGradient", {
 		Rotation = 90,
@@ -244,29 +246,18 @@ function Widgets.Bar(cfg, parent)
 	return { root = root, fill = fill, maxWidth = maxWidth, height = fillHeight, inset = inset }
 end
 
--- The selected-slot ring: a thin bright line with small corners and a soft glow.
-function Widgets.SelectionRing(cfg, parent: Instance): Frame
-	local color = Layout.Color(cfg.color)
-	local ring = Widgets.Make("Frame", {
-		Name = "Selected",
-		BackgroundTransparency = 1,
-		Position = Layout.Position(cfg.rect),
-		Size = Layout.Size(cfg.rect),
-		Visible = false,
-		ZIndex = 4,
-	}, parent)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, cfg.radius) }, ring)
-	Widgets.Make("UIStroke", { Color = color, Thickness = cfg.thickness }, ring)
-	local glow = Widgets.Make("Frame", {
-		Name = "Glow",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(-cfg.glow / 2, -cfg.glow / 2),
-		Size = UDim2.new(1, cfg.glow, 1, cfg.glow),
-		ZIndex = 3,
-	}, ring)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, cfg.radius + cfg.glow / 2) }, glow)
-	Widgets.Make("UIStroke", { Color = color, Thickness = cfg.glow, Transparency = 0.7 }, glow)
-	return ring :: Frame
+-- The selected-slot highlight: the sheet's glowing cyan slot frame (cfg.sprite)
+-- drawn over the slot's own frame at the same size, untinted so the glow stays
+-- bright. Hidden until the slot is selected.
+function Widgets.SelectionRing(cfg, slotSize, parent: Instance): GuiObject
+	local rect = { 0, 0, slotSize[1], slotSize[2] }
+	local ring = Widgets.Frame(cfg.sprite, rect, parent, cfg.sliceScale, cfg.frameOutset)
+	ring.Name = "Selected"
+	ring.Visible = false
+	if ring:IsA("ImageLabel") then
+		ring.ImageColor3 = Color3.new(1, 1, 1)
+	end
+	return ring
 end
 
 -- A small white map pin (circle head, pointed foot, dark centre) in `size`.

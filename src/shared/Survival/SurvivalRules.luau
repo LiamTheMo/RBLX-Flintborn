@@ -134,7 +134,7 @@ function SurvivalRules.StepStamina(state: State, dt: number, moving: boolean, ob
 	end
 end
 
--- Full to empty in 300 s (Q63). 0% adds nothing beyond the slow (Q160c).
+-- Full to empty in 60 minutes (Q63, changed in GDD §49). 0% adds nothing beyond the slow (Q160c).
 function SurvivalRules.StepFood(state: State, dt: number)
 	state.food = settle(math.max(0, state.food - dt / GameConstants.FOOD_DRAIN_SECONDS))
 end

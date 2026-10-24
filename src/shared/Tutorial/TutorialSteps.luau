@@ -15,7 +15,7 @@ TutorialSteps.Steps = {
 	{
 		id = "Survive",
 		title = "Health, food and stamina",
-		hint = "Health does not regenerate. Food drains over 5 minutes; under 30% you slow down. Hold {Sprint} to sprint; stamina lasts 3 seconds.",
+		hint = "Health does not regenerate. Food drains over 60 minutes; under 25% you slow down. Hold {Sprint} to sprint; stamina lasts 3 seconds.",
 		trigger = "Ack",
 	},
 	{
