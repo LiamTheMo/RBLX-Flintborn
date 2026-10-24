@@ -1,6 +1,7 @@
 name: Upload HUD sprites to Roblox
 # Manual only. Uploads art/ui/sprites/*.png through Open Cloud with the repository
-# secrets and returns the updated src/shared/UI/UiAssetIds.json as an artifact.
+# secrets and returns the updated src/shared/UI/UiAssetIds.json (image ids) and
+# art/ui/uploaded_decals.json (decal ids) as an artifact.
 # It never commits or publishes: a person commits the ids through the normal
 # branch -> version branch -> main flow.
 on:
@@ -19,6 +20,11 @@ on:
         description: "Only print Open Cloud details for this asset id (no upload)"
         required: false
         default: ""
+      resolve:
+        description: "Only look up image ids for decals in art/ui/uploaded_decals.json (no upload)"
+        type: boolean
+        required: false
+        default: false
       creator:
         description: "Who owns the uploaded sprites"
         type: choice
@@ -45,18 +51,23 @@ jobs:
           # A key for uploading assets may differ from the place-publishing key
           # (for example a key created under the group); fall back to the main key.
           ROBLOX_API_KEY: ${{ secrets.ROBLOX_ASSETS_API_KEY || secrets.ROBLOX_API_KEY }}
-          # The group id may live in ROBLOX_CREATOR_GROUP_ID, or in the older
-          # ROBLOX_CREATOR_USER_ID secret that was first used to hold it.
-          GROUP_ID: ${{ secrets.ROBLOX_CREATOR_GROUP_ID || secrets.ROBLOX_CREATOR_USER_ID }}
+          # The owning group's id lives in ROBLOX_CREATOR_ID; the older secrets
+          # that first held it are kept as fallbacks.
+          GROUP_ID: ${{ secrets.ROBLOX_CREATOR_ID || secrets.ROBLOX_CREATOR_GROUP_ID || secrets.ROBLOX_CREATOR_USER_ID }}
           USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
           CREATOR: ${{ inputs.creator }}
           ONLY: ${{ inputs.only }}
           UPLOAD: ${{ inputs.upload }}
           INSPECT: ${{ inputs.inspect }}
+          RESOLVE: ${{ inputs.resolve }}
         run: |
           if [ -n "$INSPECT" ]; then
             python3 scripts/roblox_upload_ui_assets.py --inspect "$INSPECT"
             exit 0
+          fi
+          if [ "$RESOLVE" = "true" ]; then
+            python3 scripts/roblox_upload_ui_assets.py --resolve
+            exit $?
           fi
           if [ "$CREATOR" = "group" ]; then
             export ROBLOX_CREATOR_GROUP_ID="$GROUP_ID"
@@ -65,9 +76,12 @@ jobs:
           fi
           if [ "$UPLOAD" = "true" ]; then MODE=--upload; else MODE=--dry-run; fi
           python3 scripts/roblox_upload_ui_assets.py "$MODE" --only "$ONLY"
-      - name: Return UiAssetIds.json
+      - name: Return asset ids
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ui-asset-ids
-          path: src/shared/UI/UiAssetIds.json
+          path: |
+            src/shared/UI/UiAssetIds.json
+            art/ui/uploaded_decals.json
+          if-no-files-found: warn
