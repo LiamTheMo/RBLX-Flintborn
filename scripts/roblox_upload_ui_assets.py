@@ -22,6 +22,7 @@ from art/ui/sprites/manifest.json. It is local only and needs no key.
 import argparse
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -37,6 +38,7 @@ SPRITES_FILE = ROOT / "src" / "shared" / "UI" / "UiSprites.json"
 
 ASSETS_URL = "https://apis.roblox.com/assets/v1/assets"
 OPERATIONS_URL = "https://apis.roblox.com/assets/v1/"
+DELIVERY_URL = "https://apis.roblox.com/asset-delivery-api/v1/assetId/"
 MAX_BYTES = 20 * 1024 * 1024
 POLL_SECONDS = 2
 POLL_LIMIT_SECONDS = 120
@@ -162,6 +164,30 @@ class Cloud:
             raise RuntimeError(f"No asset id in {operation!r}")
         return int(asset_id)
 
+    def image_id(self, decal_id):
+        """An ImageLabel needs the Image asset behind a Decal, not the Decal itself.
+
+        Fetches the decal's content through Open Cloud asset delivery: a Decal is a
+        small XML file whose <url> names the image id; an Image is PNG bytes (the id
+        is already an image). Returns (image_id, how) and falls back to the decal id
+        when delivery is not permitted for this key.
+        """
+        try:
+            meta = self._send(urllib.request.Request(DELIVERY_URL + str(decal_id), headers={"x-api-key": self.key}))
+            location = meta.get("location") or ""
+            if not location.startswith("https://"):
+                return decal_id, f"no delivery location ({meta!r:.120})"
+            with urllib.request.urlopen(location, timeout=60) as response:
+                content = response.read(200000)
+        except RuntimeError as exc:
+            return decal_id, f"delivery failed: {exc}"
+        if content.startswith(b"\x89PNG"):
+            return decal_id, "already an image"
+        match = re.search(rb"<url>[^<]*?id=(\d+)\s*</url>", content)
+        if match:
+            return int(match.group(1)), "resolved from decal"
+        return decal_id, f"unrecognised content {content[:60]!r}"
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -197,11 +223,12 @@ def main(argv=None):
         raise ValueError("ROBLOX_API_KEY is required for --upload")
     cloud = Cloud(key, creator_from_env())
     for index, file in enumerate(todo, 1):
-        asset_id = cloud.wait(cloud.upload(file))
+        decal_id = cloud.wait(cloud.upload(file))
+        asset_id, how = cloud.image_id(decal_id)
         ids[file.stem] = asset_id
         # Saved after every upload so an interrupted run never repeats one.
         write_json(IDS_FILE, ids)
-        print(f"[{index}/{len(todo)}] {file.stem} -> rbxassetid://{asset_id}")
+        print(f"[{index}/{len(todo)}] {file.stem} -> rbxassetid://{asset_id} (decal {decal_id}: {how})")
     print(f"Uploaded {len(todo)}; {IDS_FILE.relative_to(ROOT)} now lists {len(ids)} ids")
     return 0
 
