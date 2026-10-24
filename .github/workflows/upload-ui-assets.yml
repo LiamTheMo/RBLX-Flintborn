@@ -15,6 +15,11 @@ on:
         type: boolean
         required: true
         default: false
+      creator:
+        description: "Who owns the uploaded sprites"
+        type: choice
+        options: [group, user]
+        default: group
 
 permissions:
   contents: read
@@ -33,11 +38,22 @@ jobs:
           persist-credentials: false
       - name: Upload sprites
         env:
-          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
-          ROBLOX_CREATOR_USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
+          # A key for uploading assets may differ from the place-publishing key
+          # (for example a key created under the group); fall back to the main key.
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_ASSETS_API_KEY || secrets.ROBLOX_API_KEY }}
+          # The group id may live in ROBLOX_CREATOR_GROUP_ID, or in the older
+          # ROBLOX_CREATOR_USER_ID secret that was first used to hold it.
+          GROUP_ID: ${{ secrets.ROBLOX_CREATOR_GROUP_ID || secrets.ROBLOX_CREATOR_USER_ID }}
+          USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
+          CREATOR: ${{ inputs.creator }}
           ONLY: ${{ inputs.only }}
           UPLOAD: ${{ inputs.upload }}
         run: |
+          if [ "$CREATOR" = "group" ]; then
+            export ROBLOX_CREATOR_GROUP_ID="$GROUP_ID"
+          else
+            export ROBLOX_CREATOR_USER_ID="$USER_ID"
+          fi
           if [ "$UPLOAD" = "true" ]; then MODE=--upload; else MODE=--dry-run; fi
           python3 scripts/roblox_upload_ui_assets.py "$MODE" --only "$ONLY"
       - name: Return UiAssetIds.json
