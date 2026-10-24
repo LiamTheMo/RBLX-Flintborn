@@ -1,0 +1,561 @@
+{
+  "images": {
+    "palette": {
+      "decal": 115888836844372,
+      "image": 81552715112600,
+      "sha1": "278211664238b0d0588adaed7131eddda6a1f38b"
+    },
+    "vfx_dust_mote": {
+      "decal": 122940151779689,
+      "image": 70828334944330,
+      "sha1": "7d1abcc344c591f71fadb254fffc08e3c25a1560"
+    },
+    "vfx_ember_dot": {
+      "decal": 136574202297451,
+      "image": 118960968438058,
+      "sha1": "fc9d161f3525adeafccb8458df00041b71be0a36"
+    },
+    "vfx_fire_flipbook_4x4": {
+      "decal": 110538279779874,
+      "image": 95135133586266,
+      "sha1": "c1db2c0f17ad4fa3f02bde957bf7136d593951dd"
+    },
+    "vfx_foam_patch": {
+      "decal": 74069133317465,
+      "image": 73417724280920,
+      "sha1": "f13a63e6a7687cb17ea8be46acfa569dc3850f6c"
+    },
+    "vfx_glow_soft": {
+      "decal": 118358517516741,
+      "image": 125587073952665,
+      "sha1": "de77a7d02cfab8dac0bf3273b996d77c74ea53ed"
+    },
+    "vfx_mist_soft": {
+      "decal": 79456530343003,
+      "image": 115514283532806,
+      "sha1": "bf465948ec5796245ad8309a6ffd9abb82982445"
+    },
+    "vfx_rune_mote": {
+      "decal": 129813006488993,
+      "image": 138056545066166,
+      "sha1": "a1fa961d1442025cb8f7ed5abc6ea24de20194e1"
+    },
+    "vfx_smoke_puff": {
+      "decal": 100806601203616,
+      "image": 107530423656041,
+      "sha1": "fa0a950d5ee64dcde7d7c4a416dcd959f09d5d6e"
+    },
+    "vfx_spark_diamond": {
+      "decal": 89998838140882,
+      "image": 95652493931291,
+      "sha1": "a4571472bfd6ef630a6b59bb237559a1034d94ac"
+    },
+    "vfx_splash_droplets": {
+      "decal": 74885731004631,
+      "image": 132714130995380,
+      "sha1": "bdf51f374bd44d13103e7953853d07a27d44e15c"
+    }
+  },
+  "models": {
+    "AncestralForge": {
+      "id": 124576063500320,
+      "sha1": "a29a4ac1ea2dd98c1e307a6518150882ca1ef787"
+    },
+    "AncestralForge_glow_ember": {
+      "id": 137766850419826,
+      "sha1": "fb222a9641d583a98f427c01d4d31d001d838a5e"
+    },
+    "AncestralForge_glow_fire_core": {
+      "id": 70827495841418,
+      "sha1": "fab360d4b122e9624a2b39df045ae9c814a74c67"
+    },
+    "AncestralForge_glow_fire_mid": {
+      "id": 79902815166331,
+      "sha1": "eb16f2c53d93d8ea63d8f191f15e273275b09340"
+    },
+    "AncestralForge_glow_fire_outer": {
+      "id": 78865836483960,
+      "sha1": "9578c12bb82e1f2a90f7d46df27fb329825f3d20"
+    },
+    "AncestralForge_glow_glow_orange": {
+      "id": 96614375381741,
+      "sha1": "e4d9cd427205d6c5d8c8dbd2b90d77c575f825fc"
+    },
+    "AnvilLarge": {
+      "id": 87222685561605,
+      "sha1": "a277af759342706d02febc770cd5ac2bb79eb0e4"
+    },
+    "Barrel": {
+      "id": 110162612279804,
+      "sha1": "9d5c6153e49cb709a317df092fb55e42b598cde7"
+    },
+    "BerryBush": {
+      "id": 81380747106683,
+      "sha1": "78c2ab4bd9502cd0dd0debc7d390c672503ee933"
+    },
+    "BlacksmithHammer": {
+      "id": 87976834790536,
+      "sha1": "84eeb744d42f7af376b08303b59b780430f45ed5"
+    },
+    "BroadLeafHerb": {
+      "id": 140668597870908,
+      "sha1": "b77423c7b0abab2c006e217d81de4091c3b75262"
+    },
+    "BroadleafTreeLeaning": {
+      "id": 137896939425431,
+      "sha1": "0f27c029433c89856690b33d2cac801d727e07a5"
+    },
+    "BroadleafTreeStout": {
+      "id": 137554447722881,
+      "sha1": "d5d8a687856a7e8dd9bcd04bc259fdbe18166b6f"
+    },
+    "BroadleafTreeTall": {
+      "id": 133395092794744,
+      "sha1": "8ac6c3e7ab23c4278436e61decd4d2f0c02da230"
+    },
+    "BroadleafTreeWideOld": {
+      "id": 88455319350057,
+      "sha1": "c389afe352f534e186258fe70fcd5c9b6c5f4483"
+    },
+    "Campfire": {
+      "id": 125119002921837,
+      "sha1": "b63b506b1e8f8b603b80ab6c78c4a50b836a89bf"
+    },
+    "Campfire_glow_ember": {
+      "id": 92016528878007,
+      "sha1": "2a559bdd46b3fa722a376dd2667004d9a7ef3015"
+    },
+    "Campfire_glow_fire_core": {
+      "id": 91535704132199,
+      "sha1": "6bce19d58a6d835b159d39ce2ac1495752d23866"
+    },
+    "Campfire_glow_fire_mid": {
+      "id": 96543810532455,
+      "sha1": "0f99ba84120fa97163759288dbd7d6a8b74201bc"
+    },
+    "Campfire_glow_fire_outer": {
+      "id": 130789442341811,
+      "sha1": "60020c2ef84fea5091d995afbb2625c6ef1716a8"
+    },
+    "ClayStoragePot": {
+      "id": 130299603594220,
+      "sha1": "e070b6337f273e311acf8c97b56a6212f8aa6e95"
+    },
+    "CliffOuterCorner": {
+      "id": 97644487462519,
+      "sha1": "40d8d325885c493711ebb4498b831163f859868a"
+    },
+    "CliffSection": {
+      "id": 101293657793448,
+      "sha1": "10665f1b2b57c1518568feabee8c8ce494fb4253"
+    },
+    "CraftingWorkbench": {
+      "id": 75458627246326,
+      "sha1": "a7581220ab04fce8e7e8197452217d19eb98c972"
+    },
+    "CutLog": {
+      "id": 138349552381153,
+      "sha1": "794dacd8eeb3ab37cb2dbdcfe5e7ad6ddc5223da"
+    },
+    "DeployGate": {
+      "id": 109585602087738,
+      "sha1": "bc7e6f539ffe1a9f318a51fd439bfa1eee2c1d48"
+    },
+    "DeployGate_glow_fire_core": {
+      "id": 97372630903335,
+      "sha1": "e5d71633f443244870186272e6ed4101b73f6e99"
+    },
+    "DeployGate_glow_fire_mid": {
+      "id": 128156617617194,
+      "sha1": "5caac7b06e8d14f0b25681f189113e107bb82e5a"
+    },
+    "DeployGate_glow_fire_outer": {
+      "id": 101037243398883,
+      "sha1": "cb77f9f57d4827ec1e8c1a64189954451438672f"
+    },
+    "EarthSwitchback": {
+      "id": 74410158276744,
+      "sha1": "0c1ec87cb483bd4e9477932d7a3ba7db7fc37917"
+    },
+    "EldersTotemTall": {
+      "id": 99018660102192,
+      "sha1": "486037641aba55c7d31a1f43969bd5e92e6cd93d"
+    },
+    "EldersTotem_StelaFootings": {
+      "id": 107067024481252,
+      "sha1": "94f927550bdec4b3059e1c2c9bee0048d5521c07"
+    },
+    "ElongatedRuneStone": {
+      "id": 95854999537349,
+      "sha1": "dec25f0f45f9e36005c690d6d8ad8d85fd7845b8"
+    },
+    "FallenLog": {
+      "id": 129280316305122,
+      "sha1": "d5db366dcfc0f04a5be9dcd209fd250b7c6748fd"
+    },
+    "FernLeafy": {
+      "id": 70537041650603,
+      "sha1": "fc59f3306eaac10b627fac6c898759598446022e"
+    },
+    "FootbridgeSmall": {
+      "id": 125994236704434,
+      "sha1": "2f500ccda0e5f056615ce199f7ea5010a7bb1203"
+    },
+    "ForestFloor": {
+      "id": 132670209238097,
+      "sha1": "2f7e4fd13b367c30b1aced9de5465a5bea2f340a"
+    },
+    "Forge_StoneStairs": {
+      "id": 96001773427745,
+      "sha1": "11c286d0254cc7d39a40e5ac714a90a84a09c45b"
+    },
+    "GrassClumpSmall": {
+      "id": 100800001082144,
+      "sha1": "fa268bb65d5418f498485b27290165ef9cef2091"
+    },
+    "GrassTuftLarge": {
+      "id": 133648817949382,
+      "sha1": "5e93fe7eb6c1e748351697b766636e414c825f56"
+    },
+    "Ground_DirtPlazaPaths_01": {
+      "id": 110548975317380,
+      "sha1": "4297c8df67b4ce16e8c566630df49bdd637bc7df"
+    },
+    "Ground_DirtPlazaPaths_02": {
+      "id": 121906785125100,
+      "sha1": "42d1e261879cc69b33286e654155ef8c6c57f9e0"
+    },
+    "Ground_GateFlagstones": {
+      "id": 125038343391192,
+      "sha1": "3366e5a511b6c969944176c958505440dd445be7"
+    },
+    "Ground_GrassTufts_01": {
+      "id": 83929990965287,
+      "sha1": "5c813544ca110a075480f276d197ada5c32bcd6c"
+    },
+    "Ground_GrassTufts_02": {
+      "id": 107974419902794,
+      "sha1": "6756e0d94c34f26459abf6113fbee4a54590e18b"
+    },
+    "Ground_Lowland_01": {
+      "id": 138567596065581,
+      "sha1": "6d042af24261ce21772c2c53ec06b5d1c7f7cdb7"
+    },
+    "Ground_Lowland_02": {
+      "id": 75770803919955,
+      "sha1": "182e6021c8a8044967065a976a1ed4bd947179c6"
+    },
+    "Ground_Lowland_03": {
+      "id": 89093522461023,
+      "sha1": "ff60574f7207c6e40f1f9af244af167e0a2922b3"
+    },
+    "Ground_Lowland_04": {
+      "id": 90173615368449,
+      "sha1": "7ec0b55b8e9d6e29c39f88c676dae12308c74037"
+    },
+    "Ground_Pebbles_01": {
+      "id": 117767303063957,
+      "sha1": "e4f0fe880740e4baa9392527162d29401b25d0d4"
+    },
+    "Ground_Pebbles_02": {
+      "id": 105908922253992,
+      "sha1": "60c16ce428f02627f188463d01c0f184331b3bd9"
+    },
+    "Ground_Plateau_02": {
+      "id": 94423544526182,
+      "sha1": "3599662ebb72fb6f41605f95bf632872a7e64bfc"
+    },
+    "Ground_Plateau_03": {
+      "id": 112835005800264,
+      "sha1": "cc393de901a29fc2ab4be61261879df0c095505c"
+    },
+    "Ground_Plateau_04": {
+      "id": 122976255383569,
+      "sha1": "1a0196a7b4587d20893188f5fce64aae33eeda0b"
+    },
+    "HideMarketStall": {
+      "id": 114642127788381,
+      "sha1": "ada00646cd28f7e36d997ca22c3382f288dd9320"
+    },
+    "IronShortSword": {
+      "id": 135000970926508,
+      "sha1": "f745ab3ffabcf4155de90ace1ea2f4d5f4dd5379"
+    },
+    "IronSpear": {
+      "id": 74453332257034,
+      "sha1": "60d0453156fe92a98648a947865a933b69c00d86"
+    },
+    "LargeChest": {
+      "id": 138418979198234,
+      "sha1": "38d5cb8dec8250b5fd83fd60b54d6b96a001cf5b"
+    },
+    "LargeRuneStone": {
+      "id": 126181883733263,
+      "sha1": "e0825bb0661c12074c1ef2f265b51c645d093e29"
+    },
+    "LedgerLectern": {
+      "id": 113517942488842,
+      "sha1": "9c57ee0d577ed28daeb8032bab0a683574ff23a0"
+    },
+    "LogBench": {
+      "id": 129304197566647,
+      "sha1": "e4de6057cc708089229889ec9f09604b627a5ebd"
+    },
+    "LogRailFence": {
+      "id": 85079597081786,
+      "sha1": "463a8f6686ce05e94a7115edc6c71723f19ea92c"
+    },
+    "LongBoulder": {
+      "id": 99094299938286,
+      "sha1": "ec605ac8f8ad7d6e2c13b112d06cd5683751ba3f"
+    },
+    "LowBoulder": {
+      "id": 116289557584175,
+      "sha1": "566a485273267695a73ef8419d47803f42cc12d2"
+    },
+    "OpenChest": {
+      "id": 84107597584935,
+      "sha1": "a23b0dcb2aad7bc85d2ec8ef9593883feb8b42bf"
+    },
+    "PalisadeMainPost": {
+      "id": 70720927298130,
+      "sha1": "21fb1e8801a0b3a2e4cda70864733dc88fecc5c3"
+    },
+    "PalisadeMainPostBanner": {
+      "id": 139267065430917,
+      "sha1": "d8a22c596648d114e34bddb4829f5b2572c749af"
+    },
+    "PalisadeMainPostTorch": {
+      "id": 77736255896934,
+      "sha1": "8066b8214e9f6fb63b7a8cc1e2863b21d5ba8d78"
+    },
+    "PalisadeMainPostTorch_glow_fire_core": {
+      "id": 92905704571485,
+      "sha1": "901335f271a58089a9cce5f111709ed86fb574bb"
+    },
+    "PalisadeMainPostTorch_glow_fire_mid": {
+      "id": 136537080633023,
+      "sha1": "d99d39ab6e87e091b08203bfc0127fee2c56772b"
+    },
+    "PalisadeMainPostTorch_glow_fire_outer": {
+      "id": 100942127326510,
+      "sha1": "bc4205751cca87ad6023a7337e12593815914137"
+    },
+    "PalisadeSection": {
+      "id": 130041105819937,
+      "sha1": "16f0689328777a7e2eb4da372942fb1cd62dc524"
+    },
+    "PalisadeSectionLow": {
+      "id": 95390744659387,
+      "sha1": "489d19093fd6ccb3656662526b49ef6effc4006f"
+    },
+    "PineTreeMature": {
+      "id": 107875619433687,
+      "sha1": "45264762d11f7943b6ed0be3750aebb1f61c5ace"
+    },
+    "PineTreeShortWide": {
+      "id": 108131075364067,
+      "sha1": "e3ed81288999a760059cb8f4d0ef0c411bd7291a"
+    },
+    "PineTreeTallNarrow": {
+      "id": 80627471411398,
+      "sha1": "0be8ee56fbe0a3f9199bc9ad198db7abd0e6b924"
+    },
+    "PineTreeYoung": {
+      "id": 131149706181034,
+      "sha1": "57201c8b56c2f5a20f513aa88e317f04e0acc4c7"
+    },
+    "QuestBoard": {
+      "id": 81442014420193,
+      "sha1": "c4f0468247bf555c6946ae9165b7dca483135aec"
+    },
+    "River_WaterLower_water": {
+      "id": 93278928257761,
+      "sha1": "32aef2d8361dd041ff6a8c7b5bc8eb114bab141a"
+    },
+    "River_WaterUpper_water": {
+      "id": 96187760549073,
+      "sha1": "f68b4bf4ae78a863aacbc9573acc74fc2be48228"
+    },
+    "Riverbank": {
+      "id": 136322965321667,
+      "sha1": "1a4a2631b982889fb77b08fd09489eba896aba5b"
+    },
+    "Riverbank_water": {
+      "id": 135427004054466,
+      "sha1": "bfec9996bf809461847280a01de70255a420436a"
+    },
+    "RockArch": {
+      "id": 73866169541533,
+      "sha1": "8eddfe6a133305a70473fbb5fd0e5fe17512c27e"
+    },
+    "RockShelfTwoLevels": {
+      "id": 92466801314538,
+      "sha1": "42eedd9101ee12638115b29b303085550f0c76a5"
+    },
+    "ShrubLowWide": {
+      "id": 72373295612837,
+      "sha1": "89f25e6761e34e3ba18270a766ef67d1bcf17b7d"
+    },
+    "ShrubTallDense": {
+      "id": 109341945185819,
+      "sha1": "6279cffae96fd64334a54a4dcb65a7508146b175"
+    },
+    "SmeltingFurnace": {
+      "id": 95610594637040,
+      "sha1": "a170178630cc55984a47be9b636843aa28db60b7"
+    },
+    "SmeltingFurnace_glow_ember": {
+      "id": 93729732058384,
+      "sha1": "f1cd6ec3a3e5226c806392e5c009c7e5e0fa87d0"
+    },
+    "SmeltingFurnace_glow_fire_core": {
+      "id": 88444939173965,
+      "sha1": "9931d3978fe2da93d7baac589d0c70efd56088e5"
+    },
+    "SmeltingFurnace_glow_fire_mid": {
+      "id": 120008815046166,
+      "sha1": "be2438169c097190a0f9e5b2020087f440daa487"
+    },
+    "SmeltingFurnace_glow_fire_outer": {
+      "id": 81077385430342,
+      "sha1": "a3994968213e962951106981947e4c9c43100498"
+    },
+    "SmeltingFurnace_glow_glow_orange": {
+      "id": 81731856125916,
+      "sha1": "2278f8e206558b125b9895436db173a382942893"
+    },
+    "SplitBoulder": {
+      "id": 137887800005661,
+      "sha1": "e18d19d034dcdbe69cc9804e6abde5dae064f4a5"
+    },
+    "SteppingStone": {
+      "id": 78905523113766,
+      "sha1": "451f1e595c0570817448474560d1598c60396884"
+    },
+    "StoneAxeBasic": {
+      "id": 74749834466548,
+      "sha1": "a42a3a98bf10bfb643ebf5bf7eb1c5ab65e1b2c2"
+    },
+    "StoneBrazier": {
+      "id": 81285127733684,
+      "sha1": "e401fa1e40dfb580fffda884b2306b99c3811a30"
+    },
+    "StoneBrazier_glow_fire_core": {
+      "id": 138315433373306,
+      "sha1": "47ba306aa81eb901a57993e1c33864ade012e645"
+    },
+    "StoneBrazier_glow_fire_mid": {
+      "id": 93744658833173,
+      "sha1": "f1912b0809af3c32eb617c78ef0f939b7ddb918b"
+    },
+    "StoneBrazier_glow_fire_outer": {
+      "id": 73806261914874,
+      "sha1": "0ec3558dc05ab641ac653cba76329529bfc9cd47"
+    },
+    "StoneKnife": {
+      "id": 71428312359347,
+      "sha1": "0b3548df2fbc74fc8b31a4a5552538b795f3ebc4"
+    },
+    "StonePickaxeDouble": {
+      "id": 136061625482171,
+      "sha1": "85ebd79e8d1273c9188bc040ecd0784786a59a4f"
+    },
+    "StoneSpear": {
+      "id": 126467457944875,
+      "sha1": "c21ba33abd028dc67686dec360f34462c5fb958a"
+    },
+    "StoneWarClub": {
+      "id": 76186953746614,
+      "sha1": "1e50a8e4d60a0d232f257c763d4d9b2a236144a8"
+    },
+    "StorageCabinet": {
+      "id": 134355332881057,
+      "sha1": "e6baf52eec59205113dae8409340fce59058bd57"
+    },
+    "Stump": {
+      "id": 74221205104357,
+      "sha1": "7fd94919a97e70cc0a0925438c7efa14299ba3f7"
+    },
+    "SupplyCrate": {
+      "id": 82412167417810,
+      "sha1": "9441d3053f038eddb8eda75361acf7f6501f76b6"
+    },
+    "TallBoulder": {
+      "id": 86364633576450,
+      "sha1": "2d8ddd53223f9bb0b2b4fd82d2237120f907c09c"
+    },
+    "Terrain_RimSkirt": {
+      "id": 121198710805377,
+      "sha1": "375c4f749376a02e486790f591dd9aaba07ec8f6"
+    },
+    "ThatchMarketStall": {
+      "id": 111789582117478,
+      "sha1": "bda56a7edac01669871b1816927e0fc82eb41a6b"
+    },
+    "TimberClubBone": {
+      "id": 129131723710597,
+      "sha1": "096c319951cf80f86bd74c421917027affa0fba5"
+    },
+    "TorchPost": {
+      "id": 116945871891893,
+      "sha1": "1f526d2d51bafeac8ff2ce6f6a4719ff322dcf92"
+    },
+    "TorchPost_glow_fire_core": {
+      "id": 72971656911296,
+      "sha1": "872fc905ce20c03264844bf0766e189675b9a4e6"
+    },
+    "TorchPost_glow_fire_mid": {
+      "id": 115906473320676,
+      "sha1": "a3d58728f0ec39392c55ad1b90b031d12e17cc3d"
+    },
+    "TorchPost_glow_fire_outer": {
+      "id": 119047664942859,
+      "sha1": "9e81b4b4a57e70b9c02300503d86431f46a3934a"
+    },
+    "VaultHall": {
+      "id": 113294606641505,
+      "sha1": "79c6ba26808eb8abf9ce331000b32c73cab7ea2f"
+    },
+    "VaultHall_RedRug": {
+      "id": 76225936243482,
+      "sha1": "b00b2ea771b1d3840558ecff0be380e1d79922cb"
+    },
+    "WatchtowerRoofed": {
+      "id": 127797509999979,
+      "sha1": "d9dd97fae8623499fa99dc9f790b9e8c94420773"
+    },
+    "WatchtowerTall": {
+      "id": 70757923272659,
+      "sha1": "1b80de5861b46418694abc34ab469d789b1ad6fe"
+    },
+    "WaterfallCliff": {
+      "id": 72240434659650,
+      "sha1": "23e4d9b222abd6f27145582237e439bf385b9a37"
+    },
+    "WaterfallCliff_water": {
+      "id": 138023214510164,
+      "sha1": "28ab60e262f44108a966cd25d2acd86634805d3f"
+    },
+    "WeaponRack": {
+      "id": 119212224641248,
+      "sha1": "96369a473ddf059a0a1dfbdd14d822f527e6fd28"
+    },
+    "WildflowerWhite": {
+      "id": 122698072043963,
+      "sha1": "de4eec1541aa113d543cb53fa87d4f4a073a4df9"
+    },
+    "WoodenBowSimple": {
+      "id": 78210498637867,
+      "sha1": "8987ad76fedcc8a34daff31e13248e37491f00e5"
+    },
+    "WoodenSpear": {
+      "id": 72379443354753,
+      "sha1": "c1c8b8438a0f9ae0e485aa708ea92d2fa00f2764"
+    },
+    "WovenBasket": {
+      "id": 84435590757299,
+      "sha1": "3e38030256ba257ce143c71e776a705644098186"
+    }
+  }
+}
