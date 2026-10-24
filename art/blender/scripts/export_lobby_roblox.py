@@ -357,6 +357,31 @@ def main():
         spawn = (0.0, 2.0, 30.0)
     gate = scene.objects.get("DeployGate")
 
+    # Scene lighting: suns become the place's sun and ambient (direction TOWARD the
+    # light, Roblox axes; colours sRGB hex), and point lights that are not VFX
+    # previews become PointLights (the Vault hall's interior glow).
+    def hexcol(rgb):
+        return "#" + "".join("%02X" % round(255 * min(1.0, srgb(c))) for c in rgb[:3])
+
+    suns, lights = {}, []
+    for o in scene.objects:
+        if o.type != "LIGHT" or o.name.startswith("VFXPreview"):
+            continue
+        if o.data.type == "SUN":
+            toward = o.matrix_world.to_3x3() @ Vector((0, 0, 1))
+            suns[o.name] = {"direction": [r(c) for c in to_rbx(toward.normalized())],
+                            "color": hexcol(o.data.color), "energy": r(o.data.energy)}
+        elif o.data.type == "POINT":
+            lights.append({"name": o.name, "position": [r(c) for c in to_rbx(o.matrix_world.translation)],
+                           "color": hexcol(o.data.color), "range": r(max(8.0, min(60.0, o.data.shadow_soft_size * 4 + 16)))})
+    background = None
+    world = scene.world
+    if world and world.use_nodes:
+        node = next((n for n in world.node_tree.nodes if n.type == "BACKGROUND"), None)
+        if node:
+            strength = node.inputs[1].default_value
+            background = hexcol([c * strength for c in node.inputs[0].default_value[:3]])
+
     manifest = {
         "version": 1,
         "source": "art/blender/lobby/FlintbornLobby.blend",
@@ -369,6 +394,8 @@ def main():
         "spawn": [r(c) for c in spawn],
         "deployGate": [r(c) for c in to_rbx(gate.matrix_world.translation)] if gate else None,
         "npcSpots": npcs,
+        "lighting": {"sun": suns.get("LobbySun"), "fill": suns.get("LobbySkyFill"), "background": background,
+                     "lights": lights},
         "stats": {
             "uniqueParts": len(parts),
             "uniqueTris": sum(p["tris"] for p in parts.values()),
