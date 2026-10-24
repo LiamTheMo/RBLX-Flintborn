@@ -1,6 +1,7 @@
 -- Extraction HUD (GDD §9, §25.3). Lists every running countdown in the world with
 -- its distance and whether you are inside its zone, and confirms protection once
--- you extract. World place only.
+-- you extract. World place only. With the new HUD (HudMode) the list is hidden and
+-- the objective panel shows the nearest countdown from `Events` instead.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -9,6 +10,8 @@ local RunService = game:GetService("RunService")
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local ExtractionController = {}
@@ -16,6 +19,11 @@ local ExtractionController = {}
 local player = Players.LocalPlayer
 local events = {}
 local ui = {}
+
+-- Running countdowns by id ({id, name, kind, position, radius, endsAt}), read-only
+-- for other controllers; Changed fires whenever one starts or ends.
+ExtractionController.Events = events
+ExtractionController.Changed = Signal.new()
 
 local function make(className: string, props, parent)
 	local instance = Instance.new(className)
@@ -74,7 +82,7 @@ local function update()
 		local bonus = event.kind == ExtractionRules.Kinds.Center and " (2× materials)" or ""
 		table.insert(lines, ("⟁ %s%s — %ds%s"):format(event.name, bonus, remaining, where))
 	end
-	ui.list.Visible = #lines > 0
+	ui.list.Visible = #lines > 0 and not HudMode.ReplacesLegacy()
 	ui.list.Text = table.concat(lines, "\n")
 end
 
@@ -89,9 +97,11 @@ function ExtractionController.Start()
 			Theme.Subtitle("Extraction alert: " .. view.name)
 		end
 		events[view.id] = view
+		ExtractionController.Changed:Fire()
 	end)
 	Remotes.Get("ExtractionEnded").OnClientEvent:Connect(function(eventId)
 		events[eventId] = nil
+		ExtractionController.Changed:Fire()
 	end)
 	player:GetAttributeChangedSignal("SessionState"):Connect(function()
 		ui.protected.Visible = player:GetAttribute("SessionState") == "ExtractionProtected"

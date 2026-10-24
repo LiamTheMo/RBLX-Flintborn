@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 600" width="680" height="600" font-family="Segoe UI, Helvetica, Arial, sans-serif" role="img">
+  <title>Lobby hub draft plan</title>
+  <desc>Draft top-down plan of the compact lobby hub: arrival in the south, vault and forge on the east, deploy gate in the north, quests and the market on the west, and a bonfire plaza in the middle.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#B0552E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="600" fill="#F6F1E7"/>
+  <rect x="8" y="28" width="664" height="520" rx="40" fill="#EFE7D6" stroke="#9A8A6A" stroke-width="1.5" stroke-dasharray="8 5"/>
+  <text x="24" y="20" font-size="12" fill="#6B5E48">N ↑  Palisade boundary (draft)</text>
+
+  <circle cx="340" cy="290" r="75" fill="#F3D9A4" stroke="#B07A2A" stroke-width="1"/>
+  <text x="340" y="284" font-size="14" font-weight="600" text-anchor="middle" fill="#3A3226">Bonfire plaza</text>
+  <text x="340" y="304" font-size="12" text-anchor="middle" fill="#6B5E48">Party up, show titles</text>
+
+  <rect x="245" y="50" width="190" height="52" rx="8" fill="#E8DFC8" stroke="#7A6A4A"/>
+  <text x="340" y="72" font-size="14" font-weight="600" text-anchor="middle" fill="#3A3226">Deploy gate</text>
+  <text x="340" y="91" font-size="12" text-anchor="middle" fill="#6B5E48">Party ring, at-risk list</text>
+
+  <rect x="260" y="475" width="160" height="52" rx="8" fill="#E8DFC8" stroke="#7A6A4A"/>
+  <text x="340" y="497" font-size="14" font-weight="600" text-anchor="middle" fill="#3A3226">Arrival stones</text>
+  <text x="340" y="516" font-size="12" text-anchor="middle" fill="#6B5E48">Join + extraction receipt</text>
+
+  <rect x="470" y="140" width="190" height="120" rx="8" fill="#E8DFC8" stroke="#7A6A4A"/>
+  <text x="565" y="162" font-size="14" font-weight="600" text-anchor="middle" fill="#3A3226">Ancestral Forge</text>
+  <text x="565" y="184" font-size="12" text-anchor="middle" fill="#6B5E48">Stonecarver's Table</text>
+  <text x="565" y="202" font-size="12" text-anchor="middle" fill="#6B5E48">Tribal Smithy</text>
+  <text x="565" y="220" font-size="12" text-anchor="middle" fill="#6B5E48">Medical / Rarework Table</text>
+  <text x="565" y="238" font-size="12" text-anchor="middle" fill="#6B5E48">Eternal Anvil (Permanent)</text>
+
+  <rect x="470" y="320" width="190" height="100" rx="8" fill="#E8DFC8" stroke="#7A6A4A"/>
+  <text x="565" y="342" font-size="14" font-weight="600" text-anchor="middle" fill="#3A3226">Vault hall</text>
+  <text x="565" y="364" font-size="12" text-anchor="middle" fill="#6B5E48">Secure Vault + backpack</text>
+  <text x="565" y="382" font-size="12" text-anchor="middle" fill="#6B5E48">Permanent Armory</text>
+  <text x="565" y="400" font-size="12" text-anchor="middle" fill="#6B5E48">Vault Ledger</text>
+
+  <rect x="20" y="140" width="190" height="120" rx="8" fill="#DCE6D5" stroke="#5E7A50"/>
+  <text x="115" y="162" font-size="14" font-weight="600" text-anchor="middle" fill="#2F3F27">Elder's totem</text>
+  <text x="115" y="184" font-size="12" text-anchor="middle" fill="#4E6342">Quest giver</text>
+  <text x="115" y="202" font-size="12" text-anchor="middle" fill="#4E6342">Recipe Tracker board</text>
+  <text x="115" y="220" font-size="12" text-anchor="middle" fill="#4E6342">Recent Extractions board</text>
+  <text x="115" y="238" font-size="12" text-anchor="middle" fill="#4E6342">Rebirth shrine</text>
+
+  <rect x="20" y="320" width="190" height="100" rx="8" fill="#DCE6D5" stroke="#5E7A50"/>
+  <text x="115" y="342" font-size="14" font-weight="600" text-anchor="middle" fill="#2F3F27">Market</text>
+  <text x="115" y="364" font-size="12" text-anchor="middle" fill="#4E6342">Merchant (buys, fixed)</text>
+  <text x="115" y="382" font-size="12" text-anchor="middle" fill="#4E6342">Coin shop · Gem shop</text>
+  <text x="115" y="400" font-size="12" text-anchor="middle" fill="#4E6342">Trade stones</text>
+
+  <line x1="420" y1="490" x2="500" y2="424" stroke="#B0552E" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <line x1="565" y1="318" x2="565" y2="264" stroke="#B0552E" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <line x1="472" y1="176" x2="440" y2="100" stroke="#B0552E" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+
+  <rect x="20" y="562" width="14" height="14" rx="3" fill="#E8DFC8" stroke="#7A6A4A"/>
+  <text x="40" y="574" font-size="12" fill="#3A3226">Core loop: arrive → vault → forge → deploy (dashed path)</text>
+  <rect x="400" y="562" width="14" height="14" rx="3" fill="#DCE6D5" stroke="#5E7A50"/>
+  <text x="420" y="574" font-size="12" fill="#3A3226">Social and economy side</text>
+  <text x="20" y="594" font-size="12" fill="#6B5E48">Draft schematic, not to scale · ~160 studs across · geometry pending owner reference image</text>
+</svg>
