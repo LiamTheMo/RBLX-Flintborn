@@ -13,6 +13,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
@@ -158,6 +159,8 @@ local function build()
 		Font = Enum.Font.GothamBold,
 		TextSize = 12,
 		LayoutOrder = Theme.TopOrder.Compass,
+		-- The new HUD draws its own compass strip.
+		Visible = not HudMode.ReplacesLegacy(),
 	}, Theme.TopStack())
 	ui.safe = make("TextLabel", {
 		AnchorPoint = Vector2.new(0.5, 1),

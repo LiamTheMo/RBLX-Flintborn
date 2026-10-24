@@ -16,11 +16,33 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_TYPES = ("Script", "LocalScript", "ModuleScript")
 EXTENSIONS = (".luau", ".lua")
+# Rojo turns any other `*.json` file into a ModuleScript that returns the
+# decoded JSON. These suffixes mean something else to Rojo and are never
+# JSON modules, so they are skipped.
+JSON_EXTENSION = ".json"
+NON_MODULE_JSON = (".project.json", ".meta.json", ".model.json")
+SOURCE_EXTENSIONS = EXTENSIONS + (JSON_EXTENSION,)
 ALLOWED_SOURCE_ROOTS = ("src/server", "src/client", "src/shared")
+# Indentation stops growing past this depth so deep JSON cannot blow up the
+# generated source quadratically.
+MAX_INDENT_DEPTH = 32
+
+
+def is_json_module(path):
+    name = path.name
+    return name.endswith(JSON_EXTENSION) and not name.endswith(NON_MODULE_JSON)
 
 
 def kind(path):
     name = path.name
+    if name.endswith(JSON_EXTENSION):
+        if not is_json_module(path):
+            return None
+        stem = name[:-len(JSON_EXTENSION)]
+        if not stem:
+            raise ValueError("JSON module without a name: " + str(path))
+        # Rojo has no `init.json` rule: the instance is always named after the file.
+        return "ModuleScript", stem
     if name.endswith((".server.luau", ".server.lua")):
         return "Script", name.split(".server.")[0]
     if name.endswith((".client.luau", ".client.lua")):
@@ -35,7 +57,7 @@ def discover():
     entries = {}
     def add_source(directory, destination):
         for file in sorted(directory.rglob("*")):
-            if not file.is_file() or not file.name.endswith(EXTENSIONS):
+            if not file.is_file() or not file.name.endswith(SOURCE_EXTENSIONS):
                 continue
             if any(parent.name.endswith(".project.json") for parent in file.parents):
                 raise ValueError("Nested Rojo project requires explicit support: " + str(file))
@@ -44,7 +66,7 @@ def discover():
                 continue
             class_name, name = spec
             relative = file.relative_to(directory)
-            if name == "init":
+            if name == "init" and not is_json_module(file):
                 parts = destination + relative.parts[:-1]
             else:
                 parts = destination + relative.parts[:-1] + (name,)
@@ -66,7 +88,8 @@ def discover():
                 spec = kind(source)
                 if spec:
                     class_name, name = spec
-                    parts = destination if name == "init" else destination[:-1] + (name,)
+                    is_init = name == "init" and not is_json_module(source)
+                    parts = destination if is_init else destination[:-1] + (name,)
                     if parts in entries:
                         raise ValueError("Duplicate script target: " + "/".join(parts))
                     entries[parts] = (source, class_name)
@@ -78,6 +101,100 @@ def discover():
     if not entries:
         raise ValueError("No scripts mapped from approved Rojo source roots")
     return entries
+
+
+class _JsonNumber(str):
+    """A JSON number kept as its original text (a valid Luau numeral)."""
+
+
+def _reject_constant(name):
+    raise ValueError("Non-standard JSON constant: " + name)
+
+
+_LUAU_ESCAPES = {'"': '\\"', "\\": "\\\\", "\n": "\\n", "\r": "\\r", "\t": "\\t"}
+
+
+def luau_string(text):
+    """Quote text as an ASCII-only Luau string literal."""
+    out = ['"']
+    for ch in text:
+        code = ord(ch)
+        if ch in _LUAU_ESCAPES:
+            out.append(_LUAU_ESCAPES[ch])
+        elif 0x20 <= code < 0x7F:
+            out.append(ch)
+        elif code < 0x80:
+            out.append("\\x%02X" % code)  # other control characters and DEL
+        elif 0xD800 <= code <= 0xDFFF:
+            raise ValueError("Unpaired UTF-16 surrogate in JSON string")
+        else:
+            out.append("\\u{%X}" % code)
+    out.append('"')
+    return "".join(out)
+
+
+def json_to_luau(text, origin=None):
+    """Convert JSON text to a Luau module returning the equivalent value.
+
+    Objects become `["key"] = value` tables (duplicate keys: last wins, as in
+    Rojo), arrays become sequential tables, true/false/null become
+    true/false/nil and numbers keep their JSON spelling. The output is
+    deterministic, ASCII-only, and built without recursion.
+    """
+    try:
+        value = json.loads(text, parse_int=_JsonNumber, parse_float=_JsonNumber,
+                           parse_constant=_reject_constant)
+    except RecursionError:
+        raise ValueError("JSON nesting is too deep to convert") from None
+    out = []
+    if origin:
+        out.append("-- Generated from %s by the release scripts. Edit the JSON in Git.\n" % origin)
+    out.append("return ")
+    stack = [(False, value, 0)]
+    while stack:
+        is_text, item, depth = stack.pop()
+        if is_text:
+            out.append(item)
+        elif isinstance(item, (dict, list)):
+            if not item:
+                out.append("{}")
+                continue
+            inner = "\t" * min(depth + 1, MAX_INDENT_DEPTH)
+            entries = item.items() if isinstance(item, dict) else ((None, x) for x in item)
+            pending = []
+            for key, child in entries:
+                label = "" if key is None else "[" + luau_string(key) + "] = "
+                pending.append((True, "\n" + inner + label, depth))
+                pending.append((False, child, depth + 1))
+                pending.append((True, ",", depth))
+            pending.append((True, "\n" + "\t" * min(depth, MAX_INDENT_DEPTH) + "}", depth))
+            out.append("{")
+            stack.extend(reversed(pending))
+        elif item is True:
+            out.append("true")
+        elif item is False:
+            out.append("false")
+        elif item is None:
+            out.append("nil")
+        elif isinstance(item, _JsonNumber):
+            out.append(str.__str__(item))
+        elif isinstance(item, str):
+            out.append(luau_string(item))
+        else:
+            raise ValueError("Unsupported JSON value: " + type(item).__name__)
+    out.append("\n")
+    return "".join(out)
+
+
+def local_source(file):
+    """The Source a mapped file should have in Roblox, matching Rojo."""
+    text = file.read_text(encoding="utf-8")
+    if is_json_module(file):
+        try:
+            return json_to_luau(text, origin=file.name)
+        except ValueError as error:
+            raise ValueError("Invalid JSON module %s: %s" % (file, error)) from None
+    return text
 
 
 class Cloud:
@@ -180,7 +297,7 @@ def preflight(cloud, entries):
                     raise ValueError("Invalid instance ID")
             record = cloud.instance(parent)
             source = script_source(record, expected_class)
-            local = file.read_text(encoding="utf-8")
+            local = local_source(file)
             # Fail before ANY write if a script cannot be safely resolved.
             selected.append((path, parent, expected_class, source, local))
         except (ValueError, RuntimeError) as error:
@@ -199,10 +316,15 @@ def main():
     choice.add_argument("--deploy", action="store_true", help="Update changed existing scripts (never publish a place)")
     args = parser.parse_args()
     entries = discover()
-    print("Validated %d Git-managed scripts; all Studio assets are excluded." % len(entries), flush=True)
+    json_modules = sum(1 for file, _ in entries.values() if is_json_module(file))
+    print("Validated %d Git-managed scripts (%d JSON modules published as Luau tables); "
+          "all Studio assets are excluded." % (len(entries), json_modules), flush=True)
     if args.check:
         for target, (file, kind_name) in sorted(entries.items()):
-            print("%s (%s) <- %s" % ("/".join(target), kind_name, file.relative_to(ROOT)))
+            local_source(file)  # surfaces invalid JSON modules offline
+            suffix = " [JSON -> Luau table]" if is_json_module(file) else ""
+            print("%s (%s) <- %s%s" % ("/".join(target), kind_name,
+                                       file.relative_to(ROOT).as_posix(), suffix))
         return
     cloud = Cloud()
     selected = preflight(cloud, entries)

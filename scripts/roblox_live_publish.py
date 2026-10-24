@@ -13,7 +13,7 @@ import time
 import urllib.error
 import urllib.request
 
-from roblox_cloud_sync import discover
+from roblox_cloud_sync import discover, is_json_module, local_source
 
 ANCHORS = (
     ("ServerScriptService", "Server"),
@@ -136,7 +136,9 @@ def spec_list():
             raise ValueError("Target outside approved script containers: " + "/".join(path))
         if kind not in ("Script", "LocalScript", "ModuleScript"):
             raise ValueError("Unsupported script type: " + str(kind))
-        source = file.read_text(encoding="utf-8")
+        # JSON modules become the Luau table Rojo would generate, so publish
+        # and verify both compare against the converted source.
+        source = local_source(file)
         if any(ord(ch) < 32 and ch not in "\n\r\t" for ch in source):
             raise ValueError("Unsupported control characters in " + str(file))
         found.append((path, kind, source))
@@ -216,8 +218,12 @@ def main():
     records = spec_list()
     publish = make_script(records)
     verify = make_script(records, verify=True)
-    print(f"Validated {len(records)} mapped scripts; no full-place upload", flush=True)
+    json_targets = sorted(path for path, (file, _) in discover().items() if is_json_module(file))
+    print(f"Validated {len(records)} mapped scripts ({len(json_targets)} JSON modules "
+          "published as Luau tables); no full-place upload", flush=True)
     if args.check:
+        for path in json_targets:
+            print("JSON module -> Luau table: " + "/".join(path))
         return
     cloud = Cloud()
     cloud.task(publish)

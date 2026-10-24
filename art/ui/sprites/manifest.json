@@ -1,0 +1,877 @@
+{
+  "compass_marker": {
+    "file": "compass_marker.png",
+    "w": 32,
+    "h": 30,
+    "slice": null
+  },
+  "slot_lock": {
+    "file": "slot_lock.png",
+    "w": 54,
+    "h": 69,
+    "slice": null
+  },
+  "slot_cooldown": {
+    "file": "slot_cooldown.png",
+    "w": 92,
+    "h": 92,
+    "slice": null
+  },
+  "frame_slot": {
+    "file": "frame_slot.png",
+    "w": 151,
+    "h": 145,
+    "slice": [
+      33,
+      37,
+      35,
+      34
+    ]
+  },
+  "frame_slot_selected": {
+    "file": "frame_slot_selected.png",
+    "w": 152,
+    "h": 146,
+    "slice": [
+      35,
+      39,
+      37,
+      38
+    ]
+  },
+  "frame_panel_wide": {
+    "file": "frame_panel_wide.png",
+    "w": 421,
+    "h": 109,
+    "slice": [
+      35,
+      20,
+      35,
+      19
+    ]
+  },
+  "frame_panel_medium": {
+    "file": "frame_panel_medium.png",
+    "w": 357,
+    "h": 110,
+    "slice": [
+      35,
+      22,
+      35,
+      21
+    ]
+  },
+  "frame_badge": {
+    "file": "frame_badge.png",
+    "w": 191,
+    "h": 90,
+    "slice": [
+      39,
+      36,
+      38,
+      33
+    ]
+  },
+  "frame_compass": {
+    "file": "frame_compass.png",
+    "w": 729,
+    "h": 84,
+    "slice": [
+      59,
+      21,
+      60,
+      21
+    ]
+  },
+  "frame_prompt": {
+    "file": "frame_prompt.png",
+    "w": 311,
+    "h": 118,
+    "slice": [
+      29,
+      21,
+      36,
+      20
+    ]
+  },
+  "stat_bar_empty": {
+    "file": "stat_bar_empty.png",
+    "w": 430,
+    "h": 83,
+    "slice": [
+      34,
+      20,
+      35,
+      26
+    ]
+  },
+  "slot_lock_full": {
+    "file": "slot_lock_full.png",
+    "w": 153,
+    "h": 145,
+    "slice": null
+  },
+  "slot_cooldown_full": {
+    "file": "slot_cooldown_full.png",
+    "w": 154,
+    "h": 146,
+    "slice": null
+  },
+  "slot_broken": {
+    "file": "slot_broken.png",
+    "w": 154,
+    "h": 146,
+    "slice": null
+  },
+  "frame_bar": {
+    "file": "frame_bar.png",
+    "w": 425,
+    "h": 111,
+    "slice": [
+      48,
+      31,
+      47,
+      32
+    ]
+  },
+  "frame_panel_large": {
+    "file": "frame_panel_large.png",
+    "w": 338,
+    "h": 178,
+    "slice": [
+      43,
+      35,
+      44,
+      39
+    ]
+  },
+  "frame_round": {
+    "file": "frame_round.png",
+    "w": 199,
+    "h": 201,
+    "slice": null
+  },
+  "frame_square_hollow": {
+    "file": "frame_square_hollow.png",
+    "w": 142,
+    "h": 135,
+    "slice": [
+      45,
+      46,
+      50,
+      45
+    ]
+  },
+  "frame_selected_hollow": {
+    "file": "frame_selected_hollow.png",
+    "w": 165,
+    "h": 152,
+    "slice": [
+      46,
+      48,
+      45,
+      48
+    ]
+  },
+  "frame_wide_hollow": {
+    "file": "frame_wide_hollow.png",
+    "w": 219,
+    "h": 130,
+    "slice": [
+      52,
+      38,
+      45,
+      42
+    ]
+  },
+  "frame_bar_hollow": {
+    "file": "frame_bar_hollow.png",
+    "w": 425,
+    "h": 111,
+    "slice": [
+      48,
+      36,
+      47,
+      37
+    ]
+  },
+  "frame_panel_large_hollow": {
+    "file": "frame_panel_large_hollow.png",
+    "w": 338,
+    "h": 178,
+    "slice": [
+      46,
+      38,
+      46,
+      40
+    ]
+  },
+  "frame_round_hollow": {
+    "file": "frame_round_hollow.png",
+    "w": 199,
+    "h": 201,
+    "slice": null
+  },
+  "nine_corner_tl": {
+    "file": "nine_corner_tl.png",
+    "w": 108,
+    "h": 115,
+    "slice": null
+  },
+  "nine_corner_tr": {
+    "file": "nine_corner_tr.png",
+    "w": 107,
+    "h": 115,
+    "slice": null
+  },
+  "nine_corner_bl": {
+    "file": "nine_corner_bl.png",
+    "w": 112,
+    "h": 117,
+    "slice": null
+  },
+  "nine_corner_br": {
+    "file": "nine_corner_br.png",
+    "w": 113,
+    "h": 116,
+    "slice": null
+  },
+  "nine_edge_top": {
+    "file": "nine_edge_top.png",
+    "w": 430,
+    "h": 56,
+    "slice": null
+  },
+  "nine_edge_bottom": {
+    "file": "nine_edge_bottom.png",
+    "w": 430,
+    "h": 57,
+    "slice": null
+  },
+  "nine_edge_left": {
+    "file": "nine_edge_left.png",
+    "w": 54,
+    "h": 153,
+    "slice": null
+  },
+  "nine_edge_right": {
+    "file": "nine_edge_right.png",
+    "w": 55,
+    "h": 153,
+    "slice": null
+  },
+  "fill_red": {
+    "file": "fill_red.png",
+    "w": 168,
+    "h": 41,
+    "slice": [
+      18,
+      13,
+      17,
+      12
+    ]
+  },
+  "fill_green": {
+    "file": "fill_green.png",
+    "w": 168,
+    "h": 41,
+    "slice": [
+      19,
+      13,
+      16,
+      12
+    ]
+  },
+  "fill_yellow": {
+    "file": "fill_yellow.png",
+    "w": 168,
+    "h": 42,
+    "slice": [
+      17,
+      14,
+      17,
+      12
+    ]
+  },
+  "fill_orange_striped": {
+    "file": "fill_orange_striped.png",
+    "w": 175,
+    "h": 43,
+    "slice": [
+      21,
+      14,
+      21,
+      14
+    ]
+  },
+  "fill_blue": {
+    "file": "fill_blue.png",
+    "w": 168,
+    "h": 45,
+    "slice": [
+      17,
+      15,
+      17,
+      14
+    ]
+  },
+  "fill_track": {
+    "file": "fill_track.png",
+    "w": 212,
+    "h": 46,
+    "slice": [
+      18,
+      15,
+      18,
+      14
+    ]
+  },
+  "panel_dark": {
+    "file": "panel_dark.png",
+    "w": 223,
+    "h": 96,
+    "slice": [
+      16,
+      14,
+      14,
+      13
+    ]
+  },
+  "panel_dark_small": {
+    "file": "panel_dark_small.png",
+    "w": 106,
+    "h": 97,
+    "slice": [
+      14,
+      14,
+      13,
+      13
+    ]
+  },
+  "pill_dark": {
+    "file": "pill_dark.png",
+    "w": 194,
+    "h": 110,
+    "slice": [
+      38,
+      30,
+      37,
+      28
+    ]
+  },
+  "keycap": {
+    "file": "keycap.png",
+    "w": 165,
+    "h": 148,
+    "slice": [
+      31,
+      41,
+      33,
+      39
+    ]
+  },
+  "icon_crown": {
+    "file": "icon_crown.png",
+    "w": 145,
+    "h": 127,
+    "slice": null
+  },
+  "icon_lock_silver": {
+    "file": "icon_lock_silver.png",
+    "w": 113,
+    "h": 142,
+    "slice": null
+  },
+  "icon_red_dot": {
+    "file": "icon_red_dot.png",
+    "w": 80,
+    "h": 79,
+    "slice": null
+  },
+  "icon_spinner": {
+    "file": "icon_spinner.png",
+    "w": 141,
+    "h": 148,
+    "slice": null
+  },
+  "icon_backpack": {
+    "file": "icon_backpack.png",
+    "w": 123,
+    "h": 128,
+    "slice": null
+  },
+  "icon_hammer": {
+    "file": "icon_hammer.png",
+    "w": 128,
+    "h": 129,
+    "slice": null
+  },
+  "icon_chest": {
+    "file": "icon_chest.png",
+    "w": 157,
+    "h": 115,
+    "slice": null
+  },
+  "icon_coin_bag": {
+    "file": "icon_coin_bag.png",
+    "w": 111,
+    "h": 125,
+    "slice": null
+  },
+  "icon_scroll": {
+    "file": "icon_scroll.png",
+    "w": 147,
+    "h": 125,
+    "slice": null
+  },
+  "icon_group": {
+    "file": "icon_group.png",
+    "w": 157,
+    "h": 115,
+    "slice": null
+  },
+  "icon_star": {
+    "file": "icon_star.png",
+    "w": 130,
+    "h": 123,
+    "slice": null
+  },
+  "icon_gear": {
+    "file": "icon_gear.png",
+    "w": 128,
+    "h": 126,
+    "slice": null
+  },
+  "icon_map": {
+    "file": "icon_map.png",
+    "w": 148,
+    "h": 119,
+    "slice": null
+  },
+  "icon_compass": {
+    "file": "icon_compass.png",
+    "w": 118,
+    "h": 133,
+    "slice": null
+  },
+  "icon_help": {
+    "file": "icon_help.png",
+    "w": 124,
+    "h": 123,
+    "slice": null
+  },
+  "icon_swap": {
+    "file": "icon_swap.png",
+    "w": 121,
+    "h": 122,
+    "slice": null
+  },
+  "icon_add_friend": {
+    "file": "icon_add_friend.png",
+    "w": 125,
+    "h": 112,
+    "slice": null
+  },
+  "icon_trophy": {
+    "file": "icon_trophy.png",
+    "w": 132,
+    "h": 121,
+    "slice": null
+  },
+  "icon_calendar": {
+    "file": "icon_calendar.png",
+    "w": 122,
+    "h": 118,
+    "slice": null
+  },
+  "icon_gift": {
+    "file": "icon_gift.png",
+    "w": 128,
+    "h": 126,
+    "slice": null
+  },
+  "icon_heart": {
+    "file": "icon_heart.png",
+    "w": 125,
+    "h": 113,
+    "slice": null
+  },
+  "icon_lightning": {
+    "file": "icon_lightning.png",
+    "w": 84,
+    "h": 130,
+    "slice": null
+  },
+  "icon_meat": {
+    "file": "icon_meat.png",
+    "w": 123,
+    "h": 135,
+    "slice": null
+  },
+  "icon_star_gold": {
+    "file": "icon_star_gold.png",
+    "w": 130,
+    "h": 124,
+    "slice": null
+  },
+  "icon_coin": {
+    "file": "icon_coin.png",
+    "w": 120,
+    "h": 122,
+    "slice": null
+  },
+  "icon_gem": {
+    "file": "icon_gem.png",
+    "w": 118,
+    "h": 128,
+    "slice": null
+  },
+  "icon_shield": {
+    "file": "icon_shield.png",
+    "w": 123,
+    "h": 133,
+    "slice": null
+  },
+  "icon_crossed_swords": {
+    "file": "icon_crossed_swords.png",
+    "w": 139,
+    "h": 134,
+    "slice": null
+  },
+  "icon_axe": {
+    "file": "icon_axe.png",
+    "w": 137,
+    "h": 139,
+    "slice": null
+  },
+  "icon_pickaxe": {
+    "file": "icon_pickaxe.png",
+    "w": 134,
+    "h": 133,
+    "slice": null
+  },
+  "icon_stone_hammer": {
+    "file": "icon_stone_hammer.png",
+    "w": 130,
+    "h": 138,
+    "slice": null
+  },
+  "icon_bow": {
+    "file": "icon_bow.png",
+    "w": 139,
+    "h": 138,
+    "slice": null
+  },
+  "icon_spear": {
+    "file": "icon_spear.png",
+    "w": 127,
+    "h": 136,
+    "slice": null
+  },
+  "icon_sword": {
+    "file": "icon_sword.png",
+    "w": 135,
+    "h": 138,
+    "slice": null
+  },
+  "icon_campfire": {
+    "file": "icon_campfire.png",
+    "w": 138,
+    "h": 133,
+    "slice": null
+  },
+  "icon_anvil": {
+    "file": "icon_anvil.png",
+    "w": 171,
+    "h": 112,
+    "slice": null
+  },
+  "icon_x": {
+    "file": "icon_x.png",
+    "w": 103,
+    "h": 103,
+    "slice": null
+  },
+  "icon_plus": {
+    "file": "icon_plus.png",
+    "w": 109,
+    "h": 107,
+    "slice": null
+  },
+  "icon_minus": {
+    "file": "icon_minus.png",
+    "w": 111,
+    "h": 46,
+    "slice": null
+  },
+  "icon_check": {
+    "file": "icon_check.png",
+    "w": 123,
+    "h": 102,
+    "slice": null
+  },
+  "icon_lock": {
+    "file": "icon_lock.png",
+    "w": 90,
+    "h": 118,
+    "slice": null
+  },
+  "icon_unlock": {
+    "file": "icon_unlock.png",
+    "w": 89,
+    "h": 124,
+    "slice": null
+  },
+  "icon_search": {
+    "file": "icon_search.png",
+    "w": 119,
+    "h": 114,
+    "slice": null
+  },
+  "icon_more": {
+    "file": "icon_more.png",
+    "w": 131,
+    "h": 45,
+    "slice": null
+  },
+  "icon_up": {
+    "file": "icon_up.png",
+    "w": 108,
+    "h": 73,
+    "slice": null
+  },
+  "icon_down": {
+    "file": "icon_down.png",
+    "w": 113,
+    "h": 78,
+    "slice": null
+  },
+  "icon_left": {
+    "file": "icon_left.png",
+    "w": 72,
+    "h": 102,
+    "slice": null
+  },
+  "icon_right": {
+    "file": "icon_right.png",
+    "w": 74,
+    "h": 104,
+    "slice": null
+  },
+  "icon_back": {
+    "file": "icon_back.png",
+    "w": 111,
+    "h": 103,
+    "slice": null
+  },
+  "icon_refresh": {
+    "file": "icon_refresh.png",
+    "w": 110,
+    "h": 106,
+    "slice": null
+  },
+  "icon_expand": {
+    "file": "icon_expand.png",
+    "w": 120,
+    "h": 106,
+    "slice": null
+  },
+  "icon_collapse": {
+    "file": "icon_collapse.png",
+    "w": 111,
+    "h": 101,
+    "slice": null
+  },
+  "icon_sound_on": {
+    "file": "icon_sound_on.png",
+    "w": 123,
+    "h": 105,
+    "slice": null
+  },
+  "icon_sound_off": {
+    "file": "icon_sound_off.png",
+    "w": 120,
+    "h": 110,
+    "slice": null
+  },
+  "icon_music": {
+    "file": "icon_music.png",
+    "w": 94,
+    "h": 103,
+    "slice": null
+  },
+  "icon_bell": {
+    "file": "icon_bell.png",
+    "w": 105,
+    "h": 114,
+    "slice": null
+  },
+  "icon_warning": {
+    "file": "icon_warning.png",
+    "w": 112,
+    "h": 100,
+    "slice": null
+  },
+  "icon_info": {
+    "file": "icon_info.png",
+    "w": 109,
+    "h": 108,
+    "slice": null
+  },
+  "icon_skull": {
+    "file": "icon_skull.png",
+    "w": 107,
+    "h": 110,
+    "slice": null
+  },
+  "icon_hourglass": {
+    "file": "icon_hourglass.png",
+    "w": 84,
+    "h": 116,
+    "slice": null
+  },
+  "icon_exit": {
+    "file": "icon_exit.png",
+    "w": 133,
+    "h": 113,
+    "slice": null
+  },
+  "icon_waypoint": {
+    "file": "icon_waypoint.png",
+    "w": 96,
+    "h": 112,
+    "slice": null
+  },
+  "icon_eye": {
+    "file": "icon_eye.png",
+    "w": 143,
+    "h": 92,
+    "slice": null
+  },
+  "icon_hand": {
+    "file": "icon_hand.png",
+    "w": 107,
+    "h": 113,
+    "slice": null
+  },
+  "icon_run": {
+    "file": "icon_run.png",
+    "w": 124,
+    "h": 128,
+    "slice": null
+  },
+  "icon_storm": {
+    "file": "icon_storm.png",
+    "w": 115,
+    "h": 122,
+    "slice": null
+  },
+  "icon_mountain": {
+    "file": "icon_mountain.png",
+    "w": 158,
+    "h": 99,
+    "slice": null
+  },
+  "icon_tower": {
+    "file": "icon_tower.png",
+    "w": 132,
+    "h": 112,
+    "slice": null
+  },
+  "button_backpack": {
+    "file": "button_backpack.png",
+    "w": 183,
+    "h": 165,
+    "slice": null
+  },
+  "button_tools": {
+    "file": "button_tools.png",
+    "w": 180,
+    "h": 165,
+    "slice": null
+  },
+  "button_chest": {
+    "file": "button_chest.png",
+    "w": 183,
+    "h": 165,
+    "slice": null
+  },
+  "button_gift": {
+    "file": "button_gift.png",
+    "w": 184,
+    "h": 166,
+    "slice": null
+  },
+  "button_scroll": {
+    "file": "button_scroll.png",
+    "w": 183,
+    "h": 165,
+    "slice": null
+  },
+  "button_group": {
+    "file": "button_group.png",
+    "w": 183,
+    "h": 165,
+    "slice": null
+  },
+  "button_star": {
+    "file": "button_star.png",
+    "w": 182,
+    "h": 166,
+    "slice": null
+  },
+  "button_gear": {
+    "file": "button_gear.png",
+    "w": 180,
+    "h": 166,
+    "slice": null
+  },
+  "button_map": {
+    "file": "button_map.png",
+    "w": 183,
+    "h": 164,
+    "slice": null
+  },
+  "button_help": {
+    "file": "button_help.png",
+    "w": 180,
+    "h": 164,
+    "slice": null
+  },
+  "button_swap": {
+    "file": "button_swap.png",
+    "w": 182,
+    "h": 163,
+    "slice": null
+  },
+  "button_add_friend": {
+    "file": "button_add_friend.png",
+    "w": 183,
+    "h": 163,
+    "slice": null
+  },
+  "button_check": {
+    "file": "button_check.png",
+    "w": 184,
+    "h": 164,
+    "slice": null
+  },
+  "button_x": {
+    "file": "button_x.png",
+    "w": 184,
+    "h": 164,
+    "slice": null
+  },
+  "button_back": {
+    "file": "button_back.png",
+    "w": 183,
+    "h": 163,
+    "slice": null
+  },
+  "button_sound_on": {
+    "file": "button_sound_on.png",
+    "w": 179,
+    "h": 164,
+    "slice": null
+  }
+}

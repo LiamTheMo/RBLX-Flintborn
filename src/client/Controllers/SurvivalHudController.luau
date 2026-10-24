@@ -1,7 +1,9 @@
 -- Survival HUD (GDD §11, §4.5): health, stamina and food bars with numbers, the
 -- medicine cooldown and pending food healing. Consumables are used from the hotbar
 -- (InventoryController). Low states use text and a symbol, not colour alone.
--- World place only.
+-- World place only. The new HUD (HudController) replaces these bars when HudMode
+-- says so, including the medicine and food-healing status; this stays as the
+-- fallback for a place published without the HUD layout.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -10,6 +12,7 @@ local RunService = game:GetService("RunService")
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 
 local SurvivalHudController = {}
 
@@ -107,7 +110,7 @@ local function build()
 end
 
 function SurvivalHudController.Start()
-	if not PlaceConfig.IsWorld() then
+	if not PlaceConfig.IsWorld() or HudMode.ReplacesLegacy() then
 		return
 	end
 	build()
