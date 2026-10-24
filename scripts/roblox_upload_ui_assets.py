@@ -20,6 +20,7 @@ from art/ui/sprites/manifest.json. It is local only and needs no key.
   python scripts/roblox_upload_ui_assets.py --upload --only frame_slot,icon_heart
 """
 import argparse
+import gzip
 import json
 import os
 import re
@@ -184,6 +185,9 @@ class Cloud:
                 content = response.read(200000)
         except RuntimeError as exc:
             return decal_id, f"delivery failed: {exc}"
+        # Some decals are served gzip-compressed without a Content-Encoding header.
+        if content.startswith(b"\x1f\x8b"):
+            content = gzip.decompress(content)
         if content.startswith(b"\x89PNG"):
             return decal_id, "already an image"
         match = re.search(rb"<url>[^<]*?id=(\d+)\s*</url>", content)
