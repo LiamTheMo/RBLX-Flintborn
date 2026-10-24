@@ -125,11 +125,11 @@ class Cloud:
                 raise RuntimeError(f"Roblox API HTTP {exc.code}: {body}") from None
         raise RuntimeError("Roblox API retries exhausted")
 
-    def upload(self, file):
+    def upload(self, file, asset_type="Decal", content_type="image/png", name=None, description=None):
         payload = {
-            "assetType": "Decal",
-            "displayName": f"Flintborn UI {file.stem}"[:50],
-            "description": "Flintborn HUD sprite",
+            "assetType": asset_type,
+            "displayName": (name or f"Flintborn UI {file.stem}")[:50],
+            "description": description or "Flintborn HUD sprite",
             "creationContext": {"creator": self.creator},
         }
         boundary = uuid.uuid4().hex
@@ -140,7 +140,7 @@ class Cloud:
             json.dumps(payload).encode("utf-8"),
             f"\r\n--{boundary}\r\n".encode(),
             f'Content-Disposition: form-data; name="fileContent"; filename="{file.name}"\r\n'.encode(),
-            b"Content-Type: image/png\r\n\r\n",
+            f"Content-Type: {content_type}\r\n\r\n".encode(),
             file.read_bytes(),
             f"\r\n--{boundary}--\r\n".encode(),
         ])

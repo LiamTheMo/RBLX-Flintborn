@@ -31,7 +31,12 @@ Rendering uses Eevee headless (Blender 5.2). A 16-asset sheet renders in well un
 - **Palette:** only `flintkit.PALETTE` keys. Every mesh carries a `Tint` colour attribute, so each part gets a slight hand-painted brightness variation.
 - **Budget:** aim for ≤ 3,000 triangles for props, ≤ 8,000 for buildings and large trees (`obj["tris"]` records it). Roblox meshes must stay well under 20,000.
 - **VFX:** live effects are **VFX sockets** (`lib/vfx.py`): Empties named `VFX_<kind>` parented to the asset at the emitter point, carrying the Roblox ParticleEmitter/PointLight spec as JSON. Kinds: torch_fire, campfire, brazier_fire, forge_fire, chimney_smoke, embers, heat_glow, glyph_glow, rune_glow, waterfall_mist, water_foam, dust. Particle textures are rendered by `scripts/build_08_vfx.py` into `art/vfx/textures/`, and `vfx.realize()` turns sockets into preview lights and particles. Emissive meshes stay on the asset as the static look.
-- **Roblox export (later):** materials are flat palette colours; the `Tint` variation and emissive fire are Blender-side. Bake or split by material when exporting.
+- **Roblox export:** `run.sh scripts/export_lobby_roblox.py art/roblox/lobby/manifest.json` writes the lobby to `art/roblox/lobby/`:
+  - one `.glb` per unique mesh, so Roblox downloads each shape once and clones it for every placement;
+  - `palette.png`, a single texture carrying every palette colour at 32 `Tint` levels;
+  - `manifest.json`, with placements, collision profiles, VFX sockets, the arrival spawn and NPC spots.
+
+  Fire colours become Neon parts and water becomes see-through parts. The **Upload and place the lobby map** workflow (`scripts/roblox_lobby_map.py`) uploads the export and builds `Workspace.LobbyMap` in the lobby place.
 
 ## Scale sheet (studs, width × depth × height)
 

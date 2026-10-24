@@ -79,7 +79,7 @@ A walled camp around a central **bonfire plaza**. North is the Deploy gate; sout
 
 ## Authoring and tags
 
-Lobby geometry is authored in Studio and published from Studio to the lobby place, because the release pipeline only ships scripts (`docs/roblox-live-deployment.md`). Map models synced through Rojo go under `src/maps/Lobby/` (`ServerStorage.Maps`). Gameplay finds the stations through CollectionService tags, the same way world services find theirs:
+Lobby geometry is built in Blender (`art/blender/lobby/FlintbornLobby.blend`) and exported for Roblox by `art/blender/scripts/export_lobby_roblox.py`. The manual **Upload and place the lobby map** workflow (`.github/workflows/lobby-map.yml`) uploads the meshes and builds `Workspace.LobbyMap` in the lobby place. It replaces only that model and disables, never deletes, other spawn locations. The script deploy still ships scripts only (`docs/roblox-live-deployment.md`). The map adds a `LobbyArrival` spawn on the arrival rune stone, a `DeployGate` marker and `LobbyNPCSpot` markers (attribute `Role`); station prompt parts are still to come. Gameplay finds the stations through CollectionService tags, the same way world services find theirs:
 
 | Tag | On |
 | --- | --- |
