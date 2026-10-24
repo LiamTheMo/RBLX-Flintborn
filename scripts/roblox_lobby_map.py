@@ -18,8 +18,10 @@ a client downloads ~130 meshes and one palette texture for 2,400+ parts. Small
 dressing and unreachable scenery never collide, query or touch, so physics skips
 them; ground keeps precise collision so players walk on the real surface.
 
---place only touches Workspace.LobbyMap (replaced as a whole) and disables, never
-deletes, any other SpawnLocation so players arrive at the map's arrival stones.
+--place replaces Workspace.LobbyMap as a whole. It never deletes anything else:
+the template's Baseplate and top-level SpawnLocations move to
+ServerStorage.DisabledByLobbyMap, and any other SpawnLocation is disabled, so
+players arrive at the map's arrival stones.
 Like scripts/roblox_live_publish.py it needs a closed Team Create session.
 
 Environment: ROBLOX_API_KEY, plus ROBLOX_CREATOR_GROUP_ID or ROBLOX_CREATOR_USER_ID
@@ -456,12 +458,26 @@ for _, spot in data.npcSpots do
 end
 
 map.Parent = workspace
--- Players arrive at the map: any other spawn is disabled (kept, not deleted).
+-- The template's Baseplate (top at Y = 0) would cut through the map's ground,
+-- and players must arrive at the map: both move to ServerStorage (kept, not
+-- deleted, so they can be put back). Other spawns elsewhere are disabled.
+local shelf = game:GetService("ServerStorage"):FindFirstChild("DisabledByLobbyMap")
+if not shelf then
+  shelf = Instance.new("Folder")
+  shelf.Name = "DisabledByLobbyMap"
+  shelf.Parent = game:GetService("ServerStorage")
+end
 local disabled = {}
+for _, child in workspace:GetChildren() do
+  if (child.Name == "Baseplate" and child:IsA("BasePart")) or child:IsA("SpawnLocation") then
+    child.Parent = shelf
+    table.insert(disabled, "moved " .. child.Name .. " to ServerStorage.DisabledByLobbyMap")
+  end
+end
 for _, d in workspace:GetDescendants() do
   if d:IsA("SpawnLocation") and d ~= spawn and d.Enabled then
     d.Enabled = false
-    table.insert(disabled, d:GetFullName())
+    table.insert(disabled, "disabled " .. d:GetFullName())
   end
 end
 local templateCount = 0
