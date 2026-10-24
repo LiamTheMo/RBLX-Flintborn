@@ -38,6 +38,7 @@ import sys
 import bmesh
 import bpy
 from mathutils import Matrix, Vector
+from mathutils.bvhtree import BVHTree
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BLENDER_DIR = os.path.dirname(HERE)
@@ -334,6 +335,29 @@ def main():
             cf, _ = cframe(obj.matrix_world, Vector((0, 0, tall / (2 * s.z))))
             colliders.append([cf, [r(width), r(tall), r(width)]])
 
+    # Ground probes: the walkable surface height on a grid inside the wall, so the
+    # place step can raycast the built map and catch a misplaced or missing floor.
+    verts, polys = [], []
+    for obj in objects:
+        asset = obj.data.name
+        if not (asset in WALKABLE or asset.startswith("Ground_")) or asset in PLANTS:
+            continue
+        evaluated = obj.evaluated_get(depsgraph).to_mesh()
+        base = len(verts)
+        verts.extend(obj.matrix_world @ v.co for v in evaluated.vertices)
+        polys.extend([base + i for i in poly.vertices] for poly in evaluated.polygons)
+        obj.evaluated_get(depsgraph).to_mesh_clear()
+    ground = BVHTree.FromPolygons(verts, polys)
+    probes = []
+    for gx in range(int(cx - rx), int(cx + rx) + 1, 12):
+        for gy in range(int(cy - ry), int(cy + ry) + 1, 12):
+            point = Vector((gx, gy, 0))
+            if not reachable(point):
+                continue
+            hit = ground.ray_cast(Vector((gx, gy, 300)), Vector((0, 0, -1)))
+            if hit[0] is not None:
+                probes.append([r(c, 2) for c in to_rbx(hit[0])])
+
     vfx, kinds, npcs = [], {}, []
     for o in scene.objects:
         if o.type != "EMPTY":
@@ -394,6 +418,7 @@ def main():
         "spawn": [r(c) for c in spawn],
         "deployGate": [r(c) for c in to_rbx(gate.matrix_world.translation)] if gate else None,
         "npcSpots": npcs,
+        "groundProbes": probes,
         "lighting": {"sun": suns.get("LobbySun"), "fill": suns.get("LobbySkyFill"), "background": background,
                      "lights": lights},
         "stats": {
