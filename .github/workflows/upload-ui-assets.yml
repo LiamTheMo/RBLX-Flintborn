@@ -1,0 +1,48 @@
+name: Upload HUD sprites to Roblox
+# Manual only. Uploads art/ui/sprites/*.png through Open Cloud with the repository
+# secrets and returns the updated src/shared/UI/UiAssetIds.json as an artifact.
+# It never commits or publishes: a person commits the ids through the normal
+# branch -> version branch -> main flow.
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Comma-separated sprite names (empty = every sprite not yet in UiAssetIds.json)"
+        required: false
+        default: ""
+      upload:
+        description: "Upload for real (false = dry run)"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upload-ui-assets
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Upload sprites
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_CREATOR_USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
+          ONLY: ${{ inputs.only }}
+          UPLOAD: ${{ inputs.upload }}
+        run: |
+          if [ "$UPLOAD" = "true" ]; then MODE=--upload; else MODE=--dry-run; fi
+          python3 scripts/roblox_upload_ui_assets.py "$MODE" --only "$ONLY"
+      - name: Return UiAssetIds.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-asset-ids
+          path: src/shared/UI/UiAssetIds.json
