@@ -12,6 +12,8 @@ unique mesh, palette.png, manifest.json). This script:
              spawn locations, an existing LobbyMap)
   --place    rebuild Workspace.LobbyMap in the lobby place from the manifest and
              the recorded ids, save the place, then verify it in a fresh session
+  --lighting set the lobby's Lighting to match the Blender scene (sun angle and
+             colour, ambient, atmosphere, bloom, colour grade, sun rays) and save
 
 Loading fast: each unique mesh is loaded ONCE and cloned for every placement, so
 a client downloads ~130 meshes and one palette texture for 2,400+ parts. Small
@@ -424,8 +426,22 @@ for _, socket in data.vfx do
     light.Brightness = spec.light.brightness or 1
     light.Range = math.min(60, (spec.light.range or 8) * scale)
     light.Shadows = false
+    if spec.light.flicker then
+      -- LightFlickerController animates these on each client (nothing replicates).
+      light:SetAttribute("BaseBrightness", light.Brightness)
+      CollectionService:AddTag(light, "FlickerLight")
+    end
     light.Parent = attachment
   end
+end
+for _, l in data.lights do
+  local holder = marker(l.name, CFrame.new(l.position[1], l.position[2], l.position[3]), Vector3.new(0.2, 0.2, 0.2), vfxFolder)
+  local light = Instance.new("PointLight")
+  light.Color = Color3.fromHex(l.color)
+  light.Brightness = 1.2
+  light.Range = l.range
+  light.Shadows = false
+  light.Parent = holder
 end
 
 -- 4. Arrival spawn, the Deploy gate and NPC spots (CollectionService tags, docs/maps).
@@ -487,6 +503,109 @@ return HttpService:JSONEncode({ placed = placed, templates = templateCount, emit
   disabledSpawns = disabled, warnings = warnings })
 '''
 
+# The lobby's look, matched to the Blender scene (art/blender/lobby): a warm
+# afternoon sun from the west-southwest about 40 degrees up, a cool sky fill,
+# soft haze, and bloom so the Neon flames glow. Colours are sRGB hex.
+LIGHTING_STYLE = {
+    "brightness": 2.6,
+    "exposure": 0.1,
+    "ambient": "#5C5046",
+    "outdoorAmbient": "#8F8C7E",
+    "colorShiftBottom": "#2B261F",
+    "environmentDiffuse": 1.0,
+    "environmentSpecular": 0.4,
+    "shadowSoftness": 0.25,
+    "atmosphere": {"density": 0.28, "offset": 0.2, "color": "#CBC3A6", "decay": "#9C8466", "glare": 0.15,
+                   "haze": 1.4},
+    "bloom": {"intensity": 0.7, "size": 28, "threshold": 1.4},
+    "colorCorrection": {"brightness": 0.02, "contrast": 0.12, "saturation": 0.18, "tint": "#FFF6EA"},
+    "sunRays": {"intensity": 0.05, "spread": 0.55},
+    "sunAngularSize": 12,
+}
+
+LIGHTING = r'''
+local HttpService = game:GetService("HttpService")
+local Lighting = game:GetService("Lighting")
+local cfg = %DATA%
+local report = { warnings = {} }
+
+-- The sun: the clock time and latitude whose sun direction is nearest the scene's.
+local target = Vector3.new(cfg.sun.direction[1], cfg.sun.direction[2], cfg.sun.direction[3]).Unit
+local best, bestTime, bestLatitude = -2, 14, 41.7
+local function try(latitude, clock)
+  Lighting.GeographicLatitude = latitude
+  Lighting.ClockTime = clock
+  local dot = Lighting:GetSunDirection():Dot(target)
+  if dot > best then best, bestTime, bestLatitude = dot, clock, latitude end
+end
+for latitude = -66, 66, 3 do
+  for clock = 6, 18, 0.25 do try(latitude, clock) end
+end
+local coarseLatitude, coarseTime = bestLatitude, bestTime
+for latitude = coarseLatitude - 3, coarseLatitude + 3, 0.5 do
+  for clock = coarseTime - 0.25, coarseTime + 0.25, 0.02 do try(latitude, clock) end
+end
+Lighting.GeographicLatitude = bestLatitude
+Lighting.ClockTime = bestTime
+report.clockTime = bestTime
+report.latitude = bestLatitude
+report.sunErrorDegrees = math.deg(math.acos(math.clamp(best, -1, 1)))
+if report.sunErrorDegrees > 10 then table.insert(report.warnings, "sun direction is off by more than 10 degrees") end
+
+local style = cfg.style
+local ok, err = pcall(function() Lighting.Technology = Enum.Technology.Future end)
+report.technology = if ok then "Future" else ("unchanged: " .. tostring(err))
+Lighting.Brightness = style.brightness
+Lighting.ExposureCompensation = style.exposure
+Lighting.Ambient = Color3.fromHex(style.ambient)
+Lighting.OutdoorAmbient = Color3.fromHex(style.outdoorAmbient)
+-- Sunlit faces take the scene sun's warm colour, softened toward white.
+Lighting.ColorShift_Top = Color3.new(1, 1, 1):Lerp(Color3.fromHex(cfg.sun.color), 0.6)
+Lighting.ColorShift_Bottom = Color3.fromHex(style.colorShiftBottom)
+Lighting.EnvironmentDiffuseScale = style.environmentDiffuse
+Lighting.EnvironmentSpecularScale = style.environmentSpecular
+Lighting.GlobalShadows = true
+Lighting.ShadowSoftness = style.shadowSoftness
+
+-- One of each effect: the first existing one is reused, otherwise one is made.
+local function single(className)
+  local object = Lighting:FindFirstChildWhichIsA(className)
+  if not object then
+    object = Instance.new(className)
+    object.Parent = Lighting
+  end
+  return object
+end
+local atmosphere = single("Atmosphere")
+atmosphere.Density = style.atmosphere.density
+atmosphere.Offset = style.atmosphere.offset
+atmosphere.Color = Color3.fromHex(style.atmosphere.color)
+atmosphere.Decay = Color3.fromHex(style.atmosphere.decay)
+atmosphere.Glare = style.atmosphere.glare
+atmosphere.Haze = style.atmosphere.haze
+local sky = single("Sky")
+sky.SunAngularSize = style.sunAngularSize
+sky.CelestialBodiesShown = true
+local bloom = single("BloomEffect")
+bloom.Enabled = true
+bloom.Intensity = style.bloom.intensity
+bloom.Size = style.bloom.size
+bloom.Threshold = style.bloom.threshold
+local grade = single("ColorCorrectionEffect")
+grade.Enabled = true
+grade.Brightness = style.colorCorrection.brightness
+grade.Contrast = style.colorCorrection.contrast
+grade.Saturation = style.colorCorrection.saturation
+grade.TintColor = Color3.fromHex(style.colorCorrection.tint)
+local rays = single("SunRaysEffect")
+rays.Enabled = true
+rays.Intensity = style.sunRays.intensity
+rays.Spread = style.sunRays.spread
+
+game:GetService("AssetService"):SavePlaceAsync({ SaveWithoutPublish = false })
+return HttpService:JSONEncode(report)
+'''
+
 VERIFY = r'''
 local HttpService = game:GetService("HttpService")
 local CollectionService = game:GetService("CollectionService")
@@ -534,6 +653,7 @@ def place_script(m, ids):
         "spawn": m["spawn"],
         "deployGate": m["deployGate"],
         "npcSpots": m["npcSpots"],
+        "lights": (m.get("lighting") or {}).get("lights", []),
     }
     body = lua_value(data)
     # The placements are one long string, parsed in Luau, so the script stays small.
@@ -543,6 +663,13 @@ def place_script(m, ids):
     if size > MAX_SCRIPT_BYTES:
         raise ValueError(f"Placement script is {size} bytes; too large for one Luau task")
     return script
+
+
+def lighting_script(m):
+    sun = (m.get("lighting") or {}).get("sun")
+    if not sun:
+        raise ValueError("manifest has no lighting.sun; re-run the export")
+    return LIGHTING.replace("%DATA%", lua_value({"sun": sun, "style": LIGHTING_STYLE}))
 
 
 def show(task):
@@ -560,7 +687,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--inspect", "--place"):
+    for flag in ("--check", "--upload", "--inspect", "--place", "--lighting"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -584,6 +711,9 @@ def main():
     cloud = PlaceCloud()
     if args.inspect:
         show(cloud.task(INSPECT))
+        return 0
+    if args.lighting:
+        show(cloud.task(lighting_script(m)))
         return 0
     problems = check(m, ids, need_ids=True)
     if problems:
