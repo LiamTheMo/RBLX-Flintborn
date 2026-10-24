@@ -21,6 +21,7 @@
 ## Cloud safeguards
 
 - Mappings derive from `default.project.json` and Rojo's `*.server.luau`, `*.client.luau`, `*.luau`, and `init.*` conventions.
+- JSON modules (`*.json`, except `*.project.json`, `*.meta.json` and `*.model.json`) map to ModuleScripts named after the file and are synced as the JSON converted to a Luau table; preflight and post-update checks compare against that converted Source.
 - Script mapping is **allowlisted** to `src/server`, `src/client`, and `src/shared` only. Asset folders and place structure never get uploaded by the cloud job.
 - All targets must already exist, be uniquely identifiable by hierarchy, match their expected script class, and expose readable Source.
 - A complete preflight finishes **before the first write**; errors stop the deployment without creating or deleting instances.

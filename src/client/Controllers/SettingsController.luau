@@ -42,8 +42,9 @@ local function viewportFactor(): number
 end
 
 -- Roblox's own touch controls (thumbstick, jump and action buttons) live in
--- PlayerGui too; they size themselves for the screen and must not shrink.
-local UNSCALED = { TouchGui = true }
+-- PlayerGui too; they size themselves for the screen and must not shrink. The
+-- in-world HUD fits itself to the screen and applies UiScale on its own.
+local UNSCALED = { TouchGui = true, FlintbornHud = true, FlintbornHudOverlay = true }
 
 local function applyScale()
 	local scale = (player:GetAttribute("UiScale") or 1) * viewportFactor()

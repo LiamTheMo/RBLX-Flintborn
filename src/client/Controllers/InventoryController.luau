@@ -2,7 +2,9 @@
 -- (GDD §25.4, §25.4.1). Tapping a hotbar slot equips a tool or weapon, uses a
 -- consumable, or places a workbench. In the backpack, tap one slot then another
 -- to move or swap (no precise dragging). Server snapshots are the only truth.
--- World place only.
+-- World place only. With the new HUD (HudMode) its own hotbar strip draws the
+-- slots, so this strip only shows while the backpack is open (to move items
+-- between hotbar and backpack), and the Backpack button lives in the nav bar.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -14,6 +16,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
@@ -22,6 +25,8 @@ local InventoryController = {}
 -- Fires (snapshot) whenever the server sends a new inventory.
 InventoryController.Changed = Signal.new()
 InventoryController.Snapshot = { slots = {}, equipped = nil }
+-- Fires (open) when the backpack opens or closes.
+InventoryController.BackpackToggled = Signal.new()
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -248,6 +253,7 @@ local function build()
 	ui.root = make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Visible = false }, gui)
 
 	local hotbar = make("Frame", {
+		Name = "Hotbar",
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.new(0.5, 0, 1, -12),
 		Size = UDim2.fromOffset(GameConstants.HOTBAR_SLOTS * 66, 62),
@@ -262,6 +268,8 @@ local function build()
 	for index = 1, GameConstants.HOTBAR_SLOTS do
 		makeSlot("hotbar", index, hotbar)
 	end
+	ui.hotbar = hotbar
+	hotbar.Visible = not HudMode.ReplacesLegacy()
 
 	ui.backpack = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 1),
@@ -337,6 +345,8 @@ local function build()
 	toggle.Activated:Connect(function()
 		InventoryController.ToggleBackpack()
 	end)
+	-- The new HUD's hotbar spans this spot; the nav bar keeps a Backpack button.
+	toggle.Visible = not HudMode.ReplacesLegacy()
 	-- Button and slot captions name the player's current keys.
 	local function relabel()
 		drop.Text = ("Drop (%s)"):format(Binds.Label("Drop"))
@@ -375,8 +385,12 @@ end
 function InventoryController.ToggleBackpack()
 	ui.backpack.Visible = not ui.backpack.Visible
 	ui.armorRow.Visible = ui.backpack.Visible
+	if HudMode.ReplacesLegacy() then
+		ui.hotbar.Visible = ui.backpack.Visible
+	end
 	selected = nil
 	InventoryController.Render()
+	InventoryController.BackpackToggled:Fire(ui.backpack.Visible)
 end
 
 local function bindKeys(active: boolean)
