@@ -12,6 +12,9 @@ unique mesh, palette.png, manifest.json). This script:
              spawn locations, an existing LobbyMap)
   --place    rebuild Workspace.LobbyMap in the lobby place from the manifest and
              the recorded ids, save the place, then verify it in a fresh session
+  --diagnose compare how Roblox stored a few meshes (vertex extremes, centroid,
+             winding, UV range) with the exported .glb files, plus the placed
+             parts' TextureID, to find import orientation or texture problems
   --lighting set the lobby's Lighting to match the Blender scene (sun angle and
              colour, ambient, atmosphere, bloom, colour grade, sun rays) and save
 
@@ -33,6 +36,7 @@ for --upload, and ROBLOX_UNIVERSE_ID with ROBLOX_PLACE_ID (the lobby) for
 import argparse
 import hashlib
 import json
+import struct
 import os
 import sys
 import threading
@@ -606,6 +610,82 @@ game:GetService("AssetService"):SavePlaceAsync({ SaveWithoutPublish = false })
 return HttpService:JSONEncode(report)
 '''
 
+DIAGNOSE = r'''
+local AssetService = game:GetService("AssetService")
+local HttpService = game:GetService("HttpService")
+local InsertService = game:GetService("InsertService")
+local parts = %DATA%
+local out = {}
+for name, id in parts do
+  local entry = {}
+  out[name] = entry
+  local ok, err = pcall(function()
+    local model = InsertService:LoadAsset(id)
+    local mesh = model:FindFirstChildWhichIsA("MeshPart", true)
+    entry.size = { mesh.Size.X, mesh.Size.Y, mesh.Size.Z }
+    entry.meshSize = { mesh.MeshSize.X, mesh.MeshSize.Y, mesh.MeshSize.Z }
+    entry.textureId = mesh.TextureID
+    local kids = {}
+    for _, d in model:GetDescendants() do table.insert(kids, d.ClassName .. ":" .. d.Name) end
+    entry.descendants = kids
+    local editable = AssetService:CreateEditableMeshAsync(mesh.MeshContent)
+    local verts = editable:GetVertices()
+    local sum, n = Vector3.zero, 0
+    local lo, hi = Vector3.new(math.huge, math.huge, math.huge), Vector3.new(-math.huge, -math.huge, -math.huge)
+    local far = {}
+    for _, v in verts do
+      local p = editable:GetPosition(v)
+      sum += p
+      n += 1
+      lo = lo:Min(p)
+      hi = hi:Max(p)
+    end
+    local c = sum / n
+    entry.vertices = n
+    entry.min = { lo.X, lo.Y, lo.Z }
+    entry.max = { hi.X, hi.Y, hi.Z }
+    entry.centroid = { c.X, c.Y, c.Z }
+    -- Mirroring flips winding: compare each face's geometric normal with its stored normals.
+    local agree, against = 0, 0
+    local faces = editable:GetFaces()
+    entry.faces = #faces
+    for i = 1, math.min(#faces, 400) do
+      local fv = editable:GetFaceVertices(faces[i])
+      local a, b, cc = editable:GetPosition(fv[1]), editable:GetPosition(fv[2]), editable:GetPosition(fv[3])
+      local geometric = (b - a):Cross(cc - a)
+      local normals = editable:GetFaceNormals(faces[i])
+      if #normals > 0 and geometric.Magnitude > 1e-9 then
+        if geometric:Dot(editable:GetNormal(normals[1])) >= 0 then agree += 1 else against += 1 end
+      end
+    end
+    entry.windingAgree = agree
+    entry.windingAgainst = against
+    local uvlo, uvhi = Vector2.new(math.huge, math.huge), Vector2.new(-math.huge, -math.huge)
+    local uvs = editable:GetUVs()
+    for i = 1, math.min(#uvs, 2000) do
+      local uv = editable:GetUV(uvs[i])
+      uvlo = uvlo:Min(uv)
+      uvhi = uvhi:Max(uv)
+    end
+    entry.uvs = #uvs
+    entry.uvMin = { uvlo.X, uvlo.Y }
+    entry.uvMax = { uvhi.X, uvhi.Y }
+  end)
+  if not ok then entry.error = tostring(err) end
+end
+local map = workspace:FindFirstChild("LobbyMap")
+local placed = {}
+if map then
+  for _, d in map:GetDescendants() do
+    if d:IsA("MeshPart") and parts[d.Name] and not placed[d.Name] then
+      placed[d.Name] = { textureId = d.TextureID, size = tostring(d.Size), cframe = tostring(d.CFrame),
+        material = d.Material.Name, color = d.Color:ToHex(), transparency = d.Transparency }
+    end
+  end
+end
+return HttpService:JSONEncode({ meshes = out, placed = placed, lighting = tostring(game:GetService("Lighting").Technology) })
+'''
+
 VERIFY = r'''
 local HttpService = game:GetService("HttpService")
 local CollectionService = game:GetService("CollectionService")
@@ -672,6 +752,36 @@ def lighting_script(m):
     return LIGHTING.replace("%DATA%", lua_value({"sun": sun, "style": LIGHTING_STYLE}))
 
 
+def glb_stats(path):
+    """Vertex extremes and centroid of a .glb's first primitive (glTF axes = Roblox axes)."""
+    data = path.read_bytes()
+    length = struct.unpack_from("<I", data, 12)[0]
+    doc = json.loads(data[20:20 + length])
+    binary = data[20 + length + 8:]
+    primitive = doc["meshes"][0]["primitives"][0]
+    accessor = doc["accessors"][primitive["attributes"]["POSITION"]]
+    view = doc["bufferViews"][accessor["bufferView"]]
+    offset = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+    count = accessor["count"]
+    points = [struct.unpack_from("<3f", binary, offset + 12 * i) for i in range(count)]
+    uv_acc = doc["accessors"][primitive["attributes"]["TEXCOORD_0"]]
+    uv_view = doc["bufferViews"][uv_acc["bufferView"]]
+    uv_off = uv_view.get("byteOffset", 0) + uv_acc.get("byteOffset", 0)
+    uvs = [struct.unpack_from("<2f", binary, uv_off + 8 * i) for i in range(uv_acc["count"])]
+    return {
+        "vertices": count,
+        "min": [round(min(p[i] for p in points), 3) for i in range(3)],
+        "max": [round(max(p[i] for p in points), 3) for i in range(3)],
+        "centroid": [round(sum(p[i] for p in points) / count, 3) for i in range(3)],
+        "uvMin": [round(min(u[i] for u in uvs), 3) for i in range(2)],
+        "uvMax": [round(max(u[i] for u in uvs), 3) for i in range(2)],
+    }
+
+
+DIAGNOSE_PARTS = ["Ground_Plateau_01", "Ground_DirtPlazaPaths_01", "VaultHall", "DeployGate", "CliffSection",
+                  "Barrel", "PalisadeSection", "LogBench"]
+
+
 def show(task):
     """Prints a task's JSON return value (or the raw output if it is not JSON)."""
     output = task.get("output") or {}
@@ -687,7 +797,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--inspect", "--place", "--lighting"):
+    for flag in ("--check", "--upload", "--inspect", "--place", "--lighting", "--diagnose"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -711,6 +821,13 @@ def main():
     cloud = PlaceCloud()
     if args.inspect:
         show(cloud.task(INSPECT))
+        return 0
+    if args.diagnose:
+        names = [n for n in DIAGNOSE_PARTS if n in m["parts"] and n in ids["models"]]
+        for name in names:
+            print(name, "EXPORT", json.dumps(glb_stats(EXPORT / m["parts"][name]["file"])), flush=True)
+        script = DIAGNOSE.replace("%DATA%", lua_value({n: ids["models"][n]["id"] for n in names}))
+        show(cloud.task(script))
         return 0
     if args.lighting:
         show(cloud.task(lighting_script(m)))
