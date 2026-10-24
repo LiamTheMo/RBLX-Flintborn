@@ -196,7 +196,19 @@ def main(argv=None):
     mode.add_argument("--upload", action="store_true", help="upload for real and write UiAssetIds.json")
     parser.add_argument("--only", default="", help="comma-separated sprite names to consider")
     parser.add_argument("--sprites", action="store_true", help="regenerate UiSprites.json from the manifest")
+    parser.add_argument("--inspect", default="", help="print Open Cloud details for an asset id and exit")
     args = parser.parse_args(argv)
+
+    if args.inspect:
+        key = os.environ.get("ROBLOX_API_KEY", "").strip()
+        cloud = Cloud(key, None)
+        for url in (f"{ASSETS_URL}/{args.inspect}", f"{ASSETS_URL}/{args.inspect}?readMask=*"):
+            try:
+                print(url, json.dumps(cloud._send(urllib.request.Request(url, headers={"x-api-key": key})), indent=1))
+            except RuntimeError as exc:
+                print(url, "->", exc)
+        print("image lookup:", cloud.image_id(int(args.inspect)))
+        return 0
 
     if args.sprites:
         sync_sprites()
