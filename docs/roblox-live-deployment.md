@@ -40,6 +40,11 @@ else (pull requests, version branches, minor branches) ever publishes.
   collisions, creates **only missing code instances inside approved roots**,
   updates only source, calls `AssetService:SavePlaceAsync({SaveWithoutPublish=false})`,
   then separately checks code in Roblox's latest published place.
+- JSON modules (`*.json` under the approved roots, except `*.project.json`,
+  `*.meta.json` and `*.model.json`) are published as ModuleScripts named after
+  the file, whose Source is the JSON converted to a Luau table (`return {...}`),
+  as Rojo does. Publish and verify both compare against that converted Source.
+  The JSON must be strict: comments or trailing commas stop the release.
 - Entirely Studio-managed world geometry, terrain, models, lighting, and UI
   objects are **never targeted**. However, the headless task loads the live
   game: any startup scripts that modify the world can still have side effects
