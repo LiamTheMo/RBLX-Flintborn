@@ -323,6 +323,11 @@ local function group(name)
   return groups[name]
 end
 
+-- Roblox's glTF import turns every mesh half a turn about Y relative to the
+-- file: a vertex at (x, y, z) is stored at (-x, y, -z) (measured with
+-- --diagnose; nothing is mirrored). Each placement turns it back.
+local IMPORT_TURN = CFrame.Angles(0, math.pi, 0)
+
 local placed = 0
 for line in string.gmatch(data.instances, "[^\n]+") do
   local fields = string.split(line, "|")
@@ -333,7 +338,7 @@ for line in string.gmatch(data.instances, "[^\n]+") do
   if source then
     local part = source:Clone()
     part.Size = Vector3.new(n[13], n[14], n[15])
-    part.CFrame = CFrame.new(n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12])
+    part.CFrame = CFrame.new(n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8], n[9], n[10], n[11], n[12]) * IMPORT_TURN
     part.Parent = group(profileName)
     placed += 1
   end
@@ -707,10 +712,30 @@ local enabledSpawns = 0
 for _, d in workspace:GetDescendants() do
   if d:IsA("SpawnLocation") and d.Enabled then enabledSpawns += 1 end
 end
+-- The floor: raycast the ground parts at the export's probe points and compare
+-- the hit height with the Blender surface (a turned or missing chunk misses or
+-- lands far off).
+local probes = %PROBES%
+local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Include
+params.FilterDescendantsInstances = { map:FindFirstChild("ground") }
+local floor = { probes = #probes, within1 = 0, within3 = 0, missed = 0, worst = {} }
+for _, p in probes do
+  local hit = workspace:Raycast(Vector3.new(p[1], 300, p[3]), Vector3.new(0, -600, 0), params)
+  if not hit then
+    floor.missed += 1
+    table.insert(floor.worst, { p[1], p[3], "miss" })
+  else
+    local off = math.abs(hit.Position.Y - p[2])
+    if off <= 1 then floor.within1 += 1 end
+    if off <= 3 then floor.within3 += 1 else table.insert(floor.worst, { p[1], p[3], off, hit.Instance.Name }) end
+  end
+end
+while #floor.worst > 12 do table.remove(floor.worst) end
 return HttpService:JSONEncode({ version = map:GetAttribute("ExportSha1"), folders = counts, meshParts = meshParts,
   untextured = untextured, arrival = #CollectionService:GetTagged("LobbyArrival"),
   deployGate = #CollectionService:GetTagged("DeployGate"), npcSpots = #CollectionService:GetTagged("LobbyNPCSpot"),
-  enabledSpawns = enabledSpawns })
+  enabledSpawns = enabledSpawns, floor = floor })
 '''
 
 
@@ -838,7 +863,7 @@ def main():
     script = place_script(m, ids)
     print(f"Placement script: {len(script.encode('utf-8')) / 1e6:.2f} MB", flush=True)
     show(cloud.task(script))
-    show(cloud.task(VERIFY))
+    show(cloud.task(VERIFY.replace("%PROBES%", lua_value(m.get("groundProbes", [])))))
     return 0
 
 
