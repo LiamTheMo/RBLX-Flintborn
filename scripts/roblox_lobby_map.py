@@ -683,7 +683,7 @@ if map then
     end
   end
 end
-return HttpService:JSONEncode({ meshes = out, placed = placed, lighting = tostring(game:GetService("Lighting").Technology) })
+return HttpService:JSONEncode({ meshes = out, placed = placed })
 '''
 
 VERIFY = r'''
