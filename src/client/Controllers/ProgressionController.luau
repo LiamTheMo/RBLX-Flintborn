@@ -4,7 +4,6 @@
 -- words before confirming) and the perk shop. In the world the new HUD (HudMode)
 -- draws the level bar from Changed/View() and hosts the pop-ups (MountPopups).
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,6 +14,7 @@ local ProgressionRules = require(ReplicatedStorage.Shared.Progression.Progressio
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local ProgressionController = {}
 
@@ -394,12 +394,12 @@ function ProgressionController.Start()
 			updateBar()
 		end
 	end)
-	ContextActionService:BindAction("FlintbornProgression", function(_, state)
+	Binds.Bind("Progression", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			ProgressionController.Toggle()
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.P, Enum.KeyCode.ButtonSelect)
+	end)
 end
 
 return ProgressionController

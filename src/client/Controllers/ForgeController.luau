@@ -1,9 +1,8 @@
--- Ancestral Forge (GDD §15–16, §25.3). F (or DPadDown) opens the recipe browser in
+-- Ancestral Forge (GDD §15–16, §25.3). The Forge navigation button opens the recipe browser in
 -- the lobby. Counts are vault-only Owned/Needed; locked recipes show what unlocks
 -- them. A Permanent conversion asks for confirmation naming the exact item and the
 -- Permanent rules before anything is spent. Lobby place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -303,12 +302,6 @@ function ForgeController.Start()
 		return
 	end
 	build()
-	ContextActionService:BindAction("FlintbornForge", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			ForgeController.Toggle()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.F, Enum.KeyCode.DPadDown)
 end
 
 return ForgeController

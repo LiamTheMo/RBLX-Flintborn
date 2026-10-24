@@ -1,10 +1,9 @@
--- Lobby vault and lobby backpack (GDD §10.3, §25.2). G (or DPadRight) opens the
+-- Lobby vault and lobby backpack (GDD §10.3, §25.2). The Vault button on the navigation bar opens the
 -- panel: click a backpack item to deposit it or a vault item to withdraw it.
 -- Vault materials are listed only: they never leave the lobby (GDD §45). The
 -- latest extraction receipt shows on arrival.
 -- Lobby place only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -274,12 +273,6 @@ function VaultController.Start()
 	end
 	build()
 	Remotes.Get("ExtractionReceipt").OnClientEvent:Connect(showReceipt)
-	ContextActionService:BindAction("FlintbornVault", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			VaultController.Toggle()
-		end
-		return Enum.ContextActionResult.Pass
-	end, false, Enum.KeyCode.G, Enum.KeyCode.DPadRight)
 end
 
 return VaultController

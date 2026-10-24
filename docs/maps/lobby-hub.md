@@ -1,7 +1,7 @@
 # Lobby hub — map design
 
-> **Status:** Draft 0.2 (2026-10-23). The station list and flow follow confirmed GDD rules, including owner answers Q166–Q169 (GDD §46). **The geometry is provisional** until the owner supplies a reference image.
-> **GDD sources:** §2.1, §9.1–9.2, §10, §16.1–16.2, §16.8, §25.1–25.2, §25.4.1, §31, §33, §36.3–36.5, §45, §46, Q24, Q80, Q98, Q105, Q155, Q161c, Q163, Q164
+> **Status:** Draft 0.2 (2026-10-23). The station list and flow follow confirmed GDD rules, including owner answers Q166–Q169 (GDD §48). **The geometry is provisional** until the owner supplies a reference image.
+> **GDD sources:** §2.1, §9.1–9.2, §10, §16.1–16.2, §16.8, §25.1–25.2, §25.4.1, §31, §33, §36.3–36.5, §45, §46, §48, Q24, Q80, Q98, Q105, Q155, Q161c, Q163, Q164
 
 The GDD is the source of truth. If this document disagrees with it, the GDD wins and this document must be corrected.
 
@@ -9,7 +9,7 @@ The GDD is the source of truth. If this document disagrees with it, the GDD wins
 
 The lobby is the **secure hub** between runs, and its own place in the universe (Q163). Players arrive here after an extraction or a death, settle their loot, craft and trade safely, party up and deploy into a public world. Nothing in the lobby is ever at risk (`LobbySafe`, §31.2).
 
-**Current build:** the shipped lobby (v0.03–v0.18) is menu-driven: every station is a panel opened from the hub menu or a hotkey (for example G for the vault, F for the Forge). This document designs the **physical hub** those panels live in. Because a menu can open every station from anywhere (Q167), the physical stations are landmarks and walk-up shortcuts, never gates.
+**Current build:** the shipped lobby (v0.03–v0.18) is menu-driven: every station is a panel opened from the hub menu (the lobby navigation buttons; lobby panels have no keyboard keys, GDD §46). This document designs the **physical hub** those panels live in. Because a menu can open every station from anywhere (Q167), the physical stations are landmarks and walk-up shortcuts, never gates.
 
 The hub is **small on purpose**. It is a place to pass through, not to explore.
 
@@ -92,7 +92,7 @@ A walk-up prompt opens the same panel as the hub menu; it adds no new server pat
 
 **Automated checks (when the map exists):** every `LobbyStation` id above is tagged exactly once (`TradeStone` may repeat), at least one `LobbyArrival` and one `DeployGate` exist, and no world-only tag is present.
 
-## Owner answers (GDD §46)
+## Owner answers (GDD §48)
 
 | # | Confirmed decision | Map consequence |
 | --- | --- | --- |

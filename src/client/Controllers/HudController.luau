@@ -32,6 +32,7 @@ local Layout = require(Hud.Layout)
 local ObjectivePanel = require(Hud.ObjectivePanel)
 local PartyFrames = require(Hud.PartyFrames)
 local Vitals = require(Hud.Vitals)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local HudController = {}
@@ -52,20 +53,30 @@ HudController.DEFAULT_ZONE_RADIUS = 10
 HudController.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
 
 -- The right bumper steps the selection forward, wrapping. The left bumper is left to
--- InventoryController's Drop, so one press never does two things.
+-- InventoryController's Drop, so one press never does two things. Gamepad buttons
+-- are fixed (GDD §46), so this one is not rebindable.
 local HOTBAR_STEP_KEYS = { [Enum.KeyCode.ButtonR1] = 1 }
 
-local HOTBAR_KEYS = {
-	Enum.KeyCode.One,
-	Enum.KeyCode.Two,
-	Enum.KeyCode.Three,
-	Enum.KeyCode.Four,
-	Enum.KeyCode.Five,
-	Enum.KeyCode.Six,
-	Enum.KeyCode.Seven,
-	Enum.KeyCode.Eight,
-	Enum.KeyCode.Nine,
-}
+-- The keyboard keys that select each slot: the player's Hotbar1–9 binds (1–9 by
+-- default, rebindable in Settings, GDD §46).
+local function hotbarKeys(count: number): { [Enum.KeyCode]: number }
+	local keys = {}
+	for index = 1, count do
+		local key = Binds.Key("Hotbar" .. index)
+		if key then
+			keys[key] = index
+		end
+	end
+	return keys
+end
+
+local function hotbarLabels(count: number): { string }
+	local labels = {}
+	for index = 1, count do
+		labels[index] = Binds.Label("Hotbar" .. index)
+	end
+	return labels
+end
 
 local player = Players.LocalPlayer
 local layout = nil
@@ -374,16 +385,21 @@ local function bindHotbar(active: boolean)
 		ContextActionService:UnbindAction("FlintbornHudHotbar")
 		return
 	end
-	-- Above InventoryController's bindings and passing every key on, so the number
+	-- Above InventoryController's bindings and passing every key on, so the hotbar
 	-- keys still use their slot, as before. Bound at Medium so build mode's
 	-- High-priority placement (ButtonR1) sinks the bumper before it reaches us.
-	local keys = table.clone(HOTBAR_KEYS)
+	-- Rebinding in Settings re-runs this with the new keys (Binds.Changed).
+	local slotKeys = hotbarKeys(layout.bottom.hotbar.count)
+	local keys = {}
+	for key in slotKeys do
+		table.insert(keys, key)
+	end
 	for key in HOTBAR_STEP_KEYS do
 		table.insert(keys, key)
 	end
 	ContextActionService:BindActionAtPriority("FlintbornHudHotbar", function(_, state, input)
 		if state == Enum.UserInputState.Begin then
-			local index = table.find(HOTBAR_KEYS, input.KeyCode)
+			local index = slotKeys[input.KeyCode]
 			local step = HOTBAR_STEP_KEYS[input.KeyCode]
 			if index then
 				selectSlot(index)
@@ -496,10 +512,19 @@ function HudController.Start()
 	end
 	ProgressionController.MountPopups(widgets.popups)
 
-	-- Hotbar: selection only, from keys 1–9, taps and the gamepad bumpers. Taps
-	-- never use items. The mouse wheel stays on camera zoom (GDD Q58).
+	-- Hotbar: selection only, from the Hotbar1–9 binds (keys 1–9 by default), taps
+	-- and the right gamepad bumper. Taps never use items. The mouse wheel stays on
+	-- camera zoom (GDD Q58). Slot numbers name the bound keys and follow rebinds.
 	selectSlot(HudController.Selected)
 	widgets.bottom.SlotPressed:Connect(selectSlot)
+	widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))
+	Binds.Changed:Connect(function()
+		widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))
+		if hotbarBound then
+			hotbarBound = false
+			bindHotbar(true)
+		end
+	end)
 	-- The backpack view uses the old strip to move items, so it takes the spot.
 	InventoryController.BackpackToggled:Connect(function(open)
 		widgets.bottom.hotbar.Visible = not open

@@ -1,10 +1,12 @@
 -- Custom ProximityPrompt look (GDD §11): the game's prompts switch to
 -- Style = Custom on this client, and each shown prompt draws a rope-framed
--- panel with a keycap (E, the gamepad button, or TAP), ActionText as the title
--- and ObjectText as the subtitle, plus a hold bar for timed prompts. Touch and
--- click call InputHoldBegin/End; the server still validates every trigger. Roblox
--- re-shows a prompt with the new input type when the player switches input, so
--- the keycap follows keyboard, gamepad and touch.
+-- panel with a keycap (the prompt's key, the gamepad button, or TAP), ActionText
+-- as the title and ObjectText as the subtitle, plus a hold bar for timed prompts.
+-- Touch and click call InputHoldBegin/End; the server still validates every
+-- trigger. Roblox re-shows a prompt with the new input type when the player
+-- switches input, so the keycap follows keyboard, gamepad and touch. Binds
+-- retargets prompts authored on E to the player's Interact key (F by default,
+-- GDD §46), and the keycap redraws whenever that key is rebound.
 
 local Players = game:GetService("Players")
 local ProximityPromptService = game:GetService("ProximityPromptService")
@@ -12,6 +14,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 local Layout = require(script.Parent.Layout)
 local Widgets = require(script.Parent.Widgets)
 
@@ -48,7 +51,10 @@ local function keyName(prompt: ProximityPrompt, inputType: Enum.ProximityPromptI
 	elseif inputType == Enum.ProximityPromptInputType.Gamepad then
 		return HudModel.KeyLabel("Gamepad", prompt.GamepadKeyCode.Name)
 	end
-	return HudModel.KeyLabel("Keyboard", prompt.KeyboardKeyCode.Name)
+	-- Binds keeps KeyboardKeyCode on the current Interact key (or a second
+	-- choice's own key), so the keycap reads the prompt's live key.
+	local interact = Binds.Key("Interact")
+	return HudModel.KeyLabel("Keyboard", prompt.KeyboardKeyCode.Name, interact and interact.Name)
 end
 
 local function build(prompt: ProximityPrompt, inputType: Enum.ProximityPromptInputType, scale: number)
@@ -139,6 +145,8 @@ local function build(prompt: ProximityPrompt, inputType: Enum.ProximityPromptInp
 	for _, property in { "ActionText", "ObjectText", "HoldDuration", "KeyboardKeyCode", "GamepadKeyCode" } do
 		table.insert(connections, prompt:GetPropertyChangedSignal(property):Connect(refresh))
 	end
+	-- A rebind in Settings retargets the prompt first, then fires Changed.
+	table.insert(connections, Binds.Changed:Connect(refresh))
 	Widgets.SetBar(hold, 0, true)
 	local function holdBegan()
 		if prompt.HoldDuration <= 0 then

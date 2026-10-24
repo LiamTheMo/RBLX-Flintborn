@@ -78,7 +78,7 @@ function BottomBar.new(parent: Instance, layout)
 		local frame = Widgets.Frame(hotbarCfg.frame, slotRect, slot, hotbarCfg.sliceScale, hotbarCfg.frameOutset)
 		frame.ZIndex = 2
 		local ring = Widgets.SelectionRing(cfg.selected, slot)
-		Widgets.Text(cfg.slotNumber, {
+		local number = Widgets.Text(cfg.slotNumber, {
 			Name = "Number",
 			Text = tostring(index),
 			Position = Layout.Position(cfg.slotNumber.rect),
@@ -89,9 +89,19 @@ function BottomBar.new(parent: Instance, layout)
 		slot.Activated:Connect(function()
 			self.SlotPressed:Fire(index)
 		end)
-		self.slots[index] = { button = slot, ring = ring }
+		self.slots[index] = { button = slot, ring = ring, number = number }
 	end
 	return self
+end
+
+-- labels[index]: the key that selects each slot ("1", or a rebound key).
+function BottomBar:SetSlotLabels(labels: { string })
+	for index, slot in self.slots do
+		local text = labels[index] or tostring(index)
+		slot.number.Text = text
+		-- A long key name ("Right Shift") shrinks to fit the slot corner.
+		slot.number.TextScaled = #text > 2
+	end
 end
 
 function BottomBar:Select(index: number)

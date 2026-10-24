@@ -3,6 +3,8 @@
 -- and the objective/event text. No Instances here, so the headless specs and the
 -- HUD share one definition. The HUD only displays; the server owns every value.
 
+local Keybinds = require(script.Parent.Parent.Settings.Keybinds)
+
 local HudModel = {}
 
 -- Roblox studs to metres for player-facing distances.
@@ -176,7 +178,8 @@ function HudModel.SliceScale(width: number, height: number, targetWidth: number,
 	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1)
 end
 
--- Next hotbar slot for a scroll step (wheel down = +1), wrapping around.
+-- Next hotbar slot for a step (the right bumper = +1), wrapping around. The mouse
+-- wheel never steps the hotbar: it stays on camera zoom.
 function HudModel.HotbarStep(current: number, step: number, count: number): number
 	return ((current - 1 + step) % count) + 1
 end
@@ -203,14 +206,19 @@ local KEY_NAMES = {
 }
 
 -- The keycap text for a prompt: the keyboard key, the gamepad button, or TAP.
-function HudModel.KeyLabel(inputType: string, keyName: string?): string
+-- A keyboard prompt without a key reads `fallbackKey` (the player's bound
+-- Interact key), or else the default Interact key (Keybinds, GDD §46).
+function HudModel.KeyLabel(inputType: string, keyName: string?, fallbackKey: string?): string
 	if inputType == "Touch" then
 		return "TAP"
 	end
 	if keyName == nil or keyName == "" or keyName == "Unknown" then
-		return if inputType == "Gamepad" then "X" else "E"
+		if inputType == "Gamepad" then
+			return "X"
+		end
+		keyName = fallbackKey or Keybinds.Get("Interact").default
 	end
-	return KEY_NAMES[keyName] or keyName
+	return KEY_NAMES[keyName] or Keybinds.Display(keyName :: string)
 end
 
 -- Medicine lock, pending food healing, hunger slow and crouching: what only the
