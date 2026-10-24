@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.14  
-> **Last updated:** 2026-10-23  
+> **Design revision:** 1.15  
+> **Last updated:** 2026-10-24  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -69,7 +69,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 ### 1.2 Design guardrails — Proposed
 
-- Survival meters at launch are **health, stamina and food only**. **Base maximum HP: 100** (can increase through approved upgrades/gear). **Full sprint duration: 3 seconds**, then **5 seconds for full stamina recovery**. **Full food meter depletes to empty in 5 minutes** (baseline), and food **below 25% slows movement by 10%**. No thirst, temperature or weather-exposure survival meters.
+- Survival meters at launch are **health, stamina and food only**. **Base maximum HP: 100** (can increase through approved upgrades/gear). **Full sprint duration: 3 seconds**, then **5 seconds for full stamina recovery**. **Full food meter depletes to empty in 60 minutes** (baseline, §49), and food **below 25% slows movement by 10%**. No thirst, temperature or weather-exposure survival meters.
 - Avoid a “rich get richer” lockout where fresh spawns cannot make progress.
 - Prioritize readable telegraphs and counterplay over surprise one-hit kills.
 - **Confirmed monetization rule:** All paid benefits must have an **earnable in-game currency/resource path** given enough playtime, even if monetization goes beyond cosmetics/convenience. Avoid unbounded pay-to-win advantage, and preserve contested rare-item gameplay; exact perk caps and native Roblox purchase feasibility are Open.
@@ -176,7 +176,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Ammunition | **Every arrow recipe crafts 10 arrows**, with better material tiers optionally increasing damage; slow physical projectiles |
 | Armor | **Head**, **Chest** and combined **Legs/Boots** are the only three armor slots; gear lasts indefinitely, no shields |
 | Medical items | Basic **+10 HP**, advanced **+25 HP**, potion **+50 HP** immediately (capped at current max), followed by varying animation durations as the reuse cooldown |
-| Food | Food meter drains from full to zero in **5 minutes**; below **25%** slows movement **10%**. Eating produces food-dependent healing over **10 seconds**, halved on hits, with small remainder cutoff |
+| Food | Food meter drains from full to zero in **60 minutes** (§49); below **25%** slows movement **10%**. Eating produces food-dependent healing over **10 seconds**, halved on hits, with small remainder cutoff |
 | Utility | Torches, storage supplies, farm tools, primitive traps and other nonmagical gear |
 | Building | Placeable shelters/doors/storage/totems/farms and functional stations; initial wood, stone and iron tiers |
 | Future (not launch) | Elemental spells, enchanted combat weapons, special defensive resistances and any charge/mana subsystem |
@@ -185,7 +185,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
 - **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. **Recovery stops the moment a sprint starts and resumes 3 seconds after it ends (§47).** Sprint speed and stamina UI granularity remain Open.
-- **Food:** A full food meter falls from **100% to 0% over 300 seconds (5 minutes)** under the baseline drain. **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
+- **Food:** A full food meter falls from **100% to 0% over 3,600 seconds (60 minutes)** under the baseline drain (§49; was 5 minutes). **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
 ### 4.4 Recipes and Permanent equipment
@@ -251,7 +251,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
 - **Food:** Every food grants its item-specific healing total over **10 seconds**; each damaging hit halves the *remaining unapplied* healing, cancelling it if the post-hit remainder is **≤10 HP**. Previously healed HP is not taken away by this cancellation rule.
-- **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **5 minutes** to go from full to empty; below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
+- **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **60 minutes** to go from full to empty (§49); below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
 - **Downed (Q159):** Players may only **crawl very slowly**; no medicine, food or other healing, and any running food HoT is cleared on downing. Pending revive and death rules supersede all other inputs.
 
 ### 5.5 Combat integrity and spawn safety
@@ -845,7 +845,7 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 - **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; **recovery waits 3 seconds after a sprint ends (§47)**; partial-sprint behavior, pace and speed remain Open.
 - **Crouching:** Low profile/stealth/movement choice; does not consume stamina. Sprinting and crouch interactions are implementation choices.
 - **Medicine:** Basic **+10 HP** with **0.5s animation**, advanced **+25 HP** with **1.0s animation**, potion **+50 HP** with **1.5s animation**. Healing applies **immediately**, then the animation is the **ONLY cooldown**; another medical use is prohibited until animation completes. The server blocks replayed/parallel remotes, including latency abuse. No additional hidden cooldown.
-- **Food:** Full meter decays in **5 minutes**; below **25%** gives **−10% speed**. **Accepted starter food examples (Q137):** Berries replenish **10% of hunger and heal 10 HP over 10 seconds**; Cooked Meat replenishes **35% hunger and heals 30 HP over 10 seconds**. Actual launch recipe/catalog still subject to naming. Each damaging hit halves pending food healing; if new remaining heal ≤10 HP, cancel it entirely.
+- **Food:** Full meter decays in **60 minutes** (§49); below **25%** gives **−10% speed**. **Accepted starter food examples (Q137):** Berries replenish **10% of hunger and heal 10 HP over 10 seconds**; Cooked Meat replenishes **35% hunger and heals 30 HP over 10 seconds**. Actual launch recipe/catalog still subject to naming. Each damaging hit halves pending food healing; if new remaining heal ≤10 HP, cancel it entirely.
 - **Armor:** Armor modifies **effective HP (EHP)** using a multiplier, not direct flat damage reduction: **EHP = current HP × armor factor** and damage applies to EHP; convert back to displayed actual HP (§21.5). Early armor multipliers are slightly different but visibly useful. Equipment remains indefinitely durable; magical/special resistance is future-only.
 - **No player magic/shields:** Skeletons, elementals and other mythical adversaries remain enemy content; magic attacks, magical barriers and dodge/stamina combos are out of launch scope.
 
@@ -1734,7 +1734,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | --- | --- | --- | --- |
 | **61** | Health | **100 base max HP**; equipment and approved upgrades can raise max HP | Bonus source/stat caps and gear interactions |
 | **62** | Sprint | **3 seconds sprint on full bar; 5 seconds recovery from empty to full**; stamina used only for sprint | Regen delay, rates after partial sprint, actual sprint speed |
-| **63** | Food | Full food meter **100% → 0% in 5 minutes**; **below 25% food** gives **−10% movement speed** | Refills, exact drain exceptions, zero-food additional effects |
+| **63** | Food | Full food meter **100% → 0% in 60 minutes** (§49; was 5 minutes); **below 25% food** gives **−10% movement speed** | Refills, exact drain exceptions, zero-food additional effects |
 | **64** | Instant medicine | **Basic +10 HP**, **advanced +25 HP**, **potion +50 HP**; immediately applied, then varying animation cooldowns | **Q135:** 0.5/1.0/1.5 s; mobility during cooldown Open |
 | **65** | Food HoT | Food-dependent total healing **over 10 seconds**. On each damage event, remaining HoT cut by **50%**; if *post-cut remainder ≤10 HP*, clear it completely | Food catalog/totals, overlapping food HoTs, tick granularity |
 | **66** | Early melee | **Rock 5 raw damage per hit with high attack speed**; **wooden spear ~15** slower/longer range; **stone spear ~25** | Spear values tentative; cooldowns set by Q133; reach Open |
@@ -1800,7 +1800,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 
 1. Full HP defaults to **100**, but valid account/gear upgrades raise maximum HP; medicine cannot exceed the current modified max HP.
 2. Full sprint runs **3 seconds**, stamina from empty fully returns in **5 seconds**; combat/crouching/gathering spend no stamina.
-3. At food exactly 25%, the **below-25%** speed penalty has not yet triggered; 24.99% triggers **10% movement slow**; full meter empties in **300 seconds**.
+3. At food exactly 25%, the **below-25%** speed penalty has not yet triggered; 24.99% triggers **10% movement slow**; full meter empties in **3,600 seconds** (§49).
 4. Basic medicine immediately heals **10**, advanced **25**, potion **50**, followed by tier-specific animation/reuse lock. Spammed remotes do not repeat healing.
 5. Food HoT completes after **10 seconds** absent hits, with food-dependent total. A hit halves remaining heal, and if post-hit remainder ≤10 HP, cancel rest, without retroactive health loss.
 6. Rock deals **5 raw damage**, tentative wooden spear **~15** and stone spear **~25**; armor multiplies EHP rather than flat damage reduction. Actual HP/EHP conversion remains consistent for attack, heal and downed finishes.
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
 | **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
 | **1.13** | 2026-10-23 | Owner decided stamina recovery stops when a sprint starts and resumes 3 seconds after it ends, and reported walking after releasing sprint still draining stamina (fixed: pace is now judged over a full second against the allowed speed). Added §47. |
 | **1.12** | 2026-10-23 | Owner changed Interact to **F** and removed the lobby panel keys (vault, Forge, market, trade): those panels open from the lobby navigation buttons. Updated §46. |
@@ -2272,6 +2273,20 @@ Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft 
 **QA:** a 21st player joining a full lobby server is placed in another lobby server; every lobby station opens from the hub menu at any position; a trade request reaches any player in the same lobby server; a weapon swung or an arrow fired in the lobby damages nothing.
 
 **Still Open:** the lobby hub's setting and look (Q170, pending the owner's reference image) and the Deploy gate's form (Q171). See `docs/maps/lobby-hub.md`.
+
+## 49. Owner change: food drain and HUD feedback (2026-10-24)
+
+**Food:** a full food meter now drains from **100% to 0% over 60 minutes** (3,600 s), replacing the 5-minute baseline. The below-25% slow (−10% movement speed) and every other food rule are unchanged, so a player now reaches the slow after 45 minutes without eating.
+
+**HUD feedback** (in-world HUD, §11 and §25.4):
+
+- At maximum, the Health, Stamina and Food bars fill their whole track; the number sits beside the bar.
+- Hotbar keys (1–9 by default, §46) select slots again. The inventory's key handler waited on the server before passing the key on, which Roblox treats as consuming it.
+- Hotbar slots match the owner's reference: about 88 px squares with clear gaps. The selected slot uses the sheet's glowing cyan slot frame.
+- All HUD text uses the rounded **Fredoka One** font.
+- Bar fills, rope frames and panels show the reference colours. The bar shine had darkened and oversaturated each fill, a brown tint darkened the rope, and panels were bluish rather than charcoal.
+
+**QA:** with full food, wait 30 minutes and the meter reads 50; at full health, stamina and food each bar reaches the end of its track; press 1, 2 and 3 in a run and the cyan frame moves to that slot; the rest of the HUD matches the owner's reference screenshot.
 
 ---
 

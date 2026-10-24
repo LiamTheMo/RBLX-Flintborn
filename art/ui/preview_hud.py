@@ -426,8 +426,7 @@ def place(entry, size=None):
 def draw_frame(name, x, y, w, h, scale_override=None, outset=None):
     # Widgets.Frame: the sprite is drawn larger so its rails land on the rect.
     l, t, r, b = outset or layout.get("frameOutset", [0, 0, 0, 0])
-    draw_sprite(name, x - l, y - t, w + l + r, h + t + b, scale_override=scale_override,
-                tint=layout.get("frameTint"))
+    draw_sprite(name, x - l, y - t, w + l + r, h + t + b, scale_override=scale_override)
 
 
 def panel(cfg, x, y, w, h):
@@ -595,12 +594,10 @@ def draw_vitals(preview):
         text(cfg["value"], value, x + cfg["value"]["right"] - vw, y + top, vw, cfg["rowHeight"], align="right")
 
 
-def draw_selection(cfg, sx, sy):
-    rx, ry, rw, rh = cfg["rect"]
-    color = hex_color(cfg["color"])[:3]
-    glow = cfg["glow"]
-    stroke_rrect(sx + rx - glow / 2, sy + ry - glow / 2, rw + glow, rh + glow, cfg["radius"] + glow / 2, glow, color, 0.3)
-    stroke_rrect(sx + rx, sy + ry, rw, rh, cfg["radius"], cfg["thickness"], color, 1)
+def draw_selection(cfg, sx, sy, sw, sh):
+    # Widgets.SelectionRing: the glowing slot frame over the slot, untinted.
+    l, t, r, b = cfg.get("frameOutset") or layout.get("frameOutset", [0, 0, 0, 0])
+    draw_sprite(cfg["sprite"], sx - l, sy - t, sw + l + r, sh + t + b, scale_override=cfg.get("sliceScale"))
 
 
 def draw_bottom(preview):
@@ -624,7 +621,7 @@ def draw_bottom(preview):
         sy = y + hot["y"]
         draw_frame(hot["frame"], sx, sy, sw, sh, hot.get("sliceScale"), hot.get("frameOutset"))
         if index + 1 == preview["selectedSlot"]:
-            draw_selection(cfg["selected"], sx, sy)
+            draw_selection(cfg["selected"], sx, sy, sw, sh)
         nx, ny, nw, nh = number["rect"]
         text(number, str(index + 1), sx + nx, sy + ny, nw, nh)
 
