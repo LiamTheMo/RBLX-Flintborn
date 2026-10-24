@@ -405,7 +405,9 @@ local function bindKeys(active: boolean)
 	for index = 1, 9 do
 		Binds.Bind("Hotbar" .. index, function(_, state)
 			if state == Enum.UserInputState.Begin then
-				activateHotbar(index)
+				-- Spawned: activating calls the server, and a handler that yields
+				-- counts as sinking the key, so the HUD hotbar would never see it.
+				task.spawn(activateHotbar, index)
 			end
 			return Enum.ContextActionResult.Pass
 		end)

@@ -385,9 +385,10 @@ local function bindHotbar(active: boolean)
 		ContextActionService:UnbindAction("FlintbornHudHotbar")
 		return
 	end
-	-- Above InventoryController's bindings and passing every key on, so the hotbar
-	-- keys still use their slot, as before. Bound at Medium so build mode's
-	-- High-priority placement (ButtonR1) sinks the bumper before it reaches us.
+	-- One step above InventoryController's bindings (Medium, rebound often, so
+	-- otherwise usually first) and passing every key on, so the hotbar keys still
+	-- use their slot, as before. Below High, so build mode's placement (ButtonR1)
+	-- sinks the bumper before it reaches us.
 	-- Rebinding in Settings re-runs this with the new keys (Binds.Changed).
 	local slotKeys = hotbarKeys(layout.bottom.hotbar.count)
 	local keys = {}
@@ -408,7 +409,7 @@ local function bindHotbar(active: boolean)
 			end
 		end
 		return Enum.ContextActionResult.Pass
-	end, false, Enum.ContextActionPriority.Medium.Value, table.unpack(keys))
+	end, false, Enum.ContextActionPriority.Medium.Value + 1, table.unpack(keys))
 end
 
 -- Build ------------------------------------------------------------------------
