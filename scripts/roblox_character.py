@@ -15,7 +15,8 @@ maps, ten tribe pants colours, the face). This script:
   --probe    report what the installed character wears in ROBLOX_PLACE_ID
   --install  in the place ROBLOX_PLACE_ID: build StarterPlayer.StarterCharacter
              (an R6 rig: HumanoidRootPart, the six rounded MeshParts, Humanoid
-             RigType R6, Roblox's default Motor6Ds, the face decal, and the
+             RigType R6, Roblox's default R6 Motor6Ds (the Neck's C1 seats the
+             master's larger head on the torso), the face decal, and the
              clothing welded to its parts), put one pants look per tribe colour in
              ReplicatedStorage.CharacterOutfits (OutfitService applies them), turn
              off StarterPlayer.LoadCharacterAppearance so avatars don't load on
@@ -249,7 +250,8 @@ root.Parent = model
 model.PrimaryPart = root
 
 local positions = {
-  Torso = Vector3.new(0, 3, 0), Head = Vector3.new(0, 4.5, 0),
+  -- The head sits as far above the neck (torso top, y 4) as the Neck's C1 says.
+  Torso = Vector3.new(0, 3, 0), Head = Vector3.new(0, 4 - data.motors.Neck.c1[2], 0),
   ["Right Arm"] = Vector3.new(1.5, 3, 0), ["Left Arm"] = Vector3.new(-1.5, 3, 0),
   ["Right Leg"] = Vector3.new(0.5, 1, 0), ["Left Leg"] = Vector3.new(-0.5, 1, 0),
 }

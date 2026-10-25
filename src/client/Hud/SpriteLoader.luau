@@ -14,7 +14,8 @@ local SpriteLoader = {}
 SpriteLoader.RETRIES = 6
 SpriteLoader.FIRST_DELAY = 1
 
--- image id -> { users = {Instance = property}, state = "pending" | "loading" | "loaded" | "failed", tries }
+-- image id -> { users = {Instance = property} (weak, so destroyed characters go),
+-- state = "pending" | "loading" | "loaded" | "failed", tries }
 local images = {}
 local flushQueued = false
 
@@ -115,8 +116,15 @@ function SpriteLoader.TrackProperty(instance: Instance, property: string)
 	end
 	local entry = images[id]
 	if entry == nil then
-		entry = { users = {}, state = "pending", tries = 0 }
+		entry = { users = setmetatable({}, { __mode = "k" }), state = "pending", tries = 0 }
 		images[id] = entry
+	elseif entry.state == "failed" and entry.users[instance] == nil then
+		-- Something new wants an image that gave up earlier: try it again from scratch.
+		entry.state = "pending"
+		entry.tries = 0
+	end
+	if entry.users[instance] == property then
+		return -- already watching this image here
 	end
 	entry.users[instance] = property
 	if entry.state == "loaded" and not instance:IsA("ImageLabel") then

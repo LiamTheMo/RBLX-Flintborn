@@ -18,9 +18,16 @@ local function track(instance: Instance)
 	if property == nil then
 		return
 	end
+	local last = (instance :: any)[property]
 	SpriteLoader.TrackProperty(instance, property)
 	instance:GetPropertyChangedSignal(property):Connect(function()
-		SpriteLoader.TrackProperty(instance, property)
+		-- Only a new image counts: SpriteLoader's own retries clear and restore the
+		-- same id, and tracking that again would retry forever.
+		local current = (instance :: any)[property]
+		if current ~= "" and current ~= last then
+			last = current
+			SpriteLoader.TrackProperty(instance, property)
+		end
 	end)
 end
 
