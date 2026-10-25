@@ -261,8 +261,9 @@ local function build()
 	make("UIListLayout", { VerticalAlignment = Enum.VerticalAlignment.Bottom, Padding = UDim.new(0, 2) }, ui.popups)
 	-- The new HUD replaces the level bar while it is on screen and hosts the
 	-- pop-ups; whenever it is hidden (world menu, protected, dead) this bar shows.
+	-- In the lobby the lobby HUD's profile panel always shows the level instead.
 	local function refreshBar()
-		ui.bar.Visible = not (HudMode.ReplacesLegacy() and HudMode.IsVisible())
+		ui.bar.Visible = not ((HudMode.ReplacesLegacy() and HudMode.IsVisible()) or HudMode.ReplacesLobby())
 	end
 	HudMode.VisibilityChanged:Connect(refreshBar)
 	refreshBar()

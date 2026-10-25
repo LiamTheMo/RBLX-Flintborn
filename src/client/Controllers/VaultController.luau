@@ -267,6 +267,10 @@ function VaultController.Toggle()
 	end
 end
 
+function VaultController.IsOpen(): boolean
+	return ui.panel ~= nil and ui.panel.Visible
+end
+
 function VaultController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
