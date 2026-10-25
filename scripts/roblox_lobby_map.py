@@ -44,7 +44,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import roblox_upload_ui_assets as uploader
-from roblox_live_publish import Cloud as PlaceCloud
+from roblox_live_publish import SAVE_PLACE, Cloud as PlaceCloud
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT = ROOT / "art" / "roblox" / "lobby"
@@ -527,10 +527,10 @@ for _, d in workspace:GetDescendants() do
 end
 local templateCount = 0
 for _ in templates do templateCount += 1 end
-AssetService:SavePlaceAsync({ SaveWithoutPublish = false })
+%SAVE_PLACE%
 return HttpService:JSONEncode({ placed = placed, templates = templateCount, emitters = emitters,
   disabledSpawns = disabled, warnings = warnings })
-'''
+'''.replace("%SAVE_PLACE%", SAVE_PLACE)
 
 # The lobby's look, matched to the Blender scene (art/blender/lobby): a warm
 # afternoon sun from the west-southwest about 40 degrees up, a cool sky fill,
@@ -634,9 +634,9 @@ rays.Enabled = true
 rays.Intensity = style.sunRays.intensity
 rays.Spread = style.sunRays.spread
 
-game:GetService("AssetService"):SavePlaceAsync({ SaveWithoutPublish = false })
+%SAVE_PLACE%
 return HttpService:JSONEncode(report)
-'''
+'''.replace("%SAVE_PLACE%", SAVE_PLACE)
 
 DIAGNOSE = r'''
 local AssetService = game:GetService("AssetService")

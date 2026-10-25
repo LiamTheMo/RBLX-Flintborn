@@ -29,10 +29,24 @@ class CloudPublishSafetyTests(unittest.TestCase):
             (("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", source)
         ])
         self.assertIn("SavePlaceAsync({ SaveWithoutPublish = false })", script)
+        self.assertIn(cloud.SAVE_PLACE, script)
         self.assertIn("Managed Studio root is missing", script)
         self.assertIn("Script class mismatch", script)
-        self.assertNotIn("Destroy()", script)
+        # The only removal is the save's: the engine's runtime copies of its
+        # default player scripts.
+        self.assertNotIn("Destroy()", script.replace(cloud.SAVE_PLACE, ""))
+        self.assertEqual(cloud.SAVE_PLACE.count("Destroy()"), 2)
+        self.assertIn('child.Name == "PlayerModule" and child:IsA("ModuleScript")', cloud.SAVE_PLACE)
+        self.assertIn('child.Name == "RbxCharacterSounds" and child:IsA("LocalScript")', cloud.SAVE_PLACE)
         self.assertNotIn("versionType=Published", script)
+
+    def test_every_cloud_save_strips_engine_copies(self):
+        root = Path(__file__).resolve().parents[1] / "scripts"
+        for name in ("roblox_live_publish.py", "roblox_character.py", "roblox_lobby_map.py"):
+            text = (root / name).read_text(encoding="utf-8")
+            outside = text.split("SAVE_PLACE = r'''", 1)
+            body = outside[0] + (outside[1].split("'''", 1)[1] if len(outside) > 1 else "")
+            self.assertNotIn("SavePlaceAsync(", body, name + " saves without SAVE_PLACE")
 
     def test_post_publish_source_verification(self):
         script = cloud.make_script([
