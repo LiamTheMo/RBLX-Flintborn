@@ -1,0 +1,72 @@
+name: Upload and install the player character
+# Manual only. Uploads the default R6 character (art/roblox/character and
+# art/character/textures, from art/blender/scripts/build_09_character.py) and
+# installs it as StarterPlayer.StarterCharacter, with the tribe pants looks, in
+# the lobby and world places. Returns art/roblox/character/asset_ids.json as an
+# artifact for a person to commit.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "upload = upload meshes and textures; install = build the character in both places; all = both"
+        type: choice
+        options: [upload, install, all]
+        default: all
+      creator:
+        description: "Who owns uploaded assets (must own the experience so the places can load them)"
+        type: choice
+        options: [group, user]
+        default: group
+
+permissions:
+  contents: read
+
+# Shares the script sync's lock for this branch, so a deploy and an install never
+# save a place at the same time.
+concurrency:
+  group: roblox-script-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  character:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Character
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_ASSETS_API_KEY || secrets.ROBLOX_API_KEY }}
+          PLACE_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          LOBBY_PLACE_ID: ${{ secrets.ROBLOX_LOBBY_PLACE_ID }}
+          WORLD_PLACE_ID: ${{ secrets.ROBLOX_MAIN_PLACE_ID }}
+          GROUP_ID: ${{ secrets.ROBLOX_CREATOR_ID || secrets.ROBLOX_CREATOR_GROUP_ID || secrets.ROBLOX_CREATOR_USER_ID }}
+          USER_ID: ${{ secrets.ROBLOX_CREATOR_USER_ID }}
+          CREATOR: ${{ inputs.creator }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          python3 scripts/roblox_character.py --check
+          if [ "$CREATOR" = "group" ]; then
+            export ROBLOX_CREATOR_GROUP_ID="$GROUP_ID"
+          else
+            export ROBLOX_CREATOR_USER_ID="$USER_ID"
+          fi
+          if [ "$MODE" = "upload" ] || [ "$MODE" = "all" ]; then
+            python3 scripts/roblox_character.py --upload
+          fi
+          if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
+            export ROBLOX_API_KEY="$PLACE_KEY"
+            for place in "$LOBBY_PLACE_ID" "$WORLD_PLACE_ID"; do
+              echo "Installing in place $place"
+              ROBLOX_PLACE_ID="$place" python3 scripts/roblox_character.py --install
+            done
+          fi
+      - name: Return asset ids
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: character-asset-ids
+          path: art/roblox/character/asset_ids.json
+          if-no-files-found: warn
