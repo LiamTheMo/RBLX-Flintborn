@@ -562,8 +562,11 @@ report.sunErrorDegrees = math.deg(math.acos(math.clamp(best, -1, 1)))
 if report.sunErrorDegrees > 10 then table.insert(report.warnings, "sun direction is off by more than 10 degrees") end
 
 local style = cfg.style
-local ok, err = pcall(function() Lighting.Technology = Enum.Technology.Future end)
-report.technology = if ok then "Future" else ("unchanged: " .. tostring(err))
+-- Realistic lighting (Studio's Lighting > LightingStyle, which replaced
+-- Technology). Cloud scripts may not be allowed to set it; then it stays as set
+-- in Studio.
+local ok, err = pcall(function() Lighting.LightingStyle = Enum.LightingStyle.Realistic end)
+report.lightingStyle = if ok then "Realistic" else ("unchanged (set it in Studio): " .. tostring(err))
 Lighting.Brightness = style.brightness
 Lighting.ExposureCompensation = style.exposure
 Lighting.Ambient = Color3.fromHex(style.ambient)
