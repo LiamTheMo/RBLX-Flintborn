@@ -118,6 +118,9 @@ function SpriteLoader.TrackProperty(instance: Instance, property: string)
 		entry = { users = {}, state = "pending", tries = 0 }
 		images[id] = entry
 	end
+	if entry.users[instance] == property then
+		return -- already watching this image here
+	end
 	entry.users[instance] = property
 	if entry.state == "loaded" and not instance:IsA("ImageLabel") then
 		-- Already fetched: ask once more in case this one's own fetch failed.
