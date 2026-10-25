@@ -37,7 +37,6 @@ Run through the wrapper:
 import json
 import math
 import os
-import shutil
 import sys
 
 import blf
@@ -235,7 +234,8 @@ def strap(name, collection):
     """The hide band over the right shoulder: a sweep across the torso top from the
     front, over the rounded edge, to the back."""
     bm = bmesh.new()
-    a_front, top, r = 0.575, 4.075, 0.16  # just outside the wrap, so the two never z-fight
+    # Lies flush over the shoulder, just proud of the wrap so the two never z-fight.
+    a_front, top, r = 0.552, 4.052, 0.15
     path = []
     for k in range(9):  # front face, going up
         path.append((-a_front, 3.55 + k * (top - r - 3.55) / 8))
@@ -249,7 +249,7 @@ def strap(name, collection):
         path.append(((a_front - r) + r * math.sin(t), top - r + r * math.cos(t)))
     for k in range(1, 9):  # back face, going down
         path.append((a_front, top - r - k * (top - r - 3.55) / 8))
-    xs = [-1.08, -0.98, -0.82, -0.62, -0.42, -0.30]
+    xs = [-1.052, -0.96, -0.8, -0.62, -0.44, -0.32]
     rows = []
     for py, pz in path:
         rows.append([bm.verts.new((x, py, pz)) for x in xs])
@@ -277,7 +277,7 @@ def blob(bm, centre, radii, rot_z=0.0, rot_x=0.0):
 def knot(name, collection):
     """The tied knot at the left hip, front: a bunched centre, two lobes and two tails."""
     bm = bmesh.new()
-    c = Vector((0.93, -0.6, 2.36))
+    c = Vector((0.92, -0.58, 2.36))
     blob(bm, c, (0.17, 0.12, 0.15))
     blob(bm, c + Vector((-0.17, -0.01, 0.05)), (0.13, 0.09, 0.09), rot_z=0.3)
     blob(bm, c + Vector((0.15, 0.02, 0.06)), (0.11, 0.09, 0.09), rot_z=-0.4)
@@ -326,14 +326,13 @@ def build_clothing(col):
     # The wrap: a tube around the torso, cut on the diagonal from the right shoulder
     # (-X, top) to below the left armpit, hanging past the torso over the shorts.
     # The cut runs from the right shoulder (x -1.06, top) to the left side at z 3.2.
-    diagonal = ((-1.06, 0.0, 4.06), (0.86, 0.0, 2.12), lambda x: 0.02 + 0.02 * math.sin(x * 9.0 + 1.3))
+    diagonal = ((-1.04, 0.0, 4.04), (0.84, 0.0, 2.08), lambda x: 0.02 + 0.02 * math.sin(x * 9.0 + 1.3))
 
-    def hang(z):
-        # Flares out below the waist, so a walking R6 leg clips the hem less.
-        return 0.2 * max(0.0, 2.05 - z) / 0.45
 
-    wrap = shell("Shirt", (0, 0, 0), 1.06, 0.56, 0.16, wavy(1.6, 0.04, 7, 1.0), 4.06, col,
-                 ring_count=40, around=96, flare=hang, cut=diagonal)
+    # Flat like the master: the wrap hugs the torso straight down to a gently wavy
+    # hem, with no outward flare.
+    wrap = shell("Shirt", (0, 0, 0), 1.04, 0.54, 0.15, wavy(1.62, 0.035, 7, 1.0), 4.04, col,
+                 ring_count=40, around=96, cut=diagonal)
     band = strap("ShirtStrap", col)
     tie = knot("ShirtKnot", col)
     # No subdivision: smooth shading keeps the cloth soft and each mesh well under
@@ -351,8 +350,8 @@ def build_clothing(col):
     waist = shell("PantsWaist", (0, 0, 0), 1.02, 0.52, 0.14, lambda s: 1.9, 2.32, col, ring_count=6, around=72)
     pants.append(waist)
     for name, x, seed in (("PantsRightLeg", -0.5, 2.0), ("PantsLeftLeg", 0.5, 5.0)):
-        leg = shell(name, (x, 0, 0), 0.535, 0.535, 0.13, wavy(0.97, 0.035, 5, seed), 2.06, col,
-                    ring_count=16, around=56, flare=lambda z: 0.03 * max(0.0, 1.25 - z) / 0.3)
+        leg = shell(name, (x, 0, 0), 0.528, 0.528, 0.13, wavy(0.97, 0.03, 5, seed), 2.06, col,
+                    ring_count=16, around=56)
         pants.append(leg)
     for o in pants:
         mod = o.modifiers.new("Thick", "SOLIDIFY")
@@ -937,9 +936,11 @@ def export_piece(obj, name, scene):
 
 
 def export_roblox(parts, clothing, texture_paths):
-    if os.path.isdir(EXPORT_DIR):
-        shutil.rmtree(EXPORT_DIR)
-    os.makedirs(EXPORT_DIR)
+    # Replace only what this export writes; asset_ids.json (upload records) stays.
+    os.makedirs(EXPORT_DIR, exist_ok=True)
+    for old in os.listdir(EXPORT_DIR):
+        if old.endswith(".glb") or old == "manifest.json":
+            os.remove(os.path.join(EXPORT_DIR, old))
     scene = bpy.context.scene
     manifest = {"version": 1, "rig": "R6", "units": "studs; Roblox axes (Y up, front -Z)",
                 "textureDir": "art/character/textures",
