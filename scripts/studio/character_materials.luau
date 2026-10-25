@@ -18,7 +18,22 @@ local function id(number)
 	return "rbxassetid://" .. number
 end
 
--- BEGIN IDS
+-- BEGIN IDS (written by scripts/roblox_character.py --studio-script)
+local SHIRT = { color = id(72647109486331), normal = id(125721140852975), roughness = id(106503771228314) }
+local PANTS_NORMAL = id(93410040470018)
+local PANTS_ROUGHNESS = id(118571673825909)
+local PANTS = {
+	Earth = 125768072993836,
+	Ember = 99968080013618,
+	Clay = 91666189734889,
+	Ochre = 100513955215090,
+	Moss = 129319047091621,
+	Tide = 108462547184125,
+	River = 122597045824631,
+	Dusk = 134076212024476,
+	Ash = 92024643451737,
+	Bone = 115545559388769,
+}
 -- END IDS
 
 local function appearance(name, color, normal, roughness)
