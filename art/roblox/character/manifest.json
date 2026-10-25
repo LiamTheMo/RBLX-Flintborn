@@ -3,7 +3,7 @@
  "rig": "R6",
  "units": "studs; Roblox axes (Y up, front -Z)",
  "textureDir": "art/character/textures",
- "note": "Meshes are centred on their bounding box. Roblox's glTF import turns meshes half a turn about Y (see scripts/roblox_lobby_map.py), so place each with CFrame.Angles(0, math.pi, 0) after its offset.",
+ "note": "Meshes are centred on their bounding box. Offsets are in the export frame, which faces +Z; Roblox's glTF import turns each mesh half a turn about Y, so the imported meshes face -Z like a Roblox rig, and an offset (x, y, z) becomes (-x, y, -z) there (scripts/roblox_character.py).",
  "parts": {
   "Torso": {
    "file": "Torso.glb",
@@ -26,16 +26,16 @@
   },
   "Head": {
    "file": "Head.glb",
-   "tris": 588,
+   "tris": 2112,
    "size": [
-    1.25,
-    1.2,
-    1.25
+    1.5,
+    1.4,
+    1.5
    ],
    "partSize": [
-    2.0,
-    1.0,
-    1.0
+    1.5,
+    1.4,
+    1.5
    ],
    "offset": [
     0.0,
@@ -123,17 +123,17 @@
  "clothing": {
   "Shirt": {
    "file": "Shirt.glb",
-   "tris": 15404,
+   "tris": 13884,
    "size": [
-    2.227,
-    2.488,
-    1.2732
+    2.1558,
+    2.33,
+    1.3175
    ],
    "part": "Torso",
    "offset": [
-    0.0615,
-    -0.192,
-    0.0616
+    0.0,
+    -0.125,
+    -0.0
    ]
   },
   "PantsWaist": {
@@ -156,13 +156,13 @@
    "tris": 3808,
    "size": [
     1.056,
-    1.1378,
+    1.0378,
     1.056
    ],
    "part": "Right Leg",
    "offset": [
     0.0,
-    0.4911,
+    0.5411,
     -0.0
    ]
   },
@@ -171,13 +171,13 @@
    "tris": 3808,
    "size": [
     1.056,
-    1.1346,
+    1.0346,
     1.056
    ],
    "part": "Left Leg",
    "offset": [
     0.0,
-    0.4927,
+    0.5427,
     -0.0
    ]
   }
@@ -234,7 +234,7 @@
    ],
    "c1": [
     0,
-    -0.5,
+    -0.7,
     0,
     -1,
     0,
@@ -377,11 +377,11 @@
   }
  },
  "colors": {
-  "skin": "#F1C7A3",
-  "shirt": "#C8B392",
+  "skin": "#EFBE9D",
+  "shirt": "#C8AC88",
   "pantsNeutral": "#BDB5A8",
   "tribes": {
-   "Earth": "#6B4A2F",
+   "Earth": "#643E20",
    "Ember": "#9C3328",
    "Clay": "#B5602F",
    "Ochre": "#B98A2E",
