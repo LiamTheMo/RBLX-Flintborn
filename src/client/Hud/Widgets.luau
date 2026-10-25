@@ -10,6 +10,7 @@ local TweenService = game:GetService("TweenService")
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local Layout = require(script.Parent.Layout)
+local SpriteLoader = require(script.Parent.SpriteLoader)
 
 local Widgets = {}
 
@@ -112,6 +113,7 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 		return fallback(name, props, parent)
 	end
 	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = id }, parent)
+	SpriteLoader.Track(image)
 	local center = UiAssets.sliceCenter(name)
 	local sprite = UiAssets.sprite(name)
 	if center and sprite then
