@@ -762,7 +762,7 @@ local ok, err = pcall(function()
   local AssetService = game:GetService("AssetService")
   local ContentProvider = game:GetService("ContentProvider")
   report.loads = {}
-  for _, name in { "icon_backpack", "icon_coin", "icon_heart", "frame_slot", "frame_bar_hollow" } do
+  for _, name in { "icon_backpack", "icon_coin", "icon_mountain", "icon_chest", "icon_scroll", "icon_coin_bag", "icon_anvil", "icon_swap", "icon_gear", "icon_gem", "icon_group", "icon_crown", "icon_add_friend", "icon_down" } do
     local id = UiAssets.image(name)
     local entry = { id = id }
     local okImage, result = pcall(function()
