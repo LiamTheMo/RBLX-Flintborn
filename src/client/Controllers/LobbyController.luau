@@ -1,19 +1,33 @@
 -- Lobby screen: Deploy with a list of every item that will enter the run (GDD Q155),
 -- and the party panel for invites (GDD Q161c). Lobby place only. Everything the
 -- server needs is sent as intent through remotes; the server decides.
+--
+-- With the lobby HUD (HudMode.ReplacesLobby) this keeps the logic and the HUD
+-- draws it: Deploy(), PartyAction(), PartyView(), Preview(), Invitable(),
+-- Status() and Changed. Otherwise it also builds its own panel.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local LobbyController = {}
 
+-- Fires (what) when "party", "preview" or "status" changes.
+LobbyController.Changed = Signal.new()
+
 local player = Players.LocalPlayer
 local partyView = { party = nil, invites = {} }
+-- The deploy preview: {catalogId, quantity, permanent}[] once read, or nil.
+local previewItems = nil
+local statusText = "You are safe in the lobby."
+local deploying = false
 local ui = {}
 
 local function make(className: string, props, parent)
@@ -62,15 +76,26 @@ local function clear(container)
 end
 
 local function setStatus(text: string)
-	ui.status.Text = text
+	statusText = text
+	if ui.status then
+		ui.status.Text = text
+	end
+	LobbyController.Changed:Fire("status")
 end
 
 local function refreshPreview()
 	local ok, items = pcall(function()
 		return Remotes.Get("DeployPreview"):InvokeServer()
 	end)
-	clear(ui.preview)
 	-- A guarded remote answers `false, reason` when rate-limited or not loaded.
+	if ok and type(items) == "table" then
+		previewItems = items
+		LobbyController.Changed:Fire("preview")
+	end
+	if not ui.preview then
+		return
+	end
+	clear(ui.preview)
 	if not ok or type(items) ~= "table" then
 		label("Could not read your backpack yet.", ui.preview)
 		return
@@ -110,21 +135,48 @@ local function requestPreview()
 end
 
 LobbyController.PREVIEW_REFRESH_SECONDS = 30
+LobbyController.MAINTENANCE_TEXT = "Game update: your items were saved and return on your next Play."
 
 local function partyAction(action: string, argument)
 	local ok, success, reason = pcall(function()
 		return Remotes.Get("PartyAction"):InvokeServer(action, argument)
 	end)
 	if not ok or not success then
-		setStatus("Party: " .. tostring(reason or "request failed"))
+		setStatus("Party: " .. Reasons.Text(reason or "request failed"))
 	end
 end
 
+-- Players in this lobby server you may invite: everyone outside your party, when
+-- you lead it or have none.
+local function invitable(): { Player }
+	local party = partyView.party
+	if party ~= nil and party.leader ~= player.UserId then
+		return {}
+	end
+	local list = {}
+	for _, other in Players:GetPlayers() do
+		local inParty = false
+		if party then
+			for _, member in party.members do
+				inParty = inParty or member.userId == other.UserId
+			end
+		end
+		if other ~= player and not inParty then
+			table.insert(list, other)
+		end
+	end
+	return list
+end
+
 local function refreshParty()
+	LobbyController.Changed:Fire("party")
+	if not ui.party then
+		return
+	end
 	clear(ui.party)
 	local party = partyView.party
 	if party then
-		label("Your party (" .. #party.members .. "/8):", ui.party)
+		label("Your party (" .. #party.members .. "/" .. PartyRules.MAX_SIZE .. "):", ui.party)
 		for _, member in party.members do
 			label((member.userId == party.leader and "★ " or "• ") .. member.name, ui.party)
 		end
@@ -143,37 +195,86 @@ local function refreshParty()
 			partyAction("decline", invite.partyId)
 		end)
 	end
-	local canInvite = party == nil or party.leader == player.UserId
-	if canInvite then
-		for _, other in Players:GetPlayers() do
-			local inParty = false
-			if party then
-				for _, member in party.members do
-					inParty = inParty or member.userId == other.UserId
-				end
-			end
-			if other ~= player and not inParty then
-				button("Invite " .. other.DisplayName, ui.party, function()
-					partyAction("invite", other.UserId)
-				end)
-			end
-		end
+	for _, other in invitable() do
+		button("Invite " .. other.DisplayName, ui.party, function()
+			partyAction("invite", other.UserId)
+		end)
 	end
 end
 
 local function deploy()
+	if deploying then
+		return
+	end
+	deploying = true
 	setStatus("Deploying…")
-	ui.deploy.Active = false
+	if ui.deploy then
+		ui.deploy.Active = false
+	end
 	local ok, success, reason = pcall(function()
 		return Remotes.Get("Deploy"):InvokeServer()
 	end)
-	ui.deploy.Active = true
+	deploying = false
+	if ui.deploy then
+		ui.deploy.Active = true
+	end
 	if ok and success then
 		setStatus("Travelling to a world…")
 	else
 		setStatus("Deploy failed: " .. Reasons.Text(reason or success) .. ". Nothing was lost.")
 		requestPreview()
 	end
+end
+
+-- Asks the server to deploy (the party leader takes the whole party). Yields.
+function LobbyController.Deploy()
+	deploy()
+end
+
+function LobbyController.IsDeploying(): boolean
+	return deploying
+end
+
+-- "invite" + userId, "accept"/"decline" + partyId, or "leave". Yields.
+function LobbyController.PartyAction(action: string, argument: any?)
+	partyAction(action, argument)
+end
+
+-- {party = {id, leader, members = {{userId, name}}} or nil, invites = {{partyId, from}}}
+function LobbyController.PartyView()
+	return partyView
+end
+
+function LobbyController.Invitable(): { Player }
+	return invitable()
+end
+
+-- The items that will enter the run ({catalogId, quantity, permanent}[]), or nil
+-- until the first read; RefreshPreview() asks again.
+function LobbyController.Preview()
+	return previewItems
+end
+
+function LobbyController.RefreshPreview()
+	requestPreview()
+end
+
+-- Reads the deploy preview now (yields) and returns it, or nil when the server
+-- could not answer; the lobby HUD asks this when Enter is pressed (GDD Q155).
+function LobbyController.FetchPreview()
+	local ok, items = pcall(function()
+		return Remotes.Get("DeployPreview"):InvokeServer()
+	end)
+	if ok and type(items) == "table" then
+		previewItems = items
+		LobbyController.Changed:Fire("preview")
+		return items
+	end
+	return nil
+end
+
+function LobbyController.Status(): string
+	return statusText
 end
 
 local function build()
@@ -234,11 +335,24 @@ local function build()
 	make("UIListLayout", { Padding = UDim.new(0, 4) }, ui.party)
 end
 
+-- Builds the older lobby panel after the lobby HUD failed to start, so Deploy and
+-- the party stay reachable.
+function LobbyController.BuildFallback()
+	if ui.status == nil and PlaceConfig.IsLobby() then
+		build()
+		ui.status.Text = statusText
+		refreshParty()
+		requestPreview()
+	end
+end
+
 function LobbyController.Start()
 	if not PlaceConfig.IsLobby() then
 		return
 	end
-	build()
+	if not HudMode.ReplacesLobby() then
+		build()
+	end
 	Remotes.Get("PartyChanged").OnClientEvent:Connect(function(view)
 		partyView = view
 		refreshParty()
@@ -257,7 +371,7 @@ function LobbyController.Start()
 	end)
 	local function notice()
 		if player:GetAttribute("MaintenanceNotice") then
-			setStatus("Game update: your items were saved and return on your next Play.")
+			setStatus(LobbyController.MAINTENANCE_TEXT)
 		end
 	end
 	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(notice)
