@@ -20,6 +20,25 @@ ANCHORS = (
     ("ReplicatedStorage", "Shared"),
     ("StarterPlayer", "StarterPlayerScripts", "Client"),
 )
+# Every cloud save goes through this. Each Luau task's server inserts the engine's
+# default player scripts (a PlayerModule in StarterPlayer, RbxCharacterSounds in
+# StarterPlayerScripts), and SavePlaceAsync saved them with the place: 41 copies
+# piled up, the lobby grew past the 8 MiB a cloud save can upload, and every save
+# failed with "PublishService AssetUpload failed ... Form data is null". Servers
+# insert their own copies, so the place keeps none.
+SAVE_PLACE = r'''
+do
+  local starterPlayer = game:GetService("StarterPlayer")
+  for _, child in starterPlayer:GetChildren() do
+    if child.Name == "PlayerModule" and child:IsA("ModuleScript") then child:Destroy() end
+  end
+  local playerScripts = starterPlayer:FindFirstChildOfClass("StarterPlayerScripts")
+  for _, child in playerScripts and playerScripts:GetChildren() or {} do
+    if child.Name == "RbxCharacterSounds" and child:IsA("LocalScript") then child:Destroy() end
+  end
+  game:GetService("AssetService"):SavePlaceAsync({ SaveWithoutPublish = false })
+end
+'''
 PREAMBLE = r'''
 local specs = %SPECS%
 local services = {
@@ -112,11 +131,11 @@ for _, spec in ipairs(specs) do
     "Pre-publish source verification failed for " .. table.concat(spec.path, "/"))
 end
 if changed > 0 then
-  game:GetService("AssetService"):SavePlaceAsync({ SaveWithoutPublish = false })
+%SAVE_PLACE%
 end
 print("ROBLOX_GITHUB_LIVE_PUBLISH_COMPLETE", changed, #specs)
 return "PUBLISHED"
-'''
+'''.replace("%SAVE_PLACE%", SAVE_PLACE)
 VERIFY = r'''
 for _, spec in ipairs(specs) do
   local obj = services[spec.path[1]]
