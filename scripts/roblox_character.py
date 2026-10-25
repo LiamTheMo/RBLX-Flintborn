@@ -9,6 +9,10 @@ maps, ten tribe pants colours, the face). This script:
   --check    validate the export and the recorded ids (offline)
   --upload   upload what is new or changed: meshes as Models, textures as Decals
              resolved to Image ids; ids go to art/roblox/character/asset_ids.json
+  --studio-script  rewrite scripts/studio/character_materials.luau with the
+             recorded image ids (the Studio command-bar step that gives the
+             clothing its full SurfaceAppearance materials)
+  --probe    report what the installed character wears in ROBLOX_PLACE_ID
   --install  in the place ROBLOX_PLACE_ID: build StarterPlayer.StarterCharacter
              (an R6 rig: HumanoidRootPart, the six rounded MeshParts, Humanoid
              RigType R6, Roblox's default Motor6Ds, the face decal, and the
@@ -40,6 +44,7 @@ EXPORT = ROOT / "art" / "roblox" / "character"
 MANIFEST = EXPORT / "manifest.json"
 IDS_FILE = EXPORT / "asset_ids.json"
 UPLOAD_WORKERS = 4
+STUDIO_SCRIPT = ROOT / "scripts" / "studio" / "character_materials.luau"
 
 
 def sha1(path):
@@ -321,6 +326,71 @@ report.parts = #model:GetChildren()
 return HttpService:JSONEncode(report)
 '''
 
+# What the installed character actually wears, and whether the place can load each
+# image (EditableImage loads respect asset permissions).
+PROBE = r'''
+local AssetService = game:GetService("AssetService")
+local HttpService = game:GetService("HttpService")
+local character = game:GetService("StarterPlayer"):FindFirstChild("StarterCharacter")
+assert(character, "StarterCharacter missing")
+local report = { pieces = {}, loads = {} }
+local seen = {}
+local function test(id)
+  if id == nil or id == "" or seen[id] then return end
+  seen[id] = true
+  local ok, result = pcall(function()
+    return AssetService:CreateEditableImageAsync(Content.fromUri(id))
+  end)
+  report.loads[id] = if ok then tostring(result.Size) else tostring(result)
+end
+for _, d in character:GetDescendants() do
+  if d:IsA("MeshPart") then
+    local appearance = d:FindFirstChildWhichIsA("SurfaceAppearance")
+    report.pieces[d.Name] = { textureId = d.TextureID, color = d.Color:ToHex(), material = d.Material.Name,
+      surface = appearance and appearance.ColorMap or nil }
+    test(d.TextureID)
+  elseif d:IsA("Decal") then
+    report.pieces["decal:" .. d.Name] = { texture = d.Texture, face = d.Face.Name, parent = d.Parent.Name }
+    test(d.Texture)
+  end
+end
+-- Which way the shirt faces: its knot sits at the character's left hip, front.
+-- In a correctly facing rig that is local -X (left) and -Z (front).
+local shirt = character:FindFirstChild("Shirt")
+local okMesh, editable = pcall(function()
+  return AssetService:CreateEditableMeshAsync(shirt.MeshContent)
+end)
+if okMesh then
+  local lo, hi = math.huge, -math.huge
+  for _, v in editable:GetVertices() do
+    local p = editable:GetPosition(v)
+    lo = math.min(lo, p.Y)
+    hi = math.max(hi, p.Y)
+  end
+  local quadrants = { leftFront = 0, rightFront = 0, leftBack = 0, rightBack = 0 }
+  local strap = { left = 0, right = 0 }
+  for _, v in editable:GetVertices() do
+    local p = editable:GetPosition(v)
+    local t = (p.Y - lo) / (hi - lo)
+    if t > 0.25 and t < 0.45 and math.abs(p.Z) > 0.64 then
+      local side = if p.X < 0 then "left" else "right"
+      local face = if p.Z < 0 then "Front" else "Back"
+      quadrants[side .. face] += 1
+    end
+    if t > 0.97 then
+      if p.X < 0 then strap.left += 1 else strap.right += 1 end
+    end
+  end
+  report.knotVertices = quadrants
+  report.strapTopVertices = strap
+  report.shirtMeshScale = tostring(shirt.MeshSize) .. " -> " .. tostring(shirt.Size)
+  report.shirtCFrame = tostring(shirt.CFrame)
+else
+  report.shirtMesh = tostring(editable)
+end
+return HttpService:JSONEncode(report)
+'''
+
 VERIFY = r'''
 local HttpService = game:GetService("HttpService")
 local character = game:GetService("StarterPlayer"):FindFirstChild("StarterCharacter")
@@ -357,6 +427,26 @@ def install_script(m, ids):
     return INSTALL.replace("%DATA%", lua_value(data))
 
 
+def studio_script(m, ids):
+    """Rewrites the Studio command-bar script's id block from asset_ids.json."""
+    image = {key: ids["images"][key]["image"] for key in image_files(m)}
+    pants = "\n".join(f"\t{name} = {image['pants_color_' + name.lower()]},"
+                      for name in m["colors"]["tribes"])
+    block = (
+        "-- BEGIN IDS (written by scripts/roblox_character.py --studio-script)\n"
+        f"local SHIRT = {{ color = id({image['shirt_color']}), normal = id({image['shirt_normal']}), "
+        f"roughness = id({image['shirt_roughness']}) }}\n"
+        f"local PANTS_NORMAL = id({image['pants_normal']})\n"
+        f"local PANTS_ROUGHNESS = id({image['pants_roughness']})\n"
+        f"local PANTS = {{\n{pants}\n}}\n"
+        "-- END IDS"
+    )
+    text = STUDIO_SCRIPT.read_text(encoding="utf-8").replace("\r\n", "\n")
+    first, last = text.index("-- BEGIN IDS"), text.index("-- END IDS") + len("-- END IDS")
+    STUDIO_SCRIPT.write_text(text[:first] + block + text[last:], encoding="utf-8", newline="\n")
+    print(f"Wrote {STUDIO_SCRIPT.relative_to(ROOT)}")
+
+
 def show(task):
     output = task.get("output") or {}
     values = output.get("results") or []
@@ -371,7 +461,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--install"):
+    for flag in ("--check", "--upload", "--install", "--probe", "--studio-script"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -392,7 +482,13 @@ def main():
     problems = check(m, ids, need_ids=True)
     if problems:
         raise ValueError("; ".join(problems[:8]))
+    if args.studio_script:
+        studio_script(m, ids)
+        return 0
     cloud = PlaceCloud()
+    if args.probe:
+        show(cloud.task(PROBE))
+        return 0
     show(cloud.task(install_script(m, ids)))
     show(cloud.task(VERIFY))
     return 0

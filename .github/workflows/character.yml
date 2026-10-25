@@ -10,7 +10,7 @@ on:
       mode:
         description: "upload = upload meshes and textures; install = build the character in both places; all = both"
         type: choice
-        options: [upload, install, all]
+        options: [upload, install, all, probe]
         default: all
       creator:
         description: "Who owns uploaded assets (must own the experience so the places can load them)"
@@ -55,6 +55,10 @@ jobs:
           fi
           if [ "$MODE" = "upload" ] || [ "$MODE" = "all" ]; then
             python3 scripts/roblox_character.py --upload
+          fi
+          if [ "$MODE" = "probe" ]; then
+            export ROBLOX_API_KEY="$PLACE_KEY"
+            ROBLOX_PLACE_ID="$LOBBY_PLACE_ID" python3 scripts/roblox_character.py --probe
           fi
           if [ "$MODE" = "install" ] || [ "$MODE" = "all" ]; then
             export ROBLOX_API_KEY="$PLACE_KEY"
