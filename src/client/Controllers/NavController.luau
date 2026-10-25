@@ -8,6 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -40,6 +41,10 @@ end
 
 function NavController.Start()
 	if not PlaceConfig.IsLobby() and not PlaceConfig.IsWorld() then
+		return
+	end
+	-- The lobby HUD has its own navigation buttons (LobbyHudController).
+	if HudMode.ReplacesLobby() then
 		return
 	end
 	local gui = make("ScreenGui", { Name = "Navigation", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))

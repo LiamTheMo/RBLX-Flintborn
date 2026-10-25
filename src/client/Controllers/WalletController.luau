@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WalletController = {}
@@ -232,6 +233,8 @@ local function build()
 		TextColor3 = GOLD,
 		Font = Enum.Font.GothamBold,
 		TextSize = 15,
+		-- The lobby HUD's currency bar shows Coins and Gems instead.
+		Visible = not HudMode.ReplacesLobby(),
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.wallet)
 	ui.panel = make("Frame", {
@@ -309,6 +312,15 @@ local function build()
 		ClearTextOnFocus = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, codeBox)
+	if HudMode.ReplacesLobby() then
+		-- The lobby HUD's currency and party panels fill the top right, so the box
+		-- moves into the panel's bottom-right corner, beside the status line.
+		codeBox.AnchorPoint = Vector2.new(1, 1)
+		codeBox.Position = UDim2.new(1, -10, 1, -6)
+		codeBox.Size = UDim2.fromOffset(170, 24)
+		codeBox.Parent = ui.panel
+		ui.status.Size = UDim2.new(1, -200, 0, 22)
+	end
 	codeBox.FocusLost:Connect(function(enterPressed)
 		if enterPressed and codeBox.Text ~= "" then
 			local ok, reason = invoke("RedeemCode", codeBox.Text)
@@ -325,6 +337,21 @@ function WalletController.Toggle()
 		ui.status.Text = ""
 		render()
 	end
+end
+
+-- Opens the panel on one tab ("Shop", "Sell", "Quests" or "Vault & offers"), as
+-- the lobby HUD's Quests and Shop buttons do; pressing it again on that tab closes it.
+function WalletController.Open(name: string)
+	if ui.panel.Visible and tab == name then
+		ui.panel.Visible = false
+		return
+	end
+	if ui.tabs[name] then
+		tab = name
+	end
+	ui.panel.Visible = true
+	ui.status.Text = ""
+	render()
 end
 
 function WalletController.Start()

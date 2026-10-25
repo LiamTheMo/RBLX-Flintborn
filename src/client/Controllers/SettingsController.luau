@@ -12,6 +12,7 @@ local UserInputService = game:GetService("UserInputService")
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
+local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -44,7 +45,7 @@ end
 -- Roblox's own touch controls (thumbstick, jump and action buttons) live in
 -- PlayerGui too; they size themselves for the screen and must not shrink. The
 -- in-world HUD fits itself to the screen and applies UiScale on its own.
-local UNSCALED = { TouchGui = true, FlintbornHud = true, FlintbornHudOverlay = true }
+local UNSCALED = { TouchGui = true, FlintbornHud = true, FlintbornHudOverlay = true, FlintbornLobbyHud = true }
 
 local function applyScale()
 	local scale = (player:GetAttribute("UiScale") or 1) * viewportFactor()
@@ -253,7 +254,8 @@ local function build()
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 	}, ui.panel)
 	make("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, ui.list)
-	-- A small always-visible button, so touch players can reach settings too.
+	-- A small always-visible button, so touch players can reach settings too. The
+	-- lobby HUD has its own gear button, so this one stays hidden there.
 	local open = make("TextButton", {
 		Text = "⚙",
 		AnchorPoint = Vector2.new(1, 1),
@@ -264,6 +266,7 @@ local function build()
 		TextColor3 = Theme.Colors.Heading,
 		Font = Theme.Fonts.Bold,
 		TextSize = 22,
+		Visible = not HudMode.ReplacesLobby(),
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, open)
 	open.Activated:Connect(function()
