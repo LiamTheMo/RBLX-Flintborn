@@ -11,7 +11,7 @@ CharacterLook.DEFAULT = "Earth"
 
 -- In the order the art sheet shows them; Earth (the default) first.
 CharacterLook.COLORS = {
-	{ name = "Earth", hex = "#6B4A2F" },
+	{ name = "Earth", hex = "#643E20" },
 	{ name = "Ember", hex = "#9C3328" },
 	{ name = "Clay", hex = "#B5602F" },
 	{ name = "Ochre", hex = "#B98A2E" },
