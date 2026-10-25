@@ -129,13 +129,14 @@ function LobbyPopups:Show(spec)
 		ZIndex = 13,
 	}, card)
 	Widgets.Sprite("icon_x", { Size = UDim2.fromScale(1, 1), ZIndex = 14 }, close)
-	Widgets.Make("TextButton", {
+	local closeButton = Widgets.Make("TextButton", {
 		Name = "CloseButton",
 		Text = "",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = 15,
-	}, close).Activated:Connect(function()
+	}, close)
+	closeButton.Activated:Connect(function()
 		self:Hide()
 	end)
 
