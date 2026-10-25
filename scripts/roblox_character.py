@@ -9,6 +9,10 @@ maps, ten tribe pants colours, the face). This script:
   --check    validate the export and the recorded ids (offline)
   --upload   upload what is new or changed: meshes as Models, textures as Decals
              resolved to Image ids; ids go to art/roblox/character/asset_ids.json
+  --studio-script  rewrite scripts/studio/character_materials.luau with the
+             recorded image ids (the Studio command-bar step that gives the
+             clothing its full SurfaceAppearance materials)
+  --probe    report what the installed character wears in ROBLOX_PLACE_ID
   --install  in the place ROBLOX_PLACE_ID: build StarterPlayer.StarterCharacter
              (an R6 rig: HumanoidRootPart, the six rounded MeshParts, Humanoid
              RigType R6, Roblox's default Motor6Ds, the face decal, and the
@@ -40,6 +44,7 @@ EXPORT = ROOT / "art" / "roblox" / "character"
 MANIFEST = EXPORT / "manifest.json"
 IDS_FILE = EXPORT / "asset_ids.json"
 UPLOAD_WORKERS = 4
+STUDIO_SCRIPT = ROOT / "scripts" / "studio" / "character_materials.luau"
 
 
 def sha1(path):
@@ -422,6 +427,26 @@ def install_script(m, ids):
     return INSTALL.replace("%DATA%", lua_value(data))
 
 
+def studio_script(m, ids):
+    """Rewrites the Studio command-bar script's id block from asset_ids.json."""
+    image = {key: ids["images"][key]["image"] for key in image_files(m)}
+    pants = "\n".join(f"\t{name} = {image['pants_color_' + name.lower()]},"
+                      for name in m["colors"]["tribes"])
+    block = (
+        "-- BEGIN IDS (written by scripts/roblox_character.py --studio-script)\n"
+        f"local SHIRT = {{ color = id({image['shirt_color']}), normal = id({image['shirt_normal']}), "
+        f"roughness = id({image['shirt_roughness']}) }}\n"
+        f"local PANTS_NORMAL = id({image['pants_normal']})\n"
+        f"local PANTS_ROUGHNESS = id({image['pants_roughness']})\n"
+        f"local PANTS = {{\n{pants}\n}}\n"
+        "-- END IDS"
+    )
+    text = STUDIO_SCRIPT.read_text(encoding="utf-8").replace("\r\n", "\n")
+    first, last = text.index("-- BEGIN IDS"), text.index("-- END IDS") + len("-- END IDS")
+    STUDIO_SCRIPT.write_text(text[:first] + block + text[last:], encoding="utf-8", newline="\n")
+    print(f"Wrote {STUDIO_SCRIPT.relative_to(ROOT)}")
+
+
 def show(task):
     output = task.get("output") or {}
     values = output.get("results") or []
@@ -436,7 +461,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--install", "--probe"):
+    for flag in ("--check", "--upload", "--install", "--probe", "--studio-script"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -457,6 +482,9 @@ def main():
     problems = check(m, ids, need_ids=True)
     if problems:
         raise ValueError("; ".join(problems[:8]))
+    if args.studio_script:
+        studio_script(m, ids)
+        return 0
     cloud = PlaceCloud()
     if args.probe:
         show(cloud.task(PROBE))
