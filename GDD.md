@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.15  
-> **Last updated:** 2026-10-24  
+> **Design revision:** 1.16  
+> **Last updated:** 2026-10-25  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
 | **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
 | **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
 | **1.13** | 2026-10-23 | Owner decided stamina recovery stops when a sprint starts and resumes 3 seconds after it ends, and reported walking after releasing sprint still draining stamina (fixed: pace is now judged over a full second against the allowed speed). Added §47. |
@@ -2287,6 +2288,23 @@ Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft 
 - Bar fills, rope frames and panels show the reference colours. The bar shine had darkened and oversaturated each fill, a brown tint darkened the rope, and panels were bluish rather than charcoal.
 
 **QA:** with full food, wait 30 minutes and the meter reads 50; at full health, stamina and food each bar reaches the end of its track; press 1, 2 and 3 in a run and the cyan frame moves to that slot; the rest of the HUD matches the owner's reference screenshot.
+
+## 50. Owner decision: the default player character (2026-10-25)
+
+**Every player spawns as the same default character**, in the lobby and in the world. It is an **R6** rig at Roblox's default proportions, matching the owner's reference (`art/reference/character/hair_01_bald.png`):
+- a bald, peach-skinned body with the classic smile face;
+- a tan hide wrap over the right shoulder, knotted at the left hip;
+- ragged shorts.
+
+Roblox avatars (accessories, clothing, body colours) are not loaded on top.
+
+**Clothing is separate 3D pieces.** The shirt rides on the torso. The shorts are a waistband plus one piece per leg, so each follows its R6 limb. Every standard R6 animation works, because the rig uses Roblox's default R6 joints.
+
+**Tribe colours:** players outside a tribe wear **Earth** (the reference's brown). A tribe's members all wear one of nine other colours, picked from the tribe's public id so every server agrees: Ember, Clay, Ochre, Moss, Tide, River, Dusk, Ash and Bone. Joining or leaving a tribe recolours the shorts immediately. Two tribes can share a colour. Letting a tribe choose its own colour is Open.
+
+**Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow; colours in `src/shared/Character/CharacterLook.luau`; applied by `OutfitService`.
+
+**QA:** a new player spawns as the default character in the lobby and the world, with no avatar items; walking, jumping and idle use the R6 animations with the clothing following the limbs; a tribeless player wears brown shorts; creating or joining a tribe changes them to that tribe's colour, and leaving changes them back.
 
 ---
 
