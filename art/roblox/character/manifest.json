@@ -1,0 +1,423 @@
+{
+ "version": 1,
+ "rig": "R6",
+ "units": "studs; Roblox axes (Y up, front -Z)",
+ "textureDir": "art/character/textures",
+ "note": "Meshes are centred on their bounding box. Roblox's glTF import turns meshes half a turn about Y (see scripts/roblox_lobby_map.py), so place each with CFrame.Angles(0, math.pi, 0) after its offset.",
+ "parts": {
+  "Torso": {
+   "file": "Torso.glb",
+   "tris": 588,
+   "size": [
+    2.0,
+    2.0,
+    1.0
+   ],
+   "partSize": [
+    2.0,
+    2.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  },
+  "Head": {
+   "file": "Head.glb",
+   "tris": 588,
+   "size": [
+    1.25,
+    1.2,
+    1.25
+   ],
+   "partSize": [
+    2.0,
+    1.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  },
+  "Right Arm": {
+   "file": "RightArm.glb",
+   "tris": 588,
+   "size": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "partSize": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  },
+  "Left Arm": {
+   "file": "LeftArm.glb",
+   "tris": 588,
+   "size": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "partSize": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  },
+  "Right Leg": {
+   "file": "RightLeg.glb",
+   "tris": 588,
+   "size": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "partSize": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  },
+  "Left Leg": {
+   "file": "LeftLeg.glb",
+   "tris": 588,
+   "size": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "partSize": [
+    1.0,
+    2.0,
+    1.0
+   ],
+   "offset": [
+    0.0,
+    0.0,
+    -0.0
+   ]
+  }
+ },
+ "clothing": {
+  "Shirt": {
+   "file": "Shirt.glb",
+   "tris": 15368,
+   "size": [
+    2.571,
+    2.5534,
+    1.5722
+   ],
+   "part": "Torso",
+   "offset": [
+    0.0001,
+    -0.2017,
+    -0.0009
+   ]
+  },
+  "PantsWaist": {
+   "file": "PantsWaist.glb",
+   "tris": 2016,
+   "size": [
+    2.04,
+    0.42,
+    1.04
+   ],
+   "part": "Torso",
+   "offset": [
+    0.0,
+    -0.89,
+    -0.0
+   ]
+  },
+  "PantsRightLeg": {
+   "file": "PantsRightLeg.glb",
+   "tris": 3808,
+   "size": [
+    1.1357,
+    1.1488,
+    1.1369
+   ],
+   "part": "Right Leg",
+   "offset": [
+    -0.0,
+    0.4856,
+    0.0002
+   ]
+  },
+  "PantsLeftLeg": {
+   "file": "PantsLeftLeg.glb",
+   "tris": 3808,
+   "size": [
+    1.1359,
+    1.145,
+    1.1352
+   ],
+   "part": "Left Leg",
+   "offset": [
+    0.0003,
+    0.4875,
+    -0.0001
+   ]
+  }
+ },
+ "motors": {
+  "RootJoint": {
+   "part0": "HumanoidRootPart",
+   "part1": "Torso",
+   "c0": [
+    0,
+    0,
+    0,
+    -1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0
+   ],
+   "c1": [
+    0,
+    0,
+    0,
+    -1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0
+   ]
+  },
+  "Neck": {
+   "part0": "Torso",
+   "part1": "Head",
+   "c0": [
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0
+   ],
+   "c1": [
+    0,
+    -0.5,
+    0,
+    -1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0
+   ]
+  },
+  "Right Shoulder": {
+   "part0": "Torso",
+   "part1": "Right Arm",
+   "c0": [
+    1,
+    0.5,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0
+   ],
+   "c1": [
+    -0.5,
+    0.5,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0
+   ]
+  },
+  "Left Shoulder": {
+   "part0": "Torso",
+   "part1": "Left Arm",
+   "c0": [
+    -1,
+    0.5,
+    0,
+    0,
+    0,
+    -1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+   ],
+   "c1": [
+    0.5,
+    0.5,
+    0,
+    0,
+    0,
+    -1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+   ]
+  },
+  "Right Hip": {
+   "part0": "Torso",
+   "part1": "Right Leg",
+   "c0": [
+    1,
+    -1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0
+   ],
+   "c1": [
+    0.5,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    -1,
+    0,
+    0
+   ]
+  },
+  "Left Hip": {
+   "part0": "Torso",
+   "part1": "Left Leg",
+   "c0": [
+    -1,
+    -1,
+    0,
+    0,
+    0,
+    -1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+   ],
+   "c1": [
+    -0.5,
+    1,
+    0,
+    0,
+    0,
+    -1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+   ]
+  }
+ },
+ "colors": {
+  "skin": "#F1C7A3",
+  "shirt": "#C8B392",
+  "pantsNeutral": "#BDB5A8",
+  "tribes": {
+   "Earth": "#6B4A2F",
+   "Ember": "#9C3328",
+   "Clay": "#B5602F",
+   "Ochre": "#B98A2E",
+   "Moss": "#4F6C2F",
+   "Tide": "#2E7671",
+   "River": "#2F5C90",
+   "Dusk": "#5D3F79",
+   "Ash": "#55575C",
+   "Bone": "#D6CAB1"
+  }
+ },
+ "textures": {
+  "shirt_color": "shirt_color.png",
+  "shirt_normal": "shirt_normal.png",
+  "shirt_roughness": "shirt_roughness.png",
+  "pants_color": "pants_color.png",
+  "pants_normal": "pants_normal.png",
+  "pants_roughness": "pants_roughness.png",
+  "face": "face.png",
+  "pants_color_earth": "pants_color_earth.png",
+  "pants_color_ember": "pants_color_ember.png",
+  "pants_color_clay": "pants_color_clay.png",
+  "pants_color_ochre": "pants_color_ochre.png",
+  "pants_color_moss": "pants_color_moss.png",
+  "pants_color_tide": "pants_color_tide.png",
+  "pants_color_river": "pants_color_river.png",
+  "pants_color_dusk": "pants_color_dusk.png",
+  "pants_color_ash": "pants_color_ash.png",
+  "pants_color_bone": "pants_color_bone.png"
+ },
+ "humanoidRootPart": {
+  "size": [
+   2,
+   2,
+   1
+  ],
+  "transparency": 1
+ }
+}
