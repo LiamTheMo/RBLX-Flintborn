@@ -67,6 +67,21 @@ PROFILES = {
 }
 
 
+# In-game tuning on top of the Blender VFX specs (owner feedback: the campfire was
+# too big and every light far too bright under Realistic lighting). Per kind:
+# size scales the whole effect, rate the particle count, light its PointLight.
+VFX_TUNING = {
+    "campfire": {"size": 0.5, "rate": 0.7, "light": 0.8},
+    "brazier_fire": {"size": 0.8},
+    "forge_fire": {"size": 0.8},
+    "heat_glow": {"size": 0.8, "rate": 0.7},
+}
+LIGHT_BRIGHTNESS = 0.35  # every PointLight's brightness
+LIGHT_RANGE = 0.75  # every PointLight's range
+PARTICLE_GLOW = 0.6  # every emitter's LightEmission
+GLOW_DIM = 0.25  # Neon flame colours darkened toward black, which softens their glow
+
+
 def sha1(path):
     return hashlib.sha1(path.read_bytes()).hexdigest()
 
@@ -290,7 +305,8 @@ local function template(name, profileName)
   mesh.CastShadow = profile.shadow
   if part.kind == "glow" then
     mesh.Material = Enum.Material.Neon
-    mesh.Color = Color3.fromHex(part.color)
+    -- Neon glows by its colour's brightness: dimmed so flames read without blowing out.
+    mesh.Color = Color3.fromHex(part.color):Lerp(Color3.new(0, 0, 0), data.glowDim)
     mesh.TextureID = ""
   else
     mesh.Material = Enum.Material.SmoothPlastic
@@ -390,8 +406,12 @@ end
 local vfxFolder = group("vfx")
 local emitters = 0
 for _, socket in data.vfx do
-  local kind, position, scale = socket[1], socket[2], socket[3]
+  local kind, position, socketScale = socket[1], socket[2], socket[3]
   local spec = data.vfxKinds[kind]
+  -- In-game tuning on top of the Blender spec (VFX_TUNING): size scales the whole
+  -- effect (sizes, speeds, accelerations, emitter box), rate the particle count.
+  local tune = data.vfxTuning[kind] or {}
+  local scale = socketScale * (tune.size or 1)
   local holder = marker("VFX_" .. kind, CFrame.new(position[1], position[2], position[3]), Vector3.new(0.2, 0.2, 0.2), vfxFolder)
   local attachment = Instance.new("Attachment")
   attachment.Parent = holder
@@ -410,10 +430,10 @@ for _, socket in data.vfx do
     if e.size then emitter.Size = numberSequence(e.size, scale) end
     if e.transparency then emitter.Transparency = numberSequence(e.transparency, 1) end
     if e.lifetime then emitter.Lifetime = range(e.lifetime) end
-    if e.rate then emitter.Rate = e.rate end
+    if e.rate then emitter.Rate = e.rate * (tune.rate or 1) end
     if e.speed then emitter.Speed = range(e.speed, scale) end
     if e.spread then emitter.SpreadAngle = Vector2.new(e.spread, e.spread) end
-    if e.light_emission then emitter.LightEmission = e.light_emission end
+    if e.light_emission then emitter.LightEmission = e.light_emission * data.particleGlow end
     if e.light_influence then emitter.LightInfluence = e.light_influence end
     if e.drag then emitter.Drag = e.drag end
     if e.rotation then emitter.Rotation = range(e.rotation) end
@@ -432,8 +452,8 @@ for _, socket in data.vfx do
   if spec.light then
     local light = Instance.new("PointLight")
     light.Color = Color3.fromHex(spec.light.color)
-    light.Brightness = spec.light.brightness or 1
-    light.Range = math.min(60, (spec.light.range or 8) * scale)
+    light.Brightness = (spec.light.brightness or 1) * data.lightBrightness * (tune.light or 1)
+    light.Range = math.min(40, (spec.light.range or 8) * socketScale * data.lightRange)
     light.Shadows = false
     if spec.light.flicker then
       -- LightFlickerController animates these on each client (nothing replicates).
@@ -447,8 +467,8 @@ for _, l in data.lights do
   local holder = marker(l.name, CFrame.new(l.position[1], l.position[2], l.position[3]), Vector3.new(0.2, 0.2, 0.2), vfxFolder)
   local light = Instance.new("PointLight")
   light.Color = Color3.fromHex(l.color)
-  light.Brightness = 1.2
-  light.Range = l.range
+  light.Brightness = 1.2 * data.lightBrightness
+  light.Range = l.range * data.lightRange
   light.Shadows = false
   light.Parent = holder
 end
@@ -516,19 +536,19 @@ return HttpService:JSONEncode({ placed = placed, templates = templateCount, emit
 # afternoon sun from the west-southwest about 40 degrees up, a cool sky fill,
 # soft haze, and bloom so the Neon flames glow. Colours are sRGB hex.
 LIGHTING_STYLE = {
-    "brightness": 2.6,
-    "exposure": 0.1,
+    "brightness": 2.0,
+    "exposure": -0.2,
     "ambient": "#5C5046",
     "outdoorAmbient": "#8F8C7E",
     "colorShiftBottom": "#2B261F",
     "environmentDiffuse": 1.0,
-    "environmentSpecular": 0.4,
+    "environmentSpecular": 0.3,
     "shadowSoftness": 0.25,
     "atmosphere": {"density": 0.28, "offset": 0.2, "color": "#CBC3A6", "decay": "#9C8466", "glare": 0.15,
                    "haze": 1.4},
-    "bloom": {"intensity": 0.7, "size": 28, "threshold": 1.4},
-    "colorCorrection": {"brightness": 0.02, "contrast": 0.12, "saturation": 0.18, "tint": "#FFF6EA"},
-    "sunRays": {"intensity": 0.05, "spread": 0.55},
+    "bloom": {"intensity": 0.3, "size": 18, "threshold": 2.2},
+    "colorCorrection": {"brightness": 0.0, "contrast": 0.1, "saturation": 0.15, "tint": "#FFF6EA"},
+    "sunRays": {"intensity": 0.03, "spread": 0.5},
     "sunAngularSize": 12,
 }
 
@@ -755,6 +775,11 @@ def place_script(m, ids):
                          **({"color": part["color"]} if "color" in part else {})}
                   for name, part in m["parts"].items()},
         "profiles": PROFILES,
+        "vfxTuning": VFX_TUNING,
+        "particleGlow": PARTICLE_GLOW,
+        "lightBrightness": LIGHT_BRIGHTNESS,
+        "lightRange": LIGHT_RANGE,
+        "glowDim": GLOW_DIM,
         "colliders": m["colliders"],
         "vfxKinds": m["vfxKinds"],
         "vfx": m["vfx"],
