@@ -349,6 +349,40 @@ for _, d in character:GetDescendants() do
     test(d.Texture)
   end
 end
+-- Which way the shirt faces: its knot sits at the character's left hip, front.
+-- In a correctly facing rig that is local -X (left) and -Z (front).
+local shirt = character:FindFirstChild("Shirt")
+local okMesh, editable = pcall(function()
+  return AssetService:CreateEditableMeshAsync(shirt.MeshContent)
+end)
+if okMesh then
+  local lo, hi = math.huge, -math.huge
+  for _, v in editable:GetVertices() do
+    local p = editable:GetPosition(v)
+    lo = math.min(lo, p.Y)
+    hi = math.max(hi, p.Y)
+  end
+  local quadrants = { leftFront = 0, rightFront = 0, leftBack = 0, rightBack = 0 }
+  local strap = { left = 0, right = 0 }
+  for _, v in editable:GetVertices() do
+    local p = editable:GetPosition(v)
+    local t = (p.Y - lo) / (hi - lo)
+    if t > 0.25 and t < 0.45 and math.abs(p.Z) > 0.64 then
+      local side = if p.X < 0 then "left" else "right"
+      local face = if p.Z < 0 then "Front" else "Back"
+      quadrants[side .. face] += 1
+    end
+    if t > 0.97 then
+      if p.X < 0 then strap.left += 1 else strap.right += 1 end
+    end
+  end
+  report.knotVertices = quadrants
+  report.strapTopVertices = strap
+  report.shirtMeshScale = tostring(shirt.MeshSize) .. " -> " .. tostring(shirt.Size)
+  report.shirtCFrame = tostring(shirt.CFrame)
+else
+  report.shirtMesh = tostring(editable)
+end
 return HttpService:JSONEncode(report)
 '''
 
