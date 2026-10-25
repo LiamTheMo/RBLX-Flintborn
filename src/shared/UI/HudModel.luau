@@ -64,6 +64,19 @@ function HudModel.LevelText(level: number?, isMax: boolean?): string
 	return ("LV. %d"):format(math.max(0, math.floor(level or 0)))
 end
 
+-- A whole number with thousands separators, as the lobby's currency bar shows it:
+-- 2450 -> "2,450". Missing or negative values read 0.
+function HudModel.Thousands(value: number?): string
+	local text = tostring(math.max(0, math.floor(value or 0)))
+	local formatted = text:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+	return (formatted:gsub("^,", ""))
+end
+
+-- The lobby party header: "PARTY 1/8" (alone counts as a party of one).
+function HudModel.PartyTitle(members: number?, maxSize: number): string
+	return ("PARTY  %d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
+end
+
 -- Small text on a full XP bar at the level cap.
 function HudModel.MaxLevelHint(level: number?): string
 	return ("Level %d (max): rebirth in the lobby to keep climbing"):format(math.max(0, math.floor(level or 0)))

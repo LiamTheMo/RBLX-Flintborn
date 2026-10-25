@@ -16,9 +16,25 @@ local HudMode = {}
 HudMode.VisibilityChanged = Signal.new()
 
 local visible = false
+local lobbyFailed = false
 
 function HudMode.ReplacesLegacy(): boolean
 	return PlaceConfig.IsWorld() and Layout.Get() ~= nil
+end
+
+-- The lobby's counterpart: true in the lobby place when the layout has its lobby
+-- section. Then LobbyHudController draws the profile, currency, party, navigation
+-- and Enter button, and the older lobby panel, wallet label, navigation bar, XP
+-- bar and settings button stay hidden.
+function HudMode.ReplacesLobby(): boolean
+	local layout = Layout.Get()
+	return PlaceConfig.IsLobby() and layout ~= nil and layout.lobby ~= nil and not lobbyFailed
+end
+
+-- LobbyHudController calls this when the lobby HUD fails to build, so the
+-- controllers that start after it show their own lobby visuals instead.
+function HudMode.SetLobbyFailed()
+	lobbyFailed = true
 end
 
 -- True while the new HUD is on screen. Outside a run (world menu, protected,
