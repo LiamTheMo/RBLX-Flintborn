@@ -714,6 +714,55 @@ end
 return HttpService:JSONEncode({ meshes = out, placed = placed })
 '''
 
+# Builds the lobby HUD inside the place (server side, never parented to a
+# player) with the deployed modules and reports what each navigation button and
+# the currency icons hold, to debug sprites that do not show.
+UI_PROBE = r'''
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterPlayer = game:GetService("StarterPlayer")
+local report = {}
+local ok, err = pcall(function()
+  local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
+  report.idCount = 0
+  for _ in UiAssets.Ids do report.idCount += 1 end
+  report.backpackId = UiAssets.image("icon_backpack")
+  report.frameSlotId = UiAssets.image("frame_slot")
+  local hudFolder = StarterPlayer.StarterPlayerScripts.Client.Hud
+  local Layout = require(hudFolder.Layout)
+  local LobbyHud = require(hudFolder.LobbyHud)
+  local holder = Instance.new("ScreenGui")
+  holder.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+  local hud = LobbyHud.new(holder, Layout.Get(), function() return true end)
+  local function describe(object)
+    local items = {}
+    for _, child in object:GetChildren() do
+      local entry = { name = child.Name, class = child.ClassName }
+      if child:IsA("GuiObject") then
+        entry.z = child.ZIndex
+        entry.size = tostring(child.AbsoluteSize) .. " / " .. tostring(child.Size)
+        entry.visible = child.Visible
+      end
+      if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+        entry.image = child.Image
+        entry.scaleType = child.ScaleType.Name
+        entry.transparency = child.ImageTransparency
+      end
+      if child:IsA("TextLabel") or child:IsA("TextButton") then entry.text = child.Text end
+      table.insert(items, entry)
+    end
+    return items
+  end
+  local nav = hud.root:FindFirstChild("Navigation")
+  report.inventory = describe(nav:FindFirstChild("Inventory"))
+  report.currency = describe(hud.root:FindFirstChild("Currency"))
+  holder:Destroy()
+end)
+report.ok = ok
+report.err = if ok then nil else tostring(err)
+return HttpService:JSONEncode(report)
+'''
+
 VERIFY = r'''
 local HttpService = game:GetService("HttpService")
 local CollectionService = game:GetService("CollectionService")
@@ -850,7 +899,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--inspect", "--place", "--lighting", "--diagnose"):
+    for flag in ("--check", "--upload", "--inspect", "--place", "--lighting", "--diagnose", "--uiprobe"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -874,6 +923,9 @@ def main():
     cloud = PlaceCloud()
     if args.inspect:
         show(cloud.task(INSPECT))
+        return 0
+    if args.uiprobe:
+        show(cloud.task(UI_PROBE))
         return 0
     if args.diagnose:
         names = [n for n in DIAGNOSE_PARTS if n in m["parts"] and n in ids["models"]]
