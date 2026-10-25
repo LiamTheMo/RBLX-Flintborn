@@ -321,6 +321,37 @@ report.parts = #model:GetChildren()
 return HttpService:JSONEncode(report)
 '''
 
+# What the installed character actually wears, and whether the place can load each
+# image (EditableImage loads respect asset permissions).
+PROBE = r'''
+local AssetService = game:GetService("AssetService")
+local HttpService = game:GetService("HttpService")
+local character = game:GetService("StarterPlayer"):FindFirstChild("StarterCharacter")
+assert(character, "StarterCharacter missing")
+local report = { pieces = {}, loads = {} }
+local seen = {}
+local function test(id)
+  if id == nil or id == "" or seen[id] then return end
+  seen[id] = true
+  local ok, result = pcall(function()
+    return AssetService:CreateEditableImageAsync(Content.fromUri(id))
+  end)
+  report.loads[id] = if ok then tostring(result.Size) else tostring(result)
+end
+for _, d in character:GetDescendants() do
+  if d:IsA("MeshPart") then
+    local appearance = d:FindFirstChildWhichIsA("SurfaceAppearance")
+    report.pieces[d.Name] = { textureId = d.TextureID, color = d.Color:ToHex(), material = d.Material.Name,
+      surface = appearance and appearance.ColorMap or nil }
+    test(d.TextureID)
+  elseif d:IsA("Decal") then
+    report.pieces["decal:" .. d.Name] = { texture = d.Texture, face = d.Face.Name, parent = d.Parent.Name }
+    test(d.Texture)
+  end
+end
+return HttpService:JSONEncode(report)
+'''
+
 VERIFY = r'''
 local HttpService = game:GetService("HttpService")
 local character = game:GetService("StarterPlayer"):FindFirstChild("StarterCharacter")
@@ -371,7 +402,7 @@ def show(task):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     mode = parser.add_mutually_exclusive_group(required=True)
-    for flag in ("--check", "--upload", "--install"):
+    for flag in ("--check", "--upload", "--install", "--probe"):
         mode.add_argument(flag, action="store_true")
     args = parser.parse_args()
     m = manifest()
@@ -393,6 +424,9 @@ def main():
     if problems:
         raise ValueError("; ".join(problems[:8]))
     cloud = PlaceCloud()
+    if args.probe:
+        show(cloud.task(PROBE))
+        return 0
     show(cloud.task(install_script(m, ids)))
     show(cloud.task(VERIFY))
     return 0
