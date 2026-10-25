@@ -757,6 +757,25 @@ local ok, err = pcall(function()
   report.inventory = describe(nav:FindFirstChild("Inventory"))
   report.currency = describe(hud.root:FindFirstChild("Currency"))
   holder:Destroy()
+  -- Can the place load the image content? EditableImage loads respect asset
+  -- permissions, and PreloadAsync reports each asset's fetch status.
+  local AssetService = game:GetService("AssetService")
+  local ContentProvider = game:GetService("ContentProvider")
+  report.loads = {}
+  for _, name in { "icon_backpack", "icon_coin", "icon_heart", "frame_slot", "frame_bar_hollow" } do
+    local id = UiAssets.image(name)
+    local entry = { id = id }
+    local okImage, result = pcall(function()
+      return AssetService:CreateEditableImageAsync(Content.fromUri(id))
+    end)
+    entry.editable = if okImage then tostring(result.Size) else tostring(result)
+    pcall(function()
+      ContentProvider:PreloadAsync({ id }, function(_, status)
+        entry.preload = status.Name
+      end)
+    end)
+    report.loads[name] = entry
+  end
 end)
 report.ok = ok
 report.err = if ok then nil else tostring(err)
