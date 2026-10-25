@@ -1,11 +1,13 @@
 """Build sheet 09: the default player character (R6) and its clothing.
 
 Matches art/reference/character/hair_01_bald.png: a soft, rounded blocky body
-in warm peach skin with the classic smile face, a tan hide wrap over the right
-shoulder with a ragged hem and a knot at the left hip, and ragged brown shorts.
+in warm peach skin with the classic smile face, a tan hide wrap over the left
+shoulder with a ragged hem and knots at the hips, and ragged brown shorts.
 The proportions are Roblox's default R6 sizes, not the reference's:
 
-    Head  part 2 x 1 x 1 (mesh ~1.25 rounded, centred 0.5 above the neck)
+    Head  a cylinder (1.45 across, 1.4 tall, rounded top and bottom edges) like
+          the master's, sitting on the torso (centred 0.7 above the neck; the
+          Neck joint's C1 says so)
     Torso 2 x 2 x 1   Arms 1 x 2 x 1   Legs 1 x 2 x 1   (5 studs tall)
 
 Rig: an armature with the standard R6 joints (RootJoint, Neck, Left/Right
@@ -38,6 +40,7 @@ import json
 import math
 import os
 import sys
+import time
 
 import blf
 import bmesh
@@ -61,11 +64,11 @@ FONT_BODY = r"C:\Windows\Fonts\georgia.ttf"
 
 TEX_SIZE = 1024
 BG = "#F7F3EA"  # the reference sheet's warm cream
-SKIN = "#F1C7A3"
-SHIRT = "#C8B392"
+SKIN = "#EFBE9D"  # measured from the master
+SHIRT = "#C8AC88"
 PANTS_NEUTRAL = "#BDB5A8"  # tinted per tribe; baked variants below
 TRIBES = [
-    ("Earth", "#6B4A2F"),  # the default, as in the reference
+    ("Earth", "#643E20"),  # the default, as in the reference
     ("Ember", "#9C3328"),
     ("Clay", "#B5602F"),
     ("Ochre", "#B98A2E"),
@@ -81,18 +84,18 @@ TRIBES = [
 # Front faces -Y, so the character's right side is -X.
 PARTS = {
     "Torso": ((2.0, 1.0, 2.0), (0.0, 0.0, 3.0)),
-    "Head": ((1.25, 1.25, 1.2), (0.0, 0.0, 4.5)),
+    "Head": ((1.5, 1.5, 1.4), (0.0, 0.0, 4.7)),
     "Right Arm": ((1.0, 1.0, 2.0), (-1.5, 0.0, 3.0)),
     "Left Arm": ((1.0, 1.0, 2.0), (1.5, 0.0, 3.0)),
     "Right Leg": ((1.0, 1.0, 2.0), (-0.5, 0.0, 1.0)),
     "Left Leg": ((1.0, 1.0, 2.0), (0.5, 0.0, 1.0)),
 }
-ROUNDING = {"Head": 0.3, "Torso": 0.12}
+ROUNDING = {"Head": 0.34, "Torso": 0.12}
 # Bones: name -> (head = joint pivot, tail, parent bone, part it carries).
 BONES = {
     "HumanoidRootPart": ((0, 0, 2.0), (0, 0, 3.0), None, None),
     "Torso": ((0, 0, 3.0), (0, 0, 4.0), "HumanoidRootPart", "Torso"),
-    "Head": ((0, 0, 4.0), (0, 0, 5.1), "Torso", "Head"),
+    "Head": ((0, 0, 4.0), (0, 0, 5.4), "Torso", "Head"),
     # Limb bones hang straight down from the joint, so their local X is the world X
     # axis R6 shoulders and hips swing about (forward = negative X rotation).
     "Right Arm": ((-1.0, 0, 3.5), (-1.0, 0, 2.0), "Torso", "Right Arm"),
@@ -104,7 +107,10 @@ BONES = {
 MOTORS = {
     "RootJoint": ("HumanoidRootPart", "Torso", [0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0],
                   [0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0]),
-    "Neck": ("Torso", "Head", [0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0], [0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0]),
+    # The master's head is bigger than Roblox's and sits on the torso, so the Neck's
+    # C1 puts it 0.7 above the joint (Roblox's default is 0.5); the joint itself,
+    # and every R6 animation's head turn about it, is unchanged.
+    "Neck": ("Torso", "Head", [0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0], [0, -0.7, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0]),
     "Right Shoulder": ("Torso", "Right Arm", [1, 0.5, 0, 0, 0, 1, 0, 1, 0, -1, 0, 0],
                        [-0.5, 0.5, 0, 0, 0, 1, 0, 1, 0, -1, 0, 0]),
     "Left Shoulder": ("Torso", "Left Arm", [-1, 0.5, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0],
@@ -159,6 +165,45 @@ def rounded_box(name, size, centre, radius, collection):
     return obj
 
 
+def cylinder_head(name, diameter, height, fillet, centre, collection, segments=48, top_fillet=None):
+    """The classic round head: a vertical cylinder with filleted top and bottom
+    edges, made by spinning its profile around Z. A bigger top fillet makes the
+    crown read domed, as in the master."""
+    radius, half = diameter / 2, height / 2
+    top_fillet = top_fillet or fillet
+    profile = [(0.0, -half)]
+    for k in range(9):  # bottom fillet
+        t = -math.pi / 2 + k / 8 * math.pi / 2
+        profile.append((radius - fillet + fillet * math.cos(t), -half + fillet + fillet * math.sin(t)))
+    for k in range(13):  # top fillet
+        t = k / 12 * math.pi / 2
+        profile.append((radius - top_fillet + top_fillet * math.cos(t), half - top_fillet + top_fillet * math.sin(t)))
+    profile.append((0.0, half))
+    bm = bmesh.new()
+    rings = []
+    for j in range(segments):
+        angle = 2 * math.pi * j / segments
+        ca, sa = math.cos(angle), math.sin(angle)
+        rings.append([bm.verts.new((r * ca, r * sa, z)) if r > 1e-9 else None for r, z in profile])
+    bottom, top = bm.verts.new((0, 0, -half)), bm.verts.new((0, 0, half))
+    last = len(profile) - 1
+    for j in range(segments):
+        a, b = rings[j], rings[(j + 1) % segments]
+        bm.faces.new([bottom, b[1], a[1]])
+        for k in range(1, last - 1):
+            bm.faces.new([a[k], b[k], b[k + 1], a[k + 1]])
+        bm.faces.new([a[last - 1], b[last - 1], top])
+    for f in bm.faces:
+        f.smooth = True
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    obj = link(bpy.data.objects.new(name, me), collection)
+    obj.location = centre
+    return obj
+
+
 def rounded_rect(a, b, r, s):
     """Point and outward normal at arc-length fraction s of a rounded rectangle
     (half sizes a, b, corner radius r) centred on the origin, counter-clockwise."""
@@ -184,13 +229,16 @@ def rounded_rect(a, b, r, s):
     return starts[0], (1, 0)
 
 
-def shell(name, centre, a, b, r, bottom, top, collection, ring_count, around, keep=None, flare=None, cut=None):
+def shell(name, centre, a, b, r, bottom, top, collection, ring_count, around, keep=None, flare=None, cut=None,
+          cap=None):
     """A tube of quads around a rounded-rect cross-section from z = bottom(theta) to top,
     with faces kept by keep(x, y, z), then cut cleanly by `cut` = (point, normal, wave):
     everything on the normal's side of that plane goes, and the new edge gets a soft
-    wave(x) so it reads as cut hide. Solidified later."""
+    wave(x) so it reads as cut hide. With `cap` (a rounding radius) the tube also
+    curves over the top edge and closes across the top. Solidified later."""
     bm = bmesh.new()
     grid = []
+    side_top = top - cap if cap else top
     for i in range(ring_count + 1):
         u = i / ring_count
         row = []
@@ -198,10 +246,23 @@ def shell(name, centre, a, b, r, bottom, top, collection, ring_count, around, ke
             s = j / around
             (x, y), (nx, ny) = rounded_rect(a, b, r, s)
             z0 = bottom(s)
-            z = z0 + u * (top - z0)
+            z = z0 + u * (side_top - z0)
             push = flare(z) if flare else 0.0
             row.append(bm.verts.new((centre[0] + x + nx * push, centre[1] + y + ny * push, z)))
         grid.append(row)
+    if cap:
+        for k in range(1, 7):  # the rounded top edge, stepping inward and up
+            angle = k / 6 * math.pi / 2
+            inset = cap * (1 - math.cos(angle))
+            z = side_top + cap * math.sin(angle)
+            row = []
+            for j in range(around):
+                (x, y), (nx, ny) = rounded_rect(a, b, r, j / around)
+                row.append(bm.verts.new((centre[0] + x - nx * inset, centre[1] + y - ny * inset, z)))
+            grid.append(row)
+        ring_count = len(grid) - 1
+        f = bm.faces.new(grid[-1])  # counter-clockwise from above: faces up, like the sides face out
+        f.smooth = True
     for i in range(ring_count):
         for j in range(around):
             quad = [grid[i][j], grid[i][(j + 1) % around], grid[i + 1][(j + 1) % around], grid[i + 1][j]]
@@ -222,6 +283,8 @@ def shell(name, centre, a, b, r, bottom, top, collection, ring_count, around, ke
         for v in result["geom_cut"]:
             if isinstance(v, bmesh.types.BMVert):
                 v.co -= normal * wave(v.co.x)
+        # The cut leaves sliver faces; thickening those would throw spikes.
+        bmesh.ops.dissolve_degenerate(bm, dist=0.004, edges=list(bm.edges))
         for f in bm.faces:
             f.smooth = True
     me = bpy.data.meshes.new(name)
@@ -230,59 +293,97 @@ def shell(name, centre, a, b, r, bottom, top, collection, ring_count, around, ke
     return link(bpy.data.objects.new(name, me), collection)
 
 
-def strap(name, collection):
-    """The hide band over the right shoulder: a sweep across the torso top from the
-    front, over the rounded edge, to the back."""
-    bm = bmesh.new()
-    # Lies flush over the shoulder, just proud of the wrap so the two never z-fight.
-    a_front, top, r = 0.552, 4.052, 0.15
-    path = []
-    for k in range(9):  # front face, going up
-        path.append((-a_front, 3.55 + k * (top - r - 3.55) / 8))
-    for k in range(1, 7):  # front corner
-        t = k / 6 * math.pi / 2
-        path.append((-(a_front - r) - r * math.cos(t), top - r + r * math.sin(t)))
-    for k in range(1, 10):  # over the top
-        path.append((-(a_front - r) + k * 2 * (a_front - r) / 9, top))
-    for k in range(1, 7):  # back corner
-        t = k / 6 * math.pi / 2
-        path.append(((a_front - r) + r * math.sin(t), top - r + r * math.cos(t)))
-    for k in range(1, 9):  # back face, going down
-        path.append((a_front, top - r - k * (top - r - 3.55) / 8))
-    xs = [-1.052, -0.96, -0.8, -0.62, -0.44, -0.32]
-    rows = []
-    for py, pz in path:
-        rows.append([bm.verts.new((x, py, pz)) for x in xs])
-    for i in range(len(rows) - 1):
-        for j in range(len(xs) - 1):
-            f = bm.faces.new([rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j]])
+# The wrap's neckline, measured from the master: it starts on top of the LEFT
+# shoulder (+X) and runs down to the right side (-X), 0.87 below the torso top.
+NECK_LOW = 3.13
+NECK_SLOPE = 0.54
+
+
+def neck_line(x):
+    return NECK_LOW + (x + 1.04) * NECK_SLOPE
+
+
+def blob(bm, centre, radii, rot_z=0.0, rot_x=0.0, rot_y=0.0, segments=(16, 10)):
+    geom = bmesh.ops.create_uvsphere(bm, u_segments=segments[0], v_segments=segments[1], radius=1.0)
+    verts = geom["verts"]
+    M = (Matrix.Translation(centre) @ Matrix.Rotation(rot_z, 4, "Z") @ Matrix.Rotation(rot_y, 4, "Y")
+         @ Matrix.Rotation(rot_x, 4, "X") @ Matrix.Diagonal((*radii, 1)))
+    bmesh.ops.transform(bm, matrix=M, verts=verts)
+    for v in verts:
+        for f in v.link_faces:
             f.smooth = True
+    return verts
+
+
+def knot(name, collection, centre, turn):
+    """A tied hide knot, as in the master: a round bunched ball at the torso's edge,
+    a looped tie running inward, and two flat leaf-shaped tails hanging below.
+    Built facing front (-Y) with the loop toward -X, then turned (`turn` radians
+    about Z), scaled up 25% and moved to `centre`."""
+    bm = bmesh.new()
+    parts = []
+    parts += blob(bm, Vector((0.0, -0.01, 0.0)), (0.105, 0.065, 0.11))           # the ball
+    parts += blob(bm, Vector((0.012, -0.05, 0.03)), (0.06, 0.025, 0.05))          # its crown, tied over
+    parts += blob(bm, Vector((-0.14, 0.0, 0.0)), (0.1, 0.045, 0.052))             # one smooth loop
+    parts += blob(bm, Vector((-0.03, 0.0, -0.22)), (0.07, 0.03, 0.19), rot_y=math.radians(7))      # tails
+    parts += blob(bm, Vector((0.05, 0.005, -0.2)), (0.064, 0.028, 0.17), rot_y=math.radians(-9))
+    M = Matrix.Translation(centre) @ Matrix.Rotation(turn, 4, "Z") @ Matrix.Scale(1.25, 4)
+    bmesh.ops.transform(bm, matrix=M, verts=bm.verts)
     me = bpy.data.meshes.new(name)
     bm.to_mesh(me)
     bm.free()
     return link(bpy.data.objects.new(name, me), collection)
 
 
-def blob(bm, centre, radii, rot_z=0.0, rot_x=0.0):
-    geom = bmesh.ops.create_uvsphere(bm, u_segments=14, v_segments=9, radius=1.0)
-    verts = geom["verts"]
-    M = (Matrix.Translation(centre) @ Matrix.Rotation(rot_z, 4, "Z") @ Matrix.Rotation(rot_x, 4, "X")
-         @ Matrix.Diagonal((*radii, 1)))
-    bmesh.ops.transform(bm, matrix=M, verts=verts)
-    for v in verts:
-        for f in v.link_faces:
-            f.smooth = True
-
-
-def knot(name, collection):
-    """The tied knot at the left hip, front: a bunched centre, two lobes and two tails."""
+def wrap_shell(name, a, b, r, hem, neck, top, cap, collection, rings=28, around=88):
+    """The shirt's wrap as one sheet: a tube around the torso whose every column
+    runs from the hem up to the neckline neck(x), curving over the shoulder's
+    rounded edge (radius `cap`) where the neckline passes above the torso, and
+    closed across the top there. Columns ending exactly on the neckline give a
+    straight, clean edge, which cutting the tube afterwards cannot."""
     bm = bmesh.new()
-    c = Vector((0.92, -0.58, 2.36))
-    blob(bm, c, (0.17, 0.12, 0.15))
-    blob(bm, c + Vector((-0.17, -0.01, 0.05)), (0.13, 0.09, 0.09), rot_z=0.3)
-    blob(bm, c + Vector((0.15, 0.02, 0.06)), (0.11, 0.09, 0.09), rot_z=-0.4)
-    blob(bm, c + Vector((-0.05, -0.03, -0.27)), (0.08, 0.05, 0.21), rot_x=0.15)
-    blob(bm, c + Vector((0.09, -0.02, -0.23)), (0.07, 0.05, 0.17), rot_z=-0.3, rot_x=0.1)
+    side_top = top - cap
+    columns = []
+    for j in range(around):
+        s = j / around
+        (x, y), (nx, ny) = rounded_rect(a, b, r, s)
+        z0, zt = hem(s), neck(x)
+        col = []
+        for i in range(rings + 1):
+            col.append((x, y, z0 + i / rings * (min(zt, side_top) - z0)))
+        reach = math.asin(min(1.0, max(0.0, (min(zt, top) - side_top) / cap)))
+        for k in range(1, 7):
+            if zt <= side_top:
+                col.append(col[rings])  # ends below the shoulder: the curve collapses onto the neckline
+                continue
+            angle = reach * k / 6
+            inset = cap * (1 - math.cos(angle))
+            col.append((x - nx * inset, y - ny * inset, side_top + cap * math.sin(angle)))
+        columns.append((zt >= top - 1e-6, [bm.verts.new(p) for p in col]))
+    height = rings + 6
+    for j in range(around):
+        left, right = columns[j][1], columns[(j + 1) % around][1]
+        for i in range(height):
+            f = bm.faces.new([left[i], right[i], right[i + 1], left[i + 1]])
+            f.smooth = True
+    # The top, where the neckline runs above the torso: the run of columns that
+    # reached it, in order (counter-clockwise from above, so it faces up).
+    reached = [j for j in range(around) if columns[j][0]]
+    if reached:
+        start = next(j for j in reached if not columns[(j - 1) % around][0])
+        run = []
+        j = start
+        while columns[j][0]:
+            run.append(columns[j][1][-1])
+            j = (j + 1) % around
+        if len(run) >= 3:
+            f = bm.faces.new(run)
+            f.smooth = True
+    # Columns that never reached the shoulder collapse their curve onto one point.
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+    bmesh.ops.dissolve_degenerate(bm, dist=1e-5, edges=list(bm.edges))
+    for f in bm.faces:
+        f.smooth = True
     me = bpy.data.meshes.new(name)
     bm.to_mesh(me)
     bm.free()
@@ -323,34 +424,43 @@ def wavy(base, amp, freq, seed):
 
 
 def build_clothing(col):
-    # The wrap: a tube around the torso, cut on the diagonal from the right shoulder
-    # (-X, top) to below the left armpit, hanging past the torso over the shorts.
-    # The cut runs from the right shoulder (x -1.06, top) to the left side at z 3.2.
-    diagonal = ((-1.04, 0.0, 4.04), (0.84, 0.0, 2.08), lambda x: 0.02 + 0.02 * math.sin(x * 9.0 + 1.3))
+    # The wrap, flat to the torso like the master: a tube cut on the neckline
+    # (left shoulder down to the right side), over the left shoulder by the strap.
 
+    # The hem, measured from the master: level 0.27 below the torso on the far
+    # side, rising steeply into the knot. The front knot sits at the left edge
+    # (+X), the back knot at the right edge (-X), as each view shows it.
+    def rise(u):
+        t = min(1.0, max(0.0, u / 0.95))
+        return 1.73 + 0.47 * t ** 1.7
 
-    # Flat like the master: the wrap hugs the torso straight down to a gently wavy
-    # hem, with no outward flare.
-    wrap = shell("Shirt", (0, 0, 0), 1.04, 0.54, 0.15, wavy(1.62, 0.035, 7, 1.0), 4.04, col,
-                 ring_count=40, around=96, cut=diagonal)
-    band = strap("ShirtStrap", col)
-    tie = knot("ShirtKnot", col)
+    def hem(s):
+        (x, y), _ = rounded_rect(1.04, 0.54, 0.15, s)
+        front = min(1.0, max(0.0, (-y - 0.3) / 0.24))
+        back = min(1.0, max(0.0, (y - 0.3) / 0.24))
+        lift = front * (rise(x) - 1.73) + back * (rise(-x) - 1.73)
+        return 1.73 + lift + 0.02 * math.sin(s * 2 * math.pi * 7 + 0.8)
+
+    wrap = wrap_shell("Shirt", 1.04, 0.54, 0.15, hem, neck_line, 4.04, 0.15, col)
+    ties = [knot("ShirtKnotFront", col, Vector((0.93, -0.565, 2.52)), 0.0),
+            knot("ShirtKnotBack", col, Vector((-0.93, 0.565, 2.52)), math.pi)]
     # No subdivision: smooth shading keeps the cloth soft and each mesh well under
     # Roblox's ~20k triangle limit.
-    for o in (wrap, band):
+    for o in (wrap,):
         mod = o.modifiers.new("Thick", "SOLIDIFY")
-        mod.thickness = 0.035
+        mod.thickness = 0.04
         mod.offset = -1.0
-        mod.use_even_offset = True
+        mod.use_even_offset = False  # even thickness turns any leftover sliver into a spike
         apply_modifiers(o)
-    join(wrap, [band, tie])
+    join(wrap, ties)
 
     pants = []
     # Under the shirt: kept close to the torso so the wrap never clips through it.
     waist = shell("PantsWaist", (0, 0, 0), 1.02, 0.52, 0.14, lambda s: 1.9, 2.32, col, ring_count=6, around=72)
     pants.append(waist)
     for name, x, seed in (("PantsRightLeg", -0.5, 2.0), ("PantsLeftLeg", 0.5, 5.0)):
-        leg = shell(name, (x, 0, 0), 0.528, 0.528, 0.13, wavy(0.97, 0.03, 5, seed), 2.06, col,
+        # The master's shorts end a little below mid-thigh.
+        leg = shell(name, (x, 0, 0), 0.528, 0.528, 0.13, wavy(1.07, 0.03, 5, seed), 2.06, col,
                     ring_count=16, around=56)
         pants.append(leg)
     for o in pants:
@@ -391,9 +501,9 @@ def shader_material(name, kind):
     base = lin(SHIRT if kind == "shirt" else PANTS_NEUTRAL)
     ramp = n.new("ShaderNodeValToRGB")
     ramp.color_ramp.elements[0].position = 0.3
-    ramp.color_ramp.elements[0].color = (*(c * 0.93 for c in base), 1)
+    ramp.color_ramp.elements[0].color = (*(c * 0.96 for c in base), 1)
     ramp.color_ramp.elements[1].position = 0.75
-    ramp.color_ramp.elements[1].color = (*(min(1.0, c * 1.04) for c in base), 1)
+    ramp.color_ramp.elements[1].color = (*(min(1.0, c * 1.03) for c in base), 1)
     l.new(mottle.outputs["Fac"], ramp.inputs["Fac"])
     darken = n.new("ShaderNodeMix")
     darken.data_type = "RGBA"
@@ -401,7 +511,7 @@ def shader_material(name, kind):
     l.new(ramp.outputs["Color"], darken.inputs["A"])
     blotch_ramp = n.new("ShaderNodeValToRGB")
     blotch_ramp.color_ramp.elements[0].position = 0.35
-    blotch_ramp.color_ramp.elements[0].color = (0.95, 0.94, 0.93, 1)
+    blotch_ramp.color_ramp.elements[0].color = (0.97, 0.965, 0.96, 1)
     blotch_ramp.color_ramp.elements[1].position = 0.7
     blotch_ramp.color_ramp.elements[1].color = (1, 1, 1, 1)
     l.new(blotch.outputs["Fac"], blotch_ramp.inputs["Fac"])
@@ -484,7 +594,7 @@ def bake_set(objs, mat, prefix):
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
     scene.cycles.samples = 8
-    scene.render.bake.margin = 8
+    scene.render.bake.margin = 16
     images = {
         "color": new_image(prefix + "_color"),
         "normal": new_image(prefix + "_normal", "Non-Color"),
@@ -502,7 +612,7 @@ def bake_set(objs, mat, prefix):
                          ("normal", {"type": "NORMAL", "normal_space": "TANGENT"}),
                          ("roughness", {"type": "ROUGHNESS"})):
         node.image = images[kind]
-        bpy.ops.object.bake(use_clear=True, margin=8, **kwargs)
+        bpy.ops.object.bake(use_clear=True, margin=16, **kwargs)
         path = os.path.join(TEX_DIR, f"{prefix}_{kind}.png")
         images[kind].filepath_raw = path
         images[kind].file_format = "PNG"
@@ -538,20 +648,24 @@ def face_texture(path, size=512):
     """The classic smile: two tall oval eyes and a round smile, black on transparent."""
     yy, xx = np.mgrid[0:size, 0:size].astype(np.float32) + 0.5
     ink = np.zeros((size, size), np.float32)
+    # Measured from the master's front view (fractions of the head's width/height).
     for cx in (0.405 * size, 0.595 * size):
-        cy, rx, ry = 0.36 * size, 0.036 * size, 0.082 * size
+        cy, rx, ry = 0.36 * size, 0.034 * size, 0.086 * size
         d = np.sqrt(((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2)
         ink = np.maximum(ink, np.clip((1.0 - d) * rx, 0, 1))
-    t = np.linspace(-1, 1, 160)
-    half_width, radius, cy = 0.2 * size, 0.215 * size, 0.53 * size
-    pts = np.stack([size / 2 + half_width * t, cy + np.sqrt(radius ** 2 - (half_width * t) ** 2)], 1)
-    stroke = 0.017 * size
+    # A circular arc of +-80 degrees, its ends opening slightly outward like the
+    # master's: with the stroke, 0.35 of the head wide and 0.17 deep.
+    angles = np.radians(np.linspace(-80, 80, 160))
+    radius = 0.155 * size / math.sin(math.radians(80))
+    cy = 0.80 * size - radius
+    pts = np.stack([size / 2 + radius * np.sin(angles), cy + radius * np.cos(angles)], 1)
+    stroke = 0.022 * size
     for y0 in range(0, size, 64):
         sub_x, sub_y = xx[y0:y0 + 64, :, None], yy[y0:y0 + 64, :, None]
         dist = np.sqrt((sub_x - pts[None, None, :, 0]) ** 2 + (sub_y - pts[None, None, :, 1]) ** 2).min(2)
         ink[y0:y0 + 64] = np.maximum(ink[y0:y0 + 64], np.clip(stroke - dist + 0.5, 0, 1))
     rgba = np.zeros((size, size, 4), np.float32)
-    rgba[..., :3] = 0.07
+    rgba[..., :3] = 0.0  # pure black ink, like the master
     rgba[..., 3] = ink
     image = bpy.data.images.new("face", size, size, alpha=True, float_buffer=False)
     image.pixels[:] = rgba[::-1].ravel()
@@ -586,6 +700,70 @@ def skin_material():
     bsdf = mat.node_tree.nodes["Principled BSDF"]
     bsdf.inputs["Base Color"].default_value = (*lin(SKIN), 1)
     bsdf.inputs["Roughness"].default_value = 0.55
+    return mat
+
+
+def head_material(face_image):
+    """Skin with the face decal projected onto the front of the head, the way a
+    Roblox Decal on the Front face projects onto a MeshPart."""
+    mat = bpy.data.materials.new("HeadSkin")
+    mat.use_nodes = True
+    nt = mat.node_tree
+    n, l = nt.nodes, nt.links
+    bsdf = n["Principled BSDF"]
+    bsdf.inputs["Roughness"].default_value = 0.55
+    size, _ = PARTS["Head"]
+    coord = n.new("ShaderNodeTexCoord")
+    sep = n.new("ShaderNodeSeparateXYZ")
+    l.new(coord.outputs["Object"], sep.inputs["Vector"])
+    u = n.new("ShaderNodeMath")
+    u.operation = "MULTIPLY_ADD"  # x / width + 0.5
+    u.inputs[1].default_value = 1.0 / size[0]
+    u.inputs[2].default_value = 0.5
+    l.new(sep.outputs["X"], u.inputs[0])
+    v = n.new("ShaderNodeMath")
+    v.operation = "MULTIPLY_ADD"  # z / height + 0.5
+    v.inputs[1].default_value = 1.0 / size[2]
+    v.inputs[2].default_value = 0.5
+    l.new(sep.outputs["Z"], v.inputs[0])
+    uv = n.new("ShaderNodeCombineXYZ")
+    l.new(u.outputs["Value"], uv.inputs["X"])
+    l.new(v.outputs["Value"], uv.inputs["Y"])
+    tex = n.new("ShaderNodeTexImage")
+    tex.image = face_image
+    tex.extension = "CLIP"
+    l.new(uv.outputs["Vector"], tex.inputs["Vector"])
+    # Only the half facing front (-Y) shows the decal.
+    geo = n.new("ShaderNodeNewGeometry")
+    local_normal = n.new("ShaderNodeVectorTransform")  # the head's own front, however it turns
+    local_normal.vector_type = "NORMAL"
+    local_normal.convert_from = "WORLD"
+    local_normal.convert_to = "OBJECT"
+    l.new(geo.outputs["Normal"], local_normal.inputs["Vector"])
+    sep_n = n.new("ShaderNodeSeparateXYZ")
+    l.new(local_normal.outputs["Vector"], sep_n.inputs["Vector"])
+    front = n.new("ShaderNodeMath")
+    front.operation = "LESS_THAN"
+    front.inputs[1].default_value = -0.3
+    l.new(sep_n.outputs["Y"], front.inputs[0])
+    mask = n.new("ShaderNodeMath")
+    mask.operation = "MULTIPLY"
+    l.new(tex.outputs["Alpha"], mask.inputs[0])
+    l.new(front.outputs["Value"], mask.inputs[1])
+    mix = n.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs["A"].default_value = (*lin(SKIN), 1)
+    l.new(tex.outputs["Color"], mix.inputs["B"])
+    l.new(mask.outputs["Value"], mix.inputs["Factor"])
+    l.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    # Matte ink: no shine where the face is drawn, so it reads black like the master.
+    shine = n.new("ShaderNodeMath")
+    shine.operation = "MULTIPLY_ADD"  # 0.3 * (1 - mask)
+    shine.inputs[1].default_value = -0.3
+    shine.inputs[2].default_value = 0.3
+    l.new(mask.outputs["Value"], shine.inputs[0])
+    l.new(shine.outputs["Value"], bsdf.inputs["Specular IOR Level"])
+    bsdf.inputs["Roughness"].default_value = 0.75
     return mat
 
 
@@ -689,11 +867,13 @@ def render_cell(path, root_rot_deg, res=(480, 640), scale=6.4, centre_z=2.7, off
     rig.location = (offset_x, 0, 0)
     cam = bpy.data.objects["FB_Cam"]
     cam.data.ortho_scale = scale
-    el = math.radians(6)
+    el = math.radians(2)  # nearly level, like the master's camera
     cam.location = (offset_x, -30 * math.cos(el), centre_z + 30 * math.sin(el))
     cam.rotation_euler = (math.radians(90) - el, 0, 0)
-    scene.render.filepath = path
+    temp = path[:-4] + ".tmp.png"
+    scene.render.filepath = temp
     bpy.ops.render.render(write_still=True)
+    publish(temp, path)
     rig.rotation_euler = (0, 0, 0)
     rig.location = (0, 0, 0)
     return path
@@ -707,14 +887,27 @@ def load_px(path):
     return px
 
 
+def publish(temp, path):
+    """Moves a freshly written image into place. A viewer holding the old file
+    open (the app's file pane) can block the write for a moment, so retry."""
+    for attempt in range(40):
+        try:
+            os.replace(temp, path)
+            return
+        except OSError:
+            time.sleep(0.25)
+    raise OSError("could not replace " + path)
+
+
 def save_px(path, px):
     h, w = px.shape[:2]
     img = bpy.data.images.new("sheet", w, h, alpha=True, float_buffer=False)
     img.pixels[:] = px[::-1].ravel()
-    img.filepath_raw = path
+    img.filepath_raw = path[:-4] + ".tmp.png"
     img.file_format = "PNG"
     img.save()
     bpy.data.images.remove(img)
+    publish(path[:-4] + ".tmp.png", path)
 
 
 def canvas(w, h):
@@ -740,7 +933,9 @@ def write_text(png, items):
             blf.color(fid, *rgb, 1.0)
             blf.position(fid, cx - width / 2, height - by, 0)
             blf.draw_buffer(fid, text)
-    imbuf.write(buf, filepath=png)
+    temp = png[:-4] + ".tmp.png"
+    imbuf.write(buf, filepath=temp)
+    publish(temp, png)
 
 
 INK = (0.12, 0.09, 0.08)
@@ -758,7 +953,7 @@ def sheet_turnaround(cells_dir):
     items = [("FLINTBORN  —  DEFAULT CHARACTER (R6)", out.shape[1] / 2, 86, 44, FONT_TITLE, INK)]
     for i, (label, _) in enumerate(views):
         items.append((label, 40 + i * w + w / 2, 130 + h + 52, 26, FONT_TITLE, INK))
-    items.append(("Roblox default R6 proportions · 5 studs tall · clothing is separate meshes",
+    items.append(("R6 rig and body · cylinder head as the master · clothing is separate meshes",
                   out.shape[1] / 2, 130 + h + 100, 20, FONT_BODY, (0.35, 0.3, 0.27)))
     write_text(path, items)
     return path
@@ -858,7 +1053,7 @@ def sheet_parts(cells_dir, parts, clothing):
     items = [("R6 PARTS AND CLOTHING PIECES", out.shape[1] / 2, 86, 40, FONT_TITLE, INK),
              ("BODY  (R6 PARTS)", 40 + w / 2, 130 + h + 46, 24, FONT_TITLE, INK),
              ("CLOTHING  (SEPARATE MESHES)", 40 + w + w / 2, 130 + h + 46, 24, FONT_TITLE, INK),
-             ("Head 2x1x1 part (rounded 1.25 mesh)", 40 + w / 2, 130 + h + 86, 19, FONT_BODY, INK),
+             ("Head: cylinder 1.45 x 1.4 (as the master) · R6 Neck joint", 40 + w / 2, 130 + h + 86, 19, FONT_BODY, INK),
              ("Torso 2x2x1 · Arms 1x2x1 · Legs 1x2x1", 40 + w / 2, 130 + h + 116, 19, FONT_BODY, INK),
              ("Shirt → Torso · PantsWaist → Torso", 40 + w + w / 2, 130 + h + 86, 19, FONT_BODY, INK),
              ("PantsLeftLeg / PantsRightLeg → their legs", 40 + w + w / 2, 130 + h + 116, 19, FONT_BODY, INK)]
@@ -944,14 +1139,15 @@ def export_roblox(parts, clothing, texture_paths):
     scene = bpy.context.scene
     manifest = {"version": 1, "rig": "R6", "units": "studs; Roblox axes (Y up, front -Z)",
                 "textureDir": "art/character/textures",
-                "note": ("Meshes are centred on their bounding box. Roblox's glTF import turns meshes "
-                         "half a turn about Y (see scripts/roblox_lobby_map.py), so place each with "
-                         "CFrame.Angles(0, math.pi, 0) after its offset."),
+                "note": ("Meshes are centred on their bounding box. Offsets are in the export frame, "
+                         "which faces +Z; Roblox's glTF import turns each mesh half a turn about Y, so "
+                         "the imported meshes face -Z like a Roblox rig, and an offset (x, y, z) becomes "
+                         "(-x, y, -z) there (scripts/roblox_character.py)."),
                 "parts": {}, "clothing": {}, "motors": {}, "colors": {}, "textures": {}}
     for name in PARTS:
         info = export_piece(parts[name], name, scene)
         part_centre = Vector(PARTS[name][1])
-        info["partSize"] = [2.0, 1.0, 1.0] if name == "Head" else to_rbx_size(PARTS[name][0])
+        info["partSize"] = to_rbx_size(PARTS[name][0])
         info["offset"] = to_rbx(info.pop("centre") - part_centre)
         manifest["parts"][name] = info
     for name, part in CLOTHING.items():
@@ -992,7 +1188,10 @@ def main():
 
     parts = {}
     for name, (size, centre) in PARTS.items():
-        parts[name] = rounded_box(name, size, centre, ROUNDING.get(name, 0.12), col)
+        if name == "Head":
+            parts[name] = cylinder_head(name, size[0], size[2], 0.26, centre, col, top_fillet=0.4)
+        else:
+            parts[name] = rounded_box(name, size, centre, ROUNDING.get(name, 0.12), col)
     face_plane = bpy.data.meshes.new("Face")
     bm = bmesh.new()
     bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=0.5)
@@ -1004,8 +1203,10 @@ def main():
     bm.to_mesh(face_plane)
     bm.free()
     parts["Face"] = link(bpy.data.objects.new("Face", face_plane), col)
-    parts["Face"].location = (0, -0.627, 4.5)
-    parts["Face"].scale = (1.05, 1.0, 1.05)
+    # Like a Roblox decal: the face covers the whole front of the head part.
+    head_size, head_centre = PARTS["Head"]
+    parts["Face"].location = (0, -head_size[1] / 2 - 0.004, head_centre[2])
+    parts["Face"].scale = (head_size[0], 1.0, head_size[2])
 
     shirt, pants = build_clothing(col)
     clothing = {"Shirt": shirt}
@@ -1024,8 +1225,13 @@ def main():
 
     skin = skin_material()
     for name in PARTS:
-        parts[name].data.materials.append(skin)
+        if name != "Head":
+            parts[name].data.materials.append(skin)
+    parts["Head"].data.materials.append(head_material(face_img))
+    # The face shows through the head material (projected like a Roblox decal), so
+    # the flat plane stays as a marker only.
     parts["Face"].data.materials.append(face_material(face_img))
+    parts["Face"].hide_render = True
     shirt.data.materials.clear()
     shirt.data.materials.append(textured_material("Shirt", os.path.join(TEX_DIR, "shirt_color.png"),
                                                   os.path.join(TEX_DIR, "shirt_normal.png"),
