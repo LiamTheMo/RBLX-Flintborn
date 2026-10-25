@@ -8,7 +8,8 @@
 --   2. View > Command Bar, paste this whole file, press Enter.
 --   3. File > Publish to Roblox.
 -- Re-running the install workflow puts the plain textures back; run this again after.
--- Ids come from art/roblox/character/asset_ids.json.
+-- The ids below come from art/roblox/character/asset_ids.json (regenerate with
+-- python scripts/roblox_character.py --studio-script after an upload).
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
@@ -17,21 +18,8 @@ local function id(number)
 	return "rbxassetid://" .. number
 end
 
-local SHIRT = { color = id(80911389263141), normal = id(74408081888643), roughness = id(80813666016513) }
-local PANTS_NORMAL = id(99709380102012)
-local PANTS_ROUGHNESS = id(108890917477580)
-local PANTS = {
-	Earth = 87086532976734,
-	Ember = 78956550150619,
-	Clay = 119018456466978,
-	Ochre = 76115572783005,
-	Moss = 121859381630502,
-	Tide = 120802799686016,
-	River = 106352113188971,
-	Dusk = 96867273982977,
-	Ash = 133410290875643,
-	Bone = 117437649833721,
-}
+-- BEGIN IDS
+-- END IDS
 
 local function appearance(name, color, normal, roughness)
 	local look = Instance.new("SurfaceAppearance")
