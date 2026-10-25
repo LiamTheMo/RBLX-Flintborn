@@ -38,7 +38,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import roblox_upload_ui_assets as uploader
-from roblox_live_publish import Cloud as PlaceCloud
+from roblox_live_publish import SAVE_PLACE, Cloud as PlaceCloud
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT = ROOT / "art" / "roblox" / "character"
@@ -323,10 +323,10 @@ if oldOutfits then oldOutfits:Destroy() end
 outfits.Parent = ReplicatedStorage
 local okAppearance, appearanceErr = pcall(function() StarterPlayer.LoadCharacterAppearance = false end)
 report.loadCharacterAppearance = if okAppearance then "off" else ("unchanged: " .. tostring(appearanceErr))
-AssetService:SavePlaceAsync({ SaveWithoutPublish = false })
+%SAVE_PLACE%
 report.parts = #model:GetChildren()
 return HttpService:JSONEncode(report)
-'''
+'''.replace("%SAVE_PLACE%", SAVE_PLACE)
 
 # What the installed character actually wears, and whether the place can load each
 # image (EditableImage loads respect asset permissions).
