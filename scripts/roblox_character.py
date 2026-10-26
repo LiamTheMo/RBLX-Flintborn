@@ -215,18 +215,21 @@ local surfaceOk = pcall(function()
   probe:Destroy()
 end)
 report.surfaceAppearance = surfaceOk
-local function look(name, colorKey, normalKey, roughKey)
+-- Each look also carries its plain colour: the part is painted it, which an opaque
+-- texture hides, so a device that never gets the texture still shows the colour.
+local function look(name, colorKey, normalKey, roughKey, hex)
+  local holder
   if surfaceOk then
-    local appearance = Instance.new("SurfaceAppearance")
-    appearance.Name = name
-    appearance.ColorMap = image(colorKey)
-    appearance.NormalMap = image(normalKey)
-    appearance.RoughnessMap = image(roughKey)
-    return appearance
+    holder = Instance.new("SurfaceAppearance")
+    holder.ColorMap = image(colorKey)
+    holder.NormalMap = image(normalKey)
+    holder.RoughnessMap = image(roughKey)
+  else
+    holder = Instance.new("Folder")
+    holder:SetAttribute("TextureId", image(colorKey))
   end
-  local holder = Instance.new("Folder")
   holder.Name = name
-  holder:SetAttribute("TextureId", image(colorKey))
+  holder:SetAttribute("Color", Color3.fromHex(hex))
   return holder
 end
 local function wear(part, source)
@@ -235,6 +238,7 @@ local function wear(part, source)
   else
     part.TextureID = source:GetAttribute("TextureId")
   end
+  part.Color = source:GetAttribute("Color")
 end
 
 -- The rig: standard R6 positions around the HumanoidRootPart at (0, 3, 0).
@@ -291,10 +295,11 @@ end
 -- half a turn to match the rig, which faces -Z; the imported meshes already do.
 local outfits = Instance.new("Folder")
 outfits.Name = "CharacterOutfits"
-for colorName in data.colors.tribes do
-  look("Pants_" .. colorName, "pants_color_" .. string.lower(colorName), "pants_normal", "pants_roughness").Parent = outfits
+for colorName, hex in data.colors.tribes do
+  look("Pants_" .. colorName, "pants_color_" .. string.lower(colorName), "pants_normal", "pants_roughness",
+    hex).Parent = outfits
 end
-local shirtLook = look("Shirt", "shirt_color", "shirt_normal", "shirt_roughness")
+local shirtLook = look("Shirt", "shirt_color", "shirt_normal", "shirt_roughness", data.colors.shirt)
 for name, info in data.clothing do
   local piece = meshPart(name, Enum.CollisionFidelity.Box)
   piece.Size = Vector3.new(info.size[1], info.size[2], info.size[3])
@@ -304,7 +309,6 @@ for name, info in data.clothing do
   piece.CanCollide = false
   piece.CanQuery = false
   piece.CanTouch = false
-  piece.Color = Color3.new(1, 1, 1)
   wear(piece, if name == "Shirt" then shirtLook else outfits:FindFirstChild("Pants_" .. data.defaultPants))
   local weld = Instance.new("Weld")
   weld.Name = name .. "Weld"
