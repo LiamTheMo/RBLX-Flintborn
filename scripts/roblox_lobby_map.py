@@ -382,6 +382,14 @@ for _, c in data.colliders do
   box.CanQuery = true
 end
 
+-- The camp's boundary: invisible walls just outside the palisade, closing its gaps
+-- too, so players cannot leave. Fully transparent, so the camera sees through them.
+for _, b in data.barriers do
+  local wall = marker("Barrier", CFrame.new(b[1][1], b[1][2], b[1][3], table.unpack(b[1], 4, 12)),
+    Vector3.new(b[2][1], b[2][2], b[2][3]), group("barriers"))
+  wall.CanCollide = true
+end
+
 -- 3. Live VFX from the export's sockets (ParticleEmitters and PointLights).
 local function numberSequence(values, scale)
   if type(values) == "number" then return NumberSequence.new(values * scale) end
@@ -823,10 +831,31 @@ for _, p in probes do
   end
 end
 while #floor.worst > 12 do table.remove(floor.worst) end
+-- The boundary is closed: rays from the arrival spawn outward every 10 degrees,
+-- at walking and jumping height, must all hit a barrier.
+local barriers = map:FindFirstChild("barriers")
+local boundary = { rays = 0, hits = 0, open = {} }
+local arrival = CollectionService:GetTagged("LobbyArrival")[1]
+if barriers and arrival then
+  local wallParams = RaycastParams.new()
+  wallParams.FilterType = Enum.RaycastFilterType.Include
+  wallParams.FilterDescendantsInstances = { barriers }
+  for _, height in { 3, 12 } do
+    for degrees = 0, 350, 10 do
+      local direction = Vector3.new(math.cos(math.rad(degrees)), 0, math.sin(math.rad(degrees)))
+      boundary.rays += 1
+      if workspace:Raycast(arrival.Position + Vector3.new(0, height, 0), direction * 400, wallParams) then
+        boundary.hits += 1
+      elseif #boundary.open < 12 then
+        table.insert(boundary.open, degrees .. "@" .. height)
+      end
+    end
+  end
+end
 return HttpService:JSONEncode({ version = map:GetAttribute("ExportSha1"), folders = counts, meshParts = meshParts,
   untextured = untextured, arrival = #CollectionService:GetTagged("LobbyArrival"),
   deployGate = #CollectionService:GetTagged("DeployGate"), npcSpots = #CollectionService:GetTagged("LobbyNPCSpot"),
-  enabledSpawns = enabledSpawns, floor = floor })
+  enabledSpawns = enabledSpawns, floor = floor, boundary = boundary })
 '''
 
 
@@ -849,6 +878,7 @@ def place_script(m, ids):
         "lightRange": LIGHT_RANGE,
         "glowDim": GLOW_DIM,
         "colliders": m["colliders"],
+        "barriers": m.get("barriers", []),
         "vfxKinds": m["vfxKinds"],
         "vfx": m["vfx"],
         "spawn": m["spawn"],
