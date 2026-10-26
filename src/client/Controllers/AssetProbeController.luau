@@ -100,12 +100,21 @@ function AssetProbeController.Start()
 
 		local started = os.clock()
 		while os.clock() - started < SHOW_SECONDS do
-			local lines = { "IMAGE CHECK (screenshot this)  " .. math.floor(SHOW_SECONDS - (os.clock() - started)) .. "s" }
+			local lines =
+				{ "IMAGE CHECK (screenshot this)  " .. math.floor(SHOW_SECONDS - (os.clock() - started)) .. "s" }
 			for _, e in entries do
 				local id = e[2]
 				local now = ContentProvider:GetAssetFetchStatus(id).Name
-				table.insert(lines, string.format("%s  %s  now=%s  preload=%s", e[1], string.match(id, "%d+") or id, now,
-					preload[id] or "waiting"))
+				table.insert(
+					lines,
+					string.format(
+						"%s  %s  now=%s  preload=%s",
+						e[1],
+						string.match(id, "%d+") or id,
+						now,
+						preload[id] or "waiting"
+					)
+				)
 			end
 			label.Text = table.concat(lines, "\n")
 			task.wait(1)
