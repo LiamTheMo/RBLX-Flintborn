@@ -1,90 +1,90 @@
 {
   "images": {
     "face": {
-      "decal": 93468315729734,
-      "image": 115325648697667,
-      "sha1": "00f2f74bd365bfaf37e7902dcb4c127878a7a769"
+      "decal": 93450059681966,
+      "image": 125226655503473,
+      "sha1": "0d22819d46814ea889560581cf3b6698f614d1cc"
     },
     "pants_color_ash": {
-      "decal": 82993257396677,
-      "image": 92024643451737,
-      "sha1": "a492919505b57f3da69b2bc1c45815aa6305dab3"
+      "decal": 128632767852826,
+      "image": 124700211186546,
+      "sha1": "7c6a1e4bd8893ebb8418c58a3673120d3cfe7d58"
     },
     "pants_color_bone": {
-      "decal": 122535535703054,
-      "image": 115545559388769,
-      "sha1": "c5517100c28e903881bf622c81fdc6207ec55394"
+      "decal": 72980109769801,
+      "image": 104145496833673,
+      "sha1": "47f6c81d431eb5924914a55420036b279c2198b2"
     },
     "pants_color_clay": {
-      "decal": 80437521250304,
-      "image": 91666189734889,
-      "sha1": "88802eba4ffcb031629903d3c8b861ec59d724a7"
+      "decal": 125738801677933,
+      "image": 126894346708166,
+      "sha1": "8ad0f2d2be5d566126b66db1156401739f0ec192"
     },
     "pants_color_dusk": {
-      "decal": 83856026144258,
-      "image": 134076212024476,
-      "sha1": "02797c417b39797e66dd0ec5ee5cb544fc1898e7"
+      "decal": 81527129984944,
+      "image": 89391623310652,
+      "sha1": "b7475d16bfd915fea05d3c31409a43d5eb130432"
     },
     "pants_color_earth": {
-      "decal": 90067491960904,
-      "image": 125768072993836,
-      "sha1": "eccd13b279656860c727a5599b23fe8d4ff70d27"
+      "decal": 134016654440477,
+      "image": 78938726372681,
+      "sha1": "5f3f016b590d0bd05b7180fa258652c9e565a6c5"
     },
     "pants_color_ember": {
-      "decal": 114921276198665,
-      "image": 99968080013618,
-      "sha1": "d44aac1cc802d1aa3bfdbfbb772e77fa0645e639"
+      "decal": 93103516799240,
+      "image": 86403876768461,
+      "sha1": "2925b09a519acf71e18d14eaac4ab308778e143c"
     },
     "pants_color_moss": {
-      "decal": 96228361223079,
-      "image": 129319047091621,
-      "sha1": "8b1a180bc346c01a59f7f853396f749590771a7b"
+      "decal": 70615770712766,
+      "image": 79609829550951,
+      "sha1": "4cc89161e6bd11c695eb6ebd6c44bd24bc2a4d18"
     },
     "pants_color_ochre": {
-      "decal": 80898963177230,
-      "image": 100513955215090,
-      "sha1": "f271bcda6d55ccef6d26ba503225d80ff79c3003"
+      "decal": 134969388651712,
+      "image": 122363270974080,
+      "sha1": "ea1258c112a8c37fcb650ef3eacc6b267db06a12"
     },
     "pants_color_river": {
-      "decal": 128528110805591,
-      "image": 122597045824631,
-      "sha1": "a784048f2b86005ff26386d5d7e7b5feb484c398"
+      "decal": 139750713039761,
+      "image": 116268114841742,
+      "sha1": "de60a1da7472c7369700797376de57cd8026323f"
     },
     "pants_color_tide": {
-      "decal": 139676497738853,
-      "image": 108462547184125,
-      "sha1": "82a669f96faac87fc2b628b5308245919e1adf09"
+      "decal": 77567353421158,
+      "image": 96783757489699,
+      "sha1": "4027603b783c233b8cc0e3467326f1b473563594"
     },
     "pants_normal": {
-      "decal": 130711305052565,
-      "image": 93410040470018,
-      "sha1": "2274494e3d735d8469bbea369d9d87ba01e52175"
+      "decal": 72306295637177,
+      "image": 71058309238043,
+      "sha1": "b184ac88ad9f5f15dfcdbb992681e8cbbf443c2e"
     },
     "pants_roughness": {
-      "decal": 90006179216385,
-      "image": 118571673825909,
-      "sha1": "1dc1690ddb64c975758ac6bdd53702090f37d613"
+      "decal": 106750002657993,
+      "image": 85723223336235,
+      "sha1": "a0227a4749947170a281d9a39ff2f0724543aeec"
     },
     "shirt_color": {
-      "decal": 139060131107041,
-      "image": 72647109486331,
-      "sha1": "f718c604b3fbb58d8663716a2d3dc5284e6be8bf"
+      "decal": 84860142257850,
+      "image": 111714179640418,
+      "sha1": "2defcd0a28a436b60b9ba8f3d1c85403877be534"
     },
     "shirt_normal": {
-      "decal": 109464908395079,
-      "image": 125721140852975,
-      "sha1": "92b6423057cba8752a1be9587bd161187e71ac0e"
+      "decal": 90779388210149,
+      "image": 76197550313894,
+      "sha1": "89cf32aad31c3474ef823a6c30556c1effb07834"
     },
     "shirt_roughness": {
-      "decal": 90749164750884,
-      "image": 106503771228314,
-      "sha1": "c1349feb129f501bf5355d1914d427bdda7eb74f"
+      "decal": 81588301503912,
+      "image": 125328202465608,
+      "sha1": "9ce88c81fc253072b5144b07a7506015b4bc1274"
     }
   },
   "models": {
     "Head": {
-      "id": 77526755604573,
-      "sha1": "3db1d3b7529404a01888d703ef0c53488fd20e55"
+      "id": 93328254625352,
+      "sha1": "080cb1ac69f3606f618d7061a07e1c58428821aa"
     },
     "Left Arm": {
       "id": 115726878502290,
@@ -95,16 +95,16 @@
       "sha1": "603467820c2f600773754168d665eac5cf822559"
     },
     "PantsLeftLeg": {
-      "id": 121167420619383,
-      "sha1": "5318dd58532f77854e43f92aeb120b2e81fcf9ba"
+      "id": 88995893206133,
+      "sha1": "665c4aa9814c36a54a4c555b4522571d815fe62b"
     },
     "PantsRightLeg": {
-      "id": 71857823501792,
-      "sha1": "48f3bcc38a30caaf8c4380795b63236e3bfb6c2a"
+      "id": 137647641732337,
+      "sha1": "278d69db0f2b9763701652c4da61f88a838e2750"
     },
     "PantsWaist": {
-      "id": 114723999399985,
-      "sha1": "e0e1c8212c5da7f069b7196db998bab793c3f3a5"
+      "id": 86235968043987,
+      "sha1": "619047aef8e449927f9c4c5df06fa0893042e0e7"
     },
     "Right Arm": {
       "id": 108130481503429,
@@ -115,8 +115,8 @@
       "sha1": "71b691754d7ea8733c4b5da4e6f2da32e480cf12"
     },
     "Shirt": {
-      "id": 74150386371865,
-      "sha1": "8787bc65b1156f91ff00e886777c52c3e6b380e2"
+      "id": 132675311081327,
+      "sha1": "d7e6bf5f424dafcc32a2e690a3562e888238cfe8"
     },
     "Torso": {
       "id": 85414746271959,
