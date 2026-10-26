@@ -318,7 +318,8 @@ class PreflightExecutionTests(unittest.TestCase):
     def run_preflight(self, shared, sps_class="StarterPlayerScripts"):
         specs = cloud.spec_list()
         script = cloud.make_script(specs)
-        preflight = script[: script.index(cloud.APPLY)]
+        # APPLY has its retired list filled in, so find it by the text before that.
+        preflight = script[: script.index(cloud.APPLY.split("%RETIRED%")[0])]
         place = MOCK_PLACE.replace("%SHARED%", shared).replace("%SPS_CLASS%", sps_class)
         source = place + preflight + '\nprint("PREFLIGHT_OK")\n'
         with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as handle:
