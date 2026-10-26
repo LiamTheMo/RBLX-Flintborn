@@ -46,6 +46,11 @@ function OutfitService.Dress(player: Player)
 			else
 				part.TextureID = source:GetAttribute("TextureId") or ""
 			end
+			-- The plain colour shows wherever the texture never arrives.
+			local color = source:GetAttribute("Color")
+			if typeof(color) == "Color3" then
+				part.Color = color
+			end
 		end
 	end
 	character:SetAttribute("PantsColor", name)
