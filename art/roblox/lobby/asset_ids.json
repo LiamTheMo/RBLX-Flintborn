@@ -1,9 +1,9 @@
 {
   "images": {
     "palette": {
-      "decal": 115888836844372,
-      "image": 81552715112600,
-      "sha1": "278211664238b0d0588adaed7131eddda6a1f38b"
+      "decal": 138749519980797,
+      "image": 110506060164856,
+      "sha1": "74de7f0081585163473f17844a2f2ccfcd9ea1d7"
     },
     "vfx_dust_mote": {
       "decal": 122940151779689,
@@ -114,12 +114,12 @@
       "sha1": "8ac6c3e7ab23c4278436e61decd4d2f0c02da230"
     },
     "BroadleafTreeWideOld": {
-      "id": 88455319350057,
-      "sha1": "c389afe352f534e186258fe70fcd5c9b6c5f4483"
+      "id": 90841764599104,
+      "sha1": "2f78e434dfe1a37427cb9ca2e9faf2379c2c34d5"
     },
     "Campfire": {
-      "id": 125119002921837,
-      "sha1": "b63b506b1e8f8b603b80ab6c78c4a50b836a89bf"
+      "id": 106370675276108,
+      "sha1": "2256ebc2d9566a32c0767f39336aee4bec313b15"
     },
     "Campfire_glow_ember": {
       "id": 92016528878007,
@@ -142,12 +142,12 @@
       "sha1": "e070b6337f273e311acf8c97b56a6212f8aa6e95"
     },
     "CliffOuterCorner": {
-      "id": 97644487462519,
-      "sha1": "40d8d325885c493711ebb4498b831163f859868a"
+      "id": 138970738655910,
+      "sha1": "587a0567e39749bb9232e6478bc01b8a74709bf2"
     },
     "CliffSection": {
-      "id": 101293657793448,
-      "sha1": "10665f1b2b57c1518568feabee8c8ce494fb4253"
+      "id": 131032603755929,
+      "sha1": "904d7d9344f1f404658cf05665e5b6ed3f48226b"
     },
     "CraftingWorkbench": {
       "id": 75458627246326,
@@ -158,8 +158,8 @@
       "sha1": "794dacd8eeb3ab37cb2dbdcfe5e7ad6ddc5223da"
     },
     "DeployGate": {
-      "id": 109585602087738,
-      "sha1": "bc7e6f539ffe1a9f318a51fd439bfa1eee2c1d48"
+      "id": 80867741149793,
+      "sha1": "2a043d49d692aba7da0b02afbabee7ff2a4ec2fc"
     },
     "DeployGate_glow_fire_core": {
       "id": 97372630903335,
@@ -174,8 +174,8 @@
       "sha1": "cb77f9f57d4827ec1e8c1a64189954451438672f"
     },
     "EarthSwitchback": {
-      "id": 74410158276744,
-      "sha1": "0c1ec87cb483bd4e9477932d7a3ba7db7fc37917"
+      "id": 128305586375673,
+      "sha1": "4ab8e2ebc771d5b2b6937897f2f65e461949b2b1"
     },
     "EldersTotemTall": {
       "id": 99018660102192,
@@ -198,12 +198,12 @@
       "sha1": "fc59f3306eaac10b627fac6c898759598446022e"
     },
     "FootbridgeSmall": {
-      "id": 125994236704434,
-      "sha1": "2f500ccda0e5f056615ce199f7ea5010a7bb1203"
+      "id": 102661722248035,
+      "sha1": "67e38f05f5fc7432ede89a1dfc77cb052585ba96"
     },
     "ForestFloor": {
-      "id": 132670209238097,
-      "sha1": "2f7e4fd13b367c30b1aced9de5465a5bea2f340a"
+      "id": 80894253777652,
+      "sha1": "120948505185145a73e83dca898cc2e578184329"
     },
     "Forge_StoneStairs": {
       "id": 96001773427745,
@@ -214,16 +214,16 @@
       "sha1": "fa268bb65d5418f498485b27290165ef9cef2091"
     },
     "GrassTuftLarge": {
-      "id": 133648817949382,
-      "sha1": "5e93fe7eb6c1e748351697b766636e414c825f56"
+      "id": 85361505055666,
+      "sha1": "74940fd4f18f9576d65102c4c3b568b3792e064d"
     },
     "Ground_DirtPlazaPaths_01": {
-      "id": 110548975317380,
-      "sha1": "4297c8df67b4ce16e8c566630df49bdd637bc7df"
+      "id": 136909439353055,
+      "sha1": "3c360aedd191d1447f1d461662c8427bcaa2e020"
     },
     "Ground_DirtPlazaPaths_02": {
-      "id": 121906785125100,
-      "sha1": "42d1e261879cc69b33286e654155ef8c6c57f9e0"
+      "id": 108133848370945,
+      "sha1": "ed63e519e0bbf22e64b103778dd94a073b320143"
     },
     "Ground_GateFlagstones": {
       "id": 125038343391192,
@@ -234,52 +234,52 @@
       "sha1": "5c813544ca110a075480f276d197ada5c32bcd6c"
     },
     "Ground_GrassTufts_02": {
-      "id": 107974419902794,
-      "sha1": "6756e0d94c34f26459abf6113fbee4a54590e18b"
+      "id": 75327655260576,
+      "sha1": "a1a29cdc9cce783027c7ba9fe62ac6fbb4125c98"
     },
     "Ground_Lowland_01": {
-      "id": 138567596065581,
-      "sha1": "6d042af24261ce21772c2c53ec06b5d1c7f7cdb7"
+      "id": 137595135148795,
+      "sha1": "a48d42790a13f4a251d85d6f6feea1aaaaec1346"
     },
     "Ground_Lowland_02": {
-      "id": 75770803919955,
-      "sha1": "182e6021c8a8044967065a976a1ed4bd947179c6"
+      "id": 121160460787586,
+      "sha1": "e7937aaa8f358826e10e228c0b768d982a408456"
     },
     "Ground_Lowland_03": {
-      "id": 89093522461023,
-      "sha1": "ff60574f7207c6e40f1f9af244af167e0a2922b3"
+      "id": 133279609486391,
+      "sha1": "b72c17ae167377440b06e3c5b29dbe8a22a92174"
     },
     "Ground_Lowland_04": {
-      "id": 90173615368449,
-      "sha1": "7ec0b55b8e9d6e29c39f88c676dae12308c74037"
+      "id": 122975546601441,
+      "sha1": "32e422e01134c30c35731568f983a837a9158b60"
     },
     "Ground_Pebbles_01": {
-      "id": 117767303063957,
-      "sha1": "e4f0fe880740e4baa9392527162d29401b25d0d4"
+      "id": 137400929120360,
+      "sha1": "4204877bf4a5903cf8c341507df05533ed9d3f8f"
     },
     "Ground_Pebbles_02": {
-      "id": 105908922253992,
-      "sha1": "60c16ce428f02627f188463d01c0f184331b3bd9"
+      "id": 136529965279794,
+      "sha1": "a9917be9d61b6524d561a5bb37ae99f08ef01286"
     },
     "Ground_Plateau_01": {
-      "id": 139068074863750,
-      "sha1": "0f25561974ed326ac91499d824e6a71f3df1f16f"
+      "id": 140677931599012,
+      "sha1": "2c8e16d736389275b313a78e778f606b1457f42f"
     },
     "Ground_Plateau_02": {
-      "id": 94423544526182,
-      "sha1": "3599662ebb72fb6f41605f95bf632872a7e64bfc"
+      "id": 100387126827988,
+      "sha1": "988bf2cba5c36277052d497773e6ffc832e6bdc0"
     },
     "Ground_Plateau_03": {
-      "id": 112835005800264,
-      "sha1": "cc393de901a29fc2ab4be61261879df0c095505c"
+      "id": 103622456538656,
+      "sha1": "eb78f548bd04a7bdd2f24760230f78496986101e"
     },
     "Ground_Plateau_04": {
-      "id": 122976255383569,
-      "sha1": "1a0196a7b4587d20893188f5fce64aae33eeda0b"
+      "id": 83688414986768,
+      "sha1": "abc0c9fddd7294d6c21f26332fd95454ae4ed158"
     },
     "HideMarketStall": {
-      "id": 114642127788381,
-      "sha1": "ada00646cd28f7e36d997ca22c3382f288dd9320"
+      "id": 77240197989239,
+      "sha1": "83a02500502d9a8a350dab937a95eedfeb6921f1"
     },
     "IronShortSword": {
       "id": 135000970926508,
@@ -298,8 +298,8 @@
       "sha1": "e0825bb0661c12074c1ef2f265b51c645d093e29"
     },
     "LedgerLectern": {
-      "id": 113517942488842,
-      "sha1": "9c57ee0d577ed28daeb8032bab0a683574ff23a0"
+      "id": 74848916118464,
+      "sha1": "04834c253e494c5798c9a20bc2ba6711ad84b129"
     },
     "LogBench": {
       "id": 129304197566647,
@@ -322,8 +322,8 @@
       "sha1": "a23b0dcb2aad7bc85d2ec8ef9593883feb8b42bf"
     },
     "PalisadeMainPost": {
-      "id": 70720927298130,
-      "sha1": "21fb1e8801a0b3a2e4cda70864733dc88fecc5c3"
+      "id": 87680001651309,
+      "sha1": "99827bd0837a526444ec9e0d837c0d3c1200889b"
     },
     "PalisadeMainPostBanner": {
       "id": 139267065430917,
@@ -346,12 +346,12 @@
       "sha1": "bc4205751cca87ad6023a7337e12593815914137"
     },
     "PalisadeSection": {
-      "id": 130041105819937,
-      "sha1": "16f0689328777a7e2eb4da372942fb1cd62dc524"
+      "id": 104870230287742,
+      "sha1": "2e175b0a87323a1832ba0105a8e89535b4d32cd6"
     },
     "PalisadeSectionLow": {
-      "id": 95390744659387,
-      "sha1": "489d19093fd6ccb3656662526b49ef6effc4006f"
+      "id": 99316549334280,
+      "sha1": "3362a5e228527d3c2709d35320240fb81b41b53b"
     },
     "PineTreeMature": {
       "id": 107875619433687,
@@ -374,28 +374,28 @@
       "sha1": "c4f0468247bf555c6946ae9165b7dca483135aec"
     },
     "River_WaterLower_water": {
-      "id": 93278928257761,
-      "sha1": "32aef2d8361dd041ff6a8c7b5bc8eb114bab141a"
+      "id": 119308037392939,
+      "sha1": "ff1014a04cb22a3c88d8b264647ec49c10f60488"
     },
     "River_WaterUpper_water": {
       "id": 96187760549073,
       "sha1": "f68b4bf4ae78a863aacbc9573acc74fc2be48228"
     },
     "Riverbank": {
-      "id": 136322965321667,
-      "sha1": "1a4a2631b982889fb77b08fd09489eba896aba5b"
+      "id": 85468942100584,
+      "sha1": "9e926a5de7e08ca5d6c233241c2b26c30982f5cb"
     },
     "Riverbank_water": {
       "id": 135427004054466,
       "sha1": "bfec9996bf809461847280a01de70255a420436a"
     },
     "RockArch": {
-      "id": 73866169541533,
-      "sha1": "8eddfe6a133305a70473fbb5fd0e5fe17512c27e"
+      "id": 134576718822076,
+      "sha1": "6ca577aa356fc34b621209c3286e8ceb9cfc4b98"
     },
     "RockShelfTwoLevels": {
-      "id": 92466801314538,
-      "sha1": "42eedd9101ee12638115b29b303085550f0c76a5"
+      "id": 83072960653902,
+      "sha1": "a25c2fdda7149ef9db2fa9b495f8f302c41bf013"
     },
     "ShrubLowWide": {
       "id": 72373295612837,
@@ -430,8 +430,8 @@
       "sha1": "2278f8e206558b125b9895436db173a382942893"
     },
     "SplitBoulder": {
-      "id": 137887800005661,
-      "sha1": "e18d19d034dcdbe69cc9804e6abde5dae064f4a5"
+      "id": 138312188020337,
+      "sha1": "3924cd2f4426341ea28bd1defef63d42153bf971"
     },
     "SteppingStone": {
       "id": 78905523113766,
@@ -478,20 +478,20 @@
       "sha1": "e6baf52eec59205113dae8409340fce59058bd57"
     },
     "Stump": {
-      "id": 74221205104357,
-      "sha1": "7fd94919a97e70cc0a0925438c7efa14299ba3f7"
+      "id": 87641843024114,
+      "sha1": "5e6fc9214b6cca9c411830542ac9f78098dc9d03"
     },
     "SupplyCrate": {
       "id": 82412167417810,
       "sha1": "9441d3053f038eddb8eda75361acf7f6501f76b6"
     },
     "TallBoulder": {
-      "id": 86364633576450,
-      "sha1": "2d8ddd53223f9bb0b2b4fd82d2237120f907c09c"
+      "id": 95137186445497,
+      "sha1": "9f6de3de757f6a3ebe410a48775812e2349962b7"
     },
     "Terrain_RimSkirt": {
-      "id": 121198710805377,
-      "sha1": "375c4f749376a02e486790f591dd9aaba07ec8f6"
+      "id": 134883103617488,
+      "sha1": "a4ae19d4f708a6b10bbb4169188affa466174999"
     },
     "ThatchMarketStall": {
       "id": 111789582117478,
@@ -518,8 +518,8 @@
       "sha1": "9e81b4b4a57e70b9c02300503d86431f46a3934a"
     },
     "VaultHall": {
-      "id": 113294606641505,
-      "sha1": "79c6ba26808eb8abf9ce331000b32c73cab7ea2f"
+      "id": 134889906557142,
+      "sha1": "d5657d665cf0e244245537a4f62fbeca426ef086"
     },
     "VaultHall_RedRug": {
       "id": 76225936243482,
@@ -534,8 +534,8 @@
       "sha1": "1b80de5861b46418694abc34ab469d789b1ad6fe"
     },
     "WaterfallCliff": {
-      "id": 72240434659650,
-      "sha1": "23e4d9b222abd6f27145582237e439bf385b9a37"
+      "id": 127627719114823,
+      "sha1": "7d0f8e16997f32325a90f08b37a72720adcfbd4e"
     },
     "WaterfallCliff_water": {
       "id": 138023214510164,
@@ -546,8 +546,8 @@
       "sha1": "96369a473ddf059a0a1dfbdd14d822f527e6fd28"
     },
     "WildflowerWhite": {
-      "id": 122698072043963,
-      "sha1": "de4eec1541aa113d543cb53fa87d4f4a073a4df9"
+      "id": 121975605007419,
+      "sha1": "6a2534610bb95880bcdd1fa442d423392eb3c0b7"
     },
     "WoodenBowSimple": {
       "id": 78210498637867,
