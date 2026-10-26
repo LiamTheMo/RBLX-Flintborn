@@ -70,12 +70,24 @@ preload = function(ids: { string })
 		return
 	end
 	task.spawn(function()
+		-- Raw content strings can fail the generic asset fetch even when the same
+		-- image loads on a widget. ImageLabels request the image representation,
+		-- including for the character textures tracked here.
+		local assets = {}
+		for _, id in batch do
+			local image = Instance.new("ImageLabel")
+			image.Image = id
+			table.insert(assets, image)
+		end
 		local statuses = {}
 		local ok = pcall(function()
-			ContentProvider:PreloadAsync(batch, function(contentId: string, status: Enum.AssetFetchStatus)
+			ContentProvider:PreloadAsync(assets, function(contentId: string, status: Enum.AssetFetchStatus)
 				statuses[contentId] = status
 			end)
 		end)
+		for _, image in assets do
+			image:Destroy()
+		end
 		for _, id in batch do
 			if ok and statuses[id] == Enum.AssetFetchStatus.Success then
 				images[id].state = "loaded"
