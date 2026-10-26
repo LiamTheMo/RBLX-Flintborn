@@ -597,13 +597,12 @@ def build_vault_hall():
     for y in (-PY, PY):
         log(a, (-XO - 0.9, y, EZ), (XO + 0.9, y, EZ), 0.56)
 
-    # nave: thatched front slope (the hero surface), plainer back slope
+    # nave: both slopes fully thatched, since the lobby camera sees the back too
     Ln = math.hypot(YE, ZN - ZNE)
-    straw(a, (0, 0, ZN), (1, 0, 0), (0, -YE, -(ZN - ZNE)), 2 * XI + 1.4, 2 * XI + 1.4, Ln,
-          courses=4, gap=0.6, sw=(0.42, 0.62), eave_gap=0.9, base_t=0.9, lift=0.42,
-          eave_len=(1.1, 1.8), hang=0.15, jag=0.5)
-    straw(a, (0, 0, ZN), (1, 0, 0), (0, YE, -(ZN - ZNE)), 2 * XI + 1.4, 2 * XI + 1.4, Ln,
-          slab_only=True, base_t=0.9, eave=False)
+    for dy in (-YE, YE):
+        straw(a, (0, 0, ZN), (1, 0, 0), (0, dy, -(ZN - ZNE)), 2 * XI + 1.4, 2 * XI + 1.4, Ln,
+              courses=4, gap=0.6, sw=(0.42, 0.62), eave_gap=0.9, base_t=0.9, lift=0.42,
+              eave_len=(1.1, 1.8), hang=0.15, jag=0.5)
     # nave ridge log between the wing peaks, centre post stub
     zn = ZN + 0.9 + 0.75
     log(a, (-WC, 0, zn), (WC, 0, zn), 0.6)
