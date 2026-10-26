@@ -32,13 +32,28 @@ class CloudPublishSafetyTests(unittest.TestCase):
         self.assertIn(cloud.SAVE_PLACE, script)
         self.assertIn("Managed Studio root is missing", script)
         self.assertIn("Script class mismatch", script)
-        # The only removal is the save's: the engine's runtime copies of its
-        # default player scripts.
-        self.assertNotIn("Destroy()", script.replace(cloud.SAVE_PLACE, ""))
+        # The only removals: the save's (the engine's runtime copies of its default
+        # player scripts) and scripts retired from Git, at their exact paths.
+        self.assertEqual(script.replace(cloud.SAVE_PLACE, "").count("Destroy()"), 1)
+        self.assertIn('if obj and obj:IsA("LuaSourceContainer") then\n    obj:Destroy()', script)
+        self.assertIn('"AssetProbeController"', script)
         self.assertEqual(cloud.SAVE_PLACE.count("Destroy()"), 2)
         self.assertIn('child.Name == "PlayerModule" and child:IsA("ModuleScript")', cloud.SAVE_PLACE)
         self.assertIn('child.Name == "RbxCharacterSounds" and child:IsA("LocalScript")', cloud.SAVE_PLACE)
         self.assertNotIn("versionType=Published", script)
+
+    def test_retired_paths_stay_inside_managed_roots(self):
+        with patch.object(cloud, "RETIRED", (("Workspace", "Map", "Danger"),)):
+            with self.assertRaisesRegex(ValueError, "outside the managed"):
+                cloud.retired_paths([])
+        with patch.object(cloud, "RETIRED", (("ReplicatedStorage", "Shared"),)):
+            with self.assertRaisesRegex(ValueError, "outside the managed"):
+                cloud.retired_paths([])  # a whole root, not one script
+        live = ("ReplicatedStorage", "Shared", "Core", "Loader")
+        with patch.object(cloud, "RETIRED", (live,)):
+            with self.assertRaisesRegex(ValueError, "still published"):
+                cloud.retired_paths([(live, "ModuleScript", "return {}")])
+        self.assertNotIn("Destroy", cloud.make_script([(live, "ModuleScript", "return {}")], verify=True))
 
     def test_every_cloud_save_strips_engine_copies(self):
         root = Path(__file__).resolve().parents[1] / "scripts"

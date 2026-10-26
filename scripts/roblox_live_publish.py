@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Publish Git-managed scripts into the EXISTING Roblox place using Luau Execution.
 
-The task never uploads a Rojo-generated place or deletes Studio objects.
+The task never uploads a Rojo-generated place or deletes Studio objects, apart
+from scripts deleted from Git (RETIRED) and the engine's runtime copies of its
+default player scripts (SAVE_PLACE).
 Requires Roblox's Save Place API permission and a closed Team Create session.
 """
 import argparse
@@ -19,6 +21,12 @@ ANCHORS = (
     ("ServerScriptService", "Server"),
     ("ReplicatedStorage", "Shared"),
     ("StarterPlayer", "StarterPlayerScripts", "Client"),
+)
+# Scripts deleted from Git. The deploy never deletes Studio objects on its own, so a
+# script removed from the repo would keep running in the places; list its path here
+# and the next deploy removes it.
+RETIRED = (
+    ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "AssetProbeController"),
 )
 # Every cloud save goes through this. Each Luau task's server inserts the engine's
 # default player scripts (a PlayerModule in StarterPlayer, RbxCharacterSounds in
@@ -130,6 +138,16 @@ for _, spec in ipairs(specs) do
   assert(obj and obj.ClassName == spec.kind and obj.Source == spec.source,
     "Pre-publish source verification failed for " .. table.concat(spec.path, "/"))
 end
+-- Scripts deleted from Git (RETIRED): removed only at their exact path, and only
+-- if a script is what is there.
+for _, path in ipairs(%RETIRED%) do
+  local obj = services[path[1]]
+  for i = 2, #path do obj = obj and obj:FindFirstChild(path[i]) end
+  if obj and obj:IsA("LuaSourceContainer") then
+    obj:Destroy()
+    changed += 1
+  end
+end
 if changed > 0 then
 %SAVE_PLACE%
 end
@@ -146,6 +164,18 @@ end
 print("ROBLOX_GITHUB_LIVE_VERIFIED", #specs)
 return "VERIFIED"
 '''
+
+
+def retired_paths(specs):
+    """RETIRED, checked: each path must sit inside a managed root and must not
+    also be a script Git still publishes."""
+    live = {tuple(path) for path, _, _ in specs}
+    for path in RETIRED:
+        if not any(path[:len(anchor)] == anchor for anchor in ANCHORS) or len(path) <= 3:
+            raise ValueError("Retired path outside the managed script roots: " + "/".join(path))
+        if path in live:
+            raise ValueError("Retired path is still published from Git: " + "/".join(path))
+    return RETIRED
 
 
 def spec_list():
@@ -176,7 +206,9 @@ def make_script(specs, verify=False):
         paths = "{" + ",".join(lua_string(p) for p in path) + "}"
         records.append("{path=" + paths + ",kind=" + lua_string(kind) +
                        ",source=" + lua_string(source) + "}")
-    script = PREAMBLE.replace("%SPECS%", "{\n" + ",\n".join(records) + "\n}") + (VERIFY if verify else APPLY)
+    retired = "{" + ",".join("{" + ",".join(lua_string(p) for p in path) + "}" for path in retired_paths(specs)) + "}"
+    script = PREAMBLE.replace("%SPECS%", "{\n" + ",\n".join(records) + "\n}") + (
+        VERIFY if verify else APPLY.replace("%RETIRED%", retired))
     if len(script.encode("utf-8")) > 3000000:
         raise ValueError("Cloud task too large; publishing safely needs batching")
     return script
