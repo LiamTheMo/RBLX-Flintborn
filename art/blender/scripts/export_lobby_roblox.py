@@ -113,6 +113,30 @@ def tint_levels(objects):
             for i in range(TINT_LEVELS)]
 
 
+def pinned_levels(objects):
+    """The previous export's tint levels, if there is one (FB_RETINT=1 recomputes).
+    New quantiles shift every level a little, which moves every mesh's palette
+    UVs: one edited building would then re-upload, and make every player
+    download, the whole map. Tints new to the scene take the nearest level.
+    Each level is a tint value from the scene (a quantile); one stored rounded is
+    snapped back to that exact value, so tints sitting on a level keep its cell."""
+    try:
+        with open(os.path.join(OUT, "manifest.json"), encoding="utf-8") as f:
+            previous = json.load(f)["palette"]["tintLevels"]
+    except (OSError, KeyError, ValueError):
+        previous = None
+    if not previous or len(previous) != TINT_LEVELS or os.environ.get("FB_RETINT"):
+        return tint_levels(objects)
+    values = sorted({d.color[0] for me in {o.data for o in objects}
+                     for attr in [me.color_attributes.get("Tint")] if attr for d in attr.data})
+    pinned = []
+    for level in previous:
+        i = bisect.bisect_left(values, level)
+        near = min(values[max(0, i - 1):i + 1], key=lambda v: abs(v - level), default=level)
+        pinned.append(near if abs(near - level) <= 1e-4 else level)
+    return pinned
+
+
 def write_palette(path, levels):
     width = TINT_LEVELS * CELL
     rows = len(PALETTE_KEYS)
@@ -244,6 +268,69 @@ def cframe(matrix, local_centre):
     return [r(position[0]), r(position[1]), r(position[2])] + [r(rr[i][j], 6) for i in range(3) for j in range(3)], scale
 
 
+BARRIER_BINS = 90        # one wall point per 4 degrees round the camp
+BARRIER_OUT = 3.0        # studs outside the palisade's centre line
+BARRIER_THICK = 2.0
+BARRIER_ABOVE = 60.0     # far above any jump, even from the watchtower
+BARRIER_BELOW = 10.0     # down into the ground, so a slope never opens a gap
+BARRIER_CLEAR = 1.5      # studs past a building's footprint corner
+
+
+def barrier_ring(wall, cx, cy, footprints):
+    """Invisible walls that keep players inside the camp: a closed ring just
+    outside the palisade, which also spans the gaps a fence leaves (the Deploy
+    gate and the low south rail). The palisade's pieces are averaged into one
+    point per 4 degrees round the centre, each pushed BARRIER_OUT outward;
+    where a stretch has no palisade (the Deploy gate gap, and the NE corner the
+    Forge closes), the distance from the centre is interpolated across it, so
+    the ring keeps following the oval instead of cutting the corner. The ring is
+    then pushed out past every reachable building's footprint (the Forge stands
+    against the wall), and neighbouring points are joined by a box. Returns
+    [[cframe, size], ...] in Roblox axes."""
+    step = 2 * math.pi / BARRIER_BINS
+    bins = [[] for _ in range(BARRIER_BINS)]
+    for p in wall:
+        angle = math.atan2(p.y - cy, p.x - cx) % (2 * math.pi)
+        bins[int(angle / step) % BARRIER_BINS].append(p)
+    radius = {}
+    for i, points in enumerate(bins):
+        if points:
+            mean = sum(points, Vector()) / len(points)
+            radius[i] = math.hypot(mean.x - cx, mean.y - cy) + BARRIER_OUT
+    known = sorted(radius)
+    ring = []
+    for i in range(BARRIER_BINS):
+        if i not in radius:  # across a gap: interpolate between the known bins either side
+            before = max((k for k in known if k < i), default=known[-1])
+            after = min((k for k in known if k > i), default=known[0])
+            span = (after - before) % BARRIER_BINS
+            t = ((i - before) % BARRIER_BINS) / span
+            radius[i] = radius[before] + (radius[after] - radius[before]) * t
+    lift = dict(radius)
+    for p in footprints:
+        i = int((math.atan2(p.y - cy, p.x - cx) % (2 * math.pi)) / step)
+        for j in (i - 1, i, i + 1):  # neighbours too, so the joints either side clear it
+            j %= BARRIER_BINS
+            lift[j] = max(lift[j], math.hypot(p.x - cx, p.y - cy) + BARRIER_CLEAR)
+    radius = lift
+    for i in range(BARRIER_BINS):
+        angle = (i + 0.5) * step
+        ring.append(Vector((cx + radius[i] * math.cos(angle), cy + radius[i] * math.sin(angle), 0)))
+    bottom = min(p.z for p in wall) - BARRIER_BELOW
+    top = max(p.z for p in wall) + BARRIER_ABOVE
+    boxes = []
+    for i, a in enumerate(ring):
+        b = ring[(i + 1) % len(ring)]
+        d = b - a
+        mid = (a + b) / 2
+        mid.z = (bottom + top) / 2
+        matrix = Matrix.Translation(mid) @ Matrix.Rotation(math.atan2(d.y, d.x), 4, "Z")
+        cf, _ = cframe(matrix, Vector())
+        # Each box runs a stud past both ends, so neighbours overlap at the joints.
+        boxes.append([cf, [r(d.length + 2.0), r(top - bottom), r(BARRIER_THICK)]])
+    return boxes
+
+
 def profile(asset, collection, kind, reachable, size):
     if kind == "water":
         return "water"
@@ -272,7 +359,7 @@ def main():
     if os.path.isdir(MESH_DIR):
         shutil.rmtree(MESH_DIR)
     os.makedirs(MESH_DIR)
-    levels = tint_levels(objects)
+    levels = pinned_levels(objects)
     _, height = write_palette(os.path.join(OUT, "palette.png"), levels)
 
     # The palisade's footprint decides what players can reach.
@@ -286,6 +373,8 @@ def main():
 
     def reachable(p):
         return ((p.x - cx) / rx) ** 2 + ((p.y - cy) / ry) ** 2 <= 1
+
+    footprints = []  # corners of the reachable buildings, which the barrier must clear
 
     # Pieces export from this scene with only the piece selected.
     export = scene
@@ -326,6 +415,8 @@ def main():
             size = [r(base[0] * abs(scale.x)), r(base[1] * abs(scale.z)), r(base[2] * abs(scale.y))]
             prof = profile(asset, collection, kind, here, size)
             instances.append([name, cf, size, prof])
+        if here and asset in STRUCTURES and not asset.startswith(("Palisade", "LogRail")):
+            footprints += [obj.matrix_world @ Vector(c) for c in obj.bound_box]
         if asset in TREES and here:
             # Trees in reach collide on an invisible trunk box, not the canopy.
             lo, hi = Vector(obj.bound_box[0]), Vector(obj.bound_box[6])
@@ -334,6 +425,8 @@ def main():
             tall = min(10.0, (hi.z - lo.z) * s.z * 0.45)
             cf, _ = cframe(obj.matrix_world, Vector((0, 0, tall / (2 * s.z))))
             colliders.append([cf, [r(width), r(tall), r(width)]])
+
+    barriers = barrier_ring(wall, cx, cy, footprints)
 
     # Ground probes: the walkable surface height on a grid inside the wall, so the
     # place step can raycast the built map and catch a misplaced or missing floor.
@@ -409,10 +502,12 @@ def main():
     manifest = {
         "version": 1,
         "source": "art/blender/lobby/FlintbornLobby.blend",
-        "palette": {"file": "palette.png", "tintLevels": [r(t) for t in levels]},
+        # Full precision: the next export pins these exact levels (pinned_levels).
+        "palette": {"file": "palette.png", "tintLevels": list(levels)},
         "parts": parts,
         "instances": instances,
         "colliders": colliders,
+        "barriers": barriers,
         "vfxKinds": kinds,
         "vfx": vfx,
         "spawn": [r(c) for c in spawn],
@@ -427,6 +522,7 @@ def main():
             "placedParts": len(instances),
             "placedTris": sum(parts[i[0]]["tris"] for i in instances),
             "colliders": len(colliders),
+            "barriers": len(barriers),
             "meshBytes": sum(os.path.getsize(os.path.join(OUT, p["file"])) for p in parts.values()),
         },
     }
