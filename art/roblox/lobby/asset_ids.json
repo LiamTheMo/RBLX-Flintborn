@@ -1,9 +1,10 @@
 {
   "images": {
     "palette": {
-      "decal": 138749519980797,
-      "image": 110506060164856,
-      "sha1": "74de7f0081585163473f17844a2f2ccfcd9ea1d7"
+      "decal": 115888836844372,
+      "image": 81552715112600,
+      "sha1": "74de7f0081585163473f17844a2f2ccfcd9ea1d7",
+      "note": "The 2026-10-24 upload. This palette.png has the same layout and differs by at most 1/255 in 2,816 of 2,097,152 channels, so the older image (which phones already load) stands in for it; the newer upload 110506060164856 did not load on mobile."
     },
     "vfx_dust_mote": {
       "decal": 122940151779689,
