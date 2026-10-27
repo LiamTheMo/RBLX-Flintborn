@@ -775,11 +775,10 @@ def sample(src, box, kind="green"):
     h = px.shape[0]
     x0, y0, x1, y1 = box
     c = px[h - y1:h - y0, x0:x1, :3].reshape(-1, 3)
-
-    def to_srgb(v):
-        v = np.clip(v, 0, 1)
-        return np.where(v <= 0.0031308, v * 12.92, 1.055 * np.power(v, 1 / 2.4) - 0.055)
-    s = to_srgb(c) * 255                       # Blender loads PNGs as linear floats
+    # Image.pixels holds a PNG's stored sRGB values (0-1) unconverted, so this is already sRGB. (Until
+    # 2026-10-27 this applied a second sRGB encode: W01 samples and calibrations were in that brighter
+    # space, consistent between reference and renders but not true hex values.)
+    s = np.clip(c, 0, 1) * 255
     r, g, b = s[:, 0], s[:, 1], s[:, 2]
     mx, mn = s.max(axis=1), s.min(axis=1)
     sat = (mx - mn) / np.maximum(mx, 1)
