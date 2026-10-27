@@ -178,6 +178,198 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 | V10 | ResinheartStump | partial | ring of narrow spikes (ref chunky stump); small resin | ⬜ | | | |
 | V10 | GiantCoilFern | partial | thin coil; flat disc fan leaves; small pedestal | ⬜ | | | |
 
+
+## Numbered references (001–172)
+
+From 2026-10-27 the work follows the `roblox-blender-model` skill (`.claude/skills/roblox-blender-model/SKILL.md`) on the single-model production studies in `art/blender/assets/references/NNN.png` (`INDEX.md` there maps numbers to the original names). One model at a time, in number order.
+
+- **Where:** `FlintbornWorldKit.blend`, collection `Kit/M<NNN> <Name>`, objects tagged `kit_sheet = M<NNN>`; builder `art/blender/kit/mcp/m<NNN>.py`, shared tools `kit_models.py`.
+- **Renders:** `art/blender/renders/models/M<NNN>/` (one PNG per reference view + `M<NNN>_views.png`), spec `M<NNN>_spec.md`.
+- **Export:** `BLENDER_ARGS="art/blender/assets/kit/FlintbornWorldKit.blend --sheet M<NNN>" art/blender/run.sh scripts/export_kit_roblox.py` → `art/roblox/kit/M<NNN>/`.
+- **Budgets:** under 4000 tris for a full asset, under 1000 for an accessory/small prop or part (skill); buildings and large trees up to 8000 (repo README).
+- **Cleanup:** every mesh closed and manifold, the hero a boolean union of its parts (one shell, no interior faces), no n-gons, Smart-UV `UVMap`, flat shading.
+
+Skill vs design doc / repo (design doc wins, reported):
+1. **FBX/OBJ export** → the repo's GLB + palette + manifest export (WorldModeling.md: FBX is not a drop-in substitute). Meshes still carry a Smart-UV layer so an FBX/OBJ export works.
+2. **UVs**: the GLB exporter replaces authored UVs with palette-cell UVs; the authored `UVMap` is kept for other uses.
+3. **Specialist subagents per discipline** → the stages run in the main session (CLAUDE.md: only the main session drives Blender); subagents verify, using read-only MCP inspection while the main session waits.
+4. **One mesh per asset** (repo) vs separate part objects (reference sheets): both are delivered — the assembled hero plus each labelled part as its own asset.
+
+| # | Model | Series | Status | Tris (hero; parts) | Verifier | Manual review |
+| --- | --- | --- | --- | --- | --- | --- |
+| 001 | Flintborn Stone Model Study | World & resources | ✅ | 782; parts 356 / 212 / 212 | PASS 8/10 (round 1, MCP re-check) | none needed beyond a Studio look at the palette brightness |
+| 002 | Flintborn Flint_ Low-Poly Construction Study | World & resources | ⬜ | | | |
+| 003 | Flintborn Iron model study | World & resources | ⬜ | | | |
+| 004 | Obsidian Flintborn Model Study | World & resources | ⬜ | | | |
+| 005 | Quartz Flintborn low-poly model study | World & resources | ⬜ | | | |
+| 006 | Copper Flintborn Construction Study | World & resources | ⬜ | | | |
+| 007 | Flintborn Coal model study | World & resources | ⬜ | | | |
+| 008 | Azurite Flintborn model study | World & resources | ⬜ | | | |
+| 009 | Iron Meteor_ Flintborn model study | World & resources | ⬜ | | | |
+| 010 | Flintborn Gold model study | World & resources | ⬜ | | | |
+| 011 | Amethyst Flintborn model study | World & resources | ⬜ | | | |
+| 012 | Amber Flintborn model study | World & resources | ⬜ | | | |
+| 013 | Sulfur Flintborn exploded model study | World & resources | ⬜ | | | |
+| 014 | Starstone Low-Poly Construction Study | World & resources | ⬜ | | | |
+| 015 | Ember Meteor model study | World & resources | ⬜ | | | |
+| 016 | Stormglass Flintborn asset study | World & resources | ⬜ | | | |
+| 017 | Flintborn Berry Bush Study | World & resources | ⬜ | | | |
+| 018 | Flintborn healing herb study | World & resources | ⬜ | | | |
+| 019 | Flintborn Resin Node study | World & resources | ⬜ | | | |
+| 020 | Flintborn hardwood stump study | World & resources | ⬜ | | | |
+| 021 | Flintborn Root Cluster Study | World & resources | ⬜ | | | |
+| 022 | Flintborn Fiber Shrub Model Study | World & resources | ⬜ | | | |
+| 023 | Flintborn Clay Deposit Model Study | World & resources | ⬜ | | | |
+| 024 | Flintborn Thorn Shrub Study | World & resources | ⬜ | | | |
+| 025 | Emberbloom Flintborn Model Study | World & resources | ⬜ | | | |
+| 026 | Flintborn softwood log study | World & resources | ⬜ | | | |
+| 027 | Flintborn reed patch study | World & resources | ⬜ | | | |
+| 028 | Flintborn frost shrub model study | World & resources | ⬜ | | | |
+| 029 | Ancient root model study | World & resources | ⬜ | | | |
+| 030 | Mooncap Flintborn model study | World & resources | ⬜ | | | |
+| 031 | Cave Mushroom Construction Study | World & resources | ⬜ | | | |
+| 032 | Shoreline corner | World & resources | ⬜ | | | |
+| 033 | Flintborn cave moss model study | World & resources | ⬜ | | | |
+| 034 | Flintborn streambed model study | World & resources | ⬜ | | | |
+| 035 | Flintborn boulder model study | World & resources | ⬜ | | | |
+| 036 | Flintborn rock cluster model study | World & resources | ⬜ | | | |
+| 037 | Flintborn Waterfall Module Study | World & resources | ⬜ | | | |
+| 038 | Pebble scatter model study | World & resources | ⬜ | | | |
+| 039 | Flintborn rock spire model study | World & resources | ⬜ | | | |
+| 040 | Flintborn Cliff Wall Construction Study | World & resources | ⬜ | | | |
+| 041 | Flintborn Shore Shelf Model Study | World & resources | ⬜ | | | |
+| 042 | Young Fir Model Study | World & resources | ⬜ | | | |
+| 043 | Flintborn terraced ledge model study | World & resources | ⬜ | | | |
+| 044 | Flintborn Natural Ramp Study | World & resources | ⬜ | | | |
+| 045 | Flintborn pine sapling model study | World & resources | ⬜ | | | |
+| 046 | Flintborn Natural Arch Model Study | World & resources | ⬜ | | | |
+| 047 | Old Pine Flintborn model study | World & resources | ⬜ | | | |
+| 048 | Flintborn dock model study | World & resources | ⬜ | | | |
+| 049 | Classic Pine construction study | World & resources | ⬜ | | | |
+| 050 | Flintborn timber bridge model study | World & resources | ⬜ | | | |
+| 051 | Flintborn rope crossing model study | World & resources | ⬜ | | | |
+| 052 | Flintborn Boardwalk model study | World & resources | ⬜ | | | |
+| 053 | Flintborn dead tree asset study | World & resources | ⬜ | | | |
+| 054 | Flintborn broadleaf tree study | World & resources | ⬜ | | | |
+| 055 | Fallen Log Model Study | World & resources | ⬜ | | | |
+| 056 | Moss and Ivy model study | World & resources | ⬜ | | | |
+| 057 | Flintborn Ancient Tree Model Study | World & resources | ⬜ | | | |
+| 058 | Flintborn Low Bush Study | World & resources | ⬜ | | | |
+| 059 | Flintborn grass tuft model study | World & resources | ⬜ | | | |
+| 060 | Broadleaf Fern Model Study | World & resources | ⬜ | | | |
+| 061 | Flintborn Meadow Herb Study | World & resources | ⬜ | | | |
+| 062 | Flintborn Ground Scatter Study | World & resources | ⬜ | | | |
+| 063 | Flintborn hanging vine model study | World & resources | ⬜ | | | |
+| 064 | Flintborn A-frame tent study | World & resources | ⬜ | | | |
+| 065 | Flintborn wildflowers model study | World & resources | ⬜ | | | |
+| 066 | Canvas Shelter Model Study | World & resources | ⬜ | | | |
+| 067 | Flintborn Table and Seating Study | World & resources | ⬜ | | | |
+| 068 | Flintborn timber hut model study | World & resources | ⬜ | | | |
+| 069 | Flintborn palisade wall study | World & resources | ⬜ | | | |
+| 070 | Ruined lean-to model study | World & resources | ⬜ | | | |
+| 071 | Flintborn Supply Crate Model Study | World & resources | ⬜ | | | |
+| 072 | Flintborn Timber Gate Model Study | World & resources | ⬜ | | | |
+| 073 | Flintborn Barricade Model Study | World & resources | ⬜ | | | |
+| 074 | Flintborn fire and light station | World & resources | ⬜ | | | |
+| 075 | Flintborn wall walk study | World & resources | ⬜ | | | |
+| 076 | Flintborn watchtower model study | World & resources | ⬜ | | | |
+| 077 | Flintborn Hunt Workshop Model Study | World & resources | ⬜ | | | |
+| 078 | Flintborn craft rack study | World & resources | ⬜ | | | |
+| 079 | Flintborn cave entrance model study | World & resources | ⬜ | | | |
+| 080 | Flintborn Guard Lodge Model Study | World & resources | ⬜ | | | |
+| 081 | Flintborn mine support frame study | World & resources | ⬜ | | | |
+| 082 | Flintborn tunnel module breakdown | World & resources | ⬜ | | | |
+| 083 | Flintborn Lookout Platform Study | World & resources | ⬜ | | | |
+| 084 | Flintborn Mine Track Model Study | World & resources | ⬜ | | | |
+| 085 | Flintborn cave column study | World & resources | ⬜ | | | |
+| 086 | Flintborn Minecart Model Study | World & resources | ⬜ | | | |
+| 087 | Flintborn Cave Shelf Model Study | World & resources | ⬜ | | | |
+| 088 | Flintborn gantry and ore lift | World & resources | ⬜ | | | |
+| 089 | Flintborn ruin block wall study | World & resources | ⬜ | | | |
+| 090 | Flintborn Ruin Arch Study | World & resources | ⬜ | | | |
+| 091 | Flintborn ruin column study | World & resources | ⬜ | | | |
+| 092 | Hollow stump construction study | World & resources | ⬜ | | | |
+| 093 | Flintborn courtyard floor and steps | World & resources | ⬜ | | | |
+| 094 | Snow Pine model study | World & resources | ⬜ | | | |
+| 095 | Mosswick Stump Hall Model Study | World & resources | ⬜ | | | |
+| 096 | Snowy Cliff and Boulder Study | World & resources | ⬜ | | | |
+| 097 | Flintborn alpine ground patch study | World & resources | ⬜ | | | |
+| 098 | Root Arch Walkway Model Study | World & resources | ⬜ | | | |
+| 099 | Flintborn ice pool model study | World & resources | ⬜ | | | |
+| 100 | Lake ruin tower model study | World & resources | ⬜ | | | |
+| 101 | Flintborn Giant Redcap Mushroom Study | World & resources | ⬜ | | | |
+| 102 | Ruin Camp Shelter Model Study | World & resources | ⬜ | | | |
+| 103 | Clover patch model study | Vegetation | ⬜ | | | |
+| 104 | Field sedge construction study | Vegetation | ⬜ | | | |
+| 105 | Low-poly bluegrass clump study | Vegetation | ⬜ | | | |
+| 106 | Elderberry shrub modeling study | Vegetation | ⬜ | | | |
+| 107 | Raspberry Bush Model Study | Vegetation | ⬜ | | | |
+| 108 | Dandelion rosette model study | Vegetation | ⬜ | | | |
+| 109 | Hazel shrub low-poly model study | Vegetation | ⬜ | | | |
+| 110 | Strap Fern model study | Vegetation | ⬜ | | | |
+| 111 | Rosehip Scrub Model Study | Vegetation | ⬜ | | | |
+| 112 | Trumpet Vine Model Study | Vegetation | ⬜ | | | |
+| 113 | Heartleaf Creeper model study | Vegetation | ⬜ | | | |
+| 114 | Bracken fern 3D model study | Vegetation | ⬜ | | | |
+| 115 | Bulrush Fan model study | Vegetation | ⬜ | | | |
+| 116 | Pondweed Low-Poly Construction Study | Vegetation | ⬜ | | | |
+| 117 | Cattail clump model study | Vegetation | ⬜ | | | |
+| 118 | Water Lily Low-Poly Model Study | Vegetation | ⬜ | | | |
+| 119 | Amber Shelf Fungus Model Study | Vegetation | ⬜ | | | |
+| 120 | Chestnut Mushroom Construction Sheet | Vegetation | ⬜ | | | |
+| 121 | Puffball Fungus Model Study | Vegetation | ⬜ | | | |
+| 122 | Birch tree modeling study | Vegetation | ⬜ | | | |
+| 123 | Willow low-poly modeling reference | Vegetation | ⬜ | | | |
+| 124 | Cave Trumpet Fungus Model Study | Vegetation | ⬜ | | | |
+| 125 | Juniper shrub construction study | Vegetation | ⬜ | | | |
+| 126 | Dry tussock construction study | Vegetation | ⬜ | | | |
+| 127 | Rowan tree assembly reference sheet | Vegetation | ⬜ | | | |
+| 128 | Heather Low-Poly Construction Study | Vegetation | ⬜ | | | |
+| 129 | Alpine Cushion Plant Study | Vegetation | ⬜ | | | |
+| 130 | Flax patch construction study | Vegetation | ⬜ | | | |
+| 131 | Thorn scrub model study | Vegetation | ⬜ | | | |
+| 132 | Silkleaf Rosette Model Study | Vegetation | ⬜ | | | |
+| 133 | Moonveil Orchid Model Study | Vegetation | ⬜ | | | |
+| 134 | Redroot low-poly model study | Vegetation | ⬜ | | | |
+| 135 | Stormreed rare plant model study | Vegetation | ⬜ | | | |
+| 136 | Heartpod bramble construction study | Vegetation | ⬜ | | | |
+| 137 | Sunpod shrub model study | Vegetation | ⬜ | | | |
+| 138 | Goldencrown Tree Model Study | Vegetation | ⬜ | | | |
+| 139 | Sunburst Bloom Model Study | Vegetation | ⬜ | | | |
+| 140 | Silverbark tree rare concept study | Vegetation | ⬜ | | | |
+| 141 | Giant Coil Fern Model Study | Vegetation | ⬜ | | | |
+| 142 | Resinheart stump modeling reference | Vegetation | ⬜ | | | |
+| 143 | Flintborn altar and cache plinth | Event & VFX | ⬜ | | | |
+| 144 | Event cache model study | Event & VFX | ⬜ | | | |
+| 145 | Keep Gate Monument Model Study | Event & VFX | ⬜ | | | |
+| 146 | Banner and brazier arrangement model study | Event & VFX | ⬜ | | | |
+| 147 | Temple Gateway Model Study | Event & VFX | ⬜ | | | |
+| 148 | Flintborn rowboat model study | Event & VFX | ⬜ | | | |
+| 149 | Flintborn Mooring Post Study | Event & VFX | ⬜ | | | |
+| 150 | Flintborn courtyard ruin study | Event & VFX | ⬜ | | | |
+| 151 | Flintborn log raft model study | Event & VFX | ⬜ | | | |
+| 152 | Shore work rack model study | Event & VFX | ⬜ | | | |
+| 153 | Flintborn mine stairs and ladder | Event & VFX | ⬜ | | | |
+| 154 | Timber scaffold assembly study | Event & VFX | ⬜ | | | |
+| 155 | Mine Sign and Lantern Study | Event & VFX | ⬜ | | | |
+| 156 | Flame and embers VFX study | Event & VFX | ⬜ | | | |
+| 157 | Wall catwalk assembly reference | Event & VFX | ⬜ | | | |
+| 158 | Smoke plume VFX construction study | Event & VFX | ⬜ | | | |
+| 159 | Waterfall flow and impact mist | Event & VFX | ⬜ | | | |
+| 160 | River flow and foam VFX study | Event & VFX | ⬜ | | | |
+| 161 | Shoreline wave and foam study | Event & VFX | ⬜ | | | |
+| 162 | Crystal idle glint | Event & VFX | ⬜ | | | |
+| 163 | Meteor descent trail construction study | Event & VFX | ⬜ | | | |
+| 164 | Mining impact and rock fragments | Event & VFX | ⬜ | | | |
+| 165 | Meteor impact burst VFX study | Event & VFX | ⬜ | | | |
+| 166 | Rare flora bloom VFX study | Event & VFX | ⬜ | | | |
+| 167 | Meteor cooling cracks and heat | Event & VFX | ⬜ | | | |
+| 168 | Cache beacon and sparkles | Event & VFX | ⬜ | | | |
+| 169 | Frost bloom and snow drift | Event & VFX | ⬜ | | | |
+| 170 | Guardian awakening dust and runes | Event & VFX | ⬜ | | | |
+| 171 | Resin drip and amber glint | Event & VFX | ⬜ | | | |
+| 172 | Harvest Leaves and Pollen VFX Study | Event & VFX | ⬜ | | | |
+
 ## Log
 
 - 2026-10-27: inventory written from four independent audit agents (one per sheet group). No model is marked done; every model needs work.
@@ -185,3 +377,4 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 - 2026-10-27: W01 Rock Spire passed on verifier round 5 (7.5/10). New builders: `slabs`, `collar` (fused rim), `front_boulder`, `ledge_dressing`, bright clover mode.
 - 2026-10-27: W01 Rock Cluster passed on verifier round 3 (7.5/10). Fixed a stray copy of the Boulder exploded-layout lines in the Cluster/Pebble rows.
 - 2026-10-27: **Paused** after W01 Rock Cluster at the user's request, to start on the new numbered references in `art/blender/assets/references/` (001–172, see its INDEX.md). Next kit model when resumed: W01 Pebble Scatter (no edits made yet). W01 still needs its sheet export once Pebble Scatter passes.
+- 2026-10-27: started the numbered references with the `roblox-blender-model` skill. 001 Stone passed on the first verifier round (8/10, all technical checks re-measured through MCP). Fixed `kit_mcp.sample` (it double-encoded sRGB, so earlier hex values read brighter than true). Numbered models are displayed in their own area of FlintbornWorldKit.blend (y = -200 southward, 10 per row, labels in `_Labels`).
