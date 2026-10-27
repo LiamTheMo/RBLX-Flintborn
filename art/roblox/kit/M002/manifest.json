@@ -1,0 +1,486 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M002",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m002_base_rock",
+    "hex": "#958A89",
+    "levels": [
+     0.91244,
+     0.93021,
+     0.9366,
+     0.94674,
+     0.95164,
+     0.95783,
+     0.96085,
+     0.96503,
+     0.96742,
+     0.97139,
+     0.9731,
+     0.97471,
+     0.97854,
+     0.98329,
+     0.98692,
+     0.98918,
+     0.99189,
+     0.99586,
+     0.99834,
+     1.00142,
+     1.00345,
+     1.00754,
+     1.01037,
+     1.01176,
+     1.0145,
+     1.01775,
+     1.02422,
+     1.02891,
+     1.03354,
+     1.04081,
+     1.049,
+     1.07542
+    ],
+    "used": true
+   },
+   {
+    "key": "m002_flint",
+    "hex": "#56586A",
+    "levels": [
+     0.95724,
+     0.96508,
+     0.98238,
+     1.01509,
+     1.06254,
+     1.06037,
+     0.91385,
+     0.91622,
+     1.05567,
+     0.91898,
+     1.05117,
+     0.92209,
+     0.92826,
+     1.0438,
+     0.93164,
+     1.03656,
+     0.93597,
+     1.03416,
+     0.93857,
+     0.9991,
+     0.94143,
+     1.02986,
+     0.99672,
+     1.00165,
+     0.94424,
+     0.9457,
+     1.02639,
+     0.99361,
+     1.00409,
+     1.00613,
+     0.97307,
+     0.9898
+    ],
+    "used": true
+   },
+   {
+    "key": "m002_limestone",
+    "hex": "#B3A093",
+    "levels": [
+     0.91049,
+     0.9302,
+     0.93606,
+     0.94079,
+     0.94704,
+     0.95237,
+     0.95543,
+     0.95724,
+     0.96011,
+     0.96362,
+     0.96508,
+     0.96577,
+     0.96822,
+     0.97014,
+     0.9723,
+     0.97458,
+     0.97766,
+     0.98051,
+     0.98252,
+     0.98434,
+     0.98661,
+     0.98963,
+     0.99234,
+     0.99473,
+     0.99833,
+     1.00237,
+     1.00528,
+     1.01123,
+     1.01509,
+     1.02202,
+     1.02846,
+     1.04908
+    ],
+    "used": true
+   },
+   {
+    "key": "m002_limestone_warm",
+    "hex": "#AD9988",
+    "levels": [
+     0.9685,
+     0.97956,
+     0.98445,
+     0.98891,
+     0.99285,
+     0.998,
+     0.99967,
+     1.00226,
+     1.00696,
+     1.01,
+     1.01375,
+     1.016,
+     1.01975,
+     1.02183,
+     1.02479,
+     1.03038,
+     1.03143,
+     1.03481,
+     1.03927,
+     1.04232,
+     1.05393,
+     0.9955,
+     1.0269
+    ],
+    "used": true
+   },
+   {
+    "key": "m002_limestone_x_warm_33",
+    "hex": "#B19E8F",
+    "levels": [
+     0.95421,
+     0.95627,
+     0.96072,
+     0.96337,
+     0.96779,
+     0.97176,
+     0.9747,
+     0.97692,
+     0.9791,
+     0.98409,
+     0.98916,
+     0.99253,
+     0.995,
+     0.99842,
+     0.99931,
+     1.00353,
+     1.00541,
+     1.01018,
+     1.01365,
+     1.01703,
+     1.02026,
+     1.02356,
+     1.02609,
+     1.00756
+    ],
+    "used": true
+   },
+   {
+    "key": "m002_limestone_x_warm_67",
+    "hex": "#AF9B8C",
+    "levels": [
+     0.95097,
+     0.96284,
+     0.96752,
+     0.97021,
+     0.9783,
+     0.98002,
+     0.98327,
+     0.98662,
+     0.98891,
+     0.99157,
+     0.99531,
+     0.99823,
+     1.00013,
+     1.00221,
+     1.0053,
+     1.01022,
+     1.02047,
+     1.02342,
+     1.02654,
+     1.03289,
+     1.03742,
+     1.01446,
+     0.97409,
+     1.01719,
+     1.0131,
+     0.97599,
+     0.96534
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Flint",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "hero",
+   "size": [
+    8.5434,
+    5.8,
+    6.675
+   ],
+   "tris": 744,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Flint.glb",
+     "kind": "solid",
+     "tris": 744,
+     "offset": [
+      0.0,
+      2.9,
+      0.0
+     ],
+     "size": [
+      8.5434,
+      5.8,
+      6.675
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flint resource: pale limestone boulder with three sharp dark flint shards (large, medium, small) set in shallow recesses on its front faces, and three pale base rocks at the foot; parts unioned into one closed mesh"
+  },
+  {
+   "name": "FlintBaseRocks",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "part",
+   "size": [
+    4.7995,
+    1.2,
+    1.7077
+   ],
+   "tris": 144,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintBaseRocks.glb",
+     "kind": "solid",
+     "tris": 144,
+     "offset": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "size": [
+      4.7995,
+      1.2,
+      1.7077
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rocks (x3): three small pale rocks for the foot, one piece"
+  },
+  {
+   "name": "FlintInsertLarge",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "part",
+   "size": [
+    2.6238,
+    2.7,
+    2.6971
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertLarge.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.35,
+      0.0
+     ],
+     "size": [
+      2.6238,
+      2.7,
+      2.6971
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Flint Insert (Large): chunky dark faceted crystal"
+  },
+  {
+   "name": "FlintInsertMedium",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "part",
+   "size": [
+    2.3008,
+    2.4,
+    2.2308
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertMedium.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.2,
+      0.0
+     ],
+     "size": [
+      2.3008,
+      2.4,
+      2.2308
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Flint Insert (Medium): chunky dark faceted crystal"
+  },
+  {
+   "name": "FlintInsertSmallM002",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "part",
+   "size": [
+    1.9012,
+    2.1,
+    1.9305
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertSmallM002.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.05,
+      0.0
+     ],
+     "size": [
+      1.9012,
+      2.1,
+      1.9305
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Flint Insert (Small): chunky dark faceted crystal (exported as FlintInsertSmallM002: R01 owns the plain name)"
+  },
+  {
+   "name": "FlintLimestoneShell",
+   "sheet": "M002",
+   "subject": "Flint",
+   "role": "part",
+   "size": [
+    6.7445,
+    5.8,
+    6.4754
+   ],
+   "tris": 466,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintLimestoneShell.glb",
+     "kind": "solid",
+     "tris": 466,
+     "offset": [
+      0.0,
+      2.9,
+      0.0
+     ],
+     "size": [
+      6.7445,
+      5.8,
+      6.4754
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Limestone Shell (main body) alone, with the three shallow insert recesses"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 1426,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 170,
+  "meshBytes": 131720
+ },
+ "problems": []
+}

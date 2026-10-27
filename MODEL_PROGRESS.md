@@ -197,8 +197,8 @@ Skill vs design doc / repo (design doc wins, reported):
 
 | # | Model | Series | Status | Tris (hero; parts) | Verifier | Manual review |
 | --- | --- | --- | --- | --- | --- | --- |
-| 001 | Flintborn Stone Model Study | World & resources | ✅ | 782; parts 356 / 212 / 212 | PASS 8/10 (round 1, MCP re-check) | none needed beyond a Studio look at the palette brightness |
-| 002 | Flintborn Flint_ Low-Poly Construction Study | World & resources | ⬜ | | | |
+| 001 | Flintborn Stone Model Study | World & resources | ✅ | 820; parts 356 / 212 / 212 | PASS 8/10, re-verified PASS 7.5/10 after the node rework | minors: left support a bit large, right support hidden in the front view; check palette brightness in Studio |
+| 002 | Flintborn Flint_ Low-Poly Construction Study | World & resources | ✅ | 744; parts 466 / 24 / 24 / 24 / 144 | FAIL 4/10 → PASS 6.5/10 (round 2) | minors: shell faceting more regular than the sheet, inserts gem-like rather than wedge shards; check in Studio |
 | 003 | Flintborn Iron model study | World & resources | ⬜ | | | |
 | 004 | Obsidian Flintborn Model Study | World & resources | ⬜ | | | |
 | 005 | Quartz Flintborn low-poly model study | World & resources | ⬜ | | | |
@@ -378,3 +378,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-27: W01 Rock Cluster passed on verifier round 3 (7.5/10). Fixed a stray copy of the Boulder exploded-layout lines in the Cluster/Pebble rows.
 - 2026-10-27: **Paused** after W01 Rock Cluster at the user's request, to start on the new numbered references in `art/blender/assets/references/` (001–172, see its INDEX.md). Next kit model when resumed: W01 Pebble Scatter (no edits made yet). W01 still needs its sheet export once Pebble Scatter passes.
 - 2026-10-27: started the numbered references with the `roblox-blender-model` skill. 001 Stone passed on the first verifier round (8/10, all technical checks re-measured through MCP). Fixed `kit_mcp.sample` (it double-encoded sRGB, so earlier hex values read brighter than true). Numbered models are displayed in their own area of FlintbornWorldKit.blend (y = -200 southward, 10 per row, labels in `_Labels`).
+- 2026-10-27: user asked for chunkier nodes: 001 and 002 footprints widened to near-round (depth ≈ 0.9 of width). 002 Flint passed on round 2. Its first build overwrote R01's `FlintInsertSmall` (same name); the original was restored from the committed blend, and `kit_models.mk` now appends the model code on a name clash (`FlintInsertSmallM002`).
