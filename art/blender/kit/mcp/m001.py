@@ -18,9 +18,9 @@ STONE, STONE_COOL = "m001_stone", "m001_stone_cool"
 # broad blunt crown (about 32 hull points: broad flat faces, as the sheet's "Broad, Flat Faces").
 MAIN = [(0.0, 0.88, 7), (0.25, 1.0, 8), (0.58, 0.94, 7), (0.84, 0.72, 6), (1.0, 0.36, 4)]
 SUPPORT = [(0.0, 0.92, 6), (0.4, 1.0, 6), (0.75, 0.7, 5), (1.0, 0.25, 3)]
-MAIN_SIZE = (6.8, 4.9, 5.0)
-LEFT = ((-3.0, -0.75, 0.0), (2.3, 2.0, 1.65), 1012)        # centre, size, seed
-RIGHT = ((3.15, 0.45, 0.0), (1.85, 1.7, 1.3), 1013)
+MAIN_SIZE = (7.0, 6.4, 5.0)          # near-round footprint: reads as a chunky node (user, 2026-10-27)
+LEFT = ((-3.2, -1.1, 0.0), (2.5, 2.3, 1.8), 1012)          # centre, size, seed
+RIGHT = ((3.35, 0.6, 0.0), (2.1, 1.9, 1.45), 1013)
 CHAMFER = 0.02                                            # the sheet's "Hard Edge (Chamfered Look)"
 
 
@@ -77,7 +77,7 @@ def build(render=True):
              ("StoneMainRock", "part", lambda a: main_rock(a), 1000, "hull"),
              ("StoneSupportRockLeft", "part", lambda a: support(a, "left", (0, 0, 0)), 1000, "hull"),
              ("StoneSupportRockRight", "part", lambda a: support(a, "right", (0, 0, 0)), 1000, "hull")]
-    objs = [K.mk(SHEET, n, fn, subject=TITLE, role=r, notes=NOTES[n], budget=b, collision=c)
+    objs = [M.mk(SHEET, n, fn, subject=TITLE, role=r, notes=NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
     audits = [M.finish(o, union=(o.name == "Stone")) for o in objs]
     M.display(NUM, objs, TITLE)                       # its slot in the numbered-models display area

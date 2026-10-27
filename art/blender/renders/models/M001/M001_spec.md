@@ -6,9 +6,9 @@ Assets (collection `Kit/M001 Stone`): `Stone` (hero, the three parts unioned), `
 ## Study (2a)
 
 - **Classification:** full asset (resource node), budget 4000 tris; each part 1000.
-- **Silhouette:** a chunky faceted dome, wider than tall (front view W:H ≈ 1.28), near-vertical lower sides bulging slightly above a flat base, broad shoulder, blunt crown. Depth ≈ 0.75 of width (side and top views disagree a little; resolved at 0.75).
+- **Silhouette:** a chunky faceted dome, wider than tall (front view W:H ≈ 1.3), near-vertical lower sides bulging slightly above a flat base, broad shoulder, blunt crown. Footprint near-round (depth ≈ 0.9 of width): the sheet's side view suggests ~0.75, but at that depth the node read thin from above, so the user asked for a chunkier node (2026-10-27).
 - **Parts:** Main Rock; Support Rock (Left), larger, set into the main rock's left foot; Support Rock (Right), smaller, at its right foot. They join on flat facets ("joining surface") at the main rock's base.
-- **Scale:** matches the kit's in-game Stone node: main rock 6.4 × 4.8 × 5.0 studs (character 5.5); whole asset 8.1 × 4.8 × 5.0.
+- **Scale:** matches the kit's in-game Stone node: main rock 6.7 × 6.1 × 5.0 studs (character 5.5); whole asset 8.7 × 6.1 × 5.0.
 - **Facet style:** broad flat faces, hard edges with a slight chamfer, consistent thickness; flat shading.
 - **Colours (true sRGB, sampled):** swatches #B4A49C (light), #847773 (mid), #484749 (dark). Rendered rock in the sheet: median #958682, lit #C0ACA2, shade #6B605C. Matte, no metal, no emission.
 - **Surface:** solid colours only ("no noise, textures or photo detail"); subtle warm/cool facet drift.

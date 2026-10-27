@@ -42,6 +42,16 @@ def coll(num, title):
     return c
 
 
+def mk(sheet, name, fn, **kw):
+    """kit_mcp.mk, but never rebuilds an object that belongs to another sheet: if `name` is already taken by
+    another sheet's asset (e.g. a kit row's FlintInsertSmall), the model's own copy gets the model code
+    appended (FlintInsertSmallM002)."""
+    old = bpy.data.objects.get(name)
+    if old and old.get("kit_sheet") not in (None, sheet):
+        name = f"{name}{sheet}"
+    return K.mk(sheet, name, fn, **kw)
+
+
 def raw_sample(path, box):
     """Median true sRGB (0-255) of a box (x0, y0, x1, y1, top-left origin) - for flat swatches."""
     px = K.NS["KIT"]["load_px"](path)
@@ -85,6 +95,10 @@ def _override(o):
     win = bpy.context.window_manager.windows[0]
     area = next(a for a in win.screen.areas if a.type == "VIEW_3D")
     region = next(r for r in area.regions if r.type == "WINDOW")
+    if area.spaces[0].local_view:            # objects outside local view can't enter Edit mode
+        with bpy.context.temp_override(window=win, area=area, region=region):
+            bpy.ops.view3d.localview(frame_selected=False)
+    o.hide_set(False)
     return bpy.context.temp_override(window=win, area=area, region=region, active_object=o, object=o,
                                      selected_objects=[o], selected_editable_objects=[o])
 
@@ -216,12 +230,16 @@ def audit(o):
 def smart_uv(o, margin=0.008, angle=66.0):
     """Smart UV Project into 'UVMap'; margin 0.008 so gaps between islands clear 2 px at 1024^2. (The repo's GLB exporter writes its own
     palette-cell UVs on export; this layer serves FBX/OBJ export and any texture work.)"""
+    if not o.data.polygons:
+        return
     with _override(o):
         bpy.ops.object.mode_set(mode="EDIT")
-        bpy.ops.mesh.select_all(action="SELECT")
-        bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin, area_weight=0.0,
-                                 correct_aspect=True, scale_to_bounds=False)
-        bpy.ops.object.mode_set(mode="OBJECT")
+        try:
+            bpy.ops.mesh.select_all(action="SELECT")
+            bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin, area_weight=0.0,
+                                     correct_aspect=True, scale_to_bounds=False)
+        finally:
+            bpy.ops.object.mode_set(mode="OBJECT")
 
 
 def finish(o, union=True, uv=True):
@@ -229,7 +247,8 @@ def finish(o, union=True, uv=True):
     custom split normals, flat shading, Smart UV, origin kept at the bottom centre. Returns the audit."""
     if union and len(o.data.polygons):
         union_loose(o)
-        # re-centre: the union can trim the lowest points, so put the origin back at the bottom centre
+    if len(o.data.vertices):
+        # re-centre: unions and subtractions can move the extents, so put the origin back at the bottom centre
         me = o.data
         xs = [v.co.x for v in me.vertices]
         ys = [v.co.y for v in me.vertices]
@@ -240,6 +259,14 @@ def finish(o, union=True, uv=True):
                 v.co -= off
             for c in o.children:
                 c.location -= off
+    # booleans can leave slivers: merge near-duplicate verts and dissolve degenerate faces on every mesh
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.002)
+    bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=0.002)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    bm.to_mesh(o.data)
+    bm.free()
     # no n-gons (the boolean leaves some where shells meet): triangulate faces of more than 4 sides
     bm = bmesh.new()
     bm.from_mesh(o.data)
@@ -253,6 +280,7 @@ def finish(o, union=True, uv=True):
             bpy.ops.mesh.customdata_custom_splitnormals_clear()
     for p in o.data.polygons:
         p.use_smooth = False
+    K.drop_unused_slots(o)
     if uv:
         smart_uv(o)
     return audit(o)
