@@ -41,7 +41,7 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 
 | Sheet | Model | Audit state | Main problems at audit | Status | Tris (hero) | Verifier | Manual review |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| W01 | Boulder | mostly-done | moss cap a flat decal, not leafy lumps; base plants dark/spiky, few pebbles; exploded moss cap thin; rock slightly dark | 🔨 | | | |
+| W01 | Boulder | mostly-done | moss cap a flat decal, not leafy lumps; base plants dark/spiky, few pebbles; exploded moss cap thin; rock slightly dark | ✅ | 3812 (parts 208/288; variants 3477/3319/3232) | PASS 8/10 (round 5) | palette `w01_*` keys only, no textures beyond palette.png; no VFX; check brightness of calibrated moss/herb greens in Studio |
 | W01 | RockSpire | partial | spire slender, few facets; foot collar thin; moss streak not clumps; foliage sparse | ⬜ | | | |
 | W01 | RockCluster | mostly-done | moss small/flat/pale; foliage sparse; top view cramped | ⬜ | | | |
 | W01 | PebbleScatter | partial | slab dominant; exploded lacks 5 stone types; foliage few; variants barely differ | ⬜ | | | |
@@ -181,3 +181,4 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 ## Log
 
 - 2026-10-27: inventory written from four independent audit agents (one per sheet group). No model is marked done; every model needs work.
+- 2026-10-27: W01 Boulder passed on verifier round 5 (8/10). Shared fixes made on the way: `hull_rock` no longer deletes a flat crown (open-topped rocks), kit studio background matches the floor, cells framed on vertices, 48 samples. New W01 builders: `moss_mounds`/`place_mounds` (leafy moss cap), `herb_bush` (clover clumps), `flower5`.
