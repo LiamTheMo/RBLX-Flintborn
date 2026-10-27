@@ -1,0 +1,4202 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "R04",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "r04_cooled_ember",
+    "hex": "#A8401F",
+    "levels": [
+     1.0547,
+     1.06497
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_ember_core",
+    "hex": "#E8501A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_impact_rock",
+    "hex": "#7D7570",
+    "levels": [
+     0.90081,
+     0.92725,
+     0.93436,
+     0.93945,
+     0.94524,
+     0.95029,
+     0.95561,
+     0.96012,
+     0.96484,
+     0.97064,
+     0.97429,
+     0.97767,
+     0.98125,
+     0.98437,
+     0.9885,
+     0.99232,
+     0.99615,
+     1.00141,
+     1.00651,
+     1.01197,
+     1.01729,
+     1.02313,
+     1.03081,
+     1.03668,
+     1.04169,
+     1.04746,
+     1.05383,
+     1.06121,
+     1.06787,
+     1.07704,
+     1.08728,
+     1.10675
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_lava_crack",
+    "hex": "#FF7A12",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_meteor_rock",
+    "hex": "#4A4A54",
+    "levels": [
+     0.9212,
+     0.95014,
+     0.97798,
+     0.9877,
+     0.99615,
+     1.00088,
+     1.00645,
+     1.00978,
+     1.01298,
+     1.01697,
+     1.02037,
+     1.02376,
+     1.02632,
+     1.02884,
+     1.03104,
+     1.03375,
+     1.03584,
+     1.03851,
+     1.04021,
+     1.04163,
+     1.04338,
+     1.04621,
+     1.04904,
+     1.05199,
+     1.05365,
+     1.0565,
+     1.06122,
+     1.06666,
+     1.07261,
+     1.07826,
+     1.08599,
+     1.09587
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_sand",
+    "hex": "#CFB08C",
+    "levels": [
+     0.96118,
+     1.00456,
+     1.03072
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_star_stone",
+    "hex": "#6F6B72",
+    "levels": [
+     0.93299,
+     0.95107,
+     0.95597,
+     0.96025,
+     0.96553,
+     0.9684,
+     0.97297,
+     0.97701,
+     1.00671,
+     1.00928,
+     1.0127,
+     1.01835,
+     1.02142,
+     1.02911,
+     1.03377,
+     1.04374,
+     1.04653,
+     1.05869,
+     1.06028,
+     1.06714,
+     1.06941
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_starlight",
+    "hex": "#22C4E6",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_storm_rock",
+    "hex": "#625454",
+    "levels": [
+     0.90624,
+     0.92312,
+     0.93153,
+     0.93771,
+     0.94297,
+     0.95129,
+     0.95802,
+     0.96267,
+     0.96666,
+     0.97227,
+     0.9749,
+     0.97886,
+     0.98119,
+     0.9852,
+     0.98883,
+     0.9911,
+     0.99551,
+     0.99742,
+     1.00147,
+     1.00605,
+     1.01085,
+     1.01591,
+     1.02115,
+     1.0251,
+     1.02977,
+     1.03822,
+     1.04526,
+     1.05302,
+     1.06088,
+     1.06924,
+     1.08395,
+     1.10147
+    ],
+    "used": true
+   },
+   {
+    "key": "r04_stormglass",
+    "hex": "#28BDAA",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CooledEmberFragment",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "drop",
+   "size": [
+    1.1816,
+    1.1835,
+    0.9149
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CooledEmberFragment.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.5917,
+      0.0
+     ],
+     "size": [
+      1.1816,
+      1.1835,
+      0.9149
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cooled Ember Fragment drop: dull burnt shard, no glow."
+  },
+  {
+   "name": "CooledEmberFragmentB",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "drop",
+   "size": [
+    0.9596,
+    1.3409,
+    0.9818
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CooledEmberFragmentB.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.6705,
+      0.0
+     ],
+     "size": [
+      0.9596,
+      1.3409,
+      0.9818
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cooled Ember Fragment drop: dull burnt shard, no glow."
+  },
+  {
+   "name": "EmberMeteor",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "hero",
+   "size": [
+    9.5086,
+    7.5395,
+    8.5095
+   ],
+   "tris": 472,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteor.glb",
+     "kind": "solid",
+     "tris": 280,
+     "offset": [
+      0.0,
+      3.7697,
+      0.0
+     ],
+     "size": [
+      9.5086,
+      7.5395,
+      8.5095
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteor_glow_r04_ember_core.glb",
+     "kind": "glow",
+     "tris": 80,
+     "offset": [
+      0.0296,
+      2.6143,
+      0.7189
+     ],
+     "size": [
+      5.0095,
+      4.7866,
+      4.3291
+     ],
+     "key": "r04_ember_core",
+     "color": "#E8501A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteor_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 112,
+     "offset": [
+      0.0459,
+      3.8257,
+      0.3654
+     ],
+     "size": [
+      4.5772,
+      4.9336,
+      4.6597
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_embers.001",
+     "kind": "embers",
+     "position": [
+      0.0,
+      5.4,
+      0.8
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_deplete.016",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.013",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      4.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#46464E",
+       "#FF8A2A"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.006",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      2.8,
+      1.7
+     ],
+     "vfx_scale": 1.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF6A10",
+       "brightness": 1.6,
+       "range": 14,
+       "flicker": true
+      },
+      "color": [
+       "#FF6A10",
+       "#FFB030"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.007",
+     "kind": "heat_glow",
+     "position": [
+      -1.7767,
+      4.4932,
+      1.3782
+     ],
+     "vfx_scale": 0.4,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_heat_glow.008",
+     "kind": "heat_glow",
+     "position": [
+      -1.9616,
+      3.0353,
+      1.3159
+     ],
+     "vfx_scale": 0.4,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_heat_glow.009",
+     "kind": "heat_glow",
+     "position": [
+      -0.2167,
+      4.1977,
+      -1.0088
+     ],
+     "vfx_scale": 0.4,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_heat_glow.010",
+     "kind": "heat_glow",
+     "position": [
+      1.1326,
+      1.7952,
+      2.0046
+     ],
+     "vfx_scale": 0.4,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Ember Meteor node. heat_glow at core (orange PointLight), embers rising above the core, small heat_glow on each lava seam, harvest_hit on the front strike face (charcoal chips), harvest_deplete at base centre. No ore_glint: core is molten, not glossy ore."
+  },
+  {
+   "name": "EmberMeteorCore",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "part",
+   "size": [
+    4.419,
+    4.2744,
+    3.8977
+   ],
+   "tris": 80,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorCore_glow_r04_ember_core.glb",
+     "kind": "glow",
+     "tris": 80,
+     "offset": [
+      0.0,
+      2.1372,
+      0.0
+     ],
+     "size": [
+      4.419,
+      4.2744,
+      3.8977
+     ],
+     "key": "r04_ember_core",
+     "color": "#E8501A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_heat_glow.012",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      2.2,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF6A10",
+       "brightness": 1.3,
+       "range": 12,
+       "flicker": true
+      },
+      "color": [
+       "#FF6A10",
+       "#FFB030"
+      ]
+     }
+    }
+   ],
+   "notes": "Ember Core: faceted molten core, emissive; heat_glow with orange light."
+  },
+  {
+   "name": "EmberMeteorDepleted",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "depleted",
+   "size": [
+    8.086,
+    1.7265,
+    5.2869
+   ],
+   "tris": 160,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorDepleted.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.8633,
+      0.0
+     ],
+     "size": [
+      8.086,
+      1.7265,
+      5.2869
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Depleted (Base): low rubble pile, no meteor or glow."
+  },
+  {
+   "name": "EmberMeteorImpactBase",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "part",
+   "size": [
+    6.8859,
+    1.7911,
+    3.068
+   ],
+   "tris": 140,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorImpactBase.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      0.8956,
+      0.0
+     ],
+     "size": [
+      6.8859,
+      1.7911,
+      3.068
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Impact Base: grey-tan rubble cluster."
+  },
+  {
+   "name": "EmberMeteorShellPiece",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "part",
+   "size": [
+    3.6464,
+    4.3106,
+    2.9566
+   ],
+   "tris": 56,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorShellPiece.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      2.1553,
+      -0.0708
+     ],
+     "size": [
+      3.6464,
+      4.3106,
+      2.815
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteorShellPiece_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 36,
+     "offset": [
+      -0.1641,
+      2.3624,
+      1.1176
+     ],
+     "size": [
+      2.2817,
+      2.6519,
+      0.7215
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_heat_glow.011",
+     "kind": "heat_glow",
+     "position": [
+      0.9869,
+      3.1896,
+      1.0004
+     ],
+     "vfx_scale": 0.4,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Shell Piece: tall angular charcoal slab with one glowing seam (small heat_glow)."
+  },
+  {
+   "name": "EmberMeteorShellPieceB",
+   "sheet": "R04",
+   "subject": "EmberMeteor",
+   "role": "part",
+   "size": [
+    4.6113,
+    2.5644,
+    2.5042
+   ],
+   "tris": 20,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorShellPieceB.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.2822,
+      0.0
+     ],
+     "size": [
+      4.6113,
+      2.5644,
+      2.5042
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Shell Piece variant: flatter angular charcoal slab."
+  },
+  {
+   "name": "IronMeteor",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "hero",
+   "size": [
+    9.2591,
+    6.8763,
+    8.7432
+   ],
+   "tris": 1148,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteor.glb",
+     "kind": "solid",
+     "tris": 1004,
+     "offset": [
+      0.0,
+      3.4382,
+      0.0
+     ],
+     "size": [
+      9.2591,
+      6.8763,
+      8.7432
+     ]
+    },
+    {
+     "file": "meshes/IronMeteor_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 144,
+     "offset": [
+      0.1594,
+      3.4463,
+      0.6642
+     ],
+     "size": [
+      7.2748,
+      4.633,
+      4.11
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_embers",
+     "kind": "embers",
+     "position": [
+      -0.8,
+      6.1,
+      2.8
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_deplete.014",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.012",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.5,
+      4.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#4A4A54",
+       "#7D7570"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.001",
+     "kind": "heat_glow",
+     "position": [
+      -1.6,
+      3.8,
+      3.4
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF9A1E",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#FF8A1A",
+       "#FFC040"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.002",
+     "kind": "heat_glow",
+     "position": [
+      2.1,
+      3.8,
+      3.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF9A1E",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#FF8A1A",
+       "#FFC040"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.003",
+     "kind": "heat_glow",
+     "position": [
+      -3.6,
+      2.9,
+      -0.9
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#FF8A1A",
+       "#FFC040"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.004",
+     "kind": "heat_glow",
+     "position": [
+      3.5,
+      3.6,
+      -0.8
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#FF8A1A",
+       "#FFC040"
+      ]
+     }
+    }
+   ],
+   "notes": "Iron meteor node. heat_glow x4 mark the emissive crack seams (front two carry an orange PointLight), embers rise from the top of the big left-front crack, harvest_hit on the front strike face, harvest_deplete at the base centre. No ore_glint (matte). PARTS labels (Rock Shell, Metal Core, Impact Rim) are real part assets."
+  },
+  {
+   "name": "IronMeteorDepleted",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "depleted",
+   "size": [
+    8.867,
+    1.6155,
+    7.9004
+   ],
+   "tris": 702,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorDepleted.glb",
+     "kind": "solid",
+     "tris": 702,
+     "offset": [
+      0.0,
+      0.8078,
+      0.0
+     ],
+     "size": [
+      8.867,
+      1.6155,
+      7.9004
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.015",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Depleted (Base): low ring of impact rubble with a hollow centre; harvest_deplete at base centre."
+  },
+  {
+   "name": "IronMeteorImpactRim",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "part",
+   "size": [
+    7.1052,
+    1.409,
+    3.0668
+   ],
+   "tris": 474,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorImpactRim.glb",
+     "kind": "solid",
+     "tris": 474,
+     "offset": [
+      0.0,
+      0.7045,
+      0.0
+     ],
+     "size": [
+      7.1052,
+      1.409,
+      3.0668
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Impact Rim part: merged cluster of flat grey-tan rubble rocks."
+  },
+  {
+   "name": "IronMeteorMetalCore",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "part",
+   "size": [
+    3.7718,
+    3.931,
+    3.9265
+   ],
+   "tris": 104,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorMetalCore.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.9655,
+      -0.0209
+     ],
+     "size": [
+      3.7718,
+      3.931,
+      3.8847
+     ]
+    },
+    {
+     "file": "meshes/IronMeteorMetalCore_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      -0.2515,
+      2.3047,
+      1.7457
+     ],
+     "size": [
+      0.6948,
+      1.7341,
+      0.4351
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_heat_glow.005",
+     "kind": "heat_glow",
+     "position": [
+      -0.3,
+      2.4,
+      2.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#FF8A1A",
+       "#FFC040"
+      ]
+     }
+    }
+   ],
+   "notes": "Metal Core part: chunky faceted core with one short emissive seam (heat_glow)."
+  },
+  {
+   "name": "IronMeteorRockShell",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "part",
+   "size": [
+    4.7717,
+    2.3943,
+    3.4914
+   ],
+   "tris": 80,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorRockShell.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.1971,
+      0.0
+     ],
+     "size": [
+      4.7717,
+      2.3943,
+      3.4914
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Shell part: elongated angular charcoal shell slab, no glow."
+  },
+  {
+   "name": "MeteorIronChunk",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "drop",
+   "size": [
+    1.4083,
+    1.0221,
+    1.2286
+   ],
+   "tris": 104,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeteorIronChunk.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.511,
+      -0.0213
+     ],
+     "size": [
+      1.4083,
+      1.0221,
+      1.186
+     ]
+    },
+    {
+     "file": "meshes/MeteorIronChunk_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      -0.0796,
+      0.5179,
+      0.4577
+     ],
+     "size": [
+      0.4632,
+      0.759,
+      0.3132
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Meteor Iron Chunk drop: charcoal chunk with one emissive front seam."
+  },
+  {
+   "name": "MeteorIronChunkB",
+   "sheet": "R04",
+   "subject": "IronMeteor",
+   "role": "drop",
+   "size": [
+    0.9857,
+    1.3853,
+    0.9671
+   ],
+   "tris": 104,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeteorIronChunkB.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.6927,
+      -0.0212
+     ],
+     "size": [
+      0.9857,
+      1.3853,
+      0.9248
+     ]
+    },
+    {
+     "file": "meshes/MeteorIronChunkB_glow_r04_lava_crack.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      -0.0292,
+      0.7197,
+      0.3875
+     ],
+     "size": [
+      0.3067,
+      0.9932,
+      0.1921
+     ],
+     "key": "r04_lava_crack",
+     "color": "#FF7A12",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Meteor Iron Chunk drop (tall variant) with a vertical emissive seam."
+  },
+  {
+   "name": "StarlightShard",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "drop",
+   "size": [
+    0.9979,
+    1.744,
+    0.9029
+   ],
+   "tris": 24,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarlightShard.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      0.872,
+      0.0
+     ],
+     "size": [
+      0.9979,
+      1.744,
+      0.9029
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.021",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      1.0,
+      0.4
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Starlight Shard drop: pointed emissive cyan crystal; small ore_glint."
+  },
+  {
+   "name": "StarlightShardB",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "drop",
+   "size": [
+    0.9491,
+    1.3552,
+    1.225
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarlightShardB.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.6776,
+      0.0
+     ],
+     "size": [
+      0.9491,
+      1.3552,
+      1.225
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.022",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      0.7,
+      0.5
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Starlight Shard drop (chunky angled variant); small ore_glint."
+  },
+  {
+   "name": "Starstone",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "hero",
+   "size": [
+    9.1106,
+    9.0,
+    7.2293
+   ],
+   "tris": 274,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Starstone.glb",
+     "kind": "solid",
+     "tris": 274,
+     "offset": [
+      0.0,
+      4.5,
+      0.0
+     ],
+     "size": [
+      9.1106,
+      9.0,
+      7.2293
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_dust.001",
+     "kind": "dust",
+     "position": [
+      0.6,
+      3.6,
+      0.6
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Dust",
+        "texture": "dust_mote",
+        "color": [
+         "#F3E1B8",
+         "#E2C890"
+        ],
+        "size": [
+         0.3,
+         0.12
+        ],
+        "transparency": [
+         0.4,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 180,
+        "light_emission": 0.3,
+        "shape": [
+         8.0,
+         2.0,
+         4.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#40E0F8",
+       "#A8F4FF"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_deplete.017",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#6F6B72",
+       "#8A8690"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.014",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      3.5
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#22C4E6",
+       "#6F6B72"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.013",
+     "kind": "heat_glow",
+     "position": [
+      0.6,
+      3.4,
+      0.4
+     ],
+     "vfx_scale": 1.2,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#40E0F8",
+       "brightness": 1.0,
+       "range": 12,
+       "flicker": false
+      },
+      "color": [
+       "#40E0F8",
+       "#A8F4FF"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.019",
+     "kind": "ore_glint",
+     "position": [
+      0.5,
+      3.6,
+      1.3
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Starstone node: two broad leaning grey-violet slabs with an emissive cyan hex crystal wedged in the cleft. heat_glow (cyan PointLight) + dust motes = soft starlight halo at the crystal; ore_glint on the glossy crystal front; harvest_hit on the front strike face (cyan/grey chips); harvest_deplete at base centre."
+  },
+  {
+   "name": "StarstoneBaseRock",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "part",
+   "size": [
+    5.8459,
+    1.6222,
+    2.8899
+   ],
+   "tris": 100,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarstoneBaseRock.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.8111,
+      0.0
+     ],
+     "size": [
+      5.8459,
+      1.6222,
+      2.8899
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock: low cluster of angular grey rocks merged into one mesh."
+  },
+  {
+   "name": "StarstoneDepleted",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "depleted",
+   "size": [
+    8.0863,
+    3.0,
+    5.7258
+   ],
+   "tris": 180,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarstoneDepleted.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      1.5,
+      0.0
+     ],
+     "size": [
+      8.0863,
+      3.0,
+      5.7258
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.018",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#6F6B72",
+       "#8A8690"
+      ]
+     }
+    }
+   ],
+   "notes": "Depleted (Base): low angular grey rubble pile with a stubby broken slab stump at the back, no crystal; harvest_deplete at base centre."
+  },
+  {
+   "name": "StarstoneStarlightCore",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "part",
+   "size": [
+    2.4334,
+    5.4604,
+    2.2544
+   ],
+   "tris": 24,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarstoneStarlightCore.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.7302,
+      0.0
+     ],
+     "size": [
+      2.4334,
+      5.4604,
+      2.2544
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_heat_glow.014",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      2.8,
+      0.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      },
+      "color": [
+       "#40E0F8",
+       "#A8F4FF"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.020",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      3.0,
+      1.1
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Starlight Core: emissive long hex crystal; heat_glow halo and ore_glint."
+  },
+  {
+   "name": "StarstoneStoneShell",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "part",
+   "size": [
+    4.7572,
+    5.9329,
+    2.7194
+   ],
+   "tris": 34,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarstoneStoneShell.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      2.9665,
+      0.0
+     ],
+     "size": [
+      4.7572,
+      5.9329,
+      2.7194
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stone Shell: the hero's left slab, tilted ~25 deg."
+  },
+  {
+   "name": "StarstoneStoneShellB",
+   "sheet": "R04",
+   "subject": "Starstone",
+   "role": "part",
+   "size": [
+    3.6338,
+    4.5922,
+    2.4361
+   ],
+   "tris": 36,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StarstoneStoneShellB.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      2.2961,
+      0.0
+     ],
+     "size": [
+      3.6338,
+      4.5922,
+      2.4361
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stone Shell B: the hero's right-hand slab."
+  },
+  {
+   "name": "Stormglass",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "hero",
+   "size": [
+    11.199,
+    7.9536,
+    9.9125
+   ],
+   "tris": 854,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Stormglass.glb",
+     "kind": "solid",
+     "tris": 854,
+     "offset": [
+      0.0,
+      3.9768,
+      0.0
+     ],
+     "size": [
+      11.199,
+      7.9536,
+      9.9125
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_dust.002",
+     "kind": "dust",
+     "position": [
+      0.0,
+      1.6,
+      0.0
+     ],
+     "vfx_scale": 1.2,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Dust",
+        "texture": "dust_mote",
+        "color": [
+         "#F3E1B8",
+         "#E2C890"
+        ],
+        "size": [
+         0.3,
+         0.12
+        ],
+        "transparency": [
+         0.4,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 180,
+        "light_emission": 0.3,
+        "shape": [
+         8.0,
+         2.0,
+         4.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E0B880",
+       "#C89A60"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_deplete.019",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E0B880",
+       "#C89A60"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.015",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      4.0,
+      3.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#28BDAA",
+       "#8FF0E4"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.015",
+     "kind": "heat_glow",
+     "position": [
+      0.2,
+      3.8,
+      0.2
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#30D8C8",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": false
+      },
+      "color": [
+       "#30D8C8",
+       "#A8FFF0"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.023",
+     "kind": "ore_glint",
+     "position": [
+      0.1,
+      3.6,
+      1.1
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E8FFFB",
+       "#7FF2E4"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.024",
+     "kind": "ore_glint",
+     "position": [
+      1.25,
+      7.6,
+      -1.15
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E8FFFB",
+       "#7FF2E4"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.025",
+     "kind": "ore_glint",
+     "position": [
+      2.8,
+      6.3,
+      2.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E8FFFB",
+       "#7FF2E4"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.026",
+     "kind": "ore_glint",
+     "position": [
+      -3.8,
+      5.0,
+      0.25
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E8FFFB",
+       "#7FF2E4"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.027",
+     "kind": "ore_glint",
+     "position": [
+      -0.55,
+      5.6,
+      -2.9
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E8FFFB",
+       "#7FF2E4"
+      ]
+     }
+    }
+   ],
+   "notes": "ore_glint: trunk front + 4 branch tips; heat_glow: cyan soft halo + teal PointLight at the fork (emissive glass); dust: sand motes over the mound; harvest_hit: teal chips on the front strike face; harvest_deplete: base centre"
+  },
+  {
+   "name": "StormglassBranchStub",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    4.2563,
+    2.5176,
+    1.9178
+   ],
+   "tris": 124,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassBranchStub.glb",
+     "kind": "solid",
+     "tris": 124,
+     "offset": [
+      0.0,
+      1.2588,
+      0.0
+     ],
+     "size": [
+      4.2563,
+      2.5176,
+      1.9178
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch Stub: broken limb, slight upward tilt, hex cut end"
+  },
+  {
+   "name": "StormglassDepleted",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "depleted",
+   "size": [
+    10.8476,
+    2.9051,
+    9.9212
+   ],
+   "tris": 318,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassDepleted.glb",
+     "kind": "solid",
+     "tris": 318,
+     "offset": [
+      0.0,
+      1.4525,
+      0.0
+     ],
+     "size": [
+      10.8476,
+      2.9051,
+      9.9212
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_dust.003",
+     "kind": "dust",
+     "position": [
+      0.0,
+      1.2,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Dust",
+        "texture": "dust_mote",
+        "color": [
+         "#F3E1B8",
+         "#E2C890"
+        ],
+        "size": [
+         0.3,
+         0.12
+        ],
+        "transparency": [
+         0.4,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 180,
+        "light_emission": 0.3,
+        "shape": [
+         8.0,
+         2.0,
+         4.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E0B880",
+       "#C89A60"
+      ]
+     }
+    }
+   ],
+   "notes": "Depleted (Base): mound with centre crater, rock ring, no crystal; dust motes"
+  },
+  {
+   "name": "StormglassFragment",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "drop",
+   "size": [
+    1.3445,
+    1.0171,
+    0.9826
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassFragment.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.5085,
+      0.0
+     ],
+     "size": [
+      1.3445,
+      1.0171,
+      0.9826
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stormglass Fragment (lying)"
+  },
+  {
+   "name": "StormglassFragmentB",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "drop",
+   "size": [
+    1.0354,
+    1.437,
+    0.7666
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassFragmentB.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.7185,
+      0.0
+     ],
+     "size": [
+      1.0354,
+      1.437,
+      0.7666
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stormglass Fragment (tall)"
+  },
+  {
+   "name": "StormglassMainBranch",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    4.9771,
+    6.7102,
+    2.761
+   ],
+   "tris": 248,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassMainBranch.glb",
+     "kind": "solid",
+     "tris": 248,
+     "offset": [
+      0.0,
+      3.3551,
+      0.0
+     ],
+     "size": [
+      4.9771,
+      6.7102,
+      2.761
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Branch: Y-forked trunk"
+  },
+  {
+   "name": "StormglassSandBase",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    10.8824,
+    2.3,
+    9.8246
+   ],
+   "tris": 358,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassSandBase.glb",
+     "kind": "solid",
+     "tris": 358,
+     "offset": [
+      0.0,
+      1.15,
+      0.0
+     ],
+     "size": [
+      10.8824,
+      2.3,
+      9.8246
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Sand Base: mound with rim rocks"
+  },
+  {
+   "name": "StormglassSideBranch",
+   "sheet": "R04",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    2.7167,
+    3.1994,
+    1.654
+   ],
+   "tris": 184,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassSideBranch.glb",
+     "kind": "solid",
+     "tris": 184,
+     "offset": [
+      0.0,
+      1.5997,
+      0.0
+     ],
+     "size": [
+      2.7167,
+      3.1994,
+      1.654
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Branch: small Y twig"
+  }
+ ],
+ "stats": {
+  "assets": 31,
+  "pieces": 38,
+  "solid": 30,
+  "water": 0,
+  "glow": 8,
+  "tris": 6502,
+  "vfxSockets": 39,
+  "paletteColours": 10,
+  "paletteLevels": 126,
+  "meshBytes": 688412
+ },
+ "problems": []
+}

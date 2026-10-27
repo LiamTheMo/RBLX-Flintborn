@@ -1,0 +1,1594 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V06",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v06_bark",
+    "hex": "#925D36",
+    "levels": [
+     0.95039,
+     0.95312,
+     0.95603,
+     0.9597,
+     0.96417,
+     0.96617,
+     0.96899,
+     0.97377,
+     0.97648,
+     0.98042,
+     0.98427,
+     0.98538,
+     0.98961,
+     0.99338,
+     0.99421,
+     1.00077,
+     1.00565,
+     1.00783,
+     1.01239,
+     1.01573,
+     1.01905,
+     1.02321,
+     1.0274,
+     1.02884,
+     1.03228,
+     1.03628,
+     1.03802,
+     1.03913,
+     1.04165,
+     1.04431,
+     1.04699,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_berry",
+    "hex": "#F0461E",
+    "levels": [
+     0.95179,
+     0.95607,
+     0.96031,
+     0.96271,
+     0.96582,
+     0.96807,
+     0.97132,
+     0.97429,
+     0.97646,
+     0.98087,
+     0.98626,
+     0.98917,
+     0.99366,
+     0.99664,
+     0.99956,
+     1.0032,
+     1.00842,
+     1.01026,
+     1.01341,
+     1.01501,
+     1.01741,
+     1.02153,
+     1.02325,
+     1.02649,
+     1.03052,
+     1.03266,
+     1.03412,
+     1.03684,
+     1.03898,
+     1.04224,
+     1.04501,
+     1.04841
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_birch",
+    "hex": "#E9DCC0",
+    "levels": [
+     0.9505,
+     0.95323,
+     0.95606,
+     0.95889,
+     0.96267,
+     0.96566,
+     0.9713,
+     0.97588,
+     0.97757,
+     0.98152,
+     0.98448,
+     0.98673,
+     0.9899,
+     0.99319,
+     0.99456,
+     0.99921,
+     1.00156,
+     1.00583,
+     1.00821,
+     1.01428,
+     1.02247,
+     1.02475,
+     1.02784,
+     1.02944,
+     1.03396,
+     1.03813,
+     1.04013,
+     1.04359,
+     1.04612,
+     1.04824
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_blue",
+    "hex": "#3A7BE0",
+    "levels": [
+     0.95148,
+     0.96178,
+     0.96625,
+     0.98085,
+     0.9915,
+     0.99609,
+     1.00515,
+     1.03193,
+     1.03922
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_juniper",
+    "hex": "#3E8F55",
+    "levels": [
+     0.95059,
+     0.95478,
+     0.95865,
+     0.96137,
+     0.96457,
+     0.96625,
+     0.96972,
+     0.97186,
+     0.9746,
+     0.9782,
+     0.98237,
+     0.9865,
+     0.99102,
+     0.9951,
+     0.99778,
+     1.00491,
+     1.00646,
+     1.00935,
+     1.01002,
+     1.01137,
+     1.01664,
+     1.01825,
+     1.02095,
+     1.0228,
+     1.02395,
+     1.03115,
+     1.03347,
+     1.03676,
+     1.03861,
+     1.03988,
+     1.04374,
+     1.04988
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_lime",
+    "hex": "#8CC63A",
+    "levels": [
+     0.95107,
+     0.95617,
+     0.9586,
+     0.96186,
+     0.97045,
+     0.97455,
+     0.97758,
+     0.98094,
+     0.98518,
+     0.98743,
+     0.99046,
+     0.99391,
+     0.99951,
+     1.00229,
+     1.00464,
+     1.01058,
+     1.01338,
+     1.01731,
+     1.02045,
+     1.0229,
+     1.02673,
+     1.02895,
+     1.03096,
+     1.03598,
+     1.03917,
+     1.04105,
+     1.04358,
+     1.04606,
+     1.0479
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_moss",
+    "hex": "#7DB83A",
+    "levels": [
+     0.9501,
+     0.95204,
+     0.95623,
+     0.9591,
+     0.9637,
+     0.96859,
+     0.97064,
+     0.97449,
+     0.97892,
+     0.98084,
+     0.98302,
+     0.98587,
+     0.98863,
+     0.99066,
+     0.99418,
+     0.99708,
+     0.99956,
+     1.00334,
+     1.00679,
+     1.01119,
+     1.01536,
+     1.01672,
+     1.02145,
+     1.02387,
+     1.02771,
+     1.03038,
+     1.03364,
+     1.03767,
+     1.04023,
+     1.04342,
+     1.04639,
+     1.04955
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_patch",
+    "hex": "#5E4A3C",
+    "levels": [
+     0.95664,
+     0.95861,
+     0.96689,
+     0.97014,
+     0.97739,
+     0.98041,
+     0.98321,
+     0.99493,
+     0.99875,
+     1.006,
+     1.01133,
+     1.01568,
+     1.01764,
+     1.02267,
+     1.03073,
+     1.03404,
+     1.0371,
+     1.04293,
+     1.04681
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_rowan",
+    "hex": "#86C23E",
+    "levels": [
+     0.95064,
+     0.95617,
+     0.95969,
+     0.9629,
+     0.97107,
+     0.97445,
+     0.97659,
+     0.97949,
+     0.98465,
+     0.98699,
+     0.99109,
+     0.99391,
+     0.99951,
+     1.00246,
+     1.00464,
+     1.01058,
+     1.01334,
+     1.01654,
+     1.01905,
+     1.02156,
+     1.0243,
+     1.02744,
+     1.0289,
+     1.03096,
+     1.03631,
+     1.03962,
+     1.04135,
+     1.04371,
+     1.04616,
+     1.04832,
+     1.04965,
+     0.96831
+    ],
+    "used": true
+   },
+   {
+    "key": "v06_willow",
+    "hex": "#7CC43A",
+    "levels": [
+     0.95128,
+     0.95341,
+     0.95597,
+     0.95967,
+     0.96354,
+     0.96649,
+     0.97115,
+     0.973,
+     0.97954,
+     0.98417,
+     0.98569,
+     0.98878,
+     0.99245,
+     0.99558,
+     0.99798,
+     1.00125,
+     1.00744,
+     1.00973,
+     1.01179,
+     1.01581,
+     1.01877,
+     1.0241,
+     1.02868,
+     1.03091,
+     1.03459,
+     1.04148,
+     1.04425,
+     1.04806
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Birch",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "hero",
+   "size": [
+    7.2658,
+    9.9827,
+    5.3557
+   ],
+   "tris": 3856,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Birch.glb",
+     "kind": "solid",
+     "tris": 3856,
+     "offset": [
+      0.0,
+      4.9914,
+      0.0
+     ],
+     "size": [
+      7.2658,
+      9.9827,
+      5.3557
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "birch: slender pale ivory trunk with dark bark patches forking into kinked limbs under six bright lime leaf clumps; airy canopy"
+  },
+  {
+   "name": "BirchBarkPatch",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "part",
+   "size": [
+    0.9,
+    0.45,
+    0.15
+   ],
+   "tris": 12,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchBarkPatch.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.225,
+      0.0
+     ],
+     "size": [
+      0.9,
+      0.45,
+      0.15
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bark patch (flat)"
+  },
+  {
+   "name": "BirchFork",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "part",
+   "size": [
+    2.133,
+    3.1581,
+    0.5806
+   ],
+   "tris": 72,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchFork.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      1.579,
+      0.0
+     ],
+     "size": [
+      2.133,
+      3.1581,
+      0.5806
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fork (branch)"
+  },
+  {
+   "name": "BirchLeafClump",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "part",
+   "size": [
+    3.4828,
+    3.1063,
+    3.4349
+   ],
+   "tris": 480,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchLeafClump.glb",
+     "kind": "solid",
+     "tris": 480,
+     "offset": [
+      0.0,
+      1.5532,
+      0.0
+     ],
+     "size": [
+      3.4828,
+      3.1063,
+      3.4349
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump (module)"
+  },
+  {
+   "name": "BirchSapling",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "variant",
+   "size": [
+    3.9893,
+    6.0407,
+    2.3201
+   ],
+   "tris": 2776,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchSapling.glb",
+     "kind": "solid",
+     "tris": 2776,
+     "offset": [
+      0.0,
+      3.0204,
+      0.0
+     ],
+     "size": [
+      3.9893,
+      6.0407,
+      2.3201
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Sapling"
+  },
+  {
+   "name": "BirchTall",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "variant",
+   "size": [
+    6.411,
+    12.1253,
+    4.8939
+   ],
+   "tris": 3856,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchTall.glb",
+     "kind": "solid",
+     "tris": 3856,
+     "offset": [
+      0.0,
+      6.0626,
+      0.0
+     ],
+     "size": [
+      6.411,
+      12.1253,
+      4.8939
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall"
+  },
+  {
+   "name": "BirchTrunk",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "part",
+   "size": [
+    1.0303,
+    6.2337,
+    1.1231
+   ],
+   "tris": 184,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchTrunk.glb",
+     "kind": "solid",
+     "tris": 184,
+     "offset": [
+      0.0,
+      3.1168,
+      0.0
+     ],
+     "size": [
+      1.0303,
+      6.2337,
+      1.1231
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk (base)"
+  },
+  {
+   "name": "BirchTwinTrunk",
+   "sheet": "V06",
+   "subject": "Birch",
+   "role": "variant",
+   "size": [
+    9.0544,
+    10.3219,
+    3.7399
+   ],
+   "tris": 4052,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BirchTwinTrunk.glb",
+     "kind": "solid",
+     "tris": 4052,
+     "offset": [
+      0.0,
+      5.161,
+      0.0
+     ],
+     "size": [
+      9.0544,
+      10.3219,
+      3.7399
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Twin Trunk"
+  },
+  {
+   "name": "Juniper",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "hero",
+   "size": [
+    7.8983,
+    5.6425,
+    4.0567
+   ],
+   "tris": 2348,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Juniper.glb",
+     "kind": "solid",
+     "tris": 2348,
+     "offset": [
+      0.0,
+      2.8213,
+      0.0
+     ],
+     "size": [
+      7.8983,
+      5.6425,
+      4.0567
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "juniper: low multi-trunk gnarled evergreen with chunky spiky dark foliage clusters and large blue berries; wind-swept silhouette"
+  },
+  {
+   "name": "JuniperBerry",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "part",
+   "size": [
+    1.0367,
+    1.637,
+    0.5104
+   ],
+   "tris": 72,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperBerry.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.8185,
+      0.0
+     ],
+     "size": [
+      1.0367,
+      1.637,
+      0.5104
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "berry (module)"
+  },
+  {
+   "name": "JuniperFoliageCluster",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "part",
+   "size": [
+    3.1607,
+    2.0424,
+    2.7585
+   ],
+   "tris": 148,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperFoliageCluster.glb",
+     "kind": "solid",
+     "tris": 148,
+     "offset": [
+      0.0,
+      1.0212,
+      0.0
+     ],
+     "size": [
+      3.1607,
+      2.0424,
+      2.7585
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "foliage cluster (module)"
+  },
+  {
+   "name": "JuniperGnarled",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "variant",
+   "size": [
+    6.7967,
+    4.7963,
+    3.5787
+   ],
+   "tris": 1556,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperGnarled.glb",
+     "kind": "solid",
+     "tris": 1556,
+     "offset": [
+      0.0,
+      2.3981,
+      0.0
+     ],
+     "size": [
+      6.7967,
+      4.7963,
+      3.5787
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Gnarled"
+  },
+  {
+   "name": "JuniperGroundShrub",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "variant",
+   "size": [
+    8.5377,
+    3.5538,
+    4.6283
+   ],
+   "tris": 2052,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperGroundShrub.glb",
+     "kind": "solid",
+     "tris": 2052,
+     "offset": [
+      0.0,
+      1.7769,
+      0.0
+     ],
+     "size": [
+      8.5377,
+      3.5538,
+      4.6283
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Ground Shrub"
+  },
+  {
+   "name": "JuniperTrunk",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "part",
+   "size": [
+    2.93,
+    2.3306,
+    0.862
+   ],
+   "tris": 60,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperTrunk.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.1653,
+      0.0
+     ],
+     "size": [
+      2.93,
+      2.3306,
+      0.862
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk (base)"
+  },
+  {
+   "name": "JuniperUpright",
+   "sheet": "V06",
+   "subject": "Juniper",
+   "role": "variant",
+   "size": [
+    5.373,
+    6.5203,
+    3.9606
+   ],
+   "tris": 1992,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/JuniperUpright.glb",
+     "kind": "solid",
+     "tris": 1992,
+     "offset": [
+      0.0,
+      3.2602,
+      0.0
+     ],
+     "size": [
+      5.373,
+      6.5203,
+      3.9606
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Upright"
+  },
+  {
+   "name": "Rowan",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "hero",
+   "size": [
+    9.1454,
+    9.2166,
+    5.8692
+   ],
+   "tris": 4892,
+   "budget": 11000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Rowan.glb",
+     "kind": "solid",
+     "tris": 4892,
+     "offset": [
+      0.0,
+      4.6083,
+      0.0
+     ],
+     "size": [
+      9.1454,
+      9.2166,
+      5.8692
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rowan: flared forked trunk splitting into three limbs and kinked twigs, nine separate knobbly lime leaf clumps with gaps showing the branches, four bunches of big orange-red berries hanging on two-pronged stalks"
+  },
+  {
+   "name": "RowanBerryBunch",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "part",
+   "size": [
+    1.6836,
+    2.5391,
+    1.6327
+   ],
+   "tris": 236,
+   "budget": 2400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanBerryBunch.glb",
+     "kind": "solid",
+     "tris": 236,
+     "offset": [
+      0.0,
+      1.2696,
+      0.0
+     ],
+     "size": [
+      1.6836,
+      2.5391,
+      1.6327
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "berry bunch (module)"
+  },
+  {
+   "name": "RowanBranch",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "part",
+   "size": [
+    0.9912,
+    2.7276,
+    0.6109
+   ],
+   "tris": 68,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanBranch.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      1.3638,
+      0.0
+     ],
+     "size": [
+      0.9912,
+      2.7276,
+      0.6109
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (segment)"
+  },
+  {
+   "name": "RowanFruiting",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "variant",
+   "size": [
+    9.2372,
+    9.1235,
+    5.9369
+   ],
+   "tris": 5600,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanFruiting.glb",
+     "kind": "solid",
+     "tris": 5600,
+     "offset": [
+      0.0,
+      4.5617,
+      0.0
+     ],
+     "size": [
+      9.2372,
+      9.1235,
+      5.9369
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Fruiting: nine berry bunches"
+  },
+  {
+   "name": "RowanFruitless",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "variant",
+   "size": [
+    8.281,
+    9.1844,
+    5.0938
+   ],
+   "tris": 3476,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanFruitless.glb",
+     "kind": "solid",
+     "tris": 3476,
+     "offset": [
+      0.0,
+      4.5922,
+      0.0
+     ],
+     "size": [
+      8.281,
+      9.1844,
+      5.0938
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Fruitless"
+  },
+  {
+   "name": "RowanLeafClump",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "part",
+   "size": [
+    3.0815,
+    2.7537,
+    2.5074
+   ],
+   "tris": 200,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanLeafClump.glb",
+     "kind": "solid",
+     "tris": 200,
+     "offset": [
+      0.0,
+      1.3768,
+      0.0
+     ],
+     "size": [
+      3.0815,
+      2.7537,
+      2.5074
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump (module)"
+  },
+  {
+   "name": "RowanTrunk",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "part",
+   "size": [
+    3.1307,
+    4.7477,
+    3.1337
+   ],
+   "tris": 600,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanTrunk.glb",
+     "kind": "solid",
+     "tris": 600,
+     "offset": [
+      0.0,
+      2.3738,
+      0.0
+     ],
+     "size": [
+      3.1307,
+      4.7477,
+      3.1337
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk (base): flared buttress base forking into limbs"
+  },
+  {
+   "name": "RowanYoung",
+   "sheet": "V06",
+   "subject": "Rowan",
+   "role": "variant",
+   "size": [
+    6.2498,
+    6.153,
+    3.5283
+   ],
+   "tris": 3948,
+   "budget": 11000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RowanYoung.glb",
+     "kind": "solid",
+     "tris": 3948,
+     "offset": [
+      0.0,
+      3.0765,
+      0.0
+     ],
+     "size": [
+      6.2498,
+      6.153,
+      3.5283
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young: smaller tree, two berry bunches"
+  },
+  {
+   "name": "Willow",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "hero",
+   "size": [
+    9.7918,
+    7.9353,
+    7.5367
+   ],
+   "tris": 2504,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Willow.glb",
+     "kind": "solid",
+     "tris": 2504,
+     "offset": [
+      0.0,
+      3.9677,
+      0.0
+     ],
+     "size": [
+      9.7918,
+      7.9353,
+      7.5367
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "willow: low thick twisting trunk with snaking roots, wide open crown of six hanging leaf clumps whose drooping strands form an umbrella"
+  },
+  {
+   "name": "WillowBranch",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "part",
+   "size": [
+    2.1142,
+    2.5488,
+    0.8803
+   ],
+   "tris": 40,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowBranch.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.2744,
+      0.0
+     ],
+     "size": [
+      2.1142,
+      2.5488,
+      0.8803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (segment)"
+  },
+  {
+   "name": "WillowHangingLeafClump",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "part",
+   "size": [
+    3.2766,
+    4.1893,
+    3.655
+   ],
+   "tris": 164,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowHangingLeafClump.glb",
+     "kind": "solid",
+     "tris": 164,
+     "offset": [
+      0.0,
+      2.0946,
+      0.0
+     ],
+     "size": [
+      3.2766,
+      4.1893,
+      3.655
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "hanging leaf clump (module)"
+  },
+  {
+   "name": "WillowLeaning",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "variant",
+   "size": [
+    7.7319,
+    7.5529,
+    5.312
+   ],
+   "tris": 2056,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowLeaning.glb",
+     "kind": "solid",
+     "tris": 2056,
+     "offset": [
+      0.0,
+      3.7764,
+      0.0
+     ],
+     "size": [
+      7.7319,
+      7.5529,
+      5.312
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Leaning"
+  },
+  {
+   "name": "WillowRootBase",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "part",
+   "size": [
+    3.5532,
+    1.8551,
+    2.7995
+   ],
+   "tris": 432,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowRootBase.glb",
+     "kind": "solid",
+     "tris": 432,
+     "offset": [
+      0.0,
+      0.9275,
+      0.0
+     ],
+     "size": [
+      3.5532,
+      1.8551,
+      2.7995
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional)"
+  },
+  {
+   "name": "WillowTrunk",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "part",
+   "size": [
+    3.0101,
+    3.5563,
+    3.3139
+   ],
+   "tris": 488,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowTrunk.glb",
+     "kind": "solid",
+     "tris": 488,
+     "offset": [
+      0.0,
+      1.7781,
+      0.0
+     ],
+     "size": [
+      3.0101,
+      3.5563,
+      3.3139
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk (base)"
+  },
+  {
+   "name": "WillowWide",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "variant",
+   "size": [
+    11.219,
+    7.4793,
+    7.2373
+   ],
+   "tris": 2728,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowWide.glb",
+     "kind": "solid",
+     "tris": 2728,
+     "offset": [
+      0.0,
+      3.7397,
+      0.0
+     ],
+     "size": [
+      11.219,
+      7.4793,
+      7.2373
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide"
+  },
+  {
+   "name": "WillowYoung",
+   "sheet": "V06",
+   "subject": "Willow",
+   "role": "variant",
+   "size": [
+    6.4107,
+    5.3608,
+    3.2277
+   ],
+   "tris": 1832,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WillowYoung.glb",
+     "kind": "solid",
+     "tris": 1832,
+     "offset": [
+      0.0,
+      2.6804,
+      0.0
+     ],
+     "size": [
+      6.4107,
+      5.3608,
+      3.2277
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young"
+  }
+ ],
+ "stats": {
+  "assets": 31,
+  "pieces": 31,
+  "solid": 31,
+  "water": 0,
+  "glow": 0,
+  "tris": 52780,
+  "vfxSockets": 0,
+  "paletteColours": 10,
+  "paletteLevels": 275,
+  "meshBytes": 5313044
+ },
+ "problems": []
+}

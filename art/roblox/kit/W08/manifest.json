@@ -1,0 +1,1882 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W08",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w08_banner",
+    "hex": "#B3202A",
+    "levels": [
+     0.93116,
+     0.93478,
+     0.9452,
+     0.94901,
+     0.95383,
+     0.95606,
+     0.95867,
+     0.96151,
+     0.9655,
+     0.96703,
+     0.97088,
+     0.97443,
+     0.97673,
+     0.98393,
+     0.99048,
+     0.99336,
+     0.99537,
+     1.0046,
+     1.00824,
+     1.02288,
+     1.03109,
+     1.03832,
+     1.04281,
+     1.04578,
+     1.04869,
+     1.05369,
+     1.05919,
+     1.06775
+    ],
+    "used": false
+   },
+   {
+    "key": "w08_nail",
+    "hex": "#C48A3C",
+    "levels": [
+     0.9302,
+     0.93331,
+     0.93702,
+     0.94248,
+     0.94829,
+     0.95131,
+     0.95568,
+     0.96014,
+     0.9631,
+     0.9697,
+     0.97857,
+     0.98273,
+     0.98866,
+     0.99313,
+     0.99863,
+     1.00342,
+     1.00866,
+     1.01366,
+     1.01699,
+     1.02113,
+     1.02468,
+     1.02903,
+     1.03476,
+     1.03985,
+     1.04355,
+     1.04894,
+     1.05362,
+     1.05721,
+     1.05988,
+     1.06347,
+     1.06832,
+     1.07
+    ],
+    "used": false
+   },
+   {
+    "key": "w08_pile_wood",
+    "hex": "#5C3420",
+    "levels": [
+     0.93387,
+     0.94509,
+     0.95265,
+     0.95955,
+     0.96194,
+     0.96896,
+     0.97576,
+     0.98271,
+     0.98719,
+     1.0006,
+     1.00367,
+     1.00884,
+     1.0175,
+     1.0248,
+     1.03186,
+     1.04308,
+     1.04627,
+     1.05245,
+     1.0583,
+     1.05958,
+     1.06286
+    ],
+    "used": false
+   },
+   {
+    "key": "w08_rope",
+    "hex": "#D9BC84",
+    "levels": [
+     0.93083,
+     0.93887,
+     0.94234,
+     0.94849,
+     0.95043,
+     0.95648,
+     0.96049,
+     0.96621,
+     0.9718,
+     0.97477,
+     0.97925,
+     0.98286,
+     0.98656,
+     0.98926,
+     0.99293,
+     0.99859,
+     1.00131,
+     1.00557,
+     1.00762,
+     1.01156,
+     1.01512,
+     1.01815,
+     1.02254,
+     1.02804,
+     1.0349,
+     1.03819,
+     1.04162,
+     1.04561,
+     1.04995,
+     1.05284,
+     1.064,
+     1.06963
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_stone",
+    "hex": "#B0AEB2",
+    "levels": [
+     0.88843,
+     0.92763,
+     0.93662,
+     0.9381,
+     0.94133,
+     0.9427,
+     0.9427,
+     0.95391,
+     0.95427,
+     0.96582,
+     0.97403,
+     0.9874,
+     0.98846,
+     1.00031,
+     1.00073,
+     1.00304,
+     1.0122,
+     1.01916,
+     1.02092,
+     1.02489,
+     1.02678,
+     1.0308,
+     1.03226,
+     1.03444,
+     1.03688,
+     1.04322,
+     1.04874,
+     1.05001,
+     1.05848,
+     1.06741,
+     1.08117,
+     1.11854
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_wood",
+    "hex": "#A8622E",
+    "levels": [
+     0.93014,
+     0.93509,
+     0.93807,
+     0.94358,
+     0.94779,
+     0.95221,
+     0.95544,
+     0.96004,
+     0.96364,
+     0.96662,
+     0.97034,
+     0.97409,
+     0.9809,
+     0.98491,
+     0.99066,
+     0.99572,
+     1.00074,
+     1.00464,
+     1.0091,
+     1.01457,
+     1.01879,
+     1.0232,
+     1.02819,
+     1.03123,
+     1.03639,
+     1.0417,
+     1.04593,
+     1.04922,
+     1.05433,
+     1.06098,
+     1.06582,
+     1.06993
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_cloth",
+    "hex": "#C0302C",
+    "levels": [
+     0.94559,
+     1.00089,
+     1.03858,
+     0.96472,
+     1.05373,
+     1.00979,
+     0.95089
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_iron",
+    "hex": "#5A5A60",
+    "levels": [
+     0.9445,
+     0.94559,
+     0.94728,
+     0.94753,
+     0.94838,
+     0.95089,
+     0.95486,
+     0.95731,
+     0.95824,
+     0.96679,
+     0.97415,
+     0.97597,
+     0.9777,
+     0.98629,
+     0.98872,
+     0.99204,
+     1.00431,
+     1.00611,
+     1.00925,
+     1.01027,
+     1.01207,
+     1.01529,
+     1.01667,
+     1.02165,
+     1.03533,
+     1.03794,
+     1.03831,
+     1.04302,
+     1.04457,
+     1.05373,
+     1.05715,
+     1.05917
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_post",
+    "hex": "#94572B",
+    "levels": [
+     0.97195,
+     0.98304,
+     0.98591
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Boardwalk",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "hero",
+   "size": [
+    17.86,
+    3.75,
+    6.12
+   ],
+   "tris": 2344,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Boardwalk.glb",
+     "kind": "solid",
+     "tris": 2344,
+     "offset": [
+      0.0,
+      1.875,
+      0.0
+     ],
+     "size": [
+      17.86,
+      3.75,
+      6.12
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "raised boardwalk: plank deck on short posts and crossbeams, square-post rails with two rails, entry stairs"
+  },
+  {
+   "name": "BoardwalkCornerL",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "variant",
+   "size": [
+    14.5951,
+    3.75,
+    10.5951
+   ],
+   "tris": 2516,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkCornerL.glb",
+     "kind": "solid",
+     "tris": 2516,
+     "offset": [
+      0.0,
+      1.875,
+      0.0
+     ],
+     "size": [
+      14.5951,
+      3.75,
+      10.5951
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Corner (L): two sections meeting at a right angle"
+  },
+  {
+   "name": "BoardwalkCrossbeam",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    5.6,
+    0.5,
+    0.5
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkCrossbeam.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "size": [
+      5.6,
+      0.5,
+      0.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crossbeam"
+  },
+  {
+   "name": "BoardwalkFloorPlank",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    5.0067,
+    0.4038,
+    1.1262
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkFloorPlank.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.2019,
+      0.0
+     ],
+     "size": [
+      5.0067,
+      0.4038,
+      1.1262
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor plank"
+  },
+  {
+   "name": "BoardwalkRail",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    0.45,
+    0.45,
+    7.0
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkRail.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.225,
+      0.0
+     ],
+     "size": [
+      0.45,
+      0.45,
+      7.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rail"
+  },
+  {
+   "name": "BoardwalkRailPost",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    0.92,
+    3.65,
+    0.9951
+   ],
+   "tris": 108,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkRailPost.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      1.825,
+      0.0
+     ],
+     "size": [
+      0.92,
+      3.65,
+      0.9951
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rail post"
+  },
+  {
+   "name": "BoardwalkRampEnd",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "variant",
+   "size": [
+    14.9911,
+    3.75,
+    6.12
+   ],
+   "tris": 2064,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkRampEnd.glb",
+     "kind": "solid",
+     "tris": 2064,
+     "offset": [
+      0.0,
+      1.875,
+      0.0
+     ],
+     "size": [
+      14.9911,
+      3.75,
+      6.12
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Ramp End: four stepped treads down to the ground with rails both sides"
+  },
+  {
+   "name": "BoardwalkStairs",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    4.0,
+    1.2,
+    3.9
+   ],
+   "tris": 132,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkStairs.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "size": [
+      4.0,
+      1.2,
+      3.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stairs"
+  },
+  {
+   "name": "BoardwalkStraight",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "variant",
+   "size": [
+    11.9951,
+    3.75,
+    6.12
+   ],
+   "tris": 1780,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkStraight.glb",
+     "kind": "solid",
+     "tris": 1780,
+     "offset": [
+      0.0,
+      1.875,
+      0.0
+     ],
+     "size": [
+      11.9951,
+      3.75,
+      6.12
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight: straight section with rails both sides"
+  },
+  {
+   "name": "BoardwalkSupportPost",
+   "sheet": "W08",
+   "subject": "Boardwalk",
+   "role": "part",
+   "size": [
+    0.75,
+    1.4,
+    0.8841
+   ],
+   "tris": 64,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoardwalkSupportPost.glb",
+     "kind": "solid",
+     "tris": 64,
+     "offset": [
+      0.0,
+      0.7,
+      0.0
+     ],
+     "size": [
+      0.75,
+      1.4,
+      0.8841
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "support post"
+  },
+  {
+   "name": "Dock",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "hero",
+   "size": [
+    10.2225,
+    4.35,
+    7.5225
+   ],
+   "tris": 2168,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Dock.glb",
+     "kind": "solid",
+     "tris": 2168,
+     "offset": [
+      0.0,
+      2.175,
+      0.0
+     ],
+     "size": [
+      10.2225,
+      4.35,
+      7.5225
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wooden dock: plank deck on tall legs, X-braced between posts, rope-wrapped posts with sagging rope rails"
+  },
+  {
+   "name": "DockBeam",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    7.0,
+    0.7,
+    0.7
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockBeam.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.35,
+      0.0
+     ],
+     "size": [
+      7.0,
+      0.7,
+      0.7
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "beam"
+  },
+  {
+   "name": "DockBrace",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    2.7095,
+    2.7826,
+    0.5127
+   ],
+   "tris": 12,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockBrace.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      1.3913,
+      0.0
+     ],
+     "size": [
+      2.7095,
+      2.7826,
+      0.5127
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "brace"
+  },
+  {
+   "name": "DockDeckPlank",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    6.0074,
+    0.4355,
+    1.2312
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockDeckPlank.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.2177,
+      0.0
+     ],
+     "size": [
+      6.0074,
+      0.4355,
+      1.2312
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "deck plank"
+  },
+  {
+   "name": "DockLHead",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "variant",
+   "size": [
+    15.7783,
+    4.35,
+    10.7783
+   ],
+   "tris": 3616,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockLHead.glb",
+     "kind": "solid",
+     "tris": 3616,
+     "offset": [
+      0.0,
+      2.175,
+      0.0
+     ],
+     "size": [
+      15.7783,
+      4.35,
+      10.7783
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. L-Head: walkway turning to one side at the end"
+  },
+  {
+   "name": "DockMooringPost",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    1.24,
+    3.45,
+    1.2591
+   ],
+   "tris": 164,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockMooringPost.glb",
+     "kind": "solid",
+     "tris": 164,
+     "offset": [
+      0.0,
+      1.725,
+      0.0
+     ],
+     "size": [
+      1.24,
+      3.45,
+      1.2591
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "mooring post with rope wrap"
+  },
+  {
+   "name": "DockPile",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    1.2685,
+    5.1078,
+    1.2772
+   ],
+   "tris": 112,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockPile.glb",
+     "kind": "solid",
+     "tris": 112,
+     "offset": [
+      0.0,
+      2.5539,
+      0.0
+     ],
+     "size": [
+      1.2685,
+      5.1078,
+      1.2772
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pile: round piling with rope wrap"
+  },
+  {
+   "name": "DockRopeTie",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "part",
+   "size": [
+    1.9434,
+    1.0068,
+    0.992
+   ],
+   "tris": 104,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockRopeTie.glb",
+     "kind": "solid",
+     "tris": 104,
+     "offset": [
+      0.0,
+      0.5034,
+      0.0
+     ],
+     "size": [
+      1.9434,
+      1.0068,
+      0.992
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rope tie"
+  },
+  {
+   "name": "DockStraight",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "variant",
+   "size": [
+    14.226,
+    4.35,
+    6.5225
+   ],
+   "tris": 2300,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockStraight.glb",
+     "kind": "solid",
+     "tris": 2300,
+     "offset": [
+      0.0,
+      2.175,
+      0.0
+     ],
+     "size": [
+      14.226,
+      4.35,
+      6.5225
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight: long straight dock"
+  },
+  {
+   "name": "DockTHead",
+   "sheet": "W08",
+   "subject": "Dock",
+   "role": "variant",
+   "size": [
+    15.7783,
+    4.35,
+    12.2212
+   ],
+   "tris": 4424,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DockTHead.glb",
+     "kind": "solid",
+     "tris": 4424,
+     "offset": [
+      0.0,
+      2.175,
+      0.0
+     ],
+     "size": [
+      15.7783,
+      4.35,
+      12.2212
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. T-Head: walkway ending in a crosswise platform with its own posts"
+  },
+  {
+   "name": "Footbridge",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "hero",
+   "size": [
+    14.0881,
+    3.95,
+    6.154
+   ],
+   "tris": 3228,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Footbridge.glb",
+     "kind": "solid",
+     "tris": 3228,
+     "offset": [
+      0.0,
+      1.975,
+      0.0
+     ],
+     "size": [
+      14.0881,
+      3.95,
+      6.154
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "plank footbridge: cross planks on stringers, capped posts with sagging rope rails, X-braced trestles at both ends"
+  },
+  {
+   "name": "FootbridgeArched",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "variant",
+   "size": [
+    12.2841,
+    5.55,
+    6.154
+   ],
+   "tris": 2660,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeArched.glb",
+     "kind": "solid",
+     "tris": 2660,
+     "offset": [
+      0.0,
+      2.775,
+      0.0
+     ],
+     "size": [
+      12.2841,
+      5.55,
+      6.154
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Arched: deck arches up in the middle"
+  },
+  {
+   "name": "FootbridgeBrace",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    1.8728,
+    3.6495,
+    0.5927
+   ],
+   "tris": 24,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeBrace.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.8247,
+      0.0
+     ],
+     "size": [
+      1.8728,
+      3.6495,
+      0.5927
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "brace"
+  },
+  {
+   "name": "FootbridgeBroken",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "variant",
+   "size": [
+    10.0611,
+    3.95,
+    6.5104
+   ],
+   "tris": 1308,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeBroken.glb",
+     "kind": "solid",
+     "tris": 1308,
+     "offset": [
+      0.0,
+      1.975,
+      0.0
+     ],
+     "size": [
+      10.0611,
+      3.95,
+      6.5104
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Broken: missing and fallen planks, one rope down"
+  },
+  {
+   "name": "FootbridgeCrossbeam",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    1.6,
+    0.6,
+    0.6
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeCrossbeam.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.6,
+      0.6,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crossbeam"
+  },
+  {
+   "name": "FootbridgePlank",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    5.0068,
+    0.4138,
+    1.1263
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgePlank.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.2069,
+      0.0
+     ],
+     "size": [
+      5.0068,
+      0.4138,
+      1.1263
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "plank"
+  },
+  {
+   "name": "FootbridgePost",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    1.035,
+    4.65,
+    1.1046
+   ],
+   "tris": 108,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgePost.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      2.325,
+      0.0
+     ],
+     "size": [
+      1.035,
+      4.65,
+      1.1046
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "post"
+  },
+  {
+   "name": "FootbridgeRopeSegment",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    5.1527,
+    0.9058,
+    0.3682
+   ],
+   "tris": 128,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeRopeSegment.glb",
+     "kind": "solid",
+     "tris": 128,
+     "offset": [
+      0.0,
+      0.4529,
+      0.0
+     ],
+     "size": [
+      5.1527,
+      0.9058,
+      0.3682
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rope segment"
+  },
+  {
+   "name": "FootbridgeShortSpan",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "variant",
+   "size": [
+    6.0881,
+    3.95,
+    6.154
+   ],
+   "tris": 1704,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeShortSpan.glb",
+     "kind": "solid",
+     "tris": 1704,
+     "offset": [
+      0.0,
+      1.975,
+      0.0
+     ],
+     "size": [
+      6.0881,
+      3.95,
+      6.154
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short Span: two post pairs"
+  },
+  {
+   "name": "FootbridgeStringer",
+   "sheet": "W08",
+   "subject": "Footbridge",
+   "role": "part",
+   "size": [
+    7.0,
+    0.6,
+    0.5
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FootbridgeStringer.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      7.0,
+      0.6,
+      0.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stringer"
+  },
+  {
+   "name": "RopeCrossing",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "hero",
+   "size": [
+    20.8168,
+    7.25,
+    8.9926
+   ],
+   "tris": 2724,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossing.glb",
+     "kind": "solid",
+     "tris": 2724,
+     "offset": [
+      0.0,
+      3.625,
+      0.0
+     ],
+     "size": [
+      20.8168,
+      7.25,
+      8.9926
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rope bridge: plank deck hung on sagging ropes between post pairs on clustered stone anchors, hanger ropes, red flags"
+  },
+  {
+   "name": "RopeCrossingAnchorStone",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    4.471,
+    3.06,
+    3.5669
+   ],
+   "tris": 31,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingAnchorStone.glb",
+     "kind": "solid",
+     "tris": 31,
+     "offset": [
+      0.0,
+      1.53,
+      0.0
+     ],
+     "size": [
+      4.471,
+      3.06,
+      3.5669
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "anchor stone"
+  },
+  {
+   "name": "RopeCrossingDamaged",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "variant",
+   "size": [
+    22.5086,
+    7.25,
+    11.7246
+   ],
+   "tris": 2544,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingDamaged.glb",
+     "kind": "solid",
+     "tris": 2544,
+     "offset": [
+      0.0,
+      3.625,
+      0.0
+     ],
+     "size": [
+      22.5086,
+      7.25,
+      11.7246
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Damaged: missing planks, a plank dangling"
+  },
+  {
+   "name": "RopeCrossingEndPost",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    1.116,
+    4.25,
+    1.1451
+   ],
+   "tris": 164,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingEndPost.glb",
+     "kind": "solid",
+     "tris": 164,
+     "offset": [
+      0.0,
+      2.125,
+      0.0
+     ],
+     "size": [
+      1.116,
+      4.25,
+      1.1451
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "end post"
+  },
+  {
+   "name": "RopeCrossingHangerRope",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    0.231,
+    2.4728,
+    0.1927
+   ],
+   "tris": 12,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingHangerRope.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      1.2364,
+      0.0
+     ],
+     "size": [
+      0.231,
+      2.4728,
+      0.1927
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "hanger rope"
+  },
+  {
+   "name": "RopeCrossingMainRope",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    6.1526,
+    0.9454,
+    0.4043
+   ],
+   "tris": 128,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingMainRope.glb",
+     "kind": "solid",
+     "tris": 128,
+     "offset": [
+      0.0,
+      0.4727,
+      0.0
+     ],
+     "size": [
+      6.1526,
+      0.9454,
+      0.4043
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "main rope"
+  },
+  {
+   "name": "RopeCrossingNarrow",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "variant",
+   "size": [
+    19.2872,
+    7.25,
+    9.3486
+   ],
+   "tris": 2636,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingNarrow.glb",
+     "kind": "solid",
+     "tris": 2636,
+     "offset": [
+      0.0,
+      3.625,
+      0.0
+     ],
+     "size": [
+      19.2872,
+      7.25,
+      9.3486
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Narrow: single-file span"
+  },
+  {
+   "name": "RopeCrossingPlank",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    3.6042,
+    0.2945,
+    0.7683
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingPlank.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.1473,
+      0.0
+     ],
+     "size": [
+      3.6042,
+      0.2945,
+      0.7683
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "plank"
+  },
+  {
+   "name": "RopeCrossingSideRope",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "part",
+   "size": [
+    6.1043,
+    0.5913,
+    0.332
+   ],
+   "tris": 128,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingSideRope.glb",
+     "kind": "solid",
+     "tris": 128,
+     "offset": [
+      0.0,
+      0.2957,
+      0.0
+     ],
+     "size": [
+      6.1043,
+      0.5913,
+      0.332
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "side rope"
+  },
+  {
+   "name": "RopeCrossingWide",
+   "sheet": "W08",
+   "subject": "RopeCrossing",
+   "role": "variant",
+   "size": [
+    19.283,
+    7.25,
+    12.2967
+   ],
+   "tris": 2636,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeCrossingWide.glb",
+     "kind": "solid",
+     "tris": 2636,
+     "offset": [
+      0.0,
+      3.625,
+      0.0
+     ],
+     "size": [
+      19.283,
+      7.25,
+      12.2967
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide: broad span with shallower sag"
+  }
+ ],
+ "stats": {
+  "assets": 40,
+  "pieces": 40,
+  "solid": 40,
+  "water": 0,
+  "glow": 0,
+  "tris": 42467,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 138,
+  "meshBytes": 3654528
+ },
+ "problems": []
+}
