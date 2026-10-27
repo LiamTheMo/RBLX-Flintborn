@@ -44,7 +44,7 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 | W01 | Boulder | mostly-done | moss cap a flat decal, not leafy lumps; base plants dark/spiky, few pebbles; exploded moss cap thin; rock slightly dark | ✅ | 3812 (parts 208/288; variants 3477/3319/3232) | PASS 8/10 (round 5) | palette `w01_*` keys only, no textures beyond palette.png; no VFX; check brightness of calibrated moss/herb greens in Studio |
 | W01 | RockSpire | partial | spire slender, few facets; foot collar thin; moss streak not clumps; foliage sparse | ✅ | 5633 (parts 180/588; variants 2945/3546/3226) | PASS 7.5/10 (round 5) | palette `w01_*` only; no VFX; minors: clover clumps chunkier than master rosettes, spire moss streak |
 | W01 | RockCluster | mostly-done | moss small/flat/pale; foliage sparse; top view cramped | ✅ | 5959 (parts 345/745/405; variants 4110/4028/3730) | PASS 7.5/10 (round 3) | palette `w01_*` only; no VFX; minors: Rock C egg-like, moss caps tuft-like |
-| W01 | PebbleScatter | partial | slab dominant; exploded lacks 5 stone types; foliage few; variants barely differ | 🔨 | | | |
+| W01 | PebbleScatter | partial | slab dominant; exploded lacks 5 stone types; foliage few; variants barely differ | ⬜ | | | |
 | W02 | CliffWall | partial | face smooth, missing chunky spires; grass top flat, no lip; corner variants unclear; too purple | ⬜ | | | |
 | W02 | TerracedLedge | partial | rock hidden under flat lime slabs; low smooth cliffs; ramp end flat; wide/shallow identical | ⬜ | | | |
 | W02 | NaturalRamp | partial | thin strip on thin slab (ref thick stepped wedge); flat side wall; dotted borders | ⬜ | | | |
@@ -184,3 +184,4 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 - 2026-10-27: W01 Boulder passed on verifier round 5 (8/10). Shared fixes made on the way: `hull_rock` no longer deletes a flat crown (open-topped rocks), kit studio background matches the floor, cells framed on vertices, 48 samples. New W01 builders: `moss_mounds`/`place_mounds` (leafy moss cap), `herb_bush` (clover clumps), `flower5`.
 - 2026-10-27: W01 Rock Spire passed on verifier round 5 (7.5/10). New builders: `slabs`, `collar` (fused rim), `front_boulder`, `ledge_dressing`, bright clover mode.
 - 2026-10-27: W01 Rock Cluster passed on verifier round 3 (7.5/10). Fixed a stray copy of the Boulder exploded-layout lines in the Cluster/Pebble rows.
+- 2026-10-27: **Paused** after W01 Rock Cluster at the user's request, to start on the new numbered references in `art/blender/assets/references/` (001–172, see its INDEX.md). Next kit model when resumed: W01 Pebble Scatter (no edits made yet). W01 still needs its sheet export once Pebble Scatter passes.
