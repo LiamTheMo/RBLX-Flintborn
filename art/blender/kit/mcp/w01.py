@@ -244,10 +244,11 @@ def herb(a, loc, size, seed, flowers=0, sprigs=8):
     return out
 
 
-def herb_bush(a, loc, size, seed, flowers=0):
+def herb_bush(a, loc, size, seed, flowers=0, bright=False):
     """Clover clump as the master draws it round the rocks at gameplay scale: a small bushy mound of
     chunky round-lobed leaf clusters (broad facets), a wide mid-green base clump and 2-3 higher lime
-    clumps stepping up, with `flowers` white blooms with yellow centres on top."""
+    clumps stepping up, with `flowers` white blooms with yellow centres on top. bright: young-leaf to
+    lime-moss greens (the sunnier clumps of the Rock Spire row) instead of leaf to young-leaf."""
     rng = random.Random(seed)
     x0, y0, z0 = loc
     out = []
@@ -257,7 +258,7 @@ def herb_bush(a, loc, size, seed, flowers=0):
              (math.cos(t0 + 2.3) * 0.25, math.sin(t0 + 2.3) * 0.25, 0.22, 0.36, 0.7, 0.6),
              (math.cos(t0 + 4.4) * 0.12, math.sin(t0 + 4.4) * 0.12, 0.5, 0.3, 0.75, 1.0)]
     for k, (dx, dy, dz, r, sq, lime) in enumerate(specs):
-        mat = K.mix_key(LEAF, LEAF_YOUNG, lime)
+        mat = K.mix_key(LEAF_YOUNG, MOSS_LIME, lime) if bright else K.mix_key(LEAF, LEAF_YOUNG, lime)
         v = a.leaf_cluster(r * size * rng.uniform(0.9, 1.1), loc=(x0 + dx * size, y0 + dy * size, z0 + dz * size),
                            mat=mat, lobes=rng.choice((6, 7)), squash=sq, facets=1, depth=0.8, lobe_size=(0.5, 0.7),
                            seed=seed + 13 * k, floor=z0)
@@ -270,11 +271,11 @@ def herb_bush(a, loc, size, seed, flowers=0):
     return out
 
 
-def dress_herbs(a, rx, ry, clumps, pebbles, seed, cx=0.0, cy=0.0):
+def dress_herbs(a, rx, ry, clumps, pebbles, seed, cx=0.0, cy=0.0, bright=False):
     """Herb clumps [(angle, size, flowers)] and pebbles [(angle, size, dist)] round an ellipse
     (angle 0 = +X, -pi/2 = the front), as at the foot of the master's rocks."""
     for i, (t, s, fl) in enumerate(clumps):
-        herb_bush(a, (cx + math.cos(t) * rx, cy + math.sin(t) * ry, 0), s, seed + i, flowers=fl)
+        herb_bush(a, (cx + math.cos(t) * rx, cy + math.sin(t) * ry, 0), s, seed + i, flowers=fl, bright=bright)
     for i, (t, s, dist) in enumerate(pebbles):
         v = K.pebble(a, (s, s * 0.85, s * 0.62), (cx + math.cos(t) * rx * dist, cy + math.sin(t) * ry * dist, 0),
                      seed + 50 + i, (ROCK, ROCK_COOL, ROCK_BASE)[i % 3])
@@ -407,7 +408,7 @@ def boulder_row(render=True):
 
 # ---------------------------------------------------------------- Row 2: Rock Spire
 # Tall obelisk: a few broad side facets and a chisel tip (two top points make a short ridge).
-SPIRE = [(0.0, 1.0, 7), (0.25, 0.86, 7), (0.5, 0.66, 6), (0.74, 0.46, 6), (0.91, 0.28, 5), (1.0, 0.08, 2)]
+SPIRE = [(0.0, 1.0, 7), (0.3, 0.82, 7), (0.6, 0.6, 6), (0.86, 0.36, 5), (1.0, 0.12, 2)]   # tapers to an angled peak
 # Shorter leaning pillar with a sloped, blunt top.
 PILLAR_BLUNT = [(0.0, 1.0, 5), (0.45, 0.9, 5), (0.82, 0.66, 5), (1.0, 0.36, 3)]   # few points: sharp, angular
 
@@ -423,8 +424,8 @@ def colour_rock(a, vs, size, loc, seed, cuts=1):
     """Same stone treatment as rock(): warm/cool facet drift, texture, coplanar split (cuts=0 skips
     it for small rocks), damp foot."""
     z0 = loc[2]
-    K.blend(a, vs, ROCK, ROCK_COOL, K.noise_field(scale=0.18, seed=seed), level=0.1, width=0.5, steps=3)
-    K.texture(a, vs, amp=0.07, scale=0.28, jitter=0.02, seed=seed)
+    K.blend(a, vs, ROCK, ROCK_COOL, K.noise_field(scale=0.18, seed=seed), level=0.05, width=0.5, steps=3)
+    K.texture(a, vs, amp=0.05, scale=0.28, jitter=0.05, seed=seed)       # crisp tone step per facet
     if cuts:
         vs = K.refine(a, vs, cuts)
     if size[2] < 1.5:                 # pebbles: too few faces for a damp band (it would track facing)
@@ -469,90 +470,202 @@ def side_pillars(a, s=1.0, seed=340):
     return "pillar_l", "pillar_r"
 
 
-def spire_hero(a):
-    sp = spire_main(a)
-    # lime moss streak down the middle of the spire's right face, fading out above and below
-    streak(a, sp, -0.85, 3.2, 8.6, seed=364)
-    side_pillars(a)
-    stain(a, K.part(a, "pillar_l"), -2.2, height=3.0, seed=351, cx=-3.0, cy=-0.4)
-    K.tag_part(a, foot_collar(a, s=1.35), "collar")
-    # leafy clumps growing on the ledges (pillar tops, the big front block), a thin moss mat on a
-    # collar rock, as on the sheet
-    for name, xy, sz, fl, sd in (("pillar_l", (-3.4, -0.7), 1.3, 0, 361), ("pillar_r", (3.2, 0.3), 1.1, 0, 362),
-                                 ("collar", (math.cos(-1.7) * 3.6, math.sin(-1.7) * 3.6), 1.4, 1, 363)):
-        z = K.top_at(a, xy, on=K.part(a, name))
-        K.clover(a, (xy[0], xy[1], z - 0.1), sz, sd, LEAF_YOUNG, young_mat=MOSS_LIME)
-    # thin moss streak down the right pillar's front flank
-    streak(a, K.part(a, "pillar_r"), -0.9, 2.5, 6.5, spread=0.5, seed=366, cx=3.3, cy=0.2)
-    # clover in the crevices between the collar rocks
-    dress(a, 6.2, 5.4, ((-2.3, 1.7, 0), (-1.3, 1.5, 0), (-0.45, 1.4, 0), (0.6, 1.6, 0), (2.7, 1.6, 0), (1.6, 1.3, 0)),
-          ((-2.9, 1.1), (-1.0, 0.9), (0.3, 1.0), (1.9, 0.8), (3.3, 1.8), (-0.05, 1.6)), 370)
+# Rounded, chunky shoulder rocks stepping down from the spire (not slab pillars).
+SHOULDER = [(0.0, 1.0, 7), (0.45, 0.94, 7), (0.78, 0.72, 6), (1.0, 0.4, 4)]
 
+# Hero foot rocks round the spire, as on the master (angle, distance, w, d, h, rings, seed offset): a big
+# flat-topped boulder in front, a medium one front-left, angular chunks at the sides, small ones at the back.
+SPIRE_FOOT = ((-1.2, 4.0, 6.0, 5.0, 5.0, "block", 0), (-2.3, 4.2, 4.2, 3.6, 3.4, "block", 1),
+              (2.95, 4.0, 3.2, 3.0, 2.6, "wedge", 2), (-0.2, 4.6, 3.4, 3.0, 2.6, "block", 3),
+              (-0.6, 6.0, 1.9, 1.7, 1.4, "block", 4), (2.1, 3.7, 2.8, 2.4, 2.0, "wedge", 5),
+              (1.05, 3.8, 2.8, 2.4, 1.9, "block", 6), (1.6, 3.6, 2.4, 2.2, 1.7, "wedge", 7))
+
+
+def foot_rocks(a, loc=(0, 0, 0), s=1.0, seed=320, rocks=SPIRE_FOOT):
+    """The Foot Collar: a broken ring of angular, flat-topped stone chunks round a spire's foot."""
+    out = []
+    for t, d, w, dp, h, kind, k in rocks:
+        p = (loc[0] + math.cos(t) * d * s, loc[1] + math.sin(t) * d * s, loc[2])
+        rings = BOLD_BLOCK if kind == "block" else WEDGE
+        vs = K.hull_rock(a, (w * s, dp * s, h * s), loc=p, seed=seed + k, mat=ROCK, rings=rings, jitter=0.06,
+                         rot=t + 0.4, lean=(-math.cos(t) * 0.08, -math.sin(t) * 0.08))
+        out += colour_rock(a, vs, (w * s, dp * s, h * s), p, seed + k, cuts=0)
+    return out
+
+
+def spire_pillars(a, s=1.0, seed=340, hl=6.2, hr=4.8, which="lr"):
+    """The two shorter pillars beside the spire: a tall one on the left, a lower one on the right, both
+    with sloped flat tops (ledges for moss and clover)."""
+    if "l" in which:
+        l = K.hull_rock(a, (5.0 * s, 4.4 * s, hl * s), loc=(-3.7 * s, -1.4 * s, 0), seed=seed, mat=ROCK,
+                        rings=SHOULDER, jitter=0.05, rot=0.2, lean=(0.1, 0.0))
+        K.tag_part(a, colour_rock(a, l, (4.6 * s, 4.0 * s, hl * s), (0, 0, 0), seed), "pillar_l")
+    if "r" in which:
+        r = K.hull_rock(a, (4.6 * s, 4.0 * s, hr * s), loc=(3.6 * s, -0.8 * s, 0), seed=seed + 1, mat=ROCK,
+                        rings=SHOULDER, jitter=0.05, rot=-0.3, lean=(-0.08, 0.0))
+        K.tag_part(a, colour_rock(a, r, (4.0 * s, 3.6 * s, hr * s), (0, 0, 0), seed + 1), "pillar_r")
+
+
+FLAT_TUFT = ((0.0, 0.0, 1.5, 0.55, 6), (1.1, 0.5, 1.1, 0.45, 5))      # low flat moss patch for ledges
+
+
+def ledge_dressing(a, spots, seed):
+    """Clover clumps and flat moss patches sitting on ledges: [(part, (x, y), size, kind, flowers)]."""
+    for i, (part, xy, sz, kind, fl) in enumerate(spots):
+        on = K.part(a, part)
+        if kind == "moss":
+            place_mounds(a, xy, sz, 0.3 * i, seed + 10 * i, mounds=FLAT_TUFT, on=on)
+        else:
+            z = K.top_at(a, xy, on=on)
+            herb_bush(a, (xy[0], xy[1], z - 0.15), sz, seed + 10 * i, flowers=fl, bright=True)
+
+
+def spire_flank_moss(a, sp, angle, z0, z1, seed):
+    """A small flat lime moss patch on the spire's flank (moss growing on the face, as on the master)."""
+    streak(a, sp, angle, z0, z1, spread=0.42, seed=seed, key=MOSS_LIME)
+
+
+# The Foot Collar: a low ring of angular rocks round an empty centre where the spire stands
+# (angle, distance, w, d, h, rings, seed offset).
+# One fused jagged rim of big flat-topped angular blocks, tallest at the back, a notch at the front-right.
+COLLAR_RING = ((1.57, 3.5, 4.6, 3.2, 4.4, "block", 0), (0.7, 3.6, 4.4, 3.2, 3.9, "block", 1),
+               (2.45, 3.6, 4.4, 3.2, 3.7, "block", 2), (-0.2, 3.8, 4.2, 3.2, 3.0, "block", 3),
+               (3.3, 3.8, 4.2, 3.2, 2.9, "block", 4), (-2.35, 3.9, 4.2, 3.2, 2.3, "block", 5))
+# Stepped slabs leaning on the spire: (x, y, w, d, h, lean x, seed offset).
+SLABS_LEFT = ((-3.4, -0.9, 4.2, 3.6, 6.4, 0.14, 0),)
+SLABS_RIGHT = ((3.2, -0.2, 3.8, 3.2, 5.4, -0.12, 1), (4.6, -1.6, 3.0, 2.8, 3.4, -0.1, 2),
+               (1.0, 3.0, 3.8, 3.2, 6.0, -0.02, 3))
+
+
+def collar(a, s=1.0, seed=320, rocks=COLLAR_RING):
+    return foot_rocks(a, s=s, seed=seed, rocks=rocks)
+
+
+def slabs(a, specs, s=1.0, seed=340, name="slab"):
+    """Angular stepped slabs with sloped flat tops leaning on the spire (tagged name0, name1, ...)."""
+    for x, y, w, d, h, lx, k in specs:
+        v = K.hull_rock(a, (w * s, d * s, h * s), loc=(x * s, y * s, 0), seed=seed + k, mat=ROCK, rings=PILLAR_BLUNT,
+                        jitter=0.05, rot=0.25 * (k + 1), lean=(lx, 0.0))
+        K.tag_part(a, colour_rock(a, v, (w * s, d * s, h * s), (0, 0, 0), seed + k), f"{name}{k}")
+
+
+def front_boulder(a, s=1.0, seed=330, loc=(1.8, -4.9), size=(5.0, 4.4, 3.7), name="front"):
+    """The big chunky boulder at the front of the foot."""
+    w, d, h = size
+    p = (loc[0] * s, loc[1] * s, 0)
+    v = K.hull_rock(a, (w * s, d * s, h * s), loc=p, seed=seed, mat=ROCK, rings=BOLD, jitter=0.06, rot=0.5)
+    K.tag_part(a, colour_rock(a, v, (w * s, d * s, h * s), p, seed), name)
+
+
+def spire_hero(a):
+    sp = spire_main(a, h=12.4, w=7.4)
+    K.tag_part(a, sp, "spire")
+    stain(a, sp, -2.4, spread=0.5, height=3.2, seed=364)
+    spire_flank_moss(a, sp, -0.6, 6.4, 8.2, 365)
+    slabs(a, SLABS_LEFT, seed=340, name="l")
+    slabs(a, SLABS_RIGHT, seed=350, name="r")
+    K.tag_part(a, collar(a), "collar")
+    front_boulder(a)
+    front_boulder(a, seed=331, loc=(-2.8, -4.3), size=(4.2, 3.8, 3.0), name="front_l")
+    front_boulder(a, seed=332, loc=(-6.0, -1.6), size=(3.4, 3.0, 2.2), name="side_l")      # the foot steps
+    front_boulder(a, seed=333, loc=(6.2, -2.4), size=(3.2, 2.8, 2.0), name="side_r")       # down outward
+    ledge_dressing(a, (("l0", (-3.4, -1.0), 0.7, "moss", 0), ("l0", (-4.1, -2.0), 1.8, "herb", 0),
+                       ("r1", (2.9, -0.4), 1.7, "herb", 0), ("r2", (4.6, -1.7), 1.5, "herb", 0),
+                       ("front", (2.0, -4.6), 0.75, "moss", 0), ("front_l", (-2.8, -4.3), 0.6, "moss", 0),
+                       ("collar", (-0.4, -3.6), 1.5, "herb", 0), ("r3", (1.6, 2.4), 1.5, "herb", 0)), 361)
+    dress_herbs(a, 6.8, 6.0, ((-2.65, 2.3, 0), (-1.6, 2.0, 0), (-0.25, 2.0, 0), (2.6, 2.0, 0)),
+                ((-1.9, 1.2, 1.12), (-0.4, 1.1, 1.12), (0.35, 1.0, 1.18), (2.9, 1.0, 1.1), (-2.8, 0.9, 1.1)), 370,
+                bright=True)
 
 
 def spire_part_main(a):
-    sp = spire_main(a)
-    streak(a, sp, -0.85, 3.2, 8.6, seed=364)
+    sp = spire_main(a, h=12.4, w=7.4)
+    stain(a, sp, -2.4, spread=0.5, height=3.2, seed=364)
+    spire_flank_moss(a, sp, -0.6, 6.4, 8.2, 365)
+
+
+def spire_collar_part(a):
+    """The Foot Collar alone: a low ring of angular rocks round the empty centre, a moss patch on one."""
+    K.tag_part(a, collar(a), "collar")
+    for i, t in enumerate((-2.35, -0.2, 3.3)):
+        place_mounds(a, (math.cos(t) * 3.8, math.sin(t) * 3.8), 0.6, 0.4 + t, 321 + i, mounds=FLAT_TUFT,
+                     on=K.part(a, "collar"))
 
 
 def spire_short(a):
-    """Short Spire (stubby): a squat wide spire, one leaning pillar, the collar and clover."""
-    sp = spire_main(a, h=7.0, w=5.4, seed=381)
-    streak(a, sp, -0.9, 2.4, 5.5, seed=382)
-    l = K.hull_rock(a, (3.2, 2.9, 4.6), loc=(-2.6, -0.6, 0), seed=383, mat=ROCK, rings=PILLAR_BLUNT, jitter=0.06,
-                    rot=0.2, lean=(0.12, 0.0))
-    K.tag_part(a, colour_rock(a, l, (3.2, 2.9, 4.6), (0, 0, 0), 383), "pillar_l")
-    K.tag_part(a, foot_collar(a, s=0.85, seed=384), "collar")
-    z = K.top_at(a, (-2.6, -0.6), on=K.part(a, "pillar_l"))
-    K.clover(a, (-2.6, -0.6, z - 0.1), 0.95, 385, LEAF, young_mat=LEAF_YOUNG)
-    dress(a, 4.2, 3.6, ((-2.3, 1.4, 1), (-0.5, 1.3, 0), (0.7, 1.3, 1), (2.7, 1.3, 0)), ((-1.2, 0.8), (1.8, 0.7)), 386)
+    """Short Spire (stubby): a squat wide spire, a low slab, small foot rocks and clover."""
+    sp = spire_main(a, h=7.6, w=6.0, seed=381)
+    K.tag_part(a, sp, "spire")
+    spire_flank_moss(a, sp, -0.6, 3.4, 5.4, 382)
+    slabs(a, ((-2.9, -0.8, 3.4, 3.0, 4.2, 0.12, 0),), seed=383, name="l")
+    K.tag_part(a, collar(a, s=0.8, seed=384), "collar")
+    ledge_dressing(a, (("l0", (-3.1, -1.4), 1.5, "herb", 0), ("collar", (2.2, -2.0), 0.55, "moss", 0)), 385)
+    dress_herbs(a, 5.2, 4.5, ((-2.5, 2.0, 0), (-1.4, 1.9, 0), (-0.3, 1.9, 0), (0.7, 1.8, 0), (2.7, 1.8, 0)),
+                ((-1.2, 0.9, 1.15), (1.8, 0.8, 1.15)), 386, bright=True)
 
 
 def spire_tall(a):
-    """Tall Spire (high, narrow): a much taller slim spire, a tall pillar beside it, the collar."""
-    sp = spire_main(a, h=15.5, w=4.6, seed=391)
-    streak(a, sp, -0.85, 5.5, 12.0, seed=392)
-    l = K.hull_rock(a, (3.2, 3.0, 8.6), loc=(-2.4, -0.4, 0), seed=393, mat=ROCK, rings=PILLAR_BLUNT, jitter=0.06,
-                    rot=0.2, lean=(0.1, 0.0))
-    K.tag_part(a, colour_rock(a, l, (3.2, 3.0, 8.6), (0, 0, 0), 393), "pillar_l")
-    K.tag_part(a, foot_collar(a, s=0.9, seed=394), "collar")
-    z = K.top_at(a, (math.cos(-1.7) * 2.4, math.sin(-1.7) * 2.4), on=K.part(a, "collar"))
-    K.clover(a, (math.cos(-1.7) * 2.4, math.sin(-1.7) * 2.4, z - 0.1), 1.1, 395, LEAF, flowers=1, young_mat=LEAF_YOUNG)
-    dress(a, 4.4, 3.8, ((-2.4, 1.5, 1), (-0.6, 1.3, 0), (0.6, 1.4, 0), (2.6, 1.3, 1)), ((-1.1, 0.8), (1.9, 0.8)), 396)
+    """Tall Spire (high, narrow): a much taller spire, stepped slabs both sides, foot rocks."""
+    sp = spire_main(a, h=16.0, w=7.0, seed=391)
+    K.tag_part(a, sp, "spire")
+    spire_flank_moss(a, sp, -1.4, 8.0, 11.0, 392)
+    slabs(a, ((-3.3, -1.0, 4.0, 3.4, 8.0, 0.12, 0),), seed=393, name="l")
+    slabs(a, ((3.1, -0.3, 3.6, 3.0, 6.4, -0.1, 1), (4.4, -1.6, 2.8, 2.6, 3.4, -0.1, 2)), seed=397, name="r")
+    K.tag_part(a, collar(a, s=0.9, seed=394), "collar")
+    ledge_dressing(a, (("l0", (-3.8, -1.6), 1.8, "herb", 0), ("r1", (2.9, -0.4), 1.6, "herb", 0),
+                       ("l0", (-3.2, -0.9), 0.65, "moss", 0)), 395)
+    dress_herbs(a, 5.6, 4.9, ((-2.5, 2.0, 0), (-1.3, 1.8, 0), (-0.2, 1.9, 0), (0.8, 1.8, 0), (2.6, 1.8, 0)),
+                ((-1.1, 0.9, 1.15), (1.9, 0.8, 1.15)), 396, bright=True)
+
+
+# Leaning spire: a tilted slab with a blunt chisel crown.
+LEAN_SLAB = [(0.0, 1.0, 7), (0.35, 0.84, 7), (0.7, 0.6, 6), (0.9, 0.38, 5), (1.0, 0.16, 2)]
 
 
 def spire_leaning(a):
-    """Leaning Spire (tilted): the spire leans ~20 degrees to the right over its collar."""
-    sp = spire_main(a, h=11.0, w=5.6, seed=401, lean=(1.7, 0.05))
-    streak(a, sp, -0.6, 3.0, 8.0, seed=402)
-    K.tag_part(a, foot_collar(a, s=0.9, seed=403), "collar")
-    z = K.top_at(a, (math.cos(-1.7) * 2.4, math.sin(-1.7) * 2.4), on=K.part(a, "collar"))
-    K.clover(a, (math.cos(-1.7) * 2.4, math.sin(-1.7) * 2.4, z - 0.1), 1.1, 404, LEAF, young_mat=LEAF_YOUNG)
-    dress(a, 4.4, 3.8, ((-2.5, 1.6, 0), (-0.6, 1.3, 1), (0.4, 1.4, 0), (2.4, 1.5, 0)), ((-1.2, 0.8), (1.8, 0.8)), 405)
+    """Leaning Spire (tilted): a slab spire leaning ~12 degrees to the left with a blunt chisel top, a
+    stepped slab on its right, a low rocky skirt."""
+    vs = K.hull_rock(a, (6.4, 5.2, 11.6), seed=401, mat=ROCK, rings=LEAN_SLAB, jitter=0.05, rot=0.4,
+                     lean=(-1.0, 0.05))
+    sp = colour_rock(a, vs, (6.4, 6.4, 11.6), (0, 0, 0), 401)
+    K.tag_part(a, sp, "spire")
+    spire_flank_moss(a, sp, -0.5, 4.6, 7.0, 402)
+    slabs(a, ((3.0, -0.4, 3.4, 3.0, 5.0, -0.1, 0),), s=0.9, seed=406, name="r")
+    K.tag_part(a, collar(a, s=0.8, seed=403), "collar")
+    ledge_dressing(a, (("r0", (2.7, -0.6), 1.6, "herb", 0), ("collar", (-2.4, -2.6), 1.5, "herb", 0)), 404)
+    dress_herbs(a, 5.2, 4.5, ((-2.5, 2.0, 0), (-1.4, 1.9, 0), (-0.2, 1.9, 0), (0.6, 1.8, 0), (2.5, 2.0, 0)),
+                ((-1.2, 0.9, 1.15), (1.8, 0.8, 1.15)), 405, bright=True)
 
 
 SPIRE_NOTES = {
-    "RockSpire": "tall faceted obelisk with a chisel tip and a lime moss streak down its front-right face; a "
-                 "shorter pillar leaning on its left and a lower one behind on the right; a broken collar of "
-                 "angular wedge chunks round the foot; leafy clumps on the ledges, clover with daisies round the base",
-    "RockSpireMain": "spire main mesh alone (obelisk with chisel tip and moss streak)",
-    "RockSpireFootCollar": "foot collar alone: broken ring of angular wedge chunks; set any spire inside",
-    "RockSpireShort": "Short Spire: stubby wide spire, one leaning pillar, collar, clover",
-    "RockSpireTall": "Tall Spire: high narrow spire with a tall pillar beside it, collar, clover",
-    "RockSpireLeaning": "Leaning Spire: spire tilted ~20 degrees over its collar, clover",
+    "RockSpire": "tall faceted obelisk tapering to an angled peak, a lime moss patch on its front-right flank; an "
+                 "angular slab at ~50% of its height on the left and stepped slabs on the right; a low ring of foot "
+                 "rocks (the Foot Collar) and a big boulder in front; flat moss patches and lime clover clumps on the "
+                 "ledges and round the base",
+    "RockSpireMain": "spire main mesh alone (chunky obelisk, moss patch on the flank, damp stain low on the front-left)",
+    "RockSpireFootCollar": "foot collar alone: low ring of angular rocks round an empty centre, a moss patch; set any "
+                           "spire inside",
+    "RockSpireShort": "Short Spire: stubby wide spire, a low slab, small foot rocks, clover",
+    "RockSpireTall": "Tall Spire: high spire with stepped slabs both sides, moss on its flank, foot rocks, clover",
+    "RockSpireLeaning": "Leaning Spire: slab spire tilted ~12 degrees to the left with a blunt chisel top, a slab on "
+                        "its right, a low rocky skirt, clover",
 }
 
 
 def spire_row(render=True):
     palette()
-    specs = [("RockSpire", "hero", spire_hero, 4500, "hull"),
+    # 6000: a landmark rock (WorldModeling 16: 1500-5000 initially) whose dressing is most of the count
+    specs = [("RockSpire", "hero", spire_hero, 6000, "hull"),
              ("RockSpireMain", "part", spire_part_main, 1500, "hull"),
-             ("RockSpireFootCollar", "part", lambda a: foot_collar(a), 1500, "hull"),
-             ("RockSpireShort", "variant", spire_short, 4500, "hull"),
-             ("RockSpireTall", "variant", spire_tall, 4500, "hull"),
-             ("RockSpireLeaning", "variant", spire_leaning, 4500, "hull")]
+             ("RockSpireFootCollar", "part", spire_collar_part, 1500, "hull"),
+             ("RockSpireShort", "variant", spire_short, 5000, "hull"),
+             ("RockSpireTall", "variant", spire_tall, 5000, "hull"),
+             ("RockSpireLeaning", "variant", spire_leaning, 5000, "hull")]
     objs = [K.mk(SHEET, n, fn, subject="RockSpire", role=r, notes=SPIRE_NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
+    # exploded cell: the spire floats above its foot collar, as on the master
+    sp, col = objs[1], objs[2]
+    sp.location = (col.location.x, col.location.y, col.location.z + 6.4)
     out = {"stats": K.stats(objs), "problems": K.check(objs)}
     if render:
         out["compare"] = K.render_row(SHEET, "rock_spire", 2, "RockSpire", objs, vfx=True, SIDE_AZIMUTH=-90,
