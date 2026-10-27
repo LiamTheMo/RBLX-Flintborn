@@ -1,0 +1,1696 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W04",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.9388,
+     0.95,
+     0.96,
+     0.96,
+     0.96,
+     0.96558,
+     0.975,
+     0.975,
+     0.98,
+     0.98,
+     0.98,
+     0.98,
+     0.99331,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00129,
+     1.01761,
+     1.02,
+     1.02,
+     1.02,
+     1.025,
+     1.025,
+     1.025,
+     1.04,
+     1.04,
+     1.04,
+     1.04026,
+     1.05,
+     1.06854
+    ],
+    "used": false
+   },
+   {
+    "key": "w04_bark",
+    "hex": "#80492A",
+    "levels": [
+     0.9133,
+     0.93514,
+     0.94549,
+     0.95002,
+     0.9576,
+     0.96,
+     0.96586,
+     0.97194,
+     0.975,
+     0.975,
+     0.98,
+     0.98075,
+     0.98627,
+     0.99083,
+     0.99543,
+     0.99983,
+     1.0,
+     1.0,
+     1.00249,
+     1.00746,
+     1.01396,
+     1.01932,
+     1.02,
+     1.025,
+     1.025,
+     1.02963,
+     1.03691,
+     1.04,
+     1.04668,
+     1.05152,
+     1.06339,
+     1.09176
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_grass",
+    "hex": "#78B436",
+    "levels": [
+     0.925,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.96683,
+     0.975,
+     0.975,
+     0.975,
+     0.975,
+     0.975,
+     0.98427,
+     0.99297,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.01003,
+     1.02126,
+     1.025,
+     1.025,
+     1.025,
+     1.025,
+     1.025,
+     1.04133,
+     1.05,
+     1.05,
+     1.05,
+     1.05,
+     1.1
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_ground",
+    "hex": "#DCC9A0",
+    "levels": [
+     0.95,
+     0.975,
+     0.98,
+     0.99,
+     1.0,
+     1.01,
+     1.02,
+     1.025,
+     1.05
+    ],
+    "used": false
+   },
+   {
+    "key": "w04_needle",
+    "hex": "#3F7C30",
+    "levels": [
+     0.725,
+     0.725,
+     0.75,
+     0.75,
+     0.768,
+     0.775,
+     0.784,
+     0.8,
+     0.816,
+     0.832,
+     0.94848,
+     0.95948,
+     0.96631,
+     0.97174,
+     0.97605,
+     0.9805,
+     0.98469,
+     0.9891,
+     0.99471,
+     1.00099,
+     1.00623,
+     1.01128,
+     1.01597,
+     1.02069,
+     1.02493,
+     1.02932,
+     1.0354,
+     1.04598,
+     1.1,
+     1.15,
+     1.175,
+     1.2
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_wood_end",
+    "hex": "#E4A458",
+    "levels": [
+     0.95,
+     0.95659,
+     0.9615,
+     0.96581,
+     0.96749,
+     0.97,
+     0.97423,
+     0.975,
+     0.97975,
+     0.9843,
+     0.98772,
+     0.99283,
+     0.99516,
+     0.99843,
+     1.0,
+     1.0,
+     1.00166,
+     1.00672,
+     1.01298,
+     1.015,
+     1.015,
+     1.02022,
+     1.023,
+     1.025,
+     1.0266,
+     1.0266,
+     1.03,
+     1.03113,
+     1.03574,
+     1.04095,
+     1.04539,
+     1.05
+    ],
+    "used": false
+   },
+   {
+    "key": "w04_dirt",
+    "hex": "#D9C49C",
+    "levels": [
+     0.96166,
+     0.97491,
+     1.0153,
+     1.03988,
+     1.04958,
+     1.02232,
+     1.01211
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_rock",
+    "hex": "#B4ACA8",
+    "levels": [
+     0.9535,
+     0.95843,
+     0.97008,
+     0.97437,
+     0.99117,
+     0.99779,
+     1.00863,
+     1.01604,
+     1.02569,
+     1.03008,
+     1.04086,
+     1.04624,
+     0.98637,
+     1.00213,
+     1.03374,
+     0.97784,
+     0.96678,
+     1.01285,
+     0.9947,
+     1.03812
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "ClassicPine",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "hero",
+   "size": [
+    12.7514,
+    14.5209,
+    14.8088
+   ],
+   "tris": 1352,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPine.glb",
+     "kind": "solid",
+     "tris": 1352,
+     "offset": [
+      0.0,
+      7.2604,
+      0.0
+     ],
+     "size": [
+      12.7514,
+      14.5209,
+      14.8088
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "classic tiered pine, 15 tall: 4 layered drooping star tiers + tip, buttress roots, boulders and grass tufts"
+  },
+  {
+   "name": "ClassicPineAsymmetric",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "variant",
+   "size": [
+    11.1245,
+    14.2687,
+    10.1494
+   ],
+   "tris": 1352,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineAsymmetric.glb",
+     "kind": "solid",
+     "tris": 1352,
+     "offset": [
+      0.0,
+      7.1344,
+      0.0
+     ],
+     "size": [
+      11.1245,
+      14.2687,
+      10.1494
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Asymmetric: lopsided tiers pushed to one side, slight lean"
+  },
+  {
+   "name": "ClassicPineCanopyTier1",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    12.7514,
+    7.2275,
+    14.8088
+   ],
+   "tris": 120,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineCanopyTier1.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      3.6138,
+      0.0
+     ],
+     "size": [
+      12.7514,
+      7.2275,
+      14.8088
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canopy tier 1: layered drooping star skirt"
+  },
+  {
+   "name": "ClassicPineCanopyTier2",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    10.8985,
+    5.8769,
+    11.0038
+   ],
+   "tris": 120,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineCanopyTier2.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      2.9384,
+      0.0
+     ],
+     "size": [
+      10.8985,
+      5.8769,
+      11.0038
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canopy tier 2: layered drooping star skirt"
+  },
+  {
+   "name": "ClassicPineCanopyTier3",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    8.0247,
+    4.7765,
+    7.7036
+   ],
+   "tris": 120,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineCanopyTier3.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      2.3883,
+      0.0
+     ],
+     "size": [
+      8.0247,
+      4.7765,
+      7.7036
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canopy tier 3: layered drooping star skirt"
+  },
+  {
+   "name": "ClassicPineRootFoot",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    6.8087,
+    2.4754,
+    6.9355
+   ],
+   "tris": 831,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineRootFoot.glb",
+     "kind": "solid",
+     "tris": 831,
+     "offset": [
+      0.0,
+      1.2377,
+      0.0
+     ],
+     "size": [
+      6.8087,
+      2.4754,
+      6.9355
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root foot: buttress roots with a ring of boulders and tufts"
+  },
+  {
+   "name": "ClassicPineShortWide",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "variant",
+   "size": [
+    14.0029,
+    11.8398,
+    13.5255
+   ],
+   "tris": 1356,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineShortWide.glb",
+     "kind": "solid",
+     "tris": 1356,
+     "offset": [
+      0.0,
+      5.9199,
+      0.0
+     ],
+     "size": [
+      14.0029,
+      11.8398,
+      13.5255
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Short & Wide: 11.5 tall, broad tiers"
+  },
+  {
+   "name": "ClassicPineTallNarrow",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "variant",
+   "size": [
+    10.3439,
+    17.0936,
+    9.7455
+   ],
+   "tris": 1594,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineTallNarrow.glb",
+     "kind": "solid",
+     "tris": 1594,
+     "offset": [
+      0.0,
+      8.5468,
+      0.0
+     ],
+     "size": [
+      10.3439,
+      17.0936,
+      9.7455
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tall & Narrow: 19 tall, 6 tiers"
+  },
+  {
+   "name": "ClassicPineTopTip",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    3.3261,
+    3.3185,
+    3.2408
+   ],
+   "tris": 42,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineTopTip.glb",
+     "kind": "solid",
+     "tris": 42,
+     "offset": [
+      0.0,
+      1.6592,
+      0.0
+     ],
+     "size": [
+      3.3261,
+      3.3185,
+      3.2408
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top tip: small pointed crown"
+  },
+  {
+   "name": "ClassicPineTrunk",
+   "sheet": "W04",
+   "subject": "ClassicPine",
+   "role": "part",
+   "size": [
+    1.9284,
+    6.391,
+    1.9043
+   ],
+   "tris": 24,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ClassicPineTrunk.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      3.1955,
+      0.0
+     ],
+     "size": [
+      1.9284,
+      6.391,
+      1.9043
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk: thick tapered log"
+  },
+  {
+   "name": "OldPine",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "hero",
+   "size": [
+    16.7262,
+    18.9863,
+    13.4118
+   ],
+   "tris": 6106,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPine.glb",
+     "kind": "solid",
+     "tris": 6106,
+     "offset": [
+      0.0,
+      9.4931,
+      0.0
+     ],
+     "size": [
+      16.7262,
+      18.9863,
+      13.4118
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "old pine, 19 tall: massive twisting buttressed bole forking low into thick splayed limbs, each carrying a lumpy pad in a domed crown; shrubs and boulders"
+  },
+  {
+   "name": "OldPineBent",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    16.8055,
+    17.4231,
+    13.8285
+   ],
+   "tris": 4760,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBent.glb",
+     "kind": "solid",
+     "tris": 4760,
+     "offset": [
+      0.0,
+      8.7115,
+      0.0
+     ],
+     "size": [
+      16.8055,
+      17.4231,
+      13.8285
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bent: bole leans and curves over, crown swept to one side"
+  },
+  {
+   "name": "OldPineBranchA",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    7.0628,
+    5.1364,
+    2.8026
+   ],
+   "tris": 28,
+   "budget": 50,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBranchA.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      2.5682,
+      0.0
+     ],
+     "size": [
+      7.0628,
+      5.1364,
+      2.8026
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (angled): long thick limb with cut ends"
+  },
+  {
+   "name": "OldPineBranchB",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    5.7321,
+    4.266,
+    2.4026
+   ],
+   "tris": 28,
+   "budget": 50,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBranchB.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      2.133,
+      0.0
+     ],
+     "size": [
+      5.7321,
+      4.266,
+      2.4026
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (angled): shorter limb"
+  },
+  {
+   "name": "OldPineBrokenCrown",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    15.334,
+    13.9514,
+    12.5833
+   ],
+   "tris": 4780,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBrokenCrown.glb",
+     "kind": "solid",
+     "tris": 4780,
+     "offset": [
+      0.0,
+      6.9757,
+      0.0
+     ],
+     "size": [
+      15.334,
+      13.9514,
+      12.5833
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broken Crown: tall snapped bole with jagged splinters; limbs low on one side still carry pads"
+  },
+  {
+   "name": "OldPineCanopyTier",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    12.054,
+    8.568,
+    6.3658
+   ],
+   "tris": 1872,
+   "budget": 2400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineCanopyTier.glb",
+     "kind": "solid",
+     "tris": 1872,
+     "offset": [
+      0.0,
+      4.284,
+      0.0
+     ],
+     "size": [
+      12.054,
+      8.568,
+      6.3658
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canopy tiers: three lumpy pads, one per limb end"
+  },
+  {
+   "name": "OldPineForkedTrunk",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    7.3975,
+    10.4761,
+    5.434
+   ],
+   "tris": 184,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineForkedTrunk.glb",
+     "kind": "solid",
+     "tris": 184,
+     "offset": [
+      0.0,
+      5.2381,
+      0.0
+     ],
+     "size": [
+      7.3975,
+      10.4761,
+      5.434
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "forked trunk: massive twisting bole splitting in two"
+  },
+  {
+   "name": "OldPineRootsBase",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    13.5436,
+    3.1379,
+    12.9482
+   ],
+   "tris": 1260,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineRootsBase.glb",
+     "kind": "solid",
+     "tris": 1260,
+     "offset": [
+      0.0,
+      1.5689,
+      0.0
+     ],
+     "size": [
+      13.5436,
+      3.1379,
+      12.9482
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "roots / base: heavy buttress roots, shrubs and boulders"
+  },
+  {
+   "name": "OldPineSplitTrunk",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    18.0782,
+    18.681,
+    13.1969
+   ],
+   "tris": 5404,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineSplitTrunk.glb",
+     "kind": "solid",
+     "tris": 5404,
+     "offset": [
+      0.0,
+      9.3405,
+      0.0
+     ],
+     "size": [
+      18.0782,
+      18.681,
+      13.1969
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Split Trunk: twin leaders from a low split, each with its own pads"
+  },
+  {
+   "name": "Sapling",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "hero",
+   "size": [
+    4.5437,
+    5.693,
+    4.4974
+   ],
+   "tris": 1011,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Sapling.glb",
+     "kind": "solid",
+     "tris": 1011,
+     "offset": [
+      0.0,
+      2.8465,
+      0.0
+     ],
+     "size": [
+      4.5437,
+      5.693,
+      4.4974
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "sapling, 6 tall: three tiers on a visible stem, rocks and tufts"
+  },
+  {
+   "name": "SaplingBushy",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "variant",
+   "size": [
+    6.0629,
+    4.4458,
+    5.8491
+   ],
+   "tris": 1036,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingBushy.glb",
+     "kind": "solid",
+     "tris": 1036,
+     "offset": [
+      0.0,
+      2.2229,
+      0.0
+     ],
+     "size": [
+      6.0629,
+      4.4458,
+      5.8491
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bushy: short and wide, broad tiers"
+  },
+  {
+   "name": "SaplingLowerFoliage",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "part",
+   "size": [
+    4.9981,
+    2.5525,
+    4.78
+   ],
+   "tris": 108,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingLowerFoliage.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      1.2762,
+      0.0
+     ],
+     "size": [
+      4.9981,
+      2.5525,
+      4.78
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "lower foliage tier"
+  },
+  {
+   "name": "SaplingRootsBase",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "part",
+   "size": [
+    3.9492,
+    1.0972,
+    4.1081
+   ],
+   "tris": 562,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingRootsBase.glb",
+     "kind": "solid",
+     "tris": 562,
+     "offset": [
+      0.0,
+      0.5486,
+      0.0
+     ],
+     "size": [
+      3.9492,
+      1.0972,
+      4.1081
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "roots / base: rocks and tufts"
+  },
+  {
+   "name": "SaplingSeedling",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "variant",
+   "size": [
+    3.0452,
+    3.2602,
+    2.9536
+   ],
+   "tris": 822,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingSeedling.glb",
+     "kind": "solid",
+     "tris": 822,
+     "offset": [
+      0.0,
+      1.6301,
+      0.0
+     ],
+     "size": [
+      3.0452,
+      3.2602,
+      2.9536
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Seedling: small two-tier tree on a short visible stem, 3.4 tall"
+  },
+  {
+   "name": "SaplingSlender",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "variant",
+   "size": [
+    3.486,
+    6.7166,
+    3.7138
+   ],
+   "tris": 1091,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingSlender.glb",
+     "kind": "solid",
+     "tris": 1091,
+     "offset": [
+      0.0,
+      3.3583,
+      0.0
+     ],
+     "size": [
+      3.486,
+      6.7166,
+      3.7138
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Slender: tall thin sapling"
+  },
+  {
+   "name": "SaplingTopFoliage",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "part",
+   "size": [
+    2.6667,
+    1.7887,
+    2.581
+   ],
+   "tris": 108,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingTopFoliage.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      0.8943,
+      0.0
+     ],
+     "size": [
+      2.6667,
+      1.7887,
+      2.581
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top foliage tier"
+  },
+  {
+   "name": "SaplingTrunk",
+   "sheet": "W04",
+   "subject": "Sapling",
+   "role": "part",
+   "size": [
+    0.8018,
+    3.3728,
+    0.8803
+   ],
+   "tris": 20,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SaplingTrunk.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.6864,
+      0.0
+     ],
+     "size": [
+      0.8018,
+      3.3728,
+      0.8803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk: visible stem"
+  },
+  {
+   "name": "YoungFir",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "hero",
+   "size": [
+    10.288,
+    13.1514,
+    9.5269
+   ],
+   "tris": 1304,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFir.glb",
+     "kind": "solid",
+     "tris": 1304,
+     "offset": [
+      0.0,
+      6.5757,
+      0.0
+     ],
+     "size": [
+      10.288,
+      13.1514,
+      9.5269
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "young fir, 14 tall: lower skirt, middle tiers, crown tier; buttress roots"
+  },
+  {
+   "name": "YoungFirCrownTier",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    3.1788,
+    2.6651,
+    2.9457
+   ],
+   "tris": 42,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirCrownTier.glb",
+     "kind": "solid",
+     "tris": 42,
+     "offset": [
+      0.0,
+      1.3326,
+      0.0
+     ],
+     "size": [
+      3.1788,
+      2.6651,
+      2.9457
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crown tier: pointed top"
+  },
+  {
+   "name": "YoungFirFull",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    11.3425,
+    13.7683,
+    10.8089
+   ],
+   "tris": 1415,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirFull.glb",
+     "kind": "solid",
+     "tris": 1415,
+     "offset": [
+      0.0,
+      6.8842,
+      0.0
+     ],
+     "size": [
+      11.3425,
+      13.7683,
+      10.8089
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Full: dense 5-tier fir"
+  },
+  {
+   "name": "YoungFirLeaning",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    10.3039,
+    12.1972,
+    9.8429
+   ],
+   "tris": 1302,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirLeaning.glb",
+     "kind": "solid",
+     "tris": 1302,
+     "offset": [
+      0.0,
+      6.0986,
+      0.0
+     ],
+     "size": [
+      10.3039,
+      12.1972,
+      9.8429
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaning: whole fir tilts clearly to one side"
+  },
+  {
+   "name": "YoungFirLowerSkirt",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    10.288,
+    4.8588,
+    9.5269
+   ],
+   "tris": 108,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirLowerSkirt.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      2.4294,
+      0.0
+     ],
+     "size": [
+      10.288,
+      4.8588,
+      9.5269
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "lower skirt: widest drooping tier"
+  },
+  {
+   "name": "YoungFirMiddleTier",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    5.4519,
+    3.0727,
+    5.6622
+   ],
+   "tris": 108,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirMiddleTier.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      1.5364,
+      0.0
+     ],
+     "size": [
+      5.4519,
+      3.0727,
+      5.6622
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "middle tier: layered star"
+  },
+  {
+   "name": "YoungFirRootBase",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    6.0608,
+    2.2667,
+    6.4714
+   ],
+   "tris": 766,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirRootBase.glb",
+     "kind": "solid",
+     "tris": 766,
+     "offset": [
+      0.0,
+      1.1334,
+      0.0
+     ],
+     "size": [
+      6.0608,
+      2.2667,
+      6.4714
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base: flared buttress roots, ring of rocks and tufts"
+  },
+  {
+   "name": "YoungFirSparse",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    6.7098,
+    12.4666,
+    6.6647
+   ],
+   "tris": 1236,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirSparse.glb",
+     "kind": "solid",
+     "tris": 1236,
+     "offset": [
+      0.0,
+      6.2333,
+      0.0
+     ],
+     "size": [
+      6.7098,
+      12.4666,
+      6.6647
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Sparse: small offset tiers, trunk showing between them"
+  },
+  {
+   "name": "YoungFirTrunk",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    1.6359,
+    8.091,
+    1.6191
+   ],
+   "tris": 24,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirTrunk.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      4.0455,
+      0.0
+     ],
+     "size": [
+      1.6359,
+      8.091,
+      1.6191
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk: tall tapered log rising into the skirt"
+  }
+ ],
+ "stats": {
+  "assets": 36,
+  "pieces": 36,
+  "solid": 36,
+  "water": 0,
+  "glow": 0,
+  "tris": 42396,
+  "vfxSockets": 0,
+  "paletteColours": 5,
+  "paletteLevels": 123,
+  "meshBytes": 4280448
+ },
+ "problems": []
+}

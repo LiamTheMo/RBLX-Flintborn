@@ -1,0 +1,2425 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V02",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v02_bark",
+    "hex": "#7B4A28",
+    "levels": [
+     0.93025,
+     0.934,
+     0.93812,
+     0.94269,
+     0.94643,
+     0.95197,
+     0.95573,
+     0.9592,
+     0.96305,
+     0.96636,
+     0.97152,
+     0.97534,
+     0.98029,
+     0.98702,
+     0.99287,
+     0.99658,
+     1.00091,
+     1.00354,
+     1.00896,
+     1.01464,
+     1.01912,
+     1.02506,
+     1.02898,
+     1.03239,
+     1.03442,
+     1.04025,
+     1.04532,
+     1.04999,
+     1.05565,
+     1.06054,
+     1.06456,
+     1.0697
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_elder_leaf",
+    "hex": "#2C6B2E",
+    "levels": [
+     0.93008,
+     0.93542,
+     0.93963,
+     0.94262,
+     0.94454,
+     0.9502,
+     0.95487,
+     0.95752,
+     0.9598,
+     0.96402,
+     0.96616,
+     0.96923,
+     0.97319,
+     0.98113,
+     0.9852,
+     0.989,
+     0.99345,
+     0.99997,
+     1.00831,
+     1.01312,
+     1.01618,
+     1.02014,
+     1.02909,
+     1.03613,
+     1.04158,
+     1.04576,
+     1.04961,
+     1.05388,
+     1.05924,
+     1.06428,
+     1.06725,
+     1.06967
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_elderberry",
+    "hex": "#242C78",
+    "levels": [
+     0.9321,
+     0.93473,
+     0.93983,
+     0.94731,
+     0.95186,
+     0.9564,
+     0.96297,
+     0.9697,
+     0.97509,
+     0.98158,
+     0.98606,
+     0.99256,
+     0.99449,
+     0.99876,
+     0.99997,
+     1.01131,
+     1.01687,
+     1.02215,
+     1.03353,
+     1.03658,
+     1.03924,
+     1.04133,
+     1.04445,
+     1.04794,
+     1.05186,
+     1.05516,
+     1.05928,
+     1.06194,
+     1.06507,
+     1.06845,
+     1.06967
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_hazel_husk",
+    "hex": "#B9B83A",
+    "levels": [
+     0.94116,
+     0.94244,
+     0.94864,
+     0.95246,
+     0.95507,
+     0.95569,
+     0.96264,
+     0.96332,
+     0.97019,
+     0.97552,
+     0.9788,
+     0.97993,
+     0.988,
+     0.99402,
+     0.999,
+     0.99984,
+     1.00257,
+     1.00844,
+     1.01107,
+     1.01611,
+     1.02025,
+     1.02384,
+     1.02652,
+     1.02784,
+     1.03889,
+     1.04171,
+     1.04377,
+     1.05189,
+     1.05644,
+     1.05873,
+     1.06454,
+     1.06693
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_hazel_leaf",
+    "hex": "#80B81C",
+    "levels": [
+     0.93105,
+     0.93457,
+     0.93782,
+     0.9393,
+     0.94256,
+     0.94801,
+     0.95313,
+     0.95827,
+     0.96159,
+     0.96619,
+     0.97629,
+     0.97955,
+     0.98485,
+     0.98807,
+     0.99298,
+     0.99759,
+     1.00322,
+     1.00725,
+     1.00885,
+     1.0125,
+     1.01835,
+     1.01977,
+     1.02433,
+     1.0294,
+     1.03548,
+     1.03928,
+     1.04326,
+     1.04742,
+     1.05394,
+     1.05776,
+     1.06463,
+     1.06951
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_hazel_nut",
+    "hex": "#C48A4E",
+    "levels": [
+     0.94275,
+     0.96826,
+     0.98108,
+     1.02431,
+     1.03304,
+     1.05316,
+     1.05789
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_raspberry",
+    "hex": "#D41C28",
+    "levels": [
+     0.93231,
+     0.9408,
+     0.94672,
+     0.94932,
+     0.95256,
+     0.95752,
+     0.96366,
+     0.97372,
+     0.9771,
+     0.98121,
+     0.98398,
+     0.98628,
+     0.99156,
+     0.99459,
+     1.00078,
+     1.0097,
+     1.01652,
+     1.0226,
+     1.03244,
+     1.03443,
+     1.04016,
+     1.04489,
+     1.04786,
+     1.05313,
+     1.05736,
+     1.05946,
+     1.06287,
+     1.06709,
+     1.06879
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_raspberry_leaf",
+    "hex": "#3A9A22",
+    "levels": [
+     0.93007,
+     0.93543,
+     0.93964,
+     0.94433,
+     0.94869,
+     0.95105,
+     0.95348,
+     0.95711,
+     0.96222,
+     0.96777,
+     0.97069,
+     0.97405,
+     0.97794,
+     0.98123,
+     0.98644,
+     0.99143,
+     0.99588,
+     1.0006,
+     1.00385,
+     1.00861,
+     1.01274,
+     1.01996,
+     1.02435,
+     1.02897,
+     1.0328,
+     1.03816,
+     1.04403,
+     1.05052,
+     1.05503,
+     1.06155,
+     1.06519,
+     1.07
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_rosehip",
+    "hex": "#EE5A14",
+    "levels": [
+     0.93245,
+     0.9588,
+     0.97246,
+     0.97674,
+     0.98129,
+     0.98607,
+     0.98802,
+     0.99109,
+     1.01127,
+     1.01976,
+     1.03624,
+     1.05674,
+     1.06326,
+     1.06725
+    ],
+    "used": true
+   },
+   {
+    "key": "v02_rosehip_leaf",
+    "hex": "#5D8A2C",
+    "levels": [
+     0.93012,
+     0.93322,
+     0.93785,
+     0.94162,
+     0.94561,
+     0.95102,
+     0.95778,
+     0.96178,
+     0.96559,
+     0.9726,
+     0.97638,
+     0.982,
+     0.98488,
+     0.98817,
+     0.99349,
+     1.00029,
+     1.00517,
+     1.00877,
+     1.0128,
+     1.01661,
+     1.02016,
+     1.0249,
+     1.02874,
+     1.03396,
+     1.03608,
+     1.04325,
+     1.04816,
+     1.05174,
+     1.05923,
+     1.06264,
+     1.06573,
+     1.06998
+    ],
+    "used": true
+   },
+   {
+    "key": "wood_end",
+    "hex": "#C48852",
+    "levels": [
+     0.94719,
+     0.97407
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "ElderberryBerryBunch",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "part",
+   "size": [
+    1.455,
+    1.6678,
+    0.9796
+   ],
+   "tris": 508,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryBerryBunch.glb",
+     "kind": "solid",
+     "tris": 508,
+     "offset": [
+      0.0,
+      0.8339,
+      0.0
+     ],
+     "size": [
+      1.455,
+      1.6678,
+      0.9796
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "6-sphere berry bunch, stalk and nub."
+  },
+  {
+   "name": "ElderberryForkedStem",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "part",
+   "size": [
+    2.563,
+    4.1005,
+    1.3309
+   ],
+   "tris": 76,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryForkedStem.glb",
+     "kind": "solid",
+     "tris": 76,
+     "offset": [
+      0.0,
+      2.0503,
+      0.0
+     ],
+     "size": [
+      2.563,
+      4.1005,
+      1.3309
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Forked base stem, cut ends."
+  },
+  {
+   "name": "ElderberryLeafClump",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "part",
+   "size": [
+    2.7085,
+    3.0,
+    0.2854
+   ],
+   "tris": 52,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryLeafClump.glb",
+     "kind": "solid",
+     "tris": 52,
+     "offset": [
+      0.0,
+      1.5,
+      0.0
+     ],
+     "size": [
+      2.7085,
+      3.0,
+      0.2854
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Three-leaf clump on a stem."
+  },
+  {
+   "name": "ElderberryLeafUnderside",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "part",
+   "size": [
+    1.8097,
+    0.1737,
+    1.3651
+   ],
+   "tris": 12,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryLeafUnderside.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.0869,
+      0.0
+     ],
+     "size": [
+      1.8097,
+      0.1737,
+      1.3651
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single leaf, underside up."
+  },
+  {
+   "name": "ElderberryShrub",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "hero",
+   "size": [
+    8.8139,
+    7.0922,
+    8.3194
+   ],
+   "tris": 2060,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryShrub.glb",
+     "kind": "solid",
+     "tris": 2060,
+     "offset": [
+      0.0,
+      3.5461,
+      0.0
+     ],
+     "size": [
+      8.8139,
+      7.0922,
+      8.3194
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.031",
+     "kind": "harvest_hit",
+     "position": [
+      -0.251,
+      4.4497,
+      2.186
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#2C6B2E",
+       "#242C78"
+      ]
+     }
+    }
+   ],
+   "notes": "Wide forked elderberry shrub with 4 navy berry bunches. harvest_hit socket on the front bunch (leaf/berry colours) for picking."
+  },
+  {
+   "name": "ElderberryShrubFruitless",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "depleted",
+   "size": [
+    9.109,
+    7.0918,
+    8.6188
+   ],
+   "tris": 1900,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryShrubFruitless.glb",
+     "kind": "solid",
+     "tris": 1900,
+     "offset": [
+      0.0,
+      3.5459,
+      0.0
+     ],
+     "size": [
+      9.109,
+      7.0918,
+      8.6188
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Hero shrub after picking: same branches and leaves, no berries."
+  },
+  {
+   "name": "ElderberryShrubMature",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "variant",
+   "size": [
+    9.0003,
+    7.0045,
+    7.2692
+   ],
+   "tris": 1968,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryShrubMature.glb",
+     "kind": "solid",
+     "tris": 1968,
+     "offset": [
+      0.0,
+      3.5023,
+      0.0
+     ],
+     "size": [
+      9.0003,
+      7.0045,
+      7.2692
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.032",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.2994,
+      2.5712
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#2C6B2E",
+       "#242C78"
+      ]
+     }
+    }
+   ],
+   "notes": "Wide mature shrub, 5 arms, 4 bunches across the front top. harvest_hit on the front bunch."
+  },
+  {
+   "name": "ElderberryShrubYoung",
+   "sheet": "V02",
+   "subject": "ElderberryShrub",
+   "role": "variant",
+   "size": [
+    5.7967,
+    4.5422,
+    5.5629
+   ],
+   "tris": 464,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ElderberryShrubYoung.glb",
+     "kind": "solid",
+     "tris": 464,
+     "offset": [
+      0.0,
+      2.2711,
+      0.0
+     ],
+     "size": [
+      5.7967,
+      4.5422,
+      5.5629
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Young airy shrub, no berries."
+  },
+  {
+   "name": "HazelHusk",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "part",
+   "size": [
+    1.537,
+    1.3828,
+    1.537
+   ],
+   "tris": 180,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelHusk.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      0.6914,
+      0.0
+     ],
+     "size": [
+      1.537,
+      1.3828,
+      1.537
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Empty husk cup."
+  },
+  {
+   "name": "HazelLeafCluster",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "part",
+   "size": [
+    3.002,
+    2.7,
+    0.3251
+   ],
+   "tris": 88,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelLeafCluster.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      1.35,
+      0.0
+     ],
+     "size": [
+      3.002,
+      2.7,
+      0.3251
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Three-leaf cluster on a stalk."
+  },
+  {
+   "name": "HazelNut",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "drop",
+   "size": [
+    0.875,
+    0.86,
+    0.92
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelNut.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.43,
+      0.0
+     ],
+     "size": [
+      0.875,
+      0.86,
+      0.92
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Harvested hazelnut pickup."
+  },
+  {
+   "name": "HazelNutPod",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "part",
+   "size": [
+    1.3459,
+    1.59,
+    1.3459
+   ],
+   "tris": 260,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelNutPod.glb",
+     "kind": "solid",
+     "tris": 260,
+     "offset": [
+      0.0,
+      0.795,
+      0.0
+     ],
+     "size": [
+      1.3459,
+      1.59,
+      1.3459
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Nut in its husk."
+  },
+  {
+   "name": "HazelShrub",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "hero",
+   "size": [
+    7.3662,
+    7.6752,
+    8.7083
+   ],
+   "tris": 3204,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelShrub.glb",
+     "kind": "solid",
+     "tris": 3204,
+     "offset": [
+      0.0,
+      3.8376,
+      0.0
+     ],
+     "size": [
+      7.3662,
+      7.6752,
+      8.7083
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.033",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      4.5,
+      0.4
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#80B81C",
+       "#B9B83A"
+      ]
+     }
+    }
+   ],
+   "notes": "Full & fruiting hazel. harvest_hit socket at the front pods (leaf/husk colours)."
+  },
+  {
+   "name": "HazelShrubFruiting",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "variant",
+   "size": [
+    8.5398,
+    7.8752,
+    7.8521
+   ],
+   "tris": 2768,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelShrubFruiting.glb",
+     "kind": "solid",
+     "tris": 2768,
+     "offset": [
+      0.0,
+      3.9376,
+      0.0
+     ],
+     "size": [
+      8.5398,
+      7.8752,
+      7.8521
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.034",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      4.5,
+      0.4
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#80B81C",
+       "#B9B83A"
+      ]
+     }
+    }
+   ],
+   "notes": "Full & fruiting, 4 pods, different layout. harvest_hit socket at the front pods."
+  },
+  {
+   "name": "HazelShrubHarvested",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "depleted",
+   "size": [
+    7.2149,
+    7.5962,
+    6.9177
+   ],
+   "tris": 1896,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelShrubHarvested.glb",
+     "kind": "solid",
+     "tris": 1896,
+     "offset": [
+      0.0,
+      3.7981,
+      0.0
+     ],
+     "size": [
+      7.2149,
+      7.5962,
+      6.9177
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Harvested: hero stems and leaves, no pods."
+  },
+  {
+   "name": "HazelShrubSapling",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "variant",
+   "size": [
+    2.8677,
+    4.0708,
+    1.8905
+   ],
+   "tris": 348,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelShrubSapling.glb",
+     "kind": "solid",
+     "tris": 348,
+     "offset": [
+      0.0,
+      2.0354,
+      0.0
+     ],
+     "size": [
+      2.8677,
+      4.0708,
+      1.8905
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Young sapling, no pods."
+  },
+  {
+   "name": "HazelStem",
+   "sheet": "V02",
+   "subject": "HazelShrub",
+   "role": "part",
+   "size": [
+    0.6824,
+    4.0,
+    0.6653
+   ],
+   "tris": 24,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HazelStem.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      0.6824,
+      4.0,
+      0.6653
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single stem section."
+  },
+  {
+   "name": "RaspberryBerryCluster",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "part",
+   "size": [
+    1.0117,
+    0.72,
+    0.9802
+   ],
+   "tris": 100,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryBerryCluster.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.36,
+      0.0
+     ],
+     "size": [
+      1.0117,
+      0.72,
+      0.9802
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Berry module: 4 lobes around a centre."
+  },
+  {
+   "name": "RaspberryBush",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "hero",
+   "size": [
+    7.4465,
+    6.6916,
+    7.3221
+   ],
+   "tris": 2456,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryBush.glb",
+     "kind": "solid",
+     "tris": 2456,
+     "offset": [
+      0.0,
+      3.3458,
+      0.0
+     ],
+     "size": [
+      7.4465,
+      6.6916,
+      7.3221
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Full & fruiting raspberry bush; leafy, but hull for the canes. No VFX."
+  },
+  {
+   "name": "RaspberryBushFruiting",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "variant",
+   "size": [
+    7.1254,
+    6.9282,
+    7.331
+   ],
+   "tris": 2456,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryBushFruiting.glb",
+     "kind": "solid",
+     "tris": 2456,
+     "offset": [
+      0.0,
+      3.4641,
+      0.0
+     ],
+     "size": [
+      7.1254,
+      6.9282,
+      7.331
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Full & fruiting, different clump layout from the hero."
+  },
+  {
+   "name": "RaspberryBushHarvested",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "depleted",
+   "size": [
+    7.4465,
+    6.6945,
+    7.3221
+   ],
+   "tris": 1924,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryBushHarvested.glb",
+     "kind": "solid",
+     "tris": 1924,
+     "offset": [
+      0.0,
+      3.3473,
+      0.0
+     ],
+     "size": [
+      7.4465,
+      6.6945,
+      7.3221
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Harvested (fruitless) state: hero canes and leaves, calyx stubs, no berries. Swap target after harvesting the hero."
+  },
+  {
+   "name": "RaspberryBushYoung",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "variant",
+   "size": [
+    4.0833,
+    3.4022,
+    3.9184
+   ],
+   "tris": 808,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryBushYoung.glb",
+     "kind": "solid",
+     "tris": 808,
+     "offset": [
+      0.0,
+      1.7011,
+      0.0
+     ],
+     "size": [
+      4.0833,
+      3.4022,
+      3.9184
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Young small bush, sparse, no berries."
+  },
+  {
+   "name": "RaspberryCane",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "part",
+   "size": [
+    2.1071,
+    3.6253,
+    0.8452
+   ],
+   "tris": 172,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryCane.glb",
+     "kind": "solid",
+     "tris": 172,
+     "offset": [
+      0.0,
+      1.8127,
+      0.0
+     ],
+     "size": [
+      2.1071,
+      3.6253,
+      0.8452
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Y-shaped cane stem with cut ends."
+  },
+  {
+   "name": "RaspberryLeafCluster",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "part",
+   "size": [
+    2.2878,
+    0.563,
+    2.4074
+   ],
+   "tris": 112,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryLeafCluster.glb",
+     "kind": "solid",
+     "tris": 112,
+     "offset": [
+      0.0,
+      0.2815,
+      0.0
+     ],
+     "size": [
+      2.2878,
+      0.563,
+      2.4074
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Three-leaf cluster on a short stalk."
+  },
+  {
+   "name": "RaspberryLeafUnderside",
+   "sheet": "V02",
+   "subject": "RaspberryBush",
+   "role": "part",
+   "size": [
+    2.0,
+    0.2356,
+    1.0333
+   ],
+   "tris": 32,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RaspberryLeafUnderside.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.1178,
+      0.0
+     ],
+     "size": [
+      2.0,
+      0.2356,
+      1.0333
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single leaf, slightly curled along the midrib."
+  },
+  {
+   "name": "Rosehip",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "drop",
+   "size": [
+    0.4911,
+    0.922,
+    0.4967
+   ],
+   "tris": 48,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Rosehip.glb",
+     "kind": "solid",
+     "tris": 48,
+     "offset": [
+      0.0,
+      0.461,
+      0.0
+     ],
+     "size": [
+      0.4911,
+      0.922,
+      0.4967
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Loose rosehip fruit pickup."
+  },
+  {
+   "name": "RosehipLeafCluster",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "part",
+   "size": [
+    2.4298,
+    2.2372,
+    0.7911
+   ],
+   "tris": 40,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipLeafCluster.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.1186,
+      0.0
+     ],
+     "size": [
+      2.4298,
+      2.2372,
+      0.7911
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Three-leaf cluster."
+  },
+  {
+   "name": "RosehipLeafUnderside",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "part",
+   "size": [
+    0.75,
+    0.2162,
+    2.0469
+   ],
+   "tris": 20,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipLeafUnderside.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.1081,
+      0.0
+     ],
+     "size": [
+      0.75,
+      0.2162,
+      2.0469
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single leaf, raised midrib."
+  },
+  {
+   "name": "RosehipScrub",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "hero",
+   "size": [
+    9.152,
+    4.779,
+    8.5494
+   ],
+   "tris": 3304,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipScrub.glb",
+     "kind": "solid",
+     "tris": 3304,
+     "offset": [
+      0.0,
+      2.3895,
+      0.0
+     ],
+     "size": [
+      9.152,
+      4.779,
+      8.5494
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.035",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      2.2,
+      2.5
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#5D8A2C",
+       "#EE5A14"
+      ]
+     }
+    }
+   ],
+   "notes": "Low thorny rosehip scrub, 7 hips. harvest_hit: leaf/orange burst on pick."
+  },
+  {
+   "name": "RosehipScrubBare",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "depleted",
+   "size": [
+    6.6463,
+    3.9482,
+    5.6442
+   ],
+   "tris": 1492,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipScrubBare.glb",
+     "kind": "solid",
+     "tris": 1492,
+     "offset": [
+      0.0,
+      1.9741,
+      0.0
+     ],
+     "size": [
+      6.6463,
+      3.9482,
+      5.6442
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bare winter state: thorny stems only."
+  },
+  {
+   "name": "RosehipScrubCompact",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "variant",
+   "size": [
+    6.5089,
+    3.139,
+    7.0157
+   ],
+   "tris": 2164,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipScrubCompact.glb",
+     "kind": "solid",
+     "tris": 2164,
+     "offset": [
+      0.0,
+      1.5695,
+      0.0
+     ],
+     "size": [
+      6.5089,
+      3.139,
+      7.0157
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.036",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      1.5,
+      1.8
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#5D8A2C",
+       "#EE5A14"
+      ]
+     }
+    }
+   ],
+   "notes": "Compact low scrub, 4 hips. harvest_hit: pick burst."
+  },
+  {
+   "name": "RosehipScrubSpreading",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "variant",
+   "size": [
+    10.7069,
+    4.4668,
+    10.0853
+   ],
+   "tris": 2984,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipScrubSpreading.glb",
+     "kind": "solid",
+     "tris": 2984,
+     "offset": [
+      0.0,
+      2.2334,
+      0.0
+     ],
+     "size": [
+      10.7069,
+      4.4668,
+      10.0853
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.037",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      2.2,
+      2.8
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#5D8A2C",
+       "#EE5A14"
+      ]
+     }
+    }
+   ],
+   "notes": "Widest spreading scrub, 8 hips. harvest_hit: pick burst."
+  },
+  {
+   "name": "RosehipThorn",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "part",
+   "size": [
+    0.59,
+    1.0,
+    0.16
+   ],
+   "tris": 24,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipThorn.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      0.59,
+      1.0,
+      0.16
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single curved thorn spike."
+  },
+  {
+   "name": "RosehipThornStem",
+   "sheet": "V02",
+   "subject": "RosehipScrub",
+   "role": "part",
+   "size": [
+    1.5365,
+    4.1072,
+    0.8423
+   ],
+   "tris": 132,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RosehipThornStem.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      2.0536,
+      0.0
+     ],
+     "size": [
+      1.5365,
+      4.1072,
+      0.8423
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Thorn stem section, cut ends."
+  }
+ ],
+ "stats": {
+  "assets": 34,
+  "pieces": 34,
+  "solid": 34,
+  "water": 0,
+  "glow": 0,
+  "tris": 34156,
+  "vfxSockets": 7,
+  "paletteColours": 11,
+  "paletteLevels": 275,
+  "meshBytes": 3162576
+ },
+ "problems": []
+}

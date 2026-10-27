@@ -1,0 +1,1531 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V04",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v04_brown",
+    "hex": "#8E5B2E",
+    "levels": [
+     0.95194,
+     0.9553,
+     0.95733,
+     0.95974,
+     0.96338,
+     0.96538,
+     0.96937,
+     0.97499,
+     0.97664,
+     0.97858,
+     0.98245,
+     0.98484,
+     0.98742,
+     0.99262,
+     0.99435,
+     0.99865,
+     1.00156,
+     1.00479,
+     1.00756,
+     1.0117,
+     1.01468,
+     1.01837,
+     1.02442,
+     1.0267,
+     1.03229,
+     1.03347,
+     1.03945,
+     1.04114,
+     1.04356,
+     1.04622,
+     1.0488
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_center",
+    "hex": "#F3C42A",
+    "levels": [
+     0.96238,
+     0.98238,
+     0.9919,
+     1.02823,
+     1.01278,
+     0.95907
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_leaf",
+    "hex": "#4E9A32",
+    "levels": [
+     0.95504,
+     0.95794,
+     0.96103,
+     0.96495,
+     0.9688,
+     0.97288,
+     0.97688,
+     0.97895,
+     0.98068,
+     0.98328,
+     0.98613,
+     0.99036,
+     0.99374,
+     0.99823,
+     1.00068,
+     1.00455,
+     1.00589,
+     1.00898,
+     1.01324,
+     1.01768,
+     1.02026,
+     1.02426,
+     1.02558,
+     1.02931,
+     1.03187,
+     1.03344,
+     1.03807,
+     1.04029,
+     1.04349,
+     1.04926
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_pad",
+    "hex": "#6FBC3A",
+    "levels": [
+     0.9554,
+     0.96614,
+     0.97846,
+     0.98238,
+     0.98646,
+     0.99276,
+     1.01176,
+     1.028,
+     0.97196,
+     0.96063,
+     1.01497,
+     0.95231
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_petal",
+    "hex": "#F1EEE6",
+    "levels": [
+     0.95142,
+     0.95375,
+     0.95668,
+     0.95877,
+     0.96508,
+     0.9704,
+     0.97237,
+     0.97506,
+     0.9793,
+     0.98238,
+     0.98652,
+     0.99307,
+     0.99795,
+     1.0017,
+     1.00359,
+     1.00864,
+     1.01241,
+     1.01535,
+     1.01762,
+     1.02996,
+     1.03311,
+     1.03717,
+     1.04032,
+     1.04336,
+     1.04709,
+     1.00585
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_stem",
+    "hex": "#5AA332",
+    "levels": [
+     0.9631,
+     0.96575,
+     0.97687,
+     0.9856,
+     0.9979,
+     1.00155,
+     1.01804,
+     1.02313,
+     1.03294,
+     1.0455,
+     1.04931,
+     0.95142,
+     1.01176,
+     1.03828,
+     0.97177,
+     1.00603,
+     0.95895,
+     1.03047,
+     0.9793,
+     1.04346
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_weed",
+    "hex": "#7CC03C",
+    "levels": [
+     0.95382,
+     0.95669,
+     0.95842,
+     0.9614,
+     0.964,
+     0.96672,
+     0.97018,
+     0.97238,
+     0.97998,
+     0.98522,
+     0.98801,
+     0.99296,
+     0.99518,
+     0.99778,
+     1.00112,
+     1.00415,
+     1.00691,
+     1.01269,
+     1.01821,
+     1.02485,
+     1.02638,
+     1.02988,
+     1.0324,
+     1.03617,
+     1.04021,
+     1.04385,
+     1.04919
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_wstem",
+    "hex": "#8A7A3A",
+    "levels": [
+     0.95269,
+     0.95483,
+     0.96032,
+     0.96533,
+     0.97403,
+     0.97587,
+     0.97978,
+     0.98335,
+     0.98538,
+     0.98887,
+     0.99262,
+     0.99753,
+     0.99999,
+     1.00263,
+     1.01294,
+     1.01416,
+     1.02529,
+     1.02776,
+     1.03382,
+     1.03705,
+     1.04035,
+     1.04594,
+     1.04779
+    ],
+    "used": true
+   },
+   {
+    "key": "v04_padunder",
+    "hex": "#86643F",
+    "levels": [
+     0.96508,
+     0.98858,
+     1.00266,
+     1.03189,
+     1.04516
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BulrushClipped",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "variant",
+   "size": [
+    3.5532,
+    4.4096,
+    3.3083
+   ],
+   "tris": 792,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushClipped.glb",
+     "kind": "solid",
+     "tris": 792,
+     "offset": [
+      0.0,
+      2.2048,
+      0.0
+     ],
+     "size": [
+      3.5532,
+      4.4096,
+      3.3083
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Clipped (Single Head)"
+  },
+  {
+   "name": "BulrushFan",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "hero",
+   "size": [
+    5.7554,
+    5.3119,
+    4.4879
+   ],
+   "tris": 1216,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushFan.glb",
+     "kind": "solid",
+     "tris": 1216,
+     "offset": [
+      0.0,
+      2.656,
+      0.0
+     ],
+     "size": [
+      5.7554,
+      5.3119,
+      4.4879
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bulrush fan: fan of upright leaf blades, thick cylindrical stalks, two rounded brown seed clusters on stalks, root plug"
+  },
+  {
+   "name": "BulrushLeaf",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "part",
+   "size": [
+    1.4891,
+    3.3026,
+    0.8815
+   ],
+   "tris": 16,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.6513,
+      0.0
+     ],
+     "size": [
+      1.4891,
+      3.3026,
+      0.8815
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (blade)"
+  },
+  {
+   "name": "BulrushLowCompact",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "variant",
+   "size": [
+    4.2636,
+    3.9689,
+    4.3357
+   ],
+   "tris": 864,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushLowCompact.glb",
+     "kind": "solid",
+     "tris": 864,
+     "offset": [
+      0.0,
+      1.9844,
+      0.0
+     ],
+     "size": [
+      4.2636,
+      3.9689,
+      4.3357
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Low & Compact"
+  },
+  {
+   "name": "BulrushRootPlug",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "part",
+   "size": [
+    1.6942,
+    0.6495,
+    1.8175
+   ],
+   "tris": 320,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushRootPlug.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3247,
+      0.0
+     ],
+     "size": [
+      1.6942,
+      0.6495,
+      1.8175
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root plug (base)"
+  },
+  {
+   "name": "BulrushSeedCluster",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "part",
+   "size": [
+    1.2434,
+    1.65,
+    1.2283
+   ],
+   "tris": 300,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushSeedCluster.glb",
+     "kind": "solid",
+     "tris": 300,
+     "offset": [
+      0.0,
+      0.825,
+      0.0
+     ],
+     "size": [
+      1.2434,
+      1.65,
+      1.2283
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed cluster (head)"
+  },
+  {
+   "name": "BulrushStalk",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "part",
+   "size": [
+    0.3342,
+    3.0728,
+    0.3441
+   ],
+   "tris": 20,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushStalk.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.5364,
+      0.0
+     ],
+     "size": [
+      0.3342,
+      3.0728,
+      0.3441
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stalk (segment)"
+  },
+  {
+   "name": "BulrushStalkElbow",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "part",
+   "size": [
+    0.9921,
+    2.9514,
+    0.3627
+   ],
+   "tris": 40,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushStalkElbow.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.4757,
+      0.0
+     ],
+     "size": [
+      0.9921,
+      2.9514,
+      0.3627
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stalk elbow (joint)"
+  },
+  {
+   "name": "BulrushWideSplayed",
+   "sheet": "V04",
+   "subject": "BulrushFan",
+   "role": "variant",
+   "size": [
+    7.7589,
+    5.0879,
+    6.6577
+   ],
+   "tris": 928,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BulrushWideSplayed.glb",
+     "kind": "solid",
+     "tris": 928,
+     "offset": [
+      0.0,
+      2.544,
+      0.0
+     ],
+     "size": [
+      7.7589,
+      5.0879,
+      6.6577
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide & Splayed"
+  },
+  {
+   "name": "CattailClump",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "hero",
+   "size": [
+    5.3462,
+    6.4561,
+    6.3199
+   ],
+   "tris": 742,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailClump.glb",
+     "kind": "solid",
+     "tris": 742,
+     "offset": [
+      0.0,
+      3.228,
+      0.0
+     ],
+     "size": [
+      5.3462,
+      6.4561,
+      6.3199
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cattail clump: broad folded arching leaf blades, three tall green stems with brown cylindrical seed heads and spikes, root plug"
+  },
+  {
+   "name": "CattailLeaf",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "part",
+   "size": [
+    1.5578,
+    3.3967,
+    1.0308
+   ],
+   "tris": 16,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.6984,
+      0.0
+     ],
+     "size": [
+      1.5578,
+      3.3967,
+      1.0308
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (blade)"
+  },
+  {
+   "name": "CattailLeafy",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "variant",
+   "size": [
+    7.4187,
+    4.2805,
+    6.5
+   ],
+   "tris": 528,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailLeafy.glb",
+     "kind": "solid",
+     "tris": 528,
+     "offset": [
+      0.0,
+      2.1403,
+      0.0
+     ],
+     "size": [
+      7.4187,
+      4.2805,
+      6.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Leafy (No Seeds)"
+  },
+  {
+   "name": "CattailRootPlug",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "part",
+   "size": [
+    1.8445,
+    0.6442,
+    1.5752
+   ],
+   "tris": 320,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailRootPlug.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3221,
+      0.0
+     ],
+     "size": [
+      1.8445,
+      0.6442,
+      1.5752
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root plug (base)"
+  },
+  {
+   "name": "CattailSeedHead",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "part",
+   "size": [
+    0.64,
+    2.637,
+    0.64
+   ],
+   "tris": 82,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailSeedHead.glb",
+     "kind": "solid",
+     "tris": 82,
+     "offset": [
+      0.0,
+      1.3185,
+      0.0
+     ],
+     "size": [
+      0.64,
+      2.637,
+      0.64
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed head (capsule) on a stem stub"
+  },
+  {
+   "name": "CattailShortCompact",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "variant",
+   "size": [
+    4.8937,
+    5.0302,
+    4.56
+   ],
+   "tris": 710,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailShortCompact.glb",
+     "kind": "solid",
+     "tris": 710,
+     "offset": [
+      0.0,
+      2.5151,
+      0.0
+     ],
+     "size": [
+      4.8937,
+      5.0302,
+      4.56
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short & Compact"
+  },
+  {
+   "name": "CattailStem",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "part",
+   "size": [
+    0.4461,
+    3.573,
+    0.2701
+   ],
+   "tris": 20,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailStem.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.7865,
+      0.0
+     ],
+     "size": [
+      0.4461,
+      3.573,
+      0.2701
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (segment)"
+  },
+  {
+   "name": "CattailTallDense",
+   "sheet": "V04",
+   "subject": "CattailClump",
+   "role": "variant",
+   "size": [
+    8.0838,
+    6.9555,
+    8.8029
+   ],
+   "tris": 806,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CattailTallDense.glb",
+     "kind": "solid",
+     "tris": 806,
+     "offset": [
+      0.0,
+      3.4778,
+      0.0
+     ],
+     "size": [
+      8.0838,
+      6.9555,
+      8.8029
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall & Dense"
+  },
+  {
+   "name": "Pondweed",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "hero",
+   "size": [
+    4.8848,
+    5.5573,
+    4.733
+   ],
+   "tris": 2000,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Pondweed.glb",
+     "kind": "solid",
+     "tris": 2000,
+     "offset": [
+      0.0,
+      2.7786,
+      0.0
+     ],
+     "size": [
+      4.8848,
+      5.5573,
+      4.733
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pondweed: cluster of flexible olive stems with broad paired leaves at each node, root plug"
+  },
+  {
+   "name": "PondweedArchedFlowing",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "variant",
+   "size": [
+    6.2608,
+    2.7764,
+    7.821
+   ],
+   "tris": 1040,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedArchedFlowing.glb",
+     "kind": "solid",
+     "tris": 1040,
+     "offset": [
+      0.0,
+      1.3882,
+      0.0
+     ],
+     "size": [
+      6.2608,
+      2.7764,
+      7.821
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Arched & Flowing"
+  },
+  {
+   "name": "PondweedLeafPair",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "part",
+   "size": [
+    2.3518,
+    1.4974,
+    0.9475
+   ],
+   "tris": 48,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedLeafPair.glb",
+     "kind": "solid",
+     "tris": 48,
+     "offset": [
+      0.0,
+      0.7487,
+      0.0
+     ],
+     "size": [
+      2.3518,
+      1.4974,
+      0.9475
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf pair (2 leaves)"
+  },
+  {
+   "name": "PondweedRootPlug",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "part",
+   "size": [
+    1.844,
+    0.6482,
+    1.8248
+   ],
+   "tris": 320,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedRootPlug.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3241,
+      0.0
+     ],
+     "size": [
+      1.844,
+      0.6482,
+      1.8248
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root plug (base)"
+  },
+  {
+   "name": "PondweedSparseStalk",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "variant",
+   "size": [
+    2.1385,
+    5.773,
+    2.1686
+   ],
+   "tris": 560,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedSparseStalk.glb",
+     "kind": "solid",
+     "tris": 560,
+     "offset": [
+      0.0,
+      2.8865,
+      0.0
+     ],
+     "size": [
+      2.1385,
+      5.773,
+      2.1686
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Sparse Stalk"
+  },
+  {
+   "name": "PondweedStem",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "part",
+   "size": [
+    0.6364,
+    2.6798,
+    0.2163
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedStem.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.3399,
+      0.0
+     ],
+     "size": [
+      0.6364,
+      2.6798,
+      0.2163
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (segment)"
+  },
+  {
+   "name": "PondweedUprightCluster",
+   "sheet": "V04",
+   "subject": "Pondweed",
+   "role": "variant",
+   "size": [
+    4.1988,
+    5.9349,
+    3.5522
+   ],
+   "tris": 1760,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PondweedUprightCluster.glb",
+     "kind": "solid",
+     "tris": 1760,
+     "offset": [
+      0.0,
+      2.9674,
+      0.0
+     ],
+     "size": [
+      4.1988,
+      5.9349,
+      3.5522
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Upright Cluster"
+  },
+  {
+   "name": "WaterLily",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "hero",
+   "size": [
+    5.6439,
+    3.3138,
+    5.5941
+   ],
+   "tris": 1265,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLily.glb",
+     "kind": "solid",
+     "tris": 1265,
+     "offset": [
+      0.0,
+      1.6569,
+      0.0
+     ],
+     "size": [
+      5.6439,
+      3.3138,
+      5.5941
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "water lily: thick notched faceted pads with brown undersides raised on bent green stems at several heights, a white two-ring chunky-petal bloom with a big faceted yellow core"
+  },
+  {
+   "name": "WaterLilyClosedBud",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "variant",
+   "size": [
+    4.7565,
+    4.189,
+    2.9047
+   ],
+   "tris": 649,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyClosedBud.glb",
+     "kind": "solid",
+     "tris": 649,
+     "offset": [
+      0.0,
+      2.0945,
+      0.0
+     ],
+     "size": [
+      4.7565,
+      4.189,
+      2.9047
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Closed Bud"
+  },
+  {
+   "name": "WaterLilyFlowerCenter",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "part",
+   "size": [
+    0.9839,
+    1.1,
+    0.9357
+   ],
+   "tris": 20,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyFlowerCenter.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.55,
+      0.0
+     ],
+     "size": [
+      0.9839,
+      1.1,
+      0.9357
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower center (core)"
+  },
+  {
+   "name": "WaterLilyFlowerPetals",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "part",
+   "size": [
+    3.6554,
+    1.5309,
+    3.1841
+   ],
+   "tris": 295,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyFlowerPetals.glb",
+     "kind": "solid",
+     "tris": 295,
+     "offset": [
+      0.0,
+      0.7654,
+      0.0
+     ],
+     "size": [
+      3.6554,
+      1.5309,
+      3.1841
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower petals (chunky, two rings)"
+  },
+  {
+   "name": "WaterLilyFloweringCluster",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "variant",
+   "size": [
+    4.8197,
+    3.1211,
+    4.8935
+   ],
+   "tris": 1265,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyFloweringCluster.glb",
+     "kind": "solid",
+     "tris": 1265,
+     "offset": [
+      0.0,
+      1.5605,
+      0.0
+     ],
+     "size": [
+      4.8197,
+      3.1211,
+      4.8935
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Flowering Cluster"
+  },
+  {
+   "name": "WaterLilyPadUnderside",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "part",
+   "size": [
+    3.1918,
+    0.418,
+    3.1028
+   ],
+   "tris": 122,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyPadUnderside.glb",
+     "kind": "solid",
+     "tris": 122,
+     "offset": [
+      0.0,
+      0.209,
+      0.0
+     ],
+     "size": [
+      3.1918,
+      0.418,
+      3.1028
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pad underside (bottom, brown)"
+  },
+  {
+   "name": "WaterLilySinglePad",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "variant",
+   "size": [
+    3.807,
+    0.63,
+    3.6893
+   ],
+   "tris": 122,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilySinglePad.glb",
+     "kind": "solid",
+     "tris": 122,
+     "offset": [
+      0.0,
+      0.315,
+      0.0
+     ],
+     "size": [
+      3.807,
+      0.63,
+      3.6893
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Single Pad (resting low)"
+  },
+  {
+   "name": "WaterLilyStem",
+   "sheet": "V04",
+   "subject": "WaterLily",
+   "role": "part",
+   "size": [
+    0.4308,
+    2.2642,
+    0.4197
+   ],
+   "tris": 60,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WaterLilyStem.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.1321,
+      0.0
+     ],
+     "size": [
+      0.4308,
+      2.2642,
+      0.4197
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (segment)"
+  }
+ ],
+ "stats": {
+  "assets": 32,
+  "pieces": 32,
+  "solid": 32,
+  "water": 0,
+  "glow": 0,
+  "tris": 17262,
+  "vfxSockets": 0,
+  "paletteColours": 9,
+  "paletteLevels": 180,
+  "meshBytes": 1719628
+ },
+ "problems": []
+}

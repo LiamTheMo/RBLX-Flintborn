@@ -1,0 +1,1645 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V03",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v03_frond",
+    "hex": "#6AB33A",
+    "levels": [
+     0.95062,
+     0.952,
+     0.95588,
+     0.95799,
+     0.95992,
+     0.96533,
+     0.97082,
+     0.97674,
+     0.98003,
+     0.98137,
+     0.98266,
+     0.98541,
+     0.98671,
+     0.99281,
+     0.99454,
+     0.99789,
+     0.99958,
+     1.00283,
+     1.00982,
+     1.01343,
+     1.01418,
+     1.01974,
+     1.02366,
+     1.02667,
+     1.02873,
+     1.0302,
+     1.0328,
+     1.03681,
+     1.04043,
+     1.04669,
+     1.04799,
+     1.04907
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_leaf",
+    "hex": "#4E9C38",
+    "levels": [
+     0.95116,
+     0.95412,
+     0.95657,
+     0.95863,
+     0.96209,
+     0.96546,
+     0.96729,
+     0.97337,
+     0.97521,
+     0.97691,
+     0.9795,
+     0.98228,
+     0.98676,
+     0.99007,
+     0.99229,
+     0.99645,
+     1.00059,
+     1.00433,
+     1.00934,
+     1.01549,
+     1.0172,
+     1.02244,
+     1.02451,
+     1.02584,
+     1.02992,
+     1.03241,
+     1.03462,
+     1.04045,
+     1.04521,
+     1.0486,
+     1.01247,
+     0.97054
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_petal",
+    "hex": "#F6E2A4",
+    "levels": [
+     0.95218,
+     0.95638,
+     0.95909,
+     0.96259,
+     0.96598,
+     0.96958,
+     0.97187,
+     0.97487,
+     0.9775,
+     0.98322,
+     0.98727,
+     0.99106,
+     0.99486,
+     0.99992,
+     1.00281,
+     1.01296,
+     1.01509,
+     1.02497,
+     1.03487,
+     1.03835,
+     1.04061,
+     1.0462,
+     1.04965,
+     1.00816,
+     1.02022,
+     1.01031,
+     0.98064,
+     1.02706,
+     1.03172,
+     1.00613
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_root",
+    "hex": "#8E5A32",
+    "levels": [
+     0.95182,
+     0.96551,
+     0.97079,
+     0.97747,
+     0.98249,
+     0.98487,
+     0.99276,
+     1.00155,
+     1.00487,
+     1.03254,
+     1.04042,
+     1.0488,
+     1.01918,
+     1.02331,
+     0.95673,
+     1.00944,
+     1.04483,
+     0.98724
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_throat",
+    "hex": "#F0B62A",
+    "levels": [
+     0.96433,
+     0.97079,
+     0.98382,
+     1.00696,
+     1.03629,
+     1.02107,
+     0.95161,
+     0.9944,
+     1.04666,
+     0.99664,
+     1.01687,
+     1.02664,
+     0.99276,
+     0.95773,
+     0.99026,
+     1.00064,
+     0.97684,
+     1.01301,
+     1.04147,
+     1.0316,
+     1.00256,
+     0.96007,
+     0.97436,
+     0.98059,
+     1.00994,
+     0.96784,
+     0.98657,
+     0.96179,
+     1.03391,
+     1.00463,
+     0.95474,
+     1.04937
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_tip",
+    "hex": "#B0753F",
+    "levels": [
+     0.97327,
+     0.98565,
+     0.99482
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_vine",
+    "hex": "#8A5532",
+    "levels": [
+     0.95123,
+     0.95182,
+     0.9549,
+     0.9631,
+     0.96544,
+     0.96673,
+     0.97098,
+     0.97586,
+     0.97648,
+     0.98015,
+     0.98426,
+     0.98504,
+     0.99647,
+     1.00183,
+     1.00501,
+     1.00565,
+     1.01603,
+     1.01804,
+     1.01804,
+     1.01905,
+     1.02161,
+     1.02823,
+     1.03219,
+     1.03289,
+     1.03391,
+     1.0397,
+     1.04268,
+     1.04456,
+     1.0464,
+     1.0488,
+     1.04931,
+     1.04988
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_fibre",
+    "hex": "#D6B486",
+    "levels": [
+     0.96063,
+     0.96895,
+     0.99748,
+     1.0051,
+     1.04346
+    ],
+    "used": true
+   },
+   {
+    "key": "v03_rachis",
+    "hex": "#4C8C2C",
+    "levels": [
+     0.95216,
+     0.95584,
+     0.95693,
+     0.96037,
+     0.96405,
+     0.96487,
+     0.96728,
+     0.97,
+     0.97238,
+     0.97418,
+     0.97654,
+     0.97937,
+     0.98192,
+     0.98603,
+     0.98972,
+     0.99152,
+     0.99388,
+     0.99892,
+     1.00175,
+     1.00434,
+     1.00799,
+     1.01019,
+     1.01257,
+     1.01593,
+     1.01911,
+     1.02939,
+     1.03344,
+     1.03541,
+     1.03978,
+     1.04501,
+     1.04975,
+     1.02461
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BrackenCurlTip",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "part",
+   "size": [
+    1.008,
+    2.3419,
+    0.3795
+   ],
+   "tris": 620,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenCurlTip.glb",
+     "kind": "solid",
+     "tris": 620,
+     "offset": [
+      0.0,
+      1.171,
+      0.0
+     ],
+     "size": [
+      1.008,
+      2.3419,
+      0.3795
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "curl tip (young fiddlehead)"
+  },
+  {
+   "name": "BrackenFern",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "hero",
+   "size": [
+    9.6381,
+    5.8333,
+    8.8513
+   ],
+   "tris": 2776,
+   "budget": 9500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenFern.glb",
+     "kind": "solid",
+     "tris": 2776,
+     "offset": [
+      0.0,
+      2.9166,
+      0.0
+     ],
+     "size": [
+      9.6381,
+      5.8333,
+      8.8513
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bracken fern: eight bold arching fronds, each a thick rachis with five pairs of broad thick paddle lobes and a terminal lobe, radiating from a brown splayed-root base with tan fibre scales"
+  },
+  {
+   "name": "BrackenFernFrond",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "part",
+   "size": [
+    3.0568,
+    4.9952,
+    2.2987
+   ],
+   "tris": 452,
+   "budget": 2300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenFernFrond.glb",
+     "kind": "solid",
+     "tris": 452,
+     "offset": [
+      0.0,
+      2.4976,
+      0.0
+     ],
+     "size": [
+      3.0568,
+      4.9952,
+      2.2987
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fern frond (5 paired lobes)"
+  },
+  {
+   "name": "BrackenFullFern",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "variant",
+   "size": [
+    7.8222,
+    5.4855,
+    7.0472
+   ],
+   "tris": 2776,
+   "budget": 9500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenFullFern.glb",
+     "kind": "solid",
+     "tris": 2776,
+     "offset": [
+      0.0,
+      2.7427,
+      0.0
+     ],
+     "size": [
+      7.8222,
+      5.4855,
+      7.0472
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Full Fern (standard)"
+  },
+  {
+   "name": "BrackenJuvenile",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "variant",
+   "size": [
+    2.4175,
+    3.293,
+    2.212
+   ],
+   "tris": 2996,
+   "budget": 6500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenJuvenile.glb",
+     "kind": "solid",
+     "tris": 2996,
+     "offset": [
+      0.0,
+      1.6465,
+      0.0
+     ],
+     "size": [
+      2.4175,
+      3.293,
+      2.212
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Juvenile (curls): four rising fiddleheads, no open fronds"
+  },
+  {
+   "name": "BrackenRootBase",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "part",
+   "size": [
+    2.5141,
+    1.0739,
+    2.4042
+   ],
+   "tris": 516,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenRootBase.glb",
+     "kind": "solid",
+     "tris": 516,
+     "offset": [
+      0.0,
+      0.537,
+      0.0
+     ],
+     "size": [
+      2.5141,
+      1.0739,
+      2.4042
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional): stump core, six splayed roots, tan fibre scales"
+  },
+  {
+   "name": "BrackenWideSpread",
+   "sheet": "V03",
+   "subject": "BrackenFern",
+   "role": "variant",
+   "size": [
+    11.3543,
+    4.2732,
+    10.9328
+   ],
+   "tris": 3680,
+   "budget": 10500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrackenWideSpread.glb",
+     "kind": "solid",
+     "tris": 3680,
+     "offset": [
+      0.0,
+      2.1366,
+      0.0
+     ],
+     "size": [
+      11.3543,
+      4.2732,
+      10.9328
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Wide Spread (mature): nine longer, lower fronds"
+  },
+  {
+   "name": "HeartleafCreeper",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "hero",
+   "size": [
+    5.2505,
+    8.9719,
+    2.7831
+   ],
+   "tris": 1756,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafCreeper.glb",
+     "kind": "solid",
+     "tris": 1756,
+     "offset": [
+      0.0,
+      4.4859,
+      0.0
+     ],
+     "size": [
+      5.2505,
+      8.9719,
+      2.7831
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "heartleaf creeper: two thick twisting woody vines climbing together, large heart-shaped leaves on short stalks, roots spreading at the foot"
+  },
+  {
+   "name": "HeartleafElbowJoint",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "part",
+   "size": [
+    1.6283,
+    2.5061,
+    0.6397
+   ],
+   "tris": 60,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafElbowJoint.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.253,
+      0.0
+     ],
+     "size": [
+      1.6283,
+      2.5061,
+      0.6397
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "elbow joint (angled)"
+  },
+  {
+   "name": "HeartleafForkJoint",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "part",
+   "size": [
+    2.3866,
+    2.8046,
+    0.5997
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafForkJoint.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.4023,
+      0.0
+     ],
+     "size": [
+      2.3866,
+      2.8046,
+      0.5997
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fork joint (T-joint)"
+  },
+  {
+   "name": "HeartleafGroundTrail",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "variant",
+   "size": [
+    9.1273,
+    1.9479,
+    4.5586
+   ],
+   "tris": 800,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafGroundTrail.glb",
+     "kind": "solid",
+     "tris": 800,
+     "offset": [
+      0.0,
+      0.9739,
+      0.0
+     ],
+     "size": [
+      9.1273,
+      1.9479,
+      4.5586
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Ground Trail (sprawling)"
+  },
+  {
+   "name": "HeartleafHangingLoop",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "variant",
+   "size": [
+    6.2792,
+    7.2136,
+    1.4533
+   ],
+   "tris": 1176,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafHangingLoop.glb",
+     "kind": "solid",
+     "tris": 1176,
+     "offset": [
+      0.0,
+      3.6068,
+      0.0
+     ],
+     "size": [
+      6.2792,
+      7.2136,
+      1.4533
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Hanging Loop (draping)"
+  },
+  {
+   "name": "HeartleafLeafAttachment",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "part",
+   "size": [
+    0.35,
+    0.4,
+    0.35
+   ],
+   "tris": 32,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafLeafAttachment.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.2,
+      0.0
+     ],
+     "size": [
+      0.35,
+      0.4,
+      0.35
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf attachment (nub)"
+  },
+  {
+   "name": "HeartleafLeafPair",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "part",
+   "size": [
+    4.0313,
+    2.6808,
+    0.7964
+   ],
+   "tris": 144,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafLeafPair.glb",
+     "kind": "solid",
+     "tris": 144,
+     "offset": [
+      0.0,
+      1.3404,
+      0.0
+     ],
+     "size": [
+      4.0313,
+      2.6808,
+      0.7964
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf pair (left/right)"
+  },
+  {
+   "name": "HeartleafVineSegment",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "part",
+   "size": [
+    0.5493,
+    3.0728,
+    0.6111
+   ],
+   "tris": 20,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafVineSegment.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.5364,
+      0.0
+     ],
+     "size": [
+      0.5493,
+      3.0728,
+      0.6111
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "vine segment (straight)"
+  },
+  {
+   "name": "HeartleafWallClimb",
+   "sheet": "V03",
+   "subject": "HeartleafCreeper",
+   "role": "variant",
+   "size": [
+    3.9672,
+    8.0237,
+    2.8223
+   ],
+   "tris": 1040,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartleafWallClimb.glb",
+     "kind": "solid",
+     "tris": 1040,
+     "offset": [
+      0.0,
+      4.0119,
+      0.0
+     ],
+     "size": [
+      3.9672,
+      8.0237,
+      2.8223
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wall Climb (vertical)"
+  },
+  {
+   "name": "StrapFern",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "hero",
+   "size": [
+    3.2799,
+    3.5326,
+    3.467
+   ],
+   "tris": 512,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFern.glb",
+     "kind": "solid",
+     "tris": 512,
+     "offset": [
+      0.0,
+      1.7663,
+      0.0
+     ],
+     "size": [
+      3.2799,
+      3.5326,
+      3.467
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "strap fern: low rosette of broad undivided pointed leaves from a rooted base"
+  },
+  {
+   "name": "StrapFernLeaf",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "part",
+   "size": [
+    1.8826,
+    3.1418,
+    1.357
+   ],
+   "tris": 24,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernLeaf.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.5709,
+      0.0
+     ],
+     "size": [
+      1.8826,
+      3.1418,
+      1.357
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "strap leaf (single)"
+  },
+  {
+   "name": "StrapFernLowProfile",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "variant",
+   "size": [
+    4.8421,
+    2.3093,
+    5.056
+   ],
+   "tris": 536,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernLowProfile.glb",
+     "kind": "solid",
+     "tris": 536,
+     "offset": [
+      0.0,
+      1.1547,
+      0.0
+     ],
+     "size": [
+      4.8421,
+      2.3093,
+      5.056
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Low Profile (compact)"
+  },
+  {
+   "name": "StrapFernOlder",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "variant",
+   "size": [
+    3.9586,
+    4.1555,
+    3.3049
+   ],
+   "tris": 544,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernOlder.glb",
+     "kind": "solid",
+     "tris": 544,
+     "offset": [
+      0.0,
+      2.0778,
+      0.0
+     ],
+     "size": [
+      3.9586,
+      4.1555,
+      3.3049
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Older (brown tips)"
+  },
+  {
+   "name": "StrapFernRootBase",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "part",
+   "size": [
+    1.6007,
+    0.5804,
+    1.5119
+   ],
+   "tris": 320,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.2902,
+      0.0
+     ],
+     "size": [
+      1.6007,
+      0.5804,
+      1.5119
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional)"
+  },
+  {
+   "name": "StrapFernUpright",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "variant",
+   "size": [
+    1.9826,
+    4.3108,
+    2.7905
+   ],
+   "tris": 488,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernUpright.glb",
+     "kind": "solid",
+     "tris": 488,
+     "offset": [
+      0.0,
+      2.1554,
+      0.0
+     ],
+     "size": [
+      1.9826,
+      4.3108,
+      2.7905
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Upright (tall)"
+  },
+  {
+   "name": "StrapFernYoungCurl",
+   "sheet": "V03",
+   "subject": "StrapFern",
+   "role": "part",
+   "size": [
+    1.0783,
+    1.8827,
+    0.2883
+   ],
+   "tris": 192,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StrapFernYoungCurl.glb",
+     "kind": "solid",
+     "tris": 192,
+     "offset": [
+      0.0,
+      0.9413,
+      0.0
+     ],
+     "size": [
+      1.0783,
+      1.8827,
+      0.2883
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "young curl (emerging)"
+  },
+  {
+   "name": "TrumpetVine",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "hero",
+   "size": [
+    8.3959,
+    5.8907,
+    6.4149
+   ],
+   "tris": 3576,
+   "budget": 8700,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVine.glb",
+     "kind": "solid",
+     "tris": 3576,
+     "offset": [
+      0.0,
+      2.9454,
+      0.0
+     ],
+     "size": [
+      8.3959,
+      5.8907,
+      6.4149
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trumpet vine: short thick twisting woody vine with a wrapping strand, Y fork and splayed roots; broad oval leaves on short nubs; large cream five-petal trumpet flowers with yellow tubes, throats and stamens; closed buds at the fork tips"
+  },
+  {
+   "name": "TrumpetVineCutFruitless",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "variant",
+   "size": [
+    6.0062,
+    5.4039,
+    5.1316
+   ],
+   "tris": 1944,
+   "budget": 6500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineCutFruitless.glb",
+     "kind": "solid",
+     "tris": 1944,
+     "offset": [
+      0.0,
+      2.7019,
+      0.0
+     ],
+     "size": [
+      6.0062,
+      5.4039,
+      5.1316
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Cut / Fruitless (no flowers, cut arm ends)"
+  },
+  {
+   "name": "TrumpetVineFlowerBud",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    0.582,
+    1.857,
+    0.672
+   ],
+   "tris": 52,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineFlowerBud.glb",
+     "kind": "solid",
+     "tris": 52,
+     "offset": [
+      0.0,
+      0.9285,
+      0.0
+     ],
+     "size": [
+      0.582,
+      1.857,
+      0.672
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower bud (closed)"
+  },
+  {
+   "name": "TrumpetVineFlowerInterior",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    0.701,
+    1.044,
+    0.7285
+   ],
+   "tris": 124,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineFlowerInterior.glb",
+     "kind": "solid",
+     "tris": 124,
+     "offset": [
+      0.0,
+      0.522,
+      0.0
+     ],
+     "size": [
+      0.701,
+      1.044,
+      0.7285
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower interior (with stamens)"
+  },
+  {
+   "name": "TrumpetVineFlowerTube",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    1.2,
+    1.68,
+    1.2
+   ],
+   "tris": 50,
+   "budget": 260,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineFlowerTube.glb",
+     "kind": "solid",
+     "tris": 50,
+     "offset": [
+      0.0,
+      0.84,
+      0.0
+     ],
+     "size": [
+      1.2,
+      1.68,
+      1.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower tube (side view)"
+  },
+  {
+   "name": "TrumpetVineFloweringDrape",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "variant",
+   "size": [
+    8.2719,
+    6.87,
+    6.2736
+   ],
+   "tris": 4644,
+   "budget": 9700,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineFloweringDrape.glb",
+     "kind": "solid",
+     "tris": 4644,
+     "offset": [
+      0.0,
+      3.435,
+      0.0
+     ],
+     "size": [
+      8.2719,
+      6.87,
+      6.2736
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Flowering Drape (blooms)"
+  },
+  {
+   "name": "TrumpetVineLeaf",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    2.6489,
+    2.5381,
+    0.2596
+   ],
+   "tris": 72,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineLeaf.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      1.2691,
+      0.0
+     ],
+     "size": [
+      2.6489,
+      2.5381,
+      0.2596
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (single, oval with pointed tip)"
+  },
+  {
+   "name": "TrumpetVineLeafAttachment",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    0.7836,
+    0.7503,
+    0.2617
+   ],
+   "tris": 28,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineLeafAttachment.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.3751,
+      0.0
+     ],
+     "size": [
+      0.7836,
+      0.7503,
+      0.2617
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf attachment (nub)"
+  },
+  {
+   "name": "TrumpetVinePetalRim",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    3.1955,
+    1.6499,
+    2.8667
+   ],
+   "tris": 388,
+   "budget": 650,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVinePetalRim.glb",
+     "kind": "solid",
+     "tris": 388,
+     "offset": [
+      0.0,
+      0.8249,
+      0.0
+     ],
+     "size": [
+      3.1955,
+      1.6499,
+      2.8667
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "petal rim (top view) with throat"
+  },
+  {
+   "name": "TrumpetVineSmall",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "variant",
+   "size": [
+    5.7336,
+    5.3442,
+    5.4648
+   ],
+   "tris": 1556,
+   "budget": 5500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineSmall.glb",
+     "kind": "solid",
+     "tris": 1556,
+     "offset": [
+      0.0,
+      2.6721,
+      0.0
+     ],
+     "size": [
+      5.7336,
+      5.3442,
+      5.4648
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Small Vine (young)"
+  },
+  {
+   "name": "TrumpetVineWoodyFork",
+   "sheet": "V03",
+   "subject": "TrumpetVine",
+   "role": "part",
+   "size": [
+    3.2251,
+    4.142,
+    3.2677
+   ],
+   "tris": 604,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TrumpetVineWoodyFork.glb",
+     "kind": "solid",
+     "tris": 604,
+     "offset": [
+      0.0,
+      2.071,
+      0.0
+     ],
+     "size": [
+      3.2251,
+      4.142,
+      3.2677
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "woody fork (base)"
+  }
+ ],
+ "stats": {
+  "assets": 34,
+  "pieces": 34,
+  "solid": 34,
+  "water": 0,
+  "glow": 0,
+  "tris": 34578,
+  "vfxSockets": 0,
+  "paletteColours": 9,
+  "paletteLevels": 216,
+  "meshBytes": 3079292
+ },
+ "problems": []
+}

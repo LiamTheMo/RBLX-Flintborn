@@ -1,0 +1,554 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W05_dead_tree.blend",
+ "sheet": "W05",
+ "module": "dead_tree",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.95089,
+     0.95352,
+     0.95602,
+     0.95892,
+     0.96154,
+     0.96436,
+     0.96892,
+     0.97316,
+     0.97568,
+     0.9787,
+     0.98028,
+     0.98369,
+     0.9877,
+     0.98965,
+     0.99665,
+     1.00011,
+     1.00264,
+     1.00639,
+     1.01031,
+     1.01271,
+     1.016,
+     1.01918,
+     1.02239,
+     1.02514,
+     1.02804,
+     1.03167,
+     1.03436,
+     1.03884,
+     1.04132,
+     1.04482,
+     1.04739,
+     1.0496
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_bark",
+    "hex": "#A5653A",
+    "levels": [
+     0.93672,
+     0.94985,
+     0.95469,
+     0.95915,
+     0.96236,
+     0.96582,
+     0.96948,
+     0.97246,
+     0.97579,
+     0.97929,
+     0.98287,
+     0.98621,
+     0.98974,
+     0.99244,
+     0.99584,
+     0.99873,
+     1.00143,
+     1.00495,
+     1.00799,
+     1.01112,
+     1.01434,
+     1.01728,
+     1.02076,
+     1.02433,
+     1.02794,
+     1.03149,
+     1.03493,
+     1.03875,
+     1.0429,
+     1.04752,
+     1.05322,
+     1.06527
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_grass",
+    "hex": "#86AC22",
+    "levels": [
+     0.95047,
+     0.95495,
+     0.95927,
+     0.96365,
+     0.96514,
+     0.96668,
+     0.97022,
+     0.97302,
+     0.97631,
+     0.97986,
+     0.98221,
+     0.98516,
+     0.98753,
+     0.99066,
+     0.99291,
+     0.99524,
+     0.99817,
+     1.00146,
+     1.00504,
+     1.00878,
+     1.01356,
+     1.01531,
+     1.01725,
+     1.01957,
+     1.02274,
+     1.02592,
+     1.03257,
+     1.03465,
+     1.03993,
+     1.0441,
+     1.04832,
+     1.0495
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_heartwood",
+    "hex": "#F0B26E",
+    "levels": [
+     0.95205,
+     0.95611,
+     0.95979,
+     0.96273,
+     0.9653,
+     0.97427,
+     0.97789,
+     0.9814,
+     0.98767,
+     0.98915,
+     0.99611,
+     1.00012,
+     1.00346,
+     1.00825,
+     1.01036,
+     1.01388,
+     1.02056,
+     1.02493,
+     1.02903,
+     1.03159,
+     1.03418,
+     1.03757,
+     1.03973,
+     1.04259,
+     1.04482,
+     1.04757,
+     1.05939,
+     0.94162,
+     0.9692,
+     0.98493,
+     0.94632
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_hollow",
+    "hex": "#1C130F",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_leaf",
+    "hex": "#9CBB1C",
+    "levels": [
+     0.95202,
+     0.96076,
+     0.96374,
+     0.96599,
+     0.97,
+     0.98075,
+     0.98384,
+     0.99493,
+     0.99749,
+     1.00308,
+     1.00508,
+     1.01088,
+     1.01823,
+     1.02068,
+     1.02762,
+     1.03001,
+     1.03466,
+     1.03777,
+     1.04569,
+     1.0492,
+     0.98866,
+     0.95646,
+     0.97651,
+     0.98731,
+     1.01487,
+     0.99176,
+     1.00028,
+     1.02338,
+     1.04011,
+     1.00736,
+     1.01615,
+     1.04276
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_moss",
+    "hex": "#C6CB1F",
+    "levels": [
+     0.95007,
+     0.95353,
+     0.95636,
+     0.96031,
+     0.96611,
+     0.97411,
+     0.97777,
+     0.98393,
+     0.98833,
+     0.99371,
+     0.99682,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00721,
+     1.01002,
+     1.01284,
+     1.01539,
+     1.0211,
+     1.02505,
+     1.02765,
+     1.03089,
+     1.03288,
+     1.03811,
+     1.04485,
+     1.0481,
+     1.04965
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "DeadBranchModuleA",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "part",
+   "size": [
+    7.1473,
+    4.9827,
+    4.9395
+   ],
+   "tris": 243,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadBranchModuleA.glb",
+     "kind": "solid",
+     "tris": 243,
+     "offset": [
+      0.0,
+      2.4914,
+      0.0
+     ],
+     "size": [
+      7.1473,
+      4.9827,
+      4.9395
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "long kinked limb; the heartwood cut end (+X) attaches to a trunk; includes the loose short stick and splinter the parts column shows"
+  },
+  {
+   "name": "DeadBranchModuleB",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "part",
+   "size": [
+    7.2834,
+    3.152,
+    1.8013
+   ],
+   "tris": 140,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadBranchModuleB.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      1.576,
+      0.0
+     ],
+     "size": [
+      7.2834,
+      3.152,
+      1.8013
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "chunky forked limb with a Y-split tip; the heartwood cut end (+X) attaches"
+  },
+  {
+   "name": "DeadTree",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "hero",
+   "size": [
+    19.5283,
+    23.6,
+    19.5107
+   ],
+   "tris": 3176,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadTree.glb",
+     "kind": "solid",
+     "tris": 3176,
+     "offset": [
+      0.0,
+      11.8,
+      0.0
+     ],
+     "size": [
+      19.5283,
+      23.6,
+      19.5107
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bare dead tree: braided trunk, roots, limbs and the two big boulders collide (precise keeps the gaps between limbs open); grass tufts, pebbles and moss patches carry kit_nocollide=1"
+  },
+  {
+   "name": "DeadTreeLeaning",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "variant",
+   "size": [
+    18.1076,
+    20.2,
+    12.3164
+   ],
+   "tris": 1840,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadTreeLeaning.glb",
+     "kind": "solid",
+     "tris": 1840,
+     "offset": [
+      0.0,
+      10.1,
+      0.0
+     ],
+     "size": [
+      18.1076,
+      20.2,
+      12.3164
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk leans ~18 deg to +X; the large rock at the -X base collides; dressing faces carry kit_nocollide=1"
+  },
+  {
+   "name": "DeadTreeSnappedTrunk",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "variant",
+   "size": [
+    13.085,
+    7.605,
+    9.5026
+   ],
+   "tris": 1145,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadTreeSnappedTrunk.glb",
+     "kind": "solid",
+     "tris": 1145,
+     "offset": [
+      0.0,
+      3.8025,
+      0.0
+     ],
+     "size": [
+      13.085,
+      7.605,
+      9.5026
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "snapped hollow stump + fallen section (walk over/around); dressing faces carry kit_nocollide=1"
+  },
+  {
+   "name": "DeadTreeUpright",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "variant",
+   "size": [
+    13.8298,
+    23.6,
+    12.0839
+   ],
+   "tris": 1677,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadTreeUpright.glb",
+     "kind": "solid",
+     "tris": 1677,
+     "offset": [
+      0.0,
+      11.8,
+      0.0
+     ],
+     "size": [
+      13.8298,
+      23.6,
+      12.0839
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tall narrow dead tree; dressing faces carry kit_nocollide=1"
+  },
+  {
+   "name": "DeadTrunkBase",
+   "sheet": "W05",
+   "subject": "DeadTree",
+   "role": "part",
+   "size": [
+    8.9218,
+    9.465,
+    8.973
+   ],
+   "tris": 536,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DeadTrunkBase.glb",
+     "kind": "solid",
+     "tris": 536,
+     "offset": [
+      0.0,
+      4.7325,
+      0.0
+     ],
+     "size": [
+      8.9218,
+      9.465,
+      8.973
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "splintered trunk base with roots; limbs or modules dock into the jagged top"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 8757,
+  "vfxSockets": 0,
+  "paletteColours": 7,
+  "paletteLevels": 192,
+  "meshBytes": 883968
+ },
+ "problems": []
+}

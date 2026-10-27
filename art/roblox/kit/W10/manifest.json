@@ -1,0 +1,3245 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W10",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w10_banner",
+    "hex": "#B8191F",
+    "levels": [
+     0.94347,
+     0.96221,
+     0.99164,
+     1.00076,
+     1.01513,
+     1.0176,
+     1.02517,
+     1.03914,
+     1.04765,
+     1.06202
+    ],
+    "used": false
+   },
+   {
+    "key": "w10_bedroll",
+    "hex": "#2C6A52",
+    "levels": [
+     0.93874,
+     0.96049,
+     1.01706,
+     1.02091,
+     1.03418,
+     1.05088,
+     1.06424,
+     1.06737
+    ],
+    "used": false
+   },
+   {
+    "key": "w10_canvas",
+    "hex": "#EEDFBF",
+    "levels": [
+     0.9314,
+     0.93601,
+     0.94154,
+     0.95377,
+     0.96386,
+     0.96424,
+     0.96424,
+     0.96424,
+     0.96915,
+     0.97948,
+     0.98165,
+     0.99176,
+     1.00084,
+     1.01221,
+     1.01809,
+     1.01809,
+     1.01809,
+     1.01809,
+     1.02829,
+     1.0423,
+     1.05079,
+     1.05079,
+     1.05363,
+     1.05363,
+     1.05363,
+     1.05436,
+     1.06135,
+     1.06135,
+     1.06235,
+     1.06235,
+     1.06235,
+     1.06474
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_foliage",
+    "hex": "#3F8C24",
+    "levels": [
+     0.91722,
+     0.9331,
+     0.94015,
+     0.94503,
+     0.95115,
+     0.95591,
+     0.9614,
+     0.96607,
+     0.96954,
+     0.97432,
+     0.98115,
+     0.98677,
+     0.99394,
+     0.99997,
+     1.00421,
+     1.00999,
+     1.01381,
+     1.01721,
+     1.02082,
+     1.02458,
+     1.02809,
+     1.03143,
+     1.03474,
+     1.03942,
+     1.04311,
+     1.04632,
+     1.0508,
+     1.05373,
+     1.05702,
+     1.06252,
+     1.06704,
+     1.08494
+    ],
+    "used": false
+   },
+   {
+    "key": "w10_iron",
+    "hex": "#4A4A50",
+    "levels": [
+     0.93022,
+     0.94192,
+     0.94676,
+     0.95371,
+     0.95406,
+     0.95868,
+     0.96407,
+     0.96687,
+     0.97235,
+     0.97952,
+     0.98617,
+     0.99116,
+     0.99189,
+     0.99685,
+     1.00369,
+     1.00848,
+     1.01208,
+     1.01424,
+     1.01798,
+     1.02044,
+     1.0228,
+     1.02447,
+     1.02942,
+     1.0317,
+     1.03878,
+     1.04208,
+     1.04403,
+     1.04623,
+     1.05366,
+     1.05958,
+     1.06655,
+     1.06913
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_lantern",
+    "hex": "#FFB022",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "w10_rope",
+    "hex": "#D9BC84",
+    "levels": [
+     0.93112,
+     0.93522,
+     0.93878,
+     0.94633,
+     0.95002,
+     0.95269,
+     0.95535,
+     0.95871,
+     0.96108,
+     0.96527,
+     0.96897,
+     0.97143,
+     0.97563,
+     0.98011,
+     0.98815,
+     0.99544,
+     0.99918,
+     1.00323,
+     1.00825,
+     1.01275,
+     1.01766,
+     1.02118,
+     1.02562,
+     1.02903,
+     1.03406,
+     1.03856,
+     1.04594,
+     1.04966,
+     1.05496,
+     1.05984,
+     1.06594,
+     1.06987
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_snow",
+    "hex": "#F2F6FA",
+    "levels": [
+     0.93072,
+     0.93429,
+     0.93608,
+     0.93948,
+     0.95862,
+     0.96145,
+     0.96812,
+     0.99034,
+     0.99329,
+     1.00809,
+     1.01326,
+     1.01602,
+     1.0205,
+     1.02287,
+     1.02698,
+     1.03562,
+     1.04506,
+     1.05344,
+     1.06011,
+     1.06574,
+     0.99735,
+     0.95493,
+     1.03217,
+     1.04195,
+     0.98727
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_stone",
+    "hex": "#B4ADA8",
+    "levels": [
+     0.93025,
+     0.93421,
+     0.9397,
+     0.94515,
+     0.951,
+     0.95848,
+     0.9641,
+     0.96901,
+     0.97401,
+     0.97827,
+     0.98294,
+     0.98705,
+     0.99212,
+     0.99433,
+     1.00014,
+     1.00438,
+     1.00716,
+     1.01057,
+     1.015,
+     1.01945,
+     1.02297,
+     1.02805,
+     1.03081,
+     1.03446,
+     1.03901,
+     1.04276,
+     1.04622,
+     1.05,
+     1.05779,
+     1.06118,
+     1.06497,
+     1.06999
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_tentcanvas",
+    "hex": "#EFE2C4",
+    "levels": [
+     0.93608,
+     0.94611,
+     0.94897,
+     0.95436,
+     0.96012,
+     0.96807,
+     0.97157,
+     0.9778,
+     0.98008,
+     0.98588,
+     0.98882,
+     0.99388,
+     0.99652,
+     1.00645,
+     1.00926,
+     1.01233,
+     1.01538,
+     1.02229,
+     1.02513,
+     1.03065,
+     1.03778,
+     1.04163,
+     1.04401,
+     1.05095,
+     1.05317
+    ],
+    "used": false
+   },
+   {
+    "key": "w10_wood",
+    "hex": "#A8602C",
+    "levels": [
+     0.93003,
+     0.93358,
+     0.93793,
+     0.94423,
+     0.94866,
+     0.95232,
+     0.95744,
+     0.96222,
+     0.96765,
+     0.97182,
+     0.97582,
+     0.98051,
+     0.98601,
+     0.98991,
+     0.99475,
+     1.00021,
+     1.00413,
+     1.00794,
+     1.01222,
+     1.01594,
+     1.02056,
+     1.0246,
+     1.02858,
+     1.03224,
+     1.03672,
+     1.04178,
+     1.04564,
+     1.05013,
+     1.05512,
+     1.05994,
+     1.06542,
+     1.06979
+    ],
+    "used": true
+   },
+   {
+    "key": "w09_grass",
+    "hex": "#6CB436",
+    "levels": [
+     0.95,
+     0.95547,
+     0.95897,
+     0.96021,
+     0.96357,
+     0.96557,
+     0.97099,
+     0.97389,
+     0.97638,
+     0.97849,
+     0.9839,
+     0.98642,
+     0.99047,
+     0.99441,
+     0.99904,
+     1.00079,
+     1.0029,
+     1.006,
+     1.0077,
+     1.01234,
+     1.01421,
+     1.01624,
+     1.01934,
+     1.02346,
+     1.02587,
+     1.02848,
+     1.03231,
+     1.03565,
+     1.04066,
+     1.04301,
+     1.04531,
+     1.04926
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_chimney",
+    "hex": "#6A6870",
+    "levels": [
+     0.95187,
+     0.97594,
+     1.00127
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_cloth",
+    "hex": "#C8302C",
+    "levels": [
+     0.96061,
+     0.96679,
+     0.98185,
+     0.99432,
+     0.99735,
+     1.00603,
+     1.01125,
+     1.02293,
+     1.03057,
+     1.04016,
+     1.04965,
+     0.972,
+     0.99971
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_flame",
+    "hex": "#FFC24A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_mat",
+    "hex": "#3C8A5A",
+    "levels": [
+     0.97044,
+     0.98591,
+     0.99795,
+     1.01241,
+     1.0153,
+     1.02996,
+     1.041
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_moss",
+    "hex": "#7AB02E",
+    "levels": [
+     0.93836,
+     0.94693,
+     0.95088,
+     0.95448,
+     0.95795,
+     0.96136,
+     0.96431,
+     0.96696,
+     0.9689,
+     0.97071,
+     0.97243,
+     0.97436,
+     0.97632,
+     0.97909,
+     0.98187,
+     0.98515,
+     0.98878,
+     0.99192,
+     0.99553,
+     0.99991,
+     1.00653,
+     1.0101,
+     1.01346,
+     1.01662,
+     1.01958,
+     1.02303,
+     1.02668,
+     1.03003,
+     1.03334,
+     1.03676,
+     1.04406,
+     1.06365
+    ],
+    "used": true
+   },
+   {
+    "key": "w10_slate",
+    "hex": "#7C7A86",
+    "levels": [
+     0.9503,
+     0.9557,
+     0.95951,
+     0.96335,
+     0.96638,
+     0.9703,
+     0.972,
+     0.97615,
+     0.97949,
+     0.98486,
+     0.98693,
+     0.98952,
+     0.99189,
+     0.995,
+     0.99786,
+     1.00063,
+     1.00618,
+     1.00891,
+     1.01259,
+     1.0156,
+     1.01833,
+     1.0239,
+     1.02889,
+     1.03745,
+     1.04039,
+     1.04268,
+     1.04531,
+     1.04763,
+     1.04965
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "AFrameTent",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "hero",
+   "size": [
+    11.1036,
+    7.7025,
+    10.5512
+   ],
+   "tris": 988,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTent.glb",
+     "kind": "solid",
+     "tris": 976,
+     "offset": [
+      0.0,
+      3.8512,
+      0.0
+     ],
+     "size": [
+      11.1036,
+      7.7025,
+      10.5512
+     ]
+    },
+    {
+     "file": "meshes/AFrameTent_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -0.0258,
+      4.9854,
+      4.0644
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_AFrameTent_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0258,
+      4.9674,
+      4.0644
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "A-frame tent: crossed lashed poles and ridge, canvas sides, tied-back door flaps, mat and bedroll inside, guy ropes, crate, barrel, lantern | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "AFrameTentCanvasLeft",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    3.5,
+    6.08,
+    8.0
+   ],
+   "tris": 100,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentCanvasLeft.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      3.04,
+      0.0
+     ],
+     "size": [
+      3.5,
+      6.08,
+      8.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas panel (left)"
+  },
+  {
+   "name": "AFrameTentCanvasRight",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    3.5,
+    6.08,
+    8.0
+   ],
+   "tris": 100,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentCanvasRight.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      3.04,
+      0.0
+     ],
+     "size": [
+      3.5,
+      6.08,
+      8.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas panel (right)"
+  },
+  {
+   "name": "AFrameTentClosed",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "variant",
+   "size": [
+    11.5685,
+    7.7025,
+    10.28
+   ],
+   "tris": 952,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentClosed.glb",
+     "kind": "solid",
+     "tris": 940,
+     "offset": [
+      0.0,
+      3.8512,
+      0.0
+     ],
+     "size": [
+      11.5685,
+      7.7025,
+      10.28
+     ]
+    },
+    {
+     "file": "meshes/AFrameTentClosed_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -0.2583,
+      4.9854,
+      4.2
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_AFrameTentClosed_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.2583,
+      4.9674,
+      4.2
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "1. Closed: door panel laced shut | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "AFrameTentFrameEnd",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    7.8839,
+    7.6996,
+    0.7984
+   ],
+   "tris": 88,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentFrameEnd.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      3.8498,
+      0.0
+     ],
+     "size": [
+      7.8839,
+      7.6996,
+      0.7984
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "frame end (x2)"
+  },
+  {
+   "name": "AFrameTentMat",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    4.8,
+    1.0319,
+    5.0
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentMat.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      0.516,
+      0.0
+     ],
+     "size": [
+      4.8,
+      1.0319,
+      5.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tent mat with bedroll"
+  },
+  {
+   "name": "AFrameTentPeg",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    0.28,
+    0.8,
+    0.28
+   ],
+   "tris": 12,
+   "budget": 20,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentPeg.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      0.28,
+      0.8,
+      0.28
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "peg (x4)"
+  },
+  {
+   "name": "AFrameTentRidgePole",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "part",
+   "size": [
+    0.5074,
+    0.5431,
+    9.2728
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentRidgePole.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.2716,
+      0.0
+     ],
+     "size": [
+      0.5074,
+      0.5431,
+      9.2728
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ridge pole"
+  },
+  {
+   "name": "AFrameTentRolledDoorway",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "variant",
+   "size": [
+    11.1396,
+    7.7025,
+    10.28
+   ],
+   "tris": 1016,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentRolledDoorway.glb",
+     "kind": "solid",
+     "tris": 1004,
+     "offset": [
+      0.0,
+      3.8512,
+      0.0
+     ],
+     "size": [
+      11.1396,
+      7.7025,
+      10.28
+     ]
+    },
+    {
+     "file": "meshes/AFrameTentRolledDoorway_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -0.0078,
+      4.9854,
+      4.2
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_AFrameTentRolledDoorway_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0078,
+      4.9674,
+      4.2
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "2. Rolled Doorway: door canvas rolled up over the opening | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "AFrameTentTornWorn",
+   "sheet": "W10",
+   "subject": "AFrameTent",
+   "role": "variant",
+   "size": [
+    11.1036,
+    7.7025,
+    10.28
+   ],
+   "tris": 984,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AFrameTentTornWorn.glb",
+     "kind": "solid",
+     "tris": 972,
+     "offset": [
+      0.0,
+      3.8512,
+      0.0
+     ],
+     "size": [
+      11.1036,
+      7.7025,
+      10.28
+     ]
+    },
+    {
+     "file": "meshes/AFrameTentTornWorn_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -0.0258,
+      4.9854,
+      4.2
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_AFrameTentTornWorn_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0258,
+      4.9674,
+      4.2
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "3. Torn / Worn: hole torn in one side panel | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "CampAwning",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "hero",
+   "size": [
+    10.8702,
+    8.1822,
+    10.08
+   ],
+   "tris": 1650,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwning.glb",
+     "kind": "solid",
+     "tris": 1638,
+     "offset": [
+      0.0,
+      4.0911,
+      0.0
+     ],
+     "size": [
+      10.8702,
+      8.1822,
+      10.08
+     ]
+    },
+    {
+     "file": "meshes/CampAwning_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      4.6951,
+      4.864,
+      3.5
+     ],
+     "size": [
+      0.6,
+      0.84,
+      0.6
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CampAwning_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      4.6951,
+      4.84,
+      3.5
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "camp awning: four lashed poles on stone footings, ridge pole, draped sagging canvas, guy ropes; table, benches, crates, barrels, banner, lantern | VFX: lantern heat_glow | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "CampAwningCanvasCanopy",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "part",
+   "size": [
+    8.6,
+    1.88,
+    7.6
+   ],
+   "tris": 256,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningCanvasCanopy.glb",
+     "kind": "solid",
+     "tris": 256,
+     "offset": [
+      0.0,
+      0.94,
+      0.0
+     ],
+     "size": [
+      8.6,
+      1.88,
+      7.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas canopy: draped sheet"
+  },
+  {
+   "name": "CampAwningLeanTo",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "variant",
+   "size": [
+    8.9446,
+    7.1358,
+    8.68
+   ],
+   "tris": 1490,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningLeanTo.glb",
+     "kind": "solid",
+     "tris": 1478,
+     "offset": [
+      0.0,
+      3.5679,
+      0.0
+     ],
+     "size": [
+      8.9446,
+      7.1358,
+      8.68
+     ]
+    },
+    {
+     "file": "meshes/CampAwningLeanTo_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      3.9573,
+      4.864,
+      3.0
+     ],
+     "size": [
+      0.6,
+      0.84,
+      0.6
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CampAwningLeanTo_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      3.9573,
+      4.84,
+      3.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "3. Lean-To: single canvas sloping down to low back poles | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "CampAwningLongShelter",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "variant",
+   "size": [
+    15.88,
+    8.1554,
+    12.5488
+   ],
+   "tris": 1850,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningLongShelter.glb",
+     "kind": "solid",
+     "tris": 1838,
+     "offset": [
+      0.0,
+      4.0777,
+      0.0
+     ],
+     "size": [
+      15.88,
+      8.1554,
+      12.5488
+     ]
+    },
+    {
+     "file": "meshes/CampAwningLongShelter_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      6.6,
+      4.864,
+      3.7283
+     ],
+     "size": [
+      0.6,
+      0.84,
+      0.6
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CampAwningLongShelter_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      6.6,
+      4.84,
+      3.7283
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "2. Long Shelter: six poles | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "CampAwningPeg",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "part",
+   "size": [
+    0.28,
+    0.8,
+    0.28
+   ],
+   "tris": 12,
+   "budget": 20,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningPeg.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      0.28,
+      0.8,
+      0.28
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "peg"
+  },
+  {
+   "name": "CampAwningRidgePole",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "part",
+   "size": [
+    10.0728,
+    0.4728,
+    0.5051
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningRidgePole.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.2364,
+      0.0
+     ],
+     "size": [
+      10.0728,
+      0.4728,
+      0.5051
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ridge pole"
+  },
+  {
+   "name": "CampAwningSquareStall",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "variant",
+   "size": [
+    9.2038,
+    8.1822,
+    9.38
+   ],
+   "tris": 1650,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningSquareStall.glb",
+     "kind": "solid",
+     "tris": 1638,
+     "offset": [
+      0.0,
+      4.0911,
+      0.0
+     ],
+     "size": [
+      9.2038,
+      8.1822,
+      9.38
+     ]
+    },
+    {
+     "file": "meshes/CampAwningSquareStall_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      3.8393,
+      4.864,
+      3.25
+     ],
+     "size": [
+      0.6,
+      0.84,
+      0.6
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CampAwningSquareStall_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      3.8393,
+      4.84,
+      3.25
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "1. Square Stall | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "CampAwningTableSet",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "part",
+   "size": [
+    3.6,
+    1.74,
+    4.4
+   ],
+   "tris": 228,
+   "budget": 260,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningTableSet.glb",
+     "kind": "solid",
+     "tris": 228,
+     "offset": [
+      0.0,
+      0.87,
+      0.0
+     ],
+     "size": [
+      3.6,
+      1.74,
+      4.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "table and benches"
+  },
+  {
+   "name": "CampAwningWoodPost",
+   "sheet": "W10",
+   "subject": "CampAwning",
+   "role": "part",
+   "size": [
+    0.8189,
+    6.6728,
+    0.7984
+   ],
+   "tris": 68,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CampAwningWoodPost.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      3.3364,
+      0.0
+     ],
+     "size": [
+      0.8189,
+      6.6728,
+      0.7984
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wood post"
+  },
+  {
+   "name": "RuinLeanTo",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "hero",
+   "size": [
+    13.7244,
+    8.02,
+    10.0204
+   ],
+   "tris": 5822,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanTo.glb",
+     "kind": "solid",
+     "tris": 5810,
+     "offset": [
+      0.0,
+      4.01,
+      0.0
+     ],
+     "size": [
+      13.7244,
+      8.02,
+      10.0204
+     ]
+    },
+    {
+     "file": "meshes/RuinLeanTo_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -2.9873,
+      3.923,
+      2.7829
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_RuinLeanTo_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -2.9873,
+      3.905,
+      2.7829
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "ruin lean-to: canvas stretched from two lashed poles to a broken stone wall, bedroll, crates, barrel, banner, lantern, moss and rubble | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "RuinLeanToAbandoned",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "variant",
+   "size": [
+    13.239,
+    8.02,
+    9.6984
+   ],
+   "tris": 5710,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToAbandoned.glb",
+     "kind": "solid",
+     "tris": 5698,
+     "offset": [
+      0.0,
+      4.01,
+      0.0
+     ],
+     "size": [
+      13.239,
+      8.02,
+      9.6984
+     ]
+    },
+    {
+     "file": "meshes/RuinLeanToAbandoned_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -2.7463,
+      3.923,
+      2.9478
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_RuinLeanToAbandoned_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -2.7463,
+      3.905,
+      2.9478
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "3. Abandoned: torn canvas, scattered rubble | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "RuinLeanToBedMat",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    3.4,
+    1.0319,
+    2.2
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToBedMat.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      0.516,
+      0.0
+     ],
+     "size": [
+      3.4,
+      1.0319,
+      2.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bed mat"
+  },
+  {
+   "name": "RuinLeanToCanvasCanopy",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    8.0,
+    1.9261,
+    7.2
+   ],
+   "tris": 144,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToCanvasCanopy.glb",
+     "kind": "solid",
+     "tris": 144,
+     "offset": [
+      0.0,
+      0.963,
+      0.0
+     ],
+     "size": [
+      8.0,
+      1.9261,
+      7.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas canopy"
+  },
+  {
+   "name": "RuinLeanToPeg",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    0.28,
+    0.8,
+    0.28
+   ],
+   "tris": 12,
+   "budget": 20,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToPeg.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      0.28,
+      0.8,
+      0.28
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "peg"
+  },
+  {
+   "name": "RuinLeanToSnowShelter",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "variant",
+   "size": [
+    15.1478,
+    8.02,
+    10.248
+   ],
+   "tris": 6198,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToSnowShelter.glb",
+     "kind": "solid",
+     "tris": 6186,
+     "offset": [
+      0.0,
+      4.01,
+      0.0
+     ],
+     "size": [
+      15.1478,
+      8.02,
+      10.248
+     ]
+    },
+    {
+     "file": "meshes/RuinLeanToSnowShelter_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -3.6998,
+      3.923,
+      2.876
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_RuinLeanToSnowShelter_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -3.6998,
+      3.905,
+      2.876
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "1. Snow Shelter: snow on canvas, wall tops and ground | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "RuinLeanToTraderStall",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "variant",
+   "size": [
+    13.8122,
+    8.02,
+    10.2207
+   ],
+   "tris": 6058,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToTraderStall.glb",
+     "kind": "solid",
+     "tris": 6058,
+     "offset": [
+      0.0,
+      4.01,
+      0.0
+     ],
+     "size": [
+      13.8122,
+      8.02,
+      10.2207
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "2. Trader Stall: counter table with wares"
+  },
+  {
+   "name": "RuinLeanToUprightPost",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    0.8189,
+    5.4728,
+    0.7984
+   ],
+   "tris": 68,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToUprightPost.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      2.7364,
+      0.0
+     ],
+     "size": [
+      0.8189,
+      5.4728,
+      0.7984
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "upright post (x2)"
+  },
+  {
+   "name": "RuinLeanToWallAnchor",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    0.7,
+    1.22,
+    0.7
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToWallAnchor.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      0.61,
+      0.0
+     ],
+     "size": [
+      0.7,
+      1.22,
+      0.7
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall anchor"
+  },
+  {
+   "name": "RuinLeanToWallBlocks",
+   "sheet": "W10",
+   "subject": "RuinLeanTo",
+   "role": "part",
+   "size": [
+    5.9234,
+    3.92,
+    1.5355
+   ],
+   "tris": 660,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RuinLeanToWallBlocks.glb",
+     "kind": "solid",
+     "tris": 660,
+     "offset": [
+      0.0,
+      1.96,
+      0.0
+     ],
+     "size": [
+      5.9234,
+      3.92,
+      1.5355
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ruin wall blocks"
+  },
+  {
+   "name": "TimberHut",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "hero",
+   "size": [
+    12.9746,
+    10.6842,
+    12.4679
+   ],
+   "tris": 4398,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHut.glb",
+     "kind": "solid",
+     "tris": 4374,
+     "offset": [
+      0.0,
+      5.3421,
+      0.0
+     ],
+     "size": [
+      12.9746,
+      10.6842,
+      12.4679
+     ]
+    },
+    {
+     "file": "meshes/TimberHut_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      0.3113,
+      3.8572,
+      3.434
+     ],
+     "size": [
+      3.65,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberHut_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2887,
+      3.8392,
+      3.434
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberHut_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      1.9113,
+      3.8392,
+      3.434
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "timber hut: stone footing, plank walls with door, windows and lanterns, gables, canvas roof on a ridge beam, chimney, banner, barrel and crate | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "TimberHutCornerPost",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    1.0,
+    5.9,
+    1.0
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutCornerPost.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      2.95,
+      0.0
+     ],
+     "size": [
+      1.0,
+      5.9,
+      1.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner post (x4) on stone"
+  },
+  {
+   "name": "TimberHutDoorframe",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    2.7,
+    3.6,
+    0.4
+   ],
+   "tris": 80,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutDoorframe.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      2.7,
+      3.6,
+      0.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "doorframe + door"
+  },
+  {
+   "name": "TimberHutFloor",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    9.0,
+    0.3,
+    8.9
+   ],
+   "tris": 396,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutFloor.glb",
+     "kind": "solid",
+     "tris": 396,
+     "offset": [
+      0.0,
+      0.15,
+      0.0
+     ],
+     "size": [
+      9.0,
+      0.3,
+      8.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor"
+  },
+  {
+   "name": "TimberHutOpenWorkshop",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "variant",
+   "size": [
+    12.9746,
+    10.6842,
+    12.0899
+   ],
+   "tris": 4090,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutOpenWorkshop.glb",
+     "kind": "solid",
+     "tris": 4066,
+     "offset": [
+      0.0,
+      5.3421,
+      0.0
+     ],
+     "size": [
+      12.9746,
+      10.6842,
+      12.0899
+     ]
+    },
+    {
+     "file": "meshes/TimberHutOpenWorkshop_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      0.3113,
+      3.8572,
+      3.615
+     ],
+     "size": [
+      3.65,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberHutOpenWorkshop_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2887,
+      3.8392,
+      3.615
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberHutOpenWorkshop_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      1.9113,
+      3.8392,
+      3.615
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "2. Open Workshop: open front with workbench, crates and barrels | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "TimberHutRidgeBeam",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    0.6286,
+    0.6803,
+    10.0728
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutRidgeBeam.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.3402,
+      0.0
+     ],
+     "size": [
+      0.6286,
+      0.6803,
+      10.0728
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ridge beam"
+  },
+  {
+   "name": "TimberHutRoof",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    11.0,
+    4.48,
+    10.0
+   ],
+   "tris": 200,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutRoof.glb",
+     "kind": "solid",
+     "tris": 200,
+     "offset": [
+      0.0,
+      2.24,
+      0.0
+     ],
+     "size": [
+      11.0,
+      4.48,
+      10.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "roof (2 sides)"
+  },
+  {
+   "name": "TimberHutStandard",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "variant",
+   "size": [
+    11.9746,
+    10.2342,
+    11.4679
+   ],
+   "tris": 4398,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutStandard.glb",
+     "kind": "solid",
+     "tris": 4374,
+     "offset": [
+      0.0,
+      5.1171,
+      0.0
+     ],
+     "size": [
+      11.9746,
+      10.2342,
+      11.4679
+     ]
+    },
+    {
+     "file": "meshes/TimberHutStandard_glow_w10_flame.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      0.3113,
+      3.8572,
+      2.934
+     ],
+     "size": [
+      3.65,
+      0.63,
+      0.45
+     ],
+     "key": "w10_flame",
+     "color": "#FFC24A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberHutStandard_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2887,
+      3.8392,
+      2.934
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberHutStandard_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      1.9113,
+      3.8392,
+      2.934
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "1. Standard One-Room | lanterns: emissive glass + heat_glow light sockets"
+  },
+  {
+   "name": "TimberHutWallPanel",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "part",
+   "size": [
+    9.2535,
+    4.3,
+    0.6374
+   ],
+   "tris": 308,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutWallPanel.glb",
+     "kind": "solid",
+     "tris": 308,
+     "offset": [
+      0.0,
+      2.15,
+      0.0
+     ],
+     "size": [
+      9.2535,
+      4.3,
+      0.6374
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall panel (x4)"
+  },
+  {
+   "name": "TimberHutWeathered",
+   "sheet": "W10",
+   "subject": "TimberHut",
+   "role": "variant",
+   "size": [
+    10.0097,
+    10.2,
+    11.2215
+   ],
+   "tris": 7582,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberHutWeathered.glb",
+     "kind": "solid",
+     "tris": 7582,
+     "offset": [
+      0.0,
+      5.1,
+      0.0
+     ],
+     "size": [
+      10.0097,
+      10.2,
+      11.2215
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "3. Weathered: slate roof with holes, moss creeping up the walls"
+  }
+ ],
+ "stats": {
+  "assets": 39,
+  "pieces": 53,
+  "solid": 39,
+  "water": 0,
+  "glow": 14,
+  "tris": 57836,
+  "vfxSockets": 17,
+  "paletteColours": 13,
+  "paletteLevels": 302,
+  "meshBytes": 4688364
+ },
+ "problems": []
+}
