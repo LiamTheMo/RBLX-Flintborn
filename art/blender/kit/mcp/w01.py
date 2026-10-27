@@ -244,7 +244,7 @@ def herb(a, loc, size, seed, flowers=0, sprigs=8):
     return out
 
 
-def herb_bush(a, loc, size, seed, flowers=0, bright=False):
+def herb_bush(a, loc, size, seed, flowers=0, bright=False, lite=False):
     """Clover clump as the master draws it round the rocks at gameplay scale: a small bushy mound of
     chunky round-lobed leaf clusters (broad facets), a wide mid-green base clump and 2-3 higher lime
     clumps stepping up, with `flowers` white blooms with yellow centres on top. bright: young-leaf to
@@ -260,22 +260,24 @@ def herb_bush(a, loc, size, seed, flowers=0, bright=False):
     for k, (dx, dy, dz, r, sq, lime) in enumerate(specs):
         mat = K.mix_key(LEAF_YOUNG, MOSS_LIME, lime) if bright else K.mix_key(LEAF, LEAF_YOUNG, lime)
         v = a.leaf_cluster(r * size * rng.uniform(0.9, 1.1), loc=(x0 + dx * size, y0 + dy * size, z0 + dz * size),
-                           mat=mat, lobes=rng.choice((6, 7)), squash=sq, facets=1, depth=0.8, lobe_size=(0.5, 0.7),
+                           mat=mat, lobes=rng.choice((5, 6) if lite else (6, 7)), squash=sq, facets=1, depth=0.8, lobe_size=(0.5, 0.7),
                            seed=seed + 13 * k, floor=z0)
         K.texture(a, v, amp=0.05, scale=1.0, jitter=0.02, seed=seed + k)
         out += v
     for i in range(flowers):
         t = rng.uniform(0, 6.28)
         r = size * rng.uniform(0.1, 0.3)
-        flower5(a, (x0 + math.cos(t) * r, y0 + math.sin(t) * r, z0 + size * 0.68), size * 0.2, seed + 17 * i)
+        flower5(a, (x0 + math.cos(t) * r, y0 + math.sin(t) * r, z0 + size * 0.68), size * (0.26 if lite else 0.2),
+                seed + 17 * i)
     return out
 
 
-def dress_herbs(a, rx, ry, clumps, pebbles, seed, cx=0.0, cy=0.0, bright=False):
+def dress_herbs(a, rx, ry, clumps, pebbles, seed, cx=0.0, cy=0.0, bright=False, lite=False):
     """Herb clumps [(angle, size, flowers)] and pebbles [(angle, size, dist)] round an ellipse
     (angle 0 = +X, -pi/2 = the front), as at the foot of the master's rocks."""
     for i, (t, s, fl) in enumerate(clumps):
-        herb_bush(a, (cx + math.cos(t) * rx, cy + math.sin(t) * ry, 0), s, seed + i, flowers=fl, bright=bright)
+        herb_bush(a, (cx + math.cos(t) * rx, cy + math.sin(t) * ry, 0), s, seed + i, flowers=fl, bright=bright,
+                  lite=lite)
     for i, (t, s, dist) in enumerate(pebbles):
         v = K.pebble(a, (s, s * 0.85, s * 0.62), (cx + math.cos(t) * rx * dist, cy + math.sin(t) * ry * dist, 0),
                      seed + 50 + i, (ROCK, ROCK_COOL, ROCK_BASE)[i % 3])
@@ -679,96 +681,110 @@ EGG = [(0.0, 0.92, 10), (0.3, 1.0, 10), (0.6, 0.94, 9), (0.8, 0.78, 8), (0.93, 0
 # Gabled tall rock (Rock A): broad flat sides rising to a short ridge; few points, big facets.
 GABLE = [(0.0, 1.0, 7), (0.4, 0.95, 7), (0.7, 0.8, 6), (0.88, 0.52, 5), (1.0, 0.14, 2)]
 # Bulky low-facet boulder for Rock C and a coarse dome for Rock B.
-BULK = [(0.0, 0.96, 8), (0.35, 1.0, 8), (0.65, 0.92, 7), (0.85, 0.7, 6), (1.0, 0.36, 4)]
+BULK = [(0.0, 0.96, 8), (0.35, 1.0, 8), (0.65, 0.92, 7), (0.85, 0.7, 6), (0.95, 0.42, 4), (1.0, 0.14, 3)]
 # Squat dome for Rock B.
-DOME_LOW = [(0.0, 0.97, 8), (0.3, 1.0, 8), (0.62, 0.86, 7), (0.85, 0.6, 6), (1.0, 0.28, 4)]
+DOME_LOW = [(0.0, 0.97, 8), (0.3, 1.0, 8), (0.62, 0.86, 7), (0.85, 0.6, 6), (0.96, 0.32, 4), (1.0, 0.1, 3)]
 
 
 def cluster_rock(a, which, loc=(0, 0, 0), s=1.0, rot=0.0, seed=0, cap=True):
-    """Rock A (tall upright egg), B (squat dome) or C (barrel), each a finished part with its own
-    thin moss tuft and moss creeping up one face, as on the exploded view. Tagged as part `which`."""
-    spec = {"A": ((7.0, 6.2, 10.4), GABLE, (0.04, 0.06), -2.6, 0.55),
-            "B": ((7.2, 6.4, 4.8), DOME_LOW, (0.0, 0.0), -0.4, 0.5),
-            "C": ((9.4, 8.0, 6.2), BULK, (-0.03, 0.02), -2.4, 0.6)}[which]
+    """Rock A (tall gabled boulder), B (squat dome) or C (wide rounded dome), each a finished part:
+    crisp big facets, a lobed lime moss tuft on its crown and lime moss running down one face, as on the
+    exploded view. Tagged as part `which`."""
+    spec = {"A": ((7.8, 6.8, 10.4), GABLE, (0.04, 0.06), -2.5, 0.95),
+            "B": ((7.0, 6.2, 5.0), DOME_LOW, (0.0, 0.0), -0.5, 0.85),
+            "C": ((9.2, 8.2, 7.4), BULK, (-0.03, 0.02), -2.3, 0.95)}[which]
     size, rings, lean, side, cap_s = spec
     size = tuple(x * s for x in size)
     sd = seed or {"A": 411, "B": 421, "C": 431}[which]
-    vs = rock(a, size, loc=loc, seed=sd, rings=rings, rot=rot, lean=lean)
+    vs = rock(a, size, loc=loc, seed=sd, rings=rings, rot=rot, lean=lean, foot=False, jitter=0.06)
     name = f"rock_{which}_{sd}"
     K.tag_part(a, vs, name)
-    # leafy moss patches clinging up one face (thin mats laid on the face)
-    for k, (dz, ds) in enumerate(((0.22, 0.42), (0.48, 0.32))):
-        side_moss(a, K.part(a, name), side + rot + k * 0.25, size[2] * dz, ds * s, rot=1.3 + k, seed=sd + 5 + k,
-                  cx=loc[0], cy=loc[1])
+    # faint damp green at the foot of one face (moss is on the crowns, not painted down the faces)
+    stain(a, K.part(a, name), side + rot, spread=0.45, height=size[2] * 0.3, seed=sd + 6, cx=loc[0], cy=loc[1])
     if cap:
-        place_cap(a, (loc[0] - 0.2 * s, loc[1] + 0.1 * s), cap_s * s, rot + 0.5, sd + 2, on=K.part(a, name))
+        place_mounds(a, (loc[0] - 0.2 * s, loc[1] + 0.1 * s), cap_s * s, rot + 0.5, sd + 2, mounds=TUFT_CAP,
+                     on=K.part(a, name))
+    if which == "B":                        # a small clover tuft at its foot, as on the exploded view
+        t = side + rot
+        herb_bush(a, (loc[0] + math.cos(t) * size[0] * 0.5, loc[1] + math.sin(t) * size[1] * 0.5, 0), 1.8 * s,
+                  sd + 9, lite=True)
     return name
 
 
 CLUSTER_NOTES = {
-    "RockCluster": "three interlocking independent boulders: tall upright Rock A behind, barrel Rock C front-left, "
-                   "squat Rock B front-right; thin moss tufts on their crowns and moss creeping up their faces; "
-                   "clover with daisies in the gaps; pebbles at the front",
-    "RockClusterA": "Rock A alone: tall upright egg boulder with a moss tuft and moss up its left face",
+    "RockCluster": "three interlocking independent boulders: tall gabled Rock A behind, wide dome Rock C front-left, "
+                   "squat dome Rock B front-right; lobed lime moss tufts on their crowns with moss running down a "
+                   "face; bright clover clumps with white flowers in the gaps; pebbles at the front",
+    "RockClusterA": "Rock A alone: tall gabled boulder, moss tuft on the crown and moss down its left face",
     "RockClusterB": "Rock B alone: squat dome boulder with a moss tuft",
-    "RockClusterC": "Rock C alone: barrel boulder with a moss tuft and moss up its left face",
-    "RockClusterLinear": "Linear Cluster: two boulders in a row (low left, tall right) with clover and pebbles",
-    "RockClusterCrescent": "Crescent Cluster: three boulders on a curve, clover and pebbles",
-    "RockClusterTriangular": "Triangular Cluster: three boulders packed in a compact triangle, clover with a daisy",
+    "RockClusterC": "Rock C alone: wide rounded boulder with a moss tuft and moss down its left face",
+    "RockClusterLinear": "Linear Cluster: boulders in a row (low left, tall right) with clover and pebbles",
+    "RockClusterCrescent": "Crescent Cluster: three boulders on a curve, tall in the middle, clover and pebbles",
+    "RockClusterTriangular": "Triangular Cluster: three boulders packed in a compact triangle, clover with flowers",
 }
 
 
 def cluster_hero(a):
     cluster_rock(a, "A", (1.4, 2.4, 0))
-    cluster_rock(a, "C", (-3.8, -0.7, 0), rot=0.3)
-    cluster_rock(a, "B", (3.2, -3.0, 0), rot=-0.2)
-    # clover in the gaps between the rocks and round the foot; pebbles at the front
-    for i, (x, y, sz, fl) in enumerate(((7.3, 0.6, 2.1, 2), (-8.0, -1.9, 1.9, 1), (0.0, -4.6, 1.7, 1), (-1.6, 3.0, 1.4, 0),
-                                        (-4.8, -4.8, 1.4, 1), (7.0, -4.2, 1.4, 0), (5.0, 4.0, 1.3, 0))):
-        K.clover(a, (x, y, 0), sz, 450 + i, LEAF, flowers=fl, petal=PETAL, pollen=POLLEN, young_mat=LEAF_YOUNG)
-    for i, (x, y, sz) in enumerate(((-5.2, -3.4, 1.6), (-0.4, -5.6, 1.5), (6.3, -1.3, 1.4), (0.9, -4.9, 0.9))):
-        v = K.pebble(a, (sz, sz * 0.85, sz * 0.6), (x, y, 0), 470 + i, ROCK_COOL if i % 2 else ROCK)
+    cluster_rock(a, "C", (-3.6, -0.8, 0), rot=0.3)
+    cluster_rock(a, "B", (3.6, -3.0, 0), s=1.15, rot=-0.2)
+    # clover round the foot, (x, y, z, size, flowers); z > 0 climbs a rock side
+    for i, (x, y, z, sz, fl) in enumerate(((6.9, -0.2, 0.0, 3.4, 1), (-8.0, -1.8, 0.0, 3.4, 1),
+                                           (-0.2, -3.6, 0.0, 3.4, 1), (-5.0, -4.6, 0.0, 3.0, 0),
+                                           (6.6, -4.4, 0.0, 2.8, 0), (4.8, 3.8, 0.0, 2.8, 0),
+                                           (-6.9, 1.8, 0.0, 2.8, 0), (-1.8, 3.4, 0.0, 2.8, 0),
+                                           # in the joints between the rocks and climbing their sides
+                                           (0.5, -1.9, 1.2, 2.6, 1), (4.9, 0.4, 1.4, 2.6, 0),
+                                           (-1.2, 0.8, 2.2, 2.4, 0), (-6.6, -3.0, 0.9, 2.2, 0))):
+        herb_bush(a, (x, y, z), sz, 450 + i, flowers=fl, lite=True)
+    for i, (x, y, sz) in enumerate(((-5.6, -3.8, 2.0), (-1.0, -6.0, 1.9), (6.6, -1.8, 1.8), (1.6, -5.6, 1.5),
+                                    (-7.8, 0.4, 1.6), (3.0, -6.2, 1.2))):
+        v = K.pebble(a, (sz, sz * 0.85, sz * 0.6), (x, y, 0), 470 + i, (ROCK, ROCK_COOL, ROCK_BASE)[i % 3])
         K.texture(a, v, amp=0.08, scale=0.5, seed=470 + i)
 
 
 def cluster_linear(a):
-    """Linear: three boulders stepping up in a row, low B left, C middle, tall A right."""
-    cluster_rock(a, "B", (-6.2, -0.3, 0), s=0.7, rot=0.4, seed=480)
-    cluster_rock(a, "C", (-1.4, 0.0, 0), s=0.8, rot=0.2, seed=481)
-    cluster_rock(a, "A", (4.0, 0.4, 0), s=0.85, rot=-0.3, seed=482)
-    dress(a, 8.6, 3.6, ((-2.7, 1.4, 1), (-0.4, 1.3, 0), (0.15, 1.4, 1), (2.9, 1.2, 0), (-1.6, 1.2, 0)),
-          ((-1.2, 1.0), (-0.9, 0.7), (-1.9, 0.8)), 483)
+    """Linear: three touching boulders in a row, a small dome left, the tall one in the middle, a medium
+    one right."""
+    cluster_rock(a, "B", (-6.0, -0.3, 0), s=0.85, rot=0.3, seed=480)
+    cluster_rock(a, "A", (-0.6, 0.3, 0), s=0.85, rot=-0.2, seed=482)
+    cluster_rock(a, "C", (5.2, -0.1, 0), s=0.72, rot=0.4, seed=481)
+    dress_herbs(a, 8.4, 3.8, ((-2.8, 3.0, 1), (-1.9, 2.8, 0), (-1.2, 2.8, 1), (-0.4, 2.8, 0), (0.15, 3.0, 0),
+                              (2.0, 2.6, 0), (1.2, 2.6, 0)),
+                ((-1.4, 1.4, 1.15), (-0.8, 1.2, 1.2), (-2.0, 1.2, 1.15), (-0.3, 1.0, 1.2)), 483, lite=True)
 
 
 def cluster_crescent(a):
-    """Crescent: three boulders on a clear arc opening to the front, tall A at the centre-back."""
-    cluster_rock(a, "C", (-6.4, -1.4, 0), s=0.72, rot=0.9, seed=491)
+    """Crescent: three touching boulders on a clear arc opening to the front, tall A at the back."""
+    cluster_rock(a, "C", (-4.8, -2.6, 0), s=0.72, rot=0.9, seed=491)
     cluster_rock(a, "A", (0.0, 1.6, 0), s=0.85, rot=0.0, seed=492)
-    cluster_rock(a, "B", (6.4, -1.4, 0), s=0.8, rot=-0.9, seed=493)
-    dress(a, 6.0, 4.0, ((-2.8, 1.4, 0), (-1.6, 1.3, 1), (-0.4, 1.4, 0), (0.6, 1.2, 0)), ((-1.3, 0.9), (-1.8, 0.7)), 494)
+    cluster_rock(a, "B", (4.8, -2.6, 0), s=0.95, rot=-0.9, seed=493)
+    dress_herbs(a, 6.4, 4.6, ((-2.8, 3.0, 0), (-1.9, 2.8, 1), (-1.2, 2.8, 0), (-0.4, 2.6, 1), (0.4, 2.8, 0),
+                              (2.0, 2.6, 0), (1.2, 2.6, 0)),
+                ((-1.4, 1.3, 1.15), (-1.8, 1.1, 1.2), (-0.9, 1.0, 0.6)), 494, lite=True)
 
 
 def cluster_triangular(a):
-    cluster_rock(a, "A", (0.8, 1.6, 0), s=0.85, seed=501)
-    cluster_rock(a, "C", (-2.3, -0.8, 0), s=0.75, rot=0.4, seed=502)
-    cluster_rock(a, "B", (2.6, -1.9, 0), s=0.7, rot=-0.3, seed=503)
-    dress(a, 4.6, 3.8, ((-2.6, 1.4, 1), (-1.5, 1.2, 1), (2.6, 1.4, 0), (0.0, 1.2, 0)), ((-1.1, 0.9), (-0.3, 0.7)), 504)
+    """Triangular: three boulders packed tight in a compact triangle, tall A behind."""
+    cluster_rock(a, "A", (0.6, 1.2, 0), s=0.85, seed=501)
+    cluster_rock(a, "C", (-2.1, -1.0, 0), s=0.75, rot=0.4, seed=502)
+    cluster_rock(a, "B", (2.4, -1.9, 0), s=0.8, rot=-0.3, seed=503)
+    dress_herbs(a, 4.8, 4.2, ((-2.6, 3.0, 1), (-1.5, 2.8, 1), (2.6, 3.0, 0), (0.0, 2.8, 0), (1.2, 2.5, 0),
+                              (-0.8, 2.6, 0)),
+                ((-1.1, 1.3, 1.15), (-0.3, 1.1, 1.2), (-2.2, 1.0, 1.15)), 504, lite=True)
 
 
 def cluster_row(render=True):
     palette()
-    specs = [("RockCluster", "hero", cluster_hero, 4500, "hull"),
+    specs = [("RockCluster", "hero", cluster_hero, 7000, "hull"),
              ("RockClusterA", "part", lambda a: cluster_rock(a, "A"), 1500, "hull"),
              ("RockClusterB", "part", lambda a: cluster_rock(a, "B"), 1500, "hull"),
              ("RockClusterC", "part", lambda a: cluster_rock(a, "C"), 1500, "hull"),
-             ("RockClusterLinear", "variant", cluster_linear, 4500, "hull"),
-             ("RockClusterCrescent", "variant", cluster_crescent, 4500, "hull"),
-             ("RockClusterTriangular", "variant", cluster_triangular, 4500, "hull")]
+             ("RockClusterLinear", "variant", cluster_linear, 5000, "hull"),
+             ("RockClusterCrescent", "variant", cluster_crescent, 5000, "hull"),
+             ("RockClusterTriangular", "variant", cluster_triangular, 5000, "hull")]
     objs = [K.mk(SHEET, n, fn, subject="RockCluster", role=r, notes=CLUSTER_NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
-    # exploded cell: the moss cap floats above the main rock, as on the master
-    rk, cap = objs[1], objs[2]
-    cap.location = (rk.location.x - 0.8, rk.location.y + 0.4, rk.location.z + 9.0)
     for o in objs:
         if any(m.name == "FB_" + MOSS_LIME for m in o.data.materials):
             o["kit_shading_ok"] = ("moss clumps: the darker side band is the stem layer under the lime top "
@@ -870,9 +886,6 @@ def pebble_row(render=True):
              ("PebbleScatterDense", "variant", pebble_dense, 4500, "none")]
     objs = [K.mk(SHEET, n, fn, subject="PebbleScatter", role=r, notes=PEBBLE_NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
-    # exploded cell: the moss cap floats above the main rock, as on the master
-    rk, cap = objs[1], objs[2]
-    cap.location = (rk.location.x - 0.8, rk.location.y + 0.4, rk.location.z + 9.0)
     for o in objs:
         if any(m.name == "FB_" + MOSS_LIME for m in o.data.materials):
             o["kit_shading_ok"] = ("moss clumps: the darker side band is the stem layer under the lime top "
