@@ -267,6 +267,17 @@ function render()
 				},
 			})
 		end
+		-- Tradeable berries deposited in the vault offer from the backpack only.
+		local stored = {}
+		for _, item in view.items or {} do
+			if item.quantity and TradeRules.IsTradeableSlot(item) then
+				table.insert(stored, item.name)
+			end
+		end
+		if #stored > 0 then
+			line("Withdraw " .. table.concat(stored, ", ") .. " from the vault to offer it.", TEXT)
+		end
+		line("Rare materials and rare berries trade; ores, bars and common materials never do.", TEXT)
 	end
 	local now = workspace:GetServerTimeNow()
 	if session.confirmAt and now < session.confirmAt then

@@ -286,6 +286,6 @@
     "level": 12,
     "xp": 0.36,
     "selectedSlot": 1,
-    "prompt": { "key": "F", "title": "Gather Berries", "subtitle": "Yields Food" }
+    "prompt": { "key": "F", "title": "Gather Redberries", "subtitle": "Yields Food" }
   }
 }

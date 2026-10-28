@@ -1,0 +1,1750 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V07",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v07_bell",
+    "hex": "#D67AD6",
+    "levels": [
+     0.95136,
+     0.95935,
+     0.96243,
+     0.96471,
+     0.96974,
+     0.97273,
+     0.97437,
+     0.9792,
+     0.98223,
+     0.98553,
+     0.98884,
+     0.99506,
+     0.99847,
+     1.01298,
+     1.01798,
+     1.0256,
+     1.03004,
+     1.03323,
+     1.03589,
+     1.04016,
+     1.04209
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_grass",
+    "hex": "#6FA83A",
+    "levels": [
+     0.95364,
+     0.95549,
+     0.96152,
+     0.96545,
+     0.97093,
+     0.97493,
+     0.98168,
+     0.9883,
+     0.99547,
+     1.00194,
+     1.00859,
+     1.02374,
+     1.02585,
+     1.02827,
+     1.03036,
+     1.03672,
+     1.03986,
+     1.04231,
+     1.04462,
+     1.04823
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_greywood",
+    "hex": "#8A7C70",
+    "levels": [
+     0.95182,
+     0.95573,
+     0.95895,
+     0.96395,
+     0.96615,
+     0.96988,
+     0.97471,
+     0.98137,
+     0.98722,
+     0.9893,
+     0.99324,
+     0.99735,
+     1.00016,
+     1.00469,
+     1.01389,
+     1.01925,
+     1.02252,
+     1.03083,
+     1.03349,
+     1.03637,
+     1.04113,
+     1.0435,
+     1.04783,
+     1.02647,
+     0.9844,
+     0.979,
+     0.97688,
+     1.00799,
+     1.01646,
+     1.01146,
+     0.96152,
+     1.00237
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_leaf",
+    "hex": "#7EBE38",
+    "levels": [
+     0.95043,
+     0.95531,
+     0.95853,
+     0.96354,
+     0.96641,
+     0.97103,
+     0.97337,
+     0.97555,
+     0.97844,
+     0.98163,
+     0.98434,
+     0.99009,
+     0.99227,
+     0.99641,
+     0.99868,
+     1.00108,
+     1.00446,
+     1.01307,
+     1.01663,
+     1.02109,
+     1.02347,
+     1.03092,
+     1.03326,
+     1.03602,
+     1.03869,
+     1.04212,
+     1.04378,
+     1.04544,
+     1.04911,
+     1.00932,
+     1.00808,
+     1.02699
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_needle",
+    "hex": "#5DAE3A",
+    "levels": [
+     0.95004,
+     0.95307,
+     0.954,
+     0.95558,
+     0.95639,
+     0.96207,
+     0.96622,
+     0.96962,
+     0.97023,
+     0.97572,
+     0.9771,
+     0.97877,
+     0.97969,
+     0.98813,
+     0.99381,
+     0.99952,
+     1.00048,
+     1.00214,
+     1.00385,
+     1.00688,
+     1.0111,
+     1.01309,
+     1.01799,
+     1.02068,
+     1.02295,
+     1.02881,
+     1.03134,
+     1.03321,
+     1.03483,
+     1.04016,
+     1.0445,
+     1.04996
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_pink",
+    "hex": "#D97AB8",
+    "levels": [
+     0.95022,
+     0.9524,
+     0.9559,
+     0.95806,
+     0.96074,
+     0.96293,
+     0.96581,
+     0.96762,
+     0.97088,
+     0.97376,
+     0.97784,
+     0.98494,
+     0.98664,
+     0.98919,
+     0.99171,
+     0.99554,
+     0.9985,
+     1.00155,
+     1.00663,
+     1.00891,
+     1.01259,
+     1.01724,
+     1.01905,
+     1.02741,
+     1.02979,
+     1.03193,
+     1.03733,
+     1.03919,
+     1.04554
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_rock",
+    "hex": "#8A6A4E",
+    "levels": [
+     0.97504,
+     0.98238,
+     0.98865,
+     1.01745,
+     1.04763,
+     1.02497,
+     1.04488
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_rosette",
+    "hex": "#5FB33A",
+    "levels": [
+     0.9512,
+     0.95614,
+     0.95889,
+     0.96069,
+     0.96477,
+     0.96726,
+     0.9683,
+     0.97126,
+     0.97495,
+     0.97744,
+     0.98056,
+     0.983,
+     0.98391,
+     0.98668,
+     0.98995,
+     0.99747,
+     1.00294,
+     1.00804,
+     1.00924,
+     1.01125,
+     1.01398,
+     1.01955,
+     1.02281,
+     1.02598,
+     1.03071,
+     1.03363,
+     1.03585,
+     1.03898,
+     1.04231,
+     1.04441,
+     1.0466
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_seed",
+    "hex": "#A8743A",
+    "levels": [
+     0.95328,
+     0.95649,
+     0.95806,
+     0.9613,
+     0.96513,
+     0.96807,
+     0.97088,
+     0.97784,
+     0.98124,
+     0.98711,
+     0.98965,
+     0.99153,
+     0.99492,
+     1.00339,
+     1.00494,
+     1.00779,
+     1.00944,
+     1.01393,
+     1.01682,
+     1.01953,
+     1.02646,
+     1.03172,
+     1.03745,
+     1.0451,
+     1.04785
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_snow",
+    "hex": "#EEF2F6",
+    "levels": [
+     0.98137,
+     1.01953
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_straw",
+    "hex": "#E2B865",
+    "levels": [
+     0.95015,
+     0.95284,
+     0.95608,
+     0.96188,
+     0.96545,
+     0.97121,
+     0.97557,
+     0.97875,
+     0.98189,
+     0.98426,
+     0.98995,
+     0.99547,
+     1.00159,
+     1.00338,
+     1.00912,
+     1.02432,
+     1.03096,
+     1.03672,
+     1.03939,
+     1.04231,
+     1.04502,
+     1.04918
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_thorn",
+    "hex": "#C2652A",
+    "levels": [
+     0.95226,
+     0.95728,
+     0.96245,
+     0.97044,
+     0.97389,
+     0.97881,
+     0.98129,
+     0.98484,
+     0.98826,
+     0.99153,
+     0.99421,
+     0.99767,
+     0.99957,
+     1.00871,
+     1.013,
+     1.01866,
+     1.02059,
+     1.0239,
+     1.0267,
+     1.03364,
+     1.03923,
+     1.04579,
+     1.04824,
+     1.02996,
+     0.96562,
+     0.96762,
+     1.01593,
+     0.95964,
+     0.97649,
+     1.03705,
+     1.00165,
+     1.00487
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_white",
+    "hex": "#F4F2EA",
+    "levels": [
+     0.9541,
+     0.95647,
+     0.95907,
+     0.96201,
+     0.96489,
+     0.96807,
+     0.9706,
+     0.97441,
+     0.97928,
+     0.98128,
+     0.98687,
+     0.98967,
+     0.99268,
+     0.99538,
+     0.99852,
+     1.00141,
+     1.00412,
+     1.00798,
+     1.00944,
+     1.01314,
+     1.01582,
+     1.01903,
+     1.02015,
+     1.02294,
+     1.02609,
+     1.02944,
+     1.03221,
+     1.03548,
+     1.03751,
+     1.04471,
+     1.04798
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_wood",
+    "hex": "#8A5A34",
+    "levels": [
+     0.9516,
+     0.95408,
+     0.95972,
+     0.96222,
+     0.96418,
+     0.96494,
+     0.96797,
+     0.97122,
+     0.97423,
+     0.9763,
+     0.979,
+     0.98317,
+     0.9863,
+     0.99057,
+     0.99283,
+     0.99579,
+     1.00019,
+     1.00155,
+     1.00488,
+     1.0117,
+     1.01342,
+     1.01418,
+     1.01765,
+     1.02381,
+     1.02866,
+     1.03193,
+     1.03445,
+     1.03884,
+     1.04088,
+     1.04268,
+     1.04531,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "v07_yellow",
+    "hex": "#F2C42A",
+    "levels": [
+     0.96238,
+     0.97232,
+     0.97627,
+     0.97846,
+     0.98924,
+     1.00494,
+     1.00744,
+     1.01389,
+     1.03752
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "AlpineCushion",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "hero",
+   "size": [
+    7.0286,
+    2.3191,
+    6.2018
+   ],
+   "tris": 3670,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushion.glb",
+     "kind": "solid",
+     "tris": 3670,
+     "offset": [
+      0.0,
+      1.1596,
+      0.0
+     ],
+     "size": [
+      7.0286,
+      2.3191,
+      6.2018
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "alpine cushion: compact low mound packed with succulent leaf rosettes and four large white blooms with yellow centres"
+  },
+  {
+   "name": "AlpineCushionFlower",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "part",
+   "size": [
+    1.8186,
+    0.6939,
+    1.8186
+   ],
+   "tris": 308,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionFlower.glb",
+     "kind": "solid",
+     "tris": 308,
+     "offset": [
+      0.0,
+      0.347,
+      0.0
+     ],
+     "size": [
+      1.8186,
+      0.6939,
+      1.8186
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower (with center)"
+  },
+  {
+   "name": "AlpineCushionLeaf",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "part",
+   "size": [
+    0.6717,
+    1.3532,
+    0.9869
+   ],
+   "tris": 8,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionLeaf.glb",
+     "kind": "solid",
+     "tris": 8,
+     "offset": [
+      0.0,
+      0.6766,
+      0.0
+     ],
+     "size": [
+      0.6717,
+      1.3532,
+      0.9869
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (single)"
+  },
+  {
+   "name": "AlpineCushionLeafRosette",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "part",
+   "size": [
+    2.314,
+    0.9841,
+    2.0699
+   ],
+   "tris": 160,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionLeafRosette.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.4921,
+      0.0
+     ],
+     "size": [
+      2.314,
+      0.9841,
+      2.0699
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf rosette (small)"
+  },
+  {
+   "name": "AlpineCushionRootBase",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "part",
+   "size": [
+    1.8141,
+    0.6489,
+    1.814
+   ],
+   "tris": 320,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3244,
+      0.0
+     ],
+     "size": [
+      1.8141,
+      0.6489,
+      1.814
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (detachable)"
+  },
+  {
+   "name": "AlpineCushionSmall",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "variant",
+   "size": [
+    4.6467,
+    1.8691,
+    4.2898
+   ],
+   "tris": 3362,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionSmall.glb",
+     "kind": "solid",
+     "tris": 3362,
+     "offset": [
+      0.0,
+      0.9346,
+      0.0
+     ],
+     "size": [
+      4.6467,
+      1.8691,
+      4.2898
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Small Cushion"
+  },
+  {
+   "name": "AlpineCushionSnowCapped",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "variant",
+   "size": [
+    6.1837,
+    2.1391,
+    5.44
+   ],
+   "tris": 3720,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionSnowCapped.glb",
+     "kind": "solid",
+     "tris": 3720,
+     "offset": [
+      0.0,
+      1.0696,
+      0.0
+     ],
+     "size": [
+      6.1837,
+      2.1391,
+      5.44
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Snow-Capped"
+  },
+  {
+   "name": "AlpineCushionWide",
+   "sheet": "V07",
+   "subject": "AlpineCushion",
+   "role": "variant",
+   "size": [
+    8.649,
+    2.8245,
+    7.5458
+   ],
+   "tris": 5210,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AlpineCushionWide.glb",
+     "kind": "solid",
+     "tris": 5210,
+     "offset": [
+      0.0,
+      1.4123,
+      0.0
+     ],
+     "size": [
+      8.649,
+      2.8245,
+      7.5458
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide Cushion"
+  },
+  {
+   "name": "DryTussock",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "hero",
+   "size": [
+    4.977,
+    5.9883,
+    4.5002
+   ],
+   "tris": 928,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussock.glb",
+     "kind": "solid",
+     "tris": 928,
+     "offset": [
+      0.0,
+      2.9942,
+      0.0
+     ],
+     "size": [
+      4.977,
+      5.9883,
+      4.5002
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "dry tussock: broad curled straw-tan blades around a green heart, four tall stalks with brown seed heads"
+  },
+  {
+   "name": "DryTussockBlade",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "part",
+   "size": [
+    2.1838,
+    2.2911,
+    0.76
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockBlade.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.1456,
+      0.0
+     ],
+     "size": [
+      2.1838,
+      2.2911,
+      0.76
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "blade (single)"
+  },
+  {
+   "name": "DryTussockBladeCluster",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "part",
+   "size": [
+    2.2149,
+    1.4965,
+    2.2032
+   ],
+   "tris": 80,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockBladeCluster.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.7482,
+      0.0
+     ],
+     "size": [
+      2.2149,
+      1.4965,
+      2.2032
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "blade cluster (base)"
+  },
+  {
+   "name": "DryTussockHalfDry",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "variant",
+   "size": [
+    3.4718,
+    5.5416,
+    3.644
+   ],
+   "tris": 592,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockHalfDry.glb",
+     "kind": "solid",
+     "tris": 592,
+     "offset": [
+      0.0,
+      2.7708,
+      0.0
+     ],
+     "size": [
+      3.4718,
+      5.5416,
+      3.644
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Half-Dry"
+  },
+  {
+   "name": "DryTussockSeedHead",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "part",
+   "size": [
+    0.8134,
+    1.95,
+    0.787
+   ],
+   "tris": 140,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockSeedHead.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      0.975,
+      0.0
+     ],
+     "size": [
+      0.8134,
+      1.95,
+      0.787
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed head (top)"
+  },
+  {
+   "name": "DryTussockSeedStalk",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "part",
+   "size": [
+    0.6507,
+    4.3959,
+    0.6296
+   ],
+   "tris": 152,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockSeedStalk.glb",
+     "kind": "solid",
+     "tris": 152,
+     "offset": [
+      0.0,
+      2.1979,
+      0.0
+     ],
+     "size": [
+      0.6507,
+      4.3959,
+      0.6296
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed stalk (with heads)"
+  },
+  {
+   "name": "DryTussockShort",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "variant",
+   "size": [
+    3.6166,
+    2.0933,
+    3.1754
+   ],
+   "tris": 272,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockShort.glb",
+     "kind": "solid",
+     "tris": 272,
+     "offset": [
+      0.0,
+      1.0467,
+      0.0
+     ],
+     "size": [
+      3.6166,
+      2.0933,
+      3.1754
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short Tussock"
+  },
+  {
+   "name": "DryTussockTall",
+   "sheet": "V07",
+   "subject": "DryTussock",
+   "role": "variant",
+   "size": [
+    4.3471,
+    6.5457,
+    4.4889
+   ],
+   "tris": 1080,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DryTussockTall.glb",
+     "kind": "solid",
+     "tris": 1080,
+     "offset": [
+      0.0,
+      3.2729,
+      0.0
+     ],
+     "size": [
+      4.3471,
+      6.5457,
+      4.4889
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall Tussock"
+  },
+  {
+   "name": "Heather",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "hero",
+   "size": [
+    7.1082,
+    3.9874,
+    6.3727
+   ],
+   "tris": 5408,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Heather.glb",
+     "kind": "solid",
+     "tris": 5408,
+     "offset": [
+      0.0,
+      1.9937,
+      0.0
+     ],
+     "size": [
+      7.1082,
+      3.9874,
+      6.3727
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "heather: low spreading woody shrub of kinked brown branches tipped with chunky green needle tufts and hanging pink bell flowers"
+  },
+  {
+   "name": "HeatherBellFlower",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "part",
+   "size": [
+    0.9215,
+    1.3644,
+    1.064
+   ],
+   "tris": 48,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherBellFlower.glb",
+     "kind": "solid",
+     "tris": 48,
+     "offset": [
+      0.0,
+      0.6822,
+      0.0
+     ],
+     "size": [
+      0.9215,
+      1.3644,
+      1.064
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bell flower (with cap)"
+  },
+  {
+   "name": "HeatherBranchSegment",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "part",
+   "size": [
+    1.7208,
+    2.7055,
+    0.4803
+   ],
+   "tris": 60,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherBranchSegment.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.3528,
+      0.0
+     ],
+     "size": [
+      1.7208,
+      2.7055,
+      0.4803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch segment (base)"
+  },
+  {
+   "name": "HeatherFlowerUnderside",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "part",
+   "size": [
+    0.866,
+    0.08,
+    1.0
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherFlowerUnderside.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.04,
+      0.0
+     ],
+     "size": [
+      0.866,
+      0.08,
+      1.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower underside"
+  },
+  {
+   "name": "HeatherFlowerless",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "variant",
+   "size": [
+    6.5842,
+    3.9573,
+    5.9039
+   ],
+   "tris": 4736,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherFlowerless.glb",
+     "kind": "solid",
+     "tris": 4736,
+     "offset": [
+      0.0,
+      1.9787,
+      0.0
+     ],
+     "size": [
+      6.5842,
+      3.9573,
+      5.9039
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Flowerless"
+  },
+  {
+   "name": "HeatherLeafTuft",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "part",
+   "size": [
+    1.7013,
+    1.188,
+    1.2346
+   ],
+   "tris": 92,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherLeafTuft.glb",
+     "kind": "solid",
+     "tris": 92,
+     "offset": [
+      0.0,
+      0.594,
+      0.0
+     ],
+     "size": [
+      1.7013,
+      1.188,
+      1.2346
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf tuft (cluster)"
+  },
+  {
+   "name": "HeatherLowMat",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "variant",
+   "size": [
+    8.0127,
+    3.4441,
+    8.5307
+   ],
+   "tris": 5904,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherLowMat.glb",
+     "kind": "solid",
+     "tris": 5904,
+     "offset": [
+      0.0,
+      1.7221,
+      0.0
+     ],
+     "size": [
+      8.0127,
+      3.4441,
+      8.5307
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Low Mat"
+  },
+  {
+   "name": "HeatherUprightForm",
+   "sheet": "V07",
+   "subject": "Heather",
+   "role": "variant",
+   "size": [
+    5.7019,
+    4.3334,
+    5.238
+   ],
+   "tris": 4816,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeatherUprightForm.glb",
+     "kind": "solid",
+     "tris": 4816,
+     "offset": [
+      0.0,
+      2.1667,
+      0.0
+     ],
+     "size": [
+      5.7019,
+      4.3334,
+      5.238
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Upright Form"
+  },
+  {
+   "name": "ThornScrub",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "hero",
+   "size": [
+    12.0852,
+    5.358,
+    12.2315
+   ],
+   "tris": 4337,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrub.glb",
+     "kind": "solid",
+     "tris": 4337,
+     "offset": [
+      0.0,
+      2.679,
+      0.0
+     ],
+     "size": [
+      12.0852,
+      5.358,
+      12.2315
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "thorn scrub: twisted angular grey-brown woody branches forking twice from a grey rock base, chunky orange thorn spikes on alternating sides, three-leaf clusters at every tip"
+  },
+  {
+   "name": "ThornScrubBranchSegment",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "part",
+   "size": [
+    2.1859,
+    2.8938,
+    2.1896
+   ],
+   "tris": 60,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubBranchSegment.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.4469,
+      0.0
+     ],
+     "size": [
+      2.1859,
+      2.8938,
+      2.1896
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch segment (base) with side stub and thorns"
+  },
+  {
+   "name": "ThornScrubLeaf",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "part",
+   "size": [
+    1.701,
+    1.5876,
+    1.1923
+   ],
+   "tris": 128,
+   "budget": 250,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubLeaf.glb",
+     "kind": "solid",
+     "tris": 128,
+     "offset": [
+      0.0,
+      0.7938,
+      0.0
+     ],
+     "size": [
+      1.701,
+      1.5876,
+      1.1923
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (single) cluster"
+  },
+  {
+   "name": "ThornScrubLowSprawl",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "variant",
+   "size": [
+    12.7672,
+    5.3402,
+    13.0497
+   ],
+   "tris": 5195,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubLowSprawl.glb",
+     "kind": "solid",
+     "tris": 5195,
+     "offset": [
+      0.0,
+      2.6701,
+      0.0
+     ],
+     "size": [
+      12.7672,
+      5.3402,
+      13.0497
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Low Sprawl"
+  },
+  {
+   "name": "ThornScrubRootBase",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "part",
+   "size": [
+    2.0544,
+    1.32,
+    1.7651
+   ],
+   "tris": 39,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubRootBase.glb",
+     "kind": "solid",
+     "tris": 39,
+     "offset": [
+      0.0,
+      0.66,
+      0.0
+     ],
+     "size": [
+      2.0544,
+      1.32,
+      1.7651
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (detachable rock)"
+  },
+  {
+   "name": "ThornScrubTangled",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "variant",
+   "size": [
+    9.2661,
+    6.4423,
+    8.7726
+   ],
+   "tris": 6057,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubTangled.glb",
+     "kind": "solid",
+     "tris": 6057,
+     "offset": [
+      0.0,
+      3.2212,
+      0.0
+     ],
+     "size": [
+      9.2661,
+      6.4423,
+      8.7726
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tangled Form"
+  },
+  {
+   "name": "ThornScrubThorn",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "part",
+   "size": [
+    0.6145,
+    1.3,
+    0.6145
+   ],
+   "tris": 12,
+   "budget": 20,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubThorn.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.65,
+      0.0
+     ],
+     "size": [
+      0.6145,
+      1.3,
+      0.6145
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "thorn (spike)"
+  },
+  {
+   "name": "ThornScrubYoungGreen",
+   "sheet": "V07",
+   "subject": "ThornScrub",
+   "role": "variant",
+   "size": [
+    5.9759,
+    4.8531,
+    6.5113
+   ],
+   "tris": 1955,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ThornScrubYoungGreen.glb",
+     "kind": "solid",
+     "tris": 1955,
+     "offset": [
+      0.0,
+      2.4265,
+      0.0
+     ],
+     "size": [
+      5.9759,
+      4.8531,
+      6.5113
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Young Green"
+  }
+ ],
+ "stats": {
+  "assets": 32,
+  "pieces": 32,
+  "solid": 32,
+  "water": 0,
+  "glow": 0,
+  "tris": 58885,
+  "vfxSockets": 0,
+  "paletteColours": 15,
+  "paletteLevels": 357,
+  "meshBytes": 5613616
+ },
+ "problems": []
+}

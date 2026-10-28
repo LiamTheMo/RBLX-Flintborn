@@ -1,0 +1,1445 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V05",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v05_amber",
+    "hex": "#E89A2A",
+    "levels": [
+     0.95375,
+     0.9558,
+     0.96508,
+     1.00359,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_cap",
+    "hex": "#9A4E28",
+    "levels": [
+     0.95375,
+     0.98238,
+     0.98657,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_cream",
+    "hex": "#EDE3CF",
+    "levels": [
+     0.9571,
+     0.96508,
+     0.98238,
+     0.98657,
+     1.00074,
+     1.00359
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_dark",
+    "hex": "#6A5A30",
+    "levels": [
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_inner",
+    "hex": "#5E3A9A",
+    "levels": [
+     0.95724,
+     1.00074,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_leaf",
+    "hex": "#5DAE3A",
+    "levels": [
+     0.95078,
+     0.95304,
+     0.95759,
+     0.96156,
+     0.96794,
+     0.97148,
+     0.97501,
+     0.97699,
+     0.97929,
+     0.98035,
+     0.98169,
+     0.98589,
+     0.98877,
+     0.99138,
+     0.99295,
+     0.996,
+     0.99742,
+     0.99804,
+     1.00333,
+     1.00881,
+     1.01151,
+     1.01876,
+     1.02202,
+     1.02484,
+     1.02759,
+     1.02885,
+     1.03132,
+     1.03389,
+     1.03918,
+     1.04367,
+     1.04725,
+     1.04935
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_lilac",
+    "hex": "#C9B8E0",
+    "levels": [
+     0.96508,
+     0.98238,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_purple",
+    "hex": "#8A5ED0",
+    "levels": [
+     0.9558,
+     0.96508,
+     0.98238,
+     0.98657,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_root",
+    "hex": "#7A5638",
+    "levels": [
+     0.95375,
+     0.95724,
+     0.98238,
+     0.99336,
+     1.00359,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_spore",
+    "hex": "#6E4A38",
+    "levels": [
+     0.9558,
+     0.96508,
+     0.98238,
+     1.00359,
+     1.01509
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_stem",
+    "hex": "#A8A3A8",
+    "levels": [
+     0.98238,
+     1.00359
+    ],
+    "used": true
+   },
+   {
+    "key": "v05_wood",
+    "hex": "#8A5A3A",
+    "levels": [
+     0.98238
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "AmberOldDarkBracket",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "variant",
+   "size": [
+    5.8116,
+    4.4,
+    5.185
+   ],
+   "tris": 325,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberOldDarkBracket.glb",
+     "kind": "solid",
+     "tris": 325,
+     "offset": [
+      0.0,
+      2.2,
+      0.0
+     ],
+     "size": [
+      5.8116,
+      4.4,
+      5.185
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Old Dark Bracket"
+  },
+  {
+   "name": "AmberShelfCap",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "part",
+   "size": [
+    3.1972,
+    0.78,
+    4.4362
+   ],
+   "tris": 82,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberShelfCap.glb",
+     "kind": "solid",
+     "tris": 82,
+     "offset": [
+      0.0,
+      0.39,
+      0.0
+     ],
+     "size": [
+      3.1972,
+      0.78,
+      4.4362
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "shelf cap (top)"
+  },
+  {
+   "name": "AmberShelfFungus",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "hero",
+   "size": [
+    5.416,
+    5.2,
+    5.4438
+   ],
+   "tris": 595,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberShelfFungus.glb",
+     "kind": "solid",
+     "tris": 595,
+     "offset": [
+      0.0,
+      2.6,
+      0.0
+     ],
+     "size": [
+      5.416,
+      5.2,
+      5.4438
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "amber shelf fungus: broad layered orange bracket caps with cream rims growing from a faceted log section, leaves at the foot"
+  },
+  {
+   "name": "AmberSingleShelf",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "variant",
+   "size": [
+    5.4917,
+    4.0,
+    4.5411
+   ],
+   "tris": 333,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberSingleShelf.glb",
+     "kind": "solid",
+     "tris": 333,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      5.4917,
+      4.0,
+      4.5411
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Single Shelf"
+  },
+  {
+   "name": "AmberThickRim",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "part",
+   "size": [
+    2.0228,
+    0.16,
+    3.9709
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberThickRim.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      0.08,
+      0.0
+     ],
+     "size": [
+      2.0228,
+      0.16,
+      3.9709
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "thick rim (underside)"
+  },
+  {
+   "name": "AmberTieredStack",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "variant",
+   "size": [
+    5.2619,
+    4.6,
+    4.7791
+   ],
+   "tris": 577,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberTieredStack.glb",
+     "kind": "solid",
+     "tris": 577,
+     "offset": [
+      0.0,
+      2.3,
+      0.0
+     ],
+     "size": [
+      5.2619,
+      4.6,
+      4.7791
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tiered Stack"
+  },
+  {
+   "name": "AmberWoodChip",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "part",
+   "size": [
+    0.8405,
+    1.0,
+    0.6786
+   ],
+   "tris": 19,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodChip.glb",
+     "kind": "solid",
+     "tris": 19,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      0.8405,
+      1.0,
+      0.6786
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wood chip"
+  },
+  {
+   "name": "AmberWoodSupport",
+   "sheet": "V05",
+   "subject": "AmberShelfFungus",
+   "role": "part",
+   "size": [
+    2.5467,
+    4.4,
+    2.5486
+   ],
+   "tris": 51,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodSupport.glb",
+     "kind": "solid",
+     "tris": 51,
+     "offset": [
+      0.0,
+      2.2,
+      0.0
+     ],
+     "size": [
+      2.5467,
+      4.4,
+      2.5486
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wood support (log section)"
+  },
+  {
+   "name": "CaveTrumpetBase",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "part",
+   "size": [
+    1.3469,
+    0.5,
+    1.2066
+   ],
+   "tris": 23,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetBase.glb",
+     "kind": "solid",
+     "tris": 23,
+     "offset": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "size": [
+      1.3469,
+      0.5,
+      1.2066
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base (root, optional)"
+  },
+  {
+   "name": "CaveTrumpetCapUnderside",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "part",
+   "size": [
+    2.8532,
+    0.9,
+    3.0
+   ],
+   "tris": 36,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetCapUnderside.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      0.45,
+      0.0
+     ],
+     "size": [
+      2.8532,
+      0.9,
+      3.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cap underside (simplified)"
+  },
+  {
+   "name": "CaveTrumpetFungus",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "hero",
+   "size": [
+    6.5568,
+    3.52,
+    5.0365
+   ],
+   "tris": 551,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetFungus.glb",
+     "kind": "solid",
+     "tris": 551,
+     "offset": [
+      0.0,
+      1.76,
+      0.0
+     ],
+     "size": [
+      6.5568,
+      3.52,
+      5.0365
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cave trumpet fungus: two thick grey stems flaring into wide purple funnel caps with dark inner throats, dirt mound, leaves"
+  },
+  {
+   "name": "CaveTrumpetFunnelCap",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "part",
+   "size": [
+    3.1385,
+    1.24,
+    3.3
+   ],
+   "tris": 92,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetFunnelCap.glb",
+     "kind": "solid",
+     "tris": 92,
+     "offset": [
+      0.0,
+      0.62,
+      0.0
+     ],
+     "size": [
+      3.1385,
+      1.24,
+      3.3
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "funnel cap (shell)"
+  },
+  {
+   "name": "CaveTrumpetPaleYoung",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "variant",
+   "size": [
+    6.1563,
+    2.515,
+    3.3271
+   ],
+   "tris": 335,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetPaleYoung.glb",
+     "kind": "solid",
+     "tris": 335,
+     "offset": [
+      0.0,
+      1.2575,
+      0.0
+     ],
+     "size": [
+      6.1563,
+      2.515,
+      3.3271
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Pale Young"
+  },
+  {
+   "name": "CaveTrumpetShortWide",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "variant",
+   "size": [
+    6.4905,
+    2.19,
+    3.7143
+   ],
+   "tris": 335,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetShortWide.glb",
+     "kind": "solid",
+     "tris": 335,
+     "offset": [
+      0.0,
+      1.095,
+      0.0
+     ],
+     "size": [
+      6.4905,
+      2.19,
+      3.7143
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short & Wide"
+  },
+  {
+   "name": "CaveTrumpetStem",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "part",
+   "size": [
+    1.9,
+    1.8,
+    1.9
+   ],
+   "tris": 28,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetStem.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      1.9,
+      1.8,
+      1.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (stalk)"
+  },
+  {
+   "name": "CaveTrumpetTallFunnel",
+   "sheet": "V05",
+   "subject": "CaveTrumpetFungus",
+   "role": "variant",
+   "size": [
+    6.306,
+    4.055,
+    4.0236
+   ],
+   "tris": 335,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveTrumpetTallFunnel.glb",
+     "kind": "solid",
+     "tris": 335,
+     "offset": [
+      0.0,
+      2.0275,
+      0.0
+     ],
+     "size": [
+      6.306,
+      4.055,
+      4.0236
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall Funnel"
+  },
+  {
+   "name": "ChestnutButtonStage",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "variant",
+   "size": [
+    3.7928,
+    3.28,
+    2.6494
+   ],
+   "tris": 361,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutButtonStage.glb",
+     "kind": "solid",
+     "tris": 361,
+     "offset": [
+      0.0,
+      1.64,
+      0.0
+     ],
+     "size": [
+      3.7928,
+      3.28,
+      2.6494
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Button Stage"
+  },
+  {
+   "name": "ChestnutCap",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "part",
+   "size": [
+    3.1876,
+    1.15,
+    3.2153
+   ],
+   "tris": 74,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutCap.glb",
+     "kind": "solid",
+     "tris": 74,
+     "offset": [
+      0.0,
+      0.575,
+      0.0
+     ],
+     "size": [
+      3.1876,
+      1.15,
+      3.2153
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cap (top)"
+  },
+  {
+   "name": "ChestnutHarvestedStalk",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "variant",
+   "size": [
+    4.3277,
+    2.25,
+    2.1248
+   ],
+   "tris": 271,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutHarvestedStalk.glb",
+     "kind": "solid",
+     "tris": 271,
+     "offset": [
+      0.0,
+      1.125,
+      0.0
+     ],
+     "size": [
+      4.3277,
+      2.25,
+      2.1248
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested Stalk"
+  },
+  {
+   "name": "ChestnutLeaf",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "part",
+   "size": [
+    1.1873,
+    0.5302,
+    0.8905
+   ],
+   "tris": 16,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      0.2651,
+      0.0
+     ],
+     "size": [
+      1.1873,
+      0.5302,
+      0.8905
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ground leaf"
+  },
+  {
+   "name": "ChestnutMushroom",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "hero",
+   "size": [
+    6.4432,
+    4.0625,
+    5.7862
+   ],
+   "tris": 845,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutMushroom.glb",
+     "kind": "solid",
+     "tris": 845,
+     "offset": [
+      0.0,
+      2.0312,
+      0.0
+     ],
+     "size": [
+      6.4432,
+      4.0625,
+      5.7862
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "chestnut mushroom: three thick cream-stalked mushrooms with broad brown domed caps and cream undersides, dirt mound, leaf rosettes"
+  },
+  {
+   "name": "ChestnutOpenCap",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "variant",
+   "size": [
+    4.6239,
+    3.84,
+    4.631
+   ],
+   "tris": 455,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutOpenCap.glb",
+     "kind": "solid",
+     "tris": 455,
+     "offset": [
+      0.0,
+      1.92,
+      0.0
+     ],
+     "size": [
+      4.6239,
+      3.84,
+      4.631
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Open Cap"
+  },
+  {
+   "name": "ChestnutRootBase",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "part",
+   "size": [
+    1.2604,
+    0.5,
+    1.1272
+   ],
+   "tris": 23,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutRootBase.glb",
+     "kind": "solid",
+     "tris": 23,
+     "offset": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "size": [
+      1.2604,
+      0.5,
+      1.1272
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional)"
+  },
+  {
+   "name": "ChestnutStalk",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "part",
+   "size": [
+    1.7,
+    2.2,
+    1.7
+   ],
+   "tris": 28,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutStalk.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      1.1,
+      0.0
+     ],
+     "size": [
+      1.7,
+      2.2,
+      1.7
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stalk"
+  },
+  {
+   "name": "ChestnutUnderside",
+   "sheet": "V05",
+   "subject": "ChestnutMushroom",
+   "role": "part",
+   "size": [
+    2.9,
+    0.12,
+    2.9
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ChestnutUnderside.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.06,
+      0.0
+     ],
+     "size": [
+      2.9,
+      0.12,
+      2.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "underside (simplified)"
+  },
+  {
+   "name": "PuffballBase",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "part",
+   "size": [
+    1.4157,
+    0.5,
+    1.1448
+   ],
+   "tris": 23,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballBase.glb",
+     "kind": "solid",
+     "tris": 23,
+     "offset": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "size": [
+      1.4157,
+      0.5,
+      1.1448
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base (root, optional)"
+  },
+  {
+   "name": "PuffballFungus",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "hero",
+   "size": [
+    6.5349,
+    3.24,
+    4.7238
+   ],
+   "tris": 623,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballFungus.glb",
+     "kind": "solid",
+     "tris": 623,
+     "offset": [
+      0.0,
+      1.62,
+      0.0
+     ],
+     "size": [
+      6.5349,
+      3.24,
+      4.7238
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "puffball fungus: three faceted cream spore balls, the two larger with star-shaped openings, on a dirt mound with leaves"
+  },
+  {
+   "name": "PuffballInnerPlug",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "part",
+   "size": [
+    1.1794,
+    1.0,
+    1.2506
+   ],
+   "tris": 29,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballInnerPlug.glb",
+     "kind": "solid",
+     "tris": 29,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      1.1794,
+      1.0,
+      1.2506
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "inner plug (spores, simplified)"
+  },
+  {
+   "name": "PuffballMatureOpen",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "variant",
+   "size": [
+    6.6509,
+    3.44,
+    3.6987
+   ],
+   "tris": 331,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballMatureOpen.glb",
+     "kind": "solid",
+     "tris": 331,
+     "offset": [
+      0.0,
+      1.72,
+      0.0
+     ],
+     "size": [
+      6.6509,
+      3.44,
+      3.6987
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Mature (Open)"
+  },
+  {
+   "name": "PuffballOuterBulb",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "part",
+   "size": [
+    2.663,
+    2.8,
+    2.8
+   ],
+   "tris": 80,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballOuterBulb.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.4,
+      0.0
+     ],
+     "size": [
+      2.663,
+      2.8,
+      2.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "outer bulb (body)"
+  },
+  {
+   "name": "PuffballSmallGroup",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "variant",
+   "size": [
+    6.46,
+    1.94,
+    4.7761
+   ],
+   "tris": 659,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballSmallGroup.glb",
+     "kind": "solid",
+     "tris": 659,
+     "offset": [
+      0.0,
+      0.97,
+      0.0
+     ],
+     "size": [
+      6.46,
+      1.94,
+      4.7761
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Small Group"
+  },
+  {
+   "name": "PuffballYoungClosed",
+   "sheet": "V05",
+   "subject": "PuffballFungus",
+   "role": "variant",
+   "size": [
+    6.5059,
+    2.0,
+    2.7844
+   ],
+   "tris": 295,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PuffballYoungClosed.glb",
+     "kind": "solid",
+     "tris": 295,
+     "offset": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "size": [
+      6.5059,
+      2.0,
+      2.7844
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young (Closed)"
+  }
+ ],
+ "stats": {
+  "assets": 32,
+  "pieces": 32,
+  "solid": 32,
+  "water": 0,
+  "glow": 0,
+  "tris": 7914,
+  "vfxSockets": 0,
+  "paletteColours": 12,
+  "paletteLevels": 73,
+  "meshBytes": 767652
+ },
+ "problems": []
+}

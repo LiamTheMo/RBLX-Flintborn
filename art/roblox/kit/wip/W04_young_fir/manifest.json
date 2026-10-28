@@ -1,0 +1,466 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W04_young_fir.blend",
+ "sheet": "W04",
+ "module": "young_fir",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_bark",
+    "hex": "#9A6038",
+    "levels": [
+     0.925,
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05,
+     1.075
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_grass",
+    "hex": "#8DB83A",
+    "levels": [
+     0.925,
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05,
+     1.075,
+     1.1
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_ground",
+    "hex": "#DCC9A0",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_needle",
+    "hex": "#6A963E",
+    "levels": [
+     0.725,
+     0.75,
+     0.775
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_wood_end",
+    "hex": "#E4A458",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "YoungFir",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "hero",
+   "size": [
+    11.445,
+    17.0,
+    11.2193
+   ],
+   "tris": 1826,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFir.glb",
+     "kind": "solid",
+     "tris": 1826,
+     "offset": [
+      0.0,
+      8.5,
+      0.0
+     ],
+     "size": [
+      11.445,
+      17.0,
+      11.2193
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tiers + trunk + boulder collide; grass tufts, pebbles and soil patch faces carry kit_nocollide=1 (walk-through dressing)"
+  },
+  {
+   "name": "YoungFirCrownTier",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    5.3187,
+    5.4867,
+    5.6846
+   ],
+   "tris": 208,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirCrownTier.glb",
+     "kind": "solid",
+     "tris": 208,
+     "offset": [
+      0.0,
+      2.7434,
+      0.0
+     ],
+     "size": [
+      5.3187,
+      5.4867,
+      5.6846
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crown Tier: hero top cone, notches at z=13.6 on the hero; its dark under-cone ends on the trunk above the middle group (gap)"
+  },
+  {
+   "name": "YoungFirFull",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    12.6736,
+    17.0,
+    12.2584
+   ],
+   "tris": 1890,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirFull.glb",
+     "kind": "solid",
+     "tris": 1890,
+     "offset": [
+      0.0,
+      8.5,
+      0.0
+     ],
+     "size": [
+      12.6736,
+      17.0,
+      12.2584
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "dense 7-hem fir; dressing faces carry kit_nocollide=1"
+  },
+  {
+   "name": "YoungFirLeaning",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    10.0446,
+    15.0,
+    9.8023
+   ],
+   "tris": 1506,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirLeaning.glb",
+     "kind": "solid",
+     "tris": 1506,
+     "offset": [
+      0.0,
+      7.5,
+      0.0
+     ],
+     "size": [
+      10.0446,
+      15.0,
+      9.8023
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk leans ~12 deg toward +X; the runner centres the origin on the footprint, so the trunk base sits ~1.2 studs -X of the origin"
+  },
+  {
+   "name": "YoungFirLowerSkirt",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    11.4989,
+    3.2142,
+    11.1119
+   ],
+   "tris": 224,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirLowerSkirt.glb",
+     "kind": "solid",
+     "tris": 224,
+     "offset": [
+      0.0,
+      1.6071,
+      0.0
+     ],
+     "size": [
+      11.4989,
+      3.2142,
+      11.1119
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Lower Skirt: two hems, widest, drooping tips, dark under-cone; re-stacks below the middle gap"
+  },
+  {
+   "name": "YoungFirMiddleTier",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    8.9648,
+    4.9972,
+    8.8294
+   ],
+   "tris": 208,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirMiddleTier.glb",
+     "kind": "solid",
+     "tris": 208,
+     "offset": [
+      0.0,
+      2.4986,
+      0.0
+     ],
+     "size": [
+      8.9648,
+      4.9972,
+      8.8294
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Middle Tier: two nested hems + dark under-cone; on the hero its bottom sits ~1 stud below the crown gap"
+  },
+  {
+   "name": "YoungFirRootBase",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    6.901,
+    1.8,
+    6.5685
+   ],
+   "tris": 850,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirRootBase.glb",
+     "kind": "solid",
+     "tris": 850,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      6.901,
+      1.8,
+      6.5685
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Base: roots collide; tufts/pebbles/soil carry kit_nocollide=1"
+  },
+  {
+   "name": "YoungFirSparse",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "variant",
+   "size": [
+    8.1691,
+    16.0,
+    8.1498
+   ],
+   "tris": 1488,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirSparse.glb",
+     "kind": "solid",
+     "tris": 1488,
+     "offset": [
+      0.0,
+      8.0,
+      0.0
+     ],
+     "size": [
+      8.1691,
+      16.0,
+      8.1498
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "see-through sparse fir; dressing faces carry kit_nocollide=1"
+  },
+  {
+   "name": "YoungFirTrunk",
+   "sheet": "W04",
+   "subject": "YoungFir",
+   "role": "part",
+   "size": [
+    1.6733,
+    4.6,
+    1.5807
+   ],
+   "tris": 86,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/YoungFirTrunk.glb",
+     "kind": "solid",
+     "tris": 86,
+     "offset": [
+      0.0,
+      2.3,
+      0.0
+     ],
+     "size": [
+      1.6733,
+      4.6,
+      1.5807
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Trunk: the visible stretch, sits on YoungFirRootBase cut top (z=1.8) up to the skirt"
+  }
+ ],
+ "stats": {
+  "assets": 9,
+  "pieces": 9,
+  "solid": 9,
+  "water": 0,
+  "glow": 0,
+  "tris": 8286,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 33,
+  "meshBytes": 820240
+ },
+ "problems": []
+}

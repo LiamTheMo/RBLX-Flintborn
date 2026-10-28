@@ -13,11 +13,26 @@ local function fullSet(tier)
 	}
 end
 
-test("full armor sets give 120/150/180/200 EHP at 100 HP", function()
-	for tier, ehp in { Hide = 120, Wood = 150, Stone = 180, Iron = 200 } do
+test("full armor sets follow the Hide → Adamantine ladder at 100 HP", function()
+	-- Confirmed Hide ×1.2 and Iron ×2.0; Bone 1.5, Copper 1.8; then ×1.25 per metal.
+	local ladder = {
+		Hide = 120,
+		Bone = 150,
+		Copper = 180,
+		Iron = 200,
+		Silver = 250,
+		Cobalt = 312.5,
+		Mithril = 390.625,
+		Adamantine = 488.28125,
+	}
+	for tier, ehp in ladder do
 		expectNear(100 * ArmorRules.Factor(fullSet(tier)), ehp, 1e-9, tier .. " full set")
 	end
 	expectEq(ArmorRules.Factor({}), 1, "unarmored")
+	-- Wood and Stone armor are removed; gem-class materials make no armor.
+	for _, tier in { "Wood", "Stone", "Flint", "Obsidian", "Jade" } do
+		expectEq(ArmorRules.Factor(fullSet(tier)), 1, tier .. " gives no armor")
+	end
 end)
 
 test("armor pieces add and mixed tiers combine additively", function()
@@ -44,6 +59,16 @@ test("confirmed melee numbers and cooldowns", function()
 	expectEq(WeaponCatalog.For("StoneDagger").cooldown, 0.4, "dagger 0.4 s")
 	expectEq(WeaponCatalog.For("StoneSword").cooldown, 0.7, "sword 0.7 s")
 	expectEq(WeaponCatalog.For("StoneAxe"), WeaponCatalog.Hand, "tools strike like a rock")
+	-- Every crafted tier hits about 25% harder than the one below it (GDD §51).
+	local previous = 0
+	for _, tier in { "Stone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" } do
+		local damage = WeaponCatalog.For(tier .. "Sword").damage
+		expect(damage > previous, tier .. " sword beats the tier below")
+		previous = damage
+	end
+	expectEq(WeaponCatalog.For("AdamantineSword").damage, 69, "adamantine sword")
+	expectEq(WeaponCatalog.For("GuardianFang").damage, 86, "the Guardian's Fang is one tier above Adamantine")
+	expectEq(WeaponCatalog.For("GuardianFang").cooldown, 0.7, "the Fang swings like a sword")
 end)
 
 test("attack cadence is enforced per weapon", function()
@@ -78,8 +103,16 @@ test("reach and arc checks", function()
 end)
 
 test("bow damage ignores draw time while range grows", function()
-	local bow = WeaponCatalog.For("BasicBow")
-	expectEq(DamageRules.ArrowDamage(bow, "Arrow"), 12, "basic bow + arrow")
+	local bow = WeaponCatalog.For("WoodenBow")
+	expectEq(DamageRules.ArrowDamage(bow, "FlintArrow"), 12, "wooden bow + flint arrow")
+	expectEq(WeaponCatalog.ARROW, "FlintArrow", "flint is the only arrow tip")
+	expectEq(WeaponCatalog.Arrows.Arrow, nil, "the plain Arrow is gone")
+	-- Each metal bow adds 25% to the bow's own damage; the Flint Arrow adds 6.
+	for tier, damage in { Copper = 14, Iron = 15, Silver = 18, Cobalt = 21, Mithril = 24, Adamantine = 29 } do
+		local metalBow = WeaponCatalog.For(tier .. "Bow")
+		expectEq(metalBow.kind, "Bow", tier .. " bow is a bow")
+		expectEq(DamageRules.ArrowDamage(metalBow, "FlintArrow"), damage, tier .. " bow + flint arrow")
+	end
 	expect(DamageRules.ArrowSpeed(0.2) < DamageRules.ArrowSpeed(1), "longer draw flies faster")
 	expectEq(DamageRules.ArrowSpeed(5), DamageRules.ArrowSpeed(1), "capped at a full draw")
 	expectNear(DamageRules.MeleeDamage(WeaponCatalog.For("StoneSword"), -0.05), 17.1, 1e-9, "roll scales damage")

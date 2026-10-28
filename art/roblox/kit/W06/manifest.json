@@ -1,0 +1,2003 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W06",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "berry",
+    "hex": "#C8262B",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "flower_white",
+    "hex": "#F5F2EA",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "flower_yellow",
+    "hex": "#F2C230",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "w06_bark",
+    "hex": "#7A4E2C",
+    "levels": [
+     0.94755,
+     0.96117,
+     0.96483,
+     0.96714,
+     0.97322,
+     0.97699,
+     0.97808,
+     0.97824,
+     0.97824,
+     0.97941,
+     0.97954,
+     0.9821,
+     0.98532,
+     0.99258,
+     1.00106,
+     1.00794,
+     1.01107,
+     1.01228,
+     1.01373,
+     1.01442,
+     1.01798,
+     1.02209,
+     1.02588,
+     1.03403,
+     1.0381,
+     1.04066,
+     1.04282,
+     1.04345,
+     1.04441,
+     1.05081,
+     1.05661,
+     1.05661
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_broadleaf",
+    "hex": "#8EC22C",
+    "levels": [
+     0.95117,
+     0.95487,
+     0.96329,
+     0.96559,
+     0.97185,
+     0.98025,
+     0.98873,
+     0.9925,
+     1.00207,
+     1.00434,
+     1.00814,
+     1.01631,
+     1.01798,
+     1.0213,
+     1.02589,
+     1.02964,
+     1.03583,
+     1.04203,
+     1.04633,
+     0.98434,
+     1.01336,
+     0.99921,
+     0.98599,
+     1.0489,
+     1.03836,
+     0.95728,
+     1.03346,
+     0.97795
+    ],
+    "used": false
+   },
+   {
+    "key": "w06_bushleaf",
+    "hex": "#54A006",
+    "levels": [
+     0.95208,
+     0.95304,
+     0.95675,
+     0.95955,
+     0.96332,
+     0.96375,
+     0.96768,
+     0.97196,
+     0.97692,
+     0.9837,
+     0.98629,
+     0.98743,
+     0.99046,
+     0.99186,
+     0.9928,
+     0.99465,
+     0.99674,
+     1.00274,
+     1.00514,
+     1.00591,
+     1.00813,
+     1.00962,
+     1.01252,
+     1.01343,
+     1.01664,
+     1.02256,
+     1.0304,
+     1.03217,
+     1.03583,
+     1.0385,
+     1.04427,
+     1.0495
+    ],
+    "used": false
+   },
+   {
+    "key": "w06_fern",
+    "hex": "#5AA834",
+    "levels": [
+     0.95198,
+     0.95532,
+     0.95767,
+     0.96364,
+     0.96757,
+     0.97156,
+     0.97429,
+     0.97811,
+     0.98061,
+     0.98659,
+     0.99225,
+     0.99674,
+     1.00018,
+     1.00427,
+     1.01451,
+     1.01678,
+     1.02004,
+     1.02487,
+     1.03304,
+     1.03535,
+     1.0381,
+     1.04067,
+     1.0436,
+     1.04556,
+     1.02884,
+     1.0116,
+     0.98376,
+     0.96085,
+     0.99474,
+     1.05932,
+     1.05765,
+     0.94099
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_ivy",
+    "hex": "#66AE2E",
+    "levels": [
+     0.94002,
+     0.94308,
+     0.94779,
+     0.95117,
+     0.95586,
+     0.96072,
+     0.96513,
+     0.96865,
+     0.97266,
+     0.97703,
+     0.97903,
+     0.98386,
+     0.9874,
+     0.99119,
+     0.99481,
+     0.99899,
+     1.00143,
+     1.00487,
+     1.00823,
+     1.01294,
+     1.01577,
+     1.02029,
+     1.02457,
+     1.0297,
+     1.03263,
+     1.03501,
+     1.03988,
+     1.043,
+     1.04798,
+     1.05208,
+     1.05668,
+     1.05966
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_moss",
+    "hex": "#9CC52A",
+    "levels": [
+     0.93708,
+     0.95297,
+     0.96164,
+     0.96423,
+     0.96816,
+     0.97545,
+     0.98148,
+     0.98167,
+     0.98653,
+     0.98716,
+     0.99175,
+     0.99346,
+     0.99544,
+     0.99818,
+     1.00251,
+     1.0049,
+     1.00693,
+     1.00997,
+     1.01172,
+     1.013,
+     1.01456,
+     1.0214,
+     1.02284,
+     1.02657,
+     1.02842,
+     1.03006,
+     1.03195,
+     1.03399,
+     1.03838,
+     1.04401,
+     1.04904,
+     1.05516
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_soil",
+    "hex": "#5A4030",
+    "levels": [
+     0.95001,
+     0.95468,
+     0.957,
+     0.97482,
+     0.99211,
+     1.0,
+     1.02976,
+     1.05347,
+     0.98675
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_stone",
+    "hex": "#B8B2AB",
+    "levels": [
+     0.86477,
+     0.94152,
+     0.95197,
+     0.95616,
+     0.95824,
+     0.96169,
+     0.96453,
+     0.96781,
+     0.97408,
+     0.97783,
+     0.98091,
+     0.98369,
+     0.9852,
+     0.98965,
+     0.99332,
+     0.99671,
+     1.00086,
+     1.00555,
+     1.00895,
+     1.01183,
+     1.01361,
+     1.01574,
+     1.02013,
+     1.02244,
+     1.02396,
+     1.02952,
+     1.03463,
+     1.03962,
+     1.04403,
+     1.04706,
+     1.05228,
+     1.0891
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_berry",
+    "hex": "#D8302C",
+    "levels": [
+     1.0,
+     0.97207,
+     0.98591,
+     1.01207
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_petal",
+    "hex": "#F6F3EA",
+    "levels": [
+     1.0,
+     0.94276,
+     1.05695,
+     1.05494,
+     0.9455,
+     1.05247,
+     0.94901,
+     1.04884,
+     0.95236,
+     1.04629,
+     1.042,
+     1.03864,
+     0.96205,
+     1.03607,
+     0.96543,
+     1.03375,
+     0.96773,
+     1.02989,
+     0.97069,
+     0.97306,
+     1.02608,
+     1.0243,
+     0.97756,
+     1.02129,
+     1.01854,
+     0.98217,
+     1.01589,
+     0.98636,
+     1.01207,
+     0.98864,
+     0.99099,
+     1.00891
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_pollen",
+    "hex": "#F2C230",
+    "levels": [
+     1.0,
+     0.95034,
+     0.95673,
+     0.9593,
+     1.03982,
+     1.0339,
+     1.03054,
+     1.02667,
+     1.01698,
+     0.98373,
+     1.01459,
+     0.98925,
+     1.00492,
+     1.00208
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_leaf",
+    "hex": "#4FA834",
+    "levels": [
+     0.92622,
+     0.94227,
+     0.9493,
+     0.95418,
+     0.95932,
+     0.96433,
+     0.96894,
+     0.9739,
+     0.97933,
+     0.98419,
+     0.98879,
+     0.99316,
+     0.99797,
+     1.00251,
+     1.00666,
+     1.01039,
+     1.01403,
+     1.01799,
+     1.02147,
+     1.02479,
+     1.0276,
+     1.0308,
+     1.03373,
+     1.0361,
+     1.03916,
+     1.04193,
+     1.04459,
+     1.04722,
+     1.0508,
+     1.05518,
+     1.06125,
+     1.07379
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_rock",
+    "hex": "#ABA7A6",
+    "levels": [
+     0.9559,
+     0.96538,
+     0.9726,
+     1.00978,
+     1.01756,
+     1.02212,
+     1.03036,
+     1.03319,
+     1.03715,
+     1.05376,
+     1.05636,
+     0.99047,
+     0.99935,
+     0.98206,
+     0.96214,
+     1.03982
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_vine",
+    "hex": "#8A5A32",
+    "levels": [
+     0.94052,
+     0.94602,
+     0.95174,
+     0.95469,
+     0.95735,
+     0.96015,
+     0.9664,
+     0.97005,
+     0.97192,
+     0.97383,
+     0.9748,
+     0.9777,
+     0.98218,
+     0.98488,
+     0.98732,
+     0.99367,
+     0.99697,
+     1.00186,
+     1.00745,
+     1.01592,
+     1.01688,
+     1.02047,
+     1.02558,
+     1.028,
+     1.02868,
+     1.03152,
+     1.03625,
+     1.03831,
+     1.04005,
+     1.04457,
+     1.0541,
+     1.05821
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "FernAndBroadleaf",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "hero",
+   "size": [
+    10.2328,
+    6.8263,
+    9.6159
+   ],
+   "tris": 3549,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleaf.glb",
+     "kind": "solid",
+     "tris": 3549,
+     "offset": [
+      0.0,
+      3.4132,
+      0.0
+     ],
+     "size": [
+      10.2328,
+      6.8263,
+      9.6159
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fern clump: dense rosette of broad-leaflet fronds, three upright cupped broad leaves, flared root stump in a ring of rocks"
+  },
+  {
+   "name": "FernAndBroadleafBroadLeaf",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    4.5732,
+    2.3146,
+    2.4203
+   ],
+   "tris": 24,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafBroadLeaf.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.1573,
+      0.0
+     ],
+     "size": [
+      4.5732,
+      2.3146,
+      2.4203
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "broad leaf (single): cupped rounded leaf"
+  },
+  {
+   "name": "FernAndBroadleafBroadleafCluster",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    8.4306,
+    6.3913,
+    8.0569
+   ],
+   "tris": 1683,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafBroadleafCluster.glb",
+     "kind": "solid",
+     "tris": 1683,
+     "offset": [
+      0.0,
+      3.1957,
+      0.0
+     ],
+     "size": [
+      8.4306,
+      6.3913,
+      8.0569
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Broadleaf Cluster: rosette of six cupped broad leaves with a few fronds"
+  },
+  {
+   "name": "FernAndBroadleafFrondLarge",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    7.7097,
+    3.0529,
+    5.0801
+   ],
+   "tris": 384,
+   "budget": 450,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafFrondLarge.glb",
+     "kind": "solid",
+     "tris": 384,
+     "offset": [
+      0.0,
+      1.5264,
+      0.0
+     ],
+     "size": [
+      7.7097,
+      3.0529,
+      5.0801
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fern frond: rib with broad overlapping rounded leaflets"
+  },
+  {
+   "name": "FernAndBroadleafFrondMedium",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    5.972,
+    2.4153,
+    4.0869
+   ],
+   "tris": 384,
+   "budget": 450,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafFrondMedium.glb",
+     "kind": "solid",
+     "tris": 384,
+     "offset": [
+      0.0,
+      1.2077,
+      0.0
+     ],
+     "size": [
+      5.972,
+      2.4153,
+      4.0869
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fern frond: rib with broad overlapping rounded leaflets"
+  },
+  {
+   "name": "FernAndBroadleafFrondSmall",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    4.2372,
+    1.7777,
+    3.0938
+   ],
+   "tris": 384,
+   "budget": 450,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafFrondSmall.glb",
+     "kind": "solid",
+     "tris": 384,
+     "offset": [
+      0.0,
+      0.8889,
+      0.0
+     ],
+     "size": [
+      4.2372,
+      1.7777,
+      3.0938
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fern frond: rib with broad overlapping rounded leaflets"
+  },
+  {
+   "name": "FernAndBroadleafRootCluster",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    4.0148,
+    1.5978,
+    3.8697
+   ],
+   "tris": 104,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafRootCluster.glb",
+     "kind": "solid",
+     "tris": 104,
+     "offset": [
+      0.0,
+      0.7989,
+      0.0
+     ],
+     "size": [
+      4.0148,
+      1.5978,
+      3.8697
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root cluster (base): stump with flared roots"
+  },
+  {
+   "name": "FernAndBroadleafSpread",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    16.2414,
+    3.8868,
+    16.3564
+   ],
+   "tris": 3528,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafSpread.glb",
+     "kind": "solid",
+     "tris": 3528,
+     "offset": [
+      0.0,
+      1.9434,
+      0.0
+     ],
+     "size": [
+      16.2414,
+      3.8868,
+      16.3564
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Spread Fern: low, wide rosette"
+  },
+  {
+   "name": "FernAndBroadleafUpright",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    9.282,
+    8.5739,
+    8.4788
+   ],
+   "tris": 3148,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleafUpright.glb",
+     "kind": "solid",
+     "tris": 3148,
+     "offset": [
+      0.0,
+      4.287,
+      0.0
+     ],
+     "size": [
+      9.282,
+      8.5739,
+      8.4788
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Upright Fern: tall fronds rising steeply"
+  },
+  {
+   "name": "HangingVine",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "hero",
+   "size": [
+    9.0513,
+    9.1108,
+    6.1688
+   ],
+   "tris": 3885,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVine.glb",
+     "kind": "solid",
+     "tris": 3885,
+     "offset": [
+      0.0,
+      4.5554,
+      0.0
+     ],
+     "size": [
+      9.0513,
+      9.1108,
+      6.1688
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone wall block with thick twisted climbing vines and dense three-leaf ivy clusters"
+  },
+  {
+   "name": "HangingVineAttachmentPad",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "part",
+   "size": [
+    1.5452,
+    1.8,
+    0.854
+   ],
+   "tris": 26,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineAttachmentPad.glb",
+     "kind": "solid",
+     "tris": 26,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      1.5452,
+      1.8,
+      0.854
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "attachment pad (wall/rock): stone the vine hangs from"
+  },
+  {
+   "name": "HangingVineBranched",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "variant",
+   "size": [
+    8.0001,
+    10.9883,
+    1.4941
+   ],
+   "tris": 2644,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineBranched.glb",
+     "kind": "solid",
+     "tris": 2644,
+     "offset": [
+      0.0,
+      5.4941,
+      0.0
+     ],
+     "size": [
+      8.0001,
+      10.9883,
+      1.4941
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Branched Vine: two vines from two pads joined by a V strand"
+  },
+  {
+   "name": "HangingVineCurvedDraping",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "variant",
+   "size": [
+    10.0311,
+    10.31,
+    1.5442
+   ],
+   "tris": 3256,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineCurvedDraping.glb",
+     "kind": "solid",
+     "tris": 3256,
+     "offset": [
+      0.0,
+      5.155,
+      0.0
+     ],
+     "size": [
+      10.0311,
+      10.31,
+      1.5442
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Curved Draping: vine sagging in a smooth arc between two pads, ends hanging"
+  },
+  {
+   "name": "HangingVineFork",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "part",
+   "size": [
+    4.2572,
+    3.9511,
+    0.9803
+   ],
+   "tris": 60,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineFork.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.9756,
+      0.0
+     ],
+     "size": [
+      4.2572,
+      3.9511,
+      0.9803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "vine fork (T-joint): thick T with two even arms"
+  },
+  {
+   "name": "HangingVineLeafCluster",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "part",
+   "size": [
+    2.3497,
+    3.0239,
+    0.7582
+   ],
+   "tris": 88,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineLeafCluster.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      1.512,
+      0.0
+     ],
+     "size": [
+      2.3497,
+      3.0239,
+      0.7582
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf cluster (3 leaves): trefoil on a short stalk"
+  },
+  {
+   "name": "HangingVineSegment",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "part",
+   "size": [
+    1.2774,
+    7.0944,
+    0.8203
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineSegment.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      3.5472,
+      0.0
+     ],
+     "size": [
+      1.2774,
+      7.0944,
+      0.8203
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "vine segment (straight)"
+  },
+  {
+   "name": "HangingVineStraight",
+   "sheet": "W06",
+   "subject": "HangingVine",
+   "role": "variant",
+   "size": [
+    3.7589,
+    11.8142,
+    1.4316
+   ],
+   "tris": 1250,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HangingVineStraight.glb",
+     "kind": "solid",
+     "tris": 1250,
+     "offset": [
+      0.0,
+      5.9071,
+      0.0
+     ],
+     "size": [
+      3.7589,
+      11.8142,
+      1.4316
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight Vine: one twisted vine hanging from a stone pad"
+  },
+  {
+   "name": "LowBush",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "hero",
+   "size": [
+    8.1649,
+    5.4123,
+    7.9817
+   ],
+   "tris": 2353,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBush.glb",
+     "kind": "solid",
+     "tris": 2353,
+     "offset": [
+      0.0,
+      2.7061,
+      0.0
+     ],
+     "size": [
+      8.1649,
+      5.4123,
+      7.9817
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "low faceted leafy bush: big faceted clumps in a dome down to the ground, short forked trunk visible at the front, white flowers, rocks"
+  },
+  {
+   "name": "LowBushBerries",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    1.1386,
+    0.6,
+    1.2043
+   ],
+   "tris": 60,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushBerries.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.1386,
+      0.6,
+      1.2043
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "optional berries: red cluster"
+  },
+  {
+   "name": "LowBushBranchStem",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    2.5523,
+    3.163,
+    0.8803
+   ],
+   "tris": 60,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushBranchStem.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.5815,
+      0.0
+     ],
+     "size": [
+      2.5523,
+      3.163,
+      0.8803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch stem (base): Y-forked stem the clumps sit on"
+  },
+  {
+   "name": "LowBushBranchStemB",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    1.4346,
+    2.7543,
+    0.7803
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushBranchStemB.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.3771,
+      0.0
+     ],
+     "size": [
+      1.4346,
+      2.7543,
+      0.7803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch stem (secondary): small forked stem"
+  },
+  {
+   "name": "LowBushDome",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "variant",
+   "size": [
+    7.7066,
+    5.403,
+    7.8035
+   ],
+   "tris": 1990,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushDome.glb",
+     "kind": "solid",
+     "tris": 1990,
+     "offset": [
+      0.0,
+      2.7015,
+      0.0
+     ],
+     "size": [
+      7.7066,
+      5.403,
+      7.8035
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Dome Bush: tight rounded dome with flowers"
+  },
+  {
+   "name": "LowBushFlower",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    0.9192,
+    0.24,
+    0.9357
+   ],
+   "tris": 120,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushFlower.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      0.12,
+      0.0
+     ],
+     "size": [
+      0.9192,
+      0.24,
+      0.9357
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "optional flower: white daisy"
+  },
+  {
+   "name": "LowBushHedge",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "variant",
+   "size": [
+    12.3038,
+    4.7031,
+    6.8235
+   ],
+   "tris": 2382,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushHedge.glb",
+     "kind": "solid",
+     "tris": 2382,
+     "offset": [
+      0.0,
+      2.3515,
+      0.0
+     ],
+     "size": [
+      12.3038,
+      4.7031,
+      6.8235
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Hedge Bush: long low hedge"
+  },
+  {
+   "name": "LowBushLeafClumpLarge",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    3.8209,
+    2.5782,
+    3.7985
+   ],
+   "tris": 94,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushLeafClumpLarge.glb",
+     "kind": "solid",
+     "tris": 94,
+     "offset": [
+      0.0,
+      1.2891,
+      0.0
+     ],
+     "size": [
+      3.8209,
+      2.5782,
+      3.7985
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump: big flat-faceted lobed ball"
+  },
+  {
+   "name": "LowBushLeafClumpMedium",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    3.0631,
+    1.9388,
+    3.0553
+   ],
+   "tris": 94,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushLeafClumpMedium.glb",
+     "kind": "solid",
+     "tris": 94,
+     "offset": [
+      0.0,
+      0.9694,
+      0.0
+     ],
+     "size": [
+      3.0631,
+      1.9388,
+      3.0553
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump: big flat-faceted lobed ball"
+  },
+  {
+   "name": "LowBushLeafClumpSmall",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "part",
+   "size": [
+    2.1342,
+    1.3592,
+    2.0892
+   ],
+   "tris": 94,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushLeafClumpSmall.glb",
+     "kind": "solid",
+     "tris": 94,
+     "offset": [
+      0.0,
+      0.6796,
+      0.0
+     ],
+     "size": [
+      2.1342,
+      1.3592,
+      2.0892
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump: big flat-faceted lobed ball"
+  },
+  {
+   "name": "LowBushOpenWoody",
+   "sheet": "W06",
+   "subject": "LowBush",
+   "role": "variant",
+   "size": [
+    7.0971,
+    6.6151,
+    8.4902
+   ],
+   "tris": 1389,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowBushOpenWoody.glb",
+     "kind": "solid",
+     "tris": 1389,
+     "offset": [
+      0.0,
+      3.3075,
+      0.0
+     ],
+     "size": [
+      7.0971,
+      6.6151,
+      8.4902
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Open Woody: open frame of woody arms, a clump on each arm tip, gaps between"
+  },
+  {
+   "name": "MossAndIvy",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "hero",
+   "size": [
+    13.2524,
+    10.0577,
+    10.5543
+   ],
+   "tris": 6801,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvy.glb",
+     "kind": "solid",
+     "tris": 6801,
+     "offset": [
+      0.0,
+      5.0288,
+      0.0
+     ],
+     "size": [
+      13.2524,
+      10.0577,
+      10.5543
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone block with rounded moss domes clustered on one top corner, dense ivy climbing two faces, moss domes at the base"
+  },
+  {
+   "name": "MossAndIvyCornerPiece",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    3.2877,
+    5.4753,
+    4.2355
+   ],
+   "tris": 1608,
+   "budget": 2800,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyCornerPiece.glb",
+     "kind": "solid",
+     "tris": 1608,
+     "offset": [
+      0.0,
+      2.7376,
+      0.0
+     ],
+     "size": [
+      3.2877,
+      5.4753,
+      4.2355
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner piece (angled): dense ivy wrapping two faces"
+  },
+  {
+   "name": "MossAndIvyCornerWrap",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    8.152,
+    8.1158,
+    8.5203
+   ],
+   "tris": 3747,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyCornerWrap.glb",
+     "kind": "solid",
+     "tris": 3747,
+     "offset": [
+      0.0,
+      4.0579,
+      0.0
+     ],
+     "size": [
+      8.152,
+      8.1158,
+      8.5203
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Corner Wrap: ivy wrapping one corner of a block, moss on top"
+  },
+  {
+   "name": "MossAndIvyCushionLarge",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    4.8908,
+    1.6176,
+    4.7022
+   ],
+   "tris": 355,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyCushionLarge.glb",
+     "kind": "solid",
+     "tris": 355,
+     "offset": [
+      0.0,
+      0.8088,
+      0.0
+     ],
+     "size": [
+      4.8908,
+      1.6176,
+      4.7022
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "moss cushion (large): puffy dome"
+  },
+  {
+   "name": "MossAndIvyCushionSmall",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    3.0447,
+    0.9433,
+    3.0341
+   ],
+   "tris": 292,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyCushionSmall.glb",
+     "kind": "solid",
+     "tris": 292,
+     "offset": [
+      0.0,
+      0.4716,
+      0.0
+     ],
+     "size": [
+      3.0447,
+      0.9433,
+      3.0341
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "moss cushion (small)"
+  },
+  {
+   "name": "MossAndIvyIvyCluster",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    3.8686,
+    1.9121,
+    4.0948
+   ],
+   "tris": 432,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyIvyCluster.glb",
+     "kind": "solid",
+     "tris": 432,
+     "offset": [
+      0.0,
+      0.956,
+      0.0
+     ],
+     "size": [
+      3.8686,
+      1.9121,
+      4.0948
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ivy cluster (flat): clump of lobed ivy leaves"
+  },
+  {
+   "name": "MossAndIvyRockCap",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    9.7543,
+    6.7734,
+    8.5288
+   ],
+   "tris": 2746,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyRockCap.glb",
+     "kind": "solid",
+     "tris": 2746,
+     "offset": [
+      0.0,
+      3.3867,
+      0.0
+     ],
+     "size": [
+      9.7543,
+      6.7734,
+      8.5288
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Rock Cap: rounded faceted boulder with moss domes along the rim and ivy drips"
+  },
+  {
+   "name": "MossAndIvySingleLeaf",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    2.3497,
+    0.6342,
+    1.9893
+   ],
+   "tris": 72,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvySingleLeaf.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.3171,
+      0.0
+     ],
+     "size": [
+      2.3497,
+      0.6342,
+      1.9893
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "single ivy leaf (three-lobed)"
+  },
+  {
+   "name": "MossAndIvyTendril",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    2.9712,
+    6.6022,
+    0.7358
+   ],
+   "tris": 912,
+   "budget": 1400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyTendril.glb",
+     "kind": "solid",
+     "tris": 912,
+     "offset": [
+      0.0,
+      3.3011,
+      0.0
+     ],
+     "size": [
+      2.9712,
+      6.6022,
+      0.7358
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ivy tendril (segment)"
+  },
+  {
+   "name": "MossAndIvyWallStrip",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    10.5302,
+    5.789,
+    3.937
+   ],
+   "tris": 3640,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvyWallStrip.glb",
+     "kind": "solid",
+     "tris": 3640,
+     "offset": [
+      0.0,
+      2.8945,
+      0.0
+     ],
+     "size": [
+      10.5302,
+      5.789,
+      3.937
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wall Strip: low stone wall with three ivy strands"
+  }
+ ],
+ "stats": {
+  "assets": 38,
+  "pieces": 38,
+  "solid": 38,
+  "water": 0,
+  "glow": 0,
+  "tris": 53698,
+  "vfxSockets": 0,
+  "paletteColours": 12,
+  "paletteLevels": 299,
+  "meshBytes": 5441464
+ },
+ "problems": []
+}

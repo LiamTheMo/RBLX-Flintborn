@@ -92,6 +92,48 @@ local function report(ok, result, success: string)
 	ui.status.Text = if ok then success else ("Not done: " .. tostring(result))
 end
 
+-- One vault material: its stock and price, then a button for the next
+-- SELL_STEP and one for the whole stack (never for a Forge reagent, which warns).
+local function sellRow(entry, order: number)
+	local row = make("Frame", {
+		Size = UDim2.new(1, -8, 0, 28),
+		BackgroundTransparency = 1,
+		LayoutOrder = order,
+	}, ui.list)
+	make("TextLabel", {
+		Text = ("%s ×%d · %d each"):format(entry.name, entry.quantity, entry.each),
+		Size = UDim2.new(0.5, -4, 1, 0),
+		BackgroundTransparency = 1,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		TextColor3 = TEXT,
+		Font = Enum.Font.GothamMedium,
+		TextSize = 13,
+	}, row)
+	local step = math.min(WalletController.SELL_STEP, entry.quantity)
+	local amounts = { step }
+	if entry.quantity > step and not entry.warning then
+		table.insert(amounts, entry.quantity)
+	end
+	for index, amount in amounts do
+		local b = make("TextButton", {
+			Text = ("%s ×%d · %d"):format(if index == 1 then "Sell" else "All", amount, entry.each * amount),
+			Position = UDim2.new(0.25 + index * 0.25, 0, 0, 0),
+			Size = UDim2.new(0.25, -4, 1, 0),
+			BackgroundColor3 = Color3.fromRGB(110, 70, 30),
+			TextColor3 = Color3.fromRGB(255, 240, 220),
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			Font = Enum.Font.GothamBold,
+			TextSize = 12,
+		}, row)
+		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
+		b.Activated:Connect(function()
+			report(invoke("MerchantSell", "vault", entry.key, amount, nonce()), "Sold.")
+			render()
+		end)
+	end
+end
+
 local function updateWallet()
 	ui.wallet.Text = ("🪙 %d   💎 %d"):format(player:GetAttribute("Coins") or 0, player:GetAttribute("Gems") or 0)
 end
@@ -156,39 +198,67 @@ function render()
 		return
 	end
 	if shown == "Shop" then
-		line("Purchases go to your lobby backpack.", TEXT, nextOrder())
+		line("Starter supplies. Purchases go to your lobby backpack.", TEXT, nextOrder())
+		-- Grouped by category, in stock order.
+		local categories, byCategory = {}, {}
 		for _, entry in view.stock do
-			local text = ("%s%s — %d Coins"):format(
-				entry.name,
-				entry.quantity and (" ×" .. entry.quantity) or "",
-				entry.price
-			)
-			if entry.owned then
-				line("✓ " .. text, Color3.fromRGB(150, 200, 150), nextOrder())
-			else
-				button(text, coins >= entry.price, nextOrder(), function()
-					report(invoke("ShopBuy", entry.id, nonce()), "Bought " .. entry.name .. ".")
-				end)
+			local category = entry.category or "Other"
+			if byCategory[category] == nil then
+				byCategory[category] = {}
+				table.insert(categories, category)
+			end
+			table.insert(byCategory[category], entry)
+		end
+		for _, category in categories do
+			line(category, GOLD, nextOrder())
+			for _, entry in byCategory[category] do
+				local text = ("%s%s — %d Coins"):format(
+					entry.name,
+					entry.quantity and (" ×" .. entry.quantity) or "",
+					entry.price
+				)
+				if entry.owned then
+					line("✓ " .. text, Color3.fromRGB(150, 200, 150), nextOrder())
+				else
+					button(text, coins >= entry.price, nextOrder(), function()
+						report(invoke("ShopBuy", entry.id, nonce()), "Bought " .. entry.name .. ".")
+					end)
+				end
+				if entry.note then
+					line("   " .. entry.note, TEXT, nextOrder())
+				end
 			end
 		end
 	elseif shown == "Sell" then
-		line("Merchants pay fixed prices. Vault materials sell 10 at a time.", TEXT, nextOrder())
+		line(
+			"Merchants pay fixed prices; crafted gear is worth 40% of its materials. Withdraw gear from the vault to sell it.",
+			TEXT,
+			nextOrder()
+		)
+		local heading = nil
 		for _, entry in view.sellable do
-			local quantity = if entry.source == "vault"
-				then math.min(WalletController.SELL_STEP, entry.quantity)
-				else nil
-			local coinsFor = entry.coins or (entry.each * quantity)
-			local text = ("Sell %s%s for %d Coins"):format(
-				entry.name,
-				quantity and (" ×" .. quantity) or (entry.quantity and (" ×" .. entry.quantity) or ""),
-				coinsFor
-			)
-			button(text, true, nextOrder(), function()
-				report(invoke("MerchantSell", entry.source, entry.key, quantity, nonce()), "Sold.")
-			end)
+			if entry.source ~= heading then
+				heading = entry.source
+				line(if heading == "vault" then "From your vault" else "From your lobby backpack", GOLD, nextOrder())
+			end
+			if entry.source == "vault" then
+				sellRow(entry, nextOrder())
+			else
+				local text = ("Sell %s%s for %d Coins"):format(
+					entry.name,
+					entry.quantity and (" ×" .. entry.quantity) or "",
+					entry.coins
+				)
+				button(text, true, nextOrder(), function()
+					report(invoke("MerchantSell", entry.source, entry.key, nil, nonce()), "Sold.")
+				end)
+			end
 			if entry.warning then
 				line("⚠ " .. entry.warning, WARN, nextOrder())
 			end
+		end
+		if heading == nil then
+			line("Nothing to sell yet.", TEXT, nextOrder())
 		end
 	else
 		line(("Vault tier %d / %d (+25 item slots each)"):format(view.vaultTier, view.maxVaultTier), GOLD, nextOrder())

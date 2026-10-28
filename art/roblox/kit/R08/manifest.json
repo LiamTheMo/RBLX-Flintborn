@@ -1,0 +1,2665 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "R08",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "r08_cap_purple",
+    "hex": "#6248B2",
+    "levels": [
+     0.97083,
+     0.97834,
+     1.00974,
+     1.05977
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_ember",
+    "hex": "#F2800F",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_frond",
+    "hex": "#7A9A2A",
+    "levels": [
+     0.95221,
+     0.95803,
+     0.96258,
+     0.96489,
+     0.97361,
+     0.97598,
+     0.98179,
+     0.98723,
+     0.99238,
+     1.004,
+     1.00659,
+     1.01047,
+     1.01441,
+     1.01723,
+     1.0214,
+     1.02748,
+     1.03328,
+     1.04006,
+     1.04311,
+     1.04816
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_frost_leaf",
+    "hex": "#5583CC",
+    "levels": [
+     0.93494,
+     0.94594,
+     0.99299,
+     1.00381,
+     1.00881,
+     1.03096
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_ice",
+    "hex": "#9FC4EE",
+    "levels": [
+     0.90476,
+     0.9091,
+     0.91717,
+     0.92107,
+     0.93183,
+     0.94072,
+     0.94623,
+     0.94833,
+     0.95341,
+     0.95558,
+     0.95744,
+     0.96238,
+     0.96897,
+     0.97222,
+     0.97393,
+     0.97623,
+     0.97845,
+     0.98204,
+     0.99403,
+     0.9963,
+     1.02025,
+     1.03021,
+     1.04082,
+     1.05904
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_leaf_green",
+    "hex": "#6E9A18",
+    "levels": [
+     0.97332,
+     0.97523,
+     0.9777,
+     0.9802,
+     0.98252,
+     0.98481,
+     0.9874,
+     0.9898,
+     0.99218,
+     0.99456,
+     0.99725,
+     0.99938,
+     1.00116,
+     1.04595,
+     1.04786,
+     1.05019,
+     1.05236,
+     1.05424,
+     1.05588,
+     1.0587,
+     1.06054,
+     1.06277,
+     1.06473,
+     1.06707,
+     1.0692,
+     1.07215,
+     1.07462,
+     1.07608
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_petal_red",
+    "hex": "#B0121C",
+    "levels": [
+     0.96719,
+     0.98032,
+     0.98373,
+     0.99158,
+     1.00214,
+     1.03007,
+     1.03897,
+     1.04994,
+     1.06679
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_rock",
+    "hex": "#6F6661",
+    "levels": [
+     0.89343,
+     0.92728,
+     0.9425,
+     0.94941,
+     0.95375,
+     0.9558,
+     0.95687,
+     0.95724,
+     0.96508,
+     0.96508,
+     0.97359,
+     0.9822,
+     0.98657,
+     0.98934,
+     0.99336,
+     0.99476,
+     0.99971,
+     1.00074,
+     1.00359,
+     1.00494,
+     1.01148,
+     1.01509,
+     1.017,
+     1.02569,
+     1.03147,
+     1.03964,
+     1.04358,
+     1.05283,
+     1.0595,
+     1.0709,
+     1.0909,
+     1.11967
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_root",
+    "hex": "#9B6A45",
+    "levels": [
+     0.96035,
+     0.96293,
+     0.96615,
+     0.97566,
+     0.99746,
+     1.00123,
+     1.00252,
+     1.01406,
+     1.01865,
+     1.02516,
+     1.02682,
+     1.02996,
+     1.03272,
+     1.03692,
+     1.04125,
+     1.04467,
+     1.04918
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_sap",
+    "hex": "#7DC25C",
+    "levels": [
+     0.95699,
+     0.98238
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_soil",
+    "hex": "#5E4636",
+    "levels": [
+     0.98238
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_spore",
+    "hex": "#62D3A0",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_spot_cyan",
+    "hex": "#3FD6E4",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_stem_cream",
+    "hex": "#DCC08E",
+    "levels": [
+     0.93631,
+     0.96071,
+     0.97205,
+     0.98975,
+     1.00133,
+     1.01374,
+     1.04517,
+     1.04746
+    ],
+    "used": true
+   },
+   {
+    "key": "r08_twig",
+    "hex": "#684738",
+    "levels": [
+     0.9338,
+     0.94314,
+     0.94759,
+     0.95324,
+     0.96116,
+     0.96986,
+     0.97168,
+     0.98639,
+     0.99463,
+     1.00995,
+     1.01856,
+     1.02334,
+     1.02559,
+     1.03085,
+     1.03325,
+     1.03724,
+     1.03928,
+     1.04102,
+     1.0454,
+     1.05258,
+     1.05563,
+     1.06355,
+     1.06985
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "AncientRoot",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "hero",
+   "size": [
+    10.0596,
+    6.685,
+    7.8938
+   ],
+   "tris": 1229,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRoot.glb",
+     "kind": "solid",
+     "tris": 1229,
+     "offset": [
+      0.0,
+      3.3425,
+      0.0
+     ],
+     "size": [
+      10.0596,
+      6.685,
+      7.8938
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_AncientRoot_ore_glint_1",
+     "kind": "ore_glint",
+     "position": [
+      0.0151,
+      2.912,
+      1.1141
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "ancient root: massive twisting root arch over a large green sapstone mineral nodule on a dark soil mound ringed with chunky rocks, spiky leaf clumps | VFX: ore_glint on the sapstone"
+  },
+  {
+   "name": "AncientRootBase",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "part",
+   "size": [
+    8.9742,
+    1.4544,
+    7.8938
+   ],
+   "tris": 379,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootBase.glb",
+     "kind": "solid",
+     "tris": 379,
+     "offset": [
+      0.0,
+      0.7272,
+      0.0
+     ],
+     "size": [
+      8.9742,
+      1.4544,
+      7.8938
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base: soil mound ringed with rocks"
+  },
+  {
+   "name": "AncientRootDepleted",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "depleted",
+   "size": [
+    9.6308,
+    1.7439,
+    7.7841
+   ],
+   "tris": 415,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootDepleted.glb",
+     "kind": "solid",
+     "tris": 415,
+     "offset": [
+      0.0,
+      0.8719,
+      0.0
+     ],
+     "size": [
+      9.6308,
+      1.7439,
+      7.7841
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "depleted base: soil mound with two cut root stubs"
+  },
+  {
+   "name": "AncientRootHalfLeft",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "part",
+   "size": [
+    6.6043,
+    6.5057,
+    3.9134
+   ],
+   "tris": 180,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootHalfLeft.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      3.2528,
+      0.0
+     ],
+     "size": [
+      6.6043,
+      6.5057,
+      3.9134
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root half (left)"
+  },
+  {
+   "name": "AncientRootHalfRight",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "part",
+   "size": [
+    5.1365,
+    6.3086,
+    3.8493
+   ],
+   "tris": 140,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootHalfRight.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      3.1543,
+      0.0
+     ],
+     "size": [
+      5.1365,
+      6.3086,
+      3.8493
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root half (right)"
+  },
+  {
+   "name": "AncientRootLeafClump",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "part",
+   "size": [
+    3.2726,
+    1.8805,
+    2.8109
+   ],
+   "tris": 96,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootLeafClump.glb",
+     "kind": "solid",
+     "tris": 96,
+     "offset": [
+      0.0,
+      0.9403,
+      0.0
+     ],
+     "size": [
+      3.2726,
+      1.8805,
+      2.8109
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf clump"
+  },
+  {
+   "name": "AncientRootMineralNodule",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "part",
+   "size": [
+    2.8337,
+    3.75,
+    2.3936
+   ],
+   "tris": 62,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AncientRootMineralNodule.glb",
+     "kind": "solid",
+     "tris": 62,
+     "offset": [
+      0.0,
+      1.875,
+      0.0
+     ],
+     "size": [
+      2.8337,
+      3.75,
+      2.3936
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "mineral nodule (green sapstone)"
+  },
+  {
+   "name": "EmberSeed",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "drop",
+   "size": [
+    1.2,
+    1.8,
+    1.0392
+   ],
+   "tris": 60,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberSeed.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      1.2,
+      1.8,
+      1.0392
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_embers.003",
+     "kind": "embers",
+     "position": [
+      0.0,
+      1.2,
+      0.0
+     ],
+     "vfx_scale": 0.3,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "embers: small sparks off the seed"
+  },
+  {
+   "name": "Emberbloom",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "hero",
+   "size": [
+    8.3757,
+    6.5,
+    8.0147
+   ],
+   "tris": 496,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Emberbloom.glb",
+     "kind": "solid",
+     "tris": 496,
+     "offset": [
+      0.0,
+      3.25,
+      0.0
+     ],
+     "size": [
+      8.3757,
+      6.5,
+      8.0147
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_embers.002",
+     "kind": "embers",
+     "position": [
+      0.0,
+      6.0,
+      0.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.028",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      2.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#B0121C",
+       "#F2800F"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow.016",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      4.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "heat_glow: seedpod glow + orange PointLight; embers: sparks rising off the pod tip; harvest_hit: petal/ember chips on the front face; the deplete burst lives on EmberbloomDepleted (swapped in when harvested)"
+  },
+  {
+   "name": "EmberbloomBase",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "part",
+   "size": [
+    8.8267,
+    1.5002,
+    8.4686
+   ],
+   "tris": 256,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberbloomBase.glb",
+     "kind": "solid",
+     "tris": 256,
+     "offset": [
+      0.0,
+      0.7501,
+      0.0
+     ],
+     "size": [
+      8.8267,
+      1.5002,
+      8.4686
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rock ring with dished dirt centre"
+  },
+  {
+   "name": "EmberbloomDepleted",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "depleted",
+   "size": [
+    8.972,
+    1.4736,
+    8.5521
+   ],
+   "tris": 256,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberbloomDepleted.glb",
+     "kind": "solid",
+     "tris": 256,
+     "offset": [
+      0.0,
+      0.7368,
+      0.0
+     ],
+     "size": [
+      8.972,
+      1.4736,
+      8.5521
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.033",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "empty rock ring; harvest_deplete: burst at base centre"
+  },
+  {
+   "name": "EmberbloomLeaf",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "part",
+   "size": [
+    4.0,
+    0.995,
+    1.8
+   ],
+   "tris": 20,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberbloomLeaf.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.4975,
+      0.0
+     ],
+     "size": [
+      4.0,
+      0.995,
+      1.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "one rosette petal"
+  },
+  {
+   "name": "EmberbloomSeedpod",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "part",
+   "size": [
+    3.0,
+    4.5,
+    2.5981
+   ],
+   "tris": 60,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberbloomSeedpod.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      2.25,
+      0.0
+     ],
+     "size": [
+      3.0,
+      4.5,
+      2.5981
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_heat_glow.017",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      2.2,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "heat_glow: seedpod glow + light"
+  },
+  {
+   "name": "FrostBud",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "drop",
+   "size": [
+    1.1619,
+    1.666,
+    1.1208
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBud.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.833,
+      0.0
+     ],
+     "size": [
+      1.1619,
+      1.666,
+      1.1208
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "FrostShrub",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "hero",
+   "size": [
+    10.5562,
+    8.6808,
+    7.7915
+   ],
+   "tris": 852,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrub.glb",
+     "kind": "solid",
+     "tris": 852,
+     "offset": [
+      0.0,
+      4.3404,
+      0.0
+     ],
+     "size": [
+      10.5562,
+      8.6808,
+      7.7915
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.029",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      4.0,
+      2.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#9FC4EE",
+         "#CFE6FF"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_vapour.002",
+     "kind": "vapour",
+     "position": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Vapour",
+        "texture": "mist_soft",
+        "color": [
+         "#CFE6FF",
+         "#E8F3FF"
+        ],
+        "size": [
+         1.5,
+         3.5
+        ],
+        "transparency": [
+         0.9,
+         0.8,
+         1.0
+        ],
+        "lifetime": [
+         4,
+         7
+        ],
+        "rate": 2,
+        "speed": [
+         0.2,
+         0.5
+        ],
+        "spread": 20,
+        "light_emission": 0.15,
+        "drag": 0.4,
+        "acceleration": [
+         0.15,
+         0.1,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -10,
+         10
+        ],
+        "shape": [
+         5.0,
+         0.3,
+         4.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "vapour: cold white mist off the snow slab; harvest_hit: ice chips on the front strike face"
+  },
+  {
+   "name": "FrostShrubBase",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "part",
+   "size": [
+    8.6693,
+    1.8254,
+    7.7139
+   ],
+   "tris": 298,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrubBase.glb",
+     "kind": "solid",
+     "tris": 298,
+     "offset": [
+      0.0,
+      0.9127,
+      0.0
+     ],
+     "size": [
+      8.6693,
+      1.8254,
+      7.7139
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "FrostShrubDepleted",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "depleted",
+   "size": [
+    8.6193,
+    2.6376,
+    7.7674
+   ],
+   "tris": 374,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrubDepleted.glb",
+     "kind": "solid",
+     "tris": 374,
+     "offset": [
+      0.0,
+      1.3188,
+      0.0
+     ],
+     "size": [
+      8.6193,
+      2.6376,
+      7.7674
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.034",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#9FC4EE",
+         "#CFE6FF"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "harvest_deplete: ice burst at base centre when the shrub is stripped"
+  },
+  {
+   "name": "FrostShrubForkedStem",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "part",
+   "size": [
+    4.9955,
+    6.0272,
+    1.1444
+   ],
+   "tris": 244,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrubForkedStem.glb",
+     "kind": "solid",
+     "tris": 244,
+     "offset": [
+      0.0,
+      3.0136,
+      0.0
+     ],
+     "size": [
+      4.9955,
+      6.0272,
+      1.1444
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk and branches only"
+  },
+  {
+   "name": "FrostShrubIceNodule",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "part",
+   "size": [
+    2.3287,
+    3.475,
+    2.2757
+   ],
+   "tris": 20,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrubIceNodule.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.7375,
+      0.0
+     ],
+     "size": [
+      2.3287,
+      3.475,
+      2.2757
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "FrostShrubLeaf",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "part",
+   "size": [
+    3.2801,
+    2.1031,
+    0.4345
+   ],
+   "tris": 32,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostShrubLeaf.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      1.0516,
+      0.0
+     ],
+     "size": [
+      3.2801,
+      2.1031,
+      0.4345
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "GreenSapstone",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "drop",
+   "size": [
+    0.9037,
+    1.3,
+    0.8351
+   ],
+   "tris": 36,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GreenSapstone.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      0.65,
+      0.0
+     ],
+     "size": [
+      0.9037,
+      1.3,
+      0.8351
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "green sapstone drop"
+  },
+  {
+   "name": "IcyLeaf",
+   "sheet": "R08",
+   "subject": "FrostShrub",
+   "role": "drop",
+   "size": [
+    1.9385,
+    1.0974,
+    0.2773
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IcyLeaf.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.5487,
+      0.0
+     ],
+     "size": [
+      1.9385,
+      1.0974,
+      0.2773
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "Mooncap",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "hero",
+   "size": [
+    10.0573,
+    7.4586,
+    8.1157
+   ],
+   "tris": 896,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Mooncap.glb",
+     "kind": "solid",
+     "tris": 896,
+     "offset": [
+      0.0,
+      3.7293,
+      0.0
+     ],
+     "size": [
+      10.0573,
+      7.4586,
+      8.1157
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_dust.005",
+     "kind": "dust",
+     "position": [
+      0.0,
+      6.5,
+      0.0
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Spores",
+        "texture": "dust_mote",
+        "color": [
+         "#8FF3FA",
+         "#62D3A0"
+        ],
+        "size": [
+         0.25,
+         0.1
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 1.2,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 180,
+        "light_emission": 0.8,
+        "shape": [
+         6.0,
+         4.0,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_glyph_glow",
+     "kind": "glyph_glow",
+     "position": [
+      -1.2,
+      6.6,
+      0.4
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glimmer",
+        "texture": "glow_soft",
+        "color": [
+         "#3FD6E4",
+         "#8FF3FA"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0,
+         0.2
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#3FD6E4",
+       "brightness": 0.9,
+       "range": 10.0,
+       "flicker": false,
+       "pulse": true
+      }
+     }
+    },
+    {
+     "name": "VFX_glyph_glow.001",
+     "kind": "glyph_glow",
+     "position": [
+      2.7,
+      4.0,
+      -1.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glimmer",
+        "texture": "glow_soft",
+        "color": [
+         "#3FD6E4",
+         "#8FF3FA"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0,
+         0.2
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#3FD6E4",
+       "brightness": 0.54,
+       "range": 6.0,
+       "flicker": false,
+       "pulse": true
+      }
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.030",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      5.0,
+      3.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#6248B2",
+       "#3FD6E4"
+      ]
+     }
+    }
+   ],
+   "notes": "glyph_glow x2: cyan cap-spot glow + light (big/small cap); dust: faint glowing spores; harvest_hit: strike face of the big cap, purple/cyan chips"
+  },
+  {
+   "name": "MooncapBase",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    8.536,
+    2.0928,
+    7.3802
+   ],
+   "tris": 212,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapBase.glb",
+     "kind": "solid",
+     "tris": 212,
+     "offset": [
+      0.0,
+      1.0464,
+      0.0
+     ],
+     "size": [
+      8.536,
+      2.0928,
+      7.3802
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rock pile with dirt"
+  },
+  {
+   "name": "MooncapCapShell",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    7.1653,
+    3.5734,
+    6.2587
+   ],
+   "tris": 80,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapCapShell.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.7867,
+      0.0
+     ],
+     "size": [
+      7.1653,
+      3.5734,
+      6.2587
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cap shell without spots"
+  },
+  {
+   "name": "MooncapDepleted",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "depleted",
+   "size": [
+    10.0969,
+    1.6855,
+    8.1434
+   ],
+   "tris": 292,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapDepleted.glb",
+     "kind": "solid",
+     "tris": 292,
+     "offset": [
+      0.0,
+      0.8428,
+      0.0
+     ],
+     "size": [
+      10.0969,
+      1.6855,
+      8.1434
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.035",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "harvest_deplete: burst at the base centre when the node is used up"
+  },
+  {
+   "name": "MooncapDrop",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "drop",
+   "size": [
+    1.9924,
+    2.3421,
+    1.7281
+   ],
+   "tris": 82,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapDrop.glb",
+     "kind": "solid",
+     "tris": 82,
+     "offset": [
+      0.0,
+      1.171,
+      0.0
+     ],
+     "size": [
+      1.9924,
+      2.3421,
+      1.7281
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_glyph_glow.003",
+     "kind": "glyph_glow",
+     "position": [
+      0.0,
+      2.0,
+      0.4
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glimmer",
+        "texture": "glow_soft",
+        "color": [
+         "#3FD6E4",
+         "#8FF3FA"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0,
+         0.2
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#3FD6E4",
+       "brightness": 0.27,
+       "range": 3.0,
+       "flicker": false,
+       "pulse": true
+      }
+     }
+    }
+   ],
+   "notes": "glyph_glow: faint spot glow on the pickup"
+  },
+  {
+   "name": "MooncapSpotInsert",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    1.413,
+    0.6364,
+    1.4128
+   ],
+   "tris": 20,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapSpotInsert.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.3182,
+      0.0
+     ],
+     "size": [
+      1.413,
+      0.6364,
+      1.4128
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_glyph_glow.002",
+     "kind": "glyph_glow",
+     "position": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glimmer",
+        "texture": "glow_soft",
+        "color": [
+         "#3FD6E4",
+         "#8FF3FA"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0,
+         0.2
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#3FD6E4",
+       "brightness": 0.36000000000000004,
+       "range": 4.0,
+       "flicker": false,
+       "pulse": true
+      }
+     }
+    }
+   ],
+   "notes": "glyph_glow: spot glow + light"
+  },
+  {
+   "name": "MooncapStem",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    2.861,
+    3.5563,
+    2.8095
+   ],
+   "tris": 44,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapStem.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      1.7782,
+      0.0
+     ],
+     "size": [
+      2.861,
+      3.5563,
+      2.8095
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cream stem alone"
+  },
+  {
+   "name": "RedPetal",
+   "sheet": "R08",
+   "subject": "Emberbloom",
+   "role": "drop",
+   "size": [
+    1.674,
+    0.7635,
+    0.9
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedPetal.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.3817,
+      0.0
+     ],
+     "size": [
+      1.674,
+      0.7635,
+      0.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "loose petal pickup"
+  },
+  {
+   "name": "RootFragment",
+   "sheet": "R08",
+   "subject": "AncientRoot",
+   "role": "drop",
+   "size": [
+    2.0236,
+    1.0927,
+    0.8454
+   ],
+   "tris": 100,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RootFragment.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.5463,
+      0.0
+     ],
+     "size": [
+      2.0236,
+      1.0927,
+      0.8454
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root fragment drop"
+  },
+  {
+   "name": "SporePod",
+   "sheet": "R08",
+   "subject": "Mooncap",
+   "role": "drop",
+   "size": [
+    1.1419,
+    2.1012,
+    1.2205
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SporePod.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      1.0506,
+      0.0
+     ],
+     "size": [
+      1.1419,
+      2.1012,
+      1.2205
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "mint spore pod pickup (faint emissive)"
+  }
+ ],
+ "stats": {
+  "assets": 32,
+  "pieces": 32,
+  "solid": 32,
+  "water": 0,
+  "glow": 0,
+  "tris": 7311,
+  "vfxSockets": 17,
+  "paletteColours": 15,
+  "paletteLevels": 177,
+  "meshBytes": 770104
+ },
+ "problems": []
+}

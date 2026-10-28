@@ -1,0 +1,554 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W06_fern_and_broadleaf.blend",
+ "sheet": "W06",
+ "module": "fern_and_broadleaf",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w06_bark",
+    "hex": "#8D6237",
+    "levels": [
+     0.95078,
+     0.95284,
+     0.95919,
+     0.96431,
+     0.9675,
+     0.97134,
+     0.9778,
+     0.98031,
+     0.98222,
+     0.9862,
+     0.99404,
+     0.99948,
+     1.00798,
+     1.01411,
+     1.02188,
+     1.02527,
+     1.03202,
+     1.03508,
+     1.03863,
+     1.04482,
+     1.04803,
+     1.01107
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_broadleaf",
+    "hex": "#8EC22C",
+    "levels": [
+     0.95194,
+     0.95523,
+     0.95767,
+     0.95995,
+     0.97153,
+     0.97395,
+     0.97903,
+     0.98978,
+     0.99204,
+     0.99675,
+     0.99956,
+     1.00257,
+     1.00433,
+     1.01111,
+     1.01418,
+     1.01743,
+     1.02318,
+     1.02502,
+     1.03304,
+     1.03577,
+     1.04093,
+     1.04556,
+     0.96559,
+     1.02964,
+     0.96329,
+     1.00814
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_fern",
+    "hex": "#2F7A33",
+    "levels": [
+     0.95119,
+     0.95382,
+     0.95635,
+     0.96143,
+     0.96364,
+     0.96751,
+     0.97005,
+     0.97464,
+     0.9776,
+     0.98132,
+     0.98547,
+     0.98949,
+     0.99225,
+     0.99591,
+     0.99987,
+     1.00755,
+     1.01103,
+     1.02041,
+     1.02502,
+     1.03563,
+     1.0381,
+     1.04315,
+     1.04539,
+     1.01682,
+     1.01451,
+     1.00427,
+     1.03304,
+     1.04067
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_moss",
+    "hex": "#ACC722",
+    "levels": [
+     0.96988,
+     0.99509,
+     1.01225,
+     1.02106,
+     1.04815,
+     1.03615,
+     0.98653,
+     1.00326,
+     0.97779
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_soil",
+    "hex": "#6E4B2B",
+    "levels": [
+     0.95001,
+     0.957,
+     0.97482,
+     0.99211
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_stone",
+    "hex": "#B1ADA9",
+    "levels": [
+     0.90555,
+     0.92173,
+     0.93695,
+     0.94649,
+     0.95232,
+     0.96027,
+     0.96631,
+     0.97133,
+     0.9744,
+     0.97865,
+     0.98196,
+     0.9854,
+     0.99067,
+     0.9942,
+     0.99873,
+     1.00153,
+     1.00364,
+     1.0061,
+     1.01121,
+     1.01484,
+     1.02239,
+     1.02644,
+     1.0317,
+     1.03837,
+     1.04465,
+     1.04846,
+     1.05467,
+     1.06131,
+     1.06598,
+     1.07054,
+     1.07883,
+     1.09739
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BroadLeafSingle",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    2.6,
+    1.3718,
+    1.2748
+   ],
+   "tris": 55,
+   "budget": 150,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadLeafSingle.glb",
+     "kind": "solid",
+     "tris": 55,
+     "offset": [
+      0.0,
+      0.6859,
+      0.0
+     ],
+     "size": [
+      2.6,
+      1.3718,
+      1.2748
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "One faceted kite/spade leaf on a short stem, stem end at the origin."
+  },
+  {
+   "name": "BroadleafCluster",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    5.6245,
+    4.7592,
+    5.1276
+   ],
+   "tris": 1574,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafCluster.glb",
+     "kind": "solid",
+     "tris": 1574,
+     "offset": [
+      0.0,
+      2.3796,
+      0.0
+     ],
+     "size": [
+      5.6245,
+      4.7592,
+      5.1276
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "8 broad kite leaves in 3 tiers on short stems, 4 green fern fronds behind, soil + rocks. No collision."
+  },
+  {
+   "name": "FernAndBroadleaf",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "hero",
+   "size": [
+    7.6872,
+    5.8112,
+    7.0045
+   ],
+   "tris": 2951,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernAndBroadleaf.glb",
+     "kind": "solid",
+     "tris": 2951,
+     "offset": [
+      0.0,
+      2.9056,
+      0.0
+     ],
+     "size": [
+      7.6872,
+      5.8112,
+      7.0045
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Walk-through undergrowth: no collision. 12 fern fronds in an even 360-degree rosette + 3 broad kite leaves low at the front, on a soil mound with 5 root nubs, 6 boulders and 2 moss tufts. No VFX."
+  },
+  {
+   "name": "FernFrondLarge",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    4.5,
+    1.9815,
+    1.1146
+   ],
+   "tris": 296,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernFrondLarge.glb",
+     "kind": "solid",
+     "tris": 296,
+     "offset": [
+      0.0,
+      0.9908,
+      0.0
+     ],
+     "size": [
+      4.5,
+      1.9815,
+      1.1146
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single pinnate fern frond, stem end at the origin, face to -Y; rotate and plant in a root crown to kit-bash a fern."
+  },
+  {
+   "name": "FernFrondMedium",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    3.2,
+    1.4068,
+    0.8067
+   ],
+   "tris": 232,
+   "budget": 250,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernFrondMedium.glb",
+     "kind": "solid",
+     "tris": 232,
+     "offset": [
+      0.0,
+      0.7034,
+      0.0
+     ],
+     "size": [
+      3.2,
+      1.4068,
+      0.8067
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single pinnate fern frond, stem end at the origin, face to -Y; rotate and plant in a root crown to kit-bash a fern."
+  },
+  {
+   "name": "FernFrondSmall",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    2.2,
+    0.9701,
+    0.5649
+   ],
+   "tris": 168,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernFrondSmall.glb",
+     "kind": "solid",
+     "tris": 168,
+     "offset": [
+      0.0,
+      0.485,
+      0.0
+     ],
+     "size": [
+      2.2,
+      0.9701,
+      0.5649
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single pinnate fern frond, stem end at the origin, face to -Y; rotate and plant in a root crown to kit-bash a fern."
+  },
+  {
+   "name": "FernRootCluster",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "part",
+   "size": [
+    2.0993,
+    1.1745,
+    1.9797
+   ],
+   "tris": 189,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FernRootCluster.glb",
+     "kind": "solid",
+     "tris": 189,
+     "offset": [
+      0.0,
+      0.5873,
+      0.0
+     ],
+     "size": [
+      2.0993,
+      1.1745,
+      1.9797
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stump-like root crown with 5 splayed roots; sits under a fern clump."
+  },
+  {
+   "name": "SpreadFern",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    7.0146,
+    2.7843,
+    7.0524
+   ],
+   "tris": 2555,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SpreadFern.glb",
+     "kind": "solid",
+     "tris": 2555,
+     "offset": [
+      0.0,
+      1.3922,
+      0.0
+     ],
+     "size": [
+      7.0146,
+      2.7843,
+      7.0524
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Low star of 10 near-horizontal mature fronds + 4 lighter young fronds rising at the centre, small mound. No broad leaves. No collision."
+  },
+  {
+   "name": "UprightFern",
+   "sheet": "W06",
+   "subject": "FernAndBroadleaf",
+   "role": "variant",
+   "size": [
+    5.1035,
+    5.2126,
+    4.4903
+   ],
+   "tris": 2272,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/UprightFern.glb",
+     "kind": "solid",
+     "tris": 2272,
+     "offset": [
+      0.0,
+      2.6063,
+      0.0
+     ],
+     "size": [
+      5.1035,
+      5.2126,
+      4.4903
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Narrow vase fern: 10 steep fronds, 2 broad leaves at the foot, soil + small rocks. No collision."
+  }
+ ],
+ "stats": {
+  "assets": 9,
+  "pieces": 9,
+  "solid": 9,
+  "water": 0,
+  "glow": 0,
+  "tris": 10292,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 121,
+  "meshBytes": 1049024
+ },
+ "problems": []
+}

@@ -1,8 +1,13 @@
--- World events by category and rarity (GDD §7, Q42–48, Q111–112, Q140–143). Each
--- category rolls on its own every director tick; a category without a Common entry
--- skips when nothing rarer hits. Footprints are radii in studs; biomes are the
--- placeholder rings until the real island arrives (v0.15). Loot entries are
--- {catalogId, min, max, chance}. Names, loot and NPC groups are placeholders.
+-- World events by category and rarity (GDD §7, §51, Q42–48, Q111–112, Q140–143).
+-- Each category rolls on its own every director tick, and after it triggers every
+-- non-Common entry rolls its own rarity weight, so event types never compete; a
+-- category without a Common entry skips when nothing rarer hits. Footprints are
+-- radii in studs; biomes are the placeholder rings until the real island arrives
+-- (v0.15). Loot entries are {catalogId, min, max, chance}. Ore events and meteors
+-- carry `minRank`, the pickaxe they need. Names, loot and NPC groups are
+-- placeholders.
+
+local Tiers = require(script.Parent.Parent.Items.Tiers)
 
 local EventCatalog = {}
 
@@ -27,12 +32,15 @@ local function node(id, name, rarity, biome, loot)
 	}
 end
 
-local function ore(id, name, rarity, biome, loot)
+-- Ore events need a pickaxe that can mine every ore they drop (GDD §51).
+local function ore(id, name, rarity, biome, minRank, loot)
 	local entry = node(id, name, rarity, biome, loot)
 	entry.footprint = 25
-	entry.tool = "Pickaxe"
+	entry.minRank = minRank
 	return entry
 end
+
+local R = Tiers.ToolRank
 
 local function npc(id, name, rarity, biome, group)
 	return {
@@ -65,32 +73,68 @@ local RUNE = { "ExtractionRune", 1, 1, 0.01 }
 
 EventCatalog.Entries = {
 	Vegetation = {
-		node("WildHerbPatch", "Wild Herb Patch", "Common", "OuterRim", { { "Herbs", 6, 10, 1 } }),
+		node("WildHerbPatch", "Wild Herb Patch", "Common", "OuterRim", {
+			{ "Herbs", 6, 10, 1 },
+			{ "Sweetberry", 2, 4, 0.5 },
+		}),
 		node("BloodberryThicket", "Bloodberry Thicket", "Uncommon", "InnerRing", {
-			{ "Berries", 8, 12, 1 },
+			{ "Redberry", 8, 12, 1 },
+			{ "Sweetberry", 4, 8, 1 },
 			{ "Herbs", 4, 8, 1 },
 		}),
-		node("IronbarkSapling", "Ironbark Sapling", "Rare", "Any", { { "Wood", 40, 60, 1 } }),
-		node("Emberbloom", "Emberbloom", "Epic", "Center", { { "AncientEmber", 1, 1, 1 }, { "Herbs", 10, 14, 1 } }),
+		node("IronbarkSapling", "Ironbark Sapling", "Rare", "Any", { { "Wood", 40, 60, 1 }, { "Resin", 3, 6, 1 } }),
+		-- The rare shrub (GDD §51): gathered by hand for rare berries and rare herbs.
+		node("WildbloomShrub", "Wildbloom Shrub", "Rare", "Any", {
+			{ "Sunberry", 2, 4, 1 },
+			{ "Glimmerberry", 2, 4, 1 },
+			{ "Bloodroot", 1, 2, 0.5 },
+			{ "Moonpetal", 1, 2, 0.5 },
+		}),
+		node("AncientWildbloom", "Ancient Wildbloom", "Epic", "InnerRing", {
+			{ "Sunberry", 5, 8, 1 },
+			{ "Glimmerberry", 5, 8, 1 },
+			{ "Bloodroot", 2, 3, 1 },
+			{ "Moonpetal", 2, 3, 1 },
+		}),
+		node("Emberbloom", "Emberbloom", "Epic", "Center", {
+			{ "AncientEmber", 1, 1, 1 },
+			{ "Herbs", 10, 14, 1 },
+			{ "Bloodroot", 1, 2, 0.5 },
+		}),
 		node("ElderIronwood", "Elder Ironwood", "Legendary", "Any", {
 			{ "Wood", 100, 140, 1 },
+			{ "Resin", 8, 12, 1 },
 			{ "AncientEmber", 1, 2, 1 },
 		}),
 		node("StarfallLotus", "Starfall Lotus", "Secret", "Center", {
 			{ "AncientEmber", 3, 3, 1 },
 			{ "Herbs", 30, 30, 1 },
+			{ "Moonpetal", 3, 3, 1 },
+			{ "Bloodroot", 3, 3, 1 },
 		}),
 	},
+	-- Ore by region (GDD §51): Outer Rim copper and iron, Inner Ring silver and
+	-- cobalt, the Crater mithril; Adamantine only in the rarest Crater seam.
 	Ore = {
-		ore("SurfaceStoneVein", "Surface Stone Vein", "Common", "OuterRim", { { "Stone", 30, 40, 1 } }),
-		ore("IronOutcrop", "Iron Outcrop", "Uncommon", "InnerRing", { { "Iron", 15, 25, 1 } }),
-		ore("RichIronLode", "Rich Iron Lode", "Rare", "Any", { { "Iron", 40, 60, 1 } }),
-		ore("EmberVeinedRock", "Ember-Veined Rock", "Epic", "Center", {
-			{ "Iron", 25, 35, 1 },
+		ore("SurfaceStoneVein", "Surface Stone Vein", "Common", "OuterRim", R.Wood, {
+			{ "Stone", 30, 40, 1 },
+			{ "Flint", 4, 8, 1 },
+		}),
+		ore("IronOutcrop", "Iron Outcrop", "Uncommon", "OuterRim", R.Copper, {
+			{ "IronOre", 15, 25, 1 },
+			{ "CopperOre", 10, 15, 1 },
+		}),
+		ore("CobaltLode", "Rich Cobalt Lode", "Rare", "InnerRing", R.Silver, {
+			{ "CobaltOre", 15, 25, 1 },
+			{ "SilverOre", 20, 30, 1 },
+		}),
+		ore("EmberVeinedRock", "Ember-Veined Rock", "Epic", "Center", R.Cobalt, {
+			{ "MithrilOre", 15, 25, 1 },
 			{ "AncientEmber", 1, 1, 1 },
 		}),
-		ore("HeartstoneSeam", "Heartstone Seam", "Mythic", "Center", {
-			{ "Iron", 70, 90, 1 },
+		ore("HeartstoneSeam", "Heartstone Seam", "Mythic", "Center", R.Mithril, {
+			{ "MithrilOre", 40, 60, 1 },
+			{ "AdamantineOre", 4, 8, 1 },
 			{ "AncientEmber", 2, 2, 1 },
 		}),
 	},
@@ -120,25 +164,31 @@ EventCatalog.Entries = {
 	},
 	Cache = {
 		cache("WeatheredCache", "Weathered Supply Cache", "Uncommon", {
-			{ "Iron", 10, 20, 1 },
+			{ "IronOre", 10, 20, 1 },
 			{ "Hide", 4, 8, 1 },
 			{ "BasicMedicine", 1, 2, 0.5 },
 		}),
 		cache("AncientCache", "Ancient Supply Cache", "Rare", {
-			{ "Iron", 20, 35, 1 },
+			{ "IronOre", 20, 35, 1 },
 			{ "AdvancedMedicine", 1, 2, 0.6 },
+			{ "AshenOil", 1, 2, 0.5 },
+			{ "SiegeResin", 1, 1, 0.3 },
 			{ "AncientEmber", 1, 1, 0.5 },
 			RUNE,
 		}),
 		cache("GildedCache", "Gilded Ancient Cache", "Epic", {
-			{ "Iron", 40, 60, 1 },
+			{ "SilverOre", 20, 35, 1 },
 			{ "Potion", 1, 1, 0.6 },
+			{ "AshenOil", 1, 3, 0.8 },
+			{ "SiegeResin", 1, 2, 0.6 },
 			{ "AncientEmber", 1, 2, 1 },
 			RUNE,
 		}),
 		cache("ElderCache", "Elder Ancient Cache", "Legendary", {
-			{ "Iron", 60, 90, 1 },
+			{ "CobaltOre", 30, 50, 1 },
 			{ "Potion", 1, 2, 1 },
+			{ "AshenOil", 2, 4, 1 },
+			{ "SiegeResin", 2, 3, 1 },
 			{ "AncientEmber", 2, 3, 1 },
 			RUNE,
 		}),
@@ -153,7 +203,14 @@ EventCatalog.Entries = {
 			footprint = 100,
 			lifetime = 900,
 			chunks = 8,
-			loot = { { "Iron", 15, 25, 1 }, { "AncientEmber", 1, 1, 0.25 } },
+			-- Meteors carry Adamantine Ore, so chunks need a Mithril Pickaxe (GDD §51).
+			minRank = R.Mithril,
+			loot = {
+				{ "AdamantineOre", 4, 8, 1 },
+				{ "AbyssalShard", 1, 2, 0.6 },
+				{ "Emberglass", 1, 2, 0.6 },
+				{ "AncientEmber", 1, 1, 0.25 },
+			},
 		},
 		{
 			id = "GreatMeteor",
@@ -164,7 +221,13 @@ EventCatalog.Entries = {
 			footprint = 100,
 			lifetime = 900,
 			chunks = 8,
-			loot = { { "Iron", 30, 45, 1 }, { "AncientEmber", 1, 1, 0.6 } },
+			minRank = R.Mithril,
+			loot = {
+				{ "AdamantineOre", 10, 16, 1 },
+				{ "AbyssalShard", 2, 4, 1 },
+				{ "Emberglass", 2, 4, 1 },
+				{ "AncientEmber", 1, 1, 0.6 },
+			},
 		},
 	},
 	Structure = {

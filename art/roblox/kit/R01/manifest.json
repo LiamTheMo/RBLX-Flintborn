@@ -1,0 +1,2679 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "R01",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "coal",
+    "hex": "#2F3137",
+    "levels": [
+     0.92,
+     0.96,
+     1.0,
+     1.04,
+     1.08
+    ],
+    "used": true
+   },
+   {
+    "key": "copper",
+    "hex": "#E2713A",
+    "levels": [
+     0.96,
+     1.0,
+     1.04
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_cu_rock",
+    "hex": "#9A897D",
+    "levels": [
+     0.96,
+     1.0,
+     1.04
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_cu_verdigris",
+    "hex": "#5E9E94",
+    "levels": [
+     0.96,
+     1.0,
+     1.04
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_flint",
+    "hex": "#3A393F",
+    "levels": [
+     0.97164,
+     0.97439,
+     0.97689,
+     0.97961,
+     0.98138,
+     0.98381,
+     0.98609,
+     0.98964,
+     0.99244,
+     0.99522,
+     0.99754,
+     0.99951,
+     1.00088,
+     1.00428,
+     1.00524,
+     1.00813,
+     1.01003,
+     1.01164,
+     1.01365,
+     1.01696,
+     1.01951,
+     1.02149,
+     1.02436,
+     1.02686,
+     1.02868
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_limestone",
+    "hex": "#C9AE94",
+    "levels": [
+     0.97133,
+     0.97357,
+     0.97674,
+     0.97884,
+     0.98118,
+     0.98326,
+     0.99011,
+     0.99257,
+     0.99445,
+     0.99795,
+     0.99974,
+     1.00295,
+     1.0055,
+     1.00747,
+     1.01072,
+     1.01434,
+     1.01551,
+     1.01788,
+     1.02009,
+     1.02264,
+     1.02633,
+     1.02951
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_stone",
+    "hex": "#877C78",
+    "levels": [
+     0.95,
+     0.96,
+     0.97184,
+     0.975,
+     0.97754,
+     0.97932,
+     0.98187,
+     0.98478,
+     0.98712,
+     0.99046,
+     0.99306,
+     0.99569,
+     0.99999,
+     1.00117,
+     1.00359,
+     1.00606,
+     1.00853,
+     1.01449,
+     1.01616,
+     1.01867,
+     1.02074,
+     1.02305,
+     1.02503,
+     1.02801,
+     1.02936,
+     1.04,
+     1.05,
+     0.96508,
+     0.95724
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CoalLump",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "drop",
+   "size": [
+    1.2203,
+    0.9175,
+    1.093
+   ],
+   "tris": 196,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalLump.glb",
+     "kind": "solid",
+     "tris": 196,
+     "offset": [
+      0.0,
+      0.4588,
+      0.0
+     ],
+     "size": [
+      1.2203,
+      0.9175,
+      1.093
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Coal lump item the player gets (two shapes; pick either per drop)."
+  },
+  {
+   "name": "CoalLumpB",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "drop",
+   "size": [
+    1.1444,
+    0.9292,
+    1.0481
+   ],
+   "tris": 162,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalLumpB.glb",
+     "kind": "solid",
+     "tris": 162,
+     "offset": [
+      0.0,
+      0.4646,
+      0.0
+     ],
+     "size": [
+      1.1444,
+      0.9292,
+      1.0481
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Coal lump item the player gets (two shapes; pick either per drop)."
+  },
+  {
+   "name": "CoalMainChunk",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "part",
+   "size": [
+    3.8643,
+    4.8332,
+    3.7652
+   ],
+   "tris": 234,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalMainChunk.glb",
+     "kind": "solid",
+     "tris": 234,
+     "offset": [
+      0.0,
+      2.4166,
+      0.0
+     ],
+     "size": [
+      3.8643,
+      4.8332,
+      3.7652
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broad gem-shaped main coal chunk, facets climbing to an apex left of centre."
+  },
+  {
+   "name": "CoalNode",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "hero",
+   "size": [
+    7.1531,
+    4.888,
+    4.9537
+   ],
+   "tris": 1166,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalNode.glb",
+     "kind": "solid",
+     "tris": 1166,
+     "offset": [
+      0.0,
+      2.444,
+      0.0
+     ],
+     "size": [
+      7.1531,
+      4.888,
+      4.9537
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.002",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.05,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#3A3C43",
+         "#24262B"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#55575F",
+         "#3B3D44"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#3A3C43",
+       "#24262B"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.002",
+     "kind": "harvest_hit",
+     "position": [
+      0.0654,
+      2.75,
+      1.3485
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#3A3C43",
+         "#24262B"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#55575F",
+         "#3B3D44"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#3A3C43",
+       "#24262B"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.005",
+     "kind": "ore_glint",
+     "position": [
+      0.0654,
+      3.85,
+      0.8202
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#C9CED8",
+         "#8E94A2"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.3,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 0.4,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.5,
+         0.4,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#C9CED8",
+       "#8E94A2"
+      ],
+      "rate": 0.3,
+      "light_emission": 0.4
+     }
+    }
+   ],
+   "notes": "Mine standing at the front (-Y). VFX_harvest_hit: front face of the main chunk at mid height, black/dark-grey coal chips and dark dust on each strike. VFX_harvest_deplete: base centre, coal chip and dust burst when the node empties (swap to CoalNodeDepleted). VFX_ore_glint: faint grey sheen twinkles over the coal."
+  },
+  {
+   "name": "CoalNodeBaseRock",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "part",
+   "size": [
+    3.7741,
+    1.6944,
+    1.8383
+   ],
+   "tris": 276,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalNodeBaseRock.glb",
+     "kind": "solid",
+     "tris": 276,
+     "offset": [
+      0.0,
+      0.8472,
+      0.0
+     ],
+     "size": [
+      3.7741,
+      1.6944,
+      1.8383
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Grey base rocks under the coal."
+  },
+  {
+   "name": "CoalNodeDepleted",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "depleted",
+   "size": [
+    7.1172,
+    1.5457,
+    4.9586
+   ],
+   "tris": 766,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalNodeDepleted.glb",
+     "kind": "solid",
+     "tris": 766,
+     "offset": [
+      0.0,
+      0.7729,
+      0.0
+     ],
+     "size": [
+      7.1172,
+      1.5457,
+      4.9586
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Mined-out base: grey rocks only, same footprint as CoalNode."
+  },
+  {
+   "name": "CoalSideChunk",
+   "sheet": "R01",
+   "subject": "CoalNode",
+   "role": "part",
+   "size": [
+    2.5534,
+    3.0997,
+    2.3104
+   ],
+   "tris": 218,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalSideChunk.glb",
+     "kind": "solid",
+     "tris": 218,
+     "offset": [
+      0.0,
+      1.5498,
+      0.0
+     ],
+     "size": [
+      2.5534,
+      3.0997,
+      2.3104
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Egg-shaped side coal chunk; lean it outward against a main chunk."
+  },
+  {
+   "name": "CopperInsert",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    1.4399,
+    1.2,
+    1.283
+   ],
+   "tris": 82,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperInsert.glb",
+     "kind": "solid",
+     "tris": 82,
+     "offset": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "size": [
+      1.4399,
+      1.2,
+      1.283
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Copper gem insert, flat base at z=0: sink about 40-50% of it into a rock face along the face normal (it rides on the host's collision). Add an ore_glint socket just off its crown when placed."
+  },
+  {
+   "name": "CopperInsertShard",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    0.7493,
+    1.0368,
+    0.5076
+   ],
+   "tris": 72,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperInsertShard.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.5184,
+      0.0
+     ],
+     "size": [
+      0.7493,
+      1.0368,
+      0.5076
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Copper gem insert, flat base at z=0: sink about 40-50% of it into a rock face along the face normal (it rides on the host's collision). Add an ore_glint socket just off its crown when placed."
+  },
+  {
+   "name": "CopperInsertSmall",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    0.7909,
+    0.85,
+    0.8044
+   ],
+   "tris": 64,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperInsertSmall.glb",
+     "kind": "solid",
+     "tris": 64,
+     "offset": [
+      0.0,
+      0.425,
+      0.0
+     ],
+     "size": [
+      0.7909,
+      0.85,
+      0.8044
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Copper gem insert, flat base at z=0: sink about 40-50% of it into a rock face along the face normal (it rides on the host's collision). Add an ore_glint socket just off its crown when placed."
+  },
+  {
+   "name": "CopperNode",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "hero",
+   "size": [
+    7.2028,
+    4.3337,
+    4.6562
+   ],
+   "tris": 1275,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperNode.glb",
+     "kind": "solid",
+     "tris": 1275,
+     "offset": [
+      0.0,
+      2.1669,
+      0.0
+     ],
+     "size": [
+      7.2028,
+      4.3337,
+      4.6562
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.003",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#9C8576",
+         "#E2713A"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#C2B2A6",
+         "#9C8B80"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#9C8576",
+       "#E2713A"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.003",
+     "kind": "harvest_hit",
+     "position": [
+      0.25,
+      2.6,
+      1.2629
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#E2713A",
+         "#9C8576"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#C2B2A6",
+         "#9C8B80"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E2713A",
+       "#9C8576"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.006",
+     "kind": "ore_glint",
+     "position": [
+      -1.2444,
+      3.7004,
+      1.0991
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFE6C2",
+         "#F7A061"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         0.25,
+         0.25,
+         0.25
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFE6C2",
+       "#F7A061"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.007",
+     "kind": "ore_glint",
+     "position": [
+      -0.9816,
+      1.7527,
+      1.9863
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFE6C2",
+         "#F7A061"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         0.25,
+         0.25,
+         0.25
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFE6C2",
+       "#F7A061"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.008",
+     "kind": "ore_glint",
+     "position": [
+      1.6542,
+      1.9971,
+      2.0034
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFE6C2",
+         "#F7A061"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         0.25,
+         0.25,
+         0.25
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFE6C2",
+       "#F7A061"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.009",
+     "kind": "ore_glint",
+     "position": [
+      1.7053,
+      2.9381,
+      -2.0846
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFE6C2",
+         "#F7A061"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         0.25,
+         0.25,
+         0.25
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFE6C2",
+       "#F7A061"
+      ]
+     }
+    }
+   ],
+   "notes": "Copper node, mined standing up. VFX: harvest_hit on the front strike face at mid height (orange copper + grey-brown rock chips and dust on each tool strike); harvest_deplete at the base centre (big chip burst when the node empties, then swap to CopperNodeDepleted); ore_glint just off the crown of each of the four copper gems (warm orange twinkles, copper is metallic; small emitter box so no glint spawns inside the gem)."
+  },
+  {
+   "name": "CopperNodeBaseRock",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    1.4592,
+    1.0084,
+    1.6408
+   ],
+   "tris": 35,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperNodeBaseRock.glb",
+     "kind": "solid",
+     "tris": 35,
+     "offset": [
+      0.0,
+      0.5042,
+      0.0
+     ],
+     "size": [
+      1.4592,
+      1.0084,
+      1.6408
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Small base rock for the node's foot."
+  },
+  {
+   "name": "CopperNodeBaseRockSmall",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    0.959,
+    0.613,
+    0.9684
+   ],
+   "tris": 37,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperNodeBaseRockSmall.glb",
+     "kind": "solid",
+     "tris": 37,
+     "offset": [
+      0.0,
+      0.3065,
+      0.0
+     ],
+     "size": [
+      0.959,
+      0.613,
+      0.9684
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Small base rock for the node's foot."
+  },
+  {
+   "name": "CopperNodeDepleted",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "depleted",
+   "size": [
+    6.7153,
+    1.7101,
+    4.3478
+   ],
+   "tris": 155,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperNodeDepleted.glb",
+     "kind": "solid",
+     "tris": 155,
+     "offset": [
+      0.0,
+      0.855,
+      0.0
+     ],
+     "size": [
+      6.7153,
+      1.7101,
+      4.3478
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Shown after the node is mined out; same footprint as CopperNode."
+  },
+  {
+   "name": "CopperNodeHostRock",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "part",
+   "size": [
+    6.8874,
+    4.3337,
+    4.3164
+   ],
+   "tris": 206,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperNodeHostRock.glb",
+     "kind": "solid",
+     "tris": 206,
+     "offset": [
+      0.0,
+      2.1669,
+      0.0
+     ],
+     "size": [
+      6.8874,
+      4.3337,
+      4.3164
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "The bare host rock, without copper or patina, for kit-bashing."
+  },
+  {
+   "name": "CopperOre",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "drop",
+   "size": [
+    1.4,
+    1.05,
+    1.25
+   ],
+   "tris": 204,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperOre.glb",
+     "kind": "solid",
+     "tris": 204,
+     "offset": [
+      0.0,
+      0.525,
+      0.0
+     ],
+     "size": [
+      1.4,
+      1.05,
+      1.25
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Copper ore item the player gets: faceted orange chunk with teal patina."
+  },
+  {
+   "name": "CopperOreSmall",
+   "sheet": "R01",
+   "subject": "CopperNode",
+   "role": "drop",
+   "size": [
+    1.2,
+    1.0,
+    1.05
+   ],
+   "tris": 186,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CopperOreSmall.glb",
+     "kind": "solid",
+     "tris": 186,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      1.2,
+      1.0,
+      1.05
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Copper ore item the player gets: faceted orange chunk with teal patina."
+  },
+  {
+   "name": "FlintFlake",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "drop",
+   "size": [
+    1.3909,
+    0.7935,
+    0.92
+   ],
+   "tris": 28,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintFlake.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.3968,
+      0.0
+     ],
+     "size": [
+      1.3909,
+      0.7935,
+      0.92
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.003",
+     "kind": "ore_glint",
+     "position": [
+      -0.1703,
+      0.752,
+      0.2049
+     ],
+     "vfx_scale": 0.25,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint flake drop (inventory item); ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintFlakeAlt",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "drop",
+   "size": [
+    1.3253,
+    0.829,
+    0.84
+   ],
+   "tris": 26,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintFlakeAlt.glb",
+     "kind": "solid",
+     "tris": 26,
+     "offset": [
+      0.0,
+      0.4145,
+      0.0
+     ],
+     "size": [
+      1.3253,
+      0.829,
+      0.84
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.004",
+     "kind": "ore_glint",
+     "position": [
+      -0.4202,
+      0.7685,
+      0.29
+     ],
+     "vfx_scale": 0.25,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint flake drop (inventory item); ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintInsert",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    2.0,
+    3.4,
+    1.1
+   ],
+   "tris": 62,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsert.glb",
+     "kind": "solid",
+     "tris": 62,
+     "offset": [
+      0.0,
+      1.7,
+      0.0
+     ],
+     "size": [
+      2.0,
+      3.4,
+      1.1
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.002",
+     "kind": "ore_glint",
+     "position": [
+      -0.5002,
+      2.1246,
+      0.3201
+     ],
+     "vfx_scale": 0.35,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock; ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintInsertSmall",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    1.4,
+    2.1,
+    0.84
+   ],
+   "tris": 16,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertSmall.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.05,
+      0.0
+     ],
+     "size": [
+      1.4,
+      2.1,
+      0.84
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock"
+  },
+  {
+   "name": "FlintInsertThin",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    0.8,
+    2.5,
+    0.6
+   ],
+   "tris": 16,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertThin.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.25,
+      0.0
+     ],
+     "size": [
+      0.8,
+      2.5,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock"
+  },
+  {
+   "name": "FlintNode",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "hero",
+   "size": [
+    7.0861,
+    5.5,
+    5.6883
+   ],
+   "tris": 341,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNode.glb",
+     "kind": "solid",
+     "tris": 341,
+     "offset": [
+      0.0,
+      2.75,
+      0.0
+     ],
+     "size": [
+      7.0861,
+      5.5,
+      5.6883
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.001",
+     "kind": "harvest_deplete",
+     "position": [
+      -0.0329,
+      0.3,
+      -0.3047
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#C9AE94",
+         "#4A4950"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D8C4AE",
+         "#BBA48E"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#C9AE94",
+       "#4A4950"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.001",
+     "kind": "harvest_hit",
+     "position": [
+      0.3671,
+      2.4,
+      1.6746
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#C9AE94",
+         "#45444A"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D8C4AE",
+         "#BBA48E"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#C9AE94",
+       "#45444A"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint",
+     "kind": "ore_glint",
+     "position": [
+      -1.6498,
+      1.7456,
+      2.6046
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.5,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.5
+     }
+    },
+    {
+     "name": "VFX_ore_glint.001",
+     "kind": "ore_glint",
+     "position": [
+      0.3009,
+      4.2295,
+      1.6638
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.5,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.5
+     }
+    }
+   ],
+   "notes": "harvest_hit: front strike face at mid height, tan limestone + dark flint chips; harvest_deplete: base centre, burst when the node empties; ore_glint x2: low-rate cool-white twinkles just off the front-left and upper flint crystals"
+  },
+  {
+   "name": "FlintNodeBaseRock",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    1.767,
+    1.1505,
+    1.3006
+   ],
+   "tris": 54,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeBaseRock.glb",
+     "kind": "solid",
+     "tris": 54,
+     "offset": [
+      0.0,
+      0.5753,
+      0.0
+     ],
+     "size": [
+      1.767,
+      1.1505,
+      1.3006
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "warm grey base rock scatter"
+  },
+  {
+   "name": "FlintNodeBaseRockSmall",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    0.7836,
+    0.5222,
+    0.7474
+   ],
+   "tris": 44,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeBaseRockSmall.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.2611,
+      0.0
+     ],
+     "size": [
+      0.7836,
+      0.5222,
+      0.7474
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "warm grey base rock scatter"
+  },
+  {
+   "name": "FlintNodeDepleted",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "depleted",
+   "size": [
+    6.55,
+    1.45,
+    4.0272
+   ],
+   "tris": 261,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeDepleted.glb",
+     "kind": "solid",
+     "tris": 261,
+     "offset": [
+      0.0,
+      0.725,
+      0.0
+     ],
+     "size": [
+      6.55,
+      1.45,
+      4.0272
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "mined-out base, same footprint as FlintNode"
+  },
+  {
+   "name": "FlintNodeLimestoneShell",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    6.588,
+    5.5,
+    4.2991
+   ],
+   "tris": 167,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeLimestoneShell.glb",
+     "kind": "solid",
+     "tris": 167,
+     "offset": [
+      0.0,
+      2.75,
+      0.0
+     ],
+     "size": [
+      6.588,
+      5.5,
+      4.2991
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bare limestone shell; flint inserts sit on its facets"
+  },
+  {
+   "name": "StoneChunk",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "drop",
+   "size": [
+    0.9832,
+    0.8499,
+    0.8792
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneChunk.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.4249,
+      0.0
+     ],
+     "size": [
+      0.9832,
+      0.8499,
+      0.8792
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone chunk drop"
+  },
+  {
+   "name": "StoneChunkB",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "drop",
+   "size": [
+    0.9076,
+    1.0288,
+    0.9672
+   ],
+   "tris": 20,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneChunkB.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.5144,
+      0.0
+     ],
+     "size": [
+      0.9076,
+      1.0288,
+      0.9672
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone chunk drop (taller)"
+  },
+  {
+   "name": "StoneNode",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "hero",
+   "size": [
+    7.3826,
+    4.7,
+    4.6252
+   ],
+   "tris": 200,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneNode.glb",
+     "kind": "solid",
+     "tris": 200,
+     "offset": [
+      0.0,
+      2.35,
+      0.0
+     ],
+     "size": [
+      7.3826,
+      4.7,
+      4.6252
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone node: big faceted grey boulder dome, flared base, three small support rocks at its foot"
+  },
+  {
+   "name": "StoneNodeDepleted",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "depleted",
+   "size": [
+    7.6727,
+    1.9,
+    4.3649
+   ],
+   "tris": 104,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneNodeDepleted.glb",
+     "kind": "solid",
+     "tris": 104,
+     "offset": [
+      0.0,
+      0.95,
+      0.0
+     ],
+     "size": [
+      7.6727,
+      1.9,
+      4.3649
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "depleted base: low flat rubble mound with side rocks"
+  },
+  {
+   "name": "StoneNodeMainRock",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "part",
+   "size": [
+    6.3629,
+    4.7,
+    4.6252
+   ],
+   "tris": 107,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneNodeMainRock.glb",
+     "kind": "solid",
+     "tris": 107,
+     "offset": [
+      0.0,
+      2.35,
+      0.0
+     ],
+     "size": [
+      6.3629,
+      4.7,
+      4.6252
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "main rock"
+  },
+  {
+   "name": "StoneNodeSupportRock",
+   "sheet": "R01",
+   "subject": "StoneNode",
+   "role": "part",
+   "size": [
+    1.5242,
+    1.0,
+    1.624
+   ],
+   "tris": 31,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneNodeSupportRock.glb",
+     "kind": "solid",
+     "tris": 31,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      1.5242,
+      1.0,
+      1.624
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "support rock"
+  }
+ ],
+ "stats": {
+  "assets": 33,
+  "pieces": 33,
+  "solid": 33,
+  "water": 0,
+  "glow": 0,
+  "tris": 6831,
+  "vfxSockets": 16,
+  "paletteColours": 7,
+  "paletteLevels": 90,
+  "meshBytes": 652812
+ },
+ "problems": []
+}

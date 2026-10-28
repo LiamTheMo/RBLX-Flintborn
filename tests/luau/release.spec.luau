@@ -2,8 +2,10 @@
 -- phase load into the final schema without losing data, and launch catalogs are
 -- complete and consistent.
 local Shared = game:GetService("ReplicatedStorage").Shared
+local EventCatalog = require(Shared.Events.EventCatalog)
 local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
+local NodeCatalog = require(Shared.Resources.NodeCatalog)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
 local QuestCatalog = require(Shared.Economy.QuestCatalog)
 local Recipes = require(Shared.Crafting.Recipes)
@@ -80,8 +82,19 @@ test("launch catalogs are complete: every item is obtainable or deliberately rar
 			sources[entry.catalogId] = true
 		end
 	end
-	-- Materials come from nodes and events; the rune and the Guardian's Fang
-	-- come from caches and the Guardian.
+	-- Berries grow on nodes; the rare berries only come from the rare shrub event.
+	for nodeType, node in NodeCatalog.Nodes do
+		expect(ItemCatalog.Get(node.material) ~= nil, nodeType .. " gives a real item")
+		sources[node.material] = true
+	end
+	for eventId, event in EventCatalog.ById do
+		for _, loot in event.loot or {} do
+			expect(ItemCatalog.Get(loot[1]) ~= nil, eventId .. " drops a real item: " .. tostring(loot[1]))
+			sources[loot[1]] = true
+		end
+	end
+	-- Materials come from nodes, creatures and events; the rune and the Guardian's
+	-- Fang come from caches and the Guardian.
 	local special = { ExtractionRune = true, GuardianFang = true }
 	for id, item in ItemCatalog.Items do
 		local ok = sources[id] or special[id] or item.family == ItemCatalog.Families.Material

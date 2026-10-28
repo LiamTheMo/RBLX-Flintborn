@@ -1,0 +1,532 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M007",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m007_base_rock",
+    "hex": "#9B8C88",
+    "levels": [
+     0.8917,
+     0.91238,
+     0.92412,
+     0.92767,
+     0.93124,
+     0.93898,
+     0.94624,
+     0.94896,
+     0.95111,
+     0.95432,
+     0.95636,
+     0.95996,
+     0.96458,
+     0.96626,
+     0.9694,
+     0.97226,
+     0.97361,
+     0.97794,
+     0.98164,
+     0.98493,
+     0.98772,
+     0.99219,
+     0.99395,
+     0.99754,
+     1.0006,
+     1.00379,
+     1.00903,
+     1.01373,
+     1.01878,
+     1.0228,
+     1.03145,
+     1.06927
+    ],
+    "used": true
+   },
+   {
+    "key": "m007_base_rock_cool",
+    "hex": "#928988",
+    "levels": [
+     0.93659,
+     0.9392,
+     0.96724,
+     0.97245,
+     0.97628,
+     0.97965,
+     0.98591,
+     0.98886,
+     0.99143,
+     1.00086,
+     1.00496,
+     1.00768,
+     1.01379,
+     1.01794,
+     1.02286,
+     1.0244,
+     1.02667,
+     1.03566,
+     1.03841
+    ],
+    "used": true
+   },
+   {
+    "key": "m007_base_rock_x_cool_50",
+    "hex": "#968A88",
+    "levels": [
+     0.93366,
+     0.94177,
+     0.94331,
+     0.94856,
+     0.95251,
+     0.9568,
+     0.95963,
+     0.96295,
+     0.9647,
+     0.9728,
+     0.97639,
+     0.98003,
+     0.9827,
+     0.98463,
+     0.98803,
+     0.99147,
+     0.99354,
+     0.99708,
+     0.99952,
+     1.00242,
+     1.00459,
+     1.0075,
+     1.01133,
+     1.01347,
+     1.01665,
+     1.02037,
+     1.02312,
+     1.02512,
+     1.02773,
+     1.03304
+    ],
+    "used": true
+   },
+   {
+    "key": "m007_coal",
+    "hex": "#2C2C31",
+    "levels": [
+     0.904,
+     0.9294,
+     0.93644,
+     0.94027,
+     0.94048,
+     0.9443,
+     0.94839,
+     0.95247,
+     0.95346,
+     0.95565,
+     0.95713,
+     0.95955,
+     0.96168,
+     0.96683,
+     0.96714,
+     0.96717,
+     0.97107,
+     0.97127,
+     0.972,
+     0.97374,
+     0.97798,
+     0.98536,
+     0.98784,
+     0.99246,
+     0.99398,
+     0.99903,
+     1.00397,
+     1.004,
+     1.01173,
+     1.02346,
+     1.03439,
+     1.05679
+    ],
+    "used": true
+   },
+   {
+    "key": "m007_coal_grey",
+    "hex": "#3B3B42",
+    "levels": [
+     0.89577,
+     0.9495,
+     0.96087,
+     0.9651,
+     0.97262,
+     0.97556,
+     0.97741,
+     0.98107,
+     0.98723,
+     0.98984,
+     0.99087,
+     0.99313,
+     0.99829,
+     1.00102,
+     1.00529,
+     1.00685,
+     1.00685,
+     1.00947,
+     1.01147,
+     1.01311,
+     1.01785,
+     1.01897,
+     1.02489,
+     1.02761,
+     1.03381,
+     1.03519,
+     1.03623,
+     1.03955,
+     1.05176,
+     1.05176,
+     1.05279,
+     1.09299
+    ],
+    "used": true
+   },
+   {
+    "key": "m007_coal_x_grey_50",
+    "hex": "#34343A",
+    "levels": [
+     0.92369,
+     0.93998,
+     0.94025,
+     0.94383,
+     0.94429,
+     0.94851,
+     0.94851,
+     0.95628,
+     0.96124,
+     0.96494,
+     0.9726,
+     0.97652,
+     0.97948,
+     0.98167,
+     0.98194,
+     0.98681,
+     0.98681,
+     0.98912,
+     0.99647,
+     1.00157,
+     1.00606,
+     1.00867,
+     1.01217,
+     1.01258,
+     1.01648,
+     1.0185,
+     1.01965,
+     1.03242,
+     1.04185,
+     1.06835,
+     1.06835,
+     1.07212
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Coal",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "hero",
+   "size": [
+    10.4153,
+    7.2,
+    7.1064
+   ],
+   "tris": 834,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Coal.glb",
+     "kind": "solid",
+     "tris": 834,
+     "offset": [
+      0.0,
+      3.6,
+      0.0
+     ],
+     "size": [
+      10.4153,
+      7.2,
+      7.1064
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "coal resource: a tall dark faceted main chunk with a side chunk each side, on a centre base rock and smaller pale base rocks round the foot; broad flat faces; one closed mesh"
+  },
+  {
+   "name": "CoalBaseRockCenter",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    4.8427,
+    2.6,
+    3.4579
+   ],
+   "tris": 50,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalBaseRockCenter.glb",
+     "kind": "solid",
+     "tris": 50,
+     "offset": [
+      0.0,
+      1.3,
+      0.0
+     ],
+     "size": [
+      4.8427,
+      2.6,
+      3.4579
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (Center): broad pale faceted rock"
+  },
+  {
+   "name": "CoalBaseRockLeft",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    2.2883,
+    1.4,
+    2.0079
+   ],
+   "tris": 50,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalBaseRockLeft.glb",
+     "kind": "solid",
+     "tris": 50,
+     "offset": [
+      0.0,
+      0.7,
+      0.0
+     ],
+     "size": [
+      2.2883,
+      1.4,
+      2.0079
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (Left): small pale faceted rock"
+  },
+  {
+   "name": "CoalBaseRockRight",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    1.9976,
+    1.3,
+    1.9764
+   ],
+   "tris": 50,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalBaseRockRight.glb",
+     "kind": "solid",
+     "tris": 50,
+     "offset": [
+      0.0,
+      0.65,
+      0.0
+     ],
+     "size": [
+      1.9976,
+      1.3,
+      1.9764
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (Right): small pale faceted rock"
+  },
+  {
+   "name": "CoalChunkLeft",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    3.4374,
+    5.0,
+    3.5885
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalChunkLeft.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      2.5,
+      0.0
+     ],
+     "size": [
+      3.4374,
+      5.0,
+      3.5885
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Chunk (Left): dark faceted coal chunk"
+  },
+  {
+   "name": "CoalChunkMain",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    4.6515,
+    7.2,
+    5.118
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalChunkMain.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      3.6,
+      0.0
+     ],
+     "size": [
+      4.6515,
+      7.2,
+      5.118
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Chunk: tall dark faceted coal chunk"
+  },
+  {
+   "name": "CoalChunkRight",
+   "sheet": "M007",
+   "subject": "Coal",
+   "role": "part",
+   "size": [
+    3.2778,
+    4.7,
+    3.0707
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CoalChunkRight.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      2.35,
+      0.0
+     ],
+     "size": [
+      3.2778,
+      4.7,
+      3.0707
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Chunk (Right): dark faceted coal chunk"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 1164,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 177,
+  "meshBytes": 109628
+ },
+ "problems": []
+}

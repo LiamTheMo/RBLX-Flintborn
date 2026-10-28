@@ -1,0 +1,898 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W01_pebble_scatter.blend",
+ "sheet": "W01",
+ "module": "pebble_scatter",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "flower_white",
+    "hex": "#F5F2EA",
+    "levels": [
+     0.97118,
+     0.97327,
+     0.97512,
+     0.97743,
+     0.98009,
+     0.98235,
+     0.98438,
+     0.98666,
+     0.98873,
+     0.99096,
+     0.99307,
+     0.99536,
+     0.99723,
+     0.99924,
+     1.00137,
+     1.0037,
+     1.0056,
+     1.00771,
+     1.01001,
+     1.01217,
+     1.01437,
+     1.01599,
+     1.01845,
+     1.02078,
+     1.02284,
+     1.02515,
+     1.02752,
+     1.02927
+    ],
+    "used": true
+   },
+   {
+    "key": "flower_yellow",
+    "hex": "#F2C230",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.94113,
+     0.95074,
+     0.9529,
+     0.95587,
+     0.9597,
+     0.96292,
+     0.96935,
+     0.97186,
+     0.97377,
+     0.97777,
+     0.98017,
+     0.98571,
+     0.98906,
+     0.99691,
+     1.00074,
+     1.00314,
+     1.00538,
+     1.00775,
+     1.01004,
+     1.01277,
+     1.01424,
+     1.01676,
+     1.022,
+     1.02517,
+     1.02684,
+     1.03011,
+     1.03273,
+     1.03549,
+     1.03745,
+     1.03925,
+     1.04448,
+     1.04911
+    ],
+    "used": false
+   },
+   {
+    "key": "kit_rock_dark",
+    "hex": "#7F7C8A",
+    "levels": [
+     0.82,
+     0.8281,
+     0.83276,
+     0.83879,
+     0.84323,
+     0.8497,
+     0.852,
+     0.85569,
+     0.86309,
+     0.87042,
+     0.87614,
+     0.87851,
+     0.88467,
+     0.89318,
+     0.90527,
+     0.90846,
+     0.91599,
+     0.91949,
+     0.9243,
+     0.92983,
+     0.94245,
+     0.94455,
+     0.95064,
+     0.95771,
+     0.96895,
+     0.9745,
+     0.97831,
+     0.98987,
+     0.99838,
+     1.00633,
+     1.014,
+     1.01974
+    ],
+    "used": false
+   },
+   {
+    "key": "kit_rock_light",
+    "hex": "#C9BCB4",
+    "levels": [
+     0.9441,
+     0.95467,
+     0.96257,
+     0.96471,
+     0.96667,
+     0.96917,
+     0.97158,
+     0.97389,
+     0.97589,
+     0.97938,
+     0.98176,
+     0.98472,
+     0.9873,
+     0.98863,
+     0.99255,
+     0.99561,
+     0.99826,
+     1.00059,
+     1.00549,
+     1.00771,
+     1.01049,
+     1.01333,
+     1.01819,
+     1.01944,
+     1.02284,
+     1.0272,
+     1.03005,
+     1.03397,
+     1.0384,
+     1.04182,
+     1.04393,
+     1.04838
+    ],
+    "used": false
+   },
+   {
+    "key": "leaf",
+    "hex": "#6C9A28",
+    "levels": [
+     0.90977,
+     0.92916,
+     0.93874,
+     0.94347,
+     0.95089,
+     0.95534,
+     0.95953,
+     0.96468,
+     0.96869,
+     0.9728,
+     0.97641,
+     0.98203,
+     0.98561,
+     0.99122,
+     0.9944,
+     0.99897,
+     1.00166,
+     1.00517,
+     1.00901,
+     1.0141,
+     1.01923,
+     1.02502,
+     1.02934,
+     1.03433,
+     1.03914,
+     1.04891,
+     1.0524,
+     1.05835,
+     1.06416,
+     1.07079,
+     1.08163,
+     1.09715
+    ],
+    "used": false
+   },
+   {
+    "key": "leaf_dark",
+    "hex": "#3F6A1E",
+    "levels": [
+     0.83641,
+     0.86057,
+     0.86636,
+     0.87318,
+     0.88196,
+     0.88724,
+     0.89246,
+     0.89669,
+     0.90319,
+     0.90801,
+     0.91108,
+     0.91578,
+     0.92137,
+     0.92564,
+     0.9292,
+     0.93208,
+     0.93564,
+     0.94105,
+     0.94475,
+     0.94971,
+     0.95445,
+     0.95949,
+     0.9633,
+     0.96634,
+     0.97087,
+     0.97683,
+     0.98105,
+     0.98616,
+     0.99316,
+     1.00568,
+     1.03267,
+     1.09454
+    ],
+    "used": false
+   },
+   {
+    "key": "leaf_light",
+    "hex": "#86AE2E",
+    "levels": [
+     0.90374,
+     0.92083,
+     0.9328,
+     0.93901,
+     0.94504,
+     0.95037,
+     0.95532,
+     0.96013,
+     0.96515,
+     0.97035,
+     0.9759,
+     0.97833,
+     0.98315,
+     0.98702,
+     0.99008,
+     0.99366,
+     0.99729,
+     1.00137,
+     1.00555,
+     1.00872,
+     1.01307,
+     1.01784,
+     1.02344,
+     1.02876,
+     1.0341,
+     1.04107,
+     1.0441,
+     1.05095,
+     1.05743,
+     1.06564,
+     1.07617,
+     1.09326
+    ],
+    "used": false
+   },
+   {
+    "key": "moss",
+    "hex": "#8AAA24",
+    "levels": [
+     0.91437,
+     0.95852,
+     0.96325,
+     0.96946,
+     0.9736,
+     0.97768,
+     0.98276,
+     0.98775,
+     0.99399,
+     0.99795,
+     0.99992,
+     1.00427,
+     1.01,
+     1.01257,
+     1.01455,
+     1.01946,
+     1.02186,
+     1.02485,
+     1.02852,
+     1.03309,
+     1.03579,
+     1.0389,
+     1.04316,
+     1.04784,
+     1.05246,
+     1.05549,
+     1.0589,
+     1.0631,
+     1.06527,
+     1.07104,
+     1.07619,
+     1.08416
+    ],
+    "used": false
+   },
+   {
+    "key": "moss_dark",
+    "hex": "#5E8A1E",
+    "levels": [
+     0.84302,
+     0.86814,
+     0.89533,
+     0.90613,
+     0.91248,
+     0.9225,
+     0.92795,
+     0.93248,
+     0.93687,
+     0.94098,
+     0.95119,
+     0.95463,
+     0.95672,
+     0.9585,
+     0.962,
+     0.96533,
+     0.97099,
+     0.97501,
+     0.97872,
+     0.98431,
+     0.98968,
+     0.99222,
+     0.99735,
+     1.00433,
+     1.00869,
+     1.01527,
+     1.02137,
+     1.02859,
+     1.03499,
+     1.04039,
+     1.04466,
+     1.07306
+    ],
+    "used": false
+   },
+   {
+    "key": "moss_light",
+    "hex": "#C4D02E",
+    "levels": [
+     0.91042,
+     0.92594,
+     0.93212,
+     0.9386,
+     0.94169,
+     0.94751,
+     0.95306,
+     0.96007,
+     0.96221,
+     0.96448,
+     0.96889,
+     0.97222,
+     0.97348,
+     0.97859,
+     0.982,
+     0.9886,
+     0.99145,
+     0.99482,
+     0.99946,
+     1.00315,
+     1.00478,
+     1.01003,
+     1.01177,
+     1.01578,
+     1.01966,
+     1.02665,
+     1.0316,
+     1.03563,
+     1.0418,
+     1.05409,
+     1.06474,
+     1.09292
+    ],
+    "used": false
+   },
+   {
+    "key": "w01_leaf",
+    "hex": "#7AAB1E",
+    "levels": [
+     0.90421,
+     0.9315,
+     0.94141,
+     0.94757,
+     0.95331,
+     0.95834,
+     0.96295,
+     0.96695,
+     0.97197,
+     0.97556,
+     0.9794,
+     0.98287,
+     0.98675,
+     0.99066,
+     0.99422,
+     0.99759,
+     1.00185,
+     1.00576,
+     1.01001,
+     1.01354,
+     1.01739,
+     1.02168,
+     1.02596,
+     1.0302,
+     1.03448,
+     1.03893,
+     1.04367,
+     1.04994,
+     1.05662,
+     1.06474,
+     1.07334,
+     1.09434
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss",
+    "hex": "#ADBB14",
+    "levels": [
+     0.95001,
+     0.95271,
+     0.9565,
+     0.9587,
+     0.96172,
+     0.96414,
+     0.96788,
+     0.97131,
+     0.9741,
+     0.97832,
+     0.98225,
+     0.98569,
+     0.98856,
+     0.99166,
+     0.99475,
+     0.9989,
+     1.00154,
+     1.00548,
+     1.00859,
+     1.01163,
+     1.01515,
+     1.01748,
+     1.02174,
+     1.0253,
+     1.02927,
+     1.03277,
+     1.03536,
+     1.03864,
+     1.04115,
+     1.04423,
+     1.0469,
+     1.04984
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock",
+    "hex": "#B29F98",
+    "levels": [
+     0.94004,
+     0.94385,
+     0.94847,
+     0.95219,
+     0.95531,
+     0.95904,
+     0.96351,
+     0.96807,
+     0.97026,
+     0.97466,
+     0.97753,
+     0.98093,
+     0.98605,
+     0.9895,
+     0.99198,
+     0.99681,
+     1.0014,
+     1.00417,
+     1.00855,
+     1.01304,
+     1.01744,
+     1.02226,
+     1.02614,
+     1.03029,
+     1.03286,
+     1.03955,
+     1.04259,
+     1.04494,
+     1.048,
+     1.052,
+     1.05523,
+     1.05985
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Pebble",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    1.4,
+    1.05,
+    1.25
+   ],
+   "tris": 59,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Pebble.glb",
+     "kind": "solid",
+     "tris": 59,
+     "offset": [
+      0.0,
+      0.525,
+      0.0
+     ],
+     "size": [
+      1.4,
+      1.05,
+      1.25
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "PebbleFlatSlab",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    5.0,
+    1.15,
+    3.2
+   ],
+   "tris": 105,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleFlatSlab.glb",
+     "kind": "solid",
+     "tris": 105,
+     "offset": [
+      0.0,
+      0.575,
+      0.0
+     ],
+     "size": [
+      5.0,
+      1.15,
+      3.2
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "PebbleRoundRock",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    1.5,
+    1.25,
+    1.4
+   ],
+   "tris": 89,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleRoundRock.glb",
+     "kind": "solid",
+     "tris": 89,
+     "offset": [
+      0.0,
+      0.625,
+      0.0
+     ],
+     "size": [
+      1.5,
+      1.25,
+      1.4
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "PebbleScatter",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "hero",
+   "size": [
+    10.1102,
+    2.0475,
+    7.617
+   ],
+   "tris": 2096,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatter.glb",
+     "kind": "solid",
+     "tris": 2096,
+     "offset": [
+      0.0,
+      1.0237,
+      0.0
+     ],
+     "size": [
+      10.1102,
+      2.0475,
+      7.617
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "slab, wedge, round rock, pebble, small stones; moss, leafy clumps, white flowers"
+  },
+  {
+   "name": "PebbleScatterDense",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    9.2711,
+    1.5225,
+    8.8188
+   ],
+   "tris": 2372,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterDense.glb",
+     "kind": "solid",
+     "tris": 2372,
+     "offset": [
+      0.0,
+      0.7613,
+      0.0
+     ],
+     "size": [
+      9.2711,
+      1.5225,
+      8.8188
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "8+ pieces"
+  },
+  {
+   "name": "PebbleScatterMedium",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    8.0,
+    1.3125,
+    7.1745
+   ],
+   "tris": 1367,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterMedium.glb",
+     "kind": "solid",
+     "tris": 1367,
+     "offset": [
+      0.0,
+      0.6562,
+      0.0
+     ],
+     "size": [
+      8.0,
+      1.3125,
+      7.1745
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "5 pieces"
+  },
+  {
+   "name": "PebbleScatterSparse",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    7.9283,
+    1.3125,
+    5.0307
+   ],
+   "tris": 811,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterSparse.glb",
+     "kind": "solid",
+     "tris": 811,
+     "offset": [
+      0.0,
+      0.6562,
+      0.0
+     ],
+     "size": [
+      7.9283,
+      1.3125,
+      5.0307
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "3 pieces"
+  },
+  {
+   "name": "PebbleSmallStone",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    1.2,
+    0.8,
+    1.0
+   ],
+   "tris": 60,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleSmallStone.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      1.2,
+      0.8,
+      1.0
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "PebbleWedgeRock",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    2.8,
+    1.8324,
+    2.3019
+   ],
+   "tris": 331,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleWedgeRock.glb",
+     "kind": "solid",
+     "tris": 331,
+     "offset": [
+      0.0,
+      0.9162,
+      0.0
+     ],
+     "size": [
+      2.8,
+      1.8324,
+      2.3019
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "knee high (2.8 x 2.3 x 1.6): map placement may override collision to hull when it stands alone"
+  }
+ ],
+ "stats": {
+  "assets": 9,
+  "pieces": 9,
+  "solid": 9,
+  "water": 0,
+  "glow": 0,
+  "tris": 7290,
+  "vfxSockets": 0,
+  "paletteColours": 5,
+  "paletteLevels": 125,
+  "meshBytes": 700200
+ },
+ "problems": []
+}

@@ -1,0 +1,1897 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V01",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v01_blue_blade",
+    "hex": "#1F8A52",
+    "levels": [
+     0.93341,
+     0.93833,
+     0.94304,
+     0.95024,
+     0.95258,
+     0.95487,
+     0.9578,
+     0.95991,
+     0.96245,
+     0.96615,
+     0.97624,
+     0.98067,
+     0.98466,
+     0.98691,
+     0.99185,
+     0.99635,
+     1.00612,
+     1.00743,
+     1.01154,
+     1.0171,
+     1.02233,
+     1.03203,
+     1.03369,
+     1.0364,
+     1.04014,
+     1.04404,
+     1.04731,
+     1.04936,
+     1.05693,
+     1.06032,
+     1.06425,
+     1.06881
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_brown",
+    "hex": "#8A5530",
+    "levels": [
+     0.9312,
+     0.93329,
+     0.93739,
+     0.94297,
+     0.9471,
+     0.95135,
+     0.95267,
+     0.95657,
+     0.96146,
+     0.9624,
+     0.96774,
+     0.97267,
+     0.97557,
+     0.98334,
+     0.98958,
+     0.99371,
+     1.00029,
+     1.0076,
+     1.01066,
+     1.01223,
+     1.01923,
+     1.02415,
+     1.02704,
+     1.03172,
+     1.03756,
+     1.04123,
+     1.04551,
+     1.05057,
+     1.05484,
+     1.05794,
+     1.05974,
+     1.06681
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_clover_leaf",
+    "hex": "#2E9A3A",
+    "levels": [
+     0.93032,
+     0.93252,
+     0.93589,
+     0.94092,
+     0.94481,
+     0.95047,
+     0.95436,
+     0.959,
+     0.96318,
+     0.96652,
+     0.9718,
+     0.97458,
+     0.97743,
+     0.98886,
+     0.99097,
+     0.99707,
+     0.99794,
+     1.00876,
+     1.01519,
+     1.02182,
+     1.0246,
+     1.02922,
+     1.0358,
+     1.0407,
+     1.04213,
+     1.04311,
+     1.04696,
+     1.05588,
+     1.05847,
+     1.0659,
+     1.06843,
+     1.06989
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_cream",
+    "hex": "#EFE6CF",
+    "levels": [
+     0.93003,
+     0.93522,
+     0.93886,
+     0.94341,
+     0.94875,
+     0.95035,
+     0.95354,
+     0.95845,
+     0.96621,
+     0.97032,
+     0.97196,
+     0.97475,
+     0.97896,
+     0.98531,
+     0.99046,
+     0.99479,
+     0.9999,
+     1.00514,
+     1.01053,
+     1.01824,
+     1.02365,
+     1.02739,
+     1.03087,
+     1.03749,
+     1.04045,
+     1.04493,
+     1.04724,
+     1.05308,
+     1.05588,
+     1.05931,
+     1.06424,
+     1.06922
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_dandelion_leaf",
+    "hex": "#5FAE2A",
+    "levels": [
+     0.93098,
+     0.93175,
+     0.9347,
+     0.93896,
+     0.94576,
+     0.94701,
+     0.94743,
+     0.95097,
+     0.95507,
+     0.95555,
+     0.95794,
+     0.95816,
+     0.96198,
+     0.96803,
+     0.97428,
+     0.97749,
+     0.98004,
+     0.98536,
+     1.00233,
+     1.01108,
+     1.01783,
+     1.02525,
+     1.03024,
+     1.03247,
+     1.03577,
+     1.04236,
+     1.04749,
+     1.05179,
+     1.05974,
+     1.06479,
+     1.06656,
+     1.06778
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_dandelion_yellow",
+    "hex": "#FFC400",
+    "levels": [
+     0.93074,
+     0.9336,
+     0.94022,
+     0.94372,
+     0.94947,
+     0.95254,
+     0.95727,
+     0.96211,
+     0.96562,
+     0.96891,
+     0.96979,
+     0.97386,
+     0.98029,
+     0.98367,
+     0.98852,
+     0.9915,
+     0.99494,
+     0.99906,
+     1.00581,
+     1.01026,
+     1.01372,
+     1.02049,
+     1.02349,
+     1.02762,
+     1.03136,
+     1.0351,
+     1.03836,
+     1.04513,
+     1.0512,
+     1.05488,
+     1.05927,
+     1.06708
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_dry_grass",
+    "hex": "#C9A035",
+    "levels": [
+     0.95018,
+     0.95424,
+     0.96623,
+     0.97118,
+     0.97703,
+     0.98031,
+     0.98692,
+     0.99069,
+     0.99806,
+     1.01763,
+     1.01887,
+     1.02643,
+     1.02981,
+     1.03202,
+     1.03656,
+     1.05513,
+     1.06716
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_sedge_blade",
+    "hex": "#8DB82A",
+    "levels": [
+     0.93161,
+     0.93489,
+     0.93931,
+     0.94267,
+     0.94351,
+     0.94672,
+     0.951,
+     0.95539,
+     0.95658,
+     0.96279,
+     0.96374,
+     0.96664,
+     0.96772,
+     0.96956,
+     0.97721,
+     0.98259,
+     0.99309,
+     0.99615,
+     1.00281,
+     1.00914,
+     1.01056,
+     1.01329,
+     1.0152,
+     1.02413,
+     1.02981,
+     1.03556,
+     1.04469,
+     1.05067,
+     1.05373,
+     1.05461,
+     1.05736,
+     1.06271
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_seedhead_tan",
+    "hex": "#D0AC70",
+    "levels": [
+     0.93197,
+     0.93439,
+     0.93749,
+     0.93978,
+     0.94511,
+     0.9475,
+     0.9521,
+     0.95549,
+     0.96022,
+     0.9722,
+     0.97846,
+     0.98146,
+     0.98507,
+     0.9881,
+     0.99071,
+     0.99498,
+     1.00332,
+     1.00697,
+     1.01679,
+     1.02016,
+     1.02116,
+     1.02606,
+     1.03253,
+     1.04058,
+     1.04467,
+     1.04627,
+     1.04851,
+     1.05157,
+     1.05785,
+     1.06395,
+     1.06807,
+     1.06979
+    ],
+    "used": true
+   },
+   {
+    "key": "v01_stem",
+    "hex": "#4C9230",
+    "levels": [
+     0.93166,
+     0.93425,
+     0.93835,
+     0.94332,
+     0.94771,
+     0.94859,
+     0.95926,
+     0.96436,
+     0.96741,
+     0.9719,
+     0.97681,
+     0.98071,
+     0.98705,
+     0.99271,
+     0.99501,
+     0.99564,
+     1.00433,
+     1.01272,
+     1.01813,
+     1.02135,
+     1.02603,
+     1.03395,
+     1.03931,
+     1.04004,
+     1.04423,
+     1.05045,
+     1.06097,
+     1.06445,
+     1.06475,
+     1.0672,
+     1.06806,
+     1.06857
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BluegrassClump",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "hero",
+   "size": [
+    5.5542,
+    4.1896,
+    5.5985
+   ],
+   "tris": 1992,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassClump.glb",
+     "kind": "solid",
+     "tris": 1992,
+     "offset": [
+      0.0,
+      2.0948,
+      0.0
+     ],
+     "size": [
+      5.5542,
+      4.1896,
+      5.5985
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassCompact",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "variant",
+   "size": [
+    2.5253,
+    2.7808,
+    2.9895
+   ],
+   "tris": 1394,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassCompact.glb",
+     "kind": "solid",
+     "tris": 1394,
+     "offset": [
+      0.0,
+      1.3904,
+      0.0
+     ],
+     "size": [
+      2.5253,
+      2.7808,
+      2.9895
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassDryLateGrowth",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "variant",
+   "size": [
+    3.8619,
+    3.8944,
+    3.9571
+   ],
+   "tris": 2146,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassDryLateGrowth.glb",
+     "kind": "solid",
+     "tris": 2146,
+     "offset": [
+      0.0,
+      1.9472,
+      0.0
+     ],
+     "size": [
+      3.8619,
+      3.8944,
+      3.9571
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassLongBlade",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "part",
+   "size": [
+    1.6962,
+    3.3207,
+    0.4677
+   ],
+   "tris": 46,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassLongBlade.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      1.6603,
+      0.0
+     ],
+     "size": [
+      1.6962,
+      3.3207,
+      0.4677
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassRootBase",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "part",
+   "size": [
+    1.5524,
+    0.615,
+    1.49
+   ],
+   "tris": 160,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassRootBase.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.3075,
+      0.0
+     ],
+     "size": [
+      1.5524,
+      0.615,
+      1.49
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassSeedhead",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "part",
+   "size": [
+    1.058,
+    3.2074,
+    0.4919
+   ],
+   "tris": 262,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassSeedhead.glb",
+     "kind": "solid",
+     "tris": 262,
+     "offset": [
+      0.0,
+      1.6037,
+      0.0
+     ],
+     "size": [
+      1.058,
+      3.2074,
+      0.4919
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassShortBlade",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "part",
+   "size": [
+    0.5769,
+    2.3441,
+    0.3929
+   ],
+   "tris": 46,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassShortBlade.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      1.1721,
+      0.0
+     ],
+     "size": [
+      0.5769,
+      2.3441,
+      0.3929
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassStem",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "part",
+   "size": [
+    0.4358,
+    2.011,
+    0.2
+   ],
+   "tris": 84,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassStem.glb",
+     "kind": "solid",
+     "tris": 84,
+     "offset": [
+      0.0,
+      1.0055,
+      0.0
+     ],
+     "size": [
+      0.4358,
+      2.011,
+      0.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "BluegrassWideSpread",
+   "sheet": "V01",
+   "subject": "BluegrassClump",
+   "role": "variant",
+   "size": [
+    5.9142,
+    3.0497,
+    5.7812
+   ],
+   "tris": 2284,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BluegrassWideSpread.glb",
+     "kind": "solid",
+     "tris": 2284,
+     "offset": [
+      0.0,
+      1.5249,
+      0.0
+     ],
+     "size": [
+      5.9142,
+      3.0497,
+      5.7812
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bluegrass: folded arching blades, tan seedheads. No sockets, no VFX."
+  },
+  {
+   "name": "CloverFlowerHead",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "part",
+   "size": [
+    0.6915,
+    0.9543,
+    0.7039
+   ],
+   "tris": 268,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverFlowerHead.glb",
+     "kind": "solid",
+     "tris": 268,
+     "offset": [
+      0.0,
+      0.4772,
+      0.0
+     ],
+     "size": [
+      0.6915,
+      0.9543,
+      0.7039
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets"
+  },
+  {
+   "name": "CloverFloweringPatch",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "variant",
+   "size": [
+    2.9679,
+    2.8059,
+    2.8024
+   ],
+   "tris": 2794,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverFloweringPatch.glb",
+     "kind": "solid",
+     "tris": 2794,
+     "offset": [
+      0.0,
+      1.403,
+      0.0
+     ],
+     "size": [
+      2.9679,
+      2.8059,
+      2.8024
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Flowering Patch"
+  },
+  {
+   "name": "CloverLeafModule",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "part",
+   "size": [
+    1.2028,
+    1.3705,
+    0.8701
+   ],
+   "tris": 146,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverLeafModule.glb",
+     "kind": "solid",
+     "tris": 146,
+     "offset": [
+      0.0,
+      0.6852,
+      0.0
+     ],
+     "size": [
+      1.2028,
+      1.3705,
+      0.8701
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets"
+  },
+  {
+   "name": "CloverLeaflet",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "part",
+   "size": [
+    0.6336,
+    1.0431,
+    0.4552
+   ],
+   "tris": 40,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverLeaflet.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      0.5216,
+      0.0
+     ],
+     "size": [
+      0.6336,
+      1.0431,
+      0.4552
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "underside shown"
+  },
+  {
+   "name": "CloverPatch",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "hero",
+   "size": [
+    2.9046,
+    2.386,
+    2.9234
+   ],
+   "tris": 2720,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverPatch.glb",
+     "kind": "solid",
+     "tris": 2720,
+     "offset": [
+      0.0,
+      1.193,
+      0.0
+     ],
+     "size": [
+      2.9046,
+      2.386,
+      2.9234
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Clover clump scatter; no sockets."
+  },
+  {
+   "name": "CloverRootBase",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "part",
+   "size": [
+    1.3573,
+    0.6,
+    1.3087
+   ],
+   "tris": 164,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverRootBase.glb",
+     "kind": "solid",
+     "tris": 164,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.3573,
+      0.6,
+      1.3087
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets"
+  },
+  {
+   "name": "CloverSingleSprig",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "variant",
+   "size": [
+    1.4694,
+    1.5236,
+    1.0447
+   ],
+   "tris": 408,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverSingleSprig.glb",
+     "kind": "solid",
+     "tris": 408,
+     "offset": [
+      0.0,
+      0.7618,
+      0.0
+     ],
+     "size": [
+      1.4694,
+      1.5236,
+      1.0447
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Single Sprig"
+  },
+  {
+   "name": "CloverSpreadPatch",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "variant",
+   "size": [
+    4.3033,
+    1.358,
+    4.0172
+   ],
+   "tris": 2720,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverSpreadPatch.glb",
+     "kind": "solid",
+     "tris": 2720,
+     "offset": [
+      0.0,
+      0.679,
+      0.0
+     ],
+     "size": [
+      4.3033,
+      1.358,
+      4.0172
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Spread Patch"
+  },
+  {
+   "name": "CloverStem",
+   "sheet": "V01",
+   "subject": "CloverPatch",
+   "role": "part",
+   "size": [
+    0.5284,
+    1.6501,
+    0.2
+   ],
+   "tris": 96,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CloverStem.glb",
+     "kind": "solid",
+     "tris": 96,
+     "offset": [
+      0.0,
+      0.825,
+      0.0
+     ],
+     "size": [
+      0.5284,
+      1.6501,
+      0.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "jointed stalk"
+  },
+  {
+   "name": "DandelionClippedRosette",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "depleted",
+   "size": [
+    2.7606,
+    1.4114,
+    2.6418
+   ],
+   "tris": 1140,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionClippedRosette.glb",
+     "kind": "solid",
+     "tris": 1140,
+     "offset": [
+      0.0,
+      0.7057,
+      0.0
+     ],
+     "size": [
+      2.7606,
+      1.4114,
+      2.6418
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Clipped Rosette (harvested state); no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionFlowerHeadBottom",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    1.0626,
+    1.2479,
+    1.0581
+   ],
+   "tris": 812,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionFlowerHeadBottom.glb",
+     "kind": "solid",
+     "tris": 812,
+     "offset": [
+      0.0,
+      0.624,
+      0.0
+     ],
+     "size": [
+      1.0626,
+      1.2479,
+      1.0581
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionFlowerHeadSide",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    1.0626,
+    1.0487,
+    1.0626
+   ],
+   "tris": 812,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionFlowerHeadSide.glb",
+     "kind": "solid",
+     "tris": 812,
+     "offset": [
+      0.0,
+      0.5243,
+      0.0
+     ],
+     "size": [
+      1.0626,
+      1.0487,
+      1.0626
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionLeafLarge",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    1.3433,
+    2.381,
+    0.4263
+   ],
+   "tris": 102,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionLeafLarge.glb",
+     "kind": "solid",
+     "tris": 102,
+     "offset": [
+      0.0,
+      1.1905,
+      0.0
+     ],
+     "size": [
+      1.3433,
+      2.381,
+      0.4263
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionLeafMedium",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    1.0866,
+    1.7857,
+    0.3403
+   ],
+   "tris": 86,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionLeafMedium.glb",
+     "kind": "solid",
+     "tris": 86,
+     "offset": [
+      0.0,
+      0.8929,
+      0.0
+     ],
+     "size": [
+      1.0866,
+      1.7857,
+      0.3403
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionLeafSmall",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    0.8342,
+    1.1905,
+    0.2413
+   ],
+   "tris": 70,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionLeafSmall.glb",
+     "kind": "solid",
+     "tris": 70,
+     "offset": [
+      0.0,
+      0.5952,
+      0.0
+     ],
+     "size": [
+      0.8342,
+      1.1905,
+      0.2413
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionRootBase",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    1.1333,
+    0.6,
+    1.2026
+   ],
+   "tris": 140,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionRootBase.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.1333,
+      0.6,
+      1.2026
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionRosette",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "hero",
+   "size": [
+    4.0466,
+    3.3335,
+    3.7836
+   ],
+   "tris": 2112,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionRosette.glb",
+     "kind": "solid",
+     "tris": 2112,
+     "offset": [
+      0.0,
+      1.6668,
+      0.0
+     ],
+     "size": [
+      4.0466,
+      3.3335,
+      3.7836
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionSeedPuff",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "variant",
+   "size": [
+    3.5391,
+    3.2346,
+    3.3699
+   ],
+   "tris": 1252,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionSeedPuff.glb",
+     "kind": "solid",
+     "tris": 1252,
+     "offset": [
+      0.0,
+      1.6173,
+      0.0
+     ],
+     "size": [
+      3.5391,
+      3.2346,
+      3.3699
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Seed Puff; no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionStalk",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "part",
+   "size": [
+    0.5457,
+    2.3712,
+    0.27
+   ],
+   "tris": 76,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionStalk.glb",
+     "kind": "solid",
+     "tris": 76,
+     "offset": [
+      0.0,
+      1.1856,
+      0.0
+     ],
+     "size": [
+      0.5457,
+      2.3712,
+      0.27
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "DandelionYellowBloom",
+   "sheet": "V01",
+   "subject": "DandelionRosette",
+   "role": "variant",
+   "size": [
+    3.799,
+    3.1311,
+    3.4948
+   ],
+   "tris": 1964,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DandelionYellowBloom.glb",
+     "kind": "solid",
+     "tris": 1964,
+     "offset": [
+      0.0,
+      1.5655,
+      0.0
+     ],
+     "size": [
+      3.799,
+      3.1311,
+      3.4948
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Yellow Bloom; no sockets; plain mesh flowers, players walk through it"
+  },
+  {
+   "name": "FieldSedge",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "hero",
+   "size": [
+    4.3465,
+    4.0148,
+    4.5998
+   ],
+   "tris": 1126,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FieldSedge.glb",
+     "kind": "solid",
+     "tris": 1126,
+     "offset": [
+      0.0,
+      2.0074,
+      0.0
+     ],
+     "size": [
+      4.3465,
+      4.0148,
+      4.5998
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeBladeLarge",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "part",
+   "size": [
+    0.2172,
+    3.4951,
+    0.6
+   ],
+   "tris": 46,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeBladeLarge.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      1.7476,
+      0.0
+     ],
+     "size": [
+      0.2172,
+      3.4951,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeBladeMedium",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "part",
+   "size": [
+    0.5077,
+    2.5418,
+    0.52
+   ],
+   "tris": 46,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeBladeMedium.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      1.2709,
+      0.0
+     ],
+     "size": [
+      0.5077,
+      2.5418,
+      0.52
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeBladeSmall",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "part",
+   "size": [
+    1.0557,
+    1.4438,
+    0.42
+   ],
+   "tris": 46,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeBladeSmall.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      0.7219,
+      0.0
+     ],
+     "size": [
+      1.0557,
+      1.4438,
+      0.42
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeCutTuft",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "depleted",
+   "size": [
+    1.5644,
+    1.024,
+    1.5275
+   ],
+   "tris": 592,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeCutTuft.glb",
+     "kind": "solid",
+     "tris": 592,
+     "offset": [
+      0.0,
+      0.512,
+      0.0
+     ],
+     "size": [
+      1.5644,
+      1.024,
+      1.5275
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Cut Tuft: clipped blunt blades. No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeRootBase",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "part",
+   "size": [
+    1.4651,
+    0.6,
+    1.4267
+   ],
+   "tris": 170,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeRootBase.glb",
+     "kind": "solid",
+     "tris": 170,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.4651,
+      0.6,
+      1.4267
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeSeedSpike",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "part",
+   "size": [
+    0.5199,
+    3.1996,
+    0.4229
+   ],
+   "tris": 94,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeSeedSpike.glb",
+     "kind": "solid",
+     "tris": 94,
+     "offset": [
+      0.0,
+      1.5998,
+      0.0
+     ],
+     "size": [
+      0.5199,
+      3.1996,
+      0.4229
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeShortFan",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "variant",
+   "size": [
+    2.7628,
+    1.9728,
+    2.4064
+   ],
+   "tris": 640,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeShortFan.glb",
+     "kind": "solid",
+     "tris": 640,
+     "offset": [
+      0.0,
+      0.9864,
+      0.0
+     ],
+     "size": [
+      2.7628,
+      1.9728,
+      2.4064
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short Fan. No sockets. Plant only (no water mesh)."
+  },
+  {
+   "name": "SedgeTallArchingFan",
+   "sheet": "V01",
+   "subject": "FieldSedge",
+   "role": "variant",
+   "size": [
+    5.0438,
+    4.373,
+    5.1939
+   ],
+   "tris": 1126,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SedgeTallArchingFan.glb",
+     "kind": "solid",
+     "tris": 1126,
+     "offset": [
+      0.0,
+      2.1865,
+      0.0
+     ],
+     "size": [
+      5.0438,
+      4.373,
+      5.1939
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall Arching Fan. No sockets. Plant only (no water mesh)."
+  }
+ ],
+ "stats": {
+  "assets": 38,
+  "pieces": 38,
+  "solid": 38,
+  "water": 0,
+  "glow": 0,
+  "tris": 30222,
+  "vfxSockets": 0,
+  "paletteColours": 10,
+  "paletteLevels": 305,
+  "meshBytes": 2899536
+ },
+ "problems": []
+}

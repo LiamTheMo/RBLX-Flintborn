@@ -1,0 +1,1710 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V09",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v07_thorn",
+    "hex": "#C0642A",
+    "levels": [
+     1.00871,
+     1.01953
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_amber",
+    "hex": "#E8661E",
+    "levels": [
+     0.98238,
+     1.04657
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_cup",
+    "hex": "#7A5230",
+    "levels": [
+     0.99276,
+     1.04657
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_dark",
+    "hex": "#2E7A60",
+    "levels": [
+     0.95509,
+     0.95936,
+     0.96239,
+     0.96726,
+     0.97109,
+     0.97378,
+     0.97591,
+     0.97974,
+     0.98301,
+     0.98645,
+     0.99795,
+     1.00306,
+     1.01181,
+     1.01346,
+     1.01993,
+     1.02238,
+     1.02565,
+     1.02809,
+     1.03219,
+     1.03719,
+     1.03982,
+     1.04577
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_gold",
+    "hex": "#F5C030",
+    "levels": [
+     0.97538,
+     0.98238,
+     0.99458,
+     1.00471,
+     1.04672
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_husk",
+    "hex": "#C8963A",
+    "levels": [
+     0.96109,
+     0.96643,
+     0.96768,
+     0.97592,
+     0.98238,
+     0.98601,
+     0.98943,
+     0.99423,
+     1.00307,
+     1.00552,
+     1.00801,
+     1.01335,
+     1.01573,
+     1.02646,
+     1.02881,
+     1.03198,
+     1.03801,
+     1.04902
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_leaf",
+    "hex": "#5E9E30",
+    "levels": [
+     0.96376,
+     0.96879,
+     0.97383,
+     0.98123,
+     0.98758,
+     0.99309,
+     0.99805,
+     1.00169,
+     1.00462,
+     1.00847,
+     1.01822,
+     1.02624,
+     1.02932,
+     1.03206,
+     1.03688,
+     1.04078,
+     1.04281,
+     1.04518,
+     1.04959
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_purple",
+    "hex": "#8A5AE0",
+    "levels": [
+     0.95303,
+     0.95724,
+     0.96017,
+     0.96508,
+     0.9693,
+     0.97538,
+     0.97856,
+     0.98238,
+     0.98685,
+     0.99509,
+     1.00353,
+     1.01509,
+     1.03347,
+     1.0397,
+     1.04316
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_red",
+    "hex": "#E0303A",
+    "levels": [
+     0.95483,
+     0.96046,
+     0.96508,
+     0.97648,
+     0.98238,
+     0.98598,
+     1.00552,
+     1.00774,
+     1.01363,
+     1.01797,
+     1.02436,
+     1.02977,
+     1.0373,
+     1.03954,
+     1.04917
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_reed",
+    "hex": "#2E9A80",
+    "levels": [
+     0.95551,
+     0.95707,
+     0.96005,
+     0.96443,
+     0.96993,
+     0.97417,
+     0.97768,
+     0.97894,
+     0.98179,
+     0.98777,
+     0.99004,
+     0.99447,
+     0.99663,
+     1.00034,
+     1.00241,
+     1.00695,
+     1.01301,
+     1.01876,
+     1.02387,
+     1.02652,
+     1.03002,
+     1.03207,
+     1.03509,
+     1.04355,
+     1.0454,
+     1.04847
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_root",
+    "hex": "#8A5A34",
+    "levels": [
+     0.95182,
+     0.96544,
+     0.97747,
+     0.98249,
+     0.98487,
+     0.99276,
+     1.00155,
+     1.00487,
+     1.03254,
+     1.04042,
+     1.0488
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_sage",
+    "hex": "#6EA680",
+    "levels": [
+     0.95369,
+     0.95837,
+     0.96152,
+     0.96682,
+     0.97477,
+     0.97722,
+     0.98097,
+     0.98431,
+     0.98689,
+     0.98884,
+     0.9974,
+     0.9997,
+     1.00453,
+     1.00811,
+     1.01299,
+     1.02448,
+     1.0276,
+     1.03758,
+     1.04351,
+     1.04658
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_stem",
+    "hex": "#6E9A2A",
+    "levels": [
+     0.95395,
+     0.96049,
+     0.96592,
+     0.97145,
+     0.97539,
+     0.97752,
+     0.98137,
+     0.9932,
+     1.0029,
+     1.01366,
+     1.01778,
+     1.03193,
+     1.03705,
+     1.04527
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_teal",
+    "hex": "#7FE0D8",
+    "levels": [
+     0.95486,
+     0.96508,
+     0.97752,
+     0.98238,
+     0.99735
+    ],
+    "used": true
+   },
+   {
+    "key": "v09_wood",
+    "hex": "#9A6A3A",
+    "levels": [
+     0.95175,
+     0.95618,
+     0.96228,
+     0.96612,
+     0.97547,
+     0.98137,
+     0.98601,
+     0.9877,
+     0.98983,
+     0.99458,
+     0.99753,
+     1.00007,
+     1.00224,
+     1.00501,
+     1.00808,
+     1.01304,
+     1.01804,
+     1.02179,
+     1.02507,
+     1.03008,
+     1.03584,
+     1.03859,
+     1.04417,
+     1.0492
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "HeartpodBramble",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "hero",
+   "size": [
+    6.8223,
+    5.2875,
+    7.0147
+   ],
+   "tris": 1720,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodBramble.glb",
+     "kind": "solid",
+     "tris": 1720,
+     "offset": [
+      0.0,
+      2.6438,
+      0.0
+     ],
+     "size": [
+      6.8223,
+      5.2875,
+      7.0147
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "heartpod bramble: thick angular brown branches with broad dark leaves and red heart-shaped pods held in spiky golden husks"
+  },
+  {
+   "name": "HeartpodBranchSegment",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "part",
+   "size": [
+    1.815,
+    1.7108,
+    0.8945
+   ],
+   "tris": 68,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodBranchSegment.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      0.8554,
+      0.0
+     ],
+     "size": [
+      1.815,
+      1.7108,
+      0.8945
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch segment (thorny)"
+  },
+  {
+   "name": "HeartpodHarvested",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "variant",
+   "size": [
+    6.5643,
+    5.3451,
+    6.8037
+   ],
+   "tris": 960,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodHarvested.glb",
+     "kind": "solid",
+     "tris": 960,
+     "offset": [
+      0.0,
+      2.6725,
+      0.0
+     ],
+     "size": [
+      6.5643,
+      5.3451,
+      6.8037
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested"
+  },
+  {
+   "name": "HeartpodHeartPod",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "part",
+   "size": [
+    1.945,
+    1.8136,
+    0.5
+   ],
+   "tris": 70,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodHeartPod.glb",
+     "kind": "solid",
+     "tris": 70,
+     "offset": [
+      0.0,
+      0.9068,
+      0.0
+     ],
+     "size": [
+      1.945,
+      1.8136,
+      0.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "heart pod (red)"
+  },
+  {
+   "name": "HeartpodHuskHalf",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "part",
+   "size": [
+    1.9063,
+    1.4231,
+    0.5377
+   ],
+   "tris": 60,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodHuskHalf.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.7116,
+      0.0
+     ],
+     "size": [
+      1.9063,
+      1.4231,
+      0.5377
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "husk half (with thorns)"
+  },
+  {
+   "name": "HeartpodLeaf",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "part",
+   "size": [
+    1.541,
+    1.0683,
+    1.2898
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      0.5341,
+      0.0
+     ],
+     "size": [
+      1.541,
+      1.0683,
+      1.2898
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (broad)"
+  },
+  {
+   "name": "HeartpodOpenPods",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "variant",
+   "size": [
+    7.9023,
+    5.2089,
+    6.8367
+   ],
+   "tris": 1560,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodOpenPods.glb",
+     "kind": "solid",
+     "tris": 1560,
+     "offset": [
+      0.0,
+      2.6045,
+      0.0
+     ],
+     "size": [
+      7.9023,
+      5.2089,
+      6.8367
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Open Pods"
+  },
+  {
+   "name": "HeartpodPodStem",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "part",
+   "size": [
+    0.4,
+    1.137,
+    0.4
+   ],
+   "tris": 28,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodPodStem.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.5685,
+      0.0
+     ],
+     "size": [
+      0.4,
+      1.137,
+      0.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pod stem (joint)"
+  },
+  {
+   "name": "HeartpodSealedPods",
+   "sheet": "V09",
+   "subject": "HeartpodBramble",
+   "role": "variant",
+   "size": [
+    7.3469,
+    5.1788,
+    7.074
+   ],
+   "tris": 1530,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HeartpodSealedPods.glb",
+     "kind": "solid",
+     "tris": 1530,
+     "offset": [
+      0.0,
+      2.5894,
+      0.0
+     ],
+     "size": [
+      7.3469,
+      5.1788,
+      7.074
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Sealed Pods"
+  },
+  {
+   "name": "MoonveilDoubleBloom",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "variant",
+   "size": [
+    5.9118,
+    4.8839,
+    5.2454
+   ],
+   "tris": 936,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilDoubleBloom.glb",
+     "kind": "solid",
+     "tris": 936,
+     "offset": [
+      0.0,
+      2.4419,
+      0.0
+     ],
+     "size": [
+      5.9118,
+      4.8839,
+      5.2454
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Double Bloom"
+  },
+  {
+   "name": "MoonveilEmptyStalk",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "variant",
+   "size": [
+    5.674,
+    4.7131,
+    6.0197
+   ],
+   "tris": 544,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilEmptyStalk.glb",
+     "kind": "solid",
+     "tris": 544,
+     "offset": [
+      0.0,
+      2.3565,
+      0.0
+     ],
+     "size": [
+      5.674,
+      4.7131,
+      6.0197
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Empty Stalk"
+  },
+  {
+   "name": "MoonveilFlowerStalk",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "part",
+   "size": [
+    1.6902,
+    3.7372,
+    0.3031
+   ],
+   "tris": 96,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilFlowerStalk.glb",
+     "kind": "solid",
+     "tris": 96,
+     "offset": [
+      0.0,
+      1.8686,
+      0.0
+     ],
+     "size": [
+      1.6902,
+      3.7372,
+      0.3031
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower stalk (arched)"
+  },
+  {
+   "name": "MoonveilHoodPetal",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "part",
+   "size": [
+    1.8103,
+    1.5544,
+    1.7957
+   ],
+   "tris": 100,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilHoodPetal.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.7772,
+      0.0
+     ],
+     "size": [
+      1.8103,
+      1.5544,
+      1.7957
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "hood petal (outer)"
+  },
+  {
+   "name": "MoonveilInnerBell",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "part",
+   "size": [
+    0.7275,
+    1.15,
+    0.84
+   ],
+   "tris": 36,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilInnerBell.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      0.575,
+      0.0
+     ],
+     "size": [
+      0.7275,
+      1.15,
+      0.84
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "inner bell (turquoise)"
+  },
+  {
+   "name": "MoonveilLeaf",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "part",
+   "size": [
+    2.8415,
+    0.896,
+    1.2471
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      0.448,
+      0.0
+     ],
+     "size": [
+      2.8415,
+      0.896,
+      1.2471
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (large)"
+  },
+  {
+   "name": "MoonveilOrchid",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "hero",
+   "size": [
+    6.0132,
+    4.9101,
+    6.0941
+   ],
+   "tris": 684,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilOrchid.glb",
+     "kind": "solid",
+     "tris": 684,
+     "offset": [
+      0.0,
+      2.4551,
+      0.0
+     ],
+     "size": [
+      6.0132,
+      4.9101,
+      6.0941
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "moonveil orchid: thick silver-green leaf rosette, arched flower stalk carrying an oversized purple hooded bloom over a pale turquoise inner bell"
+  },
+  {
+   "name": "MoonveilRootBase",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "part",
+   "size": [
+    1.6724,
+    0.6474,
+    1.6589
+   ],
+   "tris": 320,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3237,
+      0.0
+     ],
+     "size": [
+      1.6724,
+      0.6474,
+      1.6589
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional)"
+  },
+  {
+   "name": "MoonveilSingleBloom",
+   "sheet": "V09",
+   "subject": "MoonveilOrchid",
+   "role": "variant",
+   "size": [
+    5.7149,
+    4.7063,
+    5.5146
+   ],
+   "tris": 684,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MoonveilSingleBloom.glb",
+     "kind": "solid",
+     "tris": 684,
+     "offset": [
+      0.0,
+      2.3532,
+      0.0
+     ],
+     "size": [
+      5.7149,
+      4.7063,
+      5.5146
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Single Bloom"
+  },
+  {
+   "name": "Stormreed",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "hero",
+   "size": [
+    3.2404,
+    6.1842,
+    3.4403
+   ],
+   "tris": 743,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Stormreed.glb",
+     "kind": "solid",
+     "tris": 743,
+     "offset": [
+      0.0,
+      3.0921,
+      0.0
+     ],
+     "size": [
+      3.2404,
+      6.1842,
+      3.4403
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stormreed: rare reed with thick angular zigzag teal stems topped by large faceted violet seedheads, thick pointed teal leaf blades"
+  },
+  {
+   "name": "StormreedLeafBlade",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "part",
+   "size": [
+    1.6572,
+    2.069,
+    0.8407
+   ],
+   "tris": 8,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedLeafBlade.glb",
+     "kind": "solid",
+     "tris": 8,
+     "offset": [
+      0.0,
+      1.0345,
+      0.0
+     ],
+     "size": [
+      1.6572,
+      2.069,
+      0.8407
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf blade (thick)"
+  },
+  {
+   "name": "StormreedRootBase",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "part",
+   "size": [
+    2.0207,
+    0.7125,
+    1.939
+   ],
+   "tris": 320,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3562,
+      0.0
+     ],
+     "size": [
+      2.0207,
+      0.7125,
+      1.939
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (cluster)"
+  },
+  {
+   "name": "StormreedSeedhead",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "part",
+   "size": [
+    1.1519,
+    2.08,
+    1.1422
+   ],
+   "tris": 33,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedSeedhead.glb",
+     "kind": "solid",
+     "tris": 33,
+     "offset": [
+      0.0,
+      1.04,
+      0.0
+     ],
+     "size": [
+      1.1519,
+      2.08,
+      1.1422
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seedhead (violet)"
+  },
+  {
+   "name": "StormreedShortCluster",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "variant",
+   "size": [
+    3.0966,
+    5.1891,
+    3.8075
+   ],
+   "tris": 610,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedShortCluster.glb",
+     "kind": "solid",
+     "tris": 610,
+     "offset": [
+      0.0,
+      2.5946,
+      0.0
+     ],
+     "size": [
+      3.0966,
+      5.1891,
+      3.8075
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short Cluster"
+  },
+  {
+   "name": "StormreedStemSegment",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "part",
+   "size": [
+    0.8475,
+    3.1103,
+    0.83
+   ],
+   "tris": 60,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedStemSegment.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.5551,
+      0.0
+     ],
+     "size": [
+      0.8475,
+      3.1103,
+      0.83
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem segment (zigzag)"
+  },
+  {
+   "name": "StormreedTallCluster",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "variant",
+   "size": [
+    2.9114,
+    6.9892,
+    3.4101
+   ],
+   "tris": 751,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedTallCluster.glb",
+     "kind": "solid",
+     "tris": 751,
+     "offset": [
+      0.0,
+      3.4946,
+      0.0
+     ],
+     "size": [
+      2.9114,
+      6.9892,
+      3.4101
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall Cluster"
+  },
+  {
+   "name": "StormreedTrimmed",
+   "sheet": "V09",
+   "subject": "Stormreed",
+   "role": "variant",
+   "size": [
+    3.0852,
+    5.389,
+    2.8158
+   ],
+   "tris": 477,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormreedTrimmed.glb",
+     "kind": "solid",
+     "tris": 477,
+     "offset": [
+      0.0,
+      2.6945,
+      0.0
+     ],
+     "size": [
+      3.0852,
+      5.389,
+      2.8158
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Trimmed"
+  },
+  {
+   "name": "SunburstBloom",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "hero",
+   "size": [
+    5.1278,
+    2.5307,
+    5.244
+   ],
+   "tris": 608,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstBloom.glb",
+     "kind": "solid",
+     "tris": 608,
+     "offset": [
+      0.0,
+      1.2654,
+      0.0
+     ],
+     "size": [
+      5.1278,
+      2.5307,
+      5.244
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "sunburst bloom: rare low flower, six thick golden wedge petals round a large faceted amber seed centre on a short stem over a wide leaf rosette"
+  },
+  {
+   "name": "SunburstClosedBud",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "variant",
+   "size": [
+    4.9054,
+    3.6281,
+    4.5023
+   ],
+   "tris": 608,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstClosedBud.glb",
+     "kind": "solid",
+     "tris": 608,
+     "offset": [
+      0.0,
+      1.8141,
+      0.0
+     ],
+     "size": [
+      4.9054,
+      3.6281,
+      4.5023
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Closed Bud"
+  },
+  {
+   "name": "SunburstFullBloom",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "variant",
+   "size": [
+    5.162,
+    2.5352,
+    4.7059
+   ],
+   "tris": 608,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstFullBloom.glb",
+     "kind": "solid",
+     "tris": 608,
+     "offset": [
+      0.0,
+      1.2676,
+      0.0
+     ],
+     "size": [
+      5.162,
+      2.5352,
+      4.7059
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Full Bloom"
+  },
+  {
+   "name": "SunburstLeaf",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "part",
+   "size": [
+    3.9112,
+    0.8776,
+    1.1343
+   ],
+   "tris": 32,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstLeaf.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.4388,
+      0.0
+     ],
+     "size": [
+      3.9112,
+      0.8776,
+      1.1343
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (rosette)"
+  },
+  {
+   "name": "SunburstPetal",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "part",
+   "size": [
+    1.412,
+    1.9612,
+    0.288
+   ],
+   "tris": 20,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstPetal.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.9806,
+      0.0
+     ],
+     "size": [
+      1.412,
+      1.9612,
+      0.288
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "petal (wedge)"
+  },
+  {
+   "name": "SunburstRootBase",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "part",
+   "size": [
+    1.8436,
+    0.6489,
+    1.8011
+   ],
+   "tris": 320,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3245,
+      0.0
+     ],
+     "size": [
+      1.8436,
+      0.6489,
+      1.8011
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (optional)"
+  },
+  {
+   "name": "SunburstSeedCenter",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "part",
+   "size": [
+    1.4311,
+    1.6,
+    1.361
+   ],
+   "tris": 20,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstSeedCenter.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "size": [
+      1.4311,
+      1.6,
+      1.361
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed center (amber)"
+  },
+  {
+   "name": "SunburstSeedRemoved",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "variant",
+   "size": [
+    5.5649,
+    2.574,
+    5.9617
+   ],
+   "tris": 616,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstSeedRemoved.glb",
+     "kind": "solid",
+     "tris": 616,
+     "offset": [
+      0.0,
+      1.287,
+      0.0
+     ],
+     "size": [
+      5.5649,
+      2.574,
+      5.9617
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Seed Removed"
+  },
+  {
+   "name": "SunburstStem",
+   "sheet": "V09",
+   "subject": "SunburstBloom",
+   "role": "part",
+   "size": [
+    0.6275,
+    2.0482,
+    0.6
+   ],
+   "tris": 40,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunburstStem.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.0241,
+      0.0
+     ],
+     "size": [
+      0.6275,
+      2.0482,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (top)"
+  }
+ ],
+ "stats": {
+  "assets": 35,
+  "pieces": 35,
+  "solid": 35,
+  "water": 0,
+  "glow": 0,
+  "tris": 15302,
+  "vfxSockets": 0,
+  "paletteColours": 15,
+  "paletteLevels": 200,
+  "meshBytes": 1462140
+ },
+ "problems": []
+}

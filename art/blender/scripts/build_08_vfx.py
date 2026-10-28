@@ -5,16 +5,24 @@ small stand-in bases, and exports the VFX catalog.
         --python art/blender/scripts/build_08_vfx.py
 
 Outputs
-- art/vfx/textures/<name>.png      one per texture named in vfx.KINDS (transparent RGBA)
+- art/vfx/textures/<name>.png      one per texture named in vfx.KINDS, emitters and
+                                   beams (transparent RGBA)
 - art/vfx/vfx_catalog.json         vfx.catalog()
 - art/blender/renders/08_vfx.png        stand-in bases with realize()d sockets, studio light
 - art/blender/renders/08_vfx_dim.png    the same with the studio dimmed so the lights read
 - art/blender/renders/08_vfx_textures.png  contact sheet of the textures on a dark ground
 
-Every texture is low-poly geometry with baked, flat-shaded emissive vertex colours
-(one shared material), rendered orthographically by Eevee. The facet shading is
-computed in Python from a fixed key direction, so the stylised look is
-deterministic and independent of scene lights.
+Particle textures (TEX_BUILDERS) are low-poly geometry with baked, flat-shaded
+emissive vertex colours (one shared material), rendered orthographically by
+Eevee. The facet shading is computed in Python from a fixed key direction, so the
+stylised look is deterministic and independent of scene lights. Tileable beam
+textures (TEX_PAINTERS: waterfall_streaks, water_streaks) are painted with numpy
+on a torus instead, so they wrap seamlessly in both directions; u (the image's
+width) runs along the beam.
+
+FX_ONLY=tex renders only the textures (plus the contact sheet and catalog);
+FX_TEX=name1,name2 limits that to the named textures and leaves the others, which
+may already be uploaded, untouched.
 """
 
 import importlib
@@ -581,7 +589,17 @@ def build_dust(fx):
     fx.paint(vs, WHITE, 0.92, shade=(0.88, 0.15))
 
 
+def build_rock_chip(fx):
+    # three faceted chips of different sizes, lit from the upper left
+    for c, r, sq, rot in (((-0.28, 0.0, 0.22), 0.42, (1.15, 0.8, 0.75), 0.4),
+                          ((0.38, 0.05, -0.12), 0.3, (0.9, 0.8, 1.1), 1.7),
+                          ((-0.12, 0.1, -0.5), 0.2, (1.2, 0.8, 0.7), 2.9)):
+        vs = fx.ico(c, r, sub=0, jitter=0.18, squash=sq, rot=rot)
+        fx.paint(vs, WHITE, 1.0, shade=(0.6, 0.45))
+
+
 TEX_BUILDERS = {
+    "rock_chip": (build_rock_chip, 2.0, 256),
     "fire_flipbook_4x4": (build_fire, 8.0, 128),
     "smoke_puff": (build_smoke, 2.0, 1024),
     "spark_diamond": (build_spark, 2.0, 1024),
@@ -595,12 +613,137 @@ TEX_BUILDERS = {
 }
 
 
+# -- tileable beam textures (numpy, painted on a torus so they wrap seamlessly) ----
+
+PALE_BLUE = (0.80, 0.93, 0.99)  # sRGB; the Beam's Color sequence multiplies it
+
+
+def _grid(w, h):
+    """Pixel-centre coordinates u (along the beam, 0..1 across the width) and v."""
+    u = ((np.arange(w) + 0.5) / w)[None, :]
+    v = ((np.arange(h) + 0.5) / h)[:, None]
+    return u, v
+
+
+def _wrap(d):
+    return (d + 0.5) % 1.0 - 0.5
+
+
+def _dashes(u, count, duty, offset, taper=0.08):
+    """Periodic dashes along u: 1 inside a dash, tapering to 0 at its ends."""
+    f = (u * count + offset) % 1.0
+    inside = f < duty
+    edge = np.minimum(f, duty - f) / max(taper * duty, 1e-4)
+    return np.where(inside, np.clip(edge, 0.0, 1.0), 0.0)
+
+
+def _streak(u, v, rng, h, thick, dash_count, duty, wobble=0.01, vc=None):
+    """One wavy streak line along u at v = vc (default random), crisp edges ~1 px,
+    tapered dashes."""
+    vc = rng.uniform(0, 1) if vc is None else vc
+    m1, m2 = int(rng.integers(1, 3)), int(rng.integers(2, 5))
+    ph1, ph2 = rng.uniform(0, 2 * PI, 2)
+    centre = vc + wobble * np.sin(2 * PI * m1 * u + ph1)
+    dash = _dashes(u, dash_count, duty, rng.uniform(0, 1))
+    t = thick * (0.75 + 0.25 * np.sin(2 * PI * m2 * u + ph2)) * dash ** 0.6
+    dv = np.abs(_wrap(v - centre))
+    return np.where(t > 0, np.clip((t - dv) * h + 0.5, 0.0, 1.0), 0.0)  # 1 px anti-aliased edge
+
+
+def _fleck(u, v, rng, w, h, rx, ry):
+    """Soft-edged ellipse (radii in uv), wrapped on the torus."""
+    cu, cv = rng.uniform(0, 1, 2)
+    d = np.sqrt((_wrap(u - cu) / rx) ** 2 + (_wrap(v - cv) / ry) ** 2)
+    return np.clip((1.0 - d) * min(rx * w, ry * h) + 0.5, 0.0, 1.0)
+
+
+def paint_waterfall_streaks(w, h, seed):
+    """Falling water seen from the front: a pale-blue translucent sheet, bold white
+    streak bands running along u (the fall) in long tapered dashes, a few clearer
+    gaps and elongated foam flecks. Tiles in u and v."""
+    rng = np.random.default_rng(seed)
+    u, v = _grid(w, h)
+    alpha = np.full((h, w), 0.45)
+    white = np.zeros((h, w))
+    for _ in range(5):  # clearer gaps between the sheets of water
+        g = _streak(u, v, rng, h, rng.uniform(0.02, 0.04), int(rng.integers(1, 3)), rng.uniform(0.5, 0.8))
+        alpha = alpha * (1 - 0.5 * g)
+    n = 26
+    for i in range(n):  # bold streak bands, spread evenly across the width
+        s = _streak(u, v, rng, h, rng.uniform(0.006, 0.02), int(rng.integers(1, 4)), rng.uniform(0.45, 0.85),
+                    vc=(i + rng.uniform(0.0, 1.0)) / n)
+        k = rng.uniform(0.65, 1.0)
+        alpha = alpha + (0.95 - alpha) * s * k
+        white = np.maximum(white, s * k)
+    for _ in range(40):  # thin fast highlights
+        s = _streak(u, v, rng, h, rng.uniform(0.002, 0.004), int(rng.integers(2, 5)), rng.uniform(0.2, 0.5))
+        alpha = alpha + (0.9 - alpha) * s
+        white = np.maximum(white, s)
+    for _ in range(28):  # foam flecks, stretched along the fall
+        f = _fleck(u, v, rng, w, h, rng.uniform(0.012, 0.03), rng.uniform(0.006, 0.012))
+        alpha = np.maximum(alpha, 0.97 * f)
+        white = np.maximum(white, f)
+    rgb = np.stack([PALE_BLUE[i] + (1.0 - PALE_BLUE[i]) * white for i in range(3)], -1)
+    return np.concatenate([rgb, alpha[..., None]], -1)
+
+
+def paint_water_streaks(w, h, seed):
+    """Flow lines on a water surface seen from above: sparse thin white streaks
+    along u in short tapered dashes, and a few small foam specks, on transparent.
+    Tiles in u and v."""
+    rng = np.random.default_rng(seed)
+    u, v = _grid(w, h)
+    alpha = np.zeros((h, w))
+    n = 18
+    for i in range(n):
+        s = _streak(u, v, rng, h, rng.uniform(0.004, 0.009), int(rng.integers(1, 4)), rng.uniform(0.2, 0.5),
+                    wobble=0.015, vc=(i + rng.uniform(0.0, 1.0)) / n)
+        alpha = np.maximum(alpha, rng.uniform(0.6, 0.9) * s)
+    for _ in range(10):
+        f = _fleck(u, v, rng, w, h, rng.uniform(0.01, 0.02), rng.uniform(0.007, 0.012))
+        alpha = np.maximum(alpha, 0.7 * f)
+    rgb = np.ones((h, w, 3))
+    return np.concatenate([rgb, alpha[..., None]], -1)
+
+
+def paint_tex(name, paint):
+    """Paint a tileable texture with numpy and save it as art/vfx/textures/<name>.png."""
+    info = vfx.TEXTURES[name]
+    w, h = info["size"], info.get("height", info["size"])
+    px = np.clip(paint(w, h, sum(map(ord, name))), 0.0, 1.0).astype(np.float32)
+    img = bpy.data.images.new("FXP_" + name, w, h, alpha=True)
+    img.colorspace_settings.name = "Non-Color"  # values are already sRGB
+    img.pixels.foreach_set(np.ascontiguousarray(px[::-1]).ravel())  # Blender rows run bottom-up
+    path = os.path.join(TEX_DIR, name + ".png")
+    os.makedirs(TEX_DIR, exist_ok=True)
+    img.filepath_raw = path
+    img.file_format = "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+    print(f"[08] texture {name} {w}x{h}px (tileable)")
+    return path
+
+
+TEX_PAINTERS = {
+    "waterfall_streaks": paint_waterfall_streaks,
+    "water_streaks": paint_water_streaks,
+}
+
+
 def render_textures():
-    names = sorted({e["texture"] for k in vfx.KINDS.values() for e in k["emitters"]})
-    missing = set(names) - set(TEX_BUILDERS)
+    names = sorted({e["texture"] for k in vfx.KINDS.values()
+                    for e in list(k.get("emitters", [])) + list(k.get("beams") or [])})
+    missing = set(names) - set(TEX_BUILDERS) - set(TEX_PAINTERS)
     assert not missing, f"no builder for {missing}"
-    paths = {}
+    # FX_TEX=rock_chip,... re-renders only those, leaving uploaded textures untouched
+    picked = {n for n in os.environ.get("FX_TEX", "").split(",") if n}
+    paths = {n: os.path.join(TEX_DIR, n + ".png") for n in names}
     for n in names:
+        if picked and n not in picked:
+            continue
+        if n in TEX_PAINTERS:
+            paths[n] = paint_tex(n, TEX_PAINTERS[n])
+            continue
         build, ortho, samples = TEX_BUILDERS[n]
         info = vfx.TEXTURES[n]
         paths[n] = render_tex(n, build, info["size"], ortho, samples, cells=4 if n.endswith("4x4") else 1)
@@ -634,11 +777,12 @@ def label(coll, text, loc, size=0.26, color="#E9E1D3"):
     return ob
 
 
-def image_plane(coll, path, size, loc):
+def image_plane(coll, path, size, loc, aspect=1.0):
+    """Image on a plane `size` wide and size * aspect (height / width) tall."""
     me = bpy.data.meshes.new("FXP_" + os.path.basename(path))
     bm = bmesh.new()
-    s = size / 2
-    vs = [bm.verts.new(p) for p in ((-s, 0, -s), (s, 0, -s), (s, 0, s), (-s, 0, s))]
+    s, t = size / 2, size * aspect / 2
+    vs = [bm.verts.new(p) for p in ((-s, 0, -t), (s, 0, -t), (s, 0, t), (-s, 0, t))]
     f = bm.faces.new(vs)
     uv = bm.loops.layers.uv.new("UV")
     for lp, co in zip(f.loops, ((0, 0), (1, 0), (1, 1), (0, 1))):
@@ -715,12 +859,18 @@ def contact_sheet(paths, out_path):
     image_plane(coll, paths["fire_flipbook_4x4"], 7.4, (-3.95, 0, 0.35))
     label(coll, "fire_flipbook_4x4  (1024, 4x4 loop)", (-3.95, -0.5, -3.75), size=0.3)
     singles = [n for n in sorted(paths) if n != "fire_flipbook_4x4"]
+    # 3 columns while they fit in three rows, else 4 smaller ones (the frame is 16 x 9)
+    cols, size, step, x0, zstep, lab = ((3, 2.1, 2.65, 1.35, 2.85, 0.19) if len(singles) <= 9
+                                        else (4, 1.7, 1.95, 1.2, 2.75, 0.15))
     for i, n in enumerate(singles):
-        r, c = divmod(i, 3)
-        x, z = 1.35 + c * 2.65, 2.85 - r * 2.85
-        tile_plane(coll, 2.1, (x, 1, z + 0.22), tile)
-        image_plane(coll, paths[n], 2.1, (x, 0, z + 0.22))
-        label(coll, f"{n} ({vfx.TEXTURES[n]['size']})", (x, -0.5, z - 1.08), size=0.19)
+        r, c = divmod(i, cols)
+        x, z = x0 + c * step, 2.85 - r * zstep
+        info = vfx.TEXTURES[n]
+        aspect = info.get("height", info["size"]) / info["size"]
+        tile_plane(coll, size, (x, 1, z + 0.22), tile)
+        image_plane(coll, paths[n], size, (x, 0, z + 0.22), aspect)
+        dims = f"{info['size']}x{info['height']}" if "height" in info else f"{info['size']}"
+        label(coll, f"{n} ({dims})", (x, -0.5, z - size / 2 - 0.03), size=lab)
     sc.render.filepath = out_path
     sc.render.image_settings.file_format = "PNG"
     sc.render.image_settings.color_mode = "RGB"

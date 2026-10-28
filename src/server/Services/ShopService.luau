@@ -40,6 +40,7 @@ local function view(player: Player)
 			quantity = entry.quantity,
 			price = entry.price,
 			category = entry.category,
+			note = entry.note,
 			owned = entry.title ~= nil and profile.progression.titles[entry.title] == true,
 		})
 	end
@@ -70,6 +71,16 @@ local function view(player: Player)
 			})
 		end
 	end
+	-- Backpack slots first, then vault materials, each by name.
+	table.sort(sellable, function(a, b)
+		if a.source ~= b.source then
+			return a.source == "backpack"
+		end
+		if a.name ~= b.name then
+			return a.name < b.name
+		end
+		return tostring(a.key) < tostring(b.key)
+	end)
 	local offers = {}
 	for _, offer in OfferCatalog.Offers do
 		table.insert(
