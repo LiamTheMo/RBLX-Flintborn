@@ -130,6 +130,7 @@ end)
 | `heat_glow` | Heat (glow_soft) | `#FF7A22`, 1.2, range 10, flicker | The forge arch and lava seam, the furnace slits, the cave interior. |
 | `glyph_glow` | Glimmer (glow_soft) | `#FF8C2A`, 0.9, range 10, pulse | The forge emblem. |
 | `rune_glow` | Motes (rune_mote, 3 × 2 box) | `#A8E2F4`, 0.6, range 8, pulse | Engraved rune stones. |
+| `crystal_glow` | none (light only) | `#B06AF5`, 1.0, range 10, steady, shadows on | Inside a crystal cluster or geode cave; override `light` with the crystal's colour. Pair with `ore_glint` on the tips. |
 | `waterfall_mist` | Mist (mist_soft, 5 × 2 box), Splash (splash_droplets, gravity −20) | none | Where a waterfall hits its pool. |
 | `water_foam` | Foam (foam_patch, flat, 6 × 1.5 box) | none | Shore lines, pool rims, river riffles. |
 | `dust` | Dust (dust_mote, 8 × 4 × 2 box) | none | Gate threshold, path ends: very sparse. |

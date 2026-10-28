@@ -682,12 +682,14 @@ def drop_unused_slots(o):
     if len(used) == len(me.materials):
         return
     remap = {old: new for new, old in enumerate(used)}
-    for p in me.polygons:
-        p.material_index = remap[p.material_index]
+    idx = [remap[p.material_index] for p in me.polygons]
     keep = [me.materials[i] for i in used]
+    # clearing the slots resets every face's index to 0, so the remapped indices are written after the new slots
     me.materials.clear()
     for m in keep:
         me.materials.append(m)
+    me.polygons.foreach_set("material_index", idx)
+    me.update()
 
 
 def row_objs(sheet, subject):

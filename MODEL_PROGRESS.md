@@ -205,10 +205,10 @@ Skill vs design doc / repo (design doc wins, reported):
 | 006 | Copper Flintborn Construction Study | World & resources | ✅ | 1030; parts 464 / 32×3 / 36×2 | PASS 6/10 (round 1) | minors: inserts rounder than the sheet's angular nuggets; teal patches hard-edged; copper sheen to check in Studio |
 | 007 | Flintborn Coal model study | World & resources | ✅ | 834; parts 60×3 / 50×3 | PASS 7/10 (round 1) | minors: chunks a little columnar vs the sheet's rounder egg shapes |
 | 008 | Azurite Flintborn model study | World & resources | ✅ | 908; parts 48×2 / 40 / 44 | PASS 6.5/10 (round 1) | minors: rocks render dark from behind (studio light) |
-| 009 | Iron Meteor_ Flintborn model study | World & resources | ✅ | 2278 (8 shells); parts 58 / 40 / 44 | PASS 6/10 (round 1) | minors: even-width cracks; shell piece is a plain wedge |
+| 009 | Iron Meteor_ Flintborn model study | World & resources | 🔨 | 2278 (8 shells); parts 58 / 40 / 44 | PASS 6/10 (round 1) | user review: cracks not apparent, no depth; rework queued |
 | 010 | Flintborn Gold model study | World & resources | ✅ | 710; parts 112 / 24×3 / 36 | PASS 6/10 (round 1) | minors: no visible recessed seats; host a touch pink |
-| 011 | Amethyst Flintborn model study | World & resources | ✅ | 1122; parts 456 / 232 / 24 | PASS 6/10 (round 1); reworked 3× from user review | minors: rock a touch pink; rim roll is quite regular |
-| 012 | Amber Flintborn model study | World & resources | ✅ | 820; parts 76 / 130 / 62 / 66 / 24 | PASS 6/10 (round 1) | minors: wood dark in back-lit views |
+| 011 | Amethyst Flintborn model study | World & resources | ✅ | 1334; parts 386 / 594 / 36 | remade through stage agents; verifier R3 6.5/10, final fixes applied (2-round cap) | top view shows dome (sheet conflict, side view wins); trough has no end horns |
+| 012 | Amber Flintborn model study | World & resources | 🔨 | 820; parts 76 / 130 / 62 / 66 / 24 | PASS 6/10 (round 1) | user: colour/texture completely off, wood terribly made; full remake queued |
 | 013 | Sulfur Flintborn exploded model study | World & resources | ⬜ | | | |
 | 014 | Starstone Low-Poly Construction Study | World & resources | ⬜ | | | |
 | 015 | Ember Meteor model study | World & resources | ⬜ | | | |
@@ -390,3 +390,5 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: PR #77 (009, 010) merged into v0.18 after v0.18 was fixed. 011 Amethyst passed (6/10): geode carved with `kit_models.carve`, crystals and lip joined in with `kit_models.merge_in`. `m004.floor_cut` takes an explicit ground height.
 - 2026-10-28: 011 reworked from user review: the cave is bare stone inside (not a violet lining), with thick walls, a flat mouth cut and a thick rolled lip. `kit_models.drop_specks` removes boolean slivers.
 - 2026-10-28: PR #78 (011) merged into v0.18. 012 Amber passed (6/10).
+- 2026-10-28: user review: 011 Amethyst "looks terrible" (full remake), 012 Amber colour/texture and wood off (full remake), 009 Iron Meteor cracks lack depth (rework). Colours must be sampled from the master, calibrated and blended into neighbours. From now on each model goes through STAGES.md stage agents on Opus 5.5 high.
+- 2026-10-28: 011 Amethyst remade through the STAGES.md stage agents (Opus, high): a hollowed-out stone geode with calibrated, blended colour, a stone cave, a crystal_glow cave light and 4 ore_glint sockets. Verifier rounds 6 / 6.5 / 6.5; the last round's fixes applied and committed under the new 2-round cap. Studio gained a rear fill light (build_kit FILL_ENERGY 2.5); renders now restore FB_Ground and hide it in the viewport.
