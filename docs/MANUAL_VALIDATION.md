@@ -572,3 +572,28 @@ Studio and live checks:
 - [ ] With 20–30 players and about 50 creatures, the server holds frame rate. Note heartbeat and memory.
 - [ ] Gamepad: in a planter, a tap on the fourth crop button switches Sapling ↔ Fiber, and holding it plants the crop shown.
 
+## Knee-deep water, no swimming (GDD §55)
+
+How it's built:
+- Every water bed sits on the 4-stud voxel grid, with a quarter-full water voxel on top, which makes 1 stud of water.
+- The lake bed is at 28. The river and creek step down in 4-stud stages. There are six marsh pools.
+- A 64-stud shelf at 0 runs along the coast. An invisible wall stands 40 studs offshore, and the sea beyond it is deep.
+- Swimming is disabled for players. Creatures always stand on the bed.
+- Walking or sprinting with your feet in water runs at 70% speed; the Tidewalker perk adds back while wading. Creatures slow to 70% too.
+
+Automated (`world.spec`, `survival.spec`):
+- Water is 0.8–1.3 studs deep everywhere it can be reached.
+- Beds are on the voxel grid.
+- Everything placed is inside the wall.
+- The lake can be waded and the bridge stays dry.
+- Speed multipliers stack correctly.
+- Stepping into or out of water never trips the pace check.
+
+Studio and live checks:
+
+- [ ] Water reaches about knee height on the default character, everywhere: lake, river, marsh pools and the coastal shelf. If a quarter-full water voxel renders too thin or not at all, raise `WATER_DEPTH` (IslandLayout) toward 1.3.
+- [ ] Nothing ever swims: jump into the lake, the river and the sea shelf.
+- [ ] Speed drops to 70% at the water's edge and comes back on dry ground, with no movement warnings or kicks.
+- [ ] The offshore wall stops walking and jumping out to sea.
+- [ ] The river's small step-down "rapids" and the shorelines look acceptable; the ocean surface meets the shelf without a seam.
+- [ ] Creatures wade on the bed at reduced speed.

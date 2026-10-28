@@ -8,7 +8,8 @@
     "Beams: one Beam per entry of a kind's `beams`, from an Attachment at the socket (Attachment0) to one at socket position + `end` (Attachment1). Orient both Attachments with Axis = `axis` and SecondaryAxis = `normal` (the face of a beam with FaceCamera false). color/transparency are sequences from Attachment0 to Attachment1. Width0/Width1 and TextureLength scale with vfx_scale.",
     "Beam texture_speed is in studs/second along the beam (positive = start to end). Roblox does not document TextureSpeed's unit; if it is texture lengths per second, set TextureSpeed = texture_speed / texture_length (verify once in Studio).",
     "Beam textures put u (the image's width) along the beam and v across it.",
-    "Emitters with shape_follows_width already have shape[0] set from the socket's width override."
+    "Emitters with shape_follows_width already have shape[0] set from the socket's width override.",
+    "A kind's light is one PointLight in the socket's Attachment: Color, Brightness, Range (x vfx_scale), Shadows = light.shadows (default false); flicker/pulse are animated in game."
   ],
   "textures": {
     "fire_flipbook_4x4": {
@@ -902,10 +903,10 @@
             "#E6F7FC"
           ],
           "transparency": [
-            0.85,
-            0.5,
-            0.5,
-            0.85
+            0.92,
+            0.72,
+            0.72,
+            0.92
           ],
           "width0": 6.0,
           "width1": 6.0,
@@ -1231,6 +1232,49 @@
             1.5,
             2.0
           ]
+        }
+      ],
+      "light": null
+    },
+    "crystal_glow": {
+      "emitters": [],
+      "light": {
+        "color": "#B06AF5",
+        "brightness": 1.0,
+        "range": 10,
+        "flicker": false,
+        "shadows": true
+      }
+    },
+    "crystal_halo": {
+      "emitters": [
+        {
+          "name": "Halo",
+          "texture": "glow_soft",
+          "color": [
+            "#C5F0ED",
+            "#6EF2F8"
+          ],
+          "size": [
+            12,
+            14
+          ],
+          "transparency": [
+            1.0,
+            0.82,
+            1.0
+          ],
+          "lifetime": [
+            2,
+            3
+          ],
+          "rate": 0.8,
+          "speed": [
+            0,
+            0
+          ],
+          "spread": 0,
+          "light_emission": 1.0
         }
       ],
       "light": null

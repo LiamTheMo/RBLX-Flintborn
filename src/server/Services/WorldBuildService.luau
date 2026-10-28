@@ -27,7 +27,7 @@ local WorldBuildService = {}
 
 WorldBuildService.MAP_NAME = "ShatteredCrater"
 -- Bump when the generated layout changes, so islands saved into a place rebuild.
-WorldBuildService.LAYOUT_VERSION = 2
+WorldBuildService.LAYOUT_VERSION = 3
 -- Terrain is written in square chunks (16 × 16 voxel columns).
 WorldBuildService.CHUNK = 64
 WorldBuildService.OCEAN_TILE = 1024
@@ -100,7 +100,8 @@ local function material(name: string): Enum.Material
 	return value
 end
 
--- The open ocean out to the full 6,144 studs: a sand floor and water to sea level.
+-- The open ocean out to the full 6,144 studs: a sand floor and water to sea level
+-- (its top voxel a quarter full, so the surface meets the shelf's knee-deep water).
 local function ocean(terrain: Terrain)
 	local half = BiomeCatalog.WORLD_SIZE / 2
 	local tile = WorldBuildService.OCEAN_TILE
@@ -113,9 +114,10 @@ local function ocean(terrain: Terrain)
 				Vector3.new(tile, 8, tile),
 				Enum.Material.Sand
 			)
+			local level = IslandLayout.SEA_LEVEL
 			terrain:FillBlock(
-				CFrame.new(center + Vector3.new(0, floor / 2, 0)),
-				Vector3.new(tile, -floor, tile),
+				CFrame.new(center + Vector3.new(0, (floor + level) / 2, 0)),
+				Vector3.new(tile, level - floor, tile),
 				Enum.Material.Water
 			)
 			breathe()
@@ -156,7 +158,8 @@ local function chunk(terrain: Terrain, cx: number, cz: number)
 		for k = 1, columns do
 			local x, z = cx + (i - 0.5) * VOXEL, cz + (k - 0.5) * VOXEL
 			local h = IslandLayout.HeightAt(x, z)
-			local w = IslandLayout.WaterLevelAt(x, z)
+			-- Water only on knee-deep beds (and the open sea): see IslandLayout.
+			local w = IslandLayout.WaterLevelAt(x, z) or -math.huge
 			local index = (i - 1) * columns + k
 			heights[index], waters[index] = h, w
 			surfaces[index] = latticeMaterial(math.round((x + half) / step), math.round((z + half) / step))
@@ -236,6 +239,32 @@ local function carveCave(terrain: Terrain)
 			Vector3.new(16, 4, 120),
 			Enum.Material.CrackedLava
 		)
+	end
+end
+
+-- The invisible wall a short way offshore: players wade the knee-deep shelf but
+-- never walk out to the deep sea (GDD §55). Rays pass through it.
+WorldBuildService.BOUNDARY_STEP_DEGREES = 1
+WorldBuildService.BOUNDARY_HEIGHT = 120
+
+local function boundary()
+	local wall = Instance.new("Folder")
+	wall.Name = "Boundary"
+	wall.Parent = folder
+	local points = IslandLayout.BoundaryPoints(WorldBuildService.BOUNDARY_STEP_DEGREES)
+	local height = WorldBuildService.BOUNDARY_HEIGHT
+	for index, a in points do
+		local b = points[index % #points + 1]
+		local mid = (a + b) / 2 + Vector3.new(0, height / 2 - 20, 0)
+		part({
+			Name = "Wall",
+			Size = Vector3.new(4, height, (b - a).Magnitude + 4),
+			CFrame = CFrame.lookAt(mid, mid + (b - a)),
+			Transparency = 1,
+			CanQuery = false,
+			CanTouch = false,
+			Parent = wall,
+		})
 	end
 end
 
@@ -686,6 +715,7 @@ local function generate()
 		baseplate:Destroy()
 	end
 	buildTerrain()
+	boundary()
 	for _, entry in PoiCatalog.Landmarks do
 		local build = LANDMARKS[entry.style]
 		if build then

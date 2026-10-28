@@ -65,12 +65,13 @@ local function groundParams()
 	return params
 end
 
--- Creatures wade through shallows on the bed and swim on deeper water's surface.
-NpcService.WADE_DEPTH = 4
+-- Creatures walk on the bed of knee-deep water, 30% slower (GDD §55).
+NpcService.WATER_SPEED_MULTIPLIER = 0.7
 
-local function groundAt(position: Vector3, params): Vector3
-	local hit = WorldState.Standing(position + Vector3.new(0, 20, 0), 60, params, NpcService.WADE_DEPTH)
-	return if hit then hit.Position else position
+-- The ground under a spot and whether it is in water.
+local function groundAt(position: Vector3, params): (Vector3, boolean)
+	local hit, wet = WorldState.Standing(position + Vector3.new(0, 20, 0), 60, params)
+	return if hit then hit.Position else position, wet
 end
 
 local function label(npc)
@@ -395,8 +396,12 @@ local function step(dt: number)
 				end
 			end
 		elseif flat.Magnitude > 1 then
+			if npc.inWater then
+				speed *= NpcService.WATER_SPEED_MULTIPLIER
+			end
 			local move = flat.Unit * math.min(speed * dt, flat.Magnitude)
-			local ground = groundAt(position + move, params)
+			local ground, wet = groundAt(position + move, params)
+			npc.inWater = wet
 			npc.body.CFrame = CFrame.lookAt(
 				ground + Vector3.new(0, npc.body.Size.Y / 2, 0),
 				ground + Vector3.new(0, npc.body.Size.Y / 2, 0) + flat.Unit

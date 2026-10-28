@@ -7,7 +7,16 @@
 -- shallow ford from the east; a river runs from the lake through the Riverlands to
 -- the sea, fed by a creek out of Mosswick Forest. Heights are sampled on an
 -- 8-stud lattice and blended in between, so the generated terrain and HeightAt
--- agree. Used to build the island until the authored map replaces it, and by
+-- agree.
+--
+-- No swimming (GDD §55): every water a player can reach is knee-deep, WATER_DEPTH
+-- (1 stud) over a flat bed. Terrain water fills whole 4-stud voxels, and a voxel
+-- holds either ground or water, so each bed sits exactly on a voxel boundary (a
+-- multiple of 4) with water at a quarter occupancy in the voxel above it: the lake
+-- at 28 (surface 29), the river and creek stepping down in 4-stud stages, marsh
+-- pools, and a shelf at 0 along the coast (sea surface 1). An invisible wall
+-- BOUNDARY_OFFSET studs offshore keeps players on the shelf; the sea drops away
+-- past it for looks. Used to build the island until the authored map replaces it, and by
 -- gameplay (resource nodes, wildlife, events) to find dry ground in a zone.
 
 local BiomeCatalog = require(script.Parent.BiomeCatalog)
@@ -15,15 +24,22 @@ local PoiCatalog = require(script.Parent.PoiCatalog)
 
 local IslandLayout = {}
 
-IslandLayout.SEA_LEVEL = 0
+-- Water surfaces stand WATER_DEPTH above beds on the 4-stud voxel grid.
+IslandLayout.WATER_DEPTH = 1
+IslandLayout.SEA_BED = 0
+IslandLayout.SEA_LEVEL = IslandLayout.SEA_BED + IslandLayout.WATER_DEPTH
 IslandLayout.SEA_FLOOR = -40
+-- The knee-deep shelf runs this far out from the coast; the wall stands inside it.
+IslandLayout.SHELF_WIDTH = 64
+IslandLayout.BOUNDARY_OFFSET = 40
 IslandLayout.LATTICE = 8
 -- The lattice (and the generated terrain) reaches past the island so the sea floor
 -- slopes down before the open ocean.
 IslandLayout.BUILD_HALF = 2304
 IslandLayout.BEACH_WIDTH = 200
 
-IslandLayout.LAKE_LEVEL = 28
+IslandLayout.LAKE_BED = 28
+IslandLayout.LAKE_LEVEL = IslandLayout.LAKE_BED + IslandLayout.WATER_DEPTH
 IslandLayout.LAKE_WATER_RADIUS = 600
 IslandLayout.RIM_HEIGHT = 72
 IslandLayout.KEEP_HEIGHT = 120
@@ -46,7 +62,6 @@ IslandLayout.Courtyard = { x = 0, z = -140, halfX = 90, halfZ = 110 }
 IslandLayout.KeepRamp = { halfWidth = 12, topZ = 190, bottomZ = 345, bottom = 32, sideSlope = 0.6, sideWidth = 60 }
 local KEEP_RAMP = IslandLayout.KeepRamp
 local BRIDGE = { halfWidth = 14, fromZ = 150, toZ = 700 }
-local FORD = { z = -100, halfWidth = 16, fromX = 180, toX = 640 }
 
 -- Frostpeak's summits {x, z, height, radius}.
 IslandLayout.Peaks = {
@@ -61,8 +76,9 @@ IslandLayout.TempleRamp = { halfWidth = 14, length = 150 }
 IslandLayout.Lookout = { x = -1330, z = 120, height = 148, radius = 110, slope = 110 }
 IslandLayout.CaveHill = { height = 150, margin = 20, slope = 110 }
 
--- Rivers: polylines from source to mouth with water surface and half width at each
--- end and the channel depth.
+-- Rivers: polylines from source to mouth with their half width at each end and the
+-- water surface of each equal stretch, stepping down 4 studs at a time (a flat
+-- knee-deep bed per stretch, short rapids between).
 IslandLayout.Rivers = {
 	{
 		id = "LakeRiver",
@@ -75,9 +91,8 @@ IslandLayout.Rivers = {
 			Vector3.new(1700, 0, 300),
 			Vector3.new(2080, 0, 400),
 		},
-		surface = { 28, -1 },
+		levels = { 29, 25, 21, 17, 13, 9, 5, 1 },
 		halfWidth = { 16, 26 },
-		depth = 8,
 	},
 	{
 		id = "MossCreek",
@@ -88,10 +103,19 @@ IslandLayout.Rivers = {
 			Vector3.new(1300, 0, -300),
 			Vector3.new(1250, 0, 60),
 		},
-		surface = { 30, 15 },
+		levels = { 29, 25, 21, 17 },
 		halfWidth = { 7, 10 },
-		depth = 4,
 	},
+}
+
+-- Marsh pools {x, z, radius, level}: knee-deep, with banks just above the water.
+IslandLayout.Pools = {
+	{ x = 1450, z = -1150, radius = 40, level = 29 },
+	{ x = 1550, z = -650, radius = 35, level = 25 },
+	{ x = 1000, z = -650, radius = 35, level = 25 },
+	{ x = 1200, z = 350, radius = 40, level = 25 },
+	{ x = 1700, z = -150, radius = 35, level = 21 },
+	{ x = 1100, z = 450, radius = 35, level = 25 },
 }
 
 for _, river in IslandLayout.Rivers do
@@ -146,10 +170,11 @@ function IslandLayout.RiverAt(x: number, z: number)
 			local distance = math.sqrt((x - px) ^ 2 + (z - pz) ^ 2)
 			if best == nil or distance < best.distance then
 				local along = (river.lengths[index - 1] + math.sqrt(lengthSq) * t) / river.length
+				local stage = math.min(#river.levels, math.floor(along * #river.levels) + 1)
 				best = {
 					river = river,
 					distance = distance,
-					surface = lerp(river.surface[1], river.surface[2], along),
+					surface = river.levels[stage],
 					halfWidth = lerp(river.halfWidth[1], river.halfWidth[2], along),
 				}
 			end
@@ -274,9 +299,10 @@ local function crater(x: number, z: number, land: number): number
 	local rim = IslandLayout.RIM_HEIGHT + noise(x, z, 60, 9.4) * 8
 	local h
 	if r < water then
-		h = math.max(-8, IslandLayout.LAKE_LEVEL + 2 - (water - r) * 0.25)
+		-- A shallow, walkable lake.
+		h = IslandLayout.LAKE_BED
 	elseif r < LAKE.radius then
-		h = lerp(IslandLayout.LAKE_LEVEL + 2, rim, smooth((r - water) / (LAKE.radius - water)))
+		h = lerp(IslandLayout.LAKE_LEVEL + 1.5, rim, smooth((r - water) / (LAKE.radius - water)))
 	else
 		h = lerp(rim, land, smooth((r - LAKE.radius) / 120))
 	end
@@ -286,18 +312,26 @@ local function crater(x: number, z: number, land: number): number
 		if z >= KEEP.z + BRIDGE.fromZ and z <= KEEP.z + BRIDGE.toZ then
 			h = math.max(h, IslandLayout.LAKE_LEVEL + 4 - math.max(0, side) * 0.6)
 		end
-		local fordSide = math.abs(z - FORD.z) - FORD.halfWidth
-		if dx >= FORD.fromX and dx <= FORD.toX then
-			h = math.max(h, IslandLayout.LAKE_LEVEL - 1.5 - math.max(0, fordSide) * 0.4)
-		end
 	end
 	return h
+end
+
+-- The marsh pool at (x, z) and the distance from its centre, if one is near.
+local function poolNear(x: number, z: number, reach: number)
+	for _, pool in IslandLayout.Pools do
+		local distance = math.sqrt((x - pool.x) ^ 2 + (z - pool.z) ^ 2)
+		if distance < pool.radius + reach then
+			return pool, distance
+		end
+	end
+	return nil, math.huge
 end
 
 -- Ground height before lattice smoothing.
 function IslandLayout.RawHeight(x: number, z: number): number
 	local inland = BiomeCatalog.CoastDistance(x, z)
-	if inland < -150 then
+	local shelf = IslandLayout.SHELF_WIDTH
+	if inland < -shelf - 150 then
 		return IslandLayout.SEA_FLOOR
 	end
 	local h = blendedLand(x, z)
@@ -305,23 +339,35 @@ function IslandLayout.RawHeight(x: number, z: number): number
 	if dx * dx + dz * dz < (LAKE.radius + 120) ^ 2 then
 		h = crater(x, z, h)
 	end
-	if inland < IslandLayout.BEACH_WIDTH then
-		if inland < 0 then
-			h = math.max(IslandLayout.SEA_FLOOR, 1.5 + inland * 0.35)
+	local pool, poolDistance = poolNear(x, z, 30)
+	if pool then
+		if poolDistance < pool.radius then
+			h = pool.level - IslandLayout.WATER_DEPTH
 		else
-			h = lerp(1.5, h, smooth(inland / IslandLayout.BEACH_WIDTH))
+			-- Banks rise from just above the water back to the land around.
+			local bank = pool.level + 0.5
+			h = math.max(bank, lerp(bank, h, smooth((poolDistance - pool.radius) / 30)))
+		end
+	end
+	if inland < IslandLayout.BEACH_WIDTH then
+		if inland < -shelf then
+			h = math.max(IslandLayout.SEA_FLOOR, IslandLayout.SEA_BED - (-inland - shelf) * 0.5)
+		elseif inland < 0 then
+			h = IslandLayout.SEA_BED
+		else
+			h = lerp(IslandLayout.SEA_LEVEL + 0.5, h, smooth(inland / IslandLayout.BEACH_WIDTH))
 		end
 	end
 	local river = IslandLayout.RiverAt(x, z)
 	if river then
 		local edge = river.halfWidth
 		if river.distance < edge then
-			h = math.min(h, river.surface - river.river.depth * (1 - (river.distance / edge) ^ 2))
+			h = river.surface - IslandLayout.WATER_DEPTH
 		elseif river.distance < edge + 60 and inland > 0 then
 			-- Banks (and a low levee) keep the water in its channel.
 			local beyond = river.distance - edge
 			local top = river.surface + 1.5 + beyond * 0.6
-			local bottom = river.surface + 1.5 - math.max(0, beyond - 20) * 0.25
+			local bottom = river.surface + 0.5 - math.max(0, beyond - 20) * 0.25
 			h = math.clamp(h, bottom, top)
 		end
 	end
@@ -370,8 +416,9 @@ function IslandLayout.HeightAt(x: number, z: number): number
 	return h
 end
 
--- The water surface over (x, z): the lake, a river channel or the sea.
-function IslandLayout.WaterLevelAt(x: number, z: number): number
+-- The surface of the water body over (x, z) whatever the ground (the lake, a river
+-- channel, a marsh pool or the sea), or nil.
+function IslandLayout.BodyLevelAt(x: number, z: number): number?
 	local dx, dz = x - LAKE.x, z - LAKE.z
 	if dx * dx + dz * dz < IslandLayout.LAKE_WATER_RADIUS ^ 2 then
 		return IslandLayout.LAKE_LEVEL
@@ -380,15 +427,55 @@ function IslandLayout.WaterLevelAt(x: number, z: number): number
 	if river and river.distance < river.halfWidth then
 		return river.surface
 	end
-	return IslandLayout.SEA_LEVEL
+	local pool, distance = poolNear(x, z, 0)
+	if pool and distance < pool.radius then
+		return pool.level
+	end
+	if BiomeCatalog.CoastDistance(x, z) < 0 then
+		return IslandLayout.SEA_LEVEL
+	end
+	return nil
 end
 
--- True when (x, z) is land above any water.
+-- The water surface standing over the ground at (x, z), or nil where it is dry.
+-- Water lies only on a bed at exactly WATER_DEPTH below its surface (a voxel
+-- boundary), so reachable water is knee-deep; only the open sea past the wall is
+-- deeper.
+function IslandLayout.WaterLevelAt(x: number, z: number): number?
+	local level = IslandLayout.BodyLevelAt(x, z)
+	if level == nil then
+		return nil
+	end
+	local h = IslandLayout.HeightAt(x, z)
+	local bed = level - IslandLayout.WATER_DEPTH
+	if math.abs(h - bed) <= 0.05 or (level == IslandLayout.SEA_LEVEL and h < bed) then
+		return level
+	end
+	return nil
+end
+
+-- True when (x, z) is land with no water on it.
 function IslandLayout.IsDry(x: number, z: number): boolean
 	if BiomeCatalog.CoastDistance(x, z) <= 0 then
 		return false
 	end
-	return IslandLayout.HeightAt(x, z) > IslandLayout.WaterLevelAt(x, z) + 0.5
+	return IslandLayout.WaterLevelAt(x, z) == nil
+end
+
+-- Inside the offshore wall: where a player can be (the island and its shelf).
+function IslandLayout.InBounds(x: number, z: number): boolean
+	return BiomeCatalog.CoastDistance(x, z) > -IslandLayout.BOUNDARY_OFFSET
+end
+
+-- The offshore wall's corners, every `degrees` around the island.
+function IslandLayout.BoundaryPoints(degrees: number): { Vector3 }
+	local points = {}
+	for angle = 0, 360 - degrees, degrees do
+		local dx, dz = math.cos(math.rad(angle)), math.sin(math.rad(angle))
+		local r = BiomeCatalog.CoastRadius(dx, dz) + IslandLayout.BOUNDARY_OFFSET
+		table.insert(points, Vector3.new(dx * r, 0, dz * r))
+	end
+	return points
 end
 
 -- Steepness (rise per stud) of the ground at (x, z).
@@ -452,12 +539,11 @@ function IslandLayout.HabitatMatches(habitat: string, zoneId: string, x: number,
 		local keep = BiomeCatalog.EnvelopeDistance("ShatteredKeep", x, z)
 		return (r >= IslandLayout.LAKE_WATER_RADIUS - 10 and r < IslandLayout.LAKE_WATER_RADIUS + 70)
 			or (keep > 0.85 and keep < 1)
-			or (math.abs(z - FORD.z) < 60 and x - LAKE.x > FORD.fromX)
 	elseif habitat == "River" then
 		local river = IslandLayout.RiverAt(x, z)
 		return river ~= nil and river.distance < river.halfWidth + 70
 	elseif habitat == "Marsh" then
-		return h < 36 and noise(x, z, 180, 11.3) > 0.05
+		return (h < 36 and noise(x, z, 180, 11.3) > 0.05) or poolNear(x, z, 60) ~= nil
 	elseif habitat == "Rocky" then
 		return IslandLayout.SlopeAt(x, z) > 0.45 or noise(x, z, 150, 12.7) > 0.25 or h > 200
 	elseif habitat == "Highland" then
@@ -618,6 +704,9 @@ function IslandLayout.SurfaceMaterial(zoneId: string?, x: number, z: number, h: 
 	end
 	local river = IslandLayout.RiverAt(x, z)
 	if river and river.distance < river.halfWidth + 3 then
+		return "Mud"
+	end
+	if poolNear(x, z, 4) then
 		return "Mud"
 	end
 	if zoneId == "CraterLake" then

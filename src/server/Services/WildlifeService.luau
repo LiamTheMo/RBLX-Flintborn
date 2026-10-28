@@ -25,8 +25,6 @@ local WildlifeService = {}
 
 -- Hostile groups never start this close to a player spawn point.
 WildlifeService.HOSTILE_SPAWN_CLEARANCE = 100
--- Creatures wade shallows and swim deeper water (as NpcService moves them).
-WildlifeService.WADE_DEPTH = 4
 
 -- slot = {zone, readyAt, group?}; group = {slot, members = {npc -> true}, size, lastNear}.
 local slots = {}
@@ -77,7 +75,7 @@ local function groundParams()
 end
 
 local function standingAt(position: Vector3, params): Vector3
-	local hit = WorldState.Standing(position + Vector3.new(0, 30, 0), 80, params, WildlifeService.WADE_DEPTH)
+	local hit = WorldState.Standing(position + Vector3.new(0, 30, 0), 80, params)
 	return if hit then hit.Position else position
 end
 
