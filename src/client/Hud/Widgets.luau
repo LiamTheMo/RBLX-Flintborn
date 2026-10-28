@@ -66,7 +66,7 @@ end
 -- Parchment-kit stand-ins: words for icons, warm paper or leather plates for the
 -- rest, so the lobby reads before its art is uploaded.
 Widgets.PARCHMENT_GLYPHS = {
-	pm_icon_crown = { "♛", "gold" },
+	pm_icon_crown = { "♛", "leather" },
 	pm_icon_add_friend = { "+", "ink" },
 	pm_button_add_friend = { "+", "ink" },
 	pm_button_x = { "✕", "ink" },

@@ -167,13 +167,18 @@ local function inkText(entry, props, parent: Instance): TextLabel
 end
 
 -- Widens a small button's touch area past its art until it is at least MIN_TAP
--- points on screen at `screenScale` (never past `target.maxPad`, which keeps
+-- points on screen at `screenScale` (never past `target.maxPad` on each side,
+-- {left, top, right, bottom} in reference px, which keeps
 -- neighbours apart).
 local function padTouch(target, screenScale: number)
-	local art = math.min(target.w, target.h)
-	local pad = math.clamp((MIN_TAP / math.max(screenScale, 0.01) - art) / 2, 0, target.maxPad)
-	target.button.Position = UDim2.fromOffset(-pad, -pad)
-	target.button.Size = UDim2.new(1, pad * 2, 1, pad * 2)
+	local want = MIN_TAP / math.max(screenScale, 0.01)
+	local limit = target.maxPad -- {left, top, right, bottom}
+	local x = math.max(0, (want - target.w) / 2)
+	local y = math.max(0, (want - target.h) / 2)
+	local left, right = math.min(x, limit[1]), math.min(x, limit[3])
+	local up, down = math.min(y, limit[2]), math.min(y, limit[4])
+	target.button.Position = UDim2.fromOffset(-left, -up)
+	target.button.Size = UDim2.new(1, left + right, 1, up + down)
 end
 
 function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
@@ -354,7 +359,12 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 	-- Enter (its lettering is painted on the art) with a veil while busy.
 	local enterCfg = cfg.enter
 	local enter = holder("Enter", enterCfg, self.root)
-	art(enterCfg.sprite, enter)
+	local enterArt = art(enterCfg.sprite, enter)
+	if not hasArt(enterCfg.sprite) then
+		-- The stand-in plate covers only the banner (the part that is the button).
+		enterArt.Position = UDim2.fromOffset(enterCfg.hit[1], enterCfg.hit[2])
+		enterArt.Size = UDim2.fromOffset(enterCfg.hit[3], enterCfg.hit[4])
+	end
 	if not hasArt(enterCfg.sprite) then
 		for _, key in { "title", "subtitle" } do
 			local entry = enterCfg[key]
@@ -418,20 +428,21 @@ end
 
 -- Registers a small button whose touch area Fit grows on small screens. `party`
 -- buttons sit in the party panel and shrink with it.
-function LobbyHud:_target(button: GuiObject, w: number, h: number, maxPad: number, party: boolean)
+function LobbyHud:_target(button: GuiObject, w: number, h: number, maxPad: { number }, party: boolean)
 	local target = { button = button, w = w, h = h, maxPad = maxPad, party = party }
 	table.insert(self.targets, target)
 	padTouch(target, self.screenScale * (if party then self.partyScale.Scale else 1))
 end
 
 -- A small sprite button at `entry.rect` (party panel) with a touch area that
--- grows to MIN_TAP on small screens, up to `entry.touchPad` on each side.
+-- grows to MIN_TAP on small screens, up to `entry.touchPad` ({left, top, right,
+-- bottom}) so it never reaches a neighbouring button.
 function LobbyHud:_spriteButton(name: string, entry, parent: Instance, onPress)
 	local frame = Widgets.Make("Frame", rect(entry, { Name = name, BackgroundTransparency = 1, ZIndex = 6 }), parent)
 	Widgets.Sprite(entry.sprite, { Size = UDim2.fromScale(1, 1), ZIndex = 6 }, frame)
 	local button = hit(frame, name .. "Button", self.steady)
 	button.Activated:Connect(onPress)
-	self:_target(button, entry.rect[3], entry.rect[4], entry.touchPad or 0, true)
+	self:_target(button, entry.rect[3], entry.rect[4], entry.touchPad or { 0, 0, 0, 0 }, true)
 	return frame
 end
 
@@ -545,6 +556,14 @@ function LobbyHud:SetParty(members, invites, maxSize: number, canInvite: boolean
 	local cfg = self.cfg.party
 	self.partyCount.Text = HudModel.PartyCount(#members, maxSize)
 	self.leave.Visible = inParty
+	-- The rows' buttons are about to go: forget their touch areas.
+	local kept = {}
+	for _, target in self.targets do
+		if not target.button:IsDescendantOf(self.list) then
+			table.insert(kept, target)
+		end
+	end
+	self.targets = kept
 	for _, child in self.list:GetChildren() do
 		if child:IsA("GuiObject") then
 			child:Destroy()

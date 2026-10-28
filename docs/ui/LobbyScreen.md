@@ -29,7 +29,7 @@ All in `src/shared/UI/HudLayout.json`: colours in the top-level `colors`, the se
 | rule | #DEC09E | Party row rules |
 | photoEdge | #A88E72 | Party headshot edge |
 | dot | #C9A681 | Empty party slot markers |
-| thumb / track | #916540 / #D8B890 | Party scrollbar |
+| thumb / track | #9A6E4C / #D8B890 | Party scrollbar |
 | photo | #C5B3A1 | Portrait backdrop behind headshots |
 | leather | #9B3A1E | Fallback Enter / primary buttons |
 | cream | #FBEBD0 | Text on leather |
@@ -60,7 +60,7 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Party.Divider | 1262,353,334,2 | in panel | line | — | native |
 | Party.List | 1261,359,345,236 | in panel | scrolling; bar 10 px thumb/track | rows | native |
 | Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 229,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
-| Invite row | h 58 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 160 / 262 | incoming invites | native + images |
+| Invite row | h 76 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 160,14 / 262,14 | incoming invites | native + images |
 | Empty slot row | h 50 | list | dot 22 px at 3,14; rule at y 48 | free slots up to the cap | native |
 | Enter | 525,741,622,180 | bottom-centre | `pm_lobby_enter` (lettering painted) | "ENTER / SHATTERED CRATER" | image |
 | Server | 1150,799,251,71 | right of Enter | `pm_lobby_server` (icon + arrow painted) | "Choose server" Serif 17 (shrinks) at 1224,815,134,34 | image + native |
@@ -76,7 +76,7 @@ component scan, scanlines and ink boxes; see Measurements log).
 - XP track: scanlines row 172 and columns 400/500 — outline 162–180, interior
   165–178, fill 287–462.
 - Party rules: column scans at x 1276/1450 — divider 353–355, rules 433, 480, 532,
-  583; dots 451–472 (22 px); scrollbar x 1595–1605, thumb #996E4B, track #D8B890.
+  583; dots 451–472 (22 px); scrollbar x 1595–1605, thumb core #9A6E4C, track #D8B890.
 - Portrait window: grid crop at 4× — 69–171 × 104–201.
 
 ## States
@@ -169,9 +169,17 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 - The party scrollbar runs the whole list height (the master draws it below the
   leader row), so the add-friend button sits 14 px further left than the master
   to stay clear of it, and the crown 4 px left to keep a gap before the button.
+- The close-up sheet's mail button with a "1" badge is not built: the game has no
+  mail; party invites arrive as rows in the party panel.
+- Text on phones: Roblox draws the lobby at half size on phones (the HUD's minimum
+  scale, shared with the in-world HUD), so party text is about 8–10 pt there. A
+  larger minimum scale for phones is an owner decision; it would also squeeze the
+  layout.
 - Merriweather's numerals: a local copy of the font renders old-style figures;
   whether Roblox's Merriweather does is a manual Studio check.
 - Small buttons (Settings, Leave, add-friend, invite Accept/Decline) get touch
-  areas that grow past their art to 44 points on screen; on short screens the
+  areas that grow past their art toward 44 points on screen, each side limited so
+  it never reaches a neighbouring button (on the smallest phones some stay at
+  ~30 pt); on short screens the
   party panel moves up under Coins before it shrinks; popups grow on small
   screens and never reach under the top bar.

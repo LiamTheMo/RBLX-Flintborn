@@ -46,7 +46,7 @@
     "rule": "#DEC09E",
     "photoEdge": "#A88E72",
     "dot": "#C9A681",
-    "thumb": "#916540",
+    "thumb": "#9A6E4C",
     "scrollTrack": "#D8B890",
     "photo": "#C5B3A1",
     "leather": "#9B3A1E",
@@ -207,7 +207,7 @@
       "pos": [1, -34, 0, 98],
       "size": [69, 66],
       "sprite": "pm_lobby_gear",
-      "touchPad": 24
+      "touchPad": [24, 24, 24, 24]
     },
     "nav": {
       "anchor": [0, 0],
@@ -234,22 +234,22 @@
       "title": { "rect": [54, 40, 140, 40], "font": "serif", "textSize": 34, "color": "ink", "text": "PARTY" },
       "count": { "rect": [197, 40, 140, 40], "font": "serif", "textSize": 34, "color": "ink" },
       "divider": { "rect": [51, 86, 334, 2] },
-      "leave": { "rect": [368, 42, 36, 35], "sprite": "pm_button_x", "touchPad": 36 },
+      "leave": { "rect": [368, 42, 36, 35], "sprite": "pm_button_x", "touchPad": [30, 16, 30, 12] },
       "list": { "rect": [50, 92, 345, 236], "scrollBar": 10 },
       "member": {
         "height": 76,
         "headshot": { "rect": [0, 7, 62, 59] },
         "name": { "rect": [82, 22, 134, 30], "font": "serif", "textSize": 20, "color": "ink" },
         "crown": { "rect": [229, 24, 30, 23], "sprite": "pm_icon_crown" },
-        "invite": { "rect": [262, 9, 68, 52], "sprite": "pm_button_add_friend", "touchPad": 24 },
+        "invite": { "rect": [262, 9, 68, 52], "sprite": "pm_button_add_friend", "touchPad": [24, 9, 4, 15] },
         "rule": { "rect": [1, 74, 319, 2] }
       },
       "invite": {
-        "height": 58,
-        "text": { "rect": [8, 14, 146, 30], "font": "serif", "textSize": 18, "color": "inkSoft" },
-        "accept": { "rect": [160, 5, 48, 47], "sprite": "pm_button_check", "touchPad": 26 },
-        "decline": { "rect": [262, 5, 48, 47], "sprite": "pm_button_x", "touchPad": 26 },
-        "rule": { "rect": [1, 56, 319, 2] }
+        "height": 76,
+        "text": { "rect": [8, 23, 146, 30], "font": "serif", "textSize": 18, "color": "inkSoft" },
+        "accept": { "rect": [160, 14, 48, 47], "sprite": "pm_button_check", "touchPad": [26, 14, 26, 13] },
+        "decline": { "rect": [262, 14, 48, 47], "sprite": "pm_button_x", "touchPad": [26, 14, 18, 13] },
+        "rule": { "rect": [1, 74, 319, 2] }
       },
       "empty": {
         "height": 50,
