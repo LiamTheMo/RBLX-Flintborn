@@ -92,6 +92,9 @@ def _override(o):
         ob.select_set(False)
     bpy.context.view_layer.objects.active = o
     o.select_set(True)
+    if not bpy.context.window_manager.windows:   # background session (bgmcp.py): no viewport to borrow
+        return bpy.context.temp_override(active_object=o, object=o, selected_objects=[o],
+                                         selected_editable_objects=[o])
     win = bpy.context.window_manager.windows[0]
     area = next(a for a in win.screen.areas if a.type == "VIEW_3D")
     region = next(r for r in area.regions if r.type == "WINDOW")
@@ -106,8 +109,10 @@ def _override(o):
 def union_loose(o, merge=0.01):
     """Boolean-union an object's separate closed shells into one manifold surface (no interior faces where parts
     interpenetrate). Materials and the Tint attribute carry over from each shell. Returns the shell count merged."""
-    if bpy.context.object and bpy.context.object.mode != "OBJECT":
-        bpy.ops.object.mode_set(mode="OBJECT")
+    act = bpy.context.view_layer.objects.active
+    if act and act.mode != "OBJECT":
+        with bpy.context.temp_override(active_object=act, object=act):
+            bpy.ops.object.mode_set(mode="OBJECT")
     others = split_loose(o)
     for p in others:
         m = o.modifiers.new("U", "BOOLEAN")

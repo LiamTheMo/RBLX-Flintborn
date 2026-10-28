@@ -833,3 +833,1128 @@ and the keys `r04_ember_core`, `r04_lava_crack`, `r04_meteor_rock`, `r04_impact_
 ## Correction (main session, 2026-10-28): side-view direction
 
 The kit's side camera (`VIEWS["side"]` = azimuth 90) sits at +X and looks along −X with Z up, so screen right is +Y: the model's BACK (fronts face −Y). Wherever this spec says the side view's right is the front, read it mirrored. Stage 1 should confirm this with a probe render before using side-view numbers. The 3D layout is unaffected.
+
+## Stage 1 — Modelling
+
+Builder: `art/blender/kit/mcp/m015.py` (`build()`; `iterate()` = build without the full render set plus the sheet-angle
+preview). Collection `Kit/M015 Ember Meteor`; `FlintbornWorldKit.blend` saved through the MCP. Renders in
+`art/blender/renders/models/M015/`: the kit's seven views, `front_sheet (0, 7)`, `side_sheet (90, 7)`, `rear_sheet (180, 7)`,
+`top78`, `f34_sheet (-14, 10)`, `r34_sheet (166, 10)`, `exploded`, five `part_*` shots and `M015_views.png`.
+Side-view direction confirmed by render: `side_sheet` (camera +X) has the front on the LEFT, so every side number below
+is compared with the sheet's side mirrored (`MEASURE_VIEWS` / `MIRRORED` in the builder).
+
+### What was built
+
+Each part has its own function; the hero is pasted strictly from the finished part meshes (`m011._paste`) and unioned.
+
+- **`EmberMeteorSlab` (A, `slab()`)**: two convex hulls, unioned. A lower section (3.3 long, 6-point rings 3.9 × 3.5,
+  leaning 12° towards +X) and an arm leaving the elbow at heading 62° (towards +X +Y, away from the crack face), rising
+  20°, 3.9 long, its end ring small and dropped 0.45 b, so the end is one big slanted facet and the peak sits mid-arm
+  (the front view's rounded boulder, not a log). 64 merged facets before the slot. Crack on the lower section's front
+  (−Y) face (`SLAB_CRACK`): a wide notch at the elbow (G 0.46), down and across, a jog (0.36), then nearly straight
+  down, closing 0.65 above the bottom (see deviations).
+- **`EmberMeteorCap` (B, `cap()`)**: hull of the spec's four rings plus a 2-point ridge; 5.0 × 3.45 × 2.7, 45 facets,
+  50 tris. No crack.
+- **`EmberMeteorChunk` (C, `chunk()`)**: hull of six 6-point rings (3.6 × 3.2 × 5.0) with a ridge point at +X on the
+  0.4 / 0.65 / 0.85 rings; 59 facets. Crack (`CHUNK_CRACK`) beside the ridge (θ −8 … −16°), from 0.81 L down to
+  0.30 L, widest 0.34 in its upper middle, a jog at 0.57 L, tapering closed at both ends.
+- **`EmberCore` (`core()`)**: hull of 32 Fibonacci points (wobble 0.95–1.04) on 5.0 × 4.8 × 5.2, with hull triangles
+  within 20° merged (`CORE_MERGE`; 9° left 40 facets): **32 broad facets, 60 tris**. Placeholder keys by height plus a
+  lean to +X +Y: `core_deep` below, `core` belt, `core_hot` crown.
+- **`EmberMeteorBaseRock` (`base_rock()`)**: `K.hull_rock` dome, flat bottom, blunt 3-point crown, 49 facets, 58 tris.
+  One variant only (13 copies, non-uniform scale, turns, mirrors).
+- **Crack slots (§6.2)**: `crack_stations()` snaps control rays onto the part's uncut surface, resamples to at most
+  0.42 apart and smooths the normals. `_crack_tube()` lofts one closed cutter per crack. Its cross-section runs lid
+  (+0.5) → lip chamfer on side A (0.08 deep, +0.06 set-back) → wall rows at 0.25 d and 0.55 d → a flat floor 0.45 G
+  wide, so the walls splay. Closed ends converge to a line (depth × 0.55 there, so the end wall leans in). `M.carve`
+  (exact) cuts it, and the cutter's faces carry the keys into the slot: lip band and chamfer `m015_ember_lip`,
+  0.25–0.55 d `m015_ember_wall`, 0.55 d–d `m015_core`, floor `m015_core_hot`. Depth d = 1.0 (A) and 0.9 (C, ×1.2–1.75
+  in the hero).
+- **Cleanup**:
+  - `_clean()` is m011 `_clean` (ears, quads, slivers) with every vert on a lip or ember-wall face locked (colour
+    geometry) and the ground plane kept flat.
+  - `_finish()` is `M.finish` (UVs 45° ANGLE_BASED, margin 0.008), then holes filled and slivers forced until nothing is
+    under 3°.
+  - `_ground_keys()` gives each floor-cap face the key of the wall it closes (the scan fill had made the whole
+    underside `m015_core`).
+- **Hero layout** (`PIECES`: location, spin about the part's own Z, lean heading and angle, part-axis scale, mirror):
+
+  | Piece | Part | Location | Spin | Lean | Scale | Mirror | Core overlap |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | Core | EmberCore | (0.15, −0.75, 3.2) | 20 | — | 1.04 | | |
+  | FL | Slab | (−1.6, −3.05, −0.4) | 10 | — | 1.0 | yes | 0.71 |
+  | BR | Chunk | (5.3, 2.8, −0.3) | 60 (crack faces about 48°, back-right) | 30° to heading 205 | (1.4, 1.2, 1.75) | | 0.88 |
+  | BL | Chunk | (−4.4, 2.95, −0.3) | −92 (crack faces about 100°, back) | 28° to heading −25 | (1.35, 1.15, 1.62) | yes | 0.55 |
+  | FR | Cap | (2.55, −1.95, 2.8) | 25 | 50° to heading −65 | (0.85, 0.95, 0.95) | | 0.45 |
+
+  - Rocks (`ROCKS`) follow §2.3, pulled in about 5 % (F1 at −4.8, S1 at 4.6, the back row at Y 3.7–4.8) and sunk 0.3.
+  - Core to rock: F4 is 0.23 clear (target ≥ 0.2) and every other rock 1.0–3.5. The core sits above the rocks with dark
+    gaps (underside render).
+- **Core decision:** the core is **not** a separate shell. It overlaps all four shells by 0.45–0.88 (target 0.3–0.8; BR
+  is 0.08 over) and is unioned in, so the junctions are crisp creases ("Shell pieces overlap the core with open gaps").
+  A free-floating core would touch nothing and need hidden support; overlapping reads as the sheet and keeps one closed
+  mesh.
+
+### Measured (MCP, final build)
+
+| Object | Tris / budget | Size (studs) | Shells | Non-manifold / boundary | Self-crossings | Min corner | Keys |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 2122 / 4000 | 12.04 × 10.73 × 7.47 | 2 (meteor + pebble P1) | 0 / 0 | 0 | 3.42° | core, core_deep, core_hot, shell, ember_lip, ember_wall, base |
+| EmberMeteorSlab | 518 / 1000 | 5.21 × 5.82 × 5.80 | 1 | 0 / 0 | 0 | 3.46° | shell, lip, wall, core, core_hot |
+| EmberMeteorCap | 50 / 1000 | 5.03 × 3.45 × 2.70 | 1 | 0 / 0 | 0 | 28.1° | shell |
+| EmberMeteorChunk | 302 / 1000 | 3.70 × 3.12 × 4.93 | 1 | 0 / 0 | 0 | 3.02° | shell, lip, wall, core, core_hot |
+| EmberCore | 60 / 1000 | 4.72 × 4.72 × 5.13 | 1 | 0 / 0 | 0 | 35.0° | core, core_deep, core_hot |
+| EmberMeteorBaseRock | 58 / 1000 | 2.62 × 2.42 × 1.90 | 1 | 0 / 0 | 0 | 17.9° | base |
+
+- Normals are outward, there are no n-gons, and `K.check` is clean.
+- Hero size against the 11.5 × 10.0 × 7.6 target: W is 0.04 over the ±0.5 band, D 0.13 over ±0.6, H in band.
+- The slab and chunk are well above the spec's tri estimates (150–230 and 110–160), because the slot walls keep three
+  rows plus the chamfer and floor at every station. Both are still under 1000.
+
+### Against the sheet (orthographic label rasters, `measure()`; sheet tables §1.2 and §1.5)
+
+| View | Profile error mean / worst | Glow O share, ours / sheet | W : H, ours / sheet |
+| --- | --- | --- | --- |
+| front (0, 7) | 0.074 / 0.23 | 21.5 / 26.3 % | 1.47 / 1.34 |
+| side (90, 7, mirrored) | 0.104 / 0.21 | 16.8 / 17.7 % | 1.36 / 1.14 |
+| rear (180, 7) | 0.064 / 0.18 | 17.2 / 24.2 % | 1.53 / 1.38 |
+| top (0, 78) | — | 19.5 / 27.0 % | 1.13 / 1.08 |
+| f34 (−14, 10) | — | 20.8 / 22.9 % | 1.41 / 1.42 |
+| r34 (166, 10) | — | 14.0 / 17.4 % | 1.49 / 1.33 |
+
+O here is the core keys plus the ember-wall faces, in placeholder colours. The lip share is 1.3–2.2 % against the
+sheet's 5.6–8.5 %; the sheet's L also counts the red-tinted rims, which stage 4's spill and cavity fields add.
+
+- **Front.** FL reads as the sheet's boulder, with the sliver and crack 1 in front of the core, BL's tip peeking over
+  the top left, BR's peak at the top right, and FR as the dark mass right of the window, on F4.
+  - Profile: f 0.20–0.30 within 0.03. The worst error is at f 0.45–0.50 (ours 0.76, sheet 0.95–1.0): the sheet's BR
+    peak sits over the window centre, ours at f 0.6, so the core's crown shows there.
+  - Window rows (f): h 0.25 0.47–0.60 (sheet 0.53–0.62, the bottom slot); h 0.49 0.40–0.56 (sheet 0.46–0.75: ours is
+    1.9 studs wide against 3.5, because FR and F4 cover its right half); h 0.62 0.31–0.65 (0.43–0.69); h 0.76 0.44–0.56
+    (0.38–0.50).
+  - Crack 1 runs from f 0.31–0.33 at h 0.2–0.25 up to the notch at (0.42, 0.6); the sheet's is f 0.31–0.42, h 0.18–0.59.
+  - **Crack 2 (BR's crack edge-on) does not show in the front view**: BR's crack faces back-right.
+- **Side (mirrored).** BR fills the back two-thirds, with its crack running diagonally across its +X face; FR sits at the
+  front edge.
+  - Crack: f 0.16–0.23 at h 0.62–0.82 plus the lower run; the sheet's is f 0.20–0.45, h 0.39–0.69, so ours sits higher
+    and steeper.
+  - Window onto the core: f 0.51–0.61 at h 0.49 (sheet 0.62–0.87); about 1.0 stud against 2.5.
+  - Profile: worst at the back end (BR's back flank stands higher than the sheet's 0.42–0.59).
+- **Rear.** The two leaning back pieces frame a V window onto the core: a diamond, a slot at the bottom and a point at
+  the top.
+  - Point at h 0.82: f 0.46–0.49 (sheet 0.52–0.56).
+  - Width at h 0.58: f 0.45–0.57 (sheet 0.37–0.66): 1.4 studs against 3.4.
+  - One crack on each piece: BR's on its upper outer flank (left); crack 5 on BL at f 0.68–0.80, h 0.35–0.70 (sheet
+    0.77–0.88, h 0.15–0.58). Ours is higher because C's crack runs 0.30–0.81 L.
+- **Top.** Four pieces in quadrants round a central diamond of core, widest at d 0.49, f 0.30–0.69 (sheet f 0.38–0.76 at
+  d 0.43: the same width, 0.07 to the left). The crack tops of BR and BL show as short glowing slots near the piece tops.
+- **Cracks in the hero** (`crack_probe()`, BVH ray pairs, 5 stations per crack; the end stations are the tapers):
+
+  | Crack | Opening (lip to lip) | Floor | Depth (surface → floor) |
+  | --- | --- | --- | --- |
+  | FL (crack 1) | 0.45 (elbow notch), 0.28, 0.31 (jog), 0.17 | 0.25, 0.21, 0.14, 0.08 | 0.95, 0.90, 1.00, 1.00 |
+  | BR (×1.2–1.75) | 0.33, 0.40, 0.31, 0.19 | 0.17, 0.23, 0.17, 0.11 | 0.57 (top taper), 0.91–1.24, 1.02, 0.55 (bottom taper) |
+  | BL (×1.15–1.62) | 0.32, 0.39, 0.29, 0.18 | 0.17, 0.22, 0.17, 0.11 | 0.55 (taper), 0.86–1.17, 0.94, 0.52 (taper) |
+
+  - Openings are 0.17–0.45 (target 0.15–0.5) and floors 0.45–0.6 of the opening.
+  - Depth is at least 0.9 along the open runs, except BL's 0.86 at one station.
+  - One station per crack sits on a jog, where the side ray ran along the slot; it reports 2.0+ and is ignored.
+- **Parts against their cells.** A is a chunky bent slab with its crack and strip on the lower section (`part_slab`); C
+  a faceted egg with the crack beside its ridge (`part_chunk`); B the flat lozenge; the core a chunky 32-facet ball; the
+  base rock a rounded dome. The exploded render lays them round the core, with the 13-rock ring below.
+
+### Deviations and decisions
+
+- A's crack closes 0.65 above the part's bottom instead of exiting through it. Run out, the slot crossed the hero's
+  floor cut and the ground cap triangulated its outline into a 0.78° sliver. In the hero, F2 and F3 hide the last stud.
+- BL leans 28° and BR 30° in towards each other, to put their peaks near the centre in the front view (on the sheet both
+  peaks sit at f 0.40–0.52). Straight egg copies can't also keep the sheet's wide rear window, because the sheet's pieces
+  curve like petals. So the rear and side windows are narrower than drawn, and the rear and top glow shares are 7–7.5
+  points low.
+- BR's crack faces back-right (side and rear), so the front view's crack 2 is lost; recorded, not chased.
+- The hero is 0.04 wider and 0.13 deeper than the tolerance band (rocks S1 and F1, BR's back).
+
+### Left for later stages
+
+- **Stage 2:** min corners are 3.0–3.5° on the hero, slab and chunk (target 5°, with the wall rows locked: the m009
+  `_polish` pattern with `WALL_KEYS` = lip + ember wall). The hero's 2nd shell is pebble P1 (allowed). Keep the slot
+  rows.
+- **Stage 4:** every key is a placeholder. The spill and cavity fields (§5.5) will add the sheet's L band. The core's
+  three keys come from a height + lateral field; its facing correlation is not checked yet.
+- **Shape follow-ups if the verifier asks:**
+  - widen the front window (FR further right, or smaller);
+  - open the rear window (less lean on BL and BR, at the cost of the front-view peaks);
+  - lower BR's crack in the side view;
+  - make the hero 0.1–0.2 narrower.
+
+### Stage 1 rework (overall read)
+
+The main session's review of the first pass: it read as "rocks round a campfire" — small, low, separate boulders
+ringing a big exposed orange ball, with oversized base rocks. The sheet is one big rounded fractured meteor, height
+0.8–0.9 of its width, whose tall faceted pieces close round the core like a cracked egg shell that has partly opened.
+The core glows through one main opening and thin seams, and its crown is covered. `m015.py` was rewritten; the
+first-pass layout above is superseded.
+
+**Construction (now).**
+- **One common dome** (`dome()`): a convex hull of six 8-point rings, 10.2 × 9.2 at the belt, 7.3 high plus a crown
+  lift. It is mirror-symmetric about the plane x = `XC` (0.3), steep-flanked with a broad shoulder, and its back half
+  rises up to 0.6 higher, so the back pieces stand tallest. 75 merged facets.
+  - The first try (10 points on 7 rings, 121 facets) read as a smooth ball, so it was cut down to fewer, bigger planes.
+- **Core** (`core()`): the same 32-point Fibonacci hull, now built from the x ≥ 0 half and mirrored, so it is symmetric
+  and the mirrored back-left piece still fits it. 5.3 × 5.1 × 5.3, 31 facets, 58 tris, centre (XC, −0.65, 3.05).
+- **Four pieces = dome sectors.** Vertical seam planes through the centre at azimuths front −75°, right −5°, back 90°
+  (on the mirror plane) and left 185° (the right seam's mirror) give the top view's cross. Each piece is built by
+  `piece_obj()` with exact booleans:
+  1. dome ∩ its sector prism, stopping 0.04 short of each seam line (no coplanar contact in the union);
+  2. minus the hollow: the core hull scaled 0.9 with the core's own 20° merge, so each piece's inner face lies about
+     0.25 inside the core and the union leaves crisp creases;
+  3. minus the openings it borders;
+  4. minus the slot cutters along its seams and its own crack;
+  5. floor-cut at the ground, with loose crumbs dropped.
+- **Openings** (`OPENINGS`): diamond frusta from inside the core outward, flare 1.22, so the rims splay a little and
+  read as lit cavity walls (`m015_ember_lip`).
+  - front: centred on the core, slightly right, 4.4 × 5.0;
+  - rear: on the mirror plane, 3.9 × 4.7;
+  - side: +X, cut from FR only, 2.7 × 3.9;
+  - crown: vertical, 3.5 × 4.1, where the four seams meet.
+  - The side opening was moved back 0.6: at first it met the front opening and cut FR into two shells.
+- **Seams and cracks** use the same lofted slot cutter as the first pass: splayed walls with rows at 0.25 d and 0.55 d
+  (lip / ember wall / core band) and a hot floor 0.45 G wide.
+  - Seams: depth 1.25, G 0.36–0.55, no chamfer (keeps them mirror-exact), stations every 0.75. The left seam's cutter
+    is the exact mirror of the right one's.
+  - Cracks: crack 1 down FL's front left of the window (the boulder | sliver crack), and the BR crack running
+    diagonally down its back-right flank (mirrored onto BL as crack 5). Depth 1.0, G up to 0.42, one-side chamfer,
+    tapered closed at both ends.
+- **Part mapping** (changed; recorded): the shells are now the dome's sectors, not independent shapes.
+  - `EmberMeteorSlab` (A) is FL: the long piece wrapping from the front window round the left side, with crack 1.
+  - `EmberMeteorCap` (B) is FR, between the front and side windows.
+  - `EmberMeteorChunk` (C) is BR, the tallest, with its crack.
+  - The back-left piece is the Chunk mirrored about x = XC (the main session's decision kept). The dome, core, rear
+    window, crown opening and back seam are symmetric, and the left seam is the right one's mirror, so the mirrored
+    copy fits exactly.
+  - The hero pastes FL, FR, BR, mirrored BR, the core and 13 stones, all from the finished part meshes. The pieces sit
+    0.05 below the ground so the floor cut never runs along their own flat bottoms.
+  - The sheet's exploded shapes (elbow slab, lozenge, egg) are no longer matched literally: the shells are curved dome
+    sectors. That is what lets them close into the meteor silhouette.
+- **Base rocks:** 13 low stones round the foot (`ROCKS` by azimuth and distance, × 0.88), 0.7–1.7 high. The part is a
+  2.4 × 2.25 × 1.3 rounded stone.
+- **Cleanup additions:**
+  - `_ground_slivers()` fixes thin floor-cap triangles fanned onto a 0.1 ground edge where a stone meets a piece. It
+    first tries a merge (when the link condition allows), then a flip, then splits the cap's long edges.
+  - `gaps()` now reports core-to-rock clearance and core contact. The shells' overlap with the core is fixed by
+    construction (0.9 hollow); the old nearest-face depth was unreliable through slotted pieces.
+
+**Measured (MCP, final build).**
+
+| Object | Tris / budget | Size (studs) | Shells | Non-manifold / boundary | Self-crossings | Min corner |
+| --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 3360 / 4000 | 11.13 × 10.24 × 7.34 | 1 | 0 / 0 | 0 | 3.05° |
+| EmberMeteorSlab (FL) | 614 / 1000 | 5.75 × 4.17 × 6.95 | 1 | 0 / 0 | 0 | 3.21° |
+| EmberMeteorCap (FR) | 354 / 1000 | 4.67 × 3.94 × 6.95 | 1 | 0 / 0 | 0 | 3.06° |
+| EmberMeteorChunk (BR) | 744 / 1000 | 4.79 × 4.78 × 7.39 | 1 | 0 / 0 | 0 | 3.36° |
+| EmberCore | 58 / 1000 | 4.91 × 4.72 × 5.23 | 1 | 0 / 0 | 0 | 18.6° |
+| EmberMeteorBaseRock | 58 / 1000 | 2.41 × 2.25 × 1.30 | 1 | 0 / 0 | 0 | 9.9° |
+
+- Normals are outward, there are no n-gons, and `K.check` is clean.
+- Hero size is inside every tolerance band (11.5 ± 0.5, 10.0 ± 0.6, 7.6 ± 0.3).
+- The core touches all four pieces and clears every stone by at least 1.14.
+
+**Against the sheet** (orthographic rasters at the sheet's elevations; side compared mirrored).
+
+| View | Meteor W : H (shells only) | Profile error mean / worst | Glow share, ours / sheet | Lip share, ours / sheet |
+| --- | --- | --- | --- | --- |
+| front | 1.22 (H = 0.82 W) | 0.101 / 0.31 | 21.9 / 26.3 % | 14.2 / 5.6 % |
+| side | 1.09 (H = 0.92 W) | 0.066 / 0.20 | 11.7 / 17.7 % | 13.0 / 8.5 % |
+| rear | 1.27 (H = 0.79 W) | 0.066 / 0.28 | 16.9 / 24.2 % | 8.3 / 6.9 % |
+| top | — | — | 16.0 / 27.0 % | 18.4 / 7.1 % |
+| f34 (−14, 10) | — | — | 16.7 / 22.9 % | — |
+| r34 (166, 10) | — | — | 13.5 / 17.4 % | — |
+
+- **Front.** One tall dome, peaked over the back, with crack 1 on FL left of a large diamond window onto the core, and
+  the front seam running up from the window's top to the crown. The core's crown is covered.
+  - Window (f of the hero width): h 0.25 0.46–0.59 (sheet slot 0.53–0.62); h 0.49 0.36–0.71 (sheet 0.46–0.75, 3.9
+    studs against 3.5); h 0.62 0.44–0.63 (0.43–0.69); closing to a point at h 0.76 (0.52–0.55; the sheet's top point
+    0.44–0.49 at h 0.83).
+  - Profile worst at f 0.50: the back seam's V notch at the crown shows through the top silhouette (ours 0.80,
+    sheet 1.0). On the sheet that notch is seen only from the rear.
+  - The sheet's crack 2 (right flank) is not reproduced; the right seam sits on the +X limb.
+- **Side (mirrored).** A closed dome: BR's broad flank with its diagonal crack, the right seam as a glowing line, and
+  the side window at f 0.52–0.72, h 0.25–0.62 (sheet f 0.62–0.87, h 0.22–0.69; ours sits 0.1 further back and is
+  narrower).
+- **Rear.** Matches best: two tall back pieces with a diamond window between them, h 0.58 f 0.38–0.65 (sheet
+  0.37–0.66). It is a slot at the bottom (h 0.25, 0.50–0.53) and a point at the top (h 0.76, 0.48–0.54; sheet h 0.82,
+  0.52–0.56). The back seam continues above and below, with a crack on each piece.
+- **Top.** Four quadrant pieces round a central diamond of core with glowing cross seams, as the sheet's top view. The
+  diamond is 2.2 studs wide (f 0.38–0.60) against the sheet's 4.4, and the seams' outer runs show as glowing channels.
+- **f34 and r34:** the same read as front and rear.
+- **Slots in the hero** (`crack_probe()`; ray pairs):
+
+  | Slot | Opening | Floor | Depth |
+  | --- | --- | --- | --- |
+  | crack 1 (FL) | 0.30–0.41 | 0.12–0.17 (0.38 at the elbow notch) | 1.02–1.16 |
+  | BR crack (and BL mirrored) | 0.30–0.37 | 0.13–0.15 | 1.03–1.04 |
+  | right seam | 0.36–0.44 | 0.17–0.28 | 1.26–1.29 |
+
+  - The tapered ends close to 0.1, depth 0.98.
+  - The back and front seam probes run along the 0.08 hairline or into the openings, so their depth reads 1.1–2.7
+    (through to the core).
+
+**Left open.**
+- **Glow shares are low by 4–11 points** (top worst: the crown opening is half the sheet's 4.4-wide diamond).
+  - Widening the openings further eats the pieces' crowns, which the main session asked to keep.
+  - The lip share is high instead (the opening rims and the hollow seen past the core's edge are `ember_lip`). On the
+    sheet those rims render lit orange-red, so stage 4 can move the outer rim rows toward `ember_wall` / `core`. That
+    would recover most of the gap in the O share.
+- The seam walls of the openings have no depth rows (each rim is one frustum face). Stage 4 may need `K.refine` there
+  for blends.
+- **Stage 2:** min corners are 3.05–3.4° (target 5°, with the slot rows locked as before).
+
+
+## Stage 2+3 — Cleanup and UV
+
+All changes are in `m015.py`. I rebuilt with `m015.build()` in the open `FlintbornWorldKit.blend` and saved it through
+the MCP. Every number below was re-measured through the MCP after the final build.
+
+**Stage 2: `_polish(o)`** runs on each part after `_finish` and the ground keys, before the hero pastes the part, and
+then on the hero. It leaves every face a triangle, opens every corner under `POLISH_LIM` = 5°, puts the origin back at
+the bottom centre (the `m015_offset` follows) and re-makes the UVs. Each thin face gets the first of these that works,
+least invasive first:
+
+1. a near-flat same-key flip (`m009._flip_thin`; the surface moves at most 0.08);
+2. `_slide`: a corner slides within its own flat facet, or along its own straight feature line (a slot row, lip line,
+   crease or ground edge). Slot verts may slide too, because the surface and every row and key line stay where they
+   are;
+3. `_remesh`: the near-flat facet round the face (one key, normals within 3.5°) is re-triangulated as a constrained
+   Delaunay triangulation (`mathutils.geometry.delaunay_2d_cdt`), with up to 12 new inner verts on the old surface.
+   Nothing moves. New verts are kept out of the lens where they would make a thin triangle with an outline edge,
+   which can't be split;
+4. `m009._nudge_free` (up to 0.08) of a free corner;
+5. `_collapse`: a free vert merges onto a neighbour up to 0.25 away. Two verts under `LOCK_MERGE` = 0.1 apart may
+   merge even on a slot, and the smallest such move wins;
+6. `_nudge_far`: the same nudge, searched over 26 directions, up to 0.1.
+
+Every move is undone, or refused beforehand, if it makes faces cross.
+
+- **Lock.** `_wall_verts` holds every vert within 1e-3 of a slot cutter's surface, plus every ember-wall vert.
+  - The cutters are rebuilt from `ST`; the hero's include the 0.05 `SINK`.
+  - That covers the lip line, chamfer row, 0.25 d and 0.55 d rows and the floor of every seam and crack.
+  - The openings' rims and the hollow carry the lip key, but they are not slot rows, so they are free like the shell.
+    Stage 1's slivers were mostly there: 66 of the hero's 107 sub-5° faces had all three verts on lip-keyed faces.
+- **Determinism fix.** `m014._hull` passed `dissolve_limit` a Python set of edges, which iterates by memory
+  address. The core therefore came out at 58 or 60 tris, with a min corner of 18.6° or 4.8° / 8.0°, from one build
+  to the next, and the hero changed with it. `m015._hull` (also used by `base_rock`) passes the edges in index order.
+  The core is now 58 tris and 18.61° on every build, which is stage 1's mesh.
+- **`build()` now also returns** `corner5`, `interior` (ray parity: a point 2e-3 off a face along its normal lies
+  inside on 2 of 3 rays), `inner_shells` (`m009._inner_shells`) and `uv` (`M.uv_stats`). Any non-zero result is added
+  to `problems`. `POLISH_ON = False` rebuilds the stage-1 meshes for A/B checks.
+
+**Operations per object (final build)**
+
+| Object | Flips | Slides | Remeshes (new verts) | Nudges | Collapses (slot merges, largest move) |
+| --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 1 | 6 | 8 (12) | 9 | 3 (1, 0.011) |
+| EmberMeteorSlab | 1 | 1 | 7 (10) | 2 | 3 (3, 0.021) |
+| EmberMeteorCap | 1 | 4 | 10 (14) | 3 | 0 |
+| EmberMeteorChunk | 0 | 3 | 6 (8) | 2 | 2 (2, 0.030) |
+| EmberCore, EmberMeteorBaseRock | — | — | — | — | — (already past 5°) |
+
+### Measured (MCP, final build)
+
+| Object | Tris / budget | Verts | Size (studs) | Shells | Non-manifold / boundary / wire / loose | Zero-area / dup verts | Quads / n-gons | Self-crossings | Interior faces / inner shells | Normals | Min corner (stage 1) | Origin offset | Transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 3468 / 4000 (3360) | 1724 | 11.13 × 10.24 × 7.34 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 5.01° (3.05°) | 0, 0, 0 | applied |
+| EmberMeteorSlab | 628 / 1000 (614) | 314 | 5.75 × 4.17 × 6.95 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 5.27° (3.21°) | 0, 0, 0 | applied |
+| EmberMeteorCap | 382 / 1000 (354) | 193 | 4.67 × 3.94 × 6.95 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 5.11° (3.06°) | 0, 0, 0 | applied |
+| EmberMeteorChunk | 756 / 1000 (744) | 380 | 4.79 × 4.78 × 7.39 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 5.02° (3.36°) | 0, 0, 0 | applied |
+| EmberCore | 58 / 1000 | 31 | 4.91 × 4.72 × 5.23 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 18.61° | 0, 0, 0 | applied |
+| EmberMeteorBaseRock | 58 / 1000 | 31 | 2.41 × 2.25 × 1.30 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 / 0 | outward | 9.85° | 0, 0, 0 | applied |
+
+- On all six: no custom split normals, no modifiers, no parent or children, rotation 0 and scale 1, one UV layer
+  (`UVMap`), and only the `FB_m015_*` keys in use. `K.check` reports nothing.
+- **Purge.** `_drop_unused` removed 23 orphan M015 meshes: the build's temporaries and the replaced datablocks.
+  - No `_m015_*` objects, orphan M015 meshes or unused `FB_m015_*` materials are left.
+  - Every mesh is named after its object, and the collection holds exactly the six objects.
+- **Hero gaps unchanged.** The core touches all four pieces and clears every stone by 1.14–3.57.
+
+**Slots and silhouette against stage 1.** This is a true A/B: one build with `POLISH_ON = False`, which reproduces the
+saved stage-1 `crack_probe()` and `measure()` exactly, then the final build.
+- **Slot verts.** Every stage-1 slot vert lies within 0.0133 of the new surface.
+  - Over 0.001: 12 of 945 on the hero, 3 of 237 on the slab, 0 of 100 on the cap, 4 of 301 on the chunk.
+  - Over 0.01: one, the same vert on the slab and the hero, on the front seam's upper run (build (0.56, −2.10, 6.3)),
+    where a slot merge took place.
+- **Slot profile** (scratch probe `slot_profile`): the width across every seam and crack at 0.05, 0.25, 0.55 and
+  0.85 d, at 9 stations each.
+  - The slab, cap and chunk are identical to stage 1.
+  - On the hero, the right seam and back seam widths differ by at most 0.006, apart from runs inside the openings.
+  - The front seam's centre-ray depth changes by −0.015, −0.013 and +0.007 at three stations. That ray runs down the
+    0.08 hairline onto the core.
+- **`crack_probe()`.** Every opening is unchanged. The table below has the only changes; everything else matches
+  stage 1 to two decimals.
+
+  | Slot, station | Stage 1 | Now | Why |
+  | --- | --- | --- | --- |
+  | crack 1, station 0, floor | 0.38 | 2.17 | The depth went 1.142 → 1.148, so the floor ray at depth − 0.05 now passes just under the slot floor into the core gap at the elbow notch. At a fixed 0.85 d both builds read 2.11. |
+  | front seam, stations 0 and 3, floor / depth | 0.88 / 1.69, 0.68 / 1.17 | 0.89 / 1.68, 0.65 / 1.18 | Hairline probe. |
+  | back seam, stations 1 and 2, floor | 3.90, 3.15 | 3.92, 3.17 | Inside the rear and crown openings. |
+
+- **Silhouette** (`measure()`).
+  - Profile errors are unchanged: front 0.100 / 0.31 (was 0.101), side 0.066 / 0.20, rear 0.065 / 0.28 (was 0.066).
+  - Single profile columns differ by 0.01, and the glow and lip shares by at most 0.003.
+  - Renders: `front_sheet` and the stage-1 copy are indistinguishable by eye. Pixel diffs are 0.4–1.4 % of pixels,
+    all along edges and the horizon line, which is sampling noise. The core and base-rock part shots are identical.
+
+### UV (`M.uv_stats`, layer `UVMap`; Stage 3)
+
+`UV_ANGLE` and `_uv(o)` follow M013 and M014. Each object gets a Smart UV island angle, its island borders become
+seams, and each island is re-unwrapped ANGLE_BASED with an exact margin of 0.008 and `min_angle` equal to the angle,
+so there is no silent fallback. Any faces the unwrap folds are cut free by `m012._uv_unfold`. For each object I
+compared 35°, 40°, 45°, 50° and 55° on the polished meshes and chose by worst conformal stretch, then p95, then
+fewest islands.
+
+| Object (worst / p95, islands, faces cut free) | 35° | 40° | 45° | 50° | 55° | Chosen |
+| --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | **1.054 / 1.007, 476, 59** | 1.118 / 1.010, 396, 8 | 1.070 / 1.014, 444, 67 | 1.170 / 1.023, 338, 72 | 1.544 / 1.064, 287, 97 | 35° |
+| EmberMeteorSlab | 1.074 / 1.013, 48 | **1.033 / 1.010, 48, 1** | 1.073 / 1.011, 46, 2 | 1.047 / 1.016, 33, 1 | 1.312 / 1.060, 60, 26 | 40° |
+| EmberMeteorCap | **1.029 / 1.008, 32** | 1.029 / 1.009, 28 | 1.034 / 1.013, 24, 1 | 1.049 / 1.020, 24, 1 | 1.049 / 1.023, 22 | 35° |
+| EmberMeteorChunk | 1.048 / 1.010, 90, 34 | **1.018 / 1.010, 83, 34** | 1.094 / 1.014, 81, 34 | 1.094 / 1.014, 79, 34 | 1.094 / 1.023, 77, 34 | 40° |
+| EmberCore | 1.056 / 1.053, 20 | 1.056 / 1.053, 14 | 1.056 / 1.053, 11 | **1.000 / 1.000, 8** | 1.143 / 1.132, 6 | 50° |
+| EmberMeteorBaseRock | **1.021 / 1.015, 16** | 1.049 / 1.045, 11 | 1.082 / 1.070, 8 | 1.103 / 1.077, 8 | 1.089 / 1.079, 7 | 35° |
+
+| Object | Angle | Islands | Overlaps / cross-island | Flipped | Faces cut free | Min gap / border | Fill | Density min / med / max | Conformal worst / p95 | Area worst | Worst angle change | px / stud at 1024 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 35° | 476 | 0 / 0 | 0 | 59 | 0.016 / 0.008 | 0.275 | 1 / 1 / 1 | 1.054 / 1.007 | 1.046 | 2.15° | 24.2 |
+| EmberMeteorSlab | 40° | 48 | 0 / 0 | 0 | 1 | 0.016 / 0.008 | 0.471 | 1 / 1 / 1 | 1.033 / 1.010 | 1.044 | 1.17° | 66.0 |
+| EmberMeteorCap | 35° | 32 | 0 / 0 | 0 | 0 | 0.016 / 0.008 | 0.427 | 1 / 1 / 1 | 1.029 / 1.008 | 1.044 | 1.23° | 72.2 |
+| EmberMeteorChunk | 40° | 83 | 0 / 0 | 0 | 34 | 0.016 / 0.008 | 0.434 | 1 / 1 / 1 | 1.018 / 1.010 | 1.023 | 0.94° | 59.0 |
+| EmberCore | 50° | 8 | 0 / 0 | 0 | 0 | 0.016 / 0.008 | 0.374 | 1 / 1 / 1 | 1.000 / 1.000 | 1.000 | 0.00° | 71.4 |
+| EmberMeteorBaseRock | 35° | 16 | 0 / 0 | 0 | 0 | 0.016 / 0.008 | 0.523 | 1 / 1 / 1 | 1.021 / 1.015 | 1.014 | 1.15° | 209.6 |
+
+- The faces cut free are union S-steps: the chunk's 34 at every angle, where the slots meet the hollow, and the
+  hero's 59.
+- The hero's fill (0.275, 24 px per stud) is low because 476 islands each carry the margin. That is harmless: the
+  GLB exporter writes its own palette-cell UVs, and this layer only has to exist and be clean.
+
+### Left for later stages
+
+- Stage 4 onwards as listed under Stage 1. Remeshed facets keep their key and Tint value, so stage 4's fields colour them
+  like their neighbours.
+- The hero has 532 tris of headroom (3468 / 4000) for any stage-4 `K.refine`.
+
+## Stage 4 — Materials, colour and texture
+
+All changes are in `m015.py` (`palette()`, `calibrate()`, `colour()` / `colour_all()`, `report()`), run from
+`finish_stages()` at the end of `build()`, after stage 2's polish and stage 3's UVs. Stage 4 only changes material
+indices and Tint, so there are no geometry or UV changes and no `K.refine`. The rims needed no refine: the booleans and
+the polish had already split each rim wall into 60–110 triangles, so a per-face depth grade is fine enough. Rebuilt in
+the open `FlintbornWorldKit.blend` and saved through the MCP. All numbers were measured through the MCP on the final
+build.
+
+### Method
+
+- **Faces are classified by the construction surface they lie on**, not by key or facing (`_classify`). The classes
+  are:
+  - rock: the hero's base-key faces;
+  - core: on the core hull at `CORE_AT`;
+  - ground: z = 0;
+  - slot: on a seam or crack cutter;
+  - `rim_<opening>`: on an opening frustum;
+  - hollow: on the 0.9-scale hollow;
+  - dome: within 0.15 of the uncut dome;
+  - sector: the hidden seam hairline walls.
+- Everything is in the shared piece build frame:
+  - the hero's mesh + offset + SINK;
+  - a part's mesh + offset;
+  - the core part + `CORE_AT`.
+  So the slab, cap and chunk parts are coloured face for face like the same piece in the hero. Each base rock uses
+  its own part frame, through its placement.
+- The pass repeats: Tint is reset first, and the classes come from the geometry.
+- **Measured with the study's own masks.** `report()` renders the hero at the sheet's angles (front / side / rear at
+  el 7, top 78, f34 (−14, 10), r34 (166, 10)). It applies `measure.py`'s `cls()` (O / L / S / B), ported to numpy as
+  `_cls_px`, inside the hero's own pixels, using a label render as the mask. `sheet_stats()` runs the same masks on the
+  sheet's view boxes.
+  - The full-box sheet shares differ slightly from §1.2's bbox shares: front 24.5 %, side 16.3 %, rear 22.4 %,
+    top 23.8 %, f34 20.7 %, r34 15.6 %.
+  - `light=True` realises the sockets' PointLights (no particle stand-ins).
+
+### Sampling and calibration (two passes)
+
+- **Targets** are §5.4's rendered medians (`TARGETS`).
+- **Pass 1, test dome** (`calibrate()`): the m009 / m014 wrapper. Stone keys are sampled unfiltered, the Neon preview
+  is kept on every round, and the `T_Calib` meshes are purged.
+- **Pass 2, hero** (`report()`, VFX off): the shell family rendered 9–26 levels under the sheet in the lit views
+  (front `#4E484E` against `#685E64`; f34 `#575057` against `#60595F`; top `#575156` against `#61595E`). The dome's top
+  faces the key light and the hero's flanks don't, the same as M014. So the four shell keys were scaled ×(1.41, 1.38,
+  1.34) in linear light, the geometric mean of the three views' gains.
+- The rocks matched straight from pass 1 (front `#AC9389` against `#AF968C`), so they kept their pass-1 hexes.
+
+| Key | Target (rendered) | Dome render | Final hex | Rough | Emission | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `m015_shell` | `#5F585E` | `#615A60` | `#534F58` (pass 2) | 0.88 | 0 | |
+| `m015_shell_light` | `#7C7378` | `#7C7378` | `#6C676F` (pass 2) | 0.88 | 0 | |
+| `m015_shell_dark` | `#45404A` | `#49444C` | `#3B3743` (pass 2) | 0.9 | 0 | |
+| `m015_shell_warm` | `#685D5E` | `#695F60` | `#5B5358` (pass 2) | 0.88 | 0 | used only through its 25 / 50 % mixes |
+| `m015_ember_lip` | `#5E2620` | `#5C2720` | `#4A211D` | 0.85 | 0 | specular 0.06 |
+| `m015_ember_wall` | `#B04A2C` | `#AF4A2D` | `#A74F34` | 0.75 | **1.0 (Neon)** | stage 5 decision |
+| `m015_core` | `#FD7428` | `#FF7429` | `#FB7430` | 0.5 | **1.0 (Neon)** | |
+| `m015_core_hot` | `#FDB548` | `#FFB449` | `#FBAB4E` | 0.5 | **1.0 (Neon)** | |
+| `m015_core_deep` | `#D9441A` | `#D7441A` | `#A33A16` | 0.5 | 0 | solid, lit; specular 0.06 |
+| `m015_base` | `#B39A8F` | `#B1998E` | `#857774` | 0.92 | 0 | was the placeholder `#B39A8F`, which rendered peach `#E7C0A9` |
+| `m015_base_light` | `#C8AFA3` | `#C8AFA4` | `#968885` | 0.92 | 0 | |
+| `m015_base_dark` | `#8F786D` | `#8D786C` | `#6A5D58` | 0.92 | 0 | used only through its 25 / 50 % mixes |
+
+- Mix keys come from `K.mix_key` and are solid. They include `shell_x_light/dark/warm_25–75`, `ember_lip_x_ember_wall_50`,
+  `ember_lip_x_core_deep_25–75`, `shell_warm_x_ember_lip_50` and `base_x_light/dark_25–75`.
+- `EMBER_SPEC` puts 0.06 specular on every lip, rim and deep key, mixes included. Flintkit made the mixes at 0.2, and a
+  white sheen turned the lit front rim salmon pink (lit quartile `#D8716A`).
+
+### Colouring (position fields; never by facing)
+
+- **Shell outside (dome faces):**
+  - one tone per coplanar facet, from broad noise at the facet centre (scale 0.2, dead zone 0.12, quarter steps toward
+    `shell_light` / `shell_dark`);
+  - minus a ground band among the rocks (hero z < 1.0 → −0.5, < 2.0 → −0.25);
+  - per face, warm spill from the distance to the nearest glow surface (core hull, slot cutter or opening frustum):
+    < 0.2 → 50 % `shell_warm`, < 0.45 → 25 %.
+  - The spec's 0.25 / 0.5 / 0.9 ramp warmed 68 % of the shell's area, because four seams and two cracks put most
+    broad facets' centres within 0.9 of a glow. Now the warm faces are only the narrow fragments along the rims and
+    slot lips.
+- **Seam hairline walls (hidden):** `shell_dark` down to 0.3 deep, then `ember_lip`.
+- **Slots (seams and cracks):** graded by depth below the uncut dome as a fraction t of the nearest station's slot
+  depth:
+  - t < 0.07, the chamfer row: `ember_lip`, the dark lip line;
+  - < 0.25, the lip row: `ember_lip_x_ember_wall_50`, solid red-brown;
+  - < 0.55: `ember_wall` (Neon);
+  - < 0.93: `core` (Neon);
+  - the floor: `core_hot` where the local opening G ≥ 0.28, otherwise `core`, so the tapered crack ends and the seams'
+    closed feet cool.
+  - Hero floors: 79 faces hot, 30 cooled to core.
+  - The first try, with plain lip on the whole lip row, left the cracks reading as dark grooves from the front (slot
+    median `#381511`, L share twice the sheet's). The sheet's crack deciles run about 1 lip, 2 red-brown and 7
+    orange / hot.
+- **Window rims** (each piece side is one frustum wall): s = (distance to the dome) / (distance to the dome + distance to
+  the core), so 0 is the outer edge and 1 the core.
+  - s < 0.2: `shell_warm_x_ember_lip_50`;
+  - < 0.35: `ember_lip`;
+  - < 0.55: `lip_x_deep_50`;
+  - < 0.75: `lip_x_deep_75`;
+  - beyond: `core_deep`.
+  - All solid, so the big rim faces keep their lit facet steps and read lit orange-red next to the core (front rim
+    median `#8A3922`, lit `#CA4822`), dark red at the lip. That is the spec's cavity gradient: shell → shell_warm →
+    ember_lip → the core's colours.
+  - Hollow faces get `lip_x_deep_25`. This happens only on the parts; the hero's hollow is inside the core.
+- **Core:** hf is the height fraction, folded back above 0.8 with slope 1.5. Then
+  u = 0.75 hf + 0.22 × (x / rx) + 0.15 × noise:
+  - u < 0.24: `core_deep`;
+  - u < 0.56: `core`;
+  - otherwise: `core_hot`.
+  - In the hero, a core face within 0.4 of a shell is `core_deep` (occlusion strips under the rims).
+  - Why: the spec's (+X, +Y) lateral term made the whole back of the core hot (rear `#FFB348`), and height at full
+    weight made the crown hot from the top (`#FFB348` against the sheet's orange `#FC7325`). A lateral weight of 0.35
+    made the side window all hot; 0.15 lost the front's hot facets. With the fold and a +X lean of 0.22, the front,
+    side, top and f34 windows each read an orange median with a hot lit quartile, as the sheet does.
+  - The core part reads hot upper right, orange belt and deep lower left, like the exploded core: 13 hot, 26 core and
+    19 deep of its 58 faces.
+- **Base rocks** (each in its own part frame):
+  - light patches by noise (scale 0.7) toward `base_light`;
+  - in the hero, faces within 0.25 / 0.5 of a shell go 50 / 25 % toward `base_dark` (a soft contact band against the
+    dark shell), the crown never.
+  - The ground-contact row (u < 0.22 → 25 % dark) was tried and dropped: K.check's baked-shading score went to 0.80 on
+    the 58-tri stone, whose low ring is its down / outward-facing ring (as on M009).
+- **Tint:** one value per coplanar facet group, so there is no per-triangle confetti. Tint = per-piece level × (1 +
+  amp × 1.6 × broad noise):
+  - shell: amp 0.06, scale 0.45; piece levels FL 1.0, FR 0.97, BR 1.03, BL 0.98;
+  - walls and rims: amp 0.03;
+  - core_deep: amp 0.03;
+  - rocks: amp 0.05 in each rock's own frame with its own noise offset, and per-rock levels 0.97–1.03;
+  - the Neon keys: Tint 1 (the exporter ignores it).
+- **K.check:** clean on all six objects. Baked-shading scores: hero 0.10, slab 0, cap 0, chunk 0.04, core 0, rock 0. No
+  waiver was needed; `SHADING_OK` is kept for the case that it trips.
+
+### Re-measured against the sheet (final build; `cls()` masks; VFX off / VFX on)
+
+| View | Glow O share, sheet / ours off / ours on | Lip L share, sheet / off / on | Shell S median, sheet / ours (on) | Glow O median and lit quartile, sheet / ours (on) | Base B median, sheet / ours (on) |
+| --- | --- | --- | --- | --- | --- |
+| front (0, 7) | 24.5 / 24.9 / 27.0 % | 5.2 / 12.9 / 11.5 % | `#685E64` / `#595258` | `#FC7D27` `#FDB745` / `#FF7429` `#FFB449` | `#AF968C` / `#AE9489` (off `#AB9389`) |
+| f34 (−14, 10) | 20.7 / 21.9 / 24.1 % | 5.4 / 12.1 / 10.0 % | `#60595F` / `#645C63` | `#FD7C25` `#FEB747` / `#FF7329` (core region lit `#FFB449`) | `#AC9389` / `#B0988D` |
+| top (0, 78) | 23.8 / 21.9 / 22.1 % | 6.2 / 12.1 / 12.7 % | `#61595E` / `#645C62` | `#FC7325` `#FECD5A` / `#FF7329` (core region lit `#FFB449`) | `#C1A699` / `#B0978B` |
+| side (90, 7) | 16.3 / 12.2 / 12.3 % | 7.8 / 4.9 / 5.0 % | `#5D565D` / `#534D54` | `#FC6C23` `#FDB040` / `#FF7329` `#FFB449` | `#B2978C` / `#84736C` (studio shade) |
+| rear (180, 7) | 22.4 / 16.8 / 17.5 % | 6.3 / 7.3 / 8.1 % | `#5B545A` / `#545057` | `#FB6521` `#FEB140` / `#FF7429` `#FF7429` | `#B49A8D` / `#8E7B75` (studio shade) |
+| r34 (166, 10) | 15.6 / 15.3 / 16.5 % | 6.5 / 7.9 / 8.3 % | `#5C555A` / `#555057` | `#FC6F22` `#FDAA3B` / `#FF7329` `#FF7429` | `#B2978A` / `#8E7974` (studio shade) |
+
+- **Glow share** against stage 1's placeholder shares, which were 4–11 points under:
+  - front, f34, top and r34 are now within ±3.4 with the lights on (front +2.5, f34 +3.4, top −1.7, r34 +0.9);
+  - side is −4.0 and rear −4.9. Those windows are narrower than drawn (stage 1 geometry), and their rims sit in the
+    studio key light's shade.
+  - The recovery came from the rim walls, graded to lit lip → deep orange-red that counts as O, and the Neon
+    `ember_wall` row in every slot.
+- **Lip share** is still 1.5–2.4× the sheet's in front, f34 and top. Our rims are wider flared walls than the sheet's
+  thin red edges: stage 1's `flare` 1.22 makes their outer band and shade quartile dark red. Side, rear and r34 are
+  within 1.8 points.
+- **Shell:** f34 +4, top +3, r34 −6, rear −6, side −10, front −15 levels (sum of channels / 3).
+  - The front and f34 disagree in opposite directions: the sheet's front is lighter than its f34, ours is darker. One
+    palette can't match both; the average error of the three lit views is −3.
+  - Side and rear sit in the kit studio's shade (key light from the front-left). The sheet lights every view.
+- **Glow:** every window's O median is `#FF7329`–`#FF7429` against the sheet's `#FB6521`–`#FD7C25`. Every lit
+  quartile except the rear and r34 reaches the hot key, as the sheet's do. The rear and r34 cores show no hot facet
+  (the hot lean is +X).
+- **Rocks:** front and f34 are within 4 levels of the sheet, and VFX on moves the front rock median by +3 levels
+  (`#AB9389` → `#AE9489`), so there is no orange wash. The top-view rocks are 16 darker than the sheet's (`#C1A699`).
+  Side, rear and r34 are in studio shade.
+- **Cracks:** slot region (front / f34, VFX on) medians are `#562217` / `#6A2A1C` with lit quartile `#AF4A2D`, against
+  the sheet's crack quartiles `#6F3026` / `#E25D21` / `#FAA829`.
+  - The label region includes every seam's lip rows seen in shade, so the median is darker than the sheet's crack-1
+    box.
+  - In the renders every crack and seam reads as a glowing slot: a dark lip line, the red-brown Neon wall, the
+    orange core row and the hot floor in the wide stretches.
+
+### Parts and notes
+
+- **Parts are coloured like the hero**, face for face, by the same build-frame fields. Their hollow sides (the cap's
+  and chunk's inner faces) read graded lip → orange-red.
+- **Purged:** `_drop_unused` drops calibration meshes and unused `FB_m015_*` materials (including the unused parent
+  keys `shell_warm` and `base_dark`, which are kept in the palette and set by `palette()`).
+- **Left for stage 1 / 2 (geometry, not changed here):** on the `EmberMeteorSlab` part render, the crack-1 elbow notch
+  shows a white pin-hole: the slot floor breaks through into the hollow, as stage 2 recorded ("crack 1, station 0,
+  floor 2.17"). In the hero the core fills it.
+
+## Stage 5+6 — Lighting and VFX
+
+### Stage 5: lighting
+
+- **Neon keys: `m015_core` `#FB7430`, `m015_core_hot` `#FBAB4E` and `m015_ember_wall` `#A74F34`**, all at emission 1.0
+  (the exporter's `GLOW_EMISSION`). The Blender preview shows them unlit (`_glow_mats`), as Roblox's Neon does. **The
+  export should report 3 glow pieces**, not the spec's 2.
+  - Why ember_wall is Neon: with it solid, the slot walls sat in their own shade and rendered `#381511`–`#481810`, and
+    the cracks read as dark grooves. On the sheet they glow red-brown to orange (the M009 lesson that made its ember
+    band Neon).
+  - Depth grading is kept by colour steps: dark solid lip → solid red-brown lip row → Neon red-brown wall → Neon
+    orange → Neon hot floor.
+  - `core_deep`, the lip, the rim mixes and every shell and rock key stay solid and lit, so the rims and the core's
+    lower facets keep their facet shading.
+- **Lights (PointLights in the window recesses, in the open, shadows on, flicker on):**
+
+  | Light | Build point | Hero-local Roblox (x, y, z) | Colour | Brightness | Range | Clearance |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | front window (`heat_glow_1`) | (0.9, −4.3, 3.6) | (0.47, 3.60, 3.98) | `#FF7A22` | 0.7 | 10 | 1.42 from the nearest surface, outside the solid |
+  | back window (`heat_glow_2`) | (0.3, 3.6, 4.2) | (−0.13, 4.20, −3.92) | `#FF7A22` | 0.9 | 8 | 1.28, outside |
+
+  - Changed from the spec's 0.9 / 0.6. With those, the front rims lit to O and front / f34 went 4.6 / 5.1 points over
+    the sheet's share. The back window faces away from the studio key, so its light carries more.
+  - Neither light is inside the meteor; a ray-parity check confirms both are outside.
+  - With the lights on, the rocks moved at most 3 levels (no peach wash), and the rims next to the windows read lit
+    orange-red (front rim `#713822` → `#8A3922`).
+- **Studio notes:**
+  - The sheet's soft halo hugging the silhouette (`#F8DCC0`–`#F9D5B0`) relies on the place's default Bloom over the
+    Neon core and walls, plus the heat_glow puffs.
+  - With Bloom off, the Neon still reads and the emitters carry the halo.
+  - Both lights cast shadows, so the shells keep the light in the windows; that costs two shadowed PointLights per
+    node.
+
+### Stage 6: VFX
+
+Sockets go on the hero only (`_vfx`, via `K.socket` on the finished hero; `SOCKETS`). `fx_check()` tests every socket
+and its spawn box on a 5³ grid (ray parity).
+
+| Socket | Build point | Emitter | Clearance | Grid points inside the hero |
+| --- | --- | --- | --- | --- |
+| `heat_glow_1` | (0.9, −4.3, 3.6) | Heat: `glow_soft`, `#FFB347` → `#FF6A1A`, size 1.4–2.0, transparency 0.6–1.0, rate 2.5, speed 0.2–0.4, shape [1.8, 2.4, 0.4] (fits inside the front window's diamond) | 1.42 | 0 / 125 |
+| `heat_glow_2` | (0.3, 3.6, 4.2) | the same, rate 2.0, shape [1.4, 2.2, 0.4] | 1.28 | 0 / 125 |
+| `embers_1` | (0.3, 0.0, 8.4), above the crown | Embers: `ember_dot`, colour sequence `#FEBD79` → `#FD6A22` → `#FE5A1B`, size 0.55 → 0.45 → 0.15, lifetime 2–3.5, rate 3, speed 0.6–1.4, spread 70, drag 0.6, rise 0.5, shape [4.0, 0.6, 3.5] | 1.73 | 0 / 125 |
+| `embers_2` | (0.9, −5.6, 2.6), in front of the front window | the same, rate 1.5, shape [2.0, 1.0, 0.6] | 1.59 | 0 / 125 |
+
+- The ember colours and sizes are the sheet's VFX panel shards: 0.4–0.8 studs, orange `#FD6A22` / `#FE5A1B`, hot
+  `#FEBD79`, shrinking to 0.15 sparks.
+- The spec's E1 point (0.5, −0.4, 6.4) was moved above the dome top (z 8.4): at z 6.4 a 5 × 1 × 4 spawn box would
+  reach into the shell round the crown opening.
+- **Not added** (the sheet shows none): smoke, dust, ore_glint, heat shimmer, and harvest sockets (main-session
+  decision).
+- **Renders:** `render_views` now renders with `vfx=True` (the lights plus the glow and ember stand-ins). The stand-ins
+  don't veil the model: soft puffs over the windows and a few floating shards. The compare numbers above come from
+  `report()`, with VFX off (no lights) and on (lights only).
+- **For the main session's export:** the STATS line should report 4 sockets and 3 glow pieces (core, core_hot,
+  ember_wall).
+
+### Build fixes (after verifier round 1)
+
+Built in the GUI through the MCP with `m015.build()` and saved. The finish stages ran unchanged inside the build: the
+palette, the colour pass and the sockets.
+
+**What crashed Blender (twice) and what fixed it.**
+- **The crash.** In stage 2's `_remesh`, a near-degenerate old triangle passed `intersect_point_tri_2d` and gave
+  barycentric weights of about 1e7. The "lifted" new vertex landed 16 million studs below the Chunk, and the hero's exact
+  union then crashed inside `meshintersect::find_patches`.
+- **Diagnosis.** Reproduced headless in a throwaway background Blender that never saved, with `bg_build.py` in the
+  scratchpad. Each step was traced until the Chunk's `_polish` showed the wild vertex.
+- **Fix 1:** `lift()` accepts only weights inside the triangle.
+- **Fix 2:** `_remesh` gives up on a region where a locked vertex would lose all its edges (a dead-vertex reference).
+- **Guard:** `_sane()` stops the build before the hero's unions if any part has a vertex more than 30 studs out.
+- **Core check:** `core_present` in `build()` checks by ray parity that the core survived the unions. Cutting FR's
+  front and side windows one at a time had left a crossing face pair, and core ∪ FR came out empty, so the core vanished
+  silently. FR's front and side frusta are now one cutter, with the pillar taken out of it; then the crown is cut.
+
+**Findings.**
+1. **Slab see-through at crack 1: fixed.**
+   - `_cap()` limits every slot station's depth to the shell thickness below it (to the hollow or an opening),
+     minus 0.15. Stations capped: crack 1 4, BR crack 2, right seam 3, back seam 3, front seam 9.
+   - Crack 1's upper stations are now 0.73 / 0.60 deep (they were 1.0 through a 0.8-thick wall).
+   - The Slab is a closed genus-0 surface (Euler characteristic 2; it was 0).
+   - A bow-tie vertex that the sliver collapse left at the front window's top corner (χ 1) is split by
+     `_fix_bowties()`.
+2. **Sightlines.**
+   - The back seam now overlaps 0.08 (`SEAM_HAIR["back"]` = −0.04). BR and the mirrored BL fuse along the mirror plane;
+     the coincident cut faces union cleanly.
+     - Overlapping every seam broke the hero (the core was lost, 4 crossings), so the front, right and left seams keep
+       their 0.08 gap.
+   - FR keeps a pillar between its front and side windows (`PILLAR_AZ` −60 … −47).
+   - The dome's back lift is zero on the seam plane, and the summit ridge sits in front of the crown opening.
+   - The rear window's centre is 0.6 lower.
+   - `see_through()`, raster holes at about 0.026 stud per pixel over 16 views:
+     - hero: (180, 7) 3 px and (−45, 45) 4 px, both grazing slits under 0.05 stud wide over the core's crown, between
+       the crown shaft's rim and the rear / front window rims;
+     - before: front 3, rear 11, top 7, (45, 20) 1, (−45, 20) and (135, 20) reported by the verifier;
+     - Chunk: none.
+     - Slab: 5 px at (0, 78), and Cap: its two windows. Both are the part's own openings into its open hollow (there is
+       no core in a part). The Cap is genus 1 by design: the pillar bridges its two windows.
+   - Closing the last grazing slits by keeping every window's top under a crown shaft started at 5.2 made the Slab and
+     Chunk polish cross faces and lost the core. Reverted, and recorded in `OPENINGS`.
+3. **Back-seam V on the front silhouette: fixed.** The back seam closes over el 64–72. The front profile at mid-width is
+   0.98 / 0.99 (it was 0.80).
+4. **Windows.**
+   - Rear: hw 2.3. At h 0.49 it spans f 0.38–0.65 (sheet 0.37–0.66). Rear glow 22.0 % against the sheet's 24.2 % (the
+     verifier's 22.8 %); it was 17.5 %.
+   - Side: hw 1.8, moved forward, but its front part is held back by the FR pillar. At h 0.49 it spans f 0.57–0.65
+     (sheet 0.62–0.87). Side glow is 8.5 % against 17.7 %. **Still open**: the pillar and the side window trade off.
+5. **Rocks.** A larger table:
+   - F4 2.6 tall (0.34–0.35 H at the front, against the sheet's 0.39); F2, S1, B2 and B4 at 0.25–0.3 H.
+   - The front rock tops now read 0.16–0.34 H (the sheet's 0.09–0.39).
+   - Rock cover of the silhouette: front 25.2 %, side 24.1 %, rear 23.7 %, top 22.2 % (sheet 26–29 %; it was 13–16 %).
+   - The core clears every stone by at least 0.35 (F4).
+
+**Polish and cleanup additions.**
+- `_force5()`: `m012._force_slivers` at 5° and then `_merge_needles` (merging needle edges under 0.05, kept only if the
+  mesh stays manifold with no crossings), then `_polish` again for the origin and the UVs.
+- `_fix_bowties()`.
+- `_ground_slivers` (floor caps).
+
+**Measured (MCP, final saved build).**
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts, boundary | Crossings | Interior | Min corner | UV islands / overlaps / flipped |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 3862 / 4000 | 11.08 × 10.50 × 7.55 | 1 | 0 / 0, 0 | 0 | 0 | 5.00° | 475 / 0 / 0 |
+| EmberMeteorSlab | 682 | 5.75 × 4.17 × 7.60 | 1 | 0 / 0, 0 | 0 | 0 | 5.09° | 91 / 0 / 0 |
+| EmberMeteorCap | 442 | 4.67 × 3.97 × 7.47 | 1 | 0 / 0, 0 | 0 | 0 | 5.08° | 59 / 0 / 0 |
+| EmberMeteorChunk | 796 | 4.87 × 4.61 × 7.34 | 1 | 0 / 0, 0 | 0 | 0 | 5.02° | 104 / 0 / 0 |
+| EmberCore | 58 | 4.91 × 4.72 × 5.23 | 1 | 0 / 0, 0 | 0 | 0 | 18.6° | 8 / 0 / 0 |
+| EmberMeteorBaseRock | 58 | 2.41 × 2.25 × 1.30 | 1 | 0 / 0, 0 | 0 | 0 | 9.9° | 16 / 0 / 0 |
+
+- Hero size is inside all three bands (11.5 ± 0.5, 10.0 ± 0.6, 7.6 ± 0.3). The core is present; no inner shells; `K.check`
+  is clean.
+- **Sockets** (`fx_check`): all four outside the solid, with no spawn-box point inside. Clearances: embers 1.75 / 0.98,
+  heat_glow 1.55 / 0.99. The front heat_glow moved to (0.9, −4.9, 3.8): after the rocks grew, 6 of its 125 spawn points
+  were inside.
+- **Slots** (`crack_probe`; opening / floor / depth):
+  - crack 1: 0.30–0.40 / 0.12–0.18 / 0.60–1.02;
+  - BR crack: 0.30–0.37 / 0.13–0.15 / 1.03–1.04 (0.85–0.98 at the tapers);
+  - right seam: 0.36–0.44 / 0.17–0.21 / 1.26–1.27.
+  - The other seam stations fall in the hairline or the openings, so their probe values are not slot depths.
+- **Against the sheet** (glow share ours / sheet; profile error mean / worst):
+
+  | View | Glow share | Profile error |
+  | --- | --- | --- |
+  | front | 21.9 / 26.3 % | 0.090 / 0.27 |
+  | side | 8.5 / 17.7 % | 0.090 / 0.24 |
+  | rear | 22.0 / 24.2 % | 0.093 / 0.29 |
+  | top | 15.6 / 27.0 % | — |
+  | f34 | 20.4 / 22.9 % | — |
+  | r34 | 17.3 / 17.4 % | — |
+
+  Meteor W : H 1.25 (front), 1.05 (side), 1.25 (rear).
+- **Renders** (`M015_views.png`, VFX on): one rounded meteor dome on a ring of broad pale stones. The core shows through
+  the front and rear diamonds and the crown, and crack 1 runs beside the front window. The side view shows its window
+  and the right seam; the underside is dark stone.
+
+**Left for the Finish agent / round 2.**
+- Side glow (8.5 % against 17.7 %) and top glow (15.6 % against 27 %) are still low. Widening the side window means
+  narrowing or moving the FR pillar (sightlines); widening the crown eats the crowns.
+- Two grazing see-through slits remain in the hero (3–4 px, under 0.05 stud).
+- The lip share is 9–13 % against the sheet's 6–9 %: the rims are dark; colour could lift the outer rim rows.
+- The colour pass ran on the new geometry, but nobody re-calibrated it against the new rims and pillar.
+
+## Verifier round 1: findings for stages 4–6 (main session, 2026-10-28)
+
+The round-1 verifier failed 015 at 6/10. Its build findings are handled under "Build fixes (after verifier round 1)" above. These are the colour, lighting and VFX findings, which the next modeller must fix:
+
+- **Cracks read as dark grooves, not glowing embers (blocker).**
+  - Lip rows dominate the crack faces. Keep the dark-red lip only on the chamfer row.
+  - Make the crack walls Neon `ember_wall` from depth 0.07–0.25, and `core` from 0.3 down.
+  - Push `ember_wall` toward `#D85A22`, so the crack medians land near the sheet's `#E25D21` and more than 60 % of crack pixels read bright.
+- **Rim colour.** The window rims give a dark-red lip share of 9–13 %, against the sheet's 6–9 %. Lift the outer rim rows toward orange (less lip).
+- **Shell contrast is low.** Use a noise dead zone of 0.05 and full light/dark facets, so the dark shell mottling reads like the sheet.
+- **Embers only at the crown and front.** Add flank ember sockets, left and right, outside the solid (`fx_check`).
+- **Glow share still short after the build fixes:** side 8.5 % against the sheet's 17.7 %, and top 15.6 % against 27.0 %. Colour can recover part of this (brighter crack walls on the side and crown). A geometry change to the FR pillar or the crown opening must not reopen the sightlines (`see_through`) or eat the crowns.
+- Re-calibrate (`K.calibrate`) against the new rims and pillar. The existing colour pass ran on the new geometry, but was never re-measured.
+
+## Stage 4–6 (round 2)
+
+Modeller round 2, after verifier round 1 (the work list above). Run in a background Blender (`bgmcp.py`, port 9879,
+work file `art/blender/assets/kit/wip/M015.blend`), never the GUI. Every change is in `m015.py`. No geometry, UV or
+slot-cutter change: the colour pass, the palette, the measurement code and two sockets only. The full `m015.build()`
+was re-run at the end; every geometry number is identical to "Build fixes (after verifier round 1)".
+
+### What changed in the builder
+
+- **Cracks and seams (`SLOT_ROWS`, `FLOOR_HOT_G` 0.28 → 0.22).** The old lip → wall 50 % row was solid and sat in the
+  slot's own shade, so 81–97 % of crack pixels fell in the dark lip class L (the sheet: 16–23 %).
+  - A probe of the slot faces showed why moving the hot row deeper did nothing. A 0.3-wide, 1.0-deep slot shows only its
+    chamfer and the top quarter of its far wall from any sheet view. Moving hot from t 0.93 to 0.45 changed no crack pixel.
+  - The four depth steps are therefore packed into what is seen:
+    - the chamfer (t < 0.07): `ember_lip`, the dark lip line;
+    - wall band 1 (t 0.08–0.25), split at its triangles' centroids: upper `ember_wall`, lower `core` (a red → orange
+      sawtooth that reads as a gradient along the crack);
+    - band 2 down (t ≥ 0.3): `core_hot`, cooling to `core` where the slot narrows (G < 0.22), as the floor does.
+  - Hero slot faces: 681 hot, 97 cooled.
+- **`ember_wall` → `#C95E2A`** (renders `#D75B23`; the verifier's target `#D85A22`), still Neon. Its Tint is now 1, like
+  `core` and `core_hot`, so every Neon key is one flat colour.
+- **Window rims (`RIM_KEYS`, `RIM_STEPS`, `_pillar_wall`).** Bands, outer → core:
+  1. `shell_warm`;
+  2. `shell_warm` / `ember_lip` 50 (the thin dark lip line);
+  3. `ember_lip` / `core_deep` 75;
+  4. `core_deep` (solid, lit orange-red);
+  5. Neon `ember_wall` at the junction.
+  - The band limits are set per opening, because the flared rims fill very different shares of each view.
+  - The FR pillar's two cut walls are told apart by construction plane (`_f` front-window side, `_s` side-window side).
+  - Measured by making one opening's rims fully Neon and the rest grey (glow points added, % of the meteor):
+
+    | Rims | Points added per view |
+    | --- | --- |
+    | front frustum | front 3.7, f34 1.8, top 1.6 |
+    | pillar, front-window wall | front 6.5, f34 7.9 |
+    | pillar, side-window wall | side 7.9 (no other view) |
+    | rear frustum | rear 8.2, r34 10.1 |
+    | crown | top 7.0 |
+    | side frustum | front 8.0, f34 3.9, top 3.2, side 1.9 |
+
+    - With every rim grey: front 22.7, side 6.2, rear 17.1, top 18.2, f34 19.8, r34 13.6 %.
+  - Final `RIM_STEPS` (the s where bands 1–4 end):
+
+    | Rims | Bands 1–4 end at s |
+    | --- | --- |
+    | front, pillar_f | 0.62 / 0.72 / 0.84 / 0.92 |
+    | pillar_s | 0.05 / 0.08 / 0.1 / 0.12 |
+    | side | 0.35 / 0.45 / 0.58 / 0.68 |
+    | rear | 0.45 / 0.55 / 0.68 / 0.78 |
+    | crown | 0.1 / 0.15 / 0.2 / 0.25 |
+
+  - So the side window's main rim, as the side view sees it (the pillar's side-window wall), glows almost wholly. That
+    is the side-glow recovery, without touching the pillar geometry.
+- **Facet flood bug fixed (`_facets`).** `m012._facets` floods into any edge-connected coplanar face, whatever its class.
+  The core loop therefore painted 17 rear-rim faces `core_deep` (a core facet was coplanar with them), and the Tint
+  groups ran across class borders. `colour()` now uses a flood bounded to the list it is given.
+- **Core (`CORE_LAT` 0.22 → 0, `CORE_FWD` 0.07 toward −Y, `CORE_NOISE` 0.15 → 0.2, `CORE_CAP` / `FOLD` 0.75 / 1.5,
+  `CORE_BANDS` (0.24, 0.44), `CORE_OCC` 0.4 → 0.25).**
+  - Before, every window core measured lit quartile `#FF7429` (no hot facet showed) and the side window 83 % hot.
+  - The occlusion strips in shade read L (front core 19 % L).
+  - The 58 facets make the hot share jump a facet at a time (front 26 / 53 % at band 0.44 / 0.43). The band keeps
+    every window's median orange with hot facets in the lit quartile.
+- **Shell tone (`SHELL_TONE`):** dead zone 0.12 → 0.05, width 0.3 → 0.15 (full light/dark steps), seed 15061 → 15071.
+  - With full steps, 15061 put a dark bias on the front quarter (14 sq studs `shell_dark` against 5 `shell_light`;
+    front shell median 20 levels under the sheet).
+  - Of eight seeds, 15071 is even (mean tone front +0.11, back −0.06, left −0.22, right +0.34). It keeps K.check's
+    baked-shading score ≤ 0.08.
+  - 15121 and 15091 were as even but lit the up-facing facets (score 0.37 / 0.42), which reads as painted light.
+- **Sockets:** two flank `embers` sockets added (`SOCKETS`). Now six in all, four `embers` and two `heat_glow`.
+- **Measurement:** `report()` now returns per-region cls() make-up (`reg_cls`), crack-only stats (`crack`: slot faces
+  whose nearest station is a crack, label colour cyan) and core-only stats (`core_px`). `sheet_cracks()` measures the
+  sheet's five crack boxes (§5.2) on their O + L pixels.
+
+### Calibration (two passes)
+
+| Key | Target | Pass 1 hex (dome render) | Pass 2 gain (linear) | Final hex |
+| --- | --- | --- | --- | --- |
+| `m015_shell` | `#5F585E` | `#4B4751` (`#60595F`) | × 1.24 | `#534F5B` |
+| `m015_shell_light` | `#7C7378` | `#635F68` (`#7C7478`) | × 1.95 | `#88828E` |
+| `m015_shell_dark` | `#45404A` | `#34313E` (`#47424B`) | × 0.67 | `#2A2732` |
+| `m015_shell_warm` | `#685D5E` | `#524B51` (`#685D5F`) | × 1.24 | `#5C535B` |
+| `m015_ember_lip` | `#5E2620` | `#522420` (`#602620`) | — | `#522420` |
+| `m015_ember_wall` (Neon) | `#D85A22` | `#C95E2A` (`#D75B23`) | — | `#C95E2A` |
+| `m015_core` (Neon) | `#FD7428` | `#FB7430` (`#FF7429`) | — | `#FB7430` |
+| `m015_core_hot` (Neon) | `#FDB548` | `#FBAB4E` (`#FFB449`) | — | `#FBAB4E` |
+| `m015_core_deep` | `#D9441A` | `#AE3F19` (`#DA451A`) | × 1.3 | `#C4481E` |
+| `m015_base` | `#B39A8F` | `#8F7F7C` (`#B49A8F`) | × 0.89 | `#887875` |
+| `m015_base_light` | `#C8AFA3` | `#9F908D` | × 0.89 | `#978986` |
+| `m015_base_dark` | `#8F786D` | `#72635E` | × 0.89 | `#6C5E59` |
+
+- **Pass 1:** `calibrate()` on the test dome. Every key ended within 6 levels of its target. The rock keys came out
+  brighter than round 1's (`#8F7F7C` against `#857774`) in this session's studio, so they were not reused.
+- **Pass 2:** `report(light=True)` on the hero, over all six sheet views, in two rounds.
+  - Shell medians were 6–25 levels under the sheet, and the lit quartile 20–30 under in the lit views.
+  - After the seed change, the medians were about 10 over and the shade quartile 15–25 over the sheet's `#373134`.
+  - `core_deep` × 1.3: the front and f34 rims read 40–57 % L. The core's shade quartile is now `#CB3E17` / `#CA3E18`
+    (rear / r34), against the sheet's `#A52F0E` / `#BA360E`.
+  - Rocks × 0.89: the front and f34 rocks were 9–19 levels over.
+
+### Re-measured (final build, `report(light=True)`, cls() masks inside the hero's pixels; sheet = full view boxes)
+
+| View | Glow O, ours / sheet | Lip L, ours / sheet | Shell S median (lit, shade): ours / sheet | Glow median, lit: ours / sheet | Rock B median: ours / sheet |
+| --- | --- | --- | --- | --- | --- |
+| front | 25.5 / 24.5 % | 6.8 / 5.2 % | `#686067` (`#94878D`, `#4A4449`) / `#685E64` (`#8B7F83`, `#373134`) | `#FF7429` `#FFB449` / `#FC7D27` `#FDB745` | `#B29489` / `#AF968C` |
+| side | 14.1 / 16.3 % | 1.9 / 7.8 % | `#686063` / `#5D565D` | `#D75B23` `#FFB348` / `#FC6C23` `#FDB040` | `#87746C` / `#B2978C` (studio shade) |
+| rear | 21.2 / 22.4 % | 5.8 / 6.3 % | `#605861` / `#5B545A` | `#FF7429` `#FF7429` / `#FB6521` `#FEB140` | `#8A7973` / `#B49A8D` (studio shade) |
+| top | 24.8 / 23.8 % | 4.4 / 6.2 % | `#5E575F` / `#61595E` | `#FF7429` `#FFB449` / `#FC7325` `#FECD5A` | `#B39487` / `#C1A699` |
+| f34 | 22.2 / 20.7 % | 6.0 / 5.4 % | `#72646B` / `#60595F` | `#FF7429` `#FFB449` / `#FD7C25` `#FEB747` | `#B5978C` / `#AC9389` |
+| r34 | 18.1 / 15.6 % | 6.5 / 6.5 % | `#605862` / `#5C555A` | `#FF7329` `#FF7429` / `#FC6F22` `#FDAA3B` | `#8A7973` / `#B2978A` (studio shade) |
+
+- **Glow share by `measure()`** (the key-label raster the verifier used; sheet = §1.2 bbox shares):
+
+  | View | Now | Sheet | Round 1 |
+  | --- | --- | --- | --- |
+  | front | 23.1 | 26.3 | 21.9 |
+  | side | 18.3 | 17.7 | 8.5 |
+  | rear | 26.6 | 24.2 | 22.0 |
+  | top | 20.5 | 27.0 | 15.6 |
+  | f34 | 18.7 | 22.9 | 20.4 |
+  | r34 | 23.5 | 17.4 | 17.3 |
+
+  - This raster counts every `core*` and `ember_wall*` face as glow, lit or not. The rendered cls() share above is the
+    better colour measure.
+- **Core hot share (O pixels at r ≥ 245, g ≥ 140):**
+
+  | View | Ours | Sheet |
+  | --- | --- | --- |
+  | front | 26 % | 37 % |
+  | f34 | 21 % | 40 % |
+  | side | 35 % | 29 % |
+  | rear | 18 % | 28 % |
+  | r34 | 17 % | 30 % |
+  | top | 41 % | 33 % |
+
+### Cracks against the sheet (crack-only pixels)
+
+`sheet_cracks()` on the O + L pixels of the §5.2 boxes. `bright` is the share in the cls() glow class O; `hot` is the
+share at r ≥ 245, g ≥ 140.
+
+| Crack | Median | Lit | Shade | bright | L | hot |
+| --- | --- | --- | --- | --- | --- | --- |
+| sheet crack 1, front | `#E25E20` | `#FAA82E` | `#723126` | 81.5 % | 18.5 % | — |
+| sheet crack 2, front | `#C45822` | `#F99B2B` | `#752E1D` | 80.5 % | 19.5 % | — |
+| sheet BR, side | `#DB531E` | `#FBA12C` | `#822C1C` | 83.6 % | 16.4 % | — |
+| sheet BR, rear | `#D15025` | `#FD721F` | `#753E36` | 76.7 % | 23.3 % | — |
+| sheet crack 5, rear | `#CB541F` | `#F89622` | `#6F2E24` | 78.8 % | 21.2 % | — |
+| **ours, front** | `#E66325` | `#FFAC46` | `#4D1F14` | 83.7 % | 15.5 % | 18.1 % |
+| **ours, f34** | `#FF963A` | `#FFB449` | `#B64C1F` | 90.9 % | 8.7 % | 51.1 % |
+| **ours, top** | `#D75B25` | `#FF8C37` | `#4F1F15` | 70.2 % | 29.8 % | 13.0 % |
+| **ours, side** | `#D75B23` | `#FFA643` | `#31110E` | 63.6 % | 36.4 % | 14.9 % |
+| **ours, r34** | `#D15822` | `#FF7329` | `#451B16` | 62.6 % | 37.4 % | 1.5 % |
+| **ours, rear** | `#56251D` | `#D75B23` | `#411915` | 42.4 % | 57.6 % | 0 % |
+| round 1, front / side / rear | `#511F13` / `#3C160E` / `#481E19` | `#A8472C` / `#9E4228` / `#723022` | | 18 / 15 / 9 % | 81 / 86 / 91 % | 0 % |
+
+- The front, f34 and top cracks now read as the sheet's: a dark lip edge, red-orange wall and hot centre line.
+- The rear and r34 still read lip-heavy. In our geometry the BR crack and its mirror run down the flanks, so the rear
+  view sees them nearly edge-on (mostly chamfer). The sheet draws the BR crack across the face of the upper back. That
+  is crack placement (stage 1), not colour.
+
+### Lighting and VFX (stage 5 + 6)
+
+- **Neon pieces** (emission 1.0, one flat colour, Tint 1): `core` `#FB7430`, `core_hot` `#FBAB4E` and `ember_wall`
+  `#C95E2A`. Export: 3 glow pieces. Everything else is solid.
+- **Lights:** unchanged. Two shadowed, flickering PointLights `#FF7A22` in the window recesses, outside the solid (front
+  0.7 / range 10; back 0.9 / range 8).
+- **Sockets (`fx_check`, final build; build frame, clearance, spawn-box grid points inside):**
+
+  | Socket | Point | Clearance | Grid points inside |
+  | --- | --- | --- | --- |
+  | heat_glow_1 | (0.9, −4.9, 3.8) | 1.55 | 0 / 125 |
+  | heat_glow_2 | (0.3, 3.6, 4.2) | 0.99 | 0 / 125 |
+  | embers_1, crown | (0.3, 0.0, 8.4) | 1.75 | 0 / 125 |
+  | embers_2, front | (0.9, −5.6, 2.6) | 0.98 | 0 / 125 |
+  | **embers_3, left flank** | (−5.6, −0.3, 4.0), shape [0.8, 3.6, 3.0], rate 1.5 | 1.37 | 0 / 125 |
+  | **embers_4, right flank** | (6.4, −0.3, 4.0), the same | 1.57 | 0 / 125 |
+
+  - The flank boxes stand 1.2 out from the shell's widest point at z 1.5–6 (x −4.39 / +5.21), from z 2.2 to 5.8, as the
+    VFX panel's shards float round both flanks.
+  - The export STATS line should report **6 sockets and 3 glow pieces**.
+
+### Checks (final `m015.build()`, saved)
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts, boundary | Crossings | Interior | Min corner | UV islands / overlaps / flipped |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 3862 / 4000 | 11.08 × 10.50 × 7.55 | 1 | 0 / 0, 0 | 0 | 0 | 5.00° | 475 / 0 / 0 |
+| EmberMeteorSlab | 682 | 5.75 × 4.17 × 7.60 | 1 | 0 / 0, 0 | 0 | 0 | 5.09° | 91 / 0 / 0 |
+| EmberMeteorCap | 442 | 4.67 × 3.97 × 7.47 | 1 | 0 / 0, 0 | 0 | 0 | 5.08° | 59 / 0 / 0 |
+| EmberMeteorChunk | 796 | 4.87 × 4.61 × 7.34 | 1 | 0 / 0, 0 | 0 | 0 | 5.02° | 104 / 0 / 0 |
+| EmberCore | 58 | 4.91 × 4.72 × 5.23 | 1 | 0 / 0, 0 | 0 | 0 | 18.6° | 8 / 0 / 0 |
+| EmberMeteorBaseRock | 58 | 2.41 × 2.25 × 1.30 | 1 | 0 / 0, 0 | 0 | 0 | 9.9° | 16 / 0 / 0 |
+
+- `core_present` true; no inner shells.
+- `K.check` clean. Baked-shading scores: hero 0, slab 0.07, cap 0.08, chunk 0, core 0, rock 0.
+- `crack_probe` is unchanged:
+  - crack 1: opening 0.30–0.40, floor 0.12–0.18, depth 0.60–1.02;
+  - BR crack: opening 0.30–0.37, floor 0.13–0.15, depth 1.03–1.04.
+- `see_through` is unchanged from round 1, as no geometry changed:
+  - hero: (180, 7) 3 px and (−45, 45) 4 px, the known grazing slits under 0.05 stud;
+  - Slab: (0, 78) 6 px, its own opening;
+  - Cap: its two windows into its open hollow (by design: a part has no core).
+
+### Left over
+
+- **Side glow** is 14.1 % rendered against the sheet's 16.3 %, and the `measure()` share 18.3 against 17.7 %. Most of
+  it is now the pillar's side wall glowing Neon `ember_wall`, which reads as a flat orange-red plane beside the core in
+  the side view. A wider real side window (geometry) would read better.
+- **r34** is 2.5 points over the sheet and the rear 1.2 under. The rear rims serve both views, and the r34 sees more of
+  them than the sheet's r34 does.
+- **Rear / r34 cracks** read lip-heavy because they run down the flanks, edge-on to those views (stage 1 placement).
+- **Core hot facets:** front, f34, rear and r34 are 10–20 points under the sheet's hot share. The 58-facet core flips a
+  whole big facet at a time, so finer control needs more core facets.
+- **Side, rear and r34 rocks** sit in the kit studio's shade (`#87746C`–`#8A7973` against the sheet's evenly lit
+  `#B2978C`). That is the studio key light; the sheet lights every view.
+- **Shell:** the f34 median is 15 levels over the sheet and the front matches. The sheet's front and f34 disagree, so
+  one palette cannot match both.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (did no other stage). This was a read-only run in a background Blender (port 9880) on
+`art/blender/assets/kit/wip/M015_verify.blend`. I did not save, did not call `build()`, and sent the fresh renders to the
+scratchpad (`kit_models.MODEL_RENDERS` redirected), so the committed renders are untouched. I measured the geometry with
+my own bmesh/BVH script, not the builder's numbers. I used the builder's `see_through`, `crack_probe`, `gaps`,
+`fx_check`, `measure`, `report(light=True)` and `sheet_stats` as instruments, and I cross-checked colour with my own
+patch sampler on both images.
+
+**Verdict: PASS, 7/10.** Nothing is broken, and every round-1 colour, lighting and VFX finding is fixed or within
+tolerance. The remaining differences from the sheet are the stage-1 dome-sector concept (a main-session decision) and
+the placement of the BR crack. They are recorded below as minors, for the commit notes.
+
+### Re-measured (own script)
+
+| Object | Tris | Size (studs) | Shells | NM edges / verts / boundary / wire / loose | n-gons / zero-area / dup verts | Winding conflicts, volume | Self-hits | Interior | Min corner (faces < 5°) | UV: layer, flipped, overlap cells @1024 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberMeteorDeposit | 3862 / 4000 | 11.08 × 10.50 × 7.55 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +306.9 | 0 | 0 | 5.00° (0) | UVMap, 0, 0 |
+| EmberMeteorSlab | 682 / 1000 | 5.75 × 4.17 × 7.60 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +61.3 | 0 | 0 | 5.09° (0) | UVMap, 0, 0 |
+| EmberMeteorCap | 442 / 1000 | 4.67 × 3.97 × 7.47 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +37.6 | 0 | 0 | 5.08° (0) | UVMap, 0, 0 |
+| EmberMeteorChunk | 796 / 1000 | 4.87 × 4.61 × 7.34 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +65.3 | 0 | 0 | 5.02° (0) | UVMap, 0, 0 |
+| EmberCore | 58 / 1000 | 4.91 × 4.72 × 5.23 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +60.1 | 0 | 0 | 18.61° (0) | UVMap, 0, 0 |
+| EmberMeteorBaseRock | 58 / 1000 | 2.41 × 2.25 × 1.30 | 1 | 0/0/0/0/0 | 0/0/0 | 0, +3.4 | 0 | 0 | 9.85° (0) | UVMap, 0, 0 |
+
+- **Hero size** is inside the decided bands: 11.5 ± 0.5, 10.0 ± 0.6 and 7.6 ± 0.3. D is 10.50, near the top of its
+  band.
+- **Origin** is at the bottom centre on all six: the local bbox bottom centre is (0, 0, 0). Rotation is 0 and scale 1,
+  with no modifiers, parents or custom split normals.
+- **Normals and faces:** normals are outward (consistent winding, positive volume). All faces are triangles, and all
+  UVs lie in 0–1.
+- **Materials:** the hero uses 26 `FB_m015_*` keys and mixes, and every material slot is used. The Neon keys are
+  `core` `#FB7430`, `core_hot` `#FBAB4E` and `ember_wall` `#C95E2A`. Each has emission strength 1.0, no Tint mix node,
+  and Tint 1.000 on every face on every object, so each is one flat colour. Every other key is solid (emission 0).
+  Export: 3 glow pieces.
+- **Core:** present (ray parity at `CORE_AT`). It touches all four shells. Its clearance to the rocks is ≥ 0.35 (F4),
+  so ≥ 0.2 holds. A ray straight down at the core centre hits `core_hot` at z 5.65, so the crown opening is open.
+- **Sockets:** 6 in all, 2 `heat_glow` (each with a shadowed PointLight `#FF7A22`) and 4 `embers` (crown, front, left
+  flank, right flank).
+  - Every socket point is outside the solid, with clearance 0.98–1.75.
+  - On my finer 7³ spawn-box grid (5 rays, majority), five sockets have 0 points inside. **heat_glow_2 has 6 / 343
+    inside**, 0.02–0.03 deep at the two top corners of its box (build (−0.4 / 1.0, 3.4–3.53, 4.93), the rear window's
+    top rim). The builder's 5³ grid misses them.
+- **Sightlines (`see_through`):**
+  - hero: (180, 7) 3 px and (−45, 45) 4 px, the known grazing slits under 0.05 stud;
+  - Chunk: none;
+  - Slab: (0, 78) 6 px, its own opening;
+  - Cap: its two windows, open through its hollow, by design.
+- **Slots (`crack_probe`, opening / floor / depth):**
+  - crack 1 (FL): 0.30–0.40 / 0.12–0.18 / 0.60–1.02. The two upper stations are 0.73 and 0.60 deep, capped by the
+    wall's thickness.
+  - BR crack: 0.30–0.37 / 0.13–0.15 / 1.03–1.04 (tapers 0.85 / 0.98).
+  - right seam: 0.36–0.44 / 0.17–0.21 / 1.26–1.27.
+
+### Against the sheet (fresh renders at the spec cameras; side compared mirrored)
+
+`measure()` (key-label raster): profile error mean / worst, front 0.090 / 0.27, side 0.090 / 0.24, rear 0.093 / 0.29.
+Meteor W : H: front 1.25, side 1.05, rear 1.25. Rendered cls() O share, ours / sheet, with lights on:
+
+| View | Front | f34 | Top | Side | Rear | r34 |
+| --- | --- | --- | --- | --- | --- | --- |
+| O share | 25.5 / 24.5 | 22.2 / 20.7 | 24.8 / 23.8 | 14.1 / 16.3 | 21.2 / 22.4 | 18.1 / 15.6 |
+
+**Colours.** Ours − sheet, per channel (R, G, B). Shell, rim and core come from the label-masked medians (`report`
+against `sheet_stats`); lip, wall and rock from my own patch masks on both images.
+
+| Region | Front | f34 | Top | Side | Rear | r34 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Shell median | `#686067` / `#685E64`: (0, +2, +3) | `#72646B` / `#60595F`: (+18, +11, +12) | `#5E575F` / `#61595E`: (−3, −2, +1) | `#686063` / `#5D565D`: (+11, +10, +6) | `#605861` / `#5B545A`: (+5, +4, +7) | `#605862` / `#5C555A`: (+4, +3, +8) |
+| Shell shade quartile | `#4A4449` / `#373134`: (+19, +19, +21) | `#4E484D` / `#373133`: (+23, +23, +26) | | | `#433F46` / `#373135`: (+12, +14, +17) | |
+| Core O median | `#FF7429` / `#FC7D27`: (+3, −9, +2) | `#FF7429` / `#FD7C25`: (+2, −8, +4) | `#FF7429` / `#FC7325`: (+3, +1, +4) | `#D75B23` / `#FC6C23`: (−37, −17, 0) [pillar wall] | `#FF7429` / `#FB6521`: (+4, +15, +8) | `#FF7329` / `#FC6F22`: (+3, +4, +7) |
+| Core lit quartile | `#FFB449` / `#FDB745`: (+2, −3, +4) | | `#FFB449` / `#FECD5A`: (+1, −25, −17) | | `#FF7429` / `#FEB140`: (+1, −61, −23) [no hot facet] | `#FF7429` / `#FDAA3B`: (+2, −54, −18) |
+| Hot core patch | `#FFB449` / `#FDB443`: (+2, 0, +6) | (+2, +1, +7) | (+2, −21, −13) | (+2, +4, +10) | (+1, +3, +10) | (+2, +11, +15) |
+| Ember wall (red-orange) | `#D45422` / `#C03A16`: (+20, +26, +12) | (+31, +25, +19) | (+23, +46, +26) | (+11, +37, +19) | (+19, +15, +14) | (+1, +10, +12) |
+| Lip | `#7A371E` / `#863920`: (−12, −2, −2) | (−9, +10, +19) | (−20, −1, −6) | (−19, −14, −14) | (−16, +2, −7) | (−1, 0, −8) |
+| Base rock | `#B29489` / `#AF968C`: (+3, −2, −3) | `#B5978C` / `#AC9389`: (+9, +4, +3) | `#B39487` / `#C1A699`: (−14, −18, −18) | `#87746C` / `#B2978C`: (−43, −35, −32) | `#8A7973` / `#B49A8D`: (−42, −33, −26) | `#8A7973` / `#B2978A`: (−40, −30, −23) |
+
+- **Cracks** (crack-only pixels; ours against the sheet):
+  - front: `#E66325` / `#E25E20`, bright 84 / 82 %;
+  - f34: `#FF963A`, 91 %;
+  - top: 70 %;
+  - side: `#D75B23` / `#DB531E`, 64 / 84 %;
+  - r34: 63 %;
+  - **rear: `#56251D` / `#D15025`, 42 / 77 %.**
+- **Read by view** (side-by-side crops checked):
+  - **Front and f34:** a good read. Crack 1 is a glowing slot with a dark lip, red wall and hot centre, left of a
+    diamond window onto the faceted core. The dark faceted shell is mottled, with pale stones at the foot.
+  - **Top:** a central diamond of core with glowing cross seams, close to the sheet's cross-shaped opening.
+  - **Side and rear:** the weakest views (minors 1–3).
+
+### Round-1 findings, one by one
+
+| Round-1 finding | Status |
+| --- | --- |
+| Slab see-through at crack 1 | **Fixed.** Only the Slab's own top opening (6 px) remains; crack 1 is capped 0.15 short of the hollow. |
+| Hero sightlines (front 3, rear 11, top 7 px, …) | **Fixed** apart from the two known grazing slits (3 and 4 px, under 0.05 stud). Minor. |
+| Back-seam V on the front silhouette | **Fixed.** The front profile reads 0.98–0.99 at mid-width. |
+| Rear window too narrow | **Fixed.** Rear O share 21.2 against 22.4 %. |
+| Rocks too small or low | **Fixed.** Front rock tops 0.16–0.34 H; rock median within 3–9 levels in the lit views. |
+| Cracks read as dark grooves (blocker) | **Fixed** in front, f34, top and side (64–91 % bright; the sheet 77–84 %). **The rear is still lip-heavy (42 %)**: the crack runs edge-on to that view. Minor 1. |
+| Rim lip share 9–13 % | **Fixed:** 1.9–6.8 % against the sheet's 5.2–7.8 %. |
+| Low shell contrast | **Mostly fixed.** The front median matches to 3 levels, but the shade quartile is still 12–26 levels lighter than the sheet's `#373134`. Minor 5. |
+| Embers only at the crown and front | **Fixed.** Left and right flank `embers` sockets, outside the solid. |
+| Glow share short (side 8.5 %, top 15.6 %) | **Fixed numerically** (side 14.1 / 16.3 %, top 24.8 / 23.8 %). The side recovery is mostly the flat Neon pillar wall. Minor 2. |
+| Re-calibrate against the new rims | **Done** (two passes, recorded under Stage 4–6 round 2). |
+
+### Itemised list (no blockers)
+
+1. **Minor: the BR crack and its mirror read edge-on in the rear and side views.**
+   - On the sheet's rear, the BR crack crosses the face of the upper-left piece diagonally, and crack 5 runs down the
+     right piece. On the sheet's side, BR's crack runs diagonally across the big piece's face.
+   - Ours run down the flanks at about 135° and 45°, so both views see them near the silhouette as thin lines. Rear
+     crack pixels are 42 % bright, against the sheet's 77 %.
+   - Fix (stage 1, if ever reopened): move the BR crack's control rays about 25–35° toward the rear view's face (and
+     the mirror with it), then re-run the polish and see-through checks.
+2. **Minor: the side window's glow is mostly the FR pillar's flat Neon `ember_wall` wall.**
+   - It reads as one flat orange-red plane (`#D75B23`), not the faceted core; the core itself is 2007 px against the
+     wall's 9257 px.
+   - In Roblox the core is flat Neon too, so the in-game difference is small. The real fix is a wider side window
+     (stage 1 geometry).
+3. **Minor: the overall gestalt is a closed conical/bell dome with diamond windows and full-height glowing seams.**
+   - The sheet has four separate lumpy boulders round a core that bulges forward. The side and rear read symmetric
+     where the sheet is asymmetric.
+   - The front profile's flanks are low: f 0.05 / 0.95 at 0.26 / 0.24 H, against the sheet's 0.53 / 0.49, so the
+     sheet's boulders bulge to the edges.
+   - From the top the dome covers most of the rock ring (top rock share 10 % against 16 %).
+   - This is the main session's stage-1 rework decision, so it is recorded and not failed.
+4. **Minor: core hot facets.**
+   - The rear and r34 windows show no `core_hot` facet: lit quartile `#FF7429` against `#FEB140`, G −61.
+   - The core has no deep shading in the windows: front shade `#DD5922` against the sheet's `#B53B11`, because Neon is
+     flat.
+   - Fix: let `CORE_FWD` or the noise put one `core_hot` facet in the upper rear window. This is colour only.
+5. **Minor: the shell shade quartile is 12–26 levels lighter than the sheet's**, and the f34 median is 11–18 levels
+   over. The dark facets could go one step darker (`shell_dark` mix weight up), without moving the front median.
+6. **Minor: the Neon `ember_wall` is more orange than the sheet's crack walls**: rendered `#D75B23` / `#D45422` against
+   the sheet's `#B5310F`–`#CC3610` (G +15…+46). The crack medians still match (front `#E66325` / `#E25E20`), so this
+   is optional.
+7. **Minor: rocks in the side, rear and r34 views render 23–43 levels darker than the evenly lit sheet.** This is the
+   kit studio's key-light shade, as on other models; the lit views match within 3–9 levels. The top-view rocks are 14–18
+   under.
+8. **Minor: heat_glow_2's spawn box has 6 / 343 grid points 0.02–0.03 inside the rear window's top rim.**
+   - Fix: `BACK_LIGHT["pos"]` (0.3, 3.6, 4.2) → (0.3, 3.9, 4.2). I verified that shifts of +0.2 to +0.4 give 0 / 343
+     inside.
+9. **Minor: crack 1's two upper stations are 0.60–0.73 deep**, against the ≥ 0.9 target. This is capped by the shell
+   thickness so the slot can't break through, and it is recorded in the build fixes.
+10. **Minor: the exported Cap and Slab parts have openings into their hollows** (Cap see-through by design, genus 1).
+    Standalone, those parts are not the sheet's solid lozenge and elbow slab; this follows the main session's
+    dome-sector mapping.
+11. **Minor: the hero has 138 tris of headroom** (3862 / 4000), so any later geometry fix (1, 2) must trade tris.
