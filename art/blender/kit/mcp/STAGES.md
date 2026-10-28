@@ -2,13 +2,14 @@
 
 **Agent grouping (user decision, 2026-10-28, revised the same day to speed things up):**
 - **Three modellers at a time**, one model each, all Opus 5.5 at high effort, each started with a fresh context. Each modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) in its own background Blender (see "Parallel sessions").
+- **A separate verifier per model, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
 - **The main session is the hub.** It:
-  - starts the modellers;
+  - starts every agent;
   - owns the open GUI Blender (`FlintbornWorldKit.blend`);
-  - puts each finished model into it;
-  - does stage 7, the final verification (it built none of the model);
+  - puts each finished model into it (`mNNN.build()` there, then save);
+  - rules on verifier results;
   - exports, commits and merges.
-- Every modeller first loads the `roblox-blender-model` skill (Skill tool), then reads this file and the model's spec.
+- **Every agent starts with a fresh context** (a new agent, never a fork or a continuation of a finished one). It loads exactly what its job needs: the `roblox-blender-model` skill (Skill tool), this file, the model's spec, and the reference. Modellers also read the builder. Fixes after a failed verification go to a fresh modeller.
 - Each modeller still runs every check listed for its stages below and records each stage in the spec under its own heading.
 - Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken.
 - A non-Blender study agent writes the next models' 2a studies ahead of time.
@@ -18,7 +19,7 @@
 
 Each modeller drives its own live Blender. The open GUI (`FlintbornWorldKit.blend`, the MCP tool, port 9876)
 belongs to the main session for integration and verification. Modellers use background Blender processes running
-the same MCP bridge on their own ports (9877–9879), driven through
+the same MCP bridge on their own ports (modellers 9877–9879, verifiers 9880 and up), driven through
 `bgmcp.py` (tested 2026-10-28: an M014 build there gave the same tris, sizes and renders as the GUI, mean pixel
 difference 0.02/255):
 
