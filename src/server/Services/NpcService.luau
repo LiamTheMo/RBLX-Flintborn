@@ -18,6 +18,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local ModifierService = require(script.Parent.ModifierService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
@@ -142,8 +143,17 @@ end
 local function kill(npc)
 	local position = npc.body.Position - Vector3.new(0, npc.body.Size.Y / 2, 0)
 	NpcService.Despawn(npc)
-	for _, item in EventRules.RollLoot(npc.def.drops, rng) do
+	-- The killer's luck raises the chance rows only (GDD §51); certain drops stay certain.
+	local killer = npc.lastAttacker
+	local luck = if killer and killer.Parent then ModifierService.Sum(killer, "Luck") else 0
+	for _, item in EventRules.RollLoot(npc.def.drops, rng, luck) do
 		DropService.Spawn(item, position)
+	end
+	-- Alphas also carry the elite materials (GDD §51).
+	if npc.elite then
+		for _, item in EventRules.RollLoot(EnemyCatalog.ELITE_DROPS, rng, luck) do
+			DropService.Spawn(item, position)
+		end
 	end
 	NpcService.Died:Fire(npc)
 end

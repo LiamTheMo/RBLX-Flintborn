@@ -1,11 +1,13 @@
--- Every launch item archetype (GDD §4.2, §19.1, Q100–108). Rarity is fixed per
--- archetype; individual unique items may carry a small quality roll. Stackable items
--- (materials, ammunition, consumables, placeables) occupy one slot per type; tools,
--- weapons and armor are unique instances. Values not confirmed by the GDD are
--- starting placeholders.
+-- Every item archetype (GDD §4.2, §19.1, §51). Rarity is fixed per archetype;
+-- individual unique items may carry a small quality roll. Stackable items
+-- (materials, ammunition, consumables, siege items, placeables) occupy one slot per
+-- type; tools, weapons and armor are unique instances. Gear is generated from the
+-- tier ladder (Tiers): what each material can make, its rarity and its tool rank.
+-- Values not confirmed by the GDD are starting placeholders.
 
 local Consumables = require(script.Parent.Consumables)
 local Rarity = require(script.Parent.Rarity)
+local Tiers = require(script.Parent.Tiers)
 
 local ItemCatalog = {}
 
@@ -16,6 +18,7 @@ ItemCatalog.Families = {
 	Armor = "Armor",
 	Ammo = "Ammo",
 	Consumable = "Consumable",
+	Siege = "Siege",
 	Placeable = "Placeable",
 }
 
@@ -24,90 +27,65 @@ ItemCatalog.STACK_CAPS = {
 	Material = 1000,
 	Ammo = 500,
 	Consumable = 50,
+	Siege = 10,
 	Placeable = 5,
 }
 
 local F = ItemCatalog.Families
 
-local function material(id: string, name: string, rarity: string?)
-	return { id = id, name = name, family = F.Material, rarity = rarity or "Common" }
-end
-
-local function tool(id: string, name: string, kind: string, tier: number, rarity: string?)
-	return { id = id, name = name, family = F.Tool, rarity = rarity or "Common", tool = { kind = kind, tier = tier } }
-end
-
-local function weapon(id: string, name: string, weaponFamily: string, rarity: string?)
-	return { id = id, name = name, family = F.Weapon, rarity = rarity or "Common", weapon = { family = weaponFamily } }
-end
-
-local function armor(tier: string, slot: string, rarity: string?)
-	return {
-		id = tier .. slot,
-		name = tier .. " " .. (slot == "Legs" and "Legs/Boots" or slot),
-		family = F.Armor,
-		rarity = rarity or "Common",
-		armor = { slot = slot, tier = tier },
-	}
+-- `tradeable` marks the materials players may trade (GDD §51: elite, Guardian,
+-- meteor and cache materials, rare herbs, and Ancient Ember); common materials,
+-- ores and bars never trade.
+local function material(id: string, name: string, rarity: string?, extra: any?)
+	local entry = { id = id, name = name, family = F.Material, rarity = rarity or "Common" }
+	for key, value in extra or {} do
+		entry[key] = value
+	end
+	return entry
 end
 
 local entries = {
-	-- Materials (GDD Q104 small starting catalog)
+	-- Common materials (gathered everywhere).
 	material("Wood", "Wood"),
 	material("Stone", "Stone"),
-	material("Iron", "Iron"),
+	material("Flint", "Flint"),
 	material("Fiber", "Plant Fiber"),
 	material("Herbs", "Herbs"),
+	material("Resin", "Resin"),
 	material("Hide", "Hide"),
-	-- Dropped by hunted creatures; cooked at a furnace.
 	material("RawMeat", "Raw Meat"),
-	-- Inner Ring materials (GDD §18.1).
-	material("Jade", "Jade", "Uncommon"),
+	material("Bone", "Bone"),
+
+	-- Restricted (gem-class) materials: daggers and spears only (Flint also arrows).
 	material("Obsidian", "Obsidian", "Uncommon"),
-	-- Special material: rare-event reagent (v0.11 events drop it). It banks into the
-	-- vault like every material but cannot be traded.
+	material("Jade", "Jade", "Rare"),
+
+	-- Rare and endgame materials (tradeable).
+	material("DireHide", "Dire Hide", "Uncommon", { tradeable = true }),
+	material("ChargedCore", "Charged Core", "Rare", { tradeable = true }),
+	material("GlowFur", "Glow-Fur", "Rare", { tradeable = true }),
+	material("GuardianHeart", "Guardian Heart", "Legendary", { tradeable = true }),
+	material("AshenOil", "Ashen Oil", "Rare", { tradeable = true }),
+	material("SiegeResin", "Siege Resin", "Rare", { tradeable = true }),
+	material("AbyssalShard", "Abyssal Shard", "Epic", { tradeable = true }),
+	material("Emberglass", "Emberglass", "Epic", { tradeable = true }),
+	material("Bloodroot", "Bloodroot", "Rare", { tradeable = true }),
+	material("Moonpetal", "Moonpetal", "Rare", { tradeable = true }),
+	-- Special material: the rare-event reagent (v0.11 events drop it).
+	material("AncientEmber", "Ancient Ember", "Epic", { special = true, tradeable = true, tags = { "event" } }),
+
+	-- Ammunition: Flint is the only arrow tip (Q107, GDD §51).
+	{ id = "FlintArrow", name = "Flint Arrow", family = F.Ammo, rarity = "Common" },
+
+	-- Siege items (GDD §51): thrown fire, placed breaching charge.
+	{ id = "FireBomb", name = "Fire Bomb", family = F.Siege, rarity = "Rare", siege = { kind = "Thrown" } },
 	{
-		id = "AncientEmber",
-		name = "Ancient Ember",
-		family = F.Material,
-		rarity = "Epic",
-		special = true,
-		tags = { "event" },
+		id = "BreachingCharge",
+		name = "Breaching Charge",
+		family = F.Siege,
+		rarity = "Rare",
+		siege = { kind = "Placed" },
 	},
-
-	-- Tools
-	tool("StoneAxe", "Stone Axe", "Axe", 1),
-	tool("BasicPickaxe", "Basic Pickaxe", "Pickaxe", 1),
-	tool("Sickle", "Sickle", "Sickle", 1),
-	tool("IronAxe", "Iron Axe", "Axe", 2, "Uncommon"),
-	tool("IronPickaxe", "Iron Pickaxe", "Pickaxe", 2, "Uncommon"),
-
-	-- Weapons (Q100: spears, daggers, swords, bows)
-	weapon("WoodenSpear", "Wooden Spear", "Spear"),
-	weapon("StoneSpear", "Stone Spear", "Spear"),
-	weapon("StoneDagger", "Stone Dagger", "Dagger"),
-	weapon("StoneSword", "Stone Sword", "Sword"),
-	weapon("IronSword", "Iron Sword", "Sword", "Rare"),
-	weapon("BasicBow", "Basic Bow", "Bow"),
-	-- The Guardian's once-per-encounter Legendary (GDD §8.1); ordinary world loot.
-	weapon("GuardianFang", "Guardian's Fang", "Sword", "Legendary"),
-
-	-- Armor (Q101: Head, Chest, Legs/Boots)
-	armor("Hide", "Head"),
-	armor("Hide", "Chest"),
-	armor("Hide", "Legs"),
-	armor("Wood", "Head"),
-	armor("Wood", "Chest"),
-	armor("Wood", "Legs"),
-	armor("Stone", "Head", "Uncommon"),
-	armor("Stone", "Chest", "Uncommon"),
-	armor("Stone", "Legs", "Uncommon"),
-	armor("Iron", "Head", "Rare"),
-	armor("Iron", "Chest", "Rare"),
-	armor("Iron", "Legs", "Rare"),
-
-	-- Ammunition (Q107)
-	{ id = "Arrow", name = "Arrow", family = F.Ammo, rarity = "Common" },
 
 	-- Placeables
 	{ id = "Workbench", name = "Workbench", family = F.Placeable, rarity = "Common", placeable = "Workbench" },
@@ -120,7 +98,77 @@ local entries = {
 		rarity = "Legendary",
 		placeable = "ExtractionRune",
 	},
+
+	-- The Guardian's once-per-encounter Legendary (GDD §8.1): stronger than any
+	-- crafted sword (one tier above Adamantine).
+	{
+		id = "GuardianFang",
+		name = "Guardian's Fang",
+		family = F.Weapon,
+		rarity = "Legendary",
+		weapon = { family = "Sword" },
+	},
 }
+
+-- Ores and bars for every metal (GDD §51): ore smelts 1:1 into bars at a Furnace.
+for _, metal in Tiers.Metals do
+	local tier = Tiers.Get(metal)
+	table.insert(entries, material(tier.ore, metal .. " Ore", tier.rarity))
+	table.insert(entries, material(tier.material, metal .. " Bar", tier.rarity))
+end
+
+local ARMOR_SLOTS = { "Head", "Chest", "Legs" }
+local SLOT_NAMES = { Head = "Head", Chest = "Chest", Legs = "Legs/Boots" }
+
+-- The display prefix for gear of a tier ("Wooden" for wood, otherwise the tier).
+local function prefix(tierId: string): string
+	return if tierId == "Wood" then "Wooden" else tierId
+end
+
+-- Gear id for a tier and family (e.g. "IronSword", "WoodenBow", "BoneChest").
+function ItemCatalog.GearId(tierId: string, family: string): string
+	return prefix(tierId) .. family
+end
+
+-- Gear from the ladder: weapons, tools and armor each material can make.
+for _, tier in Tiers.Ladder do
+	for _, family in { "Spear", "Dagger", "Sword", "Bow" } do
+		if tier.canMake[family] then
+			table.insert(entries, {
+				id = ItemCatalog.GearId(tier.id, family),
+				name = prefix(tier.id) .. " " .. family,
+				family = F.Weapon,
+				rarity = tier.rarity,
+				tier = tier.id,
+				weapon = { family = family },
+			})
+		end
+	end
+	for _, kind in { "Axe", "Pickaxe" } do
+		if tier.canMake[kind] then
+			table.insert(entries, {
+				id = ItemCatalog.GearId(tier.id, kind),
+				name = prefix(tier.id) .. " " .. kind,
+				family = F.Tool,
+				rarity = tier.rarity,
+				tier = tier.id,
+				tool = { kind = kind, tier = Tiers.ToolRank[tier.id] },
+			})
+		end
+	end
+	if tier.canMake.Armor then
+		for _, slot in ARMOR_SLOTS do
+			table.insert(entries, {
+				id = tier.id .. slot,
+				name = tier.id .. " " .. SLOT_NAMES[slot],
+				family = F.Armor,
+				rarity = tier.rarity,
+				tier = tier.id,
+				armor = { slot = slot, tier = tier.id },
+			})
+		end
+	end
+end
 
 -- Medicine and food come from the consumables catalog.
 for id, consumable in Consumables.Catalog do
@@ -128,7 +176,8 @@ for id, consumable in Consumables.Catalog do
 		id = id,
 		name = consumable.name,
 		family = F.Consumable,
-		rarity = "Common",
+		rarity = consumable.rarity or "Common",
+		tradeable = consumable.tradeable,
 		consumable = consumable,
 	})
 end

@@ -6,6 +6,7 @@
 
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local Rarity = require(script.Parent.Parent.Items.Rarity)
+local Tiers = require(script.Parent.Parent.Items.Tiers)
 
 local BossScaling = {}
 
@@ -14,7 +15,15 @@ BossScaling.MAX = 2.0
 BossScaling.PER_SCORE = 0.25
 BossScaling.MAX_LEVEL = 50
 
-local ARMOR_TIERS = { Hide = 1, Wood = 2, Stone = 3, Iron = 4 }
+-- Armor tiers ranked in ladder order (GDD §51); higher tiers score more.
+local ARMOR_TIERS = {}
+local ARMOR_TIER_COUNT = 0
+for _, tier in Tiers.Ladder do
+	if tier.canMake.Armor then
+		ARMOR_TIER_COUNT += 1
+		ARMOR_TIERS[tier.id] = ARMOR_TIER_COUNT
+	end
+end
 
 -- 0..1 from the best carried weapon's rarity and worn/carried armor tiers.
 function BossScaling.GearScore(items): number
@@ -29,7 +38,7 @@ function BossScaling.GearScore(items): number
 		end
 	end
 	local armorTotal = (armor.Head or 0) + (armor.Chest or 0) + (armor.Legs or 0)
-	return math.clamp(0.5 * math.min(bestWeapon / 5, 1) + 0.5 * armorTotal / 12, 0, 1)
+	return math.clamp(0.5 * math.min(bestWeapon / 5, 1) + 0.5 * armorTotal / (3 * ARMOR_TIER_COUNT), 0, 1)
 end
 
 -- One player's 0..1 contribution.
