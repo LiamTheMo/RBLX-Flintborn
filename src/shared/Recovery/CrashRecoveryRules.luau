@@ -10,11 +10,11 @@
 -- The Play that starts a run records it in the profile together with the consume
 -- (its ID, its server and, until the first checkpoint, the loadout it carries in),
 -- so a crash before any checkpoint still restores the loadout, and a new run can
--- start only once the previous one is settled (one checkpoint slot per user). The
--- record also keeps, for the whole run, the material quantities carried in, which
--- the Center bonus never multiplies (GDD §53).
+-- start only once the previous one is settled (one checkpoint slot per user).
+-- Checkpoints and the Play loadout keep each material stack's carried count
+-- (GDD §53); items restored to the lobby drop it, since the next Play tags
+-- whatever it takes from the lobby afresh.
 
-local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 
@@ -42,6 +42,7 @@ local function compact(items)
 			instanceId = item.instanceId,
 			catalogId = item.catalogId,
 			quantity = item.quantity,
+			carried = item.carried,
 			qualityRoll = item.qualityRoll,
 			ownerId = item.ownerId,
 			permanent = item.permanent,
@@ -62,15 +63,13 @@ end
 
 -- Records the run a Play starts, inside its consume operation. `carried` are the
 -- consumed items that enter the run inventory (the rest stay in the lobby), kept
--- until the first checkpoint; their material quantities stay recorded as carried
--- in for the whole run (GDD §53).
+-- until the first checkpoint with their stacks' carried counts (GDD §53).
 function CrashRecoveryRules.BeginRun(profile, runId: string, jobId: string, carried, now: number)
 	ProgressionRules.StartRun(profile, runId)
 	local run = profile.progression.currentRun
 	run.jobId = jobId
 	run.startedAt = now
 	run.loadout = if #carried > 0 then compact(carried) else nil
-	ExtractionRules.RecordCarriedIn(run, carried)
 end
 
 -- The run's first checkpoint was written (or tried): from now on only
@@ -165,6 +164,7 @@ function CrashRecoveryRules.Restore(profile, checkpoint, now: number)
 	for _, item in checkpoint.items do
 		if item.instanceId == nil or not excluded[item.instanceId] then
 			local copy = table.clone(item)
+			copy.carried = nil
 			if copy.instanceId then
 				copy.location = "LobbyBackpack"
 				if copy.permanent then

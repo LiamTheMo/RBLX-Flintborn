@@ -133,15 +133,22 @@ function VaultService.Start()
 	end
 	ProfileService.ProfileLoaded:Connect(showReceipt)
 	Remotes.Handle("VaultSnapshot", snapshot)
-	Remotes.Handle("VaultDeposit", function(player, index)
-		if not Validation.IsQuantity(index, 1, 50) then
+	-- A material deposit that would go past the vault's capacity is refused with
+	-- the amount it would delete, until the client confirms the loss (GDD §53).
+	Remotes.Handle("VaultDeposit", function(player, index, confirmOverflow)
+		if
+			not Validation.IsQuantity(index, 1, 50) or (confirmOverflow ~= nil and type(confirmOverflow) ~= "boolean")
+		then
 			return false, "BadRequest"
 		end
 		local ok, reason = operate(player, "VaultDeposit", function(profile)
-			return VaultRules.Deposit(profile, index, os.time())
+			return VaultRules.Deposit(profile, index, os.time(), confirmOverflow == true)
 		end)
 		if ok then
 			VaultService.Deposited:Fire(player)
+		elseif reason == VaultRules.WOULD_OVERFLOW then
+			local profile = ProfileService.GetProfile(player)
+			return false, reason, profile and VaultRules.DepositLoss(profile, index) or 0
 		end
 		return ok, reason
 	end)

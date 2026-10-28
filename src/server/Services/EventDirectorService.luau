@@ -83,9 +83,12 @@ local function groundParams()
 	return params
 end
 
-local function groundAt(x: number, z: number): Vector3?
+-- The ground under (x, z), cast down from `fromY` (default: above the whole map;
+-- lower to find a cave floor under the hill).
+local function groundAt(x: number, z: number, fromY: number?): Vector3?
 	local params = groundParams()
-	local hit = workspace:Raycast(Vector3.new(x, 1000, z), Vector3.new(0, -2000, 0), params)
+	local top = fromY or 1000
+	local hit = workspace:Raycast(Vector3.new(x, top, z), Vector3.new(0, -(top + 1000), 0), params)
 	if hit and hit.Material ~= Enum.Material.Water and hit.Position.Y > -50 then
 		return hit.Position
 	end
@@ -109,15 +112,24 @@ local function keepOut()
 	return zones
 end
 
--- A random spot in the entry's biome that keeps clear of other footprints.
+-- A random spot in the entry's zone, habitat or tier that keeps clear of other
+-- footprints. On the generated island EventRules.PlacePoint already returns
+-- ground (the cave floor for cave events, which a raycast from above would miss);
+-- an authored map falls back to a distance band and a raycast.
 local function place(entry): Vector3?
 	local mapRadius = workspace:GetAttribute("FlintbornMapRadius") or EventDirectorService.DEFAULT_MAP_RADIUS
+	local generated = workspace:GetAttribute("FlintbornGeneratedIsland") == true
 	local footprints = activeFootprints()
 	local zones = keepOut()
 	for _ = 1, EventDirectorService.PLACEMENT_ATTEMPTS do
-		local angle = rng:NextNumber(0, math.pi * 2)
-		local distance = EventRules.BiomeDistance(entry.biome, rng) * mapRadius
-		local position = groundAt(math.cos(angle) * distance, math.sin(angle) * distance)
+		local position
+		if generated then
+			position = EventRules.PlacePoint(entry, rng)
+		else
+			local angle = rng:NextNumber(0, math.pi * 2)
+			local distance = EventRules.BiomeDistance(entry.biome, rng) * mapRadius
+			position = groundAt(math.cos(angle) * distance, math.sin(angle) * distance)
+		end
 		if
 			position
 			and EventRules.Separated(position, entry.footprint, footprints)
@@ -197,12 +209,17 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 	end)
 end
 
+-- One event's creatures share a group, so Neutral members defend the others
+-- (protective boars around the Iron-Tusk Boar, GDD §54).
 local function spawnGroup(event, group, center: Vector3)
+	local pack = NpcService.NewGroup()
 	for _, member in group do
 		for _ = 1, member.count do
 			local offset = Vector3.new(rng:NextNumber(-8, 8), 0, rng:NextNumber(-8, 8))
-			local position = groundAt(center.X + offset.X, center.Z + offset.Z) or center
-			local npc = NpcService.Spawn(member.enemy, position, member.elite, event.id)
+			-- Cast from just above the event centre, so a cave event's creatures
+			-- stand on the cave floor rather than the hill above it.
+			local position = groundAt(center.X + offset.X, center.Z + offset.Z, center.Y + 20) or center
+			local npc = NpcService.Spawn(member.enemy, position, member.elite, event.id, pack)
 			event.npcs[npc] = true
 		end
 	end

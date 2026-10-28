@@ -6,6 +6,9 @@
 -- is charged if the output does not fit, and downed players cannot craft.
 -- Crafting mastery gives only better quality rolls and, when smelting, a chance
 -- of a bonus bar (owner decision 2026-10-28); it never speeds crafting up.
+-- A craft that uses any carried-in unit (GDD §53) makes a carried output: every
+-- bar smelted from a carried ore, and its bonus bar, stays outside the Center
+-- bonus like the ore was.
 --
 -- Smelting costs only time (no fuel): a request for N bars starts one job bound to
 -- the furnace the player stands at, and each bar takes its ore in the same step
@@ -148,30 +151,39 @@ local function fits(inventory, inputs, output): (boolean, string?)
 end
 
 -- Takes one unit's inputs and grants `output` in one step, after checking both on
--- a copy. Nothing changes when it fails.
-local function commit(player: Player, inventory, recipe, output): (boolean, string?)
+-- a copy. Nothing changes when it fails. Inputs spend carried units first; when
+-- any was carried, a material output is carried in whole (GDD §53). Returns (ok,
+-- reason, whether the inputs used carried units).
+local function commit(player: Player, inventory, recipe, output): (boolean, string?, boolean)
 	local ok, reason = fits(inventory, recipe.inputs, output)
 	if not ok then
-		return false, reason
+		return false, reason, false
 	end
-	InventoryRules.RemoveAll(inventory, recipe.inputs)
+	local _, carried = InventoryRules.RemoveAll(inventory, recipe.inputs)
+	if carried > 0 then
+		InventoryRules.MarkCarried({ output })
+	end
 	InventoryRules.Add(inventory, output)
 	InventoryService.Publish(player)
 	ProgressionService.GrantXp(player, "Craft", "Crafting")
 	ProgressionService.GrantMastery(player, "Crafting", 1)
-	return true, nil
+	return true, nil, carried > 0
 end
 
 -- Smelting jobs -------------------------------------------------------------------
 
 -- Crafting mastery's chance of one bonus bar after a bar is smelted. It goes into
 -- the inventory only when the job's remaining bars would still fit beside it;
--- otherwise it lands at the smelter's feet, so a bonus never stops a job.
-local function grantBonusBar(player: Player, inventory, job)
+-- otherwise it lands at the smelter's feet, so a bonus never stops a job. The
+-- bonus bar of a carried ore is carried too (GDD §53).
+local function grantBonusBar(player: Player, inventory, job, carried: boolean)
 	if rng:NextNumber() >= ModifierService.Sum(player, "SmeltBonus") then
 		return
 	end
 	local bonus = { catalogId = job.recipe.output, quantity = 1 }
+	if carried then
+		InventoryRules.MarkCarried({ bonus })
+	end
 	local remaining = job.count - job.done - 1
 	local trial = ProfileSchema.DeepCopy(inventory)
 	local room = InventoryRules.Add(trial, table.clone(bonus)) == 0
@@ -247,12 +259,12 @@ local function stepJob(player: Player, job, at: number)
 		return
 	end
 	local output = makeOutput(player, job.recipe, QualityRoll.Stations.Anywhere, "smelt")
-	local ok, failure = commit(player, inventory, job.recipe, output)
+	local ok, failure, carried = commit(player, inventory, job.recipe, output)
 	if not ok then
 		stopJob(player, failure or "MissingIngredients")
 		return
 	end
-	grantBonusBar(player, inventory, job)
+	grantBonusBar(player, inventory, job, carried)
 	if CraftingRules.Advance(job) then
 		stopJob(player, "Done")
 	else

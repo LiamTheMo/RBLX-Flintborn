@@ -2,15 +2,17 @@
 -- Q126–129, Q151–154, Q158). Presence counts only at the deadline. Only the fixed
 -- Center portal doubles material quantities; portable runes never do. Materials
 -- may be carried into a run (GDD §53), and what was carried in never multiplies:
--- Play records each material's carried-in quantity on the run (RecordCarriedIn),
--- and per material only the extracted amount above it is multiplied. That is
--- keyed on totals, not stacks, so dropping, re-picking or trading units inside a
--- run changes nothing. Every material, special ones included, banks into the
--- vault: its material capacity (1,000 per type) decides what is deleted, and the
--- receipt lists it. Everything else lands in the durable 50-slot lobby backpack,
+-- Play tags each material stack it takes from the lobby as carried
+-- (InventoryRules.MarkCarried), the tag stays on the units through every drop,
+-- body, chest, merge and craft (a carried ore smelts into a carried bar), and per
+-- material only the extracted units not tagged carried are multiplied. Units
+-- handed to another player stay carried for them too. Every material, special
+-- ones included, banks into the vault: its material capacity (1,000 per type)
+-- decides what is deleted, and the receipt lists it. Everything else lands in the durable 50-slot lobby backpack,
 -- where only a full backpack deletes. Unique gear is never multiplied.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
@@ -40,25 +42,8 @@ local function count(value: any): number
 	return if type(value) == "number" and value == value and value > 0 and value ~= math.huge then value else 0
 end
 
--- Adds the material stacks among `items` to the run's carried-in record
--- ({[catalogId] = quantity}), which Settle never multiplies. Play records what
--- enters the run inventory, inside its consume operation, so the record is saved
--- with the run and survives a rejoin or a crash.
-function ExtractionRules.RecordCarriedIn(run, items)
-	local carried = run.carriedIn or {}
-	for _, item in items do
-		if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
-			local quantity = count(item.quantity)
-			if quantity > 0 then
-				carried[item.catalogId] = (carried[item.catalogId] or 0) + quantity
-			end
-		end
-	end
-	run.carriedIn = carried
-end
-
 -- The settled quantity of `extracted` units of a material when `carriedIn` of
--- them entered the run: the carried-in part counts once, only the rest multiplies
+-- them are tagged carried: the carried part counts once, only the rest multiplies
 -- (bring 100, extract 160 at the Center: 100 + 60 × 2 = 220).
 function ExtractionRules.MaterialYield(extracted: number, carriedIn: number, multiplier: number): number
 	local unmultiplied = math.min(extracted, carriedIn)
@@ -126,18 +111,20 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 		shown = false,
 	}
 	local materials = profile.vault.materials
-	-- Materials settle per type, from their extracted totals (GDD §53).
-	local run = profile.progression.currentRun
-	local carried = if run and not run.settled and type(run.carriedIn) == "table" then run.carriedIn else {}
-	local totals, order = {}, {}
+	-- Materials settle per type, from their extracted totals and the carried units
+	-- among them (GDD §53).
+	local totals, carried, order = {}, {}, {}
 	for _, item in items do
 		local catalogId = item.catalogId
 		if item.instanceId == nil and ItemCatalog.IsMaterial(catalogId) then
 			if totals[catalogId] == nil then
 				totals[catalogId] = 0
+				carried[catalogId] = 0
 				table.insert(order, catalogId)
 			end
-			totals[catalogId] += count(item.quantity)
+			local quantity = count(item.quantity)
+			totals[catalogId] += quantity
+			carried[catalogId] += math.min(InventoryRules.Carried(item), quantity)
 		else
 			local copy = table.clone(item)
 			if creditsRebirth(copy) then
@@ -152,7 +139,7 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 	end
 	for _, catalogId in order do
 		local extracted = totals[catalogId]
-		local carriedIn = count(carried[catalogId])
+		local carriedIn = carried[catalogId]
 		local current = materials[catalogId] or 0
 		local stored, deleted =
 			GameConstants.SettleMaterialStack(current, ExtractionRules.MaterialYield(extracted, carriedIn, multiplier))

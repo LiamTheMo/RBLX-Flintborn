@@ -19,9 +19,9 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus. The materials it carried in
--- (which the bonus never multiplies, GDD §53) are recorded on it at Play
--- (ExtractionRules.RecordCarriedIn).
+-- Starts counting a new run's XP for the Center bonus. The materials it carries in
+-- (which the bonus never multiplies, GDD §53) are tagged on their own stacks
+-- (InventoryRules.MarkCarried), not on the run.
 function ProgressionRules.StartRun(profile, runId: string)
 	profile.progression.currentRun = {
 		runId = runId,
