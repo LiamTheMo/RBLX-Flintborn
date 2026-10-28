@@ -1,0 +1,427 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M011",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m011_cave",
+    "hex": "#857774",
+    "levels": [
+     0.97638,
+     1.04397
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_crystal_dark",
+    "hex": "#5F3289",
+    "levels": [
+     0.91118,
+     0.91655,
+     0.9193,
+     0.92315,
+     0.92538,
+     0.92824,
+     0.93111,
+     0.93548,
+     0.93949,
+     0.94265,
+     0.94893,
+     0.96106,
+     0.96238,
+     0.96639,
+     0.97058,
+     0.97292,
+     0.97668,
+     1.03313,
+     1.03748,
+     1.03975,
+     1.05874,
+     1.05121,
+     0.90454,
+     0.95372,
+     0.90675,
+     0.98079,
+     0.95702,
+     0.9518
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_crystal_light",
+    "hex": "#C097DD",
+    "levels": [
+     0.92763,
+     0.93189,
+     0.93447,
+     0.93773,
+     0.94681,
+     0.9495,
+     0.95274,
+     0.96286,
+     0.97715,
+     0.98071,
+     0.98326,
+     1.00152,
+     1.05096,
+     0.97361,
+     0.94383,
+     0.95485
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_crystal_mid",
+    "hex": "#924EC3",
+    "levels": [
+     0.91683,
+     0.92707,
+     0.92899,
+     0.93125,
+     0.93231,
+     0.93594,
+     0.93807,
+     0.93821,
+     0.9426,
+     0.94439,
+     0.94469,
+     0.94788,
+     0.95171,
+     0.95395,
+     0.95443,
+     0.95894,
+     0.97717,
+     0.98207,
+     0.98768,
+     0.99271,
+     1.03718,
+     1.04439,
+     1.047,
+     1.05315,
+     1.05398,
+     1.05476,
+     1.05903,
+     1.05994,
+     1.06297,
+     1.06523,
+     1.06771,
+     1.06778
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_rock",
+    "hex": "#9E8F8B",
+    "levels": [
+     0.88872,
+     0.91619,
+     0.92511,
+     0.93461,
+     0.93927,
+     0.94763,
+     0.94896,
+     0.95273,
+     0.95446,
+     0.95817,
+     0.96156,
+     0.96538,
+     0.96835,
+     0.97429,
+     0.98172,
+     0.98434,
+     0.9868,
+     0.9904,
+     0.99372,
+     0.99751,
+     0.9998,
+     1.00252,
+     1.0069,
+     1.01333,
+     1.02165,
+     1.02496,
+     1.03302,
+     1.0432,
+     1.06117,
+     1.07399,
+     1.0921,
+     1.13377
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_rock_dark",
+    "hex": "#8D7F7C",
+    "levels": [
+     0.94442,
+     0.96154,
+     0.9709,
+     0.97313,
+     0.9758,
+     0.97948,
+     0.97948,
+     0.98527,
+     0.9886,
+     0.99273,
+     0.99561,
+     0.99738,
+     0.99903,
+     1.003,
+     1.00841,
+     1.01167,
+     1.01415,
+     1.018,
+     1.02029,
+     1.02029,
+     1.02324,
+     1.02382,
+     1.02802,
+     1.04238,
+     1.04841,
+     1.05066,
+     1.06161,
+     1.06604,
+     1.0854,
+     1.10308,
+     1.10563,
+     1.13823
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_rock_x_dark_50",
+    "hex": "#968784",
+    "levels": [
+     0.93576,
+     0.9472,
+     0.95729,
+     0.96682,
+     0.96682,
+     0.96682,
+     0.96783,
+     0.96854,
+     0.96854,
+     0.96854,
+     0.96978,
+     0.97134,
+     0.97655,
+     0.98482,
+     0.98873,
+     0.9936,
+     0.99489,
+     0.99763,
+     0.9987,
+     1.00104,
+     1.00654,
+     1.00879,
+     1.01612,
+     1.02087,
+     1.03281,
+     1.03664,
+     1.04623,
+     1.04926,
+     1.0577,
+     1.07611,
+     1.13399,
+     1.14852
+    ],
+    "used": true
+   },
+   {
+    "key": "m011_cave_dark",
+    "hex": "#736764",
+    "levels": [
+     0.97638
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Amethyst",
+   "sheet": "M011",
+   "subject": "Amethyst",
+   "role": "hero",
+   "size": [
+    11.6864,
+    8.3219,
+    9.9846
+   ],
+   "tris": 1122,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Amethyst.glb",
+     "kind": "solid",
+     "tris": 1122,
+     "offset": [
+      0.0,
+      4.161,
+      0.0
+     ],
+     "size": [
+      11.6864,
+      8.3219,
+      9.9846
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "amethyst geode: a thick-walled hollow faceted rock dome open to the front, its cavity bare stone, seven purple crystals (a tall main one fanned by smaller ones) on the cave floor, and a low lip of rocks across the mouth; one closed mesh"
+  },
+  {
+   "name": "AmethystShard",
+   "sheet": "M011",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    2.8281,
+    6.4,
+    2.4558
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystShard.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      3.2,
+      0.0
+     ],
+     "size": [
+      2.8281,
+      6.4,
+      2.4558
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crystal (reusable): six-sided purple crystal with a long pointed tip and a short root point"
+  },
+  {
+   "name": "AmethystShellBottom",
+   "sheet": "M011",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    11.6864,
+    2.6,
+    6.2165
+   ],
+   "tris": 232,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystShellBottom.glb",
+     "kind": "solid",
+     "tris": 232,
+     "offset": [
+      0.0,
+      1.3,
+      0.0
+     ],
+     "size": [
+      11.6864,
+      2.6,
+      6.2165
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bottom Shell: the low lip of rocks across the cave mouth"
+  },
+  {
+   "name": "AmethystShellTop",
+   "sheet": "M011",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    10.3123,
+    8.3219,
+    7.9725
+   ],
+   "tris": 456,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystShellTop.glb",
+     "kind": "solid",
+     "tris": 456,
+     "offset": [
+      0.0,
+      4.161,
+      0.0
+     ],
+     "size": [
+      10.3123,
+      8.3219,
+      7.9725
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Top Shell: the thick-walled hollow faceted dome, bare stone inside"
+  }
+ ],
+ "stats": {
+  "assets": 4,
+  "pieces": 4,
+  "solid": 4,
+  "water": 0,
+  "glow": 0,
+  "tris": 1834,
+  "vfxSockets": 0,
+  "paletteColours": 8,
+  "paletteLevels": 175,
+  "meshBytes": 156248
+ },
+ "problems": []
+}
