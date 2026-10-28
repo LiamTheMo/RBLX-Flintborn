@@ -91,5 +91,6 @@ All methods add geometry to the asset and return its verts. Rotations are radian
 | `waterfall_mist`, `water_foam` | splash mist where a fall lands; foam along shores and rims |
 | `water_flow` | flat Beam lying on a river; start→end is the flow direction |
 | `harvest_hit`, `harvest_deplete`, `ore_glint` | resource nodes: hit on the strike face, deplete at the base, glint only on glossy ore |
+| `crystal_glow`, `crystal_halo` | glowing crystals: a steady PointLight in the open (override `light`), and a faint glow billboard behind the crystal (override the emitter `color`) |
 
 Note each socket's purpose in the asset's `kit.tag(..., notes=...)`.

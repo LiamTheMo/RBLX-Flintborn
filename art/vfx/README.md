@@ -26,7 +26,7 @@ Preview sheet order, left to right and top to bottom: torch head (`torch_fire`),
 | `fire_flipbook_4x4` | 1024 (16 × 256) | colour | Seamless 16-frame loop of a chunky faceted flame. It has a pale-yellow core, an orange body and red-orange tips. Tongues bob and sway, and small diamond fragments split off the tips, rise and shrink away. | all fire kinds |
 | `spark_diamond` | 256 | white | A faceted 4-point diamond with a faint halo. | campfire, forge |
 | `ember_dot` | 128 | white | A faceted octagon dot with a soft halo. | torch, brazier, embers |
-| `glow_soft` | 256 | white | A radial soft glow. | heat_glow, glyph_glow |
+| `glow_soft` | 256 | white | A radial soft glow. | heat_glow, glyph_glow, crystal_halo |
 | `rune_mote` | 256 | pale blue | A lozenge rune glyph with a star glint and a pale-blue halo. | rune_glow |
 | `smoke_puff` | 256 | white-grey | A cluster of faceted puffs with soft, fading edges. | campfire, chimney |
 | `mist_soft` | 512 | white | A large, very soft mist blob. | waterfall_mist |
@@ -50,7 +50,7 @@ Re-uploading a re-rendered PNG gives a new id, so update the module whenever the
 
 Each asset carries Empties named `VFX_<kind>`, parented to the mesh at the emitter position. Their custom properties are:
 
-- `vfx_kind`: one of the 12 kinds.
+- `vfx_kind`: one of the kinds below (`vfx.KINDS`).
 - `vfx_scale`: a size multiplier (1.0 is tuned for the kind's typical asset).
 - `roblox`: the JSON spec (emitters and light).
 
@@ -131,6 +131,7 @@ end)
 | `glyph_glow` | Glimmer (glow_soft) | `#FF8C2A`, 0.9, range 10, pulse | The forge emblem. |
 | `rune_glow` | Motes (rune_mote, 3 × 2 box) | `#A8E2F4`, 0.6, range 8, pulse | Engraved rune stones. |
 | `crystal_glow` | none (light only) | `#B06AF5`, 1.0, range 10, steady, shadows on | Inside a crystal cluster or geode cave; override `light` with the crystal's colour. Pair with `ore_glint` on the tips. |
+| `crystal_halo` | Halo (glow_soft, 12–14 studs, transparency 1 → 0.82 → 1, about 2 overlapping) | none | A faint, steady halo behind a luminous crystal (014 Starstone's "Starlight Glow", pale cyan). Put the socket behind the crystal's centre, inside the asset, so the mesh hides the billboard's middle and the glow shows round the silhouette. Size it with `vfx_scale` (1.0 suits a node about 10 studs wide); override the emitter's `color` for other crystals. Pair with `crystal_glow` and `ore_glint`. |
 | `waterfall_mist` | Mist (mist_soft, 5 × 2 box), Splash (splash_droplets, gravity −20) | none | Where a waterfall hits its pool. |
 | `water_foam` | Foam (foam_patch, flat, 6 × 1.5 box) | none | Shore lines, pool rims, river riffles. |
 | `dust` | Dust (dust_mote, 8 × 4 × 2 box) | none | Gate threshold, path ends: very sparse. |
