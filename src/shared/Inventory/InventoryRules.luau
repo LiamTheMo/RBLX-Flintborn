@@ -1,4 +1,4 @@
--- Fixed 9-slot hotbar and 50-slot backpack (GDD §22.1.1, Q108, Q126–128). Every
+-- Fixed 6-slot hotbar and 50-slot backpack (GDD §22.1.1, §56, Q108, Q127–128). Every
 -- stackable type (materials, ammo, consumables) lives in ONE slot with one
 -- quantity; tools, weapons and armor are unique instances in their own slots and
 -- never merge. Three equipped armor slots (Head, Chest, Legs/Boots; Q101) hold

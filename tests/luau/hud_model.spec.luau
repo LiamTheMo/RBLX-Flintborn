@@ -144,9 +144,9 @@ test("slice scale shrinks corners for small widgets", function()
 end)
 
 test("hotbar stepping wraps", function()
-	expectEq(HudModel.HotbarStep(1, 1, 9), 2, "next")
-	expectEq(HudModel.HotbarStep(9, 1, 9), 1, "wraps forward")
-	expectEq(HudModel.HotbarStep(1, -1, 9), 9, "wraps back")
+	expectEq(HudModel.HotbarStep(1, 1, 6), 2, "next")
+	expectEq(HudModel.HotbarStep(6, 1, 6), 1, "wraps forward")
+	expectEq(HudModel.HotbarStep(1, -1, 6), 6, "wraps back")
 end)
 
 test("hotbar slots show their items, stacks and the equipped one", function()
@@ -157,9 +157,9 @@ test("hotbar slots show their items, stacks and the equipped one", function()
 			{ area = "hotbar", index = 2, catalogId = "IronSword", permanent = true },
 			{ area = "hotbar", index = 3, catalogId = "Redberry", quantity = 1 },
 			{ area = "backpack", index = 4, catalogId = "Wood", quantity = 50 },
-			{ area = "hotbar", index = 12, catalogId = "Wood", quantity = 5 },
+			{ area = "hotbar", index = 7, catalogId = "Wood", quantity = 5 },
 		},
-	}, 9)
+	}, 6)
 	expectEq(views[1].name, "Flint Arrow", "item name")
 	expectEq(views[1].count, "×24", "stack count")
 	expectEq(views[1].equipped, false, "not equipped")
@@ -169,8 +169,8 @@ test("hotbar slots show their items, stacks and the equipped one", function()
 	expectEq(views[3].count, "", "a single item shows no count")
 	expectEq(views[4], nil, "backpack items stay off the hotbar")
 	expectEq(views[5], nil, "an empty slot is nil")
-	expectEq(views[12], nil, "out-of-range slots are ignored")
-	expectEq(next(HudModel.HotbarSlots(nil, 9)), nil, "no snapshot, empty hotbar")
+	expectEq(views[7], nil, "slots past the sixth are ignored")
+	expectEq(next(HudModel.HotbarSlots(nil, 6)), nil, "no snapshot, empty hotbar")
 end)
 
 test("prompt keycaps name the key for the input in use", function()

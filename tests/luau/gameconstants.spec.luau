@@ -76,7 +76,7 @@ test("crafting mastery raises the best-roll chance relatively", function()
 end)
 
 test("inventory, vault and world limits match the GDD", function()
-	expectEq(GameConstants.HOTBAR_SLOTS, 9, "hotbar")
+	expectEq(GameConstants.HOTBAR_SLOTS, 6, "hotbar (§56)")
 	expectEq(GameConstants.BACKPACK_SLOTS, 50, "backpack")
 	expectEq(GameConstants.VaultSlots(0), 25, "starting vault")
 	expectEq(GameConstants.VaultSlots(2), 75, "two upgrades")

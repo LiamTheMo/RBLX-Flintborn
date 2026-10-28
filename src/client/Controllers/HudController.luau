@@ -58,7 +58,7 @@ HudController.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
 -- are fixed (GDD §46), so this one is not rebindable.
 local HOTBAR_STEP_KEYS = { [Enum.KeyCode.ButtonR1] = 1 }
 
--- The keyboard keys that select each slot: the player's Hotbar1–9 binds (1–9 by
+-- The keyboard keys that select each slot: the player's Hotbar1–6 binds (1–6 by
 -- default, rebindable in Settings, GDD §46).
 local function hotbarKeys(count: number): { [Enum.KeyCode]: number }
 	local keys = {}
@@ -514,7 +514,7 @@ function HudController.Start()
 	end
 	ProgressionController.MountPopups(widgets.popups)
 
-	-- Hotbar: the run inventory's hotbar items. The Hotbar1–9 binds (keys 1–9 by
+	-- Hotbar: the run inventory's hotbar items. The Hotbar1–6 binds (keys 1–6 by
 	-- default) and taps select a slot and use it, as InventoryController's keys do
 	-- (equip, eat, place, ready); the right gamepad bumper only steps the
 	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot numbers name
