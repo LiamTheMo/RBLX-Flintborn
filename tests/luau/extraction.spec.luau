@@ -56,63 +56,67 @@ test("the Center doubles materials but never clones a sword", function()
 	expectEq(#profile.lobbyBackpack.slots, 1, "one sword")
 end)
 
--- A profile in a run that carried `carried` in at Play (GDD §53).
-local function inRun(carried)
-	local profile = ProfileSchema.Default(0)
-	CrashRecoveryRules.BeginRun(profile, "run-1", "job-1", carried, 0)
-	return profile
+-- A material stack carrying `carried` of its units in from the lobby (GDD §53).
+local function stack(catalogId, quantity, carried)
+	return { catalogId = catalogId, quantity = quantity, carried = carried }
 end
 
 test("carried-in materials never double at the Center; only what was gathered does", function()
-	local profile = inRun({ { catalogId = "Wood", quantity = 100 }, sword("s1") })
-	expectEq(profile.progression.currentRun.carriedIn.Wood, 100, "Play recorded the Wood")
-	local receipt = ExtractionRules.Settle(profile, { { catalogId = "Wood", quantity = 160 } }, "Center", "r1", 5)
+	local profile = ProfileSchema.Default(0)
+	-- 100 Wood brought in merged with 60 gathered into one stack of 160.
+	local receipt = ExtractionRules.Settle(profile, { stack("Wood", 160, 100), sword("s1") }, "Center", "r1", 5)
 	expectEq(profile.vault.materials.Wood, 220, "100 + 60 × 2")
 	expectEq(receipt.vaulted.Wood, 220, "the receipt lists 220")
 	expectEq(receipt.carriedIn.Wood, 100, "and the 100 it did not double")
 end)
 
 test("carrying 100 in and extracting 40 doubles nothing", function()
-	local profile = inRun({ { catalogId = "Wood", quantity = 100 } })
-	ExtractionRules.Settle(profile, { { catalogId = "Wood", quantity = 40 } }, "Center", "r1", 5)
+	local profile = ProfileSchema.Default(0)
+	ExtractionRules.Settle(profile, { stack("Wood", 40, 40) }, "Center", "r1", 5)
 	expectEq(profile.vault.materials.Wood, 40, "40 settle once")
 end)
 
-test("the carried-in total counts across stacks, so splitting or re-picking changes nothing", function()
-	local profile = inRun({ { catalogId = "Stone", quantity = 30 }, { catalogId = "Stone", quantity = 20 } })
-	expectEq(profile.progression.currentRun.carriedIn.Stone, 50, "both stacks recorded as 50")
+test("carried units count across stacks, whoever extracts them", function()
+	local profile = ProfileSchema.Default(0)
 	ExtractionRules.Settle(profile, {
-		{ catalogId = "Stone", quantity = 25 },
-		{ catalogId = "Wood", quantity = 10 },
-		{ catalogId = "Stone", quantity = 45 },
+		stack("Stone", 25, 25),
+		stack("Wood", 10),
+		stack("Stone", 45, 25),
 	}, "Center", "r1", 5)
 	expectEq(profile.vault.materials.Stone, 90, "50 once + 20 gathered × 2")
-	expectEq(profile.vault.materials.Wood, 20, "a material not carried in doubles in full")
+	expectEq(profile.vault.materials.Wood, 20, "a material with no carried units doubles in full")
+	-- A malformed tag never counts more than the stack holds.
+	local odd = ProfileSchema.Default(0)
+	ExtractionRules.Settle(odd, { stack("Wood", 10, 99), stack("Stone", 10, -4) }, "Center", "r2", 5)
+	expectEq(odd.vault.materials.Wood, 10, "carried is capped at the quantity")
+	expectEq(odd.vault.materials.Stone, 20, "a negative tag counts as none")
 end)
 
 test("other extractions settle carried-in and gathered materials alike", function()
 	for _, kind in { "Fixed", "Portable" } do
-		local profile = inRun({ { catalogId = "Wood", quantity = 100 } })
-		local receipt = ExtractionRules.Settle(profile, { { catalogId = "Wood", quantity = 160 } }, kind, "r1", 5)
+		local profile = ProfileSchema.Default(0)
+		local receipt = ExtractionRules.Settle(profile, { stack("Wood", 160, 100) }, kind, "r1", 5)
 		expectEq(profile.vault.materials.Wood, 160, kind .. " settles 160")
 		expectEq(receipt.carriedIn, nil, kind .. " lists nothing as skipped")
 	end
 	expectEq(ExtractionRules.MaterialYield(160, 100, 1), 160, "×1 never changes a total")
 end)
 
-test("a crash-restored or reloaded run keeps its carried-in record", function()
-	local profile = inRun({ { catalogId = "Wood", quantity = 100 } })
-	-- The first checkpoint drops the Play loadout, never the record.
-	CrashRecoveryRules.Checkpointed(profile, "run-1")
-	expectEq(profile.progression.currentRun.loadout, nil, "loadout dropped")
-	-- The profile is saved and loaded on another server.
+test("a Play loadout and a crash checkpoint keep each stack's carried units", function()
+	local profile = ProfileSchema.Default(0)
+	CrashRecoveryRules.BeginRun(profile, "run-1", "job-1", { stack("Wood", 100, 100), sword("s1") }, 0)
+	expectEq(profile.progression.currentRun.loadout[1].carried, 100, "the loadout keeps the tag")
+	expectEq(profile.progression.currentRun.carriedIn, nil, "nothing is recorded on the run itself")
 	local reloaded = ProfileSchema.Migrate(ProfileSchema.DeepCopy(profile), 0)
-	expectEq(reloaded.progression.currentRun.carriedIn.Wood, 100, "the record survives the reload")
-	ExtractionRules.Settle(reloaded, { { catalogId = "Wood", quantity = 160 } }, "Center", "r1", 5)
-	expectEq(reloaded.vault.materials.Wood, 220, "and still keeps the carried-in Wood at ×1")
-	-- A settled run never lends its record to a later receipt.
-	local again = ExtractionRules.Settle(reloaded, { { catalogId = "Wood", quantity = 10 } }, "Center", "r2", 6)
-	expectEq(again.carriedIn, nil, "nothing carried in once the run is settled")
+	expectEq(reloaded.progression.currentRun.loadout[1].carried, 100, "and so does a reload")
+	local checkpoint = CrashRecoveryRules.Checkpoint("run-1", "job-1", { stack("Wood", 130, 100) }, {}, 0)
+	expectEq(checkpoint.items[1].carried, 100, "a checkpoint keeps the tag")
+	-- Restored into the lobby, the stack is lobby material again: the next Play
+	-- tags whatever it takes afresh.
+	CrashRecoveryRules.Restore(reloaded, checkpoint, 10)
+	local restored = reloaded.lobbyBackpack.slots[#reloaded.lobbyBackpack.slots]
+	expectEq(restored.quantity, 130, "all 130 Wood restored")
+	expectEq(restored.carried, nil, "without a run tag")
 end)
 
 test("anything over a vault stack's 1,000 is deleted and listed", function()
@@ -188,7 +192,7 @@ test("vault items and material stacks withdraw into the lobby backpack (GDD §53
 	expectEq(#full.lobbyBackpack.slots, 50, "backpack unchanged")
 end)
 
-test("backpack materials stay put until deposited; a deposit past capacity deletes the rest", function()
+test("backpack materials stay put until deposited; a confirmed deposit past capacity deletes the rest", function()
 	local profile = ProfileSchema.Default(0)
 	profile.vault.materials.Stone = 800
 	profile.lobbyBackpack.slots = {
@@ -198,7 +202,13 @@ test("backpack materials stay put until deposited; a deposit past capacity delet
 	}
 	expectEq(VaultRules.BankMaterials, nil, "nothing banks the backpack automatically any more")
 	expectEq(#profile.lobbyBackpack.slots, 3, "materials wait in the backpack")
-	expect(VaultRules.Deposit(profile, 1, 77), "Stone deposits")
+	expectEq(VaultRules.DepositLoss(profile, 1), 100, "100 of the 300 Stone would be lost")
+	local ok, reason = VaultRules.Deposit(profile, 1, 76)
+	expect(not ok and reason == VaultRules.WOULD_OVERFLOW, "refused until confirmed: " .. tostring(reason))
+	expectEq(profile.vault.materials.Stone, 800, "a refused deposit changes nothing")
+	expectEq(#profile.lobbyBackpack.slots, 3, "the Stone stays in the backpack")
+	expectEq(profile.vault.lastOverflow, nil, "and nothing is deleted")
+	expect(VaultRules.Deposit(profile, 1, 77, true), "Stone deposits once the loss is confirmed")
 	expectEq(profile.vault.materials.Stone, 1000, "Stone fills its vault capacity")
 	expectEq(profile.vault.lastOverflow.at, 77, "the loss is recorded")
 	expectEq(profile.vault.lastOverflow.deleted.Stone, 100, "800 + 300 leaves 100 deleted")

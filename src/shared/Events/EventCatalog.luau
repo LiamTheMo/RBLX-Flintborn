@@ -4,8 +4,9 @@
 -- category without a Common entry skips when nothing rarer hits. Footprints are
 -- radii in studs; biomes are the placeholder rings until the real island arrives
 -- (v0.15). Loot entries are {catalogId, min, max, chance}. Ore events and meteors
--- carry `minRank`, the pickaxe they need. Names, loot and NPC groups are
--- placeholders.
+-- carry `minRank`, the pickaxe they need. Creature events (GDD §54) may name a
+-- preferred map `zone` or `habitat` (WildlifeRules.HABITATS) inside their biome
+-- tier for placement. Names, loot and NPC groups are placeholders.
 
 local Tiers = require(script.Parent.Parent.Items.Tiers)
 
@@ -42,13 +43,16 @@ end
 
 local R = Tiers.ToolRank
 
-local function npc(id, name, rarity, biome, group)
+-- `where` = {zone?, habitat?}: where in the biome the creatures prefer (§54).
+local function npc(id, name, rarity, biome, group, where)
 	return {
 		id = id,
 		name = name,
 		rarity = rarity,
 		kind = K.Npc,
 		biome = biome,
+		zone = where and where.zone,
+		habitat = where and where.habitat,
 		footprint = 40,
 		lifetime = 600,
 		group = group,
@@ -138,29 +142,37 @@ EventCatalog.Entries = {
 			{ "AncientEmber", 2, 2, 1 },
 		}),
 	},
+	-- Creature events (GDD §54). Regular wildlife roams on its own (WildlifeRules),
+	-- so there is no Common fallback: a missed roll spawns nothing, and every
+	-- creature event rolls its own weight. The Minotaur comes only from the Keep's
+	-- ritual altar (BossCatalog.Rituals).
 	Npc = {
-		npc("WolfPack", "Wolf Pack", "Common", "OuterRim", { { enemy = "Wolf", count = 3 } }),
-		npc("SkeletonPatrol", "Skeleton Patrol", "Uncommon", "InnerRing", { { enemy = "Skeleton", count = 3 } }),
-		npc("AlphaBoar", "Alpha Boar", "Rare", "Any", {
-			{ enemy = "Boar", count = 1, elite = true },
-			{ enemy = "Boar", count = 2 },
-		}),
-		npc("RaiderWarband", "Raider Warband", "Epic", "Any", {
-			{ enemy = "Bandit", count = 1, elite = true },
-			{ enemy = "Bandit", count = 3 },
-		}),
-		npc("EmberWisps", "Ember Wisps", "Legendary", "Center", {
+		npc("SkeletonPatrol", "Skeleton Patrol", "Uncommon", "InnerRing", {
+			{ enemy = "Skeleton", count = 3 },
+		}, { zone = "FallenTemple" }),
+		npc("WoollyMammoth", "Woolly Mammoth", "Uncommon", "Any", {
+			{ enemy = "WoollyMammoth", count = 1 },
+		}, { habitat = "Grassland" }),
+		npc("GiantGroundSloth", "Giant Ground Sloth", "Rare", "Any", {
+			{ enemy = "GiantGroundSloth", count = 1 },
+		}, { habitat = "Clearing" }),
+		npc("AncientTortoise", "Ancient Tortoise", "Rare", "Any", {
+			{ enemy = "AncientTortoise", count = 1 },
+		}, { habitat = "Lakeshore" }),
+		npc("IronTuskBoar", "Iron-Tusk Boar", "Rare", "InnerRing", {
+			{ enemy = "IronTuskBoar", count = 1 },
+			{ enemy = "WildBoar", count = 3 },
+		}, { habitat = "Clearing" }),
+		npc("SaberToothedTiger", "Saber-Toothed Tiger", "Epic", "InnerRing", {
+			{ enemy = "SaberToothedTiger", count = 1 },
+		}, { habitat = "Jungle" }),
+		npc("StonehideRhino", "Stonehide Rhino", "Epic", "InnerRing", {
+			{ enemy = "StonehideRhino", count = 1 },
+		}, { habitat = "Rocky" }),
+		npc("EmberWisps", "Ember Wisps", "Legendary", "InnerRing", {
 			{ enemy = "EmberWisp", count = 1, elite = true },
 			{ enemy = "EmberWisp", count = 3 },
-		}),
-		npc("SabertoothAlpha", "Sabertooth Alpha", "Legendary", "InnerRing", {
-			{ enemy = "Sabertooth", count = 1, elite = true },
-			{ enemy = "Wolf", count = 2 },
-		}),
-		npc("Minotaur", "Minotaur", "Mythic", "Center", {
-			{ enemy = "Minotaur", count = 1, elite = true },
-			{ enemy = "Skeleton", count = 2 },
-		}),
+		}, { zone = "EmberhollowCaves", habitat = "Cave" }),
 	},
 	Cache = {
 		cache("WeatheredCache", "Weathered Supply Cache", "Uncommon", {
@@ -263,7 +275,8 @@ EventCatalog.Entries = {
 			footprint = 80,
 			lifetime = 900,
 			cache = "AncientCache",
-			defenders = { { enemy = "Bandit", count = 3 } },
+			-- A ruined camp the dead still hold (placeholder guards since Bandits left, §54).
+			defenders = { { enemy = "Skeleton", count = 3 } },
 		},
 		{
 			id = "WarlordsHold",
@@ -276,7 +289,7 @@ EventCatalog.Entries = {
 			lifetime = 900,
 			cache = "GildedCache",
 			boss = "RaiderWarlord",
-			defenders = { { enemy = "Bandit", count = 2 } },
+			defenders = { { enemy = "Skeleton", count = 2 } },
 		},
 	},
 	-- Event bosses (Q45). No Common entry: a missed roll spawns nothing.
@@ -298,6 +311,18 @@ EventCatalog.Entries = {
 			kind = K.Boss,
 			boss = "BoneColossus",
 			biome = "Any",
+			footprint = 150,
+			lifetime = 900,
+		},
+		-- The Crater Gorilla holds a large jungle clearing near the crater approaches (§54).
+		{
+			id = "CraterGorillaEvent",
+			name = "Crater Gorilla",
+			rarity = "Epic",
+			kind = K.Boss,
+			boss = "CraterGorilla",
+			biome = "InnerRing",
+			habitat = "Clearing",
 			footprint = 150,
 			lifetime = 900,
 		},

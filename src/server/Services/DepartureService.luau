@@ -1,7 +1,9 @@
 -- Death and active departure (GDD §29, Q156–157). When an at-risk player dies or
 -- leaves the world any way at all, their ordinary carried items go into ONE
 -- lootable body that lasts exactly 600 s; owned Permanent items go back to their
--- lobby backpack instead. Bodies are looted item by item. World place only.
+-- lobby backpack instead. Bodies are looted item by item; a looted stack keeps
+-- its carried count (GDD §53), so carried-in units stay unmultiplied for the
+-- looter too. World place only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -10,6 +12,7 @@ local RunService = game:GetService("RunService")
 
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
@@ -106,14 +109,16 @@ local function take(looter: Player, bodyId: any, index: any)
 		-- A looted unique item now belongs to the looter (still unsecured).
 		copy.ownerId = looter.UserId
 	end
-	local remaining = InventoryService.Add(looter, copy)
+	local remaining, carried = InventoryService.Add(looter, copy)
 	if copy.instanceId then
 		if remaining > 0 then
 			return false, "NoRoom"
 		end
 		DeathRules.Take(body.contents, index)
 	elseif remaining > 0 then
+		-- What stays on the body keeps its share of the carried units.
 		entry.quantity = remaining
+		InventoryRules.SetCarried(entry, carried)
 	else
 		DeathRules.Take(body.contents, index)
 	end

@@ -11,6 +11,7 @@ local TEXT = {
 	BoostActive = "a boost at least as strong is already running",
 	BackpackFull = "your lobby backpack has no room for that",
 	NotEnough = "your vault doesn't hold that many",
+	VaultWouldOverflow = "your vault can't hold all of that material",
 }
 
 function Reasons.Text(code: any): string

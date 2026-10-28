@@ -56,17 +56,50 @@ BossCatalog.Bosses = {
 		attacks = { "Slam", "Bolt", "Quake" },
 		loot = { { "IronOre", 40, 60, 1 }, { "AncientEmber", 1, 2, 1 } },
 	},
-	EmberTitan = {
-		name = "Ember Titan",
+	-- The roster's event boss (GDD §54): hostile, plenty of a large animal's meat,
+	-- hide and bone, the elite materials, and Inner Ring silver and cobalt.
+	CraterGorilla = {
+		name = "Crater Gorilla",
+		source = "Event",
+		health = 5000,
+		damage = 24,
+		speed = 15,
+		reach = 9,
+		size = Vector3.new(7, 9, 6),
+		color = Color3.fromRGB(58, 54, 56),
+		attacks = { "Slam", "Bolt", "Quake" },
+		loot = {
+			{ "RawMeat", 12, 18, 1 },
+			{ "Hide", 10, 14, 1 },
+			{ "Bone", 8, 12, 1 },
+			{ "DireHide", 2, 4, 1 },
+			{ "ChargedCore", 1, 2, 1 },
+			{ "GlowFur", 1, 2, 1 },
+			{ "SilverOre", 8, 14, 1 },
+			{ "CobaltOre", 5, 10, 1 },
+		},
+	},
+	-- The Shattered Keep's ritual boss (GDD §54): Inner Ring silver and cobalt in
+	-- bulk and the elite materials.
+	Minotaur = {
+		name = "Minotaur",
 		source = "Ritual",
 		health = 6000,
-		damage = 25,
-		speed = 10,
-		reach = 10,
-		size = Vector3.new(7, 14, 6),
-		color = Color3.fromRGB(255, 110, 40),
-		attacks = { "Slam", "Bolt" },
-		loot = { { "AncientEmber", 3, 5, 1 }, { "IronOre", 30, 50, 1 }, { "ExtractionRune", 1, 1, 0.05 } },
+		damage = 26,
+		speed = 13,
+		reach = 9,
+		size = Vector3.new(5.6, 11.2, 4.2),
+		color = Color3.fromRGB(90, 60, 40),
+		attacks = { "Slam", "Quake" },
+		loot = {
+			{ "SilverOre", 15, 25, 1 },
+			{ "CobaltOre", 10, 18, 1 },
+			{ "AncientEmber", 3, 5, 1 },
+			{ "DireHide", 2, 3, 1 },
+			{ "ChargedCore", 1, 2, 0.6 },
+			{ "GlowFur", 1, 2, 0.6 },
+			{ "ExtractionRune", 1, 1, 0.05 },
+		},
 	},
 	RaiderWarlord = {
 		name = "Raider Warlord",
@@ -83,10 +116,27 @@ BossCatalog.Bosses = {
 }
 
 -- What a ritual site asks for to summon its boss (consumed once on the server).
-BossCatalog.Ritual = { boss = "EmberTitan", offering = { AncientEmber = 3, IronOre = 50 }, summonSeconds = 10 }
+-- A site summons the ritual of its map zone, else the first one. The Minotaur is
+-- the Shattered Keep's ritual boss, and the Keep holds every altar (§54).
+BossCatalog.Rituals = {
+	{ boss = "Minotaur", zone = "ShatteredKeep", offering = { AncientEmber = 3, IronOre = 50 }, summonSeconds = 10 },
+}
 
 function BossCatalog.Get(bossId: any)
 	return type(bossId) == "string" and BossCatalog.Bosses[bossId] or nil
+end
+
+-- The ritual a site in `zoneId` (nil when unknown) performs.
+function BossCatalog.RitualFor(zoneId: string?)
+	local fallback = nil
+	for _, ritual in BossCatalog.Rituals do
+		if ritual.zone ~= nil and ritual.zone == zoneId then
+			return ritual
+		elseif ritual.zone == nil and fallback == nil then
+			fallback = ritual
+		end
+	end
+	return fallback or BossCatalog.Rituals[1]
 end
 
 return BossCatalog

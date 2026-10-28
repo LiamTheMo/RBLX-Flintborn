@@ -4,7 +4,10 @@
 -- Ordinary drops vanish after the body timer; Permanent drops stay until the world
 -- resets, when anything unclaimed is lost. Gathered drops from node hits (GDD §53)
 -- follow GroundDrops instead: the hitting player's for 10 s, gone after 2 minutes,
--- collected by walking over them or with Interact, within reach. World place only.
+-- collected by walking over them or with Interact, within reach of the player's
+-- last server-validated position. A dropped stack keeps its carried count (GDD
+-- §53), so carried-in units stay unmultiplied for whoever picks them up. World
+-- place only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -12,12 +15,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local GroundDrops = require(ReplicatedStorage.Shared.Resources.GroundDrops)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
@@ -157,8 +162,11 @@ function pickUp(player: Player, id: string, walked: boolean)
 		return
 	end
 	if drop.rules then
+		-- Reach counts from the last server-validated position, not wherever the
+		-- client put its own character.
 		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-		local distance = if root then (root.Position - drop.part.Position).Magnitude else math.huge
+		local position = root and (AntiExploitService.ValidatedPosition(player) or root.Position)
+		local distance = if position then (position - drop.part.Position).Magnitude else math.huge
 		local ok, reason = GroundDrops.CanClaim(drop.rules, player.UserId, distance, os.clock())
 		if not ok then
 			if reason == "Expired" then
@@ -173,7 +181,7 @@ function pickUp(player: Player, id: string, walked: boolean)
 	-- Claim first so a second, simultaneous pickup finds nothing.
 	drops[id] = nil
 	local copy = DropService.PrepareClaim(player, drop.item)
-	local remaining = InventoryService.Add(player, copy)
+	local remaining, carried = InventoryService.Add(player, copy)
 	if remaining > 0 and (copy.instanceId or remaining == (drop.item.quantity or 1)) then
 		drops[id] = drop
 		if not walked then
@@ -182,7 +190,9 @@ function pickUp(player: Player, id: string, walked: boolean)
 		return
 	end
 	if remaining > 0 then
+		-- What stays on the ground keeps its share of the carried units.
 		drop.item.quantity = remaining
+		InventoryRules.SetCarried(drop.item, carried)
 		drop.prompt.ObjectText = label(drop.item)
 		drops[id] = drop
 	else

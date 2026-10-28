@@ -1,7 +1,8 @@
 -- The secure vault (GDD §10.3, §53, Q96, Q122, Q151, Q154). 25 item slots (+25
 -- per upgrade, v0.14) and material storage of up to 1,000 per type. Item deposits
--- are manual and are refused when there is no room, never deleted. Material
--- deposits always go in: anything over the capacity is deleted (GDD §53). Item
+-- are manual and are refused when there is no room, never deleted. A material
+-- deposit that would go over the capacity is refused until the player confirms
+-- it, and then anything over the capacity is deleted (GDD §53). Item
 -- and material withdrawals go to the lobby backpack, which deploys on the next
 -- Play (Q155), materials included (GDD §53).
 
@@ -28,15 +29,34 @@ function VaultRules.BankMaterial(profile, catalogId: string, quantity: number, n
 	return over
 end
 
+-- How much of the material stack in a lobby backpack slot depositing it would
+-- delete for lack of vault capacity (0 for anything else).
+function VaultRules.DepositLoss(profile, backpackIndex: number): number
+	local item = profile.lobbyBackpack.slots[backpackIndex]
+	if item == nil or item.instanceId ~= nil or not ItemCatalog.IsMaterial(item.catalogId) then
+		return 0
+	end
+	local current = profile.vault.materials[item.catalogId] or 0
+	local _, over = GameConstants.SettleMaterialStack(current, math.max(0, item.quantity or 0))
+	return over
+end
+
+VaultRules.WOULD_OVERFLOW = "VaultWouldOverflow"
+
 -- Moves one lobby backpack slot into the vault. Returns (ok, reason). A material
--- stack banks whole, past the capacity included (BankMaterial).
-function VaultRules.Deposit(profile, backpackIndex: number, now: number?)
+-- stack banks whole; one that would go past the capacity is refused with
+-- WOULD_OVERFLOW (DepositLoss says how much) unless `allowOverflow` confirms the
+-- loss, and then the excess is deleted (BankMaterial).
+function VaultRules.Deposit(profile, backpackIndex: number, now: number?, allowOverflow: boolean?)
 	local slots = profile.lobbyBackpack.slots
 	local item = slots[backpackIndex]
 	if item == nil then
 		return false, "Empty"
 	end
 	if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
+		if not allowOverflow and VaultRules.DepositLoss(profile, backpackIndex) > 0 then
+			return false, VaultRules.WOULD_OVERFLOW
+		end
 		VaultRules.BankMaterial(profile, item.catalogId, item.quantity or 0, now or 0)
 		table.remove(slots, backpackIndex)
 		return true, nil

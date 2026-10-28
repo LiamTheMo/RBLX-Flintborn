@@ -313,10 +313,7 @@ local function rebuildWaypoints()
 		waypointPositions[id] = position
 	end
 	for _, entry in PoiCatalog.Landmarks do
-		-- The ridge rings the whole crater, so it has no single bearing.
-		if entry.style ~= "Ridge" then
-			add("landmark:" .. entry.id, "icon_mountain", PoiCatalog.Position(entry))
-		end
+		add("landmark:" .. entry.id, "icon_mountain", PoiCatalog.Position(entry))
 	end
 	for _, entry in PoiCatalog.SafeZones do
 		add("camp:" .. entry.id, "icon_tower", PoiCatalog.Position(entry))

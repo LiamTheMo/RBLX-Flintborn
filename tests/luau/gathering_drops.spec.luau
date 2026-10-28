@@ -1,6 +1,7 @@
 -- Gathering by node health and ground drops (GDD §53).
 local Shared = game:GetService("ReplicatedStorage").Shared
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
+local BossCatalog = require(Shared.Bosses.BossCatalog)
 local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
 local GameConstants = require(Shared.GameConstants)
 local GroundDrops = require(Shared.Resources.GroundDrops)
@@ -218,26 +219,36 @@ test("only the hitter may take a ground drop for 10 s; it lasts 2 minutes", func
 	expect(not ok and reason == "Expired", "an expired drop can't be taken")
 end)
 
-test("every biome has the basics; new nodes sit in fitting biomes", function()
+test("every zone has the basics; new nodes sit in fitting zones (GDD §53, §54)", function()
 	local basics = { "Tree", "Rock", "FiberPlant", "HerbShrub", "RedberryBush", "SweetberryBush" }
-	for name, biome in BiomeCatalog.Biomes do
+	for name, zone in BiomeCatalog.Zones do
 		for _, nodeType in basics do
-			expect((biome.resources[nodeType] or 0) > 0, name .. " has " .. nodeType)
+			expect((zone.resources[nodeType] or 0) > 0, name .. " has " .. nodeType)
+		end
+	end
+	-- Fewer basics deeper in: every Extreme zone has fewer trees than any Low zone.
+	for _, deep in BiomeCatalog.ZonesIn("CenterCrater") do
+		for _, outer in BiomeCatalog.ZonesIn("OuterRim") do
+			expect(
+				BiomeCatalog.Zones[deep].resources.Tree < BiomeCatalog.Zones[outer].resources.Tree,
+				deep .. " has fewer trees than " .. outer
+			)
 		end
 	end
 	local homes = {
-		ClayDeposit = { Beach = true, Woodland = true },
-		AmethystGeode = { Jungle = true },
-		StarstoneOutcrop = { Caldera = true },
-		StormglassCluster = { Caldera = true },
-		CaveMushroomPatch = { Woodland = true, Jungle = true },
-		RedcapMushroomPatch = { Woodland = true, Jungle = true },
-		ChestnutMushroomPatch = { Woodland = true, Jungle = true },
+		ClayDeposit = { Rimlands = true, MosswickForest = true, Riverlands = true, CraterLake = true },
+		AmethystGeode = { EmberhollowCaves = true, FallenTemple = true },
+		StarstoneOutcrop = { FrostpeakRidge = true, CraterLake = true, ShatteredKeep = true },
+		StormglassCluster = { FrostpeakRidge = true, CraterLake = true },
+		FrostShrub = { FrostpeakRidge = true },
+		CaveMushroomPatch = { PinewoodWilds = true, MosswickForest = true, EmberhollowCaves = true },
+		RedcapMushroomPatch = { MosswickForest = true, Timberwatch = true, FallenTemple = true },
+		ChestnutMushroomPatch = { PinewoodWilds = true, MosswickForest = true, Timberwatch = true },
 	}
 	for nodeType, allowed in homes do
 		local found = 0
-		for name, biome in BiomeCatalog.Biomes do
-			if biome.resources[nodeType] then
+		for name, zone in BiomeCatalog.Zones do
+			if zone.resources[nodeType] then
 				found += 1
 				expect(allowed[name], nodeType .. " does not belong in " .. name)
 			end
@@ -283,29 +294,38 @@ test("the new materials are bankable, sellable and never traded", function()
 	end
 end)
 
-test("creatures drop ore by where they live", function()
-	local function ores(enemyId: string)
+test("creatures drop ore by where they live (GDD §54)", function()
+	local function ores(drops)
 		local found = {}
-		for _, row in EnemyCatalog.Get(enemyId).drops do
+		for _, row in drops do
 			if row[1]:match("Ore$") then
 				found[row[1]] = row
 			end
 		end
 		return found
 	end
-	for _, enemyId in { "Wolf", "Boar", "Sabertooth", "EmberWisp" } do
-		expect(next(ores(enemyId)) == nil, enemyId .. " drops no ore")
+	-- Animals never drop ore, except the Stonehide Rhino's little iron.
+	for enemyId, enemy in EnemyCatalog.Enemies do
+		if (enemy.theme == "Primitive" or enemy.theme == "Ancient") and enemyId ~= "StonehideRhino" then
+			expect(next(ores(enemy.drops)) == nil, enemyId .. " drops no ore")
+		end
 	end
-	local skeleton = ores("Skeleton")
+	expect(next(ores(EnemyCatalog.Get("EmberWisp").drops)) == nil, "Ember Wisps drop no ore")
+	local rhino = ores(EnemyCatalog.Get("StonehideRhino").drops)
+	expect(rhino.IronOre and next(rhino, next(rhino)) == nil, "the Rhino drops only iron")
+	expect(rhino.IronOre[3] <= 5, "a little iron")
+	local skeleton = ores(EnemyCatalog.Get("Skeleton").drops)
 	expect(skeleton.CopperOre and skeleton.IronOre, "Skeletons carry copper and iron")
-	expect(skeleton.SilverOre == nil, "no silver on Skeletons")
-	local bandit = ores("Bandit")
-	expect(bandit.CopperOre and bandit.IronOre and bandit.SilverOre, "Raiders carry copper, iron and some silver")
-	expect(bandit.SilverOre[4] <= 0.15, "silver is a small chance")
-	local minotaur = ores("Minotaur")
+	expect(skeleton.SilverOre == nil, "no silver on Fallen Temple Skeletons")
+	local keep = ores(EnemyCatalog.Get("KeepSkeleton").drops)
+	expect(keep.CopperOre and keep.IronOre and keep.SilverOre, "Keep Skeletons add silver")
+	expectEq(EnemyCatalog.Get("Bandit"), nil, "Bandits are gone")
+	local minotaur = ores(BossCatalog.Get("Minotaur").loot)
 	expect(minotaur.SilverOre and minotaur.CobaltOre, "the Minotaur hoards silver and cobalt")
 	expect(minotaur.IronOre == nil, "no more iron from the Minotaur")
 	expect(minotaur.SilverOre[2] + minotaur.CobaltOre[2] >= 10, "in bulk")
+	local gorilla = ores(BossCatalog.Get("CraterGorilla").loot)
+	expect(gorilla.SilverOre and gorilla.CobaltOre, "the Crater Gorilla drops silver and cobalt")
 end)
 
 test("Fiber is a planter crop; the rare berries stay wild", function()

@@ -1,8 +1,9 @@
 -- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53). The Vault button on the
 -- navigation bar opens the panel: click a backpack item to deposit it or a vault
 -- item to withdraw it. A vault material withdraws the amount picked above the
--- materials list (1, 10, 100 or all) into the backpack, to deploy with it. The
--- latest extraction receipt shows on arrival. The Backpack key (Tab by default,
+-- materials list (1, 10, 100 or all) into the backpack, to deploy with it. A
+-- material deposit the vault cannot hold in full asks first how much it would
+-- delete (GDD §53). The latest extraction receipt shows on arrival. The Backpack key (Tab by default,
 -- GDD §46) opens and closes the panel, as it opens the backpack in a run.
 -- Lobby place only.
 
@@ -35,11 +36,11 @@ local function make(className: string, props, parent)
 end
 
 local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
+	local ok, success, reason, detail = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
 	if not ok then
 		return false, "Request failed"
 	end
-	return success, reason
+	return success, reason, detail
 end
 
 local function clear(frame)
@@ -84,6 +85,47 @@ local function act(name: string, ...)
 	refresh()
 end
 
+-- The deposit waiting for "deposit anyway": {index, catalogId, quantity}.
+local pendingDeposit = nil
+
+local function hideConfirm()
+	pendingDeposit = nil
+	ui.confirm.Visible = false
+end
+
+-- Deposits a backpack slot. When the vault cannot hold all of a material, asks
+-- first how much would be deleted.
+local function deposit(index: number, item)
+	hideConfirm()
+	local ok, reason, lost = invoke("VaultDeposit", index)
+	if not ok and reason == "VaultWouldOverflow" and type(lost) == "number" then
+		pendingDeposit = { index = index, catalogId = item.catalogId, quantity = item.quantity }
+		ui.confirmText.Text = ("Your vault is nearly full: %d %s would be deleted. Deposit anyway?"):format(
+			lost,
+			item.name
+		)
+		ui.confirm.Visible = true
+		ui.status.Text = ""
+		return
+	end
+	ui.status.Text = if ok then "Done." else ("Not possible: " .. Reasons.Text(reason))
+	refresh()
+end
+
+-- "Deposit anyway": only while that slot still holds the same stack.
+local function confirmDeposit()
+	local pending = pendingDeposit
+	hideConfirm()
+	local view = pending and invoke("VaultSnapshot")
+	local item = type(view) == "table" and view.backpack[pending.index]
+	if item == nil or item.catalogId ~= pending.catalogId or item.quantity ~= pending.quantity then
+		ui.status.Text = "Your backpack changed; nothing was deposited."
+		refresh()
+		return
+	end
+	act("VaultDeposit", pending.index, true)
+end
+
 function refresh()
 	local view = invoke("VaultSnapshot")
 	if type(view) ~= "table" then
@@ -100,7 +142,7 @@ function refresh()
 	ui.itemsTitle.Text = ("Vault: safe forever (%d/%d) · click to withdraw"):format(#view.items, view.itemCapacity)
 	for index, item in view.backpack do
 		row(ui.backpack, itemText(item), Rarity.Colors[item.rarity] or Color3.new(1, 1, 1), function()
-			act("VaultDeposit", index)
+			deposit(index, item)
 		end)
 	end
 	for index, item in view.items do
@@ -231,12 +273,50 @@ local function build()
 	}, ui.panel)
 	close.Activated:Connect(function()
 		ui.panel.Visible = false
+		hideConfirm()
 	end)
 	ui.backpackTitle, ui.backpack = column(ui.panel, 0, "Lobby backpack")
 	ui.itemsTitle, ui.items = column(ui.panel, 1 / 3, "Vault items")
 	local _, materials = column(ui.panel, 2 / 3, "Vault materials · click to take", 86)
 	ui.materials = materials
 	buildSteps(ui.panel, 2 / 3, 58)
+	-- "N would be deleted — deposit anyway?" above the status line.
+	ui.confirm = make("Frame", {
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 10, 1, -32),
+		Size = UDim2.new(1, -20, 0, 30),
+		BackgroundColor3 = Color3.fromRGB(70, 34, 28),
+		Visible = false,
+		ZIndex = 3,
+	}, ui.panel)
+	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.confirm)
+	ui.confirmText = make("TextLabel", {
+		Text = "",
+		Position = UDim2.fromOffset(8, 0),
+		Size = UDim2.new(1, -196, 1, 0),
+		BackgroundTransparency = 1,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		TextColor3 = Color3.fromRGB(255, 214, 200),
+		Font = Enum.Font.GothamMedium,
+		TextSize = 13,
+		ZIndex = 3,
+	}, ui.confirm)
+	for order, choice in { { "Deposit anyway", confirmDeposit }, { "Cancel", hideConfirm } } do
+		local button = make("TextButton", {
+			Text = choice[1],
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, if order == 1 then -76 else -4, 0.5, 0),
+			Size = UDim2.fromOffset(if order == 1 then 110 else 68, 24),
+			BackgroundColor3 = if order == 1 then Color3.fromRGB(150, 60, 44) else Color3.fromRGB(70, 56, 40),
+			TextColor3 = Color3.fromRGB(245, 236, 222),
+			Font = Enum.Font.GothamBold,
+			TextSize = 13,
+			ZIndex = 3,
+		}, ui.confirm)
+		make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
+		button.Activated:Connect(choice[2])
+	end
 	ui.status = make("TextLabel", {
 		Text = "",
 		AnchorPoint = Vector2.new(0, 1),
@@ -322,6 +402,7 @@ end
 -- Opens or closes this panel (keys, and the on-screen navigation bar).
 function VaultController.Toggle()
 	ui.panel.Visible = not ui.panel.Visible
+	hideConfirm()
 	if ui.panel.Visible then
 		ui.status.Text = ""
 		refresh()

@@ -4,6 +4,7 @@
 -- Play consumes it exactly once; any failure before that rolls it back. These
 -- functions run inside ProfileService operations.
 
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 
 local TransitRules = {}
@@ -41,14 +42,16 @@ function TransitRules.Reserve(profile, reservationId: string, now: number)
 	return reservationId
 end
 
--- Hands the reserved items to the starting run and clears the reservation.
+-- Hands the reserved items to the starting run and clears the reservation. Every
+-- material stack leaves the lobby tagged carried in whole, so the Center bonus
+-- never multiplies it, whoever extracts it (GDD §53).
 function TransitRules.Consume(profile, reservationId: string)
 	local transit = profile.transit
 	if transit == nil or transit.reservationId ~= reservationId then
 		error("No matching transit reservation")
 	end
 	profile.transit = nil
-	return transit.items
+	return InventoryRules.MarkCarried(transit.items)
 end
 
 -- Returns reserved items to the lobby backpack. A missing reservation is a no-op.
