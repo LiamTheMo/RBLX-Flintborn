@@ -21,10 +21,35 @@ accelerations in studs, rates in particles/second, angles in degrees. Two-value
 lists are NumberRanges (min, max); longer `size`/`transparency`/`color` lists are
 sequences with evenly spaced keypoints over the particle's life. Multiply Size,
 Speed, Acceleration, shape and light Range by the socket's `vfx_scale`.
+
+Beams. A kind may also have `beams`: Roblox Beams running from the socket
+(Attachment0) to an END point (Attachment1), for falling water, flowing streaks
+and other ribbons. Beam kinds need the end point:
+
+    vfx.add(obj, "waterfall_curtain", (0, -2, 20), end=(0, -3, 1), width=8)
+
+`end` is in the same asset-local Blender studs as `loc`. The socket stores it as
+`vfx_end` (Blender local) and gets a child Empty `<socket>_End` there; the
+`roblox` JSON gets `end` (Roblox axes, relative to the socket), `axis` and
+`normal` (Roblox unit vectors: set both Attachments so their Axis / RightVector
+is `axis`, the direction CurveSize0/1 bend along, and their SecondaryAxis /
+UpVector is `normal`, the face direction of a beam with FaceCamera false). By
+default `axis` is the start->end direction and `normal` faces up for flat beams
+(water_flow) or toward the asset front (Blender -Y) for steep ones (falls);
+`normal=` / `axis=` override them (Blender local). `width=` sets the first
+beam's Width0 and scales the others (and any emitter with `shape_follows_width`)
+to match. Beam keys: name, texture, color / transparency (sequences along the
+beam from start to end), width0, width1, texture_speed (studs/s, positive scrolls
+from start to end), texture_length (studs per tile), texture_mode
+(Wrap/Stretch/Static), light_emission, light_influence, segments, face_camera,
+and optional curve0 / curve1 (CurveSize0/1). The texture's horizontal axis (u)
+runs along the beam, its vertical axis (v) across the width. Multiply Width0/1
+and TextureLength by `vfx_scale`.
 """
 
 import json
 import math
+import os
 import random
 import zlib
 
@@ -154,6 +179,90 @@ KINDS = {
         ],
         "light": None,
     },
+    # -- falling and flowing water, vapour. Beam kinds need vfx.add(..., end=(x, y, z)).
+    "waterfall_curtain": {  # socket on the top lip, end where the fall meets the pool
+        "emitters": [
+            {"name": "Spray", "texture": "splash_droplets", "color": ["#FFFFFF", "#D8F1FA"], "size": [0.7, 1.5],
+             "transparency": [0.35, 1.0], "lifetime": [0.4, 0.8], "rate": 8, "speed": [1.0, 2.5], "spread": 40,
+             "light_emission": 0.15, "acceleration": [0, -25, 0], "rotation": [-30, 30],
+             "shape": [7.0, 0.3, 0.5], "shape_follows_width": 0.9},
+        ],
+        "beams": [
+            # the body of the fall: bold streaks scrolling down
+            {"name": "Fall", "texture": "waterfall_streaks", "color": ["#FFFFFF", "#D4F1FB"],
+             "transparency": [0.2, 0.15, 0.3], "width0": 8.0, "width1": 9.0, "texture_speed": 15.0,
+             "texture_length": 10.0, "texture_mode": "Wrap", "light_emission": 0.25, "light_influence": 0.7,
+             "segments": 12, "face_camera": False},
+            # a fainter, faster sheen layer in front: two speeds read as depth
+            {"name": "Sheen", "texture": "waterfall_streaks", "color": ["#FFFFFF", "#E8F8FD"],
+             "transparency": [0.6, 0.5, 0.7], "width0": 6.8, "width1": 7.8, "texture_speed": 22.0,
+             "texture_length": 6.0, "texture_mode": "Wrap", "light_emission": 0.35, "light_influence": 0.6,
+             "segments": 12, "face_camera": False},
+        ],
+        "light": None,
+    },
+    "water_flow": {  # flat streaks on a river or stream surface; start -> end = the flow direction
+        "emitters": [],
+        "beams": [
+            {"name": "Streaks", "texture": "water_streaks", "color": ["#FFFFFF", "#E6F7FC"],
+             "transparency": [0.92, 0.72, 0.72, 0.92], "width0": 6.0, "width1": 6.0, "texture_speed": 4.0,
+             "texture_length": 8.0, "texture_mode": "Wrap", "light_emission": 0.1, "light_influence": 0.8,
+             "segments": 4, "face_camera": False},
+        ],
+        "light": None,
+    },
+    "vapour": {  # soft white rising steam / water-spray haze (not the grey chimney_smoke)
+        "emitters": [
+            {"name": "Vapour", "texture": "mist_soft", "color": ["#FFFFFF", "#EEF8FB"], "size": [3.0, 9.0],
+             "transparency": [0.85, 0.72, 1.0], "lifetime": [4, 7], "rate": 3, "speed": [0.8, 1.6], "spread": 20,
+             "light_emission": 0.15, "drag": 0.4, "acceleration": [0.2, 0.6, 0], "rotation": [0, 360],
+             "rot_speed": [-10, 10], "shape": [3.0, 0.5, 3.0]},
+            {"name": "Wisps", "texture": "smoke_puff", "color": ["#FFFFFF", "#F4FAFC"], "size": [1.5, 4.0],
+             "transparency": [0.8, 1.0], "lifetime": [2.5, 4.0], "rate": 2, "speed": [1.5, 2.5], "spread": 15,
+             "light_emission": 0.1, "drag": 0.3, "acceleration": [0.1, 0.4, 0], "rotation": [0, 360],
+             "rot_speed": [-15, 15]},
+        ],
+        "light": None,
+    },
+    # -- world kit: harvesting. `burst` emitters have rate 0 and fire
+    # ParticleEmitter:Emit(burst) when the socket's `trigger` event happens
+    # ("hit" = each tool strike, "deplete" = the node empties). Override `color`
+    # per material, e.g. vfx.add(obj, "harvest_hit", loc, color=["#E2713A", "#B8542A"]).
+    "harvest_hit": {
+        "trigger": "hit",
+        "emitters": [
+            {"name": "Chips", "texture": "rock_chip", "color": ["#B9B1AB", "#8F8B8F"], "size": [0.45, 0.25],
+             "transparency": [0, 0, 1], "lifetime": [0.5, 0.9], "rate": 0, "burst": 8, "speed": [7, 12],
+             "spread": 55, "light_emission": 0.0, "acceleration": [0, -35, 0], "rotation": [0, 360],
+             "rot_speed": [-360, 360]},
+            {"name": "Dust", "texture": "smoke_puff", "color": ["#CFC6BE", "#B3AAA2"], "size": [0.8, 2.2],
+             "transparency": [0.45, 1.0], "lifetime": [0.6, 1.1], "rate": 0, "burst": 4, "speed": [1.5, 3],
+             "spread": 70, "light_emission": 0.0, "drag": 3.0, "rotation": [0, 360], "rot_speed": [-40, 40]},
+        ],
+        "light": None,
+    },
+    "harvest_deplete": {
+        "trigger": "deplete",
+        "emitters": [
+            {"name": "Chips", "texture": "rock_chip", "color": ["#B9B1AB", "#8F8B8F"], "size": [0.7, 0.35],
+             "transparency": [0, 0, 1], "lifetime": [0.7, 1.2], "rate": 0, "burst": 18, "speed": [8, 15],
+             "spread": 80, "light_emission": 0.0, "acceleration": [0, -35, 0], "rotation": [0, 360],
+             "rot_speed": [-360, 360], "shape": [3.0, 1.0, 3.0]},
+            {"name": "Dust", "texture": "smoke_puff", "color": ["#D6CEC6", "#B3AAA2"], "size": [2.0, 5.0],
+             "transparency": [0.35, 1.0], "lifetime": [1.0, 1.8], "rate": 0, "burst": 10, "speed": [2, 4],
+             "spread": 90, "light_emission": 0.0, "drag": 2.5, "rotation": [0, 360], "rot_speed": [-30, 30],
+             "shape": [3.0, 0.5, 3.0]},
+        ],
+        "light": None,
+    },
+    "ore_glint": {  # sparse twinkles on ore inserts; set color to the ore
+        "emitters": [
+            {"name": "Glint", "texture": "spark_diamond", "color": ["#FFF4D6", "#FFD9A8"], "size": [0, 0.5, 0],
+             "transparency": [0.1, 1.0], "lifetime": [0.5, 0.8], "rate": 0.8, "speed": [0, 0], "spread": 0,
+             "light_emission": 1.0, "rotation": [0, 90], "shape": [2.0, 1.5, 2.0]},
+        ],
+        "light": None,
+    },
     "dust": {  # gate threshold, path ends: very sparse floating motes
         "emitters": [
             {"name": "Dust", "texture": "dust_mote", "color": ["#F3E1B8", "#E2C890"], "size": [0.3, 0.12],
@@ -178,6 +287,13 @@ TEXTURES = {
     "splash_droplets": {"size": 256, "tint": True, "about": "fan of faceted water droplets"},
     "foam_patch": {"size": 512, "tint": True, "about": "flat white foam swirl, seen from above"},
     "dust_mote": {"size": 128, "tint": True, "about": "tiny soft mote"},
+    "rock_chip": {"size": 256, "tint": True, "about": "cluster of three faceted stone chips, white-grey"},
+    # Beam textures: u (width) runs along the beam, v (height) across it; both tile.
+    "waterfall_streaks": {"size": 512, "height": 256, "tint": True, "tile": "uv",
+                          "about": "falling-water streak bands and foam flecks, white / pale blue on transparent; "
+                                   "streaks run along u (the beam), tiles both ways"},
+    "water_streaks": {"size": 256, "tint": True, "tile": "uv",
+                      "about": "sparse thin flow streaks on transparent, along u; tiles both ways"},
 }
 
 # Which assets carry which sockets, as built into the sheet .blend files
@@ -208,12 +324,56 @@ ASSET_SOCKETS = [
 ]
 
 
-def add(obj, kind, loc, scale=1.0, name=None, **overrides):
-    """Attach a VFX socket to `obj` at local `loc` (studs). Returns the Empty."""
+def _to_rbx(v):
+    """Blender (x, y, z up) -> Roblox (x, y up, z)."""
+    return [round(float(v[0]), 4) + 0.0, round(float(v[2]), 4) + 0.0, round(-float(v[1]), 4) + 0.0]
+
+
+def beam_frame(direction, face_camera=False, normal=None, axis=None):
+    """(axis, normal) unit vectors in Blender space for a beam along `direction`:
+    axis = the curve direction (default: along the beam), normal = the beam's face
+    (default: up for a flat beam, the asset front -Y for a steep one), made
+    perpendicular to the axis."""
+    d = Vector(direction)
+    d = d.normalized() if d.length > 1e-6 else Vector((0, 0, -1))
+    ax = Vector(axis).normalized() if axis is not None and Vector(axis).length > 1e-6 else d
+    if normal is not None and Vector(normal).length > 1e-6:
+        n = Vector(normal)
+    elif face_camera:
+        n = Vector((math.sin(math.radians(-22)), -math.cos(math.radians(-22)), math.tan(math.radians(20))))
+    else:
+        n = Vector((0, 0, 1)) if abs(d.z) < 0.5 else Vector((0, -1, 0))
+    n = n - ax * n.dot(ax)
+    if n.length < 1e-4:  # normal along the axis: pick any perpendicular
+        n = ax.orthogonal()
+    return ax, n.normalized()
+
+
+def add(obj, kind, loc, scale=1.0, name=None, end=None, normal=None, axis=None, **overrides):
+    """Attach a VFX socket to `obj` at local `loc` (studs). Returns the Empty.
+
+    Kinds with `beams` need `end` (asset-local studs, like `loc`): the beam runs
+    from the socket to it. `normal` / `axis` (Blender local vectors) override the
+    beam orientation, `width=` the beam width (see the module docstring). Other
+    keyword arguments replace top-level keys of the kind's spec (color, emitters...).
+    """
     if kind not in KINDS:
         raise ValueError(f"unknown VFX kind {kind!r}; use one of {sorted(KINDS)}")
     spec = json.loads(json.dumps(KINDS[kind]))
+    width = overrides.pop("width", None)
     spec.update(overrides)
+    beams = spec.get("beams") or []
+    if beams and end is None:
+        raise ValueError(f"VFX kind {kind!r} has beams: pass end=(x, y, z), the beam's end point in asset studs")
+    if width is not None and beams:
+        base = float(beams[0].get("width0", 1.0)) or 1.0
+        for b in beams:
+            k = float(width) / base
+            b["width0"] = round(float(b.get("width0", base)) * k, 3)
+            b["width1"] = round(float(b.get("width1", b["width0"])) * k, 3)
+        for em in spec.get("emitters", []):
+            if em.get("shape_follows_width") and em.get("shape"):
+                em["shape"][0] = round(float(width) * float(em["shape_follows_width"]), 3)
     empty = bpy.data.objects.new(name or f"VFX_{kind}", None)
     empty.empty_display_type = "SPHERE"
     empty.empty_display_size = 0.4 * scale
@@ -223,8 +383,40 @@ def add(obj, kind, loc, scale=1.0, name=None, **overrides):
     empty.location = loc
     empty["vfx_kind"] = kind
     empty["vfx_scale"] = float(scale)
+    if end is not None:
+        rel = Vector(end) - Vector(loc)
+        face_camera = bool(beams and beams[0].get("face_camera"))
+        ax, n = beam_frame(rel, face_camera, normal, axis)
+        spec["end"] = _to_rbx(rel)
+        spec["axis"] = _to_rbx(ax)
+        spec["normal"] = _to_rbx(n)
+        empty["vfx_end"] = [float(c) for c in end]
+        empty["vfx_axis"] = [float(c) for c in ax]
+        empty["vfx_normal"] = [float(c) for c in n]
+        tip = bpy.data.objects.new(f"{empty.name}_End", None)
+        tip.empty_display_type = "CONE"
+        tip.empty_display_size = 0.3 * scale
+        for coll in obj.users_collection:
+            coll.objects.link(tip)
+        tip.parent = empty
+        tip.location = rel
+        tip["vfx_end_of"] = empty.name
     empty["roblox"] = json.dumps(spec)
     return empty
+
+
+def end_of(socket):
+    """A beam socket's end point relative to the socket (Blender, socket space), or None."""
+    for c in socket.children:
+        if c.get("vfx_end_of"):
+            return Vector(c.location)
+    if socket.get("vfx_end") is not None:
+        return Vector(socket["vfx_end"]) - Vector(socket.location)
+    try:
+        e = json.loads(socket.get("roblox", "{}")).get("end")
+    except ValueError:
+        e = None
+    return _rb(e) if e else None
 
 
 def sockets(obj):
@@ -242,6 +434,15 @@ def catalog():
             "length are sequences with evenly spaced keypoints over the particle life.",
             "Multiply Size, Speed, Acceleration, shape and light Range by the socket's vfx_scale.",
             "Texture names refer to art/vfx/textures/<name>.png; upload them and swap in rbxassetid://<id>.",
+            "Beams: one Beam per entry of a kind's `beams`, from an Attachment at the socket (Attachment0) to "
+            "one at socket position + `end` (Attachment1). Orient both Attachments with Axis = `axis` and "
+            "SecondaryAxis = `normal` (the face of a beam with FaceCamera false). color/transparency are "
+            "sequences from Attachment0 to Attachment1. Width0/Width1 and TextureLength scale with vfx_scale.",
+            "Beam texture_speed is in studs/second along the beam (positive = start to end). Roblox does not "
+            "document TextureSpeed's unit; if it is texture lengths per second, set TextureSpeed = "
+            "texture_speed / texture_length (verify once in Studio).",
+            "Beam textures put u (the image's width) along the beam and v across it.",
+            "Emitters with shape_follows_width already have shape[0] set from the socket's width override.",
         ],
         "textures": TEXTURES,
         "kinds": KINDS,
@@ -272,8 +473,14 @@ _STAND_IN = {
     "mist_soft": ("mist", "mound"),
     "splash_droplets": ("solid", "droplets"),
     "foam_patch": ("solid", "foam"),
+    "rock_chip": ("solid", "chips"),
     "fire_flipbook_4x4": (None, None),  # the asset mesh already carries the flame
+    # beam textures: drawn as textured strips by _beam_strip, never as particles
+    "waterfall_streaks": (None, None),
+    "water_streaks": (None, None),
 }
+BEAM_PREVIEW_SEGMENTS = 16  # at most this many quads along a previewed beam
+TEXTURE_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "vfx", "textures"))
 
 
 def _lin(h):
@@ -406,6 +613,123 @@ def _material(look):
     return mat
 
 
+def _beam_material(texture, light_emission):
+    """Blended, double-sided material for beam strips: the beam's texture PNG (from
+    art/vfx/textures, tiled by the strip's UVs) x the VFXCol colour/alpha, lit but
+    with an emission floor so the water reads in any light."""
+    le = round(float(light_emission or 0.0), 2)
+    name = f"{PREVIEW_PREFIX}beam_{texture}_{int(le * 100)}"
+    mat = bpy.data.materials.get(name)
+    if mat:
+        return mat
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    nt = mat.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nt.nodes.new("ShaderNodeBsdfPrincipled")
+    attr = nt.nodes.new("ShaderNodeAttribute")
+    attr.attribute_name = "VFXCol"
+    attr.attribute_type = "GEOMETRY"
+    colour, alpha = attr.outputs["Color"], attr.outputs["Alpha"]
+    path = os.path.join(TEXTURE_DIR, texture + ".png")
+    if os.path.exists(path):
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = bpy.data.images.load(path, check_existing=True)
+        tex.extension = "REPEAT"
+        tex.interpolation = "Linear"
+        uv = nt.nodes.new("ShaderNodeUVMap")
+        uv.uv_map = "UVMap"
+        nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
+        mix = nt.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.blend_type = "MULTIPLY"
+        mix.inputs["Factor"].default_value = 1.0
+        nt.links.new(tex.outputs["Color"], mix.inputs["A"])
+        nt.links.new(colour, mix.inputs["B"])
+        mul = nt.nodes.new("ShaderNodeMath")
+        mul.operation = "MULTIPLY"
+        nt.links.new(tex.outputs["Alpha"], mul.inputs[0])
+        nt.links.new(alpha, mul.inputs[1])
+        colour, alpha = mix.outputs["Result"], mul.outputs[0]
+    nt.links.new(colour, bsdf.inputs["Base Color"])
+    nt.links.new(colour, bsdf.inputs["Emission Color"])
+    nt.links.new(alpha, bsdf.inputs["Alpha"])
+    bsdf.inputs["Roughness"].default_value = 0.35
+    bsdf.inputs["Emission Strength"].default_value = 0.3 + 0.8 * le
+    nt.links.new(bsdf.outputs[0], out.inputs["Surface"])
+    for attr_name, val in (("surface_render_method", "BLENDED"), ("use_backface_culling", False),
+                           ("use_transparency_overlap", True), ("use_transparent_shadow", True)):
+        if hasattr(mat, attr_name):
+            setattr(mat, attr_name, val)
+    return mat
+
+
+def _bezier(p0, p1, p2, p3, t):
+    s = 1 - t
+    return p0 * s ** 3 + p1 * 3 * s * s * t + p2 * 3 * s * t * t + p3 * t ** 3
+
+
+def _beam_strip(s, beam, layer, scale):
+    """A textured quad strip previewing one Roblox Beam of socket `s`: start at the
+    socket, end at its end point, Width0 -> Width1, CurveSize0/1 along the axis,
+    u along the beam (TextureLength studs per tile in Wrap mode), v across it.
+    Returns the mesh object (socket space, unparented) or None without an end."""
+    rel = end_of(s)
+    if rel is None:
+        return None
+    face_camera = bool(beam.get("face_camera"))
+    if s.get("vfx_axis") is not None and s.get("vfx_normal") is not None and not face_camera:
+        ax, n = Vector(s["vfx_axis"]), Vector(s["vfx_normal"])
+    else:
+        ax, n = beam_frame(rel, face_camera)
+    p0, p3 = Vector((0, 0, 0)), Vector(rel)
+    p1 = p0 + ax * float(beam.get("curve0", 0.0))
+    p2 = p3 - ax * float(beam.get("curve1", 0.0))
+    segs = max(1, min(int(beam.get("segments", 10)), BEAM_PREVIEW_SEGMENTS))
+    w0 = float(beam.get("width0", 1.0)) * scale
+    w1 = float(beam.get("width1", beam.get("width0", 1.0))) * scale
+    tile = max(float(beam.get("texture_length", 1.0)) * scale, 1e-3)
+    mode = beam.get("texture_mode", "Wrap")
+    lift = n * 0.04 * (layer + 1)  # layered beams sit just in front of one another
+    bm = bmesh.new()
+    col = bm.loops.layers.float_color.new("VFXCol")
+    uvl = bm.loops.layers.uv.new("UVMap")
+    rows, dist, prev = [], 0.0, None
+    for i in range(segs + 1):
+        t = i / segs
+        p = _bezier(p0, p1, p2, p3, t)
+        tan = _bezier(p0, p1, p2, p3, min(1.0, t + 1e-3)) - _bezier(p0, p1, p2, p3, max(0.0, t - 1e-3))
+        side = tan.cross(n)
+        if side.length < 1e-6:
+            side = ax.cross(n)
+        side.normalize()
+        if prev is not None:
+            dist += (p - prev).length
+        prev = p
+        w = w0 + (w1 - w0) * t
+        u = t if mode == "Stretch" else dist / tile
+        c = _seq(beam.get("color", ["#FFFFFF"]), t)
+        a = 1.0 - _seq(beam.get("transparency", [0.0]), t)[0]
+        left = bm.verts.new(p - side * w / 2 + lift)
+        right = bm.verts.new(p + side * w / 2 + lift)
+        rows.append(((left, (u, 0.0)), (right, (u, 1.0)), (c[0], c[1], c[2], a)))
+    for (l0, r0, c0), (l1, r1, c1) in zip(rows, rows[1:]):
+        f = bm.faces.new((l0[0], r0[0], r1[0], l1[0]))
+        f.smooth = False
+        for lp, (uvv, cc) in zip(f.loops, ((l0[1], c0), (r0[1], c0), (r1[1], c1), (l1[1], c1))):
+            lp[uvl].uv = uvv
+            lp[col] = cc
+    me = bpy.data.meshes.new(f"{PREVIEW_PREFIX}{s.name}_{beam.get('name', 'Beam')}")
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(_beam_material(beam.get("texture", ""), beam.get("light_emission", 0.0)))
+    mo = bpy.data.objects.new(me.name, me)
+    if hasattr(mo, "visible_shadow"):
+        mo.visible_shadow = False
+    return mo
+
+
 def _shape(bm, shape, size, rng, vel):
     """Add one stand-in particle of `shape` at the origin; returns its verts."""
     if shape in ("diamond", "mote"):
@@ -444,6 +768,18 @@ def _shape(bm, shape, size, rng, vel):
             bmesh.ops.translate(bm, verts=vs, vec=off)
             out += vs
         return out
+    if shape == "chips":  # a few faceted stone chips, like the rock_chip texture
+        out = []
+        for _ in range(3):
+            r = size * rng.uniform(0.12, 0.2)
+            vs = bmesh.ops.create_icosphere(bm, subdivisions=0, radius=r)["verts"]
+            sq = (rng.uniform(0.7, 1.3), rng.uniform(0.7, 1.3), rng.uniform(0.5, 0.9))
+            for v in vs:
+                v.co = Vector((v.co.x * sq[0], v.co.y * sq[1], v.co.z * sq[2]))
+            off = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1))) * size * 0.3
+            bmesh.ops.translate(bm, verts=vs, vec=off)
+            out += vs
+        return out
     if shape == "foam":  # two flat swirl crescents, like the foam_patch texture
         out = []
         a0 = rng.uniform(0, 2 * math.pi)
@@ -469,8 +805,11 @@ def _shape(bm, shape, size, rng, vel):
 def _snapshot(em, scale, rng):
     """Positions/velocities/ages of a still frame of this emitter (Blender socket space)."""
     life = em["lifetime"]
-    n = int(round(em["rate"] * (life[0] + life[1]) / 2 * 0.7))
-    n = max(3, min(MAX_PER_EMITTER, n))
+    if em.get("burst"):  # one burst, caught mid-flight
+        n = max(3, min(MAX_PER_EMITTER, em["burst"]))
+    else:
+        n = int(round(em["rate"] * (life[0] + life[1]) / 2 * 0.7))
+        n = max(3, min(MAX_PER_EMITTER, n))
     spread = math.radians(em.get("spread", 0))
     acc = _rb(em.get("acceleration", (0, 0, 0))) * scale
     drag = em.get("drag", 0.0)
@@ -540,7 +879,9 @@ def realize(scene=None, objects=None, particles=True):
     brightness x range^2, flicker/pulse driver) and, with `particles`, one merged
     stand-in mesh per emitter: a still frame of that emitter (sparks, embers,
     smoke puffs, mist mounds, droplets, foam patches, motes) simulated from its
-    speed, spread, drag, acceleration, size and transparency. `objects` limits it
+    speed, spread, drag, acceleration, size and transparency, plus one textured,
+    blended quad strip per beam from the socket to its end point (the beam's PNG
+    from art/vfx/textures, colour and transparency along it). `objects` limits it
     to those assets/sockets (default: every socket in the scene). Re-running
     replaces the previous `VFXPreview_*` objects; all live in the `VFX Preview`
     collection. Returns the created objects.
@@ -610,6 +951,10 @@ def realize(scene=None, objects=None, particles=True):
                 if hasattr(mo, "visible_shadow"):
                     mo.visible_shadow = False
                 made.append(mo)
+            for layer, beam in enumerate(spec.get("beams") or []):
+                mo = _beam_strip(s, beam, layer, scale)
+                if mo is not None:
+                    made.append(mo)
         for o in made:
             if o.parent is None and o.get("vfx_socket") is None:
                 o["vfx_socket"] = s.name

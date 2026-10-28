@@ -1,0 +1,1870 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W16",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w16_arch_stone",
+    "hex": "#D6BF9C",
+    "levels": [
+     0.93001,
+     0.93351,
+     0.94427,
+     0.94717,
+     0.95114,
+     0.95822,
+     0.96161,
+     0.97048,
+     0.97284,
+     0.97799,
+     0.98247,
+     0.98468,
+     0.9882,
+     0.99769,
+     1.0006,
+     1.00153,
+     1.00464,
+     1.01181,
+     1.01803,
+     1.02527,
+     1.02769,
+     1.03433,
+     1.03551,
+     1.03842,
+     1.04344,
+     1.04512,
+     1.0521,
+     1.05592,
+     1.0592,
+     1.06394,
+     1.06769,
+     1.06995
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_fern",
+    "hex": "#5AA620",
+    "levels": [
+     0.91706,
+     0.93474,
+     0.9387,
+     0.9436,
+     0.94921,
+     0.95305,
+     0.95797,
+     0.96271,
+     0.96708,
+     0.97032,
+     0.97437,
+     0.97854,
+     0.98409,
+     0.989,
+     0.99323,
+     0.99909,
+     1.0037,
+     1.00842,
+     1.01383,
+     1.01787,
+     1.02183,
+     1.02616,
+     1.0302,
+     1.03456,
+     1.0384,
+     1.04382,
+     1.04833,
+     1.05239,
+     1.05649,
+     1.06043,
+     1.06453,
+     1.07686
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_ivy",
+    "hex": "#62B22C",
+    "levels": [
+     0.91717,
+     0.93181,
+     0.93809,
+     0.94356,
+     0.94845,
+     0.95319,
+     0.95789,
+     0.96234,
+     0.9666,
+     0.97075,
+     0.97501,
+     0.97911,
+     0.98336,
+     0.98751,
+     0.99203,
+     0.99621,
+     1.00011,
+     1.00395,
+     1.00794,
+     1.01184,
+     1.01566,
+     1.01944,
+     1.02299,
+     1.02726,
+     1.03152,
+     1.03616,
+     1.04078,
+     1.04593,
+     1.05182,
+     1.0582,
+     1.06596,
+     1.08589
+    ],
+    "used": true
+   },
+   {
+    "key": "w16_paver",
+    "hex": "#CDB590",
+    "levels": [
+     0.93036,
+     0.93193,
+     0.93472,
+     0.9401,
+     0.94551,
+     0.9481,
+     0.9525,
+     0.95691,
+     0.96128,
+     0.96675,
+     0.97211,
+     0.97853,
+     0.98245,
+     0.98614,
+     0.98993,
+     0.99413,
+     1.00053,
+     1.00698,
+     1.01151,
+     1.0155,
+     1.01866,
+     1.02182,
+     1.0286,
+     1.03227,
+     1.03845,
+     1.04473,
+     1.04918,
+     1.05463,
+     1.05828,
+     1.06146,
+     1.06564,
+     1.06941
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_sandstone",
+    "hex": "#D4B98C",
+    "levels": [
+     0.93004,
+     0.93228,
+     0.93916,
+     0.94457,
+     0.94853,
+     0.95208,
+     0.95597,
+     0.95945,
+     0.96283,
+     0.96626,
+     0.97482,
+     0.97982,
+     0.98547,
+     0.99068,
+     0.99384,
+     0.99698,
+     1.00301,
+     1.00589,
+     1.01196,
+     1.01685,
+     1.01897,
+     1.02168,
+     1.0245,
+     1.03074,
+     1.03459,
+     1.03981,
+     1.04394,
+     1.04697,
+     1.05571,
+     1.06082,
+     1.06402,
+     1.0697
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_soil",
+    "hex": "#7A4A2A",
+    "levels": [
+     0.94023,
+     0.94575,
+     0.94803,
+     0.9625,
+     0.97139,
+     0.97395,
+     0.97724,
+     0.98069,
+     0.98353,
+     0.98831,
+     0.99649,
+     0.99761,
+     1.00659,
+     1.01069,
+     1.01821,
+     1.02194,
+     1.02636,
+     1.03341,
+     1.03921,
+     1.04835,
+     1.05597,
+     1.06567,
+     1.06805
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_stone_grey",
+    "hex": "#8F8D86",
+    "levels": [
+     0.93387,
+     0.93511,
+     0.93779,
+     0.93998,
+     0.94208,
+     0.94513,
+     0.94791,
+     0.95631,
+     0.95951,
+     0.96269,
+     0.96552,
+     0.97148,
+     0.97352,
+     0.98169,
+     0.98646,
+     0.9924,
+     0.99915,
+     1.00192,
+     1.00489,
+     1.01111,
+     1.01331,
+     1.01724,
+     1.0247,
+     1.0281,
+     1.03057,
+     1.03836,
+     1.04429,
+     1.0482,
+     1.0499,
+     1.05343,
+     1.05857,
+     1.06443
+    ],
+    "used": false
+   },
+   {
+    "key": "w16_stone",
+    "hex": "#E2C397",
+    "levels": [
+     0.95363,
+     0.95567,
+     0.95714,
+     0.9592,
+     0.96209,
+     0.96493,
+     0.96805,
+     0.9713,
+     0.97244,
+     0.97464,
+     0.97666,
+     0.97923,
+     0.98166,
+     0.98615,
+     0.98724,
+     0.98961,
+     0.99284,
+     0.99534,
+     1.00056,
+     1.00329,
+     1.00477,
+     1.00797,
+     1.01308,
+     1.01519,
+     1.01889,
+     1.02326,
+     1.02583,
+     1.02944,
+     1.03216,
+     1.03634,
+     1.04467,
+     1.04762
+    ],
+    "used": true
+   },
+   {
+    "key": "w16_vine",
+    "hex": "#8C5A34",
+    "levels": [
+     0.95011,
+     0.9527,
+     0.95724,
+     0.96048,
+     0.96617,
+     0.97018,
+     0.97214,
+     0.97476,
+     0.97756,
+     0.98124,
+     0.98676,
+     0.98924,
+     0.99324,
+     0.99562,
+     0.99838,
+     0.99982,
+     1.0011,
+     1.00352,
+     1.00663,
+     1.00864,
+     1.01203,
+     1.01392,
+     1.01882,
+     1.02222,
+     1.0273,
+     1.03262,
+     1.03625,
+     1.03791,
+     1.04192,
+     1.04432,
+     1.04675,
+     1.04965
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BlockWall",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "hero",
+   "size": [
+    10.1319,
+    5.6256,
+    6.0003
+   ],
+   "tris": 8502,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWall.glb",
+     "kind": "solid",
+     "tris": 8502,
+     "offset": [
+      0.0,
+      2.8128,
+      0.0
+     ],
+     "size": [
+      10.1319,
+      5.6256,
+      6.0003
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "block wall: L-shaped running-bond sandstone wall with coping, corner and end pillars with caps, broken return wall, rubble, ivy and tufts"
+  },
+  {
+   "name": "BlockWallBlockLarge",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "part",
+   "size": [
+    1.8975,
+    0.643,
+    1.2962
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallBlockLarge.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3215,
+      0.0
+     ],
+     "size": [
+      1.8975,
+      0.643,
+      1.2962
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall block (large)"
+  },
+  {
+   "name": "BlockWallBlockMedium",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "part",
+   "size": [
+    1.2611,
+    0.6644,
+    1.202
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallBlockMedium.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3322,
+      0.0
+     ],
+     "size": [
+      1.2611,
+      0.6644,
+      1.202
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall block (medium)"
+  },
+  {
+   "name": "BlockWallBlockSmall",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "part",
+   "size": [
+    0.9891,
+    0.6661,
+    1.1609
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallBlockSmall.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3331,
+      0.0
+     ],
+     "size": [
+      0.9891,
+      0.6661,
+      1.1609
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall block (small)"
+  },
+  {
+   "name": "BlockWallBrokenStepped",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "variant",
+   "size": [
+    8.6508,
+    4.7978,
+    3.3786
+   ],
+   "tris": 2802,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallBrokenStepped.glb",
+     "kind": "solid",
+     "tris": 2802,
+     "offset": [
+      0.0,
+      2.3989,
+      0.0
+     ],
+     "size": [
+      8.6508,
+      4.7978,
+      3.3786
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broken / Stepped"
+  },
+  {
+   "name": "BlockWallCopingStone",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "part",
+   "size": [
+    2.3157,
+    0.3862,
+    1.5794
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallCopingStone.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.1931,
+      0.0
+     ],
+     "size": [
+      2.3157,
+      0.3862,
+      1.5794
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "coping stone (top)"
+  },
+  {
+   "name": "BlockWallCornerBlockStacked",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "part",
+   "size": [
+    1.9131,
+    4.7082,
+    1.9343
+   ],
+   "tris": 396,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallCornerBlockStacked.glb",
+     "kind": "solid",
+     "tris": 396,
+     "offset": [
+      0.0,
+      2.3541,
+      0.0
+     ],
+     "size": [
+      1.9131,
+      4.7082,
+      1.9343
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner block (stacked pillar with cap)"
+  },
+  {
+   "name": "BlockWallCornerSection",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "variant",
+   "size": [
+    5.7635,
+    4.7178,
+    5.1172
+   ],
+   "tris": 4252,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallCornerSection.glb",
+     "kind": "solid",
+     "tris": 4252,
+     "offset": [
+      0.0,
+      2.3589,
+      0.0
+     ],
+     "size": [
+      5.7635,
+      4.7178,
+      5.1172
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Corner Section"
+  },
+  {
+   "name": "BlockWallIntact",
+   "sheet": "W16",
+   "subject": "BlockWall",
+   "role": "variant",
+   "size": [
+    9.0836,
+    4.726,
+    2.5244
+   ],
+   "tris": 4724,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BlockWallIntact.glb",
+     "kind": "solid",
+     "tris": 4724,
+     "offset": [
+      0.0,
+      2.363,
+      0.0
+     ],
+     "size": [
+      9.0836,
+      4.726,
+      2.5244
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Intact Wall"
+  },
+  {
+   "name": "Column",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "hero",
+   "size": [
+    5.353,
+    7.7851,
+    5.3282
+   ],
+   "tris": 5416,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Column.glb",
+     "kind": "solid",
+     "tris": 5416,
+     "offset": [
+      0.0,
+      3.8926,
+      0.0
+     ],
+     "size": [
+      5.353,
+      7.7851,
+      5.3282
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "column: octagonal sandstone shaft segments on a two-step base, neck and cap stone, ivy climbing, rubble and tufts"
+  },
+  {
+   "name": "ColumnBaseStone",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    2.9147,
+    1.0888,
+    3.0058
+   ],
+   "tris": 88,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnBaseStone.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.5444,
+      0.0
+     ],
+     "size": [
+      2.9147,
+      1.0888,
+      3.0058
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base stone"
+  },
+  {
+   "name": "ColumnBrokenCap",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    3.0574,
+    0.9785,
+    1.7153
+   ],
+   "tris": 88,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnBrokenCap.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.4892,
+      0.0
+     ],
+     "size": [
+      3.0574,
+      0.9785,
+      1.7153
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "broken cap"
+  },
+  {
+   "name": "ColumnBrokenShaft",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    1.7588,
+    1.4811,
+    1.663
+   ],
+   "tris": 56,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnBrokenShaft.glb",
+     "kind": "solid",
+     "tris": 56,
+     "offset": [
+      0.0,
+      0.7406,
+      0.0
+     ],
+     "size": [
+      1.7588,
+      1.4811,
+      1.663
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "broken shaft (optional)"
+  },
+  {
+   "name": "ColumnCapStone",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    2.3472,
+    0.8201,
+    2.3454
+   ],
+   "tris": 88,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnCapStone.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.4101,
+      0.0
+     ],
+     "size": [
+      2.3472,
+      0.8201,
+      2.3454
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cap stone"
+  },
+  {
+   "name": "ColumnFallen",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "variant",
+   "size": [
+    9.9309,
+    3.0411,
+    4.8316
+   ],
+   "tris": 2352,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnFallen.glb",
+     "kind": "solid",
+     "tris": 2352,
+     "offset": [
+      0.0,
+      1.5205,
+      0.0
+     ],
+     "size": [
+      9.9309,
+      3.0411,
+      4.8316
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Fallen Column: shaft lying on its side, cap tipped over"
+  },
+  {
+   "name": "ColumnFull",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "variant",
+   "size": [
+    5.6369,
+    7.3018,
+    4.9746
+   ],
+   "tris": 4796,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnFull.glb",
+     "kind": "solid",
+     "tris": 4796,
+     "offset": [
+      0.0,
+      3.6509,
+      0.0
+     ],
+     "size": [
+      5.6369,
+      7.3018,
+      4.9746
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Full Column"
+  },
+  {
+   "name": "ColumnIvyOverlay",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    1.9997,
+    3.5644,
+    0.7071
+   ],
+   "tris": 800,
+   "budget": 1400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnIvyOverlay.glb",
+     "kind": "solid",
+     "tris": 800,
+     "offset": [
+      0.0,
+      1.7822,
+      0.0
+     ],
+     "size": [
+      1.9997,
+      3.5644,
+      0.7071
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ivy overlay (separate)"
+  },
+  {
+   "name": "ColumnShaftSegment",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "part",
+   "size": [
+    1.663,
+    1.0,
+    1.663
+   ],
+   "tris": 28,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnShaftSegment.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      1.663,
+      1.0,
+      1.663
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "shaft segment (repeating)"
+  },
+  {
+   "name": "ColumnStump",
+   "sheet": "W16",
+   "subject": "Column",
+   "role": "variant",
+   "size": [
+    5.0679,
+    4.6468,
+    4.7048
+   ],
+   "tris": 3572,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ColumnStump.glb",
+     "kind": "solid",
+     "tris": 3572,
+     "offset": [
+      0.0,
+      2.3234,
+      0.0
+     ],
+     "size": [
+      5.0679,
+      4.6468,
+      4.7048
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stump (Broken): two segments and a snapped piece"
+  },
+  {
+   "name": "CourtyardFloor",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "hero",
+   "size": [
+    8.8104,
+    3.3393,
+    9.6962
+   ],
+   "tris": 4472,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloor.glb",
+     "kind": "solid",
+     "tris": 4472,
+     "offset": [
+      0.0,
+      1.6697,
+      0.0
+     ],
+     "size": [
+      8.8104,
+      3.3393,
+      9.6962
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "courtyard floor and rubble: raised paver platform on edge blocks, front steps, corner blocks with caps, step-side blocks, rubble, ivy and tufts"
+  },
+  {
+   "name": "CourtyardFloorBrokenRubble",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "variant",
+   "size": [
+    8.9275,
+    3.454,
+    9.6416
+   ],
+   "tris": 4332,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorBrokenRubble.glb",
+     "kind": "solid",
+     "tris": 4332,
+     "offset": [
+      0.0,
+      1.727,
+      0.0
+     ],
+     "size": [
+      8.9275,
+      3.454,
+      9.6416
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broken Rubble: missing and tipped pavers, fallen corner, scattered blocks"
+  },
+  {
+   "name": "CourtyardFloorClean",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "variant",
+   "size": [
+    8.9074,
+    3.1199,
+    9.7795
+   ],
+   "tris": 2768,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorClean.glb",
+     "kind": "solid",
+     "tris": 2768,
+     "offset": [
+      0.0,
+      1.56,
+      0.0
+     ],
+     "size": [
+      8.9074,
+      3.1199,
+      9.7795
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Clean Floor"
+  },
+  {
+   "name": "CourtyardFloorCornerBlock",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    1.5531,
+    1.8059,
+    1.5703
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorCornerBlock.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.9029,
+      0.0
+     ],
+     "size": [
+      1.5531,
+      1.8059,
+      1.5703
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner block"
+  },
+  {
+   "name": "CourtyardFloorCrackedPaver",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    1.5013,
+    0.2859,
+    1.4921
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorCrackedPaver.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.1429,
+      0.0
+     ],
+     "size": [
+      1.5013,
+      0.2859,
+      1.4921
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cracked paver"
+  },
+  {
+   "name": "CourtyardFloorIvyPlant",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    3.4945,
+    1.7979,
+    1.6749
+   ],
+   "tris": 662,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorIvyPlant.glb",
+     "kind": "solid",
+     "tris": 662,
+     "offset": [
+      0.0,
+      0.8989,
+      0.0
+     ],
+     "size": [
+      3.4945,
+      1.7979,
+      1.6749
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ivy / plant (optional)"
+  },
+  {
+   "name": "CourtyardFloorOvergrown",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "variant",
+   "size": [
+    8.9439,
+    3.1195,
+    9.5273
+   ],
+   "tris": 7956,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorOvergrown.glb",
+     "kind": "solid",
+     "tris": 7956,
+     "offset": [
+      0.0,
+      1.5598,
+      0.0
+     ],
+     "size": [
+      8.9439,
+      3.1195,
+      9.5273
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Overgrown: grass in the joints, ivy on the steps"
+  },
+  {
+   "name": "CourtyardFloorPaver2x2",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    3.0267,
+    0.2449,
+    3.0256
+   ],
+   "tris": 176,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorPaver2x2.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      0.1225,
+      0.0
+     ],
+     "size": [
+      3.0267,
+      0.2449,
+      3.0256
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor paver (2x2)"
+  },
+  {
+   "name": "CourtyardFloorRubbleBlocks",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    2.874,
+    0.7745,
+    2.2499
+   ],
+   "tris": 176,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorRubbleBlocks.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      0.3872,
+      0.0
+     ],
+     "size": [
+      2.874,
+      0.7745,
+      2.2499
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rubble blocks"
+  },
+  {
+   "name": "CourtyardFloorStepBlock",
+   "sheet": "W16",
+   "subject": "CourtyardFloor",
+   "role": "part",
+   "size": [
+    2.8963,
+    0.6448,
+    0.8179
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CourtyardFloorStepBlock.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3224,
+      0.0
+     ],
+     "size": [
+      2.8963,
+      0.6448,
+      0.8179
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "step block (edge)"
+  },
+  {
+   "name": "StoneArch",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "hero",
+   "size": [
+    9.5773,
+    8.7444,
+    4.8641
+   ],
+   "tris": 10990,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArch_01.glb",
+     "kind": "solid",
+     "tris": 5495,
+     "offset": [
+      -2.81,
+      4.0626,
+      0.0
+     ],
+     "size": [
+      3.9573,
+      8.1252,
+      4.8641
+     ]
+    },
+    {
+     "file": "meshes/StoneArch_02.glb",
+     "kind": "solid",
+     "tris": 5495,
+     "offset": [
+      1.5613,
+      4.3797,
+      0.0556
+     ],
+     "size": [
+      6.4547,
+      8.7295,
+      4.4249
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone arch: two stacked sandstone piers on stepped plinths with impost blocks, pointed ring of wedge stones and keystone, rubble, ivy vines and leaf sprigs on piers and arch, grass tufts"
+  },
+  {
+   "name": "StoneArchBaseStone",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "part",
+   "size": [
+    2.0533,
+    0.7145,
+    2.2052
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchBaseStone.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3572,
+      0.0
+     ],
+     "size": [
+      2.0533,
+      0.7145,
+      2.2052
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base stone"
+  },
+  {
+   "name": "StoneArchHalfCollapsed",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "variant",
+   "size": [
+    9.6545,
+    8.5424,
+    4.7214
+   ],
+   "tris": 9582,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchHalfCollapsed.glb",
+     "kind": "solid",
+     "tris": 9582,
+     "offset": [
+      0.0,
+      4.2712,
+      0.0
+     ],
+     "size": [
+      9.6545,
+      8.5424,
+      4.7214
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Half-Collapsed: right pier broken, half the ring fallen into rubble"
+  },
+  {
+   "name": "StoneArchKeystone",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "part",
+   "size": [
+    1.0,
+    1.4,
+    1.55
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchKeystone.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.7,
+      0.0
+     ],
+     "size": [
+      1.0,
+      1.4,
+      1.55
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "keystone"
+  },
+  {
+   "name": "StoneArchPierBlocks",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "part",
+   "size": [
+    1.8153,
+    4.2384,
+    1.8742
+   ],
+   "tris": 308,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchPierBlocks.glb",
+     "kind": "solid",
+     "tris": 308,
+     "offset": [
+      0.0,
+      2.1192,
+      0.0
+     ],
+     "size": [
+      1.8153,
+      4.2384,
+      1.8742
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pier blocks (stacked)"
+  },
+  {
+   "name": "StoneArchPointed",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "variant",
+   "size": [
+    9.4321,
+    8.7642,
+    4.559
+   ],
+   "tris": 11278,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchPointed_01.glb",
+     "kind": "solid",
+     "tris": 5639,
+     "offset": [
+      -2.7265,
+      4.0742,
+      0.0175
+     ],
+     "size": [
+      3.9792,
+      8.1417,
+      4.4155
+     ]
+    },
+    {
+     "file": "meshes/StoneArchPointed_02.glb",
+     "kind": "solid",
+     "tris": 5639,
+     "offset": [
+      1.566,
+      4.3821,
+      0.0
+     ],
+     "size": [
+      6.3,
+      8.7642,
+      4.559
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Pointed Arch"
+  },
+  {
+   "name": "StoneArchRound",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "variant",
+   "size": [
+    9.6209,
+    8.5267,
+    5.0453
+   ],
+   "tris": 10910,
+   "budget": 12000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchRound_01.glb",
+     "kind": "solid",
+     "tris": 5455,
+     "offset": [
+      -2.8367,
+      3.9056,
+      -0.0622
+     ],
+     "size": [
+      3.9474,
+      7.7962,
+      4.4549
+     ]
+    },
+    {
+     "file": "meshes/StoneArchRound_02.glb",
+     "kind": "solid",
+     "tris": 5455,
+     "offset": [
+      1.6987,
+      4.2633,
+      0.0
+     ],
+     "size": [
+      6.2236,
+      8.5267,
+      5.0453
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Round Arch"
+  },
+  {
+   "name": "StoneArchWedgeStones",
+   "sheet": "W16",
+   "subject": "StoneArch",
+   "role": "part",
+   "size": [
+    4.245,
+    2.5919,
+    1.8
+   ],
+   "tris": 132,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneArchWedgeStones.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      1.2959,
+      0.0
+     ],
+     "size": [
+      4.245,
+      2.5919,
+      1.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "arch wedge stones"
+  }
+ ],
+ "stats": {
+  "assets": 37,
+  "pieces": 40,
+  "solid": 40,
+  "water": 0,
+  "glow": 0,
+  "tris": 102186,
+  "vfxSockets": 0,
+  "paletteColours": 3,
+  "paletteLevels": 96,
+  "meshBytes": 9665132
+ },
+ "problems": []
+}
