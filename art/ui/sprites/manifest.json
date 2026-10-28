@@ -873,5 +873,223 @@
     "w": 179,
     "h": 164,
     "slice": null
+  },
+  "pm_button_add_friend": {
+    "file": "pm_button_add_friend.png",
+    "w": 68,
+    "h": 52,
+    "slice": null
+  },
+  "pm_button_check": {
+    "file": "pm_button_check.png",
+    "w": 155,
+    "h": 150,
+    "slice": null
+  },
+  "pm_button_leather": {
+    "file": "pm_button_leather.png",
+    "w": 401,
+    "h": 140,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ]
+  },
+  "pm_button_leather_disabled": {
+    "file": "pm_button_leather_disabled.png",
+    "w": 405,
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ]
+  },
+  "pm_button_leather_hover": {
+    "file": "pm_button_leather_hover.png",
+    "w": 406,
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ]
+  },
+  "pm_button_leather_pressed": {
+    "file": "pm_button_leather_pressed.png",
+    "w": 404,
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ]
+  },
+  "pm_button_parchment": {
+    "file": "pm_button_parchment.png",
+    "w": 386,
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ]
+  },
+  "pm_button_parchment_disabled": {
+    "file": "pm_button_parchment_disabled.png",
+    "w": 386,
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ]
+  },
+  "pm_button_parchment_hover": {
+    "file": "pm_button_parchment_hover.png",
+    "w": 387,
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ]
+  },
+  "pm_button_parchment_pressed": {
+    "file": "pm_button_parchment_pressed.png",
+    "w": 385,
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ]
+  },
+  "pm_button_x": {
+    "file": "pm_button_x.png",
+    "w": 155,
+    "h": 150,
+    "slice": null
+  },
+  "pm_fill_xp": {
+    "file": "pm_fill_xp.png",
+    "w": 176,
+    "h": 14,
+    "slice": [
+      7,
+      6,
+      7,
+      6
+    ]
+  },
+  "pm_icon_add_friend": {
+    "file": "pm_icon_add_friend.png",
+    "w": 179,
+    "h": 143,
+    "slice": null
+  },
+  "pm_icon_crown": {
+    "file": "pm_icon_crown.png",
+    "w": 168,
+    "h": 131,
+    "slice": null
+  },
+  "pm_lobby_coins": {
+    "file": "pm_lobby_coins.png",
+    "w": 166,
+    "h": 70,
+    "slice": null
+  },
+  "pm_lobby_enter": {
+    "file": "pm_lobby_enter.png",
+    "w": 626,
+    "h": 184,
+    "slice": null
+  },
+  "pm_lobby_gear": {
+    "file": "pm_lobby_gear.png",
+    "w": 73,
+    "h": 70,
+    "slice": null
+  },
+  "pm_lobby_gems": {
+    "file": "pm_lobby_gems.png",
+    "w": 136,
+    "h": 70,
+    "slice": null
+  },
+  "pm_lobby_party": {
+    "file": "pm_lobby_party.png",
+    "w": 437,
+    "h": 385,
+    "slice": null
+  },
+  "pm_lobby_profile": {
+    "file": "pm_lobby_profile.png",
+    "w": 533,
+    "h": 139,
+    "slice": null
+  },
+  "pm_lobby_server": {
+    "file": "pm_lobby_server.png",
+    "w": 255,
+    "h": 75,
+    "slice": null
+  },
+  "pm_panel": {
+    "file": "pm_panel.png",
+    "w": 529,
+    "h": 314,
+    "slice": [
+      70,
+      62,
+      70,
+      62
+    ]
+  },
+  "pm_tile_forge": {
+    "file": "pm_tile_forge.png",
+    "w": 146,
+    "h": 145,
+    "slice": null
+  },
+  "pm_tile_inventory": {
+    "file": "pm_tile_inventory.png",
+    "w": 146,
+    "h": 145,
+    "slice": null
+  },
+  "pm_tile_quests": {
+    "file": "pm_tile_quests.png",
+    "w": 146,
+    "h": 143,
+    "slice": null
+  },
+  "pm_tile_shop": {
+    "file": "pm_tile_shop.png",
+    "w": 146,
+    "h": 143,
+    "slice": null
+  },
+  "pm_tile_trade": {
+    "file": "pm_tile_trade.png",
+    "w": 146,
+    "h": 145,
+    "slice": null
+  },
+  "pm_tile_vault": {
+    "file": "pm_tile_vault.png",
+    "w": 146,
+    "h": 144,
+    "slice": null
   }
 }
