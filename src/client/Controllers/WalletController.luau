@@ -260,7 +260,9 @@ end
 
 local function drawCodes()
 	window:Line("Codes come from Flintborn's group and social posts. Each one works once per player.")
-	window:Input("Redeem a code", "Type a code…", function(code)
+	local box
+	box = window:Input("Redeem a code", "Type a code…", function(code)
+		box.Text = ""
 		local ok, reason = invoke("RedeemCode", code)
 		window:SetStatus(if ok then "Code redeemed!" else ("Code: " .. tostring(reason)))
 	end)

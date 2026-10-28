@@ -670,6 +670,7 @@ Studio and live checks:
 - [ ] Market: the Shop tile and nav button open it; Coins and Gems in the corner follow purchases; BUY, SELL, SELL 10 and SELL ALL move the right amounts; respec asks first; a Robux offer prompts the real product; a code redeems once.
 - [ ] Progress: P opens it in lobby and run; perk BUY spends tokens; REVIEW REBIRTH arms after 1.5 s and rebirths; Perks and Rebirth say they are lobby-only in a run.
 - [ ] Trade: inviting a second player shows them the ACCEPT / DECLINE card; both offers update live; any change unlocks both; the countdown runs after both lock; CONFIRM completes; typing gems while the partner changes their offer keeps what you typed.
+- [ ] Phones (844 × 390): the list windows draw at about half size, so row details read at roughly 9–10 px; judge on a device whether they need a larger phone text size.
 - [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
 - [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.
 - [ ] World map (run): N / DPadDown opens it centred on you; pins name the camps and landmarks; active portals and events show and update; zoom follows you until you drag; the safe-camp card appears inside a camp and leaves outside it.

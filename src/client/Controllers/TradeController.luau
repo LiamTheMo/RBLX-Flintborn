@@ -243,6 +243,11 @@ function render()
 	if token ~= renderToken or session ~= current then
 		return
 	end
+	if gemsBox and gemsBox.Parent and gemsBox:IsFocused() then
+		-- Focused during the round trip: still wait for the player.
+		pending = true
+		return
+	end
 	pending = false
 	window:Begin()
 	countdown = nil
@@ -341,12 +346,16 @@ local function build()
 		onClose = close,
 	})
 	window.screen:Watch()
-	invite = NoticeCard.new(Theme.TopStack(), {
-		name = "TradeInvite",
-		width = 420,
-		layoutOrder = Theme.TopOrder.TradeInvite,
-		title = "Trade invite",
-	})
+	-- Its own gui above the parchment windows (their veils would cover the
+	-- banner column), so an invite can be answered with a menu open.
+	local inviteGui = Theme.Make(
+		"ScreenGui",
+		{ Name = "TradeInvite", ResetOnSpawn = false, DisplayOrder = 30 },
+		player:WaitForChild("PlayerGui")
+	)
+	invite = NoticeCard.new(inviteGui, { name = "Card", width = 420, title = "Trade invite" })
+	invite.frame.AnchorPoint = Vector2.new(0.5, 0)
+	invite.frame.Position = UDim2.new(0.5, 0, 0, 16)
 	for _, choice in { { "ACCEPT", true }, { "DECLINE", false } } do
 		invite:AddButton(choice[1], if choice[2] then nil else "paper", function()
 			invite:Hide()

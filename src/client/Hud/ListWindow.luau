@@ -25,7 +25,7 @@ local W, H = ListWindow.SIZE[1], ListWindow.SIZE[2]
 local TOP, BOTTOM = 132, 664
 local TAB_COLUMN = { 44, TOP, 304, BOTTOM - TOP }
 local TAB_HEIGHT, TAB_PITCH = 80, 88
-local BUTTON_W, BUTTON_H = 150, 54
+local BUTTON_W, BUTTON_H = 160, 54
 -- Text tones a controller can ask for.
 local TONES = { ink = "ink", soft = "inkSoft", good = "haveEnough", warn = "haveShort", gold = "headerRule" }
 
@@ -70,8 +70,8 @@ function ListWindow.new(parent: Instance?, opts)
 	self.corner = Widgets.Make("Frame", {
 		Name = "Corner",
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(70, 58),
-		Size = UDim2.fromOffset(W / 2 - 330, 48),
+		Position = UDim2.fromOffset(56, 58),
+		Size = UDim2.fromOffset(W / 2 - 250 - 56, 48),
 		ZIndex = 4,
 	}, window)
 	Widgets.Make("UIListLayout", {
@@ -154,9 +154,14 @@ function ListWindow:SetCorner(items)
 				ZIndex = 4,
 			}, self.corner)
 		end
-		-- Sized for its digits (a wallet amount), so nothing truncates.
-		local width = 16 + #item.text * 16
-		local label = Parchment.Text(item.text, { 0, 0, width, 40 }, self.corner, { size = 26, name = "Text" .. index })
+		-- Sized for its digits (a wallet amount); a long amount shrinks to fit.
+		local width = math.min(12 + #item.text * 15, 104)
+		local label = Parchment.Text(
+			item.text,
+			{ 0, 0, width, 40 },
+			self.corner,
+			{ size = 26, name = "Text" .. index, scaled = true, minSize = 14 }
+		)
 		label.LayoutOrder = index * 2
 	end
 end
@@ -165,10 +170,13 @@ end
 -- the gamepad's focus so Finish() can give it back.
 function ListWindow:Begin()
 	local focus = GuiService.SelectedObject
-	self.focusName = nil
+	self.focusName, self.focusRow = nil, nil
 	self.hadFocus = focus ~= nil and focus:IsDescendantOf(self.window)
 	if self.hadFocus and focus:IsDescendantOf(self.list) then
-		self.focusName = focus.Parent and focus.Parent.Name
+		-- The button's key and its row's: keys like "Buy" repeat on every row.
+		local holder = focus.Parent
+		self.focusName = holder and holder.Name
+		self.focusRow = holder and holder.Parent and holder.Parent.Name
 	end
 	for _, child in self.list:GetChildren() do
 		if child:IsA("GuiObject") then
@@ -187,7 +195,15 @@ function ListWindow:Finish()
 	for _, object in self.list:GetDescendants() do
 		if object:IsA("TextButton") and object.Selectable then
 			first = first or object
-			if self.focusName and object.Parent and object.Parent.Name == self.focusName then
+			local holder = object.Parent
+			if
+				match == nil
+				and self.focusName
+				and holder
+				and holder.Name == self.focusName
+				and holder.Parent
+				and holder.Parent.Name == self.focusRow
+			then
 				match = object
 			end
 		end
@@ -248,11 +264,17 @@ local function addButton(parent: Instance, spec, r)
 		name = spec.key or spec.label,
 		label = spec.label,
 		color = if primary then "cream" else "ink",
-		size = 21,
-		inset = 16,
+		size = 20,
+		-- Clear of the leather plate's end ornaments.
+		inset = if primary then 26 else 16,
 		z = 6,
 	})
-	button.SetEnabled(spec.enabled ~= false)
+	local enabled = spec.enabled ~= false
+	button.SetEnabled(enabled)
+	-- The art's tint alone barely reads as off; the label fades too.
+	if button.label and not enabled then
+		button.label.TextTransparency = 0.45
+	end
 	return button
 end
 
@@ -336,10 +358,13 @@ function ListWindow:Row(spec)
 	end
 	-- Alone, the title sits in the middle of the card.
 	local hasDetail = spec.detail ~= nil and spec.detail ~= ""
+	-- Long names shrink to fit beside the buttons rather than lose their end.
 	Parchment.Text(spec.title, { textX, if hasDetail then 10 else 27, 0, 30 }, holder, {
 		size = 24,
 		color = tone(spec.tone),
 		name = "Title",
+		scaled = true,
+		minSize = 14,
 		z = 5,
 	}).Size =
 		UDim2.new(1, -(textX + right), 0, 30)
@@ -371,13 +396,15 @@ function ListWindow:Buttons(specs)
 	return holder
 end
 
--- A text box on the search-box art with a label before it. onSubmit(text)
+-- A text box on a paper field with a label before it. onSubmit(text)
 -- runs when focus leaves with Enter and text typed (or on any focus loss, even
 -- empty, when `always`).
 function ListWindow:Input(label: string, placeholder: string, onSubmit, always: boolean?): TextBox
 	local holder = self:_holder(60)
 	Parchment.Text(label, { 6, 8, 300, 44 }, holder, { size = 22, name = "Label", z = 5 })
-	local field = Widgets.Sprite("pm_search_box", { Name = "Field", ZIndex = 5 }, holder)
+	-- The stepper's plain paper field (the search box's magnifier would read
+	-- as search).
+	local field = Widgets.Sprite("pm_stepper_field", { Name = "Field", ZIndex = 5 }, holder, 1)
 	place(field, { 316, 6, 320, 48 })
 	local box = Widgets.Make("TextBox", {
 		Name = "Box",
@@ -386,9 +413,8 @@ function ListWindow:Input(label: string, placeholder: string, onSubmit, always: 
 		Font = Enum.Font.Merriweather,
 		PlaceholderColor3 = Layout.Color("inkSoft"),
 		PlaceholderText = placeholder,
-		-- Clear of the magnifier drawn on the box's left end.
-		Position = UDim2.fromOffset(364, 6),
-		Size = UDim2.fromOffset(260, 48),
+		Position = UDim2.fromOffset(332, 6),
+		Size = UDim2.fromOffset(292, 48),
 		Text = "",
 		TextColor3 = Layout.Color("ink"),
 		TextSize = 21,
@@ -436,6 +462,21 @@ end
 -- A confirmation over the page, its button armed after `delay` seconds.
 function ListWindow:_confirmCard(window: Instance)
 	local r = self.pageRect
+	-- Under the question the window takes no presses: the tabs, close and the
+	-- page's buttons stay out of reach until it is answered.
+	self.confirmScrim = Widgets.Make("TextButton", {
+		Name = "ConfirmScrim",
+		Active = true,
+		AutoButtonColor = false,
+		BackgroundColor3 = Layout.Color("veil"),
+		BackgroundTransparency = 0.8,
+		BorderSizePixel = 0,
+		Selectable = false,
+		Size = UDim2.fromScale(1, 1),
+		Text = "",
+		Visible = false,
+		ZIndex = 11,
+	}, window)
 	local card = Widgets.Sprite("pm_inset", { Name = "Confirm", Active = true, Visible = false, ZIndex = 12 }, window)
 	place(card, r)
 	if card:IsA("ImageLabel") then
@@ -472,6 +513,8 @@ function ListWindow:Confirm(text: string, yes: string, delay: number, onYes)
 	self.confirmYes.SetEnabled(delay <= 0)
 	self.confirmArmed = delay <= 0
 	self.confirmCard.Visible = true
+	self.confirmScrim.Visible = true
+	self.list.Visible = false
 	if GuiService.SelectedObject ~= nil then
 		GuiService.SelectedObject = self.confirmNo.button
 	end
@@ -492,6 +535,8 @@ function ListWindow:HideConfirm()
 	self.confirmFn = nil
 	self.confirmArmed = false
 	self.confirmCard.Visible = false
+	self.confirmScrim.Visible = false
+	self.list.Visible = true
 	local focus = GuiService.SelectedObject
 	if wasOpen and focus and focus:IsDescendantOf(self.confirmCard) then
 		GuiService.SelectedObject = self.close

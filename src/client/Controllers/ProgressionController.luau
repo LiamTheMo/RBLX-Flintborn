@@ -136,6 +136,7 @@ local function drawOverview()
 		glyph = "pm_glyph_person",
 		value = ("Rebirths %d"):format(rebirth.count),
 	})
+	window:Line(("Perk tokens: %d (spent on perks in the lobby)."):format(rebirth.tokens))
 	local bonuses = {}
 	if view.premium then
 		table.insert(bonuses, "Premium +25% XP")

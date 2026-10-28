@@ -383,7 +383,6 @@ local function showReceipt(receipt)
 	if next(receipt.deleted) then
 		table.insert(lines, "Deleted (no room): " .. listOf(receipt.deleted))
 	end
-	table.insert(lines, "(click to dismiss)")
 	ui.receipt:Show(table.concat(lines, "\n") .. "\n\nTap to dismiss.")
 end
 
