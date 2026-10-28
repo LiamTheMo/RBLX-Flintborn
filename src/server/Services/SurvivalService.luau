@@ -3,7 +3,10 @@
 -- crouch intent. Whether a player is moving (and so whether a sprint drains
 -- stamina) comes from server-observed root travel, never the client-replicated
 -- MoveDirection, and travel at sprint pace drains stamina even without a sprint
--- request. Meters are run state and reset on each spawn. World place only.
+-- request. Walking through water is 30% slower (GDD §55): the server checks for
+-- water at each player's feet a few times a second and folds it into the walk
+-- speed it sets. Nobody swims: the Swimming state is off for every character.
+-- Meters are run state and reset on each spawn. World place only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,6 +16,7 @@ local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SurvivalRules = require(ReplicatedStorage.Shared.Survival.SurvivalRules)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local ModifierService = require(script.Parent.ModifierService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
@@ -22,6 +26,8 @@ SurvivalService.PUBLISH_INTERVAL = 0.1
 -- Root travel is sampled over this window; faster than MOVING_SPEED counts as moving.
 SurvivalService.MOVE_SAMPLE_SECONDS = 0.2
 SurvivalService.MOVING_SPEED = 2
+-- How often each player's feet are checked for water.
+SurvivalService.WATER_CHECK_SECONDS = 0.2
 
 local entries = {}
 
@@ -70,6 +76,8 @@ local function startRun(player: Player, character: Model)
 	if regen and regen:IsA("Script") then
 		regen:Destroy()
 	end
+	-- No swimming (GDD §55); the client turns it off too (it owns the character's state).
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
 	humanoid.MaxHealth = GameConstants.BASE_MAX_HEALTH
 	humanoid.Health = GameConstants.BASE_MAX_HEALTH
 	local entry = {
@@ -82,7 +90,10 @@ local function startRun(player: Player, character: Model)
 		pace = SurvivalRules.NewPace(),
 		observedSprint = false,
 		lastPublish = 0,
-		-- Snapshotted per run from masteries and perks (v0.13).
+		inWater = false,
+		waterCheckedAt = 0,
+		-- Snapshotted per run from masteries and perks (v0.13): Tidewalker's bonus
+		-- speed in water.
 		swimBonus = ModifierService.Sum(player, "SwimSpeed"),
 	}
 	entry.rules.staminaDrainScale = 1 / (1 + ModifierService.Sum(player, "SprintEfficiency"))
@@ -139,8 +150,12 @@ local function step(dt: number)
 				return
 			end
 			local rules = entry.rules
-			local swimming = humanoid:GetState() == Enum.HumanoidStateType.Swimming
-			local walkPace = SurvivalRules.WALK_SPEED * (if swimming then 1 + entry.swimBonus else 1)
+			if time - entry.waterCheckedAt >= SurvivalService.WATER_CHECK_SECONDS then
+				entry.waterCheckedAt = time
+				local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				entry.inWater = root ~= nil and WorldState.FeetInWater(root.Position)
+			end
+			local walkPace = SurvivalRules.WalkPace(entry.inWater, entry.swimBonus)
 			local moving = observeMoving(player, entry, time, walkPace)
 			entry.sprinting = SurvivalRules.IsSprinting(rules, moving)
 			SurvivalRules.StepStamina(rules, dt, moving, entry.observedSprint)
@@ -149,11 +164,7 @@ local function step(dt: number)
 			if healed > 0 then
 				SurvivalService.SetHealth(player, humanoid.Health + healed)
 			end
-			local speed = SurvivalRules.MoveSpeed(rules, moving)
-			if entry.swimBonus > 0 and swimming then
-				-- The Tidewalker perk: faster movement in water.
-				speed *= 1 + entry.swimBonus
-			end
+			local speed = SurvivalRules.MoveSpeed(rules, moving, entry.inWater, entry.swimBonus)
 			if humanoid.WalkSpeed ~= speed then
 				humanoid.WalkSpeed = speed
 			end
