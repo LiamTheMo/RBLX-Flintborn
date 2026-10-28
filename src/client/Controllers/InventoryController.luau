@@ -1,4 +1,4 @@
--- Hotbar (9 slots, keys 1–9) and backpack (50 slots) for the run inventory
+-- Hotbar (6 slots, keys 1–6) and backpack (50 slots) for the run inventory
 -- (GDD §25.4, §25.4.1). Tapping a hotbar slot (or pressing its key) equips a tool or weapon, uses a
 -- consumable, places a workbench, readies a Fire Bomb (the attack input or touch
 -- Attack button then throws it) or sets a Breaching Charge on the wall or door in
