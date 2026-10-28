@@ -27,19 +27,19 @@ test("about 25% of ticks trigger per category", function()
 	local list = entries("Common")
 	local hits, trials = 0, 40000
 	for _ = 1, trials do
-		if EventRules.RollCategory(list, rng) then
+		if #EventRules.RollCategory(list, rng) > 0 then
 			hits += 1
 		end
 	end
 	expectNear(hits / trials, 0.25, 0.01, "trigger rate")
 end)
 
-test("the waterfall tries Secret first and falls back to Common", function()
+test("a rare type rolls on its own and Common is the fallback", function()
 	local rng = Random.new(13)
 	local list = entries("Common", "Secret")
 	local secret, common, trials = 0, 0, 400000
 	for _ = 1, trials do
-		local entry = EventRules.RollCategory(list, rng)
+		local entry = EventRules.RollCategory(list, rng)[1]
 		if entry and entry.rarity == "Secret" then
 			secret += 1
 		elseif entry then
@@ -50,17 +50,35 @@ test("the waterfall tries Secret first and falls back to Common", function()
 	expectNear(common / trials, 0.25 * 0.999, 0.01, "everything else falls back to Common")
 end)
 
+test("rare types of one rarity never compete: each keeps its own rate", function()
+	local rng = Random.new(15)
+	local list = { { id = "ShrubA", rarity = "Rare" }, { id = "ShrubB", rarity = "Rare" } }
+	local a, b, both, trials = 0, 0, 0, 200000
+	for _ = 1, trials do
+		local seen = {}
+		for _, entry in EventRules.RollCategory(list, rng) do
+			seen[entry.id] = true
+		end
+		a += if seen.ShrubA then 1 else 0
+		b += if seen.ShrubB then 1 else 0
+		both += if seen.ShrubA and seen.ShrubB then 1 else 0
+	end
+	expectNear(a / trials, 0.25 * 0.12, 0.003, "the first type keeps the full Rare rate")
+	expectNear(b / trials, 0.25 * 0.12, 0.003, "and so does the second")
+	expect(both > 0, "both can start in the same tick")
+end)
+
 test("a category with no Common skips when nothing rarer hits", function()
 	local rng = Random.new(14)
 	local list = entries("Rare")
 	local hits, trials = 0, 100000
 	for _ = 1, trials do
-		if EventRules.RollCategory(list, rng) then
+		if #EventRules.RollCategory(list, rng) > 0 then
 			hits += 1
 		end
 	end
 	expectNear(hits / trials, 0.25 * 0.12, 0.004, "only the Rare roll can produce an event")
-	expectEq(EventRules.RollCategory({}, rng), nil, "empty categories (bosses until v0.12) never roll")
+	expectEq(#EventRules.RollCategory({}, rng), 0, "empty categories never roll")
 end)
 
 test("footprint separation rejects overlapping candidates", function()

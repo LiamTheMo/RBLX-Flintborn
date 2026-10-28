@@ -21,14 +21,14 @@ TutorialSteps.Steps = {
 	{
 		id = "Gather",
 		title = "Gather materials",
-		hint = "Walk up to a tree, rock or plant and hold {Interact} at the prompt. Better tools gather more.",
+		hint = "Walk up to a tree, rock, plant or berry bush and hold {Interact} at the prompt. Axes and pickaxes gather more; plants and berries are picked by hand.",
 		trigger = "Harvest",
 		reward = { xp = "Harvest" },
 	},
 	{
 		id = "Craft",
 		title = "Craft arrows or a tool",
-		hint = "Press {Craft} to open crafting. Arrows come in tens and need wood and fiber.",
+		hint = "Press {Craft} to open crafting. Flint Arrows come in tens and need wood, flint and fiber; a wooden axe or pickaxe needs only wood and fiber.",
 		trigger = "Craft",
 	},
 	{

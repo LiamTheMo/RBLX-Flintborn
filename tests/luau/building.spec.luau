@@ -73,6 +73,8 @@ end)
 test("tools hit 1.5× against their material; snapping uses the grid", function()
 	expectEq(BuildRules.StructureDamage(10, "Axe", "Wood"), 15, "axe vs wood")
 	expectEq(BuildRules.StructureDamage(10, "Pickaxe", "Iron"), 15, "pickaxe vs iron")
+	expectEq(BuildRules.StructureDamage(10, "Pickaxe", "Adamantine"), 15, "pickaxe vs every metal tier")
+	expectEq(BuildRules.StructureDamage(10, "Pickaxe", "Wood"), 10, "pickaxe vs wood")
 	expectEq(BuildRules.StructureDamage(10, "Axe", "Stone"), 10, "axe vs stone")
 	expectEq(BuildRules.StructureDamage(10, nil, "Wood"), 10, "weapons hit normally")
 	local snapped = BuildRules.Snap(Vector3.new(5.1, 2.26, -6.2))
@@ -80,7 +82,17 @@ test("tools hit 1.5× against their material; snapping uses the grid", function(
 end)
 
 test("crops ripen on server timestamps", function()
-	local berries = StructureCatalog.Crops.Berries
+	local berries = StructureCatalog.Crops.Redberry
 	expectEq(BuildRules.CropRemaining(berries, 100, 100), 180, "3 minutes")
 	expectEq(BuildRules.CropRemaining(berries, 100, 400), 0, "ripe")
+	expectEq(StructureCatalog.Crops.Berries, nil, "plain Berries no longer grow")
+	-- Planters grow Redberries, Sweetberries, Herbs and saplings (GDD §51).
+	local grown = {}
+	for _, cropId in StructureCatalog.CROP_ORDER do
+		expect(StructureCatalog.Crops[cropId] ~= nil, cropId .. " is a crop")
+		grown[StructureCatalog.Crops[cropId].yield.catalogId] = true
+	end
+	for _, catalogId in { "Redberry", "Sweetberry", "Herbs", "Wood" } do
+		expect(grown[catalogId], "a planter grows " .. catalogId)
+	end
 end)

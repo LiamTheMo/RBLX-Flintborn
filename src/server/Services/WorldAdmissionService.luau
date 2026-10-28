@@ -53,11 +53,12 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "BasicMedicine", quantity = 3 },
 	{ catalogId = "AdvancedMedicine", quantity = 2 },
 	{ catalogId = "Potion", quantity = 1 },
-	{ catalogId = "Berries", quantity = 5 },
+	{ catalogId = "Redberry", quantity = 5 },
 	{ catalogId = "CookedMeat", quantity = 2 },
 	{ catalogId = "Wood", quantity = 30 },
 	{ catalogId = "Stone", quantity = 20 },
 	{ catalogId = "Fiber", quantity = 20 },
+	{ catalogId = "Flint", quantity = 4 },
 	{ catalogId = "ExtractionRune", quantity = 1 },
 	{ catalogId = "AncientEmber", quantity = 1 },
 }

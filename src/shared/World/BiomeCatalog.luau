@@ -1,6 +1,7 @@
 -- The Shattered Crater's regions and biomes (GDD §3, §18.1). One seamless island
 -- with three concentric risk regions; each biome has its own resource pool (node
--- type -> count). Jade and obsidian come only from the Inner Ring. Radii are
+-- type -> count). Ores follow danger (GDD §51): copper and iron in the Outer Rim,
+-- silver, cobalt, jade and obsidian in the Inner Ring, mithril in the Crater. Radii are
 -- placeholders in studs.
 
 local BiomeCatalog = {}
@@ -20,7 +21,7 @@ BiomeCatalog.Biomes = {
 		outer = 1180,
 		color = Color3.fromRGB(222, 202, 150),
 		material = "Sand",
-		resources = { FiberPlant = 12, Rock = 10, BerryBush = 8 },
+		resources = { FiberPlant = 12, Rock = 10, RedberryBush = 5, SweetberryBush = 4, CopperDeposit = 4 },
 	},
 	Woodland = {
 		region = "OuterRim",
@@ -28,7 +29,16 @@ BiomeCatalog.Biomes = {
 		outer = 1050,
 		color = Color3.fromRGB(104, 150, 74),
 		material = "Grass",
-		resources = { Tree = 55, Rock = 22, FiberPlant = 22, HerbShrub = 12, BerryBush = 12 },
+		resources = {
+			Tree = 55,
+			Rock = 22,
+			FiberPlant = 22,
+			HerbShrub = 12,
+			RedberryBush = 7,
+			SweetberryBush = 6,
+			CopperDeposit = 12,
+			IronDeposit = 8,
+		},
 	},
 	Jungle = {
 		region = "InnerRing",
@@ -36,7 +46,15 @@ BiomeCatalog.Biomes = {
 		outer = 750,
 		color = Color3.fromRGB(58, 112, 52),
 		material = "LeafyGrass",
-		resources = { Tree = 45, IronDeposit = 14, HerbShrub = 16, JadeVein = 10, ObsidianOutcrop = 8 },
+		resources = {
+			Tree = 45,
+			Rock = 10,
+			HerbShrub = 16,
+			SilverDeposit = 10,
+			CobaltDeposit = 7,
+			JadeVein = 6,
+			ObsidianOutcrop = 8,
+		},
 	},
 	Caldera = {
 		region = "CenterCrater",
@@ -44,7 +62,7 @@ BiomeCatalog.Biomes = {
 		outer = 270,
 		color = Color3.fromRGB(70, 56, 52),
 		material = "Basalt",
-		resources = { IronDeposit = 6, Rock = 6 },
+		resources = { MithrilDeposit = 6, Rock = 6 },
 	},
 }
 

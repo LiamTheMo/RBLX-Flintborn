@@ -22,7 +22,15 @@ BossCatalog.Bosses = {
 		attacks = { "Slam", "Bolt", "Quake" },
 		pillars = { count = 4, health = 1500 },
 		legendary = "GuardianFang",
-		loot = { { "Iron", 60, 90, 1 }, { "AncientEmber", 2, 3, 1 } },
+		-- Elite loot (GDD §51): the unique Guardian Heart, plenty of elite materials
+		-- and Adamantine Ore, besides the mid-fight Legendary.
+		loot = {
+			{ "GuardianHeart", 1, 1, 1 },
+			{ "ChargedCore", 4, 6, 1 },
+			{ "GlowFur", 4, 6, 1 },
+			{ "AdamantineOre", 10, 20, 1 },
+			{ "AncientEmber", 2, 3, 1 },
+		},
 	},
 	IronhideBehemoth = {
 		name = "Ironhide Behemoth",
@@ -34,7 +42,7 @@ BossCatalog.Bosses = {
 		size = Vector3.new(8, 9, 12),
 		color = Color3.fromRGB(96, 84, 76),
 		attacks = { "Slam", "Quake" },
-		loot = { { "Hide", 15, 25, 1 }, { "Iron", 20, 30, 1 }, { "AncientEmber", 1, 1, 0.5 } },
+		loot = { { "Hide", 15, 25, 1 }, { "IronOre", 20, 30, 1 }, { "AncientEmber", 1, 1, 0.5 } },
 	},
 	BoneColossus = {
 		name = "Bone Colossus",
@@ -46,7 +54,7 @@ BossCatalog.Bosses = {
 		size = Vector3.new(7, 16, 5),
 		color = Color3.fromRGB(226, 220, 200),
 		attacks = { "Slam", "Bolt", "Quake" },
-		loot = { { "Iron", 40, 60, 1 }, { "AncientEmber", 1, 2, 1 } },
+		loot = { { "IronOre", 40, 60, 1 }, { "AncientEmber", 1, 2, 1 } },
 	},
 	EmberTitan = {
 		name = "Ember Titan",
@@ -58,7 +66,7 @@ BossCatalog.Bosses = {
 		size = Vector3.new(7, 14, 6),
 		color = Color3.fromRGB(255, 110, 40),
 		attacks = { "Slam", "Bolt" },
-		loot = { { "AncientEmber", 3, 5, 1 }, { "Iron", 30, 50, 1 }, { "ExtractionRune", 1, 1, 0.05 } },
+		loot = { { "AncientEmber", 3, 5, 1 }, { "IronOre", 30, 50, 1 }, { "ExtractionRune", 1, 1, 0.05 } },
 	},
 	RaiderWarlord = {
 		name = "Raider Warlord",
@@ -70,12 +78,12 @@ BossCatalog.Bosses = {
 		size = Vector3.new(4, 7, 3),
 		color = Color3.fromRGB(140, 30, 30),
 		attacks = { "Slam", "Bolt" },
-		loot = { { "Iron", 25, 40, 1 }, { "Potion", 1, 2, 0.6 } },
+		loot = { { "IronOre", 25, 40, 1 }, { "Potion", 1, 2, 0.6 } },
 	},
 }
 
 -- What a ritual site asks for to summon its boss (consumed once on the server).
-BossCatalog.Ritual = { boss = "EmberTitan", offering = { AncientEmber = 3, Iron = 50 }, summonSeconds = 10 }
+BossCatalog.Ritual = { boss = "EmberTitan", offering = { AncientEmber = 3, IronOre = 50 }, summonSeconds = 10 }
 
 function BossCatalog.Get(bossId: any)
 	return type(bossId) == "string" and BossCatalog.Bosses[bossId] or nil

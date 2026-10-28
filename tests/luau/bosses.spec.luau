@@ -42,15 +42,37 @@ test("scaling is clamped and frozen at spawn", function()
 end)
 
 test("gear score rewards better weapons and armor", function()
+	local function kit(weapon: string?, armorTier: string?)
+		local items = {}
+		if weapon then
+			table.insert(items, { catalogId = weapon })
+		end
+		if armorTier then
+			for _, slot in { "Head", "Chest", "Legs" } do
+				table.insert(items, { catalogId = armorTier .. slot })
+			end
+		end
+		return items
+	end
 	local naked = BossScaling.GearScore({})
-	local armed = BossScaling.GearScore({
-		{ catalogId = "IronSword" },
-		{ catalogId = "IronHead" },
-		{ catalogId = "IronChest" },
-		{ catalogId = "IronLegs" },
-	})
 	expectEq(naked, 0, "nothing carried")
-	expect(armed > 0.7 and armed <= 1, "full iron with a rare sword")
+	local iron = BossScaling.GearScore(kit("IronSword", "Iron"))
+	expect(iron > naked and iron < 0.5, "full iron with a common sword sits mid-ladder")
+	local top = BossScaling.GearScore(kit("AdamantineSword", "Adamantine"))
+	expect(top > 0.7 and top <= 1, "full adamantine with an epic sword")
+	expectEq(BossScaling.GearScore(kit("GuardianFang", "Adamantine")), 1, "the Legendary Fang tops the score")
+	expect(
+		BossScaling.GearScore(kit("AdamantineSword")) > BossScaling.GearScore(kit("IronSword")),
+		"a rarer weapon scores more"
+	)
+	-- Every armor tier on the ladder scores more than the one before it.
+	local previous = 0
+	for _, tier in { "Hide", "Bone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" } do
+		local score = BossScaling.GearScore(kit(nil, tier))
+		expect(score > previous, tier .. " armor scores more than the tier below")
+		previous = score
+	end
+	expectEq(BossScaling.GearScore({ { catalogId = "WoodChest" } }), 0, "removed Wood armor scores nothing")
 end)
 
 test("each boss source resets by its own rule", function()

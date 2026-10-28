@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.16  
+> **Design revision:** 1.17  
 > **Last updated:** 2026-10-25  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
 | **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
 | **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
 | **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
@@ -2305,6 +2306,29 @@ Roblox avatars (accessories, clothing, body colours) are not loaded on top.
 **Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow; colours in `src/shared/Character/CharacterLook.luau`; applied by `OutfitService`.
 
 **QA:** a new player spawns as the default character in the lobby and the world, with no avatar items; walking, jumping and idle use the R6 animations with the clothing following the limbs; a tribeless player wears brown shorts; creating or joining a tribe changes them to that tribe's colour, and leaving changes them back.
+
+## 51. Item and material catalog (2026-10-27)
+
+The owner defined the launch item and material catalog in a question round on 2026-10-27. **The full tables, recipes and numbers live in [`docs/ITEM_CATALOG.md`](docs/ITEM_CATALOG.md)**; the data is generated from `src/shared/Items/Tiers.luau`. Summary of the decisions:
+
+1. **Ladder:** Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, expandable later. Each tier is about **25% stronger** than the last (damage, tool yield, building HP and armor above Iron), anchored on the confirmed wooden spear 15, stone spear 25, Hide armor ×1.2 and Iron armor ×2.0.
+2. **Weapons:** spears, daggers, swords and bows only. Bows go Wooden, then a metal-reinforced bow per metal.
+3. **Restricted (gem-class) materials:** Flint, Obsidian, Jade and any future gemstone make **only daggers and spears**, plus Forge and Permanent inputs. **Flint is the only arrow tip**, and Flint Arrows are the only arrows. Strength is staggered: Flint between Stone and Copper, Obsidian between Iron and Silver, Jade between Cobalt and Mithril.
+4. **Ores:** smelted into bars at a Furnace, **1 ore → 1 bar, no fuel**, costing only time. Mining needs the **previous tier's pickaxe**. Ores spawn by danger: Copper and Iron in the Outer Rim, Silver and Cobalt in the Inner Ring, Mithril in the Crater, and Adamantine only from meteors, the Guardian and rare events.
+5. **Armor:** Hide → Bone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine. Wood and Stone armor are removed.
+6. **Tools:** axes and pickaxes at every tier from Wood. **Sickles are removed**; Fiber, Herbs and berries are gathered by hand.
+7. **Stations:** Wood, Stone, Flint, Bone and Hide gear by hand; Copper, Iron and Obsidian at a Workbench; Silver and up, and Jade, at a new **Anvil**; smelting and cooking at the Furnace; potions at a new **Cauldron**. No other intermediate components.
+8. **Rarity** rises slowly with tier (Wood through Iron Common, Silver and Cobalt Uncommon, Mithril Rare, Adamantine Epic); Legendary and above stay for boss and event drops. Quality rolls stay ±5% (Q139).
+9. **New materials:** Flint, Resin and Bone (common); Dire Hide, Charged Core and Glow-Fur (elite creatures); **Guardian Heart** (the Guardian, which joins the elite group); Ashen Oil and Siege Resin (ancient caches); Abyssal Shard and Emberglass (meteors); Bloodroot and Moonpetal (rare herbs). Ancient Ember stays.
+10. **Rare shrub event:** a new announced event that grows rare berries and rare herbs, at the same frequency as other rare events. **Every rare event type rolls individually** instead of competing within its category.
+11. **Berries:** Redberry (healing), Sweetberry (fullness), Sunberry (XP boost) and Glimmerberry (luck boost). Each brews at the Cauldron into a stronger potion or draught. XP boosts add to Premium and paid boosters (Q162). **Luck raises rare-drop chance only.** Medicine and Cooked Meat are unchanged.
+12. **Siege:** Fire Bomb (Ashen Oil; burns Wood hard, Stone less, metal barely) and Breaching Charge (Siege Resin; heavy damage to one wall or door after a fuse). Rare materials also feed Mithril and Adamantine gear and Permanent conversions.
+13. **Building:** walls, floors, doors and roofs come in the full ladder, built from bars at metal tiers.
+14. **Permanent:** **any gear** can be converted; the cost scales with tier (10× its recipe, Ancient Ember, and rare materials at Cobalt and above).
+15. **Guardian's Fang:** Legendary, one tier above the Adamantine sword.
+16. **Trading:** elite, Guardian, meteor and cache materials, rare herbs, rare berries and Ancient Ember trade; common materials, ores and bars do not.
+17. **Shop:** starter supplies only (Wood and Stone tools, Flint Arrows, basic medicine, common berries and their seeds).
+18. **Pre-release cleanup:** removed items and the old "Iron" material are deleted from existing saves.
 
 ---
 
