@@ -788,6 +788,8 @@ def sample(src, box, kind="green"):
         m = (sat < 0.18) & (mx > 60) & (mx < 245)
     elif kind == "brown":
         m = (r > g + 15) & (g > b) & (sat > 0.3)
+    elif kind == "vivid":                    # any strongly coloured material (crystals, ores, amber, sulfur)
+        m = (sat > 0.35) & (mx > 40)
     else:
         m = np.ones(len(s), bool)
     sel = s[m]
