@@ -28,6 +28,8 @@ LobbyPopups.__index = LobbyPopups
 local TITLE_HEIGHT = 34
 local ROW_HEIGHT = 52
 local MAX_LIST_HEIGHT = 230
+-- List room a card keeps before growing on a phone (about three lines).
+local MIN_LIST_HEIGHT = 66
 local CLOSE_SIZE = 44
 local BASE_Z = 10
 -- Below this screen scale (phones) the card is drawn larger, up to MAX_GROW.
@@ -197,6 +199,10 @@ function LobbyPopups:Show(spec)
 	-- always ends below the top bar, scrolling its list when space runs out.
 	local grow = if self.screenScale < SMALL_SCREEN then math.min(MAX_GROW, SMALL_SCREEN / self.screenScale) else 1
 	local room = self.screenHeight + enter.pos[4] - enter.size[2] + 4 - (self.topLimit + 8)
+	-- The list keeps room for about three lines before the card grows: on a
+	-- very short screen what the card says matters more than its size.
+	local wanted = math.min(listHeight, MIN_LIST_HEIGHT)
+	grow = math.max(1, math.min(grow, room / (chrome + wanted)))
 	listHeight = math.max(0, math.min(listHeight, room / grow - chrome))
 	if (chrome + listHeight) * grow > room then
 		grow = math.max(0.5, room / (chrome + listHeight))
@@ -253,7 +259,9 @@ function LobbyPopups:Show(spec)
 		Name = "CloseButton",
 		Text = "",
 		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
+		-- A touch area a little past the art, clear of the list below.
+		Position = UDim2.fromOffset(-8, -8),
+		Size = UDim2.new(1, 16, 1, 8),
 		ZIndex = BASE_Z + 4,
 	}, close)
 	closeButton.Activated:Connect(function()

@@ -272,6 +272,7 @@
       "pos": [0.5, 314, 1, -71],
       "size": [251, 71],
       "sprite": "pm_lobby_server",
+      "touchPad": [0, 12, 0, 12],
       "label": { "rect": [74, 16, 134, 34], "font": "serif", "textSize": 17, "color": "ink", "text": "Choose server" }
     },
     "status": {
