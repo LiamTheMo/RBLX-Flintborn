@@ -116,15 +116,16 @@ NOTES = {
 }
 
 
-def floor_cut(o):
-    """Cut everything below z = 0 (the crystals' sunk bases) and cap the hole flat: a planar base."""
-    import bpy
+def floor_cut(o, z0=None):
+    """Cut everything below the ground (the crystals' sunk bases) and cap the hole flat: a planar base. z0 is the
+    ground in object coordinates; by default the most common z of the down-facing flat faces."""
     bm = bmesh.new()
     bm.from_mesh(o.data)
-    # the ground is where the rocks' flat bottoms are (the asset may have been lifted because a leaning
-    # crystal dipped below it): the most common z of the down-facing flat faces
-    flat = [round(f.calc_center_median().z, 3) for f in bm.faces if f.normal.z < -0.99]
-    z0 = max(set(flat), key=flat.count) if flat else 0.0
+    if z0 is None:
+        # the ground is where the rocks' flat bottoms are (the asset may have been lifted because a leaning
+        # crystal dipped below it)
+        flat = [round(f.calc_center_median().z, 3) for f in bm.faces if f.normal.z < -0.99]
+        z0 = max(set(flat), key=flat.count) if flat else 0.0
     res = bmesh.ops.bisect_plane(bm, geom=list(bm.verts) + list(bm.edges) + list(bm.faces), plane_co=(0, 0, z0),
                                  plane_no=(0, 0, -1), clear_outer=True)
     # anything the bisect left below the plane (e.g. a stray vertex of a face lying across it) goes too
