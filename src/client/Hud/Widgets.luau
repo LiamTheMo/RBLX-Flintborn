@@ -173,9 +173,42 @@ local function fallback(name: string, props, parent: Instance?)
 	return apply(frame, props)
 end
 
+-- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
+-- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
+-- share of the whole, so the sprite still resizes as one image.
+local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
+	local ids = {}
+	for _, tile in sprite.tiles do
+		local id = UiAssets.image(tile[1])
+		if id == nil then
+			return nil
+		end
+		ids[tile[1]] = id
+	end
+	local holder = Widgets.Make("Frame", { Name = name, BackgroundTransparency = 1 }, parent)
+	apply(holder, props)
+	for _, tile in sprite.tiles do
+		local image = Widgets.Make("ImageLabel", {
+			Name = tile[1],
+			BackgroundTransparency = 1,
+			Image = ids[tile[1]],
+			ScaleType = Enum.ScaleType.Stretch,
+			Position = UDim2.fromScale(tile[2] / sprite.w, tile[3] / sprite.h),
+			Size = UDim2.fromScale(tile[4] / sprite.w, tile[5] / sprite.h),
+			ZIndex = holder.ZIndex,
+		}, holder)
+		SpriteLoader.Track(image)
+	end
+	return holder
+end
+
 -- An image from the art sheets by sprite name, or its styled fallback.
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
+	local whole = UiAssets.sprite(name)
+	if whole and type(whole.tiles) == "table" then
+		return tiled(name, whole, props, parent) or fallback(name, props, parent)
+	end
 	local id = UiAssets.image(name)
 	if id == nil then
 		return fallback(name, props, parent)

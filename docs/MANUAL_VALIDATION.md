@@ -597,3 +597,23 @@ Studio and live checks:
 - [ ] The offshore wall stops walking and jumping out to sea.
 - [ ] The river's small step-down "rapids" and the shorelines look acceptable; the ocean surface meets the shelf without a seam.
 - [ ] Creatures wade on the bed at reduced speed.
+
+## Parchment Settings screen and new settings (GDD §57)
+
+How it's built: `Hud/SettingsPanel` draws the window from the parchment kit (`Hud/Parchment`); `SettingsController` keeps the draft and saves on APPLY; `PreferencesController` applies volumes, camera sensitivity and inversion, names and graphics quality; `Hud/DamageNumbers` floats hit damage. Spec: `docs/ui/SettingsScreen.md`.
+
+Automated: `settings.spec` (defaults, ranges, the server accepting only known, valid values, saved junk falling back to defaults); `art/ui/capture/capture.py settings` renders every tab and `settings_flow` drives open → change → APPLY → RESET → close and checks what is sent.
+
+Studio and live checks (desktop, touch and controller):
+
+- [ ] The gear (lobby), ⚙ (world) and O open the window centred below the top bar; it fits on a phone in landscape (text is small at 0.3–0.5×; note whether it stays readable) and on a large monitor.
+- [ ] Each tab shows its page; the selected tab turns leather with cream text. Close (✕) and gamepad B close it.
+- [ ] Sliders drag with mouse and touch and step with a gamepad's d-pad; the dropdown opens upward on Gameplay and downward on Graphics, and closes on a choice.
+- [ ] APPLY is dimmed until something changes, saves, and the values are still there after rejoining. RESET puts back only the open tab's settings and keys. Closing without APPLY keeps the old values.
+- [ ] Music and Effects change volume at once after APPLY (Effects: hits, alerts, world sounds). Music has no soundtrack yet, so check it with a sound tagged `Music`.
+- [ ] Camera Sensitivity 10 / 50 / 100 makes mouse look slow / normal / fast.
+- [ ] Invert Camera flips mouse, touch and right-stick vertical look; off restores it. If Roblox's PlayerModule changed and it does nothing, the client logs "Invert Camera is unavailable".
+- [ ] Show Damage on: damage numbers float up from creatures, players and structures you hit (still, with reduced motion); off: hit markers without numbers.
+- [ ] Show Names off hides other players' name tags for you only.
+- [ ] Graphics Quality Low turns shadows off and thins fires and effects; High restores them.
+- [ ] Rebinding from the Gameplay key list and from Controls works, swaps clashing keys, refuses reserved ones with a note, and saves on APPLY.

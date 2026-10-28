@@ -1,10 +1,18 @@
--- Settings (GDD §25, §11, §46): UI scale, colour-blind palette, reduced motion,
--- subtitles for alert sounds, replaying the tutorial, and keyboard controls. The
--- Settings key (O by default) or the ⚙ button opens it; choices save to the
--- profile and apply everywhere at once. To rebind, click an action and press the
--- new key (Esc cancels); a key another action uses swaps with it.
+-- Settings (GDD §25, §11, §46): the parchment Settings window (Hud/SettingsPanel)
+-- with its five tabs — volumes, camera sensitivity and inversion, damage numbers,
+-- names, graphics quality, UI scale, colour-blind palette, reduced motion,
+-- subtitles, replaying the tutorial and keyboard controls. The Settings key (O by
+-- default) or a ⚙ button opens it. Changes collect in a draft: APPLY saves them to
+-- the profile (the server echoes them back as player attributes, and every
+-- controller reacts to those), RESET puts the open tab back to its defaults and
+-- closing discards the draft. To rebind, click a key and press the new one (Esc
+-- cancels); a key another action uses swaps with it.
+--
+-- This module also applies two settings itself: UI scale on every ScreenGui that
+-- does not fit itself, and the colour-blind rarity palette.
 
 local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -12,7 +20,10 @@ local UserInputService = game:GetService("UserInputService")
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
+local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local SettingsPanel = require(script.Parent.Parent.Hud.SettingsPanel)
+local Widgets = require(script.Parent.Parent.Hud.Widgets)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -20,13 +31,17 @@ local SettingsController = {}
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local ui = {}
 local defaultRarity = table.clone(Rarity.Colors)
--- The action waiting for its new key, and a note shown under Controls.
+local panel = nil
+-- The unsaved choices: every setting's value and the keyboard overrides.
+local draft = nil
+local keyDraft = nil
+-- The action waiting for its new key, and a note shown under the keys.
 local capturing = nil
-local controlsNote = ""
+local keyNote = ""
 
 local CAPTURE_ACTION = "FlintbornKeyCapture"
+local CLOSE_ACTION = "FlintbornSettingsClose"
 
 local make = Theme.Make
 
@@ -44,13 +59,14 @@ end
 
 -- Roblox's own touch controls (thumbstick, jump and action buttons) live in
 -- PlayerGui too; they size themselves for the screen and must not shrink. The
--- in-world HUD fits itself to the screen and applies UiScale on its own.
+-- HUDs and parchment menus fit themselves to the screen and apply UiScale on
+-- their own (menus mark their ScreenGui "FitsItself").
 local UNSCALED = { TouchGui = true, FlintbornHud = true, FlintbornHudOverlay = true, FlintbornLobbyHud = true }
 
 local function applyScale()
 	local scale = (player:GetAttribute("UiScale") or 1) * viewportFactor()
 	for _, gui in playerGui:GetChildren() do
-		if gui:IsA("ScreenGui") and not UNSCALED[gui.Name] then
+		if gui:IsA("ScreenGui") and not UNSCALED[gui.Name] and not gui:GetAttribute("FitsItself") then
 			local uiScale = gui:FindFirstChild("FlintbornScale") or make("UIScale", { Name = "FlintbornScale" }, gui)
 			uiScale.Scale = scale
 		end
@@ -64,28 +80,63 @@ local function applyPalette()
 	end
 end
 
-local function save(changes)
-	local settings = {
-		uiScale = player:GetAttribute("UiScale") or 1,
-		colourBlindMode = player:GetAttribute("ColourBlind") == true,
-		reducedMotion = player:GetAttribute("ReducedMotion") == true,
-		subtitles = player:GetAttribute("Subtitles") ~= false,
-	}
-	for key, value in changes do
-		settings[key] = value
+-- Every setting as saved (the server's attributes), defaults where unset.
+local function saved(): { [string]: any }
+	local choices = {}
+	for _, setting in SettingsRules.Settings do
+		choices[setting.key] = player:GetAttribute(setting.attribute)
 	end
-	Remotes.Get("SaveSettings"):FireServer(settings)
+	return SettingsRules.Resolve(choices)
 end
 
-local render
+local function sameKeys(a, b): boolean
+	for id, key in a do
+		if b[id] ~= key then
+			return false
+		end
+	end
+	for id, key in b do
+		if a[id] ~= key then
+			return false
+		end
+	end
+	return true
+end
+
+-- The settings in the draft that differ from what is saved.
+local function changes(): { [string]: any }
+	local current = saved()
+	local diff = {}
+	for key, value in draft do
+		if current[key] ~= value then
+			diff[key] = value
+		end
+	end
+	return diff
+end
+
+local function isDirty(): boolean
+	return next(changes()) ~= nil or not sameKeys(Keybinds.Sanitize(keyDraft), Binds.Overrides())
+end
+
+local function canRebind(): boolean
+	return UserInputService.KeyboardEnabled
+end
+
+local function showKeys()
+	panel:SetKeys(Keybinds.Resolve(keyDraft), capturing, keyNote, canRebind())
+end
+
+local function refresh()
+	panel:SetDirty(isDirty())
+	showKeys()
+end
 
 local function stopCapture()
-	capturing = nil
-	ContextActionService:UnbindAction(CAPTURE_ACTION)
-end
-
-local function saveKeys(overrides)
-	Remotes.Get("SaveKeybinds"):FireServer(overrides)
+	if capturing then
+		capturing = nil
+		ContextActionService:UnbindAction(CAPTURE_ACTION)
+	end
 end
 
 -- Waits for the next key for action `id`. Bound above every game action and sunk,
@@ -93,193 +144,157 @@ end
 local function startCapture(id: string)
 	stopCapture()
 	capturing = id
-	controlsNote = ""
+	keyNote = ""
 	ContextActionService:BindActionAtPriority(CAPTURE_ACTION, function(_, state, input)
 		if state ~= Enum.UserInputState.Begin then
 			return Enum.ContextActionResult.Sink
 		end
 		local key = input.KeyCode.Name
 		if input.KeyCode == Enum.KeyCode.Escape then
-			controlsNote = ""
+			keyNote = ""
 		elseif Keybinds.IsAllowed(key) then
-			local overrides = Keybinds.Assign(Binds.Overrides(), id, key)
+			local overrides = Keybinds.Assign(keyDraft, id, key)
 			if overrides then
-				saveKeys(overrides)
-				controlsNote = ("%s → %s"):format(Keybinds.Get(id).label, Keybinds.Display(key))
+				keyDraft = overrides
+				keyNote = ("%s → %s"):format(Keybinds.Get(id).label, SettingsPanel.KeyText(key))
 			end
 		else
-			controlsNote = ("%s is reserved (movement, chat or menus)."):format(Keybinds.Display(key))
+			keyNote = ("%s is kept for movement, chat or menus."):format(SettingsPanel.KeyText(key))
 		end
 		stopCapture()
-		render()
+		refresh()
 		return Enum.ContextActionResult.Sink
 	end, false, Enum.ContextActionPriority.High.Value + 100, Enum.UserInputType.Keyboard)
-	render()
+	refresh()
 end
 
-function render()
-	for _, child in ui.list:GetChildren() do
-		if not child:IsA("UIListLayout") then
-			child:Destroy()
+-- Loads the saved choices into a fresh draft.
+local function loadDraft()
+	draft = saved()
+	keyDraft = Binds.Overrides()
+	keyNote = ""
+	panel:SetValues(draft)
+	refresh()
+end
+
+local function close()
+	stopCapture()
+	ContextActionService:UnbindAction(CLOSE_ACTION)
+	local selected = GuiService.SelectedObject
+	if selected and selected:IsDescendantOf(panel.screen.gui) then
+		GuiService.SelectedObject = nil
+	end
+	panel.screen:SetOpen(false)
+end
+
+local function apply()
+	stopCapture()
+	local diff = changes()
+	if next(diff) ~= nil then
+		Remotes.Get("SaveSettings"):FireServer(diff)
+	end
+	local keys = Keybinds.Sanitize(keyDraft)
+	if not sameKeys(keys, Binds.Overrides()) then
+		Remotes.Get("SaveKeybinds"):FireServer(keys)
+	end
+	keyNote = "Saved."
+	-- The saved state arrives as attributes in a moment; until then the draft is it.
+	panel:SetDirty(false)
+	showKeys()
+end
+
+-- RESET puts the open tab's settings and keys back to their defaults (in the
+-- draft; APPLY saves them).
+local function reset(tab: string)
+	stopCapture()
+	for _, key in SettingsPanel.TAB_SETTINGS[tab] or {} do
+		draft[key] = SettingsRules.Get(key).default
+	end
+	local keys = SettingsPanel.TAB_KEYS[tab]
+	if keys == "all" then
+		keyDraft = {}
+	elseif keys then
+		for _, id in keys do
+			keyDraft = Keybinds.Assign(keyDraft, id, Keybinds.Get(id).default) or keyDraft
 		end
 	end
-	local order = 0
-	local function nextOrder(): number
-		order += 1
-		return order
-	end
-	local function row(text: string, onClick, height: number?)
-		local b = make("TextButton", {
-			Text = text,
-			Size = UDim2.new(1, -8, 0, height or Theme.TOUCH_TARGET),
-			BackgroundColor3 = Theme.Colors.Button,
-			TextColor3 = Theme.Colors.Text,
-			Font = Theme.Fonts.Bold,
-			TextSize = Theme.TextSize.Body,
-			LayoutOrder = nextOrder(),
-		}, ui.list)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(function()
-			onClick()
-			task.delay(0.3, render)
-		end)
-		return b
-	end
-	local function heading(text: string)
-		make("TextLabel", {
-			Text = text,
-			Size = UDim2.new(1, -8, 0, 22),
-			BackgroundTransparency = 1,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			TextColor3 = Theme.Colors.Heading,
-			Font = Theme.Fonts.Bold,
-			TextSize = Theme.TextSize.Heading,
-			LayoutOrder = nextOrder(),
-		}, ui.list)
-	end
-	local scale = player:GetAttribute("UiScale") or 1
-	row(("UI scale: %.1f×  (tap to cycle)"):format(scale), function()
-		local nextScale = scale + 0.1
-		save({ uiScale = if nextScale > 1.4 + 1e-6 then 0.8 else nextScale })
-	end)
-	local function toggle(label: string, attribute: string, key: string, default: boolean)
-		local value = player:GetAttribute(attribute)
-		if value == nil then
-			value = default
-		end
-		row(("%s: %s"):format(label, if value then "ON" else "OFF"), function()
-			save({ [key] = not value })
-		end)
-	end
-	toggle("Colour-blind palette", "ColourBlind", "colourBlindMode", false)
-	toggle("Reduced motion", "ReducedMotion", "reducedMotion", false)
-	toggle("Subtitles for alert sounds", "Subtitles", "subtitles", true)
-	row("Replay the tutorial", function()
-		pcall(function()
-			Remotes.Get("TutorialAction"):InvokeServer("Replay")
-		end)
-	end)
-	-- Keyboard controls: only meaningful with a keyboard attached.
-	if not UserInputService.KeyboardEnabled then
-		return
-	end
-	heading("Controls — click an action, then press a key")
-	if controlsNote ~= "" then
-		heading(controlsNote)
-	end
-	local keys = Binds.Map()
-	for _, action in Keybinds.Actions do
-		local text = if capturing == action.id
-			then ("%s: press a key… (Esc cancels)"):format(action.label)
-			else ("%s: %s"):format(action.label, Keybinds.Display(keys[action.id]))
-		local b = row(text, function()
-			startCapture(action.id)
-		end, 30)
-		b.TextXAlignment = Enum.TextXAlignment.Left
-		b.TextSize = Theme.TextSize.Small
-		make("UIPadding", { PaddingLeft = UDim.new(0, 8) }, b)
-	end
-	row("Reset controls to defaults", function()
-		stopCapture()
-		controlsNote = "Controls reset to defaults."
-		saveKeys({})
-	end)
+	keyNote = ""
+	panel:SetValues(draft)
+	refresh()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Settings", ResetOnSpawn = false, DisplayOrder = 20 }, playerGui)
-	ui.panel = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(380, 440),
-		BackgroundColor3 = Theme.Colors.Panel,
-		Active = true,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("TextLabel", {
-		Text = "Settings",
-		Position = UDim2.fromOffset(12, 6),
-		Size = UDim2.new(1, -50, 0, 26),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Theme.Colors.Heading,
-		Font = Theme.Fonts.Title,
-		TextSize = Theme.TextSize.Title,
-	}, ui.panel)
-	local close = make("TextButton", {
-		Text = "✕",
-		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, -6, 0, 6),
-		Size = UDim2.fromOffset(32, 28),
-		BackgroundColor3 = Theme.Colors.ButtonDisabled,
-		TextColor3 = Theme.Colors.Text,
-		Font = Theme.Fonts.Bold,
-		TextSize = 14,
-	}, ui.panel)
-	close.Activated:Connect(function()
-		ui.panel.Visible = false
-		stopCapture()
-	end)
-	-- Scrolls: the controls list is longer than the panel.
-	ui.list = make("ScrollingFrame", {
-		Position = UDim2.fromOffset(12, 40),
-		Size = UDim2.new(1, -24, 1, -50),
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		ScrollBarThickness = 6,
-		CanvasSize = UDim2.new(),
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		ScrollingDirection = Enum.ScrollingDirection.Y,
-	}, ui.panel)
-	make("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, ui.list)
-	-- A small always-visible button, so touch players can reach settings too. The
-	-- lobby HUD has its own gear button, so this one stays hidden there.
-	local open = make("TextButton", {
-		Text = "⚙",
+	panel = SettingsPanel.new(playerGui, {
+		onClose = close,
+		onApply = apply,
+		onReset = reset,
+		onChange = function(key: string, value)
+			draft[key] = value
+			refresh()
+		end,
+		onRebind = function(id: string)
+			if canRebind() then
+				startCapture(id)
+			end
+		end,
+		onReplayTutorial = function()
+			close()
+			task.spawn(function()
+				pcall(function()
+					Remotes.Get("TutorialAction"):InvokeServer("Replay")
+				end)
+			end)
+		end,
+		onTab = function()
+			stopCapture()
+			if draft then
+				refresh()
+			end
+		end,
+	})
+	panel.screen:Watch()
+
+	-- A small always-visible button, so touch players can reach settings in the
+	-- world too. The lobby HUD has its own gear button, so this one stays hidden there.
+	local gui =
+		make("ScreenGui", { Name = "FlintbornSettingsButton", ResetOnSpawn = false, DisplayOrder = 5 }, playerGui)
+	local open = Widgets.Sprite("pm_lobby_gear", {
+		Name = "Open",
 		AnchorPoint = Vector2.new(1, 1),
 		Position = UDim2.new(1, -12, 1, -12),
 		Size = UDim2.fromOffset(Theme.TOUCH_TARGET, Theme.TOUCH_TARGET),
-		BackgroundColor3 = Theme.Colors.Panel,
-		BackgroundTransparency = 0.2,
-		TextColor3 = Theme.Colors.Heading,
-		Font = Theme.Fonts.Bold,
-		TextSize = 22,
 		Visible = not HudMode.ReplacesLobby(),
 	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, open)
-	open.Activated:Connect(function()
+	local press = make("TextButton", {
+		Name = "Press",
+		Text = "",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = 3,
+	}, open)
+	press.Activated:Connect(function()
 		SettingsController.Toggle()
 	end)
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes the window (keys, the ⚙ buttons).
 function SettingsController.Toggle()
-	ui.panel.Visible = not ui.panel.Visible
-	stopCapture()
-	if ui.panel.Visible then
-		render()
+	if panel.screen:IsOpen() then
+		close()
+		return
+	end
+	loadDraft()
+	panel:SelectTab(panel.tab or "Gameplay")
+	panel.screen:SetOpen(true)
+	-- Gamepad B closes it, like the other parchment menus.
+	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			close()
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.ButtonB)
+	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
+		GuiService.SelectedObject = panel.tabs[panel.tab].button
 	end
 end
 
@@ -308,11 +323,28 @@ function SettingsController.Start()
 	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(watchCamera)
 	watchCamera()
 	player:GetAttributeChangedSignal("ColourBlind"):Connect(applyPalette)
-	Binds.Changed:Connect(function()
-		if ui.panel.Visible then
-			render()
+	-- Saved changes arriving while the window is open (the server's echo after
+	-- APPLY): shown when nothing is left unsaved, so edits in progress stay.
+	local function resync()
+		if panel.screen:IsOpen() and draft and not isDirty() then
+			local note = keyNote
+			loadDraft()
+			keyNote = note
+			showKeys()
+		elseif panel.screen:IsOpen() and draft then
+			refresh()
+		end
+	end
+	local watched = {}
+	for _, setting in SettingsRules.Settings do
+		watched[setting.attribute] = true
+	end
+	player.AttributeChanged:Connect(function(name: string)
+		if watched[name] then
+			resync()
 		end
 	end)
+	Binds.Changed:Connect(resync)
 	Binds.Bind("Settings", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			SettingsController.Toggle()

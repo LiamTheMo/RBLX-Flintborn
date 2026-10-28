@@ -719,10 +719,20 @@
     "slice": null,
     "w": 68
   },
+  "pm_button_apply": {
+    "h": 94,
+    "slice": null,
+    "w": 284
+  },
   "pm_button_check": {
     "h": 150,
     "slice": null,
     "w": 155
+  },
+  "pm_button_close": {
+    "h": 92,
+    "slice": null,
+    "w": 98
   },
   "pm_button_leather": {
     "h": 140,
@@ -804,10 +814,35 @@
     ],
     "w": 385
   },
+  "pm_button_reset": {
+    "h": 77,
+    "slice": null,
+    "w": 212
+  },
   "pm_button_x": {
     "h": 150,
     "slice": null,
     "w": 155
+  },
+  "pm_check_off": {
+    "h": 61,
+    "slice": null,
+    "w": 58
+  },
+  "pm_check_on": {
+    "h": 71,
+    "slice": null,
+    "w": 70
+  },
+  "pm_dropdown": {
+    "h": 73,
+    "slice": [
+      30,
+      26,
+      72,
+      26
+    ],
+    "w": 239
   },
   "pm_fill_xp": {
     "h": 14,
@@ -819,6 +854,36 @@
     ],
     "w": 176
   },
+  "pm_glyph_diamond": {
+    "h": 27,
+    "slice": null,
+    "w": 24
+  },
+  "pm_glyph_gamepad": {
+    "h": 42,
+    "slice": null,
+    "w": 58
+  },
+  "pm_glyph_gear": {
+    "h": 54,
+    "slice": null,
+    "w": 53
+  },
+  "pm_glyph_monitor": {
+    "h": 51,
+    "slice": null,
+    "w": 54
+  },
+  "pm_glyph_person": {
+    "h": 60,
+    "slice": null,
+    "w": 50
+  },
+  "pm_glyph_sound": {
+    "h": 47,
+    "slice": null,
+    "w": 55
+  },
   "pm_icon_add_friend": {
     "h": 143,
     "slice": null,
@@ -828,6 +893,21 @@
     "h": 131,
     "slice": null,
     "w": 168
+  },
+  "pm_keycap": {
+    "h": 71,
+    "slice": [
+      22,
+      22,
+      22,
+      26
+    ],
+    "w": 116
+  },
+  "pm_keycap_small": {
+    "h": 71,
+    "slice": null,
+    "w": 79
   },
   "pm_lobby_coins": {
     "h": 70,
@@ -874,6 +954,31 @@
     ],
     "w": 529
   },
+  "pm_slider_knob": {
+    "h": 58,
+    "slice": null,
+    "w": 58
+  },
+  "pm_tab_leather": {
+    "h": 104,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ],
+    "w": 320
+  },
+  "pm_tab_paper": {
+    "h": 101,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ],
+    "w": 312
+  },
   "pm_tile_forge": {
     "h": 145,
     "slice": null,
@@ -903,6 +1008,37 @@
     "h": 145,
     "slice": null,
     "w": 146
+  },
+  "pm_window_settings": {
+    "h": 706,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_settings__1_1",
+        0,
+        0,
+        817,
+        706
+      ],
+      [
+        "pm_window_settings__1_2",
+        813,
+        0,
+        817,
+        706
+      ]
+    ],
+    "w": 1630
+  },
+  "pm_window_settings__1_1": {
+    "h": 706,
+    "slice": null,
+    "w": 817
+  },
+  "pm_window_settings__1_2": {
+    "h": 706,
+    "slice": null,
+    "w": 817
   },
   "slot_broken": {
     "h": 146,
