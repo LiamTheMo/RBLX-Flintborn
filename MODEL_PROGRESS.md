@@ -216,7 +216,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 017 | Flintborn Berry Bush Study | World & resources | ✅ | 2596; parts 206 / 330 / 96 | modeller + fresh verifiers; R1 FAIL 6 (round lobes, dark hidden stems), R2 7 (one berry blocker, fixed by main session) | minors: f34 shows 5 of the sheet's 6 berries; front skirt lobes end high; upper stems dark in front under the canopy shadow; side/rear darker from the studio fill |
 | 018 | Flintborn healing herb study | World & resources | ⬜ | | | |
 | 019 | Flintborn Resin Node study | World & resources | ⬜ | | | |
-| 020 | Flintborn hardwood stump study | World & resources | ⬜ | | | |
+| 020 | Flintborn hardwood stump study | World & resources | ✅ | 1808; parts 798 / 210 / 124 / 174 | modeller + fresh verifiers; R1 FAIL 5 (smooth cone trunk, tulip clumps, boulder root), R2 PASS 7 | minors: bark light patches still read as faint slabs from the back; rim notches crack-like rather than scalloped; BL clump high and BR low in f34; top-view leaf share +6 |
 | 021 | Flintborn Root Cluster Study | World & resources | ⬜ | | | |
 | 022 | Flintborn Fiber Shrub Model Study | World & resources | ⬜ | | | |
 | 023 | Flintborn Clay Deposit Model Study | World & resources | ⬜ | | | |
@@ -399,3 +399,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: 015 Ember Meteor built through the stage agents: a cracked dark dome around a faceted Neon core, with real-depth cracks graded dark lip → ember wall → hot, a rock ring, 2 heat_glow lights and 4 ember sockets. R1 FAIL 6, R2 PASS 7. The setup changed to three modellers at once, each in its own background Blender (bgmcp.py), with a fresh verifier per model and the main session as hub; PRs are batched every 3–5 models.
 - 2026-10-28: 016 Stormglass built by one modeller in a background Blender: a faceted cyan crystal tree with octagonal fan caps, set in a real hex socket pit in a sand mound ringed by rocks, with 3 ore_glint sockets. Verifier R1 PASS 7. The main session lifted the glint boxes clear of the tilted caps (272 → 1 spawn points inside).
 - 2026-10-28: 017 Berry Bush built by parallel modellers: a forked five-stem trunk under 15 faceted, peaked leaf lobes in 5 clumps, with 8 glossy berries. R1 FAIL 6, R2 7 with one cheap blocker (two berries hidden behind the right lobes). The main session moved B5 and B6 forward: the f34 now shows 5 berries (sheet 6) and the rear shows 3.
+- 2026-10-28: 020 Hardwood Stump built by parallel modellers: a fluted, 8-lobed trunk with a notched bark rim around a ringed cut face, four wedge roots and four flat star leaf clumps. R1 FAIL 5, R2 PASS 7. The main session gave the bark light patches 25 %/50 % edge rings, so they blend (hard edges 80 → 14). PR #84 (015–017) merged into v0.18.
