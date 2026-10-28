@@ -452,14 +452,14 @@ end
 
 local function bindKeys(active: boolean)
 	if not active then
-		for index = 1, 9 do
+		for index = 1, GameConstants.HOTBAR_SLOTS do
 			Binds.Unbind("Hotbar" .. index)
 		end
 		Binds.Unbind("Backpack")
 		Binds.Unbind("Drop")
 		return
 	end
-	for index = 1, 9 do
+	for index = 1, GameConstants.HOTBAR_SLOTS do
 		Binds.Bind("Hotbar" .. index, function(_, state)
 			if state == Enum.UserInputState.Begin then
 				-- Spawned: activating calls the server, and a handler that yields
