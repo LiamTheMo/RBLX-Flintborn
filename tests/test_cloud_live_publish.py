@@ -351,17 +351,20 @@ class PreflightExecutionTests(unittest.TestCase):
     """Runs the real preflight Luau against a mock place in the luau CLI."""
 
     def run_preflight(self, shared, sps_class="StarterPlayerScripts"):
-        specs = cloud.spec_list()
-        script = cloud.make_script(specs)
-        # APPLY has its retired list filled in, so find it by the text before that.
-        preflight = script[: script.index(cloud.APPLY.split("%RETIRED%")[0])]
+        # The real release is batched: run every batch's validate task (the
+        # preflight without its closing VALIDATE lines) against the mock place.
         place = MOCK_PLACE.replace("%SHARED%", shared).replace("%SPS_CLASS%", sps_class)
-        source = place + preflight + '\nprint("PREFLIGHT_OK")\n'
-        with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as handle:
-            handle.write(source)
-        result = subprocess.run(["luau", handle.name], capture_output=True, text=True)
-        Path(handle.name).unlink()
-        return result.stdout + result.stderr
+        output = ""
+        for batch in cloud.plan_batches(cloud.spec_list()):
+            preflight = batch["validate"][: batch["validate"].index(cloud.VALIDATE)]
+            with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as handle:
+                handle.write(place + preflight + '\nprint("PREFLIGHT_OK")\n')
+            result = subprocess.run(["luau", handle.name], capture_output=True, text=True)
+            Path(handle.name).unlink()
+            output += result.stdout + result.stderr
+            if "PREFLIGHT_OK" not in result.stdout:
+                return output
+        return output
 
     def test_engine_containers_on_root_paths_are_allowed(self):
         # Regression: StarterPlayerScripts used to trip the code-only check.
