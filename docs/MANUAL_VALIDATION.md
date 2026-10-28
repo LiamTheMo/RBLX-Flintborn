@@ -325,7 +325,9 @@ Studio and live checks:
 - [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
 - [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
 
-## Q164 — Materials stay in the lobby
+## Q164 — Materials stay in the lobby (superseded by GDD §53)
+
+> Replaced on 2026-10-28: materials can be carried back into runs. The checks below describe the old behaviour; see "Resources, gathering and boosts (GDD §53)" for the current ones.
 
 Owner decisions (GDD §45, Q164/Q164a): extracted materials never come back out into the play world; any material that reaches the lobby backpack goes straight into the vault and cannot be taken out, and the vault's material capacity alone decides what is deleted.
 
@@ -455,4 +457,52 @@ Studio and live checks:
 - [ ] On a phone or tablet (or Studio's device emulator): the HUD hotbar shows each item's name and count. Tapping a weapon equips it (the ring moves there), tapping food eats it, tapping a Workbench places it, and tapping a Fire Bomb readies it.
 - [ ] Pressing a number key moves the ring to that slot and uses it, as a tap does.
 - [ ] With the backpack open, the HUD hotbar hides and the backpack's own strip still moves items.
+
+## Resources, gathering and boosts (GDD §53)
+
+Owner decisions 2026-10-28:
+- Materials can go back into runs, but the carried-in amount never gets the Center 2×.
+- Boosts pause between runs.
+- Every gathering hit drops material on the ground, and better tools take more node health per hit.
+- Nodes regrow on tiered timers, and every region has basic resources.
+- New gatherable items with no use yet, creature ore drops, and Fiber in planters.
+
+Automated:
+- **Vault and carry-in** (`admission`, `extraction`, `review_lifecycle`, `catalog_migration`, `trade_materials`):
+  - Withdrawing a vault material is all-or-nothing into the lobby backpack, and a deploy carries materials.
+  - The carried-in record is saved at Play and survives checkpoints, reloads and migration.
+  - The Center multiplier settles min(extracted, carried in) at 1× and the rest at 2×: bring 100 Wood and extract 160 → 220; extract only 40 → 40.
+  - Deposits over 1,000 are deleted and recorded.
+- **Boost pause** (`boost_pause.spec.luau`):
+  - Extraction saves the remaining time; the next deploy resumes the same time, and time in the lobby doesn't count.
+  - Death or leaving clears saved boosts.
+  - A stronger boost still takes over a resumed one.
+  - Saves are sanitized.
+- **Gathering** (`gathering_drops.spec.luau`, `gathering_tiers`, `building`):
+  - Drops per hit follow tool rank against node rank, use the same node health, and the last hit is clamped.
+  - Ores need their pickaxe; plants give 1 per hit.
+  - Mastery adds extra drops without using health; Flint and Resin bonuses still drop.
+  - Pickups: the gatherer has a 10 s window, drops despawn after 120 s, each is claimed once, and a full inventory leaves it on the ground.
+  - Regrow times follow the tiers; every biome has basics.
+  - The new items are sellable and not tradeable.
+  - Creature ore drops; the Fiber crop.
+
+Placeholders:
+- Node health: trees and rocks 12, plants and bushes 3, Copper to Cobalt 8, Mithril 6, Obsidian and Jade 5, new nodes 4.
+- Regrowth: 2 / 3 / 5 / 8 minutes.
+- Sell values for the new items: Clay 2 up to Starstone and Stormglass 40.
+- The Fiber crop costs 3 Fiber and grows 12 in 240 s.
+
+Studio and live checks:
+
+- [ ] Vault → pick ×10 and click Wood: 10 Wood moves to the lobby backpack. Deploy: the Wood is in the run inventory.
+- [ ] Bring 100 Wood, gather 60 more, and extract at the Center: the receipt shows 100 "brought in, not doubled" and 120 from the gathered 60, so the vault gains 220.
+- [ ] Drink a Sunberry Draught, extract with 6:00 left, and wait in the lobby: the next deploy shows about 6:00 on the HUD. Die with a boost running: it's gone on the next deploy.
+- [ ] Hit a tree by hand: 1 Wood drops beside it. With a Stone axe, 3 drop and the tree empties in 4 hits.
+- [ ] A friend can't pick up your drop for 10 s, then can. Drops vanish after 2 minutes.
+- [ ] Walking over a drop collects it, and so does pressing F on it. Check F still harvests a node when drops lie beside it.
+- [ ] An emptied Copper node regrows after about 3 minutes, a Mithril node after about 8.
+- [ ] Clay, mushrooms, shrubs, Amethyst, Starstone and Stormglass nodes can be gathered, banked and sold, and are not offered in trades.
+- [ ] Plant Fiber in a planter (H key): it grows 12 Fiber.
+- [ ] The planter's gamepad key (R1) doesn't fight the hotbar step or build placement.
 

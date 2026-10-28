@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.19  
+> **Design revision:** 1.20  
 > **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
 | **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
 | **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
 | **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
@@ -2268,7 +2269,7 @@ Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft 
 
 | # | Decision | Consequences |
 | --- | --- | --- |
-| **165** | The Shattered Crater is designed around **~2,400 studs across**. | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
+| **165** | The Shattered Crater is designed around **~2,400 studs across** (superseded by §54: a 4,096-stud island). | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
 | **166** | A lobby server holds **20 players**. | Set the lobby place's maximum players to 20 in the Creator Dashboard (a place setting, not code). Parties (up to 8) and trades need both players in the same lobby server. |
 | **167** | A **hub menu opens any station from anywhere** in the lobby. | Matches the shipped menu-driven lobby: the lobby navigation buttons open every panel (lobby panels have no keys, §46). Physical stations in the lobby map are landmarks and walk-up shortcuts to the same panels, never the only way in. |
 | **168** | **Trades can be started anywhere** in the lobby. | Matches the shipped trade flow (no range check). Q98 limits (eligible items and Gems, never Coins) still apply. |
@@ -2352,9 +2353,75 @@ The owner defined the launch item and material catalog in a question round on 20
 7. **Regrowth by tier:** basics 2 min, Copper and Iron 3 min, Silver, Cobalt and Obsidian 5 min, Jade and Mithril 8 min. Event-only ores (Adamantine) never come from regrowing nodes.
 8. **Every region has basics:** trees, rocks, fiber, herbs and berry bushes appear in every biome, the Crater included, in smaller numbers deeper in.
 9. **New gatherables with no use yet** (bankable and sellable, not tradeable): Clay, Amethyst, Starstone, Stormglass, Cave Mushroom, Redcap Mushroom, Chestnut Mushroom, Thornvine, Frostleaf, Juniper Berry, Elderberry, Raspberry and Hazelnut. Models follow the world-kit studies; the Sunpod shrub stands for the rare shrub event, and the Iron and Ember meteors for meteor crashes. Ore deposits, the Jade vein and the Obsidian outcrop still need model sheets.
-10. **Creature ore drops by habitat:** animals (wolf, boar, sabertooth) never drop ore; Skeletons drop Copper and Iron Ore; Bandits drop Copper and Iron Ore with a small Silver chance; the Minotaur drops Silver and Cobalt Ore in bulk; Ember Wisps drop none.
+10. **Creature ore drops by habitat:** animals never drop ore; Skeletons drop Copper and Iron Ore; the Minotaur drops Silver and Cobalt Ore in bulk; Ember Wisps drop none. Revised with the new roster in §54.2, which also removes Bandits.
 11. **Farming:** Fiber can be planted in planters. Sunberries and Glimmerberries stay wild-only.
 12. **Selling:** banked materials, ores and bars all sell to the merchant for Coins.
+
+
+## 54. Owner decisions: play-world layout and creatures (2026-10-28)
+
+### 54.1 Layout
+
+Approximate regional envelopes with shared transition areas, not rectangles packed together:
+
+| Area | Footprint (studs) | Danger tier |
+| --- | --- | --- |
+| Entire island | 4,096 × 4,096 | — |
+| Island plus surrounding ocean | 6,144 × 6,144 | — |
+| Rimlands | 3,000 × 500, curving around the southern coast | Low |
+| Pinewood Wilds | 1,000 × 1,100 | Low |
+| Mosswick Forest | 900 × 900 | Low |
+| Riverlands | 1,100 × 900 | Low |
+| Timberwatch region | 800 × 900 | Medium |
+| Fallen Temple region | 800 × 800 | Medium |
+| Emberhollow Caves | 700 × 700 exterior; 450 × 350 interior | Medium |
+| Frostpeak Ridge | 1,400 × 800 | Extreme |
+| Crater Lake | about 1,400 across | Extreme (shores) |
+| Shattered Keep island | 550 × 650 | Extreme |
+| Keep's boss courtyard | 180 × 220 | Extreme |
+
+- **Heights:** sea level 0, ordinary land 20–80 studs, elevated terraces 100–220, Frostpeak's tallest peaks 450–600.
+- **Ores by danger:** Low regions give Copper and Iron, Medium regions Silver, Cobalt, Obsidian and Jade, Extreme regions Mithril. Every region has basics (§53).
+- **Centre:** the Guardian fights in the Keep's boss courtyard. The Center (2×) extraction stands on the Keep island, reached across Crater Lake by a land bridge or a shallow ford. The Minotaur is the Keep's ritual boss.
+- The generated placeholder map is a playable test build until an authored map replaces it.
+
+### 54.2 Creatures
+
+**Passive** animals always flee. **Neutral** animals ignore players until they or their group are hurt, then fight back. **Hostile** creatures attack on sight.
+
+| Creature | Type | Where | How it appears |
+| --- | --- | --- | --- |
+| Wild Boar | Regular · Neutral | Low-region woodland and forest edges | Roaming; alone or small groups |
+| Forest Stag | Regular · Passive | Low-region meadows and clearings | Roaming small herds |
+| Grey Wolf | Regular · Hostile | Medium-region forests and rocky woodland | Roaming small packs |
+| Brown Bear | Regular · Neutral | Medium-region woodland, near cave entrances | Roaming, usually alone |
+| River Crocodile | Regular · Hostile | Rivers, marshes and lake shores | Roaming along banks |
+| Plains Bison | Regular · Neutral | Broad Low-region grasslands | Roaming small herds |
+| Meadow Rabbit | Regular · Passive | Low-region grasslands and shrub patches | Roaming small groups |
+| Island Dodo | Regular · Passive | Beaches, coastal clearings, open woodland | Roaming small flocks |
+| River Capybara | Regular · Passive | Gentle riverbanks and grassy lake shores | Roaming small groups |
+| Highland Goat | Regular · Passive | Rocky slopes and highland ledges | Roaming small groups |
+| Forest Tapir | Regular · Passive | Forest interiors near streams | Roaming, alone or in pairs |
+| Giant Ground Sloth | Rare event · Passive | Large forest clearings | Creature event; one |
+| Saber-Toothed Tiger | Event elite · Hostile | Medium-region jungle and rocky forest | Creature event; one roaming predator |
+| Woolly Mammoth | Event wildlife · Neutral | Large grasslands and highland valleys | Creature event; one |
+| Iron-Tusk Boar | Event alpha · Hostile | Medium-region forest clearings | Alpha event with protective boars |
+| Ancient Tortoise | Rare event · Passive | Lakeside clearings and old-growth forest | Creature event; one |
+| Stonehide Rhino | Event elite · Neutral | Rocky plateaus and Medium-region grasslands | Creature event; one |
+| Crater Gorilla | Event boss · Hostile | A large jungle clearing near the crater approaches | Event boss at a suitable arena |
+
+- **Earlier creatures:** Wolf, Boar and Sabertooth become the Grey Wolf, Wild Boar and Saber-Toothed Tiger. Skeletons stay in the Fallen Temple and guard the Shattered Keep, Ember Wisps stay in Emberhollow Caves, and the Minotaur stays as the Keep's ritual boss. **Bandits are removed.**
+- **Drops by size:**
+  - small passives: Raw Meat and a little Hide;
+  - medium animals: Meat, Hide and Bone;
+  - large animals: plenty of each.
+  - Event elites and bosses add Dire Hide, Charged Core and Glow-Fur.
+- **Ore drops:**
+  - Skeletons drop Copper and Iron, and Silver in the Keep.
+  - The Minotaur and the Crater Gorilla drop Silver and Cobalt.
+  - The Stonehide Rhino drops a little Iron.
+  - Other animals never drop ore.
+- **Density (light):** about 2–4 small groups per region, roughly 40–60 roaming creatures island-wide. A killed group respawns after about 3 minutes, away from players and outside safe zones. Each rare creature event rolls on its own.
 
 ---
 
