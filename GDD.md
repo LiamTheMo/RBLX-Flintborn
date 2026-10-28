@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.20  
+> **Design revision:** 1.21  
 > **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.21** | 2026-10-28 | Owner decision (§55): no swimming; all water is knee-deep and slows walking by 30%. |
 | **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
 | **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
 | **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
@@ -2423,6 +2424,14 @@ Approximate regional envelopes with shared transition areas, not rectangles pack
   - Other animals never drop ore.
 - **Rituals:** the Keep's altars summon the **Minotaur** (3 Ancient Ember and 50 Iron Ore), which replaces the Ember Titan. The Minotaur is no longer a roaming event. Raider Camp and Warlord's Hold are guarded by Skeletons now that Bandits are gone.
 - **Density (light):** about 2–4 small groups per region, roughly 40–60 roaming creatures island-wide. A killed group respawns after about 3 minutes, away from players and outside safe zones. Each rare creature event rolls on its own.
+
+
+## 55. Owner decision: knee-deep water, no swimming (2026-10-28)
+
+1. **Nobody swims.** Swimming is disabled for players and creatures.
+2. **All reachable water is knee-deep:** the lake, the rivers and creeks, marshes, the ford and the sea along the coast. A player can always walk through it without going under. Crater Lake becomes a shallow lake that can be crossed on foot; the land bridge stays as a dry path to the Keep.
+3. **The sea:** a knee-deep shelf runs along the coast, and an invisible boundary a short way offshore stops anyone walking out to sea.
+4. **Water slows movement by 30%.** Walking or sprinting with your feet in water runs at 70% of normal speed, on top of the other speed rules. Creatures are slowed the same way.
 
 ---
 
