@@ -109,96 +109,129 @@ end
 -- Deposits backpack slot `index`. A material the vault cannot hold in full asks
 -- first how much would be deleted (GDD §53); "deposit anyway" only goes through
 -- while that slot still holds the same stack.
+local showChoice
+
+-- Runs a request with every button held off until the new snapshot is drawn,
+-- so a second tap cannot act on a slot that has since moved.
+local function hold(fn)
+	if busy then
+		return
+	end
+	busy = true
+	showChoice()
+	fn()
+	busy = false
+	showChoice()
+end
+
 local function deposit(index: number)
 	local item = view and view.backpack[index]
 	if item == nil or busy then
 		return
 	end
 	busy = true
+	showChoice()
 	local ok, reason, lost = invoke("VaultDeposit", index)
 	busy = false
+	showChoice()
 	if not ok and reason == "VaultWouldOverflow" and type(lost) == "number" then
 		panel:Confirm(
 			("Your vault is nearly full: %d %s would be deleted. Deposit anyway?"):format(lost, item.name),
 			"DEPOSIT",
 			function()
-				local latest = invoke("VaultSnapshot")
-				local now = type(latest) == "table" and latest.backpack[index] or nil
-				if type(now) ~= "table" or now.catalogId ~= item.catalogId or now.quantity ~= item.quantity then
-					panel:SetStatus("Your backpack changed; nothing was deposited.")
+				hold(function()
+					local latest = invoke("VaultSnapshot")
+					local now = type(latest) == "table" and latest.backpack[index] or nil
+					if type(now) ~= "table" or now.catalogId ~= item.catalogId or now.quantity ~= item.quantity then
+						panel:SetStatus("Your backpack changed; nothing was deposited.")
+						refresh()
+						return
+					end
+					local stored, why = invoke("VaultDeposit", index, item.catalogId, lost)
+					report(stored, why, "Stored " .. item.name .. ".")
+					selected = nil
 					refresh()
-					return
-				end
-				report(invoke("VaultDeposit", index, item.catalogId, lost), "Stored " .. item.name .. ".")
-				selected = nil
-				refresh()
+				end)
 			end
 		)
 		return
 	end
-	report(ok, reason, "Stored " .. item.name .. ".")
-	selected = nil
-	refresh()
+	hold(function()
+		report(ok, reason, "Stored " .. item.name .. ".")
+		selected = nil
+		refresh()
+	end)
 end
 
 local function withdraw()
 	local choice = chosen()
-	if choice == nil or busy then
+	if choice == nil then
 		return
 	end
-	busy = true
-	local ok, reason
-	if choice.kind == "item" then
-		ok, reason = invoke("VaultWithdrawItem", choice.index)
-	elseif choice.kind == "material" then
-		local step = VaultController.MATERIAL_STEPS[stepIndex]
-		local amount = if step then math.min(step, choice.entry.quantity) else choice.entry.quantity
-		ok, reason = invoke("VaultWithdrawMaterial", choice.entry.catalogId, amount)
-	end
-	busy = false
-	report(ok, reason, "Moved to your backpack; it goes with you on Play.")
-	if ok then
-		selected = nil
-	end
-	refresh()
+	hold(function()
+		local ok, reason
+		if choice.kind == "item" then
+			ok, reason = invoke("VaultWithdrawItem", choice.index)
+		elseif choice.kind == "material" then
+			local step = VaultController.MATERIAL_STEPS[stepIndex]
+			local amount = if step then math.min(step, choice.entry.quantity) else choice.entry.quantity
+			ok, reason = invoke("VaultWithdrawMaterial", choice.entry.catalogId, amount)
+		end
+		report(ok, reason, "Moved to your backpack; it goes with you on Play.")
+		if ok then
+			selected = nil
+		end
+		refresh()
+	end)
 end
 
 -- STORE ALL: every backpack slot, last first so earlier indices stay put. A
 -- material that would overflow is left for its own confirmation.
+-- Refusals that apply to every slot alike: STORE ALL stops at the first.
+local STOP_ALL = { InTrade = true, InTransit = true, NotInLobby = true, Rejected = true }
+
 local function storeAll()
-	if view == nil or busy then
+	if view == nil then
 		return
 	end
-	busy = true
-	local stored, held = 0, 0
-	for index = #view.backpack, 1, -1 do
-		local ok, reason = invoke("VaultDeposit", index)
-		if ok then
-			stored += 1
-		elseif reason == "VaultWouldOverflow" then
-			held += 1
+	hold(function()
+		local stored, held, refusal = 0, 0, nil
+		for index = #view.backpack, 1, -1 do
+			local ok, reason = invoke("VaultDeposit", index)
+			if ok then
+				stored += 1
+			elseif reason == "VaultWouldOverflow" then
+				held += 1
+			else
+				refusal = refusal or reason
+				if STOP_ALL[reason] then
+					break
+				end
+			end
 		end
-	end
-	busy = false
-	selected = nil
-	panel:SetStatus(
-		if held > 0
-			then ("Stored %d. %d would overflow the vault: store those one by one."):format(stored, held)
-			else ("Stored %d."):format(stored)
-	)
-	refresh()
+		selected = nil
+		local parts = { ("Stored %d."):format(stored) }
+		if held > 0 then
+			table.insert(parts, ("%d would overflow the vault: store those one by one."):format(held))
+		end
+		if refusal then
+			table.insert(parts, "Some could not be stored: " .. Reasons.Text(refusal))
+		end
+		panel:SetStatus(table.concat(parts, " "))
+		refresh()
+	end)
 end
 
 -- Shows the detail strip, buttons and picker for the current choice.
-local function showChoice()
+function showChoice()
 	local choice = chosen()
 	if choice == nil then
 		selected = nil
 	end
 	panel:Select(selected)
 	panel:SetDetail(choice and asItem(choice.entry), "Choose an item to store or take.")
-	local fromVault = choice ~= nil and choice.kind ~= "backpack"
-	local fromBackpack = choice ~= nil and choice.kind == "backpack"
+	local fromVault = choice ~= nil and choice.kind ~= "backpack" and not busy
+	local fromBackpack = choice ~= nil and choice.kind == "backpack" and not busy
 	panel:SetActions({
 		{ "TAKE", fromVault, withdraw },
 		{
@@ -214,7 +247,7 @@ local function showChoice()
 		function()
 			deposit(choice.index)
 		end,
-	}, { fromVault, withdraw }, { "STORE\nALL", view ~= nil and #view.backpack > 0, storeAll })
+	}, { fromVault, withdraw }, { "STORE\nALL", view ~= nil and #view.backpack > 0 and not busy, storeAll })
 	if choice and choice.kind == "material" then
 		panel:SetAmounts(VaultController.STEP_LABELS, stepIndex, function(index)
 			stepIndex = index
@@ -225,7 +258,9 @@ local function showChoice()
 	end
 end
 
-function refresh()
+-- Fetches and draws the vault. `opening`: also tells of deliveries the vault had
+-- no room for (shown once per opening, so it never hides an action's result).
+function refresh(opening: boolean?)
 	local latest = invoke("VaultSnapshot")
 	if type(latest) ~= "table" then
 		panel:SetStatus("Your data is still loading.")
@@ -251,7 +286,7 @@ function refresh()
 		{ header = "Materials", entries = sorted(materials) },
 	})
 	-- Material deposits the vault had no room for (GDD §53), shown for a day.
-	if view.overflow and #view.overflow > 0 then
+	if opening and view.overflow and #view.overflow > 0 then
 		local parts = {}
 		for _, lost in view.overflow do
 			table.insert(parts, ("%s ×%d"):format(lost.name, lost.quantity))
@@ -385,7 +420,7 @@ function VaultController.Toggle()
 	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
 		GuiService.SelectedObject = panel.tabs.All.button
 	end
-	task.spawn(refresh)
+	task.spawn(refresh, true)
 end
 
 function VaultController.IsOpen(): boolean

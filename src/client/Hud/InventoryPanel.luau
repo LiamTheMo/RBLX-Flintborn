@@ -10,6 +10,7 @@
 -- Positions are the reference sheet's own pixels (the window art was cut at
 -- ORIGIN), so they read straight off the image.
 
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
@@ -26,15 +27,17 @@ InventoryPanel.SIZE = { 1494, 786 }
 local ORIGIN = { 148, 6 }
 
 -- Category tabs: {id, icon sprite, reference rect}.
+-- Category tabs: {id, icon sprite, the tile's reference rect on the column}.
 InventoryPanel.TABS = {
-	{ id = "All", icon = "pm_cat_all", rect = { 48, 114, 122, 124 } },
-	{ id = "Tools", icon = "pm_cat_tools", rect = { 44, 250, 120, 124 } },
-	{ id = "Materials", icon = "pm_cat_materials", rect = { 44, 380, 120, 124 } },
-	{ id = "Food", icon = "pm_cat_food", rect = { 44, 510, 120, 124 } },
+	{ id = "All", icon = "pm_cat_all", rect = { 54, 116, 108, 120 } },
+	{ id = "Tools", icon = "pm_cat_tools", rect = { 52, 253, 108, 118 } },
+	{ id = "Materials", icon = "pm_cat_materials", rect = { 52, 383, 108, 118 } },
+	{ id = "Food", icon = "pm_cat_food", rect = { 52, 515, 108, 124 } },
 }
 
 local CELL = UDim2.fromOffset(ItemSlot.SIZE[1], ItemSlot.SIZE[2])
-local CELL_GAP = UDim2.fromOffset(7.6, 9.5)
+-- Whole pixels (offsets are integers in the engine): a 101 × 106 pitch.
+local CELL_GAP = UDim2.fromOffset(8, 10)
 local CHIP_X = { 408, 526, 640 }
 local GLYPHS = { sword = "pm_glyph_sword", hammer = "pm_glyph_hammer", weight = "pm_glyph_weight" }
 
@@ -100,33 +103,42 @@ function InventoryPanel.new(parent: Instance?, handlers)
 	return self
 end
 
+-- The tab column: the wooden spine with four plain tiles (one sprite), the
+-- glowing tile laid over the chosen tab, and each tab's icon.
 function InventoryPanel:_tabs(window: Instance)
+	local columnW, columnH = natural("pm_side_column", { 156, 569 })
+	Widgets.Sprite("pm_side_column", {
+		Name = "TabColumn",
+		Position = UDim2.fromOffset(18 - ORIGIN[1], 93 - ORIGIN[2]),
+		Size = UDim2.fromOffset(columnW, columnH),
+		ZIndex = 2,
+	}, window)
+	local glowW, glowH = natural("pm_side_tab_selected", { 122, 134 })
 	self.tabs = {}
 	for _, tab in InventoryPanel.TABS do
 		local r = tab.rect
 		local holder = Widgets.Make("Frame", { Name = tab.id, BackgroundTransparency = 1, ZIndex = 2 }, window)
-		place(holder, at(r[1] - 2, r[2] - 2, r[3] + 4, r[4] + 4))
-		local selW, selH = natural("pm_side_tab_selected", { r[3] + 4, r[4] + 4 })
-		local w, h = natural("pm_side_tab", { r[3] + 4, r[4] + 4 })
+		place(holder, at(r[1], r[2], r[3], r[4]))
 		local on = Widgets.Sprite("pm_side_tab_selected", {
 			Name = "On",
-			Size = UDim2.fromOffset(selW, selH),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(glowW, glowH),
 			ZIndex = 2,
 		}, holder)
-		local off = Widgets.Sprite("pm_side_tab", { Name = "Off", Size = UDim2.fromOffset(w, h), ZIndex = 2 }, holder)
 		local iconW, iconH = natural(tab.icon, { 80, 80 })
 		local k = 78 / math.max(iconW, iconH)
-		Widgets.Sprite(tab.icon, {
+		local icon = Widgets.Sprite(tab.icon, {
 			Name = "Icon",
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromOffset((r[3] + 4) / 2, (r[4] + 4) / 2),
+			Position = UDim2.fromScale(0.5, 0.5),
 			Size = UDim2.fromOffset(iconW * k, iconH * k),
 			ZIndex = 3,
 		}, holder)
-		local button = Parchment.Pressable(holder, off, function()
+		local button = Parchment.Pressable(holder, icon, function()
 			self:SelectTab(tab.id)
-		end)
-		self.tabs[tab.id] = { on = on, off = off, button = button }
+		end, 6)
+		self.tabs[tab.id] = { on = on, button = button }
 	end
 end
 
@@ -247,7 +259,7 @@ function InventoryPanel:_middle(window: Instance)
 	middle.square.label.TextTruncate = Enum.TextTruncate.None
 	self.middle = middle
 	-- The lower half of the dashed column, under the detail strip's own mark.
-	Widgets.Sprite("pm_glyph_mountain", {
+	self.mark2 = Widgets.Sprite("pm_glyph_mountain", {
 		Name = "Mark2",
 		Position = UDim2.fromOffset(870 - ORIGIN[1], 677 - ORIGIN[2]),
 		Size = UDim2.fromOffset(44, 27),
@@ -364,7 +376,8 @@ function InventoryPanel:SetHeader(paneId: string, title: string, icon: string?, 
 	local header = self.headers[paneId]
 	header.title.Text = title
 	if paneId == "right" then
-		if icon and header.icon.Name ~= icon then
+		if icon and header.iconName ~= icon then
+			header.iconName = icon
 			local position, size = header.icon.Position, header.icon.Size
 			header.icon:Destroy()
 			header.icon =
@@ -387,15 +400,51 @@ end
 function InventoryPanel:SetPane(paneId: string, sections, filterMode: string?)
 	local pane = self.panes[paneId]
 	pane.filterMode = filterMode or "hide"
+	-- Same slots as before (a refresh): update them in place, so nothing the
+	-- player is pointing at (gamepad focus) is destroyed.
+	local key = {}
+	for _, section in sections do
+		local ids = {}
+		for _, entry in section.entries do
+			table.insert(ids, tostring(entry.id))
+		end
+		table.insert(key, (section.header or "") .. ":" .. table.concat(ids, ","))
+	end
+	local layoutKey = table.concat(key, "|")
+	if layoutKey == pane.layoutKey then
+		local index = 0
+		for _, section in sections do
+			for _, entry in section.entries do
+				index += 1
+				local cell = pane.slots[index]
+				cell.entry = entry
+				cell.slot:Set(entry.item)
+				cell.slot:SetKey(entry.key)
+			end
+		end
+		self:_refilter()
+		self:_reselect()
+		return
+	end
+	pane.layoutKey = layoutKey
+	local focused = nil
+	local focus = GuiService.SelectedObject
+	for _, cell in pane.slots do
+		if focus and focus:IsDescendantOf(cell.slot.holder) then
+			focused = cell.entry.id
+		end
+	end
 	for _, child in pane.scroller:GetChildren() do
 		if child:IsA("GuiObject") then
 			child:Destroy()
 		end
 	end
 	pane.slots = {}
+	pane.sections = {}
 	for order, section in sections do
+		local header = nil
 		if section.header then
-			Widgets.Text({ font = "serif", textSize = 20, color = "inkSoft" }, {
+			header = Widgets.Text({ font = "serif", textSize = 20, color = "inkSoft" }, {
 				Name = "Header" .. order,
 				LayoutOrder = order * 2 - 1,
 				Text = string.upper(section.header),
@@ -404,14 +453,11 @@ function InventoryPanel:SetPane(paneId: string, sections, filterMode: string?)
 				ZIndex = 4,
 			}, pane.scroller)
 		end
-		-- Sized from its rows (six slots to a row), so sections stack cleanly.
-		local rows = math.max(1, math.ceil(#section.entries / 6))
-		local height = rows * CELL.Y.Offset + (rows - 1) * CELL_GAP.Y.Offset
 		local grid = Widgets.Make("Frame", {
 			Name = "Grid" .. order,
 			BackgroundTransparency = 1,
 			LayoutOrder = order * 2,
-			Size = UDim2.new(1, -10, 0, height),
+			Size = UDim2.new(1, -10, 0, 0),
 			ZIndex = 3,
 		}, pane.scroller)
 		Widgets.Make("UIGridLayout", {
@@ -419,31 +465,56 @@ function InventoryPanel:SetPane(paneId: string, sections, filterMode: string?)
 			CellPadding = CELL_GAP,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 		}, grid)
+		local cells = {}
 		for index, entry in section.entries do
-			local slot = ItemSlot.new(grid, { Name = tostring(entry.id), LayoutOrder = index }, function()
-				self.handlers.onSlot(paneId, entry)
+			local cell = { entry = entry }
+			cell.slot = ItemSlot.new(grid, { Name = tostring(entry.id), LayoutOrder = index }, function()
+				self.handlers.onSlot(paneId, cell.entry)
 			end)
-			slot:Set(entry.item)
-			slot:SetKey(entry.key)
-			table.insert(pane.slots, { slot = slot, entry = entry })
+			cell.slot:Set(entry.item)
+			cell.slot:SetKey(entry.key)
+			table.insert(pane.slots, cell)
+			table.insert(cells, cell)
+			if focused ~= nil and entry.id == focused then
+				GuiService.SelectedObject = cell.slot.button
+			end
 		end
+		table.insert(pane.sections, { header = header, grid = grid, cells = cells })
 	end
 	self:_refilter()
 	self:_reselect()
 end
 
+-- Rows needed for `count` slots, six to a row, as a grid height.
+local function gridHeight(count: number): number
+	local rows = math.max(1, math.ceil(count / 6))
+	return rows * CELL.Y.Offset + (rows - 1) * CELL_GAP.Y.Offset
+end
+
 function InventoryPanel:_refilter()
 	for _, pane in self.panes do
-		for _, cell in pane.slots do
-			local item = cell.entry.item
-			local match = item == nil
-				or (ItemInfo.InCategory(item.catalogId, self.category) and ItemInfo.Matches(item.name, self.query))
-			if pane.filterMode == "dim" then
-				cell.slot.holder.Visible = true
-				cell.slot:SetDimmed(item ~= nil and not match)
-			else
-				cell.slot.holder.Visible = item ~= nil and match
-				cell.slot:SetDimmed(false)
+		for _, section in pane.sections or {} do
+			local shown = 0
+			for _, cell in section.cells do
+				local item = cell.entry.item
+				local match = item == nil
+					or (ItemInfo.InCategory(item.catalogId, self.category) and ItemInfo.Matches(item.name, self.query))
+				if pane.filterMode == "dim" then
+					cell.slot.holder.Visible = true
+					cell.slot:SetDimmed(item ~= nil and not match)
+					shown += 1
+				else
+					local visible = item ~= nil and match
+					cell.slot.holder.Visible = visible
+					cell.slot:SetDimmed(false)
+					shown += if visible then 1 else 0
+				end
+			end
+			-- A section with nothing to show folds away (header and all).
+			section.grid.Size = UDim2.new(1, -10, 0, gridHeight(shown))
+			section.grid.Visible = shown > 0
+			if section.header then
+				section.header.Visible = shown > 0
 			end
 		end
 	end
@@ -453,7 +524,6 @@ function InventoryPanel:SelectTab(id: string)
 	self.category = id
 	for name, tab in self.tabs do
 		tab.on.Visible = name == id
-		tab.off.Visible = name ~= id
 	end
 	self:_refilter()
 	if self.handlers.onTab then
@@ -552,6 +622,8 @@ end
 -- The amount picker: `labels` (nil hides it), the picked index and onPick(index).
 function InventoryPanel:SetAmounts(labels: { string }?, picked: number?, onPick)
 	self.amountFn = onPick
+	-- The picker crosses the middle column: its lower mark steps aside.
+	self.mark2.Visible = labels == nil
 	for index, amount in self.detail.amounts do
 		local label = labels and labels[index]
 		amount.button.holder.Visible = label ~= nil
@@ -562,8 +634,8 @@ function InventoryPanel:SetAmounts(labels: { string }?, picked: number?, onPick)
 	end
 end
 
-function InventoryPanel:SetStatus(text: string)
-	self.detail.status.Text = text
+function InventoryPanel:SetStatus(text: string?)
+	self.detail.status.Text = text or ""
 end
 
 -- Asks before something that cannot be undone; `yes` names the confirm button.
@@ -572,6 +644,10 @@ function InventoryPanel:Confirm(text: string, yes: string, onYes)
 	self.detail.confirmText.Text = text
 	self.detail.confirmYes.label.Text = yes
 	self.detail.card.Visible = true
+	-- A gamepad lands on the choice.
+	if GuiService.SelectedObject ~= nil then
+		GuiService.SelectedObject = self.detail.confirmNo.button
+	end
 end
 
 function InventoryPanel:HideConfirm()

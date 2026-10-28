@@ -551,7 +551,8 @@ def silhouette(a, rect, dark=True, lo=0.30, hi=0.75):
     piece = a[y:y + h, x:x + w]
     L = lum(piece)
     alpha = (hi - L) / (hi - lo) if dark else (L - lo) / (hi - lo)
-    alpha = np.clip(alpha, 0, 1)
+    # Transparent sheet pixels (an icon on the icon sheet) are never ink.
+    alpha = np.clip(alpha, 0, 1) * piece[..., 3]
     # Keep the glyph's own islands, not stray texture.
     keep = np.zeros(alpha.shape, bool)
     for ys, xs in components(alpha > 0.5):
@@ -736,6 +737,8 @@ def build_inventory():
     win = erase_ink(g, (560, 30, 1112, 92), dark=False, texture="hide", threshold=0.6, grow=3, amount=1.0)
     # The ampersand is repainted whole (its anti-aliased edge survives the ink pass).
     win = erase(win, box(g.shape, (878, 36, 924, 90)), amount=1.0, feather=2, texture="hide")
+    # Stitch dashes left over from the erased mark under the title.
+    win = erase(win, box(g.shape, (824, 86, 868, 100)), amount=1.0, feather=2, texture="hide")
     for rect in ((206, 131, 830, 614), (843, 130, 941, 617), (955, 131, 1592, 614), (210, 627, 1586, 771)):
         win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
     # The category tabs are drawn on their own: clear what of them overlaps the
@@ -749,10 +752,16 @@ def build_inventory():
     for key, rect in tabs.items():
         tab = cut_clean(g, rect)
         s["pm_cat_" + key] = (extract_icon(tab, 14, 26), None)
-        if key == "all":
-            s["pm_side_tab_selected"] = (erase(tab, dilate(icon_mask(tab, 14, 26), 2), amount=0.8), None)
-        elif key == "tools":
-            s["pm_side_tab"] = (erase(tab, dilate(icon_mask(tab, 14, 26), 2), amount=0.8), None)
+    # The whole tab column (wooden spine, ropes and four plain tiles, icons
+    # erased): the first tile's glow is replaced by a copy of the second tile, so
+    # the glowing tile can be laid on whichever tab is chosen.
+    column = g.copy()
+    column[110:244, 36:172] = g[246:380, 36:172]
+    for y0, y1 in ((122, 236), (258, 370), (388, 500), (518, 636)):
+        column = erase(column, box(g.shape, (64, y0, 150, y1)), amount=1.0, feather=4)
+    s["pm_side_column"] = (cut_clean(column, (20, 95, 152, 565)), None)
+    glow = rounded_cut(g, (50, 112, 118, 130), 16)
+    s["pm_side_tab_selected"] = (erase(glow, box(glow.shape, (16, 12, 104, 120)), amount=1.0, feather=4), None)
     # Slots and controls.
     s["pm_item_slot"] = (rounded_cut(g, (216, 518, 93, 92), 9), [20, 20, 20, 20])
     search = rounded_cut(g, (497, 141, 226, 42), 9)
@@ -771,6 +780,56 @@ def build_inventory():
     s["pm_button_action"] = (erase_ink(action, (34, 14, 196, 68), dark=False, texture="hide"), [40, 26, 40, 26])
     icons = sheet("04")
     s["pm_icon_chest"] = (cut_clean(icons, (290, 482, 210, 166)), None)
+    return s
+
+
+def build_crafting():
+    """Crafting window (09_crafting): the shell with the recipe column, the
+    detail card and the queue repainted as paper (title, close and panel frames
+    stay), and the tabs, rows, chips, cards, stepper and buttons."""
+    g = sheet("09")
+    s = {}
+    win = g
+    for rect in ((76, 168, 484, 772), (518, 172, 1168, 772), (1194, 170, 1616, 772)):
+        win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
+    s["pm_window_crafting"] = (cut_clean(win, (25, 60, 1625, 738)), None)
+    # The same shell for the lobby's Forge, its title word erased (the game
+    # writes it; the hammers stay).
+    forge = erase_ink(win, (196, 96, 450, 152), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_window_forge"] = (cut_clean(forge, (25, 60, 1625, 738)), None)
+    # Category tabs: selected (gold) and plain, glyph erased; the glyphs as
+    # white silhouettes.
+    tab = rounded_cut(g, (82, 235, 79, 60), 7)
+    s["pm_ctab_selected"] = (erase(tab, box(tab.shape, (12, 8, 70, 56)), amount=1.0, feather=2), [16, 14, 16, 14])
+    tab = rounded_cut(g, (163, 235, 78, 60), 7)
+    s["pm_ctab"] = (erase(tab, box(tab.shape, (12, 8, 70, 56)), amount=1.0, feather=2), [16, 14, 16, 14])
+    for key, rect in (("tools", (90, 242, 64, 48)), ("tent", (170, 242, 64, 48)), ("armor", (250, 242, 64, 48)),
+                      ("bench", (328, 242, 64, 48)), ("bag", (406, 242, 62, 48))):
+        s["pm_glyph_" + key] = (silhouette(g, rect, lo=0.3, hi=0.62), None)
+    # Recipe rows (chevron kept; icon and name erased).
+    for name, rect in (("pm_recipe_row_selected", (80, 307, 401, 72)), ("pm_recipe_row", (80, 385, 401, 70))):
+        row = rounded_cut(g, rect, 7)
+        s[name] = (erase(row, box(row.shape, (10, 6, 350, rect[3] - 2)), amount=1.0, feather=2), [30, 24, 60, 24])
+    # Detail card pieces.
+    chip = rounded_cut(g, (827, 295, 102, 68), 8)
+    s["pm_stat_chip_tall"] = (erase(chip, box(chip.shape, (8, 8, 96, 62)), amount=1.0, feather=2), [18, 18, 18, 18])
+    card = rounded_cut(g, (830, 447, 102, 152), 8)
+    s["pm_req_card"] = (erase(card, box(card.shape, (8, 10, 96, 146)), amount=1.0, feather=2), [18, 18, 18, 18])
+    s["pm_stepper_minus"] = (rounded_cut(g, (535, 670, 60, 61), 8), None)
+    s["pm_stepper_plus"] = (rounded_cut(g, (667, 670, 60, 61), 8), None)
+    field = rounded_cut(g, (595, 672, 73, 58), 3)
+    s["pm_stepper_field"] = (erase(field, box(field.shape, (10, 6, 66, 56)), amount=1.0, feather=2), [10, 10, 10, 10])
+    craft = plate(g, (754, 655, 280, 92))
+    s["pm_button_craft"] = (erase_ink(craft, (70, 14, 210, 76), dark=False, texture="hide"), [70, 26, 70, 26])
+    small = rounded_cut(g, (1041, 672, 125, 60), 9)
+    s["pm_button_paper"] = (erase_ink(small, (12, 8, 114, 52), dark=True), [22, 18, 22, 18])
+    # Queue.
+    queue = rounded_cut(g, (1205, 230, 400, 94), 8)
+    s["pm_queue_row"] = (erase(queue, box(queue.shape, (8, 8, 334, 88)), amount=1.0, feather=2), [24, 24, 60, 24])
+    s["pm_queue_empty"] = (rounded_cut(g, (1205, 541, 400, 92), 10), None)
+    s["pm_button_x_leather"] = (rounded_cut(g, (1547, 252, 51, 49), 6), None)
+    # Food & potions tab: the icon sheet's heart as a silhouette.
+    s["pm_glyph_heart"] = (silhouette(sheet("04"), (566, 662, 162, 150), lo=0.55, hi=0.9), None)
     return s
 
 
@@ -800,6 +859,7 @@ def main():
     sprites.update(build_settings())
     sprites.update(build_journal())
     sprites.update(build_inventory())
+    sprites.update(build_crafting())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]

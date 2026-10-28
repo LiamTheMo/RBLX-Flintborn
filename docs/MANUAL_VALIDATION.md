@@ -645,3 +645,16 @@ Studio and live checks:
 - [ ] Run: Tab opens the window with the 50 backpack slots, the six hotbar slots (with their keys) and the three armour slots; a slot then another moves or swaps; → sends to the first free hotbar slot (armour to its slot); ← sends back to the backpack; WEAR / TAKE OFF / EQUIP / USE / DROP work; the equipped hotbar slot has a leather ring.
 - [ ] Run: Tab closes it again, Q drops, 1–6 still select hotbar slots (hotfix 2026-10-28: the six-slot change had stopped Tab and Q from binding in runs).
 - [ ] Gamepad: B closes; slots, tabs and buttons are reachable with the D-pad.
+
+## Parchment Crafting and Forge (GDD §15–16, §25.3)
+
+How it's built: one recipe window (`Hud/CraftingPanel`) used by `CraftingController` in runs and `ForgeController` in the lobby. Spec: `docs/ui/CraftingScreen.md`.
+
+Automated: `capture.py crafting`, `crafting_flow`, `forge_flow`.
+
+Studio and live checks:
+
+- [ ] Run: V (Craft) opens it; tabs filter (the chosen tab again shows all); search works; counts follow the backpack live; walking up to a Workbench, Furnace, Anvil or Cauldron ticks it under STATIONS NEARBY and enables its recipes.
+- [ ] Run: CRAFT makes one; smelting takes the stepper's batch or Craft all; the job row shows progress and time left; ✕ stops it and keeps the bars made.
+- [ ] Lobby: the Forge tile opens ANCESTRAL FORGE with vault counts; locked recipes say what unlocks them; FORGE puts the item in the lobby backpack.
+- [ ] Lobby: a Permanent recipe lists the vault gear it can convert; CONVERT asks first, arms after 1.5 s, and converts the chosen piece only.
