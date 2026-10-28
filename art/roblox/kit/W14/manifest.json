@@ -1,0 +1,1473 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W14",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w14_moss",
+    "hex": "#5C8A2E",
+    "levels": [
+     0.94634,
+     0.95732,
+     0.96063,
+     0.96371,
+     0.96743,
+     0.9716,
+     0.97389,
+     0.9774,
+     0.9814,
+     0.98513,
+     0.988,
+     0.99249,
+     0.99521,
+     0.99731,
+     1.00019,
+     1.00317,
+     1.00607,
+     1.00878,
+     1.0119,
+     1.01403,
+     1.01798,
+     1.02057,
+     1.02357,
+     1.02615,
+     1.02839,
+     1.03136,
+     1.03383,
+     1.03631,
+     1.03863,
+     1.04253,
+     1.0464,
+     1.05697
+    ],
+    "used": false
+   },
+   {
+    "key": "w14_rock",
+    "hex": "#A99C9C",
+    "levels": [
+     0.90522,
+     0.93034,
+     0.94224,
+     0.95043,
+     0.95579,
+     0.96119,
+     0.96589,
+     0.96957,
+     0.97313,
+     0.97702,
+     0.97907,
+     0.98164,
+     0.98554,
+     0.98938,
+     0.99241,
+     0.99546,
+     0.99872,
+     1.00165,
+     1.00542,
+     1.00842,
+     1.01251,
+     1.01574,
+     1.0195,
+     1.02266,
+     1.02571,
+     1.02936,
+     1.03363,
+     1.03817,
+     1.04475,
+     1.05381,
+     1.06767,
+     1.10012
+    ],
+    "used": true
+   },
+   {
+    "key": "w14_sand",
+    "hex": "#C79B6C",
+    "levels": [
+     0.95873,
+     0.96177,
+     0.96237,
+     0.9635,
+     0.96519,
+     0.97012,
+     0.97286,
+     0.97825,
+     0.97977,
+     0.98058,
+     0.9828,
+     0.9871,
+     0.98891,
+     0.99012,
+     0.99254,
+     0.99641,
+     0.99936,
+     1.00382,
+     1.00554,
+     1.00975,
+     1.01121,
+     1.01287,
+     1.01505,
+     1.01791,
+     1.0218,
+     1.02367,
+     1.02686,
+     1.03113,
+     1.03584,
+     1.03858,
+     1.03986,
+     1.04721
+    ],
+    "used": false
+   },
+   {
+    "key": "w09_grass",
+    "hex": "#6CB436",
+    "levels": [
+     0.9501,
+     0.95186,
+     0.95598,
+     0.96213,
+     0.96706,
+     0.97004,
+     0.97157,
+     0.97455,
+     0.97974,
+     0.98259,
+     0.984,
+     0.98553,
+     0.98679,
+     0.98916,
+     0.99122,
+     0.99746,
+     1.00269,
+     1.00477,
+     1.00603,
+     1.0085,
+     1.01205,
+     1.01866,
+     1.02046,
+     1.02806,
+     1.0325,
+     1.03379,
+     1.03665,
+     1.03825,
+     1.04043,
+     1.04359,
+     1.04611,
+     1.04994
+    ],
+    "used": true
+   },
+   {
+    "key": "w14_floor",
+    "hex": "#CBB59C",
+    "levels": [
+     0.95699,
+     0.95907,
+     0.96188,
+     0.96469,
+     0.96807,
+     0.97215,
+     0.98081,
+     0.98591,
+     0.98967,
+     0.99229,
+     0.99532,
+     0.99982,
+     1.00815,
+     1.01274,
+     1.02571,
+     1.03197,
+     1.04477,
+     1.01881,
+     1.03735,
+     1.04802,
+     0.97476,
+     1.01509
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CaveColumn",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "hero",
+   "size": [
+    9.2069,
+    12.9582,
+    8.4783
+   ],
+   "tris": 1588,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumn.glb",
+     "kind": "solid",
+     "tris": 1588,
+     "offset": [
+      0.0,
+      6.4791,
+      0.0
+     ],
+     "size": [
+      9.2069,
+      12.9582,
+      8.4783
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cave column: thick lumpy hourglass of stacked faceted boulders, broad flared cap, rubble skirt, plants"
+  },
+  {
+   "name": "CaveColumnBaseSection",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "part",
+   "size": [
+    4.5723,
+    3.6,
+    4.3036
+   ],
+   "tris": 36,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnBaseSection.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      4.5723,
+      3.6,
+      4.3036
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "base section"
+  },
+  {
+   "name": "CaveColumnBroken",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "variant",
+   "size": [
+    9.047,
+    8.0262,
+    8.6273
+   ],
+   "tris": 566,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnBroken.glb",
+     "kind": "solid",
+     "tris": 566,
+     "offset": [
+      0.0,
+      4.0131,
+      0.0
+     ],
+     "size": [
+      9.047,
+      8.0262,
+      8.6273
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Broken Column (ruined)"
+  },
+  {
+   "name": "CaveColumnFull",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "variant",
+   "size": [
+    9.5112,
+    14.1822,
+    8.9852
+   ],
+   "tris": 1594,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnFull.glb",
+     "kind": "solid",
+     "tris": 1594,
+     "offset": [
+      0.0,
+      7.0911,
+      0.0
+     ],
+     "size": [
+      9.5112,
+      14.1822,
+      8.9852
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Full Column (floor to ceiling)"
+  },
+  {
+   "name": "CaveColumnMiddleSection",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "part",
+   "size": [
+    3.2036,
+    4.6,
+    2.8025
+   ],
+   "tris": 22,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnMiddleSection.glb",
+     "kind": "solid",
+     "tris": 22,
+     "offset": [
+      0.0,
+      2.3,
+      0.0
+     ],
+     "size": [
+      3.2036,
+      4.6,
+      2.8025
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "middle section"
+  },
+  {
+   "name": "CaveColumnPaired",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "variant",
+   "size": [
+    12.5556,
+    12.9582,
+    8.5681
+   ],
+   "tris": 1630,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnPaired.glb",
+     "kind": "solid",
+     "tris": 1630,
+     "offset": [
+      0.0,
+      6.4791,
+      0.0
+     ],
+     "size": [
+      12.5556,
+      12.9582,
+      8.5681
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Paired Formation (column + stalactite + stalagmite)"
+  },
+  {
+   "name": "CaveColumnStalactite",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "part",
+   "size": [
+    2.016,
+    4.0,
+    2.0125
+   ],
+   "tris": 24,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnStalactite.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      2.016,
+      4.0,
+      2.0125
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stalactite (hanging)"
+  },
+  {
+   "name": "CaveColumnStalagmite",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "part",
+   "size": [
+    1.8406,
+    4.0,
+    1.8125
+   ],
+   "tris": 20,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnStalagmite.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      1.8406,
+      4.0,
+      1.8125
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stalagmite (floor)"
+  },
+  {
+   "name": "CaveColumnUpperSection",
+   "sheet": "W14",
+   "subject": "CaveColumn",
+   "role": "part",
+   "size": [
+    3.8562,
+    3.6,
+    3.3764
+   ],
+   "tris": 34,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveColumnUpperSection.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      3.8562,
+      3.6,
+      3.3764
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "upper section"
+  },
+  {
+   "name": "CaveEntranceRing",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "hero",
+   "size": [
+    16.0499,
+    10.0451,
+    10.2819
+   ],
+   "tris": 2017,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRing.glb",
+     "kind": "solid",
+     "tris": 2017,
+     "offset": [
+      0.0,
+      5.0225,
+      0.0
+     ],
+     "size": [
+      16.0499,
+      10.0451,
+      10.2819
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cave entrance ring: double arch of big faceted boulders around a walk-in opening, stepping-slab floor, rubble and plants"
+  },
+  {
+   "name": "CaveEntranceRingCeilingRock",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "part",
+   "size": [
+    6.2613,
+    2.6,
+    3.7238
+   ],
+   "tris": 47,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingCeilingRock.glb",
+     "kind": "solid",
+     "tris": 47,
+     "offset": [
+      0.0,
+      1.3,
+      0.0
+     ],
+     "size": [
+      6.2613,
+      2.6,
+      3.7238
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ceiling rock"
+  },
+  {
+   "name": "CaveEntranceRingFloorSill",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "part",
+   "size": [
+    6.9283,
+    0.4,
+    5.0381
+   ],
+   "tris": 64,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingFloorSill.glb",
+     "kind": "solid",
+     "tris": 64,
+     "offset": [
+      0.0,
+      0.2,
+      0.0
+     ],
+     "size": [
+      6.9283,
+      0.4,
+      5.0381
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor / sill"
+  },
+  {
+   "name": "CaveEntranceRingLeftWall",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "part",
+   "size": [
+    3.6971,
+    6.0,
+    2.9089
+   ],
+   "tris": 80,
+   "budget": 160,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingLeftWall.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      3.0,
+      0.0
+     ],
+     "size": [
+      3.6971,
+      6.0,
+      2.9089
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "left wall"
+  },
+  {
+   "name": "CaveEntranceRingRightWall",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "part",
+   "size": [
+    3.8146,
+    5.4,
+    2.5041
+   ],
+   "tris": 88,
+   "budget": 160,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingRightWall.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      2.7,
+      0.0
+     ],
+     "size": [
+      3.8146,
+      5.4,
+      2.5041
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "right wall"
+  },
+  {
+   "name": "CaveEntranceRingRounded",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "variant",
+   "size": [
+    15.1355,
+    9.0413,
+    10.7219
+   ],
+   "tris": 2035,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingRounded.glb",
+     "kind": "solid",
+     "tris": 2035,
+     "offset": [
+      0.0,
+      4.5206,
+      0.0
+     ],
+     "size": [
+      15.1355,
+      9.0413,
+      10.7219
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Rounded Entrance"
+  },
+  {
+   "name": "CaveEntranceRingSplit",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "variant",
+   "size": [
+    18.7727,
+    9.2865,
+    10.4551
+   ],
+   "tris": 2084,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingSplit.glb",
+     "kind": "solid",
+     "tris": 2084,
+     "offset": [
+      0.0,
+      4.6433,
+      0.0
+     ],
+     "size": [
+      18.7727,
+      9.2865,
+      10.4551
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Split Entrance (portal with pillar)"
+  },
+  {
+   "name": "CaveEntranceRingWide",
+   "sheet": "W14",
+   "subject": "CaveEntranceRing",
+   "role": "variant",
+   "size": [
+    19.9545,
+    9.2408,
+    10.3653
+   ],
+   "tris": 2027,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveEntranceRingWide.glb",
+     "kind": "solid",
+     "tris": 2027,
+     "offset": [
+      0.0,
+      4.6204,
+      0.0
+     ],
+     "size": [
+      19.9545,
+      9.2408,
+      10.3653
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide Entrance"
+  },
+  {
+   "name": "CaveLedge",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "hero",
+   "size": [
+    15.1566,
+    8.871,
+    8.2916
+   ],
+   "tris": 859,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedge.glb",
+     "kind": "solid",
+     "tris": 859,
+     "offset": [
+      0.0,
+      4.4355,
+      0.0
+     ],
+     "size": [
+      15.1566,
+      8.871,
+      8.2916
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cave ledge: thick flat platform slab resting on a solid skirt of faceted boulders, backed by a rock wall, corner filler"
+  },
+  {
+   "name": "CaveLedgeBackWallPanel",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "part",
+   "size": [
+    6.5323,
+    8.0,
+    2.5677
+   ],
+   "tris": 113,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgeBackWallPanel.glb",
+     "kind": "solid",
+     "tris": 113,
+     "offset": [
+      0.0,
+      4.0,
+      0.0
+     ],
+     "size": [
+      6.5323,
+      8.0,
+      2.5677
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "back wall panel"
+  },
+  {
+   "name": "CaveLedgeCornerFiller",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "part",
+   "size": [
+    2.4689,
+    4.0,
+    2.534
+   ],
+   "tris": 49,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgeCornerFiller.glb",
+     "kind": "solid",
+     "tris": 49,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      2.4689,
+      4.0,
+      2.534
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner filler"
+  },
+  {
+   "name": "CaveLedgeNaturalSpan",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "variant",
+   "size": [
+    15.1789,
+    5.2,
+    4.5785
+   ],
+   "tris": 394,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgeNaturalSpan.glb",
+     "kind": "solid",
+     "tris": 394,
+     "offset": [
+      0.0,
+      2.6,
+      0.0
+     ],
+     "size": [
+      15.1789,
+      5.2,
+      4.5785
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Natural Span (freestanding arch carrying a slab)"
+  },
+  {
+   "name": "CaveLedgePitRim",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "variant",
+   "size": [
+    12.8616,
+    3.2,
+    10.9465
+   ],
+   "tris": 629,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgePitRim.glb",
+     "kind": "solid",
+     "tris": 629,
+     "offset": [
+      0.0,
+      1.6,
+      0.0
+     ],
+     "size": [
+      12.8616,
+      3.2,
+      10.9465
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Pit Rim (encircling)"
+  },
+  {
+   "name": "CaveLedgePlatformSlab",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "part",
+   "size": [
+    10.2336,
+    0.8,
+    6.4736
+   ],
+   "tris": 33,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgePlatformSlab.glb",
+     "kind": "solid",
+     "tris": 33,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      10.2336,
+      0.8,
+      6.4736
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "platform slab"
+  },
+  {
+   "name": "CaveLedgeWall",
+   "sheet": "W14",
+   "subject": "CaveLedge",
+   "role": "variant",
+   "size": [
+    13.3733,
+    9.1406,
+    8.3371
+   ],
+   "tris": 814,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveLedgeWall.glb",
+     "kind": "solid",
+     "tris": 814,
+     "offset": [
+      0.0,
+      4.5703,
+      0.0
+     ],
+     "size": [
+      13.3733,
+      9.1406,
+      8.3371
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Wall Ledge (attached)"
+  },
+  {
+   "name": "TunnelModule",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "hero",
+   "size": [
+    12.2651,
+    9.1262,
+    16.6127
+   ],
+   "tris": 3376,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModule.glb",
+     "kind": "solid",
+     "tris": 3376,
+     "offset": [
+      0.0,
+      4.5631,
+      0.0
+     ],
+     "size": [
+      12.2651,
+      9.1262,
+      16.6127
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tunnel module: two-cell tunnel, walls of stacked faceted boulders arching into a boulder ceiling, sand floor, open both ends"
+  },
+  {
+   "name": "TunnelModuleBend",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "variant",
+   "size": [
+    17.8182,
+    9.1262,
+    17.9988
+   ],
+   "tris": 4747,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleBend.glb",
+     "kind": "solid",
+     "tris": 4747,
+     "offset": [
+      0.0,
+      4.5631,
+      0.0
+     ],
+     "size": [
+      17.8182,
+      9.1262,
+      17.9988
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Bend Module (90 degrees)"
+  },
+  {
+   "name": "TunnelModuleCeilingModule",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "part",
+   "size": [
+    9.6557,
+    3.2,
+    7.978
+   ],
+   "tris": 147,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleCeilingModule.glb",
+     "kind": "solid",
+     "tris": 147,
+     "offset": [
+      0.0,
+      1.6,
+      0.0
+     ],
+     "size": [
+      9.6557,
+      3.2,
+      7.978
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ceiling module: slab boulders"
+  },
+  {
+   "name": "TunnelModuleFloorModule",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "part",
+   "size": [
+    8.0192,
+    1.0,
+    7.5182
+   ],
+   "tris": 175,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleFloorModule.glb",
+     "kind": "solid",
+     "tris": 175,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      8.0192,
+      1.0,
+      7.5182
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor module: sand slabs"
+  },
+  {
+   "name": "TunnelModuleJunction",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "variant",
+   "size": [
+    23.9142,
+    9.131,
+    23.6843
+   ],
+   "tris": 6591,
+   "budget": 14000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleJunction.glb",
+     "kind": "solid",
+     "tris": 6591,
+     "offset": [
+      0.0,
+      4.5655,
+      0.0
+     ],
+     "size": [
+      23.9142,
+      9.131,
+      23.6843
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Junction (4-way)"
+  },
+  {
+   "name": "TunnelModuleLeftWall",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "part",
+   "size": [
+    3.2165,
+    6.1,
+    7.496
+   ],
+   "tris": 251,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleLeftWall.glb",
+     "kind": "solid",
+     "tris": 251,
+     "offset": [
+      0.0,
+      3.05,
+      0.0
+     ],
+     "size": [
+      3.2165,
+      6.1,
+      7.496
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "left wall: stacked boulders"
+  },
+  {
+   "name": "TunnelModuleRightWall",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "part",
+   "size": [
+    3.1105,
+    6.1,
+    7.3091
+   ],
+   "tris": 251,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleRightWall.glb",
+     "kind": "solid",
+     "tris": 251,
+     "offset": [
+      0.0,
+      3.05,
+      0.0
+     ],
+     "size": [
+      3.1105,
+      6.1,
+      7.3091
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "right wall: stacked boulders"
+  },
+  {
+   "name": "TunnelModuleStraight",
+   "sheet": "W14",
+   "subject": "TunnelModule",
+   "role": "variant",
+   "size": [
+    12.2697,
+    9.1262,
+    23.6497
+   ],
+   "tris": 4635,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TunnelModuleStraight.glb",
+     "kind": "solid",
+     "tris": 4635,
+     "offset": [
+      0.0,
+      4.5631,
+      0.0
+     ],
+     "size": [
+      12.2697,
+      9.1262,
+      23.6497
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight Tunnel: three cells long"
+  }
+ ],
+ "stats": {
+  "assets": 32,
+  "pieces": 32,
+  "solid": 32,
+  "water": 0,
+  "glow": 0,
+  "tris": 37020,
+  "vfxSockets": 0,
+  "paletteColours": 3,
+  "paletteLevels": 86,
+  "meshBytes": 3687300
+ },
+ "problems": []
+}

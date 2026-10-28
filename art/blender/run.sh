@@ -20,7 +20,10 @@ SCRIPT="$1"; shift
 [ -f "$SCRIPT" ] || SCRIPT="$HERE/$SCRIPT"
 NAME="$(basename "$SCRIPT" .py)"
 mkdir -p "$HERE/logs"
-LOG="$HERE/logs/$NAME.log"
+# Runs with different arguments get their own log, so parallel runs of one
+# script (e.g. several build_kit.py modules) never overwrite each other's.
+TAG="$(printf '%s' "${BLENDER_ARGS:-}" | tr -cs 'A-Za-z0-9' '_' | sed 's/^_//; s/_$//')"
+LOG="$HERE/logs/$NAME${TAG:+-$TAG}.log"
 
 OUTPUTS=("$@")
 if [ ${#OUTPUTS[@]} -eq 0 ]; then

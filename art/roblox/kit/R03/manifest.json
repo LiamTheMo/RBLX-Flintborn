@@ -1,0 +1,2731 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "R03",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "r03_amber",
+    "hex": "#F28A1C",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_amber_wood",
+    "hex": "#7A4A2B",
+    "levels": [
+     0.89716,
+     0.91805,
+     0.92699,
+     0.93875,
+     0.94384,
+     0.95055,
+     0.95556,
+     0.96188,
+     0.96941,
+     0.97407,
+     0.97955,
+     0.98422,
+     0.98867,
+     0.99227,
+     0.99736,
+     1.00048,
+     1.00645,
+     1.00958,
+     1.01321,
+     1.01623,
+     1.01952,
+     1.02554,
+     1.02812,
+     1.03328,
+     1.03799,
+     1.04234,
+     1.04728,
+     1.05609,
+     1.06406,
+     1.07143,
+     1.08041,
+     1.10787
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_amethyst",
+    "hex": "#8A4BC9",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_azurite",
+    "hex": "#1C8EDB",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_geode_dark",
+    "hex": "#3B2358",
+    "levels": [
+     0.94403,
+     0.94988,
+     0.97851,
+     0.99269,
+     1.00125,
+     1.00461,
+     1.01031,
+     1.01852,
+     1.02179,
+     1.03083,
+     1.03369,
+     1.03606,
+     1.04803
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_quartz",
+    "hex": "#D8CFC8",
+    "levels": [
+     0.96174,
+     0.96879,
+     0.97534,
+     0.99333,
+     0.99644,
+     1.01705,
+     1.01955,
+     1.03313
+    ],
+    "used": true
+   },
+   {
+    "key": "r03_rock",
+    "hex": "#8C7E78",
+    "levels": [
+     0.91308,
+     0.93172,
+     0.94084,
+     0.94574,
+     0.94942,
+     0.95928,
+     0.96245,
+     0.96882,
+     0.97244,
+     0.97486,
+     0.98007,
+     0.985,
+     0.98851,
+     0.98968,
+     0.99179,
+     0.99639,
+     1.00018,
+     1.00397,
+     1.0059,
+     1.00985,
+     1.01547,
+     1.02032,
+     1.0257,
+     1.02578,
+     1.03073,
+     1.0346,
+     1.0376,
+     1.04191,
+     1.04835,
+     1.05603,
+     1.06654,
+     1.08849
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "AmberDepleted",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "depleted",
+   "size": [
+    7.7492,
+    2.4199,
+    4.9351
+   ],
+   "tris": 252,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberDepleted.glb",
+     "kind": "solid",
+     "tris": 252,
+     "offset": [
+      0.0,
+      1.21,
+      0.0
+     ],
+     "size": [
+      7.7492,
+      2.4199,
+      4.9351
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.013",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F28A1C",
+       "#FFB347"
+      ]
+     }
+    }
+   ],
+   "notes": "Depleted (Base); harvest_deplete: amber chip burst at base centre"
+  },
+  {
+   "name": "AmberNode",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "hero",
+   "size": [
+    8.2451,
+    8.3975,
+    7.6107
+   ],
+   "tris": 1024,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberNode.glb",
+     "kind": "solid",
+     "tris": 1024,
+     "offset": [
+      0.0,
+      4.1988,
+      0.0
+     ],
+     "size": [
+      8.2451,
+      8.3975,
+      7.6107
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.011",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      2.5
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F28A1C",
+       "#FFB347"
+      ]
+     }
+    },
+    {
+     "name": "VFX_heat_glow",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      4.0,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FFB347",
+         "#F28A1C"
+        ],
+        "size": [
+         2.0,
+         2.6
+        ],
+        "transparency": [
+         0.75,
+         1.0
+        ],
+        "lifetime": [
+         1.2,
+         1.8
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 10,
+        "light_emission": 1.0
+       },
+       {
+        "name": "Motes",
+        "texture": "dust_mote",
+        "color": [
+         "#FFD27A",
+         "#F28A1C"
+        ],
+        "size": [
+         0.25,
+         0.1
+        ],
+        "transparency": [
+         0.3,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 1.2,
+        "speed": [
+         0.2,
+         0.5
+        ],
+        "spread": 40,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFA23A",
+       "brightness": 0.6,
+       "range": 9,
+       "flicker": false
+      },
+      "color": [
+       "#FFB347",
+       "#F28A1C"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.017",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      4.5,
+      2.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFF1C8",
+       "#FFC266"
+      ]
+     }
+    }
+   ],
+   "notes": "harvest_hit: amber chips on the front strike face; ore_glint: twinkle on the glossy nodule front; heat_glow: soft warm amber light + motes at the nodule core"
+  },
+  {
+   "name": "AmberNodule",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    5.2913,
+    6.6456,
+    4.5748
+   ],
+   "tris": 320,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberNodule.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      3.3228,
+      0.0
+     ],
+     "size": [
+      5.2913,
+      6.6456,
+      4.5748
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.018",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      3.5,
+      2.0
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#FFF1C8",
+       "#FFC266"
+      ]
+     }
+    }
+   ],
+   "notes": "ore_glint: glossy nodule twinkle"
+  },
+  {
+   "name": "AmberSideWood",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    1.7262,
+    2.4038,
+    1.6251
+   ],
+   "tris": 44,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberSideWood.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      1.2019,
+      0.0
+     ],
+     "size": [
+      1.7262,
+      2.4038,
+      1.6251
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "small split stump"
+  },
+  {
+   "name": "AmberWoodBase",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    8.0457,
+    4.0354,
+    5.3694
+   ],
+   "tris": 324,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodBase.glb",
+     "kind": "solid",
+     "tris": 324,
+     "offset": [
+      0.0,
+      2.0177,
+      0.0
+     ],
+     "size": [
+      8.0457,
+      4.0354,
+      5.3694
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wood cradle"
+  },
+  {
+   "name": "AmethystBottomShell",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    7.9628,
+    2.996,
+    4.6395
+   ],
+   "tris": 172,
+   "budget": 1800,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystBottomShell.glb",
+     "kind": "solid",
+     "tris": 172,
+     "offset": [
+      0.0,
+      1.498,
+      0.0
+     ],
+     "size": [
+      7.9628,
+      2.996,
+      4.6395
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bottom U-shaped shell basin."
+  },
+  {
+   "name": "AmethystCrystal",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    1.3725,
+    4.0,
+    1.5895
+   ],
+   "tris": 32,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystal.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      2.0,
+      0.0
+     ],
+     "size": [
+      1.3725,
+      4.0,
+      1.5895
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single amethyst crystal."
+  },
+  {
+   "name": "AmethystCrystalB",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    1.6826,
+    3.3961,
+    1.3209
+   ],
+   "tris": 32,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystalB.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      1.698,
+      0.0
+     ],
+     "size": [
+      1.6826,
+      3.3961,
+      1.3209
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single amethyst crystal."
+  },
+  {
+   "name": "AmethystCrystalC",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    1.5414,
+    2.9109,
+    1.2356
+   ],
+   "tris": 32,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystalC.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      1.4555,
+      0.0
+     ],
+     "size": [
+      1.5414,
+      2.9109,
+      1.2356
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single amethyst crystal."
+  },
+  {
+   "name": "AmethystCrystalD",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    0.9534,
+    1.9924,
+    0.9752
+   ],
+   "tris": 32,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystalD.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.9962,
+      0.0
+     ],
+     "size": [
+      0.9534,
+      1.9924,
+      0.9752
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single amethyst crystal."
+  },
+  {
+   "name": "AmethystCrystalDrop",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "drop",
+   "size": [
+    1.2983,
+    1.0058,
+    1.133
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystalDrop.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.5029,
+      0.0
+     ],
+     "size": [
+      1.2983,
+      1.0058,
+      1.133
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Amethyst nugget drop."
+  },
+  {
+   "name": "AmethystCrystalDropB",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "drop",
+   "size": [
+    1.0446,
+    1.3791,
+    1.085
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystCrystalDropB.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.6895,
+      0.0
+     ],
+     "size": [
+      1.0446,
+      1.3791,
+      1.085
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Upright amethyst nugget drop."
+  },
+  {
+   "name": "AmethystDepleted",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "depleted",
+   "size": [
+    7.9465,
+    3.5783,
+    5.4497
+   ],
+   "tris": 536,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystDepleted.glb",
+     "kind": "solid",
+     "tris": 536,
+     "offset": [
+      0.0,
+      1.7891,
+      0.0
+     ],
+     "size": [
+      7.9465,
+      3.5783,
+      5.4497
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.012",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Broken empty geode base. harvest_deplete: rock burst at base centre."
+  },
+  {
+   "name": "AmethystNode",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "hero",
+   "size": [
+    8.793,
+    7.2777,
+    8.8029
+   ],
+   "tris": 784,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystNode.glb",
+     "kind": "solid",
+     "tris": 784,
+     "offset": [
+      0.0,
+      3.6388,
+      0.0
+     ],
+     "size": [
+      8.793,
+      7.2777,
+      8.8029
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_hit.010",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      2.5,
+      3.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#A86BE0",
+       "#8A4BC9"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.016",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      3.0,
+      1.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4E6FF",
+         "#B47CFF"
+        ],
+        "size": [
+         0,
+         0.28,
+         0
+        ],
+        "transparency": [
+         0.05,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.7
+        ],
+        "rate": 0.7,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.2,
+         1.2,
+         3.0
+        ]
+       },
+       {
+        "name": "Motes",
+        "texture": "dust_mote",
+        "color": [
+         "#C79BFF",
+         "#9A5CE6"
+        ],
+        "size": [
+         0.09,
+         0.03
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         2,
+         3.2
+        ],
+        "rate": 1.2,
+        "speed": [
+         0.1,
+         0.25
+        ],
+        "spread": 180,
+        "light_emission": 1.0,
+        "shape": [
+         2.6,
+         1.6,
+         2.6
+        ]
+       }
+      ],
+      "light": {
+       "color": "#9A5CE6",
+       "brightness": 0.9,
+       "range": 10,
+       "flicker": false
+      }
+     }
+    }
+   ],
+   "notes": "Hollow geode node. harvest_hit: amethyst chips on the front strike face; ore_glint: small violet twinkles + motes + soft violet PointLight on the big crystal."
+  },
+  {
+   "name": "AmethystTopShell",
+   "sheet": "R03",
+   "subject": "Amethyst",
+   "role": "part",
+   "size": [
+    7.9844,
+    3.6454,
+    4.4773
+   ],
+   "tris": 312,
+   "budget": 1800,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmethystTopShell.glb",
+     "kind": "solid",
+     "tris": 312,
+     "offset": [
+      0.0,
+      1.8227,
+      0.0
+     ],
+     "size": [
+      7.9844,
+      3.6454,
+      4.4773
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Top half-dome shell: arched roof slab with a dark hollow underside."
+  },
+  {
+   "name": "AzuriteBaseRock",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "part",
+   "size": [
+    7.0226,
+    2.5706,
+    3.4327
+   ],
+   "tris": 40,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteBaseRock.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.2853,
+      0.0
+     ],
+     "size": [
+      7.0226,
+      2.5706,
+      3.4327
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "large boulder mound plus a small separate satellite rock"
+  },
+  {
+   "name": "AzuriteCrystalDrop",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "drop",
+   "size": [
+    1.803,
+    1.1738,
+    1.2477
+   ],
+   "tris": 44,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteCrystalDrop.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.5869,
+      0.0
+     ],
+     "size": [
+      1.803,
+      1.1738,
+      1.2477
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "azurite shard lying diagonally"
+  },
+  {
+   "name": "AzuriteCrystalDropB",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "drop",
+   "size": [
+    1.3303,
+    1.2893,
+    1.012
+   ],
+   "tris": 44,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteCrystalDropB.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.6447,
+      0.0
+     ],
+     "size": [
+      1.3303,
+      1.2893,
+      1.012
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "azurite shard, tilted upright pose"
+  },
+  {
+   "name": "AzuriteDepleted",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "depleted",
+   "size": [
+    6.7322,
+    2.6955,
+    3.3937
+   ],
+   "tris": 60,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteDepleted.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.3477,
+      0.0
+     ],
+     "size": [
+      6.7322,
+      2.6955,
+      3.3937
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.011",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#8C7E78",
+       "#1C8EDB"
+      ]
+     }
+    }
+   ],
+   "notes": "Depleted (Base); harvest_deplete burst at the base centre"
+  },
+  {
+   "name": "AzuriteMainCrystal",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "part",
+   "size": [
+    4.0629,
+    7.0179,
+    3.1888
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteMainCrystal.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      3.5089,
+      0.0
+     ],
+     "size": [
+      4.0629,
+      7.0179,
+      3.1888
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "main azurite crystal"
+  },
+  {
+   "name": "AzuriteNode",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "hero",
+   "size": [
+    7.8764,
+    7.6946,
+    6.8619
+   ],
+   "tris": 400,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteNode.glb",
+     "kind": "solid",
+     "tris": 400,
+     "offset": [
+      0.0,
+      3.8473,
+      0.0
+     ],
+     "size": [
+      7.8764,
+      7.6946,
+      6.8619
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_dust",
+     "kind": "dust",
+     "position": [
+      0.0,
+      4.5,
+      0.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Dust",
+        "texture": "dust_mote",
+        "color": [
+         "#F3E1B8",
+         "#E2C890"
+        ],
+        "size": [
+         0.3,
+         0.12
+        ],
+        "transparency": [
+         0.4,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.1,
+         0.3
+        ],
+        "spread": 180,
+        "light_emission": 0.3,
+        "shape": [
+         8.0,
+         2.0,
+         4.0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#4FB4FF",
+       "brightness": 0.7,
+       "range": 10,
+       "flicker": false,
+       "pulse": true
+      },
+      "color": [
+       "#9ADCFF",
+       "#4FB0F0"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.009",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      2.5
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#8FD8FF",
+       "#1C8EDB"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint.015",
+     "kind": "ore_glint",
+     "position": [
+      0.0,
+      5.0,
+      1.5
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F2FBFF",
+       "#9ADCFF"
+      ]
+     }
+    }
+   ],
+   "notes": "harvest_hit: blue chips on the front boulder/crystal face; ore_glint: twinkle on the main gem; dust: blue motes + soft blue PointLight for the faint crystal glow."
+  },
+  {
+   "name": "AzuriteSideCrystal",
+   "sheet": "R03",
+   "subject": "Azurite",
+   "role": "part",
+   "size": [
+    2.76,
+    4.5938,
+    2.446
+   ],
+   "tris": 60,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AzuriteSideCrystal.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      2.2969,
+      0.0
+     ],
+     "size": [
+      2.76,
+      4.5938,
+      2.446
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "side azurite crystal"
+  },
+  {
+   "name": "QuartzBaseRock",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    7.7592,
+    2.8247,
+    3.6063
+   ],
+   "tris": 214,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzBaseRock.glb",
+     "kind": "solid",
+     "tris": 214,
+     "offset": [
+      0.0,
+      1.4123,
+      0.0
+     ],
+     "size": [
+      7.7592,
+      2.8247,
+      3.6063
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Two joined host boulders plus a small third rock."
+  },
+  {
+   "name": "QuartzCrystalDrop",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "drop",
+   "size": [
+    1.3137,
+    0.9093,
+    0.8085
+   ],
+   "tris": 88,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzCrystalDrop.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      0.4547,
+      0.0
+     ],
+     "size": [
+      1.3137,
+      0.9093,
+      0.8085
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Quartz Crystal drop: chunky shard lying, chisel-pointed both ends."
+  },
+  {
+   "name": "QuartzCrystalDropB",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "drop",
+   "size": [
+    0.9701,
+    1.3869,
+    0.822
+   ],
+   "tris": 72,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzCrystalDropB.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.6935,
+      0.0
+     ],
+     "size": [
+      0.9701,
+      1.3869,
+      0.822
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Second quartz shard drop, standing upright, slanted chisel tip."
+  },
+  {
+   "name": "QuartzDepleted",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "depleted",
+   "size": [
+    8.133,
+    1.9529,
+    6.0426
+   ],
+   "tris": 490,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzDepleted.glb",
+     "kind": "solid",
+     "tris": 490,
+     "offset": [
+      0.0,
+      0.9765,
+      0.0
+     ],
+     "size": [
+      8.133,
+      1.9529,
+      6.0426
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.010",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 0.35,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Depleted (Base): the hero's boulder ring left after the crystals are mined, hollow centre; harvest_deplete (small) at the base centre."
+  },
+  {
+   "name": "QuartzMainCrystal",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    2.7676,
+    8.5,
+    3.1479
+   ],
+   "tris": 72,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzMainCrystal.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      4.25,
+      0.0
+     ],
+     "size": [
+      2.7676,
+      8.5,
+      3.1479
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main crystal of the quartz node, upright, chisel tip."
+  },
+  {
+   "name": "QuartzNode",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "hero",
+   "size": [
+    8.7358,
+    8.9,
+    7.3565
+   ],
+   "tris": 866,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzNode.glb",
+     "kind": "solid",
+     "tris": 866,
+     "offset": [
+      0.0,
+      4.45,
+      0.0
+     ],
+     "size": [
+      8.7358,
+      8.9,
+      7.3565
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete.009",
+     "kind": "harvest_deplete",
+     "position": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D6CEC6",
+         "#B3AAA2"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_harvest_hit.008",
+     "kind": "harvest_hit",
+     "position": [
+      0.0,
+      3.0,
+      2.2
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#B9B1AB",
+         "#8F8B8F"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#CFC6BE",
+         "#B3AAA2"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#E6DED8",
+       "#C9BFB8"
+      ]
+     }
+    }
+   ],
+   "notes": "Quartz node: 3 chunky milky crystals centred in a ring of 7 host boulders. harvest_hit on the front strike face (quartz chips); harvest_deplete at the base centre. Matte quartz: no ore_glint, no light."
+  },
+  {
+   "name": "QuartzSideCrystal",
+   "sheet": "R03",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    1.9668,
+    5.5,
+    2.3309
+   ],
+   "tris": 72,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzSideCrystal.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      2.75,
+      0.0
+     ],
+     "size": [
+      1.9668,
+      5.5,
+      2.3309
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side crystal with an off-centre angled chisel tip."
+  },
+  {
+   "name": "RawAmberDrop",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "drop",
+   "size": [
+    1.5,
+    1.1,
+    1.1
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RawAmberDrop.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.55,
+      0.0
+     ],
+     "size": [
+      1.5,
+      1.1,
+      1.1
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "raw amber chunk"
+  },
+  {
+   "name": "RawAmberDropB",
+   "sheet": "R03",
+   "subject": "Amber",
+   "role": "drop",
+   "size": [
+    1.2,
+    1.4,
+    1.0
+   ],
+   "tris": 80,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RawAmberDropB.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.7,
+      0.0
+     ],
+     "size": [
+      1.2,
+      1.4,
+      1.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "raw amber chunk B"
+  }
+ ],
+ "stats": {
+  "assets": 31,
+  "pieces": 31,
+  "solid": 31,
+  "water": 0,
+  "glow": 0,
+  "tris": 6798,
+  "vfxSockets": 15,
+  "paletteColours": 7,
+  "paletteLevels": 88,
+  "meshBytes": 698864
+ },
+ "problems": []
+}

@@ -1,0 +1,338 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M001",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 64,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m001_stone",
+    "hex": "#93898B",
+    "levels": [
+     0.91359,
+     0.93031,
+     0.93815,
+     0.94141,
+     0.94486,
+     0.94844,
+     0.95269,
+     0.95589,
+     0.95916,
+     0.96108,
+     0.96281,
+     0.96482,
+     0.96569,
+     0.96791,
+     0.96969,
+     0.97211,
+     0.97476,
+     0.97768,
+     0.97938,
+     0.98155,
+     0.98324,
+     0.98547,
+     0.98868,
+     0.99196,
+     0.99425,
+     0.99757,
+     1.00112,
+     1.00629,
+     1.01103,
+     1.01888,
+     1.02975,
+     1.06213
+    ],
+    "used": true
+   },
+   {
+    "key": "m001_stone_cool",
+    "hex": "#838188",
+    "levels": [
+     0.98395,
+     0.99175,
+     1.00213,
+     1.00763,
+     1.01896,
+     1.03123,
+     0.99755,
+     1.01143,
+     1.03479,
+     0.94795,
+     0.95183,
+     0.95498,
+     0.95835,
+     0.97106,
+     0.98072,
+     0.98647,
+     0.99981,
+     1.00551
+    ],
+    "used": true
+   },
+   {
+    "key": "m001_stone_x_cool_33",
+    "hex": "#8E868A",
+    "levels": [
+     0.93052,
+     0.94712,
+     0.95208,
+     0.95668,
+     0.96514,
+     0.9664,
+     0.96867,
+     0.972,
+     0.97491,
+     0.97727,
+     0.97931,
+     0.98136,
+     0.9825,
+     0.9843,
+     0.98709,
+     0.99092,
+     0.99335,
+     0.99505,
+     0.9976,
+     1.00054,
+     1.00179,
+     1.0045,
+     1.00599,
+     1.00899,
+     1.01133,
+     1.01483,
+     1.01899,
+     1.02052,
+     1.02391,
+     1.02549,
+     1.03672,
+     1.04208
+    ],
+    "used": true
+   },
+   {
+    "key": "m001_stone_x_cool_67",
+    "hex": "#888489",
+    "levels": [
+     0.93597,
+     0.93954,
+     0.94752,
+     0.95683,
+     0.96809,
+     0.97087,
+     0.9717,
+     0.97721,
+     0.97762,
+     0.97956,
+     0.98161,
+     0.98804,
+     0.9898,
+     0.99308,
+     0.99677,
+     0.99803,
+     0.99811,
+     1.00004,
+     1.00062,
+     1.00148,
+     1.0023,
+     1.00369,
+     1.00918,
+     1.00982,
+     1.01426,
+     1.01734,
+     1.01956,
+     1.02091,
+     1.02282,
+     1.03325,
+     1.04129,
+     1.05533
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Stone",
+   "sheet": "M001",
+   "subject": "Stone",
+   "role": "hero",
+   "size": [
+    8.699,
+    5.0,
+    6.1349
+   ],
+   "tris": 820,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Stone.glb",
+     "kind": "solid",
+     "tris": 820,
+     "offset": [
+      0.0,
+      2.5,
+      0.0
+     ],
+     "size": [
+      8.699,
+      5.0,
+      6.1349
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone resource: a chunky faceted main rock (broad flat faces, chamfered hard edges) with a support rock set into its foot on each side; parts unioned into one closed mesh"
+  },
+  {
+   "name": "StoneMainRock",
+   "sheet": "M001",
+   "subject": "Stone",
+   "role": "part",
+   "size": [
+    6.7139,
+    5.0,
+    6.1349
+   ],
+   "tris": 356,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneMainRock.glb",
+     "kind": "solid",
+     "tris": 356,
+     "offset": [
+      0.0,
+      2.5,
+      0.0
+     ],
+     "size": [
+      6.7139,
+      5.0,
+      6.1349
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Rock alone: chunky faceted dome with a flat base"
+  },
+  {
+   "name": "StoneSupportRockLeft",
+   "sheet": "M001",
+   "subject": "Stone",
+   "role": "part",
+   "size": [
+    2.3544,
+    1.8,
+    2.1399
+   ],
+   "tris": 212,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSupportRockLeft.glb",
+     "kind": "solid",
+     "tris": 212,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      2.3544,
+      1.8,
+      2.1399
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Support Rock (Left): small faceted rock, sits in the main rock's left foot"
+  },
+  {
+   "name": "StoneSupportRockRight",
+   "sheet": "M001",
+   "subject": "Stone",
+   "role": "part",
+   "size": [
+    1.9499,
+    1.45,
+    1.7185
+   ],
+   "tris": 212,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSupportRockRight.glb",
+     "kind": "solid",
+     "tris": 212,
+     "offset": [
+      0.0,
+      0.725,
+      0.0
+     ],
+     "size": [
+      1.9499,
+      1.45,
+      1.7185
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Support Rock (Right): smaller faceted rock, sits in the main rock's right foot"
+  }
+ ],
+ "stats": {
+  "assets": 4,
+  "pieces": 4,
+  "solid": 4,
+  "water": 0,
+  "glow": 0,
+  "tris": 1600,
+  "vfxSockets": 0,
+  "paletteColours": 4,
+  "paletteLevels": 114,
+  "meshBytes": 147876
+ },
+ "problems": []
+}

@@ -1,0 +1,879 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W02_natural_arch.blend",
+ "sheet": "W02",
+ "module": "natural_arch",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "flower_white",
+    "hex": "#F5F2EA",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "flower_yellow",
+    "hex": "#F2C230",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_bush",
+    "hex": "#4F8A3B",
+    "levels": [
+     0.92345,
+     0.93899,
+     0.94696,
+     0.95303,
+     0.95838,
+     0.96285,
+     0.96706,
+     0.9705,
+     0.97384,
+     0.97774,
+     0.98089,
+     0.98368,
+     0.98693,
+     0.99018,
+     0.99376,
+     0.99731,
+     1.00053,
+     1.00368,
+     1.00692,
+     1.01048,
+     1.01362,
+     1.01747,
+     1.0209,
+     1.02455,
+     1.02824,
+     1.03187,
+     1.03588,
+     1.04046,
+     1.0452,
+     1.05109,
+     1.0597,
+     1.08089
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_bush_dark",
+    "hex": "#30602C",
+    "levels": [
+     0.9226,
+     0.94025,
+     0.94806,
+     0.95268,
+     0.95799,
+     0.96245,
+     0.96601,
+     0.96949,
+     0.97357,
+     0.97681,
+     0.98038,
+     0.98354,
+     0.9868,
+     0.99048,
+     0.99402,
+     0.99759,
+     1.00063,
+     1.00356,
+     1.00655,
+     1.01018,
+     1.01358,
+     1.01734,
+     1.02101,
+     1.0246,
+     1.02861,
+     1.03353,
+     1.03779,
+     1.04339,
+     1.04907,
+     1.05347,
+     1.06291,
+     1.0808
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_bush_light",
+    "hex": "#7DAF3E",
+    "levels": [
+     0.92383,
+     0.94259,
+     0.94995,
+     0.95628,
+     0.95923,
+     0.96316,
+     0.96751,
+     0.97169,
+     0.97457,
+     0.97708,
+     0.98002,
+     0.98286,
+     0.98548,
+     0.98847,
+     0.99052,
+     0.99345,
+     0.99683,
+     0.9996,
+     1.00276,
+     1.00603,
+     1.00954,
+     1.01282,
+     1.01604,
+     1.02022,
+     1.0245,
+     1.02938,
+     1.03442,
+     1.03933,
+     1.04564,
+     1.05213,
+     1.06184,
+     1.07731
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_connector",
+    "hex": "#8A858A",
+    "levels": [
+     0.97,
+     0.97615,
+     1.0,
+     1.00373,
+     1.0187,
+     0.99243,
+     1.01304,
+     0.97363,
+     0.99559,
+     1.02146
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_earth",
+    "hex": "#9F6A47",
+    "levels": [
+     0.95005,
+     0.95303,
+     0.95678,
+     0.9593,
+     0.96285,
+     0.96615,
+     0.96918,
+     0.97368,
+     0.97663,
+     0.9802,
+     0.9828,
+     0.98627,
+     0.99001,
+     0.99296,
+     0.99616,
+     0.99976,
+     1.00314,
+     1.00612,
+     1.01024,
+     1.01354,
+     1.01692,
+     1.02002,
+     1.02175,
+     1.02509,
+     1.02737,
+     1.03002,
+     1.0329,
+     1.03737,
+     1.04037,
+     1.04482,
+     1.04765,
+     1.04999
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_grass",
+    "hex": "#A9BE26",
+    "levels": [
+     0.96001,
+     0.96695,
+     0.97082,
+     0.97306,
+     0.97494,
+     0.97763,
+     0.98037,
+     0.98224,
+     0.98508,
+     0.98729,
+     0.98909,
+     0.99201,
+     0.99439,
+     0.99721,
+     0.99956,
+     1.0,
+     1.0,
+     1.0,
+     1.00248,
+     1.00494,
+     1.00658,
+     1.00921,
+     1.01148,
+     1.01403,
+     1.01645,
+     1.01972,
+     1.022,
+     1.02397,
+     1.02761,
+     1.0297,
+     1.03529,
+     1.03984
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_grass_dark",
+    "hex": "#789428",
+    "levels": [
+     0.95,
+     0.97117,
+     0.97328,
+     0.97579,
+     0.97834,
+     0.98018,
+     0.98234,
+     0.98428,
+     0.98741,
+     0.98911,
+     0.99148,
+     0.99371,
+     0.99575,
+     0.99819,
+     1.00114,
+     1.00301,
+     1.00589,
+     1.00757,
+     1.01012,
+     1.01231,
+     1.01475,
+     1.01673,
+     1.01955,
+     1.02139,
+     1.02407,
+     1.02579,
+     1.02781,
+     1.02903
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_grass_light",
+    "hex": "#C2D23A",
+    "levels": [
+     0.97087,
+     0.97332,
+     0.97529,
+     0.97704,
+     0.97963,
+     0.98246,
+     0.98491,
+     0.98698,
+     0.98901,
+     0.99212,
+     0.99436,
+     0.99641,
+     0.99867,
+     1.00062,
+     1.00284,
+     1.00504,
+     1.00732,
+     1.0088,
+     1.01166,
+     1.01314,
+     1.01645,
+     1.01852,
+     1.02069,
+     1.02276,
+     1.02443,
+     1.02711,
+     1.02913
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_path",
+    "hex": "#E2A86E",
+    "levels": [
+     1.0,
+     0.97056,
+     1.02781,
+     0.97257,
+     0.9755,
+     1.02405,
+     0.97884,
+     1.01968,
+     0.98271,
+     1.01555,
+     0.98687,
+     1.01047,
+     1.00799,
+     0.99261,
+     0.99499,
+     1.00219
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_path_dark",
+    "hex": "#C48A52",
+    "levels": [
+     0.92,
+     0.97514,
+     0.97817,
+     0.98895,
+     0.9916,
+     0.99493,
+     1.00138,
+     1.00393,
+     1.00659,
+     1.00977,
+     1.01546,
+     1.02872,
+     1.02613,
+     1.02304,
+     1.02063,
+     0.97017,
+     0.98215,
+     1.01911,
+     0.9857,
+     0.99794,
+     1.01339
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_rock",
+    "hex": "#958482",
+    "levels": [
+     0.95005,
+     0.95411,
+     0.95809,
+     0.96378,
+     0.96686,
+     0.96969,
+     0.9725,
+     0.97538,
+     0.97861,
+     0.98204,
+     0.98462,
+     0.98825,
+     0.99041,
+     0.99474,
+     0.99759,
+     1.00136,
+     1.00619,
+     1.00965,
+     1.0125,
+     1.01678,
+     1.02059,
+     1.02451,
+     1.02794,
+     1.03101,
+     1.03506,
+     1.0379,
+     1.04261,
+     1.04652,
+     1.04962,
+     1.0533,
+     1.05648,
+     1.05999
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_rock_cool",
+    "hex": "#686A7C",
+    "levels": [
+     0.92824,
+     0.95124,
+     0.95374,
+     0.958,
+     0.96098,
+     0.96465,
+     0.96921,
+     0.97334,
+     0.97676,
+     0.98135,
+     0.98414,
+     0.99001,
+     0.99402,
+     0.99669,
+     0.99952,
+     1.00378,
+     1.00881,
+     1.01233,
+     1.01672,
+     1.02064,
+     1.02369,
+     1.0273,
+     1.03145,
+     1.03542,
+     1.03845,
+     1.04169,
+     1.04405,
+     1.04661,
+     1.05076,
+     1.05392,
+     1.05624,
+     1.05995
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_rock_deep",
+    "hex": "#525A6E",
+    "levels": [
+     0.92155,
+     0.94279,
+     0.95287,
+     0.95802,
+     0.96279,
+     0.96665,
+     0.97058,
+     0.97402,
+     0.97734,
+     0.98371,
+     0.98782,
+     0.98904,
+     0.99493,
+     0.99778,
+     1.0009,
+     1.00431,
+     1.00629,
+     1.01174,
+     1.01457,
+     1.01815,
+     1.02016,
+     1.02446,
+     1.02627,
+     1.03094,
+     1.03442,
+     1.03699,
+     1.03965,
+     1.04445,
+     1.04796,
+     1.05054,
+     1.05461,
+     1.05926
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_rock_light",
+    "hex": "#BBA090",
+    "levels": [
+     0.91589,
+     0.95187,
+     0.95673,
+     0.96085,
+     0.96549,
+     0.96922,
+     0.97319,
+     0.97713,
+     0.98071,
+     0.98567,
+     0.98994,
+     0.99351,
+     0.99767,
+     1.00097,
+     1.00446,
+     1.00759,
+     1.01235,
+     1.01547,
+     1.01937,
+     1.02295,
+     1.02591,
+     1.02917,
+     1.03182,
+     1.03618,
+     1.03916,
+     1.04276,
+     1.04595,
+     1.04954,
+     1.05404,
+     1.05778,
+     1.06983,
+     1.11945
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_slab",
+    "hex": "#BFAEA8",
+    "levels": [
+     0.92,
+     1.0,
+     1.02892
+    ],
+    "used": true
+   }
+  ]
+ },
+ "assets": [
+  {
+   "name": "NaturalArch",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "hero",
+   "size": [
+    34.1737,
+    23.0087,
+    24.7224
+   ],
+   "tris": 5230,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArch.glb",
+     "kind": "solid",
+     "tris": 5230,
+     "offset": [
+      0.0,
+      11.5043,
+      0.0
+     ],
+     "size": [
+      34.1737,
+      23.0087,
+      24.7224
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": [
+    "w02_rock_cool = the cool blue-grey stone lining the arch soffit and tunnel (sheet swatch 2, a W02 plan requirement); outer rock is one colour, w02_rock",
+    "w02_slab = the pale cut-stone floor sill",
+    "w02_connector = the flat grey back connector plate (a kit joint, not rock)",
+    "w02_path = the sandy walkway dirt, w02_earth = the brown soil band under the grass lip"
+   ]
+  },
+  {
+   "name": "NaturalArchBroken",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    30.6389,
+    20.7704,
+    20.8471
+   ],
+   "tris": 4742,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchBroken.glb",
+     "kind": "solid",
+     "tris": 4742,
+     "offset": [
+      0.0,
+      10.3852,
+      0.0
+     ],
+     "size": [
+      30.6389,
+      20.7704,
+      20.8471
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": [
+    "w02_connector = the flat grey back connector plate (a kit joint, not rock)",
+    "w02_path = the sandy walkway dirt, w02_earth = the brown soil band under the grass lip"
+   ]
+  },
+  {
+   "name": "NaturalArchGroundSill",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    14.1859,
+    0.63,
+    10.0
+   ],
+   "tris": 90,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchGroundSill.glb",
+     "kind": "solid",
+     "tris": 90,
+     "offset": [
+      0.0,
+      0.315,
+      0.0
+     ],
+     "size": [
+      14.1859,
+      0.63,
+      10.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pale stone floor slab under the opening"
+  },
+  {
+   "name": "NaturalArchLeftRockMass",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    10.0841,
+    20.4561,
+    22.0753
+   ],
+   "tris": 971,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchLeftRockMass.glb",
+     "kind": "solid",
+     "tris": 971,
+     "offset": [
+      0.0,
+      10.2281,
+      0.0
+     ],
+     "size": [
+      10.0841,
+      20.4561,
+      22.0753
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "NaturalArchNarrow",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    26.4337,
+    22.7673,
+    18.8199
+   ],
+   "tris": 4752,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchNarrow.glb",
+     "kind": "solid",
+     "tris": 4752,
+     "offset": [
+      0.0,
+      11.3836,
+      0.0
+     ],
+     "size": [
+      26.4337,
+      22.7673,
+      18.8199
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": [
+    "w02_rock_cool = the cool blue-grey stone lining the arch soffit and tunnel (sheet swatch 2, a W02 plan requirement); outer rock is one colour, w02_rock",
+    "w02_slab = the pale cut-stone floor sill",
+    "w02_connector = the flat grey back connector plate (a kit joint, not rock)",
+    "w02_path = the sandy walkway dirt, w02_earth = the brown soil band under the grass lip"
+   ]
+  },
+  {
+   "name": "NaturalArchRightRockMass",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    10.8983,
+    18.1905,
+    22.5738
+   ],
+   "tris": 934,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchRightRockMass.glb",
+     "kind": "solid",
+     "tris": 934,
+     "offset": [
+      0.0,
+      9.0952,
+      0.0
+     ],
+     "size": [
+      10.8983,
+      18.1905,
+      22.5738
+     ]
+    }
+   ],
+   "vfx": []
+  },
+  {
+   "name": "NaturalArchTopSpan",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    23.0,
+    8.7092,
+    19.8519
+   ],
+   "tris": 1154,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchTopSpan.glb",
+     "kind": "solid",
+     "tris": 1154,
+     "offset": [
+      0.0,
+      4.3546,
+      0.0
+     ],
+     "size": [
+      23.0,
+      8.7092,
+      19.8519
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": [
+    "w02_rock_cool = the cool blue-grey stone lining the arch soffit and tunnel (sheet swatch 2, a W02 plan requirement); outer rock is one colour, w02_rock"
+   ]
+  },
+  {
+   "name": "NaturalArchWide",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    33.5948,
+    18.7859,
+    24.5304
+   ],
+   "tris": 5544,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchWide.glb",
+     "kind": "solid",
+     "tris": 5544,
+     "offset": [
+      0.0,
+      9.3929,
+      0.0
+     ],
+     "size": [
+      33.5948,
+      18.7859,
+      24.5304
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": [
+    "w02_rock_cool = the cool blue-grey stone lining the arch soffit and tunnel (sheet swatch 2, a W02 plan requirement); outer rock is one colour, w02_rock",
+    "w02_slab = the pale cut-stone floor sill",
+    "w02_connector = the flat grey back connector plate (a kit joint, not rock)",
+    "w02_path = the sandy walkway dirt, w02_earth = the brown soil band under the grass lip"
+   ]
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 23417,
+  "vfxSockets": 0,
+  "paletteColours": 10,
+  "paletteLevels": 191,
+  "meshBytes": 2280008
+ },
+ "problems": [
+  "palette: w02_rock row is full, a tint lands 0.055 from its level (FB_RETINT=1 recomputes the layout)"
+ ]
+}
