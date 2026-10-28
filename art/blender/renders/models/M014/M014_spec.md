@@ -548,3 +548,7 @@ clash to `<name>M014`, so avoid them all.
 
 - Halo: add a small generic `crystal_halo` kind to `art/blender/lib/vfx.py`, using the existing `glow_soft` texture, for the sheet's "Starlight Glow". Stage 6 adds it in that file's conventions and documents it in `art/vfx/README.md`.
 - Names: use the proposed `StarstoneNode`, `StarstoneShellLeft`, `StarstoneShellRight`, `StarlightCore` and `StarstoneFootRock`. The old R04 sheet owns the plain names.
+
+## Correction (main session, 2026-10-28): side-view direction
+
+The kit's side camera (`VIEWS["side"]` = azimuth 90) sits at +X and looks along −X with Z up, so screen right is +Y: the model's BACK (fronts face −Y). Wherever this spec says the side view's right is the front, read it mirrored. Stage 1 should confirm this with a probe render before using side-view numbers. The 3D layout is unaffected.
