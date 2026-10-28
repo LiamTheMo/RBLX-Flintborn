@@ -201,7 +201,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 002 | Flintborn Flint_ Low-Poly Construction Study | World & resources | ✅ | 744; parts 466 / 24 / 24 / 24 / 144 | FAIL 4/10 → PASS 6.5/10 (round 2) | minors: shell faceting more regular than the sheet, inserts gem-like rather than wedge shards; check in Studio |
 | 003 | Flintborn Iron model study | World & resources | ✅ | 988; parts 216 / 42 / 36 | PASS 6.5/10 (round 1), re-verified PASS 6.5/10 after denser host + gem-top chunks | verifiers split on chunk thickness (thin inlay vs thick slab): decide in review; steel sheen and metallic look need a Studio check |
 | 004 | Obsidian Flintborn Model Study | World & resources | ✅ | 1380; parts 34×3 / 40×2 / 484 | PASS 6.5 → FAIL 6 (base off the ground) → PASS 6.5/10 (round 3) | minors: crystals leaner than the sheet's chunky ones; small front crystals partly hidden; glassy specular to check in Studio |
-| 005 | Quartz Flintborn low-poly model study | World & resources | ⬜ | | | |
+| 005 | Quartz Flintborn low-poly model study | World & resources | ✅ | 1216; parts 34 / 34 / 440 | PASS 6.5/10 (round 1) | minors: crystals regular/slim vs the sheet's chunky tapered ones; rock mound smaller and sparser at the rear |
 | 006 | Copper Flintborn Construction Study | World & resources | ⬜ | | | |
 | 007 | Flintborn Coal model study | World & resources | ⬜ | | | |
 | 008 | Azurite Flintborn model study | World & resources | ⬜ | | | |
@@ -381,3 +381,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-27: user asked for chunkier nodes: 001 and 002 footprints widened to near-round (depth ≈ 0.9 of width). 002 Flint passed on round 2. Its first build overwrote R01's `FlintInsertSmall` (same name); the original was restored from the committed blend, and `kit_models.mk` now appends the model code on a name clash (`FlintInsertSmallM002`).
 - 2026-10-28: PR #72 (world kit W01, 001, 002) merged into v0.18. 003 Iron passed (6.5/10).
 - 2026-10-28: PR #73 (003) merged into v0.18. 004 Obsidian passed on round 3 (fixed a crystal lean-angle bug and a floor cut that left the base above z = 0).
+- 2026-10-28: PR #74 (004) merged into v0.18. 005 Quartz passed (6.5/10). `kit_models.repair_nonmanifold` now clears the grazing-contact slivers booleans leave.
