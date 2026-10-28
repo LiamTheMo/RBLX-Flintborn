@@ -149,6 +149,68 @@ test("crouch and sprint speeds", function()
 	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.CROUCH_SPEED, "crouch wins over sprint")
 end)
 
+test("walking through water is 30% slower, on top of sprint, crouch and hunger (GDD §55)", function()
+	local state = SurvivalRules.NewState()
+	local walk, water = SurvivalRules.WALK_SPEED, SurvivalRules.WATER_SPEED_MULTIPLIER
+	expectEq(water, 0.7, "30% slower")
+	expectNear(SurvivalRules.MoveSpeed(state, true, true), walk * 0.7, 1e-9, "walking in water")
+	expectEq(SurvivalRules.MoveSpeed(state, true, false), walk, "dry ground is unchanged")
+	state.sprintIntent = true
+	expectNear(SurvivalRules.MoveSpeed(state, true, true), SurvivalRules.SPRINT_SPEED * 0.7, 1e-9, "sprinting in water")
+	state.food = 0.1
+	expectNear(
+		SurvivalRules.MoveSpeed(state, true, true),
+		SurvivalRules.SPRINT_SPEED * 0.9 * 0.7,
+		1e-9,
+		"hungry sprint in water"
+	)
+	state.sprintIntent, state.crouching, state.food = false, true, 1
+	expectNear(SurvivalRules.MoveSpeed(state, true, true), SurvivalRules.CROUCH_SPEED * 0.7, 1e-9, "crouching in water")
+	state.crouching = false
+	expectNear(SurvivalRules.MoveSpeed(state, true, true, 0.2), walk * 0.7 * 1.2, 1e-9, "Tidewalker helps in water")
+	expectEq(SurvivalRules.MoveSpeed(state, true, false, 0.2), walk, "but not on land")
+	expectNear(SurvivalRules.WalkPace(true), walk * 0.7, 1e-9, "walking pace in water")
+	expectEq(SurvivalRules.WalkPace(false), walk, "walking pace on land")
+end)
+
+test("stepping into or out of water never looks like a sprint", function()
+	-- The server's view, one 0.2 s sample at a time: the water check flips the
+	-- walking pace first, the slower walk speed follows a sample later, and the
+	-- client keeps its old speed for a further 0.4 s of latency.
+	local function walkThrough(speeds, paces, allowances)
+		local pace = SurvivalRules.NewPace()
+		local flagged = false
+		for index = 1, #speeds do
+			flagged = SurvivalRules.ObservePace(pace, speeds[index] * 0.2, 0.2, allowances[index], paces[index])
+				or flagged
+		end
+		return flagged
+	end
+	local dry, wet = SurvivalRules.WalkPace(false), SurvivalRules.WalkPace(true)
+	local speeds, paces, allowances = {}, {}, {}
+	for index = 1, 30 do
+		local inWater = index > 10
+		paces[index] = if inWater then wet else dry
+		allowances[index] = if index > 11 then wet else dry
+		speeds[index] = if index > 13 then wet else dry
+	end
+	expect(not walkThrough(speeds, paces, allowances), "walking into water")
+	for index = 1, 30 do
+		local inWater = index <= 10
+		paces[index] = if inWater then wet else dry
+		allowances[index] = if index <= 11 then wet else dry
+		speeds[index] = if index <= 10 then wet else dry
+	end
+	expect(not walkThrough(speeds, paces, allowances), "walking out of water")
+	-- Keeping dry-land walking speed in water is faster than the water allows.
+	local cheat = SurvivalRules.NewPace()
+	local caught = false
+	for _ = 1, 10 do
+		caught = SurvivalRules.ObservePace(cheat, dry * 0.2, 0.2, wet, wet) or caught
+	end
+	expect(caught, "dry-land pace in water counts as sprinting")
+end)
+
 test("medicine heals at once, caps at max HP and locks for its animation", function()
 	local state = SurvivalRules.NewState()
 	local basic = Consumables.Get("BasicMedicine")
@@ -176,6 +238,20 @@ test("food restores hunger and heals its total over exactly 10 s", function()
 	end
 	expectNear(healed, 30, 1e-6, "cooked meat heals 30")
 	expectEq(#state.foodHeals, 0, "finished after 10 s")
+	-- Berries: a Redberry heals 10 over 10 s for +10% food; a Sweetberry only fills.
+	for catalogId, effect in { Redberry = { hunger = 0.10, heal = 10 }, Sweetberry = { hunger = 0.25, heal = 0 } } do
+		local eater = SurvivalRules.NewState()
+		eater.food = 0.5
+		SurvivalRules.Eat(eater, Consumables.Get(catalogId), 0)
+		expectNear(eater.food, 0.5 + effect.hunger, 1e-9, catalogId .. " hunger")
+		local total, t = 0, 0
+		for _ = 1, 100 do
+			total += SurvivalRules.StepFoodHeals(eater, t, 0.1)
+			t += 0.1
+		end
+		expectNear(total, effect.heal, 1e-6, catalogId .. " heal")
+	end
+	expectEq(Consumables.Get("Berries"), nil, "plain Berries are gone")
 end)
 
 test("a hit halves pending food healing and cancels it at 10 HP or less", function()
@@ -200,7 +276,8 @@ end)
 
 test("downed players lose pending food healing", function()
 	local state = SurvivalRules.NewState()
-	SurvivalRules.Eat(state, Consumables.Get("Berries"), 0)
+	SurvivalRules.Eat(state, Consumables.Get("Redberry"), 0)
+	expect(SurvivalRules.PendingFoodHealing(state) > 0, "a Redberry heals over time")
 	SurvivalRules.OnDowned(state)
 	expectEq(SurvivalRules.PendingFoodHealing(state), 0, "cleared")
 end)

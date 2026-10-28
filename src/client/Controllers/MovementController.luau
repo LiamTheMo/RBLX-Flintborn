@@ -1,5 +1,8 @@
 -- Sprint (hold) and crouch (toggle) input on keyboard, gamepad and touch (GDD §5.1,
--- Q27). Sends intent only; the server owns stamina and movement speed. World only.
+-- Q27). Sends intent only; the server owns stamina and movement speed (including
+-- the 30% slow in water). Nobody swims (GDD §55): this client owns its
+-- character's humanoid state, so it turns Swimming off on every character. World
+-- only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -63,9 +66,21 @@ local function refresh()
 	end
 end
 
+-- Knee-deep water is walked through, never swum.
+local function noSwimming(character: Model)
+	local humanoid = character:WaitForChild("Humanoid", 10)
+	if humanoid and humanoid:IsA("Humanoid") then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+	end
+end
+
 function MovementController.Start()
 	if not PlaceConfig.IsWorld() then
 		return
+	end
+	player.CharacterAdded:Connect(noSwimming)
+	if player.Character then
+		task.spawn(noSwimming, player.Character)
 	end
 	player:GetAttributeChangedSignal("SessionState"):Connect(refresh)
 	refresh()

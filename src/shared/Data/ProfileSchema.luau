@@ -2,7 +2,9 @@
 -- version and pure migrations from every older version live here so the server,
 -- client and headless specs agree on one definition.
 
+local BoostRules = require(script.Parent.Parent.Survival.BoostRules)
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 
 local ProfileSchema = {}
 
@@ -64,7 +66,9 @@ function ProfileSchema.Default(now: number?)
 			pvpCredits = {},
 		},
 		rebirth = { count = 0, tokens = 0, ownedPerks = {}, legendariesSinceRebirth = 0 },
-		boosters = { xpUntil = 0 },
+		-- `paused`: consumable boosts saved at extraction with their remaining
+		-- seconds ({kind, amount, remaining}), resumed on the next deploy (GDD §53).
+		boosters = { xpUntil = 0, paused = {} },
 		recipes = { unlocked = {}, discovered = {} },
 		receipts = { extraction = {}, forge = {}, maintenance = {}, crashRecovery = {} },
 		operations = { records = {}, order = {} },
@@ -116,6 +120,163 @@ local function backfillRedeemedCodes(profile)
 	end
 end
 
+-- Pre-release catalog cleanup (GDD §51, ITEM_CATALOG §8): the items the catalog
+-- retired are deleted wherever the profile holds them. Only this explicit list is
+-- deleted, never "anything this server doesn't know": an older server still
+-- running after a publish would otherwise delete items a newer build added.
+-- Running it on every load is safe.
+ProfileSchema.RETIRED_ITEMS = {
+	Iron = true,
+	Arrow = true,
+	Sickle = true,
+	BasicPickaxe = true,
+	BasicBow = true,
+	Berries = true,
+	WoodHead = true,
+	WoodChest = true,
+	WoodLegs = true,
+	StoneHead = true,
+	StoneChest = true,
+	StoneLegs = true,
+}
+
+local function known(catalogId: any): boolean
+	return type(catalogId) == "string" and not ProfileSchema.RETIRED_ITEMS[catalogId]
+end
+
+-- Removes unknown records from a list in place. Returns how many were removed.
+local function pruneList(list: any): number
+	if type(list) ~= "table" then
+		return 0
+	end
+	local removed = 0
+	for index = #list, 1, -1 do
+		local item = list[index]
+		if type(item) ~= "table" or not known(item.catalogId) then
+			table.remove(list, index)
+			removed += 1
+		end
+	end
+	return removed
+end
+
+-- Removes unknown keys from a {[catalogId] = value} map in place.
+local function pruneMap(map: any): number
+	if type(map) ~= "table" then
+		return 0
+	end
+	local removed = 0
+	for catalogId in table.clone(map) do
+		if not known(catalogId) then
+			map[catalogId] = nil
+			removed += 1
+		end
+	end
+	return removed
+end
+
+-- Deletes every reference to a retired item, and the Forge conversions of retired
+-- items. Returns how many entries were removed (0 when the profile is clean).
+function ProfileSchema.PruneRetiredItems(profile): number
+	local removed = 0
+	removed += pruneList(profile.lobbyBackpack.slots)
+	removed += pruneList(profile.vault.items)
+	removed += pruneMap(profile.vault.materials)
+	local overflow = profile.vault.lastOverflow
+	if type(overflow) == "table" then
+		removed += pruneMap(overflow.deleted)
+	end
+	if type(profile.transit) == "table" then
+		removed += pruneList(profile.transit.items)
+	end
+	for _, receipt in profile.receipts.maintenance do
+		if type(receipt) == "table" then
+			removed += pruneList(receipt.items)
+		end
+	end
+	for _, receipt in profile.receipts.extraction do
+		if type(receipt) == "table" then
+			removed += pruneMap(receipt.vaulted) + pruneMap(receipt.toBackpack) + pruneMap(receipt.deleted)
+			removed += pruneMap(receipt.carriedIn)
+		end
+	end
+	for receiptId, receipt in table.clone(profile.receipts.forge) do
+		local output = type(receipt) == "table" and receipt.output
+		if type(output) == "table" and not known(output.catalogId) then
+			profile.receipts.forge[receiptId] = nil
+			removed += 1
+		end
+	end
+	-- The loadout a run recorded at Play, restored if its server crashes.
+	local run = profile.progression.currentRun
+	if type(run) == "table" then
+		removed += pruneList(run.loadout)
+		if type(run.loadout) == "table" and #run.loadout == 0 then
+			run.loadout = nil
+		end
+	end
+	-- A trade awaiting reconciliation never hands back or claws back a removed item.
+	for _, pending in profile.trades.pending do
+		for _, side in { pending.gave, pending.received } do
+			if type(side) == "table" then
+				removed += pruneList(side.items) + pruneMap(side.materials)
+			end
+		end
+	end
+	for instanceId, entry in table.clone(profile.permanentItems) do
+		if type(entry) ~= "table" or not known(entry.catalogId) then
+			profile.permanentItems[instanceId] = nil
+			removed += 1
+		end
+	end
+	removed += pruneMap(profile.recipes.discovered)
+	for recipeId in table.clone(profile.recipes.unlocked) do
+		local source = string.match(recipeId, "^Permanent(.+)$")
+		if source and not known(source) then
+			profile.recipes.unlocked[recipeId] = nil
+			removed += 1
+		end
+	end
+	return removed
+end
+
+-- Saves from before carried-in provenance moved onto the stacks (GDD §53) kept
+-- one per-material total on the run instead (`currentRun.carriedIn`). Only a run
+-- that maintenance escrowed still needs it, since the pending receipt brings its
+-- items back into the next run: those material stacks take the total as their
+-- carried units, stack by stack, so restoring them never multiplies what the
+-- player brought in. The total is then dropped, leaving the stacks as the one
+-- record. Safe on every load.
+local function migrateCarriedIn(profile)
+	local run = profile.progression.currentRun
+	local legacy = type(run) == "table" and run.carriedIn
+	if legacy == nil or legacy == false then
+		return
+	end
+	run.carriedIn = nil
+	if type(legacy) ~= "table" then
+		return
+	end
+	local pending = {}
+	for operationId, receipt in profile.receipts.maintenance do
+		if type(receipt) == "table" and receipt.status == "Pending" and type(receipt.items) == "table" then
+			table.insert(pending, operationId)
+		end
+	end
+	table.sort(pending)
+	for _, operationId in pending do
+		for _, item in profile.receipts.maintenance[operationId].items do
+			local left = type(item) == "table" and item.instanceId == nil and legacy[item.catalogId]
+			if type(left) == "number" and left >= 1 and type(item.quantity) == "number" then
+				local had = InventoryRules.Carried(item)
+				local tagged = math.max(0, math.min(math.floor(left), item.quantity - had))
+				InventoryRules.SetCarried(item, had + tagged)
+				legacy[item.catalogId] = left - tagged
+			end
+		end
+	end
+end
+
 -- Pure migrations: MIGRATIONS[n] upgrades a version-n profile to version n + 1.
 local MIGRATIONS: { [number]: (any) -> any } = {}
 
@@ -141,7 +302,10 @@ function ProfileSchema.Migrate(data: any, now: number?)
 		profile.schemaVersion += 1
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
+	profile.boosters.paused = BoostRules.Sanitize(profile.boosters.paused)
 	backfillRedeemedCodes(profile)
+	migrateCarriedIn(profile)
+	ProfileSchema.PruneRetiredItems(profile)
 	return profile, nil
 end
 

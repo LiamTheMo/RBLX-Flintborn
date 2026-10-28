@@ -1,12 +1,16 @@
 -- Ancestral Forge (GDD §15–16, §25.3). The Forge navigation button opens the recipe browser in
--- the lobby. Counts are vault-only Owned/Needed; locked recipes show what unlocks
--- them. A Permanent conversion asks for confirmation naming the exact item and the
--- Permanent rules before anything is spent. Lobby place only.
+-- the lobby, one tab per category. Counts are vault-only Owned/Needed; locked
+-- recipes show what unlocks them. The Permanent tab lists conversions for the gear
+-- in your vault first; "show all" lists every conversion grouped by tier, each
+-- tier collapsed to one line until opened. A Permanent conversion asks for
+-- confirmation naming the exact item and the Permanent rules before anything is
+-- spent. Lobby place only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ForgeRecipes = require(ReplicatedStorage.Shared.Crafting.ForgeRecipes)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
@@ -18,6 +22,11 @@ ForgeController.CONFIRM_DELAY = 1.5
 local player = Players.LocalPlayer
 local ui = {}
 local pending = nil
+-- The last snapshot, the open tab, and the Permanent tab's filter and open tiers.
+local view = nil
+local category = "Permanent"
+local showAll = false
+local expanded = {}
 
 local GOOD = Color3.fromRGB(160, 230, 160)
 local SHORT = Color3.fromRGB(240, 140, 120)
@@ -74,6 +83,7 @@ local function button(parent, label: string, enabled: boolean, order: number, on
 end
 
 local refresh
+local draw
 
 local function submit(recipeId: string, sourceId: string?)
 	-- One nonce per confirmed request; a retry of the same request reuses it.
@@ -165,28 +175,134 @@ local function renderRecipe(recipe, order: number)
 	end
 end
 
-function refresh()
-	local view = invoke("ForgeSnapshot")
+local function clear()
 	for _, child in ui.list:GetChildren() do
 		if not child:IsA("UIListLayout") then
 			child:Destroy()
 		end
+	end
+end
+
+local FAMILY_NAMES = { Weapon = "weapons", Tool = "tools", Armor = "armor" }
+
+local function tierLabel(tierId: string, recipes): string
+	local families, seen = {}, {}
+	for _, recipe in recipes do
+		local family = FAMILY_NAMES[recipe.family]
+		if family and not seen[family] then
+			seen[family] = true
+			table.insert(families, family)
+		end
+	end
+	return ("%s gear — %d conversion%s (%s)"):format(
+		tierId,
+		#recipes,
+		#recipes == 1 and "" or "s",
+		table.concat(families, ", ")
+	)
+end
+
+-- The Permanent tab: vaulted gear first, or every conversion grouped by tier.
+local function drawPermanent(recipes, nextOrder)
+	button(
+		ui.list,
+		if showAll then "Show only gear in your vault" else "Show every Permanent conversion",
+		true,
+		nextOrder(),
+		function()
+			showAll = not showAll
+			draw()
+		end
+	)
+	if not showAll then
+		local any = false
+		for _, recipe in recipes do
+			if #recipe.sources > 0 then
+				any = true
+				renderRecipe(recipe, nextOrder())
+			end
+		end
+		if not any then
+			text(
+				ui.list,
+				"None of the gear in your vault can be converted yet. Deposit gear in the Vault, or show every conversion to see what each costs.",
+				TEXT,
+				13,
+				nextOrder()
+			)
+		end
+		return
+	end
+	text(
+		ui.list,
+		"Any weapon, tool or armor piece can become Permanent; the cost rises with its tier.",
+		TEXT,
+		12,
+		nextOrder()
+	)
+	for _, tierId in view.tiers or {} do
+		local group = {}
+		for _, recipe in recipes do
+			if recipe.tier == tierId then
+				table.insert(group, recipe)
+			end
+		end
+		if #group == 0 then
+			continue
+		end
+		-- Every conversion in a tier unlocks together, so the header carries the lock.
+		local first = group[1]
+		local header = (expanded[tierId] and "▾ " or "▸ ")
+			.. (first.unlocked and "" or "🔒 ")
+			.. tierLabel(tierId, group)
+		button(ui.list, header, true, nextOrder(), function()
+			expanded[tierId] = not expanded[tierId]
+			draw()
+		end)
+		if expanded[tierId] then
+			if not first.unlocked then
+				text(ui.list, first.requirement, TEXT, 12, nextOrder())
+			end
+			for _, recipe in group do
+				renderRecipe(recipe, nextOrder())
+			end
+		end
+	end
+end
+
+-- Rebuilds the list from the last snapshot without yielding.
+function draw()
+	clear()
+	for name, tab in ui.tabs do
+		tab.BackgroundColor3 = if name == category then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(46, 38, 30)
 	end
 	if type(view) ~= "table" then
 		ui.status.Text = "Your data is still loading."
 		return
 	end
 	local order = 0
-	for _, category in view.categories do
+	local function nextOrder()
 		order += 1
-		text(ui.list, category, Color3.fromRGB(255, 190, 110), 15, order)
-		for _, recipe in view.recipes do
-			if recipe.category == category then
-				order += 1
-				renderRecipe(recipe, order)
-			end
+		return order
+	end
+	local recipes = {}
+	for _, recipe in view.recipes do
+		if recipe.category == category then
+			table.insert(recipes, recipe)
 		end
 	end
+	if category == "Permanent" then
+		drawPermanent(recipes, nextOrder)
+		return
+	end
+	for _, recipe in recipes do
+		renderRecipe(recipe, nextOrder())
+	end
+end
+
+function refresh()
+	view = invoke("ForgeSnapshot")
+	draw()
 end
 
 local function build()
@@ -228,9 +344,39 @@ local function build()
 		ui.panel.Visible = false
 		ui.confirm.Visible = false
 	end)
+	-- One tab per recipe category.
+	local tabs = make("Frame", {
+		Position = UDim2.fromOffset(8, 34),
+		Size = UDim2.new(1, -16, 0, 24),
+		BackgroundTransparency = 1,
+	}, ui.panel)
+	make("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		Padding = UDim.new(0, 4),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, tabs)
+	ui.tabs = {}
+	for index, name in ForgeRecipes.Categories do
+		local tab = make("TextButton", {
+			Text = name,
+			Size = UDim2.new(1 / #ForgeRecipes.Categories, -4, 1, 0),
+			BackgroundColor3 = Color3.fromRGB(46, 38, 30),
+			TextColor3 = Color3.fromRGB(245, 236, 222),
+			Font = Enum.Font.GothamBold,
+			TextSize = 12,
+			LayoutOrder = index,
+		}, tabs)
+		make("UICorner", { CornerRadius = UDim.new(0, 6) }, tab)
+		tab.Activated:Connect(function()
+			category = name
+			ui.status.Text = ""
+			draw()
+		end)
+		ui.tabs[name] = tab
+	end
 	ui.list = make("ScrollingFrame", {
-		Position = UDim2.fromOffset(8, 36),
-		Size = UDim2.new(1, -16, 1, -70),
+		Position = UDim2.fromOffset(8, 64),
+		Size = UDim2.new(1, -16, 1, -98),
 		BackgroundTransparency = 1,
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		CanvasSize = UDim2.new(),

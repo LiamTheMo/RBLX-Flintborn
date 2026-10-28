@@ -1,14 +1,19 @@
--- The lobby screen (art/reference/ui/lobby_master.png), drawn from the "lobby"
--- section of HudLayout.json with the UI art sheets' sprites: the profile panel
--- (headshot, name, level and XP), the navigation buttons, the currency bar, the
--- party panel, the Enter button with its server line, and the settings gear.
+-- The lobby screen in the parchment-and-leather style (docs/ui/LobbyScreen.md,
+-- art/reference/ui/parchment/13_lobby_master.png), drawn from the "lobby"
+-- section of HudLayout.json with the pm_* sprites: the profile (headshot, name,
+-- level and XP), Coins, Gems and Settings, the navigation tiles, the party panel,
+-- the Enter button with the server dropdown, and a status strip.
 -- Display only: LobbyHudController feeds it and handles the signals.
+--
+-- Until a sprite is uploaded Widgets draws a paper stand-in, and the words the
+-- art would carry (tile names, ENTER) are added so the screen still reads.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local Layout = require(script.Parent.Layout)
 local Widgets = require(script.Parent.Widgets)
 
@@ -16,6 +21,16 @@ local LobbyHud = {}
 LobbyHud.__index = LobbyHud
 
 local HOVER = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+-- Every sprite carries this much transparent padding around its art.
+local SPRITE_PAD = 2
+-- Below this design width the Enter button reaches under the party panel.
+local NARROW_WIDTH = 1544
+-- Clearance kept under the Roblox top bar, in design pixels.
+local TOP_GAP = 8
+-- Smallest touch target on screen, in points (Roblox's mobile guidance).
+local MIN_TAP = 44
+-- Room kept clear on each side of the status strip at the top, in design px.
+local STATUS_GAP = 16
 
 local function rect(entry, props)
 	props = props or {}
@@ -24,20 +39,59 @@ local function rect(entry, props)
 	return props
 end
 
--- A transparent button over `parent` (or at `entry.rect`) that grows slightly on
--- hover and press, unless `steady` says motion is reduced.
-local function hit(parent: Instance, props, steady: () -> boolean)
+local function hasArt(name: string): boolean
+	return UiAssets.image(name) ~= nil
+end
+
+-- A sprite filling `parent` (its art lands on the parent's bounds; the padding
+-- spills over).
+local function art(name: string, parent: Instance, zIndex: number?): GuiObject
+	return Widgets.Sprite(name, {
+		Name = "Art",
+		Position = UDim2.fromOffset(-SPRITE_PAD, -SPRITE_PAD),
+		Size = UDim2.new(1, SPRITE_PAD * 2, 1, SPRITE_PAD * 2),
+		ZIndex = zIndex or 2,
+	}, parent)
+end
+
+-- A top-level holder placed from a layout entry {anchor, pos, size}.
+local function holder(name: string, entry, parent: Instance): Frame
+	local frame = Widgets.Make("Frame", { Name = name, BackgroundTransparency = 1 }, parent)
+	Layout.Place(frame, entry)
+	return frame
+end
+
+-- Text that shrinks to fit its box, from the entry's size down to `minSize`.
+local function fitted(label: TextLabel, maxSize: number, minSize: number?): TextLabel
+	label.TextScaled = true
+	Widgets.Make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = minSize or 12 }, label)
+	return label
+end
+
+-- A transparent button over `parent` (or `area` inside it) that grows slightly
+-- on hover, selection and press, unless `steady` says motion is reduced.
+-- `onFocus(bool)` hears hover and gamepad selection. `pad` widens the touch area
+-- past the art on every side for small buttons.
+local function hit(
+	parent: Instance,
+	name: string,
+	steady: () -> boolean,
+	onFocus: ((boolean) -> ())?,
+	area,
+	pad: number?
+)
+	pad = pad or 0
 	local button = Widgets.Make("TextButton", {
-		Name = "Hit",
+		Name = name,
 		Text = "",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
+		Position = if area then UDim2.fromOffset(area[1] - pad, area[2] - pad) else UDim2.fromOffset(-pad, -pad),
+		Size = if area
+			then UDim2.fromOffset(area[3] + pad * 2, area[4] + pad * 2)
+			else UDim2.new(1, pad * 2, 1, pad * 2),
 		ZIndex = 8,
 	}, parent)
-	for key, value in props or {} do
-		(button :: any)[key] = value
-	end
 	local scale = Widgets.Make("UIScale", { Scale = 1 }, parent)
 	local function to(value: number)
 		if steady() then
@@ -46,46 +100,98 @@ local function hit(parent: Instance, props, steady: () -> boolean)
 		end
 		TweenService:Create(scale, HOVER, { Scale = value }):Play()
 	end
+	local hovering = false
+	local function focus(on: boolean)
+		hovering = on
+		to(if on then 1.04 else 1)
+		if onFocus then
+			onFocus(on)
+		end
+	end
 	button.MouseEnter:Connect(function()
-		to(1.04)
+		focus(true)
 	end)
 	button.MouseLeave:Connect(function()
-		to(1)
+		focus(false)
 	end)
 	button.SelectionGained:Connect(function()
-		to(1.04)
+		focus(true)
 	end)
 	button.SelectionLost:Connect(function()
-		to(1)
+		focus(false)
 	end)
 	button.MouseButton1Down:Connect(function()
 		to(0.97)
 	end)
-	button.MouseButton1Up:Connect(function()
-		to(1.04)
+	button.InputEnded:Connect(function(input: InputObject)
+		-- Touch has no hover: a lifted finger returns the button to rest.
+		if input.UserInputType == Enum.UserInputType.Touch then
+			focus(false)
+		elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
+			to(if hovering then 1.04 else 1)
+		end
 	end)
 	return button
 end
 
-local function rounded(color: Color3, radius: number, props, parent: Instance)
-	local frame = Widgets.Make("Frame", { BackgroundColor3 = color, BorderSizePixel = 0 }, parent)
+local function rounded(colorKey: string, radius: UDim, props, parent: Instance): Frame
+	local frame = Widgets.Make("Frame", {
+		BackgroundColor3 = Layout.Color(colorKey),
+		BorderSizePixel = 0,
+	}, parent)
 	for key, value in props do
 		(frame :: any)[key] = value
 	end
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, radius) }, frame)
-	return frame
+	Widgets.Make("UICorner", { CornerRadius = radius }, frame)
+	return frame :: Frame
+end
+
+-- A paper name tag (tile names, the status strip).
+local function tag(entry, props, parent: Instance): (Frame, TextLabel)
+	local frame = rounded("paper", UDim.new(0, 8), props, parent)
+	Widgets.Make("UIStroke", { Color = Layout.Color("paperEdge"), Thickness = 2 }, frame)
+	local label = Widgets.Text(entry, {
+		Name = "Text",
+		Size = UDim2.new(1, -16, 1, -4),
+		Position = UDim2.fromOffset(8, 2),
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextStrokeTransparency = 1,
+		ZIndex = frame.ZIndex + 1,
+	}, frame)
+	return frame, label
+end
+
+local function inkText(entry, props, parent: Instance): TextLabel
+	props.TextStrokeTransparency = 1
+	return Widgets.Text(entry, props, parent)
+end
+
+-- Widens a small button's touch area past its art until it is at least MIN_TAP
+-- points on screen at `screenScale` (never past `target.maxPad` on each side,
+-- {left, top, right, bottom} in reference px, which keeps
+-- neighbours apart).
+local function padTouch(target, screenScale: number)
+	local want = MIN_TAP / math.max(screenScale, 0.01)
+	local limit = target.maxPad -- {left, top, right, bottom}
+	local x = math.max(0, (want - target.w) / 2)
+	local y = math.max(0, (want - target.h) / 2)
+	local left, right = math.min(x, limit[1]), math.min(x, limit[3])
+	local up, down = math.min(y, limit[2]), math.min(y, limit[4])
+	target.button.Position = UDim2.fromOffset(-left, -up)
+	target.button.Size = UDim2.new(1, left + right, 1, up + down)
 end
 
 function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 	local cfg = layout.lobby
-	local colors = cfg.colors
-	local function color(key: string): Color3
-		return Color3.fromHex(colors[key])
-	end
 	local self = setmetatable({
 		cfg = cfg,
-		color = color,
 		steady = steady,
+		-- Top-anchored widgets and their layout entries, moved down by Fit when the
+		-- Roblox top bar would cover them.
+		topWidgets = {},
+		-- Small buttons whose touch areas Fit sizes for the screen.
+		targets = {},
+		screenScale = 1,
 		NavPressed = Signal.new(),
 		ProfilePressed = Signal.new(),
 		SettingsPressed = Signal.new(),
@@ -94,251 +200,317 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		InvitePressed = Signal.new(),
 		LeavePressed = Signal.new(),
 		InviteAnswered = Signal.new(), -- (partyId, accept)
-		thumbnails = {},
 	}, LobbyHud)
 	self.root = Widgets.Make("Frame", {
 		Name = "Lobby",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 	}, parent)
+	local function top(name: string, entry): Frame
+		local frame = holder(name, entry, self.root)
+		table.insert(self.topWidgets, { frame, entry })
+		return frame
+	end
 
-	-- Profile: headshot, name, "LV. n" and the XP bar. Opens Progress.
+	-- Profile: the live headshot shows through the frame's portrait window. Its
+	-- paper stand-in has no window, so until the art is uploaded the headshot
+	-- sits on top of it instead.
 	local profileCfg = cfg.profile
-	local profile = Widgets.Panel(profileCfg, {
-		Name = "Profile",
-		Size = UDim2.fromOffset(profileCfg.size[1], profileCfg.size[2]),
-	}, self.root)
-	Layout.Place(profile, profileCfg)
+	local profile = top("Profile", profileCfg)
+	art(profileCfg.sprite, profile, if hasArt(profileCfg.sprite) then 3 else 1)
 	self.avatar = Widgets.Make(
 		"ImageLabel",
 		rect(profileCfg.avatar, {
 			Name = "Headshot",
-			BackgroundColor3 = color("row"),
+			BackgroundColor3 = Layout.Color("photo"),
+			BorderSizePixel = 0,
 			ScaleType = Enum.ScaleType.Crop,
-			ZIndex = 4,
+			ZIndex = 2,
 		}),
 		profile
 	)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, self.avatar)
-	Widgets.Make("UIStroke", { Color = color("rowStroke"), Thickness = 2 }, self.avatar)
-	self.nameText = Widgets.Text(profileCfg.name, rect(profileCfg.name, { Name = "PlayerName" }), profile)
-	self.levelText = Widgets.Text(profileCfg.level, rect(profileCfg.level, { Name = "Level", Text = "LV." }), profile)
+	self.nameText = fitted(
+		inkText(profileCfg.name, rect(profileCfg.name, { Name = "PlayerName", ZIndex = 4 }), profile),
+		profileCfg.name.textSize,
+		16
+	)
+	self.levelText = fitted(
+		inkText(profileCfg.level, rect(profileCfg.level, { Name = "Level", Text = "LV.", ZIndex = 4 }), profile),
+		profileCfg.level.textSize
+	)
 	self.xpBar = Widgets.Bar({
 		rect = profileCfg.xp.rect,
-		inset = profileCfg.xp.inset,
-		track = profileCfg.xp.track,
+		fill = profileCfg.xp.fill,
 		fillColor = profileCfg.xp.fillColor,
+		-- The art carries its own groove; its stand-in needs one drawn.
+		trackColor = if hasArt(profileCfg.sprite) then nil else "line",
 	}, profile)
 	Widgets.SetBar(self.xpBar, 0, true) -- empty until the first progression snapshot
-	hit(profile, { Name = "OpenProgress" }, steady).Activated:Connect(function()
+	hit(profile, "OpenProgress", steady).Activated:Connect(function()
 		self.ProfilePressed:Fire()
 	end)
 
-	-- Navigation buttons: rope-framed squares with an icon and a label.
+	-- Coins, Gems and Settings, top right.
+	local function pill(name: string, entry): TextLabel
+		local frame = top(name, entry)
+		art(entry.sprite, frame)
+		local value = inkText(entry.value, rect(entry.value, { Name = "Value", Text = "0", ZIndex = 4 }), frame)
+		return fitted(value, entry.value.textSize, 11)
+	end
+	self.coinsText = pill("Coins", cfg.coins)
+	self.gemsText = pill("Gems", cfg.gems)
+	local settings = top("Settings", cfg.settings)
+	art(cfg.settings.sprite, settings)
+	local settingsButton = hit(settings, "OpenSettings", steady)
+	settingsButton.Activated:Connect(function()
+		self.SettingsPressed:Fire()
+	end)
+	self:_target(settingsButton, cfg.settings.size[1], cfg.settings.size[2], cfg.settings.touchPad, false)
+
+	-- Navigation tiles in a grid; each names itself on hover or selection (and
+	-- always while its art is not uploaded).
 	local navCfg = cfg.nav
-	local nav = Widgets.Make("Frame", {
-		Name = "Navigation",
-		BackgroundTransparency = 1,
-	}, self.root)
-	self.navHeight = navCfg.pitch * (#navCfg.buttons - 1) + navCfg.button[2]
-	Layout.Place(nav, {
+	local rows = math.ceil(#navCfg.buttons / navCfg.columns)
+	self.navHeight = navCfg.pitch[2] * (rows - 1) + navCfg.tile[2]
+	local nav = top("Navigation", {
 		anchor = navCfg.anchor,
 		pos = navCfg.pos,
-		size = { navCfg.button[1], self.navHeight },
+		size = { navCfg.pitch[1] * (navCfg.columns - 1) + navCfg.tile[1], self.navHeight },
 	})
-	-- Shrinks the column on short screens so it ends above the settings gear (Fit).
 	self.navScale = Widgets.Make("UIScale", { Scale = 1 }, nav)
 	for index, entry in navCfg.buttons do
-		local slot = Widgets.Make("Frame", {
+		local column = (index - 1) % navCfg.columns
+		local row = (index - 1) // navCfg.columns
+		local tile = Widgets.Make("Frame", {
 			Name = entry.id,
 			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(0, (index - 1) * navCfg.pitch),
-			Size = UDim2.fromOffset(navCfg.button[1], navCfg.button[2]),
+			Position = UDim2.fromOffset(column * navCfg.pitch[1], row * navCfg.pitch[2]),
+			Size = UDim2.fromOffset(navCfg.tile[1], navCfg.tile[2]),
 		}, nav)
-		local slotRect = { 0, 0, navCfg.button[1], navCfg.button[2] }
-		local frame = Widgets.Frame(navCfg.frame, slotRect, slot, navCfg.sliceScale, { 0, 0, 0, 0 })
-		frame.ZIndex = 2
-		Widgets.Sprite(entry.icon, rect(navCfg.icon, { Name = "Icon", ZIndex = 4 }), slot)
-		local labelProps = rect(navCfg.label, {
-			Name = "Label",
-			Text = entry.label,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextStrokeTransparency = 0.4,
-		})
-		Widgets.Text(navCfg.label, labelProps, slot)
-		hit(slot, { Name = "Open" .. entry.id }, steady).Activated:Connect(function()
+		art(entry.sprite, tile)
+		local always = not hasArt(entry.sprite)
+		local nameTag, label =
+			tag(navCfg.label, rect(navCfg.label, { Name = "Name", Visible = always, ZIndex = 5 }), tile)
+		label.Text = entry.label
+		fitted(label, navCfg.label.textSize)
+		local button = hit(tile, "Open" .. entry.id, steady, function(on)
+			nameTag.Visible = always or on
+		end)
+		button.Activated:Connect(function()
 			self.NavPressed:Fire(entry.id)
 		end)
 	end
 
-	-- Currency bar: Coins and Gems.
-	local currencyCfg = cfg.currency
-	local currency = Widgets.Panel(currencyCfg, {
-		Name = "Currency",
-		Size = UDim2.fromOffset(currencyCfg.size[1], currencyCfg.size[2]),
-	}, self.root)
-	Layout.Place(currency, currencyCfg)
-	Widgets.Sprite(currencyCfg.coinIcon.icon, rect(currencyCfg.coinIcon, { Name = "CoinIcon", ZIndex = 4 }), currency)
-	self.coinsText = Widgets.Text(currencyCfg.coins, rect(currencyCfg.coins, { Name = "Coins", Text = "0" }), currency)
-	Widgets.Sprite(currencyCfg.gemIcon.icon, rect(currencyCfg.gemIcon, { Name = "GemIcon", ZIndex = 4 }), currency)
-	self.gemsText = Widgets.Text(currencyCfg.gems, rect(currencyCfg.gems, { Name = "Gems", Text = "0" }), currency)
-
-	-- Party panel: header, then a scrolling list of rows.
+	-- Party panel: "PARTY" and its count, divider, Leave, and a scrolling list.
 	local partyCfg = cfg.party
-	local party = Widgets.Panel(partyCfg, {
-		Name = "Party",
-		Size = UDim2.fromOffset(partyCfg.size[1], partyCfg.size[2]),
-	}, self.root)
-	Layout.Place(party, partyCfg)
-	local partyIcon = Widgets.Sprite(partyCfg.icon.icon, rect(partyCfg.icon, { Name = "Icon", ZIndex = 4 }), party)
-	if partyCfg.icon.tint and partyIcon:IsA("ImageLabel") then
-		partyIcon.ImageColor3 = Layout.Color(partyCfg.icon.tint)
-	end
-	self.partyTitle = Widgets.Text(partyCfg.title, rect(partyCfg.title, { Name = "Title", Text = "PARTY" }), party)
+	-- Placed by Fit, which may move it up on short screens.
+	local party = holder("Party", partyCfg, self.root)
+	self.party = party
+	self.partyScale = Widgets.Make("UIScale", { Scale = 1 }, party)
+	art(partyCfg.sprite, party)
+	inkText(partyCfg.title, rect(partyCfg.title, { Name = "Title", Text = partyCfg.title.text, ZIndex = 4 }), party)
+	self.partyCount = inkText(partyCfg.count, rect(partyCfg.count, { Name = "Count", Text = "", ZIndex = 4 }), party)
 	Widgets.Make(
 		"Frame",
 		rect(partyCfg.divider, {
 			Name = "Divider",
-			BackgroundColor3 = Color3.new(1, 1, 1),
-			BackgroundTransparency = partyCfg.divider.transparency,
+			BackgroundColor3 = Layout.Color("line"),
 			BorderSizePixel = 0,
 			ZIndex = 4,
 		}),
 		party
 	)
-	-- Leave: a small exit button at the header's right while you are in a party.
-	self.leave = Widgets.Make("Frame", {
-		Name = "Leave",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(partyCfg.size[1] - 46, 14),
-		Size = UDim2.fromOffset(26, 26),
+	self.leave = self:_spriteButton("Leave", partyCfg.leave, party, function()
+		self.LeavePressed:Fire()
+	end)
+	self.leave.Visible = false
+	local listCfg = partyCfg.list
+	local listRect = listCfg.rect
+	self.track = rounded("scrollTrack", UDim.new(0.5, 0), {
+		Name = "ScrollTrack",
+		Position = UDim2.fromOffset(listRect[1] + listRect[3] - listCfg.scrollBar, listRect[2]),
+		Size = UDim2.fromOffset(listCfg.scrollBar, listRect[4]),
 		Visible = false,
 		ZIndex = 4,
 	}, party)
-	Widgets.Sprite("icon_exit", { Size = UDim2.fromScale(1, 1), ZIndex = 5 }, self.leave)
-	hit(self.leave, { Name = "LeaveParty" }, steady).Activated:Connect(function()
-		self.LeavePressed:Fire()
-	end)
 	self.list = Widgets.Make(
 		"ScrollingFrame",
-		rect(partyCfg.list, {
+		rect(listCfg, {
 			Name = "List",
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			CanvasSize = UDim2.new(),
 			AutomaticCanvasSize = Enum.AutomaticSize.Y,
-			ScrollBarThickness = partyCfg.list.scrollBar,
-			ScrollBarImageColor3 = color("scroll"),
+			ScrollBarThickness = listCfg.scrollBar,
+			ScrollBarImageColor3 = Layout.Color("thumb"),
+			VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
-			ZIndex = 4,
+			ZIndex = 5,
 		}),
 		party
 	)
-	Widgets.Make("UIListLayout", {
-		Padding = UDim.new(0, partyCfg.list.rowGap),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, self.list)
-
-	-- Enter button with its server line underneath.
-	local enterCfg = cfg.enter
-	local enter = Widgets.Panel(enterCfg, {
-		Name = "Enter",
-		Size = UDim2.fromOffset(enterCfg.size[1], enterCfg.size[2]),
-	}, self.root)
-	Layout.Place(enter, enterCfg)
-	Widgets.Sprite(enterCfg.icon.icon, rect(enterCfg.icon, { Name = "Icon", ZIndex = 4 }), enter)
-	local function goldText(entry, name: string)
-		local props = rect(entry, {
-			Name = name,
-			Text = entry.text,
-			TextColor3 = Color3.new(1, 1, 1),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextStrokeTransparency = 1,
-			TextTruncate = Enum.TextTruncate.None,
-			ZIndex = 5,
-		})
-		local label = Widgets.Text(entry, props, enter)
-		Widgets.Make("UIGradient", {
-			Rotation = 90,
-			Color = ColorSequence.new(color("ctaTop"), color("ctaBottom")),
-		}, label)
-		Widgets.Make("UIStroke", { Color = color("ctaStroke"), Thickness = 2.5 }, label)
-		return label
+	Widgets.Make("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder }, self.list)
+	local function showTrack()
+		self.track.Visible = self.list.AbsoluteCanvasSize.Y > self.list.AbsoluteWindowSize.Y + 1
 	end
-	self.enterTitle = goldText(enterCfg.title, "Title")
-	self.enterSubtitle = goldText(enterCfg.subtitle, "Subtitle")
-	self.enterShade = Widgets.Make("Frame", {
-		Name = "Busy",
-		BackgroundColor3 = Color3.new(0, 0, 0),
-		BackgroundTransparency = 0.45,
-		BorderSizePixel = 0,
-		Position = UDim2.fromOffset(6, 6),
-		Size = UDim2.new(1, -12, 1, -12),
-		Visible = false,
-		ZIndex = 7,
-	}, enter)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, self.enterShade)
-	self.enterButton = hit(enter, { Name = "EnterWorld" }, steady)
+	self.list:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(showTrack)
+	self.list:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(showTrack)
+
+	-- Enter (its lettering is painted on the art) with a veil while busy.
+	local enterCfg = cfg.enter
+	local enter = holder("Enter", enterCfg, self.root)
+	local enterArt = art(enterCfg.sprite, enter)
+	if not hasArt(enterCfg.sprite) then
+		-- The stand-in plate covers only the banner (the part that is the button).
+		enterArt.Position = UDim2.fromOffset(enterCfg.hit[1], enterCfg.hit[2])
+		enterArt.Size = UDim2.fromOffset(enterCfg.hit[3], enterCfg.hit[4])
+	end
+	if not hasArt(enterCfg.sprite) then
+		for _, key in { "title", "subtitle" } do
+			local entry = enterCfg[key]
+			inkText(
+				entry,
+				rect(entry, {
+					Name = key,
+					Text = entry.text,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					ZIndex = 4,
+				}),
+				enter
+			)
+		end
+	end
+	self.enterShade = rounded(
+		"veil",
+		UDim.new(0, 10),
+		rect(enterCfg.veil, {
+			Name = "Busy",
+			BackgroundTransparency = enterCfg.veil.transparency,
+			Visible = false,
+			ZIndex = 7,
+		}),
+		enter
+	)
+	self.enterButton = hit(enter, "EnterWorld", steady, nil, enterCfg.hit)
 	self.enterButton.Activated:Connect(function()
 		self.EnterPressed:Fire()
 	end)
 
-	local serverCfg = enterCfg.server
-	local server = Widgets.Make("TextButton", {
-		Name = "Server",
-		Text = "",
-		AutoButtonColor = false,
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(serverCfg.rect[1], serverCfg.rect[2]),
-		Size = UDim2.fromOffset(serverCfg.rect[3], serverCfg.rect[4]),
-		ZIndex = 5,
-	}, enter)
-	Widgets.Make("UIListLayout", {
-		FillDirection = Enum.FillDirection.Horizontal,
-		HorizontalAlignment = Enum.HorizontalAlignment.Center,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		Padding = UDim.new(0, 8),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, server)
-	self.serverText = Widgets.Text(serverCfg, {
-		Name = "Label",
-		Text = serverCfg.text,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, serverCfg.rect[4]),
-		TextTruncate = Enum.TextTruncate.None,
-		TextStrokeTransparency = 0.3,
-		LayoutOrder = 1,
-	}, server)
-	self.chevron = Widgets.Sprite(enterCfg.chevron.icon, {
-		Name = "Chevron",
-		Size = UDim2.fromOffset(enterCfg.chevron.size, enterCfg.chevron.size),
-		LayoutOrder = 2,
-		ZIndex = 5,
-	}, server)
-	server.Activated:Connect(function()
+	-- Server dropdown beside Enter.
+	local serverCfg = cfg.server
+	local server = holder("Server", serverCfg, self.root)
+	art(serverCfg.sprite, server)
+	fitted(
+		inkText(
+			serverCfg.label,
+			rect(serverCfg.label, { Name = "Label", Text = serverCfg.label.text, ZIndex = 4 }),
+			server
+		),
+		serverCfg.label.textSize
+	)
+	local serverButton = hit(server, "ChooseServer", steady)
+	serverButton.Activated:Connect(function()
 		self.ServerPressed:Fire()
 	end)
+	self:_target(serverButton, serverCfg.size[1], serverCfg.size[2], serverCfg.touchPad, false)
 
-	-- Settings gear.
-	local settingsCfg = cfg.settings
-	local settings = Widgets.Make("Frame", { Name = "Settings", BackgroundTransparency = 1 }, self.root)
-	Layout.Place(settings, settingsCfg)
-	local gearRect = { 0, 0, settingsCfg.size[1], settingsCfg.size[2] }
-	local gearFrame = Widgets.Frame(settingsCfg.frame, gearRect, settings, settingsCfg.sliceScale, { 0, 0, 0, 0 })
-	gearFrame.ZIndex = 2
-	Widgets.Sprite(settingsCfg.icon.icon, rect(settingsCfg.icon, { Name = "Icon", ZIndex = 4 }), settings)
-	hit(settings, { Name = "OpenSettings" }, steady).Activated:Connect(function()
-		self.SettingsPressed:Fire()
-	end)
+	-- Status strip, top centre between the profile and the currencies (deploy
+	-- status, invites sent, maintenance); up to two lines.
+	local statusCfg = cfg.status
+	self.status, self.statusText = tag(statusCfg.text, {
+		Name = "Status",
+		Visible = false,
+		ZIndex = 6,
+	}, self.root)
+	Layout.Place(self.status, statusCfg)
+	self.statusText.TextWrapped = true
+	fitted(self.statusText, statusCfg.text.textSize)
 	return self
 end
 
--- Fits the navigation column between its top and the settings gear on a screen
--- `height` reference pixels tall (short phone screens), never below half size.
-function LobbyHud:Fit(height: number)
-	local navCfg, gear = self.cfg.nav, self.cfg.settings
-	local available = height + gear.pos[4] - gear.size[2] - 12 - navCfg.pos[4]
-	self.navScale.Scale = math.clamp(available / self.navHeight, 0.5, 1)
+-- Registers a small button whose touch area Fit grows on small screens. `party`
+-- buttons sit in the party panel and shrink with it.
+function LobbyHud:_target(button: GuiObject, w: number, h: number, maxPad: { number }, party: boolean)
+	local target = { button = button, w = w, h = h, maxPad = maxPad, party = party }
+	table.insert(self.targets, target)
+	padTouch(target, self.screenScale * (if party then self.partyScale.Scale else 1))
+end
+
+-- A small sprite button at `entry.rect` (party panel) with a touch area that
+-- grows to MIN_TAP on small screens, up to `entry.touchPad` ({left, top, right,
+-- bottom}) so it never reaches a neighbouring button.
+function LobbyHud:_spriteButton(name: string, entry, parent: Instance, onPress)
+	local frame = Widgets.Make("Frame", rect(entry, { Name = name, BackgroundTransparency = 1, ZIndex = 6 }), parent)
+	Widgets.Sprite(entry.sprite, { Size = UDim2.fromScale(1, 1), ZIndex = 6 }, frame)
+	local button = hit(frame, name .. "Button", self.steady)
+	button.Activated:Connect(onPress)
+	self:_target(button, entry.rect[3], entry.rect[4], entry.touchPad or { 0, 0, 0, 0 }, true)
+	return frame
+end
+
+-- Adds a widget (from the controller) that moves down with the top row.
+function LobbyHud:AddTopWidget(frame: GuiObject, entry)
+	Layout.Place(frame, entry)
+	table.insert(self.topWidgets, { frame, entry })
+end
+
+-- Fits the screen to `width` × `height` reference pixels drawn at `screenScale`,
+-- with the Roblox top bar ending `topInset` reference pixels down:
+-- * the top widgets move down when the bar would cover the profile (phones,
+--   where the screen is drawn small);
+-- * the navigation grid shrinks to end above the bottom edge;
+-- * the party panel moves up under Coins, and only then shrinks, to end above
+--   the Enter group under it (neither below half size);
+-- * the status strip sits between the profile and Coins when there is room,
+--   else above Enter;
+-- * small buttons' touch areas grow to MIN_TAP points.
+function LobbyHud:Fit(width: number, height: number, topInset: number?, screenScale: number?)
+	local cfg = self.cfg
+	self.screenScale = screenScale or 1
+	local drop = math.max(0, (topInset or 0) + TOP_GAP - cfg.profile.pos[4])
+	for _, item in self.topWidgets do
+		local frame, entry = item[1], item[2]
+		frame.Position = UDim2.new(entry.pos[1], entry.pos[2], entry.pos[3], entry.pos[4] + drop)
+	end
+	local navCfg, partyCfg = cfg.nav, cfg.party
+	local navRoom = height - navCfg.bottomMargin - navCfg.pos[4] - drop
+	self.navScale.Scale = math.clamp(navRoom / self.navHeight, 0.5, 1)
+
+	local below = if width < NARROW_WIDTH
+		then cfg.enter.size[2] - cfg.enter.pos[4]
+		else cfg.server.size[2] - cfg.server.pos[4]
+	local bottom = height - below - 10
+	local partyTop = partyCfg.pos[4] + drop
+	if partyTop + partyCfg.size[2] > bottom then
+		local coinsBottom = cfg.coins.pos[4] + cfg.coins.size[2] + drop
+		partyTop = math.max(coinsBottom + 10, bottom - partyCfg.size[2])
+	end
+	self.partyScale.Scale = math.clamp((bottom - partyTop) / partyCfg.size[2], 0.5, 1)
+	self.party.Position = UDim2.new(partyCfg.pos[1], partyCfg.pos[2], partyCfg.pos[3], partyTop)
+
+	local statusCfg = cfg.status
+	local left = cfg.profile.pos[2] + cfg.profile.size[1] + STATUS_GAP
+	local right = width + cfg.coins.pos[2] - cfg.coins.size[1] - STATUS_GAP
+	local room = right - left
+	if room >= statusCfg.minWidth then
+		local stripWidth = math.min(statusCfg.size[1], room)
+		self.status.AnchorPoint = Vector2.new(0.5, 0)
+		self.status.Position = UDim2.fromOffset((left + right) / 2, statusCfg.pos[4] + drop)
+		self.status.Size = UDim2.fromOffset(stripWidth, statusCfg.size[2])
+	else
+		self.status.AnchorPoint = Vector2.new(0.5, 1)
+		self.status.Position = UDim2.new(0.5, 0, 1, cfg.enter.pos[4] - cfg.enter.size[2] - 10)
+		self.status.Size = UDim2.fromOffset(math.min(statusCfg.size[1], width - 40), statusCfg.size[2])
+	end
+
+	local live = {}
+	for _, target in self.targets do
+		if target.button.Parent ~= nil then
+			table.insert(live, target)
+			padTouch(target, self.screenScale * (if target.party then self.partyScale.Scale else 1))
+		end
+	end
+	self.targets = live
 end
 
 function LobbyHud:SetProfile(name: string, thumbnail: string?)
@@ -358,109 +530,111 @@ function LobbyHud:SetCurrency(coins: number?, gems: number?)
 	self.gemsText.Text = HudModel.Thousands(gems)
 end
 
-function LobbyHud:_row(order: number)
-	local cfg = self.cfg.party
-	local row = rounded(self.color("row"), cfg.row.radius, {
+function LobbyHud:_row(order: number, entry): Frame
+	local row = Widgets.Make("Frame", {
 		Name = "Row" .. order,
-		LayoutOrder = order,
-		Size = UDim2.fromOffset(cfg.row.width, cfg.list.rowHeight),
-		ZIndex = 4,
-	}, self.list)
-	Widgets.Make("UIStroke", {
-		Color = self.color("rowStroke"),
-		Thickness = 1.5,
-		Transparency = cfg.row.strokeTransparency,
-	}, row)
-	return row
-end
-
-local function iconButton(name: string, sprite: string, rectValue, parent: Instance, steady, onPress)
-	local holder = Widgets.Make("Frame", {
-		Name = name,
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(rectValue[1], rectValue[2]),
-		Size = UDim2.fromOffset(rectValue[3], rectValue[4]),
+		LayoutOrder = order,
+		Size = UDim2.new(1, 0, 0, entry.height),
 		ZIndex = 5,
-	}, parent)
-	Widgets.Sprite(sprite, { Size = UDim2.fromScale(1, 1), ZIndex = 6 }, holder)
-	hit(holder, { Name = name .. "Button" }, steady).Activated:Connect(onPress)
-	return holder
+	}, self.list)
+	Widgets.Make(
+		"Frame",
+		rect(entry.rule, {
+			Name = "Rule",
+			BackgroundColor3 = Layout.Color("rule"),
+			BorderSizePixel = 0,
+			ZIndex = 5,
+		}),
+		row
+	)
+	return row :: Frame
 end
 
 -- members: {{userId, name, leader, thumbnail?}}; invites: {{partyId, from}};
--- canInvite: show the Invite Friends row; inParty: show Leave.
+-- canInvite: the leader's row offers Invite; inParty: show Leave. Free places up
+-- to `maxSize` show as empty slots.
 function LobbyHud:SetParty(members, invites, maxSize: number, canInvite: boolean, inParty: boolean)
 	local cfg = self.cfg.party
-	self.partyTitle.Text = HudModel.PartyTitle(#members, maxSize)
+	self.partyCount.Text = HudModel.PartyCount(#members, maxSize)
 	self.leave.Visible = inParty
+	-- The rows' buttons are about to go: forget their touch areas.
+	local kept = {}
+	for _, target in self.targets do
+		if not target.button:IsDescendantOf(self.list) then
+			table.insert(kept, target)
+		end
+	end
+	self.targets = kept
 	for _, child in self.list:GetChildren() do
 		if child:IsA("GuiObject") then
 			child:Destroy()
 		end
 	end
 	local order = 0
+	local memberCfg = cfg.member
 	for _, member in members do
 		order += 1
-		local row = self:_row(order)
+		local row = self:_row(order, memberCfg)
 		local headshot = Widgets.Make(
 			"ImageLabel",
-			rect(cfg.headshot, {
+			rect(memberCfg.headshot, {
 				Name = "Headshot",
-				BackgroundColor3 = Color3.new(0.12, 0.12, 0.12),
+				BackgroundColor3 = Layout.Color("photo"),
+				BorderSizePixel = 0,
 				Image = member.thumbnail or "",
 				ScaleType = Enum.ScaleType.Crop,
-				ZIndex = 5,
+				ZIndex = 6,
 			}),
 			row
 		)
 		Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 6) }, headshot)
-		local dot = rounded(self.color("online"), cfg.dot.size, {
-			Name = "Online",
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromOffset(cfg.dot.centre[1], cfg.dot.centre[2]),
-			Size = UDim2.fromOffset(cfg.dot.size, cfg.dot.size),
-			ZIndex = 6,
-		}, row)
-		Widgets.Make("UIStroke", { Color = Color3.new(0, 0, 0), Thickness = 1 }, dot)
-		Widgets.Text(cfg.memberName, rect(cfg.memberName, { Name = "MemberName", Text = member.name }), row)
+		Widgets.Make("UIStroke", { Color = Layout.Color("photoEdge"), Thickness = 1.5 }, headshot)
+		fitted(
+			inkText(memberCfg.name, rect(memberCfg.name, { Name = "MemberName", Text = member.name, ZIndex = 6 }), row),
+			memberCfg.name.textSize
+		)
 		if member.leader then
-			Widgets.Sprite(cfg.crown.icon, rect(cfg.crown, { Name = "Leader", ZIndex = 5 }), row)
+			Widgets.Sprite(memberCfg.crown.sprite, rect(memberCfg.crown, { Name = "Leader", ZIndex = 6 }), row)
+			if canInvite then
+				self:_spriteButton("InviteFriends", memberCfg.invite, row, function()
+					self.InvitePressed:Fire()
+				end)
+			end
 		end
 	end
+	local inviteCfg = cfg.invite
 	for _, invite in invites do
 		order += 1
-		local row = self:_row(order)
-		Widgets.Sprite(cfg.inviteIcon.icon, rect(cfg.inviteIcon, { Name = "Icon", ZIndex = 5 }), row)
-		Widgets.Text(cfg.memberName, {
-			Name = "From",
-			Text = "From " .. invite.from,
-			Position = UDim2.fromOffset(cfg.invite.rect[1], cfg.invite.rect[2]),
-			Size = UDim2.fromOffset(cfg.invite.rect[3] - 60, cfg.invite.rect[4]),
-			TextSize = 14,
-		}, row)
-		iconButton("Accept", "icon_check", { cfg.row.width - 62, 12, 24, 24 }, row, self.steady, function()
+		local row = self:_row(order, inviteCfg)
+		fitted(
+			inkText(
+				inviteCfg.text,
+				rect(inviteCfg.text, { Name = "From", Text = "From " .. invite.from, ZIndex = 6 }),
+				row
+			),
+			inviteCfg.text.textSize
+		)
+		self:_spriteButton("Accept", inviteCfg.accept, row, function()
 			self.InviteAnswered:Fire(invite.partyId, true)
 		end)
-		iconButton("Decline", "icon_x", { cfg.row.width - 32, 12, 24, 24 }, row, self.steady, function()
+		self:_spriteButton("Decline", inviteCfg.decline, row, function()
 			self.InviteAnswered:Fire(invite.partyId, false)
 		end)
 	end
-	if canInvite then
+	local emptyCfg = cfg.empty
+	for _ = #members + 1, maxSize do
 		order += 1
-		local row = self:_row(order)
-		Widgets.Sprite(cfg.inviteIcon.icon, rect(cfg.inviteIcon, { Name = "Icon", ZIndex = 5 }), row)
-		Widgets.Text(cfg.invite, rect(cfg.invite, { Name = "Label", Text = cfg.invite.text }), row)
-		hit(row, { Name = "InviteFriends" }, self.steady).Activated:Connect(function()
-			self.InvitePressed:Fire()
-		end)
+		local row = self:_row(order, emptyCfg)
+		rounded("dot", UDim.new(0.5, 0), rect(emptyCfg.dot, { Name = "Free", ZIndex = 6 }), row)
 	end
 end
 
--- Shows `text` on the server line (status and errors), or the "Choose server"
--- label again when `text` is nil.
+-- Shows `text` in the status strip (status and errors), or hides the strip when
+-- `text` is nil. The server dropdown always reads "Choose server".
 function LobbyHud:SetServerLine(text: string?)
-	self.serverText.Text = text or self.cfg.enter.server.text
-	self.chevron.Visible = text == nil
+	self.statusText.Text = text or ""
+	self.status.Visible = text ~= nil and text ~= ""
 end
 
 function LobbyHud:SetEnterBusy(busy: boolean)

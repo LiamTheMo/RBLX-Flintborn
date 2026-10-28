@@ -68,4 +68,25 @@ function Layout.Font(key: string?): Enum.Font
 	return if ok and font then font else Enum.Font.GothamMedium
 end
 
+local faceCache = {}
+
+-- A FontFace for `key` from the layout's "fontFaces" ({family, weight}), or nil
+-- when the key names only a classic font. Families are Roblox's built-in ones
+-- (rbxasset://fonts/families/<family>.json).
+function Layout.FontFace(key: string?): Font?
+	local layout = Layout.Get()
+	local spec = layout and layout.fontFaces and layout.fontFaces[key or ""]
+	if type(spec) ~= "table" or type(spec.family) ~= "string" then
+		return nil
+	end
+	if faceCache[key] == nil then
+		local ok, face = pcall(function()
+			local weight = (Enum.FontWeight :: any)[spec.weight or "Regular"] or Enum.FontWeight.Regular
+			return Font.new("rbxasset://fonts/families/" .. spec.family .. ".json", weight)
+		end)
+		faceCache[key] = if ok then face else false
+	end
+	return faceCache[key] or nil
+end
+
 return Layout

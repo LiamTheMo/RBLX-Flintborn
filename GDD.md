@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.16  
-> **Last updated:** 2026-10-25  
+> **Design revision:** 1.22  
+> **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -24,7 +24,7 @@
 
 **Confirmed economy/persistence history (2026-10-22):** **All items actually deposited into secure vault storage stay saved forever across world resets**, including ordinary and rare items. **Q129 later specifies** that extraction auto-vaults *ordinary materials only*, while gear, tools, other items and special materials stay protected in the lobby backpack until the user manually vaults them. Center extraction doubles ordinary/special material quantities plus all earned run XP, not Coins/Gems. Coins/Gems persist and never drop. Player trading is lobby-only using eligible items/Gems, no Coins; raw material trades need rare/Exclusive catalog permission. Rarity: **Common → Uncommon → Rare → Epic → Legendary → Mythic → Secret → Exclusive**. Five level-10 permanent masteries, level-reset rebirth with token perks, enhanced primitive Booga Booga art, adjustable camera, guided tutorial/quests and earned-path monetization are Confirmed. See §§10, 36 and 39.
 
-**Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar**, **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **1,000 units per secure material stack** (surplus beyond the limit is **deleted**, Q154). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
+**Confirmed Q116–150 (2026-10-22):** No automatic Coin reward on extraction; fixed-price NPC shops/sales, 250/1000/3000 Coin quest payouts, typical Gem award ~25. Constant Gem price per +25 vault item-slot tier (amount TBD). **9-slot hotbar** (now **6 slots**, §56), **50-slot backpack**, one logical ordinary material stack per backpack slot, and separately **1,000 units per secure material stack** (surplus beyond the limit is **deleted**, Q154). Ordinary extracted materials auto-bank, while equipment/tools/other items and special materials remain in a protected lobby backpack until manually vaulted. Full armor set EHP factors Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0 with three pieces contributing additively. Medical animations 0.5/1/1.5 seconds; revival restores 10% max EHP converted to actual HP. Rock/dagger/sword/spear attack-cadence targets 0.3/0.4/0.7/0.9 seconds; bow hold changes range not damage. Craft quality ±5%; mastery improves best-roll odds multiplicatively by 5% per level (1% → 1.05% at level 1 → 1.5% at level 10). Event categories roll independently after ~25% trigger checks, descending Secret (~0.1% illustrative) to Common fallback; no fixed event count cap beyond footprint/performance. Totems start hut-sized and upgrade via materials, overlapping areas preserve original ownership until takeover. Bosses have fixed baseline plus combined level/gear scaling. First Permanent pickaxe candidate. Premium baseline XP +25% and temporary consumable boosters earnable by everyone. See §39.
 
 **Clarifications Q151–153 (2026-10-22):** Secure-vault material storage is **1,000 units PER material stack** (not 1,000 globally). **Unvaulted extracted gear/tools/other items/special materials persist in the protected lobby backpack across logout, rejoin and world resets**; vault deposits remain optional until the user deliberately redeploys gear into risk. **Premium +25% base XP and temporary consumable XP boosters stack**; **Q162 (2026-10-23):** they combine **additively** (e.g. +25% Premium and a +50% booster give +75%). Booster strength and duration remain Open. See §40.
 
@@ -491,7 +491,7 @@ Treat extraction hold, protected animation, death, ordinary leave, maintenance k
 
 ### 10.3 Backpack, post-extraction settlement, vault — Confirmed Q122/Q126–129
 
-- **Hotbar exactly 9 slots. Backpack initially 50 slots.** Each ordinary material type occupies one logical backpack slot. **Secure vault** materials have **1,000 units per material stack** (Q151); units beyond 1,000 are deleted (Q154). The live backpack numerical stack limit remains Open.
+- **Hotbar exactly 6 slots (§56, replacing Q126's nine). Backpack initially 50 slots.** Each ordinary material type occupies one logical backpack slot. **Secure vault** materials have **1,000 units per material stack** (Q151); units beyond 1,000 are deleted (Q154). The live backpack numerical stack limit remains Open.
 - Secure **item/equipment vault starts with 25 slots**, +25 per upgrade, at a **constant Gem price per upgrade tier** (amount not chosen), or equivalent Robux upgrade. Robux cost constancy remains Open.
 - **Confirmed Q151:** Secure-vault material limit is **1,000 units per material stack**, not 1,000 units across all stored resources. Units in other material stacks are separate. **Confirmed Q154:** There is no second stack and no overflow escrow. Any quantity beyond a stack's 1,000 units is **deleted** at settlement, and the receipt must show what was lost.
 - **On successful extraction:** Regular **ordinary materials automatically transfer to safe material vault storage**, with center portal's valid ×2 quantity. **Weapons, tools, other items and special materials remain in a protected lobby backpack**, where the player may manually deposit desired items into the safe vault.
@@ -912,7 +912,7 @@ For normal current HP \(H\), \(E=H A\); a raw damage hit \(D\) produces \(E'=\ma
 
 ### 22.1.1 Fixed hotbar/backpack with material aggregation — Confirmed Q108/Q126–129
 
-- **Hotbar exactly 9 slots. Backpack initially 50 slots.** Each ordinary material type occupies **one logical backpack slot** and shows one quantity. Numeric material stack caps and backpack upgrade possibilities are Open.
+- **Hotbar exactly 6 slots (§56, replacing Q126's nine). Backpack initially 50 slots.** Each ordinary material type occupies **one logical backpack slot** and shows one quantity. Numeric material stack caps and backpack upgrade possibilities are Open.
 - **All units of the same resource type appear as one logical consolidated stack** in the backpack UI (e.g., one Stone entry with a single quantity) for simplicity, rather than dozens of duplicated Stone icons. Exact underlying maximum quantity, whether hidden sub-stacks are required for implementation, carry limits, and over-capacity behavior are Open.
 - Weapons, tools, armor and other **unique gear instances remain individually distinguishable** because their rarity/catalog types and minor quality rolls may differ. Consolidated raw material stack behavior must **not** merge differently rolled swords or duplicate Permanent instances.
 - **Three equipped armor slots:** Head, Chest and combined Legs/Boots. **No shields**.
@@ -955,13 +955,13 @@ Vault and Permanent armory are outside the island and cannot be directly raided.
 | --- | --- | --- |
 | **ProfileService** | Session locks, schema upgrades, revisions, **persistent vault/Coins/Gems/XP/masteries/rebirth entitlements**, protected extraction and maintenance recovery | Saved/pending/recovery status, currency, level and perk state |
 | **ItemCatalog** | Definitions, valid tags and input/output restrictions | Static icons/descriptions/stats for display |
-| **InventoryService** | 9-slot hotbar/50-slot backpack, one ordinary material type per logical entry, **persist extracted unvaulted lobby backpack items across logout/server changes** | **Q155:** all unvaulted items deploy on Play; safe staging and manually triggered vault deposit |
+| **InventoryService** | 6-slot hotbar (§56)/50-slot backpack, one ordinary material type per logical entry, **persist extracted unvaulted lobby backpack items across logout/server changes** | **Q155:** all unvaulted items deploy on Play; safe staging and manually triggered vault deposit |
 | **VaultService** | 25+25 item-slot upgrades with constant Gem tier price, **1,000 units per secure material stack**, auto-bank every extracted material (Q164), manual equipment deposits, no material withdrawal | Always-persistent holdings; overflow beyond capacity deleted once and shown on receipt (Q154) |
 | **ForgeService** | Craft ±5% stat quality range on eligible field gear, fixed baseline lobby gear, **5% relative best-roll probability increase per Crafting mastery level**, ten arrows/craft and catalog-eligible first Permanent pickaxe | Server-authorized quality chances and item stats, no false rarity roll |
 | **PermanentEquipmentService** | One canonical owner, death retention in backpack/hotbar (no recovery fee, Q156), manual drops, theft pickup and trade escrow | Current owner, transfer receipt, tentative repair/slot status |
 | **LoadoutService** | Safe cross-place transit of the **whole unvaulted lobby backpack/hotbar except materials** (Q155, Q164), no Permanent slot limit (Q156) and validation | Safe menu equipment preview and risk labels |
 | **ExtractionService** | Server-shared 120s fixed or 30s portable timer; end-of-timer presence snapshot, alerts and protected animation | Shared countdown, deadline zone and verified individual receipt |
-| **CombatService** | Full armor set EHP targets **Hide ×1.2/Wood ×1.5/Stone ×1.8/Iron ×2.0** with additive pieces; 10%-max-EHP revive, melee cooldowns rock .3/dagger .4/sword .7/spear .9s, bow draw determines range not damage, medicine animation only .5/1/1.5s, food examples | Combat/health UI, 9-slot hotbar, deterministic armor stats and draw/recovery animations |
+| **CombatService** | Full armor set EHP targets **Hide ×1.2/Wood ×1.5/Stone ×1.8/Iron ×2.0** with additive pieces; 10%-max-EHP revive, melee cooldowns rock .3/dagger .4/sword .7/spear .9s, bow draw determines range not damage, medicine animation only .5/1/1.5s, food examples | Combat/health UI, 6-slot hotbar (§56), deterministic armor stats and draw/recovery animations |
 | **BuildingService** | Booga Booga construction; wood/stone/iron tier, **tribe totem claim**, unclaimed decay, accessible storage and any-time ordinary-tool raids | Build previews, visible totem coverage, structure HP/decay |
 | **EventDirector** | **~5-minute independent category trigger rolls**, baseline 25% per category, descending Secret (~0.1% illustrative) to Common event fallback, no fixed concurrency cap with footprint/performance validation | All successfully spawned categories publicly announced, proper biome placement |
 | **BossService** | **Fixed boss baseline plus combined account-level and equipped gear-score scaling**; snapshot timing formula Open; Guardian retains independent schedule | Boss difficulty UI and contested physical loot |
@@ -1420,7 +1420,7 @@ Verify biome randomness, event public announcements, weighted distribution, 8-me
 | **Mining** | Authentic ores/nodes mined and mining objectives | **+1% per mastery level** to suitable mining/resource yield; cosmetics |
 | **Woodcutting** | Trees legitimately chopped, varied wood harvested | **+1% per level** to suitable wood yield; cosmetics |
 | **Farming** | Crops planted, matured and harvested | **+1% per level** to eligible crop output; cosmetics |
-| **Crafting** | Legitimate completed crafting actions and achievements | **All of:** ingredient efficiency, craft output/batches, crafting speed and recipe unlocks, balanced by level |
+| **Crafting** | Legitimate completed crafting actions and achievements | Better gear quality rolls and a bonus-bar chance when smelting (§52; no crafting speed) |
 | **PvP** | Real opponent combat, kills and contested objectives | **Both** minor combat and noncombat perks (e.g. loot/coins/utility), plus cosmetics |
 
 **Confirmed:** Mastery level **cap is 10** for now. Each mastery level grants a **buff**, and the player advances through meaningful **milestones**, not merely passive hours logged in. **+1% per eligible level** is the baseline for resource-yield buffs (at ten earned +1% increments, an illustrative cap of **+10%**). This does **not** automatically mean +1% raw PvP damage or every crafting stat per level; precise perk catalogs, milestone thresholds and tier associations remain **Open**. Mastery levels, buffs and cosmetics remain **permanent account progress** across world reset, death and rebirth.
@@ -1673,7 +1673,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 - **Confirmed tracks (Q71):** **Mining, Woodcutting, Farming, Crafting and PvP only**.
 - **Confirmed Q72–75:** Milestone-based mastery progression, **maximum level 10**, **one buff at every level**, baseline **+1% per eligible mastery level** for resource yield. Exact resource type and level thresholds are Open.
 - **Confirmed Q76:** PvP mastery includes **both combat and noncombat** advantages, bounded for fairness. Exact magnitude Open.
-- **Confirmed Q77:** Crafting mastery supports **all** proposed benefit types: ingredient savings, larger craft outputs, faster craft speeds and recipe unlocks; exact distribution Open.
+- **Confirmed Q77 (superseded 2026-10-28, §52):** Crafting mastery supports **all** proposed benefit types: ingredient savings, larger craft outputs, faster craft speeds and recipe unlocks; exact distribution Open.
 - **Confirmed Q78:** Specific buffs/perks are **additive** and others **multiplicative**. Catalog must explicitly classify each; center portal still doubles carried materials and all run XP. It does not duplicate counted milestone actions.
 - **Confirmed Q79–80:** Mastery milestones can grant cosmetics, titles and similar collectibles. **Mastery titles/levels may display in the lobby**; exact visibility layout Open.
 - **Confirmed Q81–89:** Rebirth resets general level to **1** after a level requirement and challenge, with progressively harder costs; permanent perk token purchases, possible multirank perks, and **Gem/Robux/code** respec. Other saved protected systems remain preserved.
@@ -1769,7 +1769,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 | **74** | Buff cadence | **Every mastery level** grants a buff | Per-level mapping |
 | **75** | Resource benefits | **+1% yield per applicable mastery level** as starting balance | Which drop/resource classes apply and rounding |
 | **76** | PvP mastery | **Both combat and noncombat rewards** | Power caps, PvP reward types |
-| **77** | Crafting mastery | **All four:** material discounts, output/batch increases, crafting speed, recipe unlocks | Buff rates and individual levels |
+| **77** | Crafting mastery | **All four:** material discounts, output/batch increases, crafting speed, recipe unlocks (superseded by §52: quality rolls and a smelting bonus bar only) | Buff rates and individual levels |
 | **78** | Modifier operations | **Specific additive and multiplicative multipliers** coexist | Each modifier's type and caps |
 | **79** | Cosmetics | **Yes** to titles, cosmetics, animations and building decorations as milestone rewards | Exact milestones and content |
 | **80** | Social display | Mastery levels/titles **may be visible in lobby** | Inspection/badges/privacy options |
@@ -1810,7 +1810,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 10. Center extraction pays **exactly one additional set of current-run XP grants** and double materials; it does not retroactively double prior runs or invent extra milestone action counters.
 11. UI and persisted schema contain **only five active mastery tracks**, each capped at **level 10**, with one-time buff at **every mastery level** and cosmetic milestones; lobby can show progress/titles.
 12. Resource mastery +1% increments stack with catalog-classified **additive/multiplicative modifiers** in a deterministic order. Combat and noncombat PvP mastery bonuses are bounded and tested.
-13. Crafting mastery supports ingredient savings, output batch, crafting speed and unlock milestones without allowing zero-cost infinite crafts.
+13. Crafting mastery improves gear quality rolls and gives a bonus-bar chance per bar smelted (§52); every bonus bar still needs its own ore to be smelted, so nothing is ever crafted from nothing.
 14. Rebirth requires both level and completed challenge, increases future costs, sets **general level 1** but retains vault, Permanent equipment and permanent mastery/owned perks.
 15. Rebirth perk purchases are permanently active; some perks have ranks, and their XP/luck/drop-volume/water movement effects cannot be client-forged.
 16. Each Gem, Robux-receipted or redemption-code respec is a once-only entitlement. Player cannot duplicate tokens or avoid valid charges by disconnecting.
@@ -1935,7 +1935,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 | # | Confirmed owner answer | Open details |
 | --- | --- | --- |
-| **126** | **Nine fixed hotbar slots** | Control bindings, quick-swap UX |
+| **126** | **Nine fixed hotbar slots** — superseded by §56: **six** | Control bindings, quick-swap UX |
 | **127** | **50 starting backpack slots** | Whether later backpack upgrades exist |
 | **128** | One ordinary material type occupies one backpack slot; **secure material stack stores exactly up to 1,000 units** | **Clarified Q151:** 1,000 is **per material stack**, not global; **Q154:** excess is deleted |
 | **129** | Ordinary materials auto-vault; equipment/tools/other items and special materials remain in **persistent protected lobby backpack** for later optional vault deposit (**special materials revised by Q164: they auto-vault too**) | **Clarified Q152:** persists across logout/reconnect/world wipes; **Q154:** excess items deleted |
@@ -1996,7 +1996,7 @@ Exact NPC prices and vault tier costs/cap; Coin-to-Gem exchange; currency earn-s
 
 1. Quests pay their configured 250/1000/3000 Coin bands once, merchant sales credit fixed server quotes, and no direct Coins are issued simply for extracting or doubled centrally.
 2. Gem grants average around the chosen 25 baseline by source; trade safety checks, no Coin trade, protection through death and empty-world resets.
-3. 9-slot hotbar and 50-slot backpack remain bounded; each ordinary material type displays one consolidated row/slot, while unique gear can have its own roll and instance ID.
+3. 6-slot hotbar (§56) and 50-slot backpack remain bounded; each ordinary material type displays one consolidated row/slot, while unique gear can have its own roll and instance ID.
 4. Vault item capacity starts 25 and upgrades +25 at constant Gems per tier; material stacks are **limited to 1,000 units each**, not an account-wide material limit. Overflow is deleted exactly once and shown on the receipt (Q154).
 5. Extracted ordinary material auto-banks; extracted unique gear/tools and special materials stay protected in lobby backpack until manually deposited, with one-time central material ×2 and no data loss/duplication.
 6. Full matching armor sets produce 120/150/180/200 EHP for 100 base HP. Piece modifiers add. Revive restores 10% modified maximum EHP converted into actual HP.
@@ -2183,6 +2183,12 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.22** | 2026-10-28 | Owner decision (§56): the hotbar has **6 slots** for now (keys 1–6), replacing Q126's nine. |
+| **1.21** | 2026-10-28 | Owner decision (§55): no swimming; all water is knee-deep and slows walking by 30%. |
+| **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
+| **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
+| **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
+| **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
 | **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
 | **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
 | **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
@@ -2203,7 +2209,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 - The placeholder island layout and POI positions (§3), until the authored Shattered Crater replaces it.
 - Whether to reset the playtest profile DataStore at launch (by switching `ProfileService.STORE_NAME`, never by deleting data).
 
-## 45. Owner answer Q164: materials stay in the lobby (2026-10-23)
+## 45. Owner answer Q164: materials stay in the lobby (2026-10-23) — superseded by §53
 
 | # | Decision | Consequences |
 | --- | --- | --- |
@@ -2231,7 +2237,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 | Interact / pick up (proximity prompts) | F | prompt default |
 | Backpack / inventory | Tab | Y |
 | Drop item | Q | L1 |
-| Hotbar slots 1–9 | 1–9 | — |
+| Hotbar slots 1–6 | 1–6 (§56) | — |
 | Crafting | V | D-pad up |
 | Build mode / rotate piece | X / R | D-pad right / L2 |
 | Tribe | T | D-pad left |
@@ -2241,7 +2247,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 **Rules**
 
-1. Every keyboard action has the default above. **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
+1. Every keyboard action has the default above. **Roblox's player list is hidden in both places** so Tab only opens the inventory: the run backpack in the world, the backpack and vault panel in the lobby (1.18). **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
 2. **No two actions share a key.** Choosing a key another action already uses swaps the two.
 3. **Reserved keys** stay with Roblox: W A S D and Space (movement), / (chat), Esc, Enter and Backspace. Function keys are not bindable.
 4. Choices save to the player's profile (only the keys that differ from the defaults) and follow them to every server and both places. The server validates every save; a malformed or conflicting save falls back to the defaults.
@@ -2265,7 +2271,7 @@ Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft 
 
 | # | Decision | Consequences |
 | --- | --- | --- |
-| **165** | The Shattered Crater is designed around **~2,400 studs across**. | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
+| **165** | The Shattered Crater is designed around **~2,400 studs across** (superseded by §54: a 4,096-stud island). | Matches the shipped placeholder (`MAP_RADIUS = 1200`). About 75 s of walking from the edge to the centre and 150 s across at the default 16 studs/s. |
 | **166** | A lobby server holds **20 players**. | Set the lobby place's maximum players to 20 in the Creator Dashboard (a place setting, not code). Parties (up to 8) and trades need both players in the same lobby server. |
 | **167** | A **hub menu opens any station from anywhere** in the lobby. | Matches the shipped menu-driven lobby: the lobby navigation buttons open every panel (lobby panels have no keys, §46). Physical stations in the lobby map are landmarks and walk-up shortcuts to the same panels, never the only way in. |
 | **168** | **Trades can be started anywhere** in the lobby. | Matches the shipped trade flow (no range check). Q98 limits (eligible items and Gems, never Coins) still apply. |
@@ -2306,6 +2312,135 @@ Roblox avatars (accessories, clothing, body colours) are not loaded on top.
 
 **QA:** a new player spawns as the default character in the lobby and the world, with no avatar items; walking, jumping and idle use the R6 animations with the clothing following the limbs; a tribeless player wears brown shorts; creating or joining a tribe changes them to that tribe's colour, and leaving changes them back.
 
+## 51. Item and material catalog (2026-10-27)
+
+The owner defined the launch item and material catalog in a question round on 2026-10-27. **The full tables, recipes and numbers live in [`docs/ITEM_CATALOG.md`](docs/ITEM_CATALOG.md)**; the data is generated from `src/shared/Items/Tiers.luau`. Summary of the decisions:
+
+1. **Ladder:** Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, expandable later. Each tier is about **25% stronger** than the last (damage, tool yield, building HP and armor above Iron), anchored on the confirmed wooden spear 15, stone spear 25, Hide armor ×1.2 and Iron armor ×2.0.
+2. **Weapons:** spears, daggers, swords and bows only. Bows go Wooden, then a metal-reinforced bow per metal.
+3. **Restricted (gem-class) materials:** Flint, Obsidian, Jade and any future gemstone make **only daggers and spears**, plus Forge and Permanent inputs. **Flint is the only arrow tip**, and Flint Arrows are the only arrows. Strength is staggered: Flint between Stone and Copper, Obsidian between Iron and Silver, Jade between Cobalt and Mithril.
+4. **Ores:** smelted into bars at a Furnace, **1 ore → 1 bar, no fuel**, costing only time (Crafting mastery adds a chance of one bonus bar per bar, §52). Mining needs the **previous tier's pickaxe**. Ores spawn by danger: Copper and Iron in the Outer Rim, Silver and Cobalt in the Inner Ring, Mithril in the Crater, and Adamantine only from meteors, the Guardian and rare events.
+5. **Armor:** Hide → Bone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine. Wood and Stone armor are removed.
+6. **Tools:** axes and pickaxes at every tier from Wood. **Sickles are removed**; Fiber, Herbs and berries are gathered by hand.
+7. **Stations:** Wood, Stone, Flint, Bone and Hide gear by hand; Copper, Iron and Obsidian at a Workbench; Silver and up, and Jade, at a new **Anvil**; smelting and cooking at the Furnace; potions at a new **Cauldron**. No other intermediate components.
+8. **Rarity** rises slowly with tier (Wood through Iron Common, Silver and Cobalt Uncommon, Mithril Rare, Adamantine Epic); Legendary and above stay for boss and event drops. Quality rolls stay ±5% (Q139).
+9. **New materials:** Flint, Resin and Bone (common); Dire Hide, Charged Core and Glow-Fur (elite creatures); **Guardian Heart** (the Guardian, which joins the elite group); Ashen Oil and Siege Resin (ancient caches); Abyssal Shard and Emberglass (meteors); Bloodroot and Moonpetal (rare herbs). Ancient Ember stays.
+10. **Rare shrub event:** a new announced event that grows rare berries and rare herbs, at the same frequency as other rare events. **Every rare event type rolls individually** instead of competing within its category.
+11. **Berries:** Redberry (healing), Sweetberry (fullness), Sunberry (XP boost) and Glimmerberry (luck boost). Each brews at the Cauldron into a stronger potion or draught. XP boosts add to Premium and paid boosters (Q162). **Luck raises rare-drop chance only.** A running boost never weakens (§52). Medicine and Cooked Meat are unchanged.
+12. **Siege:** Fire Bomb (Ashen Oil; burns Wood hard, Stone less, metal barely) and Breaching Charge (Siege Resin; heavy damage to one wall or door after a fuse). Rare materials also feed Mithril and Adamantine gear and Permanent conversions.
+13. **Building:** walls, floors, doors and roofs come in the full ladder, built from bars at metal tiers.
+14. **Permanent:** **any gear** can be converted; the cost scales with tier (10× its recipe, Ancient Ember, and rare materials at Cobalt and above).
+15. **Guardian's Fang:** Legendary, one tier above the Adamantine sword.
+16. **Trading:** elite, Guardian, meteor and cache materials, rare herbs, rare berries and Ancient Ember trade; common materials, ores and bars do not.
+17. **Shop:** starter supplies only (Wood and Stone tools, Flint Arrows, basic medicine, common berries and their seeds).
+18. **Pre-release cleanup:** removed items and the old "Iron" material are deleted from existing saves.
+
+
+## 52. Owner decisions: boosts, Crafting mastery, hotbar and Tab (2026-10-28)
+
+1. **Boosts never weaken.** One boost runs per kind (XP, Luck). While it runs it stays exactly as it is until it ends: a weaker or equally strong boost of the same kind changes nothing, and only a **stronger** one takes over, with its own timer (owner confirmed). A draught that would change nothing is refused and kept; a boost berry still feeds you and its toast says the running boost keeps going.
+2. **Crafting mastery gives only two benefits:** better gear quality-roll chances (Q139's +5% relative per level) and, when smelting, a **chance of one bonus bar per bar smelted** (starting value 2% per level, 20% at level 10; a bonus bar with no room drops at the smelter's feet). **Everything about crafting speed is removed**, as are ingredient savings and larger craft outputs. Every player crafts at the same rate (one craft per second; smelting times per §51). Recipe gates that require a Crafting mastery level stay (owner confirmed).
+3. **Touch hotbar:** the HUD hotbar shows each slot's item (name in its rarity colour, stack count), the selection follows the equipped slot, and **tapping a slot uses it exactly as its number key does** (equip, eat or drink, place, ready a siege item).
+4. **Tab and the player list:** Roblox's player list is disabled in both places; Tab (the rebindable Backpack key) opens the run backpack in the world and the backpack and vault panel in the lobby.
+
+
+## 53. Owner decisions: resources, gathering and boosts (2026-10-28)
+
+1. **Materials go back into runs** (reverses §45, Q164 and Q164a). Players withdraw material stacks from the vault into the lobby backpack and deploy with them like any other item; the lobby backpack no longer banks materials automatically. The vault keeps its 1,000-per-material capacity, and anything deposited or extracted beyond it is still deleted.
+2. **Carried-in materials never multiply.** The Center extraction's 2× (and any other extraction resource multiplier) applies only to the amount of each material above what the player carried into that run. Bringing 100 Wood and extracting 160 at the Center settles 100 + 60 × 2 = 220. XP multipliers are unchanged.
+3. **Boosts pause between runs.** Nothing outside the consumable weakens its boost. A successful extraction (or a maintenance kick) saves each running boost's remaining time, and it resumes on the next deploy; boosts only count down during a run. Dying, or leaving the play world without extracting, ends them. After a server crash, boosts come back with the time they had when that run started; boosts first used during the crashed run are lost.
+4. **Every gathering hit drops material on the ground.** Nodes have health and take many hits. A hit drops 1 material plus 1 for each tier the tool is above the node, and uses that much node health, so a better tool empties a node in fewer hits for the same total. Bare hands count as rank 0: trees and rocks give 1 per hit by hand and 2 with a Wooden tool. Ores still need the previous tier's pickaxe, which gives 1 per hit. Plants and bushes are gathered by hand at 1 per hit. Flint and Resin bonus chances stay. Gathering mastery becomes a per-hit chance of one extra drop (1% per level) that uses no node health.
+5. **Pickups:** only the gatherer can pick up a drop for its first 10 seconds, then anyone can; drops disappear after 2 minutes. Walking over a drop collects it, and so does looking at it and pressing Interact.
+6. **Node health** (starting values): trees and rocks 12, plants and berry bushes 3, Copper, Iron, Silver and Cobalt 8, Mithril 6, Obsidian and Jade 5, the new nodes 4.
+7. **Regrowth by tier:** basics 2 min, Copper and Iron 3 min, Silver, Cobalt and Obsidian 5 min, Jade and Mithril 8 min. Event-only ores (Adamantine) never come from regrowing nodes.
+8. **Every region has basics:** trees, rocks, fiber, herbs and berry bushes appear in every biome, the Crater included, in smaller numbers deeper in.
+9. **New gatherables with no use yet** (bankable and sellable, not tradeable): Clay, Amethyst, Starstone, Stormglass, Cave Mushroom, Redcap Mushroom, Chestnut Mushroom, Thornvine, Frostleaf, Juniper Berry, Elderberry, Raspberry and Hazelnut. Models follow the world-kit studies; the Sunpod shrub stands for the rare shrub event, and the Iron and Ember meteors for meteor crashes. Ore deposits, the Jade vein and the Obsidian outcrop still need model sheets.
+10. **Creature ore drops by habitat:** animals never drop ore; Skeletons drop Copper and Iron Ore; the Minotaur drops Silver and Cobalt Ore in bulk; Ember Wisps drop none. Revised with the new roster in §54.2, which also removes Bandits.
+11. **Farming:** Fiber can be planted in planters. Sunberries and Glimmerberries stay wild-only.
+12. **Selling:** banked materials, ores and bars all sell to the merchant for Coins.
+
+
+## 54. Owner decisions: play-world layout and creatures (2026-10-28)
+
+### 54.1 Layout
+
+Approximate regional envelopes with shared transition areas, not rectangles packed together:
+
+| Area | Footprint (studs) | Danger tier |
+| --- | --- | --- |
+| Entire island | 4,096 × 4,096 | — |
+| Island plus surrounding ocean | 6,144 × 6,144 | — |
+| Rimlands | 3,000 × 500, curving around the southern coast | Low |
+| Pinewood Wilds | 1,000 × 1,100 | Low |
+| Mosswick Forest | 900 × 900 | Low |
+| Riverlands | 1,100 × 900 | Low |
+| Timberwatch region | 800 × 900 | Medium |
+| Fallen Temple region | 800 × 800 | Medium |
+| Emberhollow Caves | 700 × 700 exterior; 450 × 350 interior | Medium |
+| Frostpeak Ridge | 1,400 × 800 | Extreme |
+| Crater Lake | about 1,400 across | Extreme (shores) |
+| Shattered Keep island | 550 × 650 | Extreme |
+| Keep's boss courtyard | 180 × 220 | Extreme |
+
+- **Heights:** sea level 0, ordinary land 20–80 studs, elevated terraces 100–220, Frostpeak's tallest peaks 450–600.
+- **Ores by danger:** Low regions give Copper and Iron, Medium regions Silver, Cobalt, Obsidian and Jade, Extreme regions Mithril. Every region has basics (§53).
+- **Centre:** the Guardian fights in the Keep's boss courtyard. The Center (2×) extraction stands on the Keep island, reached across Crater Lake by a land bridge or a shallow ford. The Minotaur is the Keep's ritual boss.
+- The generated placeholder map is a playable test build until an authored map replaces it.
+
+### 54.2 Creatures
+
+**Passive** animals always flee. **Neutral** animals ignore players until they or their group are hurt, then fight back. **Hostile** creatures attack on sight.
+
+| Creature | Type | Where | How it appears |
+| --- | --- | --- | --- |
+| Wild Boar | Regular · Neutral | Low-region woodland and forest edges | Roaming; alone or small groups |
+| Forest Stag | Regular · Passive | Low-region meadows and clearings | Roaming small herds |
+| Grey Wolf | Regular · Hostile | Medium-region forests and rocky woodland | Roaming small packs |
+| Brown Bear | Regular · Neutral | Medium-region woodland, near cave entrances | Roaming, usually alone |
+| River Crocodile | Regular · Hostile | Rivers, marshes and lake shores | Roaming along banks |
+| Plains Bison | Regular · Neutral | Broad Low-region grasslands | Roaming small herds |
+| Meadow Rabbit | Regular · Passive | Low-region grasslands and shrub patches | Roaming small groups |
+| Island Dodo | Regular · Passive | Beaches, coastal clearings, open woodland | Roaming small flocks |
+| River Capybara | Regular · Passive | Gentle riverbanks and grassy lake shores | Roaming small groups |
+| Highland Goat | Regular · Passive | Rocky slopes and highland ledges | Roaming small groups |
+| Forest Tapir | Regular · Passive | Forest interiors near streams | Roaming, alone or in pairs |
+| Giant Ground Sloth | Rare event · Passive | Large forest clearings | Creature event; one |
+| Saber-Toothed Tiger | Event elite · Hostile | Medium-region jungle and rocky forest | Creature event; one roaming predator |
+| Woolly Mammoth | Event wildlife · Neutral | Large grasslands and highland valleys | Creature event; one |
+| Iron-Tusk Boar | Event alpha · Hostile | Medium-region forest clearings | Alpha event with protective boars |
+| Ancient Tortoise | Rare event · Passive | Lakeside clearings and old-growth forest | Creature event; one |
+| Stonehide Rhino | Event elite · Neutral | Rocky plateaus and Medium-region grasslands | Creature event; one |
+| Crater Gorilla | Event boss · Hostile | A large jungle clearing near the crater approaches | Event boss at a suitable arena |
+
+- **Earlier creatures:** Wolf, Boar and Sabertooth become the Grey Wolf, Wild Boar and Saber-Toothed Tiger. Skeletons stay in the Fallen Temple and guard the Shattered Keep, Ember Wisps stay in Emberhollow Caves, and the Minotaur stays as the Keep's ritual boss. **Bandits are removed.**
+- **Drops by size:**
+  - small passives: Raw Meat and a little Hide;
+  - medium animals: Meat, Hide and Bone;
+  - large animals: plenty of each.
+  - Event elites and bosses add Dire Hide, Charged Core and Glow-Fur.
+- **Ore drops:**
+  - Skeletons drop Copper and Iron, and Silver in the Keep.
+  - The Minotaur and the Crater Gorilla drop Silver and Cobalt.
+  - The Stonehide Rhino drops a little Iron.
+  - Other animals never drop ore.
+- **Rituals:** the Keep's altars summon the **Minotaur** (3 Ancient Ember and 50 Iron Ore), which replaces the Ember Titan. The Minotaur is no longer a roaming event. Raider Camp and Warlord's Hold are guarded by Skeletons now that Bandits are gone.
+- **Density (light):** about 2–4 small groups per region, roughly 40–60 roaming creatures island-wide. A killed group respawns after about 3 minutes, away from players and outside safe zones. Each rare creature event rolls on its own.
+
+
+## 55. Owner decision: knee-deep water, no swimming (2026-10-28)
+
+1. **Nobody swims.** Swimming is disabled for players and creatures.
+2. **All reachable water is knee-deep:** the lake, the rivers and creeks, marshes, the ford and the sea along the coast. A player can always walk through it without going under. Crater Lake becomes a shallow lake that can be crossed on foot; the land bridge stays as a dry path to the Keep.
+3. **The sea:** a knee-deep shelf runs along the coast, and an invisible boundary a short way offshore stops anyone walking out to sea.
+4. **Water slows movement by 30%.** Walking or sprinting with your feet in water runs at 70% of normal speed, on top of the other speed rules. Creatures are slowed the same way.
+
+## 56. Owner decision: six hotbar slots (2026-10-28)
+
+1. **The hotbar has at most 6 slots for now**, replacing Q126's nine. The backpack stays at 50 slots, so a run inventory holds 6 + 50 = 56 entries.
+2. **Keys 1–6** select the slots by default (rebindable, §46); the Hotbar7–9 binds are gone and a saved rebind for them is ignored.
+3. **Nothing is lost by the change.** Saves keep items as a list and slots are filled again when a run starts, so items that sat in slots 7–9 move to the backpack. If a deployed loadout no longer fits the 56 slots, the rest stays safely in the lobby backpack (the existing run-start rule), never deleted.
+4. The parchment HUD reference's nine slots are drawn as six when that screen is built.
+
 ---
 
-**Working principle:** Flintborn is a Roblox primitive-fantasy PvPvE extraction survival game with protected Play admission, 100 base HP, additive hide/wood/stone/iron EHP, 10-second tribe revives and permanent five-track masteries. Every extracted material, special ones included, automatically banks into the vault; **the secure materials vault holds up to 1,000 units per stack, not 1,000 total**, and that capacity decides what is deleted. **Materials never leave the lobby once extracted** (Q164). Gear, tools and other items arrive in the **durable protected lobby backpack**, surviving logout/server resets until manually moved into the vault; **pressing Play deploys every unvaulted item except materials**. Central extraction doubles *all* material quantities and earned-run XP, never Coins/Gems. Premium base +25% XP **adds to** temporary boosters available to every player (Q162). Other confirmed mechanics include 9 hotbar/50 backpack, 25 vault item slots (+25 upgrades), restricted lobby Gem/item trading, raidable totem claims/4–6-minute decay, independent weighted server events, fixed baseline plus level/gear boss scaling, and a candidate first Permanent pickaxe. No firearms, usable shields, player-cast magic or durability at launch.
+**Working principle:** Flintborn is a Roblox primitive-fantasy PvPvE extraction survival game with protected Play admission, 100 base HP, additive hide/wood/stone/iron EHP, 10-second tribe revives and permanent five-track masteries. Every extracted material, special ones included, automatically banks into the vault; **the secure materials vault holds up to 1,000 units per stack, not 1,000 total**, and that capacity decides what is deleted. **Materials can be withdrawn from the vault and carried back into runs, but carried-in units never get an extraction multiplier** (§53, replacing Q164). Gear, tools and other items arrive in the **durable protected lobby backpack**, surviving logout/server resets until manually moved into the vault; **pressing Play deploys every unvaulted item, materials included**. Central extraction doubles material gathered during the run (never carried-in units) and earned-run XP, never Coins/Gems. Premium base +25% XP **adds to** temporary boosters available to every player (Q162). Other confirmed mechanics include 6 hotbar (§56)/50 backpack, 25 vault item slots (+25 upgrades), restricted lobby Gem/item trading, raidable totem claims/4–6-minute decay, independent weighted server events, fixed baseline plus level/gear boss scaling, and a candidate first Permanent pickaxe. No firearms, usable shields, player-cast magic or durability at launch.

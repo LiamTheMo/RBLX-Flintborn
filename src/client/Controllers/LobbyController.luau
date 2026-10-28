@@ -113,7 +113,7 @@ local function refreshPreview()
 			)
 		end
 	end
-	label("Items in your vault always stay safe; materials always stay in the vault.", ui.preview)
+	label("Items in your vault always stay safe. Materials you bring never get the Center ×2.", ui.preview)
 end
 
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,

@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
@@ -53,11 +54,12 @@ WorldAdmissionService.STUDIO_TEST_KIT = {
 	{ catalogId = "BasicMedicine", quantity = 3 },
 	{ catalogId = "AdvancedMedicine", quantity = 2 },
 	{ catalogId = "Potion", quantity = 1 },
-	{ catalogId = "Berries", quantity = 5 },
+	{ catalogId = "Redberry", quantity = 5 },
 	{ catalogId = "CookedMeat", quantity = 2 },
 	{ catalogId = "Wood", quantity = 30 },
 	{ catalogId = "Stone", quantity = 20 },
 	{ catalogId = "Fiber", quantity = 20 },
+	{ catalogId = "Flint", quantity = 4 },
 	{ catalogId = "ExtractionRune", quantity = 1 },
 	{ catalogId = "AncientEmber", quantity = 1 },
 }
@@ -147,6 +149,10 @@ local function requestPlay(player: Player, requestId: any)
 	if state ~= SessionStates.WorldMainMenuReady then
 		return false, "NotReady"
 	end
+	-- Nobody enters the world before the map is built (it builds after startup).
+	if not SpawnService.WorldReady() then
+		return false, "WorldLoading"
+	end
 	if ProfileService.IsShuttingDown() then
 		return false, "ShuttingDown"
 	end
@@ -218,6 +224,8 @@ local function requestPlay(player: Player, requestId: any)
 		for index, stack in items do
 			items[index] = table.clone(stack)
 		end
+		-- The kit's materials are carried in like any loadout's (GDD §53).
+		InventoryRules.MarkCarried(items)
 	end
 	setState(player, SessionStates.ActiveRun)
 	humanoid.Died:Connect(function()

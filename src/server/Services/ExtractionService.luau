@@ -18,6 +18,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local DownedService = require(script.Parent.DownedService)
 local InventoryService = require(script.Parent.InventoryService)
@@ -375,7 +376,11 @@ function ExtractionService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	setupSites()
+	-- Portal sites are the map's tagged parts, so they wait for the map.
+	task.spawn(function()
+		WorldState.WaitUntilReady()
+		setupSites()
+	end)
 	Remotes.Handle("PlaceRune", placeRune)
 	-- Late joiners still see countdowns already running.
 	WorldAdmissionService.RunStarted:Connect(function(player)

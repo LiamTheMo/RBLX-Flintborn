@@ -63,7 +63,75 @@ local function targetSize(props): (number, number)
 	return 0, 0
 end
 
+-- Parchment-kit stand-ins: words for icons, warm paper or leather plates for the
+-- rest, so the lobby reads before its art is uploaded.
+Widgets.PARCHMENT_GLYPHS = {
+	pm_icon_crown = { "♛", "leather" },
+	pm_icon_add_friend = { "+", "ink" },
+	pm_button_add_friend = { "+", "ink" },
+	pm_button_x = { "✕", "ink" },
+	pm_button_check = { "✓", "ink" },
+	pm_lobby_gear = { "⚙", "ink" },
+}
+
+-- Coins and Gems plates: a coloured mark at the left where the art has its coin
+-- or gem, so the two read apart before upload.
+Widgets.PARCHMENT_BADGES = {
+	pm_lobby_coins = { "●", "gold" },
+	pm_lobby_gems = { "◆", "cyan" },
+}
+
+local function parchmentFallback(name: string, props, parent: Instance?)
+	local frame = Widgets.Make("Frame", { Name = name, BorderSizePixel = 0 }, parent)
+	local leather = name == "pm_lobby_enter" or string.find(name, "^pm_button_leather") ~= nil
+	if name == "pm_fill_xp" then
+		frame.BackgroundColor3 = Layout.Color("xp")
+		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, frame)
+		return apply(frame, props)
+	end
+	frame.BackgroundColor3 = Layout.Color(if leather then "leather" else "paper")
+	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, frame)
+	Widgets.Make("UIStroke", { Color = Layout.Color("paperEdge"), Thickness = 2 }, frame)
+	local badge = Widgets.PARCHMENT_BADGES[name]
+	if badge then
+		local mark = Widgets.Make("TextLabel", {
+			Name = "Badge",
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 10, 0.15, 0),
+			Size = UDim2.fromScale(0.3, 0.7),
+			Text = badge[1],
+			TextColor3 = Layout.Color(badge[2]),
+			TextScaled = true,
+			Font = Enum.Font.GothamBold,
+			ZIndex = (props and props.ZIndex or 1) + 1,
+		}, frame)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+	end
+	local glyph = Widgets.PARCHMENT_GLYPHS[name]
+	if glyph then
+		if string.sub(name, 1, 8) == "pm_icon_" then
+			frame.BackgroundTransparency = 1
+			frame:FindFirstChildOfClass("UIStroke"):Destroy()
+		end
+		local mark = Widgets.Make("TextLabel", {
+			Name = "Glyph",
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			Text = glyph[1],
+			TextColor3 = Layout.Color(glyph[2]),
+			TextScaled = true,
+			Font = Enum.Font.GothamBold,
+			ZIndex = (props and props.ZIndex or 1) + 1,
+		}, frame)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+	end
+	return apply(frame, props)
+end
+
 local function fallback(name: string, props, parent: Instance?)
+	if string.sub(name, 1, 3) == "pm_" then
+		return parchmentFallback(name, props, parent)
+	end
 	local glyph = Widgets.GLYPHS[name]
 	if glyph or string.sub(name, 1, 5) == "icon_" then
 		local label = Widgets.Make("TextLabel", {
@@ -210,6 +278,10 @@ function Widgets.Text(entry, props, parent: Instance?): TextLabel
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		ZIndex = 4,
 	}, parent)
+	local face = Layout.FontFace(entry.font)
+	if face then
+		label.FontFace = face
+	end
 	return apply(label, props) :: TextLabel
 end
 
@@ -240,12 +312,22 @@ function Widgets.Bar(cfg, parent)
 	end
 	local fillHeight = rect[4] - inset * 2
 	local maxWidth = cfg.maxWidth or (rect[3] - inset * 2)
-	local fill = Widgets.Fill(cfg.fillColor, {
+	local fillProps = {
+		Name = "Fill",
 		Position = UDim2.fromOffset(cfg.insetX or inset, inset),
 		Size = UDim2.fromOffset(maxWidth, fillHeight),
 		ZIndex = 5,
-	}, root)
-	return { root = root, fill = fill, maxWidth = maxWidth, height = fillHeight, inset = inset }
+	}
+	-- A sprite fill (9-sliced art, corners at their natural size) or a colour fill.
+	local fill = if cfg.fill
+		then Widgets.Sprite(cfg.fill, fillProps, root, 1)
+		else Widgets.Fill(cfg.fillColor, fillProps, root)
+	-- A sprite fill narrower than its two end caps would fold over itself, so it
+	-- hides below that width.
+	local sprite = cfg.fill and UiAssets.sprite(cfg.fill)
+	local slice = sprite and sprite.slice
+	local minWidth = if type(slice) == "table" and #slice == 4 then slice[1] + slice[3] else 1
+	return { root = root, fill = fill, maxWidth = maxWidth, height = fillHeight, inset = inset, minWidth = minWidth }
 end
 
 -- The selected-slot highlight: the sheet's glowing cyan slot frame (cfg.sprite)
@@ -313,7 +395,7 @@ function Widgets.SetBar(bar, fraction: number, instant: boolean?)
 	end
 	if instant then
 		bar.fill.Size = goal
-		bar.fill.Visible = width >= 1
+		bar.fill.Visible = width >= (bar.minWidth or 1)
 		return
 	end
 	-- Ease all the way to empty, then hide the rounded sliver that would remain.
@@ -322,7 +404,7 @@ function Widgets.SetBar(bar, fraction: number, instant: boolean?)
 	bar.tween = tween
 	tween.Completed:Connect(function(state)
 		if state == Enum.PlaybackState.Completed and bar.tween == tween then
-			bar.fill.Visible = width >= 1
+			bar.fill.Visible = width >= (bar.minWidth or 1)
 		end
 	end)
 	tween:Play()

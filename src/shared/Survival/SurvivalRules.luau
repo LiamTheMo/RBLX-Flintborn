@@ -11,6 +11,9 @@ local SurvivalRules = {}
 SurvivalRules.WALK_SPEED = 16
 SurvivalRules.SPRINT_SPEED = 24
 SurvivalRules.CROUCH_SPEED = 8
+-- Walking (or sprinting, or crouching) through knee-deep water is 30% slower
+-- (GDD §55); the Tidewalker perk's bonus applies on top.
+SurvivalRules.WATER_SPEED_MULTIPLIER = 0.7
 
 -- Meter values this close to an end are snapped to it, so float drift from many
 -- small ticks never leaves "almost empty" stamina that still allows a sprint.
@@ -65,16 +68,29 @@ SurvivalRules.PACE_WINDOW_SECONDS = 1
 -- (16) to sprinting (24), well clear of a walker's network jitter.
 SurvivalRules.SPRINT_PACE = 1.25
 
-export type Pace = { samples: { { distance: number, elapsed: number } }, allowed: number? }
+export type Pace = { samples: { { distance: number, elapsed: number } }, allowed: number?, walkPace: number? }
 
 function SurvivalRules.NewPace(): Pace
-	return { samples = {}, allowed = nil }
+	return { samples = {}, allowed = nil, walkPace = nil }
+end
+
+-- The multiplier water puts on every movement speed (1 on dry ground).
+function SurvivalRules.WaterFactor(inWater: boolean?, waterBonus: number?): number
+	if not inWater then
+		return 1
+	end
+	return SurvivalRules.WATER_SPEED_MULTIPLIER * (1 + (waterBonus or 0))
+end
+
+-- Plain walking pace right now, the yardstick for spotting unrequested sprints.
+function SurvivalRules.WalkPace(inWater: boolean?, waterBonus: number?): number
+	return SurvivalRules.WALK_SPEED * SurvivalRules.WaterFactor(inWater, waterBonus)
 end
 
 -- Feeds one server sample of horizontal travel (`distance` studs over `elapsed`
 -- seconds) while the server allows `allowed` studs/s. A change of allowance (a
--- sprint released, a crouch) restarts the window, so travel from just before it
--- never counts. Returns true when a full window was clearly faster than walking
+-- sprint released, a crouch) or of walking pace (stepping into or out of water)
+-- restarts the window, so travel from just before it never counts. Returns true when a full window was clearly faster than walking
 -- at `walkPace` (default WALK_SPEED): the player is sprinting whatever their
 -- client claims (GDD §24).
 function SurvivalRules.ObservePace(
@@ -84,8 +100,9 @@ function SurvivalRules.ObservePace(
 	allowed: number,
 	walkPace: number?
 ): boolean
-	if pace.allowed ~= allowed then
+	if pace.allowed ~= allowed or pace.walkPace ~= walkPace then
 		pace.allowed = allowed
+		pace.walkPace = walkPace
 		table.clear(pace.samples)
 	end
 	if elapsed <= 0 then
@@ -139,7 +156,9 @@ function SurvivalRules.StepFood(state: State, dt: number)
 	state.food = settle(math.max(0, state.food - dt / GameConstants.FOOD_DRAIN_SECONDS))
 end
 
-function SurvivalRules.MoveSpeed(state: State, moving: boolean): number
+-- The server-set walk speed: walk, sprint or crouch, times the hunger slow and the
+-- water slow (with the Tidewalker `waterBonus`).
+function SurvivalRules.MoveSpeed(state: State, moving: boolean, inWater: boolean?, waterBonus: number?): number
 	local speed = SurvivalRules.WALK_SPEED
 	if state.crouching then
 		speed = SurvivalRules.CROUCH_SPEED
@@ -149,7 +168,7 @@ function SurvivalRules.MoveSpeed(state: State, moving: boolean): number
 	if GameConstants.IsFoodSlowed(state.food) then
 		speed *= GameConstants.FOOD_SLOW_MULTIPLIER
 	end
-	return speed
+	return speed * SurvivalRules.WaterFactor(inWater, waterBonus)
 end
 
 function SurvivalRules.CanUseMedicine(state: State, now: number): boolean

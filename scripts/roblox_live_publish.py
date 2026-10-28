@@ -154,6 +154,12 @@ end
 print("ROBLOX_GITHUB_LIVE_PUBLISH_COMPLETE", changed, #specs)
 return "PUBLISHED"
 '''.replace("%SAVE_PLACE%", SAVE_PLACE)
+# Checks a batch's whole mapping and writes nothing: every batch is validated
+# before the first batch is applied.
+VALIDATE = r'''
+print("ROBLOX_GITHUB_LIVE_VALIDATED", #specs)
+return "VALIDATED"
+'''
 VERIFY = r'''
 for _, spec in ipairs(specs) do
   local obj = services[spec.path[1]]
@@ -200,18 +206,79 @@ def lua_string(s):
     return json.dumps(s, ensure_ascii=False)
 
 
-def make_script(specs, verify=False):
-    records = []
-    for path, kind, source in specs:
-        paths = "{" + ",".join(lua_string(p) for p in path) + "}"
-        records.append("{path=" + paths + ",kind=" + lua_string(kind) +
-                       ",source=" + lua_string(source) + "}")
-    retired = "{" + ",".join("{" + ",".join(lua_string(p) for p in path) + "}" for path in retired_paths(specs)) + "}"
-    script = PREAMBLE.replace("%SPECS%", "{\n" + ",\n".join(records) + "\n}") + (
-        VERIFY if verify else APPLY.replace("%RETIRED%", retired))
-    if len(script.encode("utf-8")) > 3000000:
-        raise ValueError("Cloud task too large; publishing safely needs batching")
+# Roblox refuses a Luau Execution task whose script is over 1 MiB ("Script too
+# large"), so the release goes up in batches that each stay well under it.
+MAX_TASK_BYTES = 900_000
+
+
+def spec_record(path, kind, source):
+    paths = "{" + ",".join(lua_string(p) for p in path) + "}"
+    return "{path=" + paths + ",kind=" + lua_string(kind) + ",source=" + lua_string(source) + "}"
+
+
+def make_script(specs, verify=False, validate=False, retired=None):
+    """One cloud task over `specs`: apply (the default), `validate` (check the
+    mapping, write nothing) or `verify` (compare after publishing). `retired`
+    lists the paths the apply task removes; by default every RETIRED path."""
+    records = [spec_record(path, kind, source) for path, kind, source in specs]
+    if retired is None:
+        retired = retired_paths(specs)
+    retired_lua = "{" + ",".join("{" + ",".join(lua_string(p) for p in path) + "}" for path in retired) + "}"
+    tail = VERIFY if verify else VALIDATE if validate else APPLY.replace("%RETIRED%", retired_lua)
+    script = PREAMBLE.replace("%SPECS%", "{\n" + ",\n".join(records) + "\n}") + tail
+    if len(script.encode("utf-8")) > MAX_TASK_BYTES:
+        raise ValueError("Cloud task too large; one script exceeds what a single task can carry")
     return script
+
+
+def plan_batches(specs):
+    """Splits the release into batches whose tasks each fit MAX_TASK_BYTES. Returns
+    a list of {validate, publish, verify} scripts; RETIRED paths are removed by
+    the last batch only, once everything else is in place."""
+    retired = retired_paths(specs)
+    overhead = max(len(make_script([], retired=retired).encode("utf-8")),
+                   len(make_script([], verify=True).encode("utf-8")))
+    groups, current, size = [], [], overhead
+    for spec in specs:
+        cost = len(spec_record(*spec).encode("utf-8")) + 2
+        if current and size + cost > MAX_TASK_BYTES:
+            groups.append(current)
+            current, size = [], overhead
+        current.append(spec)
+        size += cost
+    if current:
+        groups.append(current)
+    plan = []
+    for index, group in enumerate(groups):
+        last = index == len(groups) - 1
+        plan.append({
+            "validate": make_script(group, validate=True, retired=()),
+            "publish": make_script(group, retired=retired if last else ()),
+            "verify": make_script(group, verify=True, retired=()),
+            "count": len(group),
+        })
+    return plan
+
+
+# Both places publish at once, each in several batched tasks, so Open Cloud rate
+# limits (HTTP 429) are expected: wait as long as Roblox asks, or back off.
+RETRIES = 7
+MAX_RETRY_SECONDS = 60
+POLL_SECONDS = 10
+
+
+def retry_delay(retry, retry_after=None):
+    """Seconds to wait before retry number `retry` (0-based): 3, 6, 12 … capped at
+    MAX_RETRY_SECONDS, or Roblox's Retry-After when that is longer (a short
+    Retry-After alone burned every retry while the limit lasted minutes)."""
+    backoff = min(MAX_RETRY_SECONDS, 3 * (2 ** retry))
+    try:
+        asked = float(retry_after)
+    except (TypeError, ValueError):
+        return backoff
+    if 0 < asked <= MAX_RETRY_SECONDS:
+        return max(asked, backoff)
+    return backoff
 
 
 class Cloud:
@@ -227,7 +294,7 @@ class Cloud:
         if not url.startswith(self.base):
             raise ValueError("Unexpected Roblox API path")
         data = None if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")
-        for retry in range(4):
+        for retry in range(RETRIES):
             req = urllib.request.Request(url, data=data, method=method, headers={
                 "x-api-key": self.key, "Content-Type": "application/json"
             })
@@ -235,8 +302,8 @@ class Cloud:
                 with urllib.request.urlopen(req, timeout=60) as response:
                     return json.loads(response.read().decode("utf-8"))
             except urllib.error.HTTPError as exc:
-                if exc.code in (429, 500, 502, 503, 504) and retry < 3:
-                    time.sleep(3 * (2 ** retry))
+                if exc.code in (429, 500, 502, 503, 504) and retry < RETRIES - 1:
+                    time.sleep(retry_delay(retry, exc.headers.get("Retry-After")))
                     continue
                 raise RuntimeError(f"Roblox API HTTP {exc.code}: " +
                                    exc.read(800).decode("utf-8", errors="replace")) from None
@@ -253,7 +320,8 @@ class Cloud:
         while result.get("state") not in ("COMPLETE", "FAILED", "CANCELLED"):
             if time.monotonic() - start > 350:
                 raise RuntimeError("Luau execution timed out; check task state before retrying")
-            time.sleep(5)
+            # Status polls count against the same rate limit as task creation.
+            time.sleep(POLL_SECONDS)
             result = self.request("GET", url)
         if result["state"] != "COMPLETE":
             raise RuntimeError("Luau task failed: " + str(result.get("error", result["state"])))
@@ -267,18 +335,27 @@ def main():
     modes.add_argument("--deploy", action="store_true")
     args = parser.parse_args()
     records = spec_list()
-    publish = make_script(records)
-    verify = make_script(records, verify=True)
+    batches = plan_batches(records)
     json_targets = sorted(path for path, (file, _) in discover().items() if is_json_module(file))
     print(f"Validated {len(records)} mapped scripts ({len(json_targets)} JSON modules "
-          "published as Luau tables); no full-place upload", flush=True)
+          f"published as Luau tables) in {len(batches)} cloud task batch(es); no full-place upload",
+          flush=True)
     if args.check:
         for path in json_targets:
             print("JSON module -> Luau table: " + "/".join(path))
         return
     cloud = Cloud()
-    cloud.task(publish)
-    cloud.task(verify)
+    # Every batch's mapping is checked before anything is written.
+    for batch in batches:
+        cloud.task(batch["validate"])
+    for index, batch in enumerate(batches):
+        try:
+            cloud.task(batch["publish"])
+        except RuntimeError as error:
+            raise RuntimeError(f"batch {index + 1} of {len(batches)} failed after {index} were "
+                               f"saved; re-run the deploy to finish ({error})") from None
+    for batch in batches:
+        cloud.task(batch["verify"])
     print("Post-publication source verification PASSED", flush=True)
 
 

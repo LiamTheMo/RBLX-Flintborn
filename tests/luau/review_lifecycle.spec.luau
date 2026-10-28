@@ -268,6 +268,10 @@ TravelService.ToLobby = function(players)
 	return true
 end
 local SpawnService = require(Server.Services.SpawnService)
+local worldReady = true
+SpawnService.WorldReady = function()
+	return worldReady
+end
 SpawnService.Pick = function()
 	return "spawn"
 end
@@ -359,6 +363,22 @@ end
 
 -- Cases (the shutdown case runs last: a shutdown cannot be undone) ---------------
 
+test("Play waits for the island to finish building, losing nothing (GDD §54)", function()
+	local player = arrive(100, stacks(2))
+	worldReady = false
+	local early = play(player, "req-100-a")
+	advance(2)
+	expectEq(early.ok, false, "no run while the map builds")
+	expectEq(early.reason, "WorldLoading", "the player is told the island is loading")
+	expectEq(WorldAdmissionService.GetState(player), "WorldMainMenuReady", "still on the menu")
+	expectEq(storedCount(100), 2, "the loadout stays reserved")
+	worldReady = true
+	local later = play(player, "req-100-b")
+	advance(5)
+	expectEq(later.ok, true, "Play works once the map is ready")
+	expectEq(started[player] and #started[player], 2, "with the reserved loadout")
+end)
+
 test("a Play whose save failed keeps the reservation, so the next Play brings the loadout", function()
 	local player = arrive(101, stacks(3))
 	backing.failNext = 5
@@ -428,15 +448,15 @@ test("items that do not fit the run are saved back to the lobby at once", functi
 	play(player, "req-105")
 	advance(1)
 	expectEq(WorldAdmissionService.GetState(player), "ActiveRun", "in the run")
-	expectEq(#stored(105).lobbyBackpack.slots, 11, "the 11 overflow items are already stored")
+	-- 70 stacks into 6 hotbar + 50 backpack slots leave 14 behind.
+	expectEq(#stored(105).lobbyBackpack.slots, 14, "the 14 overflow items are already stored")
 end)
 
-test("materials never stay in the lobby backpack: banked on load and after every write", function()
-	-- A save from before GDD §45 still holds materials in its backpack.
+test("lobby backpack materials stay put on load and after every write (GDD §53)", function()
 	local legacy = ProfileSchema.Default(0)
-	legacy.vault.materials.Iron = 995
+	legacy.vault.materials.IronOre = 995
 	legacy.lobbyBackpack.slots = {
-		{ catalogId = "Iron", quantity = 20 },
+		{ catalogId = "IronOre", quantity = 20 },
 		{ instanceId = "spear-301", catalogId = "StoneSpear", ownerId = 1 },
 	}
 	backing._data[ProfileStore.KeyFor(301)] = legacy
@@ -445,23 +465,105 @@ test("materials never stay in the lobby backpack: banked on load and after every
 	Players.PlayerAdded:Fire(player)
 	advance(2)
 	local profile = ProfileService.GetProfile(player)
-	expectEq(profile.vault.materials.Iron, 1000, "legacy backpack Iron banked on load")
-	expectEq(profile.vault.lastOverflow.deleted.Iron, 15, "the overflow was deleted")
-	expectEq(#profile.lobbyBackpack.slots, 1, "only the spear stays in the backpack")
+	expectEq(profile.vault.materials.IronOre, 995, "nothing banked on load")
+	expectEq(profile.vault.lastOverflow, nil, "and nothing deleted")
+	expectEq(#profile.lobbyBackpack.slots, 2, "the Iron Ore waits in the backpack")
 
-	-- Any operation (a trade, a crash recovery, a rollback) that lands a material in
-	-- the backpack ends with it banked.
 	local ok = ProfileService.RunOperation(player, "test-bank-301", "Test", function(working)
 		table.insert(working.lobbyBackpack.slots, { catalogId = "AncientEmber", quantity = 3 })
 	end)
 	expect(ok, "operation committed")
-	expectEq(profile.vault.materials.AncientEmber, 3, "banked by the same write")
-	expectEq(#profile.lobbyBackpack.slots, 1, "still only the spear")
+	expectEq(profile.vault.materials.AncientEmber, nil, "an operation banks nothing")
+	expectEq(#profile.lobbyBackpack.slots, 3, "the Ember stays in the backpack")
 	ProfileService.Mutate(player, function(live)
 		table.insert(live.lobbyBackpack.slots, { catalogId = "Wood", quantity = 4 })
 	end)
-	expectEq(profile.vault.materials.Wood, 4, "a direct mutation banks too")
-	expectEq(#profile.lobbyBackpack.slots, 1, "the backpack holds no material")
+	expectEq(profile.vault.materials.Wood, nil, "a direct mutation banks nothing")
+	expectEq(#profile.lobbyBackpack.slots, 4, "the Wood stays in the backpack")
+end)
+
+-- The run inventory's stack of a material, or nil.
+local function runStack(player, catalogId: string)
+	for _, entry in InventoryService.Items(player) do
+		if entry.instanceId == nil and entry.catalogId == catalogId then
+			return entry
+		end
+	end
+	return nil
+end
+
+test("a Play tags the materials it carries in, and escrow keeps each stack's own tag (GDD §53)", function()
+	local player = arrive(106, {
+		{ catalogId = "Wood", quantity = 60 },
+		{ instanceId = "sword-106", catalogId = "StoneSword", ownerId = 1 },
+		{ catalogId = "Wood", quantity = 40 },
+		{ catalogId = "IronOre", quantity = 7 },
+	})
+	play(player, "req-106")
+	advance(1)
+	expectEq(WorldAdmissionService.GetState(player), "ActiveRun", "in the run")
+	local wood = runStack(player, "Wood")
+	expectEq(wood and wood.quantity, 100, "both Wood stacks merge into one")
+	expectEq(wood and wood.carried, 100, "all of it carried in")
+	expectEq(runStack(player, "IronOre").carried, 7, "Iron Ore carried in")
+	local run = stored(106).progression.currentRun
+	expectEq(run.carriedIn, nil, "no per-run total: the stacks are the record")
+	local loadoutWood = 0
+	for _, item in run.loadout do
+		if item.catalogId == "Wood" then
+			loadoutWood += item.carried or 0
+		elseif item.catalogId == "StoneSword" then
+			expectEq(item.carried, nil, "gear is never tagged")
+		end
+	end
+	expectEq(loadoutWood, 100, "the saved loadout keeps the tags for a crash")
+
+	-- Gathered Wood joins the stack; a checkpoint keeps the split.
+	InventoryService.Add(player, { catalogId = "Wood", quantity = 30 })
+	expectEq(runStack(player, "Wood").quantity, 130, "130 Wood")
+	expectEq(runStack(player, "Wood").carried, 100, "still only 100 carried")
+	advance(5)
+	local ok, checkpoint = CheckpointStore.Read(106)
+	local checkpointed = nil
+	for _, item in (ok and checkpoint and checkpoint.items) or {} do
+		if item.catalogId == "Wood" then
+			checkpointed = item
+		end
+	end
+	expectEq(checkpointed and checkpointed.carried, 100, "the checkpoint keeps the tag")
+
+	-- A safe kick escrows the stacks as they are: the 30 gathered stay eligible.
+	expect(MaintenanceService.Escrow(player), "escrowed")
+	local escrowed = nil
+	for _, receipt in ProfileService.GetProfile(player).receipts.maintenance do
+		for _, item in receipt.items do
+			if item.catalogId == "Wood" then
+				escrowed = item
+			end
+		end
+	end
+	expectEq(escrowed and escrowed.quantity, 130, "all 130 Wood escrowed")
+	expectEq(escrowed and escrowed.carried, 100, "with only its own 100 carried")
+	leave(player)
+	advance(5)
+
+	-- The next Play brings the escrow back with its tags, beside 5 Wood from the lobby.
+	local saved = stored(106)
+	saved.transit = {
+		reservationId = "res-106b",
+		items = { { catalogId = "Wood", quantity = 5 } },
+		createdAt = 0,
+		status = "Reserved",
+	}
+	local again = newPlayer(106, "res-106b")
+	table.insert(Players._list, again)
+	Players.PlayerAdded:Fire(again)
+	advance(2)
+	play(again, "req-106b")
+	advance(1)
+	expectEq(WorldAdmissionService.GetState(again), "ActiveRun", "back in a run")
+	expectEq(runStack(again, "Wood").quantity, 135, "130 escrowed + 5 from the lobby")
+	expectEq(runStack(again, "Wood").carried, 105, "the gathered 30 are still not carried")
 end)
 
 test("a shutdown racing a Play never loses the reserved loadout", function()

@@ -67,7 +67,7 @@ end
 local function starterItems()
 	local items = {
 		{ catalogId = "Wood", quantity = 300 },
-		{ catalogId = "Arrow", quantity = 40 },
+		{ catalogId = "FlintArrow", quantity = 40 },
 		{ catalogId = "Stone", quantity = 12 },
 	}
 	for index, catalogId in { "IronHead", "IronChest", "IronLegs", "HideHead", "HideChest", "HideLegs" } do
@@ -138,7 +138,7 @@ test("a run start never drops items that do not fit (> 59 entries, over-cap stac
 	end
 	table.insert(items, { catalogId = "Wood", quantity = 2500 })
 	table.insert(items, { catalogId = "Wood", quantity = 700 })
-	table.insert(items, { catalogId = "Berries", quantity = 80 })
+	table.insert(items, { catalogId = "Redberry", quantity = 80 })
 	table.insert(items, { catalogId = "MysteryRelic" }) -- unknown, non-stackable
 	local inventory, leftovers = InventoryRules.FromItems(items)
 
@@ -182,7 +182,7 @@ end
 local function carried()
 	return {
 		{ instanceId = "s1", catalogId = "IronSword", ownerId = 1 },
-		{ catalogId = "Iron", quantity = 30 },
+		{ catalogId = "IronOre", quantity = 30 },
 	}
 end
 

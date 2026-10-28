@@ -1,6 +1,9 @@
--- Hotbar (9 slots, keys 1–9) and backpack (50 slots) for the run inventory
--- (GDD §25.4, §25.4.1). Tapping a hotbar slot equips a tool or weapon, uses a
--- consumable, or places a workbench. In the backpack, tap one slot then another
+-- Hotbar (6 slots, keys 1–6) and backpack (50 slots) for the run inventory
+-- (GDD §25.4, §25.4.1). Tapping a hotbar slot (or pressing its key) equips a tool or weapon, uses a
+-- consumable, places a workbench, readies a Fire Bomb (the attack input or touch
+-- Attack button then throws it) or sets a Breaching Charge on the wall or door in
+-- the crosshair (with none in reach it is held instead, and the attack input sets
+-- it once one is). In the backpack, tap one slot then another
 -- to move or swap (no precise dragging). Server snapshots are the only truth.
 -- World place only. With the new HUD (HudMode) its own hotbar strip draws the
 -- slots, so this strip only shows while the backpack is open (to move items
@@ -9,16 +12,19 @@
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local InventoryController = {}
 
@@ -92,6 +98,53 @@ local function slotAt(area: string, index: number)
 	return nil
 end
 
+-- Where the player aims, as a direction from the head: through the mouse on
+-- desktop, otherwise through the centre of the screen (touch and gamepad aim with
+-- the camera). Nil without a character.
+local function aimDirection(): Vector3?
+	local character = player.Character
+	local head = character and character:FindFirstChild("Head")
+	local camera = workspace.CurrentCamera
+	if head == nil or camera == nil then
+		return nil
+	end
+	local screen = if Theme.UsingMouse() then UserInputService:GetMouseLocation() else camera.ViewportSize / 2
+	local ray = camera:ViewportPointToRay(screen.X, screen.Y)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { character }
+	local hit = workspace:Raycast(ray.Origin, ray.Direction * 200, params)
+	local direction = (if hit then hit.Position else ray.Origin + ray.Direction * 200) - head.Position
+	return if direction.Magnitude > 0.5 then direction.Unit else camera.CFrame.LookVector
+end
+
+-- Fire Bombs are equipped (the attack input throws them); a Breaching Charge is
+-- set on the targeted wall or door at once. The server checks everything.
+local function activateSiege(index: number, kind: string)
+	if kind == "Placed" then
+		local ok, reason = invoke("PlaceCharge", index, aimDirection())
+		if ok then
+			toast(SiegeRules.Message("ChargeSet"))
+		elseif reason == "NoTarget" and InventoryController.Snapshot.equipped ~= index then
+			-- Nothing in reach: hold it, so the attack input (or Attack button) sets it.
+			invoke("EquipSlot", index)
+			toast(SiegeRules.Message("ChargeReady"))
+		else
+			toast(SiegeRules.Message(reason))
+		end
+		return
+	end
+	local equipping = InventoryController.Snapshot.equipped ~= index
+	local ok, reason = invoke("EquipSlot", index)
+	if not ok then
+		toast("Can't equip that (" .. tostring(reason) .. ")")
+	elseif equipping then
+		toast(SiegeRules.Message("BombReady"))
+	end
+end
+
+-- Uses hotbar slot `index` as its key does: equip, use, place or ready it. The
+-- HUD hotbar's taps call this too (yields on the server call).
 local function activateHotbar(index: number)
 	local slot = slotAt("hotbar", index)
 	if slot == nil then
@@ -102,8 +155,10 @@ local function activateHotbar(index: number)
 	if def and def.family == ItemCatalog.Families.Consumable then
 		local ok, reason = invoke("UseConsumable", HttpService:GenerateGUID(false), slot.catalogId)
 		if not ok then
-			toast("Can't use that now (" .. tostring(reason) .. ")")
+			toast("Can't use that now: " .. Reasons.Text(reason))
 		end
+	elseif def and def.siege then
+		activateSiege(index, def.siege.kind)
 	elseif def and def.placeable == "ExtractionRune" then
 		local ok, reason = invoke("PlaceRune", index)
 		toast(ok and "Rune placed: 30 s to extract." or ("Can't place a rune here (" .. tostring(reason) .. ")"))
@@ -381,6 +436,8 @@ local function build()
 	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.toast)
 end
+
+InventoryController.ActivateHotbar = activateHotbar
 
 function InventoryController.ToggleBackpack()
 	ui.backpack.Visible = not ui.backpack.Visible

@@ -1,6 +1,7 @@
--- The lobby screen (GDD §11, §25): the profile panel with level and XP, the
--- navigation buttons, Coins and Gems, the party panel, the Enter button and the
--- settings gear, built by Hud/LobbyHud from HudLayout.json's "lobby" section.
+-- The lobby screen (GDD §11, §25; docs/ui/LobbyScreen.md): the profile with level
+-- and XP, the navigation tiles, Coins, Gems and Settings, the party panel and the
+-- Enter button with the server dropdown, built by Hud/LobbyHud from
+-- HudLayout.json's "lobby" section.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
 -- If the HUD fails to build, the lobby falls back to those older visuals.
 --
@@ -8,6 +9,7 @@
 -- reads the deploy preview and runs party actions; the buttons open the Vault,
 -- Market (Quests and Shop tabs), Forge, Trade, Progress and Settings panels.
 
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SocialService = game:GetService("SocialService")
@@ -31,7 +33,7 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local LobbyHudController = {}
 
--- How long a status message replaces "Choose server" before it returns.
+-- How long a status message stays in the status strip.
 LobbyHudController.STATUS_SECONDS = 6
 
 local player = Players.LocalPlayer
@@ -109,6 +111,19 @@ local NAV_ACTIONS = {
 	end,
 }
 
+-- How far down the Roblox top bar (menu and chat buttons) reaches into this
+-- ScreenGui, in screen pixels.
+local function topInset(): number
+	local ok, inset = pcall(function()
+		return GuiService.TopbarInset.Max.Y
+	end)
+	if not ok or type(inset) ~= "number" then
+		-- Older clients without TopbarInset: the classic GUI inset.
+		inset = GuiService:GetGuiInset().Y
+	end
+	return math.max(0, inset - gui.AbsolutePosition.Y)
+end
+
 local function applyScale()
 	local size = gui.AbsoluteSize
 	local scale = HudModel.HudScale(
@@ -122,7 +137,9 @@ local function applyScale()
 	)
 	uiScale.Scale = scale
 	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
-	hud:Fit(size.Y / scale)
+	local top = topInset() / scale
+	hud:Fit(size.X / scale, size.Y / scale, top, scale)
+	popups:SetScreen(size.Y / scale, top, scale)
 end
 
 local refreshParty
@@ -162,13 +179,13 @@ local function refreshCurrency()
 	hud:SetCurrency(player:GetAttribute("Coins"), player:GetAttribute("Gems"))
 end
 
--- The server line between messages: "Choose server", or the game-update notice
+-- The status strip between messages: empty, or the game-update notice
 -- while it applies.
 local function idleLine(): string?
 	return if player:GetAttribute("MaintenanceNotice") then LobbyController.MAINTENANCE_TEXT else nil
 end
 
--- Shows a status message on the server line for a few seconds.
+-- Shows a status message in the status strip for a few seconds.
 local function showStatus(text: string)
 	statusToken += 1
 	local token = statusToken
@@ -295,6 +312,12 @@ local function build()
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = 1
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- The layout uses the master's full-screen coordinates and keeps clear of the
+	-- top bar itself (LobbyHud:Fit); device cut-outs (notches) stay excluded.
+	gui.IgnoreGuiInset = true
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+	end)
 	root = Instance.new("Frame")
 	root.Name = "Root"
 	root.BackgroundTransparency = 1
@@ -304,13 +327,12 @@ local function build()
 	uiScale.Parent = root
 	hud = LobbyHud.new(root, layout, steady)
 	popups = LobbyPopups.new(root, layout)
-	-- XP pop-ups appear beside the navigation, under the profile panel.
+	-- XP pop-ups appear under the profile panel, above the navigation tiles.
 	local host = Instance.new("Frame")
 	host.Name = "XpPopups"
 	host.BackgroundTransparency = 1
-	host.Position = UDim2.fromOffset(150, 120)
-	host.Size = UDim2.fromOffset(320, 120)
 	host.Parent = root
+	hud:AddTopWidget(host, { anchor = { 0, 0 }, pos = { 0, 48, 0, 232 }, size = { 320, 120 } })
 	ProgressionController.MountPopups(host)
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
@@ -320,6 +342,9 @@ local function start()
 	build()
 	applyScale()
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(applyScale)
+	pcall(function()
+		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(applyScale)
+	end)
 	player:GetAttributeChangedSignal("UiScale"):Connect(function()
 		task.defer(applyScale)
 	end)
