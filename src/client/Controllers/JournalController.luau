@@ -56,10 +56,14 @@ local function claim(questId: string)
 	local token = session
 	panel:SetClaiming(true)
 	local ok, reason = invoke("QuestClaim", questId)
+	-- Always released, even if the Journal closed meanwhile.
+	panel:SetClaiming(false)
 	if token ~= session then
 		return
 	end
-	panel:SetClaiming(false)
+	if ok then
+		panel:MarkClaimed(questId)
+	end
 	panel:SetMessage(if ok then "Reward claimed." else Reasons.Text(reason))
 	refresh(token)
 end
@@ -71,6 +75,7 @@ function JournalController.Toggle()
 	end
 	session += 1
 	local token = session
+	panel:SetClaiming(false)
 	panel:SetMessage("")
 	panel.screen:SetOpen(true)
 	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)

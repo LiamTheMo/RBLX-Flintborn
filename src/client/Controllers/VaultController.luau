@@ -1,39 +1,49 @@
--- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53). The Vault button on the
--- navigation bar opens the panel: click a backpack item to deposit it or a vault
--- item to withdraw it. A vault material withdraws the amount picked above the
--- materials list (1, 10, 100 or all) into the backpack, to deploy with it. A
--- material deposit the vault cannot hold in full asks first how much it would
--- delete (GDD §53). The latest extraction receipt shows on arrival. The Backpack key (Tab by default,
--- GDD §46) opens and closes the panel, as it opens the backpack in a run.
--- Lobby place only.
+-- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53) in the parchment
+-- Inventory & Vault window (Hud/InventoryPanel). The Inventory and Vault tiles,
+-- or the Backpack key (Tab by default, GDD §46), open it: the lobby backpack on
+-- the left, the vault's items and materials on the right. Choose a slot, then
+-- STORE (or →) puts a backpack item in the vault and TAKE (or ←) brings a vault
+-- entry out; a vault material comes out in the amount picked (1, 10, 100 or all)
+-- and deploys with the backpack. STORE ALL vaults the whole backpack. A material
+-- deposit the vault cannot hold in full asks first how much it would delete
+-- (GDD §53). The latest extraction receipt shows on arrival. Lobby place only.
 
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local Theme = require(script.Parent.Parent.Ui.Theme)
-local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local InventoryPanel = require(script.Parent.Parent.Hud.InventoryPanel)
 local Binds = require(script.Parent.Parent.Ui.Binds)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local VaultController = {}
 
--- Amounts a click on a vault material withdraws; false means the whole stack.
+-- Amounts the picker offers for a vault material; false means the whole stack.
 VaultController.MATERIAL_STEPS = { 1, 10, 100, false }
+VaultController.STEP_LABELS = { "×1", "×10", "×100", "All" }
+-- Orders the sort button cycles through.
+VaultController.SORTS = { "Saved", "Name", "Count" }
 
 local player = Players.LocalPlayer
 local ui = {}
+local panel = nil
+local view = nil
+-- The chosen slot: {paneId = "left" | "right", id}; ids are "b<index>" for the
+-- backpack, "i<index>" for vault items and "m<catalogId>" for vault materials.
+local selected = nil
+local stepIndex = 2
+local sortIndex = 1
+local busy = false
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local CLOSE_ACTION = "FlintbornVaultClose"
+
+local make = Theme.Make
 
 local function invoke(name: string, ...)
 	local ok, success, reason, detail = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
@@ -43,291 +53,244 @@ local function invoke(name: string, ...)
 	return success, reason, detail
 end
 
-local function clear(frame)
-	for _, child in frame:GetChildren() do
-		if not child:IsA("UIListLayout") then
-			child:Destroy()
+local function asItem(entry)
+	local def = ItemCatalog.Get(entry.catalogId)
+	return {
+		catalogId = entry.catalogId,
+		name = entry.name or (def and def.name) or entry.catalogId,
+		quantity = entry.quantity,
+		rarity = entry.rarity or (def and def.rarity),
+		permanent = entry.permanent,
+		qualityRoll = entry.qualityRoll,
+	}
+end
+
+-- Entries in the picked order (each keeps its own id).
+local function sorted(entries)
+	local mode = VaultController.SORTS[sortIndex]
+	if mode == "Name" then
+		table.sort(entries, function(a, b)
+			return a.item.name < b.item.name
+		end)
+	elseif mode == "Count" then
+		table.sort(entries, function(a, b)
+			return (a.item.quantity or 1) > (b.item.quantity or 1)
+		end)
+	end
+	return entries
+end
+
+local function chosen()
+	if selected == nil or view == nil then
+		return nil
+	end
+	local kind, key = string.sub(selected.id, 1, 1), string.sub(selected.id, 2)
+	if kind == "b" then
+		local entry = view.backpack[tonumber(key)]
+		return entry and { kind = "backpack", index = tonumber(key), entry = entry }
+	elseif kind == "i" then
+		local entry = view.items[tonumber(key)]
+		return entry and { kind = "item", index = tonumber(key), entry = entry }
+	end
+	for _, material in view.materials do
+		if material.catalogId == key then
+			return { kind = "material", entry = material }
 		end
 	end
-end
-
-local function row(parent, text: string, color: Color3, onClick)
-	local b = make("TextButton", {
-		Text = text,
-		Size = UDim2.new(1, 0, 0, 26),
-		BackgroundColor3 = Color3.fromRGB(46, 38, 30),
-		TextColor3 = color,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 13,
-	}, parent)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-	if onClick then
-		b.Activated:Connect(onClick)
-	else
-		b.AutoButtonColor = false
-	end
-end
-
-local function itemText(item): string
-	return (item.permanent and "★ " or "") .. item.name .. (item.quantity and (" ×" .. item.quantity) or "")
+	return nil
 end
 
 local refresh
 
--- The picked withdrawal amount (an entry of MATERIAL_STEPS; false = all).
-local materialStep: number | boolean = 10
-
-local function act(name: string, ...)
-	local ok, reason = invoke(name, ...)
-	ui.status.Text = if ok then "Done." else ("Not possible: " .. Reasons.Text(reason))
-	refresh()
+local function report(ok: boolean, reason: any, done: string)
+	panel:SetStatus(if ok then done else ("Not possible: " .. Reasons.Text(reason)))
 end
 
--- The deposit waiting for "deposit anyway": {index, catalogId, quantity}.
-local pendingDeposit = nil
-
-local function hideConfirm()
-	pendingDeposit = nil
-	ui.confirm.Visible = false
-end
-
--- Deposits a backpack slot. When the vault cannot hold all of a material, asks
--- first how much would be deleted.
-local function deposit(index: number, item)
-	hideConfirm()
+-- Deposits backpack slot `index`. A material the vault cannot hold in full asks
+-- first how much would be deleted (GDD §53); "deposit anyway" only goes through
+-- while that slot still holds the same stack.
+local function deposit(index: number)
+	local item = view and view.backpack[index]
+	if item == nil or busy then
+		return
+	end
+	busy = true
 	local ok, reason, lost = invoke("VaultDeposit", index)
+	busy = false
 	if not ok and reason == "VaultWouldOverflow" and type(lost) == "number" then
-		pendingDeposit = { index = index, catalogId = item.catalogId, quantity = item.quantity, lost = lost }
-		ui.confirmText.Text = ("Your vault is nearly full: %d %s would be deleted. Deposit anyway?"):format(
-			lost,
-			item.name
+		panel:Confirm(
+			("Your vault is nearly full: %d %s would be deleted. Deposit anyway?"):format(lost, item.name),
+			"DEPOSIT",
+			function()
+				local latest = invoke("VaultSnapshot")
+				local now = type(latest) == "table" and latest.backpack[index] or nil
+				if type(now) ~= "table" or now.catalogId ~= item.catalogId or now.quantity ~= item.quantity then
+					panel:SetStatus("Your backpack changed; nothing was deposited.")
+					refresh()
+					return
+				end
+				report(invoke("VaultDeposit", index, item.catalogId, lost), "Stored " .. item.name .. ".")
+				selected = nil
+				refresh()
+			end
 		)
-		ui.confirm.Visible = true
-		ui.status.Text = ""
 		return
 	end
-	ui.status.Text = if ok then "Done." else ("Not possible: " .. Reasons.Text(reason))
+	report(ok, reason, "Stored " .. item.name .. ".")
+	selected = nil
 	refresh()
 end
 
--- "Deposit anyway": only while that slot still holds the same stack.
-local function confirmDeposit()
-	local pending = pendingDeposit
-	hideConfirm()
-	local view = pending and invoke("VaultSnapshot")
-	local item = type(view) == "table" and view.backpack[pending.index] or nil
-	if type(item) ~= "table" or item.catalogId ~= pending.catalogId or item.quantity ~= pending.quantity then
-		ui.status.Text = "Your backpack changed; nothing was deposited."
-		refresh()
+local function withdraw()
+	local choice = chosen()
+	if choice == nil or busy then
 		return
 	end
-	act("VaultDeposit", pending.index, pending.catalogId, pending.lost)
+	busy = true
+	local ok, reason
+	if choice.kind == "item" then
+		ok, reason = invoke("VaultWithdrawItem", choice.index)
+	elseif choice.kind == "material" then
+		local step = VaultController.MATERIAL_STEPS[stepIndex]
+		local amount = if step then math.min(step, choice.entry.quantity) else choice.entry.quantity
+		ok, reason = invoke("VaultWithdrawMaterial", choice.entry.catalogId, amount)
+	end
+	busy = false
+	report(ok, reason, "Moved to your backpack; it goes with you on Play.")
+	if ok then
+		selected = nil
+	end
+	refresh()
+end
+
+-- STORE ALL: every backpack slot, last first so earlier indices stay put. A
+-- material that would overflow is left for its own confirmation.
+local function storeAll()
+	if view == nil or busy then
+		return
+	end
+	busy = true
+	local stored, held = 0, 0
+	for index = #view.backpack, 1, -1 do
+		local ok, reason = invoke("VaultDeposit", index)
+		if ok then
+			stored += 1
+		elseif reason == "VaultWouldOverflow" then
+			held += 1
+		end
+	end
+	busy = false
+	selected = nil
+	panel:SetStatus(
+		if held > 0
+			then ("Stored %d. %d would overflow the vault: store those one by one."):format(stored, held)
+			else ("Stored %d."):format(stored)
+	)
+	refresh()
+end
+
+-- Shows the detail strip, buttons and picker for the current choice.
+local function showChoice()
+	local choice = chosen()
+	if choice == nil then
+		selected = nil
+	end
+	panel:Select(selected)
+	panel:SetDetail(choice and asItem(choice.entry), "Choose an item to store or take.")
+	local fromVault = choice ~= nil and choice.kind ~= "backpack"
+	local fromBackpack = choice ~= nil and choice.kind == "backpack"
+	panel:SetActions({
+		{ "TAKE", fromVault, withdraw },
+		{
+			"STORE",
+			fromBackpack,
+			function()
+				deposit(choice.index)
+			end,
+		},
+	})
+	panel:SetMiddle({
+		fromBackpack,
+		function()
+			deposit(choice.index)
+		end,
+	}, { fromVault, withdraw }, { "STORE\nALL", view ~= nil and #view.backpack > 0, storeAll })
+	if choice and choice.kind == "material" then
+		panel:SetAmounts(VaultController.STEP_LABELS, stepIndex, function(index)
+			stepIndex = index
+			showChoice()
+		end)
+	else
+		panel:SetAmounts(nil)
+	end
 end
 
 function refresh()
-	local view = invoke("VaultSnapshot")
-	if type(view) ~= "table" then
-		ui.status.Text = "Your data is still loading."
+	local latest = invoke("VaultSnapshot")
+	if type(latest) ~= "table" then
+		panel:SetStatus("Your data is still loading.")
 		return
 	end
-	clear(ui.backpack)
-	clear(ui.items)
-	clear(ui.materials)
-	ui.backpackTitle.Text = ("Backpack: goes with you on Play (%d/%d) · click to vault"):format(
-		#view.backpack,
-		view.backpackCapacity
-	)
-	ui.itemsTitle.Text = ("Vault: safe forever (%d/%d) · click to withdraw"):format(#view.items, view.itemCapacity)
-	for index, item in view.backpack do
-		row(ui.backpack, itemText(item), Rarity.Colors[item.rarity] or Color3.new(1, 1, 1), function()
-			deposit(index, item)
-		end)
+	view = latest
+	local left, right = {}, {}
+	for index, entry in view.backpack do
+		table.insert(left, { id = "b" .. index, item = asItem(entry) })
 	end
-	for index, item in view.items do
-		row(ui.items, itemText(item), Rarity.Colors[item.rarity] or Color3.new(1, 1, 1), function()
-			act("VaultWithdrawItem", index)
-		end)
+	for index, entry in view.items do
+		table.insert(right, { id = "i" .. index, item = asItem(entry) })
 	end
-	-- Withdrawn materials join the backpack and deploy with it (GDD §53).
+	local materials = {}
 	for _, material in view.materials do
-		local amount = if materialStep then math.min(materialStep, material.quantity) else material.quantity
-		row(
-			ui.materials,
-			("%s ×%d — take %d"):format(material.name, material.quantity, amount),
-			Color3.fromRGB(230, 220, 200),
-			function()
-				act("VaultWithdrawMaterial", material.catalogId, amount)
-			end
-		)
+		table.insert(materials, { id = "m" .. material.catalogId, item = asItem(material) })
 	end
-	for _, lost in view.overflow or {} do
-		row(
-			ui.materials,
-			("Vault full — deleted %s ×%d"):format(lost.name, lost.quantity),
-			Color3.fromRGB(235, 120, 100),
-			nil
-		)
-	end
-end
-
-local function column(parent, x: number, title: string, listTop: number?)
-	local label = make("TextLabel", {
-		Text = title,
-		Position = UDim2.new(x, 4, 0, 34),
-		Size = UDim2.new(1 / 3, -8, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		TextColor3 = Color3.fromRGB(255, 220, 170),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-	}, parent)
-	local top = listTop or 58
-	local list = make("ScrollingFrame", {
-		Position = UDim2.new(x, 4, 0, top),
-		Size = UDim2.new(1 / 3, -8, 1, -(top + 32)),
-		BackgroundTransparency = 1,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(),
-		ScrollBarThickness = 6,
-	}, parent)
-	make("UIListLayout", { Padding = UDim.new(0, 3) }, list)
-	return label, list
-end
-
--- The 1 / 10 / 100 / All picker above the vault materials list.
-local function buildSteps(parent, x: number, y: number)
-	local bar = make("Frame", {
-		Position = UDim2.new(x, 4, 0, y),
-		Size = UDim2.new(1 / 3, -8, 0, 24),
-		BackgroundTransparency = 1,
-	}, parent)
-	make("UIListLayout", {
-		FillDirection = Enum.FillDirection.Horizontal,
-		Padding = UDim.new(0, 4),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, bar)
-	local buttons = {}
-	local function paint()
-		for step, button in buttons do
-			local picked = step == materialStep
-			button.BackgroundColor3 = if picked then Color3.fromRGB(120, 90, 50) else Color3.fromRGB(46, 38, 30)
+	panel:SetHeader("left", ("INVENTORY %d/%d"):format(#view.backpack, view.backpackCapacity))
+	panel:SetHeader("right", "VAULT", "pm_icon_chest", { #view.items, view.itemCapacity })
+	panel:SetPane("left", { { entries = sorted(left) } })
+	panel:SetPane("right", {
+		{ header = "Items", entries = sorted(right) },
+		{ header = "Materials", entries = sorted(materials) },
+	})
+	-- Material deposits the vault had no room for (GDD §53), shown for a day.
+	if view.overflow and #view.overflow > 0 then
+		local parts = {}
+		for _, lost in view.overflow do
+			table.insert(parts, ("%s ×%d"):format(lost.name, lost.quantity))
 		end
+		panel:SetStatus("Vault full: deleted " .. table.concat(parts, ", ") .. ".")
 	end
-	for order, step in VaultController.MATERIAL_STEPS do
-		local button = make("TextButton", {
-			Text = if step then ("×%d"):format(step) else "All",
-			LayoutOrder = order,
-			Size = UDim2.new(0.25, -3, 1, 0),
-			TextColor3 = Color3.fromRGB(245, 236, 222),
-			Font = Enum.Font.GothamBold,
-			TextSize = 13,
-		}, bar)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
-		buttons[step] = button
-		button.Activated:Connect(function()
-			materialStep = step
-			paint()
-			refresh()
-		end)
+	showChoice()
+end
+
+local function close()
+	ContextActionService:UnbindAction(CLOSE_ACTION)
+	panel:HideConfirm()
+	local focus = GuiService.SelectedObject
+	if focus and focus:IsDescendantOf(panel.screen.gui) then
+		GuiService.SelectedObject = nil
 	end
-	paint()
+	panel.screen:SetOpen(false)
 end
 
 local function build()
-	-- Above the always-open lobby panel.
-	local gui =
-		make("ScreenGui", { Name = "Vault", ResetOnSpawn = false, DisplayOrder = 2 }, player:WaitForChild("PlayerGui"))
-	-- Never taller than the screen, so the close button stays reachable on phones.
-	ui.panel = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.45, 0.5),
-		Size = UDim2.new(0.6, 0, 1, -24),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		Active = true,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(820, 420), MinSize = Vector2.new(480, 240) }, ui.panel)
-	make("TextLabel", {
-		Text = "Secure Vault",
-		Position = UDim2.fromOffset(10, 6),
-		Size = UDim2.new(1, -50, 0, 24),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(255, 214, 150),
-		Font = Enum.Font.GothamBlack,
-		TextSize = 18,
-	}, ui.panel)
-	local close = make("TextButton", {
-		Text = "✕",
-		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, -6, 0, 6),
-		Size = UDim2.fromOffset(28, 24),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.panel)
-	close.Activated:Connect(function()
-		ui.panel.Visible = false
-		hideConfirm()
-	end)
-	ui.backpackTitle, ui.backpack = column(ui.panel, 0, "Lobby backpack")
-	ui.itemsTitle, ui.items = column(ui.panel, 1 / 3, "Vault items")
-	local _, materials = column(ui.panel, 2 / 3, "Vault materials · click to take", 86)
-	ui.materials = materials
-	buildSteps(ui.panel, 2 / 3, 58)
-	-- "N would be deleted — deposit anyway?" above the status line.
-	ui.confirm = make("Frame", {
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 10, 1, -32),
-		Size = UDim2.new(1, -20, 0, 30),
-		BackgroundColor3 = Color3.fromRGB(70, 34, 28),
-		Visible = false,
-		ZIndex = 3,
-	}, ui.panel)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.confirm)
-	ui.confirmText = make("TextLabel", {
-		Text = "",
-		Position = UDim2.fromOffset(8, 0),
-		Size = UDim2.new(1, -196, 1, 0),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		TextColor3 = Color3.fromRGB(255, 214, 200),
-		Font = Enum.Font.GothamMedium,
-		TextSize = 13,
-		ZIndex = 3,
-	}, ui.confirm)
-	for order, choice in { { "Deposit anyway", confirmDeposit }, { "Cancel", hideConfirm } } do
-		local button = make("TextButton", {
-			Text = choice[1],
-			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, if order == 1 then -76 else -4, 0.5, 0),
-			Size = UDim2.fromOffset(if order == 1 then 110 else 68, 24),
-			BackgroundColor3 = if order == 1 then Color3.fromRGB(150, 60, 44) else Color3.fromRGB(70, 56, 40),
-			TextColor3 = Color3.fromRGB(245, 236, 222),
-			Font = Enum.Font.GothamBold,
-			TextSize = 13,
-			ZIndex = 3,
-		}, ui.confirm)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
-		button.Activated:Connect(choice[2])
-	end
-	ui.status = make("TextLabel", {
-		Text = "",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 10, 1, -6),
-		Size = UDim2.new(1, -20, 0, 22),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(220, 210, 196),
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-	}, ui.panel)
+	panel = InventoryPanel.new(player:WaitForChild("PlayerGui"), {
+		onClose = close,
+		onSlot = function(paneId: string, entry)
+			if selected and selected.paneId == paneId and selected.id == entry.id then
+				selected = nil
+			else
+				selected = { paneId = paneId, id = entry.id }
+			end
+			panel:HideConfirm()
+			showChoice()
+		end,
+		onSort = function()
+			sortIndex = sortIndex % #VaultController.SORTS + 1
+			panel:SetStatus("Sorted by " .. string.lower(VaultController.SORTS[sortIndex]) .. ".")
+			refresh()
+		end,
+	})
+	panel:SetTitle("INVENTORY & VAULT")
+	panel.screen:Watch()
 
 	-- In the shared top-centre column with the other banners.
 	ui.receipt = make("TextButton", {
@@ -399,18 +362,34 @@ local function showReceipt(receipt)
 	ui.receipt.Visible = true
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes the window (the Backpack key, the Inventory and Vault tiles).
 function VaultController.Toggle()
-	ui.panel.Visible = not ui.panel.Visible
-	hideConfirm()
-	if ui.panel.Visible then
-		ui.status.Text = ""
-		refresh()
+	if panel.screen:IsOpen() then
+		close()
+		return
 	end
+	selected = nil
+	panel:SetStatus("")
+	panel:HideConfirm()
+	panel.screen:SetOpen(true)
+	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			if panel:IsConfirming() then
+				panel:HideConfirm()
+			else
+				close()
+			end
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.ButtonB)
+	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
+		GuiService.SelectedObject = panel.tabs.All.button
+	end
+	task.spawn(refresh)
 end
 
 function VaultController.IsOpen(): boolean
-	return ui.panel ~= nil and ui.panel.Visible
+	return panel ~= nil and panel.screen:IsOpen()
 end
 
 function VaultController.Start()

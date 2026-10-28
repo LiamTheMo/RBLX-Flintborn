@@ -1,10 +1,12 @@
 -- The painted island map (art/ui/map/island.png, uploaded as pm_map_island) inside
--- a clipped frame: zoom in and out, pins for places with a name plate on the
--- chosen one, and an optional live marker. The Journal's map panel and the world
--- Map screen use it. The image covers MAP_SPAN studs centred on the island with
--- −Z (north) up, the span render_island.py paints.
+-- a clipped frame: zoom in and out, drag to pan, pins for places with a name
+-- plate on the chosen one, and an optional live marker. The Journal's map panel
+-- uses it. The image covers MAP_SPAN studs centred on the island with −Z (north)
+-- up, the span render_island.py paints (it refuses to run if the two differ). It
+-- shows the generated island; an authored world would need its own painting.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Layout = require(script.Parent.Layout)
@@ -15,8 +17,11 @@ local IslandMap = {}
 IslandMap.__index = IslandMap
 
 IslandMap.MAP_SPAN = 4400
-IslandMap.ZOOMS = { 1, 1.5, 2.25, 3.4 }
+-- The 1,000 px painting stays sharp to about twice its size.
+IslandMap.ZOOMS = { 1, 1.4, 2 }
 IslandMap.PIN = 50
+-- Extra touch room round a pin, in map pixels.
+IslandMap.PIN_PAD = 12
 
 -- Landmarks big enough to find your way by; the rest stay off the map so it
 -- does not crowd.
@@ -90,8 +95,16 @@ function IslandMap.new(parent: Instance, r, opts)
 		}, canvas)
 		Widgets.Sprite("pm_map_pin", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 5 }, pin)
 		local press = Parchment.Pressable(pin, nil, function()
-			self:Select(if self.selected == place.id then nil else place.id)
-		end)
+			if self.selected == place.id then
+				self:Select(nil)
+			else
+				self:Select(place.id)
+				-- Zoomed in, the map follows the chosen pin.
+				if self.zoomIndex > 1 then
+					self:Focus(place.x, place.z)
+				end
+			end
+		end, IslandMap.PIN_PAD)
 		press.ZIndex = 6
 		self.pins[place.id] = { frame = pin, place = place }
 	end
@@ -104,11 +117,17 @@ function IslandMap.new(parent: Instance, r, opts)
 		Visible = false,
 		ZIndex = 7,
 	}, canvas)
-	Widgets.Sprite("pm_map_label", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 7 }, self.label)
-	self.labelText = Parchment.Text("", { 34, 8, 150, 36 }, self.label, {
-		size = 22,
+	Widgets.Sprite(
+		"pm_map_label",
+		{ Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 7 },
+		self.label,
+		Parchment.SliceFor("pm_map_label", { 0, 0, 196, 70 })
+	)
+	self.labelText = Parchment.Text("", { 28, 14, 140, 28 }, self.label, {
+		size = 18,
 		align = "Center",
 		scaled = true,
+		minSize = 10,
 		z = 8,
 	})
 	-- The player's own position (world Map), hidden until SetMarker.
@@ -126,11 +145,12 @@ function IslandMap.new(parent: Instance, r, opts)
 	if opts.zoomButtons then
 		self.zoomIn = Parchment.Button("pm_button_zoom_in", opts.zoomButtons[1], parent, function()
 			self:Zoom(1)
-		end, { name = "ZoomIn", z = 8 })
+		end, { name = "ZoomIn", z = 8, pad = 6 })
 		self.zoomOut = Parchment.Button("pm_button_zoom_out", opts.zoomButtons[2], parent, function()
 			self:Zoom(-1)
-		end, { name = "ZoomOut", z = 8 })
+		end, { name = "ZoomOut", z = 8, pad = 6 })
 	end
+	self:_drag(clip)
 	self:_place()
 	return self
 end
@@ -148,6 +168,52 @@ function IslandMap:_place()
 		self.zoomIn.SetEnabled(self.zoomIndex < #IslandMap.ZOOMS)
 		self.zoomOut.SetEnabled(self.zoomIndex > 1)
 	end
+end
+
+-- Dragging the map (mouse or finger) pans it while zoomed in.
+function IslandMap:_drag(clip: Frame)
+	local drag = Widgets.Make("TextButton", {
+		Name = "Drag",
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		Selectable = false,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = 4,
+	}, clip) :: TextButton
+	local active: InputObject? = nil
+	local last: Vector3? = nil
+	drag.InputBegan:Connect(function(input: InputObject)
+		local kind = input.UserInputType
+		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
+			active, last = input, input.Position
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input: InputObject)
+		if active == nil or last == nil then
+			return
+		end
+		local moved = input.UserInputType == Enum.UserInputType.MouseMovement
+			or (input.UserInputType == Enum.UserInputType.Touch and input == active)
+		if not moved then
+			return
+		end
+		local delta = input.Position - last
+		last = input.Position
+		-- Screen pixels → map fractions at the current zoom and window scale.
+		local scale = clip.AbsoluteSize.X / math.max(self.size[1], 1)
+		local side = self.side * IslandMap.ZOOMS[self.zoomIndex] * math.max(scale, 0.01)
+		self.focus = {
+			math.clamp(self.focus[1] - delta.X / side, 0, 1),
+			math.clamp(self.focus[2] - delta.Y / side, 0, 1),
+		}
+		self:_place()
+	end)
+	UserInputService.InputEnded:Connect(function(input: InputObject)
+		if input == active or input.UserInputType == Enum.UserInputType.MouseButton1 then
+			active, last = nil, nil
+		end
+	end)
 end
 
 function IslandMap:Zoom(step: number)
@@ -169,7 +235,11 @@ function IslandMap:Select(id: string?)
 	self.label.Visible = entry ~= nil
 	if entry then
 		local u, v = IslandMap.ToMap(entry.place.x, entry.place.z)
-		self.label.Position = UDim2.new(u, 0, v, -6)
+		-- The plate hangs below and right of the pin, or flips left near the
+		-- east edge and above it near the south edge, so it stays on the map.
+		local east, south = u > 0.72, v > 0.86
+		self.label.AnchorPoint = Vector2.new(if east then 0.88 else 0.12, if south then 1 else 0)
+		self.label.Position = UDim2.new(u, 0, v, if south then -IslandMap.PIN - 4 else -6)
 		self.labelText.Text = entry.place.name
 	end
 end

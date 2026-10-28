@@ -147,11 +147,16 @@ local function pressable(holder: GuiObject, art: GuiObject?, onPress, pad: numbe
 	}, holder) :: TextButton
 	local enabled = true
 	local hovering = false
+	-- A stand-in Frame (art not uploaded yet) darkens its own fill instead.
+	local baseFill = if art and art:IsA("Frame") then art.BackgroundColor3 else nil
 	local function tint(color: Color3)
 		if art == nil then
 			return
 		end
-		if art:IsA("ImageLabel") then
+		if baseFill then
+			(art :: Frame).BackgroundColor3 =
+				Color3.new(baseFill.R * color.R, baseFill.G * color.G, baseFill.B * color.B)
+		elseif art:IsA("ImageLabel") then
 			(art :: ImageLabel).ImageColor3 = color
 		else
 			for _, child in art:GetChildren() do
@@ -228,7 +233,7 @@ function Parchment.Button(sprite: string, r, parent: Instance, onPress, opts)
 	local label = nil
 	if opts.label then
 		-- Clear of the art's sliced corners, which scale with the button's height.
-		local inset = math.max(12, r[4] * 0.4)
+		local inset = opts.inset or math.max(12, r[4] * 0.4)
 		label = Parchment.Text(opts.label, { inset, 0, r[3] - inset * 2, r[4] }, holder, {
 			size = opts.size or 24,
 			color = opts.color or "ink",
@@ -411,31 +416,54 @@ function Parchment.Slider(r, parent: Instance, min: number, max: number, step: n
 			onChange(nextValue)
 		end
 	end
+	-- The stick steps once per push (it must come back near the middle before
+	-- the next), and left/right navigation points back at the slider itself.
+	local stickLatched = false
+	local function onStep(_, state, input)
+		local key = input.KeyCode
+		if key == Enum.KeyCode.Thumbstick1 then
+			local x = input.Position.X
+			if math.abs(x) < 0.3 then
+				stickLatched = false
+			elseif math.abs(x) > 0.6 and not stickLatched then
+				stickLatched = true
+				nudge(if x > 0 then step else -step)
+			end
+			-- Up and down still move between controls.
+			return if math.abs(input.Position.Y) > math.abs(x)
+				then Enum.ContextActionResult.Pass
+				else Enum.ContextActionResult.Sink
+		end
+		if state == Enum.UserInputState.Begin then
+			if key == Enum.KeyCode.DPadRight or key == Enum.KeyCode.Right then
+				nudge(step)
+			elseif key == Enum.KeyCode.DPadLeft or key == Enum.KeyCode.Left then
+				nudge(-step)
+			end
+		end
+		return Enum.ContextActionResult.Sink
+	end
 	hit.SelectionGained:Connect(function()
 		knob.Size = UDim2.fromOffset(knobSize * 1.1, knobSize * 1.1)
+		hit.NextSelectionLeft = hit
+		hit.NextSelectionRight = hit
 		ContextActionService:BindActionAtPriority(
 			stepAction,
-			function(_, state, input)
-				if state == Enum.UserInputState.Begin then
-					local key = input.KeyCode
-					if key == Enum.KeyCode.DPadRight or key == Enum.KeyCode.Right then
-						nudge(step)
-					elseif key == Enum.KeyCode.DPadLeft or key == Enum.KeyCode.Left then
-						nudge(-step)
-					end
-				end
-				return Enum.ContextActionResult.Sink
-			end,
+			onStep,
 			false,
 			Enum.ContextActionPriority.High.Value + 50,
 			Enum.KeyCode.DPadLeft,
 			Enum.KeyCode.DPadRight,
 			Enum.KeyCode.Left,
-			Enum.KeyCode.Right
+			Enum.KeyCode.Right,
+			Enum.KeyCode.Thumbstick1
 		)
 	end)
 	hit.SelectionLost:Connect(function()
 		knob.Size = UDim2.fromOffset(knobSize, knobSize)
+		hit.NextSelectionLeft = nil
+		hit.NextSelectionRight = nil
+		stickLatched = false
 		ContextActionService:UnbindAction(stepAction)
 	end)
 	set(min)
@@ -485,7 +513,9 @@ end
 
 -- A dropdown: the paper box with its arrow, the chosen option's name, and a list
 -- of options that opens on press (above the box when `openUp`). Returns {Set, Close}.
-function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, openUp: boolean?)
+-- `layer` (optional) is the page holding the dropdown: it rises with the
+-- dropdown while the list is open, so the list beats everything on the window.
+function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, openUp: boolean?, layer: GuiObject?)
 	local position, extent = rect(r)
 	local holder = Widgets.Make("Frame", {
 		Name = "Dropdown",
@@ -527,10 +557,14 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 	}, holder) :: Frame
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, list)
 	Widgets.Make("UIStroke", { Color = Layout.Color("paperEdge"), Thickness = 2 }, list)
+	local layerZ = if layer then layer.ZIndex else nil
 	local function open(on: boolean)
 		list.Visible = on
 		catcher.Visible = on
 		holder.ZIndex = if on then 15 else 4
+		if layer and layerZ then
+			layer.ZIndex = if on then 30 else layerZ
+		end
 	end
 	catcher.Activated:Connect(function()
 		open(false)

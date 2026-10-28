@@ -16,6 +16,7 @@ Journal and Map screens place pins with the same span (src/client/Hud/IslandMap
 Pillow. Deterministic.
 """
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -129,7 +130,16 @@ def stamp(img, alpha_img, cx, cy, r, body, shadow=True):
     img[y0:y1, x0:x1] = img[y0:y1, x0:x1] * (1 - a[..., None]) + color * a[..., None]
 
 
+def check_span():
+    """The map screens place pins with the same span (IslandMap.MAP_SPAN)."""
+    source = (ROOT / "src" / "client" / "Hud" / "IslandMap.luau").read_text(encoding="utf-8")
+    found = re.search(r"IslandMap\.MAP_SPAN = (\d+)", source)
+    if not found or int(found.group(1)) != MAP_SPAN:
+        sys.exit(f"IslandMap.MAP_SPAN must equal MAP_SPAN ({MAP_SPAN}) here")
+
+
 def main():
+    check_span()
     data, zones, dry, heights, water = sample()
     ids = [c[0] for c in data["colors"]]
     tint = np.zeros((len(ids) + 1, 3), np.float32)

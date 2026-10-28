@@ -56,12 +56,15 @@
     "sliderTrack": "#50311D",
     "sliderFill": "#FDB335",
     "damage": "#FFE1A0",
-    "listPaper": "#EBCB9A",
+    "listPaper": "#E2BC86",
     "listEdge": "#C59462",
     "slotEdge": "#D4A069",
     "questReady": "#FFC029",
     "questOpen": "#A28969",
-    "questDone": "#43C33F"
+    "questDone": "#43C33F",
+    "badge": "#3A2418",
+    "selectGlow": "#F7B32B",
+    "line2": "#B89366"
   },
   "party": {
     "anchor": [0, 0],
