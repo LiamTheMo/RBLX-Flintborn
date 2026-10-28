@@ -1,9 +1,46 @@
 # Numbered-model stage procedure
 
+**Agent grouping (user decision, 2026-10-28, revised the same day to speed things up):**
+- **Three modellers at a time**, one model each, all Opus 5.5 at high effort, each started with a fresh context. Each modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) in its own background Blender (see "Parallel sessions").
+- **The main session is the hub.** It:
+  - starts the modellers;
+  - owns the open GUI Blender (`FlintbornWorldKit.blend`);
+  - puts each finished model into it;
+  - does stage 7, the final verification (it built none of the model);
+  - exports, commits and merges.
+- Every modeller first loads the `roblox-blender-model` skill (Skill tool), then reads this file and the model's spec.
+- Each modeller still runs every check listed for its stages below and records each stage in the spec under its own heading.
+- Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken.
+- A non-Blender study agent writes the next models' 2a studies ahead of time.
+- Passed models are batched into one PR into the version branch every 3–5 models; each model still gets its own commit.
+
+## Parallel sessions
+
+Each modeller drives its own live Blender. The open GUI (`FlintbornWorldKit.blend`, the MCP tool, port 9876)
+belongs to the main session for integration and verification. Modellers use background Blender processes running
+the same MCP bridge on their own ports (9877–9879), driven through
+`bgmcp.py` (tested 2026-10-28: an M014 build there gave the same tris, sizes and renders as the GUI, mean pixel
+difference 0.02/255):
+
+```bash
+PY=C:/Users/Orang/.local/bin/python3.14.exe
+$PY art/blender/kit/mcp/bgmcp.py start <port> art/blender/assets/kit/wip/MNNN.blend   # once, at the start
+$PY art/blender/kit/mcp/bgmcp.py run <port> <code.py>       # or `run <port> -` with a heredoc; prints the JSON response
+$PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages are done
+```
+
+- **State.** The session keeps its state between calls, exactly like the MCP tool, so run, read back, render and look as usual. Assign a dict to `result`. Put longer code in a scratchpad `.py` file.
+- **Work file and port.** The main session gives you a port and a work copy of the kit file at `art/blender/assets/kit/wip/MNNN.blend` (gitignored). Save that file after every good build, so a crash loses nothing. Never open or save `FlintbornWorldKit.blend` from a background session.
+- **Renders.** These go to `art/blender/renders/models/MNNN/` as usual. Read them with the Read tool.
+- **No viewport.** `K.focus` does nothing in the background; everything else works.
+- **Crashes.** A crash takes down only that session, and the log is `art/blender/logs/bgmcp-<port>.log`. Restart with `start` on the saved work file.
+- **Shared helpers are frozen while sessions run in parallel.** Don't edit `kit_models.py`, `kit_mcp.py`, `build_kit.py` or `lib/vfx.py`. Put new helpers in your own `mNNN.py`. If a shared change is truly needed, report it and the main session makes it.
+- **Into the kit file.** When a model passes, the main session runs `mNNN.build()` in the GUI kit file (the builder is the source of truth), saves it, checks that the renders match, then exports and commits.
+
 How every numbered model (`art/blender/assets/references/NNN.png`, builders `mNNN.py`) is built. It follows the
 `roblox-blender-model` skill (`.claude/skills/roblox-blender-model/SKILL.md`) and `WorldModeling.md` (read §1, §2,
-§5, §12, §17 and §18). Each stage is its own agent, running on Opus 5.5 at high effort. Stages run strictly one
-after another: only one agent drives the open Blender (`FlintbornWorldKit.blend`) through the MCP at any time.
+§5, §12, §17 and §18). Agents run on Opus 5.5 at high effort and are grouped as described above. Each Blender
+session (the GUI or a background one) is driven by only one agent at a time.
 
 ## Rules for every stage
 
@@ -17,6 +54,7 @@ after another: only one agent drives the open Blender (`FlintbornWorldKit.blend`
   - M: `mk`, `union_loose`, `carve`, `merge_in`, `finish`, `audit`, `views`, `display`, `sample`, `raw_sample`, `drop_specks`.
   - K: `hull_rock`, `blend`, `mix_key`, `noise_field`, `texture`, `refine`, `set_colour`, `calibrate`, `socket`, `check`.
 - **Check every step through the MCP.** Never assume a script worked. Read back the counts, sizes and materials.
+- **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps.
 - **Look at the renders.** `build()` writes `art/blender/renders/models/MNNN/` (single views plus `MNNN_views.png`). Open them with the Read tool and compare them with the reference, view by view.
 - **No commits, pushes or exports.** The main session does those.
 - **Scope.** Don't touch other models' collections or objects, and don't save over another sheet's names (`M.mk` guards this).
