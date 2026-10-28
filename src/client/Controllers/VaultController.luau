@@ -1,7 +1,8 @@
 -- Lobby vault and lobby backpack (GDD §10.3, §25.2). The Vault button on the navigation bar opens the
 -- panel: click a backpack item to deposit it or a vault item to withdraw it.
 -- Vault materials are listed only: they never leave the lobby (GDD §45). The
--- latest extraction receipt shows on arrival.
+-- latest extraction receipt shows on arrival. The Backpack key (Tab by default,
+-- GDD §46) opens and closes the panel, as it opens the backpack in a run.
 -- Lobby place only.
 
 local Players = game:GetService("Players")
@@ -13,6 +14,7 @@ local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local VaultController = {}
 
@@ -277,6 +279,12 @@ function VaultController.Start()
 	end
 	build()
 	Remotes.Get("ExtractionReceipt").OnClientEvent:Connect(showReceipt)
+	Binds.Bind("Backpack", function(_, state)
+		if state == Enum.UserInputState.Begin then
+			VaultController.Toggle()
+		end
+		return Enum.ContextActionResult.Sink
+	end)
 end
 
 return VaultController

@@ -185,7 +185,7 @@ Studio and live checks (two tribes):
 
 Automated: 8 specs cover XP saved when earned and kept through death, the 100 × n^1.5 curve capped at 50, the Center bonus equal to the run's XP once (mastery XP too, never action counts; runes never), exactly five tracks capped at 10 with titles, +1% yield per level (+10% at 10), the 132 ordering example and Premium + booster adding to +75%, rebirth resetting only the level (vault, Permanent items, masteries and perks kept; harder each time), and perk ranks spending tokens once. Deployed and verified on both places (2026-10-23).
 
-Placeholders: XP per action — gather 2, craft 5, crop 10, forge 15, chunk 15, creature 10 (elite 30), node 25, cache 40, player 20 (once per pair per 30 min), boss 100, Guardian 300. Mastery thresholds 25…3,000 actions; Crafting also gives ingredient savings (2%/level), larger stack outputs (+10% every third level), faster crafting (base 1 craft/s, +3%/level) and Forge recipe gates; PvP gives +0.5% damage per level (cap 5%) and +2% sprint per level. Rebirth needs level 50 and 1, 2, 3, 4, 6… Guardian Legendaries extracted since the last rebirth; tokens 3, +1 every third rebirth. Perks: Scholar (XP), Fortune (luck), Bounty (yield), Tidewalker (swim). Level gates now apply to Permanent spear (10) and iron gear (20), and Potions need Crafting 3.
+Placeholders: XP per action — gather 2, craft 5, crop 10, forge 15, chunk 15, creature 10 (elite 30), node 25, cache 40, player 20 (once per pair per 30 min), boss 100, Guardian 300. Mastery thresholds 25…3,000 actions; Crafting gives better quality rolls and, when smelting, a 2%-per-level bonus-bar chance (GDD §52; crafting speed, ingredient savings and larger outputs were removed 2026-10-28), and Forge recipes keep their Crafting level gates; PvP gives +0.5% damage per level (cap 5%) and +2% sprint per level. Rebirth needs level 50 and 1, 2, 3, 4, 6… Guardian Legendaries extracted since the last rebirth; tokens 3, +1 every third rebirth. Perks: Scholar (XP), Fortune (luck), Bounty (yield), Tidewalker (swim). Level gates now apply to Permanent spear (10) and iron gear (20), and Potions need Crafting 3.
 
 Studio and live checks:
 
@@ -367,7 +367,7 @@ Studio and live checks:
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
-- [ ] Tab also toggles Roblox's player list: decide whether that's acceptable or the player list should move.
+- [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the backpack and vault panel in the lobby, and Tab again closes it.
 - [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
 - [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
 - [ ] The tutorial hints name the current keys after a rebind.
@@ -433,4 +433,26 @@ Studio and live checks:
 - [ ] **Shop and merchant:** the shop shows only starter supplies. The merchant sells by ×10 or all, with no "Sell all" for Forge reagents.
 - [ ] **Trading:** a Sunberry and an Ancient Ember trade between two players. Ores, bars and common materials are refused.
 - [ ] **Planters:** all four crops have their own prompt keys.
+
+## Boosts, Crafting mastery, touch hotbar and Tab (GDD §52)
+
+Owner decisions 2026-10-28: a running boost never weakens; Crafting mastery gives only quality rolls and a smelting bonus bar (no crafting speed); the HUD hotbar shows items and taps use them; the Roblox player list is gone and Tab opens the inventory.
+
+Automated (`boosts.spec.luau`, `progression.spec.luau`, `stations_smelting.spec.luau`, `hud_model.spec.luau`):
+- A weaker or equal boost leaves the running one untouched (strength and timer); a stronger one takes over; any boost starts once the old one ends; the berry toast says the running boost keeps going.
+- Crafting mastery's buffs are exactly BestRollLevel and SmeltBonus (20% at level 10); CraftSpeed, IngredientSave, CraftOutput and RecipeTier are gone.
+- A certain bonus makes three ore into six bars, each bar still taking its own ore; instant crafts get no bonus; a bonus bar with no room drops at the smelter's feet and the job still finishes.
+- HUD hotbar slots show item names, Permanent stars and stack counts, mark the equipped slot, and ignore backpack and out-of-range slots.
+
+Placeholders: bonus-bar chance 2% per Crafting level.
+
+Studio and live checks:
+
+- [ ] Drink a Sunberry Draught, then eat a Sunberry: you're fed, the toast says the +25% XP boost keeps running, and the HUD timer doesn't change. Drinking a second Sunberry Draught is refused with "a boost at least as strong is already running" and the draught stays in the hotbar.
+- [ ] Eat a Sunberry, then drink a Sunberry Draught: the boost rises to +25% with a new 10:00 timer.
+- [ ] At Crafting mastery 0, smelting 10 ore gives exactly 10 bars. At a high level, some smelts give an extra bar (the count rises by 2 for one ore).
+- [ ] Crafting speed is the same at every Crafting level (one craft per second).
+- [ ] On a phone or tablet (or Studio's device emulator): the HUD hotbar shows each item's name and count. Tapping a weapon equips it (the ring moves there), tapping food eats it, tapping a Workbench places it, and tapping a Fire Bomb readies it.
+- [ ] Pressing a number key moves the ring to that slot and uses it, as a tap does.
+- [ ] With the backpack open, the HUD hotbar hides and the backpack's own strip still moves items.
 

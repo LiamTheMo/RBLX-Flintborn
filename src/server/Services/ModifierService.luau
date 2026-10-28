@@ -40,29 +40,39 @@ local function publishBoosts(player: Player)
 	end
 end
 
--- Starts a timed boost ({kind, amount, seconds}), replacing a running boost of the
--- same kind. Returns the new entry and the one it replaced, or nil for a bad boost.
+-- True when `boost` would take effect for `player` now (BoostRules.Takes).
+function ModifierService.BoostTakes(player: Player, boost): boolean
+	local state = boosts[player]
+	return BoostRules.IsValid(boost) and (state == nil or BoostRules.Takes(state, boost, now()))
+end
+
+-- Starts a timed boost ({kind, amount, seconds}) unless a boost of its kind at
+-- least as strong is running, which then stays exactly as it is. Returns the
+-- entry in force and whether this boost started, or nil for a bad boost.
 function ModifierService.ApplyBoost(player: Player, boost)
 	if not BoostRules.IsValid(boost) then
-		return nil, nil
+		return nil, false
 	end
 	local state = boosts[player]
 	if state == nil then
 		state = BoostRules.New()
 		boosts[player] = state
 	end
-	local entry, replaced = BoostRules.Apply(state, boost, now())
+	local entry, started = BoostRules.Apply(state, boost, now())
+	if not started then
+		return entry, false
+	end
 	publishBoosts(player)
 	task.delay(boost.seconds, function()
 		-- Only the boost this timer started (Sources may have pruned it already); a
-		-- replacement keeps its own timer.
+		-- stronger one that took over keeps its own timer.
 		local current = state[boost.kind]
 		if boosts[player] == state and (current == nil or current == entry) and player.Parent then
 			state[boost.kind] = nil
 			publishBoosts(player)
 		end
 	end)
-	return entry, replaced
+	return entry, true
 end
 
 -- Ends every boost (the run ended, or a new one started).

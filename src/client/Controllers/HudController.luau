@@ -37,8 +37,8 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local HudController = {}
 
--- Fires (index) when the selected hotbar slot changes. Selection only for now:
--- the hotbar is not bound to inventory contents yet.
+-- Fires (index) when the selected hotbar slot changes. The selection follows the
+-- equipped slot, and every key press or tap on a slot also uses it.
 HudController.SelectionChanged = Signal.new()
 HudController.Selected = 1
 
@@ -513,11 +513,24 @@ function HudController.Start()
 	end
 	ProgressionController.MountPopups(widgets.popups)
 
-	-- Hotbar: selection only, from the Hotbar1–9 binds (keys 1–9 by default), taps
-	-- and the right gamepad bumper. Taps never use items. The mouse wheel stays on
-	-- camera zoom (GDD Q58). Slot numbers name the bound keys and follow rebinds.
+	-- Hotbar: the run inventory's hotbar items. The Hotbar1–9 binds (keys 1–9 by
+	-- default) and taps select a slot and use it, as InventoryController's keys do
+	-- (equip, eat, place, ready); the right gamepad bumper only steps the
+	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot numbers name
+	-- the bound keys and follow rebinds.
 	selectSlot(HudController.Selected)
-	widgets.bottom.SlotPressed:Connect(selectSlot)
+	widgets.bottom.SlotPressed:Connect(function(index)
+		selectSlot(index)
+		task.spawn(InventoryController.ActivateHotbar, index)
+	end)
+	local function showItems(snapshot)
+		widgets.bottom:SetSlotItems(HudModel.HotbarSlots(snapshot, layout.bottom.hotbar.count))
+		if snapshot.equipped and snapshot.equipped ~= HudController.Selected then
+			selectSlot(snapshot.equipped)
+		end
+	end
+	InventoryController.Changed:Connect(showItems)
+	showItems(InventoryController.Snapshot)
 	widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))
 	Binds.Changed:Connect(function()
 		widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))

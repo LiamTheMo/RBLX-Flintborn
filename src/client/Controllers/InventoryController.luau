@@ -1,5 +1,5 @@
 -- Hotbar (9 slots, keys 1–9) and backpack (50 slots) for the run inventory
--- (GDD §25.4, §25.4.1). Tapping a hotbar slot equips a tool or weapon, uses a
+-- (GDD §25.4, §25.4.1). Tapping a hotbar slot (or pressing its key) equips a tool or weapon, uses a
 -- consumable, places a workbench, readies a Fire Bomb (the attack input or touch
 -- Attack button then throws it) or sets a Breaching Charge on the wall or door in
 -- the crosshair (with none in reach it is held instead, and the attack input sets
@@ -24,6 +24,7 @@ local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local InventoryController = {}
 
@@ -142,6 +143,8 @@ local function activateSiege(index: number, kind: string)
 	end
 end
 
+-- Uses hotbar slot `index` as its key does: equip, use, place or ready it. The
+-- HUD hotbar's taps call this too (yields on the server call).
 local function activateHotbar(index: number)
 	local slot = slotAt("hotbar", index)
 	if slot == nil then
@@ -152,7 +155,7 @@ local function activateHotbar(index: number)
 	if def and def.family == ItemCatalog.Families.Consumable then
 		local ok, reason = invoke("UseConsumable", HttpService:GenerateGUID(false), slot.catalogId)
 		if not ok then
-			toast("Can't use that now (" .. tostring(reason) .. ")")
+			toast("Can't use that now: " .. Reasons.Text(reason))
 		end
 	elseif def and def.siege then
 		activateSiege(index, def.siege.kind)
@@ -433,6 +436,8 @@ local function build()
 	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.toast)
 end
+
+InventoryController.ActivateHotbar = activateHotbar
 
 function InventoryController.ToggleBackpack()
 	ui.backpack.Visible = not ui.backpack.Visible

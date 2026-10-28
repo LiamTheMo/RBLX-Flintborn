@@ -102,6 +102,9 @@ GameConstants.MASTERY_MAX_LEVEL = 10
 GameConstants.MASTERY_YIELD_PER_LEVEL = 0.01
 GameConstants.CRAFT_QUALITY_ROLL = 0.05
 GameConstants.BEST_ROLL_RELATIVE_PER_LEVEL = 0.05
+-- Crafting mastery's chance per level of one bonus bar for each bar smelted
+-- (owner decision 2026-10-28; placeholder rate, 20% at level 10).
+GameConstants.SMELT_BONUS_BAR_PER_LEVEL = 0.02
 GameConstants.PREMIUM_XP_BONUS = 0.25
 
 GameConstants.RARITIES = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Secret", "Exclusive" }

@@ -1,5 +1,7 @@
--- Timed consumable boosts (GDD §51, Q162). One boost per kind: a new one replaces
--- the running one and restarts its timer, so boosts never stack with themselves.
+-- Timed consumable boosts (GDD §51, Q162). One boost per kind, and a running boost
+-- never weakens (owner decision 2026-10-28): it stays exactly as it is until it
+-- runs out, unless a stronger boost of its kind takes over with its own timer.
+-- Boosts never stack with themselves.
 -- Each kind feeds one modifier stat as an additive bonus, so an XP boost adds to
 -- Premium and the paid booster rather than multiplying them, and Luck raises
 -- rare-drop chances only (EventRules.RollLoot). Boosts are run state: the server
@@ -42,13 +44,22 @@ function BoostRules.Active(boosts, kind: string, now: number): Entry?
 	return entry
 end
 
--- Starts `boost`, replacing any boost of the same kind. Returns the new entry and
--- the one it replaced while that was still running.
-function BoostRules.Apply(boosts, boost: Boost, now: number): (Entry, Entry?)
-	local replaced = BoostRules.Active(boosts, boost.kind, now)
+-- True when `boost` would take effect now: nothing of its kind is running, or it
+-- is stronger than what is. An equal or weaker one would change nothing.
+function BoostRules.Takes(boosts, boost: Boost, now: number): boolean
+	local running = BoostRules.Active(boosts, boost.kind, now)
+	return running == nil or boost.amount > running.amount
+end
+
+-- Starts `boost` when it Takes; otherwise the running boost stays as it is.
+-- Returns the entry in force and whether `boost` started.
+function BoostRules.Apply(boosts, boost: Boost, now: number): (Entry, boolean)
+	if not BoostRules.Takes(boosts, boost, now) then
+		return boosts[boost.kind], false
+	end
 	local entry = { amount = boost.amount, endsAt = now + boost.seconds }
 	boosts[boost.kind] = entry
-	return entry, replaced
+	return entry, true
 end
 
 -- Drops boosts that have run out.
@@ -102,8 +113,9 @@ function BoostRules.Describe(boost: Boost): string
 end
 
 -- The toast after using a consumable, e.g. "Sunberry: +5% food, +10% XP
--- for 3:00". `replaced` (from Apply) adds what the new boost took the place of.
-function BoostRules.UseText(item, replaced: Entry?): string
+-- for 3:00". `kept` is the running boost that stayed because this item's was not
+-- stronger (from Apply); the toast then says so instead of naming the boost.
+function BoostRules.UseText(item, kept: Entry?): string
 	local parts = {}
 	if (item.hunger or 0) > 0 then
 		table.insert(parts, BoostRules.Percent(item.hunger) .. " food")
@@ -116,17 +128,18 @@ function BoostRules.UseText(item, replaced: Entry?): string
 				else ("heals %d over %d s"):format(item.heal, GameConstants.FOOD_HEAL_SECONDS)
 		)
 	end
-	if item.boost then
+	if item.boost and kept then
+		table.insert(
+			parts,
+			("your %s %s boost keeps running"):format(
+				BoostRules.Percent(kept.amount),
+				BoostRules.LABELS[item.boost.kind] or item.boost.kind
+			)
+		)
+	elseif item.boost then
 		table.insert(parts, BoostRules.Describe(item.boost))
 	end
-	local text = item.name .. ": " .. (if #parts > 0 then table.concat(parts, ", ") else "used")
-	if replaced and item.boost then
-		text ..= (" (replaces your %s %s boost)"):format(
-			BoostRules.Percent(replaced.amount),
-			BoostRules.LABELS[item.boost.kind] or item.boost.kind
-		)
-	end
-	return text
+	return item.name .. ": " .. (if #parts > 0 then table.concat(parts, ", ") else "used")
 end
 
 return BoostRules
