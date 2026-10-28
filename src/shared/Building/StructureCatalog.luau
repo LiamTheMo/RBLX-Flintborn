@@ -96,8 +96,10 @@ StructureCatalog.Crops = {
 	Sweetberry = { seed = { Sweetberry = 1 }, yield = { catalogId = "Sweetberry", quantity = 4 }, seconds = 180 },
 	Herbs = { seed = { Herbs = 2 }, yield = { catalogId = "Herbs", quantity = 6 }, seconds = 300 },
 	Sapling = { seed = { Wood = 5 }, yield = { catalogId = "Wood", quantity = 25 }, seconds = 600 },
+	-- Fiber grows in planters too (GDD §53); Sunberry and Glimmerberry stay wild-only.
+	Fiber = { seed = { Fiber = 3 }, yield = { catalogId = "Fiber", quantity = 12 }, seconds = 240 },
 }
-StructureCatalog.CROP_ORDER = { "Redberry", "Sweetberry", "Herbs", "Sapling" }
+StructureCatalog.CROP_ORDER = { "Redberry", "Sweetberry", "Herbs", "Sapling", "Fiber" }
 
 function StructureCatalog.Get(pieceId: any, tier: any)
 	local piece = type(pieceId) == "string" and StructureCatalog.Pieces[pieceId] or nil

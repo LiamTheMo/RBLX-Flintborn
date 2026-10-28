@@ -1,12 +1,13 @@
 -- Lobby trading (GDD §10.2, Q13, Q50, Q56, Q98, Q125, Q130, Q164). Two players in
 -- the same lobby trade designated items and Gems — never Coins. Raw materials trade
--- only when flagged rare or Exclusive, and only out of the vault, where every
--- material lives; they land in the receiver's vault, so an offer needs room there
--- and a trade never deletes. Gem trades need level 10 on both sides, are
--- capped per UTC day for sending and receiving, and pay a 5% fee. Settlement
--- writes the trade into both profiles as pending; Reconcile later finalises it
--- (the counterpart saved it too) or rolls one side back (the counterpart never
--- saved it, or rolled back), and waits while the counterpart may still save.
+-- only when flagged rare or Exclusive, and only out of the vault (a backpack
+-- stack is deposited first, GDD §53); they land in the receiver's vault, so an
+-- offer needs room there and a trade never deletes. Gem trades need level 10 on
+-- both sides, are capped per UTC day for sending and receiving, and pay a 5%
+-- fee. Settlement writes the trade into both profiles as pending; Reconcile later
+-- finalises it (the counterpart saved it too) or rolls one side back (the
+-- counterpart never saved it, or rolled back), and waits while the counterpart
+-- may still save.
 -- Until then the profile is "settling": nothing a rollback could not claw back
 -- (sales, Forge crafts, Gem spending, a Deploy) may consume what it received.
 
@@ -47,7 +48,7 @@ function TradeRules.IsTradeable(item): boolean
 end
 
 -- A lobby backpack slot that may be offered: never a material, which trades only
--- from the vault (Q164).
+-- from the vault (Q164; still so under GDD §53).
 function TradeRules.IsTradeableSlot(item): boolean
 	return not ItemCatalog.IsMaterial(item.catalogId) and TradeRules.IsTradeable(item)
 end

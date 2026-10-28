@@ -4,9 +4,12 @@
 -- Boosts never stack with themselves.
 -- Each kind feeds one modifier stat as an additive bonus, so an XP boost adds to
 -- Premium and the paid booster rather than multiplying them, and Luck raises
--- rare-drop chances only (EventRules.RollLoot). Boosts are run state: the server
--- clears them when a run ends. Times are in the caller's clock (the server uses
--- workspace:GetServerTimeNow(), which clients can count down against).
+-- rare-drop chances only (EventRules.RollLoot). Boosts count down only during a
+-- run and pause between runs (GDD §53): a successful extraction saves each
+-- running boost's remaining time (Pause) and the next deploy resumes it (Resume);
+-- dying or leaving the world without extracting ends them. Times are in the
+-- caller's clock (the server uses workspace:GetServerTimeNow(), which clients can
+-- count down against); saved boosts hold only remaining seconds.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local Consumables = require(script.Parent.Parent.Items.Consumables)
@@ -21,6 +24,15 @@ BoostRules.LABELS = { XP = "XP", Luck = "rare-drop chance" }
 
 export type Boost = { kind: string, amount: number, seconds: number }
 export type Entry = { amount: number, endsAt: number }
+export type Paused = { kind: string, amount: number, remaining: number }
+
+-- The longest boost any consumable grants: a saved boost never has more left.
+BoostRules.MAX_SECONDS = 0
+for _, item in Consumables.Catalog do
+	if item.boost then
+		BoostRules.MAX_SECONDS = math.max(BoostRules.MAX_SECONDS, item.boost.seconds)
+	end
+end
 
 function BoostRules.New(): { [string]: Entry }
 	return {}
@@ -86,6 +98,63 @@ function BoostRules.Modifiers(boosts, now: number)
 		end
 	end
 	return list
+end
+
+local function finite(value: any): boolean
+	return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
+end
+
+-- The running boosts with their remaining seconds, to save between runs.
+function BoostRules.Pause(boosts, now: number): { Paused }
+	local saved = {}
+	for _, kind in BoostRules.ORDER do
+		local entry = BoostRules.Active(boosts, kind, now)
+		if entry then
+			table.insert(saved, { kind = kind, amount = entry.amount, remaining = entry.endsAt - now })
+		end
+	end
+	return BoostRules.Sanitize(saved)
+end
+
+-- A saved boost list as loaded: only known kinds with a positive finite amount and
+-- a finite remaining time in (0, MAX_SECONDS], and one per kind (the stronger
+-- one, as Apply would keep). Anything else is dropped.
+function BoostRules.Sanitize(saved: any): { Paused }
+	local best = {}
+	if type(saved) == "table" then
+		for _, entry in saved do
+			if
+				type(entry) == "table"
+				and BoostRules.STATS[entry.kind] ~= nil
+				and finite(entry.amount)
+				and entry.amount > 0
+				and finite(entry.remaining)
+				and entry.remaining > 0
+				and entry.remaining <= BoostRules.MAX_SECONDS
+			then
+				local kept = best[entry.kind]
+				if kept == nil or entry.amount > kept.amount then
+					best[entry.kind] = { kind = entry.kind, amount = entry.amount, remaining = entry.remaining }
+				end
+			end
+		end
+	end
+	local list = {}
+	for _, kind in BoostRules.ORDER do
+		if best[kind] then
+			table.insert(list, best[kind])
+		end
+	end
+	return list
+end
+
+-- Boost state that resumes saved boosts at `now` with their remaining time.
+function BoostRules.Resume(saved, now: number): { [string]: Entry }
+	local boosts = BoostRules.New()
+	for _, entry in BoostRules.Sanitize(saved) do
+		BoostRules.Apply(boosts, { kind = entry.kind, amount = entry.amount, seconds = entry.remaining }, now)
+	end
+	return boosts
 end
 
 -- Player attributes that replicate a boost to its owner's HUD.

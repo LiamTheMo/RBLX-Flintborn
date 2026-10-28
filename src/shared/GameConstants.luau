@@ -93,12 +93,24 @@ GameConstants.UNCLAIMED_DECAY_MAX_SECONDS = 360
 GameConstants.MAX_PLAYERS_PER_WORLD = 30
 GameConstants.EVENT_CHECK_SECONDS = 300
 GameConstants.EVENT_CATEGORY_TRIGGER_CHANCE = 0.25
-GameConstants.NODE_RESPAWN_SECONDS = 120
+-- Resource node regrowth by tier (GDD §53; placeholders): trees, rocks, plants,
+-- bushes and the common new nodes 2 min; Copper and Iron 3 min; Silver, Cobalt,
+-- Obsidian and Amethyst 5 min; Jade, Mithril, Starstone and Stormglass 8 min.
+GameConstants.NODE_REGROW_SECONDS = { Basic = 120, Low = 180, Mid = 300, High = 480 }
+
+-- Gathered ground drops (GDD §53): only the player whose hit made a drop may take
+-- it for the first 10 s, then anyone; it vanishes after 2 minutes. Pickups are
+-- checked against this reach from the player's root.
+GameConstants.GATHER_DROP_OWNER_SECONDS = 10
+GameConstants.GATHER_DROP_LIFETIME_SECONDS = 120
+GameConstants.GATHER_DROP_PICKUP_RANGE = 10
 
 -- Progression (GDD §16.8, §33, §39.5, Q75, Q139, Q150) -------------------------------
 
 GameConstants.MASTERY_TRACKS = { "Mining", "Woodcutting", "Farming", "Crafting", "PvP" }
 GameConstants.MASTERY_MAX_LEVEL = 10
+-- Gathering mastery per level: a node hit's chance of one extra drop (GDD §53) and
+-- the planter harvest bonus (Farming).
 GameConstants.MASTERY_YIELD_PER_LEVEL = 0.01
 GameConstants.CRAFT_QUALITY_ROLL = 0.05
 GameConstants.BEST_ROLL_RELATIVE_PER_LEVEL = 0.05

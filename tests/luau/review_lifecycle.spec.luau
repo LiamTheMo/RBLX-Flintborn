@@ -431,8 +431,7 @@ test("items that do not fit the run are saved back to the lobby at once", functi
 	expectEq(#stored(105).lobbyBackpack.slots, 11, "the 11 overflow items are already stored")
 end)
 
-test("materials never stay in the lobby backpack: banked on load and after every write", function()
-	-- A save from before GDD §45 still holds materials in its backpack.
+test("lobby backpack materials stay put on load and after every write (GDD §53)", function()
 	local legacy = ProfileSchema.Default(0)
 	legacy.vault.materials.IronOre = 995
 	legacy.lobbyBackpack.slots = {
@@ -445,23 +444,40 @@ test("materials never stay in the lobby backpack: banked on load and after every
 	Players.PlayerAdded:Fire(player)
 	advance(2)
 	local profile = ProfileService.GetProfile(player)
-	expectEq(profile.vault.materials.IronOre, 1000, "legacy backpack Iron Ore banked on load")
-	expectEq(profile.vault.lastOverflow.deleted.IronOre, 15, "the overflow was deleted")
-	expectEq(#profile.lobbyBackpack.slots, 1, "only the spear stays in the backpack")
+	expectEq(profile.vault.materials.IronOre, 995, "nothing banked on load")
+	expectEq(profile.vault.lastOverflow, nil, "and nothing deleted")
+	expectEq(#profile.lobbyBackpack.slots, 2, "the Iron Ore waits in the backpack")
 
-	-- Any operation (a trade, a crash recovery, a rollback) that lands a material in
-	-- the backpack ends with it banked.
 	local ok = ProfileService.RunOperation(player, "test-bank-301", "Test", function(working)
 		table.insert(working.lobbyBackpack.slots, { catalogId = "AncientEmber", quantity = 3 })
 	end)
 	expect(ok, "operation committed")
-	expectEq(profile.vault.materials.AncientEmber, 3, "banked by the same write")
-	expectEq(#profile.lobbyBackpack.slots, 1, "still only the spear")
+	expectEq(profile.vault.materials.AncientEmber, nil, "an operation banks nothing")
+	expectEq(#profile.lobbyBackpack.slots, 3, "the Ember stays in the backpack")
 	ProfileService.Mutate(player, function(live)
 		table.insert(live.lobbyBackpack.slots, { catalogId = "Wood", quantity = 4 })
 	end)
-	expectEq(profile.vault.materials.Wood, 4, "a direct mutation banks too")
-	expectEq(#profile.lobbyBackpack.slots, 1, "the backpack holds no material")
+	expectEq(profile.vault.materials.Wood, nil, "a direct mutation banks nothing")
+	expectEq(#profile.lobbyBackpack.slots, 4, "the Wood stays in the backpack")
+end)
+
+test("a Play saves the materials it carries in with the run (GDD §53)", function()
+	local player = arrive(106, {
+		{ catalogId = "Wood", quantity = 60 },
+		{ instanceId = "sword-106", catalogId = "StoneSword", ownerId = 1 },
+		{ catalogId = "Wood", quantity = 40 },
+		{ catalogId = "IronOre", quantity = 7 },
+	})
+	play(player, "req-106")
+	advance(1)
+	expectEq(WorldAdmissionService.GetState(player), "ActiveRun", "in the run")
+	local run = stored(106).progression.currentRun
+	expectEq(run.carriedIn.Wood, 100, "both Wood stacks are recorded as one total")
+	expectEq(run.carriedIn.IronOre, 7, "Iron Ore recorded")
+	expectEq(run.carriedIn.StoneSword, nil, "gear is not a material")
+	-- A crash now: the next server loads the saved run with its record intact.
+	local reloaded = ProfileSchema.Migrate(ProfileSchema.DeepCopy(stored(106)), 0)
+	expectEq(reloaded.progression.currentRun.carriedIn.Wood, 100, "the record survives a reload")
 end)
 
 test("a shutdown racing a Play never loses the reserved loadout", function()

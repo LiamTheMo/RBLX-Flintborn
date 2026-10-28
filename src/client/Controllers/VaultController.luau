@@ -1,6 +1,7 @@
--- Lobby vault and lobby backpack (GDD §10.3, §25.2). The Vault button on the navigation bar opens the
--- panel: click a backpack item to deposit it or a vault item to withdraw it.
--- Vault materials are listed only: they never leave the lobby (GDD §45). The
+-- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53). The Vault button on the
+-- navigation bar opens the panel: click a backpack item to deposit it or a vault
+-- item to withdraw it. A vault material withdraws the amount picked above the
+-- materials list (1, 10, 100 or all) into the backpack, to deploy with it. The
 -- latest extraction receipt shows on arrival. The Backpack key (Tab by default,
 -- GDD §46) opens and closes the panel, as it opens the backpack in a run.
 -- Lobby place only.
@@ -17,6 +18,9 @@ local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local VaultController = {}
+
+-- Amounts a click on a vault material withdraws; false means the whole stack.
+VaultController.MATERIAL_STEPS = { 1, 10, 100, false }
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -71,6 +75,9 @@ end
 
 local refresh
 
+-- The picked withdrawal amount (an entry of MATERIAL_STEPS; false = all).
+local materialStep: number | boolean = 10
+
 local function act(name: string, ...)
 	local ok, reason = invoke(name, ...)
 	ui.status.Text = if ok then "Done." else ("Not possible: " .. Reasons.Text(reason))
@@ -101,10 +108,17 @@ function refresh()
 			act("VaultWithdrawItem", index)
 		end)
 	end
-	-- Materials stay in the vault for the Forge, the market and trades; they never
-	-- go back out into a run.
+	-- Withdrawn materials join the backpack and deploy with it (GDD §53).
 	for _, material in view.materials do
-		row(ui.materials, ("%s ×%d"):format(material.name, material.quantity), Color3.fromRGB(230, 220, 200), nil)
+		local amount = if materialStep then math.min(materialStep, material.quantity) else material.quantity
+		row(
+			ui.materials,
+			("%s ×%d — take %d"):format(material.name, material.quantity, amount),
+			Color3.fromRGB(230, 220, 200),
+			function()
+				act("VaultWithdrawMaterial", material.catalogId, amount)
+			end
+		)
 	end
 	for _, lost in view.overflow or {} do
 		row(
@@ -116,7 +130,7 @@ function refresh()
 	end
 end
 
-local function column(parent, x: number, title: string)
+local function column(parent, x: number, title: string, listTop: number?)
 	local label = make("TextLabel", {
 		Text = title,
 		Position = UDim2.new(x, 4, 0, 34),
@@ -128,9 +142,10 @@ local function column(parent, x: number, title: string)
 		Font = Enum.Font.GothamBold,
 		TextSize = 13,
 	}, parent)
+	local top = listTop or 58
 	local list = make("ScrollingFrame", {
-		Position = UDim2.new(x, 4, 0, 58),
-		Size = UDim2.new(1 / 3, -8, 1, -90),
+		Position = UDim2.new(x, 4, 0, top),
+		Size = UDim2.new(1 / 3, -8, 1, -(top + 32)),
 		BackgroundTransparency = 1,
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		CanvasSize = UDim2.new(),
@@ -138,6 +153,45 @@ local function column(parent, x: number, title: string)
 	}, parent)
 	make("UIListLayout", { Padding = UDim.new(0, 3) }, list)
 	return label, list
+end
+
+-- The 1 / 10 / 100 / All picker above the vault materials list.
+local function buildSteps(parent, x: number, y: number)
+	local bar = make("Frame", {
+		Position = UDim2.new(x, 4, 0, y),
+		Size = UDim2.new(1 / 3, -8, 0, 24),
+		BackgroundTransparency = 1,
+	}, parent)
+	make("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		Padding = UDim.new(0, 4),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, bar)
+	local buttons = {}
+	local function paint()
+		for step, button in buttons do
+			local picked = step == materialStep
+			button.BackgroundColor3 = if picked then Color3.fromRGB(120, 90, 50) else Color3.fromRGB(46, 38, 30)
+		end
+	end
+	for order, step in VaultController.MATERIAL_STEPS do
+		local button = make("TextButton", {
+			Text = if step then ("×%d"):format(step) else "All",
+			LayoutOrder = order,
+			Size = UDim2.new(0.25, -3, 1, 0),
+			TextColor3 = Color3.fromRGB(245, 236, 222),
+			Font = Enum.Font.GothamBold,
+			TextSize = 13,
+		}, bar)
+		make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
+		buttons[step] = button
+		button.Activated:Connect(function()
+			materialStep = step
+			paint()
+			refresh()
+		end)
+	end
+	paint()
 end
 
 local function build()
@@ -180,8 +234,9 @@ local function build()
 	end)
 	ui.backpackTitle, ui.backpack = column(ui.panel, 0, "Lobby backpack")
 	ui.itemsTitle, ui.items = column(ui.panel, 1 / 3, "Vault items")
-	local _, materials = column(ui.panel, 2 / 3, "Vault materials (stay in the lobby)")
+	local _, materials = column(ui.panel, 2 / 3, "Vault materials · click to take", 86)
 	ui.materials = materials
+	buildSteps(ui.panel, 2 / 3, 58)
 	ui.status = make("TextLabel", {
 		Text = "",
 		AnchorPoint = Vector2.new(0, 1),
@@ -233,6 +288,10 @@ local function showReceipt(receipt)
 		"Banked to vault: " .. listOf(receipt.vaulted),
 		"Lobby backpack: " .. listOf(receipt.toBackpack),
 	}
+	if receipt.carriedIn and next(receipt.carriedIn) then
+		-- What the player brought into the run settles once (GDD §53).
+		table.insert(lines, "Brought in, not doubled: " .. listOf(receipt.carriedIn))
+	end
 	if (receipt.runGeneralXPEarned or 0) > 0 or (receipt.runMasteryXPEarned or 0) > 0 then
 		-- Base XP was credited as it was earned; the Center bonus is the extra (§25.4.1).
 		table.insert(

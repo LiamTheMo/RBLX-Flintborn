@@ -1,11 +1,12 @@
--- The lobby vault and lobby backpack (GDD §10.3, §25.2, Q96, Q129, Q151–152, Q155).
--- Shows the latest extraction receipt on arrival, and handles manual deposits and
--- withdrawals through exactly-once profile operations, refused during an open
--- trade. Lobby place only.
+-- The lobby vault and lobby backpack (GDD §10.3, §25.2, §53, Q96, Q129, Q151–152,
+-- Q155). Shows the latest extraction receipt on arrival, and handles manual
+-- deposits and withdrawals (items, and material stacks by quantity) through
+-- exactly-once profile operations, refused during an open trade. Lobby place only.
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -59,8 +60,8 @@ local function snapshot(player: Player)
 			tradeable = TradeRules.IsTradeable({ catalogId = catalogId, quantity = quantity }),
 		})
 	end
-	-- Materials banked from the backpack outside an extraction (a trade, a crash
-	-- recovery) that the vault had no room for, shown for a day (GDD §45).
+	-- Material deposits the vault had no room for, deleted past its capacity and
+	-- shown for a day (GDD §53).
 	local overflow = profile.vault.lastOverflow
 	if type(overflow) == "table" and os.time() - (overflow.at or 0) < VaultService.OVERFLOW_NOTICE_SECONDS then
 		view.overflow = {}
@@ -137,7 +138,7 @@ function VaultService.Start()
 			return false, "BadRequest"
 		end
 		local ok, reason = operate(player, "VaultDeposit", function(profile)
-			return VaultRules.Deposit(profile, index)
+			return VaultRules.Deposit(profile, index, os.time())
 		end)
 		if ok then
 			VaultService.Deposited:Fire(player)
@@ -150,6 +151,17 @@ function VaultService.Start()
 		end
 		return operate(player, "VaultWithdraw", function(profile)
 			return VaultRules.WithdrawItem(profile, index)
+		end)
+	end)
+	Remotes.Handle("VaultWithdrawMaterial", function(player, catalogId, quantity)
+		if
+			not ItemCatalog.IsMaterial(catalogId)
+			or not Validation.IsQuantity(quantity, 1, GameConstants.MATERIAL_STACK_MAX)
+		then
+			return false, "BadRequest"
+		end
+		return operate(player, "VaultWithdrawMaterial", function(profile)
+			return VaultRules.WithdrawMaterial(profile, catalogId, quantity)
 		end)
 	end)
 end

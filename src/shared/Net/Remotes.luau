@@ -45,6 +45,7 @@ local DEFINITIONS = {
 	VaultSnapshot = "RemoteFunction", -- () -> vault and lobby backpack view
 	VaultDeposit = "RemoteFunction", -- (backpackIndex) -> ok, reason
 	VaultWithdrawItem = "RemoteFunction", -- (vaultIndex) -> ok, reason
+	VaultWithdrawMaterial = "RemoteFunction", -- (catalogId, quantity) -> ok, reason
 	ExtractionReceipt = "RemoteEvent", -- server -> client: the latest extraction receipt
 	ForgeSnapshot = "RemoteFunction", -- () -> recipes with vault counts and unlock state
 	ForgeCraft = "RemoteFunction", -- (recipeId, sourceInstanceId?, nonce) -> ok, receipt or reason
