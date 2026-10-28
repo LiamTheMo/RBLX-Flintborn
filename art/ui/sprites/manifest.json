@@ -880,6 +880,12 @@
     "h": 52,
     "slice": null
   },
+  "pm_button_apply": {
+    "file": "pm_button_apply.png",
+    "w": 280,
+    "h": 94,
+    "slice": null
+  },
   "pm_button_check": {
     "file": "pm_button_check.png",
     "w": 155,
@@ -974,11 +980,40 @@
       48
     ]
   },
+  "pm_button_reset": {
+    "file": "pm_button_reset.png",
+    "w": 212,
+    "h": 77,
+    "slice": null
+  },
   "pm_button_x": {
     "file": "pm_button_x.png",
     "w": 155,
     "h": 150,
     "slice": null
+  },
+  "pm_check_off": {
+    "file": "pm_check_off.png",
+    "w": 58,
+    "h": 61,
+    "slice": null
+  },
+  "pm_check_on": {
+    "file": "pm_check_on.png",
+    "w": 70,
+    "h": 71,
+    "slice": null
+  },
+  "pm_dropdown": {
+    "file": "pm_dropdown.png",
+    "w": 239,
+    "h": 73,
+    "slice": [
+      30,
+      26,
+      72,
+      26
+    ]
   },
   "pm_fill_xp": {
     "file": "pm_fill_xp.png",
@@ -991,6 +1026,42 @@
       6
     ]
   },
+  "pm_glyph_diamond": {
+    "file": "pm_glyph_diamond.png",
+    "w": 24,
+    "h": 27,
+    "slice": null
+  },
+  "pm_glyph_gamepad": {
+    "file": "pm_glyph_gamepad.png",
+    "w": 58,
+    "h": 42,
+    "slice": null
+  },
+  "pm_glyph_gear": {
+    "file": "pm_glyph_gear.png",
+    "w": 53,
+    "h": 54,
+    "slice": null
+  },
+  "pm_glyph_monitor": {
+    "file": "pm_glyph_monitor.png",
+    "w": 54,
+    "h": 51,
+    "slice": null
+  },
+  "pm_glyph_person": {
+    "file": "pm_glyph_person.png",
+    "w": 50,
+    "h": 60,
+    "slice": null
+  },
+  "pm_glyph_sound": {
+    "file": "pm_glyph_sound.png",
+    "w": 55,
+    "h": 47,
+    "slice": null
+  },
   "pm_icon_add_friend": {
     "file": "pm_icon_add_friend.png",
     "w": 179,
@@ -1001,6 +1072,23 @@
     "file": "pm_icon_crown.png",
     "w": 168,
     "h": 131,
+    "slice": null
+  },
+  "pm_keycap": {
+    "file": "pm_keycap.png",
+    "w": 116,
+    "h": 71,
+    "slice": [
+      22,
+      22,
+      22,
+      26
+    ]
+  },
+  "pm_keycap_small": {
+    "file": "pm_keycap_small.png",
+    "w": 79,
+    "h": 71,
     "slice": null
   },
   "pm_lobby_coins": {
@@ -1056,6 +1144,34 @@
       62
     ]
   },
+  "pm_slider_knob": {
+    "file": "pm_slider_knob.png",
+    "w": 58,
+    "h": 58,
+    "slice": null
+  },
+  "pm_tab_leather": {
+    "file": "pm_tab_leather.png",
+    "w": 320,
+    "h": 104,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ]
+  },
+  "pm_tab_paper": {
+    "file": "pm_tab_paper.png",
+    "w": 312,
+    "h": 101,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ]
+  },
   "pm_tile_forge": {
     "file": "pm_tile_forge.png",
     "w": 146,
@@ -1091,5 +1207,39 @@
     "w": 146,
     "h": 145,
     "slice": null
+  },
+  "pm_window_settings__1_1": {
+    "file": "pm_window_settings__1_1.png",
+    "w": 817,
+    "h": 706,
+    "slice": null
+  },
+  "pm_window_settings__1_2": {
+    "file": "pm_window_settings__1_2.png",
+    "w": 817,
+    "h": 706,
+    "slice": null
+  },
+  "pm_window_settings": {
+    "file": null,
+    "w": 1630,
+    "h": 706,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_settings__1_1",
+        0,
+        0,
+        817,
+        706
+      ],
+      [
+        "pm_window_settings__1_2",
+        813,
+        0,
+        817,
+        706
+      ]
+    ]
   }
 }

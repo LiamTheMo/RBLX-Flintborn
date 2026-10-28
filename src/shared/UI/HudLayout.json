@@ -51,7 +51,11 @@
     "photo": "#C5B3A1",
     "leather": "#9B3A1E",
     "cream": "#FBEBD0",
-    "veil": "#1A0E06"
+    "veil": "#1A0E06",
+    "headerRule": "#9E6B42",
+    "sliderTrack": "#50311D",
+    "sliderFill": "#FDB335",
+    "damage": "#FFE1A0"
   },
   "party": {
     "anchor": [0, 0],

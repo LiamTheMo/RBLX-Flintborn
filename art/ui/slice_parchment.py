@@ -36,6 +36,10 @@ REF = ROOT / "art" / "reference" / "ui" / "parchment"
 OUT = HERE / "sprites"
 MANIFEST = OUT / "manifest.json"
 PAD = 2
+# Roblox's largest image side; bigger art is split into tiles of at most TILE px.
+MAX_SIDE = 1024
+TILE = 1000
+TILE_OVERLAP = 2
 
 N4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 N8 = N4 + [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -234,19 +238,22 @@ def push_pull(rgb, known):
     return est
 
 
-_grain = None
+_grains = {}
+# Clean texture patches: plain paper (materials sheet) and blank leather (the
+# buttons sheet's leather plate).
+GRAIN_SOURCES = {"paper": ("06", (62, 60, 362, 236)), "leather": ("03", (70, 92, 370, 170))}
 
 
-def grain():
-    """High-pass texture of a clean parchment plate (materials sheet, plain paper)."""
-    global _grain
-    if _grain is None:
-        paper = sheet("06")[60:236, 62:362, :3]
-        _grain = paper - box_blur(paper, 5)
-    return _grain
+def grain(kind="paper"):
+    """High-pass texture of a clean patch, to re-texture repainted areas."""
+    if kind not in _grains:
+        name, (x0, y0, x1, y1) = GRAIN_SOURCES[kind]
+        patch = sheet(name)[y0:y1, x0:x1, :3]
+        _grains[kind] = patch - box_blur(patch, 5)
+    return _grains[kind]
 
 
-def erase(a, mask, amount=0.8, feather=1):
+def erase(a, mask, amount=0.8, feather=1, texture="paper"):
     """Repaints `mask` from its surroundings plus parchment grain, blending over
     `feather` pixels at its edge. Alpha is kept."""
     a = a.copy()
@@ -260,7 +267,7 @@ def erase(a, mask, amount=0.8, feather=1):
     paper = ring & (lum(a) > 0.78)
     ring = paper if paper.sum() > 50 else ring
     base = push_pull(a[..., :3], ring)
-    g = grain()
+    g = grain(texture)
     h, w = mask.shape
     reps = (h // g.shape[0] + 2, w // g.shape[1] + 2, 1)
     tex = np.tile(np.concatenate([g, g[:, ::-1]], 1), reps)[:h, :w]
@@ -506,9 +513,121 @@ def build():
     return s
 
 
+# ---------------------------------------------------------------------------
+# menu kit helpers
+# ---------------------------------------------------------------------------
+
+
+def trim_alpha(a, pad=PAD):
+    """Crops to the opaque bounding box with `pad` transparent pixels around."""
+    ys, xs = np.nonzero(a[..., 3] > 0.02)
+    a = a[ys.min(): ys.max() + 1, xs.min(): xs.max() + 1]
+    out = np.zeros((a.shape[0] + 2 * pad, a.shape[1] + 2 * pad, 4), np.float32)
+    out[pad:pad + a.shape[0], pad:pad + a.shape[1]] = a
+    return out
+
+
+def plate(a, rect):
+    """A button or tab drawn on paper: cut out (paper around it made clear),
+    reduced to its largest piece and trimmed."""
+    piece = frame_cutout(a, rect, pad=0)
+    parts = components(piece[..., 3] > 0.1)
+    if parts:
+        ys, xs = max(parts, key=lambda c: len(c[0]))
+        keep = np.zeros(piece.shape[:2], bool)
+        keep[ys, xs] = True
+        piece[~dilate(keep, 1), 3] = 0.0
+    return trim_alpha(piece)
+
+
+def silhouette(a, rect, dark=True, lo=0.30, hi=0.75):
+    """A glyph as a white silhouette (tinted in game with ImageColor3): alpha is how
+    far each pixel is from the background toward the ink (dark ink on paper, or
+    light ink on leather when dark=False)."""
+    x, y, w, h = rect
+    piece = a[y:y + h, x:x + w]
+    L = lum(piece)
+    alpha = (hi - L) / (hi - lo) if dark else (L - lo) / (hi - lo)
+    alpha = np.clip(alpha, 0, 1)
+    # Keep the glyph's own islands, not stray texture.
+    keep = np.zeros(alpha.shape, bool)
+    for ys, xs in components(alpha > 0.5):
+        if len(ys) >= 25:
+            keep[ys, xs] = True
+    alpha *= dilate(keep, 2)
+    out = np.ones(piece.shape, np.float32)
+    out[..., 3] = alpha
+    return trim_alpha(out)
+
+
+def disc(a, cx, cy, r):
+    """A round piece (a slider knob) cut with an anti-aliased circular mask."""
+    size = int(2 * r + 2 * PAD)
+    x0, y0 = int(cx - r - PAD), int(cy - r - PAD)
+    piece = a[y0:y0 + size, x0:x0 + size].copy()
+    ys, xs = np.mgrid[0:size, 0:size]
+    d = np.sqrt((xs + 0.5 - (cx - x0)) ** 2 + (ys + 0.5 - (cy - y0)) ** 2)
+    piece[..., 3] *= np.clip(r - d + 0.5, 0, 1)
+    return piece
+
+
+def erase_ink(a, rect, dark=True, threshold=None, grow=2, amount=0.8, texture="paper"):
+    """Erases text or a glyph inside rect: dark ink on paper, or light ink on leather."""
+    x0, y0, x1, y1 = rect
+    m = np.zeros(a.shape[:2], bool)
+    L = lum(a[y0:y1, x0:x1])
+    if dark:
+        m[y0:y1, x0:x1] = L < (threshold or 0.62)
+    else:
+        m[y0:y1, x0:x1] = L > (threshold or 0.55)
+    m = dilate(m, grow) & box(a.shape, rect)
+    return erase(a, m, amount=amount, texture=texture)
+
+
+def build_settings():
+    """Settings window (10_settings): the shell with tabs and content erased, and
+    the pieces its screen is built from."""
+    g = sheet("10")
+    s = {}
+    # Tabs: the selected (leather) and normal (paper) plates, label and icon erased.
+    sel = plate(g, (84, 190, 320, 104))
+    # The leather face between its stitch lines is repainted whole (label and
+    # icon), so no ghost of either stays.
+    sel = erase(sel, box(sel.shape, (22, 24, 264, 82)), amount=1.0, feather=3, texture="leather")
+    s["pm_tab_leather"] = (sel, [40, 30, 52, 30])
+    tab = plate(g, (86, 294, 316, 100))
+    tab = erase_ink(tab, (26, 10, 262, 92), dark=True)
+    s["pm_tab_paper"] = (tab, [40, 30, 52, 30])
+    # Tab icons as white silhouettes.
+    s["pm_glyph_gear"] = (silhouette(g, (116, 212, 66, 66), dark=False, lo=0.35, hi=0.8), None)
+    s["pm_glyph_sound"] = (silhouette(g, (116, 312, 66, 62)), None)
+    s["pm_glyph_monitor"] = (silhouette(g, (112, 408, 72, 66)), None)
+    s["pm_glyph_gamepad"] = (silhouette(g, (112, 510, 72, 62)), None)
+    s["pm_glyph_person"] = (silhouette(g, (116, 606, 64, 74)), None)
+    s["pm_glyph_diamond"] = (silhouette(g, (448, 222, 26, 28)), None)
+    # Window shell: the tab column and the whole content panel repainted as paper.
+    win = erase(g, box(g.shape, (84, 190, 404, 702)), amount=0.8, feather=4)
+    win = erase(win, box(g.shape, (424, 197, 1584, 724)), amount=0.8, feather=4)
+    s["pm_window_settings"] = (cut_clean(win, (23, 60, 1626, 702)), None)
+    # Controls from the component strip.
+    s["pm_check_off"] = (cut_clean(g, (50, 817, 54, 57)), None)
+    s["pm_check_on"] = (cut_clean(g, (152, 812, 66, 67)), None)
+    dd = erase_ink(g, (290, 820, 420, 870), dark=True)
+    s["pm_dropdown"] = (cut_clean(dd, (267, 810, 235, 69)), [30, 26, 72, 26])
+    s["pm_slider_knob"] = (disc(g, 746, 842, 27), None)
+    for name, rect, text in (("pm_keycap", (1098, 814, 112, 67), (1110, 824, 1200, 868)),
+                             ("pm_keycap_small", (1249, 814, 75, 67), (1258, 824, 1316, 868))):
+        k = erase_ink(g, text, dark=True)
+        s[name] = (cut_clean(k, rect), [22, 22, 22, 26] if name == "pm_keycap" else None)
+    s["pm_button_reset"] = (plate(g, (1076, 634, 214, 76)), None)
+    s["pm_button_apply"] = (plate(g, (1304, 624, 281, 94)), None)
+    return s
+
+
 def contact(sprites, path):
     items = [(n, a) for n, (a, _) in sorted(sprites.items())]
-    width, x, y, row, gap = 1600, 10, 10, 0, 12
+    width = max(1600, max(a.shape[1] for _, a in items) + 20)
+    x, y, row, gap = 10, 10, 0, 12
     placed = []
     for name, a in items:
         h, w = a.shape[:2]
@@ -528,16 +647,37 @@ def contact(sprites, path):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     sprites = build()
+    sprites.update(build_settings())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]
+    for old in OUT.glob("pm_*.png"):
+        old.unlink()
     for name, (a, insets) in sorted(sprites.items()):
         a = clean(a)
         sprites[name] = (a, insets)
-        save(a, OUT / f"{name}.png")
         h, w = a.shape[:2]
-        manifest[name] = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets}
-        print(f"{name:28s} {w:4d}x{h:<4d} slice={insets}")
+        if w <= MAX_SIDE and h <= MAX_SIDE:
+            save(a, OUT / f"{name}.png")
+            manifest[name] = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets}
+        else:
+            # Roblox shrinks uploads past 1024 px: big art goes up as tiles that
+            # Widgets.Sprite lays back together (tiles overlap by TILE_OVERLAP so
+            # filtering leaves no seam).
+            tiles = []
+            cols, rows = -(-w // TILE), -(-h // TILE)
+            for row in range(rows):
+                for col in range(cols):
+                    x0, y0 = col * w // cols, row * h // rows
+                    x1, y1 = (col + 1) * w // cols, (row + 1) * h // rows
+                    ex0, ey0 = max(0, x0 - TILE_OVERLAP), max(0, y0 - TILE_OVERLAP)
+                    ex1, ey1 = min(w, x1 + TILE_OVERLAP), min(h, y1 + TILE_OVERLAP)
+                    tile = f"{name}__{row + 1}_{col + 1}"
+                    save(a[ey0:ey1, ex0:ex1], OUT / f"{tile}.png")
+                    manifest[tile] = {"file": f"{tile}.png", "w": int(ex1 - ex0), "h": int(ey1 - ey0), "slice": None}
+                    tiles.append([tile, int(ex0), int(ey0), int(ex1 - ex0), int(ey1 - ey0)])
+            manifest[name] = {"file": None, "w": int(w), "h": int(h), "slice": None, "tiles": tiles}
+        print(f"{name:28s} {w:4d}x{h:<4d} slice={insets}" + (" (tiled)" if w > MAX_SIDE or h > MAX_SIDE else ""))
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     contact(sprites, OUT / "_parchment_contact.png")
     print(f"{len(sprites)} parchment sprites -> {OUT.relative_to(ROOT)}")

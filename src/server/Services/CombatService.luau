@@ -104,7 +104,10 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 	-- PvP mastery combat perk, bounded at +5% (Q76).
 	rawDamage = ModifierRules.Raw(rawDamage, ModifierService.Get(attacker, "PvpDamage"))
 	local newHealth = applyDamage(target, humanoid, rawDamage)
-	Remotes.Get("CombatFeedback"):FireClient(attacker, "Hit", math.round(rawDamage))
+	-- The hit's place lets the attacker's client float a damage number there.
+	local root = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+	Remotes.Get("CombatFeedback")
+		:FireClient(attacker, "Hit", math.round(rawDamage), root and (root :: BasePart).Position or nil)
 	Remotes.Get("CombatFeedback"):FireClient(target, "Hurt", math.round(rawDamage))
 	CombatService.Damaged:Fire(attacker, target, rawDamage, newHealth)
 	return true

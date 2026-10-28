@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.22  
+> **Design revision:** 1.23  
 > **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2184,6 +2184,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
 | **1.22** | 2026-10-28 | Owner decision (§56): the hotbar has **6 slots** for now (keys 1–6), replacing Q126's nine. |
+| **1.23** | 2026-10-28 | Owner decision (§57): the parchment Settings screen with five tabs and new settings — Music and Effects volumes, Camera Sensitivity, Invert Camera, Show Damage (floating damage numbers), Show Names and Graphics Quality — saved through APPLY. |
 | **1.21** | 2026-10-28 | Owner decision (§55): no swimming; all water is knee-deep and slows walking by 30%. |
 | **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
 | **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
@@ -2440,6 +2441,19 @@ Approximate regional envelopes with shared transition areas, not rectangles pack
 2. **Keys 1–6** select the slots by default (rebindable, §46); the Hotbar7–9 binds are gone and a saved rebind for them is ignored.
 3. **Nothing is lost by the change.** Saves keep items as a list and slots are filled again when a run starts, so items that sat in slots 7–9 move to the backpack. If a deployed loadout no longer fits the 56 slots, the rest stays safely in the lobby backpack (the existing run-start rule), never deleted.
 4. The parchment HUD reference's nine slots are drawn as six when that screen is built.
+
+## 57. Owner decision: the parchment Settings screen and its new settings (2026-10-28)
+
+The Settings window is rebuilt from the parchment reference (`art/reference/ui/parchment/10_settings.png`, spec `docs/ui/SettingsScreen.md`) with five tabs, and the owner asked for the reference's new settings to be real features, not decoration:
+
+1. **Music** and **Effects** volumes, 0–100 (defaults 75 and 80). Sounds play through two sound groups: sounds tagged `Music` go to Music, every other sound without a group of its own to Effects.
+2. **Camera Sensitivity**, 10–100 (default 50 = Roblox's own; 10 is a fifth of it, 100 twice it).
+3. **Invert Camera** (off by default) flips vertical look input.
+4. **Show Damage** (on): a hit's damage floats up from where it landed (still, with reduced motion); off, hit markers stay but carry no numbers.
+5. **Show Names** (on): other players' name tags; off hides them on this client only.
+6. **Graphics Quality** Low / Medium / High (default High): Low keeps a quarter of decorative particles and turns shadows off, Medium keeps 60% with shadows, High keeps everything.
+7. Changes collect in a draft: **APPLY** saves them, **RESET** returns the open tab's settings and keys to their defaults, and closing the window discards unsaved changes. The existing settings (UI scale, colour-blind palette, reduced motion, subtitles, tutorial replay, key rebinds, §46) keep their rules and move into the tabs.
+8. The server accepts only known settings with valid values (`SettingsRules`), as before.
 
 ---
 
