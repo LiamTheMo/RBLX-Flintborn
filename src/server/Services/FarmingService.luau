@@ -23,10 +23,19 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local FarmingService = {}
 
+-- One plant prompt per crop in CROP_ORDER, each on its own key.
 local KEYS = {
 	{ Enum.KeyCode.E, Enum.KeyCode.ButtonX },
 	{ Enum.KeyCode.R, Enum.KeyCode.ButtonY },
 	{ Enum.KeyCode.F, Enum.KeyCode.ButtonB },
+	{ Enum.KeyCode.G, Enum.KeyCode.ButtonL2 },
+}
+-- Colour of each crop once ripe (green while growing).
+local RIPE_COLORS = {
+	Redberry = Color3.fromRGB(220, 60, 90),
+	Sweetberry = Color3.fromRGB(240, 150, 60),
+	Herbs = Color3.fromRGB(120, 200, 90),
+	Sapling = Color3.fromRGB(120, 86, 50),
 }
 
 local planters = {}
@@ -54,6 +63,14 @@ local function seedText(seed): string
 	return table.concat(parts, ", ")
 end
 
+-- What players read for a crop: the item it yields ("Redberry"), or the crop
+-- itself when that is a generic material (a Sapling grows Wood).
+local function cropName(cropId: string): string
+	local crop = StructureCatalog.Crops[cropId]
+	local def = crop.yield.catalogId == cropId and ItemCatalog.Get(cropId)
+	return def and def.name or cropId
+end
+
 local function refresh(planter)
 	local crop = planter.cropId and StructureCatalog.Crops[planter.cropId]
 	for _, prompt in planter.plantPrompts do
@@ -71,19 +88,21 @@ local function refresh(planter)
 	local progress = 1 - remaining / crop.seconds
 	planter.harvest.Enabled = remaining <= 0
 	planter.harvest.ObjectText = if remaining <= 0
-		then planter.cropId .. " (ripe)"
-		else ("%s — %d:%02d"):format(planter.cropId, remaining // 60, remaining % 60)
+		then cropName(planter.cropId) .. " (ripe)"
+		else ("%s — %d:%02d"):format(cropName(planter.cropId), remaining // 60, remaining % 60)
 	if planter.plant then
 		local height = 0.4 + 2.6 * progress
 		planter.plant.Size = Vector3.new(1.5, height, 1.5)
 		planter.plant.CFrame = planter.record.part.CFrame * CFrame.new(0, 0.75 + height / 2, 0)
-		planter.plant.Color = if remaining <= 0 then Color3.fromRGB(220, 60, 90) else Color3.fromRGB(80, 170, 70)
+		planter.plant.Color = if remaining <= 0
+			then RIPE_COLORS[planter.cropId] or Color3.fromRGB(220, 60, 90)
+			else Color3.fromRGB(80, 170, 70)
 	end
 end
 
 local function plant(player: Player, planter, cropId: string)
 	local crop = StructureCatalog.Crops[cropId]
-	if planter.cropId or not canAct(player) then
+	if crop == nil or planter.cropId or not canAct(player) then
 		return
 	end
 	if not InventoryService.RemoveAll(player, crop.seed) then
@@ -131,10 +150,13 @@ local function register(record)
 	for index, cropId in StructureCatalog.CROP_ORDER do
 		local crop = StructureCatalog.Crops[cropId]
 		local prompt = Instance.new("ProximityPrompt")
-		prompt.ActionText = "Plant " .. cropId
+		prompt.ActionText = "Plant " .. cropName(cropId)
 		prompt.ObjectText = "Costs " .. seedText(crop.seed)
-		prompt.KeyboardKeyCode = KEYS[index][1]
-		prompt.GamepadKeyCode = KEYS[index][2]
+		local keys = KEYS[index]
+		if keys then
+			prompt.KeyboardKeyCode = keys[1]
+			prompt.GamepadKeyCode = keys[2]
+		end
 		prompt.HoldDuration = 0.5
 		prompt.MaxActivationDistance = 8
 		prompt.Parent = record.part

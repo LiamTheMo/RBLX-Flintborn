@@ -4,7 +4,8 @@
 -- sight, risk state, friendly fire and safe zones, and applies damage through
 -- armor EHP. Nobody inside a safe zone deals damage to anything (§3.2). Arrows
 -- leave from the head, and draw time is capped at what the server saw. Swings and
--- shots only count near the player's last server-validated position. World only.
+-- shots only count near the player's last server-validated position. With a siege
+-- item equipped the attack input throws or sets it instead (SiegeService). World only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,6 +18,7 @@ local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local AntiExploitService = require(script.Parent.AntiExploitService)
@@ -38,6 +40,10 @@ CombatService.Hurt = Signal.new()
 -- How far (horizontally) a swing's root may be from the last validated position:
 -- two samples of sprinting (one of them a forgiven overrun from jitter).
 CombatService.VALIDATED_SLACK = 12
+-- Set by SiegeService: `(player, aim)` handles the attack input while a siege
+-- item (Fire Bomb, Breaching Charge) is equipped. Kept as a hook so CombatService
+-- does not require SiegeService (which uses ApplyHit).
+CombatService.SiegeAttack = nil :: ((Player, Vector3) -> ())?
 
 local lastAttack = {}
 local lastSequence = {}
@@ -180,6 +186,12 @@ local function melee(player: Player, sequence: any, direction: any)
 	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
 		return
 	end
+	-- A held siege item is thrown or set, never swung (SiegeService validates it).
+	local held = InventoryService.Equipped(player)
+	if CombatService.SiegeAttack and SiegeRules.Kind(held and held.catalogId) then
+		CombatService.SiegeAttack(player, aim)
+		return
+	end
 	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) or inSafeZone(player) then
 		return
 	end
@@ -253,11 +265,11 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 		return
 	end
 	-- Each shot consumes one crafted arrow (GDD Q28).
-	if not InventoryService.RemoveAll(player, { Arrow = 1 }) then
+	if not InventoryService.RemoveAll(player, { [WeaponCatalog.ARROW] = 1 }) then
 		InventoryService.Notify(player, "You have no arrows.")
 		return
 	end
-	local damage = DamageRules.ArrowDamage(profile, "Arrow", equipped.qualityRoll)
+	local damage = DamageRules.ArrowDamage(profile, WeaponCatalog.ARROW, equipped.qualityRoll)
 	-- The draw cannot have lasted longer than the server saw since the last attack.
 	local draw = DamageRules.ObservedDraw(drawSeconds, previous, lastAttack[player])
 	-- Launched from the head itself, so an arrow can never start beyond a wall.

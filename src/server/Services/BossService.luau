@@ -23,6 +23,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
+local ModifierService = require(script.Parent.ModifierService)
 local NpcService = require(script.Parent.NpcService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -236,7 +237,7 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 		lastContested = os.clock(),
 		phase = "Fight",
 		options = options,
-		-- Player -> true for everyone who damaged it (participation credit).
+		-- Player -> damage dealt, for everyone who damaged it (participation credit).
 		contributors = {},
 	}
 	boss.npc = NpcService.Register({
@@ -249,7 +250,7 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 		onDamaged = function(npc, amount, attacker)
 			boss.lastContested = os.clock()
 			if attacker then
-				boss.contributors[attacker] = true
+				boss.contributors[attacker] = (boss.contributors[attacker] or 0) + amount
 			end
 			if options.onDamaged then
 				options.onDamaged(boss, npc.health + amount, npc.health)
@@ -262,7 +263,10 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 			end
 			bosses[boss.id] = nil
 			local at = body.Position - Vector3.new(0, def.size.Y / 2, 0)
-			for _, item in EventRules.RollLoot(def.loot, rng) do
+			-- The top damage dealer's luck raises the chance rows (GDD §51).
+			local top = BossService.TopContributor(boss)
+			local luck = if top then ModifierService.Sum(top, "Luck") else 0
+			for _, item in EventRules.RollLoot(def.loot, rng, luck) do
 				DropService.Spawn(item, at + Vector3.new(rng:NextNumber(-5, 5), 0, rng:NextNumber(-5, 5)))
 			end
 			BossService.Defeated:Fire(boss)
@@ -355,6 +359,17 @@ local function step(dt: number)
 			body.CFrame = CFrame.lookAt(standing, standing + flat.Unit)
 		end
 	end
+end
+
+-- The player still in the server who dealt the boss the most damage, or nil.
+function BossService.TopContributor(boss): Player?
+	local best, bestDamage = nil, 0
+	for player, damage in boss.contributors do
+		if player.Parent and damage > bestDamage then
+			best, bestDamage = player, damage
+		end
+	end
+	return best
 end
 
 function BossService.Active()

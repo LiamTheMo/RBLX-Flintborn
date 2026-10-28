@@ -8,6 +8,12 @@ local EnemyCatalog = {}
 EnemyCatalog.Themes = { "Primitive", "Ancient", "Skeletal", "Elemental", "EvilNpc", "Mythological" }
 
 EnemyCatalog.ELITE = { health = 3, damage = 1.5, size = 1.4 }
+-- What an alpha drops on top of its kind's drops (GDD §18.1, §51; placeholders).
+EnemyCatalog.ELITE_DROPS = {
+	{ "DireHide", 1, 2, 0.8 },
+	{ "ChargedCore", 1, 1, 0.35 },
+	{ "GlowFur", 1, 1, 0.35 },
+}
 
 EnemyCatalog.Enemies = {
 	Wolf = {
@@ -20,7 +26,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.2,
 		size = Vector3.new(2, 2.5, 4),
 		color = Color3.fromRGB(110, 110, 115),
-		drops = { { "Hide", 1, 2, 1 }, { "RawMeat", 1, 2, 1 } },
+		drops = { { "Hide", 1, 2, 1 }, { "RawMeat", 1, 2, 1 }, { "Bone", 1, 2, 1 } },
 	},
 	Boar = {
 		name = "Boar",
@@ -32,7 +38,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.4,
 		size = Vector3.new(2.5, 2.5, 4),
 		color = Color3.fromRGB(105, 76, 52),
-		drops = { { "Hide", 2, 3, 1 }, { "RawMeat", 2, 3, 1 }, { "Berries", 1, 3, 0.4 } },
+		drops = { { "Hide", 2, 3, 1 }, { "RawMeat", 2, 3, 1 }, { "Bone", 1, 3, 1 }, { "Redberry", 1, 3, 0.4 } },
 	},
 	Sabertooth = {
 		name = "Sabertooth",
@@ -44,7 +50,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.3,
 		size = Vector3.new(3, 3.5, 6),
 		color = Color3.fromRGB(196, 150, 88),
-		drops = { { "Hide", 4, 6, 1 }, { "RawMeat", 3, 5, 1 } },
+		drops = { { "Hide", 4, 6, 1 }, { "RawMeat", 3, 5, 1 }, { "Bone", 2, 4, 1 } },
 	},
 	Skeleton = {
 		name = "Skeleton Warrior",
@@ -56,7 +62,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.3,
 		size = Vector3.new(2, 5, 1.5),
 		color = Color3.fromRGB(226, 220, 200),
-		drops = { { "Stone", 3, 6, 1 }, { "Iron", 1, 3, 0.5 } },
+		drops = { { "Stone", 3, 6, 1 }, { "IronOre", 1, 3, 0.5 } },
 	},
 	EmberWisp = {
 		name = "Ember Wisp",
@@ -80,7 +86,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.2,
 		size = Vector3.new(2, 5, 1.5),
 		color = Color3.fromRGB(120, 40, 40),
-		drops = { { "Iron", 2, 5, 1 }, { "Fiber", 3, 6, 0.6 } },
+		drops = { { "IronOre", 2, 5, 1 }, { "Fiber", 3, 6, 0.6 } },
 	},
 	Minotaur = {
 		name = "Minotaur",
@@ -92,7 +98,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.8,
 		size = Vector3.new(4, 8, 3),
 		color = Color3.fromRGB(90, 60, 40),
-		drops = { { "Iron", 15, 25, 1 }, { "AncientEmber", 1, 1, 1 } },
+		drops = { { "IronOre", 15, 25, 1 }, { "AncientEmber", 1, 1, 1 } },
 	},
 }
 

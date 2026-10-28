@@ -1,23 +1,27 @@
--- Pure event director rules (GDD §7.1, Q42, Q140–143), driven by an injected
+-- Pure event director rules (GDD §7.1, §51, Q42, Q140–143), driven by an injected
 -- Random so specs can seed it. Every category rolls on its own each tick: ~25% to
--- trigger, then rarities are tried highest first with explicit weights, falling
--- back to Common when the category has one and skipping when it does not.
+-- trigger, then every non-Common entry rolls its own rarity weight, so event types
+-- never compete with others of their category or rarity (owner decision, GDD §51)
+-- and several may start at once. Common is the fallback when nothing rarer hits;
+-- a category without one skips.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local Rarity = require(script.Parent.Parent.Items.Rarity)
 
 local EventRules = {}
 
 EventRules.TRIGGER_CHANCE = GameConstants.EVENT_CATEGORY_TRIGGER_CHANCE
 EventRules.TICK_SECONDS = GameConstants.EVENT_CHECK_SECONDS
 
--- Tried in this order after a category triggers (placeholder weights).
-EventRules.WATERFALL = {
-	{ "Secret", 0.001 },
-	{ "Mythic", 0.005 },
-	{ "Legendary", 0.015 },
-	{ "Epic", 0.05 },
-	{ "Rare", 0.12 },
-	{ "Uncommon", 0.25 },
+-- Each entry's chance once its category triggers, by rarity (placeholder weights).
+-- An entry of a rarity listed here starts as often as the whole rarity used to.
+EventRules.RARITY_WEIGHTS = {
+	Secret = 0.001,
+	Mythic = 0.005,
+	Legendary = 0.015,
+	Epic = 0.05,
+	Rare = 0.12,
+	Uncommon = 0.25,
 }
 
 -- Budget per server (placeholders): event NPCs alive and large-footprint events.
@@ -34,15 +38,6 @@ EventRules.BIOMES = {
 	Any = { 0.03, 0.9 },
 }
 
-local function has(entries, rarity: string): boolean
-	for _, entry in entries do
-		if entry.rarity == rarity then
-			return true
-		end
-	end
-	return false
-end
-
 local function pick(entries, rarity: string, rng)
 	local matching = {}
 	for _, entry in entries do
@@ -56,31 +51,55 @@ local function pick(entries, rarity: string, rng)
 	return matching[rng:NextInteger(1, #matching)]
 end
 
--- One category's roll for one tick: an entry, or nil.
-function EventRules.RollCategory(entries, rng)
-	if #entries == 0 or rng:NextNumber() >= EventRules.TRIGGER_CHANCE then
-		return nil
+-- Rarest first, keeping catalog order within a rarity.
+local function byRarity(list)
+	local order = {}
+	for index, entry in list do
+		order[entry] = index
 	end
-	for _, step in EventRules.WATERFALL do
-		local rarity, weight = step[1], step[2]
-		-- Rarities a category does not have are not rolled.
-		if has(entries, rarity) and rng:NextNumber() < weight then
-			return pick(entries, rarity, rng)
+	table.sort(list, function(a, b)
+		local ra, rb = Rarity.Index(a.rarity) or 0, Rarity.Index(b.rarity) or 0
+		if ra ~= rb then
+			return ra > rb
 		end
-	end
-	return pick(entries, "Common", rng)
+		return order[a] < order[b]
+	end)
+	return list
 end
 
--- Every category rolls independently, so several events can start in one tick.
-function EventRules.RollTick(catalog, categories, rng)
+-- One category's roll for one tick: the entries that start, rarest first (empty
+-- when the category does not trigger or has no Common to fall back on).
+function EventRules.RollCategory(entries, rng)
 	local results = {}
-	for _, category in categories do
-		local entry = EventRules.RollCategory(catalog[category] or {}, rng)
-		if entry then
+	if #entries == 0 or rng:NextNumber() >= EventRules.TRIGGER_CHANCE then
+		return results
+	end
+	for _, entry in entries do
+		-- Every non-Common type rolls on its own; unlisted rarities never roll.
+		local weight = EventRules.RARITY_WEIGHTS[entry.rarity]
+		if weight and rng:NextNumber() < weight then
 			table.insert(results, entry)
 		end
 	end
-	return results
+	if #results == 0 then
+		local common = pick(entries, "Common", rng)
+		if common then
+			table.insert(results, common)
+		end
+	end
+	return byRarity(results)
+end
+
+-- Every category rolls independently, so several events can start in one tick.
+-- Rarest first across categories, so the budget favours them when it runs short.
+function EventRules.RollTick(catalog, categories, rng)
+	local results = {}
+	for _, category in categories do
+		for _, entry in EventRules.RollCategory(catalog[category] or {}, rng) do
+			table.insert(results, entry)
+		end
+	end
+	return byRarity(results)
 end
 
 -- True when a footprint at `position` overlaps none of the active ones.
@@ -122,8 +141,8 @@ function EventRules.NpcCount(group): number
 	return count
 end
 
--- Rolls a loot table into {catalogId, quantity} stacks. `luck` (the Fortune
--- perk) raises each row's chance relatively, never above certain.
+-- Rolls a loot table into {catalogId, quantity} stacks. `luck` (the Fortune perk
+-- and luck boosts) raises each row's chance relatively, never above certain.
 function EventRules.RollLoot(loot, rng, luck: number?)
 	local items = {}
 	for _, row in loot or {} do

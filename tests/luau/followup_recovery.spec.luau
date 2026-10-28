@@ -570,7 +570,7 @@ local function settling()
 	profile.progression.level = 12
 	profile.currency.coins = 100
 	profile.currency.gems = 1000
-	profile.vault.materials.Iron = 50
+	profile.vault.materials.IronBar = 50
 	profile.vault.materials.Wood = 50
 	profile.lobbyBackpack.slots = { { catalogId = "AncientEmber", quantity = 1 } }
 	profile.trades.pending.t1 = {
@@ -587,7 +587,7 @@ test("selling, forging, Gem spending and Deploy wait while a trade settles", fun
 	local ok, reason = EconomyRules.Sell(profile, "backpack", 1, nil, "sale:x", NOW)
 	expectEq(ok, false, "no backpack sale")
 	expectEq(reason, "TradeSettling", "with a clear reason")
-	ok = EconomyRules.Sell(profile, "vault", "Iron", 5, "sale:y", NOW)
+	ok = EconomyRules.Sell(profile, "vault", "IronBar", 5, "sale:y", NOW)
 	expectEq(ok, false, "no vault sale")
 	ok, reason = EconomyRules.BuyVaultTier(profile)
 	expectEq(reason, "TradeSettling", "no Gem vault upgrade")
@@ -606,7 +606,7 @@ test("selling, forging, Gem spending and Deploy wait while a trade settles", fun
 	})
 	expectEq(receipt, nil, "no Forge craft")
 	expectEq(why, "TradeSettling", "with a clear reason")
-	expectEq(profile.vault.materials.Iron, 50, "inputs untouched")
+	expectEq(profile.vault.materials.IronBar, 50, "inputs untouched")
 	local reserved, err = pcall(TransitRules.Reserve, profile, "res-x", NOW)
 	expect(not reserved and tostring(err):find("TradeSettling") ~= nil, "no Deploy reservation")
 	expectEq(#profile.lobbyBackpack.slots, 1, "the received item stays reclaimable")

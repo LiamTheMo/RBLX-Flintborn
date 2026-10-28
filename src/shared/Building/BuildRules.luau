@@ -191,6 +191,40 @@ function BuildRules.Claim(structures, totem, totems)
 	return claimed
 end
 
+-- The tiers a piece comes in, in ladder order: every StructureCatalog tier for
+-- walls, floors, doors and roofs; the one tier of furniture and stations.
+function BuildRules.TiersOf(pieceId: string): { string }
+	local piece = StructureCatalog.Pieces[pieceId]
+	local list = {}
+	for _, tier in StructureCatalog.TIERS do
+		if piece and piece.tiers[tier] then
+			table.insert(list, tier)
+		end
+	end
+	return list
+end
+
+function BuildRules.IsTiered(pieceId: string): boolean
+	return #BuildRules.TiersOf(pieceId) > 1
+end
+
+-- The tier to build `pieceId` in when the player picked `wanted`: that tier when
+-- the piece comes in it, otherwise the piece's lowest tier.
+function BuildRules.TierFor(pieceId: string, wanted: string?): string?
+	local tiers = BuildRules.TiersOf(pieceId)
+	return if table.find(tiers, wanted) then wanted else tiers[1]
+end
+
+-- The tier `delta` steps from `tier` along the piece's tiers, wrapping round.
+function BuildRules.CycleTier(pieceId: string, tier: string, delta: number): string?
+	local tiers = BuildRules.TiersOf(pieceId)
+	if #tiers == 0 then
+		return nil
+	end
+	local index = table.find(tiers, tier) or 1
+	return tiers[(index - 1 + delta) % #tiers + 1]
+end
+
 function BuildRules.TotemLevel(level: number)
 	return StructureCatalog.TotemLevels[level]
 end
@@ -202,10 +236,9 @@ function BuildRules.UpgradeCost(level: number)
 end
 
 -- Raw weapon damage against a structure; a matching tool hits 1.5× (axe vs wood,
--- pickaxe vs stone and iron).
+-- pickaxe vs stone and every metal).
 function BuildRules.StructureDamage(rawDamage: number, toolKind: string?, material: string): number
-	local matches = (toolKind == "Axe" and material == "Wood")
-		or (toolKind == "Pickaxe" and (material == "Stone" or material == "Iron"))
+	local matches = (toolKind == "Axe" and material == "Wood") or (toolKind == "Pickaxe" and material ~= "Wood")
 	return rawDamage * (if matches then 1.5 else 1)
 end
 

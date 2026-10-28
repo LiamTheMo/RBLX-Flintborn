@@ -2,7 +2,9 @@
 -- version and pure migrations from every older version live here so the server,
 -- client and headless specs agree on one definition.
 
+local ForgeRecipes = require(script.Parent.Parent.Crafting.ForgeRecipes)
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 
 local ProfileSchema = {}
 
@@ -116,6 +118,109 @@ local function backfillRedeemedCodes(profile)
 	end
 end
 
+-- Pre-release catalog cleanup (GDD §51, ITEM_CATALOG §8): items whose catalogId no
+-- longer exists (the old Iron material, plain Arrows, Sickles, Basic Pickaxe and
+-- Bow, Berries, Wood and Stone armor) are deleted wherever the profile holds them,
+-- so no code path ever meets an unknown ID. Valid entries are never touched, so
+-- running it on every load is safe.
+local function known(catalogId: any): boolean
+	return ItemCatalog.Get(catalogId) ~= nil
+end
+
+-- Removes unknown records from a list in place. Returns how many were removed.
+local function pruneList(list: any): number
+	if type(list) ~= "table" then
+		return 0
+	end
+	local removed = 0
+	for index = #list, 1, -1 do
+		local item = list[index]
+		if type(item) ~= "table" or not known(item.catalogId) then
+			table.remove(list, index)
+			removed += 1
+		end
+	end
+	return removed
+end
+
+-- Removes unknown keys from a {[catalogId] = value} map in place.
+local function pruneMap(map: any): number
+	if type(map) ~= "table" then
+		return 0
+	end
+	local removed = 0
+	for catalogId in table.clone(map) do
+		if not known(catalogId) then
+			map[catalogId] = nil
+			removed += 1
+		end
+	end
+	return removed
+end
+
+-- Deletes every reference to an item or Forge recipe that is no longer in the
+-- catalog. Returns how many entries were removed (0 when the profile is clean).
+function ProfileSchema.PruneUnknownItems(profile): number
+	local removed = 0
+	removed += pruneList(profile.lobbyBackpack.slots)
+	removed += pruneList(profile.vault.items)
+	removed += pruneMap(profile.vault.materials)
+	local overflow = profile.vault.lastOverflow
+	if type(overflow) == "table" then
+		removed += pruneMap(overflow.deleted)
+	end
+	if type(profile.transit) == "table" then
+		removed += pruneList(profile.transit.items)
+	end
+	for _, receipt in profile.receipts.maintenance do
+		if type(receipt) == "table" then
+			removed += pruneList(receipt.items)
+		end
+	end
+	for _, receipt in profile.receipts.extraction do
+		if type(receipt) == "table" then
+			removed += pruneMap(receipt.vaulted) + pruneMap(receipt.toBackpack) + pruneMap(receipt.deleted)
+		end
+	end
+	for receiptId, receipt in table.clone(profile.receipts.forge) do
+		local output = type(receipt) == "table" and receipt.output
+		if type(output) == "table" and not known(output.catalogId) then
+			profile.receipts.forge[receiptId] = nil
+			removed += 1
+		end
+	end
+	-- The loadout a run recorded at Play, restored if its server crashes.
+	local run = profile.progression.currentRun
+	if type(run) == "table" then
+		removed += pruneList(run.loadout)
+		if type(run.loadout) == "table" and #run.loadout == 0 then
+			run.loadout = nil
+		end
+	end
+	-- A trade awaiting reconciliation never hands back or claws back a removed item.
+	for _, pending in profile.trades.pending do
+		for _, side in { pending.gave, pending.received } do
+			if type(side) == "table" then
+				removed += pruneList(side.items) + pruneMap(side.materials)
+			end
+		end
+	end
+	for instanceId, entry in table.clone(profile.permanentItems) do
+		if type(entry) ~= "table" or not known(entry.catalogId) then
+			profile.permanentItems[instanceId] = nil
+			removed += 1
+		end
+	end
+	removed += pruneMap(profile.recipes.discovered)
+	for recipeId in table.clone(profile.recipes.unlocked) do
+		if ForgeRecipes.Get(recipeId) == nil then
+			profile.recipes.unlocked[recipeId] = nil
+			removed += 1
+		end
+	end
+	return removed
+end
+
 -- Pure migrations: MIGRATIONS[n] upgrades a version-n profile to version n + 1.
 local MIGRATIONS: { [number]: (any) -> any } = {}
 
@@ -142,6 +247,7 @@ function ProfileSchema.Migrate(data: any, now: number?)
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
 	backfillRedeemedCodes(profile)
+	ProfileSchema.PruneUnknownItems(profile)
 	return profile, nil
 end
 
