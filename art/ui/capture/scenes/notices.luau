@@ -23,5 +23,8 @@ local gui = stack.Parent
 local notice = NoticeCard.new(gui, { name = "Card", width = 480, title = "" })
 notice.frame.AnchorPoint = Vector2.new(0.5, 0)
 notice.frame.Position = UDim2.new(0.5, 0, 0, 560)
-notice:Show("The server restarted. Everything you carried was recovered to your vault.\n\nTap to dismiss.", "Items recovered")
+notice:Show(
+	"The server restarted. Everything you carried was recovered to your vault.\n\nTap to dismiss.",
+	"Items recovered"
+)
 __dump(gui, 1280, 820)

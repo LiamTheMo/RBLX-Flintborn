@@ -672,3 +672,4 @@ Studio and live checks:
 - [ ] Trade: inviting a second player shows them the ACCEPT / DECLINE card; both offers update live; any change unlocks both; the countdown runs after both lock; CONFIRM completes; typing gems while the partner changes their offer keeps what you typed.
 - [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
 - [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.
+- [ ] World map (run): N / DPadDown opens it centred on you; pins name the camps and landmarks; active portals and events show and update; zoom follows you until you drag; the safe-camp card appears inside a camp and leaves outside it.
