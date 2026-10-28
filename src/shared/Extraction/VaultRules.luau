@@ -45,16 +45,22 @@ VaultRules.WOULD_OVERFLOW = "VaultWouldOverflow"
 
 -- Moves one lobby backpack slot into the vault. Returns (ok, reason). A material
 -- stack banks whole; one that would go past the capacity is refused with
--- WOULD_OVERFLOW (DepositLoss says how much) unless `allowOverflow` confirms the
--- loss, and then the excess is deleted (BankMaterial).
-function VaultRules.Deposit(profile, backpackIndex: number, now: number?, allowOverflow: boolean?)
+-- WOULD_OVERFLOW (DepositLoss says how much) unless `confirmed` = {catalogId,
+-- loss} accepts it: the slot must still hold that material and lose no more than
+-- the player agreed to, and then the excess is deleted (BankMaterial).
+function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confirmed: any?)
 	local slots = profile.lobbyBackpack.slots
 	local item = slots[backpackIndex]
 	if item == nil then
 		return false, "Empty"
 	end
 	if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
-		if not allowOverflow and VaultRules.DepositLoss(profile, backpackIndex) > 0 then
+		local loss = VaultRules.DepositLoss(profile, backpackIndex)
+		local accepted = type(confirmed) == "table"
+			and confirmed.catalogId == item.catalogId
+			and type(confirmed.loss) == "number"
+			and loss <= confirmed.loss
+		if loss > 0 and not accepted then
 			return false, VaultRules.WOULD_OVERFLOW
 		end
 		VaultRules.BankMaterial(profile, item.catalogId, item.quantity or 0, now or 0)
