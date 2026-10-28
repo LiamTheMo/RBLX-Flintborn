@@ -149,6 +149,10 @@ local function requestPlay(player: Player, requestId: any)
 	if state ~= SessionStates.WorldMainMenuReady then
 		return false, "NotReady"
 	end
+	-- Nobody enters the world before the map is built (it builds after startup).
+	if not SpawnService.WorldReady() then
+		return false, "WorldLoading"
+	end
 	if ProfileService.IsShuttingDown() then
 		return false, "ShuttingDown"
 	end

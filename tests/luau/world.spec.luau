@@ -82,6 +82,14 @@ test("ZoneAt agrees with each zone's footprint; nil out at sea", function()
 		expect(IslandLayout.HeightAt(corner[1], corner[2]) < 0, "under water at the edge")
 	end
 	expect(IslandLayout.HeightAt(3000, -3000) < 0, "the ocean reaches the 6,144-stud square")
+	-- The coast along a direction does not depend on the direction's length.
+	for degrees = 0, 350, 25 do
+		local dx, dz = math.cos(math.rad(degrees)), math.sin(math.rad(degrees))
+		local coast = BiomeCatalog.CoastRadius(dx, dz)
+		expect(math.abs(coast - BiomeCatalog.CoastRadius(dx * 900, dz * 900)) < 0.01, "coast radius at " .. degrees)
+		expect(math.abs(BiomeCatalog.CoastDistance(dx * coast, dz * coast)) < 0.01, "the coast is at " .. degrees)
+		expect(coast > 1800 and coast < BiomeCatalog.ISLAND_SIZE * 0.6, "coast inside the island square")
+	end
 	-- Frostpeak is north (−Z), the Rimlands south.
 	local _, frostZ = BiomeCatalog.Center("FrostpeakRidge")
 	local _, rimZ = BiomeCatalog.Center("Rimlands")
@@ -176,14 +184,65 @@ test("the Keep is reached across the lake by a land bridge and a ford", function
 		local depth = level - IslandLayout.HeightAt(x, -100)
 		expect(depth < 2.5, "the ford stays shallow at x " .. x)
 	end
-	-- The ramp climbs from the lower terrace to the plateau.
-	local previous = IslandLayout.HeightAt(0, 110)
-	for z = 100, -10, -10 do
-		local h = IslandLayout.HeightAt(0, z)
-		expect(h + 0.01 >= previous - 0.5, "the ramp keeps climbing at z " .. z)
-		previous = h
+end)
+
+-- The steepest rise per stud along a polyline (4-stud steps), and whether all of it
+-- is dry ground.
+local function walk(points)
+	local worst, dry = 0, true
+	for index = 2, #points do
+		local a, b = points[index - 1], points[index]
+		local steps = math.max(1, math.floor((b - a).Magnitude / 4))
+		for step = 0, steps - 1 do
+			local p, q = a + (b - a) * (step / steps), a + (b - a) * ((step + 1) / steps)
+			local rise = math.abs(IslandLayout.HeightAt(q.X, q.Z) - IslandLayout.HeightAt(p.X, p.Z))
+			worst = math.max(worst, rise / (q - p).Magnitude)
+			dry = dry and IslandLayout.IsDry(q.X, q.Z)
+		end
 	end
-	expect(previous >= IslandLayout.KEEP_HEIGHT - 1, "the ramp reaches the plateau")
+	return worst, dry
+end
+
+test("walkable paths lead from the bridge and ford to the courtyard, portal and altars", function()
+	local MAX_RISE = 0.7
+	local function at(x, z)
+		return Vector3.new(x, 0, z)
+	end
+	local portal, west, north
+	for _, entry in PoiCatalog.Portals do
+		if entry.kind == "Center" then
+			portal = at(entry.x, entry.z)
+		end
+	end
+	for _, site in PoiCatalog.RitualSites do
+		if site.id == "KeepWestAltar" then
+			west = at(site.x, site.z)
+		elseif site.id == "KeepNorthAltar" then
+			north = at(site.x, site.z)
+		end
+	end
+	local court = IslandLayout.Courtyard
+	local gate = at(court.x, court.z + court.halfZ)
+	local paths = {
+		-- Up the ramp from the land bridge to the courtyard's south gate.
+		ramp = { at(0, 420), gate },
+		bridgeToPortal = { at(0, 240), at(70, 200), portal },
+		portalToFordToNorthAltar = { portal, at(230, 0), at(270, -100), at(215, -215), north },
+		ford = { at(600, -100), at(270, -100) },
+		bridgeToWestAltar = { at(0, 240), at(-90, 200), at(-190, 110), west },
+		templeRamp = {
+			at(IslandLayout.TempleMound.x, IslandLayout.TempleMound.z + 220),
+			at(IslandLayout.TempleMound.x, IslandLayout.TempleMound.z),
+		},
+	}
+	for name, points in paths do
+		local worst, dry = walk(points)
+		expect(worst <= MAX_RISE, ("%s rises %.2f per stud at worst"):format(name, worst))
+		if name ~= "ford" then
+			expect(dry, name .. " stays dry")
+		end
+	end
+	expect(IslandLayout.HeightAt(gate.X, gate.Z) >= IslandLayout.KEEP_HEIGHT - 1, "the gate is on the plateau")
 end)
 
 test("the river runs from the lake to the sea in a contained channel", function()

@@ -4,46 +4,43 @@
 -- or despawned group's slot refills about three minutes later, never within
 -- PLAYER_CLEARANCE of a player or inside a safe zone. A hard cap bounds the
 -- island's creatures; when it is full, a group nobody has been near for a while
--- is despawned to make room. NpcService drives the bodies. Until the map provides
--- RandomPointIn nothing spawns. World place only.
+-- is despawned to make room. Hostile groups also keep clear of player spawn
+-- points. NpcService drives the bodies. Wildlife needs the generated island's zones
+-- (an authored map has none yet, so nothing spawns there) and waits for the map to
+-- be built. World place only.
 
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
+local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local NpcService = require(script.Parent.NpcService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
 
 local WildlifeService = {}
+
+-- Hostile groups never start this close to a player spawn point.
+WildlifeService.HOSTILE_SPAWN_CLEARANCE = 100
+-- Creatures wade shallows and swim deeper water (as NpcService moves them).
+WildlifeService.WADE_DEPTH = 4
 
 -- slot = {zone, readyAt, group?}; group = {slot, members = {npc -> true}, size, lastNear}.
 local slots = {}
 local owners = {}
 local alive = 0
 local rng = Random.new()
-local layout = nil
+local spawnPoints = {}
 
 local function now(): number
 	return os.clock()
 end
 
--- The world layout, if it is there and loads (it lands with the map work).
-local function loadLayout()
-	local world = ReplicatedStorage.Shared:FindFirstChild("World")
-	local module = world and world:FindFirstChild("IslandLayout")
-	if module == nil then
-		return nil
-	end
-	local ok, result = pcall(require, module)
-	return if ok and type(result) == "table" then result else nil
-end
-
 local function randomPoint(zoneId: string, habitat: string?): Vector3?
-	if layout == nil or type(layout.RandomPointIn) ~= "function" then
-		return nil
-	end
-	local ok, point = pcall(layout.RandomPointIn, zoneId, rng, habitat)
+	local ok, point = pcall(IslandLayout.RandomPointIn, zoneId, rng, habitat)
 	return if ok and typeof(point) == "Vector3" then point else nil
 end
 
@@ -61,7 +58,7 @@ end
 -- Map ground only: creatures, events, bosses and characters are see-through.
 local function groundParams()
 	local ignore = {}
-	for _, name in { "EventEnemies", "WorldEvents", "Bosses", "GuardianArena", "Arrows" } do
+	for _, name in { "EventEnemies", "WorldEvents", "Bosses", "GuardianArena", "Arrows", "ResourceNodes" } do
 		local other = workspace:FindFirstChild(name)
 		if other then
 			table.insert(ignore, other)
@@ -80,8 +77,8 @@ local function groundParams()
 end
 
 local function standingAt(position: Vector3, params): Vector3
-	local hit = workspace:Raycast(position + Vector3.new(0, 30, 0), Vector3.new(0, -80, 0), params)
-	return if hit and hit.Material ~= Enum.Material.Water then hit.Position else position
+	local hit = WorldState.Standing(position + Vector3.new(0, 30, 0), 80, params, WildlifeService.WADE_DEPTH)
+	return if hit then hit.Position else position
 end
 
 local function despawn(group)
@@ -113,12 +110,21 @@ local function makeRoom(count: number): boolean
 	return true
 end
 
--- A spot for a group in `zoneId`'s `habitat`, away from players and safe zones.
-local function place(zoneId: string, habitat: string?): Vector3?
+-- A spot for a group in `zoneId`'s `habitat`, away from players and safe zones
+-- (and, for Hostile creatures, from player spawn points).
+local function place(zoneId: string, habitat: string?, hostile: boolean): Vector3?
 	local players = playerPositions()
 	for _ = 1, WildlifeRules.PLACEMENT_ATTEMPTS do
 		local point = randomPoint(zoneId, habitat)
-		if point and WildlifeRules.ClearOfPlayers(point, players) and not SafeZoneService.Contains(point) then
+		if
+			point
+			and WildlifeRules.ClearOfPlayers(point, players)
+			and not SafeZoneService.Contains(point)
+			and (
+				not hostile
+				or WildlifeRules.ClearOfPlayers(point, spawnPoints, WildlifeService.HOSTILE_SPAWN_CLEARANCE)
+			)
+		then
 			return point
 		end
 	end
@@ -130,7 +136,9 @@ local function fill(slot): boolean
 	local zone = WildlifeRules.Zones[slot.zone]
 	local entry = WildlifeRules.Pick(zone.spawns, rng)
 	local size = WildlifeRules.GroupSize(entry, rng)
-	local center = place(slot.zone, entry.habitat)
+	local enemy = EnemyCatalog.Get(entry.enemy)
+	local hostile = enemy ~= nil and enemy.behaviour == EnemyCatalog.Behaviours.Hostile
+	local center = place(slot.zone, entry.habitat, hostile)
 	if center == nil or not makeRoom(size) then
 		return false
 	end
@@ -186,7 +194,6 @@ function WildlifeService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	layout = loadLayout()
 	for _, zoneId in WildlifeRules.Slots() do
 		table.insert(slots, { zone = zoneId, readyAt = 0 })
 	end
@@ -205,6 +212,16 @@ function WildlifeService.Start()
 		end
 	end)
 	task.spawn(function()
+		WorldState.WaitUntilReady()
+		if not WorldState.IsGenerated() then
+			-- An authored map has no zone data for wildlife yet.
+			return
+		end
+		for _, part in CollectionService:GetTagged("SpawnCandidate") do
+			if part:IsA("BasePart") then
+				table.insert(spawnPoints, part.Position)
+			end
+		end
 		while true do
 			task.wait(WildlifeRules.TICK_SECONDS)
 			WildlifeService.Tick()

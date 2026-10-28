@@ -46,7 +46,7 @@ PoiCatalog.GuardianArena = { x = 0, z = -140, radius = 80 }
 -- Landmarks for navigation without a minimap.
 PoiCatalog.Landmarks = {
 	{ id = "FrostpeakSummit", name = "Frostpeak Summit", x = -64, z = -1440, style = "Peak" },
-	{ id = "KeepTower", name = "Shattered Keep", x = 0, z = -280, style = "Keep" },
+	{ id = "KeepTower", name = "Shattered Keep", x = 50, z = -262, style = "Keep" },
 	{ id = "FallenTemple", name = "Fallen Temple", x = -750, z = 980, style = "Temple" },
 	{ id = "TimberwatchTower", name = "Timberwatch Tower", x = -1330, z = 120, style = "Tower" },
 	{ id = "EmberhollowMouth", name = "Emberhollow Mouth", x = 750, z = 1330, style = "CaveMouth" },

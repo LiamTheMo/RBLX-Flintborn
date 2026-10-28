@@ -17,6 +17,7 @@ local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
 local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -251,7 +252,7 @@ local function scatter()
 	local folder = Instance.new("Folder")
 	folder.Name = "ResourceNodes"
 	folder.Parent = workspace
-	local generated = workspace:GetAttribute("FlintbornGeneratedIsland") == true
+	local generated = WorldState.IsGenerated()
 	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
 	local scale = radius / BiomeCatalog.MAP_RADIUS
 	for _, zoneId in BiomeCatalog.ZONE_IDS do
@@ -270,16 +271,20 @@ function ResourceService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	local tagged = CollectionService:GetTagged(ResourceService.TAG)
-	if #tagged > 0 then
-		for _, part in tagged do
-			if part:IsA("BasePart") then
-				register(part, part:GetAttribute("NodeType"))
+	-- Nodes sit on the map's ground, so placement waits for the map.
+	task.spawn(function()
+		WorldState.WaitUntilReady()
+		local tagged = CollectionService:GetTagged(ResourceService.TAG)
+		if #tagged > 0 then
+			for _, part in tagged do
+				if part:IsA("BasePart") then
+					register(part, part:GetAttribute("NodeType"))
+				end
 			end
+		else
+			scatter()
 		end
-	else
-		scatter()
-	end
+	end)
 	Players.PlayerRemoving:Connect(function(player)
 		lastHit[player] = nil
 	end)

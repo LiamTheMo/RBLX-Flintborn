@@ -18,6 +18,7 @@ local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -118,7 +119,7 @@ end
 -- an authored map falls back to a distance band and a raycast.
 local function place(entry): Vector3?
 	local mapRadius = workspace:GetAttribute("FlintbornMapRadius") or EventDirectorService.DEFAULT_MAP_RADIUS
-	local generated = workspace:GetAttribute("FlintbornGeneratedIsland") == true
+	local generated = WorldState.IsGenerated()
 	local footprints = activeFootprints()
 	local zones = keepOut()
 	for _ = 1, EventDirectorService.PLACEMENT_ATTEMPTS do
@@ -367,6 +368,8 @@ function EventDirectorService.Start()
 		end
 	end)
 	task.spawn(function()
+		-- Events are placed on the map's ground, so the map must be in place first.
+		WorldState.WaitUntilReady()
 		while true do
 			local seconds = workspace:GetAttribute("FlintbornEventSeconds")
 				or (if RunService:IsStudio() then EventDirectorService.STUDIO_TICK_SECONDS else EventRules.TICK_SECONDS)

@@ -549,7 +549,11 @@ Placeholders: every creature stat, drop, group size and event weight; zone posit
 
 Studio and live checks:
 
-- [ ] Server start prints "Built the placeholder island in X s". Note X; aim for under about 10 s.
+- [ ] Server start prints "Built the placeholder island in X s"; note X. The server keeps running while it builds:
+  - Matchmaking reports straight away.
+  - Pressing Play before the island is ready says the world is still loading, and works once `FlintbornWorldReady` is set.
+- [ ] In Studio, run `require(game.ServerScriptService.Server.Services.WorldBuildService).Generate()` from the command bar and save the place. The next start reuses the saved island without rebuilding it. Check the module path in the Explorer.
+- [ ] Passive animals give a quarter of the usual kill XP and still count as hunts for quests.
 - [ ] Walk or fly the coast and every zone boundary: no holes, floating terrain or cliffs you can't climb where routes should be. Frostpeak's summit reads as the tallest point.
 - [ ] Walk the Crater Lake rim and cross to the Keep by the south land bridge and by the east ford (wading, not swimming). Climb the Keep ramp and the Fallen Temple ramp.
 - [ ] Enter Emberhollow through the south tunnel: the interior is lit enough, its roof has no holes, and cave nodes and Ember Wisps stand on the cave floor.

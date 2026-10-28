@@ -41,7 +41,10 @@ local TUNNEL = BiomeCatalog.Zones.EmberhollowCaves.tunnel
 IslandLayout.Courtyard = { x = 0, z = -140, halfX = 90, halfZ = 110 }
 
 -- The Keep's way up: a ramp from the lower terrace to the plateau's south edge.
-local KEEP_RAMP = { halfWidth = 12, topZ = 88, bottomZ = 210, bottom = 40 }
+-- It runs from the plateau's south edge down over the lower terrace to meet the
+-- land bridge, as a broad embankment (about 0.55 rise per stud).
+IslandLayout.KeepRamp = { halfWidth = 12, topZ = 190, bottomZ = 345, bottom = 32, sideSlope = 0.6, sideWidth = 60 }
+local KEEP_RAMP = IslandLayout.KeepRamp
 local BRIDGE = { halfWidth = 14, fromZ = 150, toZ = 700 }
 local FORD = { z = -100, halfWidth = 16, fromX = 180, toX = 640 }
 
@@ -54,7 +57,7 @@ IslandLayout.Peaks = {
 
 -- Raised features {x, z, plateau height, plateau half-size or radius, slope width}.
 IslandLayout.TempleMound = { x = -750, z = 980, height = 104, halfX = 80, halfZ = 80, slope = 70 }
-IslandLayout.TempleRamp = { halfWidth = 14, length = 120 }
+IslandLayout.TempleRamp = { halfWidth = 14, length = 150 }
 IslandLayout.Lookout = { x = -1330, z = 120, height = 148, radius = 110, slope = 110 }
 IslandLayout.CaveHill = { height = 150, margin = 20, slope = 110 }
 
@@ -251,12 +254,13 @@ local function keepIsland(x: number, z: number): number
 	else
 		h = shore - (e - 1) * KEEP.halfZ * 0.3
 	end
-	-- The ramp from the lower terrace up to the plateau's south edge.
+	-- The ramp from the bridge up to the plateau's south edge.
 	local dz = z - KEEP.z
 	local side = math.abs(x - KEEP.x) - KEEP_RAMP.halfWidth
-	if dz >= KEEP_RAMP.topZ - 10 and dz <= KEEP_RAMP.bottomZ and side < 30 then
+	if dz >= KEEP_RAMP.topZ - 10 and dz <= KEEP_RAMP.bottomZ and side < KEEP_RAMP.sideWidth then
 		local t = math.clamp((dz - KEEP_RAMP.topZ) / (KEEP_RAMP.bottomZ - KEEP_RAMP.topZ), 0, 1)
-		h = math.max(h, lerp(IslandLayout.KEEP_HEIGHT, KEEP_RAMP.bottom, t) - math.max(0, side) * 2.5)
+		local top = lerp(IslandLayout.KEEP_HEIGHT, KEEP_RAMP.bottom, t)
+		h = math.max(h, top - math.max(0, side) * KEEP_RAMP.sideSlope)
 	end
 	return h
 end
@@ -498,7 +502,7 @@ local function candidate(zoneId: string, rng: Random, habitat: string?): (number
 	if shape.kind == "Coast" then
 		local angle = math.rad(shape.angle + rng:NextNumber(-shape.halfAngle, shape.halfAngle))
 		local dx, dz = math.cos(angle), math.sin(angle)
-		local coast = BiomeCatalog.CoastDistance(dx, dz) + 1
+		local coast = BiomeCatalog.CoastRadius(dx, dz)
 		local depth = if habitat == "Beach" then IslandLayout.BEACH_WIDTH else shape.depth
 		local r = coast - rng:NextNumber(10, depth)
 		return dx * r, dz * r
@@ -584,7 +588,7 @@ function IslandLayout.SpawnCandidates(): { Vector3 }
 				if zone.shape.kind == "Coast" then
 					local angle = math.rad(zone.shape.angle + offset[1] * zone.shape.halfAngle * 1.2)
 					local dx, dz = math.cos(angle), math.sin(angle)
-					local r = BiomeCatalog.CoastDistance(dx, dz) + 1 - zone.shape.depth * (0.5 + offset[2] * 0.5)
+					local r = BiomeCatalog.CoastRadius(dx, dz) - zone.shape.depth * (0.5 + offset[2] * 0.5)
 					x, z = dx * r, dz * r
 				else
 					local cx, cz = BiomeCatalog.Center(zoneId)
