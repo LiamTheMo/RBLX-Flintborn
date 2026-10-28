@@ -658,3 +658,17 @@ Studio and live checks:
 - [ ] Run: CRAFT makes one; smelting takes the stepper's batch or Craft all; the job row shows progress and time left; ✕ stops it and keeps the bars made.
 - [ ] Lobby: the Forge tile opens ANCESTRAL FORGE with vault counts; locked recipes say what unlocks them; FORGE puts the item in the lobby backpack.
 - [ ] Lobby: a Permanent recipe lists the vault gear it can convert; CONVERT asks first, arms after 1.5 s, and converts the chosen piece only.
+
+## Parchment Market, Progress, Trade and notice cards (GDD §10, §33, §37, §34.1)
+
+How it's built: one list window (`Hud/ListWindow`) for the Market (`WalletController`), Progress (`ProgressionController`) and Trade (`TradeController`); notices, trade invites, toasts and receipts on `Hud/NoticeCard`. Spec: `docs/ui/ListWindows.md`.
+
+Automated: `capture.py market_flow`, `progress_flow`, `trade_flow`, `notices`.
+
+Studio and live checks:
+
+- [ ] Market: the Shop tile and nav button open it; Coins and Gems in the corner follow purchases; BUY, SELL, SELL 10 and SELL ALL move the right amounts; respec asks first; a Robux offer prompts the real product; a code redeems once.
+- [ ] Progress: P opens it in lobby and run; perk BUY spends tokens; REVIEW REBIRTH arms after 1.5 s and rebirths; Perks and Rebirth say they are lobby-only in a run.
+- [ ] Trade: inviting a second player shows them the ACCEPT / DECLINE card; both offers update live; any change unlocks both; the countdown runs after both lock; CONFIRM completes; typing gems while the partner changes their offer keeps what you typed.
+- [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
+- [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.

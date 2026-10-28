@@ -10,6 +10,7 @@ Parchment-and-leather UI from the reference sheets in `art/reference/ui/parchmen
 | Inventory & Vault (lobby + run) | 08_inventory_vault | ✅ [InventoryScreen.md](InventoryScreen.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ VaultController + InventoryController | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | Crafting + Forge | 09_crafting | ✅ [CraftingScreen.md](CraftingScreen.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ Craft / smelt / ForgeCraft | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | Settings | 10_settings | ✅ [SettingsScreen.md](SettingsScreen.md) | ✅ sliced (upload ⏳) | ✅ | ✅ | n/a (instant) | ✅ new settings live through attributes | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
+| Market, Progress, Trade + notice cards | 11_panel_layouts | ✅ [ListWindows.md](ListWindows.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ Shop / Sell / Offers / Codes, perks, rebirth, trades, notices | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | In-world HUD (parchment) | 12_hud_master, 05_widgets | — | — | — | — | — | — | — | — | — | Not started (hotbar is six slots now, GDD §56) |
 | Kit sheets | 01, 03–06, 11, 14–16 | — | partial (lobby pieces) | — | — | — | — | — | — | — | Sliced as screens need them |
 

@@ -27,6 +27,7 @@ local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local InventoryPanel = require(script.Parent.Parent.Hud.InventoryPanel)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
@@ -71,12 +72,11 @@ function InventoryController.Count(catalogId: string): number
 end
 
 local function toast(message: string)
-	ui.toast.Text = message
-	ui.toast.Visible = true
+	ui.toast:Show(message)
 	local shown = message
 	task.delay(2.5, function()
-		if ui.toast.Text == shown then
-			ui.toast.Visible = false
+		if ui.toast.text.Text == shown then
+			ui.toast:Hide()
 		end
 	end)
 end
@@ -543,17 +543,7 @@ local function build()
 	relabel()
 	Binds.Changed:Connect(relabel)
 
-	ui.toast = make("TextLabel", {
-		Size = UDim2.fromOffset(420, 34),
-		LayoutOrder = Theme.TopOrder.Toast,
-		BackgroundColor3 = Color3.fromRGB(30, 26, 22),
-		BackgroundTransparency = 0.2,
-		TextColor3 = Color3.fromRGB(255, 236, 210),
-		Font = Enum.Font.GothamMedium,
-		TextSize = 15,
-		Visible = false,
-	}, Theme.TopStack())
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.toast)
+	ui.toast = NoticeCard.new(Theme.TopStack(), { name = "Toast", width = 420, layoutOrder = Theme.TopOrder.Toast })
 
 	-- The backpack window: backpack on the left, hotbar and armour on the right.
 	panel = InventoryPanel.new(player:WaitForChild("PlayerGui"), {

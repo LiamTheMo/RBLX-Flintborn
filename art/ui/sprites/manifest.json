@@ -886,6 +886,17 @@
     "h": 75,
     "slice": null
   },
+  "pm_banner": {
+    "file": "pm_banner.png",
+    "w": 948,
+    "h": 92,
+    "slice": [
+      64,
+      30,
+      64,
+      30
+    ]
+  },
   "pm_button_action": {
     "file": "pm_button_action.png",
     "w": 227,
@@ -1088,6 +1099,17 @@
     "h": 63,
     "slice": null
   },
+  "pm_card": {
+    "file": "pm_card.png",
+    "w": 314,
+    "h": 148,
+    "slice": [
+      56,
+      48,
+      40,
+      40
+    ]
+  },
   "pm_cat_all": {
     "file": "pm_cat_all.png",
     "w": 74,
@@ -1178,6 +1200,28 @@
       6,
       7,
       6
+    ]
+  },
+  "pm_frame_hollow": {
+    "file": "pm_frame_hollow.png",
+    "w": 774,
+    "h": 333,
+    "slice": [
+      96,
+      112,
+      96,
+      122
+    ]
+  },
+  "pm_frame_window": {
+    "file": "pm_frame_window.png",
+    "w": 743,
+    "h": 380,
+    "slice": [
+      96,
+      112,
+      96,
+      122
     ]
   },
   "pm_glyph_armor": {
@@ -1317,6 +1361,17 @@
     "w": 182,
     "h": 164,
     "slice": null
+  },
+  "pm_inset": {
+    "file": "pm_inset.png",
+    "w": 376,
+    "h": 318,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ]
   },
   "pm_item_slot": {
     "file": "pm_item_slot.png",
