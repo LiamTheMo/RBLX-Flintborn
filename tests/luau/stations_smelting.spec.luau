@@ -611,21 +611,41 @@ test("ore taken away mid-smelt stops the job without a free bar", function()
 	expect(string.find(player.notes[#player.notes], "ran out of ore") ~= nil, "told why")
 end)
 
-test("Crafting mastery never makes a bar from nothing: smelting stays 1 ore to 1 bar", function()
-	-- The largest buffs: every instant craft doubles and refunds an input.
-	modifiers.CraftOutput = 1
-	modifiers.IngredientSave = 1
-	local player = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
+test("Crafting mastery's bonus bar: one extra bar per bar smelted, by chance", function()
+	local player = newPlayer({ IronOre = 3 })
 	expect(craft(player, "IronBar", 3), "started")
 	for _ = 1, 3 do
 		clock += 3
 		pump()
 	end
-	expectEq(count(player, "IronBar"), 3, "three ore make exactly three bars")
-	expectEq(count(player, "IronOre"), 0, "and no ore comes back")
-	expectEq(#dropped, 0, "nor drops at the smelter's feet")
-	expect(craft(player, "BasicMedicine"), "instant craft")
-	expectEq(count(player, "BasicMedicine"), 2, "instant crafts keep the larger output")
-	modifiers.CraftOutput = nil
-	modifiers.IngredientSave = nil
+	expectEq(count(player, "IronBar"), 3, "without mastery, three ore make three bars")
+
+	-- A certain bonus: every bar smelted brings one more.
+	modifiers.SmeltBonus = 1
+	local lucky = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
+	expect(craft(lucky, "IronBar", 3), "started")
+	for _ = 1, 3 do
+		clock += 3
+		pump()
+	end
+	expectEq(count(lucky, "IronBar"), 6, "three ore make six bars")
+	expectEq(count(lucky, "IronOre"), 0, "each bar still takes its own ore")
+	expect(craft(lucky, "BasicMedicine"), "instant craft")
+	expectEq(count(lucky, "BasicMedicine"), 1, "instant crafts never get a bonus")
+	modifiers.SmeltBonus = nil
+end)
+
+test("a bonus bar with no room drops at the smelter's feet and the job finishes", function()
+	modifiers.SmeltBonus = 1
+	local before = #dropped
+	-- Every slot full: the ore keeps its slot, the bar stack has room for one.
+	local player = newPlayer({ IronOre = 2, IronBar = 999, Wood = 57000 })
+	expect(craft(player, "IronBar", 1), "started")
+	clock += 3
+	pump()
+	expectEq(count(player, "IronBar"), 1000, "the smelted bar fits")
+	expectEq(#dropped, before + 1, "the bonus bar dropped")
+	expectEq(dropped[#dropped].catalogId, "IronBar", "an iron bar")
+	expectEq(player.attributes.SmeltRecipe, nil, "the job finished, not stopped")
+	modifiers.SmeltBonus = nil
 end)

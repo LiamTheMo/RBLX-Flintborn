@@ -1,6 +1,6 @@
 -- Berry and draught boosts (GDD §51, Q162, docs/ITEM_CATALOG.md §3): one timed
--- boost per kind that a new one replaces, XP that adds to Premium and the paid
--- booster, and luck that raises rare-drop chances only.
+-- boost per kind that never weakens (only a stronger one takes over), XP that adds
+-- to Premium and the paid booster, and luck that raises rare-drop chances only.
 local Shared = game:GetService("ReplicatedStorage").Shared
 local BoostRules = require(Shared.Survival.BoostRules)
 local Consumables = require(Shared.Items.Consumables)
@@ -63,20 +63,31 @@ test("bad boosts are rejected", function()
 	expect(not BoostRules.IsValid({ kind = "XP", amount = "lots", seconds = 60 }), "non-number amount")
 end)
 
-test("a new boost of the same kind replaces the running one and restarts its timer", function()
+test("a running boost never weakens: only a stronger one takes over", function()
 	local boosts = BoostRules.New()
-	local first, replaced = BoostRules.Apply(boosts, catalog.Sunberry.boost, 0)
-	expectEq(replaced, nil, "nothing to replace at first")
+	local first, started = BoostRules.Apply(boosts, catalog.Sunberry.boost, 0)
+	expect(started, "nothing running, so the berry starts")
 	expectEq(first.endsAt, 180, "a Sunberry lasts 3 minutes")
 
-	local draught, previous = BoostRules.Apply(boosts, catalog.SunberryDraught.boost, 60)
-	expectEq(previous, first, "the draught replaced the berry")
+	local draught, upgraded = BoostRules.Apply(boosts, catalog.SunberryDraught.boost, 60)
+	expect(upgraded, "a stronger draught takes over")
 	expectNear(BoostRules.Amount(boosts, "XP", 61), 0.25, 1e-9, "the draught's strength, not the sum")
-	expectEq(draught.endsAt, 660, "timer restarts from the drink, not added on")
+	expectEq(draught.endsAt, 660, "its own timer, from the drink")
 
-	BoostRules.Apply(boosts, catalog.SunberryDraught.boost, 500)
-	expectNear(BoostRules.Amount(boosts, "XP", 501), 0.25, 1e-9, "drinking twice never doubles")
-	expectEq(boosts.XP.endsAt, 1100, "drinking again only resets the timer")
+	expect(not BoostRules.Takes(boosts, catalog.Sunberry.boost, 100), "a weaker berry would change nothing")
+	local kept, weaker = BoostRules.Apply(boosts, catalog.Sunberry.boost, 100)
+	expect(not weaker, "the weaker berry does not start")
+	expectEq(kept, draught, "the draught keeps running")
+	expectNear(BoostRules.Amount(boosts, "XP", 101), 0.25, 1e-9, "still +25%")
+	expectEq(boosts.XP.endsAt, 660, "and its timer is untouched")
+
+	local _, same = BoostRules.Apply(boosts, catalog.StrongSunberryDraught.boost, 500)
+	expect(not same, "an equally strong draught changes nothing either")
+	expectEq(boosts.XP.endsAt, 660, "the running boost stays static until it ends")
+
+	local _, after = BoostRules.Apply(boosts, catalog.Sunberry.boost, 660)
+	expect(after, "once it has run out, any boost starts again")
+	expectNear(BoostRules.Amount(boosts, "XP", 661), 0.10, 1e-9, "the berry's own strength")
 end)
 
 test("XP and luck boosts run side by side", function()
@@ -97,8 +108,8 @@ test("boosts end on time and stop counting", function()
 	expectNear(BoostRules.Amount(boosts, "Luck", 179.9), 0.05, 1e-9, "still running just before the end")
 	expectEq(BoostRules.Amount(boosts, "Luck", 180), 0, "over at 3 minutes")
 	expectEq(#BoostRules.Modifiers(boosts, 180), 0, "no modifier once over")
-	local _, replaced = BoostRules.Apply(boosts, catalog.Glimmerberry.boost, 200)
-	expectEq(replaced, nil, "an expired boost is not reported as replaced")
+	local _, started = BoostRules.Apply(boosts, catalog.Glimmerberry.boost, 200)
+	expect(started, "an expired boost never blocks a new one")
 	BoostRules.Prune(boosts, 400)
 	expectEq(boosts.Luck, nil, "pruned after it ran out")
 end)
@@ -173,8 +184,8 @@ test("use toasts name the item and its effects", function()
 	expectEq(BoostRules.UseText(catalog.HeartyTonic), "Hearty Tonic: +60% food", "Hearty Tonic toast")
 	expectEq(
 		BoostRules.UseText(catalog.Sunberry, { amount = 0.25, endsAt = 600 }),
-		"Sunberry: +5% food, +10% XP for 3:00 (replaces your +25% XP boost)",
-		"replacing a stronger boost says so"
+		"Sunberry: +5% food, your +25% XP boost keeps running",
+		"a berry eaten under a stronger boost still feeds and says the boost stays"
 	)
 end)
 

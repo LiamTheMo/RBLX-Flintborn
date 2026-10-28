@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.17  
-> **Last updated:** 2026-10-25  
+> **Design revision:** 1.18  
+> **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -1420,7 +1420,7 @@ Verify biome randomness, event public announcements, weighted distribution, 8-me
 | **Mining** | Authentic ores/nodes mined and mining objectives | **+1% per mastery level** to suitable mining/resource yield; cosmetics |
 | **Woodcutting** | Trees legitimately chopped, varied wood harvested | **+1% per level** to suitable wood yield; cosmetics |
 | **Farming** | Crops planted, matured and harvested | **+1% per level** to eligible crop output; cosmetics |
-| **Crafting** | Legitimate completed crafting actions and achievements | **All of:** ingredient efficiency, craft output/batches, crafting speed and recipe unlocks, balanced by level |
+| **Crafting** | Legitimate completed crafting actions and achievements | Better gear quality rolls and a bonus-bar chance when smelting (§52; no crafting speed) |
 | **PvP** | Real opponent combat, kills and contested objectives | **Both** minor combat and noncombat perks (e.g. loot/coins/utility), plus cosmetics |
 
 **Confirmed:** Mastery level **cap is 10** for now. Each mastery level grants a **buff**, and the player advances through meaningful **milestones**, not merely passive hours logged in. **+1% per eligible level** is the baseline for resource-yield buffs (at ten earned +1% increments, an illustrative cap of **+10%**). This does **not** automatically mean +1% raw PvP damage or every crafting stat per level; precise perk catalogs, milestone thresholds and tier associations remain **Open**. Mastery levels, buffs and cosmetics remain **permanent account progress** across world reset, death and rebirth.
@@ -1673,7 +1673,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 - **Confirmed tracks (Q71):** **Mining, Woodcutting, Farming, Crafting and PvP only**.
 - **Confirmed Q72–75:** Milestone-based mastery progression, **maximum level 10**, **one buff at every level**, baseline **+1% per eligible mastery level** for resource yield. Exact resource type and level thresholds are Open.
 - **Confirmed Q76:** PvP mastery includes **both combat and noncombat** advantages, bounded for fairness. Exact magnitude Open.
-- **Confirmed Q77:** Crafting mastery supports **all** proposed benefit types: ingredient savings, larger craft outputs, faster craft speeds and recipe unlocks; exact distribution Open.
+- **Confirmed Q77 (superseded 2026-10-28, §52):** Crafting mastery supports **all** proposed benefit types: ingredient savings, larger craft outputs, faster craft speeds and recipe unlocks; exact distribution Open.
 - **Confirmed Q78:** Specific buffs/perks are **additive** and others **multiplicative**. Catalog must explicitly classify each; center portal still doubles carried materials and all run XP. It does not duplicate counted milestone actions.
 - **Confirmed Q79–80:** Mastery milestones can grant cosmetics, titles and similar collectibles. **Mastery titles/levels may display in the lobby**; exact visibility layout Open.
 - **Confirmed Q81–89:** Rebirth resets general level to **1** after a level requirement and challenge, with progressively harder costs; permanent perk token purchases, possible multirank perks, and **Gem/Robux/code** respec. Other saved protected systems remain preserved.
@@ -1769,7 +1769,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 | **74** | Buff cadence | **Every mastery level** grants a buff | Per-level mapping |
 | **75** | Resource benefits | **+1% yield per applicable mastery level** as starting balance | Which drop/resource classes apply and rounding |
 | **76** | PvP mastery | **Both combat and noncombat rewards** | Power caps, PvP reward types |
-| **77** | Crafting mastery | **All four:** material discounts, output/batch increases, crafting speed, recipe unlocks | Buff rates and individual levels |
+| **77** | Crafting mastery | **All four:** material discounts, output/batch increases, crafting speed, recipe unlocks (superseded by §52: quality rolls and a smelting bonus bar only) | Buff rates and individual levels |
 | **78** | Modifier operations | **Specific additive and multiplicative multipliers** coexist | Each modifier's type and caps |
 | **79** | Cosmetics | **Yes** to titles, cosmetics, animations and building decorations as milestone rewards | Exact milestones and content |
 | **80** | Social display | Mastery levels/titles **may be visible in lobby** | Inspection/badges/privacy options |
@@ -1810,7 +1810,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 10. Center extraction pays **exactly one additional set of current-run XP grants** and double materials; it does not retroactively double prior runs or invent extra milestone action counters.
 11. UI and persisted schema contain **only five active mastery tracks**, each capped at **level 10**, with one-time buff at **every mastery level** and cosmetic milestones; lobby can show progress/titles.
 12. Resource mastery +1% increments stack with catalog-classified **additive/multiplicative modifiers** in a deterministic order. Combat and noncombat PvP mastery bonuses are bounded and tested.
-13. Crafting mastery supports ingredient savings, output batch, crafting speed and unlock milestones without allowing zero-cost infinite crafts.
+13. Crafting mastery improves gear quality rolls and gives a bonus-bar chance per bar smelted (§52); every bonus bar still needs its own ore to be smelted, so nothing is ever crafted from nothing.
 14. Rebirth requires both level and completed challenge, increases future costs, sets **general level 1** but retains vault, Permanent equipment and permanent mastery/owned perks.
 15. Rebirth perk purchases are permanently active; some perks have ranks, and their XP/luck/drop-volume/water movement effects cannot be client-forged.
 16. Each Gem, Robux-receipted or redemption-code respec is a once-only entitlement. Player cannot duplicate tokens or avoid valid charges by disconnecting.
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
 | **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
 | **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
 | **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
@@ -2242,7 +2243,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 **Rules**
 
-1. Every keyboard action has the default above. **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
+1. Every keyboard action has the default above. **Roblox's player list is hidden in both places** so Tab only opens the inventory: the run backpack in the world, the backpack and vault panel in the lobby (1.18). **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
 2. **No two actions share a key.** Choosing a key another action already uses swaps the two.
 3. **Reserved keys** stay with Roblox: W A S D and Space (movement), / (chat), Esc, Enter and Backspace. Function keys are not bindable.
 4. Choices save to the player's profile (only the keys that differ from the defaults) and follow them to every server and both places. The server validates every save; a malformed or conflicting save falls back to the defaults.
@@ -2314,14 +2315,14 @@ The owner defined the launch item and material catalog in a question round on 20
 1. **Ladder:** Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, expandable later. Each tier is about **25% stronger** than the last (damage, tool yield, building HP and armor above Iron), anchored on the confirmed wooden spear 15, stone spear 25, Hide armor ×1.2 and Iron armor ×2.0.
 2. **Weapons:** spears, daggers, swords and bows only. Bows go Wooden, then a metal-reinforced bow per metal.
 3. **Restricted (gem-class) materials:** Flint, Obsidian, Jade and any future gemstone make **only daggers and spears**, plus Forge and Permanent inputs. **Flint is the only arrow tip**, and Flint Arrows are the only arrows. Strength is staggered: Flint between Stone and Copper, Obsidian between Iron and Silver, Jade between Cobalt and Mithril.
-4. **Ores:** smelted into bars at a Furnace, **1 ore → 1 bar, no fuel**, costing only time. Mining needs the **previous tier's pickaxe**. Ores spawn by danger: Copper and Iron in the Outer Rim, Silver and Cobalt in the Inner Ring, Mithril in the Crater, and Adamantine only from meteors, the Guardian and rare events.
+4. **Ores:** smelted into bars at a Furnace, **1 ore → 1 bar, no fuel**, costing only time (Crafting mastery adds a chance of one bonus bar per bar, §52). Mining needs the **previous tier's pickaxe**. Ores spawn by danger: Copper and Iron in the Outer Rim, Silver and Cobalt in the Inner Ring, Mithril in the Crater, and Adamantine only from meteors, the Guardian and rare events.
 5. **Armor:** Hide → Bone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine. Wood and Stone armor are removed.
 6. **Tools:** axes and pickaxes at every tier from Wood. **Sickles are removed**; Fiber, Herbs and berries are gathered by hand.
 7. **Stations:** Wood, Stone, Flint, Bone and Hide gear by hand; Copper, Iron and Obsidian at a Workbench; Silver and up, and Jade, at a new **Anvil**; smelting and cooking at the Furnace; potions at a new **Cauldron**. No other intermediate components.
 8. **Rarity** rises slowly with tier (Wood through Iron Common, Silver and Cobalt Uncommon, Mithril Rare, Adamantine Epic); Legendary and above stay for boss and event drops. Quality rolls stay ±5% (Q139).
 9. **New materials:** Flint, Resin and Bone (common); Dire Hide, Charged Core and Glow-Fur (elite creatures); **Guardian Heart** (the Guardian, which joins the elite group); Ashen Oil and Siege Resin (ancient caches); Abyssal Shard and Emberglass (meteors); Bloodroot and Moonpetal (rare herbs). Ancient Ember stays.
 10. **Rare shrub event:** a new announced event that grows rare berries and rare herbs, at the same frequency as other rare events. **Every rare event type rolls individually** instead of competing within its category.
-11. **Berries:** Redberry (healing), Sweetberry (fullness), Sunberry (XP boost) and Glimmerberry (luck boost). Each brews at the Cauldron into a stronger potion or draught. XP boosts add to Premium and paid boosters (Q162). **Luck raises rare-drop chance only.** Medicine and Cooked Meat are unchanged.
+11. **Berries:** Redberry (healing), Sweetberry (fullness), Sunberry (XP boost) and Glimmerberry (luck boost). Each brews at the Cauldron into a stronger potion or draught. XP boosts add to Premium and paid boosters (Q162). **Luck raises rare-drop chance only.** A running boost never weakens (§52). Medicine and Cooked Meat are unchanged.
 12. **Siege:** Fire Bomb (Ashen Oil; burns Wood hard, Stone less, metal barely) and Breaching Charge (Siege Resin; heavy damage to one wall or door after a fuse). Rare materials also feed Mithril and Adamantine gear and Permanent conversions.
 13. **Building:** walls, floors, doors and roofs come in the full ladder, built from bars at metal tiers.
 14. **Permanent:** **any gear** can be converted; the cost scales with tier (10× its recipe, Ancient Ember, and rare materials at Cobalt and above).
@@ -2329,6 +2330,14 @@ The owner defined the launch item and material catalog in a question round on 20
 16. **Trading:** elite, Guardian, meteor and cache materials, rare herbs, rare berries and Ancient Ember trade; common materials, ores and bars do not.
 17. **Shop:** starter supplies only (Wood and Stone tools, Flint Arrows, basic medicine, common berries and their seeds).
 18. **Pre-release cleanup:** removed items and the old "Iron" material are deleted from existing saves.
+
+
+## 52. Owner decisions: boosts, Crafting mastery, hotbar and Tab (2026-10-28)
+
+1. **Boosts never weaken.** One boost runs per kind (XP, Luck). While it runs it stays exactly as it is until it ends: a weaker or equally strong boost of the same kind changes nothing, and only a **stronger** one takes over, with its own timer. A draught that would change nothing is refused and kept; a boost berry still feeds you and its toast says the running boost keeps going.
+2. **Crafting mastery gives only two benefits:** better gear quality-roll chances (Q139's +5% relative per level) and, when smelting, a **chance of one bonus bar per bar smelted** (starting value 2% per level, 20% at level 10; a bonus bar with no room drops at the smelter's feet). **Everything about crafting speed is removed**, as are ingredient savings and larger craft outputs. Every player crafts at the same rate (one craft per second; smelting times per §51). Recipe gates that require a Crafting mastery level are unchanged.
+3. **Touch hotbar:** the HUD hotbar shows each slot's item (name in its rarity colour, stack count), the selection follows the equipped slot, and **tapping a slot uses it exactly as its number key does** (equip, eat or drink, place, ready a siege item).
+4. **Tab and the player list:** Roblox's player list is disabled in both places; Tab (the rebindable Backpack key) opens the run backpack in the world and the backpack and vault panel in the lobby.
 
 ---
 

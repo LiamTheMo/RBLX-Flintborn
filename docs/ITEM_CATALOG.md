@@ -10,7 +10,7 @@
 | Gear ladder | Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, extendable later. Cobalt replaced Emerald so the ladder is all metal. |
 | Weapon families | Spear, dagger, sword and bow only. |
 | Restricted (gem-class) materials | Jade, Obsidian, Flint and any future gemstone make **only daggers and spears**, plus Forge and Permanent inputs. **Flint is the only arrow tip.** Strength is staggered: Flint sits between Stone and Copper, Obsidian between Iron and Silver, Jade between Cobalt and Mithril. |
-| Ores | Smelted into bars at the Furnace, **1 ore → 1 bar, no fuel**; time is the only cost. |
+| Ores | Smelted into bars at the Furnace, **1 ore → 1 bar, no fuel**; time is the only cost. Crafting mastery adds a chance of one bonus bar per bar (2% per level, 2026-10-28). |
 | Mining gate | Each ore needs a pickaxe of the previous tier. |
 | Ore regions | By danger: Outer Rim has Stone, Copper and Iron; Inner Ring has Silver and Cobalt; the Crater has Mithril; Adamantine comes only from meteors, the Guardian and rare events. |
 | Armor ladder | Hide → Bone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine. Wood and Stone armor are removed. |
@@ -22,7 +22,7 @@
 | Rarity | Rises slowly with tier; Legendary and above are reserved for boss and event drops. |
 | Quality rolls | Keep ±5% (Q139). |
 | Components | No intermediates besides metal bars. Recipes use Wood, Fiber and Hide directly. |
-| Consumables | Keep Basic Medicine, Advanced Medicine, Healing Potion and Cooked Meat. Berries come in varieties with different effects (healing, fullness, XP boost, luck boost), and brewing them at the Cauldron gives a stronger effect. |
+| Consumables | Keep Basic Medicine, Advanced Medicine, Healing Potion and Cooked Meat. Berries come in varieties with different effects (healing, fullness, XP boost, luck boost), and brewing them at the Cauldron gives a stronger effect. A running boost never weakens: only a stronger one of the same kind takes over (2026-10-28). |
 | Luck | Raises rare-drop chance only, from creatures, caches and events. |
 | XP potions | Add to Premium and paid boosters, as with Q162. |
 | Building | Full ladder: Wood through Adamantine walls, floors, doors and roofs. |
@@ -108,7 +108,7 @@ Berries are food, not materials, so they can be carried into a run.
 
 - Medicine is unchanged: Basic Medicine (heal 10) and Advanced Medicine (heal 25).
 - Cooked Meat is unchanged (Raw Meat at the Furnace).
-- Boost durations don't stack; drinking another resets the timer. XP boosts add to Premium and paid boosters.
+- Boosts don't stack. A running boost never weakens or resets: a weaker or equal one changes nothing (a draught is refused and kept), and only a stronger one takes over with its own timer (2026-10-28). XP boosts add to Premium and paid boosters.
 - Effect sizes and durations are placeholders.
 
 ## 4. Gear by tier
