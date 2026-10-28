@@ -55,16 +55,16 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Settings | 1569,98,69,66 | top-right | `pm_lobby_gear`; touch area +10 px each side | — | image |
 | Nav tiles | 35,370 and 182,370 / 35,517 and 182,517 / 35,664 and 182,664; 142×141, pitch 147 | left | `pm_tile_*` | Inventory, Vault, Quests, Shop, Forge, Trade | image |
 | Party | 1211,267,433,381 | top-right | `pm_lobby_party` | — | image |
-| Party.Title / Party.Count | 1265,307,140,40 / 1408,307,140,40 | in panel | Serif 34, ink | "PARTY", "1/10" | native |
+| Party.Title / Party.Count | 1265,307,140,40 / 1408,307,140,40 | in panel | Serif 34, ink | "PARTY", "1/8" (party cap) | native |
 | Party.Leave | 1579,309,36,35 | in panel, while in a party | `pm_button_x`; touch area +12 px | — | image |
 | Party.Divider | 1262,353,334,2 | in panel | line | — | native |
 | Party.List | 1261,359,345,236 | in panel | scrolling; bar 10 px thumb/track | rows | native |
 | Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 229,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
-| Invite row | h 58 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 204 / 262 | incoming invites | native + images |
+| Invite row | h 58 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 160 / 262 | incoming invites | native + images |
 | Empty slot row | h 50 | list | dot 22 px at 3,14; rule at y 48 | free slots up to the cap | native |
 | Enter | 525,741,622,180 | bottom-centre | `pm_lobby_enter` (lettering painted) | "ENTER / SHATTERED CRATER" | image |
 | Server | 1150,799,251,71 | right of Enter | `pm_lobby_server` (icon + arrow painted) | "Choose server" Serif 17 (shrinks) at 1224,815,134,34 | image + native |
-| Status strip | centred, top 104, 480×48 | top centre, between profile and Coins | paper fill, paperEdge stroke, Serif 17 ink, up to two lines | status / maintenance text | native |
+| Status strip | top 104, up to 480×48, centred between profile and Coins (above Enter when that gap is under 300) | top row | paper fill, paperEdge stroke, Serif 17 ink, up to two lines | status / maintenance text | native |
 
 ## Measurements log
 
@@ -171,6 +171,7 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
   to stay clear of it, and the crown 4 px left to keep a gap before the button.
 - Merriweather's numerals: a local copy of the font renders old-style figures;
   whether Roblox's Merriweather does is a manual Studio check.
-- Small party and popup buttons get touch areas larger than their art (Leave,
-  Settings) or larger art (invite Accept/Decline 48 px, popup close 44 px) so
-  they stay tappable when phones draw the screen at half size.
+- Small buttons (Settings, Leave, add-friend, invite Accept/Decline) get touch
+  areas that grow past their art to 44 points on screen; on short screens the
+  party panel moves up under Coins before it shrinks; popups grow on small
+  screens and never reach under the top bar.
