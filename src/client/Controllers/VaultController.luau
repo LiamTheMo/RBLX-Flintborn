@@ -99,7 +99,7 @@ local function deposit(index: number, item)
 	hideConfirm()
 	local ok, reason, lost = invoke("VaultDeposit", index)
 	if not ok and reason == "VaultWouldOverflow" and type(lost) == "number" then
-		pendingDeposit = { index = index, catalogId = item.catalogId, quantity = item.quantity }
+		pendingDeposit = { index = index, catalogId = item.catalogId, quantity = item.quantity, lost = lost }
 		ui.confirmText.Text = ("Your vault is nearly full: %d %s would be deleted. Deposit anyway?"):format(
 			lost,
 			item.name
@@ -117,13 +117,13 @@ local function confirmDeposit()
 	local pending = pendingDeposit
 	hideConfirm()
 	local view = pending and invoke("VaultSnapshot")
-	local item = type(view) == "table" and view.backpack[pending.index]
-	if item == nil or item.catalogId ~= pending.catalogId or item.quantity ~= pending.quantity then
+	local item = type(view) == "table" and view.backpack[pending.index] or nil
+	if type(item) ~= "table" or item.catalogId ~= pending.catalogId or item.quantity ~= pending.quantity then
 		ui.status.Text = "Your backpack changed; nothing was deposited."
 		refresh()
 		return
 	end
-	act("VaultDeposit", pending.index, true)
+	act("VaultDeposit", pending.index, pending.catalogId, pending.lost)
 end
 
 function refresh()

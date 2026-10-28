@@ -208,7 +208,15 @@ test("backpack materials stay put until deposited; a confirmed deposit past capa
 	expectEq(profile.vault.materials.Stone, 800, "a refused deposit changes nothing")
 	expectEq(#profile.lobbyBackpack.slots, 3, "the Stone stays in the backpack")
 	expectEq(profile.vault.lastOverflow, nil, "and nothing is deleted")
-	expect(VaultRules.Deposit(profile, 1, 77, true), "Stone deposits once the loss is confirmed")
+	local wrong = VaultRules.Deposit(profile, 1, 77, { catalogId = "Wood", loss = 100 })
+	expect(not wrong, "a confirmation for another material is refused")
+	local less = VaultRules.Deposit(profile, 1, 77, { catalogId = "Stone", loss = 50 })
+	expect(not less, "a confirmation for a smaller loss than now is refused")
+	expectEq(profile.vault.materials.Stone, 800, "neither changed anything")
+	expect(
+		VaultRules.Deposit(profile, 1, 77, { catalogId = "Stone", loss = 100 }),
+		"Stone deposits once the loss is confirmed"
+	)
 	expectEq(profile.vault.materials.Stone, 1000, "Stone fills its vault capacity")
 	expectEq(profile.vault.lastOverflow.at, 77, "the loss is recorded")
 	expectEq(profile.vault.lastOverflow.deleted.Stone, 100, "800 + 300 leaves 100 deleted")

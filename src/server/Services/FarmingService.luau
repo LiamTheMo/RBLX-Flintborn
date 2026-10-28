@@ -196,10 +196,15 @@ local function register(record)
 		end)
 		prompt.PromptButtonHoldEnded:Connect(function(player)
 			local hold = holding[player]
-			holding[player] = nil
-			if hold and #choices > 1 and os.clock() - hold.at < prompt.HoldDuration * TAP_FRACTION then
-				shown = shown % #choices + 1
-				label()
+			-- Only a tap is forgotten here. A long hold keeps its record, because
+			-- Roblox may report the hold ending before Triggered, and Triggered must
+			-- still plant the crop this player saw (the next HoldBegan replaces it).
+			if hold and os.clock() - hold.at < prompt.HoldDuration * TAP_FRACTION then
+				holding[player] = nil
+				if #choices > 1 then
+					shown = shown % #choices + 1
+					label()
+				end
 			end
 		end)
 		prompt.Triggered:Connect(function(player)

@@ -135,14 +135,21 @@ function VaultService.Start()
 	Remotes.Handle("VaultSnapshot", snapshot)
 	-- A material deposit that would go past the vault's capacity is refused with
 	-- the amount it would delete, until the client confirms the loss (GDD §53).
-	Remotes.Handle("VaultDeposit", function(player, index, confirmOverflow)
-		if
-			not Validation.IsQuantity(index, 1, 50) or (confirmOverflow ~= nil and type(confirmOverflow) ~= "boolean")
-		then
+	-- The confirmation names the material and the loss shown, so a stack that
+	-- changed in between (a withdraw merged into it, slots shifted) is refused again.
+	Remotes.Handle("VaultDeposit", function(player, index, confirmCatalogId, confirmLoss)
+		if not Validation.IsQuantity(index, 1, 50) then
 			return false, "BadRequest"
 		end
+		local confirmed = nil
+		if confirmCatalogId ~= nil then
+			if type(confirmCatalogId) ~= "string" or not Validation.IsQuantity(confirmLoss, 0, 1000) then
+				return false, "BadRequest"
+			end
+			confirmed = { catalogId = confirmCatalogId, loss = confirmLoss }
+		end
 		local ok, reason = operate(player, "VaultDeposit", function(profile)
-			return VaultRules.Deposit(profile, index, os.time(), confirmOverflow == true)
+			return VaultRules.Deposit(profile, index, os.time(), confirmed)
 		end)
 		if ok then
 			VaultService.Deposited:Fire(player)
