@@ -31,8 +31,8 @@ BASE_RINGS = [(0.0, 0.92, 6), (0.4, 1.0, 6), (0.75, 0.7, 5), (1.0, 0.25, 3)]
 
 
 def palette():
-    K.set_colour(HOST, "#9C8B80", rough=0.92)
-    K.set_colour(HOST_COOL, "#928682", rough=0.92)
+    K.set_colour(HOST, "#958274", rough=0.92)        # measured against the sheet host render #978679
+    K.set_colour(HOST_COOL, "#8C7E78", rough=0.92)
     K.set_colour(COPPER, "#D45A1E", rough=0.55, metal=0.2)
     K.set_colour(OXIDE, "#3F8B80", rough=0.8)
     K.set_colour(BASE, "#958C8B", rough=0.92)
@@ -61,14 +61,17 @@ def host(a, oxide=True):
     vs = K.hull_rock(a, HOST_SIZE, seed=6001, mat=HOST, rings=HOST_RINGS, jitter=0.05, rot=0.3, keep_bottom=True)
     K.blend(a, vs, HOST, HOST_COOL, K.noise_field(scale=0.22, seed=6001), level=0.15, width=0.45, steps=2)
     if oxide:
-        # teal oxidation smudged onto the host round each insert (a real colour region, noisy edge)
+        # teal oxidation smudged onto the host round each insert (a real colour region): the big facets are split
+        # into coplanar pieces first (silhouette unchanged) so the smudges stay small; a stone/teal half-mix ring
+        # softens their edge
+        K.tag_part(a, vs, "host")
+        vs = K.refine(a, K.part(a, "host"), 1)
         pts = [(p, R) for _, p, n, R, _ in seats()]
-        nf = K.noise_field(scale=0.9, seed=6002)
-        oi = a._mi(OXIDE)
-        for f in K.faces_of(vs):
-            c = f.calc_center_median()
-            if any((c - p).length < R * 1.55 + nf(c) * 0.6 for p, R in pts):
-                f.material_index = oi
+        nf = K.noise_field(scale=1.2, seed=6002)
+
+        def field(c):
+            return max(1.0 - (c - p).length / (R * 1.35) for p, R in pts) + nf(c) * 0.35
+        K.blend(a, vs, HOST, OXIDE, field, level=0.35, width=0.3, mode="half")
     K.texture(a, vs, amp=0.04, scale=0.3, jitter=0.035, seed=6001)
     return vs
 
@@ -82,15 +85,15 @@ def insert(a, base, normal, R, seed):
     w = n.cross(u)
     c = Vector(base) + n * R * 0.25
     pts = []
-    for k in range(10):
-        # points on a lumpy ellipsoid, longer across the surface than out of it
-        th = rng.uniform(0, 2 * math.pi)
-        ph = math.acos(rng.uniform(-1, 1))
-        v = (u * math.cos(th) * math.sin(ph) * 1.15 + w * math.sin(th) * math.sin(ph) * 0.95 + n * math.cos(ph) * 0.85)
-        pts.append(c + v * R * rng.uniform(0.85, 1.05))
-    for k in range(4):
-        th = 2 * math.pi * k / 4 + rng.uniform(-0.3, 0.3)
-        pts.append(c + (u * math.cos(th) + w * math.sin(th)) * R * 1.05 - n * R * 0.55)
+    N = 18
+    for k in range(N):
+        # evenly spread points (Fibonacci sphere) on a slightly lumpy ellipsoid, longer across the surface than out
+        # of it: a chunky nugget with broad facets of similar size, as the sheet's insert detail
+        zz = 1 - 2 * (k + 0.5) / N
+        r = math.sqrt(1 - zz * zz)
+        th = k * 2.39996 + rng.uniform(-0.15, 0.15)
+        v = u * math.cos(th) * r * 1.15 + w * math.sin(th) * r * 0.95 + n * zz * 0.8
+        pts.append(c + v * R * rng.uniform(0.9, 1.04))
     bm = a.bm
     vs = [bm.verts.new(p) for p in pts]
     bmesh.ops.convex_hull(bm, input=vs)
