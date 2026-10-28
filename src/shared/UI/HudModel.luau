@@ -3,6 +3,7 @@
 -- and the objective/event text. No Instances here, so the headless specs and the
 -- HUD share one definition. The HUD only displays; the server owns every value.
 
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local Keybinds = require(script.Parent.Parent.Settings.Keybinds)
 
 local HudModel = {}
@@ -72,9 +73,10 @@ function HudModel.Thousands(value: number?): string
 	return (formatted:gsub("^,", ""))
 end
 
--- The lobby party header: "PARTY 1/8" (alone counts as a party of one).
-function HudModel.PartyTitle(members: number?, maxSize: number): string
-	return ("PARTY  %d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
+-- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
+-- of one).
+function HudModel.PartyCount(members: number?, maxSize: number): string
+	return ("%d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
 end
 
 -- Small text on a full XP bar at the level cap.
@@ -195,6 +197,26 @@ end
 -- wheel never steps the hotbar: it stays on camera zoom.
 function HudModel.HotbarStep(current: number, step: number, count: number): number
 	return ((current - 1 + step) % count) + 1
+end
+
+-- What each HUD hotbar slot shows for an inventory snapshot ({slots, equipped}):
+-- index -> {name, count, rarity, equipped}, or nil for an empty slot. `count` is
+-- "" for unique items and "×n" for stacks; Permanent items carry a star.
+function HudModel.HotbarSlots(snapshot, count: number)
+	local views = {}
+	for _, slot in (snapshot and snapshot.slots) or {} do
+		local index = slot.index
+		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
+			local def = ItemCatalog.Get(slot.catalogId)
+			views[index] = {
+				name = (if slot.permanent then "★ " else "") .. (if def then def.name else tostring(slot.catalogId)),
+				count = if slot.quantity and slot.quantity > 1 then ("×%d"):format(slot.quantity) else "",
+				rarity = if def then def.rarity else "Common",
+				equipped = snapshot.equipped == index,
+			}
+		end
+	end
+	return views
 end
 
 local KEY_NAMES = {

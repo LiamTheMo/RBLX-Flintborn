@@ -1,12 +1,13 @@
 -- Lobby trading (GDD §10.2, Q13, Q50, Q56, Q98, Q125, Q130, Q164). Two players in
 -- the same lobby trade designated items and Gems — never Coins. Raw materials trade
--- only when flagged rare or Exclusive, and only out of the vault, where every
--- material lives; they land in the receiver's vault, so an offer needs room there
--- and a trade never deletes. Gem trades need level 10 on both sides, are
--- capped per UTC day for sending and receiving, and pay a 5% fee. Settlement
--- writes the trade into both profiles as pending; Reconcile later finalises it
--- (the counterpart saved it too) or rolls one side back (the counterpart never
--- saved it, or rolled back), and waits while the counterpart may still save.
+-- only when flagged rare or Exclusive, and only out of the vault (a backpack
+-- stack is deposited first, GDD §53); they land in the receiver's vault, so an
+-- offer needs room there and a trade never deletes. Gem trades need level 10 on
+-- both sides, are capped per UTC day for sending and receiving, and pay a 5%
+-- fee. Settlement writes the trade into both profiles as pending; Reconcile later
+-- finalises it (the counterpart saved it too) or rolls one side back (the
+-- counterpart never saved it, or rolled back), and waits while the counterpart
+-- may still save.
 -- Until then the profile is "settling": nothing a rollback could not claw back
 -- (sales, Forge crafts, Gem spending, a Deploy) may consume what it received.
 
@@ -30,7 +31,8 @@ TradeRules.MATERIAL_PREFIX = "mat:"
 local TRADEABLE_FAMILIES = { Tool = true, Weapon = true, Armor = true, Placeable = true }
 
 -- Designated items only (Q130): gear, tools, placeables (runes), Permanent items,
--- and materials flagged rare/Exclusive (Q56).
+-- and materials or consumables flagged tradeable (rare materials and berries, GDD
+-- §51) or Exclusive (Q56).
 function TradeRules.IsTradeable(item): boolean
 	local def = ItemCatalog.Get(item.catalogId)
 	if def == nil then
@@ -39,14 +41,14 @@ function TradeRules.IsTradeable(item): boolean
 	if item.permanent then
 		return true
 	end
-	if def.family == ItemCatalog.Families.Material then
-		return def.special == true or def.rarity == "Exclusive"
+	if def.family == ItemCatalog.Families.Material or def.family == ItemCatalog.Families.Consumable then
+		return def.tradeable == true or def.rarity == "Exclusive"
 	end
 	return TRADEABLE_FAMILIES[def.family] == true
 end
 
 -- A lobby backpack slot that may be offered: never a material, which trades only
--- from the vault (Q164).
+-- from the vault (Q164; still so under GDD §53).
 function TradeRules.IsTradeableSlot(item): boolean
 	return not ItemCatalog.IsMaterial(item.catalogId) and TradeRules.IsTradeable(item)
 end
@@ -206,6 +208,32 @@ local function bank(profile, materials)
 	end
 end
 
+-- Puts a received or returned item into the lobby backpack. A stack (a tradeable
+-- consumable such as Sunberry) tops up the slot of its type first, keeping one
+-- slot per type (Q128); whatever is over the cap gets its own slot, since a trade
+-- never deletes.
+local function land(slots, item)
+	local cap = if item.instanceId == nil then ItemCatalog.StackCap(item.catalogId) else nil
+	if cap then
+		local quantity = item.quantity or 0
+		for _, slot in slots do
+			if quantity <= 0 then
+				break
+			end
+			if slot.instanceId == nil and slot.catalogId == item.catalogId and slot.quantity < cap then
+				local added = math.min(quantity, cap - slot.quantity)
+				slot.quantity += added
+				quantity -= added
+			end
+		end
+		if quantity <= 0 then
+			return
+		end
+		item.quantity = quantity
+	end
+	table.insert(slots, item)
+end
+
 local function give(profile, taken, receiverId: number, now: number)
 	for _, item in taken.items do
 		local copy = table.clone(item)
@@ -218,7 +246,7 @@ local function give(profile, taken, receiverId: number, now: number)
 			end
 		end
 		-- Received items always land, even past 50 slots: a trade never deletes.
-		table.insert(profile.lobbyBackpack.slots, copy)
+		land(profile.lobbyBackpack.slots, copy)
 	end
 	-- ValidateReceive made room for them.
 	bank(profile, taken.materials)
@@ -340,7 +368,7 @@ local function rollBack(profile, pending, now: number)
 	end
 	takeMaterials(profile, pending.received.materials)
 	for _, item in pending.gave.items do
-		table.insert(profile.lobbyBackpack.slots, table.clone(item))
+		land(profile.lobbyBackpack.slots, table.clone(item))
 		if item.permanent then
 			profile.permanentItems[item.instanceId] = PermanentRules.LedgerEntry(item, now)
 		end

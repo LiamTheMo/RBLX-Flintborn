@@ -57,6 +57,9 @@ jobs:
     # that is not yet prepared with Rojo cannot block releases to the other.
     strategy:
       fail-fast: false
+      # One place at a time: both publish through the same Open Cloud key, and
+      # running them together hit its rate limit (HTTP 429).
+      max-parallel: 1
       matrix:
         place: [main, lobby]
     steps:

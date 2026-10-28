@@ -1,9 +1,11 @@
--- Additive piece-based armor (GDD §21.5, Q132). A full matching set has the
--- confirmed factor (Hide ×1.2, Wood ×1.5, Stone ×1.8, Iron ×2.0); each piece adds
--- its share of that set's increment, and pieces add rather than multiply. The
--- per-piece split and how quality rolls apply are starting placeholders.
+-- Additive piece-based armor (GDD §21.5, §51, Q132). A full matching set has its
+-- tier's factor (confirmed Hide ×1.2 and Iron ×2.0; Bone ×1.5, Copper ×1.8, then
+-- ×1.25 per metal above Iron); each piece adds its share of that set's increment,
+-- and pieces add rather than multiply. The per-piece split and how quality rolls
+-- apply are starting placeholders.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local Tiers = require(script.Parent.Parent.Items.Tiers)
 
 local ArmorRules = {}
 
@@ -11,7 +13,8 @@ ArmorRules.PIECE_SHARE = { Head = 0.25, Chest = 0.45, Legs = 0.30 }
 
 -- Increment one piece adds above the unarmored factor of 1.
 function ArmorRules.PieceIncrement(tier: string, slot: string, qualityRoll: number?): number
-	local setFactor = GameConstants.ARMOR_SET_FACTOR[tier]
+	local ladder = Tiers.Get(tier)
+	local setFactor = ladder and Tiers.ArmorFactor(ladder)
 	local share = ArmorRules.PIECE_SHARE[slot]
 	if setFactor == nil or share == nil then
 		return 0

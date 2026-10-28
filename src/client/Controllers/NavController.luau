@@ -21,8 +21,9 @@ local function entries()
 	local controllers = script.Parent
 	if PlaceConfig.IsLobby() then
 		return {
-			-- Lobby panels have no keyboard keys (GDD §46): these buttons open them.
-			{ "🔒 Vault", nil, require(controllers.VaultController).Toggle },
+			-- Lobby panels have no keys of their own (GDD §46); the Backpack key also
+			-- opens the vault panel (VaultController, GDD §52).
+			{ "🔒 Vault", "Backpack", require(controllers.VaultController).Toggle },
 			{ "🔥 Forge", nil, require(controllers.ForgeController).Toggle },
 			{ "🪙 Market", nil, require(controllers.WalletController).Toggle },
 			{ "🤝 Trade", nil, require(controllers.TradeController).Toggle },

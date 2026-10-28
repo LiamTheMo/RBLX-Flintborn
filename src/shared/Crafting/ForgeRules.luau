@@ -10,8 +10,65 @@ local Receipts = require(script.Parent.Parent.Data.Receipts)
 local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
 local ForgeRecipes = require(script.Parent.ForgeRecipes)
 local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
+local Tiers = require(script.Parent.Parent.Items.Tiers)
 
 local ForgeRules = {}
+
+-- Permanent conversions are browsed by their source's tier, weakest first (power,
+-- then ladder order); gear without a tier (the Guardian's Fang) comes last.
+ForgeRules.LEGENDARY_TIER = "Legendary"
+ForgeRules.TIER_ORDER = {}
+do
+	local ladder = table.clone(Tiers.Ladder)
+	local position = {}
+	for index, tier in ladder do
+		position[tier] = index
+	end
+	table.sort(ladder, function(a, b)
+		if a.power ~= b.power then
+			return a.power < b.power
+		end
+		return position[a] < position[b]
+	end)
+	for _, tier in ladder do
+		table.insert(ForgeRules.TIER_ORDER, tier.id)
+	end
+	table.insert(ForgeRules.TIER_ORDER, ForgeRules.LEGENDARY_TIER)
+end
+local tierRank = {}
+for index, tierId in ForgeRules.TIER_ORDER do
+	tierRank[tierId] = index
+end
+
+-- The browsing tier of a Permanent recipe's source, or nil for special recipes.
+function ForgeRules.PermanentTier(recipe): string?
+	if recipe.kind ~= ForgeRecipes.Kinds.Permanent then
+		return nil
+	end
+	local def = ItemCatalog.Get(recipe.output)
+	return def and def.tier or ForgeRules.LEGENDARY_TIER
+end
+
+-- Every Forge recipe, Permanent conversions sorted by tier and otherwise in
+-- catalog order (weapons, tools, then armor within a tier).
+local ordered = table.clone(ForgeRecipes.List)
+do
+	local listed = {}
+	for index, recipe in ordered do
+		listed[recipe] = index
+	end
+	table.sort(ordered, function(a, b)
+		local ta, tb = ForgeRules.PermanentTier(a), ForgeRules.PermanentTier(b)
+		local ra, rb = ta and tierRank[ta] or 0, tb and tierRank[tb] or 0
+		if ra ~= rb then
+			return ra < rb
+		end
+		return listed[a] < listed[b]
+	end)
+end
+function ForgeRules.Ordered()
+	return ordered
+end
 
 -- Vaulted quantity of a material. The lobby backpack never counts (§25.3).
 function ForgeRules.Owned(profile, catalogId: string): number

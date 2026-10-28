@@ -43,9 +43,9 @@ test("lobby currency and party header text", function()
 	expectEq(HudModel.Thousands(999), "999", "no leading comma")
 	expectEq(HudModel.Thousands(nil), "0", "missing reads 0")
 	expectEq(HudModel.Thousands(-5), "0", "negative reads 0")
-	expectEq(HudModel.PartyTitle(nil, 8), "PARTY  1/8", "alone is a party of one")
-	expectEq(HudModel.PartyTitle(3, 8), "PARTY  3/8", "members")
-	expectEq(HudModel.PartyTitle(12, 8), "PARTY  8/8", "clamped to the cap")
+	expectEq(HudModel.PartyCount(nil, 8), "1/8", "alone is a party of one")
+	expectEq(HudModel.PartyCount(3, 8), "3/8", "members")
+	expectEq(HudModel.PartyCount(12, 8), "8/8", "clamped to the cap")
 end)
 
 test("timers read m:ss and h:mm:ss", function()
@@ -144,9 +144,33 @@ test("slice scale shrinks corners for small widgets", function()
 end)
 
 test("hotbar stepping wraps", function()
-	expectEq(HudModel.HotbarStep(1, 1, 9), 2, "next")
-	expectEq(HudModel.HotbarStep(9, 1, 9), 1, "wraps forward")
-	expectEq(HudModel.HotbarStep(1, -1, 9), 9, "wraps back")
+	expectEq(HudModel.HotbarStep(1, 1, 6), 2, "next")
+	expectEq(HudModel.HotbarStep(6, 1, 6), 1, "wraps forward")
+	expectEq(HudModel.HotbarStep(1, -1, 6), 6, "wraps back")
+end)
+
+test("hotbar slots show their items, stacks and the equipped one", function()
+	local views = HudModel.HotbarSlots({
+		equipped = 2,
+		slots = {
+			{ area = "hotbar", index = 1, catalogId = "FlintArrow", quantity = 24 },
+			{ area = "hotbar", index = 2, catalogId = "IronSword", permanent = true },
+			{ area = "hotbar", index = 3, catalogId = "Redberry", quantity = 1 },
+			{ area = "backpack", index = 4, catalogId = "Wood", quantity = 50 },
+			{ area = "hotbar", index = 7, catalogId = "Wood", quantity = 5 },
+		},
+	}, 6)
+	expectEq(views[1].name, "Flint Arrow", "item name")
+	expectEq(views[1].count, "×24", "stack count")
+	expectEq(views[1].equipped, false, "not equipped")
+	expectEq(views[2].name, "★ Iron Sword", "Permanent items carry a star")
+	expectEq(views[2].count, "", "unique items show no count")
+	expectEq(views[2].equipped, true, "the equipped slot")
+	expectEq(views[3].count, "", "a single item shows no count")
+	expectEq(views[4], nil, "backpack items stay off the hotbar")
+	expectEq(views[5], nil, "an empty slot is nil")
+	expectEq(views[7], nil, "slots past the sixth are ignored")
+	expectEq(next(HudModel.HotbarSlots(nil, 6)), nil, "no snapshot, empty hotbar")
 end)
 
 test("prompt keycaps name the key for the input in use", function()

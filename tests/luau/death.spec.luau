@@ -93,7 +93,7 @@ end)
 test("Permanent items never enter a body; bodies last exactly 600 s", function()
 	local items = {
 		{ catalogId = "Wood", quantity = 10 },
-		{ instanceId = "p", catalogId = "BasicPickaxe", permanent = true },
+		{ instanceId = "p", catalogId = "StonePickaxe", permanent = true },
 		{ instanceId = "s", catalogId = "StoneSpear" },
 	}
 	local body, kept = DeathRules.Split(items)

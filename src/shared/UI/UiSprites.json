@@ -714,6 +714,196 @@
     ],
     "w": 194
   },
+  "pm_button_add_friend": {
+    "h": 52,
+    "slice": null,
+    "w": 68
+  },
+  "pm_button_check": {
+    "h": 150,
+    "slice": null,
+    "w": 155
+  },
+  "pm_button_leather": {
+    "h": 140,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ],
+    "w": 401
+  },
+  "pm_button_leather_disabled": {
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ],
+    "w": 405
+  },
+  "pm_button_leather_hover": {
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ],
+    "w": 406
+  },
+  "pm_button_leather_pressed": {
+    "h": 141,
+    "slice": [
+      64,
+      44,
+      64,
+      44
+    ],
+    "w": 404
+  },
+  "pm_button_parchment": {
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "w": 386
+  },
+  "pm_button_parchment_disabled": {
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "w": 386
+  },
+  "pm_button_parchment_hover": {
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "w": 387
+  },
+  "pm_button_parchment_pressed": {
+    "h": 159,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "w": 385
+  },
+  "pm_button_x": {
+    "h": 150,
+    "slice": null,
+    "w": 155
+  },
+  "pm_fill_xp": {
+    "h": 14,
+    "slice": [
+      7,
+      6,
+      7,
+      6
+    ],
+    "w": 176
+  },
+  "pm_icon_add_friend": {
+    "h": 143,
+    "slice": null,
+    "w": 179
+  },
+  "pm_icon_crown": {
+    "h": 131,
+    "slice": null,
+    "w": 168
+  },
+  "pm_lobby_coins": {
+    "h": 70,
+    "slice": null,
+    "w": 166
+  },
+  "pm_lobby_enter": {
+    "h": 184,
+    "slice": null,
+    "w": 626
+  },
+  "pm_lobby_gear": {
+    "h": 70,
+    "slice": null,
+    "w": 73
+  },
+  "pm_lobby_gems": {
+    "h": 70,
+    "slice": null,
+    "w": 136
+  },
+  "pm_lobby_party": {
+    "h": 385,
+    "slice": null,
+    "w": 437
+  },
+  "pm_lobby_profile": {
+    "h": 139,
+    "slice": null,
+    "w": 533
+  },
+  "pm_lobby_server": {
+    "h": 75,
+    "slice": null,
+    "w": 255
+  },
+  "pm_panel": {
+    "h": 314,
+    "slice": [
+      70,
+      62,
+      70,
+      62
+    ],
+    "w": 529
+  },
+  "pm_tile_forge": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
+  "pm_tile_inventory": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
+  "pm_tile_quests": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
+  "pm_tile_shop": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
+  "pm_tile_trade": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
+  "pm_tile_vault": {
+    "h": 145,
+    "slice": null,
+    "w": 146
+  },
   "slot_broken": {
     "h": 146,
     "slice": null,

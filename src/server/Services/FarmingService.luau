@@ -3,12 +3,15 @@
 -- as the rest of a base. Growth uses server timestamps, so crops keep growing while
 -- their planter is unattended, for as long as the world exists. Harvest XP and
 -- mastery are capped per player per minute (BuildRules.TakeCropCredit), so a field
--- of hundreds of planters is not a progression farm. World place only.
+-- of hundreds of planters is not a progression farm. Planting with carried-in
+-- seed (GDD §53) makes that many of the harvest carried too, so a planter never
+-- turns carried units into ones the Center bonus multiplies. World place only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -23,10 +26,25 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local FarmingService = {}
 
+-- One plant prompt per crop in CROP_ORDER, each on its own key. Every other
+-- gamepad button already has a job (hotbar step, placement, drop, panels), so the
+-- crops after the last key share its prompt: a tap shows the next of them and a
+-- full hold plants the one shown.
 local KEYS = {
 	{ Enum.KeyCode.E, Enum.KeyCode.ButtonX },
 	{ Enum.KeyCode.R, Enum.KeyCode.ButtonY },
 	{ Enum.KeyCode.F, Enum.KeyCode.ButtonB },
+	{ Enum.KeyCode.G, Enum.KeyCode.ButtonL2 },
+}
+-- A release this far short of the hold is a tap (cycles a shared prompt).
+local TAP_FRACTION = 0.8
+-- Colour of each crop once ripe (green while growing).
+local RIPE_COLORS = {
+	Redberry = Color3.fromRGB(220, 60, 90),
+	Sweetberry = Color3.fromRGB(240, 150, 60),
+	Herbs = Color3.fromRGB(120, 200, 90),
+	Fiber = Color3.fromRGB(180, 200, 110),
+	Sapling = Color3.fromRGB(120, 86, 50),
 }
 
 local planters = {}
@@ -54,6 +72,14 @@ local function seedText(seed): string
 	return table.concat(parts, ", ")
 end
 
+-- What players read for a crop: the item it yields ("Redberry"), or the crop
+-- itself when that is a generic material (a Sapling grows Wood).
+local function cropName(cropId: string): string
+	local crop = StructureCatalog.Crops[cropId]
+	local def = crop.yield.catalogId == cropId and ItemCatalog.Get(cropId)
+	return def and def.name or cropId
+end
+
 local function refresh(planter)
 	local crop = planter.cropId and StructureCatalog.Crops[planter.cropId]
 	for _, prompt in planter.plantPrompts do
@@ -71,27 +97,31 @@ local function refresh(planter)
 	local progress = 1 - remaining / crop.seconds
 	planter.harvest.Enabled = remaining <= 0
 	planter.harvest.ObjectText = if remaining <= 0
-		then planter.cropId .. " (ripe)"
-		else ("%s — %d:%02d"):format(planter.cropId, remaining // 60, remaining % 60)
+		then cropName(planter.cropId) .. " (ripe)"
+		else ("%s — %d:%02d"):format(cropName(planter.cropId), remaining // 60, remaining % 60)
 	if planter.plant then
 		local height = 0.4 + 2.6 * progress
 		planter.plant.Size = Vector3.new(1.5, height, 1.5)
 		planter.plant.CFrame = planter.record.part.CFrame * CFrame.new(0, 0.75 + height / 2, 0)
-		planter.plant.Color = if remaining <= 0 then Color3.fromRGB(220, 60, 90) else Color3.fromRGB(80, 170, 70)
+		planter.plant.Color = if remaining <= 0
+			then RIPE_COLORS[planter.cropId] or Color3.fromRGB(220, 60, 90)
+			else Color3.fromRGB(80, 170, 70)
 	end
 end
 
 local function plant(player: Player, planter, cropId: string)
 	local crop = StructureCatalog.Crops[cropId]
-	if planter.cropId or not canAct(player) then
+	if crop == nil or planter.cropId or not canAct(player) then
 		return
 	end
-	if not InventoryService.RemoveAll(player, crop.seed) then
+	local paid, carried = InventoryService.RemoveAll(player, crop.seed)
+	if not paid then
 		InventoryService.Notify(player, "You need " .. seedText(crop.seed) .. " to plant that.")
 		return
 	end
 	planter.cropId = cropId
 	planter.plantedAt = now()
+	planter.carried = carried
 	local sprout = Instance.new("Part")
 	sprout.Name = "Crop"
 	sprout.Anchored = true
@@ -108,14 +138,21 @@ local function harvest(player: Player, planter)
 	if crop == nil or not canAct(player) or BuildRules.CropRemaining(crop, planter.plantedAt, now()) > 0 then
 		return
 	end
+	local carried = planter.carried or 0
 	planter.cropId = nil
 	planter.plantedAt = nil
+	planter.carried = nil
 	local yield = table.clone(crop.yield)
 	yield.quantity =
 		ModifierRules.RollYield(yield.quantity, ModifierService.Get(player, "FarmingYield", "DropQuantity"), rng)
-	local remaining = InventoryService.Add(player, yield)
+	if ItemCatalog.IsMaterial(yield.catalogId) then
+		InventoryRules.SetCarried(yield, carried)
+	end
+	local remaining, remainingCarried = InventoryService.Add(player, yield)
 	if remaining > 0 then
-		DropService.Spawn({ catalogId = yield.catalogId, quantity = remaining }, planter.record.position)
+		local spill = { catalogId = yield.catalogId, quantity = remaining }
+		InventoryRules.SetCarried(spill, remainingCarried)
+		DropService.Spawn(spill, planter.record.position)
 	end
 	local ledger = credits[player] or {}
 	credits[player] = ledger
@@ -128,18 +165,52 @@ end
 
 local function register(record)
 	local planter = { record = record, plantPrompts = {} }
-	for index, cropId in StructureCatalog.CROP_ORDER do
-		local crop = StructureCatalog.Crops[cropId]
+	local order = StructureCatalog.CROP_ORDER
+	for index, keys in KEYS do
+		-- The crops this prompt offers: its own, or every remaining one on the last key.
+		local choices = if index < #KEYS then { order[index] } else table.move(order, index, #order, 1, {})
+		if #choices == 0 then
+			break
+		end
+		local shown = 1
 		local prompt = Instance.new("ProximityPrompt")
-		prompt.ActionText = "Plant " .. cropId
-		prompt.ObjectText = "Costs " .. seedText(crop.seed)
-		prompt.KeyboardKeyCode = KEYS[index][1]
-		prompt.GamepadKeyCode = KEYS[index][2]
+		local function label()
+			local cropId = choices[shown]
+			prompt.ActionText = "Plant " .. cropName(cropId)
+			prompt.ObjectText = "Costs " .. seedText(StructureCatalog.Crops[cropId].seed)
+			if #choices > 1 then
+				prompt.ObjectText ..= (" · tap for %s"):format(cropName(choices[shown % #choices + 1]))
+			end
+		end
+		label()
+		prompt.KeyboardKeyCode = keys[1]
+		prompt.GamepadKeyCode = keys[2]
 		prompt.HoldDuration = 0.5
 		prompt.MaxActivationDistance = 8
 		prompt.Parent = record.part
+		-- The crop shown when each player started holding, so a cycle by someone
+		-- else mid-hold never changes what they plant.
+		local holding = setmetatable({}, { __mode = "k" })
+		prompt.PromptButtonHoldBegan:Connect(function(player)
+			holding[player] = { at = os.clock(), cropId = choices[shown] }
+		end)
+		prompt.PromptButtonHoldEnded:Connect(function(player)
+			local hold = holding[player]
+			-- Only a tap is forgotten here. A long hold keeps its record, because
+			-- Roblox may report the hold ending before Triggered, and Triggered must
+			-- still plant the crop this player saw (the next HoldBegan replaces it).
+			if hold and os.clock() - hold.at < prompt.HoldDuration * TAP_FRACTION then
+				holding[player] = nil
+				if #choices > 1 then
+					shown = shown % #choices + 1
+					label()
+				end
+			end
+		end)
 		prompt.Triggered:Connect(function(player)
-			plant(player, planter, cropId)
+			local hold = holding[player]
+			holding[player] = nil
+			plant(player, planter, if hold then hold.cropId else choices[shown])
 		end)
 		table.insert(planter.plantPrompts, prompt)
 	end

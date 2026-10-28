@@ -64,6 +64,18 @@ test("gathering yield reaches +10% at mastery 10", function()
 	expectEq(pvp[1].value, 0.05, "PvP combat perks capped at +5%")
 end)
 
+test("Crafting mastery gives only better quality rolls and a smelting bonus bar", function()
+	local stats = {}
+	for _, buff in MasteryCatalog.Buffs("Crafting", 10) do
+		stats[buff.stat] = buff.value
+	end
+	expectEq(stats.BestRollLevel, 10, "quality rolls improve per level")
+	expectNear(stats.SmeltBonus, 0.2, 1e-9, "20% bonus-bar chance at level 10")
+	for _, removed in { "CraftSpeed", "IngredientSave", "CraftOutput", "RecipeTier" } do
+		expectEq(stats[removed], nil, removed .. " is gone")
+	end
+end)
+
 test("additive then multiplicative: base 100, +10% and ×1.2 gives 132", function()
 	local modifiers = { { op = "Additive", value = 0.1 }, { op = "Multiplicative", value = 1.2 } }
 	expectEq(ModifierRules.Final(100, modifiers), 132, "132")
@@ -77,8 +89,8 @@ end)
 test("rebirth resets only the general level and keeps everything else", function()
 	local profile = ProfileSchema.Default(0)
 	profile.progression.level = 50
-	profile.vault.materials.Iron = 500
-	profile.permanentItems.p1 = { catalogId = "BasicPickaxe" }
+	profile.vault.materials.IronBar = 500
+	profile.permanentItems.p1 = { catalogId = "StonePickaxe" }
 	ProgressionRules.GrantMastery(profile, "Crafting", 500)
 	profile.rebirth.ownedPerks.Scholar = 2
 	local ok, reason = ProgressionRules.Rebirth(profile)
@@ -92,7 +104,7 @@ test("rebirth resets only the general level and keeps everything else", function
 	)
 	expect(ProgressionRules.Rebirth(profile), "rebirth")
 	expectEq(profile.progression.level, 1, "level reset")
-	expectEq(profile.vault.materials.Iron, 500, "vault kept")
+	expectEq(profile.vault.materials.IronBar, 500, "vault kept")
 	expect(profile.permanentItems.p1 ~= nil, "Permanent items kept")
 	expectEq(profile.progression.masteryTracks.Crafting.level, 5, "masteries kept")
 	expectEq(profile.rebirth.ownedPerks.Scholar, 2, "perks kept")

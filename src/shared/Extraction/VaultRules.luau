@@ -1,10 +1,10 @@
--- The secure vault (GDD §10.3, Q96, Q122, Q151, Q154, Q164). 25 item slots (+25
+-- The secure vault (GDD §10.3, §53, Q96, Q122, Q151, Q154). 25 item slots (+25
 -- per upgrade, v0.14) and material storage of up to 1,000 per type. Item deposits
--- are manual and are refused when there is no room, never deleted. Item
--- withdrawals go to the lobby backpack, which deploys on the next Play (Q155).
--- Materials live only in the vault: any that reach the lobby backpack bank at
--- once (BankMaterials), anything over the capacity is deleted, and they never
--- come back out.
+-- are manual and are refused when there is no room, never deleted. A material
+-- deposit that would go over the capacity is refused until the player confirms
+-- it, and then anything over the capacity is deleted (GDD §53). Item
+-- and material withdrawals go to the lobby backpack, which deploys on the next
+-- Play (Q155), materials included (GDD §53).
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
@@ -16,43 +16,56 @@ function VaultRules.ItemCapacity(profile): number
 	return GameConstants.VaultSlots(profile.vault.upgradeTier or 0)
 end
 
--- Banks every material stack in the lobby backpack into the vault, deleting what
--- exceeds the vault's material capacity. Runs after every profile operation and
--- on load, so the backpack never holds a material. Returns {catalogId = deleted}
--- (empty when nothing was lost) and records any loss on `vault.lastOverflow`.
-function VaultRules.BankMaterials(profile, now: number)
-	local slots = profile.lobbyBackpack.slots
+-- Settles `quantity` of a material into its vault stack, deleting what exceeds the
+-- capacity; a loss is recorded on `vault.lastOverflow` so the vault can show it.
+-- Returns how much was deleted.
+function VaultRules.BankMaterial(profile, catalogId: string, quantity: number, now: number): number
 	local materials = profile.vault.materials
-	local deleted, lost = {}, false
-	for index = #slots, 1, -1 do
-		local item = slots[index]
-		if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
-			local current = materials[item.catalogId] or 0
-			local stored, over = GameConstants.SettleMaterialStack(current, math.max(0, item.quantity or 0))
-			materials[item.catalogId] = if stored > 0 then stored else nil
-			if over > 0 then
-				deleted[item.catalogId] = (deleted[item.catalogId] or 0) + over
-				lost = true
-			end
-			table.remove(slots, index)
-		end
+	local stored, over = GameConstants.SettleMaterialStack(materials[catalogId] or 0, math.max(0, quantity))
+	materials[catalogId] = if stored > 0 then stored else nil
+	if over > 0 then
+		profile.vault.lastOverflow = { at = now, deleted = { [catalogId] = over } }
 	end
-	if lost then
-		profile.vault.lastOverflow = { at = now, deleted = deleted }
-	end
-	return deleted
+	return over
 end
 
--- Moves one lobby backpack item into the vault. Returns (ok, reason).
-function VaultRules.Deposit(profile, backpackIndex: number)
+-- How much of the material stack in a lobby backpack slot depositing it would
+-- delete for lack of vault capacity (0 for anything else).
+function VaultRules.DepositLoss(profile, backpackIndex: number): number
+	local item = profile.lobbyBackpack.slots[backpackIndex]
+	if item == nil or item.instanceId ~= nil or not ItemCatalog.IsMaterial(item.catalogId) then
+		return 0
+	end
+	local current = profile.vault.materials[item.catalogId] or 0
+	local _, over = GameConstants.SettleMaterialStack(current, math.max(0, item.quantity or 0))
+	return over
+end
+
+VaultRules.WOULD_OVERFLOW = "VaultWouldOverflow"
+
+-- Moves one lobby backpack slot into the vault. Returns (ok, reason). A material
+-- stack banks whole; one that would go past the capacity is refused with
+-- WOULD_OVERFLOW (DepositLoss says how much) unless `confirmed` = {catalogId,
+-- loss} accepts it: the slot must still hold that material and lose no more than
+-- the player agreed to, and then the excess is deleted (BankMaterial).
+function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confirmed: any?)
 	local slots = profile.lobbyBackpack.slots
 	local item = slots[backpackIndex]
 	if item == nil then
 		return false, "Empty"
 	end
 	if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
-		-- Never an item slot: the sweep after this operation banks it.
-		return false, "MaterialsBankAutomatically"
+		local loss = VaultRules.DepositLoss(profile, backpackIndex)
+		local accepted = type(confirmed) == "table"
+			and confirmed.catalogId == item.catalogId
+			and type(confirmed.loss) == "number"
+			and loss <= confirmed.loss
+		if loss > 0 and not accepted then
+			return false, VaultRules.WOULD_OVERFLOW
+		end
+		VaultRules.BankMaterial(profile, item.catalogId, item.quantity or 0, now or 0)
+		table.remove(slots, backpackIndex)
+		return true, nil
 	end
 	if #profile.vault.items >= VaultRules.ItemCapacity(profile) then
 		return false, "VaultFull"
@@ -75,6 +88,26 @@ function VaultRules.WithdrawItem(profile, vaultIndex: number)
 		return false, "BackpackFull"
 	end
 	table.remove(profile.vault.items, vaultIndex)
+	return true, nil
+end
+
+-- Moves `quantity` of a vaulted material into the lobby backpack, all or nothing
+-- (GDD §53). Returns (ok, reason).
+function VaultRules.WithdrawMaterial(profile, catalogId: string, quantity: number)
+	local current = profile.vault.materials[catalogId] or 0
+	if quantity <= 0 or quantity % 1 ~= 0 or quantity > current then
+		return false, "NotEnough"
+	end
+	local trial = table.clone(profile.lobbyBackpack.slots)
+	for index, slot in trial do
+		trial[index] = table.clone(slot)
+	end
+	if ExtractionRules.AddToLobbyBackpack(trial, { catalogId = catalogId, quantity = quantity }) > 0 then
+		return false, "BackpackFull"
+	end
+	profile.lobbyBackpack.slots = trial
+	local remaining = current - quantity
+	profile.vault.materials[catalogId] = if remaining > 0 then remaining else nil
 	return true, nil
 end
 

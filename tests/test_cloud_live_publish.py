@@ -75,6 +75,53 @@ class CloudPublishSafetyTests(unittest.TestCase):
             cloud.make_script([
                 (("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", "x"*3001000)
             ])
+        # One script too big for any task can never be batched.
+        with self.assertRaisesRegex(ValueError, "too large"):
+            cloud.plan_batches([
+                (("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", "x"*(cloud.MAX_TASK_BYTES + 1))
+            ])
+
+    def test_large_release_is_batched_under_the_task_limit(self):
+        # Roblox refuses a task script over 1 MiB, so a big release splits into
+        # batches that each fit, with every script in exactly one batch.
+        specs = [(("ReplicatedStorage", "Shared", "Mod%03d" % i), "ModuleScript", "return " + "1" * 20000)
+                 for i in range(120)]
+        live = ("ReplicatedStorage", "Shared", "Gone", "Old")
+        with patch.object(cloud, "RETIRED", (live,)):
+            plan = cloud.plan_batches(specs)
+        self.assertGreater(len(plan), 1)
+        self.assertLess(cloud.MAX_TASK_BYTES, 1048576)
+        self.assertEqual(sum(batch["count"] for batch in plan), len(specs))
+        seen = []
+        for index, batch in enumerate(plan):
+            for kind in ("validate", "publish", "verify"):
+                self.assertLessEqual(len(batch[kind].encode("utf-8")), cloud.MAX_TASK_BYTES)
+            # Validation writes nothing; verification never saves.
+            self.assertNotIn("SavePlaceAsync", batch["validate"])
+            self.assertNotIn(".Source = spec.source", batch["validate"])
+            self.assertNotIn("SavePlaceAsync", batch["verify"])
+            self.assertIn("SavePlaceAsync", batch["publish"])
+            # Retired scripts are removed once, by the last batch.
+            self.assertEqual('"Gone"' in batch["publish"], index == len(plan) - 1)
+            seen += re.findall(r'"(Mod\d{3})"', batch["publish"])
+        self.assertEqual(sorted(seen), sorted("Mod%03d" % i for i in range(120)))
+
+    def test_rate_limits_back_off(self):
+        # The longer of Retry-After and an exponential backoff, capped.
+        self.assertEqual(cloud.retry_delay(0, "7"), 7.0)
+        self.assertEqual(cloud.retry_delay(0, None), 3)
+        self.assertEqual(cloud.retry_delay(2, "nonsense"), 12)
+        self.assertEqual(cloud.retry_delay(6, None), cloud.MAX_RETRY_SECONDS)
+        self.assertEqual(cloud.retry_delay(1, "9999"), 6)
+        # A short Retry-After never shortens the backoff.
+        self.assertEqual(cloud.retry_delay(4, "1"), 48)
+        total = sum(cloud.retry_delay(r) for r in range(cloud.RETRIES - 1))
+        self.assertGreaterEqual(total, 120, "rides out a couple of minutes of rate limiting")
+
+    def test_small_release_stays_one_batch(self):
+        plan = cloud.plan_batches([(("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", "return 1")])
+        self.assertEqual(len(plan), 1)
+        self.assertIn("LIVE PUBLISH verification failed", plan[0]["verify"])
 
 
 _TOKEN = re.compile(r'''\s+|--[^\n]*|(?P<str>"(?:[^"\\\n]|\\.)*")|(?P<num>-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)'''
@@ -316,17 +363,20 @@ class PreflightExecutionTests(unittest.TestCase):
     """Runs the real preflight Luau against a mock place in the luau CLI."""
 
     def run_preflight(self, shared, sps_class="StarterPlayerScripts"):
-        specs = cloud.spec_list()
-        script = cloud.make_script(specs)
-        # APPLY has its retired list filled in, so find it by the text before that.
-        preflight = script[: script.index(cloud.APPLY.split("%RETIRED%")[0])]
+        # The real release is batched: run every batch's validate task (the
+        # preflight without its closing VALIDATE lines) against the mock place.
         place = MOCK_PLACE.replace("%SHARED%", shared).replace("%SPS_CLASS%", sps_class)
-        source = place + preflight + '\nprint("PREFLIGHT_OK")\n'
-        with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as handle:
-            handle.write(source)
-        result = subprocess.run(["luau", handle.name], capture_output=True, text=True)
-        Path(handle.name).unlink()
-        return result.stdout + result.stderr
+        output = ""
+        for batch in cloud.plan_batches(cloud.spec_list()):
+            preflight = batch["validate"][: batch["validate"].index(cloud.VALIDATE)]
+            with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as handle:
+                handle.write(place + preflight + '\nprint("PREFLIGHT_OK")\n')
+            result = subprocess.run(["luau", handle.name], capture_output=True, text=True)
+            Path(handle.name).unlink()
+            output += result.stdout + result.stderr
+            if "PREFLIGHT_OK" not in result.stdout:
+                return output
+        return output
 
     def test_engine_containers_on_root_paths_are_allowed(self):
         # Regression: StarterPlayerScripts used to trip the code-only check.

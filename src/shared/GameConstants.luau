@@ -29,18 +29,17 @@ GameConstants.FOOD_HEAL_SECONDS = 10
 GameConstants.FOOD_HIT_CUTOFF = 10
 -- Accepted starter examples (Q137); the full food catalog is still Open.
 GameConstants.FOOD = {
-	Berries = { hunger = 0.10, heal = 10 },
+	Redberry = { hunger = 0.10, heal = 10 },
 	CookedMeat = { hunger = 0.35, heal = 30 },
 }
 
 -- Combat (GDD §21.1, §21.5, Q66, Q132-133) ---------------------------------------
 
--- Full matching three-piece set factors; pieces add, they never multiply.
+-- Confirmed full three-piece set factors; pieces add, they never multiply. Every
+-- other armor tier is set by the tier ladder (Items/Tiers, GDD §51).
 GameConstants.ARMOR_SET_FACTOR = {
 	None = 1.0,
 	Hide = 1.2,
-	Wood = 1.5,
-	Stone = 1.8,
 	Iron = 2.0,
 }
 -- Starting targets (raw damage and seconds between attacks).
@@ -75,9 +74,9 @@ GameConstants.PORTAL_NO_BUILD_METERS = 50
 -- Roblox's standard character scale: 1 stud is 0.28 m.
 GameConstants.STUDS_PER_METER = 1 / 0.28
 
--- Inventory and vault (GDD §10.3, Q126-129, Q151, Q154) ---------------------------
+-- Inventory and vault (GDD §10.3, Q126-129, Q151, Q154; six hotbar slots §56) ----
 
-GameConstants.HOTBAR_SLOTS = 9
+GameConstants.HOTBAR_SLOTS = 6
 GameConstants.BACKPACK_SLOTS = 50
 GameConstants.VAULT_START_SLOTS = 25
 GameConstants.VAULT_SLOTS_PER_UPGRADE = 25
@@ -94,15 +93,30 @@ GameConstants.UNCLAIMED_DECAY_MAX_SECONDS = 360
 GameConstants.MAX_PLAYERS_PER_WORLD = 30
 GameConstants.EVENT_CHECK_SECONDS = 300
 GameConstants.EVENT_CATEGORY_TRIGGER_CHANCE = 0.25
-GameConstants.NODE_RESPAWN_SECONDS = 120
+-- Resource node regrowth by tier (GDD §53; placeholders): trees, rocks, plants,
+-- bushes and the common new nodes 2 min; Copper and Iron 3 min; Silver, Cobalt,
+-- Obsidian and Amethyst 5 min; Jade, Mithril, Starstone and Stormglass 8 min.
+GameConstants.NODE_REGROW_SECONDS = { Basic = 120, Low = 180, Mid = 300, High = 480 }
+
+-- Gathered ground drops (GDD §53): only the player whose hit made a drop may take
+-- it for the first 10 s, then anyone; it vanishes after 2 minutes. Pickups are
+-- checked against this reach from the player's root.
+GameConstants.GATHER_DROP_OWNER_SECONDS = 10
+GameConstants.GATHER_DROP_LIFETIME_SECONDS = 120
+GameConstants.GATHER_DROP_PICKUP_RANGE = 10
 
 -- Progression (GDD §16.8, §33, §39.5, Q75, Q139, Q150) -------------------------------
 
 GameConstants.MASTERY_TRACKS = { "Mining", "Woodcutting", "Farming", "Crafting", "PvP" }
 GameConstants.MASTERY_MAX_LEVEL = 10
+-- Gathering mastery per level: a node hit's chance of one extra drop (GDD §53) and
+-- the planter harvest bonus (Farming).
 GameConstants.MASTERY_YIELD_PER_LEVEL = 0.01
 GameConstants.CRAFT_QUALITY_ROLL = 0.05
 GameConstants.BEST_ROLL_RELATIVE_PER_LEVEL = 0.05
+-- Crafting mastery's chance per level of one bonus bar for each bar smelted
+-- (owner decision 2026-10-28; placeholder rate, 20% at level 10).
+GameConstants.SMELT_BONUS_BAR_PER_LEVEL = 0.02
 GameConstants.PREMIUM_XP_BONUS = 0.25
 
 GameConstants.RARITIES = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Secret", "Exclusive" }

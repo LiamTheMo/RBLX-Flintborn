@@ -1,7 +1,9 @@
 -- Build mode (GDD §6.1, §3.2, §25.4). The Build key (X by default; DPadRight) toggles it during a run.
--- Pick a piece and tier from the palette; a ghost follows the aim point (mouse on
--- desktop, screen centre on touch and controller), snaps to the grid and shows ✓/✕
--- with colour. R / L2 / the Rotate button turns it; click, R1 or the Place button
+-- Pick a piece from the palette and step its tier with ◀ ▶ (walls, floors, doors
+-- and roofs come in every tier, Wood to Adamantine; furniture and stations in
+-- one), with the cost shown against what you carry. A ghost follows the aim point
+-- (mouse on desktop, screen centre on touch and controller), snaps to the grid and
+-- shows ✓/✕ with colour. R / L2 / the Rotate button turns it; click, R1 or the Place button
 -- builds. No-build auras around portals and totem radii are drawn while building,
 -- and hovering a structure shows its HP, owner and decay timer. The server decides
 -- every placement. World place only.
@@ -12,6 +14,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
@@ -29,10 +32,13 @@ local visuals = {}
 local renderConnection = nil
 
 local OK_COLOR = Color3.fromRGB(110, 220, 120)
--- Six 70 px pieces per row fit the 444 px palette, so all 11 take two rows
--- and never run under the tier buttons.
-local PIECE_WIDTH = 70
+-- Pieces sit in one row that scrolls sideways, so new pieces never push the
+-- palette under the tier row; buttons are touch-sized.
+local PIECE_WIDTH = 78
+local ROW_HEIGHT = 40
 local BAD_COLOR = Color3.fromRGB(230, 90, 80)
+local SELECTED = Color3.fromRGB(110, 70, 30)
+local UNSELECTED = Color3.fromRGB(46, 38, 30)
 
 local function make(className: string, props, parent)
 	local instance = Instance.new(className)
@@ -43,8 +49,14 @@ local function make(className: string, props, parent)
 	return instance
 end
 
+-- The tier the current piece is built in: the chosen ladder tier when the piece
+-- comes in it (the choice survives picking a chest in between), else its only one.
+local function currentTier(): string
+	return BuildRules.TierFor(state.piece, state.tier) or "Wood"
+end
+
 local function stats()
-	return StructureCatalog.Get(state.piece, state.tier)
+	return StructureCatalog.Get(state.piece, currentTier())
 end
 
 local function affordable(cost): boolean
@@ -56,13 +68,26 @@ local function affordable(cost): boolean
 	return true
 end
 
+-- "Iron Bar 3/8  Stone 4/4", with what is still missing in the warning colour.
 local function costLine(cost): string
 	local parts = {}
 	for catalogId, quantity in cost do
-		table.insert(parts, ("%s %d/%d"):format(catalogId, InventoryController.Count(catalogId), quantity))
+		local def = ItemCatalog.Get(catalogId)
+		local owned = InventoryController.Count(catalogId)
+		local text = ("%s %d/%d"):format(def and def.name or catalogId, math.min(owned, quantity), quantity)
+		if owned < quantity then
+			text = ('<font color="#FFAA78">%s</font>'):format(text)
+		end
+		table.insert(parts, { key = catalogId, text = text })
 	end
-	table.sort(parts)
-	return table.concat(parts, "  ")
+	table.sort(parts, function(a, b)
+		return a.key < b.key
+	end)
+	local texts = {}
+	for _, part in parts do
+		table.insert(texts, part.text)
+	end
+	return table.concat(texts, "  ")
 end
 
 local function clearVisuals()
@@ -118,9 +143,12 @@ local function describeHover(target: Instance?): string
 	if not part or not part:GetAttribute("Piece") then
 		return ""
 	end
-	local text = ("%s %s — %d/%d HP — %s"):format(
-		part:GetAttribute("Tier") or "",
-		part:GetAttribute("Piece"),
+	local pieceId = part:GetAttribute("Piece")
+	-- Furniture and stations have one tier, so only tiered pieces name it.
+	local tier = if BuildRules.IsTiered(pieceId) then (part:GetAttribute("Tier") or "") .. " " else ""
+	local text = ("%s%s — %d/%d HP — %s"):format(
+		tier,
+		pieceId,
 		part:GetAttribute("HP") or 0,
 		part:GetAttribute("MaxHP") or 0,
 		part:GetAttribute("Owner") or "unknown"
@@ -173,7 +201,8 @@ local function update()
 	ui.ghost.Color = if state.valid then OK_COLOR else BAD_COLOR
 	ui.mark.Text = if state.valid then "✓" else "✕"
 	ui.mark.TextColor3 = ui.ghost.Color
-	ui.status.Text = reason or ("Place " .. state.piece)
+	ui.status.Text = reason
+		or ("Place " .. (if BuildRules.IsTiered(state.piece) then currentTier() .. " " else "") .. state.piece)
 end
 
 local function place()
@@ -181,7 +210,7 @@ local function place()
 		return
 	end
 	local ok, success, reason = pcall(function()
-		return Remotes.Get("Build"):InvokeServer(state.piece, state.tier, state.base, state.steps)
+		return Remotes.Get("Build"):InvokeServer(state.piece, currentTier(), state.base, state.steps)
 	end)
 	if not ok or not success then
 		ui.status.Text = "Can't build here (" .. tostring(reason or success) .. ")"
@@ -198,42 +227,32 @@ local renderPalette
 
 local function select(pieceId: string)
 	state.piece = pieceId
-	local piece = StructureCatalog.Pieces[pieceId]
-	if piece.tiers[state.tier] == nil then
-		state.tier = "Wood"
-	end
 	renderPalette()
 end
 
+-- Steps the building tier up or down the ladder (walls, floors, doors, roofs).
+local function cycleTier(delta: number)
+	if BuildRules.IsTiered(state.piece) then
+		state.tier = BuildRules.CycleTier(state.piece, currentTier(), delta) or state.tier
+		renderPalette()
+	end
+end
+
 function renderPalette()
-	for _, child in ui.pieces:GetChildren() do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
+	for pieceId, button in ui.pieceButtons do
+		button.BackgroundColor3 = if pieceId == state.piece then SELECTED else UNSELECTED
 	end
-	for _, pieceId in StructureCatalog.ORDER do
-		local b = make("TextButton", {
-			Text = pieceId,
-			Size = UDim2.fromOffset(PIECE_WIDTH, 24),
-			BackgroundColor3 = if pieceId == state.piece
-				then Color3.fromRGB(110, 70, 30)
-				else Color3.fromRGB(46, 38, 30),
-			TextColor3 = Color3.fromRGB(245, 236, 222),
-			Font = Enum.Font.GothamMedium,
-			TextSize = 12,
-		}, ui.pieces)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(function()
-			select(pieceId)
-		end)
-	end
-	local piece = StructureCatalog.Pieces[state.piece]
-	for _, tier in StructureCatalog.TIERS do
-		local button = ui.tiers[tier]
-		button.Visible = piece.tiers[tier] ~= nil
-		button.BackgroundColor3 = if tier == state.tier then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(46, 38, 30)
-	end
+	local tiered = BuildRules.IsTiered(state.piece)
+	local tier = currentTier()
 	local _, tierStats = stats()
+	ui.tierDown.Visible = tiered
+	ui.tierUp.Visible = tiered
+	if tiered then
+		local tiers = BuildRules.TiersOf(state.piece)
+		ui.tierLabel.Text = ("%s  %d/%d  · %d HP"):format(tier, table.find(tiers, tier) or 1, #tiers, tierStats.hp)
+	else
+		ui.tierLabel.Text = ("%s  · %d HP"):format(state.piece, tierStats.hp)
+	end
 	ui.cost.Text = "Cost: " .. costLine(tierStats.cost)
 end
 
@@ -278,7 +297,7 @@ local function build()
 	ui.panel = make("Frame", {
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.new(0.5, 0, 1, -96),
-		Size = UDim2.fromOffset(460, 150),
+		Size = UDim2.fromOffset(460, 156),
 		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
 		BackgroundTransparency = 0.1,
 		-- Active panels swallow clicks, so a tap on the panel never places behind it.
@@ -286,62 +305,85 @@ local function build()
 		Visible = false,
 	}, gui)
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	ui.pieces = make("Frame", {
+	ui.pieces = make("ScrollingFrame", {
 		Position = UDim2.fromOffset(8, 8),
-		Size = UDim2.new(1, -16, 0, 56),
+		Size = UDim2.new(1, -16, 0, ROW_HEIGHT + 6),
 		BackgroundTransparency = 1,
 		Active = true,
+		ScrollingDirection = Enum.ScrollingDirection.X,
+		AutomaticCanvasSize = Enum.AutomaticSize.X,
+		CanvasSize = UDim2.new(),
+		ScrollBarThickness = 4,
 	}, ui.panel)
-	make(
-		"UIGridLayout",
-		{ CellSize = UDim2.fromOffset(PIECE_WIDTH, 24), CellPadding = UDim2.fromOffset(4, 4) },
-		ui.pieces
-	)
-	ui.tiers = {}
-	for index, tier in StructureCatalog.TIERS do
+	make("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		Padding = UDim.new(0, 4),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, ui.pieces)
+	ui.pieceButtons = {}
+	for order, pieceId in StructureCatalog.ORDER do
 		local b = make("TextButton", {
-			Text = tier,
-			Position = UDim2.fromOffset(8 + (index - 1) * 72, 70),
-			Size = UDim2.fromOffset(68, 24),
+			Text = pieceId,
+			Size = UDim2.fromOffset(PIECE_WIDTH, ROW_HEIGHT),
+			LayoutOrder = order,
+			BackgroundColor3 = UNSELECTED,
 			TextColor3 = Color3.fromRGB(245, 236, 222),
-			Font = Enum.Font.GothamBold,
+			Font = Enum.Font.GothamMedium,
 			TextSize = 12,
-		}, ui.panel)
+		}, ui.pieces)
 		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
 		b.Activated:Connect(function()
-			state.tier = tier
-			renderPalette()
+			select(pieceId)
 		end)
-		ui.tiers[tier] = b
+		ui.pieceButtons[pieceId] = b
 	end
-	local function action(text: string, x: number, onClick)
+	local function button(text: string, position: UDim2, width: number, onClick)
 		local b = make("TextButton", {
 			Text = text,
-			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.new(1, x, 0, 70),
-			Size = UDim2.fromOffset(80, 24),
-			BackgroundColor3 = Color3.fromRGB(110, 70, 30),
+			Position = position,
+			Size = UDim2.fromOffset(width, ROW_HEIGHT),
+			BackgroundColor3 = SELECTED,
 			TextColor3 = Color3.fromRGB(255, 240, 220),
 			Font = Enum.Font.GothamBold,
-			TextSize = 12,
+			TextSize = 13,
 		}, ui.panel)
 		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
 		b.Activated:Connect(onClick)
+		return b
 	end
+	-- Tier stepper: ◀ Copper 3/8 · 1000 HP ▶ (hidden arrows for one-tier pieces).
+	local rowY = ROW_HEIGHT + 18
+	ui.tierDown = button("◀", UDim2.fromOffset(8, rowY), 44, function()
+		cycleTier(-1)
+	end)
+	ui.tierLabel = make("TextLabel", {
+		Position = UDim2.fromOffset(56, rowY),
+		Size = UDim2.fromOffset(170, ROW_HEIGHT),
+		BackgroundTransparency = 1,
+		TextColor3 = Color3.fromRGB(255, 230, 190),
+		Font = Enum.Font.GothamBold,
+		TextSize = 13,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+	}, ui.panel)
+	ui.tierUp = button("▶", UDim2.fromOffset(230, rowY), 44, function()
+		cycleTier(1)
+	end)
 	-- Touch and controller players build with buttons instead of precise dragging.
-	action("Place", -8, place)
-	action("Rotate", -92, rotate)
+	button("Rotate", UDim2.new(1, -172, 0, rowY), 80, rotate)
+	button("Place", UDim2.new(1, -88, 0, rowY), 80, place)
 	ui.cost = make("TextLabel", {
-		Position = UDim2.fromOffset(8, 98),
+		Position = UDim2.fromOffset(8, rowY + ROW_HEIGHT + 6),
 		Size = UDim2.new(1, -16, 0, 20),
 		BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextColor3 = Color3.fromRGB(230, 220, 200),
 		Font = Enum.Font.Gotham,
 		TextSize = 13,
+		RichText = true,
+		TextTruncate = Enum.TextTruncate.AtEnd,
 	}, ui.panel)
 	ui.status = make("TextLabel", {
-		Position = UDim2.fromOffset(8, 120),
+		Position = UDim2.fromOffset(8, rowY + ROW_HEIGHT + 28),
 		Size = UDim2.new(1, -16, 0, 20),
 		BackgroundTransparency = 1,
 		TextXAlignment = Enum.TextXAlignment.Left,
