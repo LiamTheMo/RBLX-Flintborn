@@ -208,7 +208,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 009 | Iron Meteor_ Flintborn model study | World & resources | ✅ | 2278 (8 shells); parts 58 / 40 / 44 | PASS 6/10 (round 1) | minors: even-width cracks; shell piece is a plain wedge |
 | 010 | Flintborn Gold model study | World & resources | ✅ | 710; parts 112 / 24×3 / 36 | PASS 6/10 (round 1) | minors: no visible recessed seats; host a touch pink |
 | 011 | Amethyst Flintborn model study | World & resources | ✅ | 1122; parts 456 / 232 / 24 | PASS 6/10 (round 1); reworked 3× from user review | minors: rock a touch pink; rim roll is quite regular |
-| 012 | Amber Flintborn model study | World & resources | ⬜ | | | |
+| 012 | Amber Flintborn model study | World & resources | ✅ | 820; parts 76 / 130 / 62 / 66 / 24 | PASS 6/10 (round 1) | minors: wood dark in back-lit views |
 | 013 | Sulfur Flintborn exploded model study | World & resources | ⬜ | | | |
 | 014 | Starstone Low-Poly Construction Study | World & resources | ⬜ | | | |
 | 015 | Ember Meteor model study | World & resources | ⬜ | | | |
@@ -389,3 +389,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: 010 Gold passed (6/10). `kit_models.carve` (boolean difference with a cutter built in the asset's coordinates) shared from 009. PR #77 held: v0.18's own CI went red after another branch's batched-publishing merge (preflight tests: "Cloud task too large").
 - 2026-10-28: PR #77 (009, 010) merged into v0.18 after v0.18 was fixed. 011 Amethyst passed (6/10): geode carved with `kit_models.carve`, crystals and lip joined in with `kit_models.merge_in`. `m004.floor_cut` takes an explicit ground height.
 - 2026-10-28: 011 reworked from user review: the cave is bare stone inside (not a violet lining), with thick walls, a flat mouth cut and a thick rolled lip. `kit_models.drop_specks` removes boolean slivers.
+- 2026-10-28: PR #78 (011) merged into v0.18. 012 Amber passed (6/10).
