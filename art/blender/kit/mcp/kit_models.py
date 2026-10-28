@@ -124,6 +124,7 @@ def union_loose(o, merge=0.01):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(o.data)
     bm.free()
+    repair_nonmanifold(o)
     K.drop_unused_slots(o)
     return len(others)
 
@@ -175,6 +176,36 @@ def split_loose(o):
     b.to_mesh(o.data)
     b.free()
     return out
+
+
+def repair_nonmanifold(o, tries=3):
+    """Exact booleans can leave an edge shared by four faces where two shells only graze each other (two
+    sliver faces meeting the edge). Delete the smallest faces on such edges, re-fill the holes, and repeat.
+    Returns the number of non-manifold edges left."""
+    for _ in range(tries):
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bad = [e for e in bm.edges if len(e.link_faces) > 2]
+        if not bad:
+            bm.free()
+            return 0
+        kill = set()
+        for e in bad:
+            fs = sorted(e.link_faces, key=lambda f: f.calc_area())
+            kill.update(fs[:len(fs) - 2])
+        bmesh.ops.delete(bm, geom=list(kill), context="FACES")
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+        bnd = [e for e in bm.edges if e.is_boundary]
+        if bnd:
+            bmesh.ops.holes_fill(bm, edges=bnd)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(o.data)
+        bm.free()
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    n = sum(1 for e in bm.edges if not e.is_manifold)
+    bm.free()
+    return n
 
 
 def _shells(bm):
@@ -278,6 +309,7 @@ def finish(o, union=True, uv=True):
     if o.data.has_custom_normals:
         with _override(o):
             bpy.ops.mesh.customdata_custom_splitnormals_clear()
+    repair_nonmanifold(o)
     for p in o.data.polygons:
         p.use_smooth = False
     K.drop_unused_slots(o)

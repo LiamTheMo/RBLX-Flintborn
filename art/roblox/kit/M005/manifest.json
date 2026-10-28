@@ -1,0 +1,391 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M005",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m005_crystal",
+    "hex": "#E6D8CD",
+    "levels": [
+     0.92169,
+     0.9294,
+     0.93768,
+     0.9418,
+     0.94537,
+     0.94828,
+     0.95141,
+     0.95662,
+     0.9592,
+     0.96052,
+     0.96052,
+     0.96295,
+     0.96563,
+     0.96662,
+     0.96909,
+     0.97107,
+     0.97109,
+     0.97583,
+     0.9808,
+     0.98551,
+     0.98633,
+     0.98766,
+     0.99204,
+     0.99555,
+     1.00412,
+     1.01596,
+     1.02014,
+     1.02215,
+     1.02822,
+     1.04249,
+     1.0495,
+     1.05975
+    ],
+    "used": true
+   },
+   {
+    "key": "m005_crystal_side",
+    "hex": "#B9ABA4",
+    "levels": [
+     0.92028,
+     0.92803,
+     0.9363,
+     0.93959,
+     0.94074,
+     0.94699,
+     0.95045,
+     0.95436,
+     0.96076,
+     0.96261,
+     0.96446,
+     0.96587,
+     0.96756,
+     0.97063,
+     0.97219,
+     0.9759,
+     0.97755,
+     0.97924,
+     0.98207,
+     0.98598,
+     0.98773,
+     0.99565,
+     1.00105,
+     1.00476,
+     1.01233,
+     1.02213,
+     1.02435,
+     1.02519,
+     1.02982,
+     1.04281,
+     1.05546,
+     1.07405
+    ],
+    "used": true
+   },
+   {
+    "key": "m005_rock",
+    "hex": "#7E716D",
+    "levels": [
+     0.87519,
+     0.90976,
+     0.92074,
+     0.9273,
+     0.9333,
+     0.93887,
+     0.94274,
+     0.94628,
+     0.95152,
+     0.95445,
+     0.95748,
+     0.96048,
+     0.96369,
+     0.96676,
+     0.96914,
+     0.97245,
+     0.97448,
+     0.97646,
+     0.9803,
+     0.98214,
+     0.98529,
+     0.99005,
+     0.99339,
+     0.9965,
+     1.00175,
+     1.00808,
+     1.01291,
+     1.01812,
+     1.02309,
+     1.02742,
+     1.03476,
+     1.05935
+    ],
+    "used": true
+   },
+   {
+    "key": "m005_rock_cool",
+    "hex": "#776E6E",
+    "levels": [
+     0.93963,
+     0.94452,
+     0.94452,
+     0.94904,
+     0.96109,
+     0.97109,
+     0.97561,
+     0.97881,
+     0.98453,
+     0.98633,
+     0.99261,
+     0.99727,
+     0.99802,
+     0.9991,
+     0.9991,
+     1.00218,
+     1.00567,
+     1.00567,
+     1.00975,
+     1.01339,
+     1.01556,
+     1.01936,
+     1.02401,
+     1.02806,
+     1.0322,
+     1.03282,
+     1.03459,
+     1.03787,
+     1.04249,
+     1.04842,
+     1.05615,
+     1.07104
+    ],
+    "used": true
+   },
+   {
+    "key": "m005_rock_x_cool_50",
+    "hex": "#7A706E",
+    "levels": [
+     0.92149,
+     0.93277,
+     0.93465,
+     0.95007,
+     0.95932,
+     0.96257,
+     0.96614,
+     0.96833,
+     0.97085,
+     0.97324,
+     0.97858,
+     0.98187,
+     0.9831,
+     0.9844,
+     0.98662,
+     0.988,
+     0.99044,
+     0.9923,
+     0.99589,
+     1.00205,
+     1.00336,
+     1.00382,
+     1.00666,
+     1.00807,
+     1.01317,
+     1.01794,
+     1.02433,
+     1.03015,
+     1.03446,
+     1.03982,
+     1.04678,
+     1.08118
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Quartz",
+   "sheet": "M005",
+   "subject": "Quartz",
+   "role": "hero",
+   "size": [
+    11.127,
+    9.4835,
+    7.9356
+   ],
+   "tris": 1216,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Quartz.glb",
+     "kind": "solid",
+     "tris": 1216,
+     "offset": [
+      0.0,
+      4.7417,
+      0.0
+     ],
+     "size": [
+      11.127,
+      9.4835,
+      7.9356
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "quartz cave crystal: one large pale hexagonal crystal with a pointed cap and four smaller side crystals fanning out of a mound of rounded dark faceted base rocks; one closed mesh"
+  },
+  {
+   "name": "QuartzBaseRockM005",
+   "sheet": "M005",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    9.819,
+    2.9,
+    7.9356
+   ],
+   "tris": 440,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzBaseRockM005.glb",
+     "kind": "solid",
+     "tris": 440,
+     "offset": [
+      0.0,
+      1.45,
+      0.0
+     ],
+     "size": [
+      9.819,
+      2.9,
+      7.9356
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock: mound of rounded faceted dark rocks, flat bottom"
+  },
+  {
+   "name": "QuartzMainCrystalM005",
+   "sheet": "M005",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    4.2977,
+    9.0,
+    3.4887
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzMainCrystalM005.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      4.5,
+      0.0
+     ],
+     "size": [
+      4.2977,
+      9.0,
+      3.4887
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Crystal (reusable): large six-sided prism with a pyramidal cap, flat root"
+  },
+  {
+   "name": "QuartzSideCrystalM005",
+   "sheet": "M005",
+   "subject": "Quartz",
+   "role": "part",
+   "size": [
+    2.5273,
+    6.0,
+    2.7524
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/QuartzSideCrystalM005.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      3.0,
+      0.0
+     ],
+     "size": [
+      2.5273,
+      6.0,
+      2.7524
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Crystal (reusable): smaller six-sided crystal, flat root"
+  }
+ ],
+ "stats": {
+  "assets": 4,
+  "pieces": 4,
+  "solid": 4,
+  "water": 0,
+  "glow": 0,
+  "tris": 1724,
+  "vfxSockets": 0,
+  "paletteColours": 5,
+  "paletteLevels": 160,
+  "meshBytes": 158600
+ },
+ "problems": []
+}
