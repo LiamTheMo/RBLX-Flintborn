@@ -1,0 +1,401 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M012",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m012_amber_dark",
+    "hex": "#D25117",
+    "levels": [
+     0.98238
+    ],
+    "used": true
+   },
+   {
+    "key": "m012_amber_light",
+    "hex": "#FECD64",
+    "levels": [
+     0.98238
+    ],
+    "used": true
+   },
+   {
+    "key": "m012_amber_mid",
+    "hex": "#FE7719",
+    "levels": [
+     0.98238
+    ],
+    "used": true
+   },
+   {
+    "key": "m012_wood",
+    "hex": "#8D5D3D",
+    "levels": [
+     0.90379,
+     0.93007,
+     0.93482,
+     0.94229,
+     0.94577,
+     0.95137,
+     0.95617,
+     0.96147,
+     0.96546,
+     0.96871,
+     0.97033,
+     0.97198,
+     0.97594,
+     0.9788,
+     0.98182,
+     0.98371,
+     0.98584,
+     0.99016,
+     0.99065,
+     0.9933,
+     0.99542,
+     0.99749,
+     1.00118,
+     1.00565,
+     1.00744,
+     1.0145,
+     1.02024,
+     1.02708,
+     1.03313,
+     1.0426,
+     1.0459,
+     1.06655
+    ],
+    "used": true
+   },
+   {
+    "key": "m012_wood_dark",
+    "hex": "#84563A",
+    "levels": [
+     0.91191,
+     0.91533,
+     0.92131,
+     0.92789,
+     0.93457,
+     0.93655,
+     0.94071,
+     0.94652,
+     0.94869,
+     0.95092,
+     0.95503,
+     0.95641,
+     0.95939,
+     0.96136,
+     0.96503,
+     0.9674,
+     0.97043,
+     0.97404,
+     0.98001,
+     0.98182,
+     0.98875,
+     0.99505,
+     1.02122
+    ],
+    "used": true
+   },
+   {
+    "key": "m012_wood_light",
+    "hex": "#9C6845",
+    "levels": [
+     0.933,
+     0.94345,
+     0.95763,
+     0.96201,
+     0.96614,
+     0.97114,
+     0.97466,
+     0.97918,
+     0.98648,
+     0.98901,
+     0.99472,
+     0.99866,
+     1.00178,
+     1.00458,
+     1.00885,
+     1.01571,
+     1.01916,
+     1.0216,
+     1.03098,
+     1.03551,
+     1.03845,
+     1.0446,
+     1.04673,
+     1.0495,
+     1.05551,
+     1.05835,
+     1.06281
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Amber",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "hero",
+   "size": [
+    9.1765,
+    6.8787,
+    7.8282
+   ],
+   "tris": 820,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Amber.glb",
+     "kind": "solid",
+     "tris": 820,
+     "offset": [
+      0.0,
+      3.4394,
+      0.0
+     ],
+     "size": [
+      9.1765,
+      6.8787,
+      7.8282
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "amber resource: a big egg-shaped faceted amber nodule (three ambers as broad facet regions) nestled in weathered wood - splintered beams lying across its front and back, upright splinters at its sides and rear; one closed mesh, flat bottom"
+  },
+  {
+   "name": "AmberCrystalMain",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    5.235,
+    6.7553,
+    4.6989
+   ],
+   "tris": 76,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberCrystalMain.glb",
+     "kind": "solid",
+     "tris": 76,
+     "offset": [
+      0.0,
+      3.3776,
+      0.0
+     ],
+     "size": [
+      5.235,
+      6.7553,
+      4.6989
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Amber Nodule (main crystal): faceted amber egg"
+  },
+  {
+   "name": "AmberWoodBack",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    5.7767,
+    2.428,
+    2.5344
+   ],
+   "tris": 62,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodBack.glb",
+     "kind": "solid",
+     "tris": 62,
+     "offset": [
+      0.0,
+      1.214,
+      0.0
+     ],
+     "size": [
+      5.7767,
+      2.428,
+      2.5344
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Wood Base (Rear): two stacked splintered beams"
+  },
+  {
+   "name": "AmberWoodFront",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    9.1765,
+    2.797,
+    3.9873
+   ],
+   "tris": 130,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodFront.glb",
+     "kind": "solid",
+     "tris": 130,
+     "offset": [
+      0.0,
+      1.3985,
+      0.0
+     ],
+     "size": [
+      9.1765,
+      2.797,
+      3.9873
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Wood Base (Front): two stacked splintered beams and an end block"
+  },
+  {
+   "name": "AmberWoodLeft",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    1.8249,
+    4.5635,
+    3.5464
+   ],
+   "tris": 66,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodLeft.glb",
+     "kind": "solid",
+     "tris": 66,
+     "offset": [
+      0.0,
+      2.2818,
+      0.0
+     ],
+     "size": [
+      1.8249,
+      4.5635,
+      3.5464
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Wood (Left): two broad upright splintered planks"
+  },
+  {
+   "name": "AmberWoodRight",
+   "sheet": "M012",
+   "subject": "Amber",
+   "role": "part",
+   "size": [
+    1.7673,
+    4.3905,
+    2.4761
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/AmberWoodRight.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.1953,
+      0.0
+     ],
+     "size": [
+      1.7673,
+      4.3905,
+      2.4761
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Wood (Right): a broad upright splintered plank"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 1178,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 85,
+  "meshBytes": 104592
+ },
+ "problems": []
+}

@@ -318,24 +318,203 @@ def audit(o):
     return res
 
 
-def smart_uv(o, margin=0.008, angle=66.0):
-    """Smart UV Project into 'UVMap'; margin 0.008 so gaps between islands clear 2 px at 1024^2. (The repo's GLB exporter writes its own
-    palette-cell UVs on export; this layer serves FBX/OBJ export and any texture work.)"""
+def _uv_islands(bm, uv, eps=1e-5):
+    """Faces grouped into UV islands: neighbours across an edge share an island when both edge ends have the same
+    UVs on both sides."""
+    parent = list(range(len(bm.faces)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for e in bm.edges:
+        if len(e.link_faces) != 2:
+            continue
+        f1, f2 = e.link_faces
+        a = {l.vert: l[uv].uv for l in f1.loops}
+        b = {l.vert: l[uv].uv for l in f2.loops}
+        if all((a[v] - b[v]).length < eps for v in e.verts):
+            parent[find(f1.index)] = find(f2.index)
+    return [find(f.index) for f in bm.faces]
+
+
+def _tri_overlap(t1, t2, eps=1e-7):
+    """Two 2D triangles overlap with positive area (separating axis test; touching edges don't count)."""
+    for tri in (t1, t2):
+        for i in range(3):
+            a, b = tri[i], tri[(i + 1) % 3]
+            n = (b[1] - a[1], a[0] - b[0])
+            p1 = [n[0] * p[0] + n[1] * p[1] for p in t1]
+            p2 = [n[0] * p[0] + n[1] * p[1] for p in t2]
+            if max(p1) <= min(p2) + eps or max(p2) <= min(p1) + eps:
+                return False
+    return True
+
+
+def _seg_dist(p1, p2, q1, q2):
+    def pd(p, a, b):
+        ab = b - a
+        t = 0.0 if ab.length_squared == 0 else max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
+        return (p - (a + ab * t)).length
+
+    def side(o, a, b):
+        return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
+    if side(q1, q2, p1) * side(q1, q2, p2) < 0 and side(p1, p2, q1) * side(p1, p2, q2) < 0:
+        return 0.0
+    return min(pd(p1, q1, q2), pd(p2, q1, q2), pd(q1, p1, p2), pd(q2, p1, p2))
+
+
+def uv_stats(o, cell=0.05):
+    """Stage 3 measurements of the active UV layer (faces are fanned into triangles):
+    islands; overlapping triangle pairs (and how many cross islands); flipped triangles; the minimum gap between
+    islands and to the 0-1 border; texel density per island (UV area / 3D area, relative to the whole mesh:
+    min / median / max); and stretch per triangle: conformal (largest / smallest singular value of the 3D -> UV
+    map, 1 = no shear), area (UV / 3D area against the mesh average, worse of r and 1/r) and the worst corner-angle
+    change in degrees."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bm.faces.ensure_lookup_table()
+    uv = bm.loops.layers.uv.active
+    if uv is None or not bm.faces:
+        bm.free()
+        return {"name": o.name, "uv_layer": None}
+    isl = _uv_islands(bm, uv)
+    tris = []
+    for f in bm.faces:
+        ls = list(f.loops)
+        for i in range(1, len(ls) - 1):
+            t = (ls[0], ls[i], ls[i + 1])
+            tris.append((f.index, [l[uv].uv.copy() for l in t], [l.vert.co.copy() for l in t]))
+    area3 = {}
+    areau = {}
+    rows = []
+    for fi, u, p in tris:
+        e1, e2 = p[1] - p[0], p[2] - p[0]
+        n = e1.cross(e2)
+        a3 = n.length / 2
+        au = ((u[1].x - u[0].x) * (u[2].y - u[0].y) - (u[1].y - u[0].y) * (u[2].x - u[0].x)) / 2
+        k = isl[fi]
+        area3[k] = area3.get(k, 0.0) + a3
+        areau[k] = areau.get(k, 0.0) + abs(au)
+        if a3 < 1e-12:
+            continue
+        x = e1.normalized()
+        y = n.normalized().cross(x)
+        s1, s2 = (e1.dot(x), e1.dot(y)), (e2.dot(x), e2.dot(y))
+        t1, t2 = u[1] - u[0], u[2] - u[0]
+        det = s1[0] * s2[1] - s2[0] * s1[1]
+        i00, i01, i10, i11 = s2[1] / det, -s2[0] / det, -s1[1] / det, s1[0] / det
+        a, b = t1.x * i00 + t2.x * i10, t1.x * i01 + t2.x * i11
+        c, d = t1.y * i00 + t2.y * i10, t1.y * i01 + t2.y * i11
+        E, F, G = a * a + c * c, a * b + c * d, b * b + d * d
+        root = math.sqrt(max(0.0, (E - G) ** 2 + 4 * F * F))
+        smax, smin = math.sqrt(max(0.0, (E + G + root) / 2)), math.sqrt(max(0.0, (E + G - root) / 2))
+        angles3 = [(p[(i + 2) % 3] - p[i]).angle(p[(i + 1) % 3] - p[i], 0.0) for i in range(3)]
+        uv3 = [Vector((q.x, q.y, 0.0)) for q in u]
+        anglesu = [(uv3[(i + 2) % 3] - uv3[i]).angle(uv3[(i + 1) % 3] - uv3[i], 0.0) for i in range(3)]
+        rows.append((smax / smin if smin > 1e-12 else math.inf, abs(au) / a3, a * d - b * c < 0,
+                     max(abs(i - j) for i, j in zip(angles3, anglesu))))
+    g = sum(areau.values()) / sum(area3.values())
+    dens = sorted(areau[k] / area3[k] / g for k in area3 if area3[k] > 0)
+    # overlaps: triangles bucketed on a grid by their UV bounding boxes
+    boxes = [(min(q.x for q in u), min(q.y for q in u), max(q.x for q in u), max(q.y for q in u)) for _, u, _ in tris]
+    grid = {}
+    for k, bx in enumerate(boxes):
+        for i in range(int(bx[0] // cell), int(bx[2] // cell) + 1):
+            for j in range(int(bx[1] // cell), int(bx[3] // cell) + 1):
+                grid.setdefault((i, j), []).append(k)
+    pairs = {(a, b) for lst in grid.values() for ii, a in enumerate(lst) for b in lst[ii + 1:]
+             if tris[a][0] != tris[b][0]}
+    overlaps = cross = 0
+    for a, b in pairs:
+        A, B = boxes[a], boxes[b]
+        if A[2] <= B[0] or B[2] <= A[0] or A[3] <= B[1] or B[3] <= A[1]:
+            continue
+        if _tri_overlap([(q.x, q.y) for q in tris[a][1]], [(q.x, q.y) for q in tris[b][1]]):
+            overlaps += 1
+            cross += isl[tris[a][0]] != isl[tris[b][0]]
+    # gaps: island boundary edges, bucketed with a gap-sized pad
+    edges = []
+    for f in bm.faces:
+        for l in f.loops:
+            other = [x for x in l.edge.link_faces if x is not f]
+            if not other or isl[other[0].index] != isl[f.index]:
+                edges.append((isl[f.index], l[uv].uv.copy(), l.link_loop_next[uv].uv.copy()))
+    pad = 0.02
+    eg = {}
+    for k, (_, a, b) in enumerate(edges):
+        for i in range(int((min(a.x, b.x) - pad) // pad), int((max(a.x, b.x) + pad) // pad) + 1):
+            for j in range(int((min(a.y, b.y) - pad) // pad), int((max(a.y, b.y) + pad) // pad) + 1):
+                eg.setdefault((i, j), []).append(k)
+    gap = math.inf
+    seen = set()
+    for lst in eg.values():
+        for ii, a in enumerate(lst):
+            for b in lst[ii + 1:]:
+                if edges[a][0] != edges[b][0] and (a, b) not in seen:
+                    seen.add((a, b))
+                    gap = min(gap, _seg_dist(edges[a][1], edges[a][2], edges[b][1], edges[b][2]))
+    us = [q for _, u, _ in tris for q in u]
+    border = min(min(q.x for q in us), min(q.y for q in us), 1 - max(q.x for q in us), 1 - max(q.y for q in us))
+    bm.free()
+    conf = sorted(r[0] for r in rows)
+    area = [max(r[1] / g, g / r[1]) if r[1] > 0 else math.inf for r in rows]
+    return {"name": o.name, "uv_layer": o.data.uv_layers.active.name, "islands": len(set(isl)),
+            "overlap_pairs": overlaps, "overlap_cross_island": cross, "flipped": sum(r[2] for r in rows),
+            "min_gap": round(gap, 4) if gap < math.inf else None, "border": round(border, 4),
+            "uv_fill": round(sum(areau.values()), 3),
+            "density": [round(dens[0], 3), round(dens[len(dens) // 2], 3), round(dens[-1], 3)],
+            "stretch_conformal_worst": round(conf[-1], 3),
+            "stretch_conformal_p95": round(conf[int(0.95 * (len(conf) - 1))], 3),
+            "stretch_area_worst": round(max(area), 3),
+            "angle_change_worst_deg": round(math.degrees(max(r[3] for r in rows)), 2),
+            "texels_per_stud_1024": round(math.sqrt(g) * 1024, 1)}
+
+
+def smart_uv(o, margin=0.008, angle=66.0, method=None, min_angle=25.0):
+    """UVs into 'UVMap', packed with an exact margin: margin is a fraction of UV space round each island, so the
+    gap between islands is 2 x margin (0.016 at the default; 2 px at 1024^2 is 0.002) and margin to the border.
+    Smart UV Project at `angle` makes the islands. With method "ANGLE_BASED" (or "CONFORMAL" / "MINIMUM_STRETCH")
+    those island borders become seams and each island is re-unwrapped by that method, which removes the
+    projection's foreshortening (Smart UV alone compresses faces up to `angle` off its axis, up to 1/cos(angle))
+    and gives every island the same texel density. If the unwrap folds an island over itself, the angle drops by
+    10 degrees (not below min_angle) and it runs again. Returns uv_stats(o).
+    (The repo's GLB exporter writes its own palette-cell UVs on export; this layer serves FBX/OBJ export and any
+    texture work.)"""
     if not o.data.polygons:
-        return
-    with _override(o):
-        bpy.ops.object.mode_set(mode="EDIT")
-        try:
-            bpy.ops.mesh.select_all(action="SELECT")
-            bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin, area_weight=0.0,
-                                     correct_aspect=True, scale_to_bounds=False)
-        finally:
-            bpy.ops.object.mode_set(mode="OBJECT")
+        return None
+    while True:
+        with _override(o):
+            bpy.ops.object.mode_set(mode="EDIT")
+            try:
+                bpy.ops.mesh.select_all(action="SELECT")
+                if method:
+                    bpy.ops.mesh.mark_seam(clear=True)      # the seams are this unwrap's own island borders
+                bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin,
+                                         margin_method="FRACTION", area_weight=0.0, correct_aspect=True,
+                                         scale_to_bounds=False)
+                if method:
+                    bpy.ops.uv.select_all(action="SELECT")
+                    bpy.ops.uv.seams_from_islands(mark_seams=True, mark_sharp=False)
+                    bpy.ops.mesh.select_all(action="SELECT")
+                    bpy.ops.uv.unwrap(method=method, fill_holes=False, correct_aspect=True,
+                                      margin_method="FRACTION", margin=margin)
+            finally:
+                bpy.ops.object.mode_set(mode="OBJECT")
+        stats = uv_stats(o)
+        stats["angle"] = angle
+        stats["method"] = method or "SMART"
+        if not method or (not stats["overlap_pairs"] and not stats["flipped"]) or angle - 10 < min_angle:
+            return stats
+        angle -= 10
 
 
 def finish(o, union=True, uv=True):
     """Cleanup pass for a finished asset: union interpenetrating shells, merge by distance, outward normals, no
-    custom split normals, flat shading, Smart UV, origin kept at the bottom centre. Returns the audit."""
+    custom split normals, flat shading, UVs, origin kept at the bottom centre. uv: True for smart_uv's defaults,
+    a dict of smart_uv arguments, or False for none. Returns the audit (with smart_uv's uv_stats under "uv")."""
     if union and len(o.data.polygons):
         union_loose(o)
     if len(o.data.vertices):
@@ -374,9 +553,13 @@ def finish(o, union=True, uv=True):
     for p in o.data.polygons:
         p.use_smooth = False
     K.drop_unused_slots(o)
+    uv_res = None
     if uv:
-        smart_uv(o)
-    return audit(o)
+        uv_res = smart_uv(o, **(uv if isinstance(uv, dict) else {}))
+    res = audit(o)
+    if uv_res:
+        res["uv"] = uv_res
+    return res
 
 
 VIEWS = {"front34": (-28, 12), "rear34": (152, 12), "front": (0, 4), "side": (90, 4), "rear": (180, 4),
@@ -396,6 +579,10 @@ def views(num, objs, names=("front34", "rear34", "front", "side", "rear", "top",
     kit["CELL"] = cell
     sc = bpy.context.scene
     ground = bpy.data.objects.get("FB_Ground")
+    # the studio floor follows each shot (build_kit.frame_box puts it under the group's lowest point, up in the air
+    # for lifted exploded parts): put it back afterwards and keep it out of the viewport, where it would slice
+    # through the models on display; renders still see it (hide_render is separate)
+    ground_home = ground.location.copy() if ground else None
     paths = []
     shots = [(v, objs) + VIEWS[v] for v in names] + [(k, list(g), az, el) for k, (g, az, el) in (extra or {}).items()]
     try:
@@ -410,6 +597,8 @@ def views(num, objs, names=("front34", "rear34", "front", "side", "rear", "top",
         kit["CELL"] = old
         if ground:
             ground.hide_render = False
+            ground.location = (ground_home.x, ground_home.y, 0.0)
+            ground.hide_set(True)
         if vfx:
             kit["vfx"].clear(sc)
     rows = [kit["hstack"](paths[i:i + 4]) for i in range(0, len(paths), 4)]
