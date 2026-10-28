@@ -64,7 +64,9 @@
     "questDone": "#43C33F",
     "badge": "#3A2418",
     "selectGlow": "#F7B32B",
-    "line2": "#B89366"
+    "line2": "#B89366",
+    "haveEnough": "#2E7D24",
+    "haveShort": "#A3271B"
   },
   "party": {
     "anchor": [0, 0],

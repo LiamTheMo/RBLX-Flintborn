@@ -8,7 +8,7 @@ Parchment-and-leather UI from the reference sheets in `art/reference/ui/parchmen
 | Lobby popups (deploy check, invites, server) | 01_frames, 03_buttons | in LobbyScreen.md | ✅ uploaded | ✅ | ✅ | ✅ | ✅ | code-reviewed; not in the preview, Studio ⏳ | sizing simulated ✅ | ✅ | Built |
 | Journal (quests + island map) | 07_journal | ✅ [JournalScreen.md](JournalScreen.md) | ✅ sliced + painted map (upload ⏳) | ✅ | ✅ | n/a | ✅ QuestView / QuestClaim | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | Inventory & Vault (lobby + run) | 08_inventory_vault | ✅ [InventoryScreen.md](InventoryScreen.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ VaultController + InventoryController | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
-| Crafting | 09_crafting | — | — | — | — | — | — | — | — | — | Not started |
+| Crafting + Forge | 09_crafting | ✅ [CraftingScreen.md](CraftingScreen.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ Craft / smelt / ForgeCraft | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | Settings | 10_settings | ✅ [SettingsScreen.md](SettingsScreen.md) | ✅ sliced (upload ⏳) | ✅ | ✅ | n/a (instant) | ✅ new settings live through attributes | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | In-world HUD (parchment) | 12_hud_master, 05_widgets | — | — | — | — | — | — | — | — | — | Not started (hotbar is six slots now, GDD §56) |
 | Kit sheets | 01, 03–06, 11, 14–16 | — | partial (lobby pieces) | — | — | — | — | — | — | — | Sliced as screens need them |

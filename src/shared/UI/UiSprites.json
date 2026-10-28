@@ -759,6 +759,16 @@
     ],
     "w": 391
   },
+  "pm_button_craft": {
+    "h": 94,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ],
+    "w": 282
+  },
   "pm_button_leather": {
     "h": 140,
     "slice": [
@@ -798,6 +808,16 @@
       44
     ],
     "w": 404
+  },
+  "pm_button_paper": {
+    "h": 64,
+    "slice": [
+      22,
+      18,
+      22,
+      18
+    ],
+    "w": 129
   },
   "pm_button_parchment": {
     "h": 159,
@@ -869,6 +889,11 @@
     "slice": null,
     "w": 155
   },
+  "pm_button_x_leather": {
+    "h": 53,
+    "slice": null,
+    "w": 55
+  },
   "pm_button_zoom_in": {
     "h": 62,
     "slice": null,
@@ -919,6 +944,26 @@
     "slice": null,
     "w": 93
   },
+  "pm_ctab": {
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ],
+    "w": 82
+  },
+  "pm_ctab_selected": {
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ],
+    "w": 83
+  },
   "pm_dropdown": {
     "h": 73,
     "slice": [
@@ -939,6 +984,21 @@
     ],
     "w": 176
   },
+  "pm_glyph_armor": {
+    "h": 37,
+    "slice": null,
+    "w": 39
+  },
+  "pm_glyph_bag": {
+    "h": 37,
+    "slice": null,
+    "w": 32
+  },
+  "pm_glyph_bench": {
+    "h": 35,
+    "slice": null,
+    "w": 41
+  },
   "pm_glyph_diamond": {
     "h": 27,
     "slice": null,
@@ -958,6 +1018,11 @@
     "h": 32,
     "slice": null,
     "w": 27
+  },
+  "pm_glyph_heart": {
+    "h": 135,
+    "slice": null,
+    "w": 160
   },
   "pm_glyph_monitor": {
     "h": 51,
@@ -983,6 +1048,16 @@
     "h": 31,
     "slice": null,
     "w": 27
+  },
+  "pm_glyph_tent": {
+    "h": 35,
+    "slice": null,
+    "w": 40
+  },
+  "pm_glyph_tools": {
+    "h": 39,
+    "slice": null,
+    "w": 40
   },
   "pm_glyph_weight": {
     "h": 32,
@@ -1154,6 +1229,51 @@
     ],
     "w": 364
   },
+  "pm_queue_empty": {
+    "h": 96,
+    "slice": null,
+    "w": 404
+  },
+  "pm_queue_row": {
+    "h": 98,
+    "slice": [
+      24,
+      24,
+      60,
+      24
+    ],
+    "w": 404
+  },
+  "pm_recipe_row": {
+    "h": 74,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ],
+    "w": 405
+  },
+  "pm_recipe_row_selected": {
+    "h": 76,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ],
+    "w": 405
+  },
+  "pm_req_card": {
+    "h": 156,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 106
+  },
   "pm_search_box": {
     "h": 46,
     "slice": [
@@ -1164,15 +1284,15 @@
     ],
     "w": 230
   },
-  "pm_side_tab": {
-    "h": 128,
+  "pm_side_column": {
+    "h": 569,
     "slice": null,
-    "w": 124
+    "w": 156
   },
   "pm_side_tab_selected": {
-    "h": 128,
+    "h": 134,
     "slice": null,
-    "w": 126
+    "w": 122
   },
   "pm_slider_knob": {
     "h": 58,
@@ -1193,6 +1313,36 @@
       14
     ],
     "w": 104
+  },
+  "pm_stat_chip_tall": {
+    "h": 72,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 106
+  },
+  "pm_stepper_field": {
+    "h": 62,
+    "slice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "w": 77
+  },
+  "pm_stepper_minus": {
+    "h": 65,
+    "slice": null,
+    "w": 64
+  },
+  "pm_stepper_plus": {
+    "h": 65,
+    "slice": null,
+    "w": 64
   },
   "pm_tab_leather": {
     "h": 104,
@@ -1243,6 +1393,68 @@
     "h": 145,
     "slice": null,
     "w": 146
+  },
+  "pm_window_crafting": {
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_crafting__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_crafting__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ],
+    "w": 1629
+  },
+  "pm_window_crafting__1_1": {
+    "h": 742,
+    "slice": null,
+    "w": 816
+  },
+  "pm_window_crafting__1_2": {
+    "h": 742,
+    "slice": null,
+    "w": 817
+  },
+  "pm_window_forge": {
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_forge__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_forge__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ],
+    "w": 1629
+  },
+  "pm_window_forge__1_1": {
+    "h": 742,
+    "slice": null,
+    "w": 816
+  },
+  "pm_window_forge__1_2": {
+    "h": 742,
+    "slice": null,
+    "w": 817
   },
   "pm_window_inventory": {
     "h": 786,

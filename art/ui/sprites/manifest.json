@@ -926,6 +926,17 @@
       26
     ]
   },
+  "pm_button_craft": {
+    "file": "pm_button_craft.png",
+    "w": 282,
+    "h": 94,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ]
+  },
   "pm_button_leather": {
     "file": "pm_button_leather.png",
     "w": 401,
@@ -968,6 +979,17 @@
       44,
       64,
       44
+    ]
+  },
+  "pm_button_paper": {
+    "file": "pm_button_paper.png",
+    "w": 129,
+    "h": 64,
+    "slice": [
+      22,
+      18,
+      22,
+      18
     ]
   },
   "pm_button_parchment": {
@@ -1048,6 +1070,12 @@
     "h": 150,
     "slice": null
   },
+  "pm_button_x_leather": {
+    "file": "pm_button_x_leather.png",
+    "w": 55,
+    "h": 53,
+    "slice": null
+  },
   "pm_button_zoom_in": {
     "file": "pm_button_zoom_in.png",
     "w": 62,
@@ -1108,6 +1136,28 @@
     "h": 117,
     "slice": null
   },
+  "pm_ctab": {
+    "file": "pm_ctab.png",
+    "w": 82,
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ]
+  },
+  "pm_ctab_selected": {
+    "file": "pm_ctab_selected.png",
+    "w": 83,
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ]
+  },
   "pm_dropdown": {
     "file": "pm_dropdown.png",
     "w": 239,
@@ -1129,6 +1179,24 @@
       7,
       6
     ]
+  },
+  "pm_glyph_armor": {
+    "file": "pm_glyph_armor.png",
+    "w": 39,
+    "h": 37,
+    "slice": null
+  },
+  "pm_glyph_bag": {
+    "file": "pm_glyph_bag.png",
+    "w": 32,
+    "h": 37,
+    "slice": null
+  },
+  "pm_glyph_bench": {
+    "file": "pm_glyph_bench.png",
+    "w": 41,
+    "h": 35,
+    "slice": null
   },
   "pm_glyph_diamond": {
     "file": "pm_glyph_diamond.png",
@@ -1152,6 +1220,12 @@
     "file": "pm_glyph_hammer.png",
     "w": 27,
     "h": 32,
+    "slice": null
+  },
+  "pm_glyph_heart": {
+    "file": "pm_glyph_heart.png",
+    "w": 160,
+    "h": 135,
     "slice": null
   },
   "pm_glyph_monitor": {
@@ -1182,6 +1256,18 @@
     "file": "pm_glyph_sword.png",
     "w": 27,
     "h": 31,
+    "slice": null
+  },
+  "pm_glyph_tent": {
+    "file": "pm_glyph_tent.png",
+    "w": 40,
+    "h": 35,
+    "slice": null
+  },
+  "pm_glyph_tools": {
+    "file": "pm_glyph_tools.png",
+    "w": 40,
+    "h": 39,
     "slice": null
   },
   "pm_glyph_weight": {
@@ -1380,6 +1466,56 @@
       30
     ]
   },
+  "pm_queue_empty": {
+    "file": "pm_queue_empty.png",
+    "w": 404,
+    "h": 96,
+    "slice": null
+  },
+  "pm_queue_row": {
+    "file": "pm_queue_row.png",
+    "w": 404,
+    "h": 98,
+    "slice": [
+      24,
+      24,
+      60,
+      24
+    ]
+  },
+  "pm_recipe_row": {
+    "file": "pm_recipe_row.png",
+    "w": 405,
+    "h": 74,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ]
+  },
+  "pm_recipe_row_selected": {
+    "file": "pm_recipe_row_selected.png",
+    "w": 405,
+    "h": 76,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ]
+  },
+  "pm_req_card": {
+    "file": "pm_req_card.png",
+    "w": 106,
+    "h": 156,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ]
+  },
   "pm_search_box": {
     "file": "pm_search_box.png",
     "w": 230,
@@ -1391,16 +1527,16 @@
       14
     ]
   },
-  "pm_side_tab": {
-    "file": "pm_side_tab.png",
-    "w": 124,
-    "h": 128,
+  "pm_side_column": {
+    "file": "pm_side_column.png",
+    "w": 156,
+    "h": 569,
     "slice": null
   },
   "pm_side_tab_selected": {
     "file": "pm_side_tab_selected.png",
-    "w": 126,
-    "h": 128,
+    "w": 122,
+    "h": 134,
     "slice": null
   },
   "pm_slider_knob": {
@@ -1425,6 +1561,40 @@
       16,
       14
     ]
+  },
+  "pm_stat_chip_tall": {
+    "file": "pm_stat_chip_tall.png",
+    "w": 106,
+    "h": 72,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ]
+  },
+  "pm_stepper_field": {
+    "file": "pm_stepper_field.png",
+    "w": 77,
+    "h": 62,
+    "slice": [
+      10,
+      10,
+      10,
+      10
+    ]
+  },
+  "pm_stepper_minus": {
+    "file": "pm_stepper_minus.png",
+    "w": 64,
+    "h": 65,
+    "slice": null
+  },
+  "pm_stepper_plus": {
+    "file": "pm_stepper_plus.png",
+    "w": 64,
+    "h": 65,
+    "slice": null
   },
   "pm_tab_leather": {
     "file": "pm_tab_leather.png",
@@ -1483,6 +1653,74 @@
     "w": 146,
     "h": 145,
     "slice": null
+  },
+  "pm_window_crafting__1_1": {
+    "file": "pm_window_crafting__1_1.png",
+    "w": 816,
+    "h": 742,
+    "slice": null
+  },
+  "pm_window_crafting__1_2": {
+    "file": "pm_window_crafting__1_2.png",
+    "w": 817,
+    "h": 742,
+    "slice": null
+  },
+  "pm_window_crafting": {
+    "file": null,
+    "w": 1629,
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_crafting__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_crafting__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ]
+  },
+  "pm_window_forge__1_1": {
+    "file": "pm_window_forge__1_1.png",
+    "w": 816,
+    "h": 742,
+    "slice": null
+  },
+  "pm_window_forge__1_2": {
+    "file": "pm_window_forge__1_2.png",
+    "w": 817,
+    "h": 742,
+    "slice": null
+  },
+  "pm_window_forge": {
+    "file": null,
+    "w": 1629,
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_forge__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_forge__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ]
   },
   "pm_window_inventory__1_1": {
     "file": "pm_window_inventory__1_1.png",

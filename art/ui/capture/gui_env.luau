@@ -318,6 +318,8 @@ local BASES = {
 	SurfaceGui = { "LayerCollector", "GuiBase2d" },
 	UIListLayout = { "UIGridStyleLayout", "UILayout", "UIComponent" },
 	UIGridLayout = { "UIGridStyleLayout", "UILayout", "UIComponent" },
+	Part = { "BasePart", "PVInstance" },
+	MeshPart = { "BasePart", "PVInstance" },
 }
 
 -- Properties Roblox only has on some classes: setting one elsewhere errors there
@@ -370,6 +372,9 @@ for name in ONLY.Text do
 end
 
 function checkProperty(className, key, value)
+	if (key == "Text" or key == "PlaceholderText") and type(value) ~= "string" then
+		error(("%s must be a string, got %s"):format(key, type(value)), 3)
+	end
 	local allowed = ONLY[key]
 	if allowed and GUI_CLASSES[className] and not allowed[className] and type(value) ~= "function" then
 		error(("%s is not a valid member of %s"):format(key, className), 3)
@@ -865,6 +870,47 @@ function Methods:InvokeServer()
 	return false, "Offline"
 end
 function Methods:FireServer() end
+function Methods:GetServerTimeNow()
+	return 0
+end
+
+-- CollectionService tags (on any instance; the service's methods take it).
+local tagged = {}
+function Methods:AddTag(instance, tag)
+	if tag == nil then
+		instance, tag = self, instance
+	end
+	tagged[tag] = tagged[tag] or {}
+	if not table.find(tagged[tag], instance) then
+		table.insert(tagged[tag], instance)
+	end
+end
+function Methods:RemoveTag(instance, tag)
+	if tag == nil then
+		instance, tag = self, instance
+	end
+	local list = tagged[tag] or {}
+	local i = table.find(list, instance)
+	if i then
+		table.remove(list, i)
+	end
+end
+function Methods:HasTag(instance, tag)
+	if tag == nil then
+		instance, tag = self, instance
+	end
+	return table.find(tagged[tag] or {}, instance) ~= nil
+end
+function Methods:GetTagged(tag)
+	return table.clone(tagged[tag] or {})
+end
+local tagSignals = {}
+function Methods:GetInstanceAddedSignal(tag)
+	tagSignals[tag] = tagSignals[tag] or newSignal()
+	return tagSignals[tag]
+end
+Methods.GetInstanceRemovedSignal = Methods.GetInstanceAddedSignal
+
 -- BindableEvent:Fire reaches its Event's listeners.
 function Methods:Fire(...)
 	self.Event:Fire(...)

@@ -86,6 +86,7 @@ local before = #calls
 window.Confirm.Yes.Press.Activated:Fire()
 local last = calls[#calls]
 check(#calls == before + 1 and last[3] == "Wood" and last[4] == 40, "deposit anyway names the stack and loss")
+check(window.Status.Text == "Stored Wood.", "the confirmed deposit reports it")
 -- Take 100 stone (×100 picked).
 slot("Right", "mStone").Press.Activated:Fire()
 window.Amount3.Press.Activated:Fire()

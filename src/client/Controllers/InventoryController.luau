@@ -402,7 +402,9 @@ local function showChoice()
 		end,
 	}, {
 		("DROP\n(%s)"):format(Binds.Label("Drop")),
-		slot ~= nil or InventoryController.Snapshot.equipped ~= nil,
+		-- The window's DROP takes only the chosen slot, and worn armour comes
+		-- off first (the server drops from the hotbar and backpack only).
+		slot ~= nil and choice ~= nil and choice.area ~= "armor",
 		function()
 			dropSelected()
 		end,
@@ -640,6 +642,10 @@ function InventoryController.Start()
 		local inRun = player:GetAttribute("SessionState") == "ActiveRun"
 		ui.root.Visible = inRun
 		bindKeys(inRun)
+		-- Leaving the run closes the window over the emptied inventory.
+		if not inRun and panel.screen:IsOpen() then
+			closeBackpack()
+		end
 	end)
 	InventoryController.Render()
 end
