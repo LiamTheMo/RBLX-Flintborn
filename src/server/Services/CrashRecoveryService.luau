@@ -94,7 +94,7 @@ local function attempt(player: Player): string
 				error("AlreadyRestored", 0)
 			end
 			-- A checkpoint written before a catalog change may name removed items.
-			ProfileSchema.PruneUnknownItems(working)
+			ProfileSchema.PruneRetiredItems(working)
 			return restored
 		end
 	)

@@ -8,10 +8,12 @@
 --
 -- Smelting costs only time (no fuel): a request for N bars starts one job bound to
 -- the furnace the player stands at, and each bar takes its ore in the same step
--- that grants it, every `seconds`. The job stops, keeping the bars already made
--- and taking nothing more, when the player moves away, dies, is downed, leaves
--- the run or the server, or the furnace is destroyed. One job per player; its
--- progress replicates as Smelt* player attributes. World place only.
+-- that grants it, every `seconds`; Crafting mastery's larger outputs and saved
+-- ingredients never apply, so one ore is always one bar. The job stops, keeping
+-- the bars already made and taking nothing more, when the player moves away,
+-- dies, is downed, leaves the run or the server, or the furnace is destroyed. One
+-- job per player; its progress replicates as Smelt* player attributes. World
+-- place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -117,8 +119,10 @@ end
 local function makeOutput(player: Player, recipe, station: string, source: string)
 	if ItemCatalog.IsStackable(recipe.output) then
 		-- Larger outputs from Crafting mastery (every third level); the fraction pays
-		-- out by chance, so +30% still counts on a quantity-1 recipe.
-		local quantity = ModifierRules.RollYield(recipe.quantity, ModifierService.Get(player, "CraftOutput"), rng)
+		-- out by chance, so +30% still counts on a quantity-1 recipe. Smelting is
+		-- exactly one bar per ore (GDD §51), so a timed recipe never rolls it.
+		local modifiers = if CraftingRules.IsTimed(recipe) then {} else ModifierService.Get(player, "CraftOutput")
+		local quantity = ModifierRules.RollYield(recipe.quantity, modifiers, rng)
 		return { catalogId = recipe.output, quantity = quantity }
 	end
 	local output = ItemInstance.New(
@@ -156,8 +160,9 @@ local function commit(player: Player, inventory, recipe, output): (boolean, stri
 	end
 	InventoryRules.RemoveAll(inventory, recipe.inputs)
 	InventoryRules.Add(inventory, output)
-	-- Ingredient savings: a chance to get one unit of one input back.
-	if rng:NextNumber() < ModifierService.Sum(player, "IngredientSave") then
+	-- Ingredient savings: a chance to get one unit of one input back (never the ore
+	-- of a smelt, which would make bars from nothing).
+	if not CraftingRules.IsTimed(recipe) and rng:NextNumber() < ModifierService.Sum(player, "IngredientSave") then
 		local inputs = {}
 		for catalogId in recipe.inputs do
 			table.insert(inputs, catalogId)

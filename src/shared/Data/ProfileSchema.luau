@@ -2,9 +2,7 @@
 -- version and pure migrations from every older version live here so the server,
 -- client and headless specs agree on one definition.
 
-local ForgeRecipes = require(script.Parent.Parent.Crafting.ForgeRecipes)
 local GameConstants = require(script.Parent.Parent.GameConstants)
-local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 
 local ProfileSchema = {}
 
@@ -118,13 +116,28 @@ local function backfillRedeemedCodes(profile)
 	end
 end
 
--- Pre-release catalog cleanup (GDD §51, ITEM_CATALOG §8): items whose catalogId no
--- longer exists (the old Iron material, plain Arrows, Sickles, Basic Pickaxe and
--- Bow, Berries, Wood and Stone armor) are deleted wherever the profile holds them,
--- so no code path ever meets an unknown ID. Valid entries are never touched, so
--- running it on every load is safe.
+-- Pre-release catalog cleanup (GDD §51, ITEM_CATALOG §8): the items the catalog
+-- retired are deleted wherever the profile holds them. Only this explicit list is
+-- deleted, never "anything this server doesn't know": an older server still
+-- running after a publish would otherwise delete items a newer build added.
+-- Running it on every load is safe.
+ProfileSchema.RETIRED_ITEMS = {
+	Iron = true,
+	Arrow = true,
+	Sickle = true,
+	BasicPickaxe = true,
+	BasicBow = true,
+	Berries = true,
+	WoodHead = true,
+	WoodChest = true,
+	WoodLegs = true,
+	StoneHead = true,
+	StoneChest = true,
+	StoneLegs = true,
+}
+
 local function known(catalogId: any): boolean
-	return ItemCatalog.Get(catalogId) ~= nil
+	return type(catalogId) == "string" and not ProfileSchema.RETIRED_ITEMS[catalogId]
 end
 
 -- Removes unknown records from a list in place. Returns how many were removed.
@@ -158,9 +171,9 @@ local function pruneMap(map: any): number
 	return removed
 end
 
--- Deletes every reference to an item or Forge recipe that is no longer in the
--- catalog. Returns how many entries were removed (0 when the profile is clean).
-function ProfileSchema.PruneUnknownItems(profile): number
+-- Deletes every reference to a retired item, and the Forge conversions of retired
+-- items. Returns how many entries were removed (0 when the profile is clean).
+function ProfileSchema.PruneRetiredItems(profile): number
 	local removed = 0
 	removed += pruneList(profile.lobbyBackpack.slots)
 	removed += pruneList(profile.vault.items)
@@ -213,7 +226,8 @@ function ProfileSchema.PruneUnknownItems(profile): number
 	end
 	removed += pruneMap(profile.recipes.discovered)
 	for recipeId in table.clone(profile.recipes.unlocked) do
-		if ForgeRecipes.Get(recipeId) == nil then
+		local source = string.match(recipeId, "^Permanent(.+)$")
+		if source and not known(source) then
 			profile.recipes.unlocked[recipeId] = nil
 			removed += 1
 		end
@@ -247,7 +261,7 @@ function ProfileSchema.Migrate(data: any, now: number?)
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
 	backfillRedeemedCodes(profile)
-	ProfileSchema.PruneUnknownItems(profile)
+	ProfileSchema.PruneRetiredItems(profile)
 	return profile, nil
 end
 
