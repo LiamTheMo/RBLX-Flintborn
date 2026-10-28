@@ -27,6 +27,10 @@ local SPRITE_PAD = 2
 local NARROW_WIDTH = 1544
 -- Clearance kept under the Roblox top bar, in design pixels.
 local TOP_GAP = 8
+-- Smallest touch target on screen, in points (Roblox's mobile guidance).
+local MIN_TAP = 44
+-- Room kept clear on each side of the status strip at the top, in design px.
+local STATUS_GAP = 16
 
 local function rect(entry, props)
 	props = props or {}
@@ -96,7 +100,9 @@ local function hit(
 		end
 		TweenService:Create(scale, HOVER, { Scale = value }):Play()
 	end
+	local hovering = false
 	local function focus(on: boolean)
+		hovering = on
 		to(if on then 1.04 else 1)
 		if onFocus then
 			onFocus(on)
@@ -122,7 +128,7 @@ local function hit(
 		if input.UserInputType == Enum.UserInputType.Touch then
 			focus(false)
 		elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
-			to(1.04)
+			to(if hovering then 1.04 else 1)
 		end
 	end)
 	return button
@@ -160,12 +166,14 @@ local function inkText(entry, props, parent: Instance): TextLabel
 	return Widgets.Text(entry, props, parent)
 end
 
--- A small sprite button at `entry.rect` with a padded touch area.
-local function spriteButton(name: string, entry, parent: Instance, steady, onPress, pad: number?)
-	local frame = Widgets.Make("Frame", rect(entry, { Name = name, BackgroundTransparency = 1, ZIndex = 6 }), parent)
-	Widgets.Sprite(entry.sprite, { Size = UDim2.fromScale(1, 1), ZIndex = 6 }, frame)
-	hit(frame, name .. "Button", steady, nil, nil, pad).Activated:Connect(onPress)
-	return frame
+-- Widens a small button's touch area past its art until it is at least MIN_TAP
+-- points on screen at `screenScale` (never past `target.maxPad`, which keeps
+-- neighbours apart).
+local function padTouch(target, screenScale: number)
+	local art = math.min(target.w, target.h)
+	local pad = math.clamp((MIN_TAP / math.max(screenScale, 0.01) - art) / 2, 0, target.maxPad)
+	target.button.Position = UDim2.fromOffset(-pad, -pad)
+	target.button.Size = UDim2.new(1, pad * 2, 1, pad * 2)
 end
 
 function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
@@ -176,6 +184,9 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		-- Top-anchored widgets and their layout entries, moved down by Fit when the
 		-- Roblox top bar would cover them.
 		topWidgets = {},
+		-- Small buttons whose touch areas Fit sizes for the screen.
+		targets = {},
+		screenScale = 1,
 		NavPressed = Signal.new(),
 		ProfilePressed = Signal.new(),
 		SettingsPressed = Signal.new(),
@@ -226,6 +237,8 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		rect = profileCfg.xp.rect,
 		fill = profileCfg.xp.fill,
 		fillColor = profileCfg.xp.fillColor,
+		-- The art carries its own groove; its stand-in needs one drawn.
+		trackColor = if hasArt(profileCfg.sprite) then nil else "line",
 	}, profile)
 	Widgets.SetBar(self.xpBar, 0, true) -- empty until the first progression snapshot
 	hit(profile, "OpenProgress", steady).Activated:Connect(function()
@@ -237,15 +250,17 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		local frame = top(name, entry)
 		art(entry.sprite, frame)
 		local value = inkText(entry.value, rect(entry.value, { Name = "Value", Text = "0", ZIndex = 4 }), frame)
-		return fitted(value, entry.value.textSize, 14)
+		return fitted(value, entry.value.textSize, 11)
 	end
 	self.coinsText = pill("Coins", cfg.coins)
 	self.gemsText = pill("Gems", cfg.gems)
 	local settings = top("Settings", cfg.settings)
 	art(cfg.settings.sprite, settings)
-	hit(settings, "OpenSettings", steady, nil, nil, cfg.settings.touchPad).Activated:Connect(function()
+	local settingsButton = hit(settings, "OpenSettings", steady)
+	settingsButton.Activated:Connect(function()
 		self.SettingsPressed:Fire()
 	end)
+	self:_target(settingsButton, cfg.settings.size[1], cfg.settings.size[2], cfg.settings.touchPad, false)
 
 	-- Navigation tiles in a grid; each names itself on hover or selection (and
 	-- always while its art is not uploaded).
@@ -272,6 +287,7 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		local nameTag, label =
 			tag(navCfg.label, rect(navCfg.label, { Name = "Name", Visible = always, ZIndex = 5 }), tile)
 		label.Text = entry.label
+		fitted(label, navCfg.label.textSize)
 		local button = hit(tile, "Open" .. entry.id, steady, function(on)
 			nameTag.Visible = always or on
 		end)
@@ -282,7 +298,9 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 
 	-- Party panel: "PARTY" and its count, divider, Leave, and a scrolling list.
 	local partyCfg = cfg.party
-	local party = top("Party", partyCfg)
+	-- Placed by Fit, which may move it up on short screens.
+	local party = holder("Party", partyCfg, self.root)
+	self.party = party
 	self.partyScale = Widgets.Make("UIScale", { Scale = 1 }, party)
 	art(partyCfg.sprite, party)
 	inkText(partyCfg.title, rect(partyCfg.title, { Name = "Title", Text = partyCfg.title.text, ZIndex = 4 }), party)
@@ -297,9 +315,9 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		}),
 		party
 	)
-	self.leave = spriteButton("Leave", partyCfg.leave, party, steady, function()
+	self.leave = self:_spriteButton("Leave", partyCfg.leave, party, function()
 		self.LeavePressed:Fire()
-	end, partyCfg.leave.touchPad)
+	end)
 	self.leave.Visible = false
 	local listCfg = partyCfg.list
 	local listRect = listCfg.rect
@@ -393,19 +411,49 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		ZIndex = 6,
 	}, self.root)
 	Layout.Place(self.status, statusCfg)
-	table.insert(self.topWidgets, { self.status, statusCfg })
 	self.statusText.TextWrapped = true
 	fitted(self.statusText, statusCfg.text.textSize)
 	return self
 end
 
--- Fits the screen to `width` × `height` reference pixels with the Roblox top bar
--- ending `topInset` reference pixels down: the top widgets move down when the
--- bar would cover the profile (phones, where the screen is drawn small), the
--- navigation grid shrinks to end above the bottom edge, and the party panel to
--- end above the Enter group under it. Neither goes below half size.
-function LobbyHud:Fit(width: number, height: number, topInset: number?)
+-- Registers a small button whose touch area Fit grows on small screens. `party`
+-- buttons sit in the party panel and shrink with it.
+function LobbyHud:_target(button: GuiObject, w: number, h: number, maxPad: number, party: boolean)
+	local target = { button = button, w = w, h = h, maxPad = maxPad, party = party }
+	table.insert(self.targets, target)
+	padTouch(target, self.screenScale * (if party then self.partyScale.Scale else 1))
+end
+
+-- A small sprite button at `entry.rect` (party panel) with a touch area that
+-- grows to MIN_TAP on small screens, up to `entry.touchPad` on each side.
+function LobbyHud:_spriteButton(name: string, entry, parent: Instance, onPress)
+	local frame = Widgets.Make("Frame", rect(entry, { Name = name, BackgroundTransparency = 1, ZIndex = 6 }), parent)
+	Widgets.Sprite(entry.sprite, { Size = UDim2.fromScale(1, 1), ZIndex = 6 }, frame)
+	local button = hit(frame, name .. "Button", self.steady)
+	button.Activated:Connect(onPress)
+	self:_target(button, entry.rect[3], entry.rect[4], entry.touchPad or 0, true)
+	return frame
+end
+
+-- Adds a widget (from the controller) that moves down with the top row.
+function LobbyHud:AddTopWidget(frame: GuiObject, entry)
+	Layout.Place(frame, entry)
+	table.insert(self.topWidgets, { frame, entry })
+end
+
+-- Fits the screen to `width` × `height` reference pixels drawn at `screenScale`,
+-- with the Roblox top bar ending `topInset` reference pixels down:
+-- * the top widgets move down when the bar would cover the profile (phones,
+--   where the screen is drawn small);
+-- * the navigation grid shrinks to end above the bottom edge;
+-- * the party panel moves up under Coins, and only then shrinks, to end above
+--   the Enter group under it (neither below half size);
+-- * the status strip sits between the profile and Coins when there is room,
+--   else above Enter;
+-- * small buttons' touch areas grow to MIN_TAP points.
+function LobbyHud:Fit(width: number, height: number, topInset: number?, screenScale: number?)
 	local cfg = self.cfg
+	self.screenScale = screenScale or 1
 	local drop = math.max(0, (topInset or 0) + TOP_GAP - cfg.profile.pos[4])
 	for _, item in self.topWidgets do
 		local frame, entry = item[1], item[2]
@@ -414,11 +462,42 @@ function LobbyHud:Fit(width: number, height: number, topInset: number?)
 	local navCfg, partyCfg = cfg.nav, cfg.party
 	local navRoom = height - navCfg.bottomMargin - navCfg.pos[4] - drop
 	self.navScale.Scale = math.clamp(navRoom / self.navHeight, 0.5, 1)
+
 	local below = if width < NARROW_WIDTH
 		then cfg.enter.size[2] - cfg.enter.pos[4]
 		else cfg.server.size[2] - cfg.server.pos[4]
-	local partyRoom = height - below - 10 - partyCfg.pos[4] - drop
-	self.partyScale.Scale = math.clamp(partyRoom / partyCfg.size[2], 0.5, 1)
+	local bottom = height - below - 10
+	local partyTop = partyCfg.pos[4] + drop
+	if partyTop + partyCfg.size[2] > bottom then
+		local coinsBottom = cfg.coins.pos[4] + cfg.coins.size[2] + drop
+		partyTop = math.max(coinsBottom + 10, bottom - partyCfg.size[2])
+	end
+	self.partyScale.Scale = math.clamp((bottom - partyTop) / partyCfg.size[2], 0.5, 1)
+	self.party.Position = UDim2.new(partyCfg.pos[1], partyCfg.pos[2], partyCfg.pos[3], partyTop)
+
+	local statusCfg = cfg.status
+	local left = cfg.profile.pos[2] + cfg.profile.size[1] + STATUS_GAP
+	local right = width + cfg.coins.pos[2] - cfg.coins.size[1] - STATUS_GAP
+	local room = right - left
+	if room >= statusCfg.minWidth then
+		local stripWidth = math.min(statusCfg.size[1], room)
+		self.status.AnchorPoint = Vector2.new(0.5, 0)
+		self.status.Position = UDim2.fromOffset((left + right) / 2, statusCfg.pos[4] + drop)
+		self.status.Size = UDim2.fromOffset(stripWidth, statusCfg.size[2])
+	else
+		self.status.AnchorPoint = Vector2.new(0.5, 1)
+		self.status.Position = UDim2.new(0.5, 0, 1, cfg.enter.pos[4] - cfg.enter.size[2] - 10)
+		self.status.Size = UDim2.fromOffset(math.min(statusCfg.size[1], width - 40), statusCfg.size[2])
+	end
+
+	local live = {}
+	for _, target in self.targets do
+		if target.button.Parent ~= nil then
+			table.insert(live, target)
+			padTouch(target, self.screenScale * (if target.party then self.partyScale.Scale else 1))
+		end
+	end
+	self.targets = live
 end
 
 function LobbyHud:SetProfile(name: string, thumbnail: string?)
@@ -497,7 +576,7 @@ function LobbyHud:SetParty(members, invites, maxSize: number, canInvite: boolean
 		if member.leader then
 			Widgets.Sprite(memberCfg.crown.sprite, rect(memberCfg.crown, { Name = "Leader", ZIndex = 6 }), row)
 			if canInvite then
-				spriteButton("InviteFriends", memberCfg.invite, row, self.steady, function()
+				self:_spriteButton("InviteFriends", memberCfg.invite, row, function()
 					self.InvitePressed:Fire()
 				end)
 			end
@@ -515,10 +594,10 @@ function LobbyHud:SetParty(members, invites, maxSize: number, canInvite: boolean
 			),
 			inviteCfg.text.textSize
 		)
-		spriteButton("Accept", inviteCfg.accept, row, self.steady, function()
+		self:_spriteButton("Accept", inviteCfg.accept, row, function()
 			self.InviteAnswered:Fire(invite.partyId, true)
 		end)
-		spriteButton("Decline", inviteCfg.decline, row, self.steady, function()
+		self:_spriteButton("Decline", inviteCfg.decline, row, function()
 			self.InviteAnswered:Fire(invite.partyId, false)
 		end)
 	end

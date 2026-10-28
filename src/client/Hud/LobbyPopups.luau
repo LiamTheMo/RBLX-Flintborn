@@ -19,6 +19,7 @@ local TextService = game:GetService("TextService")
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local Layout = require(script.Parent.Layout)
+local SpriteLoader = require(script.Parent.SpriteLoader)
 local Widgets = require(script.Parent.Widgets)
 
 local LobbyPopups = {}
@@ -29,6 +30,9 @@ local ROW_HEIGHT = 52
 local MAX_LIST_HEIGHT = 230
 local CLOSE_SIZE = 44
 local BASE_Z = 10
+-- Below this screen scale (phones) the card is drawn larger, up to MAX_GROW.
+local SMALL_SCREEN = 0.75
+local MAX_GROW = 1.5
 local CLOSE_ACTION = "FlintbornLobbyPopupClose"
 
 -- The height a wrapped line of popup text needs at `width`. Measured with the
@@ -84,10 +88,17 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 	local function show(state: string?)
 		local name = if state then base .. "_" .. state else base
 		local id = UiAssets.image(name)
-		if id and face:IsA("ImageLabel") then
-			-- The state art is a few pixels off the base size: its own slice centre.
-			face.Image = id
-			face.SliceCenter = UiAssets.sliceCenter(name) or face.SliceCenter
+		if face:IsA("ImageLabel") then
+			if id then
+				-- The state art is a few pixels off the base size: its own slice centre.
+				face.Image = id
+				face.SliceCenter = UiAssets.sliceCenter(name) or face.SliceCenter
+				face.ImageColor3 = Color3.new(1, 1, 1)
+				SpriteLoader.Track(face)
+			else
+				-- No state art uploaded: darken the base art when pressed.
+				face.ImageColor3 = if state == "pressed" then Color3.new(0.85, 0.85, 0.85) else Color3.new(1, 1, 1)
+			end
 		elseif restColor then
 			-- Paper stand-in: lighten on hover, darken on press.
 			local frame = face :: Frame
@@ -123,7 +134,18 @@ function LobbyPopups.new(parent: Instance, layout)
 	local self = setmetatable({ layout = layout, Closed = Signal.new() }, LobbyPopups)
 	self.card = nil
 	self.parent = parent
+	-- The screen in reference pixels: its height, where the top bar ends, and the
+	-- scale it is drawn at (LobbyHudController keeps these current).
+	self.screenHeight = layout.reference.height
+	self.topLimit = 0
+	self.screenScale = 1
 	return self
+end
+
+function LobbyPopups:SetScreen(height: number, topLimit: number, screenScale: number)
+	self.screenHeight = height
+	self.topLimit = topLimit
+	self.screenScale = screenScale
 end
 
 function LobbyPopups:IsOpen(): boolean
@@ -163,8 +185,17 @@ function LobbyPopups:Show(spec)
 	end
 	listHeight = math.min(MAX_LIST_HEIGHT, listHeight + #rows * (ROW_HEIGHT + 6))
 	local footer = if #buttons > 0 then 14 + cfg.button.height else 0
-	local height = pad + TITLE_HEIGHT + 10 + listHeight + footer + pad
+	local chrome = pad + TITLE_HEIGHT + 10 + footer + pad
 	local enter = lobby.enter
+	-- On phones the card is drawn larger so its text and buttons stay usable; it
+	-- always ends below the top bar, scrolling its list when space runs out.
+	local grow = if self.screenScale < SMALL_SCREEN then math.min(MAX_GROW, SMALL_SCREEN / self.screenScale) else 1
+	local room = self.screenHeight + enter.pos[4] - enter.size[2] + 4 - (self.topLimit + 8)
+	listHeight = math.max(0, math.min(listHeight, room / grow - chrome))
+	if (chrome + listHeight) * grow > room then
+		grow = math.max(0.5, room / (chrome + listHeight))
+	end
+	local height = chrome + listHeight
 	local card = Widgets.Make("Frame", {
 		Name = "LobbyPopup",
 		Active = true,
@@ -174,7 +205,14 @@ function LobbyPopups:Show(spec)
 		Position = UDim2.new(enter.pos[1], enter.pos[2], enter.pos[3], enter.pos[4] - enter.size[2] + 4),
 		Size = UDim2.fromOffset(width, height),
 		ZIndex = BASE_Z,
+		-- Gamepad selection stays inside the card while it is open.
+		SelectionGroup = true,
+		SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
 	}, self.parent)
+	Widgets.Make("UIScale", { Scale = grow }, card)
 	self.card = card
 	Widgets.Sprite(cfg.sprite, {
 		Name = "Panel",

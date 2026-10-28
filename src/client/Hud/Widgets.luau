@@ -94,7 +94,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 	Widgets.Make("UIStroke", { Color = Layout.Color("paperEdge"), Thickness = 2 }, frame)
 	local badge = Widgets.PARCHMENT_BADGES[name]
 	if badge then
-		Widgets.Make("TextLabel", {
+		local mark = Widgets.Make("TextLabel", {
 			Name = "Badge",
 			BackgroundTransparency = 1,
 			Position = UDim2.new(0, 10, 0.15, 0),
@@ -105,6 +105,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
 	end
 	local glyph = Widgets.PARCHMENT_GLYPHS[name]
 	if glyph then
@@ -112,7 +113,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			frame.BackgroundTransparency = 1
 			frame:FindFirstChildOfClass("UIStroke"):Destroy()
 		end
-		Widgets.Make("TextLabel", {
+		local mark = Widgets.Make("TextLabel", {
 			Name = "Glyph",
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 1),
@@ -122,6 +123,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
 	end
 	return apply(frame, props)
 end

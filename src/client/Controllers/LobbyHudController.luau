@@ -117,7 +117,8 @@ local function topInset(): number
 	local ok, inset = pcall(function()
 		return GuiService.TopbarInset.Max.Y
 	end)
-	if not ok or type(inset) ~= "number" or inset <= 0 then
+	if not ok or type(inset) ~= "number" then
+		-- Older clients without TopbarInset: the classic GUI inset.
 		inset = GuiService:GetGuiInset().Y
 	end
 	return math.max(0, inset - gui.AbsolutePosition.Y)
@@ -136,7 +137,9 @@ local function applyScale()
 	)
 	uiScale.Scale = scale
 	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
-	hud:Fit(size.X / scale, size.Y / scale, topInset() / scale)
+	local top = topInset() / scale
+	hud:Fit(size.X / scale, size.Y / scale, top, scale)
+	popups:SetScreen(size.Y / scale, top, scale)
 end
 
 local refreshParty
@@ -328,9 +331,8 @@ local function build()
 	local host = Instance.new("Frame")
 	host.Name = "XpPopups"
 	host.BackgroundTransparency = 1
-	host.Position = UDim2.fromOffset(48, 232)
-	host.Size = UDim2.fromOffset(320, 120)
 	host.Parent = root
+	hud:AddTopWidget(host, { anchor = { 0, 0 }, pos = { 0, 48, 0, 232 }, size = { 320, 120 } })
 	ProgressionController.MountPopups(host)
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
