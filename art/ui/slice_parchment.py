@@ -255,6 +255,10 @@ def erase(a, mask, amount=0.8, feather=1):
     # clean ring of paper around the mask.
     mask = dilate(mask, 1)
     ring = dilate(mask, 8) & ~dilate(mask, 3) & (a[..., 3] > 0.9)
+    # Only paper feeds the fill: a leather corner or its shadow beside the mask
+    # would smudge into it.
+    paper = ring & (lum(a) > 0.78)
+    ring = paper if paper.sum() > 50 else ring
     base = push_pull(a[..., :3], ring)
     g = grain()
     h, w = mask.shape
@@ -440,6 +444,18 @@ def build():
     # row's pieces), so the paper between keeps its own colour and grain.
     area = (1250, 302, 1613, 603)
     content = box(m.shape, area) & (lum(m) < 0.84)
+    # The frame's leather corners reach into the area: anything dark that runs
+    # past the area's edge belongs to the frame and stays untouched.
+    x0, y0, x1, y1 = area
+    inner = box(m.shape, (x0 + 1, y0 + 1, x1 - 1, y1 - 1))
+    dark = lum(m) < 0.84
+    for ys, xs in components(dark & box(m.shape, (x0 - 40, y0 - 40, x1 + 40, y1 + 40))):
+        if not inner[ys, xs].all() and box(m.shape, area)[ys, xs].any():
+            frame = np.zeros_like(content)
+            frame[ys, xs] = True
+            content &= ~dilate(frame, 3)
+    # The painted scrollbar joins the frame's edge shading, so it is named here.
+    content |= box(m.shape, (1592, 432, 1609, 601))
     for rect in ((1256, 360, 1330, 432), (1486, 378, 1527, 412), (1533, 364, 1609, 424)):
         content |= box(m.shape, rect)
     party = erase(m, dilate(content, 2) & box(m.shape, area), amount=0.8, feather=2)
