@@ -1386,3 +1386,7 @@ one shot with the halo's (oversized) preview stand-in.
   - The crystal reads washed-out from the side.
   - The side view's back slope at f 0.10 is high.
   - Crystal share is a little high: 17 % against 16 % front, and 10.2 % against 8.5 % side.
+
+## Follow-up (main session, 2026-10-28)
+
+- `m014._hull` passes `dissolve_limit` a Python set of edges. A set iterates in memory-address order, so a rebuild can produce a slightly different core (found and fixed in `m015._hull` with `_edges_in_order`). Apply the same fix to m014 the next time 014 is rebuilt, then re-check the core and the Neon facet pick.
