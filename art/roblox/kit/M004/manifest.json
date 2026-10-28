@@ -1,0 +1,506 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M004",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m004_obsidian",
+    "hex": "#26262C",
+    "levels": [
+     0.90063,
+     0.93145,
+     0.93322,
+     0.93862,
+     0.93951,
+     0.94771,
+     0.95216,
+     0.95581,
+     0.96036,
+     0.96228,
+     0.9652,
+     0.96766,
+     0.97158,
+     0.9731,
+     0.9771,
+     0.97978,
+     0.98316,
+     0.98519,
+     0.98973,
+     0.99407,
+     0.99605,
+     1.00125,
+     1.00154,
+     1.0035,
+     1.00503,
+     1.00906,
+     1.01708,
+     1.02028,
+     1.02775,
+     1.03021,
+     1.0605,
+     1.10039
+    ],
+    "used": true
+   },
+   {
+    "key": "m004_obsidian_mid",
+    "hex": "#353D55",
+    "levels": [
+     0.9222,
+     0.94066,
+     0.94617,
+     0.95312,
+     0.96064,
+     0.96411,
+     0.96859,
+     0.97142,
+     0.9716,
+     0.97366,
+     0.97631,
+     0.97913,
+     0.9795,
+     0.9806,
+     0.98298,
+     0.98508,
+     0.98815,
+     0.99079,
+     0.99268,
+     0.99724,
+     1.00269,
+     1.00572,
+     1.00997,
+     1.01223,
+     1.01286,
+     1.01546,
+     1.01713,
+     1.01853,
+     1.02516,
+     1.03306,
+     1.04032,
+     1.05238
+    ],
+    "used": true
+   },
+   {
+    "key": "m004_rock",
+    "hex": "#968680",
+    "levels": [
+     0.88734,
+     0.91031,
+     0.9164,
+     0.92208,
+     0.92513,
+     0.93169,
+     0.93628,
+     0.94252,
+     0.94627,
+     0.95059,
+     0.95198,
+     0.95459,
+     0.95828,
+     0.96094,
+     0.96242,
+     0.96502,
+     0.96831,
+     0.97298,
+     0.97514,
+     0.97876,
+     0.98419,
+     0.98692,
+     0.98779,
+     0.98994,
+     0.9946,
+     0.99728,
+     1.00241,
+     1.00561,
+     1.01275,
+     1.02079,
+     1.03054,
+     1.07922
+    ],
+    "used": true
+   },
+   {
+    "key": "m004_rock_cool",
+    "hex": "#8E8483",
+    "levels": [
+     0.96758,
+     0.9703,
+     0.97982,
+     0.98142,
+     0.98533,
+     0.98784,
+     0.99086,
+     0.99384,
+     0.99837,
+     1.00018,
+     1.00231,
+     1.00399,
+     1.00679,
+     1.01094,
+     1.01484,
+     1.01633,
+     1.01944,
+     1.02428,
+     1.02861,
+     1.03056,
+     1.03253,
+     1.03498,
+     1.03749,
+     1.04005,
+     1.04339,
+     1.04452,
+     1.04822,
+     1.05474,
+     1.0607,
+     1.07178
+    ],
+    "used": true
+   },
+   {
+    "key": "m004_rock_x_cool_50",
+    "hex": "#928582",
+    "levels": [
+     0.93193,
+     0.94131,
+     0.9524,
+     0.95836,
+     0.96298,
+     0.96463,
+     0.96685,
+     0.9746,
+     0.97547,
+     0.97547,
+     0.97851,
+     0.98133,
+     0.98574,
+     0.9898,
+     0.99114,
+     0.99314,
+     0.99355,
+     0.99419,
+     0.99669,
+     0.99853,
+     1.00175,
+     1.00815,
+     1.01133,
+     1.01428,
+     1.01716,
+     1.0215,
+     1.02264,
+     1.02565,
+     1.027,
+     1.03168,
+     1.03886,
+     1.07348
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Obsidian",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "hero",
+   "size": [
+    9.9285,
+    8.0542,
+    7.9719
+   ],
+   "tris": 1380,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Obsidian.glb",
+     "kind": "solid",
+     "tris": 1380,
+     "offset": [
+      0.0,
+      4.0271,
+      0.0
+     ],
+     "size": [
+      9.9285,
+      8.0542,
+      7.9719
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "obsidian resource: five sharp faceted blue-black crystals (three tall, two small at the front) growing out of a cluster of rounded grey base rocks; thin lighter edge tone, mid-tone blue facet patches; one closed mesh"
+  },
+  {
+   "name": "ObsidianCrystalA",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    4.4835,
+    6.8,
+    3.5768
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianCrystalA.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      3.4,
+      0.0
+     ],
+     "size": [
+      4.4835,
+      6.8,
+      3.5768
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Obsidian Chunk A (tall left): faceted crystal, flat joining surface underneath"
+  },
+  {
+   "name": "ObsidianCrystalB",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    4.7532,
+    7.8,
+    4.7052
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianCrystalB.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      3.9,
+      0.0
+     ],
+     "size": [
+      4.7532,
+      7.8,
+      4.7052
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Obsidian Chunk B (tall centre): the tallest faceted crystal"
+  },
+  {
+   "name": "ObsidianCrystalC",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    3.9441,
+    6.4,
+    3.3011
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianCrystalC.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      3.2,
+      0.0
+     ],
+     "size": [
+      3.9441,
+      6.4,
+      3.3011
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Obsidian Chunk C (tall right): faceted crystal"
+  },
+  {
+   "name": "ObsidianCrystalD",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    2.1471,
+    3.3,
+    1.9236
+   ],
+   "tris": 40,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianCrystalD.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.65,
+      0.0
+     ],
+     "size": [
+      2.1471,
+      3.3,
+      1.9236
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Obsidian Chunk D (small front right): faceted crystal"
+  },
+  {
+   "name": "ObsidianCrystalE",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    2.2723,
+    3.5,
+    1.9971
+   ],
+   "tris": 40,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianCrystalE.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.75,
+      0.0
+     ],
+     "size": [
+      2.2723,
+      3.5,
+      1.9971
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Obsidian Chunk E (small front left): faceted crystal"
+  },
+  {
+   "name": "ObsidianRockCluster",
+   "sheet": "M004",
+   "subject": "Obsidian",
+   "role": "part",
+   "size": [
+    9.4777,
+    2.8,
+    7.9719
+   ],
+   "tris": 484,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ObsidianRockCluster.glb",
+     "kind": "solid",
+     "tris": 484,
+     "offset": [
+      0.0,
+      1.4,
+      0.0
+     ],
+     "size": [
+      9.4777,
+      2.8,
+      7.9719
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (cluster): rounded faceted grey rocks with recessed joining surfaces"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 2046,
+  "vfxSockets": 0,
+  "paletteColours": 5,
+  "paletteLevels": 158,
+  "meshBytes": 182448
+ },
+ "problems": []
+}
