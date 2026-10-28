@@ -264,18 +264,21 @@ def plan_batches(specs):
 # limits (HTTP 429) are expected: wait as long as Roblox asks, or back off.
 RETRIES = 7
 MAX_RETRY_SECONDS = 60
+POLL_SECONDS = 10
 
 
 def retry_delay(retry, retry_after=None):
-    """Seconds to wait before retry number `retry` (0-based): Roblox's Retry-After
-    when it sends a sane one, else 3, 6, 12 … capped at MAX_RETRY_SECONDS."""
+    """Seconds to wait before retry number `retry` (0-based): 3, 6, 12 … capped at
+    MAX_RETRY_SECONDS, or Roblox's Retry-After when that is longer (a short
+    Retry-After alone burned every retry while the limit lasted minutes)."""
+    backoff = min(MAX_RETRY_SECONDS, 3 * (2 ** retry))
     try:
         asked = float(retry_after)
     except (TypeError, ValueError):
-        asked = None
-    if asked is not None and 0 < asked <= MAX_RETRY_SECONDS:
-        return asked
-    return min(MAX_RETRY_SECONDS, 3 * (2 ** retry))
+        return backoff
+    if 0 < asked <= MAX_RETRY_SECONDS:
+        return max(asked, backoff)
+    return backoff
 
 
 class Cloud:
@@ -317,7 +320,8 @@ class Cloud:
         while result.get("state") not in ("COMPLETE", "FAILED", "CANCELLED"):
             if time.monotonic() - start > 350:
                 raise RuntimeError("Luau execution timed out; check task state before retrying")
-            time.sleep(5)
+            # Status polls count against the same rate limit as task creation.
+            time.sleep(POLL_SECONDS)
             result = self.request("GET", url)
         if result["state"] != "COMPLETE":
             raise RuntimeError("Luau task failed: " + str(result.get("error", result["state"])))
