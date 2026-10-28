@@ -10,8 +10,8 @@
 -- Smelting costs only time (no fuel): a request for N bars starts one job bound to
 -- the furnace the player stands at, and each bar takes its ore in the same step
 -- that grants it, every `seconds`. Each bar may bring one bonus bar (Crafting
--- mastery's SmeltBonus chance); a bonus bar with no room drops at the smelter's
--- feet, so it never stops the job. The job stops, keeping
+-- mastery's SmeltBonus chance); a bonus bar that would leave no room for the
+-- job's later bars drops at the smelter's feet instead, so it never stops the job. The job stops, keeping
 -- the bars already made and taking nothing more, when the player moves away,
 -- dies, is downed, leaves the run or the server, or the furnace is destroyed. One
 -- job per player; its progress replicates as Smelt* player attributes. World
@@ -156,17 +156,6 @@ local function commit(player: Player, inventory, recipe, output): (boolean, stri
 	end
 	InventoryRules.RemoveAll(inventory, recipe.inputs)
 	InventoryRules.Add(inventory, output)
-	-- Crafting mastery's bonus bar when smelting (never on instant crafts).
-	if CraftingRules.IsTimed(recipe) and rng:NextNumber() < ModifierService.Sum(player, "SmeltBonus") then
-		local bonus = { catalogId = recipe.output, quantity = 1 }
-		if InventoryRules.Add(inventory, table.clone(bonus)) > 0 then
-			-- No room: the bonus bar lands at the smelter's feet, not nowhere.
-			local root = rootOf(player)
-			if root then
-				DropService.Spawn(bonus, root.Position - Vector3.new(0, 2.5, 0))
-			end
-		end
-	end
 	InventoryService.Publish(player)
 	ProgressionService.GrantXp(player, "Craft", "Crafting")
 	ProgressionService.GrantMastery(player, "Crafting", 1)
@@ -174,6 +163,29 @@ local function commit(player: Player, inventory, recipe, output): (boolean, stri
 end
 
 -- Smelting jobs -------------------------------------------------------------------
+
+-- Crafting mastery's chance of one bonus bar after a bar is smelted. It goes into
+-- the inventory only when the job's remaining bars would still fit beside it;
+-- otherwise it lands at the smelter's feet, so a bonus never stops a job.
+local function grantBonusBar(player: Player, inventory, job)
+	if rng:NextNumber() >= ModifierService.Sum(player, "SmeltBonus") then
+		return
+	end
+	local bonus = { catalogId = job.recipe.output, quantity = 1 }
+	local remaining = job.count - job.done - 1
+	local trial = ProfileSchema.DeepCopy(inventory)
+	local room = InventoryRules.Add(trial, table.clone(bonus)) == 0
+		and (remaining <= 0 or InventoryRules.Add(trial, { catalogId = job.recipe.output, quantity = remaining }) == 0)
+	if room then
+		InventoryRules.Add(inventory, bonus)
+		InventoryService.Publish(player)
+		return
+	end
+	local root = rootOf(player)
+	if root then
+		DropService.Spawn(bonus, root.Position - Vector3.new(0, 2.5, 0))
+	end
+end
 
 local function publishJob(player: Player, job)
 	player:SetAttribute("SmeltRecipe", job and job.recipe.id or nil)
@@ -240,6 +252,7 @@ local function stepJob(player: Player, job, at: number)
 		stopJob(player, failure or "MissingIngredients")
 		return
 	end
+	grantBonusBar(player, inventory, job)
 	if CraftingRules.Advance(job) then
 		stopJob(player, "Done")
 	else
