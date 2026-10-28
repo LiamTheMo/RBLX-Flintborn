@@ -5,7 +5,7 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 local Keybinds = require(Shared.Settings.Keybinds)
 local TutorialSteps = require(Shared.Tutorial.TutorialSteps)
 
-test("the requested defaults: Shift sprint, Tab backpack, 1-9 hotbar, Q drop, F interact", function()
+test("the requested defaults: Shift sprint, Tab backpack, 1-6 hotbar, Q drop, F interact", function()
 	local map = Keybinds.Resolve(nil)
 	expectEq(map.Sprint, "LeftShift", "hold Shift to sprint")
 	expect(Keybinds.Get("Sprint").hold, "sprint acts while held")
@@ -15,10 +15,12 @@ test("the requested defaults: Shift sprint, Tab backpack, 1-9 hotbar, Q drop, F 
 	for _, lobby in { "Vault", "Forge", "Market", "Trade" } do
 		expectEq(Keybinds.Get(lobby), nil, lobby .. " has no key: the lobby uses its navigation buttons")
 	end
-	local digits = { "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" }
+	local digits = { "One", "Two", "Three", "Four", "Five", "Six" }
 	for index, key in digits do
 		expectEq(map["Hotbar" .. index], key, "hotbar slot " .. index)
 	end
+	expectEq(Keybinds.Get("Hotbar7"), nil, "six hotbar slots (§56): no seventh key")
+	expectEq(Keybinds.Resolve({ Hotbar7 = "G" }).Hotbar7, nil, "a saved bind for a removed slot is ignored")
 end)
 
 test("every default is allowed and no two actions share one", function()
