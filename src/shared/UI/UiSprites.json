@@ -885,12 +885,12 @@
     "w": 146
   },
   "pm_tile_quests": {
-    "h": 143,
+    "h": 145,
     "slice": null,
     "w": 146
   },
   "pm_tile_shop": {
-    "h": 143,
+    "h": 145,
     "slice": null,
     "w": 146
   },
@@ -900,7 +900,7 @@
     "w": 146
   },
   "pm_tile_vault": {
-    "h": 144,
+    "h": 145,
     "slice": null,
     "w": 146
   },
