@@ -31,7 +31,7 @@ function MovementRules.MaxSpeed(downed: boolean, swimBonus: number?): number
 end
 
 -- The speed the player is allowed right now: the server-set Humanoid walk speed
--- (it already includes sprint, crouch, hunger and swim modifiers), or the crawl
+-- (it already includes sprint, crouch, hunger and water modifiers), or the crawl
 -- while downed. `previous` (last sample's allowance) covers the latency of a
 -- change, e.g. stamina running out mid-sprint.
 function MovementRules.AllowedSpeed(downed: boolean, walkSpeed: number?, previous: number?): number

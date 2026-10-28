@@ -28,21 +28,33 @@ function WorldState.IsGenerated(): boolean
 	return workspace:GetAttribute(WorldState.GENERATED_ATTRIBUTE) == true
 end
 
--- Where a creature stands at a column: the ground, or the water's surface where it
--- is deeper than `wade` studs (it swims there). One extra ray only over water.
-function WorldState.Standing(origin: Vector3, depth: number, params: RaycastParams, wade: number): RaycastResult?
+-- Where a creature stands at a column: always the ground, the bed under any water
+-- (nothing swims, GDD §55), and whether that spot is in water. One extra ray only
+-- over water.
+function WorldState.Standing(origin: Vector3, depth: number, params: RaycastParams): (RaycastResult?, boolean)
 	params.IgnoreWater = false
 	local hit = workspace:Raycast(origin, Vector3.new(0, -depth, 0), params)
 	if hit == nil or hit.Material ~= Enum.Material.Water then
-		return hit
+		return hit, false
 	end
 	params.IgnoreWater = true
 	local bed = workspace:Raycast(hit.Position, Vector3.new(0, -(depth - (origin.Y - hit.Position.Y)), 0), params)
 	params.IgnoreWater = false
-	if bed and hit.Position.Y - bed.Position.Y <= wade then
-		return bed
-	end
-	return hit
+	return bed, true
+end
+
+-- How far below a character's root its feet are (R6: legs 2, half a torso 1).
+WorldState.FEET_BELOW_ROOT = 3
+
+-- True when terrain water stands at the feet of a character whose root is at
+-- `rootPosition`: a short ray down from the root that stops at water.
+function WorldState.FeetInWater(rootPosition: Vector3): boolean
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { workspace.Terrain }
+	params.IgnoreWater = false
+	local hit = workspace:Raycast(rootPosition, Vector3.new(0, -(WorldState.FEET_BELOW_ROOT + 1), 0), params)
+	return hit ~= nil and hit.Material == Enum.Material.Water
 end
 
 return WorldState

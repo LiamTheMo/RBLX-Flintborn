@@ -170,11 +170,11 @@ test("heights stay within the owner's vertical ranges", function()
 	do
 		expect(h >= 100 and h <= 220, name .. " terrace height")
 	end
-	expect(IslandLayout.HeightAt(-300, 300) < IslandLayout.LAKE_LEVEL - 10, "the lake is deep water")
 	expect(not IslandLayout.IsDry(-300, 300), "Crater Lake is wet")
+	expectEq(IslandLayout.WaterLevelAt(-300, 300), IslandLayout.LAKE_LEVEL, "lake water")
 end)
 
-test("the Keep is reached across the lake by a land bridge and a ford", function()
+test("the Keep is reached across the shallow lake, with a dry land bridge", function()
 	local level = IslandLayout.LAKE_LEVEL
 	for z = 240, 480, 20 do
 		expect(IslandLayout.IsDry(0, z), "the bridge stays dry at z " .. z)
@@ -182,7 +182,107 @@ test("the Keep is reached across the lake by a land bridge and a ford", function
 	end
 	for x = 300, 580, 20 do
 		local depth = level - IslandLayout.HeightAt(x, -100)
-		expect(depth < 2.5, "the ford stays shallow at x " .. x)
+		expect(depth <= IslandLayout.WATER_DEPTH + 0.01, "the lake is wadeable at x " .. x)
+	end
+end)
+
+-- Knee-deep water (GDD §55): the water's depth over the ground at (x, z), 0 if dry.
+local function depthAt(x: number, z: number): number
+	local level = IslandLayout.WaterLevelAt(x, z)
+	return if level then level - IslandLayout.HeightAt(x, z) else 0
+end
+
+test("every reachable water is knee-deep: lake, river, creek, marsh pools and the coastal shelf", function()
+	local MAX_DEPTH = 1.3
+	local wet, deepest = {}, {}
+	local function check(kind: string, x: number, z: number)
+		if not IslandLayout.InBounds(x, z) then
+			return
+		end
+		local depth = depthAt(x, z)
+		if depth > 0 then
+			wet[kind] = (wet[kind] or 0) + 1
+			deepest[kind] = math.max(deepest[kind] or 0, depth)
+		end
+	end
+	local lake = BiomeCatalog.Zones.CraterLake.shape
+	for x = lake.x - 620, lake.x + 620, 8 do
+		for z = lake.z - 620, lake.z + 620, 8 do
+			check("lake", x, z)
+		end
+	end
+	for _, river in IslandLayout.Rivers do
+		for index = 2, #river.points do
+			local a, b = river.points[index - 1], river.points[index]
+			local direction = (b - a) / (b - a).Magnitude
+			local across = Vector3.new(-direction.Z, 0, direction.X)
+			for t = 0, 1, 0.02 do
+				for offset = -40, 40, 4 do
+					local p = a + (b - a) * t + across * offset
+					check(river.id, p.X, p.Z)
+				end
+			end
+		end
+	end
+	for _, pool in IslandLayout.Pools do
+		for x = pool.x - pool.radius - 20, pool.x + pool.radius + 20, 4 do
+			for z = pool.z - pool.radius - 20, pool.z + pool.radius + 20, 4 do
+				check("pools", x, z)
+			end
+		end
+	end
+	for degrees = 0, 359, 3 do
+		local dx, dz = math.cos(math.rad(degrees)), math.sin(math.rad(degrees))
+		local coast = BiomeCatalog.CoastRadius(dx, dz)
+		for out = -30, IslandLayout.BOUNDARY_OFFSET, 2 do
+			check("shelf", dx * (coast + out), dz * (coast + out))
+		end
+	end
+	for _, kind in { "lake", "LakeRiver", "MossCreek", "pools", "shelf" } do
+		expect((wet[kind] or 0) > 20, kind .. " has water")
+		expect((deepest[kind] or 0) <= MAX_DEPTH, ("%s is %.2f deep at most"):format(kind, deepest[kind] or 0))
+		expect((deepest[kind] or 0) >= 0.8, kind .. " is deep enough to look like water")
+	end
+	-- Every bed sits on the 4-stud voxel grid, with the surface WATER_DEPTH above it.
+	expectEq((IslandLayout.LAKE_LEVEL - IslandLayout.WATER_DEPTH) % 4, 0, "lake bed on the grid")
+	expectEq((IslandLayout.SEA_LEVEL - IslandLayout.WATER_DEPTH) % 4, 0, "sea shelf on the grid")
+	for _, river in IslandLayout.Rivers do
+		for _, level in river.levels do
+			expectEq((level - IslandLayout.WATER_DEPTH) % 4, 0, river.id .. " bed on the grid")
+		end
+	end
+	for _, pool in IslandLayout.Pools do
+		expectEq((pool.level - IslandLayout.WATER_DEPTH) % 4, 0, "pool bed on the grid")
+	end
+	-- Past the wall the sea drops away (unreachable, for looks).
+	local far = BiomeCatalog.CoastRadius(1, 0) + IslandLayout.SHELF_WIDTH + 80
+	expect(depthAt(far, 0) > 10, "deep sea beyond the wall")
+end)
+
+test("the offshore wall keeps everything that is placed inside it", function()
+	local points = IslandLayout.BoundaryPoints(1)
+	expectEq(#points, 360, "a wall all the way round")
+	for _, point in points do
+		local inland = BiomeCatalog.CoastDistance(point.X, point.Z)
+		expect(math.abs(inland + IslandLayout.BOUNDARY_OFFSET) < 0.5, "the wall stands just offshore")
+		expect(depthAt(point.X, point.Z) <= 1.3, "the water at the wall is still knee-deep")
+	end
+	for _, position in IslandLayout.SpawnCandidates() do
+		expect(IslandLayout.InBounds(position.X, position.Z), "spawn inside the wall")
+	end
+	local rng = Random.new(55)
+	for _, zoneId in BiomeCatalog.ZONE_IDS do
+		for _ = 1, 40 do
+			local point = IslandLayout.RandomPointIn(zoneId, rng)
+			if point then
+				expect(IslandLayout.InBounds(point.X, point.Z), zoneId .. " point inside the wall")
+			end
+		end
+	end
+	for _, list in { PoiCatalog.Portals, PoiCatalog.SafeZones, PoiCatalog.RitualSites, PoiCatalog.Landmarks } do
+		for _, poi in list do
+			expect(IslandLayout.InBounds(poi.x, poi.z), poi.id .. " inside the wall")
+		end
 	end
 end)
 
@@ -203,7 +303,7 @@ local function walk(points)
 	return worst, dry
 end
 
-test("walkable paths lead from the bridge and ford to the courtyard, portal and altars", function()
+test("walkable paths lead from the bridge and the lake to the courtyard, portal and altars", function()
 	local MAX_RISE = 0.7
 	local function at(x, z)
 		return Vector3.new(x, 0, z)
@@ -228,7 +328,7 @@ test("walkable paths lead from the bridge and ford to the courtyard, portal and 
 		ramp = { at(0, 420), gate },
 		bridgeToPortal = { at(0, 240), at(70, 200), portal },
 		portalToFordToNorthAltar = { portal, at(230, 0), at(270, -100), at(215, -215), north },
-		ford = { at(600, -100), at(270, -100) },
+		lakeWade = { at(600, -100), at(270, -100) },
 		bridgeToWestAltar = { at(0, 240), at(-90, 200), at(-190, 110), west },
 		templeRamp = {
 			at(IslandLayout.TempleMound.x, IslandLayout.TempleMound.z + 220),
@@ -238,7 +338,7 @@ test("walkable paths lead from the bridge and ford to the courtyard, portal and 
 	for name, points in paths do
 		local worst, dry = walk(points)
 		expect(worst <= MAX_RISE, ("%s rises %.2f per stud at worst"):format(name, worst))
-		if name ~= "ford" then
+		if name ~= "lakeWade" then
 			expect(dry, name .. " stays dry")
 		end
 	end
@@ -247,22 +347,27 @@ end)
 
 test("the river runs from the lake to the sea in a contained channel", function()
 	for _, river in IslandLayout.Rivers do
+		local samples, wet = 0, 0
 		for index = 2, #river.points do
 			local a, b = river.points[index - 1], river.points[index]
-			for t = 0.1, 0.9, 0.2 do
+			for t = 0.05, 0.95, 0.05 do
 				local p = a + (b - a) * t
-				if BiomeCatalog.CoastDistance(p.X, p.Z) > 40 and not IslandLayout.InCaveInterior(p.X, p.Z) then
-					expect(not IslandLayout.IsDry(p.X, p.Z), river.id .. " has water")
-					local direction = (b - a) / (b - a).Magnitude
-					local info = IslandLayout.RiverAt(p.X, p.Z)
-					local bank = info.halfWidth + 6
-					local side = Vector3.new(-direction.Z, 0, direction.X) * bank
-					local left, right = p + side, p - side
-					expect(IslandLayout.HeightAt(left.X, left.Z) > info.surface, river.id .. " left bank holds")
-					expect(IslandLayout.HeightAt(right.X, right.Z) > info.surface, river.id .. " right bank holds")
+				if BiomeCatalog.CoastDistance(p.X, p.Z) > 40 then
+					samples += 1
+					-- Short dry rapids sit where the river steps down a stage.
+					if not IslandLayout.IsDry(p.X, p.Z) then
+						wet += 1
+						local direction = (b - a) / (b - a).Magnitude
+						local info = IslandLayout.RiverAt(p.X, p.Z)
+						local side = Vector3.new(-direction.Z, 0, direction.X) * (info.halfWidth + 6)
+						local left, right = p + side, p - side
+						expect(IslandLayout.HeightAt(left.X, left.Z) > info.surface, river.id .. " left bank holds")
+						expect(IslandLayout.HeightAt(right.X, right.Z) > info.surface, river.id .. " right bank holds")
+					end
 				end
 			end
 		end
+		expect(wet >= samples * 0.9, ("%s has water along %d of %d samples"):format(river.id, wet, samples))
 	end
 end)
 
