@@ -260,6 +260,24 @@ def plan_batches(specs):
     return plan
 
 
+# Both places publish at once, each in several batched tasks, so Open Cloud rate
+# limits (HTTP 429) are expected: wait as long as Roblox asks, or back off.
+RETRIES = 7
+MAX_RETRY_SECONDS = 60
+
+
+def retry_delay(retry, retry_after=None):
+    """Seconds to wait before retry number `retry` (0-based): Roblox's Retry-After
+    when it sends a sane one, else 3, 6, 12 … capped at MAX_RETRY_SECONDS."""
+    try:
+        asked = float(retry_after)
+    except (TypeError, ValueError):
+        asked = None
+    if asked is not None and 0 < asked <= MAX_RETRY_SECONDS:
+        return asked
+    return min(MAX_RETRY_SECONDS, 3 * (2 ** retry))
+
+
 class Cloud:
     def __init__(self):
         self.key = os.environ.get("ROBLOX_API_KEY", "")
@@ -273,7 +291,7 @@ class Cloud:
         if not url.startswith(self.base):
             raise ValueError("Unexpected Roblox API path")
         data = None if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")
-        for retry in range(4):
+        for retry in range(RETRIES):
             req = urllib.request.Request(url, data=data, method=method, headers={
                 "x-api-key": self.key, "Content-Type": "application/json"
             })
@@ -281,8 +299,8 @@ class Cloud:
                 with urllib.request.urlopen(req, timeout=60) as response:
                     return json.loads(response.read().decode("utf-8"))
             except urllib.error.HTTPError as exc:
-                if exc.code in (429, 500, 502, 503, 504) and retry < 3:
-                    time.sleep(3 * (2 ** retry))
+                if exc.code in (429, 500, 502, 503, 504) and retry < RETRIES - 1:
+                    time.sleep(retry_delay(retry, exc.headers.get("Retry-After")))
                     continue
                 raise RuntimeError(f"Roblox API HTTP {exc.code}: " +
                                    exc.read(800).decode("utf-8", errors="replace")) from None
