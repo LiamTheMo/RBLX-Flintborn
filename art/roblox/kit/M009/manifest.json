@@ -1,0 +1,546 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M009",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m009_core",
+    "hex": "#F55E21",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact",
+    "hex": "#B8A498",
+    "levels": [
+     0.88324,
+     0.9158,
+     0.92737,
+     0.93161,
+     0.93758,
+     0.94235,
+     0.94862,
+     0.9522,
+     0.95522,
+     0.95812,
+     0.96129,
+     0.96384,
+     0.96747,
+     0.97035,
+     0.97294,
+     0.97609,
+     0.97951,
+     0.9821,
+     0.98473,
+     0.98803,
+     0.99118,
+     0.99316,
+     0.99631,
+     0.99918,
+     1.00284,
+     1.0056,
+     1.01146,
+     1.02129,
+     1.02761,
+     1.03687,
+     1.04643,
+     1.10433
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact_cool",
+    "hex": "#ABA09A",
+    "levels": [
+     0.91518,
+     0.95564,
+     0.95888,
+     0.96638,
+     0.97051,
+     0.97134,
+     0.97191,
+     0.97364,
+     0.97746,
+     0.98305,
+     0.98405,
+     0.98846,
+     0.99149,
+     0.99173,
+     0.9949,
+     0.99738,
+     1.0025,
+     1.00361,
+     1.00686,
+     1.01084,
+     1.01776,
+     1.02281,
+     1.02554,
+     1.026,
+     1.03034,
+     1.03352,
+     1.0371,
+     1.04244,
+     1.04611,
+     1.04983,
+     1.05819,
+     1.06943
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact_x_cool_50",
+    "hex": "#B2A299",
+    "levels": [
+     0.91742,
+     0.9244,
+     0.93207,
+     0.94491,
+     0.94941,
+     0.95385,
+     0.95985,
+     0.96517,
+     0.96937,
+     0.97187,
+     0.97433,
+     0.97802,
+     0.98083,
+     0.98389,
+     0.98496,
+     0.987,
+     0.98898,
+     0.99424,
+     1.00009,
+     1.00376,
+     1.00753,
+     1.01256,
+     1.01786,
+     1.02221,
+     1.02874,
+     1.02965,
+     1.03411,
+     1.04149,
+     1.0456,
+     1.0549,
+     1.0755,
+     1.10222
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell",
+    "hex": "#55515A",
+    "levels": [
+     0.91836,
+     0.93078,
+     0.93566,
+     0.93929,
+     0.94775,
+     0.95008,
+     0.95761,
+     0.95991,
+     0.96029,
+     0.96775,
+     0.96811,
+     0.96976,
+     0.97264,
+     0.97315,
+     0.97315,
+     0.97633,
+     0.9798,
+     0.98007,
+     0.98325,
+     0.98374,
+     0.98725,
+     0.98896,
+     0.98952,
+     0.99014,
+     0.99368,
+     0.99595,
+     0.99849,
+     0.99992,
+     1.00244,
+     1.00998,
+     1.01647,
+     1.02228
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_grey",
+    "hex": "#645E63",
+    "levels": [
+     0.939,
+     0.95475,
+     0.95905,
+     0.96298,
+     0.96662,
+     0.97091,
+     0.97197,
+     0.97602,
+     0.98228,
+     0.98648,
+     0.99145,
+     0.99432,
+     0.99619,
+     1.00127,
+     1.00577,
+     1.00914,
+     1.01381,
+     1.01628,
+     1.02231,
+     1.02978,
+     1.03151
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "IronMeteorCore",
+   "sheet": "M009",
+   "subject": "Iron Meteor",
+   "role": "part",
+   "size": [
+    5.7832,
+    5.4876,
+    5.4555
+   ],
+   "tris": 40,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorCore_glow_m009_core.glb",
+     "kind": "glow",
+     "tris": 40,
+     "offset": [
+      0.0,
+      2.7438,
+      0.0
+     ],
+     "size": [
+      5.7832,
+      5.4876,
+      5.4555
+     ],
+     "key": "m009_core",
+     "color": "#F55E21",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Metal Core: faceted glowing orange ball that fills the seams between the shell pieces"
+  },
+  {
+   "name": "IronMeteorDeposit",
+   "sheet": "M009",
+   "subject": "Iron Meteor",
+   "role": "hero",
+   "size": [
+    11.7852,
+    5.897,
+    11.0117
+   ],
+   "tris": 2278,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorDeposit.glb",
+     "kind": "solid",
+     "tris": 1708,
+     "offset": [
+      0.0,
+      2.9485,
+      0.0
+     ],
+     "size": [
+      11.7852,
+      5.897,
+      11.0117
+     ]
+    },
+    {
+     "file": "meshes/IronMeteorDeposit_glow_m009_core.glb",
+     "kind": "glow",
+     "tris": 570,
+     "offset": [
+      -1.3044,
+      2.8708,
+      0.1132
+     ],
+     "size": [
+      8.2182,
+      5.7417,
+      7.2539
+     ],
+     "key": "m009_core",
+     "color": "#F55E21",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_IronMeteorDeposit_embers_1",
+     "kind": "embers",
+     "position": [
+      -0.2511,
+      6.7298,
+      -0.1622
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_IronMeteorDeposit_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.2511,
+      3.2298,
+      -0.1622
+     ],
+     "vfx_scale": 2.2,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "iron meteorite deposit: a big dark faceted meteor with jagged cracks glowing orange where the metal core shows through, a smaller cracked lobe at its front left, and a ring of pale impact rocks round the foot with a few loose stones further out; cracks glow"
+  },
+  {
+   "name": "IronMeteorImpactRock",
+   "sheet": "M009",
+   "subject": "Iron Meteor",
+   "role": "part",
+   "size": [
+    2.1203,
+    1.2854,
+    2.3808
+   ],
+   "tris": 44,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorImpactRock.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.6427,
+      0.0
+     ],
+     "size": [
+      2.1203,
+      1.2854,
+      2.3808
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Impact Rock (reusable): pale faceted stone of the impact rim"
+  },
+  {
+   "name": "IronMeteorShellPiece",
+   "sheet": "M009",
+   "subject": "Iron Meteor",
+   "role": "part",
+   "size": [
+    3.4935,
+    5.7923,
+    2.7745
+   ],
+   "tris": 58,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IronMeteorShellPiece.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      2.8961,
+      0.0
+     ],
+     "size": [
+      3.4935,
+      5.7923,
+      2.7745
+     ]
+    },
+    {
+     "file": "meshes/IronMeteorShellPiece_glow_m009_core.glb",
+     "kind": "glow",
+     "tris": 22,
+     "offset": [
+      0.0,
+      2.8961,
+      -0.0285
+     ],
+     "size": [
+      3.4935,
+      5.7923,
+      2.7175
+     ],
+     "key": "m009_core",
+     "color": "#F55E21",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Shell Piece (reusable, 4-5 per meteor): dark faceted wedge of the meteor's shell with orange inner (seam) faces"
+  }
+ ],
+ "stats": {
+  "assets": 4,
+  "pieces": 6,
+  "solid": 3,
+  "water": 0,
+  "glow": 3,
+  "tris": 2420,
+  "vfxSockets": 2,
+  "paletteColours": 6,
+  "paletteLevels": 150,
+  "meshBytes": 220900
+ },
+ "problems": []
+}
