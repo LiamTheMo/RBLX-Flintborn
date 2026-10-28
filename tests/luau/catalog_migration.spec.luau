@@ -394,13 +394,32 @@ test("the cleanup is idempotent and never touches a clean profile", function()
 	local once = assert(ProfileSchema.Migrate(legacyProfile(), 10))
 	local twice = assert(ProfileSchema.Migrate(once, 11))
 	expect(deepEqual(once, twice), "a second load changes nothing")
-	expectEq(ProfileSchema.PruneUnknownItems(twice), 0, "nothing left to remove")
+	expectEq(ProfileSchema.PruneRetiredItems(twice), 0, "nothing left to remove")
 	local fresh = ProfileSchema.Default(0)
 	local copy = ProfileSchema.DeepCopy(fresh)
-	expectEq(ProfileSchema.PruneUnknownItems(fresh), 0, "a new profile is clean")
+	expectEq(ProfileSchema.PruneRetiredItems(fresh), 0, "a new profile is clean")
 	expect(deepEqual(fresh, copy), "and untouched")
 	local legacy = legacyProfile()
-	expectEq(ProfileSchema.PruneUnknownItems(legacy), 23, "every legacy reference counted once")
+	expectEq(ProfileSchema.PruneRetiredItems(legacy), 23, "every legacy reference counted once")
+end)
+
+test("items from a newer build survive an older server's cleanup", function()
+	-- A server still running an older build after a publish must never delete
+	-- what a newer build added: only the explicit retired list is pruned.
+	local profile = ProfileSchema.Default(0)
+	profile.vault.materials.FutureOre = 7
+	table.insert(profile.vault.items, gear("future", "FutureBlade", "Vault"))
+	profile.permanentItems.future = { catalogId = "FutureBlade" }
+	profile.recipes.discovered.FutureOre = true
+	profile.recipes.unlocked.PermanentFutureBlade = { unlockSource = "Discovery", unlockedAt = 1 }
+	profile.recipes.unlocked.PermanentWoodChest = { unlockSource = "Discovery", unlockedAt = 1 }
+	expectEq(ProfileSchema.PruneRetiredItems(profile), 1, "only the retired Wood Chest conversion goes")
+	expectEq(profile.vault.materials.FutureOre, 7, "an unknown material is kept")
+	expectEq(#profile.vault.items, 1, "an unknown item is kept")
+	expect(profile.permanentItems.future ~= nil, "its Permanent ledger entry is kept")
+	expect(profile.recipes.discovered.FutureOre, "its discovery is kept")
+	expect(profile.recipes.unlocked.PermanentFutureBlade ~= nil, "its Forge unlock is kept")
+	expectEq(profile.recipes.unlocked.PermanentWoodChest, nil, "a retired item's conversion is dropped")
 end)
 
 test("every current item survives the cleanup", function()
@@ -421,7 +440,7 @@ test("every current item survives the cleanup", function()
 		profile.recipes.unlocked[recipe.id] = { unlockSource = "Discovery", unlockedAt = 1 }
 	end
 	local before = ProfileSchema.DeepCopy(profile)
-	expectEq(ProfileSchema.PruneUnknownItems(profile), 0, "nothing removed")
+	expectEq(ProfileSchema.PruneRetiredItems(profile), 0, "nothing removed")
 	expect(deepEqual(before, profile), "nothing changed")
 end)
 

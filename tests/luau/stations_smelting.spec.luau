@@ -262,6 +262,8 @@ local function pump()
 end
 
 local dropped = {}
+-- Additive modifier totals by stat (Crafting mastery buffs, in the cases that set them).
+local modifiers = {}
 local stubs = {
 	BuildingService = { Removing = Signal.new(), Placed = Signal.new() },
 	DownedService = {
@@ -284,11 +286,17 @@ local stubs = {
 		end,
 	},
 	ModifierService = {
-		Sum = function()
-			return 0
+		Sum = function(_, stat)
+			return modifiers[stat] or 0
 		end,
-		Get = function()
-			return {}
+		Get = function(_, ...)
+			local list = {}
+			for _, stat in { ... } do
+				if modifiers[stat] then
+					table.insert(list, { stat = stat, op = "Additive", value = modifiers[stat] })
+				end
+			end
+			return list
 		end,
 	},
 	ProfileService = {
@@ -601,4 +609,23 @@ test("ore taken away mid-smelt stops the job without a free bar", function()
 	expectEq(count(player, "AdamantineBar"), 0, "no bar from nothing")
 	expectEq(player.attributes.SmeltRecipe, nil, "stopped")
 	expect(string.find(player.notes[#player.notes], "ran out of ore") ~= nil, "told why")
+end)
+
+test("Crafting mastery never makes a bar from nothing: smelting stays 1 ore to 1 bar", function()
+	-- The largest buffs: every instant craft doubles and refunds an input.
+	modifiers.CraftOutput = 1
+	modifiers.IngredientSave = 1
+	local player = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
+	expect(craft(player, "IronBar", 3), "started")
+	for _ = 1, 3 do
+		clock += 3
+		pump()
+	end
+	expectEq(count(player, "IronBar"), 3, "three ore make exactly three bars")
+	expectEq(count(player, "IronOre"), 0, "and no ore comes back")
+	expectEq(#dropped, 0, "nor drops at the smelter's feet")
+	expect(craft(player, "BasicMedicine"), "instant craft")
+	expectEq(count(player, "BasicMedicine"), 2, "instant crafts keep the larger output")
+	modifiers.CraftOutput = nil
+	modifiers.IngredientSave = nil
 end)
