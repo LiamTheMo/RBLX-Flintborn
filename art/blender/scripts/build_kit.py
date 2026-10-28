@@ -407,6 +407,7 @@ PAPER_HEX = "#F2EEE6"  # the reference sheets' paper
 # warm sun and modest sky ambient. Shading must come from this, never from paint.
 KEY_ENERGY = float(os.environ.get("KIT_KEY", 4.5))
 AMBIENT = float(os.environ.get("KIT_AMBIENT", 0.45))
+FILL_ENERGY = float(os.environ.get("KIT_FILL", 2.5))   # rear fill sun (flintkit's FB_Fill was 0.8, shadowed)
 AMBIENT_HEX = os.environ.get("KIT_AMBIENT_HEX", "#D2D0CC")
 KIT_LOOK = os.environ.get("KIT_LOOK", "Medium High Contrast")
 GROUND_ALBEDO = float(os.environ.get("KIT_GROUND", 0.68))  # lit floor ~ the paper, so only the shadow reads
@@ -433,6 +434,12 @@ def kit_studio(scene):
     if key:
         key.data.energy = KEY_ENERGY
         key.data.color = flintkit.hex_rgb("#FFF7EC")  # slightly warm sun, as on the sheets
+    fill = bpy.data.objects.get("FB_Fill")
+    if fill:
+        # the sheets light their rear and side views too: a shadowless fill from behind brings those views to the
+        # sheet's values (a 011 rear: #98857F against the sheet's #988580) without touching the front-lit views
+        fill.data.energy = FILL_ENERGY
+        fill.data.use_shadow = False
     gm = bpy.data.materials.get("FB_GroundMat")
     if gm:
         gm.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
