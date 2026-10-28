@@ -1,10 +1,14 @@
--- Meteor crashes (GDD §7.2): a crater of chunks that each take a 30 s channel to
--- break loose, so harvesting the whole meteor is long and contestable. Each chunk
--- pays out once as physical drops. World place only.
+-- Meteor crashes (GDD §7.2, §51): a crater of chunks that each take a 30 s channel
+-- to break loose, so harvesting the whole meteor is long and contestable. Chunks
+-- hold Adamantine Ore, so breaking one needs the entry's pickaxe (a Mithril Pickaxe
+-- or better). Each chunk pays out once as physical drops, luck included. World
+-- place only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
+local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
 local Channel = require(script.Parent.Parent.Infrastructure.Channel)
 local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
@@ -36,6 +40,11 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 	glow.Range = 30
 	glow.Brightness = 3
 	glow.Parent = core
+	local minRank = entry.minRank or Tiers.ToolRank.Mithril
+	-- Why `player` cannot break a chunk with what they hold, or nil.
+	local function notice(player: Player): string?
+		return NodeCatalog.PickaxeNotice(InventoryService.EquippedTool(player), minRank)
+	end
 	local remaining = entry.chunks
 	for index = 1, entry.chunks do
 		local angle = (index / entry.chunks) * math.pi * 2
@@ -49,13 +58,20 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 		chunk.Parent = parent
 		local prompt = Instance.new("ProximityPrompt")
 		prompt.ActionText = "Break loose (30 s)"
-		prompt.ObjectText = entry.name
+		prompt.ObjectText = ("%s · %s+"):format(entry.name, NodeCatalog.PickaxeName(minRank))
 		prompt.MaxActivationDistance = MeteorService.REACH - 2
 		prompt.RequiresLineOfSight = false
 		prompt.Parent = chunk
+		-- Say so as the hold starts; the channel itself never starts without the pickaxe.
+		prompt.PromptButtonHoldBegan:Connect(function(player)
+			local message = notice(player)
+			if message then
+				InventoryService.Notify(player, message)
+			end
+		end)
 		local site = {}
 		Channel.Attach(prompt, MeteorService.CHUNK_SECONDS, function(player)
-			return CacheService.CanInteract(player, chunk, MeteorService.REACH)
+			return notice(player) == nil and CacheService.CanInteract(player, chunk, MeteorService.REACH)
 		end, function(player)
 			if not EventRules.Claim(site) then
 				return
@@ -71,7 +87,7 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 				onDepleted()
 			end
 		end, function(player)
-			InventoryService.Notify(player, "Interrupted: the chunk starts over.")
+			InventoryService.Notify(player, notice(player) or "Interrupted: the chunk starts over.")
 		end)
 	end
 	return core

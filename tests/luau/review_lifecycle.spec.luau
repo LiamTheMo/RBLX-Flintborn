@@ -434,9 +434,9 @@ end)
 test("materials never stay in the lobby backpack: banked on load and after every write", function()
 	-- A save from before GDD §45 still holds materials in its backpack.
 	local legacy = ProfileSchema.Default(0)
-	legacy.vault.materials.Iron = 995
+	legacy.vault.materials.IronOre = 995
 	legacy.lobbyBackpack.slots = {
-		{ catalogId = "Iron", quantity = 20 },
+		{ catalogId = "IronOre", quantity = 20 },
 		{ instanceId = "spear-301", catalogId = "StoneSpear", ownerId = 1 },
 	}
 	backing._data[ProfileStore.KeyFor(301)] = legacy
@@ -445,8 +445,8 @@ test("materials never stay in the lobby backpack: banked on load and after every
 	Players.PlayerAdded:Fire(player)
 	advance(2)
 	local profile = ProfileService.GetProfile(player)
-	expectEq(profile.vault.materials.Iron, 1000, "legacy backpack Iron banked on load")
-	expectEq(profile.vault.lastOverflow.deleted.Iron, 15, "the overflow was deleted")
+	expectEq(profile.vault.materials.IronOre, 1000, "legacy backpack Iron Ore banked on load")
+	expectEq(profile.vault.lastOverflow.deleted.IronOre, 15, "the overflow was deleted")
 	expectEq(#profile.lobbyBackpack.slots, 1, "only the spear stays in the backpack")
 
 	-- Any operation (a trade, a crash recovery, a rollback) that lands a material in

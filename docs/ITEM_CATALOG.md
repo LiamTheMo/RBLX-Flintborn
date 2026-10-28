@@ -1,6 +1,6 @@
 # Flintborn item and material catalog — draft for owner review
 
-> **Status:** Draft built from the owner's answers on 2026-10-27. Nothing here is in the game yet. Every name is a proposal to rename freely. Numbers marked *placeholder* are starting values for playtests. Items flagged **Review** need an owner decision before implementation.
+> **Status:** Approved by the owner on 2026-10-27 (GDD §51) and being implemented. Names are kept for now. Numbers marked *placeholder* are starting values for playtests. The data lives in `src/shared/Items/Tiers.luau`, `ItemCatalog.luau`, `Consumables.luau`, `src/shared/Crafting/Recipes.luau` and `ForgeRecipes.luau`.
 
 ## 1. Owner decisions this catalog follows
 
@@ -79,16 +79,16 @@ All materials bank into the vault and never re-enter a run (GDD §45).
 | Elite | Dire Hide | Elite creatures | Mithril and Adamantine armor |
 | Elite | Charged Core | Alpha creatures and their packs | Mithril and Adamantine weapons; Permanent conversions |
 | Elite | Glow-Fur | Alpha creatures and their packs | Mithril and Adamantine armor; Permanent conversions |
-| Elite (Guardian) | Guardian Heart | The Crater Guardian only, with large amounts of Charged Core and Glow-Fur and the mid-fight Legendary | Top Permanent conversions; Adamantine gear |
+| Elite (Guardian) | Guardian Heart | The Crater Guardian only, with large amounts of Charged Core and Glow-Fur, Adamantine Ore and the mid-fight Legendary | Adamantine and Guardian's Fang Permanent conversions |
 | Cache | Ashen Oil | Ancient caches | Fire Bomb |
 | Cache | Siege Resin | Ancient caches | Breaching Charge |
 | Meteor | Abyssal Shard | Meteor crashes | Adamantine weapons; Permanent conversions |
 | Meteor | Emberglass | Meteor crashes | Adamantine armor; Permanent conversions |
-| Event | Ancient Ember | Rare events (as today) | Forge and Permanent reagent (not tradeable, as today) |
+| Event | Ancient Ember | Rare events (as today) | Forge and Permanent reagent (tradeable, as today) |
 
 ### 2.5 Rare shrub event (new)
 
-A rare shrub sprouts somewhere on the island as an announced event. Gathering it by hand gives rare berries and rare herbs. It is weighted like other rare events *(placeholder)*.
+A rare shrub sprouts somewhere on the island as an announced event. Gathering it by hand gives rare berries and rare herbs. It is weighted like other rare events. **Every rare event type rolls on its own** (owner decision): it never competes with other events of its category or rarity.
 
 | Rare herb (tradeable) | Use |
 | --- | --- |
@@ -162,13 +162,13 @@ Bow damage is the bow's damage plus 6 for the Flint Arrow, unchanged by draw tim
 
 Bare hands gather 1. Ores give 1 per hit with any pickaxe that is allowed to mine them, plus 1 per tier above the minimum.
 
-### 4.4 Armor — **Review**
+### 4.4 Armor (owner decision: 25% compounding)
 
-The GDD confirms full-set protection of Hide ×1.2 and Iron ×2.0 (Q134). A true 25% compounding from Iron would make Adamantine ×4.9, which means about 490 effective HP and would break fights. Proposed gentler curve:
+The confirmed anchors stay (Hide ×1.2, Iron ×2.0, Q134). Above Iron, each metal adds 25% compounding.
 
 | Set | Hide | Bone | Copper | Iron | Silver | Cobalt | Mithril | Adamantine |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Full-set EHP factor | 1.2 | 1.5 | 1.8 | 2.0 | 2.25 | 2.5 | 2.8 | 3.1 |
+| Full-set EHP factor | 1.2 | 1.5 | 1.8 | 2.0 | 2.5 | 3.13 | 3.91 | 4.88 |
 
 ### 4.5 Building HP per piece *(placeholder, 1.25× per tier after Stone)*
 
@@ -221,12 +221,12 @@ No metal, bars or higher gear.
 - The plain Arrow, replaced by Flint Arrows.
 - The "HerbSeeds" entry, already gone.
 
-Existing Iron gear stays. Today's "Iron" material becomes Iron Ore, which can be smelted. Today's Basic Pickaxe becomes the Stone Pickaxe, and Berries become Redberries.
+Also deleted (pre-release): the old "Iron" material, the Basic Pickaxe (now the Stone Pickaxe), the Basic Bow (now the Wooden Bow) and plain Berries (now Redberries). Existing Iron gear (Iron Sword, axe, pickaxe, armor) keeps its IDs and stays.
 
-## 9. Open questions for review
+## 9. Owner answers (2026-10-27)
 
-1. **Armor curve (§4.4):** accept the gentler curve, or use true 25% compounding?
-2. **Guardian's Fang:** today it beats Iron. Proposed: about Cobalt strength (sword 44), Legendary rarity, Permanent-eligible. Or should it beat Adamantine?
-3. **Names:** Cobalt, Sunberry, Glimmerberry, Bloodroot, Moonpetal, Hearty Tonic, the draughts, Fire Bomb, Breaching Charge, Anvil, Cauldron. Rename anything.
-4. **Rare shrub frequency:** treat it as a Rare-weight event like ore nodes, or make it rarer?
-5. **Ores in today's vaults:** existing "Iron" counts become Iron Ore at the same quantity. Is that right?
+1. **Armor:** 25% compounding (§4.4).
+2. **Guardian's Fang:** beats Adamantine: one tier above the Adamantine sword (86 damage), Legendary, Permanent-eligible.
+3. **Names:** kept as drafted for now.
+4. **Rare shrub:** same frequency as other rare events, and every rare event type is rolled individually.
+5. **Iron already in vaults:** removed with the other legacy items (pre-release).

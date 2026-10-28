@@ -1,16 +1,24 @@
--- Field crafting (GDD §16.8, §19.1, Q103–107). Basic recipes craft anywhere;
--- advanced recipes need a nearby placed workbench, where gear rolls a small ±5%
--- quality. Inputs are removed and the output created in one server step; a
--- repeated request ID is applied once (a request refused as TooFast can be
--- retried with the same ID), nothing is charged if the output does not fit, and
--- downed players cannot craft. A saved ingredient that does not fit drops at the
--- crafter's feet. World place only.
+-- Field crafting (GDD §16.8, §19.1, §51, Q103–107). Basic recipes craft anywhere;
+-- the rest need a nearby built station (Workbench, Furnace, Anvil or Cauldron).
+-- Gear made at a Workbench or Anvil rolls a small ±5% quality. Inputs are removed
+-- and the output created in one server step; a repeated request ID is applied once
+-- (a request refused as TooFast or Busy can be retried with the same ID), nothing
+-- is charged if the output does not fit, and downed players cannot craft. A saved
+-- ingredient that does not fit drops at the crafter's feet.
+--
+-- Smelting costs only time (no fuel): a request for N bars starts one job bound to
+-- the furnace the player stands at, and each bar takes its ore in the same step
+-- that grants it, every `seconds`. The job stops, keeping the bars already made
+-- and taking nothing more, when the player moves away, dies, is downed, leaves
+-- the run or the server, or the furnace is destroyed. One job per player; its
+-- progress replicates as Smelt* player attributes. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInstance = require(ReplicatedStorage.Shared.Data.ItemInstance)
@@ -32,32 +40,55 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local CraftingService = {}
 
-CraftingService.WORKBENCH_TAG = "Workbench"
-CraftingService.FURNACE_TAG = "Furnace"
-CraftingService.WORKBENCH_RANGE = 12
 CraftingService.REMEMBERED_REQUESTS = 32
 CraftingService.CRAFT_SECONDS = 1
+-- How often running smelting jobs are checked and advanced.
+CraftingService.SMELT_TICK = 0.2
+
+-- Stations whose gear rolls quality (QualityRoll's world workbench roll).
+local ROLLING_STATIONS = { [Recipes.Workbench] = true, [Recipes.Anvil] = true }
+
+-- What a stopped job tells its smelter.
+local STOP_TEXT = {
+	MovedAway = "you moved away from the furnace",
+	StationGone = "the furnace was destroyed",
+	Died = "you died",
+	Downed = "you were downed",
+	NotInRun = "you left the run",
+	MissingIngredients = "you ran out of ore",
+	InventoryFull = "your inventory is full",
+}
 
 local rng = Random.new()
 local seenRequests = {}
 local lastCraft = {}
+local jobs = {}
+
+local function now(): number
+	return workspace:GetServerTimeNow()
+end
 
 local function rootOf(player: Player)
 	local character = player.Character
 	return character and character:FindFirstChild("HumanoidRootPart")
 end
 
-local function nearStation(player: Player, tag: string): boolean
+-- The closest standing tagged station part in range, or nil.
+local function nearestStation(player: Player, tag: string)
 	local root = rootOf(player)
 	if root == nil then
-		return false
+		return nil
 	end
-	for _, bench in CollectionService:GetTagged(tag) do
-		if bench:IsA("BasePart") and (bench.Position - root.Position).Magnitude <= CraftingService.WORKBENCH_RANGE then
-			return true
+	local best, bestDistance = nil, CraftingRules.STATION_RANGE
+	for _, part in CollectionService:GetTagged(tag) do
+		if part:IsA("BasePart") and part.Parent ~= nil then
+			local distance = (part.Position - root.Position).Magnitude
+			if distance <= bestDistance then
+				best, bestDistance = part, distance
+			end
 		end
 	end
-	return false
+	return best
 end
 
 local function firstTime(player: Player, requestId: string): boolean
@@ -83,73 +114,46 @@ local function craftingMastery(player: Player): number
 	return track and track.level or 0
 end
 
-local function craft(player: Player, requestId: any, recipeId: any)
-	if not Validation.IsId(requestId) then
-		return false, "BadRequest"
-	end
-	local recipe = Recipes.Get(recipeId)
-	if recipe == nil then
-		return false, "UnknownRecipe"
-	end
-	if not WorldAdmissionService.IsAtRisk(player) then
-		return false, "NotInRun"
-	end
-	if DownedService.IsDowned(player) then
-		return false, "Downed"
-	end
-	local inventory = InventoryService.Get(player)
-	if inventory == nil then
-		return false, "NotInRun"
-	end
-	local station = QualityRoll.Stations.Anywhere
-	if recipe.station == Recipes.Furnace and not nearStation(player, CraftingService.FURNACE_TAG) then
-		return false, "NeedsFurnace"
-	end
-	if recipe.station == Recipes.Workbench then
-		if not nearStation(player, CraftingService.WORKBENCH_TAG) then
-			return false, "NeedsWorkbench"
-		end
-		station = QualityRoll.Stations.WorldWorkbench
-	end
-	-- One craft per second, faster with Crafting mastery (Q77); also stops spam.
-	-- Checked before the request ID is recorded, so a retry is not a "Duplicate".
-	local cooldown = CraftingService.CRAFT_SECONDS / (1 + ModifierService.Sum(player, "CraftSpeed"))
-	local now = os.clock()
-	if lastCraft[player] and now - lastCraft[player] < cooldown then
-		return false, "TooFast"
-	end
-	if not firstTime(player, requestId) then
-		return false, "Duplicate"
-	end
-
-	-- Build the output, then check everything on a copy before touching the real inventory.
-	local output
+local function makeOutput(player: Player, recipe, station: string, source: string)
 	if ItemCatalog.IsStackable(recipe.output) then
 		-- Larger outputs from Crafting mastery (every third level); the fraction pays
 		-- out by chance, so +30% still counts on a quantity-1 recipe.
 		local quantity = ModifierRules.RollYield(recipe.quantity, ModifierService.Get(player, "CraftOutput"), rng)
-		output = { catalogId = recipe.output, quantity = quantity }
-	else
-		output = ItemInstance.New(
-			function()
-				return HttpService:GenerateGUID(false)
-			end,
-			recipe.output,
-			player.UserId,
-			ItemInstance.Locations.Carried,
-			QualityRoll.Roll(rng, station, craftingMastery(player)),
-			"craft:" .. requestId
-		)
-		output.recipeVersion = recipe.version
+		return { catalogId = recipe.output, quantity = quantity }
 	end
+	local output = ItemInstance.New(
+		function()
+			return HttpService:GenerateGUID(false)
+		end,
+		recipe.output,
+		player.UserId,
+		ItemInstance.Locations.Carried,
+		QualityRoll.Roll(rng, station, craftingMastery(player)),
+		source
+	)
+	output.recipeVersion = recipe.version
+	return output
+end
+
+-- True when `inputs` could be paid and `output` would fit, checked on a copy.
+local function fits(inventory, inputs, output): (boolean, string?)
 	local trial = ProfileSchema.DeepCopy(inventory)
-	if not InventoryRules.RemoveAll(trial, recipe.inputs) then
+	if not InventoryRules.RemoveAll(trial, inputs) then
 		return false, "MissingIngredients"
 	end
-	if InventoryRules.Add(trial, ProfileSchema.DeepCopy(output)) > 0 then
+	if output and InventoryRules.Add(trial, ProfileSchema.DeepCopy(output)) > 0 then
 		return false, "InventoryFull"
 	end
+	return true, nil
+end
 
+-- Takes one unit's inputs and grants `output` in one step, after checking both on
+-- a copy. Nothing changes when it fails.
+local function commit(player: Player, inventory, recipe, output): (boolean, string?)
+	local ok, reason = fits(inventory, recipe.inputs, output)
+	if not ok then
+		return false, reason
+	end
 	InventoryRules.RemoveAll(inventory, recipe.inputs)
 	InventoryRules.Add(inventory, output)
 	-- Ingredient savings: a chance to get one unit of one input back.
@@ -168,10 +172,169 @@ local function craft(player: Player, requestId: any, recipeId: any)
 			end
 		end
 	end
-	lastCraft[player] = now
 	InventoryService.Publish(player)
 	ProgressionService.GrantXp(player, "Craft", "Crafting")
 	ProgressionService.GrantMastery(player, "Crafting", 1)
+	return true, nil
+end
+
+-- Smelting jobs -------------------------------------------------------------------
+
+local function publishJob(player: Player, job)
+	player:SetAttribute("SmeltRecipe", job and job.recipe.id or nil)
+	player:SetAttribute("SmeltCount", job and job.count or nil)
+	player:SetAttribute("SmeltDone", job and job.done or nil)
+	player:SetAttribute("SmeltEndsAt", job and job.unitEndsAt or nil)
+	player:SetAttribute("SmeltSeconds", job and job.recipe.seconds or nil)
+end
+
+local function stopJob(player: Player, reason: string)
+	local job = jobs[player]
+	if job == nil then
+		return
+	end
+	jobs[player] = nil
+	if player.Parent == nil then
+		return
+	end
+	publishJob(player, nil)
+	local name = ItemCatalog.Get(job.recipe.output).name
+	if reason == "Done" then
+		InventoryService.Notify(player, ("Smelted %d %s."):format(job.done, name))
+	elseif reason ~= "Stopped" then
+		InventoryService.Notify(
+			player,
+			("Smelting stopped (%d/%d %s): %s."):format(job.done, job.count, name, STOP_TEXT[reason] or reason)
+		)
+	end
+end
+
+local function interruption(player: Player, job): string?
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local root = rootOf(player)
+	local station = job.station
+	return CraftingRules.Interruption({
+		atRisk = player.Parent ~= nil and WorldAdmissionService.IsAtRisk(player),
+		sameCharacter = character ~= nil and character == job.character,
+		alive = humanoid ~= nil and humanoid.Health > 0,
+		downed = DownedService.IsDowned(player),
+		stationStanding = station.Parent ~= nil,
+		distance = root and (station.Position - root.Position).Magnitude,
+	})
+end
+
+-- Checks one job and finishes its current unit when due.
+local function stepJob(player: Player, job, at: number)
+	local reason = interruption(player, job)
+	if reason then
+		stopJob(player, reason)
+		return
+	end
+	if not CraftingRules.UnitDue(job, at) then
+		return
+	end
+	local inventory = InventoryService.Get(player)
+	if inventory == nil then
+		stopJob(player, "NotInRun")
+		return
+	end
+	local output = makeOutput(player, job.recipe, QualityRoll.Stations.Anywhere, "smelt")
+	local ok, failure = commit(player, inventory, job.recipe, output)
+	if not ok then
+		stopJob(player, failure or "MissingIngredients")
+		return
+	end
+	if CraftingRules.Advance(job) then
+		stopJob(player, "Done")
+	else
+		publishJob(player, job)
+	end
+end
+
+local function step()
+	local at = now()
+	for player, job in table.clone(jobs) do
+		-- A job stopped earlier in this pass is not stepped again.
+		if jobs[player] == job then
+			stepJob(player, job, at)
+		end
+	end
+end
+
+-- Crafting --------------------------------------------------------------------
+
+local function craft(player: Player, requestId: any, recipeId: any, count: any)
+	if not Validation.IsId(requestId) then
+		return false, "BadRequest"
+	end
+	local recipe = Recipes.Get(recipeId)
+	if recipe == nil then
+		return false, "UnknownRecipe"
+	end
+	count = CraftingRules.BatchCount(recipe, count)
+	if count == nil then
+		return false, "BadQuantity"
+	end
+	if count == 0 then
+		-- Stopping keeps the bars already made; the unit in progress takes nothing.
+		stopJob(player, "Stopped")
+		return true, nil
+	end
+	if not WorldAdmissionService.IsAtRisk(player) then
+		return false, "NotInRun"
+	end
+	if DownedService.IsDowned(player) then
+		return false, "Downed"
+	end
+	local inventory = InventoryService.Get(player)
+	if inventory == nil then
+		return false, "NotInRun"
+	end
+	local stationTag = CraftingRules.StationFor(recipe)
+	local stationPart = stationTag and nearestStation(player, stationTag)
+	if stationTag and stationPart == nil then
+		return false, CraftingRules.Refusal(stationTag)
+	end
+	local timed = CraftingRules.IsTimed(recipe)
+	if timed and jobs[player] then
+		return false, "Busy"
+	end
+	-- One craft per second, faster with Crafting mastery (Q77); also stops spam.
+	-- Checked before the request ID is recorded, so a retry is not a "Duplicate".
+	local cooldown = CraftingService.CRAFT_SECONDS / (1 + ModifierService.Sum(player, "CraftSpeed"))
+	local at = os.clock()
+	if lastCraft[player] and at - lastCraft[player] < cooldown then
+		return false, "TooFast"
+	end
+	if not firstTime(player, requestId) then
+		return false, "Duplicate"
+	end
+
+	if timed then
+		-- Nothing is taken now: every unit pays for itself when it finishes.
+		local ok, reason = fits(inventory, CraftingRules.BatchInputs(recipe, count), {
+			catalogId = recipe.output,
+			quantity = recipe.quantity,
+		})
+		if not ok then
+			return false, reason
+		end
+		local job = CraftingRules.NewJob(recipe, count, now(), stationPart, player.Character)
+		jobs[player] = job
+		lastCraft[player] = at
+		publishJob(player, job)
+		return true, nil
+	end
+
+	local station = if ROLLING_STATIONS[recipe.station]
+		then QualityRoll.Stations.WorldWorkbench
+		else QualityRoll.Stations.Anywhere
+	local ok, reason = commit(player, inventory, recipe, makeOutput(player, recipe, station, "craft:" .. requestId))
+	if not ok then
+		return false, reason
+	end
+	lastCraft[player] = at
 	return true, nil
 end
 
@@ -206,9 +369,24 @@ function CraftingService.Start()
 	end
 	Remotes.Handle("Craft", craft)
 	Remotes.Handle("PlaceItem", place)
+	-- A destroyed or decayed furnace stops the jobs bound to it at once.
+	BuildingService.Removing:Connect(function(record)
+		for player, job in table.clone(jobs) do
+			if job.station == record.part then
+				stopJob(player, "StationGone")
+			end
+		end
+	end)
 	Players.PlayerRemoving:Connect(function(player)
+		jobs[player] = nil
 		seenRequests[player] = nil
 		lastCraft[player] = nil
+	end)
+	task.spawn(function()
+		while true do
+			task.wait(CraftingService.SMELT_TICK)
+			step()
+		end
 	end)
 end
 

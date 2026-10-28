@@ -38,7 +38,7 @@ test("ordinary materials auto-bank and unique gear goes to the lobby backpack", 
 	local receipt = ExtractionRules.Settle(profile, {
 		{ catalogId = "Stone", quantity = 30 },
 		sword("s1"),
-		{ catalogId = "Arrow", quantity = 20 },
+		{ catalogId = "FlintArrow", quantity = 20 },
 	}, "Fixed", "r1", 5)
 	expectEq(profile.vault.materials.Stone, 30, "stone banked")
 	expectEq(#profile.lobbyBackpack.slots, 2, "sword and arrows in the lobby backpack")
@@ -94,11 +94,11 @@ end)
 test("withdrawals move vault items into the lobby backpack; materials stay vaulted", function()
 	local profile = ProfileSchema.Default(0)
 	profile.vault.items = { sword("a") }
-	profile.vault.materials.Iron = 40
+	profile.vault.materials.IronBar = 40
 	expect(VaultRules.WithdrawItem(profile, 1), "withdraw sword")
 	expectEq(#profile.vault.items, 0, "vault emptied")
 	expectEq(VaultRules.WithdrawMaterial, nil, "materials have no way back out of the vault")
-	expectEq(profile.vault.materials.Iron, 40, "iron untouched")
+	expectEq(profile.vault.materials.IronBar, 40, "iron bars untouched")
 end)
 
 test("backpack materials bank into the vault at once; overflow is deleted", function()
@@ -108,7 +108,7 @@ test("backpack materials bank into the vault at once; overflow is deleted", func
 		{ catalogId = "Stone", quantity = 300 },
 		sword("a"),
 		{ catalogId = "AncientEmber", quantity = 2 },
-		{ catalogId = "Arrow", quantity = 20 },
+		{ catalogId = "FlintArrow", quantity = 20 },
 		{ catalogId = "Stone", quantity = 50 },
 	}
 	local deleted = VaultRules.BankMaterials(profile, 77)
@@ -117,7 +117,10 @@ test("backpack materials bank into the vault at once; overflow is deleted", func
 	expectEq(profile.vault.materials.AncientEmber, 2, "special materials bank too")
 	expectEq(#profile.lobbyBackpack.slots, 2, "only the sword and arrows stay")
 	for _, item in profile.lobbyBackpack.slots do
-		expect(item.catalogId == "StoneSword" or item.catalogId == "Arrow", "non-material kept: " .. item.catalogId)
+		expect(
+			item.catalogId == "StoneSword" or item.catalogId == "FlintArrow",
+			"non-material kept: " .. item.catalogId
+		)
 	end
 	expectEq(profile.vault.lastOverflow.at, 77, "the loss is recorded")
 	expectEq(profile.vault.lastOverflow.deleted.Stone, 150, "with its amount")

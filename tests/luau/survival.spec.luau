@@ -176,6 +176,20 @@ test("food restores hunger and heals its total over exactly 10 s", function()
 	end
 	expectNear(healed, 30, 1e-6, "cooked meat heals 30")
 	expectEq(#state.foodHeals, 0, "finished after 10 s")
+	-- Berries: a Redberry heals 10 over 10 s for +10% food; a Sweetberry only fills.
+	for catalogId, effect in { Redberry = { hunger = 0.10, heal = 10 }, Sweetberry = { hunger = 0.25, heal = 0 } } do
+		local eater = SurvivalRules.NewState()
+		eater.food = 0.5
+		SurvivalRules.Eat(eater, Consumables.Get(catalogId), 0)
+		expectNear(eater.food, 0.5 + effect.hunger, 1e-9, catalogId .. " hunger")
+		local total, t = 0, 0
+		for _ = 1, 100 do
+			total += SurvivalRules.StepFoodHeals(eater, t, 0.1)
+			t += 0.1
+		end
+		expectNear(total, effect.heal, 1e-6, catalogId .. " heal")
+	end
+	expectEq(Consumables.Get("Berries"), nil, "plain Berries are gone")
 end)
 
 test("a hit halves pending food healing and cancels it at 10 HP or less", function()
@@ -200,7 +214,8 @@ end)
 
 test("downed players lose pending food healing", function()
 	local state = SurvivalRules.NewState()
-	SurvivalRules.Eat(state, Consumables.Get("Berries"), 0)
+	SurvivalRules.Eat(state, Consumables.Get("Redberry"), 0)
+	expect(SurvivalRules.PendingFoodHealing(state) > 0, "a Redberry heals over time")
 	SurvivalRules.OnDowned(state)
 	expectEq(SurvivalRules.PendingFoodHealing(state), 0, "cleared")
 end)

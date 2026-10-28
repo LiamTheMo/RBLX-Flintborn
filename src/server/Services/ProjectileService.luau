@@ -1,6 +1,7 @@
 -- Server-simulated arrows (GDD §21.1, Q134): slow, visible, on a slight gravity arc.
 -- Each step raycasts the travelled segment, so hits are decided on the server from
--- server state. The arrow part replicates as the visual. World place only.
+-- server state. The arrow part replicates as the visual. Thrown Fire Bombs fly the
+-- same way with their own look and a heavier arc. World place only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -25,16 +26,31 @@ local function arrowFolder()
 end
 
 -- Launches an arrow. `ignore` is the shooter's character; `onHit(result)` is called
--- once with the RaycastResult when it hits something.
-function ProjectileService.Fire(origin: Vector3, velocity: Vector3, ignore: Instance, onHit: (RaycastResult) -> ())
+-- once with the RaycastResult when it hits something. `style` (optional) overrides
+-- the arrow's look and flight for other thrown things (the Fire Bomb): {name, size,
+-- color, material, ball, gravityScale, lifetime, stuckSeconds}.
+function ProjectileService.Fire(
+	origin: Vector3,
+	velocity: Vector3,
+	ignore: Instance,
+	onHit: (RaycastResult) -> (),
+	style: { [string]: any }?
+)
+	style = style or {}
 	local part = Instance.new("Part")
-	part.Name = "Arrow"
+	part.Name = style.name or "Arrow"
 	part.Anchored = true
 	part.CanCollide = false
 	part.CanQuery = false
 	part.CanTouch = false
-	part.Size = Vector3.new(0.2, 0.2, 2.5)
-	part.Color = Color3.fromRGB(120, 90, 60)
+	if style.ball then
+		part.Shape = Enum.PartType.Ball
+	end
+	part.Size = style.size or Vector3.new(0.2, 0.2, 2.5)
+	part.Color = style.color or Color3.fromRGB(120, 90, 60)
+	if style.material then
+		part.Material = style.material
+	end
 	part.CFrame = CFrame.lookAt(origin, origin + velocity)
 	part.Parent = arrowFolder()
 	local params = RaycastParams.new()
@@ -47,27 +63,30 @@ function ProjectileService.Fire(origin: Vector3, velocity: Vector3, ignore: Inst
 		params = params,
 		onHit = onHit,
 		age = 0,
+		gravityScale = style.gravityScale or WeaponCatalog.ARROW_GRAVITY_SCALE,
+		lifetime = style.lifetime or WeaponCatalog.ARROW_LIFETIME,
+		stuckSeconds = style.stuckSeconds or ProjectileService.STUCK_SECONDS,
 	})
 end
 
 local function step(dt: number)
-	local gravity = Vector3.new(0, -workspace.Gravity * WeaponCatalog.ARROW_GRAVITY_SCALE, 0)
 	for index = #arrows, 1, -1 do
 		local arrow = arrows[index]
+		local gravity = Vector3.new(0, -workspace.Gravity * arrow.gravityScale, 0)
 		arrow.age += dt
 		local displacement = arrow.velocity * dt + gravity * (0.5 * dt * dt)
 		local result = workspace:Raycast(arrow.position, displacement, arrow.params)
 		if result then
 			table.remove(arrows, index)
 			arrow.part.CFrame = CFrame.lookAt(result.Position, result.Position + arrow.velocity)
-			task.delay(ProjectileService.STUCK_SECONDS, function()
+			task.delay(arrow.stuckSeconds, function()
 				arrow.part:Destroy()
 			end)
 			local ok, err = pcall(arrow.onHit, result)
 			if not ok then
 				warn("[ProjectileService] Hit handler failed: " .. tostring(err))
 			end
-		elseif arrow.age >= WeaponCatalog.ARROW_LIFETIME then
+		elseif arrow.age >= arrow.lifetime then
 			table.remove(arrows, index)
 			arrow.part:Destroy()
 		else

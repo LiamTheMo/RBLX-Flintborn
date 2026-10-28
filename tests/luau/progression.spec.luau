@@ -77,8 +77,8 @@ end)
 test("rebirth resets only the general level and keeps everything else", function()
 	local profile = ProfileSchema.Default(0)
 	profile.progression.level = 50
-	profile.vault.materials.Iron = 500
-	profile.permanentItems.p1 = { catalogId = "BasicPickaxe" }
+	profile.vault.materials.IronBar = 500
+	profile.permanentItems.p1 = { catalogId = "StonePickaxe" }
 	ProgressionRules.GrantMastery(profile, "Crafting", 500)
 	profile.rebirth.ownedPerks.Scholar = 2
 	local ok, reason = ProgressionRules.Rebirth(profile)
@@ -92,7 +92,7 @@ test("rebirth resets only the general level and keeps everything else", function
 	)
 	expect(ProgressionRules.Rebirth(profile), "rebirth")
 	expectEq(profile.progression.level, 1, "level reset")
-	expectEq(profile.vault.materials.Iron, 500, "vault kept")
+	expectEq(profile.vault.materials.IronBar, 500, "vault kept")
 	expect(profile.permanentItems.p1 ~= nil, "Permanent items kept")
 	expectEq(profile.progression.masteryTracks.Crafting.level, 5, "masteries kept")
 	expectEq(profile.rebirth.ownedPerks.Scholar, 2, "perks kept")

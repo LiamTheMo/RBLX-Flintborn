@@ -1,10 +1,31 @@
 local GameConstants = require(game:GetService("ReplicatedStorage").Shared.GameConstants)
+local Tiers = require(game:GetService("ReplicatedStorage").Shared.Items.Tiers)
 
 test("full armor sets give the confirmed EHP at 100 base HP", function()
-	local expected = { Hide = 120, Wood = 150, Stone = 180, Iron = 200 }
+	expectEq(GameConstants.BASE_MAX_HEALTH, 100, "100 base HP")
+	-- The confirmed anchors (Q134): Hide ×1.2 and Iron ×2.0.
+	local expected = { Hide = 120, Iron = 200 }
 	for set, ehp in expected do
 		local factor = GameConstants.ARMOR_SET_FACTOR[set]
 		expectNear(GameConstants.BASE_MAX_HEALTH * factor, ehp, 1e-9, set .. " full-set EHP")
+		expectEq(Tiers.ArmorFactor(Tiers.Get(set)), factor, set .. " ladder uses the confirmed anchor")
+	end
+	-- Wood and Stone armor are removed (GDD §51).
+	expectEq(GameConstants.ARMOR_SET_FACTOR.Wood, nil, "no Wood armor")
+	expectEq(GameConstants.ARMOR_SET_FACTOR.Stone, nil, "no Stone armor")
+	expectEq(Tiers.ArmorFactor(Tiers.Get("Wood")), nil, "Wood makes no armor")
+	expectEq(Tiers.ArmorFactor(Tiers.Get("Stone")), nil, "Stone makes no armor")
+	-- Bone 1.5 and Copper 1.8 sit between; above Iron each metal compounds 25%.
+	local ladder = {
+		Bone = 150,
+		Copper = 180,
+		Silver = 250,
+		Cobalt = 312.5,
+		Mithril = 390.625,
+		Adamantine = 488.28125,
+	}
+	for set, ehp in ladder do
+		expectNear(GameConstants.BASE_MAX_HEALTH * Tiers.ArmorFactor(Tiers.Get(set)), ehp, 1e-9, set .. " full-set EHP")
 	end
 end)
 

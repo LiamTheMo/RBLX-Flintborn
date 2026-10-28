@@ -222,7 +222,7 @@ test("only flagged materials trade, and only from the vault", function()
 	expect(not TradeRules.IsTradeableSlot({ catalogId = EMBER, quantity = 2 }), "no backpack material slot")
 	expect(TradeRules.IsTradeableSlot(sword("s1")), "gear still trades from the backpack")
 	expectEq(TradeRules.MaterialOf(TradeRules.MaterialKey(EMBER)), EMBER, "material keys round-trip")
-	expectEq(TradeRules.MaterialOf("stack:Arrow"), nil, "backpack keys are not material keys")
+	expectEq(TradeRules.MaterialOf("stack:FlintArrow"), nil, "backpack keys are not material keys")
 end)
 
 test("a vault material offer is checked against the vault", function()

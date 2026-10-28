@@ -9,9 +9,9 @@ local NOW = 100000
 local function carried()
 	return {
 		{ instanceId = "s1", catalogId = "IronSword", ownerId = 1, qualityRoll = 0.02 },
-		{ instanceId = "p1", catalogId = "BasicPickaxe", ownerId = 1, permanent = true, ownershipVersion = 1 },
+		{ instanceId = "p1", catalogId = "StonePickaxe", ownerId = 1, permanent = true, ownershipVersion = 1 },
 		{ instanceId = "d1", catalogId = "StoneDagger", ownerId = 1 },
-		{ catalogId = "Iron", quantity = 30 },
+		{ catalogId = "IronOre", quantity = 30 },
 	}
 end
 
