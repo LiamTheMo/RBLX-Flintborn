@@ -1071,13 +1071,13 @@
   "pm_tile_quests": {
     "file": "pm_tile_quests.png",
     "w": 146,
-    "h": 143,
+    "h": 145,
     "slice": null
   },
   "pm_tile_shop": {
     "file": "pm_tile_shop.png",
     "w": 146,
-    "h": 143,
+    "h": 145,
     "slice": null
   },
   "pm_tile_trade": {
@@ -1089,7 +1089,7 @@
   "pm_tile_vault": {
     "file": "pm_tile_vault.png",
     "w": 146,
-    "h": 144,
+    "h": 145,
     "slice": null
   }
 }

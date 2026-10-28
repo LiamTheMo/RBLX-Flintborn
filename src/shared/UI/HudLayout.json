@@ -38,11 +38,13 @@
     "selected": "#07FBFF",
     "fallbackFill": "#1E1E1E",
     "fallbackStroke": "#8A5A2E",
-    "ink": "#3A1F0F",
+    "ink": "#2A0B02",
     "inkSoft": "#5A3A24",
     "paper": "#F6DDB8",
     "paperEdge": "#6B4528",
     "line": "#C4A27A",
+    "rule": "#DEC09E",
+    "photoEdge": "#A88E72",
     "dot": "#C9A681",
     "thumb": "#996E4B",
     "scrollTrack": "#D8B890",
@@ -182,7 +184,7 @@
       "size": [529, 135],
       "sprite": "pm_lobby_profile",
       "avatar": { "rect": [19, 17, 106, 101] },
-      "name": { "rect": [158, 26, 290, 40], "font": "serif", "textSize": 30, "color": "ink" },
+      "name": { "rect": [158, 28, 290, 40], "font": "serif", "textSize": 32, "color": "ink" },
       "level": { "rect": [160, 74, 76, 26], "font": "serif", "textSize": 23, "color": "ink" },
       "xp": { "rect": [239, 80, 232, 14], "fill": "pm_fill_xp", "fillColor": "xp" }
     },
@@ -204,7 +206,8 @@
       "anchor": [1, 0],
       "pos": [1, -34, 0, 98],
       "size": [69, 66],
-      "sprite": "pm_lobby_gear"
+      "sprite": "pm_lobby_gear",
+      "touchPad": 10
     },
     "nav": {
       "anchor": [0, 0],
@@ -213,7 +216,6 @@
       "pitch": [147, 147],
       "columns": 2,
       "bottomMargin": 20,
-      "tag": { "font": "serif", "textSize": 18, "color": "ink", "height": 30 },
       "label": { "rect": [8, 104, 126, 28], "font": "serif", "textSize": 17, "color": "ink" },
       "buttons": [
         { "id": "Inventory", "label": "Inventory", "sprite": "pm_tile_inventory" },
@@ -229,23 +231,24 @@
       "pos": [1, -28, 0, 267],
       "size": [433, 381],
       "sprite": "pm_lobby_party",
-      "title": { "rect": [54, 40, 300, 40], "font": "serif", "textSize": 34, "color": "ink" },
+      "title": { "rect": [54, 40, 140, 40], "font": "serif", "textSize": 34, "color": "ink", "text": "PARTY" },
+      "count": { "rect": [197, 40, 140, 40], "font": "serif", "textSize": 34, "color": "ink" },
       "divider": { "rect": [51, 86, 334, 2] },
-      "leave": { "rect": [372, 44, 34, 33], "sprite": "pm_button_x" },
-      "list": { "rect": [50, 92, 345, 240], "scrollBar": 10, "track": { "rect": [384, 170, 11, 161] } },
+      "leave": { "rect": [368, 42, 36, 35], "sprite": "pm_button_x", "touchPad": 12 },
+      "list": { "rect": [50, 92, 345, 236], "scrollBar": 10 },
       "member": {
-        "height": 75,
+        "height": 76,
         "headshot": { "rect": [0, 7, 62, 59] },
-        "name": { "rect": [82, 22, 145, 30], "font": "serif", "textSize": 20, "color": "ink" },
-        "crown": { "rect": [231, 24, 30, 23], "sprite": "pm_icon_crown" },
-        "invite": { "rect": [276, 9, 68, 52], "sprite": "pm_button_add_friend" },
-        "rule": { "rect": [1, 73, 319, 2] }
+        "name": { "rect": [82, 22, 134, 30], "font": "serif", "textSize": 20, "color": "ink" },
+        "crown": { "rect": [222, 24, 30, 23], "sprite": "pm_icon_crown" },
+        "invite": { "rect": [262, 9, 68, 52], "sprite": "pm_button_add_friend" },
+        "rule": { "rect": [1, 74, 319, 2] }
       },
       "invite": {
         "height": 58,
-        "text": { "rect": [8, 14, 220, 30], "font": "serif", "textSize": 18, "color": "inkSoft" },
-        "accept": { "rect": [244, 11, 37, 36], "sprite": "pm_button_check" },
-        "decline": { "rect": [286, 11, 37, 36], "sprite": "pm_button_x" },
+        "text": { "rect": [8, 14, 186, 30], "font": "serif", "textSize": 18, "color": "inkSoft" },
+        "accept": { "rect": [204, 5, 48, 47], "sprite": "pm_button_check" },
+        "decline": { "rect": [262, 5, 48, 47], "sprite": "pm_button_x" },
         "rule": { "rect": [1, 56, 319, 2] }
       },
       "empty": {
@@ -269,13 +272,13 @@
       "pos": [0.5, 314, 1, -71],
       "size": [251, 71],
       "sprite": "pm_lobby_server",
-      "label": { "rect": [74, 16, 132, 34], "font": "serif", "textSize": 19, "color": "ink", "text": "Choose server" }
+      "label": { "rect": [74, 16, 134, 34], "font": "serif", "textSize": 17, "color": "ink", "text": "Choose server" }
     },
     "status": {
-      "anchor": [0.5, 1],
-      "pos": [0.5, 0, 1, -205],
-      "size": [560, 34],
-      "text": { "font": "serif", "textSize": 18, "color": "ink" }
+      "anchor": [0.5, 0],
+      "pos": [0.5, 0, 0, 104],
+      "size": [480, 48],
+      "text": { "font": "serif", "textSize": 17, "color": "ink" }
     },
     "popup": {
       "width": 460,
@@ -285,7 +288,7 @@
       "title": { "font": "serif", "textSize": 22, "color": "ink" },
       "line": { "font": "serif", "textSize": 16, "color": "inkSoft" },
       "row": { "font": "serif", "textSize": 17, "color": "ink" },
-      "button": { "font": "serif", "textSize": 18, "height": 48, "sliceScale": 0.42 },
+      "button": { "font": "serif", "textSize": 18, "height": 56, "sliceScale": 0.45 },
       "close": "pm_button_x"
     },
     "preview": {

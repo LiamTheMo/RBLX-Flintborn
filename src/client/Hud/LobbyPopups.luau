@@ -11,6 +11,8 @@
 --   buttons = { { label, primary?, onPress } },           -- footer buttons
 -- }
 
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextService = game:GetService("TextService")
 
@@ -23,10 +25,11 @@ local LobbyPopups = {}
 LobbyPopups.__index = LobbyPopups
 
 local TITLE_HEIGHT = 34
-local ROW_HEIGHT = 44
+local ROW_HEIGHT = 52
 local MAX_LIST_HEIGHT = 230
-local CLOSE_SIZE = 34
+local CLOSE_SIZE = 44
 local BASE_Z = 10
+local CLOSE_ACTION = "FlintbornLobbyPopupClose"
 
 -- The height a wrapped line of popup text needs at `width`. Measured with the
 -- family's classic (regular) font without yielding; the bold face runs wider, so
@@ -77,10 +80,21 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = z + 2,
 	}, holder)
+	local restColor = if face:IsA("Frame") then face.BackgroundColor3 else nil
 	local function show(state: string?)
-		local id = UiAssets.image(if state then base .. "_" .. state else base) or UiAssets.image(base)
+		local name = if state then base .. "_" .. state else base
+		local id = UiAssets.image(name)
 		if id and face:IsA("ImageLabel") then
+			-- The state art is a few pixels off the base size: its own slice centre.
 			face.Image = id
+			face.SliceCenter = UiAssets.sliceCenter(name) or face.SliceCenter
+		elseif restColor then
+			-- Paper stand-in: lighten on hover, darken on press.
+			local frame = face :: Frame
+			frame.BackgroundColor3 = if state == "hover"
+				then restColor:Lerp(Color3.new(1, 1, 1), 0.15)
+				elseif state == "pressed" then restColor:Lerp(Color3.new(0, 0, 0), 0.15)
+				else restColor
 		end
 	end
 	hit.MouseEnter:Connect(function()
@@ -102,7 +116,7 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 		show("hover")
 	end)
 	hit.Activated:Connect(onPress)
-	return holder
+	return holder, hit
 end
 
 function LobbyPopups.new(parent: Instance, layout)
@@ -118,8 +132,15 @@ end
 
 function LobbyPopups:Hide()
 	if self.card then
+		ContextActionService:UnbindAction(CLOSE_ACTION)
+		local selected = GuiService.SelectedObject
+		if selected and selected:IsDescendantOf(self.card) then
+			-- Gamepad focus returns to where it was before the card opened.
+			GuiService.SelectedObject = if self.returnTo and self.returnTo.Parent then self.returnTo else nil
+		end
 		self.card:Destroy()
 		self.card = nil
+		self.returnTo = nil
 		self.Closed:Fire()
 	end
 end
@@ -170,6 +191,11 @@ function LobbyPopups:Show(spec)
 		TextScaled = true,
 		ZIndex = BASE_Z + 3,
 	}, card)
+	Widgets.Make(
+		"UITextSizeConstraint",
+		{ MaxTextSize = cfg.title.textSize, MinTextSize = 14 },
+		card:FindFirstChild("Title")
+	)
 	local close = Widgets.Make("Frame", {
 		Name = "Close",
 		BackgroundTransparency = 1,
@@ -179,16 +205,16 @@ function LobbyPopups:Show(spec)
 		ZIndex = BASE_Z + 3,
 	}, card)
 	Widgets.Sprite(cfg.close, { Size = UDim2.fromScale(1, 1), ZIndex = BASE_Z + 3 }, close)
-	Widgets.Make("TextButton", {
+	local closeButton = Widgets.Make("TextButton", {
 		Name = "CloseButton",
 		Text = "",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = BASE_Z + 4,
-	}, close).Activated
-		:Connect(function()
-			self:Hide()
-		end)
+	}, close)
+	closeButton.Activated:Connect(function()
+		self:Hide()
+	end)
 
 	local list = Widgets.Make("ScrollingFrame", {
 		Name = "List",
@@ -263,12 +289,28 @@ function LobbyPopups:Show(spec)
 	local count = #buttons
 	local gap = 12
 	local buttonWidth = (inner - gap * (count - 1)) / math.max(1, count)
+	local first = nil
 	for index, entry in buttons do
-		button(cfg.button, card, entry.label, entry.primary == true, {
+		local _, press = button(cfg.button, card, entry.label, entry.primary == true, {
 			Position = UDim2.new(0, pad + (index - 1) * (buttonWidth + gap), 1, -pad - cfg.button.height),
 			Size = UDim2.fromOffset(buttonWidth, cfg.button.height),
 			ZIndex = BASE_Z + 3,
 		}, entry.onPress)
+		first = first or press
+	end
+
+	-- Gamepad: B closes the card, and a player already navigating with the
+	-- gamepad lands on its first button (or the close button).
+	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			self:Hide()
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.ButtonB)
+	local selected = GuiService.SelectedObject
+	if selected ~= nil then
+		self.returnTo = selected
+		GuiService.SelectedObject = first or closeButton
 	end
 	return card
 end

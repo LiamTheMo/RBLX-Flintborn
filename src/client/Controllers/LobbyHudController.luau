@@ -9,6 +9,7 @@
 -- reads the deploy preview and runs party actions; the buttons open the Vault,
 -- Market (Quests and Shop tabs), Forge, Trade, Progress and Settings panels.
 
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SocialService = game:GetService("SocialService")
@@ -32,7 +33,7 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local LobbyHudController = {}
 
--- How long a status message replaces "Choose server" before it returns.
+-- How long a status message stays in the status strip.
 LobbyHudController.STATUS_SECONDS = 6
 
 local player = Players.LocalPlayer
@@ -110,6 +111,18 @@ local NAV_ACTIONS = {
 	end,
 }
 
+-- How far down the Roblox top bar (menu and chat buttons) reaches into this
+-- ScreenGui, in screen pixels.
+local function topInset(): number
+	local ok, inset = pcall(function()
+		return GuiService.TopbarInset.Max.Y
+	end)
+	if not ok or type(inset) ~= "number" or inset <= 0 then
+		inset = GuiService:GetGuiInset().Y
+	end
+	return math.max(0, inset - gui.AbsolutePosition.Y)
+end
+
 local function applyScale()
 	local size = gui.AbsoluteSize
 	local scale = HudModel.HudScale(
@@ -123,7 +136,7 @@ local function applyScale()
 	)
 	uiScale.Scale = scale
 	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
-	hud:Fit(size.X / scale, size.Y / scale)
+	hud:Fit(size.X / scale, size.Y / scale, topInset() / scale)
 end
 
 local refreshParty
@@ -163,13 +176,13 @@ local function refreshCurrency()
 	hud:SetCurrency(player:GetAttribute("Coins"), player:GetAttribute("Gems"))
 end
 
--- The server line between messages: "Choose server", or the game-update notice
+-- The status strip between messages: empty, or the game-update notice
 -- while it applies.
 local function idleLine(): string?
 	return if player:GetAttribute("MaintenanceNotice") then LobbyController.MAINTENANCE_TEXT else nil
 end
 
--- Shows a status message on the server line for a few seconds.
+-- Shows a status message in the status strip for a few seconds.
 local function showStatus(text: string)
 	statusToken += 1
 	local token = statusToken
@@ -296,9 +309,12 @@ local function build()
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = 1
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses the master's full-screen coordinates; it keeps clear of the
-	-- top bar itself.
+	-- The layout uses the master's full-screen coordinates and keeps clear of the
+	-- top bar itself (LobbyHud:Fit); device cut-outs (notches) stay excluded.
 	gui.IgnoreGuiInset = true
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+	end)
 	root = Instance.new("Frame")
 	root.Name = "Root"
 	root.BackgroundTransparency = 1
@@ -324,6 +340,9 @@ local function start()
 	build()
 	applyScale()
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(applyScale)
+	pcall(function()
+		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(applyScale)
+	end)
 	player:GetAttributeChangedSignal("UiScale"):Connect(function()
 		task.defer(applyScale)
 	end)

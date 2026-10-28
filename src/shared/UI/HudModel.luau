@@ -73,9 +73,10 @@ function HudModel.Thousands(value: number?): string
 	return (formatted:gsub("^,", ""))
 end
 
--- The lobby party header: "PARTY 1/8" (alone counts as a party of one).
-function HudModel.PartyTitle(members: number?, maxSize: number): string
-	return ("PARTY  %d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
+-- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
+-- of one).
+function HudModel.PartyCount(members: number?, maxSize: number): string
+	return ("%d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
 end
 
 -- Small text on a full XP bar at the level cap.

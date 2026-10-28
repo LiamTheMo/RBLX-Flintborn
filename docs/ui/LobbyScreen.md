@@ -17,15 +17,17 @@ above the Enter button as parchment cards.
 
 ## Tokens
 
-All in `src/shared/UI/HudLayout.json` → `lobby.colors` / `fontFaces`.
+All in `src/shared/UI/HudLayout.json`: colours in the top-level `colors`, the serif face in `fontFaces.serif`.
 
 | Token | Value | Used by |
 |---|---|---|
-| ink | #3A1F0F | Name, title, values, member names |
+| ink | #2A0B02 | Name, title, values, member names |
 | inkSoft | #5A3A24 | Secondary text (invites, popup lines) |
 | paper | #F6DDB8 | Fallback plates, status strip, popup rows |
 | paperEdge | #6B4528 | Fallback strokes |
-| line | #C4A27A | Party header divider and row rules |
+| line | #C4A27A | Party header divider |
+| rule | #DEC09E | Party row rules |
+| photoEdge | #A88E72 | Party headshot edge |
 | dot | #C9A681 | Empty party slot markers |
 | thumb / track | #996E4B / #D8B890 | Party scrollbar |
 | photo | #C5B3A1 | Portrait backdrop behind headshots |
@@ -43,24 +45,26 @@ component scan, scanlines and ink boxes; see Measurements log).
 |---|---|---|---|---|---|
 | Profile | 48,85,529,135 | top-left | `pm_lobby_profile` | — | image |
 | Profile.Headshot | 67,102,106,101 | in profile | photo #C5B3A1 under the frame's window | live headshot | native |
-| Profile.Name | 206,111,290,40 | in profile | Serif 32, ink | DisplayName | native |
-| Profile.Level | 208,159,74,26 | in profile | Serif 24, ink | "LV. 12" | native |
+| Profile.Name | 206,113,290,40 | in profile | Serif 32 (shrinks to 16 for long names), ink | DisplayName | native |
+| Profile.Level | 208,159,76,26 | in profile | Serif 23 (shrinks to fit), ink | "LV. 12" | native |
 | Profile.XpFill | 287,165,232,14 | in profile | `pm_fill_xp` 9-slice, width = fraction | XP | image |
 | Coins | 1253,99,162,66 | top-right | `pm_lobby_coins` | — | image |
-| Coins.Value | 1321,113,88,38 | in pill | Serif 26, ink | "2,450" | native |
+| Coins.Value | 1321,113,88,38 | in pill | Serif 24 (shrinks to 14), ink | "2,450" | native |
 | Gems | 1425,99,132,66 | top-right | `pm_lobby_gems` | — | image |
-| Gems.Value | 1489,113,64,38 | in pill | Serif 26, ink | "125" | native |
-| Settings | 1569,98,69,66 | top-right | `pm_lobby_gear` | — | image |
+| Gems.Value | 1489,113,64,38 | in pill | Serif 24 (shrinks to 14), ink | "125" | native |
+| Settings | 1569,98,69,66 | top-right | `pm_lobby_gear`; touch area +10 px each side | — | image |
 | Nav tiles | 35,370 and 182,370 / 35,517 and 182,517 / 35,664 and 182,664; 142×141, pitch 147 | left | `pm_tile_*` | Inventory, Vault, Quests, Shop, Forge, Trade | image |
 | Party | 1211,267,433,381 | top-right | `pm_lobby_party` | — | image |
-| Party.Title | 1265,307,300,40 | in panel | Serif 34, ink | "PARTY  1/10" | native |
+| Party.Title / Party.Count | 1265,307,140,40 / 1408,307,140,40 | in panel | Serif 34, ink | "PARTY", "1/10" | native |
+| Party.Leave | 1579,309,36,35 | in panel, while in a party | `pm_button_x`; touch area +12 px | — | image |
 | Party.Divider | 1262,353,334,2 | in panel | line | — | native |
-| Party.List | 1261,359,345,240 | in panel | scrolling; bar 10 px thumb/track | rows | native |
-| Member row | h 75 | list | headshot 62×59 at 0,7; name Serif 24 at 82; crown 30×23 at 231,24; add-friend 68×52 at 276,9 (own row, leader, room left); rule at y 74 | members | native + images |
+| Party.List | 1261,359,345,236 | in panel | scrolling; bar 10 px thumb/track | rows | native |
+| Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 222,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
+| Invite row | h 58 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 204 / 262 | incoming invites | native + images |
 | Empty slot row | h 50 | list | dot 22 px at 3,14; rule at y 48 | free slots up to the cap | native |
 | Enter | 525,741,622,180 | bottom-centre | `pm_lobby_enter` (lettering painted) | "ENTER / SHATTERED CRATER" | image |
-| Server | 1150,799,251,71 | right of Enter | `pm_lobby_server` (icon + arrow painted) | "Choose server" Serif 19 at 1224,815,132,34 | image + native |
-| Status strip | centred, bottom 736, 560×34 | above Enter | paper fill, paperEdge stroke, Serif 18 ink | status / maintenance text | native |
+| Server | 1150,799,251,71 | right of Enter | `pm_lobby_server` (icon + arrow painted) | "Choose server" Serif 17 (shrinks) at 1224,815,134,34 | image + native |
+| Status strip | centred, top 104, 480×48 | top centre, between profile and Coins | paper fill, paperEdge stroke, Serif 17 ink, up to two lines | status / maintenance text | native |
 
 ## Measurements log
 
@@ -83,9 +87,9 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Profile / Coins / Settings / Server | art | UIScale 1.04 | 0.97 | — | as hover | default |
 | Enter | art | UIScale 1.04 | 0.97 | dark veil over the leather, inactive | as hover | default |
 | Add friend | art | 1.04 | 0.97 | hidden when not leader / party full | as hover | ref image 2 |
-| Popup buttons | `pm_button_leather` / `pm_button_parchment` | `_hover` art | `_pressed` art | `_disabled` art | as hover | ref image 3 |
+| Popup buttons (56 px tall) | `pm_button_leather` / `pm_button_parchment` | `_hover` art (stand-in: lighter) | `_pressed` art (stand-in: darker) | — (`_disabled` art is sliced for later screens) | as hover; the first button is selected when a gamepad opens the card, B closes it | ref image 3 |
 
-Reduced motion (the game's ReducedMotion attribute) turns the scale tweens off.
+Reduced motion (the game's ReducedMotion attribute) turns the scale tweens off. On touch a lifted finger returns a button to rest.
 
 ## Motion and effects
 
@@ -133,8 +137,11 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 ## Architecture
 
 - Scaling: design-resolution offsets with the root UIScale from
-  `HudModel.HudScale` (existing). The lobby ScreenGui ignores the GUI inset so the
-  master's full-screen coordinates apply (the master leaves the top bar clear).
+  `HudModel.HudScale` (existing). The lobby ScreenGui ignores the top-bar inset so
+  the master's full-screen coordinates apply, keeps device cut-outs excluded
+  (`ScreenInsets = DeviceSafeInsets`), and `LobbyHud:Fit` moves every top widget
+  down when the Roblox top bar would reach the profile (phones, where the screen
+  is drawn at half size).
 - Regions: profile and nav top-left; Coins, Gems, Settings and Party top-right;
   Enter and the server dropdown bottom-centre. `LobbyHud:Fit` shrinks the nav grid
   and the party panel on short screens so they never meet the Enter group.
@@ -151,10 +158,19 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 2. No hover/selected look is drawn for tiles. Default: the existing scale
    feedback plus a name tag, so each tile is named in words too (GDD §11).
 3. Status messages ("Party invite sent…") had no place in the master. Default: a
-   parchment strip above Enter; the server dropdown always reads "Choose server".
+   parchment strip at the top centre (clear of the popups above Enter); the server
+   dropdown always reads "Choose server".
 
 ## Deviations from reference
 
 - Font: Merriweather Bold stands in for the sheets' slab serif (closest Roblox
   family); letter widths differ slightly.
 - Headshots are live Roblox thumbnails, not the painted portrait.
+- The party scrollbar runs the whole list height (the master draws it below the
+  leader row), so the add-friend button sits 14 px further left than the master
+  to stay clear of it.
+- Merriweather's numerals: a local copy of the font renders old-style figures;
+  whether Roblox's Merriweather does is a manual Studio check.
+- Small party and popup buttons get touch areas larger than their art (Leave,
+  Settings) or larger art (invite Accept/Decline 48 px, popup close 44 px) so
+  they stay tappable when phones draw the screen at half size.
