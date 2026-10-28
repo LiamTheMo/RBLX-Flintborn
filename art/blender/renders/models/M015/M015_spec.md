@@ -829,3 +829,7 @@ and the keys `r04_ember_core`, `r04_lava_crack`, `r04_meteor_rock`, `r04_impact_
 - Back-left piece: a mirrored copy of C, which keeps the rear view's second crack.
 - Harvest sockets: none for now, consistent with m009 and m011–m013. Gameplay sockets can be added to every node later in one pass.
 - Names: as proposed (`EmberMeteorDeposit`, `EmberMeteorSlab`, `EmberMeteorCap`, `EmberMeteorChunk`, `EmberCore`, `EmberMeteorBaseRock`).
+
+## Correction (main session, 2026-10-28): side-view direction
+
+The kit's side camera (`VIEWS["side"]` = azimuth 90) sits at +X and looks along −X with Z up, so screen right is +Y: the model's BACK (fronts face −Y). Wherever this spec says the side view's right is the front, read it mirrored. Stage 1 should confirm this with a probe render before using side-view numbers. The 3D layout is unaffected.
