@@ -208,7 +208,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 009 | Iron Meteor_ Flintborn model study | World & resources | 🔨 | 2278 (8 shells); parts 58 / 40 / 44 | PASS 6/10 (round 1) | user review: cracks not apparent, no depth; rework queued |
 | 010 | Flintborn Gold model study | World & resources | ✅ | 710; parts 112 / 24×3 / 36 | PASS 6/10 (round 1) | minors: no visible recessed seats; host a touch pink |
 | 011 | Amethyst Flintborn model study | World & resources | ✅ | 1334; parts 386 / 594 / 36 | remade through stage agents; verifier R3 6.5/10, final fixes applied (2-round cap) | top view shows dome (sheet conflict, side view wins); trough has no end horns |
-| 012 | Amber Flintborn model study | World & resources | 🔨 | 820; parts 76 / 130 / 62 / 66 / 24 | PASS 6/10 (round 1) | user: colour/texture completely off, wood terribly made; full remake queued |
+| 012 | Amber Flintborn model study | World & resources | ✅ | 3364; parts 882 / 626 / 892 / 602 / 378 | remade via stage agents; PASS 7/10 (round 2) | minors: rear uprights post-like; rear amber share low; top nodule forward |
 | 013 | Sulfur Flintborn exploded model study | World & resources | ⬜ | | | |
 | 014 | Starstone Low-Poly Construction Study | World & resources | ⬜ | | | |
 | 015 | Ember Meteor model study | World & resources | ⬜ | | | |
@@ -392,3 +392,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: PR #78 (011) merged into v0.18. 012 Amber passed (6/10).
 - 2026-10-28: user review: 011 Amethyst "looks terrible" (full remake), 012 Amber colour/texture and wood off (full remake), 009 Iron Meteor cracks lack depth (rework). Colours must be sampled from the master, calibrated and blended into neighbours. From now on each model goes through STAGES.md stage agents on Opus 5.5 high.
 - 2026-10-28: 011 Amethyst remade through the STAGES.md stage agents (Opus, high): a hollowed-out stone geode with calibrated, blended colour, a stone cave, a crystal_glow cave light and 4 ore_glint sockets. Verifier rounds 6 / 6.5 / 6.5; the last round's fixes applied and committed under the new 2-round cap. Studio gained a rear fill light (build_kit FILL_ENERGY 2.5); renders now restore FB_Ground and hide it in the viewport.
+- 2026-10-28: PR #79 (011) merged into v0.18. 012 Amber remade through the stage agents (study, model, cleanup+UV, colour, lighting+VFX): chamfered split-timber wood, faceted amber with glowing seams and inclusions, an amber crystal_glow light and 3 glints. Verifier R1 5/10 FAIL, R2 PASS 7/10. Studies written ahead for 009 (rework), 013, 014, 015 (016 in progress).
