@@ -1,4 +1,4 @@
--- Bottom-centre group: the "LV. n" badge with a long XP bar, and the 9-slot
+-- Bottom-centre group: the "LV. n" badge with a long XP bar, and the 6-slot
 -- hotbar. Each slot shows its item's name (in its rarity colour) and stack count;
 -- tapping a slot fires SlotPressed, which HudController turns into the same use
 -- as its key. At the level cap the badge reads MAX over a full bar with a short

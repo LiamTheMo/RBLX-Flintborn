@@ -159,7 +159,7 @@
     "xp": { "rect": [73, 8, 804, 22], "frame": "frame_bar_hollow", "track": "fill_track", "inset": [5, 3.5, 5, 3.5], "fillColor": "xp", "frameOutset": [2, 2, 2, 2] },
     "maxHint": { "font": "bold", "textSize": 11, "color": "text" },
     "popups": { "rect": [73, -122, 420, 118] },
-    "hotbar": { "x": 3.5, "y": 47, "slot": [88, 88], "pitch": 97.5, "count": 9, "frame": "frame_slot", "sliceScale": 0.42, "frameOutset": [0, 0, 0, 0] },
+    "hotbar": { "x": 150.75, "y": 47, "slot": [88, 88], "pitch": 97.5, "count": 6, "frame": "frame_slot", "sliceScale": 0.42, "frameOutset": [0, 0, 0, 0] },
     "selected": { "sprite": "frame_slot_selected", "sliceScale": 0.42, "frameOutset": [0, 0, 0, 0] },
     "slotNumber": { "rect": [12, 9, 22, 22], "font": "bold", "textSize": 16, "color": "text" }
   },
