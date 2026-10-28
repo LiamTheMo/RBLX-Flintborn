@@ -241,7 +241,10 @@ def push_pull(rgb, known):
 _grains = {}
 # Clean texture patches: plain paper (materials sheet) and blank leather (the
 # buttons sheet's leather plate).
-GRAIN_SOURCES = {"paper": ("06", (62, 60, 362, 236)), "leather": ("03", (70, 92, 370, 170))}
+GRAIN_SOURCES = {"paper": ("06", (62, 60, 362, 236)), "leather": ("03", (70, 92, 370, 170)),
+                 # Leather well inside the plate, clear of its rivets and stitching
+                 # (the screens after the lobby use this one).
+                 "hide": ("03", (100, 106, 330, 156))}
 
 
 def grain(kind="paper"):
@@ -625,7 +628,7 @@ def build_settings():
     sel = plate(g, (84, 190, 320, 104))
     # The leather face between its stitch lines is repainted whole (label and
     # icon), so no ghost of either stays.
-    sel = erase(sel, box(sel.shape, (22, 24, 264, 82)), amount=1.0, feather=3, texture="leather")
+    sel = erase(sel, box(sel.shape, (22, 24, 264, 82)), amount=1.0, feather=3, texture="hide")
     s["pm_tab_leather"] = (sel, [40, 30, 52, 30])
     tab = plate(g, (86, 294, 316, 100))
     tab = erase_ink(tab, (26, 10, 262, 92), dark=True)
@@ -639,10 +642,10 @@ def build_settings():
     s["pm_glyph_diamond"] = (silhouette(g, (448, 222, 26, 28)), None)
     # Window shell: the tab column and the whole content panel repainted as paper.
     win = erase(g, box(g.shape, (84, 190, 404, 702)), amount=0.8, feather=4)
-    # RESET and APPLY are drawn back over their own place, so their pixels stay
-    # (repainting them would cut a hard edge into the leather corner beside APPLY).
-    content = box(g.shape, (424, 197, 1584, 724)) & ~box(g.shape, (1074, 630, 1292, 712)) \
-        & ~box(g.shape, (1300, 620, 1590, 720))
+    # RESET and APPLY are repainted too (their own sprites draw over the spot and
+    # dim cleanly); only the strip where APPLY meets the leather corner keeps its
+    # pixels, under APPLY's own right end, so no hard edge cuts into the corner.
+    content = box(g.shape, (424, 197, 1584, 724)) & ~box(g.shape, (1574, 618, 1592, 728))
     win = erase(win, content, amount=0.8, feather=4)
     s["pm_window_settings"] = (cut_clean(win, (23, 60, 1626, 702)), None)
     # Controls from the component strip.
@@ -679,7 +682,7 @@ def build_journal():
     s["pm_window_journal"] = (cut_clean(win, (22, 20, 1628, 768)), None)
     # Category tabs: selected leather, normal paper, labels erased.
     tab = cut_clean(g, (63, 144, 122, 54))
-    s["pm_jtab_leather"] = (erase_ink(tab, (14, 8, 112, 50), dark=False, texture="leather"), [20, 16, 20, 8])
+    s["pm_jtab_leather"] = (erase_ink(tab, (14, 8, 112, 50), dark=False, texture="hide"), [20, 16, 20, 8])
     tab = plate(g, (189, 146, 125, 52))
     s["pm_jtab_paper"] = (erase_ink(tab, (16, 8, 110, 50), dark=True), [20, 16, 20, 8])
     # Quest rows (scroll icon and chevron kept; name and status dot erased).
@@ -692,21 +695,25 @@ def build_journal():
     s["pm_quest_row"] = (erase(row, box(row.shape, (290, 24, 326, 60)), amount=1.0, feather=2), [40, 30, 40, 30])
     # Leather strip buttons with their labels erased (CLAIM, the active count).
     claim = plate(g, (506, 682, 388, 78))
-    s["pm_button_claim"] = (erase_ink(claim, (90, 12, 300, 64), dark=False, texture="leather"), [70, 26, 70, 26])
+    s["pm_button_claim"] = (erase_ink(claim, (90, 12, 300, 64), dark=False, texture="hide"), [70, 26, 70, 26])
     count = plate(g, (76, 675, 354, 76))
-    s["pm_button_strip"] = (erase_ink(count, (70, 12, 290, 62), dark=False, texture="leather"), [64, 26, 64, 26])
+    s["pm_button_strip"] = (erase_ink(count, (70, 12, 290, 62), dark=False, texture="hide"), [64, 26, 64, 26])
     # Card pieces.
     # The mountain mark in the middle of the card's dividers (the lines are drawn
     # natively, so the mark never stretches).
     s["pm_glyph_mountain"] = (silhouette(g, (668, 522, 62, 32), lo=0.35, hi=0.8), None)
-    s["pm_check_green"] = (rounded_cut(g, (485, 448, 32, 32), 5), None)
+    s["pm_check_green"] = (rounded_cut(g, (487, 450, 28, 28), 4), None)
     # Map pieces: compass rose, zoom buttons, the red pin and its name plate.
     s["pm_compass_rose"] = (silhouette(g, (1500, 146, 106, 120), lo=0.3, hi=0.7), None)
-    s["pm_button_zoom_in"] = (rounded_cut(g, (1546, 540, 62, 62), 10), None)
-    s["pm_button_zoom_out"] = (rounded_cut(g, (1546, 606, 62, 63), 10), None)
+    s["pm_button_zoom_in"] = (rounded_cut(g, (1548, 542, 58, 58), 9), None)
+    s["pm_button_zoom_out"] = (rounded_cut(g, (1548, 608, 58, 59), 9), None)
     s["pm_map_pin"] = (pin_cut(g, 1297, 789, 40, 862), None)
     label = plate(g, (1262, 808, 296, 104))
-    s["pm_map_label"] = (erase_ink(label, (70, 20, 260, 68), dark=True), [40, 30, 40, 30])
+    # The pin's foot covers the plate's left end: that end is the right end
+    # mirrored (the plate is symmetric).
+    half = label.shape[1] // 2
+    label[:, :half] = label[:, ::-1][:, :half]
+    s["pm_map_label"] = (erase_ink(label, (70, 20, label.shape[1] - 70, 68), dark=True), [40, 30, 40, 30])
     # The painted island (art/ui/map/render_island.py) for the map panels.
     island = np.asarray(Image.open(HERE / "map" / "island.png").convert("RGBA"), np.float32) / 255
     s["pm_map_island"] = (island, None)
@@ -716,6 +723,54 @@ def build_journal():
     s["pm_icon_coin"] = (cut_clean(i, (1058, 494, 172, 162)), None)
     s["pm_icon_gem"] = (cut_clean(i, (1318, 488, 124, 164)), None)
     s["pm_icon_bolt"] = (cut_clean(i, (838, 662, 126, 156)), None)
+    return s
+
+
+def build_inventory():
+    """Inventory & Vault window (08_inventory_vault): the shell with both panes,
+    the middle column and the detail strip repainted as paper and the title
+    erased (the game writes "INVENTORY & VAULT" or "INVENTORY"), plus the slots,
+    controls and category tabs the screen is built from."""
+    g = sheet("08")
+    s = {}
+    win = erase_ink(g, (560, 30, 1112, 92), dark=False, texture="hide", threshold=0.6, grow=3, amount=1.0)
+    # The ampersand is repainted whole (its anti-aliased edge survives the ink pass).
+    win = erase(win, box(g.shape, (878, 36, 924, 90)), amount=1.0, feather=2, texture="hide")
+    for rect in ((206, 131, 830, 614), (843, 130, 941, 617), (955, 131, 1592, 614), (210, 627, 1586, 771)):
+        win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
+    # The category tabs are drawn on their own: clear what of them overlaps the
+    # window's left edge.
+    win = win.copy()
+    win[105:650, :163, 3] = 0.0
+    s["pm_window_inventory"] = (cut_clean(win, (150, 8, 1490, 782)), None)
+    # Category tabs down the left: backgrounds with the icon erased, and the icons.
+    tabs = {"all": (48, 114, 122, 124), "tools": (44, 250, 120, 124), "materials": (44, 380, 120, 124),
+            "food": (44, 510, 120, 124)}
+    for key, rect in tabs.items():
+        tab = cut_clean(g, rect)
+        s["pm_cat_" + key] = (extract_icon(tab, 14, 26), None)
+        if key == "all":
+            s["pm_side_tab_selected"] = (erase(tab, dilate(icon_mask(tab, 14, 26), 2), amount=0.8), None)
+        elif key == "tools":
+            s["pm_side_tab"] = (erase(tab, dilate(icon_mask(tab, 14, 26), 2), amount=0.8), None)
+    # Slots and controls.
+    s["pm_item_slot"] = (rounded_cut(g, (216, 518, 93, 92), 9), [20, 20, 20, 20])
+    search = rounded_cut(g, (497, 141, 226, 42), 9)
+    s["pm_search_box"] = (erase_ink(search, (46, 6, 220, 40), dark=True, threshold=0.7), [40, 14, 14, 14])
+    s["pm_sort_button"] = (rounded_cut(g, (737, 141, 77, 42), 9), None)
+    s["pm_arrow_right"] = (rounded_cut(g, (851, 276, 82, 71), 13), None)
+    s["pm_arrow_left"] = (rounded_cut(g, (851, 375, 82, 70), 13), None)
+    store = rounded_cut(g, (836, 516, 112, 89), 10)
+    s["pm_button_square"] = (erase_ink(store, (16, 14, 98, 78), dark=False, texture="hide"), [26, 26, 26, 26])
+    chip = rounded_cut(g, (408, 698, 100, 43), 9)
+    s["pm_stat_chip"] = (erase_ink(chip, (8, 5, 96, 40), dark=True, threshold=0.6), [16, 14, 16, 14])
+    s["pm_glyph_sword"] = (silhouette(g, (414, 703, 32, 34)), None)
+    s["pm_glyph_hammer"] = (silhouette(g, (533, 703, 32, 34)), None)
+    s["pm_glyph_weight"] = (silhouette(g, (648, 703, 30, 34)), None)
+    action = plate(g, (1102, 652, 226, 82))
+    s["pm_button_action"] = (erase_ink(action, (34, 14, 196, 68), dark=False, texture="hide"), [40, 26, 40, 26])
+    icons = sheet("04")
+    s["pm_icon_chest"] = (cut_clean(icons, (290, 482, 210, 166)), None)
     return s
 
 
@@ -744,6 +799,7 @@ def main():
     sprites = build()
     sprites.update(build_settings())
     sprites.update(build_journal())
+    sprites.update(build_inventory())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]

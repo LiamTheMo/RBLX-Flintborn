@@ -7,6 +7,8 @@
 -- Positions are the reference sheet's own pixels (the window art was cut at
 -- ORIGIN), so they read straight off the image.
 
+local GuiService = game:GetService("GuiService")
+
 local Layout = require(script.Parent.Layout)
 local IslandMap = require(script.Parent.IslandMap)
 local Parchment = require(script.Parent.Parchment)
@@ -175,7 +177,8 @@ function JournalPanel:_card(window: Instance)
 		wrap = true,
 		name = "Title",
 	})
-	Parchment.Divider(at(476, 241, 446, 28), window)
+	-- Clear of the scroll icon, as on the sheet.
+	Parchment.Divider(at(593, 241, 329, 28), window)
 	-- The objective: box (ticked when done), name, bar and count.
 	card.boxOff = Widgets.Sprite("pm_check_off", {
 		Name = "Open",
@@ -260,6 +263,15 @@ function JournalPanel:_visible()
 end
 
 function JournalPanel:_drawList()
+	-- Gamepad focus on a row survives the redraw (it moves to the same quest's
+	-- new row).
+	local focused = nil
+	local focus = GuiService.SelectedObject
+	for _, row in self.rows do
+		if focus and focus:IsDescendantOf(row.holder) then
+			focused = row.quest.id
+		end
+	end
 	for _, row in self.rows do
 		row.holder:Destroy()
 	end
@@ -291,10 +303,13 @@ function JournalPanel:_drawList()
 		if state == "claimed" then
 			dot.BackgroundColor3 = Layout.Color("questDone")
 		end
-		Parchment.Pressable(holder, art, function()
+		local press = Parchment.Pressable(holder, art, function()
 			self:Select(quest.id)
 		end)
 		table.insert(self.rows, { holder = holder, quest = quest })
+		if quest.id == focused then
+			GuiService.SelectedObject = press
+		end
 	end
 end
 
@@ -319,7 +334,7 @@ function JournalPanel:_drawCard()
 			slot.frame.Visible = false
 		end
 		card.claim.SetEnabled(false)
-		self.map:Select(nil)
+		self:_point(nil)
 		return
 	end
 	local state = status(quest)
@@ -350,7 +365,7 @@ function JournalPanel:_drawCard()
 			slot.icon = Widgets.Sprite(reward[1], {
 				Name = "Icon",
 				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.fromOffset(47.5, 33),
+				Position = UDim2.new(0.5, 0, 0, 33),
 				Size = UDim2.fromOffset(54, 52),
 				ZIndex = 5,
 			}, slot.frame)
@@ -359,7 +374,18 @@ function JournalPanel:_drawCard()
 	end
 	card.claim.label.Text = if state == "claimed" then "CLAIMED" else "CLAIM"
 	card.claim.SetEnabled(state == "ready" and not self.claiming)
-	local placeId = JournalPanel.PLACES[quest.action or ""]
+	self:_point(quest)
+end
+
+-- Points the map at the chosen quest's place, only when the chosen quest
+-- changes, so a pin the player tapped keeps its plate through refreshes.
+function JournalPanel:_point(quest)
+	local id = quest and quest.id
+	if id == self.pointedAt then
+		return
+	end
+	self.pointedAt = id
+	local placeId = quest and JournalPanel.PLACES[quest.action or ""]
 	self.map:Select(placeId)
 	if placeId then
 		local pin = self.map.pins[placeId]
@@ -377,9 +403,13 @@ function JournalPanel:_drawStrip()
 	self.strip.label.Text = ("%d Active Quest%s"):format(active, if active == 1 then "" else "s")
 end
 
+-- The active strip: the next quest waiting to be claimed, on any tab.
 function JournalPanel:_jumpToClaimable()
-	for _, quest in self:_visible() do
+	for _, quest in self.quests do
 		if status(quest) == "ready" then
+			if self.tab ~= "All" and quest.repeats ~= self.tab then
+				self:SelectTab("All")
+			end
 			self:Select(quest.id)
 			return
 		end
@@ -427,6 +457,19 @@ end
 -- A short line under the card's notes (a claim's outcome); "" clears it.
 function JournalPanel:SetMessage(text: string)
 	self.card.message.Text = text
+end
+
+-- Marks a quest claimed at once when the server says so (before the next
+-- refresh), so CLAIM cannot be pressed twice.
+function JournalPanel:MarkClaimed(id: string)
+	for _, quest in self.quests do
+		if quest.id == id then
+			quest.claimed = true
+		end
+	end
+	self:_drawStrip()
+	self:_drawList()
+	self:_drawCard()
 end
 
 -- While a claim is on its way, CLAIM stays dimmed.

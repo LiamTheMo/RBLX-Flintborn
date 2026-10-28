@@ -631,3 +631,17 @@ Studio and live checks:
 - [ ] Progress moves while the Journal is open (it refreshes every 5 s); CLAIM pays a finished quest once and then reads CLAIMED; Coins and Gems update.
 - [ ] The map matches the island in play (coast, Crater Lake and the Keep, river, Frostpeak's snow, Emberhollow); pins sit on their places; zoom works; the Keep's plate shows for the Guardian quest.
 - [ ] Phones: the window fits; rows, tabs and CLAIM are tappable.
+
+## Parchment Inventory & Vault (GDD §10.3, §25.4, §53)
+
+How it's built: one window (`Hud/InventoryPanel`, slots `Hud/ItemSlot`, item text `ItemInfo`) driven by `VaultController` in the lobby and `InventoryController` in a run. Spec: `docs/ui/InventoryScreen.md`. Item icons are not drawn yet; slots show names until `item_<catalogId>` sprites are uploaded.
+
+Automated: `item_info.spec` (tabs, search, stat chips); `capture.py inventory`; `vault_flow` and `inventory_flow` drive both controllers.
+
+Studio and live checks:
+
+- [ ] Lobby: the Inventory and Vault tiles and Tab open the window; STORE / → vault the chosen backpack item; TAKE / ← bring a vault item or the picked amount of a material out; STORE ALL vaults everything that fits and says how many overflowed; a near-full material deposit asks first and deletes only what it said.
+- [ ] Lobby: tabs and search filter both panes; sort cycles Saved / Name / Count; the capacity bar matches the vault's item slots.
+- [ ] Run: Tab opens the window with the 50 backpack slots, the six hotbar slots (with their keys) and the three armour slots; a slot then another moves or swaps; → sends to the first free hotbar slot (armour to its slot); ← sends back to the backpack; WEAR / TAKE OFF / EQUIP / USE / DROP work; the equipped hotbar slot has a leather ring.
+- [ ] Run: Tab closes it again, Q drops, 1–6 still select hotbar slots (hotfix 2026-10-28: the six-slot change had stopped Tab and Q from binding in runs).
+- [ ] Gamepad: B closes; slots, tabs and buttons are reachable with the D-pad.

@@ -874,6 +874,29 @@
     "h": 164,
     "slice": null
   },
+  "pm_arrow_left": {
+    "file": "pm_arrow_left.png",
+    "w": 86,
+    "h": 74,
+    "slice": null
+  },
+  "pm_arrow_right": {
+    "file": "pm_arrow_right.png",
+    "w": 86,
+    "h": 75,
+    "slice": null
+  },
+  "pm_button_action": {
+    "file": "pm_button_action.png",
+    "w": 227,
+    "h": 85,
+    "slice": [
+      40,
+      26,
+      40,
+      26
+    ]
+  },
   "pm_button_add_friend": {
     "file": "pm_button_add_friend.png",
     "w": 68,
@@ -997,6 +1020,17 @@
     "h": 77,
     "slice": null
   },
+  "pm_button_square": {
+    "file": "pm_button_square.png",
+    "w": 116,
+    "h": 93,
+    "slice": [
+      26,
+      26,
+      26,
+      26
+    ]
+  },
   "pm_button_strip": {
     "file": "pm_button_strip.png",
     "w": 357,
@@ -1016,20 +1050,44 @@
   },
   "pm_button_zoom_in": {
     "file": "pm_button_zoom_in.png",
-    "w": 66,
-    "h": 66,
+    "w": 62,
+    "h": 62,
     "slice": null
   },
   "pm_button_zoom_out": {
     "file": "pm_button_zoom_out.png",
-    "w": 66,
-    "h": 67,
+    "w": 62,
+    "h": 63,
+    "slice": null
+  },
+  "pm_cat_all": {
+    "file": "pm_cat_all.png",
+    "w": 74,
+    "h": 83,
+    "slice": null
+  },
+  "pm_cat_food": {
+    "file": "pm_cat_food.png",
+    "w": 79,
+    "h": 73,
+    "slice": null
+  },
+  "pm_cat_materials": {
+    "file": "pm_cat_materials.png",
+    "w": 78,
+    "h": 68,
+    "slice": null
+  },
+  "pm_cat_tools": {
+    "file": "pm_cat_tools.png",
+    "w": 84,
+    "h": 85,
     "slice": null
   },
   "pm_check_green": {
     "file": "pm_check_green.png",
-    "w": 36,
-    "h": 36,
+    "w": 32,
+    "h": 32,
     "slice": null
   },
   "pm_check_off": {
@@ -1090,6 +1148,12 @@
     "h": 54,
     "slice": null
   },
+  "pm_glyph_hammer": {
+    "file": "pm_glyph_hammer.png",
+    "w": 27,
+    "h": 32,
+    "slice": null
+  },
   "pm_glyph_monitor": {
     "file": "pm_glyph_monitor.png",
     "w": 54,
@@ -1114,6 +1178,18 @@
     "h": 47,
     "slice": null
   },
+  "pm_glyph_sword": {
+    "file": "pm_glyph_sword.png",
+    "w": 27,
+    "h": 31,
+    "slice": null
+  },
+  "pm_glyph_weight": {
+    "file": "pm_glyph_weight.png",
+    "w": 23,
+    "h": 32,
+    "slice": null
+  },
   "pm_icon_add_friend": {
     "file": "pm_icon_add_friend.png",
     "w": 179,
@@ -1124,6 +1200,12 @@
     "file": "pm_icon_bolt.png",
     "w": 130,
     "h": 160,
+    "slice": null
+  },
+  "pm_icon_chest": {
+    "file": "pm_icon_chest.png",
+    "w": 214,
+    "h": 170,
     "slice": null
   },
   "pm_icon_coin": {
@@ -1149,6 +1231,17 @@
     "w": 182,
     "h": 164,
     "slice": null
+  },
+  "pm_item_slot": {
+    "file": "pm_item_slot.png",
+    "w": 97,
+    "h": 96,
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ]
   },
   "pm_jtab_leather": {
     "file": "pm_jtab_leather.png",
@@ -1287,11 +1380,51 @@
       30
     ]
   },
+  "pm_search_box": {
+    "file": "pm_search_box.png",
+    "w": 230,
+    "h": 46,
+    "slice": [
+      40,
+      14,
+      14,
+      14
+    ]
+  },
+  "pm_side_tab": {
+    "file": "pm_side_tab.png",
+    "w": 124,
+    "h": 128,
+    "slice": null
+  },
+  "pm_side_tab_selected": {
+    "file": "pm_side_tab_selected.png",
+    "w": 126,
+    "h": 128,
+    "slice": null
+  },
   "pm_slider_knob": {
     "file": "pm_slider_knob.png",
     "w": 58,
     "h": 58,
     "slice": null
+  },
+  "pm_sort_button": {
+    "file": "pm_sort_button.png",
+    "w": 81,
+    "h": 46,
+    "slice": null
+  },
+  "pm_stat_chip": {
+    "file": "pm_stat_chip.png",
+    "w": 104,
+    "h": 47,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ]
   },
   "pm_tab_leather": {
     "file": "pm_tab_leather.png",
@@ -1350,6 +1483,40 @@
     "w": 146,
     "h": 145,
     "slice": null
+  },
+  "pm_window_inventory__1_1": {
+    "file": "pm_window_inventory__1_1.png",
+    "w": 749,
+    "h": 786,
+    "slice": null
+  },
+  "pm_window_inventory__1_2": {
+    "file": "pm_window_inventory__1_2.png",
+    "w": 749,
+    "h": 786,
+    "slice": null
+  },
+  "pm_window_inventory": {
+    "file": null,
+    "w": 1494,
+    "h": 786,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_inventory__1_1",
+        0,
+        0,
+        749,
+        786
+      ],
+      [
+        "pm_window_inventory__1_2",
+        745,
+        0,
+        749,
+        786
+      ]
+    ]
   },
   "pm_window_journal__1_1": {
     "file": "pm_window_journal__1_1.png",

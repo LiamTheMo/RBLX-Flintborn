@@ -3,12 +3,16 @@
 -- consumable, places a workbench, readies a Fire Bomb (the attack input or touch
 -- Attack button then throws it) or sets a Breaching Charge on the wall or door in
 -- the crosshair (with none in reach it is held instead, and the attack input sets
--- it once one is). In the backpack, tap one slot then another
--- to move or swap (no precise dragging). Server snapshots are the only truth.
+-- it once one is). The Backpack key opens the parchment inventory window
+-- (Hud/InventoryPanel): the backpack on the left, the hotbar and worn armour on
+-- the right. Choose a slot, then another to move or swap (no precise dragging);
+-- the arrows send the chosen item to the hotbar or back to the backpack, WEAR /
+-- TAKE OFF handle armour and DROP drops it. Server snapshots are the only truth.
 -- World place only. With the new HUD (HudMode) its own hotbar strip draws the
--- slots, so this strip only shows while the backpack is open (to move items
--- between hotbar and backpack), and the Backpack button lives in the nav bar.
+-- slots; the old strip here shows only with the legacy HUD.
 
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -22,6 +26,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local InventoryPanel = require(script.Parent.Parent.Hud.InventoryPanel)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
@@ -36,9 +41,14 @@ InventoryController.BackpackToggled = Signal.new()
 
 local player = Players.LocalPlayer
 local ui = {}
-local slotButtons = { hotbar = {}, backpack = {}, armor = {} }
+local slotButtons = { hotbar = {} }
 local ARMOR_SLOTS = { "Head", "Chest", "Legs" }
+-- The chosen slot in the inventory window: {area, index}.
 local selected = nil
+local panel = nil
+local dropSelected
+
+local CLOSE_ACTION = "FlintbornBackpackClose"
 
 local function make(className: string, props, parent)
 	local instance = Instance.new(className)
@@ -170,45 +180,81 @@ local function activateHotbar(index: number)
 	end
 end
 
-local function onArmorClicked(index: number)
-	if selected then
-		local from = selected
-		selected = nil
-		local ok, reason = invoke("EquipArmor", from.area, from.index)
-		if not ok then
-			toast("Can't wear that (" .. tostring(reason) .. ")")
+local function sameSlot(a, b): boolean
+	return a ~= nil and b ~= nil and a.area == b.area and a.index == b.index
+end
+
+-- The first empty slot of `area`, or nil.
+local function firstEmpty(area: string, count: number): number?
+	for index = 1, count do
+		if slotAt(area, index) == nil then
+			return index
 		end
-		InventoryController.Render()
-	elseif slotAt("armor", index) then
-		local ok, reason = invoke("UnequipArmor", ARMOR_SLOTS[index])
-		if not ok then
-			toast("No room to take that off (" .. tostring(reason) .. ")")
-		end
+	end
+	return nil
+end
+
+local function move(from, area: string, index: number)
+	local ok, reason = invoke("MoveItem", from.area, from.index, area, index)
+	if not ok then
+		toast("Can't move that (" .. Reasons.Text(reason) .. ")")
 	end
 end
 
-local function onSlotClicked(area: string, index: number)
-	if area == "armor" then
-		onArmorClicked(index)
-		return
+local function wear(from)
+	local ok, reason = invoke("EquipArmor", from.area, from.index)
+	if not ok then
+		toast("Can't wear that (" .. Reasons.Text(reason) .. ")")
 	end
-	if selected then
-		local from = selected
-		selected = nil
-		if from.area ~= area or from.index ~= index then
-			local ok, reason = invoke("MoveItem", from.area, from.index, area, index)
-			if not ok then
-				toast("Can't move that (" .. tostring(reason) .. ")")
-			end
+end
+
+local function takeOff(index: number)
+	local ok, reason = invoke("UnequipArmor", ARMOR_SLOTS[index])
+	if not ok then
+		toast("No room to take that off (" .. Reasons.Text(reason) .. ")")
+	end
+end
+
+local function isArmor(slot): boolean
+	local def = slot and ItemCatalog.Get(slot.catalogId)
+	return def ~= nil and def.family == ItemCatalog.Families.Armor
+end
+
+-- A slot pressed in the inventory window: the first press chooses it, a press on
+-- another slot moves or swaps the chosen item there (an armour slot wears it, a
+-- worn piece pressed onto the backpack or hotbar comes off), the same slot again
+-- lets go.
+local function onSlot(area: string, index: number)
+	local target = { area = area, index = index }
+	local from = selected
+	if from == nil then
+		if slotAt(area, index) then
+			selected = target
 		end
 		InventoryController.Render()
 		return
 	end
-	if area == "hotbar" and not ui.backpack.Visible then
+	selected = nil
+	if not sameSlot(from, target) then
+		if area == "armor" then
+			if from.area ~= "armor" then
+				wear(from)
+			end
+		elseif from.area == "armor" then
+			takeOff(from.index)
+		else
+			move(from, area, index)
+		end
+	end
+	InventoryController.Render()
+end
+
+-- Kept for the old on-screen hotbar strip (shown without the new HUD).
+local function onSlotClicked(area: string, index: number)
+	if area == "hotbar" and not (panel and panel.screen:IsOpen()) then
 		activateHotbar(index)
-	elseif slotAt(area, index) then
-		selected = { area = area, index = index }
-		InventoryController.Render()
+	else
+		onSlot(area, index)
 	end
 end
 
@@ -235,58 +281,186 @@ local function makeSlot(area: string, index: number, parent)
 		Font = Enum.Font.GothamMedium,
 		TextSize = 11,
 	}, button)
-	local keyLabel = nil
-	if area == "hotbar" or area == "armor" then
-		-- Hotbar slots show the key that selects them (rebindable, so kept current).
-		keyLabel = make("TextLabel", {
-			Text = area == "armor" and ARMOR_SLOTS[index] or Binds.Label("Hotbar" .. index),
-			Size = UDim2.fromOffset(40, 14),
-			BackgroundTransparency = 1,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextColor3 = Color3.fromRGB(200, 190, 170),
-			Font = Enum.Font.GothamBold,
-			TextSize = 11,
-		}, button)
-	end
+	-- Hotbar slots show the key that selects them (rebindable, so kept current).
+	local keyLabel = make("TextLabel", {
+		Text = Binds.Label("Hotbar" .. index),
+		Size = UDim2.fromOffset(40, 14),
+		BackgroundTransparency = 1,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = Color3.fromRGB(200, 190, 170),
+		Font = Enum.Font.GothamBold,
+		TextSize = 11,
+	}, button)
 	button.Activated:Connect(function()
 		onSlotClicked(area, index)
 	end)
-	slotButtons[area][index] = {
-		button = button,
-		stroke = stroke,
-		label = label,
-		keyLabel = if area == "hotbar" then keyLabel else nil,
+	slotButtons[area][index] = { button = button, stroke = stroke, label = label, keyLabel = keyLabel }
+end
+
+local function panelItem(slot)
+	if slot == nil then
+		return nil
+	end
+	local def = ItemCatalog.Get(slot.catalogId)
+	return {
+		catalogId = slot.catalogId,
+		name = def and def.name or slot.catalogId,
+		quantity = slot.quantity,
+		rarity = def and def.rarity or "Common",
+		permanent = slot.permanent,
+		qualityRoll = slot.qualityRoll,
 	}
+end
+
+local function id(area: string, index: number): string
+	return area .. ":" .. index
+end
+
+-- The detail strip, arrows and action for the chosen slot.
+local function showChoice()
+	local choice = selected
+	local slot = choice and slotAt(choice.area, choice.index)
+	if choice and slot == nil then
+		selected, choice = nil, nil
+	end
+	panel:Select(
+		choice
+			and { paneId = if choice.area == "backpack" then "left" else "right", id = id(choice.area, choice.index) },
+		InventoryController.Snapshot.equipped
+			and { paneId = "right", id = id("hotbar", InventoryController.Snapshot.equipped) }
+	)
+	panel:SetDetail(panelItem(slot), "Choose a slot, then another to move or swap.")
+	local def = slot and ItemCatalog.Get(slot.catalogId)
+	local action = nil
+	if choice and choice.area == "hotbar" then
+		local using = def and def.family == ItemCatalog.Families.Consumable
+		local held = InventoryController.Snapshot.equipped == choice.index
+		action = {
+			if using then "USE" elseif held then "PUT AWAY" else "EQUIP",
+			true,
+			function()
+				task.spawn(activateHotbar, choice.index)
+			end,
+		}
+	elseif choice and choice.area == "armor" then
+		action = {
+			"TAKE OFF",
+			true,
+			function()
+				selected = nil
+				takeOff(choice.index)
+				InventoryController.Render()
+			end,
+		}
+	elseif choice and isArmor(slot) then
+		action = {
+			"WEAR",
+			true,
+			function()
+				selected = nil
+				wear(choice)
+				InventoryController.Render()
+			end,
+		}
+	end
+	panel:SetActions({ nil, action })
+	-- → puts a backpack item on the hotbar (armour on its slot); ← brings a hotbar
+	-- or worn item back to the backpack.
+	local toRight = choice ~= nil and choice.area == "backpack"
+	local toLeft = choice ~= nil and choice.area ~= "backpack"
+	panel:SetMiddle({
+		toRight,
+		function()
+			selected = nil
+			if isArmor(slot) then
+				wear(choice)
+			else
+				local free = firstEmpty("hotbar", GameConstants.HOTBAR_SLOTS)
+				if free then
+					move(choice, "hotbar", free)
+				else
+					toast("Your hotbar is full.")
+				end
+			end
+			InventoryController.Render()
+		end,
+	}, {
+		toLeft,
+		function()
+			selected = nil
+			if choice.area == "armor" then
+				takeOff(choice.index)
+			else
+				local free = firstEmpty("backpack", GameConstants.BACKPACK_SLOTS)
+				if free then
+					move(choice, "backpack", free)
+				else
+					toast("Your backpack is full.")
+				end
+			end
+			InventoryController.Render()
+		end,
+	}, {
+		("DROP\n(%s)"):format(Binds.Label("Drop")),
+		slot ~= nil or InventoryController.Snapshot.equipped ~= nil,
+		function()
+			dropSelected()
+		end,
+	})
 end
 
 function InventoryController.Render()
 	local equipped = InventoryController.Snapshot.equipped
-	for area, buttons in slotButtons do
-		for index, parts in buttons do
-			local slot = slotAt(area, index)
-			if slot then
-				local text, rarity = describe(slot)
-				parts.label.Text = text .. "\n" .. rarity
-				parts.stroke.Color = Rarity.Colors[rarity] or Color3.fromRGB(70, 60, 50)
-			else
-				parts.label.Text = ""
-				parts.stroke.Color = Color3.fromRGB(70, 60, 50)
-			end
-			local isSelected = selected and selected.area == area and selected.index == index
-			local isEquipped = area == "hotbar" and equipped == index
-			parts.stroke.Thickness = (isSelected or isEquipped) and 4 or 2
-			parts.button.BackgroundColor3 = isEquipped and Color3.fromRGB(78, 62, 40) or Color3.fromRGB(36, 31, 26)
+	for index, parts in slotButtons.hotbar do
+		local slot = slotAt("hotbar", index)
+		if slot then
+			local text, rarity = describe(slot)
+			parts.label.Text = text .. "\n" .. rarity
+			parts.stroke.Color = Rarity.Colors[rarity] or Color3.fromRGB(70, 60, 50)
+		else
+			parts.label.Text = ""
+			parts.stroke.Color = Color3.fromRGB(70, 60, 50)
 		end
+		local isEquipped = equipped == index
+		parts.stroke.Thickness = if isEquipped then 4 else 2
+		parts.button.BackgroundColor3 = isEquipped and Color3.fromRGB(78, 62, 40) or Color3.fromRGB(36, 31, 26)
 	end
-	ui.hint.Text = if selected
-		then ("Tap another slot to move or swap, an armor slot to wear it, or Drop (%s) to drop it."):format(
-			Binds.Label("Drop")
-		)
-		else ""
+	if panel == nil or not panel.screen:IsOpen() then
+		return
+	end
+	local backpack, hotbar, armor = {}, {}, {}
+	local used = 0
+	for index = 1, GameConstants.BACKPACK_SLOTS do
+		local slot = slotAt("backpack", index)
+		used += if slot then 1 else 0
+		table.insert(backpack, { id = id("backpack", index), area = "backpack", index = index, item = panelItem(slot) })
+	end
+	for index = 1, GameConstants.HOTBAR_SLOTS do
+		table.insert(hotbar, {
+			id = id("hotbar", index),
+			area = "hotbar",
+			index = index,
+			item = panelItem(slotAt("hotbar", index)),
+			key = Binds.Label("Hotbar" .. index),
+		})
+	end
+	for index, name in ARMOR_SLOTS do
+		table.insert(armor, {
+			id = id("armor", index),
+			area = "armor",
+			index = index,
+			item = panelItem(slotAt("armor", index)),
+			key = name,
+		})
+	end
+	panel:SetHeader("left", ("BACKPACK %d/%d"):format(used, GameConstants.BACKPACK_SLOTS))
+	panel:SetPane("left", { { entries = backpack } }, "dim")
+	panel:SetPane("right", { { header = "Hotbar", entries = hotbar }, { header = "Armour", entries = armor } }, "dim")
+	showChoice()
 end
 
--- Drops the selected slot, or else the equipped hotbar item (the Drop key, L1 or the Drop button).
-local function dropSelected()
+-- Drops the selected slot, or else the equipped hotbar item (the Drop key, L1 or the window's DROP).
+function dropSelected()
 	local target = selected
 		or (
 			InventoryController.Snapshot.equipped and { area = "hotbar", index = InventoryController.Snapshot.equipped }
@@ -295,7 +469,7 @@ local function dropSelected()
 	if target then
 		local ok, reason = invoke("DropItem", target.area, target.index)
 		if not ok then
-			toast("Can't drop that (" .. tostring(reason) .. ")")
+			toast("Can't drop that (" .. Reasons.Text(reason) .. ")")
 		end
 	else
 		toast("Select a slot (or equip an item) to drop it.")
@@ -303,10 +477,23 @@ local function dropSelected()
 	InventoryController.Render()
 end
 
+local function closeBackpack()
+	ContextActionService:UnbindAction(CLOSE_ACTION)
+	selected = nil
+	local focus = GuiService.SelectedObject
+	if focus and focus:IsDescendantOf(panel.screen.gui) then
+		GuiService.SelectedObject = nil
+	end
+	panel.screen:SetOpen(false)
+	InventoryController.Render()
+	InventoryController.BackpackToggled:Fire(false)
+end
+
 local function build()
 	local gui = make("ScreenGui", { Name = "Inventory", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
 	ui.root = make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Visible = false }, gui)
 
+	-- The old hotbar strip, for the legacy HUD only (the new HUD draws its own).
 	local hotbar = make("Frame", {
 		Name = "Hotbar",
 		AnchorPoint = Vector2.new(0.5, 1),
@@ -325,65 +512,6 @@ local function build()
 	end
 	ui.hotbar = hotbar
 	hotbar.Visible = not HudMode.ReplacesLegacy()
-
-	ui.backpack = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -86),
-		Size = UDim2.fromOffset(10 * 66 + 12, 5 * 66 + 12),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		BackgroundTransparency = 0.1,
-		Active = true,
-		Visible = false,
-	}, ui.root)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.backpack)
-	make("UIPadding", { PaddingLeft = UDim.new(0, 6), PaddingTop = UDim.new(0, 6) }, ui.backpack)
-	make("UIGridLayout", {
-		CellSize = UDim2.fromOffset(60, 60),
-		CellPadding = UDim2.fromOffset(6, 6),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, ui.backpack)
-	for index = 1, GameConstants.BACKPACK_SLOTS do
-		makeSlot("backpack", index, ui.backpack)
-	end
-
-	-- Worn armor (Head, Chest, Legs/Boots): select a piece, then tap its slot to wear it.
-	-- A column beside the backpack (not above it), with the Drop button under it,
-	-- so it stays on-screen on short phone screens.
-	local side = make("Frame", {
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(0.5, -(5 * 66 + 6) - 8, 1, -86),
-		Size = UDim2.fromOffset(62, 3 * 66 + 36),
-		BackgroundTransparency = 1,
-		Active = true,
-		Visible = false,
-	}, ui.root)
-	ui.armorRow = side
-	local armorColumn = make("Frame", {
-		Size = UDim2.fromOffset(62, 3 * 66),
-		BackgroundTransparency = 1,
-		Active = true,
-	}, side)
-	make("UIGridLayout", {
-		CellSize = UDim2.fromOffset(60, 60),
-		CellPadding = UDim2.fromOffset(0, 6),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, armorColumn)
-	for index = 1, #ARMOR_SLOTS do
-		makeSlot("armor", index, armorColumn)
-	end
-	-- Touch players have no Drop key: this drops the selected (or equipped) item.
-	local drop = make("TextButton", {
-		Text = "Drop",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.fromScale(0, 1),
-		Size = UDim2.fromOffset(62, 30),
-		BackgroundColor3 = Color3.fromRGB(120, 50, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 12,
-	}, side)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, drop)
-	drop.Activated:Connect(dropSelected)
 
 	-- Right of the hotbar, above the Craft button (the XP bar owns the bottom-left).
 	local toggle = make("TextButton", {
@@ -404,26 +532,15 @@ local function build()
 	toggle.Visible = not HudMode.ReplacesLegacy()
 	-- Button and slot captions name the player's current keys.
 	local function relabel()
-		drop.Text = ("Drop (%s)"):format(Binds.Label("Drop"))
 		toggle.Text = ("Backpack (%s)"):format(Binds.Label("Backpack"))
 		for index, parts in slotButtons.hotbar do
-			if parts.keyLabel then
-				parts.keyLabel.Text = Binds.Label("Hotbar" .. index)
-			end
+			parts.keyLabel.Text = Binds.Label("Hotbar" .. index)
 		end
+		InventoryController.Render()
 	end
 	relabel()
 	Binds.Changed:Connect(relabel)
 
-	ui.hint = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -80),
-		Size = UDim2.fromOffset(400, 18),
-		BackgroundTransparency = 1,
-		TextColor3 = Color3.fromRGB(240, 232, 220),
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-	}, ui.root)
 	ui.toast = make("TextLabel", {
 		Size = UDim2.fromOffset(420, 34),
 		LayoutOrder = Theme.TopOrder.Toast,
@@ -435,31 +552,52 @@ local function build()
 		Visible = false,
 	}, Theme.TopStack())
 	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.toast)
+
+	-- The backpack window: backpack on the left, hotbar and armour on the right.
+	panel = InventoryPanel.new(player:WaitForChild("PlayerGui"), {
+		onClose = closeBackpack,
+		onSlot = function(_, entry)
+			onSlot(entry.area, entry.index)
+		end,
+	})
+	panel:SetTitle("INVENTORY")
+	panel:SetHeader("right", "EQUIPMENT", "pm_cat_all", nil)
+	panel:SetSortVisible(false)
+	panel.screen:Watch()
 end
 
 InventoryController.ActivateHotbar = activateHotbar
 
 function InventoryController.ToggleBackpack()
-	ui.backpack.Visible = not ui.backpack.Visible
-	ui.armorRow.Visible = ui.backpack.Visible
-	if HudMode.ReplacesLegacy() then
-		ui.hotbar.Visible = ui.backpack.Visible
+	if panel.screen:IsOpen() then
+		closeBackpack()
+		return
 	end
 	selected = nil
+	panel.screen:SetOpen(true)
+	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			closeBackpack()
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.ButtonB)
+	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
+		GuiService.SelectedObject = panel.tabs.All.button
+	end
 	InventoryController.Render()
-	InventoryController.BackpackToggled:Fire(ui.backpack.Visible)
+	InventoryController.BackpackToggled:Fire(true)
 end
 
 local function bindKeys(active: boolean)
 	if not active then
-		for index = 1, 9 do
+		for index = 1, GameConstants.HOTBAR_SLOTS do
 			Binds.Unbind("Hotbar" .. index)
 		end
 		Binds.Unbind("Backpack")
 		Binds.Unbind("Drop")
 		return
 	end
-	for index = 1, 9 do
+	for index = 1, GameConstants.HOTBAR_SLOTS do
 		Binds.Bind("Hotbar" .. index, function(_, state)
 			if state == Enum.UserInputState.Begin then
 				-- Spawned: activating calls the server, and a handler that yields

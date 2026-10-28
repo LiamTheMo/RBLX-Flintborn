@@ -541,8 +541,10 @@ function BuildingService.Hit(
 		return false
 	end
 	local tool = InventoryService.EquippedTool(player)
-	local dealt = BuildRules.StructureDamage(rawDamage, tool and tool.kind, best.material)
-	best.hp -= dealt
+	local damage = BuildRules.StructureDamage(rawDamage, tool and tool.kind, best.material)
+	-- The health actually taken: a breaking blow shows what was left.
+	local dealt = math.min(damage, math.max(best.hp, 0))
+	best.hp -= damage
 	Remotes.Get("CombatFeedback"):FireClient(player, "Hit", math.round(dealt), best.part.Position)
 	if best.hp <= 0 then
 		remove(best, "Destroyed")
