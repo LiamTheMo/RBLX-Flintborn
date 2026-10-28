@@ -126,6 +126,12 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 	hit.MouseButton1Up:Connect(function()
 		show("hover")
 	end)
+	hit.InputEnded:Connect(function(input: InputObject)
+		-- Touch has no hover: a lifted finger returns the button to rest.
+		if input.UserInputType == Enum.UserInputType.Touch then
+			show(nil)
+		end
+	end)
 	hit.Activated:Connect(onPress)
 	return holder, hit
 end
