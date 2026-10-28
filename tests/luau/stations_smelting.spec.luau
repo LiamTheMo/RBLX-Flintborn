@@ -635,11 +635,29 @@ test("Crafting mastery's bonus bar: one extra bar per bar smelted, by chance", f
 	modifiers.SmeltBonus = nil
 end)
 
+test("a bonus bar never takes the room a later bar of the same job needs", function()
+	modifiers.SmeltBonus = 1
+	local before = #dropped
+	-- The bar stack has room for exactly the two bars being smelted.
+	local player = newPlayer({ IronOre = 3, IronBar = 998 })
+	expect(craft(player, "IronBar", 2), "started")
+	for _ = 1, 2 do
+		clock += 3
+		pump()
+	end
+	expectEq(count(player, "IronBar"), 1000, "both smelted bars fit")
+	expectEq(count(player, "IronOre"), 1, "two ore used")
+	expectEq(#dropped, before + 2, "both bonus bars dropped instead")
+	expectEq(player.attributes.SmeltRecipe, nil, "the job finished")
+	expect(string.find(player.notes[#player.notes], "Smelted 2") ~= nil, "not stopped for room")
+	modifiers.SmeltBonus = nil
+end)
+
 test("a bonus bar with no room drops at the smelter's feet and the job finishes", function()
 	modifiers.SmeltBonus = 1
 	local before = #dropped
-	-- Every slot full: the ore keeps its slot, the bar stack has room for one.
-	local player = newPlayer({ IronOre = 2, IronBar = 999, Wood = 57000 })
+	-- The bar stack (one slot per item type) has room for one more bar.
+	local player = newPlayer({ IronOre = 2, IronBar = 999 })
 	expect(craft(player, "IronBar", 1), "started")
 	clock += 3
 	pump()

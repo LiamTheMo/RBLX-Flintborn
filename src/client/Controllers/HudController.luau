@@ -1,8 +1,8 @@
 -- In-world HUD (GDD §11, §25.4), laid out from src/shared/UI/HudLayout.json and
 -- drawn from the UI art sheets (art/ui/sprites, uploaded ids in UiAssetIds.json,
 -- styled Frames until then). Party frames, compass with waypoints, extraction
--- objective, world event, vitals, level/XP bar, an empty selection-only hotbar
--- and the custom interaction prompt. It only displays what the server already
+-- objective, world event, vitals, level/XP bar, the hotbar (its items; a tap
+-- uses a slot like its key) and the custom interaction prompt. It only displays what the server already
 -- replicated: Humanoid health, the Stamina/Food/MedicineLockUntil/FoodHealing
 -- attributes, progression snapshots, TribeId attributes, and the extraction and
 -- event remotes (through their controllers). World place only, during a run.
