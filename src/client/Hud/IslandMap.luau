@@ -136,12 +136,12 @@ function IslandMap.new(parent: Instance, r, opts)
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundColor3 = Layout.Color("cream"),
 		BorderSizePixel = 0,
-		Size = UDim2.fromOffset(16, 16),
+		Size = UDim2.fromOffset(24, 24),
 		Visible = false,
 		ZIndex = 9,
 	}, canvas)
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, self.marker)
-	Widgets.Make("UIStroke", { Color = Layout.Color("leather"), Thickness = 3 }, self.marker)
+	Widgets.Make("UIStroke", { Color = Layout.Color("leather"), Thickness = 4 }, self.marker)
 	if opts.zoomButtons then
 		self.zoomIn = Parchment.Button("pm_button_zoom_in", opts.zoomButtons[1], parent, function()
 			self:Zoom(1)
@@ -187,6 +187,8 @@ function IslandMap:_drag(clip: Frame)
 		local kind = input.UserInputType
 		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
 			active, last = input, input.Position
+			-- Whoever follows a moving marker leaves the map alone meanwhile.
+			self.dragging = true
 		end
 	end)
 	UserInputService.InputChanged:Connect(function(input: InputObject)
@@ -212,6 +214,7 @@ function IslandMap:_drag(clip: Frame)
 	UserInputService.InputEnded:Connect(function(input: InputObject)
 		if input == active or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			active, last = nil, nil
+			self.dragging = false
 		end
 	end)
 end
@@ -241,6 +244,37 @@ function IslandMap:Select(id: string?)
 		self.label.AnchorPoint = Vector2.new(if east then 0.88 else 0.12, if south then 1 else 0)
 		self.label.Position = UDim2.new(u, 0, v, if south then -IslandMap.PIN - 4 else -6)
 		self.labelText.Text = entry.place.name
+	end
+end
+
+-- Live markers (the world Map's portals and events): {{id, x, z, name, color}},
+-- each a small tinted diamond with its name beside it. Replaces the last set.
+function IslandMap:SetMarkers(markers)
+	for _, old in self.extra or {} do
+		old:Destroy()
+	end
+	self.extra = {}
+	for _, entry in markers do
+		local u, v = IslandMap.ToMap(entry.x, entry.z)
+		local holder = Widgets.Make("Frame", {
+			Name = entry.id,
+			AnchorPoint = Vector2.new(0, 0.5),
+			BackgroundTransparency = 1,
+			Position = UDim2.new(u, -13, v, 0),
+			Size = UDim2.fromOffset(200, 28),
+			ZIndex = 8,
+		}, self.canvas)
+		Widgets.Sprite("pm_glyph_diamond", {
+			Name = "Mark",
+			ImageColor3 = entry.color or Layout.Color("ink"),
+			Position = UDim2.fromOffset(0, 0),
+			Size = UDim2.fromOffset(26, 28),
+			ZIndex = 8,
+		}, holder)
+		local text = Parchment.Text(entry.name, { 30, 0, 170, 28 }, holder, { size = 18, z = 8, name = "Name" })
+		text.TextStrokeColor3 = Layout.Color("cream")
+		text.TextStrokeTransparency = 0.2
+		table.insert(self.extra, holder)
 	end
 end
 
