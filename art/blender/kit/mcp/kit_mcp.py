@@ -903,6 +903,8 @@ def test_asset(name, fn, seed=7, tint_var=0.05):
 def focus(names, shading="MATERIAL"):
     """Open models in the Blender viewport on their own (local view, framed, material preview) so
     the work can be watched and checked in the GUI, not only in renders."""
+    if not bpy.context.window_manager.windows:   # background session (bgmcp.py): nothing to show
+        return
     win = bpy.context.window_manager.windows[0]
     area = next(a for a in win.screen.areas if a.type == "VIEW_3D")
     region = next(r for r in area.regions if r.type == "WINDOW")

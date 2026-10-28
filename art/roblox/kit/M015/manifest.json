@@ -1,0 +1,1607 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M015",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m015_base",
+    "hex": "#887875",
+    "levels": [
+     0.9299,
+     0.93987,
+     0.94979,
+     0.954,
+     0.9573,
+     0.96051,
+     0.96201,
+     0.96229,
+     0.96395,
+     0.96639,
+     0.9722,
+     0.9766,
+     0.97866,
+     0.98148,
+     0.98657,
+     0.99058,
+     0.993,
+     0.99642,
+     0.99961,
+     1.00117,
+     1.00664,
+     1.01183,
+     1.01442,
+     1.01839,
+     1.02119,
+     1.02592,
+     1.02815,
+     1.03317,
+     1.04291,
+     1.04594,
+     1.05557,
+     1.08474
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_light",
+    "hex": "#978986",
+    "levels": [
+     0.93281,
+     0.94254,
+     0.94774,
+     0.95624,
+     0.96008,
+     0.96332,
+     0.9657,
+     0.96986,
+     0.97457,
+     0.9786,
+     0.98056,
+     0.98337,
+     0.9858,
+     0.98943,
+     0.99581,
+     0.99816,
+     1.00033,
+     1.00863,
+     1.01347,
+     1.01906,
+     1.02121,
+     1.02922,
+     1.04587
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_x_dark_25",
+    "hex": "#81726E",
+    "levels": [
+     0.93165,
+     0.94416,
+     0.9464,
+     0.94849,
+     0.95245,
+     0.95579,
+     0.95758,
+     0.96097,
+     0.96311,
+     0.97163,
+     0.97758,
+     0.97962,
+     0.9825,
+     0.98452,
+     0.98613,
+     0.99122,
+     1.00028,
+     1.00085,
+     1.00282,
+     1.00644,
+     1.01015,
+     1.01319,
+     1.01735,
+     1.01839,
+     1.02263,
+     1.02743,
+     1.03179,
+     1.03769,
+     1.04517,
+     1.05628,
+     1.06021,
+     1.08943
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_x_dark_50",
+    "hex": "#7A6B67",
+    "levels": [
+     0.9299,
+     0.94509,
+     0.94774,
+     0.95299,
+     0.95607,
+     0.96143,
+     0.96452,
+     0.97147,
+     0.97837,
+     0.983,
+     0.98391,
+     0.98496,
+     0.99083,
+     0.99201,
+     0.99354,
+     1.00002,
+     1.00217,
+     1.00695,
+     1.01278,
+     1.01497,
+     1.01868,
+     1.02063,
+     1.02305,
+     1.02558,
+     1.0278,
+     1.03277,
+     1.03708,
+     1.0372,
+     1.04378,
+     1.061,
+     1.07124,
+     1.08943
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_x_light_25",
+    "hex": "#8C7C79",
+    "levels": [
+     0.93205,
+     0.93281,
+     0.95447,
+     0.95859,
+     0.96311,
+     0.96845,
+     0.97102,
+     0.97593,
+     0.9786,
+     0.98104,
+     0.98352,
+     0.98384,
+     0.98898,
+     0.99033,
+     0.99048,
+     0.99113,
+     0.9921,
+     0.99348,
+     0.9982,
+     1.00277,
+     1.00442,
+     1.00843,
+     1.00881,
+     1.02063,
+     1.02134,
+     1.0252,
+     1.03179,
+     1.03666,
+     1.04242,
+     1.05808,
+     1.06589,
+     1.08967
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_x_light_50",
+    "hex": "#90807E",
+    "levels": [
+     0.93281,
+     0.95401,
+     0.95741,
+     0.96311,
+     0.97686,
+     0.98275,
+     0.98606,
+     0.99133,
+     0.9966,
+     0.99884,
+     1.00277,
+     1.01439,
+     1.02134,
+     1.04055,
+     1.0451,
+     1.0589
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_base_x_light_75",
+    "hex": "#938582",
+    "levels": [
+     0.93281,
+     0.95454,
+     0.9593,
+     0.96352,
+     0.96605,
+     0.96983,
+     0.97728,
+     0.98049,
+     0.98253,
+     0.99073,
+     0.99601,
+     1.00033,
+     1.00863,
+     1.01421,
+     1.01667,
+     1.01906,
+     1.03179,
+     1.06011,
+     1.06464
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_core",
+    "hex": "#FB7430",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_core_deep",
+    "hex": "#C4481E",
+    "levels": [
+     0.96887,
+     0.97333,
+     0.97762,
+     0.9799,
+     0.98203,
+     0.98518,
+     0.98744,
+     0.99057,
+     0.99304,
+     0.99528,
+     0.99671,
+     0.99964,
+     1.00105,
+     1.00349,
+     1.0066,
+     1.00845,
+     1.01058,
+     1.0126,
+     1.01487,
+     1.01743,
+     1.01889,
+     1.02101,
+     1.02343
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_core_hot",
+    "hex": "#FBAB4E",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_ember_lip",
+    "hex": "#522420",
+    "levels": [
+     0.92461,
+     0.94671,
+     0.95133,
+     0.95362,
+     0.95562,
+     0.95996,
+     0.97055,
+     0.97561,
+     0.97989,
+     0.98418,
+     0.98719,
+     0.98779,
+     0.98917,
+     0.99286,
+     0.99568,
+     1.00005,
+     1.00286,
+     1.00429,
+     1.00685,
+     1.00936,
+     1.01244,
+     1.01455,
+     1.01585,
+     1.01793,
+     1.01999,
+     1.02244,
+     1.02448,
+     1.02756,
+     1.03068,
+     1.04408,
+     1.05795,
+     1.05795
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_ember_lip_x_core_deep_25",
+    "hex": "#6E2D20",
+    "levels": [
+     0.9738,
+     0.97631,
+     0.98023,
+     0.98339,
+     0.98519,
+     0.98731,
+     0.99138,
+     0.99358,
+     0.99599,
+     0.99922,
+     1.00227,
+     1.00703,
+     1.00932,
+     1.01342,
+     1.01694,
+     1.01964,
+     1.02125,
+     1.02515,
+     1.02663
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_ember_lip_x_core_deep_75",
+    "hex": "#A83F1E",
+    "levels": [
+     0.96939,
+     0.97941,
+     0.98195,
+     0.98552,
+     0.98857,
+     0.99118,
+     0.99415,
+     1.00001,
+     1.00496,
+     1.00958,
+     1.01202,
+     1.01551,
+     1.0309
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_ember_wall",
+    "hex": "#C95E2A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell",
+    "hex": "#534F5B",
+    "levels": [
+     0.96533,
+     0.98331,
+     0.98674,
+     0.99329,
+     0.99626,
+     0.99903,
+     1.00436,
+     1.01106,
+     1.02133,
+     1.03576,
+     1.07596
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_dark",
+    "hex": "#2A2732",
+    "levels": [
+     0.94484,
+     0.95017,
+     0.95362,
+     0.95649,
+     0.95937,
+     0.9619,
+     0.96411,
+     0.97167,
+     0.97335,
+     0.97673,
+     0.97923,
+     0.98146,
+     0.9877,
+     0.99186,
+     0.99637,
+     1.00776,
+     1.00986,
+     1.01262,
+     1.01493,
+     1.0225,
+     1.04408,
+     1.09305
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_light",
+    "hex": "#88828E",
+    "levels": [
+     0.94352,
+     0.95109,
+     0.96946,
+     0.97318,
+     0.97814,
+     0.98145,
+     0.98573,
+     0.98757,
+     0.99009,
+     0.99354,
+     0.99826,
+     1.00141,
+     1.00344,
+     1.00774,
+     1.00993,
+     1.02089,
+     1.02522,
+     1.03206,
+     1.03336,
+     1.04254,
+     1.04504,
+     1.05119,
+     1.05345
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_warm",
+    "hex": "#5C535B",
+    "levels": [
+     0.96905,
+     0.97369,
+     0.97994,
+     0.98467,
+     0.98703,
+     0.98865,
+     0.99133,
+     0.99458,
+     0.99639,
+     0.99896,
+     1.00201,
+     1.00502,
+     1.00974,
+     1.01185,
+     1.01599,
+     1.02129,
+     1.02357,
+     1.03363
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_warm_x_ember_lip_50",
+    "hex": "#573C3E",
+    "levels": [
+     0.96915,
+     0.97318,
+     0.97923,
+     0.98195,
+     0.98502,
+     0.9889,
+     0.991,
+     0.99441,
+     1.00194,
+     1.00506,
+     1.00918,
+     1.01123,
+     1.0153,
+     1.03363
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_dark_25",
+    "hex": "#494551",
+    "levels": [
+     0.96533,
+     0.9786,
+     0.98639,
+     1.00095,
+     1.04644,
+     1.06038,
+     1.06659
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_dark_50",
+    "hex": "#3E3B46",
+    "levels": [
+     0.96533,
+     0.98991,
+     1.00703,
+     1.00912,
+     1.03102,
+     1.03493,
+     1.04675,
+     1.05538
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_dark_75",
+    "hex": "#34313C",
+    "levels": [
+     0.98641,
+     0.99159,
+     1.04262,
+     1.06104
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_light_25",
+    "hex": "#605C68",
+    "levels": [
+     0.99093,
+     0.99329,
+     1.06842
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_light_50",
+    "hex": "#6E6874",
+    "levels": [
+     0.98971,
+     1.00934,
+     1.01596,
+     1.02783,
+     1.03276,
+     1.06842
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_light_75",
+    "hex": "#7B7581",
+    "levels": [
+     0.96428,
+     0.96842,
+     1.02783
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_warm_25",
+    "hex": "#55505B",
+    "levels": [
+     0.94352,
+     0.95373,
+     0.95784,
+     0.96385,
+     0.96861,
+     0.97032,
+     0.97341,
+     0.97933,
+     0.98168,
+     0.98654,
+     0.98911,
+     0.9915,
+     0.99626,
+     0.99888,
+     1.00121,
+     1.00746,
+     1.01001,
+     1.01186,
+     1.01562,
+     1.01773,
+     1.02589,
+     1.03244,
+     1.03586,
+     1.03932,
+     1.04274,
+     1.04482,
+     1.04836,
+     1.05549,
+     1.05734,
+     1.06659
+    ],
+    "used": true
+   },
+   {
+    "key": "m015_shell_x_warm_50",
+    "hex": "#58515B",
+    "levels": [
+     0.92162,
+     0.95097,
+     0.95109,
+     0.95253,
+     0.95408,
+     0.96243,
+     0.96465,
+     0.9673,
+     0.96924,
+     0.97288,
+     0.97334,
+     0.97583,
+     0.9786,
+     0.98116,
+     0.98488,
+     0.98944,
+     0.99159,
+     0.99327,
+     0.99533,
+     0.99903,
+     1.00095,
+     1.00153,
+     1.00776,
+     1.0131,
+     1.01777,
+     1.02514,
+     1.03782,
+     1.04262,
+     1.04408,
+     1.05515,
+     1.05565,
+     1.06113
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "EmberCore",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "part",
+   "size": [
+    4.9147,
+    5.2296,
+    4.7209
+   ],
+   "tris": 58,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberCore.glb",
+     "kind": "solid",
+     "tris": 19,
+     "offset": [
+      -0.0461,
+      1.6878,
+      0.0
+     ],
+     "size": [
+      4.8226,
+      3.3756,
+      4.7209
+     ]
+    },
+    {
+     "file": "meshes/EmberCore_glow_m015_core.glb",
+     "kind": "glow",
+     "tris": 21,
+     "offset": [
+      0.0,
+      3.0858,
+      0.0
+     ],
+     "size": [
+      4.9147,
+      4.2877,
+      4.7209
+     ],
+     "key": "m015_core",
+     "color": "#FB7430",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberCore_glow_m015_core_hot.glb",
+     "kind": "glow",
+     "tris": 18,
+     "offset": [
+      0.0,
+      3.7147,
+      -0.0157
+     ],
+     "size": [
+      4.9147,
+      3.0297,
+      4.6894
+     ],
+     "key": "m015_core_hot",
+     "color": "#FBAB4E",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Ember Core (reusable): chunky faceted ball, about 30 broad facets, hot crown, deep underside"
+  },
+  {
+   "name": "EmberMeteorBaseRock",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "part",
+   "size": [
+    2.414,
+    1.3,
+    2.2458
+   ],
+   "tris": 58,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorBaseRock.glb",
+     "kind": "solid",
+     "tris": 58,
+     "offset": [
+      0.0,
+      0.65,
+      0.0
+     ],
+     "size": [
+      2.414,
+      1.3,
+      2.2458
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (reusable): low rounded faceted stone, blunt off-centre crown, flat bottom"
+  },
+  {
+   "name": "EmberMeteorCap",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "part",
+   "size": [
+    4.6724,
+    7.4721,
+    3.9738
+   ],
+   "tris": 442,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorCap.glb",
+     "kind": "solid",
+     "tris": 302,
+     "offset": [
+      0.0,
+      3.7361,
+      0.0
+     ],
+     "size": [
+      4.6724,
+      7.4721,
+      3.9738
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteorCap_glow_m015_core.glb",
+     "kind": "glow",
+     "tris": 13,
+     "offset": [
+      0.1839,
+      4.4868,
+      -0.3751
+     ],
+     "size": [
+      3.8236,
+      5.3824,
+      2.646
+     ],
+     "key": "m015_core",
+     "color": "#FB7430",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorCap_glow_m015_core_hot.glb",
+     "kind": "glow",
+     "tris": 54,
+     "offset": [
+      -0.0087,
+      4.6223,
+      -0.4395
+     ],
+     "size": [
+      3.8169,
+      5.5362,
+      2.8154
+     ],
+     "key": "m015_core_hot",
+     "color": "#FBAB4E",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorCap_glow_m015_ember_wall.glb",
+     "kind": "glow",
+     "tris": 73,
+     "offset": [
+      0.085,
+      4.2143,
+      -0.214
+     ],
+     "size": [
+      4.2009,
+      6.4668,
+      3.2989
+     ],
+     "key": "m015_ember_wall",
+     "color": "#C95E2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Shell Piece B (front-right): thick sector of the meteor dome between the front and side openings"
+  },
+  {
+   "name": "EmberMeteorChunk",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "part",
+   "size": [
+    4.8698,
+    7.3405,
+    4.6054
+   ],
+   "tris": 796,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorChunk.glb",
+     "kind": "solid",
+     "tris": 386,
+     "offset": [
+      0.0,
+      3.6703,
+      0.0
+     ],
+     "size": [
+      4.8698,
+      7.3405,
+      4.6054
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteorChunk_glow_m015_core.glb",
+     "kind": "glow",
+     "tris": 98,
+     "offset": [
+      -0.0146,
+      4.1897,
+      0.3296
+     ],
+     "size": [
+      4.4031,
+      5.6948,
+      3.9097
+     ],
+     "key": "m015_core",
+     "color": "#FB7430",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorChunk_glow_m015_core_hot.glb",
+     "kind": "glow",
+     "tris": 217,
+     "offset": [
+      -0.2373,
+      4.0157,
+      0.3443
+     ],
+     "size": [
+      4.3953,
+      5.3468,
+      3.781
+     ],
+     "key": "m015_core_hot",
+     "color": "#FBAB4E",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorChunk_glow_m015_ember_wall.glb",
+     "kind": "glow",
+     "tris": 95,
+     "offset": [
+      -0.0797,
+      3.9429,
+      0.3356
+     ],
+     "size": [
+      4.7103,
+      6.3041,
+      3.9217
+     ],
+     "key": "m015_ember_wall",
+     "color": "#C95E2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Shell Piece C (back-right, also used mirrored at the back-left): the tallest sector of the meteor dome, a glowing crack slot running diagonally down its back flank"
+  },
+  {
+   "name": "EmberMeteorDeposit",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "hero",
+   "size": [
+    11.0826,
+    7.55,
+    10.4987
+   ],
+   "tris": 3862,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorDeposit.glb",
+     "kind": "solid",
+     "tris": 2515,
+     "offset": [
+      0.0,
+      3.775,
+      0.0
+     ],
+     "size": [
+      11.0826,
+      7.55,
+      10.4987
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteorDeposit_glow_m015_core.glb",
+     "kind": "glow",
+     "tris": 306,
+     "offset": [
+      -0.1354,
+      4.4036,
+      -0.3257
+     ],
+     "size": [
+      9.1637,
+      6.2227,
+      7.1915
+     ],
+     "key": "m015_core",
+     "color": "#FB7430",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorDeposit_glow_m015_core_hot.glb",
+     "kind": "glow",
+     "tris": 698,
+     "offset": [
+      -0.1354,
+      4.3787,
+      -0.3429
+     ],
+     "size": [
+      8.7105,
+      6.1728,
+      6.999
+     ],
+     "key": "m015_core_hot",
+     "color": "#FBAB4E",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorDeposit_glow_m015_ember_wall.glb",
+     "kind": "glow",
+     "tris": 343,
+     "offset": [
+      -0.1686,
+      4.1688,
+      -0.3109
+     ],
+     "size": [
+      9.2743,
+      6.7081,
+      7.2209
+     ],
+     "key": "m015_ember_wall",
+     "color": "#C95E2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_EmberMeteorDeposit_embers_1",
+     "kind": "embers",
+     "position": [
+      -0.1354,
+      8.4,
+      -0.6681
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FEBD79",
+         "#FD6A22",
+         "#FE5A1B"
+        ],
+        "size": [
+         0.55,
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0.0,
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.5
+        ],
+        "rate": 3.0,
+        "speed": [
+         0.6,
+         1.4
+        ],
+        "spread": 70,
+        "light_emission": 1.0,
+        "drag": 0.6,
+        "acceleration": [
+         0,
+         0.5,
+         0
+        ],
+        "shape": [
+         4.0,
+         0.6,
+         3.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_EmberMeteorDeposit_embers_2",
+     "kind": "embers",
+     "position": [
+      0.4646,
+      2.6,
+      4.9319
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FEBD79",
+         "#FD6A22",
+         "#FE5A1B"
+        ],
+        "size": [
+         0.55,
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0.0,
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.6,
+         1.4
+        ],
+        "spread": 70,
+        "light_emission": 1.0,
+        "drag": 0.6,
+        "acceleration": [
+         0,
+         0.5,
+         0
+        ],
+        "shape": [
+         2.0,
+         1.0,
+         0.6
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_EmberMeteorDeposit_embers_3",
+     "kind": "embers",
+     "position": [
+      -6.0354,
+      4.0,
+      -0.3681
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FEBD79",
+         "#FD6A22",
+         "#FE5A1B"
+        ],
+        "size": [
+         0.55,
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0.0,
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.6,
+         1.4
+        ],
+        "spread": 70,
+        "light_emission": 1.0,
+        "drag": 0.6,
+        "acceleration": [
+         0,
+         0.5,
+         0
+        ],
+        "shape": [
+         0.8,
+         3.6,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_EmberMeteorDeposit_embers_4",
+     "kind": "embers",
+     "position": [
+      5.9646,
+      4.0,
+      -0.3681
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FEBD79",
+         "#FD6A22",
+         "#FE5A1B"
+        ],
+        "size": [
+         0.55,
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0.0,
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.5
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.6,
+         1.4
+        ],
+        "spread": 70,
+        "light_emission": 1.0,
+        "drag": 0.6,
+        "acceleration": [
+         0,
+         0.5,
+         0
+        ],
+        "shape": [
+         0.8,
+         3.6,
+         3.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_EmberMeteorDeposit_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      0.4646,
+      3.8,
+      4.2319
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FFB347",
+         "#FF6A1A"
+        ],
+        "size": [
+         1.4,
+         2.0
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 2.5,
+        "speed": [
+         0.2,
+         0.4
+        ],
+        "spread": 5,
+        "light_emission": 1.0,
+        "shape": [
+         1.8,
+         2.4,
+         0.4
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 0.7,
+       "range": 10.0,
+       "flicker": true,
+       "shadows": true
+      }
+     }
+    },
+    {
+     "name": "VFX_EmberMeteorDeposit_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      -0.1354,
+      4.2,
+      -4.5681
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FFB347",
+         "#FF6A1A"
+        ],
+        "size": [
+         1.4,
+         2.0
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 2.0,
+        "speed": [
+         0.2,
+         0.4
+        ],
+        "spread": 5,
+        "light_emission": 1.0,
+        "shape": [
+         1.4,
+         2.2,
+         0.4
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 0.9,
+       "range": 8.0,
+       "flicker": true,
+       "shadows": true
+      }
+     }
+    }
+   ],
+   "notes": "ember meteor event node: one rounded fractured meteor dome of four thick dark shell pieces round a faceted ember core, which glows through a main front opening, small back / side / crown openings and thin seams and cracks with real depth; a ring of low pale stones; one closed mesh, flat base"
+  },
+  {
+   "name": "EmberMeteorSlab",
+   "sheet": "M015",
+   "subject": "Ember Meteor",
+   "role": "part",
+   "size": [
+    5.7501,
+    7.6,
+    4.1692
+   ],
+   "tris": 682,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/EmberMeteorSlab.glb",
+     "kind": "solid",
+     "tris": 352,
+     "offset": [
+      0.0,
+      3.8,
+      0.0
+     ],
+     "size": [
+      5.7501,
+      7.6,
+      4.1692
+     ]
+    },
+    {
+     "file": "meshes/EmberMeteorSlab_glow_m015_core.glb",
+     "kind": "glow",
+     "tris": 78,
+     "offset": [
+      -0.0774,
+      4.3454,
+      -0.1602
+     ],
+     "size": [
+      5.1143,
+      6.4392,
+      3.342
+     ],
+     "key": "m015_core",
+     "color": "#FB7430",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorSlab_glow_m015_core_hot.glb",
+     "kind": "glow",
+     "tris": 179,
+     "offset": [
+      0.0639,
+      4.5773,
+      -0.2727
+     ],
+     "size": [
+      5.0049,
+      5.8755,
+      3.3402
+     ],
+     "key": "m015_core_hot",
+     "color": "#FBAB4E",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/EmberMeteorSlab_glow_m015_ember_wall.glb",
+     "kind": "glow",
+     "tris": 73,
+     "offset": [
+      -0.1206,
+      4.2574,
+      -0.1723
+     ],
+     "size": [
+      5.2074,
+      6.6309,
+      3.6025
+     ],
+     "key": "m015_ember_wall",
+     "color": "#C95E2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Shell Piece A (front-left): thick curved sector of the meteor dome, wrapping from the front opening round the left side, with a glowing crack slot down its front"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 20,
+  "solid": 6,
+  "water": 0,
+  "glow": 14,
+  "tris": 5898,
+  "vfxSockets": 6,
+  "paletteColours": 27,
+  "paletteLevels": 457,
+  "meshBytes": 558864
+ },
+ "problems": []
+}
