@@ -1246,6 +1246,39 @@
         "shadows": true
       }
     },
+    "crystal_halo": {
+      "emitters": [
+        {
+          "name": "Halo",
+          "texture": "glow_soft",
+          "color": [
+            "#C5F0ED",
+            "#6EF2F8"
+          ],
+          "size": [
+            12,
+            14
+          ],
+          "transparency": [
+            1.0,
+            0.82,
+            1.0
+          ],
+          "lifetime": [
+            2,
+            3
+          ],
+          "rate": 0.8,
+          "speed": [
+            0,
+            0
+          ],
+          "spread": 0,
+          "light_emission": 1.0
+        }
+      ],
+      "light": null
+    },
     "dust": {
       "emitters": [
         {

@@ -276,6 +276,20 @@ KINDS = {
         "emitters": [],
         "light": {"color": "#B06AF5", "brightness": 1.0, "range": 10, "flicker": False, "shadows": True},
     },
+    "crystal_halo": {  # a big, faint, steady glow behind a luminous crystal; set color to the crystal's
+        # (014 Starstone's "Starlight Glow" halo is the default.) Emitters only: pair with crystal_glow (the light) and ore_glint (the sparkle). Place the socket behind the
+        # crystal's centre, inside the asset, so the mesh in front hides the billboard's middle and the glow shows
+        # round the silhouette. A few overlapping particles that fade in and out, never still, never popping.
+        # Size the halo with vfx_scale (1.0 = a node about 10 studs wide). Override color per crystal, e.g.
+        # vfx.add(obj, "crystal_halo", loc, scale=0.6, emitters=[dict(KINDS["crystal_halo"]["emitters"][0],
+        #                                                          color=["#E9D2FF", "#B06AF5"])])
+        "emitters": [
+            {"name": "Halo", "texture": "glow_soft", "color": ["#C5F0ED", "#6EF2F8"], "size": [12, 14],
+             "transparency": [1.0, 0.82, 1.0], "lifetime": [2, 3], "rate": 0.8, "speed": [0, 0], "spread": 0,
+             "light_emission": 1.0},
+        ],
+        "light": None,
+    },
     "dust": {  # gate threshold, path ends: very sparse floating motes
         "emitters": [
             {"name": "Dust", "texture": "dust_mote", "color": ["#F3E1B8", "#E2C890"], "size": [0.3, 0.12],
