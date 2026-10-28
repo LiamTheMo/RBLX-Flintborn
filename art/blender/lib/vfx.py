@@ -22,6 +22,10 @@ lists are NumberRanges (min, max); longer `size`/`transparency`/`color` lists ar
 sequences with evenly spaced keypoints over the particle's life. Multiply Size,
 Speed, Acceleration, shape and light Range by the socket's `vfx_scale`.
 
+Lights: `light` is one PointLight at the socket, keys color, brightness, range,
+flicker / pulse (animated in game), and optional `shadows` (PointLight.Shadows,
+default false; the preview honours it too).
+
 Beams. A kind may also have `beams`: Roblox Beams running from the socket
 (Attachment0) to an END point (Attachment1), for falling water, flowing streaks
 and other ribbons. Beam kinds need the end point:
@@ -263,6 +267,15 @@ KINDS = {
         ],
         "light": None,
     },
+    "crystal_glow": {  # steady soft light from a crystal cluster / geode cave; set light to the crystal's colour
+        # Light only: the crystals' own sparkle is a separate ore_glint socket on their tips. No flicker or pulse
+        # (crystals shine steadily). Shadows on, so the asset's own walls keep the light in its cave: place the
+        # socket in the open, clear of the crystal meshes, or they shadow it. Override the whole light, e.g.
+        # vfx.add(obj, "crystal_glow", loc, light={"color": "#6FB7FF", "brightness": 0.8, "range": 8,
+        #                                         "flicker": False, "shadows": True})
+        "emitters": [],
+        "light": {"color": "#B06AF5", "brightness": 1.0, "range": 10, "flicker": False, "shadows": True},
+    },
     "dust": {  # gate threshold, path ends: very sparse floating motes
         "emitters": [
             {"name": "Dust", "texture": "dust_mote", "color": ["#F3E1B8", "#E2C890"], "size": [0.3, 0.12],
@@ -443,6 +456,8 @@ def catalog():
             "texture_speed / texture_length (verify once in Studio).",
             "Beam textures put u (the image's width) along the beam and v across it.",
             "Emitters with shape_follows_width already have shape[0] set from the socket's width override.",
+            "A kind's light is one PointLight in the socket's Attachment: Color, Brightness, Range (x vfx_scale), "
+            "Shadows = light.shadows (default false); flicker/pulse are animated in game.",
         ],
         "textures": TEXTURES,
         "kinds": KINDS,
@@ -459,7 +474,8 @@ def catalog():
 PREVIEW_PREFIX = "VFXPreview_"
 PREVIEW_COLLECTION = "VFX Preview"
 LIGHT_WATTS = 1.4       # Blender watts per (Roblox brightness x range^2 studs)
-LIGHT_SHADOWS = False   # shadowless: cheap, and not blocked by the asset's own flame mesh
+LIGHT_SHADOWS = False   # default shadowless: cheap, and not blocked by the asset's own flame mesh
+                        # (a kind's light can ask for shadows: "shadows": True)
 MAX_PER_EMITTER = 12
 
 # How each texture looks as a 3D stand-in: (look, shape)
@@ -910,7 +926,7 @@ def realize(scene=None, objects=None, particles=True):
             ld.energy = base
             ld["vfx_base_energy"] = base
             ld.shadow_soft_size = 0.3 * scale
-            ld.use_shadow = LIGHT_SHADOWS
+            ld.use_shadow = bool(light.get("shadows", LIGHT_SHADOWS))
             if hasattr(ld, "use_custom_distance"):
                 ld.use_custom_distance = True
                 ld.cutoff_distance = rng_studs * 1.5
