@@ -136,7 +136,10 @@ end
 function refresh()
 	local view = invoke("ForgeSnapshot")
 	if type(view) ~= "table" then
-		panel:SetStatus("Your data is still loading.")
+		-- Keeps a forge result on screen; the list just stays as it was.
+		if panel.card.status.Text == "" then
+			panel:SetStatus("Your data is still loading.")
+		end
 		return
 	end
 	local entries = {}

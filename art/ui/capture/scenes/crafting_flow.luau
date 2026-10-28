@@ -38,6 +38,11 @@ folder.InventoryChanged.OnClientEvent:Fire({
 })
 CraftingController.Toggle()
 local gui = player.PlayerGui:FindFirstChild("FlintbornCrafting")
+-- Pinned to the sheet's own scale and place, as the crafting scene is.
+if gui then
+	gui.Window.UIScale.Scale = 1
+	gui.Window.Position = UDim2.fromOffset(23 + 814.5, 58 + 371)
+end
 local function check(cond, msg)
 	print((cond and "  ok " or "  FAIL ") .. msg)
 	if not cond then

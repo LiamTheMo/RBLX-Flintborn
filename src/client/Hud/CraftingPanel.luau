@@ -134,7 +134,8 @@ function CraftingPanel:_left(window: Instance)
 	place(box, at(126, 180, 340, 40))
 	box:GetPropertyChangedSignal("Text"):Connect(function()
 		self.query = box.Text
-		self:_drawList()
+		-- A recipe the search hides leaves the card too.
+		self:SelectCategory(self.category)
 	end)
 	self.search = box
 
@@ -384,6 +385,21 @@ end
 
 -- A confirmation over the middle card (forge conversions), armed after a delay.
 function CraftingPanel:_confirmCard(window: Instance)
+	-- While the question is open the rest of the window takes no presses, so
+	-- the recipe and piece it names cannot change under it.
+	self.confirmScrim = Widgets.Make("TextButton", {
+		Name = "ConfirmScrim",
+		Active = true,
+		AutoButtonColor = false,
+		BackgroundColor3 = Layout.Color("veil"),
+		BackgroundTransparency = 0.75,
+		BorderSizePixel = 0,
+		Selectable = false,
+		Size = UDim2.fromScale(1, 1),
+		Text = "",
+		Visible = false,
+		ZIndex = 11,
+	}, window)
 	local card = Widgets.Make("Frame", {
 		Name = "Confirm",
 		Active = true,
@@ -410,7 +426,7 @@ function CraftingPanel:_confirmCard(window: Instance)
 			fn()
 		end
 	end, { name = "Yes", label = "", color = "cream", size = 30, inset = 64, z = 13 })
-	Parchment.Button("pm_button_paper", { 400, 486, 220, 60 }, card, function()
+	self.confirmNo = Parchment.Button("pm_button_paper", { 400, 486, 220, 60 }, card, function()
 		self:HideConfirm()
 	end, { name = "No", label = "Cancel", size = 22, inset = 12, z = 13 })
 	self.confirmCard = card
@@ -605,7 +621,10 @@ function CraftingPanel:_drawCard()
 		child:Destroy()
 	end
 	if entry == nil then
-		card.name.Text = if #self.entries == 0 then "Loading…" else "Choose a recipe"
+		card.name.Text = if #self.entries == 0
+			then "Loading…"
+			elseif #self:_visible() == 0 then "Nothing matches"
+			else "Choose a recipe"
 		card.where.Text = ""
 		for _, chip in card.chips do
 			chip.frame.Visible = false
@@ -636,6 +655,12 @@ function CraftingPanel:_drawCard()
 	local count = if entry.timed then self.count else 1
 	local enough = self:_drawNeeds(entry, count)
 	card.countText.Text = tostring(count)
+	if self.mode ~= "forge" then
+		-- The stepper is for batches, which only smelting has.
+		for _, part in { card.minus.holder, card.plus.holder, card.field, card.countText } do
+			part.Visible = entry.timed == true
+		end
+	end
 	card.minus.SetEnabled(entry.timed == true and self.count > 1)
 	card.plus.SetEnabled(entry.timed == true and self.count < CraftingPanel.MAX_BATCH)
 	card.craft.label.Text = if entry.locked then "LOCKED" else (entry.verb or "CRAFT")
@@ -645,11 +670,13 @@ function CraftingPanel:_drawCard()
 		and entry.here ~= false
 		and not entry.locked
 		and not self.busy
+		-- One smelt at a time: the furnace is busy until the running job ends.
+		and not (entry.timed and self.job ~= nil)
 		and (not sourceNeeded or self.source ~= nil)
 	card.craft.SetEnabled(ready)
 	if self.mode ~= "forge" then
 		card.all.holder.Visible = entry.timed == true
-		card.all.SetEnabled(entry.here ~= false and (entry.can or 0) > 0 and not self.busy)
+		card.all.SetEnabled(entry.here ~= false and (entry.can or 0) > 0 and not self.busy and self.job == nil)
 	end
 	self:_drawSources(entry)
 end
@@ -676,7 +703,12 @@ function CraftingPanel:_drawSources(entry)
 		return
 	end
 	local right = self.right
+	local focusedSource = nil
+	local focus = GuiService.SelectedObject
 	for _, row in right.rows do
+		if focus and focus:IsDescendantOf(row) then
+			focusedSource = row.Name
+		end
 		row:Destroy()
 	end
 	right.rows = {}
@@ -711,10 +743,13 @@ function CraftingPanel:_drawSources(entry)
 			minSize = 10,
 			z = 5,
 		})
-		Parchment.Pressable(holder, rowArt, function()
+		local press = Parchment.Pressable(holder, rowArt, function()
 			self.source = source.id
 			self:_drawCard()
 		end)
+		if focusedSource == source.id then
+			GuiService.SelectedObject = press
+		end
 		table.insert(right.rows, holder)
 	end
 	right.notes.Text = if #sources == 0
@@ -760,6 +795,7 @@ function CraftingPanel:Select(id: string)
 		self.count = 1
 		self.source = nil
 		self.card.status.Text = ""
+		self:HideConfirm()
 	end
 	self.selected = id
 	self:_drawList()
@@ -785,6 +821,11 @@ end
 -- Crafting: the running smelt {entry, count, done, progress (0-1), left (s)} or nil.
 function CraftingPanel:SetJob(job)
 	local right = self.right
+	local changed = (self.job == nil) ~= (job == nil)
+	self.job = job
+	if changed then
+		self:_drawCard()
+	end
 	right.job.Visible = job ~= nil
 	right.empty.holder.Visible = job == nil
 	right.slots.Text = if job then "1/1" else "0/1"
@@ -836,6 +877,11 @@ function CraftingPanel:Confirm(text: string, yes: string, delay: number, onYes)
 	self.confirmYes.label.Text = "READ FIRST…"
 	self.confirmYes.SetEnabled(false)
 	self.confirmCard.Visible = true
+	self.confirmScrim.Visible = true
+	-- A gamepad's focus moves into the question, on Cancel.
+	if GuiService.SelectedObject ~= nil then
+		GuiService.SelectedObject = self.confirmNo.button
+	end
 	local fn = onYes
 	task.delay(delay, function()
 		if self.confirmFn == fn and self.confirmCard.Visible then
@@ -847,9 +893,15 @@ function CraftingPanel:Confirm(text: string, yes: string, delay: number, onYes)
 end
 
 function CraftingPanel:HideConfirm()
+	local wasOpen = self.confirmCard.Visible
 	self.confirmFn = nil
 	self.confirmArmed = false
 	self.confirmCard.Visible = false
+	self.confirmScrim.Visible = false
+	local focus = GuiService.SelectedObject
+	if wasOpen and focus and focus:IsDescendantOf(self.confirmCard) then
+		GuiService.SelectedObject = self.card.craft.button
+	end
 end
 
 function CraftingPanel:IsConfirming(): boolean

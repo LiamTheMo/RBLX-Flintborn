@@ -25,6 +25,7 @@ local InventoryController = require(script.Parent.InventoryController)
 local CraftingPanel = require(script.Parent.Parent.Hud.CraftingPanel)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Binds = require(script.Parent.Parent.Ui.Binds)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local CraftingController = {}
@@ -180,10 +181,14 @@ local function stopSmelt()
 	if recipeId == nil then
 		return
 	end
-	pcall(function()
+	local ok, stopped, reason = pcall(function()
 		return Remotes.Get("Craft"):InvokeServer(HttpService:GenerateGUID(false), recipeId, 0)
 	end)
-	panel:SetStatus("Smelting stopped. Bars already made are yours.")
+	panel:SetStatus(
+		if ok and stopped
+			then "Smelting stopped. Bars already made are yours."
+			else ("Not stopped: " .. Reasons.Text(if ok then reason else "Request failed"))
+	)
 end
 
 -- Smelting progress ----------------------------------------------------------
