@@ -96,13 +96,15 @@ class Canvas:
                     self.image.alpha_composite(piece, (x + dx0, y + dy0))
 
     def text(self, entry, value, x, y, w, h, align="left", size=None):
-        """Roblox-style text: the line box centred vertically in its rect."""
-        f = font(size or entry["textSize"])
+        """Roblox-style text: the line box centred vertically in its rect, shrunk
+        to fit its width down to 12 px (TextScaled with a size constraint)."""
+        size = size or entry["textSize"]
+        f = font(size)
+        while f.getlength(value) > w and size > 12:
+            size -= 1
+            f = font(size)
         ascent, descent = f.getmetrics()
         width = f.getlength(value)
-        while width > w and len(value) > 1:  # TextTruncate.AtEnd
-            value = value[:-2] + "…"
-            width = f.getlength(value)
         tx = x + (w - width) / 2 if align == "center" else x
         ty = y + (h - (ascent + descent)) / 2
         ImageDraw.Draw(self.image).text((tx, ty), value, font=f, fill=color(entry["color"]))
@@ -156,7 +158,8 @@ def draw(c, preview):
     cfg = LOBBY["party"]
     x, y, w, h = place(cfg)
     c.sprite(cfg["sprite"], x, y, w, h)
-    c.text(cfg["title"], "PARTY  %d/%d" % (len(preview["party"]), preview["partyMax"]), *at(cfg["title"], x, y))
+    c.text(cfg["title"], cfg["title"]["text"], *at(cfg["title"], x, y))
+    c.text(cfg["count"], "%d/%d" % (len(preview["party"]), preview["partyMax"]), *at(cfg["count"], x, y))
     c.rect(*at(cfg["divider"], x, y), "line")
     lx, ly, lw, lh = at(cfg["list"], x, y)
     rows = [("member", m) for m in preview["party"]] + [("empty", None)] * (preview["partyMax"] - len(preview["party"]))
@@ -170,11 +173,11 @@ def draw(c, preview):
     ry = 0
     for kind, member in rows:
         entry = cfg[kind]
-        sub.rect(*at(entry["rule"], 0, ry), "line")
+        sub.rect(*at(entry["rule"], 0, ry), "rule")
         if kind == "member":
             hx, hy, hw, hh = at(entry["headshot"], 0, ry)
             sub.rect(hx, hy, hw, hh, "photo", 6)
-            ImageDraw.Draw(region).rounded_rectangle([hx, hy, hx + hw - 1, hy + hh - 1], 6, None, color("paperEdge"), 2)
+            ImageDraw.Draw(region).rounded_rectangle([hx, hy, hx + hw - 1, hy + hh - 1], 6, None, color("photoEdge"), 2)
             sub.text(entry["name"], member["name"], *at(entry["name"], 0, ry))
             if member.get("leader"):
                 sub.fit(entry["crown"]["sprite"], *at(entry["crown"], 0, ry))

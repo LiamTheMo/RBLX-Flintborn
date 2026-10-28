@@ -384,9 +384,11 @@ M = {
     "gear": (1569, 98, 69, 66),
     "party": (1211, 267, 433, 381),
     "tile_inventory": (35, 370, 142, 141),
-    "tile_vault": (182, 370, 142, 140),
-    "tile_quests": (35, 517, 142, 139),
-    "tile_shop": (182, 517, 142, 139),
+    # Every tile is cut at one size so all six draw unscaled (the master's are
+    # 139-141 px tall; the extra rows are transparent).
+    "tile_vault": (182, 370, 142, 141),
+    "tile_quests": (35, 517, 142, 141),
+    "tile_shop": (182, 517, 142, 141),
     "enter": (525, 741, 622, 180),
     "server": (1150, 799, 251, 71),
 }
@@ -399,21 +401,31 @@ def build():
     # Profile: name, level and XP erased, the portrait cut out, empty XP track.
     p = m.copy()
     p = erase(p, ink(p, (203, 114, 392, 150)) | ink(p, (203, 156, 280, 186)))
-    for y in range(164, 180):  # XP fill -> the track's own dark interior, row by row
-        p[y, 287:466, :3] = p[y, 505, :3]
-    hole = box(p.shape, (69, 104, 171, 201))
-    for cx, cy in ((69, 104), (170, 104), (69, 200), (170, 200)):
-        near = np.zeros_like(hole)
-        near[max(cy - 26, 0):cy + 26, max(cx - 26, 0):cx + 26] = True
-        # Paper photo corners overlapping the window: the paper islands that
-        # touch the window's edge, plus their outline.
-        edge = hole & ~box(p.shape, (71, 106, 169, 199))
-        frame = np.zeros_like(hole)
-        for ys, xs in components(parchment_like(p) & near & hole):
-            if edge[ys, xs].any() and len(ys) >= 6:
-                frame[ys, xs] = True
-        hole &= ~(dilate(frame, 2) & near)
-    p[hole, 3] = 0.0
+    # XP fill -> the track's own dark interior: each row repeats a stretch of the
+    # empty track, so its grain carries on with no seam.
+    for y in range(164, 180):
+        p[y, 287:466, :3] = np.resize(p[y, 468:508, :3], (179, 3))
+    # Portrait window. The paper photo corners that overlap it stay: paper pixels
+    # near the window's own corners (a short diagonal), never the painted
+    # portrait (its hands and face are paper-coloured too).
+    x0, y0, x1, y1 = 69, 104, 171, 201
+    hole = box(p.shape, (x0, y0, x1, y1))
+    ys, xs = np.mgrid[0:p.shape[0], 0:p.shape[1]]
+    corner = np.zeros_like(hole)
+    for cx, cy in ((x0, y0), (x1 - 1, y0), (x0, y1 - 1), (x1 - 1, y1 - 1)):
+        corner |= (np.abs(xs - cx) + np.abs(ys - cy)) < 18
+    keep = dilate(parchment_like(p) & corner & hole, 2) & corner & hole
+    # The tapes' rivets are dark: islands the paper encloses stay too.
+    open_window = ~corner & hole
+    for ys, xs in components(corner & hole & ~keep):
+        island = np.zeros_like(keep)
+        island[ys, xs] = True
+        if len(ys) < 60 and not (dilate(island, 1) & open_window).any():
+            keep |= island
+    hole &= ~keep
+    # Soft 1 px edge: the cut is anti-aliased instead of stepped.
+    cut_alpha = np.clip(1 - box_blur(hole.astype(np.float32), 1) * 1.5, 0, 1)
+    p[..., 3] *= cut_alpha
     s["pm_lobby_profile"] = (cut_clean(p, M["profile"]), None)
 
     # Coins and Gems plates with their icons; the numbers are drawn live.
@@ -424,7 +436,13 @@ def build():
     s["pm_lobby_gear"] = (cut_clean(m, M["gear"]), None)
 
     # Party panel: every bit of content erased; rows are drawn live.
-    party = erase(m, box(m.shape, (1250, 302, 1613, 603)), amount=0.9, feather=5)
+    # Only the content is repainted (ink, rules, dots, scrollbar and the member
+    # row's pieces), so the paper between keeps its own colour and grain.
+    area = (1250, 302, 1613, 603)
+    content = box(m.shape, area) & (lum(m) < 0.84)
+    for rect in ((1256, 360, 1330, 432), (1486, 378, 1527, 412), (1533, 364, 1609, 424)):
+        content |= box(m.shape, rect)
+    party = erase(m, dilate(content, 2) & box(m.shape, area), amount=0.8, feather=2)
     s["pm_lobby_party"] = (cut_clean(party, M["party"]), None)
     s["pm_button_add_friend"] = (frame_cutout(m, (1537, 368, 68, 52), pad=0), None)
 
