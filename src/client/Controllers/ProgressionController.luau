@@ -1,12 +1,16 @@
 -- Progression UI (GDD §33, §37, §25.4). A level bar with XP pop-ups everywhere; P
--- (or ButtonSelect) opens the panel: mastery tracks with their next milestone,
--- titles, and in the lobby the rebirth screen (Reset / Kept / Gained in plain
--- words before confirming) and the perk shop. In the world the new HUD (HudMode)
+-- (or ButtonSelect) opens the parchment Progress window (Hud/ListWindow): the
+-- level and mastery tracks with their next milestone, titles, and in the lobby
+-- the rebirth tab (Reset / Kept / Gained in plain words before confirming) and
+-- the perk shop. In the world the new HUD (HudMode)
 -- draws the level bar from Changed/View() and hosts the pop-ups (MountPopups).
 
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local PerkCatalog = require(ReplicatedStorage.Shared.Progression.PerkCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -14,9 +18,20 @@ local ProgressionRules = require(ReplicatedStorage.Shared.Progression.Progressio
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local ListWindow = require(script.Parent.Parent.Hud.ListWindow)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local ProgressionController = {}
+
+-- The rebirth confirmation arms after this many seconds.
+ProgressionController.CONFIRM_DELAY = 1.5
+ProgressionController.TABS = {
+	{ id = "Overview", label = "Overview", glyph = "pm_glyph_person" },
+	{ id = "Perks", label = "Perks", glyph = "pm_glyph_diamond" },
+	{ id = "Rebirth", label = "Rebirth", glyph = "pm_glyph_mountain" },
+	{ id = "Titles", label = "Titles", glyph = "pm_glyph_sword" },
+}
 
 -- Fires (view) with every new progression snapshot.
 ProgressionController.Changed = Signal.new()
@@ -25,6 +40,10 @@ local player = Players.LocalPlayer
 local ui = {}
 local view = nil
 local popupHost = nil
+local window = nil
+local tab = "Overview"
+
+local CLOSE_ACTION = "FlintbornProgressClose"
 
 -- The latest progression snapshot {level, xp, xpToNext, ...}, or nil while loading.
 function ProgressionController.View()
@@ -68,38 +87,6 @@ local function invoke(name: string, ...)
 	return success, reason
 end
 
-local function line(text: string, color: Color3?, size: number?, order: number?)
-	return make("TextLabel", {
-		Text = text,
-		Size = UDim2.new(1, -8, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		TextColor3 = color or TEXT,
-		Font = Enum.Font.GothamMedium,
-		TextSize = size or 13,
-		LayoutOrder = order or 0,
-	}, ui.list)
-end
-
-local function button(text: string, enabled: boolean, order: number, onClick)
-	local b = make("TextButton", {
-		Text = text,
-		Size = UDim2.new(1, -8, 0, 28),
-		BackgroundColor3 = if enabled then Color3.fromRGB(110, 70, 30) else Color3.fromRGB(50, 44, 38),
-		TextColor3 = if enabled then Color3.fromRGB(255, 240, 220) else Color3.fromRGB(140, 130, 120),
-		AutoButtonColor = enabled,
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-		LayoutOrder = order,
-	}, ui.list)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-	if enabled then
-		b.Activated:Connect(onClick)
-	end
-end
-
 local function updateBar()
 	if view == nil then
 		return
@@ -114,40 +101,41 @@ end
 
 local renderPanel
 
+-- Shows the rebirth question with what it resets, keeps and gains, in plain words.
 local function confirmRebirth()
 	local preview = invoke("RebirthPreview")
 	if type(preview) ~= "table" then
+		window:SetStatus("The rebirth preview could not load. Try again.")
 		return
 	end
-	ui.confirmText.Text = ("Rebirth?\n\nRESET: %s\n\nKEPT: %s\n\nGAINED: %s"):format(
-		table.concat(preview.reset, "; "),
-		table.concat(preview.kept, "; "),
-		table.concat(preview.gained, "; ")
+	window:Confirm(
+		("RESET: %s\n\nKEPT: %s\n\nGAINED: %s"):format(
+			table.concat(preview.reset, "; "),
+			table.concat(preview.kept, "; "),
+			table.concat(preview.gained, "; ")
+		),
+		"REBIRTH",
+		ProgressionController.CONFIRM_DELAY,
+		function()
+			local ok, reason = invoke("Rebirth", HttpService:GenerateGUID(false))
+			window:SetStatus(
+				if ok then "Reborn. Your tokens are ready to spend." else ("Not reborn: " .. Reasons.Text(reason))
+			)
+		end
 	)
-	ui.confirm.Visible = true
 end
 
-function renderPanel()
-	for _, child in ui.list:GetChildren() do
-		if not child:IsA("UIListLayout") then
-			child:Destroy()
-		end
-	end
-	if view == nil then
-		line("Your progress is still loading.")
-		return
-	end
-	local order = 0
-	local function nextOrder()
-		order += 1
-		return order
-	end
-	line(
-		("Level %d · Rebirths %d · Tokens %d"):format(view.level, view.rebirth.count, view.rebirth.tokens),
-		GOLD,
-		16,
-		nextOrder()
-	)
+local function drawOverview()
+	local rebirth = view.rebirth
+	window:Row({
+		key = "Level",
+		title = ("Level %d"):format(view.level),
+		detail = if view.xpToNext
+			then ("%d / %d XP to level %d"):format(view.xp, view.xpToNext, view.level + 1)
+			else "Max level: rebirth to keep climbing.",
+		glyph = "pm_glyph_person",
+		value = ("Rebirths %d"):format(rebirth.count),
+	})
 	local bonuses = {}
 	if view.premium then
 		table.insert(bonuses, "Premium +25% XP")
@@ -156,50 +144,115 @@ function renderPanel()
 		table.insert(bonuses, "XP booster +50%")
 	end
 	if #bonuses > 0 then
-		line("Active: " .. table.concat(bonuses, " + "), Color3.fromRGB(160, 230, 160), 12, nextOrder())
+		window:Line("Active: " .. table.concat(bonuses, " + "), "good")
 	end
-	line("Masteries", GOLD, 15, nextOrder())
+	window:Section("Masteries")
 	for _, mastery in view.masteries do
-		local progress = if mastery.nextXp then ("%d / %d"):format(mastery.xp, mastery.nextXp) else "max"
-		local reward = if mastery.nextReward then "  · next title: " .. mastery.nextReward else ""
-		line(("%s %d/10 — %s%s"):format(mastery.track, mastery.level, progress, reward), TEXT, 13, nextOrder())
+		window:Row({
+			key = mastery.track,
+			title = ("%s  %d / 10"):format(mastery.track, mastery.level),
+			detail = (if mastery.nextXp then ("%d / %d XP"):format(mastery.xp, mastery.nextXp) else "Mastered")
+				.. (if mastery.nextReward then (" · next title: " .. mastery.nextReward) else ""),
+			glyph = "pm_glyph_hammer",
+			done = mastery.nextXp == nil,
+		})
 	end
-	if #view.titles > 0 then
-		line("Titles: " .. table.concat(view.titles, ", "), Color3.fromRGB(200, 180, 255), 12, nextOrder())
-	end
-	if not PlaceConfig.IsLobby() then
-		line("Rebirth and perks are in the lobby.", TEXT, 12, nextOrder())
+end
+
+local function drawTitles()
+	if #view.titles == 0 then
+		window:Line("No titles yet. Masteries, quests and the shop award them.", "ink")
 		return
 	end
-	line("Rebirth", GOLD, 15, nextOrder())
+	for _, title in view.titles do
+		window:Row({ key = title, title = title, glyph = "pm_glyph_diamond", done = true })
+	end
+end
+
+local function drawRebirth()
 	local rebirth = view.rebirth
-	line(
-		("Needs level %d (you: %d) and %d Guardian Legendary extraction(s) since your last rebirth (you: %d)."):format(
-			rebirth.levelNeeded,
-			view.level,
-			rebirth.legendariesNeeded,
-			rebirth.legendaries
-		),
-		TEXT,
-		12,
-		nextOrder()
+	window:Line(
+		"Rebirth starts your level again in exchange for perk tokens. Review shows exactly what resets, what is kept and what you gain."
 	)
-	local eligible = view.level >= rebirth.levelNeeded and rebirth.legendaries >= rebirth.legendariesNeeded
-	button("Review rebirth…", eligible, nextOrder(), confirmRebirth)
-	line("Perk shop", GOLD, 15, nextOrder())
+	local levelOk = view.level >= rebirth.levelNeeded
+	local legendOk = rebirth.legendaries >= rebirth.legendariesNeeded
+	window:Row({
+		key = "NeedLevel",
+		title = ("Reach level %d"):format(rebirth.levelNeeded),
+		detail = ("You: level %d"):format(view.level),
+		glyph = "pm_glyph_person",
+		done = levelOk,
+	})
+	window:Row({
+		key = "NeedLegendary",
+		title = ("Extract %d Guardian Legendary"):format(rebirth.legendariesNeeded),
+		detail = ("Since your last rebirth: %d"):format(rebirth.legendaries),
+		glyph = "pm_glyph_sword",
+		done = legendOk,
+	})
+	window:Buttons({
+		{
+			label = "REVIEW REBIRTH",
+			key = "Review",
+			width = 260,
+			enabled = levelOk and legendOk,
+			onPress = confirmRebirth,
+		},
+	})
+end
+
+local function drawPerks()
+	local rebirth = view.rebirth
+	window:Line(
+		("Perk tokens: %d. Tokens come from rebirths; a respec in the Market refunds them."):format(rebirth.tokens)
+	)
 	for _, perkId in PerkCatalog.ORDER do
 		local perk = PerkCatalog.Perks[perkId]
 		local rank = rebirth.ownedPerks[perkId] or 0
 		local cost = ProgressionRules.PerkCost(perkId, rank)
-		local label = ("%s %d/%d — %s"):format(perk.name, rank, #perk.costs, perk.description)
-		line(label, TEXT, 12, nextOrder())
-		if cost then
-			button(("Buy rank %d (%d tokens)"):format(rank + 1, cost), rebirth.tokens >= cost, nextOrder(), function()
-				local ok, reason = invoke("BuyPerk", perkId, HttpService:GenerateGUID(false))
-				ui.status.Text = if ok then perk.name .. " upgraded." else ("Not bought: " .. tostring(reason))
-			end)
-		end
+		window:Row({
+			key = perkId,
+			title = ("%s  %d / %d"):format(perk.name, rank, #perk.costs),
+			detail = perk.description,
+			glyph = "pm_glyph_diamond",
+			value = if cost then ("%d token%s"):format(cost, if cost == 1 then "" else "s") else nil,
+			done = cost == nil,
+			buttons = if cost
+				then {
+					{
+						label = "BUY",
+						key = "Buy",
+						enabled = rebirth.tokens >= cost,
+						onPress = function()
+							local ok, reason = invoke("BuyPerk", perkId, HttpService:GenerateGUID(false))
+							window:SetStatus(
+								if ok then perk.name .. " upgraded." else ("Not bought: " .. Reasons.Text(reason))
+							)
+						end,
+					},
+				}
+				else nil,
+		})
 	end
+end
+
+function renderPanel()
+	window:SetTab(tab)
+	window:Begin()
+	if view == nil then
+		window:Line("Your progress is still loading.", "ink")
+	elseif tab == "Titles" then
+		drawTitles()
+	elseif tab == "Overview" then
+		drawOverview()
+	elseif not PlaceConfig.IsLobby() then
+		window:Line("Rebirth and perks are in the lobby.", "ink")
+	elseif tab == "Rebirth" then
+		drawRebirth()
+	else
+		drawPerks()
+	end
+	window:Finish()
 end
 
 local function popup(payload)
@@ -269,113 +322,42 @@ local function build()
 	refreshBar()
 	placePopups()
 
-	ui.panel = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.new(0.45, 0, 0.75, 0),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		Active = true,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(520, 620), MinSize = Vector2.new(300, 300) }, ui.panel)
-	local close = make("TextButton", {
-		Text = "✕",
-		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, -6, 0, 6),
-		Size = UDim2.fromOffset(28, 24),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.panel)
-	close.Activated:Connect(function()
-		ui.panel.Visible = false
-		ui.confirm.Visible = false
-	end)
-	ui.list = make("ScrollingFrame", {
-		Position = UDim2.fromOffset(10, 34),
-		Size = UDim2.new(1, -20, 1, -66),
-		BackgroundTransparency = 1,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(),
-		ScrollBarThickness = 6,
-	}, ui.panel)
-	make("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }, ui.list)
-	ui.status = make("TextLabel", {
-		Text = "",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 10, 1, -6),
-		Size = UDim2.new(1, -20, 0, 22),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = TEXT,
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-	}, ui.panel)
-
-	ui.confirm = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(420, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = Color3.fromRGB(40, 28, 18),
-		Active = true,
-		Visible = false,
-		ZIndex = 5,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.confirm)
-	make("UIPadding", {
-		PaddingTop = UDim.new(0, 12),
-		PaddingBottom = UDim.new(0, 12),
-		PaddingLeft = UDim.new(0, 12),
-		PaddingRight = UDim.new(0, 12),
-	}, ui.confirm)
-	make("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }, ui.confirm)
-	ui.confirmText = make("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		TextColor3 = TEXT,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 14,
-		LayoutOrder = 1,
-		ZIndex = 5,
-	}, ui.confirm)
-	local function confirmButton(text: string, order: number, onClick)
-		local b = make("TextButton", {
-			Text = text,
-			Size = UDim2.new(1, 0, 0, 30),
-			BackgroundColor3 = Color3.fromRGB(110, 70, 30),
-			TextColor3 = Color3.fromRGB(255, 240, 220),
-			Font = Enum.Font.GothamBold,
-			TextSize = 14,
-			LayoutOrder = order,
-			ZIndex = 5,
-		}, ui.confirm)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(onClick)
-	end
-	confirmButton("Rebirth now", 2, function()
-		ui.confirm.Visible = false
-		local ok, reason = invoke("Rebirth", HttpService:GenerateGUID(false))
-		ui.status.Text = if ok then "Reborn. Your tokens are ready to spend." else ("Not reborn: " .. tostring(reason))
-	end)
-	confirmButton("Cancel", 3, function()
-		ui.confirm.Visible = false
-	end)
+	window = ListWindow.new(player:WaitForChild("PlayerGui"), {
+		name = "FlintbornProgress",
+		title = "PROGRESS",
+		tabs = ProgressionController.TABS,
+		onTab = function(id)
+			tab = id
+			window:SetStatus("")
+			renderPanel()
+		end,
+		onClose = function()
+			ProgressionController.Toggle()
+		end,
+	})
+	window.screen:Watch()
 end
 
 -- Opens or closes this panel (keys, and the on-screen navigation bar).
 function ProgressionController.Toggle()
-	ui.panel.Visible = not ui.panel.Visible
-	ui.confirm.Visible = false
-	if ui.panel.Visible then
-		ui.status.Text = ""
-		renderPanel()
+	if window.screen:IsOpen() then
+		ContextActionService:UnbindAction(CLOSE_ACTION)
+		window:Close()
+		return
 	end
+	window:SetStatus("")
+	window:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
+	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
+		if state == Enum.UserInputState.Begin then
+			if window:IsConfirming() then
+				window:HideConfirm()
+			else
+				ProgressionController.Toggle()
+			end
+		end
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.ButtonB)
+	renderPanel()
 end
 
 function ProgressionController.Start()
@@ -383,7 +365,7 @@ function ProgressionController.Start()
 	Remotes.Get("ProgressionChanged").OnClientEvent:Connect(function(snapshot)
 		view = snapshot
 		updateBar()
-		if ui.panel.Visible then
+		if window.screen:IsOpen() then
 			renderPanel()
 		end
 	end)

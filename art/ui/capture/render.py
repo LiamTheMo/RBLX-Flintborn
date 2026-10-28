@@ -191,6 +191,16 @@ def layout(node, pw, ph):
     for child in kids:
         size_child(child, pw, ph)
     lst, grid = node.first("UIListLayout"), node.first("UIGridLayout")
+    if lst or grid:
+        # A layout stacks auto-sized containers at their grown size, so grow
+        # them first (the engine does the same).
+        for child in kids:
+            if enum(child.props.get("AutomaticSize")) != "None" and child.cls not in (
+                    "TextLabel", "TextButton", "TextBox", "ScrollingFrame"):
+                child.rect = (0, 0) + tuple(child.size)
+                layout(child, *child.size)
+                auto_size_after(child)
+                child.size = (child.rect[2], child.rect[3])
     if lst:
         list_layout(lst, kids, pw, ph, left, top)
     elif grid:
@@ -208,7 +218,11 @@ def layout(node, pw, ph):
             canvas_layout(child, w, h)
         else:
             layout(child, w, h)
+            before = child.rect
             auto_size_after(child)
+            if child.rect != before:
+                # Children sized by scale follow the grown box, as in the engine.
+                layout(child, child.rect[2], child.rect[3])
 
 
 def size_child(child, pw, ph):

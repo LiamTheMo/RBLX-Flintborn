@@ -833,6 +833,31 @@ def build_crafting():
     return s
 
 
+def build_windows():
+    """Generic parchment windows for the screens with no sheet of their own
+    (Market, Trade, Progress, the world map, notices), from the panel layouts
+    (11): a 9-sliced window with its inner panels and mark repainted as
+    paper, an inset panel, the hollow map frame, a notice card and a long
+    banner (titles sit on the leather button plate)."""
+    p = sheet("11")
+    s = {}
+    win = erase(p, box(p.shape, (812, 47, 1496, 362)), amount=0.8, feather=3)
+    # The mark on the title band: the band is the same all along, so a stretch
+    # of it beside the mark covers it with no seam.
+    win[14:47, 1124:1196] = win[14:47, 1040:1112]
+    # Corners deep enough to hold the rope bindings near them, so only plain
+    # leather and stitching stretch.
+    s["pm_frame_window"] = (cut_clean(win, (784, 8, 739, 376)), [96, 112, 96, 122])
+    inset = cut(p, (965, 46, 376, 318), pad=0)
+    s["pm_inset"] = (inset, [22, 22, 22, 22])
+    hollow = p.copy()
+    hollow[400:440, 352:428] = hollow[400:440, 250:326]
+    s["pm_frame_hollow"] = (cut_clean(hollow, (14, 397, 770, 329)), [96, 112, 96, 122])
+    s["pm_card"] = (cut_clean(p, (1207, 750, 310, 144)), [56, 48, 40, 40])
+    s["pm_banner"] = (cut_clean(p, (576, 910, 944, 88)), [64, 30, 64, 30])
+    return s
+
+
 def contact(sprites, path):
     items = [(n, a) for n, (a, _) in sorted(sprites.items())]
     width = max(1600, max(a.shape[1] for _, a in items) + 20)
@@ -860,6 +885,7 @@ def main():
     sprites.update(build_journal())
     sprites.update(build_inventory())
     sprites.update(build_crafting())
+    sprites.update(build_windows())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]

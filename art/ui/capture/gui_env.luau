@@ -797,7 +797,14 @@ function Methods:GetUserThumbnailAsync()
 	return "rbxthumb://type=AvatarHeadShot&id=1&w=150&h=150", true
 end
 function Methods:GetPlayers()
-	return { LocalPlayer }
+	-- The local player, and any Player a scene parents to Players.
+	local list = {}
+	for _, child in Players:GetChildren() do
+		if child.ClassName == "Player" then
+			table.insert(list, child)
+		end
+	end
+	return if #list > 0 then list else { LocalPlayer }
 end
 function Methods:GetPlayerByUserId(id)
 	return if id == 1 then LocalPlayer else nil

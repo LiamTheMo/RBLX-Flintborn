@@ -18,6 +18,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local InventoryPanel = require(script.Parent.Parent.Hud.InventoryPanel)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Theme = require(script.Parent.Parent.Ui.Theme)
@@ -42,8 +43,6 @@ local sortIndex = 1
 local busy = false
 
 local CLOSE_ACTION = "FlintbornVaultClose"
-
-local make = Theme.Make
 
 local function invoke(name: string, ...)
 	local ok, success, reason, detail = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
@@ -328,23 +327,15 @@ local function build()
 	panel.screen:Watch()
 
 	-- In the shared top-centre column with the other banners.
-	ui.receipt = make("TextButton", {
-		Size = UDim2.fromOffset(460, 0),
-		LayoutOrder = Theme.TopOrder.Receipt,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = Color3.fromRGB(16, 38, 30),
-		BackgroundTransparency = 0.05,
-		TextColor3 = Color3.fromRGB(210, 255, 226),
-		TextWrapped = true,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 14,
-		Visible = false,
-	}, Theme.TopStack())
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.receipt)
-	make("UIPadding", { PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8) }, ui.receipt)
-	ui.receipt.Activated:Connect(function()
-		ui.receipt.Visible = false
-	end)
+	ui.receipt = NoticeCard.new(Theme.TopStack(), {
+		name = "Receipt",
+		width = 480,
+		layoutOrder = Theme.TopOrder.Receipt,
+		title = "Extraction receipt",
+		onPress = function()
+			ui.receipt:Hide()
+		end,
+	})
 end
 
 local function listOf(map): string
@@ -393,8 +384,7 @@ local function showReceipt(receipt)
 		table.insert(lines, "Deleted (no room): " .. listOf(receipt.deleted))
 	end
 	table.insert(lines, "(click to dismiss)")
-	ui.receipt.Text = table.concat(lines, "\n")
-	ui.receipt.Visible = true
+	ui.receipt:Show(table.concat(lines, "\n") .. "\n\nTap to dismiss.")
 end
 
 -- Opens or closes the window (the Backpack key, the Inventory and Vault tiles).
