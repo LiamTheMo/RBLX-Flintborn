@@ -107,12 +107,14 @@ class CloudPublishSafetyTests(unittest.TestCase):
         self.assertEqual(sorted(seen), sorted("Mod%03d" % i for i in range(120)))
 
     def test_rate_limits_back_off(self):
-        # Retry-After is honoured when sane; otherwise exponential, capped.
+        # The longer of Retry-After and an exponential backoff, capped.
         self.assertEqual(cloud.retry_delay(0, "7"), 7.0)
         self.assertEqual(cloud.retry_delay(0, None), 3)
         self.assertEqual(cloud.retry_delay(2, "nonsense"), 12)
         self.assertEqual(cloud.retry_delay(6, None), cloud.MAX_RETRY_SECONDS)
         self.assertEqual(cloud.retry_delay(1, "9999"), 6)
+        # A short Retry-After never shortens the backoff.
+        self.assertEqual(cloud.retry_delay(4, "1"), 48)
         total = sum(cloud.retry_delay(r) for r in range(cloud.RETRIES - 1))
         self.assertGreaterEqual(total, 120, "rides out a couple of minutes of rate limiting")
 
