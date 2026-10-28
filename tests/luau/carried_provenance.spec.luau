@@ -114,9 +114,9 @@ test("moving, taking and storing a stack keep its tag", function()
 	local inventory = InventoryRules.New()
 	InventoryRules.Add(inventory, stack("Wood", 30, 30))
 	local area, index = "backpack", 1
-	expect(InventoryRules.Move(inventory, area, index, "hotbar", 9), "moved")
-	expectEq(InventoryRules.At(inventory, "hotbar", 9).carried, 30, "moved with its tag")
-	local taken = InventoryRules.TakeAt(inventory, "hotbar", 9)
+	expect(InventoryRules.Move(inventory, area, index, "hotbar", 6), "moved")
+	expectEq(InventoryRules.At(inventory, "hotbar", 6).carried, 30, "moved with its tag")
+	local taken = InventoryRules.TakeAt(inventory, "hotbar", 6)
 	expectEq(taken.carried, 30, "taken out with its tag")
 	local chest = {}
 	expect(InventoryRules.Store(chest, taken, 10), "stored")

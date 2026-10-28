@@ -74,9 +74,9 @@ GameConstants.PORTAL_NO_BUILD_METERS = 50
 -- Roblox's standard character scale: 1 stud is 0.28 m.
 GameConstants.STUDS_PER_METER = 1 / 0.28
 
--- Inventory and vault (GDD §10.3, Q126-129, Q151, Q154) ---------------------------
+-- Inventory and vault (GDD §10.3, Q126-129, Q151, Q154; six hotbar slots §56) ----
 
-GameConstants.HOTBAR_SLOTS = 9
+GameConstants.HOTBAR_SLOTS = 6
 GameConstants.BACKPACK_SLOTS = 50
 GameConstants.VAULT_START_SLOTS = 25
 GameConstants.VAULT_SLOTS_PER_UPGRADE = 25

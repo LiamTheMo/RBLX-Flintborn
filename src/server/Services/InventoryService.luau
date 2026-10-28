@@ -1,4 +1,4 @@
--- The authoritative run inventory (GDD §22.1.1): a fixed 9-slot hotbar and 50-slot
+-- The authoritative run inventory (GDD §22.1.1, §56): a fixed 6-slot hotbar and 50-slot
 -- backpack held in server memory while a player is in a run. Every gain, loss,
 -- move and equip goes through here and is replicated to the owner as a snapshot.
 -- World place only.

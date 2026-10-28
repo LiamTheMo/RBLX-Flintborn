@@ -65,7 +65,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–9 equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
+- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -354,7 +354,7 @@ Studio and live checks:
 
 ## Keyboard controls and rebinding
 
-Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots, Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots (1–6 since the six-slot hotbar, §56), Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
 
 Automated (`keybinds.spec.luau`, 7 cases):
 - The requested defaults, with every default allowed and unique.
@@ -365,7 +365,7 @@ Automated (`keybinds.spec.luau`, 7 cases):
 
 Studio and live checks:
 
-- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–9 select hotbar slots, Q drops, and F picks up a dropped item, loots a body and harvests a node.
+- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–6 select hotbar slots (7–9 do nothing), Q drops, and F picks up a dropped item, loots a body and harvests a node.
 - [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
 - [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.

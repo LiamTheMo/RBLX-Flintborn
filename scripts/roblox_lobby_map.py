@@ -763,14 +763,15 @@ local ok, err = pcall(function()
   end
   local nav = hud.root:FindFirstChild("Navigation")
   report.inventory = describe(nav:FindFirstChild("Inventory"))
-  report.currency = describe(hud.root:FindFirstChild("Currency"))
+  report.coins = describe(hud.root:FindFirstChild("Coins"))
+  report.gems = describe(hud.root:FindFirstChild("Gems"))
   holder:Destroy()
   -- Can the place load the image content? EditableImage loads respect asset
   -- permissions, and PreloadAsync reports each asset's fetch status.
   local AssetService = game:GetService("AssetService")
   local ContentProvider = game:GetService("ContentProvider")
   report.loads = {}
-  for _, name in { "icon_backpack", "icon_coin", "icon_mountain", "icon_chest", "icon_scroll", "icon_coin_bag", "icon_anvil", "icon_swap", "icon_gear", "icon_gem", "icon_group", "icon_crown", "icon_add_friend", "icon_down" } do
+  for _, name in { "pm_lobby_profile", "pm_lobby_coins", "pm_lobby_gems", "pm_lobby_gear", "pm_lobby_party", "pm_lobby_enter", "pm_lobby_server", "pm_tile_inventory", "pm_tile_vault", "pm_tile_quests", "pm_tile_shop", "pm_tile_forge", "pm_tile_trade", "pm_icon_crown", "pm_button_add_friend" } do
     local id = UiAssets.image(name)
     local entry = { id = id }
     local okImage, result = pcall(function()

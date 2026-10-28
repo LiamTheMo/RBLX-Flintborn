@@ -448,7 +448,8 @@ test("items that do not fit the run are saved back to the lobby at once", functi
 	play(player, "req-105")
 	advance(1)
 	expectEq(WorldAdmissionService.GetState(player), "ActiveRun", "in the run")
-	expectEq(#stored(105).lobbyBackpack.slots, 11, "the 11 overflow items are already stored")
+	-- 70 stacks into 6 hotbar + 50 backpack slots leave 14 behind.
+	expectEq(#stored(105).lobbyBackpack.slots, 14, "the 14 overflow items are already stored")
 end)
 
 test("lobby backpack materials stay put on load and after every write (GDD §53)", function()
