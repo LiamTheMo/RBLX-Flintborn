@@ -318,6 +318,9 @@ TravelService.ToLobby = function(players)
 	return true
 end
 local SpawnService = require(Server.Services.SpawnService)
+SpawnService.WorldReady = function()
+	return true
+end
 SpawnService.Pick = function()
 	return "spawn"
 end

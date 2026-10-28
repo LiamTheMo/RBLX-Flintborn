@@ -3,8 +3,11 @@
 -- XP, checked on the server), the earnable XP booster (+50%) and the timed boosts
 -- from berries and draughts as {stat, op, value}; callers combine them with
 -- ModifierRules. Every XP bonus is additive, so a potion adds to Premium and the
--- booster (Q162). Consumable boosts are run state: they end with the run (death,
--- leaving, extracting) or when the player leaves the server.
+-- booster (Q162). Consumable boosts count down only during a run (GDD §53): a
+-- successful extraction (or a maintenance kick, which preserves the run's items)
+-- saves each one's remaining time in the profile and the next deploy resumes it;
+-- dying or leaving the world without extracting ends them and clears what was
+-- saved.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -29,8 +32,22 @@ local function now(): number
 	return workspace:GetServerTimeNow()
 end
 
+local publishBoosts
+
+-- Ends `entry` after `seconds` unless it is no longer the boost of its kind (Sources
+-- may have pruned it already; a stronger one that took over keeps its own timer).
+local function expireLater(player: Player, state, kind: string, entry, seconds: number)
+	task.delay(math.max(0, seconds), function()
+		local current = state[kind]
+		if boosts[player] == state and (current == nil or current == entry) and player.Parent then
+			state[kind] = nil
+			publishBoosts(player)
+		end
+	end)
+end
+
 -- Replicates each boost kind to its owner's HUD as an amount and an end time.
-local function publishBoosts(player: Player)
+function publishBoosts(player: Player)
 	local state = boosts[player]
 	for _, kind in BoostRules.ORDER do
 		local amountName, untilName = BoostRules.Attributes(kind)
@@ -40,37 +57,65 @@ local function publishBoosts(player: Player)
 	end
 end
 
--- Starts a timed boost ({kind, amount, seconds}), replacing a running boost of the
--- same kind. Returns the new entry and the one it replaced, or nil for a bad boost.
+-- True when `boost` would take effect for `player` now (BoostRules.Takes).
+function ModifierService.BoostTakes(player: Player, boost): boolean
+	local state = boosts[player]
+	return BoostRules.IsValid(boost) and (state == nil or BoostRules.Takes(state, boost, now()))
+end
+
+-- Starts a timed boost ({kind, amount, seconds}) unless a boost of its kind at
+-- least as strong is running, which then stays exactly as it is. Returns the
+-- entry in force and whether this boost started, or nil for a bad boost.
 function ModifierService.ApplyBoost(player: Player, boost)
 	if not BoostRules.IsValid(boost) then
-		return nil, nil
+		return nil, false
 	end
 	local state = boosts[player]
 	if state == nil then
 		state = BoostRules.New()
 		boosts[player] = state
 	end
-	local entry, replaced = BoostRules.Apply(state, boost, now())
+	local entry, started = BoostRules.Apply(state, boost, now())
+	if not started then
+		return entry, false
+	end
 	publishBoosts(player)
-	task.delay(boost.seconds, function()
-		-- Only the boost this timer started (Sources may have pruned it already); a
-		-- replacement keeps its own timer.
-		local current = state[boost.kind]
-		if boosts[player] == state and (current == nil or current == entry) and player.Parent then
-			state[boost.kind] = nil
-			publishBoosts(player)
-		end
-	end)
-	return entry, replaced
+	expireLater(player, state, boost.kind, entry, boost.seconds)
+	return entry, true
 end
 
--- Ends every boost (the run ended, or a new one started).
+-- Ends every boost in memory (the run ended, or a new one started).
 function ModifierService.ClearBoosts(player: Player)
 	boosts[player] = nil
 	if player.Parent then
 		publishBoosts(player)
 	end
+end
+
+-- Starts a run's boosts: the ones its last extraction saved, with the time they
+-- had left (GDD §53). The saved copy stays in the profile until the run ends, so
+-- a crashed run loses nothing.
+function ModifierService.ResumeBoosts(player: Player)
+	local profile = ProfileService.GetProfile(player)
+	local state = BoostRules.Resume(profile and profile.boosters.paused, now())
+	boosts[player] = state
+	for kind, entry in state do
+		expireLater(player, state, kind, entry, entry.endsAt - now())
+	end
+	publishBoosts(player)
+end
+
+-- Ends the run's boosts. An extraction or a maintenance kick saves what is left of
+-- each; any other ending (death, leaving) saves nothing and clears what an earlier
+-- extraction saved.
+function ModifierService.EndBoosts(player: Player, reason: string?)
+	local state = boosts[player]
+	local keep = reason == "Extracted" or reason == "Maintenance"
+	local paused = if keep and state then BoostRules.Pause(state, now()) else {}
+	ProfileService.Mutate(player, function(profile)
+		profile.boosters.paused = paused
+	end)
+	ModifierService.ClearBoosts(player)
 end
 
 function ModifierService.IsPremium(player: Player): boolean
@@ -133,10 +178,13 @@ function ModifierService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	WorldAdmissionService.RunStarted:Connect(ModifierService.ClearBoosts)
-	WorldAdmissionService.RunEnded:Connect(ModifierService.ClearBoosts)
+	WorldAdmissionService.RunStarted:Connect(ModifierService.ResumeBoosts)
+	WorldAdmissionService.RunEnded:Connect(ModifierService.EndBoosts)
 	Players.PlayerRemoving:Connect(function(player)
-		boosts[player] = nil
+		-- Deferred: a departure or shutdown ending (BeforeRelease) reads them first.
+		task.defer(function()
+			boosts[player] = nil
+		end)
 	end)
 end
 

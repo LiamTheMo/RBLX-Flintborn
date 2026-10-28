@@ -171,6 +171,9 @@ function LoadoutService.Consume(player: Player)
 		items, taken = {}, { transit = nil, maintenance = {}, runId = runId }
 		if reservationId then
 			taken.transit = ProfileSchema.DeepCopy(working.transit)
+			-- Consume tags the lobby's material stacks carried (GDD §53); escrowed
+			-- items below keep the tags they had in their run, so what was gathered
+			-- there stays eligible for the Center bonus.
 			for _, item in TransitRules.Consume(working, reservationId) do
 				table.insert(items, item)
 			end

@@ -56,6 +56,23 @@ local entries = {
 	material("RawMeat", "Raw Meat"),
 	material("Bone", "Bone"),
 
+	-- Gathered materials with no use yet (GDD §53): bankable and sellable, never
+	-- traded. Clay, mushrooms, shrub leaves, nuts and wild berries are common; the
+	-- stones come from gated nodes deeper in.
+	material("Clay", "Clay"),
+	material("CaveMushroom", "Cave Mushroom"),
+	material("RedcapMushroom", "Redcap Mushroom"),
+	material("ChestnutMushroom", "Chestnut Mushroom"),
+	material("Thornvine", "Thornvine"),
+	material("Frostleaf", "Frostleaf"),
+	material("JuniperBerry", "Juniper Berry"),
+	material("Elderberry", "Elderberry"),
+	material("Raspberry", "Raspberry"),
+	material("Hazelnut", "Hazelnut"),
+	material("Amethyst", "Amethyst", "Uncommon"),
+	material("Starstone", "Starstone", "Rare"),
+	material("Stormglass", "Stormglass", "Rare"),
+
 	-- Restricted (gem-class) materials: daggers and spears only (Flint also arrows).
 	material("Obsidian", "Obsidian", "Uncommon"),
 	material("Jade", "Jade", "Rare"),

@@ -1,11 +1,12 @@
--- The lobby vault and lobby backpack (GDD §10.3, §25.2, Q96, Q129, Q151–152, Q155).
--- Shows the latest extraction receipt on arrival, and handles manual deposits and
--- withdrawals through exactly-once profile operations, refused during an open
--- trade. Lobby place only.
+-- The lobby vault and lobby backpack (GDD §10.3, §25.2, §53, Q96, Q129, Q151–152,
+-- Q155). Shows the latest extraction receipt on arrival, and handles manual
+-- deposits and withdrawals (items, and material stacks by quantity) through
+-- exactly-once profile operations, refused during an open trade. Lobby place only.
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -59,8 +60,8 @@ local function snapshot(player: Player)
 			tradeable = TradeRules.IsTradeable({ catalogId = catalogId, quantity = quantity }),
 		})
 	end
-	-- Materials banked from the backpack outside an extraction (a trade, a crash
-	-- recovery) that the vault had no room for, shown for a day (GDD §45).
+	-- Material deposits the vault had no room for, deleted past its capacity and
+	-- shown for a day (GDD §53).
 	local overflow = profile.vault.lastOverflow
 	if type(overflow) == "table" and os.time() - (overflow.at or 0) < VaultService.OVERFLOW_NOTICE_SECONDS then
 		view.overflow = {}
@@ -132,15 +133,29 @@ function VaultService.Start()
 	end
 	ProfileService.ProfileLoaded:Connect(showReceipt)
 	Remotes.Handle("VaultSnapshot", snapshot)
-	Remotes.Handle("VaultDeposit", function(player, index)
+	-- A material deposit that would go past the vault's capacity is refused with
+	-- the amount it would delete, until the client confirms the loss (GDD §53).
+	-- The confirmation names the material and the loss shown, so a stack that
+	-- changed in between (a withdraw merged into it, slots shifted) is refused again.
+	Remotes.Handle("VaultDeposit", function(player, index, confirmCatalogId, confirmLoss)
 		if not Validation.IsQuantity(index, 1, 50) then
 			return false, "BadRequest"
 		end
+		local confirmed = nil
+		if confirmCatalogId ~= nil then
+			if type(confirmCatalogId) ~= "string" or not Validation.IsQuantity(confirmLoss, 0, 1000) then
+				return false, "BadRequest"
+			end
+			confirmed = { catalogId = confirmCatalogId, loss = confirmLoss }
+		end
 		local ok, reason = operate(player, "VaultDeposit", function(profile)
-			return VaultRules.Deposit(profile, index)
+			return VaultRules.Deposit(profile, index, os.time(), confirmed)
 		end)
 		if ok then
 			VaultService.Deposited:Fire(player)
+		elseif reason == VaultRules.WOULD_OVERFLOW then
+			local profile = ProfileService.GetProfile(player)
+			return false, reason, profile and VaultRules.DepositLoss(profile, index) or 0
 		end
 		return ok, reason
 	end)
@@ -150,6 +165,17 @@ function VaultService.Start()
 		end
 		return operate(player, "VaultWithdraw", function(profile)
 			return VaultRules.WithdrawItem(profile, index)
+		end)
+	end)
+	Remotes.Handle("VaultWithdrawMaterial", function(player, catalogId, quantity)
+		if
+			not ItemCatalog.IsMaterial(catalogId)
+			or not Validation.IsQuantity(quantity, 1, GameConstants.MATERIAL_STACK_MAX)
+		then
+			return false, "BadRequest"
+		end
+		return operate(player, "VaultWithdrawMaterial", function(profile)
+			return VaultRules.WithdrawMaterial(profile, catalogId, quantity)
 		end)
 	end)
 end

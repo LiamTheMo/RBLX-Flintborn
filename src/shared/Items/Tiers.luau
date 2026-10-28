@@ -146,8 +146,6 @@ Tiers.BASE = {
 	Spear = 25,
 	Sword = 18,
 	Dagger = 9,
-	-- Per-hit yield of an axe on trees or a pickaxe on rock.
-	ToolYield = 3,
 }
 -- The wooden spear's confirmed damage (Q66) sits below the curve.
 Tiers.WOODEN_SPEAR_DAMAGE = 15

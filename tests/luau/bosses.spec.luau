@@ -114,5 +114,24 @@ test("event and structure bosses name real bosses of the right source", function
 			expectEq(boss.source, expected, entry.id .. " source")
 		end
 	end
-	expectEq(BossCatalog.Get(BossCatalog.Ritual.boss).source, "Ritual", "ritual boss")
+	for _, ritual in BossCatalog.Rituals do
+		expectEq(BossCatalog.Get(ritual.boss).source, "Ritual", ritual.boss .. " is a ritual boss")
+		for catalogId, quantity in ritual.offering do
+			expect(ItemCatalog.Get(catalogId) ~= nil and quantity > 0, ritual.boss .. " offering " .. catalogId)
+		end
+	end
+end)
+
+test("the Shattered Keep's altar summons the Minotaur (GDD §54)", function()
+	expectEq(BossCatalog.RitualFor("ShatteredKeep").boss, "Minotaur", "the Keep's ritual boss")
+	expectEq(BossCatalog.Get("Minotaur").source, "Ritual", "summoned, not an event")
+	expectEq(BossCatalog.Get("EmberTitan"), nil, "the Ember Titan is retired")
+	expectEq(BossCatalog.RitualFor(nil).boss, "Minotaur", "an altar of unknown zone still works")
+	-- One Minotaur source: no event spawns it.
+	for _, entry in EventCatalog.ById do
+		expect(entry.boss ~= "Minotaur", entry.id .. " is not a Minotaur")
+		for _, member in entry.group or entry.defenders or {} do
+			expect(member.enemy ~= "Minotaur", entry.id .. " has no Minotaur")
+		end
+	end
 end)

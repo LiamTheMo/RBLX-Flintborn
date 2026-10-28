@@ -40,6 +40,10 @@ ProgressionService.XP = {
 	PvpKill = 20,
 }
 
+-- Passive wildlife (rabbits, dodos) never fights back, so its kills give a quarter
+-- of the Enemy XP (at least 1) but still count as hunts (GDD §54).
+ProgressionService.PASSIVE_XP_SHARE = 0.25
+
 -- The same victim credits the same attacker at most once per window (alt farming).
 ProgressionService.PVP_REPEAT_SECONDS = 1800
 
@@ -157,10 +161,13 @@ end
 ProgressionService.Acted = Signal.new()
 
 -- Grants general XP for a verified action (a key of ProgressionService.XP),
--- through the modifier pipeline.
-function ProgressionService.GrantXp(player: Player, action: string, reason: string)
+-- through the modifier pipeline. `share` scales the action's base XP (at least 1).
+function ProgressionService.GrantXp(player: Player, action: string, reason: string, share: number?)
 	local base = ProgressionService.XP[action]
 	assert(base, "Unknown XP action " .. tostring(action))
+	if share then
+		base = math.max(1, math.floor(base * share))
+	end
 	ProgressionService.Acted:Fire(player, action, reason)
 	local amount = ModifierRules.Final(base, ModifierService.Get(player, "Xp"))
 	local gained = 0
@@ -245,7 +252,13 @@ function ProgressionService.Start()
 	NpcService.Died:Connect(function(npc)
 		local killer = npc.lastAttacker
 		if killer and killer.Parent then
-			ProgressionService.GrantXp(killer, if npc.elite then "Elite" else "Enemy", npc.name .. " defeated")
+			local passive = npc.behaviour == "Passive" and not npc.elite
+			ProgressionService.GrantXp(
+				killer,
+				if npc.elite then "Elite" else "Enemy",
+				npc.name .. " defeated",
+				if passive then ProgressionService.PASSIVE_XP_SHARE else nil
+			)
 		end
 	end)
 	-- Only players who damaged the boss share its XP (and the quest progress it

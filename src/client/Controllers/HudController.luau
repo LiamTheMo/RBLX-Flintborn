@@ -1,8 +1,8 @@
 -- In-world HUD (GDD §11, §25.4), laid out from src/shared/UI/HudLayout.json and
 -- drawn from the UI art sheets (art/ui/sprites, uploaded ids in UiAssetIds.json,
 -- styled Frames until then). Party frames, compass with waypoints, extraction
--- objective, world event, vitals, level/XP bar, an empty selection-only hotbar
--- and the custom interaction prompt. It only displays what the server already
+-- objective, world event, vitals, level/XP bar, the hotbar (its items; a tap
+-- uses a slot like its key) and the custom interaction prompt. It only displays what the server already
 -- replicated: Humanoid health, the Stamina/Food/MedicineLockUntil/FoodHealing
 -- attributes, progression snapshots, TribeId attributes, and the extraction and
 -- event remotes (through their controllers). World place only, during a run.
@@ -18,6 +18,7 @@ local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local EventFeedController = require(script.Parent.EventFeedController)
 local ExtractionController = require(script.Parent.ExtractionController)
 local InventoryController = require(script.Parent.InventoryController)
@@ -37,8 +38,8 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local HudController = {}
 
--- Fires (index) when the selected hotbar slot changes. Selection only for now:
--- the hotbar is not bound to inventory contents yet.
+-- Fires (index) when the selected hotbar slot changes. The selection follows the
+-- equipped slot, and every key press or tap on a slot also uses it.
 HudController.SelectionChanged = Signal.new()
 HudController.Selected = 1
 
@@ -312,14 +313,14 @@ local function rebuildWaypoints()
 		table.insert(list, { id = id, icon = icon })
 		waypointPositions[id] = position
 	end
-	for _, entry in PoiCatalog.Landmarks do
-		-- The ridge rings the whole crater, so it has no single bearing.
-		if entry.style ~= "Ridge" then
+	-- The catalog's landmarks and camps describe the generated island only.
+	if WorldState.IsGenerated() then
+		for _, entry in PoiCatalog.Landmarks do
 			add("landmark:" .. entry.id, "icon_mountain", PoiCatalog.Position(entry))
 		end
-	end
-	for _, entry in PoiCatalog.SafeZones do
-		add("camp:" .. entry.id, "icon_tower", PoiCatalog.Position(entry))
+		for _, entry in PoiCatalog.SafeZones do
+			add("camp:" .. entry.id, "icon_tower", PoiCatalog.Position(entry))
+		end
 	end
 	for part in portals do
 		add("portal:" .. part:GetFullName(), "icon_waypoint", part.Position)
@@ -513,11 +514,24 @@ function HudController.Start()
 	end
 	ProgressionController.MountPopups(widgets.popups)
 
-	-- Hotbar: selection only, from the Hotbar1–9 binds (keys 1–9 by default), taps
-	-- and the right gamepad bumper. Taps never use items. The mouse wheel stays on
-	-- camera zoom (GDD Q58). Slot numbers name the bound keys and follow rebinds.
+	-- Hotbar: the run inventory's hotbar items. The Hotbar1–9 binds (keys 1–9 by
+	-- default) and taps select a slot and use it, as InventoryController's keys do
+	-- (equip, eat, place, ready); the right gamepad bumper only steps the
+	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot numbers name
+	-- the bound keys and follow rebinds.
 	selectSlot(HudController.Selected)
-	widgets.bottom.SlotPressed:Connect(selectSlot)
+	widgets.bottom.SlotPressed:Connect(function(index)
+		selectSlot(index)
+		task.spawn(InventoryController.ActivateHotbar, index)
+	end)
+	local function showItems(snapshot)
+		widgets.bottom:SetSlotItems(HudModel.HotbarSlots(snapshot, layout.bottom.hotbar.count))
+		if snapshot.equipped and snapshot.equipped ~= HudController.Selected then
+			selectSlot(snapshot.equipped)
+		end
+	end
+	InventoryController.Changed:Connect(showItems)
+	showItems(InventoryController.Snapshot)
 	widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))
 	Binds.Changed:Connect(function()
 		widgets.bottom:SetSlotLabels(hotbarLabels(layout.bottom.hotbar.count))
@@ -534,6 +548,7 @@ function HudController.Start()
 	-- Compass waypoints and the two top-right panels.
 	watchPortals()
 	rebuildWaypoints()
+	workspace:GetAttributeChangedSignal(WorldState.GENERATED_ATTRIBUTE):Connect(rebuildWaypoints)
 	ExtractionController.Changed:Connect(rebuildWaypoints)
 	EventFeedController.Changed:Connect(rebuildWaypoints)
 

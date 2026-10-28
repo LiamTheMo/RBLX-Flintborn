@@ -185,7 +185,7 @@ Studio and live checks (two tribes):
 
 Automated: 8 specs cover XP saved when earned and kept through death, the 100 × n^1.5 curve capped at 50, the Center bonus equal to the run's XP once (mastery XP too, never action counts; runes never), exactly five tracks capped at 10 with titles, +1% yield per level (+10% at 10), the 132 ordering example and Premium + booster adding to +75%, rebirth resetting only the level (vault, Permanent items, masteries and perks kept; harder each time), and perk ranks spending tokens once. Deployed and verified on both places (2026-10-23).
 
-Placeholders: XP per action — gather 2, craft 5, crop 10, forge 15, chunk 15, creature 10 (elite 30), node 25, cache 40, player 20 (once per pair per 30 min), boss 100, Guardian 300. Mastery thresholds 25…3,000 actions; Crafting also gives ingredient savings (2%/level), larger stack outputs (+10% every third level), faster crafting (base 1 craft/s, +3%/level) and Forge recipe gates; PvP gives +0.5% damage per level (cap 5%) and +2% sprint per level. Rebirth needs level 50 and 1, 2, 3, 4, 6… Guardian Legendaries extracted since the last rebirth; tokens 3, +1 every third rebirth. Perks: Scholar (XP), Fortune (luck), Bounty (yield), Tidewalker (swim). Level gates now apply to Permanent spear (10) and iron gear (20), and Potions need Crafting 3.
+Placeholders: XP per action — gather 2, craft 5, crop 10, forge 15, chunk 15, creature 10 (elite 30), node 25, cache 40, player 20 (once per pair per 30 min), boss 100, Guardian 300. Mastery thresholds 25…3,000 actions; Crafting gives better quality rolls and, when smelting, a 2%-per-level bonus-bar chance (GDD §52; crafting speed, ingredient savings and larger outputs were removed 2026-10-28), and Forge recipes keep their Crafting level gates; PvP gives +0.5% damage per level (cap 5%) and +2% sprint per level. Rebirth needs level 50 and 1, 2, 3, 4, 6… Guardian Legendaries extracted since the last rebirth; tokens 3, +1 every third rebirth. Perks: Scholar (XP), Fortune (luck), Bounty (yield), Tidewalker (swim). Level gates now apply to Permanent spear (10) and iron gear (20), and Potions need Crafting 3.
 
 Studio and live checks:
 
@@ -211,6 +211,8 @@ Studio and live checks (two accounts):
 - [ ] Review Roblox purchase policy (paid random items, Premium) before release.
 
 ## v0.15 — Shattered Crater world, art direction and camera
+
+> The placeholder island described here was replaced on 2026-10-28 by the 4,096-stud map in GDD §54; see "Play-world map and creatures (GDD §54)" for the current checks.
 
 Automated: 6 specs cover every portal POI having a zone radius inside its region (3 Outer + 1 hidden, 3 Inner, 1 Center), every biome having a resource pool with jade and obsidian only in the Inner Ring, safe camps with volumes in the Outer Rim, spawn candidates in all three regions, the island profile (sea, beach, a tall ridge with route gaps, an open caldera) and camera bounds. Deployed and verified on both places (2026-10-23).
 
@@ -325,7 +327,9 @@ Studio and live checks:
 - [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
 - [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
 
-## Q164 — Materials stay in the lobby
+## Q164 — Materials stay in the lobby (superseded by GDD §53)
+
+> Replaced on 2026-10-28: materials can be carried back into runs. The checks below describe the old behaviour; see "Resources, gathering and boosts (GDD §53)" for the current ones.
 
 Owner decisions (GDD §45, Q164/Q164a): extracted materials never come back out into the play world; any material that reaches the lobby backpack goes straight into the vault and cannot be taken out, and the vault's material capacity alone decides what is deleted.
 
@@ -367,7 +371,7 @@ Studio and live checks:
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
-- [ ] Tab also toggles Roblox's player list: decide whether that's acceptable or the player list should move.
+- [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the backpack and vault panel in the lobby, and Tab again closes it.
 - [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
 - [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
 - [ ] The tutorial hints name the current keys after a rebind.
@@ -433,4 +437,138 @@ Studio and live checks:
 - [ ] **Shop and merchant:** the shop shows only starter supplies. The merchant sells by ×10 or all, with no "Sell all" for Forge reagents.
 - [ ] **Trading:** a Sunberry and an Ancient Ember trade between two players. Ores, bars and common materials are refused.
 - [ ] **Planters:** all four crops have their own prompt keys.
+
+## Boosts, Crafting mastery, touch hotbar and Tab (GDD §52)
+
+Owner decisions 2026-10-28: a running boost never weakens; Crafting mastery gives only quality rolls and a smelting bonus bar (no crafting speed); the HUD hotbar shows items and taps use them; the Roblox player list is gone and Tab opens the inventory.
+
+Automated (`boosts.spec.luau`, `progression.spec.luau`, `stations_smelting.spec.luau`, `hud_model.spec.luau`):
+- A weaker or equal boost leaves the running one untouched (strength and timer); a stronger one takes over; any boost starts once the old one ends; the berry toast says the running boost keeps going.
+- Crafting mastery's buffs are exactly BestRollLevel and SmeltBonus (20% at level 10); CraftSpeed, IngredientSave, CraftOutput and RecipeTier are gone.
+- A certain bonus makes three ore into six bars, each bar still taking its own ore; instant crafts get no bonus; a bonus bar with no room drops at the smelter's feet and the job still finishes.
+- HUD hotbar slots show item names, Permanent stars and stack counts, mark the equipped slot, and ignore backpack and out-of-range slots.
+
+Placeholders: bonus-bar chance 2% per Crafting level.
+
+Studio and live checks:
+
+- [ ] Drink a Sunberry Draught, then eat a Sunberry: you're fed, the toast says the +25% XP boost keeps running, and the HUD timer doesn't change. Drinking a second Sunberry Draught is refused with "a boost at least as strong is already running" and the draught stays in the hotbar.
+- [ ] Eat a Sunberry, then drink a Sunberry Draught: the boost rises to +25% with a new 10:00 timer.
+- [ ] At Crafting mastery 0, smelting 10 ore gives exactly 10 bars. At a high level, some smelts give an extra bar (the count rises by 2 for one ore).
+- [ ] Crafting speed is the same at every Crafting level (one craft per second).
+- [ ] On a phone or tablet (or Studio's device emulator): the HUD hotbar shows each item's name and count. Tapping a weapon equips it (the ring moves there), tapping food eats it, tapping a Workbench places it, and tapping a Fire Bomb readies it.
+- [ ] Pressing a number key moves the ring to that slot and uses it, as a tap does.
+- [ ] With the backpack open, the HUD hotbar hides and the backpack's own strip still moves items.
+
+## Resources, gathering and boosts (GDD §53)
+
+Owner decisions 2026-10-28:
+- Materials can go back into runs, but the carried-in amount never gets the Center 2×.
+- Boosts pause between runs.
+- Every gathering hit drops material on the ground, and better tools take more node health per hit.
+- Nodes regrow on tiered timers, and every region has basic resources.
+- New gatherable items with no use yet, creature ore drops, and Fiber in planters.
+
+Automated:
+- **Vault and carry-in** (`admission`, `extraction`, `review_lifecycle`, `catalog_migration`, `trade_materials`):
+  - Withdrawing a vault material is all-or-nothing into the lobby backpack, and a deploy carries materials.
+  - The carried-in record is saved at Play and survives checkpoints, reloads and migration.
+  - The Center multiplier settles min(extracted, carried in) at 1× and the rest at 2×: bring 100 Wood and extract 160 → 220; extract only 40 → 40.
+  - Deposits over 1,000 are deleted and recorded.
+- **Boost pause** (`boost_pause.spec.luau`):
+  - Extraction saves the remaining time; the next deploy resumes the same time, and time in the lobby doesn't count.
+  - Death or leaving clears saved boosts.
+  - A stronger boost still takes over a resumed one.
+  - Saves are sanitized.
+- **Gathering** (`gathering_drops.spec.luau`, `gathering_tiers`, `building`):
+  - Drops per hit follow tool rank against node rank, use the same node health, and the last hit is clamped.
+  - Ores need their pickaxe; plants give 1 per hit.
+  - Mastery adds extra drops without using health; Flint and Resin bonuses still drop.
+  - Pickups: the gatherer has a 10 s window, drops despawn after 120 s, each is claimed once, and a full inventory leaves it on the ground.
+  - Regrow times follow the tiers; every biome has basics.
+  - The new items are sellable and not tradeable.
+  - Creature ore drops; the Fiber crop.
+
+Placeholders:
+- Node health: trees and rocks 12, plants and bushes 3, Copper to Cobalt 8, Mithril 6, Obsidian and Jade 5, new nodes 4.
+- Regrowth: 2 / 3 / 5 / 8 minutes.
+- Sell values for the new items: Clay 2 up to Starstone and Stormglass 40.
+- The Fiber crop costs 3 Fiber and grows 12 in 240 s.
+
+Studio and live checks:
+
+- [ ] Vault → pick ×10 and click Wood: 10 Wood moves to the lobby backpack. Deploy: the Wood is in the run inventory.
+- [ ] Bring 100 Wood, gather 60 more, and extract at the Center: the receipt shows 100 "brought in, not doubled" and 120 from the gathered 60, so the vault gains 220.
+- [ ] Drink a Sunberry Draught, extract with 6:00 left, and wait in the lobby: the next deploy shows about 6:00 on the HUD. Die with a boost running: it's gone on the next deploy.
+- [ ] Hit a tree by hand: 1 Wood drops beside it. With a Stone axe, 3 drop and the tree empties in 4 hits.
+- [ ] A friend can't pick up your drop for 10 s, then can. Drops vanish after 2 minutes.
+- [ ] Walking over a drop collects it, and so does pressing F on it. Check F still harvests a node when drops lie beside it.
+- [ ] An emptied Copper node regrows after about 3 minutes, a Mithril node after about 8.
+- [ ] Clay, mushrooms, shrubs, Amethyst, Starstone and Stormglass nodes can be gathered, banked and sold, and are not offered in trades.
+- [ ] Plant Fiber in a planter (H key): it grows 12 Fiber.
+- [ ] The planter's gamepad key (R1) doesn't fight the hotbar step or build placement.
+
+## Play-world map and creatures (GDD §54)
+
+Owner request 2026-10-28: a small, playable placeholder world MVP. It has the new layout, the wildlife roster with roaming spawns, creature events, placeholder nodes and the Keep ritual.
+
+**Map** (generated at server start when no authored `ShatteredCrater` model exists):
+- A terrain island about 3,900 studs across inside a 6,144-stud ocean. −Z is north.
+- Zones:
+  - Low: Rimlands (south coast), Pinewood Wilds (NW), Mosswick Forest (NE), Riverlands (E).
+  - Medium: Timberwatch (W), Fallen Temple (SW), Emberhollow Caves (SE hill, with a 450 × 350 interior reached by a tunnel from the south).
+  - Extreme: Frostpeak Ridge (N, peaks 596/505/470), Crater Lake (centre, water level 28), Shattered Keep (island plateau 120, courtyard 180 × 220).
+- One river runs from the lake through the Riverlands to the sea. A land bridge from the south and a ford from the east reach the Keep.
+- Portals:
+  - Low: Driftwood Cove, Elder Grove, Reed Ferry.
+  - Medium: Lookout Gate, Temple Steps, Ember Gate.
+  - Center: Crater Heart, on the Keep's lower terrace.
+  - Hidden: Sunken Shrine.
+- Safe camps: Tidewater (Rimlands) and Mossfire (Mosswick).
+- The Guardian fights in the Keep courtyard. Ritual altars: Keep West and Keep North.
+- 57 spawn points, in Low and Medium zones only.
+- About 1,260 nodes, with basics in every zone. Mithril, Starstone and Stormglass appear only in Extreme zones; Frost shrubs only on Frostpeak.
+
+**Creatures:**
+- Roaming wildlife: 25 groups, about 52 creatures (cap 60). A group respawns 180 s after it dies, at least 150 studs from players and outside camps.
+- Behaviour:
+  - Passive animals flee and never hurt anyone.
+  - A Neutral group fights back for 20 s after it is hurt.
+  - Hostile creatures attack on sight.
+- Events: Skeleton Patrol, Woolly Mammoth, Giant Ground Sloth, Ancient Tortoise, Iron-Tusk Boar with boars, Saber-Toothed Tiger, Stonehide Rhino, Ember Wisps (cave), and the Crater Gorilla boss.
+- The Minotaur is now the Keep's ritual boss (3 Ancient Ember + 50 Iron Ore). The Ember Titan and Bandits are removed. Raider Camp and Warlord's Hold are guarded by Skeletons.
+
+Automated:
+- `world.spec`: zones, footprints, heights, POIs on dry ground in the right tier, `RandomPointIn`, node pools by tier.
+- `wildlife.spec`: spawn tables, density, respawn rules, behaviours.
+- `events.spec`: zone and habitat placement, no Bandits, camps guarded, no Minotaur event.
+- `bosses.spec`: the Minotaur ritual.
+- `gathering_drops`: fewer basics deeper in.
+
+Placeholders: every creature stat, drop, group size and event weight; zone positions and heights; node counts per zone.
+
+Studio and live checks:
+
+- [ ] Server start prints "Built the placeholder island in X s"; note X. The server keeps running while it builds:
+  - Matchmaking reports straight away.
+  - Pressing Play before the island is ready says the world is still loading, and works once `FlintbornWorldReady` is set.
+- [ ] In Studio, run `require(game.ServerScriptService.Server.Services.WorldBuildService).Generate()` from the command bar and save the place. The next start reuses the saved island without rebuilding it. Check the module path in the Explorer.
+- [ ] Passive animals give a quarter of the usual kill XP and still count as hunts for quests.
+- [ ] Walk or fly the coast and every zone boundary: no holes, floating terrain or cliffs you can't climb where routes should be. Frostpeak's summit reads as the tallest point.
+- [ ] Walk the Crater Lake rim and cross to the Keep by the south land bridge and by the east ford (wading, not swimming). Climb the Keep ramp and the Fallen Temple ramp.
+- [ ] Enter Emberhollow through the south tunnel: the interior is lit enough, its roof has no holes, and cave nodes and Ember Wisps stand on the cave floor.
+- [ ] Spawns land in Low and Medium zones, never in water or terrain, and never in Extreme zones.
+- [ ] Each portal (and the Center portal on the Keep) works; both safe camps protect players.
+- [ ] Nodes sit on the ground across zones (none floating or underwater).
+- [ ] Animals:
+  - Rabbits, dodos, capybaras, stags, goats and tapirs flee.
+  - Boars, bears, bison and mammoths ignore you until you hit them, then the group fights back and calms down after about 20 s.
+  - Wolves, crocodiles and skeletons attack on sight.
+- [ ] Kill a group and stay nearby: it doesn't respawn on top of you. About 3 minutes later a group is back somewhere else in that zone.
+- [ ] Events appear in their zones and habitats: Mammoth on grassland, Tortoise by the lake, Ember Wisps inside the cave, the Crater Gorilla in a clearing toward the crater.
+- [ ] Offer 3 Ancient Ember and 50 Iron Ore at a Keep altar: the Minotaur is summoned. A third party's hit breaks the summon and spills the offering.
+- [ ] The Guardian fight works inside the courtyard walls.
+- [ ] N opens the map: zones tinted by danger, zone names, the lake, river and points of interest, and a legend. It opens without a long freeze.
+- [ ] With 20–30 players and about 50 creatures, the server holds frame rate. Note heartbeat and memory.
+- [ ] Gamepad: in a planter, a tap on the fourth crop button switches Sapling ↔ Fiber, and holding it plants the crop shown.
 

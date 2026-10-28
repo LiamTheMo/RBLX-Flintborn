@@ -3,13 +3,18 @@
 -- Gear made at a Workbench or Anvil rolls a small ±5% quality. Inputs are removed
 -- and the output created in one server step; a repeated request ID is applied once
 -- (a request refused as TooFast or Busy can be retried with the same ID), nothing
--- is charged if the output does not fit, and downed players cannot craft. A saved
--- ingredient that does not fit drops at the crafter's feet.
+-- is charged if the output does not fit, and downed players cannot craft.
+-- Crafting mastery gives only better quality rolls and, when smelting, a chance
+-- of a bonus bar (owner decision 2026-10-28); it never speeds crafting up.
+-- A craft that uses any carried-in unit (GDD §53) makes a carried output: every
+-- bar smelted from a carried ore, and its bonus bar, stays outside the Center
+-- bonus like the ore was.
 --
 -- Smelting costs only time (no fuel): a request for N bars starts one job bound to
 -- the furnace the player stands at, and each bar takes its ore in the same step
--- that grants it, every `seconds`; Crafting mastery's larger outputs and saved
--- ingredients never apply, so one ore is always one bar. The job stops, keeping
+-- that grants it, every `seconds`. Each bar may bring one bonus bar (Crafting
+-- mastery's SmeltBonus chance); a bonus bar that would leave no room for the
+-- job's later bars drops at the smelter's feet instead, so it never stops the job. The job stops, keeping
 -- the bars already made and taking nothing more, when the player moves away,
 -- dies, is downed, leaves the run or the server, or the furnace is destroyed. One
 -- job per player; its progress replicates as Smelt* player attributes. World
@@ -25,7 +30,6 @@ local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInstance = require(ReplicatedStorage.Shared.Data.ItemInstance)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local QualityRoll = require(ReplicatedStorage.Shared.Crafting.QualityRoll)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
@@ -118,12 +122,7 @@ end
 
 local function makeOutput(player: Player, recipe, station: string, source: string)
 	if ItemCatalog.IsStackable(recipe.output) then
-		-- Larger outputs from Crafting mastery (every third level); the fraction pays
-		-- out by chance, so +30% still counts on a quantity-1 recipe. Smelting is
-		-- exactly one bar per ore (GDD §51), so a timed recipe never rolls it.
-		local modifiers = if CraftingRules.IsTimed(recipe) then {} else ModifierService.Get(player, "CraftOutput")
-		local quantity = ModifierRules.RollYield(recipe.quantity, modifiers, rng)
-		return { catalogId = recipe.output, quantity = quantity }
+		return { catalogId = recipe.output, quantity = recipe.quantity }
 	end
 	local output = ItemInstance.New(
 		function()
@@ -152,38 +151,53 @@ local function fits(inventory, inputs, output): (boolean, string?)
 end
 
 -- Takes one unit's inputs and grants `output` in one step, after checking both on
--- a copy. Nothing changes when it fails.
-local function commit(player: Player, inventory, recipe, output): (boolean, string?)
+-- a copy. Nothing changes when it fails. Inputs spend carried units first; when
+-- any was carried, a material output is carried in whole (GDD §53). Returns (ok,
+-- reason, whether the inputs used carried units).
+local function commit(player: Player, inventory, recipe, output): (boolean, string?, boolean)
 	local ok, reason = fits(inventory, recipe.inputs, output)
 	if not ok then
-		return false, reason
+		return false, reason, false
 	end
-	InventoryRules.RemoveAll(inventory, recipe.inputs)
+	local _, carried = InventoryRules.RemoveAll(inventory, recipe.inputs)
+	if carried > 0 then
+		InventoryRules.MarkCarried({ output })
+	end
 	InventoryRules.Add(inventory, output)
-	-- Ingredient savings: a chance to get one unit of one input back (never the ore
-	-- of a smelt, which would make bars from nothing).
-	if not CraftingRules.IsTimed(recipe) and rng:NextNumber() < ModifierService.Sum(player, "IngredientSave") then
-		local inputs = {}
-		for catalogId in recipe.inputs do
-			table.insert(inputs, catalogId)
-		end
-		table.sort(inputs)
-		local refund = { catalogId = inputs[rng:NextInteger(1, #inputs)], quantity = 1 }
-		if InventoryRules.Add(inventory, table.clone(refund)) > 0 then
-			-- No room: the saved ingredient lands at the crafter's feet, not nowhere.
-			local root = rootOf(player)
-			if root then
-				DropService.Spawn(refund, root.Position - Vector3.new(0, 2.5, 0))
-			end
-		end
-	end
 	InventoryService.Publish(player)
 	ProgressionService.GrantXp(player, "Craft", "Crafting")
 	ProgressionService.GrantMastery(player, "Crafting", 1)
-	return true, nil
+	return true, nil, carried > 0
 end
 
 -- Smelting jobs -------------------------------------------------------------------
+
+-- Crafting mastery's chance of one bonus bar after a bar is smelted. It goes into
+-- the inventory only when the job's remaining bars would still fit beside it;
+-- otherwise it lands at the smelter's feet, so a bonus never stops a job. The
+-- bonus bar of a carried ore is carried too (GDD §53).
+local function grantBonusBar(player: Player, inventory, job, carried: boolean)
+	if rng:NextNumber() >= ModifierService.Sum(player, "SmeltBonus") then
+		return
+	end
+	local bonus = { catalogId = job.recipe.output, quantity = 1 }
+	if carried then
+		InventoryRules.MarkCarried({ bonus })
+	end
+	local remaining = job.count - job.done - 1
+	local trial = ProfileSchema.DeepCopy(inventory)
+	local room = InventoryRules.Add(trial, table.clone(bonus)) == 0
+		and (remaining <= 0 or InventoryRules.Add(trial, { catalogId = job.recipe.output, quantity = remaining }) == 0)
+	if room then
+		InventoryRules.Add(inventory, bonus)
+		InventoryService.Publish(player)
+		return
+	end
+	local root = rootOf(player)
+	if root then
+		DropService.Spawn(bonus, root.Position - Vector3.new(0, 2.5, 0))
+	end
+end
 
 local function publishJob(player: Player, job)
 	player:SetAttribute("SmeltRecipe", job and job.recipe.id or nil)
@@ -245,11 +259,12 @@ local function stepJob(player: Player, job, at: number)
 		return
 	end
 	local output = makeOutput(player, job.recipe, QualityRoll.Stations.Anywhere, "smelt")
-	local ok, failure = commit(player, inventory, job.recipe, output)
+	local ok, failure, carried = commit(player, inventory, job.recipe, output)
 	if not ok then
 		stopJob(player, failure or "MissingIngredients")
 		return
 	end
+	grantBonusBar(player, inventory, job, carried)
 	if CraftingRules.Advance(job) then
 		stopJob(player, "Done")
 	else
@@ -305,11 +320,10 @@ local function craft(player: Player, requestId: any, recipeId: any, count: any)
 	if timed and jobs[player] then
 		return false, "Busy"
 	end
-	-- One craft per second, faster with Crafting mastery (Q77); also stops spam.
-	-- Checked before the request ID is recorded, so a retry is not a "Duplicate".
-	local cooldown = CraftingService.CRAFT_SECONDS / (1 + ModifierService.Sum(player, "CraftSpeed"))
+	-- One craft per second for everyone; also stops spam. Checked before the
+	-- request ID is recorded, so a retry is not a "Duplicate".
 	local at = os.clock()
-	if lastCraft[player] and at - lastCraft[player] < cooldown then
+	if lastCraft[player] and at - lastCraft[player] < CraftingService.CRAFT_SECONDS then
 		return false, "TooFast"
 	end
 	if not firstTime(player, requestId) then

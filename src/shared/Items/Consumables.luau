@@ -14,7 +14,8 @@ local food = GameConstants.FOOD
 
 -- Draughts and boost berries apply a timed boost (GDD §51): `boost` = {kind,
 -- amount, seconds}. XP boosts add to Premium and paid boosters (Q162); Luck raises
--- rare-drop chances. A new boost of the same kind replaces the running one.
+-- rare-drop chances. A running boost never weakens: only a stronger one of the
+-- same kind takes over (BoostRules).
 Consumables.Boost = "Boost"
 Consumables.BoostKinds = { XP = "XP", Luck = "Luck" }
 

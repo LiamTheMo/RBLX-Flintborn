@@ -10,7 +10,7 @@
 | Gear ladder | Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, extendable later. Cobalt replaced Emerald so the ladder is all metal. |
 | Weapon families | Spear, dagger, sword and bow only. |
 | Restricted (gem-class) materials | Jade, Obsidian, Flint and any future gemstone make **only daggers and spears**, plus Forge and Permanent inputs. **Flint is the only arrow tip.** Strength is staggered: Flint sits between Stone and Copper, Obsidian between Iron and Silver, Jade between Cobalt and Mithril. |
-| Ores | Smelted into bars at the Furnace, **1 ore → 1 bar, no fuel**; time is the only cost. |
+| Ores | Smelted into bars at the Furnace, **1 ore → 1 bar, no fuel**; time is the only cost. Crafting mastery adds a chance of one bonus bar per bar (2% per level, 2026-10-28). |
 | Mining gate | Each ore needs a pickaxe of the previous tier. |
 | Ore regions | By danger: Outer Rim has Stone, Copper and Iron; Inner Ring has Silver and Cobalt; the Crater has Mithril; Adamantine comes only from meteors, the Guardian and rare events. |
 | Armor ladder | Hide → Bone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine. Wood and Stone armor are removed. |
@@ -22,7 +22,7 @@
 | Rarity | Rises slowly with tier; Legendary and above are reserved for boss and event drops. |
 | Quality rolls | Keep ±5% (Q139). |
 | Components | No intermediates besides metal bars. Recipes use Wood, Fiber and Hide directly. |
-| Consumables | Keep Basic Medicine, Advanced Medicine, Healing Potion and Cooked Meat. Berries come in varieties with different effects (healing, fullness, XP boost, luck boost), and brewing them at the Cauldron gives a stronger effect. |
+| Consumables | Keep Basic Medicine, Advanced Medicine, Healing Potion and Cooked Meat. Berries come in varieties with different effects (healing, fullness, XP boost, luck boost), and brewing them at the Cauldron gives a stronger effect. A running boost never weakens: only a stronger one of the same kind takes over (2026-10-28). |
 | Luck | Raises rare-drop chance only, from creatures, caches and events. |
 | XP potions | Add to Premium and paid boosters, as with Q162. |
 | Building | Full ladder: Wood through Adamantine walls, floors, doors and roofs. |
@@ -37,7 +37,9 @@
 
 ## 2. Materials
 
-All materials bank into the vault and never re-enter a run (GDD §45).
+Extracted materials bank into the vault. Since 2026-10-28 (GDD §53) they can be withdrawn into the lobby backpack and carried into a run again, but the carried-in amount never gets the Center 2× or any other extraction multiplier.
+
+Gathering (GDD §53): every hit drops material on the ground. Only the gatherer can pick it up for 10 s, then anyone can, and it disappears after 2 minutes. Walking over it or pressing Interact collects it.
 
 ### 2.1 Common (every region unless noted)
 
@@ -45,10 +47,10 @@ All materials bank into the vault and never re-enter a run (GDD §45).
 | --- | --- | --- |
 | Wood | Trees (hand or axe) | Building, hafts, bows. |
 | Stone | Rocks (hand or pickaxe) | Stone tier, building, stations. |
-| Flint | Rocks: a 15% chance per hit, plus 1 when a rock is finished *(placeholder)* | Restricted: daggers, spears, arrow tips. |
+| Flint | Rocks: a 15% chance per hit of an extra drop, plus 1 when a rock is finished *(placeholder)* | Restricted: daggers, spears, arrow tips. |
 | Plant Fiber | Fiber plants (hand) | Bindings in most recipes. |
 | Herbs | Herb shrubs (hand) | Medicine. |
-| Resin | Trees: a 10% chance per hit *(placeholder)* | Binding agent in Silver+ recipes and the Fire Bomb. |
+| Resin | Trees: a 10% chance per hit of an extra drop *(placeholder)* | Binding agent in Silver+ recipes and the Fire Bomb. |
 | Hide | Hunted creatures | Hide armor; straps in metal armor. |
 | Raw Meat | Hunted creatures | Cooked at the Furnace. |
 | Bone | Hunted creatures | Bone armor, daggers and spears. |
@@ -86,6 +88,18 @@ All materials bank into the vault and never re-enter a run (GDD §45).
 | Meteor | Emberglass | Meteor crashes | Adamantine armor; Permanent conversions |
 | Event | Ancient Ember | Rare events (as today) | Forge and Permanent reagent (tradeable, as today) |
 
+### 2.4a Gatherables with no use yet (GDD §53)
+
+Bankable and sellable, not tradeable. Uses come later.
+
+| Material | Node | Where | Needs |
+| --- | --- | --- | --- |
+| Clay | Clay deposit | Beach, woodland | Hand or any pickaxe |
+| Amethyst (Uncommon) | Amethyst geode | Medium regions | Iron pickaxe |
+| Starstone, Stormglass (Rare) | Outcrop, cluster | Extreme regions | Cobalt pickaxe |
+| Cave, Redcap and Chestnut Mushroom | Mushroom patches | Forests and jungle | Hand |
+| Thornvine, Frostleaf, Juniper Berry, Elderberry, Raspberry, Hazelnut | Thorn, Frost, Juniper, Elderberry, Hazel shrubs and Raspberry bush | Spread by habitat (Frost shrubs on high ground) | Hand |
+
 ### 2.5 Rare shrub event (new)
 
 A rare shrub sprouts somewhere on the island as an announced event. Gathering it by hand gives rare berries and rare herbs. It is weighted like other rare events. **Every rare event type rolls on its own** (owner decision): it never competes with other events of its category or rarity.
@@ -108,7 +122,7 @@ Berries are food, not materials, so they can be carried into a run.
 
 - Medicine is unchanged: Basic Medicine (heal 10) and Advanced Medicine (heal 25).
 - Cooked Meat is unchanged (Raw Meat at the Furnace).
-- Boost durations don't stack; drinking another resets the timer. XP boosts add to Premium and paid boosters.
+- Boosts don't stack. A running boost never weakens or resets: a weaker or equal one changes nothing (a draught is refused and kept), and only a stronger one takes over with its own timer (2026-10-28). XP boosts add to Premium and paid boosters.
 - Effect sizes and durations are placeholders.
 
 ## 4. Gear by tier
@@ -154,13 +168,24 @@ Legendary and above stay reserved for boss and event drops, such as the Guardian
 
 Bow damage is the bow's damage plus 6 for the Flint Arrow, unchanged by draw time (Q134). Flint Arrows: Wood ×3 + Flint ×1 + Fiber ×2 make 10.
 
-### 4.3 Tool yield per hit *(placeholder)*
+### 4.3 Drops per hit and node health (GDD §53)
 
-| Tier | Wood | Stone | Copper | Iron | Silver | Cobalt | Mithril | Adamantine |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Axe on trees / pickaxe on rock | 2 | 3 | 4 | 5 | 6 | 7 | 9 | 11 |
+A hit drops **1 + one per tier the tool is above the node** and uses that much node health, so a better tool empties a node in fewer hits for the same total. Bare hands are rank 0: trees, rocks and Clay give 1 per hit by hand, 2 with a Wooden tool, 3 with Stone, and so on. An ore or gem node's rank is the pickaxe it needs (the previous tier's), which gives 1 per hit; each pickaxe tier above adds 1. Plants, bushes, mushrooms and shrubs give 1 per hit by hand. Gathering mastery adds a 1%-per-level chance of one extra drop per hit, without using node health.
 
-Bare hands gather 1. Ores give 1 per hit with any pickaxe that is allowed to mine them, plus 1 per tier above the minimum.
+| Node | Health *(placeholder)* | Regrows after |
+| --- | --- | --- |
+| Tree, Rock | 12 | 2 min |
+| Fiber, Herbs, berry bushes | 3 | 2 min |
+| Copper, Iron deposits | 8 | 3 min |
+| Silver, Cobalt deposits | 8 | 5 min |
+| Obsidian outcrop | 5 | 5 min |
+| Jade vein | 5 | 8 min |
+| Mithril deposit | 6 | 8 min |
+| Clay, mushrooms, shrubs | 4 | 2 min |
+| Amethyst geode | 4 | 5 min |
+| Starstone, Stormglass | 4 | 8 min |
+
+Adamantine only comes from meteors, the Guardian and rare events; rare event nodes never regrow.
 
 ### 4.4 Armor (owner decision: 25% compounding)
 
@@ -189,7 +214,7 @@ Floors, doors and roofs scale the same way from today's values; metal tiers cost
 | **Fire Bomb** (new, consumable) | Ashen Oil ×1, Resin ×1, Fiber ×2 | Thrown; burns structures: Wood ×3 damage, Stone ×1, metal ×0.25 |
 | **Breaching Charge** (new, placeable) | Siege Resin ×2, Iron Bar ×2, Fiber ×2 | Placed on a wall or door; 8 s fuse; heavy damage to that one piece |
 
-The Portable Extraction Rune and the existing building pieces (chest, bed, trap, planter, totem) are unchanged. Planters grow Redberries, Sweetberries, Herbs and saplings.
+The Portable Extraction Rune and the existing building pieces (chest, bed, trap, planter, totem) are unchanged. Planters grow Redberries, Sweetberries, Herbs, saplings and Fiber (GDD §53); saplings and Fiber share one prompt (tap to switch, hold to plant). Seeds that were carried into the run grow a harvest that counts as carried. Sunberries and Glimmerberries are wild-only.
 
 ## 6. Permanent conversions
 

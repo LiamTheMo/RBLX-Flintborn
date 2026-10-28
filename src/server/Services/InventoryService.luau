@@ -77,15 +77,17 @@ function InventoryService.Get(player: Player)
 	return entry and entry.inventory or nil
 end
 
--- Adds a stack or unique instance. Returns how much did not fit.
-function InventoryService.Add(player: Player, item): number
+-- Adds a stack or unique instance. Returns how much did not fit and how many of
+-- those units are carried in (InventoryRules.Add), so a partly taken drop, body
+-- or chest stack keeps its share of the carried tag (GDD §53).
+function InventoryService.Add(player: Player, item): (number, number)
 	local entry = entries[player]
 	if entry == nil then
-		return item.quantity or 1
+		return item.quantity or 1, InventoryRules.Carried(item)
 	end
-	local remaining = InventoryRules.Add(entry.inventory, item)
+	local remaining, carried = InventoryRules.Add(entry.inventory, item)
 	InventoryService.Publish(player)
-	return remaining
+	return remaining, carried
 end
 
 function InventoryService.Count(player: Player, catalogId: string): number
@@ -93,14 +95,19 @@ function InventoryService.Count(player: Player, catalogId: string): number
 	return inventory and InventoryRules.Count(inventory, catalogId) or 0
 end
 
--- Removes stackable items, all or nothing.
-function InventoryService.RemoveAll(player: Player, costs: { [string]: number }): boolean
+-- Removes stackable items, all or nothing, carried units first. Returns (ok, how
+-- many of the removed units were carried in).
+function InventoryService.RemoveAll(player: Player, costs: { [string]: number }): (boolean, number)
 	local inventory = InventoryService.Get(player)
-	if inventory == nil or not InventoryRules.RemoveAll(inventory, costs) then
-		return false
+	if inventory == nil then
+		return false, 0
+	end
+	local ok, carried = InventoryRules.RemoveAll(inventory, costs)
+	if not ok then
+		return false, 0
 	end
 	InventoryService.Publish(player)
-	return true
+	return true, carried
 end
 
 -- Removes stackable items, all or nothing, and returns them as stacks (or nil).
@@ -175,6 +182,8 @@ local function keepInLobby(player: Player, leftovers)
 				if item.instanceId then
 					item.location = "LobbyBackpack"
 				end
+				-- The next Play tags what it takes from the lobby afresh (GDD §53).
+				item.carried = nil
 				table.insert(profile.lobbyBackpack.slots, item)
 			end
 		end

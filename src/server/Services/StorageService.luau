@@ -71,8 +71,8 @@ local function send(player: Player, id: string, chest)
 	Remotes.Get("ChestOpened"):FireClient(player, id, view(chest))
 end
 
--- Merging keeps a stack's deployed-from-lobby count, so a chest never launders
--- carried-in materials into doublable ones.
+-- Merging adds up the stacks' carried counts, so a chest never launders
+-- carried-in materials into doublable ones (GDD §53).
 local function store(chest, item): boolean
 	return InventoryRules.Store(chest.slots, item, StructureCatalog.CHEST_SLOTS)
 end
@@ -87,12 +87,14 @@ local function take(player: Player, id: any, index: any)
 		return false, "Empty"
 	end
 	local copy = DropService.PrepareClaim(player, entry)
-	local remaining = InventoryService.Add(player, copy)
+	local remaining, carried = InventoryService.Add(player, copy)
 	if remaining > 0 and (copy.instanceId or remaining == entry.quantity) then
 		return false, "NoRoom"
 	end
 	if remaining > 0 then
+		-- What stays in the chest keeps its share of the carried units.
 		entry.quantity = remaining
+		InventoryRules.SetCarried(entry, carried)
 	else
 		table.remove(chest.slots, index)
 	end

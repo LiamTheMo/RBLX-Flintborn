@@ -1,79 +1,75 @@
--- Named points of interest on the Shattered Crater (GDD §3.2, Q22, Q33, Q160a),
--- given as polar positions (degrees, studs from the centre) so gameplay reads the
--- map without hard-coded coordinates. Placeholders until the authored island.
+-- Named points of interest on the play-world island (GDD §3.2, Q22, Q33, Q160a,
+-- §54), given as world X/Z (−Z north) so gameplay reads the map without hard-coded
+-- coordinates. Placeholders until the authored island.
 
 local BiomeCatalog = require(script.Parent.BiomeCatalog)
 
 local PoiCatalog = {}
 
--- Fixed portal candidates: 3 Outer, 3 Inner, 1 Center, 1 hidden (each server
--- activates a different subset, the Center always on).
+-- Fixed portal candidates: 3 in Low zones, 3 in Medium zones, the Center on the
+-- Keep island and 1 hidden (each server activates a different subset, the Center
+-- always on).
 PoiCatalog.Portals = {
-	{ id = "DriftwoodCove", name = "Driftwood Cove", angle = 30, distance = 920, kind = "Fixed", zoneRadius = 12 },
-	{ id = "SaltCliffs", name = "Salt Cliffs", angle = 150, distance = 900, kind = "Fixed", zoneRadius = 12 },
-	{ id = "ElderGrove", name = "Elder Grove", angle = 280, distance = 880, kind = "Fixed", zoneRadius = 12 },
-	{ id = "JadeSteps", name = "Jade Steps", angle = 95, distance = 540, kind = "Fixed", zoneRadius = 10 },
-	{ id = "BoneHollow", name = "Bone Hollow", angle = 215, distance = 520, kind = "Fixed", zoneRadius = 10 },
-	{ id = "VineGate", name = "Vine Gate", angle = 335, distance = 560, kind = "Fixed", zoneRadius = 10 },
-	{ id = "CraterHeart", name = "Crater Heart", angle = 0, distance = 120, kind = "Center", zoneRadius = 8 },
+	{ id = "DriftwoodCove", name = "Driftwood Cove", x = 300, z = 1720, kind = "Fixed", zoneRadius = 12 },
+	{ id = "ElderGrove", name = "Elder Grove", x = -1350, z = -900, kind = "Fixed", zoneRadius = 12 },
+	{ id = "ReedFerry", name = "Reed Ferry", x = 1550, z = 0, kind = "Fixed", zoneRadius = 12 },
+	{ id = "LookoutGate", name = "Lookout Gate", x = -1130, z = 400, kind = "Fixed", zoneRadius = 10 },
+	{ id = "TempleSteps", name = "Temple Steps", x = -560, z = 1150, kind = "Fixed", zoneRadius = 10 },
+	{ id = "EmberGate", name = "Ember Gate", x = 900, z = 1320, kind = "Fixed", zoneRadius = 10 },
+	{ id = "CraterHeart", name = "Crater Heart", x = 130, z = 150, kind = "Center", zoneRadius = 8 },
 	{
 		id = "SunkenShrine",
 		name = "Sunken Shrine",
-		angle = 200,
-		distance = 1120,
+		x = 1600,
+		z = -1350,
 		kind = "Fixed",
 		zoneRadius = 10,
 		hidden = true,
 	},
 }
 
--- Safe POIs (Q160a): two Outer Rim trading camps. Radius in studs.
+-- Safe POIs (Q160a): two trading camps in Low zones. Radius in studs.
 PoiCatalog.SafeZones = {
-	{ id = "EastCamp", name = "Tidewater Camp", angle = 75, distance = 980, radius = 30 },
-	{ id = "WestCamp", name = "Ashfall Camp", angle = 255, distance = 980, radius = 30 },
+	{ id = "TidewaterCamp", name = "Tidewater Camp", x = -450, z = 1720, radius = 30 },
+	{ id = "MossfireCamp", name = "Mossfire Camp", x = 1450, z = -850, radius = 30 },
 }
 
+-- The Minotaur's altars stand on the Keep island's lower terrace (GDD §54).
 PoiCatalog.RitualSites = {
-	{ id = "NorthAltar", name = "North Altar", angle = 0, distance = 610 },
-	{ id = "SouthAltar", name = "South Altar", angle = 180, distance = 610 },
+	{ id = "KeepWestAltar", name = "Keep West Altar", x = -215, z = -60, zone = "ShatteredKeep" },
+	{ id = "KeepNorthAltar", name = "Keep North Altar", x = 150, z = -330, zone = "ShatteredKeep" },
 }
 
-PoiCatalog.GuardianArena = { angle = 0, distance = 0, radius = 80 }
+-- The Guardian fights in the Keep's courtyard (GDD §54).
+PoiCatalog.GuardianArena = { x = 0, z = -140, radius = 80 }
 
 -- Landmarks for navigation without a minimap.
 PoiCatalog.Landmarks = {
-	{ id = "GiantRoots", name = "Giant Roots", angle = 120, distance = 860, style = "Roots" },
-	{ id = "OldRuins", name = "Old Ruins", angle = 320, distance = 960, style = "Ruins" },
-	{ id = "Monoliths", name = "The Monoliths", angle = 40, distance = 560, style = "Monoliths" },
-	{ id = "JadeFalls", name = "Jade Falls", angle = 260, distance = 470, style = "Jade" },
-	{ id = "VolcanicRidge", name = "Volcanic Ridge", angle = 0, distance = 300, style = "Ridge" },
+	{ id = "FrostpeakSummit", name = "Frostpeak Summit", x = -64, z = -1440, style = "Peak" },
+	{ id = "KeepTower", name = "Shattered Keep", x = 50, z = -262, style = "Keep" },
+	{ id = "FallenTemple", name = "Fallen Temple", x = -750, z = 980, style = "Temple" },
+	{ id = "TimberwatchTower", name = "Timberwatch Tower", x = -1330, z = 120, style = "Tower" },
+	{ id = "EmberhollowMouth", name = "Emberhollow Mouth", x = 750, z = 1330, style = "CaveMouth" },
+	{ id = "GiantRoots", name = "Giant Roots", x = 1130, z = -780, style = "Roots" },
+	{ id = "Monoliths", name = "The Monoliths", x = -1500, z = -1250, style = "Monoliths" },
+	{ id = "MillBridge", name = "Mill Bridge", x = 1050, z = 120, style = "Bridge" },
+	{ id = "FerryBridge", name = "Ferry Bridge", x = 1450, z = 220, style = "Bridge" },
+	{ id = "OldLighthouse", name = "Old Lighthouse", x = -1100, z = 1650, style = "Lighthouse" },
 }
 
--- Route gaps through the volcanic ridge (degrees).
-PoiCatalog.RidgeGaps = { 45, 135, 225, 315 }
-
--- Spread-out spawn candidates in every region (Q33); the server still filters
--- them for crowding at spawn time.
-function PoiCatalog.SpawnCandidates()
-	local list = {}
-	local rings = { { 980, 12 }, { 600, 9 }, { 420, 6 }, { 180, 4 } }
-	for ringIndex, ring in rings do
-		local distance, count = ring[1], ring[2]
-		for index = 1, count do
-			table.insert(list, { angle = (index / count) * 360 + ringIndex * 11, distance = distance })
-		end
-	end
-	return list
-end
-
--- World position (y = 0) of a polar POI.
+-- World position (y = 0) of a POI.
 function PoiCatalog.Position(poi): Vector3
-	local radians = math.rad(poi.angle)
-	return Vector3.new(math.cos(radians) * poi.distance, 0, math.sin(radians) * poi.distance)
+	return Vector3.new(poi.x, 0, poi.z)
 end
 
+-- The zone a POI stands in.
+function PoiCatalog.ZoneOf(poi): string?
+	return BiomeCatalog.ZoneAt(poi.x, poi.z)
+end
+
+-- The risk tier (OuterRim / InnerRing / CenterCrater) a POI stands in.
 function PoiCatalog.RegionOf(poi): string?
-	return BiomeCatalog.RegionAt(poi.distance)
+	return BiomeCatalog.RegionAt(poi.x, poi.z)
 end
 
 return PoiCatalog
