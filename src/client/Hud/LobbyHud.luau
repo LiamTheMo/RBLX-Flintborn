@@ -408,9 +408,11 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		),
 		serverCfg.label.textSize
 	)
-	hit(server, "ChooseServer", steady).Activated:Connect(function()
+	local serverButton = hit(server, "ChooseServer", steady)
+	serverButton.Activated:Connect(function()
 		self.ServerPressed:Fire()
 	end)
+	self:_target(serverButton, serverCfg.size[1], serverCfg.size[2], serverCfg.touchPad, false)
 
 	-- Status strip, top centre between the profile and the currencies (deploy
 	-- status, invites sent, maintenance); up to two lines.

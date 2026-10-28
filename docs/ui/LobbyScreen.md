@@ -52,11 +52,11 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Coins.Value | 1321,113,88,38 | in pill | Serif 24 (shrinks to 14), ink | "2,450" | native |
 | Gems | 1425,99,132,66 | top-right | `pm_lobby_gems` | — | image |
 | Gems.Value | 1489,113,64,38 | in pill | Serif 24 (shrinks to 14), ink | "125" | native |
-| Settings | 1569,98,69,66 | top-right | `pm_lobby_gear`; touch area +10 px each side | — | image |
+| Settings | 1569,98,69,66 | top-right | `pm_lobby_gear`; touch area grows toward 44 pt (up to +24 px a side) | — | image |
 | Nav tiles | 35,370 and 182,370 / 35,517 and 182,517 / 35,664 and 182,664; 142×141, pitch 147 | left | `pm_tile_*` | Inventory, Vault, Quests, Shop, Forge, Trade | image |
 | Party | 1211,267,433,381 | top-right | `pm_lobby_party` | — | image |
 | Party.Title / Party.Count | 1265,307,140,40 / 1408,307,140,40 | in panel | Serif 34, ink | "PARTY", "1/8" (party cap) | native |
-| Party.Leave | 1579,309,36,35 | in panel, while in a party | `pm_button_x`; touch area +12 px | — | image |
+| Party.Leave | 1579,309,36,35 | in panel, while in a party | `pm_button_x`; touch area grows toward 44 pt (up to +30 sideways, +16 up, +12 down) | — | image |
 | Party.Divider | 1262,353,334,2 | in panel | line | — | native |
 | Party.List | 1261,359,345,236 | in panel | scrolling; bar 10 px thumb/track | rows | native |
 | Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 229,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
@@ -84,7 +84,7 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Element | Default | Hover | Pressed | Busy / disabled | Focus (gamepad) | Source |
 |---|---|---|---|---|---|---|
 | Nav tile | art | UIScale 1.04 + name tag beside the tile | UIScale 0.97 | — | same as hover | default (reference shows none) |
-| Profile / Coins / Settings / Server | art | UIScale 1.04 | 0.97 | — | as hover | default |
+| Profile / Settings / Server | art | UIScale 1.04 | 0.97 | — | as hover | default |
 | Enter | art | UIScale 1.04 | 0.97 | dark veil over the leather, inactive | as hover | default |
 | Add friend | art | 1.04 | 0.97 | hidden when not leader / party full | as hover | ref image 2 |
 | Popup buttons (56 px tall) | `pm_button_leather` / `pm_button_parchment` | `_hover` art (stand-in: lighter) | `_pressed` art (stand-in: darker) | — (`_disabled` art is sliced for later screens) | as hover; the first button is selected when a gamepad opens the card, B closes it | ref image 3 |
@@ -169,6 +169,11 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 - The party scrollbar runs the whole list height (the master draws it below the
   leader row), so the add-friend button sits 14 px further left than the master
   to stay clear of it, and the crown 4 px left to keep a gap before the button.
+- The smallest phones (about 568×320 points, first-generation iPhone SE class)
+  have too little height for the party panel beside the Enter group, so it
+  shrinks toward half size there (party text ~6 pt, its buttons ~27 pt). Every
+  larger phone keeps it at 0.82–1.0. A shorter panel for those screens is left
+  until such devices matter.
 - The close-up sheet's mail button with a "1" badge is not built: the game has no
   mail; party invites arrive as rows in the party panel.
 - Text on phones: Roblox draws the lobby at half size on phones (the HUD's minimum
@@ -179,7 +184,8 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
   whether Roblox's Merriweather does is a manual Studio check.
 - Small buttons (Settings, Leave, add-friend, invite Accept/Decline) get touch
   areas that grow past their art toward 44 points on screen, each side limited so
-  it never reaches a neighbouring button (on the smallest phones some stay at
-  ~30 pt); on short screens the
+  it never reaches a neighbouring button (on notched phones the party buttons
+  reach about 38–44 pt wide and 26–37 pt tall, boxed in by Settings above and the
+  list rows); on short screens the
   party panel moves up under Coins before it shrinks; popups grow on small
   screens and never reach under the top bar.
