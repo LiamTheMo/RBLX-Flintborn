@@ -4,7 +4,7 @@ beams lying across its front and back, and upright splinters standing at its sid
     import importlib, m012; importlib.reload(m012); m012.build()
 
 Parts as on the sheet: Amber Nodule (main crystal), Wood Base (Front), Wood Base (Rear), Side Wood (Left), Side Wood
-(Right). The hero is their union.
+(Right). The hero is their union. The R03 kit sheet owns `AmberNodule`, so the nodule part is `AmberCrystalMain`.
 """
 import math
 import random
@@ -23,40 +23,40 @@ WOOD, WOOD_DARK, WOOD_LIGHT = "m012_wood", "m012_wood_dark", "m012_wood_light"
 NODULE = ((0.0, 0.3, 3.5), (2.7, 2.4, 3.6), 12001)        # centre, radii, seed: sunk 0.1 into the ground
 # wood groups: beams (p0, p1, width, depth, taper, seed); each group is one part on the sheet
 WOOD_GROUPS = {
-    "BaseFront": (((-4.4, -2.0, 0.55), (3.9, -3.1, 0.75), 1.9, 1.4, 1.0, 12011),
-                  ((-3.2, -1.3, 1.6), (2.5, -1.7, 1.75), 1.4, 1.0, 0.9, 12012),
-                  ((-4.4, -2.9, 0.6), (-2.8, -3.3, 1.0), 1.6, 1.4, 1.0, 12013)),
-    "BaseRear": (((-2.4, 1.9, 0.6), (2.8, 2.5, 0.7), 1.7, 1.3, 1.0, 12021),
-                 ((-1.4, 2.6, 1.5), (1.9, 2.9, 1.6), 1.3, 1.0, 0.9, 12022)),
-    "SideLeft": (((-3.0, 0.1, 0.0), (-3.5, -0.2, 4.6), 1.1, 0.9, 0.4, 12031),
-                 ((-2.3, 0.9, 0.0), (-2.6, 1.0, 3.7), 1.0, 0.8, 0.45, 12032),
-                 ((-3.5, -1.0, 0.0), (-3.4, -1.2, 2.3), 1.2, 1.0, 0.5, 12033)),
-    "SideRight": (((3.2, -0.5, 0.0), (3.7, -0.7, 4.4), 1.15, 0.9, 0.35, 12041),
-                  ((3.7, 0.6, 0.0), (4.0, 0.8, 3.5), 1.0, 0.85, 0.4, 12042)),
-    "Rear": (((1.4, 2.4, 0.0), (1.9, 2.7, 6.6), 1.35, 1.1, 0.35, 12051),
-             ((2.6, 1.5, 0.0), (3.0, 1.5, 5.2), 1.15, 0.95, 0.4, 12052),
-             ((-0.7, 2.7, 0.0), (-0.9, 2.9, 4.5), 1.1, 0.9, 0.4, 12053)),
+    "BaseFront": (((-4.6, -2.0, 0.6), (4.0, -3.0, 1.6), 2.8, 2.0, 0.9, 12011),     # the thick, sloped front log
+                  ((-3.4, -1.2, 2.1), (2.6, -1.7, 2.3), 1.9, 1.3, 0.9, 12012),
+                  ((-4.5, -2.9, 0.7), (-2.7, -3.4, 1.2), 2.0, 1.6, 1.0, 12013)),
+    "BaseRear": (((-2.6, 2.0, 0.8), (2.8, 2.5, 0.9), 2.2, 1.6, 1.0, 12021),
+                 ((-1.6, 2.6, 1.9), (1.9, 2.9, 2.0), 1.7, 1.2, 0.9, 12022)),
+    # upright splintered planks: broad, chunky slabs (width across the plank's face), leaning outward, tapering
+    # to an angled top
+    "SideLeft": (((-3.0, 0.0, 0.0), (-3.7, -0.3, 4.4), 2.6, 1.5, 0.5, 12031),
+                 ((-3.4, -1.4, 0.0), (-3.8, -1.6, 2.4), 2.2, 1.5, 0.6, 12033)),
+    "SideRight": (((2.5, -0.4, 0.0), (3.3, -0.6, 4.2), 2.6, 1.5, 0.5, 12041),),
+    "Rear": (((1.4, 2.4, 0.0), (1.9, 2.8, 6.2), 1.7, 3.0, 0.5, 12051),
+             ((-0.6, 2.7, 0.0), (-0.9, 3.0, 4.0), 1.5, 2.6, 0.55, 12053)),
 }
 
 
 def palette():
-    K.set_colour(A_LIGHT, "#FFC94F", rough=0.3)
-    K.set_colour(A_MID, "#FF8A1E", rough=0.3)
-    K.set_colour(A_DARK, "#D9561A", rough=0.3)
-    K.set_colour(WOOD, "#8E5B3B", rough=0.9)
-    K.set_colour(WOOD_DARK, "#7A4C31", rough=0.9)
-    K.set_colour(WOOD_LIGHT, "#A06A47", rough=0.9)
+    # sheet swatches: amber light #FECD64, mid #FE7719, dark #D25117; wood #8D5D3D
+    K.set_colour(A_LIGHT, "#FECD64", rough=0.3)
+    K.set_colour(A_MID, "#FE7719", rough=0.3)
+    K.set_colour(A_DARK, "#D25117", rough=0.3)
+    K.set_colour(WOOD, "#8D5D3D", rough=0.9)
+    K.set_colour(WOOD_DARK, "#84563A", rough=0.9)
+    K.set_colour(WOOD_LIGHT, "#9C6845", rough=0.9)
 
 
 def nodule(a, at_origin=False):
-    """The amber nodule: an egg of about 30 broad facets; three ambers as broad facet regions (by noise)."""
+    """The amber nodule: an egg of about 40 broad facets; three ambers as broad facet regions (by noise)."""
     centre, radii, seed = NODULE
     if at_origin:
         centre = (0.0, 0.0, radii[2])
     rng = random.Random(seed)
     c = Vector(centre)
     pts = []
-    n = 30
+    n = 40
     for k in range(n):
         z = 1 - 2 * (k + 0.5) / n
         r = math.sqrt(1 - z * z) * (1.0 - 0.12 * z)          # a little fuller below the middle: an egg
@@ -72,9 +72,9 @@ def nodule(a, at_origin=False):
     li, di = a._mi(A_LIGHT), a._mi(A_DARK)
     for f in K.faces_of(vs):
         v = nf(f.calc_center_median())
-        if v > 0.15:
+        if v > 0.22:                                     # mostly the mid amber, as on the sheet
             f.material_index = li
-        elif v < -0.3:
+        elif v < -0.25:
             f.material_index = di
     return vs
 
@@ -116,7 +116,6 @@ def woods(a, group, at_origin=False):
     beams = WOOD_GROUPS[group]
     shift = Vector((0, 0, 0))
     if at_origin:
-        lo = [min(b[0][i], b[1][i]) for b in beams for i in range(2)]
         shift = -Vector((sum(b[0][0] + b[1][0] for b in beams) / (2 * len(beams)),
                          sum(b[0][1] + b[1][1] for b in beams) / (2 * len(beams)), 0))
     for p0, p1, w, d, taper, seed in beams:
@@ -134,11 +133,11 @@ NOTES = {
     "Amber": "amber resource: a big egg-shaped faceted amber nodule (three ambers as broad facet regions) nestled in "
              "weathered wood - splintered beams lying across its front and back, upright splinters at its sides "
              "and rear; one closed mesh, flat bottom",
-    "AmberNodule": "Amber Nodule (main crystal): faceted amber egg",
+    "AmberCrystalMain": "Amber Nodule (main crystal): faceted amber egg",
     "AmberWoodFront": "Wood Base (Front): two stacked splintered beams and an end block",
     "AmberWoodBack": "Wood Base (Rear): two stacked splintered beams",
-    "AmberWoodLeft": "Side Wood (Left): upright splinters",
-    "AmberWoodRight": "Side Wood (Right): upright splinters",
+    "AmberWoodLeft": "Side Wood (Left): two broad upright splintered planks",
+    "AmberWoodRight": "Side Wood (Right): a broad upright splintered plank",
 }
 
 
@@ -146,7 +145,7 @@ def build(render=True):
     M.coll(NUM, TITLE)
     palette()
     specs = [("Amber", "hero", hero, 4000, "hull"),
-             ("AmberNodule", "part", lambda a: nodule(a, True), 1000, "hull"),
+             ("AmberCrystalMain", "part", lambda a: nodule(a, True), 1000, "hull"),
              ("AmberWoodFront", "part", lambda a: woods(a, "BaseFront", True), 1000, "hull"),
              ("AmberWoodBack", "part", lambda a: woods(a, "BaseRear", True), 1000, "hull"),
              ("AmberWoodLeft", "part", lambda a: woods(a, "SideLeft", True), 1000, "hull"),
@@ -154,9 +153,9 @@ def build(render=True):
     objs = [M.mk(SHEET, n, fn, subject=TITLE, role=r, notes=NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
     audits = []
-    for o in objs:
+    for o, (_, _, fn, _, _) in zip(objs, specs):
         M.union_loose(o)
-        m004.floor_cut(o)
+        m004.floor_cut(o, z0=-M._build_offset(fn).z)    # the ground (build z = 0) in object coordinates
         audits.append(M.finish(o, union=False))
     M.display(NUM, objs, TITLE)
     out = {"audit": audits, "problems": K.check(objs)}
