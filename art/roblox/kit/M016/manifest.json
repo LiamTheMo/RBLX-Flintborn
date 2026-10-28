@@ -1,0 +1,1150 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M016",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m016_glass",
+    "hex": "#17B8B4",
+    "levels": [
+     0.97363,
+     0.97735,
+     0.98028,
+     0.98249,
+     0.98505,
+     0.98729,
+     0.98987,
+     0.99146,
+     0.99433,
+     0.99773,
+     1.00032,
+     1.00196,
+     1.00513,
+     1.00764,
+     1.01067,
+     1.01301,
+     1.01553,
+     1.01849,
+     1.02072,
+     1.02343,
+     1.02488
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_deep",
+    "hex": "#0AA9A3",
+    "levels": [
+     0.97618,
+     0.9796,
+     0.98297,
+     0.98508,
+     0.98838,
+     0.99011,
+     0.99186,
+     0.99472,
+     0.99699,
+     0.99884,
+     1.00161,
+     1.00506,
+     1.00732,
+     1.0115,
+     1.01349,
+     1.0157,
+     1.01773
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_deep_x_glass_25",
+    "hex": "#0DADA7",
+    "levels": [
+     0.97944,
+     0.98208,
+     0.98639,
+     0.99519,
+     0.99744,
+     1.00157,
+     1.00369,
+     1.00696,
+     1.01402,
+     1.01629
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_deep_x_glass_50",
+    "hex": "#10B0AC",
+    "levels": [
+     0.97355,
+     0.97699,
+     0.97919,
+     0.98132,
+     0.98353,
+     0.98515,
+     0.98774,
+     0.98961,
+     0.99154,
+     0.99458,
+     0.99685,
+     0.99927,
+     1.0011,
+     1.00362,
+     1.00545,
+     1.00802,
+     1.01051,
+     1.01251,
+     1.01718,
+     1.01971,
+     1.02427,
+     1.02557
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_deep_x_glass_75",
+    "hex": "#14B4B0",
+    "levels": [
+     0.98266,
+     0.99224,
+     0.99676,
+     1.00176,
+     1.00467,
+     1.0067,
+     1.00959,
+     1.01128,
+     1.01483,
+     1.01641,
+     1.01921,
+     1.02122
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_glint",
+    "hex": "#4EE4E5",
+    "levels": [
+     0.98627,
+     0.98927,
+     0.99129,
+     0.99476,
+     0.99748,
+     1.00242,
+     1.00686,
+     1.00892,
+     1.01179,
+     1.01794,
+     1.01961
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_light",
+    "hex": "#22CFC7",
+    "levels": [
+     0.97844,
+     0.98033,
+     0.98349,
+     0.98584,
+     0.98803,
+     0.99068,
+     0.99246,
+     0.99546,
+     0.99779,
+     0.99959,
+     1.00217,
+     1.00499,
+     1.00637,
+     1.00837,
+     1.01036,
+     1.01291,
+     1.01616,
+     1.01792,
+     1.0205
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_light_x_glass_glint_50",
+    "hex": "#38DAD6",
+    "levels": [
+     0.98041,
+     0.98326,
+     0.98672,
+     0.98942,
+     0.99129,
+     0.99367,
+     0.99691,
+     1.0026,
+     1.0058,
+     1.0078,
+     1.01101,
+     1.01407,
+     1.01794,
+     1.01961
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_root",
+    "hex": "#3F9493",
+    "levels": [
+     0.98718,
+     0.99022,
+     0.9919,
+     0.99459,
+     0.99705,
+     0.99925,
+     1.0019,
+     1.00451,
+     1.0075,
+     1.00973
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_root_x_glass_deep_50",
+    "hex": "#249E9B",
+    "levels": [
+     0.98819,
+     0.99104,
+     0.99543,
+     0.99842,
+     1.00125,
+     1.0044,
+     1.00618
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_x_light_25",
+    "hex": "#1ABEB9",
+    "levels": [
+     0.98468,
+     0.99192,
+     0.9954,
+     0.99687,
+     1.00083,
+     1.00421,
+     1.00706,
+     1.00887,
+     1.01524,
+     1.02247
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_x_light_50",
+    "hex": "#1CC4BE",
+    "levels": [
+     0.9722,
+     0.98904,
+     0.99176,
+     0.99401,
+     0.99824,
+     1.00036,
+     1.0039,
+     1.0071,
+     1.00906,
+     1.01151,
+     1.01458,
+     1.01736,
+     1.02036
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_glass_x_light_75",
+    "hex": "#1FC9C2",
+    "levels": [
+     0.97612,
+     0.98486,
+     0.98773,
+     0.9963,
+     0.99862,
+     1.00161,
+     1.00381,
+     1.0063,
+     1.00834,
+     1.01306,
+     1.0169
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_rock",
+    "hex": "#6A6262",
+    "levels": [
+     0.92186,
+     0.94535,
+     0.9505,
+     0.95628,
+     0.95832,
+     0.96274,
+     0.96591,
+     0.96678,
+     0.96956,
+     0.97301,
+     0.9756,
+     0.98285,
+     0.98638,
+     0.98949,
+     0.99226,
+     0.99412,
+     0.99682,
+     0.99945,
+     1.002,
+     1.00662,
+     1.00832,
+     1.01112,
+     1.01246,
+     1.01489,
+     1.02147,
+     1.02772,
+     1.03103,
+     1.03527,
+     1.03778,
+     1.04556,
+     1.05788,
+     1.07283
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_rock_accent",
+    "hex": "#7D716E",
+    "levels": [
+     0.93017,
+     0.94188,
+     0.95342,
+     0.96053,
+     0.962,
+     0.9636,
+     0.96764,
+     0.96944,
+     0.96974,
+     0.9723,
+     0.97474,
+     0.97583,
+     0.9774,
+     0.98001,
+     0.98388,
+     0.98616,
+     0.98906,
+     0.99104,
+     0.99479,
+     1.00283,
+     1.00547,
+     1.01612,
+     1.0206,
+     1.03655,
+     1.04192,
+     1.04761,
+     1.05816,
+     1.0648,
+     1.06852,
+     1.0736,
+     1.08291,
+     1.10313
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_rock_dark",
+    "hex": "#534C4B",
+    "levels": [
+     0.96298,
+     0.96692,
+     0.97992,
+     0.98519,
+     0.9873,
+     1.01851
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_rock_x_accent_50",
+    "hex": "#746A68",
+    "levels": [
+     0.91641,
+     0.92447,
+     0.93864,
+     0.94485,
+     0.94979,
+     0.95137,
+     0.95843,
+     0.96647,
+     0.96803,
+     0.97363,
+     0.97798,
+     0.97972,
+     0.9827,
+     0.98327,
+     0.98691,
+     0.9923,
+     0.9957,
+     0.9969,
+     0.99811,
+     1.00076,
+     1.00213,
+     1.00639,
+     1.0134,
+     1.01798,
+     1.01881,
+     1.02398,
+     1.0265,
+     1.02979,
+     1.03505,
+     1.0508,
+     1.05986,
+     1.09538
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_rock_x_dark_50",
+    "hex": "#5E5756",
+    "levels": [
+     0.93194,
+     0.94628,
+     0.95153,
+     0.95589,
+     0.9585,
+     0.95967,
+     0.96299,
+     0.96577,
+     0.96923,
+     0.97166,
+     0.97527,
+     0.97782,
+     0.98007,
+     0.98122,
+     0.98287,
+     0.98656,
+     0.98882,
+     0.99216,
+     0.99625,
+     0.99837,
+     1.00155,
+     1.00598,
+     1.0094,
+     1.01319,
+     1.01715,
+     1.01968,
+     1.033,
+     1.03974,
+     1.04235,
+     1.0573,
+     1.0638,
+     1.09173
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand",
+    "hex": "#C1A283",
+    "levels": [
+     0.96341,
+     0.96577,
+     0.97169,
+     0.97649,
+     0.98042,
+     0.98259,
+     0.98646,
+     0.98778,
+     0.99213,
+     0.9946,
+     0.99767,
+     1.00034,
+     1.00299,
+     1.00679,
+     1.00807,
+     1.01057,
+     1.0118,
+     1.01397,
+     1.01654,
+     1.01992,
+     1.02272,
+     1.02556,
+     1.02799,
+     1.04881
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_dark",
+    "hex": "#B99175",
+    "levels": [
+     0.95294,
+     0.96213,
+     0.96631,
+     0.9689,
+     0.97155,
+     0.97396,
+     0.97547,
+     0.97952,
+     0.98079,
+     0.98216,
+     0.98485,
+     0.98682,
+     0.98946,
+     0.99177,
+     0.99512,
+     0.99904,
+     1.00014,
+     1.00289,
+     1.00411,
+     1.00737,
+     1.01203,
+     1.01306,
+     1.01465,
+     1.01742,
+     1.02246,
+     1.02622,
+     1.0277,
+     1.02929,
+     1.03278,
+     1.03655,
+     1.04784,
+     1.06215
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_light",
+    "hex": "#C9AD8F",
+    "levels": [
+     0.98908,
+     0.99145,
+     0.99462,
+     1.00529,
+     1.01277,
+     1.01467,
+     1.01753,
+     1.02028,
+     1.02162,
+     1.02488,
+     1.02811,
+     1.03068,
+     1.03657,
+     1.04121,
+     1.04361,
+     1.04601,
+     1.04778,
+     1.0506,
+     1.0542,
+     1.06132,
+     1.0641
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_pit",
+    "hex": "#745842",
+    "levels": [
+     0.96447,
+     0.97475,
+     0.98076,
+     0.98694,
+     0.98799,
+     0.98989,
+     0.99099,
+     0.99322,
+     0.99445,
+     0.99601,
+     0.99811,
+     0.99967,
+     1.00019,
+     1.00104,
+     1.00416,
+     1.00555,
+     1.00643,
+     1.00831,
+     1.00922,
+     1.00995,
+     1.01074,
+     1.01544,
+     1.01709,
+     1.02112,
+     1.02363,
+     1.02657,
+     1.03202,
+     1.03592,
+     1.04235,
+     1.04555,
+     1.05877,
+     1.07162
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_dark_25",
+    "hex": "#BF9E80",
+    "levels": [
+     0.95735,
+     0.9672,
+     0.97591,
+     0.97888,
+     0.98448,
+     1.00706,
+     1.01593,
+     1.02305,
+     1.03249
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_dark_50",
+    "hex": "#BD9A7C",
+    "levels": [
+     0.9614,
+     0.9661,
+     0.97104,
+     0.97604,
+     0.97745,
+     0.97844,
+     0.98123,
+     0.98508,
+     0.98687,
+     0.98839,
+     0.99193,
+     0.99371,
+     0.99542,
+     0.99643,
+     0.99693,
+     0.99821,
+     1.00049,
+     1.00228,
+     1.00621,
+     1.00843,
+     1.01038,
+     1.01217,
+     1.01352,
+     1.01678,
+     1.01814,
+     1.02284,
+     1.02654,
+     1.0294,
+     1.03264,
+     1.03554,
+     1.04046,
+     1.05243
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_light_25",
+    "hex": "#C3A586",
+    "levels": [
+     0.96179,
+     0.96538,
+     0.96836,
+     0.9717,
+     0.97483,
+     0.97889,
+     0.98227,
+     0.98443,
+     0.98743,
+     0.99052,
+     0.992,
+     0.99738,
+     0.99988,
+     1.00216,
+     1.00474,
+     1.00782,
+     1.01051,
+     1.0156,
+     1.01763,
+     1.01964,
+     1.02893,
+     1.03375,
+     1.04198,
+     1.04606,
+     1.04862,
+     1.05874
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_light_50",
+    "hex": "#C5A889",
+    "levels": [
+     0.95056,
+     0.9528,
+     0.96386,
+     0.96549,
+     0.96884,
+     0.97203,
+     0.97761,
+     0.98501,
+     0.98666,
+     0.98963,
+     0.99189,
+     0.9943,
+     0.99805,
+     1.00321,
+     1.00693,
+     1.01074,
+     1.01402,
+     1.0168,
+     1.02009,
+     1.02283,
+     1.03301,
+     1.05201
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_light_75",
+    "hex": "#C7AA8C",
+    "levels": [
+     0.95363,
+     0.96575,
+     0.96811,
+     0.9725,
+     0.97766,
+     0.98183,
+     0.98412,
+     0.98845,
+     0.99599,
+     0.99922,
+     1.00104,
+     1.00358,
+     1.00823,
+     1.01004,
+     1.0119,
+     1.01489,
+     1.01711,
+     1.01958,
+     1.02231,
+     1.02349,
+     1.02592,
+     1.02926,
+     1.03404,
+     1.03779,
+     1.04608
+    ],
+    "used": true
+   },
+   {
+    "key": "m016_sand_x_pit_50",
+    "hex": "#9A7D62",
+    "levels": [
+     0.94654,
+     0.95707,
+     0.96722,
+     0.97123,
+     0.97274,
+     0.98387,
+     0.98717,
+     0.99048,
+     0.99281,
+     0.99549,
+     0.99709,
+     1.00008,
+     1.00399,
+     1.00604,
+     1.00884,
+     1.01087,
+     1.01392,
+     1.01669,
+     1.01943,
+     1.02268,
+     1.02477,
+     1.02713,
+     1.02925,
+     1.03512,
+     1.05565
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "StormglassBranch",
+   "sheet": "M016",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    8.335,
+    7.48,
+    5.6654
+   ],
+   "tris": 452,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassBranch.glb",
+     "kind": "solid",
+     "tris": 452,
+     "offset": [
+      0.0,
+      3.74,
+      0.0
+     ],
+     "size": [
+      8.335,
+      7.48,
+      5.6654
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crystal Assembly (Main Branch, reusable): faceted teal tube tree, a thick trunk with a buried blunt root and two thick arms, every limb ending in a flat octagonal cap"
+  },
+  {
+   "name": "StormglassMound",
+   "sheet": "M016",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    8.5183,
+    2.2173,
+    7.5339
+   ],
+   "tris": 482,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassMound.glb",
+     "kind": "solid",
+     "tris": 482,
+     "offset": [
+      0.0,
+      1.1086,
+      0.0
+     ],
+     "size": [
+      8.5183,
+      2.2173,
+      7.5339
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Sand Base (with sockets, reusable): low lumpy faceted sand dome, a big hexagonal socket pit and a small one on top (raised bevelled rims, steep walls, flat floors), three blind hex pockets in the flat bottom"
+  },
+  {
+   "name": "StormglassNode",
+   "sheet": "M016",
+   "subject": "Stormglass",
+   "role": "hero",
+   "size": [
+    10.0171,
+    7.9,
+    8.1702
+   ],
+   "tris": 1780,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassNode.glb",
+     "kind": "solid",
+     "tris": 1780,
+     "offset": [
+      0.0,
+      3.95,
+      0.0
+     ],
+     "size": [
+      10.0171,
+      7.9,
+      8.1702
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_StormglassNode_ore_glint_1",
+     "kind": "ore_glint",
+     "position": [
+      0.231,
+      8.5,
+      0.436
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#E8FFFC",
+         "#62EAEC"
+        ],
+        "size": [
+         0,
+         0.45,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         1.2,
+         0.3,
+         1.2
+        ],
+        "rate": 0.4
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_StormglassNode_ore_glint_2",
+     "kind": "ore_glint",
+     "position": [
+      4.027,
+      6.252,
+      1.832
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#E8FFFC",
+         "#62EAEC"
+        ],
+        "size": [
+         0,
+         0.45,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         1.2,
+         0.3,
+         1.2
+        ],
+        "rate": 0.3
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_StormglassNode_ore_glint_3",
+     "kind": "ore_glint",
+     "position": [
+      -3.41,
+      5.911,
+      -2.335
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#E8FFFC",
+         "#62EAEC"
+        ],
+        "size": [
+         0,
+         0.45,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         1.2,
+         0.3,
+         1.2
+        ],
+        "rate": 0.3
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "stormglass resource node: a chunky faceted teal crystal tree (thick trunk, two thick arms, flat octagonal caps) standing in a hexagonal socket pit in a low lumpy sand mound, a ring of grey-brown faceted rocks round the foot and two on the upper slope, a second small empty socket behind the trunk, three blind pockets under the base; one closed mesh, flat base"
+  },
+  {
+   "name": "StormglassSprig",
+   "sheet": "M016",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    3.1584,
+    3.4132,
+    1.4351
+   ],
+   "tris": 190,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassSprig.glb",
+     "kind": "solid",
+     "tris": 190,
+     "offset": [
+      0.0,
+      1.7066,
+      0.0
+     ],
+     "size": [
+      3.1584,
+      3.4132,
+      1.4351
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crystal Branch (Side Branch, reusable): a short faceted Y twig of the same limbs and caps"
+  },
+  {
+   "name": "StormglassStone",
+   "sheet": "M016",
+   "subject": "Stormglass",
+   "role": "part",
+   "size": [
+    2.6733,
+    1.7,
+    2.2239
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StormglassStone.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.85,
+      0.0
+     ],
+     "size": [
+      2.6733,
+      1.7,
+      2.2239
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base Rock (reusable): faceted boulder, broad top facet, flat bottom"
+  }
+ ],
+ "stats": {
+  "assets": 5,
+  "pieces": 5,
+  "solid": 5,
+  "water": 0,
+  "glow": 0,
+  "tris": 2964,
+  "vfxSockets": 3,
+  "paletteColours": 28,
+  "paletteLevels": 559,
+  "meshBytes": 303484
+ },
+ "problems": []
+}

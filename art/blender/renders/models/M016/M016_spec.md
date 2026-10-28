@@ -772,3 +772,376 @@ All recommendations are accepted:
 7. Names as proposed (`StormglassNode`, `StormglassBranch`, `StormglassSprig`, `StormglassMound`, `StormglassStone`).
 
 Side-view direction (pitfall 13): confirmed from `frame_box`'s maths. The side camera at +X has screen right = +Y, the back. The 013–015 specs carry a correction note.
+
+## Stage 1 - Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m016.py` (`build()`), run in the background session on port 9877 against
+`art/blender/assets/kit/wip/M016.blend`. Every part has its own function in one shared build frame (front -Y, ground
+z 0, mound centre at the origin); the hero pastes the finished part meshes (m011._paste) and unions them.
+
+- **`_limb()`**: one solid 8-sided faceted tube along a polyline (parallel-transported rings, each turned ±10°,
+  scaled ±5-7 %, vertices jittered 3.5 % radially and 0.05 along the axis), ending in the flat octagonal cap: a bevel
+  ring half a step turned at 0.72 R, 0.22 past the last ring, and a low fan centre 0.08 above it. The base is either a
+  buried fan (arm roots, inside the trunk) or a taper to a tip vertex (the trunk's root, the sprig's root).
+- **StormglassBranch** (`branch`): trunk at (0.2, -0.5), stations z 0.75 → 7.6 (r 0.38, 0.84, 1.13 at the sand line,
+  1.34 just above the sand, 1.22 → 1.28 up the shaft), section 1.1× deeper in Y (`TRUNK_YSCALE`), root tip z 0.42.
+  Right arm heading (3.4, -1.25) (front-right), left arm (-3.35, 2.55) (back-left), each from the trunk axis out to its
+  cap: a shallow first run (25-30°), an elbow, a steeper end run (about 55°); radii 1.0-1.08 at the root, 0.93-0.96 at
+  the neck, 1.06-1.1 at the cap. Two exact unions (`M.union_loose`). Cap tops: trunk 8.0 (hero 7.9 after the floor
+  cut), right about 6.3, left about 5.8.
+- **StormglassSprig** (`sprig`): the Y twig (stem to a tall cap, arm up-right at about 45°, root taper to a tip),
+  3.2 × 1.4 × 3.4. Built at x + 7 in the frame; not in the hero.
+- **StormglassMound** (`mound`): a 16-point lobed ring dome (6 rings with a broad plateau: z -0.05 / 0.5 / 1.2 / 1.75 /
+  2.02 / 2.12 at radius fractions 1.0 / 0.95 / 0.82 / 0.64 / 0.42 / 0.2, top 2.15) on a 4.2 × 3.65 ellipse, flat fan
+  bottom. Then per socket (`_sockets`), one exact boolean at a time on closed inputs:
+  - a raised bevelled **collar** (a closed hex cake whose sloped top rises 0.08 above the sand at the rim, its outer
+    edge 0.07 under the sand) unioned;
+  - the **pit** carved: a 50° chamfer cone from above the lip down to the rim line (`SAND_RIM`), walls tapering 5° to
+    the floor (`SAND_PIT`).
+  - Socket 1 (main): (0.2, -0.5), circumradius 1.65, depth 0.68 under the lowest rim corner, floor half way to
+    parallel with the rim. Socket 2: (-1.9, 1.5), circumradius 0.75, depth 0.45, floor parallel to its rim (it sits
+    on the slope).
+  - Then the three blind underside pockets (hex r 0.7, 0.45 deep) at (-1.8, 1.2), (1.9, 0.6), (-0.2, -2.0).
+- **StormglassStone** (variant A) and build-only variants B (dome), C (peaked dome, blunt crown), D (cobble):
+  `K.hull_rock` with a flat bottom, 3° coplanar merge, BEAUTY triangulation (37-51 facets).
+- **Hero** (`placements`, `hero`): mound and branch at identity, 11 rim rocks (`ROCKS`: transformed, some mirrored
+  copies, sunk 0.26-0.35, each a different sink so no two bottoms are coplanar), T1 / T2 on the upper slope (bedded:
+  their flat bottoms turned 70 % of the way to the sand's mean normal, 0.3 deep, 0.95 / 0.85 above the sand). Then
+  `union_loose` (15 shells), `_floor_cut` at z 0, the underside pockets carved, `_clean_mesh`. No Blender crash.
+
+Iterations (renders read against the sheet each time):
+1. First build: rocks too big and spiky (variant C and T1 stretched vertically), mound too flat, arms thin, socket
+   gap 0.6+ (the rim sat low on the dome). Fixed with a fuller plateau mound, an R 1.65 pit, a rounder C, tilted T
+   rocks, and rocks pulled in and made 10 % smaller; thicker arms.
+2. The arms read as straight 45° tubes, then as "J" hooks (flat run, vertical end). Settled on shallow → elbow →
+   steeper end, which matches the sheet's front and exploded arms best.
+3. Side view: the trunk was too narrow in depth (the sheet's trunk spans f 0.30-0.60), so its section went 1.1× in Y;
+   the far arm was too high in the side, so the left arm came down 0.3 (the front stays within ±0.04).
+
+**Stage 1 measurements** (final build; orthographic silhouettes at the sheet's elevation, `measure()`):
+
+| View | Profile error mean / worst | Shares C / S / R (sheet) | Crystal span f (sheet) |
+| --- | --- | --- | --- |
+| front (0, 9) | 0.046 / 0.29 | 0.56 / 0.21 / 0.23 (0.53 / 0.26 / 0.21) | 0.12-0.95 (0.12-0.94) |
+| side (90, 9) | 0.065 / 0.19 | 0.54 / 0.25 / 0.21 (0.55 / 0.24 / 0.22) | 0.17-0.85 (0.21-0.86) |
+| rear (180, 9) | 0.081 / 0.51 | 0.55 / 0.23 / 0.22 (0.57 / 0.21 / 0.22) | 0.05-0.88 (0.04-0.94) |
+| top (0, 89) | - | 0.32 / 0.42 / 0.27 (0.34 / 0.44 / 0.21) | - |
+| f34 (-15, 12) | - | 0.56 / 0.22 / 0.23 (0.46 / 0.29 / 0.25) | - |
+| r34 (165, 12) | - | 0.55 / 0.25 / 0.21 (0.52 / 0.26 / 0.22) | - |
+
+- The worst profile points are known conflicts:
+  - front f 0.65 (0.92 against 0.63): the trunk's right edge lands just past the sheet's; widening it for the rear
+    pushed it there;
+  - rear f 0.90-0.95 (0.24 against 0.75): the sheet's rear is drawn 11 % narrower than its front (§3.5), so its left
+    cap reaches the frame edge; ours ends at 0.88;
+  - side f 0.65-0.85 (0.80 against 0.61-0.69): the far-arm height conflict of §3.7 (the front's left cap is already at
+    0.73-0.78 against 0.74-0.78).
+- Profile ends (f 0.00 / 1.00) read 0 because the sample column is the bbox edge itself; ignore them.
+- Arms: the right arm is in front of the trunk in the front view and behind it in the rear; the near arm is a column
+  at screen left in the side view (camera at +X, screen right +Y).
+- **Socket 1 gap** (`socket_gap()`, rays at 6 stations): 0.32-0.46 at the rim, 0.46-0.62 at 0.5 below it; depth under
+  each rim corner 0.68-0.84. Socket 2: 0.45 under each rim corner. No rock in a pit (T1's back edge is 0.05 in front
+  of the collar). The junction extra (-20, 40) shows the gap and the dark walls all round the trunk.
+- **Hero size 10.02 × 8.17 × 7.90** (target 10.2 × 8.4 × 8.0, ±0.5 / ±0.5 / ±0.3). Mound part 8.52 × 7.53 × 2.22.
+
+## Stage 2 - Optimisation and cleanup
+
+Per object: `_weld` (zero-length edges; m011's sliver pass divides by edge length), `_clean_mesh` (ears, closed
+pockets, m011 sliver pass with the ground plane locked, forced slivers), `_finish` (M.finish plus the crumbs / holes /
+slivers loop), `_polish` (all triangles, every corner opened past 5°, a second longer-collapse pass only if a corner
+stays under, origin back at the bottom centre, UVs re-made).
+
+| Object | Tris | Size (studs) | Shells | Non-manifold / boundary | Normals | n-gons | Min corner | Crossing face pairs |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StormglassNode (hero) | 1780 | 10.02 × 8.17 × 7.90 | 1 | 0 / 0 | outward | 0 | 5.01° | 0 |
+| StormglassBranch | 452 | 8.33 × 5.67 × 7.48 | 1 | 0 / 0 | outward | 0 | 5.22° | 0 |
+| StormglassSprig | 190 | 3.16 × 1.44 × 3.41 | 1 | 0 / 0 | outward | 0 | 6.15° | 0 |
+| StormglassMound | 482 | 8.52 × 7.53 × 2.22 | 1 | 0 / 0 | outward | 0 | 5.14° | 0 |
+| StormglassStone | 60 | 2.67 × 2.22 × 1.70 | 1 | 0 / 0 | outward | 0 | 17.05° | 0 |
+
+- The hero is under 4000 and every part under 1000; transforms are applied; origins at the bottom centre (hero OFF
+  (-0.03, -0.06, 0)).
+- The pit walls, rim chamfers and floors are kept (colour and shape geometry, §6.1).
+
+## Stage 3 - UV
+
+`M.smart_uv` at angle 45 with an ANGLE_BASED re-unwrap and margin 0.008 (`UV`); `m012._uv_unfold` for folds (none
+needed).
+
+| Object | Islands | Overlaps / flipped | Min gap / border | Density min / med / max | Conformal worst / p95 | Texels / stud @1024 |
+| --- | --- | --- | --- | --- | --- | --- |
+| hero | 298 | 0 / 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.238 / 1.023 | 34.0 |
+| branch | 47 | 0 / 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.083 / 1.05 | 64.1 |
+| sprig | 32 | 0 / 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.013 / 1.011 | 157.9 |
+| mound | 76 | 0 / 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.077 / 1.026 | 62.2 |
+| stone | 9 | 0 / 0 | 0.018 / 0.008 | 1.0 / 1.0 / 1.0 | 1.079 / 1.072 | 164.1 |
+
+## Stage 4 - Materials, colour and texture
+
+**Keys** (`PALETTE`, the final calibrated hexes). Roughness: glass 0.3 (root 0.5), sand 0.95, rock 0.9; metal 0.
+Crystal Specular IOR Level 0.25 on every crystal key and mix (`_glass_spec`; 0.4 clipped the cap tops white in the top
+and junction views).
+
+| Key | Final hex | Dome calibration: target → hex (rendered) |
+| --- | --- | --- |
+| m016_glass | #18B8B5 | #20C0B7 → #179E9E (#24BDB5) |
+| m016_glass_light | #23CFC8 | #2CD6CC → #22B3AF (#2ED8CA) |
+| m016_glass_glint | #50E4E6 | #5DEFE9 → #4EC5C9 (#5DEFEA) |
+| m016_glass_deep | #0AA9A3 | #18ACA2 → #0A918F (#1BADA2) |
+| m016_glass_root | #409493 | #4E9A94 → #3E7F81 (#4F9893) |
+| m016_sand | #C1A284 | #DFB68E → #B0967B (#DFB78E) |
+| m016_sand_light | #C9AD90 | #EAC49C → #B8A087 (#E9C49C) |
+| m016_sand_dark | #B99176 | #D0A57E → #A9866D (#D5A37D) |
+| m016_sand_pit | #745842 | #A07C5C → #7E6650 (#9E7B5C) |
+| m016_rock | #6A6262 | #776C68 → #5F595A (#776C68) |
+| m016_rock_accent | #7D716E | #8E7D76 → #706666 (#8C7C76) |
+| m016_rock_dark | #534C4B | #5E5450 → #4A4445 (#5F5552) |
+
+Method:
+1. **Sample**: the sheet's rendered region medians (§5.1-5.2 and `sheet_stats()`, the study's C / S / R masks over
+   each view box).
+2. **Calibrate**: `calibrate()` (K.calibrate on the test dome; non-crystal keys sampled unfiltered). Every key rendered
+   within 6 levels of its target on the dome.
+3. **Hero pass** (`report()` plus a refit script):
+   - our hero rendered at the sheet's views (front / side / rear at 9°, f34 (-15, 12), r34 (165, 12)), with a label
+     render for the masks;
+   - each region's keys multiplied in linear light by the geometric-mean gain (sheet / ours) over those five views;
+   - two rounds (the gains converged to 0.99-1.04), a third for the rock after its contact bands were narrowed;
+   - `SAND_PIT` then re-measured in a junction extra (-20, 40): **#8D6B4E against the sheet's walls #88674C** (floor
+     #716357).
+4. **Blend** (`colour()`; every field is a position, never a facing):
+   - **Crystal**: u along each limb (trunk: from the sand line z 2.0 to the top 8.0; arms: from where they leave the
+     trunk, 1.3 from its axis, to the cap), plus broad noise ±0.08, onto a 9-step ladder: deep → 25 / 50 / 75 % →
+     body → 25 / 50 / 75 % → light (`DEEP_BAND` 0.04-0.30, `LIGHT_BAND` 0.60-0.86).
+     - Faces within 0.4 of another limb (the crotches) go no lighter than step 2.
+     - Cap bevel faces are light; cap fan faces are glint on the hero, and 50 % light → glint on the branch / sprig
+       parts (see K.check below).
+     - Trunk faces below socket 1's rim (interpolated round the hex) are `glass_root`; the branch part's buried root
+       below the pit floor is 50 % root → deep.
+   - **Sand**: height field z 1.3 → 2.0, up to 75 % light; broad noise patches +25 % light; foot band (z < 0.35 50 %,
+     z < 0.7 25 % dark); contact within 0.25 of a rock 50 % dark; pit walls and floors `sand_pit`; rim chamfer
+     50 % sand → pit; floor cap `sand_dark`.
+   - **Rock**: per placed rock (the nearest piece, in its own part frame): noise patches 50 / 100 % accent; R1 / R6 /
+     R10 half accent; the ground row (u < 0.15) and the sand contact (< 0.2, below the crown) 50 % dark; floor
+     `rock_dark`.
+   - Hard edges only where materials meet (crystal / sand, sand / rock): separate keys on separate faces.
+5. **Texture (Tint)**: broad mottling per region (`MOTTLE`: sand amp 0.05 at scale 0.4; rock 0.06 / 0.45 with a
+   per-rock level of 0.97-1.03; crystal 0.025 / 0.5); per-face jitter at most 0.015; no confetti.
+6. **K.check**: no problems. Facing correlation: hero 0.45, branch 0.49, sprig 0.44, mound 0.0, stone 0.82 (waived
+   with `kit_shading_ok`: its flat bottom is the ground-contact tone, chosen by position, as on M014).
+   - The branch first scored 0.52 with glint caps (spec §5.4's warning), hence the parts' 50 % caps.
+   - The rock family on the hero scored 0.50 with wider dark bands (ground 0.22, contact 0.3; 60 % of the rock faces
+     dark), hence 0.15 / 0.2.
+
+**Re-measure** (final hero renders against the sheet; median, or median / lit / shade quartile):
+
+| View | Crystal ours (sheet) | Sand ours (sheet) | Rock ours (sheet) |
+| --- | --- | --- | --- |
+| front | #1FCEC0 / #2AEEDB / #13867D (#21C3B9 / #4BE8E1 / #0EA096) | #FDC898 (#E3BA93) | #887871 / #A69187 / #5A504D (#746A66 / #AA978E / #5C524E) |
+| side | #21B4AC (#22C8BE) | #C8A683 (#DEB78F) | #695F5C (#786A66) |
+| rear | #20BBB3 (#21C7BE) | #CEA987 (#DCB38C) | #6B6361 (#7D6E69) |
+| f34 | #1FD2C4 (#1FBEB5) | #FFD1A1 (#E1B790) | #8F7E77 (#756D6A) |
+| r34 | #1EBEB7 (#1EBCB2) | #CDA885 (#DAB28B) | #6C6362 (#756967) |
+
+- The studio's key light comes from the front, so the same key renders 15-20 levels apart between the front-lit views
+  (front, f34) and the side / rear ones, where the sheet is evenly lit. The fit is the geometric mean: the front
+  views read a little light and the side / rear a little dark. The r34 matches within 4 levels. Hues match (crystal
+  175-177°, sand 29-31°, rock 6-15°).
+- Crystal bands (front, top → bottom): ours #2BEDDA #1FD1C2 #22DACB #1BC9B9 #15A598, sheet #4AE4DF #25D0C8 #20C0B5
+  #1FBEB5 #18B0A7. Same order (deep at the sand, light at the caps); our top band is more saturated (the sheet's
+  cap tops are a paler aqua).
+
+## Stage 5 - Lighting
+
+Skipped by design (spec §7.1, main-session decision 6). The sheet's crystal is lit, not luminous: dark teal shade
+facets, no spill on the sand or the rocks. No key has emission (a Neon key would flatten the limb gradient into one
+unlit colour) and there is no PointLight. Studio side: nothing to set.
+
+## Stage 6 - VFX
+
+Three `ore_glint` sockets on the hero (`_vfx`, `glint_points()`), each 0.12 above a cap's fan centre along its axis.
+Overrides: colour ["#E8FFFC", "#62EAEC"], size [0, 0.45, 0], shape [1.6, 0.6, 1.6] (flat over the cap), rate 0.4 on the
+trunk and 0.3 on each arm. Hero-local positions: trunk (0.231, -0.436, 8.02), right (3.78, -1.741, 5.851), left
+(-3.166, 2.149, 5.543). The parts carry none. Renders use vfx=True (the glints show as small sparks over the caps). No
+halo, light, dust, smoke or lightning: the sheet shows none, and §12.5 rules out electrical strands.
+
+## Modeller's notes for the verifier
+
+- Renders are in `art/blender/renders/models/M016/`: the kit views plus `front_sheet` / `side_sheet` / `rear_sheet`
+  at 9°, `f34_near`, `r34_near`, `top_tilt`, `junction`, `exploded` and `part_*`.
+- Known misses:
+  - the side view's far arm reads high (0.80 against 0.61-0.69, the §3.7 conflict);
+  - the rear's left cap ends at f 0.88 (sheet 0.94, §3.5);
+  - the kit's top view shows the arms on one diagonal, not the sheet's T (§3.2);
+  - the trunk's cap top glares near-white from straight above under the studio sun (sheet: pale aqua);
+  - the underside renders dark brown (no light from below; the sheet's close-up is lit).
+- The hero's lowest corner (5.01°) is a long triangle on the floor cap; every other face is above 5.14°.
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier (did no other stage). This was a read-only run in a background Blender (port 9880) on
+`art/blender/assets/kit/wip/M016_verify.blend`, the copy saved after the main session's rebuild. I did not save, did not
+call `build()`, and sent every fresh render to the scratchpad (`kit_models.MODEL_RENDERS` redirected), so the committed
+renders are untouched. Geometry was measured with my own bmesh/BVH scripts. `M.audit`, `M.uv_stats`, `K.check`,
+`m016.silhouette` / `measure` and `m016.report` were used as instruments. Sheet colours were cross-checked with my own
+numpy sampler on the PNG; it reproduces the study's medians exactly (front crystal `#21C3B9`, sand `#E3BA93`, rock
+`#746A66`; junction walls `#87674D`).
+
+**Verdict: PASS, 7/10.** Nothing is broken, every technical requirement holds, and the model reads as the sheet's
+Stormglass: a chunky faceted teal tube tree in a real socket pit in a lumpy sand mound ringed by grey-brown rocks.
+The remaining differences are minors. Most follow from the sheet's own view conflicts (§3) or from the studio key
+light, which sits in front of the model.
+
+### Re-measured (own scripts)
+
+| Object | Tris | Size (studs) | Shells | NM / boundary / wire / loose | n-gons / zero-area / dup | Flipped / interior faces (ray parity) | Self-intersecting pairs | Min corner (< 5°) | UV: islands, overlaps, flipped, gap / border |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StormglassNode | 1794 / 4000 | 10.02 × 8.17 × 7.90 | 1 | 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 5.01° (0) | 312, 0, 0, 0.016 / 0.008 |
+| StormglassBranch | 452 / 1000 | 8.33 × 5.67 × 7.48 | 1 | 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 5.22° (0) | 47, 0, 0, 0.016 / 0.008 |
+| StormglassSprig | 190 / 1000 | 3.16 × 1.44 × 3.41 | 1 | 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 6.15° (0) | 32, 0, 0, 0.016 / 0.008 |
+| StormglassMound | 482 / 1000 | 8.52 × 7.53 × 2.22 | 1 | 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 5.14° (0) | 76, 0, 0, 0.016 / 0.008 |
+| StormglassStone | 60 / 1000 | 2.67 × 2.22 × 1.70 | 1 | 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 17.05° (0) | 9, 0, 0, 0.018 / 0.008 |
+
+- **Hero size** is inside the decided bands: 10.2 ± 0.5, 8.4 ± 0.5 and 8.0 ± 0.3. The mound (8.52 × 7.53 × 2.22) is
+  inside 8.4 × 7.3 × 2.1 ± 0.4 / 0.4 / 0.2.
+- **Tris:** this file's hero has 1794 tris; the modeller's run had 1780. All other counts and sizes are identical, so
+  the rebuild is not bit-for-bit deterministic across sessions. The GUI kit file holds the 1794 version.
+- **Origin and transforms:** the local bbox bottom centre is (0, 0, 0) on all five. Rotation is 0, scale 1, and
+  there are no modifiers or custom split normals. Every object has the `UVMap` layer, the `Tint` attribute, and
+  texel density 1.0 / 1.0 / 1.0.
+- **Materials:** 25 `FB_m016_*` keys and mixes on the hero, all Principled, metal 0.
+  - Roughness: crystal 0.3 (root 0.5), sand 0.95, rock 0.9. Crystal Specular IOR Level is 0.25.
+  - **No key has emission** (all 0.0) and alpha is 1.0 everywhere, so there are no Neon pieces, as decided.
+  - `K.check`: no problems. Baked-shading scores: hero 0.45, branch 0.49, sprig 0.44, mound 0.0; the stone's 0.82 is
+    waived (flat ground-contact bottom).
+  - My unweighted luminance-vs-normal.z correlation is 0.53 for the crystal and 0.55 for the rock. `colour()` never
+    reads a normal; the correlation comes from positional fields that happen to face up (cap fans, limb ends) or down
+    (ground rows). That is acceptable, but it is close to the limit.
+- **VFX:** 3 `ore_glint` sockets (rates 0.4 / 0.3 / 0.3, colour `#E8FFFC`→`#62EAEC`, shape 1.6 × 0.6 × 1.6). Each
+  socket point is outside the solid, 0.125–0.127 above its cap. The parts carry none. See minor 7 for the spawn
+  boxes.
+- **Socket 1** (my rays, 12 bearings):
+  - Gap between the crystal and the pit wall: 0.31–0.53 at z 1.7–2.05 (just under the rim), widening to 0.52–0.67 at
+    the floor (z 1.25). Target: 0.25–0.55 at the rim.
+  - Floor at z 1.09–1.25. Depth under the six hex corners: 0.74–0.90 (target ≥ 0.6).
+  - The walls are `sand_pit`, the rim chamfer is `sand_x_pit_50`, and the crystal below the rim is `glass_root`. No
+    rock enters the pit; T1 sits at the front rim.
+  - The junction extra shows the dark gap round the trunk, as the close-up does.
+- **Socket 2:** a real hex pit back-left of the trunk, floor z 0.85–1.40 (tilted to the slope). It shows in the r34
+  as the sheet's dimple, as decided.
+- **Underside pockets:** three blind pockets (at (−1.8, 1.2), (1.9, 0.6), (−0.2, −2.0)), each with its roof at
+  z 0.52, coloured `sand_pit`. They match the "Base Underside" close-up.
+
+### Against the sheet (fresh renders at the spec's cameras)
+
+Silhouettes (`measure`; key-label raster; the sheet's values are in brackets):
+
+| View | Profile error mean / worst | Shares C / S / R | Crystal span f | Aspect |
+| --- | --- | --- | --- | --- |
+| front (0, 9) | 0.046 / 0.29 | .56 / .21 / .23 (.53 / .26 / .21) | .12–.95 (.12–.94) | 1.19 (1.24) |
+| side (90, 9) | 0.065 / 0.19 | .54 / .25 / .21 (.55 / .24 / .22) | .17–.85 (.21–.86) | 0.95 (0.96) |
+| rear (180, 9) | 0.081 / 0.51 | .55 / .23 / .22 (.57 / .21 / .22) | .05–.88 (.04–.94) | 1.16 (1.10) |
+| top (0, 89) | — | .32 / .42 / .27 (.34 / .44 / .21) | — | — |
+| f34 (−15, 12) | — | .56 / .22 / .23 (.46 / .29 / .25) | .08–.98 (.17–.91) | 1.13 (1.20) |
+| r34 (165, 12) | — | .55 / .25 / .21 (.52 / .26 / .22) | .02–.92 (.13–.90) | 1.12 (1.13) |
+
+- **The f34 miss is a camera question, not a model one.** Projected widths:
+  - At az −15 / −28 the crystal spans 0.91–0.95 of the silhouette, because the arm line is perpendicular to those
+    cameras by design (§2.1).
+  - At az **+15**, the crystal spans **0.18–0.92** (sheet 0.17–0.91). At (+15, 18) the shares are .50 / .27 / .24,
+    within ±4 of the sheet.
+  - So the model fits the sheet's three-quarter view from a front-right camera. Against the kit's front34 it reads
+    wider than the sheet's f34.
+- **Part relationships hold:**
+  - the right arm is in front of the trunk in the front view and behind it in the rear;
+  - in the side view, the near arm is a column at screen left;
+  - the trunk sits in socket 1 with a real gap;
+  - the rocks ring the mound's foot, and T1 / T2 are on the upper slope;
+  - three limb ends, each a flat octagonal cap with a fan centre and a bevel ring.
+- **Facets** are calm, medium triangulated facets on 8-sided turned rings, as on the sheet: no needles, no confetti,
+  no smooth tubes.
+- **Parts** against the Parts Breakdown:
+  - Branch: matches (tube tree, wide fork, blunt root taper).
+  - Sprig: a correct Y, but about 10 % small (3.16 W × 3.41 H against 3.6 × 3.7).
+  - Mound: a lumpy faceted dome with the pits.
+  - Stone A: a broad faceted boulder with a flat bottom.
+
+**Colours.** Medians; for the crystal, also the lit and shade quartiles. Ours first, then (sheet), then Δ R / G / B:
+
+| View | Crystal median | Crystal lit / shade | Sand median | Rock median |
+| --- | --- | --- | --- | --- |
+| front | `#1FCEC0` (`#21C3B9`) −2 / +11 / +7 | `#2AEEDB` / `#13867D` (`#4BE8E1` / `#0EA096`) | `#FDC898` (`#E3BA93`) +26 / +14 / +5 | `#887871` (`#746A66`) +20 / +14 / +11 |
+| side | `#21B4AC` (`#22C8BE`) −1 / −20 / −18 | `#53DAD1` / `#177770` (`#52EBE4` / `#11A499`) | `#C8A683` (`#DEB78F`) −22 / −17 / −12 | `#695F5C` (`#786A66`) −15 / −11 / −10 |
+| rear | `#20BBB3` (`#21C7BE`) −1 / −12 / −11 | `#41DCD2` / `#159993` (`#4BE8E1` / `#0FA39A`) | `#CEA987` (`#DCB38C`) −14 / −10 / −5 | `#6B6361` (`#7D6E69`) −18 / −11 / −8 |
+| f34 | `#1FD2C4` (`#1FBEB5`) 0 / +20 / +15 | `#27EFDC` / `#198E85` (`#49E8E2` / `#0FA299`) | `#FFD1A1` (`#E1B790`) +30 / +26 / +17 | `#8F7E77` (`#756D6A`) +26 / +17 / +13 |
+| r34 | `#1EBEB7` (`#1EBCB2`) 0 / +2 / +5 | `#2DD9CF` / `#169D96` (`#4AEAE2` / `#10A196`) | `#CDA885` (`#DAB28B`) −13 / −10 / −6 | `#6C6362` (`#756967`) −9 / −6 / −5 |
+| top | `#2DF9EA` (`#34DAD1`) −7 / +31 / +25 | `#5DFFFF` / `#1FD0C4` (`#5CF0EB` / `#12A398`) | `#D3AF8A` (`#D0A883`) +3 / +7 / +7 | `#7D706C` (`#80706A`) −3 / 0 / +2 |
+
+- Pit walls (rear / r34): `#7A5B44` / `#7A5C45` against the close-up's `#88674C` (−14 / −12 / −8).
+- Crystal bands, front, top to bottom: ours `#2BEDDA #1FD1C2 #22DACB #1BC9B9 #15A598`, sheet
+  `#4AE4DF #25D0C8 #20C0B5 #1FBEB5 #18B0A7`.
+- **Hues match everywhere:** crystal 174–177°, sand 29–31°, rock 6–15°.
+- **The gradients match the sheet:** the crystal runs deep at the sand line to light at the limb ends; the sand runs
+  from a darker foot to a paler crown, with a contact band at the rocks; the rocks carry warm accent patches and
+  dark ground rows. The blends are 3-step and soft, hard only where materials meet.
+- **The level errors follow the light, not the keys.** The front-lit views (front, f34) read 11–30 levels light; the
+  side and rear read 10–22 dark; the r34 and top medians are within 0–9 (except the top crystal). Every key was fitted
+  to the geometric mean, so no key change can fix all views at once. This is the studio's key direction, not a wrong
+  colour.
+
+### Findings
+
+No blockers.
+
+Minors (for the commit notes; worth doing only if a round 2 happens for another reason):
+1. **The arms read flatter than the sheet's** (the most visible shape difference).
+   - In the front view, the arm undersides rise at about 34–37° (ours) against about 45° (sheet), measured from the
+     crystal-bottom profile (f 0.15–0.35 and 0.65–0.95).
+   - The arm caps face out (normal tilt 33° on the right, 41° on the left) where the sheet's caps face more up. So
+     the kit's front34 reads as a wide "Y" rather than the sheet's up-swept candelabra.
+   - The crystal-bottom profile is still inside ±0.06 except at f 0.35 (+0.08) and f 0.95 (−0.10).
+   - Fix: in `ARM_L_ST` / `ARM_R_ST`, keep each cap's position and raise the middle stations about 0.3–0.4, so the
+     runs rise about 40–45° and the last run about 60–65° (cap tilt ≤ 30°). Re-check the front crystal-bottom
+     profile and the cap tops.
+2. **The side view's far arm is high:** 0.80 against 0.61–0.69 (a §3.7 conflict). The front's left cap (0.78–0.80
+   against 0.76–0.78) has room to drop about 0.3 stud, which brings the side about 0.04 closer.
+3. **The rear view's screen-right arm ends at f 0.85–0.88** (sheet 0.94; profile miss 0.51 at f 0.90). This is the
+   §3.5 width conflict: the crystal's projected width is the same in our front and rear, as on the sheet. Leave it.
+4. **The rocks read as pointed teeth in the side and rear views.**
+   - The side profile ends are 0.08–0.14 h higher than the sheet (f 0.10–0.20 and 0.90–0.95), against a ±0.05
+     tolerance for rock tops.
+   - The variant B / C crowns (top ring radius 0.15–0.16 with 2 verts) give near-points. R7 (H/D 1.08), R10 (1.04),
+     R6 (0.93) and R4 (0.84) are tall for their footprint.
+   - Fix: give B / C a 3–4-vertex top ring at radius 0.3–0.35, and lower R4 / R6 / R7 / R10 / R11 H by about 15 %.
+5. **The crystal clips from above.** In the top view, 37 % of the crystal pixels clip to `#xxFFFF` (p95 `#5FFFFF`,
+   median `#2DF9EA` against `#34DAD1`); top_tilt 27 %, junction 6 %. The trunk cap reads near-white in the junction
+   and top_tilt views (sheet: pale aqua `#5DEFE9`).
+   - Cause: the studio sun on up-facing light / glint faces.
+   - Possible fix: Specular 0.25 → 0.15 on the light / glint keys and `glass_glint` about 8 % darker. Re-measure the
+     top crystal against `#34DAD1` and the front against `#21C3B9`.
+6. **The crystal's light band is too saturated.**
+   - The lit quartile is `#2AEEDB` (sat 0.82) against the sheet's paler aqua `#4BE8E1` (sat 0.68).
+   - The top band is `#2BEDDA` against `#4AE4DF`, with R 31 levels low.
+   - Fix: raise R in `glass_light` (for example `#22CFC7` → `#30D0C8`) so the limb ends go paler, not greener.
+7. **About 25 % of the glint spawn box sits inside the crystal** (my 7³ grid with 5-ray parity: 82, 93 and 97 of
+   343 points).
+   - The trunk box (0.6 tall, centred 0.125 above the fan) dips 0.175 into the cap.
+   - The arm caps tilt 33–41° under a world-level box.
+   - Fix: lift each socket so the box bottom clears the cap (about +0.3 on the trunk), or use shape [1.2, 0.3, 1.2]
+     with a 0.35 lift on the arms.
+8. **The studio light spreads the levels** (see Colours). The front-lit views read 11–30 levels light; the side and
+   rear read 10–22 dark; the hues are right. Confirm in Studio under the game's lighting.
+9. **The underside renders dark brown** (no light from below), where the sheet's close-up is lit (`#A98362`). The
+   geometry matches.
+10. **The sprig is about 10 % small** (3.16 × 3.41 against 3.6 × 3.7).
+11. **The build is not deterministic across sessions** (1794 against 1780 tris). Harmless, but the commit should
+    quote the kit file's 1794.
+
+Renders for this verification are in the session scratchpad
+(`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\v016\`):
+`renders\M016\` (kit views plus the spec's extras), `renders2\M016\` (parts, underside), `renders3\M016\` (f34 / r34
+from the mirrored side), and the side-by-side comparisons `cmp_*.png`.
+
+## Main session after verification (2026-10-28)
+
+Applied minor 7: the glint boxes are 1.2 × 0.3 × 1.2, lifted 0.6 along each cap axis (`GLINT_LIFT`). Spawn-grid points inside the hero went from 272 to 1 of 1029. The rebuild in the kit file gave a hero of 1780 tris: one shell, 0 non-manifold, 0 boundary. Export: 5 assets, 3 vfx sockets, 0 problems. The other minors are recorded for a later polish pass.

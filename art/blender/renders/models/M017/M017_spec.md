@@ -2,7 +2,7 @@
 
 Reference: `art/blender/assets/references/017.png` (BERRY BUSH, "Shrub / Nature / Flintborn Style", "Individual Model
 Study", footer "PAGE 17/132"; INDEX.md lists it as 17, "Flintborn Berry Bush Study"; 1024 × 1536 px).
-Builder: `art/blender/kit/mcp/m017.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`.
+Builder: `art/blender/kit/mcp/m017.py` → `build()` (stages 1–6 below). Procedure: `art/blender/kit/mcp/STAGES.md`.
 
 User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
 into the colors nearby. please ensure all color and textures are being made and applied." Effects ship wherever the
@@ -686,3 +686,610 @@ Names owned elsewhere (a `git grep` of the repo and a byte search of `FlintbornW
 6. **Exports.** The bush and three parts.
 7. **Effects.** None; skip stages 5 and 6 and record why.
 8. **Names.** As proposed: `BerryBushNode`, `BerryBushTrunkFork`, `BerryBushLeafClump`, `BerryBushBerry`.
+
+## Stage 1 — Modelling
+
+Builder `art/blender/kit/mcp/m017.py` (`build()`), run in a background session (`bgmcp.py`, port 9878, work file
+`art/blender/assets/kit/wip/M017.blend`). Every table in the builder is in **sheet studs**; each builder scales its
+result by `S = 0.70` at the end (decision 1: the hero 3.6 tall; the study's 0.72, less the 0.1 our lobes stand taller).
+
+### Parts (each its own function; the hero uses the same builders)
+- `lobe_mesh()`: one ico-2 sphere (80 tris, built in a scratch bmesh and copied in, see stage 2) reshaped: ovoid
+  W 1.0 : D 0.9 : H 0.85, sides drawn in below the widest ring (teardrop underside), three broad pulls (±10 % over
+  0.75 rad), the pole pushed out 1.2× (the five-facet apex every sheet lobe shows) and turned up and outwards. No
+  per-vertex noise.
+- `BerryBushLeafClump` (`clump_part`): the exploded three-lobe clump (tall centre lobe, smaller left lobe lower and out,
+  right lobe behind) on a flared hex collar with a hex peg. 316 tris, 2.20 × 1.43 × 1.55.
+- `BerryBushBerry` (`berry_part`): ico-2 ball (radius jitter ≤ 1.8 %, squash 0.96) and a 6-sided peg on top. 96 tris,
+  0.68 across, 0.79 tall with the peg.
+- `BerryBushTrunkFork` (`fork_part`): 6-sided trunk (Ø 1.44 → 1.2) to 1.45, three limbs (centre ~10° left to 3.1, right
+  ~40° to 2.8, left ~52° to 2.2), ±8 % / ±10° ring jitter, pale heartwood hex cut ends. 202 tris, 2.63 × 1.00 × 2.21.
+
+### Hero `BerryBushNode`
+- Five stems (`_tube` along a bent Bézier, 6 sides, Ø 0.72 flare at the ground, 0.62 above, 0.46 at the tip; each
+  starts at its own depth below the ground) parting at the foot. Each tip is moved towards its clump until the stem runs
+  ≥ 0.35 into it (`_seat`; measured 0.36–0.92). A flared hex collar where each stem leaves its clump (`_entry` marches
+  back down the stem with a ray-parity test).
+- Fifteen lobes in five clumps (`LOBES`): the study's table, re-laid against the renders (below).
+- Eight berries (`BERRIES`): B1, B2, B4 cast in from the front and Bk1, Bk2 from the rear, each dropped onto the canopy
+  with a ring of rays (`_drop`, first contact) and sunk 30 % (B4 45 %); B3, B5, B6 at fixed points, pushed along a
+  given direction until 22–36 % sunk (`_surface_dist` hold check). Pegs point into the canopy.
+- Union: `_union` (one exact boolean per shell, each checked against the volumes going in, undone and retried with a
+  small nudge if it throws geometry away), floor cut at z 0, m011 / m012 sliver passes, `_seal`.
+
+### Why the layout moved from the study's table
+1. The drawn widths are silhouettes; the lobe mesh is narrower in depth and height and tapers, so at the drawn sizes a
+   contact graph of the 41 pieces showed eleven separate groups, and berries showed through from the far side. Every
+   lobe grows `LOBE_GROW = 1.18`; L3 / L4 / L11 sit a little further out; L8 is bigger (1.4) and further in (it touched
+   only by an edge, which left non-manifold edges).
+2. The side view has no leaf below h 0.28 at mid depth, but the front and rear both show low lobes at the sides: L6 and
+   L12 moved to the back-left and back-right (Y 1.4–1.5, z 1.35–1.4), where the rear's low lobes are.
+3. L7 moved left and smaller, L10 right and smaller (1.75): the front and front three-quarter showed no stem between
+   them (the sheet shows stems to h 0.25–0.59 at f 0.45–0.6).
+4. Berries typed as 3D centres were either buried by the grown lobes or perched; casting them from their view put the
+   front's six at the sheet's (f, h).
+
+### Measured (stage 1 final; the study's masks on both images, `m017.measure()`)
+| View | W:H sheet / ours | L / B / T % sheet | L / B / T % ours | Berries |
+| --- | --- | --- | --- | --- |
+| Front (0, 8) | 1.224 / 1.146 | 66 / 19 / 15 | 72 / 17 / 12 | 6 of 6: (.20,.45) (.36,.59) (.52,.49) (.66,.71) (.91,.63) (.93,.28, partial) against (.17,.45) (.34,.61) (.51,.47) (.69,.78) (.87,.60) (.91,.32) |
+| Side (90, 8) | 0.954 / 0.940 | 69 / 17 / 14 | 81 / 13 / 6 | 4: front edge (B3), top-front (B4), mid-low (B6), back-high (B5) |
+| Rear (180, 8) | 1.160 / 1.222 | 70 / 8 / 22 | 75 / 11 / 15 | 3: (.09,.60) (.50,.44) (.79,.65) against (.11,.59) (.48,.45) (.78,.71) |
+| f34 (−20, 14) | 1.438 / 1.103 | 69 / 17 / 14 | 74 / 17 / 9 | 5 of 6 (B6 hidden) |
+| r34 (160, 14) | 1.350 / 1.154 | 66 / 16 / 19 | 78 / 12 / 10 | 5 |
+| Top (0, 70) | 1.034 / 1.220 | 82 / 17 / 1 | 82 / 17 / 1 | 7 |
+
+- Front top profile (f 0…1 by 0.05): ours `.39 .51 .67 .71 .71 .70 .89 .93 .96 .99 .98 .94 .91 .88 .78 .79 .79 .71 .68 .64 .46`
+  against `.39 .48 .63 .71 .75 .76 .91 .96 .94 .96 1.0 .97 .92 .86 .87 .83 .76 .74 .66 .55 .46` (worst 0.09 at f 0.70).
+  Leaf bottom ours `.36 .30 .21 .13 .11 .09 .06 .05 .10 .20 .59 .59 .36 .20 .14 .13 .14 .17 .20 .36 .43` against
+  `.36 .27 .24 .15 .10 .12 .16 .09 .09 .25 .57 .56 .34 .29 .28 .16 .12 .10 .14 .38 .43` (worst 0.10 at f 0.30).
+- Rear top profile within 0.06 except f 0.05 (0.67 against 0.51: B5 at the left edge); side within 0.06 except the
+  front column (our front berry is narrower than the sheet's 0.234 H one).
+- Hero 4.50 × 3.33 × 3.66 (target 4.3 × 3.5 × 3.6: W +0.20, D −0.17, H +0.06; all inside ±0.22 / ±0.22 / ±0.18).
+- Stems: five, 6-sided, Ø 0.46–0.72; the rear shows all five fanned from the ground, as `z_rear_trunk.png`.
+
+### Left (honest)
+- Stems read less in the front and side than on the sheet (T 12 % / 6 % against 15 % / 14 %): the studio sun is high
+  and the canopy's cast shadow falls on them, and at mid depth the side lobes hang to h 0.22 (sheet 0.28–0.36).
+- The side view shows B4 over the crown and B6 at mid depth where the sheet shows two berries at the back; the sheet's
+  side and front disagree on B5 / B6 (spec 3.4) and the front won.
+- The sheet's 3/4 cells are drawn wider (spec 3.8); judged by shares and counts.
+- Close up, the lobes are a little rounder than the sheet's crisper polyhedra.
+
+## Stage 2 — Optimisation and cleanup
+
+- Tris: hero **2660** (budget 4000); fork 202, clump 316, berry 96 (each under 1000).
+- Every object: 1 shell, 0 non-manifold, 0 boundary, 0 wire or loose, 0 n-gons, 0 duplicate verts, normals outward, no
+  custom normals, transforms applied, origin at the bottom centre (offset 0, 0, 0).
+- Smallest corner: hero 5.22°, fork 7.49°, clump 7.15°, berry 15.09° (none under 5°).
+- Self-intersections (face pairs crossing without a shared vertex): 0 on every object. `build()` adds any to `problems`.
+- No interior faces: one guarded exact union per shell (41 hero shells, 0 retried, 0 failed; a failure is listed in
+  `problems`), pockets dropped.
+- Pitfalls met and fixed in the builder: `bmesh.ops.create_icosphere` on a non-empty bmesh invalidated earlier vert
+  references (`_ico` builds in a scratch bmesh); five nearly coplanar stem bottom caps made one exact union discard most
+  of the hero (stems start at staggered depths); a stem grazing another failed its union at nudges up to 0.02 (the S4
+  base moved 0.07); a 4-edge pinhole by B3 whose other diagonal already existed (`_fan_fill`).
+
+## Stage 3 — UV
+
+Smart UV islands made seams and re-unwrapped angle-based, margin 0.008 (`M.smart_uv`, as M013 / M014), then
+`m012._uv_unfold`.
+
+| Object | Islands | Overlaps | Flipped | Min gap | Border | Worst conformal | Worst angle change | Texels/stud @1024 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BerryBushNode | 488 | 0 | 0 | 0.016 | 0.008 | 1.137 | 4.4° | 61.6 |
+| BerryBushTrunkFork | 32 | 0 | 0 | 0.016 | 0.008 | 1.091 | 4.0° | 223.6 |
+| BerryBushLeafClump | 58 | 0 | 0 | 0.016 | 0.008 | 1.065 | 3.4° | 229.6 |
+| BerryBushBerry | 18 | 0 | 0 | 0.016 | 0.008 | 1.082 | 4.1° | 589.3 |
+
+Texel density is even within each object (min / median / max 1.0 / 1.0 / 1.0). The hero's many islands follow the
+union's cut lines; the exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+### Keys and calibration (`TARGETS`, `calibrate()`, `PALETTE`)
+1. `calibrate()` (K.calibrate on the test dome) against the sheet's rendered medians: every key rendered within 3
+   levels of its target.
+2. Hero fit: the hero rendered darker than the dome (lobe sides and undersides, the canopy's shadow), so the keys were
+   corrected in linear light by sheet / hero over the lit views (front, f34, top). The side and rear are lit mostly by
+   the studio fill and are reported, not fitted (as M013).
+
+| Key | Target (sheet render) | Dome-calibrated (dome render) | Final (hero fit) | Finish |
+| --- | --- | --- | --- | --- |
+| m017_leaf | #6B8F22 | #597722 (#698C22) | #638427 (×1.25) | rough 0.85, foliage spec 0.06 |
+| m017_leaf_young | #A0C032 | #809C31 (#9CBC32) | #89A635 (×1.15) | same |
+| m017_leaf_old | #4E6D1E | #435D1E (#4D6A1E) | #4F6D25 (×1.4) | same |
+| m017_berry | #F42524 | #C31617 (#F32524) | #D71A1B (×1.25) | rough 0.32, spec 0.5 |
+| m017_berry_deep | #B5161A | #930309 (#B51B1D) | #A3040B (×1.25) | same |
+| m017_berry_stem | #865137 | #6A412C (#85523A) | #6A412C | rough 0.9 |
+| m017_bark | #8A5D38 | #6E4C2D (#8A5E3B) | #73502F (×1.1) | rough 0.9 |
+| m017_bark_dark | #5E4128 | #493119 (#5D422B) | #4D341B (×1.1) | rough 0.9 |
+| m017_heartwood | #C3A588 | #998675 (#C1A488) | #998675 | rough 0.85 (fork cut ends only) |
+| m017_peg | #584833 | #453928 (#594A37) | #453928 | rough 0.9 (collars, pegs) |
+
+### Method (position fields only, never facing; painted in the builders before the union, which keeps keys and Tint)
+- Leaves on one ladder young ↔ leaf ↔ old in quarter steps (`leaf_key`, K.mix_key): per-lobe maturity (young L1, L2,
+  L5, L8, L10; mid L3, L9, L13, L14, L15; old L4, L6, L7, L11, L12), a canopy height field (above 4.0 younger, below 1.3
+  older, ±0.15 broad noise on z), each lobe's lowest 30 % up to +0.25 older, and 50 % old within 0.25 of a berry or
+  where a stem enters.
+- Berries: body to berry_deep over the third nearest the peg (the side in the canopy), 3 steps.
+- Bark: darker up under the canopy (z > 1.6 → 50 %, > 2.2 → 75 %), in the V-creases (within 0.12 of another stem below
+  1.0), at the ground (z < 0.12 → 40 %), plus broad noise patches; floor-cut faces 50 % dark. Fork: noise patches only.
+  Hero stem tips are hidden in the clumps and carry no heartwood.
+- Tint: per lobe level ±4 %, broad mottling (leaf amp 0.035 scale 0.5, bark 0.05 / 0.35, berry 0.02 / 0.9), per-face
+  jitter ≤ 0.6 %. Tint spread: hero 1.13, fork 1.06, clump 1.06, berry 1.03.
+- K.check facing correlation: hero 0.27, clump 0.31, fork 0.0, berry 0.0 (limit 0.5). Problems: none.
+
+### Target against got (medians, with lit / shade quartiles on the front)
+| View | Leaves sheet → ours | Berries sheet → ours | Bark sheet → ours |
+| --- | --- | --- | --- |
+| Front | #6F9322 (#A9C72E / #405C19) → #6B8E24 (#98BD33 / #32450F) | #F62624 → #E52625 | #6A4829 → #3B2716 |
+| f34 | #709221 → #759A29 | #F82523 → #F82827 | #724C2B → #3C2818 |
+| Top | #86AB20 → #7FA42B | #EA2221 → #FD2A29 | — |
+| Side | #678B21 → #53731D | #EB2222 → #BB2221 | #5B3E23 → #583B25 |
+| Rear | #658923 → #577820 | #F52526 → #D62424 | #6B492A → #66462E |
+
+- Leaf bands on the front (ground → crown): sheet `#4F6E1E #5D8022 #709320 #729520 #9DBE2E`, ours
+  `#3C4F15 #799929 #4C641A #688B23 #9FC234` (crown palest, lowest deepest, as the sheet).
+- Left: front / f34 bark is 40–50 levels dark (the canopy's cast shadow on the stems in the kit studio; side and rear
+  bark match within 6). Side / rear greens are 15–20 dark and berries 20–40 dark (studio fill). The sheet's lit lime
+  facets are a little yellower than ours (#A9C72E against #98BD33).
+
+## Stage 5 — Lighting
+
+Skipped, as decided (decision 7, spec 7.1): the sheet shows no glow, and the berry highlights are gloss, not emission.
+No key has emission (no Neon pieces) and there is no light. Studio note (Requires Manual Validation): check that the
+berries keep a visible gloss in Roblox; if they read matte, set the berry MeshPart material to SmoothPlastic.
+
+## Stage 6 — VFX
+
+Skipped, as decided (decision 7, spec 7.2): the sheet shows no particles, sparkle, dust or falling leaves. No sockets on
+any object; the renders ran with vfx=True and realised nothing.
+
+## Stage 7 — Verification (round 1)
+
+Fresh verifier, read-only. Background session on port 9881 with `wip/M017_verify.blend` (not saved, `build()` not
+called). Fresh renders via `m017.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratchpad
+(`...\scratchpad\v017\renders\M017\`), plus side-by-side crops `pair_*.png` there. Measured with `M.audit`,
+`M.uv_stats`, `K.check`, `m017.measure()` and my own BVH / bmesh probes.
+
+**Verdict: FAIL, 6/10.** The geometry is clean and inside budget, but two things are visibly unlike the sheet in every
+view: how the lobes are faceted, and how the stem skeleton reads.
+
+### Re-measured (all independently)
+| Object | Tris | Size (studs) | Shells | Non-manifold / boundary / wire / loose | N-gons | Normals | Min corner | Self-hits | UV (layer / overlaps / flips / margin) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BerryBushNode | 2660 / 4000 | 4.50 × 3.33 × 3.66 | 1 | 0 / 0 / 0 / 0 | 0 | outward | 5.22° | 0 | UVMap / 0 / 0 / 0.008 (506 islands) |
+| BerryBushTrunkFork | 202 / 1000 | 2.63 × 1.00 × 2.21 | 1 | 0 | 0 | outward | 7.49° | 0 | UVMap / 0 / 0 / 0.008 |
+| BerryBushLeafClump | 316 / 1000 | 2.20 × 1.43 × 1.55 | 1 | 0 | 0 | outward | 7.15° | 0 | UVMap / 0 / 0 / 0.008 |
+| BerryBushBerry | 96 / 1000 | 0.68 × 0.70 × 0.79 | 1 | 0 | 0 | outward | 15.09° | 0 | UVMap / 0 / 0 / 0.008 |
+
+- Size against decision 1 (4.3 × 3.5 × 3.6): W +0.20, D −0.17, H +0.06, all inside the scaled tolerances. Hero berries
+  0.60–0.66 across (mesh), 0.62–0.72 in the front render.
+- Origin at the bottom centre (offset 0, 0, 0) on all four; rotation 0 and scale 1; no modifiers; no custom normals;
+  0 duplicate vertices; 0 zero-area faces.
+- Counts: 5 stems, 15 lobes (5 clumps), 8 berry regions on the mesh, collars present (136 peg faces).
+- Materials: 18 `FB_m017_*` on the hero, all Principled, metal 0, alpha 1, emission 0. Leaves rough 0.85 / spec 0.06;
+  berries rough 0.32 / spec 0.5; wood rough 0.85–0.9. `Tint` corner attribute present on all four.
+- VFX: no sockets and no children on any object, as decided (decision 7).
+- `K.check`: no problems (this includes the facing-correlation test).
+- **Interior / inverted faces:** a five-direction parity test plus a flood-fill cavity test found **3 inside-out faces
+  at the stem foot** (indices 2403, 2658, 2659, around (0.25, 0.12, 0.00–0.13)). They form a thin inverted tetrahedral
+  fin, about 0.005 thick, standing in the V-crease between two stems; it is what `_seal`'s fan fill left behind.
+  Two of the three faces carry `FB_m017_leaf`, which is why the hero's lowest "leaf" vertex is at z 0. There is also one
+  micro-pocket face at (0.14, −0.46, 2.38). Total area is about 0.05 stud².
+
+### Views against the sheet (8° extras, `m017.measure()`, the study's masks)
+| View | L / B / T % sheet | L / B / T % ours | Berries | Notes |
+| --- | --- | --- | --- | --- |
+| Front | 66 / 19 / 15 | 72 / 17 / 12 | 6 (B6 a 0.05 H sliver; sheet 0.14) | top profile worst 0.09 (f 0.70) |
+| Side | 69 / 17 / 14 | 81 / 13 / **6** | 4 at f .10 / .14 / .44 / .66 (sheet .12 / .77 / .83) | the two back-edge berries are missing; a low berry at mid depth (B6) |
+| Rear | 70 / 8 / 22 | 75 / 11 / 15 | 3, positions within 0.06 | 5 stems fanned, good layout |
+| f34 | 69 / 17 / 14 | 74 / 17 / 9 | 5 of 6 | leaf bottom 0.02–0.08 H at f 0.3–0.5 (sheet 0.08–0.12, centre 0.59): the stems are hidden |
+| r34 | 66 / 16 / 19 | 78 / 12 / **10** | 5 (sheet 6) | leaf bottom 0.03–0.05 at f 0.2–0.35 (sheet 0.14–0.61) |
+| Top | 82 / 17 / 1 | 82 / 17 / 1 | 7 (5–7 allowed) | reads as round balls, not the sheet's pointed radiating masses |
+
+### Colours (median; lit / shade quartiles; sheet → ours)
+| Region | Sheet | Ours | Δ (R, G, B) |
+| --- | --- | --- | --- |
+| Leaf, front | #6F9322 (#A9C72D / #3F5C19) | #6B8D24 (#98BD33 / #32450F) | −4, −6, +2 (lit −17, −10, +6) |
+| Leaf, f34 / top | #709221 / #86AB20 | #759A29 / #7FA42B | +5, +8, +8 / −7, −7, +11 |
+| Leaf, side / rear / r34 | #678B21 / #658923 / #678B23 | #54731D / #577820 / #5A7C21 | −19, −24, −4 / −14, −17, −3 / −13, −15, −2 |
+| Leaf, exploded / clump close-up | #618426 / #597C29 | #779C28 / #81AA2B | +22, +24, +2 / +40, +46, +2 (the sheet's cell is an underside view) |
+| Berry, front / f34 / top | #F62624 / #F82523 / #EA2221 | #E52625 / #F82827 / #FD2A29 | −17, 0, +1 / 0, +3, +4 / +19, +8, +8 |
+| Berry, side / rear / r34 | #EB2222 / #F52526 / #F62625 | #BC2221 / #D62424 / #DB2524 | −47 / −31 / −27 on R (studio fill) |
+| Berry part / berry peg | #EB2628 / #875137 | #F32726 / #7F4E37 | +8, +1, −2 / −8, −3, 0 |
+| **Bark, front / f34** | #6A4829 / #724C2B | **#3B2716 / #3C2818** | **−47, −33, −19 / −54, −36, −19** |
+| **Bark foot band h 0–0.1, front** | #835A34 (the lightest bark band) | **#3B2616** | **−72, −52, −30** |
+| Bark, side / rear / r34 | #5B3E23 / #6B492A / #614327 | #583B25 / #67462E / #68492E | −3, −3, +2 / −4, −3, +4 / +7, +6, +7 |
+| Bark, fork part / exploded | #8C5F39 / #835B38 | #815735 / #765034 | −11, −8, −4 / −13, −11, −4 |
+| Heartwood | #BD9F83 | #CCAD90 | +15, +14, +13 |
+| Peg / collar | #554531 | #4B3F31 | −10, −6, 0 |
+
+- Blending: the leaf ladder grades crown (lime) to low lobes (deep) as on the sheet, with no confetti and no colouring by
+  facing (K.check passes, and the crown lime follows the height field). The berries grade to deep on the canopy side.
+- **The bark paint works against the sheet at the foot.** In the hero, 87 of the 108 bark faces below z 0.25 are
+  `bark_x_dark_50` (the "z < 0.12 → 40 % dark" ground term plus "floor-cut faces 50 % dark"). On the sheet, the foot
+  band is the lightest bark in every view.
+
+### Items
+
+**Blockers**
+1. **Lobe facet read: round geodesic balls instead of the sheet's angular faceted lobes** (every view; worst on the top,
+   front and exploded views; spec pitfall 2). Each sheet lobe is a crisp polyhedron: big flat facets, a pronounced
+   pointed apex where five facets meet and stand out on the silhouette, and straight ridge lines. Seen from the top they
+   read as pointed masses radiating outwards. Ours are ico-2 spheres with every vertex on an ovoid, so they read round
+   and soft, and the top view reads as round balls.
+   Fix in `lobe_mesh()`, keeping 80 tris per lobe:
+   - Build an ico-1 and subdivide it once *flat*, without re-projecting the new mid-edge vertices onto the sphere.
+     Push them only 30–50 % of the way out, so that each original ico-1 face reads as one broad, slightly bent facet
+     group.
+   - Raise `LOBE_APEX` from 1.2 to about 1.45–1.6, so that the apex is a visible peak on the front, side and top
+     silhouettes.
+   - Give the crown and the clump-centre lobes a taller H (about 0.95–1.0 of W, against 0.85 now), as in the exploded
+     top clump.
+   - Re-check the exploded clump against `z_expl_topclump.png`: it should be a tall, pointed centre lobe, not three
+     squat domes.
+   - Re-run the union and polish checks afterwards; the sharper lobes change where they intersect.
+2. **The stem skeleton under-reads, and the front stems are near black.** T shares are low in every view: front 12
+   against 15, **side 6 against 14, r34 10 against 19**, rear 15 against 22, f34 9 against 14. In the f34 the big low
+   front-left lobes hang to 0.02–0.08 H in front of the foot and hide the stems; the sheet shows four or five warm
+   brown stems there. Front and f34 bark is 47–54 levels too dark, and 72 too dark at the foot.
+   Fix:
+   - **(a) Paint.** In `paint_wood` / `BARK_FIELD`, drop the ground-contact darkening (`ground=(0.12, 0.4)`) and the
+     50 % dark on the floor-cut faces. Make z < 0.5 plain `bark`, and keep the darkening only for z > 1.6, which is
+     under the canopy, and for the V-creases.
+   - **(b) Shape.** Raise or tuck in the low front-left lobes (L5, L7) and the side's mid-depth low lobes, so the
+     leaf-bottom profile over the stems meets the sheet: f34 at f 0.35–0.6 ≥ 0.10 H with the centre gap open, and side
+     at f 0.35–0.7 ≥ 0.28.
+   - Targets: T share within ±4 points in the front, side and rear; at least 11 % in the f34 and at least 15 % in the
+     r34; foot band (h 0–0.1) within 20 levels of #835A34 in the front and f34.
+
+**Minors**
+3. **Inverted fin at the stem foot:** 3 inside-out faces, two of them with leaf material, in the crease at
+   (0.25, 0.12, 0–0.13), plus one micro-pocket face at (0.14, −0.46, 2.38).
+   - Fix: after `_seal`, delete any face whose front side tests as solid by multi-direction parity (or that a flood fill
+     can't reach), then re-seal. Better still, nudge the two stems at that crease so the union never opens a pinhole
+     there.
+   - Re-test with the parity and cavity probes (expect 0 faces).
+4. **B6 is hidden in the front** (0.05 H sliver against the sheet's 0.14 H at f 0.91, h 0.32), and in the side it shows
+   at mid depth (f 0.44, h 0.19), not at the back edge.
+   - It sits at (1.65, −0.18, 1.0). Move it out and back to about (1.75, +0.55, 1.05), so it shows at the front's right
+     edge and as the side's back-low berry (f about 0.77).
+   - The side's back-high berry (f 0.83, h 0.67) would then be B5 if B5 sits about 0.2 further out in +Y.
+5. **Lit tones.** The lit lime is less yellow than the sheet's (front lit #98BD33 against #A9C72D). The side, rear and r34
+   leaves are 13–24 dark and the berries 27–47 dark. Most of this is the studio fill, which is not fixable in paint
+   without breaking the front. Note it for the Studio check.
+6. **Front top profile** misses by 0.09 at f 0.70 (tolerance 0.06); the other columns are within tolerance.
+7. **Parts.** The exploded and part leaves render 22–40 levels lighter than the sheet's exploded and underside cells.
+   The fork's left limb leans about 65°, against the sheet's 50–55°. Heartwood is 15 levels pale.
+8. **The top view shows 7 berries.** That is within the allowed 5–7; the sheet shows 5.
+
+### What passed
+- Technical requirements:
+  - budgets;
+  - one closed manifold shell per object;
+  - no n-gons, no self-intersections;
+  - minimum corner angle ≥ 5°;
+  - UVs clean;
+  - origin and transforms;
+  - no emission and no VFX, as decided.
+- Counts and layout:
+  - 5 stems fanned as in the rear view;
+  - 15 lobes in 5 clumps with collars;
+  - 8 berries, with the front's six in the sheet's left-to-right order;
+  - the rear's three berries within 0.06 of the sheet.
+- Size inside tolerance. Colours:
+  - leaf and berry medians within about 10 levels on the lit views (front, f34, top);
+  - the bark on the parts, side and rear within 13;
+  - the colour blends along the height and maturity ladders, never by facing.
+
+## Round 2 fixes (modeller)
+
+A fresh modeller did this round in a background session (port 9879, `wip/M017.blend`), saving after the final good
+build.
+- The builder `m017.py` is the source of truth. `build()` was rerun after each change (about 40 s each).
+- After each build, every render was read view by view, then measured against the sheet with `m017.measure()` and a
+  quartile colour probe, both on the study's masks.
+- The shared helpers were not touched.
+
+### What changed in the builder
+1. **Lobes (blocker 1).**
+   - **Mesh.** `lobe_mesh()` now starts from `_ico_flat()`: an ico-1 subdivided once *flat*. That is 80 tris and
+     42 verts, the same as before. Its mid-edge verts are pushed only `LOBE_FACET = 0.4` of the way to the sphere, so
+     each ico-1 face reads as one broad, slightly bent facet group with straight ridges.
+   - **Apex.** The pole is lifted by `LOBE_APEX - 1`, and the lift runs linearly down the five pole facets (each
+     pole-to-ring mid vert gets half). This gives a real five-facet pyramid, not a small spike.
+   - **`LOBE_APEX = 1.25`, not the suggested 1.45–1.6.** With this linear lift, 1.5 made every lobe a candle-flame
+     spike; that was rendered and rejected. The suggested value assumed a pole-only push, with the neighbouring verts
+     left on the sphere.
+   - At 1.25 the pole facets rise at about 40°, against the plain icosahedron's 32°. The apex shows on the front, side
+     and top silhouettes, and in the exploded clump.
+   - **Taller lobes.** `TALL = 0.95` (H : W) on the crown and clump-centre lobes (L1, L2, L8, L9, L13, L15) and on the
+     part clump's centre lobe.
+   - **Taper.** The teardrop taper is softened from 0.42 to 0.30, so the lobes read as polyhedra, not onions.
+2. **Stems (blocker 2), paint.**
+   - The ground-contact and floor-cut darkening are gone. `_fix_floor` paints the floor cut plain `bark`.
+   - Below z 1.1 (sheet studs), a foot ladder runs from a new key, `m017_bark_light`, up to z 0.5, then grades to
+     `bark` in thirds by z 1.1. No crease or noise patches are painted there.
+   - The under-canopy darkening (z above 1.6 and 2.2) and the V-crease darkening stay above that.
+3. **Stems (blocker 2), shape.** All positions are in sheet studs.
+   - L5 moved from (−1.2, −1.1, 1.55), Ø 2.05, to (−1.4, −1.0, 1.85), Ø 1.9.
+   - L7 moved from (−0.95, −1.1, 0.8) to (−1.2, −0.85, 1.25).
+   - L4 moved forward, out of the side view's mid depth, to Y −0.45 and X −2.2.
+   - L6 and L12 went up about 0.65 and back or out; L12 is now at (2.35, 1.4, 2.3).
+   - L14 went up to z 2.85.
+   - L11 moved to (2.1, 0.3, 2.45).
+   - L10 shrank to Ø 1.6 at X 1.45, so B6 shows.
+   - The crown came down, because the apex adds height:
+     - L1 is now at (−0.4, −0.15, 3.7), Ø 2.15, tilt 0.35.
+     - L2 went down 0.2.
+     - L8 and L9 moved so that clump C3 touches the crown.
+   - S3's tip moved so that it seats in L9 through L10, which joins clump C3.
+   - Stem radii went up slightly, to (0.38, 0.32, 0.24).
+4. **Inverted fin (minor 3).**
+   - **Detection.** A new `_inverted()` runs a five-direction majority ray-parity test on a point 2e-3 in front of each
+     face.
+   - **Repair.** `_polish` deletes any face that test finds and re-seals.
+   - **Reporting.** `build()` lists any such face still left under `problems`, along with a hero that has more than one
+     shell.
+   - **Foot.** A low hexagonal `FOOT_PLUG` frustum fills the inner V-creases at the ground. S3's base moved from
+     (0.45, −0.2) to (0.42, −0.25): at the old base, the union left a three-face crossing fin standing on the floor cut.
+   - **Result.** 0 inverted or interior faces and 0 self-intersections.
+5. **Berries.**
+   - **B6.** Started at (2.75, 0.6, 1.6) and held by L11 and L12. It ends at (2.73, 0.61, 1.62), which is kit
+     (1.91, 0.43, 1.13); the suggested position was (1.75, 0.55, 1.05).
+   - **B5.** Started at (2.35, 0.9, 3.7), on the right shoulder; it ends at (2.27, 0.9, 3.66).
+   - **Others.** B1, B2 and B4 were re-aimed. B3 was pushed forward (hold 0.15) for depth. Bk1 was re-placed between
+     L14 and L15.
+   - **Contact check.** On the first try Bk1 ended as a floating interior shell. Since then, a contact graph of the 41
+     pieces is checked before each build.
+6. **Parts (minor 7).**
+   - The fork's left limb tip is now (−1.5, −0.05, 2.25), no longer leaning toward the camera. It measures about 49°
+     from vertical in the part shot; round 1 measured about 65°, and the sheet shows 50–55°.
+   - The part clump's maturities changed from (−0.5, 0, 0.25) to (0.5, 0.75, 1.0).
+   - `m017_heartwood` changed from #998675 to #8E7B6A.
+
+### Final numbers (hero 8° extras; sheet → ours)
+| View | L / B / T % sheet | L / B / T % ours | Round 1 T | Berries |
+| --- | --- | --- | --- | --- |
+| Front | 66.4 / 18.9 / 14.7 | 65.4 / 17.5 / **17.1** | 11.5 | 6 (detail below the table) |
+| Side | 69.4 / 17.0 / 13.6 | 75.0 / 14.2 / **10.8** | 6.0 | 3: front edge (.12, .55), back-low (.60, .20), back-high (.66, .70); sheet (.12, .53), (.77, .28), (.83, .67) |
+| Rear | 69.5 / 8.3 / 22.1 | 66.3 / 12.6 / **21.1** | 14.9 | 4 (B6 shows low left; sheet 3) |
+| f34 | 68.9 / 17.3 / 13.8 | 69.5 / 15.8 / **14.6** | 9.3 | 4 components (B1 and B2 overlap) |
+| r34 | 65.6 / 15.6 / 18.8 | 71.3 / 13.2 / **15.5** | 10.4 | 5 |
+| Top | 81.8 / 16.9 / 1.3 | 80.2 / 18.3 / 1.5 | 0.8 | 6 (5–7 allowed) |
+
+- **Front berries.** Ours: (.15, .45), (.32, .59), (.53, .48), (.69, .77), (.89, .72, partial) and (.95, .35, partial,
+  w .10). Sheet: (.17, .45), (.34, .61), (.51, .47), (.69, .78), (.87, .60) and (.91, .32, w .14).
+- **Trunk shares.**
+  - Front, side and rear are inside ±4 points.
+  - f34 is 14.6, against the asked 11 or more.
+  - r34 is 15.5, against the asked 15 or more.
+- **Leaf bottom.**
+  - f34 at f 0.35–0.60: .12 .11 .12 .15 .21 .53. The ask was 0.10 or more; the centre gap is open from f 0.55.
+  - Side at f 0.35–0.70: .21 .26 .29 .31 .27 .29 .30 .30. Three columns miss the asked 0.28 or more: f 0.35, 0.40 and
+    0.50 read .21, .26 and .27. The sheet itself reads .18 and .11 at f 0.35 and 0.40.
+- **Front top profile.**
+  - f 0.70 now reads .85 against .87 (round 1: .78).
+  - Three columns are still outside ±0.06: f 0.35 (.89 against .96), f 0.85 (.81 against .74) and f 0.90 (.77 against
+    .66). The f 0.90 miss is B5, which now sits on the right shoulder so that the front can show it.
+- **Stem foot band (h 0–0.1).**
+  - Front: #815530 against #835A34 (−2, −5, −4).
+  - f34: #815531 against #8C5D35 (−11, −8, −4).
+  - Round 1 was 72 levels dark.
+  - Side: #7D5432 against #77502E.
+  - Rear and r34 now read lighter than the sheet (+28 and +43).
+- **Stem medians.**
+  - Front and f34 are #52351E against #6A4829 and #724C2B: −24 and −32 (round 1: −47 and −54).
+  - Side is +22, rear +11, r34 +26.
+  - The kit studio's canopy shadow falls on the front stems and not on the back ones. Without painting by facing, the
+    foot ladder is the compromise: the front and f34 foot are on target, and the back views come out a little light.
+
+### Colour (two passes)
+- **Pass 1** (measured on the new shape) changed four things:
+  - `leaf_young` went from #89A635 to **#95AD2F**. That closes about 70 % of the lit-quartile miss, per channel in
+    linear light, averaged over front, f34 and top.
+  - `bark_light` is **#986A40** (bark × 1.85 in linear light), fitted to the front and f34 foot band.
+  - `heartwood` is **#8E7B6A**.
+  - The part clump's maturities changed, as above.
+- **Pass 2** re-measured and changed no key:
+  - Leaf medians are front +1 / +3 / +3, f34 +7 / +9 / +8 and top −12 / −12 / +9 (R / G / B). They straddle zero, so
+    moving the mid key would trade one lit view for another.
+  - Berry R is front −17, f34 +4 and top +21.
+
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Leaf, front (shade / median / lit) | #3F5C19 / #6F9322 / #A9C72D | #384B0F / #709625 / #A1C02E (lit was #97BC32) |
+| Leaf, f34 / top median | #709221 / #86AB20 | #779B29 / #7A9F29 |
+| Leaf, side / rear / r34 median | #678B21 / #658923 / #678B23 | #55741E / #5A7C21 / #5B7E21 (studio fill, as in round 1) |
+| Leaf bands, front (ground → crown) | #4F6E1E #5D8022 #709320 #729520 #9DBE2E | #384A11 #709523 #4A5D16 #749A27 #ABCA2F |
+| Berry, front / f34 / top | #F62624 / #F82523 / #EA2221 | #E52524 / #FC2927 / #FF2B29 |
+| Leaves, exploded | #618426 | **#5E8024** (round 1: #779C28) |
+| Leaves, part clump (the sheet cell is an underside view) | #597C29 | #678B27 (round 1: #81AA2B) |
+| Bark, fork part | #8C5F39 | #815735 |
+| Heartwood | #C3A588 (verifier's #BD9F83) | **#B99C81** (round 1: #CCAD90) |
+| Berry part | #EB2628 | #F32726 |
+
+- **Final palette:** leaf #638427, leaf_young #95AD2F, leaf_old #4F6D25, berry #D71A1B, berry_deep #A3040B, berry_stem
+  #6A412C, bark #73502F, bark_dark #4D341B, **bark_light #986A40**, heartwood #8E7B6A, peg #453928.
+- **How colour is placed:** by position only (lobe maturity, canopy height, berry and stem contact, the bark height
+  ladder), plus broad Tint mottling. `K.check`, which includes the facing-correlation test, is clean.
+
+### Checks (independently re-run on the saved file)
+| Object | Tris | Size | Shells | NM / bnd / wire / loose | N-gons | Min corner | Self-hits | Inverted | UV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BerryBushNode | 2600 / 4000 | 4.33 × 3.44 × 3.65 | 1 | 0 / 0 / 0 / 0 | 0 | 5.05° | 0 | 0 | 495 islands; 0 overlaps, 0 flips; border 0.008; gap 0.016; conformal ≤ 1.10 |
+| BerryBushTrunkFork | 206 / 1000 | 2.55 × 1.00 × 2.21 | 1 | 0 | 0 | 6.93° | 0 | 0 | 34 islands, clean |
+| BerryBushLeafClump | 330 / 1000 | 2.16 × 1.41 × 1.68 | 1 | 0 | 0 | 5.12° | 0 | 0 | 63 islands, clean |
+| BerryBushBerry | 96 / 1000 | 0.68 × 0.70 × 0.79 | 1 | 0 | 0 | 15.09° | 0 | 0 | 18 islands, clean |
+
+- **Hero size** against the decided 4.3 × 3.5 × 3.6: +0.03, −0.06, +0.05.
+- **All four objects:** normals outward, transforms applied, origin at the bottom centre, no modifiers, 0 duplicate
+  verts.
+- **`K.check`:** no problems.
+- **Hero union:** 41 shells, none failed.
+
+### Left (honest)
+- **Studio lighting differs from the sheet's.**
+  - The side, rear and r34 leaves are 11–23 levels dark.
+  - Their berries are 30–48 levels dark.
+  - These are the same gaps as in round 1.
+  - Stem tone differs by about 50 levels between the front and the back views.
+- **Side.** It still reads leafier than the sheet: L 75 against 69, because its low back lobes fill in at mid depth.
+- **Rear.** It shows B6 as a fourth berry, so B is 12.6 against 8.3.
+- **Front.** B5 and B6 show only partly: 0.08 and 0.10 H wide, against the sheet's 0.14.
+- **The stem-foot union is fragile.**
+  - Moving S3's base by 0.03 brought a crossing fin back.
+  - Both the inverted-face test and the self-hit test run in `build()`, so a regression shows under `problems`.
+
+## Stage 7 — Verification (round 2)
+
+Fresh verifier (not the round-1 verifier, no other stage), read-only. Background session on port 9880 with
+`wip/M017_verify.blend` (the main session's copy after its rebuild; not saved, `build()` not called, session stopped).
+Fresh renders via `m017.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratchpad
+(`...\scratchpad\v017r2\renders\M017\`), side-by-side crops `pair_*.png` there. Measured with my own bmesh / BVH
+probes (`geo.py`: 7-direction parity, front and behind tests, shells, corners, self-hits, volume), `M.uv_stats`,
+`K.check`, `m017.measure()` and a quartile colour probe on the study's masks (`col.py`), plus a facing-correlation
+test on the painted keys (`face.py`).
+
+**Verdict: FAIL, 7/10 — one cheap blocker.** Both round-1 blockers are fixed: the lobes are now broad-faceted polyhedra
+with visible five-facet peaks, and the stems read warm and show in every view (T shares inside tolerance). The one
+remaining clear miss is the berries on the right side: the sheet's headline front three-quarter shows six berries, ours
+four.
+
+### Re-measured (all independently)
+| Object | Tris | Size (studs) | Shells | NM / bnd / wire / loose | N-gons | Zero-area | Dup verts | Min corner | Self-hits | Volume | UV (islands / overlaps / flips / border / gap / worst conformal) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BerryBushNode | 2600 / 4000 | 4.333 × 3.440 × 3.653 | 1 | 0 / 0 / 0 / 0 | 0 | 0 | 0 | 5.05° | 0 | +10.64 | 495 / 0 / 0 / 0.008 / 0.016 / 1.10 |
+| BerryBushTrunkFork | 206 / 1000 | 2.550 × 1.003 × 2.213 | 1 | 0 | 0 | 0 | 0 | 6.93° | 0 | +1.23 | 34 / 0 / 0 / 0.008 / 0.016 / 1.09 |
+| BerryBushLeafClump | 330 / 1000 | 2.165 × 1.415 × 1.680 | 1 | 0 | 0 | 0 | 0 | 5.12° | 0 | +1.26 | 63 / 0 / 0 / 0.008 / 0.016 / 1.07 |
+| BerryBushBerry | 96 / 1000 | 0.679 × 0.703 × 0.790 | 1 | 0 | 0 | 0 | 0 | 15.09° | 0 | +0.15 | 18 / 0 / 0 / 0.008 / 0.016 / 1.08 |
+
+- **Size** against decision 1 (4.3 × 3.5 × 3.6): +0.03, −0.06, +0.05. Hero berries 0.63–0.67 across.
+- **Origin and transforms:** origin at the bottom centre (offset 0, 0, 0) on all four; rotation 0, scale 1; no
+  modifiers, no custom normals, flat shading, no parents or children. Texel density even (1.0 / 1.0 / 1.0).
+- **Normals and interior faces:** positive volume on all four. Behind every face is solid (0 failures). A point 2 mm in
+  front of each face is outside on all four (**0 inverted or interior faces; the round-1 fin is gone**).
+  - At 6 mm, four hero faces test inside: 1767, 1993, 2083 and 2579, each ≤ 0.0024 stud².
+  - They are not inverted. Each sits in a folded crevice (dihedral −167° to −174°), and a ray along its normal hits the
+    opposite wall 3.5–6 mm away, which faces back at it (dot −0.94 to −0.995). These are union creases where two lobes
+    meet, or a lobe meets a berry, at (−0.87, −0.90, 1.90), (1.17, 0.96, 1.83) and (0.11, −1.10, 1.90). They can't be
+    seen. Info only.
+- **Materials:** 22 `FB_m017_*` Principled materials (21 on the hero), metal 0, alpha 1, emission 0.
+  - Leaves: roughness 0.85, specular 0.06.
+  - Berries: roughness 0.32, specular 0.5.
+  - Wood: roughness 0.85–0.9.
+  - `Tint` corner attribute on all four (hero range 0.92–1.07).
+  - Palette: leaf #638427, leaf_young #95AD2F, leaf_old #4F6D25, berry #D71A1B, berry_deep #A3040B, berry_stem
+    #6A412C, bark #73502F, bark_dark #4D341B, bark_light #986A40, heartwood #8E7B6A, peg #453928.
+- **`K.check`:** no problems. VFX: none and no sockets, as decided.
+- **Facing (my own test).** I correlated the painted key luminance with face normal z: leaves 0.19, bark 0.20, berries
+  −0.04. The colour follows height instead: leaves +0.44, bark −0.83. **No colouring by facing.**
+
+### Round-1 items
+| # | Round-1 item | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | Lobes round geodesic balls (blocker) | **Fixed** | Broad flat facets with straight ridges and a visible five-facet peak on every lobe, in the front, side, rear and top. The exploded clump has a tall pointed centre lobe. Residual minor 6. |
+| 2 | Stems under-read and near black (blocker) | **Fixed** | T share (sheet / ours): front 14.7 / 17.1, side 13.6 / 10.8, rear 22.1 / 21.1, f34 13.8 / 14.6, r34 18.8 / 15.5 (all inside the asks). Foot band h 0–0.1: front #835A34 → #815530 (−2, −5, −4); f34 #8C5D35 → #815531 (−11, −8, −4). Five stems fanned in the rear and r34. Residual minor 3. |
+| 3 | Inverted fin at the foot | **Fixed** | 0 faces by parity at 2 mm; behind test clean. |
+| 4 | B6 hidden in the front / mid-depth in the side | **Partly** | Front: (.95, .35), w .097, against (.91, .32), w .14. Side back-low: f .60 against .77. See blocker 1. |
+| 5 | Lit tones | **Front fixed; side and rear as before** | Front lit leaf #A9C72D → #A1C02E (−8, −7, +1). Side, rear and r34 leaves are 11–18 dark at the median (studio fill). |
+| 6 | Front top profile at f 0.70 | **Fixed** | .85 against .87. New misses: f .85 +.07 and f .90 +.11 (B5 on the shoulder), f .35 −.07. |
+| 7 | Parts | **Fixed** | Exploded leaves #618426 → #5E8024 (−3, −4, −2). Fork left limb about 50°. Heartwood #C3A588 → #B99C81 (−10, −9, −7). |
+| 8 | Top shows 7 berries | **Fine** | 6 (5–7 allowed; sheet 5). |
+
+### Views against the sheet (8° extras; the study's masks; sheet → ours)
+| View | W : H | L / B / T % | Berries (f, h, w) | Notes |
+| --- | --- | --- | --- | --- |
+| Front | 1.224 → 1.123 | 66 / 19 / 15 → 66 / 17 / 17 | 6: (.15,.45) (.32,.59) (.53,.48) (.69,.77) all full; **(.89,.72) w .077 and (.95,.35) w .097**, against the sheet's (.87,.60) w .14 and (.91,.32) w .14 | Top profile ±.07 except f .90 (+.11). The skirt is higher: leaf bottom .17–.20 at the sides (sheet .10–.15), width at h .1 .29 (sheet .68). |
+| f34 (−20, 14) | 1.438 → 1.040 (drawn wider, spec 3.8) | 69 / 17 / 14 → 70 / 16 / 15 | **4 of 6**: B1, B2, B3, B4. **B5 and B6 are not visible**; on the sheet both sit prominently at the right edge (.86, .62) and (.89, .34). | Stems warm and well shown; centre gap open. |
+| Side | 0.954 → 0.977 | 69 / 17 / 14 → 75 / 14 / 11 | 3: front edge (.12, .55) OK; back pair at f .60 / .66 (sheet .77 / .83) | Known sheet conflict (spec 3.4). |
+| Rear | 1.160 → 1.217 | 70 / 8 / 22 → 66 / 13 / 21 | 4 (sheet 3): an extra low-left berry (B6 from behind, (.10, .27), w .17); R1 at (.14, .71), w .15 (sheet .07 partial) | Five fanned stems, good. B is 4.3 points over. |
+| r34 (160, 14) | 1.350 → 1.186 | 66 / 16 / 19 → 71 / 13 / 16 | 5 (sheet 6) | The lobes hang a little higher than the sheet's (more bare stem). |
+| Top (0, 70) | 1.034 → 1.151 | 82 / 17 / 1 → 80 / 18 / 2 | 6 | A big lime crown in the middle with smaller masses around it. Reads less as six big radiating masses than the sheet. |
+
+Parts against their cells: the clump has three lobes, a dark collar and a hex peg; the berry is round and faceted with a
+top peg; the fork has six-sided limbs and pale hex cut ends. All match.
+
+### Colours (sheet → ours; Δ R, G, B; median, with the lit and shade quartiles where they tell something)
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| Leaf, front (shade / median / lit) | #3F5C19 / #6F9322 / #A9C72D | #384A0F / #709525 / #A1C02E | −7,−18,−10 / +1,+2,+3 / −8,−7,+1 |
+| Leaf, f34 (shade / median / lit) | #3F5C18 / #709221 / #ADC92E | #4B6216 / #779B29 / #A9C82F | +12,+6,−2 / +7,+9,+8 / −4,−1,+1 |
+| Leaf, top median / lit | #86AB20 / #B6D025 | #7A9F29 / #ABC930 | −12,−12,+9 / −11,−7,+11 |
+| Leaf, side / rear / r34 median | #678B21 / #658923 / #678B23 | #55741E / #5A7C21 / #5C7E21 | −18,−23,−3 / −11,−13,−2 / −11,−13,−2 |
+| Leaf bands, front (ground → crown) | #4F6E1E #5D8022 #709320 #729520 #9DBE2E | #384A11 #6F9523 #4A5D16 #749A27 #ABC92F | crown palest, lowest deepest, as on the sheet |
+| Berry, front / f34 / top median | #F62624 / #F82523 / #EA2221 | #E52524 / #FC2927 / #FF2B29 | −17,−1,0 / +4,+4,+4 / +21,+9,+8 |
+| Berry, side / rear / r34 median | #EB2222 / #F52526 / #F62625 | #BB2322 / #D32525 / #D82625 | −48 / −34 / −30 on R (studio fill) |
+| Berry, lit quartile, front | #FD6560 | #FF514E | +2,−20,−18 (a little less pink sheen) |
+| Bark, front / f34 median | #6A4829 / #724C2B | #52351E / #52351E | −24,−19,−11 / −32,−23,−13 |
+| Bark, band h 0.2–0.3, front / f34 | #543A22 / #664628 | #3C2718 / #432D1C | −24,−19,−10 / −35,−25,−12 |
+| Bark, side / rear / r34 median | #5B3E23 / #6B492A / #614327 | #714E30 / #765233 / #7B5535 | +22,+16,+13 / +11,+9,+9 / +26,+18,+14 |
+| Bark, fork part | #8C5F39 | #825835 | −10,−7,−4 |
+| Leaves, exploded / clump close-up | #618426 / #597C29 | #5E8024 / #678B27 | −3,−4,−2 / +14,+15,−2 |
+| Berry part | #EB2628 | #F32726 | +8,+1,−2 |
+| Heartwood | #C3A588 | #B99C81 | −10,−9,−7 |
+| Peg / collar (close-up) | #554531 | #4B3F31 | −10,−6,0 |
+
+Medians are within about 10 levels on the lit views (front, f34, top). The side and rear gaps are the kit studio's fill,
+not paint. The paint blends along the maturity and height ladders; there's no confetti.
+
+### Items
+
+**Blockers**
+1. **B5 and B6 hardly show on the front-right; the f34 shows four berries, the sheet six.**
+   - **Front:** both are slivers, w .077 and .097 against .14. B5 also sits high on the shoulder (h .72 against .60),
+     which causes the f .90 top-profile miss.
+   - **f34:** both are invisible, which leaves the right half of the hero three-quarter without berries.
+   - **Rear:** the same two show too much. B6 is an extra fourth berry at the low left, and B5's R1 is 0.15 wide against
+     the sheet's 0.07 partial.
+   - **Cause:** both sit at Y +0.6 to +0.9 (sheet studs), behind the right lobes.
+   - **Fix (two entries in `BERRIES`, sheet studs):**
+     - B5: start about (2.4, 0.3, 3.3) instead of (2.35, 0.9, 3.7).
+     - B6: start about (2.7, 0.0, 1.75) instead of (2.75, 0.6, 1.6).
+     - Keep their push axes and holds, so each still ends 25 % sunk between L9 / L11 and L10 / L11 / L12.
+   - **Targets:**
+     - front: B5 near (.87, .60) and B6 near (.91, .32), each ≥ 0.12 H wide;
+     - f34: 6 berry components;
+     - rear: 3 berries, B ≤ 10 %.
+   - **Trade-off:** the side's back pair moves a little further from the sheet's back edge (already a known spec 3.4
+     conflict).
+   - **After the fix:** re-run `build()` and confirm that `problems` is empty, the hero is 1 shell and the inverted count
+     is 0. The union at the foot is fragile, but these berries are far from it.
+
+**Minors** (record; don't block)
+2. **Front skirt.** The side lobes end higher than the sheet's: leaf bottom .17–.20 at f .15–.35 and .75–.90, against
+   .10–.15; width at h .1 is .29 against .68. Ours reads a little more like a small tree on stems than the sheet's full
+   shrub. This is the cost of round 1's "show the stems" fix. If wanted, drop L6 / L12 or L4 by about 0.2 at the outer
+   edges only; leave the centre gap.
+3. **Upper stems dark in the front and f34.** The h 0.2–0.3 band is 24–35 dark, and the medians are 24–32 dark. The
+   back views are 11–26 light. This is the studio's canopy shadow against no facing paint. A paint-only nudge (raise
+   `BARK_FIELD` z thresholds from 1.6 / 2.2 to about 2.0 / 2.6) would trade some back-view lightness for it. Optional.
+4. **Studio fill.** The side, rear and r34 leaves are 11–23 dark and their berries 30–48 dark, as in round 1. This is for
+   the Studio check, not paint.
+5. **Top view.** It reads as a big lime crown with smaller masses around it, rather than the sheet's six big, pointed,
+   radiating masses. Counts and spread are OK.
+6. **Lobe peaks.** The crown lobe L1 and a few side lobes come to a slightly sharp, onion-like point in the front and side
+   silhouettes, where the sheet's peaks are a little lower and broader. Acceptable at this view size.
+7. **Four tiny crevice faces** (≤ 0.0024 stud², gaps of 3.5–6 mm in union creases) test inside at 6 mm. They are
+   correctly oriented and not visible. Info only.
+
+### What passed
+- All of 2c, re-measured:
+  - budgets: 2600 / 206 / 330 / 96;
+  - one closed manifold shell per object;
+  - no n-gons, no zero-area faces, no duplicate verts;
+  - no self-intersections, no inverted or interior faces;
+  - minimum corner angle ≥ 5°;
+  - UVs clean and even;
+  - origin at the bottom centre, transforms applied;
+  - Principled materials with the right finishes, `Tint` present;
+  - no emission and no VFX, as decided.
+- Size inside tolerance. The lobes are angular and faceted with visible peaks. The stems are warm at the foot, five fanned.
+  15 lobes in 5 clumps with collars; 8 berries.
+- Colours on the lit views are within about 10 levels. Colour blends by position, never by facing.
+
+## Main session after verification round 2 (2026-10-28)
+
+Applied the round-2 blocker fix: B5 starts at (2.4, 0.3, 3.3) and B6 at (2.7, 0.0, 1.75); push directions and sink are unchanged. The rebuild in the kit file gave a hero of 2596 tris, 4.31 × 3.44 × 3.65, one shell, 0 non-manifold, and an empty `problems` list. `f34_sheet` now shows 5 berries (4 full, 1 at the right edge) against the sheet's 6; `rear_sheet` shows 3. Export: 4 assets, 0 problems. The 2-round cap is reached, so this is committed with the minors in MODEL_PROGRESS.md.
