@@ -552,3 +552,7 @@ The draft's names (`build()` specs):
 - **Sizes:** the draft hero is about 11.9 W × 9.4 D × 6.0 H; the target is 10.4 × 8.8 × 7.0.
 - **Colour:** an uncalibrated palette; hard random patches; host blend `steps=1`. Replace with §5.
 - **Names:** two clash with R02 (§7).
+
+## Correction (main session, 2026-10-28): side-view direction
+
+The kit's side camera (`VIEWS["side"]` = azimuth 90) sits at +X and looks along −X with Z up, so screen right is +Y: the model's BACK (fronts face −Y). Wherever this spec says the side view's right is the front, read it mirrored. Stage 1 should confirm this with a probe render before using side-view numbers. The 3D layout is unaffected.
