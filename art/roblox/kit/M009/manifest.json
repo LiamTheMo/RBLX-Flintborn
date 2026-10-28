@@ -8,14 +8,38 @@
  "palette": {
   "file": "palette.png",
   "width": 512,
-  "height": 128,
+  "height": 512,
   "cell": 16,
   "columns": 32,
   "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
   "rows": [
    {
     "key": "m009_core",
-    "hex": "#F55E21",
+    "hex": "#E5642A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_core_deep",
+    "hex": "#BF4520",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_core_hot",
+    "hex": "#FB8D24",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_core_x_hot_50",
+    "hex": "#F07827",
     "levels": [
      1.0
     ],
@@ -23,185 +47,473 @@
    },
    {
     "key": "m009_impact",
-    "hex": "#B8A498",
+    "hex": "#786A66",
     "levels": [
-     0.88324,
-     0.9158,
-     0.92737,
-     0.93161,
-     0.93758,
-     0.94235,
-     0.94862,
-     0.9522,
-     0.95522,
-     0.95812,
-     0.96129,
-     0.96384,
-     0.96747,
-     0.97035,
-     0.97294,
-     0.97609,
-     0.97951,
-     0.9821,
-     0.98473,
-     0.98803,
-     0.99118,
-     0.99316,
-     0.99631,
-     0.99918,
-     1.00284,
-     1.0056,
-     1.01146,
-     1.02129,
-     1.02761,
-     1.03687,
-     1.04643,
-     1.10433
+     0.91439,
+     0.91907,
+     0.92476,
+     0.94104,
+     0.95039,
+     0.9514,
+     0.95423,
+     0.9587,
+     0.96273,
+     0.97539,
+     0.99373,
+     1.00283,
+     1.00718,
+     1.0154,
+     1.01895,
+     1.02438,
+     1.02818,
+     1.03152,
+     1.03612,
+     1.0393,
+     1.04312,
+     1.04475,
+     1.04729,
+     1.05182,
+     1.05688,
+     1.0622,
+     1.06777,
+     1.07185,
+     1.08162,
+     1.08409,
+     1.09006,
+     1.10672
     ],
     "used": true
    },
    {
-    "key": "m009_impact_cool",
-    "hex": "#ABA09A",
+    "key": "m009_impact_x_dark_25",
+    "hex": "#736764",
     "levels": [
-     0.91518,
-     0.95564,
-     0.95888,
-     0.96638,
-     0.97051,
-     0.97134,
-     0.97191,
-     0.97364,
-     0.97746,
-     0.98305,
-     0.98405,
-     0.98846,
-     0.99149,
-     0.99173,
-     0.9949,
-     0.99738,
-     1.0025,
-     1.00361,
-     1.00686,
-     1.01084,
-     1.01776,
-     1.02281,
-     1.02554,
-     1.026,
-     1.03034,
-     1.03352,
-     1.0371,
-     1.04244,
-     1.04611,
-     1.04983,
-     1.05819,
-     1.06943
+     0.92246,
+     0.92584,
+     0.93399,
+     0.93722,
+     0.93918,
+     0.94243,
+     0.98742,
+     0.99513,
+     1.00002,
+     1.00482,
+     1.00781,
+     1.01258,
+     1.0167,
+     1.0176,
+     1.02091,
+     1.02595,
+     1.02798,
+     1.03066,
+     1.03325,
+     1.03888,
+     1.04335,
+     1.04884,
+     1.05124,
+     1.0635,
+     1.06498,
+     1.06871,
+     1.07044
     ],
     "used": true
    },
    {
-    "key": "m009_impact_x_cool_50",
-    "hex": "#B2A299",
+    "key": "m009_impact_x_dark_50",
+    "hex": "#6E6462",
     "levels": [
-     0.91742,
-     0.9244,
-     0.93207,
-     0.94491,
-     0.94941,
-     0.95385,
-     0.95985,
-     0.96517,
-     0.96937,
-     0.97187,
-     0.97433,
-     0.97802,
-     0.98083,
-     0.98389,
-     0.98496,
-     0.987,
-     0.98898,
-     0.99424,
-     1.00009,
-     1.00376,
-     1.00753,
-     1.01256,
-     1.01786,
-     1.02221,
-     1.02874,
-     1.02965,
-     1.03411,
-     1.04149,
-     1.0456,
-     1.0549,
-     1.0755,
-     1.10222
+     0.92235,
+     0.92458,
+     0.9419,
+     0.94417,
+     0.9871,
+     0.99481,
+     0.99936,
+     1.00392,
+     1.00809,
+     1.01341,
+     1.01589,
+     1.02054,
+     1.02535,
+     1.0292,
+     1.03421,
+     1.03624,
+     1.04815,
+     1.0512,
+     1.07205,
+     1.07354
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact_x_light_25",
+    "hex": "#7C6F6B",
+    "levels": [
+     0.90123,
+     0.90178,
+     0.92546,
+     0.92809,
+     0.93974,
+     0.94232,
+     0.94709,
+     0.9641,
+     0.96643,
+     0.97142,
+     0.98969,
+     0.99211,
+     1.00254,
+     1.00731,
+     1.01113,
+     1.01635,
+     1.021,
+     1.02566,
+     1.02896,
+     1.03188,
+     1.03468,
+     1.03788,
+     1.0446,
+     1.04666,
+     1.05207,
+     1.05478,
+     1.0578,
+     1.06113,
+     1.07239,
+     1.07745,
+     1.09656,
+     1.10452
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact_x_light_50",
+    "hex": "#807470",
+    "levels": [
+     0.88922,
+     0.89774,
+     0.90068,
+     0.90786,
+     0.9106,
+     0.9106,
+     0.91251,
+     0.94167,
+     0.94187,
+     0.95118,
+     0.95548,
+     0.96206,
+     0.97145,
+     0.97328,
+     0.97947,
+     0.98425,
+     0.98826,
+     0.99234,
+     0.99874,
+     1.00155,
+     1.00703,
+     1.01341,
+     1.01805,
+     1.0227,
+     1.02591,
+     1.03321,
+     1.03397,
+     1.03537,
+     1.04468,
+     1.05134,
+     1.06869,
+     1.08413
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_impact_x_light_75",
+    "hex": "#847975",
+    "levels": [
+     0.87391,
+     0.87636,
+     0.87821,
+     0.88067,
+     0.93587,
+     0.93826,
+     0.94295,
+     0.9468,
+     0.94856,
+     0.95146,
+     0.95464,
+     0.95771,
+     0.96043,
+     0.96291,
+     0.97204,
+     0.97542,
+     0.97881,
+     0.99508,
+     0.99669,
+     0.99879,
+     1.01467,
+     1.02259,
+     1.02727,
+     1.03196,
+     1.03571,
+     1.04103,
+     1.04308,
+     1.05414,
+     1.05853,
+     1.07938,
+     1.08062
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_seam_deep",
+    "hex": "#963623",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_seam_ember",
+    "hex": "#B73C1C",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_seam_lip",
+    "hex": "#500E0E",
+    "levels": [
+     1.0
     ],
     "used": true
    },
    {
     "key": "m009_shell",
-    "hex": "#55515A",
+    "hex": "#43424A",
     "levels": [
-     0.91836,
-     0.93078,
-     0.93566,
-     0.93929,
-     0.94775,
-     0.95008,
-     0.95761,
-     0.95991,
-     0.96029,
-     0.96775,
-     0.96811,
-     0.96976,
-     0.97264,
-     0.97315,
-     0.97315,
-     0.97633,
-     0.9798,
-     0.98007,
-     0.98325,
-     0.98374,
-     0.98725,
-     0.98896,
-     0.98952,
-     0.99014,
-     0.99368,
-     0.99595,
-     0.99849,
-     0.99992,
-     1.00244,
-     1.00998,
-     1.01647,
-     1.02228
+     0.94379,
+     0.95296,
+     0.95882,
+     0.96527,
+     0.96817,
+     0.97157,
+     0.97397,
+     0.97801,
+     0.98009,
+     0.9833,
+     0.98667,
+     0.98923,
+     0.99316,
+     0.99699,
+     1.00048,
+     1.0027,
+     1.0057,
+     1.00987,
+     1.01309,
+     1.01598,
+     1.01774,
+     1.0203,
+     1.0233,
+     1.0253,
+     1.03219,
+     1.03819,
+     1.04986
     ],
     "used": true
    },
    {
-    "key": "m009_shell_grey",
-    "hex": "#645E63",
+    "key": "m009_shell_cut",
+    "hex": "#726B69",
     "levels": [
-     0.939,
-     0.95475,
-     0.95905,
-     0.96298,
-     0.96662,
-     0.97091,
-     0.97197,
-     0.97602,
-     0.98228,
-     0.98648,
-     0.99145,
-     0.99432,
-     0.99619,
-     1.00127,
-     1.00577,
-     1.00914,
-     1.01381,
-     1.01628,
-     1.02231,
-     1.02978,
-     1.03151
+     0.95602,
+     0.96201,
+     0.97832,
+     0.98278,
+     0.99301,
+     1.00513,
+     1.01222,
+     1.01908,
+     1.02727,
+     1.03059,
+     1.03385,
+     1.04372
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_dark",
+    "hex": "#322E33",
+    "levels": [
+     0.9798,
+     0.99165,
+     1.01555
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_light",
+    "hex": "#51505D",
+    "levels": [
+     0.95612,
+     0.98429,
+     0.98881,
+     1.02747
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_dark_25",
+    "hex": "#3F3D44",
+    "levels": [
+     0.92954,
+     0.93265,
+     0.94172,
+     0.95941,
+     0.96753,
+     0.9691,
+     0.97279,
+     0.97828,
+     0.98051,
+     0.98275,
+     0.98474,
+     0.98669,
+     0.98926,
+     0.99127,
+     0.99744,
+     1.00013,
+     1.00677,
+     1.00963,
+     1.01521,
+     1.01745,
+     1.01957,
+     1.02313,
+     1.02879,
+     1.03198,
+     1.03745,
+     1.04098,
+     1.04613,
+     1.04992
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_dark_50",
+    "hex": "#3A383E",
+    "levels": [
+     0.95172,
+     0.97692,
+     0.99742,
+     1.02081,
+     1.02314,
+     1.02539,
+     1.03083,
+     1.03475,
+     1.03888,
+     1.07772
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_dark_75",
+    "hex": "#363339",
+    "levels": [
+     0.93163,
+     0.95429,
+     0.9597,
+     0.96915,
+     0.97124,
+     0.98733,
+     0.9975,
+     1.00189,
+     1.00402,
+     1.0061,
+     1.01539,
+     1.02965,
+     1.03242,
+     1.03608,
+     1.04008,
+     1.04088
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_light_25",
+    "hex": "#46464F",
+    "levels": [
+     0.96682,
+     0.96961,
+     0.97155,
+     0.97372,
+     0.97883,
+     0.98139,
+     0.98404,
+     0.99069,
+     0.99303,
+     0.99632,
+     0.99919,
+     1.00144,
+     1.00678,
+     1.00906,
+     1.01038,
+     1.0145,
+     1.01774,
+     1.02196,
+     1.02518,
+     1.02864,
+     1.03405,
+     1.0386,
+     1.05571,
+     1.06523,
+     1.06726
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_light_50",
+    "hex": "#4A4954",
+    "levels": [
+     0.94478,
+     0.94766,
+     0.95089,
+     0.954,
+     0.97471,
+     0.97915,
+     0.98422,
+     0.98808,
+     0.99103,
+     0.99514,
+     0.99858,
+     1.00582,
+     1.01153,
+     1.01409,
+     1.01823,
+     1.02159,
+     1.02333,
+     1.02727,
+     1.0308,
+     1.03553,
+     1.05041,
+     1.0527
+    ],
+    "used": true
+   },
+   {
+    "key": "m009_shell_x_light_75",
+    "hex": "#4E4C58",
+    "levels": [
+     0.96367,
+     0.97261,
+     0.97891,
+     0.98366,
+     0.98757,
+     0.99283,
+     1.00579,
+     1.00912,
+     1.01265,
+     1.01376,
+     1.01597,
+     1.01846,
+     1.02562,
+     1.02962,
+     1.05022
     ],
     "used": true
    }
@@ -221,11 +533,11 @@
    "subject": "Iron Meteor",
    "role": "part",
    "size": [
-    5.7832,
-    5.4876,
-    5.4555
+    8.3438,
+    7.1413,
+    8.0651
    ],
-   "tris": 40,
+   "tris": 76,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -241,16 +553,91 @@
      "tris": 40,
      "offset": [
       0.0,
-      2.7438,
+      3.5707,
       0.0
      ],
      "size": [
-      5.7832,
-      5.4876,
-      5.4555
+      8.3438,
+      7.1413,
+      8.0651
      ],
      "key": "m009_core",
-     "color": "#F55E21",
+     "color": "#E5642A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorCore_glow_m009_core_deep.glb",
+     "kind": "glow",
+     "tris": 17,
+     "offset": [
+      0.3713,
+      3.5707,
+      0.0
+     ],
+     "size": [
+      7.6012,
+      7.1413,
+      8.0651
+     ],
+     "key": "m009_core_deep",
+     "color": "#BF4520",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorCore_glow_m009_core_hot.glb",
+     "kind": "glow",
+     "tris": 9,
+     "offset": [
+      -1.2076,
+      3.6874,
+      0.0
+     ],
+     "size": [
+      5.9286,
+      6.4604,
+      8.0651
+     ],
+     "key": "m009_core_hot",
+     "color": "#FB8D24",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorCore_glow_m009_core_x_hot_50.glb",
+     "kind": "glow",
+     "tris": 10,
+     "offset": [
+      -0.3085,
+      3.4707,
+      0.4194
+     ],
+     "size": [
+      7.7268,
+      6.9414,
+      7.2263
+     ],
+     "key": "m009_core_x_hot_50",
+     "color": "#F07827",
      "material": "Neon",
      "collision": {
       "CollisionFidelity": "Box",
@@ -262,7 +649,7 @@
     }
    ],
    "vfx": [],
-   "notes": "Metal Core: faceted glowing orange ball that fills the seams between the shell pieces"
+   "notes": "Metal Core: faceted glowing orange ball, the hollow the shell pieces close round"
   },
   {
    "name": "IronMeteorDeposit",
@@ -270,11 +657,11 @@
    "subject": "Iron Meteor",
    "role": "hero",
    "size": [
-    11.7852,
-    5.897,
-    11.0117
+    13.3632,
+    7.414,
+    11.8759
    ],
-   "tris": 2278,
+   "tris": 3028,
    "budget": 4000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -287,34 +674,134 @@
     {
      "file": "meshes/IronMeteorDeposit.glb",
      "kind": "solid",
-     "tris": 1708,
+     "tris": 1936,
      "offset": [
       0.0,
-      2.9485,
+      3.707,
       0.0
      ],
      "size": [
-      11.7852,
-      5.897,
-      11.0117
+      13.3632,
+      7.414,
+      11.8759
      ]
     },
     {
      "file": "meshes/IronMeteorDeposit_glow_m009_core.glb",
      "kind": "glow",
-     "tris": 570,
+     "tris": 530,
      "offset": [
-      -1.3044,
-      2.8708,
-      0.1132
+      0.4118,
+      3.276,
+      0.323
      ],
      "size": [
-      8.2182,
-      5.7417,
-      7.2539
+      7.004,
+      6.5521,
+      7.914
      ],
      "key": "m009_core",
-     "color": "#F55E21",
+     "color": "#E5642A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorDeposit_glow_m009_core_hot.glb",
+     "kind": "glow",
+     "tris": 132,
+     "offset": [
+      1.0551,
+      2.9285,
+      0.2689
+     ],
+     "size": [
+      5.1437,
+      5.857,
+      7.0659
+     ],
+     "key": "m009_core_hot",
+     "color": "#FB8D24",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorDeposit_glow_m009_core_x_hot_50.glb",
+     "kind": "glow",
+     "tris": 110,
+     "offset": [
+      0.9118,
+      2.9285,
+      0.1737
+     ],
+     "size": [
+      5.5591,
+      5.857,
+      7.055
+     ],
+     "key": "m009_core_x_hot_50",
+     "color": "#F07827",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorDeposit_glow_m009_seam_deep.glb",
+     "kind": "glow",
+     "tris": 92,
+     "offset": [
+      -1.4598,
+      2.3724,
+      3.0812
+     ],
+     "size": [
+      3.6647,
+      4.7448,
+      2.5088
+     ],
+     "key": "m009_seam_deep",
+     "color": "#963623",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorDeposit_glow_m009_seam_ember.glb",
+     "kind": "glow",
+     "tris": 228,
+     "offset": [
+      1.1014,
+      3.2932,
+      0.2468
+     ],
+     "size": [
+      5.9852,
+      6.5864,
+      8.1565
+     ],
+     "key": "m009_seam_ember",
+     "color": "#B73C1C",
      "material": "Neon",
      "collision": {
       "CollisionFidelity": "Box",
@@ -330,9 +817,9 @@
      "name": "VFX_IronMeteorDeposit_embers_1",
      "kind": "embers",
      "position": [
-      -0.2511,
-      6.7298,
-      -0.1622
+      -2.8232,
+      4.759,
+      2.8968
      ],
      "vfx_scale": 1.0,
      "trigger": null,
@@ -342,34 +829,93 @@
         "name": "Embers",
         "texture": "ember_dot",
         "color": [
-         "#FFC86A",
-         "#FF6A1A"
+         "#FDBD40",
+         "#F75610"
         ],
         "size": [
-         0.3,
-         0.1
+         0.18,
+         0.05
         ],
         "transparency": [
-         0,
-         1
+         0.0,
+         1.0
         ],
         "lifetime": [
-         1.2,
-         2.4
+         1.0,
+         2.0
         ],
-        "rate": 6,
         "speed": [
-         1.5,
-         3
+         1.0,
+         2.0
         ],
-        "spread": 40,
+        "spread": 20,
         "light_emission": 1.0,
         "drag": 0.8,
         "acceleration": [
          0,
          0.8,
          0
-        ]
+        ],
+        "shape": [
+         0.3,
+         0.3,
+         0.3
+        ],
+        "rate": 3.0
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_IronMeteorDeposit_embers_2",
+     "kind": "embers",
+     "position": [
+      2.5158,
+      6.356,
+      3.0098
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FDBD40",
+         "#F75610"
+        ],
+        "size": [
+         0.18,
+         0.05
+        ],
+        "transparency": [
+         0.0,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         2.0
+        ],
+        "speed": [
+         1.0,
+         2.0
+        ],
+        "spread": 20,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ],
+        "shape": [
+         0.3,
+         0.3,
+         0.3
+        ],
+        "rate": 1.5
        }
       ],
       "light": null
@@ -379,11 +925,11 @@
      "name": "VFX_IronMeteorDeposit_heat_glow_1",
      "kind": "heat_glow",
      "position": [
-      -0.2511,
-      3.2298,
-      -0.1622
+      -1.7112,
+      3.571,
+      4.6978
      ],
-     "vfx_scale": 2.2,
+     "vfx_scale": 1.0,
      "trigger": null,
      "spec": {
       "emitters": [
@@ -391,40 +937,142 @@
         "name": "Heat",
         "texture": "glow_soft",
         "color": [
-         "#FF8C2A",
-         "#FF5A1A"
+         "#FC8917",
+         "#F75610"
         ],
         "size": [
-         1.0,
-         1.4
+         0.5,
+         0.8
         ],
         "transparency": [
-         0.5,
+         0.78,
          1.0
         ],
         "lifetime": [
          0.8,
-         1.2
+         1.3
         ],
-        "rate": 3,
+        "rate": 2.5,
         "speed": [
-         0.3,
-         0.6
+         0.4,
+         0.7
         ],
-        "spread": 5,
-        "light_emission": 1.0
+        "spread": 8,
+        "light_emission": 1.0,
+        "shape": [
+         0.5,
+         0.4,
+         0.5
+        ]
        }
       ],
       "light": {
        "color": "#FF7A22",
-       "brightness": 1.2,
-       "range": 10,
-       "flicker": true
+       "brightness": 0.7,
+       "range": 6.0,
+       "flicker": true,
+       "shadows": true
       }
+     }
+    },
+    {
+     "name": "VFX_IronMeteorDeposit_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      -2.6482,
+      4.771,
+      3.1618
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FC8917",
+         "#F75610"
+        ],
+        "size": [
+         0.5,
+         0.8
+        ],
+        "transparency": [
+         0.78,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.3
+        ],
+        "rate": 2.0,
+        "speed": [
+         0.4,
+         0.7
+        ],
+        "spread": 8,
+        "light_emission": 1.0,
+        "shape": [
+         0.5,
+         0.3,
+         0.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_IronMeteorDeposit_heat_glow_3",
+     "kind": "heat_glow",
+     "position": [
+      4.2419,
+      4.104,
+      -3.5192
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FC8917",
+         "#F75610"
+        ],
+        "size": [
+         0.5,
+         0.8
+        ],
+        "transparency": [
+         0.78,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.3
+        ],
+        "rate": 1.5,
+        "speed": [
+         0.4,
+         0.7
+        ],
+        "spread": 8,
+        "light_emission": 1.0,
+        "shape": [
+         0.5,
+         0.4,
+         0.5
+        ]
+       }
+      ],
+      "light": null
      }
     }
    ],
-   "notes": "iron meteorite deposit: a big dark faceted meteor with jagged cracks glowing orange where the metal core shows through, a smaller cracked lobe at its front left, and a ring of pale impact rocks round the foot with a few loose stones further out; cracks glow"
+   "notes": "iron meteorite deposit: a big dark faceted meteor split into thick shell pieces along jagged seams; the seams are real gaps through the shell, dark at the lip and glowing orange down to the metal core at their floor; a smaller lobe at the front left, a ring of pale impact rocks round the foot; seams and core glow"
   },
   {
    "name": "IronMeteorImpactRock",
@@ -432,9 +1080,9 @@
    "subject": "Iron Meteor",
    "role": "part",
    "size": [
-    2.1203,
-    1.2854,
-    2.3808
+    2.4051,
+    1.25,
+    2.112
    ],
    "tris": 44,
    "budget": 1000,
@@ -452,13 +1100,13 @@
      "tris": 44,
      "offset": [
       0.0,
-      0.6427,
+      0.625,
       0.0
      ],
      "size": [
-      2.1203,
-      1.2854,
-      2.3808
+      2.4051,
+      1.25,
+      2.112
      ]
     }
    ],
@@ -471,11 +1119,11 @@
    "subject": "Iron Meteor",
    "role": "part",
    "size": [
-    3.4935,
-    5.7923,
-    2.7745
+    5.8402,
+    4.516,
+    4.4696
    ],
-   "tris": 58,
+   "tris": 386,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -488,34 +1136,84 @@
     {
      "file": "meshes/IronMeteorShellPiece.glb",
      "kind": "solid",
-     "tris": 36,
+     "tris": 221,
      "offset": [
       0.0,
-      2.8961,
+      2.258,
       0.0
      ],
      "size": [
-      3.4935,
-      5.7923,
-      2.7745
+      5.8402,
+      4.516,
+      4.4696
      ]
     },
     {
      "file": "meshes/IronMeteorShellPiece_glow_m009_core.glb",
      "kind": "glow",
-     "tris": 22,
+     "tris": 58,
      "offset": [
-      0.0,
-      2.8961,
-      -0.0285
+      1.1059,
+      2.2213,
+      0.5204
      ],
      "size": [
-      3.4935,
-      5.7923,
-      2.7175
+      3.4435,
+      4.4427,
+      2.2274
      ],
      "key": "m009_core",
-     "color": "#F55E21",
+     "color": "#E5642A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorShellPiece_glow_m009_core_deep.glb",
+     "kind": "glow",
+     "tris": 63,
+     "offset": [
+      1.2685,
+      2.1851,
+      -0.4205
+     ],
+     "size": [
+      3.3032,
+      4.3702,
+      3.6209
+     ],
+     "key": "m009_core_deep",
+     "color": "#BF4520",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/IronMeteorShellPiece_glow_m009_seam_deep.glb",
+     "kind": "glow",
+     "tris": 44,
+     "offset": [
+      1.0069,
+      2.2415,
+      0.6838
+     ],
+     "size": [
+      3.2455,
+      4.4829,
+      2.2248
+     ],
+     "key": "m009_seam_deep",
+     "color": "#963623",
      "material": "Neon",
      "collision": {
       "CollisionFidelity": "Box",
@@ -527,20 +1225,20 @@
     }
    ],
    "vfx": [],
-   "notes": "Rock Shell Piece (reusable, 4-5 per meteor): dark faceted wedge of the meteor's shell with orange inner (seam) faces"
+   "notes": "Rock Shell Piece (reusable): a thick curved segment of the meteor's shell, dark rock outside, orange inner face, the shell thickness showing at its cut ends and stepped seam walls along its open edges"
   }
  ],
  "stats": {
   "assets": 4,
-  "pieces": 6,
+  "pieces": 15,
   "solid": 3,
   "water": 0,
-  "glow": 3,
-  "tris": 2420,
-  "vfxSockets": 2,
-  "paletteColours": 6,
-  "paletteLevels": 150,
-  "meshBytes": 220900
+  "glow": 12,
+  "tris": 3534,
+  "vfxSockets": 5,
+  "paletteColours": 23,
+  "paletteLevels": 343,
+  "meshBytes": 333384
  },
  "problems": []
 }
