@@ -32,7 +32,13 @@ end)
 
 test("extracting grants zero Coins and zero Gems, even at the Center", function()
 	local profile = ProfileSchema.Default(0)
-	ExtractionRules.Settle(profile, { { catalogId = "Iron", quantity = 50 }, sword("s1") }, "Center", "r1", 1)
+	ExtractionRules.Settle(
+		profile,
+		{ { catalogId = "IronOre", quantity = 50 }, { catalogId = "IronBar", quantity = 5 }, sword("s1") },
+		"Center",
+		"r1",
+		1
+	)
 	expectEq(profile.currency.coins, 0, "no Coins")
 	expectEq(profile.currency.gems, 0, "no Gems")
 end)
@@ -77,21 +83,53 @@ test("shops sell into the lobby backpack and merchants buy at fixed prices", fun
 		id += 1
 		return "n" .. id
 	end
-	expect(EconomyRules.Buy(profile, "BasicPickaxe", newId, 7), "bought")
+	expect(EconomyRules.Buy(profile, "StonePickaxe", newId, 7), "bought")
 	expectEq(profile.currency.coins, 150, "150 Coins")
+	expectEq(profile.lobbyBackpack.slots[1].catalogId, "StonePickaxe", "a stone pickaxe")
 	expectEq(profile.lobbyBackpack.slots[1].ownerId, 7, "owned")
 	local ok, reason = EconomyRules.Buy(profile, "TitleWanderer", newId, 7)
 	expect(not ok and reason == "NotEnoughCoins", "too expensive")
-	profile.vault.materials.Iron = 10
-	local sold, coins = EconomyRules.Sell(profile, "vault", "Iron", 10, "sale:1", 1)
-	expect(sold and coins == 80, "10 iron at 8")
-	expectEq(profile.vault.materials.Iron, nil, "sold out")
+	ok, reason = EconomyRules.Buy(profile, "BasicPickaxe", newId, 7)
+	expect(not ok and reason == "UnknownItem", "the old Basic Pickaxe is not sold")
+	profile.vault.materials.IronOre = 10
+	local sold, coins = EconomyRules.Sell(profile, "vault", "IronOre", 10, "sale:1", 1)
+	expect(sold and coins == 80, "10 iron ore at 8")
+	expectEq(profile.vault.materials.IronOre, nil, "sold out")
+	profile.vault.materials.IronBar = 10
+	sold, coins = EconomyRules.Sell(profile, "vault", "IronBar", 10, "sale:2", 1)
+	expect(sold and coins == 100, "10 iron bars at 10: a bar is worth more than its ore")
 	local value = ShopCatalog.SellValue("StoneSpear")
 	expect(value ~= nil and value > 0, "crafted gear is worth 40% of its materials")
 	local _, warning = EconomyRules.Quote({ catalogId = "AncientEmber", quantity = 1 })
 	expect(warning ~= nil, "selling a Forge reagent warns")
 	local permanent = EconomyRules.Quote({ catalogId = "IronSword", instanceId = "p", permanent = true })
 	expectEq(permanent, nil, "Permanent items are not sold to merchants")
+	-- Starter supplies only (GDD §51): Wood and Stone tools, Flint Arrows, basic
+	-- medicine and common berries. No metal, bars or higher gear.
+	local starter = {
+		WoodenAxe = true,
+		WoodenPickaxe = true,
+		StoneAxe = true,
+		StonePickaxe = true,
+		FlintArrow = true,
+		BasicMedicine = true,
+		Redberry = true,
+		Sweetberry = true,
+	}
+	for _, entry in ShopCatalog.Stock do
+		if entry.catalogId then
+			expect(starter[entry.catalogId] == true, entry.id .. " is a starter supply")
+		else
+			expect(entry.title ~= nil, entry.id .. " is a title")
+		end
+	end
+	for catalogId in starter do
+		local stocked = false
+		for _, entry in ShopCatalog.Stock do
+			stocked = stocked or entry.catalogId == catalogId
+		end
+		expect(stocked, catalogId .. " is in stock")
+	end
 end)
 
 test("trades reject Coins and raw materials and allow Gems, gear and Permanent items", function()
@@ -115,6 +153,37 @@ test("trades reject Coins and raw materials and allow Gems, gear and Permanent i
 		TradeRules.ValidateOffer(profile, { items = { 1, 4 }, materials = { AncientEmber = 2 }, gems = 100 }, DAY),
 		"gear, rare vault material, Permanent and Gems"
 	)
+	-- Common materials, ores and bars never trade; elite, Guardian, meteor and
+	-- cache materials, rare herbs and berries, and Ancient Ember do (GDD §51).
+	for _, catalogId in { "Wood", "Stone", "Flint", "Bone", "Hide", "Obsidian", "Jade", "Redberry", "Sweetberry" } do
+		expect(not TradeRules.IsTradeable({ catalogId = catalogId }), catalogId .. " never trades")
+	end
+	for _, metal in { "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" } do
+		expect(not TradeRules.IsTradeable({ catalogId = metal .. "Ore" }), metal .. " ore never trades")
+		expect(not TradeRules.IsTradeable({ catalogId = metal .. "Bar" }), metal .. " bar never trades")
+	end
+	for _, catalogId in
+		{
+			"DireHide",
+			"ChargedCore",
+			"GlowFur",
+			"GuardianHeart",
+			"AshenOil",
+			"SiegeResin",
+			"AbyssalShard",
+			"Emberglass",
+			"Bloodroot",
+			"Moonpetal",
+			"AncientEmber",
+			"Sunberry",
+			"Glimmerberry",
+		}
+	do
+		expect(TradeRules.IsTradeable({ catalogId = catalogId }), catalogId .. " trades")
+	end
+	profile.vault.materials.IronBar = 5
+	ok, reason = TradeRules.ValidateOffer(profile, { items = {}, materials = { IronBar = 5 } }, DAY)
+	expect(not ok and reason == "NotTradeable", "vaulted bars never trade")
 	profile.progression.level = 5
 	ok, reason = TradeRules.ValidateOffer(profile, { items = {}, gems = 10 }, DAY)
 	expect(not ok and reason == "GemLevel", "Gem trades need level 10")

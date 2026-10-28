@@ -1,5 +1,6 @@
 -- The Ancestral Forge (GDD §15–16, §25.3). Lobby only. Shows every recipe with
--- vault-only Owned/Needed counts and its unlock state, and commits special crafts
+-- vault-only Owned/Needed counts and its unlock state (Permanent conversions sorted
+-- and tagged with their source's tier and family for grouping), and commits special crafts
 -- and Permanent conversions as exactly-once operations keyed by the client's nonce,
 -- so a retried request returns the first result instead of charging again. Crafts
 -- wait while the player is in an open trade, or while a settled trade may still
@@ -33,10 +34,10 @@ local function requirementText(recipe): string
 	for _, catalogId in recipe.unlock.discovered or {} do
 		table.insert(parts, "extract " .. nameOf(catalogId))
 	end
-	if recipe.unlock.level then
+	if (recipe.unlock.level or 0) > 0 then
 		table.insert(parts, ("reach level %d"):format(recipe.unlock.level))
 	end
-	if recipe.unlock.crafting then
+	if (recipe.unlock.crafting or 0) > 0 then
 		table.insert(parts, ("Crafting mastery %d"):format(recipe.unlock.crafting))
 	end
 	return if #parts > 0 then "Unlock: " .. table.concat(parts, ", ") else ""
@@ -59,7 +60,7 @@ local function snapshot(player: Player)
 		profile = ProfileService.GetProfile(player)
 	end
 	local recipes = {}
-	for _, recipe in ForgeRecipes.List do
+	for _, recipe in ForgeRules.Ordered() do
 		local inputs = {}
 		for catalogId, needed in recipe.inputs do
 			table.insert(inputs, {
@@ -83,6 +84,9 @@ local function snapshot(player: Player)
 			inputs = inputs,
 		}
 		if recipe.kind == ForgeRecipes.Kinds.Permanent then
+			local def = ItemCatalog.Get(recipe.output)
+			view.tier = ForgeRules.PermanentTier(recipe)
+			view.family = def and def.family
 			view.sources = {}
 			for _, item in ForgeRules.Sources(profile, recipe, player.UserId) do
 				table.insert(view.sources, {
@@ -94,7 +98,7 @@ local function snapshot(player: Player)
 		end
 		table.insert(recipes, view)
 	end
-	return { recipes = recipes, categories = ForgeRecipes.Categories }
+	return { recipes = recipes, categories = ForgeRecipes.Categories, tiers = ForgeRules.TIER_ORDER }
 end
 
 local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)

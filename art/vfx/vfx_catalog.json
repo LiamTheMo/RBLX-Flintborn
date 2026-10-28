@@ -4,7 +4,11 @@
   "notes": [
     "Two-value lists are NumberRanges (min, max); size/transparency/color lists of any other length are sequences with evenly spaced keypoints over the particle life.",
     "Multiply Size, Speed, Acceleration, shape and light Range by the socket's vfx_scale.",
-    "Texture names refer to art/vfx/textures/<name>.png; upload them and swap in rbxassetid://<id>."
+    "Texture names refer to art/vfx/textures/<name>.png; upload them and swap in rbxassetid://<id>.",
+    "Beams: one Beam per entry of a kind's `beams`, from an Attachment at the socket (Attachment0) to one at socket position + `end` (Attachment1). Orient both Attachments with Axis = `axis` and SecondaryAxis = `normal` (the face of a beam with FaceCamera false). color/transparency are sequences from Attachment0 to Attachment1. Width0/Width1 and TextureLength scale with vfx_scale.",
+    "Beam texture_speed is in studs/second along the beam (positive = start to end). Roblox does not document TextureSpeed's unit; if it is texture lengths per second, set TextureSpeed = texture_speed / texture_length (verify once in Studio).",
+    "Beam textures put u (the image's width) along the beam and v across it.",
+    "Emitters with shape_follows_width already have shape[0] set from the socket's width override."
   ],
   "textures": {
     "fire_flipbook_4x4": {
@@ -57,6 +61,24 @@
       "size": 128,
       "tint": true,
       "about": "tiny soft mote"
+    },
+    "rock_chip": {
+      "size": 256,
+      "tint": true,
+      "about": "cluster of three faceted stone chips, white-grey"
+    },
+    "waterfall_streaks": {
+      "size": 512,
+      "height": 256,
+      "tint": true,
+      "tile": "uv",
+      "about": "falling-water streak bands and foam flecks, white / pale blue on transparent; streaks run along u (the beam), tiles both ways"
+    },
+    "water_streaks": {
+      "size": 256,
+      "tint": true,
+      "tile": "uv",
+      "about": "sparse thin flow streaks on transparent, along u; tiles both ways"
     }
   },
   "kinds": {
@@ -771,6 +793,443 @@
             6.0,
             0.1,
             1.5
+          ]
+        }
+      ],
+      "light": null
+    },
+    "waterfall_curtain": {
+      "emitters": [
+        {
+          "name": "Spray",
+          "texture": "splash_droplets",
+          "color": [
+            "#FFFFFF",
+            "#D8F1FA"
+          ],
+          "size": [
+            0.7,
+            1.5
+          ],
+          "transparency": [
+            0.35,
+            1.0
+          ],
+          "lifetime": [
+            0.4,
+            0.8
+          ],
+          "rate": 8,
+          "speed": [
+            1.0,
+            2.5
+          ],
+          "spread": 40,
+          "light_emission": 0.15,
+          "acceleration": [
+            0,
+            -25,
+            0
+          ],
+          "rotation": [
+            -30,
+            30
+          ],
+          "shape": [
+            7.0,
+            0.3,
+            0.5
+          ],
+          "shape_follows_width": 0.9
+        }
+      ],
+      "beams": [
+        {
+          "name": "Fall",
+          "texture": "waterfall_streaks",
+          "color": [
+            "#FFFFFF",
+            "#D4F1FB"
+          ],
+          "transparency": [
+            0.2,
+            0.15,
+            0.3
+          ],
+          "width0": 8.0,
+          "width1": 9.0,
+          "texture_speed": 15.0,
+          "texture_length": 10.0,
+          "texture_mode": "Wrap",
+          "light_emission": 0.25,
+          "light_influence": 0.7,
+          "segments": 12,
+          "face_camera": false
+        },
+        {
+          "name": "Sheen",
+          "texture": "waterfall_streaks",
+          "color": [
+            "#FFFFFF",
+            "#E8F8FD"
+          ],
+          "transparency": [
+            0.6,
+            0.5,
+            0.7
+          ],
+          "width0": 6.8,
+          "width1": 7.8,
+          "texture_speed": 22.0,
+          "texture_length": 6.0,
+          "texture_mode": "Wrap",
+          "light_emission": 0.35,
+          "light_influence": 0.6,
+          "segments": 12,
+          "face_camera": false
+        }
+      ],
+      "light": null
+    },
+    "water_flow": {
+      "emitters": [],
+      "beams": [
+        {
+          "name": "Streaks",
+          "texture": "water_streaks",
+          "color": [
+            "#FFFFFF",
+            "#E6F7FC"
+          ],
+          "transparency": [
+            0.85,
+            0.5,
+            0.5,
+            0.85
+          ],
+          "width0": 6.0,
+          "width1": 6.0,
+          "texture_speed": 4.0,
+          "texture_length": 8.0,
+          "texture_mode": "Wrap",
+          "light_emission": 0.1,
+          "light_influence": 0.8,
+          "segments": 4,
+          "face_camera": false
+        }
+      ],
+      "light": null
+    },
+    "vapour": {
+      "emitters": [
+        {
+          "name": "Vapour",
+          "texture": "mist_soft",
+          "color": [
+            "#FFFFFF",
+            "#EEF8FB"
+          ],
+          "size": [
+            3.0,
+            9.0
+          ],
+          "transparency": [
+            0.85,
+            0.72,
+            1.0
+          ],
+          "lifetime": [
+            4,
+            7
+          ],
+          "rate": 3,
+          "speed": [
+            0.8,
+            1.6
+          ],
+          "spread": 20,
+          "light_emission": 0.15,
+          "drag": 0.4,
+          "acceleration": [
+            0.2,
+            0.6,
+            0
+          ],
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -10,
+            10
+          ],
+          "shape": [
+            3.0,
+            0.5,
+            3.0
+          ]
+        },
+        {
+          "name": "Wisps",
+          "texture": "smoke_puff",
+          "color": [
+            "#FFFFFF",
+            "#F4FAFC"
+          ],
+          "size": [
+            1.5,
+            4.0
+          ],
+          "transparency": [
+            0.8,
+            1.0
+          ],
+          "lifetime": [
+            2.5,
+            4.0
+          ],
+          "rate": 2,
+          "speed": [
+            1.5,
+            2.5
+          ],
+          "spread": 15,
+          "light_emission": 0.1,
+          "drag": 0.3,
+          "acceleration": [
+            0.1,
+            0.4,
+            0
+          ],
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -15,
+            15
+          ]
+        }
+      ],
+      "light": null
+    },
+    "harvest_hit": {
+      "trigger": "hit",
+      "emitters": [
+        {
+          "name": "Chips",
+          "texture": "rock_chip",
+          "color": [
+            "#B9B1AB",
+            "#8F8B8F"
+          ],
+          "size": [
+            0.45,
+            0.25
+          ],
+          "transparency": [
+            0,
+            0,
+            1
+          ],
+          "lifetime": [
+            0.5,
+            0.9
+          ],
+          "rate": 0,
+          "burst": 8,
+          "speed": [
+            7,
+            12
+          ],
+          "spread": 55,
+          "light_emission": 0.0,
+          "acceleration": [
+            0,
+            -35,
+            0
+          ],
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -360,
+            360
+          ]
+        },
+        {
+          "name": "Dust",
+          "texture": "smoke_puff",
+          "color": [
+            "#CFC6BE",
+            "#B3AAA2"
+          ],
+          "size": [
+            0.8,
+            2.2
+          ],
+          "transparency": [
+            0.45,
+            1.0
+          ],
+          "lifetime": [
+            0.6,
+            1.1
+          ],
+          "rate": 0,
+          "burst": 4,
+          "speed": [
+            1.5,
+            3
+          ],
+          "spread": 70,
+          "light_emission": 0.0,
+          "drag": 3.0,
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -40,
+            40
+          ]
+        }
+      ],
+      "light": null
+    },
+    "harvest_deplete": {
+      "trigger": "deplete",
+      "emitters": [
+        {
+          "name": "Chips",
+          "texture": "rock_chip",
+          "color": [
+            "#B9B1AB",
+            "#8F8B8F"
+          ],
+          "size": [
+            0.7,
+            0.35
+          ],
+          "transparency": [
+            0,
+            0,
+            1
+          ],
+          "lifetime": [
+            0.7,
+            1.2
+          ],
+          "rate": 0,
+          "burst": 18,
+          "speed": [
+            8,
+            15
+          ],
+          "spread": 80,
+          "light_emission": 0.0,
+          "acceleration": [
+            0,
+            -35,
+            0
+          ],
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -360,
+            360
+          ],
+          "shape": [
+            3.0,
+            1.0,
+            3.0
+          ]
+        },
+        {
+          "name": "Dust",
+          "texture": "smoke_puff",
+          "color": [
+            "#D6CEC6",
+            "#B3AAA2"
+          ],
+          "size": [
+            2.0,
+            5.0
+          ],
+          "transparency": [
+            0.35,
+            1.0
+          ],
+          "lifetime": [
+            1.0,
+            1.8
+          ],
+          "rate": 0,
+          "burst": 10,
+          "speed": [
+            2,
+            4
+          ],
+          "spread": 90,
+          "light_emission": 0.0,
+          "drag": 2.5,
+          "rotation": [
+            0,
+            360
+          ],
+          "rot_speed": [
+            -30,
+            30
+          ],
+          "shape": [
+            3.0,
+            0.5,
+            3.0
+          ]
+        }
+      ],
+      "light": null
+    },
+    "ore_glint": {
+      "emitters": [
+        {
+          "name": "Glint",
+          "texture": "spark_diamond",
+          "color": [
+            "#FFF4D6",
+            "#FFD9A8"
+          ],
+          "size": [
+            0,
+            0.5,
+            0
+          ],
+          "transparency": [
+            0.1,
+            1.0
+          ],
+          "lifetime": [
+            0.5,
+            0.8
+          ],
+          "rate": 0.8,
+          "speed": [
+            0,
+            0
+          ],
+          "spread": 0,
+          "light_emission": 1.0,
+          "rotation": [
+            0,
+            90
+          ],
+          "shape": [
+            2.0,
+            1.5,
+            2.0
           ]
         }
       ],

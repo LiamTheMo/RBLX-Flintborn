@@ -6,6 +6,7 @@
 
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
+local Recipes = require(script.Parent.Recipes)
 
 local ForgeRecipes = {}
 
@@ -16,43 +17,43 @@ ForgeRecipes.Kinds = { Special = "Special", Permanent = "Permanent" }
 ForgeRecipes.Categories = { "Tools", "Weapons", "Armor", "Supplies", "Permanent" }
 
 local list = {
-	-- Special: ordinary gear at default quality.
-	{ id = "ForgeIronPickaxe", output = "IronPickaxe", category = "Tools", inputs = { Iron = 20, Wood = 10 } },
-	{ id = "ForgeIronAxe", output = "IronAxe", category = "Tools", inputs = { Iron = 16, Wood = 10 } },
+	-- Special: ordinary gear at default quality, from vaulted bars.
+	{ id = "ForgeIronPickaxe", output = "IronPickaxe", category = "Tools", inputs = { IronBar = 20, Wood = 10 } },
+	{ id = "ForgeIronAxe", output = "IronAxe", category = "Tools", inputs = { IronBar = 16, Wood = 10 } },
 	{
 		id = "ForgeIronSword",
 		output = "IronSword",
 		category = "Weapons",
-		inputs = { Iron = 30, Wood = 10, Hide = 4 },
-		unlock = { extractions = 1, discovered = { "Iron" } },
+		inputs = { IronBar = 30, Wood = 10, Hide = 4 },
+		unlock = { extractions = 1, discovered = { "IronOre" } },
 	},
 	{
 		id = "ForgeIronHead",
 		output = "IronHead",
 		category = "Armor",
-		inputs = { Iron = 24, Hide = 6 },
-		unlock = { extractions = 1, discovered = { "Iron" } },
+		inputs = { IronBar = 24, Hide = 6 },
+		unlock = { extractions = 1, discovered = { "IronOre" } },
 	},
 	{
 		id = "ForgeIronChest",
 		output = "IronChest",
 		category = "Armor",
-		inputs = { Iron = 40, Hide = 10 },
-		unlock = { extractions = 1, discovered = { "Iron" } },
+		inputs = { IronBar = 40, Hide = 10 },
+		unlock = { extractions = 1, discovered = { "IronOre" } },
 	},
 	{
 		id = "ForgeIronLegs",
 		output = "IronLegs",
 		category = "Armor",
-		inputs = { Iron = 30, Hide = 8 },
-		unlock = { extractions = 1, discovered = { "Iron" } },
+		inputs = { IronBar = 30, Hide = 8 },
+		unlock = { extractions = 1, discovered = { "IronOre" } },
 	},
 	{
 		id = "ForgeArrows",
-		output = "Arrow",
+		output = "FlintArrow",
 		quantity = 50,
 		category = "Supplies",
-		inputs = { Wood = 12, Stone = 6, Fiber = 8 },
+		inputs = { Wood = 12, Flint = 4, Fiber = 8 },
 	},
 	{
 		id = "ForgePotion",
@@ -62,47 +63,80 @@ local list = {
 		inputs = { Herbs = 20, Fiber = 4 },
 		unlock = { discovered = { "Herbs" }, crafting = 3 },
 	},
+}
 
-	-- Permanent conversions. The pickaxe is the first target: roughly two
-	-- extractions plus one rare event (Q110, Q149). Higher tiers need materials from
-	-- several activities (Q16) and event reagents that farming cannot supply (Q55).
+-- Permanent conversions (GDD §51): any weapon, tool or armor piece, for 10× its
+-- crafting recipe plus Ancient Ember and, at the top tiers, rare materials from
+-- several activities (Q16, Q55). The first conversions need roughly two extractions
+-- plus one rare event (Q110, Q149). Amounts are placeholders.
+ForgeRecipes.PERMANENT_MULTIPLIER = 10
+local PERMANENT_GROUPS = {
+	-- {tiers, Ember, unlock {extractions, level}, rare inputs for gear, for armor}
+	{ tiers = { "Wood", "Stone", "Flint", "Bone", "Hide", "Copper" }, ember = 1, extractions = 2, level = 0 },
+	{ tiers = { "Iron", "Obsidian", "Silver" }, ember = 2, extractions = 4, level = 10 },
 	{
-		id = "PermanentBasicPickaxe",
-		source = "BasicPickaxe",
-		inputs = { Stone = 150, Wood = 60, Iron = 20, AncientEmber = 1 },
-		unlock = { extractions = 2, discovered = { "AncientEmber" } },
+		tiers = { "Cobalt", "Jade" },
+		ember = 3,
+		extractions = 6,
+		level = 20,
+		gear = { Moonpetal = 2 },
+		armor = { Moonpetal = 2 },
 	},
 	{
-		id = "PermanentStoneSpear",
-		source = "StoneSpear",
-		inputs = { Stone = 200, Wood = 120, Fiber = 60, AncientEmber = 2 },
-		unlock = { extractions = 4, discovered = { "AncientEmber" }, level = 10 },
+		tiers = { "Mithril" },
+		ember = 4,
+		extractions = 8,
+		level = 30,
+		gear = { ChargedCore = 3 },
+		armor = { GlowFur = 3 },
 	},
 	{
-		id = "PermanentIronSword",
-		source = "IronSword",
-		inputs = { Iron = 120, Wood = 40, Hide = 20, AncientEmber = 3 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
-	},
-	{
-		id = "PermanentIronHead",
-		source = "IronHead",
-		inputs = { Iron = 100, Hide = 20, AncientEmber = 2 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
-	},
-	{
-		id = "PermanentIronChest",
-		source = "IronChest",
-		inputs = { Iron = 160, Hide = 30, AncientEmber = 3 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
-	},
-	{
-		id = "PermanentIronLegs",
-		source = "IronLegs",
-		inputs = { Iron = 120, Hide = 24, AncientEmber = 2 },
-		unlock = { extractions = 6, discovered = { "AncientEmber", "Iron" }, level = 20 },
+		tiers = { "Adamantine" },
+		ember = 5,
+		extractions = 10,
+		level = 40,
+		gear = { GuardianHeart = 1, AbyssalShard = 3 },
+		armor = { GuardianHeart = 1, Emberglass = 3 },
 	},
 }
+
+local groupOf = {}
+for _, group in PERMANENT_GROUPS do
+	for _, tier in group.tiers do
+		groupOf[tier] = group
+	end
+end
+
+local function permanent(source: string, inputs, group, isArmor: boolean)
+	local cost = {}
+	for input, amount in inputs do
+		cost[input] = amount * ForgeRecipes.PERMANENT_MULTIPLIER
+	end
+	cost.AncientEmber = (cost.AncientEmber or 0) + group.ember
+	for input, amount in (if isArmor then group.armor else group.gear) or {} do
+		cost[input] = (cost[input] or 0) + amount
+	end
+	table.insert(list, {
+		id = "Permanent" .. source,
+		source = source,
+		inputs = cost,
+		unlock = { extractions = group.extractions, discovered = { "AncientEmber" }, level = group.level },
+	})
+end
+
+for _, recipe in Recipes.List do
+	local def = ItemCatalog.Get(recipe.output)
+	if PermanentRules.IsEligible(recipe.output) and def.tier and groupOf[def.tier] then
+		permanent(recipe.output, recipe.inputs, groupOf[def.tier], def.family == ItemCatalog.Families.Armor)
+	end
+end
+-- The Guardian's Fang has no recipe: its conversion is priced directly.
+table.insert(list, {
+	id = "PermanentGuardianFang",
+	source = "GuardianFang",
+	inputs = { AncientEmber = 5, GuardianHeart = 2, ChargedCore = 5, GlowFur = 5 },
+	unlock = { extractions = 10, discovered = { "AncientEmber" }, level = 40 },
+})
 
 ForgeRecipes.ById = {}
 ForgeRecipes.List = {}

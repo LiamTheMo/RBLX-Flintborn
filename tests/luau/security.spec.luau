@@ -26,16 +26,16 @@ local function forgeReady()
 	local profile = ProfileSchema.Default(0)
 	profile.metrics.extractions = 2
 	profile.recipes.discovered.AncientEmber = true
-	profile.vault.materials = { Stone = 999, Wood = 999, Iron = 999, AncientEmber = 9 }
-	profile.vault.items = { { instanceId = "p1", catalogId = "BasicPickaxe", ownerId = 7, location = "Vault" } }
+	profile.vault.materials = { Stone = 999, Wood = 999, Fiber = 999, IronBar = 999, AncientEmber = 9 }
+	profile.vault.items = { { instanceId = "p1", catalogId = "StonePickaxe", ownerId = 7, location = "Vault" } }
 	ForgeRules.RefreshUnlocks(profile, 1)
 	return profile
 end
 
-local function convert(profile, operationId, sourceId)
+local function convert(profile, operationId, sourceId, recipeId)
 	return function(working)
 		local receipt, reason = ForgeRules.Craft(working, {
-			recipeId = "PermanentBasicPickaxe",
+			recipeId = recipeId or "PermanentStonePickaxe",
 			sourceId = sourceId or "p1",
 			ownerId = 7,
 			operationId = operationId,
@@ -58,11 +58,25 @@ test("§24 forged Permanent IDs are rejected", function()
 	expect(not ok and reason == "NoSource", "unknown instance")
 	expect(
 		not PermanentRules.CanConvert(
-			{ instanceId = "p9", catalogId = "BasicPickaxe", ownerId = 99, location = "Vault" },
+			{ instanceId = "p9", catalogId = "StonePickaxe", ownerId = 99, location = "Vault" },
 			7
 		),
 		"someone else's item"
 	)
+	-- Recipe IDs for removed or invented items are refused before anything changes.
+	for _, recipeId in { "PermanentBasicPickaxe", "PermanentSickle", "PermanentWoodChest", "PermanentStonePickaxe2" } do
+		ok, reason = pcall(
+			OperationJournal.Run,
+			profile,
+			"forge:" .. recipeId,
+			"Forge",
+			1,
+			convert(profile, "forge:" .. recipeId, "p1", recipeId)
+		)
+		expect(not ok and reason == "UnknownRecipe", recipeId .. " is not a recipe")
+	end
+	expectEq(profile.vault.materials.Stone, 999, "nothing charged")
+	expect(not profile.vault.items[1].permanent, "nothing converted")
 end)
 
 test("§24 double Forge requests commit once", function()
@@ -70,7 +84,8 @@ test("§24 double Forge requests commit once", function()
 	OperationJournal.Run(profile, "forge:a", "Forge", 1, convert(profile, "forge:a"))
 	local _, applied = OperationJournal.Run(profile, "forge:a", "Forge", 2, convert(profile, "forge:a"))
 	expect(not applied, "the same nonce is a no-op")
-	expectEq(profile.vault.materials.Stone, 849, "charged once")
+	expectEq(profile.vault.materials.Stone, 959, "charged once")
+	expectEq(profile.vault.materials.AncientEmber, 8, "one reagent spent")
 end)
 
 test("§24 simultaneous devices cannot both hold a profile", function()
@@ -84,6 +99,8 @@ test("§24 teleporting mid-operation (pending Deploy) blocks vault-side changes"
 	profile.transit = { reservationId = "t1", items = {} }
 	local ok, reason = pcall(OperationJournal.Run, profile, "forge:b", "Forge", 1, convert(profile, "forge:b"))
 	expect(not ok and reason == "InTransit", "nothing converts during transit")
+	expectEq(profile.vault.materials.Stone, 999, "nothing charged during transit")
+	expect(not profile.vault.items[1].permanent, "the source stays ordinary")
 end)
 
 test("§24 death and extraction are mutually exclusive", function()
@@ -176,8 +193,10 @@ test("§24 negative and fractional quantities are rejected", function()
 	expect(not Validation.IsQuantity(0 / 0), "NaN")
 	expect(not Validation.IsQuantity(math.huge), "infinite")
 	local profile = ProfileSchema.Default(0)
-	profile.vault.materials.Iron = 10
-	expect(not EconomyRules.Sell(profile, "vault", "Iron", -5, "s", 1), "negative sale")
+	profile.vault.materials.IronOre = 10
+	expect(not EconomyRules.Sell(profile, "vault", "IronOre", -5, "s", 1), "negative sale")
+	expect(not EconomyRules.Sell(profile, "vault", "IronOre", 1.5, "s", 1), "fractional sale")
+	expectEq(profile.vault.materials.IronOre, 10, "nothing sold")
 end)
 
 test("§24 DataStore budget exhaustion loses nothing", function()

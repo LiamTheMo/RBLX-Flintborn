@@ -15,6 +15,7 @@ local RunService = game:GetService("RunService")
 
 local EventCatalog = require(ReplicatedStorage.Shared.Events.EventCatalog)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local AnnouncementService = require(script.Parent.AnnouncementService)
@@ -150,9 +151,10 @@ local function spill(loot, position: Vector3, luck: number?)
 	end
 end
 
--- A one-time rare node: harvested once, never regrows (Q112).
-local function spawnNode(event, loot, position: Vector3, tool: string?, onClaimed)
-	local isOre = tool == "Pickaxe"
+-- A one-time rare node: harvested once, never regrows (Q112). Plant nodes are
+-- gathered by hand; ore nodes need a pickaxe of at least `minRank` (GDD §51).
+local function spawnNode(event, loot, position: Vector3, minRank: number?, onClaimed)
+	local isOre = minRank ~= nil
 	local part = Instance.new("Part")
 	part.Name = event.entry.name
 	part.Anchored = true
@@ -164,19 +166,26 @@ local function spawnNode(event, loot, position: Vector3, tool: string?, onClaime
 	part.Parent = event.model
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = if isOre then "Mine" else "Harvest"
-	prompt.ObjectText = ("%s · %s"):format(event.entry.name, event.entry.rarity)
+	prompt.ObjectText = if isOre
+		then ("%s · %s · %s+"):format(event.entry.name, event.entry.rarity, NodeCatalog.PickaxeName(minRank))
+		else ("%s · %s"):format(event.entry.name, event.entry.rarity)
 	prompt.HoldDuration = EventDirectorService.NODE_HARVEST_SECONDS
 	prompt.MaxActivationDistance = 8
 	prompt.RequiresLineOfSight = false
 	prompt.Parent = part
+	local function notice(player: Player): string?
+		return if isOre then NodeCatalog.PickaxeNotice(InventoryService.EquippedTool(player), minRank) else nil
+	end
+	-- Say so as the hold starts rather than after it.
+	prompt.PromptButtonHoldBegan:Connect(function(player)
+		local message = notice(player)
+		if message then
+			InventoryService.Notify(player, message)
+		end
+	end)
 	local site = {}
 	prompt.Triggered:Connect(function(player)
-		if not CacheService.CanInteract(player, part, 10) then
-			return
-		end
-		local equipped = InventoryService.EquippedTool(player)
-		if tool and (equipped == nil or equipped.kind ~= tool) then
-			InventoryService.Notify(player, "You need a " .. string.lower(tool) .. " for that.")
+		if not CacheService.CanInteract(player, part, 10) or notice(player) then
 			return
 		end
 		if EventRules.Claim(site) then
@@ -273,7 +282,7 @@ local function start(entry): boolean
 	end
 	local kind = entry.kind
 	if kind == EventCatalog.Kinds.Node then
-		spawnNode(event, entry.loot, position, entry.tool, done)
+		spawnNode(event, entry.loot, position, entry.minRank, done)
 	elseif kind == EventCatalog.Kinds.Cache then
 		CacheService.Spawn(entry, position, model, done)
 	elseif kind == EventCatalog.Kinds.Meteor then
@@ -312,7 +321,9 @@ local function start(entry): boolean
 	return true
 end
 
--- One director tick: every category rolls independently (Q141).
+-- One director tick: every category rolls independently (Q141), and so does every
+-- rare type within it; each result is placed in turn (rarest first), so later ones
+-- see the footprints and budget the earlier ones took.
 function EventDirectorService.Tick()
 	for _, entry in EventRules.RollTick(EventCatalog.Entries, EventCatalog.Categories, rng) do
 		if not start(entry) then

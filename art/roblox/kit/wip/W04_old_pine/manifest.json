@@ -1,0 +1,555 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W04_old_pine.blend",
+ "sheet": "W04",
+ "module": "old_pine",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.93825,
+     0.95145,
+     0.95632,
+     0.96355,
+     0.96733,
+     0.97279,
+     0.9763,
+     0.97973,
+     0.98331,
+     0.98558,
+     0.98821,
+     0.99073,
+     0.99337,
+     0.99575,
+     0.99769,
+     1.00014,
+     1.00331,
+     1.00485,
+     1.00766,
+     1.01135,
+     1.01425,
+     1.01917,
+     1.02222,
+     1.02775,
+     1.03077,
+     1.03446,
+     1.04005,
+     1.04572,
+     1.04909,
+     1.05408,
+     1.05844,
+     1.06746
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_bark",
+    "hex": "#9A6038",
+    "levels": [
+     0.9129,
+     0.93874,
+     0.9499,
+     0.95697,
+     0.96189,
+     0.96628,
+     0.96998,
+     0.97324,
+     0.97675,
+     0.97975,
+     0.98304,
+     0.98656,
+     0.98958,
+     0.99278,
+     0.99552,
+     0.9987,
+     1.00161,
+     1.00471,
+     1.0081,
+     1.0111,
+     1.01456,
+     1.01772,
+     1.02116,
+     1.02428,
+     1.02752,
+     1.03081,
+     1.03568,
+     1.04074,
+     1.04631,
+     1.05354,
+     1.06388,
+     1.0906
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_grass",
+    "hex": "#8DB83A",
+    "levels": [
+     0.93574,
+     0.95158,
+     0.95647,
+     0.96104,
+     0.9651,
+     0.96906,
+     0.97223,
+     0.97589,
+     0.97942,
+     0.98279,
+     0.98572,
+     0.98795,
+     0.99107,
+     0.99374,
+     0.99684,
+     0.9993,
+     1.00155,
+     1.00443,
+     1.00693,
+     1.00942,
+     1.01227,
+     1.01479,
+     1.01798,
+     1.02121,
+     1.02468,
+     1.0284,
+     1.03177,
+     1.03591,
+     1.03966,
+     1.04326,
+     1.04771,
+     1.06788
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_ground",
+    "hex": "#DCC9A0",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_needle",
+    "hex": "#4E7E1C",
+    "levels": [
+     0.95002,
+     0.95359,
+     0.95721,
+     0.96044,
+     0.96339,
+     0.96664,
+     0.9697,
+     0.97319,
+     0.97641,
+     0.97951,
+     0.98225,
+     0.98549,
+     0.98897,
+     0.99253,
+     0.99557,
+     0.99857,
+     1.00187,
+     1.00536,
+     1.00856,
+     1.01163,
+     1.0143,
+     1.01754,
+     1.0209,
+     1.0241,
+     1.02696,
+     1.03051,
+     1.03393,
+     1.03706,
+     1.03997,
+     1.04351,
+     1.04655,
+     1.04999
+    ],
+    "used": true
+   },
+   {
+    "key": "w04_wood_end",
+    "hex": "#E4A458",
+    "levels": [
+     0.95005,
+     0.95374,
+     0.95629,
+     0.95634,
+     0.95756,
+     0.96167,
+     0.96331,
+     0.96584,
+     0.9713,
+     0.97527,
+     0.97831,
+     0.98247,
+     0.98535,
+     0.98777,
+     0.9936,
+     0.99582,
+     0.99836,
+     1.00085,
+     1.00677,
+     1.01035,
+     1.01304,
+     1.01456,
+     1.01728,
+     1.02022,
+     1.02433,
+     1.02802,
+     1.03022,
+     1.03572,
+     1.03805,
+     1.04361,
+     1.04612,
+     1.04957
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "OldPine",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "hero",
+   "size": [
+    21.566,
+    22.784,
+    22.2496
+   ],
+   "tris": 5398,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPine.glb",
+     "kind": "solid",
+     "tris": 5398,
+     "offset": [
+      0.0,
+      11.392,
+      0.0
+     ],
+     "size": [
+      21.566,
+      22.784,
+      22.2496
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ancient umbrella pine: massive 6-lobed fluted trunk with deep spiral V grooves and buttress roots, forking at ~12 studs into two leaders that splay apart, elbowed limbs, six flat star cloud pads (layered star rosettes, flat undersides), two deep hollow broken stubs, boulders, grass, leafy bushes on an ~18-stud sandy patch. Hull collision (convex, trunk + crown); the exporter has no per-face hull filter, so the pads are inside the hull. Grass and leafy-bush faces carry kit_nocollide = 1. No VFX (no fire, water or harvest). One colour per material, every Tint 1.0 +/- a few percent."
+  },
+  {
+   "name": "OldPineBent",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    24.737,
+    17.98,
+    16.9668
+   ],
+   "tris": 3743,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBent.glb",
+     "kind": "solid",
+     "tris": 3743,
+     "offset": [
+      0.0,
+      8.99,
+      0.0
+     ],
+     "size": [
+      24.737,
+      17.98,
+      16.9668
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Thick S-curved trunk, long near-horizontal elbowed branch out to a far pad; lower and wider than the hero. Hull collision (convex, trunk + crown); the exporter has no per-face hull filter, so the pads are inside the hull. Grass and leafy-bush faces carry kit_nocollide = 1. No VFX (no fire, water or harvest). One colour per material, every Tint 1.0 +/- a few percent."
+  },
+  {
+   "name": "OldPineBranchAngled",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    6.5151,
+    4.1864,
+    5.055
+   ],
+   "tris": 224,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBranchAngled.glb",
+     "kind": "solid",
+     "tris": 224,
+     "offset": [
+      0.0,
+      2.0932,
+      0.0
+     ],
+     "size": [
+      6.5151,
+      4.1864,
+      5.055
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Bent branch log (~7.5 long, ~2 dia) with a sharp elbow (~45 deg), a knob and hollow cut ends (pale heartwood rim round a narrow, 1.8 deep recessed hollow); lies at an angle."
+  },
+  {
+   "name": "OldPineBrokenCrown",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    20.3718,
+    23.8,
+    19.0084
+   ],
+   "tris": 4193,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineBrokenCrown.glb",
+     "kind": "solid",
+     "tris": 4193,
+     "offset": [
+      0.0,
+      11.9,
+      0.0
+     ],
+     "size": [
+      20.3718,
+      23.8,
+      19.0084
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tall fat bare trunk snapped near the top: tall jagged pale heartwood splinters around a wide, deep recessed hollow; a few small star pads on lower side branches. Hull collision (convex, trunk + crown); the exporter has no per-face hull filter, so the pads are inside the hull. Grass and leafy-bush faces carry kit_nocollide = 1. No VFX (no fire, water or harvest). One colour per material, every Tint 1.0 +/- a few percent."
+  },
+  {
+   "name": "OldPineCanopyTier",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    6.1404,
+    2.684,
+    5.8013
+   ],
+   "tris": 306,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineCanopyTier.glb",
+     "kind": "solid",
+     "tris": 306,
+     "offset": [
+      0.0,
+      1.342,
+      0.0
+     ],
+     "size": [
+      6.1404,
+      2.684,
+      5.8013
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "One flat star cloud pad (~6 x 6 x 2.4): a big flat 7-leaf star with a flat down-facing underside, a ring of five outward-tilted star clumps, an upper star and a raised centre star; one needle colour (the dark underside is shading)."
+  },
+  {
+   "name": "OldPineForkedTrunk",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    12.1357,
+    13.092,
+    11.1037
+   ],
+   "tris": 1594,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineForkedTrunk.glb",
+     "kind": "solid",
+     "tris": 1594,
+     "offset": [
+      0.0,
+      6.546,
+      0.0
+     ],
+     "size": [
+      12.1357,
+      13.092,
+      11.1037
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stocky twisted fluted trunk from the roots to the fork; a V of two leaders, both cut flat with pale heartwood rims around narrow, deep recessed hollows. Hull collision."
+  },
+  {
+   "name": "OldPineRootsBase",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "part",
+   "size": [
+    14.221,
+    3.4765,
+    14.6611
+   ],
+   "tris": 1596,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineRootsBase.glb",
+     "kind": "solid",
+     "tris": 1596,
+     "offset": [
+      0.0,
+      1.7383,
+      0.0
+     ],
+     "size": [
+      14.221,
+      3.4765,
+      14.6611
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Buttress-root spread cut at ~2.5 studs (pale heartwood cut top around a deep recessed hollow) with boulders, grass, leafy bushes and the sandy soil patch. Hull collision (convex, trunk + crown); the exporter has no per-face hull filter, so the pads are inside the hull. Grass and leafy-bush faces carry kit_nocollide = 1. No VFX (no fire, water or harvest). One colour per material, every Tint 1.0 +/- a few percent."
+  },
+  {
+   "name": "OldPineSplitTrunk",
+   "sheet": "W04",
+   "subject": "OldPine",
+   "role": "variant",
+   "size": [
+    20.56,
+    20.76,
+    18.1896
+   ],
+   "tris": 4294,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OldPineSplitTrunk.glb",
+     "kind": "solid",
+     "tris": 4294,
+     "offset": [
+      0.0,
+      10.38,
+      0.0
+     ],
+     "size": [
+      20.56,
+      20.76,
+      18.1896
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Fat trunk splits low (~6 studs) into a V of two fluted leaders, the right one snapped into a hollow cut top; star pads on both; a hollow stub low on the trunk. Hull collision (convex, trunk + crown); the exporter has no per-face hull filter, so the pads are inside the hull. Grass and leafy-bush faces carry kit_nocollide = 1. No VFX (no fire, water or harvest). One colour per material, every Tint 1.0 +/- a few percent."
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 21348,
+  "vfxSockets": 0,
+  "paletteColours": 6,
+  "paletteLevels": 161,
+  "meshBytes": 2115036
+ },
+ "problems": []
+}

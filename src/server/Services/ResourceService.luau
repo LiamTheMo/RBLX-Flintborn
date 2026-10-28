@@ -1,7 +1,9 @@
--- Harvestable resource nodes (GDD §4.1, §7.6). Uses map parts tagged "ResourceNode"
--- (attribute NodeType) when present; otherwise scatters placeholder nodes across
--- the ground until the real map arrives (v0.15). Each hit is validated for range,
--- cadence, tool and node state; depleted nodes regrow after ~120 s. World only.
+-- Harvestable resource nodes (GDD §4.1, §7.6, §51). Uses map parts tagged
+-- "ResourceNode" (attribute NodeType) when present; otherwise scatters placeholder
+-- nodes over each biome's ring until the real map arrives (v0.15). Each hit is
+-- validated for range, cadence, tool and node state; ores and gems need their
+-- pickaxe tier, plants are gathered by hand. Depleted nodes regrow after ~120 s.
+-- World only.
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -9,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local InventoryService = require(script.Parent.InventoryService)
@@ -20,36 +23,6 @@ local ResourceService = {}
 
 ResourceService.TAG = "ResourceNode"
 ResourceService.DEFAULT_MAP_RADIUS = 1000
--- Placeholder scatter counts per node type when the map has no tagged nodes.
-ResourceService.SCATTER = {
-	Tree = 60,
-	Rock = 40,
-	IronDeposit = 14,
-	FiberPlant = 40,
-	HerbShrub = 25,
-	BerryBush = 20,
-}
-
-local LOOKS = {
-	Tree = { size = Vector3.new(3, 14, 3), color = Color3.fromRGB(110, 78, 46), shape = Enum.PartType.Cylinder },
-	Rock = { size = Vector3.new(6, 4, 6), color = Color3.fromRGB(128, 126, 120), shape = Enum.PartType.Block },
-	IronDeposit = { size = Vector3.new(5, 4, 5), color = Color3.fromRGB(150, 112, 92), shape = Enum.PartType.Block },
-	FiberPlant = { size = Vector3.new(2, 3, 2), color = Color3.fromRGB(130, 170, 80), shape = Enum.PartType.Block },
-	HerbShrub = { size = Vector3.new(3, 2, 3), color = Color3.fromRGB(70, 140, 90), shape = Enum.PartType.Ball },
-	BerryBush = { size = Vector3.new(3, 3, 3), color = Color3.fromRGB(150, 50, 80), shape = Enum.PartType.Ball },
-	JadeVein = {
-		size = Vector3.new(4, 5, 4),
-		color = Color3.fromRGB(70, 190, 130),
-		shape = Enum.PartType.Block,
-		material = Enum.Material.Glass,
-	},
-	ObsidianOutcrop = {
-		size = Vector3.new(5, 4, 5),
-		color = Color3.fromRGB(30, 26, 40),
-		shape = Enum.PartType.Block,
-		material = Enum.Material.Glass,
-	},
-}
 
 local nodes = {}
 local lastHit = {}
@@ -58,6 +31,11 @@ local rng = Random.new()
 local function rootOf(player: Player)
 	local character = player.Character
 	return character and character:FindFirstChild("HumanoidRootPart")
+end
+
+local function itemName(catalogId: string): string
+	local item = ItemCatalog.Get(catalogId)
+	return if item then item.name else catalogId
 end
 
 local function setActive(node, active: boolean)
@@ -84,9 +62,11 @@ local function harvest(player: Player, node)
 	lastHit[player] = now
 
 	local def = NodeCatalog.Nodes[node.nodeType]
-	local base = NodeCatalog.YieldFor(node.nodeType, InventoryService.EquippedTool(player))
+	local tool = InventoryService.EquippedTool(player)
+	local base = NodeCatalog.YieldFor(node.nodeType, tool)
 	if base <= 0 then
-		InventoryService.Notify(player, "You need a better tool for that.")
+		-- Ores and gems below their pickaxe gate give nothing (GDD §51).
+		InventoryService.Notify(player, NodeCatalog.GateNotice(node.nodeType, tool) or "You can't gather that.")
 		return
 	end
 	-- Mastery (+1% per level) and the Bounty perk stack through one pipeline.
@@ -94,13 +74,18 @@ local function harvest(player: Player, node)
 		ModifierRules.RollYield(base, ModifierService.Get(player, def.mastery .. "Yield", "DropQuantity"), rng)
 	local remaining = InventoryService.Add(player, { catalogId = def.material, quantity = amount })
 	if remaining >= amount then
-		InventoryService.Notify(player, "No room for " .. def.material .. ".")
+		InventoryService.Notify(player, "No room for " .. itemName(def.material) .. ".")
 		return
 	end
 	ProgressionService.GrantXp(player, "Harvest", "Gathering")
 	ProgressionService.GrantMastery(player, def.mastery, 1)
 	node.hitsLeft -= 1
-	if node.hitsLeft <= 0 then
+	local depleted = node.hitsLeft <= 0
+	-- Resin from trees, Flint from rocks: a per-hit chance plus the finishing hit.
+	for _, extra in NodeCatalog.Extras(node.nodeType, depleted, rng) do
+		InventoryService.Add(player, extra)
+	end
+	if depleted then
 		setActive(node, false)
 		task.delay(NodeCatalog.RESPAWN_SECONDS, function()
 			node.hitsLeft = def.hits
@@ -116,8 +101,13 @@ local function register(part: BasePart, nodeType: string)
 		return
 	end
 	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = "Harvest"
-	prompt.ObjectText = nodeType
+	prompt.ActionText = if def.minRank or def.tool == "Pickaxe"
+		then "Mine"
+		elseif def.tool == "Axe" then "Chop"
+		else "Gather"
+	-- "Iron Deposit · Copper Pickaxe+" so the gate shows before the first swing.
+	local label = (nodeType:gsub("(%l)(%u)", "%1 %2"))
+	prompt.ObjectText = if def.minRank then ("%s · %s+"):format(label, NodeCatalog.PickaxeName(def.minRank)) else label
 	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = NodeCatalog.HARVEST_RANGE - 2
 	prompt.RequiresLineOfSight = false
@@ -129,22 +119,12 @@ local function register(part: BasePart, nodeType: string)
 	table.insert(nodes, node)
 end
 
-local function groundPoint(radius: number): Vector3?
-	local angle = rng:NextNumber(0, math.pi * 2)
-	local distance = radius * math.sqrt(rng:NextNumber())
-	local origin = Vector3.new(math.cos(angle) * distance, 1000, math.sin(angle) * distance)
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = { workspace:FindFirstChild("ResourceNodes") }
-	local hit = workspace:Raycast(origin, Vector3.new(0, -2000, 0), params)
-	if hit and hit.Material ~= Enum.Material.Water and hit.Position.Y > -50 then
-		return hit.Position
-	end
-	return nil
-end
-
 local function makeNode(folder: Folder, nodeType: string, position: Vector3)
-	local look = LOOKS[nodeType]
+	local look = NodeCatalog.Looks[nodeType]
+	if look == nil then
+		warn("[ResourceService] No look for node type " .. nodeType)
+		return
+	end
 	local part = Instance.new("Part")
 	part.Name = nodeType
 	part.Anchored = true
@@ -178,30 +158,26 @@ local function groundInBand(inner: number, outer: number): Vector3?
 	return nil
 end
 
+-- Each biome's resource pool goes into its own ring (GDD §3, §18.1, §51), so ores
+-- follow danger: copper and iron outside, silver, cobalt and gems in the Inner
+-- Ring, mithril in the Crater. A map without the generated island scales the
+-- rings to its own radius.
 local function scatter()
 	local folder = Instance.new("Folder")
 	folder.Name = "ResourceNodes"
 	folder.Parent = workspace
-	if workspace:GetAttribute("FlintbornIsland") then
-		-- The Shattered Crater: each biome has its own resource pool (GDD §3, §18.1).
-		for _, biome in BiomeCatalog.Biomes do
-			for nodeType, count in biome.resources do
-				for _ = 1, count do
-					local position = groundInBand(biome.inner, biome.outer)
-					if position then
-						makeNode(folder, nodeType, position)
-					end
-				end
-			end
-		end
-		return
+	local scale = 1
+	if not workspace:GetAttribute("FlintbornIsland") then
+		local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
+		scale = radius / BiomeCatalog.MAP_RADIUS
 	end
-	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
-	for nodeType, count in ResourceService.SCATTER do
-		for _ = 1, count do
-			local position = groundPoint(radius)
-			if position then
-				makeNode(folder, nodeType, position)
+	for _, biome in BiomeCatalog.Biomes do
+		for nodeType, count in biome.resources do
+			for _ = 1, count do
+				local position = groundInBand(biome.inner * scale, biome.outer * scale)
+				if position then
+					makeNode(folder, nodeType, position)
+				end
 			end
 		end
 	end

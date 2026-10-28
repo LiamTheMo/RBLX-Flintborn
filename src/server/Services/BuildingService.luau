@@ -15,6 +15,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -48,7 +49,12 @@ BuildingService.Removing = Signal.new()
 local TIER_LOOK = {
 	Wood = { Enum.Material.WoodPlanks, Color3.fromRGB(140, 100, 62) },
 	Stone = { Enum.Material.Slate, Color3.fromRGB(130, 128, 122) },
+	Copper = { Enum.Material.Metal, Color3.fromRGB(184, 115, 72) },
 	Iron = { Enum.Material.DiamondPlate, Color3.fromRGB(150, 156, 164) },
+	Silver = { Enum.Material.Metal, Color3.fromRGB(205, 208, 214) },
+	Cobalt = { Enum.Material.Metal, Color3.fromRGB(70, 96, 180) },
+	Mithril = { Enum.Material.Foil, Color3.fromRGB(160, 215, 225) },
+	Adamantine = { Enum.Material.DiamondPlate, Color3.fromRGB(60, 70, 64) },
 }
 
 local records = {}
@@ -288,13 +294,15 @@ local function inSight(head: BasePart, base: Vector3, half: Vector3): boolean
 	return BuildRules.InSight(hit and (hit.Position - head.Position).Magnitude, offset.Magnitude)
 end
 
-local function makePart(pieceId: string, tier: string, center: Vector3, half: Vector3)
+local function makePart(pieceId: string, tier: string, material: string, center: Vector3, half: Vector3)
 	local part = Instance.new("Part")
 	part.Name = pieceId
 	part.Anchored = true
 	part.Size = half * 2
 	part.CFrame = CFrame.new(center)
-	local look = TIER_LOOK[tier] or TIER_LOOK.Wood
+	-- Tiered pieces look like their tier; single-tier pieces like what they are
+	-- built from (a stone furnace, an iron anvil).
+	local look = TIER_LOOK[material] or TIER_LOOK[tier] or TIER_LOOK.Wood
 	part.Material, part.Color = look[1], look[2]
 	if pieceId == "Totem" then
 		part.Material = Enum.Material.Wood
@@ -303,12 +311,17 @@ local function makePart(pieceId: string, tier: string, center: Vector3, half: Ve
 		part.Color = Color3.fromRGB(110, 70, 40)
 	elseif pieceId == "Planter" then
 		part.Color = Color3.fromRGB(92, 64, 40)
+	elseif pieceId == "Anvil" then
+		part.Color = Color3.fromRGB(70, 72, 78)
+	elseif pieceId == "Cauldron" then
+		part.Material = Enum.Material.Metal
+		part.Color = Color3.fromRGB(46, 44, 42)
 	end
 	part:SetAttribute("Piece", pieceId)
 	part:SetAttribute("Tier", tier)
 	CollectionService:AddTag(part, BuildingService.STRUCTURE_TAG)
-	if pieceId == "Workbench" or pieceId == "Furnace" then
-		-- Crafting stations (CraftingService): advanced gear and cooking.
+	if CraftingRules.IsStation(pieceId) then
+		-- Crafting stations (CraftingService): Workbench, Furnace, Anvil, Cauldron.
 		CollectionService:AddTag(part, pieceId)
 	end
 	return part
@@ -449,7 +462,7 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		isTotem = isTotem,
 		level = isTotem and 1 or nil,
 		radius = level and level.radius or nil,
-		part = makePart(pieceId, tier, center, half),
+		part = makePart(pieceId, tier, stats.material, center, half),
 	}
 	record.part:SetAttribute("Owner", ownerName(player, ownerKey))
 	records[record.id] = record

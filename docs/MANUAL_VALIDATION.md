@@ -391,3 +391,46 @@ Studio and live checks:
 - [ ] Walk normally on a laggy connection (Studio network simulation): stamina never drains.
 - [ ] A speed exploit without the sprint key still loses stamina (and is pulled back by movement checks).
 
+## Item and material catalog (GDD §51)
+
+Owner-defined catalog, with full tables in [`docs/ITEM_CATALOG.md`](ITEM_CATALOG.md).
+
+Automated (new specs):
+- `gathering_tiers`, 13 cases: the pickaxe gate, Resin and Flint bonuses, ores by region, the rare shrub event, per-type event rolls.
+- `stations_smelting`, 14 cases: the Anvil and Cauldron, timed smelting, every interruption, and no duplication when spamming, leaving, or using two furnaces.
+- `boosts`, 12 cases: berry and draught boosts, replacement, and luck and XP stacking.
+- `siege`, 7 cases: Fire Bomb and Breaching Charge damage, refusals and throw limits.
+- `catalog_migration`, 16 cases: removed items pruned from every save location, Forge conversions, the shop and trading.
+
+Every older spec was migrated to the new IDs and rules, for 37 spec files in all.
+
+Placeholders:
+- **Tiers:** ×1.25 per tier, smelt times 2–8 s per bar, recipe amounts.
+- **Boosts:** berries +10% XP or +5% luck for 3 min; draughts +25% XP or +15% luck for 10 min (15 min for the Strong versions).
+- **Fire Bomb:** base 60, 6-stud burst, 20 damage to players and creatures, about 40 studs of range.
+- **Breaching Charge:** 900 damage after an 8 s fuse, placed within 8 studs.
+- **Bonus drops:** Resin 10% and Flint 15% per hit.
+- **Prices:** merchant values in ShopCatalog.
+
+Studio and live checks:
+
+- [ ] **Old saves:** load one holding Iron, Berries, Arrows, a Basic Pickaxe or Bow, and Wood or Stone armor. They are gone from the vault, backpack and Forge, and nothing errors.
+- [ ] **Mining gate:** hit Copper with a Wooden Pickaxe and get nothing plus "Needs a Stone Pickaxe or better". A Stone Pickaxe mines it. The same applies up the ladder, and prompts show "· X Pickaxe+".
+- [ ] **Ore regions:** Copper and Iron appear in the Outer Rim, Silver, Cobalt, Jade and Obsidian in the Inner Ring, and Mithril in the Crater, with distinct looks.
+- [ ] **Gathering:** trees sometimes give Resin and rocks give Flint, always on the last hit. Plants are gathered by hand.
+- [ ] **Smelting:** a batch at a Furnace shows a progress bar. Walking more than 12 studs away, dying or breaking the furnace stops it, and the bars already made are kept. The Stop button works.
+- [ ] **Stations:** an Anvil enables Silver and up and Jade gear. A Cauldron enables potions and draughts.
+- [ ] **Build mode:** cycles all 8 tiers with HP and cost, and offers the Anvil and Cauldron. Check the panel layout on a phone.
+- [ ] **Crafting menu:** the chips, tier stepper and "Here only" toggle work on touch.
+- [ ] **Boosts:** the toast and HUD line appear with a countdown. Drinking another boost of the same kind replaces it, and boosts end on death, extraction and leaving.
+- [ ] **XP stacking:** Premium, a booster and a potion add up: 100 XP becomes 200.
+- [ ] **Luck:** comes from the killer, the cache opener and the boss's top damage dealer.
+- [ ] **Fire Bomb:** arcs, and burns Wood far more than Stone and barely touches metal. It respects PvP, friendly fire and safe zones.
+- [ ] **Breaching Charge:** places on an enemy wall or door within reach and shows its countdown. It is refused on your own pieces, floors, safe zones and portal auras, and breaks a Wood or Stone wall.
+- [ ] **Meteors:** chunks need a Mithril Pickaxe and give Adamantine Ore.
+- [ ] **Rare shrubs:** the event is announced and gives rare berries and herbs. Several events can start in one tick without overlapping.
+- [ ] **Forge:** tabs work; Permanent opens on your vaulted gear; the show-all toggle groups conversions by tier; the confirmation names the item and its cost.
+- [ ] **Shop and merchant:** the shop shows only starter supplies. The merchant sells by ×10 or all, with no "Sell all" for Forge reagents.
+- [ ] **Trading:** a Sunberry and an Ancient Ember trade between two players. Ores, bars and common materials are refused.
+- [ ] **Planters:** all four crops have their own prompt keys.
+

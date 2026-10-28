@@ -29,18 +29,17 @@ GameConstants.FOOD_HEAL_SECONDS = 10
 GameConstants.FOOD_HIT_CUTOFF = 10
 -- Accepted starter examples (Q137); the full food catalog is still Open.
 GameConstants.FOOD = {
-	Berries = { hunger = 0.10, heal = 10 },
+	Redberry = { hunger = 0.10, heal = 10 },
 	CookedMeat = { hunger = 0.35, heal = 30 },
 }
 
 -- Combat (GDD §21.1, §21.5, Q66, Q132-133) ---------------------------------------
 
--- Full matching three-piece set factors; pieces add, they never multiply.
+-- Confirmed full three-piece set factors; pieces add, they never multiply. Every
+-- other armor tier is set by the tier ladder (Items/Tiers, GDD §51).
 GameConstants.ARMOR_SET_FACTOR = {
 	None = 1.0,
 	Hide = 1.2,
-	Wood = 1.5,
-	Stone = 1.8,
 	Iron = 2.0,
 }
 -- Starting targets (raw damage and seconds between attacks).

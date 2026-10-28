@@ -1,0 +1,469 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W05_log_and_stump.blend",
+ "sheet": "W05",
+ "module": "log_and_stump",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "kit_rock",
+    "hex": "#A89C9C",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_bark",
+    "hex": "#A5653A",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05,
+     1.075,
+     0.925,
+     0.9375,
+     1.0625,
+     0.9875,
+     0.9625,
+     1.0375,
+     1.0125
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_grass",
+    "hex": "#86AC22",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_heartwood",
+    "hex": "#F0B26E",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_hollow",
+    "hex": "#1C130F",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_moss",
+    "hex": "#C6CB1F",
+    "levels": [
+     0.93762,
+     0.94211,
+     0.94468,
+     0.95,
+     0.95653,
+     0.97052,
+     0.975,
+     0.9799,
+     0.98459,
+     0.98911,
+     0.9919,
+     0.99365,
+     0.99679,
+     1.0,
+     1.00761,
+     1.01993,
+     1.02506,
+     1.03234,
+     1.03716,
+     1.04127,
+     1.04498,
+     1.04709,
+     1.05003,
+     1.05372,
+     1.05635,
+     1.05948,
+     1.06296,
+     1.06948,
+     0.93115,
+     0.96166
+    ],
+    "used": true
+   },
+   {
+    "key": "w05_leaf",
+    "hex": "#9CBB1C",
+    "levels": [
+     0.95,
+     0.975,
+     1.0,
+     1.025,
+     1.05
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BrokenLog",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "variant",
+   "size": [
+    12.6668,
+    6.7853,
+    9.0166
+   ],
+   "tris": 1339,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BrokenLog.glb",
+     "kind": "solid",
+     "tris": 1339,
+     "offset": [
+      0.0,
+      3.3927,
+      0.0
+     ],
+     "size": [
+      12.6668,
+      6.7853,
+      9.0166
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "snapped log: open end, splintered heartwood shards, split top, broken stub"
+  },
+  {
+   "name": "FallenHollowLog",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "hero",
+   "size": [
+    16.6152,
+    8.9798,
+    10.2191
+   ],
+   "tris": 2812,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FallenHollowLog.glb",
+     "kind": "solid",
+     "tris": 2812,
+     "offset": [
+      0.0,
+      4.4899,
+      0.0
+     ],
+     "size": [
+      16.6152,
+      8.9798,
+      10.2191
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "big fallen hollow log: open dark bore at -X (front-left), forked branch stub, moss drape, rocks + grass; precise collision keeps the bore open"
+  },
+  {
+   "name": "HollowLog",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "variant",
+   "size": [
+    12.9481,
+    7.1629,
+    9.3419
+   ],
+   "tris": 2128,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HollowLog.glb",
+     "kind": "solid",
+     "tris": 2128,
+     "offset": [
+      0.0,
+      3.5815,
+      0.0
+     ],
+     "size": [
+      12.9481,
+      7.1629,
+      9.3419
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "shorter hollow log with open end, forked stub and moss"
+  },
+  {
+   "name": "LogBranchStub",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "part",
+   "size": [
+    4.9945,
+    4.4287,
+    1.3928
+   ],
+   "tris": 160,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LogBranchStub.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      2.2144,
+      0.0
+     ],
+     "size": [
+      4.9945,
+      4.4287,
+      1.3928
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Y-forked broken branch with heartwood cut base"
+  },
+  {
+   "name": "LogCutEndCap",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "part",
+   "size": [
+    4.7316,
+    4.6934,
+    1.6
+   ],
+   "tris": 474,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LogCutEndCap.glb",
+     "kind": "solid",
+     "tris": 474,
+     "offset": [
+      0.0,
+      2.3467,
+      0.0
+     ],
+     "size": [
+      4.7316,
+      4.6934,
+      1.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cut log disc standing on edge, ring face toward -Y; plugs a log end"
+  },
+  {
+   "name": "LogMossFoliage",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "part",
+   "size": [
+    3.8545,
+    1.4664,
+    1.8624
+   ],
+   "tris": 582,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LogMossFoliage.glb",
+     "kind": "solid",
+     "tris": 582,
+     "offset": [
+      0.0,
+      0.7332,
+      0.0
+     ],
+     "size": [
+      3.8545,
+      1.4664,
+      1.8624
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "two leafy w05_moss clumps and a small w05_grass fern sprig to scatter on logs; walk-through"
+  },
+  {
+   "name": "LogShell",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "part",
+   "size": [
+    12.3129,
+    5.2223,
+    7.0734
+   ],
+   "tris": 908,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LogShell.glb",
+     "kind": "solid",
+     "tris": 908,
+     "offset": [
+      0.0,
+      2.6111,
+      0.0
+     ],
+     "size": [
+      12.3129,
+      5.2223,
+      7.0734
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bare hollow log tube, both ends open; precise collision keeps the bore walkable"
+  },
+  {
+   "name": "LowStump",
+   "sheet": "W05",
+   "subject": "LogAndStump",
+   "role": "variant",
+   "size": [
+    9.2979,
+    3.5,
+    8.7637
+   ],
+   "tris": 1732,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LowStump.glb",
+     "kind": "solid",
+     "tris": 1732,
+     "offset": [
+      0.0,
+      1.75,
+      0.0
+     ],
+     "size": [
+      9.2979,
+      3.5,
+      8.7637
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "low cut stump: flat ring top, ridged bark, flared roots, moss + grass foot"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 10135,
+  "vfxSockets": 0,
+  "paletteColours": 7,
+  "paletteLevels": 68,
+  "meshBytes": 1000120
+ },
+ "problems": []
+}
