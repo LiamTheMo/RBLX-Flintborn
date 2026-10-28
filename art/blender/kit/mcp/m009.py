@@ -11,8 +11,7 @@ import math
 import random
 
 import bmesh
-import bpy
-from mathutils import Matrix, Vector
+from mathutils import Vector
 
 import flintkit
 
@@ -168,27 +167,8 @@ def crack_cutter(a):
 
 
 def carve(o):
-    """Cut the cracks into the built hero: an exact boolean difference whose new groove walls take the core's
-    orange. The cutter is built in the same build coordinates as the hero, so it is placed by the hero's
-    bottom-centre offset (found from a probe build)."""
-    probe = flintkit.Asset("_probe", "probe")
-    hero(probe)
-    xs, ys, zs = ([v.co[i] for v in probe.bm.verts] for i in range(3))
-    off = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))
-    probe.bm.free()
-    cut = flintkit.Asset("_crack_cutter", "probe")
-    crack_cutter(cut)
-    c = cut.finish(collection=o.users_collection[0], mark_asset=False, origin=None)
-    c.matrix_world = o.matrix_world @ Matrix.Translation(-off)
-    m = o.modifiers.new("Cracks", "BOOLEAN")
-    m.operation, m.solver, m.object = "DIFFERENCE", "EXACT", c
-    m.use_self = True
-    m.material_mode = "TRANSFER"
-    with M._override(o):
-        bpy.ops.object.modifier_apply(modifier=m.name)
-    me = c.data
-    bpy.data.objects.remove(c, do_unlink=True)
-    bpy.data.meshes.remove(me)
+    """Cut the cracks into the built hero; the groove walls take the core's orange."""
+    M.carve(o, hero, crack_cutter)
 
 
 def impact_ring():
