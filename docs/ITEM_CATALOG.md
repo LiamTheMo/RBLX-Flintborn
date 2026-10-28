@@ -214,7 +214,7 @@ Floors, doors and roofs scale the same way from today's values; metal tiers cost
 | **Fire Bomb** (new, consumable) | Ashen Oil ×1, Resin ×1, Fiber ×2 | Thrown; burns structures: Wood ×3 damage, Stone ×1, metal ×0.25 |
 | **Breaching Charge** (new, placeable) | Siege Resin ×2, Iron Bar ×2, Fiber ×2 | Placed on a wall or door; 8 s fuse; heavy damage to that one piece |
 
-The Portable Extraction Rune and the existing building pieces (chest, bed, trap, planter, totem) are unchanged. Planters grow Redberries, Sweetberries, Herbs, saplings and Fiber (GDD §53). Sunberries and Glimmerberries are wild-only.
+The Portable Extraction Rune and the existing building pieces (chest, bed, trap, planter, totem) are unchanged. Planters grow Redberries, Sweetberries, Herbs, saplings and Fiber (GDD §53); saplings and Fiber share one prompt (tap to switch, hold to plant). Seeds that were carried into the run grow a harvest that counts as carried. Sunberries and Glimmerberries are wild-only.
 
 ## 6. Permanent conversions
 
