@@ -720,19 +720,24 @@
     "w": 68
   },
   "pm_button_apply": {
-    "h": 94,
+    "h": 89,
     "slice": null,
-    "w": 284
+    "w": 276
   },
   "pm_button_check": {
     "h": 150,
     "slice": null,
     "w": 155
   },
-  "pm_button_close": {
-    "h": 92,
-    "slice": null,
-    "w": 98
+  "pm_button_claim": {
+    "h": 82,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ],
+    "w": 391
   },
   "pm_button_leather": {
     "h": 140,
@@ -819,10 +824,35 @@
     "slice": null,
     "w": 212
   },
+  "pm_button_strip": {
+    "h": 80,
+    "slice": [
+      64,
+      26,
+      64,
+      26
+    ],
+    "w": 357
+  },
   "pm_button_x": {
     "h": 150,
     "slice": null,
     "w": 155
+  },
+  "pm_button_zoom_in": {
+    "h": 66,
+    "slice": null,
+    "w": 66
+  },
+  "pm_button_zoom_out": {
+    "h": 67,
+    "slice": null,
+    "w": 66
+  },
+  "pm_check_green": {
+    "h": 36,
+    "slice": null,
+    "w": 36
   },
   "pm_check_off": {
     "h": 61,
@@ -833,6 +863,11 @@
     "h": 71,
     "slice": null,
     "w": 70
+  },
+  "pm_compass_rose": {
+    "h": 117,
+    "slice": null,
+    "w": 93
   },
   "pm_dropdown": {
     "h": 73,
@@ -874,6 +909,11 @@
     "slice": null,
     "w": 54
   },
+  "pm_glyph_mountain": {
+    "h": 27,
+    "slice": null,
+    "w": 44
+  },
   "pm_glyph_person": {
     "h": 60,
     "slice": null,
@@ -889,10 +929,50 @@
     "slice": null,
     "w": 179
   },
+  "pm_icon_bolt": {
+    "h": 160,
+    "slice": null,
+    "w": 130
+  },
+  "pm_icon_coin": {
+    "h": 166,
+    "slice": null,
+    "w": 176
+  },
   "pm_icon_crown": {
     "h": 131,
     "slice": null,
     "w": 168
+  },
+  "pm_icon_gem": {
+    "h": 168,
+    "slice": null,
+    "w": 128
+  },
+  "pm_icon_scroll": {
+    "h": 164,
+    "slice": null,
+    "w": 182
+  },
+  "pm_jtab_leather": {
+    "h": 58,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ],
+    "w": 126
+  },
+  "pm_jtab_paper": {
+    "h": 54,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ],
+    "w": 129
   },
   "pm_keycap": {
     "h": 71,
@@ -944,6 +1024,26 @@
     "slice": null,
     "w": 255
   },
+  "pm_map_island": {
+    "h": 1000,
+    "slice": null,
+    "w": 1000
+  },
+  "pm_map_label": {
+    "h": 108,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 300
+  },
+  "pm_map_pin": {
+    "h": 118,
+    "slice": null,
+    "w": 84
+  },
   "pm_panel": {
     "h": 314,
     "slice": [
@@ -953,6 +1053,26 @@
       62
     ],
     "w": 529
+  },
+  "pm_quest_row": {
+    "h": 88,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 362
+  },
+  "pm_quest_row_selected": {
+    "h": 90,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 364
   },
   "pm_slider_knob": {
     "h": 58,
@@ -1008,6 +1128,37 @@
     "h": 145,
     "slice": null,
     "w": 146
+  },
+  "pm_window_journal": {
+    "h": 772,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_journal__1_1",
+        0,
+        0,
+        818,
+        772
+      ],
+      [
+        "pm_window_journal__1_2",
+        814,
+        0,
+        818,
+        772
+      ]
+    ],
+    "w": 1632
+  },
+  "pm_window_journal__1_1": {
+    "h": 772,
+    "slice": null,
+    "w": 818
+  },
+  "pm_window_journal__1_2": {
+    "h": 772,
+    "slice": null,
+    "w": 818
   },
   "pm_window_settings": {
     "h": 706,

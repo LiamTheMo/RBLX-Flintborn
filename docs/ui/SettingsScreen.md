@@ -50,7 +50,7 @@ their defaults in the draft. Closing discards the draft.
 | Key row | label 1123; key 1279, cy−24, w, 48 | `pm_keycap` (slice scale 0.62); width 60/76/94/106/116 for 1–5 characters |
 | Column divider | 1061, 248, 2, 368 | `headerRule` |
 | RESET | 1077, 634, 212, 77 | `pm_button_reset` (label baked) |
-| APPLY | 1302, 624, 284, 94 | `pm_button_apply` (label baked) |
+| APPLY | 1307, 627, 276, 89 | `pm_button_apply` (label baked) |
 
 Rows (centre y): sliders 303, 360, 418; checkboxes 480, 531, 585; Graphics
 Quality 663; key rows 300, 367, 436, 507, 578. Rules at 330, 388, 448, 505, 558,
@@ -81,14 +81,15 @@ one draft value; changing it on one page shows on the other.
 
 ## Behaviour
 
-- Rebinding: press a keycap, then the new key; Esc cancels; a key another action
+- Rebinding: press a keycap, then the new key; pressing the keycap again cancels
+  (Roblox keeps Esc for its own menu); a key another action
   uses swaps with it; keys kept for movement, chat and menus are refused with a
   note. The draft keys save on APPLY.
 - Gamepad: opening selects the current tab; B closes.
 - Saved changes echo back as player attributes; an open window with nothing
   unsaved reloads them.
 - Effects (PreferencesController, DamageNumbers, CombatController): volumes on
-  the Music / Effects sound groups, `MouseDeltaSensitivity`, inverted vertical
+  the Music / Effects sound groups, look speed (mouse, touch and gamepad) and inverted vertical
   look through the PlayerModule's camera input, other players' name tags,
   `Lighting.GlobalShadows` and particle rates, floating damage numbers.
 

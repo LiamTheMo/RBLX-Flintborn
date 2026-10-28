@@ -86,12 +86,58 @@ Vector2Meta.__mul = function(a, b)
 end
 
 local Vector3Meta = {}
-Vector3Meta.__index = Vector3Meta
 Vector3 = {}
 function Vector3.new(x, y, z)
 	return typed("Vector3", { X = x or 0, Y = y or 0, Z = z or 0 }, Vector3Meta)
 end
 Vector3.zero = Vector3.new(0, 0, 0)
+Vector3.one = Vector3.new(1, 1, 1)
+local Vector3Methods = {}
+function Vector3Methods.Dot(a, b)
+	return a.X * b.X + a.Y * b.Y + a.Z * b.Z
+end
+function Vector3Methods.Cross(a, b)
+	return Vector3.new(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X)
+end
+function Vector3Methods.Lerp(a, b, t)
+	return Vector3.new(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t, a.Z + (b.Z - a.Z) * t)
+end
+Vector3Meta.__index = function(v, key)
+	if key == "Magnitude" then
+		return math.sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
+	elseif key == "Unit" then
+		local m = math.sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
+		return if m > 0 then Vector3.new(v.X / m, v.Y / m, v.Z / m) else Vector3.new(0 / 0, 0 / 0, 0 / 0)
+	end
+	return Vector3Methods[key]
+end
+Vector3Meta.__add = function(a, b)
+	return Vector3.new(a.X + b.X, a.Y + b.Y, a.Z + b.Z)
+end
+Vector3Meta.__sub = function(a, b)
+	return Vector3.new(a.X - b.X, a.Y - b.Y, a.Z - b.Z)
+end
+Vector3Meta.__unm = function(a)
+	return Vector3.new(-a.X, -a.Y, -a.Z)
+end
+Vector3Meta.__mul = function(a, b)
+	if type(a) == "number" then
+		a, b = b, a
+	end
+	if type(b) == "number" then
+		return Vector3.new(a.X * b, a.Y * b, a.Z * b)
+	end
+	return Vector3.new(a.X * b.X, a.Y * b.Y, a.Z * b.Z)
+end
+Vector3Meta.__div = function(a, b)
+	if type(b) == "number" then
+		return Vector3.new(a.X / b, a.Y / b, a.Z / b)
+	end
+	return Vector3.new(a.X / b.X, a.Y / b.Y, a.Z / b.Z)
+end
+Vector3Meta.__eq = function(a, b)
+	return a.X == b.X and a.Y == b.Y and a.Z == b.Z
+end
 
 local RectMeta = {}
 RectMeta.__index = function(r, key)
@@ -273,6 +319,62 @@ local BASES = {
 	UIListLayout = { "UIGridStyleLayout", "UILayout", "UIComponent" },
 	UIGridLayout = { "UIGridStyleLayout", "UILayout", "UIComponent" },
 }
+
+-- Properties Roblox only has on some classes: setting one elsewhere errors there
+-- ("X is not a valid member of Frame"), so it errors here too. A scene may still
+-- stub a method with a function value.
+local IMAGE_PROPS = {
+	"Image",
+	"ImageColor3",
+	"ImageTransparency",
+	"ImageRectOffset",
+	"ImageRectSize",
+	"ResampleMode",
+	"ScaleType",
+	"SliceCenter",
+	"SliceScale",
+	"TileSize",
+}
+local TEXT_PROPS = {
+	"Text",
+	"TextColor3",
+	"TextSize",
+	"TextScaled",
+	"TextWrapped",
+	"TextXAlignment",
+	"TextYAlignment",
+	"TextTransparency",
+	"TextStrokeColor3",
+	"TextStrokeTransparency",
+	"TextTruncate",
+	"Font",
+	"FontFace",
+	"RichText",
+	"LineHeight",
+	"MaxVisibleGraphemes",
+}
+local ONLY = {}
+for _, key in IMAGE_PROPS do
+	ONLY[key] = { ImageLabel = true, ImageButton = true }
+end
+for _, key in TEXT_PROPS do
+	ONLY[key] = { TextLabel = true, TextButton = true, TextBox = true }
+end
+ONLY.AutoButtonColor = { TextButton = true, ImageButton = true, GuiButton = true }
+local GUI_CLASSES = { Frame = true, ScrollingFrame = true, CanvasGroup = true, ViewportFrame = true }
+for name in ONLY.Image do
+	GUI_CLASSES[name] = true
+end
+for name in ONLY.Text do
+	GUI_CLASSES[name] = true
+end
+
+function checkProperty(className, key, value)
+	local allowed = ONLY[key]
+	if allowed and GUI_CLASSES[className] and not allowed[className] and type(value) ~= "function" then
+		error(("%s is not a valid member of %s"):format(key, className), 3)
+	end
+end
 
 local function defaults(className)
 	local p = {
@@ -497,6 +599,7 @@ InstanceMeta.__newindex = function(self, key, value)
 		return
 	end
 	local props = rawProps(self)
+	checkProperty(props.ClassName, key, value)
 	local old = props[key]
 	props[key] = value
 	if old ~= value then
@@ -824,10 +927,17 @@ function Methods:GetService(name)
 end
 workspace = service("Workspace")
 
+-- Time never passes in a capture: a spawned thread runs until its first wait and
+-- then stays parked there (so refresh loops run once), and delays never fire.
+-- A wait on the main thread returns at once.
 task = {
 	spawn = function(fn, ...)
 		if type(fn) == "function" then
-			fn(...)
+			local thread = coroutine.create(fn)
+			local ok, err = coroutine.resume(thread, ...)
+			if not ok then
+				error(debug.traceback(thread, tostring(err)), 2)
+			end
 		end
 	end,
 	defer = function(fn, ...)
@@ -837,6 +947,9 @@ task = {
 	end,
 	delay = function() end,
 	wait = function()
+		if coroutine.isyieldable() then
+			coroutine.yield()
+		end
 		return 0
 	end,
 	cancel = function() end,

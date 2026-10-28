@@ -5,8 +5,8 @@
 -- default) or a ⚙ button opens it. Changes collect in a draft: APPLY saves them to
 -- the profile (the server echoes them back as player attributes, and every
 -- controller reacts to those), RESET puts the open tab back to its defaults and
--- closing discards the draft. To rebind, click a key and press the new one (Esc
--- cancels); a key another action uses swaps with it.
+-- closing discards the draft. To rebind, click a key and press the new one
+-- (clicking it again cancels); a key another action uses swaps with it.
 --
 -- This module also applies two settings itself: UI scale on every ScreenGui that
 -- does not fit itself, and the colour-blind rarity palette.
@@ -233,7 +233,11 @@ local function build()
 			refresh()
 		end,
 		onRebind = function(id: string)
-			if canRebind() then
+			-- Clicking the waiting key again cancels (Roblox keeps Esc for its menu).
+			if capturing == id then
+				stopCapture()
+				refresh()
+			elseif canRebind() then
 				startCapture(id)
 			end
 		end,
@@ -288,7 +292,7 @@ function SettingsController.Toggle()
 	panel.screen:SetOpen(true)
 	-- Gamepad B closes it, like the other parchment menus.
 	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin then
+		if state == Enum.UserInputState.Begin and not panel:CloseDropdowns() then
 			close()
 		end
 		return Enum.ContextActionResult.Sink

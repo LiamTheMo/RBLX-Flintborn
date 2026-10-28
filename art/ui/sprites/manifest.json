@@ -882,8 +882,8 @@
   },
   "pm_button_apply": {
     "file": "pm_button_apply.png",
-    "w": 280,
-    "h": 94,
+    "w": 276,
+    "h": 89,
     "slice": null
   },
   "pm_button_check": {
@@ -891,6 +891,17 @@
     "w": 155,
     "h": 150,
     "slice": null
+  },
+  "pm_button_claim": {
+    "file": "pm_button_claim.png",
+    "w": 391,
+    "h": 82,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ]
   },
   "pm_button_leather": {
     "file": "pm_button_leather.png",
@@ -986,10 +997,39 @@
     "h": 77,
     "slice": null
   },
+  "pm_button_strip": {
+    "file": "pm_button_strip.png",
+    "w": 357,
+    "h": 80,
+    "slice": [
+      64,
+      26,
+      64,
+      26
+    ]
+  },
   "pm_button_x": {
     "file": "pm_button_x.png",
     "w": 155,
     "h": 150,
+    "slice": null
+  },
+  "pm_button_zoom_in": {
+    "file": "pm_button_zoom_in.png",
+    "w": 66,
+    "h": 66,
+    "slice": null
+  },
+  "pm_button_zoom_out": {
+    "file": "pm_button_zoom_out.png",
+    "w": 66,
+    "h": 67,
+    "slice": null
+  },
+  "pm_check_green": {
+    "file": "pm_check_green.png",
+    "w": 36,
+    "h": 36,
     "slice": null
   },
   "pm_check_off": {
@@ -1002,6 +1042,12 @@
     "file": "pm_check_on.png",
     "w": 70,
     "h": 71,
+    "slice": null
+  },
+  "pm_compass_rose": {
+    "file": "pm_compass_rose.png",
+    "w": 93,
+    "h": 117,
     "slice": null
   },
   "pm_dropdown": {
@@ -1050,6 +1096,12 @@
     "h": 51,
     "slice": null
   },
+  "pm_glyph_mountain": {
+    "file": "pm_glyph_mountain.png",
+    "w": 44,
+    "h": 27,
+    "slice": null
+  },
   "pm_glyph_person": {
     "file": "pm_glyph_person.png",
     "w": 50,
@@ -1068,11 +1120,57 @@
     "h": 143,
     "slice": null
   },
+  "pm_icon_bolt": {
+    "file": "pm_icon_bolt.png",
+    "w": 130,
+    "h": 160,
+    "slice": null
+  },
+  "pm_icon_coin": {
+    "file": "pm_icon_coin.png",
+    "w": 176,
+    "h": 166,
+    "slice": null
+  },
   "pm_icon_crown": {
     "file": "pm_icon_crown.png",
     "w": 168,
     "h": 131,
     "slice": null
+  },
+  "pm_icon_gem": {
+    "file": "pm_icon_gem.png",
+    "w": 128,
+    "h": 168,
+    "slice": null
+  },
+  "pm_icon_scroll": {
+    "file": "pm_icon_scroll.png",
+    "w": 182,
+    "h": 164,
+    "slice": null
+  },
+  "pm_jtab_leather": {
+    "file": "pm_jtab_leather.png",
+    "w": 126,
+    "h": 58,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ]
+  },
+  "pm_jtab_paper": {
+    "file": "pm_jtab_paper.png",
+    "w": 129,
+    "h": 54,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ]
   },
   "pm_keycap": {
     "file": "pm_keycap.png",
@@ -1133,6 +1231,29 @@
     "h": 75,
     "slice": null
   },
+  "pm_map_island": {
+    "file": "pm_map_island.png",
+    "w": 1000,
+    "h": 1000,
+    "slice": null
+  },
+  "pm_map_label": {
+    "file": "pm_map_label.png",
+    "w": 300,
+    "h": 108,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ]
+  },
+  "pm_map_pin": {
+    "file": "pm_map_pin.png",
+    "w": 84,
+    "h": 118,
+    "slice": null
+  },
   "pm_panel": {
     "file": "pm_panel.png",
     "w": 529,
@@ -1142,6 +1263,28 @@
       62,
       70,
       62
+    ]
+  },
+  "pm_quest_row": {
+    "file": "pm_quest_row.png",
+    "w": 362,
+    "h": 88,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ]
+  },
+  "pm_quest_row_selected": {
+    "file": "pm_quest_row_selected.png",
+    "w": 364,
+    "h": 90,
+    "slice": [
+      40,
+      30,
+      40,
+      30
     ]
   },
   "pm_slider_knob": {
@@ -1207,6 +1350,40 @@
     "w": 146,
     "h": 145,
     "slice": null
+  },
+  "pm_window_journal__1_1": {
+    "file": "pm_window_journal__1_1.png",
+    "w": 818,
+    "h": 772,
+    "slice": null
+  },
+  "pm_window_journal__1_2": {
+    "file": "pm_window_journal__1_2.png",
+    "w": 818,
+    "h": 772,
+    "slice": null
+  },
+  "pm_window_journal": {
+    "file": null,
+    "w": 1632,
+    "h": 772,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_journal__1_1",
+        0,
+        0,
+        818,
+        772
+      ],
+      [
+        "pm_window_journal__1_2",
+        814,
+        0,
+        818,
+        772
+      ]
+    ]
   },
   "pm_window_settings__1_1": {
     "file": "pm_window_settings__1_1.png",
