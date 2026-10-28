@@ -18,6 +18,7 @@ local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local EventFeedController = require(script.Parent.EventFeedController)
 local ExtractionController = require(script.Parent.ExtractionController)
 local InventoryController = require(script.Parent.InventoryController)
@@ -312,11 +313,14 @@ local function rebuildWaypoints()
 		table.insert(list, { id = id, icon = icon })
 		waypointPositions[id] = position
 	end
-	for _, entry in PoiCatalog.Landmarks do
-		add("landmark:" .. entry.id, "icon_mountain", PoiCatalog.Position(entry))
-	end
-	for _, entry in PoiCatalog.SafeZones do
-		add("camp:" .. entry.id, "icon_tower", PoiCatalog.Position(entry))
+	-- The catalog's landmarks and camps describe the generated island only.
+	if WorldState.IsGenerated() then
+		for _, entry in PoiCatalog.Landmarks do
+			add("landmark:" .. entry.id, "icon_mountain", PoiCatalog.Position(entry))
+		end
+		for _, entry in PoiCatalog.SafeZones do
+			add("camp:" .. entry.id, "icon_tower", PoiCatalog.Position(entry))
+		end
 	end
 	for part in portals do
 		add("portal:" .. part:GetFullName(), "icon_waypoint", part.Position)
@@ -544,6 +548,7 @@ function HudController.Start()
 	-- Compass waypoints and the two top-right panels.
 	watchPortals()
 	rebuildWaypoints()
+	workspace:GetAttributeChangedSignal(WorldState.GENERATED_ATTRIBUTE):Connect(rebuildWaypoints)
 	ExtractionController.Changed:Connect(rebuildWaypoints)
 	EventFeedController.Changed:Connect(rebuildWaypoints)
 

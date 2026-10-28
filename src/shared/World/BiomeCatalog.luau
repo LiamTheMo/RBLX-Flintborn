@@ -300,16 +300,21 @@ for _, zone in BiomeCatalog.Zones do
 	zone.region = zone.tier
 end
 
--- Inland distance from the coast at (x, z): negative out at sea.
-function BiomeCatalog.CoastDistance(x: number, z: number): number
-	local r = math.sqrt(x * x + z * z)
-	if r < 1 then
+-- Distance from the centre to the coast along the direction (dx, dz) (any length).
+function BiomeCatalog.CoastRadius(dx: number, dz: number): number
+	local r = math.sqrt(dx * dx + dz * dz)
+	if r < 1e-6 then
 		return BiomeCatalog.COAST_RADIUS
 	end
-	local c, s = math.abs(x) / r, math.abs(z) / r
+	local c, s = math.abs(dx) / r, math.abs(dz) / r
 	local shape = (c ^ 4 + s ^ 4) ^ -0.25
-	local wobble = math.noise(x / r * 2.2, z / r * 2.2, 4.1) * BiomeCatalog.COAST_WOBBLE
-	return BiomeCatalog.COAST_RADIUS * shape + wobble - r
+	local wobble = math.noise(dx / r * 2.2, dz / r * 2.2, 4.1) * BiomeCatalog.COAST_WOBBLE
+	return BiomeCatalog.COAST_RADIUS * shape + wobble
+end
+
+-- Inland distance from the coast at (x, z): negative out at sea.
+function BiomeCatalog.CoastDistance(x: number, z: number): number
+	return BiomeCatalog.CoastRadius(x, z) - math.sqrt(x * x + z * z)
 end
 
 local function angleGap(a: number, b: number): number
@@ -398,7 +403,7 @@ function BiomeCatalog.Center(zoneId: string): (number, number)
 	if shape.kind == "Coast" then
 		local radians = math.rad(shape.angle)
 		local dx, dz = math.cos(radians), math.sin(radians)
-		local coast = BiomeCatalog.CoastDistance(dx, dz) + 1
+		local coast = BiomeCatalog.CoastRadius(dx, dz)
 		local r = coast - shape.depth / 2
 		return dx * r, dz * r
 	end

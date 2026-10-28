@@ -15,6 +15,7 @@ local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
 local CacheService = require(script.Parent.CacheService)
@@ -174,26 +175,30 @@ function RitualService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	local tagged = CollectionService:GetTagged(RitualService.SITE_TAG)
-	for _, part in tagged do
-		if part:IsA("BasePart") then
-			register(part.Position, part.Name)
-		end
-	end
-	if #tagged == 0 then
-		-- Placeholder altars in the inner ring until the island arrives (v0.15).
-		local radius = (workspace:GetAttribute("FlintbornMapRadius") or RitualService.DEFAULT_MAP_RADIUS) * 0.45
-		for index = 1, RitualService.PLACEHOLDER_SITES do
-			local angle = (index / RitualService.PLACEHOLDER_SITES) * math.pi * 2 + 0.6
-			local hit = workspace:Raycast(
-				Vector3.new(math.cos(angle) * radius, 1000, math.sin(angle) * radius),
-				Vector3.new(0, -2000, 0)
-			)
-			if hit then
-				register(hit.Position, "Ritual Altar " .. index)
+	-- Altars are the map's tagged parts, so they wait for the map.
+	task.spawn(function()
+		WorldState.WaitUntilReady()
+		local tagged = CollectionService:GetTagged(RitualService.SITE_TAG)
+		for _, part in tagged do
+			if part:IsA("BasePart") then
+				register(part.Position, part.Name)
 			end
 		end
-	end
+		if #tagged == 0 then
+			-- Placeholder altars in the inner ring until the island arrives (v0.15).
+			local radius = (workspace:GetAttribute("FlintbornMapRadius") or RitualService.DEFAULT_MAP_RADIUS) * 0.45
+			for index = 1, RitualService.PLACEHOLDER_SITES do
+				local angle = (index / RitualService.PLACEHOLDER_SITES) * math.pi * 2 + 0.6
+				local hit = workspace:Raycast(
+					Vector3.new(math.cos(angle) * radius, 1000, math.sin(angle) * radius),
+					Vector3.new(0, -2000, 0)
+				)
+				if hit then
+					register(hit.Position, "Ritual Altar " .. index)
+				end
+			end
+		end
+	end)
 	CombatService.Hurt:Connect(RitualService.Interrupt)
 end
 

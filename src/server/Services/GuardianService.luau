@@ -17,6 +17,7 @@ local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local BossService = require(script.Parent.BossService)
 local BuildingService = require(script.Parent.BuildingService)
 local DropService = require(script.Parent.DropService)
@@ -246,7 +247,11 @@ function GuardianService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
-	schedule(now())
+	-- The first horn is counted from when the map (and its arena) is in place.
+	task.spawn(function()
+		WorldState.WaitUntilReady()
+		schedule(now())
+	end)
 	BuildingService.AddAuraSource(GuardianService.ActiveArena)
 	-- A countdown already running is shown to late arrivals too.
 	Players.PlayerAdded:Connect(function(player)

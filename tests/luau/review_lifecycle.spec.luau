@@ -268,6 +268,10 @@ TravelService.ToLobby = function(players)
 	return true
 end
 local SpawnService = require(Server.Services.SpawnService)
+local worldReady = true
+SpawnService.WorldReady = function()
+	return worldReady
+end
 SpawnService.Pick = function()
 	return "spawn"
 end
@@ -358,6 +362,22 @@ local function storedCount(userId: number): number
 end
 
 -- Cases (the shutdown case runs last: a shutdown cannot be undone) ---------------
+
+test("Play waits for the island to finish building, losing nothing (GDD §54)", function()
+	local player = arrive(100, stacks(2))
+	worldReady = false
+	local early = play(player, "req-100-a")
+	advance(2)
+	expectEq(early.ok, false, "no run while the map builds")
+	expectEq(early.reason, "WorldLoading", "the player is told the island is loading")
+	expectEq(WorldAdmissionService.GetState(player), "WorldMainMenuReady", "still on the menu")
+	expectEq(storedCount(100), 2, "the loadout stays reserved")
+	worldReady = true
+	local later = play(player, "req-100-b")
+	advance(5)
+	expectEq(later.ok, true, "Play works once the map is ready")
+	expectEq(started[player] and #started[player], 2, "with the reserved loadout")
+end)
 
 test("a Play whose save failed keeps the reservation, so the next Play brings the loadout", function()
 	local player = arrive(101, stacks(3))

@@ -6,6 +6,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SpawnRules = require(ReplicatedStorage.Shared.Admission.SpawnRules)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 
 local SpawnService = {}
 
@@ -51,6 +52,12 @@ local function candidates(): { Vector3 }
 		return tagged
 	end
 	return sampleGround()
+end
+
+-- Whether the map (and its spawn points) is in place yet: the placeholder island
+-- builds in the background after the server starts (GDD §54).
+function SpawnService.WorldReady(): boolean
+	return WorldState.IsReady()
 end
 
 -- A spawn CFrame for one player. `livingPositions` are other active players.

@@ -6,8 +6,11 @@
 -- enterable cave, and a few simple placeholder structures (the Keep's walled
 -- courtyard, the Fallen Temple ruins, Timberwatch's tower, bridges, camps). Every
 -- gameplay POI is a tagged part so the other services read the map without
--- coordinates. Runs in Init, before any service's Start reads the world, and
--- yields between terrain chunks so a long build never trips the script timeout.
+-- coordinates. The build runs in the background from Init, yielding between
+-- terrain chunks, so every other service starts at once (matchmaking keeps
+-- reporting); services that read the map's terrain or tagged parts, and Play
+-- admission, wait for WorldState's ready flag. A generated island saved into the
+-- place (its folder carries the current GeneratedLayout version) is reused as is.
 -- World place only.
 
 local CollectionService = game:GetService("CollectionService")
@@ -18,10 +21,13 @@ local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
 local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 
 local WorldBuildService = {}
 
 WorldBuildService.MAP_NAME = "ShatteredCrater"
+-- Bump when the generated layout changes, so islands saved into a place rebuild.
+WorldBuildService.LAYOUT_VERSION = 2
 -- Terrain is written in square chunks (16 × 16 voxel columns).
 WorldBuildService.CHUNK = 64
 WorldBuildService.OCEAN_TILE = 1024
@@ -51,6 +57,11 @@ local function part(props, tags)
 	end
 	for _, tag in tags or {} do
 		CollectionService:AddTag(instance, tag)
+		if tag == "GeneratedStructure" then
+			-- Map ruins are never claimable (Q39); BuildingService marks tagged parts at
+			-- Start, before this background build has made them.
+			instance:SetAttribute("Generated", true)
+		end
 	end
 	instance.Parent = props.Parent or folder
 	return instance
@@ -241,7 +252,8 @@ local function buildTerrain()
 		end
 	end
 	carveCave(terrain)
-	table.clear(latticeMaterials)
+	-- Let the per-point materials go (the height lattice stays for gameplay).
+	latticeMaterials = {}
 end
 
 -- Structures ---------------------------------------------------------------------
@@ -340,11 +352,12 @@ local function keep(entry)
 		STONE,
 		Enum.Material.Cobblestone
 	)
-	for index = 1, 4 do
+	-- Fallen stones along the tower's east face, clear of the north gate.
+	for index = 1, 3 do
 		block(
 			keepModel,
 			"Rubble",
-			CFrame.new(base + Vector3.new(index * 9 - 22, 4, 24 + (index % 2) * 8))
+			CFrame.new(base + Vector3.new(21 + (index % 2) * 3, 3, (index - 2) * 9))
 				* CFrame.Angles(math.rad(index * 23), math.rad(index * 41), 0),
 			Vector3.new(8, 6, 7),
 			STONE,
@@ -433,7 +446,8 @@ local function caveMouth(entry)
 	local caveModel = model(entry.name, { Landmark = entry.name })
 	local cave = BiomeCatalog.Zones.EmberhollowCaves
 	local room, tunnel = cave.interior, cave.tunnel
-	local mouthZ = tunnel.toZ - 66
+	-- The gateway stands where the tunnel's open trench meets the ground outside.
+	local mouthZ = tunnel.toZ - 20
 	local floor = room.floor
 	local tunnelHeight = tunnel.ceiling - floor
 	for _, side in { -1, 1 } do
@@ -664,6 +678,7 @@ local function generate()
 	lastYield = started
 	folder = Instance.new("Folder")
 	folder.Name = WorldBuildService.MAP_NAME
+	folder:SetAttribute("GeneratedLayout", WorldBuildService.LAYOUT_VERSION)
 	folder.Parent = workspace
 	-- A Studio baseplate would cut through the island; it only exists at runtime here.
 	local baseplate = workspace:FindFirstChild("Baseplate")
@@ -700,9 +715,40 @@ local function generate()
 	print(("[WorldBuildService] Built the placeholder island in %.1f s"):format(os.clock() - started))
 end
 
+-- Builds the placeholder island now (yields). Also usable from Studio's command bar
+-- to bake the island into the place, which later starts then reuse.
+function WorldBuildService.Generate()
+	local old = workspace:FindFirstChild(WorldBuildService.MAP_NAME)
+	if old then
+		old:Destroy()
+	end
+	generate()
+end
+
+local function publish(generated: boolean)
+	if generated then
+		-- Gameplay may trust IslandLayout's zones and heights on this map.
+		workspace:SetAttribute(WorldState.GENERATED_ATTRIBUTE, true)
+	end
+	workspace:SetAttribute("FlintbornIsland", true)
+	workspace:SetAttribute("FlintbornMapRadius", BiomeCatalog.MAP_RADIUS)
+end
+
 function WorldBuildService.Init()
 	if not PlaceConfig.IsWorld() then
 		return
+	end
+	local existing = workspace:FindFirstChild(WorldBuildService.MAP_NAME)
+	local version = existing and existing:GetAttribute("GeneratedLayout")
+	if version ~= nil then
+		if version == WorldBuildService.LAYOUT_VERSION then
+			-- A generated island saved into the place: nothing to build.
+			publish(true)
+			WorldState.MarkReady()
+			return
+		end
+		-- An island saved from an older layout is rebuilt.
+		existing:Destroy()
 	end
 	local authored = workspace:FindFirstChild(WorldBuildService.MAP_NAME)
 	local stored = ServerStorage:FindFirstChild("Maps")
@@ -711,16 +757,23 @@ function WorldBuildService.Init()
 		stored:Clone().Parent = workspace
 		authored = workspace:FindFirstChild(WorldBuildService.MAP_NAME)
 	end
-	if authored == nil then
-		if workspace:GetAttribute("FlintbornGenerateIsland") == false then
-			return
-		end
-		generate()
-		-- Gameplay may trust IslandLayout's zones and heights on this map.
-		workspace:SetAttribute("FlintbornGeneratedIsland", true)
+	if authored then
+		publish(false)
+		WorldState.MarkReady()
+		return
 	end
-	workspace:SetAttribute("FlintbornIsland", true)
-	workspace:SetAttribute("FlintbornMapRadius", BiomeCatalog.MAP_RADIUS)
+	if workspace:GetAttribute("FlintbornGenerateIsland") == false then
+		WorldState.MarkReady()
+		return
+	end
+	publish(true)
+	task.spawn(function()
+		local ok, err = pcall(generate)
+		if not ok then
+			warn("[WorldBuildService] Island build failed: " .. tostring(err))
+		end
+		WorldState.MarkReady()
+	end)
 end
 
 return WorldBuildService

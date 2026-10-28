@@ -1,7 +1,9 @@
 -- Compass, map and safe-zone notice (GDD §3, §25, §54). A compass strip shows
 -- your heading; the Map key (N by default; DPadDown) opens a top-down map of the
 -- island with its named zones (tinted by danger tier), Crater Lake and the river,
--- landmarks, safe camps, active portals, announced events and your position.
+-- landmarks, safe camps, active portals, announced events and your position. The
+-- zone picture is worked out in the background once the generated island is
+-- ready; an authored map shows only its live markers (camps, portals, events).
 -- Entering a safe camp shows a clear notice. World place only.
 
 local CollectionService = game:GetService("CollectionService")
@@ -15,6 +17,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
@@ -72,7 +75,8 @@ local function cellColor(x: number, z: number): Color3?
 	return color:Lerp(Color3.fromRGB(250, 250, 250), shade * 0.08):Lerp(Color3.new(0, 0, 0), 0.12 - shade * 0.03)
 end
 
--- The zone picture, drawn once: runs of equal colour per row, the river on top and
+-- The zone picture, drawn once in the background (a row per frame, so working out
+-- the heights never hitches): runs of equal colour per row, the river on top and
 -- each zone's name at its heart.
 local function drawZones()
 	local cells = MapController.RESOLUTION
@@ -96,6 +100,7 @@ local function drawZones()
 				runStart, runColor = column, color
 			end
 		end
+		task.wait()
 	end
 	for _, river in IslandLayout.Rivers do
 		for index = 2, #river.points do
@@ -152,11 +157,21 @@ local function renderMarkers()
 	for _, child in ui.markers:GetChildren() do
 		child:Destroy()
 	end
-	for _, entry in PoiCatalog.Landmarks do
-		marker(ui.markers, PoiCatalog.Position(entry), "▲ " .. entry.name, Color3.fromRGB(240, 230, 210))
-	end
-	for _, entry in PoiCatalog.SafeZones do
-		marker(ui.markers, PoiCatalog.Position(entry), "🛡 " .. entry.name, Color3.fromRGB(150, 200, 255))
+	local camp = Color3.fromRGB(150, 200, 255)
+	if WorldState.IsGenerated() then
+		for _, entry in PoiCatalog.Landmarks do
+			marker(ui.markers, PoiCatalog.Position(entry), "▲ " .. entry.name, Color3.fromRGB(240, 230, 210))
+		end
+		for _, entry in PoiCatalog.SafeZones do
+			marker(ui.markers, PoiCatalog.Position(entry), "🛡 " .. entry.name, camp)
+		end
+	else
+		-- An authored map: its own camp volumes, not the placeholder catalog.
+		for zone in safeZones do
+			if zone:IsA("BasePart") then
+				marker(ui.markers, zone.Position, "🛡 " .. (zone:GetAttribute("SafeName") or zone.Name), camp)
+			end
+		end
 	end
 	-- Only the portals active in this world exist as portal parts.
 	for _, part in workspace:GetChildren() do
@@ -309,11 +324,6 @@ end
 function MapController.Toggle()
 	ui.map.Visible = not ui.map.Visible
 	if ui.map.Visible then
-		if not ui.drawn then
-			-- Drawn on first open so the island's heights are only worked out if needed.
-			ui.drawn = true
-			drawZones()
-		end
 		renderMarkers()
 	end
 end
@@ -342,6 +352,12 @@ function MapController.Start()
 		return Enum.ContextActionResult.Pass
 	end)
 	watchSafeZones()
+	task.spawn(function()
+		WorldState.WaitUntilReady()
+		if WorldState.IsGenerated() then
+			drawZones()
+		end
+	end)
 	RunService.RenderStepped:Connect(function(dt)
 		sinceSafeCheck += dt
 		update()

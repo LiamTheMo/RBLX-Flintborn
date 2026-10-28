@@ -21,6 +21,7 @@ local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -45,10 +46,16 @@ local byPart = {}
 local folder = nil
 local rng = Random.new()
 
+-- Map ground only: creatures, characters and resource nodes are see-through, so
+-- nobody stands on a tree or a rock node.
 local function groundParams()
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	local ignore = { folder }
+	local nodes = workspace:FindFirstChild("ResourceNodes")
+	if nodes then
+		table.insert(ignore, nodes)
+	end
 	for _, player in Players:GetPlayers() do
 		if player.Character then
 			table.insert(ignore, player.Character)
@@ -58,8 +65,11 @@ local function groundParams()
 	return params
 end
 
+-- Creatures wade through shallows on the bed and swim on deeper water's surface.
+NpcService.WADE_DEPTH = 4
+
 local function groundAt(position: Vector3, params): Vector3
-	local hit = workspace:Raycast(position + Vector3.new(0, 20, 0), Vector3.new(0, -60, 0), params)
+	local hit = WorldState.Standing(position + Vector3.new(0, 20, 0), 60, params, NpcService.WADE_DEPTH)
 	return if hit then hit.Position else position
 end
 
