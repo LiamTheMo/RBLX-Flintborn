@@ -2421,6 +2421,7 @@ Approximate regional envelopes with shared transition areas, not rectangles pack
   - The Minotaur and the Crater Gorilla drop Silver and Cobalt.
   - The Stonehide Rhino drops a little Iron.
   - Other animals never drop ore.
+- **Rituals:** the Keep's altars summon the **Minotaur** (3 Ancient Ember and 50 Iron Ore), which replaces the Ember Titan. The Minotaur is no longer a roaming event. Raider Camp and Warlord's Hold are guarded by Skeletons now that Bandits are gone.
 - **Density (light):** about 2–4 small groups per region, roughly 40–60 roaming creatures island-wide. A killed group respawns after about 3 minutes, away from players and outside safe zones. Each rare creature event rolls on its own.
 
 ---

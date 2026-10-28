@@ -212,6 +212,8 @@ Studio and live checks (two accounts):
 
 ## v0.15 — Shattered Crater world, art direction and camera
 
+> The placeholder island described here was replaced on 2026-10-28 by the 4,096-stud map in GDD §54; see "Play-world map and creatures (GDD §54)" for the current checks.
+
 Automated: 6 specs cover every portal POI having a zone radius inside its region (3 Outer + 1 hidden, 3 Inner, 1 Center), every biome having a resource pool with jade and obsidian only in the Inner Ring, safe camps with volumes in the Outer Rim, spawn candidates in all three regions, the island profile (sea, beach, a tall ridge with route gaps, an open caldera) and camera bounds. Deployed and verified on both places (2026-10-23).
 
 Placeholders: until an authored `ShatteredCrater` model is placed in the world place (Workspace or `ServerStorage.Maps`), the server builds a blocky placeholder island at start-up (radius 1,200 studs, 48-stud tiles, Outer Rim 750–1,200, Inner Ring 300–750, crater < 300, ridge at 300 with four route gaps) and removes the Studio `Baseplate` at runtime only. Set the workspace attribute `FlintbornGenerateIsland = false` to opt out. POIs and landmarks come from `src/shared/World/PoiCatalog.luau`. Camera zoom 8–40 studs.
@@ -505,4 +507,64 @@ Studio and live checks:
 - [ ] Clay, mushrooms, shrubs, Amethyst, Starstone and Stormglass nodes can be gathered, banked and sold, and are not offered in trades.
 - [ ] Plant Fiber in a planter (H key): it grows 12 Fiber.
 - [ ] The planter's gamepad key (R1) doesn't fight the hotbar step or build placement.
+
+## Play-world map and creatures (GDD §54)
+
+Owner request 2026-10-28: a small, playable placeholder world MVP. It has the new layout, the wildlife roster with roaming spawns, creature events, placeholder nodes and the Keep ritual.
+
+**Map** (generated at server start when no authored `ShatteredCrater` model exists):
+- A terrain island about 3,900 studs across inside a 6,144-stud ocean. −Z is north.
+- Zones:
+  - Low: Rimlands (south coast), Pinewood Wilds (NW), Mosswick Forest (NE), Riverlands (E).
+  - Medium: Timberwatch (W), Fallen Temple (SW), Emberhollow Caves (SE hill, with a 450 × 350 interior reached by a tunnel from the south).
+  - Extreme: Frostpeak Ridge (N, peaks 596/505/470), Crater Lake (centre, water level 28), Shattered Keep (island plateau 120, courtyard 180 × 220).
+- One river runs from the lake through the Riverlands to the sea. A land bridge from the south and a ford from the east reach the Keep.
+- Portals:
+  - Low: Driftwood Cove, Elder Grove, Reed Ferry.
+  - Medium: Lookout Gate, Temple Steps, Ember Gate.
+  - Center: Crater Heart, on the Keep's lower terrace.
+  - Hidden: Sunken Shrine.
+- Safe camps: Tidewater (Rimlands) and Mossfire (Mosswick).
+- The Guardian fights in the Keep courtyard. Ritual altars: Keep West and Keep North.
+- 57 spawn points, in Low and Medium zones only.
+- About 1,260 nodes, with basics in every zone. Mithril, Starstone and Stormglass appear only in Extreme zones; Frost shrubs only on Frostpeak.
+
+**Creatures:**
+- Roaming wildlife: 25 groups, about 52 creatures (cap 60). A group respawns 180 s after it dies, at least 150 studs from players and outside camps.
+- Behaviour:
+  - Passive animals flee and never hurt anyone.
+  - A Neutral group fights back for 20 s after it is hurt.
+  - Hostile creatures attack on sight.
+- Events: Skeleton Patrol, Woolly Mammoth, Giant Ground Sloth, Ancient Tortoise, Iron-Tusk Boar with boars, Saber-Toothed Tiger, Stonehide Rhino, Ember Wisps (cave), and the Crater Gorilla boss.
+- The Minotaur is now the Keep's ritual boss (3 Ancient Ember + 50 Iron Ore). The Ember Titan and Bandits are removed. Raider Camp and Warlord's Hold are guarded by Skeletons.
+
+Automated:
+- `world.spec`: zones, footprints, heights, POIs on dry ground in the right tier, `RandomPointIn`, node pools by tier.
+- `wildlife.spec`: spawn tables, density, respawn rules, behaviours.
+- `events.spec`: zone and habitat placement, no Bandits, camps guarded, no Minotaur event.
+- `bosses.spec`: the Minotaur ritual.
+- `gathering_drops`: fewer basics deeper in.
+
+Placeholders: every creature stat, drop, group size and event weight; zone positions and heights; node counts per zone.
+
+Studio and live checks:
+
+- [ ] Server start prints "Built the placeholder island in X s". Note X; aim for under about 10 s.
+- [ ] Walk or fly the coast and every zone boundary: no holes, floating terrain or cliffs you can't climb where routes should be. Frostpeak's summit reads as the tallest point.
+- [ ] Walk the Crater Lake rim and cross to the Keep by the south land bridge and by the east ford (wading, not swimming). Climb the Keep ramp and the Fallen Temple ramp.
+- [ ] Enter Emberhollow through the south tunnel: the interior is lit enough, its roof has no holes, and cave nodes and Ember Wisps stand on the cave floor.
+- [ ] Spawns land in Low and Medium zones, never in water or terrain, and never in Extreme zones.
+- [ ] Each portal (and the Center portal on the Keep) works; both safe camps protect players.
+- [ ] Nodes sit on the ground across zones (none floating or underwater).
+- [ ] Animals:
+  - Rabbits, dodos, capybaras, stags, goats and tapirs flee.
+  - Boars, bears, bison and mammoths ignore you until you hit them, then the group fights back and calms down after about 20 s.
+  - Wolves, crocodiles and skeletons attack on sight.
+- [ ] Kill a group and stay nearby: it doesn't respawn on top of you. About 3 minutes later a group is back somewhere else in that zone.
+- [ ] Events appear in their zones and habitats: Mammoth on grassland, Tortoise by the lake, Ember Wisps inside the cave, the Crater Gorilla in a clearing toward the crater.
+- [ ] Offer 3 Ancient Ember and 50 Iron Ore at a Keep altar: the Minotaur is summoned. A third party's hit breaks the summon and spills the offering.
+- [ ] The Guardian fight works inside the courtyard walls.
+- [ ] N opens the map: zones tinted by danger, zone names, the lake, river and points of interest, and a legend. It opens without a long freeze.
+- [ ] With 20–30 players and about 50 creatures, the server holds frame rate. Note heartbeat and memory.
+- [ ] Gamepad: in a planter, a tap on the fourth crop button switches Sapling ↔ Fiber, and holding it plants the crop shown.
 
