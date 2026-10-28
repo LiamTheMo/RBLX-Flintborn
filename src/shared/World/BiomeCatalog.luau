@@ -1,8 +1,11 @@
 -- The Shattered Crater's regions and biomes (GDD §3, §18.1). One seamless island
 -- with three concentric risk regions; each biome has its own resource pool (node
 -- type -> count). Ores follow danger (GDD §51): copper and iron in the Outer Rim,
--- silver, cobalt, jade and obsidian in the Inner Ring, mithril in the Crater. Radii are
--- placeholders in studs.
+-- silver, cobalt, jade and obsidian in the Inner Ring, mithril in the Crater. Every
+-- biome has the basics (GDD §53): trees, rocks, fiber, herbs and berry bushes. The
+-- new nodes spread by fit: clay on the beach and in the woods, mushrooms in the
+-- woods and jungle, amethyst in the Inner Ring, starstone, stormglass and frost
+-- shrubs on the high crater. Radii and counts are placeholders.
 
 local BiomeCatalog = {}
 
@@ -21,7 +24,18 @@ BiomeCatalog.Biomes = {
 		outer = 1180,
 		color = Color3.fromRGB(222, 202, 150),
 		material = "Sand",
-		resources = { FiberPlant = 12, Rock = 10, RedberryBush = 5, SweetberryBush = 4, CopperDeposit = 4 },
+		resources = {
+			Tree = 8,
+			Rock = 10,
+			FiberPlant = 12,
+			HerbShrub = 4,
+			RedberryBush = 5,
+			SweetberryBush = 4,
+			CopperDeposit = 4,
+			ClayDeposit = 6,
+			JuniperShrub = 4,
+			RaspberryBush = 3,
+		},
 	},
 	Woodland = {
 		region = "OuterRim",
@@ -38,6 +52,13 @@ BiomeCatalog.Biomes = {
 			SweetberryBush = 6,
 			CopperDeposit = 12,
 			IronDeposit = 8,
+			ClayDeposit = 6,
+			CaveMushroomPatch = 4,
+			RedcapMushroomPatch = 3,
+			ChestnutMushroomPatch = 4,
+			HazelShrub = 5,
+			ElderberryShrub = 4,
+			RaspberryBush = 4,
 		},
 	},
 	Jungle = {
@@ -49,11 +70,20 @@ BiomeCatalog.Biomes = {
 		resources = {
 			Tree = 45,
 			Rock = 10,
+			FiberPlant = 14,
 			HerbShrub = 16,
+			RedberryBush = 5,
+			SweetberryBush = 4,
 			SilverDeposit = 10,
 			CobaltDeposit = 7,
 			JadeVein = 6,
 			ObsidianOutcrop = 8,
+			AmethystGeode = 5,
+			CaveMushroomPatch = 4,
+			RedcapMushroomPatch = 4,
+			ChestnutMushroomPatch = 3,
+			ThornShrub = 6,
+			ElderberryShrub = 3,
 		},
 	},
 	Caldera = {
@@ -62,7 +92,19 @@ BiomeCatalog.Biomes = {
 		outer = 270,
 		color = Color3.fromRGB(70, 56, 52),
 		material = "Basalt",
-		resources = { MithrilDeposit = 6, Rock = 6 },
+		resources = {
+			Tree = 6,
+			Rock = 6,
+			FiberPlant = 6,
+			HerbShrub = 4,
+			RedberryBush = 3,
+			SweetberryBush = 2,
+			MithrilDeposit = 6,
+			StarstoneOutcrop = 3,
+			StormglassCluster = 3,
+			FrostShrub = 4,
+			ThornShrub = 3,
+		},
 	},
 }
 

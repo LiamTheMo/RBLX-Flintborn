@@ -29,12 +29,14 @@ local KEYS = {
 	{ Enum.KeyCode.R, Enum.KeyCode.ButtonY },
 	{ Enum.KeyCode.F, Enum.KeyCode.ButtonB },
 	{ Enum.KeyCode.G, Enum.KeyCode.ButtonL2 },
+	{ Enum.KeyCode.H, Enum.KeyCode.ButtonR1 },
 }
 -- Colour of each crop once ripe (green while growing).
 local RIPE_COLORS = {
 	Redberry = Color3.fromRGB(220, 60, 90),
 	Sweetberry = Color3.fromRGB(240, 150, 60),
 	Herbs = Color3.fromRGB(120, 200, 90),
+	Fiber = Color3.fromRGB(180, 200, 110),
 	Sapling = Color3.fromRGB(120, 86, 50),
 }
 

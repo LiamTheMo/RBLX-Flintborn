@@ -1,4 +1,4 @@
--- Lobby trading (GDD §10.2, §25.4, §45). The Trade navigation button opens the trade panel:
+-- Lobby trading (GDD §10.2, §25.4, §53). The Trade navigation button opens the trade panel:
 -- pick a player in this lobby to invite. The trade window shows both offers, your
 -- tradeable lobby-backpack items to add or remove, your tradeable vault materials
 -- (+1, +10, all or remove), a Gem amount (never Coins), a lock, a countdown and
@@ -196,7 +196,8 @@ function render()
 		TEXT
 	)
 	-- Tradeable items come from the lobby backpack and vault views the vault panel
-	-- uses. Materials are offered only from the vault (GDD §45).
+	-- uses. Materials are offered only from the vault (GDD §53: deposit a backpack
+	-- stack to offer it).
 	if type(view) == "table" then
 		line("Your tradeable lobby-backpack items (tap to add or remove):", GOLD)
 		local offered, offeredMaterials = myOffer()

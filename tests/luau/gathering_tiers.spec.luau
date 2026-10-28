@@ -16,24 +16,27 @@ local function tool(tierId: string, kind: string)
 	return item.tool
 end
 
-test("plants are gathered by hand at the old sickle rate, whatever is held", function()
-	local rates = { FiberPlant = 3, HerbShrub = 2, RedberryBush = 2, SweetberryBush = 2 }
-	for nodeType, rate in rates do
-		expectEq(NodeCatalog.YieldFor(nodeType, nil), rate, nodeType .. " by hand")
-		expectEq(NodeCatalog.YieldFor(nodeType, tool("Mithril", "Axe")), rate, nodeType .. " with an axe")
-		expect(NodeCatalog.GateNotice(nodeType, nil) == nil, nodeType .. " has no gate")
+test("plants and bushes are gathered by hand at 1 per hit, whatever is held", function()
+	for nodeType, node in NodeCatalog.Nodes do
+		if node.tool == nil and node.minRank == nil then
+			expectEq(NodeCatalog.YieldFor(nodeType, nil), 1, nodeType .. " by hand")
+			expectEq(NodeCatalog.YieldFor(nodeType, tool("Mithril", "Axe")), 1, nodeType .. " with an axe")
+			expectEq(NodeCatalog.YieldFor(nodeType, tool("Mithril", "Pickaxe")), 1, nodeType .. " with a pickaxe")
+			expect(NodeCatalog.GateNotice(nodeType, nil) == nil, nodeType .. " has no gate")
+		end
 	end
 	for _, item in ItemCatalog.Items do
 		expect(item.tool == nil or item.tool.kind ~= "Sickle", item.id .. " is not a sickle")
 	end
 end)
 
-test("axes on trees and pickaxes on rock follow the §4.3 curve; bare hands gather 1", function()
-	local expected = { 2, 3, 4, 5, 6, 7, 9, 11 }
+test("axes on trees and pickaxes on rock and clay drop 1 + tool rank; bare hands 1", function()
 	for index, tierId in LADDER do
-		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Axe")), expected[index], tierId .. " axe on a tree")
-		expectEq(NodeCatalog.YieldFor("Rock", tool(tierId, "Pickaxe")), expected[index], tierId .. " pickaxe on rock")
+		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Axe")), 1 + index, tierId .. " axe on a tree")
+		expectEq(NodeCatalog.YieldFor("Rock", tool(tierId, "Pickaxe")), 1 + index, tierId .. " pickaxe on rock")
+		expectEq(NodeCatalog.YieldFor("ClayDeposit", tool(tierId, "Pickaxe")), 1 + index, tierId .. " pickaxe on clay")
 	end
+	expectEq(NodeCatalog.YieldFor("ClayDeposit", nil), 1, "bare hands dig clay")
 	expectEq(NodeCatalog.YieldFor("Tree", nil), 1, "bare hands chop")
 	expectEq(NodeCatalog.YieldFor("Rock", nil), 1, "bare hands quarry")
 	expectEq(NodeCatalog.YieldFor("Tree", tool("Adamantine", "Pickaxe")), 1, "the wrong tool is bare hands")
@@ -121,7 +124,10 @@ test("every node type spawns in its region with its own look", function()
 		CobaltDeposit = "InnerRing",
 		ObsidianOutcrop = "InnerRing",
 		JadeVein = "InnerRing",
+		AmethystGeode = "InnerRing",
 		MithrilDeposit = "CenterCrater",
+		StarstoneOutcrop = "CenterCrater",
+		StormglassCluster = "CenterCrater",
 	}
 	local placed, seenLooks = {}, {}
 	for name, biome in BiomeCatalog.Biomes do

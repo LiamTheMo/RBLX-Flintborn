@@ -19,8 +19,9 @@ local function track(profile, name: string)
 	return tracks[name]
 end
 
--- Starts counting a new run's XP for the Center bonus. Materials never enter a
--- run from the lobby, so every material it extracts was gathered in a run.
+-- Starts counting a new run's XP for the Center bonus. The materials it carried in
+-- (which the bonus never multiplies, GDD §53) are recorded on it at Play
+-- (ExtractionRules.RecordCarriedIn).
 function ProgressionRules.StartRun(profile, runId: string)
 	profile.progression.currentRun = {
 		runId = runId,

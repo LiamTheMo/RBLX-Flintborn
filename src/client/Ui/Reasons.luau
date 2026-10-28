@@ -9,6 +9,8 @@ local TEXT = {
 	PartnerVaultFull = "their vault has no room for that many",
 	BadQuantity = "that amount isn't allowed",
 	BoostActive = "a boost at least as strong is already running",
+	BackpackFull = "your lobby backpack has no room for that",
+	NotEnough = "your vault doesn't hold that many",
 }
 
 function Reasons.Text(code: any): string

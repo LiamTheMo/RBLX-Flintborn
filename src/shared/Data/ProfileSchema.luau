@@ -2,6 +2,7 @@
 -- version and pure migrations from every older version live here so the server,
 -- client and headless specs agree on one definition.
 
+local BoostRules = require(script.Parent.Parent.Survival.BoostRules)
 local GameConstants = require(script.Parent.Parent.GameConstants)
 
 local ProfileSchema = {}
@@ -64,7 +65,9 @@ function ProfileSchema.Default(now: number?)
 			pvpCredits = {},
 		},
 		rebirth = { count = 0, tokens = 0, ownedPerks = {}, legendariesSinceRebirth = 0 },
-		boosters = { xpUntil = 0 },
+		-- `paused`: consumable boosts saved at extraction with their remaining
+		-- seconds ({kind, amount, remaining}), resumed on the next deploy (GDD §53).
+		boosters = { xpUntil = 0, paused = {} },
 		recipes = { unlocked = {}, discovered = {} },
 		receipts = { extraction = {}, forge = {}, maintenance = {}, crashRecovery = {} },
 		operations = { records = {}, order = {} },
@@ -193,6 +196,7 @@ function ProfileSchema.PruneRetiredItems(profile): number
 	for _, receipt in profile.receipts.extraction do
 		if type(receipt) == "table" then
 			removed += pruneMap(receipt.vaulted) + pruneMap(receipt.toBackpack) + pruneMap(receipt.deleted)
+			removed += pruneMap(receipt.carriedIn)
 		end
 	end
 	for receiptId, receipt in table.clone(profile.receipts.forge) do
@@ -202,13 +206,15 @@ function ProfileSchema.PruneRetiredItems(profile): number
 			removed += 1
 		end
 	end
-	-- The loadout a run recorded at Play, restored if its server crashes.
+	-- The loadout a run recorded at Play, restored if its server crashes, and the
+	-- material quantities it carried in (GDD §53).
 	local run = profile.progression.currentRun
 	if type(run) == "table" then
 		removed += pruneList(run.loadout)
 		if type(run.loadout) == "table" and #run.loadout == 0 then
 			run.loadout = nil
 		end
+		removed += pruneMap(run.carriedIn)
 	end
 	-- A trade awaiting reconciliation never hands back or claws back a removed item.
 	for _, pending in profile.trades.pending do
@@ -260,6 +266,7 @@ function ProfileSchema.Migrate(data: any, now: number?)
 		profile.schemaVersion += 1
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
+	profile.boosters.paused = BoostRules.Sanitize(profile.boosters.paused)
 	backfillRedeemedCodes(profile)
 	ProfileSchema.PruneRetiredItems(profile)
 	return profile, nil

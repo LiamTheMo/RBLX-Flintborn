@@ -1,9 +1,10 @@
--- Harvestable resource nodes (GDD §4.1, §7.6, §51). Uses map parts tagged
+-- Harvestable resource nodes (GDD §4.1, §7.6, §51, §53). Uses map parts tagged
 -- "ResourceNode" (attribute NodeType) when present; otherwise scatters placeholder
 -- nodes over each biome's ring until the real map arrives (v0.15). Each hit is
 -- validated for range, cadence, tool and node state; ores and gems need their
--- pickaxe tier, plants are gathered by hand. Depleted nodes regrow after ~120 s.
--- World only.
+-- pickaxe tier, plants are gathered by hand. Every hit drops its material on the
+-- ground beside the node (the hitter's for 10 s, DropService) and takes as much
+-- from the node's health; depleted nodes regrow after their tier's time. World only.
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -11,9 +12,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
 local ProgressionService = require(script.Parent.ProgressionService)
@@ -33,11 +34,6 @@ local function rootOf(player: Player)
 	return character and character:FindFirstChild("HumanoidRootPart")
 end
 
-local function itemName(catalogId: string): string
-	local item = ItemCatalog.Get(catalogId)
-	return if item then item.name else catalogId
-end
-
 local function setActive(node, active: boolean)
 	node.active = active
 	node.prompt.Enabled = active
@@ -45,6 +41,41 @@ local function setActive(node, active: boolean)
 	node.part.CanCollide = active
 	-- A depleted node is gone: no invisible blocker for rays or spatial queries.
 	node.part.CanQuery = active
+end
+
+-- A drop's colour: the look of the node that gives that material.
+local looksByMaterial = {}
+for nodeType, def in NodeCatalog.Nodes do
+	local look = NodeCatalog.Looks[nodeType]
+	if look and looksByMaterial[def.material] == nil then
+		looksByMaterial[def.material] = look.color
+	end
+end
+local BONUS_COLORS = {
+	Flint = Color3.fromRGB(70, 70, 76),
+	Resin = Color3.fromRGB(214, 150, 40),
+}
+local function colorOf(stack): Color3?
+	return BONUS_COLORS[stack.catalogId] or looksByMaterial[stack.catalogId]
+end
+
+-- A ground point just outside the node, scattered over the half facing `from`.
+local function dropPoint(node, from: Vector3): Vector3
+	local part = node.part
+	-- World-axis extents, so a tree's rotated cylinder counts as standing up.
+	local rotated = part.CFrame:VectorToWorldSpace(part.Size)
+	local size = Vector3.new(math.abs(rotated.X), math.abs(rotated.Y), math.abs(rotated.Z))
+	local toward = (from - part.Position) * Vector3.new(1, 0, 1)
+	local facing = if toward.Magnitude > 0.1 then math.atan2(toward.Z, toward.X) else rng:NextNumber(0, math.pi * 2)
+	local angle = facing + rng:NextNumber(-math.pi / 2, math.pi / 2)
+	local reach = math.max(size.X, size.Z) / 2 + rng:NextNumber(1, 2.5)
+	local point = part.Position + Vector3.new(math.cos(angle) * reach, 0, math.sin(angle) * reach)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { part, workspace:FindFirstChild("ResourceNodes") }
+	local top = part.Position.Y + size.Y
+	local hit = workspace:Raycast(Vector3.new(point.X, top, point.Z), Vector3.new(0, -(size.Y + 20), 0), params)
+	return if hit then hit.Position else Vector3.new(point.X, part.Position.Y - size.Y / 2, point.Z)
 end
 
 local function harvest(player: Player, node)
@@ -63,32 +94,29 @@ local function harvest(player: Player, node)
 
 	local def = NodeCatalog.Nodes[node.nodeType]
 	local tool = InventoryService.EquippedTool(player)
-	local base = NodeCatalog.YieldFor(node.nodeType, tool)
-	if base <= 0 then
+	-- Mastery's level-based chance of one extra drop that costs no health (GDD §53).
+	local hit =
+		NodeCatalog.Hit(node.nodeType, node.health, tool, ModifierService.Sum(player, def.mastery .. "Yield"), rng)
+	if hit == nil then
 		-- Ores and gems below their pickaxe gate give nothing (GDD §51).
 		InventoryService.Notify(player, NodeCatalog.GateNotice(node.nodeType, tool) or "You can't gather that.")
 		return
 	end
-	-- Mastery (+1% per level) and the Bounty perk stack through one pipeline.
-	local amount =
-		ModifierRules.RollYield(base, ModifierService.Get(player, def.mastery .. "Yield", "DropQuantity"), rng)
-	local remaining = InventoryService.Add(player, { catalogId = def.material, quantity = amount })
-	if remaining >= amount then
-		InventoryService.Notify(player, "No room for " .. itemName(def.material) .. ".")
-		return
-	end
+	-- The Bounty perk still adds to the material dropped.
+	local material = hit.stacks[1]
+	material.quantity = ModifierRules.RollYield(material.quantity, ModifierService.Get(player, "DropQuantity"), rng)
+	node.health = hit.health
 	ProgressionService.GrantXp(player, "Harvest", "Gathering")
 	ProgressionService.GrantMastery(player, def.mastery, 1)
-	node.hitsLeft -= 1
-	local depleted = node.hitsLeft <= 0
-	-- Resin from trees, Flint from rocks: a per-hit chance plus the finishing hit.
-	for _, extra in NodeCatalog.Extras(node.nodeType, depleted, rng) do
-		InventoryService.Add(player, extra)
+	-- The material, plus Resin from trees and Flint from rocks, lands beside the
+	-- node on the hitter's side.
+	for _, stack in hit.stacks do
+		DropService.Spawn(stack, dropPoint(node, root.Position), { ownerId = player.UserId, color = colorOf(stack) })
 	end
-	if depleted then
+	if hit.depleted then
 		setActive(node, false)
-		task.delay(NodeCatalog.RESPAWN_SECONDS, function()
-			node.hitsLeft = def.hits
+		task.delay(NodeCatalog.RegrowSeconds(node.nodeType), function()
+			node.health = NodeCatalog.Health(node.nodeType)
 			setActive(node, true)
 		end)
 	end
@@ -112,7 +140,7 @@ local function register(part: BasePart, nodeType: string)
 	prompt.MaxActivationDistance = NodeCatalog.HARVEST_RANGE - 2
 	prompt.RequiresLineOfSight = false
 	prompt.Parent = part
-	local node = { part = part, nodeType = nodeType, hitsLeft = def.hits, prompt = prompt, active = true }
+	local node = { part = part, nodeType = nodeType, health = def.health, prompt = prompt, active = true }
 	prompt.Triggered:Connect(function(player)
 		harvest(player, node)
 	end)

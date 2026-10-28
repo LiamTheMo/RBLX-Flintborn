@@ -1,7 +1,10 @@
 -- Enemy archetypes (GDD §7.3, Q44). Themes cover primitive animals, ancient
 -- creatures, skeletons, elementals, evil NPCs and mythological beings; elemental
 -- enemies never give players magic. Elites (alphas) have more health and hit
--- harder. Drops are {catalogId, min, max, chance}. Stats are placeholders.
+-- harder. Drops are {catalogId, min, max, chance}. Creatures drop ore by where
+-- they live (GDD §53): animals and wisps never do; skeletons and raiders carry
+-- Outer Rim copper and iron (raiders rarely silver); the Minotaur hoards Inner
+-- Ring silver and cobalt. Stats are placeholders.
 
 local EnemyCatalog = {}
 
@@ -62,7 +65,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.3,
 		size = Vector3.new(2, 5, 1.5),
 		color = Color3.fromRGB(226, 220, 200),
-		drops = { { "Stone", 3, 6, 1 }, { "IronOre", 1, 3, 0.5 } },
+		drops = { { "Stone", 3, 6, 1 }, { "CopperOre", 1, 3, 0.5 }, { "IronOre", 1, 2, 0.35 } },
 	},
 	EmberWisp = {
 		name = "Ember Wisp",
@@ -86,7 +89,12 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.2,
 		size = Vector3.new(2, 5, 1.5),
 		color = Color3.fromRGB(120, 40, 40),
-		drops = { { "IronOre", 2, 5, 1 }, { "Fiber", 3, 6, 0.6 } },
+		drops = {
+			{ "CopperOre", 2, 4, 0.8 },
+			{ "IronOre", 1, 3, 0.6 },
+			{ "SilverOre", 1, 2, 0.1 },
+			{ "Fiber", 3, 6, 0.6 },
+		},
 	},
 	Minotaur = {
 		name = "Minotaur",
@@ -98,7 +106,7 @@ EnemyCatalog.Enemies = {
 		cooldown = 1.8,
 		size = Vector3.new(4, 8, 3),
 		color = Color3.fromRGB(90, 60, 40),
-		drops = { { "IronOre", 15, 25, 1 }, { "AncientEmber", 1, 1, 1 } },
+		drops = { { "SilverOre", 8, 14, 1 }, { "CobaltOre", 5, 10, 1 }, { "AncientEmber", 1, 1, 1 } },
 	},
 }
 

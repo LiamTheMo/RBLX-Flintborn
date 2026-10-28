@@ -34,7 +34,9 @@ function MasteryCatalog.Buffs(track: string, level: number)
 		return buffs
 	end
 	if track == "Mining" or track == "Woodcutting" or track == "Farming" then
-		-- +1% yield per level, +10% at level 10 (Q75).
+		-- 1% per level, 10% at level 10 (Q75): each node hit's chance of one extra
+		-- drop that costs the node no health (GDD §53); Farming also adds this much
+		-- to planter harvests.
 		table.insert(buffs, { stat = track .. "Yield", op = "Additive", value = YIELD * level })
 	elseif track == "Crafting" then
 		-- Only two benefits (owner decision 2026-10-28, replacing Q77's four): better

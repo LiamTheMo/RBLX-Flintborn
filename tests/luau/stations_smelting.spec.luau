@@ -198,8 +198,9 @@ test("walls, floors, doors and roofs come in all eight tiers; stations in one", 
 	expectEq(BuildRules.StructureDamage(10, "Pickaxe", anvil.material), 15, "pickaxes break the iron anvil")
 end)
 
-test("planters grow four crops from real items", function()
-	expectEq(#StructureCatalog.CROP_ORDER, 4, "four crops")
+test("planters grow five crops from real items", function()
+	-- Redberry, Sweetberry, Herbs, Sapling and Fiber (GDD §53).
+	expectEq(#StructureCatalog.CROP_ORDER, 5, "five crops")
 	for _, cropId in StructureCatalog.CROP_ORDER do
 		local crop = StructureCatalog.Crops[cropId]
 		expect(crop ~= nil, cropId .. " defined")

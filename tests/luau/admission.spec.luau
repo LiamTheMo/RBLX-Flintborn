@@ -76,7 +76,7 @@ test("deploy reserves every unvaulted item and consumes it exactly once", functi
 	expect(not pcall(TransitRules.Consume, profile, "res-1"), "cannot consume twice")
 end)
 
-test("extracted materials never leave the lobby: a deploy leaves them behind", function()
+test("materials deploy with everything else (GDD §53)", function()
 	local profile = ProfileSchema.Default(0)
 	profile.lobbyBackpack.slots = {
 		{ catalogId = "Wood", quantity = 40 },
@@ -87,23 +87,13 @@ test("extracted materials never leave the lobby: a deploy leaves them behind", f
 		{ catalogId = "IronBar", quantity = 3 },
 	}
 	TransitRules.Reserve(profile, "res-m", 10)
-	expectEq(#profile.transit.items, 2, "only the spear and arrows are reserved")
+	expectEq(#profile.transit.items, 6, "every slot is reserved, materials included")
+	expectEq(#profile.lobbyBackpack.slots, 0, "nothing is left behind")
 	for _, item in profile.transit.items do
-		expect(
-			item.catalogId == "StoneSpear" or item.catalogId == "FlintArrow",
-			"no material in transit: " .. item.catalogId
-		)
+		expect(TransitRules.Deployable(item), "deployable: " .. item.catalogId)
 	end
-	expectEq(#profile.lobbyBackpack.slots, 4, "every material stays in the backpack")
-	for _, item in profile.lobbyBackpack.slots do
-		expect(not TransitRules.Deployable(item), "only materials stayed: " .. item.catalogId)
-	end
-	expect(
-		TransitRules.Deployable({ instanceId = "x", catalogId = "Wood" }),
-		"a unique record is never a material stack"
-	)
 	TransitRules.Rollback(profile)
-	expectEq(#profile.lobbyBackpack.slots, 6, "a rollback returns the reserved items beside the materials")
+	expectEq(#profile.lobbyBackpack.slots, 6, "a rollback returns every reserved item")
 end)
 
 test("any failure before Play rolls every item back", function()

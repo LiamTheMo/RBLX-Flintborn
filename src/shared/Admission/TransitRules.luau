@@ -1,26 +1,25 @@
 -- Loss-free transit of a player's unvaulted items between the lobby and a world
--- (GDD §31.4, Q155). Pressing Deploy moves every unvaulted lobby backpack item
--- except materials into one transit reservation: once extracted, materials stay in
--- the lobby for good (vault, Forge, market and trades), whatever route brought
--- them to the backpack. Successful Play consumes it exactly once; any failure
--- before that rolls it back. These functions run inside ProfileService operations.
+-- (GDD §31.4, §53, Q155). Pressing Deploy moves every unvaulted lobby backpack
+-- item, materials included (GDD §53), into one transit reservation. Successful
+-- Play consumes it exactly once; any failure before that rolls it back. These
+-- functions run inside ProfileService operations.
 
-local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 
 local TransitRules = {}
 
 TransitRules.Reserved = "Reserved"
 
--- True for a lobby backpack entry that may enter a run: anything but a material.
+-- True for a lobby backpack entry that may enter a run: every entry, materials
+-- included (GDD §53 reverses §45, which kept materials in the lobby).
 function TransitRules.Deployable(item): boolean
-	return item.instanceId ~= nil or not ItemCatalog.IsMaterial(item.catalogId)
+	return type(item) == "table" and type(item.catalogId) == "string"
 end
 
--- Moves every deployable lobby backpack slot into a new reservation; materials
--- stay behind. Errors (changing nothing, since operations run on a copy) if a
--- reservation already exists, or while a trade settles (a rollback cannot reclaim
--- items carried into a run).
+-- Moves every deployable lobby backpack slot into a new reservation (malformed
+-- entries stay behind). Errors (changing nothing, since operations run on a copy)
+-- if a reservation already exists, or while a trade settles (a rollback cannot
+-- reclaim items carried into a run).
 function TransitRules.Reserve(profile, reservationId: string, now: number)
 	if profile.transit ~= nil then
 		error("A transit reservation already exists")
