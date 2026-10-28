@@ -1,6 +1,7 @@
--- The lobby screen (GDD §11, §25): the profile panel with level and XP, the
--- navigation buttons, Coins and Gems, the party panel, the Enter button and the
--- settings gear, built by Hud/LobbyHud from HudLayout.json's "lobby" section.
+-- The lobby screen (GDD §11, §25; docs/ui/LobbyScreen.md): the profile with level
+-- and XP, the navigation tiles, Coins, Gems and Settings, the party panel and the
+-- Enter button with the server dropdown, built by Hud/LobbyHud from
+-- HudLayout.json's "lobby" section.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
 -- If the HUD fails to build, the lobby falls back to those older visuals.
 --
@@ -122,7 +123,7 @@ local function applyScale()
 	)
 	uiScale.Scale = scale
 	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
-	hud:Fit(size.Y / scale)
+	hud:Fit(size.X / scale, size.Y / scale)
 end
 
 local refreshParty
@@ -295,6 +296,9 @@ local function build()
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = 1
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- The layout uses the master's full-screen coordinates; it keeps clear of the
+	-- top bar itself.
+	gui.IgnoreGuiInset = true
 	root = Instance.new("Frame")
 	root.Name = "Root"
 	root.BackgroundTransparency = 1
@@ -304,11 +308,11 @@ local function build()
 	uiScale.Parent = root
 	hud = LobbyHud.new(root, layout, steady)
 	popups = LobbyPopups.new(root, layout)
-	-- XP pop-ups appear beside the navigation, under the profile panel.
+	-- XP pop-ups appear under the profile panel, above the navigation tiles.
 	local host = Instance.new("Frame")
 	host.Name = "XpPopups"
 	host.BackgroundTransparency = 1
-	host.Position = UDim2.fromOffset(150, 120)
+	host.Position = UDim2.fromOffset(48, 232)
 	host.Size = UDim2.fromOffset(320, 120)
 	host.Parent = root
 	ProgressionController.MountPopups(host)
