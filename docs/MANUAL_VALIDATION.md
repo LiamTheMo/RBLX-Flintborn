@@ -368,7 +368,7 @@ Studio and live checks:
 - [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–6 select hotbar slots (7–9 do nothing), Q drops, and F picks up a dropped item, loots a body and harvests a node.
 - [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
 - [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
-- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
+- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; clicking the waiting key again cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
 - [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the backpack and vault panel in the lobby, and Tab again closes it.
@@ -617,3 +617,17 @@ Studio and live checks (desktop, touch and controller):
 - [ ] Show Names off hides other players' name tags for you only.
 - [ ] Graphics Quality Low turns shadows off and thins fires and effects; High restores them.
 - [ ] Rebinding from the Gameplay key list and from Controls works, swaps clashing keys, refuses reserved ones with a note, and saves on APPLY.
+
+## Parchment Journal (GDD §10.1, §25)
+
+How it's built: `Hud/JournalPanel` (view), `Hud/IslandMap` (the painted map, also for the world Map), `JournalController` (QuestView / QuestClaim). The map image comes from `art/ui/map/render_island.py`. Spec: `docs/ui/JournalScreen.md`.
+
+Automated: `capture.py journal` renders every tab; `journal_flow` checks that an unfinished quest cannot be claimed, a finished one sends its id, the card then reads CLAIMED, and the tabs filter.
+
+Studio and live checks:
+
+- [ ] The lobby's Quests tile opens the Journal; ✕ and gamepad B close it.
+- [ ] The list shows every quest with the right dot (gold: claim waiting, grey: under way, green: claimed); All / Daily / Main filter it; the list scrolls.
+- [ ] Progress moves while the Journal is open (it refreshes every 5 s); CLAIM pays a finished quest once and then reads CLAIMED; Coins and Gems update.
+- [ ] The map matches the island in play (coast, Crater Lake and the Keep, river, Frostpeak's snow, Emberhollow); pins sit on their places; zoom works; the Keep's plate shows for the Guardian quest.
+- [ ] Phones: the window fits; rows, tabs and CLAIM are tappable.

@@ -571,6 +571,38 @@ def disc(a, cx, cy, r):
     return piece
 
 
+def rounded_cut(a, rect, r):
+    """A rounded-rectangle piece (x, y, w, h, corner radius r) cut out of busy art
+    with an anti-aliased mask, where flooding the background would leak."""
+    x, y, w, h = rect
+    piece = cut(a, rect)
+    ys, xs = np.mgrid[0:h + 2 * PAD, 0:w + 2 * PAD]
+    px, py = xs + 0.5 - PAD, ys + 0.5 - PAD
+    dx = np.maximum(np.maximum(r - px, px - (w - r)), 0)
+    dy = np.maximum(np.maximum(r - py, py - (h - r)), 0)
+    inside = np.where((dx > 0) & (dy > 0), r - np.sqrt(dx ** 2 + dy ** 2),
+                      np.minimum(np.minimum(px, w - px), np.minimum(py, h - py)))
+    piece[..., 3] *= np.clip(inside + 0.5, 0, 1)
+    return piece
+
+
+def pin_cut(a, cx, cy, r, tip):
+    """A map pin: the round head (centre cx, cy, radius r) and its pointed foot down
+    to y `tip`, cut out of whatever it is drawn over."""
+    x0, y0 = int(cx - r - PAD), int(cy - r - PAD)
+    w, h = int(2 * r + 2 * PAD), int(tip - y0 + PAD + 1)
+    piece = a[y0:y0 + h, x0:x0 + w].copy()
+    ys, xs = np.mgrid[0:h, 0:w]
+    px, py = xs + 0.5 + x0, ys + 0.5 + y0
+    head = np.clip(r - np.sqrt((px - cx) ** 2 + (py - cy) ** 2) + 0.5, 0, 1)
+    # The foot: a triangle from the head's lower sides to the tip.
+    top = cy + r * 0.66
+    half = r * 0.78 * np.clip((tip - py) / (tip - top), 0, 1)
+    foot = np.clip(half - np.abs(px - cx) + 0.5, 0, 1) * (py >= cy) * (py <= tip + 0.5)
+    piece[..., 3] *= np.maximum(head, foot)
+    return piece
+
+
 def erase_ink(a, rect, dark=True, threshold=None, grow=2, amount=0.8, texture="paper"):
     """Erases text or a glyph inside rect: dark ink on paper, or light ink on leather."""
     x0, y0, x1, y1 = rect
@@ -607,7 +639,11 @@ def build_settings():
     s["pm_glyph_diamond"] = (silhouette(g, (448, 222, 26, 28)), None)
     # Window shell: the tab column and the whole content panel repainted as paper.
     win = erase(g, box(g.shape, (84, 190, 404, 702)), amount=0.8, feather=4)
-    win = erase(win, box(g.shape, (424, 197, 1584, 724)), amount=0.8, feather=4)
+    # RESET and APPLY are drawn back over their own place, so their pixels stay
+    # (repainting them would cut a hard edge into the leather corner beside APPLY).
+    content = box(g.shape, (424, 197, 1584, 724)) & ~box(g.shape, (1074, 630, 1292, 712)) \
+        & ~box(g.shape, (1300, 620, 1590, 720))
+    win = erase(win, content, amount=0.8, feather=4)
     s["pm_window_settings"] = (cut_clean(win, (23, 60, 1626, 702)), None)
     # Controls from the component strip.
     s["pm_check_off"] = (cut_clean(g, (50, 817, 54, 57)), None)
@@ -620,7 +656,66 @@ def build_settings():
         k = erase_ink(g, text, dark=True)
         s[name] = (cut_clean(k, rect), [22, 22, 22, 26] if name == "pm_keycap" else None)
     s["pm_button_reset"] = (plate(g, (1076, 634, 214, 76)), None)
-    s["pm_button_apply"] = (plate(g, (1304, 624, 281, 94)), None)
+    # The leather corner of the window touches APPLY's lower right: cut on the
+    # button's own rounded outline instead.
+    s["pm_button_apply"] = (rounded_cut(g, (1309, 629, 272, 85), 12), None)
+    return s
+
+
+def build_journal():
+    """Journal window (07_journal): the shell with the quest list, the quest card's
+    contents and the map erased, and the pieces the screen is built from. Reward
+    and objective icons come from the icon sheet (04_icons)."""
+    g = sheet("07")
+    s = {}
+    # Window: list column, quest card contents and the map repainted as paper
+    # (the card's and map's own frames stay).
+    win = erase(g, box(g.shape, (60, 142, 441, 760)), amount=0.8, feather=4)
+    win = erase(win, box(g.shape, (468, 140, 932, 761)), amount=0.8, feather=3)
+    win = erase(win, box(g.shape, (972, 140, 1613, 753)), amount=0.8, feather=4)
+    # The strip's map pin overlaps the window's bottom edge: patch that stretch of
+    # frame from the stretch beside it.
+    win[738:792, 1246:1350] = win[738:792, 1126:1230]
+    s["pm_window_journal"] = (cut_clean(win, (22, 20, 1628, 768)), None)
+    # Category tabs: selected leather, normal paper, labels erased.
+    tab = cut_clean(g, (63, 144, 122, 54))
+    s["pm_jtab_leather"] = (erase_ink(tab, (14, 8, 112, 50), dark=False, texture="leather"), [20, 16, 20, 8])
+    tab = plate(g, (189, 146, 125, 52))
+    s["pm_jtab_paper"] = (erase_ink(tab, (16, 8, 110, 50), dark=True), [20, 16, 20, 8])
+    # Quest rows (scroll icon and chevron kept; name and status dot erased).
+    row = plate(g, (68, 204, 366, 92))
+    row = erase_ink(row, (92, 14, 296, 80), dark=True)
+    s["pm_quest_row_selected"] = (erase(row, box(row.shape, (290, 18, 332, 74)), amount=1.0, feather=2), [40, 30, 40, 30])
+    # A plain row as the list draws it (cut on its rounded outline).
+    row = rounded_cut(g, (72, 299, 358, 84), 8)
+    row = erase_ink(row, (96, 12, 292, 76), dark=True)
+    s["pm_quest_row"] = (erase(row, box(row.shape, (290, 24, 326, 60)), amount=1.0, feather=2), [40, 30, 40, 30])
+    # Leather strip buttons with their labels erased (CLAIM, the active count).
+    claim = plate(g, (506, 682, 388, 78))
+    s["pm_button_claim"] = (erase_ink(claim, (90, 12, 300, 64), dark=False, texture="leather"), [70, 26, 70, 26])
+    count = plate(g, (76, 675, 354, 76))
+    s["pm_button_strip"] = (erase_ink(count, (70, 12, 290, 62), dark=False, texture="leather"), [64, 26, 64, 26])
+    # Card pieces.
+    # The mountain mark in the middle of the card's dividers (the lines are drawn
+    # natively, so the mark never stretches).
+    s["pm_glyph_mountain"] = (silhouette(g, (668, 522, 62, 32), lo=0.35, hi=0.8), None)
+    s["pm_check_green"] = (rounded_cut(g, (485, 448, 32, 32), 5), None)
+    # Map pieces: compass rose, zoom buttons, the red pin and its name plate.
+    s["pm_compass_rose"] = (silhouette(g, (1500, 146, 106, 120), lo=0.3, hi=0.7), None)
+    s["pm_button_zoom_in"] = (rounded_cut(g, (1546, 540, 62, 62), 10), None)
+    s["pm_button_zoom_out"] = (rounded_cut(g, (1546, 606, 62, 63), 10), None)
+    s["pm_map_pin"] = (pin_cut(g, 1297, 789, 40, 862), None)
+    label = plate(g, (1262, 808, 296, 104))
+    s["pm_map_label"] = (erase_ink(label, (70, 20, 260, 68), dark=True), [40, 30, 40, 30])
+    # The painted island (art/ui/map/render_island.py) for the map panels.
+    island = np.asarray(Image.open(HERE / "map" / "island.png").convert("RGBA"), np.float32) / 255
+    s["pm_map_island"] = (island, None)
+    # Icons from the icon sheet (on transparency).
+    i = sheet("04")
+    s["pm_icon_scroll"] = (cut_clean(i, (552, 484, 178, 160)), None)
+    s["pm_icon_coin"] = (cut_clean(i, (1058, 494, 172, 162)), None)
+    s["pm_icon_gem"] = (cut_clean(i, (1318, 488, 124, 164)), None)
+    s["pm_icon_bolt"] = (cut_clean(i, (838, 662, 126, 156)), None)
     return s
 
 
@@ -648,6 +743,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     sprites = build()
     sprites.update(build_settings())
+    sprites.update(build_journal())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]

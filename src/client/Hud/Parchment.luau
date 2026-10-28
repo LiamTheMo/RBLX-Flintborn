@@ -6,6 +6,7 @@
 -- the window's UIScale maps them to the screen. Sprites without an uploaded id
 -- fall back to Widgets' warm paper plates, so a screen reads before upload.
 
+local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -33,6 +34,17 @@ local SERIF = "serif"
 local function rect(r): (UDim2, UDim2)
 	return UDim2.fromOffset(r[1], r[2]), UDim2.fromOffset(r[3], r[4])
 end
+
+-- The 9-slice corner scale for sprite `name` drawn at `r`'s size, so its corners
+-- shrink with a small box instead of overlapping (nil when it does not slice).
+local function sliceFor(name: string, r): number?
+	local sprite = UiAssets.sprite(name)
+	if sprite == nil or type(sprite.slice) ~= "table" then
+		return nil
+	end
+	return HudModel.SliceScale(sprite.w, sprite.h, r[3], r[4])
+end
+Parchment.SliceFor = sliceFor
 
 local function assign(object: Instance, props)
 	if props then
@@ -81,19 +93,43 @@ function Parchment.Rule(r, parent: Instance, colorKey: string?, z: number?): Fra
 end
 
 -- A section header: the small diamond mark, capital ink text and a rule under it.
--- `r` spans the whole header from the mark to the rule's right end.
-function Parchment.Header(text: string, r, parent: Instance): TextLabel
+-- `r` spans the whole header from the mark to the rule's right end; the rule
+-- starts at `ruleX` when given (clear of a column divider beside the mark).
+function Parchment.Header(text: string, r, parent: Instance, ruleX: number?): TextLabel
 	local x, y, w, h = r[1], r[2], r[3], r[4]
 	Widgets.Sprite("pm_glyph_diamond", {
 		Name = "Mark",
 		Position = UDim2.fromOffset(x, y + h / 2 - 15),
 		Size = UDim2.fromOffset(26, 28),
-		ImageColor3 = Layout.Color("leather"),
+		ImageColor3 = Layout.Color("headerRule"),
 		ZIndex = 4,
 	}, parent)
-	local label = Parchment.Text(string.upper(text), { x + 41, y, w - 41, h }, parent, { size = 33, name = "Header" })
-	Parchment.Rule({ x, y + h + 2, w, 2 }, parent, "headerRule")
+	local label = Parchment.Text(string.upper(text), { x + 41, y, w - 41, h }, parent, { size = 29, name = "Header" })
+	local from = ruleX or x
+	Parchment.Rule({ from, y + h + 2, x + w - from, 2 }, parent, "headerRule")
 	return label
+end
+
+-- A divider: two ruled lines with the mountain mark between them, centred in `r`.
+function Parchment.Divider(r, parent: Instance, colorKey: string?)
+	local color = colorKey or "headerRule"
+	local x, y, w, h = r[1], r[2], r[3], r[4]
+	local markW, markH, gap = 44, 27, 14
+	local mid = x + w / 2
+	local lineY = y + h / 2 - 1.5
+	local left = Parchment.Rule({ x, lineY, w / 2 - markW / 2 - gap, 3 }, parent, color, 4)
+	local right = Parchment.Rule({ mid + markW / 2 + gap, lineY, w / 2 - markW / 2 - gap, 3 }, parent, color, 4)
+	for _, line in { left, right } do
+		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, line)
+	end
+	Widgets.Sprite("pm_glyph_mountain", {
+		Name = "Mark",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromOffset(mid, y + h / 2 - 2),
+		Size = UDim2.fromOffset(markW, markH),
+		ImageColor3 = Layout.Color(color),
+		ZIndex = 4,
+	}, parent)
 end
 
 -- A transparent button over `holder` that tints `art` for hover and press.
@@ -161,11 +197,13 @@ local function pressable(holder: GuiObject, art: GuiObject?, onPress, pad: numbe
 			onPress()
 		end
 	end)
-	return button, function(on: boolean)
-		enabled = on
-		button.AutoButtonColor = false
-		rest()
-	end
+	return button,
+		function(on: boolean)
+			enabled = on
+			-- A disabled control is skipped by gamepad selection.
+			button.Selectable = on
+			rest()
+		end
 end
 Parchment.Pressable = pressable
 
@@ -181,7 +219,12 @@ function Parchment.Button(sprite: string, r, parent: Instance, onPress, opts)
 		Size = extent,
 		ZIndex = opts.z or 4,
 	}, parent) :: Frame
-	local art = Widgets.Sprite(sprite, { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = holder.ZIndex }, holder)
+	local art = Widgets.Sprite(
+		sprite,
+		{ Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = holder.ZIndex },
+		holder,
+		sliceFor(sprite, r)
+	)
 	local label = nil
 	if opts.label then
 		-- Clear of the art's sliced corners, which scale with the button's height.
@@ -260,6 +303,8 @@ function Parchment.Tab(r, parent: Instance, label: string, glyph: string, onPres
 	}
 end
 
+local sliders = 0
+
 -- A horizontal slider: a dark rounded track, a gold fill and the brass knob.
 -- `r` is the track. Dragging (mouse or touch) or clicking the track calls
 -- onChange(value) with a value snapped to `step`. Returns {Set, holder}.
@@ -303,13 +348,15 @@ function Parchment.Slider(r, parent: Instance, min: number, max: number, step: n
 		value = math.clamp(v, min, max)
 		place(if max > min then (value - min) / (max - min) else 0)
 	end
+	-- The drag band reaches well above and below the thin track, for fingers.
+	local band = math.max(knobSize, 56)
 	local hit = Widgets.Make("TextButton", {
 		Name = "Drag",
 		Text = "",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(-knobSize / 2, -knobSize / 2 + r[4] / 2),
-		Size = UDim2.new(1, knobSize, 0, knobSize),
+		Position = UDim2.fromOffset(-knobSize / 2, -band / 2 + r[4] / 2),
+		Size = UDim2.new(1, knobSize, 0, band),
 		ZIndex = 7,
 	}, holder) :: TextButton
 	local dragging: InputObject? = nil
@@ -352,26 +399,44 @@ function Parchment.Slider(r, parent: Instance, min: number, max: number, step: n
 			dragging = nil
 		end
 	end)
-	-- Gamepad: the knob steps left and right while the slider is selected.
+	-- Gamepad: while the slider is selected, left and right step the value. They
+	-- are bound above the selection navigation and sunk, so focus stays put; up
+	-- and down still move between controls.
+	sliders += 1
+	local stepAction = "FlintbornSliderStep" .. sliders
+	local function nudge(delta: number)
+		local nextValue = math.round(math.clamp(value + delta, min, max) * 1000) / 1000
+		if nextValue ~= value then
+			set(nextValue)
+			onChange(nextValue)
+		end
+	end
 	hit.SelectionGained:Connect(function()
 		knob.Size = UDim2.fromOffset(knobSize * 1.1, knobSize * 1.1)
+		ContextActionService:BindActionAtPriority(
+			stepAction,
+			function(_, state, input)
+				if state == Enum.UserInputState.Begin then
+					local key = input.KeyCode
+					if key == Enum.KeyCode.DPadRight or key == Enum.KeyCode.Right then
+						nudge(step)
+					elseif key == Enum.KeyCode.DPadLeft or key == Enum.KeyCode.Left then
+						nudge(-step)
+					end
+				end
+				return Enum.ContextActionResult.Sink
+			end,
+			false,
+			Enum.ContextActionPriority.High.Value + 50,
+			Enum.KeyCode.DPadLeft,
+			Enum.KeyCode.DPadRight,
+			Enum.KeyCode.Left,
+			Enum.KeyCode.Right
+		)
 	end)
 	hit.SelectionLost:Connect(function()
 		knob.Size = UDim2.fromOffset(knobSize, knobSize)
-	end)
-	hit.InputBegan:Connect(function(input: InputObject)
-		local key = input.KeyCode
-		local delta = if key == Enum.KeyCode.DPadRight or key == Enum.KeyCode.Right
-			then step
-			elseif key == Enum.KeyCode.DPadLeft or key == Enum.KeyCode.Left then -step
-			else 0
-		if delta ~= 0 then
-			local nextValue = math.round(math.clamp(value + delta, min, max) * 1000) / 1000
-			if nextValue ~= value then
-				set(nextValue)
-				onChange(nextValue)
-			end
-		end
+		ContextActionService:UnbindAction(stepAction)
 	end)
 	set(min)
 	return { holder = holder, button = hit, Set = set }
@@ -413,7 +478,7 @@ function Parchment.Checkbox(r, parent: Instance, label: string, onToggle)
 	local button = pressable(holder, nil, function()
 		set(not checked)
 		onToggle(checked)
-	end)
+	end, 6)
 	set(false)
 	return { holder = holder, button = button, Set = set }
 end
@@ -429,8 +494,26 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 		Size = extent,
 		ZIndex = 4,
 	}, parent) :: Frame
-	local art = Widgets.Sprite("pm_dropdown", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 4 }, holder)
+	local art = Widgets.Sprite(
+		"pm_dropdown",
+		{ Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 4 },
+		holder,
+		sliceFor("pm_dropdown", r)
+	)
 	local text = Parchment.Text("", { 30, 0, r[3] - 100, r[4] }, holder, { size = 25, z = 5 })
+	-- While open, the whole dropdown rises above its neighbours (the list must
+	-- draw and take presses over them), and a press anywhere else closes it.
+	local catcher = Widgets.Make("TextButton", {
+		Name = "Outside",
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(-4000, -4000),
+		Size = UDim2.new(1, 8000, 1, 8000),
+		Selectable = false,
+		Visible = false,
+		ZIndex = 19,
+	}, holder) :: TextButton
 	local rowHeight = 48
 	local listHeight = rowHeight * #options + 12
 	local list = Widgets.Make("Frame", {
@@ -444,6 +527,14 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 	}, holder) :: Frame
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, list)
 	Widgets.Make("UIStroke", { Color = Layout.Color("paperEdge"), Thickness = 2 }, list)
+	local function open(on: boolean)
+		list.Visible = on
+		catcher.Visible = on
+		holder.ZIndex = if on then 15 else 4
+	end
+	catcher.Activated:Connect(function()
+		open(false)
+	end)
 	local chosen = options[1]
 	local rows = {}
 	local function set(value: string)
@@ -475,7 +566,7 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 			row.BackgroundTransparency = if option == chosen then 0.75 else 1
 		end)
 		row.Activated:Connect(function()
-			list.Visible = false
+			open(false)
 			if option ~= chosen then
 				set(option)
 				onSelect(option)
@@ -483,7 +574,7 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 		end)
 	end
 	local button = pressable(holder, art, function()
-		list.Visible = not list.Visible
+		open(not list.Visible)
 	end)
 	set(chosen)
 	return {
@@ -491,7 +582,10 @@ function Parchment.Dropdown(r, parent: Instance, options: { string }, onSelect, 
 		button = button,
 		Set = set,
 		Close = function()
-			list.Visible = false
+			open(false)
+		end,
+		IsOpen = function(): boolean
+			return list.Visible
 		end,
 	}
 end
@@ -514,16 +608,24 @@ function Parchment.Keycap(text: string, r, parent: Instance, onPress)
 		Size = extent,
 		ZIndex = 4,
 	}, parent) :: Frame
-	local art = Widgets.Sprite("pm_keycap", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 4 }, holder, 0.62)
-	-- The label follows the cap when SetKeys widens it for a longer key name.
-	local label = Parchment.Text(text, { 6, 2, r[3] - 12, r[4] - 8 }, holder, {
+	-- The cap art has a few transparent pixels round it: drawn that much larger so
+	-- the visible cap fills the box.
+	local art = Widgets.Sprite("pm_keycap", {
+		Name = "Art",
+		Position = UDim2.fromOffset(-3, -3),
+		Size = UDim2.new(1, 6, 1, 6),
+		ZIndex = 4,
+	}, holder, 0.66)
+	-- The label follows the cap when SetKeys widens it for a longer key name; it
+	-- sits a little high, above the cap's thicker bottom edge.
+	local label = Parchment.Text(text, { 6, 3, r[3] - 12, r[4] - 9 }, holder, {
 		size = 21,
 		align = "Center",
 		scaled = true,
 		minSize = 10,
 		z = 5,
 	})
-	label.Size = UDim2.new(1, -12, 1, -8)
+	label.Size = UDim2.new(1, -12, 1, -9)
 	local result = { holder = holder, art = art, label = label }
 	function result.SetText(value: string)
 		label.Text = value
@@ -573,7 +675,9 @@ function Parchment.Screen(name: string, size: { number }, displayOrder: number?,
 		BackgroundColor3 = Layout.Color("veil"),
 		BackgroundTransparency = 0.45,
 		BorderSizePixel = 0,
-		Size = UDim2.fromScale(1, 1),
+		-- Past the safe-area edges too, so a notch's strip is veiled as well.
+		Position = UDim2.fromOffset(-400, -400),
+		Size = UDim2.new(1, 800, 1, 800),
 		ZIndex = 0,
 	}, gui) :: Frame
 	local window = Widgets.Make("Frame", {
@@ -596,6 +700,12 @@ function ScreenMethods:Fit(width: number, height: number, topInset: number?, use
 	local top = topInset or 0
 	local margin = Parchment.MARGIN
 	local roomW, roomH = width - margin * 2, height - top - margin * 2
+	-- A window already shrunk to fit (phones) is never shrunk further by a UI
+	-- scale below 1; that would only make its text unreadable.
+	local fit = math.min(roomW / self.size[1], roomH / self.size[2])
+	if fit < 1 then
+		userScale = math.max(userScale or 1, 1)
+	end
 	local scale =
 		HudModel.HudScale(roomW, roomH, self.size[1], self.size[2], Parchment.MIN_SCALE, Parchment.MAX_SCALE, userScale)
 	self.scale.Scale = scale

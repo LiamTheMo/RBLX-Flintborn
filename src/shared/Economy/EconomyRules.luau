@@ -217,6 +217,7 @@ function EconomyRules.QuestView(profile, now: number)
 			needed = quest.count,
 			claimed = entry.claimed,
 			repeats = quest.repeats,
+			action = quest.action,
 		})
 	end
 	return list

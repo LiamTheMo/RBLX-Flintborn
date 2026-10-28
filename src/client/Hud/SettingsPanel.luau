@@ -55,9 +55,9 @@ SettingsPanel.TAB_KEYS = {
 -- Labels shown for keys that read badly as KeyCode names.
 local KEY_TEXT = {
 	LeftShift = "SHIFT",
-	RightShift = "SHIFT",
+	RightShift = "R SHIFT",
 	LeftControl = "CTRL",
-	RightControl = "CTRL",
+	RightControl = "R CTRL",
 	LeftAlt = "ALT",
 	RightAlt = "ALT",
 }
@@ -79,6 +79,8 @@ end
 local LEFT = { mark = 448, label = 491, slider = 683, sliderWidth = 260, value = 966, right = 1021 }
 local RIGHT = { mark = 1060, label = 1123, key = 1279, right = 1558 }
 local HEADER_Y = 220
+-- The right column's header rules start clear of the column divider.
+local RIGHT_RULE = 1100 - ORIGIN[1]
 local SLIDER_ROWS = { 303, 360, 418 }
 local CHECK_ROWS = { 480, 531, 585 }
 local KEY_ROWS = { 300, 367, 436, 507, 578 }
@@ -152,7 +154,7 @@ function SettingsPanel.new(parent: Instance?, handlers)
 	self.reset = Parchment.Button("pm_button_reset", at(1077, 634, 212, 77), window, function()
 		handlers.onReset(self.tab)
 	end, { name = "Reset" })
-	self.apply = Parchment.Button("pm_button_apply", at(1302, 624, 284, 94), window, function()
+	self.apply = Parchment.Button("pm_button_apply", at(1307, 627, 276, 89), window, function()
 		handlers.onApply()
 	end, { name = "Apply" })
 	self:SetDirty(false)
@@ -178,7 +180,7 @@ end
 function SettingsPanel:_slider(page: Instance, cy: number, label: string, key: string, format)
 	local setting = SettingsRules.Get(key)
 	Parchment.Text(label, at(LEFT.label, cy - 20, LEFT.slider - LEFT.label - 4, 40), page, {
-		size = 20,
+		size = 19.5,
 		scaled = true,
 	})
 	local value = Parchment.Text("", at(LEFT.value, cy - 20, LEFT.right - LEFT.value, 40), page, { size = 21 })
@@ -229,13 +231,13 @@ end
 
 -- The right column's notes: a header and wrapped text.
 local function notes(page: Instance, title: string, text: string)
-	Parchment.Header(title, at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page)
+	Parchment.Header(title, at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page, RIGHT_RULE)
 	Parchment.Text(text, at(1100, 280, 458, 330), page, { size = 21, wrap = true, color = "inkSoft" }).TextYAlignment =
 		Enum.TextYAlignment.Top
 end
 
 local function divider(page: Instance)
-	Parchment.Rule(at(1061, 248, 2, 368), page, "headerRule")
+	Parchment.Rule(at(1061, 264, 2, 352), page, "headerRule")
 end
 
 -- A key row: label and one rebindable keycap at reference y `cy`.
@@ -266,7 +268,7 @@ function SettingsPanel:_gameplay(page: Instance)
 	self:_quality(page, 663, true)
 	divider(page)
 
-	Parchment.Header("Key Bindings", at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page)
+	Parchment.Header("Key Bindings", at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page, RIGHT_RULE)
 	-- Movement stays on W A S D (Roblox's own); it is shown, not rebindable.
 	Parchment.Text("Move", at(RIGHT.label, KEY_ROWS[1] - 20, 150, 40), page, { size = 21 })
 	for index, letter in { "W", "A", "S", "D" } do
@@ -279,7 +281,7 @@ function SettingsPanel:_gameplay(page: Instance)
 	for _, y in { 333, 402, 471, 542, 612 } do
 		rightRule(page, y)
 	end
-	self.notes.Gameplay = Parchment.Text("", at(1100, 614, 458, 22), page, { size = 16, color = "leather" })
+	self.notes.Gameplay = Parchment.Text("", at(1100, 615, 458, 18), page, { size = 15, color = "leather" })
 end
 
 function SettingsPanel:_audio(page: Instance)
@@ -294,7 +296,7 @@ function SettingsPanel:_audio(page: Instance)
 	notes(
 		page,
 		"About Sound",
-		"Music sets the soundtrack's volume and Effects every other sound: combat, tools, "
+		"Music sets the volume of music tracks, and Effects every other sound: combat, tools, "
 			.. "alerts and the world around you.\n\nSubtitles write alert sounds (storms, "
 			.. "bosses, extraction) on screen as well."
 	)
@@ -372,7 +374,7 @@ function SettingsPanel:_accessibility(page: Instance)
 	self:_slider(page, 478, "UI Scale", "uiScale", times)
 	leftRule(page, 505)
 	divider(page)
-	Parchment.Header("Tutorial", at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page)
+	Parchment.Header("Tutorial", at(RIGHT.mark, HEADER_Y, RIGHT.right - RIGHT.mark, 34), page, RIGHT_RULE)
 	Parchment.Text(
 		"Walk through the first steps again: gathering, crafting and getting out alive.",
 		at(1100, 280, 458, 90),
@@ -425,10 +427,25 @@ function SettingsPanel:SetKeys(map, capturing: string?, note: string?, canRebind
 	end
 	local hint = if not canRebind
 		then "Connect a keyboard to change keys. Gamepad buttons are fixed."
-		elseif capturing then ("Press the new key for %s. Esc cancels."):format(Keybinds.Get(capturing).label)
+		elseif capturing then ("Press the new key for %s, or click it again to cancel."):format(
+			Keybinds.Get(capturing).label
+		)
 		else "Click a key, then press the new one. A key another action uses swaps with it."
 	self.notes.Controls.Text = if note and note ~= "" then note .. "\n" .. hint else hint
-	self.notes.Gameplay.Text = note or (if capturing then "Press a key. Esc cancels." else "")
+	self.notes.Gameplay.Text = if capturing then "Press a key, or click it again to cancel." else note or ""
+end
+
+-- Closes an open dropdown list; true when one was open (gamepad B closes the
+-- list before the window).
+function SettingsPanel:CloseDropdowns(): boolean
+	local any = false
+	for _, dropdown in self.dropdowns do
+		if dropdown.IsOpen() then
+			dropdown.Close()
+			any = true
+		end
+	end
+	return any
 end
 
 -- APPLY is bright only while there is something to save.

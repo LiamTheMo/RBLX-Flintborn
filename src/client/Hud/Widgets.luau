@@ -48,6 +48,33 @@ local function apply(object: Instance, props)
 	return object
 end
 
+-- Properties only images have: a stand-in Frame (or a tiled sprite's holder)
+-- skips them, so a caller can tint or slice a sprite without knowing whether its
+-- art is uploaded yet.
+local IMAGE_ONLY = {
+	Image = true,
+	ImageColor3 = true,
+	ImageTransparency = true,
+	ImageRectOffset = true,
+	ImageRectSize = true,
+	ResampleMode = true,
+	ScaleType = true,
+	SliceCenter = true,
+	SliceScale = true,
+	TileSize = true,
+}
+
+local function applyFrame(object: Instance, props)
+	if props then
+		for key, value in props do
+			if not IMAGE_ONLY[key] then
+				(object :: any)[key] = value
+			end
+		end
+	end
+	return object
+end
+
 function Widgets.Make(className: string, props, parent: Instance?)
 	local object = Instance.new(className)
 	apply(object, props)
@@ -72,7 +99,50 @@ Widgets.PARCHMENT_GLYPHS = {
 	pm_button_x = { "✕", "ink" },
 	pm_button_check = { "✓", "ink" },
 	pm_lobby_gear = { "⚙", "ink" },
+	pm_glyph_gear = { "⚙", "ink" },
+	pm_glyph_sound = { "♪", "ink" },
+	pm_glyph_monitor = { "▭", "ink" },
+	pm_glyph_gamepad = { "✚", "ink" },
+	pm_glyph_person = { "☺", "ink" },
+	pm_glyph_diamond = { "◆", "leather" },
+	pm_glyph_mountain = { "▲", "leather" },
+	pm_icon_coin = { "●", "gold" },
+	pm_icon_gem = { "◆", "cyan" },
+	pm_icon_bolt = { "⚡", "gold" },
+	pm_icon_scroll = { "✉", "ink" },
+	pm_compass_rose = { "N", "ink" },
+	pm_check_on = { "✓", "ink" },
+	pm_check_green = { "✓", "stamina" },
+	pm_button_zoom_in = { "+", "ink" },
+	pm_button_zoom_out = { "−", "ink" },
+	pm_map_pin = { "▼", "leather" },
 }
+
+-- Words baked into button and window art, written on their stand-ins.
+Widgets.PARCHMENT_LABELS = {
+	pm_button_apply = "APPLY",
+	pm_button_reset = "RESET",
+	pm_window_settings = "SETTINGS",
+	pm_window_journal = "JOURNAL",
+}
+
+-- Stand-ins drawn as leather rather than paper.
+local LEATHER = {
+	pm_lobby_enter = true,
+	pm_button_apply = true,
+	pm_button_claim = true,
+	pm_button_strip = true,
+	pm_tab_leather = true,
+	pm_jtab_leather = true,
+}
+
+-- Stand-ins with no plate behind their glyph.
+local function bare(name: string): boolean
+	return string.sub(name, 1, 8) == "pm_icon_"
+		or string.sub(name, 1, 9) == "pm_glyph_"
+		or name == "pm_compass_rose"
+		or name == "pm_map_pin"
+end
 
 -- Coins and Gems plates: a coloured mark at the left where the art has its coin
 -- or gem, so the two read apart before upload.
@@ -83,11 +153,17 @@ Widgets.PARCHMENT_BADGES = {
 
 local function parchmentFallback(name: string, props, parent: Instance?)
 	local frame = Widgets.Make("Frame", { Name = name, BorderSizePixel = 0 }, parent)
-	local leather = name == "pm_lobby_enter" or string.find(name, "^pm_button_leather") ~= nil
+	local leather = LEATHER[name] or string.find(name, "^pm_button_leather") ~= nil
 	if name == "pm_fill_xp" then
 		frame.BackgroundColor3 = Layout.Color("xp")
 		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, frame)
-		return apply(frame, props)
+		return applyFrame(frame, props)
+	end
+	if name == "pm_slider_knob" then
+		frame.BackgroundColor3 = Layout.Color("paperEdge")
+		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, frame)
+		Widgets.Make("UIStroke", { Color = Layout.Color("ink"), Thickness = 2 }, frame)
+		return applyFrame(frame, props)
 	end
 	frame.BackgroundColor3 = Layout.Color(if leather then "leather" else "paper")
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 8) }, frame)
@@ -107,12 +183,44 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 		}, frame)
 		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
 	end
-	local glyph = Widgets.PARCHMENT_GLYPHS[name]
-	if glyph then
-		if string.sub(name, 1, 8) == "pm_icon_" then
-			frame.BackgroundTransparency = 1
-			frame:FindFirstChildOfClass("UIStroke"):Destroy()
+	local words = Widgets.PARCHMENT_LABELS[name]
+	if words then
+		local window = string.sub(name, 1, 10) == "pm_window_"
+		local label = Widgets.Make("TextLabel", {
+			Name = "Words",
+			BackgroundTransparency = 1,
+			Position = if window then UDim2.new(0.3, 0, 0, 20) else UDim2.fromScale(0.1, 0.15),
+			Size = if window then UDim2.new(0.4, 0, 0, 60) else UDim2.fromScale(0.8, 0.7),
+			Text = words,
+			TextColor3 = Layout.Color(if leather then "cream" else "ink"),
+			TextScaled = true,
+			Font = Enum.Font.GothamBold,
+			ZIndex = (props and props.ZIndex or 1) + 1,
+		}, frame)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 44 }, label)
+		if window then
+			-- The window art's close button: a ✕ where it is painted.
+			local close = Widgets.Make("TextLabel", {
+				Name = "CloseMark",
+				AnchorPoint = Vector2.new(1, 0),
+				BackgroundTransparency = 1,
+				Position = UDim2.new(1, -40, 0, 40),
+				Size = UDim2.fromOffset(70, 70),
+				Text = "✕",
+				TextColor3 = Layout.Color("ink"),
+				TextScaled = true,
+				Font = Enum.Font.GothamBold,
+				ZIndex = (props and props.ZIndex or 1) + 1,
+			}, frame)
+			Widgets.Make("UITextSizeConstraint", { MaxTextSize = 48 }, close)
 		end
+	end
+	local glyph = Widgets.PARCHMENT_GLYPHS[name]
+	if bare(name) then
+		frame.BackgroundTransparency = 1
+		frame:FindFirstChildOfClass("UIStroke"):Destroy()
+	end
+	if glyph then
 		local mark = Widgets.Make("TextLabel", {
 			Name = "Glyph",
 			BackgroundTransparency = 1,
@@ -125,7 +233,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 		}, frame)
 		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
 	end
-	return apply(frame, props)
+	return applyFrame(frame, props)
 end
 
 local function fallback(name: string, props, parent: Instance?)
@@ -142,7 +250,7 @@ local function fallback(name: string, props, parent: Instance?)
 			TextScaled = true,
 			Font = Enum.Font.GothamBold,
 		}, parent)
-		return apply(label, props)
+		return applyFrame(label, props)
 	end
 	local frame = Widgets.Make("Frame", { Name = name, BorderSizePixel = 0 }, parent)
 	local fillKey = Widgets.FILL_COLORS[name]
@@ -170,7 +278,7 @@ local function fallback(name: string, props, parent: Instance?)
 			Widgets.Make("UIStroke", { Color = Layout.Color("fallbackStroke"), Thickness = 2 }, frame)
 		end
 	end
-	return apply(frame, props)
+	return applyFrame(frame, props)
 end
 
 -- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
@@ -186,7 +294,7 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 		ids[tile[1]] = id
 	end
 	local holder = Widgets.Make("Frame", { Name = name, BackgroundTransparency = 1 }, parent)
-	apply(holder, props)
+	applyFrame(holder, props)
 	for _, tile in sprite.tiles do
 		local image = Widgets.Make("ImageLabel", {
 			Name = tile[1],

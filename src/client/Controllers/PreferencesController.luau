@@ -71,16 +71,24 @@ local function routeSounds()
 	end)
 end
 
+-- Set once the camera input is wrapped: sensitivity then scales mouse, touch and
+-- gamepad look alike; until then (or without the module) it scales the mouse only.
+local hooked = false
+
 local function applySensitivity()
 	pcall(function()
-		UserInputService.MouseDeltaSensitivity = SettingsRules.MouseSensitivity(value("cameraSensitivity"))
+		UserInputService.MouseDeltaSensitivity = if hooked
+			then 1
+			else SettingsRules.MouseSensitivity(value("cameraSensitivity"))
 	end)
 end
 
--- Inverted camera: Roblox's camera reads look input through the PlayerModule's
--- CameraInput.getRotation; wrapping it flips the vertical part while the setting
--- is on. Without that module (a forked or missing camera) the setting does nothing.
-local function hookInvert()
+-- Camera sensitivity and inversion: Roblox's camera reads look input (mouse,
+-- touch and gamepad) through the PlayerModule's CameraInput.getRotation; wrapping
+-- it scales the turn and flips its vertical part while the setting is on. Without
+-- that module (a forked or missing camera) inversion does nothing and sensitivity
+-- falls back to the mouse.
+local function hookCamera()
 	task.spawn(function()
 		local scripts = player:WaitForChild("PlayerScripts", 30)
 		local module = scripts and scripts:WaitForChild("PlayerModule", 30)
@@ -97,21 +105,36 @@ local function hookInvert()
 		local getRotation = CameraInput.getRotation
 		CameraInput.getRotation = function(...)
 			local rotation = getRotation(...)
-			if typeof(rotation) == "Vector2" and player:GetAttribute("InvertCamera") == true then
-				return Vector2.new(rotation.X, -rotation.Y)
+			if typeof(rotation) ~= "Vector2" then
+				return rotation
 			end
-			return rotation
+			local k = SettingsRules.MouseSensitivity(value("cameraSensitivity"))
+			local flip = if player:GetAttribute("InvertCamera") == true then -1 else 1
+			return Vector2.new(rotation.X * k, rotation.Y * k * flip)
 		end
+		hooked = true
+		applySensitivity()
 	end)
 end
 
--- Other players' name tags, shown or hidden.
+-- Other players' name tags, shown or hidden. Hiding remembers the tag's own
+-- setting so showing again restores it.
+local shownAs = setmetatable({}, { __mode = "k" })
+local nameWatch = {}
+
 local function applyName(character: Model?)
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	if humanoid then
-		humanoid.DisplayDistanceType = if value("showNames")
-			then Enum.HumanoidDisplayDistanceType.Viewer
-			else Enum.HumanoidDisplayDistanceType.None
+	if humanoid == nil then
+		return
+	end
+	if value("showNames") then
+		if shownAs[humanoid] then
+			humanoid.DisplayDistanceType = shownAs[humanoid]
+			shownAs[humanoid] = nil
+		end
+	elseif humanoid.DisplayDistanceType ~= Enum.HumanoidDisplayDistanceType.None then
+		shownAs[humanoid] = humanoid.DisplayDistanceType
+		humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	end
 end
 
@@ -119,7 +142,7 @@ local function watchPlayer(other: Player)
 	if other == player then
 		return
 	end
-	other.CharacterAdded:Connect(function(character)
+	nameWatch[other] = other.CharacterAdded:Connect(function(character)
 		character:WaitForChild("Humanoid", 10)
 		applyName(character)
 	end)
@@ -160,11 +183,17 @@ function PreferencesController.Start()
 	applyVolumes()
 	routeSounds()
 	applySensitivity()
-	hookInvert()
+	hookCamera()
 	for _, other in Players:GetPlayers() do
 		watchPlayer(other)
 	end
 	Players.PlayerAdded:Connect(watchPlayer)
+	Players.PlayerRemoving:Connect(function(other)
+		if nameWatch[other] then
+			nameWatch[other]:Disconnect()
+			nameWatch[other] = nil
+		end
+	end)
 	applyGraphics()
 	workspace.DescendantAdded:Connect(scaleParticles)
 	local handlers = {
