@@ -1,0 +1,2492 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W13",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w13_banner",
+    "hex": "#C3262A",
+    "levels": [
+     0.93469,
+     0.94366,
+     0.95354,
+     0.95606,
+     1.00378,
+     1.02321,
+     1.02823,
+     1.03471,
+     1.05217,
+     1.06023
+    ],
+    "used": false
+   },
+   {
+    "key": "w13_canvas",
+    "hex": "#EEDFBF",
+    "levels": [
+     0.93179,
+     0.95345,
+     0.96373,
+     0.96377,
+     0.96377,
+     0.96377,
+     0.97839,
+     0.97919,
+     0.9895,
+     0.9895,
+     0.99194,
+     0.99278,
+     0.99278,
+     0.9972,
+     0.9972,
+     0.9975,
+     0.9975,
+     1.01122,
+     1.01456,
+     1.01629,
+     1.01629,
+     1.04023,
+     1.04242,
+     1.04587,
+     1.04587,
+     1.04587,
+     1.04929,
+     1.05661,
+     1.06097,
+     1.06097,
+     1.0626,
+     1.0657
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_glass",
+    "hex": "#2E4256",
+    "levels": [
+     0.94496,
+     0.95839,
+     0.97799,
+     0.99262,
+     1.00848,
+     1.06281
+    ],
+    "used": false
+   },
+   {
+    "key": "w13_lantern_glow",
+    "hex": "#FFB23A",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "w13_moss",
+    "hex": "#4C9A3C",
+    "levels": [
+     0.92189,
+     0.93791,
+     0.94334,
+     0.94847,
+     0.95322,
+     0.9593,
+     0.96515,
+     0.97172,
+     0.97722,
+     0.9823,
+     0.98611,
+     0.98918,
+     0.99279,
+     0.99639,
+     0.99998,
+     1.00274,
+     1.0057,
+     1.00955,
+     1.01292,
+     1.01691,
+     1.02158,
+     1.02832,
+     1.03325,
+     1.03821,
+     1.04321,
+     1.0473,
+     1.05139,
+     1.05478,
+     1.05834,
+     1.06317,
+     1.06871,
+     1.08431
+    ],
+    "used": false
+   },
+   {
+    "key": "w13_stone",
+    "hex": "#9E9CA4",
+    "levels": [
+     0.89112,
+     0.93238,
+     0.93896,
+     0.94361,
+     0.94848,
+     0.95251,
+     0.95896,
+     0.9645,
+     0.96819,
+     0.97409,
+     0.97688,
+     0.98098,
+     0.98559,
+     0.98832,
+     0.99195,
+     0.99515,
+     0.99884,
+     1.00277,
+     1.00633,
+     1.01067,
+     1.0139,
+     1.01909,
+     1.02404,
+     1.03362,
+     1.0384,
+     1.04287,
+     1.0471,
+     1.05055,
+     1.05558,
+     1.06152,
+     1.06609,
+     1.12138
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_timber",
+    "hex": "#A9612C",
+    "levels": [
+     0.93016,
+     0.93492,
+     0.93865,
+     0.94354,
+     0.94696,
+     0.95318,
+     0.95851,
+     0.963,
+     0.96683,
+     0.9708,
+     0.97484,
+     0.97959,
+     0.98389,
+     0.98742,
+     0.9929,
+     0.99807,
+     1.00278,
+     1.00822,
+     1.01281,
+     1.01794,
+     1.0227,
+     1.02782,
+     1.03274,
+     1.03751,
+     1.0418,
+     1.04751,
+     1.0513,
+     1.05496,
+     1.05827,
+     1.06081,
+     1.06606,
+     1.06995
+    ],
+    "used": false
+   },
+   {
+    "key": "w11_clay",
+    "hex": "#D88A4A",
+    "levels": [
+     0.95848
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_ember",
+    "hex": "#FF8A2A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_iron",
+    "hex": "#3E3E46",
+    "levels": [
+     0.95017,
+     0.95417,
+     0.95837,
+     0.96419,
+     0.96723,
+     0.96942,
+     0.9723,
+     0.97422,
+     0.97769,
+     0.97931,
+     0.9826,
+     0.98427,
+     0.98427,
+     0.98931,
+     0.99322,
+     0.99735,
+     0.9995,
+     1.00047,
+     1.00318,
+     1.00565,
+     1.01344,
+     1.01653,
+     1.02067,
+     1.02067,
+     1.02595,
+     1.03016,
+     1.032,
+     1.03323,
+     1.03633,
+     1.04346,
+     1.04824,
+     1.04824
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_red",
+    "hex": "#C8302C",
+    "levels": [
+     0.95312,
+     0.95724,
+     0.96331,
+     0.9711,
+     0.97978,
+     0.98437,
+     0.99277,
+     1.0213,
+     1.03241,
+     1.04264
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_rope",
+    "hex": "#D9BC84",
+    "levels": [
+     0.96539,
+     1.01562
+    ],
+    "used": true
+   },
+   {
+    "key": "w13_wood",
+    "hex": "#A8642E",
+    "levels": [
+     0.95011,
+     0.95375,
+     0.95628,
+     0.95898,
+     0.96181,
+     0.96417,
+     0.96512,
+     0.96807,
+     0.97207,
+     0.97441,
+     0.9767,
+     0.97998,
+     0.98304,
+     0.98657,
+     0.98931,
+     0.99245,
+     0.99401,
+     0.99893,
+     1.00074,
+     1.00287,
+     1.00554,
+     1.00816,
+     1.01207,
+     1.01573,
+     1.02004,
+     1.02571,
+     1.02944,
+     1.03265,
+     1.03585,
+     1.04114,
+     1.04618,
+     1.04988
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "FortWorkshop",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "hero",
+   "size": [
+    10.62,
+    8.55,
+    7.6632
+   ],
+   "tris": 4348,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshop.glb",
+     "kind": "solid",
+     "tris": 4336,
+     "offset": [
+      0.0,
+      4.275,
+      0.0
+     ],
+     "size": [
+      10.62,
+      8.55,
+      7.6632
+     ]
+    },
+    {
+     "file": "meshes/FortWorkshop_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -4.89,
+      4.67,
+      3.0074
+     ],
+     "size": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FortWorkshop_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -4.89,
+      4.65,
+      3.0074
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "fort workshop: six posts on stones, gabled canvas canopy on a front-to-back ridge, half walls, workbench, log rack, crate and barrel, banner, lantern hook | VFX: lantern heat_glow"
+  },
+  {
+   "name": "FortWorkshopCanvasRoof",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    10.2,
+    1.88,
+    7.2
+   ],
+   "tris": 288,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopCanvasRoof.glb",
+     "kind": "solid",
+     "tris": 288,
+     "offset": [
+      0.0,
+      0.94,
+      0.0
+     ],
+     "size": [
+      10.2,
+      1.88,
+      7.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas roof"
+  },
+  {
+   "name": "FortWorkshopCarpenterBay",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "variant",
+   "size": [
+    10.62,
+    8.55,
+    7.6643
+   ],
+   "tris": 2854,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopCarpenterBay.glb",
+     "kind": "solid",
+     "tris": 2842,
+     "offset": [
+      0.0,
+      4.275,
+      0.0
+     ],
+     "size": [
+      10.62,
+      8.55,
+      7.6643
+     ]
+    },
+    {
+     "file": "meshes/FortWorkshopCarpenterBay_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -4.89,
+      4.67,
+      2.998
+     ],
+     "size": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FortWorkshopCarpenterBay_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -4.89,
+      4.65,
+      2.998
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "A. Carpenter Bay | VFX: lantern"
+  },
+  {
+   "name": "FortWorkshopHalfWall",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    6.25,
+    2.2,
+    0.35
+   ],
+   "tris": 308,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopHalfWall.glb",
+     "kind": "solid",
+     "tris": 308,
+     "offset": [
+      0.0,
+      1.1,
+      0.0
+     ],
+     "size": [
+      6.25,
+      2.2,
+      0.35
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "half wall"
+  },
+  {
+   "name": "FortWorkshopLanternHook",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    1.357,
+    1.9063,
+    0.84
+   ],
+   "tris": 96,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopLanternHook.glb",
+     "kind": "solid",
+     "tris": 84,
+     "offset": [
+      0.0,
+      0.9531,
+      0.0
+     ],
+     "size": [
+      1.357,
+      1.9063,
+      0.84
+     ]
+    },
+    {
+     "file": "meshes/FortWorkshopLanternHook_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      0.2585,
+      0.47,
+      0.0
+     ],
+     "size": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "lantern hook | VFX: heat_glow"
+  },
+  {
+   "name": "FortWorkshopPost",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    1.1,
+    6.7,
+    1.1
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopPost.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      3.35,
+      0.0
+     ],
+     "size": [
+      1.1,
+      6.7,
+      1.1
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "post on stone"
+  },
+  {
+   "name": "FortWorkshopRoofBeam",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    10.0728,
+    0.542,
+    0.5911
+   ],
+   "tris": 20,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopRoofBeam.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.271,
+      0.0
+     ],
+     "size": [
+      10.0728,
+      0.542,
+      0.5911
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "roof beam"
+  },
+  {
+   "name": "FortWorkshopStorageShed",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "variant",
+   "size": [
+    10.62,
+    8.55,
+    7.6763
+   ],
+   "tris": 3704,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopStorageShed.glb",
+     "kind": "solid",
+     "tris": 3692,
+     "offset": [
+      0.0,
+      4.275,
+      0.0
+     ],
+     "size": [
+      10.62,
+      8.55,
+      7.6763
+     ]
+    },
+    {
+     "file": "meshes/FortWorkshopStorageShed_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -4.89,
+      4.67,
+      2.9982
+     ],
+     "size": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FortWorkshopStorageShed_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -4.89,
+      4.65,
+      2.9982
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "B. Storage Shed: log rack and stores | VFX: lantern"
+  },
+  {
+   "name": "FortWorkshopTraderBay",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "variant",
+   "size": [
+    10.62,
+    8.55,
+    7.6688
+   ],
+   "tris": 7484,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopTraderBay.glb",
+     "kind": "solid",
+     "tris": 7472,
+     "offset": [
+      0.0,
+      4.275,
+      0.0
+     ],
+     "size": [
+      10.62,
+      8.55,
+      7.6688
+     ]
+    },
+    {
+     "file": "meshes/FortWorkshopTraderBay_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -4.89,
+      4.67,
+      3.0039
+     ],
+     "size": [
+      0.5,
+      0.7,
+      0.5
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FortWorkshopTraderBay_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -4.89,
+      4.65,
+      3.0039
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "C. Trader Bay: long counter with wares | VFX: lantern"
+  },
+  {
+   "name": "FortWorkshopWorkTable",
+   "sheet": "W13",
+   "subject": "FortWorkshop",
+   "role": "part",
+   "size": [
+    4.0,
+    2.8,
+    2.2868
+   ],
+   "tris": 556,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FortWorkshopWorkTable.glb",
+     "kind": "solid",
+     "tris": 556,
+     "offset": [
+      0.0,
+      1.4,
+      0.0
+     ],
+     "size": [
+      4.0,
+      2.8,
+      2.2868
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "work table"
+  },
+  {
+   "name": "GuardLodge",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "hero",
+   "size": [
+    11.5173,
+    8.7306,
+    12.4757
+   ],
+   "tris": 4522,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodge.glb",
+     "kind": "solid",
+     "tris": 4510,
+     "offset": [
+      0.0,
+      4.3653,
+      0.0
+     ],
+     "size": [
+      11.5173,
+      8.7306,
+      12.4757
+     ]
+    },
+    {
+     "file": "meshes/GuardLodge_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -1.2113,
+      3.823,
+      3.4379
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_GuardLodge_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2113,
+      3.805,
+      3.4379
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "guard lodge: plank-log walls on stone footing, pitched canvas roof on ridge beam, door with steps, window awning, lantern, barrel and crate | VFX: lantern heat_glow"
+  },
+  {
+   "name": "GuardLodgeAbandoned",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "variant",
+   "size": [
+    10.2546,
+    8.7876,
+    12.4869
+   ],
+   "tris": 3726,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeAbandoned.glb",
+     "kind": "solid",
+     "tris": 3714,
+     "offset": [
+      0.0,
+      4.3938,
+      0.0
+     ],
+     "size": [
+      10.2546,
+      8.7876,
+      12.4869
+     ]
+    },
+    {
+     "file": "meshes/GuardLodgeAbandoned_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -1.8427,
+      3.88,
+      3.4323
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_GuardLodgeAbandoned_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.8427,
+      3.862,
+      3.4323
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "C. Abandoned Lodge: torn roof, ladder, debris | VFX: lantern"
+  },
+  {
+   "name": "GuardLodgeCanvasRoof",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    9.0,
+    3.68,
+    10.0
+   ],
+   "tris": 200,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeCanvasRoof.glb",
+     "kind": "solid",
+     "tris": 200,
+     "offset": [
+      0.0,
+      1.84,
+      0.0
+     ],
+     "size": [
+      9.0,
+      3.68,
+      10.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas roof"
+  },
+  {
+   "name": "GuardLodgeDoor",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    2.6,
+    3.6,
+    0.4
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeDoor.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      2.6,
+      3.6,
+      0.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "doorframe and door"
+  },
+  {
+   "name": "GuardLodgeInteriorShelf",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    4.0,
+    4.1292,
+    2.1382
+   ],
+   "tris": 420,
+   "budget": 450,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeInteriorShelf.glb",
+     "kind": "solid",
+     "tris": 420,
+     "offset": [
+      0.0,
+      2.0646,
+      0.0
+     ],
+     "size": [
+      4.0,
+      4.1292,
+      2.1382
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "interior shelf"
+  },
+  {
+   "name": "GuardLodgeNarrow",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "variant",
+   "size": [
+    10.1173,
+    8.1006,
+    11.4757
+   ],
+   "tris": 4522,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeNarrow.glb",
+     "kind": "solid",
+     "tris": 4510,
+     "offset": [
+      0.0,
+      4.0503,
+      0.0
+     ],
+     "size": [
+      10.1173,
+      8.1006,
+      11.4757
+     ]
+    },
+    {
+     "file": "meshes/GuardLodgeNarrow_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -1.2113,
+      3.823,
+      2.9379
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_GuardLodgeNarrow_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2113,
+      3.805,
+      2.9379
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "A. Narrow Lodge | VFX: lantern"
+  },
+  {
+   "name": "GuardLodgeOpenGuardHut",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "variant",
+   "size": [
+    11.5173,
+    8.6869,
+    10.5121
+   ],
+   "tris": 4814,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeOpenGuardHut.glb",
+     "kind": "solid",
+     "tris": 4802,
+     "offset": [
+      0.0,
+      4.3434,
+      0.0
+     ],
+     "size": [
+      11.5173,
+      8.6869,
+      10.5121
+     ]
+    },
+    {
+     "file": "meshes/GuardLodgeOpenGuardHut_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      -1.2113,
+      3.823,
+      4.3968
+     ],
+     "size": [
+      0.45,
+      0.63,
+      0.45
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_GuardLodgeOpenGuardHut_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -1.2113,
+      3.805,
+      4.3968
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "B. Open Guard Hut | VFX: lantern"
+  },
+  {
+   "name": "GuardLodgeRoofBeam",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    0.6286,
+    0.6811,
+    10.0728
+   ],
+   "tris": 20,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeRoofBeam.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.3406,
+      0.0
+     ],
+     "size": [
+      0.6286,
+      0.6811,
+      10.0728
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "roof beam"
+  },
+  {
+   "name": "GuardLodgeWallPanel",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    7.2537,
+    3.68,
+    0.62
+   ],
+   "tris": 264,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeWallPanel.glb",
+     "kind": "solid",
+     "tris": 264,
+     "offset": [
+      0.0,
+      1.84,
+      0.0
+     ],
+     "size": [
+      7.2537,
+      3.68,
+      0.62
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wall panel"
+  },
+  {
+   "name": "GuardLodgeWindowAwning",
+   "sheet": "W13",
+   "subject": "GuardLodge",
+   "role": "part",
+   "size": [
+    1.1,
+    0.68,
+    2.4
+   ],
+   "tris": 16,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GuardLodgeWindowAwning.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      0.34,
+      0.0
+     ],
+     "size": [
+      1.1,
+      0.68,
+      2.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "window awning"
+  },
+  {
+   "name": "LookoutPlatform",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "hero",
+   "size": [
+    8.3,
+    7.9957,
+    13.7903
+   ],
+   "tris": 1924,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatform.glb",
+     "kind": "solid",
+     "tris": 1924,
+     "offset": [
+      0.0,
+      3.9978,
+      0.0
+     ],
+     "size": [
+      8.3,
+      7.9957,
+      13.7903
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "lookout platform: X-braced four-post deck on base stones, railing on three sides, stairs up the front"
+  },
+  {
+   "name": "LookoutPlatformCorner",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "variant",
+   "size": [
+    9.0762,
+    7.9368,
+    12.4008
+   ],
+   "tris": 1880,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformCorner.glb",
+     "kind": "solid",
+     "tris": 1880,
+     "offset": [
+      0.0,
+      3.9684,
+      0.0
+     ],
+     "size": [
+      9.0762,
+      7.9368,
+      12.4008
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Corner Platform"
+  },
+  {
+   "name": "LookoutPlatformFloorPlanks",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "part",
+   "size": [
+    7.54,
+    0.3,
+    8.0
+   ],
+   "tris": 308,
+   "budget": 350,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformFloorPlanks.glb",
+     "kind": "solid",
+     "tris": 308,
+     "offset": [
+      0.0,
+      0.15,
+      0.0
+     ],
+     "size": [
+      7.54,
+      0.3,
+      8.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "floor planks"
+  },
+  {
+   "name": "LookoutPlatformPost",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "part",
+   "size": [
+    1.3,
+    6.3,
+    1.3
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformPost.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      3.15,
+      0.0
+     ],
+     "size": [
+      1.3,
+      6.3,
+      1.3
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "post with base stone"
+  },
+  {
+   "name": "LookoutPlatformRailing",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "part",
+   "size": [
+    8.15,
+    1.92,
+    0.56
+   ],
+   "tris": 880,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformRailing.glb",
+     "kind": "solid",
+     "tris": 880,
+     "offset": [
+      0.0,
+      0.96,
+      0.0
+     ],
+     "size": [
+      8.15,
+      1.92,
+      0.56
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "railing"
+  },
+  {
+   "name": "LookoutPlatformStairs",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "part",
+   "size": [
+    2.8247,
+    6.2089,
+    6.3493
+   ],
+   "tris": 288,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformStairs.glb",
+     "kind": "solid",
+     "tris": 288,
+     "offset": [
+      0.0,
+      3.1045,
+      0.0
+     ],
+     "size": [
+      2.8247,
+      6.2089,
+      6.3493
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stairs with stair rail"
+  },
+  {
+   "name": "LookoutPlatformWallMounted",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "variant",
+   "size": [
+    8.6263,
+    10.0547,
+    12.9372
+   ],
+   "tris": 3640,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformWallMounted.glb",
+     "kind": "solid",
+     "tris": 3640,
+     "offset": [
+      0.0,
+      5.0273,
+      0.0
+     ],
+     "size": [
+      8.6263,
+      10.0547,
+      12.9372
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Wall-Mounted: against a stone wall"
+  },
+  {
+   "name": "LookoutPlatformWide",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "variant",
+   "size": [
+    12.3,
+    6.9852,
+    13.7574
+   ],
+   "tris": 2100,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformWide.glb",
+     "kind": "solid",
+     "tris": 2100,
+     "offset": [
+      0.0,
+      3.4926,
+      0.0
+     ],
+     "size": [
+      12.3,
+      6.9852,
+      13.7574
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide Platform"
+  },
+  {
+   "name": "LookoutPlatformXBrace",
+   "sheet": "W13",
+   "subject": "LookoutPlatform",
+   "role": "part",
+   "size": [
+    6.2817,
+    4.378,
+    0.4625
+   ],
+   "tris": 24,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/LookoutPlatformXBrace.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.189,
+      0.0
+     ],
+     "size": [
+      6.2817,
+      4.378,
+      0.4625
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "X-brace"
+  },
+  {
+   "name": "Watchtower",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "hero",
+   "size": [
+    8.2,
+    21.8509,
+    9.22
+   ],
+   "tris": 2790,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Watchtower.glb",
+     "kind": "solid",
+     "tris": 2790,
+     "offset": [
+      0.0,
+      10.9255,
+      0.0
+     ],
+     "size": [
+      8.2,
+      21.8509,
+      9.22
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "watchtower: four posts on base stones, X-braced in two levels, plank deck with railing, tall pyramid canvas roof with finial, ladder, red banner"
+  },
+  {
+   "name": "WatchtowerBracing",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    5.9247,
+    5.3423,
+    0.4625
+   ],
+   "tris": 24,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerBracing.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      2.6712,
+      0.0
+     ],
+     "size": [
+      5.9247,
+      5.3423,
+      0.4625
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bracing"
+  },
+  {
+   "name": "WatchtowerCanvasRoof",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    7.8,
+    5.1213,
+    7.8
+   ],
+   "tris": 352,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerCanvasRoof.glb",
+     "kind": "solid",
+     "tris": 352,
+     "offset": [
+      0.0,
+      2.5607,
+      0.0
+     ],
+     "size": [
+      7.8,
+      5.1213,
+      7.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "canvas roof with roof tip"
+  },
+  {
+   "name": "WatchtowerDamaged",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "variant",
+   "size": [
+    6.9,
+    17.4533,
+    8.5974
+   ],
+   "tris": 2426,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerDamaged.glb",
+     "kind": "solid",
+     "tris": 2426,
+     "offset": [
+      0.0,
+      8.7266,
+      0.0
+     ],
+     "size": [
+      6.9,
+      17.4533,
+      8.5974
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Damaged Tower: torn roof, missing braces"
+  },
+  {
+   "name": "WatchtowerDeckFloor",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    6.54,
+    0.3,
+    6.6
+   ],
+   "tris": 264,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerDeckFloor.glb",
+     "kind": "solid",
+     "tris": 264,
+     "offset": [
+      0.0,
+      0.15,
+      0.0
+     ],
+     "size": [
+      6.54,
+      0.3,
+      6.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "deck floor"
+  },
+  {
+   "name": "WatchtowerLadder",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    1.7061,
+    7.0728,
+    0.3025
+   ],
+   "tris": 96,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerLadder.glb",
+     "kind": "solid",
+     "tris": 96,
+     "offset": [
+      0.0,
+      3.5364,
+      0.0
+     ],
+     "size": [
+      1.7061,
+      7.0728,
+      0.3025
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ladder"
+  },
+  {
+   "name": "WatchtowerPost",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    1.3,
+    13.3,
+    1.3
+   ],
+   "tris": 88,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerPost.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      6.65,
+      0.0
+     ],
+     "size": [
+      1.3,
+      13.3,
+      1.3
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "post on base stone"
+  },
+  {
+   "name": "WatchtowerRailing",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "part",
+   "size": [
+    6.75,
+    1.92,
+    0.56
+   ],
+   "tris": 880,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerRailing.glb",
+     "kind": "solid",
+     "tris": 880,
+     "offset": [
+      0.0,
+      0.96,
+      0.0
+     ],
+     "size": [
+      6.75,
+      1.92,
+      0.56
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "railing"
+  },
+  {
+   "name": "WatchtowerShort",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "variant",
+   "size": [
+    8.2,
+    16.8496,
+    9.219
+   ],
+   "tris": 2718,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerShort.glb",
+     "kind": "solid",
+     "tris": 2718,
+     "offset": [
+      0.0,
+      8.4248,
+      0.0
+     ],
+     "size": [
+      8.2,
+      16.8496,
+      9.219
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Short Tower"
+  },
+  {
+   "name": "WatchtowerTall",
+   "sheet": "W13",
+   "subject": "Watchtower",
+   "role": "variant",
+   "size": [
+    7.6,
+    25.8514,
+    8.6202
+   ],
+   "tris": 2838,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WatchtowerTall.glb",
+     "kind": "solid",
+     "tris": 2838,
+     "offset": [
+      0.0,
+      12.9257,
+      0.0
+     ],
+     "size": [
+      7.6,
+      25.8514,
+      8.6202
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Tall Tower"
+  }
+ ],
+ "stats": {
+  "assets": 39,
+  "pieces": 48,
+  "solid": 39,
+  "water": 0,
+  "glow": 9,
+  "tris": 61946,
+  "vfxSockets": 8,
+  "paletteColours": 8,
+  "paletteLevels": 142,
+  "meshBytes": 4936492
+ },
+ "problems": []
+}

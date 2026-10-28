@@ -1,0 +1,1642 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V08",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v08_blue",
+    "hex": "#4A7FE0",
+    "levels": [
+     0.95014,
+     0.95724,
+     0.96508,
+     0.97261,
+     0.97689,
+     0.97922,
+     0.98202,
+     0.98903,
+     0.99733,
+     1.0023,
+     1.00872,
+     1.01309,
+     1.01559,
+     1.01739,
+     1.01922,
+     1.02162,
+     1.0253,
+     1.03146,
+     1.03853,
+     1.04134,
+     1.04407
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_bright",
+    "hex": "#58A83A",
+    "levels": [
+     0.95116,
+     0.95352,
+     0.95798,
+     0.96148,
+     0.96449,
+     0.96872,
+     0.97144,
+     0.97617,
+     0.97902,
+     0.98197,
+     0.98505,
+     0.98957,
+     0.9927,
+     0.99473,
+     0.99842,
+     1.00171,
+     1.00488,
+     1.00795,
+     1.01003,
+     1.01586,
+     1.01859,
+     1.02125,
+     1.02348,
+     1.02922,
+     1.03081,
+     1.03397,
+     1.03682,
+     1.04016,
+     1.04261,
+     1.04511,
+     1.04911,
+     1.0262
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_capsule",
+    "hex": "#C89A5A",
+    "levels": [
+     0.97037,
+     0.97647,
+     0.98238,
+     0.98727,
+     1.00029,
+     1.0172,
+     1.02381,
+     1.032,
+     1.03986,
+     1.04532
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_cream",
+    "hex": "#F2E5C2",
+    "levels": [
+     0.9503,
+     0.95335,
+     0.95898,
+     0.96181,
+     0.9652,
+     0.9701,
+     0.97519,
+     0.97642,
+     0.97939,
+     0.98111,
+     0.98668,
+     0.98906,
+     0.99229,
+     0.99533,
+     0.99794,
+     1.00038,
+     1.00252,
+     1.00471,
+     1.008,
+     1.01682,
+     1.0199,
+     1.02294,
+     1.02571,
+     1.02944,
+     1.03751,
+     1.04686,
+     1.01296,
+     0.98391
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_gold",
+    "hex": "#F8C51E",
+    "levels": [
+     0.98238,
+     0.98503,
+     0.99438,
+     1.00623,
+     1.01456,
+     1.04372,
+     0.95778,
+     0.9712,
+     1.02246,
+     1.01226,
+     0.95059,
+     1.04966,
+     1.03828,
+     1.0315,
+     1.02776,
+     0.98779,
+     1.00127,
+     0.99749
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_husk",
+    "hex": "#C8944C",
+    "levels": [
+     0.98733,
+     0.99289,
+     1.00598,
+     1.01575,
+     0.95148,
+     0.95724,
+     1.04016,
+     0.96586,
+     0.97004,
+     1.03204,
+     1.0228,
+     0.98238,
+     0.99609,
+     0.99062,
+     1.04889,
+     1.04566,
+     1.00037,
+     1.03571,
+     0.96362,
+     1.02776,
+     0.95408,
+     1.01364,
+     0.97381,
+     0.96064,
+     1.00863,
+     1.04366
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_leaf",
+    "hex": "#4F9C38",
+    "levels": [
+     0.95272,
+     0.95576,
+     0.9591,
+     0.96035,
+     0.96357,
+     0.96616,
+     0.96921,
+     0.97156,
+     0.97858,
+     0.98418,
+     0.98669,
+     0.99224,
+     0.99446,
+     0.99911,
+     1.00169,
+     1.00604,
+     1.00929,
+     1.01493,
+     1.01707,
+     1.02167,
+     1.02358,
+     1.02684,
+     1.02956,
+     1.03097,
+     1.039,
+     1.04148,
+     1.04445,
+     1.04656,
+     1.0486,
+     0.97506,
+     0.98146,
+     1.01167
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_root",
+    "hex": "#8A5A34",
+    "levels": [
+     0.95182,
+     0.96544,
+     0.97747,
+     0.98249,
+     0.98487,
+     0.99276,
+     1.00155,
+     1.00487,
+     1.03254,
+     1.04042,
+     1.0488,
+     1.01682,
+     1.02335,
+     1.01176,
+     1.02843,
+     1.00856,
+     0.98842,
+     1.04618,
+     0.9631,
+     0.99939,
+     1.02095,
+     0.95724
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_sage",
+    "hex": "#7FA882",
+    "levels": [
+     0.95287,
+     0.95541,
+     0.95927,
+     0.97054,
+     0.97558,
+     0.97901,
+     0.98133,
+     0.98668,
+     0.99081,
+     0.99331,
+     0.99737,
+     1.00155,
+     1.007,
+     1.01252,
+     1.01531,
+     1.0184,
+     1.02635,
+     1.03622,
+     1.04177,
+     1.04902
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_stem",
+    "hex": "#5E9E36",
+    "levels": [
+     0.95226,
+     0.9555,
+     0.96023,
+     0.96531,
+     0.96739,
+     0.96959,
+     0.97183,
+     0.97514,
+     0.97744,
+     0.98153,
+     0.98773,
+     0.99229,
+     0.99508,
+     0.99833,
+     1.00074,
+     1.00373,
+     1.00767,
+     1.01046,
+     1.01389,
+     1.0179,
+     1.02073,
+     1.02392,
+     1.02508,
+     1.028,
+     1.03219,
+     1.0347,
+     1.03705,
+     1.03977,
+     1.04545,
+     1.0492,
+     1.04278,
+     0.96293
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_tuber",
+    "hex": "#BD553A",
+    "levels": [
+     0.95375,
+     0.95668,
+     0.95907,
+     0.96238,
+     0.96508,
+     0.97232,
+     0.98238,
+     0.98657,
+     0.99291,
+     1.00074,
+     1.00359,
+     1.01509,
+     1.03269,
+     1.04618,
+     1.02335,
+     1.00856,
+     1.02843,
+     0.97586,
+     1.01176,
+     1.01762,
+     0.95148,
+     0.98858,
+     1.0406,
+     0.97856,
+     1.02095
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_wood",
+    "hex": "#9A6638",
+    "levels": [
+     0.95161,
+     0.96022,
+     0.96448,
+     0.96765,
+     0.97117,
+     0.97537,
+     0.9788,
+     0.98459,
+     0.98931,
+     0.99641,
+     1.00082,
+     1.00235,
+     1.00669,
+     1.01199,
+     1.01449,
+     1.01804,
+     1.0294,
+     1.03962,
+     1.04238,
+     1.04443,
+     1.04657,
+     1.04931,
+     1.03575,
+     0.99372,
+     1.02405,
+     1.02095,
+     1.03211,
+     0.98137,
+     0.99164
+    ],
+    "used": true
+   },
+   {
+    "key": "v08_yellow",
+    "hex": "#F2C42A",
+    "levels": [
+     0.98261,
+     0.98657,
+     0.99647,
+     1.00492,
+     1.02557,
+     1.04268,
+     1.04519
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "FlaxFlowerHead",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "part",
+   "size": [
+    2.8516,
+    0.6497,
+    2.7862
+   ],
+   "tris": 160,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxFlowerHead.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.3249,
+      0.0
+     ],
+     "size": [
+      2.8516,
+      0.6497,
+      2.7862
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flower head (5 petals)"
+  },
+  {
+   "name": "FlaxFlowering",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "variant",
+   "size": [
+    5.2487,
+    4.8345,
+    5.1734
+   ],
+   "tris": 1912,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxFlowering.glb",
+     "kind": "solid",
+     "tris": 1912,
+     "offset": [
+      0.0,
+      2.4172,
+      0.0
+     ],
+     "size": [
+      5.2487,
+      4.8345,
+      5.1734
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Flowering"
+  },
+  {
+   "name": "FlaxLeaf",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "part",
+   "size": [
+    1.0686,
+    2.2671,
+    0.905
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.1336,
+      0.0
+     ],
+     "size": [
+      1.0686,
+      2.2671,
+      0.905
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (reusable)"
+  },
+  {
+   "name": "FlaxPatch",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "hero",
+   "size": [
+    4.9185,
+    4.6087,
+    5.0572
+   ],
+   "tris": 1744,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxPatch.glb",
+     "kind": "solid",
+     "tris": 1744,
+     "offset": [
+      0.0,
+      2.3044,
+      0.0
+     ],
+     "size": [
+      4.9185,
+      4.6087,
+      5.0572
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flax patch: rosette of pointed leaves with sturdy stems carrying blue five-petal flowers and tan round seed capsules"
+  },
+  {
+   "name": "FlaxSeedPod",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "part",
+   "size": [
+    1.4264,
+    1.6272,
+    1.4259
+   ],
+   "tris": 76,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxSeedPod.glb",
+     "kind": "solid",
+     "tris": 76,
+     "offset": [
+      0.0,
+      0.8136,
+      0.0
+     ],
+     "size": [
+      1.4264,
+      1.6272,
+      1.4259
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed pod (closed)"
+  },
+  {
+   "name": "FlaxSeeded",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "variant",
+   "size": [
+    5.1548,
+    4.6186,
+    4.6217
+   ],
+   "tris": 1376,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxSeeded.glb",
+     "kind": "solid",
+     "tris": 1376,
+     "offset": [
+      0.0,
+      2.3093,
+      0.0
+     ],
+     "size": [
+      5.1548,
+      4.6186,
+      4.6217
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Seeded"
+  },
+  {
+   "name": "FlaxStem",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "part",
+   "size": [
+    0.9811,
+    3.0728,
+    0.3607
+   ],
+   "tris": 24,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxStem.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.5364,
+      0.0
+     ],
+     "size": [
+      0.9811,
+      3.0728,
+      0.3607
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stem (section)"
+  },
+  {
+   "name": "FlaxYoung",
+   "sheet": "V08",
+   "subject": "FlaxPatch",
+   "role": "variant",
+   "size": [
+    4.4952,
+    1.838,
+    4.0522
+   ],
+   "tris": 480,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlaxYoung.glb",
+     "kind": "solid",
+     "tris": 480,
+     "offset": [
+      0.0,
+      0.919,
+      0.0
+     ],
+     "size": [
+      4.4952,
+      1.838,
+      4.0522
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young"
+  },
+  {
+   "name": "Redroot",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "hero",
+   "size": [
+    6.6428,
+    5.9758,
+    6.1689
+   ],
+   "tris": 1656,
+   "budget": 4600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Redroot.glb",
+     "kind": "solid",
+     "tris": 1656,
+     "offset": [
+      0.0,
+      2.9879,
+      0.0
+     ],
+     "size": [
+      6.6428,
+      5.9758,
+      6.1689
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "redroot: rosette of broad pointed green leaves from a red crown over five fat faceted carrot-shaped tubers splaying down and out, two cream faceted buds on short stalks with sepals"
+  },
+  {
+   "name": "RedrootBudClosed",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "part",
+   "size": [
+    1.0605,
+    2.377,
+    1.0501
+   ],
+   "tris": 75,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootBudClosed.glb",
+     "kind": "solid",
+     "tris": 75,
+     "offset": [
+      0.0,
+      1.1885,
+      0.0
+     ],
+     "size": [
+      1.0605,
+      2.377,
+      1.0501
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bud (closed)"
+  },
+  {
+   "name": "RedrootBudUnderside",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "part",
+   "size": [
+    1.1003,
+    2.1282,
+    1.3662
+   ],
+   "tris": 75,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootBudUnderside.glb",
+     "kind": "solid",
+     "tris": 75,
+     "offset": [
+      0.0,
+      1.0641,
+      0.0
+     ],
+     "size": [
+      1.1003,
+      2.1282,
+      1.3662
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bud (underside) with sepals"
+  },
+  {
+   "name": "RedrootHarvested",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "variant",
+   "size": [
+    6.6857,
+    2.4146,
+    3.8754
+   ],
+   "tris": 552,
+   "budget": 1600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootHarvested.glb",
+     "kind": "solid",
+     "tris": 552,
+     "offset": [
+      0.0,
+      1.2073,
+      0.0
+     ],
+     "size": [
+      6.6857,
+      2.4146,
+      3.8754
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested (bare root)"
+  },
+  {
+   "name": "RedrootJuvenile",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "variant",
+   "size": [
+    3.3533,
+    2.2443,
+    3.1461
+   ],
+   "tris": 862,
+   "budget": 3100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootJuvenile.glb",
+     "kind": "solid",
+     "tris": 862,
+     "offset": [
+      0.0,
+      1.1222,
+      0.0
+     ],
+     "size": [
+      3.3533,
+      2.2443,
+      3.1461
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Juvenile: small leaves, thin brown roots"
+  },
+  {
+   "name": "RedrootLeaf",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "part",
+   "size": [
+    2.127,
+    2.7944,
+    1.2338
+   ],
+   "tris": 88,
+   "budget": 700,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootLeaf.glb",
+     "kind": "solid",
+     "tris": 88,
+     "offset": [
+      0.0,
+      1.3972,
+      0.0
+     ],
+     "size": [
+      2.127,
+      2.7944,
+      1.2338
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (reusable)"
+  },
+  {
+   "name": "RedrootMature",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "variant",
+   "size": [
+    7.7218,
+    6.4835,
+    7.3056
+   ],
+   "tris": 1501,
+   "budget": 5100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootMature.glb",
+     "kind": "solid",
+     "tris": 1501,
+     "offset": [
+      0.0,
+      3.2417,
+      0.0
+     ],
+     "size": [
+      7.7218,
+      6.4835,
+      7.3056
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Mature (exposed roots)"
+  },
+  {
+   "name": "RedrootRootFork",
+   "sheet": "V08",
+   "subject": "Redroot",
+   "role": "part",
+   "size": [
+    6.7845,
+    2.2937,
+    4.1482
+   ],
+   "tris": 554,
+   "budget": 1400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RedrootRootFork.glb",
+     "kind": "solid",
+     "tris": 554,
+     "offset": [
+      0.0,
+      1.1469,
+      0.0
+     ],
+     "size": [
+      6.7845,
+      2.2937,
+      4.1482
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root fork (main): crown and five tubers"
+  },
+  {
+   "name": "Silkleaf",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "hero",
+   "size": [
+    5.5655,
+    4.0208,
+    6.2781
+   ],
+   "tris": 904,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Silkleaf.glb",
+     "kind": "solid",
+     "tris": 904,
+     "offset": [
+      0.0,
+      2.0104,
+      0.0
+     ],
+     "size": [
+      5.5655,
+      4.0208,
+      6.2781
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "silkleaf: low rosette of broad thick silver-green leaves with a stalk topped by a soft cream seed tuft"
+  },
+  {
+   "name": "SilkleafHarvested",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "variant",
+   "size": [
+    2.9802,
+    1.0782,
+    3.2706
+   ],
+   "tris": 448,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafHarvested.glb",
+     "kind": "solid",
+     "tris": 448,
+     "offset": [
+      0.0,
+      0.5391,
+      0.0
+     ],
+     "size": [
+      2.9802,
+      1.0782,
+      3.2706
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested (trimmed)"
+  },
+  {
+   "name": "SilkleafLeaf",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "part",
+   "size": [
+    1.4597,
+    2.8319,
+    1.7032
+   ],
+   "tris": 16,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafLeaf.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.416,
+      0.0
+     ],
+     "size": [
+      1.4597,
+      2.8319,
+      1.7032
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (reusable)"
+  },
+  {
+   "name": "SilkleafMature",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "variant",
+   "size": [
+    5.5495,
+    4.0204,
+    6.4773
+   ],
+   "tris": 904,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafMature.glb",
+     "kind": "solid",
+     "tris": 904,
+     "offset": [
+      0.0,
+      2.0102,
+      0.0
+     ],
+     "size": [
+      5.5495,
+      4.0204,
+      6.4773
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Mature (with tuft)"
+  },
+  {
+   "name": "SilkleafRootBase",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "part",
+   "size": [
+    1.7788,
+    0.6499,
+    1.8008
+   ],
+   "tris": 320,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafRootBase.glb",
+     "kind": "solid",
+     "tris": 320,
+     "offset": [
+      0.0,
+      0.3249,
+      0.0
+     ],
+     "size": [
+      1.7788,
+      0.6499,
+      1.8008
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root base (flat)"
+  },
+  {
+   "name": "SilkleafSeedTuft",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "part",
+   "size": [
+    2.6895,
+    2.411,
+    2.731
+   ],
+   "tris": 440,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafSeedTuft.glb",
+     "kind": "solid",
+     "tris": 440,
+     "offset": [
+      0.0,
+      1.2055,
+      0.0
+     ],
+     "size": [
+      2.6895,
+      2.411,
+      2.731
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed tuft (side & underside)"
+  },
+  {
+   "name": "SilkleafYoung",
+   "sheet": "V08",
+   "subject": "Silkleaf",
+   "role": "variant",
+   "size": [
+    3.8281,
+    1.1418,
+    3.6677
+   ],
+   "tris": 432,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilkleafYoung.glb",
+     "kind": "solid",
+     "tris": 432,
+     "offset": [
+      0.0,
+      0.5709,
+      0.0
+     ],
+     "size": [
+      3.8281,
+      1.1418,
+      3.6677
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young"
+  },
+  {
+   "name": "SunpodBranchFork",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "part",
+   "size": [
+    1.909,
+    3.0446,
+    0.835
+   ],
+   "tris": 180,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodBranchFork.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      1.5223,
+      0.0
+     ],
+     "size": [
+      1.909,
+      3.0446,
+      0.835
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch fork (base)"
+  },
+  {
+   "name": "SunpodClosedPod",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "variant",
+   "size": [
+    9.1588,
+    6.4005,
+    8.4014
+   ],
+   "tris": 6400,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodClosedPod.glb",
+     "kind": "solid",
+     "tris": 6400,
+     "offset": [
+      0.0,
+      3.2002,
+      0.0
+     ],
+     "size": [
+      9.1588,
+      6.4005,
+      8.4014
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Closed Pod: pods wrapped shut in their husks"
+  },
+  {
+   "name": "SunpodHarvested",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "variant",
+   "size": [
+    8.6284,
+    6.268,
+    8.0014
+   ],
+   "tris": 5480,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodHarvested.glb",
+     "kind": "solid",
+     "tris": 5480,
+     "offset": [
+      0.0,
+      3.134,
+      0.0
+     ],
+     "size": [
+      8.6284,
+      6.268,
+      8.0014
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested (no pods, empty)"
+  },
+  {
+   "name": "SunpodLeaf",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "part",
+   "size": [
+    1.4577,
+    2.1909,
+    0.1647
+   ],
+   "tris": 64,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodLeaf.glb",
+     "kind": "solid",
+     "tris": 64,
+     "offset": [
+      0.0,
+      1.0954,
+      0.0
+     ],
+     "size": [
+      1.4577,
+      2.1909,
+      0.1647
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf (reusable)"
+  },
+  {
+   "name": "SunpodOpenPod",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "variant",
+   "size": [
+    8.4445,
+    6.765,
+    8.6466
+   ],
+   "tris": 6952,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodOpenPod.glb",
+     "kind": "solid",
+     "tris": 6952,
+     "offset": [
+      0.0,
+      3.3825,
+      0.0
+     ],
+     "size": [
+      8.4445,
+      6.765,
+      8.6466
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Open Pod (mature)"
+  },
+  {
+   "name": "SunpodPodHusk",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "part",
+   "size": [
+    2.5104,
+    1.5114,
+    2.5213
+   ],
+   "tris": 92,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodPodHusk.glb",
+     "kind": "solid",
+     "tris": 92,
+     "offset": [
+      0.0,
+      0.7557,
+      0.0
+     ],
+     "size": [
+      2.5104,
+      1.5114,
+      2.5213
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pod husk (open)"
+  },
+  {
+   "name": "SunpodSeedPod",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "part",
+   "size": [
+    1.5237,
+    1.6,
+    1.5686
+   ],
+   "tris": 92,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodSeedPod.glb",
+     "kind": "solid",
+     "tris": 92,
+     "offset": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "size": [
+      1.5237,
+      1.6,
+      1.5686
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed pod (round)"
+  },
+  {
+   "name": "SunpodShrub",
+   "sheet": "V08",
+   "subject": "SunpodShrub",
+   "role": "hero",
+   "size": [
+    9.0073,
+    6.3273,
+    8.4389
+   ],
+   "tris": 6768,
+   "budget": 10000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SunpodShrub.glb",
+     "kind": "solid",
+     "tris": 6768,
+     "offset": [
+      0.0,
+      3.1637,
+      0.0
+     ],
+     "size": [
+      9.0073,
+      6.3273,
+      8.4389
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "sunpod shrub: thick flared trunk splitting low into three forked limbs, broad leaf clusters at every tip forming a rounded crown, three big golden faceted seed pods cupped in four-point tan husks"
+  }
+ ],
+ "stats": {
+  "assets": 31,
+  "pieces": 31,
+  "solid": 31,
+  "water": 0,
+  "glow": 0,
+  "tris": 40643,
+  "vfxSockets": 0,
+  "paletteColours": 13,
+  "paletteLevels": 302,
+  "meshBytes": 3634932
+ },
+ "problems": []
+}

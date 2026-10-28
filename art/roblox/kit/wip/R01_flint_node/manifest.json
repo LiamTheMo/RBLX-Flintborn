@@ -1,0 +1,1225 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/R01_flint_node.blend",
+ "sheet": "R01",
+ "module": "flint_node",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "r01_base_rock",
+    "hex": "#9C908E",
+    "levels": [
+     0.94052,
+     0.94639,
+     0.95126,
+     0.95465,
+     0.96171,
+     0.9626,
+     0.96981,
+     0.97215,
+     0.97538,
+     0.98015,
+     0.98559,
+     0.98702,
+     0.98852,
+     0.98956,
+     0.99177,
+     0.99502,
+     0.99874,
+     1.00019,
+     1.01465,
+     1.01826,
+     1.01999,
+     1.02153,
+     1.02644,
+     1.03005,
+     1.03132,
+     1.03299,
+     1.03758,
+     1.0409,
+     1.04646,
+     1.04931,
+     1.05361,
+     1.05977
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_base_rock_dark",
+    "hex": "#7A7280",
+    "levels": [
+     0.94021,
+     0.94704,
+     0.963,
+     0.97003,
+     0.98073,
+     0.98303,
+     0.99266,
+     0.99626,
+     0.99961,
+     1.00644,
+     1.01957,
+     1.0299,
+     1.03304,
+     1.04614
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_base_rock_light",
+    "hex": "#B2A6A2",
+    "levels": [
+     0.94631,
+     0.95204,
+     0.95995,
+     0.9686,
+     0.97125,
+     0.97793,
+     0.99715,
+     1.01873,
+     1.02571,
+     1.02855,
+     1.05263
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_flint",
+    "hex": "#3A393F",
+    "levels": [
+     0.9413,
+     0.94318,
+     0.95043,
+     0.95421,
+     0.95744,
+     0.96011,
+     0.96386,
+     0.96679,
+     0.96857,
+     0.97289,
+     0.97641,
+     0.98296,
+     0.98572,
+     0.99063,
+     0.99438,
+     0.99834,
+     1.00094,
+     1.0068,
+     1.01049,
+     1.01387,
+     1.01825,
+     1.01936,
+     1.0206,
+     1.02223,
+     1.02321,
+     1.02809,
+     1.03375,
+     1.03724,
+     1.04706,
+     1.04966,
+     1.05534,
+     1.05823
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_limestone",
+    "hex": "#C9AE94",
+    "levels": [
+     0.94094,
+     0.94469,
+     0.95066,
+     0.95393,
+     0.95925,
+     0.96497,
+     0.96871,
+     0.97319,
+     0.97702,
+     0.98042,
+     0.98463,
+     0.98566,
+     0.98607,
+     0.989,
+     0.99243,
+     0.99827,
+     1.00489,
+     1.01269,
+     1.01635,
+     1.01947,
+     1.02137,
+     1.02696,
+     1.02696,
+     1.02746,
+     1.03232,
+     1.03964,
+     1.0406,
+     1.04088,
+     1.0482,
+     1.0512,
+     1.05352,
+     1.05797
+    ],
+    "used": true
+   },
+   {
+    "key": "r01_limestone_shadow",
+    "hex": "#A28B79",
+    "levels": [
+     0.94775,
+     0.95371,
+     0.95619,
+     0.97243,
+     0.97739,
+     0.98115,
+     0.9876,
+     0.99274,
+     1.00114,
+     1.00562,
+     1.01818,
+     1.02135,
+     1.03654,
+     1.03859,
+     1.04682,
+     1.05559
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_flint_deep",
+    "hex": "#2E2D33",
+    "levels": [
+     0.9715,
+     0.97596,
+     0.9789,
+     0.98069,
+     0.98355,
+     0.9861,
+     0.98874,
+     0.99149,
+     0.99323,
+     0.99626,
+     0.99846,
+     1.0007,
+     1.00377,
+     1.00603,
+     1.00889,
+     1.01113,
+     1.01357,
+     1.01419,
+     1.01668,
+     1.01901,
+     1.02096,
+     1.02414,
+     1.02659,
+     1.02854
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_flint_lit",
+    "hex": "#5E5E68",
+    "levels": [
+     0.97522,
+     0.97737,
+     0.98768,
+     0.99025,
+     0.9964,
+     1.0106,
+     1.01758,
+     1.02036,
+     1.02409,
+     0.98388,
+     0.98108,
+     1.01404
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_limestone_sand",
+    "hex": "#C9AE94",
+    "levels": [
+     0.97159,
+     0.9738,
+     0.9767,
+     0.97897,
+     0.98124,
+     0.98524,
+     0.9874,
+     0.99006,
+     0.99146,
+     0.99455,
+     0.99648,
+     0.99909,
+     1.00109,
+     1.00404,
+     1.00598,
+     1.00773,
+     1.01063,
+     1.01319,
+     1.0155,
+     1.01776,
+     1.02005,
+     1.02223,
+     1.02449,
+     1.0268,
+     1.02923
+    ],
+    "used": false
+   },
+   {
+    "key": "r01_stone",
+    "hex": "#877C78",
+    "levels": [
+     0.97184,
+     0.97507,
+     0.97754,
+     0.97932,
+     0.98187,
+     0.98478,
+     0.98712,
+     0.99046,
+     0.99306,
+     0.99569,
+     0.99957,
+     1.00117,
+     1.00359,
+     1.00606,
+     1.00853,
+     1.01449,
+     1.01616,
+     1.01867,
+     1.02074,
+     1.02305,
+     1.02547,
+     1.02801,
+     1.02936
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "FlintFlake",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "drop",
+   "size": [
+    1.3909,
+    0.7935,
+    0.92
+   ],
+   "tris": 28,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintFlake.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.3968,
+      0.0
+     ],
+     "size": [
+      1.3909,
+      0.7935,
+      0.92
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.003",
+     "kind": "ore_glint",
+     "position": [
+      -0.1703,
+      0.752,
+      0.2049
+     ],
+     "vfx_scale": 0.25,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint flake drop (inventory item); ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintFlakeAlt",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "drop",
+   "size": [
+    1.3253,
+    0.829,
+    0.84
+   ],
+   "tris": 26,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintFlakeAlt.glb",
+     "kind": "solid",
+     "tris": 26,
+     "offset": [
+      0.0,
+      0.4145,
+      0.0
+     ],
+     "size": [
+      1.3253,
+      0.829,
+      0.84
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.004",
+     "kind": "ore_glint",
+     "position": [
+      -0.4202,
+      0.7685,
+      0.29
+     ],
+     "vfx_scale": 0.25,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint flake drop (inventory item); ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintInsert",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    2.0,
+    3.4,
+    1.1
+   ],
+   "tris": 62,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsert.glb",
+     "kind": "solid",
+     "tris": 62,
+     "offset": [
+      0.0,
+      1.7,
+      0.0
+     ],
+     "size": [
+      2.0,
+      3.4,
+      1.1
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ore_glint.002",
+     "kind": "ore_glint",
+     "position": [
+      -0.5002,
+      2.1246,
+      0.3201
+     ],
+     "vfx_scale": 0.35,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.4,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.4
+     }
+    }
+   ],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock; ore_glint: low-rate cool-white twinkle on its lit face"
+  },
+  {
+   "name": "FlintInsertSmall",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    1.4,
+    2.1,
+    0.84
+   ],
+   "tris": 16,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertSmall.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.05,
+      0.0
+     ],
+     "size": [
+      1.4,
+      2.1,
+      0.84
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock"
+  },
+  {
+   "name": "FlintInsertThin",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    0.8,
+    2.5,
+    0.6
+   ],
+   "tris": 16,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintInsertThin.glb",
+     "kind": "solid",
+     "tris": 16,
+     "offset": [
+      0.0,
+      1.25,
+      0.0
+     ],
+     "size": [
+      0.8,
+      2.5,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flint crystal scatter (no collision); sink the base ~0.3 studs into a host rock"
+  },
+  {
+   "name": "FlintNode",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "hero",
+   "size": [
+    7.0861,
+    5.5,
+    5.6883
+   ],
+   "tris": 341,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNode.glb",
+     "kind": "solid",
+     "tris": 341,
+     "offset": [
+      0.0,
+      2.75,
+      0.0
+     ],
+     "size": [
+      7.0861,
+      5.5,
+      5.6883
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_harvest_deplete",
+     "kind": "harvest_deplete",
+     "position": [
+      -0.0329,
+      0.3,
+      -0.3047
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "deplete",
+     "spec": {
+      "trigger": "deplete",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#C9AE94",
+         "#4A4950"
+        ],
+        "size": [
+         0.7,
+         0.35
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.7,
+         1.2
+        ],
+        "rate": 0,
+        "burst": 18,
+        "speed": [
+         8,
+         15
+        ],
+        "spread": 80,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ],
+        "shape": [
+         3.0,
+         1.0,
+         3.0
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D8C4AE",
+         "#BBA48E"
+        ],
+        "size": [
+         2.0,
+         5.0
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.8
+        ],
+        "rate": 0,
+        "burst": 10,
+        "speed": [
+         2,
+         4
+        ],
+        "spread": 90,
+        "light_emission": 0.0,
+        "drag": 2.5,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.0,
+         0.5,
+         3.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#C9AE94",
+       "#4A4950"
+      ]
+     }
+    },
+    {
+     "name": "VFX_harvest_hit",
+     "kind": "harvest_hit",
+     "position": [
+      0.3671,
+      2.4,
+      1.6746
+     ],
+     "vfx_scale": 1.0,
+     "trigger": "hit",
+     "spec": {
+      "trigger": "hit",
+      "emitters": [
+       {
+        "name": "Chips",
+        "texture": "rock_chip",
+        "color": [
+         "#C9AE94",
+         "#45444A"
+        ],
+        "size": [
+         0.45,
+         0.25
+        ],
+        "transparency": [
+         0,
+         0,
+         1
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 0,
+        "burst": 8,
+        "speed": [
+         7,
+         12
+        ],
+        "spread": 55,
+        "light_emission": 0.0,
+        "acceleration": [
+         0,
+         -35,
+         0
+        ],
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -360,
+         360
+        ]
+       },
+       {
+        "name": "Dust",
+        "texture": "smoke_puff",
+        "color": [
+         "#D8C4AE",
+         "#BBA48E"
+        ],
+        "size": [
+         0.8,
+         2.2
+        ],
+        "transparency": [
+         0.45,
+         1.0
+        ],
+        "lifetime": [
+         0.6,
+         1.1
+        ],
+        "rate": 0,
+        "burst": 4,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.0,
+        "drag": 3.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -40,
+         40
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#C9AE94",
+       "#45444A"
+      ]
+     }
+    },
+    {
+     "name": "VFX_ore_glint",
+     "kind": "ore_glint",
+     "position": [
+      -1.6498,
+      1.7456,
+      2.6046
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.5,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.5
+     }
+    },
+    {
+     "name": "VFX_ore_glint.001",
+     "kind": "ore_glint",
+     "position": [
+      0.3009,
+      4.2295,
+      1.6638
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#F4F8FF",
+         "#C9D6EA"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.5,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null,
+      "color": [
+       "#F4F8FF",
+       "#C9D6EA"
+      ],
+      "rate": 0.5
+     }
+    }
+   ],
+   "notes": "harvest_hit: front strike face at mid height, tan limestone + dark flint chips; harvest_deplete: base centre, burst when the node empties; ore_glint x2: low-rate cool-white twinkles just off the front-left and upper flint crystals"
+  },
+  {
+   "name": "FlintNodeBaseRock",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    1.767,
+    1.1505,
+    1.3006
+   ],
+   "tris": 54,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeBaseRock.glb",
+     "kind": "solid",
+     "tris": 54,
+     "offset": [
+      0.0,
+      0.5753,
+      0.0
+     ],
+     "size": [
+      1.767,
+      1.1505,
+      1.3006
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "warm grey base rock scatter"
+  },
+  {
+   "name": "FlintNodeBaseRockSmall",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    0.7836,
+    0.5222,
+    0.7474
+   ],
+   "tris": 44,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeBaseRockSmall.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.2611,
+      0.0
+     ],
+     "size": [
+      0.7836,
+      0.5222,
+      0.7474
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "warm grey base rock scatter"
+  },
+  {
+   "name": "FlintNodeDepleted",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "depleted",
+   "size": [
+    6.55,
+    1.45,
+    4.0272
+   ],
+   "tris": 261,
+   "budget": 2000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeDepleted.glb",
+     "kind": "solid",
+     "tris": 261,
+     "offset": [
+      0.0,
+      0.725,
+      0.0
+     ],
+     "size": [
+      6.55,
+      1.45,
+      4.0272
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "mined-out base, same footprint as FlintNode"
+  },
+  {
+   "name": "FlintNodeLimestoneShell",
+   "sheet": "R01",
+   "subject": "FlintNode",
+   "role": "part",
+   "size": [
+    6.588,
+    5.5,
+    4.2991
+   ],
+   "tris": 167,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FlintNodeLimestoneShell.glb",
+     "kind": "solid",
+     "tris": 167,
+     "offset": [
+      0.0,
+      2.75,
+      0.0
+     ],
+     "size": [
+      6.588,
+      5.5,
+      4.2991
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bare limestone shell; flint inserts sit on its facets"
+  }
+ ],
+ "stats": {
+  "assets": 10,
+  "pieces": 10,
+  "solid": 10,
+  "water": 0,
+  "glow": 0,
+  "tris": 1015,
+  "vfxSockets": 7,
+  "paletteColours": 3,
+  "paletteLevels": 87,
+  "meshBytes": 95832
+ },
+ "problems": []
+}

@@ -1,0 +1,565 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/wip/W06_moss_and_ivy.blend",
+ "sheet": "W06",
+ "module": "moss_and_ivy",
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 64,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w06_bark",
+    "hex": "#8D6237",
+    "levels": [
+     0.96145,
+     0.96462,
+     0.96691,
+     0.97049,
+     0.97676,
+     0.97962,
+     0.98528,
+     0.98758,
+     0.99238,
+     0.99595,
+     1.00478,
+     1.01142,
+     1.01334,
+     1.01618,
+     1.02388,
+     1.03824
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_ivy",
+    "hex": "#66A828",
+    "levels": [
+     0.94002,
+     0.94138,
+     0.94553,
+     0.94846,
+     0.9523,
+     0.95585,
+     0.95948,
+     0.96499,
+     0.96787,
+     0.97246,
+     0.97696,
+     0.98056,
+     0.98439,
+     0.98869,
+     0.99234,
+     0.99662,
+     1.00046,
+     1.00243,
+     1.00513,
+     1.00946,
+     1.01382,
+     1.01823,
+     1.0235,
+     1.02787,
+     1.0313,
+     1.03547,
+     1.0391,
+     1.0409,
+     1.04774,
+     1.0508,
+     1.05541,
+     1.05995
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_moss",
+    "hex": "#ACC722",
+    "levels": [
+     0.93708,
+     0.9394,
+     0.95297,
+     0.95738,
+     0.96239,
+     0.96412,
+     0.97493,
+     0.97933,
+     0.98212,
+     0.9853,
+     0.98805,
+     0.98919,
+     0.99264,
+     0.99625,
+     0.99849,
+     1.00257,
+     1.00585,
+     1.00943,
+     1.01246,
+     1.02578,
+     1.02923,
+     1.03159,
+     1.03399,
+     1.03765,
+     1.04074,
+     1.04427,
+     1.04857
+    ],
+    "used": true
+   },
+   {
+    "key": "w06_stone",
+    "hex": "#B1ADA9",
+    "levels": [
+     0.91586,
+     0.9519,
+     0.95616,
+     0.95663,
+     0.95848,
+     0.96169,
+     0.96574,
+     0.96781,
+     0.97558,
+     0.98074,
+     0.98292,
+     0.98369,
+     0.9852,
+     0.98965,
+     0.99327,
+     0.99884,
+     1.00086,
+     1.00555,
+     1.00895,
+     1.0101,
+     1.01269,
+     1.01463,
+     1.02003,
+     1.02244,
+     1.02288,
+     1.0265,
+     1.03355,
+     1.03423,
+     1.03962,
+     1.04403,
+     1.04829,
+     1.09183
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CornerWrap",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    5.4481,
+    5.11,
+    5.155
+   ],
+   "tris": 2677,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CornerWrap.glb",
+     "kind": "solid",
+     "tris": 2677,
+     "offset": [
+      0.0,
+      2.555,
+      0.0
+     ],
+     "size": [
+      5.4481,
+      5.11,
+      5.155
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Corner Wrap: stone corner with moss on top and ivy wrapping the front-right corner"
+  },
+  {
+   "name": "IvyClusterFlat",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    2.3067,
+    2.0987,
+    0.3905
+   ],
+   "tris": 324,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IvyClusterFlat.glb",
+     "kind": "solid",
+     "tris": 324,
+     "offset": [
+      0.0,
+      1.0494,
+      0.0
+     ],
+     "size": [
+      2.3067,
+      2.0987,
+      0.3905
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ivy Cluster (flat): upright ivy mat facing -Y, lay it on any wall"
+  },
+  {
+   "name": "IvyCornerPiece",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    1.9649,
+    2.5337,
+    1.8373
+   ],
+   "tris": 516,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IvyCornerPiece.glb",
+     "kind": "solid",
+     "tris": 516,
+     "offset": [
+      0.0,
+      1.2669,
+      0.0
+     ],
+     "size": [
+      1.9649,
+      2.5337,
+      1.8373
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Corner Piece (angled): ivy bent 90 degrees round an outside corner (front -Y, side +X)"
+  },
+  {
+   "name": "IvyLeafSingle",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    0.8673,
+    0.9742,
+    0.1681
+   ],
+   "tris": 42,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IvyLeafSingle.glb",
+     "kind": "solid",
+     "tris": 42,
+     "offset": [
+      0.0,
+      0.4871,
+      0.0
+     ],
+     "size": [
+      0.8673,
+      0.9742,
+      0.1681
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Single Ivy Leaf: one leaf with its stalk, faces -Y"
+  },
+  {
+   "name": "IvyTendril",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    2.3454,
+    1.8778,
+    0.3811
+   ],
+   "tris": 184,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/IvyTendril.glb",
+     "kind": "solid",
+     "tris": 184,
+     "offset": [
+      0.0,
+      0.9389,
+      0.0
+     ],
+     "size": [
+      2.3454,
+      1.8778,
+      0.3811
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ivy Tendril (segment): curly stem with small leaves, faces -Y"
+  },
+  {
+   "name": "MossAndIvy",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "hero",
+   "size": [
+    6.9807,
+    6.41,
+    6.3217
+   ],
+   "tris": 4480,
+   "budget": 5000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossAndIvy.glb",
+     "kind": "solid",
+     "tris": 4480,
+     "offset": [
+      0.0,
+      3.205,
+      0.0
+     ],
+     "size": [
+      6.9807,
+      6.41,
+      6.3217
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Assembled moss and ivy ruin block: 3 courses of bevelled stone, moss heap on top, ivy curtain down the front-right corner, moss and rocks at the foot. No VFX."
+  },
+  {
+   "name": "MossCushionLarge",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    2.5059,
+    1.2,
+    1.8577
+   ],
+   "tris": 180,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossCushionLarge.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "size": [
+      2.5059,
+      1.2,
+      1.8577
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Moss Cushion (large): lumpy moss mound"
+  },
+  {
+   "name": "MossCushionSmall",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "part",
+   "size": [
+    1.3453,
+    0.8,
+    1.0776
+   ],
+   "tris": 120,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MossCushionSmall.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      1.3453,
+      0.8,
+      1.0776
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Moss Cushion (small)"
+  },
+  {
+   "name": "RockCap",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    7.0869,
+    4.0523,
+    5.2298
+   ],
+   "tris": 1258,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockCap.glb",
+     "kind": "solid",
+     "tris": 1258,
+     "offset": [
+      0.0,
+      2.0261,
+      0.0
+     ],
+     "size": [
+      7.0869,
+      4.0523,
+      5.2298
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Rock Cap: faceted boulder capped with moss, ivy draping its front-left face"
+  },
+  {
+   "name": "WallStrip",
+   "sheet": "W06",
+   "subject": "MossAndIvy",
+   "role": "variant",
+   "size": [
+    7.0737,
+    4.76,
+    2.7299
+   ],
+   "tris": 1974,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/WallStrip.glb",
+     "kind": "solid",
+     "tris": 1974,
+     "offset": [
+      0.0,
+      2.38,
+      0.0
+     ],
+     "size": [
+      7.0737,
+      4.76,
+      2.7299
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wall Strip: low stone wall section with two ivy strips hanging down the front"
+  }
+ ],
+ "stats": {
+  "assets": 10,
+  "pieces": 10,
+  "solid": 10,
+  "water": 0,
+  "glow": 0,
+  "tris": 11755,
+  "vfxSockets": 0,
+  "paletteColours": 4,
+  "paletteLevels": 107,
+  "meshBytes": 1189416
+ },
+ "problems": []
+}
