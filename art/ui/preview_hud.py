@@ -672,5 +672,5 @@ def main():
         print(f"Comparison written: {compare}")
 
 
-if __name__ == "__main__":  # art/ui/preview_lobby.py imports these helpers
+if __name__ == "__main__":
     main()
