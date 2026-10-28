@@ -1,7 +1,7 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.18  
+> **Design revision:** 1.19  
 > **Last updated:** 2026-10-28  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
@@ -2183,6 +2183,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.6** | 2026-10-23 | Owner confirmed Q162: Roblox Premium's +25% XP and an active consumable XP booster combine **additively**. Updated §10.4, §36.7, §39.5–39.7, §40 and the working principle. |
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
+| **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
 | **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
 | **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
 | **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
@@ -2205,7 +2206,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 - The placeholder island layout and POI positions (§3), until the authored Shattered Crater replaces it.
 - Whether to reset the playtest profile DataStore at launch (by switching `ProfileService.STORE_NAME`, never by deleting data).
 
-## 45. Owner answer Q164: materials stay in the lobby (2026-10-23)
+## 45. Owner answer Q164: materials stay in the lobby (2026-10-23) — superseded by §53
 
 | # | Decision | Consequences |
 | --- | --- | --- |
@@ -2338,6 +2339,22 @@ The owner defined the launch item and material catalog in a question round on 20
 2. **Crafting mastery gives only two benefits:** better gear quality-roll chances (Q139's +5% relative per level) and, when smelting, a **chance of one bonus bar per bar smelted** (starting value 2% per level, 20% at level 10; a bonus bar with no room drops at the smelter's feet). **Everything about crafting speed is removed**, as are ingredient savings and larger craft outputs. Every player crafts at the same rate (one craft per second; smelting times per §51). Recipe gates that require a Crafting mastery level stay (owner confirmed).
 3. **Touch hotbar:** the HUD hotbar shows each slot's item (name in its rarity colour, stack count), the selection follows the equipped slot, and **tapping a slot uses it exactly as its number key does** (equip, eat or drink, place, ready a siege item).
 4. **Tab and the player list:** Roblox's player list is disabled in both places; Tab (the rebindable Backpack key) opens the run backpack in the world and the backpack and vault panel in the lobby.
+
+
+## 53. Owner decisions: resources, gathering and boosts (2026-10-28)
+
+1. **Materials go back into runs** (reverses §45, Q164 and Q164a). Players withdraw material stacks from the vault into the lobby backpack and deploy with them like any other item; the lobby backpack no longer banks materials automatically. The vault keeps its 1,000-per-material capacity, and anything deposited or extracted beyond it is still deleted.
+2. **Carried-in materials never multiply.** The Center extraction's 2× (and any other extraction resource multiplier) applies only to the amount of each material above what the player carried into that run. Bringing 100 Wood and extracting 160 at the Center settles 100 + 60 × 2 = 220. XP multipliers are unchanged.
+3. **Boosts pause between runs.** Nothing outside the consumable weakens its boost. A successful extraction saves each running boost's remaining time, and it resumes on the next deploy; boosts only count down during a run. Dying, or leaving the play world without extracting, ends them.
+4. **Every gathering hit drops material on the ground.** Nodes have health and take many hits. A hit drops 1 material plus 1 for each tier the tool is above the node, and uses that much node health, so a better tool empties a node in fewer hits for the same total. Bare hands count as rank 0: trees and rocks give 1 per hit by hand and 2 with a Wooden tool. Ores still need the previous tier's pickaxe, which gives 1 per hit. Plants and bushes are gathered by hand at 1 per hit. Flint and Resin bonus chances stay. Gathering mastery becomes a per-hit chance of one extra drop (1% per level) that uses no node health.
+5. **Pickups:** only the gatherer can pick up a drop for its first 10 seconds, then anyone can; drops disappear after 2 minutes. Walking over a drop collects it, and so does looking at it and pressing Interact.
+6. **Node health** (starting values): trees and rocks 12, plants and berry bushes 3, Copper, Iron, Silver and Cobalt 8, Mithril 6, Obsidian and Jade 5, the new nodes 4.
+7. **Regrowth by tier:** basics 2 min, Copper and Iron 3 min, Silver, Cobalt and Obsidian 5 min, Jade and Mithril 8 min. Event-only ores (Adamantine) never come from regrowing nodes.
+8. **Every region has basics:** trees, rocks, fiber, herbs and berry bushes appear in every biome, the Crater included, in smaller numbers deeper in.
+9. **New gatherables with no use yet** (bankable and sellable, not tradeable): Clay, Amethyst, Starstone, Stormglass, Cave Mushroom, Redcap Mushroom, Chestnut Mushroom, Thornvine, Frostleaf, Juniper Berry, Elderberry, Raspberry and Hazelnut. Models follow the world-kit studies; the Sunpod shrub stands for the rare shrub event, and the Iron and Ember meteors for meteor crashes. Ore deposits, the Jade vein and the Obsidian outcrop still need model sheets.
+10. **Creature ore drops by habitat:** animals (wolf, boar, sabertooth) never drop ore; Skeletons drop Copper and Iron Ore; Bandits drop Copper and Iron Ore with a small Silver chance; the Minotaur drops Silver and Cobalt Ore in bulk; Ember Wisps drop none.
+11. **Farming:** Fiber can be planted in planters. Sunberries and Glimmerberries stay wild-only.
+12. **Selling:** banked materials, ores and bars all sell to the merchant for Coins.
 
 ---
 
