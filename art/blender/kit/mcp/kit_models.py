@@ -121,6 +121,7 @@ def union_loose(o, merge=0.01):
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=merge)
     bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=merge)
     bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    drop_specks(bm)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(o.data)
     bm.free()
@@ -129,19 +130,39 @@ def union_loose(o, merge=0.01):
     return len(others)
 
 
+def _build_offset(build_fn):
+    """The bottom-centre offset kit_mcp.mk shifts an asset by: found from a probe build of build_fn."""
+    probe = K.fk().Asset("_probe", "probe")
+    build_fn(probe)
+    xs, ys, zs = ([v.co[i] for v in probe.bm.verts] for i in range(3))
+    probe.bm.free()
+    return Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))
+
+
+def _placed(o, build_fn, fn, name):
+    """fn's geometry as a temporary object lined up with o, which mk built from build_fn."""
+    a = K.fk().Asset(name, "probe")
+    fn(a)
+    c = a.finish(collection=o.users_collection[0], mark_asset=False, origin=None)
+    c.matrix_world = o.matrix_world @ Matrix.Translation(-_build_offset(build_fn))
+    return c
+
+
+def merge_in(o, build_fn, fn):
+    """Join more geometry (fn, in the same build coordinates as build_fn, which built o) into o, e.g. what goes
+    inside a cavity carve() cut. Union it afterwards with union_loose; finish() recentres the origin."""
+    c = _placed(o, build_fn, fn, "_merge")
+    with _override(o):
+        c.select_set(True)
+        with bpy.context.temp_override(selected_objects=[o, c], selected_editable_objects=[o, c]):
+            bpy.ops.object.join()
+
+
 def carve(o, build_fn, cutter_fn):
     """Exact boolean difference of a cutter from a built asset; the new cut faces take the cutter's materials (and
     Tint). Both functions add geometry to a flintkit.Asset in the same build coordinates; the cutter is placed by
     the asset's bottom-centre offset, found from a probe build of build_fn."""
-    probe = K.fk().Asset("_probe", "probe")
-    build_fn(probe)
-    xs, ys, zs = ([v.co[i] for v in probe.bm.verts] for i in range(3))
-    off = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))
-    probe.bm.free()
-    cut = K.fk().Asset("_cutter", "probe")
-    cutter_fn(cut)
-    c = cut.finish(collection=o.users_collection[0], mark_asset=False, origin=None)
-    c.matrix_world = o.matrix_world @ Matrix.Translation(-off)
+    c = _placed(o, build_fn, cutter_fn, "_cutter")
     m = o.modifiers.new("Carve", "BOOLEAN")
     m.operation, m.solver, m.object = "DIFFERENCE", "EXACT", c
     m.use_self = True
@@ -152,6 +173,20 @@ def carve(o, build_fn, cutter_fn):
     bpy.data.objects.remove(c, do_unlink=True)
     bpy.data.meshes.remove(me)
     K.drop_unused_slots(o)
+
+
+def drop_specks(bm, min_area=0.3):
+    """Delete specks: tiny closed slivers booleans and cleanup can leave where several shells meet inside a mesh."""
+    bm.faces.index_update()
+    ids, n = _shell_ids(bm)
+    area = [0.0] * n
+    for f in bm.faces:
+        area[ids[f.index]] += f.calc_area()
+    specks = [f for f in bm.faces if area[ids[f.index]] < min_area]
+    if specks:
+        bmesh.ops.delete(bm, geom=specks, context="FACES")
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    return len(specks)
 
 
 def _shell_ids(bm):
@@ -321,6 +356,7 @@ def finish(o, union=True, uv=True):
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.002)
     bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=0.002)
     bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    drop_specks(bm)
     bm.to_mesh(o.data)
     bm.free()
     # no n-gons (the boolean leaves some where shells meet): triangulate faces of more than 4 sides
