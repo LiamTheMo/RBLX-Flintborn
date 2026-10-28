@@ -4,8 +4,8 @@ Parchment-and-leather UI from the reference sheets in `art/reference/ui/parchmen
 
 | Screen / component | Reference | Spec | Assets | Static build | States | Motion | Integration | Visual | Platform | Code review | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Lobby screen | 13_lobby_master, 02_lobby_parts | ✅ [LobbyScreen.md](LobbyScreen.md) | ✅ (upload ⏳) | ✅ | ✅ | ✅ | ✅ | preview ✅ (4 verifier rounds), Studio ⏳ | layout ✅, phones ✅ except 568×320 (documented), devices ⏳ | ✅ | Built and verified against the preview; Studio capture, device touch and the sprite upload remain |
-| Lobby popups (deploy check, invites, server) | 01_frames, 03_buttons | in LobbyScreen.md | ✅ (upload ⏳) | ✅ | ✅ | ✅ | ✅ | code-reviewed; not in the preview, Studio ⏳ | sizing simulated ✅ | ✅ | Built |
+| Lobby screen | 13_lobby_master, 02_lobby_parts | ✅ [LobbyScreen.md](LobbyScreen.md) | ✅ uploaded | ✅ | ✅ | ✅ | ✅ | preview ✅ (4 verifier rounds), Studio ⏳ | layout ✅, phones ✅ except 568×320 (documented), devices ⏳ | ✅ | Live; Studio capture and device touch remain manual checks |
+| Lobby popups (deploy check, invites, server) | 01_frames, 03_buttons | in LobbyScreen.md | ✅ uploaded | ✅ | ✅ | ✅ | ✅ | code-reviewed; not in the preview, Studio ⏳ | sizing simulated ✅ | ✅ | Built |
 | Journal (quests) | 07_journal | — | — | — | — | — | — | — | — | — | Not started |
 | Inventory & Vault | 08_inventory_vault | — | — | — | — | — | — | — | — | — | Not started |
 | Crafting | 09_crafting | — | — | — | — | — | — | — | — | — | Not started |
