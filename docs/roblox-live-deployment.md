@@ -40,6 +40,12 @@ else (pull requests, version branches, minor branches) ever publishes.
   collisions, creates **only missing code instances inside approved roots**,
   updates only source, calls `AssetService:SavePlaceAsync({SaveWithoutPublish=false})`,
   then separately checks code in Roblox's latest published place.
+- Roblox refuses a Luau Execution task script over 1 MiB, so the release goes up
+  in batches of at most 900 KB each. Every batch's mapping is validated before
+  the first batch writes anything; the batches then apply and save in order (the
+  last one also removes `RETIRED` scripts), and every batch is verified at the
+  end. If a batch fails part-way, the earlier batches are already saved: re-run
+  the deploy to finish (each batch only writes sources that differ).
 - JSON modules (`*.json` under the approved roots, except `*.project.json`,
   `*.meta.json` and `*.model.json`) are published as ModuleScripts named after
   the file, whose Source is the JSON converted to a Luau table (`return {...}`),
