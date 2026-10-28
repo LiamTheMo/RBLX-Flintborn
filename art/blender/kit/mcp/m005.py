@@ -19,11 +19,11 @@ NUM, TITLE, SHEET = 5, "Quartz", "M005"
 MAIN, SIDE, ROCK, ROCK_COOL = "m005_crystal", "m005_crystal_side", "m005_rock", "m005_rock_cool"
 
 # crystals: (label, x, y, radius, height, lean x, lean y, twist, seed, base z)
-CRYSTALS = (("Main", 0.2, 0.6, 1.9, 9.0, 0.0, 0.06, 0.0, 5011, 1.7),
-            ("SideL", -2.6, 0.2, 1.25, 6.0, -0.42, 0.0, 0.4, 5012, 1.4),
-            ("SideR", 2.8, 0.3, 1.2, 5.6, 0.42, 0.04, -0.3, 5013, 1.4),
-            ("SideFL", -1.9, -1.9, 1.0, 4.4, -0.3, -0.35, 0.2, 5014, 1.2),
-            ("SideFR", 2.3, -1.8, 0.95, 4.2, 0.35, -0.3, 0.7, 5015, 1.2))
+CRYSTALS = (("Main", 0.2, 0.6, 2.25, 9.0, 0.0, 0.06, 0.0, 5011, 1.7),
+            ("SideL", -2.7, 0.2, 1.45, 6.0, -0.42, 0.0, 0.4, 5012, 1.4),
+            ("SideR", 2.9, 0.3, 1.4, 5.6, 0.42, 0.04, -0.3, 5013, 1.4),
+            ("SideFL", -2.0, -1.9, 1.15, 4.4, -0.3, -0.35, 0.2, 5014, 1.2),
+            ("SideFR", 2.4, -1.8, 1.1, 4.2, 0.35, -0.3, 0.7, 5015, 1.2))
 ROCKS = ((0.0, 0.3, 4.8, 4.2, 2.9, 5031), (-3.0, -0.4, 3.4, 3.0, 2.3, 5032), (3.1, -0.3, 3.2, 2.9, 2.2, 5033),
          (-1.0, -2.6, 3.2, 2.7, 2.1, 5034), (1.7, -2.6, 3.0, 2.6, 1.9, 5035), (-0.6, 2.8, 3.0, 2.6, 2.0, 5036),
          (2.3, 2.2, 2.6, 2.3, 1.8, 5037), (-2.8, 2.0, 2.5, 2.2, 1.7, 5038), (-4.2, -2.0, 1.6, 1.4, 1.1, 5039),
@@ -32,10 +32,10 @@ ROCK_RINGS = [(0.0, 0.9, 7), (0.35, 1.0, 7), (0.7, 0.78, 6), (1.0, 0.36, 4)]
 
 
 def palette():
-    K.set_colour(MAIN, "#D9CDC4", rough=0.45)
+    K.set_colour(MAIN, "#E6D8CD", rough=0.45)        # toward the sheet swatch #F1E1D4
     K.set_colour(SIDE, "#B9ABA4", rough=0.45)
-    K.set_colour(ROCK, "#6A5F5C", rough=0.92)
-    K.set_colour(ROCK_COOL, "#635C5D", rough=0.92)
+    K.set_colour(ROCK, "#7E716D", rough=0.92)        # the sheet swatch is #7A6E6B
+    K.set_colour(ROCK_COOL, "#776E6E", rough=0.92)
 
 
 def crystal(a, label, origin=None):
