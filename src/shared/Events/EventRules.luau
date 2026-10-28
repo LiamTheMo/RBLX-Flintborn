@@ -5,7 +5,9 @@
 -- and several may start at once. Common is the fallback when nothing rarer hits;
 -- a category without one skips.
 
+local BiomeCatalog = require(script.Parent.Parent.World.BiomeCatalog)
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local IslandLayout = require(script.Parent.Parent.World.IslandLayout)
 local Rarity = require(script.Parent.Parent.Items.Rarity)
 
 local EventRules = {}
@@ -29,14 +31,26 @@ EventRules.MAX_EVENT_NPCS = 40
 EventRules.MAX_LARGE_EVENTS = 6
 EventRules.LARGE_FOOTPRINT = 80
 
--- Regions as fractions of the map radius (Shattered Crater: crater 300, inner ring
--- 750, outer rim 1,200 studs; v0.15).
+-- Rough distance bands per tier as fractions of the map radius (2,048 studs, GDD
+-- §54) for maps without the generated layout; PlacePoint is exact on it.
 EventRules.BIOMES = {
-	Center = { 0.03, 0.22 },
-	InnerRing = { 0.28, 0.6 },
-	OuterRim = { 0.65, 0.9 },
-	Any = { 0.03, 0.9 },
+	Center = { 0.03, 0.3 },
+	InnerRing = { 0.42, 0.66 },
+	OuterRim = { 0.7, 0.93 },
+	Any = { 0.03, 0.93 },
 }
+
+-- An entry's `biome` key to the map's risk tier ("Center" is the catalog's name for
+-- the crater tier); anything else means any zone.
+EventRules.TIERS = {
+	Center = "CenterCrater",
+	CenterCrater = "CenterCrater",
+	InnerRing = "InnerRing",
+	OuterRim = "OuterRim",
+}
+-- Inner Ring bosses take the best of this many spots toward the crater (the Crater
+-- Gorilla's clearing near the crater approaches, GDD §54).
+EventRules.CRATER_BIAS_TRIES = 4
 
 local function pick(entries, rarity: string, rng)
 	local matching = {}
@@ -160,6 +174,76 @@ function EventRules.BiomeDistance(biome: string, rng): number
 	local low, high = ring[1], ring[2]
 	-- Uniform over the ring's area, not its radius.
 	return math.sqrt(rng:NextNumber() * (high * high - low * low) + low * low)
+end
+
+local function weightedZone(zones, rng): string
+	local total = 0
+	for _, zoneId in zones do
+		total += BiomeCatalog.Area(zoneId)
+	end
+	local roll = rng:NextNumber() * total
+	for _, zoneId in zones do
+		roll -= BiomeCatalog.Area(zoneId)
+		if roll <= 0 then
+			return zoneId
+		end
+	end
+	return zones[#zones]
+end
+
+local function craterDistance(position: Vector3): number
+	local lake = BiomeCatalog.Zones.CraterLake.shape
+	return math.sqrt((position.X - lake.x) ^ 2 + (position.Z - lake.z) ^ 2)
+end
+
+-- A ground position for an event on the generated island (GDD §54): inside the
+-- entry's `zone` when it names one, else in a zone of its tier (weighted by area;
+-- Any is every zone), on dry ground matching its `habitat` when it has one. Falls
+-- back from the zone to its tier, then drops the habitat. "Cave" events stand on
+-- the Emberhollow interior floor. Nil when nothing fits.
+function EventRules.PlacePoint(entry, rng): Vector3?
+	local tier = EventRules.TIERS[entry.biome]
+	local tierZones = {}
+	for _, zoneId in BiomeCatalog.ZONE_IDS do
+		if tier == nil or BiomeCatalog.Zones[zoneId].tier == tier then
+			table.insert(tierZones, zoneId)
+		end
+	end
+	local sets = { tierZones }
+	if entry.zone and BiomeCatalog.Zones[entry.zone] then
+		table.insert(sets, 1, { entry.zone })
+	end
+	local habitats = { entry.habitat or false }
+	if entry.habitat then
+		table.insert(habitats, false)
+	end
+	local tries = if entry.kind == "Boss" and tier == "InnerRing" then EventRules.CRATER_BIAS_TRIES else 1
+	for _, habitat in habitats do
+		for _, set in sets do
+			local zones = set
+			if habitat then
+				zones = {}
+				for _, zoneId in set do
+					if BiomeCatalog.HasHabitat(zoneId, habitat) then
+						table.insert(zones, zoneId)
+					end
+				end
+			end
+			if #zones > 0 then
+				local best = nil
+				for _ = 1, tries do
+					local point = IslandLayout.RandomPointIn(weightedZone(zones, rng), rng, habitat or nil)
+					if point and (best == nil or craterDistance(point) < craterDistance(best)) then
+						best = point
+					end
+				end
+				if best then
+					return best - Vector3.new(0, IslandLayout.STAND_HEIGHT, 0)
+				end
+			end
+		end
+	end
+	return nil
 end
 
 -- Claims a one-time reward exactly once (§7.6): rare nodes never regrow.

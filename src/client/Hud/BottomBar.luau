@@ -1,11 +1,13 @@
 -- Bottom-centre group: the "LV. n" badge with a long XP bar, and the 9-slot
--- hotbar. The hotbar is selection only and deliberately empty (no item icons or
--- counts yet). At the level cap the badge reads MAX over a full bar with a short
--- rebirth hint. Display only.
+-- hotbar. Each slot shows its item's name (in its rarity colour) and stack count;
+-- tapping a slot fires SlotPressed, which HudController turns into the same use
+-- as its key. At the level cap the badge reads MAX over a full bar with a short
+-- rebirth hint.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Layout = require(script.Parent.Layout)
 local Widgets = require(script.Parent.Widgets)
@@ -87,10 +89,34 @@ function BottomBar.new(parent: Instance, layout)
 			TextTruncate = Enum.TextTruncate.None,
 			ZIndex = 5,
 		}, slot)
+		-- The item: its name, wrapped and shrunk to fit, and its stack count.
+		local item = Widgets.Text(cfg.slotNumber, {
+			Name = "Item",
+			Text = "",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			-- Between the key number (top-left) and the count (bottom-right).
+			Position = UDim2.fromScale(0.5, 0.55),
+			Size = UDim2.new(1, -12, 0.4, 0),
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextWrapped = true,
+			TextScaled = true,
+			TextTruncate = Enum.TextTruncate.None,
+			ZIndex = 5,
+		}, slot)
+		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 15, MinTextSize = 8 }, item)
+		local count = Widgets.Text(cfg.slotNumber, {
+			Name = "Count",
+			Text = "",
+			AnchorPoint = Vector2.new(1, 1),
+			Position = UDim2.new(1, -8, 1, -5),
+			Size = UDim2.fromOffset(slotWidth - 16, 18),
+			TextXAlignment = Enum.TextXAlignment.Right,
+			ZIndex = 5,
+		}, slot)
 		slot.Activated:Connect(function()
 			self.SlotPressed:Fire(index)
 		end)
-		self.slots[index] = { button = slot, ring = ring, number = number }
+		self.slots[index] = { button = slot, ring = ring, number = number, item = item, count = count }
 	end
 	return self
 end
@@ -102,6 +128,16 @@ function BottomBar:SetSlotLabels(labels: { string })
 		slot.number.Text = text
 		-- A long key name ("Right Shift") shrinks to fit the slot corner.
 		slot.number.TextScaled = #text > 2
+	end
+end
+
+-- views[index]: {name, count, rarity} from HudModel.HotbarSlots, nil when empty.
+function BottomBar:SetSlotItems(views)
+	for index, slot in self.slots do
+		local view = views[index]
+		slot.item.Text = if view then view.name else ""
+		slot.item.TextColor3 = if view then Rarity.Colors[view.rarity] or Color3.new(1, 1, 1) else Color3.new(1, 1, 1)
+		slot.count.Text = if view then view.count else ""
 	end
 end
 

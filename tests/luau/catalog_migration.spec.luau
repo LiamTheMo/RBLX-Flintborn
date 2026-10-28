@@ -136,7 +136,6 @@ local ProfileSchema = require(Shared.Data.ProfileSchema)
 local Recipes = require(Shared.Crafting.Recipes)
 local ShopCatalog = require(Shared.Economy.ShopCatalog)
 local TradeRules = require(Shared.Economy.TradeRules)
-local VaultRules = require(Shared.Extraction.VaultRules)
 
 local ProfileService = require(Server.Services.ProfileService)
 local profiles, stored = {}, {}
@@ -149,7 +148,6 @@ ProfileService.Mutate = function(player, apply)
 		return false
 	end
 	apply(profile)
-	VaultRules.BankMaterials(profile, clock)
 	return true
 end
 ProfileService.SaveNow = function(player)

@@ -86,13 +86,13 @@ test("crops ripen on server timestamps", function()
 	expectEq(BuildRules.CropRemaining(berries, 100, 100), 180, "3 minutes")
 	expectEq(BuildRules.CropRemaining(berries, 100, 400), 0, "ripe")
 	expectEq(StructureCatalog.Crops.Berries, nil, "plain Berries no longer grow")
-	-- Planters grow Redberries, Sweetberries, Herbs and saplings (GDD §51).
+	-- Planters grow Redberries, Sweetberries, Herbs, saplings (GDD §51) and Fiber (GDD §53).
 	local grown = {}
 	for _, cropId in StructureCatalog.CROP_ORDER do
 		expect(StructureCatalog.Crops[cropId] ~= nil, cropId .. " is a crop")
 		grown[StructureCatalog.Crops[cropId].yield.catalogId] = true
 	end
-	for _, catalogId in { "Redberry", "Sweetberry", "Herbs", "Wood" } do
+	for _, catalogId in { "Redberry", "Sweetberry", "Herbs", "Wood", "Fiber" } do
 		expect(grown[catalogId], "a planter grows " .. catalogId)
 	end
 end)

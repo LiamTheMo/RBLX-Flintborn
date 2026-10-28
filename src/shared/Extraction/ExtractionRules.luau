@@ -1,14 +1,18 @@
--- Extraction qualification and settlement (GDD §9, §10.3, Q17–24, Q119, Q126–129,
--- Q151–154, Q158). Presence counts only at the deadline. Only the fixed Center
--- portal doubles material quantities; portable runes never do. Materials never
--- leave the lobby again once extracted (TransitRules keeps them out of every
--- deploy), so everything a run extracts was gathered in a run. Every material,
--- special ones included, banks into the vault: its material capacity (1,000 per
--- type) decides what is deleted, and the receipt lists it. Everything else lands
--- in the durable 50-slot lobby backpack, where only a full backpack deletes.
--- Unique gear is never multiplied.
+-- Extraction qualification and settlement (GDD §9, §10.3, §53, Q17–24, Q119,
+-- Q126–129, Q151–154, Q158). Presence counts only at the deadline. Only the fixed
+-- Center portal doubles material quantities; portable runes never do. Materials
+-- may be carried into a run (GDD §53), and what was carried in never multiplies:
+-- Play tags each material stack it takes from the lobby as carried
+-- (InventoryRules.MarkCarried), the tag stays on the units through every drop,
+-- body, chest, merge and craft (a carried ore smelts into a carried bar), and per
+-- material only the extracted units not tagged carried are multiplied. Units
+-- handed to another player stay carried for them too. Every material, special
+-- ones included, banks into the vault: its material capacity (1,000 per type)
+-- decides what is deleted, and the receipt lists it. Everything else lands in the durable 50-slot lobby backpack,
+-- where only a full backpack deletes. Unique gear is never multiplied.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 local Receipts = require(script.Parent.Parent.Data.Receipts)
@@ -32,6 +36,18 @@ end
 
 function ExtractionRules.Multiplier(kind: string): number
 	return if kind == ExtractionRules.Kinds.Center then GameConstants.CENTER_MULTIPLIER else 1
+end
+
+local function count(value: any): number
+	return if type(value) == "number" and value == value and value > 0 and value ~= math.huge then value else 0
+end
+
+-- The settled quantity of `extracted` units of a material when `carriedIn` of
+-- them are tagged carried: the carried part counts once, only the rest multiplies
+-- (bring 100, extract 160 at the Center: 100 + 60 × 2 = 220).
+function ExtractionRules.MaterialYield(extracted: number, carriedIn: number, multiplier: number): number
+	local unmultiplied = math.min(extracted, carriedIn)
+	return unmultiplied + (extracted - unmultiplied) * multiplier
 end
 
 -- Adds an item to the lobby backpack (one slot per stackable type, 50 slots).
@@ -95,14 +111,20 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 		shown = false,
 	}
 	local materials = profile.vault.materials
+	-- Materials settle per type, from their extracted totals and the carried units
+	-- among them (GDD §53).
+	local totals, carried, order = {}, {}, {}
 	for _, item in items do
 		local catalogId = item.catalogId
 		if item.instanceId == nil and ItemCatalog.IsMaterial(catalogId) then
-			local current = materials[catalogId] or 0
-			local stored, deleted = GameConstants.SettleMaterialStack(current, (item.quantity or 0) * multiplier)
-			bump(receipt.vaulted, catalogId, stored - current)
-			bump(receipt.deleted, catalogId, deleted)
-			materials[catalogId] = if stored > 0 then stored else nil
+			if totals[catalogId] == nil then
+				totals[catalogId] = 0
+				carried[catalogId] = 0
+				table.insert(order, catalogId)
+			end
+			local quantity = count(item.quantity)
+			totals[catalogId] += quantity
+			carried[catalogId] += math.min(InventoryRules.Carried(item), quantity)
 		else
 			local copy = table.clone(item)
 			if creditsRebirth(copy) then
@@ -113,6 +135,24 @@ function ExtractionRules.Settle(profile, items, kind: string, receiptId: string,
 			local amount = copy.instanceId and 1 or (copy.quantity or 0)
 			bump(receipt.toBackpack, catalogId, amount - left)
 			bump(receipt.deleted, catalogId, left)
+		end
+	end
+	for _, catalogId in order do
+		local extracted = totals[catalogId]
+		local carriedIn = carried[catalogId]
+		local current = materials[catalogId] or 0
+		local stored, deleted =
+			GameConstants.SettleMaterialStack(current, ExtractionRules.MaterialYield(extracted, carriedIn, multiplier))
+		bump(receipt.vaulted, catalogId, stored - current)
+		bump(receipt.deleted, catalogId, deleted)
+		materials[catalogId] = if stored > 0 then stored else nil
+		if multiplier ~= 1 then
+			-- Units the bonus skipped because they were carried in, for the receipt.
+			local skipped = math.min(extracted, carriedIn)
+			if skipped > 0 then
+				receipt.carriedIn = receipt.carriedIn or {}
+				bump(receipt.carriedIn, catalogId, skipped)
+			end
 		end
 	end
 	-- Everything extracted counts as discovered for Forge recipe unlocks (v0.09).

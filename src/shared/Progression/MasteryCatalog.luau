@@ -34,15 +34,18 @@ function MasteryCatalog.Buffs(track: string, level: number)
 		return buffs
 	end
 	if track == "Mining" or track == "Woodcutting" or track == "Farming" then
-		-- +1% yield per level, +10% at level 10 (Q75).
+		-- 1% per level, 10% at level 10 (Q75): each node hit's chance of one extra
+		-- drop that costs the node no health (GDD §53); Farming also adds this much
+		-- to planter harvests.
 		table.insert(buffs, { stat = track .. "Yield", op = "Additive", value = YIELD * level })
 	elseif track == "Crafting" then
-		-- All four benefit types (Q77) plus the best-roll bonus (Q139).
+		-- Only two benefits (owner decision 2026-10-28, replacing Q77's four): better
+		-- gear quality rolls (Q139) and a chance of a bonus bar per bar smelted.
 		table.insert(buffs, { stat = "BestRollLevel", op = "Additive", value = level })
-		table.insert(buffs, { stat = "IngredientSave", op = "Additive", value = 0.02 * level })
-		table.insert(buffs, { stat = "CraftOutput", op = "Additive", value = 0.1 * (level // 3) })
-		table.insert(buffs, { stat = "CraftSpeed", op = "Additive", value = 0.03 * level })
-		table.insert(buffs, { stat = "RecipeTier", op = "Additive", value = level })
+		table.insert(
+			buffs,
+			{ stat = "SmeltBonus", op = "Additive", value = GameConstants.SMELT_BONUS_BAR_PER_LEVEL * level }
+		)
 	elseif track == "PvP" then
 		table.insert(buffs, {
 			stat = "PvpDamage",

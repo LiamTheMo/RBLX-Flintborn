@@ -1,6 +1,5 @@
--- Vault material trades (GDD §10.2, §45, Q56, Q164): materials live only in the
--- vault, so eligible ones are offered from there by quantity and land in the
--- receiver's vault. Covers eligibility, capacity, exactly-once settlement,
+-- Vault material trades (GDD §10.2, §53, Q56, Q164): eligible materials are
+-- offered from the vault by quantity and land in the receiver's vault. Covers eligibility, capacity, exactly-once settlement,
 -- crash reconciliation and rollback, and the real TradeService session flow
 -- (snapshots, unlock on any vault change, all-or-nothing transfer) against fake
 -- Roblox services and a fake clock.
@@ -138,7 +137,6 @@ local GameConstants = require(Shared.GameConstants)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
 local TradeRules = require(Shared.Economy.TradeRules)
-local VaultRules = require(Shared.Extraction.VaultRules)
 
 -- Profiles live in memory; a save copies one into `stored`.
 local ProfileService = require(Server.Services.ProfileService)
@@ -152,10 +150,6 @@ ProfileService.Mutate = function(player, apply)
 		return false
 	end
 	apply(profile)
-	-- The real service banks any backpack material after every write (GDD §45).
-	if VaultRules.BankMaterials then
-		VaultRules.BankMaterials(profile, clock)
-	end
 	return true
 end
 ProfileService.SaveNow = function(player)

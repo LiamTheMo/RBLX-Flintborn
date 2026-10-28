@@ -252,14 +252,14 @@ test("the best roll chance grows 5% relative per Crafting mastery level", functi
 	expectNear(bestRate(10), 0.15, 0.005, "level 10 gives 1.5x")
 end)
 
-test("node yields depend on the tool and respawn after about 120 s", function()
+test("node drops per hit depend on the tool; basic nodes regrow after 120 s", function()
 	local function tool(catalogId)
 		return ItemCatalog.Get(catalogId).tool
 	end
 	expectEq(NodeCatalog.YieldFor("Tree", nil), 1, "bare hands chop slowly")
 	expectEq(NodeCatalog.YieldFor("Rock", nil), 1, "bare hands mine slowly")
-	-- Axe on trees and pickaxe on rock: 2, 3, 4, 5, 6, 7, 9, 11 from Wood to Adamantine.
-	local ladder = { Wooden = 2, Stone = 3, Copper = 4, Iron = 5, Silver = 6, Cobalt = 7, Mithril = 9, Adamantine = 11 }
+	-- Axe on trees and pickaxe on rock: 1 + tool rank (GDD §53), Wood 2 to Adamantine 9.
+	local ladder = { Wooden = 2, Stone = 3, Copper = 4, Iron = 5, Silver = 6, Cobalt = 7, Mithril = 8, Adamantine = 9 }
 	for tier, amount in ladder do
 		expectEq(NodeCatalog.YieldFor("Tree", tool(tier .. "Axe")), amount, tier .. " axe")
 		expectEq(NodeCatalog.YieldFor("Rock", tool(tier .. "Pickaxe")), amount, tier .. " pickaxe")
@@ -288,12 +288,11 @@ test("node yields depend on the tool and respawn after about 120 s", function()
 	end
 	-- Sickles are gone: plants are gathered by hand, and no tool changes that.
 	for _, nodeType in { "FiberPlant", "HerbShrub", "RedberryBush", "SweetberryBush" } do
-		local hand = NodeCatalog.YieldFor(nodeType, nil)
-		expect(hand > 1, nodeType .. " gathers faster than bare-hand chopping")
-		expectEq(NodeCatalog.YieldFor(nodeType, tool("IronAxe")), hand, nodeType .. " ignores tools")
+		expectEq(NodeCatalog.YieldFor(nodeType, nil), 1, nodeType .. " gives 1 per hit by hand")
+		expectEq(NodeCatalog.YieldFor(nodeType, tool("IronAxe")), 1, nodeType .. " ignores tools")
+		expectEq(NodeCatalog.RegrowSeconds(nodeType), 120, nodeType .. " two-minute regrowth")
 	end
 	expectEq(NodeCatalog.Nodes.BerryBush, nil, "plain berry bushes are gone")
-	expectEq(NodeCatalog.RESPAWN_SECONDS, 120, "two-minute regrowth")
 	for nodeType, node in NodeCatalog.Nodes do
 		expect(ItemCatalog.Get(node.material) ~= nil, nodeType .. " yields a real item")
 	end

@@ -198,8 +198,9 @@ test("walls, floors, doors and roofs come in all eight tiers; stations in one", 
 	expectEq(BuildRules.StructureDamage(10, "Pickaxe", anvil.material), 15, "pickaxes break the iron anvil")
 end)
 
-test("planters grow four crops from real items", function()
-	expectEq(#StructureCatalog.CROP_ORDER, 4, "four crops")
+test("planters grow five crops from real items", function()
+	-- Redberry, Sweetberry, Herbs, Sapling and Fiber (GDD §53).
+	expectEq(#StructureCatalog.CROP_ORDER, 5, "five crops")
 	for _, cropId in StructureCatalog.CROP_ORDER do
 		local crop = StructureCatalog.Crops[cropId]
 		expect(crop ~= nil, cropId .. " defined")
@@ -611,21 +612,230 @@ test("ore taken away mid-smelt stops the job without a free bar", function()
 	expect(string.find(player.notes[#player.notes], "ran out of ore") ~= nil, "told why")
 end)
 
-test("Crafting mastery never makes a bar from nothing: smelting stays 1 ore to 1 bar", function()
-	-- The largest buffs: every instant craft doubles and refunds an input.
-	modifiers.CraftOutput = 1
-	modifiers.IngredientSave = 1
-	local player = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
+test("Crafting mastery's bonus bar: one extra bar per bar smelted, by chance", function()
+	local player = newPlayer({ IronOre = 3 })
 	expect(craft(player, "IronBar", 3), "started")
 	for _ = 1, 3 do
 		clock += 3
 		pump()
 	end
-	expectEq(count(player, "IronBar"), 3, "three ore make exactly three bars")
-	expectEq(count(player, "IronOre"), 0, "and no ore comes back")
-	expectEq(#dropped, 0, "nor drops at the smelter's feet")
-	expect(craft(player, "BasicMedicine"), "instant craft")
-	expectEq(count(player, "BasicMedicine"), 2, "instant crafts keep the larger output")
-	modifiers.CraftOutput = nil
-	modifiers.IngredientSave = nil
+	expectEq(count(player, "IronBar"), 3, "without mastery, three ore make three bars")
+
+	-- A certain bonus: every bar smelted brings one more.
+	modifiers.SmeltBonus = 1
+	local lucky = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
+	expect(craft(lucky, "IronBar", 3), "started")
+	for _ = 1, 3 do
+		clock += 3
+		pump()
+	end
+	expectEq(count(lucky, "IronBar"), 6, "three ore make six bars")
+	expectEq(count(lucky, "IronOre"), 0, "each bar still takes its own ore")
+	expect(craft(lucky, "BasicMedicine"), "instant craft")
+	expectEq(count(lucky, "BasicMedicine"), 1, "instant crafts never get a bonus")
+	modifiers.SmeltBonus = nil
+end)
+
+test("a bonus bar never takes the room a later bar of the same job needs", function()
+	modifiers.SmeltBonus = 1
+	local before = #dropped
+	-- The bar stack has room for exactly the two bars being smelted.
+	local player = newPlayer({ IronOre = 3, IronBar = 998 })
+	expect(craft(player, "IronBar", 2), "started")
+	for _ = 1, 2 do
+		clock += 3
+		pump()
+	end
+	expectEq(count(player, "IronBar"), 1000, "both smelted bars fit")
+	expectEq(count(player, "IronOre"), 1, "two ore used")
+	expectEq(#dropped, before + 2, "both bonus bars dropped instead")
+	expectEq(player.attributes.SmeltRecipe, nil, "the job finished")
+	expect(string.find(player.notes[#player.notes], "Smelted 2") ~= nil, "not stopped for room")
+	modifiers.SmeltBonus = nil
+end)
+
+test("a bonus bar with no room drops at the smelter's feet and the job finishes", function()
+	modifiers.SmeltBonus = 1
+	local before = #dropped
+	-- The bar stack (one slot per item type) has room for one more bar.
+	local player = newPlayer({ IronOre = 2, IronBar = 999 })
+	expect(craft(player, "IronBar", 1), "started")
+	clock += 3
+	pump()
+	expectEq(count(player, "IronBar"), 1000, "the smelted bar fits")
+	expectEq(#dropped, before + 1, "the bonus bar dropped")
+	expectEq(dropped[#dropped].catalogId, "IronBar", "an iron bar")
+	expectEq(player.attributes.SmeltRecipe, nil, "the job finished, not stopped")
+	modifiers.SmeltBonus = nil
+end)
+
+-- Carried-in materials (GDD §53) ---------------------------------------------------
+
+-- The stack of a material in a player's inventory, or nil.
+local function stackOf(player, catalogId)
+	for _, entry in InventoryRules.Items(player.inventory) do
+		if entry.instanceId == nil and entry.catalogId == catalogId then
+			return entry
+		end
+	end
+	return nil
+end
+
+-- A player holding `carried` of `quantity` units of a material brought in at Play.
+local function carrying(catalogId, quantity, carried)
+	local player = newPlayer({ [catalogId] = quantity })
+	InventoryRules.SetCarried(stackOf(player, catalogId), carried)
+	return player
+end
+
+test("a carried ore smelts into a carried bar, carried ore first", function()
+	-- 2 Iron Ore brought in, 3 gathered: the first two bars take the carried ore.
+	local player = carrying("IronOre", 5, 2)
+	expect(craft(player, "IronBar", 3), "started")
+	for _ = 1, 3 do
+		clock += 3
+		pump()
+	end
+	local bars, ore = stackOf(player, "IronBar"), stackOf(player, "IronOre")
+	expectEq(bars and bars.quantity, 3, "three bars")
+	expectEq(bars and bars.carried, 2, "the two smelted from carried ore are carried")
+	expectEq(ore and ore.quantity, 2, "two ore left")
+	expectEq(ore and ore.carried, nil, "the ore left is all gathered")
+end)
+
+test("smelting carried ore at scale never launders it into doublable bars", function()
+	local ExtractionRules = require(Shared.Extraction.ExtractionRules)
+	local ProfileSchema = require(Shared.Data.ProfileSchema)
+	local player = carrying("IronOre", 500, 500)
+	expect(craft(player, "IronBar", CraftingRules.MAX_BATCH), "started")
+	for _ = 1, CraftingRules.MAX_BATCH do
+		clock += 3
+		pump()
+	end
+	local bars = stackOf(player, "IronBar")
+	expectEq(bars and bars.carried, bars and bars.quantity, "every bar is carried")
+	local profile = ProfileSchema.Default(0)
+	ExtractionRules.Settle(profile, InventoryRules.Items(player.inventory), "Center", "r1", 5)
+	expectEq(
+		(profile.vault.materials.IronBar or 0) + (profile.vault.materials.IronOre or 0),
+		500,
+		"500 ore in, 500 units out at the Center"
+	)
+end)
+
+test("a bonus bar from a carried ore is carried; from a gathered ore it is not", function()
+	modifiers.SmeltBonus = 1
+	local player = carrying("IronOre", 2, 1)
+	expect(craft(player, "IronBar", 2), "started")
+	for _ = 1, 2 do
+		clock += 3
+		pump()
+	end
+	local bars = stackOf(player, "IronBar")
+	expectEq(bars and bars.quantity, 4, "two bars and two bonus bars")
+	expectEq(bars and bars.carried, 2, "the carried ore's bar and its bonus bar")
+	-- A bonus bar with no room drops with its tag.
+	local before = #dropped
+	local full = carrying("IronOre", 1, 1)
+	InventoryRules.Add(full.inventory, { catalogId = "IronBar", quantity = 999 })
+	expect(craft(full, "IronBar", 1), "started")
+	clock += 3
+	pump()
+	expectEq(#dropped, before + 1, "the bonus bar dropped")
+	expectEq(dropped[#dropped].carried, 1, "still carried on the ground")
+	modifiers.SmeltBonus = nil
+end)
+
+test("a craft from carried inputs tags only material outputs", function()
+	-- Cooked meat is a consumable: the Center bonus never touches it, so no tag.
+	local player = carrying("RawMeat", 1, 1)
+	InventoryRules.Add(player.inventory, { catalogId = "Wood", quantity = 1 })
+	station("Furnace", Vector3.new(0, 0, 2))
+	expect(craft(player, "CookedMeat"), "cooked")
+	expectEq(stackOf(player, "CookedMeat").carried, nil, "a consumable is never tagged")
+end)
+
+-- FarmingService against the same fakes --------------------------------------------
+
+local cframeMeta = {}
+cframeMeta.__mul = function(a)
+	return a
+end
+CFrame = {
+	new = function()
+		return setmetatable({}, cframeMeta)
+	end,
+}
+local function fakeInstance(className)
+	return setmetatable({ ClassName = className, Destroy = function() end }, {
+		__index = function(self, key)
+			local signal = Signal.new()
+			rawset(self, key, signal)
+			return signal
+		end,
+	})
+end
+Instance = { new = fakeInstance }
+stubs.InventoryService.RemoveAll = function(player, costs)
+	return InventoryRules.RemoveAll(player.inventory, costs)
+end
+stubs.InventoryService.Add = function(player, item)
+	return InventoryRules.Add(player.inventory, item)
+end
+local FarmingService = require(game:GetService("ServerScriptService").Server.Services.FarmingService)
+FarmingService.Start()
+
+-- A placed planter's prompts, in the order they were made.
+local function planter(id: string)
+	local made = {}
+	Instance.new = function(className)
+		local instance = fakeInstance(className)
+		if className == "ProximityPrompt" then
+			table.insert(made, instance)
+		end
+		return instance
+	end
+	local part = { Position = Vector3.new(0, 0, 0), CFrame = CFrame.new() }
+	stubs.BuildingService.Placed:Fire({ id = id, pieceId = "Planter", part = part, position = part.Position })
+	Instance.new = fakeInstance
+	return made
+end
+
+local FIBER = "Plant " .. ItemCatalog.Get("Fiber").name
+
+test("planter prompts never take a gamepad button the run already uses", function()
+	local plant, keys = {}, {}
+	for _, prompt in planter("p-keys") do
+		if string.find(prompt.ActionText, "^Plant ") then
+			table.insert(plant, prompt)
+			expect(prompt.GamepadKeyCode ~= Enum.KeyCode.ButtonR1, "ButtonR1 steps the hotbar and places pieces")
+			expect(not keys[prompt.GamepadKeyCode], prompt.ActionText .. " has a button of its own")
+			keys[prompt.GamepadKeyCode] = true
+		end
+	end
+	expectEq(#plant, 4, "four plant prompts for five crops")
+	expectEq(plant[4].ActionText, "Plant Sapling", "the last one offers Sapling first")
+	expect(string.find(plant[4].ObjectText, "tap for " .. ItemCatalog.Get("Fiber").name) ~= nil, "a tap shows Fiber")
+end)
+
+test("a tap cycles the shared prompt, a hold plants the crop it showed", function()
+	local made = planter("p-cycle")
+	local shared = made[4]
+	local farmer = carrying("Fiber", 3, 3)
+	shared.PromptButtonHoldBegan:Fire(farmer)
+	shared.PromptButtonHoldEnded:Fire(farmer)
+	expectEq(shared.ActionText, FIBER, "a tap shows Fiber")
+	expect(string.find(shared.ObjectText, "tap for Sapling") ~= nil, "and offers Sapling next")
+	shared.PromptButtonHoldBegan:Fire(farmer)
+	shared.Triggered:Fire(farmer)
+	shared.PromptButtonHoldEnded:Fire(farmer)
+	expectEq(count(farmer, "Fiber"), 0, "the Fiber seed was planted")
+	expectEq(shared.ActionText, FIBER, "a completed hold never cycles")
+
+	-- Carried seed makes as many of the harvest carried (GDD §53).
+	clock += StructureCatalog.Crops.Fiber.seconds
+	made[5].Triggered:Fire(farmer)
+	local fiber = stackOf(farmer, "Fiber")
+	expectEq(fiber and fiber.quantity, StructureCatalog.Crops.Fiber.yield.quantity, "harvested")
+	expectEq(fiber and fiber.carried, 3, "the 3 carried seed units stay carried; the growth is gathered")
 end)

@@ -21,7 +21,7 @@ TutorialSteps.Steps = {
 	{
 		id = "Gather",
 		title = "Gather materials",
-		hint = "Walk up to a tree, rock, plant or berry bush and hold {Interact} at the prompt. Axes and pickaxes gather more; plants and berries are picked by hand.",
+		hint = "Walk up to a tree, rock, plant or berry bush and press {Interact} to hit it. Each hit drops materials on the ground: walk over them to pick them up. Axes and pickaxes gather faster; plants and berries are picked by hand.",
 		trigger = "Harvest",
 		reward = { xp = "Harvest" },
 	},

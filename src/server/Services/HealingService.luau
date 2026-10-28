@@ -71,6 +71,11 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 	if item.boost ~= nil and not BoostRules.IsValid(item.boost) then
 		return false, "NotConsumable"
 	end
+	-- A draught that would change nothing (a boost at least as strong is running)
+	-- is refused rather than wasted; food still feeds and leaves the boost as is.
+	if item.kind == Consumables.Boost and not ModifierService.BoostTakes(player, item.boost) then
+		return false, "BoostActive"
+	end
 
 	local now = workspace:GetServerTimeNow()
 	if item.kind == Consumables.Medicine then
@@ -86,13 +91,13 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 	else
 		InventoryService.RemoveAll(player, { [catalogId] = 1 })
 	end
-	local replaced = nil
+	local kept = nil
 	if item.boost then
-		local _, previous = ModifierService.ApplyBoost(player, item.boost)
-		replaced = previous
+		local entry, started = ModifierService.ApplyBoost(player, item.boost)
+		kept = if started then nil else entry
 	end
 	if item.kind ~= Consumables.Medicine then
-		InventoryService.Notify(player, BoostRules.UseText(item, replaced))
+		InventoryService.Notify(player, BoostRules.UseText(item, kept))
 	end
 	HealingService.Used:Fire(player, catalogId)
 	return true, nil

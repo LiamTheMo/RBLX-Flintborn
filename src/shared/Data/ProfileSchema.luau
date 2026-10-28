@@ -2,7 +2,9 @@
 -- version and pure migrations from every older version live here so the server,
 -- client and headless specs agree on one definition.
 
+local BoostRules = require(script.Parent.Parent.Survival.BoostRules)
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 
 local ProfileSchema = {}
 
@@ -64,7 +66,9 @@ function ProfileSchema.Default(now: number?)
 			pvpCredits = {},
 		},
 		rebirth = { count = 0, tokens = 0, ownedPerks = {}, legendariesSinceRebirth = 0 },
-		boosters = { xpUntil = 0 },
+		-- `paused`: consumable boosts saved at extraction with their remaining
+		-- seconds ({kind, amount, remaining}), resumed on the next deploy (GDD §53).
+		boosters = { xpUntil = 0, paused = {} },
 		recipes = { unlocked = {}, discovered = {} },
 		receipts = { extraction = {}, forge = {}, maintenance = {}, crashRecovery = {} },
 		operations = { records = {}, order = {} },
@@ -193,6 +197,7 @@ function ProfileSchema.PruneRetiredItems(profile): number
 	for _, receipt in profile.receipts.extraction do
 		if type(receipt) == "table" then
 			removed += pruneMap(receipt.vaulted) + pruneMap(receipt.toBackpack) + pruneMap(receipt.deleted)
+			removed += pruneMap(receipt.carriedIn)
 		end
 	end
 	for receiptId, receipt in table.clone(profile.receipts.forge) do
@@ -235,6 +240,43 @@ function ProfileSchema.PruneRetiredItems(profile): number
 	return removed
 end
 
+-- Saves from before carried-in provenance moved onto the stacks (GDD §53) kept
+-- one per-material total on the run instead (`currentRun.carriedIn`). Only a run
+-- that maintenance escrowed still needs it, since the pending receipt brings its
+-- items back into the next run: those material stacks take the total as their
+-- carried units, stack by stack, so restoring them never multiplies what the
+-- player brought in. The total is then dropped, leaving the stacks as the one
+-- record. Safe on every load.
+local function migrateCarriedIn(profile)
+	local run = profile.progression.currentRun
+	local legacy = type(run) == "table" and run.carriedIn
+	if legacy == nil or legacy == false then
+		return
+	end
+	run.carriedIn = nil
+	if type(legacy) ~= "table" then
+		return
+	end
+	local pending = {}
+	for operationId, receipt in profile.receipts.maintenance do
+		if type(receipt) == "table" and receipt.status == "Pending" and type(receipt.items) == "table" then
+			table.insert(pending, operationId)
+		end
+	end
+	table.sort(pending)
+	for _, operationId in pending do
+		for _, item in profile.receipts.maintenance[operationId].items do
+			local left = type(item) == "table" and item.instanceId == nil and legacy[item.catalogId]
+			if type(left) == "number" and left >= 1 and type(item.quantity) == "number" then
+				local had = InventoryRules.Carried(item)
+				local tagged = math.max(0, math.min(math.floor(left), item.quantity - had))
+				InventoryRules.SetCarried(item, had + tagged)
+				legacy[item.catalogId] = left - tagged
+			end
+		end
+	end
+end
+
 -- Pure migrations: MIGRATIONS[n] upgrades a version-n profile to version n + 1.
 local MIGRATIONS: { [number]: (any) -> any } = {}
 
@@ -260,7 +302,9 @@ function ProfileSchema.Migrate(data: any, now: number?)
 		profile.schemaVersion += 1
 	end
 	reconcile(profile, ProfileSchema.Default(profile.createdAt))
+	profile.boosters.paused = BoostRules.Sanitize(profile.boosters.paused)
 	backfillRedeemedCodes(profile)
+	migrateCarriedIn(profile)
 	ProfileSchema.PruneRetiredItems(profile)
 	return profile, nil
 end
