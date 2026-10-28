@@ -200,7 +200,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 001 | Flintborn Stone Model Study | World & resources | ✅ | 820; parts 356 / 212 / 212 | PASS 8/10, re-verified PASS 7.5/10 after the node rework | minors: left support a bit large, right support hidden in the front view; check palette brightness in Studio |
 | 002 | Flintborn Flint_ Low-Poly Construction Study | World & resources | ✅ | 744; parts 466 / 24 / 24 / 24 / 144 | FAIL 4/10 → PASS 6.5/10 (round 2) | minors: shell faceting more regular than the sheet, inserts gem-like rather than wedge shards; check in Studio |
 | 003 | Flintborn Iron model study | World & resources | ✅ | 988; parts 216 / 42 / 36 | PASS 6.5/10 (round 1), re-verified PASS 6.5/10 after denser host + gem-top chunks | verifiers split on chunk thickness (thin inlay vs thick slab): decide in review; steel sheen and metallic look need a Studio check |
-| 004 | Obsidian Flintborn Model Study | World & resources | ⬜ | | | |
+| 004 | Obsidian Flintborn Model Study | World & resources | ✅ | 1380; parts 34×3 / 40×2 / 484 | PASS 6.5 → FAIL 6 (base off the ground) → PASS 6.5/10 (round 3) | minors: crystals leaner than the sheet's chunky ones; small front crystals partly hidden; glassy specular to check in Studio |
 | 005 | Quartz Flintborn low-poly model study | World & resources | ⬜ | | | |
 | 006 | Copper Flintborn Construction Study | World & resources | ⬜ | | | |
 | 007 | Flintborn Coal model study | World & resources | ⬜ | | | |
@@ -380,3 +380,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-27: started the numbered references with the `roblox-blender-model` skill. 001 Stone passed on the first verifier round (8/10, all technical checks re-measured through MCP). Fixed `kit_mcp.sample` (it double-encoded sRGB, so earlier hex values read brighter than true). Numbered models are displayed in their own area of FlintbornWorldKit.blend (y = -200 southward, 10 per row, labels in `_Labels`).
 - 2026-10-27: user asked for chunkier nodes: 001 and 002 footprints widened to near-round (depth ≈ 0.9 of width). 002 Flint passed on round 2. Its first build overwrote R01's `FlintInsertSmall` (same name); the original was restored from the committed blend, and `kit_models.mk` now appends the model code on a name clash (`FlintInsertSmallM002`).
 - 2026-10-28: PR #72 (world kit W01, 001, 002) merged into v0.18. 003 Iron passed (6.5/10).
+- 2026-10-28: PR #73 (003) merged into v0.18. 004 Obsidian passed on round 3 (fixed a crystal lean-angle bug and a floor cut that left the base above z = 0).
