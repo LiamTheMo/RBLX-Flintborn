@@ -1,0 +1,2056 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W01",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w01_leaf",
+    "hex": "#385601",
+    "levels": [
+     0.95002,
+     0.95392,
+     0.95596,
+     0.95699,
+     0.95907,
+     0.96228,
+     0.96509,
+     0.96807,
+     0.9732,
+     0.97611,
+     0.97879,
+     0.98297,
+     0.98724,
+     0.9899,
+     0.99276,
+     0.99492,
+     0.99741,
+     1.00155,
+     1.00477,
+     1.00799,
+     1.00944,
+     1.01471,
+     1.01687,
+     1.01962,
+     1.02571,
+     1.02944,
+     1.03219,
+     1.034,
+     1.03745,
+     1.03995,
+     1.04577,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_leaf_x_young_50",
+    "hex": "#476802",
+    "levels": [
+     0.95002,
+     0.95392,
+     0.9559,
+     0.95673,
+     0.96171,
+     0.96443,
+     0.9652,
+     0.97044,
+     0.97267,
+     0.97784,
+     0.97896,
+     0.98141,
+     0.98693,
+     0.98967,
+     0.99189,
+     0.99532,
+     0.9985,
+     1.00281,
+     1.00663,
+     1.00771,
+     1.01141,
+     1.01471,
+     1.01804,
+     1.02294,
+     1.028,
+     1.03219,
+     1.034,
+     1.03743,
+     1.03834,
+     1.04531,
+     1.04763,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_leaf_young",
+    "hex": "#567902",
+    "levels": [
+     0.95002,
+     0.9527,
+     0.9559,
+     0.95673,
+     0.96171,
+     0.96228,
+     0.96509,
+     0.9668,
+     0.9706,
+     0.97441,
+     0.97627,
+     0.97896,
+     0.98085,
+     0.98588,
+     0.98858,
+     0.99181,
+     0.99492,
+     0.99795,
+     1.00252,
+     1.00744,
+     1.00816,
+     1.01176,
+     1.01471,
+     1.01804,
+     1.0199,
+     1.02646,
+     1.03161,
+     1.03585,
+     1.03751,
+     1.04447,
+     1.04763,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_leaf_young_x_moss_lime_50",
+    "hex": "#628002",
+    "levels": [
+     0.95429,
+     0.9652,
+     0.97947,
+     0.98141,
+     0.98967,
+     0.99276,
+     0.99532,
+     0.9989,
+     1.00786,
+     1.01743,
+     1.02646,
+     1.03585,
+     1.04763
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss",
+    "hex": "#466101",
+    "levels": [
+     0.88348,
+     0.91915,
+     0.92718,
+     0.93313,
+     0.93741,
+     0.94075,
+     0.94511,
+     0.94824,
+     0.95214,
+     0.95514,
+     0.95882,
+     0.96178,
+     0.96428,
+     0.96685,
+     0.97013,
+     0.973,
+     0.97601,
+     0.97924,
+     0.98208,
+     0.98499,
+     0.98805,
+     0.99168,
+     0.99508,
+     0.99842,
+     1.00282,
+     1.00647,
+     1.01111,
+     1.01662,
+     1.02339,
+     1.03098,
+     1.04183,
+     1.08125
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss_lime",
+    "hex": "#6E8803",
+    "levels": [
+     0.89109,
+     0.91347,
+     0.9227,
+     0.929,
+     0.93364,
+     0.93748,
+     0.94185,
+     0.94726,
+     0.95112,
+     0.95596,
+     0.96039,
+     0.963,
+     0.96536,
+     0.97008,
+     0.97387,
+     0.97651,
+     0.98085,
+     0.9816,
+     0.9849,
+     0.98905,
+     0.99358,
+     0.99802,
+     1.00124,
+     1.00689,
+     1.00924,
+     1.01253,
+     1.01952,
+     1.02024,
+     1.02944,
+     1.03346,
+     1.03846,
+     1.07555
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss_lime_x_moss_sun_25",
+    "hex": "#738B05",
+    "levels": [
+     0.90356,
+     0.91277,
+     0.92155,
+     0.92838,
+     0.93555,
+     0.93787,
+     0.94217,
+     0.945,
+     0.94743,
+     0.94972,
+     0.95222,
+     0.95634,
+     0.96043,
+     0.96394,
+     0.96653,
+     0.96845,
+     0.97146,
+     0.97311,
+     0.97612,
+     0.97883,
+     0.98227,
+     0.9855,
+     0.99098,
+     0.99292,
+     0.99607,
+     1.00152,
+     1.00559,
+     1.01128,
+     1.01636,
+     1.0264,
+     1.03494,
+     1.05621
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss_lime_x_moss_sun_50",
+    "hex": "#788E07",
+    "levels": [
+     0.91056,
+     0.92639,
+     0.93663,
+     0.94447,
+     0.94786,
+     0.94996,
+     0.95203,
+     0.95623,
+     0.96003,
+     0.96297,
+     0.96544,
+     0.96712,
+     0.96898,
+     0.97151,
+     0.97456,
+     0.97618,
+     0.97815,
+     0.97952,
+     0.98116,
+     0.98541,
+     0.98959,
+     0.99194,
+     0.99553,
+     1.00081,
+     1.00311,
+     1.00997,
+     1.01206,
+     1.0208,
+     1.02509,
+     1.03081,
+     1.04327,
+     1.06357
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss_lime_x_moss_sun_75",
+    "hex": "#7E9209",
+    "levels": [
+     0.90225,
+     0.92003,
+     0.9302,
+     0.93704,
+     0.94196,
+     0.94973,
+     0.95232,
+     0.95349,
+     0.95487,
+     0.95743,
+     0.95912,
+     0.96184,
+     0.96406,
+     0.96672,
+     0.96814,
+     0.96956,
+     0.9707,
+     0.97205,
+     0.97457,
+     0.97821,
+     0.97991,
+     0.98357,
+     0.98625,
+     0.98901,
+     0.99431,
+     0.99899,
+     1.00211,
+     1.00769,
+     1.01476,
+     1.01906,
+     1.03716,
+     1.06296
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_moss_sun",
+    "hex": "#83950B",
+    "levels": [
+     0.90181,
+     0.92948,
+     0.9358,
+     0.94394,
+     0.94763,
+     0.95093,
+     0.95512,
+     0.95794,
+     0.96051,
+     0.96256,
+     0.96645,
+     0.96879,
+     0.97046,
+     0.97305,
+     0.97612,
+     0.97813,
+     0.98032,
+     0.98356,
+     0.98638,
+     0.98947,
+     0.99215,
+     0.99452,
+     0.9975,
+     1.00122,
+     1.00472,
+     1.00957,
+     1.01388,
+     1.01938,
+     1.02604,
+     1.03663,
+     1.04998,
+     1.07544
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_petal",
+    "hex": "#F6F3EA",
+    "levels": [
+     0.95002,
+     0.95392,
+     0.95596,
+     0.95628,
+     0.96171,
+     0.96293,
+     0.9652,
+     0.9706,
+     0.97441,
+     0.97784,
+     0.97896,
+     0.98141,
+     0.98642,
+     0.98724,
+     0.9899,
+     0.99492,
+     0.99617,
+     1.00176,
+     1.00477,
+     1.00744,
+     1.00856,
+     1.01389,
+     1.01682,
+     1.01953,
+     1.02571,
+     1.028,
+     1.03161,
+     1.034,
+     1.0364,
+     1.03745,
+     1.04447,
+     1.04931
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_pollen",
+    "hex": "#F2C230",
+    "levels": [
+     0.9529,
+     0.95615,
+     0.96076,
+     0.96228,
+     0.96583,
+     0.96807,
+     0.9706,
+     0.97784,
+     0.98068,
+     0.98531,
+     0.99252,
+     0.99864,
+     1.00551,
+     1.00835,
+     1.01176,
+     1.01723,
+     1.0196,
+     1.03161,
+     1.0377,
+     1.04447,
+     1.04826
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock",
+    "hex": "#8F8380",
+    "levels": [
+     0.86462,
+     0.90586,
+     0.91632,
+     0.92354,
+     0.92751,
+     0.93264,
+     0.938,
+     0.94201,
+     0.94626,
+     0.9496,
+     0.95317,
+     0.95729,
+     0.96136,
+     0.96522,
+     0.96905,
+     0.97223,
+     0.97504,
+     0.97861,
+     0.98189,
+     0.98577,
+     0.9896,
+     0.99312,
+     0.99689,
+     1.00074,
+     1.00506,
+     1.00927,
+     1.01423,
+     1.02075,
+     1.02699,
+     1.03672,
+     1.05331,
+     1.11395
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_base",
+    "hex": "#7A706C",
+    "levels": [
+     0.86462,
+     0.92029,
+     0.92635,
+     0.92947,
+     0.94054,
+     0.94358,
+     0.94613,
+     0.95679,
+     0.95914,
+     0.96065,
+     0.96388,
+     0.96948,
+     0.97161,
+     0.9739,
+     0.97628,
+     0.97946,
+     0.98171,
+     0.98333,
+     0.98607,
+     0.9887,
+     0.9906,
+     0.99428,
+     0.99803,
+     1.00119,
+     1.00294,
+     1.00553,
+     1.01059,
+     1.01307,
+     1.01815,
+     1.02067,
+     1.04056,
+     1.07077
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_cool",
+    "hex": "#7D7884",
+    "levels": [
+     0.87371,
+     0.91734,
+     0.93099,
+     0.93689,
+     0.94443,
+     0.94819,
+     0.95565,
+     0.96079,
+     0.96494,
+     0.96865,
+     0.97225,
+     0.97635,
+     0.98002,
+     0.98258,
+     0.98654,
+     0.98979,
+     0.99336,
+     0.99596,
+     1.00061,
+     1.00316,
+     1.00657,
+     1.01033,
+     1.0146,
+     1.01906,
+     1.02296,
+     1.02871,
+     1.03627,
+     1.04068,
+     1.04643,
+     1.05556,
+     1.06651,
+     1.10819
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_stain",
+    "hex": "#4F6A22",
+    "levels": [
+     0.91419,
+     0.93831,
+     0.97857,
+     0.98901,
+     1.00416,
+     1.01143,
+     1.01681,
+     1.03852,
+     1.05324
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_base_33",
+    "hex": "#887D79",
+    "levels": [
+     0.87969,
+     0.91766,
+     0.92438,
+     0.93152,
+     0.93846,
+     0.94553,
+     0.94897,
+     0.95351,
+     0.95679,
+     0.96033,
+     0.96219,
+     0.96645,
+     0.97229,
+     0.97556,
+     0.97813,
+     0.98036,
+     0.98464,
+     0.98807,
+     0.99057,
+     0.99195,
+     0.99372,
+     0.99641,
+     1.00015,
+     1.00346,
+     1.00691,
+     1.01353,
+     1.0172,
+     1.02057,
+     1.02984,
+     1.03791,
+     1.04637,
+     1.07
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_base_67",
+    "hex": "#817673",
+    "levels": [
+     0.86462,
+     0.91758,
+     0.92835,
+     0.93688,
+     0.94287,
+     0.94569,
+     0.95001,
+     0.95367,
+     0.95679,
+     0.95975,
+     0.96192,
+     0.96635,
+     0.96975,
+     0.97283,
+     0.97562,
+     0.97831,
+     0.98147,
+     0.9852,
+     0.98828,
+     0.99164,
+     0.9935,
+     0.99515,
+     0.99892,
+     1.00208,
+     1.00527,
+     1.01028,
+     1.01307,
+     1.01954,
+     1.02671,
+     1.03845,
+     1.04715,
+     1.07077
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_cool_25",
+    "hex": "#8A8081",
+    "levels": [
+     0.90141,
+     0.92755,
+     0.93838,
+     0.94536,
+     0.95133,
+     0.95515,
+     0.95754,
+     0.96314,
+     0.96594,
+     0.96926,
+     0.97362,
+     0.976,
+     0.97808,
+     0.98016,
+     0.98445,
+     0.98729,
+     0.98897,
+     0.99233,
+     0.99531,
+     0.99836,
+     1.0,
+     1.00342,
+     1.00539,
+     1.00854,
+     1.01359,
+     1.01655,
+     1.01966,
+     1.02504,
+     1.03314,
+     1.04015,
+     1.05143,
+     1.09522
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_cool_50",
+    "hex": "#867E82",
+    "levels": [
+     0.88629,
+     0.92077,
+     0.93525,
+     0.94325,
+     0.94857,
+     0.95238,
+     0.95745,
+     0.96086,
+     0.96414,
+     0.9665,
+     0.96835,
+     0.97451,
+     0.97974,
+     0.98174,
+     0.98507,
+     0.98822,
+     0.99214,
+     0.99358,
+     0.99591,
+     1.00052,
+     1.00343,
+     1.00535,
+     1.00835,
+     1.01138,
+     1.01453,
+     1.01819,
+     1.02275,
+     1.02692,
+     1.03095,
+     1.03697,
+     1.04783,
+     1.07169
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_cool_75",
+    "hex": "#827B83",
+    "levels": [
+     0.90034,
+     0.92791,
+     0.93536,
+     0.9436,
+     0.95012,
+     0.95427,
+     0.95816,
+     0.96103,
+     0.96395,
+     0.96643,
+     0.97004,
+     0.97277,
+     0.97617,
+     0.97985,
+     0.98402,
+     0.98866,
+     0.99176,
+     0.99371,
+     0.99669,
+     1.00098,
+     1.00369,
+     1.00793,
+     1.01103,
+     1.01267,
+     1.01487,
+     1.01718,
+     1.02036,
+     1.02618,
+     1.03112,
+     1.03593,
+     1.04638,
+     1.07689
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_moss_25",
+    "hex": "#7D7A60",
+    "levels": [
+     0.94513,
+     0.95703,
+     0.95999,
+     0.96297,
+     0.96856,
+     0.98401,
+     0.99784,
+     1.00054,
+     1.00476,
+     1.01419
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_moss_50",
+    "hex": "#6A7240",
+    "levels": [
+     0.94513,
+     0.96856,
+     0.98173,
+     0.98401,
+     0.9885,
+     0.99189,
+     0.99747,
+     1.00699,
+     1.02431,
+     1.03098
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_moss_75",
+    "hex": "#586A21",
+    "levels": [
+     0.95683,
+     0.95999,
+     0.99822,
+     1.00054,
+     1.01421
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_stain_20",
+    "hex": "#827E6D",
+    "levels": [
+     0.88537,
+     0.89696,
+     0.90825,
+     0.91459,
+     0.92326,
+     0.9375,
+     0.94309,
+     0.94559,
+     0.94908,
+     0.9588,
+     0.96126,
+     0.96566,
+     0.97359,
+     0.97685,
+     0.98321,
+     0.98523,
+     0.98927,
+     0.994,
+     0.99721,
+     0.99929,
+     1.00194,
+     1.0074,
+     1.01359,
+     1.01681,
+     1.01946,
+     1.02141,
+     1.02383,
+     1.02607,
+     1.03086,
+     1.03899,
+     1.05316
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_stain_40",
+    "hex": "#75795A",
+    "levels": [
+     0.89696,
+     0.90015,
+     0.90825,
+     0.91473,
+     0.92387,
+     0.92755,
+     0.93758,
+     0.94242,
+     0.94485,
+     0.94891,
+     0.9552,
+     0.95899,
+     0.96566,
+     0.97359,
+     0.97791,
+     0.98464,
+     0.9894,
+     0.99318,
+     0.99721,
+     1.00414,
+     1.00701,
+     1.01143,
+     1.01443,
+     1.01681,
+     1.02141,
+     1.02394,
+     1.02654,
+     1.03086,
+     1.03876,
+     1.05324
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_stain_60",
+    "hex": "#697448",
+    "levels": [
+     0.88537,
+     0.90825,
+     0.91437,
+     0.92313,
+     0.93831,
+     0.94266,
+     0.94485,
+     0.96566,
+     0.97857,
+     0.98993,
+     0.99817,
+     1.0041,
+     1.00598,
+     1.01143
+    ],
+    "used": true
+   },
+   {
+    "key": "w01_rock_x_stain_80",
+    "hex": "#5C6F35",
+    "levels": [
+     0.89696,
+     0.90825,
+     0.91473,
+     0.92387,
+     0.9897,
+     1.00778,
+     1.02677,
+     1.03852,
+     1.05324
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "Boulder",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "hero",
+   "size": [
+    15.6029,
+    7.0315,
+    12.6202
+   ],
+   "tris": 3781,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Boulder.glb",
+     "kind": "solid",
+     "tris": 3781,
+     "offset": [
+      0.0,
+      3.5157,
+      0.0
+     ],
+     "size": [
+      15.6029,
+      7.0315,
+      12.6202
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "squat barrel-dome boulder with many large facets and a soft front-left crease; leafy lime moss cap of layered lobed clumps; moss streak on the front-left face; clover mounds with white daisies and pebbles round the foot"
+  },
+  {
+   "name": "BoulderFlat",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "variant",
+   "size": [
+    15.54,
+    4.72,
+    11.3823
+   ],
+   "tris": 2834,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoulderFlat.glb",
+     "kind": "solid",
+     "tris": 2834,
+     "offset": [
+      0.0,
+      2.36,
+      0.0
+     ],
+     "size": [
+      15.54,
+      4.72,
+      11.3823
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Flat Boulder: wide and low, two merged humps, moss on the crown, clover and pebbles"
+  },
+  {
+   "name": "BoulderMainRock",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "part",
+   "size": [
+    11.284,
+    6.6,
+    9.574
+   ],
+   "tris": 747,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoulderMainRock.glb",
+     "kind": "solid",
+     "tris": 747,
+     "offset": [
+      0.0,
+      3.3,
+      0.0
+     ],
+     "size": [
+      11.284,
+      6.6,
+      9.574
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "main rock alone (moss streak on the front-left face); drop a BoulderMossCap on its crown"
+  },
+  {
+   "name": "BoulderMossCap",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "part",
+   "size": [
+    7.2923,
+    0.495,
+    4.1585
+   ],
+   "tris": 98,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoulderMossCap.glb",
+     "kind": "solid",
+     "tris": 98,
+     "offset": [
+      0.0,
+      0.2475,
+      0.0
+     ],
+     "size": [
+      7.2923,
+      0.495,
+      4.1585
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "moss cap: lobed lime clumps shaped to the main rock's crown; drop onto any rock top"
+  },
+  {
+   "name": "BoulderSplit",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "variant",
+   "size": [
+    13.1916,
+    8.585,
+    9.564
+   ],
+   "tris": 2544,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoulderSplit.glb",
+     "kind": "solid",
+     "tris": 2544,
+     "offset": [
+      0.0,
+      4.2925,
+      0.0
+     ],
+     "size": [
+      13.1916,
+      8.585,
+      9.564
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Split Boulder: a tall rock and a squat rock with a crack between, moss on both, clover"
+  },
+  {
+   "name": "BoulderUpright",
+   "sheet": "W01",
+   "subject": "Boulder",
+   "role": "variant",
+   "size": [
+    12.704,
+    11.72,
+    10.424
+   ],
+   "tris": 2796,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BoulderUpright.glb",
+     "kind": "solid",
+     "tris": 2796,
+     "offset": [
+      0.0,
+      5.86,
+      0.0
+     ],
+     "size": [
+      12.704,
+      11.72,
+      10.424
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Upright Boulder: tall tapering pillar with a moss tuft on top and a streak down its side, a small boulder at its foot, clover with daisies"
+  },
+  {
+   "name": "Pebble",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    1.63,
+    1.1,
+    1.2255
+   ],
+   "tris": 32,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Pebble.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.55,
+      0.0
+     ],
+     "size": [
+      1.63,
+      1.1,
+      1.2255
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "pebble alone"
+  },
+  {
+   "name": "PebbleFlatSlab",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    7.3565,
+    1.8,
+    4.246
+   ],
+   "tris": 210,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleFlatSlab.glb",
+     "kind": "solid",
+     "tris": 210,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      7.3565,
+      1.8,
+      4.246
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flat slab alone: big low slab with broad flat top facets and moss on one end"
+  },
+  {
+   "name": "PebbleRoundRock",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    3.2233,
+    2.0,
+    2.9385
+   ],
+   "tris": 224,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleRoundRock.glb",
+     "kind": "solid",
+     "tris": 224,
+     "offset": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "size": [
+      3.2233,
+      2.0,
+      2.9385
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "round rock alone: rounded rock with moss low on one side"
+  },
+  {
+   "name": "PebbleScatter",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "hero",
+   "size": [
+    16.5844,
+    3.135,
+    11.8074
+   ],
+   "tris": 3656,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatter.glb",
+     "kind": "solid",
+     "tris": 3656,
+     "offset": [
+      0.0,
+      1.5675,
+      0.0
+     ],
+     "size": [
+      16.5844,
+      3.135,
+      11.8074
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ground scatter: big low flat slab with moss on one end, a tall angular rock behind, a blocky wedge rock with a moss tuft, a rounded rock, small stones, clover clumps with white daisies"
+  },
+  {
+   "name": "PebbleScatterDense",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    13.4473,
+    2.64,
+    9.7345
+   ],
+   "tris": 3232,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterDense.glb",
+     "kind": "solid",
+     "tris": 3232,
+     "offset": [
+      0.0,
+      1.32,
+      0.0
+     ],
+     "size": [
+      13.4473,
+      2.64,
+      9.7345
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Dense: 8+ pieces with lots of clover and daisies"
+  },
+  {
+   "name": "PebbleScatterMedium",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    11.9009,
+    2.1921,
+    7.8054
+   ],
+   "tris": 2040,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterMedium.glb",
+     "kind": "solid",
+     "tris": 2040,
+     "offset": [
+      0.0,
+      1.0961,
+      0.0
+     ],
+     "size": [
+      11.9009,
+      2.1921,
+      7.8054
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Medium: 5 pieces with clover and daisies"
+  },
+  {
+   "name": "PebbleScatterSparse",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "variant",
+   "size": [
+    9.4454,
+    1.6,
+    5.9222
+   ],
+   "tris": 1042,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleScatterSparse.glb",
+     "kind": "solid",
+     "tris": 1042,
+     "offset": [
+      0.0,
+      0.8,
+      0.0
+     ],
+     "size": [
+      9.4454,
+      1.6,
+      5.9222
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Sparse: 3 pieces (slab, round rock, small stones) with a little clover"
+  },
+  {
+   "name": "PebbleSmallStone",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    1.0965,
+    0.7,
+    0.94
+   ],
+   "tris": 32,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleSmallStone.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.35,
+      0.0
+     ],
+     "size": [
+      1.0965,
+      0.7,
+      0.94
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "small stone alone"
+  },
+  {
+   "name": "PebbleWedgeRock",
+   "sheet": "W01",
+   "subject": "PebbleScatter",
+   "role": "part",
+   "size": [
+    3.1733,
+    2.586,
+    2.8275
+   ],
+   "tris": 182,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PebbleWedgeRock.glb",
+     "kind": "solid",
+     "tris": 182,
+     "offset": [
+      0.0,
+      1.293,
+      0.0
+     ],
+     "size": [
+      3.1733,
+      2.586,
+      2.8275
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wedge rock alone: blocky rock with a thin moss tuft on top"
+  },
+  {
+   "name": "RockCluster",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "hero",
+   "size": [
+    19.0446,
+    10.7092,
+    11.6899
+   ],
+   "tris": 4174,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockCluster.glb",
+     "kind": "solid",
+     "tris": 4174,
+     "offset": [
+      0.0,
+      5.3546,
+      0.0
+     ],
+     "size": [
+      19.0446,
+      10.7092,
+      11.6899
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "three interlocking independent boulders: tall upright Rock A behind, barrel Rock C front-left, squat Rock B front-right; thin moss tufts on their crowns and moss creeping up their faces; clover with daisies in the gaps; pebbles at the front"
+  },
+  {
+   "name": "RockClusterA",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "part",
+   "size": [
+    6.8401,
+    10.4844,
+    6.0779
+   ],
+   "tris": 474,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterA.glb",
+     "kind": "solid",
+     "tris": 474,
+     "offset": [
+      0.0,
+      5.2422,
+      0.0
+     ],
+     "size": [
+      6.8401,
+      10.4844,
+      6.0779
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock A alone: tall upright egg boulder with a moss tuft and moss up its left face"
+  },
+  {
+   "name": "RockClusterB",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "part",
+   "size": [
+    6.9658,
+    5.1894,
+    6.0758
+   ],
+   "tris": 518,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterB.glb",
+     "kind": "solid",
+     "tris": 518,
+     "offset": [
+      0.0,
+      2.5947,
+      0.0
+     ],
+     "size": [
+      6.9658,
+      5.1894,
+      6.0758
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock B alone: squat dome boulder with a moss tuft"
+  },
+  {
+   "name": "RockClusterC",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "part",
+   "size": [
+    9.5038,
+    6.4816,
+    7.9746
+   ],
+   "tris": 518,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterC.glb",
+     "kind": "solid",
+     "tris": 518,
+     "offset": [
+      0.0,
+      3.2408,
+      0.0
+     ],
+     "size": [
+      9.5038,
+      6.4816,
+      7.9746
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock C alone: barrel boulder with a moss tuft and moss up its left face"
+  },
+  {
+   "name": "RockClusterCrescent",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "variant",
+   "size": [
+    18.7524,
+    9.006,
+    9.3176
+   ],
+   "tris": 2830,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterCrescent.glb",
+     "kind": "solid",
+     "tris": 2830,
+     "offset": [
+      0.0,
+      4.503,
+      0.0
+     ],
+     "size": [
+      18.7524,
+      9.006,
+      9.3176
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crescent Cluster: three boulders on a curve, clover and pebbles"
+  },
+  {
+   "name": "RockClusterLinear",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "variant",
+   "size": [
+    19.3223,
+    9.1233,
+    7.7254
+   ],
+   "tris": 3254,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterLinear.glb",
+     "kind": "solid",
+     "tris": 3254,
+     "offset": [
+      0.0,
+      4.5617,
+      0.0
+     ],
+     "size": [
+      19.3223,
+      9.1233,
+      7.7254
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Linear Cluster: two boulders in a row (low left, tall right) with clover and pebbles"
+  },
+  {
+   "name": "RockClusterTriangular",
+   "sheet": "W01",
+   "subject": "RockCluster",
+   "role": "variant",
+   "size": [
+    11.5201,
+    9.1392,
+    9.07
+   ],
+   "tris": 2934,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockClusterTriangular.glb",
+     "kind": "solid",
+     "tris": 2934,
+     "offset": [
+      0.0,
+      4.5696,
+      0.0
+     ],
+     "size": [
+      11.5201,
+      9.1392,
+      9.07
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Triangular Cluster: three boulders packed in a compact triangle, clover with a daisy"
+  },
+  {
+   "name": "RockSpire",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "hero",
+   "size": [
+    15.1627,
+    11.6,
+    13.0217
+   ],
+   "tris": 3448,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpire.glb",
+     "kind": "solid",
+     "tris": 3448,
+     "offset": [
+      0.0,
+      5.8,
+      0.0
+     ],
+     "size": [
+      15.1627,
+      11.6,
+      13.0217
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tall faceted obelisk with a chisel tip and a lime moss streak down its front-right face; a shorter pillar leaning on its left and a lower one behind on the right; a broken collar of angular wedge chunks round the foot; leafy clumps on the ledges, clover with daisies round the base"
+  },
+  {
+   "name": "RockSpireFootCollar",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "part",
+   "size": [
+    8.4626,
+    3.4,
+    8.0613
+   ],
+   "tris": 228,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpireFootCollar.glb",
+     "kind": "solid",
+     "tris": 228,
+     "offset": [
+      0.0,
+      1.7,
+      0.0
+     ],
+     "size": [
+      8.4626,
+      3.4,
+      8.0613
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "foot collar alone: broken ring of angular wedge chunks; set any spire inside"
+  },
+  {
+   "name": "RockSpireLeaning",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "variant",
+   "size": [
+    10.3735,
+    11.0,
+    8.8479
+   ],
+   "tris": 2040,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpireLeaning.glb",
+     "kind": "solid",
+     "tris": 2040,
+     "offset": [
+      0.0,
+      5.5,
+      0.0
+     ],
+     "size": [
+      10.3735,
+      11.0,
+      8.8479
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaning Spire: spire tilted ~20 degrees over its collar, clover"
+  },
+  {
+   "name": "RockSpireMain",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "part",
+   "size": [
+    6.4331,
+    11.6,
+    5.6165
+   ],
+   "tris": 204,
+   "budget": 1500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpireMain.glb",
+     "kind": "solid",
+     "tris": 204,
+     "offset": [
+      0.0,
+      5.8,
+      0.0
+     ],
+     "size": [
+      6.4331,
+      11.6,
+      5.6165
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "spire main mesh alone (obelisk with chisel tip and moss streak)"
+  },
+  {
+   "name": "RockSpireShort",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "variant",
+   "size": [
+    9.7294,
+    7.0,
+    8.2627
+   ],
+   "tris": 2274,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpireShort.glb",
+     "kind": "solid",
+     "tris": 2274,
+     "offset": [
+      0.0,
+      3.5,
+      0.0
+     ],
+     "size": [
+      9.7294,
+      7.0,
+      8.2627
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Short Spire: stubby wide spire, one leaning pillar, collar, clover"
+  },
+  {
+   "name": "RockSpireTall",
+   "sheet": "W01",
+   "subject": "RockSpire",
+   "role": "variant",
+   "size": [
+    9.7185,
+    15.5,
+    8.7773
+   ],
+   "tris": 2372,
+   "budget": 4500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RockSpireTall.glb",
+     "kind": "solid",
+     "tris": 2372,
+     "offset": [
+      0.0,
+      7.75,
+      0.0
+     ],
+     "size": [
+      9.7185,
+      15.5,
+      8.7773
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tall Spire: high narrow spire with a tall pillar beside it, collar, clover"
+  }
+ ],
+ "stats": {
+  "assets": 28,
+  "pieces": 28,
+  "solid": 28,
+  "water": 0,
+  "glow": 0,
+  "tris": 48718,
+  "vfxSockets": 0,
+  "paletteColours": 28,
+  "paletteLevels": 728,
+  "meshBytes": 4565784
+ },
+ "problems": []
+}

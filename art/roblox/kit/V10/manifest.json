@@ -1,0 +1,2361 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "V10",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "v10_bark",
+    "hex": "#8A5A34",
+    "levels": [
+     0.95039,
+     0.95303,
+     0.95566,
+     0.9632,
+     0.96417,
+     0.9652,
+     0.9667,
+     0.96802,
+     0.96992,
+     0.97326,
+     0.9746,
+     0.97642,
+     0.9813,
+     0.98427,
+     0.98826,
+     0.99421,
+     0.99908,
+     1.00663,
+     1.00841,
+     1.01031,
+     1.0134,
+     1.0156,
+     1.01951,
+     1.02321,
+     1.02734,
+     1.02983,
+     1.03065,
+     1.03228,
+     1.03575,
+     1.04125,
+     1.04457,
+     1.04845
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_fern",
+    "hex": "#7BC23A",
+    "levels": [
+     0.95002,
+     0.95428,
+     0.95874,
+     0.96064,
+     0.96687,
+     0.96916,
+     0.97093,
+     0.97221,
+     0.9747,
+     0.97657,
+     0.97874,
+     0.98003,
+     0.98238,
+     0.98572,
+     0.98761,
+     0.99164,
+     0.99626,
+     0.99864,
+     1.00548,
+     1.00994,
+     1.01425,
+     1.01652,
+     1.01844,
+     1.02195,
+     1.02362,
+     1.02846,
+     1.02944,
+     1.03344,
+     1.04049,
+     1.04423,
+     1.04508,
+     1.04987
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_gold",
+    "hex": "#F2C830",
+    "levels": [
+     0.95439,
+     0.96456,
+     0.96762,
+     0.97131,
+     0.9734,
+     0.9765,
+     0.97963,
+     0.98183,
+     0.98486,
+     0.98839,
+     0.991,
+     0.99329,
+     0.99546,
+     0.9991,
+     1.00144,
+     1.00697,
+     1.00999,
+     1.01262,
+     1.01605,
+     1.02101,
+     1.024,
+     1.02693,
+     1.02956,
+     1.03214,
+     1.03739,
+     1.04088,
+     1.04464
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_green",
+    "hex": "#5E9E30",
+    "levels": [
+     0.95178,
+     0.95431,
+     0.96273,
+     0.96764,
+     0.96888,
+     0.97466,
+     0.98038,
+     0.98467,
+     0.98868,
+     0.99092,
+     0.9928,
+     0.99678,
+     1.00049,
+     1.00513,
+     1.00814,
+     1.01048,
+     1.01629,
+     1.02248,
+     1.02613,
+     1.02999,
+     1.03287,
+     1.03863,
+     1.04203,
+     1.04608,
+     1.04875
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_hollow",
+    "hex": "#3A2A20",
+    "levels": [
+     0.97898,
+     0.98922
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_leaf",
+    "hex": "#6DB43A",
+    "levels": [
+     0.95357,
+     0.95657,
+     0.96012,
+     0.96408,
+     0.96689,
+     0.971,
+     0.97353,
+     0.97896,
+     0.9819,
+     0.98561,
+     0.98917,
+     0.9946,
+     1.00291,
+     1.00518,
+     1.00964,
+     1.01222,
+     1.01513,
+     1.01819,
+     1.0201,
+     1.0229,
+     1.02464,
+     1.02629,
+     1.02953,
+     1.03557,
+     1.03676,
+     1.03999,
+     1.04394,
+     1.04869
+    ],
+    "used": false
+   },
+   {
+    "key": "v10_moss",
+    "hex": "#7DB83A",
+    "levels": [
+     0.95037,
+     0.95346,
+     0.95668,
+     0.96056,
+     0.96355,
+     0.96668,
+     0.96988,
+     0.97422,
+     0.97854,
+     0.98358,
+     0.98574,
+     0.98862,
+     0.99286,
+     0.99579,
+     1.0001,
+     1.00402,
+     1.00672,
+     1.00892,
+     1.01078,
+     1.01378,
+     1.01589,
+     1.01873,
+     1.02466,
+     1.02634,
+     1.0269,
+     1.0299,
+     1.0325,
+     1.03671,
+     1.04055,
+     1.04609,
+     1.04783,
+     1.04979
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_pearl",
+    "hex": "#EDE6DC",
+    "levels": [
+     0.9506,
+     0.96287,
+     0.99143,
+     1.01514,
+     1.01798,
+     1.04209
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_silver",
+    "hex": "#ABA7A2",
+    "levels": [
+     0.95027,
+     0.95503,
+     0.95923,
+     0.96209,
+     0.96491,
+     0.96719,
+     0.96908,
+     0.97233,
+     0.97477,
+     0.97954,
+     0.98122,
+     0.9845,
+     0.99395,
+     1.00053,
+     1.00665,
+     1.00905,
+     1.01285,
+     1.01522,
+     1.02407,
+     1.02709,
+     1.02946,
+     1.03132,
+     1.03555,
+     1.03876,
+     1.04115,
+     1.04651,
+     1.04839
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_teal",
+    "hex": "#3E9A8A",
+    "levels": [
+     0.95278,
+     0.95566,
+     0.95899,
+     0.96228,
+     0.96476,
+     0.96785,
+     0.97003,
+     0.97476,
+     0.98269,
+     0.98504,
+     0.9872,
+     0.99051,
+     0.99288,
+     1.00176,
+     1.00338,
+     1.0077,
+     1.01225,
+     1.01339,
+     1.02126,
+     1.02567,
+     1.02706,
+     1.02973,
+     1.03341,
+     1.03678,
+     1.04449,
+     1.04849
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_wood",
+    "hex": "#8E6040",
+    "levels": [
+     0.95176,
+     0.95447,
+     0.95665,
+     0.95902,
+     0.96231,
+     0.96475,
+     0.96873,
+     0.97098,
+     0.97548,
+     0.9777,
+     0.98002,
+     0.98259,
+     0.98657,
+     0.98931,
+     0.99279,
+     0.99545,
+     0.99828,
+     1.00066,
+     1.00315,
+     1.00602,
+     1.01246,
+     1.01509,
+     1.01876,
+     1.02356,
+     1.02517,
+     1.03167,
+     1.03322,
+     1.03639,
+     1.03913,
+     1.04498,
+     1.04708
+    ],
+    "used": false
+   },
+   {
+    "key": "w05_resin",
+    "hex": "#F29A1E",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "v10_bark2",
+    "hex": "#7A4E2E",
+    "levels": [
+     0.95002,
+     0.95226,
+     0.95504,
+     0.95775,
+     0.96181,
+     0.96524,
+     0.9711,
+     0.97506,
+     0.97687,
+     0.98085,
+     0.98351,
+     0.99351,
+     0.99617,
+     0.9985,
+     1.00545,
+     1.00891,
+     1.01328,
+     1.01961,
+     1.02245,
+     1.02507,
+     1.02891,
+     1.03335,
+     1.03843,
+     1.04192,
+     1.04715,
+     0.98677
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_fanleaf",
+    "hex": "#4F9C32",
+    "levels": [
+     0.95136,
+     0.9542,
+     0.9608,
+     0.9651,
+     0.96826,
+     0.97093,
+     0.97299,
+     0.9759,
+     0.98157,
+     0.98642,
+     0.98985,
+     0.99296,
+     0.99666,
+     0.99919,
+     1.00121,
+     1.00459,
+     1.00739,
+     1.01085,
+     1.01426,
+     1.02009,
+     1.02148,
+     1.02357,
+     1.02682,
+     1.02941,
+     1.03144,
+     1.03864,
+     1.03942,
+     1.04389,
+     1.0466,
+     1.04961,
+     0.95678,
+     0.95837
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_heart",
+    "hex": "#5A3A24",
+    "levels": [
+     0.95041,
+     0.9527,
+     0.96259,
+     0.96511,
+     0.97042,
+     0.97647,
+     0.98096,
+     0.9846,
+     0.98958,
+     1.00163,
+     1.00281,
+     1.01283,
+     1.01807,
+     1.02571,
+     1.04456,
+     1.04687,
+     0.97444,
+     1.00816,
+     1.04043,
+     0.9989,
+     0.96807,
+     1.02791
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_mossy",
+    "hex": "#78B83A",
+    "levels": [
+     0.95504,
+     0.97058,
+     0.98325,
+     0.99181,
+     0.99495,
+     1.00156,
+     1.00498,
+     1.00891,
+     1.01296,
+     1.03008,
+     1.04657,
+     0.9631,
+     0.95142,
+     0.98572,
+     0.97523,
+     0.9989,
+     0.97268
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_resin",
+    "hex": "#E8741A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_stone",
+    "hex": "#8E8880",
+    "levels": [
+     0.95125,
+     0.9547,
+     0.95989,
+     0.96254,
+     0.97273,
+     0.97874,
+     0.9855,
+     1.00675,
+     1.01315,
+     1.01531,
+     1.03177,
+     1.02385,
+     1.02728,
+     0.9825,
+     1.01027,
+     0.97042,
+     1.04567,
+     1.04356,
+     1.04134,
+     1.03843,
+     1.0011,
+     0.97591,
+     1.02166
+    ],
+    "used": true
+   },
+   {
+    "key": "v10_stumpwood",
+    "hex": "#9E6B42",
+    "levels": [
+     0.9527,
+     0.9527,
+     0.9558,
+     0.9612,
+     0.96937,
+     0.97018,
+     0.97453,
+     0.97687,
+     0.98095,
+     0.98238,
+     0.98238,
+     0.9826,
+     0.9826,
+     0.98657,
+     0.99181,
+     0.99322,
+     0.99745,
+     1.00156,
+     1.00217,
+     1.00432,
+     1.00665,
+     1.00961,
+     1.01262,
+     1.01296,
+     1.01674,
+     1.02571,
+     1.03008,
+     1.0312,
+     1.04214,
+     1.04657,
+     1.04717,
+     1.04975
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "GiantCoilFern",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "hero",
+   "size": [
+    7.6004,
+    6.7667,
+    7.716
+   ],
+   "tris": 2378,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFern.glb",
+     "kind": "solid",
+     "tris": 2378,
+     "offset": [
+      0.0,
+      3.3834,
+      0.0
+     ],
+     "size": [
+      7.6004,
+      6.7667,
+      7.716
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "giant coil fern: massive thick faceted fiddlehead stem rising from a heaped root pedestal and rolling into a big inward spiral, ringed by broad scalloped fan leaves, two unfurling buds"
+  },
+  {
+   "name": "GiantCoilFernCoilStem",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "part",
+   "size": [
+    4.1081,
+    4.8706,
+    1.2522
+   ],
+   "tris": 1200,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernCoilStem.glb",
+     "kind": "solid",
+     "tris": 1200,
+     "offset": [
+      0.0,
+      2.4353,
+      0.0
+     ],
+     "size": [
+      4.1081,
+      4.8706,
+      1.2522
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "coil stem (fiddlehead)"
+  },
+  {
+   "name": "GiantCoilFernFanLeafLarge",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "part",
+   "size": [
+    3.7036,
+    3.539,
+    0.7508
+   ],
+   "tris": 124,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernFanLeafLarge.glb",
+     "kind": "solid",
+     "tris": 124,
+     "offset": [
+      0.0,
+      1.7695,
+      0.0
+     ],
+     "size": [
+      3.7036,
+      3.539,
+      0.7508
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fan leaf (large)"
+  },
+  {
+   "name": "GiantCoilFernFanLeafMedium",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "part",
+   "size": [
+    2.5432,
+    2.4413,
+    0.5577
+   ],
+   "tris": 124,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernFanLeafMedium.glb",
+     "kind": "solid",
+     "tris": 124,
+     "offset": [
+      0.0,
+      1.2206,
+      0.0
+     ],
+     "size": [
+      2.5432,
+      2.4413,
+      0.5577
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "fan leaf (medium)"
+  },
+  {
+   "name": "GiantCoilFernFullFan",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "variant",
+   "size": [
+    7.1107,
+    4.5716,
+    7.0715
+   ],
+   "tris": 1302,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernFullFan.glb",
+     "kind": "solid",
+     "tris": 1302,
+     "offset": [
+      0.0,
+      2.2858,
+      0.0
+     ],
+     "size": [
+      7.1107,
+      4.5716,
+      7.0715
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Full Fan: upright crown of big fan leaves"
+  },
+  {
+   "name": "GiantCoilFernHalfUnfurled",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "variant",
+   "size": [
+    7.5484,
+    6.5631,
+    7.9722
+   ],
+   "tris": 2308,
+   "budget": 7500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernHalfUnfurled.glb",
+     "kind": "solid",
+     "tris": 2308,
+     "offset": [
+      0.0,
+      3.2816,
+      0.0
+     ],
+     "size": [
+      7.5484,
+      6.5631,
+      7.9722
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Half Unfurled"
+  },
+  {
+   "name": "GiantCoilFernLeafBud",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "part",
+   "size": [
+    0.8335,
+    1.43,
+    0.8288
+   ],
+   "tris": 35,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernLeafBud.glb",
+     "kind": "solid",
+     "tris": 35,
+     "offset": [
+      0.0,
+      0.715,
+      0.0
+     ],
+     "size": [
+      0.8335,
+      1.43,
+      0.8288
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf bud (unfurling)"
+  },
+  {
+   "name": "GiantCoilFernRootPedestal",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "part",
+   "size": [
+    3.9486,
+    1.5124,
+    4.0363
+   ],
+   "tris": 364,
+   "budget": 900,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernRootPedestal.glb",
+     "kind": "solid",
+     "tris": 364,
+     "offset": [
+      0.0,
+      0.7562,
+      0.0
+     ],
+     "size": [
+      3.9486,
+      1.5124,
+      4.0363
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root pedestal (base)"
+  },
+  {
+   "name": "GiantCoilFernTightCoil",
+   "sheet": "V10",
+   "subject": "GiantCoilFern",
+   "role": "variant",
+   "size": [
+    8.3444,
+    4.5779,
+    7.8643
+   ],
+   "tris": 2308,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GiantCoilFernTightCoil.glb",
+     "kind": "solid",
+     "tris": 2308,
+     "offset": [
+      0.0,
+      2.2889,
+      0.0
+     ],
+     "size": [
+      8.3444,
+      4.5779,
+      7.8643
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Tight Coil"
+  },
+  {
+   "name": "GoldencrownAncientFork",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "variant",
+   "size": [
+    12.729,
+    12.7152,
+    7.9832
+   ],
+   "tris": 5374,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownAncientFork.glb",
+     "kind": "solid",
+     "tris": 5374,
+     "offset": [
+      0.0,
+      6.3576,
+      0.0
+     ],
+     "size": [
+      12.729,
+      12.7152,
+      7.9832
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Ancient Fork"
+  },
+  {
+   "name": "GoldencrownBranch",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "part",
+   "size": [
+    2.5602,
+    3.351,
+    1.1432
+   ],
+   "tris": 48,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownBranch.glb",
+     "kind": "solid",
+     "tris": 48,
+     "offset": [
+      0.0,
+      1.6755,
+      0.0
+     ],
+     "size": [
+      2.5602,
+      3.351,
+      1.1432
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (segmented)"
+  },
+  {
+   "name": "GoldencrownCrownCluster",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "part",
+   "size": [
+    4.4624,
+    5.1058,
+    4.7768
+   ],
+   "tris": 880,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownCrownCluster.glb",
+     "kind": "solid",
+     "tris": 880,
+     "offset": [
+      0.0,
+      2.5529,
+      0.0
+     ],
+     "size": [
+      4.4624,
+      5.1058,
+      4.7768
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crown cluster (large)"
+  },
+  {
+   "name": "GoldencrownHollowGiant",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "variant",
+   "size": [
+    12.1736,
+    13.5337,
+    10.7896
+   ],
+   "tris": 5258,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownHollowGiant.glb",
+     "kind": "solid",
+     "tris": 5258,
+     "offset": [
+      0.0,
+      6.7669,
+      0.0
+     ],
+     "size": [
+      12.1736,
+      13.5337,
+      10.7896
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Hollow Giant"
+  },
+  {
+   "name": "GoldencrownLeafCluster",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "part",
+   "size": [
+    2.964,
+    0.4906,
+    3.1046
+   ],
+   "tris": 80,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownLeafCluster.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.2453,
+      0.0
+     ],
+     "size": [
+      2.964,
+      0.4906,
+      3.1046
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf cluster (top & underside)"
+  },
+  {
+   "name": "GoldencrownSeedCone",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "part",
+   "size": [
+    0.9302,
+    1.8,
+    0.9231
+   ],
+   "tris": 36,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownSeedCone.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      0.9302,
+      1.8,
+      0.9231
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed cone (pod)"
+  },
+  {
+   "name": "GoldencrownTree",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "hero",
+   "size": [
+    11.4209,
+    13.0978,
+    8.9716
+   ],
+   "tris": 5246,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownTree.glb",
+     "kind": "solid",
+     "tris": 5246,
+     "offset": [
+      0.0,
+      6.5489,
+      0.0
+     ],
+     "size": [
+      11.4209,
+      13.0978,
+      8.9716
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "goldencrown tree: rare ancient tree, thick twisted trunk with snaking roots, kinked limbs under four massive golden canopies with green undersides"
+  },
+  {
+   "name": "GoldencrownTrunkRoot",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "part",
+   "size": [
+    4.691,
+    4.3518,
+    4.2478
+   ],
+   "tris": 560,
+   "budget": 1200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownTrunkRoot.glb",
+     "kind": "solid",
+     "tris": 560,
+     "offset": [
+      0.0,
+      2.1759,
+      0.0
+     ],
+     "size": [
+      4.691,
+      4.3518,
+      4.2478
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "trunk / root (base)"
+  },
+  {
+   "name": "GoldencrownYoung",
+   "sheet": "V10",
+   "subject": "GoldencrownTree",
+   "role": "variant",
+   "size": [
+    7.4968,
+    9.2108,
+    4.9275
+   ],
+   "tris": 4298,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GoldencrownYoung.glb",
+     "kind": "solid",
+     "tris": 4298,
+     "offset": [
+      0.0,
+      4.6054,
+      0.0
+     ],
+     "size": [
+      7.4968,
+      9.2108,
+      4.9275
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Young Tree"
+  },
+  {
+   "name": "ResinheartExposedResin",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "variant",
+   "size": [
+    11.3505,
+    5.5537,
+    11.0031
+   ],
+   "tris": 1925,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartExposedResin.glb",
+     "kind": "solid",
+     "tris": 1805,
+     "offset": [
+      0.0,
+      2.7769,
+      0.0
+     ],
+     "size": [
+      11.3505,
+      5.5537,
+      11.0031
+     ]
+    },
+    {
+     "file": "meshes/ResinheartExposedResin_glow_v10_resin.glb",
+     "kind": "glow",
+     "tris": 120,
+     "offset": [
+      -0.079,
+      2.3017,
+      1.3697
+     ],
+     "size": [
+      2.9082,
+      3.7,
+      2.6235
+     ],
+     "key": "v10_resin",
+     "color": "#E8741A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ResinheartExposedResin_embers_1",
+     "kind": "embers",
+     "position": [
+      -0.0197,
+      3.9517,
+      1.0933
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ResinheartExposedResin_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0197,
+      2.1517,
+      1.8933
+     ],
+     "vfx_scale": 1.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_ResinheartExposedResin_ore_glint_1",
+     "kind": "ore_glint",
+     "position": [
+      -0.0197,
+      3.1517,
+      1.6933
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "B. Exposed Resin | VFX: heat_glow + ore_glint + embers"
+  },
+  {
+   "name": "ResinheartHarvestedHollow",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "variant",
+   "size": [
+    11.3505,
+    4.9592,
+    11.0031
+   ],
+   "tris": 1789,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartHarvestedHollow.glb",
+     "kind": "solid",
+     "tris": 1789,
+     "offset": [
+      0.0,
+      2.4796,
+      0.0
+     ],
+     "size": [
+      11.3505,
+      4.9592,
+      11.0031
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested Hollow: empty dark hollow, no resin"
+  },
+  {
+   "name": "ResinheartLeafCluster",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "part",
+   "size": [
+    1.8152,
+    2.2792,
+    3.5829
+   ],
+   "tris": 120,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartLeafCluster.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      1.1396,
+      0.0
+     ],
+     "size": [
+      1.8152,
+      2.2792,
+      3.5829
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf cluster (large)"
+  },
+  {
+   "name": "ResinheartResinNodule",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "part",
+   "size": [
+    1.8241,
+    3.1,
+    1.3475
+   ],
+   "tris": 30,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartResinNodule_glow_v10_resin.glb",
+     "kind": "glow",
+     "tris": 30,
+     "offset": [
+      0.0,
+      1.55,
+      0.0
+     ],
+     "size": [
+      1.8241,
+      3.1,
+      1.3475
+     ],
+     "key": "v10_resin",
+     "color": "#E8741A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "resin nodule (large)"
+  },
+  {
+   "name": "ResinheartRootHalfLeft",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "part",
+   "size": [
+    3.0213,
+    2.5076,
+    1.5803
+   ],
+   "tris": 40,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartRootHalfLeft.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.2538,
+      0.0
+     ],
+     "size": [
+      3.0213,
+      2.5076,
+      1.5803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root half (left)"
+  },
+  {
+   "name": "ResinheartRootHalfRight",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "part",
+   "size": [
+    3.0216,
+    2.4993,
+    1.5803
+   ],
+   "tris": 40,
+   "budget": 80,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartRootHalfRight.glb",
+     "kind": "solid",
+     "tris": 40,
+     "offset": [
+      0.0,
+      1.2497,
+      0.0
+     ],
+     "size": [
+      3.0216,
+      2.4993,
+      1.5803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "root half (right)"
+  },
+  {
+   "name": "ResinheartSealedResin",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "variant",
+   "size": [
+    11.3505,
+    5.0006,
+    11.0031
+   ],
+   "tris": 2215,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartSealedResin.glb",
+     "kind": "solid",
+     "tris": 2215,
+     "offset": [
+      0.0,
+      2.5003,
+      0.0
+     ],
+     "size": [
+      11.3505,
+      5.0006,
+      11.0031
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Sealed Resin: stump closed over by a thick wooden cap, no resin visible"
+  },
+  {
+   "name": "ResinheartStump",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "hero",
+   "size": [
+    11.3505,
+    5.1104,
+    11.0031
+   ],
+   "tris": 1929,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartStump.glb",
+     "kind": "solid",
+     "tris": 1809,
+     "offset": [
+      0.0,
+      2.5552,
+      0.0
+     ],
+     "size": [
+      11.3505,
+      5.1104,
+      11.0031
+     ]
+    },
+    {
+     "file": "meshes/ResinheartStump_glow_v10_resin.glb",
+     "kind": "glow",
+     "tris": 120,
+     "offset": [
+      -0.0725,
+      2.3246,
+      1.4007
+     ],
+     "size": [
+      2.8595,
+      3.7,
+      2.5575
+     ],
+     "key": "v10_resin",
+     "color": "#E8741A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ResinheartStump_embers_1",
+     "kind": "embers",
+     "position": [
+      -0.0197,
+      3.9746,
+      1.0933
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.2,
+         2.4
+        ],
+        "rate": 6,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 40,
+        "light_emission": 1.0,
+        "drag": 0.8,
+        "acceleration": [
+         0,
+         0.8,
+         0
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ResinheartStump_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0197,
+      2.1746,
+      1.8933
+     ],
+     "vfx_scale": 1.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_ResinheartStump_ore_glint_1",
+     "kind": "ore_glint",
+     "position": [
+      -0.0197,
+      3.1746,
+      1.6933
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Glint",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF4D6",
+         "#FFD9A8"
+        ],
+        "size": [
+         0,
+         0.5,
+         0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.8
+        ],
+        "rate": 0.8,
+        "speed": [
+         0,
+         0
+        ],
+        "spread": 0,
+        "light_emission": 1.0,
+        "rotation": [
+         0,
+         90
+        ],
+        "shape": [
+         2.0,
+         1.5,
+         2.0
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "resinheart stump: ancient hollow stump of jagged light-brown wood staves with bark grain ridges, dark heartwood lining and moss caps, broad low roots, rocks and big fan-leaf clusters; a large faceted glowing amber resin crystal with smaller chunks fills the open core | VFX: heat_glow + ore_glint + embers on the resin"
+  },
+  {
+   "name": "ResinheartStumpShell",
+   "sheet": "V10",
+   "subject": "ResinheartStump",
+   "role": "part",
+   "size": [
+    5.4088,
+    3.6,
+    5.0203
+   ],
+   "tris": 442,
+   "budget": 800,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ResinheartStumpShell.glb",
+     "kind": "solid",
+     "tris": 442,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      5.4088,
+      3.6,
+      5.0203
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stump shell (hollow staves)"
+  },
+  {
+   "name": "SilverbarkBranch",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "part",
+   "size": [
+    1.4299,
+    2.8155,
+    0.8581
+   ],
+   "tris": 24,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkBranch.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.4077,
+      0.0
+     ],
+     "size": [
+      1.4299,
+      2.8155,
+      0.8581
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "branch (segment)"
+  },
+  {
+   "name": "SilverbarkCrownCluster",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "part",
+   "size": [
+    3.7882,
+    3.4946,
+    3.8753
+   ],
+   "tris": 480,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkCrownCluster.glb",
+     "kind": "solid",
+     "tris": 480,
+     "offset": [
+      0.0,
+      1.7473,
+      0.0
+     ],
+     "size": [
+      3.7882,
+      3.4946,
+      3.8753
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crown cluster (medium)"
+  },
+  {
+   "name": "SilverbarkHarvestedBare",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "variant",
+   "size": [
+    7.06,
+    10.0158,
+    6.1681
+   ],
+   "tris": 1858,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkHarvestedBare.glb",
+     "kind": "solid",
+     "tris": 1858,
+     "offset": [
+      0.0,
+      5.0079,
+      0.0
+     ],
+     "size": [
+      7.06,
+      10.0158,
+      6.1681
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Harvested (Bare)"
+  },
+  {
+   "name": "SilverbarkLeafCluster",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "part",
+   "size": [
+    2.7801,
+    0.4546,
+    2.9119
+   ],
+   "tris": 80,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkLeafCluster.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.2273,
+      0.0
+     ],
+     "size": [
+      2.7801,
+      0.4546,
+      2.9119
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leaf cluster (top & underside)"
+  },
+  {
+   "name": "SilverbarkLeaning",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "variant",
+   "size": [
+    10.6055,
+    10.6873,
+    6.6942
+   ],
+   "tris": 3902,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkLeaning.glb",
+     "kind": "solid",
+     "tris": 3902,
+     "offset": [
+      0.0,
+      5.3436,
+      0.0
+     ],
+     "size": [
+      10.6055,
+      10.6873,
+      6.6942
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Leaning Form"
+  },
+  {
+   "name": "SilverbarkSeedPod",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "part",
+   "size": [
+    1.0528,
+    2.287,
+    1.0269
+   ],
+   "tris": 50,
+   "budget": 100,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkSeedPod.glb",
+     "kind": "solid",
+     "tris": 50,
+     "offset": [
+      0.0,
+      1.1435,
+      0.0
+     ],
+     "size": [
+      1.0528,
+      2.287,
+      1.0269
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "seed pod (exterior)"
+  },
+  {
+   "name": "SilverbarkSplitTrunk",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "part",
+   "size": [
+    1.7677,
+    4.3309,
+    1.6266
+   ],
+   "tris": 224,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkSplitTrunk.glb",
+     "kind": "solid",
+     "tris": 224,
+     "offset": [
+      0.0,
+      2.1655,
+      0.0
+     ],
+     "size": [
+      1.7677,
+      4.3309,
+      1.6266
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "split trunk (base)"
+  },
+  {
+   "name": "SilverbarkTree",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "hero",
+   "size": [
+    10.496,
+    11.7637,
+    7.2328
+   ],
+   "tris": 4450,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkTree.glb",
+     "kind": "solid",
+     "tris": 4450,
+     "offset": [
+      0.0,
+      5.8818,
+      0.0
+     ],
+     "size": [
+      10.496,
+      11.7637,
+      7.2328
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "silverbark tree: pale grey split twin trunk with snaking roots, cool blue-green puffy crowns and hanging pearl-white seedpods"
+  },
+  {
+   "name": "SilverbarkUpright",
+   "sheet": "V10",
+   "subject": "SilverbarkTree",
+   "role": "variant",
+   "size": [
+    7.5452,
+    12.4846,
+    6.7097
+   ],
+   "tris": 3902,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SilverbarkUpright.glb",
+     "kind": "solid",
+     "tris": 3902,
+     "offset": [
+      0.0,
+      6.2423,
+      0.0
+     ],
+     "size": [
+      7.5452,
+      12.4846,
+      6.7097
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Upright Form"
+  }
+ ],
+ "stats": {
+  "assets": 36,
+  "pieces": 38,
+  "solid": 35,
+  "water": 0,
+  "glow": 3,
+  "tris": 55423,
+  "vfxSockets": 6,
+  "paletteColours": 16,
+  "paletteLevels": 362,
+  "meshBytes": 5499928
+ },
+ "problems": []
+}

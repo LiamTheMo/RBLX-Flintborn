@@ -1,0 +1,1743 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W02",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "flower_white",
+    "hex": "#F5F2EA",
+    "levels": [
+     0.98101,
+     0.98281,
+     0.98496,
+     0.987,
+     0.98897,
+     0.99109,
+     0.99323,
+     0.99545,
+     0.99732,
+     0.99999,
+     1.00123,
+     1.00333,
+     1.00551,
+     1.00755,
+     1.0095,
+     1.0116,
+     1.01352,
+     1.01547,
+     1.01769,
+     1.01938
+    ],
+    "used": false
+   },
+   {
+    "key": "flower_yellow",
+    "hex": "#F2C230",
+    "levels": [
+     0.98119,
+     0.98332,
+     0.98553,
+     0.98759,
+     0.98978,
+     0.99204,
+     0.99456,
+     0.9965,
+     0.99832,
+     1.00001,
+     1.0028,
+     1.00475,
+     1.00726,
+     1.00935,
+     1.01141,
+     1.01321,
+     1.01574,
+     1.01783,
+     1.01984
+    ],
+    "used": false
+   },
+   {
+    "key": "leaf",
+    "hex": "#6C9A28",
+    "levels": [
+     0.91226,
+     0.9307,
+     0.93933,
+     0.94623,
+     0.95229,
+     0.95752,
+     0.96237,
+     0.96707,
+     0.97098,
+     0.97493,
+     0.97888,
+     0.98278,
+     0.98647,
+     0.98964,
+     0.99283,
+     0.99613,
+     0.99939,
+     1.00262,
+     1.00565,
+     1.00886,
+     1.01196,
+     1.01533,
+     1.01912,
+     1.02336,
+     1.02752,
+     1.03208,
+     1.03676,
+     1.04247,
+     1.04941,
+     1.0567,
+     1.06678,
+     1.09006
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_bush",
+    "hex": "#4F9A2A",
+    "levels": [
+     0.92252,
+     0.93985,
+     0.94825,
+     0.95358,
+     0.95776,
+     0.96181,
+     0.96581,
+     0.9697,
+     0.97336,
+     0.9768,
+     0.97998,
+     0.9834,
+     0.98675,
+     0.99014,
+     0.99345,
+     0.9969,
+     1.00052,
+     1.00418,
+     1.00752,
+     1.01111,
+     1.01449,
+     1.01781,
+     1.02164,
+     1.0256,
+     1.02948,
+     1.03333,
+     1.03743,
+     1.04172,
+     1.04622,
+     1.05156,
+     1.06098,
+     1.08075
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_connector",
+    "hex": "#8A868A",
+    "levels": [
+     0.92,
+     0.97,
+     0.99559,
+     1.0,
+     1.02146
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_earth",
+    "hex": "#A06A45",
+    "levels": [
+     0.90805,
+     0.96005,
+     0.96438,
+     0.96809,
+     0.97138,
+     0.9744,
+     0.97697,
+     0.97957,
+     0.98242,
+     0.98538,
+     0.98826,
+     0.99076,
+     0.99379,
+     0.9963,
+     0.99877,
+     1.0,
+     1.0,
+     1.00211,
+     1.00447,
+     1.00709,
+     1.00978,
+     1.01266,
+     1.01543,
+     1.01793,
+     1.02081,
+     1.02375,
+     1.02653,
+     1.02878,
+     1.0316,
+     1.03608,
+     1.0394,
+     1.05661
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_grass",
+    "hex": "#9BBC2C",
+    "levels": [
+     0.92616,
+     0.95044,
+     0.95794,
+     0.9635,
+     0.9683,
+     0.97226,
+     0.97534,
+     0.97826,
+     0.98112,
+     0.98367,
+     0.98658,
+     0.98985,
+     0.99303,
+     0.99581,
+     0.99933,
+     1.0,
+     1.00234,
+     1.00533,
+     1.00821,
+     1.0115,
+     1.01438,
+     1.01723,
+     1.02013,
+     1.02286,
+     1.02594,
+     1.02957,
+     1.03409,
+     1.03876,
+     1.04715,
+     1.05716,
+     1.06988,
+     1.08741
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_ledge_rock",
+    "hex": "#B09A92",
+    "levels": [
+     0.95324,
+     0.96311,
+     0.96604,
+     0.96925,
+     0.97203,
+     0.97462,
+     0.97714,
+     0.97941,
+     0.98185,
+     0.98443,
+     0.98683,
+     0.98938,
+     0.99184,
+     0.99437,
+     0.99679,
+     0.99899,
+     1.00131,
+     1.00346,
+     1.00602,
+     1.00858,
+     1.01131,
+     1.01357,
+     1.01604,
+     1.01836,
+     1.0206,
+     1.02303,
+     1.02558,
+     1.02857,
+     1.03148,
+     1.03441,
+     1.03736,
+     1.03997
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_path",
+    "hex": "#E0B48C",
+    "levels": [
+     0.93557,
+     0.97529,
+     0.98055,
+     0.98687,
+     0.99201,
+     0.99489,
+     0.9981,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00093,
+     1.00287,
+     1.00726,
+     1.01047,
+     1.01555,
+     1.01943,
+     1.02254,
+     1.02748,
+     1.02952,
+     1.03725,
+     1.04369,
+     1.05309,
+     1.06146,
+     1.0676,
+     1.07273,
+     1.07642,
+     1.08259,
+     1.08941,
+     1.09921,
+     1.12495
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_ramp_rock",
+    "hex": "#B9ADA9",
+    "levels": [
+     0.93002,
+     0.9373,
+     0.94164,
+     0.94658,
+     0.95115,
+     0.95643,
+     0.96175,
+     0.96707,
+     0.9729,
+     0.97839,
+     0.98371,
+     0.98892,
+     0.99454,
+     0.99983,
+     1.00356,
+     1.00791,
+     1.01255,
+     1.01647,
+     1.01986,
+     1.02328,
+     1.02733,
+     1.03068,
+     1.0349,
+     1.03875,
+     1.04263,
+     1.04658,
+     1.04985,
+     1.05369,
+     1.05761,
+     1.06152,
+     1.0651,
+     1.06995
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_ramp_slab",
+    "hex": "#B8B0B6",
+    "levels": [
+     0.97024,
+     0.97262,
+     0.97602,
+     0.981,
+     0.98259,
+     0.98517,
+     0.98635,
+     0.98777,
+     0.99017,
+     0.99308,
+     0.99488,
+     0.99701,
+     0.99945,
+     1.0,
+     1.00185,
+     1.0036,
+     1.00611,
+     1.00784,
+     1.00907,
+     1.01089,
+     1.01298,
+     1.01506,
+     1.01658,
+     1.01813,
+     1.02019,
+     1.02232,
+     1.02511,
+     1.02682,
+     1.02857,
+     1.03008,
+     1.03537,
+     1.03992
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_rock",
+    "hex": "#A6999B",
+    "levels": [
+     0.91636,
+     0.93742,
+     0.94463,
+     0.95206,
+     0.95835,
+     0.96278,
+     0.96703,
+     0.97087,
+     0.97388,
+     0.97721,
+     0.98012,
+     0.98286,
+     0.98563,
+     0.98841,
+     0.99155,
+     0.99447,
+     0.99791,
+     1.00191,
+     1.00477,
+     1.00856,
+     1.01239,
+     1.01605,
+     1.01977,
+     1.02418,
+     1.02903,
+     1.03473,
+     1.03964,
+     1.04529,
+     1.0512,
+     1.058,
+     1.06485,
+     1.11524
+    ],
+    "used": true
+   },
+   {
+    "key": "w02_rock_cool",
+    "hex": "#686A7C",
+    "levels": [
+     0.93076,
+     0.93764,
+     0.94012,
+     0.94352,
+     0.94963,
+     0.95446,
+     0.95849,
+     0.96057,
+     0.96247,
+     0.96775,
+     0.97107,
+     0.97259,
+     0.98238,
+     0.98897,
+     0.99819,
+     1.00069,
+     1.0038,
+     1.00856,
+     1.01604,
+     1.01849,
+     1.02165,
+     1.02464,
+     1.02918,
+     1.03001,
+     1.03329,
+     1.03545,
+     1.03756,
+     1.04453,
+     1.04924,
+     1.05644,
+     1.06316,
+     1.06977
+    ],
+    "used": false
+   },
+   {
+    "key": "w02_slab",
+    "hex": "#CDC2C3",
+    "levels": [
+     0.9253,
+     0.94492,
+     0.95739,
+     0.96198,
+     0.96806,
+     0.97278,
+     0.97723,
+     0.98172,
+     0.98689,
+     0.99049,
+     0.99311,
+     0.99539,
+     0.99938,
+     1.0,
+     1.0,
+     1.00257,
+     1.0059,
+     1.00941,
+     1.01427,
+     1.01799,
+     1.02121,
+     1.02418,
+     1.02619,
+     1.02892,
+     1.02892,
+     1.03351,
+     1.03752,
+     1.04416,
+     1.0485,
+     1.05474,
+     1.06216,
+     1.08695
+    ],
+    "used": false
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CliffWall",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "hero",
+   "size": [
+    22.5388,
+    14.6269,
+    16.0553
+   ],
+   "tris": 5024,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWall.glb",
+     "kind": "solid",
+     "tris": 5024,
+     "offset": [
+      0.0,
+      7.3134,
+      0.0
+     ],
+     "size": [
+      22.5388,
+      14.6269,
+      16.0553
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "16x10 cliff chunk, 13 tall, staggered faceted columns, thick grass lip, flat back connector at +Y"
+  },
+  {
+   "name": "CliffWallBackConnector",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "part",
+   "size": [
+    1.0,
+    11.8,
+    18.2
+   ],
+   "tris": 60,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallBackConnector.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      5.9,
+      0.0
+     ],
+     "size": [
+      1.0,
+      11.8,
+      18.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "flat back connector with tabs: hides seams between modules"
+  },
+  {
+   "name": "CliffWallBody",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "part",
+   "size": [
+    22.3219,
+    12.6881,
+    13.4855
+   ],
+   "tris": 851,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallBody.glb",
+     "kind": "solid",
+     "tris": 851,
+     "offset": [
+      0.0,
+      6.344,
+      0.0
+     ],
+     "size": [
+      22.3219,
+      12.6881,
+      13.4855
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "cliff body columns only"
+  },
+  {
+   "name": "CliffWallGrassTop",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "part",
+   "size": [
+    18.8139,
+    2.6769,
+    13.3263
+   ],
+   "tris": 1337,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallGrassTop.glb",
+     "kind": "solid",
+     "tris": 1337,
+     "offset": [
+      0.0,
+      1.3384,
+      0.0
+     ],
+     "size": [
+      18.8139,
+      2.6769,
+      13.3263
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "grass top lip: walkable cap for any 16x10 cliff"
+  },
+  {
+   "name": "CliffWallInnerCorner",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "variant",
+   "size": [
+    19.1312,
+    14.5726,
+    16.3196
+   ],
+   "tris": 3781,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallInnerCorner.glb",
+     "kind": "solid",
+     "tris": 3781,
+     "offset": [
+      0.0,
+      7.2863,
+      0.0
+     ],
+     "size": [
+      19.1312,
+      14.5726,
+      16.3196
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Inner Corner: concave L, cliff faces wrap the notch"
+  },
+  {
+   "name": "CliffWallOuterCorner",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "variant",
+   "size": [
+    21.4318,
+    14.8185,
+    17.4345
+   ],
+   "tris": 3794,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallOuterCorner.glb",
+     "kind": "solid",
+     "tris": 3794,
+     "offset": [
+      0.0,
+      7.4092,
+      0.0
+     ],
+     "size": [
+      21.4318,
+      14.8185,
+      17.4345
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Outer Corner: convex rounded corner"
+  },
+  {
+   "name": "CliffWallStraight",
+   "sheet": "W02",
+   "subject": "CliffWall",
+   "role": "variant",
+   "size": [
+    17.6812,
+    14.5504,
+    15.5581
+   ],
+   "tris": 3763,
+   "budget": 7000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffWallStraight.glb",
+     "kind": "solid",
+     "tris": 3763,
+     "offset": [
+      0.0,
+      7.2752,
+      0.0
+     ],
+     "size": [
+      17.6812,
+      14.5504,
+      15.5581
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight: 12 wide, exposed ends, connector back"
+  },
+  {
+   "name": "NaturalArch",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "hero",
+   "size": [
+    22.1985,
+    16.6644,
+    12.533
+   ],
+   "tris": 4237,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArch.glb",
+     "kind": "solid",
+     "tris": 4237,
+     "offset": [
+      0.0,
+      8.3322,
+      0.0
+     ],
+     "size": [
+      22.1985,
+      16.6644,
+      12.533
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rock arch / cave mouth: 7-wide walk-through opening, sand floor, grass top"
+  },
+  {
+   "name": "NaturalArchBroken",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    19.9942,
+    15.6569,
+    13.4296
+   ],
+   "tris": 4898,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchBroken.glb",
+     "kind": "solid",
+     "tris": 4898,
+     "offset": [
+      0.0,
+      7.8284,
+      0.0
+     ],
+     "size": [
+      19.9942,
+      15.6569,
+      13.4296
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Broken: right side collapsed to rubble"
+  },
+  {
+   "name": "NaturalArchGroundSill",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    8.0,
+    0.8,
+    13.0
+   ],
+   "tris": 24,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchGroundSill.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      8.0,
+      0.8,
+      13.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ground sill (floor): stone slab with sand"
+  },
+  {
+   "name": "NaturalArchLeftMass",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    8.3555,
+    11.2087,
+    10.7255
+   ],
+   "tris": 1161,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchLeftMass.glb",
+     "kind": "solid",
+     "tris": 1161,
+     "offset": [
+      0.0,
+      5.6043,
+      0.0
+     ],
+     "size": [
+      8.3555,
+      11.2087,
+      10.7255
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "left rock mass: pier of faceted columns"
+  },
+  {
+   "name": "NaturalArchNarrow",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    17.9493,
+    16.9291,
+    13.1206
+   ],
+   "tris": 4403,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchNarrow.glb",
+     "kind": "solid",
+     "tris": 4403,
+     "offset": [
+      0.0,
+      8.4646,
+      0.0
+     ],
+     "size": [
+      17.9493,
+      16.9291,
+      13.1206
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Narrow: tall slot opening"
+  },
+  {
+   "name": "NaturalArchRightMass",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    8.3307,
+    11.2943,
+    11.3009
+   ],
+   "tris": 1657,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchRightMass.glb",
+     "kind": "solid",
+     "tris": 1657,
+     "offset": [
+      0.0,
+      5.6471,
+      0.0
+     ],
+     "size": [
+      8.3307,
+      11.2943,
+      11.3009
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "right rock mass: pier of faceted columns"
+  },
+  {
+   "name": "NaturalArchTopSpan",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "part",
+   "size": [
+    13.5434,
+    8.0534,
+    11.82
+   ],
+   "tris": 1807,
+   "budget": 3500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchTopSpan.glb",
+     "kind": "solid",
+     "tris": 1807,
+     "offset": [
+      0.0,
+      4.0267,
+      0.0
+     ],
+     "size": [
+      13.5434,
+      8.0534,
+      11.82
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top span: arch-shaped lintel with grass cap"
+  },
+  {
+   "name": "NaturalArchWide",
+   "sheet": "W02",
+   "subject": "NaturalArch",
+   "role": "variant",
+   "size": [
+    26.2163,
+    15.5723,
+    12.9187
+   ],
+   "tris": 4543,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalArchWide.glb",
+     "kind": "solid",
+     "tris": 4543,
+     "offset": [
+      0.0,
+      7.7862,
+      0.0
+     ],
+     "size": [
+      26.2163,
+      15.5723,
+      12.9187
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide: broad low arch"
+  },
+  {
+   "name": "NaturalRamp",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "hero",
+   "size": [
+    15.4493,
+    11.4173,
+    23.3917
+   ],
+   "tris": 4308,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRamp.glb",
+     "kind": "solid",
+     "tris": 4308,
+     "offset": [
+      0.0,
+      5.7087,
+      0.0
+     ],
+     "size": [
+      15.4493,
+      11.4173,
+      23.3917
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "8-wide path climbing 9 studs over 22 along +Y between rock walls; flat connector wall on the left (-X)"
+  },
+  {
+   "name": "NaturalRampCurved",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "variant",
+   "size": [
+    26.353,
+    10.1613,
+    24.4439
+   ],
+   "tris": 5231,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampCurved.glb",
+     "kind": "solid",
+     "tris": 5231,
+     "offset": [
+      0.0,
+      5.0806,
+      0.0
+     ],
+     "size": [
+      26.353,
+      10.1613,
+      24.4439
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Curved: quarter-circle ramp, radius 11, climbs 8, rock wall round the outside"
+  },
+  {
+   "name": "NaturalRampGrassBorder",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "part",
+   "size": [
+    3.3026,
+    1.3183,
+    21.1514
+   ],
+   "tris": 1666,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampGrassBorder.glb",
+     "kind": "solid",
+     "tris": 1666,
+     "offset": [
+      0.0,
+      0.6591,
+      0.0
+     ],
+     "size": [
+      3.3026,
+      1.3183,
+      21.1514
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "grass border strip for any path edge"
+  },
+  {
+   "name": "NaturalRampGrassBorderRight",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "part",
+   "size": [
+    3.3026,
+    1.3183,
+    21.1514
+   ],
+   "tris": 1666,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampGrassBorderRight.glb",
+     "kind": "solid",
+     "tris": 1666,
+     "offset": [
+      0.0,
+      0.6591,
+      0.0
+     ],
+     "size": [
+      3.3026,
+      1.3183,
+      21.1514
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "grass border strip, right-hand side"
+  },
+  {
+   "name": "NaturalRampLandingPad",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "part",
+   "size": [
+    8.0,
+    1.8,
+    8.0
+   ],
+   "tris": 90,
+   "budget": 400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampLandingPad.glb",
+     "kind": "solid",
+     "tris": 90,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      8.0,
+      1.8,
+      8.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top landing pad (path): flat 8x8 path tile"
+  },
+  {
+   "name": "NaturalRampStraight",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "variant",
+   "size": [
+    14.3869,
+    8.5792,
+    19.4787
+   ],
+   "tris": 3357,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampStraight.glb",
+     "kind": "solid",
+     "tris": 3357,
+     "offset": [
+      0.0,
+      4.2896,
+      0.0
+     ],
+     "size": [
+      14.3869,
+      8.5792,
+      19.4787
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Straight: 18-long ramp, rock both sides"
+  },
+  {
+   "name": "NaturalRampSwitchback",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "variant",
+   "size": [
+    22.6369,
+    12.3388,
+    24.2164
+   ],
+   "tris": 6551,
+   "budget": 9000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampSwitchback.glb",
+     "kind": "solid",
+     "tris": 6551,
+     "offset": [
+      0.0,
+      6.1694,
+      0.0
+     ],
+     "size": [
+      22.6369,
+      12.3388,
+      24.2164
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Switchback: zigzag with two reversals"
+  },
+  {
+   "name": "NaturalRampWedge",
+   "sheet": "W02",
+   "subject": "NaturalRamp",
+   "role": "part",
+   "size": [
+    8.0,
+    5.0,
+    14.0
+   ],
+   "tris": 12,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/NaturalRampWedge.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      2.5,
+      0.0
+     ],
+     "size": [
+      8.0,
+      5.0,
+      14.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ramp wedge (stone): broad sloped base block, 8 x 14, rises 5"
+  },
+  {
+   "name": "TerracedLedge",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "hero",
+   "size": [
+    23.775,
+    13.4455,
+    17.1238
+   ],
+   "tris": 5869,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedge.glb",
+     "kind": "solid",
+     "tris": 5869,
+     "offset": [
+      0.0,
+      6.7228,
+      0.0
+     ],
+     "size": [
+      23.775,
+      13.4455,
+      17.1238
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "two walkable grass levels (6.5 and 12 studs), connector back with tabs"
+  },
+  {
+   "name": "TerracedLedgeBase",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "part",
+   "size": [
+    23.1806,
+    7.8021,
+    15.8284
+   ],
+   "tris": 676,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeBase.glb",
+     "kind": "solid",
+     "tris": 676,
+     "offset": [
+      0.0,
+      3.9011,
+      0.0
+     ],
+     "size": [
+      23.1806,
+      7.8021,
+      15.8284
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "main cliff base: long faceted block, no cap"
+  },
+  {
+   "name": "TerracedLedgeCornerFiller",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "part",
+   "size": [
+    4.9684,
+    8.0,
+    4.0919
+   ],
+   "tris": 60,
+   "budget": 600,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeCornerFiller.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      4.0,
+      0.0
+     ],
+     "size": [
+      4.9684,
+      8.0,
+      4.0919
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner filler rock: tall wedge plugging seams at module corners"
+  },
+  {
+   "name": "TerracedLedgeLowerShelf",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "part",
+   "size": [
+    23.0088,
+    4.1267,
+    17.0574
+   ],
+   "tris": 3482,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeLowerShelf.glb",
+     "kind": "solid",
+     "tris": 3482,
+     "offset": [
+      0.0,
+      2.0633,
+      0.0
+     ],
+     "size": [
+      23.0088,
+      4.1267,
+      17.0574
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "lower ledge shelf: grass slab on a short rock rim"
+  },
+  {
+   "name": "TerracedLedgeRampEnd",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "variant",
+   "size": [
+    22.5835,
+    12.4295,
+    17.9702
+   ],
+   "tris": 5704,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeRampEnd.glb",
+     "kind": "solid",
+     "tris": 5704,
+     "offset": [
+      0.0,
+      6.2147,
+      0.0
+     ],
+     "size": [
+      22.5835,
+      12.4295,
+      17.9702
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "C. Ramp End: path climbs diagonally from the ground to the upper level"
+  },
+  {
+   "name": "TerracedLedgeShallow",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "variant",
+   "size": [
+    23.5729,
+    8.5375,
+    17.4753
+   ],
+   "tris": 5833,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeShallow.glb",
+     "kind": "solid",
+     "tris": 5833,
+     "offset": [
+      0.0,
+      4.2688,
+      0.0
+     ],
+     "size": [
+      23.5729,
+      8.5375,
+      17.4753
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "A. Shallow: 4-stud steps"
+  },
+  {
+   "name": "TerracedLedgeUpperCap",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "part",
+   "size": [
+    16.6779,
+    3.8638,
+    9.9736
+   ],
+   "tris": 2223,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeUpperCap.glb",
+     "kind": "solid",
+     "tris": 2223,
+     "offset": [
+      0.0,
+      1.9319,
+      0.0
+     ],
+     "size": [
+      16.6779,
+      3.8638,
+      9.9736
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "upper ledge cap: grass slab on a short rock rim"
+  },
+  {
+   "name": "TerracedLedgeWide",
+   "sheet": "W02",
+   "subject": "TerracedLedge",
+   "role": "variant",
+   "size": [
+    30.7391,
+    8.532,
+    17.4585
+   ],
+   "tris": 6166,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TerracedLedgeWide.glb",
+     "kind": "solid",
+     "tris": 6166,
+     "offset": [
+      0.0,
+      4.266,
+      0.0
+     ],
+     "size": [
+      30.7391,
+      8.532,
+      17.4585
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "B. Wide: 26 across, low broad shelf"
+  }
+ ],
+ "stats": {
+  "assets": 31,
+  "pieces": 31,
+  "solid": 31,
+  "water": 0,
+  "glow": 0,
+  "tris": 94234,
+  "vfxSockets": 0,
+  "paletteColours": 4,
+  "paletteLevels": 128,
+  "meshBytes": 9441736
+ },
+ "problems": []
+}

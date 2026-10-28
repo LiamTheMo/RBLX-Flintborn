@@ -1,0 +1,2469 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "W11",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "w11_blue",
+    "hex": "#3E6AB0",
+    "levels": [
+     0.98276,
+     1.04507,
+     1.0677,
+     0.95255,
+     1.01174,
+     1.00864,
+     0.97207,
+     0.9919,
+     1.03743,
+     0.97594,
+     0.98613
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_clay",
+    "hex": "#D88A4A",
+    "levels": [
+     0.95757,
+     0.97086,
+     0.97534,
+     0.9979,
+     1.0239,
+     1.03073,
+     1.04107,
+     1.06866,
+     1.01141,
+     0.98543,
+     0.96486,
+     1.00799
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_cloth",
+    "hex": "#EAD9B4",
+    "levels": [
+     0.93098,
+     0.93303,
+     0.93601,
+     0.94966,
+     0.95418,
+     0.97435,
+     0.98057,
+     1.01441,
+     1.03918,
+     1.06371,
+     0.98556
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_flame",
+    "hex": "#FF8C1A",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "w11_glass",
+    "hex": "#FFC23D",
+    "levels": [
+     1.0
+    ],
+    "used": false
+   },
+   {
+    "key": "w11_green",
+    "hex": "#5B7A38",
+    "levels": [
+     0.96215,
+     0.98181,
+     0.9915,
+     1.00104,
+     1.00575,
+     1.02818,
+     1.04544,
+     1.04803,
+     1.05647
+    ],
+    "used": false
+   },
+   {
+    "key": "w11_iron",
+    "hex": "#3E3E46",
+    "levels": [
+     0.93188,
+     0.93701,
+     0.94021,
+     0.94189,
+     0.94573,
+     0.94936,
+     0.95595,
+     0.96182,
+     0.96708,
+     0.975,
+     0.97885,
+     0.9861,
+     0.99198,
+     0.99419,
+     0.99684,
+     1.00253,
+     1.00565,
+     1.01083,
+     1.01703,
+     1.01865,
+     1.02012,
+     1.02362,
+     1.03041,
+     1.0328,
+     1.0368,
+     1.04074,
+     1.04828,
+     1.0512,
+     1.05532,
+     1.05925,
+     1.06357,
+     1.06973
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_red",
+    "hex": "#C8302C",
+    "levels": [
+     0.93407,
+     0.93814,
+     0.94095,
+     0.946,
+     0.95084,
+     0.95485,
+     0.9807,
+     0.98458,
+     0.99926,
+     1.01277,
+     1.01937,
+     1.03324,
+     0.96311,
+     1.041,
+     1.02248
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_rope",
+    "hex": "#C99A55",
+    "levels": [
+     0.93352,
+     0.93569,
+     0.94219,
+     0.95389,
+     0.96118,
+     0.96414,
+     0.97268,
+     0.97602,
+     0.98497,
+     0.99371,
+     1.01,
+     1.01633,
+     1.02652,
+     1.02886,
+     1.03206,
+     1.03396,
+     1.03971,
+     1.04322,
+     1.05071,
+     1.06323
+    ],
+    "used": false
+   },
+   {
+    "key": "w11_stone",
+    "hex": "#A6A4AA",
+    "levels": [
+     0.90504,
+     0.92454,
+     0.93339,
+     0.94432,
+     0.94887,
+     0.95435,
+     0.95872,
+     0.96403,
+     0.96827,
+     0.97119,
+     0.97598,
+     0.98044,
+     0.9831,
+     0.98346,
+     0.98448,
+     0.987,
+     0.99209,
+     0.99616,
+     0.9984,
+     1.00152,
+     1.00638,
+     1.01077,
+     1.01401,
+     1.0179,
+     1.02449,
+     1.03019,
+     1.03666,
+     1.04334,
+     1.05023,
+     1.06046,
+     1.06745,
+     1.0949
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_wood",
+    "hex": "#B06A30",
+    "levels": [
+     0.93031,
+     0.93467,
+     0.93955,
+     0.94427,
+     0.95014,
+     0.9565,
+     0.96054,
+     0.96469,
+     0.96955,
+     0.975,
+     0.98035,
+     0.9871,
+     0.992,
+     0.99528,
+     0.99927,
+     1.00378,
+     1.0076,
+     1.01153,
+     1.01636,
+     1.02016,
+     1.02375,
+     1.02771,
+     1.03261,
+     1.03759,
+     1.04031,
+     1.04483,
+     1.04782,
+     1.05203,
+     1.05597,
+     1.05937,
+     1.06504,
+     1.06972
+    ],
+    "used": true
+   },
+   {
+    "key": "w08_rope",
+    "hex": "#D9BC84",
+    "levels": [
+     0.95673,
+     0.98983,
+     0.99873,
+     1.00124,
+     1.00941,
+     1.01524,
+     1.01953,
+     1.03161,
+     1.04525
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_ember",
+    "hex": "#FF8A2A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_mat",
+    "hex": "#5C7A3A",
+    "levels": [
+     0.95231,
+     0.97405,
+     0.98646,
+     1.01836,
+     1.02501,
+     1.0455
+    ],
+    "used": true
+   },
+   {
+    "key": "w11_sack",
+    "hex": "#E6D2A8",
+    "levels": [
+     0.96015,
+     0.96513,
+     0.97207,
+     0.98591,
+     0.99014,
+     1.04468
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "DailyItems",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "hero",
+   "size": [
+    7.905,
+    5.9557,
+    2.3664
+   ],
+   "tris": 736,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItems.glb",
+     "kind": "solid",
+     "tris": 736,
+     "offset": [
+      0.0,
+      2.9778,
+      0.0
+     ],
+     "size": [
+      7.905,
+      5.9557,
+      2.3664
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "camp rack: lashed A-frame shelf with a cloth top, jugs, bowl, rolled mats, a tied sack and red ribbons"
+  },
+  {
+   "name": "DailyItemsBowl",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    1.2,
+    0.4,
+    1.2
+   ],
+   "tris": 28,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsBowl.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.2,
+      0.0
+     ],
+     "size": [
+      1.2,
+      0.4,
+      1.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bowl"
+  },
+  {
+   "name": "DailyItemsJug",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    1.2,
+    1.5,
+    1.2
+   ],
+   "tris": 72,
+   "budget": 90,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsJug.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.75,
+      0.0
+     ],
+     "size": [
+      1.2,
+      1.5,
+      1.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "jug (ceramic)"
+  },
+  {
+   "name": "DailyItemsLogRack",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "variant",
+   "size": [
+    6.6,
+    4.3279,
+    2.1395
+   ],
+   "tris": 504,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsLogRack.glb",
+     "kind": "solid",
+     "tris": 504,
+     "offset": [
+      0.0,
+      2.164,
+      0.0
+     ],
+     "size": [
+      6.6,
+      4.3279,
+      2.1395
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Log Rack: firewood stacked in an A-frame rack"
+  },
+  {
+   "name": "DailyItemsOpenShelf",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "variant",
+   "size": [
+    6.0,
+    5.3174,
+    2.1419
+   ],
+   "tris": 620,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsOpenShelf.glb",
+     "kind": "solid",
+     "tris": 620,
+     "offset": [
+      0.0,
+      2.6587,
+      0.0
+     ],
+     "size": [
+      6.0,
+      5.3174,
+      2.1419
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Open Shelf: two-shelf rack with pots"
+  },
+  {
+   "name": "DailyItemsRackSide",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    0.5553,
+    5.9166,
+    2.1133
+   ],
+   "tris": 32,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsRackSide.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      2.9583,
+      0.0
+     ],
+     "size": [
+      0.5553,
+      5.9166,
+      2.1133
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rack side"
+  },
+  {
+   "name": "DailyItemsRolledMat",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    2.6728,
+    1.0871,
+    1.1334
+   ],
+   "tris": 28,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsRolledMat.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.5436,
+      0.0
+     ],
+     "size": [
+      2.6728,
+      1.0871,
+      1.1334
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "rolled mat (cloth)"
+  },
+  {
+   "name": "DailyItemsSack",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    1.61,
+    2.45,
+    1.361
+   ],
+   "tris": 60,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsSack.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      1.225,
+      0.0
+     ],
+     "size": [
+      1.61,
+      2.45,
+      1.361
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "sack (cloth)"
+  },
+  {
+   "name": "DailyItemsSupportBrace",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    5.7,
+    0.25,
+    1.34
+   ],
+   "tris": 132,
+   "budget": 140,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsSupportBrace.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      0.125,
+      0.0
+     ],
+     "size": [
+      5.7,
+      0.25,
+      1.34
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "support brace / shelf"
+  },
+  {
+   "name": "DailyItemsToolStand",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "variant",
+   "size": [
+    6.244,
+    6.1359,
+    2.143
+   ],
+   "tris": 586,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsToolStand.glb",
+     "kind": "solid",
+     "tris": 586,
+     "offset": [
+      0.0,
+      3.0679,
+      0.0
+     ],
+     "size": [
+      6.244,
+      6.1359,
+      2.143
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tool Stand: drying rack with hanging cloths, barrel and sack"
+  },
+  {
+   "name": "DailyItemsTopBeam",
+   "sheet": "W11",
+   "subject": "DailyItems",
+   "role": "part",
+   "size": [
+    7.0,
+    0.45,
+    0.45
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/DailyItemsTopBeam.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.225,
+      0.0
+     ],
+     "size": [
+      7.0,
+      0.45,
+      0.45
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top beam"
+  },
+  {
+   "name": "FireAndLight",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "hero",
+   "size": [
+    7.88,
+    7.467,
+    7.9829
+   ],
+   "tris": 750,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLight.glb",
+     "kind": "solid",
+     "tris": 730,
+     "offset": [
+      0.0,
+      3.8479,
+      0.0
+     ],
+     "size": [
+      7.88,
+      7.2381,
+      7.9829
+     ]
+    },
+    {
+     "file": "meshes/FireAndLight_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 20,
+     "offset": [
+      -0.0735,
+      0.7,
+      -0.071
+     ],
+     "size": [
+      1.2522,
+      1.4,
+      1.1909
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FireAndLight_campfire_1",
+     "kind": "campfire",
+     "position": [
+      -0.0735,
+      0.95,
+      -0.071
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Flame",
+        "texture": "fire_flipbook_4x4",
+        "flipbook": "4x4",
+        "color": [
+         "#FFFFFF",
+         "#FFF4E0",
+         "#FFD2A8"
+        ],
+        "size": [
+         2.6,
+         3.4,
+         0.8
+        ],
+        "transparency": [
+         0.05,
+         0.15,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 30,
+        "speed": [
+         1.8,
+         3.0
+        ],
+        "spread": 12,
+        "light_emission": 1.0,
+        "acceleration": [
+         0,
+         2.5,
+         0
+        ],
+        "rotation": [
+         -10,
+         10
+        ],
+        "shape": [
+         2.5,
+         0.2,
+         2.5
+        ]
+       },
+       {
+        "name": "Sparks",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF2B0",
+         "#FFB347"
+        ],
+        "size": [
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.0,
+         2.2
+        ],
+        "rate": 8,
+        "speed": [
+         5,
+         8
+        ],
+        "spread": 30,
+        "light_emission": 1.0,
+        "drag": 1.4,
+        "acceleration": [
+         0,
+         1.5,
+         0
+        ]
+       },
+       {
+        "name": "Smoke",
+        "texture": "smoke_puff",
+        "color": [
+         "#6E6A66",
+         "#9A9692"
+        ],
+        "size": [
+         1.5,
+         4.5
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         2.5,
+         4.0
+        ],
+        "rate": 3,
+        "speed": [
+         2,
+         3
+        ],
+        "spread": 10,
+        "light_emission": 0.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -25,
+         25
+        ],
+        "acceleration": [
+         0.3,
+         0.3,
+         0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF8C2A",
+       "brightness": 2.5,
+       "range": 28,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "campfire: closed ring of ten big faceted stones enclosing a log teepee with glowing embers, rope-bound tripod with hanging iron pot | VFX: campfire (fire, embers, smoke, light)"
+  },
+  {
+   "name": "FireAndLightBasketBrazier",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "variant",
+   "size": [
+    3.6537,
+    4.3934,
+    3.6
+   ],
+   "tris": 412,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightBasketBrazier.glb",
+     "kind": "solid",
+     "tris": 392,
+     "offset": [
+      0.0,
+      2.3386,
+      0.0
+     ],
+     "size": [
+      3.6537,
+      4.1096,
+      3.6
+     ]
+    },
+    {
+     "file": "meshes/FireAndLightBasketBrazier_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 20,
+     "offset": [
+      0.0067,
+      0.7,
+      0.0
+     ],
+     "size": [
+      1.2522,
+      1.4,
+      1.1909
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FireAndLightBasketBrazier_brazier_fire_1",
+     "kind": "brazier_fire",
+     "position": [
+      0.0067,
+      3.95,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Flame",
+        "texture": "fire_flipbook_4x4",
+        "flipbook": "4x4",
+        "color": [
+         "#FFFFFF",
+         "#FFF4E0",
+         "#FFD2A8"
+        ],
+        "size": [
+         1.4,
+         1.9,
+         0.4
+        ],
+        "transparency": [
+         0.05,
+         0.15,
+         1.0
+        ],
+        "lifetime": [
+         0.45,
+         0.8
+        ],
+        "rate": 22,
+        "speed": [
+         1.5,
+         2.6
+        ],
+        "spread": 10,
+        "light_emission": 1.0,
+        "acceleration": [
+         0,
+         2.0,
+         0
+        ],
+        "rotation": [
+         -8,
+         8
+        ]
+       },
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1,
+         2
+        ],
+        "rate": 5,
+        "speed": [
+         3,
+         5
+        ],
+        "spread": 25,
+        "light_emission": 1.0,
+        "drag": 1.2,
+        "acceleration": [
+         0,
+         1,
+         0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF9A3C",
+       "brightness": 2.0,
+       "range": 18,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Basket Brazier: ribbed flared basket with iron bands and rim on three legs, burning logs | VFX: brazier_fire"
+  },
+  {
+   "name": "FireAndLightFire",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "part",
+   "size": [
+    3.0011,
+    1.721,
+    3.0969
+   ],
+   "tris": 120,
+   "budget": 300,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightFire.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      1.0226,
+      0.0
+     ],
+     "size": [
+      3.0011,
+      1.3969,
+      3.0969
+     ]
+    },
+    {
+     "file": "meshes/FireAndLightFire_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 20,
+     "offset": [
+      -0.11,
+      0.7,
+      -0.0051
+     ],
+     "size": [
+      1.2522,
+      1.4,
+      1.1909
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FireAndLightFire_campfire_1",
+     "kind": "campfire",
+     "position": [
+      -0.11,
+      0.95,
+      -0.0051
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Flame",
+        "texture": "fire_flipbook_4x4",
+        "flipbook": "4x4",
+        "color": [
+         "#FFFFFF",
+         "#FFF4E0",
+         "#FFD2A8"
+        ],
+        "size": [
+         2.6,
+         3.4,
+         0.8
+        ],
+        "transparency": [
+         0.05,
+         0.15,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 30,
+        "speed": [
+         1.8,
+         3.0
+        ],
+        "spread": 12,
+        "light_emission": 1.0,
+        "acceleration": [
+         0,
+         2.5,
+         0
+        ],
+        "rotation": [
+         -10,
+         10
+        ],
+        "shape": [
+         2.5,
+         0.2,
+         2.5
+        ]
+       },
+       {
+        "name": "Sparks",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF2B0",
+         "#FFB347"
+        ],
+        "size": [
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.0,
+         2.2
+        ],
+        "rate": 8,
+        "speed": [
+         5,
+         8
+        ],
+        "spread": 30,
+        "light_emission": 1.0,
+        "drag": 1.4,
+        "acceleration": [
+         0,
+         1.5,
+         0
+        ]
+       },
+       {
+        "name": "Smoke",
+        "texture": "smoke_puff",
+        "color": [
+         "#6E6A66",
+         "#9A9692"
+        ],
+        "size": [
+         1.5,
+         4.5
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         2.5,
+         4.0
+        ],
+        "rate": 3,
+        "speed": [
+         2,
+         3
+        ],
+        "spread": 10,
+        "light_emission": 0.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -25,
+         25
+        ],
+        "acceleration": [
+         0.3,
+         0.3,
+         0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF8C2A",
+       "brightness": 2.5,
+       "range": 28,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "fire (separate): log pieces with embers | VFX: campfire"
+  },
+  {
+   "name": "FireAndLightHangingPot",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "part",
+   "size": [
+    2.0923,
+    1.4734,
+    2.2
+   ],
+   "tris": 72,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightHangingPot.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.7367,
+      0.0
+     ],
+     "size": [
+      2.0923,
+      1.4734,
+      2.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "hanging pot"
+  },
+  {
+   "name": "FireAndLightLanternPost",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "variant",
+   "size": [
+    3.446,
+    7.6,
+    1.4
+   ],
+   "tris": 204,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightLanternPost.glb",
+     "kind": "solid",
+     "tris": 192,
+     "offset": [
+      0.0,
+      3.8,
+      0.0
+     ],
+     "size": [
+      3.446,
+      7.6,
+      1.4
+     ]
+    },
+    {
+     "file": "meshes/FireAndLightLanternPost_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      1.177,
+      5.511,
+      0.0
+     ],
+     "size": [
+      0.65,
+      0.91,
+      0.65
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FireAndLightLanternPost_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      1.177,
+      5.485,
+      0.0
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Lantern Post: gallows post on a stone footing with a hanging lantern | VFX: heat_glow light"
+  },
+  {
+   "name": "FireAndLightStoneRing",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "part",
+   "size": [
+    8.0502,
+    1.865,
+    7.9052
+   ],
+   "tris": 390,
+   "budget": 500,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightStoneRing.glb",
+     "kind": "solid",
+     "tris": 390,
+     "offset": [
+      0.0,
+      0.9325,
+      0.0
+     ],
+     "size": [
+      8.0502,
+      1.865,
+      7.9052
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "stone ring: ten big stones that touch"
+  },
+  {
+   "name": "FireAndLightTripodPoles",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "part",
+   "size": [
+    7.1591,
+    7.2893,
+    7.0167
+   ],
+   "tris": 132,
+   "budget": 160,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightTripodPoles.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      3.6447,
+      0.0
+     ],
+     "size": [
+      7.1591,
+      7.2893,
+      7.0167
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "tripod poles (wood) with rope bind"
+  },
+  {
+   "name": "FireAndLightWallTorch",
+   "sheet": "W11",
+   "subject": "FireAndLight",
+   "role": "variant",
+   "size": [
+    1.24,
+    3.75,
+    1.77
+   ],
+   "tris": 152,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FireAndLightWallTorch.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      1.7,
+      0.0
+     ],
+     "size": [
+      1.24,
+      3.4,
+      1.77
+     ]
+    },
+    {
+     "file": "meshes/FireAndLightWallTorch_glow_w11_ember.glb",
+     "kind": "glow",
+     "tris": 20,
+     "offset": [
+      0.0,
+      3.3,
+      0.265
+     ],
+     "size": [
+      0.805,
+      0.9,
+      0.7656
+     ],
+     "key": "w11_ember",
+     "color": "#FF8A2A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_FireAndLightWallTorch_torch_fire_1",
+     "kind": "torch_fire",
+     "position": [
+      0.0,
+      3.4,
+      0.265
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Flame",
+        "texture": "fire_flipbook_4x4",
+        "flipbook": "4x4",
+        "color": [
+         "#FFFFFF",
+         "#FFF4E0",
+         "#FFD2A8"
+        ],
+        "size": [
+         0.9,
+         1.2,
+         0.3
+        ],
+        "transparency": [
+         0.1,
+         0.15,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.7
+        ],
+        "rate": 18,
+        "speed": [
+         1.2,
+         2.0
+        ],
+        "spread": 6,
+        "light_emission": 1.0,
+        "acceleration": [
+         0,
+         1.5,
+         0
+        ],
+        "rotation": [
+         -8,
+         8
+        ]
+       },
+       {
+        "name": "Embers",
+        "texture": "ember_dot",
+        "color": [
+         "#FFC86A",
+         "#FF6A1A"
+        ],
+        "size": [
+         0.3,
+         0.1
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         0.8,
+         1.6
+        ],
+        "rate": 4,
+        "speed": [
+         2.5,
+         4.5
+        ],
+        "spread": 25,
+        "light_emission": 1.0,
+        "drag": 1.2,
+        "acceleration": [
+         0,
+         1,
+         0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF9A3C",
+       "brightness": 1.6,
+       "range": 14,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Wall Torch: iron wall plate and bracket, wrapped shaft, tapered iron cup head with ember | VFX: torch_fire"
+  },
+  {
+   "name": "Storage",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "hero",
+   "size": [
+    8.0173,
+    3.9,
+    4.1633
+   ],
+   "tris": 1806,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/Storage.glb",
+     "kind": "solid",
+     "tris": 1806,
+     "offset": [
+      0.0,
+      1.95,
+      0.0
+     ],
+     "size": [
+      8.0173,
+      3.9,
+      4.1633
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "storage pair: X-braced plank crate with corner posts and nail heads, bulged iron-hooped stave barrel"
+  },
+  {
+   "name": "StorageBarrelStave",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    0.831,
+    3.0728,
+    0.7927
+   ],
+   "tris": 12,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageBarrelStave.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      1.5364,
+      0.0
+     ],
+     "size": [
+      0.831,
+      3.0728,
+      0.7927
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "wooden stave"
+  },
+  {
+   "name": "StorageCornerPost",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    0.45,
+    3.6,
+    0.45
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageCornerPost.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      0.45,
+      3.6,
+      0.45
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "corner post"
+  },
+  {
+   "name": "StorageLid",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    2.6,
+    0.25,
+    2.6
+   ],
+   "tris": 44,
+   "budget": 60,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageLid.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.125,
+      0.0
+     ],
+     "size": [
+      2.6,
+      0.25,
+      2.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "lid top / base panel"
+  },
+  {
+   "name": "StorageLongChest",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "variant",
+   "size": [
+    6.6947,
+    3.2,
+    3.45
+   ],
+   "tris": 1252,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageLongChest.glb",
+     "kind": "solid",
+     "tris": 1252,
+     "offset": [
+      0.0,
+      1.6,
+      0.0
+     ],
+     "size": [
+      6.6947,
+      3.2,
+      3.45
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Long Chest: iron-banded plank chest"
+  },
+  {
+   "name": "StorageMetalHoop",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    3.0414,
+    0.1414,
+    3.0414
+   ],
+   "tris": 96,
+   "budget": 120,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageMetalHoop.glb",
+     "kind": "solid",
+     "tris": 96,
+     "offset": [
+      0.0,
+      0.0707,
+      0.0
+     ],
+     "size": [
+      3.0414,
+      0.1414,
+      3.0414
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "metal hoop"
+  },
+  {
+   "name": "StorageOpenCrate",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "variant",
+   "size": [
+    5.0947,
+    2.8,
+    3.85
+   ],
+   "tris": 1040,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageOpenCrate.glb",
+     "kind": "solid",
+     "tris": 1040,
+     "offset": [
+      0.0,
+      1.4,
+      0.0
+     ],
+     "size": [
+      5.0947,
+      2.8,
+      3.85
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Open Crate: slatted crate without a lid"
+  },
+  {
+   "name": "StorageSidePanel",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    3.3,
+    3.55,
+    0.3
+   ],
+   "tris": 176,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageSidePanel.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      1.775,
+      0.0
+     ],
+     "size": [
+      3.3,
+      3.55,
+      0.3
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "side panel"
+  },
+  {
+   "name": "StorageSquareCrate",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "variant",
+   "size": [
+    4.2947,
+    3.9,
+    4.1633
+   ],
+   "tris": 1440,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageSquareCrate.glb",
+     "kind": "solid",
+     "tris": 1440,
+     "offset": [
+      0.0,
+      1.95,
+      0.0
+     ],
+     "size": [
+      4.2947,
+      3.9,
+      4.1633
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Square Crate"
+  },
+  {
+   "name": "StorageTopPanel",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    3.6,
+    0.3,
+    3.54
+   ],
+   "tris": 176,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageTopPanel.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      0.15,
+      0.0
+     ],
+     "size": [
+      3.6,
+      0.3,
+      3.54
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "top panel"
+  },
+  {
+   "name": "StorageXBrace",
+   "sheet": "W11",
+   "subject": "Storage",
+   "role": "part",
+   "size": [
+    3.2836,
+    3.2695,
+    0.3825
+   ],
+   "tris": 24,
+   "budget": 40,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StorageXBrace.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.6347,
+      0.0
+     ],
+     "size": [
+      3.2836,
+      3.2695,
+      0.3825
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "X brace"
+  },
+  {
+   "name": "TableAndSeating",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "hero",
+   "size": [
+    7.0,
+    3.1046,
+    7.704
+   ],
+   "tris": 876,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeating.glb",
+     "kind": "solid",
+     "tris": 876,
+     "offset": [
+      0.0,
+      1.5523,
+      0.0
+     ],
+     "size": [
+      7.0,
+      3.1046,
+      7.704
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "plank table on chunky A-frame trestles with crossbar and braces, two splay-legged plank benches"
+  },
+  {
+   "name": "TableAndSeatingBenchSeat",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "part",
+   "size": [
+    6.0,
+    1.6844,
+    1.7099
+   ],
+   "tris": 160,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingBenchSeat.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.8422,
+      0.0
+     ],
+     "size": [
+      6.0,
+      1.6844,
+      1.7099
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "bench seat (planks)"
+  },
+  {
+   "name": "TableAndSeatingCrossbar",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "part",
+   "size": [
+    5.0,
+    0.35,
+    0.35
+   ],
+   "tris": 12,
+   "budget": 30,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingCrossbar.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.175,
+      0.0
+     ],
+     "size": [
+      5.0,
+      0.35,
+      0.35
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "crossbar"
+  },
+  {
+   "name": "TableAndSeatingLongBench",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "variant",
+   "size": [
+    8.0,
+    1.8879,
+    1.9782
+   ],
+   "tris": 160,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingLongBench.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.9439,
+      0.0
+     ],
+     "size": [
+      8.0,
+      1.8879,
+      1.9782
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Long Bench"
+  },
+  {
+   "name": "TableAndSeatingStool",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "variant",
+   "size": [
+    2.0704,
+    2.0571,
+    2.0651
+   ],
+   "tris": 136,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingStool.glb",
+     "kind": "solid",
+     "tris": 136,
+     "offset": [
+      0.0,
+      1.0285,
+      0.0
+     ],
+     "size": [
+      2.0704,
+      2.0571,
+      2.0651
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stool: square seat on splayed legs"
+  },
+  {
+   "name": "TableAndSeatingTableTop",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "part",
+   "size": [
+    7.0,
+    0.35,
+    3.14
+   ],
+   "tris": 176,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingTableTop.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      0.175,
+      0.0
+     ],
+     "size": [
+      7.0,
+      0.35,
+      3.14
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "table top (planks)"
+  },
+  {
+   "name": "TableAndSeatingTrestle",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "part",
+   "size": [
+    0.8,
+    2.7035,
+    3.4459
+   ],
+   "tris": 168,
+   "budget": 200,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingTrestle.glb",
+     "kind": "solid",
+     "tris": 168,
+     "offset": [
+      0.0,
+      1.3517,
+      0.0
+     ],
+     "size": [
+      0.8,
+      2.7035,
+      3.4459
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "leg / trestle (A-frame)"
+  },
+  {
+   "name": "TableAndSeatingWorkbench",
+   "sheet": "W11",
+   "subject": "TableAndSeating",
+   "role": "variant",
+   "size": [
+    6.0,
+    5.4,
+    2.7
+   ],
+   "tris": 548,
+   "budget": 3000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TableAndSeatingWorkbench.glb",
+     "kind": "solid",
+     "tris": 548,
+     "offset": [
+      0.0,
+      2.7,
+      0.0
+     ],
+     "size": [
+      6.0,
+      5.4,
+      2.7
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Workbench: thick top on upright end frames, lower shelf, upper tool shelf"
+  }
+ ],
+ "stats": {
+  "assets": 38,
+  "pieces": 43,
+  "solid": 38,
+  "water": 0,
+  "glow": 5,
+  "tris": 13420,
+  "vfxSockets": 5,
+  "paletteColours": 11,
+  "paletteLevels": 167,
+  "meshBytes": 1117680
+ },
+ "problems": []
+}

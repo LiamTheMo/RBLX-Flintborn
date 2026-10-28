@@ -22,3 +22,20 @@ src/shared/Generated/
 
 # Blender build logs
 art/blender/logs/
+
+# World-kit orchestrator state (per machine)
+art/blender/kit/orchestrator/kit_active.json
+art/blender/kit/orchestrator/kit_hold.txt
+
+# World kit: derived and per-machine outputs (rebuilt by the kit scripts)
+art/reference/kit/rows/
+art/blender/assets/kit/wip/
+art/blender/assets/kit/checkpoints/
+art/blender/assets/kit/water_preview/
+art/blender/assets/kit/*.blend1
+art/blender/assets/kit/[WRV][0-9][0-9].blend
+art/blender/assets/kit/*_stats.json
+art/blender/renders/kit/**/*_cells/
+art/blender/renders/kit/**/*_row.png
+art/blender/renders/kit/**/mcp/
+__pycache__/

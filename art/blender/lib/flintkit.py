@@ -9,6 +9,13 @@ shape language and one camera. Conventions:
 - Shading is flat (faceted). Every mesh carries a "Tint" colour attribute that
   the shared materials multiply into the base colour, giving each plank, post
   or stone its own slight hand-painted variation.
+- Water keys outside PALETTE (KIT_PALETTE and sheet-prefixed module keys such as
+  w03_water_shallow) render see-through (blended, alpha = 1 - the Roblox
+  Transparency the kit exporter writes: 0.3 deep, 0.5 shallow, 0.4 otherwise;
+  `set_water_transparency(mat, t)` overrides one). Their base colour is the same
+  tileable cartoon water texture the exporter writes (lib/kitwater.py, cached in
+  assets/kit/water_preview/), projected from the object at 16 studs per tile.
+  PALETTE water stays flat and opaque, so the lobby looks as before.
 
 Run Blender headless, e.g.:
     blender --background --factory-startup --python build_xx.py
@@ -83,11 +90,51 @@ PALETTE = {
     "rune_blue": ("#BFE6F2", 0.5, 0.0, 0.4),  # engraved rune stones
 }
 
+# World-kit colours (art/reference/kit sheets), kept apart from PALETTE so the
+# lobby export's palette.png layout never changes. Kit sheet modules may add their
+# own keys (prefixed with the sheet id) through their PALETTE dict; build_kit.py
+# merges them in before building. The kit exporter reads colours back from each
+# material's `flintkit_hex`, so any key here is exportable. The _light/_dark keys
+# are for genuinely different material (a paler stratum, a wet base), never for
+# painting sun or shadow onto faces: lighting does that.
+KIT_PALETTE = {
+    # W01 boulders: warm mauve-grey rock with cool blue-grey shadow facets
+    "kit_rock": ("#A89C9C", 0.9, 0.0, 0.0),
+    "kit_rock_light": ("#C9BCB4", 0.9, 0.0, 0.0),
+    "kit_rock_dark": ("#7F7C8A", 0.9, 0.0, 0.0),
+    "moss": ("#8AAA24", 0.9, 0.0, 0.0),
+    "moss_light": ("#C4D02E", 0.9, 0.0, 0.0),
+    "moss_dark": ("#5E8A1E", 0.9, 0.0, 0.0),
+    # R01 stone and common ores
+    "ore_stone": ("#9D9590", 0.9, 0.0, 0.0),
+    "ore_stone_light": ("#B9B1AB", 0.9, 0.0, 0.0),
+    "ore_stone_dark": ("#6E696B", 0.9, 0.0, 0.0),
+    "limestone": ("#DCC6A2", 0.9, 0.0, 0.0),
+    "limestone_dark": ("#C2A883", 0.9, 0.0, 0.0),
+    "flint": ("#3F424C", 0.45, 0.1, 0.0),
+    "flint_light": ("#5C606D", 0.45, 0.1, 0.0),
+    "coal": ("#2F3137", 0.6, 0.0, 0.0),
+    "coal_light": ("#4B4D55", 0.6, 0.0, 0.0),
+    "copper": ("#E2713A", 0.5, 0.35, 0.0),
+    "copper_dark": ("#B8542A", 0.55, 0.35, 0.0),
+    "patina": ("#4FA89B", 0.7, 0.0, 0.0),
+}
+
+
+def palette_entry(name):
+    """(hex, roughness, metallic, emission) for a PALETTE or KIT_PALETTE key."""
+    return PALETTE[name] if name in PALETTE else KIT_PALETTE[name]
+
+
+def is_emissive(name):
+    return palette_entry(name)[3] > 0
+
+
 EMISSIVE = {k for k, v in PALETTE.items() if v[3] > 0}
 # Foliage and ground greens: a weak specular so the sky's sheen does not wash the
 # saturated greens out toward grey.
 LOW_SPEC = {"leaf", "leaf_light", "leaf_dark", "pine", "pine_dark", "grass_ground", "grass_light",
-            "grass_dark"}
+            "grass_dark", "moss", "moss_light", "moss_dark"}
 
 
 def srgb_to_linear(c):
@@ -105,7 +152,7 @@ def material(name):
     mat = bpy.data.materials.get(mname)
     if mat:
         return mat
-    hexcol, rough, metal, emit = PALETTE[name]
+    hexcol, rough, metal, emit = palette_entry(name)
     rgb = hex_rgb(hexcol)
     mat = bpy.data.materials.new(mname)
     mat.use_nodes = True
@@ -115,7 +162,7 @@ def material(name):
     bsdf.inputs["Metallic"].default_value = metal
     if name in LOW_SPEC and "Specular IOR Level" in bsdf.inputs:
         bsdf.inputs["Specular IOR Level"].default_value = 0.2
-    if name in EMISSIVE:
+    if emit > 0:
         bsdf.inputs["Base Color"].default_value = (*rgb, 1)
         bsdf.inputs["Emission Color"].default_value = (*rgb, 1)
         bsdf.inputs["Emission Strength"].default_value = emit
@@ -132,6 +179,120 @@ def material(name):
         nt.links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
     mat.diffuse_color = (*rgb, 1)
     mat["flintkit_hex"] = hexcol
+    mat["flintkit_key"] = name
+    mat["flintkit_spec"] = [rough, metal, emit]
+    if is_water_key(name) and name not in PALETTE and emit <= 0:
+        _water_texture(mat, name, hexcol)
+        _see_through(mat, water_transparency(name))
+    return mat
+
+
+# ---------------------------------------------------------------------------
+# Water: see-through in kit renders, as Roblox shows it
+# ---------------------------------------------------------------------------
+
+WATER_KEYS = {"water", "water_deep", "water_shallow"}
+WATER_TRANSPARENCY = {"deep": 0.3, "shallow": 0.5, "default": 0.4}  # Roblox Transparency by key word
+
+
+def is_water_key(name):
+    """Water faces: the PALETTE water keys or any key containing "water"
+    (w03_water_shallow, w03_water_fall ...). The kit exporter uses the same rule."""
+    return name in WATER_KEYS or "water" in name.lower()
+
+
+def water_transparency(name, mat=None):
+    """Roblox Transparency for a water key: a material's `kit_transparency`
+    custom property if set, else 0.3 for deep, 0.5 for shallow, 0.4 otherwise."""
+    if mat is not None and mat.get("kit_transparency") is not None:
+        return float(mat["kit_transparency"])
+    k = name.lower()
+    if "deep" in k:
+        return WATER_TRANSPARENCY["deep"]
+    if "shallow" in k:
+        return WATER_TRANSPARENCY["shallow"]
+    return WATER_TRANSPARENCY["default"]
+
+
+WATER_PREVIEW_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                 "assets", "kit", "water_preview")
+
+
+def _water_texture(mat, name, hexcol):
+    """Kit water preview: the exporter's water/<key>.png texture (lib/kitwater.py,
+    cached as WATER_PREVIEW_DIR/<key>.png) in place of the flat colour, still x
+    Tint. Object coordinates / 16 with box projection give the exporter's UVs
+    (up-facing faces: u = x / 16, v = y / 16 from the asset origin), and stay put
+    when the runner moves assets around. Falls back to the flat colour on error."""
+    nt = mat.node_tree
+    bsdf = nt.nodes.get("Principled BSDF")
+    link = next((l for l in bsdf.inputs["Base Color"].links), None)
+    mix = link.from_node if link is not None else None
+    if mix is None or mix.type != "MIX" or nt.nodes.get("FB_WaterTex") is not None:
+        return
+    try:
+        import sys
+
+        lib = os.path.dirname(os.path.abspath(__file__))
+        if lib not in sys.path:
+            sys.path.append(lib)
+        import kitwater
+
+        safe = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in name)
+        path = kitwater.cached_png(os.path.join(WATER_PREVIEW_DIR, safe + ".png"), hexcol, name)
+        image = bpy.data.images.load(path, check_existing=True)
+    except Exception as exc:  # noqa: BLE001  (never break a build over the preview)
+        print(f"flintkit: water preview texture for {name} failed, flat colour kept: {exc!r}")
+        return
+    image.colorspace_settings.name = "sRGB"
+    coord = nt.nodes.new("ShaderNodeTexCoord")
+    mapping = nt.nodes.new("ShaderNodeMapping")
+    mapping.vector_type = "POINT"
+    s = 1.0 / kitwater.TILE_STUDS
+    mapping.inputs["Scale"].default_value = (s, s, s)
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.name = "FB_WaterTex"
+    tex.image = image
+    tex.extension = "REPEAT"
+    tex.interpolation = "Linear"
+    tex.projection = "BOX"  # up/down faces (x, y), +-Y faces (x, z), +-X faces (y, z), as exported
+    tex.projection_blend = 0.0
+    nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+    nt.links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+    nt.links.new(tex.outputs["Color"], mix.inputs["A"])
+
+
+def _see_through(mat, transparency):
+    """Blended Eevee material with alpha 1 - transparency, single-sided like a
+    Roblox MeshPart, casting no shadow (the exporter sets CastShadow false)."""
+    nt = mat.node_tree
+    bsdf = nt.nodes.get("Principled BSDF")
+    node = nt.nodes.get("FB_WaterAlpha")
+    if node is None:
+        lp = nt.nodes.new("ShaderNodeLightPath")
+        inv = nt.nodes.new("ShaderNodeMath")
+        inv.operation = "SUBTRACT"
+        inv.inputs[0].default_value = 1.0
+        nt.links.new(lp.outputs["Is Shadow Ray"], inv.inputs[1])
+        node = nt.nodes.new("ShaderNodeMath")
+        node.name = "FB_WaterAlpha"
+        node.operation = "MULTIPLY"
+        nt.links.new(inv.outputs[0], node.inputs[1])
+        nt.links.new(node.outputs[0], bsdf.inputs["Alpha"])
+    node.inputs[0].default_value = max(0.0, min(1.0, 1.0 - transparency))
+    for attr_name, val in (("surface_render_method", "BLENDED"), ("use_backface_culling", True),
+                           ("use_transparency_overlap", False), ("use_transparent_shadow", True)):
+        if hasattr(mat, attr_name):
+            setattr(mat, attr_name, val)
+    mat.diffuse_color = (*mat.diffuse_color[:3], 1.0 - transparency)
+
+
+def set_water_transparency(mat, transparency):
+    """Override one water material's Roblox Transparency: stores `kit_transparency`
+    (read by the kit exporter) and updates the preview alpha to match."""
+    mat["kit_transparency"] = float(transparency)
+    if mat.node_tree is not None and mat.node_tree.nodes.get("Principled BSDF"):
+        _see_through(mat, float(transparency))
     return mat
 
 
@@ -474,6 +635,295 @@ class Asset:
     def leaf_blob(self, radius, loc=(0, 0, 0), mat="leaf", subdiv=1, rough=0.12, facets=0):
         return self.ico(radius, loc, mat=mat, subdiv=subdiv, jitter=rough, facets=facets,
                         face_tint_var=0.06)
+
+    # -- foliage: faceted "cauliflower" leaf masses -------------------------------
+    #
+    # The kit references build crowns and bushes from many chunky clumps: each a
+    # rounded star of protruding faceted lobes round a low peak, overlapping into
+    # one big lumpy mass. leaf_cluster makes one clump, canopy fills a whole crown
+    # volume with them. One material, flat facets, one small random Tint per clump
+    # (never by height or facing: lighting shades it), faces buried inside another
+    # clump are deleted, nothing below `floor`.
+    #
+    # Only verts.new / faces.new / transform / delete are used here: in this
+    # Blender, bmesh.ops.dissolve_limit and create_icosphere(subdivisions >= 2)
+    # invalidate the Python references to every OTHER vert already in the bmesh.
+
+    # Lobed-dome ring layout, top to bottom, per `facets` level: (tip elevation
+    # deg, tip radius, notch elevation, notch radius). A ring with notch radius
+    # None has one vert per lobe (the ridge to the peak, or the base); the others
+    # have two verts per lobe (its flat outer face) and one notch between lobes.
+    _DOME_RINGS = {
+        1: ((58, 0.80, 0, None), (24, 1.0, 18, 0.64), (-10, 0.92, -14, 0.6), (-46, 0.6, 0, None)),
+        2: ((66, 0.78, 0, None), (40, 0.96, 34, 0.68), (12, 1.0, 6, 0.6), (-16, 0.9, -20, 0.58),
+            (-50, 0.58, 0, None)),
+    }
+
+    def _lobed_dome(self, rng, lobes, lobe_size, rough, facets=1, depth=1.0):
+        """Unit lobed dome (local +Z up): an off-centre peak, ridges down to
+        `lobes` broad lobes pushed out round the upper hemisphere, deep notches
+        between them, a flat polygon base. `depth` scales how deep the notches
+        between lobes cut in (0 = a plain faceted dome). Explicit triangles:
+        16 x lobes - 2 at facets=1, 22 x lobes - 2 at facets=2. Returns its verts."""
+        bm = self.bm
+        L = max(3, int(lobes))
+        lo, hi = lobe_size
+        mid = (lo + hi) / 2
+        step = 2 * math.pi / L
+        az0 = rng.uniform(0, 2 * math.pi)
+        tips = [az0 + i * step + rng.uniform(-0.18, 0.18) * step for i in range(L)]
+        prom = [rng.uniform(lo, hi) / mid for _ in range(L)]  # each lobe's own size, ~0.8-1.2
+        lift = [rng.uniform(-7, 7) for _ in range(L)]  # each lobe sits a little higher or lower
+        gaps = [(tips[(i + 1) % L] - tips[i]) % (2 * math.pi) for i in range(L)]
+
+        def vert(az, el, r):
+            el = math.radians(el + rng.uniform(-3, 3))
+            r *= 1.0 + rng.uniform(-rough, rough)
+            return bm.verts.new((r * math.cos(el) * math.cos(az), r * math.cos(el) * math.sin(az),
+                                 r * math.sin(el)))
+
+        pole = bm.verts.new((rng.uniform(-0.1, 0.1), rng.uniform(-0.1, 0.1), rng.uniform(0.84, 0.96)))
+        rings = []
+        for el_t, r_t, el_n, r_n in self._DOME_RINGS.get(int(facets), self._DOME_RINGS[1]):
+            ring = []
+            for i in range(L):
+                rt = r_t * (1 + 0.3 * (prom[i] - 1))
+                if r_n is None:
+                    ring.append(vert(tips[i], el_t + lift[i] * 0.5, rt))
+                    continue
+                w = gaps[i] * 0.2 * prom[i]
+                ring.append(vert(tips[i] - w, el_t + lift[i], rt))
+                ring.append(vert(tips[i] + w, el_t + lift[i], rt))
+                ring.append(vert(tips[i] + gaps[i] * rng.uniform(0.45, 0.55), el_n, rt - (rt - r_n) * depth))
+            rings.append(ring)
+        new = bm.faces.new
+        for i in range(L):
+            new((pole, rings[0][i], rings[0][(i + 1) % L]))
+        for up, dn in zip(rings, rings[1:]):
+            for i in range(L):
+                j = (i + 1) % L
+                if len(up) == len(dn):
+                    for k in range(3 * i, 3 * i + 3):
+                        n = (k + 1) % len(up)
+                        new((up[k], dn[k], dn[n]))
+                        new((up[k], dn[n], up[n]))
+                elif len(up) < len(dn):  # ridge ring above a lobe ring
+                    new((up[i], dn[3 * i], dn[3 * i + 1]))
+                    new((up[i], dn[3 * i + 1], dn[3 * i + 2]))
+                    new((up[i], dn[3 * i + 2], up[j]))
+                    new((up[j], dn[3 * i + 2], dn[3 * j]))
+                else:  # lobe ring above the base ring
+                    new((up[3 * i], dn[i], up[3 * i + 1]))
+                    new((up[3 * i + 1], dn[i], up[3 * i + 2]))
+                    new((up[3 * i + 2], dn[i], dn[j]))
+                    new((up[3 * i + 2], dn[j], up[3 * j]))
+        new(list(reversed(rings[-1])))
+        return [pole] + [v for r in rings for v in r]
+
+    def _leaf_part(self, rng, radius, loc, lobes, squash, lobe_size, facets, rough, axis=None,
+                   depth=1.0):
+        """One placed lobed dome as a part record: [verts, centre, bounding
+        radius]. `radius` may be (rx, ry, rz); `axis`
+        tilts the dome's up direction (default straight up)."""
+        verts = self._lobed_dome(rng, lobes, lobe_size, rough, facets, depth)
+        rx, ry, rz = radius if isinstance(radius, (tuple, list)) else (radius, radius, radius)
+        up = Vector(axis).normalized() if axis is not None else Vector((0, 0, 1))
+        m = (Matrix.Translation(Vector(loc)) @ up.to_track_quat("Z", "Y").to_matrix().to_4x4()
+             @ Matrix.Rotation(rng.uniform(-0.12, 0.12), 4, "X")
+             @ Matrix.Rotation(rng.uniform(-0.12, 0.12), 4, "Y")
+             @ Matrix.Diagonal((rx, ry, rz * squash, 1.0)))
+        bmesh.ops.transform(self.bm, matrix=m, verts=verts)
+        return [verts, Vector(loc), max(rx, ry, rz) * (1 + rough)]
+
+    def _leaf_cull(self, parts, floor=None, margin=0.88):
+        """Delete faces buried inside another clump: every vert of the face lies
+        within `margin` of the way from that clump's centre to its surface (a ray
+        cast from the centre through the vert hits nothing that close). Lobed
+        domes are star-shaped round their centre, so the test is reliable; the
+        margin keeps faces that bridge a notch. Returns the number deleted."""
+        from mathutils.bvhtree import BVHTree
+
+        trees = []
+        for verts, c, _ in parts:
+            faces = _faces_of(verts)
+            idx = {v: n for n, v in enumerate(verts)}
+            ok = faces and (floor is None or c.z > floor + 1e-3)
+            trees.append(BVHTree.FromPolygons([v.co.copy() for v in verts],
+                                              [[idx[v] for v in f.verts] for f in faces]) if ok else None)
+        dead = set()
+        for i, (verts, c, br) in enumerate(parts):
+            near = [j for j, (_, cj, bj) in enumerate(parts)
+                    if j != i and trees[j] is not None and (cj - c).length < bj + br]
+            for f in _faces_of(verts):
+                pts = [v.co.copy() for v in f.verts]
+                if floor is not None and min(q.z for q in pts) <= floor + 1e-3:
+                    continue
+                for j in near:
+                    cj = parts[j][1]
+                    for q in pts:
+                        d = q - cj
+                        dl = d.length
+                        if dl > 1e-6 and trees[j].ray_cast(cj, d / dl, dl / margin)[0] is not None:
+                            break  # this vert is near or outside clump j's surface
+                    else:
+                        dead.add(f)
+                        break
+        if dead:
+            bmesh.ops.delete(self.bm, geom=list(dead), context="FACES")
+        for p in parts:
+            p[0] = [v for v in p[0] if v.is_valid]
+        return len(dead)
+
+    def _leaf_floor(self, verts, floor):
+        """Clamp verts to z >= floor; faces left lying on the floor face the
+        ground, so they are deleted."""
+        if floor is None:
+            return verts
+        for v in verts:
+            if v.co.z < floor:
+                v.co.z = floor
+        flat = [f for f in _faces_of(verts) if all(abs(v.co.z - floor) < 1e-4 for v in f.verts)]
+        if flat:
+            bmesh.ops.delete(self.bm, geom=flat, context="FACES")
+        return [v for v in verts if v.is_valid]
+
+    def leaf_cluster(self, radius, loc=(0, 0, 0), mat="leaf", lobes=7, squash=0.8,
+                     lobe_size=(0.45, 0.65), facets=1, rough=0.1, seed=None, tint=None,
+                     floor=None, axis=None, depth=1.0):
+        """One stylised "cauliflower" leaf clump of about `radius` studs centred on loc.
+
+        A lobed dome: a low off-centre peak with ridges running down to `lobes`
+        broad, protruding lobes round the upper hemisphere, deep notches between
+        them, and a flat base, so it reads as the references' chunky rounded star
+        with big crisp flat facets. Each lobe gets its own size (lobe_size range,
+        relative; ~0.8-1.2x) and height. `squash` flattens it along `axis` (default
+        up; tilt it to face a clump outward), `facets` is the detail level (1:
+        16 x lobes - 2 tris, 110 for 7 lobes; 2: 22 x lobes - 2, 152 for 7 lobes,
+        rounder lobes for big hero clumps), `depth` scales the notches between
+        lobes (0.5 = softer, rounder clump), `rough` jitters the vertices. Nothing
+        goes below `floor`. One material, one random Tint (+/- tint_var).
+        Returns the verts."""
+        rng = random.Random(seed) if seed is not None else self.rng
+        part = self._leaf_part(rng, radius, loc, lobes, squash, lobe_size, facets, rough, axis, depth)
+        verts = self._leaf_floor(part[0], floor)
+        t = tint if tint is not None else 1.0 + rng.uniform(-self.tint_var, self.tint_var)
+        return self._finish(verts, mat, t, 0.0, face_tint_var=0.015)
+
+    def canopy(self, center, size, mat="leaf", clumps=None, clump_radius=None, density=1.0,
+               droop=0.0, seed=None, lobes=(6, 8), squash=0.95, lobe_size=(0.45, 0.65),
+               facets=2, rough=0.1, floor=None, inner=True, core=True, flat_bottom=0.75,
+               tilt=0.35, bulge=0.45, depth=0.75):
+        """A whole crown or bush: fills the ellipsoid of full extents `size` (x, y, z)
+        centred on `center` with overlapping leaf clusters, so it reads as one big,
+        dense, lumpy cauliflower mass like the kit references.
+
+        Clumps sit just inside the shell (their outer edges on it, so the result
+        is about `size`), each turned `tilt` of the
+        way from straight up toward the shell's outward normal (0 = all face up).
+        They are bigger toward the top and smaller underneath, where the shell is
+        pulled up (`flat_bottom` scales the lower half-height). `droop` (0-1) pulls
+        rim clumps below the equator down for a heavy, hanging edge. `inner` adds
+        a sparse layer at half depth (depth between the outer clumps), `core` one
+        big many-lobed filler so no light shows through; `bulge` (x the clump
+        radius) is how far the clumps stand out of that filler: higher = more
+        distinct clumps with deeper gaps between them. Clumps whose surface is
+        wholly covered by earlier ones are skipped and faces buried inside
+        another clump are deleted.
+
+        `clump_radius` = (min, max) studs; the default scales with the size, so
+        the default clump count (shell area x `density`) is ~14-18 outer clumps
+        at any size. `clumps` sets that count. lobes / squash / lobe_size /
+        facets / rough / depth go to every clump (`lobes` may be a (min, max)
+        range). Each clump gets its own random Tint (+/- tint_var), never one by
+        height or facing.
+
+        Triangles: about 150 per clump at facets=2, 110 at facets=1. A 14 x 14 x
+        10 crown at the defaults is ~2600 tris, a 7.5 x 7 x 5 bush ~2500. For a
+        crown of several masses (one canopy per branch end) pass facets=1,
+        core=False, inner=False and clumps=6-9 per mass. Returns all verts."""
+        rng = random.Random(seed) if seed is not None else self.rng
+        c0 = Vector(center)
+        a, b, c = size[0] / 2, size[1] / 2, size[2] / 2
+        m = (a + b + c) / 3
+        rmin, rmax = clump_radius if clump_radius else (0.3 * m, 0.48 * m)
+        ravg = (rmin + rmax) / 2
+        if clumps is None:
+            p = 1.6
+            area = 4 * math.pi * (((a * b) ** p + (a * c) ** p + (b * c) ** p) / 3) ** (1 / p)
+            clumps = max(3, round(density * 0.55 * area / (math.pi * ravg * ravg)))
+        lo, hi = (lobes, lobes) if isinstance(lobes, int) else lobes
+        up = Vector((0, 0, 1))
+
+        # candidate clumps (position, radius, axis): the outer shell on a golden spiral
+        cands = []
+        golden = math.pi * (3 - math.sqrt(5))
+        rot = rng.uniform(0, 2 * math.pi)
+        for i in range(clumps):
+            z = 1 - 2 * (i + 0.5) / clumps
+            ring = math.sqrt(max(0.0, 1 - z * z))
+            az = rot + i * golden + rng.uniform(-0.2, 0.2)
+            d = Vector((math.cos(az) * ring, math.sin(az) * ring, z))
+            t = (d.z + 1) / 2
+            r = (rmin + (rmax - rmin) * (0.15 + 0.85 * t)) * rng.uniform(0.88, 1.12)
+            cz = c if d.z >= 0 else c * flat_bottom
+            inset = r * rng.uniform(0.92, 1.08)  # the clump's outer edge on the shell
+            pos = c0 + Vector((d.x * max(a - inset, 0), d.y * max(b - inset, 0), d.z * max(cz - inset, 0)))
+            if droop and d.z < 0.35:
+                h = math.hypot(d.x, d.y)
+                pos.z -= droop * c * h * h * (0.35 - d.z)
+            normal = Vector((d.x / max(a, 1e-3), d.y / max(b, 1e-3), d.z / max(cz, 1e-3))).normalized()
+            axis = up.lerp(normal, tilt)
+            axis.z = max(axis.z, -0.15)
+            cands.append((pos, r, axis.normalized()))
+        cands.sort(key=lambda prx: -prx[1])
+        if inner:
+            for i in range(max(1, round(clumps * 0.2))):
+                z = rng.uniform(-0.2, 1.0)
+                az = rng.uniform(0, 2 * math.pi)
+                ring = math.sqrt(max(0.0, 1 - z * z))
+                d = Vector((math.cos(az) * ring, math.sin(az) * ring, z))
+                cands.append((c0 + Vector((d.x * a * 0.45, d.y * b * 0.45, d.z * c * 0.45)),
+                              rmax * rng.uniform(0.95, 1.15), up.lerp(d, 0.4).normalized()))
+
+        # skip clumps whose whole sphere is covered by already accepted ones
+        samples = [Vector(s).normalized() for s in
+                   ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1),
+                    (1, 1, 1), (1, 1, -1), (1, -1, 1), (1, -1, -1),
+                    (-1, 1, 1), (-1, 1, -1), (-1, -1, 1), (-1, -1, -1))]
+        sink = ravg * (0.55 + bulge)  # the filler sits this far inside the shell
+        core_r = (max(a - sink, 0.3 * a), max(b - sink, 0.3 * b), max(c - sink, 0.3 * c))
+        solids = []  # (centre, radius) each accepted clump surely fills
+        accepted = []
+        for pos, r, axis in cands:
+            covered = True
+            for s in samples:
+                q = pos + s * (r * 0.9)
+                if core and ((q.x - c0.x) / core_r[0]) ** 2 + ((q.y - c0.y) / core_r[1]) ** 2 + \
+                        ((q.z - c0.z) / core_r[2]) ** 2 < 0.4 ** 2:
+                    continue
+                if not any((q - sc).length < sr for sc, sr in solids):
+                    covered = False
+                    break
+            if covered:
+                continue
+            accepted.append((pos, r, axis))
+            solids.append((pos, r * 0.45))
+
+        groups = []
+        if core:  # one big many-lobed filler
+            groups.append(self._leaf_part(rng, core_r, c0 - Vector((0, 0, c * 0.1)), 9, 1.0, lobe_size,
+                                          2, rough * 0.6))
+        for pos, r, axis in accepted:
+            groups.append(self._leaf_part(rng, r, pos, rng.randint(lo, hi), squash, lobe_size, facets,
+                                          rough, axis, depth))
+        for g in groups:
+            g[0] = self._leaf_floor(g[0], floor)
+        self._leaf_cull(groups, floor)
+        out = []
+        for g in groups:
+            t = 1.0 + rng.uniform(-self.tint_var, self.tint_var)
+            out += self._finish(g[0], mat, t, 0.0, face_tint_var=0.015)
+        return out
 
     def flame(self, height, radius, loc=(0, 0, 0), tongues=5):
         """Stylised fire: an outer, mid and core cone cluster with jagged tongues."""
