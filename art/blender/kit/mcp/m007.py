@@ -17,9 +17,9 @@ COAL, COAL_GREY, BASE, BASE_COOL = "m007_coal", "m007_coal_grey", "m007_base_roc
 CHUNK = [(0.0, 0.82, 7), (0.3, 1.0, 8), (0.62, 0.95, 7), (0.85, 0.7, 6), (1.0, 0.32, 4)]
 BASE_RINGS = [(0.0, 0.94, 8), (0.4, 1.0, 8), (0.75, 0.74, 7), (1.0, 0.36, 4)]
 # (label, x, y, w, d, h, seed, rings, material)
-PIECES = (("MainChunk", 0.0, 0.7, 5.2, 4.6, 7.2, 7011, CHUNK, COAL),
-          ("SideChunkLeft", -3.3, 0.1, 3.7, 3.3, 5.0, 7012, CHUNK, COAL),
-          ("SideChunkRight", 3.3, -0.1, 3.5, 3.1, 4.7, 7013, CHUNK, COAL),
+PIECES = (("ChunkMain", 0.0, 0.7, 5.2, 4.6, 7.2, 7011, CHUNK, COAL),
+          ("ChunkLeft", -3.3, 0.1, 3.7, 3.3, 5.0, 7012, CHUNK, COAL),
+          ("ChunkRight", 3.3, -0.1, 3.5, 3.1, 4.7, 7013, CHUNK, COAL),
           ("BaseRockCenter", 0.0, -2.2, 5.0, 3.8, 2.6, 7021, BASE_RINGS, BASE),
           ("BaseRockLeft", -4.2, -1.7, 2.3, 2.1, 1.4, 7022, BASE_RINGS, BASE),
           ("BaseRockRight", 4.1, -1.8, 2.1, 1.9, 1.3, 7023, BASE_RINGS, BASE))
@@ -30,8 +30,8 @@ EXTRA = ((-2.0, -2.9, 1.5, 1.3, 0.9, 7024), (2.4, -2.8, 1.6, 1.4, 1.0, 7025), (-
 def palette():
     K.set_colour(COAL, "#2C2C31", rough=0.6)
     K.set_colour(COAL_GREY, "#3B3B42", rough=0.6)
-    K.set_colour(BASE, "#958682", rough=0.92)
-    K.set_colour(BASE_COOL, "#8C8382", rough=0.92)
+    K.set_colour(BASE, "#9B8C88", rough=0.92)        # toward the sheet swatch #9D8F8A
+    K.set_colour(BASE_COOL, "#928988", rough=0.92)
 
 
 def piece(a, label, at_origin=False):
@@ -62,9 +62,9 @@ def hero(a):
 NOTES = {
     "Coal": "coal resource: a tall dark faceted main chunk with a side chunk each side, on a centre base rock and "
             "smaller pale base rocks round the foot; broad flat faces; one closed mesh",
-    "CoalMainChunk": "Main Chunk: tall dark faceted coal chunk",
-    "CoalSideChunkLeft": "Side Chunk (Left): dark faceted coal chunk",
-    "CoalSideChunkRight": "Side Chunk (Right): dark faceted coal chunk",
+    "CoalChunkMain": "Main Chunk: tall dark faceted coal chunk",
+    "CoalChunkLeft": "Side Chunk (Left): dark faceted coal chunk",
+    "CoalChunkRight": "Side Chunk (Right): dark faceted coal chunk",
     "CoalBaseRockCenter": "Base Rock (Center): broad pale faceted rock",
     "CoalBaseRockLeft": "Base Rock (Left): small pale faceted rock",
     "CoalBaseRockRight": "Base Rock (Right): small pale faceted rock",
@@ -75,6 +75,7 @@ def build(render=True):
     M.coll(NUM, TITLE)
     palette()
     specs = [("Coal", "hero", hero, 4000, "hull")]
+    # CoalChunkMain/Left/Right: the kit's R01 sheet owns CoalMainChunk
     specs += [(f"Coal{p[0]}", "part", (lambda L: lambda a: piece(a, L, True))(p[0]), 1000, "hull") for p in PIECES]
     objs = [M.mk(SHEET, n, fn, subject=TITLE, role=r, notes=NOTES.get(n.replace("M007", ""), ""), budget=b, collision=c)
             for n, r, fn, b, c in specs]

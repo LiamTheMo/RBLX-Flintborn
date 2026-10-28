@@ -203,7 +203,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 004 | Obsidian Flintborn Model Study | World & resources | ✅ | 1380; parts 34×3 / 40×2 / 484 | PASS 6.5 → FAIL 6 (base off the ground) → PASS 6.5/10 (round 3) | minors: crystals leaner than the sheet's chunky ones; small front crystals partly hidden; glassy specular to check in Studio |
 | 005 | Quartz Flintborn low-poly model study | World & resources | ✅ | 1216; parts 34 / 34 / 440 | PASS 6.5/10 (round 1) | minors: crystals regular/slim vs the sheet's chunky tapered ones; rock mound smaller and sparser at the rear |
 | 006 | Copper Flintborn Construction Study | World & resources | ✅ | 1030; parts 464 / 32×3 / 36×2 | PASS 6/10 (round 1) | minors: inserts rounder than the sheet's angular nuggets; teal patches hard-edged; copper sheen to check in Studio |
-| 007 | Flintborn Coal model study | World & resources | ⬜ | | | |
+| 007 | Flintborn Coal model study | World & resources | ✅ | 834; parts 60×3 / 50×3 | PASS 7/10 (round 1) | minors: chunks a little columnar vs the sheet's rounder egg shapes |
 | 008 | Azurite Flintborn model study | World & resources | ⬜ | | | |
 | 009 | Iron Meteor_ Flintborn model study | World & resources | ⬜ | | | |
 | 010 | Flintborn Gold model study | World & resources | ⬜ | | | |
@@ -383,3 +383,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: PR #73 (003) merged into v0.18. 004 Obsidian passed on round 3 (fixed a crystal lean-angle bug and a floor cut that left the base above z = 0).
 - 2026-10-28: PR #74 (004) merged into v0.18. 005 Quartz passed (6.5/10). `kit_models.repair_nonmanifold` now clears the grazing-contact slivers booleans leave.
 - 2026-10-28: PR #75 (005) merged into v0.18. 006 Copper passed (6/10).
+- 2026-10-28: 007 Coal passed (7/10).
