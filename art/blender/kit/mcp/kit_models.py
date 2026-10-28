@@ -15,7 +15,7 @@ import os
 import bmesh
 import bpy
 import numpy as np
-from mathutils import Vector
+from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
 
 import kit_mcp as K
@@ -127,6 +127,31 @@ def union_loose(o, merge=0.01):
     repair_nonmanifold(o)
     K.drop_unused_slots(o)
     return len(others)
+
+
+def carve(o, build_fn, cutter_fn):
+    """Exact boolean difference of a cutter from a built asset; the new cut faces take the cutter's materials (and
+    Tint). Both functions add geometry to a flintkit.Asset in the same build coordinates; the cutter is placed by
+    the asset's bottom-centre offset, found from a probe build of build_fn."""
+    probe = K.fk().Asset("_probe", "probe")
+    build_fn(probe)
+    xs, ys, zs = ([v.co[i] for v in probe.bm.verts] for i in range(3))
+    off = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))
+    probe.bm.free()
+    cut = K.fk().Asset("_cutter", "probe")
+    cutter_fn(cut)
+    c = cut.finish(collection=o.users_collection[0], mark_asset=False, origin=None)
+    c.matrix_world = o.matrix_world @ Matrix.Translation(-off)
+    m = o.modifiers.new("Carve", "BOOLEAN")
+    m.operation, m.solver, m.object = "DIFFERENCE", "EXACT", c
+    m.use_self = True
+    m.material_mode = "TRANSFER"
+    with _override(o):
+        bpy.ops.object.modifier_apply(modifier=m.name)
+    me = c.data
+    bpy.data.objects.remove(c, do_unlink=True)
+    bpy.data.meshes.remove(me)
+    K.drop_unused_slots(o)
 
 
 def _shell_ids(bm):
