@@ -46,7 +46,7 @@
     "rule": "#DEC09E",
     "photoEdge": "#A88E72",
     "dot": "#C9A681",
-    "thumb": "#996E4B",
+    "thumb": "#916540",
     "scrollTrack": "#D8B890",
     "photo": "#C5B3A1",
     "leather": "#9B3A1E",
@@ -240,7 +240,7 @@
         "height": 76,
         "headshot": { "rect": [0, 7, 62, 59] },
         "name": { "rect": [82, 22, 134, 30], "font": "serif", "textSize": 20, "color": "ink" },
-        "crown": { "rect": [222, 24, 30, 23], "sprite": "pm_icon_crown" },
+        "crown": { "rect": [229, 24, 30, 23], "sprite": "pm_icon_crown" },
         "invite": { "rect": [262, 9, 68, 52], "sprite": "pm_button_add_friend" },
         "rule": { "rect": [1, 74, 319, 2] }
       },

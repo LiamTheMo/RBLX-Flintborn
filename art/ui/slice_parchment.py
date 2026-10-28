@@ -418,7 +418,9 @@ def build():
     corner = np.zeros_like(hole)
     for cx, cy in ((x0, y0), (x1 - 1, y0), (x0, y1 - 1), (x1 - 1, y1 - 1)):
         corner |= (np.abs(xs - cx) + np.abs(ys - cy)) < 18
-    keep = dilate(parchment_like(p) & corner & hole, 2) & corner & hole
+    # Cream paper only: the painted hand is paper-bright too, but orange.
+    cream = parchment_like(p) & (p[..., 1] > p[..., 0] * 0.78)
+    keep = dilate(cream & corner & hole, 2) & corner & hole
     # The tapes' rivets are dark: islands the paper encloses stay too.
     open_window = ~corner & hole
     for ys, xs in components(corner & hole & ~keep):

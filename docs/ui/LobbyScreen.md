@@ -29,7 +29,7 @@ All in `src/shared/UI/HudLayout.json`: colours in the top-level `colors`, the se
 | rule | #DEC09E | Party row rules |
 | photoEdge | #A88E72 | Party headshot edge |
 | dot | #C9A681 | Empty party slot markers |
-| thumb / track | #996E4B / #D8B890 | Party scrollbar |
+| thumb / track | #916540 / #D8B890 | Party scrollbar |
 | photo | #C5B3A1 | Portrait backdrop behind headshots |
 | leather | #9B3A1E | Fallback Enter / primary buttons |
 | cream | #FBEBD0 | Text on leather |
@@ -59,7 +59,7 @@ component scan, scanlines and ink boxes; see Measurements log).
 | Party.Leave | 1579,309,36,35 | in panel, while in a party | `pm_button_x`; touch area +12 px | — | image |
 | Party.Divider | 1262,353,334,2 | in panel | line | — | native |
 | Party.List | 1261,359,345,236 | in panel | scrolling; bar 10 px thumb/track | rows | native |
-| Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 222,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
+| Member row | h 76 | list | headshot 62×59 at 0,7 (photoEdge 1.5 px); name Serif 20 at 82 (shrinks); crown 30×23 at 229,24; add-friend 68×52 at 262,9 (leader row while there is room); rule at y 74 | members | native + images |
 | Invite row | h 58 | list | "From <name>" Serif 18 inkSoft; accept / decline 48×47 at 204 / 262 | incoming invites | native + images |
 | Empty slot row | h 50 | list | dot 22 px at 3,14; rule at y 48 | free slots up to the cap | native |
 | Enter | 525,741,622,180 | bottom-centre | `pm_lobby_enter` (lettering painted) | "ENTER / SHATTERED CRATER" | image |
@@ -168,7 +168,7 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 - Headshots are live Roblox thumbnails, not the painted portrait.
 - The party scrollbar runs the whole list height (the master draws it below the
   leader row), so the add-friend button sits 14 px further left than the master
-  to stay clear of it.
+  to stay clear of it, and the crown 4 px left to keep a gap before the button.
 - Merriweather's numerals: a local copy of the font renders old-style figures;
   whether Roblox's Merriweather does is a manual Studio check.
 - Small party and popup buttons get touch areas larger than their art (Leave,
