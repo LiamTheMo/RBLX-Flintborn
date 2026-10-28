@@ -56,7 +56,7 @@ function NoticeCard.new(parent: Instance, opts)
 		return label
 	end
 	self.title = textLine("Title", 22, "ink", 1)
-	self.title.Visible = opts.title ~= nil
+	self.title.Visible = opts.title ~= nil and opts.title ~= ""
 	self.title.Text = opts.title or ""
 	self.text = textLine("Text", 18, "inkSoft", 2)
 	self.buttons = nil
@@ -113,7 +113,7 @@ end
 function NoticeCard:Show(text: string, title: string?)
 	if title then
 		self.title.Text = title
-		self.title.Visible = true
+		self.title.Visible = title ~= ""
 	end
 	self.text.Text = text
 	self.frame.Visible = true

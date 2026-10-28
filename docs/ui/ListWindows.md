@@ -25,7 +25,7 @@ ink / soft / good / warn / gold), **Row** (84 px rounded paper card `pm_stat_chi
 item icon `item_<catalogId>` or a category glyph, title, wrapping detail, a value
 with a coin or gem, up to four 150 × 54 buttons `pm_button_claim` / `pm_button_paper`,
 or the green check `pm_check_green` when done), **Buttons** (a right-aligned row),
-**Input** (label and `pm_search_box` field), **Pair** (two cards side by side).
+**Input** (label and a plain `pm_stepper_field` box), **Pair** (two cards side by side).
 
 | Screen | Controller | Tabs | Contents |
 |---|---|---|---|
