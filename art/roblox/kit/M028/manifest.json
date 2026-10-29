@@ -1,0 +1,898 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M028",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m028_ice",
+    "hex": "#9DCDFF",
+    "levels": [
+     0.97071,
+     0.97224,
+     0.97457,
+     0.9762,
+     0.9931,
+     0.99547,
+     0.99746,
+     0.99979,
+     1.00255,
+     1.00472,
+     1.00695,
+     1.00947,
+     1.01101,
+     1.01309,
+     1.01505,
+     1.0176,
+     1.01961,
+     1.02165
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_deep",
+    "hex": "#769AD0",
+    "levels": [
+     0.97303,
+     0.97432,
+     0.99001,
+     0.99219,
+     0.99414,
+     0.99636,
+     0.99771,
+     1.00121,
+     1.00344,
+     1.00555,
+     1.0084,
+     1.0204,
+     1.02438,
+     1.02574
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_deep_x_ice_25",
+    "hex": "#80A7DC",
+    "levels": [
+     0.99643,
+     1.00044,
+     1.00274
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_deep_x_ice_50",
+    "hex": "#8AB4E8",
+    "levels": [
+     1.00148,
+     1.00371,
+     1.00636
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_pale",
+    "hex": "#BADEFF",
+    "levels": [
+     1.01481,
+     1.01735,
+     1.01883,
+     1.02326
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_deep_25",
+    "hex": "#93C0F3",
+    "levels": [
+     0.97405,
+     0.97579,
+     0.97885,
+     0.99738,
+     1.00034,
+     1.00313,
+     1.00524,
+     1.00801,
+     1.0107,
+     1.0152,
+     1.01914,
+     1.02321,
+     1.02426
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_deep_50",
+    "hex": "#8AB4E8",
+    "levels": [
+     1.01344,
+     1.01848,
+     1.02159,
+     1.02506
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_deep_75",
+    "hex": "#80A7DC",
+    "levels": [
+     0.97102,
+     0.97423,
+     0.97774,
+     1.00098,
+     1.00282,
+     1.00521,
+     1.0071,
+     1.01048,
+     1.01547,
+     1.02369
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_pale_25",
+    "hex": "#A4D1FF",
+    "levels": [
+     0.96845,
+     0.97063,
+     0.9739,
+     0.99174,
+     0.99381,
+     0.99583,
+     0.99726,
+     1.00158,
+     1.00434,
+     1.00633,
+     1.00883,
+     1.01165,
+     1.01445,
+     1.01992,
+     1.02264
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_pale_50",
+    "hex": "#ACD6FF",
+    "levels": [
+     1.01158,
+     1.01616,
+     1.01907,
+     1.02095
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_ice_x_pale_75",
+    "hex": "#B3DAFF",
+    "levels": [
+     1.01468,
+     1.0173,
+     1.02047,
+     1.02374
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf",
+    "hex": "#3D6DB6",
+    "levels": [
+     0.99073,
+     0.99318,
+     0.9967,
+     0.99852,
+     1.00034,
+     1.00269,
+     1.00527,
+     1.00756,
+     1.00969
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_deep",
+    "hex": "#2A5393",
+    "levels": [
+     0.99057,
+     0.99295,
+     0.99513,
+     0.99738,
+     0.99928,
+     1.00194,
+     1.00438,
+     1.00815
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_x_deep_25",
+    "hex": "#3866AD",
+    "levels": [
+     0.99387,
+     0.99759,
+     0.99871,
+     1.00161,
+     1.00422,
+     1.00589,
+     1.00886
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_x_deep_50",
+    "hex": "#3460A4",
+    "levels": [
+     0.99234,
+     0.99883,
+     1.00109,
+     1.00576
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_x_deep_75",
+    "hex": "#2F5A9C",
+    "levels": [
+     0.99223,
+     0.99625,
+     0.99813,
+     0.99966,
+     1.00151,
+     1.0046
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_x_light_25",
+    "hex": "#3F70B8",
+    "levels": [
+     0.98916,
+     0.99196,
+     0.99521,
+     0.99733,
+     0.99903,
+     1.00205,
+     1.00534,
+     1.0085,
+     1.01013
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_leaf_x_light_50",
+    "hex": "#4272BA",
+    "levels": [
+     0.98643,
+     0.9891,
+     0.99263,
+     0.99557,
+     0.99833,
+     1.00137,
+     1.00533,
+     1.00797
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock",
+    "hex": "#78594A",
+    "levels": [
+     0.93986,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95,
+     0.95409,
+     0.96146,
+     0.97312,
+     0.97763,
+     0.98271,
+     0.99839,
+     1.01345,
+     1.02495,
+     1.02795,
+     1.03189,
+     1.03503,
+     1.04319
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock_cool",
+    "hex": "#6B5953",
+    "levels": [
+     0.93788,
+     0.94048,
+     0.94263,
+     0.9454,
+     0.94906,
+     0.95203,
+     0.9551,
+     0.95848,
+     0.96187,
+     0.96399,
+     0.96632,
+     0.96866,
+     0.9718,
+     0.97368,
+     0.97964,
+     0.99337,
+     0.99763,
+     0.99993,
+     1.00299,
+     1.00686,
+     1.01009,
+     1.01233,
+     1.01437,
+     1.01692,
+     1.0196,
+     1.02206,
+     1.02535,
+     1.02705,
+     1.02966,
+     1.03255,
+     1.04054
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock_cool_x_rock_dark_25",
+    "hex": "#685651",
+    "levels": [
+     0.93748,
+     0.94059,
+     0.94338,
+     0.94582,
+     0.95113,
+     0.95544,
+     0.95712,
+     0.95955,
+     0.9623,
+     0.96395,
+     0.96631,
+     0.96891,
+     0.97122,
+     0.9731,
+     0.97602,
+     0.9782,
+     0.99122,
+     0.99339,
+     0.99894,
+     1.0018,
+     1.00794,
+     1.01228,
+     1.01608,
+     1.01851,
+     1.02184,
+     1.02344,
+     1.0268,
+     1.03584
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock_cool_x_rock_dark_50",
+    "hex": "#64524E",
+    "levels": [
+     0.94074,
+     0.94436,
+     0.95017,
+     0.95248,
+     0.95557,
+     0.95898,
+     0.96132,
+     0.9641,
+     0.96827,
+     0.96997,
+     0.97272,
+     0.97569,
+     0.97936,
+     0.98203,
+     0.99356,
+     0.99555,
+     0.99882,
+     1.00232,
+     1.00786,
+     1.01108,
+     1.01394,
+     1.01596,
+     1.01859,
+     1.02061,
+     1.02308,
+     1.0257,
+     1.02778,
+     1.03176
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock_x_dark_25",
+    "hex": "#72564A",
+    "levels": [
+     0.93863,
+     0.94187,
+     0.94789,
+     0.95128,
+     0.95852,
+     0.97067,
+     0.97332,
+     0.97474,
+     0.97769,
+     0.98051,
+     0.98435,
+     0.98913,
+     0.99724,
+     1.00335,
+     1.00589,
+     1.0097,
+     1.01205,
+     1.01421,
+     1.01716,
+     1.01921,
+     1.02156,
+     1.0252,
+     1.02722,
+     1.03151,
+     1.03577,
+     1.03715,
+     1.03974,
+     1.04176,
+     1.04646,
+     1.04848
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_rock_x_dark_50",
+    "hex": "#6B524A",
+    "levels": [
+     0.93728,
+     0.94208,
+     0.94682,
+     0.95072,
+     0.95615,
+     0.96119,
+     0.96544,
+     0.9704,
+     0.97395,
+     0.97662,
+     0.97891,
+     0.98295,
+     0.98459,
+     0.98999,
+     0.9938,
+     1.00076,
+     1.00262,
+     1.00492,
+     1.01682,
+     1.0209,
+     1.02579,
+     1.02892,
+     1.03327,
+     1.03534,
+     1.03955,
+     1.04266,
+     1.04514,
+     1.04815,
+     1.05049
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_snow",
+    "hex": "#A9B8CD",
+    "levels": [
+     0.98767,
+     0.99043,
+     0.99285,
+     0.99497,
+     0.99694,
+     0.99936,
+     1.00193,
+     1.00401,
+     1.00699,
+     1.00881,
+     1.01142,
+     1.01418
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_snow_x_blue_25",
+    "hex": "#A5B5CC",
+    "levels": [
+     0.98927,
+     0.99284,
+     0.99474,
+     0.99788,
+     0.99984,
+     1.00304,
+     1.00802
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_snow_x_blue_50",
+    "hex": "#A1B2CB",
+    "levels": [
+     0.98314,
+     0.98654,
+     0.98977,
+     0.99209,
+     0.99407,
+     0.99634,
+     0.99887,
+     1.0012,
+     1.00376,
+     1.00617
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_snow_x_blue_75",
+    "hex": "#9DB0CA",
+    "levels": [
+     0.98055,
+     0.98477,
+     0.98653,
+     0.98884,
+     0.99085,
+     0.99305,
+     0.99602,
+     0.99812,
+     1.00059,
+     1.00267,
+     1.00634,
+     1.01326
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_wood",
+    "hex": "#705647",
+    "levels": [
+     0.95,
+     0.97581,
+     0.97769,
+     0.97995,
+     0.98255,
+     0.98957,
+     0.99099,
+     0.99451,
+     0.99712,
+     0.99943,
+     1.00196,
+     1.00436,
+     1.00664,
+     1.00921,
+     1.0114,
+     1.01357,
+     1.01622,
+     1.01842,
+     1.02034,
+     1.02266,
+     1.02461,
+     1.03095,
+     1.03465,
+     1.03709,
+     1.0404,
+     1.04242
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_wood_cut",
+    "hex": "#906F54",
+    "levels": [
+     0.98559,
+     0.98861,
+     0.9898,
+     0.99412,
+     0.99626,
+     0.99858,
+     1.00077,
+     1.0039,
+     1.00692,
+     1.01217,
+     1.0144,
+     1.01601
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_wood_x_dark_25",
+    "hex": "#685041",
+    "levels": [
+     0.9894,
+     0.99212,
+     0.9944,
+     0.99676,
+     0.99893,
+     1.00045,
+     1.00302,
+     1.00561,
+     1.00734,
+     1.01095,
+     1.01872,
+     1.02067,
+     1.02383,
+     1.02675,
+     1.02846,
+     1.03145,
+     1.0345,
+     1.03681,
+     1.04001,
+     1.04119
+    ],
+    "used": true
+   },
+   {
+    "key": "m028_wood_x_dark_50",
+    "hex": "#604A3C",
+    "levels": [
+     0.98744,
+     0.99066,
+     0.99373,
+     0.99678,
+     0.99956,
+     1.00079,
+     1.00348,
+     1.00663,
+     1.0087,
+     1.01472,
+     1.01661,
+     1.02108,
+     1.02487,
+     1.02699,
+     1.03324,
+     1.03657,
+     1.04025,
+     1.04189,
+     1.04495
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "FrostBushBase",
+   "sheet": "M028",
+   "subject": "Frost Shrub",
+   "role": "part",
+   "size": [
+    3.6878,
+    1.2302,
+    2.9916
+   ],
+   "tris": 944,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBushBase.glb",
+     "kind": "solid",
+     "tris": 944,
+     "offset": [
+      0.0,
+      0.6151,
+      0.0
+     ],
+     "size": [
+      3.6878,
+      1.2302,
+      2.9916
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base (reusable): eleven warm and grey-brown rocks round a lumpy snow mound with four ice gems, flat underside"
+  },
+  {
+   "name": "FrostBushIceNodule",
+   "sheet": "M028",
+   "subject": "Frost Shrub",
+   "role": "part",
+   "size": [
+    0.867,
+    1.45,
+    0.8725
+   ],
+   "tris": 46,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBushIceNodule.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      0.725,
+      0.0
+     ],
+     "size": [
+      0.867,
+      1.45,
+      0.8725
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ice Nodule (reusable): a pale faceted ice gem (1.45 x 0.92), deep bottom to pale crown"
+  },
+  {
+   "name": "FrostBushLeaf",
+   "sheet": "M028",
+   "subject": "Frost Shrub",
+   "role": "part",
+   "size": [
+    1.65,
+    0.851,
+    0.59
+   ],
+   "tris": 60,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBushLeaf.glb",
+     "kind": "solid",
+     "tris": 60,
+     "offset": [
+      0.0,
+      0.4255,
+      0.0
+     ],
+     "size": [
+      1.65,
+      0.851,
+      0.59
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf (reusable): a dark-blue 6-sided hexagonal shard (1.65 x 0.85 x 0.6), deep base to light tip"
+  },
+  {
+   "name": "FrostBushNode",
+   "sheet": "M028",
+   "subject": "Frost Shrub",
+   "role": "hero",
+   "size": [
+    4.5056,
+    3.601,
+    2.9916
+   ],
+   "tris": 1644,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBushNode.glb",
+     "kind": "solid",
+     "tris": 1644,
+     "offset": [
+      0.0,
+      1.8005,
+      0.0
+     ],
+     "size": [
+      4.5056,
+      3.601,
+      2.9916
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "frost shrub (forage shrub): a bare brown sapling (8-sided trunk column forking into a tall up-left limb, a right branch and a centre limb, flat cut ends) with three dark-blue hexagonal leaf shards and two pale faceted ice gems, on a snow mound with four ice gems inside a ring of eleven warm and grey-brown rocks; one closed mesh, flat base"
+  },
+  {
+   "name": "FrostBushStem",
+   "sheet": "M028",
+   "subject": "Frost Shrub",
+   "role": "part",
+   "size": [
+    2.816,
+    3.4934,
+    1.3194
+   ],
+   "tris": 404,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/FrostBushStem.glb",
+     "kind": "solid",
+     "tris": 404,
+     "offset": [
+      0.0,
+      1.7467,
+      0.0
+     ],
+     "size": [
+      2.816,
+      3.4934,
+      1.3194
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Forked Stem (reusable): 8-sided trunk column, left branch with two stubs, right limb, tall up-left limb, right branch and centre limb, flat pale cut ends"
+  }
+ ],
+ "stats": {
+  "assets": 5,
+  "pieces": 5,
+  "solid": 5,
+  "water": 0,
+  "glow": 0,
+  "tris": 3098,
+  "vfxSockets": 0,
+  "paletteColours": 32,
+  "paletteLevels": 439,
+  "meshBytes": 296704
+ },
+ "problems": []
+}
