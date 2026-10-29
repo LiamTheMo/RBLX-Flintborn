@@ -947,3 +947,332 @@ All recommendations are accepted:
 10. Hero plus the 6 parts.
 11. Comparison cameras: front_sheet (0,8), f34_sheet (0,14), rear_sheet (180,8), r34_sheet (180,14), side_sheet (270,8) (probe the handedness first), and the kit top plus top_tilt (0,70) flipped left-right. The floor is hidden in every `*_sheet` render.
 12. Names as proposed (`Mooncap*` hero and parts as listed, keys `m030_*`). Check that none collides with the old R08 `Mooncap*` objects in the kit file before building. If one does, use the study's fallback names.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m030.py` (`build()`), run in a background Blender (port 9881, work file
+`art/blender/assets/kit/wip/M030.blend`). Names checked first: the work file holds R08's `Mooncap`, `MooncapBase`,
+`MooncapCapShell`, `MooncapDepleted`, `MooncapDrop`, `MooncapSpotInsert`, `MooncapStem`, `SporePod` and no `m030_*`
+material; none of the decided names collides, so they are used as decided. Collection `Kit/M030 Mooncap`.
+
+**Parts** (each its own function, all in one build frame: front −Y, +X right, ground z 0):
+- `MooncapShell` (`shell_part`): `_cap_geom`, a lathe of 7 rings each turned half a step (underside stem ring →
+  underside ring ρ .68 → rim bottom → rim top (vertical band 0.15 hc) → shoulder .92/.42 → upper shoulder .70/.74 →
+  crown .34/.96) + apex + underside centre; ±4 % radius, ±3 % height jitter; 14 sectors (big) / 12 (small). The Shell
+  is the big cap undrooped with its **five** pocket gems' pockets carved (S1 S2 S3 S5 S6; S4 is a bezel gem, decision 5,
+  so it has no pocket).
+- `MooncapGlowSpot` (`spot_part`): `_gem(whole=True)`, the S1 gem Ø 1.40: 8-sided girdle, a mid crown ring turned half a
+  step, a flat 8-sided table (Ø 0.56 of the girdle), a pavilion cone; crown 0.30 d, pavilion 0.62 d → W : H 1.09 (the
+  exploded insert's rounded nugget, sheet 1.08). 48 tris.
+- `MooncapStalkLarge` / `MooncapStalkSmall`: §1.4 hero pear profiles, 10 / 8 sides, rings turned half a step, flat ends.
+- `MooncapLeafClump` (`clump_part`): L1, five thick kite leaves (convex hull of base, tip, two outline points per side
+  at 0.30 / 0.58 L, a midrib ridge 0.6 T at 0.45 L and 0.35 T at 0.75 L, a keel −0.4 T), W : L 0.44, T 0.10 L; every
+  leaf's hull also takes its own buried hub point (0.16 out along its azimuth, in the slab), so the leaves overlap.
+- `MooncapRockBase`: a 14-sided faceted dirt slab (5.0 × 3.8, raised top) + 12 peaky dome boulders (`K.hull_rock`, rings
+  7/7/5/2, flat bottoms each at its own depth) + 3 pebbles.
+
+**Hero** (`MooncapNode`): `hero_body` (slab, boulders, pebbles, stems, the two drooped caps, two clumps) → exact unions
+one shell at a time (`_union_fine`, merge 0.002, guarded) → the 7 pocket cutters carved one at a time (exact
+difference; the cutters are cap_dark, so walls and floors come out dark) → the 11 gems appended and united → floor
+cut at z 0 → m016 clean → finish → polish (m023 floor re-fan) → bowties. All booleans run with the object at the world
+origin (see the pitfalls below).
+
+**Layout as built** (changed from §2 on the renders; every change measured):
+- Size **7.36 W × 5.58 D × 5.35 H** (decision 7.1 ± 0.35 × 5.5 ± 0.4 × 5.5 ± 0.25). Why: at 7.1 × 5.5 × 5.5 the
+  front_sheet W : H came out 1.17 (sheet 1.291, accepted 1.22–1.36), because the 8° camera adds the ring's depth to the
+  visible height. Widening inside the tolerance (big cap rx 3.0, small cap rx 1.47) and lowering the crown to 5.35 gives
+  W : H 1.26.
+- Big cap: rim centre (−0.70, 0.50), z0 2.75, rx 3.0, ry 2.4 (0.8), hc 2.6, e +0.70, s +0.33, stem ring r 0.88 on
+  the stem top (−0.20, 0.35). Crown X range −0.04 … +0.70 (over the stem), left rim bottom z 1.8, right rim 3.6–3.98.
+  The underside ring droops with weight 0.5 (weight 1 folded the small cap's underside into itself). z0 2.75 / hc 2.6
+  (was 3.0 / 2.35): the cap's bottom edge per column then matches the sheet (front sheet
+  `.45 .41 .39 .41 .43 .44 .46 .50 .52 .54 .57 .59 .57 .60 .64 .69 .75`, ours
+  `.46 .40 .41 .43 .44 .46 .48 .50 .52 .54 .56 .59 .61 .64 .66 .69 .73`).
+- Small cap: rim centre (2.18, −1.55), z0 2.0, rx 1.47, ry 1.18, hc 1.42, e −0.32, s −0.35.
+- Gems: placed by casting a ray from the sheet's own camera at the gem's (f, h) in the sheet's front / rear cell onto
+  the drooped cap (front: S1 .60/.90, S2 .18/.77, S3 .25/.68, S4 .05/.55, s1 .71/.59, s2 .90/.52, s3 .77/.49; rear:
+  S5 .76/.84, s5 .16/.60; lathe: S6 ρ .70 φ 60°, s4 ρ .82 φ 20°). The axis is the normal of a plane fitted to the
+  surface round the pocket rim (two passes); S2 / S3 / S4 lean 0.40 / 0.25 / 0.35 toward the front camera (the sheet
+  draws S2 nearly face-on from the front, 35 × 31 px). The lathe guesses of §2.3 put S2 and S3 in one merged pocket.
+- Pockets (7 gems ≥ 0.6): 8-sided, circumradius 0.58 d, floor 0.08 d under the mean surface round the rim; gem girdle
+  0.02 above the floor, table 0.12 d above the mean surface. Bezel gems (S4, s3, s4, s5): a dark (cap_dark) collar
+  ring r 0.64 d sunk under the surface up to the girdle, which sits 0.025 above it (decision 5's dark ring, built as a
+  ring of faces instead of paint, since the cap facets are larger than the ring).
+- Leaves: L1 root (1.55, 1.20, 0.80), five leaves L 1.3–1.7 at elevations 35–70°; L2 root (−2.0, 1.10, 0.65), four
+  leaves L 1.0–1.35. Two back boulders added (B11 (1.35, 1.95) Ø 1.15, B12 (−2.5, 1.45) Ø 1.1) and B6 / B7 / B8 / B9 /
+  B10 a little bigger, so from behind the leaves stand on a continuous rock band (rear R was 19.4 against 24.8).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | NM edges | NM (bowtie) verts | Boundary | Wire / loose | Zero-area | n-gons | Self-int. | Min corner | Normals |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MooncapNode | 2880 | 7.36 × 5.58 × 5.35 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.01° | outward |
+| MooncapShell | 452 | 6.06 × 4.82 × 2.62 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.20° | outward |
+| MooncapGlowSpot | 48 | 1.40 × 1.40 × 1.29 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 27.8° | outward |
+| MooncapStalkLarge | 160 | 2.37 × 2.43 × 3.42 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 34.6° | outward |
+| MooncapStalkSmall | 112 | 1.49 × 1.51 × 2.43 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 43.3° | outward |
+| MooncapLeafClump | 154 | 2.24 × 1.03 × 1.78 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.02° | outward |
+| MooncapRockBase | 928 | 6.14 × 5.06 × 1.40 | 1 | 0 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.02° | outward |
+
+- Origins at the bottom centre, transforms applied, no duplicate verts, flat shading, no custom normals. Pieces before
+  union: big cap 196, small cap 168, stems 160 / 112, gems 48 each (+16 for a bezel), leaves 16, boulders ~50–60.
+- **Pitfalls hit and fixed** (keep them in mind for later models):
+  - Booleans at the display slot (x ≈ 540, y −320) made 236–675 self-intersecting pairs: the operands' float32
+    matrices are off by ~1e-4 there. `_make` now moves the object to the origin before any boolean; `M.display` puts it
+    back.
+  - B1 / B2's flat bottoms were coplanar and overlapping at z −0.1: self-intersecting slivers after the first carve.
+    Each boulder / pebble bottom now sits at its own depth (−0.1 − 0.013 i).
+  - The gem shells were first pasted in the build frame, not the hero's mesh frame (0.1 low): most crowns ended inside
+    the cap. `_append` applies `o.matrix_world⁻¹ @ cutter.matrix_world`.
+  - Floor-cap needles (1.2°) on the ground: m023's floor re-fan (poke / beautify / split long edges) is in `_polish`.
+  - Leaf hubs 0.03 apart left needles and 4 self-intersections at the clump feet: hubs 0.16 apart.
+  - The Pc pebble didn't reach a boulder (a second shell): moved to (2.72, −0.55), Ø 0.6.
+
+## Stage 3 — UV
+
+Smart UV 45° re-unwrapped ANGLE_BASED per island, margin 0.008 (gap 0.016), `m012._uv_unfold` for folds.
+
+| Object | Islands | Overlaps | Flipped | Min gap | Border | Density min / med / max | Conformal p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| MooncapNode | 574 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.031 |
+| MooncapShell | 53 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.030 |
+| MooncapGlowSpot | 8 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.053 |
+| MooncapStalkLarge | 14 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.037 |
+| MooncapStalkSmall | 17 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.026 |
+| MooncapLeafClump | 33 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.021 |
+| MooncapRockBase | 182 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.001 |
+
+## Stage 4 — Materials, colour and texture
+
+**Pass 1** (`m030.calibrate()`, the kit's test dome, against §5.4's unshadowed targets; rendered / target sRGB):
+cap `#584DA6` (103,86,192 / 106,88,194), cap_light `#725FBE` (138,109,222 / 140,112,220), cap_dark `#44396E`
+(78,62,122 / 79,63,124), stem `#B5A388` (230,200,158 / 230,200,159), stem_base `#9C876A` (197,165,123 / 200,166,123),
+leaf `#6A7C2D` (127,146,46 / 130,149,46), leaf_base `#576724`, leaf_tip `#7E8D34`, rock `#625450` (123,103,93 /
+123,102,93), rock_light `#7C6F6E`, rock_dark `#483D39`, dirt `#564845`.
+
+**Pass 2** (the hero's sheet views against the sheet's medians, linear-light gains): the caps were right (front
+`#6658BB` against `#6356BD`) and kept. Stems ×(1.33, 1.22, 1.10) → `#CCB18F` / `#B0956E` (the big cap shades them
+more than the sheet does); leaves ×1.5 → `#819630` / `#6A7D28` / `#98AA36` (they stand in the caps' and rocks' shade:
+rear `#5C6D21` against `#818F22` before); rock family ×1.2 and warmer → rock `#6E5C55`, rock_light `#8A7973`,
+rock_dark `#4F433E`, dirt `#5E4E4B`, and the dark ground band / contact paint halved (ROCK_GROUND (0.15, 0.35),
+contact 25 %). Gem keys re-aimed for the rendered Neon preview (emission 1.0): spot `#74D6EC`, spot_light `#A9F0F5`,
+spot_deep `#4DA2D0` (light 53 above mid in R, deep 52 below mid in G).
+
+**Final re-measure** (study masks, ours with the floor hidden; median / lit / shade):
+
+| View | Cap P ours vs sheet | Gem C | Stem T | Leaf G | Rock R |
+| --- | --- | --- | --- | --- | --- |
+| front | `#6657BA` / `#9277ED` / `#423676` vs `#6356BD` / `#8D75DF` / `#4A3B77` | `#74E6FF` vs `#73E7F8` | `#9A8465` / `#FAD3A2` vs `#C7A881` / `#EFD3AD` | `#434F12` vs `#4F5919` | `#7E685C` vs `#755F56` |
+| f34 | `#6758BC` vs `#6859C0` | `#74E6FF` vs `#71E8F7` | `#A08768` vs `#C8A780` | `#424E11` vs `#525D17` | `#7C675C` vs `#77635B` |
+| rear | `#52469A` vs `#604DA3` | `#74E6FF` vs `#7AEAFA` | `#CFB490` vs `#D6B891` | `#6B7E22` vs `#818F22` | `#6A5951` vs `#7A655A` |
+| side | `#5D4DAD` vs `#5A489F` | | `#B59771` vs `#E6C79F` | `#4B5717` vs `#616B1F` | `#735F54` vs `#7B675F` |
+
+- Caps within 3–14 of the sheet in every elevation view (crown light → flank → rim dark in every view); gems within
+  7–17 (the Neon preview clips B to 255); rocks within 7–16; leaves 12–22 dark (shade); **the front / f34 / side stems
+  read 30–45 darker in the median** (their lit quartile matches, `#FAD3A2` against `#EFD3AD`: the studio's key light
+  leaves more of the big stem in the cap's shadow than the sheet does). Raising the stem key further would clip the lit
+  faces; left as is and noted.
+- **Blending** (positions only, never facing): caps by the lathe ring's height fraction u + broad noise + a ±0.10
+  facet scatter on a 9-key ladder dark → cap → light (25 / 50 / 75 % steps): underside 25 % dark, rim band 50 % dark,
+  u < 0.38 ramps toward dark, u > 0.62 toward light; stems: stem_base under the lowest 25 % blending over 0.15 (3 mixes);
+  leaves base → mid → tip by t along the leaf (5 keys incl. 50 % mixes); rocks: noise patches → rock_light (mix up to
+  75 %), a dark ground band, contact faces 25 % dark, pebbles dark; dirt with 25 % rock_dark patches near boulders.
+  Hard edges only at gem | pocket (the cutter faces are cap_dark) and between materials.
+- **Tint**: per piece tint_var 0.04; broad mottling amp 0.03 (caps, stems, leaves), 0.06 (rocks, dirt), scale ~0.5;
+  gem keys Tint 1 (`_gem_tint`). Tint spread hero 1.18 (< 1.25). Baked-shading correlation (K.check): hero 0.39
+  (< 0.5) — reached by painting the underside only 25 % dark (50 % gave 0.62).
+- **Finish**: caps rough 0.70 / 0.75 dark, low spec; stems 0.85; leaves 0.75 low spec; rock 0.92, dirt 0.95; gems 0.4.
+- **Gem tone split** (deep / mid / light, sheet in brackets): front .17 / .53 / .30 (.26 / .48 / .25), f34 .17 / .53 /
+  .30 (.17 / .50 / .32), rear .23 / .51 / .26 (.26 / .41 / .33), side .19 / .54 / .27, top .17 / .54 / .29. The lower
+  crown row alternates deep / mid by triangle; table r 0.28 d.
+
+## Stage 5 — Lighting
+
+- Neon keys `m030_spot`, `m030_spot_light`, `m030_spot_deep` at emission 1.0 (≥ the exporter's GLOW_EMISSION), one flat
+  colour each, Tint 1, previewed unshaded (`_glow_mats`). All other keys emission 0. `build()` checks there are exactly 3.
+- Gem bright share (v ≥ 0.85 of C pixels): front 0.953, f34 0.948, side 0.943, rear 0.924, r34 0.928, top 0.941
+  (target ≥ 0.85 / top ≥ 0.75).
+- Light: one `crystal_glow` socket (light only) at build (0.6, −2.7, 3.6), 0.91 from the nearest surface, outside the
+  mesh; colour `#7FE9F8`, brightness 0.5, range 8, shadows true, no flicker. Spill, VFX on against off (sheet-view
+  medians): front stem `#9A8465` / `#998061`, rock `#7E685C` / `#7E675B`; f34 stem `#A08768` / `#9F8465`, rock
+  `#7C675C` / `#7C665A`; rear and side identical. Spill ≤ 4 levels (limit 10).
+- **Studio (Requires Manual Validation):** check the three gem tones stay distinct under Neon bloom, and that the light
+  reads in a dark cave without washing the cream stems cyan.
+
+## Stage 6 — VFX
+
+Only the `crystal_glow` light (decision 8): the sheet draws no halo, spores or sparkle. `fx_check`: inside False, spawn
+box n/a (no emitters), clear 0.91, Roblox xyz (0.64, 3.6, 2.75). No harvest sockets (decision 9). Renders use vfx=True.
+
+## Measured against the sheet (final)
+
+Shares P / C / T / G / R in % (sheet in brackets), study masks, ground shadow excluded:
+
+| View | P | C | T | G | R | C/(P+C) | W : H |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet | 46.9 (49.1) | 7.1 (6.8) | 21.2 (20.5) | 3.1 (2.2) | 21.7 (21.5) | 13.2 (12.1) | 1.26 (1.291) |
+| f34_sheet | 48.2 (49.3) | 7.6 (8.2) | 19.0 (18.8) | 2.7 (2.4) | 22.5 (21.3) | 13.6 (14.3) | 1.21 (1.37) |
+| rear_sheet | 50.6 (46.4) | 3.8 (3.7) | 14.5 (16.9) | 9.0 (8.3) | 22.2 (24.8) | 6.9 (7.4) | 1.26 (1.243) |
+| r34_sheet | 50.9 (48.1) | 4.1 (3.8) | 13.8 (16.1) | 8.1 (7.5) | 23.1 (24.4) | 7.5 (7.4) | 1.22 (1.23) |
+| side_sheet (270) | 58.6 (46.8) | 7.4 (2.5) | 8.9 (25.4) | 2.4 (1.8) | 22.6 (23.6) | 11.2 (5.0) | 0.92 (1.005) |
+| top (flipped) | 80.3 (72.2) | 13.8 (13.8) | 0.2 (0.5) | 0.5 (1.5) | 5.3 (11.9) | 14.6 (16.0) | |
+| top_tilt (flipped) | 71.2 (72.2) | 12.8 (13.8) | 0.2 (0.5) | 0.1 (1.5) | 15.7 (11.9) | 15.2 (16.0) | |
+
+- Front top profile mean / max error 0.020 / 0.11 (the 0.11 is the last column, the small cap's +X rim tip), f34
+  0.022 / 0.06, rear 0.048 / 0.14, r34 0.064 / 0.17. Front width per height at h .1 / .3 / .5 / .7 / .9: .82 / .87 /
+  .94 / .68 / .53 against .86 / .86 / .97 / .71 / .52.
+- Big cap visible bottom edge per column matches the front within 0.04 (above); flat crown centred at about 0.67 of the
+  cap width from the left (sheet 0.65); left rim the cap's lowest point.
+
+## Modeller's notes for the verifier
+
+1. **Rebuild**: `m030.build()` (about 45 s geometry + 23 s renders in the background session); problems list empty.
+   `m030.measure()` re-runs the study's masks on the sheet and on our `*_sheet` renders (our top flipped).
+2. **The side cell (side_sheet 270) does not match by shares** (P +11.8, T −16.5, C +4.9): with decision 4's −X-only
+   droop the big cap's whole −X rim hangs low toward this camera, so the stem is hidden above h .45 and the −X flank's
+   gems face it. §3.5 predicted this ("record it, don't chase it"); the sheet's side cell draws a back droop instead.
+   S2 / S3 / S4 already lean toward the front camera to cut this (side C was 8.4).
+3. **Size** is 7.36 × 5.58 × 5.35, inside the tolerances but wider and lower than the nominal 7.1 × 5.5 × 5.5, to meet
+   the front W : H 1.22–1.36 (at the nominal size it is 1.17). The f34 W : H stays 1.21 (§3.1: compare it by shares).
+4. **Top (kit top, flipped)**: P +8.1 and R −6.6 just outside ±6 (the ortho top hides the boulders under the caps);
+   the top_tilt view is within ±4 everywhere. The sheet's top cell looks tilted.
+5. **Rear**: P +4.2 (just over ±4), R −2.6, T −2.4; the studio leaves the rear rocks darker (`#6A5951` against
+   `#7A655A`).
+6. **Stems** read darker in the front / f34 / side medians (studio shadow under the big cap; lit quartile matches).
+7. **Shell part** has 5 empty pockets, not 6 (S4 is a bezel gem by decision 5). The pockets are shallow recesses
+   whose walls are deeper on the uphill side where a gem leans toward the camera (S2's wall reaches 0.24).
+8. Bezel gems (S4, s3, s4, s5) sit on a dark collar ring of faces rather than painted cap faces.
+9. The study's §2.3 lathe placements are replaced by sheet-camera rays (see stage 1); gem centres hit the sheet's
+   front / rear (f, h) by construction.
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-29. Read-only: background Blender on port 9881 with `wip/M030_verify.blend` (not saved,
+`build()` not called), fresh renders into the verifier's scratch folder (`kit_models.MODEL_RENDERS` redirected), the
+study's masks (`m030.measure()` and the verifier's own numpy scripts) on both images.
+
+**Result: PASS, 8 / 10.** No blockers. The leftovers below are minors.
+
+### Re-measured geometry
+
+| Object | Tris | Size | Shells | NM edges / verts | Boundary | Wire / loose | Zero-area | n-gons | Self-int. | Min corner | Inverted | Normals |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MooncapNode | 2880 / 4000 | 7.36 × 5.58 × 5.35 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.01° | 0 | outward |
+| MooncapShell | 452 | 6.06 × 4.82 × 2.62 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.20° | 0 | outward |
+| MooncapGlowSpot | 48 | 1.40 × 1.40 × 1.29 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 27.8° | 0 | outward |
+| MooncapStalkLarge | 160 | 2.37 × 2.43 × 3.42 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 34.6° | 0 | outward |
+| MooncapStalkSmall | 112 | 1.49 × 1.51 × 2.43 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 43.3° | 0 | outward |
+| MooncapLeafClump | 154 | 2.24 × 1.03 × 1.78 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.02° | 0 | outward |
+| MooncapRockBase | 928 / 1000 | 6.14 × 5.06 × 1.40 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 5.02° | 0 | outward |
+
+- **Size** is inside the decided 7.1 ± 0.35 × 5.5 ± 0.4 × 5.5 ± 0.25 (W margin 0.09, H margin 0.10).
+- **Interior faces:** none. A ray-parity test on every face found 3 tiny faces (area 0.003; two on the hero, one on
+  the base) whose two sides both test "inside" at 3 mm. At 0.8 mm their front sides are outside, so they line 2.3 mm
+  crevices (a boulder against the slab at (−2.0, 1.6, 0.04); a gem pavilion against its pocket at (1.56, −1.63, 3.30)).
+  They are not enclosed faces.
+- **Origin and transforms:** every object's origin is at its bbox bottom centre (offset 0, 0, 0), with rotation 0 and
+  scale 1. There are no modifiers, no custom normals and no duplicate verts, and every face is flat shaded.
+- **UVs:** the hero has 574 islands, 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0 and
+  conformal p95 1.031. The parts are the same (p95 1.001–1.053).
+- **Materials:** `K.check` is clean (all flintkit keys).
+  - The Neon keys `m030_spot #74D6EC`, `m030_spot_light #A9F0F5` and `m030_spot_deep #4DA2D0` are at emission 1.0
+    with no Tint node. All 489 gem faces have Tint 1 (0 loops off).
+  - Every other key is at emission 0.
+  - Baked-shading correlation: hero 0.39 (< 0.5), shell 0.17, clump 0.30, the rest 0. Tint spread 1.18.
+- **Socket:** one `crystal_glow`, light only (`#7FE9F8`, 0.5, range 8, shadows, no flicker).
+  - It sits at build (0.6, −2.7, 3.6), outside the mesh, 0.91 from the nearest surface.
+  - Spill, VFX on against off: front stem `#9A8465` / `#998061`, front rock `#7E685C` / `#7D675B`, f34 stem `#A08768`
+    / `#9F8465`; the side and rear are identical. At most 4 levels (limit 10).
+
+### Shape against the sheet
+
+- **Caps:** two thick faceted violet caps with a real underside and rim band.
+  - The big cap's crown is level: a plane fitted over its top 0.3 is tilted 1.2°. Its top verts run X −0.97 … +0.98
+    around the big stem's axis (−0.20, 0.35). The −X rim goes down to z 1.8 and the +X rim sits at 3.1–3.3. That is an
+    eccentric droop, not a rigid tilt.
+  - Top profile mean / max error: front 0.020 / 0.11 (only the small cap's +X rim tip, .34 against .45), f34
+    0.022 / 0.06.
+- **Gems:** 11 separate gem islands.
+  - Pocketed, each surrounded only by `cap_dark` wall faces: Ø 1.38, 1.17, 1.13, 0.85, 0.75, 0.70, 0.62.
+  - Bezel, a dark collar plus cap faces: Ø 0.53, 0.46, 0.43, 0.30.
+  - Glow share and bright share:
+
+| View | C ours (sheet) | C/(P+C) | Bright v ≥ 0.85 | Deep / mid / light ours (sheet) |
+| --- | --- | --- | --- | --- |
+| front | 7.1 (6.8) | 13.2 (12.1) | 0.953 (0.896) | .17 / .53 / .30 (.26 / .48 / .25) |
+| f34 | 7.6 (8.2) | 13.6 (14.3) | 0.948 | .17 / .53 / .30 (.17 / .50 / .32) |
+| rear | 3.8 (3.7) | 6.9 (7.4) | 0.924 | .23 / .51 / .26 (.26 / .41 / .33) |
+| r34 | 4.1 (3.8) | 7.5 (7.4) | 0.929 | .24 / .50 / .26 (.20 / .45 / .35) |
+| side | 7.4 (2.5) | 11.2 (5.0) | 0.943 | (side: decided, see minor 1) |
+| top (flipped) / top_tilt | 13.8 / 12.8 (13.8) | 14.7 / 15.2 (16.0) | 0.94 | |
+
+- **Stems:** fat faceted pears with the big axis at (−0.20, 0.35) and the small at (1.85, −1.35), as decided. Front
+  width per height at h .1 / .3 / .5 / .7 / .9: .82 / .87 / .94 / .68 / .53, against the sheet's .86 / .86 / .97 / .71
+  / .52.
+- **Shares** (error in points, P / C / T / G / R):
+  - front −2.2 / +0.3 / +0.7 / +0.9 / +0.2;
+  - f34 −1.1 / −0.6 / +0.2 / +0.3 / +1.2;
+  - rear +4.1 / +0.1 / −2.4 / +0.7 / −2.6;
+  - r34 +2.8 / +0.3 / −2.3 / +0.6 / −1.3;
+  - top_tilt −1.0 / −1.0 / −0.3 / −1.4 / +3.8.
+- **Boulder ring and leaves:**
+  - In the front, side and rear, the rock band is 95–98 % rock at h .0–.1 and 77–82 % at h .1–.2.
+  - Two leaf clumps stand at the back (rear G 9.0 against 8.3). Their lance leaves with midribs match the exploded
+    clump.
+
+### Colours (study masks; sheet → ours, difference in sRGB levels)
+
+| Region | front | f34 | rear | side |
+| --- | --- | --- | --- | --- |
+| Cap light (top 30 % of cap rows) | `#866DDB` → `#836FDF` (−3,+2,+4) | `#8C70DD` → `#9275E8` (+6,+5,+11) | `#846ADA` → `#7F67D0` (−5,−3,−10) | `#7C63CD` → `#8E72E6` (+18,+15,+25) |
+| Cap mid (30–70 %) | `#5E4FAC` → `#6D5EBF` (+15,+15,+19) | `#6554BB` → `#6C5EC1` (+7,+10,+6) | `#584A9E` → `#5448A6` (−4,−2,+8) | `#463665` → `#6555AE` (geometry, see minor 1) |
+| Cap dark (bottom 30 %) | `#58468F` → `#53458F` (−5,−1,0) | `#59489B` → `#53458F` (−6,−3,−12) | `#4A3B5C` → `#483D84` (−2,+2,+40) | `#4B3B6A` → `#50448F` (+5,+9,+37) |
+| Gem deep | `#56ACDF` → `#5AAADF` (+4,−2,0) | `#44AAD9` → `#59AADF` (+21,0,+6) | `#64B8E8` → `#50A9DF` (−20,−15,−9) | `#6FB9EC` → `#53AADF` (−28,−15,−13) |
+| Gem mid | `#6CE7F8` → `#74E6FF` (+8,−1,+7) | `#69E5F5` → `#74E6FF` (+11,+1,+10) | `#6FE9F9` → `#74E6FF` (+5,−3,+6) | `#79E8FA` → `#74E6FF` (−5,−2,+5) |
+| Gem light | `#AFFBFE` → `#B1FFFF` (+2,+4,+1) | `#ADFBFD` → `#B1FFFF` (+4,+4,+2) | `#B0FBFD` → `#B1FFFF` (+1,+4,+2) | `#AAF8FC` → `#B1FFFF` (+7,+7,+3) |
+| Stem (all) | `#C7A881` → `#9A8465` (−45,−36,−28) | `#C8A780` → `#A08768` (−40,−32,−24) | `#D6B891` → `#CFB490` (−7,−4,−1) | `#E6C79F` → `#B59771` (−49,−48,−46) |
+| Stem upper / lower half | `#C2A47F` → `#7A6E56` (−72) / `#CBAB83` → `#D0B085` (+5) | `#C0A27D` → `#7D7057` (−67) / `#CFAE85` → `#CFAC83` (−2) | `#C7AC8B` → `#DABB94` (+19) / `#E0C097` → `#A28868` (−62) | |
+| Rock | `#755F56` → `#7E685C` (+9,+9,+6) | `#77635B` → `#7C675C` (+5,+4,+1) | `#7A655A` → `#6A5951` (−16,−12,−9) | `#7B675F` → `#735F54` (−8,−8,−11) |
+| Leaf | `#4F5918` → `#434F12` (−12,−10,−6) | `#525D17` → `#424E12` (−16,−15,−5) | `#818F22` → `#6B7E22` (−22,−17,0) | `#616B1F` → `#4B5717` (−22,−20,−8) |
+
+- In the front, f34 and rear, the caps, gems and rocks match within 4–21 levels, and the caps blend crown → flank → rim
+  in every view.
+- The gem tones stay distinct: light is at least 60 above mid in R, and deep at least 60 below mid in G.
+
+### Items
+
+No blockers.
+
+Minors (record them; chase them only if the main session wants a round 2):
+1. **The side cell (side_sheet 270) does not match:** P +11.8, C +4.9, T −16.5, top profile max 0.21, and the cap mid
+   reads `#6555AE` against the sheet's shaded underside `#463665`. This follows from decision 4 (droop along X only),
+   as §3.5 predicted, and is accepted by that decision.
+2. **The big stem's upper half reads dark khaki in the front and f34:** `#7A6E56` against `#C2A47F` (−67…−72), so the
+   stem medians are 40–49 levels dark in the front, f34 and side.
+   - The lower half matches within 5 and the rear stem within 7, so the key is right. The darkening is the drooping
+     cap's shadow in the studio, and Roblox's sun will also shade the stem.
+   - Requires Manual Validation in Studio. If the main session wants it lighter, the only rule-safe lever is a small
+     lift of `m030_stem`: the lit quartile is already `#FAD3A2` against `#EFD3AD`, so about +5 % at most.
+3. **The rear and r34 top profiles exceed ±0.06 at the ends** (rear max 0.14, r34 max 0.17), though the shares stay
+   within ±4.1.
+   - From behind, the small cap stands about 0.13 h higher at screen left (r34 f .05–.15: .62 / .69 / .76 against
+     .49 / .55 / .59).
+   - The big cap's −X rim falls lower at screen right (.59 / .44 against .71 / .53), so from behind the big cap reads
+     more wedge-like than the sheet's rounder dome.
+4. **The rear views are darker.** The keys themselves match; this is the studio's back lighting.
+   - Rear lit quartiles: rock `#746159` against `#A08C86`, leaves `#798F26` against `#AAB829`.
+   - The cap's shaded rim in the rear and side is bluer (B +37…+40) than the sheet's greyer `#4A3B5C`.
+   - The leaves read 12–22 levels dark in every view.
+5. **Top (ortho, flipped):** P +8.1 and R −6.6, outside ±6. Every gem shows (about 6 on the big cap and 5 on the
+   small), against the sheet's 3–5 / 2–4. The sheet's top cell is tilted, and the tilted top_tilt is within ±4 on
+   every share.
+6. **Front ground line:** the bottom row of the front silhouette is 0.40 W wide against the sheet's 0.13, because our
+   front boulders sit in a straighter line on the ground than the sheet's curved ring. From h .1 up, the width per
+   height is within 0.04.
+7. **S1's pocket** shows a wide dark crescent on its uphill side (a wall of up to about 0.24, modeller note 7), where
+   the sheet shows a thinner dark ring. The tables stand roughly 0.1–0.3 proud of the mean cap surface around them
+   (the study asked for 0.08–0.12 × Ø). This is a rough measure on the curved dome.
+8. **The `MooncapGlowSpot` part** reads as a pointed brilliant-cut diamond (a pavilion cone of 0.62 d), where the
+   sheet's loose Spot Insert is a blunter, rounder nugget. In the hero it is hidden inside the cap.
+9. **The front's deep gem tone is a little under-represented** (.17 against .26), and its shaded deep quartile is
+   lighter (`#68C4EC` against `#48AADE`). The f34 split matches.
