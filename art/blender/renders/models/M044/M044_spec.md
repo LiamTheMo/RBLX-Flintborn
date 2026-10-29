@@ -877,3 +877,821 @@ All 15 recommendations are accepted, with notes on 6 and 11.
 15. **Names.** `StoneRamp*`, keys `m044_*`.
 
 The f34 shares in §1 are binding within ±4.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m044.py`, `build()`. Background session on port 9877, work file
+`art/blender/assets/kit/wip/M044.blend`; the final build ran in a freshly restarted session and was saved. Constants
+`RISE` 10.4, `TOE_Z` 0.35, `RUN` 17.5, `LANDING` 2.5, `HALF_W` 8, `PATH_HALF` 4 (decision 10: a 5.6 variant is a
+`RISE` / `RUN` change). **No boolean anywhere**: every piece is an explicit closed shell. The cliff masses are not
+unioned: each is one explicit closed solid, which leaves no interior faces and has no boolean crash risk. Each part
+has its own function, and the hero is assembled from the same functions.
+
+- **`path_part()` → StoneRampPath.**
+  - 2 × 7 tiles (`tile()`), each a closed slab 0.6 thick over a plan rectangle. Its top is tilted 1.6° flatter than
+    the slope, so each row's uphill edge sits 0.08–0.12 under the next row's downhill edge (the sheet's lips). The
+    landing row is flat at 10.4.
+  - The middle seam jogs per row (`MID_JOG`); left and right tiles differ in height by 0.015–0.022 (`TILE_DZ`) so the
+    seam reads. Tiles overlap their neighbours by 0.01, so no slit shows the wedge.
+  - Row 1's underside lies on the ground until the slab lifts off it (y −9.54); its front is the 0.35 toe lip.
+  - 20 pebbles: 3-sided prisms whose foot and top follow the tile plane, at most 0.22 tall, moved off the seams.
+- **`wedge()` → StoneRampWedge.** One closed wedge, x ±4.1, y −8.6 → +10 (back plane), top = path − 0.58.
+  - A 6-point toe end (0.57 tall), then 8-point sections: flat base; a bevelled rim ring in 0.4 / up 0.25 (close-up
+    2's flat underside ringed by rim facets); long faces broken at a mid line pushed in 0.08–0.12 (broad facets).
+  - In front of it, row 1's tiles lie on the ground. The void under them is closed by the turf tongues and the tile
+    front.
+- **`cliff(side)` → StoneRampCliffL / R.** One explicit closed solid per side, six columns C1–C6 (`COL_Y` −8.3, −4.9,
+  −1.4, 1.8, 4.9, 7.5, 10.0). Per column:
+  - the inner face on x ±4.0, overlapping the wedge side by 0.1;
+  - an outer face of two tall facets (a vertical ridge 0.15 proud at the mid station, and a staggered mid ring pushed
+    ±0.05–0.12), leaning in 0.015 per stud (batter); creases 0.35 into the outline between columns;
+  - the top: a draped plane (under the turf) inside x ±6.35, rising 63° to a ridge at ±6.65, then falling in roof
+    facets (0.85 drop) to the outer face. A hip at each column's downhill end drops the ridge 0.8 over 0.45 (the
+    peaked tip).
+  - Apex = B + 0.35 at the downhill end and B − 0.75 at the uphill end (C6 10.30 → 10.40). Measured apexes (R):
+    1.98→2.83, 3.99→4.90, 5.86→6.60, 7.83→8.51, 9.51→9.90, 10.30→10.40; L varies by ±0.1.
+  - Each column stands 0.35–1.1 over the previous one at the crease (planar risers).
+  - Tall faces are zipped between their vertex columns (`_zip`, shortest diagonal), and planar ends are
+    Delaunay-filled (`_planar`), so there are no needles. Outer faces 7.58–7.84 (+0.15 ridge, ≤ 7.97).
+  - The pointed **toe rock** (`toe_rock`, a hull, apex 1.6–1.75) stands on the ground in front of C1, its inner half
+    in the turf tongue.
+- **`turf(side)` → the border turf.** One closed sloped slab per side over 22 stations.
+  - Inner edge x 3.7 ± 0.15, lobed, over the edge tiles. A crown line +0.04 down the middle.
+  - Outer edge 6.52 at each column tip → 6.82 where the rock is low (scalloped; 6.6 at the toe).
+  - Top = B(y): path + 0.3, lowering to 10.45 at the back plane.
+  - Lime side walls run down to a bottom line through the lows at each crease. It is buried in the column tops and
+    the edge tiles, so there is no crack.
+  - On the toe ground the tongue runs to y −10, its front rounded to −10.22.
+  - The green side band shows 0–0.75 between the turf top and the rock (the side cell's sawtooth).
+- **`dome_bush()`** (spec 2.4, the M040 m2 fix): ten broad rounded cupped leaves (a spoon outline with a blunt 111°
+  tip, 8 tris each) in three tiers round a small deep heart.
+  - Four deep-emerald leaves at 14° round the foot (they hide the trunk), three mid-green at 40°, three fresh-green
+    at 70°. The result is a rounded leafy clump with a dark heart from above, not a star.
+  - 6 per side, at the spec's y, x ±5.3 / 5.6. Measured 1.9–2.4 across and 1.65–1.82 tall; 98 tris each.
+- **`boulder()`**: the hull of a foot ring following the turf (sunk 0.1), a shoulder ring at 0.6 h and a 0.7 crown.
+  Low rounded-angular lumps: five of them (BL_toe, BL_mid, BR_mid, BL_top, BR_top), 1.7–1.9 × 1.45–1.6 × 1.0–1.05.
+- **Dressing.**
+  - **Flowers** (`flower()`): yellow pentagon discs (Ø 0.56–0.64) lying on the turf with a darker knob; cream square
+    discs.
+  - **Sprigs**: the m040 leaf, 3 blades.
+  - **Aprons** (`apron()`): a lime wedge-section strip along each cliff foot, 0.26 at the rock and 0.03 at its jagged
+    edge (x 8.0–8.56, ≤ 0.56 past the side plane), with 3 yellow flowers and 3 sprigs each.
+- **Contact.**
+  - Leaves are slid onto their heart (`m040._touch`).
+  - Leaves are pushed out of the cliff, the toe rock and the boulders (`m040._Guard`, ≤ 0.05).
+  - A leaf whose tip would dip into the turf is pitched up. Flowers sit 0.03 into the turf.
+- **Camera probe (spec 2.5).**
+  - f34 was probed at az 38–68 × e 12–30 with 1×, 1.6× and 3× lenses, scored on W : H, R / P / G and the top profile.
+  - The sheet's path corners solve to an orthographic camera of about (47, 23). Its strong perspective widens W : H,
+    which no studio lens reproduces at that elevation.
+  - **`f34_sheet` = (44, 12), 3× lens** (W : H 1.444, R 38.3, P 29.2, G 32.4).
+  - The other views: front_sheet (0, 6), side_sheet (90, 4), top (0, 89), rear (180, 6), r34 (−120, 15).
+  - Extra **`f34_lit_sheet`**: the (−44, 12) render flipped left-right. It shows the sheet's composition under the
+    sheet's light (our studio key is front-left, the sheet's is front-right). It is for colour and L / F comparison
+    only.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris (limit) | Size W × L × H | Shells | Non-manifold edges / verts | Boundary / wire / loose | Zero-area / n-gons / dup | Normals | Smallest corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StoneRamp (hero) | **3574** (4000) | 17.11 × 20.22 × 12.48 | 272 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 5.18° |
+| StoneRampPath | 340 (1000) | 7.96 × 20.00 × 10.56 | 34 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 7.97° |
+| StoneRampWedge | 108 | 8.20 × 18.60 × 9.82 | **1** | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 5.18° |
+| StoneRampCliffL | 332 | 3.97 × 19.96 × 10.40 | 2 (mass + toe rock) | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 5.93° |
+| StoneRampCliffR | 332 | 3.97 × 19.98 × 10.40 | 2 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 5.98° |
+| StoneRampBorderL | **992** | 3.27 × 20.22 × 12.41 | 93 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 10.0° |
+| StoneRampBorderR | 966 | 3.27 × 20.22 × 12.48 | 92 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | outward | 9.4° |
+
+- **Hero shells by kind:**
+  - rock 30 (1062 tris): the wedge, 2 masses, 2 toe rocks, 5 boulders, 20 pebbles;
+  - tiles 14 (180);
+  - turf 4 (580): 2 borders and 2 aprons;
+  - trunks 12 (96), leaves 162 (1296), flowers and hearts 50 (360).
+- **Per-shell report:** every shell has 0 non-manifold edges and verts (**bowties 0**; `M.fix_bowties` found none), 0
+  boundary edges, 0 self-intersecting pairs, and positive volume.
+- **Floating dressing (`m040.contact_report`, 0.03):** hero 272 shells, **0 floating, 0 unchained**; the largest gap
+  of any shell is 0.000. The Path, BorderL and BorderR parts are also 0 / 0.
+- **Capping (`capping_report`).**
+  - Cliff faces with n.z > 0.85 total 87.9 studs². **Exposed: 0.000**, straight up and toward all six sheet cameras
+    (ray tests from each face's points).
+  - From straight above, inside x ±8 and y −10..10: tiles 147.5, turf 79.5, leaves 36.3, flowers 4.1, **cliff tips
+    39.5 (about 0.99 wide a side)**, boulders + pebbles + toe rocks 12.0, **wedge 0**, flat column top 0. Rock total
+    51.5 (≤ 60).
+- **Seam contract (`seam_report`, build frame).**
+  - 0 rock verts past x ±8; 0 verts behind y +10.
+  - On the back plane: 24 rock, 8 tile and 10 turf verts. Landing tiles at 10.400 (min and max). Turf top at the back
+    plane 10.45–10.49 (bottom 9.77).
+  - Foliage and apron overhang 0.56 past the sides.
+  - The hero origin is the bbox bottom centre; `m044_offset` is (−0.004, −0.110, 0). In the hero object the sides are
+    at x −7.996 / +8.004 and the back plane at y +10.11.
+- **Walk test (`walk_report`).**
+  - Downhill edges 0.35 / 2.02–2.04 / 3.69–3.71 / 5.36–5.39 / 7.04–7.06 / 8.72–8.73 / 10.40, all within 0.02 of §2.1.
+  - Row lips 0.078–0.118 (≤ 0.12); middle-seam steps 0.015–0.022; toe 0.35.
+  - Slope **29.87°** (tile tops 28.4°); the landing is flat at 10.4.
+  - Pebbles at most 0.212 above the tile under them.
+- **Plateau shot** (`plateau_f34`, `plateau_front`): an M040 copy with its lip front on our back plane. The landing
+  and border ends meet its lawn flush, and the sides sit on its seams.
+- Transforms applied, flat shading, no custom normals, no modifiers.
+
+## Stage 3 — UV
+
+`M.smart_uv` at 45°, ANGLE_BASED re-unwrap, margin 0.008, then `m012._uv_unfold` (0 faces cut).
+
+- All seven objects: **0 overlapping pairs, 0 flipped**.
+- Min island gap 0.016, border 0.008. Texel density 1.0 / 1.0 / 1.0. Conformal stretch p95 1.000–1.043.
+- Islands: hero 1435, path 184, wedge 6, cliffs 54 / 56, borders 433 / 382.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration.** `calibrate()` runs `K.calibrate` on the kit dome against spec 5.4's targets; the dome renders are
+  in the scratchpad `m044w/calib/`. Keys, with the dome's rendered sRGB in brackets:
+  - rock `#A7968D` (211,181,164). Calibrated `#A7948D` came out at hue 16°; turned to 20° (mauve guard).
+  - rock_light `#B7A9A1` (232,208,189). rock_deep `#97867E`: calibrated at 14°, turned to 19°.
+  - path `#C39C71` (246,188,125), path_light `#D0A479`, path_deep `#9F7858` (198,141,95).
+  - grass `#9CA704` (194,202,8), grass_light `#B0B804`, grass_deep `#899902`.
+  - leaf `#3A6718` (66,119,24), leaf_lit `#689634` (124,180,53), leaf_deep `#175D21` (26,106,33), leaf_lime `#879A03`.
+  - flower `#B8B717` (231,223,24), heart `#8B8E17`. Cream `#C6BEAE`: the calibration clipped at 255, so it was set by
+    hand.
+  - trunk `#582703` (110,55,30).
+  - **Every rock key and mix is R > G > B at hue 19–22°.** The brown "Rocks (Small)" swatch is not used (spec 3.8).
+- **Blending by position or role, never by facing.**
+  - **Cliffs:** rock_light rises from 0.6 of each column's apex to 40 % at the top, plus a noise drift. The tips
+    (ridge band, roof and hip facets, picked by their place on the column) are 50 % rock_light. Broad 15 % rock_deep
+    noise patches below z 1.5. The hidden draped tops, inner face and bottom are plain rock. Per-column tint
+    0.97–1.03 and Tint mottling 0.04 at scale 0.3.
+  - **Tiles:** tops are path, with path_light noise patches (10–20 %), path_deep 15 % within 0.6 of the borders, and
+    a per-tile tint of ±0.04. **The tile sides are the geometric band**: every face of a tile that is neither its top
+    nor its hidden underside, picked by the tile's own plane and never by normal, is path_deep. Undersides are plain
+    path.
+  - **Turf:** grass with grass_light noise patches 10–20 % (averaged over each face's corners), and grass_deep 15–25 %
+    within 0.8 of bush roots and boulders. Lime sides. Aprons are 30 % deep where they tuck under the rock.
+  - **Bushes, by tier:** skirt 90 % leaf_deep (and the heart), middle leaf, crown 70 % leaf_lit.
+  - **Boulders:** crown 40 % light, foot 15 % deep. **Pebbles:** 60 % rock_light; two have a 60 % deep half, by
+    position.
+- **Finish:** rock 0.9; path 0.9 low-spec; grass and leaves 0.85 low-spec; flowers 0.8; trunk 0.95. Metal 0, no
+  emission.
+- **`K.check`:** no problems. Baked shading: hero 0.01, path 0.02, the others 0.0 (limit 0.5).
+- **Re-measured renders** (`measure_views`, the study's masks; sheet values in brackets):
+
+| View | W : H | R | P | L | F | G | Rock warm | Path | Lawn | Bush F | Top err |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (44, 12) | 1.444 (1.456) | 38.3 (36.4) | 29.2 (30.6) | 13.8 (20.6) | 18.6 (11.8) | **32.4** (32.4) | `#918076` (shade) | `#FFC383` | `#C3CD0F` | `#59720F` | 0.072 |
+| f34_lit (mirrored) | 1.439 | 38.5 | 29.5 | **20.3** | **11.6** | 31.9 | `#C5AB99` (`#D6B7A3`) | `#FFC383` (`#F8BB7B`) | `#C4CE0D` (`#C3CF06`) | `#50761F` (`#43791C`) | 0.075 |
+| front_sheet (0, 6) | 1.275 (1.294) | 15.7 (21.1) | 46.1 (46.0) | 20.5 | 17.3 | 37.8 (32.3) | `#C8B19F` (`#D2B6A5`) | `#FFC383` | `#C4CE0C` | | 0.056 |
+| side_sheet (90, 4) | 1.594 (1.612) | 77.8 (76.2) | 0.4 | 2.3 | 19.5 | 21.8 (23.3) | `#928177` (shade) | | | | 0.032 |
+| top_sheet (0, 89) | 0.807 (0.739) | 14.2 (17.4) | 46.0 (48.2) | 22.7 | 16.8 | 39.5 (34.0) | `#D0B8A4` | | `#C5CF09` | | |
+
+- f34_lit bush tones: emerald `#234E1C` (113°), fresh `#5D8220` (83°). Yellow `#ECE51B` (`#E5DD0D`), 0.72 % of the view.
+- f34 fifths (sheet in brackets):
+  - green 16.8 / 22.9 / 22.6 / 23.2 / 14.6 (14.3 / 22.9 / 24.0 / 25.0 / 13.8);
+  - rock 18.5 / 38.3 / 25.1 / 15.7 / 2.4 (13.6 / 36.4 / 31.5 / 16.3 / 2.3);
+  - path 14.4 / 25.6 / 25.6 / 25.0 / 9.3 (8.7 / 31.9 / 25.2 / 21.4 / 12.7).
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no glow or light (spec 7): no emissive faces, no PointLight.
+
+Studio notes (Requires Manual Validation):
+- the rock stays warm beige (not lilac) and matches an adjacent M040 tile;
+- the path reads warm sand, clearly separate from the rock;
+- flat shading keeps the column facets as planes;
+- **a character walks from the ground to the landing and onto an M040 lawn without jumping or sliding** (29.9°, lips
+  ≤ 0.12, toe 0.35);
+- the borders stay yellow-lime and the flowers yellow.
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect (spec 7). There are no sockets, and `build()` fails if any exist. Collision tags: hero
+precise, path precise, wedge hull, cliffs hull, borders none (decision 13).
+
+## Modeller's notes for the verifier
+
+- **Renders** are in `art/blender/renders/models/M044/`.
+  - `M044_views.png`: the kit views; the `*_sheet` views; the six part shots; `wedge_underside`; `exploded`;
+    `plateau_f34` and `plateau_front`; `scale` with three 5.5-stud markers; and `f34_lit_sheet`.
+  - Close-ups: `junc_cu.png` (close-up 1: the turf over the tiles, the lime side, the column tips); `sect_cu.png` (the
+    toe: tile slab thickness, the turf tongue, the toe rock; there is no clip plane, so it is not a true section); and
+    `bush_cu.png`.
+- **`build()` returns** `audit`, `uv`, `materials`, `views`, `contact`, `capping`, `seams`, `walk`, `pebbles`,
+  `measure` and `problems`. `problems` is **empty** in the final fresh-session build.
+- **Known misses (recorded):**
+  1. **Light direction.** The studio key is front-left and the sheet's is front-right. So in f34_sheet and side the
+     near (+X) cliff and turf sides are in shade: the rock renders `#918076`, and the shaded lime sides count as F
+     (L 13.8 / F 18.6 against 20.6 / 11.8). G, R and P are within ±2. The mirrored `f34_lit` shows L 20.3 / F 11.6
+     and rock `#C5AB99`. Nothing is painted by facing to compensate.
+  2. **Rock median.** In f34_lit it is `#C5AB99` against `#D6B7A3` (−17 / −12 / −10). Our shade is warm; the sheet's
+     is lavender and is excluded by the h ≤ 60 mask. This is spec 5.4's "known miss ≤ 15", with R 2 over. Hue 24°,
+     R > G > B.
+  3. **Front and top.** Front R 15.7 / G 37.8 and top G 39.5 / W : D 0.807, against the sheet's 21.1 / 32.3 and
+     34.0 / 0.739. The sheet's front and top cells are strongly perspective (they taper and show the cliff faces);
+     ours are near-orthographic. Size decision 1 already predicted top W : D 0.80.
+  4. **f34 top-profile error:** mean 0.072 (target ≤ 0.05), max 0.46 at the right end. The sheet's near cliff falls
+     to its foot at the frame edge; ours ends in the apron.
+  5. **Bushes** are 1.9–2.4 across and 1.65–1.82 tall (spec 2.3–2.8 / 1.8–2.1). They are kept a little small so the
+     front and top green shares don't grow further. The emerald leaves render darker than the sheet's (`#234E1C`
+     against `#196B25`).
+  6. **No boolean union** of the cliff columns: each mass is one explicit closed solid. The turf and tiles are
+     separate shells that interpenetrate the rock and wedge by design (hidden).
+  7. Two white flowers per side and the sprigs are hero-only, so the border parts stay at 992 / 966 (≤ 1000).
+- Nothing is committed, exported or pushed. The shared helpers are untouched, and only the collection
+  `Kit/M044 Natural Ramp` in the work file was written. `m040.py` is imported read-only, for the helpers `_cdt`,
+  `_cap`, `_touch`, `_Guard`, `_hull_piece`, `_leaf`, `_tri_ngons`, `_mottle`, `_area2` and `contact_report`.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+I worked fresh and read-only in a background Blender on port 9880, using `wip/M044_verify.blend`. Nothing was built,
+saved, edited or exported. I used my own scripts for every measurement (bmesh, BVH ray casts and numpy masks per §1.1):
+`scratchpad/m044_verify/audit.py`, `contact.py`, `cap.py`, `walk.py`, `meas.py`, `hue.py`. I re-measured the sheet with
+the same masks: f34 R 36.3 / P 30.7 / L 20.5 / F 11.8, which reproduces §1.2.
+
+### Measured
+
+| Object | Tris (limit) | Size | Shells | Non-man e / bowties | Bound / wire / loose | Zero-area / n-gons | Self-x pairs | Winding errors | Origin / xform |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StoneRamp | 3574 (4000) | 17.11 × 20.22 × 12.48 | 272 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | **8 edges (the wedge's back face)** | bottom centre, applied |
+| StoneRampPath | 340 (1000) | 7.96 × 20.00 × 10.56 | 34 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | ok |
+| StoneRampWedge | 108 | 8.20 × 18.60 × 9.82 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | **8 edges: back face, 10 tris, normal −Y (inward)** | ok |
+| StoneRampCliffL / R | 332 / 332 | 3.97 × 19.96 / 19.98 × 10.40 | 2 / 2 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | ok |
+| StoneRampBorderL / R | 992 / 966 | 3.27 × 20.22 × 12.41 / 12.48 | 93 / 92 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | ok |
+
+- **Signed volume:** positive for every shell. The wedge stays positive overall despite its flipped back face.
+- **Floating dressing:** 0 shells more than 0.03 from every other shell and the ground, and 0 shells unchained from the
+  ground. This holds for the hero and for each part.
+- **Capping:**
+  - Flat cliff faces (n.z > 0.85) total 87.9 studs². None is visible from above or from any of 126 directions
+    (az every 20°, e 5–89°).
+  - Every cliff surface visible from above slopes ≥ 30°.
+  - The wedge shows nowhere from above.
+  - Visible from above, in studs²: path 147.4, turf 92.8, cliff tips 39.2, boulders 7.8, toe rocks 3.7, pebbles 0.6.
+- **Exposed tip strip (contiguous, step 0.02):** mean 1.08 (+X) and 1.03 (−X), max 1.32. About 45 % of stations are
+  over 1.1, by 0.02–0.22. The worst stretches are +X y −4.6 … −3.0 (1.2–1.3) and −X y −7.9 … −5.4 (1.1–1.24).
+- **Seams:**
+  - 0 rock verts past x ±8.0 (max |x| 7.97). Dressing reaches |x| 8.56.
+  - 0 verts behind y +10.
+  - On the back plane: wedge, cliff, landing-tile and turf faces.
+  - The landing is exactly 10.400 at 24 probes (y 7.6 … 9.98). The border tops at the back plane are 10.454–10.484.
+- **Plateau:**
+  - I probed M040: its lawn is 10.401, and its lip front sits at local y −3.14 … −3.57 (planned contact plane −3.28).
+  - The landing meets that lawn flush, with only a ±0.15 wobble of M040's own lip edge.
+  - `plateau_f34` and `plateau_front` show a continuous lawn with no step.
+- **Walk:**
+  - Slope 29.8°. The toe is 0.35 and the landing is flat.
+  - Row lips 0.083–0.123. The middle seam steps 0.015–0.022.
+  - The turf lobes step 0.30–0.38 onto the border, by design.
+  - Pebbles stand ≤ 0.25 above the tile (max 0.252). Their faces climb 0.07 per step, so they won't snag.
+- **Shares (f34_sheet (44, 12)):** R 38.3 / P 29.2 / L 13.8 / F 18.5 / G 32.3, against 36.4 / 30.6 / 20.6 / 11.8 / 32.4.
+  `f34_lit_sheet`: L 20.4, F 11.6.
+- **Hue split of the green (any value):**
+
+  | | Lime hue (< 85°) | Leaf hue | Dark lime counted as F |
+  | --- | --- | --- | --- |
+  | Sheet | 24.9 | 7.4 | 4.4 |
+  | f34_sheet | 23.6 | 8.8 | **9.8** |
+  | f34_lit | 23.3 | 8.6 | 3.0 |
+
+- **Other views (sheet in brackets):**
+  - front: R 15.7 (21.1), G 37.7 (32.4), leaf hue 11.1 (7.9);
+  - top: R 14.2 (17.4), G 39.5 (34.0), leaf hue 10.8 (7.2), W : D 0.807 (0.746);
+  - side: R 77.8 (76.2), G 21.8 (23.3).
+- **Colour (f34_lit against sheet f34):**
+  - rock warm `#C5AB99` against `#D6B7A3`: hue 24°, R > G > B, not mauve. Front `#C8B19F` (`#D2B6A5`); top `#D0B9A4`
+    (`#D7BCA9`);
+  - path `#FFC384` (`#F8BB7B`);
+  - lawn `#C5CF1A` (`#C5D006`): sat 0.87, target ≥ 0.92, B +20;
+  - foliage `#50761F` (`#43791C`);
+  - emerald `#234D1B` (`#196B25`), and emerald is 0.28 of F (sheet 0.44);
+  - fresh `#5D8220` (`#608316`);
+  - yellow `#ECE51B` (`#E5DE0D`), 0.72 % of the view (sheet 1.33 %).
+- **Colour by facing:** `K.check` reports nothing.
+  - Area-weighted luminance against n.z: rock 0.25, path 0.02, grass −0.64 (lighter sides, i.e. not baked light;
+    caused by the deep patches on the tops by bush and boulder position), leaves and flowers 0.
+  - The tile-side band is chosen by each face's vertices against the tile's own top and bottom planes
+    (`_paint_tile.lab`): geometric, not by normal.
+  - Tint mottling: a corner attribute, 0.93–1.09, sd 0.026.
+- **Lighting and VFX:** no emissive material, no children or sockets, no lights. Collision: hero and path precise,
+  wedge and cliffs hull, borders none. Names are `StoneRamp*` and keys `m044_*`.
+
+### On the modeller's lighting claim (lawn 13.8 / foliage 18.6)
+
+**Confirmed: this is lighting, not geometry.**
+- The green total is the same in both renders (32.3 against 32.0), and the lime-hue area matches the sheet (23.6 /
+  23.3 against 24.9).
+- The whole L→F shift is shaded lime counted as F because of its value: 9.8 % in f34_sheet against 3.0 % lit and 4.4 %
+  on the sheet.
+- Leaf area is only slightly high at the f34 (8.8 against 7.4), so the bushes are not too large or too many there.
+- Ruling: the f34 rock, path and green shares pass (R +1.9, P −1.4, G −0.1, and with sheet light L −0.2, F −0.2). The
+  rock and path fifths are within ±7.
+- The front and top views do carry ~3.5 points more leaf-hue area than the sheet. That is the flat star rosettes
+  spreading wide seen from above (B2), not the bush count.
+
+### Findings
+
+**B1. Blocker: broken mesh (wedge back face winding).**
+- `StoneRampWedge`'s back face on the back plane (10 tris) faces −Y, into the solid, and its 8 rim edges are
+  inconsistently wound. The hero carries the same shell.
+- Roblox culls it, so a stand-alone run end (§2.1) shows a see-through hole into the wedge. Stage 2's "normals outward"
+  missed this because the total signed volume stays positive.
+- **Fix:** reverse the back-face winding in `wedge()` (or `recalc_face_normals` on the whole shell after the back fan is
+  added). Target: 0 winding errors, and a parity ray test shows 0 inward faces.
+
+**B2. Blocker: spiky star bushes (decision 11; spec §9.3; STAGES "rounded clumps").**
+- `_round_leaf` is a 4-point kite or diamond outline (stem, two side points at 0.66 L, tip), and §9.3 bans kite and
+  diamond outlines. It is folded up along |y|.
+- The 4 skirt leaves splay at 14°, and their points radiate.
+- In `f34_sheet`, `front_sheet`, `junc_cu`, `bush_cu` and `plateau_front`, every bush reads as a dark agave or star
+  rosette with pointed tips. The sheet (f34 cell, close-up 1) draws puffy round domes of broad round-tipped leaves on a
+  visible short trunk.
+- They are also darker and duller than the sheet: emerald `#234D1B` against `#196B25`, emerald only 0.28 of F against
+  0.44.
+- **Fix targets:**
+  - leaves with a rounded tip of ≥ 3 tip verts (e.g. a 6-point outline: stem, two shoulders, three tip points), W/L ≥
+    0.8, no fold spike;
+  - the skirt pitched ≥ 25° and its tips tucked toward the heart, so the outline is a dome;
+  - Ø 2.3–2.6 and 1.8–2.0 tall, per §1.4;
+  - lift `leaf_deep` toward rendered `#196B25`.
+  - Keep the borders ≤ 1000: drop to 9 leaves a bush or tag another white flower hero-only.
+  - Re-check: front and top leaf-hue area within +2 of the sheet, and 0 floating shells.
+
+**B3. Blocker, small: tiles not bevelled (decision 4, §2.2).**
+- The tiles are plain slabs. The decision asked for bevelled tiles, with a 0.08 top-edge bevel so the seams read.
+- As built, the middle seam is a 0.015–0.022 height step that barely shows in any view. The sheet's "2 across, the seam
+  jogging" (f34, exploded, top) is lost, and the path reads as 6 full-width planks.
+- **Fix:** a 0.06–0.08 bevel ring on each tile's top edge (it takes the `path_deep` band by place), ~+8 tris a tile
+  (path ≈ 450). The middle seam must be legible in `f34_sheet` and `top_sheet`.
+
+**B4. Blocker, small: exposed tip strip over 1.1 (decision 6).**
+- The strip averages 1.03–1.08, but peaks at 1.32. It is over 1.1 on ~45 % of the length (worst: +X y −4.6 … −3.0;
+  −X y −7.9 … −5.4).
+- **Fix:** bring the turf's outer edge out to ~6.75 at the column tips (or pull those columns' outer faces in 0.2), so
+  the contiguous visible roof strip is ≤ 1.1 everywhere. No flat top is exposed today; keep it that way.
+
+**m1. Minor: lawn saturation.** The rendered lawn `#C5CF1A` has sat 0.87 and B 26, against the sheet's `#C5D006` (sat
+0.97). Lower the blue in `m044_grass` and `grass_light` (target rendered B ≤ 12, sat ≥ 0.92).
+
+**m2. Minor: rock warm median.** The rock warm median is `#C5AB99`, against `#D6B7A3` (R −17). It is a recorded known
+miss of the warm studio shade, and the hue and family are right. Optional: +6 on `m044_rock`.
+
+**m3. Minor: front and top shares.** Front R 15.7 / G 37.7 and top G 39.5 miss the §2.5 bands, by 1–1.5 points beyond
+tolerance. Part of this is the sheet's perspective and part is B2's wide rosettes. Re-measure after B2.
+
+**m4. Minor: yellow flowers.** They are 0.72 % against 1.33 %, and they are flat pentagon chips. Optional: Ø 0.65–0.7,
+or 2 more per border on the hero.
+
+**m5. Minor: pebbles.** They render as tiny grey specks. The sheet's are pale beige blobs, 2–2.7 % of the path area. Use
+60 % `rock_light` on the crowns, a few at 0.5–0.6 Ø.
+
+**m6. Minor: column creases.** The cliffs read as stepped tall-strip columns (not organ pipes; tops peaked). The
+creases, at 0.35, are shallower than the sheet's separate pillars. Optional: 0.45–0.5 on C2–C5.
+
+**m7. Accepted.** These were checked and pass:
+- the cliffs as hand-built closed solids: manifold, no interior faces, no self-intersection, no boolean risk;
+- the turf drape and scallop (not a table top);
+- boulders (rounded-angular, not eggs);
+- the wedge underside;
+- the plateau join;
+- the scale shot;
+- stages 5 and 6 skipped and recorded.
+
+### Decisions check
+
+| Decision | Status |
+| --- | --- |
+| 1, 2, 3, 5, 7, 8, 9, 10, 12, 13, 14, 15 | Followed. |
+| 4 | **Missed:** no tile bevel (B3). |
+| 6 | **Exceeded:** strip up to 1.32 (B4). |
+| 11 | **Missed:** spiky bushes (B2). The tile-side band, rock, path and lawn families are fine. |
+
+### Score and verdict
+
+**6/10. FAIL.** Fix B1–B4 and recheck m1 and m3.
+- B1 and B4 are quick builder fixes. B3 is a small geometry change.
+- B2 (the bush leaf shape and dome) is the one that changes how the model reads.
+- Everything else is solid: budget, manifold shells, zero floating dressing, capping, seams, plateau, walkability, f34
+  shares and the rock colour family.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+A fresh fix modeller worked in a background Blender on port 9877, on the work file `wip/M044.blend`. All changes are in
+`art/blender/kit/mcp/m044.py`. The shared helpers are untouched. `m040` is imported read-only, and the `m043` dome
+approach was ported rather than imported. The final `build()` ran in a freshly restarted session with `problems`
+**empty**, and the work file was saved.
+
+### Changes
+
+**B1, wedge back face**
+- **Cause.** The back fan's two Steiner verts were missing from the shell's vert list. `_faces(vs)` only returns faces
+  whose verts are all in that list. Every back triangle touches a Steiner vert, so `recalc_face_normals` and the
+  material pass both skipped them, and they stayed wound inward.
+- **Fix.** `wedge()` now adds the Steiner verts to the shell.
+- **New check.**
+  - `shells_report` counts `winding_errors` per shell: a manifold edge that both of its faces run in the same direction.
+  - `build()` lists any non-zero count as a problem.
+  - `build()["winding"]` sums the counts per object.
+
+**B2, round dome bushes** (`_dleaf`, `dome_bush`, `DOME_TIERS`; the m043 approach)
+- **Leaf.** A six-point outline:
+  - the stem;
+  - two shoulders, widest at 0.38 L;
+  - a three-point rounded tip: two points at 0.85 L, ±0.3 W, and the tip at L.
+
+  The tip corner is 122° and the tip-side corners are about 140°. W/L is 0.90–0.92. The sides are cupped, the tip curls
+  toward the heart, there is a raised midrib point, and the underside is 4 tris. 10 tris, closed.
+- **Bush.**
+  - A hidden faceted heart dome (`m040._dome_heart`, n = 3, 12 tris) on a short brown trunk.
+  - Nine leaves laid tangent on the dome:
+    - 3 fresh crown leaves at 22°;
+    - 3 mid leaves at 62°, one of them emerald;
+    - 3 emerald skirt leaves at 92°. These droop down the sides, curl in, and are tilted 45–68° out of horizontal.
+- **On the slope.**
+  - The dome sits on the lowest ground within 0.4 R of its root.
+  - A skirt leaf that hangs more than 0.15 above the turf walks down the dome.
+  - A leaf that cuts the turf, a cliff tip or a boulder climbs the dome, by up to 30°.
+  - A leaf still in rock after that is dropped (`_rock_depth`). R3, L1 and L6 keep 8 leaves; the rest keep 9.
+  - As a result every leaf touches its heart. This is also why the border parts now have 0 floating shells: a guard
+    push used to leave a leaf touching only the rock.
+- **Sizes.**
+  - `BUSHES`: R 1.38–1.43, H 2.04–2.08.
+  - x 5.6 → 5.5.
+  - L1 moved from (−5.5, −7.8) to (−5.4, −7.4), clear of the toe boulder.
+- **Colour.**
+  - Crown: `leaf_lit` at 70 %. Mid: `leaf`. Skirt, heart and one mid leaf: `leaf_deep`.
+  - `m044_leaf_lit` `#689634` → **`#7A9C24`**. The fresh tone now renders at 77–80°, like the sheet's `#608316`
+    (79°), instead of 86°.
+  - `m044_leaf_deep` `#175D21` → **`#145F28`**.
+  - These leaf keys were set by measuring renders, not by a new `K.calibrate` run.
+- **Check.** `build()` lists any skirt leaf flatter than `SKIRT_MIN_TILT` (25°) as a problem.
+
+**B3, tile bevel**
+- **Geometry.** Every tile top is inset by `BEVEL` (0.07), with a 45° ring down to the slab outline. The sides run down
+  from the ring. On row 1 the ring gives the toe lip its 45° chamfer.
+- **Colour.** The ring is 50 % `path_deep`, and the sides below it are 100 %. Both are picked by place within the tile
+  (the `_paint_tile` labels), never by normal.
+- **Thin-corner exemption.** Each ring side is a planar strip 0.1 wide and up to 4 long, so its two triangles have
+  corners of about 1.5° by shape. `_thin()` leaves the ring's 112 faces out of the 5° corner check, as recorded here.
+  Every other face is ≥ 5.18°.
+- **Landing probe.** `seam_report`'s landing probe now reads the top plane, not the bevel ring.
+
+**B4, tip strip**
+- **Ridge.** Moved outward: `X_FLAT` 6.35 → 6.70 and `X_RIDGE` 6.65 → 6.95. The roof facets now fall 0.85 over about
+  0.8, which is about 47°.
+- **Apex and hips.**
+  - `APEX_UP` 0.35 → 0.25, inside the spec's 0–0.3.
+  - `HIPS` 0.8 → 0.7. This keeps a riser step of 0.2 or more and avoids needle faces.
+  - The ridge at the R station now stands 0.12 proud instead of 0.15 (`RIDGE_OUT`).
+- **Near-flat band face.** The draped top's outer edge now stays at least 0.35 below the ridge, so the ridge band is
+  never near-flat at a hip. Until this was added, a 0.06 studs² near-flat band face poked through the turf.
+- **Turf outer edge.** `TURF_EDGE` (6.52, 6.82) → **(6.82, 6.95)**; at the toe, 6.6 → 6.85.
+- **New `tip_strip_report()`.**
+  - Casts downward rays every 0.05 in y and 0.02 in x, and measures the outermost contiguous run of cliff hits.
+  - On the round-1 model it reproduced the verifier's 1.32.
+  - `build()` lists any side over 1.1 as a problem.
+
+**Minors**
+- **m1, lawn.** The grass keys' blue is now 0: `#9DA800` / `#B1B900` / `#8A9A00`.
+- **m4, yellow flowers.**
+  - Ø 0.64–0.76, from r = 0.32 + 0.03 × (i mod 3); the old range was 0.56–0.72. Apron flowers use r 0.33.
+  - Two more per border and one more per apron: 9 + 9 + 4 + 4 = 26, up from 20.
+  - Each border part carries 3 yellow flowers a side (`YELLOW_PART`) and no white ones. The rest are hero-only, for
+    budget.
+- **m5, pebbles.**
+  - 16 squat four-sided blobs, 0.36–0.58 across. Before: 20 three-sided ones, 0.26–0.5.
+  - Each has a broad crown (0.42 of its size) in `rock_light`, assigned by place (the crown cap). Sides are 60 % light.
+  - Height ≤ 0.2. Two still have a darker −x half.
+- **m6, creases.** `CREASE_D` 0.35 → 0.45.
+
+**Budget trims**
+- Apron sprigs 3 → 2 a side.
+- Apron stations 13 → 11.
+- Heart dome 16 → 12 tris.
+
+### Before → after (round-1 verifier numbers → this build; sheet or target in brackets)
+
+| Check | Before | After |
+| --- | --- | --- |
+| Winding errors (hero / wedge / every other object) | 8 / 8 / 0 | **0 / 0 / 0**; parity ray test: 0 inward faces on the wedge and both cliffs |
+| Non-manifold edges and verts, boundary, wire, loose, zero-area, n-gons, duplicates, self-hits | all 0 | all 0, on every object and every shell |
+| Floating / unchained shells (hero, path, borders) | 0 / 0 | **0 / 0**, the border parts included |
+| Hero tris (4000) | 3574 | **3868** |
+| Parts: Path / Wedge / CliffL / CliffR / BorderL / BorderR (1000) | 340 / 108 / 332 / 332 / 992 / 966 | **484** / 108 / 332 / 332 / **976 / 960** |
+| Hero bbox (17.2 × 20.4 × 12.5) | 17.11 × 20.22 × 12.48 | 17.11 × 20.22 × 12.54 |
+| Shells (hero) | 272 | 259 (rock 26, tiles 14, turf 4, trunks 12, leaves + hearts 141, flowers 62) |
+| B2 leaf outline | 4-point kite, 1 tip vert | **6-point, 3 tip verts**, tip 122°, W/L 0.90–0.92 |
+| B2 skirt tilt (≥ 25°) | 14° splay | **44.8–67.7°** |
+| B2 bush size (Ø 2.3–2.6 × 1.8–2.0) | 1.9–2.4 × 1.65–1.82 | **2.14–2.44 (largest extent 2.24–2.44) × 1.84–1.87** |
+| B2 emerald, f34_lit (`#196B25`) | `#234D1B` | **`#196E28`** |
+| B2 emerald share of F, f34_lit (0.44) | 0.28 | **0.51** (f34_sheet 0.32) |
+| B2 leaf-hue area, f34_lit / front / top (sheet 7.4 / 7.9 / 7.2; allowed +2) | 8.6 / 11.1 / 10.8 | **8.6** / 12.3 / **5.0** |
+| B3 tile bevel (0.06–0.08) | none | **0.07**, 45° ring; the middle seam and row seams read in the f34, top and part shots |
+| B3 path tris (about 450) | 340 | **484** (tiles 292, pebbles 192) |
+| B4 tip strip max, R / L (≤ 1.1) | 1.32 / 1.32 | **1.04 / 1.06**; mean 0.76 / 0.76; 0 % of stations over 1.1 |
+| Flat column top exposed (from above and from every sheet camera) | 0 | **0** |
+| Rock seen from above (≤ 60 studs²) | 51.5 | **41.8** (cliff tips 30.0; boulders, pebbles and toe rocks 11.8; wedge 0) |
+| From above: tiles / turf / leaves / flowers (studs²) | 147.5 / 79.5 / 36.3 / 4.1 | 146.9 / 80.6 / 43.5 / 6.2 |
+| m1 lawn, f34_lit (`#C5D006`; B ≤ 12, sat ≥ 0.92) | `#C5CF1A` (verifier) / `#C4CE0D` (builder mask) | **`#C4CD0A`**, B 10, sat 0.95 |
+| m4 yellow, f34_lit / f34_sheet / top (%; sheet 1.3 / – / 0.92) | 0.72 / – / – | **1.00** / 0.75 / 1.47 |
+| m5 pebbles | 20 grey specks, ≤ 0.212 tall | **16** pale blobs, ≤ 0.195 tall |
+| m6 creases | 0.35 | **0.45** |
+| Walk: slope, max row lip, toe, landing | 29.87°, 0.118, 0.35, 10.4 | unchanged: 29.87°, 0.118, 0.35, landing 10.400 / 10.400 |
+| Seams: rock verts past ±8, verts behind y +10, overhang | 0 / 0 / 0.56 | 0 / 0 / 0.56; back plane: rock 24, tile 8, turf 10 verts; turf ends 9.77–10.49 |
+| UV (every object) | 0 overlaps, 0 flipped | 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0, stretch p95 ≤ 1.018 |
+| `K.check` / baked shading | none / ≤ 0.02 | **none / 0.0** on every object |
+| Smallest corner (bevel ring excluded) | 5.18° | 5.18° |
+
+**Shares** (the study's masks; sheet in brackets):
+
+| View | W : H | R | P | L | F | G | Leaf hue | Yellow |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (44, 12) | 1.434 (1.456) | 36.3 (36.4) | 29.0 (30.6) | 13.6 (20.6) | 21.0 (11.8) | **34.6** (32.4) | 8.9 | 0.75 |
+| f34_lit (mirrored) | 1.442 | **36.5** | **29.0** | **21.8** | **12.6** | **34.4** | **8.6** (7.4) | 1.00 (1.3) |
+| front_sheet (0, 6) | 1.263 (1.294) | 13.0 (21.1) | 45.4 (46.0) | 21.2 | 20.0 | 41.2 (32.3) | 12.3 (7.9) | 0.71 |
+| side_sheet (90, 4) | 1.582 (1.612) | 76.2 (76.2) | 0.5 | 2.4 | 20.8 | 23.2 (23.3) | 9.0 | |
+| top_sheet (0, 89) | 0.807 (0.739) | 11.2 (17.4) | 45.8 (48.2) | 27.4 | 15.4 | 42.8 (34.0) | 5.0 (7.2) | 1.47 (0.92) |
+
+- **f34 fifths:**
+  - green 16.5 / 22.2 / 23.2 / 22.9 / 15.1;
+  - path 14.3 / 25.9 / 25.9 / 24.6 / 9.1;
+  - rock 18.4 / 39.1 / 25.5 / 15.2 / 1.9.
+
+  All are within ±7 of §1.2. The f34 top-profile error is a mean of 0.075 and a max of 0.46, the same known miss as
+  before.
+- **Colours, f34_lit (sheet in brackets):**
+  - rock warm `#C4AA98` (`#D6B7A3`; m2, unchanged);
+  - path `#FEC383` (`#F8BB7B`);
+  - foliage `#347220` (`#43791C`);
+  - fresh `#5A7D17` (`#608316`);
+  - yellow `#EDE51B` (`#E5DD0D`).
+- **Renders against the sheet.** These were compared with the Read tool: `f34_sheet`, `f34_lit_sheet`, `front_sheet`,
+  `top_sheet`, `side_sheet`, `rear_sheet`, `junc_cu`, `bush_cu`, `exploded` and `part_path`.
+  - The bushes read as rounded leafy domes sitting on the turf, with dark emerald skirts and fresh crowns. From above
+    they are rosettes with a dark heart.
+  - The path reads as 2 tiles across, with a jogging middle seam and 6 + 1 rows.
+  - The pale column tips stand beside the turf in a thin strip.
+  - The rear view shows the wedge back filled, with no hole.
+
+### Left over (for the verifier and the main session)
+
+1. **m3: the front and top shares still miss §2.5, by more than in round 1.**
+   - Front: R 13.0 / G 41.2, against 21.1 / 32.3.
+   - Top: R 11.2 / G 42.8, against 17.4 / 34.0.
+   - Causes:
+     - the sheet's front and top cells are strong perspective views that show the cliff faces;
+     - B2's dome size (Ø 2.3–2.6) adds green;
+     - B4's ≤ 1.1 tip strip cuts the rock seen from above.
+   - The binding f34 shares pass. In f34_lit: R +0.1, P −1.6, L +1.2, F +0.8, G +2.0.
+2. **Front leaf-hue area: 12.3, against the sheet's 7.9 (up to 9.9 allowed).** The orthographic front view stacks all
+   six bushes on each side; the sheet's perspective shows 3–4. f34 and top are within the target.
+3. **Yellow: 1.0 % in f34_lit, against 1.3 %.** The flat flowers on the 30° turf look shorter from our lower camera
+   (e 12; the sheet's is about e 23). In the top view they reach 1.47 %, against the sheet's 0.92 %.
+4. **Emerald share: 0.51 in f34_lit and 0.32 in f34_sheet.** The two views bracket the 0.44 target.
+5. **Bevel-ring strips** are left out of the 5° corner check (see B3).
+6. **m2**, the rock warm median (`#C4AA98` against `#D6B7A3`), is unchanged; it was optional.
+7. **Three bushes have 8 leaves** (R3, L1, L6), because a ninth leaf would cut a boulder or a column tip.
+
+Nothing is committed, pushed or exported. Only the `Kit/M044 Natural Ramp` collection in `wip/M044.blend` was written.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+I worked fresh and read-only in a background Blender on port 9877, using `wip/M044_verify.blend`. The file was not
+saved, and its timestamp is unchanged. Nothing was built, edited or exported.
+
+Every number below comes from my own scripts (bmesh, BVH ray casts, and numpy masks per the study's `cls()` rules) in
+`scratchpad/m044_verify2/`: `audit.py`, `parity.py`, `fold.py`, `contact.py`, `cap.py`, `walk.py`, `seam.py`, `bush.py`,
+`colour.py`, `render.py` / `render2.py`, `meas.py` and `fifths.py`. Renders are in `scratchpad/m044_verify2/r/`.
+
+Re-measuring the sheet with the same masks gives f34 R 37.1 / P 30.3 / L 20.3 / F 11.7, which reproduces §1.2 within
+0.7.
+
+### Measured
+
+| Object | Tris (limit) | Size | Shells | Non-man e / bowties | Bound / wire / loose | Zero-area / n-gons | Self-x pairs (non-adjacent) | Winding errors | Parity-inward faces | Min corner | Origin / xform |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StoneRamp | 3868 (4000) | 17.11 × 20.22 × 12.54 | 259 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | **0** | 13 (crown-leaf tips, m1) | 1.05° (bevel ring only) | bottom centre, applied, no modifiers, flat, no custom normals |
+| StoneRampPath | 484 (1000) | 7.96 × 20.00 × 10.54 | 30 (14 tiles, 16 pebbles) | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 1.05° (bevel ring only) | ok |
+| StoneRampWedge | 108 | 8.20 × 18.60 × 9.82 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | **0** | **0** | 5.18° | ok |
+| StoneRampCliffL / R | 332 / 332 | 3.96 / 3.95 × 19.96 / 19.98 × 10.40 | 2 / 2 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 5.53° / 5.98° | ok |
+| StoneRampBorderL / R | 976 / 960 | 3.40 × 20.22 × 12.51 / 12.54 | 74 / 74 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 7 / 6 (crown-leaf tips) | 9.05° / 8.55° | ok |
+
+**Mesh**
+- Every shell has positive signed volume.
+- The only faces under 5° are the 112 bevel-ring faces (`m044_path_x_deep_50`). Nothing else in any object is under 5°.
+
+**Floating dressing.** I used my own shell graph at 0.03, testing each shell's verts, edge midpoints and face centres,
+plus BVH overlap.
+- Hero: 259 shells, **0 floating, 0 unchained**; the largest contact gap is 0.01.
+- Path, both borders and both cliffs: 0 floating, 0 unchained.
+
+**B1, the wedge back**
+- The wedge has 0 winding errors and 0 parity-inward faces.
+- Every face on the back plane faces +Y: rock 20, tile 4, turf 6. None faces inward.
+- `backhigh` (180, 30) and `back_cu` (160, 20) show the back filled.
+
+**B4, the tip strip.** I cast downward rays every 0.05 in y and 0.02 in x, and took the outermost contiguous run of
+cliff hits.
+- R: max **1.04**, mean 0.76. L: max **1.06**, mean 0.76.
+- **0 %** of stations are over 1.1. The worst are R y 3.2–3.35 at x 6.90–7.92, and L y 0–0.2 at x 6.90–7.94.
+- With the plants removed from the ray tree, the results are identical.
+- Flat cliff faces (n.z > 0.85) total 95.4 studs². **None is exposed** from straight above or from 108 directions (az
+  every 20°, e 5–89°).
+- The flattest cliff face visible from above slopes 42.9°, so no draped top shows anywhere.
+- Seen from above, in studs²: tiles 146.9, turf 80.6, leaves 43.5, flowers 6.2, cliff tips 30.0, boulders, pebbles and
+  toe rocks 11.8, wedge 0.
+
+**B3, the tiles**
+- Every tile has a 0.07 bevel ring.
+- The path reads as 2 across × 6 + 1 rows, with a jogging middle seam and visible row seams, in `f34_sheet`,
+  `top_sheet`, `tiles_cu` and `front_sheet`.
+- The ring and sides are labelled by each vertex's place against the tile's own top and bottom planes
+  (`_paint_tile.lab`), never by normal.
+
+**B2, the bushes.** Measured on the R side; L mirrors it.
+- Ø 2.14–2.48. The narrowest is 1.82, on R3 (8 leaves).
+- Heart to top: 1.92–2.08.
+- 9 leaves a bush; R3 and its L equivalents have 8.
+- `bush_cu`, `bush_top` and `junc_cu` show puffy rounded domes of broad round-tipped leaves, an emerald skirt and a fresh
+  crown, and from above rosettes with a dark heart. No star points.
+- Emerald in f34_lit: **`#186E28`** (sheet `#196B25`).
+
+**Seams**
+- Rock reaches |x| 7.96 at most (limit 8.0). Dressing reaches |x| 8.56.
+- Max y is 10.000, so nothing lies behind the back plane.
+- Min y is −10.22: the rounded turf tongue, inside the 0.4 toe allowance.
+- The landing tiles' tops are at 10.400 (the ring at 10.33). The turf at the back plane is 9.77–10.49.
+
+**Plateau**
+- M040's lawn is 10.401–10.55, and its lip front sits at local y −3.12 … −3.54.
+- In `plateau_f34` and `plateau_side`, the landing and both border ends meet M040's lawn flush and the sides sit on its
+  seams. There is no gap or step.
+
+**Walk.** I cast rays every 0.005 along 8 lines, against the tiles only.
+- Slope **29.87°**.
+- The largest up-step between tiles is **0.112**, a row lip (limit 0.12).
+- Across the middle seam, steps are ≤ 0.007 with the bevel.
+- There is no gap anywhere (0 ray misses).
+- The toe is 0.35 with its 45° chamfer (0.295 at y −10.0).
+- The landing is flat at 10.400.
+- Pebbles stand at most **0.195** above the tile.
+- The only larger step is the 0.30–0.38 turf lobe onto the border, which is by design (decision 5).
+
+**f34 shares** (`f34_sheet` (44, 12); sheet in brackets)
+- R 36.3 (36.4), P 29.0 (30.6), L 13.2 (20.6), F 21.4 (11.8), **G 34.6** (32.4), D 0.2.
+- `f34_lit`: L **21.4** (20.6), F **12.9** (11.8).
+- All are within ±4.
+- Fifths, all within ±7 of the sheet:
+  - green 16.7 / 22.0 / 23.3 / 22.9 / 15.0;
+  - path 14.6 / 26.0 / 25.9 / 24.6 / 9.0;
+  - rock 18.5 / 39.3 / 25.4 / 15.2 / 1.6.
+- W : H 1.434 (1.456).
+
+**Other views** (sheet in brackets)
+- Front: R 12.7 (21.1), P 45.6 (46.0), G 41.2 (32.3), leaf hue 12.6 (7.9).
+- Top: R 11.3 (17.4), P 45.8 (48.2), G 42.5 (34.0), lime hue 37.4 (26.4), leaf hue **5.1** (7.1), W : D 0.807.
+- Side: R 76.1 (76.2), G 23.3 (23.3).
+
+### The front and top trade-off: perspective, or bushes too big or too many?
+
+**It is mostly the camera and the size and strip decisions, not the bushes.**
+- **Top.**
+  - The leaf-hue area is *below* the sheet (5.1 against 7.1), so the bushes are not too big or too many in plan.
+  - The green excess is lime lawn (37.4 against 26.4), and the rock is short by 6.
+  - That comes from decision 6's ≤ 1.1 tip strip, set against the sheet's perspective top cell, which also shows the
+    cliff faces. Decision 1's flat 3.2-wide borders add to it.
+- **Front.**
+  - The leaf-hue excess falls steadily as the camera rises: 12.6 at e 6, 10.5 at e 15, **8.9** at e 25. The sheet's is
+    7.9, so at e 25 it is within +2.
+  - At e 6 our long lens sees all six bushes a side stacked in profile. The sheet's perspective front cell shows 3–4.
+  - The bush sizes are inside the round-1 target.
+  - G stays near 41 at every elevation because lawn replaces the leaves as the camera rises. That has the same cause as
+    the top: the strip and border width.
+- **Ruling:** a recorded miss, not a blocker. The binding f34 shares pass.
+
+### Colour
+
+Ours is the f34_lit render and the sheet is its f34 cell, unless stated.
+
+| Region | Ours | Sheet | Note |
+| --- | --- | --- | --- |
+| Rock warm | `#C4AA98` (hue 24.8°) | `#D6B7A3` | R > G > B. No pixel in any of our views has B > G; on the sheet 30–52 % do, from its lavender shade. Front `#CAB19E` (sheet `#D1B6A5`, within 10). Top `#C5AF9F` (sheet `#D7BCAA`) |
+| Path | `#FFC383` (31°, sat 0.49) | `#F8BB7B` | Within 12. Warm sand, clearly distinct from the rock |
+| Lawn | `#C4CE0A` (B 10, sat 0.95) | `#C5D006` | Round 1's m1 is fixed |
+| Foliage (all F) | `#2E7220` (110°) | `#43791C` (95°) | Emerald is 0.51 of F (sheet 0.44) |
+| Emerald / fresh | `#186E28` / `#5B7E16` | `#196B25` / `#608316` | Both within 6 |
+| Yellow flowers | `#EFE71B` (58°), 0.98 % | `#E5DD0D`, 1.35 % | |
+| Trunk | Barely visible (D 0–0.5 %) | 0.7 % | Decision 11 asks for little trunk |
+
+- **Keys.**
+  - `m044_rock` `#A7968D` and `rock_light` `#B7A9A1` are R > G > B, at hue 21–22°.
+  - Their R − B is only 22–26 in the key. Spec 5.4 targets the rendered colour, though, and the rendered rock has
+    R − B 44.
+- **`K.check`:** no problems.
+  - Area-weighted key luminance against n.z: rock 0.20 (0.20 on the visible cliff faces), path −0.02, leaves 0.
+  - Grass is −0.68, meaning its sides are lighter than its tops. That is the opposite of baked light: the deep patches
+    near bush roots and boulders sit on the tops.
+- **Tint.**
+  - One corner layer, ranging 0.93–1.09, with sd 0.017–0.028 per family.
+  - Neighbouring faces differ by 0.010 on average (p90 0.024), against a range of 0.16.
+  - So the mottling is broad, per facet or per region, not confetti.
+- **Finish.**
+  - Roughness: rock and path 0.9, grass and leaves 0.85, flowers 0.8, trunk 0.95.
+  - Metal 0 and emission 0 throughout. No lights, children or sockets.
+
+### Findings
+
+No blockers.
+
+**m1. Minor: crown-leaf tip folds.**
+- In 13 of the hero's crown leaves (`m044_leaf_x_lit_70`), the underside's tip triangle (across the three tip points)
+  lies up to 0.059 above the cupped top fan.
+- That gives 26 fold edges. At each one, the two faces are more than 150° apart and each opposite vertex lies in front
+  of the other face. The same 13 faces fail a 9-ray parity test.
+- Winding is consistent (0 errors), the shells are closed, and the folds are hidden under the crown, so there is no
+  see-through hole. Strictly, it is still a self-overlap between adjacent faces.
+- **Fix target:** in `_dleaf`, split the underside's tip triangle with a vertex under the midrib point, or reduce `curl`
+  / `cup` at the tip, so that 0 edges fold.
+
+**m2. Minor, recorded: front and top shares.**
+- Front R −8.4 / G +8.9; top R −6.1 / G +8.5 (see the trade-off section above).
+- The cause is the camera plus decisions 1 and 6. No fix, unless the main session decides to widen the tip strip.
+
+**m3. Minor, known since round 1: rock warm median.**
+- R is 18 below the sheet in f34_lit and in the top view, beyond spec 5.4's allowed known miss of ≤ 15. The front is
+  within 10.
+- **Optional fix:** about +6 on `m044_rock` / `rock_light`, keeping the hue at 19–22°.
+
+**m4. Minor: foliage median.**
+- `#2E7220` against `#43791C`: R is 21 low, and the hue is 110° against 95°.
+- The cause is the emerald share, 0.51 of F against 0.44. Each tone matches on its own.
+- **Optional fix:** turn each bush's one emerald mid leaf to `m044_leaf`.
+
+**m5. Minor: yellow flowers.** They cover 0.98 % in f34_lit against the sheet's 1.35 %.
+- **Optional fix:** 1–2 more on the hero's near border.
+
+**m6. Minor: pebbles.** In `f34_sheet` they still read as small pale squares, smaller than the sheet's blobs.
+- **Optional fix:** the 4–5 largest at 0.6–0.7.
+
+**m7. Minor, accepted: bevel-ring slivers.**
+- The 112 ring faces are planar strips with corners down to 1.05°.
+- They are planar, have nonzero area and are flat-shaded, so they cause no shading or collision artefact.
+- Splitting them would cost tris for no visible gain, so leaving them out of the 5° check is justified.
+
+**m8. Minor: the tip colour is picked partly by normal.**
+- In `_paint_cliff`, the 50 % `rock_light` tip band picks the roof and hip facets by `f.normal.z > 0.3`, inside a
+  position band.
+- The contrast with the upper outer faces next to them is about 10 % of a mix: 50 % light against up to 40 %.
+- The facing correlation is 0.20, and `K.check` is clean.
+- **Fix target, next time the builder is touched:** pick the roof facets by vertex position instead, as every vertex
+  above the outer face's top ring.
+
+**Accepted (checked and passing):**
+- B1, B2, B3 and B4 are all fixed.
+- The budget, manifold shells, 0 bowties and 0 floating shells.
+- Capping, the seam contract and the plateau join with M040.
+- The walk test, and the f34 shares and fifths.
+- The cliff palisade read (stepped tall-strip columns with peaked tips) and the parts layout (exploded).
+- Stages 5 and 6, skipped and recorded, and the collision tags as decided.
+
+### Decisions check
+
+| Decision | Status |
+| --- | --- |
+| 1 Size | Followed: rock x ±7.96, 20 L, 29.87°, landing 2.5 at 10.4. |
+| 2 Width | Followed: constant. |
+| 3 Back | Followed: flat, every face +Y, relief inward. |
+| 4 Tiles | Followed: 2 × 7, 0.07 bevel, lips ≤ 0.112, toe 0.35 chamfered. |
+| 5 Borders | Followed: +0.3, overlapping, lime sides, draped. |
+| 6 Column tops | Followed: strip ≤ 1.06, 0 flat exposed, turf inboard. |
+| 7 Packaging | Followed: hero + 6 parts, closed shells, 0 bowties, 0 floating. The cliffs are explicit solids, not unions (accepted in round 1). |
+| 8 Placement | Followed: flush with M040 at 10.4. |
+| 9 Cameras | Followed: probed; f34 (44, 12) governs (accepted in round 1). |
+| 10 Builder | Followed: `RISE` / `RUN` constants. |
+| 11 Colour | Followed: tile sides by place, warm rock R > G > B, path, lawn, rounded two-tone domes, flowers, trunks. |
+| 12 Lighting and VFX | Followed: both skipped and recorded; no emission, no sockets. |
+| 13 Collision | Followed: hero and path precise, wedge and cliffs hull, borders none. |
+| 14 Budget | Followed: 3868 / 4000; parts 484 / 108 / 332 / 332 / 976 / 960. |
+| 15 Names | Followed: `StoneRamp*`, `m044_*`. |
+
+### Score and verdict
+
+**8/10. PASS.**
+- All four round-1 blockers are fixed, and I re-measured each one independently.
+- Nothing is broken:
+  - 0 winding errors, 0 non-manifold elements and 0 floating shells;
+  - the budget is met;
+  - no flat column top is exposed, and the tip strip is ≤ 1.06;
+  - the seams and the plateau join are flush;
+  - the path is walkable.
+- The defining read matches the sheet: a sand-tile ramp at 30° between lime borders of round two-tone bushes, on stepped
+  pale columnar rock.
+- The leftovers, m1–m8, are minor. m1, the hidden crown-tip folds, is the one geometric item worth fixing the next time
+  the builder is opened.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 2 (8/10) and committed. Round 1 failed at 6/10 on four blockers: an inward wedge face, star bushes, unbevelled tiles and a wide tip strip.
+- **Must fix in the polish pass (rule):** `_paint_cliff` picks its lighter roof facets partly by `f.normal.z > 0.3`. That is colour by facing, even at a 10 % mix (correlation 0.20). Pick those facets by vertex position instead.
+- **Left for later polish:**
+  - Crown-leaf tip folds: 13 leaves, hidden. Split the underside tip, or reduce curl and cup.
+  - Front and top shares are off because of camera perspective. Recorded, not a defect.
+  - The rock median is R −18.
+  - Emerald is 0.51 of the foliage against the sheet's 0.44.
+  - There are few yellow flowers.
+  - The pebbles are small.
+- **Export:** 7 assets, 7 solid pieces, 7060 tris, 0 VFX sockets, palette 30 colours, 0 problems.
