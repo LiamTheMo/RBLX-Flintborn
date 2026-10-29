@@ -1,15 +1,39 @@
 -- Makes sure images actually arrive. A client that requests many new images at
--- once (phones especially) can have some fetches fail, and Roblox leaves those
--- images blank for the session: the lobby showed some HUD icons and not others,
--- and characters spawned with grey clothing and no face. Widgets.Sprite tracks
--- every HUD image here and CharacterLookController every character texture; new
--- ones are preloaded in one batch, and each image whose fetch fails is retried
--- with a growing delay, reassigning it on everything that uses it so the engine
--- asks again.
+-- once (phones especially) has some fetches fail, and Roblox leaves those images
+-- blank for the session: the lobby showed its Enter plate and nothing else.
+--
+-- HUD images (Widgets.Sprite) go through Assign: an ImageLabel starts empty and
+-- gets its image from a paced queue, a few per tick, those on screen first and
+-- the hidden menus' art after, so the client never asks for every image at
+-- once. A watchdog then checks each image on screen by what the label itself
+-- reports (IsLoaded; ContentProvider's statuses can say a fetch failed when the
+-- widget loads fine) and asks again, with a growing, jittered delay and no
+-- giving up, until it shows. Track watches a label whose image was set
+-- elsewhere (a headshot) the same way.
+--
+-- Character textures (CharacterLookController) use TrackProperty: new ones are
+-- preloaded in one batch and each failed fetch is retried with a growing delay,
+-- reassigning it on everything that uses it so the engine asks again.
 
 local ContentProvider = game:GetService("ContentProvider")
+local UserInputService = game:GetService("UserInputService")
 
 local SpriteLoader = {}
+
+-- HUD images assigned per tick while screens fill, and per tick for hidden
+-- screens' art once nothing on screen is waiting. Touch-only devices (phones,
+-- tablets) fetch a menu's art when it opens instead: the menus' window art is
+-- several megapixels, which a phone's texture memory should not hold unused.
+SpriteLoader.PER_TICK = 6
+SpriteLoader.IDLE_PER_TICK = if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then 0 else 2
+SpriteLoader.TICK = 0.1
+-- An image on screen not loaded this long after it was (re)assigned is asked
+-- for again; the wait doubles each time up to MAX_WAIT (jittered so many
+-- images do not retry together), and at most RETRIES_PER_SWEEP go per sweep.
+SpriteLoader.FIRST_WAIT = 6
+SpriteLoader.MAX_WAIT = 30
+SpriteLoader.SWEEP = 1
+SpriteLoader.RETRIES_PER_SWEEP = 4
 
 SpriteLoader.RETRIES = 6
 SpriteLoader.FIRST_DELAY = 1
@@ -149,8 +173,139 @@ function SpriteLoader.TrackProperty(instance: Instance, property: string)
 	end
 end
 
+-- HUD images ---------------------------------------------------------------------
+
+-- label -> {id, pending, due, tries}; weak, so destroyed labels drop out.
+local labels = setmetatable({}, { __mode = "k" })
+local pumping = false
+-- Set only by the headless capture runtime (art/ui/capture/gui_env.luau); a
+-- global that is nil in the game.
+local CAPTURE = (__FlintbornCapture :: any) == true
+
+local function now(): number
+	return os.clock()
+end
+
+-- On screen: in an enabled gui, with every GuiObject up the chain visible.
+local function shown(label: GuiObject): boolean
+	local gui = label:FindFirstAncestorWhichIsA("LayerCollector")
+	if gui == nil or not (gui :: any).Enabled then
+		return false
+	end
+	local node: Instance? = label
+	while node and node ~= gui do
+		if node:IsA("GuiObject") and not node.Visible then
+			return false
+		end
+		node = node.Parent
+	end
+	return true
+end
+
+local function waitFor(tries: number): number
+	local base = math.min(SpriteLoader.FIRST_WAIT * 2 ^ tries, SpriteLoader.MAX_WAIT)
+	return base * (0.75 + math.random() * 0.5)
+end
+
+local function give(label: any, entry)
+	entry.pending = false
+	entry.due = now() + waitFor(0)
+	-- Something else may have set an image meanwhile; it wins.
+	if label.Image == "" then
+		label.Image = entry.id
+	end
+end
+
+-- One tick: assign queued images (on screen first), then, once a sweep is due,
+-- ask again for images on screen that have not loaded.
+local lastSweep = 0
+local function tick(sweepNow: boolean?): boolean
+	local budget = SpriteLoader.PER_TICK
+	local waiting, hidden = false, {}
+	for label, entry in labels do
+		if entry.pending then
+			if shown(label) then
+				waiting = true
+				if budget > 0 then
+					give(label, entry)
+					budget -= 1
+				end
+			elseif #hidden < SpriteLoader.IDLE_PER_TICK then
+				-- Hidden art keeps the fast pace only where it is prefetched.
+				waiting = true
+				table.insert(hidden, label)
+			end
+		end
+	end
+	-- Nothing on screen was waiting: fetch a little of the hidden menus' art.
+	if budget == SpriteLoader.PER_TICK then
+		for _, label in hidden do
+			give(label, labels[label])
+		end
+	end
+	local time = now()
+	if sweepNow or time - lastSweep >= SpriteLoader.SWEEP then
+		lastSweep = time
+		local retries = SpriteLoader.RETRIES_PER_SWEEP
+		for label, entry in labels do
+			if retries <= 0 then
+				break
+			end
+			if not entry.pending and time >= entry.due and label.Image == entry.id then
+				if label.IsLoaded then
+					entry.due = math.huge
+				elseif shown(label) then
+					reassign(label, "Image", entry.id)
+					entry.tries += 1
+					entry.due = time + waitFor(entry.tries)
+					retries -= 1
+				end
+			end
+		end
+	end
+	return waiting
+end
+
+local function pump()
+	if pumping then
+		return
+	end
+	pumping = true
+	task.spawn(function()
+		while true do
+			local waiting = tick()
+			-- Idle between sweeps once nothing waits that this tick could give out
+			-- (a menu that opens is picked up within a sweep).
+			task.wait(if waiting then SpriteLoader.TICK else SpriteLoader.SWEEP)
+		end
+	end)
+end
+
+-- For the capture harness's loader scene: one tick, and the label table.
+SpriteLoader._tick = tick
+SpriteLoader._labels = labels
+
+-- Gives `label` the image `id` through the paced queue (at once in the headless
+-- capture, whose clock never runs).
+function SpriteLoader.Assign(label: ImageLabel, id: string)
+	if CAPTURE then
+		label.Image = id
+		return
+	end
+	label.Image = ""
+	labels[label] = { id = id, pending = true, due = math.huge, tries = 0 }
+	pump()
+end
+
+-- Watches a label whose image was set elsewhere and asks again while it does not
+-- load.
 function SpriteLoader.Track(label: ImageLabel)
-	SpriteLoader.TrackProperty(label, "Image")
+	local id = label.Image
+	if CAPTURE or id == "" then
+		return
+	end
+	labels[label] = { id = id, pending = false, due = now() + waitFor(0), tries = 0 }
+	pump()
 end
 
 return SpriteLoader
