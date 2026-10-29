@@ -1,0 +1,1173 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M029",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m029_base",
+    "hex": "#69564C",
+    "levels": [
+     0.91614,
+     0.93884,
+     0.95389,
+     0.96218,
+     0.97013,
+     0.97633,
+     0.98089,
+     0.99024,
+     0.99514,
+     0.99853,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00043,
+     1.0019,
+     1.00366,
+     1.00563,
+     1.01451,
+     1.03682
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_base_x_dark_25",
+    "hex": "#665349",
+    "levels": [
+     0.93755,
+     0.94494,
+     0.95319,
+     0.95806,
+     0.96104,
+     0.96455,
+     0.96605,
+     0.96825,
+     0.97189,
+     0.97868,
+     0.98197,
+     0.98416,
+     0.98907,
+     0.99089,
+     0.99451,
+     0.99729,
+     1.00128,
+     1.00252,
+     1.00663,
+     1.0088,
+     1.01131,
+     1.01335,
+     1.01489,
+     1.03117
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_base_x_dark_50",
+    "hex": "#625046",
+    "levels": [
+     0.9228,
+     0.93852,
+     0.94827,
+     0.95008,
+     0.95383,
+     0.96118,
+     0.96452,
+     0.96658,
+     0.96776,
+     0.97096,
+     0.97767,
+     0.9817,
+     0.98534,
+     0.98536,
+     0.98691,
+     0.9885,
+     0.99242,
+     0.99403,
+     0.99723,
+     1.0,
+     1.00211,
+     1.00388,
+     1.00633,
+     1.00765,
+     1.0091,
+     1.01047,
+     1.01168,
+     1.01473,
+     1.02531,
+     1.02531,
+     1.03508,
+     1.04151
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_base_x_rock_25",
+    "hex": "#69574E",
+    "levels": [
+     0.91787,
+     0.9355,
+     0.945,
+     0.95291,
+     0.95663,
+     0.95869,
+     0.96037,
+     0.96266,
+     0.96577,
+     0.96907,
+     0.97018,
+     0.97396,
+     0.97675,
+     0.97851,
+     0.981,
+     0.98326,
+     0.98387,
+     0.98543,
+     0.98721,
+     0.98911,
+     0.99013,
+     0.99218,
+     0.99455,
+     0.99804,
+     0.99954,
+     1.00257,
+     1.00664,
+     1.00845,
+     1.01021,
+     1.01234,
+     1.02074,
+     1.03888
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf",
+    "hex": "#637708",
+    "levels": [
+     0.94354,
+     0.94995,
+     0.95372,
+     0.95602,
+     0.9578,
+     0.95977,
+     0.96143,
+     0.96322,
+     0.96684,
+     0.96709,
+     0.96886,
+     0.97317,
+     0.97754,
+     0.98008,
+     0.98164,
+     0.98537,
+     0.98749,
+     0.99047,
+     0.99225,
+     0.99351,
+     0.99589,
+     0.99879,
+     1.00516,
+     1.00773,
+     1.01183,
+     1.0153,
+     1.01943,
+     1.02473,
+     1.03067,
+     1.03688,
+     1.04265,
+     1.04977
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_base",
+    "hex": "#50620A",
+    "levels": [
+     0.95028,
+     0.9609,
+     0.96375,
+     0.96678,
+     0.97013,
+     0.97273,
+     0.9758,
+     0.97727,
+     0.99031,
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_base_x_leaf_25",
+    "hex": "#55670A",
+    "levels": [
+     0.94399,
+     0.94734,
+     0.94967,
+     0.95254,
+     0.95497,
+     0.95746,
+     0.96135,
+     0.96466,
+     0.96719,
+     0.97271,
+     0.97623,
+     0.97924,
+     0.98361,
+     0.98775,
+     0.99045,
+     0.9934,
+     0.99515,
+     1.02172,
+     1.02497,
+     1.03199
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_base_x_leaf_50",
+    "hex": "#5A6C09",
+    "levels": [
+     0.94373,
+     0.94913,
+     0.94995,
+     0.95513,
+     0.9577,
+     0.96384,
+     0.96646,
+     0.97757,
+     0.97937,
+     0.98251,
+     0.98864,
+     0.99051,
+     0.99492,
+     0.99621,
+     1.01912,
+     1.02626
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_base_x_leaf_75",
+    "hex": "#5E7208",
+    "levels": [
+     0.95539,
+     0.95957,
+     0.96625,
+     0.97131,
+     0.98043,
+     0.99118,
+     1.02994
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_tip",
+    "hex": "#8EA618",
+    "levels": [
+     0.94252,
+     0.96274,
+     0.9674,
+     0.97049,
+     0.97552,
+     0.97927,
+     0.98741,
+     0.99258,
+     0.99942,
+     1.00307,
+     1.00521,
+     1.00997,
+     1.01313,
+     1.01488,
+     1.01857,
+     1.02217,
+     1.02527,
+     1.05812
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_x_tip_25",
+    "hex": "#6E830C",
+    "levels": [
+     0.95634,
+     0.96074,
+     0.97113,
+     0.9814,
+     0.99039,
+     0.99964,
+     1.03035
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_x_tip_50",
+    "hex": "#788E10",
+    "levels": [
+     0.97343,
+     0.97847
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_leaf_x_tip_75",
+    "hex": "#839A14",
+    "levels": [
+     0.9464,
+     0.94841,
+     0.9644,
+     0.96778,
+     0.97147,
+     0.97724,
+     0.98036,
+     0.99277,
+     1.00201,
+     1.00527,
+     1.01,
+     1.01214,
+     1.04736,
+     1.05704
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_rock",
+    "hex": "#695954",
+    "levels": [
+     0.9328,
+     0.94324,
+     0.9538,
+     0.95868,
+     0.96037,
+     0.96167,
+     0.96646,
+     0.96967,
+     0.97152,
+     0.97646,
+     0.97983,
+     0.98196,
+     0.98377,
+     0.98805,
+     0.99019,
+     0.99376,
+     0.99957,
+     1.00153,
+     1.00669,
+     1.01203,
+     1.01429,
+     1.01893,
+     1.0194,
+     1.02375,
+     1.0281,
+     1.03228,
+     1.03284,
+     1.0362,
+     1.04044,
+     1.04726,
+     1.05735,
+     1.06968
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_rock_x_base_dark_25",
+    "hex": "#66554F",
+    "levels": [
+     0.91573,
+     0.92843,
+     0.93804,
+     0.94804,
+     0.9724,
+     0.97759,
+     0.98489,
+     0.98666,
+     1.0015,
+     1.00499,
+     1.01032,
+     1.01309,
+     1.01535,
+     1.01841,
+     1.02193,
+     1.02303,
+     1.02535,
+     1.03418,
+     1.04687
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_rock_x_light_25",
+    "hex": "#70625C",
+    "levels": [
+     0.91475,
+     0.94207,
+     0.96261,
+     0.96348,
+     0.96776,
+     0.97071,
+     0.97181,
+     0.97361,
+     0.97665,
+     0.97966,
+     0.98032,
+     0.98607,
+     0.99082,
+     0.99265,
+     0.99773,
+     1.00162,
+     1.0035,
+     1.00922,
+     1.01094,
+     1.01416,
+     1.01561,
+     1.01686,
+     1.01801,
+     1.01829,
+     1.01943,
+     1.02524,
+     1.03445,
+     1.0383,
+     1.04924,
+     1.05482,
+     1.06162,
+     1.07135
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_rock_x_light_50",
+    "hex": "#786A65",
+    "levels": [
+     0.94252,
+     0.95878,
+     0.96076,
+     0.97085,
+     0.97287,
+     0.97422,
+     0.97728,
+     0.98023,
+     0.98237,
+     0.98603,
+     0.98843,
+     0.99162,
+     0.9951,
+     0.99515,
+     0.99588,
+     0.99672,
+     0.99764,
+     1.00008,
+     1.00053,
+     1.00215,
+     1.00395,
+     1.00484,
+     1.0095,
+     1.01405,
+     1.01974,
+     1.02483,
+     1.02781,
+     1.0349,
+     1.04306,
+     1.04638,
+     1.04735,
+     1.06437
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root",
+    "hex": "#93623E",
+    "levels": [
+     0.92545,
+     0.93637,
+     0.93708,
+     0.94766,
+     0.94886,
+     0.95376,
+     0.95388,
+     0.95696,
+     0.96518,
+     0.96865,
+     0.97064,
+     0.9727,
+     0.97433,
+     0.97539,
+     0.97739,
+     0.97831,
+     0.97948,
+     0.98015,
+     0.98157,
+     0.98275,
+     0.98415,
+     0.98657,
+     0.98785,
+     0.99236,
+     0.99553,
+     0.99645,
+     0.99764,
+     1.00305,
+     1.01376,
+     1.03573,
+     1.04114,
+     1.04721
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_dark",
+    "hex": "#664125",
+    "levels": [
+     0.94139,
+     0.95423,
+     0.96171,
+     0.96872,
+     0.97804,
+     0.97856,
+     0.98234,
+     0.98312,
+     0.98536,
+     0.98733,
+     0.99205,
+     0.99369,
+     0.99697,
+     0.99911,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00264,
+     1.00567,
+     1.00843,
+     1.01087,
+     1.01421,
+     1.01632,
+     1.01632,
+     1.0179,
+     1.01999,
+     1.02229,
+     1.02674,
+     1.03116,
+     1.03645
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_dark_25",
+    "hex": "#885A38",
+    "levels": [
+     0.93218,
+     0.93826,
+     0.94152,
+     0.94405,
+     0.94716,
+     0.94932,
+     0.95239,
+     0.96391,
+     0.96677,
+     0.96874,
+     0.97135,
+     0.97511,
+     0.97881,
+     0.98072,
+     0.98277,
+     0.98692,
+     0.9888,
+     0.99042,
+     0.99344,
+     0.99568,
+     0.99859,
+     1.0037,
+     1.01272,
+     1.02044,
+     1.03247,
+     1.04979
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_dark_50",
+    "hex": "#7C5232",
+    "levels": [
+     0.96171,
+     0.96499,
+     0.96849,
+     0.97432,
+     0.97768,
+     0.97919,
+     0.9839,
+     0.98659,
+     0.99058,
+     0.99431,
+     0.99889,
+     1.00641,
+     1.01182,
+     1.01516,
+     1.02626
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_dark_75",
+    "hex": "#71492B",
+    "levels": [
+     0.94342,
+     0.94984,
+     0.95433,
+     0.97271,
+     0.97562,
+     0.9844,
+     0.98624,
+     0.9909,
+     0.99314,
+     0.99567,
+     0.99894,
+     1.00169,
+     1.00365,
+     1.00547,
+     1.01214,
+     1.01664,
+     1.01862,
+     1.02096,
+     1.02486,
+     1.02904,
+     1.03184,
+     1.03473
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_light_25",
+    "hex": "#976541",
+    "levels": [
+     0.93877,
+     0.9484,
+     0.95275,
+     0.95798,
+     0.96243,
+     0.96357,
+     0.96781,
+     0.96876,
+     0.96983,
+     0.9708,
+     0.97305,
+     0.97407,
+     0.97557,
+     0.97599,
+     0.97739,
+     0.97987,
+     0.9817,
+     0.98291,
+     0.98468,
+     0.98747,
+     0.98871,
+     0.99183,
+     0.9951,
+     0.99687,
+     0.9997,
+     1.00109,
+     1.0043,
+     1.01081,
+     1.01453,
+     1.01966,
+     1.02517,
+     1.02929
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_light_50",
+    "hex": "#9C6844",
+    "levels": [
+     0.94309,
+     0.94994,
+     0.95099,
+     0.95436,
+     0.95832,
+     0.96052,
+     0.9628,
+     0.96494,
+     0.96757,
+     0.97003,
+     0.97244,
+     0.97484,
+     0.97662,
+     0.97969,
+     0.98165,
+     0.98515,
+     0.98773,
+     0.99156,
+     0.99347,
+     0.99677,
+     1.00008,
+     1.00199,
+     1.00378,
+     1.00637,
+     1.00977,
+     1.01401,
+     1.01727,
+     1.02588,
+     1.03103,
+     1.03654
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_root_x_light_75",
+    "hex": "#A06C46",
+    "levels": [
+     0.94079,
+     0.94841,
+     0.95026,
+     0.95207,
+     0.95374,
+     0.95666,
+     0.96006,
+     0.96297,
+     0.96561,
+     0.96782,
+     0.97173,
+     0.97311,
+     0.97663,
+     0.97843,
+     0.98218,
+     0.984,
+     0.98463,
+     0.98782,
+     0.99185,
+     0.99339,
+     0.9961,
+     0.99891,
+     1.00104,
+     1.00311,
+     1.00552,
+     1.00659,
+     1.00967,
+     1.01226,
+     1.01653,
+     1.01944,
+     1.02644,
+     1.03385
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap",
+    "hex": "#70A258",
+    "levels": [
+     0.96601,
+     0.9697,
+     0.97201,
+     0.97536,
+     0.97808,
+     0.98077,
+     0.98374,
+     0.98552,
+     0.98811,
+     0.99111,
+     0.99474,
+     0.9974,
+     0.99911,
+     1.00282,
+     1.005,
+     1.007,
+     1.00944,
+     1.01285,
+     1.01543,
+     1.02298
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap_x_dark_25",
+    "hex": "#689852",
+    "levels": [
+     0.96206,
+     0.97363,
+     0.97832,
+     0.98037,
+     0.98362,
+     0.98752,
+     0.98978,
+     0.99171,
+     0.99555,
+     0.99795,
+     1.00118,
+     1.00605,
+     1.00765,
+     1.01083,
+     1.01437,
+     1.02039
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap_x_dark_50",
+    "hex": "#5F8D4B",
+    "levels": [
+     0.972,
+     0.98439
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap_x_dark_75",
+    "hex": "#568244",
+    "levels": [
+     0.97063,
+     0.98541
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap_x_light_25",
+    "hex": "#7AAC5D",
+    "levels": [
+     0.97507,
+     0.9779,
+     0.9819,
+     0.9842,
+     0.98611,
+     0.9886,
+     0.99093,
+     0.99372,
+     0.99613,
+     0.99842,
+     1.00251,
+     1.00606,
+     1.00956,
+     1.01239
+    ],
+    "used": true
+   },
+   {
+    "key": "m029_sap_x_light_50",
+    "hex": "#83B662",
+    "levels": [
+     0.968,
+     0.97007,
+     0.9818,
+     0.98346,
+     0.98768,
+     0.99374,
+     0.99804
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "SapstoneRootArch",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "hero",
+   "size": [
+    10.018,
+    6.1433,
+    7.615
+   ],
+   "tris": 2566,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArch.glb",
+     "kind": "solid",
+     "tris": 2566,
+     "offset": [
+      0.0,
+      3.0717,
+      0.0
+     ],
+     "size": [
+      10.018,
+      6.1433,
+      7.615
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "ancient root resource node: a flat faceted round stone slab ringed by chunky grey-mauve boulders, a big faceted soft-green sapstone egg on its floor, two thick gnarled warm-orange root halves arching over it (a buttress foot with a spur, a club end resting on the other root), two upright lime leaf fans; one closed mesh, flat base. No VFX"
+  },
+  {
+   "name": "SapstoneRootArchBase",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    9.5512,
+    0.9,
+    7.3463
+   ],
+   "tris": 502,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchBase.glb",
+     "kind": "solid",
+     "tris": 502,
+     "offset": [
+      0.0,
+      0.45,
+      0.0
+     ],
+     "size": [
+      9.5512,
+      0.9,
+      7.3463
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base (reusable): a low round faceted stone slab, flat floor inside a low lumpy rim, flat underside"
+  },
+  {
+   "name": "SapstoneRootArchLeafClump",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    2.8624,
+    2.6834,
+    2.2838
+   ],
+   "tris": 414,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchLeafClump.glb",
+     "kind": "solid",
+     "tris": 414,
+     "offset": [
+      0.0,
+      1.3417,
+      0.0
+     ],
+     "size": [
+      2.8624,
+      2.6834,
+      2.2838
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf Clump (reusable): seven thick faceted lime kite leaves in an upright clump"
+  },
+  {
+   "name": "SapstoneRootArchRock",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    2.2288,
+    1.75,
+    1.6967
+   ],
+   "tris": 42,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchRock.glb",
+     "kind": "solid",
+     "tris": 42,
+     "offset": [
+      0.0,
+      0.875,
+      0.0
+     ],
+     "size": [
+      2.2288,
+      1.75,
+      1.6967
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rocks (Side) (reusable): a chunky faceted grey-mauve boulder, lighter greyer top"
+  },
+  {
+   "name": "SapstoneRootArchRootLeft",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    7.183,
+    6.1238,
+    3.235
+   ],
+   "tris": 442,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchRootLeft.glb",
+     "kind": "solid",
+     "tris": 442,
+     "offset": [
+      0.0,
+      3.0619,
+      0.0
+     ],
+     "size": [
+      7.183,
+      6.1238,
+      3.235
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Half (Left): a thick gnarled faceted root with a buttress foot and spur and a blunt club end"
+  },
+  {
+   "name": "SapstoneRootArchRootRight",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    6.8382,
+    6.1433,
+    2.9758
+   ],
+   "tris": 498,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchRootRight.glb",
+     "kind": "solid",
+     "tris": 498,
+     "offset": [
+      0.0,
+      3.0717,
+      0.0
+     ],
+     "size": [
+      6.8382,
+      6.1433,
+      2.9758
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Half (Right): a long S-curved gnarled faceted root, domed top end, blunt foot"
+  },
+  {
+   "name": "SapstoneRootArchSapstone",
+   "sheet": "M029",
+   "subject": "Ancient Root",
+   "role": "part",
+   "size": [
+    2.6485,
+    3.5712,
+    2.45
+   ],
+   "tris": 80,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/SapstoneRootArchSapstone.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      1.7856,
+      0.0
+     ],
+     "size": [
+      2.6485,
+      3.5712,
+      2.45
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Green Sapstone (harvestable insert): a faceted soft-green egg, flat seat"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 4544,
+  "vfxSockets": 0,
+  "paletteColours": 31,
+  "paletteLevels": 643,
+  "meshBytes": 428316
+ },
+ "problems": []
+}
