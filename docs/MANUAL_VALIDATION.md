@@ -687,7 +687,7 @@ How it's built: the same HUD modules (`Hud/Compass`, `Vitals`, `ObjectivePanel`,
 
 ## UI images on phones (SpriteLoader pacing)
 
-How it's built: `Hud/SpriteLoader` hands HUD images out a few per tick, on-screen ones first; phones fetch a menu's art when it opens; any image on screen that has not loaded is asked for again (growing, jittered waits, no limit). Automated: `capture.py sprite_loader_flow`. Image access in the live places: the "Probe UI images in a live place" workflow on main.
+How it's built: `Hud/SpriteLoader` fetches HUD images one at a time (a single preload in flight), images on screen first, then hands each to every label that uses it; phones fetch a menu's art when it opens; a failed fetch is asked again later under the other spelling of the asset, and its labels try on their own after a few failures. Phones refused bursts of image requests (the first handful loaded, the rest failed). Automated: `capture.py sprite_loader_flow`. Device reports: each client sends its image states 30 s and 2 min after joining; the "Probe UI images in a live place" workflow on main prints them (reports = true).
 
 - [ ] On a phone, on a fresh server: every lobby plate, tile, coin and gem appears within a few seconds of joining.
 - [ ] On a phone, each menu's art appears within a second or two of opening it, and the in-world HUD's art appears when a run starts.
