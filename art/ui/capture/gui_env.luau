@@ -851,10 +851,14 @@ function Methods:GetAssetFetchStatus(content)
 	local statuses = __fetchStatus or {}
 	return statuses[content] or "AssetFetchStatus.Success"
 end
+-- A scene may set __preloadStatus[content] = "AssetFetchStatus.Failure" etc.;
+-- everything else preloads.
 function Methods:PreloadAsync(list, callback)
 	if callback then
 		for _, item in list do
-			callback(if type(item) == "string" then item else item.Image or "", "AssetFetchStatus.Success")
+			local content = if type(item) == "string" then item else item.Image or ""
+			local statuses = __preloadStatus or {}
+			callback(content, statuses[content] or "AssetFetchStatus.Success")
 		end
 	end
 end
