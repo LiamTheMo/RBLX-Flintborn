@@ -684,3 +684,11 @@ How it's built: the same HUD modules (`Hud/Compass`, `Vitals`, `ObjectivePanel`,
 - [ ] The objective and world event cards appear and update under the vitals; party members show with headshots.
 - [ ] The backpack button opens and closes the backpack; the six hotbar slots select with keys, taps and the bumper; the chosen slot glows gold.
 - [ ] Phone and console sizes keep everything on screen and readable.
+
+## UI images on phones (SpriteLoader pacing)
+
+How it's built: `Hud/SpriteLoader` hands HUD images out a few per tick, on-screen ones first; phones fetch a menu's art when it opens; any image on screen that has not loaded is asked for again (growing, jittered waits, no limit). Automated: `capture.py sprite_loader_flow`. Image access in the live places: the "Probe UI images in a live place" workflow on main.
+
+- [ ] On a phone, on a fresh server: every lobby plate, tile, coin and gem appears within a few seconds of joining.
+- [ ] On a phone, each menu's art appears within a second or two of opening it, and the in-world HUD's art appears when a run starts.
+- [ ] F9 → Client log shows no repeating image errors.

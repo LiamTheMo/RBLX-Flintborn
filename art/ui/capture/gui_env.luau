@@ -5,6 +5,10 @@
 -- screen and calls __dump(root), which prints the instance tree as JSON for
 -- render.py to lay out and draw. Nothing here is used by the game.
 
+-- The game's SpriteLoader paces image loading on a clock that never runs here;
+-- in a capture it hands every image out at once.
+__FlintbornCapture = true
+
 -- Datatypes ----------------------------------------------------------------------
 
 local function typed(kind, fields, meta)
@@ -214,7 +218,10 @@ end
 ColorSequence = {}
 function ColorSequence.new(a, b)
 	if type(a) == "table" and a.__type == "Color3" then
-		return { __type = "ColorSequence", Keypoints = { ColorSequenceKeypoint.new(0, a), ColorSequenceKeypoint.new(1, b or a) } }
+		return {
+			__type = "ColorSequence",
+			Keypoints = { ColorSequenceKeypoint.new(0, a), ColorSequenceKeypoint.new(1, b or a) },
+		}
 	end
 	return { __type = "ColorSequence", Keypoints = a }
 end
@@ -225,7 +232,10 @@ end
 NumberSequence = {}
 function NumberSequence.new(a, b)
 	if type(a) == "number" then
-		return { __type = "NumberSequence", Keypoints = { NumberSequenceKeypoint.new(0, a), NumberSequenceKeypoint.new(1, b or a) } }
+		return {
+			__type = "NumberSequence",
+			Keypoints = { NumberSequenceKeypoint.new(0, a), NumberSequenceKeypoint.new(1, b or a) },
+		}
 	end
 	return { __type = "NumberSequence", Keypoints = a }
 end
@@ -681,6 +691,16 @@ function Methods:FindFirstAncestorOfClass(className)
 	local node = self.Parent
 	while node do
 		if node.ClassName == className then
+			return node
+		end
+		node = node.Parent
+	end
+	return nil
+end
+function Methods:FindFirstAncestorWhichIsA(className)
+	local node = self.Parent
+	while node do
+		if node:IsA(className) then
 			return node
 		end
 		node = node.Parent

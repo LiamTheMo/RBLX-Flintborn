@@ -299,13 +299,12 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 		local image = Widgets.Make("ImageLabel", {
 			Name = tile[1],
 			BackgroundTransparency = 1,
-			Image = ids[tile[1]],
 			ScaleType = Enum.ScaleType.Stretch,
 			Position = UDim2.fromScale(tile[2] / sprite.w, tile[3] / sprite.h),
 			Size = UDim2.fromScale(tile[4] / sprite.w, tile[5] / sprite.h),
 			ZIndex = holder.ZIndex,
 		}, holder)
-		SpriteLoader.Track(image)
+		SpriteLoader.Assign(image, ids[tile[1]])
 	end
 	return holder
 end
@@ -321,8 +320,8 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 	if id == nil then
 		return fallback(name, props, parent)
 	end
-	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = id }, parent)
-	SpriteLoader.Track(image)
+	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
+	SpriteLoader.Assign(image, id)
 	local center = UiAssets.sliceCenter(name)
 	local sprite = UiAssets.sprite(name)
 	if center and sprite then
