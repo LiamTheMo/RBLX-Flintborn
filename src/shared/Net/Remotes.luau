@@ -32,7 +32,7 @@ local DEFINITIONS = {
 	UnequipArmor = "RemoteFunction", -- (slot) -> ok, reason
 	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection); also throws/sets a held siege item
 	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
-	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount)
+	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
 	CorpseOpened = "RemoteEvent", -- server -> client: (corpseId, contents)
@@ -80,7 +80,7 @@ local DEFINITIONS = {
 	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
 	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
 	SaveCamera = "RemoteEvent", -- client -> server: (zoom) preference, throttled
-	SaveSettings = "RemoteEvent", -- client -> server: {uiScale, colourBlindMode, reducedMotion, subtitles}
+	SaveSettings = "RemoteEvent", -- client -> server: {settingKey = value} changes (SettingsRules)
 	SaveKeybinds = "RemoteEvent", -- client -> server: {actionId = keyName} overrides of the default keys
 	TutorialChanged = "RemoteEvent", -- server -> client: current tutorial step
 	TutorialAction = "RemoteFunction", -- ("Ack" | "Skip" | "Replay") -> ok

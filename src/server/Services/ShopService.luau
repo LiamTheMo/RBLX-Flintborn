@@ -36,6 +36,7 @@ local function view(player: Player)
 	for _, entry in ShopCatalog.Stock do
 		table.insert(stock, {
 			id = entry.id,
+			catalogId = entry.catalogId,
 			name = entry.title and ("Title: " .. entry.title) or nameOf(entry.catalogId),
 			quantity = entry.quantity,
 			price = entry.price,
@@ -51,6 +52,7 @@ local function view(player: Player)
 			table.insert(sellable, {
 				source = "backpack",
 				key = index,
+				catalogId = item.catalogId,
 				name = nameOf(item.catalogId),
 				quantity = item.quantity,
 				coins = coins,
@@ -64,7 +66,8 @@ local function view(player: Player)
 			table.insert(sellable, {
 				source = "vault",
 				key = catalogId,
-				name = nameOf(catalogId) .. " (vault)",
+				catalogId = catalogId,
+				name = nameOf(catalogId),
 				quantity = quantity,
 				each = each,
 				warning = warning,

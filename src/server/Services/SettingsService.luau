@@ -1,7 +1,8 @@
--- Saved player choices (GDD §23.2, §25, §46): the camera zoom preference, UI
--- scale, accessibility options (colour-blind palette, reduced motion, subtitles)
--- and keyboard rebinds. The server validates and stores them and hands them back
--- as attributes on join.
+-- Saved player choices (GDD §23.2, §25, §46): the camera zoom preference, the
+-- Settings screen's choices (SettingsRules: UI scale, accessibility, volumes,
+-- camera sensitivity and inversion, damage numbers, names, graphics quality) and
+-- keyboard rebinds. The server validates and stores them and hands them back as
+-- player attributes on join.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -10,19 +11,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CameraRules = require(ReplicatedStorage.Shared.World.CameraRules)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
 local ProfileService = require(script.Parent.ProfileService)
 
 local SettingsService = {}
 
 SettingsService.SAVE_INTERVAL = 5
-SettingsService.UI_SCALE = { min = 0.8, max = 1.4 }
 
 local function applyAttributes(player: Player, choices)
 	player:SetAttribute("CameraZoom", CameraRules.Clamp(choices.camera.zoom))
-	player:SetAttribute("UiScale", choices.uiScale or 1)
-	player:SetAttribute("ColourBlind", choices.colourBlindMode == true)
-	player:SetAttribute("ReducedMotion", choices.reducedMotion == true)
-	player:SetAttribute("Subtitles", choices.subtitles ~= false)
+	local values = SettingsRules.Resolve(choices)
+	for _, setting in SettingsRules.Settings do
+		player:SetAttribute(setting.attribute, values[setting.key])
+	end
 	-- Attributes cannot hold tables, so the overrides travel as JSON.
 	player:SetAttribute("Keybinds", HttpService:JSONEncode(Keybinds.Sanitize(choices.keybinds)))
 end
@@ -37,19 +38,9 @@ function SettingsService.Start()
 		if type(settings) ~= "table" then
 			return
 		end
-		local scale = tonumber(settings.uiScale)
 		ProfileService.Mutate(player, function(profile)
-			local choices = profile.choices
-			if scale and scale == scale then
-				choices.uiScale =
-					math.clamp(math.round(scale * 10) / 10, SettingsService.UI_SCALE.min, SettingsService.UI_SCALE.max)
-			end
-			for _, key in { "colourBlindMode", "reducedMotion", "subtitles" } do
-				if type(settings[key]) == "boolean" then
-					choices[key] = settings[key]
-				end
-			end
-			applyAttributes(player, choices)
+			SettingsRules.Apply(profile.choices, settings)
+			applyAttributes(player, profile.choices)
 		end)
 	end)
 	Remotes.Listen("SaveKeybinds", function(player, overrides)
