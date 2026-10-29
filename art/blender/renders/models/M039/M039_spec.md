@@ -815,3 +815,551 @@ All the study's recommendations are accepted.
 12. **Names:** `StoneSpire*`, with keys `m039_*`.
 
 The front three-quarter share targets in §1 are binding, within ±4: 77.3 % rock and 22.7 % green, with almost no green in the top fifth.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m039.py` (`build()`), background Blender on port 9880, work file
+`art/blender/assets/kit/wip/M039.blend`. It imports only the committed `m033` / `m012` helpers; the m036 / m038 helpers
+it needs are copied in, so an uncommitted builder can't change it.
+
+- **Spire (`_spire`, decision 4):** an explicit 7-sided obelisk.
+  - One shared base polygon (angles ±6°, radii ±6 %), rings at h 0 / .12 / .60 / .89 with scales .90 / 1.0 / .76 / .46.
+    Every band quad is a planar trapezoid, so long flat faces run up the shaft.
+  - Apex 0.5 to −X and 0.2 to −Y of the base centre.
+  - The front vertex of the .60 ring is pushed in 13 % (the diamond facet: the four triangles round it pivot on it); one
+    back vertex of the foot ring is tucked in 6 %.
+  - Cap: 4 faces (three cap-base verts lowered onto the planes through the apex and their major neighbours). Flat floor
+    fan. 54 tris.
+  - The ring heights were tuned from .15 / .52 / .88 to .12 / .60 / .89 to bring triangle-area CV to ≥ 0.6.
+- **Pillar P and Side Rock Rr (`_side_rock`):** 6 verts a ring, rings h 0 / .12 / .55 / .92 / 1.0 at .90 / 1.0 / .82 /
+  .60 / .55 of a shared polygon, a flat top ring (P slopes 7° to the front, Rr 4°), the upper rings leaned (P +0.3 X
+  toward S; Rr −0.9 X, 10° toward S), a little in-plane jitter on the middle rings (more on Rr, for its medium-sized
+  faces). 56 tris each.
+- **Hull rocks (`_hull_rock`):** F, BL, FL, FR, s1–s3, the back dome BD, back-right BR, back-left small BS.
+  - Unit point clouds of rings (angle jitter 0.45), flattened by cut planes into big flat facets (m038 method).
+  - 2–4 "chip" points just inside an upper point give small chip facets beside the broad ones (irregular triangle
+    sizes).
+  - A flat top ring tilted toward the front (FR / BR 16° toward the front-right); then yawed and scaled to exact size.
+  - F gets its nose vertex after the cuts (pushed 0.32 of the half-width forward), so five big faces meet at it; its
+    floor ring is at 0.74 so it is widest at h .55.
+- **Layout (spec 2.1):** as the table, except P moved to (−1.82, 0.35) so it overlaps S by 0.59 (≤ 0.6). Every rock is
+  its own closed shell; no booleans.
+- **Rosettes (`_rosette`):** 3–7 broad oval leaves from one root plus a bud.
+  - Leaf (`_leaf`, 12 tris): outline 2 points a side and a blunt tip, a raised two-point midrib, a flat underside fan;
+    width 0.74 of the length; length 0.48 of the rosette width.
+  - Roles: one upright back leaf (60°), two side leaves (42°), low front leaves (22–28°).
+  - Bud: a 6-sided double cone (12 tris) sunk in the hub.
+  - Flank rosettes tilt their axis 0.45 toward the flank's outward normal and face out of the flank.
+- **Clusters (`CLUSTERS`):** 14 groups, 40 rosettes, every table width × `ROS_SCALE` 1.4.
+  - Seats: ground; rock top (ray down); rock flank (horizontal ray); or "l", on the rosettes already built under it
+    (stacked mounds).
+  - The study's 21 rosettes at 1.2–2.2 across gave f34 green 7 % (sheet 22.7 %). The sheet's groups are stacked mounds
+    of 2–5 rosettes, so C1, C2, C6, C7, C9 and C10 are stacks, and C3 and C5 got second rosettes on F's top.
+- **Hero size:** 14.43 W × 10.50 D × 11.00 H (target 14.0 ± 0.6 × 10.5 ± 0.8 × 11.0 ± 0.3).
+
+## Stage 2 — Optimisation and cleanup
+
+- **Tris:** hero 3844 (rocks 544, 235 leaves 2820, 40 buds 480; limit 4000). Parts: Main 54, SideRock 152, FootRock 180,
+  SmallRock 30, Foliage 96 (limit 1000).
+- **Every object:**
+  - 0 non-manifold edges, 0 non-manifold (bowtie) verts, 0 boundary or wire edges, 0 loose verts;
+  - 0 zero-area faces, 0 n-gons, 0 duplicate verts;
+  - normals outward; no corner under 5° (hero min 5.2°; 8 slivers forced open by `m012._force_slivers`);
+  - transforms applied, no custom normals, origin at the bbox bottom centre (offset 0, 0, 0).
+- **Per shell** (`shells_report`): all 288 hero shells closed and manifold, with 0 self-intersections, 0 inverted faces
+  and positive volume.
+- **Shells:** hero 288 = 13 rocks + 235 leaves + 40 buds (decision 6).
+- **Rock overlaps** (convex-hull depth): S–P 0.59, S–Rr 0.55, P–F 0.11, FL–s1 0.03.
+- **Rock gaps:** S–BD 0.04, Rr–FR 0.06, F–FL 0.12, BL–FL 0.30, P–BL 0.35. S–F 1.07 and Rr–F 1.19 are the C5 / C6 crevices,
+  filled by rosettes.
+- **No floating dressing** (`contact_report`):
+  - Hero: 0 floating shells (gap > 0.03), max dressing gap 0.000, 0 unchained at 0.03 and at 0.05; `settle` moved 0
+    groups.
+  - SideRock, FootRock and Foliage: also 0 floating and 0 unchained.
+  - The guard pushed leaves out of rocks 127 times; 21 leaves were dropped (more than 0.4 inside a rock).
+
+### Rock-shape targets (spec 2.2), hero rocks
+
+| Rock | Tris | Area CV | Edge CV | < 25° share | Regions 5° / 7° (largest) | Widest h | Floor span | Top faces (span) | Walls |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| S | 54 | 0.68 | 0.59 | 0.47 | 19 / 16 (0.36) | .15 | .90 / .90 | apex | 0.95 |
+| P | 56 | 0.73 | 0.51 | 0.33 | 18 / 13 (0.36) | .15 | .94 / .95 | 4 (0.58) | 0.96 |
+| Rr | 56 | 0.71 | 0.47 | 0.29 | 18 / 16 (0.35) | .15 | .81 / .87 | 4 (0.49) | 0.88 |
+| F | 48 | 0.62 | 0.39 | 0.26 | 23 / 19 (0.20) | .55 | .88 / .72 | 2 (0.57) | 0.60 |
+| BL / FL / FR | 40 / 42 / 42 | .65 / .67 / .62 | .44 / .43 / .41 | .41 / .31 / .41 | 17/16, 13/12, 16/15 | .35 / .35 / .45 | | 2 / 2 / sloped | |
+| BD / BR | 46 / 42 | .53 / .66 | .33 / .41 | .21 / .46 | 19/16, 14/14 | .45 | | 2 / 2 | |
+| s1 / s2 / s3 / BS | 30–34 | .44–.61 | .30–.39 | | 10–16 | .35–.45 | | 1–2 | |
+
+- Spire: 14 faces taller than 0.35 H; 14 faces ≥ 2.5 sq studs; smallest face 0.68 sq studs; widths per height .96 1.0
+  .95 .90 .85 .80 .71 .59 .47 .19.
+- Our region counts run above the facets.py targets: those are colour regions on the sheet, ours count every 5° / 7°
+  normal break.
+
+## Stage 3 — UV
+
+Smart UV (angle 45, margin 0.008) per object; `m012._uv_unfold` found nothing to cut.
+- Hero: 1753 islands, 0 overlaps, 0 flipped, min gap 0.016, border 0.008, even density (1.0 / 1.0 / 1.0), conformal
+  stretch p95 1.0.
+- Every part the same (p95 ≤ 1.06). The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration** (`m039.calibrate()`: K.calibrate on the test dome against spec 5.4's targets):
+  - Kept: leaf `#698201` → (126,154,6), leaf_light `#9FA906` → (198,205,10), leaf_deep `#446401` → (78,115,6), bud
+    `#96A201` → (186,196,7), stain `#706D3A`, rock_deep `#917E73` → (183,153,133).
+  - **Rejected:** rock `#9C8981` and rock_light `#AB9C94`. They render right but have R − B 27 / 23 < 30, so they fail
+    the warm-stone guard.
+  - The rock keys were then set by hand inside the guard (R > G > B, hue 20–21°, R − B 32–33) and tuned on the
+    f34_sheet render. The leaf keys were lifted about 7 % (sRGB) toward the sheet's f34 leaves.
+- **Final palette:** rock `#B6A095`, rock_light `#CAB4A9`, rock_deep `#9F8A7F`, moss_stain `#706D3A`, leaf `#718A01`,
+  leaf_light `#ACB306`, leaf_deep `#496A01`, bud `#96A201`. Never `#9B949E`.
+- **Blend (by position, per flat facet):**
+  - rock_light up to 30 % on noise patches above 0.55 of each rock's height; on the spire 35 % above .62 H and at least
+    23 % on the cap;
+  - rock_deep up to 20 % on patches whose centre is below 1.5;
+  - moss_stain 10 / 20 % on whole facets below 2.5 within 1.6 of a rosette root (stained facets: P 6, Rr 7, F 10, BL 12,
+    FL 19, s1 25, s2 18, s3 17, …). With the stains off, the f34 rock median doesn't move;
+  - leaves by role: low front leaves leaf/leaf_deep 40 %, side leaves leaf, the upright back leaf leaf/leaf_light 67 %;
+    C4 and C10 one step lighter; a hard edge to the bud;
+  - nothing coloured by facing.
+- **Texture:** Tint ±0.04 per flat facet (scale 0.3) and ±0.04 per rock; leaves 0.04 per cluster; buds none.
+- **Finish:** rock rough 0.9, metal 0; leaves rough 0.85, low specular; bud rough 0.75, low specular.
+- **Re-measured** (final renders, spec masks; ours / sheet):
+
+| Cell | W : H | Rock / green % | Green fifths, bottom → top | Rock median | Lit quartile | Green median | Top profile mean / max | Width per height mean |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (0, 20) | 1.136 / 1.138 | 76.5 / 23.5 (77.3 / 22.7) | .369 .408 .105 .103 .015 (.33 .45 .126 .092 .002) | `#C8AA96` / `#C9AD9C` | `#F0CDB6` / `#E5C9B5` | `#829B09` / `#8FA304` | 0.045 / 0.14 | 0.020 |
+| front_sheet (0, 18) | 1.145 / 1.112 | 77.2 / 22.8 (76.9 / 23.1) | .378 .400 .105 .103 .014 | `#C8A996` / `#CAAE9D` | | `#829B09` / `#93A406` | 0.059 / 0.16 | 0.029 |
+| r34_sheet (−30, 20) | 0.977 / 0.997 | 76.0 / 24.0 (80.6 / 19.4) | .25 .52 .10 .12 .01 | `#E0BFA9` / `#B89E91` | | `#8BA109` / `#8CA404` | 0.059 | 0.063 |
+| side_sheet (90, 10) | 0.835 / 0.867 | 82.8 / 17.2 (81.0 / 19.0) | | `#B19A89` / `#C2A99D` | | | 0.125 | 0.095 |
+| rear_sheet (180, 15) | 1.156 / 0.969 | 90.7 / 9.3 (76.9 / 23.1) | | `#BDA497` / `#CAAC99` | | | 0.070 | 0.075 |
+| top_sheet (0, 89) | 1.356 / 1.046 | 56.9 / 43.1 (68.0 / 32.0) | | `#D3B8A6` / `#BFA495` | | `#7A9706` / `#799209` | 0.110 | 0.168 |
+
+- f34 rock median: hue 24°, sat 0.25, R > G > B; off the sheet by 1 / 3 / 6. f34 leaves: hue 70°, sat 0.94.
+- Parts shot (az 0, e 25; floor shadow excluded with sat ≥ 0.10), ours (target):
+  - rock `#CDAF9B` (`#C5A896`);
+  - Main `#CEAF9B` (`#C5A997`); SideRock `#C8A996` (`#C7A997`);
+  - FootRock `#DFBFAA` (`#C7A997`); SmallRock `#D6B6A1` (`#C4A999`);
+  - Foliage `#899F09` (`#769705`).
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no glow, light or emissive part (spec 7.1, decision 8), so there is no emission anywhere.
+
+Studio check (Requires Manual Validation):
+- the rock stays warm grey-pink under the game's sun (not lilac, not orange);
+- the spire's flat faces read as separate planes (flat shading kept);
+- the leaves stay lime, not olive.
+
+## Stage 6 — VFX: skipped
+
+Stage 6 skipped: the sheet shows no effect (spec 7.2, decision 8). No object has a socket (`build()` checks this).
+
+## Renders
+
+In `art/blender/renders/models/M039/`:
+- `M039_views.png`: the kit front34, rear34, front, side, rear, top and underside; then the `*_sheet` shots, the five
+  part shots, `parts`, `foot_under`, `exploded` and `scale`.
+- `spire_cu.png`: the cap, with no floor.
+- `junc_cu.png`: C6 in the F / S / Rr crevice.
+
+`m039.compare()` re-measures every cell against the sheet.
+
+## Modeller's notes for the verifier
+
+- **Governing views:** f34_sheet (0, 20) and front_sheet (0, 18). I didn't re-run the elevation probe: e 20 / 18 gave
+  W : H 1.136 / 1.145 against 1.138 / 1.112 and profile means 0.045 / 0.059, so I kept them.
+  - r34_sheet is the sheet's "rear three-quarter" taken as a front-left view (az −30).
+  - side, rear and top are judged loosely (front redraws and a re-composition).
+- **Known misses:**
+  - Rear (180, 15): green 9 % against the sheet's 23 %. The sheet's "rear" is a front redraw; our true back shows the
+    B1–B3 rosettes and the bare back of the spire.
+  - Top: W : D 1.36 against 1.05, and green 43 % against 32 % (a re-composition, spec 3.4).
+  - f34 top profile: max error 0.14, at f .50 (our spire's left flank is a little lower than the sheet's in that column)
+    and at f .80 (C10's upper rosette).
+  - Parts shot:
+    - the FootRock and SmallRock part medians run 18–24 levels light, because their big flat tops face the key light at
+      e 25;
+    - the Foliage part is `#899F09` against the exploded clusters' `#769705`. The hero's f34 leaves govern and are still
+      13 levels under the sheet, so the leaf keys can't go darker.
+  - Rr measures 3.11 wide (target 2.8 ± 0.2) because its 0.9 lean adds to the width. P is 3.72 × 7.80 (target 3.9 × 7.7).
+  - The rock's shade quartile is a warm brown-grey (`#917D70`) where the sheet's is lavender (`#756C70`). That is the
+    sheet's cool sky fill, not paint (spec 3.7); nothing is coloured by facing.
+- **Budget:** 3844 / 4000, so there is little room left; each extra rosette costs about 90 tris.
+- **Rosettes:** there are more and bigger rosettes than in the study's table (40 against 21). The share targets are
+  binding, and the table's sizes gave 7 % green.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier, read-only, background Blender on port 9880 (`wip/M039_verify.blend`). Every number below was re-measured
+with my own bmesh / BVH code (`mesh_check.py`, `check2.py`) and my own renders of the six `*_sheet` cameras (into the
+scratchpad, `M.MODEL_RENDERS` redirected), with side-by-side crops against the sheet cells. The part shots and close-ups
+are the modeller's renders.
+
+### Measured
+
+| Check | Result | Target | |
+| --- | --- | --- | --- |
+| Tris hero / Main / SideRock / FootRock / SmallRock / Foliage | 3844 / 54 / 152 / 180 / 30 / 96 | < 4000 / < 1000 | ok |
+| Hero size | 14.43 × 10.50 × 11.00 | 14.0 ± 0.6 × 10.5 ± 0.8 × 11.0 ± 0.3 | ok |
+| Part sizes | Main 4.40 × 3.80 × 11.00; SideRock 3.11 × 2.68 × 5.85 (rock 5.15 H); FootRock 5.00 × 3.80 × 4.30 (rock 3.70 H); SmallRock 1.40 × 1.20 × 1.00; Foliage 1.84 × 1.74 × 0.99 | §1.4 | Rr W +0.11 over 2.8 ± 0.2 |
+| Shells | hero 288 (13 rock, 235 leaf, 40 bud); SideRock 9; FootRock 12; Foliage 8; Main and SmallRock 1 | decision 6 | ok |
+| Every shell closed and manifold (all six objects) | 0 open shells, 0 non-manifold edges, 0 bowtie verts, 0 boundary, 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 duplicate verts | 0 | ok |
+| Self-intersections inside a shell | 0 pairs in 0 shells (all six objects) | 0 | ok |
+| Normals | every shell positive volume (outward); flat shaded; no custom normals; min corner 5.2° (hero) | | ok |
+| Origin / transforms | bbox bottom centre offset (0, 0, 0) on all six; rot 0, scale 1; no modifiers; UVMap present | | ok |
+| Rocks grounded | all 13 rock shells reach z 0 (floor-cut) | | ok |
+| Floating dressing (own code: shell-to-shell BVH overlap or vertex–surface distance, ground at z ≤ 0.03) | **0 floating at 0.03, 0 unchained** (hero, SideRock, FootRock, Foliage) | 0 | ok |
+| Rock overlaps (convex-hull SAT, face + edge-cross axes) | **S–P 0.625**, S–Rr 0.545, P–F 0.19, S–BD 0.04, FL–s1 0.03; deepest vertex S–P 0.571 | ≤ 0.6 | S–P 0.025 over |
+| Dressing cut into rocks (ray-parity inside test) | 24 of 275 leaf/bud shells > 0.05, 16 > 0.10, 10 > 0.20, max 0.38; 0 fully buried | ≤ 0.05 (§2.3, §6) | minor |
+| Spire | 7 verts on each of rings z 0 / 1.3 / 6.6, 3 lowered cap-base verts at 9.0–9.2, 4 at 9.8, apex 11.0; 15 band pairs exactly coplanar; 14 faces taller than 0.35 H; 16 faces ≥ 2.5 sq studs; smallest 0.68 | 6–7 sides, long flat faces, 3–4-face cap | ok |
+| Colour by facing | rock face key luminance vs normal z r = 0.13 (x −0.01, y 0.05); vs relative height r = 0.35; `K.check` problems [], `kit_baked_shading` 0.0 on all six | < 0.5 | ok |
+| Tint | corner Tint 0.93–1.07, sd 0.024, 131 levels | visible, not confetti | ok |
+| Rock area by mix | rock 62.6 %, light mixes 14.5 %, deep mixes 7.8 %, moss 10 % 13.9 %, moss 20 % 1.2 % | stains ≤ 20 % mix | ok |
+| Leaf tiers (faces) | deep-40 1272, leaf 948, light-67 540, leaf_light 60, bud 480 | three tiers + bud | ok |
+| Lighting / VFX | no children, no sockets, emission 0 on every material | none (decision 8) | ok |
+| Collision tags | hero none; Main / SideRock / FootRock / SmallRock hull; Foliage none | decision 7 | ok |
+
+**Views (my renders, spec masks; ours / sheet):**
+
+| Cell | W : H | Rock / green % | Green fifths, bottom → top | Rock median | Green median | Profile mean / max | Width/height mean |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (0, 20) | 1.136 / 1.138 | 76.5 / 23.5 (77.3 / 22.7) | .37 .41 .11 .10 .015 (.33 .45 .13 .09 .002) | `#C8AA96` / `#C9AD9C` | `#829D12` / `#8FA304` | 0.045 / 0.14 | 0.020 |
+| front_sheet (0, 18) | 1.145 / 1.112 | 77.2 / 22.8 (76.9 / 23.1) | .38 .40 .11 .10 .014 | `#C8A996` / `#CAAE9D` | `#829D12` / `#93A406` | 0.059 / 0.16 | 0.029 |
+| r34_sheet (−30, 20) | 0.977 / 0.997 | 76.0 / 24.0 (80.6 / 19.4) | | `#E0BFA9` / `#B89E91` | `#8BA214` / `#8CA404` | 0.059 / 0.16 | 0.063 |
+| side_sheet (90, 10) | 0.835 / 0.867 | 82.8 / 17.2 (81.0 / 19.0) | .45 .19 .18 .17 .00 | `#B19A89` / `#C2A99D` | | 0.125 / 0.22 | 0.095 |
+| rear_sheet (180, 15) | 1.156 / 0.969 | 90.7 / 9.3 (76.9 / 23.1) | | `#BDA497` / `#CAAC99` | | 0.070 / 0.15 | 0.075 |
+| top_sheet (0, 89) | 1.356 / 1.046 | 56.9 / 43.1 (68.0 / 32.0) | | `#D3B8A6` / `#BFA495` | | 0.110 / 0.28 | 0.168 |
+
+- My renders reproduce the modeller's table within 0.01 on shares and profiles.
+- **Colour, own Pillow sampling:**
+  - Swatches: Main `#BBA8A0` (18°), Rock Shadow `#9B949E` (282°, lavender), Highlight `#D3BAAC`, Foliage `#819A1E` /
+    `#96AB22` / `#CCCA24`.
+  - Rock medians in all four front-family renders are hue 20.5–25.5°, sat 0.20–0.25, R > G > B. **0.0 % of our rock
+    pixels have B ≥ R** (sheet 8.9 %, its sky fill).
+  - Our shade quartile is `#917D6E` (warm, 26°) against the sheet's `#736B6E` (lavender). That is light, not paint
+    (§3.7), as noted.
+  - f34 leaves: median `#809C11` (72°, sat 0.89) against `#739103` (73°, 0.98); lit `#BAC416` against `#B6C703`; shade
+    `#545E07` against `#335602`. Our shade halves are olive rather than deep green.
+  - Bud key `#96A201` (64.5°).
+
+### Findings
+
+1. **Blocker: the Foliage Cluster rosette doesn't read as the sheet's rosette.** This affects the `StoneSpireFoliage`
+   part and all 40 hero rosettes.
+   - **The sheet:** both the exploded cluster and the hero clumps are soft rounded star-flowers. Each has 6–7 broad oval
+     leaves with rounded ends and a small round lime bud in the middle. The silhouette is scalloped and round
+     (`z_clusterA.png`; spec §1.4: "broad ovals with a soft rounded point, width 0.60–0.70 of the length").
+   - **Ours (`part_foliage.png`, and the f34 and junction crops):** the rosettes are spiky crystal shapes.
+     - Each leaf is a kite or diamond: a stem wedge with outline points at 0.24 and 0.68 of the length and a
+       single-vertex tip.
+     - A high raised midrib (`LEAF_CAMBER` 0.16 L) gives each leaf a pyramid ridge.
+     - The upright back leaf stands like a tall pointed shard.
+     - The bud is a 6-sided double cone whose apex sits at 1.45 r, so it reads as a spike, not a round bud.
+   - **Scale:** the rosettes are scaled ×1.4 and stacked, 2.2–2.8 across. They reach the share, but in the f34 and front
+     views the groups read as piles of pointed green shards rather than distinct round star rosettes. STAGES says
+     "Leaves are rounded clumps, not pointed ladders."
+   - **Fix target (keep about 12 tris a leaf; the budget is 3844 / 4000):**
+     - Reshape the outline into a broad oval: widest at about 0.55–0.65 of the length, and the base wider (≥ 0.6 at
+       0.2 L, not a wedge).
+     - Make the tip blunt. Either use two tip verts about 0.3 W apart, or move the last outline pair to about 0.8 L at
+       0.85 W so the tip angle is ≥ 110°.
+     - Drop the midrib camber to ≤ 0.07 L so the leaf reads as a cupped oval, not a pyramid.
+     - Make the bud a squat round dome: ring at about 0.5 r, top at ≤ 0.9 r, or a 2-ring dome.
+     - The back leaf stays upright but broad and oval.
+     - If the broader leaves overshoot the share, bring `ROS_SCALE` back toward 1.2, or drop hidden stacked leaves.
+       Keep f34 green within 22.7 ± 4.
+   - **Re-check** `part_foliage` against the exploded cluster. Its silhouette should be round and scalloped, with
+     screen w/h 0.86–1.05.
+
+2. **Minor: rock overlap S–P is 0.625 by full convex-hull SAT** (deepest vertex 0.571); decision 6 caps it at 0.6. The
+   spire's diamond dent makes the hull estimate a little high.
+   - **Fix:** move P 0.03–0.05 toward −X, from (−1.82, 0.35) to about (−1.86, 0.35).
+
+3. **Minor: dressing cuts into rocks.** 24 leaf/bud shells sit more than 0.05 inside a rock and 10 more than 0.20 (max
+   0.38). The spec allows ≤ 0.05 (§2.3, §6), so these hidden faces waste tris.
+   - **Fix:** `DROP_DEPTH` from 0.40 to about 0.15, and push to ≤ 0.05; or re-seat those leaves.
+   - Any tris freed help pay for finding 1.
+
+4. **Minor: the foot rock reads boxier than the sheet's dome.**
+   - In the f34, front and part shots, its front and left faces stand near vertical under a large flat top. The
+     underside shot reads as a box, while the sheet's is a wide low slab (w/h 1.54).
+   - The sheet's Foot Rock is a faceted dome: the upper faces slope steadily to a smaller flat top, with a nose vertex.
+   - **Fix:** pull the upper ring in, with the top facet at about 0.45–0.50 W and the 0.80 H ring at 0.80–0.85, so the
+     upper faces slope about 35–45°. Keep the nose vertex and the flat floor.
+
+5. **Minor (known): rear_sheet green is 9.3 % against 23.1 %, and W : H is 1.16 against 0.97.**
+   - The sheet's rear is a front redraw (decision 2: loosely). Our true back shows B1–B3 and the bare spire back.
+   - Decision 3's back dressing is present: the dome BD, BR, BS and the three-rosette mound B1.
+   - Accepted as a known miss. If finding 1 frees tris, one more back rosette at the P / BD junction would help.
+
+6. **Minor (known): top view.** W : D is 1.36 against 1.05 and green 43 % against 32 %. B1 is not the largest green
+   group; the front crevice band is. The sheet's top is a re-composition (§3.4), so this is accepted.
+
+7. **Minor: Rr is 3.11 wide against 2.8 ± 0.2.**
+   - The 0.9 lean adds the extra width; the rock itself reads right (flat top, leans toward the spire) and its f34 box
+     matches.
+   - Accepted. A lean of about 0.7 would bring it inside the tolerance.
+
+8. **Minor: the part shots read light.** FootRock `#DFBFAA` and SmallRock `#D6B6A1` against `#C7A997` / `#C4A999`.
+   - Their big flat tops face the key light at e 25. The hero medians are on target within 1 / 3 / 6, so this is
+     lighting and accepted.
+
+9. **Minor: the leaf shade halves are olive (`#545E07`, 66°) where the sheet's are deep green (`#335602`, 87°), and the
+   f34 green saturation is 0.89 against ≥ 0.93.**
+   - **Fix:** take `leaf_deep` a step greener and more saturated, toward `#3F6A01`, while keeping `leaf` value ≥ 0.58.
+
+**Checked and passing:**
+- **Spire:** an explicit 7-sided obelisk with long planar band faces, a 4-face cap with a sharp ridge (matches
+  `spire_cu`), and a diamond dent at the 0.60 ring. No hull_rock zigzag.
+- **Pillar:** flat-topped, steep, tapered.
+- **Rr:** flat-topped, leans toward the spire, with C10 climbing the spire's right flank. The r34 shows the lime patch
+  on that flank.
+- **Rock ring:** BL, FL, FR, the small rocks and the back pieces are chunky faceted rocks. None is a soccer ball or an
+  egg, and there are no round shoulders.
+- **Foot rock:** the front nose fan is present.
+- **Silhouette:** the f34 / front composition, top profile and width per height match the sheet (mean 0.045 / 0.020).
+- **Shares:** the f34 share is inside ±4, and the top fifth is green-free (1.5 %).
+- **Colour:** one warm stone, never lavender, blended by position with visible Tint mottling, and moss stains at
+  ≤ 20 % mix.
+- **Lighting and VFX:** none.
+- **Decisions:** 1–12 are all followed, apart from the 0.025 overlap excess in finding 2.
+
+**Score: 6.5 / 10.**
+
+**Verdict: FAIL** on finding 1 alone: the rosette part's leaf and bud shapes are clearly unlike the sheet's. Everything
+else is minor, and a fix modeller should do 2–4 and 9 in the same pass. Round 2 should re-check:
+- `part_foliage` against the exploded cluster;
+- the f34 and front shares (±4) and the top fifth (≤ 3 %);
+- floating 0;
+- tris < 4000.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+Fresh fix modeller, background Blender on port 9880 (`wip/M039.blend`). Every change is in `m039.py`. The final numbers
+below come from a freshly restarted session: `build()`, then my own checks (ray-parity cut depth per dressing shell,
+full convex-hull SAT per rock pair, leaf/bud probe geometry, green colour quartiles). Work file saved.
+
+### Blocker: the rosettes (finding 1)
+
+- **Leaf (`_leaf`, still 12 tris, a closed solid):** a broad oval instead of the kite.
+  - 8-point outline: stem; a wide base pair at 0.20 L (0.70 of the max half-width); the widest pair at 0.58 L; blunt
+    shoulders at 0.92 L (0.45); a rounded tip point at 0.98 L. Tip corner 137°, shoulder corners 141°; no
+    single-vertex spike. Width 0.74 of the length.
+  - Midrib: a low crease-ridge from stem to tip, 0.06 L above the rim, falling linearly to the rim, so each half is one
+    near-flat plane (a lit half and a shaded half, like the sheet's folded leaves). Round 1: two midrib points at
+    0.16 L, a pyramid. The underside is a strip across the midrib (thickness under the midrib, none at the rim).
+  - Curl 0.08 (was 0.10).
+- **Bud (`_bud`, 14 tris):** a squat two-ring dome: a 6-vert equator at 0.05 r in the hub, a 3-vert top ring
+  0.62 r wide forming a flat top at 0.85 r, and a flat floor. Height 0.80 r. Round 1: a double cone with its apex
+  at 1.45 r.
+- **Back leaf:** pitch 50° (was 60–64°), length 1.0 (was 1.05–1.10). It is the same broad oval, so it stands up as a
+  rounded paddle, not a shard.
+- **Side and front leaves:** side leaves 34° (was 42–44°); low front leaves 12–16° (was 22–28°). At 22–28° they rose
+  straight at the e 18–25 sheet cameras and showed edge-on, as slivers. Now they show as ovals.
+- **`ROS_SCALE`:** kept at 1.4. The flatter, broader leaves give f34 green 21.8 %, inside 22.7 ± 4, so there was no
+  overshoot to pull back.
+- **Foliage part:** `part_foliage.png` (e 25) shows a star of oval leaves round a dome bud. Its silhouette w/h is 1.52,
+  shadow included, against the sheet cluster's 0.85: the sheet draws its clusters from well above. So `render_views`
+  adds **`part_foliage_top.png` (az 0, e 55)**. There the rosette reads like `z_clusterA`: an upright oval back leaf,
+  two side ovals, the lower ring and the bud in the middle, w/h 1.07. The top views of the hero show every rosette as a
+  round scalloped star.
+
+### Minors
+
+- **S–P overlap (finding 2):** moving P 0.04 to −X (to −1.86) only brought the full SAT overlap to 0.610. P is now at
+  (−1.94, 0.35), 0.12 from round 1, and S–P is **0.581**. P–F is 0.19 and P–BL a 0.23 gap. Nothing else moved.
+- **Dressing cut into rocks (finding 3):**
+  - `DROP_DEPTH` is 0.15 (was 0.40). A leaf that still cuts deeper than `MAX_CUT` 0.05 after the push is re-tried
+    turned and raised (`VARIANTS`: up to ±45° yaw, +45° pitch, 0.8 length) before it is left out. That keeps the share
+    (only 14 leaves left out, 7 of them in C2's triple crevice; 55 kept on a re-try).
+  - The guard now tests per rock with ray parity. One BVH over overlapping rocks plus a nearest-normal sign test
+    misread points by rock edges, and a C2 bud sat 0.23 inside FL.
+  - Ground roots that start inside a rock's foot slide out horizontally.
+  - Buds are pushed out, and raised along the rosette axis if a crevice holds them.
+- **Foot rock (finding 4):** rings are now (0, .74) (.55, 1.0) (.80, .84) (1.0, .47); they were (0, .74) (.50, 1.0)
+  (.76, .86) (1.0, .55).
+  - The top facet (normal z > 0.97) is now **0.49 W** across (was 0.57), and the top band slopes **39°** (was 61°).
+  - Area CV is 0.65 (spec ≥ 0.6). Widest at h .55. The nose vertex is kept.
+  - It reads as a faceted dome in `part_footrock` and the f34.
+- **Leaf colour (finding 9):** `leaf_deep` is `#386E03` (92°), was `#496A01`. The requested `#3F6A01` rendered a
+  median per-pixel leaf saturation of 0.922; `#386E03` gives 0.943.
+
+### Before → after
+
+| Check | Round 1 | Fix round 1 | Target |
+| --- | --- | --- | --- |
+| Leaf outline | kite, single-vertex tip | oval, tip 137° / shoulders 141°, base 0.70 of max width at 0.2 L, widest at 0.58 L | tip ≥ 110°, base ≥ 0.6 |
+| Midrib camber | 0.16 L (two points) | 0.06 L (crease-ridge) | ≤ 0.07 L |
+| Bud | double cone, apex 1.45 r, 12 tris | two-ring dome, top 0.85 r, 14 tris | top ≤ 0.9 r |
+| Back leaf | 60–64°, 1.10 L, pointed | 50°, 1.0 L, oval | no tall pointed leaf |
+| Hero tris | 3844 (235 leaves, 40 buds) | **3984** (544 rock, 240 leaves × 12, 40 buds × 14) | < 4000 |
+| Part tris Main / SideRock / FootRock / SmallRock / Foliage | 54 / 152 / 180 / 30 / 96 | 54 / 154 / 184 / 30 / 98 | < 1000 |
+| f34 rock / green | 76.5 / 23.5 | **78.2 / 21.8** | 77.3 / 22.7 ± 4 |
+| f34 green fifths | .37 .41 .11 .10 .015 | .39 .39 .11 .11 **.004** | top fifth ≤ 3 % |
+| front rock / green | 77.2 / 22.8 | 79.0 / 21.0 | 76.9 / 23.1 ± 4 |
+| f34 W : H, profile mean / max, width/height mean | 1.136, .045 / .14, .020 | 1.134, .041 / .12, .022 | 1.138 |
+| front W : H, profile mean / max | 1.145, .059 / .16 | 1.142, .070 / .18 | 1.112 |
+| r34 green, W : H | 24.0, 0.977 | 22.1, 0.977 | 19.4 (loose) |
+| Floating shells / unchained (0.03, 0.05) | 0 / 0 / 0 | **0 / 0 / 0** (all six objects; max dressing gap 0.011) | 0 |
+| Dressing shells > 0.05 in a rock (> 0.10, > 0.20), max | 24 (16, 10), 0.38 | **0 (0, 0), 0.029** (hero, 280 shells); parts max 0.024 | ≤ 0.05 |
+| S–P overlap (full SAT) | 0.625 | **0.581** | ≤ 0.6 |
+| Other overlaps (SAT) | S–Rr 0.545, P–F 0.19 | S–Rr 0.545, P–F 0.192, S–BD 0.041, FL–s1 0.03 | ≤ 0.6 |
+| Foot rock top facet / top-band slope / upper (> .55 H) slope | 0.57 W / — / 61° | **0.49 W / 39° / 58°** | 0.45–0.50 W, 35–45° |
+| Foot rock area CV / edge CV / regions 5° | 0.62 / 0.39 / 23 | 0.65 / 0.39 / 19 | ≥ 0.6 / ≥ 0.35 |
+| f34 leaves: median, lit, shade | `#829B09` (sat 0.89 per the verifier) | `#829C0A` h71 s0.94; lit `#C1CA0A`; shade `#515D04` h68 | sheet `#8FA304` / `#D0D205` / `#3B5D03` h83 |
+| Median per-pixel leaf saturation (f34) | 0.89 | **0.943** | ≥ 0.93 |
+| f34 rock median | `#C8AA96` | `#C8AA96` | `#C9AD9C` |
+
+- **Mesh checks:**
+  - Every object and every shell has 0 non-manifold edges, 0 bowtie verts, 0 boundary, wire or loose elements, 0
+    zero-area faces, 0 n-gons and 0 duplicate verts. Normals are outward, with 0 self-intersections and 0 inverted
+    faces per shell, and no corner is under 5°.
+  - Hero shells: 293 (13 rocks, 240 leaves, 40 buds).
+  - Origin at the bbox bottom centre, transforms applied.
+  - `K.check` reports none; `build()` problems `[]`.
+- **UV:** 0 overlaps, 0 flipped, min gap 0.016, border 0.008, even density, conformal stretch p95 ≤ 1.06 on all six.
+- **Size:** hero 14.46 × 10.50 × 11.00 (tolerance 14.0 ± 0.6 × 10.5 ± 0.8 × 11.0 ± 0.3).
+
+### Left over
+
+- **Leaf shade hue:** 68° against the sheet's 83°. Our shaded halves are lit by the warm studio fill, the sheet's by a
+  cool sky. The lit and median hues match (63° / 71° against 61° / 68°). Nothing is coloured by facing.
+- **Budget:** 3984 / 4000 leaves 16 tris spare. Any new rosette needs leaves removed elsewhere.
+- **Known misses, unchanged:** rear green 8.3 % (a front redraw on the sheet), top W : D 1.36 with green 45 %, Rr
+  3.11 wide, light part-shot rock medians.
+- **Junction close-up:** `junc_cu` framing is unchanged. The crevice shows the new oval leaves.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+A fresh verifier, read-only, using a background Blender on port 9880 (`wip/M039_verify.blend`, not saved). I re-measured every number below with my own bmesh, BVH, ray-parity and SAT code (`mesh.py`, `shells.py`, `colgeo.py`). I made my own renders of the six `*_sheet` cameras, the foliage, foot-rock and side-rock parts, `part_foliage_top`, `foot_under`, `junc_cu` and two extra close-ups (`c2_cu` and `c10_cu`), plus 1440 × 1200 renders of f34 and r34. Colour was sampled with Pillow on both images (`col.py`). Everything is in `scratchpad\m039_verify2\`.
+
+### Measured
+
+| Check | Result | Target | |
+| --- | --- | --- | --- |
+| Tris: hero / Main / SideRock / FootRock / SmallRock / Foliage | 3984 / 54 / 154 / 184 / 30 / 98 | < 4000 / < 1000 | ok (16 spare) |
+| Hero size | 14.46 × 10.50 × 11.00 | 14.0 ± 0.6 × 10.5 ± 0.8 × 11.0 ± 0.3 | ok |
+| Part sizes | Main 4.40 × 3.80 × 11.00; SideRock 3.11 × 2.68 × 5.72; FootRock 5.00 × 3.80 × 4.20 (rock 3.70 H); SmallRock 1.40 × 1.20 × 1.00; Foliage 1.92 × 1.77 × 0.82 | §1.4 | Rr 3.11 wide (known) |
+| Shells | hero 293 (13 rock, 240 leaf × 12 tris, 40 bud × 14 tris); SideRock 9; FootRock 12; Foliage 8; Main 1; SmallRock 1 | decision 6 | ok |
+| Mesh, all six objects | 0 open shells, 0 non-manifold edges, 0 bowtie verts, 0 boundary, 0 wire, 0 loose verts, 0 zero-area faces, 0 n-gons, 0 duplicate verts | 0 | ok |
+| Self-intersections within a shell (BVH self-overlap, shared-vertex pairs excluded) | 0 in every shell of all six objects | 0 | ok |
+| Normals, shading, transforms | every shell has positive volume; 0 smooth faces; no custom normals; min corner 5.2° (hero); origin at bbox bottom centre (0, 0, 0) on all six; rotation 0, scale 1; no modifiers; UVMap present | | ok |
+| Rocks grounded | all 13 rock shells have min z 0.000 | | ok |
+| Rock overlaps (convex-hull SAT, face and edge-cross axes; deepest vertex) | S–P **0.581** (0.527); S–Rr 0.545 (0.527); P–F 0.192; S–BD 0.041; FL–s1 0.030 | ≤ 0.6 | ok (round 1: 0.625) |
+| Floating dressing (own code: BVH overlap or vertex-to-surface ≤ 0.03; ground z ≤ 0.03; chained to a rock or the ground) | hero, SideRock, FootRock and Foliage: **0 floating, 0 unchained**; max dressing gap 0.011 | 0 | ok |
+| Leaf and bud cut into rock (ray parity with 3 rays, vertex depth) | hero: 0 shells > 0.03, **max 0.029**; SideRock 0.010; FootRock 0.024 | ≤ 0.05 | ok (round 1: 24 shells, max 0.38) |
+| Leaf shape (all 240 hero leaves and the 7 part leaves) | tip corner **138.8°**; stem corner 103°; midrib camber **0.041 L**; width ÷ length 0.74, widest at 0.58 L; L 0.54–1.43 (median 1.05) | tip ≥ 110°; camber ≤ 0.07 L | ok |
+| Bud | height ÷ radius **0.80**; top ring 0.62 r (flat 3-vert top); r 0.14–0.31 | squat dome, top ≤ 0.9 r | ok |
+| Leaves seen edge-on at the f34 camera (top-face normal within 12° of the view plane) | 67 / 240 (28 % of leaf area); 23 show their undersides; front 33 %, r34 31 % | — | minor 1 |
+| f34_sheet (0, 20) | W : H 1.134 (1.138); rock / green **78.2 / 21.8** (77.3 / 22.7); green fifths .387 .394 .105 .110 **.004**; top profile mean 0.041, max 0.12; width per height mean 0.022 | shares ± 4; top fifth ≤ 3 % | ok |
+| front_sheet (0, 18) | W : H 1.142 (1.112); 79.0 / 21.0 (76.9 / 23.1); profile mean **0.070**, max 0.18 (spire tip about 0.05 f right; FR end high); width per height 0.029 | ± 4; profile mean ≤ 0.04 | minor 4 |
+| r34_sheet (−30, 20) | W : H 0.977 (0.997); 77.9 / 22.1 (80.6 / 19.4); profile 0.059 | loose | ok |
+| side / rear / top | side 0.841 (0.867), 84 / 16; rear 1.159 (0.969), 92 / 8; top 1.359 (1.046), 55 / 45 | loose | known misses |
+| Foot rock (part, rock shell) | top facet (n z > 0.97, 2 tris) **0.49 W** × 0.29 D; width per height (h .05 → .95) .89 .92 .96 .97 .95 .87 .64, widest at h .55; upper faces (above 0.6 H) slope 17–89°, 9 of 25 between 28° and 47°; 48 tris | top 0.45–0.50 W, sloping upper faces | ok |
+| Colour by facing | rock key × Tint against normal z / x / y: r = 0.135 / 0.007 / 0.006; against height r = 0.46 (by position); leaf key against normal z 0.004; `K.check` []; `kit_baked_shading` 0.0 on all six | < 0.5 | ok |
+| Tint | corner Tint 0.922–1.072, sd 0.024, 138 levels; one tone per face (5 faces of 3984 non-uniform); 1 of 90 coplanar rock pairs breaks tone; rock-neighbour median difference 0.004 | visible, not confetti | ok |
+| Rock area by material | plain rock 63.3 %, light mixes 14.3 %, deep mixes 7.8 %, moss stain at 10 % 13.6 %, moss stain at 20 % 0.9 % | stains ≤ 20 % mix | ok |
+| Keys (sRGB) | rock `#B6A095`, moss-stain mixes `#AF9B8C` / `#A89683` (warm), leaf `#718A01`, leaf mixes `#99A504` / `#5A7F02`, leaf_light `#ACB306`, bud `#96A201`; no lavender key | R > G > B rock; never `#9B949E` | ok |
+| Lighting / VFX | emission 0.0 on every material; no children, empties or sockets | none (decision 8) | ok |
+| Collision tags | hero none; Main / SideRock / FootRock / SmallRock hull; Foliage none | decision 7 | ok |
+
+**Colour (Pillow, the spec's masks; ours / sheet):**
+
+| Cell | Rock median | Rock lit / shade | B ≥ R rock px | Green median | Green lit / shade | Per-pixel green sat |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | `#C8AA96` 24° 0.25 / `#C9AD9C` 23° 0.22 | `#EFCDB6` / `#917E71` (24°) vs `#E5C9B5` / `#756C70` (333°) | 0.000 / 0.057 | `#829C10` 71° / `#8FA304` 68° | `#C2CA16` 63° / `#515D06` **68°** vs `#D0D205` 61° / `#3B5D03` **83°** | 0.90 / 0.98 |
+| front | `#C8A996` 23° / `#CAAE9D` 23° | | 0.000 / 0.125 | `#829C10` / `#93A406` | shade `#515C06` 68° vs `#3C5606` 80° | 0.90 / 0.96 |
+| r34 / side / rear / top | `#E1C0A9` 25° / `#B29B8A` 25° / `#BDA497` 21° / `#D3B8A6` 24° | | 0.000 each | `#8CA511` / `#72860C` / `#788E0F` / `#739807` | | 0.90–0.96 |
+| part_foliage / part_foliage_top | — | | — | `#84A010` / `#829F08` vs exploded `#769605` | | 0.91 / 0.95 |
+
+- Swatches re-sampled: Main `#BBA8A0` 18°, Rock Shadow `#9B949E` 282°, Highlight `#D3BAAC`, Foliage `#819A1E` / `#96AB22` / `#CCCA24`.
+- The rock is one warm stone, R > G > B, hue 21–25°, sat 0.20–0.25, never mauve.
+- Our shade is warm grey-brown where the sheet's is lavender. That is the sheet's cool sky fill (spec §3.7), not paint.
+
+### The round-1 blocker: the rosettes
+
+- **The Foliage part does now read as the sheet's rosette** (`sbs_fol_top.png` against the exploded cluster at (180,925,250,995)):
+  - an upright oval back leaf, two oval side leaves and a lower ring of ovals round a lime bud;
+  - a scalloped, round silhouette;
+  - no kite outlines, no single-vertex spikes and no double-cone bud.
+- **The hero's rosettes are better than in round 1.** The top view shows every rosette as a round scalloped star, close to the sheet's top cell. In the f34, the upright back and side leaves of each rosette read as ovals.
+- **The fix modeller's claims were checked and hold:**
+  - tip 138.8° (they gave 137°);
+  - camber 0.041 L where it counts. They gave 0.06 L nominal; curl lowers it.
+  - bud 0.80 r high with a flat top 0.62 r wide;
+  - back leaf at 50°;
+  - S–P 0.581;
+  - maximum cut 0.029;
+  - foot-rock top 0.49 W;
+  - f34 21.8 % green with 0.4 % in the top fifth;
+  - 3984 tris.
+- **Not quite right:** the median per-pixel leaf saturation. They reported 0.943; I measure 0.90, using a mask that includes edge pixels. Their figure may come from a tighter mask.
+
+### Findings
+
+1. **Minor: at the governing cameras, the flat low leaf ring still shows edge-on as thin blades.**
+   - The low front leaves are pitched 12–16° and the side leaves 34°. The f34 camera is at e 20, so a leaf pointing at the camera is seen about 8° off edge-on.
+   - 28 % of leaf area is within 12° of edge-on at the f34 camera (33 % at the front camera), and 23 leaves show their undersides.
+   - In the 1440-px f34 (`big/`) and the close-ups `c10_cu` and `c2_cu`, the rosettes of C10 (Rr top and the spire flank), C3 and C5 (F top) and C1 have a skirt of thin pointed green slivers under their oval upper leaves.
+   - The sheet's clusters are chunkier and more upright: many small cupped ovals stacked into puffy lime columns, all facing the viewer.
+   - It no longer reads as "green shards" overall: the upper leaves are ovals and the top view is right. It is the main difference left against the sheet.
+   - **Fix target (if a round 3 or a later polish pass is wanted):**
+     - Turn the low ring away from the camera axis, so it is mostly side-facing (az ±60–100°) rather than 18–24° off the face direction.
+     - Either droop the front leaves to pitch −5 to 0°, or drop them and give the tris to a second upright tier (pitch 35–55°, facing out).
+     - Target: ≤ 12 % of leaf area within 12° of edge-on at f34 (0, 20), 0 undersides showing.
+     - Optionally shorten the leaves toward the study's 0.55–0.85 (median L is now 1.05), so the clumps read as many smaller leaves.
+
+2. **Minor: the leaf shade halves still lean olive.**
+   - f34 shade quartile `#515D06` (68°) against the sheet's `#3B5D03` (83°).
+   - Median per-pixel saturation 0.90 against 0.98 (spec ≥ 0.93 by my mask).
+   - The warm studio fill accounts for part of this. The `leaf_deep` mix `#5A7F02` (78°) could go a step greener and darker, toward `#4A7A02`, keeping `leaf` value ≥ 0.58.
+
+3. **Minor: the foot rock is a faceted dome-block rather than the sheet's rounder dome.**
+   - The top facet (0.49 W) and the sloped top band are now right.
+   - Its sides stay steep: 64 % of the area is wall within 20° of vertical, and 16 of the 25 upper faces slope ≥ 51°.
+   - The underside shot still reads boxy.
+   - Accepted: it reads as the sheet's foot rock in f34, front and `part_footrock`.
+
+4. **Minor: the front_sheet top-profile mean is 0.070** (round 1: 0.059; target ≤ 0.04). The spire tip sits about 0.05 f right of the sheet's, and the FR end stands higher. f34 is in tolerance (0.041), so this is accepted as the front redraw's offset.
+
+5. **Minor (known, accepted in round 1):**
+   - rear_sheet green is 8 % against 23 %, and its W : H is 1.16;
+   - the top view's W : D is 1.36, with 45 % green;
+   - Rr is 3.11 wide;
+   - the part-shot rock medians are light (lighting);
+   - the r34's lime patch on the spire flank reads as two separate rosettes, not a patch.
+
+6. **Minor: the loose views' rock hue is 24.6–25.5°** (r34, side), against the spec's 19–24°. It is still clearly warm, R > G > B, with 0 % B ≥ R. No action needed.
+
+**Decisions 1–12:** all followed.
+- Size: 14.46 × 10.50 × 11.00.
+- Cameras as listed.
+- Back dressing: BD, BR, BS and the B1 mound.
+- Explicit 7-sided spire: 54 tris, 4-face cap, diamond dent.
+- Hero proportions.
+- One hero of closed shells: overlaps ≤ 0.6, no booleans, 0 bowties, 0 self-intersections.
+- Six exports, named `StoneSpire*`, with the collision tags as decided.
+- No light or VFX.
+- One warm stone, blended by position, never lavender.
+- Moss stains at ≤ 20 % mix.
+- Keys named `m039_*`.
+
+**Score: 7.5 / 10.**
+
+**Verdict: PASS.**
+- The mesh is clean, under budget and correctly packaged.
+- There is no floating dressing, and no leaf or bud cuts more than 0.05 into a rock.
+- The silhouette and shares match the governing cells, the colour family is right and set by position, and every decision is followed.
+- The round-1 blocker is fixed: the rosettes are oval-leaf stars with a round bud, not shards.
+- Finding 1 is the main leftover for the commit notes: the flat low leaf ring shows edge-on at the sheet cameras, so the hero clumps are flatter and thinner-edged than the sheet's puffy upright clusters.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 2 (7.5/10) and committed. Round 1 failed (6.5/10) because the rosettes were spiky.
+- **Left for a later polish pass:**
+  - Low front leaves read as thin edge-on blades at the 20° cameras. Target: turn the low ring to the sides, add an upright 35–55° tier, keep ≤ 12 % of leaf area edge-on, and show no undersides.
+  - Leaf shade halves lean olive. Move `leaf_deep` toward `#4A7A02`.
+  - The foot rock sides are steep.
+  - The front-cell profile mean is 0.070.
+  - Budget is tight: 3984 of 4000.
+- **Export:** 6 assets, 6 solid pieces, 4504 tris, 0 VFX sockets, palette 17 colours, 0 problems.

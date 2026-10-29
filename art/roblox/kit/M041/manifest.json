@@ -1,0 +1,2075 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M041",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 1024,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m041_bed",
+    "hex": "#00A0EA",
+    "levels": [
+     0.97267,
+     0.97964,
+     0.9853,
+     0.98771,
+     0.99551,
+     1.0,
+     1.00566,
+     1.01383,
+     1.02126,
+     1.02804
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_bed_x_light_25",
+    "hex": "#0BAAEB",
+    "levels": [
+     0.98124,
+     0.98296,
+     0.98685,
+     0.99207,
+     0.9936,
+     0.99696,
+     0.99988,
+     1.00327,
+     1.00582,
+     1.00915,
+     1.01127,
+     1.01434,
+     1.01651,
+     1.02784
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_bed_x_light_50",
+    "hex": "#16B4EC",
+    "levels": [
+     0.97294,
+     0.97703,
+     0.97962,
+     0.98223,
+     0.98788,
+     0.99378,
+     0.99744,
+     0.99979,
+     1.0028,
+     1.0082,
+     1.01334,
+     1.01929,
+     1.02616
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_bed_x_light_75",
+    "hex": "#21BEED",
+    "levels": [
+     0.98027,
+     0.9847,
+     0.98762,
+     0.99048,
+     0.99519,
+     0.99905,
+     1.00274,
+     1.00731,
+     1.01317,
+     1.02156,
+     1.02999
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_bud",
+    "hex": "#A3403D",
+    "levels": [
+     0.95769,
+     0.96084,
+     0.96207,
+     0.96656,
+     0.96769
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_bud_pink",
+    "hex": "#A86A90",
+    "levels": [
+     0.99897,
+     1.00424,
+     1.00726,
+     1.00963
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_flower",
+    "hex": "#C1A700",
+    "levels": [
+     0.97223,
+     0.97625,
+     0.9801,
+     0.98311,
+     0.98599,
+     0.98883,
+     0.99079,
+     0.99519,
+     0.99783,
+     0.99893,
+     1.00123,
+     1.0139,
+     1.0231,
+     1.02569,
+     1.02842,
+     1.03197,
+     1.0333,
+     1.05272,
+     1.05466,
+     1.05765
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_grass",
+    "hex": "#93B600",
+    "levels": [
+     0.97403,
+     0.97868,
+     0.98639,
+     0.99032,
+     0.99212,
+     0.99435,
+     0.99646,
+     1.00163,
+     1.00333,
+     1.00691,
+     1.00947,
+     1.01196,
+     1.01877,
+     1.02258,
+     1.02587,
+     1.03559
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_grass_x_light_50",
+    "hex": "#9ABC00",
+    "levels": [
+     1.02018
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_grass_x_light_75",
+    "hex": "#9DBE00",
+    "levels": [
+     0.95999,
+     0.98104,
+     1.00432,
+     1.01577
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf",
+    "hex": "#0D5510",
+    "levels": [
+     0.96386,
+     0.97586,
+     0.97901,
+     0.9821,
+     0.98527,
+     0.98865,
+     0.99066,
+     0.99401,
+     0.99662,
+     0.99898,
+     1.00008,
+     1.00264,
+     1.00355,
+     1.0052,
+     1.0055,
+     1.00644,
+     1.00881,
+     1.01146,
+     1.01526,
+     1.01812,
+     1.02245,
+     1.02444,
+     1.02692,
+     1.02841,
+     1.03153,
+     1.03463,
+     1.03755,
+     1.04471,
+     1.05196,
+     1.05364,
+     1.06121,
+     1.07181
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_lime",
+    "hex": "#82A500",
+    "levels": [
+     0.95076,
+     0.95956,
+     0.96613,
+     0.97017,
+     0.97323,
+     0.97848,
+     0.98333,
+     0.98422,
+     0.98498,
+     0.98625,
+     0.98689,
+     0.98924,
+     0.9903,
+     0.99134,
+     0.99218,
+     0.9937,
+     0.99522,
+     0.99608,
+     0.9968,
+     0.99751,
+     0.99958,
+     1.00246,
+     1.00567,
+     1.01268,
+     1.01542,
+     1.0189,
+     1.02096,
+     1.02508,
+     1.02927,
+     1.03813,
+     1.03924,
+     1.05573
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_lime_x_grass_light_25",
+    "hex": "#8AAC00",
+    "levels": [
+     0.95521,
+     0.96015,
+     0.97541,
+     0.97891,
+     0.98183,
+     0.98482,
+     0.98705,
+     0.98902,
+     0.99138,
+     0.99356,
+     0.99525,
+     0.99811,
+     1.00016,
+     1.00452,
+     1.00798,
+     1.01062,
+     1.0122,
+     1.01568,
+     1.01796,
+     1.01989,
+     1.02553,
+     1.02779,
+     1.02979,
+     1.03474,
+     1.03688,
+     1.03986,
+     1.04182,
+     1.04355,
+     1.04602,
+     1.04937,
+     1.05163,
+     1.05513
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_lime_x_leaf_50",
+    "hex": "#487D08",
+    "levels": [
+     0.97666,
+     0.97881,
+     0.98206,
+     0.9843,
+     0.98682,
+     0.99096,
+     1.00166,
+     1.00549,
+     1.00818,
+     1.00937,
+     1.01217,
+     1.0151,
+     1.01781,
+     1.01999,
+     1.02277,
+     1.02891,
+     1.03131,
+     1.03356,
+     1.03968,
+     1.04157,
+     1.04369
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_lit",
+    "hex": "#1E8753",
+    "levels": [
+     0.94945,
+     0.95217,
+     0.95465,
+     0.95701,
+     0.96016,
+     0.96246,
+     0.9646,
+     0.96832,
+     0.97092
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_x_lit_25",
+    "hex": "#116221",
+    "levels": [
+     0.95365,
+     0.96062,
+     0.96353,
+     0.97279,
+     0.97597,
+     0.98146,
+     0.98442,
+     0.99459,
+     0.99872,
+     1.00168,
+     1.0042,
+     1.00589,
+     1.00828,
+     1.01095,
+     1.0145,
+     1.0186,
+     1.02163,
+     1.0237,
+     1.02929,
+     1.0315,
+     1.03451,
+     1.03701,
+     1.03958,
+     1.04176,
+     1.04539,
+     1.04906,
+     1.05293,
+     1.06773,
+     1.07054
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_leaf_x_lit_50",
+    "hex": "#166E32",
+    "levels": [
+     0.96991,
+     0.97353,
+     0.98046,
+     0.9919,
+     0.99869,
+     1.00615,
+     1.00798,
+     1.01044,
+     1.01299,
+     1.01534,
+     1.02003,
+     1.02259,
+     1.02606,
+     1.02892,
+     1.03215,
+     1.03442,
+     1.03623,
+     1.03867,
+     1.04041,
+     1.04223,
+     1.04449,
+     1.04737,
+     1.04965,
+     1.05286,
+     1.0561,
+     1.05879,
+     1.05996,
+     1.06652,
+     1.06817
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_pebble",
+    "hex": "#6F4F28",
+    "levels": [
+     0.94947,
+     0.95217,
+     0.95421,
+     0.95667,
+     0.9594,
+     0.96243,
+     0.96529,
+     0.96903,
+     0.97593,
+     0.98073,
+     0.98297,
+     0.98698,
+     0.99101,
+     1.0493,
+     1.05249,
+     1.06215,
+     1.06501,
+     1.06799,
+     1.07454,
+     1.07689,
+     1.07877
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_petal",
+    "hex": "#DACAC8",
+    "levels": [
+     0.95788,
+     0.96307,
+     0.9649,
+     0.96882,
+     0.97082,
+     0.9736,
+     0.97555,
+     0.97752,
+     0.9806,
+     0.98272,
+     0.9848,
+     0.9871,
+     0.98935,
+     0.99184,
+     0.99282,
+     0.99712,
+     1.00025,
+     1.00338,
+     1.00612,
+     1.01068,
+     1.01318,
+     1.01724,
+     1.01946,
+     1.02228,
+     1.02453,
+     1.02838,
+     1.03035,
+     1.03227,
+     1.03423,
+     1.03633
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock",
+    "hex": "#A09492",
+    "levels": [
+     0.93533,
+     0.95213,
+     0.95743,
+     0.96188,
+     0.96454,
+     0.96621,
+     0.96959,
+     0.97117,
+     0.97344,
+     0.97465,
+     0.97815,
+     0.98139,
+     0.98539,
+     0.99188,
+     0.99389,
+     0.99684,
+     1.00358,
+     1.0066,
+     1.00741,
+     1.01182,
+     1.01248,
+     1.01585,
+     1.02017,
+     1.02252,
+     1.02488,
+     1.02824,
+     1.03155,
+     1.03505,
+     1.0362,
+     1.03849,
+     1.04566,
+     1.05517
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_light",
+    "hex": "#A99F9D",
+    "levels": [
+     0.95054,
+     0.95946,
+     0.96202,
+     0.96646,
+     0.96865,
+     0.97131,
+     0.97349,
+     0.97422,
+     0.97643,
+     0.97964,
+     0.98115,
+     0.98219,
+     0.98446,
+     0.98649,
+     0.98804,
+     0.99005,
+     0.99188,
+     0.99362,
+     0.99407,
+     0.99635,
+     1.00081,
+     1.0027,
+     1.00443,
+     1.00544,
+     1.00889,
+     1.00988,
+     1.01199,
+     1.01534,
+     1.02028,
+     1.02596,
+     1.02596,
+     1.06017
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_x_deep_25",
+    "hex": "#9C908E",
+    "levels": [
+     0.93993,
+     0.94958,
+     0.95486,
+     0.95642,
+     0.9596,
+     0.96304,
+     0.96785,
+     0.97323,
+     0.9756,
+     0.9801,
+     0.98243,
+     0.98597,
+     0.98888,
+     0.99071,
+     0.99134,
+     0.99416,
+     0.99551,
+     0.99584,
+     0.9965,
+     0.99943,
+     0.99973,
+     1.00194,
+     1.00299,
+     1.00758,
+     1.01338,
+     1.01547,
+     1.02066,
+     1.02477,
+     1.02724,
+     1.03297,
+     1.03941,
+     1.06003
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_x_deep_50",
+    "hex": "#988C8A",
+    "levels": [
+     0.94853,
+     0.95418,
+     0.95851,
+     0.96162,
+     0.96449,
+     0.96651,
+     0.96868,
+     0.9717,
+     0.97474,
+     0.97725,
+     0.97948,
+     0.98094,
+     0.98239,
+     0.98391,
+     0.98513,
+     0.98582,
+     0.9872,
+     0.9898,
+     0.99282,
+     0.99436,
+     0.99579,
+     1.00046,
+     1.00299,
+     1.00778,
+     1.0094,
+     1.01439,
+     1.017,
+     1.02165,
+     1.02456,
+     1.03382,
+     1.04951,
+     1.07042
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_x_deep_75",
+    "hex": "#938987",
+    "levels": [
+     0.96497,
+     0.96975,
+     0.97395,
+     0.9762,
+     0.97861,
+     0.98149,
+     0.98375,
+     0.98594,
+     0.98867,
+     0.99154,
+     0.99412,
+     0.9988,
+     1.00175,
+     1.00491,
+     1.00801,
+     1.01119,
+     1.01335,
+     1.0151,
+     1.01925,
+     1.02339,
+     1.02648,
+     1.02899,
+     1.03161,
+     1.03475,
+     1.03742,
+     1.03967,
+     1.04437,
+     1.04713,
+     1.05023,
+     1.05715,
+     1.06152,
+     1.06485
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_x_light_25",
+    "hex": "#A29795",
+    "levels": [
+     0.95181,
+     0.95644,
+     0.96421,
+     0.97247,
+     0.97565,
+     0.97832,
+     0.98075,
+     0.98765,
+     0.98995,
+     0.99417,
+     0.99785,
+     1.00051,
+     1.00509,
+     1.00838,
+     1.01013,
+     1.01384,
+     1.0166,
+     1.02057,
+     1.02466,
+     1.02709,
+     1.03265,
+     1.03722,
+     1.04835,
+     1.05541,
+     1.05826,
+     1.06927
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_rock_x_light_50",
+    "hex": "#A49A98",
+    "levels": [
+     0.95021,
+     0.96155,
+     0.97129,
+     0.97639,
+     0.98476,
+     0.9899,
+     0.99214,
+     0.99341,
+     0.99449,
+     0.99599,
+     1.00055,
+     1.0025,
+     1.00366,
+     1.00809,
+     1.0114,
+     1.01229,
+     1.01594,
+     1.01786,
+     1.0201,
+     1.0214,
+     1.02296,
+     1.02741,
+     1.02864,
+     1.03359,
+     1.03791,
+     1.04124,
+     1.04543,
+     1.05397,
+     1.05685,
+     1.05835,
+     1.06552,
+     1.07054
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand",
+    "hex": "#EEBA95",
+    "levels": [
+     0.97617,
+     0.97846,
+     0.98167,
+     0.9842,
+     0.98861,
+     0.99196,
+     0.99527,
+     0.99823,
+     1.00029,
+     1.00351,
+     1.00498,
+     1.00858,
+     1.01167,
+     1.01487,
+     1.01869,
+     1.02412
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_deep",
+    "hex": "#BEA881",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_x_deep_25",
+    "hex": "#E2B690",
+    "levels": [
+     0.96763,
+     0.96871,
+     0.97268,
+     0.97615,
+     0.97965,
+     0.98282,
+     0.98549,
+     0.98969,
+     0.99207,
+     0.9947,
+     0.99671,
+     1.00003,
+     1.00236,
+     1.00682,
+     1.01011,
+     1.01244,
+     1.02017
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_x_deep_50",
+    "hex": "#D6B18B",
+    "levels": [
+     0.96725,
+     0.97156,
+     0.97431,
+     0.978,
+     0.9803,
+     0.98328,
+     0.98658,
+     0.98936,
+     0.99452,
+     0.99577,
+     0.9987,
+     1.00027,
+     1.00461,
+     1.01206,
+     1.01755,
+     1.02182
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_x_light_25",
+    "hex": "#F0BC97",
+    "levels": [
+     0.97857,
+     0.98554,
+     0.99179,
+     0.99463,
+     0.99918,
+     1.00098,
+     1.00308,
+     1.0051,
+     1.00841,
+     1.01184,
+     1.02913
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_x_light_50",
+    "hex": "#F1BE99",
+    "levels": [
+     0.97654,
+     0.98117,
+     0.98667,
+     0.99055,
+     0.99488,
+     1.00237,
+     1.00571,
+     1.00758,
+     1.01342,
+     1.0156,
+     1.02282
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_sand_x_light_75",
+    "hex": "#F2BF9B",
+    "levels": [
+     0.96933,
+     0.97423,
+     0.9799,
+     0.98204,
+     0.98417
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_soil",
+    "hex": "#725325",
+    "levels": [
+     0.98244,
+     0.98387,
+     0.98649,
+     0.99001,
+     0.99246,
+     0.99616,
+     0.99779,
+     1.00005,
+     1.00239,
+     1.00446,
+     1.00733,
+     1.01009,
+     1.01468,
+     1.01787,
+     1.01965,
+     1.0233
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_water",
+    "hex": "#00B4E2",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m041_water_foam",
+    "hex": "#CDE6EE",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {
+   "m041_water": {
+    "hex": "#00B4E2",
+    "texture": "water/m041_water.png",
+    "transparency": 0.3
+   },
+   "m041_water_foam": {
+    "hex": "#CDE6EE",
+    "texture": "water/m041_water_foam.png",
+    "transparency": 0.2
+   }
+  },
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "ShoreShelf",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "hero",
+   "size": [
+    32.0,
+    13.0622,
+    28.0
+   ],
+   "tris": 3858,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelf.glb",
+     "kind": "solid",
+     "tris": 2718,
+     "offset": [
+      0.0,
+      6.5311,
+      0.0
+     ],
+     "size": [
+      32.0,
+      13.0622,
+      28.0
+     ]
+    },
+    {
+     "file": "meshes/ShoreShelf_water_m041_water.glb",
+     "kind": "water",
+     "tris": 412,
+     "offset": [
+      0.0,
+      0.625,
+      0.0
+     ],
+     "size": [
+      31.96,
+      0.75,
+      27.96
+     ],
+     "key": "m041_water",
+     "color": "#00B4E2",
+     "texture": "water/m041_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/ShoreShelf_water_m041_water_foam.glb",
+     "kind": "water",
+     "tris": 728,
+     "offset": [
+      1.4059,
+      1.05,
+      0.1826
+     ],
+     "size": [
+      26.4719,
+      0.04,
+      23.3819
+     ],
+     "key": "m041_water_foam",
+     "color": "#CDE6EE",
+     "texture": "water/m041_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.2,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ShoreShelf_water_foam_1",
+     "kind": "water_foam",
+     "position": [
+      0.5,
+      1.05,
+      10.6
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_10",
+     "kind": "water_foam",
+     "position": [
+      -6.7,
+      1.05,
+      -11.8
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_11",
+     "kind": "water_foam",
+     "position": [
+      9.4,
+      1.05,
+      -11.4
+     ],
+     "vfx_scale": 0.9,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_12",
+     "kind": "water_foam",
+     "position": [
+      12.4,
+      1.05,
+      9.6
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_13",
+     "kind": "water_foam",
+     "position": [
+      8.3,
+      1.05,
+      9.6
+     ],
+     "vfx_scale": 0.5,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_2",
+     "kind": "water_foam",
+     "position": [
+      4.2,
+      1.05,
+      10.8
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_3",
+     "kind": "water_foam",
+     "position": [
+      11.5,
+      1.05,
+      1.7
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_4",
+     "kind": "water_foam",
+     "position": [
+      11.2,
+      1.05,
+      -2.8
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_5",
+     "kind": "water_foam",
+     "position": [
+      4.2,
+      1.05,
+      -10.2
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_6",
+     "kind": "water_foam",
+     "position": [
+      -2.4,
+      1.05,
+      -10.6
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_7",
+     "kind": "water_foam",
+     "position": [
+      -8.6,
+      1.05,
+      3.0
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_8",
+     "kind": "water_foam",
+     "position": [
+      -6.0,
+      1.05,
+      11.4
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShoreShelf_water_foam_9",
+     "kind": "water_foam",
+     "position": [
+      -11.6,
+      1.05,
+      -1.9
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "shore shelf water tile (32 x 28 octagon, 7 x 7 chamfers; seams X -9..9 / Y -7..7; ground 0, bed 0.2, water 0.25 -> 1.0, foam 1.03 -> 1.07, sand crest 1.6, turf 10.4): a flat cyan water plate with a pale sand shelf, one faceted sea stack (three columns, a spire, two shoulder blocks) under a lime grass cap with ferns, lime leaves, daisies and buds; six chunky flat-crowned side rocks in soft lobed foam, a foam ribbon round the shelf. One closed land shell; the cap, plants and sand pebbles their own shells; closed water and foam shells (two water pieces). Still water (no flow). 13 water_foam sockets"
+  },
+  {
+   "name": "ShoreShelfGrassCap",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    8.1328,
+    3.1622,
+    6.8826
+   ],
+   "tris": 648,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfGrassCap.glb",
+     "kind": "solid",
+     "tris": 648,
+     "offset": [
+      0.0,
+      1.5811,
+      0.0
+     ],
+     "size": [
+      8.1328,
+      3.1622,
+      6.8826
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Grass Cap (reusable): a flat turf slab (lime top, brown soil sides) with ferns, lime rosettes, daisies, buds"
+  },
+  {
+   "name": "ShoreShelfMainRock",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    14.1023,
+    9.55,
+    12.5549
+   ],
+   "tris": 496,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfMainRock.glb",
+     "kind": "solid",
+     "tris": 496,
+     "offset": [
+      0.0,
+      4.775,
+      0.0
+     ],
+     "size": [
+      14.1023,
+      9.55,
+      12.5549
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Rock (reusable): the sea stack: a summit block, two columns with bevelled tips, a spire, two shoulder blocks; flat summit under the cap"
+  },
+  {
+   "name": "ShoreShelfRockLarge",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    6.2294,
+    5.25,
+    5.4078
+   ],
+   "tris": 58,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfRockLarge.glb",
+     "kind": "solid",
+     "tris": 58,
+     "offset": [
+      0.0,
+      2.625,
+      0.0
+     ],
+     "size": [
+      6.2294,
+      5.25,
+      5.4078
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Rock Large (reusable): a broad chunky flat-crowned boulder (FL)"
+  },
+  {
+   "name": "ShoreShelfRockMedium",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    4.7863,
+    5.45,
+    4.3098
+   ],
+   "tris": 98,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfRockMedium.glb",
+     "kind": "solid",
+     "tris": 98,
+     "offset": [
+      0.0,
+      2.725,
+      0.0
+     ],
+     "size": [
+      4.7863,
+      5.45,
+      4.3098
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Rock Medium (reusable): a taller chunky boulder with a small stepped knob on its crown (BR)"
+  },
+  {
+   "name": "ShoreShelfRockSmall",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    2.2221,
+    2.75,
+    2.3589
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfRockSmall.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      1.375,
+      0.0
+     ],
+     "size": [
+      2.2221,
+      2.75,
+      2.3589
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Rock Small (reusable): a small flat-topped rock (FS)"
+  },
+  {
+   "name": "ShoreShelfSand",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    18.0916,
+    2.9,
+    18.2696
+   ],
+   "tris": 436,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfSand.glb",
+     "kind": "solid",
+     "tris": 436,
+     "offset": [
+      0.0,
+      1.45,
+      0.0
+     ],
+     "size": [
+      18.0916,
+      2.9,
+      18.2696
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Sand Shelf (reusable): the lobed sand slab (crest 1.6, bevelled edge) with two small rocks and pebbles"
+  },
+  {
+   "name": "ShoreShelfWaterPlane",
+   "sheet": "M041",
+   "subject": "Shore Shelf",
+   "role": "part",
+   "size": [
+    31.96,
+    0.75,
+    27.96
+   ],
+   "tris": 412,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShoreShelfWaterPlane_water_m041_water.glb",
+     "kind": "water",
+     "tris": 412,
+     "offset": [
+      0.0,
+      0.375,
+      0.0
+     ],
+     "size": [
+      31.96,
+      0.75,
+      27.96
+     ],
+     "key": "m041_water",
+     "color": "#00B4E2",
+     "texture": "water/m041_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Water Plane (reusable): the see-through water slab (top 1.0) with the shelf and rock holes"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 10,
+  "solid": 7,
+  "water": 3,
+  "glow": 0,
+  "tris": 6040,
+  "vfxSockets": 13,
+  "paletteColours": 36,
+  "paletteLevels": 646,
+  "meshBytes": 515020
+ },
+ "problems": []
+}

@@ -54,20 +54,34 @@ check(given(onScreen) == 10, "every on-screen image is given out")
 local before = given(hidden)
 SpriteLoader._tick()
 check(given(hidden) > before and given(hidden) <= before + SpriteLoader.IDLE_PER_TICK, "then hidden art, slowly")
--- A shown image that has not loaded is asked for again once its wait is over.
+-- An image whose fetch failed is asked for again under the other spelling,
+-- without clearing the label; one that loaded is left alone.
+__fetchStatus = {}
 local label = onScreen[1]
-label.IsLoaded = false
 local entry = SpriteLoader._labels[label]
+__fetchStatus[entry.id] = "AssetFetchStatus.Failure"
 entry.due = 0
 SpriteLoader._tick(true)
-check(entry.tries == 1 and label.Image == entry.id, "a stuck image is asked for again")
+check(
+	entry.tries == 1 and label.Image == "http://www.roblox.com/asset/?id=1001",
+	"a failed image is asked for again by its URL"
+)
 check(entry.due > os.clock(), "and waits before asking again")
--- A loaded one is left alone.
 local other = onScreen[2]
 SpriteLoader._labels[other].due = 0
-other.IsLoaded = true
 SpriteLoader._tick(true)
-check(SpriteLoader._labels[other].tries == 0, "a loaded image is not asked for again")
+check(
+	SpriteLoader._labels[other].tries == 0 and other.Image == "rbxassetid://1002",
+	"a loaded image is not asked for again"
+)
+local slow = onScreen[3]
+__fetchStatus["rbxassetid://1003"] = "AssetFetchStatus.Loading"
+SpriteLoader._labels[slow].due = 0
+SpriteLoader._tick(true)
+check(
+	SpriteLoader._labels[slow].tries == 0 and slow.Image == "rbxassetid://1003",
+	"a fetch still running is left alone"
+)
 -- Something else setting the image first wins.
 local mine = Instance.new("ImageLabel")
 mine.Parent = shownGui

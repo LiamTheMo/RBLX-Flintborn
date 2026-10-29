@@ -5,11 +5,14 @@
 -- HUD images (Widgets.Sprite) go through Assign: an ImageLabel starts empty and
 -- gets its image from a paced queue, a few per tick, those on screen first and
 -- the hidden menus' art after, so the client never asks for every image at
--- once. A watchdog then checks each image on screen that has not shown
--- (IsLoaded) and asks again only when its fetch has ended without it (a fetch
--- still running is left alone: asking again would start it over), with a
--- growing, jittered delay and no giving up. Track watches a label whose image was set
--- elsewhere (a headshot) the same way.
+-- once. Each image is then left alone while it loads: clearing and resetting a
+-- label to ask again broke fetches that were fine (phones reported Failure for
+-- exactly the images asked twice), and a label's IsLoaded reads false on phones
+-- even for images on screen. Only when the engine reports the fetch failed
+-- (Failure, TimedOut) is the image asked for again, under the other spelling of
+-- the same asset (rbxassetid:// and the asset URL) so the request is new, with a
+-- growing, jittered delay and no giving up. Track watches a label whose image
+-- was set elsewhere (a headshot), for the diagnostics.
 --
 -- Character textures (CharacterLookController) use TrackProperty: new ones are
 -- preloaded in one batch and each failed fetch is retried with a growing delay,
@@ -27,11 +30,12 @@ local SpriteLoader = {}
 SpriteLoader.PER_TICK = 6
 SpriteLoader.IDLE_PER_TICK = if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then 0 else 2
 SpriteLoader.TICK = 0.1
--- An image on screen not loaded this long after it was (re)assigned is asked
--- for again; the wait doubles each time up to MAX_WAIT (jittered so many
--- images do not retry together), and at most RETRIES_PER_SWEEP go per sweep.
+-- An image's fetch is first checked this long after it is assigned; a failed
+-- one is asked for again after a wait that doubles each time up to MAX_WAIT
+-- (jittered so many images do not retry together), at most RETRIES_PER_SWEEP
+-- per sweep.
 SpriteLoader.FIRST_WAIT = 6
-SpriteLoader.MAX_WAIT = 30
+SpriteLoader.MAX_WAIT = 60
 SpriteLoader.SWEEP = 1
 SpriteLoader.RETRIES_PER_SWEEP = 4
 
@@ -225,7 +229,25 @@ local function fetchStatus(id: string): string
 	local ok, status = pcall(function()
 		return ContentProvider:GetAssetFetchStatus(id)
 	end)
-	return if ok and typeof(status) == "EnumItem" then status.Name else "Unknown"
+	if not ok then
+		return "Unknown"
+	end
+	if typeof(status) == "EnumItem" then
+		return status.Name
+	end
+	return if type(status) == "string" then string.match(status, "(%w+)$") or status else "Unknown"
+end
+
+-- The other spelling of an asset image ("rbxassetid://N" <-> the asset URL),
+-- or nil for content that has none (headshots).
+local URL = "http://www.roblox.com/asset/?id="
+local function otherSpelling(content: string): string?
+	local id = string.match(content, "^rbxassetid://(%d+)$")
+	if id then
+		return URL .. id
+	end
+	id = string.match(content, "^http://www%.roblox%.com/asset/%?id=(%d+)$")
+	return if id then "rbxassetid://" .. id else nil
 end
 
 local function waitFor(tries: number): number
@@ -235,6 +257,7 @@ end
 
 local function give(label: any, entry)
 	entry.pending = false
+	entry.current = entry.id
 	entry.due = now() + waitFor(0)
 	-- Something else may have set an image meanwhile; it wins.
 	if label.Image == "" then
@@ -243,7 +266,7 @@ local function give(label: any, entry)
 end
 
 -- One tick: assign queued images (on screen first), then, once a sweep is due,
--- ask again for images on screen that have not loaded.
+-- ask again (under the other spelling) for images on screen whose fetch failed.
 local lastSweep = 0
 local function tick(sweepNow: boolean?): boolean
 	local budget = SpriteLoader.PER_TICK
@@ -277,20 +300,25 @@ local function tick(sweepNow: boolean?): boolean
 			if retries <= 0 then
 				break
 			end
-			if not entry.pending and time >= entry.due and label.Image == entry.id then
-				if label.IsLoaded then
+			if not entry.pending and time >= entry.due and label.Image == entry.current and shown(label) then
+				local status = fetchStatus(entry.current)
+				if status == "Success" then
 					entry.due = math.huge
-				elseif shown(label) then
-					local status = fetchStatus(entry.id)
-					if status == "Loading" or status == "None" then
-						-- Still on its way (slow phone networks take a while).
-						entry.due = time + SpriteLoader.FIRST_WAIT
-					else
-						reassign(label, "Image", entry.id)
+				elseif status == "Failure" or status == "TimedOut" then
+					local other = otherSpelling(entry.current)
+					if other then
+						-- A new request for the same image, without clearing the label.
+						entry.current = other
+						label.Image = other
 						entry.tries += 1
 						entry.due = time + waitFor(entry.tries)
 						retries -= 1
+					else
+						entry.due = math.huge
 					end
+				else
+					-- Loading (slow phone networks take a while), or not known yet.
+					entry.due = time + SpriteLoader.FIRST_WAIT
 				end
 			end
 		end
@@ -337,7 +365,7 @@ function SpriteLoader.Summary(limit: number)
 		if entry.pending then
 			counts.pending += 1
 			row.pending += 1
-		elseif label.IsLoaded then
+		elseif fetchStatus(entry.current or entry.id) == "Success" then
 			counts.loaded += 1
 			row.loaded += 1
 		end
@@ -392,7 +420,7 @@ function SpriteLoader.Track(label: ImageLabel)
 	if CAPTURE or id == "" then
 		return
 	end
-	hold(label, { id = id, pending = false, due = now() + waitFor(0), tries = 0 })
+	hold(label, { id = id, current = id, pending = false, due = now() + waitFor(0), tries = 0 })
 	pump()
 end
 
