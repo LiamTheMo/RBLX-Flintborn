@@ -858,6 +858,56 @@ def build_windows():
     return s
 
 
+def empty_track(a, x0, x1, y0, y1, empty_from):
+    """Replaces a bar's painted fill (x0 up to the empty part at `empty_from`)
+    with the empty track: each row repeats its own empty stretch, so the grain
+    and shading carry on with no seam."""
+    a = a.copy()
+    for y in range(y0, y1):
+        source = a[y, empty_from + 2:x1 - 2, :3]
+        span = empty_from - x0
+        reps = -(-span // source.shape[0]) + 1
+        a[y, x0:empty_from, :3] = np.tile(np.concatenate([source, source[::-1]]), (reps, 1))[:span]
+    return a
+
+
+def fill_start(a, x0, x1, y):
+    """Where a bar's fill ends on row y: the first track-coloured pixel."""
+    for x in range(x0 + 4, x1):
+        r, g, b = a[y, x, :3]
+        if g > 0.6 and r > 0.8 and b > 0.45:
+            return x
+    return x0
+
+
+def build_hud():
+    """The in-world HUD (12_hud_master): the compass strip with its marks
+    erased, the three vital rows (icon plate and bar) and the XP bar with their
+    fills repainted as empty track, the hotbar slot plain and selected with the
+    number erased, and the objective card with its placeholder rows erased."""
+    h = sheet("12")
+    s = {}
+    compass = erase_ink(h, (708, 46, 972, 72), dark=True, threshold=0.55, grow=3, amount=1.0)
+    s["pm_hud_compass"] = (cut_clean(compass, (596, 37, 481, 40)), [36, 16, 36, 16])
+    # Vital rows: (name, row rect, track inner rows y0..y1); the track runs
+    # x 1378..1625 on every row.
+    for name, rect, (y0, y1) in (("health", (1310, 36, 330, 53), (53, 71)),
+                                 ("stamina", (1310, 99, 330, 53), (116, 135)),
+                                 ("food", (1310, 161, 330, 54), (178, 197))):
+        mid = (y0 + y1) // 2
+        row = empty_track(h, 1378, 1625, y0, y1, fill_start(h, 1378, 1625, mid))
+        s["pm_hud_" + name] = (cut_clean(row, rect), None)
+    xp = empty_track(h, 619, 1085, 741, 755, fill_start(h, 619, 1085, 748))
+    s["pm_hud_xp"] = (cut_clean(xp, (579, 728, 515, 40)), None)
+    slot = erase_ink(h, (232, 803, 262, 836), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_hud_slot"] = (cut_clean(slot, (212, 784, 123, 120)), [40, 40, 40, 40])
+    chosen = erase_ink(h, (653, 803, 683, 836), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_hud_slot_selected"] = (cut_clean(chosen, (633, 784, 123, 120)), [40, 40, 40, 40])
+    card = erase(h, box(h.shape, (1368, 383, 1606, 502)), amount=0.8, feather=3)
+    s["pm_hud_card"] = (cut_clean(card, (1343, 323, 292, 212)), [82, 50, 36, 46])
+    return s
+
+
 def contact(sprites, path):
     items = [(n, a) for n, (a, _) in sorted(sprites.items())]
     width = max(1600, max(a.shape[1] for _, a in items) + 20)
@@ -886,6 +936,7 @@ def main():
     sprites.update(build_inventory())
     sprites.update(build_crafting())
     sprites.update(build_windows())
+    sprites.update(build_hud())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]

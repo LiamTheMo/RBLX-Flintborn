@@ -42,7 +42,19 @@ end
 vitals:SetStatus("Medicine lock 0:12")
 local bottom = BottomBar.new(root, layout)
 bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })
-bottom:SetSlotItems({ { name = "Stone Axe", count = "" }, { name = "Torch", count = "5" }, nil, { name = "Berries", count = "12" } })
+bottom:SetSlotItems({
+	{ name = "Stone Axe", count = "" },
+	{ name = "Torch", count = "5" },
+	nil,
+	{ name = "Berries", count = "12" },
+})
 bottom:Select(1)
 bottom:SetProgress({ level = 12, xp = 820, xpToNext = 1500 }, true)
+local Widgets = require(Hud.Widgets)
+local backpack = Instance.new("Frame")
+backpack.Name = "Backpack"
+backpack.BackgroundTransparency = 1
+Layout.Place(backpack, layout.backpack)
+backpack.Parent = root
+Widgets.Sprite(layout.backpack.sprite, { Name = "Art", Size = UDim2.fromScale(1, 1) }, backpack)
 __dump(gui, 1672, 941)

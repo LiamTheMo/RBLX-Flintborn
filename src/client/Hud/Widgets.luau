@@ -406,7 +406,8 @@ function Widgets.Fill(colorKey: string, props, parent: Instance?): Frame
 	return apply(fill, props) :: Frame
 end
 
--- A text label in the layout's fonts and colours. `entry` holds font, textSize, color.
+-- A text label in the layout's fonts and colours. `entry` holds font, textSize,
+-- color and stroke (the outline's transparency; 1 for ink on parchment).
 function Widgets.Text(entry, props, parent: Instance?): TextLabel
 	local label = Widgets.Make("TextLabel", {
 		BackgroundTransparency = 1,
@@ -414,7 +415,7 @@ function Widgets.Text(entry, props, parent: Instance?): TextLabel
 		TextSize = entry.textSize or 14,
 		TextColor3 = Layout.Color(entry.color),
 		TextStrokeColor3 = Color3.new(0, 0, 0),
-		TextStrokeTransparency = 0.65,
+		TextStrokeTransparency = entry.stroke or 0.65,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		ZIndex = 4,
