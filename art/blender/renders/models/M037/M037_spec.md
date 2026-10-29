@@ -1076,3 +1076,444 @@ All recommendations are accepted, with the budget rule stated:
 11. Names: `CliffFalls*` (hero `CliffFalls`), keys `m037_*`.
 
 The cliff is 7 front columns plus 2 stepped columns, with big flat faces (each visible face at least 1.5 × 4 studs, flat tops on at least 60 % of the area), not a rock pile.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m037.py` → `build()` (hero `CliffFalls` + ten parts, renders, report). Background session
+port 9881 on `wip/M037.blend`; final check in a freshly restarted session reproduced every number below.
+
+- **Cliff solid without booleans** (`cliff_solid`). The cap's three flat tops (left grass 18.0, channel bed 17.1, right
+  grass 18.0; vertical bank walls between them along §2.2's banks) over the cap outline A (front Y −1.0, sides X ±15.65,
+  back Y 16). The cap's underside at 16.9 turns in to a core outline B (front Y 0.2, sides ±14.6) that drops to the
+  ground. A's back edge between X ±14.6 lies on B, so the back joining face is one flat wall from the ground to 18.0
+  (rock below 17.4, the lime edge above, the channel slab's seam 16.9 → 17.1 bed-coloured). Back seam = M034's seam
+  raised 16.4: channel X −7 … +7, bed 17.1, water 17.4, grass 18.0.
+- **Columns** (`column`, m032's superellipse recipe): C1–C6 + the narrow flank FL in the front row, the stepped SL / SR in
+  front (tops 12.0 / 11.5), three side columns per side (6 sides). 8-sided front columns with foot / mid / shoulder rings
+  (the mid ring twisted ±0.16 rad, jittered 6 %, z ±1.1, so each big side facet breaks once) and a chamfered flat top.
+  **The front row's bevelled shoulders stand 0.3 in front of the cap's edge** (`SHOULDER_OUT`), and the side columns'
+  0.3 outside its sides, so the column tops show under the grass lip as on close-up 1 and no thin underside strip is
+  left between the cap and the columns. Column tops 17.85 sit inside the cap. Side / corner columns have no foot flare
+  and are clamped to |X| ≤ 15.97.
+- **Low boxes** B1 (top 2.4, pine), B1b (4.0, bush) and B2 (2.6, pine): soil sides under a 0.42 grass band. They stand
+  0.6 inside the tile edge, so the bed top beside them has no sliver.
+- **Bed slab** 0 → 0.2 under the whole front, its back 0.45 into the core. **Rocks** (`rock`, m034's hull recipe with flat
+  crowns): K1 / K2 (big, in the pool), K3–K6 at the foot, and the channel rocks T1, T2, T4–T7 standing on the channel
+  bed through the water.
+- **Water and foam, separate closed shells that touch nothing.**
+  - Pool plate 0.26 → 1.0 over the full width, back edge Y −1.62 (just in front of the column feet). The channel plate
+    17.16 → 17.4, 0.25 off the bank walls, 0.02 inside the back seam, 0.05 past the lip.
+  - Both plates are cut by 2D holes. The holes are first taken from each land piece's section, then **re-measured on the
+    finished land** (`refine_holes`).
+  - Curtain (`curtain`): three U-lobes over 10 points, six rings from the lip (17.45, rolled forward 0.25 under the
+    lip) to the pool (1.12), 7.1 → 8.3 wide, leaning out 1.3, 0.47 thick at the valleys; 164 tris.
+  - Foam 1.03 → 1.08: the scalloped splash disc 16 × 8 with two round holes, rings round K1 / K2 (0.85 wide), four pool
+    blobs, two channel blobs (17.43 → 17.48), the **splash veil** (a thin white spray wall in front of the foot whose top
+    is a row of splash peaks up to 6.8) and 8 splash spikes.
+- **Vegetation** (separate closed shells, `_Guard` keeps them off the land, the water and each other):
+  - 6 pines, 3 tiers each: PL1 / PL2 / PR1 / PR2 on top, PF1 / PF2 on B1 / B2, 7.0 / 6.6 tall (the front cell's corner
+    pines reach h .45).
+  - 4 dark fern bushes; lime bushes: low wide caps on SL / SR, one on B1b, one on B2, and two hanging off the C2 / C4
+    faces.
+  - 2 white daisies, 2 pink, 3 yellow flowers.
+  - **STAGES "no floating dressing":**
+    - every leaf, flower, tier and trunk sits 0.015 (`VEG_GAP`) off its support;
+    - pines are built top-down by ray casts: each tier's flat cap stops 0.015 under the tier above, and the trunk top
+      stops 0.015 under the lowest tier;
+    - face-bush leaves are based on a ray hit on the rock face;
+    - leaves have a blunt 5-point outline with a low convex ridge (rounded, not pointed).
+    - `floating(o)` counts **0 loose / 0 unchained of 77 vegetation shells** on the hero, and 0 / 0 of 24 on the cliff-top
+      part.
+- **Parts:**
+  - `CliffFallsTopWater`: the channel plate.
+  - `CliffFallsTop`: the left cap on C1–C3 and LW1–3 cut at 14.6, with PL1 / PL2, ferns and flowers.
+  - `CliffFallsWall`: C1–C3 in a row, SL in front and K3.
+  - `CliffFallsCurtain`.
+  - `CliffFallsFoamRibbon`: the ring, outer 10.3 × 3.8.
+  - `CliffFallsSplashDisc`: the disc, the veil and the spikes.
+  - `CliffFallsPool`: the bed, the plate, K1 / K2 and their rings.
+  - `CliffFallsRockLarge` / `RockMedium` / `RockSmall`: the K1, K3 and T6 shapes at the origin.
+
+**Budget cuts (decision 7, flowers / ferns / small rocks first):**
+- the T3 lawn rock and the P1 / P2 pebbles (P3 dresses the cliff-top part only);
+- ferns 8 → 4;
+- daisies 8–10 → 2 (+ 2 pink), yellow flowers 6–8 → 3;
+- four-sided pine trunks; three tiers on every pine;
+- no rings on K5 / K6; the ribbon is left out of the hero's foam union, because it lies wholly inside the splash disc
+  (the part keeps it).
+
+Columns, curtain and boulders are untouched.
+
+## Stage 2 — Optimisation and cleanup
+
+- **Land:** 35 exact merge-0 unions at the world origin, one shell at a time, with no coplanar inputs, then:
+  - a floor cut at z 0;
+  - `m016._clean_mesh` with the level planes locked (0, 0.2, 16.9, 17.1, 18.0, box and stepped tops);
+  - finish, then polish (m012 needle force, m032's fold-guarded `_polish` and `_safe_force` to 2.5);
+  - `fix_bowties`.
+  - Self-hits after the union, after the cleanup and on the finished land: 0 / 0 / 0. There were 4 when the column tops
+    were at 17.6–17.65; raising them to 17.85 fixed that. m026's guarded clean was tried and rejected: it slanted the
+    bank walls into the channel.
+- **Hero `CliffFalls`:**
+
+  | Measure | Value |
+  | --- | --- |
+  | Tris | **3920** (limit 4000) |
+  | Size | **32.00 × 32.00 × 25.22** |
+  | Shells | 98: 1 land (2022 tris), 77 veg (986), 2 water (320), 1 curtain (164), 17 foam (428), every one closed |
+  | Non-manifold edges / verts | 0 / 0 |
+  | Boundary, wire, loose, zero-area, n-gons, duplicate verts | 0 |
+  | Normals | outward |
+  | Self-intersecting face pairs | **0** |
+  | Faces under 5° | 3 rock union-seam slivers (min 1.1°) at the column creases behind SL / SR and on the RW1 / RW2 crease; the fold guard refuses to collapse them |
+  | Inverted (ray parity) | 2 tiny land faces at a cap-underside corner |
+  | Origin | bottom centre; transforms applied |
+
+- **Parts:**
+  - TopWater 120, Top 884, Wall 328, Curtain 164, Ribbon 84, Disc 220, Pool 546, RockLarge 46, RockMedium 38,
+    RockSmall 22 (all under 1000).
+  - Every one is closed, manifold, with 0 self-hits.
+  - The Wall has 1 face under 5° (the same SL / C2 crease).
+- **Holes against land:** water and foam keep ≥ 0.09 off every land piece (0.25 off the bank walls), and the foam
+  0.03 over the water.
+
+## Stage 3 — UV
+
+`M.smart_uv` (ANGLE_BASED, angle 45, margin 0.008) + `m012._uv_unfold`. Results:
+- hero 973 islands, 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal p95 1.005;
+- every part is the same: 0 overlaps, 0 flipped.
+
+## Stage 4 — Materials, colour, texture
+
+- **Calibrated** with `K.calibrate`; the rendered dome medians against the targets are:
+
+  | Key | Rendered | Target |
+  | --- | --- | --- |
+  | grass | (170,206,5) | #ABCE04 |
+  | leaf_lime | (124,180,5) | #7DB401 |
+  | leaf | (17,87,9) | #125A04 |
+  | pine | (9,97,31) | #056324 |
+  | bark | (113,69,39) | #6C4926 |
+  | petal | (254,254,241) | #F4F4EE |
+  | pink | (234,124,175) | #EB7CAF |
+  | pollen | (246,216,37) | #F6D81A |
+  | soil | (143,101,51) | #906532 |
+  | dirt | (213,169,117) | #D6AA76 |
+  | rock | (175,160,163) | #B1A2A4 |
+
+  Rock was then re-tuned on the hero renders to the **lit-face** target, giving `#ADA5AA`.
+- **`palette()`:**
+
+  | Key | Hex | Key | Hex | Key | Hex |
+  | --- | --- | --- | --- | --- | --- |
+  | grass | #8AAA00 | leaf_lime | #689600 | leaf | #0E4E06 |
+  | pine | #04561F | bark | #5A3412 | petal | #C3C9C8 |
+  | pink | #B96696 | pollen | #C2B001 | soil | #735326 |
+  | dirt | #A88B66 | rock | #ADA5AA | bed | #0B6E8F |
+  | bed_light | #3AC4EA | water | #00C2F2 (transparency 0.3) | water_fall | #10C0F2 (0.2) |
+  | water_foam | #E6FCFE (0.1) | | | | |
+
+  The bed key has no "water" in its name; the three water keys do. Water specular is 0 in the preview.
+- **Blending (by position only):**
+  - Lawn: broad noise patches up to a 50 % grass × lime mix, in 12 / 25 / 38 / 50 % steps.
+  - Within 1.0 of the channel banks: 25 % dirt.
+  - Two dirt patches with a 50 % ring round them.
+  - Channel and pool beds: deep teal with broad light patches (25 / 50 / 75 %), and 25 % rock round the boulders' feet.
+  - Cap outer walls: lime above 17.4, rock below (a hard edge between two materials).
+  - Bank walls: grass above the water, bed colour under it.
+  - The core wall behind the curtain is bed-dark, blending to rock over |x| 3.6 → 5.2.
+  - Boulders are bed-coloured below their waterline (hard: submerged).
+  - Box sides are soil under a grass band.
+  - The floor is rock.
+- **Tint:** grass 0.04 at scale 0.5, rock 0.04 per column (×0.95–1.05 per piece), bed 0.03 at scale 0.8. Water, curtain
+  and foam have none (the exporter textures water).
+- **Finish:** roughness per §5.4, metal 0, no emission. Every object carries `kit_shading_ok` (the sheet's own material
+  regions, painted by position).
+- **Final renders against the sheet** (study masks, `measure_render.py`):
+
+  | Measure | Ours | Sheet |
+  | --- | --- | --- |
+  | f34 rock lit faces | `#C7B8B5` | `#CCB8B5` |
+  | front rock lit faces | `#CABBB8` | `#C7B6B7` |
+  | Cliff-top part rock lit | `#C2B4B1` | exploded `#CBB6B1` |
+  | f34 lawn | `#9CC80E` | `#9CC303` |
+  | Cliff-top part lawn | `#A4CB0B` | exploded `#ABCE04` |
+  | f34 whole rock | `#999294` | `#9892A0` (B −12: the sheet's shade faces are blue-violet, the studio's are warm grey) |
+  | Pool deep tone (s ≥ .95) | `#0BD2FF` | `#04C9FA` |
+  | f34 W median | `#2BD8FF` | `#08D5FD` |
+  | Light share of the pool's W | 0.72 | 0.23 |
+  | Curtain W median | `#30D3FF` | `#17CEFE` |
+  | Curtain light share | 0.56 | 0.46 |
+
+  - The pool's light share runs high because the kit water preview texture lays light lines over the plate; darker
+    water or bed keys only darkened both tones and left the share unchanged, so the keys were kept.
+  - Foam renders `#FFFFFF`, shade `#BBF7FF`.
+
+## Stage 5 — Lighting
+
+Skipped (decision 8): nothing glows; no emissive key, no light. Studio notes are as in §7.1.
+
+## Stage 6 — VFX
+
+There are 16 sockets on the hero; the pool's `water_flow` is created first.
+- `water_flow`: pool (0, −6, 1.03) → (0, −15.5), width 12; channel (0.5, 15.5, 17.43) → (0, 1.0), width 5.
+- `waterfall_curtain` ×2: (±1.8, −1.15, 17.3) → (±2.0, −2.7, 1.2), width 4.
+- `waterfall_mist`: (0, −3.6, 1.4), scale 1.2.
+- `water_foam` ×11:
+  - the ribbon at (±3, −3.2);
+  - K1 and K2 at scale 1.0;
+  - K3 (−6.0, −4.9), K5 and K6 (−12.3, −8.7) at 0.6;
+  - the pool front (−3, −14) and (5, −14) at 0.7;
+  - on the channel: the throat (0, 4.2, 17.45) and the lip (0, 0, 17.45).
+
+The parts carry their own: TopWater the channel flow, Curtain the 2 curtain beams, SplashDisc the mist, Pool the pool
+flow. Renders are made with `vfx=True`.
+
+## Modeller's notes for the verifier
+
+- **Cameras** (decision 3): f34_sheet (30, 26), r34_sheet (−25, 24), front_sheet (0, 10), also for the "rear" cell,
+  side_sheet (270, 12), top_sheet (0, 50). The `*_sheet` shots use a 3× lens and hide the floor. Measure them with
+  `m037_study/measure_render.py`; `m037_study/region.py` gives class medians inside a box (the curtain, the pool band).
+  - The sheet's f34 rim rises to the right and its left end shows the cliff's left side with the low box. That reads like
+    a front-left camera, and our r34_sheet (−25) resembles it closely. The decision camera (30, 26) gives the mirror
+    layout.
+  - The top-profile ends differ at (30, 26): ours .24 / .77 against the sheet's .27 / .24, because the sheet draws a
+    hexagonal pool that sticks out past the cliff's back corners (known miss, §3.1).
+- **Shares (ours against the sheet):**
+
+  | View | G | R | W | F |
+  | --- | --- | --- | --- | --- |
+  | front | 14.7 / 17.0 | 51.4 / 40.0 | 22.9 / 19.9 | 9.1 / 13.1 |
+  | f34 | 20.6 / 19.6 | 45.9 / 36.1 | 21.7 / 21.4 | 9.1 / 12.2 |
+  | r34 | 20.0 / 19.6 | 45.6 / 42.9 | 22.2 / 16.1 | 9.5 / 11.1 |
+  | top | 29.2 / 22.5 | 29.1 / 21.6 | 26.3 / 32.0 | 11.4 / 14.4 |
+  | side | 18.0 / 17.5 | 68.2 / 57.6 | 6.8 / 6.8 | 3.3 / 9.4 |
+
+  - The sheet's O (dark outlines) is 7–8.6 %; ours is 1–3 %. Most of the sheet's outline pixels sit on rock, so R + O is
+    closer than R alone (front 52.9 against 48.5).
+  - R is still high and F low. The sheet's curtain has white streak highlights (its F share is 25 % inside the curtain,
+    ours 0.2 %) and denser pool foam. A curtain highlight would need another water key (a 4th water piece) or more foam
+    tris; the hero is at 3920 of 4000.
+- **Front view geometry:**
+  - W : H 1.178 (sheet 1.142).
+  - Top profile mean error about 0.07. The far right falls to .39 on the sheet because its cliff ends near X 14.4; ours
+    stands at the tile edge per §6.
+  - The cliff is 0.91–0.92 of the width at h .1–.7.
+  - The curtain spans f ≈ .38–.62.
+- **Side:** W : H 1.165 (sheet 0.933, squeezed depth: wider tolerance per decision 3). The low boxes sit at the
+  front-left, not at the screen-left back as the sheet's side cell draws them (known miss, §3.4).
+- **Deviations from the spec:**
+  - The cap's grass edge stops 0.35 inside the side tile edges (X ±15.65), so the side columns' bevelled tops can show
+    under it as at the front.
+  - Low boxes stand 0.6 inside the tile edge.
+  - The pool plate's back edge is at Y −1.62, so a thin strip of bed shows at the column feet.
+  - The channel plate is 0.25 off the bank walls.
+  - The corner pines are 7.0 / 6.6 tall, against the spec's 5.0 / 4.8, to reach the front cell's h .45.
+  - K3 is at (−6.0, −4.9) and K6 at (−12.3, −8.7).
+- **Known leftovers:**
+  - 3 + 1 rock union-seam slivers under 5°.
+  - 2 tiny inverted-parity land faces.
+  - 6 leaves dropped by the guard, which tried shorter and steeper leaves first.
+  - The exploded shot is small in its cell.
+  - The rock reads warm-pink-grey: the sheet's blue-violet shade faces come from its lighting, and colouring by facing
+    is not allowed.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier, read-only. It used port 9881 on `wip/M037_verify.blend`: no build, no save, and no edits to any
+`.py`. Renders went to the scratchpad (`…/scratchpad/m037_verify/r/M037/`) through `m037.render_views` with
+`M.MODEL_RENDERS` redirected. They were measured with `m037_study/measure_render.py` and `region.py`, plus my own scripts.
+These were:
+- `v3.py`: per-shell self-intersection, water/land distance, and a floating/chain check over **all** shells, including
+  water and foam;
+- `v4.py`: where the slivers and inverted faces are;
+- `v6.py`: boulder proportions;
+- `v7.py`: levels, seam, sockets and collision;
+- `hue.py`: hue per region.
+
+### Measured
+
+| Object | Tris (limit) | Size (studs) | Shells | Non-man e / v | Bound / wire / loose / zero-area / n-gon / dup | Self-x (within a shell) | Normals | < 5° faces | Inverted |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CliffFalls | **3920** (4000) | 32.00 × 32.00 × 25.22 | 98: land 1 (2022), veg 77 (986), water 2 (320), curtain 1 (164), foam 17 (428) | 0 / 0 | 0 / 0 / 0 / 0 / 0 / 0 | 0 | outward | 3 (min 1.09°) | 2 |
+| CliffFallsTopWater | 120 | 13.33 × 17.03 × 0.24 | 1 | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsTop | 884 | 13.77 × 17.53 × 10.62 | 25 (1 land + 24 veg) | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsWall | 328 | 11.55 × 9.23 × 17.85 | 1 | 0 / 0 | all 0 | 0 | outward | 1 (3.5°) | 0 |
+| CliffFallsCurtain | 164 | 8.30 × 2.25 × 16.33 | 1 | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsFoamRibbon | 84 | 10.28 × 3.80 × 0.05 | 1 | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsSplashDisc | 220 | 16.09 × 7.91 × 5.76 | 10 | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsPool | 546 | 32.00 × 16.45 × 4.90 | 4 (bed + rocks, water, 2 foam rings) | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+| CliffFallsRockLarge / Medium / Small | 46 / 38 / 22 | 4.94 × 4.50 × 5.00 / 3.02 × 2.94 × 4.30 / 1.52 × 1.48 × 2.00 | 1 each | 0 / 0 | all 0 | 0 | outward | 0 | 0 |
+
+- **Transforms and origin.** Every object has identity rotation and scale. In local space the hero's bbox is
+  X −16 … 16, Y −16 … 16, z 0 … 25.215, so the origin is at the bottom centre. Every part's local bbox is centred,
+  with min z 0.
+- **Levels.** The flat-face areas sit at these heights:
+
+  | Surface | z |
+  | --- | --- |
+  | Pool water | 1.000 |
+  | Channel water | 17.400 |
+  | Grass | 18.000 (the back seam's max is 18.000) |
+  | Low-box tops | 2.4 / 2.6 |
+  | Pool bed | 0.200 |
+  | Channel bed | 17.100 |
+  | Foam | 1.08 / 17.48 |
+
+  - The pool water spans X ±15.98 and Y −15.98 … −1.62.
+  - Channel water at the back seam spans X −6.48 … +6.75 (0.25 off the bank walls) and reaches Y 15.98.
+- **Water against land.** Water, curtain and foam are separate closed shells.
+  - The nearest land is 0.060 from the water (the pool bottom 0.26 over the bed at 0.2), 0.112 from the curtain and
+    0.108 from the foam.
+  - No water face overlaps a land face (BVH overlap 0).
+  - The curtain's top is 0.07 from the channel water (17.45, rolled over the lip).
+  - The water keys are exactly `m037_water`, `m037_water_fall` and `m037_water_foam`. `m037_bed` and its mixes contain no
+    "water".
+- **Floating** (my own check, every shell, contact 0.03):
+  - Vegetation: 0 loose and 0 unchained of 77 on the hero, and 0 / 0 of 24 on the Top part.
+  - Pool foam chains to the pool water. The 2 channel foam blobs sit exactly 0.030 over the channel water (17.43
+    against 17.40), which is right at the contact limit.
+  - The water plates and the curtain touch nothing, by design.
+  - So no leaf, petal, flower, pebble or moss shell floats.
+- **Facing.** `kit_baked_shading` is **0.00**, so no colour follows face direction. `kit_tint_spread` is 1.19. `K.check`
+  reports nothing.
+- **Sockets: 16.** There are 2 `water_flow` (`_1` is the pool's, (0, −6, 1.03), so it comes first), 2 `waterfall_curtain`
+  (±1.8, −1.15, 17.3), 1 `waterfall_mist` (0, −3.6, 1.4) and 11 `water_foam` (the ribbon ×2, K1, K2, K3, K5, K6, the
+  pool front ×2, the throat and the lip). Collision is `precise`.
+  - They suit the sheet: a curtain from the lip to the pool, mist at the impact, foam at the ribbon, the boulders and the
+    channel, and flow along the pool and the channel.
+
+**Sheet comparison** (floor hidden, vfx on, study masks; the sheet's numbers are from the same script on `cell_*.png`):
+
+| View | W:H ours / sheet | G | R | W | F | Top-profile mean error |
+| --- | --- | --- | --- | --- | --- | --- |
+| front_sheet vs front | 1.178 / 1.142 ✓ | 14.7 / 17.1 | **51.4 / 40.0** | 22.9 / 20.0 | **9.1 / 13.1** | ≈ 0.07 (both ends are the pool slab; f .95 is .74 against .39) |
+| f34_sheet vs hero | 1.119 / 1.298 (the hexagonal pool, a decided known miss) | 20.6 / 19.6 | **45.9 / 36.1** | 21.7 / 21.4 | 9.1 / 12.2 | ≈ 0.16 (the right end .77 against .24, the decided known miss) |
+| r34_sheet vs "rear 3/4" | 1.125 / 1.099 ✓ | 20.0 / 19.6 | 45.6 / 42.9 | 22.2 / 16.1 | 9.5 / 11.1 | |
+| side_sheet vs side | 1.165 / 0.933 (squeezed depth, wider tolerance) | 17.9 / 17.5 | **68.2 / 57.6** | 6.9 / 6.8 | **3.3 / 9.4** | |
+| top_sheet vs top | 0.884 / 0.903 ✓ | 29.2 / 22.5 | 29.1 / 21.6 | 26.3 / 32.0 | 11.4 / 14.4 | |
+
+- The sheet's outline class O is 7.2–8.6 % and sits mostly on rock; ours is 1.1–2.9 %. Counting R + O, the front's
+  rock excess is about +4 (52.9 against 48.4), and the rest of the gap is the missing foam.
+- The front cliff is 0.91–0.92 of the width at h .1–.7 (target 0.88–0.96). The curtain spans f .38–.62 (target
+  .40–.61).
+
+| Colour (median) | Ours | Sheet | Verdict |
+| --- | --- | --- | --- |
+| Rock, lit faces (v > .7), f34 / front | `#C7B8B5` / `#CABBB8` (h 10°, s .09) | `#CCB8B5` / `#C7B6B7` | ✓ warm |
+| Rock, shade (v < .5), f34 | `#696263` (h 351°, s .07) | `#5C5B6A` (h 244°, s .14) | lighting only (the sheet's blue-violet shade can't be painted) |
+| Rock key `m037_rock` | `#ADA5AA` (b > g, h 322°, s .05) | | faintly mauve: see finding 6 |
+| Lawn (G h 60–100), f34 / front | `#9EC912` / `#9CBE1D` | `#9CC303` / `#8EB406` | ✓ |
+| Pines, f34 / front | `#074F18` / `#09601E` | `#046525` / `#056622` | ✓ (f34 a little dark) |
+| Dark ferns, f34 | `#255C1A`, 550 px | `#125A04`, 4842 px | colour ✓; amount about 1/9 (budget cut) |
+| Pool W, f34 / pool band | `#2BD8FF` / `#2DD7FC`, light share 0.72 | `#08D5FD` / `#09CFFC`, light share 0.23 | deep tone ✓ (`#0BD2FF` / `#04C9FA`); overall paler from the preview texture's light lines |
+| Curtain, front box f .42–.58, h .35–.65 | W `#30D3FF`; F share 0.2 % | W `#1AD1FE`; F share 24.5 % | cyan ✓ (+22 R); **no white streaks** |
+| Foam / spray | `#FFFFFF`, shade `#BBF7FF` | `#F7FDFE`, shade `#A6F2FD` | ✓ |
+| Pool band F share (front, h 0–.08) | 13.8 % | 21.5 % | low |
+
+### Findings
+
+1. **minor: foam too sparse.** F is 9.1 against 13.1 in the front view, 9.1 against 12.2 in the f34 and 3.3 against
+   9.4 in the side. The pool band is 13.8 % against 21.5 %. The sheet's pool is covered in scalloped white rings and blobs;
+   ours has two angular hexagonal rings and four small blobs. Targets, budget-neutral (reshape existing foam, don't add
+   shells):
+   - grow the four pool blobs from r 1.0–1.4 to r 2.0–2.6, each with 6–8 scallops;
+   - widen the K1 / K2 rings from 0.85 to 1.3–1.5 and make them 10–12-sided with scallops instead of hexagons;
+   - extend the disc's back edge along the cliff foot as a scalloped strip about 1.2 deep.
+
+   Goals: pool-band F ≥ 18 %, front F ≥ 11.5 % and f34 F ≥ 11 %.
+2. **minor: the curtain has no white streaks.** Its F share is 0.2 % against the sheet's 24.5 %. This needs no new water
+   key: add 3 thin closed crest streaks on the **existing** `m037_water_foam` key, 0.03–0.05 in front of each lobe crest
+   from z 16.5 down to about 6. Allow ≤ 24 tris each (72 in all, inside the 80 left) and make them 0.5–0.8 wide. Goal: F
+   ≥ 12 % inside the front curtain box (f .42–.58, h .35–.65). If tris are short, take them from the 8 splash spikes
+   (8 → 5).
+3. **minor: the rock share is high** (front +11, f34 +10, side +11). About 7 points of that is the sheet's outline class,
+   and most of the rest closes with findings 1 and 2. No geometry cut is needed. Goal after 1 and 2: front R ≤ 47.
+4. **minor: the columns look like smooth prisms.** The front and side columns read as clean, uniform, smooth octagonal
+   basalt pillars ("organ pipes", clearest in the side and the kit side / rear34). The sheet's columns are chunkier, with
+   visible triangular facet breaks and slightly different rim heights (front-cell rims at h .68–.72). Decision 9's target
+   is met: 7 + 2 distinct columns, faces ≥ 1.5 × 4, flat stepped tops, not a rock pile. Optional, budget-neutral targets:
+   - mid-ring twist ±0.16 → ±0.25 rad, so each visible side shows two distinct shades;
+   - vary the shoulder tops of C1–C6 by ±0.3–0.5 (the cap still covers them).
+5. **minor: the rock parts are egg-shaped.** H / W is 1.01 for `CliffFallsRockLarge`, **1.42 for `RockMedium`** and
+   **1.31 for `RockSmall`**, and the medium and small ones taper to a point in the parts shot. The sheet's Rock Pieces
+   are domed and flat-crowned, H about 0.75–0.9 × W. In the hero the visible boulders are fine: above the water, K1 / K2
+   are 0.75 / 0.78 × W and the channel rocks 0.71–0.9. Targets (parts only):
+   - build Medium and Small from T1 / T7 (or rescale them) to H / W 0.8–0.95;
+   - crown ring 0.5 → 0.6 R, giving a flat crown ≥ 20 % of the plan (K1 / K2 now 0.17 / 0.18; Large 0.19, Medium 0.15,
+     Small 0.10).
+6. **minor: the rock key is faintly mauve.** `#ADA5AA` has b > g (h 322°, s .05). Under the studio's warm light the lit
+   faces render warm (h 10°, matching the sheet), but in Studio's neutral light the key will lean faintly mauve-grey.
+   Target: a key with g ≥ b at the same value, e.g. `#ADA6A4`. Re-check that the f34 lit-face median stays within 10 of
+   `#CCB8B5` at h 5–20°.
+7. **minor: thin vegetation on top.** The dark-fern pixels are about 1/9 of the sheet's, with 2 + 2 + 3 flowers. This
+   follows decision 7's cut order and is recorded. If finding 2 frees no tris, leave it.
+8. **minor: splash shape.** The 8 spikes plus the veil read as sharp ice-like shards. The sheet's spray is spiky but
+   foamy. Optional: blunt the spike tips (apex 0.15 wide) and cap the tallest at 5.5. Merges with finding 2's tri swap.
+9. **minor: mesh leftovers** (checked; none affect the render or import).
+   - **Slivers.** 3 land faces under 5° (1.09°, 2.08°, 3.06°; areas 0.95–2.09 sq studs, 8–13 studs long) on column-crease
+     union seams at (−15.66, −0.72, 14.25), (−8.46, −0.51, 3.39) and (15.38, 15.08, 12.89). The Wall part has 1 (3.5°).
+     They are manifold, sit in the creases, and show no shading streak in any render.
+   - **Inverted faces, hero.**
+     - 0.044 sq studs at (−8.48, −0.52, 0.38): a ray-parity false positive (even parity from a second direction).
+     - 0.061 sq studs at (15.14, 7.1, 16.9): a real tiny +Z fold in the RW1 / RW2 crease under the cap overhang. It is
+       invisible and harmless.
+10. **minor: seam.** The channel water at the back edge is X −6.48 … +6.75, 0.25 off the bank walls, against the
+    contract's −7 … +7. A chained M034 will show a 0.25–0.5 strip of bed at the joint. Record it in §6, or bring the
+    seam row of the plate to ±6.95 (the bank walls are vertical there).
+11. **minor (known, decided):**
+    - f34 W : H 1.119 and the right-end profile come from the sheet's hexagonal pool (decision 2).
+    - The side's low boxes sit at the front-left (§3.4).
+    - The rear is a flat joining wall (decision 5).
+    - The exploded shot is small in its cell.
+
+**Shape read.** The defining read holds in the front, f34, r34 and top views: a grassy, column-faced cliff split by a
+channel, a three-lobe cyan curtain pouring from a notch, a white splash at the foot, and a flat full-width pool with two
+chunky boulders in foam rings. Stepped bush-capped columns stand either side, and pine boxes sit at the front corners. The
+close-ups match: a grass slab with a lime edge on flat column tops; the curtain tucked behind the flanks; the pool
+slab's cyan side face. The pool is less foamy and the curtain plainer than the sheet's, but neither is a wrong
+silhouette.
+
+**Decisions.** I checked all 11 and found every one followed:
+
+| # | Decision | Result |
+| --- | --- | --- |
+| 1 | Levels | 32 × 32 × 25.22; grass 18.0; pool 1.0 over 0.2; channel 17.4 over 17.1, bed opening 14 wide |
+| 2 | Plan | front and top govern |
+| 3 | Cameras | used |
+| 4 | Tiling | back seam = M034's + 16.4; open-water front |
+| 5 | Back | flat back wall |
+| 6 | Water | 3 water keys; bed key without "water"; 16 sockets, pool flow first |
+| 7 | Budget | 3920 ≤ 4000, cuts recorded, columns, curtain and boulders kept |
+| 8 | Lighting | none |
+| 9 | Packaging | one object; every shell closed with 0 bowties; collision precise |
+| 10 | Parts | ten |
+| 11 | Names | `CliffFalls*` / `m037_*` |
+
+The cliff has 7 front columns + 2 stepped columns.
+
+**Score: 7 / 10.** **Verdict: PASS.** There are no blockers:
+- the mesh is clean and every shell is closed and manifold;
+- it is under budget;
+- nothing floats;
+- the colour family is right (the rock's lit faces are warm) and no colour follows facing;
+- every decision was followed.
+
+Findings 1 and 2 (foam and curtain streaks) are the most visible gap to the sheet. They are worth a round 2 if the main
+session wants the sheet's foamy look; otherwise commit with these notes.
+
+## Main session ruling (2026-10-29)
+Passed in round 1 (7/10) and committed.
+
+**Main-session tweak (finding 6):** the rock key changed from `#ADA5AA` (B > G, faintly mauve) to `#ADA6A4` (G ≥ B). Rebuilt in the GUI kit; tris and shells are unchanged.
+
+**Left for a later polish pass:**
+- Foam is too sparse: front 9.1 % against the sheet's 13.1 %, pool band 13.8 % against 21.5 %. Targets: bigger scalloped pool blobs, 10–12-sided rings 1.3–1.5 wide, and a foam strip at the cliff foot.
+- The curtain has no white streaks. Add 3 crest streaks on `m037_water_foam` (each ≤ 24 tris), taking tris from the splash spikes (8 → 5).
+- Rock share is high (+10).
+- The columns read as smooth octagonal pillars.
+- The rock parts are egg-shaped (Medium H/W 1.42, Small 1.31).
+- Splash spikes read as ice shards.
+- Back-seam water sits at X −6.48…+6.75 against the −7…+7 contract. Record it, or widen to ±6.95.
+
+**Export:** 11 assets, 16 pieces (7 solid, 9 water), 6372 tris, 21 VFX sockets, palette 27 colours, 0 problems.
