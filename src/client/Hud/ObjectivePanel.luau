@@ -8,7 +8,8 @@ local Widgets = require(script.Parent.Widgets)
 local ObjectivePanel = {}
 ObjectivePanel.__index = ObjectivePanel
 
-local function checkbox(parent, x: number, size: number, centreY: number)
+local function checkbox(parent, x: number, size: number, centreY: number, colorKey: string?)
+	local color = Layout.Color(colorKey or "text")
 	local box = Widgets.Make("Frame", {
 		Name = "Check",
 		AnchorPoint = Vector2.new(0, 0.5),
@@ -19,12 +20,12 @@ local function checkbox(parent, x: number, size: number, centreY: number)
 		ZIndex = 4,
 	}, parent)
 	Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, box)
-	Widgets.Make("UIStroke", { Color = Layout.Color("text"), Thickness = 1.5 }, box)
+	Widgets.Make("UIStroke", { Color = color, Thickness = 1.5 }, box)
 	local tickMark = Widgets.Make("TextLabel", {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		Text = "✓",
-		TextColor3 = Layout.Color("text"),
+		TextColor3 = color,
 		TextScaled = true,
 		Font = Enum.Font.GothamBold,
 		Visible = false,
@@ -83,7 +84,7 @@ function ObjectivePanel.new(parent: Instance, layout)
 	}, self.root)
 	for index, y in cfg.rows.y do
 		local centreY = y + cfg.rows.h / 2
-		local box, tickMark = checkbox(self.root, cfg.check.x, cfg.check.size, centreY)
+		local box, tickMark = checkbox(self.root, cfg.check.x, cfg.check.size, centreY, cfg.check.color)
 		local text = Widgets.Text(cfg.text, {
 			Name = "Task" .. index,
 			Position = UDim2.fromOffset(cfg.text.x, y),

@@ -102,6 +102,9 @@ def sync_sprites():
         if slice_ is not None and (not isinstance(slice_, list) or len(slice_) != 4):
             raise ValueError(f"Bad slice for {name}: {slice_!r}")
         out[name] = {"w": int(entry["w"]), "h": int(entry["h"]), "slice": slice_}
+        if entry.get("tiles"):
+            # Art too big for one image: [tile name, x, y, w, h] pieces.
+            out[name]["tiles"] = entry["tiles"]
     write_json(SPRITES_FILE, out)
     sliced = sum(1 for v in out.values() if v["slice"])
     print(f"Wrote {SPRITES_FILE.relative_to(ROOT)}: {len(out)} sprites ({sliced} 9-sliced)")

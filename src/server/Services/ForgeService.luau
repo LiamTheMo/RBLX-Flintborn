@@ -78,6 +78,7 @@ local function snapshot(player: Player)
 			kind = recipe.kind,
 			category = recipe.category,
 			name = (recipe.kind == ForgeRecipes.Kinds.Permanent and "Permanent " or "") .. nameOf(recipe.output),
+			output = recipe.output,
 			quantity = recipe.quantity,
 			unlocked = ForgeRules.IsUnlocked(profile, recipe.id),
 			requirement = requirementText(recipe),

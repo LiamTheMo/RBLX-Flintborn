@@ -11,6 +11,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local DamageNumbers = require(script.Parent.Parent.Hud.DamageNumbers)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local CombatController = {}
@@ -122,11 +123,16 @@ function CombatController.Start()
 		return
 	end
 	build()
-	Remotes.Get("CombatFeedback").OnClientEvent:Connect(function(kind, amount)
+	-- With Show Damage off the markers still confirm a hit, without the number.
+	Remotes.Get("CombatFeedback").OnClientEvent:Connect(function(kind, amount, hitPosition)
+		local numbers = player:GetAttribute("ShowDamage") ~= false
 		if kind == "Hit" then
-			flash("✕ Hit " .. tostring(amount), Color3.fromRGB(255, 220, 120))
+			flash(if numbers then "✕ Hit " .. tostring(amount) else "✕ Hit", Color3.fromRGB(255, 220, 120))
+			if numbers and typeof(hitPosition) == "Vector3" and type(amount) == "number" then
+				DamageNumbers.Show(hitPosition, amount)
+			end
 		elseif kind == "Hurt" then
-			flash("! -" .. tostring(amount), Color3.fromRGB(255, 120, 100))
+			flash(if numbers then "! -" .. tostring(amount) else "!", Color3.fromRGB(255, 120, 100))
 		end
 	end)
 	game:GetService("RunService").RenderStepped:Connect(function()
