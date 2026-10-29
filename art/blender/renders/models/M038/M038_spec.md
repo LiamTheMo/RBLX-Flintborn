@@ -837,3 +837,328 @@ The recommendations are accepted, except the contact shadow (8):
 12. Names: `StoneScatter*` (hero `StoneScatter`), keys `m038_*`.
 
 The §2 facet targets per size class are binding: no soccer-ball patterns, and the slab must not read as a smooth lozenge.
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m038.py` (`build()`), built and saved in background Blender 9882 on
+`art/blender/assets/kit/wip/M038.blend`; the final check was re-run in a freshly restarted session (same numbers).
+
+- **Packaging (decision 6).** One hero `StoneScatter` of 162 separate closed shells: 5 rocks, 2 moss pads, 119 leaves,
+  30 petals, 6 flower centres. No booleans. Parts `StoneScatterTallRock`, `…MediumRock`, `…FlatSlab`, `…WedgeRock`,
+  `…RoundRock`, `…FlowerClump` (decision 7), each built by its own function from the same builders.
+- **Rocks A, B, D, E** (`_cloud` / `_rock`): convex hulls of jittered point rings (m033 sampling), flattened by a few cut
+  planes into big flat facets (m036 method), yawed and scaled to exact world size, flat floor ring at z 0.
+  - A: 7 rings (46 points), crown lean −0.42 (crown left of centre); cuts for a broad lit front facet, a front-right
+    facet, a broad left flank, the back and a small blunt crown.
+  - B: 5 rings; a broad top facet sloping 8° to the front-right, a big front-left face, a steep right end.
+  - D: 5 rings, lean (−0.25, 0.20), the top scaled from 1.0 at the back-left to ~0.5 at the front-right, plus a tilted
+    top facet and a steep left face (the wedge).
+  - E: the hero's 0.7 pebble (decision 4), one flat top facet.
+- **Slab C** (`_slab`, decision 3): a 10-vertex plan polygon (straight back edge, chamfered ends, front vertex at 0.44 L)
+  extruded as four rings: z 0 inset 0.28 (flat underside 0.87 × 0.83 of the footprint), z 0.30, z 1.33 leaning out 0.05,
+  z 1.50 inset 0.16 (top bevel 37–44°). The top is a CDT of the top ring plus two interior verts lifted 0.13 / 0.17:
+  12 broad facets, steepest 11.4°, tilt 1.2° (highest at the back-left). Not a ring hull; no dome.
+- **Moss pads** (`_pad`): a lobed outline (MB 7 broad maple lobes with pointed tips; MC 7 rounded lobes), a mid ring and
+  a centre, as a top and a bottom layer joined by a rim band (140 tris each). Each point is wrapped continuously onto
+  its rock: it drops by its distance off the rock (at most `wrap`) and goes to the nearest rock surface, so lobes over
+  the top lie on it and lobes past an edge drape down the side. Bottom 0.03 inside the surface; top the pad's thickness
+  out (rim 0.08–0.09, centre 0.20–0.27).
+- **Plants** (`_rosette`, `_cluster`, `CLUSTERS`): rounded spatulate leaves (closed solids, 18 tris: narrow at the stem,
+  widest at 0.58 L, a blunt round tip, a raised midrib in two points, the tip curling down, one back point). A rosette
+  is an outer splayed tier plus an inner upright tier, every stem within 0.05 of the hub, so the leaves cross and touch.
+  Tall mounds (K1, L1) stack rosettes whose hub is seated (`"l"` seat) on the highest leaf surface under it (no hidden
+  stems). Leaves more than 0.40 inside a rock are dropped (1, in L1); shallower ones are pushed out to touch the rock
+  (33 pushes). Flowers: five round petals whose bases sit inside a domed centre, seated on the cluster at ≥ 0.85 of the
+  leaf height round them, tipped 0.25 rad toward the front (K1's back flower and K5's toward the back, so the rear views
+  show them).
+- **Settle pass** (`settle`): any group of dressing shells not chained to the ground or a rock/pad at 0.03 is dropped
+  straight down onto whatever is under it. Hero: 4 flower groups dropped in round 1, 0 left in round 2.
+- **Layout (spec 2.1):** C (−1.73, −1.60) yaw −8°, A (0.72, 3.30) 5°, B (4.12, 1.30) 15°, D (2.39, −3.25) −10°, E (2.25,
+  1.75) 30°. Rock clearances (minimum vertex-to-surface): AB 1.57, AC 1.98, AE 0.87, BE 0.36, CD 0.44, the rest ≥ 2.5.
+  No rock touches another.
+- **Clusters** (leaves / flowers / top z): K1 37 / 2 / 2.51 (3.2 × 2.1 across), K1b 10 / 0 / 0.97, K5 10 / 1 / 0.68, K2
+  10 / 1 / 0.66, K3 9 / 1 / 0.58, K4 11 / 1 / 0.74, L1 14 / 0 / 1.42, L2 18 / 0 / 0.88. Six flowers, Ø 1.0, 0.8, 0.6, 0.45,
+  0.42 and 0.37.
+- **Deviations from the spec's starting values (tuned on the renders):**
+  - D is 2.7 × 2.0 × 1.5 (spec 2.7 × 2.3 × 1.8): at 1.8 it stood 15 % too tall in the f34 (box h .00–.37 against .00–.32)
+    and read as a ball.
+  - K4 moved to x 4.40 and L1 / L2 0.15–0.25 inward: they were the extreme columns and pushed the f34 profile ends off.
+  - K1's top is 2.5 (spec table 1.4): the mound has to show above the slab's back edge from the e 32 camera.
+  - Cluster widths are 10–25 % over the table's: the sheet's clusters are denser and taller than the table's widths give,
+    and the green share needed it (Stage 4).
+
+**Measured against the sheet** (`compare()`, the study's masks; ours with the floor hidden and the 3× lens):
+
+| View (camera) | W : H ours / sheet | Rock / green / flower, ours | Sheet | Top profile mean / max |
+| --- | --- | --- | --- | --- |
+| f34_sheet (0, 32) | 1.652 / 1.684 | .739 / .254 / .007 | .722 / .270 / .008 | 0.054 / 0.14 |
+| front_sheet (0, 28) | 1.755 / 1.708 | .757 / .236 / .006 | .719 / .267 / .015 | 0.064 / 0.21 |
+| top_sheet (0, 72) | 1.237 / 1.196 | .633 / .357 / .010 | .691 / .299 / .010 | 0.044 / 0.15 |
+| side_sheet (90, 8), loose | 2.330 / 1.867 | .804 / .195 / .001 | .783 / .210 / .008 | 0.193 / 0.58 |
+| rear_sheet (180, 12), loose | 3.254 / 1.872 | .751 / .247 / .001 | .709 / .281 / .010 | 0.207 / 0.47 |
+| r34_sheet (150, 25), loose | 2.094 / 1.710 | .782 / .214 / .004 | .746 / .248 / .006 | 0.146 / 0.36 |
+
+- Elevation probe (decision 5): the 28 / 36 and 24 / 32 alternatives were not rendered; 32 / 28 / 72 were used throughout.
+
+## Stage 2: Optimisation and cleanup
+
+- **Tris:** hero 3398 / 4000 (rocks 316, pads 280, leaves 2142, petals 540, centres 120). Parts: TallRock 330,
+  MediumRock 206, FlatSlab 472, WedgeRock 56, RoundRock 36, FlowerClump 236 (all under 1000).
+- **Per rock (spec 2.2):**
+
+| Rock | Tris (target) | Area CV / edge CV | Valence min–max, mean, top share | Tris with a corner < 25° | Facets ≥ 0.4 % at 7° (parts camera) / largest | H/W | Floor span X / Y |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| A | 74 (70–110) | .65 / .36 | 3–9, 5.68, .21 | .41 | 19 / .226 | .97 | .79 / .90 |
+| B | 60 (60–90) | .57 / .35 | 3–8, 5.59, .30 | .32 | 20 / .283 | .53 | .85 / .86 |
+| C | 72 (60–100) | .74 / .44 | 4–8, 5.81, .38 | .53 | 14 / .222 | T/L .29 | .87 / .83 |
+| D | 51 (40–64) | .53 / .38 | 3–9, 5.65, .35 | .43 | 21 / .289 | .56 | .88 / .88 |
+| E | 32 (20–32) | exempt | 4–7 | .03 | 18 / .103 | .60 | .82 / .81 |
+
+  - C's top: 12 faces with normal z > 0.97, steepest 11.4°, bevel ring 37–44°. Their share of the top including the
+    bevel ring is .77 (100 % without it). Regular-pattern verts: A 0, B 1, C 0, D 0, E 1.
+  - Misses: B area CV .57 and D .53 (target ≥ .6); A and D valence max 9 (target ≤ 8); D's largest facet .29 (target
+    .08–.12: the tilted top facet dominates). None reads as a pattern in the renders.
+- **Mesh checks (every object):** 0 non-manifold edges, 0 non-manifold (bowtie) verts, 0 boundary, 0 wire, 0 loose, 0
+  zero-area, 0 n-gons, 0 duplicate verts; normals outward; transforms applied; no custom normals; no modifiers. Per shell
+  (`shells_report`): all 162 hero shells are closed and manifold, with 0 self-hits, 0 inverted faces and volume > 0.
+  Smallest corner 5.25° (none under 5°; `m012._force_slivers` collapsed 2 slivers in the hero).
+- **Floating dressing (STAGES):** `contact_report` on every object gives **0 floating shells** (largest gap of any
+  dressing shell to its nearest neighbour 0.00) and **0 unchained** at 0.03 and at 0.05.
+- **Origin and size:** bottom centre of each bbox, z min 0. Hero 11.17 × 8.85 × 3.00 (target 11.1 × 8.9 × 3.0 ± 0.5 / 0.6 /
+  0.2). Rocks: A 3.1 × 2.3 × 3.0, B 2.85 × 2.4 × 1.5, C 5.83 × 4.38 × 1.67 (bbox with yaw and top lifts; plan 5.8 × 4.0 ×
+  1.5), D 2.7 × 2.0 × 1.5, E 0.7 × 0.6 × 0.42.
+
+## Stage 3: UV
+
+- `M.smart_uv(angle 45, ANGLE_BASED, margin 0.008)`, then `m012._uv_unfold`. Every object: 0 overlapping triangle pairs,
+  0 flipped, minimum island gap 0.016, border 0.008, texel density min / median / max 1.0 / 1.0 / 1.0, conformal stretch
+  p95 1.01–1.06. Hero: 762 islands, 29 texels per stud at 1024.
+
+## Stage 4: Materials, colour and texture
+
+- **Calibration** (`m038.calibrate()`: `K.calibrate` on the kit dome, 6 iterations; targets from spec 5.4):
+
+| Key | Target | Calibrated key | Rendered | Final key (PALETTE) |
+| --- | --- | --- | --- | --- |
+| m038_rock | `#C9AC9C` | `#9E8C85` (R − B 25: **rejected** by the warm guard) | (200,171,155) | `#A28F84` (R − B 30, hue 22°) |
+| m038_rock_light | `#D8BFB2` | `#AA9B97` (R − B 19: rejected) | (215,190,176) | `#AC998E` (R − B 30, 22°) |
+| m038_rock_deep | `#B39A8C` | `#8D7E78` (R − B 21: rejected) | (178,153,139) | `#917E73` (R − B 30, 22°) |
+| m038_moss | `#AAC005` | `#899E03` | (168,191,7) | `#899E03` |
+| m038_moss_sun | `#D8D50A` | `#ABAE07` | (214,212,10) | `#ABAE07` |
+| m038_moss_deep | `#739005` | `#627E04` | (116,149,7) | `#627E04` |
+| m038_leaf | `#98B704` | `#7B9602` | (149,180,7) | `#84A102` (lifted 7 %: the hero's leaves read dark) |
+| m038_leaf_young | `#C9D60D` | `#A0AE0B` | (199,212,13) | `#A0AE0B` |
+| m038_leaf_deep | `#4A7A03` | `#3F6C02` | (72,125,7) | `#3F6C02` |
+| m038_petal | `#F6F2E8` | `#C2C5C5` (B > R: blue-grey) | (246,243,232) | `#C8C5BE` (warm white, R > G > B) |
+| m038_pollen | `#F0C20C` | `#BE9F00` | (240,194,36) | `#BE9F00` |
+
+  - The studio warms the stone, so the keys that render at the sheet's medians have R − B of only 19–25. Decision 10
+    requires R − B ≥ 30 on every rock key, so each rock key was moved to the nearest key with R − B = 30 and hue 22°,
+    using the calibration's per-channel linear gains (estimated render of `#A28F84`: (205,174,155)). All rock keys pass
+    `warm_ok` (R > G > B, hue 12–26°, R − B ≥ 30), and `build()` reports any that don't. The lavender swatch is never
+    used.
+- **Blending (by position only):**
+  - Rocks, per flat facet (2° regions): broad noise patches on the upper half go toward rock_light (mix up to 85 %),
+    patches below 0.4 H toward rock_deep (up to 80 %), C's top at least 30 % light, the floor plain rock.
+  - Pads, by place on the pad: the centre 90 % toward sun, lobe ridges 70 %, valleys moss or 25 %, the rim band deep
+    (90 % mix); MC is shifted 0.34 toward sun.
+  - Leaves, by tier: outer leaves leaf × deep 20 %, inner leaves leaf_young (K1b and A's foot clumps one tier lighter).
+  - Petals and centres plain.
+  - `K.check` baked-shading correlation: hero 0.01, parts ≤ 0.19 (limit 0.5).
+- **Texture (Tint):** rock ±4.5 % per facet (scale 0.3) plus ±4 % per rock; pads 5 %; leaves 4 % plus ±4 % per cluster.
+  No per-triangle confetti.
+- **Finish:** rock roughness 0.9, metal 0; moss 0.9 and leaves 0.85, both with foliage specular 0.06; petal and pollen
+  roughness 0.7. No emission.
+- **Rendered colours against the sheet** (medians, same masks):
+  - Rock: f34 `#CDB09B` vs `#CDAFA1` (R 0, G +1, B −6); front `#CBAE98` vs `#CAAE9E`; top `#CEB29E` vs `#D1B5AA`; parts
+    row `#CDAF9A` vs `#C9AC9C`. Parts: A `#BCA08C` vs `#C3A493`, C `#CDB29F` vs `#D6B9AC`, D `#D2B6A0` vs `#C7AA9D`, E
+    `#B9A290` vs `#B9A196`. All hue 20–26°, R > G > B. B runs 5–12 low, because the sheet's shade faces are lavender sky
+    light, which our studio doesn't produce and decision 10 doesn't let us paint.
+  - Green: f34 `#95B50D` vs `#95B205`; front `#95B50E` vs `#93AA07`; top `#95B508` vs `#91AB07`; MB pad (MediumRock part)
+    `#B5C415` vs `#B0C306`; FlowerClump leaves `#8EB10C` vs `#9ABB03`.
+  - Rear, side and r34 rock medians `#A99386`–`#AF998C` (the backs are in the studio's shade) vs `#CBAE9E`–`#CDAE9C`.
+
+## Stage 5: Lighting
+
+Skipped (decision 8): nothing on the sheet glows, so there is no emissive key and no light. Studio note (manual
+validation): check in Studio that the rocks stay warm grey-pink under the game sun, the pads stay yellower than the
+leaves, and the petals don't bloom.
+
+## Stage 6: VFX
+
+Skipped (decision 8): the sheet's only effect is the optional contact shadow, which Roblox's own shadowing covers. No kind
+was added to `lib/vfx.py` and there are no sockets (`build()` reports any socket on the hero as a problem).
+
+## Modeller's notes for the verifier
+
+- **Run:** `import importlib, kit_models, m038; importlib.reload(kit_models); importlib.reload(m038); m038.build()`. It
+  returns `audit`, `uv`, `materials`, `views`, `compare`, `contact` (the floating-shell report per object), `shells`,
+  `rocks` (spec 2.2 metrics), `log` (layout clearances, settle moves, clusters, pads) and `problems` (empty).
+  `m038.contact_report(o)`, `m038.shells_report(o)`, `m038.measure(path, box)` and `m038.compare()` also work alone.
+- **Cameras** (`SHEET_VIEWS`, floor hidden, 3× lens): f34_sheet (0, 32), front_sheet (0, 28) and top_sheet (0, 72)
+  govern. side_sheet (90, 8), rear_sheet (180, 12) and r34_sheet (150, 25) are judged loosely (spec 3.2: compact
+  re-compositions; our W : H there is 2.1–3.3 against 1.7–1.9, as the spec predicted). Extras: `part_*` (0, 27),
+  `part_tallrock_side` (90, 27), `parts_row`, `exploded`, `slab_under` (the FlatSlab part from below), `slab_cu` (the
+  FlatSlab part at 70, 6), `junc_cu` (K1 between C and A), `scale` (beside a 5.5-stud stand-in) and the kit views.
+- **Known misses:**
+  - front_sheet green .236 vs .267 (inside ±4) and flower share .006 vs .015; top_sheet green .357 vs .299 (1.8 over ±4).
+  - Back-view flowers are small (share .001–.004): four of the six face the front cameras.
+  - D is 2.7 × 2.0 × 1.5, smaller than the spec's 2.7 × 2.3 × 1.8 (Stage 1), and its tilted top facet is its largest
+    facet (.29 of the parts view; target .08–.12).
+  - B and D triangle-area CV .57 / .53 (target ≥ .6); A and D valence max 9.
+  - K1 rises to 2.5 (spec table 1.4); L1 to 1.42 (spec 1.7).
+  - MB drapes only 0.19 below B's top at its lowest (spec 0.3–0.45): bigger drapes over B's steep shoulder folded into
+    thin flaps, so `wrap` is 0.34 and the pad mostly lies on the top. A small lobe tip still hangs at the front edge of
+    the MediumRock part. MC drapes 0.49 over C's left end.
+  - The exploded and parts rows draw E about 2× larger; our RoundRock part is the hero's 0.7 pebble (decision 4).
+  - Side, rear and r34 profiles miss, as expected for re-compositions (mean .15–.21).
+  - The `parts_row` render is small: the five parts at one scale across about 24 studs in one 480-px cell.
+  - Single-cell extras (A's shoulder tuft, B's flank smear, D's smudge, the junction's two pebbles) are left out
+    (decision 11).
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier; read-only on `art/blender/assets/kit/wip/M038_verify.blend` (background Blender, port 9882; nothing
+built, edited or saved). Every number below is my own: my bmesh / BVH scripts and my own numpy comparison with the
+study's masks (not `m038.compare()`). Renders and scripts are in the scratchpad `m038_verify\` folder (`r\*.png`,
+`mesh_check.py`, `float_check.py`, `rock_check.py`, `colour_check.py`, `cmp.py`).
+
+### Measured
+
+| Object | Tris (limit) | Size W × D × H | Shells (kinds) | Open / NM edges / boundary / wire / loose / bowties / zero-area / n-gons / dup verts | Self-hits in a shell | Inverted (ray parity) | Origin (bbox cx, cy, zmin) | Rot / scale / mods / custom normals | Collision |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StoneScatter | 3398 (4000) | 11.17 × 8.85 × 3.00 | 162 (5 rock, 2 moss, 119 leaf, 30 petal, 6 pollen) | 0 / 0 / 0 / 0 / 0 / 0 / 0 / 0 / 0 | 0 | 0 | 0, 0, 0 | 0 / 1 / none / no | none |
+| TallRock | 330 (1000) | 4.10 × 2.30 × 3.00 | 15 (1 rock, 14 leaf) | all 0 | 0 | 0 | 0, 0, 0 | applied | hull |
+| MediumRock | 206 (1000) | 2.85 × 2.40 × 1.57 | 2 (rock, moss) | all 0 | 0 | 0 | 0, 0, 0 | applied | hull |
+| FlatSlab | 472 (1000) | 6.81 × 4.27 × 1.98 | 16 (rock, moss, 14 leaf) | all 0 | 0 | 0 | 0, 0, 0 | applied | hull |
+| WedgeRock | 56 (1000) | 2.70 × 2.00 × 1.50 | 1 | all 0 | 0 | 0 | 0, 0, 0 | applied | hull |
+| RoundRock | 36 (1000) | 0.70 × 0.60 × 0.42 | 1 | all 0 | 0 | 0 | 0, 0, 0 | applied | none |
+| FlowerClump | 236 (1000) | 1.35 × 1.24 × 0.54 | 13 (7 leaf, 5 petal, 1 pollen) | all 0 | 0 | 0 | 0, 0, 0 | applied | none |
+
+- Every shell closed (each edge exactly 2 faces), positive volume; smallest corner 5.25° (hero). UV: 0 overlaps, 0
+  flipped, min gap 0.016, border 0.008, density 1.0 on every object.
+- **Floating dressing (own code, verts + edge midpoints + face centres against every other shell, BVH overlap):** hero
+  **0 floating** (every leaf / petal / centre shell is in contact, gap 0.00), **0 unchained** at 0.03; same on all six
+  parts. Both pads touch their rock (gap 0). All rocks sit at z 0; no two rocks within 0.1 of each other.
+- **Rocks in the hero (own metrics, floor faces excluded):**
+
+| Rock | Tris (vis.) | Size | H/W | Area CV / edge CV | Valence (non-floor) min–max, mean | Slivers < 25° | Near-equal 5–6 fans | Floor span X / Y |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A | 78 (72) | 3.10 × 2.30 × 3.00 | .97 | .62 / .35 | 3–8, 5.67 (floor fan 12) | .42 | 0 | .79 / .90 |
+| B | 66 (60) | 2.85 × 2.40 × 1.50 | .53 | **.57** / .35 | 3–8, 5.59 | .36 | **4** | .85 / .86 |
+| C | 80 (72) | 5.83 × 4.38 × 1.67 | T/L .29 | .74 / .44 | 4–8, 5.81 | .51 | 0 | .87 / .83 |
+| D | 56 (51) | 2.70 × 2.00 × 1.50 | .56 | **.53** / .38 | 3–**9**, 5.65 | .46 | 1 | .88 / .88 |
+| E | 36 (32) | 0.70 × 0.60 × 0.42 | .60 | exempt | 4–7 | .08 | (exempt) | .82 / .81 |
+
+  - C's top: 12 faces with normal z > 0.97, steepest near-top face 11.4°, flat underside; .77 of the upward area
+    including the bevel ring (target ≥ .85).
+- **Renders against the sheet** (my `cmp.py`, sheet cells vs ours, floor hidden):
+
+| View | W : H ours / sheet | Rock / green / flower ours | Sheet | Profile mean / max |
+| --- | --- | --- | --- | --- |
+| f34_sheet (0, 32) | 1.652 / 1.684 | .739 / .254 / .0068 | .722 / .270 / .0079 | .054 / .13 |
+| f34 probe e 28 / 36 | 1.755 / 1.567 | — | — | .054 / .12; .054 / .14 |
+| front_sheet (0, 28) | 1.755 / 1.708 | .758 / .236 / .0062 | .719 / .267 / .0146 | .065 / .21 |
+| front probe e 24 / 32 | 1.872 / 1.652 | — | — | .070 / .25; .067 / .17 |
+| top_sheet (0, 72) | 1.237 / 1.196 | **.633 / .357** / .0097 | .691 / .300 / .0096 | .043 / .15 |
+| top probe e 64 / 80 | 1.270 / 1.255 | — | — | .046 / .15; .051 / .16 |
+| side (90, 8), loose | 2.330 / 1.867 | .804 / .195 / .0013 | .783 / .209 / .0078 | .195 / .58 |
+| rear (180, 12), loose | 3.254 / 1.872 | .751 / .247 / .0014 | .709 / .281 / .0098 | .207 / .47 |
+| r34 (150, 25), loose | 2.094 / 1.710 | .782 / .214 / .0042 | .746 / .248 / .0059 | .145 / .36 |
+
+  - The decision-5 probes are now rendered: e 32 ties 28 and 36 on the f34 (mean .054 each), e 28 is best for the
+    front (.065), e 72 best for the top (.043). The chosen cameras stand.
+- **Colour (rendered medians, same masks):**
+
+| Region | Sheet | Ours | Note |
+| --- | --- | --- | --- |
+| Rock f34 / front / top | `#CDAFA1` / `#CAAE9E` / `#D1B5AA` (hue 19 / 22 / 17) | `#CDB09B` / `#CBAE98` / `#CEB29E` (hue 25 / 26 / 25) | R > G > B, within 10; a touch more orange |
+| Rock pixels with B ≥ R | 11–15 % (lavender sky shade) | 0 % | never lavender or mauve |
+| Rock parts A / C / D / E | `#C3A493` / `#D6B9AC` / `#C7AA9D` / `#B9A196` | `#BCA08C` / `#CDB29F` / `#D2B6A0` / `#B9A290` | within 12 except C's blue (13) |
+| MB pad f34 | `#B6C508` (hue 64.8) | `#B7C516` (64.8) | match |
+| MC pad f34 | `#DCD207` (57.2) | `#C2CC17` (63.3) | **less yellow than the sheet** |
+| Leaves f34 (G outside the pad boxes) | `#87A804` (72.1, s .98) | `#93B514` (72.7, s .89) | lighter, a little grey |
+| Petals | `#FEFFFE` | `#FFFAE8` | warm white |
+
+  - Rock keys `#A28F84` … `#AA988C`: every one R > G > B, hue 22–24°, R − B = 30; the lavender swatch is not used.
+  - Pads (hue 61–65) against leaves (72.7): the two greens are 8–9° apart (≥ 4 needed).
+  - Facing: kit `baked_shading` hero 0.009, parts ≤ 0.19 (limit 0.5). My own correlation of rock-key lightness with
+    face normal z is 0.37, driven by C's top lift (a position rule from spec 5.4), and under the limit. Tint is a
+    CORNER colour attribute; broad per-facet mottling shows in the renders, with no confetti.
+- **Lighting / VFX:** emission strength 0 on all 22 `FB_m038_*` materials, no emission nodes, no lights and no
+  sockets in the collection (decision 8).
+
+### Findings
+
+No blockers.
+
+1. **minor — leaf rosettes read as cupped lettuce heads.** From the top and f34 the clusters (K2, K3, K4, K5, the
+   FlowerClump part) are closed domes of overlapping broad plates. The sheet shows splayed star rosettes of separate
+   spatulate leaves with gaps between them. The FlowerClump part's inner upright leaves read as thin blades edge-on
+   (pitfall 9). This is also why top_sheet green is .357 against .300 (+5.7, over ±4) and rock .633 against .691.
+   **Fix:** lower `IN_PITCH` to about 0.55–0.75. Use fewer, narrower outer leaves (5–7 per small cluster) splayed
+   with 15–25° gaps. Widen the inner leaves at the tip so they don't read as blades. Re-measure top_sheet green to ≤ .34.
+2. **minor — MC pad not yellow enough.** f34 MC `#C2CC17` against `#DCD207` (R −26, hue 63 against 57). **Fix:**
+   shift MC further toward `moss_sun` (0.34 → about 0.6), or make `moss_sun` yellower (the target render is R ≈ G).
+   Check MC within 12 of `#DCD207`.
+3. **minor — greens slightly grey and light.** Leaf and pad renders carry B 0x12–0x17 against the sheet's 0x04–0x08 (sat
+   .89 against .97), and the f34 leaves are 12–16 lighter than `#87A804`. **Fix:** cut the green tint amplitude, or
+   check that the Tint isn't pulling blue in, so the B channel stays ≤ 10. Darken `leaf` back toward the calibrated
+   `#7B9602`.
+4. **minor — f34 top profile mean .054, max .13** (target mean ≤ .04, max .07). The ends are too high: f .00 .40
+   against .28 and f 1.0 .59 against .45. L1 / L2 at C's left and B / K4 at the right stand taller than the sheet's.
+   **Fix:** lower L1's top and K4 by about 0.2.
+5. **minor — front_sheet flower share .0062 against .0146** (outside ±.006); rear and side flowers barely show (.0013
+   and .0014 against about .008–.010). The K1 front flower reads small. **Fix:** K1's front flower toward 1.1, and turn
+   one of K1's and K5's flowers more upward so the rear cameras see them.
+6. **minor — rock facet statistics.** B area CV .57 and D .53 (target ≥ .6). B has 4 vertices with 5–6 near-equal
+   triangles round them (allowed: at most 2). D's non-floor valence reaches 9. D's tilted top / front-left facet
+   dominates the parts view (modeller .29; target .08–.12). None reads as a soccer ball or an egg in any render. B and D
+   look like chunky faceted stones. **Fix (optional):** one more jittered point on B's front-left face and on D's big
+   facet.
+7. **minor — D smaller than the spec** (2.7 × 2.0 × 1.5 against 2.7 × 2.3 × 1.8). Its f34 box (about f .61–.86, h
+   .00–.33) still matches the sheet's (.59–.83, .00–.32), so I accept the modeller's tuning.
+8. **minor — MB drape shallow.** The star pad mostly lies on B's top, with its right lobes reaching out past the edge.
+   The sheet drapes it 0.3–0.45 down the right-front shoulder. It reads as a pad on top, not as a decal, so it isn't a
+   blocker. **Fix:** a deeper `wrap` on the right-front lobes only.
+9. **minor — slab top quiet, too few tones.** C is a correct extruded slab: flat top, uniform band, bevel and chamfer,
+   flat underside, front vertex. It is not a lozenge. Its top reads as one plain plate, though, where the sheet shows
+   broad facets of different tone. The top's share including the bevel ring is .77 (target ≥ .85). **Fix:** stronger
+   per-facet rock_light / base alternation on C's top only.
+10. **minor — part dressing light.** The TallRock's foot clumps and the FlatSlab's back-edge clump and left-foot cluster
+    are small next to the parts row (sheet: an 8–10-leaf clump at A's left foot, a substantial clump on C's back edge).
+11. **minor — rock hue 25° rendered** (spec 5.7: 17–23°). It is inside the decision's 12–26° key rule and R − B ≥ 30, a
+    little more orange than the sheet's pink. Lowering the hue would break R − B ≥ 30 at this value, so leave it.
+
+Checked and confirmed:
+- The modeller's own notes: B / D CV, D size and facet, top green, back flowers, MB drape (all real, all minor as
+  above).
+- Elevation probes, now done (32 / 28 / 72 stand).
+- Decisions 1–12: size, layout, extruded slab, 0.7 pebble, cameras, separate closed shells, hero + 6 parts, no VFX,
+  collision tags, warm stone keys, single-cell extras left out, names.
+
+### Score and verdict
+
+**7.5 / 10. PASS.** The mesh is clean, the budget holds, nothing floats and the silhouette and layout are right.
+- Clean mesh: every shell closed and manifold, 0 bowties, 0 self-intersections.
+- Budget: 3398 / 4000, parts ≤ 472.
+- Layout: the five-rock ring and every rock's role read correctly (tall blunt A, extruded slab C, boxy mossy B, wedge D,
+  pebble E).
+- Colour: the stone is warm and never lavender, two greens are kept apart, petals are warm white.
+- No colour by facing. All decisions followed.
+
+The leftovers are polish: rosette openness, MC yellow, green saturation, profile ends and flower size. Round 2 could
+take items 1–5.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 1 (7.5/10) and committed. The optional round 2 is skipped (pace rule); its items are recorded for a later polish pass.
+- **Polish items:**
+  - Leaf clusters read as cupped lettuce heads, not open star rosettes, and the top view is too green (.357 against .300). Target: `IN_PITCH` about 0.55–0.75, top green at most .34.
+  - Pad MC isn't yellow enough. Shift it toward `moss_sun`.
+  - The greens are slightly grey and light. Darken `leaf` toward `#7B9602`.
+  - The f34 top profile is off at the ends. Lower L1 and K4 by about 0.2.
+  - Flowers are too small, and the rear views miss them.
+  - The B and D facet statistics miss their targets.
+  - The B pad drape is shallow.
+  - The slab top reads as one tone.
+- **Export:** 7 assets, 7 solid pieces, 4734 tris, 0 VFX sockets, palette 22 colours, 0 problems.

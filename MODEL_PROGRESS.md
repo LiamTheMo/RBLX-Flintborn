@@ -234,7 +234,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 035 | Flintborn boulder model study | World & resources | ✅ | 3844; parts 210 / 848 / 38 / 246 | modeller + fresh verifiers; R1 FAIL 6.5 (floating, sparse tall foliage), R2 PASS 7.5 | minors: F6 reads as stacked tufts; F5a/b narrow columns; lit foliage dark and less lime; rock boxy at rear/side (wide foot); cap reads as star cones |
 | 036 | Flintborn rock cluster model study | World & resources | ✅ | 3898; parts 314 / 320 / 150 / 64 / 120 / 260 | modeller + fresh verifiers; R1 FAIL 6.5 (floating, sparse, pointed foliage), R2 PASS 7.5 | minors: foliage reads as big-leaf ivy mounds, not small clover rosettes; width 13.01 at the edge; A's olive smear a hard facet; 15 leaves cut into rock at hidden joints; back greens dark |
 | 037 | Flintborn Waterfall Module Study | World & resources | ⬜ | | | |
-| 038 | Pebble scatter model study | World & resources | ⬜ | | | |
+| 038 | Pebble scatter model study | World & resources | ✅ | 3398; parts 330 / 206 / 472 / 56 / 36 / 236 | modeller + fresh verifier; R1 PASS 7.5 | minors: leaf clusters read as cupped lettuce heads (top view too green); pad MC not yellow enough; greens slightly grey; flowers small; B/D facet stats under target; slab top one tone |
 | 039 | Flintborn rock spire model study | World & resources | ⬜ | | | |
 | 040 | Flintborn Cliff Wall Construction Study | World & resources | ⬜ | | | |
 | 041 | Flintborn Shore Shelf Model Study | World & resources | ⬜ | | | |
@@ -418,3 +418,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-29: 034 Streambed Section built by parallel modellers: a 32-stud stream tile with a broad see-through channel between thin sand banks, chunky flat-crowned boulders standing in the water with lobed foam collars, segmented bank foam, and flow and foam sockets, keeping the X −7…+7 seam contract. R1 FAIL 6, R2 PASS 8.
 - 2026-10-29: 035 Boulder built by parallel modellers: a big faceted warm stone with a real V cleft, a lobed lime moss cap fused on its crown, and dense rounded clover mounds with white flowers ringing the base, every leaf seated by contact. R1 FAIL 6.5, R2 PASS 7.5.
 - 2026-10-29: 036 Rock Cluster built by parallel modellers: a tall faceted warm stone with a flat moss mat, two shorter mossy rocks and small stones in a cluster, ringed by contact-seated clover mounds with white flowers. R1 FAIL 6.5, R2 PASS 7.5.
+- 2026-10-29: 038 Pebble Scatter built by a parallel modeller: five separate faceted warm stones round open ground, an extruded flat slab, two moss pads, contact-seated leaf rosettes and a flower clump. R1 PASS 7.5 on the first round.
