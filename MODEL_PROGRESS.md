@@ -229,7 +229,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 030 | Mooncap Flintborn model study | World & resources | ✅ | 2880; parts 452 / 48 / 160 / 112 / 154 / 928 | modeller + fresh verifier; R1 PASS 8 | minors: big stem's upper half dark in front under the drooping cap (studio shadow; Studio check); side view off (decided −X droop); rear profile ends; front boulders in a straight line; leaves 12–22 dark |
 | 031 | Cave Mushroom Construction Study | World & resources | ✅ | 1648; parts 108 / 94 / 112 / 870 | modeller + fresh verifiers; R1 FAIL 6.5 (bright underside, mauve rocks, slab rocks), R2 PASS 7.5 | minors: drum and upper stalk olive in the cap's shadow in front (Studio check under cave light); Underside part a thick puck; side rocks dark (light direction); top-view cap share high (decision) |
 | 032 | Shoreline corner | World & resources | ⬜ | | | |
-| 033 | Flintborn cave moss model study | World & resources | ⬜ | | | |
+| 033 | Flintborn cave moss model study | World & resources | ✅ | 1164; parts 56 / 54 / 268 / 170 / 62 | modeller + fresh verifier; R1 PASS | minors: base share 61 % against decision 4's 70 % (sheet ≈ 67 %, accepted); side clumps rounder than the sheet's ovoids; rock a little beige; lit moss 10–15 dull; thin fold on the base's back |
 | 034 | Flintborn streambed model study | World & resources | ⬜ | | | |
 | 035 | Flintborn boulder model study | World & resources | ⬜ | | | |
 | 036 | Flintborn rock cluster model study | World & resources | ⬜ | | | |
@@ -413,3 +413,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-29: 030 Mooncap built by a parallel modeller: two violet faceted caps drooping along X over fat pear stems, 11 Neon cyan gems in carved pockets and bezels, a dirt slab with 12 boulders, two leaf clumps and one crystal_glow light. R1 PASS 8 on the first round.
 - 2026-10-29: 031 Cave Mushroom built by parallel modellers: three faceted rust dome caps (10 sectors, 4 facet rows, crown polygon) with dark lips and tan undersides on fat cream bell stalks, the small two leaning out, in a ring of squat warm-grey boulder domes. R1 FAIL 6.5, R2 PASS 7.5.
 - 2026-10-29: 029 Ancient Root built by parallel modellers: two gnarled bark roots arching over and gripping a faceted green sapstone egg, on a lipped stone slab with nine boulders, with two upright four-blade leaf fans. R1 FAIL 6, R2 PASS 8.
+- 2026-10-29: 033 Cave Moss built by a parallel modeller: a lobed faceted warm-grey boulder under three squat moss clumps (the centre highest), a lime sprout in the bare front face and a taller one at the back-right, with pebbles and side rocks fused round the foot into one closed shell. R1 PASS on the first round.
