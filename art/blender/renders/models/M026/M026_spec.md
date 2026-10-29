@@ -712,3 +712,655 @@ All recommendations are accepted:
 11. Names as proposed: `FallenSoftwoodLogTrunk`, `FallenSoftwoodLogCutEnd`, `FallenSoftwoodLogBranchStubLarge`, `FallenSoftwoodLogBranchStubSmall`, `FallenSoftwoodLogLeafClump`, and the hero `FallenSoftwoodLog`.
 
 Leaf clumps are flat six-leaf stars at a 15–35° pitch, never upright tulips.
+
+## Stage 1. Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m026.py`, `build()` (fixed seeds, about 20 s geometry + 20 s renders in the background
+session). Every part has its own function; the hero is built from the same functions.
+
+- **Trunk (`trunk_raw`, `fuse_trunk`).** 11 stations × 22 vertices (11 corners with a fixed irregular outline ±4 % and
+  ±3 % per vertex, a vertex in the middle of every face, ring twist ±5°, axial jitter ±0.08), R 1.6 → 1.45 at t 0.9, a
+  level axis (z = 0.96 R0 − 0.06) so the bottom face lies on the ground at the cut end and the far end lifts a little.
+  **Deviation:** 11 stations (0.875 apart) instead of 12 (0.8): the spare 44 tris pay for the plates, keeping the Trunk
+  part under 1000.
+  - **Plates are part of the same surface (no booleans):** each plate's cells use copies of their corner verts lifted
+    0.07 or 0.10 along the radius; wall quads close every edge where two cells differ. 2 step ledges on the top at the
+    cut end (band 0) + 12 seeded plates (1–3 bands × 2–4 half-columns), never touching each other even at a corner (so
+    no bowtie), clear of the ground strip (228–312°), the stub/knot feet, the knot hole and the slits.
+  - **9 slits, also in the grid:** a V-groove opened along a lengthwise column line (each vertex on the line split
+    into low-side, high-side and bottom copies, plus a midpoint per band), 0.12 wide and 0.10 deep at the middle,
+    closed and pointed at both ends, 1–3 bands long (0.9–2.6 studs; the long one low on the front at t .4–.65). 7 of
+    the 9 face the hero (front/top 114–222°), 2 on the back. About 6–26 tris each against about 60 for a carved
+    boolean slit.
+  - **Knot hole:** the one boolean: a shallow inverted 5-sided pyramid (0.35 wide, 0.12 deep) near the +X top.
+  - **Cut end (−X):** bark rim annulus (ring 0 → the face edge, 0.13 wide, in the x −4.55 plane), the 45° chamfer
+    (0.92 → 1.0 of the face radius, 0.10 deep), and the flat face at x −4.65 with loops at 0.62 (11-gon following the
+    outline), 0.40 (10-gon), 0.20 (8-gon) and a centre: flush, flat (the cleanup locks the x plane).
+  - **Dome (+X):** 22 → 11 (0.9 R) → 8 (0.70 R) → 5 (0.40 R) → apex over 0.45 stud, jittered ±5 %.
+- **Large stub (`_stub`):** 8 sides, 5 stations from 0.5 buried, flared 1.14× at the foot (the flared ring 0.18 out
+  along the stub, clear of the bark: a ring lying on the bark left a 1.2° sliver), Ø 1.12 → 0.96, ±8 % per vertex,
+  twist ±11°, ring wobble 0.05, leaning 30° to +X and 8° to +Y, protrudes 2.0. Broken top: the cut plane tilted toward
+  the camera (normal d + (−0.12, −0.32, 0)), jagged ±0.04, a 0.10 chip on the +X side, a thin bark lip (0.86), the
+  pale annulus and a 6-sided pith.
+- **Knot (`_nub`):** 6 sides, Ø 0.84, protrudes 0.68 from the crest's front (x −0.15, 100°), leaning 40° to −X, a
+  jagged pale tip. (Larger than the spec's Ø 0.75 × 0.5: at that size it hid behind the crest in front34.)
+- **Small stub:** the same builder, Ø 1.0 → 0.9, flare 1.14, protrudes 2.2 from the lower front (x −1.77, 200°), yaw
+  25° toward +X, pitch 15° down; square-cut pale end resting on the ground (floor-cut).
+- **Leaf clumps (`_clump`, M020's round-2 kite recipe):** six broad kites (L 0.52 span, W 0.62 × half-span) round a
+  hidden 5-sided hub, pitch alternating in the lower / upper third of 15–35° (flat stars, never tulips), no stem.
+  Spans FL 2.1, FR 2.6, BR 2.4 (fan 240° on the log's top-back at 74°, hub sunk 0.1), BK 2.0. The spec's spans
+  (1.4–2.0) read too small against the sheet: the f34 leaf share was 6.8 % against 11.1 %, now 8.8 %. Ground hubs at
+  z 0.14 (the leaf bases above the floor cut, only the hub cone is cut) are slid toward the log until their leaves cut
+  into it (one shell), then 0.2 further.
+- **Hero:** trunk (fused) + stubs + knot + clumps → one exact union with no post-union merge (`_union_fine`, m021) →
+  floor cut at z 0 → the guarded cleanup → finish → polish → `M.fix_bowties`. A guard rebuilds with the clumps turned
+  17° if the result has a fold (clean on the first attempt with the current seeds).
+- **Size:** hero 9.30 × 6.32 × 4.84 (target 9.4 ± 0.35 × 6.7 ± 0.5 × 5.05 ± 0.25). Log Ø 3.2, length 9.3.
+  - H is the large stub's top. The spec's 2.0 protrusion with the tapered log gives 4.84; 5.03 (protrusion 2.2) made
+    the hero W : H 1.56 against the sheet's 1.74.
+  - D is set by the small stub's end (y −3.6) and BK (+2.7). The spec's 6.7 assumed BK at y 2.1 with span 1.6, which
+    doesn't reach the log and would be a separate shell.
+
+## Stage 2. Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / bowtie verts / boundary / wire / loose | Zero-area / n-gons | Self-hits | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| FallenSoftwoodLog (hero) | 2060 / 4000 | 9.30 × 6.32 × 4.84 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 | 0 | 5.07° |
+| FallenSoftwoodLogTrunk | 934 / 1000 | 9.30 × 3.28 × 3.21 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 | 0 | 5.17° |
+| FallenSoftwoodLogCutEnd | 124 | 0.38 × 2.94 × 2.95 | 1 | 0 | 0 | 0 | 9.04° |
+| FallenSoftwoodLogBranchStubLarge | 162 | 2.29 × 1.35 × 2.61 | 1 | 0 | 0 | 0 | 5.41° |
+| FallenSoftwoodLogBranchStubSmall | 108 | 1.96 × 2.78 × 1.59 | 1 | 0 | 0 | 0 | 7.48° |
+| FallenSoftwoodLogLeafClump | 186 | 1.69 × 1.79 × 0.54 | 1 | 0 | 0 | 0 | 5.66° |
+
+- Normals outward (signed volume, recalculated over each closed mesh); no custom normals; flat shading; transforms
+  applied; origin at the bbox bottom centre on every object.
+- Guarded cleanup (m020's `_clean_guarded`, copied locally): no vertex moves more than 0.08 (the slits are 0.12
+  wide). It locks the ground plane (z 0) and the cut-face plane (x = X_FACE in object coordinates), so the face stays
+  flat, and refuses moves that would push a face through another.
+- The Trunk part is 934 tris with plates and slits in the surface. The first version, with boolean-carved slits, was
+  1340.
+
+## Stage 3. UV
+
+Smart UV at 45°, re-unwrapped ANGLE_BASED from its island seams, margin 0.008, then m012's `_uv_unfold`.
+
+| Object | Islands | Overlaps / flipped | Min gap | Density spread | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- |
+| Hero | 414 | 0 / 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.015 |
+| Trunk | 108 | 0 / 0 | 0.016 | 1.0 | 1.013 |
+| CutEnd | 8 | 0 / 0 | 0.016 | 1.0 | 1.053 |
+| StubLarge | 16 | 0 / 0 | 0.016 | 1.0 | 1.029 |
+| StubSmall | 8 | 0 / 0 | 0.017 | 1.0 | 1.028 |
+| LeafClump | 35 | 0 / 0 | 0.016 | 1.0 | 1.042 |
+
+## Stage 4. Materials, colour and texture
+
+- **Pass 1** (`m026.calibrate()` on the kit dome, against the spec 5.4 targets). The keys rendered:
+  - bark (138,93,66), bark_light (148,100,74), bark_dark (94,65,49);
+  - cut (222,175,121), cut_light (240,201,151), cut_ring (231,177,120), cut_edge (247,214,168);
+  - leaf (100,162,29), tip (112,174,32), base (76,138,25).
+  All are within 6 of target.
+- **Pass 2** (hero renders against the sheet, `m026.measure()`, the study's masks; linear-light scaling):
+  - **bark ×0.88:** the f34 median was 10 light;
+  - **bark_light ×1.75:** the broad lit patches carry the sheet's lit plates (lit quartile #936448 against #B47A56);
+  - **leaf_tip ×1.56 and leaf_base ×0.85:** the lit/shade spread;
+  - **New keys `m026_face_light/ring/edge`** for the log's own cut face and the CutEnd disc. The face points −X, away
+    from the studio sun, so with the dome-calibrated cut keys it rendered #C9A87D in side_sheet against the sheet's
+    #ECC493. They are the cut keys ×1.42, from the side_sheet ratio. The sun-lit stub tops keep the cut keys, which
+    render #FEDDAF against the sheet's #FDDEAF. The small stub's end (also turned from the sun) is face_light/ring 50 %.
+- **Final keys:**
+
+| Key | Hex | Rough | Target / role |
+| --- | --- | --- | --- |
+| m026_bark | #674631 | 0.9 | #85583E |
+| m026_bark_light | #986B50 | 0.9 | lit patches |
+| m026_bark_dark | #4A3224 | 0.95 | #5E402E (slit grooves) |
+| m026_cut | #AF8F68 | 0.85 | #DFAF79 |
+| m026_cut_light | #BDA482 | 0.85 | #F0C997 (stub tops) |
+| m026_cut_ring | #B69167 | 0.85 | #E7B278 (stub piths) |
+| m026_cut_edge | #C2AE90 | 0.85 | #F6D6A8 (knot tip) |
+| m026_face_light | #DCBF99 | 0.85 | #F0C998 (face light bands, disc side) |
+| m026_face_ring | #D4AA79 | 0.85 | #E7B278 (pith, ring) |
+| m026_face_edge | #E2CBA8 | 0.85 | chamfer |
+| m026_leaf | #55881D | 0.8, low spec | #63A21E |
+| m026_leaf_tip | #76B126 | 0.8, low spec | lit #82BC22 |
+| m026_leaf_base | #3D6D16 | 0.8, low spec | #4B8A19 |
+
+- **Fields (position only, never facing):**
+  - bark: broad noise patches stepping 25 / 50 / 75 % toward bark_light;
+  - slit grooves: bark_dark (a genuine crack);
+  - cut-end bark rim: 50 % bark_dark;
+  - stub top 0.35 stud and lip: 25 % bark_light; knot: 50–75 % bark_light;
+  - cut face: flat band keys on the ring loops (pith ring, 0.20–0.40 light, 0.40–0.62 ring, 0.62–0.92 light, the
+    chamfer edge), hard to the bark rim;
+  - leaves: base → mid → tip ladder in 25 % steps along each leaf, one half 0.3 toward the base (the lit/shaded
+    halves);
+  - floor caps: bark, leaf base under leaves, the small end's key under its end.
+- **Tint:** bark amp 0.045, scale 0.6; cut amp 0.02; leaves 0.035 / 0.5. K.check is clean, including the colour-by-
+  facing correlation; the disc's sides use face_light so its one wood doesn't follow facing.
+- **Re-measured** (ours against the sheet; f34 = `f34_sheet`, long lens at −34° / 12°, which gives the cell's
+  cut-face openness 0.52 against 0.50):
+
+| View | Bark median / lit / shade | Cut face median | Leaf median / lit | Shares L / W / B | W : H | Slits |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | #845940 / #AA7453 / #543727 (sheet #82573D / #B47A56 / #533928) | #EAC494 (#DFBA8E) | #5A931E / #75B227 (#528D1A / #82BC22) | 8.8 / 10.7 / 80.6 (11.1 / 14.5 / 74.4) | 1.652 (1.743) | 8 (8) |
+| front (kit front34) | #84593F / #A87352 / #543727 | #EAC597 | #59931E | 9.0 / 4.9 / 86.1 | 1.659 (1.757) | 7 (5) |
+| side | #825940 | #EAC494 (#ECC493) | #56921D | 6.3 / 42.5 / 51.2 (15.6 / 43.2 / 41.2) | 1.108 (1.246) | 4 |
+| rear | #714F3A (#83573E) | #ECC696 (#EBC292) | #355B10 | 3.9 / 11.7 / 84.4 | 1.711 (1.712) | 9 |
+| top | #855A41 (#905F42) | #EAC495 | #5F9B1E (#568C1D) | 13.8 / 6.4 / 79.8 (12.9 / 9.0 / 78.1) | 1.317 (1.286) | 7 |
+
+## Stage 5. Lighting
+
+Skipped (decision 8): the sheet shows an ordinary sunlit log, so there is no emissive key and no light.
+- **Studio note (Requires Manual Validation):**
+  - the face keys are brighter than the stub-top keys because the face points −X, away from the kit studio's sun. If
+    the game's sun lights the −X end head-on, the face will read paler than the sheet;
+  - check that the ring bands still differ by at least 12 levels, and that the slits read as dark lines.
+
+## Stage 6. VFX
+
+Skipped (decision 8): the sheet shows no glow, sparkle, dust or chips, so there are no sockets. Renders still use
+vfx=True (nothing to realize).
+
+## Modeller's notes for the verifier
+
+- **Cameras:**
+  - `f34_sheet` is (−34, 12) with a 3× lens, compared with the f34 cell. At −28 the cut face opened only 0.42.
+  - Kit `front34` (−28, 12) is compared with the front cell.
+  - `r34_sheet`, `rear_sheet`, `side_sheet` and `top_sheet` are as decided. `measure()` runs the study's masks on
+    both images.
+- **Expected misses:**
+  - The sheet's r34/side/rear cells draw two upright stubs (spec 3.2); we have one plus the knot, so their W : H and
+    top profiles differ (side 1.11 against 1.25, r34 1.36 against 1.64).
+  - In the f34 the sheet's near cut end is enlarged by its perspective, so its W share is 14.5 % against our 10.7 %
+    and W : H is 1.74 against 1.65. The stub, log and face sizes are as decided.
+  - The back-facing bark (rear, r34) reads darker than the sheet's (#714F3A against #83573E). That is the studio sun
+    on the far side; it was not painted lighter by facing.
+- **Hero D is 6.32** (tolerance 6.2–7.2). Size notes are in stage 1.
+- **Deviations from the spec numbers:**
+  - 11 trunk stations instead of 12;
+  - knot Ø 0.84 × 0.68 instead of 0.75 × 0.5;
+  - stubs Ø 1.12 / 1.0 at a flared foot, not 1.0 / 0.92;
+  - clump spans about 1.3× the spec's;
+  - slits 0.9–2.6 long, against the sheet's 0.25–0.65 plus one of 2.5: a groove can't be shorter than one band;
+  - the large stub's top tilted toward the camera so its pale cut shows (as on the sheet).
+- **Slit count on the hero renders:** `stats()["slits"]` gives 8 in f34_sheet and 7 in front34.
+- **Self-check:** `build()["problems"]` is empty. It covers every audit field, the size targets, slit count, UV
+  overlaps and K.check.
+
+## Stage 7 — Verification (round 1)
+
+Fresh verifier, read-only, in a background session on port 9882 with `wip/M026_verify.blend`. Nothing was saved and
+`build()` was not called. Fresh renders went to the scratchpad (`.../scratchpad/v026/renders/M026/`, high-res extras
+in `.../v026/renders/big/`). Colours were sampled on both images with the study's masks (`m026.measure()`), a
+component pass (`v026/comp.py`), radial ring bands (`v026/rings.py`) and box samples (`v026/samp.py`).
+
+**Result: FAIL, 6.5 / 10.** The log, the cut face, the dome and the topology are good. The fails are three focal
+details that read clearly unlike the hero cell.
+
+### Re-measured geometry (all independent; matches the modeller's table)
+
+| Object | Tris | Size | Shells | NM edges / bowtie verts / boundary / wire / loose | Zero-area / n-gons / dup | Self-hits | Inverted (ray parity) | Min corner | UV islands / overlaps / flipped / min gap / p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FallenSoftwoodLog | 2060 / 4000 | 9.30 × 6.32 × 4.84 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.07° | 414 / 0 / 0 / 0.016 / 1.015 |
+| …Trunk | 934 / 1000 | 9.30 × 3.28 × 3.21 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.17° | 108 / 0 / 0 / 0.016 / 1.013 |
+| …CutEnd | 124 | 0.38 × 2.94 × 2.95 | 1 | 0 | 0 | 0 | 0 | 9.04° | 8 / 0 / 0 / 0.016 / 1.053 |
+| …BranchStubLarge | 162 | 2.29 × 1.35 × 2.61 | 1 | 0 | 0 | 0 | 0 | 5.41° | 16 / 0 / 0 / 0.016 / 1.029 |
+| …BranchStubSmall | 108 | 1.96 × 2.78 × 1.59 | 1 | 0 | 0 | 0 | 0 | 7.48° | 8 / 0 / 0 / 0.017 / 1.028 |
+| …LeafClump | 186 | 1.69 × 1.79 × 0.54 | 1 | 0 | 0 | 0 | 0 | 5.66° | 35 / 0 / 0 / 0.016 / 1.042 |
+
+- **Normals and interior faces.** Normals point outward (signed volume, plus a per-face ray-parity test: 0 inverted).
+  Each object is one closed manifold shell with no self-hits, so no interior faces are left.
+- **Shading and transforms.** No custom normals. Flat shading (0 smooth polys). Rotation 0, scale 1. Origin at the
+  bbox bottom centre on all 6 objects. No modifiers, parents or children.
+- **Checks.** `K.check` is clean. UV border is 0.008 and density spread is 1.0 on all objects.
+- **Size against the decision.** W 9.30 (9.4 ± 0.35) passes. D 6.32 (6.7 ± 0.5) passes. H 4.84 (5.05 ± 0.25) passes.
+  Log Ø 3.2 and length 9.30 pass.
+- **Materials.** 22 keys on the hero, all `m026_*`. No VFX and no emission (decision 8).
+
+### View comparison (sheet → ours)
+
+**What passes:**
+- **Cut face.** It reads as an irregular 11-gon with a thin bark rim and a lit chamfer, and it is flush and flat. The
+  rings are in the right order: pith dark, light, ring dark, light outer.
+- **Ring colours** (side cell → side_sheet):
+
+  | Band | Sheet | Ours | Δ |
+  | --- | --- | --- | --- |
+  | Pith | `#E7B277` | `#E1AC73` | −6/−6/−4 |
+  | Light | `#F0C896` | `#EAC493` | −6/−4/−3 |
+  | Ring | `#E6B176` | `#E2AD73` | −4/−4/−3 |
+  | Outer | `#EFC897` | `#ECC594` | −3/−3/−3 |
+
+  The G contrast is 24 against the sheet's 22. r34 and the close-up agree within 8.
+- **Bark relief.** Raised plates, the 2 ledges, the knot hole near the +X top and V-slits. Slits counted on the hero:
+  8 in f34_sheet (sheet 8) and 7 in front34 (front cell 5). It is not a tube.
+- **Dome far end.** Blunt, faceted and rounded, with slits running onto it.
+- **Underside and junction.** The underside is closed, and the stubs grow out of the bark without a seam.
+- **Top view.** W : H is 1.317 (sheet 1.286) and the leaf share 13.8 % (12.9 %).
+
+**Shares and silhouette (f34 cell → `f34_sheet`):**
+
+| Measure | Sheet | Ours | Tolerance | Result |
+| --- | --- | --- | --- | --- |
+| W : H | 1.743 | 1.652 | 1.66–1.82 | just outside |
+| Leaves L | 11.1 % | 8.8 % | ±4 | ok |
+| Cut wood W | 14.5 % | 10.7 % | ±2.5 | fails |
+| Bark B | 74.4 % | 80.6 % | ±4 | fails |
+| Wood-only top line, f .05–.40 | .68–.78 | .57–.64 | ±0.05 | fails |
+| Cut-face height | .59 H | .50 H | 0.55–0.65 | fails |
+
+- **Front cell → kit front34:** W share 4.9 % against 13.0 %, top line .67–.69 against .74–.79.
+- **Rear and side cells:** leaf share is 3.9 % against 11.0 % (rear) and 6.3 % against 15.6 % (side), outside ±6.
+
+**Components (f34 → f34_sheet):**
+
+| Item | Sheet (centre f, h; area; median) | Ours | Verdict |
+| --- | --- | --- | --- |
+| Large-stub pale top | (.691, .965); 0.47 %; 43 × 20 px; `#FDE7C2` | (.632, .971); 0.08 %; a 29 × 15 sliver; `#EAC89C` | 6× too small, Δf −0.059 |
+| Small-stub pale end | (.550, .090); 0.91 %; `#E2B480` | missing from the W mask; box median `#A4835C` | not pale |
+| Knot tip | (.521, .808); 0.04 %; `#F6D6A8` (lit) | (.470, .696); 0.27 %; `#FEDDAE` | 7× too big |
+| FR clump | (.843, .173); hf .25 | (.885, .219); hf .18 | ok position, low |
+| BR clump | (.848, .648); h .55–.78, hf .235 | (.754, .739); h .69–.79, hf .10 | Δf −0.094, Δh +0.091; flat strip |
+| FL clump | (.279, .116); hf .18 | (.325, .083); hf .15 | ok |
+
+**Colours (sheet → ours, Δ R/G/B):**
+
+| Region | Sheet | Ours | Δ R/G/B | Verdict |
+| --- | --- | --- | --- | --- |
+| Bark median, f34 | `#82573D` | `#845940` | +2/+2/+3 | |
+| Bark lit, f34 | `#B47A56` | `#AA7453` | −10/−6/−3 | |
+| Bark shade, f34 | `#533928` | `#543727` | +1/−2/−1 | |
+| Bark median, front | `#85583E` | `#84593F` | −1/+1/+1 | |
+| Bark median, rear | `#83573E` | `#714F3A` | −18/−8/−4 | studio light on the back; not to be painted by facing |
+| Bark lit, rear | `#AF7653` | `#90644A` | −31/−18/−9 | as above |
+| Cut face, f34 | `#DFBA8E` | `#EAC494` | +11/+10/+6 | the sheet's face is in shade |
+| Cut face, side | `#ECC493` | `#EAC494` | −2/+1/+1 | |
+| Cut face, r34 | `#EDC594` | `#EBC595` | −2/0/+1 | |
+| Large-stub top (box) | `#FCE4BD` | lit quartile `#E5C398` | −23/−33/−37 | the median is bark |
+| Small-stub end | `#DDAF7A` | `#A4835C` | −57/−44/−30 | |
+| Knot tip (box) | `#BE8764` | `#F2D2A5` | +52/+75/+65 | far too pale and large |
+| Leaves median, f34 | `#528D1A` | `#5B9522` | +9/+8/+8 | sat 0.77, target ≥ 0.78 |
+| Leaves lit, f34 | `#82BC22` | `#77B32D` | −11/−9/+11 | |
+| Leaves shade, f34 | `#2F5F14` | `#3C6115` | +13/+2/+1 | |
+| Leaves median, rear | `#4C851C` | `#375B13` | | BK in shadow |
+
+### Itemised findings
+
+**Blockers** (each with a fix a fresh modeller can act on):
+
+1. **Large-stub pale broken top barely shows.** It is focal silhouette 2. On the sheet it is a broad pale cap in the
+   f34, front, top and junction close-up. Ours is a sliver: 0.08 % against 0.47 % of the bbox, lit `#E5C398` against
+   `#FDE7C2`, and the junction close-up shows the same thin edge.
+   - **Cause.** The cap normal is about d + (−0.12, −0.32, 0) ≈ (0.38, −0.25, 0.88). That gives only about 0.18
+     openness toward the f34 camera.
+   - **Fix: aim the cap.** In `STUB_L` / `_stub`, aim the broken-top plane's normal at about (0.05, −0.40, 0.91) in
+     the build frame: mostly up, tipped about 25° toward the front. That is about 0.48 openness for (−34, 12).
+     Keep the jag and the +X chip.
+   - **Optional.** Widen the stub's top Ø to about 1.0 so the cap reads at the sheet's 43 × 20 px.
+   - **Acceptance in f34_sheet.** A W component of at least 0.35 % at (.69 ± .05, .96 ± .04), median within 15 of
+     `#FDE7C2`.
+2. **Small-stub pale end renders dull brown.** It is `#A4835C` against `#DDAF7A`, and the study's cut-wood mask
+   doesn't find it at all (sheet: 0.91 % at (.55, .09)). Its face normal, about (0.41, −0.88, −0.26), points down
+   and away from the key light (n·L ≈ 0.15).
+   - **Fix: geometry first.** Slant the end cut up. Rotate the end-cap plane about the stub's horizontal cross axis
+     so its normal is about (0.25, −0.80, 0.55) (n·L ≈ 0.6, openness ≈ 0.6 to the camera). Keep its lower edge on
+     the floor cut.
+   - **Then paint.** Use the same cut keys as the large-stub top: `cut_light` with a `cut_ring` pith. Add no extra
+     facing multiplier.
+   - **Acceptance in f34_sheet.** A W component of at least 0.6 % at (.55 ± .06, .09 ± .06), median within 15 of
+     `#E2B480`.
+3. **BR leaf clump on the log top lies flat and sits too far left.**
+   - **Sheet:** leaves rise above the top line, centre (.848, .648), h .55–.78.
+   - **Ours:** a thin strip at (.754, .739), h .69–.79. That is outside the stage-1 ±0.06 clump tolerance on both
+     axes.
+   - **Fix:**
+     - Move the BR hub toward +X and down the back: x ≈ 3.9–4.1, about 45–55° behind the crest. Avoid the knot
+       hole at x 3.85 / 96°.
+     - Turn its hub normal to about 10° from vertical, so the 15–35° pitch (decision) lifts the leaves above the
+       top line.
+     - Use the top of the pitch band (28–35°) and fan about 240° away from the bark.
+   - **Acceptance:** f34 BR at (.85 ± .06, .65 ± .06) with hf ≥ 0.18.
+   - **Alongside:** give all clumps broader kites (W : L 0.55–0.6) and the upper half of the pitch band, so the
+     ground clumps reach hf ≥ 0.2 (sheet FR .25) and the side/rear leaf shares come up toward ±6.
+
+**Minors** (record, or fold into the fix round if cheap):
+
+4. **Knot tip.** The pale tip is 7× the sheet's (0.27 % against 0.04 %). It is the brightest patch on the top,
+   which inverts the sheet's emphasis (big stub top, small knot tip). Shrink the pale cap to about 0.35 of the knot
+   Ø, with bark sides, and lower it to about h .80.
+5. **Stub height against the decision.** The large stub stands about 1.4× taller relative to the log than in the
+   hero cell. The f34 wood-only top line is .57–.64 against .68–.78, the cut face is .50 H against .55–.65, and
+   W : H is 1.652 against 1.66–1.82. Part of this is the sheet's perspective. The rest is the decided H (5.05 ± 0.25):
+   matching the hero cell's profile would need H ≈ 4.5. This is a decision conflict for the main session, not a
+   modeller error.
+6. **Plate pattern.** The plates' end walls all sit on the same station rings. This gives regular vertical seams
+   round the log (clear in rear_sheet and r34_sheet), a "segmented barrel" look. The sheet's plates end on
+   staggered diagonals. Possible fix: jitter each plate's end walls ±0.3 along x per column.
+7. **Slit length.** The slits are long lengthwise grooves (0.9–2.6). The sheet's are mostly short (0.25–0.65). This
+   is a recorded deviation.
+8. **Leaf colour.** Slightly flat and desaturated: median sat 0.77, the lit quartile has too much blue (Δ B +11), and
+   the shade is too light (Δ R +13). Lower `m026_leaf_tip`'s blue a little, and darken `m026_leaf_base` about 10 %.
+9. **Back bark.** It reads darker than the sheet's rear cells (−18/−8/−4). This comes from the studio light. Accepted:
+   painting it lighter would be colouring by facing.
+10. **`m026_face_*` keys: borderline, accepted with a note.**
+    - **Why accept:** they are assigned by region (the log's end grain and the whole CutEnd part, sides included),
+      not per face by normal, and `K.check` is clean.
+    - **Why borderline:** they are the cut keys with the same hue and saturation, only ×1.42 linear brighter. The
+      multiplier is purely lighting compensation for the −X face.
+    - **Correction to the modeller's note:** the studio key, (−0.49, −0.59, 0.64), does light the −X face
+      (n·L 0.49, about the same as the large-stub top). What the face lacks is fill and sky.
+    - **In-game risk:** under a high Roblox sun the compensation roughly holds. The bigger risk is the other way
+      round: the stub-top `cut_*` keys (`#BDA482`, sat 0.31) may read dull grey-tan in Studio.
+    - **Requires Manual Validation in Studio.** Don't add further facing multipliers. Blocker 2 is fixed with
+      geometry for this reason.
+
+### Re-check list for round 2
+
+- f34_sheet: stub-top, small-end and BR components per the acceptance lines above.
+- The knot tip shrinks.
+- Re-run `m026.measure()` and the audit table; the hero must still be 1 shell, 0 bowties, 0 self-hits.
+- Size stays within the decided tolerances.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, background session on port 9882 with `wip/M026.blend` (saved after the final build). The builder
+`m026.py` is the source of truth; every change is in it. Measurements use the study's masks (`m026.measure()`) and
+the verifier's component pass (`v026/comp.py`, repointed at `renders/models/M026/`), sheet f34 cell against
+`f34_sheet`.
+
+### What changed
+
+- **B1, the large stub's broken top.**
+  - **Geometry.** `_stub` takes `top_n`, the end cut's normal in the build frame. The large stub's is (0.05, −0.40,
+    0.91): mostly up, tipped toward the front. The jag (±0.04) and the 0.10 chip on the +X side are kept. The upper
+    stations moved down to 0.38 / 0.62 of the length so the slanted cut stays clear of them.
+  - **Placement.** Base x 0.93 → 1.05 and lean (30°, 8°) → (35°, 3°), which moves the cap right on screen toward
+    the cell's f .69. The protrusion is still 2.0 (no height change, decision 1).
+  - **Lip.** 0.86 → 0.88.
+  - **Colour.** A new region key, `m026_cut_top` (#C6BAA4), with a pith half way to `cut_ring`.
+    - Why a new key: the sheet's stub tops are paler paint than the cut face in every view, the unshadowed exploded
+      cell included (#FCDDAE against the insert's #DFB88A).
+    - How it was set: calibrated on the hero render, where the cap is sun-lit as it is on the sheet. This is not a
+      compensation for facing: no multiplier was added for an angle.
+- **B2, the small stub's end.**
+  - **Geometry.** The end cut is slanted up to a normal of (0.25, −0.80, 0.55), with stations at 0.34 / 0.56.
+  - **Placement** (so the pale end lands at the cell's f .55): yaw 25° → 10°, base x −1.77 → −2.05 (t .28), pitch
+    15° → 12°, protrusion 2.2 → 2.1. The lower edge still meets the floor cut; the pitch and length change took
+    8 px of bbox growth back off the bottom.
+  - **Colour.** A 25 % blend step of `cut` toward `cut_light`, with a `cut_ring` pith. The verifier suggested
+    `cut_light`, but that rendered #E5C090 (B +16 off #E2B480). The `m026_face_*` mix is gone from the small stub.
+    No facing compensation.
+- **B3, the BR clump.**
+  - **Hub.** Moved onto the crest at the +X end: (x 3.7, 86°, 4° behind the crest), span 2.4 → 2.8, a full
+    six-leaf star.
+  - **Hub normal.** 12° off vertical, tipped toward the front, so the clump plane rises toward the back.
+  - **Pitch.** (28, 35), so the back and side leaves rise above the top line as the sheet's fan does. The front
+    leaves pass over the falling front slope.
+  - **Knot hole.** Moved from x 3.85 to x 3.0 (still at 96°, on the top) so it stays clear of the hub.
+  - **Why not the suggested 45–55° behind the crest.** It was tried twice (x 4.0 at 40° and at 45°). A hub that deep
+    projects left on screen (screen x ≈ 0.83 x − 0.56 y) and sits below the crest's silhouette. It measured
+    f .754–.768, h .71–.75, hf .046–.108: a strip of leaf tips. The cell's BR is a fan rising from the log's top
+    edge (`z_f34_leafBR.png`), so the hub belongs on the crest.
+  - **Hub normal direction.** Tipping the normal toward the back, as first tried, lowers the back leaves. It has to
+    tip toward the front.
+- **All clumps.**
+  - Fuller kites: `KITE` ((0.22, 0.43), (0.52, 0.50), (0.80, 0.33)). W : L stays about 0.6 at the widest point, with
+    more area.
+  - Per-clump pitch `CLUMP_PITCH`: FL and BK (20, 35), FR (15, 32), BR (28, 35).
+  - Spans: FL 2.1 → 2.3 (hub x −3.05 → −3.35, back inside the f-tolerance), FR 2.6 → 2.8, BK 2.0 → 2.6 (for the
+    side and rear leaf shares).
+- **Minor 4, the knot tip.** `_nub` now has a bark shoulder ring round a pale tip of radius 0.35 × the knot radius
+  (`KNOT_TIP`), 6 tris more.
+- **Minor 6, the plate ends.** Each seeded plate's two end walls slide inward along X by a different amount at each
+  column (`PLATE_SHIFT` 0.3; 0.21 for 1-band plates). The plate ends become short diagonal ramps, so they no longer
+  line up on the station rings.
+  - Only the raised copies move, so the mesh stays watertight.
+  - The two ledges at the cut end keep their step.
+  - With the stub, knot-hole and small-stub feet moved, the seeded layout now fits 9 plates + 2 ledges (was 12 + 2).
+- **Minor 8, leaf colour.**
+  - `m026_leaf` #55881D → #538A16 (more saturated);
+  - `m026_leaf_tip` #76B126 → #79B416 (less blue);
+  - `m026_leaf_base` #3D6D16 → #356414 (−10 %).
+- **Not changed:**
+  - the stub height (minor 5, a decision conflict for the main session);
+  - the `m026_face_*` keys;
+  - no new lighting multipliers.
+
+### Measured (f34 cell → f34_sheet)
+
+| Item | Sheet | Round 1 | Round 2 | Target | Result |
+| --- | --- | --- | --- | --- | --- |
+| Large-stub top: area / centre | 0.47 % (.691, .965) | 0.08 % (.632, .971) | 0.46 % (.656, .954) | ≥ 0.35 % at (.69 ± .05, .96 ± .04) | pass |
+| Large-stub top: median / lit | `#FDE7C2` / `#FEEACA` | `#EAC89C` | `#FDE7C3` / `#FFECC7` | within 15 of `#FDE7C2` | pass |
+| Small-stub end: area / centre | 0.91 % (.550, .090) | not in W mask | 0.89 % (.546, .103) | ≥ 0.6 % at (.55 ± .06, .09 ± .06) | pass |
+| Small-stub end: median | `#E2B480` | `#A4835C` | `#D8AD79` (Δ −10/−7/−7) | within 15 | pass |
+| Knot tip | 0.04 % (.521, .808) | 0.27 % | 0.07 % (.462, .708), `#F4D4A8` | shrink | pass |
+| BR clump | (.848, .648), hf .235 | (.754, .739), hf .103 | (.798, .778), hf .176 | ± .06, hf ≈ .235 | f pass; h +.13; hf short |
+| FR clump | (.843, .173), hf .254 | (.885, .219) | (.878, .250), hf .188 | ± .06 | f pass; h +.077 |
+| FL clump | (.279, .116) | (.325, .083) | (.307, .113) | ± .06 | pass |
+
+- **Why BR's h misses.** The long-lens `f34_sheet` has no perspective, so our log's top line at the +X end sits at
+  h ≈ .69. On the cell it is .55: the drawing's perspective drops the far end. Our BR rises from the top line as the
+  cell's does (.69–.87 against the cell's .55–.78). A centre at h .65 would need the clump hanging in front of the
+  bark.
+- **Why FR's h rose** (.219 → .250). The small stub's slanted end lowers the bbox bottom by about 8 px, which lifts
+  every h fraction by about .03. The cell's FR also reaches lower (h .06) than geometry 2 studs behind the small end
+  can.
+
+**Whole-view shares and colours (`m026.measure()`; sheet → ours):**
+
+| View | W : H | L / W / B | Leaf median / lit / shade | Bark median | Slits |
+| --- | --- | --- | --- | --- | --- |
+| f34 | 1.743 → 1.605 | 11.1 / 14.5 / 74.4 → 11.6 / 12.4 / 76.0 | `#528D1A`/`#82BC22`/`#2F5F14` → `#599719` (sat 0.83) / `#7BBC1C` / `#346111` | `#82573D` → `#845940` | 8 → 9 |
+| front | 1.757 → 1.581 | 11.4 / 13.0 / 75.6 → 11.9 / 7.5 / 80.6 | → `#589719` | `#85583E` → `#845940` | 5 → 10 |
+| side | 1.246 → 1.157 | 15.6 / 43.2 / 41.2 → 9.8 / 41.2 / 49.0 | | | 5 → 4 |
+| rear | 1.712 → 1.726 | 11.0 / 13.2 / 75.7 → 6.9 / 11.3 / 81.8 | | `#83573E` → `#704E3A` | 5 → 8 |
+| r34 | 1.644 → 1.419 | 7.6 / 21.3 / 71.1 → 7.8 / 18.3 / 73.9 | | | 7 → 10 |
+| top | 1.286 → 1.239 | 12.9 / 9.0 / 78.1 → 18.3 / 8.1 / 73.6 | | | 9 → 9 |
+
+- **Leaf shares.**
+  - side 9.8 % (was 6.3; tolerance ±6 → ≥ 9.6, now inside);
+  - rear 6.9 % (was 3.9, now inside ±6).
+  - The side cell's big clump is the alternative drawing's clump near the cut end. Ours, BK at t .6 (decision 10),
+    hides behind the log from that camera.
+  - top 18.3 % against 12.9 % (+5.4, inside ±6).
+- **W : H** (f34 1.605; round 1 1.652; tolerance 1.66–1.82):
+  - The slanted cap's raised back edge adds about 6 px at the top of the screen.
+  - The decided H 4.81 (tolerance floor 4.80) can't come down to compensate.
+  - Part of minor 5, the decision conflict.
+- **Cut face.** Unchanged: f34 `#E9C393`, side `#EAC494` (sheet `#ECC493`).
+
+### Checks (final `build()`, `problems` empty)
+
+| Object | Tris | Size | Shells | NM edges / bowties / boundary / wire / loose | Zero-area / n-gons / dup | Self-hits | Min corner | UV islands / overlaps / flipped / min gap / p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FallenSoftwoodLog | 2266 / 4000 | 9.41 × 6.96 × 4.81 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.04° | 468 / 0 / 0 / 0.016 / 1.016 |
+| …Trunk | 956 / 1000 | 9.30 × 3.28 × 3.21 | 1 | 0 | 0 | 0 | 5.08° | 124 / 0 / 0 / 0.016 / 1.018 |
+| …CutEnd | 124 | 0.38 × 2.94 × 2.95 | 1 | 0 | 0 | 0 | 9.04° | 8 / 0 / 0 / 0.016 / 1.053 |
+| …BranchStubLarge | 162 | 2.56 × 1.29 × 2.60 | 1 | 0 | 0 | 0 | 6.13° | 21 / 0 / 0 / 0.016 / 1.036 |
+| …BranchStubSmall | 108 | 1.35 × 2.93 × 1.56 | 1 | 0 | 0 | 0 | 5.24° | 8 / 0 / 0 / 0.016 / 1.043 |
+| …LeafClump | 198 | 1.69 × 1.79 × 0.54 | 1 | 0 | 0 | 0 | 5.37° | 54 / 0 / 0 / 0.016 / 1.036 |
+
+- **Hero size.**
+  - Within the decided tolerances: W 9.41 (9.4 ± 0.35), D 6.96 (6.7 ± 0.5), H 4.81 (5.05 ± 0.25).
+  - Log Ø 3.2, length 9.3.
+- **Other checks.**
+  - Normals outward; UV border 0.008, density 1.0 everywhere; `K.check` clean.
+  - The guarded cleanup, the merge-0 union and `M.fix_bowties` are unchanged.
+  - Hero guard attempt 1 (clumps turned 17°).
+- **Time.** Build 43 s, with renders 61 s.
+
+**Final keys:** bark #674631, bark_light #986B50, bark_dark #4A3224, cut #AF8F68, cut_light #BDA482, cut_ring
+#B69167, cut_edge #C2AE90, **cut_top #C6BAA4 (new)**, leaf #538A16, leaf_tip #79B416, leaf_base #356414,
+face_light #DCBF99, face_ring #D4AA79, face_edge #E2CBA8.
+
+### Left for the verifier and the main session
+
+- **BR h, FR h and f34 W : H.** These are perspective and decision artefacts, explained above.
+- **`m026_cut_top`.** A region key set on the hero render where the cap is sun-lit. Check it in Studio alongside the
+  existing `m026_face_*` note: the cap could read near-white under a high sun.
+- **The knot hole moved** to x 3.0 / 96°.
+
+## Stage 7 — Verification (round 2)
+
+Fresh verifier (did no other stage, not the round-1 verifier). Read-only background session on port 9882 with
+`wip/M026_verify.blend`; nothing saved, `build()` not called. Fresh renders went to the scratchpad
+(`.../scratchpad/v026r2/renders/M026/`, high-res extras in `.../v026r2/renders/big/`, sheet-vs-ours pairs
+`.../v026r2/renders/cmp_*.png`). Colours were sampled on both images with the study's masks (`m026.measure()`) and the
+round-1 component pass (`v026r2/comp.py`).
+
+**Result: PASS, 7.5 / 10.** All three round-1 blockers are fixed in substance; the topology is clean. What is left is
+minor and listed below with cheap fixes the main session can take or leave.
+
+### Re-measured geometry (independent)
+
+| Object | Tris | Size | Shells | NM edges / bowtie verts / boundary / wire / loose | Zero-area / n-gons / dup | Self-hits | Inverted (ray parity) | Min corner | UV islands / overlaps / flipped / min gap / p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FallenSoftwoodLog | 2266 / 4000 | 9.409 × 6.959 × 4.813 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.04° | 468 / 0 / 0 / 0.016 / 1.016 |
+| …Trunk | 956 / 1000 | 9.30 × 3.28 × 3.21 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.08° | 124 / 0 / 0 / 0.016 / 1.018 |
+| …CutEnd | 124 | 0.38 × 2.94 × 2.95 | 1 | 0 | 0 | 0 | 0 | 9.04° | 8 / 0 / 0 / 0.016 / 1.053 |
+| …BranchStubLarge | 162 | 2.56 × 1.29 × 2.60 | 1 | 0 | 0 | 0 | 0 | 6.13° | 21 / 0 / 0 / 0.016 / 1.036 |
+| …BranchStubSmall | 108 | 1.35 × 2.93 × 1.56 | 1 | 0 | 0 | 0 | 0 | 5.24° | 8 / 0 / 0 / 0.016 / 1.043 |
+| …LeafClump | 198 | 1.69 × 1.79 × 0.54 | 1 | 0 | 0 | 0 | 0 | 5.37° | 54 / 0 / 0 / 0.016 / 1.036 |
+
+- **Matches the modeller's table exactly.**
+  - Normals point outward (signed volume and per-face ray parity).
+  - Each object is one closed shell with no self-hits, so there are no interior faces.
+  - No custom normals; 0 smooth polys; rotation 0, scale 1; origin at the bbox bottom centre on all 6.
+  - No modifiers, parents or children. One UV layer, border 0.008, density 1.0.
+  - `K.check` is clean.
+  - The hero has 23 keys, all `m026_*`, and no emission (decision 8).
+- **Size against decision 1:**
+  - W 9.41 (9.05–9.75): ok.
+  - D 6.96 (6.2–7.2): ok.
+  - H 4.81 (4.80–5.30): ok, but only 0.01 above the floor.
+  - Log Ø 3.2, length 9.30.
+- **Colour by facing** (own check: key luminance against face normal, per family):
+  - Bark is clean: |r| ≤ 0.16 (hero x 0.04, y 0.16, z −0.08).
+  - Leaves are clean: |r| ≤ 0.17.
+  - The cut-wood family correlates (hero x −0.61, y +0.63, z −0.47). That comes entirely from three region keys,
+    each covering one whole region rather than faces picked by normal:
+    - `m026_face_*` on the −X end grain;
+    - `m026_cut_top` on the large stub's cap;
+    - the 25 % cut step on the small end.
+  - `face_*` was accepted in round 1 and `cut_top` by the main session; see the Studio note.
+
+### Round-1 blockers against their targets (f34 cell → `f34_sheet`)
+
+| # | Item | Target | Measured | Result |
+| --- | --- | --- | --- | --- |
+| B1 | Large-stub pale top | ≥ 0.35 % at (.69 ± .05, .96 ± .04), within 15 of `#FDE7C2` | 0.46 % at (.656, .954), 34 × 22 px, `#FDE7C3` (Δ 0/0/+1) | **pass** |
+| B2 | Small-stub pale end | ≥ 0.6 % at (.55 ± .06, .09 ± .06), within 15 of `#E2B480` | 0.89 % at (.546, .103), `#D8AD79` (Δ −10/−7/−7) | **pass** |
+| B3 | BR clump | (.85 ± .06, .65 ± .06), hf ≥ 0.18 | (.798, .778), hf .176, h .69–.87 (sheet .55–.78) | **pass in substance** |
+
+- **B3 ruling: accepted.**
+  - f is inside the tolerance (Δ −.05).
+  - hf misses by .004, which is noise.
+  - The h offset (+.13) matches the gap between the two log top lines at the +X end: ours is about .69, the cell's
+    about .55, because the drawing's perspective drops the far end.
+  - In both images the clump rises from the log's top-back edge as a fan above the top line (`big/leaf_BR.png`
+    against the sheet crop `zs_BR.png`). It is no longer a flat strip.
+  - Moving it to h .65 would hang it in front of the bark.
+- **Knot tip (minor 4): fixed.** It was 0.27 %. It is now 0.07 % at (.462, .708), `#F4D4A8`, against the sheet's
+  0.04 %, `#F6D6A8`.
+- **Leaf colour (minor 8): fine.**
+  - f34 median `#599719`, lit `#7BBC1C`, shade `#346111`, against `#528D1A` / `#82BC22` / `#2F5F14`.
+  - The lit quartile's extra blue is gone (Δ B −6). The median is slightly bright (+7/+10/−1).
+- **Plates (minor 6): partly fixed.**
+  - The plate ends now ramp and stagger in f34 and front.
+  - rear_sheet and r34 still show two or three vertical plate-end lines, and one rectangular raised plate on the right
+    of the rear view.
+
+### View comparison (sheet → ours)
+
+- **f34 and front: it reads as the same log.**
+  - The cut face is irregular, with a rim, a chamfer and the rings in the right order.
+  - The large stub's pale cap is now a clear focal cap.
+  - The knot is small, with a pale tip.
+  - The small stub lies forward, with a pale end.
+  - There are three clumps (FL, FR, BR), and the bark has plates and slits.
+  - W : H is 1.605 against 1.743, the cut-face W share 12.4 % against 14.5 %, and the top line .59–.65 against
+    .68–.78. This is the decision-5 conflict (stub height at the decided H), not a modeller error.
+  - The front cell's cut face reads smaller in kit front34 (2.1 % against 6.0 %) because of the −28° camera
+    (decision 9).
+- **r34, rear and side.**
+  - The sheet draws two upright stubs. We have one plus the knot, as decided (3.2).
+  - Leaf share: rear 6.9 % against 11.0 % (inside ±6); side 9.8 % against 15.6 % (just inside).
+  - The back clumps and the bark render darker. That is the studio light, not the paint.
+- **top.**
+  - W : H 1.239 against 1.286. Leaves 18.3 % against 12.9 % (inside ±6).
+  - The knot's pale tip reads as a small "eye" on the top that the sheet doesn't show (cosmetic).
+- **Close-ups.**
+  - The cut-end detail matches: flat face, chamfer, rings.
+  - In the junction close-up the cap is now visible (pale, with a darker pith and a thin bark lip), and the junction
+    is seamless.
+  - The underside is closed.
+- **Exploded.** The parts match.
+  - Render-only nit: the cut-end disc is laid out edge-on to the exploded camera; the sheet shows it face-on.
+  - That comes from the `EXPL` placement, not the model.
+
+### Colours (sheet → ours, Δ R/G/B)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| Bark median, f34 | `#82573D` | `#845940` | +2/+2/+3 |
+| Bark lit, f34 | `#B47A56` | `#AB7353` | −9/−7/−3 |
+| Bark shade, f34 | `#533928` | `#543727` | +1/−2/−1 |
+| Bark median, front | `#85583E` | `#845940` | −1/+1/+2 |
+| Bark median, side | `#805842` | `#825B42` | +2/+3/0 |
+| Bark median, rear | `#83573E` | `#704E3A` | −19/−9/−4 (back light; accepted in round 1) |
+| Cut face, f34 | `#DFBA8E` | `#E9C393` | +10/+9/+5 (the sheet's face is in shade) |
+| Cut face, side | `#ECC493` | `#EAC494` | −2/0/+1 |
+| Cut face, r34 | `#EDC594` | `#EBC595` | −2/0/+1 |
+| Cut face, rear | `#EBC292` | `#ECC696` | +1/+4/+4 |
+| Large-stub top, f34 | `#FDE7C2` | `#FDE7C3` | 0/0/+1 |
+| Large-stub top, front | `#FCE5BF` | `#FEE7C3` | +2/+2/+4 |
+| Large-stub top, top view | `#FCDBAE` | `#FDE6C1` | +1/+11/+19 (slightly too cream) |
+| Small-stub end, f34 | `#E2B480` | `#D8AD79` | −10/−7/−7 |
+| Small-stub end, front | `#E7BC8A` | `#D8AD79` | −15/−15/−17 |
+| Small-stub end, top | `#E0B481` | `#D8AC78` | −8/−8/−9 |
+| Knot tip, f34 | `#F6D6A8` | `#F4D4A8` | −2/−2/0 |
+| Leaves median / lit / shade, f34 | `#528D1A` / `#82BC22` / `#2F5F14` | `#599719` / `#7BBC1C` / `#346111` | +7/+10/−1, −7/0/−6, +5/+2/−3 |
+| Leaves median, rear / r34 | `#4C851C` / `#4A8719` | `#36620C` / `#38640E` | −22/−35/−16, −18/−35/−11 (back clumps in shade) |
+| Leaves median, top | `#568C1D` | `#5E9F18` | +8/+19/−5 |
+
+### Itemised findings
+
+**Blockers:** none.
+
+**Minors** (record them; the main session may fold in the cheap ones before committing):
+
+1. **The ground clumps hover on a stalk.**
+   - FL, FR and BK's leaf blades sit 0.19–0.23 stud above the floor. The lowest outer-leaf vertex is at z 0.204
+     (FL), 0.187 (FR) and 0.225 (BK), measured on the hero.
+   - The hub cone shows as a dark green stem, with the clump's shadow detached below it (`big/leaf_FL.png`,
+     `big/leaf_FR.png`, and BK in `big/r34_sheet_big.png`). The sheet's clumps rest on the ground.
+   - **Cheap fix:** either lower `GROUND_HUB` from 0.14 to about −0.05, so the floor cut trims the hub and the leaf
+     undersides, or raise `HUB["sink"]` so the cone stays inside the leaf bases. Re-run the bowtie and self-hit audit
+     afterwards.
+2. **The small stub's end is a long chisel.**
+   - The slant that fixed B2 makes the pale end a pointed, elongated hexagon. The sheet's is a near-round octagon.
+   - Colour and area pass.
+   - **Fix only if cheap:** ease `top_n` back about 10° toward the stub axis.
+3. **Plate-end lines (round-1 minor 6, partly fixed).** They are still visible as vertical seams in rear_sheet and
+   r34.
+4. **Slits.** They are long and dark: front34 counts 10 against the cell's 5. This is a recorded deviation
+   (round-1 minor 7).
+5. **Large-stub elbow.** The flared foot plus the 35° lean gives a slight dog-leg near the foot; the sheet's stub is
+   straight. Cosmetic.
+6. **Leaf form.** In close-ups the central leaves fold up into a rounded "cabbage" dome; the sheet's leaves are
+   separate pointed blades. This is inside the decision's 15–35° pitch. Cosmetic.
+7. **The decision-5 conflict is unchanged.**
+   - f34 W : H is 1.605 against 1.743, and the stub stands tall relative to the log.
+   - H is only 0.01 above the decided floor, so it can't come down within the decision.
+
+**Requires Manual Validation (Studio):**
+- `m026_cut_top` (`#C6BAA4`, sat 0.17) is the right region key, per the main session's ruling. It renders `#FDE7C3`
+  in the studio, but under the game sun it may read grey-beige or near-white.
+- `m026_face_*` (round-1 note 10): check that the end grain doesn't wash out under a sun that hits −X head-on.
+- Check that the ring bands still differ by at least 12 levels and that the slits read as dark lines.
+
+## Main session after verification round 2 (2026-10-28)
+
+Ruling: the `m026_cut_top` key is accepted. The sheet paints stub tops paler than the cut face even in its unshadowed exploded cell, so it is a calibrated region key, not lighting compensation; it is on the Studio check list. Tried minor 1 (`GROUND_HUB` −0.05): the floor cut split the ground clumps off the hero (3 shells, 11 self-hits), so it was reverted to 0.14 and the hover is recorded. The final rebuild in the kit file gave a hero of 2266 tris, one shell, `problems` empty. Export: 0 problems.
