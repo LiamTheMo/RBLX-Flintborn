@@ -1,0 +1,673 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M039",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m039_bud",
+    "hex": "#96A201",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_leaf",
+    "hex": "#718A01",
+    "levels": [
+     0.92219,
+     0.94296,
+     0.94779,
+     0.95203,
+     0.95671,
+     0.95956,
+     0.96167,
+     0.96431,
+     0.9668,
+     0.96895,
+     0.97205,
+     0.97452,
+     0.97646,
+     0.97848,
+     0.97998,
+     0.98161,
+     0.98328,
+     0.98549,
+     0.98767,
+     0.99045,
+     0.99273,
+     0.99459,
+     0.99692,
+     0.99945,
+     1.00285,
+     1.0071,
+     1.01181,
+     1.01664,
+     1.02104,
+     1.02865,
+     1.03552,
+     1.05653
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_leaf_light",
+    "hex": "#ACB306",
+    "levels": [
+     0.94756,
+     0.95189,
+     0.95408,
+     0.95674,
+     0.95997,
+     0.96152,
+     0.96639,
+     0.96896,
+     0.97213,
+     0.97478,
+     0.97748,
+     0.97966,
+     0.98275,
+     0.98525,
+     0.98823,
+     0.99128,
+     0.99386,
+     0.99973
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_leaf_x_deep_40",
+    "hex": "#5A7F02",
+    "levels": [
+     0.93175,
+     0.94685,
+     0.95158,
+     0.95486,
+     0.95788,
+     0.96058,
+     0.96403,
+     0.96673,
+     0.96956,
+     0.97216,
+     0.97495,
+     0.97716,
+     0.97891,
+     0.98108,
+     0.9831,
+     0.98517,
+     0.98667,
+     0.98843,
+     0.99089,
+     0.99331,
+     0.99642,
+     0.99886,
+     1.00152,
+     1.00582,
+     1.0095,
+     1.01406,
+     1.019,
+     1.02313,
+     1.02707,
+     1.03206,
+     1.03897,
+     1.07211
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_leaf_x_light_67",
+    "hex": "#99A504",
+    "levels": [
+     0.92678,
+     0.94236,
+     0.94944,
+     0.9537,
+     0.9567,
+     0.95932,
+     0.96156,
+     0.96431,
+     0.96685,
+     0.96989,
+     0.9722,
+     0.97345,
+     0.97496,
+     0.97785,
+     0.98007,
+     0.98208,
+     0.98389,
+     0.985,
+     0.98662,
+     0.9885,
+     0.99128,
+     0.99492,
+     0.99867,
+     1.00139,
+     1.00397,
+     1.00642,
+     1.01022,
+     1.01497,
+     1.02001,
+     1.02602,
+     1.03338,
+     1.05767
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock",
+    "hex": "#B6A095",
+    "levels": [
+     0.96079,
+     0.97544,
+     0.97977,
+     0.98508,
+     0.98891,
+     0.99233,
+     0.99573,
+     0.99732,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00032,
+     1.00189,
+     1.00384,
+     1.00468,
+     1.00567,
+     1.00777,
+     1.00888,
+     1.01075,
+     1.0127,
+     1.01468,
+     1.01745,
+     1.0188,
+     1.02331,
+     1.02709,
+     1.03148,
+     1.03606,
+     1.03902,
+     1.0445,
+     1.06591
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_deep_13",
+    "hex": "#B39D92",
+    "levels": [
+     0.97837,
+     0.99345,
+     0.99733,
+     1.00185,
+     1.00785,
+     1.0204,
+     1.0312,
+     1.0378,
+     1.04222,
+     1.04602,
+     1.05337
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_deep_20",
+    "hex": "#B19C91",
+    "levels": [
+     0.98396,
+     0.98577,
+     0.98815,
+     0.993,
+     0.99755,
+     0.99947,
+     1.00189,
+     1.00487,
+     1.00755,
+     1.00956,
+     1.01439,
+     1.01578,
+     1.0204,
+     1.02284,
+     1.0252,
+     1.02944,
+     1.03462,
+     1.03654,
+     1.03942,
+     1.04587,
+     1.05174,
+     1.05704
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_deep_7",
+    "hex": "#B49E93",
+    "levels": [
+     1.002,
+     1.01082,
+     1.01715,
+     1.02909,
+     1.03476,
+     1.04213,
+     1.04631
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_10",
+    "hex": "#B8A297",
+    "levels": [
+     0.97427,
+     0.97765,
+     0.98164,
+     0.98584,
+     0.98886,
+     0.994,
+     1.01049,
+     1.01391,
+     1.01695,
+     1.01947,
+     1.02297,
+     1.02402,
+     1.02672,
+     1.0294,
+     1.03316,
+     1.05101
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_12",
+    "hex": "#B8A297",
+    "levels": [
+     1.03052
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_20",
+    "hex": "#BAA499",
+    "levels": [
+     0.98051,
+     0.98419,
+     0.98935,
+     0.99315,
+     1.027,
+     1.0288,
+     1.03302,
+     1.03526
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_23",
+    "hex": "#BBA59A",
+    "levels": [
+     0.98795,
+     0.99177,
+     1.00087,
+     1.00941,
+     1.01258,
+     1.02704,
+     1.02932,
+     1.03673,
+     1.03896
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_30",
+    "hex": "#BCA69B",
+    "levels": [
+     0.9744,
+     0.97606,
+     0.97936,
+     0.98543,
+     0.99017,
+     0.99264,
+     0.99565,
+     1.00322,
+     1.0144,
+     1.0174,
+     1.02041,
+     1.02414,
+     1.02808,
+     1.03055,
+     1.03472,
+     1.03932,
+     1.04152,
+     1.04899
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_light_35",
+    "hex": "#BDA79C",
+    "levels": [
+     1.0025,
+     1.00569,
+     1.00827,
+     1.0166,
+     1.02396,
+     1.02971,
+     1.03589,
+     1.03839
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_moss_stain_10",
+    "hex": "#AF9B8C",
+    "levels": [
+     0.95889,
+     0.96234,
+     0.96683,
+     0.9694,
+     0.97302,
+     0.97574,
+     0.97824,
+     0.98194,
+     0.98466,
+     0.9877,
+     0.99152,
+     0.99339,
+     0.99551,
+     0.99808,
+     1.00044,
+     1.00321,
+     1.00662,
+     1.00946,
+     1.01336,
+     1.01628,
+     1.01864,
+     1.02124,
+     1.0236,
+     1.02571,
+     1.02832,
+     1.03069,
+     1.03364,
+     1.03566,
+     1.03788,
+     1.04032,
+     1.04499,
+     1.04886
+    ],
+    "used": true
+   },
+   {
+    "key": "m039_rock_x_moss_stain_20",
+    "hex": "#A89683",
+    "levels": [
+     1.02771
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "StoneSpire",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "hero",
+   "size": [
+    14.4565,
+    11.0,
+    10.5
+   ],
+   "tris": 3984,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpire.glb",
+     "kind": "solid",
+     "tris": 3984,
+     "offset": [
+      0.0,
+      5.5,
+      0.0
+     ],
+     "size": [
+      14.4565,
+      11.0,
+      10.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock spire: a tall angular warm grey-pink 7-sided obelisk with a flat-topped pillar leaning on its left, a shorter flat-topped side rock on its right, a big faceted foot rock in front, a ring of medium and small faceted rocks and lime star rosettes (broad oval leaves round a lime bud) in the crevices and up the spire's right flank; every rock, leaf and bud its own closed shell. Landmark. No VFX"
+  },
+  {
+   "name": "StoneSpireFoliage",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "part",
+   "size": [
+    1.9244,
+    0.8171,
+    1.7743
+   ],
+   "tris": 98,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpireFoliage.glb",
+     "kind": "solid",
+     "tris": 98,
+     "offset": [
+      0.0,
+      0.4086,
+      0.0
+     ],
+     "size": [
+      1.9244,
+      0.8171,
+      1.7743
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Foliage Cluster (reusable): lime star rosette of seven broad oval leaves (an upright back leaf) round a round lime bud; every leaf and the bud its own closed piece"
+  },
+  {
+   "name": "StoneSpireFootRock",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "part",
+   "size": [
+    5.0,
+    4.1973,
+    3.8
+   ],
+   "tris": 184,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpireFootRock.glb",
+     "kind": "solid",
+     "tris": 184,
+     "offset": [
+      0.0,
+      2.0986,
+      0.0
+     ],
+     "size": [
+      5.0,
+      4.1973,
+      3.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Foot Rock (base, front): chunky wide faceted warm grey-pink dome with a broad flat top, a front nose vertex and a flat underside; two lime sprigs on its top"
+  },
+  {
+   "name": "StoneSpireMain",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "part",
+   "size": [
+    4.4,
+    11.0,
+    3.8
+   ],
+   "tris": 54,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpireMain.glb",
+     "kind": "solid",
+     "tris": 54,
+     "offset": [
+      0.0,
+      5.5,
+      0.0
+     ],
+     "size": [
+      4.4,
+      11.0,
+      3.8
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Spire (main mesh): tall 7-sided warm grey-pink obelisk, long flat faces, a 4-face pyramid cap, flat underside"
+  },
+  {
+   "name": "StoneSpireSideRock",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "part",
+   "size": [
+    3.1131,
+    5.7184,
+    2.6791
+   ],
+   "tris": 154,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpireSideRock.glb",
+     "kind": "solid",
+     "tris": 154,
+     "offset": [
+      0.0,
+      2.8592,
+      0.0
+     ],
+     "size": [
+      3.1131,
+      5.7184,
+      2.6791
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Side Rock (reusable): tapered flat-topped faceted warm grey-pink block leaning a little, one lime star rosette on its top"
+  },
+  {
+   "name": "StoneSpireSmallRock",
+   "sheet": "M039",
+   "subject": "Rock Spire",
+   "role": "part",
+   "size": [
+    1.4,
+    1.0,
+    1.2
+   ],
+   "tris": 30,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneSpireSmallRock.glb",
+     "kind": "solid",
+     "tris": 30,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      1.4,
+      1.0,
+      1.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Small Rock (reusable): squat faceted warm grey-pink pebble, one flat top facet, flat underside"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 4504,
+  "vfxSockets": 0,
+  "paletteColours": 17,
+  "paletteLevels": 280,
+  "meshBytes": 447132
+ },
+ "problems": []
+}
