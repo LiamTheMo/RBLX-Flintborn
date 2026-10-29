@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/022.png`. The sheet's own title is "FIBER SHRUB — SHRUB • RESOURCE • FOLIAGE",
 "Individual Model Study", header "PAGE 19/132" (INDEX.md row 22 calls it "Flintborn Fiber Shrub Model Study"; the page
 number on the sheet is not the index number). The image is 1024 × 1536 px.
-Builder: `art/blender/kit/mcp/m022.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`
+Builder: `art/blender/kit/mcp/m022.py` → `build()` (stages 1–6 below). Procedure: `art/blender/kit/mcp/STAGES.md`
 (one modeller does stages 1–6 in a background Blender; the main session does stage 7).
 
 User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
@@ -745,3 +745,678 @@ All recommendations are accepted:
 11. Names as proposed: `FiberPlantNode`, `FiberPlantStemFork`, `FiberPlantLeaf`, `FiberPlantTuft`.
 
 Keep the tufts from washing out to white: calibrate them against the hero render, not only the swatch.
+
+## Stage 1 — Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m022.py` (`build()` returns `audit`, `problems`, `log`, `uv`, `thin`, `self_hits`,
+`inverted`, `views`). Background session port 9880, work file `art/blender/assets/kit/wip/M022.blend`. Helpers that live
+in builders being edited in parallel (m017 / m018: `_union`, `_guarded`, `_polish`, `_seal`, `_tri_quads`) are copied
+into the builder; m004 / m011 / m012 are imported.
+
+**Parts, each its own function:**
+- `leaf_mesh()` → `FiberPlantLeaf` (L 2.3, W 1.05): a 10-point outline pointed at both ends (`LEAF_OUT` half widths
+  0.31 / 0.48 / 0.47 / 0.27 W at t 0.15 / 0.37 / 0.58 / 0.80); the front is a 6-point ring (midrib points at t 0.20 and
+  0.86, side points at about half the half width) at 0.55 of the front thickness round a raised apex at t 0.53 (the
+  close-up's centre vertex); the back a 4-point ring round a lower apex. Thickness 0.095 L front + 0.06 L back
+  (0.155 L; the study's 0.15). Front and back are zipped by angle round the apex, so each leaf is star-shaped about its
+  centre and can't fold through itself (inverted faces per leaf piece: 0 on all nine). 40 tris. Droop (t²) and the
+  face direction are parameters. Not `K.leaf`, not `NS["leaf"]`.
+- `blade_mesh()` / `tuft_mesh()` → `FiberPlantTuft`: a 6-sided waist cone and three rings of broad pointed lances
+  (`TUFT_RINGS`: inner 74-84°, middle 58-68°, outer 44-54°; width 0.40 / 0.44 / 0.48 L; a diamond section with a
+  midrib fold front and back, widest at 0.36 L, a third ring at 0.7 L, sharp tip; 22 tris a blade). Each blade is as
+  long as both the crown height and diameter allow. The part has 11 blades and a short 8-sided brown peg (decision 5).
+- `tube()` / `stems()` → the hero stem cluster; `fork_part()` → `FiberPlantStemFork` (the exploded Y: an 8-sided trunk
+  r 0.40 → 0.36 to z 1.45 with a slight foot flare, left limb to z 3.0, right limb leaning ~33° to z 2.6, a low side
+  branch out to the left; flat 8-sided ends; no socket holes, decision 5).
+
+**Hero (`hero()`):** a low foot flare (r 0.56 → 0.36, z −0.15 … 0.30) and six limbs started inside it: low stubs SL /
+SR, S1 / S2 in front (collared), S3 back right (collared), S4 at the back (thinner). Each collar is part of its limb
+tube: the last 0.32 flares to 1.4 × the radius with a 0.08 rim (no separate boolean piece). Three tufts sit 0.12 into
+the collar tops (T1 Ø 1.7 × H 1.55, T2 1.5 × 1.4, T3 1.0 × 1.0; blades 2 + 4 + 5, T3 2 + 3 + 4), pressed to 0.72 in
+world Y about their foot (`TUFT_DEPTH`), with each blade's broad face turned 40 % toward the front (`FACE_TURN`), so
+the crowns fan out to the sides like the sheet's instead of pointing blades at the camera (those read as foreshortened
+dark needles). Nine leaves (`LEAVES`, decision 2) with their bases pulled within 0.6 × the host stem's radius of its
+axis (no floating leaves, no visible stalk). The front stays open (decision 10).
+
+Changes against the study's layout, each measured on the long-lens sheet renders:
+- Foot: the study's r 0.70 trunk to z 0.62 read as a pot; the sheet's stems part at the ground (`z_f34_base`).
+- Stem bases spread and S4 thinner (r 0.19 → 0.17), so the front's h .3 row shows separate runs with paper between:
+  ours .34-.45 / .47-.54 / .54-.57 / .61-.65, sheet .36-.46 / .48-.53 / .55-.58 / .70-.71.
+- S1 end x −0.55 and T1 tilted 18° toward az 195: T1 at f .18-.48 (sheet .21-.47).
+- S3 end moved back to (0.95, 0.65, 1.75): at y 0.35 T3's blades grazed LE and left crossing faces after the union;
+  the sheet draws T3 behind LE anyway.
+- Leaves turned to face the front (side leaves `face` (0, −1, 0.8), low pair (0, −1, 0.55); the low pair first read
+  edge-on); LA / LE longer and lower (2.45 / 2.3 at 34° / 32°) and the low pair shorter and higher (2.05 at 21° / 18°),
+  so both tiers reach the silhouette's sides; the tall pair spread (az 166 / 14, el 68) for the V notch; LG's base
+  lower (z 0.75; the rear's centre leaf spans h .20-.61); LH / LI longer and facing the back.
+
+**Final measurements** (study masks, `m022.measure()`; sheet / ours):
+
+| View | W : H | Leaves | Fiber | Wood |
+| --- | --- | --- | --- | --- |
+| f34_sheet (0, 14) | 1.369 / 1.352 | .638 / .626 | .192 / .176 | .170 / .199 |
+| front_sheet (0, 10) | 1.321 / 1.360 | .639 / .619 | .200 / .175 | .161 / .206 |
+| side_sheet (90, 10) | 1.016 / 1.041 | .645 / .611 | .190 / .190 | .165 / .199 |
+| rear_sheet (180, 10) | 1.262 / 1.433 | .705 / .812 | .122 / .079 | .173 / .110 |
+| r34_sheet (152, 12) | 1.188 / 1.317 | .763 / .769 | .113 / .088 | .124 / .143 |
+| top_tilt_sheet (0, 65) | 1.139 / 1.495 | .778 / .699 | .170 / .182 | .052 / .119 |
+
+- f34 top profile (f 0 … 1): ours .65 .64 .64 .63 .68 .75 1.0 .96 .89 .82 .70 .82 .88 .94 .99 .75 .71 .65 .66 .65 .66;
+  sheet .74 .73 .70 .68 .64 .70 1.0 .93 .86 .78 .54 .83 .89 .95 .85 .69 .75 .61 .63 .66 .69. V notch h .70 (sheet .54
+  f34, .67 front cell).
+- f34 width per height (h 0 … 1): ours .01 .75 .91 .72 .76 .88 .97 .57 .44 .42 0; sheet .09 .59 .92 .91 .77 .86 .92
+  .82 .42 .40 .01.
+- Tuft components (a looser tan mask that includes shaded blades; f34): ours T1 f .18-.48 h .35-.79, T2 .53-.81 h
+  .25-.66, T3 .70-.82 h .57-.81; sheet T1 .21-.47 h .36-.75, T2 + T3 .52-.85 h .26-.75. Rear: ours .16-.38 h .48-.80
+  (T3) and .72-.82 h .58-.74 (T1's top); sheet .12-.31 / .60-.82.
+- Size **4.91 W × 3.63 D × 3.45 H** (decision 4.7 ± 0.25 × 3.9 ± 0.35 × 3.6 ± 0.2: inside all three).
+
+## Stage 2 — Optimisation and cleanup
+
+- Union: `_union` (guarded exact booleans, one shell at a time, volume-checked, `view_layer.update()` before
+  `split_loose` and before each boolean). Hero 50 shells, StemFork 4, Tuft 13: no retries, no failures. Then
+  `m004.floor_cut` at z 0, the guarded sliver clean (`m011._clean`, max move 0.05 → 0.025; each step undone if it adds
+  crossing faces or shells), `_finish`, `_polish` (quads split for the best angle, guarded `_force_slivers`, needle
+  collapses, inverted-face removal + fan-fill reseal, guarded late collapses and `_flip_thin`).
+- Fixes found in this stage: the tuft waist's bottom narrowed (0.30 → 0.18 of the crown diameter; at 0.30 the waist
+  wall sat a hair inside the collar rim and left two inverted slivers and a crossing pair) and the blade bases moved
+  inside the waist (base radii 0.03 / 0.07 / 0.11 of the diameter, at half the waist height); T2's tilt azimuth
+  345 → 338 (345 / 342 left 1-2° union needles on a blade underside that no collapse or flip could fix).
+
+| Object | Tris | Size (studs) | Shells | Non-manifold | Boundary | Wire / loose | Zero-area | n-gons | Dup verts | Normals | Min angle |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FiberPlantNode (hero) | 2066 / 4000 | 4.91 × 3.63 × 3.45 | 1 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | outward | 5.05° |
+| FiberPlantStemFork | 278 / 1000 | 2.37 × 0.86 × 3.09 | 1 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | outward | 9.34° |
+| FiberPlantLeaf | 40 / 1000 | 2.03 × 0.89 × 0.99 | 1 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | outward | 9.95° |
+| FiberPlantTuft | 382 / 1000 | 1.56 × 1.65 × 2.02 | 1 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | outward | 6.02° |
+
+- Hero before the union: 1602 tris (nine leaves × 40 = 360; T1 / T2 254 each, T3 210 (waist 12 + 22 a blade); stems
+  about 524). Union seams and slivers bring it to 2066.
+- Self-intersections (crossing face pairs without a shared vertex): 0 on every object. Inverted faces (ray parity
+  along the normal, `inverted()`): 0 on every object. M017's 5-direction test at eps 2e-3 can flag one hero face in a
+  < 2 mm crease between two T2 blades; at eps 2e-4 and 5e-5 it reports none (a crease, not an inside-out face).
+- Origin at the bounding-box bottom centre on every object; transforms applied; no modifiers; no custom normals; flat
+  shading. `K.check`: no problems.
+
+## Stage 3 — UV
+
+Smart UV (angle 45, ANGLE_BASED, margin 0.008) plus `m012._uv_unfold`:
+
+| Object | Islands | Overlap pairs | Flipped | Min gap | Density (min / median / max) | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- |
+| FiberPlantNode | 398 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.009 |
+| FiberPlantStemFork | 33 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.011 |
+| FiberPlantLeaf | 3 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.024 |
+| FiberPlantTuft | 59 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.019 |
+
+## Stage 4 — Materials, colour and texture
+
+**Keys and calibration** (`PALETTE`; targets are the spec 5.4 sheet medians of unshadowed regions):
+
+| Key | Sheet target | Dome pass (K.calibrate, 6 iterations; dome median) | Final (hero pass) |
+| --- | --- | --- | --- |
+| m022_leaf | #62893C | #53733A (#61863C) | #608131 |
+| m022_leaf_tip | #8CB238 | #729236 (#8AAF38) | #83A32E |
+| m022_leaf_base | #42653A | #395838 (#41643A) | #406234 (kept cool, hue ~100°) |
+| m022_fiber | #F2C180 | #BE9D6E (#F2C180) | #E9BB7C |
+| m022_fiber_base | #D9A567 | #AA8758 (#D7A567) | #D2A063 |
+| m022_fiber_tip | #FADDA8 | clipped on the dome (#F0B390, a pink cast): set by fiber's linear ratio, #C4B491 | #F1D5A3 |
+| m022_wood | #875D3C | #6B4C31 (#865E3E) | #73492D |
+| m022_wood_dark | #634530 | #4F3725 (#644734) | #553522 |
+
+- Pass 2 (hero renders): each family corrected in linear light by the mean sheet / ours ratio over the f34, front and
+  top: leaves ×(1.34, 1.27, 0.73), wood ×(1.16, 0.93, 0.85), fiber ×(1.28, 1.12, 0.93), then ×(1.07, 1.17, 1.21) and
+  ×(1.17, 1.12, 1.15) as the crowns changed. The side and rear are lit by the studio's fill and read darker on every
+  model: reported, not fitted (M017's rule).
+- **Re-measured (sheet / ours):** f34 leaves #6B8E2D / #6B8F2D (lit #96B93A / #8EB234, shade #3F5D25 / #3B551D);
+  front leaves #688B2D / #698E2C; top leaves #678C30 / #71962F; f34 fiber #F6C683 / #E7BB79 (lit #FDE1AB / #FFE19C,
+  shade #D39E5D / #C99B5F); front fiber #F4C380 / #E6BA78; side fiber #F4C382 / #F3C785; f34 wood #704D2F / #6E452D
+  (lit #966841 / #946E42); front wood #755132 / #6E452C. Side / rear / r34 leaves (studio fill): #6A8D2E / #4C6724,
+  #678A2E / #547424, #709530 / #587926.
+- Front leaf bands by height fifths (ground → top): sheet #54772B #709430 #5A7B2B #729530 #8EAF35, ours #547627
+  #62842B #6C912E #7A9E30 #90B22F; the top band (tall-leaf tips) is the palest in both.
+
+**Blending (positions only, never facing):**
+- Leaves: along each leaf's own t, `leaf_base` → `leaf` across t 0.06-0.40 and `leaf` → `leaf_tip` across
+  0.56-0.90, quarter steps (25 / 50 / 75 % mix keys), ±0.06 broad noise on t; tall pair +0.1 toward the tip, low leaves
+  −0.1.
+- Fiber: along each blade's t, `fiber_base` → `fiber` across t −0.1-0.24, `fiber` → `fiber_tip` across 0.46-0.84,
+  quarter steps; waist `fiber_base`; T3 0.1 toward the base.
+- Wood: `wood` with a 25 % `wood_dark` core under the tufts (z 0.55-1.1 within 0.35 of the axis, faded over 0.3) and
+  broad noise patches up to 25 %; no darkening at the ground (the sheet's foot band isn't darker). Floor-cut faces
+  plain `wood`.
+- **Tint:** per-piece level ±0.04 (fiber ±0.024) and broad mottling: leaves amp 0.035 / scale 0.5, fiber 0.025 / 0.6,
+  wood 0.05 / 0.35; jitter ≤ 0.005 (no per-triangle confetti).
+- **Finish:** leaf keys roughness 0.8 with the foliage specular (`K.FOLIAGE_SPEC`, mix keys too via `_restyle`);
+  fiber 0.85; wood 0.9; metal 0. The hero uses 20 material slots (8 keys + mix steps).
+
+## Stage 5 — Lighting
+
+Skipped (decision 7): the sheet shows an ordinary sunlit shrub; no emissive key, no light. Studio note (Requires
+Manual Validation): check that the tufts don't clip to flat cream under the game's sun and that the leaf base → tip
+gradient survives the palette export.
+
+## Stage 6 — VFX
+
+Skipped (decision 7): no glow, sparkle, floating fibres or dust on the sheet; no sockets (the hero has no children).
+Renders were made with `vfx=True` (nothing to realise).
+
+## Modeller's notes for the verifier
+
+- Renders in `art/blender/renders/models/M022/`: the decision-9 long-lens cameras (`f34_sheet`, `front_sheet`,
+  `rear_sheet`, `side_sheet`, `r34_sheet`, `top_sheet`, `top_tilt_sheet`; 3× lens as M018 / M020), the kit views,
+  `exploded`, `part_stemfork`, `part_leaf`, `part_tuft`, and `M022_sheet_compare.png` (sheet cell left, ours right,
+  each cropped to its silhouette). `m022.measure()` and `m022.compare()` re-run the study's masks.
+- Known differences:
+  1. **Tuft shading.** The sheet's tufts are bright on every face (shade quartile #D39E5D); in our studio the blades
+     facing away from the sun go darker, so the fiber share reads .176 against .192 (f34) and the fiber median #E7BB79
+     against #F6C683 (15 low in red; lit and shade quartiles within about 10). Raising the keys further clips the lit
+     faces.
+  2. **Tuft crowns** read a little rounder and fuller than the sheet's spikier flames in the f34 / front (the
+     broad-face turn that cured the needle look softened the tips). The part tuft matches the close-up's open crown.
+  3. **Rear:** the tufts show less (fiber .079 / .122): T1 sits behind LC / LA from the back. The sheet's rear shows
+     more of both, which its own front cell's depths don't allow.
+  4. **Top tilt** reads wider than deep (1.50 / 1.14) with more stem showing (.119 / .052): the sheet's top cell has a
+     front leaf the hero doesn't (decision 10 keeps the front open).
+  5. The V notch is shallower (h .70; sheet .54 f34, .67 front).
+  6. Wood share a little high in the front views (.20 / .17): collars and stubs show; the stems are at the sheet's
+     widths.
+  7. The hero is 4.91 wide (limit 4.95) and 3.45 high (limit 3.4).
+- Every union passed first try; nothing was left out.
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-28. Read-only background session on port 9882 with `wip/M022_verify.blend` (not saved,
+`build()` not called). Fresh renders by `m022.render_views()` into the scratchpad
+(`...\scratchpad\v022\renders\M022\`; the repo's render folder was untouched). Measured with `m022.measure()` (the
+study's masks on both images) and with my own scripts: bmesh topology, BVH ray parity for interior faces, and
+`v022\samp.py` for the colour gradients.
+
+**Verdict: FAIL, 6/10.** The mesh is technically clean and the leaves, palette and blending are close. Three things
+still read unlike the sheet: the tuft crowns, the fan's upper tier, and the rear.
+
+### Technical checks (all re-measured; all pass)
+
+| Object | Tris | Size (studs) | Shells | Non-manifold / boundary | Wire / loose | n-gons / zero-area | Dup verts | Self-hits | Inverted / interior | Min angle | Winding |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FiberPlantNode | 2066 / 4000 | 4.910 × 3.634 × 3.453 | 1 | 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 | 0 / 0 | 5.05° | consistent, volume +2.98 |
+| FiberPlantStemFork | 278 / 1000 | 2.369 × 0.860 × 3.088 | 1 | 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 | 0 / 0 | 9.34° | consistent |
+| FiberPlantLeaf | 40 / 1000 | 2.031 × 0.893 × 0.988 | 1 | 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 | 0 / 0 | 9.95° | consistent |
+| FiberPlantTuft | 382 / 1000 | 1.564 × 1.647 × 2.016 | 1 | 0 / 0 | 0 / 0 | 0 / 0 | 0 | 0 | 0 / 0 | 6.02° | consistent |
+
+- **Size against the decision** (4.7 ± 0.25 × 3.9 ± 0.35 × 3.6 ± 0.2): inside all three, but W 4.91 is 0.04 under its
+  cap and H 3.45 is 0.05 over its floor. Any fix must keep W ≤ 4.95 and H ≥ 3.4.
+- **Origin and transforms:** the local bbox is symmetric in X and Y with min z 0 (bottom centre) on all four objects;
+  rotation 0, scale 1; no modifiers, no custom normals, no children, flat shading.
+- **UV:** one `UVMap` each; 398 / 33 / 3 / 59 islands, 0 overlaps, 0 flipped, min gap 0.016, density 1.0, conformal
+  stretch p95 ≤ 1.024.
+- **Materials:** 20 slots on the hero (8 keys plus quarter-step mix keys), all used. Leaf roughness 0.8 with specular
+  0.06; fiber 0.85; wood 0.9; metal 0; emission 0. There is a `Tint` corner layer (0.93–1.06, sd 0.021: broad, no
+  confetti). `K.check` reports no problems.
+- **No colouring by facing:** the correlation of key lightness with the face normal is |r| ≤ 0.16 per family (leaf
+  nz 0.155, fiber −0.152, wood −0.126; ny and nx ≤ 0.06).
+- **VFX:** none, as decided (decision 7).
+
+### View comparison (sheet / ours, study masks)
+
+| View | W : H | Leaves | Fiber | Wood | Notes |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet | 1.369 / 1.352 | .638 / .627 | .192 / .174 | .170 / .199 | shares OK (±4); profile misses: see B2 |
+| front_sheet | 1.321 / 1.360 | .639 / .620 | .200 / .173 | .161 / .207 | wood +4.6, just over |
+| side_sheet | 1.016 / 1.041 | .645 / .611 | .190 / .190 | .165 / .199 | shares OK (±5); back half low (profile .47 against .83–.88) |
+| rear_sheet | 1.262 / 1.433 | .705 / **.812** | .122 / **.079** | .173 / **.110** | three shares out of ±4: see B3 |
+| r34_sheet | 1.188 / 1.317 | .763 / .769 | .113 / .088 | .124 / .143 | OK (±5) |
+| top_tilt_sheet | 1.139 / **1.495** | .778 / .701 | .170 / .180 | .052 / .119 | W : D over 1.0–1.3 |
+
+- **f34 top profile** (f 0 → 1). Sheet: .75 .73 .70 .68 .63 .70 1.0 .93 .87 .78 **.54** .83 .89 .95 .87 .68 .75 .74
+  .63 .66 .69. Ours: **.65 .64 .64 .63** .68 .75 1.0 .96 .89 .82 **.70** .82 .88 .94 .99 .75 .71 .65 .66 .65 .66.
+- **f34 width per height** (h 0 → 1). Sheet: .07 .58 .91 .92 .77 .86 .92 .82 .42 .40. Ours: .01 .75 .91 **.72** .76
+  .88 .97 **.57** .44 .42.
+- **Stem runs at h .3, front.** Sheet .36–.46 / .48–.53 / .55–.58 / .70–.71; ours .35–.45 / .47–.54 / .54–.57 /
+  .61–.65. Gaps show; the front is open.
+- **Counts:**
+  - nine leaves in the scene;
+  - f34: 6 leaves and 3 tufts visible;
+  - rear: 1 clear tuft plus the tip of T1;
+  - top: nine leaves round the circle, two tufts near the middle.
+
+### Colour (sampled on both images; Δ = ours − sheet, R/G/B levels)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| Hero leaves median / lit / shade (f34) | #6B8E2D / #96B93A / #3F5D25 | #6B8F2D / #8EB233 / #3B551D | 0,+1,0 / −8,−7,−7 / −4,−8,−8 |
+| Hero leaf bands, bottom → top (f34) | #62842B #6A8F2F #62852D #799E30 #92B136 | #5A7C28 #61842A #6D922F #799D2F #92B72F | base −8,−8,−3; mid +11,+13,+2; tip 0,+6,−7 |
+| Leaf base / mid / tip (close-up vs part_leaf) | #3F613B / #5E8940 / #8AB036 | #5C883A / #7AA337 / #98BE31 | **+29,+39,−1** / **+28,+26,−9** / +14,+14,−5 |
+| Fiber base / mid / tip (close-up vs part_tuft) | #D09D64 / #F7C27F / #FADFA8 | #CF9655 / #E4B471 / #FFE2A0 | −1,−7,−15 / −19,−14,−14 / +5,+3,−8 |
+| Fiber median (close-up vs part_tuft) | #EEBC7C | #F2C27B | +4,+6,−1 |
+| Hero fiber median / lit / shade (f34) | #F6C683 / #FDE1AB / #D39E5D | #E6B877 / #FFDF9B / #C99B5F | **−16,−14,−12** / +2,−2,−16 / −10,−3,+2 |
+| Wood (fork close-up vs part_stemfork) | #865D3C (hue 27°) | #865436 (hue 22°) | 0,−9,−6 |
+| Hero wood median / lit / shade (f34) | #704D2F / #966841 / #3D2C19 | #6E452D / #946940 / #412719 | −2,−8,−2 / −2,+1,−1 / +4,−5,0 |
+
+- **Blending:** the leaves go dark-cool to lime along each leaf, the blades orange-tan to cream, and the stems are
+  mottled; there are no hard patches. The hero leaf gradient matches.
+- **Misses:**
+  - the hero fiber median is 16 low (the spec allows 10);
+  - the part leaf has almost no dark base;
+  - the wood is about 4–5° redder than the sheet.
+
+### Findings
+
+**Blockers** (each with a fix for a fresh modeller):
+
+- **B1. The tuft crowns read as closed, shadowed balls, and as needle fans from the side.**
+  - **Sheet:** each crown is an open flame of 7–10 distinct long pointed lances. The outer blades fan out to the sides
+    at about 30–45° above horizontal, the inner ones stand upright, and every face is pale. Compare `z_ref_tufts.png`
+    and `z_ours_tufts.png` in `...\scratchpad\v022\`.
+  - **Ours:** T1 and T2 are compact balls. A front blade foreshortens toward the camera and leaves a grey-brown core
+    (shade quartile #C99B5F against #D39E5D; hero fiber median #E6B877 against #F6C683, 16 low; the spec allows 10).
+  - **From the side** (`side_sheet`), the crowns are thin spiky needle fans (pitfall 3), because the tufts are squashed
+    to `TUFT_DEPTH` 0.72 and `FACE_TURN` 0.4 turns every blade face to the front.
+  - **Fix in `TUFT_RINGS` / `tuft_mesh` / `TUFTS`:**
+    - open the crown: outer ring 30–45° above horizontal, middle ring 50–60°, inner 75–85°;
+    - use fewer, longer blades, for example (2, 3, 4) for T1 and T2 and (2, 2, 3) for T3, with blade length about the
+      crown height;
+    - make no blade lean toward −Y by more than about 30° from the tuft axis, so nothing points at the f34 camera;
+    - raise `TUFT_DEPTH` to about 0.9–1.0 and lower `FACE_TURN` to about 0.2, so the crowns stay broad lances from the
+      side and rear too.
+  - **Acceptance:**
+    - f34 fiber median within 10 of #F6C683, and the shade quartile at or above about #D09C5C;
+    - f34 tuft components within ±0.06 of the study's §1.2;
+    - `side_sheet` shows broad blades, not needles;
+    - the part tuft's crown W : H is about 0.95–1.1, as in the close-up.
+  - Keep the tris under budget, and keep the union clean: waist 0.12 into the collar, no coplanar faces.
+- **B2. The fan's upper tier is too low and too narrow.**
+  - **Upper side leaves (LA, LE):** the sheet's rise steeply to the top corners: tips at h .75 (f 0) and .69 (f 1) in
+    the f34, .71 / .65 in the front cell. Ours point almost sideways: f 0–.15 at h .63–.65.
+  - **The silhouette is narrow at two heights:**
+    - h .7: width .57 against .82 (front .63 against .84);
+    - h .3: width .72 against .92, where our pinch sits instead of at h .4.
+  - **Fix in `LEAVES`:**
+    - LA: elevation 34° → about 42°;
+    - LE: elevation 32° → about 38°;
+    - keep L, or lengthen by ≤ 0.1, so the X reach stays and W stays ≤ 4.95;
+    - LB / LF: elevation 21 / 18° → about 25 / 22°, or W + 0.1, so their upper edge fills h .3.
+  - **Acceptance (f34_sheet):**
+    - top profile within ±0.07 at f 0–.2 and .8–1.0;
+    - width per height within ±0.07 at h .3, .6 and .7.
+- **B3. From the rear, the shrub is a green wall: stems and tufts are hidden.**
+  - **Shares in rear_sheet** (sheet / ours): leaves .705 / .812, wood .173 / .110, fiber .122 / .079 (all over the
+    spec's ±4); W : H 1.262 / 1.433.
+  - **Sheet:** five stems fan visibly at h .1–.4 below a rounded centre leaf, and a tuft stands high on each shoulder.
+    In ours, LG and the long low back diagonals LH / LI (L 2.45 / 2.4) cover the stems, and T1 shows only a tip behind
+    LC / LA.
+  - **Fix:**
+    - shorten LH / LI to about 2.0–2.1 (the study's values) and lift their bases so they sit beside the stems, not in
+      front of them, in the rear camera;
+    - make LG rounder and a little smaller (L about 1.6), so S3 / S4 / SL / SR show under it;
+    - B1's more open crowns, with T1 tilted less toward az 195 if needed, should bring T1 above LC's shoulder from the
+      back.
+  - **Acceptance (rear_sheet):** shares within ±4, two tufts visible (the small one at screen left), stems visible at
+    h .1–.4.
+
+**Minors** (fix if cheap; otherwise note them at commit):
+
+- **m1. V notch.** f34 h .70 against the sheet's .54 (spec check .50–.60). The front cell matches (.70 / .69), so the
+  sheet disagrees with itself. Spreading LC / LD by about 4° in azimuth would deepen it.
+- **m2. Stems.**
+  - S1 leans about 15° and S2 about 17° from vertical (spec 30° / 25°; sheet about 20°), so they read as near-parallel
+    posts.
+  - The foot pad and stubs make h .1 wider than the sheet (.75 against .58).
+  - The collars read as ringed cups, a little heavier than the sheet's flare.
+  - Leaning S1 / S2 out further from a narrower foot would match better.
+- **m3. Wood hue.** About 4–5° redder than the sheet: key #73492D is 24°, the part renders 22° against 27°. Move
+  `m022_wood` toward hue 27° (for example #74502F) and re-check the f34 stem median within 12 of #704D2F.
+- **m4. Part leaf colour.** `FiberPlantLeaf` has no pure `leaf_base` faces (only 2 at 25 % mix). Its render is lighter
+  and limier than the close-up (median #7AA238 against #5E893F; base +29 / +39). Give the part the hero's base band
+  (shift −0.1) so its base reads dark and cool, near #3F613B.
+- **m5. Side view.** The back half is low (top profile .47 against the sheet's .83–.88), and the view reads sparse and
+  lopsided. The spec (§3.3) lets the front and rear govern, and B1 will improve the tufts here. Re-check the shares and
+  counts after B1 and B3.
+- **m6. top_tilt W : D.** 1.495 against 1.139 (spec 1.0–1.3); the plan ratio is 4.91 / 3.63 = 1.35. B2's steeper LA /
+  LE will narrow it a little.
+- **m7. Size near its limits** (W 4.91, H 3.45). Keep it in range after the fixes.
+- **m8. Part tuft proportions.** The crown is taller and narrower than the close-up's (about 0.8 against 1.06 W : H).
+  This is covered by B1.
+
+**Passes:**
+- topology, UVs, origin and transforms, and budget;
+- nine thick, pointed lens leaves, with the hero leaf colour within 1 level;
+- three tufts on brown collars;
+- the open front with stem gaps;
+- calm forage with no VFX;
+- no colouring by facing;
+- broad tint;
+- base → tip gradients on leaves and blades;
+- parts present with sensible shapes (fork Y plus side branch; leaf; tuft with peg).
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-28. Background session on port 9882 with `wip/M022.blend` (saved after every good build).
+Every change is in `m022.py`; `build()` runs in about 50–60 s with renders. Measured with `m022.measure()` (the study's
+masks), plus scratch scripts in `...\scratchpad\r2_022\` (`tcomp.py` for tuft components, `parts.py` for part colours,
+`chk.py` for the technical checks).
+
+### What changed
+
+- **B1, the tuft crowns** (`TUFT_RINGS`, `tuft_mesh`, `TUFTS`):
+  - Rings at 75–85° / 50–60° / 30–45°, with fewer and longer blades: T1 and T2 (2, 3, 4), T3 (2, 2, 3). The blades
+    are narrower lances (width 0.32 / 0.36 / 0.40 L).
+  - Hero blades sit at set world azimuths (`WORLD_AZ`):
+    - inner pair upright to the left and right;
+    - middle ring to the front diagonals and the back;
+    - outer ring straight out to both sides plus the back diagonals.
+    - `FRONT_LEAN` 30°: any blade leaning toward −Y more than 30° from vertical is steepened in 3° steps.
+    - The first try kept random azimuths with only the lean limit. It turned every front blade upright and read as a
+      narrow bundle.
+  - Each blade's width is rolled 70° (`BLADE_ROLL`) from tangential toward its radial plane. A blade splaying to either
+    side of a view now shows its broad face instead of its edge. That edge was what made the round-1 crowns read as
+    shadowed balls and needles.
+  - `TUFT_DEPTH` 0.72 → 0.95; `FACE_TURN` 0.4 → 0.2.
+  - T1 is now 1.5 × 1.45, tilted 14° toward az 205; T3 is 1.05 × 1.0 on S3, moved out to x 1.15.
+  - **Part tuft** (`PART_TUFT`): 1.95 × 1.45 with 2 + 4 + 5 = 11 blades, as in the close-up. A part roll of 40° was
+    tried: the blades read no broader and the base band went 16 dark, so `PART_ROLL` stays 70.
+- **B2, the upper tier** (`LEAVES`):
+  - LA el 43 (L 2.63, W 0.95, base on S1 at z 0.95, face (0, −0.8, 1));
+  - LE el 35 (L 2.4, W 1.12);
+  - LB / LF el 25 / 23, L 2.3, W 1.1, az 216 / 326, face (0, −1, 0.7).
+  - LE stayed at 35° rather than 38°: at 37–38° both upper tips sat above h .7, and the f34 width at h .7 went to
+    1.0 against the sheet's .82.
+  - The low pair is longer than round 1. This keeps their upper edges at h .3 and the depth inside its tolerance.
+- **B3, the rear:**
+  - LG is rounder and smaller: 1.5 × 1.0, el 42.
+  - LH / LI are L 2.15 and W 0.85, laid low and nearly flat (el 13, face mostly up), at az 112 / 68.
+  - LC W is 0.84, and T1 sits on S1 at x −0.65, so T1 shows beside LC and above LA from the back.
+  - LH / LI are 2.15 rather than the suggested 2.0–2.1, and point back rather than sideways. Shorter or more sideways
+    leaves put the depth under 3.55. With LH / LI at az 135 / 45 and L 2.05, D was 2.96.
+- **Minors:**
+  - m2, stems: S1 and S2 lean about 26° and 33° from vertical (seen from the front 19° and 23°; round 1 was 15° and
+    17°). The collars are less cup-like: `COLLAR` 0.32 / 1.4 / 0.08 → 0.30 / 1.3 / 0.06.
+  - m3, wood hue: `m022_wood` is hue 27° and `m022_wood_dark` hue 26° (see the palette below).
+  - m4, part leaf: `FiberPlantLeaf` is painted with shift −0.3. Its first two fifths are now the pure `leaf_base` key.
+  - New shared check: `M.fix_bowties(o)` runs after `_polish` in `_make`. `nonmanifold_verts` is in the audit and in
+    `problems`.
+
+### Colour (two passes)
+
+- **Pass 1** used the f34 / front medians, corrected in linear light:
+  - leaves × (1.07, 1.04, 1.04);
+  - fiber × (0.91, 0.92, 1.04): the open crowns read #FFCC7F, with red clipped;
+  - wood moved to hue 27°, then × 1.08, so the part fork stays within 8 of #885E3D while the hero stems reach
+    #704D2F. The full hero ratio (× 1.27) would have pushed the part fork about 20 too light.
+- **Pass 2** re-measured every family within tolerance, so nothing more changed.
+
+| Key | Round 1 | Round 2 |
+| --- | --- | --- |
+| m022_leaf | #608131 | #638332 |
+| m022_leaf_tip | #83A32E | #87A62F |
+| m022_leaf_base | #406234 | #426435 |
+| m022_fiber | #E9BB7C | #E0B47E |
+| m022_fiber_base | #D2A063 | #CA9A65 |
+| m022_fiber_tip | #F1D5A3 | #E8CDA6 |
+| m022_wood | #73492D | #785431 |
+| m022_wood_dark | #553522 | #583B24 |
+
+The blending is unchanged: position fields only, quarter steps, broad Tint. Facing correlation |r| ≤ 0.17 per family.
+
+### Results against the round-1 targets (sheet / ours)
+
+**B1, the crowns:**
+
+| Check | Target | Sheet | Ours | Verdict |
+| --- | --- | --- | --- | --- |
+| f34 fiber median | within 10 | #F6C683 | #FEC685 (+8, 0, +2) | pass |
+| f34 fiber shade | at or above #D09C5C | #D39E5D | #D6A46B | pass |
+| f34 fiber share | ±4 | .192 | .204 | pass |
+| T1 component | ±.06 | centre (.340, .538), f .21–.48, h .36–.75 | centre (.313, .541), f .16–.47, h .40–.76 | pass |
+| T2 + T3 component | ±.06 | T2 f .52–.75, h .27–.60; T3 f .71–.84, h .53–.75 | f .51–.84, h .25–.82 | see note |
+| Part tuft W : H | 0.95–1.1 | — | 1.91 / 1.91 = 1.00 | pass |
+| Part tuft base → tip | within 15 per fifth | #CF9C63 #E0AD70 #F6C17E #FCD191 #FADFA6 | #D3995D #EDB77A #FFC883 #FFD191 #FFEAB3 | pass (≤ 13) |
+
+- The T2 + T3 component merges into one, as in the sheet's own front cell. Its top is h .82, against T3's .75.
+- **Side view:** the side_sheet crowns show more broad blade than in round 1, but the near-vertical blades still read
+  spiky from +X. This is only partly fixed (below).
+
+**B2, the f34 silhouette:**
+
+| f | 0 | .05 | .10 | .15 | .20 | .80 | .85 | .90 | .95 | 1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Sheet top | .75 | .73 | .70 | .68 | .63 | .75 | .74 | .63 | .66 | .69 |
+| Ours top | .73 | .71 | .68 | .65 | .63 | .79 | .66 | .67 | .68 | .68 |
+
+- The worst miss is f .85 at −.08. Every other column is within .04.
+- Width per height at h .3 / .6 / .7: ours .89 / .93 / .78; sheet .92 / .91 / .82. All within .04.
+- f34 W : H 1.339 (sheet 1.369).
+- Shares L / T / W: ours .627 / .204 / .170; sheet .638 / .192 / .170.
+
+**B3, the rear (rear_sheet):**
+
+- Shares L / T / W: ours .739 / .108 / .153; sheet .705 / .122 / .173. All within ±4 (+3.4 / −1.4 / −2.0).
+- Two tuft groups show: T3 (with T2 behind it) at screen left, f .14–.43, and T1 at screen right, f .65–.82,
+  h .46–.80.
+- Stem runs (sheet / ours):
+  - h .1: .30–.68 / .33–.41, .43–.62, .64–.72;
+  - h .2: .31–.62 / .40–.65;
+  - h .3: .33–.35, .58–.68 / .35–.40, .60–.67.
+- The flat LH / LI show as a low leafy skirt at h .1–.2 that the sheet's rear doesn't draw.
+
+**Other views** (sheet / ours):
+
+| View | Leaves | Fiber | Wood | Other |
+| --- | --- | --- | --- | --- |
+| front | .639 / .618 | .200 / .206 | .161 / .176 | W : H 1.321 / 1.347 |
+| side | .645 / .607 | .190 / .174 | .165 / .219 | leaves and wood about 5 out (m5) |
+| r34 | .763 / .748 | .113 / .094 | .124 / .159 | |
+| top_tilt | — | — | — | W : D 1.139 / 1.608 (m6, not fixed) |
+
+- **Hero colour** (f34): leaves #6B8E2D / #6B8E2D; wood #704D2F / #6C4A2C.
+- **Part fork:** #8C5F39 against #885E3D.
+- **Part leaf**, base → tip fifths: #547E3D #537E3C #5B853B #679139 #789E34. The base is the cool `leaf_base` key
+  (hue 99°), but it renders about 20 lighter than the close-up's #3E603A because the part shot lights the leaf face-up.
+
+### Technical (all re-measured after the final build)
+
+| Object | Tris | Size | Shells | Non-manifold edges / verts | Boundary | Inverted | Self-hits | Min angle | UV islands, overlaps, min gap |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FiberPlantNode | 1710 / 4000 | 4.89 × 3.64 × 3.48 | 1 | 0 / 0 | 0 | 0 | 0 | 5.06° | 356, 0, 0.016 |
+| FiberPlantStemFork | 278 / 1000 | 2.37 × 0.86 × 3.09 | 1 | 0 / 0 | 0 | 0 | 0 | 9.34° | 33, 0, 0.016 |
+| FiberPlantLeaf | 40 / 1000 | 2.03 × 0.89 × 0.99 | 1 | 0 / 0 | 0 | 0 | 0 | 9.95° | 3, 0, 0.016 |
+| FiberPlantTuft | 376 / 1000 | 1.91 × 1.89 × 1.91 | 1 | 0 / 0 | 0 | 0 | 0 | 5.03° | 81, 0, 0.016 |
+
+- **Size against the decision** (4.7 ± 0.25 × 3.9 ± 0.35 × 3.6 ± 0.2): W 4.89 ≤ 4.95, D 3.64 ≥ 3.55, H 3.48 ≥ 3.4.
+- **Other checks:**
+  - no wire or loose elements, no zero-area faces, no n-gons, no duplicate verts;
+  - normals outward;
+  - origin at the bottom centre; transforms applied; no modifiers;
+  - UV density 1.0, stretch p95 ≤ 1.024;
+  - `K.check` clean; `problems` empty; bowties fixed: 0.
+- **Union inverted-face check:** the ray-parity check flagged one false positive on intermediate layouts. Along the
+  normal the ray grazed an edge; 24 random rays said the face was outside. The final layout has 0.
+
+### Left for the verifier / known misses
+
+1. **Side view (m5).** It still reads sparse and lopsided from +X:
+   - the back half is low (top profile .21–.31 at f .85–1.0, against the sheet's .49–.88);
+   - the near-vertical crown blades look spiky there.
+   - Turning the leaves' faces toward ±X (tried) didn't change the side shares, and it pushed the rear leaf share
+     out of tolerance. Reverted.
+2. **top_tilt W : D** is 1.61, against 1.14 (m6). The tall pair and the steeper upper tier read wide from 65°.
+3. **The V notch** is h .73 in the f34, against .54 (m1). The front cell (.69) agrees with ours.
+4. **The part leaf's base** is cool but lighter than the close-up (it is lit face-up).
+5. **The flat back leaves LH / LI** show as a low skirt in the rear. They are needed for the decided depth.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not the round-1 verifier), 2026-10-28. Read-only background session on port 9882 with
+`wip/M022_verify.blend`; not saved, `build()` not called, session stopped. Fresh renders by `m022.render_views()` with
+`kit_models.MODEL_RENDERS` pointed at the scratchpad (`...\scratchpad\v2_022\renders\M022\`); the repo's render folder
+is untouched. Measured with `m022.measure()` and my own scripts (`v2_022\tech.py`, `tech3.py`, `parts.py`, `crops.py`;
+the side-by-side crops are `v2_022\cmp_*.png`).
+
+**Verdict: FAIL, 7/10 (round 3 limited to four lines of `LEAVES`).** The front half now matches the sheet: open
+flame crowns, the steep upper tier, and colours within a few levels. The back half still reads like a different plant.
+From the side, r34 and rear, the leaves are edge-on blades that fan like grass (pitfalls 1 and 2), and the rear's
+face-on centre leaf is missing. Both blockers are leaf-orientation numbers in `LEAVES`; nothing else needs touching.
+
+### Technical (all re-measured; all pass)
+
+| Object | Tris | Size (studs) | Shells | NM edges / bowtie verts | Boundary / wire / loose | n-gons / zero-area / dups | Self-hits | Inverted (ray parity) | Min angle | Volume |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FiberPlantNode | 1710 / 4000 | 4.889 × 3.636 × 3.485 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.06° | +2.77 |
+| FiberPlantStemFork | 278 / 1000 | 2.369 × 0.860 × 3.088 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 9.34° | +1.29 |
+| FiberPlantLeaf | 40 / 1000 | 2.031 × 0.893 × 0.988 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 9.95° | +0.20 |
+| FiberPlantTuft | 376 / 1000 | 1.913 × 1.889 × 1.913 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.03° | +0.22 |
+
+- **Size against the decision** (4.7 ± 0.25 × 3.9 ± 0.35 × 3.6 ± 0.2): W 4.889 ≤ 4.95, D 3.636 ≥ 3.55, H 3.485 ≥ 3.4. All
+  are inside, and D and W are near their limits.
+- **Origin and transforms:** the local bbox is symmetric in X and Y with min z 0.0000 on all four objects; rotation 0,
+  scale 1. There are no modifiers, no children, no custom normals and 0 smooth faces (flat).
+- **UV:** one `UVMap` each, in the range 0.008–0.992.
+  - Islands 356 / 33 / 3 / 81; 0 overlaps; 0 flipped; min gap 0.016; density 1.0.
+  - Conformal stretch p95 1.013 / 1.011 / 1.024 / 1.010; worst 1.081 (hero).
+- **Materials:** the hero has 20 slots, all used. Roughness: leaf 0.8 (specular 0.06), fiber 0.85, wood 0.9. Metal 0,
+  emission 0. `K.check` is empty. The KITSTAT lines are all `ok`.
+- **Tint:** a corner layer. On the hero it runs 0.930–1.059 with sd 0.022; the within-face range p95 is 0.003, so the
+  mottling is broad, with no confetti.
+- **No colouring by facing:** the hero's key luminance against the face normal is |r| ≤ 0.17 for every family
+  (leaf nz +0.12, fiber nz −0.17, wood nz −0.15).
+  - The fork part shows wood nx −0.42. `paint_wood` uses only position noise (a `wood_dark` patch that happens to fall
+    on one limb side), so this is not facing-based. It is noted only.
+- **VFX / lighting:** none, as decided (decision 7).
+
+### Round-1 blockers against their pass targets (sheet / ours, my measurements)
+
+- **B1, the tuft crowns: PASS.**
+  - f34 fiber median #F6C683 / #FEC685 (+8, 0, +2; target within 10).
+  - Shade quartile #D39E5D / #D6A46B (target ≥ #D09C5C).
+  - f34 fiber share .192 / .205.
+  - Part tuft W : H .948 / .950 (target 0.95–1.1).
+  - Part tuft base → tip fifths: sheet #D09D64 #E4B171 #F7C27F #FCD192 #FAE0A8; ours #D3995D #EDBA7A #FFC883
+    #FFD697 #FFE3AC (≤ 9 per channel except the tip's blue at +4).
+  - In `cmp_tufts_f34.png` the crowns are open flames of pale lances on collars, as on the sheet. They are a little
+    sparser (T1 shows about 6 tips against 8–9).
+  - The side crowns are still spiky (see S1).
+- **B2, the upper tier: PASS.**
+  - f34 top profile at f 0–.20: .73 .71 .68 .65 .63 against .75 .73 .70 .68 .63.
+  - At f .80–1.0: .79 .71 .67 .68 .68 against .75 .74 .63 .66 .69. The worst miss is .04.
+  - Width per height at h .3 / .6 / .7: .89 / .93 / .84 against .92 / .92 / .82.
+  - W : H 1.339 / 1.369.
+- **B3, the rear: numeric targets met, but it still reads unlike the sheet** (blocker S2).
+  - Shares (sheet / ours): L .705 / .739 (+3.4), T .122 / .108, W .173 / .153.
+  - Two tufts show, one on each shoulder.
+  - Stems show at h .1–.4.
+
+### View comparison (sheet / ours)
+
+| View | W : H | Leaves | Fiber | Wood | Reads |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet | 1.369 / 1.339 | .638 / .626 | .192 / .205 | .170 / .168 | matches: fan, open front, stems with gaps, three tufts |
+| front_sheet | 1.321 / 1.347 | .639 / .618 | .200 / .208 | .161 / .174 | matches |
+| side_sheet | 1.016 / 1.046 | .645 / .606 | .190 / .174 | .165 / **.221** | **unlike**: grass-like blades fan to the back, and the back half is low |
+| rear_sheet | 1.262 / **1.405** | .705 / .739 | .122 / .108 | .173 / .153 | **unlike**: an upside-down fan with a flat skirt; no face-on centre leaf |
+| r34_sheet | 1.188 / **1.302** | .763 / .748 | .113 / .094 | .124 / .159 | **unlike**: sparse and lopsided; 1 clear tuft against 3; edge-on leaves |
+| top_tilt | 1.139 / **1.608** | .778 / .704 | .170 / .149 | .052 / .147 | sparser than the sheet's 9-leaf star (sheet self-conflict §3.5; minor) |
+
+- **Side top profile** (f 0 → 1). Sheet: .22 .48 .69 .67 .64 .73 .67 .66 .87 1.0 .95 .89 .82 .68 .75 .79 .83 .88 .53
+  .51 .49. Ours: .23 .25 .48 .72 .66 .79 .63 .71 .78 .69 .92 1.0 .71 .59 .45 .48 .50 **.31 .31 .30 .21**.
+- **Rear width per height** at h .1 / .2 / .3: sheet .38 / .90 / .89; ours .40 / **.53** / **.68**. The rear is
+  narrow at the bottom and has no low tier.
+- **Why**, from the leaf frames (|n · camera| for the broad face, from `LEAVES` through `leaf_frame`):
+  - LH / LI (face mostly up, el 13): rear 0.09, r34 0.00–0.04, side 0.13–0.21. They are edge-on from every rear and
+    side camera, so they read as the "skirt" and the side's grass blades.
+  - LC / LD: side 0.02–0.06, edge-on from both sides, so they read as the side's thin tall blade.
+  - LG's front-face normal is (−0.15, 0.67, **−0.73**). Its broad face points down and back, so from the rear it is a
+    small, shadowed sliver rather than the sheet's big, bright, face-on centre leaf (f .33–.55, h .20–.61).
+
+### Colour (Δ = ours − sheet, R/G/B levels)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| f34 leaves median / lit / shade | #6B8E2D / #96B93A / #3F5D25 | #6B8E2D / #8EB435 / #48631F | 0,0,0 / −8,−5,−5 / +9,+6,−6 |
+| f34 leaf bands, ground → top | #53752A #719531 #5A7C2B #759A30 #8FB035 | #537A26 #63842B #6B8E2E #7CA12F #97B730 | 0,+5,−4 / −14,−17,−6 / +17,+18,+3 / +7,+7,−1 / +8,+7,−5 |
+| f34 fiber median / lit / shade | #F6C683 / #FDE1AB / #D39E5D | #FEC685 / #FFE5A1 / #D6A46B | +8,0,+2 / +2,+4,−10 / +3,+6,+14 |
+| f34 wood median / lit / shade | #704D2F / #966841 / #3D2C19 | #6C4A2C / #986A41 / #452E1B | −4,−3,−3 / +2,+2,0 / +8,+2,+2 |
+| front leaves / fiber / wood | #688B2D / #F4C380 / #755132 | #6B8E2D / #FEC686 / #6C492B | +3,+3,0 / +10,+3,+6 / −9,−8,−7 |
+| side leaves / fiber / wood | #6A8D2E / #F4C382 / #6E4C2F | #567526 / #F2C589 / #775436 | −20,−24,−8 / −2,+2,+7 / +9,+8,+7 |
+| rear leaves / fiber / wood | #678A2E / #F4C381 / #6E4C2F | #547324 / #EAB97F / #6E4C2F | −19,−23,−10 / −10,−10,−2 / 0,0,0 |
+| Part tuft median (close-up) | #EEBC7C | #FFCD8A | +17,+17,+14 (part shot lit brighter) |
+| Part leaf base → tip fifths | #446841 #527A45 #5E8940 #719B3F #88AD35 | #537E3C #537E3C #5B853C #679139 #789E34 | +15,+22,−5 at the base; −16,−15,−1 at the tip |
+| Part fork median | #865D3C (hue 27°) | #8C5F39 (hue 28°) | +6,+2,−3 |
+
+- The front and f34 families are within 10 on every median.
+- The side and rear leaves are about 20 dark. This is the studio fill on every model (M017's rule): reported, not
+  fitted. The edge-on leaves make it worse, because their lit faces don't reach the camera.
+- **Blending:** the leaves go cool-dark to lime along each leaf, and the blades orange-tan to cream. The stems are
+  mottled with no hard patches. The blending is position-based, as the code shows.
+
+### Deviations by the round-2 modeller
+
+- **The tuft rebuild is accepted:** set world azimuths, `FRONT_LEAN` 30°, `BLADE_ROLL` 70°, `TUFT_DEPTH` 0.95,
+  `FACE_TURN` 0.2. It met every B1 target.
+- **LE el 35 instead of 38: accepted.** The measured h .7 width supports it.
+- **LG 1.5 × 1.0 at el 42: rejected (S2).** At that elevation, with face (0, 1, 0.35), the broad face points down.
+- **LH / LI laid flat (el 13, face up) to hold D: rejected (S1, S2).** It holds the depth but creates the skirt and the
+  side's grass blades. Depth can be held with steeper, longer leaves instead (fix below).
+- **Turning leaves toward ±X:** the modeller judged it by the side shares, which don't measure edge-on-ness. The
+  check that matters is the broad-face dot product above.
+
+### Findings
+
+**Blockers** (round 3: edit `LEAVES` only; no tuft, stem, colour or union changes):
+
+- **S1. Side and r34: the leaves read as edge-on grass blades, and the back half is low.**
+  - **Fix:**
+    - LH: `((-0.2, 0.4, 0.4), "S4", 125, 28, 2.6, 0.95, (-1, 0.4, 0.8), …)`.
+    - LI: `((0.2, 0.4, 0.4), "S4", 55, 28, 2.6, 0.95, (1, 0.4, 0.8), …)`. This raises the broad-face dot for LH / LI
+      to side about 0.55–0.68, r34 up to 0.80 and rear 0.61. Their tips land at about (∓1.5, 2.28, 1.6): y as now, so
+      D stays about 3.6, and they give the side's back-half profile at h about .45.
+    - LC face (0, −1, 0.25) → (−0.45, −1, 0.25); LD → (0.45, −1, 0.25). Side dot rises from 0.02–0.06 to 0.33; front
+      dot 1.00 → 0.93, so the front barely changes.
+  - **Acceptance:**
+    - side_sheet top profile ≥ .40 at f .85–1.0;
+    - no blade-thin leaf in side_sheet or r34_sheet;
+    - r34 shows broad low back leaves.
+- **S2. Rear: no face-on rounded centre leaf; the base is a flat skirt.**
+  - **Fix:** LG `((0.05, 0.45, 0.75), "S4", 90, 75, 1.5, 1.05, (0, 1, 0), …)`. The face normal becomes (0, 0.97,
+    −0.26): rear dot 0.91, r34 0.78. The tip is at z 2.2, so it spans h about .21–.63, as on the sheet (.20–.61). The
+    skirt goes away with S1's LH / LI.
+  - **Acceptance (rear_sheet):**
+    - a bright face-on centre leaf at f about .33–.55;
+    - width at h .3 ≥ .80;
+    - shares within ±5 (L may rise);
+    - two tufts and the stems at h .1–.4 still visible.
+- **For both:**
+  - re-run `measure()` and confirm that f34 / front are unchanged within ±.02 on shares and profile;
+  - keep W ≤ 4.95, D ≥ 3.55 and H ≥ 3.4;
+  - keep every union clean with 0 bowtie verts.
+  - If D falls under 3.55, lengthen LH / LI by 0.1 rather than flattening them.
+
+**Minors** (note at commit; don't block):
+
+- **m1. V notch** f34 h .73 against .54. The sheet's front cell (.69) agrees with ours.
+- **m2. Stems.**
+  - The f34 width at h .1 is .70 against .58: the foot pad and the SL / SR stubs.
+  - The stub ends show as flat sawn log ends from the rear34 and underside.
+  - S4 reads as a dark, square-ended post between S1 and S2 (`cmp_stems_f34.png`).
+- **m3. Crowns slightly sparse:** about 6 tips on T1 against 8–9. The shaded inner blades go brown-grey in the part
+  shot (the part's wood share is .141 against .055, from dark blade backs). Small grainy speckle in the shaded blades
+  is render noise, not the mesh.
+- **m4. r34 tuft count** 1–2 against 3. LD / LE cover T2 / T3 from behind; S1 / S2 may partly help.
+- **m5. top_tilt** W : D 1.61 against 1.14, and sparser than the 9-leaf star (§3.5 conflict). S1's steeper LH / LI
+  help a little.
+- **m6. Part leaf** base fifth #537E3C against #446841 (+15, +22): lit face-up, as the modeller noted.
+- **m7. Part tuft** renders 17 lighter than the close-up (lighting of the part shot); the hero crowns are on target.
+- **m8. Size** near the limits (W 4.889, D 3.636). Keep it in range after S1 / S2.
+
+**Passes:**
+- budget, topology, bowties, UVs, origin and transforms, and materials;
+- no facing colour, and broad Tint;
+- the hero / front silhouette, upper tier and open front;
+- the open flame crowns on collars;
+- the hero colour families within 10;
+- the leaf and blade gradients;
+- three parts (fork Y plus side branch, lens leaf, tuft with peg);
+- no VFX, as decided.
+
+## Main session after verification round 2 (2026-10-28)
+
+Applied the verifier's S1/S2 LEAVES rows exactly (LC / LD faces (∓0.45, −1, 0.25); LG az 90 el 75 L 1.5 W 1.05 face (0, 1, 0); LH / LI az 125 / 55 el 28 L 2.6 W 0.95 faces (∓1, 0.4, 0.8)). The rebuild in the kit file gave a hero of 1708 tris, 4.889 × 3.574 × 3.485 (inside the decided limits), one shell, 0 non-manifold verts, `problems` empty. `measure()`: f34 and front unchanged (leaves #6B8E2D exact); side L/T/W .640/.159/.201 against .645/.190/.165; rear .799/.104/.097 against .705/.122/.173. The rear wood share fell because the face-on LG and the steeper back pair now hide the stems. Visually the side and rear read as broad leaves rather than grass, so this was committed with the rear shares recorded as a minor.
