@@ -1,0 +1,687 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M018",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m018_bud",
+    "hex": "#E0C696",
+    "levels": [
+     0.98386,
+     0.98571,
+     0.98821,
+     0.99086,
+     0.9934,
+     0.99746,
+     0.99981,
+     1.00434,
+     1.01246,
+     1.01515,
+     1.01647,
+     1.02157
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_bud_base",
+    "hex": "#E0C591",
+    "levels": [
+     0.98831,
+     0.99022,
+     1.00172,
+     1.00286,
+     1.0083,
+     1.0127,
+     1.0157
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_bud_tip",
+    "hex": "#D8C6A9",
+    "levels": [
+     0.98434,
+     0.98676,
+     0.9882,
+     0.99024,
+     0.99279,
+     0.99706,
+     1.01042,
+     1.01388,
+     1.01683,
+     1.01927,
+     1.02175
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_bud_x_base_25",
+    "hex": "#E0C695",
+    "levels": [
+     0.98641,
+     0.98988,
+     0.99288,
+     0.99511,
+     1.00082,
+     1.00819,
+     1.01059,
+     1.0176,
+     1.01965
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_bud_x_tip_50",
+    "hex": "#DCC6A0",
+    "levels": [
+     0.98496,
+     0.9897,
+     0.99116,
+     0.99519,
+     0.99768,
+     1.00661,
+     1.01485,
+     1.02022
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf",
+    "hex": "#5A8044",
+    "levels": [
+     0.93696,
+     0.94967,
+     0.95308,
+     0.95509,
+     0.95814,
+     0.96486,
+     0.96987,
+     0.98032,
+     0.98339,
+     0.99304,
+     1.00041,
+     1.0096,
+     1.01314,
+     1.01681,
+     1.02052,
+     1.02336,
+     1.03731,
+     1.0418
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_base",
+    "hex": "#3A5A2E",
+    "levels": [
+     0.76275,
+     0.78321,
+     0.78922,
+     0.798,
+     0.79904,
+     0.80595,
+     0.81189,
+     0.81289,
+     0.81315,
+     0.81672,
+     0.81989,
+     0.82416,
+     0.82762,
+     0.82822,
+     0.83501,
+     0.8406,
+     0.84515,
+     0.84954,
+     0.85254,
+     0.86159,
+     0.86794,
+     0.88076,
+     0.89884,
+     0.95896,
+     0.9631,
+     0.96689,
+     0.96689,
+     0.97041,
+     1.02136,
+     1.02927,
+     1.0342,
+     1.03709
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_tip",
+    "hex": "#7A9C48",
+    "levels": [
+     0.95594,
+     0.95946,
+     0.96613,
+     0.96901,
+     0.97796,
+     0.98126,
+     0.98336,
+     0.98518,
+     0.98804,
+     0.9913,
+     0.99762,
+     1.00057,
+     1.00391,
+     1.0069,
+     1.01504,
+     1.01791,
+     1.02298
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_base_25",
+    "hex": "#52763E",
+    "levels": [
+     0.91992,
+     0.92979,
+     0.93312,
+     0.93867,
+     0.94252,
+     0.95009,
+     0.95133,
+     0.95514,
+     0.96404,
+     0.9687,
+     0.97449,
+     0.97962,
+     0.98254,
+     0.99048,
+     0.99354,
+     0.99638,
+     1.00183,
+     1.00791,
+     1.01063,
+     1.01418,
+     1.01677,
+     1.0193,
+     1.0227,
+     1.02826,
+     1.03532,
+     1.03743,
+     1.04072,
+     1.04549
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_base_50",
+    "hex": "#4A6D39",
+    "levels": [
+     0.86048,
+     0.86437,
+     0.86785,
+     0.87038,
+     0.87524,
+     0.87847,
+     0.88162,
+     0.88374,
+     0.88921,
+     0.89517,
+     0.90128,
+     0.90404,
+     0.90666,
+     0.91128,
+     0.91382,
+     0.91984,
+     0.92408,
+     0.92867,
+     0.93098,
+     0.93645,
+     0.94351,
+     0.94616,
+     0.94935,
+     0.95914,
+     0.9601,
+     0.96422,
+     0.96792,
+     1.01547,
+     1.02447,
+     1.03555,
+     1.0379,
+     1.04064
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_base_75",
+    "hex": "#426434",
+    "levels": [
+     0.80558,
+     0.81017,
+     0.8137,
+     0.81593,
+     0.82488,
+     0.8394,
+     0.84175,
+     0.84719,
+     0.84982,
+     0.85381,
+     0.85971,
+     0.87475,
+     0.93756,
+     0.93943,
+     0.95856,
+     0.96637,
+     1.00808,
+     1.01229,
+     1.02318,
+     1.02582,
+     1.02943
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_tip_25",
+    "hex": "#628745",
+    "levels": [
+     0.94764,
+     0.9791,
+     0.98176,
+     0.98391,
+     0.99085,
+     0.99384,
+     0.99844,
+     1.00049,
+     1.00344,
+     1.01246,
+     1.01601,
+     1.0185,
+     1.03993,
+     1.04604
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_tip_50",
+    "hex": "#6A8E46",
+    "levels": [
+     0.95828,
+     0.96162,
+     0.97148,
+     0.97382,
+     0.97807,
+     0.98089,
+     0.98336,
+     0.98805,
+     0.99285,
+     0.99883,
+     1.00304,
+     1.01264,
+     1.0185,
+     1.03412,
+     1.03946,
+     1.04753
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_leaf_x_tip_75",
+    "hex": "#729547",
+    "levels": [
+     0.95143,
+     0.95485,
+     0.95894,
+     0.96231,
+     0.96755,
+     0.97207,
+     0.97795,
+     0.98169,
+     0.98556,
+     0.9881,
+     0.99059,
+     0.99313,
+     0.9946,
+     0.99727,
+     1.00096,
+     1.00575,
+     1.01395,
+     1.01664,
+     1.02013,
+     1.02301,
+     1.04788
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug",
+    "hex": "#806A58",
+    "levels": [
+     1.0145,
+     1.0167,
+     1.01887,
+     1.02101,
+     1.02313,
+     1.02496,
+     1.02698,
+     1.02892
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug_crown",
+    "hex": "#715B47",
+    "levels": [
+     1.01528,
+     1.01746,
+     1.02051,
+     1.02448,
+     1.02661
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug_crown_x_plug_shade_75",
+    "hex": "#483829",
+    "levels": [
+     1.01446,
+     1.01789,
+     1.02024,
+     1.02403,
+     1.02644,
+     1.02936
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug_shade",
+    "hex": "#3A2D1F",
+    "levels": [
+     0.90463,
+     0.96784,
+     1.01824,
+     1.01937,
+     1.02153,
+     1.02319,
+     1.02571,
+     1.02827,
+     1.02993
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug_x_crown_25",
+    "hex": "#7C6654",
+    "levels": [
+     1.01776,
+     1.02059
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_plug_x_crown_50",
+    "hex": "#786250",
+    "levels": [
+     0.95,
+     1.01814,
+     1.02002,
+     1.02292
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_stem",
+    "hex": "#57793B",
+    "levels": [
+     0.97539,
+     0.97898,
+     0.98314,
+     0.98551,
+     0.98848,
+     0.99089,
+     0.99698,
+     0.99916,
+     1.00213,
+     1.01725,
+     1.02022,
+     1.02249,
+     1.02421
+    ],
+    "used": true
+   },
+   {
+    "key": "m018_stem_x_leaf_base_35",
+    "hex": "#4D6E36",
+    "levels": [
+     0.97762,
+     0.97958,
+     0.98299,
+     0.98441,
+     0.98729
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "HerbShrubBud",
+   "sheet": "M018",
+   "subject": "Healing Herb",
+   "role": "part",
+   "size": [
+    0.5074,
+    0.68,
+    0.5216
+   ],
+   "tris": 30,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HerbShrubBud.glb",
+     "kind": "solid",
+     "tris": 30,
+     "offset": [
+      0.0,
+      0.34,
+      0.0
+     ],
+     "size": [
+      0.5074,
+      0.68,
+      0.5216
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Flower Bud (reusable): a cream faceted closed bud, five-facet apex, two bands, short bottom cone"
+  },
+  {
+   "name": "HerbShrubLeaf",
+   "sheet": "M018",
+   "subject": "Healing Herb",
+   "role": "part",
+   "size": [
+    1.552,
+    0.2778,
+    0.7575
+   ],
+   "tris": 32,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HerbShrubLeaf.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.1389,
+      0.0
+     ],
+     "size": [
+      1.552,
+      0.2778,
+      0.7575
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf (reusable): a chunky pointed leaf, kite outline, pyramid top with a ridge to the tip, keel"
+  },
+  {
+   "name": "HerbShrubNode",
+   "sheet": "M018",
+   "subject": "Healing Herb",
+   "role": "hero",
+   "size": [
+    2.9528,
+    2.2,
+    2.6106
+   ],
+   "tris": 840,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HerbShrubNode.glb",
+     "kind": "solid",
+     "tris": 840,
+     "offset": [
+      0.0,
+      1.1,
+      0.0
+     ],
+     "size": [
+      2.9528,
+      2.2,
+      2.6106
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "healing herb forage node (HerbShrub): a low rosette of seven chunky faceted leaves round a squat brown root plug, two upright inner leaves, two six-sided green stems with cream faceted closed buds; one closed mesh, flat base"
+  },
+  {
+   "name": "HerbShrubRootPlug",
+   "sheet": "M018",
+   "subject": "Healing Herb",
+   "role": "part",
+   "size": [
+    0.838,
+    0.7697,
+    0.8553
+   ],
+   "tris": 80,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HerbShrubRootPlug.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.3849,
+      0.0
+     ],
+     "size": [
+      0.838,
+      0.7697,
+      0.8553
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Plug (reusable): a squat faceted brown ball with a flattened top"
+  },
+  {
+   "name": "HerbShrubStem",
+   "sheet": "M018",
+   "subject": "Healing Herb",
+   "role": "part",
+   "size": [
+    0.147,
+    0.75,
+    0.1589
+   ],
+   "tris": 32,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/HerbShrubStem.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.375,
+      0.0
+     ],
+     "size": [
+      0.147,
+      0.75,
+      0.1589
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stem (reusable): a straight six-sided green prism with flat ends"
+  }
+ ],
+ "stats": {
+  "assets": 5,
+  "pieces": 5,
+  "solid": 5,
+  "water": 0,
+  "glow": 0,
+  "tris": 1014,
+  "vfxSockets": 0,
+  "paletteColours": 22,
+  "paletteLevels": 298,
+  "meshBytes": 105096
+ },
+ "problems": []
+}
