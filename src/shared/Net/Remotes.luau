@@ -12,6 +12,8 @@ local Remotes = {}
 local FOLDER_NAME = "FlintbornRemotes"
 
 local DEFINITIONS = {
+	-- Diagnostics
+	ReportUiImages = "RemoteEvent", -- client -> server: (summary, lines) how HUD images are loading
 	-- Lobby
 	PartyAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	PartyChanged = "RemoteEvent", -- server -> client: party snapshot

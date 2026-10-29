@@ -75,6 +75,8 @@ SpriteLoader.Assign(mine, "rbxassetid://7")
 mine.Image = "rbxassetid://8"
 SpriteLoader._tick()
 check(mine.Image == "rbxassetid://8", "an image set elsewhere is kept")
+local counts, _, lines = SpriteLoader.Summary(5)
+check(counts.labels >= 16 and #lines <= 5, "the diagnostics summary counts labels and caps its lines")
 print(__failed and "FLOW FAILED" or "FLOW OK")
 -- The capture tool expects a picture; this one only proves the queue.
 __dump(shownGui, 64, 64)

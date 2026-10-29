@@ -5,10 +5,10 @@
 -- HUD images (Widgets.Sprite) go through Assign: an ImageLabel starts empty and
 -- gets its image from a paced queue, a few per tick, those on screen first and
 -- the hidden menus' art after, so the client never asks for every image at
--- once. A watchdog then checks each image on screen by what the label itself
--- reports (IsLoaded; ContentProvider's statuses can say a fetch failed when the
--- widget loads fine) and asks again, with a growing, jittered delay and no
--- giving up, until it shows. Track watches a label whose image was set
+-- once. A watchdog then checks each image on screen that has not shown
+-- (IsLoaded) and asks again only when its fetch has ended without it (a fetch
+-- still running is left alone: asking again would start it over), with a
+-- growing, jittered delay and no giving up. Track watches a label whose image was set
 -- elsewhere (a headshot) the same way.
 --
 -- Character textures (CharacterLookController) use TrackProperty: new ones are
@@ -202,6 +202,15 @@ local function shown(label: GuiObject): boolean
 	return true
 end
 
+-- The engine's fetch state for an image ("Loading", "Success", "Failure",
+-- "TimedOut", "None"), or "Unknown".
+local function fetchStatus(id: string): string
+	local ok, status = pcall(function()
+		return ContentProvider:GetAssetFetchStatus(id)
+	end)
+	return if ok and typeof(status) == "EnumItem" then status.Name else "Unknown"
+end
+
 local function waitFor(tries: number): number
 	local base = math.min(SpriteLoader.FIRST_WAIT * 2 ^ tries, SpriteLoader.MAX_WAIT)
 	return base * (0.75 + math.random() * 0.5)
@@ -255,10 +264,16 @@ local function tick(sweepNow: boolean?): boolean
 				if label.IsLoaded then
 					entry.due = math.huge
 				elseif shown(label) then
-					reassign(label, "Image", entry.id)
-					entry.tries += 1
-					entry.due = time + waitFor(entry.tries)
-					retries -= 1
+					local status = fetchStatus(entry.id)
+					if status == "Loading" or status == "None" then
+						-- Still on its way (slow phone networks take a while).
+						entry.due = time + SpriteLoader.FIRST_WAIT
+					else
+						reassign(label, "Image", entry.id)
+						entry.tries += 1
+						entry.due = time + waitFor(entry.tries)
+						retries -= 1
+					end
 				end
 			end
 		end
@@ -279,6 +294,53 @@ local function pump()
 			task.wait(if waiting then SpriteLoader.TICK else SpriteLoader.SWEEP)
 		end
 	end)
+end
+
+-- A summary of the HUD images on this client for diagnostics: counts, the
+-- engine's fetch state per image id, and up to `limit` lines for ids that have
+-- not shown ("<id> <status> loaded=<n>/<labels> shown=<n> tries=<n>").
+function SpriteLoader.Summary(limit: number)
+	local ids = {}
+	local counts = { labels = 0, pending = 0, loaded = 0 }
+	for label, entry in labels do
+		counts.labels += 1
+		local row = ids[entry.id]
+		if row == nil then
+			row = { labels = 0, loaded = 0, shown = 0, tries = 0, pending = 0 }
+			ids[entry.id] = row
+		end
+		row.labels += 1
+		row.tries = math.max(row.tries, entry.tries)
+		if entry.pending then
+			counts.pending += 1
+			row.pending += 1
+		elseif label.IsLoaded then
+			counts.loaded += 1
+			row.loaded += 1
+		end
+		if shown(label) then
+			row.shown += 1
+		end
+	end
+	local statuses, lines = {}, {}
+	for id, row in ids do
+		local status = if row.pending == row.labels then "Queued" else fetchStatus(id)
+		statuses[status] = (statuses[status] or 0) + 1
+		if row.loaded < row.labels - row.pending and #lines < limit then
+			table.insert(
+				lines,
+				("%s %s loaded=%d/%d shown=%d tries=%d"):format(
+					id,
+					status,
+					row.loaded,
+					row.labels,
+					row.shown,
+					row.tries
+				)
+			)
+		end
+	end
+	return counts, statuses, lines
 end
 
 -- For the capture harness's loader scene: one tick, and the label table.
