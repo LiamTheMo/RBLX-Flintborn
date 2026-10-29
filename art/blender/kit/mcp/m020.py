@@ -1213,6 +1213,7 @@ def _make(name, fn, role, budget):
         lg["clean"] = _clean_mesh(o, (0.0,) if (name in GROUND_PARTS or role == "hero") else ())
     lg["finish"] = {k: v for k, v in _finish(o).items() if k in ("tris", "nonmanifold_edges", "boundary_edges")}
     lg["polish"] = _polish(o)
+    lg["bowties"] = M.fix_bowties(o)      # leaf hubs left pinch verts (9 on the hero, 2 on the clump part)
     if name in GROUND_PARTS or role == "hero":
         lg["ground_faces"] = _ground_faces(o)
     if name == "ChoppedHardwoodStumpBody" or role == "hero":
@@ -1238,7 +1239,7 @@ def build(render=True, parts=True):
     for o in order:     # M.mk stamps "studs" before the floor cut and polish: refresh it from the final mesh (round 2)
         d = o.dimensions
         o["studs"] = f"{d.x:.1f} x {d.y:.1f} x {d.z:.1f}"
-    out = {"audit": [{k: M.audit(o)[k] for k in ("name", "tris", "size", "shells", "nonmanifold_edges",
+    out = {"audit": [{k: M.audit(o)[k] for k in ("name", "tris", "size", "shells", "nonmanifold_edges", "nonmanifold_verts",
                                                      "boundary_edges", "wire_edges", "loose_verts", "zero_area_faces",
                                                      "normals", "ngons", "dup_verts")}
                      for o in order],
