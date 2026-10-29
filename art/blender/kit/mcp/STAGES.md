@@ -57,7 +57,7 @@ session (the GUI or a background one) is driven by only one agent at a time.
   - K: `hull_rock`, `blend`, `mix_key`, `noise_field`, `texture`, `refine`, `set_colour`, `calibrate`, `socket`, `check`.
 - **Check every step through the MCP.** Never assume a script worked. Read back the counts, sizes and materials.
 - **Bowtie vertices.** `M.audit()` reports `nonmanifold_verts`: two closed face fans meeting at one vertex, which edge checks miss. It must be 0 on every object. `M.fix_bowties(o)` repairs them (019, 020 and 021 had them at leaf hubs).
-- **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps.
+- **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps. Run unions with the object at the origin, not at its display slot (x ≈ 500+): float32 matrix error there gave 030 hundreds of self-intersections. `M.union_loose` welds within 0.01, so use a merge-0 union for fine parts (`m021._union_fine`).
 - **Look at the renders.** `build()` writes `art/blender/renders/models/MNNN/` (single views plus `MNNN_views.png`). Open them with the Read tool and compare them with the reference, view by view.
 - **No commits, pushes or exports.** The main session does those.
 - **Scope.** Don't touch other models' collections or objects, and don't save over another sheet's names (`M.mk` guards this).
