@@ -28,8 +28,50 @@ SAMPLE = ["button_add_friend", "frame_slot", "pm_panel", "pm_lobby_enter", "pm_f
 
 PROBE = """
 local AssetService = game:GetService("AssetService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local lines = { ("place %d universe %d creator %s %d"):format(game.PlaceId, game.GameId,
 	tostring(game.CreatorType), game.CreatorId) }
+-- What the game's own code will see here: the place role, the asset ids and
+-- sprite data it loads, and the client modules that draw the UI.
+local function try(label, fn)
+	local ok, result = pcall(fn)
+	table.insert(lines, label .. ": " .. (if ok then tostring(result) else "ERROR " .. tostring(result)))
+end
+local Shared = ReplicatedStorage:FindFirstChild("Shared")
+try("place role", function()
+	return require(Shared.Config.PlaceConfig).Role()
+end)
+try("generated place ids", function()
+	local ids = require(Shared.Generated.PlaceIds)
+	return ("lobby %s world %s"):format(tostring(ids.lobby), tostring(ids.world))
+end)
+try("ui assets", function()
+	local UiAssets = require(Shared.UI.UiAssets)
+	local count = 0
+	for _ in UiAssets.Ids do
+		count += 1
+	end
+	local window = UiAssets.sprite("pm_window_settings")
+	return ("%d ids; pm_panel %s; pm_hud_slot %s; settings window tiles %s"):format(count,
+		tostring(UiAssets.image("pm_panel")), tostring(UiAssets.image("pm_hud_slot")),
+		tostring(window and window.tiles and #window.tiles))
+end)
+try("hud layout lobby section", function()
+	return tostring(require(Shared.UI.HudLayout).lobby ~= nil)
+end)
+try("client modules", function()
+	local client = game:GetService("StarterPlayer").StarterPlayerScripts:FindFirstChild("Client")
+	local found = {}
+	for _, path in { "Hud/LobbyHud", "Hud/Parchment", "Hud/Widgets", "Hud/SpriteLoader", "Hud/ListWindow",
+		"Controllers/LobbyHudController", "Controllers/HudController" } do
+		local node = client
+		for part in string.gmatch(path, "[^/]+") do
+			node = node and node:FindFirstChild(part)
+		end
+		table.insert(found, path .. "=" .. (if node then tostring(#node.Source) else "MISSING"))
+	end
+	return table.concat(found, " ")
+end)
 for _, entry in ENTRIES do
 	local ok, result = pcall(function()
 		local image = AssetService:CreateEditableImageAsync(Content.fromAssetId(entry[2]))
