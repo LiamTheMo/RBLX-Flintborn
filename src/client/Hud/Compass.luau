@@ -46,7 +46,8 @@ function Compass.new(parent: Instance, layout)
 		ClipsDescendants = true,
 		Position = Layout.Position(cfg.track),
 		Size = Layout.Size(cfg.track),
-		ZIndex = 2,
+		-- Above the strip's art (an opaque parchment strip on the parchment HUD).
+		ZIndex = 4,
 	}, self.root)
 	self.centre = cfg.track[3] / 2
 	self.pixelsPerDegree = self.centre / cfg.halfSpan
@@ -55,7 +56,7 @@ function Compass.new(parent: Instance, layout)
 		local notch = Widgets.Make("Frame", {
 			Name = "Notch" .. index,
 			AnchorPoint = Vector2.new(0.5, 0),
-			BackgroundColor3 = Layout.Color("body"),
+			BackgroundColor3 = Layout.Color(cfg.notchColor or "body"),
 			BackgroundTransparency = 0.3,
 			BorderSizePixel = 0,
 			Size = UDim2.fromOffset(2, cfg.minorTick.h),
@@ -70,12 +71,15 @@ function Compass.new(parent: Instance, layout)
 		}, self.track)
 		self.marks[index] = { notch = notch, letter = letter }
 	end
-	Widgets.Sprite(cfg.marker.sprite, {
+	local marker = Widgets.Sprite(cfg.marker.sprite, {
 		Name = "Marker",
 		Position = Layout.Position(cfg.marker.rect),
 		Size = Layout.Size(cfg.marker.rect),
 		ZIndex = 6,
 	}, self.root)
+	if cfg.marker.tint and marker:IsA("ImageLabel") then
+		marker.ImageColor3 = Layout.Color(cfg.marker.tint)
+	end
 	self.waypointRow = Widgets.Make("Frame", {
 		Name = "Waypoints",
 		BackgroundTransparency = 1,

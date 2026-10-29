@@ -714,15 +714,70 @@
     ],
     "w": 194
   },
+  "pm_arrow_left": {
+    "h": 74,
+    "slice": null,
+    "w": 86
+  },
+  "pm_arrow_right": {
+    "h": 75,
+    "slice": null,
+    "w": 86
+  },
+  "pm_banner": {
+    "h": 92,
+    "slice": [
+      64,
+      30,
+      64,
+      30
+    ],
+    "w": 948
+  },
+  "pm_button_action": {
+    "h": 85,
+    "slice": [
+      40,
+      26,
+      40,
+      26
+    ],
+    "w": 227
+  },
   "pm_button_add_friend": {
     "h": 52,
     "slice": null,
     "w": 68
   },
+  "pm_button_apply": {
+    "h": 89,
+    "slice": null,
+    "w": 276
+  },
   "pm_button_check": {
     "h": 150,
     "slice": null,
     "w": 155
+  },
+  "pm_button_claim": {
+    "h": 82,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ],
+    "w": 391
+  },
+  "pm_button_craft": {
+    "h": 94,
+    "slice": [
+      70,
+      26,
+      70,
+      26
+    ],
+    "w": 282
   },
   "pm_button_leather": {
     "h": 140,
@@ -764,6 +819,16 @@
     ],
     "w": 404
   },
+  "pm_button_paper": {
+    "h": 64,
+    "slice": [
+      22,
+      18,
+      22,
+      18
+    ],
+    "w": 129
+  },
   "pm_button_parchment": {
     "h": 159,
     "slice": [
@@ -804,10 +869,130 @@
     ],
     "w": 385
   },
+  "pm_button_reset": {
+    "h": 77,
+    "slice": null,
+    "w": 212
+  },
+  "pm_button_square": {
+    "h": 93,
+    "slice": [
+      26,
+      26,
+      26,
+      26
+    ],
+    "w": 116
+  },
+  "pm_button_strip": {
+    "h": 80,
+    "slice": [
+      64,
+      26,
+      64,
+      26
+    ],
+    "w": 357
+  },
   "pm_button_x": {
     "h": 150,
     "slice": null,
     "w": 155
+  },
+  "pm_button_x_leather": {
+    "h": 53,
+    "slice": null,
+    "w": 55
+  },
+  "pm_button_zoom_in": {
+    "h": 62,
+    "slice": null,
+    "w": 62
+  },
+  "pm_button_zoom_out": {
+    "h": 63,
+    "slice": null,
+    "w": 62
+  },
+  "pm_card": {
+    "h": 148,
+    "slice": [
+      56,
+      48,
+      40,
+      40
+    ],
+    "w": 314
+  },
+  "pm_cat_all": {
+    "h": 83,
+    "slice": null,
+    "w": 74
+  },
+  "pm_cat_food": {
+    "h": 73,
+    "slice": null,
+    "w": 79
+  },
+  "pm_cat_materials": {
+    "h": 68,
+    "slice": null,
+    "w": 78
+  },
+  "pm_cat_tools": {
+    "h": 85,
+    "slice": null,
+    "w": 84
+  },
+  "pm_check_green": {
+    "h": 32,
+    "slice": null,
+    "w": 32
+  },
+  "pm_check_off": {
+    "h": 61,
+    "slice": null,
+    "w": 58
+  },
+  "pm_check_on": {
+    "h": 71,
+    "slice": null,
+    "w": 70
+  },
+  "pm_compass_rose": {
+    "h": 117,
+    "slice": null,
+    "w": 93
+  },
+  "pm_ctab": {
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ],
+    "w": 82
+  },
+  "pm_ctab_selected": {
+    "h": 64,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ],
+    "w": 83
+  },
+  "pm_dropdown": {
+    "h": 73,
+    "slice": [
+      30,
+      26,
+      72,
+      26
+    ],
+    "w": 239
   },
   "pm_fill_xp": {
     "h": 14,
@@ -819,15 +1004,255 @@
     ],
     "w": 176
   },
+  "pm_frame_hollow": {
+    "h": 333,
+    "slice": [
+      96,
+      112,
+      96,
+      122
+    ],
+    "w": 774
+  },
+  "pm_frame_window": {
+    "h": 380,
+    "slice": [
+      96,
+      112,
+      96,
+      122
+    ],
+    "w": 743
+  },
+  "pm_glyph_armor": {
+    "h": 37,
+    "slice": null,
+    "w": 39
+  },
+  "pm_glyph_bag": {
+    "h": 37,
+    "slice": null,
+    "w": 32
+  },
+  "pm_glyph_bench": {
+    "h": 35,
+    "slice": null,
+    "w": 41
+  },
+  "pm_glyph_diamond": {
+    "h": 27,
+    "slice": null,
+    "w": 24
+  },
+  "pm_glyph_gamepad": {
+    "h": 42,
+    "slice": null,
+    "w": 58
+  },
+  "pm_glyph_gear": {
+    "h": 54,
+    "slice": null,
+    "w": 53
+  },
+  "pm_glyph_hammer": {
+    "h": 32,
+    "slice": null,
+    "w": 27
+  },
+  "pm_glyph_heart": {
+    "h": 135,
+    "slice": null,
+    "w": 160
+  },
+  "pm_glyph_monitor": {
+    "h": 51,
+    "slice": null,
+    "w": 54
+  },
+  "pm_glyph_mountain": {
+    "h": 27,
+    "slice": null,
+    "w": 44
+  },
+  "pm_glyph_person": {
+    "h": 60,
+    "slice": null,
+    "w": 50
+  },
+  "pm_glyph_sound": {
+    "h": 47,
+    "slice": null,
+    "w": 55
+  },
+  "pm_glyph_sword": {
+    "h": 31,
+    "slice": null,
+    "w": 27
+  },
+  "pm_glyph_tent": {
+    "h": 35,
+    "slice": null,
+    "w": 40
+  },
+  "pm_glyph_tools": {
+    "h": 39,
+    "slice": null,
+    "w": 40
+  },
+  "pm_glyph_weight": {
+    "h": 32,
+    "slice": null,
+    "w": 23
+  },
+  "pm_hud_card": {
+    "h": 216,
+    "slice": [
+      82,
+      50,
+      36,
+      46
+    ],
+    "w": 296
+  },
+  "pm_hud_compass": {
+    "h": 44,
+    "slice": [
+      36,
+      16,
+      36,
+      16
+    ],
+    "w": 485
+  },
+  "pm_hud_food": {
+    "h": 58,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_health": {
+    "h": 57,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_slot": {
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "w": 127
+  },
+  "pm_hud_slot_selected": {
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "w": 127
+  },
+  "pm_hud_stamina": {
+    "h": 57,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_xp": {
+    "h": 44,
+    "slice": null,
+    "w": 519
+  },
   "pm_icon_add_friend": {
     "h": 143,
     "slice": null,
     "w": 179
   },
+  "pm_icon_bolt": {
+    "h": 160,
+    "slice": null,
+    "w": 130
+  },
+  "pm_icon_chest": {
+    "h": 170,
+    "slice": null,
+    "w": 214
+  },
+  "pm_icon_coin": {
+    "h": 166,
+    "slice": null,
+    "w": 176
+  },
   "pm_icon_crown": {
     "h": 131,
     "slice": null,
     "w": 168
+  },
+  "pm_icon_gem": {
+    "h": 168,
+    "slice": null,
+    "w": 128
+  },
+  "pm_icon_scroll": {
+    "h": 164,
+    "slice": null,
+    "w": 182
+  },
+  "pm_inset": {
+    "h": 318,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "w": 376
+  },
+  "pm_item_slot": {
+    "h": 96,
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "w": 97
+  },
+  "pm_jtab_leather": {
+    "h": 58,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ],
+    "w": 126
+  },
+  "pm_jtab_paper": {
+    "h": 54,
+    "slice": [
+      20,
+      16,
+      20,
+      8
+    ],
+    "w": 129
+  },
+  "pm_keycap": {
+    "h": 71,
+    "slice": [
+      22,
+      22,
+      22,
+      26
+    ],
+    "w": 116
+  },
+  "pm_keycap_small": {
+    "h": 71,
+    "slice": null,
+    "w": 79
   },
   "pm_lobby_coins": {
     "h": 70,
@@ -864,6 +1289,26 @@
     "slice": null,
     "w": 255
   },
+  "pm_map_island": {
+    "h": 1000,
+    "slice": null,
+    "w": 1000
+  },
+  "pm_map_label": {
+    "h": 108,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 300
+  },
+  "pm_map_pin": {
+    "h": 118,
+    "slice": null,
+    "w": 84
+  },
   "pm_panel": {
     "h": 314,
     "slice": [
@@ -873,6 +1318,161 @@
       62
     ],
     "w": 529
+  },
+  "pm_quest_row": {
+    "h": 88,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 362
+  },
+  "pm_quest_row_selected": {
+    "h": 90,
+    "slice": [
+      40,
+      30,
+      40,
+      30
+    ],
+    "w": 364
+  },
+  "pm_queue_empty": {
+    "h": 96,
+    "slice": null,
+    "w": 404
+  },
+  "pm_queue_row": {
+    "h": 98,
+    "slice": [
+      24,
+      24,
+      60,
+      24
+    ],
+    "w": 404
+  },
+  "pm_recipe_row": {
+    "h": 74,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ],
+    "w": 405
+  },
+  "pm_recipe_row_selected": {
+    "h": 76,
+    "slice": [
+      30,
+      24,
+      60,
+      24
+    ],
+    "w": 405
+  },
+  "pm_req_card": {
+    "h": 156,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 106
+  },
+  "pm_search_box": {
+    "h": 46,
+    "slice": [
+      40,
+      14,
+      14,
+      14
+    ],
+    "w": 230
+  },
+  "pm_side_column": {
+    "h": 569,
+    "slice": null,
+    "w": 156
+  },
+  "pm_side_tab_selected": {
+    "h": 134,
+    "slice": null,
+    "w": 122
+  },
+  "pm_slider_knob": {
+    "h": 58,
+    "slice": null,
+    "w": 58
+  },
+  "pm_sort_button": {
+    "h": 46,
+    "slice": null,
+    "w": 81
+  },
+  "pm_stat_chip": {
+    "h": 47,
+    "slice": [
+      16,
+      14,
+      16,
+      14
+    ],
+    "w": 104
+  },
+  "pm_stat_chip_tall": {
+    "h": 72,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 106
+  },
+  "pm_stepper_field": {
+    "h": 62,
+    "slice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "w": 77
+  },
+  "pm_stepper_minus": {
+    "h": 65,
+    "slice": null,
+    "w": 64
+  },
+  "pm_stepper_plus": {
+    "h": 65,
+    "slice": null,
+    "w": 64
+  },
+  "pm_tab_leather": {
+    "h": 104,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ],
+    "w": 320
+  },
+  "pm_tab_paper": {
+    "h": 101,
+    "slice": [
+      40,
+      30,
+      52,
+      30
+    ],
+    "w": 312
   },
   "pm_tile_forge": {
     "h": 145,
@@ -903,6 +1503,161 @@
     "h": 145,
     "slice": null,
     "w": 146
+  },
+  "pm_window_crafting": {
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_crafting__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_crafting__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ],
+    "w": 1629
+  },
+  "pm_window_crafting__1_1": {
+    "h": 742,
+    "slice": null,
+    "w": 816
+  },
+  "pm_window_crafting__1_2": {
+    "h": 742,
+    "slice": null,
+    "w": 817
+  },
+  "pm_window_forge": {
+    "h": 742,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_forge__1_1",
+        0,
+        0,
+        816,
+        742
+      ],
+      [
+        "pm_window_forge__1_2",
+        812,
+        0,
+        817,
+        742
+      ]
+    ],
+    "w": 1629
+  },
+  "pm_window_forge__1_1": {
+    "h": 742,
+    "slice": null,
+    "w": 816
+  },
+  "pm_window_forge__1_2": {
+    "h": 742,
+    "slice": null,
+    "w": 817
+  },
+  "pm_window_inventory": {
+    "h": 786,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_inventory__1_1",
+        0,
+        0,
+        749,
+        786
+      ],
+      [
+        "pm_window_inventory__1_2",
+        745,
+        0,
+        749,
+        786
+      ]
+    ],
+    "w": 1494
+  },
+  "pm_window_inventory__1_1": {
+    "h": 786,
+    "slice": null,
+    "w": 749
+  },
+  "pm_window_inventory__1_2": {
+    "h": 786,
+    "slice": null,
+    "w": 749
+  },
+  "pm_window_journal": {
+    "h": 772,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_journal__1_1",
+        0,
+        0,
+        818,
+        772
+      ],
+      [
+        "pm_window_journal__1_2",
+        814,
+        0,
+        818,
+        772
+      ]
+    ],
+    "w": 1632
+  },
+  "pm_window_journal__1_1": {
+    "h": 772,
+    "slice": null,
+    "w": 818
+  },
+  "pm_window_journal__1_2": {
+    "h": 772,
+    "slice": null,
+    "w": 818
+  },
+  "pm_window_settings": {
+    "h": 706,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_window_settings__1_1",
+        0,
+        0,
+        817,
+        706
+      ],
+      [
+        "pm_window_settings__1_2",
+        813,
+        0,
+        817,
+        706
+      ]
+    ],
+    "w": 1630
+  },
+  "pm_window_settings__1_1": {
+    "h": 706,
+    "slice": null,
+    "w": 817
+  },
+  "pm_window_settings__1_2": {
+    "h": 706,
+    "slice": null,
+    "w": 817
   },
   "slot_broken": {
     "h": 146,

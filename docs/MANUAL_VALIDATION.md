@@ -368,7 +368,7 @@ Studio and live checks:
 - [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–6 select hotbar slots (7–9 do nothing), Q drops, and F picks up a dropped item, loots a body and harvests a node.
 - [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
 - [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
-- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; Esc cancels.
+- [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; clicking the waiting key again cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
 - [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the backpack and vault panel in the lobby, and Tab again closes it.
@@ -597,3 +597,90 @@ Studio and live checks:
 - [ ] The offshore wall stops walking and jumping out to sea.
 - [ ] The river's small step-down "rapids" and the shorelines look acceptable; the ocean surface meets the shelf without a seam.
 - [ ] Creatures wade on the bed at reduced speed.
+
+## Parchment Settings screen and new settings (GDD §57)
+
+How it's built: `Hud/SettingsPanel` draws the window from the parchment kit (`Hud/Parchment`); `SettingsController` keeps the draft and saves on APPLY; `PreferencesController` applies volumes, camera sensitivity and inversion, names and graphics quality; `Hud/DamageNumbers` floats hit damage. Spec: `docs/ui/SettingsScreen.md`.
+
+Automated: `settings.spec` (defaults, ranges, the server accepting only known, valid values, saved junk falling back to defaults); `art/ui/capture/capture.py settings` renders every tab and `settings_flow` drives open → change → APPLY → RESET → close and checks what is sent.
+
+Studio and live checks (desktop, touch and controller):
+
+- [ ] The gear (lobby), ⚙ (world) and O open the window centred below the top bar; it fits on a phone in landscape (text is small at 0.3–0.5×; note whether it stays readable) and on a large monitor.
+- [ ] Each tab shows its page; the selected tab turns leather with cream text. Close (✕) and gamepad B close it.
+- [ ] Sliders drag with mouse and touch and step with a gamepad's d-pad; the dropdown opens upward on Gameplay and downward on Graphics, and closes on a choice.
+- [ ] APPLY is dimmed until something changes, saves, and the values are still there after rejoining. RESET puts back only the open tab's settings and keys. Closing without APPLY keeps the old values.
+- [ ] Music and Effects change volume at once after APPLY (Effects: hits, alerts, world sounds). Music has no soundtrack yet, so check it with a sound tagged `Music`.
+- [ ] Camera Sensitivity 10 / 50 / 100 makes mouse look slow / normal / fast.
+- [ ] Invert Camera flips mouse, touch and right-stick vertical look; off restores it. If Roblox's PlayerModule changed and it does nothing, the client logs "Invert Camera is unavailable".
+- [ ] Show Damage on: damage numbers float up from creatures, players and structures you hit (still, with reduced motion); off: hit markers without numbers.
+- [ ] Show Names off hides other players' name tags for you only.
+- [ ] Graphics Quality Low turns shadows off and thins fires and effects; High restores them.
+- [ ] Rebinding from the Gameplay key list and from Controls works, swaps clashing keys, refuses reserved ones with a note, and saves on APPLY.
+
+## Parchment Journal (GDD §10.1, §25)
+
+How it's built: `Hud/JournalPanel` (view), `Hud/IslandMap` (the painted map, also for the world Map), `JournalController` (QuestView / QuestClaim). The map image comes from `art/ui/map/render_island.py`. Spec: `docs/ui/JournalScreen.md`.
+
+Automated: `capture.py journal` renders every tab; `journal_flow` checks that an unfinished quest cannot be claimed, a finished one sends its id, the card then reads CLAIMED, and the tabs filter.
+
+Studio and live checks:
+
+- [ ] The lobby's Quests tile opens the Journal; ✕ and gamepad B close it.
+- [ ] The list shows every quest with the right dot (gold: claim waiting, grey: under way, green: claimed); All / Daily / Main filter it; the list scrolls.
+- [ ] Progress moves while the Journal is open (it refreshes every 5 s); CLAIM pays a finished quest once and then reads CLAIMED; Coins and Gems update.
+- [ ] The map matches the island in play (coast, Crater Lake and the Keep, river, Frostpeak's snow, Emberhollow); pins sit on their places; zoom works; the Keep's plate shows for the Guardian quest.
+- [ ] Phones: the window fits; rows, tabs and CLAIM are tappable.
+
+## Parchment Inventory & Vault (GDD §10.3, §25.4, §53)
+
+How it's built: one window (`Hud/InventoryPanel`, slots `Hud/ItemSlot`, item text `ItemInfo`) driven by `VaultController` in the lobby and `InventoryController` in a run. Spec: `docs/ui/InventoryScreen.md`. Item icons are not drawn yet; slots show names until `item_<catalogId>` sprites are uploaded.
+
+Automated: `item_info.spec` (tabs, search, stat chips); `capture.py inventory`; `vault_flow` and `inventory_flow` drive both controllers.
+
+Studio and live checks:
+
+- [ ] Lobby: the Inventory and Vault tiles and Tab open the window; STORE / → vault the chosen backpack item; TAKE / ← bring a vault item or the picked amount of a material out; STORE ALL vaults everything that fits and says how many overflowed; a near-full material deposit asks first and deletes only what it said.
+- [ ] Lobby: tabs and search filter both panes; sort cycles Saved / Name / Count; the capacity bar matches the vault's item slots.
+- [ ] Run: Tab opens the window with the 50 backpack slots, the six hotbar slots (with their keys) and the three armour slots; a slot then another moves or swaps; → sends to the first free hotbar slot (armour to its slot); ← sends back to the backpack; WEAR / TAKE OFF / EQUIP / USE / DROP work; the equipped hotbar slot has a leather ring.
+- [ ] Run: Tab closes it again, Q drops, 1–6 still select hotbar slots (hotfix 2026-10-28: the six-slot change had stopped Tab and Q from binding in runs).
+- [ ] Gamepad: B closes; slots, tabs and buttons are reachable with the D-pad.
+
+## Parchment Crafting and Forge (GDD §15–16, §25.3)
+
+How it's built: one recipe window (`Hud/CraftingPanel`) used by `CraftingController` in runs and `ForgeController` in the lobby. Spec: `docs/ui/CraftingScreen.md`.
+
+Automated: `capture.py crafting`, `crafting_flow`, `forge_flow`.
+
+Studio and live checks:
+
+- [ ] Run: V (Craft) opens it; tabs filter (the chosen tab again shows all); search works; counts follow the backpack live; walking up to a Workbench, Furnace, Anvil or Cauldron ticks it under STATIONS NEARBY and enables its recipes.
+- [ ] Run: CRAFT makes one; smelting takes the stepper's batch or Craft all; the job row shows progress and time left; ✕ stops it and keeps the bars made.
+- [ ] Lobby: the Forge tile opens ANCESTRAL FORGE with vault counts; locked recipes say what unlocks them; FORGE puts the item in the lobby backpack.
+- [ ] Lobby: a Permanent recipe lists the vault gear it can convert; CONVERT asks first, arms after 1.5 s, and converts the chosen piece only.
+
+## Parchment Market, Progress, Trade and notice cards (GDD §10, §33, §37, §34.1)
+
+How it's built: one list window (`Hud/ListWindow`) for the Market (`WalletController`), Progress (`ProgressionController`) and Trade (`TradeController`); notices, trade invites, toasts and receipts on `Hud/NoticeCard`. Spec: `docs/ui/ListWindows.md`.
+
+Automated: `capture.py market_flow`, `progress_flow`, `trade_flow`, `notices`.
+
+Studio and live checks:
+
+- [ ] Market: the Shop tile and nav button open it; Coins and Gems in the corner follow purchases; BUY, SELL, SELL 10 and SELL ALL move the right amounts; respec asks first; a Robux offer prompts the real product; a code redeems once.
+- [ ] Progress: P opens it in lobby and run; perk BUY spends tokens; REVIEW REBIRTH arms after 1.5 s and rebirths; Perks and Rebirth say they are lobby-only in a run.
+- [ ] Trade: inviting a second player shows them the ACCEPT / DECLINE card; both offers update live; any change unlocks both; the countdown runs after both lock; CONFIRM completes; typing gems while the partner changes their offer keeps what you typed.
+- [ ] Phones (844 × 390): the list windows draw at about half size, so row details read at roughly 9–10 px; judge on a device whether they need a larger phone text size.
+- [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
+- [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.
+- [ ] World map (run): N / DPadDown opens it centred on you; pins name the camps and landmarks; active portals and events show and update; zoom follows you until you drag; the safe-camp card appears inside a camp and leaves outside it.
+
+## Parchment in-world HUD (GDD §11, §25.4, §56)
+
+How it's built: the same HUD modules (`Hud/Compass`, `Vitals`, `ObjectivePanel`, `EventPanel`, `PartyFrames`, `BottomBar`) with the parchment layout in `HudLayout.json`. Spec: `docs/ui/HudScreen.md`. Automated: `capture.py hud`.
+
+- [ ] In a run: the compass letters scroll with the camera over the parchment strip; waypoints sit under it.
+- [ ] Health, Stamina and Food fill and drain smoothly inside their bars, with the number readable.
+- [ ] The objective and world event cards appear and update under the vitals; party members show with headshots.
+- [ ] The backpack button opens and closes the backpack; the six hotbar slots select with keys, taps and the bumper; the chosen slot glows gold.
+- [ ] Phone and console sizes keep everything on screen and readable.
