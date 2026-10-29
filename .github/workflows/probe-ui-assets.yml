@@ -1,0 +1,44 @@
+name: Probe UI images in a live place
+# Manual only, main only. Runs one read-only Luau task in the chosen place (no
+# save, no publish) that reports whether the place can load the uploaded UI
+# images, to tell a permission or moderation problem from a code problem.
+on:
+  workflow_dispatch:
+    inputs:
+      place:
+        description: "Which place to ask"
+        type: choice
+        options: [lobby, world]
+        default: lobby
+      names:
+        description: "Comma-separated sprite names (empty = a sample of old and new sprites)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Probe images
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_LOBBY_PLACE_ID: ${{ secrets.ROBLOX_LOBBY_PLACE_ID }}
+          ROBLOX_MAIN_PLACE_ID: ${{ secrets.ROBLOX_MAIN_PLACE_ID }}
+          PLACE: ${{ inputs.place }}
+          NAMES: ${{ inputs.names }}
+        run: |
+          if [ "$PLACE" = "lobby" ]; then
+            export ROBLOX_PLACE_ID="$ROBLOX_LOBBY_PLACE_ID"
+          else
+            export ROBLOX_PLACE_ID="$ROBLOX_MAIN_PLACE_ID"
+          fi
+          python3 scripts/roblox_probe_ui_assets.py --names "$NAMES"
