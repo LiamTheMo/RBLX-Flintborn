@@ -870,3 +870,798 @@ The recommendations are accepted, with one change (6):
 10. Names as proposed (`SapstoneRootArch*`).
 
 Bark relief targets (10-sided sections, 3 creases 0.12–0.18 deep, 2 knots per root) are binding. Keep the two greens apart with the spec's hue and saturation guards. `nonmanifold_verts` must be 0.
+
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m029.py`, `build()`: about 25 s of geometry and 20 s of renders in a background session.
+Seeds are fixed and the current values need no retries. Each exploded part has its own function, and the hero is pasted
+from the same builders.
+- **Base** (`base_raw`): a lofted 14-gon slab with rings at z -0.06, 0.25, 0.45 (rim) and about 0.38 (floor edge), a
+  9-vertex inner floor ring and a centre. The floor undulates +-0.06 by broad noise. Seven low hull rim lumps
+  (`RIM_LUMPS`, top z 0.56-0.78) are sunk into the edge, fused with one exact union, and the slab is floor-cut flat. The
+  part is 9.31 x 7.24 x 0.78 (slab plan 8.6 x 6.8 plus the lumps).
+- **Boulders** (`BOULDERS`): nine, at the spec 2.1 positions. The back three moved 0.25 back, so the hero is 7.61 deep.
+  Each is a chunky hull rock (point rings 6 / 7 / 6 / 4, jitter 0.15). Boulders on the rim stand on the ground
+  (floor-cut); boulders on the floor sink 0.15 into it.
+- **Sapstone** (`_sapstone`): bmesh `create_icosphere(subdivisions=2)`, which is the spec's "icosphere subdivision 1"
+  (42 verts, 80 tris). bmesh's `subdivisions=1` is the bare 12-vertex icosahedron, which read as a crystal point in
+  round 1a.
+  - The sphere is turned (21, 13, 9 deg) so no pole sits on top.
+  - Each vertex takes its height from its latitude and its radius from the sheet's egg width profile (`SAP_PROFILE`).
+  - It is normalised to 2.65 x 2.45 x 3.45, with a flat seat and a 4 deg lean to -X.
+  - Centre (1.3, 0), bottom z 0.30. The centre moved from 1.0 to 1.3, which took the f34 egg centre from .543 to .574
+    (sheet .597).
+- **Roots** (`_tube` for L, the spur and R):
+  - **Paths:** 10-sided rings (8 on the spur) along Catmull-Rom paths through the spec 2.2 control points.
+    - Round 1b raised L's crest to a flat top at z 6.1 over X -0.3 .. 1.4, with the club end hooking down at X 2.6
+      onto R's shoulder.
+    - R's lower leg moved 0.2 right to hug the egg.
+  - **Rings:** set in the local up frame, with stations 0.68 apart (0.38 round bends).
+  - **Radius:** diameter list x broad sectors (+-7 %) x knots x per-vertex jitter (+-6 %). Each vertex slides +-0.13
+    along the limb, except round tight bends: there the slide folded the inner side (7 self-intersections at the hook
+    in round 1a).
+  - **Creases and ridges:** three crease columns pulled in (L 0.16 x r/0.95, R 0.14 x r/0.6). R has one ridge column
+    pushed out 0.06, L has two. The ring twists slowly (+-12 deg), so the creases wander.
+  - **Knots:** L at s 0.3, 0.62 and 0.97 (the club); R at s 0.05, 0.3 and 0.62.
+  - **L's foot:** diameter 3.0 -> 2.8 with an elliptical buttress (1.5 : 1 along X, fading over 2.4 studs). The leg is
+    then 3.1-3.4 wide at f34 h .3, as drawn. The feet run on under the ground into the slab.
+  - **Joins and ends:** the spur is fused to L with one union. L's club end and R's top end have domed caps; the feet
+    end in buried fans.
+- **Leaf fans** (`fan`):
+  - **Leaves:** thick hexagonal kites (`KITE`, W : L 0.48, front ridge 0.075 L, back keel 0.06 L, neck 0.14 wide),
+    stacked 0.12 apart along the fan normal (0, -0.9, 0.42).
+  - **Hubs (round 1c):** moved out to the legs' outer back flanks, 0.3 inside the bark, so the blades show beside the
+    legs. Before, only their tips showed over the leg edges.
+    - Left: low on L's buttress, origin (-2.89, -0.82, 1.64), 5 leaves 2.05-3.05 long.
+    - Right: on R's back-left, origin (3.0, -0.18, 2.54), 4 leaves 1.65-2.5 long.
+- **Leaf clump part:** 7 leaves round a hidden 6-sided hub (r 0.3), with yaws at least 45 deg apart. Two leaves 15 deg
+  apart had crossed into self-intersecting slivers. Seed 29645; the guard tries up to 8 seeds, and the first is clean.
+
+Hero assembly, in order:
+1. Paste the fused base, 9 boulders, L, R, the egg and both fans.
+2. Run 21 exact unions, one shell at a time, with merge distance 0 (so the leaf necks are not welded).
+3. Cut the floor at z 0.
+4. Run m016 `_clean_mesh`, then finish and polish.
+5. Run `M.fix_bowties` (0 bowties needed).
+
+## Stage 2: Optimisation and cleanup
+
+| Object | Tris | Size (W x D x H) | Shells | Non-manifold edges / verts | Boundary | Self-hits |
+| --- | --- | --- | --- | --- | --- | --- |
+| SapstoneRootArch (hero) | 2350 / 4000 | 9.92 x 7.61 x 6.10 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchBase | 464 | 9.31 x 7.24 x 0.78 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchRock | 42 | 1.78 x 1.38 x 1.45 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchSapstone | 80 | 2.63 x 2.45 x 3.38 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchRootLeft | 388 | 8.06 x 3.00 x 6.10 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchRootRight | 338 | 6.55 x 3.21 x 5.78 | 1 | 0 / 0 | 0 | 0 |
+| SapstoneRootArchLeafClump | 316 | 3.99 x 2.86 x 2.73 | 1 | 0 / 0 | 0 | 0 |
+
+Every object also has:
+- no wire edges, loose verts, zero-area faces or n-gons;
+- no face corner under 5 deg;
+- outward normals, flat shading and no custom normals;
+- its origin at the bottom centre, with transforms applied.
+
+`K.check` reports no problems. The hero is within its target of 9.9 x 7.6 x 6.2 (+-0.4 / 0.4 / 0.25).
+
+## Stage 3: UV
+
+Every object uses `M.smart_uv`: angle 45, an ANGLE_BASED re-unwrap, margin 0.008 (gap 0.016, border 0.008).
+- 0 overlaps and 0 flipped triangles.
+- Texel density min / median / max is 1.0 / 1.0 / 1.0.
+- Conformal stretch p95 is 1.02-1.04.
+- The hero has 371 islands at 33.6 texels per stud at 1024.
+
+## Stage 4: Materials, colour and texture
+
+**Pass 1** (`calibrate()` on the kit dome, targets from spec 5.4). Every key rendered within 6 of its target:
+
+| Key | Hex | Key | Hex |
+| --- | --- | --- | --- |
+| root | #7E5739 | rock_light | #7F7676 |
+| root_dark | #6F492B | sap | #5A8854 |
+| root_light | #8A5F40 | sap_light | #6B995B |
+| base | #62524C | sap_dark | #43693C |
+| base_dark | #554740 | leaf | #5B6D07 |
+| rock | #615454 | leaf_tip | #728817 |
+| | | leaf_base | #495A08 |
+
+**Pass 2** (the hero's `f34_sheet` render against the f34 cell). Factors are per channel (R, G, B), in linear light:
+
+| Keys | Factors |
+| --- | --- |
+| Root keys, step 1 | x (1.12, 1.06, 1.0) |
+| Root keys, step 2 | x (1.15, 1.12, 1.1) |
+| root_light, extra (crest band) | x (1.35, 1.3, 1.25) |
+| root_dark, extra (foot band) | x 0.85 |
+| sap keys | x (1.3, 1.22, 1.0) |
+| sap_light | x (1.45, 1.35, 1.1) |
+| leaf_tip | x (1.25, 1.2, 1.0) |
+
+**Final `PALETTE`:**
+
+| Key | Hex | Key | Hex |
+| --- | --- | --- | --- |
+| root | #8E5E3C | rock_light | #7F7676 |
+| root_dark | #6E4628 | sap | #669554 |
+| root_light | #A8724B | sap_light | #7FAF5F |
+| base | #62524C | sap_dark | #49703C |
+| base_dark | #554740 | leaf | #5B6D07 |
+| rock | #615454 | leaf_tip | #7E9417 |
+| | | leaf_base | #495A08 |
+
+**Re-measured** on the f34_sheet render against the f34 cell, with the study's masks:
+
+| Region | Sheet median / lit | Ours median / lit | Guard |
+| --- | --- | --- | --- |
+| Roots | #A16942 / #D08F5E | #9E643F / #CD8555 | sat 0.60 (>= 0.55) |
+| Stone | #796256 / #997F73 | #746058 / #93817A | sat 0.24 (<= 0.32) |
+| Sapstone | #699850 / #C4E986 | #65924C / #8CC06B | hue 99, sat 0.48 |
+| Leaves | #6D7F07 / #AEC022 | #6E820D / #9BB219 | hue 70, sat 0.90 |
+| Root bands, bottom -> top | #845532 ... #C88755 | #955E3A ... #C98252 | top - bottom +52 in R |
+
+- The two greens stay apart: sapstone hue 99 / sat 0.48 against leaves hue 70 / sat 0.90.
+- The egg's lit facets render darker than the sheet's near-white highlights (#8CC06B against #C4E986), because the arch
+  shades the egg in our studio.
+
+**Blending** (by position only; every mix on 25 / 50 / 75 % steps):
+- **Roots:**
+  - darker toward each foot by arc length: full root_dark at the foot, fading out by 0.4 of the limb; the whole spur is
+    dark;
+  - 25 % darker on the lower 20 % of each section (section frame);
+  - root_light 0-75 % by world z from 3.7 to 5.3;
+  - broad noise patches with 50 % and 25 % rings.
+- **Base:**
+  - an edge band (z < 0.22) up to 50 % base_dark;
+  - the floor within 0.45 of a foot or boulder up to 50 % base_dark;
+  - lump tops 25 % rock;
+  - broad 25 % rock patches.
+- **Boulders:**
+  - rock_light 0-50 % by height within each boulder, plus broad position patches;
+  - the lowest 12 % at 25 % base_dark.
+- **Sapstone:** a dark seat ring, a 25 % lighter upper body and broad mineral patches.
+- **Leaves:** a hub -> mid -> tip ladder along each leaf (3 steps, +-0.06 noise).
+
+**Texture:** broad Tint mottling, tint_var 0.04 per piece. Amplitude / scale: roots 0.05 / 0.5, base 0.05 / 0.7,
+boulders 0.06 / 0.5; sapstone amplitude 0.03, leaves 0.035.
+
+**Facing check** (`baked_shading`, limit 0.5):
+
+| Object | Correlation |
+| --- | --- |
+| Hero | 0.30 |
+| Sapstone | 0.44 |
+| RootLeft | 0.42 |
+| RootRight | 0.43 |
+| LeafClump | 0.08 |
+| Base, Rock | 0.0 |
+
+A stronger height ramp on the egg failed the check (0.81), so the egg's darker foot is left to the lighting.
+
+**Finish** (roughness): roots 0.9 / 0.92, base 0.95, rocks 0.9 / 0.88, sapstone 0.55 / 0.6, leaves 0.8 with
+FOLIAGE_SPEC.
+
+## Stage 5: Lighting
+
+Skipped (decision 8): no emissive key and no light.
+
+Studio note (Requires Manual Validation): under the game's sun, check that:
+- the soft-green egg stays apart from the olive-lime leaves;
+- the roots stay clearly warmer than the stone;
+- the boulder tops read greyer than the base.
+
+## Stage 6: VFX
+
+Skipped (decision 8): the sheet shows no glow, sparkle, dust or particles, so there are no sockets. The renders use
+`vfx=True`, with nothing to realise.
+
+## Modeller's measurements
+
+The comparison renders are `f34_sheet (0, 13)`, `r34_sheet (-40, 15)`, `side_sheet (90, 10)`, `rear_sheet (180, 10)`
+and `top_sheet (0, 50)`, all with a 3x lens. `m029.measure()` applies the study's masks to both the sheet and the
+render. The table gives sheet / ours for each value; the shares are percentages.
+
+| View | W : H | Leaves | Sapstone | Root | Stone | Top-profile error (mean / max) |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.473 / 1.546 | 15.2 / 13.0 | 15.1 / 13.7 | 46.1 / 46.9 | 23.7 / 26.4 | 0.057 / 0.19 |
+| r34 | 1.297 / 1.179 | 19.5 / 13.8 | 11.5 / 8.6 | 45.6 / 52.7 | 23.4 / 24.9 | 0.084 / 0.19 |
+| side | 1.164 / 1.128 | 21.0 / 2.5 | 13.0 / 9.8 | 48.8 / 41.7 | 17.2 / 46.1 | 0.21 / 0.64 |
+| rear | 1.337 / 1.347 | 22.3 / 13.8 | 12.3 / 13.4 | 36.5 / 40.1 | 28.9 / 32.6 | 0.086 / 0.36 |
+| top | 1.141 / 1.385 | 18.1 / 10.0 | 13.3 / 9.1 | 40.1 / 40.3 | 28.5 / 40.7 | 0.074 / 0.17 |
+
+The f34 egg centre is at (.574, .405) against the sheet's (.597, .418).
+
+**Bark relief** (`m029.bark_relief()`): rays square to the centre line in 2 deg steps, counting only this root's own
+surface.
+
+| Station | Creases (depth >= 0.06) | Depths | min / median | Spread (max - min) / 2 |
+| --- | --- | --- | --- | --- |
+| L z 1.5 | 2 | 0.21, 0.15 | 0.83 | 0.38 |
+| L z 2.5 | 3 | 0.23, 0.11, 0.20 | 0.86 | 0.31 |
+| L z 3.5 | 3 | 0.23, 0.12, 0.15 | 0.81 | 0.17 |
+| R z 2.0 | 3 | 0.09, 0.09, 0.21 | 0.77 | 0.19 |
+| R z 3.0 | 3 | 0.14, 0.10, 0.16 | 0.79 | 0.19 |
+
+**Knots** (mean radius at least 12 % over the minima on both sides):
+- L: s .18-.23 (1.27), .43 (1.15), .66 (1.16).
+- R: s .17 (1.36), .34 (1.39), .68 (1.19), .91 (1.26).
+
+## Modeller's notes for the verifier
+
+- **How to measure:** run `m029.measure()` and `m029.bark_relief()` after `m029.build()`. The renders are in this
+  folder. The hero camera is `f34_sheet`; the kit front34, rear34 and top views are self-consistency only (spec 3).
+- **Known misses:**
+  - **r34:** W : H 1.18 (target 1.22-1.38) and a root share of 52.7 (+7). From (-40, 15), L's leg covers more of the
+    egg's left than the sheet's r34 drawing does. The sheet's r34 inner fan is not modelled (decision 4).
+  - **Side cell:** it is a redraw (spec 3.3). From +X the right fan is edge-on (leaves 2.5 %) and the base floor fills
+    the view.
+  - **Top cell:** a perspective drawing; its W : H is not chased.
+  - **See-through gap:** the gap under the crest (spec 3.11) does not show.
+  - **L at z 1.5:** 2 creases, not 3; the spur fuses over the third there.
+  - **f34 W : H:** 1.546, which is 0.006 over the 1.54 limit.
+- **Leaf fans:** they are upright hands of thick hexagonal kites. In places the overlapping leaves still read as a dense
+  cluster rather than the four or five clean, separate blades drawn on the sheet.
+- **Egg:** it sits in the arch's shadow in the studio, so its rendered lit quartile is darker than the sheet's.
+- **Rock part:** a single 42-tri boulder (the big front-left one).
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-29. Read-only: a background session on port 9882 with
+`art/blender/assets/kit/wip/M029_verify.blend`, never saved, and `build()` not called. Fresh renders went to
+the scratchpad (`v029_renders/M029/`) through `m029.render_views()` with `kit_models.MODEL_RENDERS` redirected, so this
+folder's renders were not touched. Comparisons use the study's masks on both images, plus tight-cropped
+side-by-sides (`v029_cmp/t_*.png`).
+
+**Verdict: FAIL, 6/10.** The technical side is clean, and the colours mostly match the sheet. Two of the sheet's
+defining reads don't match: the root arch's relation to the egg, and the leaf fans.
+
+### Re-measured (all objects; `M.audit` plus my own checks)
+
+| Object | Tris | Size (W x D x H) | Shells | NM edges / verts | Boundary | Self-hits | Inverted / interior | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SapstoneRootArch | 2350 / 4000 | 9.92 x 7.61 x 6.10 (target 9.9 x 7.6 x 6.2: within) | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 5.01 deg |
+| ...Base | 464 | 9.31 x 7.24 x 0.78 | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 5.09 |
+| ...Rock | 42 | 1.78 x 1.38 x 1.45 | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 10.6 |
+| ...Sapstone | 80 | 2.63 x 2.45 x 3.38 (2.65 x 2.45 x 3.45) | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 38.7 |
+| ...RootLeft | 388 | 8.06 x 3.00 x 6.10 | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 6.09 |
+| ...RootRight | 338 | 6.55 x 3.21 x 5.78 | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 9.18 |
+| ...LeafClump | 316 | 3.99 x 2.86 x 2.73 | 1 | 0 / 0 | 0 | 0 | 0 / 0 | 5.2 |
+
+Every object also has:
+- no n-gons, wire edges, loose or duplicate verts, or zero-area faces;
+- consistent winding and outward normals (signed volume, plus ray-parity tests on every face);
+- no custom normals and no modifiers;
+- rotation 0 and scale 1, with the origin at the bottom centre (bbox offset 0, 0, 0);
+- a `Tint` colour attribute.
+
+The hero is one shell with the sapstone united (decision 6), and `K.check` reports no problems.
+- **UV:** one `UVMap` per object; 0 overlaps and 0 flips; gap 0.016 and border 0.008; density 1.0 / 1.0 / 1.0; conformal
+  stretch p95 1.02-1.04; the hero has 371 islands at 33.6 texels per stud.
+- **Materials:** Principled, no emission or metal. Roughness is 0.9 on roots, 0.95 on base, 0.55 on sapstone and 0.8
+  on leaves. Faces take blend steps of 25 / 50 / 75 %.
+- **Facing correlation:** hero 0.30, sapstone 0.44, roots 0.42 / 0.43, leaf clump 0.08 (all under 0.5), so nothing is
+  coloured by facing.
+- **Bark relief** (`bark_relief()`, re-run):
+  - L at z 1.5 / 2.5 / 3.5: 2 / 3 / 3 creases, min / median 0.83 / 0.86 / 0.81, spread 0.38 / 0.31 / 0.17;
+  - R at z 2.0 / 3.0: 3 / 3 creases, 0.77 / 0.79, spread 0.19 / 0.19;
+  - knots: L at s .18, .23, .43, .66; R at .09, .17, .34, .68, .86, .91.
+
+  Everything passes except L at z 1.5 (2 creases, not 3).
+
+### Views against the sheet (`measure()` on my renders; sheet / ours)
+
+| View | W : H | Leaves | Sapstone | Root | Stone | Top error mean / max |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.473 / 1.546 | 15.2 / 13.0 | 15.1 / 13.7 | 46.1 / 46.9 | 23.7 / 26.4 | 0.057 / 0.19 |
+| r34 | 1.297 / 1.179 | 19.5 / 13.8 | 11.5 / 8.6 | 45.6 / 52.7 | 23.4 / 24.9 | 0.084 / 0.19 |
+| side | 1.164 / 1.128 | 21.0 / 2.5 | 13.0 / 9.8 | 48.8 / 41.7 | 17.3 / 46.1 | 0.21 / 0.64 |
+| rear | 1.337 / 1.347 | 22.3 / **13.8** (-8.5, tolerance +-6) | 12.3 / 13.4 | 36.5 / 40.2 | 28.9 / 32.6 | 0.086 / 0.36 |
+| top | 1.141 / 1.385 | 18.1 / 10.0 | 13.3 / 9.1 | 40.1 / 40.3 | 28.6 / 40.7 | 0.074 / 0.17 |
+
+**f34 root runs** (f, sheet / ours):
+
+| h | Sheet | Ours |
+| --- | --- | --- |
+| .3 | L .12-.46 | L .09-.39 |
+| .4 | L .17-.47 | L .15-.40 |
+| .5 | L .24-.47, R .73-.84 | L .19-.41, R .70-.82 |
+| .6 | L .27-.50 | L .24-.44 |
+| .7 | L .30-.56, R .68-.75 | L .27-.46, R .53-.77 |
+
+Other f34 measurements:
+- **Egg:** f .47-.73 / .45-.70, centre (.597, .418) / (.574, .405).
+- **Background inside the arch box** (f .35-.80, h .20-.85): sheet 2.1 %, ours **11.5 %**.
+- **Right leaf fan:** sheet f .71-1.00 (143 px), ours **f .75-.90 (68 px)**. Top profile at f .90 / .95 / 1.0: sheet .63 /
+  .47 / .40, ours .44 / .32 / .31.
+- **r34 L leg width at h .5:** sheet 0.30 W, ours 0.23 W.
+
+### Colours (sheet / ours, same masks)
+
+| Region | Median | Lit quartile | Shade quartile |
+| --- | --- | --- | --- |
+| Roots, f34 | #A16942 / #9E643F (3, 5, 3) | #D08F5E / #CD8555 (3, 10, 9) | #6C4426 / #754B30 (9, 7, 10) |
+| Stone, f34 | #796256 / #746058 (5, 2, 2) | #997F73 / #93817A (6, 2, 7) | #4B3E36 / #50443E (5, 6, 8) |
+| Sapstone, f34 | #699850 / #65924C (4, 6, 4) | **#C4E986 / #8CC06B (56, 41, 27)** | #446634 / #486938 (4, 3, 4) |
+| Leaves, f34 | #6D7F07 / #6E8210 (1, 3, 9) | #AEC022 / #9BB21B (19, 14, 7) | #455202 / #5A6A08 (21, 24, 6) |
+| Root L part / exploded | #A16640 / #A66E47 (5, 8, 7) | thirds bottom -> top: #965E3A -> #C78152 / #A1683F -> #AF744B | |
+| Sapstone part / exploded | #72A357 / #70A660 (2, 3, 9) | #91C972 / #A4D67E (19, 13, 12) | thirds #64924C -> #91C36D / #59894F -> #99CF78 |
+| Leaf part / exploded L | **#5F700B / #74870D (21, 23, 2)** | #8CA11A / #9EB21D | thirds #45530B -> #7E9217 / #64750C -> #89A018 |
+| Rock part / exploded rock | #70615C / #776359 (7, 2, 3) | #8B7771 / #A58C7F (26, 21, 14) | |
+
+- **Two greens:** sapstone hue 98.6, sat 0.48; leaves hue 70.5, sat 0.88. They stay apart.
+- **Root vs stone:** root sat 0.60 against stone sat 0.24, so the gap holds.
+- **f34 root height bands, bottom -> top:**
+  - sheet #845532 #915F39 #A26941 #AB7248 #C88755;
+  - ours #955E3A #955F3B #A76B43 **#955F3C** #C98252.
+
+  The top band is +52 in R over the bottom (target at least 40), but band 4 is darker than band 3, so the ramp isn't
+  monotonic.
+
+### Blockers
+
+1. **The arch stands open instead of gripping the egg, and the two roots don't read as twisting together.** This is the
+   model's defining read.
+
+   What's wrong:
+   - In the f34, L's inner edge sits 0.06-0.10 W left of the sheet at every height (h .3-.7: .39 / .40 / .41 / .44 /
+     .46 against .46 / .47 / .47 / .50 / .56). That leaves a strip of daylight about 0.4 stud wide between L's leg
+     and the egg, and more above the egg's right shoulder. The arch box is 11.5 % background against 2.1 %.
+   - At h .7, L's run ends at .46 against the sheet's .56: the crest bends over too high and too thin.
+   - R's top end shows as a small knob (f34) and as a separate log end sticking out to the left (r34, top), not as the
+     broad hump that stands behind L's crest across f .30-.54.
+   - The club end curls under into a horizontal shelf with a dark slot below it (f34, junction close-up). The sheet
+     shows a smooth, thick down-bend resting on R.
+   - From the r34 the leg is too thin (0.23 W against 0.30): the buttress ellipse is 1.5 : 1 along X.
+
+   Fix in `ROOTS`:
+   - **L, ctrl 3-5:** move right by about 0.45 X, to (-1.6, -1.3, 1.57), (-1.0, -1.1, 2.91) and (-0.4, -0.9, 4.2).
+     Then L's inner flank meets the egg in the f34 (0-0.05 projected gap) and its outer edge lands at f .12 / .24 /
+     .30 at h .3 / .5 / .7.
+   - **L, crest:** lower the start of the bend (ctrl (-0.3, -0.75, 5.05) -> about (0.0, -0.75, 4.85)) and raise the
+     crest diameters to 1.8-1.9, so L's run at h .7 reaches f ~ .56.
+   - **L, cross-section:** cut the ellipse to about 1.2 : 1, or give the leg about 2.2 of depth in Y at z 2-4, so the
+     r34 leg is 0.28-0.32 W wide.
+   - **R's top end:** make it a broad domed hump about Ø 1.6 at about (-0.6, 1.0, 5.5), behind L's crest. Its top
+     should show level with or just above the crest at f .30-.54, and no end cap should be visible from the r34 or the
+     top view.
+   - **R's descent:** pull it in against the egg's right flank: (1.9, 0.05, 4.05) -> about (1.75, 0.0, 4.0) and
+     (2.6, -0.2, 3.4) -> about (2.4, -0.2, 3.45). Keep Ø about 1.3.
+   - **Club end:** replace the curl-under ((2.45, -0.5, 4.65), (2.6, -0.48, 4.1)) with a smooth down-bend that
+     overlaps R's shoulder by about 0.3. No horizontal ledge.
+
+   Re-check:
+   - f34 L runs within +-0.05 of the sheet;
+   - background in the arch box at most 4 %;
+   - the r34 W : H in 1.22-1.38 (now 1.18) and its root share within +-5 (now +7.1).
+
+2. **The leaf fans don't read as the sheet's big, separate kite blades spread like a hand of cards.**
+
+   What's wrong:
+   - The left fan reads as a dense, spiky, overlapping cluster.
+   - The right fan sits mostly behind R's leg (68 px wide against 143) and doesn't reach out to the right (top profile
+     at f .90-1.0 is .44 / .32 / .31 against .63 / .47 / .40).
+   - The rear leaf share is 13.8 against 22.3 (fails +-6).
+   - The LeafClump part reads as a low agave rosette, with its outer leaves near horizontal. Its height : span is
+     **0.68**; the spec target is at least 0.9, and the exploded fan is an upright V.
+
+   Fix in `FANS`, `CLUMP` and `RIDGE` / `KEEL`:
+   - **Right fan hub:** move it to R's outer back flank, about (3.6, 0.0, 2.2).
+   - **Right fan leaves:** use spec 2.3's set, (yaw, pitch, L) = (-8, -18, 2.3), (12, 15, 2.35), (38, 45, 2.45),
+     (68, 72, 2.6). The current lengths of 1.65 and 1.9 are too short, so the lowest tip should reach X ~ 4.9 at
+     z ~ 2.3.
+   - **Left fan hub:** move it about 0.35 further to -X, so each blade clears the buttress.
+   - **Both fans:** raise `FAN_STAGGER` from 0.12 to about 0.25, so the blades separate in depth.
+   - **Ridges:** raise the front ridge to about 0.11 L and the keel to about 0.08 L, so each blade has a crisp lit half
+     and dark half as drawn.
+   - **Part:** set every pitch to at least 35 deg (for example 40-85 deg), so H : span is at least 0.9 and the clump
+     reads as the exploded upright fan.
+
+   Re-check:
+   - f34 right-fan component at f .71-1.00 +-0.04;
+   - leaf shares within +-4 (f34) and +-6 (rear, r34);
+   - 4-5 individually countable blades per fan in the f34.
+
+### Minors
+
+1. **f34 W : H** is 1.546, against a limit of 1.54. It should come back in once the fans spread outward rather than
+   upward.
+2. **The egg's lit facets are dull.** The lit quartile is #8CC06B against #C4E986 (56, 41, 27), and the part's top
+   third is #91C36D against #99CF78.
+   - Lighten `sap_light` by about x1.15 linear and widen its band down to t 0.5.
+   - Keep the facing correlation under 0.5 (it is 0.44 now, so it has little room).
+3. **The leaves are darker than the sheet** in the part shot: median #5F700B against #74870D, and the hub band #45530B
+   against #64750C. In the f34 the shade quartile is 21-24 lighter than the sheet (a weak lit/dark split). Raise
+   `leaf_base` and `leaf` by about x1.2, and the ridge change in blocker 2 sharpens the split.
+4. **The root height ramp is not monotonic** in the f34: band 4 is #955F3C against the sheet's #AB7248. The root L part's
+   top third (#C78152) is about 24 lighter than the exploded's (#AF744B). Ease `root_light` slightly and extend its
+   band lower (z 3.3-5.3).
+5. **The base is a thin plate with small rim studs.** The sheet's exploded and base close-up show a chunkier slab front
+   lip and broad fused rim lumps. Raise the slab's outer ring to about 0.35 at the edge, and make the rim lumps 1.4-1.8
+   wide and 0.35-0.45 proud. Optional.
+6. **The front boulders read smaller than the sheet's.** The big front-left one is about 0.13 W against 0.19 W. Consider
+   about x1.2 on the front-left and front-mid boulders.
+7. **Bark facets** come out as many small, crumpled triangles rather than the sheet's long facets (1-2 studs) separated
+   by crisp grooves. L at z 1.5 has 2 creases, not 3. Consider a step of about 0.9 on straight runs and less per-vertex
+   jitter (0.06 -> 0.03).
+8. **The side cell** is a known miss (spec 3.3): from +X the base dominates and the right fan is edge-on (leaves
+   2.5 %). The top cell's W : H is not chased (3.5). The see-through gap (3.11) doesn't show. All three are accepted
+   per the spec.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-29. Background session on port 9882 with `art/blender/assets/kit/wip/M029.blend` (saved after
+the final build). All changes are in `m029.py`; `build()` runs in about 45 s (geometry about 25 s), fixed seeds.
+
+### Measuring
+
+- New `m029.arch_stats()` / `m029.arch_measure()` reproduce the round-1 verifier's arch reads on the sheet and our
+  `*_sheet` renders:
+  - root runs at h .3-.7;
+  - the background share in the arch box (f .35-.80, h .20-.85);
+  - the right fan's extent: the widest contiguous run of columns right of f .6 that hold at least 3 leaf pixels. On
+    the sheet this gives exactly the verifier's .71-1.00, 143 px;
+  - the widest root run at h .5.
+
+  On the round-1 renders it gave 11.6 % background (verifier 11.5) and the same runs.
+- **Mask change:** `_classes` now also counts the studio's warm-grey ground shadow (hue 30-70, sat < 0.11, value
+  > 0.62) as background, as the sheet's soft shadow already is. Before, our shadow counted as stone and stretched
+  our f34 bbox to the right, which is part of why round 1 saw the right fan end at f .90. All numbers below use it.
+- `bark_relief()` also returns the crease angles.
+
+### Blocker 1: the arch and the two roots
+
+Changes in `ROOTS`:
+- **L's leg and crest:**
+  - control points 3-5 moved 0.45 right, to (-1.6, -1.3, 1.57), (-1.0, -1.1, 2.91) and (-0.4, -0.9, 4.2);
+  - the crest bend starts at (0.0, -0.75, 4.85), with diameters 1.9 / 1.85 / 1.75;
+  - the foot ellipse is 1.2 : 1 (was 1.5), and the leg diameters are 2.45 / 2.15 / 1.95 (were 2.35 / 1.95 / 1.75);
+  - the club knot is gone.
+- **L's end:**
+  - The curl-under is replaced by a smooth down-bend: (1.35, -0.5, 5.1), (1.8, -0.45, 4.5), (2.08, -0.4, 3.8),
+    (2.32, -0.35, 3.2), with diameters 1.75 down to 0.8.
+  - It comes down in front of R's shoulder and tapers into it. Its end dome is buried in R.
+  - L stays in front of R where they cross (spec 2.2).
+  - No shelf or slot shows in the f34 or in the junction close-up.
+- **R's top end:**
+  - It is a broad hump, Ø 1.6 at about (-0.45, 0.75, 5.3), standing behind L's crest.
+  - Its end dives into the back of L's leg at (-1.1, -0.55, 3.8), so no log end shows.
+  - The hump path uses 6 points for an even bend. A tighter bend folded its inner side (6-7 self-hits).
+  - The back half of the hump keeps the plain mid brown: crest light is capped at 25 % where `y > 0.2` and
+    `x < 0.5`. So the two roots read apart where they cross, as drawn.
+- **R's descent:**
+  - It is pulled in against the egg, to (1.62, 0.0, 3.95) and (2.28, -0.2, 3.4).
+  - It is thicker at the shoulder (1.55 / 1.5 / 1.4).
+  - The lower leg moved 0.06-0.18 left, to (2.95, -0.4, 2.74), (3.32, -0.6, 2.09) and (3.68, -0.8, 1.45), with
+    diameters 1.3 / 1.3 / 1.15.
+- **Egg:**
+  - `SAP_C` moved 1.3 -> 1.18, so L hugs it.
+  - H went 3.45 -> 3.65 (3.57 after the seat), with fuller shoulders in `SAP_PROFILE`.
+  - The f34 egg top is now at h .66 (sheet .68). Its centre is (.605, .396) against the sheet's (.597, .418).
+
+| f34 L run (f) | Sheet | Round 1 | Round 2 | Inner edge delta |
+| --- | --- | --- | --- | --- |
+| h .3 | .12-.46 | .09-.39 | .13-.47 | +.01 |
+| h .4 | .17-.47 | .15-.40 | .21-.48 | +.01 |
+| h .5 | .24-.46 | .19-.41 | .26-.50 | +.04 |
+| h .6 | .27-.50 | .24-.44 | .30-.53 | +.03 |
+| h .7 | .30-.56 | .27-.46 | .32-.76 (merged) | see below |
+
+- **h .7 row:** it runs on from L into R's shoulder, which shows under the crest (root class). The sheet's opening
+  shows two small gaps there instead, so L's own inner edge can't be separated in that row.
+- **Arch-box background:** 3.2 % (sheet 2.1, round 1 11.5; target at most about 4).
+- **r34:**
+  - W : H is 1.165 (round 1 1.179, target 1.22-1.38): **not met**.
+  - Root share is 49.5 (sheet 45.7, within +-5; round 1 52.7).
+  - The widest root run at h .5 is 0.27 W (sheet 0.30, round 1 0.23).
+  - Why the width falls short: from (-40, 15) the width is set by the base and boulders on the left and by R's foot
+    on the right, and the hero is narrower than the sheet's drawing. The sheet shows L's buttress at the far left
+    (spec 3.2: its r34 reads nearer -20 to -25 deg).
+  - L's leg now hugs the egg in the f34, so from -40 it covers more of the egg (sapstone share 4.4 against 11.5). The
+    two cameras pull against each other.
+- **f34:** W : H is 1.418 (sheet 1.473, limit <= 1.54). The top-profile error (mean / max) is 0.035 / 0.19 (round 1
+  0.057 / 0.19).
+
+### Blocker 2: the leaf fans
+
+- **Both fans:**
+  - Each fan grows from a fixed `origin` just inside its root; FAN_INFO reports how deep the origin is sunk.
+  - Each has 4 kite blades: three big ones about 45 deg apart as drawn, and a fourth half-hidden.
+  - The blades are stacked `FAN_STAGGER` 0.25 apart, with the lower blades in front, as on the sheet. Before, the
+    upright blade was in front and hid the others.
+- **Left fan:** origin (-2.2, -0.55, 2.3), leaves (175, -12, 2.95), (165, 34, 2.75), (130, 58, 2.3) and
+  (155, 82, 2.8). The tips land on the sheet's (-4.9, 1.75), (-4.25, 3.7) and (-2.8, 4.9).
+- **Right fan:**
+  - Origin (3.5, -0.1, 2.5), on R's outer back flank.
+  - Leaves (0, -14, 1.5), (20, 42, 1.75) and (45, 60, 1.8).
+  - The upright blade grows from behind R's shoulder, through a new optional 4th value: a per-leaf base offset.
+  - The lowest tip is at X 4.95 (the W limit).
+- **Blade shape:**
+  - Width is now set per fan (`w`): 0.56 of L, against the global 0.48, for the sheet's broad kites.
+  - The front ridge is 0.11 L and the back keel 0.08 L.
+- **f34:**
+  - 4 separate blades can be counted in each fan (close-ups `o_lfan` / `o_rfan`).
+  - The right fan runs f **.76**-1.00, 100 px, against the sheet's .71-1.00, 143 px (round 1 .75-.90, 64 px).
+  - Its left end is .01 outside the +-.04 target, because L's down-bend hides the base of the upright blade.
+- **Leaf shares (sheet / ours):**
+  - f34: 15.2 / 15.9;
+  - rear: 22.3 / **16.5** (-5.8, within +-6; round 1 13.8);
+  - r34: 19.5 / 15.4 (-4.1).
+- **LeafClump part:** the pitches are now 51-85 deg (were 22-82), and H : span is **0.94** (round 1 0.68).
+
+### Minors
+
+1. **f34 W : H:** 1.418, within the 1.54 limit.
+2. **Sapstone:**
+   - `sap_light` x1.15, then the sap keys x(1.2-1.25, 1.2, 1.1) in calibration; the light band now starts at t 0.5.
+   - f34 median / lit / shade: ours #659049 / #91C767 / #4C6D39, sheet #699850 / #C4E986 / #446634.
+   - The egg's lit facets are still darker than the sheet's near-white, because the arch shades the egg in our studio.
+   - Facing correlation is 0.41 (< 0.5).
+3. **Leaves:**
+   - `leaf` and `leaf_base` x1.2; `leaf_tip` x1.28.
+   - f34 median / lit / shade: ours #74890D / #A5BE18 / #627508, sheet #6D7F07 / #AEC022 / #455202.
+   - The shade side is still lighter than the sheet's, because the studio key lights the back of the left fan.
+4. **Root height ramp:**
+   - f34 bands, bottom -> top: ours #8A5838, #8E5A38, #A96C43, **#9C633D**, #CB8455; sheet #845532, #915F39,
+     #A26941, #AB7248, #C88755.
+   - The bottom three bands now ramp up, and the top band is +65 in R over the bottom.
+   - Band 4 is still darker than band 3. It is the crest's underside and the arch interior, in shadow. Two tries
+     didn't move it: a steeper crest ramp (crest light over z 3.5 -> 4.6), and dropping the section-underside
+     darkening on the crest (z > 3.5). So the darkness comes from the lighting, not the paint.
+   - Changes made: `ROOT_DARK` x0.86 (#664125), foot field (0.1, 0.36), and `root_light` eased to #A46F49.
+   - A world-height foot field was tried and reverted: it failed the facing check (RootLeft 0.53).
+5. **Base:**
+   - The outer bulge ring went up 0.25 -> 0.36, for a chunkier lip.
+   - The rim lumps are 1.5-1.9 wide and 0.32-0.43 proud, with broader tops (`RIM_RINGS` top 0.75).
+   - The base part is now 9.55 x 7.35 x 0.9.
+6. **Boulders:**
+   - Front-left and front-mid are x1.25, at (2.25, 1.9, 1.75) and (1.7, 1.5, 1.4).
+   - Right-mid is now (1.3, 1.15, 1.15), which also closes the lower right of the arch box.
+   - The Rock part is 2.23 x 1.7 x 1.75.
+7. **Bark:** `STEP` 0.68 -> 0.9 and per-vertex radius jitter 0.06 -> 0.03, for longer facets and crisper grooves.
+   `bark_relief` gives:
+
+   | Station | Creases | Depths |
+   | --- | --- | --- |
+   | L z 1.5 | **2** | 0.29, 0.09 |
+   | L z 2.5 | 3 | 0.23, 0.21 |
+   | L z 3.5 | 3 | 0.26, 0.20 |
+   | R z 2.0 | 3 | 0.14, 0.10, 0.21 |
+   | R z 3.0 | **2** | 0.11, 0.17 |
+
+   - **L at z 1.5:** the section leans about 40 deg, so its lower half (rays at 100-230 deg) runs into the floor and
+     slab. Only 2 of its 3 grooves can be measured.
+     - A foot-only 4th groove was tried and reverted: its minimum fell where a left-fan blade blocks the ray.
+   - **R at z 3.0:** it lost one measurable crease because R now presses against the egg, so its inner rays hit the
+     egg.
+   - **Knots:** L at s .25 / .43 / .63; R at s .12-.21, .35, .49, .82 and .93.
+
+### Checks (final build; `problems` empty)
+
+| Object | Tris | Size (W x D x H) | Min corner | UV islands | Stretch p95 |
+| --- | --- | --- | --- | --- | --- |
+| SapstoneRootArch | 2566 / 4000 | 10.02 x 7.61 x 6.14 (target 9.9 / 7.6 / 6.2: within) | 5.0 | 400 | 1.01 |
+| ...Base | 502 | 9.55 x 7.35 x 0.90 | 5.08 | 75 | 1.03 |
+| ...Rock | 42 | 2.23 x 1.70 x 1.75 | 10.7 | 9 | 1.02 |
+| ...Sapstone | 80 | 2.65 x 2.45 x 3.57 | 39.5 | 9 | 1.06 |
+| ...RootLeft | 442 | 7.18 x 3.23 x 6.12 | 5.03 | 49 | 1.01 |
+| ...RootRight | 498 | 6.84 x 2.98 x 6.14 | 6.89 | 72 | 1.03 |
+| ...LeafClump | 414 | 2.86 x 2.28 x 2.68 | 5.0 | 74 | 1.01 |
+
+Every object also has:
+- 1 shell;
+- 0 non-manifold edges and verts, 0 boundary, wire or loose elements, and no zero-area faces, n-gons or duplicate
+  verts;
+- outward normals and 0 self-intersections;
+- rotation 0, scale 1, no modifiers and a `Tint` attribute;
+- clean UVs: 0 overlaps and 0 flips, gap 0.016, border 0.008, density 1.0.
+
+`K.check` is clean.
+- **Facing correlation:** hero 0.09, RootLeft 0.33, RootRight 0.18, Sapstone 0.41, LeafClump 0.20.
+- **The two greens stay apart:** leaves hue 70 / sat 0.91, sapstone hue 96 / sat 0.49.
+- **Root vs stone:** sat 0.60 against 0.27.
+
+**Final `PALETTE`:**
+
+| Key | Hex | Key | Hex |
+| --- | --- | --- | --- |
+| root | #93623E | rock_light | #877B76 |
+| root_dark | #664125 | sap | #70A258 |
+| root_light | #A46F49 | sap_light | #96CB6B |
+| base | #69564C | sap_dark | #4E783E |
+| base_dark | #5B4A40 | leaf | #637708 |
+| rock | #695954 | leaf_tip | #8EA618 |
+| | | leaf_base | #50620A |
+
+**f34 medians (sheet / ours):**
+
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Roots | #A16942 | #A36841 |
+| Stone | #796256 | #796458 |
+| Sapstone | #699850 | #659049 |
+| Leaves | #6D7F07 | #74890D |
+
+### Known misses, for the verifier
+
+- **r34 W : H** is 1.165, against 1.22-1.38. This is a camera and drawing mismatch (spec 3.2), and the f34 hug the
+  verifier asked for makes L hide the egg from -40.
+- **The f34 h .7 run** merges with R's shoulder under the crest.
+- **The right fan's left end** is at f .76 (target .71 +- .04).
+- **Root band 4** is darker than band 3 (the crest underside in shadow).
+- **Bark:** L at z 1.5 and R at z 3.0 each have 2 measurable creases. Both are occluded, as explained above.
+- **Accepted per the spec:**
+  - the side cell is still the known miss;
+  - the parts' exploded shapes follow the hero (decision 3);
+  - the LeafClump is a 7-leaf rosette, not the exploded drawing's planar V.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not the round-1 verifier, no other stage), 2026-10-29. Read-only: background session on port 9882
+with `art/blender/assets/kit/wip/M029_verify.blend`, never saved, `build()` not called, session stopped at the end.
+Fresh renders went to the scratchpad through `m029.render_views()` with `kit_models.MODEL_RENDERS` redirected. They are
+pixel-identical to this folder's `*_sheet` and part renders (mean difference 0.000/255), so the verify file is the
+current builder's output. Side-by-sides use the study's masks on tight crops of both images.
+
+**Verdict: PASS, 8/10.** Both round-1 blockers are fixed to their targets, or to within 0.01 of them. The technical
+side is clean. The remaining misses are camera/drawing mismatches, studio lighting, or small reads, and none is
+broken.
+
+### Re-measured (own scripts: `M.audit`, BVH self-overlap, ray-parity inversion, corner angles, `M.uv_stats`, `baked_shading`)
+
+| Object | Tris | Size (W x D x H) | Shells | NM edges / verts | Boundary | Self-hits | Inverted | Min corner | UV islands / overlaps / flips | Facing corr |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SapstoneRootArch | 2566 / 4000 | 10.02 x 7.61 x 6.14 (target 9.9 / 7.6 / 6.2 +-0.4 / 0.4 / 0.25: within) | 1 | 0 / 0 | 0 | 0 | 0 | 5.0 | 396 / 0 / 0 | 0.09 |
+| ...Base | 502 | 9.55 x 7.35 x 0.90 | 1 | 0 / 0 | 0 | 0 | 0 | 5.08 | 75 / 0 / 0 | 0.0 |
+| ...Rock | 42 | 2.23 x 1.70 x 1.75 | 1 | 0 / 0 | 0 | 0 | 0 | 10.7 | 9 / 0 / 0 | 0.0 |
+| ...Sapstone | 80 | 2.65 x 2.45 x 3.57 | 1 | 0 / 0 | 0 | 0 | 0 | 39.5 | 9 / 0 / 0 | 0.41 |
+| ...RootLeft | 442 | 7.18 x 3.23 x 6.12 | 1 | 0 / 0 | 0 | 0 | 0 | 5.03 | 49 / 0 / 0 | 0.34 |
+| ...RootRight | 498 | 6.84 x 2.98 x 6.14 | 1 | 0 / 0 | 0 | 0 | 0 | 6.89 | 72 / 0 / 0 | 0.18 |
+| ...LeafClump | 414 | 2.86 x 2.28 x 2.68 | 1 | 0 / 0 | 0 | 0 | 0 | 5.0 | 74 / 0 / 0 | 0.20 |
+
+- **Every object also has:** no n-gons, wire edges, loose or duplicate verts, or zero-area faces; outward normals; no
+  custom normals or modifiers; rotation 0 and scale 1; origin at the bottom centre (bbox offset 0, 0, 0); a CORNER
+  `Tint` attribute.
+- **UVs:** gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal p95 1.01-1.06.
+- **Kit checks:** `K.check` is empty, and every KITSTAT line is ok. The hero is one shell with the sapstone united
+  (decision 6).
+- **Facing:** all correlations are under 0.5, so nothing is coloured by facing.
+- **The two greens stay apart:** f34 leaves #74890D (hue 70, sat 0.91) against sapstone #659049 (hue 96, sat 0.49).
+- **Root against stone:** sat 0.60 against 0.27.
+
+### Mask change (round-2 `_classes`): fair
+
+The new rule (hue 30-70, sat < 0.11, value > 0.62 counts as background) was checked on both images:
+- **Our renders:** it flips 1,699 px (f34) and 8,800-13,500 px (side, rear, top). Their medians are #BCB6AC and
+  #A6A29A, the low-saturation warm grey of the studio ground shadow. Only 0-8 of the flipped pixels are enclosed by
+  object pixels on all four sides.
+- **The sheet:** it flips only 22-94 px per cell (pale highlight specks, under 0.1 %).
+- **Stone is safe:** stone renders at hue 15-25, outside the 30-70 window, so lit stone isn't dropped.
+
+### Round-1 blockers
+
+**Blocker 1 (arch grips the egg; two roots): fixed.**
+
+f34 L runs (f, sheet / ours):
+
+| h | Sheet | Ours | Inner-edge delta |
+| --- | --- | --- | --- |
+| .3 | .12-.46 | .13-.47 | +.01 |
+| .4 | .17-.47 | .21-.48 | +.01 |
+| .5 | .24-.46 | .26-.50 | +.04 |
+| .6 | .27-.50 | .30-.53 | +.03 |
+
+- **Runs:** all four are within the +-.05 target.
+- **Arch-box background:** 3.2 % (target <= 4, sheet 2.1, round 1 11.5). L's leg now sits against the egg in the
+  side-by-side.
+- **Club end:** a smooth, thick down-bend tapering onto R's shoulder, with no shelf or slot (`junc_cu`). It matches the
+  junction close-up.
+- **R's top end:** no log end shows in the r34 or the top view, and the crest reads as two lobes there.
+- **r34:** root share 49.5 against 45.7 (within +-5). The widest root run at h .5 is 0.27 W against 0.30.
+
+**Blocker 2 (leaf fans): fixed.**
+- **f34 shares:** leaf 15.9 against 15.2 (+-4).
+- **Rear share:** leaf 16.5 against 22.3 (-5.8, within +-6).
+- **r34 share:** leaf 15.4 against 19.5 (-4.1, within +-6).
+- **Right fan:** f .76-1.00, 100 px, against .71-1.00, 143 px. The left end misses the +-.04 target by .01 (round 1:
+  .75-.90, 68 px).
+- **Blades:** 4 separate kites can be counted in each fan in the f34, with a crisp lit half and dark half.
+- **LeafClump:** H : span 0.94 (target >= 0.9; round 1 0.68).
+
+### Remaining misses, judged
+
+1. **r34 W : H 1.165 against 1.22-1.38: accept (camera, not model).** I rendered the hero at other azimuths with the
+   same 3x lens and el 15:
+
+   | Azimuth | W : H | Root | Sapstone | Top-error mean |
+   | --- | --- | --- | --- | --- |
+   | -20 | 1.303 | 46.5 | 9.1 | 0.035 |
+   | -25 | 1.265 | 47.2 | 8.0 | 0.040 |
+   | -30 | 1.237 | 47.9 | 6.8 | 0.045 |
+   | -40 | 1.171 | 49.2 | 4.4 | 0.057 |
+
+   At -20 the model matches the drawing (sheet 1.297 / 45.7 / 11.5). That confirms spec 3.2: the sheet's r34 is drawn
+   nearer -20 to -25 deg, and the -40 camera (decision 9) is what misses. Optional: switch `SHEET_VIEWS["r34_sheet"]`
+   to (-22, 15).
+2. **f34 h .7 run merges (.32-.76): accept.** The sheet has L .30-.56, R's shoulder .58-.64 and R .68-.75, so the
+   only difference is the two 0.02-0.04 W slivers of daylight, which are the see-through gap (spec 3.11, nice to have).
+3. **Root band 4 is darker than band 3: accept (lighting).**
+   - f34 bands, bottom -> top: ours #8A5838 #8E5A38 #A96C43 **#9B633D** #CB8455; sheet #845532 #915F39 #A26941
+     #AB7248 #C88755.
+   - Band 4 is off by (16, 15, 11). It is the crest underside and the arch interior, in the studio shadow.
+   - Top minus bottom is +65 in R (target >= 40).
+   - The paint ramp itself is monotonic. A world-height fix fails the facing check, as the modeller found.
+4. **Bark stations: accept (the misses come from occlusion).** I checked them ray by ray.
+
+   | Station | Creases | Finding |
+   | --- | --- | --- |
+   | L z 1.5 | 2 | Rays at 100-230 deg hit rock and base (radii 2.1-2.9), so the lower half can't be measured. |
+   | R z 3.0 | 2 | Rays at 150-210 deg hit the sapstone, the egg contact blocker 1 asked for. Clear grooves at about 95 and 300 deg. |
+   | L z 2.5 | 3 | The third crease is a real groove about 0.1 deep. The reported 0.67 is inflated by a leaf hit at 282 deg. |
+   | L z 3.5 | 3 | The third crease is about 0.13 deep. |
+   | R z 2.0 | 3 | |
+
+   - **Knots:** L at s .25 / .43 / .63; R at s .12-.21, .35, .49, .82 and .93.
+   - **Facets:** in the side-by-sides, long facets run along the limbs. They are a little softer than the sheet's
+     crisply ridged bark.
+
+### Views against the sheet (`measure()`; sheet / ours)
+
+| View | W : H | Leaves | Sapstone | Root | Stone | Top error mean / max | Read |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.473 / 1.418 | 15.2 / 15.9 | 15.1 / 12.9 | 46.1 / 43.9 | 23.6 / 27.4 | 0.035 / 0.19 | Matches: arch over the egg, L's leg on the left, crest flat at h .97-1.0, fans both sides, boulder ring. |
+| r34 | 1.297 / 1.165 | 19.5 / 15.4 | 11.5 / 4.4 | 45.7 / 49.5 | 23.4 / 30.7 | 0.056 / 0.19 | Camera (above). The sheet's inner fan is not modelled (decision 4). |
+| side | 1.158 / 1.031 | 21.0 / 2.9 | 13.1 / 10.1 | 48.8 / 47.4 | 17.2 / 39.7 | 0.164 / 0.66 | Known miss (spec 3.3, a redraw). |
+| rear | 1.337 / 1.408 | 22.3 / 16.5 | 12.3 / 14.9 | 36.5 / 41.8 | 28.8 / 26.8 | 0.056 / 0.17 | Arch from behind, fans both sides. The egg shows more (the sheet hides it behind the unmodelled inner fan); sapstone centre f .40 against .47. |
+| top | 1.141 / 1.32 | 18.1 / 15.0 | 13.3 / 7.0 | 40.1 / 45.5 | 28.5 / 32.6 | 0.085 / 0.21 | High front view (spec 3.5). L's crest now covers more of the egg from 50 deg. |
+
+Other f34 measurements:
+- **Egg centre:** (.605, .396) against (.597, .418).
+- **Root top line:** within .05 at f .35-.90. At f .25 / .30 it is .48 / .60 against .53 / .77: R's hump doesn't
+  stand out past L's crest at the upper left the way the sheet's does (minor 1).
+
+### Colours (sheet / ours, same masks; difference in R, G, B)
+
+| Region | Median | Lit quartile | Shade quartile |
+| --- | --- | --- | --- |
+| Roots, f34 | #A16942 / #A36841 (2, 1, 1) | #D08F5E / #D18756 (1, 8, 8) | #6C4426 / #7A4E31 (14, 10, 11) |
+| Stone, f34 | #796256 / #7A6458 (1, 2, 2) | #987F73 / #988276 (0, 3, 3) | #4B3E36 / #56473E (11, 9, 8) |
+| Sapstone, f34 | #699850 / #659049 (4, 8, 7) | #C4E986 / #91C767 (51, 34, 31) | #446634 / #4C6D39 (8, 7, 5) |
+| Leaves, f34 | #6D7F07 / #74890D (7, 10, 6) | #AEC022 / #A5BE18 (9, 2, 10) | #455202 / #627508 (29, 35, 6) |
+| Root L, part / exploded | #9B6342 / #A66E47 (11, 11, 5) | #D18756 / #BC7D50 | #7F5031 / #855635 |
+| Root R, part / exploded | #B17249 / #935E38 (30, 20, 17) | #CF8656 / #CB8B5A | #784C30 / #6D472A |
+| Sapstone, part / exploded | #80B65C / #71A660 (15, 16, 4) | #A4E175 / #A4D67E (0, 11, 9) | #639148 / #51844C |
+| Leaf clump, part / exploded | #627509 / #74870D (18, 18, 4) | #9AB116 / #9EB21D (4, 1, 7) | #435205 / #506103 |
+
+- **Egg lit quartile:** the f34 lit quartile is dull, but the part render's lit quartile matches the sheet (#A4E175
+  against #A4D67E). The paint is right, and the f34 gap is the arch's studio shadow.
+- **Egg render noise:** the f34 shows sample noise on the egg's shaded left half. That is studio render noise, not
+  texture: the egg's Tint amplitude is 0.03, and the part render is clean.
+
+### Items
+
+No blockers.
+
+Minors (optional, cheap):
+1. **R's hump reads weakly at the upper left of the f34.** The root top is .60 against .77 at f .30. Fix: in `ROOTS`
+   R, move the hump's end point about 0.5 further to -X and 0.2 up (currently diving into L at (-1.1, -0.55, 3.8)), so
+   its top shows past L's crest at f .25-.35. Keep the 6-point bend that avoids self-hits.
+2. **Right fan left end:** f .76 against .71 +- .04 (.01 out). Fix: move the right fan origin about 0.15 to -X, or
+   give the upright blade a little more yaw to -X.
+3. **r34 camera:** change `r34_sheet` to (-22, 15) so the comparison matches the drawing (measured above). This is
+   documentation only.
+4. **Egg slightly slim.** Exploded W : H is 0.81 and our part is 0.70-0.74 (2.65 x 3.57). Fix: `SAP_SIZE` W / D
+   x1.05, if the f34 egg width allows.
+5. **Leaf clump part about 18 darker** than the exploded clump (median). In the hero the leaves are 7-10 lighter than
+   the sheet, so leave the keys and accept it.
+6. **Root R part median about 25 lighter** than the exploded R (its crest band shows more from the parts camera).
+   Cosmetic.
+7. **Accepted, unchanged:**
+   - band 4 (lighting);
+   - the h .7 merge and the see-through gap (3.11);
+   - the bark stations (occlusion);
+   - the side cell (3.3);
+   - the top cell (3.5);
+   - the rear egg exposure, from the unmodelled inner fan (decision 4);
+   - the egg lit quartile and the studio render noise;
+   - the hero's UV island count, 396 (the spec says 400).

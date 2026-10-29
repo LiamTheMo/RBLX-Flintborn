@@ -1,0 +1,1134 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M032",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m032_bark",
+    "hex": "#573300",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_bed",
+    "hex": "#054F6C",
+    "levels": [
+     0.93573,
+     0.94333,
+     0.95835,
+     0.9696,
+     0.99269,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00906,
+     1.02985,
+     1.06095
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_grass",
+    "hex": "#88A900",
+    "levels": [
+     0.96104,
+     0.96511,
+     0.96641,
+     0.97053,
+     0.97383,
+     0.97699,
+     0.97959,
+     0.98339,
+     0.98718,
+     0.98942,
+     0.99095,
+     0.99477,
+     0.99602,
+     0.99999,
+     1.00217,
+     1.00431,
+     1.00685,
+     1.00956,
+     1.01109,
+     1.01514,
+     1.01682,
+     1.02015,
+     1.02389,
+     1.03514,
+     1.03833
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_grass_x_leaf_25",
+    "hex": "#6E9603",
+    "levels": [
+     0.96553,
+     0.99217,
+     0.9968,
+     1.00044,
+     1.00599,
+     1.01113,
+     1.01458,
+     1.01901
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_leaf",
+    "hex": "#215C0C",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_petal",
+    "hex": "#C8C8C4",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_pine",
+    "hex": "#055D2D",
+    "levels": [
+     0.96379,
+     0.97466,
+     0.98857,
+     0.99841,
+     1.00736,
+     1.01347,
+     1.01858,
+     1.02203,
+     1.02985,
+     1.03325,
+     1.03963,
+     1.04192
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_pollen",
+    "hex": "#B5A51A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_rock",
+    "hex": "#B0A4A1",
+    "levels": [
+     0.91786,
+     0.94626,
+     0.95759,
+     0.96427,
+     0.96909,
+     0.97298,
+     0.97807,
+     0.98308,
+     0.98723,
+     0.99085,
+     0.99525,
+     0.99912,
+     1.0,
+     1.00047,
+     1.00696,
+     1.01237,
+     1.01736,
+     1.02182,
+     1.02546,
+     1.02774,
+     1.03036,
+     1.03234,
+     1.03512,
+     1.03763,
+     1.04084,
+     1.04457,
+     1.04851,
+     1.05305,
+     1.05662,
+     1.06187,
+     1.06828,
+     1.09472
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_rock_x_soil_dark_25",
+    "hex": "#A29082",
+    "levels": [
+     0.99781,
+     1.0,
+     1.01246,
+     1.02491
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_sand",
+    "hex": "#F0C47E",
+    "levels": [
+     0.97697,
+     0.98926,
+     1.00417,
+     1.00686,
+     1.0191,
+     1.02269,
+     1.0338
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_sand_x_light_25",
+    "hex": "#F2CD8C",
+    "levels": [
+     0.96526,
+     0.97702,
+     0.99629,
+     1.00478,
+     1.01327
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_sand_x_light_50",
+    "hex": "#F4D699",
+    "levels": [
+     0.97271,
+     0.97569,
+     0.9823,
+     0.98832,
+     0.99196,
+     0.99481,
+     0.99987,
+     1.00322,
+     1.00726,
+     1.00978,
+     1.01191,
+     1.01536,
+     1.01969,
+     1.02207,
+     1.02483
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_sand_x_soil_dark_25",
+    "hex": "#D2A868",
+    "levels": [
+     0.96839,
+     0.98803,
+     0.99002,
+     1.0,
+     1.00413,
+     1.00854,
+     1.01442
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_soil",
+    "hex": "#A8804A",
+    "levels": [
+     0.96828,
+     0.97348,
+     0.99215,
+     0.99772,
+     1.0,
+     1.00208,
+     1.00411,
+     1.00804,
+     1.01117,
+     1.03647
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_soil_dark",
+    "hex": "#765424",
+    "levels": [
+     1.0,
+     1.003
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_water",
+    "hex": "#00C8F4",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m032_water_foam",
+    "hex": "#D5FCFD",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {
+   "m032_water": {
+    "hex": "#00C8F4",
+    "texture": "water/m032_water.png",
+    "transparency": 0.3
+   },
+   "m032_water_foam": {
+    "hex": "#D5FCFD",
+    "texture": "water/m032_water_foam.png",
+    "transparency": 0.1
+   }
+  },
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "ShorelineCorner",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "hero",
+   "size": [
+    32.1961,
+    16.3928,
+    25.893
+   ],
+   "tris": 3614,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCorner.glb",
+     "kind": "solid",
+     "tris": 2978,
+     "offset": [
+      0.0,
+      8.1964,
+      -0.1914
+     ],
+     "size": [
+      32.1961,
+      16.3928,
+      25.5103
+     ]
+    },
+    {
+     "file": "meshes/ShorelineCorner_water_m032_water.glb",
+     "kind": "water",
+     "tris": 300,
+     "offset": [
+      6.1172,
+      0.63,
+      1.952
+     ],
+     "size": [
+      19.9617,
+      0.74,
+      21.2235
+     ],
+     "key": "m032_water",
+     "color": "#00C8F4",
+     "texture": "water/m032_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/ShorelineCorner_water_m032_water_foam.glb",
+     "kind": "water",
+     "tris": 336,
+     "offset": [
+      5.2126,
+      1.07,
+      2.2801
+     ],
+     "size": [
+      18.1128,
+      0.08,
+      21.3327
+     ],
+     "key": "m032_water_foam",
+     "color": "#D5FCFD",
+     "texture": "water/m032_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_ShorelineCorner_water_foam_1",
+     "kind": "water_foam",
+     "position": [
+      -3.502,
+      1.05,
+      11.9638
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_2",
+     "kind": "water_foam",
+     "position": [
+      0.298,
+      1.05,
+      8.9638
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_3",
+     "kind": "water_foam",
+     "position": [
+      5.198,
+      1.05,
+      2.3638
+     ],
+     "vfx_scale": 0.75,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_4",
+     "kind": "water_foam",
+     "position": [
+      9.898,
+      1.05,
+      -2.9362
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_5",
+     "kind": "water_foam",
+     "position": [
+      12.498,
+      1.05,
+      -6.8362
+     ],
+     "vfx_scale": 0.65,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_6",
+     "kind": "water_foam",
+     "position": [
+      5.098,
+      1.05,
+      9.9638
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_7",
+     "kind": "water_foam",
+     "position": [
+      8.898,
+      1.05,
+      5.5638
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_ShorelineCorner_water_foam_8",
+     "kind": "water_foam",
+     "position": [
+      10.698,
+      1.05,
+      -3.0362
+     ],
+     "vfx_scale": 0.8,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "riverbank shoreline corner terrain tile (32 x 26, W03 levels: bed 0.2, water 1.0, beach 1.0-1.8, grass 10.4): a grass-topped ridge with a row of big flat-faced cliff columns turning 45 degrees from the front-left to the back-right, a sand beach at the cliff foot, see-through water at the front-right with a separate flat foam ribbon and rings round the boulders; one closed land shell plus closed water and foam shells (exported as two see-through water pieces). 8 water_foam sockets"
+  },
+  {
+   "name": "ShorelineCornerFoam",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "part",
+   "size": [
+    18.1128,
+    0.08,
+    21.3327
+   ],
+   "tris": 336,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCornerFoam_water_m032_water_foam.glb",
+     "kind": "water",
+     "tris": 336,
+     "offset": [
+      0.0,
+      0.04,
+      0.0
+     ],
+     "size": [
+      18.1128,
+      0.08,
+      21.3327
+     ],
+     "key": "m032_water_foam",
+     "color": "#D5FCFD",
+     "texture": "water/m032_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Foam (reusable): the separate flat foam mesh (shore ribbon with round holes, boulder rings, blobs) 0.03 over the water"
+  },
+  {
+   "name": "ShorelineCornerGrassTop",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "part",
+   "size": [
+    24.7443,
+    7.7428,
+    22.1203
+   ],
+   "tris": 942,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCornerGrassTop.glb",
+     "kind": "solid",
+     "tris": 942,
+     "offset": [
+      0.0,
+      3.8714,
+      0.0
+     ],
+     "size": [
+      24.7443,
+      7.7428,
+      22.1203
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Grass Top (reusable): thick lime grass slab with a soil band, a sand path along the rim, two pines, fan bushes, daisies, yellow flowers, small lawn rocks"
+  },
+  {
+   "name": "ShorelineCornerRockSlope",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "part",
+   "size": [
+    24.8566,
+    9.6697,
+    20.5392
+   ],
+   "tris": 550,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCornerRockSlope.glb",
+     "kind": "solid",
+     "tris": 550,
+     "offset": [
+      0.0,
+      4.8348,
+      0.0
+     ],
+     "size": [
+      24.8566,
+      9.6697,
+      20.5392
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Slope (reusable): the front row of big flat-faced bevelled cliff columns with their foot boulders"
+  },
+  {
+   "name": "ShorelineCornerSandStrip",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "part",
+   "size": [
+    19.8,
+    1.8,
+    21.3
+   ],
+   "tris": 196,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCornerSandStrip.glb",
+     "kind": "solid",
+     "tris": 196,
+     "offset": [
+      0.0,
+      0.9,
+      0.0
+     ],
+     "size": [
+      19.8,
+      1.8,
+      21.3
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Dirt / Sand Strip (reusable): the beach slab, sloping from the cliff foot (1.8) to the waterline (1.0)"
+  },
+  {
+   "name": "ShorelineCornerWaterPlane",
+   "sheet": "M032",
+   "subject": "Shoreline Corner",
+   "role": "part",
+   "size": [
+    22.2692,
+    1.3,
+    21.4
+   ],
+   "tris": 416,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ShorelineCornerWaterPlane.glb",
+     "kind": "solid",
+     "tris": 116,
+     "offset": [
+      0.0,
+      0.25,
+      0.0
+     ],
+     "size": [
+      22.2692,
+      0.5,
+      21.4
+     ]
+    },
+    {
+     "file": "meshes/ShorelineCornerWaterPlane_water_m032_water.glb",
+     "kind": "water",
+     "tris": 300,
+     "offset": [
+      1.1537,
+      0.93,
+      0.0882
+     ],
+     "size": [
+      19.9617,
+      0.74,
+      21.2235
+     ],
+     "key": "m032_water",
+     "color": "#00C8F4",
+     "texture": "water/m032_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Water Plane (reusable): the see-through water slab (top 1.0) over its dark bed (0.2), with holes for the boulders"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 9,
+  "solid": 5,
+  "water": 4,
+  "glow": 0,
+  "tris": 6054,
+  "vfxSockets": 8,
+  "paletteColours": 18,
+  "paletteLevels": 165,
+  "meshBytes": 478944
+ },
+ "problems": []
+}

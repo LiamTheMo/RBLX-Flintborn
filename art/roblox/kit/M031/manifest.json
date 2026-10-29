@@ -1,0 +1,634 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M031",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m031_cap",
+    "hex": "#985031",
+    "levels": [
+     0.9778,
+     0.98019,
+     0.98231,
+     0.98478,
+     0.98729,
+     0.98974,
+     0.99153,
+     0.99384,
+     0.99599,
+     0.99885,
+     1.00226,
+     1.00376,
+     1.01067,
+     1.01273,
+     1.01785,
+     1.0211,
+     1.02329,
+     1.02682,
+     1.03107
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_cap_x_light_25",
+    "hex": "#9C5233",
+    "levels": [
+     0.97648,
+     0.97953,
+     0.98448,
+     0.98758,
+     0.99224,
+     0.99603,
+     1.00222,
+     1.00923,
+     1.01215,
+     1.01743
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_cap_x_light_50",
+    "hex": "#A05534",
+    "levels": [
+     0.97739,
+     0.98094,
+     0.98437,
+     0.98624,
+     0.99046,
+     0.99284,
+     1.00615,
+     1.00902
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_cap_x_rim_25",
+    "hex": "#904A2B",
+    "levels": [
+     0.97547,
+     0.97726,
+     0.98076,
+     0.98345,
+     0.98495,
+     0.98798,
+     0.99158,
+     0.99317,
+     0.99602,
+     0.9974,
+     1.00067,
+     1.00535,
+     1.0084,
+     1.0105,
+     1.01248,
+     1.01481,
+     1.01813,
+     1.01988,
+     1.02232,
+     1.02481
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_cap_x_rim_50",
+    "hex": "#884424",
+    "levels": [
+     0.97089,
+     0.97576,
+     0.97772,
+     0.98178,
+     0.98405,
+     0.9874,
+     0.99066,
+     0.9933,
+     0.99727,
+     0.99986,
+     1.0022,
+     1.00487,
+     1.00731,
+     1.01052,
+     1.01293,
+     1.0154,
+     1.01855,
+     1.02065,
+     1.02526,
+     1.02853
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_gill",
+    "hex": "#A08870",
+    "levels": [
+     0.96108,
+     0.96275,
+     0.96496,
+     0.96763,
+     0.96923,
+     0.97138,
+     0.9735,
+     0.9754,
+     0.97751,
+     0.98005,
+     0.98219,
+     0.9843,
+     0.98635,
+     0.98894,
+     0.99071,
+     0.99257,
+     0.99491,
+     0.99682,
+     0.99895,
+     1.00205,
+     1.00371,
+     1.00638,
+     1.00905,
+     1.01129,
+     1.01344,
+     1.01572,
+     1.01748,
+     1.01938,
+     1.02169,
+     1.0238,
+     1.02591,
+     1.02766
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_rock",
+    "hex": "#9B9290",
+    "levels": [
+     0.94589,
+     0.9508,
+     0.95194,
+     0.95436,
+     0.95809,
+     0.96031,
+     0.96432,
+     0.96587,
+     0.96915,
+     0.97077,
+     0.97332,
+     0.9764,
+     0.98293,
+     0.9882,
+     0.9904,
+     0.99351,
+     0.99572,
+     0.9981,
+     1.00001,
+     1.00221,
+     1.00593,
+     1.0077,
+     1.01022,
+     1.01264,
+     1.01508,
+     1.01694
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_rock_small",
+    "hex": "#7E7775",
+    "levels": [
+     0.92756,
+     0.93236,
+     0.93852,
+     0.94121,
+     0.94353,
+     0.94619,
+     0.94824,
+     0.94944,
+     0.95176,
+     0.953,
+     0.95493,
+     0.95679,
+     0.95809,
+     0.95973,
+     0.96281,
+     0.96475,
+     0.96735,
+     0.96802,
+     0.97028,
+     0.97205,
+     0.97332,
+     0.97465,
+     0.97573,
+     0.979,
+     0.98286,
+     0.98759,
+     0.99155,
+     1.00125,
+     1.01887,
+     1.02138,
+     1.04185,
+     1.05922
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_rock_small_x_rock_25",
+    "hex": "#857E7C",
+    "levels": [
+     0.93209,
+     0.93473,
+     0.93683,
+     0.9409,
+     0.94303,
+     0.94512,
+     0.94868,
+     0.95536,
+     0.95979,
+     0.96571,
+     0.97044,
+     0.97297,
+     0.97749,
+     0.98376,
+     1.02062,
+     1.02466,
+     1.02752,
+     1.03142,
+     1.03361,
+     1.03693,
+     1.04077,
+     1.04406,
+     1.04698,
+     1.04891,
+     1.05133,
+     1.05695,
+     1.06101
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_rock_x_small_25",
+    "hex": "#948B89",
+    "levels": [
+     0.94189,
+     0.94516,
+     0.94948,
+     0.95133,
+     0.95378,
+     0.95599,
+     0.96257,
+     0.96484,
+     0.96955,
+     0.97231,
+     0.97551,
+     0.98056,
+     0.98538,
+     0.9888,
+     0.99095,
+     0.9929,
+     0.99863,
+     1.00061,
+     1.00319,
+     1.00557,
+     1.00912,
+     1.0151,
+     1.01766,
+     1.01987
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_rock_x_small_50",
+    "hex": "#8C8482",
+    "levels": [
+     0.95029,
+     0.95192,
+     0.95402,
+     0.95672,
+     0.96064,
+     0.96294,
+     0.96744,
+     0.9714,
+     0.97441,
+     0.97585,
+     0.9798,
+     0.98304,
+     0.98556,
+     0.98981,
+     0.9943,
+     0.99619,
+     1.004,
+     1.0055
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_stalk",
+    "hex": "#CABBAA",
+    "levels": [
+     0.96594,
+     0.96795,
+     0.97059,
+     0.97293,
+     0.97549,
+     0.97755,
+     0.98001,
+     0.98232,
+     0.98464,
+     0.98746,
+     0.98969,
+     0.99166,
+     0.99402,
+     0.99609,
+     0.99837,
+     1.00043,
+     1.00302,
+     1.00482,
+     1.00739,
+     1.01,
+     1.01183,
+     1.01443
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_stalk_low",
+    "hex": "#BAA995",
+    "levels": [
+     0.97392,
+     0.97592,
+     0.97834,
+     0.98016
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_stalk_x_low_25",
+    "hex": "#C6B6A5",
+    "levels": [
+     0.97193,
+     0.9764,
+     0.97966,
+     0.98177,
+     0.98539,
+     0.9879,
+     0.99073,
+     0.99264,
+     0.99794,
+     1.00044,
+     1.0032,
+     1.00537,
+     1.0101,
+     1.01209,
+     1.01471
+    ],
+    "used": true
+   },
+   {
+    "key": "m031_stalk_x_low_50",
+    "hex": "#C2B2A0",
+    "levels": [
+     0.9749,
+     0.9777,
+     0.98077,
+     0.98396,
+     0.98739,
+     0.99089,
+     0.9932,
+     0.99539,
+     0.99727,
+     0.99968,
+     1.00212,
+     1.00492,
+     1.0071,
+     1.01047,
+     1.01298,
+     1.016,
+     1.01913
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CaveFungusCap",
+   "sheet": "M031",
+   "subject": "Cave Mushroom",
+   "role": "part",
+   "size": [
+    3.0426,
+    1.4893,
+    2.8155
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveFungusCap.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      0.7447,
+      0.0
+     ],
+     "size": [
+      3.0426,
+      1.4893,
+      2.8155
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Mushroom Cap (reusable): faceted rust-orange dome cap, 10 sectors and 4 facet rows, flat crown polygon, dark lip band, closed by a tan down-facing gill annulus"
+  },
+  {
+   "name": "CaveFungusNode",
+   "sheet": "M031",
+   "subject": "Cave Mushroom",
+   "role": "hero",
+   "size": [
+    4.5683,
+    3.6,
+    3.5971
+   ],
+   "tris": 1648,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveFungusNode.glb",
+     "kind": "solid",
+     "tris": 1648,
+     "offset": [
+      0.0,
+      1.8,
+      0.0
+     ],
+     "size": [
+      4.5683,
+      3.6,
+      3.5971
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cave mushroom patch (CaveMushroomPatch node): three chunky mushrooms with broad faceted rust-orange dome caps (dark lip, tan underside drum and gill ring) on fat cream stalks, the big one at the back-centre, a medium one front-left and a small one front-right leaning outward, in a lumpy ring of eleven warm-grey faceted boulders; one closed mesh, flat underside. No VFX"
+  },
+  {
+   "name": "CaveFungusRockBase",
+   "sheet": "M031",
+   "subject": "Cave Mushroom",
+   "role": "part",
+   "size": [
+    4.5246,
+    1.0,
+    3.576
+   ],
+   "tris": 870,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveFungusRockBase.glb",
+     "kind": "solid",
+     "tris": 870,
+     "offset": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "size": [
+      4.5246,
+      1.0,
+      3.576
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Base (reusable): eleven faceted warm-grey boulders, a wide low central dome among them, flat underside"
+  },
+  {
+   "name": "CaveFungusStalk",
+   "sheet": "M031",
+   "subject": "Cave Mushroom",
+   "role": "part",
+   "size": [
+    1.4655,
+    1.72,
+    1.48
+   ],
+   "tris": 112,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveFungusStalk.glb",
+     "kind": "solid",
+     "tris": 112,
+     "offset": [
+      0.0,
+      0.86,
+      0.0
+     ],
+     "size": [
+      1.4655,
+      1.72,
+      1.48
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Mushroom Stalk (reusable): 10-sided faceted cream bell stalk with a short top peg"
+  },
+  {
+   "name": "CaveFungusUnderside",
+   "sheet": "M031",
+   "subject": "Cave Mushroom",
+   "role": "part",
+   "size": [
+    2.0185,
+    0.578,
+    2.0195
+   ],
+   "tris": 94,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CaveFungusUnderside.glb",
+     "kind": "solid",
+     "tris": 94,
+     "offset": [
+      0.0,
+      0.289,
+      0.0
+     ],
+     "size": [
+      2.0185,
+      0.578,
+      2.0195
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cap Underside (reusable): 12-sided bevelled tan disc that hangs under the cap"
+  }
+ ],
+ "stats": {
+  "assets": 5,
+  "pieces": 5,
+  "solid": 5,
+  "water": 0,
+  "glow": 0,
+  "tris": 2832,
+  "vfxSockets": 0,
+  "paletteColours": 15,
+  "paletteLevels": 294,
+  "meshBytes": 271240
+ },
+ "problems": []
+}
