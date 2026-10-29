@@ -1,0 +1,2778 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M037",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m037_bark",
+    "hex": "#5A3412",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed",
+    "hex": "#0B6E8F",
+    "levels": [
+     0.92382,
+     0.94278,
+     0.95554,
+     0.96275,
+     0.9749,
+     0.97906,
+     0.98535,
+     0.99002,
+     0.99191,
+     0.99372,
+     0.99532,
+     0.99783,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00226,
+     1.00722,
+     1.00913,
+     1.00992,
+     1.01159,
+     1.01682,
+     1.01944,
+     1.02376,
+     1.027,
+     1.04522,
+     1.09936
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_light",
+    "hex": "#3AC4EA",
+    "levels": [
+     0.98047,
+     0.98638,
+     0.99609,
+     1.00318,
+     1.00963,
+     1.01515,
+     1.02355
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_x_light_25",
+    "hex": "#1784A6",
+    "levels": [
+     0.99006,
+     0.99342
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_x_light_50",
+    "hex": "#2299BC",
+    "levels": [
+     0.98012,
+     0.99552,
+     0.99817,
+     1.00553,
+     1.01046
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_x_light_75",
+    "hex": "#2EAED3",
+    "levels": [
+     0.98654
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_x_rock_25",
+    "hex": "#347C94",
+    "levels": [
+     0.97736,
+     0.98103,
+     0.9876,
+     0.99347,
+     0.99556,
+     0.99804,
+     1.00041,
+     1.00479,
+     1.01019,
+     1.01409,
+     1.01684,
+     1.02569
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_bed_x_rock_75",
+    "hex": "#84989F",
+    "levels": [
+     0.98966,
+     0.99254,
+     0.99597,
+     1.01258,
+     1.02919
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_dirt",
+    "hex": "#A88B66",
+    "levels": [
+     0.96745,
+     0.97075,
+     0.97695,
+     0.97972,
+     0.98633,
+     0.98905,
+     0.99381,
+     0.99656,
+     0.99912,
+     1.00034,
+     1.00852,
+     1.01754,
+     1.02617
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass",
+    "hex": "#8AAA00",
+    "levels": [
+     0.96034,
+     0.96409,
+     0.96658,
+     0.9703,
+     0.97292,
+     0.9748,
+     0.97748,
+     0.98018,
+     0.98275,
+     0.98474,
+     0.98791,
+     0.99009,
+     0.99285,
+     0.99531,
+     0.99801,
+     1.00004,
+     1.00254,
+     1.00429,
+     1.00653,
+     1.00766,
+     1.01071,
+     1.01274,
+     1.01476,
+     1.01767,
+     1.02006,
+     1.02149,
+     1.02433,
+     1.02667,
+     1.02942,
+     1.03219,
+     1.03887,
+     1.04425
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_dirt_25",
+    "hex": "#92A21A",
+    "levels": [
+     0.97459,
+     0.9999,
+     1.00342,
+     1.0195,
+     1.02604
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_dirt_50",
+    "hex": "#999A33",
+    "levels": [
+     0.98606,
+     0.99164,
+     1.00304,
+     1.00669,
+     1.01203,
+     1.01648
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_leaf_lime_12",
+    "hex": "#86A800",
+    "levels": [
+     0.97628
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_leaf_lime_25",
+    "hex": "#82A500",
+    "levels": [
+     0.96929,
+     0.98296,
+     0.99079,
+     0.9967,
+     1.00767,
+     1.0108,
+     1.02279
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_leaf_lime_38",
+    "hex": "#7DA200",
+    "levels": [
+     0.99206,
+     1.00113,
+     1.02019,
+     1.03098
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_grass_x_leaf_lime_50",
+    "hex": "#79A000",
+    "levels": [
+     0.97751,
+     0.98127,
+     0.99439,
+     0.99882,
+     1.00462,
+     1.00735,
+     1.01822,
+     1.02155,
+     1.02464,
+     1.02983
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_leaf",
+    "hex": "#0E4E06",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_leaf_lime",
+    "hex": "#689600",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_petal",
+    "hex": "#C3C9C8",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_pine",
+    "hex": "#04561F",
+    "levels": [
+     0.95143,
+     0.9621,
+     0.9804,
+     0.98379,
+     0.98948,
+     1.00007,
+     1.00707,
+     1.01611,
+     1.02352,
+     1.02491,
+     1.04269,
+     1.04493,
+     1.04952
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_pink",
+    "hex": "#B96696",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_pollen",
+    "hex": "#C2B001",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_rock",
+    "hex": "#ADA6A4",
+    "levels": [
+     0.91001,
+     0.94474,
+     0.95676,
+     0.96039,
+     0.9648,
+     0.97139,
+     0.97629,
+     0.98201,
+     0.98524,
+     0.98891,
+     0.99173,
+     0.99599,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00181,
+     1.00505,
+     1.00891,
+     1.01221,
+     1.01606,
+     1.0195,
+     1.02221,
+     1.02614,
+     1.03074,
+     1.03618,
+     1.04077,
+     1.04596,
+     1.05345,
+     1.0856
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_soil",
+    "hex": "#735326",
+    "levels": [
+     0.97658,
+     0.98785,
+     0.99229,
+     0.99525,
+     0.99841,
+     1.00453,
+     1.00821,
+     1.01666,
+     1.02942
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_water",
+    "hex": "#00C2F2",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_water_fall",
+    "hex": "#10C0F2",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m037_water_foam",
+    "hex": "#E6FCFE",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {
+   "m037_water": {
+    "hex": "#00C2F2",
+    "texture": "water/m037_water.png",
+    "transparency": 0.3
+   },
+   "m037_water_fall": {
+    "hex": "#10C0F2",
+    "texture": "water/m037_water_fall.png",
+    "transparency": 0.2
+   },
+   "m037_water_foam": {
+    "hex": "#E6FCFE",
+    "texture": "water/m037_water_foam.png",
+    "transparency": 0.1
+   }
+  },
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "CliffFalls",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "hero",
+   "size": [
+    32.0,
+    25.215,
+    32.0
+   ],
+   "tris": 3920,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFalls.glb",
+     "kind": "solid",
+     "tris": 3008,
+     "offset": [
+      0.0,
+      12.6075,
+      0.0
+     ],
+     "size": [
+      32.0,
+      25.215,
+      32.0
+     ]
+    },
+    {
+     "file": "meshes/CliffFalls_water_m037_water.glb",
+     "kind": "water",
+     "tris": 320,
+     "offset": [
+      0.0,
+      8.83,
+      0.0
+     ],
+     "size": [
+      31.96,
+      17.14,
+      31.96
+     ],
+     "key": "m037_water",
+     "color": "#00C2F2",
+     "texture": "water/m037_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFalls_water_flow_1"
+     }
+    },
+    {
+     "file": "meshes/CliffFalls_water_m037_water_fall.glb",
+     "kind": "water",
+     "tris": 164,
+     "offset": [
+      0.0,
+      9.285,
+      2.2244
+     ],
+     "size": [
+      8.3,
+      16.33,
+      2.2488
+     ],
+     "key": "m037_water_fall",
+     "color": "#10C0F2",
+     "texture": "water/m037_water_fall.png",
+     "tile_studs": 16.0,
+     "transparency": 0.2,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFalls_water_flow_1"
+     }
+    },
+    {
+     "file": "meshes/CliffFalls_water_m037_water_foam.glb",
+     "kind": "water",
+     "tris": 428,
+     "offset": [
+      0.034,
+      9.255,
+      4.8951
+     ],
+     "size": [
+      29.6478,
+      16.45,
+      19.009
+     ],
+     "key": "m037_water_foam",
+     "color": "#E6FCFE",
+     "texture": "water/m037_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFalls_water_flow_1"
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CliffFalls_water_flow_1",
+     "kind": "water_flow",
+     "position": [
+      0.0,
+      1.03,
+      6.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [],
+      "beams": [
+       {
+        "name": "Streaks",
+        "texture": "water_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E6F7FC"
+        ],
+        "transparency": [
+         0.92,
+         0.72,
+         0.72,
+         0.92
+        ],
+        "width0": 12.0,
+        "width1": 12.0,
+        "texture_speed": 4.0,
+        "texture_length": 8.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.1,
+        "light_influence": 0.8,
+        "segments": 4,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       0.0,
+       0.0,
+       9.5
+      ],
+      "axis": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ]
+     },
+     "end": [
+      0.0,
+      0.0,
+      9.5
+     ],
+     "axis": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "normal": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    },
+    {
+     "name": "VFX_CliffFalls_water_flow_2",
+     "kind": "water_flow",
+     "position": [
+      0.5,
+      17.43,
+      -15.5
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [],
+      "beams": [
+       {
+        "name": "Streaks",
+        "texture": "water_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E6F7FC"
+        ],
+        "transparency": [
+         0.92,
+         0.72,
+         0.72,
+         0.92
+        ],
+        "width0": 5.0,
+        "width1": 5.0,
+        "texture_speed": 4.0,
+        "texture_length": 8.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.1,
+        "light_influence": 0.8,
+        "segments": 4,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       -0.5,
+       0.0,
+       14.5
+      ],
+      "axis": [
+       -0.0345,
+       0.0,
+       0.9994
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ]
+     },
+     "end": [
+      -0.5,
+      0.0,
+      14.5
+     ],
+     "axis": [
+      -0.0345,
+      0.0,
+      0.9994
+     ],
+     "normal": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_1",
+     "kind": "water_foam",
+     "position": [
+      -3.0,
+      1.05,
+      3.2
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_10",
+     "kind": "water_foam",
+     "position": [
+      0.0,
+      17.45,
+      -4.2
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_11",
+     "kind": "water_foam",
+     "position": [
+      0.0,
+      17.45,
+      0.0
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_2",
+     "kind": "water_foam",
+     "position": [
+      3.0,
+      1.05,
+      3.2
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_3",
+     "kind": "water_foam",
+     "position": [
+      -9.6,
+      1.05,
+      10.6
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_4",
+     "kind": "water_foam",
+     "position": [
+      11.0,
+      1.05,
+      10.2
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_5",
+     "kind": "water_foam",
+     "position": [
+      -6.0,
+      1.05,
+      4.9
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_6",
+     "kind": "water_foam",
+     "position": [
+      14.0,
+      1.05,
+      6.9
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_7",
+     "kind": "water_foam",
+     "position": [
+      -12.3,
+      1.05,
+      8.7
+     ],
+     "vfx_scale": 0.6,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_8",
+     "kind": "water_foam",
+     "position": [
+      -3.0,
+      1.05,
+      14.0
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_water_foam_9",
+     "kind": "water_foam",
+     "position": [
+      5.0,
+      1.05,
+      14.0
+     ],
+     "vfx_scale": 0.7,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Foam",
+        "texture": "foam_patch",
+        "color": [
+         "#FFFFFF",
+         "#E3F4FA"
+        ],
+        "size": [
+         2.0,
+         3.0
+        ],
+        "transparency": [
+         0.2,
+         1.0
+        ],
+        "lifetime": [
+         2.0,
+         3.0
+        ],
+        "rate": 4,
+        "speed": [
+         0.05,
+         0.12
+        ],
+        "spread": 0,
+        "light_emission": 0.0,
+        "orientation": "flat",
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -12,
+         12
+        ],
+        "shape": [
+         6.0,
+         0.1,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_CliffFalls_waterfall_curtain_1",
+     "kind": "waterfall_curtain",
+     "position": [
+      -1.8,
+      17.3,
+      1.15
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Spray",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#D8F1FA"
+        ],
+        "size": [
+         0.7,
+         1.5
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.8
+        ],
+        "rate": 8,
+        "speed": [
+         1.0,
+         2.5
+        ],
+        "spread": 40,
+        "light_emission": 0.15,
+        "acceleration": [
+         0,
+         -25,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.6,
+         0.3,
+         0.5
+        ],
+        "shape_follows_width": 0.9
+       }
+      ],
+      "beams": [
+       {
+        "name": "Fall",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#D4F1FB"
+        ],
+        "transparency": [
+         0.2,
+         0.15,
+         0.3
+        ],
+        "width0": 4.0,
+        "width1": 4.5,
+        "texture_speed": 15.0,
+        "texture_length": 10.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.25,
+        "light_influence": 0.7,
+        "segments": 12,
+        "face_camera": false
+       },
+       {
+        "name": "Sheen",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E8F8FD"
+        ],
+        "transparency": [
+         0.6,
+         0.5,
+         0.7
+        ],
+        "width0": 3.4,
+        "width1": 3.9,
+        "texture_speed": 22.0,
+        "texture_length": 6.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.35,
+        "light_influence": 0.6,
+        "segments": 12,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       -0.2,
+       -16.1,
+       1.55
+      ],
+      "axis": [
+       -0.0124,
+       -0.9953,
+       0.0958
+      ],
+      "normal": [
+       0.0012,
+       0.0958,
+       0.9954
+      ]
+     },
+     "end": [
+      -0.2,
+      -16.1,
+      1.55
+     ],
+     "axis": [
+      -0.0124,
+      -0.9953,
+      0.0958
+     ],
+     "normal": [
+      0.0012,
+      0.0958,
+      0.9954
+     ]
+    },
+    {
+     "name": "VFX_CliffFalls_waterfall_curtain_2",
+     "kind": "waterfall_curtain",
+     "position": [
+      1.8,
+      17.3,
+      1.15
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Spray",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#D8F1FA"
+        ],
+        "size": [
+         0.7,
+         1.5
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.8
+        ],
+        "rate": 8,
+        "speed": [
+         1.0,
+         2.5
+        ],
+        "spread": 40,
+        "light_emission": 0.15,
+        "acceleration": [
+         0,
+         -25,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.6,
+         0.3,
+         0.5
+        ],
+        "shape_follows_width": 0.9
+       }
+      ],
+      "beams": [
+       {
+        "name": "Fall",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#D4F1FB"
+        ],
+        "transparency": [
+         0.2,
+         0.15,
+         0.3
+        ],
+        "width0": 4.0,
+        "width1": 4.5,
+        "texture_speed": 15.0,
+        "texture_length": 10.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.25,
+        "light_influence": 0.7,
+        "segments": 12,
+        "face_camera": false
+       },
+       {
+        "name": "Sheen",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E8F8FD"
+        ],
+        "transparency": [
+         0.6,
+         0.5,
+         0.7
+        ],
+        "width0": 3.4,
+        "width1": 3.9,
+        "texture_speed": 22.0,
+        "texture_length": 6.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.35,
+        "light_influence": 0.6,
+        "segments": 12,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       0.2,
+       -16.1,
+       1.55
+      ],
+      "axis": [
+       0.0124,
+       -0.9953,
+       0.0958
+      ],
+      "normal": [
+       -0.0012,
+       0.0958,
+       0.9954
+      ]
+     },
+     "end": [
+      0.2,
+      -16.1,
+      1.55
+     ],
+     "axis": [
+      0.0124,
+      -0.9953,
+      0.0958
+     ],
+     "normal": [
+      -0.0012,
+      0.0958,
+      0.9954
+     ]
+    },
+    {
+     "name": "VFX_CliffFalls_waterfall_mist_1",
+     "kind": "waterfall_mist",
+     "position": [
+      0.0,
+      1.4,
+      3.6
+     ],
+     "vfx_scale": 1.2,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Mist",
+        "texture": "mist_soft",
+        "color": [
+         "#FFFFFF",
+         "#DDF2FA"
+        ],
+        "size": [
+         3,
+         7
+        ],
+        "transparency": [
+         0.55,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 10,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.2,
+        "drag": 1.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -15,
+         15
+        ],
+        "shape": [
+         5.0,
+         0.5,
+         2.0
+        ]
+       },
+       {
+        "name": "Splash",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#CBEAF6"
+        ],
+        "size": [
+         1.0,
+         2.0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 14,
+        "speed": [
+         5,
+         8
+        ],
+        "spread": 50,
+        "light_emission": 0.1,
+        "acceleration": [
+         0,
+         -20,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         4.0,
+         0.2,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "cliff / waterfall terrain tile (32 x 32; pool water 1.0 over bed 0.2, channel water 17.4 over bed 17.1, grass top 18.0): a block of big flat-faced rock columns under one lime grass cap split by a river channel that pours over a notch as a three-lobed curtain into a full-width pool; a splash disc with spray spikes, a foam ribbon, foam rings round two boulders; stepped bush-capped columns, low pine boxes, pines, ferns, flowers. One closed land shell plus vegetation, water, curtain and foam shells (three see-through water pieces). Back seam = M034's seam raised 16.4. 16 sockets"
+  },
+  {
+   "name": "CliffFallsCurtain",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    8.3,
+    16.33,
+    2.2488
+   ],
+   "tris": 164,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsCurtain_water_m037_water_fall.glb",
+     "kind": "water",
+     "tris": 164,
+     "offset": [
+      0.0,
+      8.165,
+      0.0
+     ],
+     "size": [
+      8.3,
+      16.33,
+      2.2488
+     ],
+     "key": "m037_water_fall",
+     "color": "#10C0F2",
+     "texture": "water/m037_water_fall.png",
+     "tile_studs": 16.0,
+     "transparency": 0.2,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CliffFallsCurtain_waterfall_curtain_1",
+     "kind": "waterfall_curtain",
+     "position": [
+      -1.8,
+      16.18,
+      -1.0744
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Spray",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#D8F1FA"
+        ],
+        "size": [
+         0.7,
+         1.5
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.8
+        ],
+        "rate": 8,
+        "speed": [
+         1.0,
+         2.5
+        ],
+        "spread": 40,
+        "light_emission": 0.15,
+        "acceleration": [
+         0,
+         -25,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.6,
+         0.3,
+         0.5
+        ],
+        "shape_follows_width": 0.9
+       }
+      ],
+      "beams": [
+       {
+        "name": "Fall",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#D4F1FB"
+        ],
+        "transparency": [
+         0.2,
+         0.15,
+         0.3
+        ],
+        "width0": 4.0,
+        "width1": 4.5,
+        "texture_speed": 15.0,
+        "texture_length": 10.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.25,
+        "light_influence": 0.7,
+        "segments": 12,
+        "face_camera": false
+       },
+       {
+        "name": "Sheen",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E8F8FD"
+        ],
+        "transparency": [
+         0.6,
+         0.5,
+         0.7
+        ],
+        "width0": 3.4,
+        "width1": 3.9,
+        "texture_speed": 22.0,
+        "texture_length": 6.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.35,
+        "light_influence": 0.6,
+        "segments": 12,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       -0.2,
+       -16.1,
+       1.55
+      ],
+      "axis": [
+       -0.0124,
+       -0.9953,
+       0.0958
+      ],
+      "normal": [
+       0.0012,
+       0.0958,
+       0.9954
+      ]
+     },
+     "end": [
+      -0.2,
+      -16.1,
+      1.55
+     ],
+     "axis": [
+      -0.0124,
+      -0.9953,
+      0.0958
+     ],
+     "normal": [
+      0.0012,
+      0.0958,
+      0.9954
+     ]
+    },
+    {
+     "name": "VFX_CliffFallsCurtain_waterfall_curtain_2",
+     "kind": "waterfall_curtain",
+     "position": [
+      1.8,
+      16.18,
+      -1.0744
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Spray",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#D8F1FA"
+        ],
+        "size": [
+         0.7,
+         1.5
+        ],
+        "transparency": [
+         0.35,
+         1.0
+        ],
+        "lifetime": [
+         0.4,
+         0.8
+        ],
+        "rate": 8,
+        "speed": [
+         1.0,
+         2.5
+        ],
+        "spread": 40,
+        "light_emission": 0.15,
+        "acceleration": [
+         0,
+         -25,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         3.6,
+         0.3,
+         0.5
+        ],
+        "shape_follows_width": 0.9
+       }
+      ],
+      "beams": [
+       {
+        "name": "Fall",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#D4F1FB"
+        ],
+        "transparency": [
+         0.2,
+         0.15,
+         0.3
+        ],
+        "width0": 4.0,
+        "width1": 4.5,
+        "texture_speed": 15.0,
+        "texture_length": 10.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.25,
+        "light_influence": 0.7,
+        "segments": 12,
+        "face_camera": false
+       },
+       {
+        "name": "Sheen",
+        "texture": "waterfall_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E8F8FD"
+        ],
+        "transparency": [
+         0.6,
+         0.5,
+         0.7
+        ],
+        "width0": 3.4,
+        "width1": 3.9,
+        "texture_speed": 22.0,
+        "texture_length": 6.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.35,
+        "light_influence": 0.6,
+        "segments": 12,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       0.2,
+       -16.1,
+       1.55
+      ],
+      "axis": [
+       0.0124,
+       -0.9953,
+       0.0958
+      ],
+      "normal": [
+       -0.0012,
+       0.0958,
+       0.9954
+      ]
+     },
+     "end": [
+      0.2,
+      -16.1,
+      1.55
+     ],
+     "axis": [
+      0.0124,
+      -0.9953,
+      0.0958
+     ],
+     "normal": [
+      -0.0012,
+      0.0958,
+      0.9954
+     ]
+    }
+   ],
+   "notes": "Waterfall Mesh (reusable): the three-lobed curtain shell with a rolled lip, 7.1 -> 8.3 wide, 16.3 tall"
+  },
+  {
+   "name": "CliffFallsFoamRibbon",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    10.2796,
+    0.05,
+    3.8011
+   ],
+   "tris": 84,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsFoamRibbon_water_m037_water_foam.glb",
+     "kind": "water",
+     "tris": 84,
+     "offset": [
+      0.0,
+      0.025,
+      0.0
+     ],
+     "size": [
+      10.2796,
+      0.05,
+      3.8011
+     ],
+     "key": "m037_water_foam",
+     "color": "#E6FCFE",
+     "texture": "water/m037_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Foam Ribbon (reusable): the flat scalloped foam ring round the curtain's foot"
+  },
+  {
+   "name": "CliffFallsPool",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    32.0,
+    4.9,
+    16.45
+   ],
+   "tris": 546,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsPool.glb",
+     "kind": "solid",
+     "tris": 350,
+     "offset": [
+      0.0,
+      2.45,
+      0.0
+     ],
+     "size": [
+      32.0,
+      4.9,
+      16.45
+     ]
+    },
+    {
+     "file": "meshes/CliffFallsPool_water_m037_water.glb",
+     "kind": "water",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.63,
+      1.025
+     ],
+     "size": [
+      31.96,
+      0.74,
+      14.36
+     ],
+     "key": "m037_water",
+     "color": "#00C2F2",
+     "texture": "water/m037_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFallsPool_water_flow_1"
+     }
+    },
+    {
+     "file": "meshes/CliffFallsPool_water_m037_water_foam.glb",
+     "kind": "water",
+     "tris": 96,
+     "offset": [
+      0.5602,
+      1.055,
+      2.6015
+     ],
+     "size": [
+      28.7583,
+      0.05,
+      8.6973
+     ],
+     "key": "m037_water_foam",
+     "color": "#E6FCFE",
+     "texture": "water/m037_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFallsPool_water_flow_1"
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CliffFallsPool_water_flow_1",
+     "kind": "water_flow",
+     "position": [
+      0.0,
+      1.03,
+      -1.775
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [],
+      "beams": [
+       {
+        "name": "Streaks",
+        "texture": "water_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E6F7FC"
+        ],
+        "transparency": [
+         0.92,
+         0.72,
+         0.72,
+         0.92
+        ],
+        "width0": 12.0,
+        "width1": 12.0,
+        "texture_speed": 4.0,
+        "texture_length": 8.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.1,
+        "light_influence": 0.8,
+        "segments": 4,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       0.0,
+       0.0,
+       9.5
+      ],
+      "axis": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ]
+     },
+     "end": [
+      0.0,
+      0.0,
+      9.5
+     ],
+     "axis": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "normal": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   ],
+   "notes": "Water Plane + Foam (reusable): the pool's bed slab and see-through water plate with two boulders in foam rings"
+  },
+  {
+   "name": "CliffFallsRockLarge",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    4.9418,
+    5.0,
+    4.496
+   ],
+   "tris": 46,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsRockLarge.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      2.5,
+      0.0
+     ],
+     "size": [
+      4.9418,
+      5.0,
+      4.496
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Piece, large (reusable): a big faceted boulder with a flat crown"
+  },
+  {
+   "name": "CliffFallsRockMedium",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    3.0238,
+    4.3,
+    2.938
+   ],
+   "tris": 38,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsRockMedium.glb",
+     "kind": "solid",
+     "tris": 38,
+     "offset": [
+      0.0,
+      2.15,
+      0.0
+     ],
+     "size": [
+      3.0238,
+      4.3,
+      2.938
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Piece, medium (reusable)"
+  },
+  {
+   "name": "CliffFallsRockSmall",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    1.5246,
+    2.0,
+    1.48
+   ],
+   "tris": 22,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsRockSmall.glb",
+     "kind": "solid",
+     "tris": 22,
+     "offset": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "size": [
+      1.5246,
+      2.0,
+      1.48
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Piece, small (reusable)"
+  },
+  {
+   "name": "CliffFallsSplashDisc",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    16.0908,
+    5.76,
+    7.9115
+   ],
+   "tris": 220,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsSplashDisc_water_m037_water_foam.glb",
+     "kind": "water",
+     "tris": 220,
+     "offset": [
+      0.0,
+      2.88,
+      0.0
+     ],
+     "size": [
+      16.0908,
+      5.76,
+      7.9115
+     ],
+     "key": "m037_water_foam",
+     "color": "#E6FCFE",
+     "texture": "water/m037_water_foam.png",
+     "tile_studs": 16.0,
+     "transparency": 0.1,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CliffFallsSplashDisc_waterfall_mist_1",
+     "kind": "waterfall_mist",
+     "position": [
+      0.3611,
+      0.37,
+      -2.0657
+     ],
+     "vfx_scale": 1.2,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Mist",
+        "texture": "mist_soft",
+        "color": [
+         "#FFFFFF",
+         "#DDF2FA"
+        ],
+        "size": [
+         3,
+         7
+        ],
+        "transparency": [
+         0.55,
+         1.0
+        ],
+        "lifetime": [
+         1.5,
+         2.5
+        ],
+        "rate": 10,
+        "speed": [
+         1.5,
+         3
+        ],
+        "spread": 70,
+        "light_emission": 0.2,
+        "drag": 1.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -15,
+         15
+        ],
+        "shape": [
+         5.0,
+         0.5,
+         2.0
+        ]
+       },
+       {
+        "name": "Splash",
+        "texture": "splash_droplets",
+        "color": [
+         "#FFFFFF",
+         "#CBEAF6"
+        ],
+        "size": [
+         1.0,
+         2.0
+        ],
+        "transparency": [
+         0.1,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 14,
+        "speed": [
+         5,
+         8
+        ],
+        "spread": 50,
+        "light_emission": 0.1,
+        "acceleration": [
+         0,
+         -20,
+         0
+        ],
+        "rotation": [
+         -30,
+         30
+        ],
+        "shape": [
+         4.0,
+         0.2,
+         1.5
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Splash Disc (reusable): the flat scalloped splash disc with its crown of spray spikes"
+  },
+  {
+   "name": "CliffFallsTop",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    13.77,
+    10.615,
+    17.5259
+   ],
+   "tris": 884,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsTop.glb",
+     "kind": "solid",
+     "tris": 884,
+     "offset": [
+      0.0,
+      5.3075,
+      0.0
+     ],
+     "size": [
+      13.77,
+      10.615,
+      17.5259
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cliff Top (reusable): the left lime grass cap on the flat tops of its rock columns, with pines, dark ferns and flowers"
+  },
+  {
+   "name": "CliffFallsTopWater",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    13.3303,
+    0.24,
+    17.03
+   ],
+   "tris": 120,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsTopWater_water_m037_water.glb",
+     "kind": "water",
+     "tris": 120,
+     "offset": [
+      0.0,
+      0.12,
+      0.0
+     ],
+     "size": [
+      13.3303,
+      0.24,
+      17.03
+     ],
+     "key": "m037_water",
+     "color": "#00C2F2",
+     "texture": "water/m037_water.png",
+     "tile_studs": 16.0,
+     "transparency": 0.3,
+     "material": "SmoothPlastic",
+     "cast_shadow": false,
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     },
+     "flow": {
+      "direction": [
+       -0.0345,
+       0.0,
+       0.9994
+      ],
+      "speed": 4.0,
+      "socket": "VFX_CliffFallsTopWater_water_flow_1"
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_CliffFallsTopWater_water_flow_1",
+     "kind": "water_flow",
+     "position": [
+      0.4033,
+      0.27,
+      -8.035
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [],
+      "beams": [
+       {
+        "name": "Streaks",
+        "texture": "water_streaks",
+        "color": [
+         "#FFFFFF",
+         "#E6F7FC"
+        ],
+        "transparency": [
+         0.92,
+         0.72,
+         0.72,
+         0.92
+        ],
+        "width0": 5.0,
+        "width1": 5.0,
+        "texture_speed": 4.0,
+        "texture_length": 8.0,
+        "texture_mode": "Wrap",
+        "light_emission": 0.1,
+        "light_influence": 0.8,
+        "segments": 4,
+        "face_camera": false
+       }
+      ],
+      "light": null,
+      "end": [
+       -0.5,
+       0.0,
+       14.5
+      ],
+      "axis": [
+       -0.0345,
+       0.0,
+       0.9994
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ]
+     },
+     "end": [
+      -0.5,
+      0.0,
+      14.5
+     ],
+     "axis": [
+      -0.0345,
+      0.0,
+      0.9994
+     ],
+     "normal": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   ],
+   "notes": "Top Water Plane (reusable): the channel's see-through water plate (17.16 -> 17.4), 14 wide at the back seam"
+  },
+  {
+   "name": "CliffFallsWall",
+   "sheet": "M037",
+   "subject": "Waterfall Module",
+   "role": "part",
+   "size": [
+    11.5522,
+    17.85,
+    9.2286
+   ],
+   "tris": 328,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/CliffFallsWall.glb",
+     "kind": "solid",
+     "tris": 328,
+     "offset": [
+      0.0,
+      8.925,
+      0.0
+     ],
+     "size": [
+      11.5522,
+      17.85,
+      9.2286
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cliff Wall Pieces (reusable): three tall flat-faced bevelled rock columns in a row, a stepped column in front and a foot boulder"
+  }
+ ],
+ "stats": {
+  "assets": 11,
+  "pieces": 16,
+  "solid": 7,
+  "water": 9,
+  "glow": 0,
+  "tris": 6372,
+  "vfxSockets": 21,
+  "paletteColours": 27,
+  "paletteLevels": 205,
+  "meshBytes": 524320
+ },
+ "problems": []
+}

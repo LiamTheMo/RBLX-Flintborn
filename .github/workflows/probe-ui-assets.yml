@@ -14,6 +14,11 @@ on:
         description: "Comma-separated sprite names (empty = a sample of old and new sprites)"
         required: false
         default: ""
+      reports:
+        description: "Print the latest device image reports instead"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -35,10 +40,15 @@ jobs:
           ROBLOX_MAIN_PLACE_ID: ${{ secrets.ROBLOX_MAIN_PLACE_ID }}
           PLACE: ${{ inputs.place }}
           NAMES: ${{ inputs.names }}
+          REPORTS: ${{ inputs.reports }}
         run: |
           if [ "$PLACE" = "lobby" ]; then
             export ROBLOX_PLACE_ID="$ROBLOX_LOBBY_PLACE_ID"
           else
             export ROBLOX_PLACE_ID="$ROBLOX_MAIN_PLACE_ID"
           fi
-          python3 scripts/roblox_probe_ui_assets.py --names "$NAMES"
+          if [ "$REPORTS" = "true" ]; then
+            python3 scripts/roblox_probe_ui_assets.py --reports
+          else
+            python3 scripts/roblox_probe_ui_assets.py --names "$NAMES"
+          fi

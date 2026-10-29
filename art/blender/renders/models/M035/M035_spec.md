@@ -822,3 +822,688 @@ All recommendations are accepted, with packaging (6) stated precisely:
 11. Names: `MossyBoulder*`, keys `m035_*`.
 
 The rock-shape targets in §2.2 (facet counts, largest facet, area and edge spread, valence, base 0.65–0.80, cleft 0.6–1.0 deep) are binding. No soccer-ball or icosphere patterns.
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m035.py`, `build()` (background Blender on port 9877, work file `wip/M035.blend`). Every
+part has its own function, and the hero is built from the same functions.
+- **Main rock (`_rock`, `_mass`).** A and B are convex hulls of jittered point rings (`m033._ring_pts`/`_hull`).
+  - A: rings 8/9/9/8/6/4 at h 0/.14/.46/.76/.91/1.0, radius .66/.85/1/.97/.82/.50. Size 7.6 × 9.2 × 6.45, centre
+    (0.6, −0.1).
+  - B: rings 7/8/8/6/3. Size 4.8 × 6.8 × 5.5, centre (−2.3, 0.2), crown leaning 0.14 toward A.
+  - **The cleft is real geometry.** Each mass has one *cut plane* (`_cut`), which presses the points beyond it flat
+    onto it.
+    - A's plane forms its left flank: normal (−1, −0.12, 0.18), distance 3.0.
+    - B's plane forms its front: normal (−0.15, −1, 0.12), distance 2.4.
+    - The two walls meet in a V about 105° open at x ≈ −2.2. Without the cuts, two ellipsoid hulls gave a cleft only
+      0.03–0.26 deep, because B's front lay flush with A's curve.
+  - **Depth taper.** A's depth narrows toward the crown (`y_taper` 0.30), giving the side cell's trapezoid. Before
+    the taper, the side profile error was 0.138 mean; after, 0.091.
+  - **Union.** The two masses join in one merge-0 exact union at the origin (`m033._union_fine`), then
+    `m033._floor_cut` at z 0.
+- **Moss cap (`_rosette`, `_cap`, `_conform_rosette`).** Five rosettes, M1/M3/M4 on the rock, M2 on M1+M3, and M5 on
+  M1+M2+M3.
+  - Each rosette has 7–8 broad lobes, two corners per lobe (0.93–1.04 r) and a shallow notch (0.70–0.80 r).
+  - Radial ridges run to a raised centre, with notch valleys, a 0.18 rim band and a flat underside fan.
+  - The first version had one tip per lobe and read as a spiky star; it was changed to two corners.
+  - **Fold-free conform.** Each rim corner's top and bottom verts drop by the same amount, and no vert drops more than
+    1.1 below the seat under the rosette's centre.
+    - Plain `K.conform` folded M1's rim over the steep front flank. The exact union of that self-intersecting shell
+      returned an empty mesh, so the whole rock vanished; the stone then measured 5.4 × 3.8 × 2.8.
+    - The hero now also rejects any stone narrower than 8.5 or lower than 7.0.
+  - The rosettes are united into the stone one at a time (decision 6).
+- **Small rocks (`_small_rock`).** Hulls with flat bottoms at z 0: rings 6/7/5/3, h = 0.66 w; the pebble uses rings
+  5/5/3. Five rocks plus the pebble, kept clear of the stone by a push-out guard.
+- **Foliage (`_leaf`, `_cluster`, `_flower`).**
+  - **Leaf (`_leaf`).** An own 14-tri closed leaf: an ovate outline with a pointed tip, edges cupped (fold 0.16), a
+    raised two-point midrib, one point underneath, and a random roll of up to 0.45 rad. `K.leaf` "ovate" read as
+    flat slivers side-on, then as pyramids once thickened.
+  - **Low and small clusters.** One mound of 14 (low) or 7 (small) leaves, with pitch rising from outer to inner.
+  - **Tall clusters.** Stacks of leaf mounds every 0.55 stud up a stem that leans 12° toward the rock. Leaves
+    pointing within 62° of straight into the rock are left out, being hidden.
+    - The first versions read as fern or herring-bone columns.
+  - **Placement.** Ten clusters: the nine in §2.3, plus F9, a small deep-green tuft in the cleft's foot, which is the
+    sheet's cleft moss tuft. All are shifted −0.3 in Y (`DRESS_DY`), so the rock stands centred in its dressing in
+    the side cell.
+  - **Guard.** Every leaf is pushed out of the stone and the small rocks until it cuts in no more than 0.05, then
+    lifted to z ≥ 0.004. On the final build it moved 42 leaves or rocks.
+  - **Flowers.** Three flowers, on F1, F3 and F5a: five 14-tri petals, each based 0.03 out along its own direction,
+    and a 6-sided pollen dome; the face tips 0.3 rad toward the front.
+- **Elevation probe (spec 3.1).** All three runs used the f34 cell profile.
+
+  | Elevation | Profile error, mean / max | W : H (sheet 1.473) |
+  | --- | --- | --- |
+  | 6° | 0.072 / 0.26 | 1.476 |
+  | 10° | 0.060 / 0.23 | 1.426 |
+  | 14° | 0.052 / 0.21 | 1.370 |
+
+  Decision 9 fixes the hero camera at 10°, so `f34_sheet` stays at (0, 10). 14° fits the profile best, 6° the W : H.
+  The probe renders are `f34_e6_sheet.png` and `f34_e14_sheet.png`.
+
+## Stage 2: Optimisation and cleanup
+
+**Tris.**
+
+| Object | Tris | Limit | Size (studs) | Notes |
+| --- | --- | --- | --- | --- |
+| Hero `MossyBoulder` | 3770 | 4000 | 12.36 × 11.28 × 7.70 | target 12.0 ± 0.5 / 11.1 ± 0.6 / 7.8 ± 0.3 |
+| `MossyBoulderMainRock` | 220 | 1000 | 9.0 × 8.22 × 6.4 | |
+| `MossyBoulderMossCap` | 778 | 1000 | 5.47 × 4.69 × 2.73 | |
+| `MossyBoulderSmallRock` | 38 | 1000 | 1.66 × 1.64 × 1.19 | |
+| `MossyBoulderFoliage` | 286 | 1000 | 1.55 × 1.61 × 1.2 | 20 shells |
+
+Hero tris by shell:
+
+| Shell kind | Shells | Tris |
+| --- | --- | --- |
+| Stone (rock + cap) | 1 | 936 |
+| Small rocks | 6 | 212 |
+| Leaves | 168 | 2352 |
+| Petals | 15 | 210 |
+| Pollen | 3 | 60 |
+
+**Mesh checks.**
+- **Whole objects.** Every object has 0 non-manifold edges and verts (0 bowties), 0 boundary, wire or loose
+  elements, 0 zero-area faces and 0 n-gons. Normals point outward, transforms are applied, and the origin is at the
+  bbox bottom centre.
+- **Per shell (`shells_report`).** Every shell is closed and manifold, with 0 self-intersecting face pairs and 0
+  inverted faces.
+  - The inverted test casts five rays, ignores hits on the face itself, and merges hits closer than 1e-4. With a
+    single ray, a ray through an edge counted twice.
+- **Corners.** No corner is under 5° (minimum 5.0° on the hero).
+- **Tools.** m033's union, floor cut and `_finish`, then `m016._clean_mesh`, then `_polish` (m012). A last-resort
+  `_kill_slivers` tries a rotate, a collapse or a dissolve on any sliver left, and keeps the result only if the mesh
+  stays manifold.
+- **MossCap part.** Its rosettes have no rock to sink into, so the ones seated on the rock are staggered 0.09 apart in
+  depth (`PART_SINK_STEP`). Coplanar-close undersides had left a 1–3° sliver.
+- **Retries.** The part retries up to 6 times with a nudged cap (it passed on attempt 2); the hero passed on attempt
+  1.
+
+**Rock-shape targets (§2.2), measured on the MainRock part.**
+
+| Target | Measured | Spec |
+| --- | --- | --- |
+| Tris (no floor) | 198 | 110–200 |
+| Area CV | 1.14 | ≥ 0.6 |
+| Edge CV | 0.68 | ≥ 0.35 |
+| Valence | 4–10, mean 5.92, top share 0.28 | — |
+| Widest | h .45 | h .45–.55 |
+| Width at h .05 | .85 | — |
+| Width at h .65 | .90 | — |
+| Width at h .75 | .85 | — |
+| Width at h .85 | .65 | — |
+| Base span X / Y | .79 / .75 | .65–.80 |
+| Largest facet, front view | 7.5 % | 7–14 % |
+| Cleft depth, mid height | 0.75 | 0.6–1.0 |
+| Cleft depth, z 0.5 | 0.43 | ≥ 0.3 |
+| Rear crease | 0.27 | — |
+
+- **Borderline.** Width at h .8 is about 0.75 (target ≥ 0.78). Width at h .1 is about 0.88 (target 0.70–0.80):
+  the foot is still a little wide, because B adds width low on the left.
+- **Facets.** `facets_seen` 38 is a geometric count of every front-facing coplanar region with no occlusion, so it
+  reads higher than the sheet's 18–30 visible regions.
+- **Hero stone.** Its rock faces measure the same: cleft 0.75, largest facet 7.7 %.
+
+## Stage 3: UV
+
+`M.smart_uv` with angle 45, `ANGLE_BASED` and margin 0.008, then `m012._uv_unfold`.
+
+| Object | Islands | Overlaps | Flipped | Min gap | Border | Density (min / med / max) | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hero | 1491 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.04 |
+| MainRock | 23 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.05 |
+| MossCap | 204 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.00 |
+| SmallRock | 11 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.00 |
+| Foliage | 121 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.02 |
+
+An earlier hero build had 7–10 flipped triangles; the final build has 0.
+
+## Stage 4: Materials, colour and texture
+
+**Keys**, written into `PALETTE` with the pass notes:
+
+| Key | Hex | Roughness | Low spec |
+| --- | --- | --- | --- |
+| `m035_rock` | `#A8928D` | 0.9 | no |
+| `m035_rock_cool` | `#81767C` | 0.9 | no |
+| `m035_rock_light` | `#B59D97` | 0.9 | no |
+| `m035_moss_stain` | `#546330` | 0.95 | yes |
+| `m035_moss` | `#7F980E` | 0.9 | yes |
+| `m035_moss_sun` | `#ABB604` | 0.9 | yes |
+| `m035_moss_deep` | `#51720B` | 0.9 | yes |
+| `m035_moss_under` | `#6E5F49` | 0.95 | no |
+| `m035_leaf` | `#60A802` | 0.85 | yes |
+| `m035_leaf_young` | `#9DB702` | 0.85 | yes |
+| `m035_leaf_deep` | `#387902` | 0.85 | yes |
+| `m035_petal` | `#C1C7CA` | 0.7 | no |
+| `m035_pollen` | `#B1A100` | 0.7 | no |
+
+The warm rock key stays R > G > B: hue about 10° as a key, and it renders at hue 18–20°.
+
+**Calibration passes.**
+- **Pass 1.** `K.calibrate` on the dome against the §5.4 targets, 6 iterations. Rock keys use kind "all", because
+  the stone filter drops sat > 0.18. Moss sun uses "vivid", because the green filter drops it.
+- **Pass 2.** Linear gains so the hero's f34_sheet medians match the sheet's.
+  - Rock ×(1.37, 1.27, 1.24).
+  - Cap ×(1.09, 1.12, 0.5).
+  - Leaf and leaf deep: green ×1.35 then ×1.15. Leaf young: green ×1.15.
+- **Pass 3.** Moss under ×1.5.
+
+**Blend, all by position, never by facing.**
+- **Rock.** A noise field gives whole-facet `rock_cool` patches at up to 33 % mix (scale 0.20). Upper-half
+  `rock_light` patches reach up to 25 %. Tint mottling uses amp 0.04, scale 0.3.
+- **Stain.** The faces near the cleft-foot blob and B's two low front-left blobs are first cut into level bands at z
+  0.55, 1.1 and 1.65 (`STAIN_BANDS`). Bands below 1.65 then take `rock_x_moss_stain` at 40 % or 80 %.
+  - Whole facets painted, and K.refine'd ones, both read as tall green spikes.
+- **Cap.** The raised centre is moss→sun at 67 %. Lobe ridges take one of three moss→sun shades per lobe, the sides
+  half of that, the notch valleys deep→moss at 50 % and the rim band moss. The underside is `moss_under`, a hard
+  edge.
+  - Painting by height alone gave a facing correlation of 0.87, then 0.67. It is now 0.30 on the cap part and 0.0 on
+    the hero.
+- **Small rocks.** Each has its own tint (±0.06). R2, R4 and R5 carry a moss stain on their top facets.
+- **Leaves.** Five tiers along each mound: deep 40 % → deep 20 % → leaf → young 50 % → young. Each cluster has its
+  own tint (±0.04), and leaf mottling uses amp 0.04, scale 0.9.
+- **Finish.** Moss and leaves use `K.FOLIAGE_SPEC`. There is no emission.
+
+**Rendered colours against the sheet** (medians, the study's masks; foliage = green below 0.55 H).
+
+| View | Rock (ours / sheet) | Cap (ours / sheet) | Foliage (ours / sheet) |
+| --- | --- | --- | --- |
+| f34_sheet | `#C8A89B` / `#BFA194` | `#A7BE0F` / `#A1B809` | `#5D7F09` / `#608904` |
+| front_sheet | `#C3A497` / `#C0A394` | `#A6BC0F` / `#96B10C` | `#5A7E08` / `#729405` |
+| rear_sheet | `#B19791` / `#B0988E` | `#87A00C` / `#A2B808` | `#569006` / `#6E9004` |
+| r34_sheet | `#B09790` / `#AE988D` | `#88A10B` / `#A2B607` | `#579206` / `#668D04` |
+| side_sheet | `#927E77` / `#B29A90` | `#879F0D` / `#9DB30C` | `#4A7605` / `#6C8F05` |
+
+- The **rock** is within 10 everywhere but the side, which is darker in our side light.
+- The **cap** is within 12 in the front views. It is about 20 darker in the rear and side, where the studio light is
+  behind it.
+- The **foliage** is within 12 in f34; elsewhere it is darker (shade).
+- **Parts shots** (lit from above): small rock `#CCAEA3` against `#BCA195` (16 light), main rock `#D1AFA1`, cap
+  `#B0C70E`, foliage cluster `#68B807` against `#72A907`.
+- **Flowers.** Petals render 255/255/238 in the parts shot (clipped where they face the sun). Pollen renders
+  (241, 213, 59): hue 51°, sat 0.76.
+
+**Shares and silhouette against the sheet.**
+- f34_sheet: rock 0.775 / green 0.224 (cap 0.087, foliage 0.137) / flower 0.001. The sheet is 0.737 / 0.258 (0.109,
+  0.149) / 0.005.
+- rear_sheet: 0.708 / 0.292 (0.108, 0.184). The sheet is 0.715 / 0.279 (0.105, 0.173).
+- side_sheet: 0.745 / 0.255 (0.082, 0.172). The sheet is 0.741 / 0.251 (0.097, 0.154).
+- r34_sheet: 0.728 / 0.272 (0.098, 0.174). The sheet is 0.708 / 0.288 (0.112, 0.175).
+- W : H: f34 1.426 (sheet 1.473), r34 1.361 (1.338), rear 1.435 (1.272), side 1.319 (1.250).
+- Top-profile error, mean / max: f34 0.060 / 0.23, front 0.055 / 0.15, r34 0.059 / 0.27, rear 0.062 / 0.23, side
+  0.091 / 0.30.
+
+## Stage 5: Lighting
+
+Skipped: the sheet shows nothing that glows (decision 8). There are no emissive keys and no light sockets.
+
+Studio check (Requires Manual Validation):
+- the rock stays warm grey-pink under the game's sun;
+- the cap's lime and the foliage's green stay two distinct greens;
+- the petals don't bloom to flat white.
+
+## Stage 6: VFX
+
+Skipped: the sheet shows no glow, dust, sparkle or particles (decision 8). The hero has no `vfx_kind` children, and
+`build()` reports it as a problem if any appear.
+
+## Modeller's notes for the verifier
+
+- **Cameras** (`SHEET_VIEWS`, 3× lens, floor hidden):
+
+  | Shot | Azimuth, elevation | Against |
+  | --- | --- | --- |
+  | `f34_sheet` | 0, 10 | the hero cell |
+  | `front_sheet` | 0, 6 | the front cell |
+  | `r34_sheet` | 150, 9 | the r34 cell |
+  | `rear_sheet` | 180, 6 | the rear cell |
+  | `side_sheet` | 90, 5 | the side cell |
+  | `top_sheet` | 0, 89 | the top cell |
+
+- **Other renders.** The kit views, the four `part_*` shots (−20, 20), `exploded`, `cap_under` (the MossCap part from
+  below), `scale` (beside a 5.5-stud stand-in) and `junc_cu` (the cleft foot from −35, 12). The probe renders are
+  `f34_e6_sheet` and `f34_e14_sheet`.
+- **`measure(path)`** in the builder applies the study's masks (R, G, F, B) to any render, and `rock_metrics(o)`
+  computes the §2.2 numbers. `shells_report(o)` returns per-shell closed, manifold, self-hit and inverted results.
+- **Known misses.**
+  - **Decisions already accepted.** The top view draws no cap. The exploded rock has no cleft.
+  - **Undersides.** In `cap_under`, from below with no fill light, the brown underside renders near-black (median
+    (57, 47, 34) against the close-up's evenly lit `#725E45`).
+  - **Leaves.** A few low outer leaves lie apart from their clump at the foot (rear34, front kit view). The tall
+    clusters still read a little as stacked tiers rather than one bushy mass.
+  - **Rock foot.** It is a little wide: h .1 width about 0.88 against 0.70–0.80, and base span X 0.79.
+  - **Hero height.** It is 7.70, 0.1 under the 7.8 target, within the tolerance. A taller cap pushed the f34 W : H
+    down to 1.38, so it was lowered.
+  - **Cap colour.** The cap is about 20 darker than the sheet in the rear and side views.
+  - **Parts-shot rock.** It reads lighter than the §5.7 target, since it is lit from above with no occluders. The hero
+    rock medians match the sheet within 10.
+  - **Small-rock part.** It is variant A only. The hero places A ×2, B ×2, C ×1 and the pebble.
+- **Cap shapes.** The MossCap part's rosettes are staggered 0.09 in depth and nudged once by the retry, so the part
+  differs very slightly from the hero's cap.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier, read-only, on `wip/M035_verify.blend` (port 9877). Everything was re-measured through the MCP with
+`M.audit`, my own per-shell BVH self-intersection and volume code, `m035.shells_report`, `m035.rock_metrics`,
+`M.uv_stats`, `K.check` and `m035.measure`. I rendered my own views at 960 × 800 into the scratchpad
+(`m035_verify/`), with the same cameras as `SHEET_VIEWS`, and compared them side by side with the sheet cells
+(`sbs_*.png`, `z_*.png`).
+
+### Measured
+
+| Object | Tris (limit) | Size W × D × H | Shells | Non-manifold E / V | Boundary, wire, loose | Zero-area, n-gons | Self-hits in shells | Normals | Origin, transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `MossyBoulder` | 3770 (4000) | 12.36 × 11.28 × 7.70 | 193: stone 1 (936), rocks 6 (212), leaves 168 (2352), petals 15 (210), pollen 3 (60) | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward; every shell has positive volume; 0 inverted | bbox bottom centre (0, 0, 0); rot 0, scale 1 |
+| `MossyBoulderMainRock` | 220 (1000) | 9.00 × 8.22 × 6.40 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderMossCap` | 778 (1000) | 5.47 × 4.69 × 2.73 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderSmallRock` | 38 (1000) | 1.66 × 1.64 × 1.19 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderFoliage` | 286 (1000) | 1.55 × 1.61 × 1.20 | 20 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+
+- **Other mesh results.** No duplicate verts, no custom normals and no modifiers. The smallest corner is 5.0° on the
+  hero. No shell cuts into the stone by more than 0.044 (target ≤ 0.05). UVs: 0 overlaps and 0 flipped on every
+  object, min gap 0.016, border 0.008, density 1.0, conformal stretch p95 ≤ 1.05.
+- **Rock shape (part / hero stone).**
+  - Rock tris 198 / 319. Area CV 1.14 / 1.64; edge CV 0.68 / 0.97.
+  - Valence 4–10, mean 5.92, top share 0.28.
+  - Widest at h .45. Base span 0.79 / 0.75. Crown faces 11, spanning 6.5 × 6.0.
+  - Largest front facet 7.5 % / 7.7 %. Cleft 0.75 at mid height, 0.43 at z 0.5. Rear crease 0.27.
+  - Widths at h .05 … .95: .85 .94 .97 .99 1.0 .96 .90 .85 .65 .52.
+- **Colour by facing.** `K.check` reports nothing. My own correlation of face normal z against key luminance is
+  0.11 on the rock, 0.33 on the cap top (0.58 only when the brown underside is included, which is a hard material
+  edge by position) and −0.02 on the leaves.
+- **No painted foot band.** Rock key luminance is 147.7 below z 1 against 149.9 at mid height.
+- **Tint.** A per-corner `Tint` layer, 0.933–1.076 (std 0.026).
+- **Lighting and VFX.** The hero has no children and no sockets, and no material has emission > 0, which matches
+  the sheet.
+
+| Shot vs cell | W : H (sheet) | Rock / green (cap, foliage) / flower | Sheet | Profile err mean / max | Rock median (sheet) | Cap median (sheet) | Foliage median (sheet) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (0, 10) | 1.429 (1.473) | .773 / .225 (.087, .138) / .002 | .737 / .258 (.109, .149) / .005 | 0.060 / 0.24 | `#C8A89B` (`#BFA194`) | `#A8BF19` (`#A1B809`) | `#5C7E0C` (`#608904`) |
+| front_sheet (0, 6) | 1.482 (1.363) | .782 / .217 (.081, .136) / .001 | .747 / .245 / .008 | 0.055 / 0.15 | `#C2A396` (`#C0A394`) | `#A8BE19` (`#96B10C`) | `#577C0C` (`#729405`) |
+| r34_sheet (150, 9) | 1.363 (1.338) | .728 / .272 (.098, .174) / 0 | .708 / .288 / .004 | 0.060 / 0.26 | `#B09790` (`#AE988D`) | `#89A213` (`#A2B607`) | `#55920C` (`#668D04`) |
+| rear_sheet (180, 6) | 1.439 (1.272) | .707 / .292 (.108, .184) / 0 | .715 / .279 / .007 | 0.064 / 0.23 | `#B19790` (`#B0988E`) | `#88A114` (`#A2B808`) | `#55900B` (`#6E9004`) |
+| side_sheet (90, 5) | 1.320 (1.250) | .745 / .255 (.082, .172) / 0 | .741 / .251 / .008 | 0.091 / 0.30 | `#927E77` (`#B29A90`) | `#89A016` (`#9DB30C`) | `#497509` (`#6C8F05`) |
+| top_sheet (0, 89) | W : D 1.114 (1.084) | .552 / .445 (cap known miss) | .670 / .324 | — | `#C8A99D` (`#C4A89A`) | — | — |
+
+- **Colour families.** The rock is warm, R > G > B, in every key and mix (`#A8928D`; the cool mix `#9B8987` is
+  still R > G > B, never mauve). It renders at hue about 17° with sat 0.22. The cap renders at hue 68° with sat 0.87,
+  the foliage at hue 78° with sat 0.90, so the two greens are 10° apart.
+- **Parts shots.** Small rock `#C2A59B` (target `#BCA195`). Cap part `#B3C718`. Foliage part `#64B912` (target
+  `#72A907`). Cap underside from below `#483E30`, against the close-up's `#725E45` (key `#6E5F49`).
+- **Detached shells** (hero; distance to the nearest other shell or the ground):
+  - 25 leaf or petal shells sit more than 0.03 from everything, 13 more than 0.1, and 2 more than 0.2. The worst is
+    0.23, a leaf of F3 at (−5.83, −1.36, 1.95) and a leaf of F5a at (1.95, 4.69, 1.77), in build coordinates.
+  - At a 0.1 tolerance, 39 shells (33 leaves, 5 petals, 1 pollen) have no chain of contact to the ground or the
+    stone. These are the upper tiers of the tall clusters, which have no stem.
+
+### Findings
+
+1. **Blocker: the tall foliage clusters read as sparse ladders of separate pointed leaves, not the sheet's dense,
+   rounded clumps.** This is clearly visible in the rear, r34, side and top views.
+   - **What the sheet shows.** The rear and r34 show a big compact mound of plump leaves at the left and tight
+     clumps at the right. The side shows compact mounds at both feet, with the middle of the flank bare. The top
+     shows a near-continuous ring hugging the base.
+   - **What ours shows.** F3, F4, F5a, F5b and F6 are 0.55-stud tiers of narrow, diamond-shaped leaves that splay
+     out sideways. They read as fern or herring-bone columns, with single leaves floating apart (see "Detached
+     shells" above).
+     - In the side view, F6 stands as a leaf ladder across the middle of the +X flank, where the sheet has bare rock.
+     - In the top view, the clusters are separate tufts outside the rim instead of a ring.
+     - In the rear view, F5a's flower faces away and shows only as a grey speck.
+   - **Fix target.**
+     - Rebuild each tall cluster as 2–3 overlapping dense mounds (the low-cluster rosette, stacked so that each
+       mound's leaves overlap the one below and press against the rock).
+     - Every leaf within 0.03 of a neighbour, the rock or the ground.
+     - Leaves broader and rounder, like the part list's plump ovate leaves: `LEAF_W` towards 1.0, rounder outline
+       corners and a short tip.
+     - Move F6 forward to about y −1.5 … −2.5 (the front-right corner), so the side cell's mid-flank is bare and
+       the f34's right column stays at f .83–.98.
+     - Tighten the back and left clusters into a ring against the base, as seen from the top.
+     - Tilt F5a's flower toward +Y.
+     - Budget: the hero is at 3770 of 4000. Get the density from fewer, bigger, rounder leaves, not more leaves.
+     - Re-measure: shares within ±4, side profile mean ≤ 0.07, and 0 leaves farther than 0.05 from a neighbour.
+2. **Minor: the cap is spikier and taller-looking than the sheet's low scalloped mats.**
+   - Its lobes end in pointed, drooping corners, so from the front it reads as green shards. The sheet's rosettes are
+     broad and low, with rounded scalloped rims and a visible rim band.
+   - Cap share in the f34 is .087 against .109 (just outside ±2).
+   - Fix target: lower lobe-tip droop (`ROS_TIP_Z`), blunter corners and a slightly larger footprint.
+3. **Minor: the cap is 20–26 levels darker than the sheet in the rear, r34 and side views** (for example rear
+   `#88A114` against `#A2B808`). This comes from the studio's key light; it is not a facing paint error. Accept, or
+   lift `m035_moss` by about 8 % overall.
+4. **Minor: the cap underside renders near-black from below** (`#483E30`). This is lighting: the key `#6E5F49`
+   matches the close-up. The underside is also stepped across rosettes rather than one flat slab. Accept.
+5. **Minor: the rock reads boxy in the rear and side views.**
+   - Its flanks are near-vertical and its crown broad.
+   - Side profile: 0.091 mean, 0.30 max at f .80, where the back shoulder drops early.
+   - The foot is wide: 0.85 at h .05 and 0.94 at h .15, against 0.70–0.80 at h .1. Width at h .8 is about 0.75
+     (target ≥ 0.78).
+   - Valence reaches 10 (target 3–8).
+   - Fix target: pull the lowest ring of A and B in to about 0.75, and keep h .8 at ≥ 0.78.
+6. **Minor: W : H runs wide in the front and rear cells.** Front_sheet is 1.482 against 1.363 (stage-1 range
+   1.31–1.42); rear_sheet is 1.439 against 1.272. This is partly the decided 12.0 × 7.8 dressing, and partly the
+   leaves splaying out at the ends. It should shrink with finding 1.
+7. **Minor: the cleft is real geometry (0.75 deep), but it reads weaker than the sheet's dark V,** because both of its
+   walls take similar light in our studio. Accept.
+8. **Minor: colour details.**
+   - The `rock_light` patches are barely visible: the 25 % mix is only 3 levels above the base key.
+   - The petal key `#C1C7CA` is blue-grey (B > R). It renders white, but should be neutral or warm.
+   - Pollen renders at sat 0.76 (target ≥ 0.8).
+   - The side rock is `#927E77` against `#B29A90`, from the side light.
+9. **Minor: counts.** There are 10 clusters, not decision 4's 9: F9 is the cleft-foot tuft, which matches the
+   sheet's cleft moss. Accept.
+
+### Decisions check
+
+| Decision | Result |
+| --- | --- |
+| 1, size | Followed: rock 9.0 × 8.22 × 6.4; dressed 12.36 × 11.28 × 7.70 |
+| 2, cleft | Followed: two masses with a real cleft |
+| 3, cap | Followed |
+| 4, counts | Followed: 5 rocks + pebble from 3 variants; 4 cluster kinds placed 10 times; 3 flowers |
+| 5, camera | Followed: 10°, with the 6/10/14 probe |
+| 6, packaging | Followed: one fused stone shell; every rock, leaf, petal and pollen dome a closed, manifold shell; 0 bowties, 0 self-hits, no shared faces; `problems` checks closure |
+| 7, hero + 4 parts | Followed |
+| 8, effects | Followed: none |
+| 9, cameras | Followed |
+| 10, colour | Followed: warm stone with noise patches, olive stain, cap shaded by lobe position, foliage in tiers, no foot band |
+| 11, names | Followed |
+
+### Score and verdict
+
+**6.5 / 10. FAIL (round 1), on one blocker: the tall foliage clusters (finding 1).**
+
+Everything else holds:
+- the mesh is clean;
+- every budget is met;
+- the rock shape targets and the cleft are met;
+- colour families, calibration and blending by position are correct.
+
+The rest are minors (findings 2–9). Send finding 1, plus findings 2 and 5 if they are cheap, to a fresh modeller,
+then run a fresh verifier.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+Fresh fix modeller, background Blender on port 9877, work file `wip/M035.blend` (saved). The final numbers below come
+from `build()` run in a freshly restarted session; `problems` is empty. Everything was changed in `m035.py`.
+
+### Blocker: the tall foliage clusters (finding 1)
+
+**What changed.**
+- **Dome mounds (`_mound`).** The leaves are now laid over a dome, not splayed out from a stem.
+  - Each leaf's middle sits on the dome. Its tip points up toward the dome's top, flaring out 0–0.25 rad. Its face
+    points out of the dome, tilted 65 % of the way to straight up (`LEAF_UP`).
+  - Points follow an even-area golden spiral over 4–98° from the top (`MOUND_TH`).
+  - The clump therefore shows leaf faces from every side and from above, and reads as one rounded mass.
+  - Colour still goes by height on the dome: low leaves `leaf_deep` mixes, top ones `leaf_young`. Nothing is coloured
+    by facing.
+- **Core per mound (`_core`).** Every low or tall mound has a hidden heart: a 12-tri closed hexagonal bipyramid at
+  0.62 of the mound's radius, in `leaf×deep 60` with its upper cone `leaf×deep 20`. Through the gaps between leaves it
+  reads as the clump's shaded inside, as on the sheet, instead of rock or sky.
+- **Tall clusters (F3, F4, F5a, F5b, F6).** Each is 3 overlapping mounds (`TALL_MOUNDS`: radius 1.0 / 0.85 / 0.72 of
+  `0.40 × w`; 9 / 8 / 7 leaves).
+  - The ground mound has its centre at 0.4 of its radius above the ground. The top mound ends at the cluster's height.
+  - Each upper mound sits 45 % of the way from straight above the ground mound to resting on the flank
+    (`UPPER_LEAN`). Where the flank bulges past the column, it rests on the flank.
+  - Mounds against the rock keep their leaves within 110° of straight out (`OPEN_ARC`).
+- **Low and small clusters.** Each is one mound of 12 or 7 leaves, radius `0.36 × w` or `0.34 × w`.
+- **Leaves (`_leaf`).**
+  - `LEAF_W` 0.86 → **1.0**. The outline is widest at 0.66 of the length (was 0.60), so the tip is blunt, about 115°.
+    Camber 0.22 → 0.24.
+  - The underside is now a flat fan from the stem point: **12 tris a leaf** (was 14). Petals keep their 14-tri
+    thickened form.
+  - Leaf length 0.62–0.76 for low and tall clusters, 0.48–0.58 for small ones. That means fewer, bigger, rounder leaves
+    than the sheet's.
+- **Contact (`_Contact`).** Every leaf, core and whole flower is placed against what is already there: the ground, the
+  stone, the small rocks and the leaves accepted before it.
+  - A piece further than `CONTACT` (0.03) from all of that slides toward its nearest point until it is 0.015 away.
+    The stone guard then runs again, so nothing cuts more than 0.05 into the stone.
+  - So every shell has a chain of contact down to the ground or the stone.
+  - In the final build, 75 pieces moved, the furthest by 0.63.
+- **`contact_report(o)`.** This new check gives, per shell, the triangle overlaps and the vert-to-surface gaps against
+  every other shell and the ground. It counts:
+  - shells touching nothing within 0.03;
+  - the worst gap;
+  - shells with no chain to the ground or the stone, at 0.03 and at 0.1.
+
+  `build()` now reports any floating or unchained shell on the hero or the Foliage part as a `problem`.
+- **Layout (`CLUSTERS`, `SMALL_ROCKS`).**
+  - **F6** moved from (5.2, 0.2) to **(5.0, −2.3)**; its seat is (5.00, −2.60) after `DRESS_DY`. It is the front-right
+    column, still the f34's right end. The side view's mid-flank is now bare rock.
+  - **R3** moved from (5.0, −2.4) to (5.2, −3.3), out of F6's seat.
+  - **F5b** moved from (4.2, 2.8) to (4.0, 3.3), w 1.7, h 3.0. This fills the side cell's back clump.
+  - **R4** moved from (3.6, 3.6) to (3.0, 4.2), out of F5b's seat.
+  - **Ring seating (`hug`).** F3, F4, F5a, F5b, F6 and F8 are clamped so the ground mound's centre stands between
+    0.3 and 1.0 × its radius outside the rock's widest outline along its azimuth (`HUG_MIN`, `HUG_MAX`). This puts the
+    back and left clusters in a ring hugging the base. F3 and F6 keep their table places (`HUG_MAX_OF` 2.0), because
+    the sheet's front silhouette ends in them.
+  - Heights: F3 2.6, F4 2.3, F5a 2.8, F5b 3.0, F6 3.2.
+- **Flowers.**
+  - **F5a's flower faces the rear (+Y)** (`FLOWER_FACE`); F1's and F3's face the front.
+  - Every flower now sits on its top mound's shoulder on the side it faces, at 0.95 of the mound's radius up, instead
+    of sunk among the leaves. `FLOWER_TILT` 0.30 → 0.50.
+
+### Minors
+
+- **Cap (finding 2).** `ROS_TIP_Z` 0.85 → **1.45**, so the lobe corners are level with the notch tops and no longer
+  droop. `ROS_CORNER` 0.20 → **0.28**, for blunter, broader lobe ends. Rosette radii × **1.06** (`ROS_SCALE`).
+- **Rock (finding 5).**
+  - The shoulder was let out: A's 0.91 ring 0.82 → **0.90**, B's 0.80 ring 0.84 → **0.93**. The width at h .8 is now
+    0.79 (target ≥ 0.78).
+  - The front depth now tapers more than the back: `y_taper` (front, back) **(0.36, 0.16)**, was 0.30 both. This keeps
+    the side cell's back shoulder broad and gives a side profile of 0.055.
+  - **Foot not narrowed: tried and reverted.**
+    - At A 0.60/0.74 and B 0.66/0.82 the f34 rock read as a ball on a stalk, not the sheet's squat barrel.
+    - A middle setting (0.62/0.79, 0.70/0.89) only brought h .15 to 0.90.
+    - The foot rings are back at the round-1 values.
+  - Valence was not changed (max 10 on the MainRock part).
+- **Colour.**
+
+  | Key | Change | Why |
+  | --- | --- | --- |
+  | `m035_moss` | `#7F980E` → **`#849E0F`** (×1.04) | At ×1.08 (`#89A40F`, tried), the f34 cap read 17 levels over the sheet (`#B2C70F` against `#A1B809`). The rear, r34 and side caps stayed about 20 under at either setting, because there the studio key light is behind the cap. ×1.04 keeps the f34 cap within 12. |
+  | `m035_rock_light` | `#B59D97` → **`#C6AFA8`**, mix 0.25 → **0.35** | Its patches now reach about 10 levels over the base key (12 / 23 / 35 % mixes); before, they were 3. |
+  | `m035_petal` | `#C1C7CA` → **`#D3D2CB`** | A warm-neutral white (R ≥ G > B), no longer blue-grey. |
+  | `m035_pollen` | `#B1A100` → **`#CCAE00`**, low specular | It now renders at sat 0.94 (was 0.76). |
+  | `m035_leaf`, `m035_leaf_young`, `m035_leaf_deep` | `#60A802` → `#5B8702`, `#9DB702` → `#95A102`, `#387902` → `#346002` | The new upward-facing leaves catch the key light. With the old keys the f34 foliage rendered `#6EB30A` against the sheet's `#608904`. Linear gains R ×0.9, G ×0.62 (young G ×0.75). |
+
+### Before → after (round-1 verifier's numbers → this build)
+
+| Measure | Target | Before | After |
+| --- | --- | --- | --- |
+| Hero tris | < 4000 | 3770 | **3844** (stone 1034, rocks 212, leaves and cores 194 shells / 2328, petals 210, pollen 60) |
+| Hero size | 12.0 ± 0.5 × 11.1 ± 0.6 × 7.8 ± 0.3 | 12.36 × 11.28 × 7.70 | **12.11 × 10.91 × 7.87** |
+| Leaf or petal shells > 0.03 from everything | 0 | 25 | **0** (largest gap of any shell to its nearest neighbour: 0.015) |
+| Shells with no contact chain (0.03 / 0.1) | 0 | — / 39 | **0 / 0** |
+| Mesh, per object and per shell (non-manifold E/V, boundary, wire, loose, zero-area, n-gons, self-hits, inverted, volume ≤ 0) | 0 | 0 | **0** (219 hero shells; smallest corner 5.03°) |
+| UV overlaps / flipped; min gap; border; conformal p95 | 0 / 0 | 0 / 0; 0.016; 0.008; ≤ 1.05 | **0 / 0; 0.016; 0.008; ≤ 1.04** |
+| Side profile, mean / max | ≤ 0.07 | 0.091 / 0.30 | **0.055 / 0.21** |
+| f34 profile | — | 0.060 / 0.24 | 0.060 / 0.15 |
+| Front profile | — | 0.055 / 0.15 | 0.062 / 0.24 |
+| r34 profile | — | 0.060 / 0.26 | 0.067 / 0.22 |
+| Rear profile | — | 0.064 / 0.23 | 0.073 / 0.34 |
+| Front W : H | toward 1.363 | 1.482 | **1.432** |
+| Rear W : H | toward 1.272 | 1.439 | **1.359** |
+| f34 / r34 / side W : H | 1.473 / 1.338 / 1.250 | 1.429 / 1.363 / 1.320 | 1.368 / 1.404 / 1.247 |
+| f34 rock / green (cap, foliage) | .737 / .258 (.109, .149) ± 4 (cap ± 2) | .773 / .225 (.087, .138) | **.756 / .242 (.098, .144)** |
+| Front | .747 / .245 (.101, .143) | .782 / .217 (.081, .136) | **.765 / .234 (.092, .142)** |
+| r34 | .708 / .288 (.112, .175) | .728 / .272 (.098, .174) | **.701 / .299 (.094, .206)** |
+| Rear | .715 / .279 (.105, .173) | .707 / .292 (.108, .184) | **.691 / .309 (.103, .206)** |
+| Side | .741 / .251 (.097, .154) | .745 / .255 (.082, .172) | **.738 / .262 (.086, .176)** |
+| Top (cap is a known miss) | .670 / .324 | .552 / .445 | .516 / .481 (cap .209, foliage .272) |
+| Rock median, f34 | within 10 of `#BFA194` | `#C8A89B` | `#C9AA9C` |
+| Cap median, f34 / rear / side | `#A1B809` / `#A2B808` / `#9DB30C` | `#A8BF19` / `#88A114` / `#89A016` | `#ADC40F` / `#8AA50D` / `#8AA10D` |
+| Foliage median, f34 / front / rear | `#608904` / `#729405` / `#6E9004` | `#5C7E0C` / `#577C0C` / `#55900B` | `#688E0A` / `#668B0A` / `#507C06` |
+| Foliage part (parts shot) | `#72A907` | `#64B912` | `#629907` |
+| Petals (parts shot): median / 75th percentile | ≥ `#F0F0EA`, ≤ `#FFFFFD` | 255/255/238 | `#FFFFFD` / `#FFFFFE`, R ≥ G > B |
+| Pollen (parts shot): hue, sat | 46–56°, ≥ 0.8 | 51°, 0.76 | **51°, 0.94** |
+| Cap part (parts shot) | `#98B11B` | `#B3C718` | `#B3C90F` |
+| Cap underside, from below | lighting | `#483E30` | `#393022` (from below with no fill; key unchanged) |
+| MainRock: tris, area CV, edge CV | 110–200, ≥ 0.6, ≥ 0.35 | 198, 1.14, 0.68 | 188, 1.14, 0.67 |
+| MainRock: widths at h .05 / .15 / .75 / .85 | h .1 0.70–0.80; h .8 ≥ 0.78 | .85 / .94 / .85 / .65 | .85 / .94 / **.88 / .70** (h .8 ≈ 0.79) |
+| MainRock: base span, largest front facet, cleft mid / z 0.5 | .65–.80, 7–14 %, 0.6–1.0 / ≥ 0.3 | .79/.75, 7.5 %, 0.75 / 0.43 | .79/.76, 8.3 %, 0.78 / 0.44 |
+| MainRock valence | 3–8 | 4–10 | 3–10 (not changed) |
+| `K.check` | nothing | nothing | nothing (`problems` empty) |
+
+The flower share (0.000–0.002 against 0.004–0.008) can't be judged at the 480 × 400 preview size: a flower is a
+handful of pixels there. All three flowers show in the f34, front, rear, top and junction renders.
+
+### Looked at, against the sheet
+
+- **Rear and r34.** The left and right foliage are compact leafy mounds of round, upturned leaves. F5a's flower faces
+  the camera, and the middle of the foot has bare rock.
+- **Side.** Clumps stand at both feet and the mid-flank is bare rock, as on the sheet.
+- **Top.** The clusters ring the base round the left, back and right and leave the front open. The cap is the known
+  miss.
+- **Junction close-up.** F2 and the cleft tuft read like the sheet's Rock / Foliage Junction: plump leaves with a
+  flower, against the rock across a small gap.
+- **Foliage part.** It reads like the part-list cluster: round leaves round a mound with a white flower.
+
+### Left over
+
+- **f34 right column.** F6, seen from the front, still reads as three stacked tufts rather than one solid column. It is
+  dense and touching, but a little stepped.
+- **Rear profile** is 0.073 (was 0.064). The rock's model-left back shoulder sits lower than the sheet's (f .80–.90).
+  The r34 profile is 0.067 (was 0.060).
+- **Rock foot.** It is still 0.94 wide at h .15, against 0.70–0.80. Narrowing it read as a ball on a stalk (see
+  above). Valence max is still 10.
+- **Rear, r34 and side cap and foliage** are about 20 levels darker than the sheet. That is the studio's key light
+  behind them; the front views are within tolerance.
+- **f34 W : H** is 1.368 against 1.473, while the front is 1.432 against 1.363. The sheet's two front drawings disagree
+  here; the front cell and the dressed size are favoured.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+Fresh verifier, read-only, on `wip/M035_verify.blend` (background Blender, port 9880; nothing saved, no builder
+edits). Everything was re-measured through the MCP: `M.audit`, `m035.shells_report`, `m035.rock_metrics`,
+`M.uv_stats`, `K.check`, `m035.contact_report`, plus my own code for floating shells, contact chains, stone
+penetration, facing correlation and per-cluster vertical gaps. My renders (960 × 800, the `SHEET_VIEWS` cameras with
+m033's long lens, plus close-ups, two game-camera shots and the part shots) and side-by-sides with the sheet cells
+(`sbs_*.png`) are in the scratchpad `m035_verify2/`. Sheet colours were sampled again with the study's masks.
+
+### Measured
+
+| Object | Tris (limit) | Size W × D × H | Shells | Non-manifold E / V | Boundary, wire, loose | Zero-area, n-gons | Self-hits in shells | Normals | Origin, transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `MossyBoulder` | 3844 (4000) | 12.11 × 10.91 × 7.87 | 219: stone 1 (1034), rocks 6 (212), leaves and cores 194 (2328), petals 15 (210), pollen 3 (60) | 0 / 0 | 0, 0, 0 | 0, 0 (18 quads) | 0 | outward; 0 inverted; every shell volume > 0 | bbox bottom centre; rot 0, scale 1 |
+| `MossyBoulderMainRock` | 210 (1000) | 9.00 × 8.19 × 6.40 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderMossCap` | 848 (1000) | 5.61 × 4.87 × 2.95 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderSmallRock` | 38 (1000) | 1.66 × 1.64 × 1.19 | 1 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+| `MossyBoulderFoliage` | 246 (1000) | 1.71 × 1.74 × 0.99 | 19 | 0 / 0 | 0, 0, 0 | 0, 0 | 0 | outward | ok |
+
+- **Other mesh results.** No duplicate verts, custom normals or modifiers. Smallest corner 5.03° (hero). UVs: 0
+  overlaps and 0 flipped on every object, min gap 0.016, border 0.008, density 1.0, conformal p95 ≤ 1.04.
+- **Floating dressing (my own code).** Per shell, the smallest vert-to-surface gap to any other shell (both ways),
+  triangle overlaps, and the ground (z ≤ 0.03):
+  - hero: **0 shells more than 0.03 from everything** (184 touching, 28 within 0.015, 6 within 0.03; worst 0.015);
+    **0 shells with no contact chain to the ground or the stone**, at 0.03 and at 0.1;
+  - Foliage part: 0 floating, 0 unchained;
+  - deepest cut of any dressing vert into the stone 0.0496 (limit 0.05);
+  - `m035.contact_report` agrees (0 / 0 / 0).
+- **Tall clusters, vertical coverage** (leaf and core shells within 2.2 of each column's seat): F3, F4, F5a and F5b
+  have no empty height band. **F6 has one: nothing spans z 1.96–2.20**, so its top mound is held only by 2 leaves
+  touching the stone flank, 0.24 above the rest of the column.
+- **Rock shape (part / hero stone).** Rock tris 188 / 302; area CV 1.14 / 1.63; edge CV 0.67 / 0.97; valence 3–10
+  (mean 5.92, top share 0.36) / 3–15 (where the cap fuses on); widest at h .45; base span 0.79 / 0.76; largest front
+  facet 8.3 % / 8.6 %; cleft 0.78 at mid height, 0.44 at z 0.5; rear crease 0.32. Widths at h .05 … .95: .85 .94 .97
+  .99 1.0 .97 .93 .88 .70 .54 (h .8 ≈ 0.79).
+- **Colour by facing.** `K.check` reports nothing. Correlation of face normal z with key luminance: hero rock 0.13,
+  cap 0.22, leaves 0.13; MainRock 0.04; MossCap 0.25; Foliage 0.13. The SmallRock part is −0.76, but all its faces
+  are `rock_x_cool_22` / `_33` (4 levels apart) from the position noise field, which on a 1.7-stud rock happens to
+  fall on the top: position, not facing, and invisible in the render.
+- **No painted foot band:** MainRock key luminance 147.2 below z 1 against 150.2 at z 2–4.5.
+- **Tint:** a per-corner `Tint` layer, 0.932–1.078, sd 0.027.
+- **Lighting and VFX:** no children, no sockets, emission 0 on all 26 materials.
+
+| Shot vs cell | W : H (sheet) | Rock / green (cap, foliage) / flower | Sheet | Profile err mean / max | Rock median (sheet) | Cap median (sheet) | Foliage median (sheet) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (0, 10) | 1.369 (1.473) | .754 / .243 (.098, .145) / .002 | .737 / .258 (.109, .149) | 0.058 / 0.14 | `#C9AA9C` (`#BFA294`) | `#ADC50F` (`#9EB608`) | `#688E09` (`#608804`) |
+| front_sheet (0, 6) | 1.429 (1.363) | .763 / .235 (.092, .144) / .002 | .747 / .245 (.101, .143) | 0.060 / 0.21 | `#C8A99C` (`#BFA294`) | `#ACC40F` (`#95B00C`) | `#668B09` (`#729405`) |
+| r34_sheet (150, 9) | 1.401 (1.338) | .699 / .301 (.094, .208) / 0 | .708 / .288 (.112, .175) | 0.068 / 0.22 | `#AF968F` (`#AE988E`) | `#8AA50C` (`#A1B607`) | `#507D05` (`#668D04`) |
+| rear_sheet (180, 6) | 1.356 (1.272) | .689 / .311 (.103, .207) / 0 | .715 / .279 (.105, .173) | 0.072 / 0.32 | `#AF968F` (`#B0988E`) | `#8AA50D` (`#A2B808`) | `#4F7C06` (`#6E9004`) |
+| side_sheet (90, 5) | 1.244 (1.250) | .737 / .263 (.086, .177) / 0 | .741 / .251 (.097, .154) | 0.054 / 0.21 | `#968079` (`#B29A8F`) | `#8AA10D` (`#9CB20C`) | `#497006` (`#6C8F05`) |
+| top_sheet (0, 89) | W : D 1.109 (1.084) | .514 / .483 (cap is the known miss) | .670 / .324 | — | `#C8A99E` (`#C4A89A`) | — | — |
+
+- **Colour families.** Rock warm, R > G > B in every key and render (hue 13–19°, sat 0.18–0.22; never mauve). Cap hue
+  68–71°, sat 0.92; foliage hue 77–83°, sat 0.94–0.96: two separate greens, 9–12° apart. Petals render warm white
+  (`#FFFFF5`, key `#D3D2CB`, R ≥ G > B). Pollen renders hue 46°, sat 0.73–0.75 in the hero (10 px; the parts shot
+  is higher). Every share is within ±4, and every cap share within ±2.
+- **Sheet against ours, lit quartiles.** Foliage f34 `#7AA414` against `#A0BB0B`; rear `#5B8809` against `#9FBA0D`.
+  The sheet's clumps have bright lime-yellow tops; ours stay a darker, bluer green.
+
+### Findings
+
+1. **Minor: the F6 right column still reads as three stacked tufts** (f34, front and game three-quarter). Its top
+   mound sits 0.24 above the middle one, held only by two leaves on the stone, so from the front sky shows between the
+   tiers. The sheet's right column is one continuous leafy column. It is attached, so this is not floating dressing.
+   Fix target: lower F6's top mound by about 0.3 (or add 2–3 leaves bridging z 1.9–2.3) so the column has no empty
+   height band; a vertical-coverage check like the one above should report no gap.
+2. **Minor: the back tall clusters (F5a, F5b) read as narrow upright columns, not the sheet's broad rear-left mound**
+   (rear, r34). They are dense and rounded now, a clear improvement on round 1's ladders, but each is about two leaves
+   wide. The rear foliage share is .207 against .173, so the issue is shape, not amount. Fix target: widen their ground
+   mound (`HUG_STRETCH` about 1.6 for F5a/F5b) and drop the top mound, so the back reads as one wide low mound reaching
+   about h .45.
+3. **Minor: the foliage is darker and less lime than the sheet.** Medians are close in the f34 (`#688E09` against
+   `#608804`), but the lit quartile is 20–40 levels below the sheet's in every view, and the rear and side medians are
+   about 20–30 under. Fix target: more `leaf_young` on the top third of each mound (now 120 faces against 720 at
+   `leaf_x_deep_20`), aiming at the f34 lit quartile of about `#A0BB0B`.
+4. **Minor: the rock reads boxy in the rear and side.** Its flanks are near vertical down to the ground and the foot is
+   wide (0.85 at h .05, 0.94 at h .15, against the sheet's 0.70–0.80 at h .1). The sheet's rear and side read as a
+   dome. The rear profile is the worst (0.072 mean, 0.32 at f .85, the model-left back shoulder). Valence max is 10
+   (target 3–8). I agree with the fix modeller that pulling the foot in alone gave a ball on a stalk; it would need
+   the lower ring pulled in together with a slightly lower widest ring. Accept for this model.
+5. **Minor: the cap reads as faceted star cones rather than low scalloped mats.** It is less droopy than in round 1,
+   and its height (1.47 above the crown) and share (f34 .098 against .109) are within tolerance. The sheet's rosettes
+   have softer, serrated lobe edges. Accept.
+6. **Minor: cap and foliage are about 20 levels dark in the rear, r34 and side** (cap `#8AA50D` against `#A2B808`).
+   This is the studio key light behind the model; the front views are within about 15 (f34 cap 15 light). Accept.
+7. **Minor: W : H.** f34 1.369 against 1.473 and front 1.429 against 1.363. The sheet's two front drawings disagree
+   by the same amount, and the decided 12.0 × 7.8 size is met. Accept.
+8. **Minor: top view.** The clusters stand round the left, back and right as separate tufts with gaps between them,
+   not the sheet's continuous ring, and F1 and F2 add foliage at the front. The cap is the known miss. Accept.
+9. **Minor: pollen** renders at sat 0.73–0.75 in the hero shots (target ≥ 0.8). It is only a few pixels. Accept.
+
+The round-1 blocker is resolved: 0 floating shells and 0 unchained shells (measured independently), and every
+cluster is now built from dense rounded mounds of broad round leaves with no splayed ladders. F6 is forward
+(seat y ≈ −2.6), the side cell's mid-flank is bare rock with clumps at both feet, and the clusters surround the base
+in the top view.
+
+### Decisions check
+
+| Decision | Result |
+| --- | --- |
+| 1, size | Followed: rock 9.00 × 8.19 × 6.40; dressed 12.11 × 10.91 × 7.87 (all within tolerance) |
+| 2, cleft | Followed: two masses, cleft 0.78 deep at mid height |
+| 3, cap | Followed |
+| 4, counts | Followed: 5 rocks + pebble from 3 variants; 4 cluster kinds placed 10 times (F9 cleft tuft, accepted in round 1); 3 flowers |
+| 5, camera | Followed: f34 at 10°, with the 6/10/14 probe on record |
+| 6, packaging | Followed: one fused stone shell; every rock, leaf, core, petal and pollen dome a closed manifold shell; 0 bowties, 0 self-hits; `problems` checks closure and contact |
+| 7, hero + 4 parts | Followed |
+| 8, effects | Followed: none |
+| 9, cameras | Followed |
+| 10, colour | Followed: warm stone with position-noise cool and light patches, olive stain in the cleft, cap shaded by lobe position, foliage by height on each mound, no foot band |
+| 11, names | Followed |
+
+### Score and verdict
+
+**7.5 / 10. PASS (round 2).**
+
+There are no blockers:
+- the mesh is clean and every budget is met (hero 3844 / 4000);
+- no dressing floats, and every shell chains to the ground or the stone;
+- the silhouette and the shares are within tolerance in every cell;
+- the colour families are right, and colour is blended by position with Tint mottling;
+- every decision is followed.
+
+Findings 1–3 are worth a later polish pass if the main session wants one: F6's gap, a wider rear mound, and brighter
+lime leaf tops. The rest should be committed as noted leftovers.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 2 (7.5/10) and committed. Round 1 failed (6.5/10) because the tall foliage clusters were sparse, floating ladders.
+- **Left for a later polish pass:**
+  - F6 reads as three stacked tufts: lower the top mound about 0.3, or bridge the gap.
+  - F5a/F5b read as narrow upright columns: use a broader ground mound (`HUG_STRETCH` about 1.6).
+  - Lit foliage is 20–40 levels darker and less lime than the sheet: use more `leaf_young` on the mound tops.
+  - The rock reads boxy at the rear and side (wide foot, valence 10).
+  - The cap reads as faceted star cones.
+  - Pollen saturation is 0.74.
+- **Export:** 5 assets, 5 solid pieces, 5186 tris, 0 VFX sockets, palette 26 colours, 0 problems.

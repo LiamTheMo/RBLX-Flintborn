@@ -825,3 +825,590 @@ All recommendations are accepted:
 8. No emission or lights.
 9. Packaging: one hero object with one closed land shell (rocks unioned in), plus closed water and foam shells, collision precise. This is the same water exception as M032. Every shell is manifold with 0 bowties, and the export shows 2 water pieces and 17 sockets.
 10. Names: `StreambedSection*`, keys `m034_*`.
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m034.py`, `build()`; work file `art/blender/assets/kit/wip/M034.blend` (port 9880).
+Collection `Kit/M034 Streambed Section`. Imports the committed `m011`, `m012`, `m016` cleanup helpers only (not `m032`:
+the 2D CDT / slab / hole helpers it needed are copied into `m034.py`).
+
+- **Land without slab booleans ("terrace").** `terrace(a, regions)` builds the whole stepped tile as one closed mesh:
+  each flat region (left bank, channel, right-bank planks) is its own 2D constrained triangulation lifted to its level
+  (points about every 2.9 studs for the colour patches); vertical walls are zipped between any two regions of different
+  level (the bank inner edges 0.7 -> 1.6, the plank steps) and round the tile outline down to z 0; the bottom is one
+  flat triangulated face set at z 0. Shared boundaries use the same resampled points, so no union is needed for the
+  slabs: no coplanar boolean inputs. Rings at z 0.45 / 1.04 / 1.6 on the walls carry the sand-over-earth colour bands.
+- **Plan (decision 2, top view governs).** Bank inner edges are straight runs with 45-degree jogs:
+  left (-7,16) (-7,12) (-8.5,10.5) (-8.5,-3) (-9.5,-4) (-9.5,-13.5) (-7,-16);
+  right (7,16) (7,11) (8,10) (8,3) (10,1.5) (10,-0.6) (10,-7) (9.5,-8.5) (9.5,-11.5) (7,-14) (7,-16).
+  The front-left / front-right runs were widened 1 stud from section 2.2 (top view: open water -8.6, sand -10.5 at
+  v .925; sand +10.2 at v .825) to give the hero more water; the seams keep the contract (X -7 ... +7).
+- **Planks.** The right bank is three planks cut at y -0.6 and -8.5; the middle one is 0.3 higher (top 1.9), the
+  hero's "two small steps" on the +X face. 0.3 not 0.15: a 0.15 step wall gave needle triangles under 5 degrees on the
+  2-3 stud wall segments; the step walls are resampled every 1.1 studs. Seams and the left bank stay exactly 1.6.
+- **Rocks** (`rock()`): `K.hull_rock` with explicit rings and `keep_bottom`, then `dissolve_limit` 4 degrees and
+  re-triangulated. Rings: big (0, .97, 8) (.28, 1, 8) (.6, .92, 7) (.84, .76, 6) (1, .58, 5) (flat 5-point crown);
+  medium (0,.97,7) (.32,1,7) (.72,.84,6) (1,.6,4); small / tiny / pebble smaller sets. Positions from section 2.3 with
+  nudges: B2 (8.1, 6.8), B3 (10.4, -5.2) (more of it in the water, junction close-up), s2 (9.2, 0.4) and s8 (5.2, 12.1)
+  off the jog corners (they made boolean slivers / water needles there). 4 big, 2 mid, S1, 9 bank rocks, 11 small
+  rocks, 17 pebbles (11 brown).
+- **Heights (pass 3).** The first pass followed section 2.3 (tops 7.6-8.0, 0.9 w above the bank): the hero read as
+  tall eggs, f34 R 47 % / W 22 % against 36 / 40. Final: footprints -8 % (big 6.3-6.6 x 6.4-6.9, mid 4.3-4.4), tops
+  B1 7.4 (the hero's tallest, the back boulder, = bbox top, inside decision 1's 8.0 +- 0.6), B4 6.8, B3 6.6, B2 6.4,
+  M1 3.8, M2 3.7, S1 2.4; bank rocks 1.3 + 0.6 w; small rocks 0.6 w above their ground.
+- **Water and foam** never touch the land (as M032): water 0.76 -> 1.0, 0.09 off the bank walls, seam faces 0.02
+  inside the tile, cut round every in-water / waterline rock by a 2D hole (convex hull of the rock below z 1.2, at most
+  7 corners, + 0.09 + the simplification loss). Foam 1.03 -> 1.06: a wavy ribbon (0.4-1.0 wide plus the gap) on the
+  water along each bank edge with small triangular holes, an 8-corner wobbly collar round B1-B4, M1, M2, S1, s3, s8,
+  six loose blobs; clipped by both banks (grown 0.12 into the water), the rock holes and the seams. A 2D needle / cap
+  pass (`_needles2d`: collapse onto the hole side, flip caps, drop outline slivers, never fold) keeps every corner at
+  5 degrees or more. The study's "water bottom 0.6 inside the bed" was not used: interpenetrating shells would
+  self-intersect.
+- **Parts** (decision 5): `StreambedSectionBankSlab` (left bank terrace + its sand rocks and pebbles, unioned),
+  `StreambedSectionBedSlab` (channel terrace + S1, s3, s8), `StreambedSectionWaterPlane` (water shell, no holes, the 3
+  flow sockets), `StreambedSectionRockLarge` (B4), `...RockMedium` (M2 + a small rock at its foot, unioned),
+  `...RockSmall` (S1), all flat-bottomed at z 0.
+
+## Stage 2: Optimisation and cleanup
+
+- Hero: terrace + 44 rock / pebble shells united one at a time (exact, merge 0, at the world origin; `m033`-style
+  guard, 0 retries), `m016._clean_mesh` with plane locks z 0 / 0.7 / 1.6 / 1.9, `_finish`, `_polish`
+  (`m012._force_slivers`), `M.fix_bowties` (0). Then the water + foam shells joined (not unioned).
+- **Final build (2026-10-29):**
+
+| Object | Tris | Size (studs) | Shells | Non-manifold e / v | Boundary | Self-hits | Min corner | Inverted |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StreambedSection | 3894 / 4000 | 32.0 x 32.0 x 7.4 | 1 land (2750) + 1 water (324) + 12 foam (820) | 0 / 0 | 0 | 0 | 5.0 | 0 |
+| ...BankSlab | 876 | 9.0 x 32.0 x 3.2 | 1 | 0 / 0 | 0 | 0 | 5.2 | 0 |
+| ...BedSlab | 486 | 19.5 x 32.0 x 2.4 | 1 | 0 / 0 | 0 | 0 | 5.1 | 0 |
+| ...WaterPlane | 104 | 19.3 x 31.8 x 0.24 | 1 | 0 / 0 | 0 | 0 | 6.1 | 0 |
+| ...RockLarge | 62 | 6.7 x 6.5 x 6.4 | 1 | 0 / 0 | 0 | 0 | 9.5 | 0 |
+| ...RockMedium | 82 | 4.7 x 4.2 x 3.35 | 1 | 0 / 0 | 0 | 0 | 5.2 | 0 |
+| ...RockSmall | 28 | 2.5 x 2.4 x 2.0 | 1 | 0 / 0 | 0 | 0 | 22.9 | 0 |
+
+  No n-gons, wire edges, loose verts, zero-area faces or duplicate verts on any object; normals outward; transforms
+  applied; origin = bbox bottom centre (the tile centre, z 0). Flat land tops: 507 faces at exactly 1.6, 291 at 0.7,
+  55 at 1.9; no land vertex lies within 0.5 of an outer wall / seam plane without being on it (walls flat).
+- `_inverted` counts per shell with a slightly tilted ray and de-duplicated edge hits (an along-normal ray through an
+  edge counted both faces: false positives).
+- Rock metrics: RockLarge median facet 2.21 sq studs (min 0.55), crown (n.z > 0.9) 28 % of plan, H : W 0.96 as a free
+  piece (0.8-0.9 of its width stands above the bank in the hero); RockMedium H : W 0.72; RockSmall 0.79.
+- `K.check` puts rock and earth in one near-grey family whose shade follows facing (the earth underside faces down):
+  `kit_shading_ok` is set on the hero, BankSlab and BedSlab with the reason (earth is a real material region, painted
+  by position). Nothing is painted by facing.
+
+## Stage 3: UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED, margin 0.008) + `m012._uv_unfold` on every object: 0 overlaps, 0 flipped, min
+island gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0 (min / median / max), conformal stretch p95 1.0 (RockLarge
+1.04). Hero 713 islands. The exporter writes its own palette / water UVs; this layer is clean for FBX / OBJ.
+
+## Stage 4: Materials, colour and texture
+
+- **Keys and finish** (`PALETTE`): sand `#DAAE6C` (rough 0.95), sand_light `#E2BC86`, earth `#978C86`, rock `#9E96A0`
+  (0.85), pebble `#715735` (0.9), bed `#0080C0`, bed_light `#38C8EE`, water `#00ACDC` (rough 0.3, kit_transparency
+  0.3), water_foam `#D5FCFD` (0.6, kit_transparency 0.1). Metal 0, no emission. The bed keys contain no "water".
+- **`K.calibrate` (kit dome, 6 iterations):** sand -> `#DCA770` (renders 255,205,129 against target `#FBCE81`),
+  sand_light -> `#E5BA8A` (255,229,160), earth -> `#817F83` (161,154,151), rock (target whole-rock `#998E9A`) ->
+  `#797483` (152,141,152), pebble -> `#715735` (141,106,66). Pebble is used as calibrated. For the rest the dome
+  disagrees with the sheet-camera renders (the kit sun over-lights flat tops): sand / sand_light sit between the dome
+  result and the f34 render (the dome's `#DCA770` rendered f34 sand at hue 29, too orange); rock keeps the
+  render-tuned `#9E96A0` (the dome key `#797483` would put the hero's lit faces far under the sheet's `#C8BBBD`);
+  earth was tuned on the front cell's bed face.
+- **Blending by position** (`_paint_terrace`, `_paint_rock`): bank tops sand -> sand_light by a broad noise field
+  (`noise_field` scale 0.2: patches about 5 studs, 25 % steps), a pale shore band (50 % within 1.1 of an inner edge,
+  25 % to 1.9), a 25 % pebble contact ring within 0.2 of each rock foot; bed top bed -> bed_light by broad patches
+  (scale 0.17), 25 % earth at rock feet; walls: sand above z 0.45 over a sand / earth 50 % foot band (outer walls),
+  sand above 1.04 over 50 % below (inner walls), the channel's seam walls and the whole underside earth; rocks a
+  per-rock Tint (+-5 %) and 25 % earth below the waterline. Hard edges only where materials meet (rock | sand,
+  rock | bed, water | foam). No key chosen by facing.
+- **Tint:** sand amp 0.04 / scale 0.6; bed 0.03 / 0.8; walls + underside 0.03 / 0.8; rocks 0.04 / 0.5 per rock;
+  pebbles 0.03; water / foam 0.
+- **Rendered against the sheet** (study masks, `measure_render.py`, floor hidden):
+
+| Region | Ours | Sheet | Note |
+| --- | --- | --- | --- |
+| f34 sand S median / lit | `#FCC37D` / `#FFE89C` | `#FCCF7F` / `#FDE59D` | G -12 |
+| top sand S median | `#FFDB81` | `#F7C375` | the kit sun over-lights flat tops in the top camera; f34 and top pull opposite ways |
+| f34 rock R median / lit | `#A19799` / `#CDBFC3` | `#978D97` / `#C8BBBD` | within 10 / 6 |
+| f34 water W median / lit | `#25CFFF` / `#56E4FF` | `#08D1FD` / `#4BE5FD` | R +29 (the kit water texture's light lines) |
+| f34 foam F median | `#F0FFFF` | `#C2F2FC` | brighter (kit foam texture) |
+| f34 pebbles D median | `#957447` | `#846642` | |
+| front_sheet bed (seam) face | `#9C8E84` (before the last earth raise) | `#AD9E8F` | earth then raised to `#978C86` |
+| front_sheet bank faces (bottom band) | `#D5AD79` | `#C99C5E` | includes the earth-blend foot band |
+
+## Stage 5: Lighting
+
+Skipped by decision 8: nothing on the sheet glows; no emissive key, no PointLight. Preview-only: the water and foam
+materials get Specular IOR Level 0 (`WATER_SPEC`) so the low kit cameras don't show the sun glint mirrored white over
+the whole flat water (front34 was white); the exporter makes water SmoothPlastic, so this doesn't export.
+Studio (Requires Manual Validation): the water's cyan and pattern through the exported texture and transparency 0.3,
+the foam's opacity (0.1), the 0.6 step water -> bank and 0.9 bed -> bank for the default character, sand warmth.
+
+## Stage 6: VFX
+
+`_sockets()`: 3 `water_flow` beams at z 1.03, +Y -> -Y (centre x 0.5 width 6; x -4.5 width 3; x 5.0 -> 5.5 width 3)
+on the hero and on `StreambedSectionWaterPlane`; 14 `water_foam` at z 1.05 (B1-B4 1.0, M1 / M2 0.8, S1 0.6, s3 / s8 /
+s2 0.4, four bank-edge spots 0.7: (-8.5, 4), (-9.2, -7), (8, 13), (7.4, -15.2)). Build check: hero 3 flow + 14 foam =
+17. Export STATS not run (no exports in stage agents).
+
+## Measured views (final build, floor-hidden `*_sheet` renders, study masks)
+
+| View | W : H ours / sheet | S | R | W | F | D |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (35, 28) | 1.792 / 1.763 | 30.4 / 15.6 | 41.8 / 36.2 | 23.0 / 40.1 | 3.1 / 4.7 | 0.7 / 1.1 |
+| r34_sheet (225, 32) | 1.744 / 1.767 | 31.4 / 16.2 | 38.8 / 38.3 | 23.6 / 36.3 | 4.4 / 4.8 | 0.9 / 1.7 |
+| front_sheet (0, 5) | 3.655 / 3.373 | 21.7 / 20.4 | 62.1 / 57.7 | 13.0 / 13.8 | 2.4 / 3.6 | 0.3 / 0.5 |
+| side_sheet (270, 5) | 3.963 / 3.054 | 33.6 / 25.4 | 62.1 / 52.7 | 1.8 / 9.9 | 0.5 / 4.6 | 0.5 / 1.3 |
+| rear_sheet (180, 5) | 3.890 / 3.388 | 21.6 / 18.3 | 61.4 / 58.2 | 13.7 / 14.7 | 2.4 / 4.0 | 0.4 / 0.5 |
+| top_sheet (0, 89) | 0.994 / 1.005 | 34.0 / 31.8 | 23.2 / 23.0 | 33.9 / 35.3 | 6.7 / 4.7 | 1.0 / 1.4 |
+
+Top profiles (ours): f34 .45 .50 .56 .61 .67 .72 .77 .83 .88 .97 1.0 .89 .79 .77 .74 .74 .70 .68 .65 .62 .60;
+front .18 .34 .51 .54 .90 1.0 1.0 .73 .43 .41 .41 .41 .41 .70 .88 .88 .83 .82 .48 .39 .18 (channel dip .41 at
+f .45-.60).
+
+## Modeller's notes for the verifier
+
+1. **Cameras:** compare `f34_sheet` with the hero, `r34_sheet` with the rear three-quarter, `side_sheet` (az 270) with
+   "SIDE (LEFT)", `front_sheet` / `rear_sheet` / `top_sheet`; kit front34 / rear34 / front / side / rear / underside are
+   self-checks. Close-ups: `junc_cu` (az -40: B3 half on the right bank, half in the water, foam along the sand edge
+   and round its foot), `sect_cu` (the front seam: bank face sand over an earth foot band, the channel's earth face
+   under the water's thin cyan side, water top below the bank top), `under_cu` (one flat earth bottom).
+2. **Known misses, all from sheet inconsistencies (decision 2: the top view governs):**
+   - f34 / r34 shares: S +15, W -13 to -17. The sheet's hero draws water across the whole front-left corner and narrow
+     bank strips; the top view (which we match: S 34.0 / R 23.2 / W 33.9) has 9-stud sand banks at both seams. The
+     study predicted S +3-5 / W -3-6; the real gap is larger. The rocks were already shrunk 8 % and lowered for it
+     (f34 R 41.8 against 36.2; it was 47).
+   - front / side / rear W : H 3.66 / 3.96 / 3.89 against 3.37 / 3.05 / 3.39: the e~5 cells draw the boulders up to
+     about 9.5 studs tall, the hero draws them squat (about 0.55 w above the ground). The tops follow decision 1
+     (max 7.4, inside 8.0 +- 0.6) and the hero; raising them would push f34 R further over.
+   - side cell water 1.8 % against 9.9: the sheet's side cell is drawn from higher than e 5 and sees the stream.
+   - top F 6.7 % (sheet 4.7, tolerance +-2: at the limit); f34 F 3.1 %.
+   - sand: f34 G -12 while top +24 (the kit sun lights flat tops about 1.6x in the top camera): the key sits between.
+   - the rear cell's off-centre bed face (section 3.4) is not followed: centred channel at both seams.
+3. **Not as the study planned:** water bottom 0.76 (not 0.6) and 0.09 off the walls (no land / water intersection);
+   plank step 0.3 (not 0.15); the left inner edge widened to -9.5 and the right front to 9.5; B3 at x 10.4; s2 and s8
+   moved off the jog corners; rocks smaller and lower (above).
+4. **Shells:** foam is 12 closed shells on one key (ribbons, collars, blobs); water 1 shell; land 1 shell; all
+   manifold, 0 bowties, 0 self-intersections in the hero. `shells_report()` lists each.
+5. **Budget:** hero 3894 / 4000 (land 2750, water 324, foam 820). If something must be added, take it from the foam
+   (ribbon resample 1.8) or the top grid (`TOP_STEP` 2.9).
+6. `kit_shading_ok` is set on the hero and both slab parts (earth / rock family, see Stage 2).
+7. Rebuild: `import importlib, kit_models, m034; importlib.reload(kit_models); importlib.reload(m034); m034.build()`
+   (about 45 s build + 60 s renders in a background session). `m034.preview()` renders the sheet shots only.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier and read-only. Background session on port 9880 using `wip/M034_verify.blend`. Nothing was built, edited or saved. Renders are in
+`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m034_verify\`.
+They cover the six `*_sheet` cameras (floor hidden, with and without VFX), the kit views, the exploded view, the six parts, `junc_cu`, `sect_cu` and `under_cu`.
+Side-by-side images are `cmp_f34.png`, `cmp_r34.png`, `cmp_top.png`, `cmp_expl.png`, `cmp_rocks.png`, `cmp_cu.png` and `cmp_ortho.png`.
+All views were measured with the study's `measure_render.py`.
+
+### Mesh (re-measured)
+
+| Object | Tris (loop tris) | Size | Shells | NM e / v | Boundary / wire / loose | Zero-area / n-gons | Self-hits | Min corner | Inverted | Local bbox (origin) | Rot / scale |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StreambedSection | 3894 / 4000 | 32.0 x 32.0 x 7.4 | 14 (1 land 2750, 1 water 324, 12 foam 820) | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 5.0 | 0 | +-16, +-16, z 0 | 0 / 1 |
+| ...BankSlab | 876 / 1000 | 9.0 x 32.0 x 3.22 | 1 | 0 / 0 | 0 | 0 | 0 | 5.2 | 0 | +-4.5, +-16, z 0 | 0 / 1 |
+| ...BedSlab | 486 | 19.5 x 32.0 x 2.4 | 1 | 0 / 0 | 0 | 0 | 0 | 5.1 | 0 | centred, z 0 | 0 / 1 |
+| ...WaterPlane | 104 | 19.32 x 31.82 x 0.24 | 1 | 0 / 0 | 0 | 0 | 0 | 6.1 | 0 | centred, z 0 | 0 / 1 |
+| ...RockLarge | 62 | 6.68 x 6.5 x 6.4 | 1 | 0 / 0 | 0 | 0 | 0 | 9.5 | 0 | centred, z 0 | 0 / 1 |
+| ...RockMedium | 82 | 4.67 x 4.17 x 3.35 | 1 | 0 / 0 | 0 | 0 | 0 | 5.2 | 0 | centred, z 0 | 0 / 1 |
+| ...RockSmall | 28 | 2.52 x 2.44 x 2.0 | 1 | 0 / 0 | 0 | 0 | 0 | 22.9 | 0 | centred, z 0 | 0 / 1 |
+
+- **Every shell is closed and manifold, with 0 bowties.**
+  - Water and land don't touch: BVH overlap is 0, and the closest water-to-land gap is 0.021.
+  - Foam and land don't touch: overlap 0, closest gap 0.095.
+  - Foam and water don't touch: overlap 0, closest gap 0.030.
+- **Heights.** Water runs z 0.76 -> 1.0 and foam 1.03 -> 1.06. The flat land tops sit at 1.6 (507 faces), 0.7 (291) and 1.9 (55, the middle plank).
+- **UVs.** No overlaps or flips. The margin is 0.008 and the gap 0.016.
+- **Tiling.** At both seams Y = +-16, the land profile is bank 1.6 for |X| >= 7 and bed 0.7 between, centred. The outer walls at X = +-16 are flat (108 verts on the plane, none within 0.3 of it off the plane). No rock crosses an edge.
+- **Water keys.** Only `m034_water` and `m034_water_foam` contain "water", so they make 2 water pieces. The bed keys have none. Transparency is set on water (0.3) and foam (0.1).
+- **Collision.** The hero, BankSlab and BedSlab are precise, the rocks hull, and WaterPlane none.
+
+### Colour and shading (re-measured)
+
+| Check | Ours (f34_sheet unless stated) | Sheet | Spec 5.7 target | Result |
+| --- | --- | --- | --- | --- |
+| Sand S median / lit | `#FCC37D` / `#FFE79B` | `#FCCF7F` / `#FDE59D` | within 10 | G -12, just outside |
+| Sand, top_sheet | `#FFDB81` | `#F7C375` | - | over-lit tops (kit sun), as the modeller noted |
+| Rock R whole / lit / shade | `#A19698` / `#CDBFC3` / `#766F73` | `#978D97` / `#C8BBBD` / cool faces `#57668B` | 12 / 10 | the numbers pass, but the shade side is mauve and the sheet's is blue-violet |
+| Water W median | `#20CEFF` | `#08D1FD` | within 12 | **R +24, outside** |
+| Water tones (share of W) | light (s < .9) 0.66, **deep (s >= .97) 0.00** | light 0.34, deep 0.49 | each >= 20 % | **no deep tone** |
+| Foam F median | `#F4FFFF` (pure white) | `#C2F2FC` (pale cyan) | within 12 | **R +50, outside** |
+| Pebbles D | `#957447` | `#846642` | - | fine |
+
+- **Colour by facing: none.** I read the builder. `_paint_terrace` and `_paint_rock` choose every key by position only: region, distance to an edge or rock foot, z band, and the bottom set.
+- **`kit_shading_ok` waiver.** I measured `baked_shading` with and without the z = 0 bottom faces:
+  - hero 0.547 -> **0.412** without the underside;
+  - BankSlab 0.761 -> **0.228**;
+  - BedSlab **0.0** with or without.
+
+  The correlation comes entirely from the flat earth underside. The sheet's Underside View draws the underside as a taupe material, so it is a real material region. The waiver is **honest** on the hero and BankSlab. It is **unneeded on BedSlab**.
+- **Rock key `#9E96A0`** has hue 288 and B > R > G. On the sheet, the swatch `#B4AEAF` and the lit faces have hue 350-20 (warm). The sheet gets its cool side from shading. Ours has no blue shade (the kit sun makes `#766F73`), so the whole rock reads **pink-mauve** next to the sheet's grey (`cmp_f34.png`).
+- **Tint.** The mottling is broad, with no per-triangle confetti on rocks or bed. But the sand top's 2.9-stud triangles show as separate light and dark shards in the top view, and the 25 % pebble contact triangles round rock feet read as dark wedges (`cmp_top.png`).
+
+### Shape (sheet cameras; the study's masks)
+
+| View | W : H ours / sheet | S | R | W | F | D | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (35, 28) | 1.792 / 1.763 | **30.5** / 15.6 | 41.7 / 36.2 | **23.2** / 40.1 | 2.9 / 4.7 | 0.7 / 1.1 | top-profile mean error 0.09 (target <= .07), worst .22 at f .65 (target .12); width per height off by up to .18 |
+| r34_sheet (225, 32) | 1.744 / 1.767 | **31.4** / 16.2 | 38.9 / 38.3 | **23.9** / 36.3 | 3.9 / 4.8 | 0.9 / 1.7 | |
+| front_sheet (0, 5) | **3.655** / 3.373 | 21.7 / 20.4 | 62.1 / 57.7 | 13.2 / 13.8 | 2.2 / 3.6 | 0.3 / 0.5 | channel dip .41 in f .45-.60, ok |
+| side_sheet (270, 5) | **3.963** / 3.054 | 33.6 / 25.4 | 62.1 / 52.7 | 1.8 / 9.9 | 0.5 / 4.6 | 0.5 / 1.3 | |
+| rear_sheet (180, 5) | **3.890** / 3.388 | 21.6 / 18.3 | 61.4 / 58.2 | 13.9 / 14.7 | 2.2 / 4.0 | 0.4 / 0.5 | |
+| top_sheet (0, 89) | 1.003 / 1.005 | 34.1 / 31.8 | 23.2 / 23.0 | 34.8 / 35.3 | 5.8 / 4.7 | 1.0 / 1.4 | all within tolerance |
+
+These reproduce the modeller's table, so the modeller's numbers are confirmed.
+
+- **The hero against the top view (the modeller's claim): confirmed.**
+  - **What the hero draws.** Its banks are thin strips, about 4-5 studs across. The whole front (lower-left) edge is water from the left corner to the boulder pair. Several boulders stand fully in the water.
+  - **What the top view draws.** About 9-stud sand banks on both sides at both seams, and sand at both front corners.
+  - **Our top view matches the sheet's top within tolerance.** Water plus foam is 40.6 % on ours against 40.0 % on the sheet, so more water cannot be added without leaving the top view.
+  - **So most of the f34 / r34 gap (S +15, W -17) comes from decision 2, not from the build.** The study predicted a gap of S +3-5 and W -3-6; the real gap is about three times that. The main session should know this when it rules. If it wants the hero's broad-water read, decision 2 must change: a channel about 16 wide at the seams and 20-22 mid-tile, with banks about 5-6 wide.
+  - **On its own terms, the defining read holds only in the top view.** Seen from the hero and r34 cameras, the tile reads as broad sand banks with a stream between them and boulders along its edges. It does not read as a broad stream full of boulders between thin banks.
+- **Boulders.** They read as smooth upright eggs, not the sheet's chunky, flat-crowned boulders (`cmp_f34.png`, `cmp_rocks.png`).
+  - **Screen aspect of the hero boulders (W : H).** Ours: B1 0.82, B4 0.75, B3 1.0. The sheet's boulders in the same positions: 1.11, 1.23 and 1.1.
+  - **Implied height to width above the waterline.** Ours is about 0.95-1.0. The sheet's hero is about 0.55-0.6.
+  - **The study's own exploded-rock figure (screen W : H 1.18 at 30 degrees) also implies about 0.55-0.65.** The spec's "0.9 x width" target (1.4, 9.2) does not follow from its own measurement.
+  - **The rock pieces are too tall as well.** RockLarge is H : W 0.96. Its widths at 0.7 h / 0.9 h / 0.98 h are 0.83 / 0.65 / 0.55 of the maximum, a tapering egg. The sheet's large rock has nearly vertical upper sides and a crown about 0.6-0.65 of its width.
+  - **What does meet the spec.** The facets are big (median 2.19 sq studs) and the crown covers 26 % of plan, as 9.2 asks. The egg read comes from height and taper.
+  - **Decision 1 limits how far heights can drop.** It sets max z at 8.0 +- 0.6, so B1 alone has to stay at 7.4 or more.
+- **Foam reads as hard white outlines, not the sheet's soft white foam.**
+  - The collars are thin 8-corner polygon rings. A dark-blue gap (the water hole, showing the bed) separates each ring from its rock.
+  - The bank ribbons are crisp white strokes, again with a blue line between them and the sand.
+  - The foam renders pure white `#F4FFFF`, where the sheet's is pale cyan `#C2F2FC`.
+  - On the sheet, foam is soft, lobed and broken, and hugs each rock's foot and the sand edge. See `junc_cu` against close-up 2 in `cmp_cu.png`, and `cmp_top.png`.
+- **Water.** It is a uniform pale cyan crossed by the kit texture's thin light lines. The sheet's broad deep and light two-tone blotches are missing: 0 % of our water pixels are deep, against 49 % on the sheet.
+- **Slabs and parts.**
+  - The bank and bed slabs read as flat planks with vertical sides (ok).
+  - The jogged inner edges and the middle plank step (ok); the step is 0.3 instead of 0.15, which the modeller documented.
+  - The underside is one flat earth bottom (ok).
+  - The exploded view and the parts follow the sheet's breakdown (ok).
+  - The bank slab is one plank, not the sheet's stepped-end plank. That is acceptable under 3.7.
+- **Pebble scatter.** The density is right. The mix is 11 brown and 6 grey, where the sheet has about 8 brown and 15 grey.
+- **VFX.** There are 3 `water_flow` beams (+Y -> -Y, widths 6 / 3 / 3, faint white streaks) and 14 `water_foam` sockets at the spec's positions, with the same 3 beams on the WaterPlane part. This suits the sheet's "VFX overlay, flow strips, rendered separately". The left strip (x -4.5, 3 wide) runs straight through S1 and clips M2 and B4.
+
+### Decisions (main session)
+
+| # | Decision | Followed |
+| --- | --- | --- |
+| 1 | 32 x 32 tile, max z 8.0 +- 0.6, bed 0.7, water 1.0, banks 1.6 | yes (max 7.4, at the lower bound) |
+| 2 | The top view governs the plan | yes (top-view shares and plan match) |
+| 3 | Cameras | yes |
+| 4 | Tile contract | yes |
+| 5 | Six parts | yes |
+| 6 | Foam mesh plus 14 foam and 3 flow sockets, +Y -> -Y | yes |
+| 7 | Budget 4000 | yes (3894) |
+| 8 | No emission | yes |
+| 9 | One hero: closed land, water and foam shells, collision precise | yes |
+| 10 | Names | yes |
+
+### Findings
+
+1. **Blocker: the boulders read as tall smooth eggs.** The hero's focal silhouette doesn't match. Fix it within decision 1:
+   - Rings: change `BIG_R` to roughly (0, .97, 8), (.25, 1.0, 8), (.55, .97, 8), (.8, .9, 7), (1.0, .7, 6). That makes the width at 0.7 h >= 0.92 and at 0.9 h >= 0.8 of the maximum. Do the same for `MED_R`, with the crown at 0.7.
+   - Footprints: restore them to the top view, B1 6.8 x 7.3, B2 6.6 x 7.1, B3 7.1 x 6.8 and B4 7.1 x 7.0.
+   - Heights: keep B1's top at 7.4 (the decision-1 max) and lower B2-B4 to 5.6-6.0, which gives H : W about 0.8.
+   - RockLarge part: H : W 0.75-0.8.
+   - Targets: on f34, each big boulder's screen W : H >= 1.0 (B1 >= 0.95); top-view R share 20-26 %.
+   - Budget: about +10 tris per big rock. Take them from the foam.
+2. **Blocker: the foam reads as hard outlines.**
+   - Collars: make each one a lobed blob (10-12 corners, radial jitter +-30 %). Its inner edge follows the water hole's outline, so no blue gap is left round the rock; keep it >= 0.05 off the land. Its outer edge sits 0.8-1.4 out from the rock.
+   - Ribbons: break each bank ribbon into 3-6 segments with soft lobed ends and a few round holes. Close the blue line between the sand and the foam.
+   - Colour: aim for a rendered foam median of `#C2F2FC` +- 12 (key about `#B5ECF5`) and raise `kit_transparency` to 0.2-0.25.
+   - Targets: f34 F 3.5-6 %; top F <= 6.7 %.
+3. **Minor (fix in the same round): no deep tone in the water.** Saturate and darken the bed toward `#0090E8` and make the patch field broader. Targets: f34 W median within 12 of `#08D1FD`; at least 20 % of W pixels at s >= .97 and at least 20 % at s < .9.
+4. **Minor: the rock key reads mauve.** Move it to a neutral-warm grey with B <= R, about `#A29B9A` (hue 0-20, s <= .05). Re-measure: lit faces within 10 of `#C8BBBD`, whole rock within 12 of `#978D97`.
+5. **Minor: triangle shards on the sand.** The sand / sand_light keys and the pebble-contact keys change per 2.9-stud triangle.
+   - Use `K.blend` steps across neighbouring faces, or shrink the contact ring to faces whose centroid lies within 0.2 of a rock foot and keep it to the 25 % mix.
+   - Target: no lone triangle over 2 sq studs that differs from all its neighbours by more than 6 % in value.
+   - Also bring the f34 sand median G within 10.
+6. **Minor: remove `kit_shading_ok` from BedSlab.** Its baked value is 0.0, so the waiver only hides future regressions. The waivers on the hero and BankSlab are honest.
+7. **Minor: the left flow strip crosses rocks.** Bend it round S1, M2 and B4 with `curve0`, or narrow it to 2. Its line should stay >= 0.5 off every in-water rock footprint.
+8. **Minor: the pebble mix.** Change it to about 6 brown and 11 grey to match the sheet.
+9. **Note for the main session, not a blocker: decision 2 costs more than predicted.** f34 / r34 come out at S +15 and W -13 to -17, three times the study's estimate. The thin-bank, broad-water read of the hero can only come back by revisiting decision 2.
+10. **Known misses, consistent with the decisions.**
+    - front / side / rear W : H are 3.66 / 3.96 / 3.89 (the e ~ 5 cells draw taller boulders than the hero does);
+    - the side cell shows 1.8 % water against the sheet's 9.9 %;
+    - the rear cell's off-centre bed face is not followed;
+    - the f34 top profile is off at the right-back pair.
+
+### Score and verdict
+
+**Score 6 / 10.**
+- **What holds:** the mesh, the budget, the tile contract, the top view and the slab and part structure are all clean and match the sheet.
+- **What's wrong:** the two defining looks of a stream tile. The boulders are tall smooth eggs where the sheet has chunky flat-crowned rocks, and the foam is crisp outlines where the sheet's is soft. Both show in every view and can be fixed without breaking any decision.
+
+**Verdict: FAIL (round 1).** Fix findings 1-2, and 3-8 in the same round. Then re-verify f34, the top view, the junction close-up and the rock parts.
+
+## Main session ruling after round 1 (2026-10-29)
+- **Decision 2 is amended.** The tile contract stays as decision 4 states: bed and water X −7…+7 at both seams, with solid bank side walls. The hero cell now governs the read mid-tile.
+  - Widen the channel between the seams to about 18–20 studs mid-tile, thinning the banks there to about 6.
+  - Stand more of the boulders and medium rocks in the water, as the sheet's hero draws them.
+  - Targets: f34 sand ≤ 22 and water + foam ≥ 32 (sheet 15.6 / 40.1). The top view may drift from the top cell, but keep its sand ≥ 22 and its rock within ±5.
+- **Fix round 1** fixes both blockers and minors 3–8 from Verification round 1:
+  - chunky flat-crowned boulders (H : W 0.55–0.8);
+  - soft lobed foam with no gap to the rocks, foam colour `#C2F2FC`;
+  - deep-tone water bed;
+  - the rock key moved to hue 0–20°;
+  - sand blending;
+  - the BedSlab waiver dropped;
+  - the flow strip kept clear of the rocks;
+  - the pebble mix.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+Fresh fix modeller. Background session on port 9880 using `wip/M034.blend`. The builder `m034.py` is the source of truth, and the final build ran in a freshly restarted session. Nothing was committed or exported. The `StreambedPatch*` objects were not touched.
+Measurements:
+- Renders are floor-hidden `*_sheet` shots, measured with the study masks.
+- The share columns come from the no-VFX renders in `scratchpad/m034_fix/novfx/`. The kit renders in `renders/models/M034/` carry the VFX preview.
+- Measurement scripts are in `scratchpad/m034_fix/`:
+  - `mf.py`: shares, water tones and colour medians;
+  - `gaps.py`: water / foam to land;
+  - `shards.py`: lone sand / bed triangles;
+  - `screen.py`: boulder screen W : H through the f34 camera.
+
+### What changed
+
+1. **Layout (amended decision 2).** The seams still keep the contract. At Y = +-16 the bed and water run X -7 ... +7, centred. The outer walls are solid, and every rock stays >= 0.3 inside the tile.
+   - **Inner edges.** Each edge leaves the seam with a straight 45-degree jog and runs out to a wide channel.
+     - Left: (-7,16) (-10.5,12.5) (-10.5,5) (-12,3.5) (-12,-11) (-7,-16).
+     - Right: (7,16) (10.5,12.5) (10.5,3) (12,1.5) (12,-0.6) (12,-8.5) (12,-11) (7,-16). The plank cuts are now at x 12.
+   - **Width.** The channel is 21 wide at the back and 24 mid / front. The banks are 5.5 at the back and 4 mid / front.
+     - The ruling asked for "about 18-20 / banks about 6". That width still left f34 sand at 25.8-27.7, so the extra 2-4 studs were needed to reach the f34 targets.
+     - Top-view sand stays above its floor of 22.
+   - **Boulders.** B1-B4 now stand about 35-45 % on the bank (round 1: about 50 %). M1, M2, S1, s3 and s8 stand fully in the water.
+   - **Positions.**
+     - B1 is at (-9.4, 11), yaw -55, with its long axis turned toward the f34 screen.
+     - B2 (9.9, 7), B3 (11.3, -5.2) and B4 (-11.2, -9.4), yaw 35.
+     - M1 (7.0, -10.6) and M2 (-6.8, -2.6).
+   - **Bank rocks and pebbles.** Bank rocks K1-K9 were re-placed for the narrower banks; the near-right ones are 0.85x and the far-left K2 / K5 / K6 slightly larger. K7 and s9 were dropped. The sand rocks' bases now follow the plank level under them (K8 had been sunk 0.6 into the middle plank).
+   - A trial M3 mid-stream rock was removed, because it pushed f34 R up and W down.
+2. **Boulder shape (blocker 1).**
+   - The rings are now `BIG_R` (0, .95, 7) (.45, 1.0, 7) (.85, .92, 6) (1.0, .74, 5): near-vertical upper sides and a 5-point flat crown at 0.74. Fewer, larger facets, 42-46 tris each.
+   - `MED_R` is (0, .96, 7) (.3, 1.0, 7) (.7, .93, 6) (1.0, .72, 5).
+   - Footprints are as in the top view. Tops: B1 7.4, B2 5.6, B3 5.8, B4 5.9, M1 3.9, M2 3.8.
+3. **Foam (blocker 2).**
+   - **Holes.** Each rock's hole is now the rock's exact convex section at the foam top (z 1.06), simplified to at most 9 / 8 / 6 corners. Its offset is 0.06 plus the simplification loss, or 0.14 for the waterline straddlers, where the union and cleanup at the bank top moved faces by about 0.1. Before, the hole was the hull below z 1.2 with 7 corners, offset 0.09 plus a loss of up to 0.3, and that left the dark ring.
+   - **Collars.** Each collar is a lobed blob with 11 corners (big rocks) or 10 corners (the rest), each corner w x (0.7-1.3) out from the hole. The inner edge *is* the hole, so there is no gap. Widths: w 0.85 for the boulders and mid rocks, 0.8 for the small ones.
+     - Each collar has a 0.3 wake bias downstream (-Y; the foam trails the rock). It is wider on the camera side and narrower upstream, which gets f34 F up without raising top F.
+     - Collars stand round B1-B4, M1, M2, S1, s3 and s8.
+   - **Ribbons.** Each bank ribbon is now 4 (left) or 5 (right) segments with quarter-ellipse rounded ends and lobed widths: left 0.6-1.35, right 0.2-0.5 (hidden behind the near bank wall in f34). The left ribbon has round holes at two spots.
+   - **Land clearance.** The foam stands 0.07 off the bank walls and the water 0.06 (was 0.12 / 0.09), which closes the blue line.
+   - Six loose 6-corner blobs remain.
+   - **Colour.** Foam key `#AAD0E6`, `kit_transparency` 0.22.
+4. **Minors.**
+   - **Water.** Bed `#0090E8`. The bed patches are broad (noise scale 0.12, about 8 studs) and smoothed across neighbours.
+     - The bed and its in-between keys get **Specular IOR Level 0** (`_bed_finish()`, preview only, like `WATER_SPEC`). The bed's sky glint, seen through the 0.3-transparent water, had lifted every water pixel's red. That alone moved the deep share from 0 % to 34 %; changing the bed and water colours moved it by 0.
+     - The water key is unchanged, `#00ACDC`.
+   - **Rock key.** `#9C9898`: hue 0, B = G, s .03.
+   - **Sand blending.**
+     - The sand-light / bed-light fraction is now averaged with the face's neighbours (2 passes) before it is quantised.
+     - The pebble contact ring is gone; it made the dark wedges.
+     - The sand Tint is broad: amp 0.03 at scale 0.15 (was 0.04 / 0.6, effectively per triangle).
+     - Sand key `#DCB874`. `TOP_STEP` is 3.3 (was 2.9), to free budget for the foam.
+   - **Outer walls.** Sand above 1.04, a 50 % sand / earth band from 0.45 to 1.04, and a 75 % earth foot, following spec 5.5 and the cross-section. It was sand down to 0.45.
+   - **Waivers.** The `kit_shading_ok` waiver was dropped from BedSlab and is deleted if present. The hero and BankSlab keep theirs; `K.check` reports nothing.
+   - **Flow strips.** They run in clear lanes:
+     - centre x -0.4, width 2.6, full length;
+     - back-left x -3.8 (15.5 -> 4.6), width 1.2;
+     - right x 2.6 (15.5 -> -9.6), width 1.4.
+   - **Pebbles.** 6 brown and 11 grey, all re-placed on the narrower banks.
+   - **Sockets.** 14 `water_foam`: B1-B4 1.0, M1 / M2 0.8, S1 0.6, s3 / s8 / s2 0.4, plus four bank-edge spots at 0.7. 3 `water_flow` on the hero, and the same 3 on WaterPlane.
+
+### Before -> after
+
+| Check | Target | Round 1 | Fix round 1 |
+| --- | --- | --- | --- |
+| f34 sand S | <= 22 | 30.5 | **21.2** |
+| f34 water + foam | >= 32 | 26.1 | **32.5** (W 29.0, F 3.5) |
+| f34 R / O / D | (sheet 36.2 / 2.3 / 1.1) | 41.8 / 1.0 / 0.7 | 44.2 / 1.5 / 0.6 |
+| top S | >= 22 | 34.0 | **22.4** |
+| top R | 23.2 +- 5 | 23.2 | **24.5** |
+| top F | <= 6.7 (verifier) | 6.7 | **6.7** (8.0 with the VFX preview strips) |
+| f34 F | 3.5-6 (verifier) | 3.1 | **3.5** |
+| r34 S / W+F | - | 31.4 / 28 | 21.6 / 35.7 |
+| Big rock width at 0.7 h / 0.9 h (of max) | >= 0.92 / >= 0.8 | 0.83 / 0.65 (RockLarge) | B1 .96/.87, B2 .94/.83, B3 .95/.87, B4 .94/.84 |
+| Big footprints (plan bbox) | 6.6-7.3 | 6.3-6.6 | 6.6-7.2 (B4 / RockLarge 6.86 x 7.17) |
+| Tops | B1 7.4, B2-B4 5.6-6.0 | 7.4 / 6.4 / 6.6 / 6.8 | 7.4 / 5.6 / 5.8 / 5.9 |
+| RockLarge H : W | 0.75-0.8 | 0.96 | **0.767** (5.5 / 7.17) |
+| f34 boulder screen W : H, above the water | >= 1.0 | B1 0.82, B4 0.75, B3 1.0 | B1 **0.88**, B2 1.02, B3 1.05, B4 1.01 (M1 1.06, M2 1.04) |
+| Flat crown (n.z > 0.9, of the plan disc) / median facet | big flat facets | 26 % / 2.2 | 39-55 % / 3.0-4.3 sq studs |
+| Foam median (f34) | `#C2F2FC` +- 12 | `#F4FFFF` | **`#BDF5FF`** (-5, +3, +3) |
+| Water median (f34) | `#08D1FD` +- 12 | `#20CEFF` | **`#10D2FF`** (+8, +1, +2) |
+| Deep (s >= .97) / light (s < .9) water pixels | >= 20 % each | 0 % / 66 % | **33 % / 36 %** (top 33 / 36, r34 28 / 39) |
+| Rock lit faces (v > .7, f34) | `#C8BBBD` +- 10 | `#CDBFC3` (mauve key `#9E96A0`) | **`#C7BDB6`** (-1, +2, -7), key hue 0 |
+| Rock whole median (f34) | `#978D97` +- 12 (spec 5.7) | `#A19698` | `#A49D97` (+13, +16, 0): **residual** |
+| Sand median (f34) | `#FCCF7F`, G +- 10 | `#FCC37D` (G -12) | **`#FDCD87`** (+1, -2, +8) |
+| Lone sand / bed top triangles over 2 sq studs, > 6 % off every neighbour | 0 | dark wedges, shards | **0** of 120 checked |
+| Left flow strip off the rocks (strip edge to the rock hole) | >= 0.5 | crosses S1 / M2 / B4 | **0.50** (centre 0.66, right 0.69) |
+| Pebbles brown : grey | about 6 : 11 | 11 : 6 | **6 : 11** |
+| BedSlab waiver | none | set | **none**; `K.check` empty |
+
+### Mesh (final build, fresh session)
+
+| Object | Tris | Size | Shells | NM e / v | Boundary | Self-hits | Inverted | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| StreambedSection | **3782** / 4000 | 32.0 x 32.0 x 7.4 | 18 (1 land 2250, 1 water 376, 16 foam 1156) | 0 / 0 | 0 | 0 | 0 | 5.02 |
+| ...BankSlab | 676 | 9.0 x 32.0 x 3.28 | 1 | 0 / 0 | 0 | 0 | 0 | 5.02 |
+| ...BedSlab | 430 | 24.0 x 32.0 x 2.4 | 1 | 0 / 0 | 0 | 0 | 0 | 5.1 |
+| ...WaterPlane | 96 | 23.88 x 31.88 x 0.24 | 1 | 0 / 0 | 0 | 0 | 0 | 11.2 |
+| ...RockLarge | 46 | 6.86 x 7.17 x 5.5 | 1 | 0 / 0 | 0 | 0 | 0 | 15.9 |
+| ...RockMedium | 88 | 4.79 x 4.46 x 3.45 | 1 | 0 / 0 | 0 | 0 | 0 | 5.1 |
+| ...RockSmall | 28 | 2.52 x 2.44 x 2.0 | 1 | 0 / 0 | 0 | 0 | 0 | 22.9 |
+
+- **Shells.** Every shell is closed and manifold, with 0 bowties, no n-gons, wire, loose or zero-area elements, and normals outward.
+- **Clearances.** Water to land: BVH overlap 0, closest 0.058. Foam to land: overlap 0, closest 0.063. Foam to water: overlap 0, closest 0.03.
+- **UVs.** No overlaps or flips; min gap 0.016, conformal p95 <= 1.06.
+- **Sockets.** 14 `water_foam` and 3 `water_flow`.
+- **Inverted faces.** One intermediate build had 3: a B1 facet parallel to the left back jog wall left a zero-thickness pocket. Turning B1's yaw cleared them.
+
+### Other views (no VFX)
+
+| View | W : H ours / sheet | S | R | W | F |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet | 1.762 / 1.763 | 21.2 | 44.2 | 29.0 | 3.5 |
+| r34_sheet | 1.758 / 1.767 | 21.6 | 41.8 | 32.3 | 3.4 |
+| front_sheet | 3.647 / 3.373 | 18.6 | 65.1 | 14.2 | 1.6 |
+| side_sheet | 4.077 / 3.054 | 32.1 | 64.5 | 2.4 | 0.5 |
+| rear_sheet | 4.107 / 3.388 | 18.8 | 63.4 | 15.7 | 1.7 |
+| top_sheet | 1.000 / 1.005 | 22.4 | 24.5 | 45.5 | 6.7 |
+
+- **Slab bands** (bottom 17 % of H): side S 99 % (target >= 80); front S 54 % (55-70, slightly under with the wider channel); rear S 47 %.
+- **Top profiles.**
+  - f34: .44 .50 .60 .67 .68 .70 .76 .81 .88 1.0 .99 .93 .78 .75 .72 .70 .69 .67 .64 .61 .59. The mean error against the sheet is about .10. The right-back pair is low (about .15-.24 under at f .60-.75) because B2 / B3 are now 5.6 / 5.8 tall.
+  - front: the channel dip is .41 at f .40-.65.
+
+### Left over / for the verifier and main session
+
+1. **B1's f34 screen W : H is 0.88**, against >= 0.95-1.0. That is the most the other targets allow: with B1's top at 7.4 (decision 1) and a footprint of at most 7.3, it can't go higher. B1 is 7.0 tall above its base and 7.3 wide, with its long axis turned to the screen. B2-B4 are >= 1.0.
+2. **The channel is wider than "about 18-20" and the banks narrower than "about 6".** Channel 21-24, banks 4-5.5. With 18-20 / 6, f34 sand stayed at 25.8-27.7. The f34 sand <= 22 and water + foam >= 32 targets only came within reach at 24 mid-tile. Top-view sand sits at 22.4, just above its floor of 22.
+3. **f34 R is 44.2 against the sheet's 36.2.** The chunky full-size boulders now stand in the water, the study's spec 2.4 band is +-6, and R had no target in the ruling. The whole-rock median is +13 / +16 in R / G against `#978D97`. The sheet's shade faces are blue-violet from its lighting; ours are warm grey under the kit sun, and colour by facing is not allowed.
+4. **Known misses carried over.**
+   - The f34 top profile at the right-back pair is now lower (the ruling's B2-B4 heights).
+   - front / side / rear W : H are 3.65 / 4.08 / 4.11 (lower boulders, so wider aspect).
+   - The side cell shows 2.4 % water against 9.9.
+   - The rear cell's off-centre bed face is not followed.
+5. **Measurement note.** f34 S (21.2), top S (22.4) and top F (6.7) sit close to their limits. Measure on no-VFX renders: the flow-strip preview adds about 1.4 points of top F.
+6. **Studio (Requires Manual Validation).**
+   - The bed's specular 0 is preview only.
+   - The foam is now 0.22 transparent.
+   - The water texture and transparency as in stage 5.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+Fresh verifier, read-only. Background session on port 9880 using `wip/M034_verify.blend`, which was not saved (its timestamp is unchanged). I built nothing and edited no `.py`; `m034.py` was only read and its read-only helpers called (`_inverted`, `flow_clearance`, `render_close`, and `_bed_finish`, which is preview only).
+- **Renders** are in `C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m034_verify2\`:
+  - `novfx/`: the six `*_sheet` cameras with the floor hidden, the kit views, the six parts, `junc_cu`, `sect_cu` and `under_cu`;
+  - `vfx/`: f34, r34 and top with the flow-strip preview;
+  - `big/`: f34, r34 and top at 1200 × 1000;
+  - side-by-side comparisons: `cmp_*.png`.
+- **Measurement.** Shares come from the study's `measure_render.py` on the no-VFX renders. Mesh, clearance, boulder and foam-gap numbers come from my own bmesh/BVH scripts in the same folder: `mesh.py`, `geo.py`, `boulders.py` and the inline foam-gap ray test.
+
+### Measured table
+
+| Check | Target | Measured | Result |
+| --- | --- | --- | --- |
+| Hero tris / shells | < 4000; 1 land + 1 water + foam | **3782**; land 1 (2250), water 1 (376), foam 16 (1156) | ok |
+| Part tris | < 1000 each | BankSlab 676, BedSlab 430, WaterPlane 96, RockLarge 46, RockMedium 88, RockSmall 28 | ok |
+| Sizes | 32 ± 0.3 × 32 ± 0.3 × 8.0 ± 0.6 | 32.0 × 32.0 × 7.4 (at decision 1's lower bound) | ok |
+| Mesh, all 7 objects | 0 everywhere | non-manifold edges 0, bowtie verts 0, boundary 0, wire 0, loose 0, zero-area 0, n-gons 0, self-hits 0, inverted 0, negative-volume shells 0; min corner 5.02° | ok |
+| Origin, transforms | bottom centre; applied | local bbox ±16 / ±16, z 0 → 7.4 (parts centred, z 0); rotation 0, scale 1 | ok |
+| Water / foam vs land | no contact | BVH overlap 0 / 0 / 0; closest water–land 0.058, foam–land 0.062, foam–water 0.03 | ok |
+| Levels | water 1.0, foam 1.03–1.06 | water 0.76 → 1.0, foam 1.03 → 1.06 | ok |
+| Seams Y = ±16 | bed and water X −7…+7, centred | bed −7…+7 (bank step at ±7), water ±6.975, seam inset 0.06; no off-plane verts within 0.3 | ok |
+| Side walls X = ±16 | solid, flat | flat 0 → 1.6 (1.9 under the middle plank), no off-plane verts within 0.3 | ok |
+| Rocks inside the edges | ≥ 0.3 | 0.47 | ok |
+| Boulder width at 0.7 h / 0.9 h (of the max) | ≥ 0.92 / ≥ 0.8 | B3 .94/.85, B4 .94/.87, RockLarge .94/.87; B1 .97/.89 and B2 .98/.86 against the width at 0.45 h (their low sections include a touching bank rock) | ok |
+| Boulder H : W (base → top) | 0.55–0.8 | B1 0.96 (0.88 above water, 0.79 above the bank), B2 0.73, B3 0.76, B4 0.77, M1 0.74, M2 0.74, RockLarge 0.767 | B1 high (decision 1) |
+| Crowns | flat, ≥ 20 % of the plan | 3–6 faces with n.z > 0.9, 29–48 % of the plan | ok |
+| f34 screen W : H above the water | ≥ 1.0 (B1 ≥ 0.95) | B1 **0.874**, B2 1.08, B3 1.08, B4 1.01, M1 1.06, M2 1.04 | B1 short |
+| f34 shares (no VFX) | S ≤ 22, W + F ≥ 32 | S 21.2, R 44.2, W 29.0, F 3.5, D 0.6 → **W + F 32.5** | ok (R +8 on the sheet) |
+| Top shares | S ≥ 22, R 23.0 ± 5 | S 22.4, R 24.5, W 45.5, F 6.7 (8.0 with VFX) | ok, at the limits |
+| r34 / front / side / rear | (known misses) | r34 S 21.6, W + F 35.7; W : H 1.758 / 3.647 / 4.077 / 4.107 against 1.767 / 3.373 / 3.054 / 3.388 | as reported |
+| Foam median (f34) | `#C2F2FC` ± 12 | `#BDF5FF` (lit `#CCFFFF`) | ok |
+| Foam inner edge to the rock's plan silhouette | no gap | median gap B1 0.15, B2 0.38, B3 0.17, B4 0.07, M1 0.17, M2 0.25, S1 0.32, s3 0.15, s8 0.17 studs | **thin gap left** |
+| Water median, tones | `#08D1FD` ± 12; deep ≥ 20 %, light ≥ 20 % | `#10D2FF`; deep 33 %, light 36 % (top 33 / 36, r34 28 / 39) | ok |
+| Rock key; lit faces; whole rock | hue 0–20, B ≤ G; `#C8BBBD` ± 10; `#978D97` ± 12 | `#9C9898` (hue 0, B = G); `#C7BDB6`; `#A49D97` (+13, +16, 0) | ok; whole rock just outside |
+| Sand, f34 / top | `#FCCF7F`, G ± 10 | `#FDCD87` / `#FFE98F` | f34 ok; top over-lit |
+| Pebbles D | `#846642` | `#947644`; mix 6 brown : 11 grey | ok |
+| Sand blending | no shards or wedges | smooth broad patches in the top view; no contact wedges | ok |
+| Waivers / `K.check` | BedSlab none | BedSlab has none; hero and BankSlab keep theirs; `K.check` returns [] | ok |
+| Flow strips, edge to rock at the waterline | ≥ 0.5 | centre 0.85, back-left 1.3, right 0.9 (builder's hole metric 0.66 / 0.50 / 0.69) | ok |
+| Sockets | 14 `water_foam`, 3 `water_flow`, +Y → −Y | 14 and 3 on the hero; 3 `water_flow` on WaterPlane; the flow runs from y 15.5 down to −15.5 / 4.6 / −9.6 | ok |
+| Collision | hero and slabs precise | hero, BankSlab and BedSlab precise; rocks hull; WaterPlane none | ok |
+| Water keys | only water and foam carry "water" | `m034_water` (transparency 0.3) and `m034_water_foam` (0.22); the bed keys don't | ok |
+
+### Findings
+
+1. **Boulders: fixed.** They are chunky and flat-crowned now, not eggs. Each has near-vertical upper sides (0.85–0.89 of the max width at 0.9 h) and a 4–6-face crown covering 29–48 % of its plan. B2–B4, M1 and M2 read as squat boulders in f34, r34 and the front view. The fix modeller's claims check out.
+   - **Minor (B1).** B1's f34 screen W : H is 0.874, so the back boulder still reads a little upright. This comes from decision 1: the bbox has to reach 7.4. It doesn't matter for the read, because the sheet's back boulder is the tallest form too.
+   - **Fix target, main session only:** let decision 1 accept a max z of about 6.6–6.8, and drop B1's top to match; that gives a screen W : H of about 1.0.
+2. **Foam: fixed as far as the blocker goes.** The collars are lobed blobs, the bank ribbons come in segments with rounded ends, and the median is `#BDF5FF`. The f34 read is soft foam round the rock feet.
+   - **Minor.** A thin deep-blue ring is still left between each in-water rock and its collar. It is about 0.15–0.38 studs wide in plan, clearly visible in the top view (S1, M2, M1, s3, s8, B2) and as slivers behind S1 and M2 in f34. It is the bed seen through the water hole: the hole is the rock's section at z 1.06, plus a 0.06 offset, plus the loss from simplifying it to 6–9 corners.
+   - **Fix target:** use 12+ hole corners and an offset of about 0.03, or paint the bed faces within 0.5 of each rock foot with `bed_light`. Aim for a median plan gap ≤ 0.08.
+   - **Minor.** The collars are still fairly even halos rather than broken foam patches.
+3. **Amended layout: met.** f34 sand is 21.2 (≤ 22) and water + foam 32.5 (≥ 32). Top-view sand is 22.4 (≥ 22) and rock 24.5 (within ±5 of 23.0).
+   - **The channel is wider than ruled:** 21–24 against "about 18–20", with banks of 4–5.5. f34 and r34 still read as the sheet's hero: a broad stream full of boulders between thin sand banks.
+   - **Minor.** Seen from above, the 45° jogs at both seams make the water an elongated octagonal basin rather than a straight stream.
+   - **Minor.** f34 R is 44.2 against the sheet's 36.2, 2 points past the study's ±6 band. Fix target if it is ever revisited: trim the bank rocks K1, K8 and K9 by 10–15 %.
+4. **Minors 3–8 from round 1: all done.**
+   - The water has its deep tone (33 % deep, 36 % light).
+   - The rock key is `#9C9898`, hue 0, with B = G, and the lit faces render warm.
+   - The sand shows no shards or wedges.
+   - The BedSlab waiver is gone.
+   - The flow strips stay at least 0.85 off every rock at the waterline.
+   - The pebble mix is 6 brown : 11 grey.
+5. **Colour residuals: minor.**
+   - **Whole-rock median** `#A49D97` is +13 / +16 in R / G, against a tolerance of 12. It is an effect of the warm kit lighting, since the shade faces can't be painted blue without colouring by facing.
+   - **Top-view sand** renders `#FFE98F` against `#F7C375` because the kit sun over-lights flat tops; f34 sand is in tolerance.
+   - **Pebbles** are +16 in R / G.
+   - **Colour is chosen by position only.** In `_paint_terrace` and `_paint_rock`, keys come from the region, the distance to an edge, z bands and the bottom set. Tint mottling is broad (sand 0.03 / 0.15, rocks 0.04 / 0.5 per rock). `K.check` returns nothing.
+6. **RockLarge: minor.** It has 46 tris and very large facets, against the sheet's 1.5–2.5-stud facets. It reads chunky but plainer than the sheet's large rock. Fix target: 60–70 tris, with a seventh point on the shoulder and crown rings.
+7. **Known misses, consistent with the decisions:**
+   - front / side / rear W : H are 3.65 / 4.08 / 4.11;
+   - the side cell shows 2.4 % water against 9.9;
+   - the rear cell's off-centre bed face is not followed;
+   - the f34 top profile at the right-back pair sits low (B2 and B3 are 5.6 / 5.8).
+8. **Studio checks (Requires Manual Validation):**
+   - the bed's deep tone depends on its specular being 0, which is preview only;
+   - the foam at transparency 0.22 and the water at 0.3;
+   - the export STATS line should show 2 water pieces and 17 sockets (not run: no exports in stage agents).
+
+### Decisions (main session, as amended)
+
+| # | Decision | Followed |
+| --- | --- | --- |
+| 1 | 32 × 32, max z 8.0 ± 0.6; bed 0.7, water 1.0, banks 1.6 | yes (7.4; banks 1.6 at the seams, middle plank 1.9) |
+| 2 (amended) | The hero governs mid-tile; the seam contract stays; f34 S ≤ 22 and W + F ≥ 32; top S ≥ 22 and R ± 5 | yes (channel 21–24, wider than "about 18–20", taken to reach the targets) |
+| 3 | Cameras | yes |
+| 4 | Tile contract | yes |
+| 5 | Six parts | yes |
+| 6 | Foam mesh plus 14 foam and 3 flow sockets, +Y → −Y | yes |
+| 7 | Budget 4000 | yes (3782) |
+| 8 | No emission or lights | yes |
+| 9 | One hero with closed land, water and foam shells; collision precise; 0 bowties | yes |
+| 10 | Names and keys | yes |
+
+### Score and verdict
+
+**Score 8 / 10.**
+- **What holds:** the mesh is clean and in budget, the tile contract is intact, and every decision is followed. Both round-1 blockers are resolved: the boulders are chunky and flat-crowned, and the foam is soft and lobed in the right colour. Round 1's minors 3–8 are all done.
+- **What's left is polish:** the thin blue ring inside the foam collars, B1 a little upright (decision 1), f34 rock 8 points over the sheet, the over-lit top-view sand and the octagonal basin seen from above.
+
+**Verdict: PASS (round 2).** Commit with findings 1–6 noted as leftovers. Nothing is broken, and the defining read of the sheet's hero holds: a broad stream of chunky boulders with foam, between thin sand banks.
+
+## Main session ruling (2026-10-29)
+- **Verdict:** passed in round 2 (8/10) and committed. Round 1 failed (6/10) on egg-shaped boulders and outline foam, and decision 2 was amended so the hero cell governs mid-tile.
+- **Accepted as built:** the channel came out 21–24 wide instead of the ruled 18–20. It hits the share targets and reads as the sheet's hero.
+- **Left for a later polish pass:**
+  - a thin blue ring between in-water rocks and their foam collars (median gap 0.15–0.38, target ≤ 0.08);
+  - B1 reads a little upright (W : H 0.874; decision 1 holds it at 7.4);
+  - f34 rock share is 44 against the sheet's 36 (trim K1/K8/K9);
+  - the top view reads as an octagonal basin;
+  - top-view sand is over-lit;
+  - RockLarge facets are plain (60–70 tris);
+  - Studio checks on the bed's deep tone and the water and foam transparency.
+- **Export:** 7 assets, 9 pieces (6 solid, 3 water), 5146 tris, 20 VFX sockets (17 on the hero, 3 on WaterPlane), palette 18 colours, 0 problems.
