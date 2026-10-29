@@ -118,8 +118,10 @@ local function hookCamera()
 end
 
 -- Other players' name tags, shown or hidden. Hiding remembers the tag's own
--- setting so showing again restores it.
-local shownAs = setmetatable({}, { __mode = "k" })
+-- setting so showing again restores it. Held strongly until the humanoid is
+-- destroyed (Roblox may collect an Instance's Lua handle from a weak table while
+-- the Instance lives).
+local shownAs = {}
 local nameWatch = {}
 
 local function applyName(character: Model?)
@@ -133,6 +135,11 @@ local function applyName(character: Model?)
 			shownAs[humanoid] = nil
 		end
 	elseif humanoid.DisplayDistanceType ~= Enum.HumanoidDisplayDistanceType.None then
+		if shownAs[humanoid] == nil then
+			humanoid.Destroying:Connect(function()
+				shownAs[humanoid] = nil
+			end)
+		end
 		shownAs[humanoid] = humanoid.DisplayDistanceType
 		humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	end
