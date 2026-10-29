@@ -219,7 +219,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 020 | Flintborn hardwood stump study | World & resources | ✅ | 1808; parts 798 / 210 / 124 / 174 | modeller + fresh verifiers; R1 FAIL 5 (smooth cone trunk, tulip clumps, boulder root), R2 PASS 7 | minors: bark light patches still read as faint slabs from the back; rim notches crack-like rather than scalloped; BL clump high and BR low in f34; top-view leaf share +6 |
 | 021 | Flintborn Root Cluster Study | World & resources | ⬜ | | | |
 | 022 | Flintborn Fiber Shrub Model Study | World & resources | ⬜ | | | |
-| 023 | Flintborn Clay Deposit Model Study | World & resources | ⬜ | | | |
+| 023 | Flintborn Clay Deposit Model Study | World & resources | ✅ | 1198; parts 232 / 80 / 80 / 36 | modeller + fresh verifiers; R1 FAIL 6.5 (soccer-ball lobes), R2 PASS 7.5 | minors: squat lobes squarer than the sheet's; soil base smoother than the sheet's chunky slab; lit contrast from the studio light; rear lobe layout and rock share (accepted) |
 | 024 | Flintborn Thorn Shrub Study | World & resources | ⬜ | | | |
 | 025 | Emberbloom Flintborn Model Study | World & resources | ⬜ | | | |
 | 026 | Flintborn softwood log study | World & resources | ⬜ | | | |
@@ -402,3 +402,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-28: 020 Hardwood Stump built by parallel modellers: a fluted, 8-lobed trunk with a notched bark rim around a ringed cut face, four wedge roots and four flat star leaf clumps. R1 FAIL 5, R2 PASS 7. The main session gave the bark light patches 25 %/50 % edge rings, so they blend (hard edges 80 → 14). PR #84 (015–017) merged into v0.18.
 - 2026-10-28: 019 Resin Node built by parallel modellers: a forked log X with ringed oblique cut ends, two broad-faceted resin lumps graded by hue, five leaf clumps and 2 ore_glint sockets. R1 FAIL 6, R2 PASS 7. The main session blunted A_low's end (END_TURN −45 → −15) to remove a bark spike under the large lump.
 - 2026-10-28: 018 Healing Herb committed after three fix rounds: broad lens leaves on a two-part midline (hidden stalk, then a falling board), a hidden root plug and two cream buds graded by height. Round 3 met every numeric target (profiles, rear width, plug share) but the verifier still judged the rosette a cone rather than the sheet's mound. The main session committed it with B1–B3 recorded for a later polish pass instead of a fourth round.
+- 2026-10-28: 023 Clay Deposit built by parallel modellers: five broad-based faceted clay domes (convex hulls of jittered rings plus crown points) on a 14-sided soil pad with 11 sunk rocks. R1 FAIL 6.5, R2 PASS 7.5. The main session pulled the main lobe's upper rings and crown in, so it reads as a dome.

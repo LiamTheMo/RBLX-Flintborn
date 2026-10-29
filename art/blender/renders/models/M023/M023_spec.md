@@ -761,3 +761,629 @@ All recommendations are accepted:
 11. Names as proposed: `RedClayDeposit` with `MainLobe`, `Lobe`, `Rock` and `SoilBase`.
 
 Accepted misses: the side view reads about 18 % wider than the sheet, and the top view about 12 % wider, with the wrong colours at two lobes.
+
+
+## Stage 1 — Modelling (modeller, 2026-10-28)
+
+The builder is `art/blender/kit/mcp/m023.py`, `build()`. It takes about 8 s without renders and about 25 s with them.
+It returns a dict with a `problems` list, which is empty on the final build. The background session ran on port 9880
+with the work file `wip/M023.blend`, saved after each good build.
+
+**Parts, each built by its own function:**
+
+| Function | Object | Tris | What it is |
+| --- | --- | --- | --- |
+| `soil_base_part` | `RedClayDepositSoilBase` | 232 | the pad |
+| `main_lobe_part` | `RedClayDepositMainLobe` | 124 | the main lobe |
+| `lobe_part` | `RedClayDepositLobe` | 88 | FR's squat lobe |
+| `rock_part` | `RedClayDepositRock` | 36 | rock variant A |
+
+The hero `RedClayDeposit` is built from the same functions (`_soil_base`, `_lobe`, `rocks`).
+
+**Lobes** (`_lobe`). Each lobe is the convex solid bounded by jittered tangent planes:
+- the planes have Fibonacci normals (M019's polar-dual recipe; `_dual_hull` is copied in);
+- a flat bottom plane closes it, plus one crown plane (main and squat lobes) or two ridge planes (tall lobes);
+- the solid is fitted to its W × D box;
+- the largest faces are then poked with a 2 % raise. This gives the sheet's split facets within each broad face.
+
+Broad faces before triangulation: main 30, FR 23, FL 24, BL 20, BR 20.
+
+**What changed on the renders, and why:**
+1. **First pass.** I followed the spec's ring layout (Fibonacci normals down to z −0.42, the box fitted to 4.0 tall).
+   The lobes came out as upright rounded boxes with vertical sides.
+2. **Side planes tilted up only.** This gave frustum domes, which was better. But the f34 compare showed that the
+   sheet's lobes are full round boulders. Each is widest at about two thirds of its visible height, and its lower part
+   sinks into the pad.
+3. **Final: a faceted spheroid cut flat low down.**
+   - `LOBES` gives each lobe:
+     - its top z, taken from the f34 cell with s = z cos 14° + (Y + 4.7) sin 14°;
+     - its W × D;
+     - its height from the equator to the top;
+     - its cut b, the fraction of that height below the equator.
+
+   | Lobe | Top z | W × D | Base z |
+   | --- | --- | --- | --- |
+   | Main | 4.75 | 4.7 × 4.4 | 0.81 |
+   | FR | 3.0 | 4.3 × 3.9 | |
+   | FL | 2.2 | 2.6 × 2.4 | |
+   | BL | 3.0 | | |
+   | BR | 2.75 | | |
+
+   - Round 1b: the main lobe moved 0.25 forward, and FR and FL moved 0.3 toward the rim. In the sheet only the skirt
+     shows in front of them.
+   - Round 1c: BL and BR moved in against the main lobe. The top view had shown pad between them.
+4. **Tried and rejected.**
+   - Round 1e: BL 0.6 further back and BR lower, for the rear cell's "near" lobes. The rear barely changed, and the f34
+     profile error grew from a maximum of 0.07 to 0.12.
+   - Round 1c: rocks × 1.1. The rock share rose to 0.09 in f34 and 0.15 in the rear.
+
+**Pad** (`_soil_base`). 14 sides. The rings run from the ground up:
+
+| Ring | z | Radius |
+| --- | --- | --- |
+| bottom (below the floor cut) | −0.05 | |
+| chamfer | 0.2 | 1.0 R |
+| sloped skirt | 0.58 | 0.95 R |
+| rim | 0.95 | 0.875 R |
+| inner top | 1.1 | |
+| crown | 1.2 | |
+| centre point | 1.23 | |
+
+Each quad is split on a seeded diagonal, so the skirt reads as irregular triangles. Round 1d raised the rim from 0.8
+to 0.95 and sloped the skirt further out, which gives a thicker band in f34.
+
+**Rocks** (`rocks`). 11 instances of 5 variants: A 1.24, B 1.1, C 1.01, D 0.87 and E 0.7. These are the spec's sizes
+× 0.92, reduced after the pad got thicker. Each rock is placed by azimuth and a fraction of the pad's outline.
+- **Ground rocks:** the base sits at z −0.15 and the floor cut flattens it; the rock cuts into the skirt.
+- **Seated rocks:** the base sits 0.3 h below the soil under the rock's centre, and the bottom is turned half way
+  toward the soil normal.
+
+**Hero.**
+- **Union and cleanup:**
+  - One exact union of each shell in turn (`M.union_loose`, 16 shells).
+  - `m004.floor_cut` at z 0.
+  - Then `m016._clean_mesh`, `_finish` and `_polish` (M020's version, which includes the floor re-fan).
+  - Finally `M.fix_bowties` as a guard. It found 0 bowties on every object.
+- **Hero guard:** if the result is not one clean shell, every rock turns another 17° and the hero is rebuilt. This
+  includes no self-intersections and no bowtie vertices. In round 1d a sliver pair showed up once at R4/FL; the current
+  build passes on attempt 0.
+
+**Measured against the sheet** (`m023.measure()`). It applies the study's masks to the sheet cells and to our long-lens
+`*_sheet` renders. The rock mask also needs hue ≤ 30 or ≥ 300 and sat ≥ 0.06; without that, the studio floor's shadow
+counts as rock.
+
+| View | W : H sheet / ours | Clay K | Soil S | Rock R | top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- |
+| f34 (`f34_sheet` 0, 14) | 1.689 / 1.583 | .709 / .697 | .228 / .234 | .063 / .070 | .025 / .07 |
+| front (`front_sheet` 0, 9) | 1.739 / 1.733 | .719 / .694 | .224 / .239 | .058 / .067 | .031 / .12 |
+| r34 (f34_sheet flipped) | 1.656 / 1.583 | .711 / .697 | .233 / .234 | .056 / .070 | .044 / .13 |
+| rear (`rear_sheet` 180, 9) | 1.647 / 1.830 | .651 / .629 | .279 / .265 | .070 / .107 | .046 / .13 |
+| side (`side_sheet` −90, 10) | 1.475 / 1.645 | .660 / .605 | .292 / .268 | .048 / .126 | .052 / .12 |
+| top (`top_sheet` 0, 89) | 0.925 / 1.034 | .555 / .586 | .358 / .339 | .087 / .076 | .019 / .08 |
+
+Hero size is 10.01 × 9.71 × 4.75 (target 10.0 × 9.6 × 4.75).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts | Boundary / wire / loose | Zero-area / n-gons / dup verts | Self-hits | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RedClayDeposit (hero) | 1386 / 4000 | 10.01 × 9.71 × 4.75 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.11° |
+| RedClayDepositSoilBase | 232 / 1000 | 9.76 × 9.27 × 1.24 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.08° |
+| RedClayDepositMainLobe | 124 / 1000 | 4.57 × 4.33 × 3.94 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.28° |
+| RedClayDepositLobe | 88 / 1000 | 4.37 × 4.08 × 2.62 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 8.76° |
+| RedClayDepositRock | 36 / 1000 | 1.18 × 1.08 × 0.99 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 24.5° |
+
+- **Every object:** normals outward, no custom split normals, flat shading, transforms applied, origin at the bottom
+  centre (offset 0, 0, 0).
+- **Pre-union pieces:** pad 166 tris; lobes 116 / 92 / 94 / 72 / 64; rocks 36 each.
+- **Hero floor:** one flat cap at z 0.
+- **`K.check`:** reports nothing.
+
+## Stage 3 — UV
+
+`M.smart_uv` runs through `_finish` and `_polish`: angle 45, an ANGLE_BASED re-unwrap, margin 0.008.
+
+| Object | Islands | Overlaps | Flipped | Min gap / border | Density min / med / max | Conformal stretch p95 / worst |
+| --- | --- | --- | --- | --- | --- | --- |
+| Hero | 233 | 0 | 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.003 / 1.091 |
+| SoilBase | 15 | 0 | 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.027 / 1.039 |
+| MainLobe | 9 | 0 | 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.089 / 1.116 |
+| Lobe | 8 | 0 | 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.031 / 1.036 |
+| Rock | 10 | 0 | 0 | 0.016 / 0.008 | 1.0 / 1.0 / 1.0 | 1.06 / 1.066 |
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration, in two passes.**
+1. `m023.calibrate()` runs `K.calibrate` on the dome.
+2. The hero's `f34_sheet` render is measured against the f34 cell. Pass 2 changed only the clay keys, by
+   × (1.076, 1.021, 0.825) in linear light. Soil and rock were already within 6.
+
+| Key | Target (sheet render) | Dome pass 1 | Final hex | Roughness |
+| --- | --- | --- | --- | --- |
+| m023_clay | #D4633B | #A7502D (renders 211,99,61) | #AD5128 | 0.8 |
+| m023_clay_low | #BC5731 | #964521 (189,87,52) | #9B461D | 0.8 |
+| m023_clay_light | #DE6A3E | #AF5630 (221,106,63) | #B5572B | 0.8 |
+| m023_soil | #987054 | #785D49 (150,112,85) | #785D49 | 0.95 |
+| m023_soil_dark | #76573F | #5E4835 (117,88,64) | #5E4835 | 0.95 |
+| m023_rock | #917F7C | #7C6D6E (150,128,123) | #7C6D6E | 0.9 |
+
+**Final renders against the sheet:**
+
+| Region | Ours | Sheet |
+| --- | --- | --- |
+| f34 clay, median / lit quartile / shade quartile | #DA653C / #E96F43 / #994327 | #DA653A / #FC8355 / #AE4D2A |
+| f34 clay thirds, top / mid / bottom | #E46C40 / #DE693E / #C65933 | #EB6E42 / #D9643A / #CD5D34 |
+| f34 soil | #87644B | #856248 |
+| f34 rock | #98817C | #92827C / #95837D |
+| front clay | #DA653D | #DA673E |
+| front soil | #86644B | #8B674D |
+
+**Blends.** All painted by position only, never by facing, in 25 % steps.
+- **Clay**, a ladder from clay_low through clay to clay_light. Each lobe:
+  - goes by its own height fraction t: full 50 % clay_low below t 0.22, fading out by t 0.5;
+  - has broad noise patches toward clay_light, up to 50 %, above t 0.5–0.7;
+  - takes at least 25 % clay_low on faces within 0.45 of another lobe's surface (the creases).
+- **Soil**, a ladder from soil to soil_dark:
+  - contact rings round the lobe feet and the rocks: 50 % within 0.35, 25 % within 0.8;
+  - the chamfer band (z < 0.22) at 25 %;
+  - broad noise patches at 25 % or 50 %.
+- **Rocks:** the rock key, with a Tint of 0.95–1.04 per rock.
+- **Floor cap:** plain soil, so the colour doesn't follow facing.
+- **Hard edges:** only where two materials meet.
+
+**Tint mottling.**
+
+| Material | Amp | Scale | Extra |
+| --- | --- | --- | --- |
+| Clay | 0.03 | 0.6 | a factor of 0.98–1.02 per lobe |
+| Soil | 0.05 | 0.5 | |
+| Rock | 0.04 | 0.8 | |
+
+The asset's tint_var is 0.03, and there is no per-triangle jitter.
+
+**Hero materials (9):** soil, clay, rock, clay_low × clay at 50 % and 75 %, clay × light at 25 % and 50 %, and soil ×
+dark at 25 % and 50 %.
+
+## Stage 5 — Lighting
+
+Skipped. The sheet shows an ordinary sunlit outcrop, so there is no emissive key and no light (decision 8).
+
+**Studio check:** under the game's sun, the clay's lit faces must not clip to salmon, and clay, soil and rock must
+still be three distinct colours after the palette export.
+
+## Stage 6 — VFX
+
+Skipped. The sheet shows no glow, sparkle, dust or crumbs, so there are no sockets (decision 8). The renders still ran
+with vfx=True, which is `M.views`' default.
+
+## Modeller's notes for the verifier
+
+**Cameras.** Compare with the `*_sheet` renders, which use a 3× longer lens:
+
+| Sheet cell | Our render |
+| --- | --- |
+| f34 | `f34_sheet (0, 14)` |
+| front | `front_sheet (0, 9)` |
+| r34 | `f34_sheet` flipped left to right |
+| rear | `rear_sheet (180, 9)` |
+| side | `side_sheet (−90, 10)` |
+| top | `top_sheet` |
+
+The kit views are for self-consistency only. `m023.measure()` reproduces the tables above. Other renders: `junc_cu` (the
+Junction Detail at R4 between BL and FL), `under_cu`, `exploded`, and `part_*`.
+
+**Known misses:**
+- **Side and top are too wide:** W : H is 12 % over the sheet in both (accepted in the decisions). The side cell's
+  wide, low centre lobe is narrower in ours; BL is 3.0 deep.
+- **Rear cell.**
+  - **Lobes:** the sheet shows two low near lobes and two higher far ones beside the main lobe. Ours shows one cluster
+    per side, because FL hides behind the main lobe when seen from +Y.
+  - **Rock share:** 0.107 against 0.070. R11 and R8–R10 read larger than the sheet's rocks.
+  - **Clay colour:** ours is darker, #B35332 against #D36038. The sheet lights the rear cell from its own camera side;
+    the studio light stays at the front.
+- **Clay lit quartile:** 19 levels darker than the sheet (#E96F43 against #FC8355) at the same median. The sheet's sun
+  is brighter on the facets. I left the colour alone so the median stays matched.
+- **Main lobe part shot:** the part is the whole spheroid (4.57 × 4.33 × 3.94), so it reads rounder and taller than
+  the sheet's squat Part Close-Up (decision 3: the hero governs).
+- **Exploded shot:** it is at true hero scale, so the rocks look small next to the sheet's enlarged parts.
+
+**What matches:** the f34 top profile is within 0.07 everywhere, and the f34 shares are within 1.2 points.
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-28. Read-only background session on port 9880 with `wip/M023_verify.blend`; nothing
+was saved or rebuilt. Fresh renders went to the verifier's scratch folder (`render_views` with `M.MODEL_RENDERS`
+redirected), not to this folder. `m023.measure()` on those renders reproduces the stage 1 table exactly.
+
+**Verdict: FAIL, 6.5 / 10.** One blocker (lobe shape against the Part Close-Up and the exploded lobes); everything
+technical passes.
+
+### Re-measured (all five objects)
+
+| Object | Tris | Size | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons / dups | Self-hits | Interior faces | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RedClayDeposit | 1386 / 4000 | 10.01 × 9.71 × 4.75 (target 10.0 × 9.6 × 4.75: in tolerance) | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.11° |
+| SoilBase | 232 | 9.76 × 9.27 × 1.24 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.08° |
+| MainLobe | 124 | 4.57 × 4.33 × 3.94 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 5.28° |
+| Lobe | 88 | 4.37 × 4.08 × 2.62 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 8.76° |
+| Rock | 36 | 1.18 × 1.08 × 0.99 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 | 24.5° |
+
+- Normals outward, no custom normals, flat shading, no modifiers, rotation 0 and scale 1, origin at the bottom centre
+  (offset 0, 0, 0) on every object. Interior faces: odd-crossing ray test from each face centre, 0 everywhere.
+- UV: hero 233 islands, parts 15 / 9 / 8 / 10; 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0,
+  conformal p95 ≤ 1.09.
+- Materials: hero 9 (clay ×5 steps, soil ×3, rock); roughness clay 0.8, soil 0.95, rock 0.9; metal 0; emission 0;
+  no VFX children (decision 8). `K.check` reports nothing (facing correlation under the limit).
+- Area by key on the hero: the plain `m023_soil` key covers 67.4 of area, almost all of it the floor cap (mean normal
+  z −0.99). The visible pad is entirely 25 % (19.0) and 50 % (27.0) soil_dark mixes.
+
+### Colours, sheet against ours (study masks; Δ = ours − sheet per channel)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| f34 clay median | #DA653A | #DA653C | 0, 0, +2 |
+| f34 clay light (lit quartile) | #FC8355 | #E96F43 | −19, −20, −18 |
+| f34 clay low (shade quartile) | #AE4D2A | #994327 | −21, −10, −3 |
+| f34 clay thirds top / mid / bottom | #EB6E42 / #D9643A / #CD5D34 | #E46C40 / #DE693E / #C65933 | −7,−2,−2 / +5,+5,+4 / −7,−4,−1 |
+| f34 soil median / lit / shade | #856248 / #9F7556 / #664D3A | #87644B / #977256 / #553F2F | +2,+2,+3 / −8,−3,0 / −17,−14,−11 |
+| f34 rock median / lit / shade | #95837D / #B8A298 / #6C5E58 | #98817C / #A78E89 / #6F5E5B | +3,−2,−1 / −17,−20,−15 / +3,0,+3 |
+| front clay / soil / rock median | #DA673E / #8B674D / #99847B | #DA653D / #86644B / #98817C | 0,−2,−1 / −5,−3,−2 / −1,−3,+1 |
+| top clay / soil / rock median | #DA683F / #745642 / #998882 | #D5623A / #7C5E48 / #887573 | −5,−6,−5 / +8,+8,+6 / −17,−19,−15 |
+| side clay median | #DC663C | #C65C39 | −22, −10, −3 |
+| rear clay / soil / rock median | #D36038 / #8A664C / #928178 | #B35332 / #6B5240 / #7E6E6D | −32,−13,−6 / −31,−20,−12 / −20,−19,−11 |
+
+Medians match the sheet in the hero and front views. Hue and saturation stay in the three families. Our studio
+render has more light contrast than the sheet: lit facets are about 19 levels duller and shade 10–20 darker. The rear
+and side cells are darker because the studio key light stays at the front, which is lighting rather than paint.
+
+### Views against the sheet (`f34_sheet`, `front_sheet`, f34 flipped, `rear_sheet`, `side_sheet`, `top_sheet`)
+
+- **f34 / front:** W : H 1.583 / 1.733 (sheet 1.689 / 1.739). Shares K .697 / S .234 / R .070 (sheet .709 / .228 /
+  .063). Top profile mean / max error .025 / .07 (front .031 / .12). Five lobes with clean creases, the pad's brown
+  ring all round, 7 rocks visible. The overall read is right.
+- **Soil band under the clay** (lowest object – lowest clay, fraction of H), f34 sheet / ours: f .30 .02–.15 /
+  .04–.21; .50 .00–.17 / .00–.28 (R5 in front); .60 .02–.13 / .02–.22; .70 .02–.13 / .04–.16. The pad is not thin. FL's
+  and FR's front feet sit about 0.06–0.09 H higher than the sheet's (FL's .21–.24 against .15; FR's .16–.22 against
+  .13), which is at or just past the ±0.06 tolerance.
+- **r34 (f34 flipped):** profile .044 / .13, shares within 1.4. **Rear:** W : H 1.83 against 1.647, rock .107
+  against .070, one lobe cluster per side (known miss). **Side:** 1.645 against 1.475 (accepted miss). **Top:** W : D
+  1.034 against 0.925 (accepted miss), lobe centres right; rim rocks read smaller and sit further out than the
+  sheet's.
+- **Junction close-up:** the lobe comes down onto the soil and R4 sits sunk in front of it, as on the sheet. FL's
+  lower edge shows a small jagged notch where its undercut lower facets meet the domed pad top; the sheet's crease
+  is clean.
+- **Underside close-up:** the flat bottom is right, but the render is almost black (no light from below), so the
+  chamfer band can't be judged. Compare the geometry only.
+
+### Items
+
+1. **BLOCKER: the lobes are pinched spheroids with even, soccer-ball facets, not the sheet's broad-based boulders.**
+   - **Part Close-Up against `part_mainlobe`.** The sheet's main lobe is widest at its flat bottom. Its sides slope
+     in to a broad sloping crown, and its facets are big irregular triangles.
+   - Ours is a ball. The bottom is 3.4 × 3.6 against a maximum of 4.6 × 4.3, so the base is about 0.76 of the width,
+     and the widest point is at about half height. The facets are near-uniform pentagons and hexagons, because the
+     planes are on a Fibonacci sphere with only ±6 % jitter.
+   - The same recipe shapes the hero's lobes: FR and FL show dark undercut flanks and a jagged lower edge where they
+     meet the pad. This is pitfall 2 ("not bare icosahedra"). Decision 3 kept the height but asked to keep "a flat
+     bottom, a broad sloping crown of 4–5 big faces, and big side triangles".
+   - **Fix (builder `m023.py`, `KINDS` / `LOBES` / `_lobe`):**
+     - **(a) Cut higher so the base is broad.** Main `b` 0.75 → about 0.35–0.4, and squat `b` 0.5/0.55 → about 0.3.
+       Raise `Hup` so each lobe's top z and H stay the same: main Hup ≈ 3.94 / 1.38 ≈ 2.85. The flat bottom is then at
+       least 0.9 of the max width. Sink each lobe 0.25–0.35 into the pad as the spec's §6 says.
+     - **(b) Make the facets fewer and irregular.** Main planes 28 → 18–20, squat 22 → 14–16. Plane distance jitter
+       0.06 → 0.12–0.15, and angle jitter `ang` 0.17 → 0.3. Then poke or triangulate the largest faces into 2–4 big
+       triangles, as the close-up shows.
+     - **(c) Make the crown one broad sloping face group.** Main crown plane distance 0.86 → about 0.72–0.78, plus a
+       second crown plane next to it. The crown then makes 4–5 big faces, at least 1.5 studs across.
+   - **Re-check:** `part_mainlobe` against the Part Close-Up (base widest, broad crown); f34_sheet profile still
+     within ±0.07; FL and FR front feet at h .13–.15 (±0.06); no jagged lower edges in `junc_cu`.
+2. **Minor: lit and shade contrast.** The clay lit quartile is 19 below the sheet's, and the soil and rock lit
+   quartiles 8–20 below. This comes from the studio light and isn't paint. Don't fix it by facing. Optionally ease
+   `CLAY_LOW_MIX` from 0.5 to about 0.4 (our bottom third is 7 darker than the sheet's).
+3. **Minor: the soil key never shows.** Every visible pad face is a 25 % or 50 % soil_dark mix (the contact radius
+   0.35 / 0.8 on the dense post-union mesh covers the whole top), so no contact ring reads. The median still matches
+   (#87644B against #856248). Either narrow `SOIL_CONTACT` to about (0.2, 0.5), (0.45, 0.25) and recalibrate `m023_soil`
+   so the median holds, or record that the pad is one darker blend.
+4. **Minor: rocks.** The rim rocks read smaller and sit further out than the sheet's, in the top view especially. R6
+   and R7 at the right are mostly hidden behind FR in the f34 (the sheet shows both clearly at f .85–.95). Optionally
+   R7 rf 0.86 → 0.92 at az about 15°, and the ground rocks rf 0.93–0.98 → 0.88–0.92.
+5. **Minor (known, accepted): rear cell layout and rock share, side and top widths, rear and side darkness from the
+   lighting.**
+6. **Minor: the `under_cu` render is unlit.** Add a fill light below or raise the elevation so the chamfer band can be
+   judged. This is not a model fault.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-28. Background session on port 9880 with `wip/M023.blend` (saved after the final build). The
+builder `m023.py` is the source of truth; `build()` takes about 27–35 s with renders and returns `problems: []`.
+Scratch scripts (build, measure, clay bottom line, key areas, comparisons) are in the scratchpad folder `m023r2/`.
+
+### 1. Blocker: lobe shape — fixed (pending the round-2 verifier)
+
+**What changed.** The plane-dual spheroids are gone. I first tried the suggested parameter route (cut b 0.38 / 0.3,
+19 / 15 planes, jitter 0.13, `ang` 0.3, a two-plane crown at 0.75 / 0.77, then triangulating and nudging vertices).
+The lobes came out as angular crystal blocks with vertical sides, and the faces still had valence-3 corners. The sheet's
+Part Close-Up and hero lobes have big triangles meeting at 5–6-edge vertices, which is what a convex hull of points
+gives, not a plane dual. So `_lobe` is now the **convex hull of jittered point rings plus explicit crown points**
+(`K.hull_rock`'s recipe, inline so it keeps the layout's yaw, lean and fitted box). `_dual_hull`, `_perp` and the
+pokes are removed.
+- `KINDS` (rings are (height fraction, radius fraction, points); radial / height jitter 0.07, azimuth jitter 0.3 of a
+  step, crown jitter 0.05):
+  - **main:** rings 0.0 / 0.96, 0.12 / 1.0, 0.38 / 0.97, 0.6 / 0.88, 0.8 / 0.7, then a 5-point crown at r 0.4–0.5,
+    h 0.9–1.0, sloping to the front;
+  - **squat** (FR, FL, the Lobe part): rings 0.0 / 0.96, 0.2 / 1.0, 0.42 / 0.97, 0.62 / 0.86, 0.8 / 0.66, then a
+    5-point near-flat crown;
+  - **tall** (BL, BR): rings 0.0 / 0.95, 0.2 / 1.0, 0.45 / 0.95, 0.66 / 0.84, 0.84 / 0.64, then a crown longer along
+    local x.
+- Every lobe is a dome now: a short lower band that tucks in a little, the widest ring just above the pad top, steep
+  lower sides, a shoulder band at about 45°, and a broad crown. With only one shoulder ring (round 2a/2b) the lobes
+  read as tall cubes with flat lids against the sheet's domes.
+- **Sinking.** `LOBES` no longer carries Hup and b. Each hero lobe's base is `LOBE_SINK` 0.3 below the lowest pad top
+  under its footprint (`_lobe_base`, ray-cast at 0, 0.4 and 0.7 of the half-extents; the outer edge isn't sampled
+  because FR's and BR's edges reach over the rim). The top z stays as laid out, so H = top − base. The parts are built
+  at `PART_H` (Main 3.94, FR 2.62: round 1's heights).
+- **Layout changes** (all measured on the f34 cell):
+  - **FR:** 0.25 forward (y −2.25), 0.15 left (x 1.6), top 3.05, and yaw −20° → 0°. With the broad base, the turned
+    right end ran over the rim and down the skirt.
+  - **FL:** 0.35 forward (y −2.85). Their broad feet now come down to the rim ("Clay overlaps soil base").
+  - **BR:** 0.25 right and 0.2 wider (2.5). Its broad-based hull hid behind the main lobe (f34 profile at f .80 / .85
+    read .64 / .52).
+
+**Measured shape** (`meas.py`: hull slices, bottom face and crown faces; crown = faces with normal z > 0.75 in the top
+20 %):
+
+| Part | Size | Bottom face (fraction of max) | Widest at | Width at h .5 / .7 / .9 | Crown faces, span | Median edge |
+| --- | --- | --- | --- | --- | --- | --- |
+| MainLobe, round 1 | 4.57 × 4.33 × 3.94 | 3.4 × 3.6 (≈ 0.76) | ≈ 0.5 h | — | 1 broad face + pokes | — |
+| MainLobe, round 2 | 4.74 × 4.52 × 3.94 | 4.34 × 4.14 (0.91 / 0.92) | 0.2 h (4.66) | 4.36 / 3.76 / 2.95 | 8, 2.81 × 2.97 | 1.46 (p90 2.16) |
+| Lobe (FR), round 2 | 4.3 × 3.92 × 2.62 | 3.91 × 3.89 (0.91 / 0.99) | 0.4 h (4.21) | 3.97 / 3.17 / 2.15 | 7, 1.86 × 2.55 | 1.19 |
+
+- **Hero lobes:**
+
+  | Lobe | Base z | H | Faces |
+  | --- | --- | --- | --- |
+  | Main | 0.82 | 3.93 | 80 |
+  | FR | 0.51 | 2.54 | 78 |
+  | FL | 0.70 | 1.50 | 70 |
+  | BL | 0.67 | 2.33 | 72 |
+  | BR | 0.34 | 2.41 | 66 |
+
+  Each base is 0.3 below the lowest pad top under its footprint. The base sits 0.41–0.75 below the pad top at the
+  lobe's centre, because the pad top is domed.
+- **The facets** are now big irregular triangles meeting at 5–6-edge vertices, with no soccer-ball pentagons. Split
+  facets of slightly different tone appear where the jittered hull points lie nearly coplanar.
+
+**Re-checks:**
+- **`part_mainlobe` against the Part Close-Up** (scratch `cmp_part.png`). The base is now the widest part, the crown is
+  a broad group of faces, and the sides are big triangles.
+  - It is still taller than the close-up (h/W 0.83 against about 0.45). That is decision 3 (4.0 tall, the hero
+    governs), so the part reads as a tall dome rather than the close-up's squat mound.
+- **f34_sheet (0, 14):**
+  - W : H 1.589 (sheet 1.689; round 1 1.583).
+  - Shares K .718 / S .216 / R .066 (sheet .709 / .228 / .063).
+  - Top profile mean .028, max .08. The max is the single extreme-left column (rock R2's flank: .16 against .24).
+    Every other point is within .07. Moving R1 / R2 out flips that column to R1's top (.33), so neither setting fits
+    it exactly.
+- **front_sheet:** W : H 1.740 (1.739); shares .709 / .225 / .066; profile .033 / .09.
+- **Clay bottom line** (lowest clay pixel per column, f34, sheet / ours):
+  - **FL** (f .25–.35): .16 / .15 / .15 against .16 / .15 / .19.
+  - **FR** (f .50–.85): .17 / .15 / .13 / .13 / .13 / .13 / .17 / .25 against .23 / .20 / .18 / .14 / .12 / .12 /
+    .12 / .16.
+  - So FL and FR's front feet sit at h .12–.19, against .21–.26 in round 1. FR's left end at f .50 is still .06 high:
+    that is where R5 stands in front of it.
+- **`junc_cu`.** The lobes come straight down onto the soil with clean creases. There is no jagged notch and no dark
+  undercut flank, because the lower band now leans out instead of under. R4 sits sunk between BL and FL.
+- **Kit views.** The main lobe's back crown points were raised (0.88 → 0.93) because the kit side view had read the
+  crown as a peaked roof.
+
+### 2. Minor: lit / shade contrast and the clay low band — partly
+
+- `CLAY_LOW_MIX` 0.5 → 0.4.
+- **f34 clay thirds,** top / mid / bottom: ours #DF693B / #DC673B / #D05F36 against the sheet's #EB6E42 / #D9643A /
+  #CD5D34. The bottom third is now within 3 of the sheet's.
+- **Parts shot, main lobe:** bottom third #C65931 against the mid's #DC6639, so 22 levels darker (target 15–35).
+- **Lit quartile:** still about 16 below the sheet (#EC7244 against #FC8355). That is the studio light, not paint, and
+  I left it alone.
+
+### 3. Minor: the soil key never showed — fixed
+
+- **Changes:** `SOIL_CONTACT` (0.35, 0.5), (0.8, 0.25) → (0.2, 0.5), (0.45, 0.25), and the `SOIL_PATCH` levels
+  0.12 / 0.4 → 0.25 / 0.45.
+- **Visible pad area by key** (faces with normal z > −0.5):
+
+  | Key | Round 1 | Round 2 |
+  | --- | --- | --- |
+  | plain soil | 0 | 8.3 |
+  | 25 % mix | 19.0 | 15.7 |
+  | 50 % mix | 27.0 | 14.6 |
+
+- **Result:** in the top view the plain soil reads on the open pad and a darker ring reads round the lobe feet and
+  rocks. The floor cap stays plain soil.
+
+### 4. Minor: rocks — partly
+
+- **Moved in:** the front and back ground rocks R5 (0.95 → 0.92), R8 and R9 (0.95 / 0.96 → 0.9).
+- **R7:** az 26 → 24 and 0.86 → 0.88. With FR unturned, it shows beside FR's right flank in the f34, as on the sheet.
+  The suggested az 15 / 0.92 put it at f .95 instead of the sheet's .85–.92.
+- **R1, R2 and R6 stay near the old radii.** They are the f34 silhouette's ends. Moving them in to 0.9 dropped the hero
+  W to 9.83 and W : H to 1.556, and pushed the end profile error to 0.14.
+- **Hero D is now 9.3,** within 9.6 ± 0.4. It was 9.71 while R8 and R9 stuck out at the back.
+- **The top view** still draws its rocks larger (the top camera's magnification, §3.4).
+
+### Calibration (two passes, after the reshape)
+
+1. **Pass 1** (`m023.calibrate()` on the dome) gave the same keys as round 1: clay #A7502A, clay_low #95451D,
+   clay_light #AF562D, soil #785D49, soil_dark #5E4835, rock #7C6D6E.
+2. **Pass 2** (the new hero's f34_sheet against the f34 cell), factors in linear light:
+
+   | Family | Measured | Sheet | Factor |
+   | --- | --- | --- | --- |
+   | Clay | #D76339 | #DA653A | × (1.032, 1.043, 1.034) |
+   | Soil | #85634A | #856248 | × (1.0, 0.979, 0.946) |
+   | Rock | #9A837D | #95837D | × (0.93, 1, 1) |
+
+| Key | Final hex | Roughness |
+| --- | --- | --- |
+| m023_clay | #AF5329 | 0.8 |
+| m023_clay_low | #9D471E | 0.8 |
+| m023_clay_light | #B8592C | 0.8 |
+| m023_soil | #785C47 | 0.95 |
+| m023_soil_dark | #5E4733 | 0.95 |
+| m023_rock | #786D6E | 0.9 |
+
+**Final medians, ours / sheet:**
+
+| Region | Ours | Sheet |
+| --- | --- | --- |
+| f34 clay | #DA663A | #DA653A |
+| f34 soil | #866348 | #856248 |
+| f34 rock | #95837D | #95837D |
+| front clay | #DA663B | #DA673E |
+| Parts shot, main lobe clay | #DA6538 | #D4633B (target within 8) |
+| Parts shot, soil base | #9E7759 | #987054 (within 8) |
+| Parts shot, rock | #8F7E79 | #917F7C |
+
+- **Rear and side cells:** still darker than the sheet (rear clay #B55633 against #D36038). That is the studio key
+  light at the front (known, round 1 item 5).
+
+### Checks (final build)
+
+| Object | Tris | Size | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons / dups | Self-hits | Min corner | UV islands / overlaps / gap / border / p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RedClayDeposit | 1200 / 4000 | 10.01 × 9.30 × 4.75 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.01° | 215 / 0 / 0.016 / 0.008 / 1.034 |
+| SoilBase | 232 | 9.76 × 9.27 × 1.24 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.08° | 15 / 0 / 0.016 / 0.008 / 1.027 |
+| MainLobe | 80 | 4.74 × 4.52 × 3.94 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 6.16° | 9 / 0 / 0.016 / 0.008 / 1.069 |
+| Lobe | 80 | 4.30 × 3.92 × 2.62 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 8.61° | 11 / 0 / 0.016 / 0.008 / 1.05 |
+| Rock | 36 | 1.18 × 1.08 × 0.99 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 24.5° | 10 / 0 / 0.016 / 0.008 / 1.06 |
+
+- **Every object:** normals outward, rotation 0, scale 1, UV density 1.0.
+- **Guards:** the hero guard passed on attempt 0, and `M.fix_bowties` found 0 bowties on every object.
+- **Reports:** `K.check` reports nothing, and `problems` is empty.
+- **Hero materials:** 9.
+- **Stages 5 and 6:** unchanged (no emission, no VFX, decision 8).
+
+### Left for the verifier
+
+- **Main lobe part:** it is taller than the Part Close-Up (decision 3). Its character now matches the close-up: a
+  broad base, a broad crown and big triangles.
+- **f34 profile:** the one extreme-left column reads .08 (R2's flank).
+- **FR's left foot** at f .50 is .06 high, behind R5.
+- **Known misses as before:** the rear cell's lobe layout and rock share (.096 against .070), the side and top widths,
+  and the rear and side darkness.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not the round-1 verifier), 2026-10-28. Read-only background session on port 9880 with
+`wip/M023_verify.blend`; nothing was saved or rebuilt, and `build()` was not called. Fresh renders went to the
+verifier's scratch folder (`v023r2/renders/M023/`, with `M.MODEL_RENDERS` redirected), and the side-by-side crops to
+`v023r2/cmp_*.png`.
+
+**Verdict: PASS, 7.5 / 10.** The round-1 blocker's re-checks are all met and everything technical passes. What is
+left is minor: the main lobe reads as a rounded upright block in the side, rear and part views (item 2).
+
+### Re-measured (own bmesh code plus `M.audit`, `m016._self_hits`, `m012._thin`, `M.uv_stats`, `K.check`)
+
+| Object | Tris | Size | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons / dups | Inverted faces | Self-hits (own BVH / m016) | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RedClayDeposit | 1200 / 4000 | 10.01 × 9.30 × 4.75 (target 10.0 ± 0.4, 9.6 ± 0.4, 4.75 ± 0.2) | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 / 0 | 5.01° |
+| SoilBase | 232 | 9.76 × 9.27 × 1.24 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 / 0 | 5.08° |
+| MainLobe | 80 | 4.74 × 4.52 × 3.94 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 / 0 | 6.16° |
+| Lobe | 80 | 4.30 × 3.92 × 2.62 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 / 0 | 8.61° |
+| Rock | 36 | 1.18 × 1.08 × 0.99 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 0 / 0 | 24.5° |
+
+- **Inverted faces:** an odd-crossing ray from each face centre along its normal finds 0 on every object, and the
+  signed volumes are positive.
+- **Self-hits:** 0 BVH overlap pairs that share no vertex.
+- **Min corner:** 5.01° is above the 5° polish limit.
+- **Every object:**
+  - origin at the bottom centre (local bbox centre 0, 0; z min 0), rotation 0, scale 1;
+  - no modifiers, no custom normals, all faces flat shaded;
+  - one `UVMap` plus the `Tint` attribute;
+  - no children (no VFX, decision 8).
+- **UV:** hero 215 islands, parts 15 / 9 / 11 / 10. 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0,
+  conformal p95 1.027–1.069.
+- **Materials** (9 on the hero):
+  - clay #AF5329; clay_low × clay 50 / 75 #A64D24 / #AA5026; clay × light 25 / 50 #B1542A / #B4562A;
+  - soil #785C47; soil × dark 25 / 50 #725742 / #6B523D;
+  - rock #786D6E.
+  - Roughness clay 0.8, soil 0.95, rock 0.9; metal 0; emission 0.
+  - The visible soil now shows the plain key. Areas: plain 74.9 (including the floor cap), 25 % 17.4, 50 % 16.5.
+- **No colouring by facing.** `K.check` reports nothing. The builder paints by face-centre height (`_paint_lobe`'s
+  low band and upper patch), a noise field and crease distance, never by normal. The clay keys span only 14 levels
+  (#A64D24 – #B4562A). The per-face correlation of key luminance with normal z (0.75 on clay) comes from the height
+  band on dome geometry, not from a facing rule.
+
+### Round-1 blocker re-checks
+
+| Re-check | Result |
+| --- | --- |
+| Broad flat base | MainLobe slice widths (X × Y) at h .02 / .2 / .5 / .7 / .9: 4.39×4.21 / 4.66×4.41 / 4.36×3.93 / 3.76×3.47 / 2.95×2.75. The bottom is 0.94 / 0.95 of the max, widest at 0.2 h. **Met.** |
+| Big irregular triangles | 80 tris, vertex valence 3–9 (mostly 6–7), no soccer-ball pentagons. The facets read as broad irregular triangles in `part_mainlobe` and the hero. **Met.** |
+| Broad crown | 4 faces with normal z > 0.9 (3.67 sq studs), 8 with z > 0.75. **Met.** |
+| Front feet heights (f34 lowest clay, fraction of H; sheet / ours) | FL f .25 / .30 / .35: .16 .15 .15 / .16 .15 .19. FR f .50 / .55 / .60 / .65 / .70: .17 .15 .13 .13 .13 / .23 .20 .18 .14 .11. Within ±0.06, except f .50 (+.06, behind R5). **Met.** |
+| f34 profile | Mean .028, max .08 (one extreme-left column, R2's flank). Shares K .718 / S .216 / R .066 against .709 / .228 / .063. W : H 1.589 against 1.689. **Met.** |
+| Clean junction (`junc_cu`) | The lobes come straight down onto the soil with clean creases; no jagged notch, no undercut flank. R4 sits between BL and FL. **Met.** |
+
+### Views against the sheet
+
+Crops: `cmp_f34`, `cmp_r34`, `cmp_front`, `cmp_side`, `cmp_rear`, `cmp_top`, `cmp_part`, `cmp_expl`, `cmp_lobe`,
+`cmp_base` and `cmp_junc`.
+
+- **f34 and front:** five orange lobes on the brown pad, with grey rocks round the rim. The composition and
+  proportions read as the sheet's. Front W : H 1.740 against 1.739, profile .033 / .09, shares within 1 point.
+- **r34 (f34 flipped):** profile .049 / .11, shares within 1.7 points.
+- **Side:** W : H 1.591 against 1.475 (accepted), profile .059 / .18 (the wider pad, accepted).
+- **Rear:** W : H 1.83 against 1.647, rock share .096 against .070, one lobe cluster per side (accepted).
+- **Top:** W : D 1.074 against 0.925 (accepted), profile .024 / .06. The dark speckle on BR in `top_sheet` is render
+  noise in the main lobe's shadow, not paint.
+- **Main lobe character.** In the side, rear, exploded and part views the main lobe reads as a rounded upright block,
+  where the sheet's is a rounder dome. The height itself is decision 3.
+  - Its lower flanks are near-vertical: 41 % of its area has |normal z| < 0.26.
+  - Its shoulders are squared and its crown is a flat plateau. The f34 profile reads .97–.99 flat across f .40–.60,
+    where the sheet peaks at .55 and falls to .93 at .40.
+- **Lobe part** (`cmp_lobe`): squarer than the sheet's wide, low lobes (same recipe).
+- **Soil base part** (`cmp_base`): flatter and smoother-skirted than the sheet's chunky, bumpy slab.
+- **Exploded:** at true hero scale, so the parts look smaller than the sheet's enlarged ones (known).
+
+### Colours, sheet against ours (`m023.measure()` masks; Δ = ours − sheet)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| f34 clay median / lit / shade | #DA653A / #FC8355 / #AE4D2A | #DA663A / #EC7244 / #9A4728 | 0,+1,0 / −16,−17,−17 / −20,−6,−2 |
+| f34 clay thirds top / mid / bottom | #EB6E42 / #D9643A / #CD5D34 | #DF693B / #DC673B / #D05F36 | −12,−5,−7 / +3,+3,+1 / +3,+2,+2 |
+| f34 soil median / lit / shade | #856248 / #9F7556 / #664D3A | #866348 / #9B7358 / #503B2A | +1,+1,0 / −4,−2,+2 / −22,−18,−16 |
+| f34 rock median / lit / shade | #95837D / #B8A298 / #6C5E58 | #95837D / #A28F89 / #736662 | 0,0,0 / −22,−19,−15 / +7,+8,+10 |
+| front clay / soil / rock | #DA673E / #8B674D / #99847B | #DA663B / #856348 / #95837D | 0,−1,−3 / −6,−4,−5 / −4,−1,+2 |
+| side clay / soil / rock | #DC663C / #87644C / #81716A | #CC603B / #89664C / #8C7B76 | −16,−6,−1 / +2,+2,0 / +11,+10,+12 |
+| rear clay / soil / rock | #D36038 / #8A664C / #928178 | #B55633 / #6F5440 / #7B6F6E | −30,−10,−5 / −27,−18,−12 / −23,−18,−10 |
+| top clay / soil / rock | #DA683F / #745642 / #998882 | #D0613A / #826249 / #877875 | −10,−7,−5 / +14,+12,+7 / −18,−16,−13 |
+
+- **Medians** in the hero and front views match within 6 levels.
+- **Lit quartiles** are 16–22 levels duller, and the soil shade 16–22 darker. That is the studio light's contrast, not
+  paint.
+- **The rear and side** are darker because the key light stays at the front (known).
+
+### Items
+
+1. **Round-1 blocker (lobe shape): resolved.** Every re-check above is met.
+2. **Minor: the main lobe reads as a rounded upright block** in the side, rear and part views; the sheet's is a rounder
+   dome. Not required to pass. An optional cheap tweak in `KINDS["main"]` rounds the shoulders off and also brings
+   the f34 profile at f .35–.45 down towards the sheet's .89 / .93 / .95:
+   - pull the upper rings in: 0.38 / 0.97 → 0.93, 0.6 / 0.88 → 0.82, 0.8 / 0.7 → 0.62;
+   - move the crown points in: r 0.4–0.5 → 0.32–0.4.
+3. **Minor: the Lobe part and the squat hero lobes** are squarer than the sheet's wide, low lobes (same recipe as
+   item 2).
+4. **Minor: the soil base** is flatter and smoother than the sheet's chunky, irregular, bumpy slab. It is unchanged
+   since round 1, and the hero hides most of it.
+5. **Minor: lit and shade contrast** (the studio light). The f34 clay top third is 12 levels below the sheet's.
+6. **Minor: FR's left foot** at f .50 is .06 high (behind R5), and the extreme-left f34 column reads .08 (R2).
+7. **Minor (known, accepted):**
+   - the side and top widths;
+   - the rear lobe layout and rock share;
+   - the rear and side darkness;
+   - the unlit `under_cu` render;
+   - the exploded shot at hero scale.
+
+## Main session after verification round 2 (2026-10-28)
+
+Applied the verifier's optional minor 2: the main lobe's upper rings went 0.97/0.88/0.7 → 0.93/0.82/0.62 and its crown points moved in (r 0.4–0.5 → 0.32–0.4), so it reads as a dome rather than an upright block. The rebuild in the kit file gave a hero of 1198 tris, one shell, 0 non-manifold verts, `problems` empty, `K.check` clean. Export: 0 problems.
