@@ -154,6 +154,13 @@
     "size": [134, 131],
     "sprite": "pm_tile_inventory"
   },
+  "menu": {
+    "anchor": [0, 0],
+    "pos": [0, 43, 0, 452],
+    "size": [134, 58],
+    "item": [150, 58],
+    "gap": 10
+  },
   "status": {
     "anchor": [1, 0],
     "pos": [1, -30, 0, 222],

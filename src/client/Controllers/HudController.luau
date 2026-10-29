@@ -43,6 +43,15 @@ local HudController = {}
 -- Fires (index) when the selected hotbar slot changes. The selection follows the
 -- equipped slot, and every key press or tap on a slot also uses it.
 HudController.SelectionChanged = Signal.new()
+
+-- The in-HUD menu row: {label, controller, function}.
+HudController.MENU = {
+	{ "CRAFT", "CraftingController", "Toggle" },
+	{ "BUILD", "BuildController", "Toggle" },
+	{ "TRIBE", "TribeController", "Toggle" },
+	{ "MAP", "MapController", "Toggle" },
+	{ "PROGRESS", "ProgressionController", "Toggle" },
+}
 HudController.Selected = 1
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
@@ -450,6 +459,46 @@ local function build()
 		Parchment.Pressable(holder, art, function()
 			InventoryController.ToggleBackpack()
 		end)
+	end
+	-- The other panels' buttons (touch players have no keys): MENU under the
+	-- backpack opens a row of them, so the old navigation bar no longer covers
+	-- the vitals and cards on the right.
+	if layout.menu then
+		local cfg = layout.menu
+		local holder = Instance.new("Frame")
+		holder.Name = "Menu"
+		holder.BackgroundTransparency = 1
+		Layout.Place(holder, cfg)
+		holder.Parent = root
+		local row = Instance.new("Frame")
+		row.Name = "Row"
+		row.BackgroundTransparency = 1
+		row.Position = UDim2.fromOffset(cfg.size[1] + cfg.gap, 0)
+		row.Size = UDim2.fromOffset(#HudController.MENU * (cfg.item[1] + cfg.gap), cfg.item[2])
+		row.Visible = false
+		row.Parent = holder
+		local controllers = script.Parent
+		for index, entry in HudController.MENU do
+			Parchment.Button(
+				"pm_button_paper",
+				{
+					(index - 1) * (cfg.item[1] + cfg.gap),
+					0,
+					cfg.item[1],
+					cfg.item[2],
+				},
+				row,
+				function()
+					row.Visible = false
+					-- Required on use: these controllers start after the HUD.
+					(require(controllers[entry[2]]) :: any)[entry[3]]()
+				end,
+				{ name = entry[1], label = entry[1], size = 20, inset = 14 }
+			)
+		end
+		Parchment.Button("pm_button_paper", { 0, 0, cfg.size[1], cfg.size[2] }, holder, function()
+			row.Visible = not row.Visible
+		end, { name = "Toggle", label = "MENU", size = 22, inset = 14 })
 	end
 	gui.Parent = player:WaitForChild("PlayerGui")
 
