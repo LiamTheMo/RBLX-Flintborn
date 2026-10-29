@@ -79,7 +79,6 @@ Theme.TopOrder = {
 	BossBar = 6,
 	EventBanner = 7,
 	Receipt = 8,
-	TradeInvite = 9,
 	Toast = 10,
 	Tutorial = 11,
 }

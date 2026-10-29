@@ -7,7 +7,7 @@
 --
 -- Everything acts through the existing controllers: LobbyController deploys,
 -- reads the deploy preview and runs party actions; the buttons open the Vault,
--- Market (Quests and Shop tabs), Forge, Trade, Progress and Settings panels.
+-- Journal (quests), Market (Shop tab), Forge, Trade, Progress and Settings panels.
 
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
@@ -18,6 +18,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local ForgeController = require(script.Parent.ForgeController)
+local JournalController = require(script.Parent.JournalController)
 local LobbyController = require(script.Parent.LobbyController)
 local ProgressionController = require(script.Parent.ProgressionController)
 local SettingsController = require(script.Parent.SettingsController)
@@ -98,7 +99,7 @@ local NAV_ACTIONS = {
 		openVault("Vault")
 	end,
 	Quests = function()
-		WalletController.Open("Quests")
+		JournalController.Toggle()
 	end,
 	Shop = function()
 		WalletController.Open("Shop")
