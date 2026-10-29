@@ -112,7 +112,7 @@ for _, entry in list do
 		table.insert(lines, "    " .. line)
 	end
 end
-return table.concat(lines, "\n")
+return table.concat(lines, string.char(10))
 """
 
 
