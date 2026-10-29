@@ -96,10 +96,36 @@ return table.concat(lines, "\\n")
 """
 
 
+# The latest device reports UiDiagnosticsService kept (how HUD images loaded on
+# real clients).
+REPORTS = """
+local store = game:GetService("DataStoreService"):GetDataStore("FlintbornDiagnostics")
+local list = store:GetAsync("uiimages:latest")
+if type(list) ~= "table" or #list == 0 then
+	return "no device reports yet"
+end
+local lines = {}
+for _, entry in list do
+	table.insert(lines, ("%s user %s server %s: %s"):format(os.date("!%Y-%m-%d %H:%M:%S", entry.at),
+		tostring(entry.user), string.sub(tostring(entry.server), 1, 8), entry.summary))
+	for _, line in entry.lines or {} do
+		table.insert(lines, "    " .. line)
+	end
+end
+return table.concat(lines, "\n")
+"""
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--names", default="", help="comma-separated sprite names (default: a sample)")
+    parser.add_argument("--reports", action="store_true", help="print the latest device image reports instead")
     args = parser.parse_args(argv)
+    if args.reports:
+        result = Cloud().task(REPORTS)
+        for value in (result.get("output") or {}).get("results", []):
+            print(value)
+        return 0
     ids = json.loads(IDS.read_text(encoding="utf-8"))
     decals = json.loads(DECALS.read_text(encoding="utf-8"))
     names = [n.strip() for n in args.names.split(",") if n.strip()] or SAMPLE
