@@ -13,6 +13,7 @@ HUD's UIScale fits it to the screen). Status: Built. Hotbar: six slots (GDD §56
 | World event | top right, y 384, 334 × 98 | `pm_hud_card` |
 | Party | top left, rows every 76 px, 276 × 70 | `pm_hud_card`, headshot, ink name, health bar |
 | Backpack | left, (43, 308), 134 × 131 | `pm_tile_inventory`; opens the run backpack |
+| Menu | left, (43, 452), 134 × 58 | `pm_button_paper` MENU; opens a row of CRAFT, BUILD, TRIBE, MAP, PROGRESS (150 × 58, every 160 px) in place of the old navigation bar |
 | Level and XP | bottom centre, 37 up | `pm_stat_chip` "LV. n"; `pm_hud_xp` (star plate and empty track; fill x 42, 466 × 14) |
 | Hotbar | under the XP bar, 123 × 120 every 140 px | `pm_hud_slot`, chosen `pm_hud_slot_selected`; key number, ink item name, count, rarity stripe |
 
