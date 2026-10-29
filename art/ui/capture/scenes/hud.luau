@@ -57,4 +57,26 @@ backpack.BackgroundTransparency = 1
 Layout.Place(backpack, layout.backpack)
 backpack.Parent = root
 Widgets.Sprite(layout.backpack.sprite, { Name = "Art", Size = UDim2.fromScale(1, 1) }, backpack)
+-- The MENU button with its row open (HudController draws the same).
+local Parchment = require(Hud.Parchment)
+local HudController = require(Client.Controllers.HudController)
+local cfg = layout.menu
+local menu = Instance.new("Frame")
+menu.Name = "Menu"
+menu.BackgroundTransparency = 1
+Layout.Place(menu, cfg)
+menu.Parent = root
+Parchment.Button("pm_button_paper", { 0, 0, cfg.size[1], cfg.size[2] }, menu, function() end, {
+	label = "MENU",
+	size = 22,
+	inset = 14,
+})
+for index, entry in HudController.MENU do
+	Parchment.Button("pm_button_paper", {
+		cfg.size[1] + cfg.gap + (index - 1) * (cfg.item[1] + cfg.gap),
+		0,
+		cfg.item[1],
+		cfg.item[2],
+	}, menu, function() end, { label = entry[1], size = 20, inset = 14 })
+end
 __dump(gui, 1672, 941)
