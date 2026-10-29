@@ -288,7 +288,13 @@ local function pump()
 	pumping = true
 	task.spawn(function()
 		while true do
-			local waiting = tick()
+			-- An error in one tick must not stop every image after it.
+			local ok, result = pcall(tick)
+			local waiting = ok and result
+			if not ok then
+				SpriteLoader.LastError = tostring(result)
+				warn("[SpriteLoader] " .. SpriteLoader.LastError)
+			end
 			-- Idle between sweeps once nothing waits that this tick could give out
 			-- (a menu that opens is picked up within a sweep).
 			task.wait(if waiting then SpriteLoader.TICK else SpriteLoader.SWEEP)
@@ -339,6 +345,9 @@ function SpriteLoader.Summary(limit: number)
 				)
 			)
 		end
+	end
+	if SpriteLoader.LastError then
+		table.insert(lines, 1, "error: " .. string.sub(SpriteLoader.LastError, 1, 180))
 	end
 	return counts, statuses, lines
 end
