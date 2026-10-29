@@ -75,6 +75,13 @@ SpriteLoader.Assign(mine, "rbxassetid://7")
 mine.Image = "rbxassetid://8"
 SpriteLoader._tick()
 check(mine.Image == "rbxassetid://8", "an image set elsewhere is kept")
+-- Held strongly (a weak table lost live labels in game) and let go on Destroy.
+check(getmetatable(SpriteLoader._labels) == nil, "labels are held strongly")
+local gone = Instance.new("ImageLabel")
+gone.Parent = shownGui
+SpriteLoader.Assign(gone, "rbxassetid://9")
+gone:Destroy()
+check(SpriteLoader._labels[gone] == nil, "a destroyed label is let go")
 local counts, _, lines = SpriteLoader.Summary(5)
 check(counts.labels >= 16 and #lines <= 5, "the diagnostics summary counts labels and caps its lines")
 print(__failed and "FLOW FAILED" or "FLOW OK")
