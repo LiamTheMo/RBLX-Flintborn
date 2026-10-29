@@ -1,0 +1,1143 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M044",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m044_flower",
+    "hex": "#B8B717",
+    "levels": [
+     0.96694,
+     0.96976,
+     0.97233,
+     0.97445,
+     0.97629,
+     0.97891,
+     0.98076,
+     0.98302,
+     0.98483,
+     0.98685,
+     0.98905,
+     0.99192,
+     0.99341,
+     0.99589,
+     0.99749,
+     1.00076,
+     1.00282,
+     1.00601,
+     1.00794,
+     1.00977,
+     1.01201,
+     1.01471,
+     1.01773,
+     1.01969,
+     1.02212,
+     1.02439,
+     1.02628,
+     1.02913,
+     1.0325,
+     1.03674
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_flower_heart",
+    "hex": "#8B8E17",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_flower_white",
+    "hex": "#C6BEAE",
+    "levels": [
+     0.98409,
+     0.9856,
+     0.98966,
+     0.99282,
+     0.99414,
+     0.99683,
+     1.00273,
+     1.00511,
+     1.01195,
+     1.01904,
+     1.02168,
+     1.02399,
+     1.02626,
+     1.02889,
+     1.03677,
+     1.03819
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass",
+    "hex": "#9DA800",
+    "levels": [
+     0.96159,
+     0.96926,
+     0.97468,
+     0.97828,
+     0.98244,
+     0.98503,
+     0.98674,
+     0.98919,
+     0.99118,
+     0.99348,
+     0.99552,
+     0.99654,
+     0.99763,
+     0.99961,
+     1.00096,
+     1.00284,
+     1.00386,
+     1.00481,
+     1.00557,
+     1.00647,
+     1.00739,
+     1.00955,
+     1.01113,
+     1.01322,
+     1.01577,
+     1.01718,
+     1.01916,
+     1.02082,
+     1.02232,
+     1.02481,
+     1.02982,
+     1.04067
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass_x_deep_15",
+    "hex": "#9AA600",
+    "levels": [
+     0.95798,
+     0.96664,
+     0.97259,
+     0.97732,
+     0.97988,
+     0.98448,
+     0.98705,
+     0.98937,
+     0.99343,
+     0.99643,
+     1.00022,
+     1.00327,
+     1.00553,
+     1.00755,
+     1.01147,
+     1.01664,
+     1.01892,
+     1.02156,
+     1.02307,
+     1.02602,
+     1.02884,
+     1.03416,
+     1.0382
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass_x_deep_25",
+    "hex": "#98A400",
+    "levels": [
+     0.95686,
+     0.96376,
+     0.96876,
+     0.97098,
+     0.97532,
+     0.97866,
+     0.98241,
+     0.98482,
+     0.98829,
+     0.99047,
+     0.99431,
+     0.99721,
+     0.99982,
+     1.00286,
+     1.00641,
+     1.00926,
+     1.01141,
+     1.0139,
+     1.01717,
+     1.01957,
+     1.02372,
+     1.02648,
+     1.02831,
+     1.03108,
+     1.03339,
+     1.03703,
+     1.04291,
+     1.04892
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass_x_deep_30",
+    "hex": "#97A400",
+    "levels": [
+     0.96368,
+     0.96581,
+     0.97325,
+     0.97602,
+     0.98168,
+     0.99216,
+     0.99601,
+     0.99846,
+     1.00455,
+     1.00627,
+     1.00834,
+     1.01463,
+     1.01809,
+     1.02449
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass_x_light_10",
+    "hex": "#9FAA00",
+    "levels": [
+     0.99647,
+     1.00941
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_grass_x_light_20",
+    "hex": "#A1AB00",
+    "levels": [
+     1.01934
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_leaf",
+    "hex": "#3A6718",
+    "levels": [
+     0.94158,
+     0.95366,
+     0.96572,
+     0.96989,
+     0.97611,
+     0.9797,
+     0.98465,
+     0.98772,
+     0.98958,
+     0.99379,
+     0.99514,
+     0.99877,
+     1.00072,
+     1.00438,
+     1.00583,
+     1.00856,
+     1.01083,
+     1.01377,
+     1.01647,
+     1.01883,
+     1.02155,
+     1.02341,
+     1.02457,
+     1.02693,
+     1.02927,
+     1.03155,
+     1.0357,
+     1.03876,
+     1.04193,
+     1.04433,
+     1.05002,
+     1.05843
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_leaf_deep",
+    "hex": "#145F28",
+    "levels": [
+     0.93073,
+     0.95171,
+     0.96734,
+     0.97378,
+     0.97906,
+     0.98388,
+     0.98665,
+     0.99114,
+     0.99435,
+     0.9968,
+     0.99891,
+     1.0022,
+     1.00503,
+     1.00728,
+     1.01019,
+     1.01268,
+     1.01419,
+     1.01661,
+     1.01799,
+     1.02043,
+     1.0222,
+     1.02376,
+     1.0259,
+     1.02823,
+     1.0303,
+     1.03324,
+     1.03648,
+     1.0408,
+     1.04424,
+     1.04892,
+     1.05396,
+     1.07197
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_leaf_lime",
+    "hex": "#879A03",
+    "levels": [
+     0.93727,
+     0.93968,
+     0.94117,
+     0.94363,
+     0.94537,
+     0.94886,
+     0.95061,
+     0.95761,
+     0.95976,
+     0.96173,
+     0.96383,
+     0.96894,
+     0.97027,
+     0.9747,
+     0.97694,
+     0.97879,
+     0.9835,
+     0.98642,
+     0.99,
+     1.03174,
+     1.03526,
+     1.03725,
+     1.04035,
+     1.0423,
+     1.04464,
+     1.04878,
+     1.05421
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_leaf_lime_x_leaf_30",
+    "hex": "#708B09",
+    "levels": [
+     0.93664,
+     0.93874,
+     0.9456,
+     0.94944,
+     0.95165,
+     0.95389,
+     0.9594,
+     0.96438,
+     0.96914,
+     0.97104,
+     0.9742,
+     0.98239,
+     0.98401,
+     1.02273,
+     1.02514,
+     1.02726,
+     1.04227,
+     1.04639,
+     1.04847,
+     1.05188
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_leaf_x_lit_70",
+    "hex": "#678C20",
+    "levels": [
+     0.93489,
+     0.94925,
+     0.96005,
+     0.96929,
+     0.97177,
+     0.97467,
+     0.97954,
+     0.9854,
+     0.98887,
+     0.99238,
+     0.99589,
+     0.99843,
+     1.00254,
+     1.00587,
+     1.00848,
+     1.01145,
+     1.01418,
+     1.01731,
+     1.01841,
+     1.02125,
+     1.02262,
+     1.02394,
+     1.02618,
+     1.02798,
+     1.03049,
+     1.03241,
+     1.03515,
+     1.0387,
+     1.04163,
+     1.04592,
+     1.05227,
+     1.06326
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_path",
+    "hex": "#C39C71",
+    "levels": [
+     0.94725,
+     0.95906,
+     0.96225,
+     0.97163,
+     0.97763,
+     0.99995,
+     1.00251,
+     1.01093,
+     1.01663,
+     1.02005,
+     1.02367,
+     1.04368
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_path_deep",
+    "hex": "#9F7858",
+    "levels": [
+     0.9502,
+     0.95779,
+     0.96056,
+     0.96486,
+     0.97047,
+     0.97196,
+     0.97588,
+     0.97849,
+     0.98022,
+     0.98123,
+     0.98246,
+     0.98456,
+     0.98796,
+     0.9905,
+     0.99613,
+     0.99832,
+     0.99952,
+     1.00238,
+     1.00612,
+     1.00921,
+     1.01326,
+     1.0146,
+     1.01803,
+     1.01976,
+     1.02731,
+     1.03031,
+     1.03272,
+     1.03657,
+     1.04021,
+     1.04235,
+     1.04631,
+     1.05082
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_path_x_deep_50",
+    "hex": "#B18A64",
+    "levels": [
+     0.95028,
+     0.95765,
+     0.9606,
+     0.96492,
+     0.97046,
+     0.97169,
+     0.97509,
+     0.98027,
+     0.98158,
+     0.98209,
+     0.98342,
+     0.98395,
+     0.98664,
+     0.98756,
+     0.9933,
+     0.99632,
+     0.99723,
+     0.9999,
+     1.00227,
+     1.00439,
+     1.00855,
+     1.01088,
+     1.0116,
+     1.01525,
+     1.02219,
+     1.02753,
+     1.02894,
+     1.03598,
+     1.03925,
+     1.04322,
+     1.04459,
+     1.05028
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_path_x_light_10",
+    "hex": "#C49D72",
+    "levels": [
+     0.97614,
+     0.99497,
+     1.02315,
+     1.02666
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_path_x_light_20",
+    "hex": "#C69E73",
+    "levels": [
+     0.96996,
+     0.98778,
+     0.99638,
+     1.01088,
+     1.01705,
+     1.01933,
+     1.04614
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock",
+    "hex": "#A7968D",
+    "levels": [
+     0.93056,
+     0.94807,
+     0.96081,
+     0.96675,
+     0.96963,
+     0.97216,
+     0.97609,
+     0.97885,
+     0.98379,
+     0.98738,
+     0.99051,
+     0.99301,
+     0.99521,
+     0.99786,
+     1.00002,
+     1.00128,
+     1.00304,
+     1.00473,
+     1.00745,
+     1.00937,
+     1.01148,
+     1.01308,
+     1.01675,
+     1.01919,
+     1.0213,
+     1.02509,
+     1.02765,
+     1.03083,
+     1.03463,
+     1.03888,
+     1.04652,
+     1.05732
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_light",
+    "hex": "#B7A9A1",
+    "levels": [
+     0.95345,
+     0.95505,
+     0.95796,
+     0.96092,
+     0.963,
+     0.96644,
+     0.96985,
+     0.97358,
+     0.97864,
+     0.98462,
+     0.98597,
+     0.99059,
+     0.99216,
+     0.99862,
+     1.00325,
+     1.01269,
+     1.01578
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_deep_15",
+    "hex": "#A5948B",
+    "levels": [
+     0.93842,
+     0.94761,
+     0.9568,
+     0.9614,
+     0.96627,
+     0.96818,
+     0.97186,
+     0.97393,
+     0.9761,
+     0.97846,
+     0.98043,
+     0.9813,
+     0.98339,
+     0.98666,
+     0.98741,
+     0.98831,
+     0.98895,
+     0.99037,
+     0.99173,
+     0.9941,
+     0.99627,
+     0.99754,
+     1.00034,
+     1.00427,
+     1.00703,
+     1.01895,
+     1.02152,
+     1.03316,
+     1.04219,
+     1.05022,
+     1.07062,
+     1.09395
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_deep_60",
+    "hex": "#9D8C84",
+    "levels": [
+     0.96321,
+     0.96884,
+     0.97077,
+     0.97577,
+     0.98013,
+     0.9827,
+     0.986,
+     0.98984,
+     0.99844
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_10",
+    "hex": "#A9988F",
+    "levels": [
+     0.93049,
+     0.93538,
+     0.938,
+     0.94078,
+     0.95074,
+     0.9606,
+     0.96546,
+     0.96763,
+     0.96977,
+     0.97264,
+     0.97602,
+     0.99542,
+     0.99856,
+     1.0065,
+     1.01119,
+     1.01948,
+     1.02175,
+     1.02399,
+     1.03099,
+     1.03304,
+     1.03727,
+     1.0399,
+     1.04533,
+     1.0517,
+     1.05633
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_20",
+    "hex": "#AA9A91",
+    "levels": [
+     0.95287,
+     0.95674,
+     0.96178,
+     0.96534,
+     0.96907,
+     0.97304,
+     0.97584,
+     0.97947,
+     0.98147,
+     0.98439,
+     0.99387,
+     0.9983,
+     1.00656,
+     1.00801,
+     1.01167,
+     1.02283,
+     1.02497,
+     1.02752,
+     1.03091,
+     1.03389,
+     1.03963,
+     1.04274
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_30",
+    "hex": "#AC9C93",
+    "levels": [
+     0.93817,
+     0.94212,
+     0.94512,
+     0.96322,
+     0.96778,
+     0.96983,
+     0.9753,
+     0.97855,
+     0.98046,
+     0.98431,
+     0.98746,
+     0.99485,
+     1.00231,
+     1.00881,
+     1.01265,
+     1.0167,
+     1.02025,
+     1.02267,
+     1.02488,
+     1.0276
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_40",
+    "hex": "#AD9E95",
+    "levels": [
+     0.94545,
+     0.94759,
+     0.94982,
+     0.95363,
+     0.95687,
+     0.96561,
+     0.96848,
+     0.97528,
+     0.97837,
+     0.9818,
+     0.98417,
+     0.98709,
+     0.99357,
+     1.00151,
+     1.00302,
+     1.00666,
+     1.00848,
+     1.01052,
+     1.01367,
+     1.01631,
+     1.01837,
+     1.02012,
+     1.02292,
+     1.02938
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_50",
+    "hex": "#AFA097",
+    "levels": [
+     0.9305,
+     0.93973,
+     0.94747,
+     0.95333,
+     0.95746,
+     0.96326,
+     0.96715,
+     0.97278,
+     0.97694,
+     0.98199,
+     0.98581,
+     0.98731,
+     0.98986,
+     0.99665,
+     0.9984,
+     0.99995,
+     1.00287,
+     1.00628,
+     1.00874,
+     1.01129,
+     1.01428,
+     1.01546,
+     1.01714,
+     1.01876,
+     1.01982,
+     1.02001,
+     1.02038,
+     1.02234,
+     1.02445,
+     1.02833,
+     1.03244,
+     1.04761
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_rock_x_light_60",
+    "hex": "#B1A199",
+    "levels": [
+     0.94845,
+     0.94962,
+     0.95267,
+     0.956,
+     0.95761,
+     0.95989,
+     0.96192,
+     0.96399,
+     0.9661,
+     0.96921,
+     0.97093,
+     0.97403,
+     0.97732,
+     0.97969,
+     0.98207,
+     0.98616,
+     0.98808,
+     0.99018,
+     0.99335,
+     0.99501,
+     0.99675,
+     1.00214,
+     1.00536,
+     1.00677,
+     1.01101,
+     1.01357,
+     1.01649,
+     1.01822,
+     1.02087
+    ],
+    "used": true
+   },
+   {
+    "key": "m044_trunk",
+    "hex": "#582703",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "StoneRamp",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "hero",
+   "size": [
+    17.106,
+    12.5395,
+    20.22
+   ],
+   "tris": 3868,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRamp.glb",
+     "kind": "solid",
+     "tris": 3868,
+     "offset": [
+      0.0,
+      6.2697,
+      0.0
+     ],
+     "size": [
+      17.106,
+      12.5395,
+      20.22
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Natural ramp (16 x 20, path from z 0.35 at the toe to 10.4 at 29.9 deg, then a 2.5-stud landing): warm sand flagstone path (2 x 7 tiles) on a stone wedge between two raised lime grass borders with round two-tone bushes, pale boulders and yellow / white flowers, each border on a mass of pale warm columnar rock with peaked tips stepping up the slope; lime aprons along the cliff feet. Walkable (no step over 0.35). Seam contract: sides x = +-8, flat back plane y = +10 (meets M040's lip front), landing 10.4. Every piece its own closed shell. No VFX"
+  },
+  {
+   "name": "StoneRampBorderL",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    3.3974,
+    12.5093,
+    20.22
+   ],
+   "tris": 976,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampBorderL.glb",
+     "kind": "solid",
+     "tris": 976,
+     "offset": [
+      0.0,
+      6.2546,
+      0.0
+     ],
+     "size": [
+      3.3974,
+      12.5093,
+      20.22
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Grass Border (Left) (reusable): sloped lime turf strip with lime sides, six round two-tone bushes, pale boulders, yellow and white flowers"
+  },
+  {
+   "name": "StoneRampBorderR",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    3.3997,
+    12.5365,
+    20.22
+   ],
+   "tris": 960,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampBorderR.glb",
+     "kind": "solid",
+     "tris": 960,
+     "offset": [
+      0.0,
+      6.2682,
+      0.0
+     ],
+     "size": [
+      3.3997,
+      12.5365,
+      20.22
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Grass Border (Right) (reusable): sloped lime turf strip with lime sides, six round two-tone bushes, pale boulders, yellow and white flowers"
+  },
+  {
+   "name": "StoneRampCliffL",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    3.96,
+    10.4,
+    19.96
+   ],
+   "tris": 332,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampCliffL.glb",
+     "kind": "solid",
+     "tris": 332,
+     "offset": [
+      0.0,
+      5.2,
+      0.0
+     ],
+     "size": [
+      3.96,
+      10.4,
+      19.96
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Left Cliff Rock Mass (reusable): six tall flat-faced pale warm rock columns stepping up the slope with peaked tips and dark creases, and a pointed toe rock"
+  },
+  {
+   "name": "StoneRampCliffR",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    3.95,
+    10.4,
+    19.98
+   ],
+   "tris": 332,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampCliffR.glb",
+     "kind": "solid",
+     "tris": 332,
+     "offset": [
+      0.0,
+      5.2,
+      0.0
+     ],
+     "size": [
+      3.95,
+      10.4,
+      19.98
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Right Cliff Rock Mass (reusable): six tall flat-faced pale warm rock columns stepping up the slope with peaked tips and dark creases, and a pointed toe rock"
+  },
+  {
+   "name": "StoneRampPath",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    7.96,
+    10.5409,
+    20.0
+   ],
+   "tris": 484,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampPath.glb",
+     "kind": "solid",
+     "tris": 484,
+     "offset": [
+      0.0,
+      5.2704,
+      0.0
+     ],
+     "size": [
+      7.96,
+      10.5409,
+      20.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Top Landing Pad (Path) (reusable): 14 warm sand flagstone slabs (2 across, 6 sloped rows and a flat landing row) with darker tile sides and pale pebbles"
+  },
+  {
+   "name": "StoneRampWedge",
+   "sheet": "M044",
+   "subject": "Natural Ramp",
+   "role": "part",
+   "size": [
+    8.2,
+    9.82,
+    18.6
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/StoneRampWedge.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      4.91,
+      0.0
+     ],
+     "size": [
+      8.2,
+      9.82,
+      18.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ramp Wedge (Stone) (reusable): long pale stone wedge, flat base, broad faceted long faces, sloped top under the path"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 7060,
+  "vfxSockets": 0,
+  "paletteColours": 30,
+  "paletteLevels": 620,
+  "meshBytes": 712352
+ },
+ "problems": []
+}

@@ -1,0 +1,910 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M042",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m042_bark",
+    "hex": "#965B24",
+    "levels": [
+     0.94067,
+     0.94995,
+     0.95074,
+     0.9646,
+     0.96664,
+     0.96766,
+     0.97259,
+     0.97695,
+     0.98025,
+     0.98564,
+     0.98753,
+     0.98956,
+     0.99162,
+     0.99278,
+     0.99548,
+     0.99799,
+     0.99873,
+     1.0,
+     1.0,
+     1.00225,
+     1.00237,
+     1.00823,
+     1.00876,
+     1.0104,
+     1.01197,
+     1.01441,
+     1.01584,
+     1.01991,
+     1.02725,
+     1.03134,
+     1.03797,
+     1.0618
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_deep",
+    "hex": "#663F22",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_light",
+    "hex": "#AB6F39",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_x_deep_25",
+    "hex": "#8A5424",
+    "levels": [
+     0.94049,
+     0.96015,
+     0.96311,
+     0.9669,
+     0.96901,
+     0.97017,
+     0.9729,
+     0.97349,
+     0.97607,
+     0.97677,
+     0.97905,
+     0.9823,
+     0.98671,
+     0.98918,
+     0.99557,
+     0.99582,
+     0.99763,
+     1.00133,
+     1.00743,
+     1.00902,
+     1.01152,
+     1.01243,
+     1.01438,
+     1.01538,
+     1.01656,
+     1.01773,
+     1.02043,
+     1.02153,
+     1.0257,
+     1.02827,
+     1.03912,
+     1.04688
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_x_deep_75",
+    "hex": "#724622",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_x_light_25",
+    "hex": "#9B6029",
+    "levels": [
+     0.96782,
+     0.96976,
+     0.97349,
+     0.9773,
+     0.97931,
+     0.98194,
+     0.9859,
+     0.99141,
+     0.99579,
+     0.99707,
+     1.00009,
+     1.00543,
+     1.00732,
+     1.01011,
+     1.01268,
+     1.01506,
+     1.02209,
+     1.02488,
+     1.02692,
+     1.03098,
+     1.03326,
+     1.03575,
+     1.04005
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_bark_x_light_50",
+    "hex": "#A0652E",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle",
+    "hex": "#437529",
+    "levels": [
+     0.9373,
+     0.9479,
+     0.95411,
+     0.96002,
+     0.96713,
+     0.97214,
+     0.97325,
+     0.97731,
+     0.98062,
+     0.98829,
+     0.99608,
+     0.99788,
+     1.00207,
+     1.00698,
+     1.00988,
+     1.01242,
+     1.0146,
+     1.01871,
+     1.02053,
+     1.02252,
+     1.02412,
+     1.02547,
+     1.02636,
+     1.02676,
+     1.02763,
+     1.02922,
+     1.0326,
+     1.0343,
+     1.03639,
+     1.04051,
+     1.04656,
+     1.05256
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_deep_25",
+    "hex": "#3A6C2D",
+    "levels": [
+     0.93518,
+     0.94546,
+     0.94947,
+     0.96059,
+     0.96485,
+     0.9676,
+     0.97113,
+     0.97374,
+     0.97957,
+     0.98008,
+     0.98482,
+     0.99005,
+     0.9921,
+     0.99285,
+     0.9947,
+     0.99813,
+     0.99971,
+     1.0009,
+     1.00444,
+     1.00767,
+     1.01045,
+     1.01503,
+     1.01699,
+     1.01946,
+     1.02398,
+     1.02628,
+     1.02884,
+     1.0322,
+     1.03623,
+     1.04085,
+     1.04804,
+     1.0567
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_deep_50",
+    "hex": "#306230",
+    "levels": [
+     0.95104,
+     0.95799,
+     0.95984,
+     0.96188,
+     0.96584,
+     0.97484,
+     0.97732,
+     0.98023,
+     0.98317,
+     0.98551,
+     0.98756,
+     0.98915,
+     0.99188,
+     0.99547,
+     0.99793,
+     1.00003,
+     1.00201,
+     1.00712,
+     1.0101,
+     1.01259,
+     1.01778,
+     1.02176,
+     1.02369,
+     1.02629,
+     1.02876,
+     1.03061,
+     1.03325,
+     1.03579,
+     1.043,
+     1.0462,
+     1.04839,
+     1.051
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_deep_75",
+    "hex": "#275934",
+    "levels": [
+     0.97729,
+     0.98191,
+     0.98639,
+     0.98864,
+     0.99106,
+     0.99354,
+     0.99603,
+     0.99826,
+     1.00031,
+     1.00298,
+     1.00468,
+     1.00704,
+     1.00894,
+     1.01157,
+     1.01399,
+     1.0163,
+     1.0185,
+     1.02153,
+     1.02451,
+     1.02673,
+     1.02834,
+     1.03112
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_light_25",
+    "hex": "#5E8729",
+    "levels": [
+     0.92824,
+     0.93365,
+     0.93962,
+     0.96547,
+     0.97143,
+     0.97539,
+     0.97607,
+     0.97874,
+     0.9796,
+     0.98234,
+     0.98511,
+     0.98886,
+     0.98984,
+     0.99094,
+     0.9953,
+     0.99758,
+     0.99938,
+     1.001,
+     1.00192,
+     1.00378,
+     1.00687,
+     1.0081,
+     1.01116,
+     1.01256,
+     1.02006,
+     1.02483,
+     1.03122,
+     1.03717,
+     1.04123,
+     1.04432,
+     1.04766,
+     1.05913
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_light_50",
+    "hex": "#7A982A",
+    "levels": [
+     0.93394,
+     0.9412,
+     0.95285,
+     0.96639,
+     0.97147,
+     0.9742,
+     0.98009,
+     0.98192,
+     0.98786,
+     0.99033,
+     0.99195,
+     0.99255,
+     0.9981,
+     1.00094,
+     1.00347,
+     1.00506,
+     1.00605,
+     1.00847,
+     1.00916,
+     1.00999,
+     1.01123,
+     1.01337,
+     1.01428,
+     1.01594,
+     1.01935,
+     1.02159,
+     1.02623,
+     1.02922,
+     1.03272,
+     1.03381,
+     1.04123,
+     1.05732
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_needle_x_light_75",
+    "hex": "#95AA2A",
+    "levels": [
+     0.93822,
+     0.94721,
+     0.94998,
+     0.95362,
+     0.96779,
+     0.97981,
+     0.98336,
+     0.99225,
+     0.9937,
+     0.996,
+     0.99901,
+     1.00087,
+     1.00273,
+     1.00679,
+     1.00891,
+     1.0149,
+     1.01759,
+     1.03359,
+     1.03969,
+     1.04347,
+     1.0474
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_plant",
+    "hex": "#93A134",
+    "levels": [
+     0.9629,
+     0.976,
+     0.98072,
+     0.98512,
+     0.98986,
+     0.99109,
+     0.99743,
+     1.00155,
+     1.00732,
+     1.01073,
+     1.01199,
+     1.01814,
+     1.02322,
+     1.0287,
+     1.03442,
+     1.03593
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_plant_deep",
+    "hex": "#335A20",
+    "levels": [
+     0.96407,
+     0.96658,
+     0.96964,
+     0.97236,
+     0.97564,
+     0.98301,
+     0.98464,
+     0.98859,
+     0.99169,
+     0.99687,
+     1.00134,
+     1.00691,
+     1.01299,
+     1.01704,
+     1.02078,
+     1.0248,
+     1.02667,
+     1.03106,
+     1.03556
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_plant_deep_x_bark_deep_25",
+    "hex": "#405320",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_plant_x_deep_25",
+    "hex": "#7B8F2F",
+    "levels": [
+     0.9629,
+     0.976,
+     0.98072,
+     0.98512,
+     0.98986,
+     0.99109,
+     0.99743,
+     1.00155,
+     1.00732,
+     1.01073,
+     1.01199,
+     1.01814,
+     1.02322,
+     1.0287,
+     1.03442,
+     1.03593
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_rock",
+    "hex": "#9C9894",
+    "levels": [
+     0.97334,
+     0.97659,
+     0.97999,
+     0.98235,
+     0.98466,
+     0.98662,
+     0.99068,
+     0.99395,
+     0.9974,
+     1.00011,
+     1.00272,
+     1.00614,
+     1.00817,
+     1.0105,
+     1.01281,
+     1.01585,
+     1.01796,
+     1.02079,
+     1.02376
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_rock_x_deep_25",
+    "hex": "#989491",
+    "levels": [
+     0.97781,
+     0.97995,
+     0.98377,
+     0.98541,
+     0.98898,
+     0.99117,
+     0.99371,
+     0.99536,
+     0.99952,
+     1.00252,
+     1.00433,
+     1.00661,
+     1.0088,
+     1.01114,
+     1.01295,
+     1.01532,
+     1.01913,
+     1.02362,
+     1.02526,
+     1.02959,
+     1.03165
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_rock_x_light_25",
+    "hex": "#9F9B97",
+    "levels": [
+     0.97174,
+     0.97671,
+     0.97903,
+     0.98173,
+     0.98455,
+     0.98753,
+     0.99394,
+     0.99593,
+     0.99914,
+     1.00402,
+     1.0077,
+     1.01025,
+     1.01301,
+     1.01495,
+     1.01712,
+     1.02054,
+     1.02312
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_rock_x_light_50",
+    "hex": "#A29E9A",
+    "levels": [
+     0.96984,
+     0.97267,
+     0.97494,
+     0.97784,
+     0.98068,
+     0.98364,
+     0.98508,
+     0.98752,
+     0.98974,
+     0.99193,
+     0.99598,
+     0.99857,
+     1.00101,
+     1.00336,
+     1.00553,
+     1.00799,
+     1.01047,
+     1.0132,
+     1.01668,
+     1.0191,
+     1.02334,
+     1.02611
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_sand",
+    "hex": "#BAA784",
+    "levels": [
+     0.98845,
+     0.99734,
+     1.00243,
+     1.00464,
+     1.00693,
+     1.01408,
+     1.01623,
+     1.01961
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_sand_x_deep_25",
+    "hex": "#B3A07D",
+    "levels": [
+     0.98494,
+     0.98732,
+     0.99075,
+     0.99256,
+     0.9958,
+     0.99927,
+     1.00232,
+     1.00442,
+     1.00711,
+     1.01021,
+     1.01162,
+     1.01416,
+     1.01748,
+     1.01935
+    ],
+    "used": true
+   },
+   {
+    "key": "m042_sand_x_deep_50",
+    "hex": "#AC9976",
+    "levels": [
+     0.98441,
+     0.98733,
+     0.98906,
+     0.99386,
+     0.99632,
+     0.99898,
+     1.00083,
+     1.00356,
+     1.00616,
+     1.00845,
+     1.01145,
+     1.01382,
+     1.01596,
+     1.01931
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TieredFir",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "hero",
+   "size": [
+    12.4,
+    16.0,
+    11.9894
+   ],
+   "tris": 2714,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFir.glb",
+     "kind": "solid",
+     "tris": 2714,
+     "offset": [
+      0.0,
+      8.0,
+      0.0
+     ],
+     "size": [
+      12.4,
+      16.0,
+      11.9894
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Young Fir: three stacked foliage tiers (crown star cone + 8 hem flaps, middle 12, lower skirt 16 drooping kite flaps in two rows) seated by contact on flat caps and hubs, an octagonal planked orange-brown trunk with six kinked roots, on a sand patch with rocks, pebbles and lime / green plant clumps. No VFX"
+  },
+  {
+   "name": "TieredFirCrownTier",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "part",
+   "size": [
+    5.7355,
+    4.4943,
+    6.0204
+   ],
+   "tris": 256,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFirCrownTier.glb",
+     "kind": "solid",
+     "tris": 256,
+     "offset": [
+      0.0,
+      2.2472,
+      0.0
+     ],
+     "size": [
+      5.7355,
+      4.4943,
+      6.0204
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crown Tier: star cone (4 + 4 ridges) with a hem of 8 drooping kite flaps, octagonal hub underneath"
+  },
+  {
+   "name": "TieredFirLowerSkirt",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "part",
+   "size": [
+    11.6221,
+    5.2,
+    11.9894
+   ],
+   "tris": 368,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFirLowerSkirt.glb",
+     "kind": "solid",
+     "tris": 368,
+     "offset": [
+      0.0,
+      2.6,
+      0.0
+     ],
+     "size": [
+      11.6221,
+      5.2,
+      11.9894
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Lower Skirt: pleated core with a flat cap and an octagonal hub, 16 kite flaps in two staggered rows"
+  },
+  {
+   "name": "TieredFirMiddleTier",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "part",
+   "size": [
+    7.707,
+    4.0221,
+    8.5716
+   ],
+   "tris": 316,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFirMiddleTier.glb",
+     "kind": "solid",
+     "tris": 316,
+     "offset": [
+      0.0,
+      2.011,
+      0.0
+     ],
+     "size": [
+      7.707,
+      4.0221,
+      8.5716
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Middle Tier: pleated core with a flat cap and an octagonal hub, 12 kite flaps in two staggered rows"
+  },
+  {
+   "name": "TieredFirRootBase",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "part",
+   "size": [
+    12.4,
+    3.3301,
+    11.037
+   ],
+   "tris": 990,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFirRootBase.glb",
+     "kind": "solid",
+     "tris": 990,
+     "offset": [
+      0.0,
+      1.6651,
+      0.0
+     ],
+     "size": [
+      12.4,
+      3.3301,
+      11.037
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Base: thin lobed sand patch, 5 chunky warm-grey rocks, 3 pebbles, 8 clumps of upright lanceolate leaves"
+  },
+  {
+   "name": "TieredFirTrunk",
+   "sheet": "M042",
+   "subject": "Young Fir",
+   "role": "part",
+   "size": [
+    7.2827,
+    6.55,
+    6.9444
+   ],
+   "tris": 784,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TieredFirTrunk.glb",
+     "kind": "solid",
+     "tris": 784,
+     "offset": [
+      0.0,
+      3.275,
+      0.0
+     ],
+     "size": [
+      7.2827,
+      6.55,
+      6.9444
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Trunk: octagonal planked trunk with slits and a flat top (inner ring), six kinked angular roots unioned in"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 5428,
+  "vfxSockets": 0,
+  "paletteColours": 25,
+  "paletteLevels": 461,
+  "meshBytes": 516116
+ },
+ "problems": []
+}
