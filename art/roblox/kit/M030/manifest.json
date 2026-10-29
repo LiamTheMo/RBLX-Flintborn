@@ -1,0 +1,1214 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M030",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m030_cap",
+    "hex": "#584DA6",
+    "levels": [
+     0.96719,
+     0.96975,
+     0.97405,
+     0.97975,
+     0.98257,
+     0.98409,
+     0.987,
+     0.99038,
+     0.99469,
+     0.99643,
+     0.99994,
+     1.00214,
+     1.01571,
+     1.02699,
+     1.03153
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_dark",
+    "hex": "#44396E",
+    "levels": [
+     0.98418,
+     0.98944,
+     0.99713,
+     1.0,
+     1.00444,
+     1.01433
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_dark_x_cap_25",
+    "hex": "#493E7C",
+    "levels": [
+     0.96773,
+     0.9727,
+     0.97565,
+     0.9818,
+     0.99519,
+     1.00418,
+     1.00709
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_dark_x_cap_50",
+    "hex": "#4E438A",
+    "levels": [
+     0.96128,
+     0.96687,
+     0.97098,
+     0.97469,
+     0.97775,
+     0.98148,
+     0.98464,
+     0.98586,
+     0.98872,
+     0.99095,
+     0.99334,
+     0.99649,
+     0.99878,
+     1.00059,
+     1.00394,
+     1.00598,
+     1.00811,
+     1.01035,
+     1.01438,
+     1.01741,
+     1.01928,
+     1.02187,
+     1.02566,
+     1.02727
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_dark_x_cap_75",
+    "hex": "#534898",
+    "levels": [
+     0.95376,
+     0.96035,
+     0.96468,
+     0.96884,
+     0.97104,
+     0.97501,
+     0.977,
+     0.97901,
+     0.98099,
+     0.98345,
+     0.98599,
+     0.98806,
+     0.99113,
+     0.99309,
+     0.9953,
+     0.99729,
+     0.99927,
+     1.00142,
+     1.00356,
+     1.0055,
+     1.00767,
+     1.00993,
+     1.01229,
+     1.01401,
+     1.01644,
+     1.019,
+     1.02207,
+     1.02502,
+     1.02694,
+     1.03969
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_light",
+    "hex": "#725FBE",
+    "levels": [
+     0.96482,
+     0.96763,
+     0.96988,
+     0.97188,
+     0.97406,
+     0.97631,
+     0.9785,
+     0.98125,
+     0.98276,
+     0.98507,
+     0.98738,
+     0.98938,
+     0.99173,
+     0.99393,
+     0.99656,
+     1.00758,
+     1.01103,
+     1.01288,
+     1.01598,
+     1.01752,
+     1.02011,
+     1.02204,
+     1.02471,
+     1.02736,
+     1.02909,
+     1.03194
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_x_light_25",
+    "hex": "#5E52AC",
+    "levels": [
+     0.95664,
+     0.98012,
+     0.98711,
+     1.00274,
+     1.00764,
+     1.00961,
+     1.01748
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_x_light_50",
+    "hex": "#6556B2",
+    "levels": [
+     0.97448,
+     0.98172,
+     0.9844,
+     0.98711,
+     0.98939,
+     0.99435,
+     0.99804,
+     1.00983
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_cap_x_light_75",
+    "hex": "#6C5AB8",
+    "levels": [
+     0.95912,
+     0.97177,
+     0.97406,
+     0.98221,
+     0.98726,
+     0.99244,
+     0.99691,
+     1.00189,
+     1.00594,
+     1.01629
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_dirt",
+    "hex": "#5E4E4B",
+    "levels": [
+     0.94228,
+     0.94483,
+     0.9521,
+     0.95494,
+     0.95866,
+     0.96051,
+     0.96364,
+     0.96595,
+     0.96848,
+     0.97149,
+     0.97664,
+     0.97908,
+     0.98738,
+     0.98894,
+     0.99199,
+     0.99812,
+     0.99969,
+     1.00233,
+     1.00508,
+     1.0074,
+     1.01106,
+     1.01347,
+     1.01697,
+     1.01894,
+     1.02247,
+     1.02554,
+     1.02815,
+     1.03051
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_dirt_x_rock_dark_25",
+    "hex": "#5A4B48",
+    "levels": [
+     0.96382,
+     0.96603,
+     0.96812,
+     0.97249,
+     0.97576,
+     0.98243,
+     0.9856,
+     0.98827,
+     0.9947,
+     0.99605,
+     0.99883,
+     1.00178,
+     1.00521,
+     1.00934,
+     1.01202,
+     1.01414,
+     1.01723,
+     1.02337
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_leaf",
+    "hex": "#819630",
+    "levels": [
+     0.93836,
+     0.94229,
+     0.94484,
+     0.94535,
+     0.94696,
+     0.94892,
+     0.95982,
+     0.96413,
+     0.96589,
+     0.96716,
+     0.9684,
+     0.98601,
+     0.99319,
+     0.99461,
+     0.99663,
+     0.99784,
+     0.99907,
+     1.00057,
+     1.00078,
+     1.00487,
+     1.00773,
+     1.00961,
+     1.01164,
+     1.01569,
+     1.0165,
+     1.03205,
+     1.03448,
+     1.04829,
+     1.05069,
+     1.0518,
+     1.05703,
+     1.06281
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_leaf_base",
+    "hex": "#6A7D28",
+    "levels": [
+     0.95052,
+     0.95184,
+     0.95569,
+     0.96859,
+     0.97067,
+     0.97353,
+     0.97525,
+     0.97798,
+     0.98296,
+     0.98646,
+     0.9911,
+     0.99487,
+     0.9971,
+     1.00066,
+     1.00256,
+     1.00941,
+     1.0133,
+     1.01663,
+     1.01798,
+     1.02084,
+     1.02461,
+     1.02853,
+     1.03985,
+     1.04265,
+     1.04557,
+     1.04923,
+     1.05426
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_leaf_base_x_leaf_50",
+    "hex": "#768A2C",
+    "levels": [
+     0.94594,
+     0.94956,
+     0.96752,
+     0.97115,
+     0.97377,
+     0.98278,
+     0.98558,
+     0.98929,
+     0.9927,
+     0.99892,
+     1.00124,
+     1.00451,
+     1.00862,
+     1.0137,
+     1.01822,
+     1.02302,
+     1.02515,
+     1.0503,
+     1.05439
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_leaf_tip",
+    "hex": "#98AA36",
+    "levels": [
+     0.96453,
+     0.98478,
+     0.99186,
+     0.99495,
+     0.99835,
+     1.00239,
+     1.00506,
+     1.00948,
+     1.01191,
+     1.01492,
+     1.0437,
+     1.06025,
+     1.06799
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_leaf_x_tip_50",
+    "hex": "#8CA033",
+    "levels": [
+     0.9356,
+     0.93952,
+     0.95553,
+     0.96648,
+     0.96934,
+     0.98993,
+     1.01349,
+     1.04094,
+     1.06074
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock",
+    "hex": "#6E5C55",
+    "levels": [
+     0.88032,
+     0.90017,
+     0.92188,
+     0.94622,
+     0.95141,
+     0.95442,
+     0.95885,
+     0.96364,
+     0.96818,
+     0.97383,
+     0.97873,
+     0.9816,
+     0.98845,
+     0.99592,
+     0.99779,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00638,
+     1.04407
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_dark_x_rock_25",
+    "hex": "#574944",
+    "levels": [
+     0.94487,
+     0.94803,
+     0.95203,
+     0.95506,
+     0.95767,
+     0.95991,
+     0.96468,
+     0.96985,
+     0.97409,
+     0.9761,
+     0.97865,
+     0.9816,
+     0.98436,
+     0.98643,
+     0.98837,
+     0.99108,
+     0.99502,
+     0.99632,
+     0.99921,
+     1.00136,
+     1.00419,
+     1.00592,
+     1.0086
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_dark_x_rock_50",
+    "hex": "#5E504A",
+    "levels": [
+     1.00507,
+     1.00821
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_dark_x_rock_75",
+    "hex": "#66564F",
+    "levels": [
+     0.90628,
+     0.91372,
+     0.91891,
+     0.92148,
+     0.92543,
+     0.92926,
+     0.9323,
+     0.93596,
+     0.93883,
+     0.94241,
+     0.94636,
+     0.95494,
+     0.95696,
+     0.95962,
+     0.96198,
+     0.9649,
+     0.96692,
+     0.97094,
+     0.97393,
+     0.98121,
+     0.9842,
+     0.98867,
+     0.99281,
+     0.99462,
+     0.99613,
+     0.99952,
+     1.00316,
+     1.00883,
+     1.01887,
+     1.02656,
+     1.03881,
+     1.04961
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_x_light_25",
+    "hex": "#75635C",
+    "levels": [
+     0.89832,
+     0.94127,
+     0.9461,
+     0.95388,
+     0.95822,
+     0.96574,
+     0.9718,
+     0.9775,
+     0.98086,
+     0.9872,
+     1.00055,
+     1.00176,
+     1.00377,
+     1.00588,
+     1.01428,
+     1.02645,
+     1.02896
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_x_light_50",
+    "hex": "#7C6A64",
+    "levels": [
+     0.91541,
+     0.91842,
+     0.92471,
+     0.92688,
+     0.94504,
+     0.95234,
+     0.96409,
+     0.96836,
+     0.97622,
+     0.97841,
+     0.98231,
+     0.98559,
+     0.9981,
+     1.02043,
+     1.02786,
+     1.03767
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_rock_x_light_75",
+    "hex": "#83726C",
+    "levels": [
+     0.9151,
+     0.93258,
+     0.93462,
+     0.94233,
+     0.94729,
+     0.9537,
+     0.95653,
+     0.95887,
+     0.96054,
+     0.96311,
+     0.96974,
+     0.97128,
+     0.97551,
+     0.97826,
+     0.98315,
+     0.9875,
+     0.99239,
+     0.99708,
+     0.9996,
+     1.00384,
+     1.00632,
+     1.01079,
+     1.01466,
+     1.03945
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_spot",
+    "hex": "#74D6EC",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_spot_deep",
+    "hex": "#4DA2D0",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_spot_light",
+    "hex": "#A9F0F5",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_stem",
+    "hex": "#CCB18F",
+    "levels": [
+     0.95145,
+     0.96262,
+     0.96787,
+     0.96956,
+     0.97214,
+     0.9743,
+     0.97587,
+     0.97803,
+     0.98023,
+     0.98226,
+     0.98424,
+     0.98597,
+     0.98874,
+     0.99062,
+     0.9926,
+     0.99475,
+     0.99654,
+     0.99707,
+     0.99869,
+     1.00165,
+     1.00453,
+     1.00712,
+     1.0128,
+     1.01504,
+     1.01845,
+     1.02247,
+     1.02679,
+     1.0309,
+     1.03455,
+     1.03727,
+     1.04079,
+     1.0534
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_stem_base",
+    "hex": "#B0956E",
+    "levels": [
+     0.96399,
+     0.96756,
+     0.96962,
+     0.97246,
+     0.97414,
+     0.97858,
+     0.98165,
+     0.98456,
+     0.98736,
+     0.98977,
+     0.99312,
+     0.99837,
+     1.00292,
+     1.00549,
+     1.00935,
+     1.01322,
+     1.02179,
+     1.02444,
+     1.02765,
+     1.02895,
+     1.03295,
+     1.03837,
+     1.04722,
+     1.05364,
+     1.05699
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_stem_base_x_stem_25",
+    "hex": "#B79C76",
+    "levels": [
+     0.9582,
+     0.9633,
+     0.977,
+     0.97874,
+     0.98231,
+     0.99306,
+     0.99741,
+     1.0045,
+     1.00721,
+     1.01802,
+     1.0201,
+     1.02542
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_stem_base_x_stem_50",
+    "hex": "#BEA37E",
+    "levels": [
+     0.95763,
+     0.97095,
+     0.97365,
+     0.98027,
+     0.98426,
+     0.99034,
+     0.99507,
+     0.99651,
+     1.00032,
+     1.00926,
+     1.01398,
+     1.01732,
+     1.02318,
+     1.02631,
+     1.0395,
+     1.04274,
+     1.05989
+    ],
+    "used": true
+   },
+   {
+    "key": "m030_stem_base_x_stem_75",
+    "hex": "#C5AA87",
+    "levels": [
+     0.97196,
+     0.97464,
+     0.97834,
+     0.9807,
+     0.98671,
+     0.98928,
+     0.99571,
+     1.00522,
+     1.01289,
+     1.02066,
+     1.02776,
+     1.04644,
+     1.059
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "MooncapGlowSpot",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    1.4,
+    1.288,
+    1.4
+   ],
+   "tris": 48,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapGlowSpot_glow_m030_spot.glb",
+     "kind": "glow",
+     "tris": 24,
+     "offset": [
+      0.0,
+      1.078,
+      0.0
+     ],
+     "size": [
+      1.4,
+      0.42,
+      1.4
+     ],
+     "key": "m030_spot",
+     "color": "#74D6EC",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/MooncapGlowSpot_glow_m030_spot_deep.glb",
+     "kind": "glow",
+     "tris": 16,
+     "offset": [
+      0.0,
+      0.539,
+      0.0
+     ],
+     "size": [
+      1.4,
+      1.078,
+      1.4
+     ],
+     "key": "m030_spot_deep",
+     "color": "#4DA2D0",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/MooncapGlowSpot_glow_m030_spot_light.glb",
+     "kind": "glow",
+     "tris": 8,
+     "offset": [
+      0.0,
+      1.288,
+      0.0
+     ],
+     "size": [
+      0.784,
+      0.01,
+      0.784
+     ],
+     "key": "m030_spot_light",
+     "color": "#A9F0F5",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [],
+   "notes": "Spot Insert (reusable): an 8-sided faceted cyan gem, flat table, two crown rows, pavilion cone; Neon deep / mid / light facets"
+  },
+  {
+   "name": "MooncapLeafClump",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    2.2402,
+    1.7775,
+    1.0279
+   ],
+   "tris": 154,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapLeafClump.glb",
+     "kind": "solid",
+     "tris": 154,
+     "offset": [
+      0.0,
+      0.8887,
+      0.0
+     ],
+     "size": [
+      2.2402,
+      1.7775,
+      1.0279
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf Clump (reusable): five thick yellow-green kite leaves with a midrib ridge, dark base to bright tip"
+  },
+  {
+   "name": "MooncapNode",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "hero",
+   "size": [
+    7.3611,
+    5.35,
+    5.5759
+   ],
+   "tris": 2880,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapNode.glb",
+     "kind": "solid",
+     "tris": 2391,
+     "offset": [
+      0.0,
+      2.675,
+      0.0
+     ],
+     "size": [
+      7.3611,
+      5.35,
+      5.5759
+     ]
+    },
+    {
+     "file": "meshes/MooncapNode_glow_m030_spot.glb",
+     "kind": "glow",
+     "tris": 254,
+     "offset": [
+      -0.0929,
+      3.8962,
+      0.2871
+     ],
+     "size": [
+      6.7334,
+      2.6347,
+      4.8112
+     ],
+     "key": "m030_spot",
+     "color": "#74D6EC",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/MooncapNode_glow_m030_spot_deep.glb",
+     "kind": "glow",
+     "tris": 147,
+     "offset": [
+      -0.1644,
+      3.9177,
+      0.2871
+     ],
+     "size": [
+      6.5904,
+      2.5916,
+      4.8112
+     ],
+     "key": "m030_spot_deep",
+     "color": "#4DA2D0",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    },
+    {
+     "file": "meshes/MooncapNode_glow_m030_spot_light.glb",
+     "kind": "glow",
+     "tris": 88,
+     "offset": [
+      -0.082,
+      3.937,
+      0.2986
+     ],
+     "size": [
+      6.708,
+      2.5445,
+      4.7716
+     ],
+     "key": "m030_spot_light",
+     "color": "#A9F0F5",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_MooncapNode_crystal_glow_1",
+     "kind": "crystal_glow",
+     "position": [
+      0.6381,
+      3.6,
+      2.7529
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [],
+      "light": {
+       "color": "#7FE9F8",
+       "brightness": 0.5,
+       "range": 8.0,
+       "flicker": false,
+       "shadows": true
+      }
+     }
+    }
+   ],
+   "notes": "Mooncap event node: two chunky faceted violet toadstools (a big flat-crowned cap drooping to -X over a fat cream pear stem, a small cap drooping to +X on a short stem in front-right), eleven glowing 8-sided cyan gems set in dark pockets / bezels on the caps (Neon: deep, mid and light facets), a ring of ten domed brown-grey boulders and three pebbles on a dirt slab, two yellow-green leaf clumps at the back; one closed mesh. VFX: crystal_glow (a soft cyan light in front of and between the caps)"
+  },
+  {
+   "name": "MooncapRockBase",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    6.1449,
+    1.4,
+    5.0589
+   ],
+   "tris": 928,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapRockBase.glb",
+     "kind": "solid",
+     "tris": 928,
+     "offset": [
+      0.0,
+      0.7,
+      0.0
+     ],
+     "size": [
+      6.1449,
+      1.4,
+      5.0589
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Base (reusable): a faceted dirt slab ringed by ten peaky domed brown-grey boulders and three pebbles"
+  },
+  {
+   "name": "MooncapShell",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    6.0557,
+    2.6231,
+    4.8204
+   ],
+   "tris": 452,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapShell.glb",
+     "kind": "solid",
+     "tris": 452,
+     "offset": [
+      0.0,
+      1.3116,
+      0.0
+     ],
+     "size": [
+      6.0557,
+      2.6231,
+      4.8204
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Cap Shell (reusable): the big cap undrooped, a thick faceted flat-crowned dome with a vertical rim band and a faceted underside cone; five 8-sided gem pockets carved"
+  },
+  {
+   "name": "MooncapStalkLarge",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    2.3746,
+    3.42,
+    2.426
+   ],
+   "tris": 160,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapStalkLarge.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      1.71,
+      0.0
+     ],
+     "size": [
+      2.3746,
+      3.42,
+      2.426
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stem (Large) (reusable): a fat faceted 10-sided pear stem, darker foot band"
+  },
+  {
+   "name": "MooncapStalkSmall",
+   "sheet": "M030",
+   "subject": "Mooncap",
+   "role": "part",
+   "size": [
+    1.4902,
+    2.434,
+    1.5098
+   ],
+   "tris": 112,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MooncapStalkSmall.glb",
+     "kind": "solid",
+     "tris": 112,
+     "offset": [
+      0.0,
+      1.217,
+      0.0
+     ],
+     "size": [
+      1.4902,
+      2.434,
+      1.5098
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stem (Small) (reusable): a faceted 8-sided pear stem, darker foot band"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 12,
+  "solid": 6,
+  "water": 0,
+  "glow": 6,
+  "tris": 4734,
+  "vfxSockets": 1,
+  "paletteColours": 31,
+  "paletteLevels": 527,
+  "meshBytes": 441124
+ },
+ "problems": []
+}

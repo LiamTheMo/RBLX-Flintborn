@@ -992,3 +992,446 @@ All recommendations are accepted:
 10. Names as proposed (`FrostBush*`). For the spec's other decisions, follow its own recommendations.
 
 The stem rises as a visible column (1.55 studs bare) before it splits, as the spec's wood-run and limb-angle targets require. 024 failed as a low splayed nest.
+
+## Stage 1. Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m028.py` (`build()`). In the background session on port 9877 the build takes about 40 s,
+or about 60 s with every render. Every part comes from its own function, and the hero is assembled from the same
+functions.
+
+**`skeleton()`** (hero and `FrostBushStem`):
+- An 8-sided trunk column runs from z −0.1 to the fork at z 2.05, then makes a short taper into the crotch. Its radius
+  is:
+  - 0.47 at the flare;
+  - 0.40 at z 0.6;
+  - 0.375 at z 1.25;
+  - 0.34 at the fork.
+- The limbs are 8-sided and kinked (M024's `tube`), with knuckle rings and flat end caps:
+
+| Limb | What it is | Where it goes |
+| --- | --- | --- |
+| LB | the left branch | leaves at z 1.3; carries two stubs, LBup (for NB) and LBfr (for UL) |
+| RB | the right low limb | leaves at z 1.15; has a small up-stub, RBup |
+| TL | the tall limb | goes up-left to its cut top at (−0.3, −0.1, 3.42) |
+| RBr | the right branch | runs nearly level, then rises to its cut end at X 1.7, z 2.62 |
+| NRs | NR's stub | — |
+| CS | the centre limb | goes back, behind NR |
+
+**`leaf_mesh()`** builds a 6-sided hexagonal shard:
+- Section: width × 0.7 width, with a ridge vertex on each broad face and a flat side facet.
+- Rings, at t (half-width fraction):
+  - .10 (0.55);
+  - .30 (1.0);
+  - .46, a lerp ring for the colour ramp;
+  - .62 (0.98);
+  - .82 (0.60).
+- The base and the tip are apexes, for 60 tris.
+- Ring A is 0.55, wider than the spec's 0.30, so the outline at t .1 and .2 meets the measured profile (.29 / .40
+  against .30 / .44).
+
+**`nodule_mesh()`** is M014's hull of staggered rings:
+- Rings at t .15, .38, .62 and .84, with radii .45, .95, 1.0 and .64, plus sector jitter.
+- Dissolved at 12°, then BEAUTY-triangulated.
+- Canopy gems have 6 points per ring: 36–38 merged facets, 42–46 tris.
+- Base gems have 5 points per ring: 24–27 facets, 36–40 tris.
+- The crown ring is 0.64, not 0.50, so NR's top is as broad as the sheet's (front profile at f .70–.80).
+
+**Base:**
+- Eleven rocks on an oval of rx 1.58, ry 1.28, open at the front. Each rock is a `_dome` hull of 16 points:
+  - a flat bottom sunk 0.08;
+  - a quiet four-point top;
+  - an 8° dissolve.
+- A flat snow pad plus five snow lumps, each a dome hull dissolved at 5°.
+- Four base gems (FL, FR, BL, BR), half sunk.
+
+**Union and cleanup:**
+- The union is guarded and exact, one shell at a time, in this order: skeleton, leaves and nodules, snow, base gems,
+  rocks.
+- Every union passed with no retries and no failures: hero 36 shells, Stem 10, Base 21.
+- Then, in order:
+  - The floor cut uses `_floor_cut`, a scanfill cap. M004's `holes_fill` filled a cut loop nested inside another
+    twice, which made 3–15 crossing floor faces and 5–14 inverted faces.
+  - A guarded 4° limited dissolve, delimited by MATERIAL.
+  - M024's clean, finish and polish.
+  - `M.fix_bowties`.
+
+**Hero size: 4.51 W × 2.99 D × 3.60 H.** W was raised from 4.3 to 4.5 (the LL and R tips at ±2.26), which is inside
+the +0.25 tolerance. At 4.3 the front_sheet W : H was 1.117, under the 1.12–1.25 target. It now reads 1.171.
+
+### Measured against the sheet (`m028.measure()`)
+
+Measured on the long-lens `*_sheet` renders, with the floor hidden and the study's `cls3` masks on both images. Sheet
+values are in brackets.
+
+| View | W : H | L | I | S | I+S | W | R | leaves |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet = f34_sheet (0, 12) | 1.171 (front 1.189 / f34 1.069) | .281 (.274) | .197 (.225) | .100 (.114) | .297 (.339) | .289 (.260) | .134 (.127) | 3 (3) |
+| rear_sheet (180, 12) | 1.108 (1.198) | .194 (.165) | .332 (.295) | .061 (.118) | .393 (.413) | .277 (.270) | .137 (.152) | 3 (2) |
+| r34_sheet (180, 14) | 1.103 (1.052) | .192 (.246) | .336 (.252) | .061 (.101) | .397 (.353) | .272 (.265) | .138 (.136) | 3 (3) |
+| side_sheet (90, 12) | 0.757 (0.788) | .170 (.047) | .330 (.327) | .046 (.160) | .376 (.487) | .233 (.253) | .222 (.213) | 2 (1) |
+| top_tilt_sheet (0, 70) | 1.524 (1.034) | .113 (.240) | .359 (.313) | .166 (.125) | .525 (.438) | .254 (.261) | .108 (.061) | 1 (3) |
+
+**Front top profile**, f 0 to 1 in steps of 0.05:
+- ours: .42 .50 .54 .90 .88 .87 .81 .73 .94 .97 .89 .77 .87 .95 .90 .93 .96 .78 .61 .59 .58
+- sheet: .46 .51 .56 .91 .88 .86 .83 .76 .93 .96 .86 .74 .85 .94 .99 1.0 1.0 .77 .59 .58 .56
+- The three crown masses are there, with dips at f .35 (.73) and f .55 (.77).
+- The tall limb's flat top is on the silhouette, at .94–.97 for f .40–.45.
+- NR's dome is the weak point: .90–.96 at f .70–.80 against the sheet's .99–1.0, at worst −0.09 at f .70.
+
+**Front width per height:**
+- h .1: 0.79 (target 0.76–0.88);
+- h .3: 0.59 (the waist must stay ≤ 0.62);
+- h .5: 0.91 (target ≥ 0.86).
+
+**Front wood runs:**
+
+| Height | Ours | Sheet |
+| --- | --- | --- |
+| h .2–.4 | one trunk run, .42–.58 (.16 W) | .41–.57 |
+| h .50 | two runs, .29–.41 and .45–.60 | .28–.39 and .47–.60 |
+| h .60 (the fork) | .47–.68 | .51–.69 |
+| h .65 | .48–.77 | .50–.78 |
+| h .75 | TL .45–.61 and RBr .77–.87, separate | .46–.54 and .80–.87 |
+| h .80–.95 | TL alone, moving left from .43–.53 to .41–.47 | .44–.53 to .42–.46 |
+
+That gives a trunk column of 1.55 studs of bare wood, a low split at h .45–.50 and the fork at h .60–.65.
+
+**Rear:** the V of two prongs at h .90–.95 is weak. TL is a single run at .49–.59, and CS ends lower, at h .85
+(f .34–.37). See the notes for the verifier.
+
+## Stage 2. Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold / boundary | Bowtie verts | Self-intersections | Inverted | Thin (< 5°) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FrostBushNode (hero) | 1644 / 4000 | 4.51 × 2.99 × 3.60 | 1 | 0 / 0 | 0 (2 fixed) | 0 | 0 | 6 (floor cap, 4.1–5.0°) |
+| FrostBushStem | 404 / 1000 | 2.82 × 1.32 × 3.49 | 1 | 0 / 0 | 0 | 0 | 0 | 0 (min 5.8°) |
+| FrostBushLeaf | 60 | 1.65 × 0.59 × 0.85 | 1 | 0 / 0 | 0 | 0 | 0 | 0 (min 14.9°) |
+| FrostBushIceNodule | 46 | 0.87 × 0.87 × 1.45 | 1 | 0 / 0 | 0 | 0 | 0 | 0 (min 21.9°) |
+| FrostBushBase | 944 / 1000 | 3.69 × 2.99 × 1.23 | 1 | 0 / 0 | 0 (2 fixed) | 0 | 0 | 6 (floor cap) |
+
+**Tris before the union: 1348.**
+
+| Piece | Tris |
+| --- | --- |
+| skeleton | 408 |
+| leaves | 3 × 60 |
+| canopy gems | 46 + 42 |
+| snow | 38 + 5 × 34 |
+| base gems | 40 + 40 + 40 + 36 |
+| rocks | 11 × 28 |
+
+**Every object** has:
+- zero wire edges, loose verts, zero-area faces, n-gons and duplicate verts;
+- outward normals;
+- its origin at the bottom centre (0, 0, 0);
+- transforms applied.
+
+**The six thin faces are all in the flat underside cap at z 0.** They are scanfill fans from nearly collinear rim
+verts. `_floor_needles` flips floor-floor edges, but none of these has a better diagonal. Merging their short rim edges
+was tried and removed, because it folded a wall to 0.4°. The thin faces are invisible, they lie in one plane, and none
+has zero area.
+
+## Stage 3. UV
+
+Smart UV (angle 45, margin 0.008), then M012's `_uv_unfold`. Every object has 0 overlap pairs, 0 flipped islands and a
+minimum island gap of 0.016.
+
+| Object | Islands | Density spread | Conformal stretch p95 |
+| --- | --- | --- | --- |
+| hero | 410 | 0.84–1.04 | 1.004 |
+| Stem | 89 | 1.0 | 1.008 |
+| Leaf | 15 | 1.0 | 1.0 |
+| Nodule | 11 | 1.0 | 1.066 |
+| Base | 218 | 1.0–1.03 | 1.004 |
+
+The exporter writes its own palette UVs.
+
+## Stage 4. Materials, colour and texture
+
+### Keys
+
+The keys came from three passes (the comments in `PALETTE` record each one):
+1. `m028.calibrate()` on the dome against the spec's 5.4 targets.
+2. Each family corrected in linear light by the sheet / ours ratio of the front_sheet medians (rear at half weight).
+3. The snow-blue key made bluer.
+
+| Key | Hex | Roughness | Specular |
+| --- | --- | --- | --- |
+| `m028_leaf` / `_deep` / `_light` | `#3D6DB6` / `#2A5393` / `#4678BE` | 0.55 | 0.35 |
+| `m028_ice` / `_pale` / `_deep` | `#9DCDFF` / `#BADEFF` / `#769AD0` | 0.3 | 0.5 |
+| `m028_snow` / `_blue` | `#A9B8CD` / `#99ADC9` | 0.85 | 0.3 |
+| `m028_wood` / `_dark` / `_cut` | `#705647` / `#4F3D30` / `#906F54` | 0.9 / 0.9 / 0.85 | 0.3 |
+| `m028_rock` / `_cool` / `_dark` | `#755A50` / `#6A5A5B` / `#5E4B4A` | 0.92 / 0.92 / 0.95 | 0.3 |
+
+### Blending
+
+Colour comes from position fields only. Mix keys are 25 / 50 / 75 % (`_mix` quantises to quarters), with ±0.05–0.06
+noise on t.
+
+- **Leaves** (t along the leaf's axis):
+  - deep at the base, stepping 100 / 75 / 50 / 25 % over t < .42;
+  - the plain key across the belt;
+  - toward light over the tip, 25 then 50 % (LL 75 %).
+- **Nodules:**
+  - Canopy gems are deep below t .38, the key in the middle and pale above t .52.
+  - The base gems FR, BL and BR are deep below t .5 with only a 25 % pale crown.
+  - FL is deep with a 25 % ice crown.
+  - The exported Nodule part has 25 % ends only. The full ramp on an upright gem gave a K.check correlation of 0.79.
+- **Snow** (distance to the rocks, gems and trunk):
+  - under 0.12: 75 % blue;
+  - under 0.25: 50 %;
+  - under 0.32: 25 %.
+- **Wood:**
+  - Forks and crotches are 50 % dark within 0.22 and 25 % within 0.38.
+  - The hero only also darkens the snow collar (below z 0.95 / 1.12) and the leaf bases.
+  - Broad noise patches add 25 %.
+  - The bare ends (TL, RBr, CS, RBup) get pale cut caps. The join ends that carry leaves and gems are bark in the hero
+    and cut on the Stem part.
+- **Rocks:**
+  - warm or cool per rock;
+  - 50 / 25 % dark at the feet (by z) and in crevices within 0.06 / 0.14 of a neighbour.
+- **Underside cap:** `m028_rock`, which keeps it out of the facing check.
+
+### Tint and checks
+
+- **Tint** is broad noise, never per face: amp 0.02 for leaf, ice and snow, 0.04 for wood, 0.05 for rock, with ±3–4 %
+  per piece.
+- **K.check facing correlation:** hero 0.00, Stem 0.34; Base, Leaf and Nodule 0.00. No `kit_shading_ok` override.
+
+### Re-measured against the sheet (front_sheet; sheet in brackets)
+
+- Leaves `#4778C4` (`#4877C0`) ✓
+- Wood `#725341` (`#725342`) ✓
+- Rock `#7E6255` (`#7E6354`) ✓
+- Canopy ice, I+S `#A5D5FC` (`#A9CFFB`) ✓
+- Snow `#D5E6FC` (`#D1E0F4`): +4 / +6 / +8, at the edge of tolerance.
+- I class (base gems plus shaded snow) `#90B1D9` (`#95B5E5`): B −12, a little greyer.
+- Parts shots: leaf `#4477C1` (exploded `#4573BB` / `#4A7AC4`) ✓; stem `#7D5B47` (`#855D44`), R −8.
+
+**Rear and r34 are backlit by the kit studio sun.** The snow there reads `#B0C0D6` against the sheet's `#D6E5F7`, and S
+drops to .06. The sheet lights every cell from the front, so this comes from lighting, not paint.
+
+## Stage 5. Lighting
+
+Skipped (decision 7): the sheet shows no glow, so there are no emissive keys and no light.
+
+**Check in Studio:**
+- the nodule crowns (`#BADEFF` key) and the snow don't clip to flat white under Frostpeak's sun;
+- the leaf base-to-tip step survives the palette export.
+
+## Stage 6. VFX
+
+Skipped (decision 7): the sheet shows no glow, sparkle, mist or particles, so there are no sockets. Renders still use
+`vfx=True`.
+
+## Modeller's notes for the verifier
+
+**Cameras.** Compare with the `*_sheet` renders (3× lens, floor hidden):
+- `f34_sheet` and `front_sheet` are both (0, 12), per decision 3.
+- `side_sheet` is (90, 12); screen right is the back.
+- `top_tilt_sheet` is (0, 70).
+
+`m028.measure()` gives the numbers above, and `m028.compare()` writes `M028_sheet_compare.png`.
+
+**Known differences the decisions accept:**
+- **Side:** our UL leaf stands where the sheet's side cell draws a pale nodule, so side L is .17 against .05
+  (decision 4).
+- **Top:** judged by counts and shares only (decision 5). The top_tilt camera doesn't match the sheet's rotated
+  drawing, and our leaves merge into one mask component there.
+- **Rear V:** CS ends behind NR at (0.64, 0.55, 2.98), so the rear's +X prong is low (h .85). Raising it to the
+  sheet's h .95 at f .44 would put a second prong on the front silhouette at f .58, where the front draws a dip
+  (spec 3.7).
+- **Rear and r34 lighting:** they are backlit, so snow and rock read darker and S is low. That is lighting, not paint.
+
+**Small leftovers:**
+- NB's crown shows a sliver above the UL leaf in front_sheet (≤ 0.03 W).
+- Front I+S is .297 against .339 (−4.2 points), and wood is .289 against .260 (+2.9).
+- The front NR dome is 0.04–0.09 low at f .70–.80.
+- Six needle triangles (4.1–5.0°) sit in the flat underside cap.
+- The trunk is a straight column. The sheet's sways slightly and flares wider into the snow.
+
+## Stage 7 — Verification (round 1)
+
+Fresh verifier, read-only. Background session on port 9877 with `wip/M028_verify.blend`; nothing saved, `build()` not
+called. Fresh renders went to a scratch folder (`M.MODEL_RENDERS` redirected), not to this folder. Every number below was
+re-measured: topology with my own bmesh, BVH and ray-parity code, and colours and shares with the study's masks (`m028.classes`)
+on both the sheet and my renders.
+
+**Verdict: PASS, 7.5 / 10. No blockers.** The sheet's read is all there and the mesh is clean:
+- a bare brown trunk column with a fork, a tall up-left limb and a right branch with cut ends;
+- three blue hexagonal shards and two pale gems;
+- a snowy rock ring that is open at the front, with four base gems.
+
+What's left is colour hue on the rocks and some leftovers on the rear and top that the decisions accept.
+
+### Technical (re-measured)
+
+| Object | Tris | Size (studs) | Shells | NM edges / verts / boundary | Self-hits | Inverted (ray parity) | Faces under 5° | UV overlap / flipped / min gap | Density | Stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FrostBushNode | 1644 / 4000 | 4.51 × 2.99 × 3.60 | 1 | 0 / 0 / 0 | 0 | 0 | 6, all in the z 0 floor cap (4.09–4.96°); off the floor, min 5.07° | 0 / 0 / 0.016 | 0.84–1.04 | 1.004 |
+| FrostBushStem | 404 / 1000 | 2.82 × 1.32 × 3.49 | 1 | 0 / 0 / 0 | 0 | 0 | 0 (min 5.84°) | 0 / 0 / 0.016 | 1.0 | 1.008 |
+| FrostBushLeaf | 60 | 1.65 × 0.59 × 0.85 | 1 | 0 / 0 / 0 | 0 | 0 | 0 (min 14.9°) | 0 / 0 / 0.016 | 1.0 | 1.0 |
+| FrostBushIceNodule | 46 | 0.87 × 0.87 × 1.45 | 1 | 0 / 0 / 0 | 0 | 0 | 0 (min 21.9°) | 0 / 0 / 0.016 | 1.0 | 1.066 |
+| FrostBushBase | 944 / 1000 | 3.69 × 2.99 × 1.23 | 1 | 0 / 0 / 0 | 0 | 0 | 5, all in the floor cap (min **3.16°**) | 0 / 0 / 0.016 | 1.0–1.03 | 1.004 |
+
+**Size.** The decided size is 4.3 × 3.0 × 3.6. The hero is W +0.21 (inside +0.25), D −0.01 and H 0.
+
+**Other checks:**
+- Every object has 0 n-gons, wire edges, loose verts and duplicate verts.
+- No custom normals, no smooth faces, no modifiers, no parent or children.
+- Transforms are applied and the origin is at the bbox bottom centre (bbox x and y centred on 0, z min 0).
+- Volumes are positive (normals outward).
+- No interior faces: one manifold shell, 0 crossing face pairs and 0 odd-parity faces.
+- The hero underside is 110 coplanar faces, all pointing straight down, 7.72 stud².
+
+**The floor needles.** They are flat, coplanar, non-zero area (min 0.00017 stud²) and point straight down, so they can't shade
+or be seen. I judge them harmless.
+
+**Materials:**
+- 10 keys plus quarter mixes; every slot is used.
+- No emission anywhere and no VFX sockets (decision 7).
+- `K.check` reports no problems.
+- Area-weighted facing correlation (key luminance against normal z), whole object: hero 0.19, Stem 0.35, Base 0.15,
+  Leaf −0.03.
+
+### View comparison (sheet → ours, front_sheet / rear_sheet / r34 / side / top at the decided cameras, floor hidden)
+
+| View | W : H | L | I + S | W | R | Leaf components |
+| --- | --- | --- | --- | --- | --- | --- |
+| front | 1.189 → 1.174 | .274 → .281 | .339 → .297 | .260 → .289 | .127 → .134 | 3 → 3 |
+| f34 | 1.069 → 1.174 (accepted 1.05–1.20) | .281 → .281 | .331 → .297 | .261 → .289 | .126 → .134 | 3 → 3 |
+| rear | 1.198 → 1.108 | .165 → .194 | .413 → .392 | .270 → .277 | .152 → .137 | 2 → 3 |
+| r34 | 1.052 → 1.103 | .246 → .192 | .353 → .397 | .265 → .272 | .136 → .138 | 3 → 3 |
+| side | 0.788 → 0.757 | .047 → .170 (decision 4) | .487 → .376 | W + R .466 → .455 | | 1 → 2 |
+| top_tilt (70) | 1.034 → 1.524 | .240 → .113 | .438 → .525 | .261 → .254 | .061 → .108 | 3 → 1 (merged) |
+| top (89) | | .240 → .124 | .438 → .562 | .261 → .143 | .061 → .172 | 3 → 1 (merged) |
+
+**Front.** All shares are within ±4, and I+S is −4.2, just inside its ±5.
+
+**Front skeleton.** The trunk column, splits and limbs match the sheet:
+
+| Height | Ours | Sheet |
+| --- | --- | --- |
+| h .25–.40 | one trunk run, .42–.59 | .38–.59 |
+| h .50 | two runs, .29–.41 and .45–.61 | .28–.39 and .47–.60 |
+| h .60 (fork) | .47–.68 | .51–.69 |
+| h .75 | TL .45–.61 and RBr .77–.87, separate | .46–.54 and .80–.87 |
+| h .80–.95 | TL alone, moving left, .43–.53 → .41–.47 | .44–.53 → .42–.46 |
+
+- The tall limb's flat top is on the silhouette (.95–.97 at f .40–.45).
+- The dips are at f .35 (.73 against .76) and f .55 (.77 against .74).
+- The waist at h .3 is .59 (≤ .62 ✓), h .5 is .91 (≥ .86 ✓) and the base at h .1 is .79 ✓.
+
+**Front components:**
+- UL: f .13–.36, h .57–.90 (sheet .13–.37, .53–.90).
+- LL: f 0–.29, h .37–.56 (sheet 0–.27, .39–.56).
+- R: f .60–1.0, h .35–.61 (sheet .64–1.0, .35–.59).
+- NR: f .61–.81, h .69–.94, share **.062 against the sheet's .103** (sheet .60–.83, .67–1.0).
+- The ring is open at the front centre and the snow reaches the ground there ✓.
+
+**Rear.**
+- NR is at screen left and high, R at screen left, LL at screen right and NB at screen right and high ✓.
+- The UL leaf shows round NB: its visible component is **3.4 %** of the silhouette, inside the spec's ≤ 5 %, but it reads
+  as "gem on a blue leaf" where the sheet has one big pale gem.
+- NB is .066 of the silhouette against the sheet's .133, with its top at h .86 against .98.
+- **No V.** At h .90–.95 there is one TL run (.49–.59 / .51–.59) against the sheet's two (.43–.50 | .50–.57). The rear top
+  profile has no notch at f .60 (.94 against the sheet's .50). CS ends as a cut stub at h .85, f .34–.37.
+
+**Side.** The decision 4 conflict, accepted:
+- The UL leaf stands up the front edge, so the top profile at f .25–.45 is .93–1.0 against .71–.96. The width at h .4 is
+  .64 against .36.
+- The R leaf, seen nearly end-on, reads as a squat hexagon.
+- The wood mask's largest-component rule fails on our side render (trunk and rock merge into one shade), so I compared
+  W + R together.
+
+**Top.** By counts:
+- 3 leaves are visible, but UL and LL merge into one component;
+- 2 pale gems ✓;
+- wood crosses the centre ✓;
+- rock is at the rim ✓.
+
+By shares:
+- L is about half the sheet's (−12 points);
+- I+S is +9 to +12 (outside ±6).
+
+The UL and R leaves stand broad-face to the front, so from above they are seen edge-on.
+
+### Colours (study masks, medians; sheet → ours, difference in R/G/B)
+
+| Region (front_sheet unless noted) | Sheet | Ours | Δ | Result |
+| --- | --- | --- | --- | --- |
+| Leaves, all | `#4877C0` | `#4778C4` | −1 / +1 / +4 | ✓ (hue 216.2 → 216.8°, sat .62 → .64) |
+| Leaf base → tip, UL | `#3A5D9C` → `#4878C0` | `#3965A8` → `#6996E1` | tip +33 / +30 / +33 | the tip fifth is too light (the lit tip plus 50 % light key) |
+| Leaf base → tip, R / LL | `#2D5290` → `#4E7DC2` / `#335792` → `#5382C9` | `#3560A5` → `#4575BE` / `#2B4F8A` → `#4B7BC5` | ≤ ±21 | ✓ (base darker than tip on each) |
+| Canopy ice (NR, I+S above h .45) | `#A9CFFB` | `#A5D5FC` | −4 / +6 / +1 | ✓ |
+| NR bottom → top fifth | `#638FD2` → `#DAEFFD` | `#566F8B` → `#BBE1FE` | bottom −13 / −32 / −71 (shadowed by RBr, grey); crown −31 / −14 / +1 | crown a little cyan, not near-white |
+| Rear NB (canopy ice) | `#8EB6EE` | `#9DCAFB` | +15 / +20 / +13 | just outside the spec's 15 (NB paler than the sheet's) |
+| Base gem FL / FR area (I) | `#84A7DF` / `#9BBDED` | `#91ADD4` / `#8EB5DA` | +13 / +6 / −11 ; −13 / −8 / −19 | a bit greyer than the sheet; still read as blue on white |
+| Snow (S, base) | `#D1E0F4` (sat .13) | `#D5E6FC` (sat .14) | +4 / +6 / +8 | ✓ (at the edge) |
+| Wood | `#725342` (22°, .42) | `#725341` (23°, .43) | 0 / 0 / −1 | ✓ |
+| Stem part against exploded stem | `#855D44` | `#7C5B47` | −9 / −2 / +3 | ✓ (just outside 8 on R) |
+| Cut ends (wood, top 10 % band) | `#BB8966` | `#745644` | −71 / −51 / −34 | ✗: the TL cut top doesn't show pale from the front |
+| Rock, all | `#7E6354` | `#7E6255` | 0 / −1 / +1 | ✓ |
+| Rock, centre (warm) | `#81614C` (hue 23.6°) | `#876354` (hue 17.9°) | +6 / +2 / +8 | warm rock 6° too red |
+| Rock warm share (hue ≥ 18°) | 63 % | 27 % (rear 6 %) | | the two-tone reads as one pinkish brown |
+| Cool rock key | swatch `#6A554F` (13°) | key `#6A5A5B` (**356°, mauve**) | | renders `#6A5757` (6°) at the rear right |
+
+The rear and r34 snow (`#AFC0D6` against `#D6E5F7`) and rear wood (`#664D3E` against `#765746`) are darker. The kit sun
+backlights the rear cameras while the sheet lights every cell from the front, so this is lighting, not paint. The left/right
+lightness of the front rocks is swapped against the sheet (ours lit from the left) for the same reason.
+
+### Itemised findings (all minor; no blockers)
+
+1. **Rock hues (minor, colour).**
+   - The cool key `m028_rock_cool` `#6A5A5B` has a hue of 356° (mauve), against swatch 6 `#6A554F` / rendered cool
+     `#75635E` at 12–13°.
+   - The warm key `#755A50` (16°) renders at 18° against the sheet's 23.6°.
+   - Together they melt the warm/grey-brown two-tone into one pinkish brown (warm share 27 % against 63 %).
+   - Fix: set `ROCK_COOL` to about `#6B5953` (hue about 13°, the same luminance) and `ROCK` to about `#78594A` (hue about
+     21°). Re-check that front rock C reads hue 21–24° and the warm share is ≥ 50 %.
+2. **NR undersized in the front (minor).**
+   - The front share is .062 against .103 and the top .91–.96 against 1.0 at f .70–.80.
+   - On the sheet NR is the tallest thing; ours sits below TL's top.
+   - Fix: scale NR about 1.15 along its axis and raise its top apex to about z 3.7 (H stays inside 3.6 + 0.2).
+3. **Rear NB and UL (minor, inside the ≤ 5 % rule).**
+   - The UL leaf shows round NB (3.4 %).
+   - NB is half the sheet's rear area (.066 against .133) and lower (h .86 against .98).
+   - Fix, if a round 2 is run: move NB about 0.1 to −X and +0.1 to +Y and grow it about 1.15, so it covers UL from the
+     rear. Keep its front peek ≤ 0.03 W.
+4. **Rear V (minor, spec 3.7 conflict).**
+   - CS ends as a stub at h .85, f .34–.37, against a second prong at h .90–.95, f .41–.47.
+   - Optional fix: end CS at about (0.35, 0.55, 3.2), behind NR's left edge from the front, and confirm that the front dip
+     at f .55 stays ≤ .80.
+5. **TL cut top not visible from the front (minor).** The front's top wood band is `#745644` against the sheet's pale cut
+   face `#BB8966`. Tilt TL's end cap about 25° toward −Y, so the `wood_cut` face shows in front_sheet the way the sheet's
+   slanted cut does.
+6. **Top shares (minor, decision 5).** L is −12 and I+S is +9 to +12 on the top and top_tilt cells, because the UL and R
+   leaves stand broad-face to the front. The sheet's top cell is internally inconsistent (spec 3.5). Accept, or tilt R's
+   broad face about 15° more toward +z.
+7. **Leaf UL tip too light (minor).** The tip fifth is `#6996E1` against `#4878C0`. Drop UL's tip mix from 50 % to 25 %
+   `leaf_light`; keep LL at 75 %.
+8. **NR crown cyan, not near-white (minor).** The top fifth is `#BBE1FE` against `#DAEFFD`. The `ice_pale` key `#BADEFF`
+   could go toward `#C9E6FF`, but watch the clipping that the stage 5 Studio note mentions.
+9. **Wood dark share (minor).** On the hero, plain `wood` is 51 % of the bark area (the spec asks for ≥ 60 %), but the
+   rendered wood median matches the sheet exactly, so this is cosmetic.
+10. **Floor needles (minor, accepted).**
+    - The hero has 6 floor-cap faces at 4.1–5.0°.
+    - The Base part has 5 at **3.16**–4.61°; the spec's stage 2 table lists 6 without the 3.2° minimum.
+    - All are coplanar, point down and can't be seen.
+11. **Within-family facing correlation (minor, noted).**
+    - Rock 0.75 (dark feet by z) and ice 0.50 on the hero, and 0.76 on the exported Nodule (deep and pale ends along an
+      upright axis).
+    - These come from position fields (height, axis t) on upright pieces, not from normal-driven paint. The whole-object
+      values pass `K.check`.
+12. **Base gems paired (minor).** In the rear and side, each pair of base gems stacks into a two-gem cluster. The sheet's
+    rear shows one per side. Acceptable under decision 6.
+13. **NB crown sliver** above UL in front_sheet (≤ 0.03 W), as the modeller noted. Accepted.
+
+**Requires manual validation (Studio):**
+- the rock two-tone after the palette export;
+- that the nodule crowns and snow don't clip under the Frostpeak sun;
+- that the leaf base-to-tip step survives.
+
+## Main session after verification round 1 (2026-10-29)
+
+Applied minor 1: `ROCK` #755A50 → #78594A and `ROCK_COOL` #6A5A5B → #6B5953, so the rocks read as the sheet's warm and grey-brown pair instead of one pinkish brown. The rebuild in the kit file gave a hero of 1644 tris, one shell, 0 bowties, `K.check` clean. Export: 0 problems.

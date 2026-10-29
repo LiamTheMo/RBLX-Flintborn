@@ -874,3 +874,817 @@ All recommendations are accepted:
 11. Names as proposed (`ReedClump*`, hero `ReedClumpNode`).
 
 Every `*_sheet` render hides the studio floor, because the grey rocks can't be told apart from the ground shadow.
+
+## Stage 1 — Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m027.py`, `build()`. It takes about 15 s without renders and 31–38 s with them, uses
+fixed seeds, and the hero guard passed on attempt 0 in the final build. It was built in a background Blender (bgmcp
+port 9880, work file `art/blender/assets/kit/wip/M027.blend`).
+
+**Parts, each from its own function** (all in the build frame: front −Y, +X right, ground z 0):
+- `seed_head()`: one lofted 8-sided ring stack, no boolean, one closed shell:
+  - bottom chamfer at 0.62;
+  - body at 1.0, with a mid ring at 1.03 (±4 % jitter, ±6° ring twist);
+  - top chamfer at 0.60;
+  - a flat annulus at the top;
+  - an 8-sided nub (taper 0.9, flat cap);
+  - on the part only, a 0.07 × 0.12 peg.
+
+  Part `ReedClumpSeedHead` = H2 (Ø 0.65 × 1.36 + nub 0.20 × 0.25 + peg).
+- `stalk()`: 6-sided prism, rings at 0 / 0.45 (±3 %) / 1, flat caps. Part `ReedClumpStalk` Ø 0.25 × 2.45.
+- `leaf()`: a broad keeled lance.
+  - **Centre line:** a circular arc bent toward gravity. The arc's mid tangent is the chord, so the given face normal
+    holds at mid-length. The leaf twists about its own axis from base to tip.
+  - **Outline:** stations at t 0 / .15 / .40 / .62 / .82 with half-widths .34 / .40 / .50 / .49 / .36 × W, then a knife
+    tip offset 0.2 W sideways (onto the upper edge of a leaning leaf).
+  - **Section:** a midrib vertex on the front (faces slope 11° either side, a fold of about 158°) and one on the back
+    (4°), and **thick edges (0.045)** as a top and a bottom line.
+  - **Edge lines:** split into pieces of at most 0.25 between stations. The front and back halves are fans from the
+    midrib to those edge points.
+  - **Why the split:** a first version used plain 6-point rings. Its 0.045 × 0.5–0.85 edge strips were 3–5° slivers,
+    and the polish collapsed them to paper edges (the part lost 16 tris). Now every strip corner is ≥ 7.7° and every
+    0.045 edge survives (26 on the part, about 200 on the hero).
+
+  Part `ReedClumpLeafBlade`: L 2.5 (chord) × W 0.6, arch 25°, leaning right with its face toward the studio key (see
+  stage 4).
+- `mud_base()`: a 16-sided oval loft, rx 1.85 × ry 1.18, with a flat bottom. Part `ReedClumpMudBase`.
+  - Rings (z, r): (0, .94), (.12, 1.0), (.42, 1.02), the rim (.66, .90), the dish ring (.62, .58), centre .60.
+  - The rim has ±0.06 height jitter and two back lumps (+0.15 / +0.13 at az 62° / 118°).
+  - 5 lumps (radius ±14 % cosine), with vertical creases at the minima.
+  - Quads are split on a seeded diagonal.
+- `rock()`: `K.hull_rock`, rings (0, .9, 6), (.42, 1, 6), (.8, .66, 5), (1, .22, 2), flat bottom. Part `ReedClumpRock`
+  0.9 × 0.8 × 0.65 (34 tris).
+
+**Hero layout.** The final values are in `HEADS`, `LEAVES` and `ROCKS`, and every change is commented in the builder.
+These differ from the study's §2:
+- **Mound:** taller and steeper than §2.1 (rim 0.66, dish 0.60). With the §2.1 rings (rim 0.58, a rim inset to 0.88)
+  it read as a thin chamfered disc, or a pan with a raised rim.
+- **Rocks:**
+  - sizes are §2.1 × 1.1: at × 1.0 they read 0.7 of the sheet's rock runs at h .16, and at × 1.3 R was 16 % against 9;
+  - RK3 and RK4 are 10 % smaller again and RK5 15 % smaller (they are nearest the side and rear cameras);
+  - each base sits at the mound surface − 0.3 × its height, tilted 12° outward;
+  - their tops sit at z 0.8–1.0.
+- **Heads:** as §2.2, except:
+  - H1's head bottom moved 0.1 to the right, to x −0.95 (its head reached f .15 in f34 against the sheet's .17);
+  - all stalk feet are at z 0.42 (the higher dish).
+
+  Head axes in f34 are 110.6° / 102.3° / 74.6° (sheet 112 / 103 / 74).
+- **Leaves:**
+  - widths are §2.3 × 1.15–1.25, then × 1.08 for every hero leaf (`LEAF_W_SCALE`). The sheet's leaves read broader,
+    and the side and rear green shares were 45–50 % against 52–56.
+  - LA's tip moved to (−2.40, −1.65, 2.75) with a 35° arch, and LB's and LG's tips moved further out in depth (the
+    side's D : H was 0.56 against 0.633).
+  - LG's face turned up toward the front, to (−0.54, −0.60, 0.59). With §2.3's (−0.69, +0.69, +0.23) its underside
+    faced the camera and read dark.
+  - LC's tip now goes back-left to (−0.85, 0.20) and LI's back to (0.50, 1.05), so the top view's tips spread round the
+    circle (§3.4).
+  - The LA, LC, LE, LF and LI bases moved 0.06–0.22. A search found the smallest base move, tips fixed, that keeps
+    every leaf at least 0.04 clear of every stalk and head above z 0.75. Before it, four leaves passed through a stalk.
+
+**Stage 1 acceptance (§4.2).** Measured with the study's masks on both images (`m027.measure()`); every `*_sheet`
+render hides the floor. Each cell is ours / sheet.
+
+| View | W : H | G | S | M | R | M + R | Top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (0, 14) | 1.168 / 1.199 | 55.4 / 54.5 | 17.8 / 19.3 | 17.5 / 17.1 | 9.3 / 9.1 | 26.8 / 26.2 | 0.017 / 0.06 |
+| front_sheet (0, 10) | 1.174 / 1.09 | 55.1 / 53.8 | 18.0 / 18.9 | 17.5 / 18.6 | 9.4 / 8.7 | 26.9 / 27.3 | 0.062 / 0.33 |
+| side_sheet (90, 10) | 0.630 / 0.633 | 52.6 / 56.1 | 16.5 / 12.7 | 19.1 / 21.1 | 11.9 / 10.0 | 31.0 / 31.1 | 0.121 / 0.39 |
+| rear_sheet (180, 10) | 1.103 / 0.977 | 48.6 / 51.9 | 20.0 / 19.2 | 22.4 / 21.6 | 9.0 / 7.3 | 31.4 / 28.9 | – |
+| r34_sheet (152, 12) | 1.020 / 0.826 | 48.5 / 49.1 | 20.9 / 22.0 | 22.6 / 18.6 | 8.0 / 10.3 | 30.6 / 28.9 | – |
+| top_tilt_sheet (0, 75) | 1.622 / 0.976 | 52.0 / 54.0 | S + M 36.9 / 31.5 | – | 11.2 / 14.5 | – | – |
+
+Notes on the table:
+- **front_sheet:** a W : H of about 1.2 was expected (§3.1). The front cell draws the same composition narrower, which
+  is also why its profile error is higher.
+- **rear_sheet:** the profile is not compared, because the sheet's rear heads are not mirrored (§3.2).
+- **r34_sheet:** compared by counts and shares only (decision 9).
+- **top_tilt_sheet:** the W : D miss is accepted (decision 4).
+
+Profile and run details:
+- f34 top profile, ours `.61 .60 .58 .56 .84 .80 .70 .93 .94 .88 .72 .65 .84 .95 1.00 .68 .73 .77 .46 .47 .48`;
+  sheet `.60 .60 .60 .57 .84 .78 .68 .90 .94 .90 .71 .62 .86 .95 1.00 .67 .70 .71 .50 .47 .45`. Three head peaks
+  (f .20 / .40 / .70) with dips of .70 and .65 (sheet .68 / .62).
+- f34 width per height: h .1 0.77 (sheet .74), the h .3 neck 0.65 (.56), h .5 0.73 (.83), h .6 0.83@0.00 (.81@0.00).
+- Green runs at h .55:
+  - f34, 5 runs: LA .02–.17 (0.15 W); H1's stalk .30–.31; LB; the centre leaves with H2's and H3's stalks .43–.61;
+    LG .65–.81;
+  - front_sheet 4, rear 5;
+  - side 3: the front-leaf run is .05–.43, the back-leaf run .72–.91.
+- Rock runs at h .16 in f34: .08–.14 | .22–.36 | .64–.72 (sheet .10–.20 | .21–.35 | .62–.74).
+- Hero size **5.24 × 2.96 × 4.38** (target 5.3 × 2.8 × 4.4, tolerance ± 0.3 / 0.35 / 0.2).
+
+**Leaf face scores.** |n · camera| of each leaf's broad-face normal at mid-length, from the builder. The front and rear
+scores are equal by symmetry.
+
+| Leaf | Front / rear | Side | W (built) | Keel (built) |
+| --- | --- | --- | --- | --- |
+| LA | 0.610 | 0.765 | 0.918 | 0.168 |
+| LB | 0.699 | 0.696 | 0.670 | 0.135 |
+| LC | 0.672 | 0.673 | 0.540 | 0.119 |
+| LD | 0.701 | 0.692 | 0.540 | 0.114 |
+| LE | 0.702 | 0.709 | 0.594 | 0.125 |
+| LF | 0.718 | 0.694 | 0.734 | 0.143 |
+| LG | 0.583 | 0.510 | 0.918 | 0.166 |
+| LH | 0.495 | 0.510 | 0.886 | 0.161 |
+| LI | 0.693 | 0.714 | 0.648 | 0.132 |
+| Part | 0.638 | 0.697 | 0.600 | 0.122 |
+
+- Every score is ≥ 0.49 (target ≥ 0.35, LH ≥ 0.30, floor 0.25), and edge thickness is 0.045 everywhere (≥ 0.035).
+- The built keel (edge plus midrib rises) is 0.11–0.17, above §1.4's 0.06–0.09. The study's two numbers conflict: a
+  150° fold on a leaf 0.6–0.9 wide cannot be 0.09 thick. I kept the fold and the chunky edges because the sheet's
+  leaves read thick.
+
+**Leaf ↔ stalk / head clearance** above z 0.75 (`CLEAR`, computed inside `hero()` before the union): LA 0.048,
+LB 0.201, LC 0.049, LD 0.198, LE 0.050, LF 0.044, LG 0.056, LH 0.122, LI 0.043. None intersect.
+
+## Stage 2 — Optimisation and cleanup
+
+- **Union:** M022's guarded exact union with merge 0 (`_union`: one shell at a time, volume-checked, nudged and
+  retried on a bad result). 21 shells (mound, 5 rocks, 3 stalks, 3 heads, 9 leaves); none retried or left out.
+- **Cleanup after the union**, in order:
+  - `m004.floor_cut` at z 0 (floor faces re-keyed to plain mud, Tint 0.95);
+  - M022's guarded `_clean_mesh`, `_finish` and `_polish`;
+  - `M.fix_bowties`.
+- **Hero guard:** if the fused hero is not one clean shell, every leaf base is jittered 0.02 × attempt and the hero is
+  rebuilt (up to 6 tries). It checks shells, non-manifold edges, bowties, boundary edges, normals, self-intersections
+  and inverted faces. An earlier layout needed attempt 1: two self-intersecting faces where two leaf bases crossed at a
+  grazing angle. The final layout passes on attempt 0.
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / bowtie verts | Boundary | Wire / loose | Zero-area | N-gons | Self-intersecting pairs | Inverted faces | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ReedClumpNode (hero) | **1888** / 4000 | 5.24 × 2.96 × 4.38 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 5.04° |
+| ReedClumpSeedHead | 140 | 0.64 × 0.66 × 1.73 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 15.3° |
+| ReedClumpStalk | 32 | 0.25 × 0.23 × 2.45 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 5.25° |
+| ReedClumpLeafBlade | 122 | 1.10 × 0.49 × 2.34 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 7.68° |
+| ReedClumpMudBase | 158 | 4.12 × 2.54 × 0.84 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 8.95° |
+| ReedClumpRock | 34 | 0.81 × 0.78 × 0.65 | 1 | 0 / 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 | 15.2° |
+
+- **Budget:** each leaf costs more than §4.4's 44 tris because of the split edge lines, which is still within budget.
+- **Transforms and shading:**
+  - the origin is at the bounding-box bottom centre on every object, with rotation 0 and scale 1;
+  - no custom normals, flat shading, no duplicate verts, normals outward;
+  - `K.check` is clean;
+  - 26 orphan meshes and 1 unused material were dropped.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle-based, angle 45°, margin 0.008, min_angle 45°) plus `m012._uv_unfold`.
+
+| Object | Islands | Overlap pairs | Flipped | Min gap | Density (min / median / max) | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- |
+| hero | 288 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.006 |
+| SeedHead | 34 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.000 |
+| Stalk | 8 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.000 |
+| LeafBlade | 5 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.011 |
+| MudBase | 15 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.056 |
+| Rock | 10 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.038 |
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.**
+- **Pass 1:** `m027.calibrate()` runs `K.calibrate` on the dome for 6 iterations. Every key's dome median landed
+  within 6 of its §5.4 target.
+- **Pass 2:** the hero's f34_sheet against the f34 cell, with each family scaled in linear light. The values are in the
+  builder's palette comment.
+
+| Family | f34 median before pass 2 (ours / sheet) | Correction |
+| --- | --- | --- |
+| Leaves | #617325 / #6A8229 | scaled up |
+| Heads | #C18D56 / #C99057 | scaled up |
+| Mud | #715841 / #846549 | scaled up; mud_dark mixing cut back; raised again in pass 2b |
+| Rocks | #7B736C / #83756F | scaled up |
+| Stalk | part #728A2D / #7C9230 | raised in pass 2c |
+
+| Key | Final hex | Calibration target (sheet render) |
+| --- | --- | --- |
+| m027_leaf | #719032 | #7F9A2E |
+| m027_leaf_base | #5E7C2B | #6A862A |
+| m027_leaf_tip | #9DB849 | #ACC144 |
+| m027_stalk | #708734 | #7A9030 |
+| m027_head | #AF8251 | #D69A5D |
+| m027_head_light | #BA8F5E | #E2A86A |
+| m027_nub | #503C23 | #644A2E |
+| m027_mud | #796148 | #826347 |
+| m027_mud_dark | #63503C | #66503B |
+| m027_rock | #736C6A | #8C827B |
+| m027_rock_dark | #5A5657 | #6E6865 |
+
+**Re-measure** (final renders against the sheet, with the study's masks):
+
+| Region | Ours median / lit / shade | Sheet median / lit / shade |
+| --- | --- | --- |
+| f34 green | #6D8529 / #A2C13F / #3E5115 | #6A8229 / #9FB43D / #3E5412 |
+| f34 heads | #CA9258 / #ECAD6D / #6D4F30 | #C99057 / #F2B676 / #986B3F |
+| f34 mud | #846649 / #9B7956 / #413121 | #846549 / #9F7A58 / #5E4B37 |
+| f34 rock | #7F756E / #9C8E84 / #574F4A | #83756F / #AF9E91 / #5E554C |
+
+| Region | Ours | Sheet |
+| --- | --- | --- |
+| Front green / heads / mud / rock (medians) | #6B8429 / #C99158 / #816345 / #7F756E | #688228 / #CC9258 / #86684B / #84776E |
+| Hero nubs (f34) | #67492C | #6C4F33 (`#5B4427`–`#6C4F33`) |
+| Hero H3 stalk box | #55671F | #5E7A2A |
+| Parts shot: head / nub / stalk / mud / rock | #D69C5E / #6B4E31 / #7B9330 / #8F704F / #897D75 | #D1975C / #5B4427 / #7C9230 / #806247 / #8C8078 |
+| Parts shot: leaf, base → tip in fifths | #71952C #7FA230 #8EB436 #9FC33D #B2D446 | #7A952C #87A12E #92AB31 #A8BE40 #A5BA3F |
+
+The f34 heads' lit quartile doesn't clip (#ECAD6D). The nub is about 100 levels darker than the body.
+
+**Blending.** All colour is by position fields, never by facing (`K.check`'s facing check is clean):
+- **Leaves:** a ladder along each leaf's own t, plus ±0.06 broad noise, in 25 % steps: leaf_base → leaf over t
+  0.12–0.42, then leaf → leaf_tip over t 0.58–0.88. LC, LD and LE shift 0.1 toward the base.
+- **Heads:** head → head_light along the body's t, in 25 / 75 % steps. The nub and the part's peg are a hard m027_nub.
+- **Stalks:** plain; the bottom 30 % is 25 % toward leaf_base.
+- **Mud:** quarter steps of mud_dark:
+  - the dish 50 %;
+  - the rim band near a leaf or stalk foot 25 %;
+  - the creases between lumps 25 %;
+  - broad noise patches (scale 0.9, level 0.3) 25 %;
+  - the floor-cut underside is plain mud.
+- **Rocks:** RK1 is rock_dark, the rest rock.
+- **Hard edges** only where two materials meet.
+- **Slots:** the hero uses 21 material slots: mud ×3, rock ×2, stalk ×2, head ×4 (head, its 25 / 75 % mixes and
+  head_light), nub, and leaf ×9 (the base → leaf → tip ladder).
+
+**Tint.** Broad per-piece mottling (`_mottle`: noise patches about 1/scale studs across, never per face):
+
+| Piece | Amp | Scale | Per-piece level |
+| --- | --- | --- | --- |
+| Leaves | 0.03 | 0.5 | ±0.04 |
+| Heads | 0.025 | 0.7 | ±0.04 |
+| Stalks | 0.02 | 0.6 | – |
+| Mud | 0.05 | 0.4 | – |
+| Rocks | 0.04 | 0.8 | 0.97–1.03 per rock |
+
+**Finish:**
+
+| Keys | Roughness | Specular |
+| --- | --- | --- |
+| Leaf and stalk | 0.8 | `FOLIAGE_SPEC` |
+| Heads | 0.85 | default |
+| Nub | 0.9 | default |
+| Mud | 0.95 | 0.25 (`MUD_SPEC`) |
+| Rocks | 0.85 | default |
+
+## Stage 5 — Lighting
+
+Skipped. The sheet shows an ordinary sunlit clump: no emissive key and no light (decision 7).
+
+**Studio note (Requires Manual Validation).** In Studio, check that:
+- the head tops don't clip under the game sun;
+- the leaf base → tip ladder survives the palette export;
+- the 0.25-stud stalks stay visible at normal camera distance.
+
+## Stage 6 — VFX
+
+Skipped. The sheet shows no glow, floating seeds, fluff, water or dust (decision 7). There are no sockets; the renders
+used vfx=True.
+
+## Modeller's notes for the verifier
+
+**Renders.** Every `*_sheet` render hides the studio floor and uses the 3× lens: `f34_sheet (0, 14)`,
+`front_sheet (0, 10)`, `side_sheet (90, 10)`, `rear_sheet (180, 10)`, `r34_sheet (152, 12)` and
+`top_tilt_sheet (0, 75)`. The kit views, the exploded shot and the five part shots at (−20, 15) are rendered as well.
+
+**Tools.** `m027.measure()` runs the study's masks on both images. `m027.compare()` writes `M027_sheet_compare.png`.
+
+**Known misses, measured:**
+1. **The upper halves of LA and LG read darker than the sheet.** The f34 green bands at h .6–.7 are #7E9631 / #7D922E,
+   against the sheet's lightest bands #A2B640 / #B4C750. Neither cause is paint:
+   - LG's upper half sits in H3's head and stalk shadow. The key light runs along (0.49, 0.59, −0.64), and no LG
+     position inside the composition misses it.
+   - LA's axis is almost parallel to the key, so it is grazing-lit whatever its roll.
+
+   The f34 green median and lit and shade quartiles still match within 13.
+2. **The side view's heads share is 16.5 against 12.7.** The sheet hides H1 half behind a leaf tip; ours shows it whole.
+3. **The side view has 3 green runs at h .55 against the sheet's 6.** The broad 45° leaves overlap from the side. The
+   front-leaf run (0.38 W) and back-leaf run (0.19 W) both exceed their targets.
+4. **The rear W : H is 1.103, against the 0.90–1.10 band.** The r34 is 1.02 against 0.75–0.95, but the r34 compares by
+   counts and shares only (decision 9).
+5. **Two parts-shot colours miss:**
+   - the leaf part's tip fifth is #B2D446 against #A5BA3F (G +26), because the tip key was raised for the hero's
+     grazing-lit upper leaves;
+   - the mud part is #8F704F against #806247, although on the hero the mud matches within 3.
+6. **The hero's H3 stalk box reads #55671F against #5E7A2A.** The stalk sits partly in LI's and LG's shade.
+7. **f34 has 5 green runs at h .55, not 6.** H3's stalk run merges with LI's tip.
+8. **The keel is 0.11–0.17**, against §1.4's 0.06–0.09 (see stage 1).
+
+**Accepted by decision:** the top view's W : D is 1.62 against the sheet's 0.98 (decision 4).
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-28. Read-only: background Blender on port 9880 with `wip/M027_verify.blend`, which was
+not saved and on which `build()` was not called. The renders were made fresh with `m027.render_views()` into a
+scratchpad folder, with `M.MODEL_RENDERS` redirected, so nothing under `renders/models/M027/` was overwritten. The mesh
+checks are my own bmesh/BVH code, cross-checked with `M.audit`, `M.uv_stats` and `K.check`. The colours come from my
+own sampler, which uses the study's masks on both images.
+
+**Verdict: FAIL, 6.5 / 10.** The topology, size, UVs and front reads are clean. There are two blockers: the rocks and
+mound read as a flat plank in the back views, and the leaf tips are either too bright or too dark in the hero.
+
+### Technical (re-measured)
+
+| Object | Tris | Size (studs) | Shells | NM edges / bowtie verts | Boundary / wire / loose | Zero-area / n-gons | Self-int. pairs | Inverted / interior faces | Min corner | Dup verts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ReedClumpNode | 1888 / 4000 | 5.245 × 2.960 × 4.376 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 5.04° | 0 |
+| ReedClumpSeedHead | 140 | 0.644 × 0.657 × 1.730 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 15.3° | 0 |
+| ReedClumpStalk | 32 | 0.249 × 0.227 × 2.450 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 5.25° | 0 |
+| ReedClumpLeafBlade | 122 | 1.102 × 0.487 × 2.341 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 7.68° | 0 |
+| ReedClumpMudBase | 158 | 4.122 × 2.539 × 0.842 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 8.95° | 0 |
+| ReedClumpRock | 34 | 0.811 × 0.777 × 0.650 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 / 0 | 15.2° | 0 |
+
+- **Size** is within the decided 5.3 × 2.8 × 4.4 (±0.3 / 0.35 / 0.2) on every axis.
+- **Winding and normals:** winding is consistent (0 edges used twice in one direction), the signed volumes are
+  positive and `M.audit` reports normals outward. Shading is flat, with no custom normals and no modifiers.
+- **Origin and transforms:** the origin is at the bbox bottom centre (offset 0.0000) on all six objects, with rotation
+  0 and scale 1.
+- **UVs:** `UVMap` on every object; 0 overlap pairs, 0 flipped, 0 zero-area; min gap 0.016, border 0.008; density
+  1.0/1.0/1.0. Conformal stretch p95: hero 1.006, mud 1.056.
+- **Materials:**
+  - 21 slots on the hero, none unused.
+  - The keys match `PALETTE`, and the colour comes through the Tint attribute (range 0.945–1.053, broad).
+  - `K.check` is clean.
+  - Correlation of colour with normal z: leaves 0.16, rock 0.01, stalk −0.06.
+  - The heads (+0.85) and mud (−0.54) correlate only because the paint follows position, which is allowed: head_light
+    is on the upper half of the axis, so it lands on the up-facing top chamfer, and the dish is darker, so it lands on
+    the up-facing top. No colour is chosen by facing.
+
+### Leaf face scores (re-measured on the fused hero)
+
+For each leaf-material component, I took the area-weighted |n·d|. Crossing leaves merge into 5 components.
+
+| Component (tip) | Front | Side | Rear | f34 | side_sheet | kit rear34 | kit front34 | top |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LA (−2.62, −1.48, 2.90) | .615 | .714 | .615 | .644 | .745 | **.201** | **.266** | .263 |
+| LB (−1.00, 1.32, 2.82) | .682 | .680 | .682 | .706 | .648 | .821 | .896 | .195 |
+| LC (−0.29, −0.78, 1.88) | .684 | .679 | .684 | .620 | .643 | .374 | .302 | .182 |
+| LD+LE+LF (−0.06, −0.43, 3.18) | .702 | .686 | .702 | .669 | .681 | .886 | .866 | .059 |
+| LG+LH+LI (1.95, 1.48, 3.11) | .566 | .541 | .566 | .672 | .448 | .495 | .704 | .540 |
+
+The decided cameras (front, side, rear) are all ≥ 0.54, so they pass. LA is near edge-on only from the kit
+three-quarter cameras, which are not decision cameras; in the renders it hides behind the fan from rear34 and still
+reads as a blade from front34. The leaves are broad in every sheet view.
+
+### Shapes per view (re-rendered `*_sheet`, floor hidden; ours / sheet)
+
+| View | W:H | G | S | M | R | M+R | Top-profile err mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.168 / 1.199 | 55.4 / 54.5 | 17.8 / 19.3 | 17.5 / 17.1 | 9.3 / 9.1 | 26.8 / 26.2 | .017 / .06 |
+| front | 1.174 / 1.090 | 55.1 / 53.8 | 18.0 / 18.9 | 17.5 / 18.6 | 9.4 / 8.7 | 26.9 / 27.3 | .062 / .33 |
+| side | 0.630 / 0.633 | 52.6 / 56.1 | 16.5 / 12.7 | 19.1 / 21.1 | 11.9 / 10.0 | 31.0 / 31.1 | .121 / .39 |
+| rear | 1.103 / 0.977 | 48.6 / 51.9 | 20.0 / 19.2 | 22.4 / 21.6 | 9.0 / 7.3 | 31.4 / 28.9 | (not compared) |
+| r34 | 1.020 / 0.826 | 48.5 / 49.1 | 20.9 / 22.0 | 22.6 / 18.6 | 8.0 / 10.3 | 30.6 / 28.9 | (counts only) |
+| top_tilt | 1.622 / 0.976 | 52.0 / 54.0 | S+M 36.9 / 31.5 | | 11.2 / 14.5 | | (decision 4) |
+
+- **Heads.** The f34 has three peaks at f .20 / .40 / .70 (.84 / .94 / 1.0), with dips of .70 and .65 against the
+  sheet's .68 / .62. That passes. The heads are 8-sided capsules with chamfers and a dark nub, and they lean outward
+  as on the sheet.
+- **Neck and splay (f34 width per height).**
+
+  | h | .1 | .3 | .4 | .5 | .6 |
+  | --- | --- | --- | --- | --- | --- |
+  | Ours | .77 | .65 | .84 | .73 | .83 |
+  | Sheet | .74 | .56 | .75 | .83 | .81 |
+
+  The neck exists but is 0.02 wider than its band (0.55–0.63). The fan reaches its widest at h .4 instead of h .5–.6,
+  so it splays about 0.1 H too low.
+- **Leaf runs at h .55:** f34 5 against 6; front 4 against 6; side 3 against 6. The leaves are broad, but they overlap
+  more than the sheet's "spacing between leaves".
+- **Side.** The two visible heads cluster at the top (f .35–.6, h .8–1.0). The sheet shows one tall head and a low head
+  half hidden at h .55–.65. The sheet's side is itself inconsistent with its front, so this is a minor.
+- **Rocks and mound.** I measured each rock against the mound mesh: the rock's top z, and the highest mud within 0.8 of
+  its centre.
+
+  | Rock | Top z | Mud nearby | Note |
+  | --- | --- | --- | --- |
+  | RK1 | 0.78 | 0.67 | |
+  | RK2 | 1.04 | 0.69 | |
+  | RK3 | 0.87 | 0.67 | |
+  | RK4 | **0.72** | 0.75 | top below the mud |
+  | RK5 | **0.62** | 0.84 | 0.22 below the rim |
+
+  The spec puts rock tops at z 0.85–1.05, sitting on the rim. Rock runs at h .16: rear 2 against 3, r34 1 against 3,
+  side at .08–.26 / .64–.67 / .91–.94 against .12–.39 / .41–.55 / .80–.91.
+
+### Colours (sampled on both images; ours / sheet, median, with the ΔRGB of the median)
+
+| Region | Ours | Sheet | ΔRGB |
+| --- | --- | --- | --- |
+| f34 leaves overall (G) | #6D8529 | #6A8229 | +3 +3 0 |
+| f34 leaf base band (h .2–.32) | #425717 | #637A22 | −33 −35 −11 |
+| f34 leaf mid band (h .4–.5) | #718A2B | #6C842A | +5 +6 +1 |
+| f34 leaf top band (h .55–.72) | #809932 | #90A739 | −16 −14 −7 |
+| f34 G height bands h .6 / .7 | #7E9631 / #7D922E | #A2B640 / #B4C750 | about −36 / −55 |
+| LA tip | #90A837 | #A6BA43 | −22 −18 −12 |
+| LA mid | #657B24 | #738D2D | −14 −18 −9 |
+| **LG tip** | **#667B25** | **#ACC148** | **−70 −70 −35** |
+| **LH tip** | **#D3F255** (lit #D6F556) | **#9BB13A** | **+56 +65 +27** |
+| Parts-shot leaf fifths | #71942C #7EA230 #8EB436 #A0C43E **#C2E34D** | #7A952C #87A12E #92AB31 #A8BE40 #A5BA3F | tip +29 +41 +14 |
+| H3 stalk (f34) | #55671F | #5E792A | −9 −18 −11 |
+| Parts-shot stalk | #7B9330 | #7C9230 | −1 +1 0 |
+| Heads f34 (v ≥ .5) | #CE965A (lit #EDB06F, shade #976C3F) | #CA9258 (#F2B776, #9B6F44) | +4 +4 +2 |
+| Heads front | #CE955A | #CE945A | 0 +1 0 |
+| Parts-shot head | #D69C5E | #D1975C | +5 +5 +2 |
+| Nubs f34 / part | #664D2E / #6B4E31 | #6C4F34 / #5B4427–#6C4F33 | −6 −2 −6 |
+| Mud f34 | #836548 (lit #9B7956, shade **#413121**) | #846549 (#9F7B58, #5F4C37) | −1 0 −1 (shade −30) |
+| Parts-shot mud | #8F704F | #806247 | +15 +14 +8 |
+| Rock f34 | #7F746D (lit #9B8D84) | #83756F (#AF9E90) | −4 −1 −2 (lit −20) |
+| Parts-shot rock | #897D75 | #8C8078 | −3 −3 −3 |
+| Side / rear (heads, mud, rock, leaf top) | | | all 15–37 darker |
+
+The side and rear darkening comes from the studio rig. Its key light comes from the front, while the sheet lights every
+cell from the camera side. This is not paint, and no fix is asked for it.
+
+### Blockers
+
+1. **The rocks and mound read as a flat plank with studs in the back views** (rear, side, r34). From behind, the mound
+   shows a 0.3-tall vertical side wall with a flat top. RK4's top is below the mud beside it and RK5's is 0.22 below
+   the rim, so both sit on the wall like studs instead of on the rim as on the sheet. Rock runs at h .16 are 2 / 1
+   against the sheet's 3 / 3 in the rear and r34.
+   **Fix (in `m027.py`):**
+   - **Rock placement:** move each rock's centre to 0.92–1.0 × the local mound radius at the rim height. Raise each
+     rock so its top is at z 0.85–1.05 and at least 0.12 above the highest mud within 0.8 of it; RK4 and RK5 most of all.
+   - **Rock size and sinking:** bring RK4 back to × 1.0 and RK5 to × 0.95 (from 0.9 / 0.85). Keep about 35 % of each
+     rock's height sunk into the rim.
+   - **Mound profile:** replace the vertical wall ring `(0.42, 1.02)` with a sloped `(0.38, 0.97)`. Add a little of the
+     lump amplitude to the rim ring as well, so the back silhouette shows rounded lumps (rim z varying ±0.08 between
+     lumps).
+   - **Re-check:** rock runs at h .16, with 3 runs in rear_sheet and r34_sheet. R share within ±4 everywhere: watch the
+     rear, now 9.0 against 7.3.
+2. **The leaf tips don't match the sheet's base → tip gradient in the hero.** Two problems:
+   - LH's tip renders as a near-neon #D3F255, +56 against the sheet. The parts-shot tip fifth is #C2E34D, +29/+41
+     against #A5BA3F. The `m027_leaf_tip` key was raised to compensate for shadowed leaves.
+   - LG's tip is −70 (#667B25 against #ACC148) and LA's is −22. The f34 G bands at h .6–.7 are #7E9631 / #7D922E
+     against the spec gate "within 15 of #B4C750, lightest band".
+
+   **Fix:**
+   - (a) Recalibrate `m027_leaf_tip` on the unshadowed parts shot, so the tip fifth lands within 15 of #A5BA3F. That
+     makes the key about 10–15 % darker in linear light, and LH then lands near the sheet.
+   - (b) For LA and LG only, start the tip ladder earlier: leaf → tip over t 0.40–0.70 instead of 0.58–0.88. This is
+     the same per-leaf position shift the builder already gives LC/LD/LE, not paint by facing.
+   - (c) Move LG's upper half out of H3's cast shadow under the kit key (0.49, 0.59, −0.64). For example, LG's tip
+     +0.25 X and −0.2 Y, or H3's lean 2–3° less toward +X. Keep LG's face score ≥ 0.35 and the H3 stalk run clear.
+   - **Re-check:** LG tip and LA tip within 20 of #ACC148 / #A6BA43; LH tip within 20 of #9BB13A; f34 band h .6 or .7
+     the lightest.
+
+### Minors (record; fix only if cheap)
+
+- **f34 fan:** the neck at h .3 is 0.65 against 0.55–0.63, and the fan is widest at h .4 (0.84 against 0.75) instead of
+  h .5 (0.73 against 0.83). Lifting LA's and LH's mid-length about 0.2 would fix both.
+- **Leaf runs:** green runs at h .55 are f34 5, front 4 and side 3, against 6. The leaves overlap more than the sheet's
+  "spacing between leaves".
+- **Side view:**
+  - the top profile error is mean .12 / max .39: two heads at the top, and the sheet's low half-hidden head is not
+    reproduced. This is a sheet inconsistency, and the hero governs;
+  - S 16.5 against 12.7 (within ±4).
+- **W:H:** the rear is 1.103 against 0.90–1.10. The r34 is 1.02 against 0.75–0.95, but it compares by counts only.
+- **Top view:** the leaf tips cover about 225°, not ≥ 300°, so the back and front-right are empty. This is tied to
+  decision 4.
+- **Exploded shot:** the leaves are posed near edge-on, so they read as thin slivers. The sheet's exploded leaves are
+  broad. Rotate the EXPL leaf copies so their faces point at the camera.
+- **SeedHead part:** L : Ø including the nub and peg is 2.66, against 2.4–2.6.
+- **Mud part shot:** #8F704F against #806247, +15. On the hero the mud matches within 1.
+- **Lighting depth:** the hero's mud shade quartile is −30 (#413121 against #5E4B37) and the rock lit quartile −20,
+  from deeper contact shadows and a weaker bounce than the sheet. This is not paint.
+- **H3 stalk:** −18 G, because it sits in LI's and LG's shade.
+- **Keel:** 0.11–0.17, thicker than §1.4. Already explained by the modeller, and it reads right.
+
+### What passes
+
+- **Topology and technical requirements:** every object is clean on every requirement I re-measured.
+- **Size, budget and parts:** the hero size and budget pass, and all five parts are present and clean.
+- **Leaves:** 9 broad keeled leaves, none edge-on from the front, side or rear.
+- **Heads:** three fat 8-sided heads with nubs, three peaks with real dips, axes matching the sheet.
+- **Front read:** the f34 and front shares are within 1.5 points and the f34 profile is within .06.
+- **Colours:**
+  - the overall medians of the heads, nubs, stalks (part), mud (hero) and rocks are within 6;
+  - the head bottom → top lift is mild, as on the sheet;
+  - no colour by facing.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-28, in a background Blender (bgmcp port 9880, `wip/M027.blend`, saved after the final build).
+Every change is in `m027.py` and commented with "round 2". The final `build()` takes 18.5 s without renders and 38 s
+with them. The hero guard passes on attempt 0, and `problems` is empty.
+
+### Blocker 1: rocks and mound from behind (fixed)
+
+**Mound:**
+- The side ring `(0.42, 1.02)` is now `(0.38, 0.97)`, a slope instead of a wall.
+- The rim ring rises and falls with the lumps (`RIM_LUMP_Z` ±0.08: high on a lump, low in a crease).
+
+**Rock placement** (new `rocks()`), applied to each rock:
+- **Position:** the centre sits on the rim, at `ROCK_RIM_F` 0.96 × the rim ring's radius at the rock's azimuth (found by
+  `_rim_point`).
+- **Height:** the base sits at the surface − 0.35 × the height. The rock is then lifted or lowered so its top lies in
+  z 0.85–1.05 and at least 0.12 above the highest mound vertex within 0.8.
+- **Per-rock overrides** (`ROCK_PLACE`):
+  - RK1: rim fraction 1.0, top 0.92, moved to az 165 (§2.1's back-left). It now shows left of RK2 in the hero, and its
+    foot gives the r34 its third rock run.
+  - RK4: top 0.98.
+  - RK5: rim fraction 1.0, top 0.95. RK4 and RK5 are the rocks nearest the side and rear cameras; lowering them keeps
+    the rear's green share within band.
+- **Sizes:** RK4 is back to §2.1 × 1.0 and RK5 to × 0.95, both × `ROCK_SCALE` 1.1 as before.
+- `build()` now adds a problem whenever a rock's top leaves 0.85–1.05 or sits less than 0.12 above the mud near it.
+
+| Rock | Rim fraction | Top z | Highest mud within 0.8 | Clearance | Sunk (fraction of height under the surface at the centre) |
+| --- | --- | --- | --- | --- | --- |
+| RK1 | 1.0 | 0.92 | 0.77 | 0.149 | 0.60 |
+| RK2 | 0.96 | 1.04 | 0.64 | 0.398 | 0.42 |
+| RK3 | 0.96 | 1.01 | 0.68 | 0.331 | 0.35 |
+| RK4 | 0.96 | 0.98 | 0.74 | 0.236 | 0.50 |
+| RK5 | 1.0 | 0.95 | 0.81 | 0.139 | 0.65 |
+
+RK1 and RK5 sit deeper than 35 % because their tops were lowered. They still stand 0.14–0.15 clear of the mud.
+
+**Rock runs at h .16 (ours / sheet):**
+
+| View | Ours | Sheet |
+| --- | --- | --- |
+| rear_sheet | 3: .20–.30, .56–.66, .84–.93 | 3 |
+| r34_sheet | 3: .28–.41, .70–.82, .97–1.0 | 3 |
+| f34_sheet | 3: .13–.15, .23–.38, .60–.72 | .10–.20, .21–.35, .62–.74 |
+
+- The r34's third run is thin: the far rock (RK1) only just reaches the h .16 row.
+- The side still shows 2 runs against 3.
+
+**R share (ours / sheet, all within ±4):**
+
+| View | Ours | Sheet |
+| --- | --- | --- |
+| f34 | 10.0 | 9.1 |
+| front | 10.2 | 8.7 |
+| side | 12.8 | 10.0 |
+| rear | 9.9 | 7.3 |
+| r34 | 9.1 | 10.3 |
+
+From behind, the rocks now sit on the rim with their tops above it, as on the sheet, not on the wall. The mound still
+reads a little thinner and less lumpy from behind than the sheet's.
+
+### Blocker 2: leaf tips (LH and LG fixed; LA not)
+
+- **(a) Tip key:**
+  - Re-calibrated on the unshadowed parts shot: the tip fifth was #C2E34D against #A5BA3F, so the key is × (0.70, 0.64,
+    0.67) in linear light.
+  - `m027_leaf_tip` goes from #9DB849 to **#85963C**, back near pass 1's dome value #899D41. The cut is about 33 %, not
+    the suggested 10–15 %; that is what the measurement needed.
+  - New helpers: `m027.tips()`, `leaf_tips()` and `leaf_fifths()`.
+- **(b) Ladder:** `LEAF_TIP_BANDS` sets these leaf → tip bands:
+  - LA and LG: 0.40–0.70;
+  - LH: 0.66–1.06, so its very tip is a 75 % mix. The sheet's LH tip, #9BB13A, is darker than the other tips.
+
+  These are position shifts only, like LC/LD/LE's.
+- **(c) LG and H3:** H3's cast shadow is measured by the new `shade()`, which casts rays to the verified studio key
+  (0.492, 0.587, −0.643), and is reported in `build()["shade"]`. It covered 0.65 of LG's upper half and now covers
+  **0.22**.
+  - **LG's tip** moved (2.30, 1.30, 3.05) → (2.40, 0.92, 2.85).
+  - **H3:** foot (0.15, 0.30) → (0.20, 0.30); head bottom (0.82, 0.20, 2.85) → (0.76, 0.24, 2.875). It now leans 12.9°
+    instead of 15.6°, and its head top stays at x 1.11, so the f34 peak is still at f .70.
+  - **Rejected:**
+
+    | Option | LG shade | Why not |
+    | --- | --- | --- |
+    | Tip (2.55, 1.10) | 0.50 | too much shade |
+    | Tip (2.55, 0.75) | 0.10 | the side lost its back leaf (D : H 0.57); the f34 LG tip moved to f .91 |
+    | H3 leaning less about its old foot | | the head peak went to f .65, f34 profile max error 0.43; LI touched S3; an enclosed mud sliver forced a hero retry |
+  - LG face scores: 0.515 minimum, front / rear 0.60.
+  - Clearances above z 0.75 are at least 0.034 everywhere.
+
+**Re-check, f34_sheet tips** (my sampler: the median of the green pixels within 0.06 W of each tip):
+
+| Tip | Ours | Sheet (my sampler) | Verifier's target | Result |
+| --- | --- | --- | --- | --- |
+| LG | #ACBD42 | #B7CA4F | #ACC148 | within 6 of the verifier's target |
+| LH | #A7BD41 | #A7B748 | #9BB13A | +12 / +12 / +7 against the verifier's target |
+| LA | **#7A882D** | #A4B843 | #A6BA43 | **about −43, not fixed** |
+
+**Why LA is not fixed.** Its axis (−0.55, −0.45, 0.70) points almost straight at the studio sun (dot −0.99).
+- The camera-facing side of its tip gets a sun factor of 0.20, against LG 0.99 and LH 0.96.
+- A sweep of LA's face roll, twist and arch at its sheet tip position reached at most 0.29.
+- Reaching 0.40 needs the tip at Y −0.9, which removes the side view's front leaf (sheet Y −1.5).
+- Painting LA brighter would bake the studio sun into the asset, so I left it. It is a lighting difference, not paint
+  or shape.
+
+**Other colour checks:**
+- **f34 green bands h .1–.7:**
+  - ours `#405218 #425818 #54691E #738A2C #7E9431 #A2B43F #AEBF48`;
+  - sheet `#4D6216 #4F661D #5B7225 #6C842A #7E952F #A2B640 #B4C750`.
+
+  The lightest band is h .7, and h .6 / .7 are within 6.
+- **Parts-shot leaf fifths:**
+  - ours `#71952C #7FA230 #8EB436 #97B939 #A9BF42`;
+  - sheet `#7A952C #86A12E #8EA830 #A5BA3D #A5BA3F`.
+
+  The tip is within 5.
+
+### Minors
+
+- **f34 neck (fixed):** LA's arch went 35 → 40 and LH's 25 → 45.
+  - f34 width per height at h .1 / .3 / .4 / .5 / .6: **0.74 / 0.61 / 0.83 / 0.78 / 0.87**, against the sheet's .74 / .56 /
+    .75 / .83 / .81. The neck is now inside 0.55–0.63.
+  - The fan is still widest at h .4 and .6 rather than .5.
+  - LA at 44–50° touches H1's stalk.
+- **Mud (partly fixed):** the mud keys are × 0.93 in linear light (mud #755E45, mud_dark #604D3A).
+  - Hero f34 mud: **#846545** against #846549.
+  - Parts-shot mud: **#8D6E4D** against #806247 (+13; it was +15, and +18 after the sloped ring).
+  - The rest of the gap is the lone part being unshadowed. A part-only Tint would make the exported part darker than the
+    hero's mud, so I didn't add one.
+- **Exploded leaves (fixed):** each leaf copy is turned about Z (at most 40°) to face the camera (`EXPL_FACE`). The
+  area-weighted |n · camera| went from 0.46–0.78 to 0.82–0.90.
+- **Leaf width:** `LEAF_W_SCALE` 1.08 → 1.12. The rocks above the rim had pushed the side and rear green below their
+  bands.
+- **LB's tip:** Y 1.35 → 1.55. This restores the side's back depth once LG came forward: side D : H 0.604, band
+  0.58–0.70.
+
+### Shapes and shares (final; ours / sheet; G / S / M / R)
+
+| View | W : H | G | S | M | R | Profile error mean / max | Runs at h .55 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.154 / 1.199 | 54.4 / 54.5 | 17.9 / 19.3 | 17.6 / 17.1 | 10.0 / 9.1 | .02 / .06 | 5 / 6 |
+| front | 1.165 / 1.09 | 54.0 / 53.8 | 18.1 / 18.9 | 17.7 / 18.6 | 10.2 / 8.7 | .065 / .39 | 5 / 6 |
+| side | 0.604 / 0.633 | 52.9 / 56.1 | 16.6 / 12.7 | 17.8 / 21.1 | 12.8 / 10.0 | .12 / .41 | 3 / 6 |
+| rear | 1.094 / 0.977 | 48.1 / 51.9 | 20.5 / 19.2 | 21.4 / 21.6 | 9.9 / 7.3 | – | 5 / 5 |
+| r34 | 1.00 / 0.826 | 48.3 / 49.1 | 21.0 / 22.0 | 21.5 / 18.6 | 9.1 / 10.3 | – | 5 / 5 |
+
+Every share is within ±4 (r34 ±5). The side's G (−3.2) and S (+3.9) and the rear's G (−3.8) are close to the edge.
+
+### Technical (final)
+
+| Object | Tris | Size (studs) |
+| --- | --- | --- |
+| ReedClumpNode | 2140 / 4000 | 5.26 × 3.00 × 4.42 |
+| ReedClumpSeedHead | 140 | 0.64 × 0.66 × 1.73 |
+| ReedClumpStalk | 32 | 0.25 × 0.23 × 2.45 |
+| ReedClumpLeafBlade | 122 | 1.10 × 0.49 × 2.34 |
+| ReedClumpMudBase | 158 | 4.04 × 2.49 × 0.83 |
+| ReedClumpRock | 34 | 0.81 × 0.78 × 0.65 |
+
+- **Topology:** on all six objects:
+  - 1 shell each;
+  - 0 non-manifold edges and 0 bowtie verts;
+  - 0 boundary, wire or loose elements;
+  - 0 zero-area faces and 0 n-gons;
+  - normals outward;
+  - 0 inverted faces and 0 self-intersecting pairs;
+  - no corner under 5°.
+- **Checks:** `K.check` is clean, and the size is within tolerance.
+- **UVs:** 0 overlaps and 0 flipped; min gap 0.016; density 1.0; hero stretch p95 1.007.
+- **Leaf face scores:** every score is ≥ 0.495. The lowest are LH 0.495 and LG 0.515.
+
+**Final palette:**
+
+| Key | Hex |
+| --- | --- |
+| leaf | #719032 |
+| leaf_base | #5E7C2B |
+| leaf_tip | **#85963C** |
+| stalk | #708734 |
+| head | #AF8251 |
+| head_light | #BA8F5E |
+| nub | #503C23 |
+| mud | **#755E45** |
+| mud_dark | **#604D3A** |
+| rock | #736C6A |
+| rock_dark | #5A5657 |
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not the round-1 verifier and no other stage), 2026-10-29. Read-only: background Blender on port
+9880 with `wip/M027_verify.blend`, not saved, `build()` not called, session stopped at the end. Fresh renders came from
+`m027.render_views()` with `M.MODEL_RENDERS` redirected to my scratchpad, so `renders/models/M027/` was not touched. The
+mesh checks are my own bmesh/BVH code, cross-checked with `M.audit`, `M.uv_stats` and `K.check`.
+
+**Verdict: PASS, 8 / 10.** Both round-1 blockers meet their targets. Everything left is a minor or the accepted LA
+lighting miss.
+
+### Technical (re-measured)
+
+| Object | Tris | Size (studs) | Shells | NM edges / bowtie | Boundary / wire / loose | Zero-area / n-gons | Self-int. | Inverted | Bad winding | Min corner | Dup verts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ReedClumpNode | 2140 / 4000 | 5.262 × 3.005 × 4.415 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 5.01° | 0 |
+| ReedClumpSeedHead | 140 | 0.644 × 0.657 × 1.730 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 15.3° | 0 |
+| ReedClumpStalk | 32 | 0.249 × 0.227 × 2.450 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 5.25° | 0 |
+| ReedClumpLeafBlade | 122 | 1.102 × 0.487 × 2.341 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 7.68° | 0 |
+| ReedClumpMudBase | 158 | 4.042 × 2.490 × 0.828 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 8.95° | 0 |
+| ReedClumpRock | 34 | 0.811 × 0.777 × 0.650 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 15.2° | 0 |
+
+- **Size:** inside 5.3 × 2.8 × 4.4 (±0.3 / ±0.35 / ±0.2) on every axis; D 3.005 is 0.145 inside the limit.
+- **Origin and transforms:** bbox bottom centre at offset 0.0000 on all six; rotation 0, scale 1; no modifiers, no
+  custom normals, flat shading; positive signed volumes, `M.audit` normals outward. `K.check` is clean.
+- **UVs:** `UVMap` on all six; 0 overlaps, 0 flipped; min gap 0.016, border 0.008; density 1.0; hero conformal stretch
+  p95 1.007 (worst 1.082), mud p95 1.031.
+- **Materials:** 21 slots on the hero, none unused. The keys (Mix A, multiplied by the `Tint` corner attribute) read
+  back exactly as the final palette above.
+- **No colouring by facing** (area-weighted correlation of face colour × Tint with normal z; then with height removed):
+  leaves 0.04 (−0.14 after height), rock 0.01, stalk 0.19 (30 faces; 0.15), heads 0.65 → **0.05** after height, mud
+  −0.40 → **−0.06** after height. The head and mud correlations are explained by position (head_light on the upper
+  body, darker dish), which is allowed. The builder's paint and `_mottle` use positions only.
+
+### Leaf face scores (fused hero, area-weighted |n·d| per leaf-material component)
+
+| Component (tip) | Front | Side | Rear | f34 | r34 (152, 12) | Kit front34 | Top |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| LA (−2.63, −1.50, 2.90) | .639 | .746 | .570 | .643 | **.199** | .369 | .256 |
+| LB (−1.01, 1.50, 2.83) | .689 | .654 | .611 | .695 | .798 | .862 | .225 |
+| LC (−0.29, −0.80, 1.88) | .645 | .644 | .707 | .623 | .376 | .343 | .190 |
+| LD+LE+LF (−0.07, −0.45, 3.18) | .673 | .674 | .692 | .659 | .840 | .761 | .092 |
+| LG+LH+LI (2.05, 1.09, 2.93) | .653 | .455 | .493 | .677 | .511 | .746 | .501 |
+
+(An 11-face leaf sliver cut off by a stalk crossing scores .59–.65.) Every decision camera is ≥ 0.455. LA's 0.199
+from the r34 camera is the same as round 1 (0.201): it shows there as a thin blade beside H3's head (minor below).
+
+### Blocker 1 (rocks and mound from behind): fixed
+
+Rock tops and the highest mud vertex within 0.8 of each rock centre (my own component split of the rock material):
+
+| Rock (az) | Centre | Top z | Mud near | Clearance |
+| --- | --- | --- | --- | --- |
+| 22° | (1.16, 0.46) | 0.980 | 0.744 | 0.236 |
+| 116° | (−0.50, 1.04) | 0.950 | 0.811 | 0.139 |
+| 167° | (−1.83, 0.44) | 0.920 | 0.771 | 0.149 |
+| 212° | (−1.16, −0.73) | 1.040 | 0.879 | 0.161 |
+| 320° | (0.76, −0.64) | 1.012 | 0.681 | 0.331 |
+
+- Every top is inside 0.85–1.05 and at least 0.139 clear of the mud (target ≥ 0.12).
+- The mound's back ring is now a slope (radius 0.95–1.28 falling from z 0.83 to 0), not a wall. The rim's highest mud
+  per 15° of azimuth varies 0.62–0.88, so the lumps show in the silhouette.
+- Rock runs at h .16: rear_sheet **3** (.20–.30, .56–.66, .84–.93) against 3; r34_sheet **3** (.28–.41, .70–.82,
+  .97–1.0, the third thin) against 3; f34 3 against 3; side 2 against 3 (minor).
+- R share (ours / sheet): f34 10.0 / 9.1, front 10.2 / 8.7, side 12.8 / 10.0, rear 9.9 / 7.3, r34 9.1 / 10.3. All
+  within ±4.
+- In the rear and r34 renders the rocks sit on the rim with their tops above it; it no longer reads as a plank with
+  studs. The back of the mound is still smoother and flatter-topped than the sheet's (minor).
+
+### Blocker 2 (leaf tips): LG and LH fixed; LA accepted
+
+Tip medians in f34_sheet with `m027.leaf_tips` at three radii (0.035 / 0.06 / 0.09 W), each on both images; the picks
+land at the same positions in both (LA f .00 h .60, LG f .88 h .72, LH f 1.0 h .47):
+
+| Tip | Ours (r .06) | Sheet (r .06) | Round-1 target | Δ to target | Range across radii, ours / sheet |
+| --- | --- | --- | --- | --- | --- |
+| LG | #ACBD42 | #B7CA4F | #ACC148 | 0 −4 −6 | #ABBD42–#ADBE43 / #B7C94D–#B7CA50 |
+| LH | #A7BD41 | #A7B748 | #9BB13A | +12 +12 +7 | #A7BD41–#A7BE42 / #9CB23B–#B4C14F |
+| LA | #7A882D | #A4B843 | #A6BA43 | −44 −50 −22 | stable / #A5B943–#A8BA47 |
+
+- LG and LH are within 20 of their targets (pass). LA is the accepted studio-lighting miss (main-session ruling): its
+  axis points almost straight at the key light, and brightening it would be colouring by facing.
+- f34 green bands h .1–.7, ours `#405218 #425818 #54691E #738A2C #7E9431 #A2B43F #AEBF48`, sheet `#4D6216 #4F661D
+  #5B7225 #6C842A #7E952F #A2B640 #B4C750`. The lightest band is h .7 (−6 −8 −8); h .6 is within 2. The two lowest
+  bands are 12–13 darker (contact shade).
+- Parts-shot leaf fifths, ours `#71952C #7FA230 #8EB436 #97B939 #A9BF42`, sheet `#7A952C #86A12E #8EA830 #A5BA3D
+  #A5BA3F`. The tip fifth is +4 +5 +3; the mid fifth is +6 G and the fourth fifth −14 R.
+- No leaf reads neon any more.
+
+### Shapes per view (fresh `*_sheet` renders; ours / sheet)
+
+| View | W : H | G | S | M | R | Profile err mean / max | Green runs h .55 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.154 / 1.199 | 54.4 / 54.5 | 17.9 / 19.3 | 17.6 / 17.1 | 10.0 / 9.1 | .02 / .06 | 5 / 6 |
+| front | 1.165 / 1.090 | 54.0 / 53.8 | 18.1 / 18.9 | 17.7 / 18.6 | 10.2 / 8.7 | .065 / .39 | 5 / 6 |
+| side | 0.604 / 0.633 | 52.9 / 56.1 | 16.6 / 12.7 | 17.8 / 21.1 | 12.8 / 10.0 | .12 / .41 | 3 / 6 |
+| rear | 1.094 / 0.977 | 48.1 / 51.9 | 20.5 / 19.2 | 21.4 / 21.6 | 9.9 / 7.3 | .175 / .39 | 5 / 5 |
+| r34 | 1.000 / 0.826 | 48.3 / 49.1 | 21.0 / 22.0 | 21.5 / 18.6 | 9.1 / 10.3 | (counts only) | 5 / 5 |
+| top_tilt | 1.654 / 0.976 | 55.3 / 54.0 | 13.9 / 12.9 | 20.9 / 18.6 | 9.8 / 14.5 | (decision 4) | |
+
+- f34 width per height h .1 / .3 / .4 / .5 / .6: ours .74 / .61 / .83 / .78 / .87, sheet .74 / .56 / .75 / .83 / .81.
+  The neck at h .3 is inside 0.55–0.63.
+- Side by side (`M027_sheet_compare.png` regenerated in my scratchpad): the f34 and front match in head count, lean,
+  peaks, leaf fan and rock layout. The side shows two heads at the top, against the sheet's one tall head and a low
+  half-hidden one. The rear and r34 read as the same plant with rocks on the rim.
+
+### Colours (study masks on both images; median, ours / sheet, ΔRGB)
+
+| Region | Ours | Sheet | ΔRGB |
+| --- | --- | --- | --- |
+| f34 G (median / lit / shade) | #70862B / #A0BF3E / #3E5115 | #6A8229 / #9FB43D / #3E5412 | +6 +4 +2 / +1 +11 +1 / 0 −3 +3 |
+| f34 heads | #C99258 / #EBAE6E / #6F5030 | #C99057 / #F2B676 / #986B3F | 0 +2 +1 / −7 −8 −8 / −41 −27 −15 |
+| f34 mud | #846545 / #967552 / #443423 | #846549 / #9F7A58 / #5E4B37 | 0 0 −4 / −9 −5 −6 / −26 −23 −20 |
+| f34 rock | #7E746D / #9B8E84 / #4F4946 | #83756F / #AF9E91 / #5E554C | −5 −1 −2 / −20 −16 −13 / −15 −12 −6 |
+| front G / heads / mud / rock | #70852A / #C99158 / #836445 / #7E746D | #688228 / #CC9258 / #86684B / #84776E | +8 +3 +2 / −3 −1 0 / −3 −4 −6 / −6 −3 −1 |
+| side G / heads / mud / rock | #5E7725 / #9B7045 / #65503A / #706865 | #6F8729 / #C38A52 / #86684A / #87776E | −17 −16 −4 / −40 −26 −13 / −33 −24 −16 / −23 −15 −9 |
+| rear G / heads / mud / rock | #5D7824 / #BC8A56 / #6C553C / #706865 | #698327 / #CE9359 / #896A4C / #837469 | −12 −11 −3 / −18 −9 −3 / −29 −21 −16 / −19 −12 −4 |
+| Part head / stalk / mud / rock | #DA9C5E / #7B9330 / #8D6E4D / #897D75 | #D0955A / #7C9431 / #806247 / #8F857E | +10 +7 +4 / −1 −1 −1 / +13 +12 +6 / −6 −8 −9 |
+
+The f34 and front medians are all within 8. The side and rear are 10–40 darker because the studio key comes from the
+front while the sheet lights every cell from the camera side. That is lighting, not paint, as in round 1.
+
+### Items
+
+Blockers: **none.**
+
+Minors (record; none needs a fix before commit):
+1. **LA tip −44 / −50 / −22 in the hero** (#7A882D against #A6BA43). Accepted by the main session as a studio-lighting
+   miss; no paint change.
+2. **LA face score 0.199 from the r34 camera** (decision 10's hard floor is 0.25). It shows as a thin blade beside H3's
+   head in r34_sheet; the r34 compares by counts and shares only. If ever wanted: roll LA's face 10–15° toward +X
+   about its axis and re-check the front and side scores.
+3. **Rear mound still a little smooth and flat-topped** against the sheet's lumpier back, and the side shows 2 rock runs
+   against 3.
+4. **Side view:** two heads at the top against the sheet's tall head plus a low half-hidden one; S 16.6 against 12.7;
+   3 green runs against 6. This is a sheet inconsistency (the hero governs).
+5. **Leaf runs at h .55:** 5 against 6 in the f34 and front. The leaves are broader and overlap more than the sheet's
+   "spacing between leaves".
+6. **f34 fan** is widest at h .4 and .6 (0.83 / 0.87) rather than h .5 (0.78 against 0.83).
+7. **W : H:** rear 1.094 (inside 0.90–1.10 by 0.006); r34 1.00 against 0.826 (counts only); top 1.65 (decision 4).
+8. **Parts-shot colours:** mud +13 (the unshadowed lone part; the hero's mud matches within 4); head +10.
+9. **Lighting depth:** the f34 shade quartiles of the heads (−41 R), mud (−26) and rock lit quartile (−20) are darker
+   than the sheet, from deeper contact shadow and weaker bounce. Not paint.
+10. **Lowest two f34 green bands** 12–13 darker than the sheet (contact shade at the leaf bases).
