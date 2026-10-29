@@ -796,3 +796,765 @@ All recommendations are accepted:
 10. Names as above; keys `m032_*`.
 
 The cliff is one continuous ridge of distinct big flat-faced columns (each face at least 1.2 × 2.5 studs, at least 60 % flat tops), not a rock pile.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m032.py`, `build()` (fixed seeds; about 31 s without renders, 54 s with every render in a
+fresh background Blender). Build frame as §1.1; final tile bbox **32.20 × 25.89 × 16.06** (ridge turf 10.4, pines to
+about 16), origin at the bbox bottom centre.
+
+**Parts** (each its own function, checked against its exploded cell; `part_*.png`, `exploded.png`):
+- `grass_slab()` → GrassTop: a constrained-Delaunay slab over the `RIDGE` outline, top 10.4 (stepping to 9.7 at the left
+  end, C0) with ±0.05 jitter, 1.05 thick; its side band is green turf (top 0.62) over a brown soil line; the sand path
+  is a constraint region of the top. The pines, bushes, daisies and yellow flowers are added after the cleanup (below).
+- `beach()` → SandStrip: a slab between the waterline and a line hidden inside the columns, z 1.0 at the waterline
+  rising (smoothstep over 2.6 studs) to 1.8 at the cliff foot, its seaward wall straight down to below the ground.
+- `column()` → RockSlope: fat flat-faced columns = the convex hull of a foot ring and a shoulder ring (8-sided
+  superellipse, exponent 0.8; taper 1.04 → 0.96; the shoulder ring twisted up to ±7° and jittered ±0.35 in z, so each
+  side is one big facet of two triangles with slightly different normals), then one chamfer (inset 0.38, or 0.095 × the
+  smaller footprint side; down 0.42) to a flat top ring. 44 tris (front, 8 sides) / 38 tris (back, 7 sides).
+  RockSlope = C0, C1, C1b, C2, C3a, C3b, C4, C5, C6 + L1, W2, W3, unioned.
+- `bed()` + `water()` → WaterPlane; `foam()` → Foam (stage 6 and the water notes below).
+
+**Hero** `ShorelineCorner` (decision 9): one land shell = bed (top 0.2) + beach + ridge core (the ridge outline inset
+0.3, up into the slab) + 9 front and 8 back columns (C0–C6 with C1b; CL, BK1–BK4, BK6–BK8) + grass slab + 2 low boxes
+(tan box, grass cap slab) + 11 boulders (convex hulls; W1 on 7/7/6/4 rings, the rest 6/6/5/3 or 5/5/4/2) + 3 pebbles +
+3 lawn rocks: exact unions one shell at a time with merge 0 (m026 `_union_fine`), then a floor cut at z 0. Then, on the
+finished land: 3 pines (trunk + three drooping 5-point star tiers stacked so that no piece touches another: the lower
+tiers are frustums whose flat caps stop 0.1 under the next tier's skirt) and the bushes, daisies and yellow flowers as
+separate closed shells set 0.05 above the land by ray casts. A BVH guard checks every piece against the land, the pines
+and every plant already placed; a leaf that would touch is tried shorter and steeper, then dropped (4 of 79 dropped).
+Then the water and foam shells.
+
+**Layout against the sheet.** The study's §2 polylines were not self-consistent at e 32: the hero's column tops, feet,
+waterline and beach heights cannot all be met by one orthographic plan with a 10.4 ridge. So the plan was refitted on
+the `f34_sheet` render:
+- the column tops by projecting each column's top corners into the render's silhouette frame (C1 h .48, C0 .52, C2 and
+  C3 stepping up, C4 .78);
+- the ridge's back edge to the top profile;
+- the coast pushed back on the diagonal so the water reaches higher on screen;
+- the ridge's right end stepped down (C5 9.4, C6 7.0);
+- the water's right edge cut at Y 8.1 (the hero's right edge reads h .49–.52), so the back-right corner is empty like
+  the back-left and front-left corners (decision 2).
+
+| View | W : H sheet / ours | top profile error mean / max | bottom error mean / max |
+| --- | --- | --- | --- |
+| f34_sheet (0, 32) | 1.455 / 1.401 | .056 / .28 (the max is at f 1.0: the lens's perspective makes the front-right corner the right-most pixel) | .013 / .05 |
+| front_sheet (0, 26) | 1.539 / 1.459 | .080 / .30 | .008 / .03 |
+| r34_sheet (180, 30) | 1.476 / 1.391 | .085 / .28 | .065 / .28 |
+| rear_sheet (180, 18) | 1.482 / 1.533 | .191 / .35 | .087 / .31 |
+| side_sheet (90, 12) | 1.201 / 1.267 | .164 / .57 | .020 / .11 |
+| top_sheet (0, 89) | 1.253 / 1.205 | n/a | n/a |
+
+f34 top profile, sheet / ours, every .05 f: .29/.26 .46/.43 .57/.63 .61/.67 .63/.71 .79/.82 .78/.78 .75/.82 .82/.85
+.83/.87 .97/.95 .91/.95 .86/.93 .90/.91 .90/.90 .83/.90 .81/.86 .70/.75 .67/.52 .52/.53 .49/.21.
+f34 bottom profile, ours: .23 .14 .13 .09 .09 .05 0 … 0 .04 .08 .13 (sheet .22 .19 .17 .13 .10 .07 .04 .01 0 … .02 .07 .11).
+
+Shares in %, G vegetation / D soil / S sand / R rock / W water / F foam:
+
+| View | sheet | ours |
+| --- | --- | --- |
+| f34 | 26.2 / 1.6 / 8.6 / 37.6 / 19.6 / 2.2 | 20.2 / 3.8 / 6.7 / 47.7 / 15.1 / 1.5 |
+| front | 26.0 / 2.1 / 5.3 / 40.1 / 16.3 / 2.4 | 19.3 / 3.8 / 6.4 / 50.3 / 14.0 / 1.4 |
+| r34 | 27.5 / 1.5 / 1.8 / 47.2 / 15.0 / 1.9 | 23.3 / 3.9 / 1.8 / 62.0 / 6.7 / 0.8 |
+| rear | 26.3 / 1.8 / 2.3 / 57.5 / 4.4 / 1.2 | 19.4 / 4.7 / 1.5 / 68.3 / 3.6 / 1.0 |
+| side | 16.6 / 0.4 / 0.1 / 53.5 / 16.5 / 2.3 | 13.8 / 2.8 / 3.4 / 60.3 / 14.9 / 1.1 |
+| top | 36.5 / 1.2 / 10.3 / 9.4 / 34.5 / 4.5 | 28.9 / 0.2 / 6.6 / 34.8 / 20.4 / 2.3 |
+
+**Column faces** (before the union; the smallest foot / shoulder ring edge; the side faces are 4.8–9.3 tall above the
+beach or ground): C0 1.59 / 1.46, C1 1.77 / 1.61, C2 1.36 / 1.35, C3a 1.43 / 1.22, C4 1.34 / 1.30, BK1–BK7 1.32–1.88.
+The small columns the study sized 3.0–3.6 wide (C1b, C3b, C5, C6, CL, BK8) reach 0.96–1.17 with 8 sides.
+**Flat tops** (area within 10° of horizontal over all up-facing area): 0.66–0.74 on every column.
+
+## Stage 2 — Optimisation and cleanup
+
+- **Tris:** hero **3886** (land 2438; vegetation 804 in 93 shells; water 296; foam 348 in 7 shells). Parts: GrassTop 750,
+  SandStrip 194, RockSlope 714, WaterPlane 412, Foam 348 (all under 1000).
+- **Shells (hero):** 1 land, 93 vegetation, 1 water, 7 foam (the ribbon's pieces between boulder holes, two boulder rings,
+  blobs). Every shell has 0 non-manifold edges, 0 non-manifold (bowtie) verts and 0 boundary edges. The audit also
+  shows 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 duplicate verts, normals outward and transforms applied.
+- **Self-intersections:** 0 on the hero and every part.
+  - The water's shore edge stands 0.09 off the beach's waterline wall, and its bottom 0.06 over the bed.
+  - Every boulder is cut out of the water and foam by a 2D hole 0.09 outside its section below z 1.2.
+  - The foam (z 1.03–1.11) is 0.03 over the water.
+  - The vegetation guard (stage 1) keeps every plant shell clear.
+- **Cleanup chain:** union → floor cut → weld → ears → pockets → m026's guarded desliver → a guarded needle collapse and
+  cap flip (`_force_guarded`: each collapse is refused if it makes a face cross another, and the whole pass is undone
+  if it still folds) → finish → polish. The plain m012 `_force_slivers` folded the surface in 1–5 places on this model,
+  so it now runs only in guarded batches.
+- **Faces under 5°:** 8 on the hero, all in one place (the core wall in the notch between C1b and C2, near (−4.2, −3.5):
+  tall 9-stud strips where the column unions meet), and 3 on RockSlope; 0 on every other part. The water's and foam's
+  2D triangulations are tidied (crowded points merged, straight boundary runs thinned, beauty fill, 2D bowties split
+  before extrusion); their walls are planar quads.
+- **Collision:** hero `precise` (a walkable terrain tile, not one hull); land parts `hull`; WaterPlane and Foam `none`
+  (water pieces never collide anyway).
+
+## Stage 3 — UV
+
+Angle-based unwrap of Smart UV islands (`M.smart_uv`, margin 0.008), then m012 `_uv_unfold`:
+- hero: 950 islands, 0 overlaps, 0 flipped, minimum gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch
+  p95 1.011;
+- every part: 0 overlaps, 0 flipped, p95 ≤ 1.016.
+
+The exporter writes its own palette UVs, and box-projected UVs for the water.
+
+## Stage 4 — Materials, colour, texture
+
+**Pass 1** (K.calibrate on the dome; targets are the unshadowed rendered regions of §5.4). Key → rendered (target):
+- grass `#88A900` → 167,205,5 (#A7CE09);
+- leaf `#347909` → 58,142,11 (#3A8E0C);
+- pine `#055D2D` → 10,106,45 (#07692D);
+- bark `#573300`;
+- pollen `#B5A51A` → 229,202,48 (#E6CA2F);
+- petal `#C8C8C4`;
+- soil `#936F39` → 185,134,68 (#B98745);
+- soil_dark `#765424` → 147,102,49 (#936631);
+- rock `#8C8085` → 176,156,155 (#B19C9A);
+- sand `#DEA872`, sand_light `#E7B787`.
+
+**Pass 2** (`f34_sheet` medians with the study masks):
+- rock → `#A89AA1`: the hero's R median went from #988686 to **#B9A4A4** (sheet #B6A1A3). Lit faces are warm and shade
+  faces cool, from the light.
+- leaf → `#2C7A10`.
+- soil → `#A8804A` (the shaded sides were reading as dark soil).
+- sand → `#F0C47E`, sand_light `#F6D695`.
+- water → `#00C8F4` over a bed `#054F6C`: the water median went from #26EBFF to **#25D8FF** (sheet #05DBFE).
+
+Final f34 medians against the sheet:
+- G #779E0F (sheet #58A70A, whose G includes far more dark bush and pine);
+- S #D6AA6A (sheet #FAD58E): much of our visible sand is in the columns' shadow or seen at a grazing angle; the keys
+  render #FFCE83 when lit;
+- F #CCFFFF (#DEFAFD);
+- D #6F5334 (#885E2F).
+
+**Painting** (by position only, never facing; 25 / 50 / 75 % `mix_key` steps, `STEPS = 4`):
+- **Lawn:** broad noise patches (scale 0.18) 25 % toward the bush green. The path is a hard sand region. The slab's side
+  band is turf above `grass_z − 0.62` and soil below (two real materials, hard edge).
+- **Beach:** within 1.2 of the cliff foot, 25 % toward dark soil (contact). The open beach is 0 / 25 / 50 % toward light
+  sand by its distance from the waterline and the foot. The seaward wall takes the bed colour (submerged).
+- **Columns:** a per-column Tint of ×0.95–1.05, plus broad mottling (amp 0.04, scale 0.5). The front columns' foot band
+  (below z 2.2) is 25 % toward dark soil. The ridge core, seen only in the creases, is 50 % rock / dark soil.
+- **Boulders standing in the water:** the bed colour below z 0.98 (hard edge, submerged), rock above, with a per-boulder
+  Tint.
+- **Underside (the floor-cut cap):** dark soil (`#936631`, close-up 2).
+- **Tint mottling:** lawn 0.04, beach 0.03, and the rocks and boxes. None on water and foam (the exporter textures water).
+
+**Shading check.** The kit groups sand, tan soil and dark soil as one family and flags the sand tops against the soil
+sides and underside (corr 0.88 on the hero). These are the sheet's own material regions: the exploded sand strip, the
+tan slab sides, and the brown underside close-up. So the hero, GrassTop and SandStrip carry `kit_shading_ok` with that
+reason (`SHADING_OK`).
+
+## Stage 5 — Lighting
+
+Skipped by decision 8: nothing on the sheet glows, so there is no emissive key and no light.
+
+The water (`m032_water`, `kit_transparency` 0.3) and foam (`m032_water_foam`, 0.1) are see-through water pieces:
+SmoothPlastic, the kit water texture, no collision, no shadow.
+
+**Studio checks:**
+- the water's cyan and the foam's opacity through the exported texture;
+- that the dark bed under the water reads as depth, not as a hard edge at the tile border;
+- the rock's warmth and the lawn lime under the game sun.
+
+## Stage 6 — VFX
+
+8 `water_foam` sockets (`FX`):
+- five along the waterline at z 1.05 (scale 0.65–0.75);
+- one per boulder standing in the water (W1 1.0, W4 0.6, W6 0.8).
+
+Export check on the wip file (`--sheet M032 --out <scratch>`, never into `art/roblox/kit/`): **STATS M032: 6 assets, 9
+pieces (5 solid, 4 water, 0 glow), 8 vfx sockets, 0 problems**. The hero exports as 1 solid piece plus **2 water
+pieces** (`m032_water` 0.3, `m032_water_foam` 0.1) and carries the 8 sockets.
+
+## Modeller's notes for the verifier
+
+- **Cameras:**
+  - `f34_sheet (0,32)`, `front_sheet (0,26)`, `r34_sheet (180,30)`, `rear_sheet (180,18)`, `side_sheet (90,12)` and
+    `top_sheet (0,89)`, all with a 3× lens and the studio floor hidden;
+  - close-ups `junc_cu`, `water_cu` and `under_cu`, plus `exploded` and `part_*`.
+
+  `m032.measure()` gives every number above with the study's masks.
+- **Known misses, measured:**
+  - In f34 and front, rock is about 10 points high and vegetation about 6 low. The 10.4 cliff at e 32 stands taller on
+    screen than the sheet draws its middle columns, whose feet sit far up the beach; the sheet is not one consistent
+    orthographic model.
+  - Water is 15.1 against 19.6 in f34 (4.5 low).
+  - The r34 and rear show more back-cliff rock and less water than the sheet.
+  - The side cell shows the whole diagonal ridge. The sheet draws only its right end, which is inconsistent with C1
+    standing at the front-left in the hero.
+  - The top view shows the column tops and a narrower lawn (decision 2, §3.4).
+  - The small columns (sized 3.0–3.6 by the study) have 8 faces 1.0–1.17 wide.
+- **Needles:** 8 remain on the hero, all in one notch near (−4.2, −3.5) (core wall strips between C1b and C2), and 3 on
+  RockSlope.
+- **Vegetation** is separate shells (decision 9) standing 0.05 above the land. A guard keeps every shell clear of
+  everything else, so 4 leaves are dropped where bushes crowd the pines.
+- **Water preview:** the rebuild repaints the kit water preview texture when the water key changes
+  (`_refresh_water_texture`).
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier, read-only on `wip/M032_verify.blend` (port 9881). Every number below was re-measured through the MCP. The
+renders went to the scratchpad (`m032_verify/r/M032/`, with `M.MODEL_RENDERS` redirected in the session). The same
+`m032.render_views` cameras and `m032.measure()` masks were used. Nothing was saved, built or exported.
+
+### Measured
+
+| Check | Hero | GrassTop | SandStrip | RockSlope | WaterPlane | Foam |
+| --- | --- | --- | --- | --- | --- | --- |
+| Tris (budget) | 3886 (4000) | 750 (1000) | 194 | 714 | 412 | 348 |
+| Size (studs) | 32.20 × 25.89 × 16.06 | 22.1 × 17.0 × 7.4 | 19.8 × 21.3 × 1.8 | 25.1 × 20.9 × 9.8 | 22.3 × 21.4 × 1.3 | 17.7 × 21.3 × 0.08 |
+| Shells | 102 (land 1, veg 93, water 1, foam 7) | 57 | 1 | 2 | 2 | 7 |
+| Non-manifold edges / verts (bowties), boundary, wire, loose, zero-area, n-gons, dup verts | 0 each | 0 | 0 | 0 | 0 | 0 |
+| Self-intersections (BVH, non-adjacent face pairs) | 0 | 0 | 0 | 0 | 0 | 0 |
+| Triangles with a corner < 5° | 8 land (all in the C1b/C2 notch at about (−4.1, −3.1), z 2–5.4, plus one on the floor cap at (−5.4, −3.7)) + 102 foam walls | 0 | 0 | 3 | 0 | 102 (foam walls) |
+| Normals / origin / transforms | outward / bottom centre / applied | ok | ok | ok | ok | ok |
+| UV | 950 islands, 0 overlaps, 0 flipped, gap 0.016, p95 stretch 1.011 | 0 overlaps | 0 | 0 | 0 | 0 |
+| `K.check` | no problems | – | – | – | – | – |
+
+- **Per-shell closure (`shells_report`):** land 2438 tris, veg 804, water 296, foam 348; 0 non-manifold, bowtie or
+  boundary on every shell.
+- **Separation:**
+  - water to land: min 0.060, no BVH overlap;
+  - foam to water: 0.030 (the foam is z 1.03–1.11 over water 0.26–1.00);
+  - foam to land: min **0.019** at (12.6, 8.4), no overlap;
+  - veg to land: 0.030, no overlap.
+- **Levels:** turf 10.42 max, bed 0.2, water top 1.0, foam 1.03–1.11. The water top is 167 studs²; the foam top is
+  37 studs² in 7 pieces (16.1 and 10.8 for the ribbon, 3.8 and 3.6 for the rings, then blobs).
+- **Grass slab against column tops (plan, build frame):**
+  - grass top (turf faces above z 8): **115 studs²**;
+  - exposed rock tops (rock faces with n.z > 0.5 above z 6.5): **148 studs²**;
+  - per column, exposed top against footprint: C0 14.4/16.5, C1 16.1/20.0, C2 10.7/14.5, C3a 11.4/14.5, C4 9.2/15.1,
+    BK2 10.9/15.1, BK3 9.6/15.7, BK4 8.2/14.9, BK6 10.4/15.8. That is **60–90 % of every column top exposed**, beside
+    the slab rather than under it.
+
+**Screen shares and profiles** (`m032.measure()`; G / D / S / R / W / F %, sheet → ours; tolerance ±4, S/F/D ±2):
+
+| View | W : H | G | D | S | R | W | F | top err mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet | 1.455 / 1.401 | 26.2 / **20.2** | 1.6 / **3.8** | 8.6 / 6.7 | 37.6 / **47.7** | 19.6 / **15.1** | 2.2 / 1.5 | .056 / .28 |
+| front_sheet | 1.539 / 1.459 | 26.0 / **19.3** | 2.1 / 3.8 | 5.3 / 6.4 | 40.1 / **50.3** | 16.3 / 14.0 | 2.4 / 1.4 | .080 / .30 |
+| r34_sheet | 1.476 / 1.391 | 27.5 / **23.3** | 1.5 / **3.9** | 1.8 / 1.8 | 47.2 / **62.0** | 15.0 / **6.7** | 1.9 / 1.1 | .085 / .28 |
+| rear_sheet | 1.482 / 1.533 | 26.3 / **19.4** | 1.8 / **4.7** | 2.3 / 1.5 | 57.5 / **68.3** | 4.4 / 3.6 | 1.2 / 1.0 | .191 / .35 |
+| side_sheet | 1.201 / 1.267 | 16.6 / 13.8 | 0.4 / **2.8** | 0.1 / **3.4** | 53.4 / **60.3** | 16.5 / 14.9 | 2.3 / 1.1 | .164 / .57 |
+| top_sheet | 1.253 / 1.205 | 36.5 / **28.9** | 1.2 / 0.2 | 10.3 / **6.6** | 9.4 / **34.8** | 34.5 / **20.4** | 4.5 / 2.3 | – |
+
+**Where the extra rock sits** (f34, rock's highest screen row per 0.1 f band, sheet → ours):
+- f .15: .51 → .69
+- f .25: .43 → .77
+- f .35: .51 → .83
+- f .45: .53 → .86
+- f .65: .72 → .91
+
+C1's own bevelled top reads at h ≈ .48 (sheet .44–.49), so the **cliff height is right**. The extra rock is the exposed
+octagonal tops of the front and back column rows, showing beside and behind a narrow grass strip.
+
+**Colour** (medians with the study masks, sheet → ours):
+
+| Region | f34 | Other views and parts |
+| --- | --- | --- |
+| Lawn | #9FC904 → #99BF0A | top #9EC803 → #A8CF05; parts shot #A7CE09 → #A4C909 |
+| Bush leaves | #1B5A03 → #359013 (lighter) | – |
+| Pine | #07692D → #096129 | share 4.1 → 1.4 % |
+| Sand, all | #FAD58E → #D6AA6A | – |
+| Sand, lit (v > .9) | #FCE59E → #FFD481 (s .37 → .49) | sand strip part #FBCF83 → #FFD17D |
+| Rock median | #B6A1A3 → #B9A4A4 | – |
+| Rock, lit faces | h 17°, s .09 → h 355°, s .11 | the key #A89AA1 is h 330° |
+| Rock, cool shade (h 200–290) | 7.9 % → 0.1 % | – |
+| Water | #05DBFE → #25D8FF | – |
+| Foam | #DEFAFD → #CDFFFF | – |
+| Dark soil D | #885E2F → #6F5334 | – |
+
+**Shading by facing:** correlation of colour brightness with how much a face points up, per family on the hero:
+
+| Family | Correlation | Area |
+| --- | --- | --- |
+| sand keys only | 0.05 | – |
+| rock keys | 0.18 | – |
+| grass keys | −0.01 | – |
+| soil keys | 0.88 | `soil_dark` 578 studs², all n.z = −1 (the floor-cut cap); `soil` 79 studs², mean n.z −0.2 (side bands) |
+
+The kit's 0.87 comes only from sand tops sitting against the tan soil band and the brown underside.
+
+### Findings
+
+1. **blocker: the grass top does not rest on the columns, so the cliff dominates every view.**
+   - **What is wrong.** The sheet's defining read is a broad lime grass top that sits on the columns' flat tops. Close-up
+     1 says "Flat joining surface between rock and top piece". The top view shows grass over the whole land, with rock
+     only on the shore boulders (R 9.4 %). Ours is a narrow S-shaped turf strip (115 studs²) ringed on both sides by
+     exposed grey octagonal column tops (148 studs²).
+     - In `junc_cu`, the C2/C3a tops stand clear of the slab, a step below it and in front of it, with the brown core
+       showing between them.
+     - In `top_sheet`, the land reads as a necklace of octagons.
+     - In f34, front, rear and r34, the column tops behind the strip add rock where the sheet shows lawn.
+   - **How far off.** Rock is over tolerance in every view: +10.1 (f34), +10.2 (front), +14.8 (r34), +10.8 (rear) and
+     +25.4 (top) points. Vegetation is under in every view: −6.0, −6.7, −4.2, −6.9 and −7.6.
+   - **Verdict.** The cliff height itself matches (C1 top h .48 against .44–.49), so this is not a ridge-height problem.
+     It is the slab's footprint and how the columns join it. The read now is "a column massif with a grass strip on
+     top", not "a grassy riverbank corner over a cliff".
+   - **Fix targets:**
+     - **Widen the slab over the columns.** Make `RIDGE` the outer hull of the front and back column tops. The front rim
+       runs about 0.6 inside each front column's seaward top edge, so only a bevel strip ≤ 1.0 stud of C0–C6 shows on
+       the seaward side, like C1's grey bevel on the sheet. The back edge runs ≤ 0.6 inside each back column's outer top
+       edge. Keep the 45° plan, the empty corners (decision 2) and the 10.4 turf (9.7 at C0).
+     - **Seat the columns under the slab.** Put every column top inside the slab's soil band: top z between
+       `grass_z − 1.05` and `grass_z − 0.62`, so the union swallows the top and the bevel under the turf and the turf
+       lip overhangs 0.2–0.4. C0 goes to about 8.7–9.0. The back row goes to 9.4–9.7 under the 10.4 turf; BK2–BK7 are
+       now 9.4–9.7 but sit outside the slab.
+     - **Plan targets:**
+       - grass top ≥ 200 studs² (now 115);
+       - exposed rock tops (n.z > 0.5, z > 6.5) ≤ 50 studs² (now 148);
+       - each column's exposed top ≤ 30 % of its footprint (now 60–90 %).
+     - **Screen targets:**
+       - f34: R ≤ 41.6, G ≥ 22.2;
+       - front: R ≤ 44.1, G ≥ 22.0;
+       - r34: R ≤ 51.2;
+       - rear: R ≤ 61.5, G ≥ 22.3;
+       - top: R ≤ 15, G ≥ 32;
+       - f34 rock-top row at f .25 / .35 / .45 ≤ .55 / .57 / .59 (now .77 / .83 / .86).
+     - **Budget (stays under 4000).** The swallowed top and bevel rings free about 15 tris per column, about 250 over 17
+       columns. A larger slab cap at spacing 2.0 costs about +120. Spend the net of about +130 on vegetation:
+       - pine crowns wider: P2 Ø 3.6, P1 Ø 3.0, a fourth tier on P1 and P2 (about +40);
+       - 2–3 more fan bushes on the new rim and the back edge (about +90);
+       - f34 pine share ≥ 2.5 % (now 1.4; sheet 4.1).
+     - Hero ≤ 3950 tris.
+2. **minor: water is a little low in the hero and r34.** f34 W 15.1 (sheet 19.6, −4.5); r34 6.7 (15.0). Target: f34 W
+   ≥ 16. Move the waterline 0.5–1.0 stud landward between X 0 and 8, without narrowing the beach below 3 studs.
+3. **minor: the beach sand is more orange and less pale than the sheet.**
+   - The lit beach renders #FFD481 (s .49); the sheet's open beach is #FCE59E (s .37).
+   - The low S median (#D6AA6A) is mostly the cliff's shadow on the beach. The strip part matches (#FFD17D against
+     #FBCF83).
+   - Target: open beach more than 1.5 from the foot at 50 % `sand_light` (now 25 %), with `sand_light` re-calibrated so
+     the lit beach renders #FCE59E ± 12.
+4. **minor: the rock is slightly pink.**
+   - The key #A89AA1 is h 330°, so the lit faces render h 355°. The sheet's lit rock is h 15–20°, warm.
+   - Target: a key hue of 10–20° (about #A89B96). Re-calibrate so the f34 R median stays #B6A1A3 ± 10 and the lit-face
+     hue is ≥ 5°.
+5. **minor: small columns break the 1.2-stud face rule (decision summary).**
+   - C1b, C3b, C5, C6, CL and BK8 have 8 faces 0.96–1.17 wide.
+   - Target: 6–7 sides for any column whose smaller footprint side is under 3.6, so every face is ≥ 1.2 wide.
+6. **minor: slivers.**
+   - 8 hero triangles under 5° (0.5–4.3°, 4–9 studs long) in the hidden C1b/C2 notch at about (−4.1, −3.1), plus 3 on
+     RockSlope at (−3.7, −8.3), (2.4, 4.2) and (−3.4, −8.0).
+   - They are manifold and don't show at any sheet camera. Re-check after fix 1, which rebuilds that notch.
+   - The 102 thin foam-wall triangles come from the 0.08-thick sheet itself and are acceptable.
+7. **minor: foam to land clearance.** It is 0.019 at the back-right waterline end (12.6, 8.4), against 0.09 intended
+   (`WATER_GAP`). Target ≥ 0.05.
+8. **minor: the brown ridge core shows.**
+   - `rock_x_soil_dark_50` (#8F7762) reads as a brown vertical band between the back columns (rear, rear34) and in
+     the front creases.
+   - D is 3.8 against 1.6 in f34 and 4.7 against 1.8 in rear. The sheet's creases are dark grey-violet.
+   - Target: core at 25 % `soil_dark` or rock-only, gaps between columns ≤ 0.6, D within +2 of the sheet.
+9. **minor: bush leaves read light.** The f34 bush median is #359013 against the sheet's #1B5A03. Target: darken
+   `m032_leaf` about 20 % (f34 bush median about #26700B ± 12).
+10. **minor (Studio check): the water preview is paler.** The median is #25D8FF against #05DBFE, with R +32 against a
+    ±15 target. This is the see-through preview; the exported texture and `kit_transparency` 0.3 decide it in Studio.
+
+**Waiver ruling (`kit_shading_ok` on the hero, GrassTop and SandStrip): honest.**
+- Within each material the facing correlation is low: sand 0.05, rock 0.18, grass about 0.
+- The 0.87–0.88 comes only from three real regions:
+  - the sand on top;
+  - the tan soil band, chosen by height under the turf (`grass_z − TURF`, builder line 751) and on the box sides;
+  - the dark-soil floor-cut cap. It is selected as the bottom cap at z_min (line 1436), and close-up 2 draws it as
+    "Clean flat bottom surface" `#936631`.
+- Every blend in the builder (beach contact and light bands, column foot band, lawn patches, submerged bed) is a
+  position field.
+
+**Tint mottling:** present (Tint CORNER, spread 1.2 on the hero), broad per column and per region, no confetti; none
+on water and foam (correct).
+
+**VFX:** 8 `water_foam` sockets at z 1.05: five along the waterline and one each at W1 (1.0), W4 (0.6) and W6 (0.8).
+They suit the sheet's static foam ribbon and rings (the mesh gives the still read, the sockets the motion). No other
+kind is implied. OK.
+
+**Decisions:**
+
+| Decision | Result |
+| --- | --- |
+| 1, size | 32.20 × 25.89, turf 10.42, water 1.0, bed 0.2, pines to 16.06: met |
+| 2, footprint | 45° band, empty back-left and front-left: met |
+| 3, cameras | met |
+| 4, contract recorded | met |
+| 5, five parts and their names | met |
+| 6, foam mesh on a `*water*` key plus 8 sockets | met. The two water keys (`m032_water` 0.3, `m032_water_foam` 0.1) give 2 water pieces. I could not re-run the export, because verifiers don't export. |
+| 7, budget | 3886: met |
+| 8, no emission | all emission 0: met |
+| 9, packaging, every shell closed | met |
+| 10, names | met |
+| Columns distinct, flat-faced, flat-topped | met |
+| Faces ≥ 1.2 | missed on six small columns (minor 5) |
+
+**Score: 6 / 10.** The mesh, budget, water and foam separation, UVs, VFX, decisions and the colour families are all
+sound. The model fails on the one thing the sheet is about: the grass top over the cliff.
+
+**Verdict: FAIL.** There is one blocker (finding 1). Fixes 2–9 are cheap to fold into the same pass.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m032.py` (source of truth). The final numbers come from a freshly restarted background
+session (port 9881, `wip/M032.blend`, saved). Nothing was committed, exported or pushed.
+
+### Changes
+
+**Blocker: the grass slab now caps the columns.**
+- `RIDGE` is no longer hand-placed. `ridge_outline()` builds it as the outer hull of the column tops from three
+  pieces:
+  - every column's shoulder (top-edge) outline, inset by `RIM_IN` (front 0.6, back 0.45);
+  - the hull of each neighbour pair round the ridge (`COL_RING`: C0 … C6, BK8 … BK1, CL), which bridges the creases;
+  - the polygon through the column centres (the inside).
+
+  The union is read off a constrained triangulation (`_union_outline`), simplified (RDP 0.08, no edge under 0.35) and
+  resampled every 2.6 (`RIDGE_STEP`). Its area is 324 studs² (was about 140).
+- Every column top follows the turf above it.
+  - `column_pts()` puts each top-ring vertex at `grass_z(p) − SEAT` (`SEAT` 0.76, jitter ±0.03), with the shoulder
+    `COL_BEVEL` drop below that.
+  - The measured seats are 0.73–0.79 under the turf on all 17 columns. That is inside the soil band (0.62–1.05), so
+    the union swallows each top.
+  - What shows is a flat ledge about 0.2 wide at `grass_z − 0.76` beside the turf wall, then the 0.4 bevel: the
+    sheet's "flat joining surface".
+  - The per-column `top` field is gone. C0's top is now about 9.0, under the 9.7–10.2 turf. CL and C6, the old low
+    end columns, sit under the slab too.
+- The ridge core is the centre polygon offset 0.9 (`core_poly()`). At the two ends it is pulled back so it stays 0.5
+  inside the rim. It is now 25 % `soil_dark` (was 50 %).
+- Gaps between ring neighbours are ≤ 0.62; `col_gaps()` reports them. To get there:
+  - C0 moved +0.3 in X and widened from 5.0 to 5.6;
+  - BK4 moved 0.45 toward BK6 and widened from 5.0 to 5.6.
+- `build()` resets `RIDGE`.
+
+**Vegetation (paid for by the swallowed tops).**
+- Pines have four tiers (`PINE_TIERS` 1.8 / 1.46 / 1.1 / 0.74 × scale). P1 is scale 1.1 (Ø 3.96) and P2 is scale 1.2
+  (Ø 4.3). Their heights are 5.9 and 6.1 (bbox height 16.39).
+- Three more fan bushes stand on the new rim and back edge (the C1 rim, BK2, BK6/BK7). They and two older bushes carry
+  `on = "hero"`, which keeps the GrassTop part under 1000 tris.
+- The sand path is widened 0.45 each side (`PATH_WIDEN`). Plants that stood on it were moved just off it: P1 to
+  (−0.53, 5.63), bushes, a daisy, two yellow flowers and two lawn rocks.
+
+**Minors.**
+- **Waterline:** moved landward 0.4–0.5 at X 0–4 ((0.6, −7.2), (3.55, −3.95)).
+  - From X 6 on, the original points stay. The beach at C4 is only 1.3–2.1 wide (waterline to column foot), and the
+    move would have taken it under 1.
+  - R2 and the pebble beside it moved 0.5 landward with the waterline.
+- **Beach:**
+  - The open beach (more than 1.5 from the foot and 0.5 from the waterline) is now 50 % `sand_light`. The 25 % step
+    is only between it and the contact band.
+  - `sand_light` was re-calibrated on the render to `#F7E8B4`.
+- **Rock key:** `#A89AA1` (h 330°) → `#B0A4A1` (h 12°, R > G > B). Brighter keys (`#BCAFAD`, `#C4B6B6`) blew C1's lit
+  face out to white without lifting the median (see "Left over").
+- **Leaf key:** `#2C7A10` → `#215C0C` (× 0.75).
+- **Small columns:** C1b, C6, CL and BK8 have 6 sides. C3b and C5 have 7, and so does C3a (`COL_SIDES_OF`).
+- **Foam:**
+  - The ribbon's shore edge is offset `WATER_GAP` + 0.08, because the tidy's merge moves points up to 0.1.
+  - The ribbon now ends where it meets the water's back cut, instead of being clamped onto the beach there.
+- **Slivers:**
+  - A last guarded needle pass collapses edges up to 1.0 (`POLISH_LONG`).
+  - RockSlope's columns now start below the ground like the hero's, so the floor cut makes their bottom. Their own
+    8-gon bottoms were the floor needles.
+
+### Before → after (round-1 verifier numbers → now)
+
+| Check | Target | Before | After |
+| --- | --- | --- | --- |
+| Hero tris | ≤ 3950 | 3886 | **3614** (land 1970, veg 1008 in 116 shells, water 300, foam 336) |
+| Parts tris | < 1000 each | 750 / 194 / 714 / 412 / 348 | GrassTop 942, SandStrip 196, RockSlope 550, WaterPlane 416, Foam 336 |
+| Size | 32 ± 0.5 × 26 ± 1.5 × 17 ± 1.2 | 32.20 × 25.89 × 16.06 | 32.20 × 25.89 × 16.39 |
+| Turf top (plan, grass keys, z > 8) | ≥ 200 studs² | 115 | **285** |
+| Exposed rock tops (n.z > 0.5, z > 6.5) | ≤ 50 studs² | 148 | **15.1** |
+| Exposed top per column | ≤ 30 % | 60–90 % | **0–22 %** (C6 22, C1 18, BK6 14, C0 12, CL 11, BK8 11, the rest ≤ 7) |
+| Column top under turf | 0.62–1.05 | – | 0.73–0.79 on all 17 |
+| Gaps between neighbours | ≤ 0.6 | up to 1.1 | ≤ 0.62 (BK4–BK3 0.62, C0–C1 0.55) |
+| Smallest side face (foot / shoulder edge) | ≥ 1.2 | 0.96–1.17 on six columns | ≥ 1.20 on all 17 (CL 1.32 / 1.20) |
+| f34 R / G | ≤ 41.6 / ≥ 22.2 | 47.7 / 20.2 | **36.2 / 34.6** (sheet 37.6 / 26.2) |
+| front R | ≤ 44.1 | 50.3 | **40.5** (sheet 40.1); G 31.5 |
+| r34 R | ≤ 51.2 | 62.0 | **48.9** (sheet 47.2); G 40.2 |
+| rear R | ≤ 61.5 | 68.3 | **60.5** (sheet 57.5); G 29.9 |
+| top R / G | ≤ 15 / ≥ 32 | 34.8 / 28.9 | **7.8 / 59.4** (sheet 9.4 / 36.5) |
+| side R / G | – | 60.3 / 13.8 | 55.1 / 20.4 (sheet 53.4 / 16.6) |
+| f34 rock-top row at f .25 / .35 / .45 | ≤ .55 / .57 / .59 | .77 / .83 / .86 | **.41 / .42 / .46** (sheet .43 / .51 / .53) |
+| D (dark soil), f34 / rear | sheet + 2 | 3.8 / 4.7 | **1.5 / 2.5** (sheet 1.6 / 1.8) |
+| f34 W | ≥ 16 | 15.1 | 14.9 (miss; see "Left over") |
+| Pine share, f34 | ≥ 2.5 | 1.4 | 3.86 (sheet 5.72), measured on a different mask (see the notes below) |
+| Lit open beach (f34 lower band, v > .9) | #FCE59E ± 12 | #FFD481 | **#FFE49E** |
+| Bush median, f34 | #26700B ± 12 | #359013 | **#286D0E** |
+| Rock key hue / lit-face hue | 10–20° / ≥ 5° | 330° / 355° | **12° / 24°** |
+| Rock median, f34 | #B6A1A3 ± 10 | #B9A4A4 | #A6998E (miss; see "Left over"). Lit quartile #DAC7BA (sheet #E1D2CD) |
+| Foam to land | ≥ 0.05 | 0.019 | **0.127**; water to land 0.051 |
+| Faces under 5° | none | 8 hero + 3 RockSlope | **4 hero, 0 RockSlope** (listed in "Left over") |
+| Self-intersections | 0 | 0 | 0 on the hero and every part |
+| Non-manifold, bowtie, boundary, wire, loose, zero-area, n-gons, duplicate verts | 0 | 0 | 0 on every object and every hero shell (1 land, 116 veg, 1 water, 7 foam) |
+| UV | 0 overlaps / flipped | 0 / 0 | 0 / 0 everywhere; hero 992 islands, gap 0.016, p95 1.013 |
+| `K.check` | no problems | none | none |
+| Sockets | 8 water_foam | 8 | 8 |
+| f34 top profile error, mean / max | – | .056 / .28 | .066 / .29 |
+| f34 W : H | sheet 1.455 | 1.401 | 1.356 |
+
+Measurement notes:
+- **Rock-top row:** the highest row where rock fills at least 30 % of the band. This reproduces the verifier's sheet
+  values.
+- **Pine share:** my mask is h 128–165, s ≥ .5. On it, ours is 3.86 against the sheet's 5.72, a ratio of .67. That is
+  about 2.8 on the verifier's scale, where the sheet reads 4.1.
+
+### Left over
+
+- **Four seam needles (3.2–4.6°).** These are vertical strips where two column faces cross at a shallow angle. They
+  are manifold, and none intersects another face:
+  - (0.44, −2.83, 3.9) at C2/C3a;
+  - (11.56, 5.42, 3.8) on C6's side;
+  - (−7.73, 4.66, 8.7) on BK3, under the slab;
+  - (−12.75, −6.21, 4.6) at CL/C0.
+
+  Neither the guarded collapse (edges up to 1.6 tried) nor the flips removes them.
+- **Rock median #A6998E against #B6A1A3.**
+  - The bright flat column tops that lifted the round-1 median are now under the turf. What is left is vertical faces,
+    whose shade is darker in the kit studio than on the sheet's flat-lit painting.
+  - The lit quartile matches (#DAC7BA against #E1D2CD).
+  - A brighter key only blows C1's sunlit face out to white (it leaves the rock class), and the median stays where it
+    is.
+  - A median with B ≥ G needs a cool key, which the 10–20° hue rule doesn't allow.
+- **Vegetation share is now over the sheet:** f34 +8, front +5, r34 +13 and top +23 points.
+  - The slab covers both column rows, so the plateau is deeper in plan than the sheet draws it. The top view is 59 %
+    lawn against the sheet's 36 %.
+  - Narrowing the plateau would mean moving the back row inward, which shrinks the bbox below 24.5 in Y. This is the
+    main session's call.
+- **Water in f34 is 14.9 (sheet 19.6).** The beach between the waterline and the column feet is only 0.8–2.5 wide, so
+  the landward move was kept to X 0–4 (0.4–0.5). Moving the waterline further along would need the C3b–C5 columns
+  moved back.
+- **Water preview:** the median is unchanged (#25D8FF against #05DBFE). As in round 1, this is a Studio check.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+I am a fresh verifier and did no other stage. I worked read-only on `wip/M032_verify.blend` (port 9881), which already
+held the fixed model integrated by the main session. I re-measured every number below through the MCP. I rendered with
+`m032.render_views` (`M.MODEL_RENDERS` redirected to the scratchpad `m032_verify2/r/`) and measured with
+`m032.measure()` and the study masks. Side-by-side comparisons are in the scratchpad (`m032_verify2/cmp_*.png`).
+Nothing was built, saved or exported.
+
+### Measured
+
+| Check | Hero | GrassTop | SandStrip | RockSlope | WaterPlane | Foam |
+| --- | --- | --- | --- | --- | --- | --- |
+| Tris (budget) | 3614 (4000) | 942 (1000) | 196 | 550 | 416 | 336 |
+| Size (studs) | 32.20 × 25.89 × 16.39 | 24.7 × 22.1 × 7.7 | 19.8 × 21.3 × 1.8 | 24.9 × 20.5 × 9.7 | 22.3 × 21.4 × 1.3 | 18.1 × 21.3 × 0.08 |
+| Shells | 125 (land 1 / veg 116 / water 1 / foam 7) | 60 | 1 | 1 | 2 | 7 |
+| Non-manifold edges / bowtie verts / boundary / wire / loose / zero-area / n-gons / dup verts | 0 each | 0 | 0 | 0 | 0 | 0 |
+| Self-intersections | 0 | 0 | 0 | 0 | 0 | 0 |
+| Triangles with a corner < 5° | 4 (3.15–4.55°) | 0 | 0 | 0 | 0 | 0 |
+| Normals / origin / transforms | outward / bbox bottom centre (exact) / applied | ok | ok | ok | ok | ok |
+| UV overlaps / flipped / min gap / p95 stretch | 0 / 0 / 0.016 / 1.013 (992 islands) | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 |
+| `K.check` | no problems | | | | | |
+
+- **Per-shell closure (`shells_report`).** Land 1970 tris, vegetation 1008, water 300, foam 336. Every shell has 0
+  non-manifold edges, 0 bowtie verts and 0 boundary edges.
+- **Four needles.** All four are rock, in the land shell, on vertical faces (n.z 0.02–0.09):
+  - (0.44, −2.83, 3.9), 6.6 long, in the C2/C3a crease;
+  - (11.56, 5.42, 3.8), 7.9 long, on C6;
+  - (−7.73, 4.66, 8.7), 2.3 long, on BK3 under the slab;
+  - (−12.75, −6.21, 4.6), 6.2 long, in the CL/C0 crease.
+
+  They are manifold and nearly coplanar with their neighbours, and they cross nothing. With flat shading they make no
+  visible artefact, so they don't matter.
+- **Separation (BVH).**
+
+  | Pair | Min distance | Overlapping faces |
+  | --- | --- | --- |
+  | Water to land | 0.051, at the water's bottom edge by the beach wall (0.68, −7.24, 0.26) | 0 |
+  | Foam to land | 0.127 | 0 |
+  | Foam to water | 0.030 | 0 |
+  | Vegetation to land | 0.025 | 0 |
+
+- **Levels.** Land 0–10.76 (the turf is 10.4; the 10.76 is a lawn rock). Water 0.26–1.00. Foam 1.03–1.11. Water top
+  169.9 studs², foam top 37.1 studs².
+- **The round-1 blocker: the slab now caps the columns.**
+
+  | Check | Target | Now |
+  | --- | --- | --- |
+  | Turf top (grass keys, z > 8, plan area) | ≥ 200 studs² | **284.8** |
+  | Exposed rock tops (n.z > 0.5, z > 6.5) | ≤ 50 studs² | **15.1** |
+  | Exposed top per column | ≤ 30 % | **0–26 %** (C6 25.7, C1 21.3, BK6 16.7 (most of it a lawn rock), BK8 16.6, C0 13.5, CL 12.7; the rest ≤ 9) |
+
+  - **Seating.** Each column's highest rock vertex sits 0.68–0.77 under the turf above its centre (BK2 1.0). That is
+    inside the soil band (0.62–1.05).
+  - **Gaps** between ring neighbours are 0–0.62.
+  - **Side faces.** Each column's narrowest side face, measured at the foot ring and at the shoulder ring:
+
+    | Columns | Sides | Narrowest face (studs) |
+    | --- | --- | --- |
+    | C0, C1, C2, C4 | 8 | 1.26–1.77 |
+    | C3a, C3b, C5 and the back row | 7 | 1.26–1.88 |
+    | C1b, C6, CL, BK8 | 6 | 1.20–1.69 |
+
+    Every face is at least 1.20 wide and 9.2–10.0 tall.
+
+**Screen shares** (G / D / S / R / W / F in %; sheet → ours; tolerance ±4, and ±2 for S, F and D):
+
+| View | W : H | G | D | S | R | W | F | Top profile error, mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet | 1.455 / **1.356** | 26.2 / **34.6** | 1.6 / 1.5 | 8.6 / **5.5** | 37.6 / 36.2 | 19.6 / **14.9** | 2.2 / 1.5 | .066 / .29 |
+| front_sheet | 1.539 / **1.415** | 26.0 / **31.5** | 2.1 / 1.7 | 5.3 / 5.5 | 40.1 / 40.5 | 16.3 / 13.7 | 2.4 / 1.4 | .080 / .31 |
+| r34_sheet | 1.476 / 1.369 | 27.5 / **40.2** | 1.5 / 1.9 | 1.8 / 1.5 | 47.2 / 48.9 | 15.0 / **5.5** | 1.9 / 0.8 | .083 / .28 |
+| rear_sheet | 1.482 / 1.500 | 26.3 / 29.9 | 1.8 / 2.5 | 2.3 / 1.3 | 57.5 / 60.5 | 4.4 / 3.5 | 1.2 / 1.0 | .175 / .34 |
+| side_sheet | 1.201 / 1.238 | 16.6 / 20.4 | 0.4 / 1.7 | 0.1 / **3.0** | 53.4 / 55.1 | 16.5 / 14.5 | 2.3 / 1.1 | .165 / .57 |
+| top_sheet | 1.253 / 1.198 | 36.5 / **59.4** | 1.2 / 0.0 | 10.3 / **2.5** | 9.4 / 7.8 | 34.5 / **20.6** | 4.5 / 2.2 | – |
+
+- **Rock** is now within tolerance in **every** view; in round 1 it was 10–25 points over.
+- **Vegetation** is over in f34 (+8.4), front (+5.5), r34 (+12.7) and top (+22.9). It is within 4 in rear and side.
+- **f34 top profile** (sheet / ours, every 0.05 of the width f). The values outside ±0.08 are in bold:
+
+  | f | .00 | .05 | .10 | .15 | .20 | .25 | .30 | .35 | .40 | .45 | .50 | .55 | .60 | .65 | .70 | .75 | .80 | .85 | .90 | .95 | 1.0 |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | sheet | .29 | .46 | .57 | .61 | .63 | .79 | .78 | .75 | .82 | .83 | .97 | .91 | .86 | .90 | .90 | .83 | .81 | .70 | .67 | .52 | .49 |
+  | ours | .25 | .41 | .63 | **.71** | **.75** | .80 | .79 | .83 | .86 | .89 | .98 | .91 | .91 | .91 | .89 | **.92** | .87 | **.82** | **.50** | .52 | **.20** |
+
+  The low value at f 1.0 is the lens perspective at the front-right corner, as in round 1.
+- **f34 bottom profile:** mean error .013, max .06.
+
+**Colour.** Medians with the study masks, sheet → ours:
+
+| Region | f34 | Other views and parts |
+| --- | --- | --- |
+| Lawn | #9FC904 → #99BF0B | top #9EC803 → #A7CF05; GrassTop part #A7CE09 → #AAD20B |
+| Bush leaves | #1B5A03 → #266A0E | r34 #1A5B02 → #1F5B0C; top #226305 → #22610D |
+| Pine | #07692D → #09642A | share 6.9 → 4.0 % (h 120–165) |
+| Sand, lit (v > .9) | #FCE59E (s .37) → #FFD289 (s .44) | SandStrip part #FBCF83 → #FFD07A; top #FDDD8C → #FFD688 |
+| Rock median | #B6A1A3 → #A6998E | r34 #988D9A → #AEA09C; top #B2A3A9 → #C2B4AD |
+| Rock, lit quartile | #E0D1CC (h 15°, s .09) → #D7C3B7 (h 22°, s .15) | r34 h 12° → h 15° |
+| Rock, shade quartile | #656273 (h 251°) → #665D58 (h 21°) | cool-shade share 34 % → 1 % |
+| Water | #05DBFE → #25D8FF | |
+| Foam | #DEFAFD → #CDFFFF | |
+
+- **Facing correlation.** I correlated each material's key brightness (`flintkit_hex`) with face n.z, area-weighted,
+  per family on the land shell:
+
+  | Family | Correlation |
+  | --- | --- |
+  | Sand | −0.14 |
+  | Rock | 0.07 |
+  | Grass | −0.18 |
+  | Soil | 0.80 |
+  | Sand + soil | 0.96 |
+
+  The Tint attribute against facing is within ±0.23 in every family.
+- **Soil.** Every `soil_dark` face is the floor-cut cap: n.z = −1 at z 0, a position rule that matches close-up 2's
+  "Clean flat bottom surface". The tan `soil` is the slab's side band below `grass_z − TURF`, a height rule. The
+  `kit_shading_ok` waiver stays honest; nothing is coloured by facing.
+- **Tint** is a per-corner `Tint` attribute: rock ×0.92–1.10 (per column), grass and sand ×0.96–1.04, spread 1.19. It
+  is broad and per region, with no confetti. Water and foam carry none, which is correct.
+
+**Water, foam and sockets.**
+- Water and foam are separate closed shells that touch nothing (separation above). The foam reads in `water_cu` as a
+  shore ribbon plus a ring round W1, which matches close-up 3 (the sheet's ring has round holes; ours is plain).
+- **Sockets.** There are 8 `water_foam` sockets at z 1.05, unrotated. At their build positions:
+  - **On the shore:** (−3.6, −12.4), (0.2, −9.4), (5.1, −2.8), (9.8, 2.5) and (12.4, 6.4).
+  - **At the boulders:** W1 (5.0, −10.4) 1.0, W4 (8.8, −6.0) 0.6 and W6 (10.6, 2.6) 0.8.
+  - Three of the shore sockets sit inside boulders: (0.2, −9.4) inside W3, (9.8, 2.5) inside W6, (12.4, 6.4) inside W7.
+    The three ring sockets are at their boulders' centres by design.
+  - The emitter is a flat 6 × 1.5 box of 2–3-stud patches (×0.6–1.0), so most patches still land on the water. See
+    minor 6.
+
+### Findings
+
+1. **minor (the new risk): the plateau is deeper than the sheet's, and its rim is a smooth, even overhang.**
+   - **How far off.** Vegetation is +8.4 (f34), +5.5 (front), +12.7 (r34) and +22.9 (top). f34 W : H is 1.356 against
+     1.455 (target 1.40–1.52), and the top profile is high by .10–.12 at f .15–.20 and .09–.12 at f .75–.85.
+   - **It doesn't break the defining read.** In every view the model reads as a grassy riverbank corner over a cliff of
+     column prisms, with a beach and water:
+     - rock is within tolerance everywhere;
+     - the slab now sits on the column tops with its turf and soil lip, as close-up 1 draws it (`cmp_junc.png`);
+     - the coast turns 45°;
+     - the water and foam are separate.
+   - **The most visible difference left.** The sheet shows grey bevelled column caps stepping along the rim (C1 at
+     h .44–.49, C3 and C4 poking up). Ours hides every cap under a pill-shaped slab with an even lip. The f34 rock-top
+     row at f .35 / .45 is .42 / .46 against the sheet's .51 / .53.
+   - **The sand path** runs down the middle of the plateau; the sheet runs it along the front rim.
+   - **Fix targets, for a later pass and not needed to commit:**
+     - Pull the back row 1.5–2 studs inward between BK2 and BK6. This keeps the bbox Y ≥ 24.5, so the far-left and
+       far-right back columns stay where they are.
+     - Lift C1, C3a and C4 so 0.3–0.6 stud of grey cap shows in front of the turf lip.
+     - Move the path toward the front rim.
+     - Targets: f34 G ≤ 30, top G ≤ 45, f34 W : H ≥ 1.40.
+2. **minor: f34 water is 14.9 against 19.6, and r34 water is 5.5 against 15.0.**
+   - This comes from the narrow beach at C3b–C5 and the deep plateau, which hides the right-edge water from behind.
+   - It stays recognisably a front-right water plane with a chamfered corner.
+   - Fix target, together with finding 1: f34 W ≥ 17, by moving C3b–C5 about 1 stud landward and the waterline after
+     them.
+3. **minor: the rock median is #A6998E against #B6A1A3 (out of ±10), and the lit faces lean beige.**
+   - Our lit quartile is h 22°, s .15; the sheet's is h 15°, s .09. The hue is warm, not pink, and the family is right.
+   - The shade quartile is warm grey (h 21°), where the sheet's is blue-violet (h 251°). Spec §3.7 and §5.3 say that
+     split comes from the sheet's lighting, not paint, so it is a Studio and lighting difference, not a key error.
+   - Fix target: drop the key's saturation to about #B2A8A6 (h about 10°, s about .07), so the lit quartile renders
+     about #DCCFCB and the median comes up toward #B0A0A0.
+4. **minor: the beach sand is a little saturated.**
+   - The lit S is #FFD289 (s .44) against #FCE59E (s .37). In f34 the lit S is now mostly the ridge path (`m032_sand`),
+     and the sheet's path is #F9CF7C, so this is close.
+   - The SandStrip part matches (#FFD07A against #FBCF83).
+   - Fix target, optional: path and beach s ≤ .40.
+5. **minor: the pine share is low.** It is 4.0 against 6.9 % on the h 120–165 mask (f34). Fix target, optional: the P1
+   and P2 crowns about 15 % wider.
+6. **minor: three shore foam sockets sit inside boulders, and every socket is unrotated.**
+   - (0.2, −9.4) is inside W3, (9.8, 2.5) inside W6 and (12.4, 6.4) inside W7, so part of their emission is hidden in
+     rock.
+   - The 6-stud emitter box runs along X, not along the 45° shore.
+   - Fix targets:
+     - move the three sockets 0.5–1 stud seaward, off the boulders, onto open water;
+     - yaw the five shore sockets to the local waterline direction, if the exporter honours socket rotation.
+7. **minor: four needles of 3.2–4.6° remain in vertical column seams.** They are manifold, nearly coplanar and hidden
+   in creases or under the slab, and they make no visible artefact. Accept them.
+8. **minor (Studio check): the water preview is paler.** It renders #25D8FF against #05DBFE. The exported texture and
+   `kit_transparency` 0.3 decide it in Studio, as recorded in rounds 1 and 2.
+9. **Known misses, accepted as in the study (§3.3, §3.4):**
+   - the side cell shows the whole diagonal ridge;
+   - the top view shows empty back-left and front-left corners and only a thin beach (S 2.5 against 10.3).
+
+**Fix-round claims checked.** These all reproduce exactly:
+- tris 3614 / 942 / 196 / 550 / 416 / 336;
+- shells 1 / 116 / 1 / 7;
+- turf 285, rock tops 15.1;
+- per column 0–26 % (the claimed C6 22 % is 25.7 % on my plan-projected measure, still under 30);
+- seats 0.68–0.77;
+- side faces ≥ 1.20;
+- f34 R / G 36.2 / 34.6, W 14.9, W : H 1.356;
+- rock median #A6998E;
+- bush #266A0E (claimed #286D0E);
+- foam to land 0.127, water to land 0.051;
+- 4 needles.
+
+The lit-beach #FFE49E claim depends on the region chosen. On the full S mask with v > .9, I get #FFD289, because the
+path dominates.
+
+**Decisions:**
+
+| Decision | Result |
+| --- | --- |
+| 1, size | 32.20 × 25.89 × 16.39; turf 10.4, water 1.0, bed 0.2: met |
+| 2, footprint | 45° band; empty back-left and front-left: met |
+| 3, cameras | met |
+| 4, contract recorded | met (§6) |
+| 5, five parts and their names | met |
+| 6, foam mesh on a `*water*` key plus 8 sockets | met: `m032_water` 0.3 and `m032_water_foam` 0.1 give 2 water pieces. Export not re-run (verifiers don't export). |
+| 7, budget | 3614 / 4000; parts ≤ 942: met |
+| 8, no emission | 0 emissive materials: met |
+| 9, packaging, every shell closed | 1 land, 116 veg, 1 water, 7 foam; all closed, 0 bowties: met |
+| 10, names and keys | `m032_*`, collection "M032 Shoreline Corner": met |
+| Distinct flat-faced columns, faces ≥ 1.2 | met (all ≥ 1.20). The flat tops now sit under the slab by design (the round-1 fix target). |
+
+**Score: 7 / 10.**
+- **Sound:** the mesh, the budget, every shell closed, water and foam separate, UVs, colour families, no colour by
+  facing, and every decision met.
+- **Fixed:** the round-1 blocker. Rock is within tolerance in every view, and the slab rests on the columns.
+- **Costs left:** a deeper, smoother plateau than the sheet's, with no grey caps at the rim, and less water on screen.
+
+**Verdict: PASS.** Nothing is broken, nothing is over budget, and the defining read matches the sheet. Findings 1–8 are
+minors to note at commit.
+
+## Main session ruling (2026-10-29)
+Passed in round 2 (7/10) and committed. Round 1 failed (6/10) because the turf slab did not cap the columns; fix round 1 resolved it.
+
+**Left for a later polish pass:**
+- The plateau is deeper and smoother than the sheet's. Vegetation is +8 in f34 and +23 in top, and the rim caps are hidden. Targets: pull BK2–BK6 in 1.5–2 studs, show 0.3–0.6 of cap on C1/C3a/C4, and move the path toward the front rim.
+- Water is low on screen: 14.9 against 19.6 in f34. Move C3b–C5 about 1 stud landward.
+- The rock median leans beige: try a key of about `#B2A8A6`.
+- Lit sand is slightly saturated.
+- Pine share is 4.0 % against 6.9 %.
+- Three shore foam sockets sit inside boulders W3/W6/W7.
+- 4 hidden needle triangles in the column seams.
+- The water preview is paler than the sheet (Studio check).
+
+**Export:** 6 assets, 9 pieces (5 solid, 4 water), 6054 tris, 8 VFX sockets, palette 18 colours, 0 problems.
