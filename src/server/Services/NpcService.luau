@@ -19,6 +19,7 @@ local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
@@ -217,7 +218,16 @@ function NpcService.Damage(npc, amount: number, attacker: Player?)
 		-- Neutral herds and packs turn on whoever hurt one of them.
 		AggroRules.Anger(npc.group, attacker, npc.provokedAt)
 	end
+	local before = npc.health
 	npc.health -= amount
+	if attacker then
+		local body = npc.body
+		if typeof(body) == "Instance" and body:IsA("BasePart") then
+			-- The health actually taken: a killing blow shows what was left.
+			local dealt = math.min(amount, math.max(before, 0))
+			Remotes.Get("CombatFeedback"):FireClient(attacker, "Hit", math.round(dealt), body.Position)
+		end
+	end
 	if npc.custom then
 		if npc.onDamaged then
 			npc.onDamaged(npc, amount, attacker)
