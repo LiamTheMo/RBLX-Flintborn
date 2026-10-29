@@ -721,6 +721,8 @@ function Methods:IsDescendantOf(other)
 	return false
 end
 function Methods:Destroy()
+	-- Roblox fires Destroying before taking the instance (and its subtree) apart.
+	self.Destroying:Fire()
 	for _, child in table.clone(rawget(self, "__children")) do
 		child:Destroy()
 	end
