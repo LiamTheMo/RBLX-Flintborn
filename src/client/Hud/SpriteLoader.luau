@@ -38,8 +38,10 @@ SpriteLoader.RETRIES_PER_SWEEP = 4
 SpriteLoader.RETRIES = 6
 SpriteLoader.FIRST_DELAY = 1
 
--- image id -> { users = {Instance = property} (weak, so destroyed characters go),
--- state = "pending" | "loading" | "loaded" | "failed", tries }
+-- image id -> { users = {Instance = property}, state = "pending" | "loading" |
+-- "loaded" | "failed", tries }. Users are held strongly and dropped when they
+-- are destroyed: Roblox may collect the Lua handle of an Instance nothing else
+-- in Lua holds, so a weak table loses live parts and labels.
 local images = {}
 local flushQueued = false
 
@@ -152,7 +154,7 @@ function SpriteLoader.TrackProperty(instance: Instance, property: string)
 	end
 	local entry = images[id]
 	if entry == nil then
-		entry = { users = setmetatable({}, { __mode = "k" }), state = "pending", tries = 0 }
+		entry = { users = {}, state = "pending", tries = 0 }
 		images[id] = entry
 	elseif entry.state == "failed" and entry.users[instance] == nil then
 		-- Something new wants an image that gave up earlier: try it again from scratch.
@@ -163,6 +165,9 @@ function SpriteLoader.TrackProperty(instance: Instance, property: string)
 		return -- already watching this image here
 	end
 	entry.users[instance] = property
+	instance.Destroying:Connect(function()
+		entry.users[instance] = nil
+	end)
 	if entry.state == "loaded" and not instance:IsA("ImageLabel") then
 		-- Already fetched: ask once more in case this one's own fetch failed.
 		task.defer(reassign, instance, property, id)
@@ -175,8 +180,20 @@ end
 
 -- HUD images ---------------------------------------------------------------------
 
--- label -> {id, pending, due, tries}; weak, so destroyed labels drop out.
-local labels = setmetatable({}, { __mode = "k" })
+-- label -> {id, pending, due, tries}. Held strongly and dropped when the label
+-- is destroyed: with weak keys, Roblox collected the handles of labels no other
+-- Lua held (most HUD art), and those images were never handed out.
+local labels = {}
+
+local function hold(label: GuiObject, entry)
+	local fresh = labels[label] == nil
+	labels[label] = entry
+	if fresh then
+		label.Destroying:Connect(function()
+			labels[label] = nil
+		end)
+	end
+end
 local pumping = false
 -- Set only by the headless capture runtime (art/ui/capture/gui_env.luau); a
 -- global that is nil in the game.
@@ -364,7 +381,7 @@ function SpriteLoader.Assign(label: ImageLabel, id: string)
 		return
 	end
 	label.Image = ""
-	labels[label] = { id = id, pending = true, due = math.huge, tries = 0 }
+	hold(label, { id = id, pending = true, due = math.huge, tries = 0 })
 	pump()
 end
 
@@ -375,7 +392,7 @@ function SpriteLoader.Track(label: ImageLabel)
 	if CAPTURE or id == "" then
 		return
 	end
-	labels[label] = { id = id, pending = false, due = now() + waitFor(0), tries = 0 }
+	hold(label, { id = id, pending = false, due = now() + waitFor(0), tries = 0 })
 	pump()
 end
 
