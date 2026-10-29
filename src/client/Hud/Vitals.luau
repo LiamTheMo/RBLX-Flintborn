@@ -1,6 +1,7 @@
--- Bottom-left vitals panel: Health, Stamina and Food rows (icon, label, coloured
--- bar, number), plus a small status pill above it for the medicine lock, food
--- healing and hunger slow that the old survival HUD showed. Display only.
+-- Vitals: Health, Stamina and Food rows (the parchment HUD draws each row as one
+-- art piece, its icon plate and empty bar, with the coloured fill and number
+-- over it; a row without art has an icon, label and track), plus a small status
+-- pill for the medicine lock, food healing and hunger slow. Display only.
 
 local Layout = require(script.Parent.Layout)
 local Widgets = require(script.Parent.Widgets)
@@ -19,19 +20,31 @@ function Vitals.new(parent: Instance, layout)
 	for index, rowCfg in cfg.rows do
 		local top = cfg.rowTop + (index - 1) * cfg.rowPitch
 		local centreY = top + cfg.rowHeight / 2
-		Widgets.Sprite(rowCfg.icon, {
-			Name = rowCfg.label .. "Icon",
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.fromOffset(cfg.icon.x, centreY),
-			Size = UDim2.fromOffset(cfg.icon.size, cfg.icon.size),
-			ZIndex = 4,
-		}, self.root)
-		Widgets.Text(cfg.label, {
-			Name = rowCfg.label .. "Label",
-			Text = rowCfg.label,
-			Position = UDim2.fromOffset(cfg.label.x, top),
-			Size = UDim2.fromOffset(cfg.label.w, cfg.rowHeight),
-		}, self.root)
+		if rowCfg.art then
+			Widgets.Sprite(rowCfg.art, {
+				Name = rowCfg.label .. "Row",
+				Position = UDim2.fromOffset(0, top),
+				Size = UDim2.fromOffset(cfg.rowSize[1], cfg.rowSize[2]),
+				ZIndex = 3,
+			}, self.root)
+		end
+		if rowCfg.icon then
+			Widgets.Sprite(rowCfg.icon, {
+				Name = rowCfg.label .. "Icon",
+				AnchorPoint = Vector2.new(0, 0.5),
+				Position = UDim2.fromOffset(cfg.icon.x, centreY),
+				Size = UDim2.fromOffset(cfg.icon.size, cfg.icon.size),
+				ZIndex = 4,
+			}, self.root)
+		end
+		if cfg.label then
+			Widgets.Text(cfg.label, {
+				Name = rowCfg.label .. "Label",
+				Text = rowCfg.label,
+				Position = UDim2.fromOffset(cfg.label.x, top),
+				Size = UDim2.fromOffset(cfg.label.w, cfg.rowHeight),
+			}, self.root)
+		end
 		local trackTop = centreY - cfg.track.h / 2
 		local bar = Widgets.Bar({
 			rect = { cfg.track.x, trackTop, cfg.track.w, cfg.track.h },

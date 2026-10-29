@@ -36,6 +36,10 @@ REF = ROOT / "art" / "reference" / "ui" / "parchment"
 OUT = HERE / "sprites"
 MANIFEST = OUT / "manifest.json"
 PAD = 2
+# Roblox's largest image side; bigger art is split into tiles of at most TILE px.
+MAX_SIDE = 1024
+TILE = 1000
+TILE_OVERLAP = 2
 
 N4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 N8 = N4 + [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -234,19 +238,25 @@ def push_pull(rgb, known):
     return est
 
 
-_grain = None
+_grains = {}
+# Clean texture patches: plain paper (materials sheet) and blank leather (the
+# buttons sheet's leather plate).
+GRAIN_SOURCES = {"paper": ("06", (62, 60, 362, 236)), "leather": ("03", (70, 92, 370, 170)),
+                 # Leather well inside the plate, clear of its rivets and stitching
+                 # (the screens after the lobby use this one).
+                 "hide": ("03", (100, 106, 330, 156))}
 
 
-def grain():
-    """High-pass texture of a clean parchment plate (materials sheet, plain paper)."""
-    global _grain
-    if _grain is None:
-        paper = sheet("06")[60:236, 62:362, :3]
-        _grain = paper - box_blur(paper, 5)
-    return _grain
+def grain(kind="paper"):
+    """High-pass texture of a clean patch, to re-texture repainted areas."""
+    if kind not in _grains:
+        name, (x0, y0, x1, y1) = GRAIN_SOURCES[kind]
+        patch = sheet(name)[y0:y1, x0:x1, :3]
+        _grains[kind] = patch - box_blur(patch, 5)
+    return _grains[kind]
 
 
-def erase(a, mask, amount=0.8, feather=1):
+def erase(a, mask, amount=0.8, feather=1, texture="paper"):
     """Repaints `mask` from its surroundings plus parchment grain, blending over
     `feather` pixels at its edge. Alpha is kept."""
     a = a.copy()
@@ -260,7 +270,7 @@ def erase(a, mask, amount=0.8, feather=1):
     paper = ring & (lum(a) > 0.78)
     ring = paper if paper.sum() > 50 else ring
     base = push_pull(a[..., :3], ring)
-    g = grain()
+    g = grain(texture)
     h, w = mask.shape
     reps = (h // g.shape[0] + 2, w // g.shape[1] + 2, 1)
     tex = np.tile(np.concatenate([g, g[:, ::-1]], 1), reps)[:h, :w]
@@ -506,9 +516,402 @@ def build():
     return s
 
 
+# ---------------------------------------------------------------------------
+# menu kit helpers
+# ---------------------------------------------------------------------------
+
+
+def trim_alpha(a, pad=PAD):
+    """Crops to the opaque bounding box with `pad` transparent pixels around."""
+    ys, xs = np.nonzero(a[..., 3] > 0.02)
+    a = a[ys.min(): ys.max() + 1, xs.min(): xs.max() + 1]
+    out = np.zeros((a.shape[0] + 2 * pad, a.shape[1] + 2 * pad, 4), np.float32)
+    out[pad:pad + a.shape[0], pad:pad + a.shape[1]] = a
+    return out
+
+
+def plate(a, rect):
+    """A button or tab drawn on paper: cut out (paper around it made clear),
+    reduced to its largest piece and trimmed."""
+    piece = frame_cutout(a, rect, pad=0)
+    parts = components(piece[..., 3] > 0.1)
+    if parts:
+        ys, xs = max(parts, key=lambda c: len(c[0]))
+        keep = np.zeros(piece.shape[:2], bool)
+        keep[ys, xs] = True
+        piece[~dilate(keep, 1), 3] = 0.0
+    return trim_alpha(piece)
+
+
+def silhouette(a, rect, dark=True, lo=0.30, hi=0.75):
+    """A glyph as a white silhouette (tinted in game with ImageColor3): alpha is how
+    far each pixel is from the background toward the ink (dark ink on paper, or
+    light ink on leather when dark=False)."""
+    x, y, w, h = rect
+    piece = a[y:y + h, x:x + w]
+    L = lum(piece)
+    alpha = (hi - L) / (hi - lo) if dark else (L - lo) / (hi - lo)
+    # Transparent sheet pixels (an icon on the icon sheet) are never ink.
+    alpha = np.clip(alpha, 0, 1) * piece[..., 3]
+    # Keep the glyph's own islands, not stray texture.
+    keep = np.zeros(alpha.shape, bool)
+    for ys, xs in components(alpha > 0.5):
+        if len(ys) >= 25:
+            keep[ys, xs] = True
+    alpha *= dilate(keep, 2)
+    out = np.ones(piece.shape, np.float32)
+    out[..., 3] = alpha
+    return trim_alpha(out)
+
+
+def disc(a, cx, cy, r):
+    """A round piece (a slider knob) cut with an anti-aliased circular mask."""
+    size = int(2 * r + 2 * PAD)
+    x0, y0 = int(cx - r - PAD), int(cy - r - PAD)
+    piece = a[y0:y0 + size, x0:x0 + size].copy()
+    ys, xs = np.mgrid[0:size, 0:size]
+    d = np.sqrt((xs + 0.5 - (cx - x0)) ** 2 + (ys + 0.5 - (cy - y0)) ** 2)
+    piece[..., 3] *= np.clip(r - d + 0.5, 0, 1)
+    return piece
+
+
+def rounded_cut(a, rect, r):
+    """A rounded-rectangle piece (x, y, w, h, corner radius r) cut out of busy art
+    with an anti-aliased mask, where flooding the background would leak."""
+    x, y, w, h = rect
+    piece = cut(a, rect)
+    ys, xs = np.mgrid[0:h + 2 * PAD, 0:w + 2 * PAD]
+    px, py = xs + 0.5 - PAD, ys + 0.5 - PAD
+    dx = np.maximum(np.maximum(r - px, px - (w - r)), 0)
+    dy = np.maximum(np.maximum(r - py, py - (h - r)), 0)
+    inside = np.where((dx > 0) & (dy > 0), r - np.sqrt(dx ** 2 + dy ** 2),
+                      np.minimum(np.minimum(px, w - px), np.minimum(py, h - py)))
+    piece[..., 3] *= np.clip(inside + 0.5, 0, 1)
+    return piece
+
+
+def pin_cut(a, cx, cy, r, tip):
+    """A map pin: the round head (centre cx, cy, radius r) and its pointed foot down
+    to y `tip`, cut out of whatever it is drawn over."""
+    x0, y0 = int(cx - r - PAD), int(cy - r - PAD)
+    w, h = int(2 * r + 2 * PAD), int(tip - y0 + PAD + 1)
+    piece = a[y0:y0 + h, x0:x0 + w].copy()
+    ys, xs = np.mgrid[0:h, 0:w]
+    px, py = xs + 0.5 + x0, ys + 0.5 + y0
+    head = np.clip(r - np.sqrt((px - cx) ** 2 + (py - cy) ** 2) + 0.5, 0, 1)
+    # The foot: a triangle from the head's lower sides to the tip.
+    top = cy + r * 0.66
+    half = r * 0.78 * np.clip((tip - py) / (tip - top), 0, 1)
+    foot = np.clip(half - np.abs(px - cx) + 0.5, 0, 1) * (py >= cy) * (py <= tip + 0.5)
+    piece[..., 3] *= np.maximum(head, foot)
+    return piece
+
+
+def erase_ink(a, rect, dark=True, threshold=None, grow=2, amount=0.8, texture="paper"):
+    """Erases text or a glyph inside rect: dark ink on paper, or light ink on leather."""
+    x0, y0, x1, y1 = rect
+    m = np.zeros(a.shape[:2], bool)
+    L = lum(a[y0:y1, x0:x1])
+    if dark:
+        m[y0:y1, x0:x1] = L < (threshold or 0.62)
+    else:
+        m[y0:y1, x0:x1] = L > (threshold or 0.55)
+    m = dilate(m, grow) & box(a.shape, rect)
+    return erase(a, m, amount=amount, texture=texture)
+
+
+def build_settings():
+    """Settings window (10_settings): the shell with tabs and content erased, and
+    the pieces its screen is built from."""
+    g = sheet("10")
+    s = {}
+    # Tabs: the selected (leather) and normal (paper) plates, label and icon erased.
+    sel = plate(g, (84, 190, 320, 104))
+    # The leather face between its stitch lines is repainted whole (label and
+    # icon), so no ghost of either stays.
+    sel = erase(sel, box(sel.shape, (22, 24, 264, 82)), amount=1.0, feather=3, texture="hide")
+    s["pm_tab_leather"] = (sel, [40, 30, 52, 30])
+    tab = plate(g, (86, 294, 316, 100))
+    tab = erase_ink(tab, (26, 10, 262, 92), dark=True)
+    s["pm_tab_paper"] = (tab, [40, 30, 52, 30])
+    # Tab icons as white silhouettes.
+    s["pm_glyph_gear"] = (silhouette(g, (116, 212, 66, 66), dark=False, lo=0.35, hi=0.8), None)
+    s["pm_glyph_sound"] = (silhouette(g, (116, 312, 66, 62)), None)
+    s["pm_glyph_monitor"] = (silhouette(g, (112, 408, 72, 66)), None)
+    s["pm_glyph_gamepad"] = (silhouette(g, (112, 510, 72, 62)), None)
+    s["pm_glyph_person"] = (silhouette(g, (116, 606, 64, 74)), None)
+    s["pm_glyph_diamond"] = (silhouette(g, (448, 222, 26, 28)), None)
+    # Window shell: the tab column and the whole content panel repainted as paper.
+    win = erase(g, box(g.shape, (84, 190, 404, 702)), amount=0.8, feather=4)
+    # RESET and APPLY are repainted too (their own sprites draw over the spot and
+    # dim cleanly); only the strip where APPLY meets the leather corner keeps its
+    # pixels, under APPLY's own right end, so no hard edge cuts into the corner.
+    content = box(g.shape, (424, 197, 1584, 724)) & ~box(g.shape, (1574, 618, 1592, 728))
+    win = erase(win, content, amount=0.8, feather=4)
+    s["pm_window_settings"] = (cut_clean(win, (23, 60, 1626, 702)), None)
+    # Controls from the component strip.
+    s["pm_check_off"] = (cut_clean(g, (50, 817, 54, 57)), None)
+    s["pm_check_on"] = (cut_clean(g, (152, 812, 66, 67)), None)
+    dd = erase_ink(g, (290, 820, 420, 870), dark=True)
+    s["pm_dropdown"] = (cut_clean(dd, (267, 810, 235, 69)), [30, 26, 72, 26])
+    s["pm_slider_knob"] = (disc(g, 746, 842, 27), None)
+    for name, rect, text in (("pm_keycap", (1098, 814, 112, 67), (1110, 824, 1200, 868)),
+                             ("pm_keycap_small", (1249, 814, 75, 67), (1258, 824, 1316, 868))):
+        k = erase_ink(g, text, dark=True)
+        s[name] = (cut_clean(k, rect), [22, 22, 22, 26] if name == "pm_keycap" else None)
+    s["pm_button_reset"] = (plate(g, (1076, 634, 214, 76)), None)
+    # The leather corner of the window touches APPLY's lower right: cut on the
+    # button's own rounded outline instead.
+    s["pm_button_apply"] = (rounded_cut(g, (1309, 629, 272, 85), 12), None)
+    return s
+
+
+def build_journal():
+    """Journal window (07_journal): the shell with the quest list, the quest card's
+    contents and the map erased, and the pieces the screen is built from. Reward
+    and objective icons come from the icon sheet (04_icons)."""
+    g = sheet("07")
+    s = {}
+    # Window: list column, quest card contents and the map repainted as paper
+    # (the card's and map's own frames stay).
+    win = erase(g, box(g.shape, (60, 142, 441, 760)), amount=0.8, feather=4)
+    win = erase(win, box(g.shape, (468, 140, 932, 761)), amount=0.8, feather=3)
+    win = erase(win, box(g.shape, (972, 140, 1613, 753)), amount=0.8, feather=4)
+    # The strip's map pin overlaps the window's bottom edge: patch that stretch of
+    # frame from the stretch beside it.
+    win[738:792, 1246:1350] = win[738:792, 1126:1230]
+    s["pm_window_journal"] = (cut_clean(win, (22, 20, 1628, 768)), None)
+    # Category tabs: selected leather, normal paper, labels erased.
+    tab = cut_clean(g, (63, 144, 122, 54))
+    s["pm_jtab_leather"] = (erase_ink(tab, (14, 8, 112, 50), dark=False, texture="hide"), [20, 16, 20, 8])
+    tab = plate(g, (189, 146, 125, 52))
+    s["pm_jtab_paper"] = (erase_ink(tab, (16, 8, 110, 50), dark=True), [20, 16, 20, 8])
+    # Quest rows (scroll icon and chevron kept; name and status dot erased).
+    row = plate(g, (68, 204, 366, 92))
+    row = erase_ink(row, (92, 14, 296, 80), dark=True)
+    s["pm_quest_row_selected"] = (erase(row, box(row.shape, (290, 18, 332, 74)), amount=1.0, feather=2), [40, 30, 40, 30])
+    # A plain row as the list draws it (cut on its rounded outline).
+    row = rounded_cut(g, (72, 299, 358, 84), 8)
+    row = erase_ink(row, (96, 12, 292, 76), dark=True)
+    s["pm_quest_row"] = (erase(row, box(row.shape, (290, 24, 326, 60)), amount=1.0, feather=2), [40, 30, 40, 30])
+    # Leather strip buttons with their labels erased (CLAIM, the active count).
+    claim = plate(g, (506, 682, 388, 78))
+    s["pm_button_claim"] = (erase_ink(claim, (90, 12, 300, 64), dark=False, texture="hide"), [70, 26, 70, 26])
+    count = plate(g, (76, 675, 354, 76))
+    s["pm_button_strip"] = (erase_ink(count, (70, 12, 290, 62), dark=False, texture="hide"), [64, 26, 64, 26])
+    # Card pieces.
+    # The mountain mark in the middle of the card's dividers (the lines are drawn
+    # natively, so the mark never stretches).
+    s["pm_glyph_mountain"] = (silhouette(g, (668, 522, 62, 32), lo=0.35, hi=0.8), None)
+    s["pm_check_green"] = (rounded_cut(g, (487, 450, 28, 28), 4), None)
+    # Map pieces: compass rose, zoom buttons, the red pin and its name plate.
+    s["pm_compass_rose"] = (silhouette(g, (1500, 146, 106, 120), lo=0.3, hi=0.7), None)
+    s["pm_button_zoom_in"] = (rounded_cut(g, (1548, 542, 58, 58), 9), None)
+    s["pm_button_zoom_out"] = (rounded_cut(g, (1548, 608, 58, 59), 9), None)
+    s["pm_map_pin"] = (pin_cut(g, 1297, 789, 40, 862), None)
+    label = plate(g, (1262, 808, 296, 104))
+    # The pin's foot covers the plate's left end: that end is the right end
+    # mirrored (the plate is symmetric).
+    half = label.shape[1] // 2
+    label[:, :half] = label[:, ::-1][:, :half]
+    s["pm_map_label"] = (erase_ink(label, (70, 20, label.shape[1] - 70, 68), dark=True), [40, 30, 40, 30])
+    # The painted island (art/ui/map/render_island.py) for the map panels.
+    island = np.asarray(Image.open(HERE / "map" / "island.png").convert("RGBA"), np.float32) / 255
+    s["pm_map_island"] = (island, None)
+    # Icons from the icon sheet (on transparency).
+    i = sheet("04")
+    s["pm_icon_scroll"] = (cut_clean(i, (552, 484, 178, 160)), None)
+    s["pm_icon_coin"] = (cut_clean(i, (1058, 494, 172, 162)), None)
+    s["pm_icon_gem"] = (cut_clean(i, (1318, 488, 124, 164)), None)
+    s["pm_icon_bolt"] = (cut_clean(i, (838, 662, 126, 156)), None)
+    return s
+
+
+def build_inventory():
+    """Inventory & Vault window (08_inventory_vault): the shell with both panes,
+    the middle column and the detail strip repainted as paper and the title
+    erased (the game writes "INVENTORY & VAULT" or "INVENTORY"), plus the slots,
+    controls and category tabs the screen is built from."""
+    g = sheet("08")
+    s = {}
+    win = erase_ink(g, (560, 30, 1112, 92), dark=False, texture="hide", threshold=0.6, grow=3, amount=1.0)
+    # The ampersand is repainted whole (its anti-aliased edge survives the ink pass).
+    win = erase(win, box(g.shape, (878, 36, 924, 90)), amount=1.0, feather=2, texture="hide")
+    # Stitch dashes left over from the erased mark under the title.
+    win = erase(win, box(g.shape, (824, 86, 868, 100)), amount=1.0, feather=2, texture="hide")
+    for rect in ((206, 131, 830, 614), (843, 130, 941, 617), (955, 131, 1592, 614), (210, 627, 1586, 771)):
+        win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
+    # The category tabs are drawn on their own: clear what of them overlaps the
+    # window's left edge.
+    win = win.copy()
+    win[105:650, :163, 3] = 0.0
+    s["pm_window_inventory"] = (cut_clean(win, (150, 8, 1490, 782)), None)
+    # Category tabs down the left: backgrounds with the icon erased, and the icons.
+    tabs = {"all": (48, 114, 122, 124), "tools": (44, 250, 120, 124), "materials": (44, 380, 120, 124),
+            "food": (44, 510, 120, 124)}
+    for key, rect in tabs.items():
+        tab = cut_clean(g, rect)
+        s["pm_cat_" + key] = (extract_icon(tab, 14, 26), None)
+    # The whole tab column (wooden spine, ropes and four plain tiles, icons
+    # erased): the first tile's glow is replaced by a copy of the second tile, so
+    # the glowing tile can be laid on whichever tab is chosen.
+    column = g.copy()
+    column[110:244, 36:172] = g[246:380, 36:172]
+    for y0, y1 in ((122, 236), (258, 370), (388, 500), (518, 636)):
+        column = erase(column, box(g.shape, (64, y0, 150, y1)), amount=1.0, feather=4)
+    s["pm_side_column"] = (cut_clean(column, (20, 95, 152, 565)), None)
+    glow = rounded_cut(g, (50, 112, 118, 130), 16)
+    s["pm_side_tab_selected"] = (erase(glow, box(glow.shape, (16, 12, 104, 120)), amount=1.0, feather=4), None)
+    # Slots and controls.
+    s["pm_item_slot"] = (rounded_cut(g, (216, 518, 93, 92), 9), [20, 20, 20, 20])
+    search = rounded_cut(g, (497, 141, 226, 42), 9)
+    s["pm_search_box"] = (erase_ink(search, (46, 6, 220, 40), dark=True, threshold=0.7), [40, 14, 14, 14])
+    s["pm_sort_button"] = (rounded_cut(g, (737, 141, 77, 42), 9), None)
+    s["pm_arrow_right"] = (rounded_cut(g, (851, 276, 82, 71), 13), None)
+    s["pm_arrow_left"] = (rounded_cut(g, (851, 375, 82, 70), 13), None)
+    store = rounded_cut(g, (836, 516, 112, 89), 10)
+    s["pm_button_square"] = (erase_ink(store, (16, 14, 98, 78), dark=False, texture="hide"), [26, 26, 26, 26])
+    chip = rounded_cut(g, (408, 698, 100, 43), 9)
+    s["pm_stat_chip"] = (erase_ink(chip, (8, 5, 96, 40), dark=True, threshold=0.6), [16, 14, 16, 14])
+    s["pm_glyph_sword"] = (silhouette(g, (414, 703, 32, 34)), None)
+    s["pm_glyph_hammer"] = (silhouette(g, (533, 703, 32, 34)), None)
+    s["pm_glyph_weight"] = (silhouette(g, (648, 703, 30, 34)), None)
+    action = plate(g, (1102, 652, 226, 82))
+    s["pm_button_action"] = (erase_ink(action, (34, 14, 196, 68), dark=False, texture="hide"), [40, 26, 40, 26])
+    icons = sheet("04")
+    s["pm_icon_chest"] = (cut_clean(icons, (290, 482, 210, 166)), None)
+    return s
+
+
+def build_crafting():
+    """Crafting window (09_crafting): the shell with the recipe column, the
+    detail card and the queue repainted as paper (title, close and panel frames
+    stay), and the tabs, rows, chips, cards, stepper and buttons."""
+    g = sheet("09")
+    s = {}
+    win = g
+    for rect in ((76, 168, 484, 772), (518, 172, 1168, 772), (1194, 170, 1616, 772)):
+        win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
+    s["pm_window_crafting"] = (cut_clean(win, (25, 60, 1625, 738)), None)
+    # The same shell for the lobby's Forge, its title word erased (the game
+    # writes it; the hammers stay).
+    forge = erase_ink(win, (196, 96, 450, 152), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_window_forge"] = (cut_clean(forge, (25, 60, 1625, 738)), None)
+    # Category tabs: selected (gold) and plain, glyph erased; the glyphs as
+    # white silhouettes.
+    tab = rounded_cut(g, (82, 235, 79, 60), 7)
+    s["pm_ctab_selected"] = (erase(tab, box(tab.shape, (12, 8, 70, 56)), amount=1.0, feather=2), [16, 14, 16, 14])
+    tab = rounded_cut(g, (163, 235, 78, 60), 7)
+    s["pm_ctab"] = (erase(tab, box(tab.shape, (12, 8, 70, 56)), amount=1.0, feather=2), [16, 14, 16, 14])
+    for key, rect in (("tools", (90, 242, 64, 48)), ("tent", (170, 242, 64, 48)), ("armor", (250, 242, 64, 48)),
+                      ("bench", (328, 242, 64, 48)), ("bag", (406, 242, 62, 48))):
+        s["pm_glyph_" + key] = (silhouette(g, rect, lo=0.3, hi=0.62), None)
+    # Recipe rows (chevron kept; icon and name erased).
+    for name, rect in (("pm_recipe_row_selected", (80, 307, 401, 72)), ("pm_recipe_row", (80, 385, 401, 70))):
+        row = rounded_cut(g, rect, 7)
+        s[name] = (erase(row, box(row.shape, (10, 6, 350, rect[3] - 2)), amount=1.0, feather=2), [30, 24, 60, 24])
+    # Detail card pieces.
+    chip = rounded_cut(g, (827, 295, 102, 68), 8)
+    s["pm_stat_chip_tall"] = (erase(chip, box(chip.shape, (8, 8, 96, 62)), amount=1.0, feather=2), [18, 18, 18, 18])
+    card = rounded_cut(g, (830, 447, 102, 152), 8)
+    s["pm_req_card"] = (erase(card, box(card.shape, (8, 10, 96, 146)), amount=1.0, feather=2), [18, 18, 18, 18])
+    s["pm_stepper_minus"] = (rounded_cut(g, (535, 670, 60, 61), 8), None)
+    s["pm_stepper_plus"] = (rounded_cut(g, (667, 670, 60, 61), 8), None)
+    field = rounded_cut(g, (595, 672, 73, 58), 3)
+    s["pm_stepper_field"] = (erase(field, box(field.shape, (10, 6, 66, 56)), amount=1.0, feather=2), [10, 10, 10, 10])
+    craft = plate(g, (754, 655, 280, 92))
+    s["pm_button_craft"] = (erase_ink(craft, (70, 14, 210, 76), dark=False, texture="hide"), [70, 26, 70, 26])
+    small = rounded_cut(g, (1041, 672, 125, 60), 9)
+    s["pm_button_paper"] = (erase_ink(small, (12, 8, 114, 52), dark=True), [22, 18, 22, 18])
+    # Queue.
+    queue = rounded_cut(g, (1205, 230, 400, 94), 8)
+    s["pm_queue_row"] = (erase(queue, box(queue.shape, (8, 8, 334, 88)), amount=1.0, feather=2), [24, 24, 60, 24])
+    s["pm_queue_empty"] = (rounded_cut(g, (1205, 541, 400, 92), 10), None)
+    s["pm_button_x_leather"] = (rounded_cut(g, (1547, 252, 51, 49), 6), None)
+    # Food & potions tab: the icon sheet's heart as a silhouette.
+    s["pm_glyph_heart"] = (silhouette(sheet("04"), (566, 662, 162, 150), lo=0.55, hi=0.9), None)
+    return s
+
+
+def build_windows():
+    """Generic parchment windows for the screens with no sheet of their own
+    (Market, Trade, Progress, the world map, notices), from the panel layouts
+    (11): a 9-sliced window with its inner panels and mark repainted as
+    paper, an inset panel, the hollow map frame, a notice card and a long
+    banner (titles sit on the leather button plate)."""
+    p = sheet("11")
+    s = {}
+    win = erase(p, box(p.shape, (812, 47, 1496, 362)), amount=0.8, feather=3)
+    # The mark on the title band: the band is the same all along, so a stretch
+    # of it beside the mark covers it with no seam.
+    win[14:47, 1124:1196] = win[14:47, 1040:1112]
+    # Corners deep enough to hold the rope bindings near them, so only plain
+    # leather and stitching stretch.
+    s["pm_frame_window"] = (cut_clean(win, (784, 8, 739, 376)), [96, 112, 96, 122])
+    inset = cut(p, (965, 46, 376, 318), pad=0)
+    s["pm_inset"] = (inset, [22, 22, 22, 22])
+    hollow = p.copy()
+    hollow[400:440, 352:428] = hollow[400:440, 250:326]
+    s["pm_frame_hollow"] = (cut_clean(hollow, (14, 397, 770, 329)), [96, 112, 96, 122])
+    s["pm_card"] = (cut_clean(p, (1207, 750, 310, 144)), [56, 48, 40, 40])
+    s["pm_banner"] = (cut_clean(p, (576, 910, 944, 88)), [64, 30, 64, 30])
+    return s
+
+
+def empty_track(a, x0, x1, y0, y1, empty_from):
+    """Replaces a bar's painted fill (x0 up to the empty part at `empty_from`)
+    with the empty track: each row repeats its own empty stretch, so the grain
+    and shading carry on with no seam."""
+    a = a.copy()
+    for y in range(y0, y1):
+        source = a[y, empty_from + 2:x1 - 2, :3]
+        span = empty_from - x0
+        reps = -(-span // source.shape[0]) + 1
+        a[y, x0:empty_from, :3] = np.tile(np.concatenate([source, source[::-1]]), (reps, 1))[:span]
+    return a
+
+
+def fill_start(a, x0, x1, y):
+    """Where a bar's fill ends on row y: the first track-coloured pixel."""
+    for x in range(x0 + 4, x1):
+        r, g, b = a[y, x, :3]
+        if g > 0.6 and r > 0.8 and b > 0.45:
+            return x
+    return x0
+
+
+def build_hud():
+    """The in-world HUD (12_hud_master): the compass strip with its marks
+    erased, the three vital rows (icon plate and bar) and the XP bar with their
+    fills repainted as empty track, the hotbar slot plain and selected with the
+    number erased, and the objective card with its placeholder rows erased."""
+    h = sheet("12")
+    s = {}
+    compass = erase_ink(h, (708, 46, 972, 72), dark=True, threshold=0.55, grow=3, amount=1.0)
+    s["pm_hud_compass"] = (cut_clean(compass, (596, 37, 481, 40)), [36, 16, 36, 16])
+    # Vital rows: (name, row rect, track inner rows y0..y1); the track runs
+    # x 1378..1625 on every row.
+    for name, rect, (y0, y1) in (("health", (1310, 36, 330, 53), (53, 71)),
+                                 ("stamina", (1310, 99, 330, 53), (116, 135)),
+                                 ("food", (1310, 161, 330, 54), (178, 197))):
+        mid = (y0 + y1) // 2
+        row = empty_track(h, 1378, 1625, y0, y1, fill_start(h, 1378, 1625, mid))
+        s["pm_hud_" + name] = (cut_clean(row, rect), None)
+    xp = empty_track(h, 619, 1085, 741, 755, fill_start(h, 619, 1085, 748))
+    s["pm_hud_xp"] = (cut_clean(xp, (579, 728, 515, 40)), None)
+    slot = erase_ink(h, (232, 803, 262, 836), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_hud_slot"] = (cut_clean(slot, (212, 784, 123, 120)), [40, 40, 40, 40])
+    chosen = erase_ink(h, (653, 803, 683, 836), dark=True, threshold=0.5, grow=3, amount=1.0)
+    s["pm_hud_slot_selected"] = (cut_clean(chosen, (633, 784, 123, 120)), [40, 40, 40, 40])
+    card = erase(h, box(h.shape, (1368, 383, 1606, 502)), amount=0.8, feather=3)
+    s["pm_hud_card"] = (cut_clean(card, (1343, 323, 292, 212)), [82, 50, 36, 46])
+    return s
+
+
 def contact(sprites, path):
     items = [(n, a) for n, (a, _) in sorted(sprites.items())]
-    width, x, y, row, gap = 1600, 10, 10, 0, 12
+    width = max(1600, max(a.shape[1] for _, a in items) + 20)
+    x, y, row, gap = 10, 10, 0, 12
     placed = []
     for name, a in items:
         h, w = a.shape[:2]
@@ -528,16 +931,42 @@ def contact(sprites, path):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     sprites = build()
+    sprites.update(build_settings())
+    sprites.update(build_journal())
+    sprites.update(build_inventory())
+    sprites.update(build_crafting())
+    sprites.update(build_windows())
+    sprites.update(build_hud())
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     for name in [n for n in manifest if n.startswith("pm_")]:
         del manifest[name]
+    for old in OUT.glob("pm_*.png"):
+        old.unlink()
     for name, (a, insets) in sorted(sprites.items()):
         a = clean(a)
         sprites[name] = (a, insets)
-        save(a, OUT / f"{name}.png")
         h, w = a.shape[:2]
-        manifest[name] = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets}
-        print(f"{name:28s} {w:4d}x{h:<4d} slice={insets}")
+        if w <= MAX_SIDE and h <= MAX_SIDE:
+            save(a, OUT / f"{name}.png")
+            manifest[name] = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets}
+        else:
+            # Roblox shrinks uploads past 1024 px: big art goes up as tiles that
+            # Widgets.Sprite lays back together (tiles overlap by TILE_OVERLAP so
+            # filtering leaves no seam).
+            tiles = []
+            cols, rows = -(-w // TILE), -(-h // TILE)
+            for row in range(rows):
+                for col in range(cols):
+                    x0, y0 = col * w // cols, row * h // rows
+                    x1, y1 = (col + 1) * w // cols, (row + 1) * h // rows
+                    ex0, ey0 = max(0, x0 - TILE_OVERLAP), max(0, y0 - TILE_OVERLAP)
+                    ex1, ey1 = min(w, x1 + TILE_OVERLAP), min(h, y1 + TILE_OVERLAP)
+                    tile = f"{name}__{row + 1}_{col + 1}"
+                    save(a[ey0:ey1, ex0:ex1], OUT / f"{tile}.png")
+                    manifest[tile] = {"file": f"{tile}.png", "w": int(ex1 - ex0), "h": int(ey1 - ey0), "slice": None}
+                    tiles.append([tile, int(ex0), int(ey0), int(ex1 - ex0), int(ey1 - ey0)])
+            manifest[name] = {"file": None, "w": int(w), "h": int(h), "slice": None, "tiles": tiles}
+        print(f"{name:28s} {w:4d}x{h:<4d} slice={insets}" + (" (tiled)" if w > MAX_SIDE or h > MAX_SIDE else ""))
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     contact(sprites, OUT / "_parchment_contact.png")
     print(f"{len(sprites)} parchment sprites -> {OUT.relative_to(ROOT)}")

@@ -30,9 +30,11 @@ local EventPanel = require(Hud.EventPanel)
 local HudMode = require(Hud.HudMode)
 local InteractionPrompt = require(Hud.InteractionPrompt)
 local Layout = require(Hud.Layout)
+local Parchment = require(Hud.Parchment)
 local ObjectivePanel = require(Hud.ObjectivePanel)
 local PartyFrames = require(Hud.PartyFrames)
 local Vitals = require(Hud.Vitals)
+local Widgets = require(Hud.Widgets)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -435,6 +437,20 @@ local function build()
 	widgets.event = EventPanel.new(root, layout)
 	widgets.vitals = Vitals.new(root, layout)
 	widgets.bottom = BottomBar.new(root, layout)
+	-- The backpack button on the left, as the HUD sheet draws it (touch and mouse
+	-- open the run backpack without a key).
+	if layout.backpack then
+		local holder = Instance.new("Frame")
+		holder.Name = "Backpack"
+		holder.BackgroundTransparency = 1
+		Layout.Place(holder, layout.backpack)
+		holder.Parent = root
+		local art =
+			Widgets.Sprite(layout.backpack.sprite, { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 3 }, holder)
+		Parchment.Pressable(holder, art, function()
+			InventoryController.ToggleBackpack()
+		end)
+	end
 	gui.Parent = player:WaitForChild("PlayerGui")
 
 	-- XP pop-ups live in their own always-enabled gui, laid out like the bottom

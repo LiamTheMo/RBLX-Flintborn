@@ -39,3 +39,6 @@ art/blender/renders/kit/**/*_cells/
 art/blender/renders/kit/**/*_row.png
 art/blender/renders/kit/**/mcp/
 __pycache__/
+
+# Headless UI captures (art/ui/capture/capture.py rebuilds them)
+art/ui/captures/
