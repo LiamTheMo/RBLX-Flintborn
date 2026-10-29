@@ -927,3 +927,368 @@ All 12 recommendations are accepted.
     - Blend by position, never by facing.
 
 **Binding targets.** The f34 shares in §1 hold within ±4. Water must stay ≥ 33 % of the f34 view. The side rocks must meet their flat-crown and wall-steepness targets, so they don't read as eggs.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m041.py`, `build()` (background session, port 9881, work copy `wip/M041.blend`). It imports
+the committed `m011`, `m012`, `m016`, `m032`, `m033`, `m034` for their generic 2D / cleanup / render helpers only.
+
+- **Tile contract as decided:** a regular octagon (X −16 … 16, Y −14 … 14, 7 × 7 chamfers); bed 0 → 0.2; water 0.25 → 1.0
+  (sides 0.02 inside the plate); foam 1.03 → 1.07; sand crest 1.6 with a 0.8 bevel to 1.15 at the edge; summit 10.12;
+  turf 10.4. Hero bbox **32.00 × 28.00 × 13.06** (plant tips; origin at the bottom centre, offset 0, 0, 0).
+- **Land = one closed shell.** `terrace()` builds the bed and the shelf as one multi-level slab with no booleans (CDT
+  tops, the shelf's vertical wall from the bed to its 1.15 edge, the plate's outer wall, one flat bottom); the stack's
+  pieces, ten rocks and four in-water pebbles are united into it one shell at a time (merge-0 exact unions at the origin,
+  21 unions, 0 retries). Every rock has a hidden plinth to z 0.05 (inside the bed or the shelf), so nothing stands on a
+  point and nothing floats.
+- **Shelf** (`SHELF`, lobed Catmull-Rom, ±0.32 radial lobes every 2.6): X −7.8 … 10.3, Y −8.6 … 9.6 (38 edge points). Its front edge sits
+  at Y −8.1 … −8.3 (the hero's −8.0 at the sand band's foot), the back was grown to Y 9.4 so the stack's battered back
+  stays on sand (the r34's back beach).
+- **Main rock** (`main_rock()`, spec 2.4): a **summit block** lofted through six rings whose top ring is the cap outline
+  + 0.03 at 10.12 (so the turf covers the whole flat summit), battered front 3.3, left 1.5, right 1.2, back 1.8 over the
+  height, with two vertical creases pulled 0.5 into the front (X 1.3, 3.3: the hero's x 290 / 320) and two into the back
+  (X −0.1, 2.7); **C1** (left column, hull, shoulder 8.1, a bevel ring at 9.75 and its tip **10.85** at (−3.15, 2.8)
+  just outside the cap's left edge); **C3** (right column, tip **10.6** at (6.05, 0.45) outside the cap's front-right
+  corner); the **spire SP** (apex 7.3 at (6.35, −1.45), in front of C3); shoulder blocks **LB** (3.5) and **RB** (4.55).
+  Column faces carry a split vertex at mid height pushed out 0.1–0.16 (tall strip facets). No summit knobs (decision 8).
+- **Side rocks** (`rock()`): hulls of jittered ring stacks with a broad base, near-vertical lower sides and a flat
+  polygonal crown, coplanar facets merged (4°): FL (Large, 6.5 × 5.0 × 5.3), BR (Medium 5.0 × 4.5 × 5.5 with a small
+  stepped crown knob, a second hull from 0.9 h), L, FR (4.2 × 3.8 × 4.1), FLb lodged at FL's front, FRb at FR's
+  front-right, FS, BL in open water; S1, S2 on the sand (sunk 0.3). Positions per §2.3 (L yaw 70°, FS 2.6 × 2.4).
+- **Pebbles:** four in the water (bed 0.15 → 1.25–1.36, part of the land union), three on the sand (sunk 0.05, own
+  shells).
+- **Cap** (`cap_slab()`): the CAP outline (16 corners, notches at the front (1.2, 0.85) and back (2.9, 6.35)), turf top
+  10.4, a 0.15 turf rim band, soil to 9.9, flat underside (sunk 0.22 into the summit).
+- **Plants** (each leaf, petal, disc, stem, bud and clump heart its own closed shell; every base sunk 0.035 into the turf
+  or the sand): cap P1 dark fern (7 leaves), P2 tall lime rosette (6), P3 lime rosette (5), P4 small dark fern (5), teal
+  round leaves (3), three daisies (5 petals, yellow disc, stem), a red bud; the foot clump F1 at (−0.9, −4.5) between
+  FL's back-right and the stack (5 broad lime leaves, a 4-leaf dark fern, a daisy, a pink bud, two yellow drops); the
+  F2 sprig by RB, the back clumps B1 / B2 and the BR sprig. Ferns and lime rosettes have a low leafy heart (a 12-tri
+  bipyramid) so they read as bushy mounds.
+- **Water / foam** as stage 2 / 5. **Parts:** the seven of decision 6, each from its own function.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold e / v | Boundary | Wire / loose / zero-area / n-gons | Normals |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ShoreShelf (hero) | **3858** / 4000 | 32.00 × 28.00 × 13.06 | 124 | 0 / 0 | 0 | 0 / 0 / 0 / 0 | outward |
+| ShoreShelfGrassCap | 648 | 8.13 × 6.88 × 3.16 | 54 (slab + plants) | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfMainRock | 496 | 14.10 × 12.55 × 9.55 | 1 | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfRockLarge | 58 | 6.23 × 5.41 × 5.25 | 1 | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfRockMedium | 98 | 4.79 × 4.31 × 5.45 | 1 | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfRockSmall | 34 | 2.22 × 2.36 × 2.75 | 1 | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfSand | 436 | 18.09 × 18.27 × 2.90 | 4 (slab + 3 pebbles) | 0 / 0 | 0 | 0 | outward |
+| ShoreShelfWaterPlane | 412 | 31.96 × 27.96 × 0.75 | 1 | 0 / 0 | 0 | 0 | outward |
+
+- **Hero shells:** land 1 (1608 tris), water 1 (412), foam 28 (728), cap 1 (96), plant 90 (960), sand pebbles 3 (54).
+  Every shell closed, 0 bowties (`M.fix_bowties` 0 on land and rest), 0 self-intersections inside any shell (the
+  land's 2 post-union self-hits at L's foot went with L's new seed), 0 inverted shells, dup verts 0.
+- **Cleanup:** m016's sliver pass with the largest vertex move cut to **0.05** (`CLEAN_MOVE`; m011's 0.18 would push
+  rock faces into the water's 0.08 gap), plane-locked at 0 / 0.2 / 1.15 / 1.6 / 10.12; 116 collapses, 50 flips, then
+  polish (68 forced). Thin corners (< 5°): land 3, water walls 8, **foam walls 330** (the 0.04-thick foam's side quads
+  against 1–2-stud edges: inherent in a thin flat sheet, as M034), cap rim 14, plant blades 15.
+- **Floating dressing: 0** (hero, GrassCap, Sand: `contact_report`, every non-water shell touches another at 0, all
+  chained to the land at 0.03).
+- **Water / foam vs land:** water 0 overlapping triangle pairs, min distance to land **0.05**; foam 0 overlaps, min
+  **0.03**, inner-edge plan gap median **0.063** (max 0.24, 65 verts within 0.25 of land). Small holes (pebbles) are
+  regular 4–6-gons with every edge ≥ 0.75 (the CDT's needle pass collapsed shorter hole edges to their middle and let a
+  pebble cut the water in an early build).
+- **Capping (§2.7):** rock faces n.z > 0.85 above z 9 outside the cap outline **0.58 studs²** (limit 1.5); C1 / C3
+  shoulders were dropped to 8.1 with a steep bevel ring at 9.7 (an early build had 19 studs² of flat column top).
+- **Rock-shape targets** (parts, `rock_metrics`): Large H : W 0.84, crown (n.z > 0.9 above 0.7 h) **44 %** of plan, width
+  at 0.7 / 0.9 h **0.94 / 0.85**, widest at 0.3 h, base 0.99, 89 % of side area within 25° of vertical, 58 tris, area CV
+  0.49; Medium 1.14, crown 49 %, 0.93 / 0.88, 95 %, 98 tris (two hulls); Small 1.24, crown 27 %, 0.94 / 0.72, 85 %, 34 tris.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED, margin 0.008) + `m012._uv_unfold`: every object 0 overlapping pairs, 0 flipped,
+min island gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.035 (hero 1.020, 1020 islands).
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration** (`m041.calibrate()`, `K.calibrate` on the kit dome; targets per §5.4):
+
+  | Key | Hex | Renders (dome) | Target |
+  | --- | --- | --- | --- |
+  | m041_rock | **#A09492** (set by hand) | f34 lit faces #CAB6AB | #C6B4AE |
+  | m041_rock_light / _deep | #A99F9D / #8F8583 (by hand) | | +12 / a step below |
+  | m041_sand / _light / _deep | #EEBA95 / #F4C19D / #BEA881 | #FFE5AE / #FFEEB7 / #F1CE95 | #FDE6AD / #FEEFB7 / #F2CE95 |
+  | m041_grass / _light | #93B600 / #A0C100 | #B6DE05 / #C7EC05 | #B7DF02 / #C7ED05 |
+  | m041_soil | #725325 | #8E6532 | #8F6531 |
+  | m041_leaf / _lit / _lime | #0D5510 / #1E8753 / #82A500 | #116011 / #22A059 / #9FC805 | #126513 / #21A157 / #A0C908 |
+  | m041_petal / flower / bud | #DACAC8 / #C1A700 / #A3403D | #FFFFF1 / #F5CD25 / #CD524B | #FBF8EE / #F5CD12 / #CF514B |
+  | m041_bud_pink | #A86A90 (by hand: too pale for the vivid sampler) | | #BC7CA3 |
+  | m041_pebble | #6F4F28 | #8B6136 | #8B6136 |
+  | m041_bed / _bed_light | #00A0EA / #2CC8EE (tuned on the render) | | deep / light water |
+  | m041_water (0.3) / m041_water_foam (0.2) | #00B4E2 / #CDE6EE | | #06DFFD / #C3F3FC |
+
+  The calibrated rock keys came out **mauve** (#9C9395, B > G) and were rejected: the rock keys are set from the
+  calibration's measured studio gain (linear R 1.68, G 1.56, B 1.40) so every rock key is R > G > B with R − B = 14 and
+  renders hue 21° (the key's own hue is 9°: the studio warms it by about 12°).
+- **Blend by position, never facing:** rock — feet within 0.6 / 1.2 of the water or sand 50 % / 25 % `rock_deep`,
+  underwater faces 75 %, crowns (top 20 % of a side rock) 50 % `rock_light`, the stack above 0.85 / 0.7 of the summit
+  `rock_light` / 50 %, column creases 50 % deep; sand — bevel band 25 % / edge 50 % `sand_deep`, broad noise patches of
+  `sand_light` on the crest (smoothed over neighbours, quantised to quarters), walls `sand_deep`, underside sand under the
+  shelf / `bed` elsewhere; bed — noise patches of `bed_light` (about 25 % of the bed) and light within 0.6 of the shelf
+  and every rock (no dark ring at a collar's inner edge); turf — `grass_light` patches; leaves — inner / upper leaves lit,
+  hearts mixed deep. Tint mottling per region (rock 0.04 at 0.4, sand 0.03 at 0.15, bed 0.03 at 0.8, turf 0.04, leaves
+  0.04, a per-piece factor ±4 %); no per-triangle confetti. `K.check` facing correlation passes on every object except the
+  Sand part's walls (waived with `kit_shading_ok`: the wet sand below the waterline, close-up B's underside).
+- **Re-measured on `f34_sheet` (no VFX), study masks:**
+
+  | | Ours | Sheet |
+  | --- | --- | --- |
+  | Rock lit (v > .7) / whole | **#CAB6AB** (21°) / #B8A59B | #C6B4AF / #A4979D |
+  | Sand | #FFE5AC | #FDEEB4 |
+  | Water median / deep (s ≥ .97) / light (s < .85) | #0DDEFF / **40.1 %** / 28.9 % | #06DFFD / 52.4 % / 17.1 % |
+  | Foam | #D8FFFF (lit #FAFFFF) | #CAF1FC (lit #E7FCFE) |
+  | Turf / green (v > .7) | #B8E00F | #B5DD03 |
+
+  Rock R > G > B in every view's median (f34, r34, front, side, rear, top).
+
+## Stage 5 — Lighting
+
+Skipped by decision 10: nothing glows; no emissive key, no light. Studio notes (Requires Manual Validation): the water's
+cyan and two-tone through the exported texture and transparency 0.3 (the bed's Specular 0 is preview only), the foam at
+0.2, the rock staying warm pale grey (not lilac) under the game's sun, the sand pale cream.
+
+## Stage 6 — VFX
+
+13 `water_foam` sockets at z 1.05 (`FOAM_FX`): seven on the shore (scale 0.7) at (0.5, −10.6), (4.2, −10.8),
+(11.5, −1.7), (11.2, 2.8), (4.2, 10.2), (−2.4, 10.6), (−8.6, −3.0); six on the rocks' seaward sides: FL+FLb (−6.0, −11.4)
+1.0, L (−11.6, 1.9) 0.7, BL (−6.7, 11.8) 0.5, BR (9.4, 11.4) 0.9, FR+FRb (12.4, −9.6) 0.8, FS (8.3, −9.6) 0.5. Clearance to
+the nearest water hole (rock or shelf): min **0.61**. No `water_flow`, no `vapour` (decision 7). The foam is also a mesh
+(28 shells: a 5-segment ribbon 0.42–1.0 wide with rounded ends and five bubble holes, six lobed collars hugging the rocks'
+foam holes (FL+FLb and FR+FRb share one), five loose blobs); both water keys contain "water", the bed key doesn't
+(expected export: 2 water pieces).
+
+## Renders and comparison (stage 1–6 acceptance)
+
+`build()` writes every kit view, the six `*_sheet` cameras (**without** the VFX sprites: the sheet's foam is drawn as a
+mesh, and the white `water_foam` sprites put f34 F at 8.3 %), `f34_vfx` (the same camera with the sockets realised),
+`exploded`, seven `part_*`, `scale` (a red 5.5-stud marker on the shelf), `cap_cu`, `junc_cu`, `water_cu`, `under_cu`,
+and the contact sheet `M041_views.png`.
+
+| View | W : H ours / sheet | W | F | S | G | R | O |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **f34_sheet (0, 28)** | **1.496 / 1.548** | **37.4** / 37.1 | **4.7** / 3.3 | **7.6** / 6.2 | **6.9** / 6.8 | **42.3** / 42.6 | 0.7 / 3.7 |
+| r34_sheet (180, 26) | 1.945 / 1.641 | 38.8 / 31.4 | 3.1 / 2.8 | 5.1 / 8.1 | 5.5 / 8.4 | 46.1 / 45.1 | 1.0 |
+| front_sheet (0, 10) | 1.991 / 1.643 | 27.1 / 18.5 | 3.4 / 4.1 | 5.3 / 5.1 | 6.0 / 8.5 | 56.8 / 58.9 | 0.9 |
+| side_sheet (90, 5) | 1.972 / 1.395 | 24.3 / 17.1 | 2.5 / 3.5 | 4.0 / 3.7 | 5.0 / 10.2 | 62.5 / 61.1 | 1.4 |
+| rear_sheet (180, 10) | 2.164 / 1.532 | 27.3 / 16.8 | 2.4 / 3.2 | 4.0 / 7.6 | 5.6 / 10.2 | 58.6 / 57.6 | 1.8 |
+| top_sheet (0, 89) | 1.148 / 1.116 | 53.9 / 53.9 | 5.0 / 5.4 | 11.1 / 9.2 | 7.9 / 5.8 | 21.2 / 23.3 | 0.7 |
+
+- f34 top profile: `.25 .53 .56 .59 .62 .65 .66 .74 .83 .93 .96 1.0 .93 .92 .76 .73 .74 .60 .57 .53 .26` against the sheet's
+  `.36 .48 .51 .55 .59 .62 .66 .68 .83 .94 .97 .97 .94 .94 .79 .72 .75 .67 .62 .60 .32` (within ±0.08 for f .05–.95; the
+  ends are the regular chamfers). Bottom profile `.17 .13 .09 .05 0 …` against `.19 .16 .12 .09 .06 .02 0 …`.
+
+## Modeller's notes for the verifier
+
+- **Measure the `*_sheet` renders**, not `f34_vfx`: the sheet shots are rendered without the particle previews on
+  purpose (see Renders). With the sprites the f34 F share is 8.3 %.
+- **Known misses (recorded, not chased):**
+  1. f34 bottom profile at f .20 reads 0.00 against the sheet's .06 (and .02 at f .25): the regular 7 × 7 front-left
+     chamfer (decision 2) against the hero's 8.5 leg.
+  2. f34 F 4.7 % against 3.3 (inside the ±4 binding band, 0.1 outside the spec's ±1.5): about 2 points are the kit water
+     texture's light caustic lines and the plate's lit side band, which the sheet doesn't draw; the foam mesh itself is
+     about 2.5 %. It was narrowed (ribbon 0.42–1.0, collars 0.55 of the planned widths) to hold F; the sheet's foam reads
+     wider and lacier, with more bubble holes than the budget allows (five).
+  3. W : H of r34 / front / side / rear are wider than the sheet's (the low cells draw heights 12–35 % taller, §3.3; the
+     r34 because the stack stands back of centre and so lower on screen from behind, §3.5). Their shares are within ±7
+     except W in front / side / rear (+8.6 / +7.2 / +10.5: the same height redraw) and G there (−2.5 … −5: the sheet
+     draws the cap plants larger in those cells).
+  4. Water deep share 40 % (target ≥ 40, sheet 52) and light 29 % (sheet 17): the caustic lines are light pixels.
+  5. Rock key hue 9° (spec table 12–22° for the key): a key with hue ≥ 12° and R − B ≥ 14 renders hue 25° in the warm
+     studio; the rendered lit median #CAB6AB is within 10 of #C6B4AE at hue 21°.
+  6. RockSmall (FS) H : W 1.24 (spec 0.5–1.2; FS's own 2.8 / 2.3 per §2.3 is 1.22). Medium (BR) knob: the sheet's
+     exploded Medium has w(0.9 h) .33; ours keeps the knob above 0.9 h so w(0.9 h) is 0.88 (spec ≥ 0.70).
+  7. Cap plants are fewer and spikier than the sheet's lush mound (budget: plants 960 tris of 3858); no brown bud (cut
+     for budget), the red bud kept. No foam collars round the four in-water pebbles (budget); the foam never touches them.
+  8. No summit knobs (decision 8); rock bases don't drop below the plate's underside (decision 9 / §3.8).
+  9. Thin corners on the foam's 0.04-tall side walls (330 faces), as any thin flat sheet.
+- **Where to look:** the cap covers the summit (`cap_cu`, capping 0.58 studs²); the foot clump F1 with its daisy and pink
+  bud between FL and the stack (`junc_cu`); collars hugging FR / FRb / FS with no blue ring (`water_cu`); flat underside,
+  sand-coloured under the shelf (`under_cu`).
+- **Rebuild:** `import importlib, kit_models, m041; importlib.reload(kit_models); importlib.reload(m041); m041.build()`
+  (about 25 s build + 40 s renders). The final check was run in a freshly restarted session: `problems` empty.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh stage-7 verifier with no other stage. It worked read-only on port 9877 with `wip/M041_verify.blend`: no `build()`, no
+edits, no save (the file's timestamp is unchanged). It rendered with `m041.render_views`, with the output sent to the scratchpad
+(`…/scratchpad/m041_verify/M041/`, plus extra collar close-ups `cu_*.png` and side-by-side crops `cmp_*.png`). Every
+number below was re-measured with the verifier's own bmesh/BVH code unless it says "builder fn".
+
+### Measured
+
+| Object | Tris | Size (studs) | Shells | NM e / v | Boundary / wire / loose / zero-area / n-gons | Normals | Transforms / origin |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ShoreShelf | **3858** / 4000 | 32.00 × 28.00 × 13.06 | 124 | 0 / 0 | 0 / 0 / 0 / 0 / 0 | outward | rot 0, scale 1; bbox X −16…16, Y −14…14, z 0 |
+| ShoreShelfGrassCap | 648 | 8.13 × 6.88 × 3.16 | 54 | 0 / 0 | 0 | outward | applied, bottom centre |
+| ShoreShelfMainRock | 496 | 14.10 × 12.55 × 9.55 | 1 | 0 / 0 | 0 | outward | ok |
+| ShoreShelfRockLarge | 58 | 6.23 × 5.41 × 5.25 | 1 | 0 / 0 | 0 | outward | ok |
+| ShoreShelfRockMedium | 98 | 4.79 × 4.31 × 5.45 | 1 | 0 / 0 | 0 | outward | ok |
+| ShoreShelfRockSmall | 34 | 2.22 × 2.36 × 2.75 | 1 | 0 / 0 | 0 | outward | ok |
+| ShoreShelfSand | 436 | 18.09 × 18.27 × 2.90 | 4 | 0 / 0 | 0 | outward | ok |
+| ShoreShelfWaterPlane | 412 | 31.96 × 27.96 × 0.75 | 1 | 0 / 0 | 0 | outward | ok |
+
+- **Per shell (own code, all 8 objects):** every shell is closed and manifold. Across all of them there are 0 bowtie verts, 0
+  self-intersecting face pairs within a shell, 0 inward volumes, 0 n-gons and 0 zero-area faces. In the hero, the land shell
+  is 1608 tris, the water 1 shell (412), the foam 28 shells (728), the cap 1 shell (96), and the plants plus sand pebbles 93
+  shells. UV (builder fn `M.uv_stats`): 0 overlaps and 0 flipped on every object; min gap 0.016; conformal p95 ≤ 1.035.
+- **Thin corners < 5°:** the hero has 370. Of these, 330 are foam faces, and **all 330 are the vertical 0.04-tall side
+  walls**. The rest are water walls (8), cap rim (14), leaves (15), bed (2) and rock (1). The MainRock part has 2 and
+  GrassCap 20. **Accepted:** the foam faces are inherent in a 0.04-thick flat sheet, are never seen face-on, and none is
+  degenerate.
+- **Floating dressing (own BVH code, tol 0.03, chained to the largest dry shell):**
+  - hero: 0 floating and 0 unchained among 95 dry shells, worst gap 0.000;
+  - GrassCap: 0 / 0;
+  - Sand: 0 / 0.
+- **Water and foam against the land:**
+  - Water: 0 overlapping tri pairs, min 0.050 to the land, z 0.25 → 1.00.
+  - Foam: 0 overlaps, min 0.030 to the land, z 1.03 → 1.07, and 0.030 above the water top.
+  - Foam to plants and pebbles: min 0.44. Water to plants and pebbles: min 0.62.
+- **Capping (own ray cast upward from every land face with n.z > 0.85 above z 9):**
+  - The flat summit is 44.55 studs², and 43.97 of it is under the cap.
+  - Exposed: **0.58 studs²**, four small faces on the C3 / RB shoulder at X ≈ 5.6–5.8 (limit 1.5).
+  - Turf top 10.40.
+- **VFX:**
+  - 13 children, all `water_foam`, at z 1.05. Nothing else.
+  - Plan distance from each socket to the nearest land at z 1.05: min **0.79** (to rock 0.79, FR+FRb), max 4.2. All 13 are
+    ≥ 0.5 ✔.
+  - No `water_flow`, no `vapour`, no emission (every material's Emission Strength is 0).
+- **Tile:**
+  - The plate hull is exactly the 7 × 7 octagon.
+  - The seam faces are planar (Y ±14 / X ±16, with the water inset 0.02).
+  - The bed levels are 0 / 0.2, and the underside is flat at z 0 (798 studs²).
+  - Distances from the plate outline: rocks ≥ 0.68 (above the bed), pebbles ≥ 1.06, foam ≥ 0.30, sand crest ≥ 4.4.
+- **Keys and collision:**
+  - The `m041_bed*` keys contain no "water". `m041_water` (0.3) and `m041_water_foam` (0.2) carry `kit_transparency`.
+  - Collision: hero `precise`; MainRock, the three side rocks and GrassCap `hull`; Sand `precise`; WaterPlane `none`.
+- **`K.check`:** no problems on any of the 8 objects. Raw facing correlation (`baked_shading`, limit 0.5): hero 0.07, GrassCap
+  0.46, the rocks, MainRock and WaterPlane 0.00, **Sand part 0.84 (waived)**.
+- **Tint:** there is a CORNER layer on every land, plant and cap material:
+
+  | Material | Tint sd | Range |
+  | --- | --- | --- |
+  | rock | ±0.026 | 0.94–1.07 |
+  | sand | 0.012 | |
+  | bed | 0.014 | |
+  | leaves | 0.025 | |
+
+  Only 12 of 1065 rock faces differ from every neighbour by > 0.02, so the tint is broad patches, not confetti.
+
+**Rock shapes (builder fn `rock_metrics`, confirmed):**
+
+| Part | H : W | Crown share | w 0.7h / 0.9h | Widest | Base | Vertical side | Facets (front) | Area CV |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RockLarge | 0.84 | 0.44 | 0.94 / 0.85 | 0.3 h | 0.99 | 0.89 | 18 | 0.49 |
+| RockMedium | 1.14 | 0.49 | 0.93 / 0.88 | 0.3 h | 0.96 | 0.95 | 20 | 1.00 |
+| RockSmall | **1.24** | 0.27 | 0.94 / 0.72 | 0.3 h | 1.00 | 0.85 | 12 | 0.41 |
+
+**Renders against the sheet (study masks, `measure_render.py`, floor hidden, no VFX sprites):**
+
+| View | W : H ours / sheet | W | F | S | G | R |
+| --- | --- | --- | --- | --- | --- | --- |
+| **f34_sheet** | **1.496 / 1.548** | **37.4** / 37.1 | **4.7** / 3.3 | **7.6** / 6.2 | **6.9** / 6.8 | **42.3** / 42.6 |
+| r34_sheet | 1.945 / 1.641 | 38.8 / 31.4 | 3.1 / 2.8 | 5.1 / 8.1 | 5.5 / 8.4 | 46.1 / 45.1 |
+| front_sheet | 1.991 / 1.643 | 27.1 / 18.5 | 3.4 / 4.1 | 5.3 / 5.1 | 6.0 / 8.5 | 56.8 / 58.9 |
+| side_sheet | 1.972 / 1.395 | 24.3 / 17.1 | 2.5 / 3.5 | 4.0 / 3.7 | 5.0 / 10.2 | 62.5 / 61.1 |
+| rear_sheet | 2.164 / 1.532 | 27.3 / 16.8 | 2.4 / 3.2 | 4.0 / 7.6 | 5.6 / 10.2 | 58.6 / 57.6 |
+| top_sheet | 1.148 / 1.116 | 53.9 / 53.9 | 5.0 / 5.4 | 11.1 / 9.2 | 7.9 / 5.8 | 21.2 / 23.3 |
+
+- The f34 shares are all within the binding ±4, and water is 37.4 % (≥ 33 ✔).
+- f34 top profile, f .05–.95, ours minus the sheet: +.05 +.05 +.04 +.03 +.03 0 +.06 0 −.01 −.01 +.03 −.01 −.02 −.03 +.01 −.01
+  −.07 −.05 −.07. Every point is within ±0.08 ✔.
+
+**Colour (both images sampled with the same masks):**
+
+| Region | Ours (f34) | Sheet (f34) | |
+| --- | --- | --- | --- |
+| Rock lit (v > .7) | #CAB6AB (21°, 0.15) | #C6B4AF (13°, 0.12) | Δ ≤ 5 ✔; R > G > B |
+| Rock median | #B8A59B | #A4979D | known warm residual (the sheet's shade is blue light) |
+| Rock median r34 / top / side / exploded | #A29692 / #B5ACA5 / #958885 / #C2AEA4 | | R > G > B in every view; never B > G ✔ |
+| Sand | #FFE5AC | #FDEEB4 | Δ ≤ 9 ✔ |
+| Water median | #0DDEFF | #06DFFD | ✔ |
+| Water deep / light share | 40 % / 29 % | 52 % / 17 % | off (the water texture) |
+| Foam | #D8FFFF | #C0F0FC | Δ 24: whiter than the sheet |
+| Lime (turf and lime leaves) | #A8D00F (72°) | #9CCA03 | ✔ |
+| Dark leaves | #226A28 (125°, 0.68), 188 px | #0C6217 (128°, 0.88), 435 px | a separate type ✔; about half the sheet's amount |
+
+- The rock keys `#A09492`, `#A99F9D` and `#8F8583`, and every `rock_x_*` mix, are R > G > B with R − B = 12–14.
+
+### Findings
+
+1. **minor: the foam reads fainter and plainer than the sheet's.**
+   - What works: the collars hug the rocks (`water_cu`, `cu_*`) and the shelf ribbon sits on the waterline (median plan gap
+     0.06 along the shelf). There is no blue ring.
+   - What doesn't: at hero scale, the sheet's bright, wide, lacy surf rings with bubble rows read clearly in f34 and top.
+     Ours are a thin pale band with no visible bubbles. The rendered foam is #D8FFFF against #C0F0FC.
+   - The F share is 4.7 against 3.3, but about 1.6 points of that are the water texture's caustic lines, so the foam mesh
+     itself is about 3 % (on target).
+   - The rock collars' inner edges stand a median 0.24–0.40 off the rocks' z 1.05 section (own code). This reads fine
+     because the rocks widen under the water, but FLb's seaward face shows open water against the rock.
+   - Fix target, if a round 2 happens:
+     - ribbon 0.8–1.4 wide;
+     - collars at about 0.8 of the planned 0.6–1.4 (not 0.55);
+     - visible bubble holes;
+     - F ≤ 3.3 + 4.
+2. **minor: the cap plants are sparser and spikier than the sheet's lush mound.** There are about half the sheet's dark-leaf
+   pixels and no brown bud. Headroom is 142 tris. Fix target: one more dark fern rosette at the back-left and a brown bud,
+   both chained to the turf.
+3. **minor: the water's two-tone.** The kit water texture's caustic network replaces the sheet's soft blotches (deep 40 %
+   against 52, light 29 against 17). The median colour is on target. This is an exporter / Studio matter; leave it.
+4. **minor: the plate chamfer profile.** The f34 bottom profile at f .20 / .25 is 0.00 against .06 / .02, because of the
+   regular 7 × 7 chamfer (decision 2). Accepted.
+5. **minor: the low cells read wider.**
+   - In r34, front, side and rear: W : H +0.30 to +0.63, W share +7 to +10, G −2.5 to −5.
+   - This is decision 1: the sheet stretches heights in those cells. Accepted.
+   - The r34 also shows less of the back beach and back clumps than the sheet. Judged loosely (§3.5).
+6. **minor: RockSmall H : W 1.24** (spec 0.5–1.2; FS's own target 2.8 / 2.3 = 1.22). It is a broad-based, flat-crowned block
+   (w 0.7h 0.94, base 1.00), not an egg. Accepted.
+7. **minor: the side rocks are flatter-crowned and more barrel-like than the sheet's faceted domes.** This shows most in
+   the low cells and the exploded Medium (w 0.9h .33 against our .88). It follows the binding §2.7 anti-egg targets, which
+   are all met: crowns 27–49 %, w 0.9h ≥ 0.72, vertical sides 85–95 %. Not a defect.
+8. **minor: the Sand part's `kit_shading_ok` waiver (raw facing correlation 0.84). Upheld.**
+   - Why it stands: the walls are painted `sand_deep` by position (every face of the shelf wall below its 1.15 edge, plus
+     the bottom).
+     - In the hero they sit almost entirely under the 1.0 waterline, and the hero's own correlation is 0.07.
+     - Close-up B shows a darker sand underside.
+     - So this is a real wet-sand region, not light painted by facing.
+   - A related nit: the underside's sand paint is chosen per CDT triangle centroid, so a few big underside triangles reach
+     the plate edge (`under_cu`). They are hidden in play.
+9. **minor: no foam round the four in-water pebbles** (budget). The foam stays ≥ 0.44 off them. Accepted.
+
+**Decisions check:**
+
+| # | Decision | Result |
+| --- | --- | --- |
+| 1 | Size and heights | 32 × 28, turf 10.40, bbox height 13.06 ✔ |
+| 2 | Plate | octagon with 7 × 7 corners, straight seams ✔ |
+| 3 | Plan | hero positions; the f34 profile within ±0.08 ✔ |
+| 4 | Water stack | bed 0 → 0.2 (solid key), water 0.25 → 1.0 at 0.3, foam 1.03 → 1.07 at 0.2 ✔ |
+| 5 | Packaging | one hero with precise collision; one land shell, the cap its own shell, each leaf / petal / pebble its own shell; all manifold, 0 bowties, 0 floating; water and foam never touch the land ✔ |
+| 6 | Parts | the seven, no foam part ✔ |
+| 7 | Foam and VFX | foam mesh plus 13 `water_foam` sockets, all ≥ 0.79 off the land; no flow, no vapour ✔ |
+| 8 | Summit | flat, no knobs, capped (0.58 studs²) ✔ |
+| 9 | Underside | flat bottom at z 0 ✔ |
+| 10 | Lighting | no lights, no emission ✔ |
+| 11 | Cameras | all cameras and extras rendered ✔ |
+| 12 | Colour | as decided: rock R > G > B, sand, turf, two plant types, water median, positional blending ✔ |
+
+**Score: 8 / 10.** The mesh is clean and in budget, nothing floats, the summit is capped, every f34 share is inside the binding
+band, and the colour family is right in every view. What still separates it from the sheet is the foam's brightness and width
+and the cap's plant density.
+
+**Verdict: PASS.** There are no blockers. Findings 1 and 2 are the polish worth doing if a round 2 is run; otherwise commit
+with these notes.
+
+## Main session ruling (2026-10-29)
+- **Verdict:** passed in round 1 (8/10) and committed.
+- **Left for a later polish pass:**
+  - The foam is fainter and plainer than the sheet's, and its collars stand 0.24–0.40 off the rocks. Target: a ribbon 0.8–1.4 wide, visible bubble holes, and collars at about 0.8 of the planned widths.
+  - The cap plants are sparse. Add one dark fern and a brown bud, using the 142 tris of headroom.
+  - The water two-tone comes from the kit water texture (an exporter matter).
+  - The side rocks are barrel-like.
+  - The four in-water pebbles have no foam collars.
+- **Export:** 8 assets, 10 pieces (7 solid, 3 water), 6040 tris, 13 VFX sockets, palette 36 colours, 0 problems. Water colour and transparency still need a Studio check.
