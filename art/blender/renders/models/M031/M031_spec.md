@@ -867,3 +867,598 @@ All recommendations are accepted:
 10. Names: `CaveFungusNode`, `CaveFungusCap`, `CaveFungusUnderside`, `CaveFungusStalk`, `CaveFungusRockBase`, keys `m031_*`.
 
 The caps are faceted domes (10 sectors, 4 facet rows, a crown polygon), never balls or soccer-ball patterns. Meet each cap's W:H and visible h range per view.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m031.py` (`build()`; background session on port 9880, work file
+`art/blender/assets/kit/wip/M031.blend`). Every part comes from its own function, and the hero is assembled from
+those same functions:
+- **Cap** `_cap(R, H, n)`: rings (z fraction of H above the lip, radius fraction of R) lip (0, 0.90), rim (0.16, 1.0),
+  shoulder (0.42, 0.94), upper (0.72, 0.64), then a **flat crown pentagon** (1.0, 0.22). Ring turns `CAP_OFFS`
+  (0, 0, ½, 0) step. The lip and rim are aligned, so the lip band is a row of narrow quads (the dark lip band). The
+  shoulder sits half a step round, giving tall triangles. The upper ring is turned back, so the shoulder and upper
+  rows form diamonds and kites. Jitter is ±3.5 % radius and ±1.5 % H. Underneath, a down-facing gill annulus runs
+  from the lip to an inner ring (0.04 H, 0.62 R) with a shallow fan to the centre (0.10 H). Big cap: 10 sectors, 108
+  tris. Medium: 9 sectors. Small: 8 sectors. The big cap's rim has a vertex at ±X (front width 3.0) and its shoulder
+  a vertex at the front (az 270).
+- **Underside drum** `_drum`: 12 sides (10 on the medium and small). Rings (0, 0.86 r), (0.07, r), (just under the
+  lip, r), (top, 0.90 r), with a shallow radial cone underneath. Big: r 1.0, 0.575 tall, 94 tris. Its top sits
+  0.05 above the gill fan's apex, inside the cap; its side crosses the gill annulus transversally.
+- **Stalk** `_stalk`: 10 sides (8 on the medium and small), **4 rings** offset half a step: (0, 0.90), (0.30, 1.0),
+  (0.64, 0.84), (1.0, 0.67) of r_max. The Stalk part adds the 8-sided top peg (r 0.10, 0.15 tall). 6 rings were
+  tried first and made small triangles that read as a smooth glossy bottle.
+- **Rocks** `_rocks`: 12 `K.hull_rock` domes with flat bottoms at z −0.06 (cut flat later). Small rocks use rings
+  (0, 1.0, 7), (0.4, 0.9, 7), (0.78, 0.64, 6), (1.0, 0.38, 4); R1 uses an 8-point, 5-ring recipe. Every rock touches
+  at least one neighbour, checked with a BVH overlap for each yaw retry (`ROCK_INFO[...]["touch"]`).
+- **Layout** (`SHROOMS`, `ROCKS`). Each mushroom's stalk length comes from its crown target. The stack is stalk →
+  drum (the stalk sinks 0.08 × scale into it) → lip (drop above the drum bottom) → cap.
+  - Big: foot (+0.32, +0.30, 0.25), r_max 0.75, cap R 1.50 × H 1.45, crown z 3.60, lip z 2.15, drum z 1.77–2.35.
+  - Medium: foot (−0.95, −0.58, 0.12), leaning 18° toward az 205; R 0.78 × H 0.78, crown z 2.25.
+  - Small: foot (+1.36, −0.72, 0.10), leaning 20° toward az 315; R 0.65 × H 0.55, crown z 1.69.
+  - The caps never touch (BVH overlap check `cap_touch` = []).
+  - Rocks: R1 central (0.15, 0.00) 2.40 × 2.45 × 1.0. R2 back-right (1.30, 1.00) and R3 back-left (−1.02, 1.08)
+    reach out past the big cap's plan outline. **R6 is added** at the back centre (0.25, 1.30) 1.35 × 1.0 × 0.78:
+    the rear cell draws a rock in front of the big stalk, which R1 can't hide from behind. Seats R4 / R5; pebbles
+    P1–P6.
+- **Changes from the study's starting values**, made on the renders:
+  - Big cap H 1.6 → 1.45 and X +0.22 → +0.32 (the front cap was too tall: W : H 1.52, rim h .56 against .60–.66;
+    its centre f .54 against .58).
+  - Medium and small H 0.83 / 0.69 → 0.78 / 0.55.
+  - Medium foot 0.1 inward and lean 16° → 18°.
+  - Pebbles made squatter and moved inward until all of them overlap.
+
+Placeholder keys were the study's §5.4 targets. Stage 4 replaced them.
+
+## Stage 2 — Optimisation and cleanup
+
+- **Hero:** the 21 shells (12 rocks, 3 × stalk / drum / cap) are united one at a time (`_union_fine`: exact union,
+  0.002 merge, a guard against a union that loses the mesh), then cut flat at z 0 (`_floor_cut`, a triangle-fill
+  cap). After that come `m016._clean_mesh`, `_finish` (from m025: drop inner crumbs, fill, force slivers, recentre),
+  `_polish` (split quads, force slivers ≥ 5°, smart UV), ground faces, and `M.fix_bowties` last.
+- **Hero guard:** if the fused hero fails `_fused_ok` (one shell, 0 non-manifold, bowtie or boundary edges, no
+  self-intersections, no corner under 5°), every rock turns 13° and the hero is rebuilt (4 tries). The RockBase
+  part has the same guard. Final build: both passed on attempt 0. Earlier layouts needed attempt 1.
+- **Final audit** (`build()`, 2026-10-29):
+
+| Object | Tris | Size (studs) | Shells | NM edges | Bowtie verts | Boundary | Self-hits | Inverted | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CaveFungusNode (hero) | 1484 / 4000 | 4.45 × 3.54 × 3.60 | 1 | 0 | 0 | 0 | 0 | 0 | 5.06° |
+| CaveFungusCap | 108 / 1000 | 3.04 × 2.82 × 1.46 | 1 | 0 | 0 | 0 | 0 | 0 | 15.05° |
+| CaveFungusUnderside | 94 / 1000 | 2.02 × 2.02 × 0.57 | 1 | 0 | 0 | 0 | 0 | 0 | 15.0° |
+| CaveFungusStalk | 112 / 1000 | 1.47 × 1.48 × 1.75 | 1 | 0 | 0 | 0 | 0 | 0 | 9.9° |
+| CaveFungusRockBase | 664 / 1000 | 4.37 × 3.47 × 1.05 | 1 | 0 | 0 | 0 | 0 | 0 | 5.11° |
+
+- On every object: wire edges, loose verts, zero-area faces, n-gons and duplicate verts are all 0. Normals point
+  outward (volume check, plus a ray-parity count of inverted faces, `_inverted`). Transforms are applied, the origin
+  is at the bottom centre, there are no custom normals, shading is flat, and `K.check` reports no problems.
+- Size against the target 4.4 × 3.5 × 3.6: W +0.05, D +0.04, H 0.
+
+## Stage 3 — UV
+
+`M.smart_uv(angle 45, ANGLE_BASED, margin 0.008)` plus `m012._uv_unfold`:
+
+| Object | Islands | Overlap pairs | Flipped | Min gap | Border | Density min / med / max | Conformal p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hero | 291 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.033 |
+| Cap | 13 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.064 |
+| Underside | 7 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.051 |
+| Stalk | 15 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.041 |
+| RockBase | 130 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.013 |
+
+## Stage 4 — Materials, colour and texture
+
+**Keys** (`PALETTE`). Roughness: caps 0.75, gill and stalk 0.85, rocks 0.92. Normal specular, no metal.
+- `m031_cap` `#985031`, `m031_cap_rim` `#783818`, `m031_cap_light` `#A95A38`;
+- `m031_gill` `#E8BF92`;
+- `m031_stalk` `#CABBAA`, `m031_stalk_low` `#BAA995`;
+- `m031_rock` `#999296`, `m031_rock_small` `#7C7679`;
+- 25 / 50 % mixes made by `K.mix_key`.
+
+**Calibration:**
+- **Pass 1** (`calibrate()`, `K.calibrate` on the test dome against the §5.4 targets). Rendered medians: cap
+  (178,99,67) against `#B56240`, rim (141,74,48), light (199,110,74), gill (167,131,96), stalk (235,210,185), stalk
+  low (215,189,161), rock (162,149,146), small rock (133,122,119), all within 6 of target.
+- **Pass 2** (the hero's `*_sheet` renders with the floor hidden, against the sheet's class-masked region medians;
+  scratch `m031_mod/reg.py`). Linear gains from the geometric mean of front and f34:
+  - caps × (1.16, 1.01, 0.89);
+  - rocks × 1.46 and small rocks × 1.4: with no floor bounce, the rock sides render darker than on the dome;
+  - stalks × 1.2 on pass 1's hue. A per-channel gain greyed the stalk, so its shaded faces fell out of the cream mask;
+  - gill × 3.5. The drum side sits in the cap's shadow, and the band rendered `#51402F` against `#957252`.
+
+**Final re-measure** (median / lit quartile / shade quartile, sheet → ours):
+
+| Region | Sheet | Ours | Δ median |
+| --- | --- | --- | --- |
+| Front big cap | `#BA6441` / `#DB7F56` / `#7D4024` | `#B96242` / `#D8754F` / `#6D361E` | ≤ 2 |
+| F34 big cap | `#BA6442` | `#BC6542` | ≤ 3 |
+| Front crown third | `#DA7C54` | `#D1704A` | 9–12 |
+| Front lip band | `#7F4224` | `#74361E` | 11–12 (inside `#6E3A1E`–`#8A4A2C`) |
+| Front underside band (left / right) | `#957252` / `#9C7653` | `#957655` / `#896C4D` | 4 / 19 |
+| Front big stalk | `#EBD7C2` | `#EDD3B6` | 12 (B) |
+| F34 big stalk | `#EAD7C3` | `#E5CDB1` | 18 (B) |
+| Front central rock | `#A79A95` | `#B0A29F` | 9–10 |
+| Front small rocks (left / right) | `#82797A` / `#8C7E77` | `#938784` / `#766A5F` | 17 / 24 (the right group sits in the key light's shade) |
+| Side / rear big cap | `#C06843` / `#B96340` | `#9E563C` / `#A0563C` | 34 / 25 darker (light direction, not paint) |
+
+- Saturation: front cap 0.64 (sheet 0.65); band 0.43 (target 0.42–0.47, hue 31°); stalk 0.23 (sheet 0.17–0.21).
+- The two rock families are 29 levels apart (central `#B0A29F` against small `#938784`). Both are warm.
+
+**Blending** (by position only, in 25 / 50 % steps, never by facing; `K.check` baked-shading correlation 0.00 on
+every object):
+- **Caps:** the lip band faces (centre under 0.12 H) are 50 % rim, the rim–shoulder band 25 % rim. On the upper half,
+  broad noise patches (scale 0.8) are 25 / 50 % toward `cap_light`. The gill annulus is GILL.
+- **Stalks:** from the visible foot (big 0.85, medium 0.35, small 0.30) the lowest 15 % is 50 % `stalk_low` and the
+  next band to 32 % is 25 %. The peg is `stalk_low`.
+- **Rocks:** the big rocks' bottom 15 % is 50 % `rock_small` and up to 32 % is 25 %. Faces within 0.2 of a neighbour
+  are 25 %. Small rocks get broad patches 25 % toward `rock`.
+- **Ground** (floor-cut cap): plain `rock`. A `rock_small` floor made the RockBase part's rock family follow facing
+  (corr 0.50).
+
+**Texture:** broad Tint mottling per piece: caps amp 0.03 at scale 0.6, gill and stalk 0.025 at 0.6, rocks 0.05 at
+0.5, plus a per-piece tint (±0.03 / ±0.04). Tint spread: hero 1.14, cap 1.06, underside 1.03, stalk 1.04, rock base
+1.14.
+
+## Stage 5 — Lighting
+
+Skipped by decision 7. The sheet shows no glow (glow share 0 %) and WorldModeling §9 rules out automatic emission
+for cave mushrooms. No emissive key, no light. Studio note (Requires Manual Validation): check in Emberhollow Caves
+lighting that the caps still read rust-orange; if not, fix the zone's placed lights.
+
+## Stage 6 — VFX
+
+Skipped by decision 7: the sheet says "No additional details, variants, or effects". There are no sockets, and
+`build()` flags any socket on the hero as a problem. Renders use `vfx=True` (nothing to realise).
+
+## Modeller's notes for the verifier
+
+- **Measuring:** `m031_mod/meas.py` (shares, top profile, width per h, bands, per-cap f / h / W : H / rim),
+  `reg.py` (region colours) and `vis.py` (class maps), in the scratchpad next to `m031_study`. They apply the
+  study's `m.py` masks to both the sheet and `renders/models/M031/*_sheet.png`. The `*_sheet` renders use a 3× long
+  lens and hide the floor, so there is no ground shadow. The r34 is compared with the f34_sheet render, unflipped
+  (§3.1). Final numbers are in `m031_mod/final_meas.txt`.
+- **Shares** (sheet → ours, C / K / R):
+  - front 44.9 / 24.5 / 30.6 → 47.3 / 17.3 / 35.5;
+  - f34 43.6 / 23.3 / 33.1 → 48.6 / 16.2 / 35.2;
+  - side 44.0 / 24.2 / 31.7 → 45.3 / 22.9 / 31.8;
+  - rear 47.6 / 19.4 / 33.0 → 40.0 / 25.3 / 34.6;
+  - r34 49.3 / 17.9 / 32.7 → 48.6 / 16.2 / 35.2;
+  - top 63.5 / 0 / 36.5 → 89.4 / 0.2 / 10.4.
+- **Cap W : H and extents** (ours; sheet in brackets):
+
+| View | Big | Medium | Small |
+| --- | --- | --- | --- |
+| Front | 1.87 (1.75), f .22–.88 (.235–.927), h .59–1.0 (.52–1.0); rim h .59–.62 (.60–.66) | 1.40 (1.38), f .00–.33 (.03–.39), h .37–.64 (.32–.63) | 1.44 (1.47), f .73–1.0 (.70–.99), h .27–.48 (.23–.47) |
+| F34 | 1.72 (1.82) | 1.36 (1.42) | 1.37 (1.44) |
+| Side | 1.62 (1.74; merged with the medium cap behind it) | — | 1.43 (1.42) |
+| Rear | 1.79 (1.82) | — | 1.80 (1.40) |
+
+  - Big cap width per its own height (front): .04 .92 .98 .96 .91 .84 .75 .67 .53 .36 .04 (sheet .02 .13 .95 .99 .94
+    .87 .78 .69 .51 .33 .04).
+  - Big stalk width (front): .33 W at h .30, .26 at .35, .28 at .40, .25 at .45 (sheet .31 / .29 / .27 / .24).
+- **Known misses:**
+  1. **Cream share low in the front and f34 (−6 to −7), and C / R correspondingly high.** The kit studio's high key
+     light casts the big cap's shadow onto the upper stalk and the drum's left side. Those pixels fall below the
+     cream mask's v 0.55 and count as rock or background (see `m031_mod/cls_front_sheet.png`). The lit colours
+     match (stalk `#EDD3B6` against `#EBD7C2`, band `#957655` against `#957252`). Painting those faces lighter would
+     be painting light, so I didn't. The side view, with the shadow behind, matches within 1.3.
+  2. **Top cap share 89 % against the 60–75 % target** (§3.3 expected it to run high). With the front-view cap sizes
+     and the 4.4 × 3.5 footprint, the caps cover most of the plan. The back and side rocks were moved out past the
+     cap outline (rock 7 → 10 %). Reaching 25 %+ rock would need a footprint about 5 × 4.5.
+  3. **Rear:** C −7.6 and K +5.9. The sheet draws the rear as the front again (§3.4). From behind, our small caps sit
+     higher (h .40–.56 against .28–.53) and more stalk shows. R6 was added so a rock stands behind the big stalk.
+  4. **Side D : H 0.90 (target 0.92–1.04) and f34 W : H 1.12 (1.20–1.32).** The hero matches the decided size, so
+     these come from the camera.
+  5. Side and rear caps render 25–34 levels darker than the sheet's (light direction).
+  6. Side view: the medium cap shows behind the small one (§3.2, expected).
+- **Build time:** `build()` takes about 16–34 s plus about 19–20 s of renders (≈ 35–55 s in all). `preview()`
+  renders only the sheet shots.
+
+## Stage 7 — Verification (round 1)
+
+Fresh verifier, read-only. Background session on port 9880 with `wip/M031_verify.blend` (not saved, no `build()`). Fresh
+renders came from `m031.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratch folder
+(`scratchpad/m031_ver/renders/M031/`). The modeller's `meas.py` / `reg.py` were re-pointed at those renders; the
+verifier's own `band.py` adds the underside band, the parts and per-class colours. Side-by-side crops are
+`scratchpad/m031_ver/pair_*.png` and `parts*.png`.
+
+**Result: FAIL, 6.5 / 10.** Three blockers: the underside colour blows out wherever it is lit, the rock keys are
+mauve rather than warm, and the rocks have the wrong shape. Geometry, topology, UVs, the caps and the stalks all pass.
+
+### Re-measured (verifier's own bmesh scripts, plus `M.audit`)
+
+| Object | Tris | Size (studs) | Shells | NM edges | Bowtie verts | Boundary | n-gons | Zero-area | Min corner | Self-hits | Inverted | Interior |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CaveFungusNode | 1484 / 4000 | 4.447 × 3.541 × 3.600 | 1 | 0 | 0 | 0 | 0 | 0 | 5.06° | 0 | 0 | 0 |
+| CaveFungusCap | 108 / 1000 | 3.043 × 2.815 × 1.459 | 1 | 0 | 0 | 0 | 0 | 0 | 15.05° | 0 | 0 | 0 |
+| CaveFungusUnderside | 94 / 1000 | 2.019 × 2.020 × 0.575 | 1 | 0 | 0 | 0 | 0 | 0 | 15.0° | 0 | 0 | 0 |
+| CaveFungusStalk | 112 / 1000 | 1.466 × 1.480 × 1.750 | 1 | 0 | 0 | 0 | 0 | 0 | 9.9° | 0 | 0 | 0 |
+| CaveFungusRockBase | 664 / 1000 | 4.374 × 3.467 × 1.050 | 1 | 0 | 0 | 0 | 0 | 0 | 5.11° | 0 | 0 | 0 |
+
+- **Size and origin.** Against the decided 4.4 × 3.5 × 3.6: +0.05, +0.04 and 0, all inside tolerance. The local bbox
+  is centred on x/y 0 with min z 0. Rotation is 0 and scale 1 on all five objects. There are no modifiers, parents,
+  children or VFX sockets, no custom normals, and 0 smooth faces (flat shading). There are 0 wire edges, loose verts
+  and duplicate verts, and the volume is positive.
+- **Interior faces.** A single-ray parity test flagged 1 face each on the hero and the RockBase. A 5-ray majority
+  vote on both sides of every face gives 0 interior and 0 inverted faces, so the flag was a false positive.
+- **UV.** Each object has one layer. Islands: hero 291, cap 13, underside 7, stalk 15, base 130. Rasterised at
+  1024², there are **0 overlapping texels**. There are 0 flipped and 0 zero-area UV faces. Density p5–p95 is
+  0.96–1.04 of the median on every object, and the range is 0.008–0.992.
+- **Materials.** There are 14 `m031_*` slots on the hero, all used. Roughness is 0.75 on the cap, 0.85 on the gill
+  and stalk, and 0.92 on the rocks. Specular is 0.5, metal 0, emission 0. `K.check` reports nothing.
+  - Within the cap faces, key luminance correlates with face normal z at 0.89, because the lip ring is darker and
+    the upper patches lighter. Both are painted by ring height, as §3.8 and §5.5 prescribe, so this isn't colour by
+    facing.
+  - Tint is a corner attribute ranging 0.93–1.06.
+
+### Views against the sheet
+
+Renders are identical to the modeller's: the same numbers reproduce exactly.
+- **Caps (pass).** These are faceted domes, not balls or soccer patterns:
+  - a dark lip quad band, tall shoulder triangles, diamond and kite upper facets, and a pentagon crown (visible in
+    the f34 and the top);
+  - big W : H 1.87 front (sheet 1.75; tolerance 1.70–1.85, just over because the sheet's lip dips at its right end),
+    1.72 f34, 1.79 rear;
+  - width per cap height `.92 .98 .96 .91 .84 .75 .67 .53 .37` against `.95 .99 .94 .87 .78 .69 .51 .33`;
+  - medium front f .00–.33 / h .37–.64 (sheet .03–.39 / .32–.63), small .73–1.0 / .27–.48 (sheet .70–.99 / .23–.47);
+  - both lean outward with rim slopes like the sheet's (medium rim .37 → .52 against .33 → .47, small .34 → .27
+    against .32 → .23).
+- **Stalks (pass).** Fat cream bells. The big stalk's front width is .33 / .26 / .28 / .25 W at h .30–.45 (sheet
+  .31 / .29 / .27 / .24). The Stalk part matches the exploded bell.
+- **Underside band.** Present under every cap, but see blocker 1.
+- **Rock ring.** See blockers 2 and 3.
+
+### Colours (median / lit quartile / shade quartile, sheet → ours, Δ = per-channel on the median)
+
+| Region | Sheet | Ours | Δ median |
+| --- | --- | --- | --- |
+| Front big cap | `#BA6441` / `#DB7F56` / `#7D4024` | `#B96242` / `#D8754F` / `#6D361E` | 1 / 2 / 1 |
+| F34 big cap | `#BA6442` | `#BC6542` | 2 / 1 / 0 |
+| Front crown third | `#DA7C54` | `#D1704A` | 9 / 12 / 10 |
+| Front lip band | `#7F4224` | `#74361E` | 11 / 12 / 6 |
+| Cap part vs exploded cap | `#B25F3E` | `#C56946` | 19 / 10 / 8 |
+| Side / rear big cap | `#C06843` / `#B96340` | `#9E563C` / `#A0563C` | ≈ 34 / 25 darker (kit light direction) |
+| Front big stalk | `#EBD7C2` / lit `#FDE9D1` | `#EDD3B6` / `#F6DCBF` | 2 / 4 / 12 |
+| Stalk part vs exploded stalk | `#ECD6BD` | `#F8DEC0` | 12 / 8 / 3 |
+| Front underside band | `#A27C58` / `#B28F71` / `#8F6D4D` | `#896D51` / `#B2906D` / `#826A4C` | 25 / 15 / 7 (in the cap's shadow) |
+| **Side underside band** | `#A37E5B` / `#AF9074` | `#B18F71` / **`#FDCF9D`** | 14 / 17 / 22; lit +78 |
+| **Rear underside band** | `#AA8969` / `#C5AC94` | **`#E2BB8C`** / **`#FFD19C`** | **56 / 50 / 35** |
+| **Underside part vs exploded disc** | `#BDA489` / `#F9E1C7` | **`#FFDEA0`** / `#FFEEAC` | **66 / 58 / 23** |
+| Gill close-up vs cap-part underside | `#B08C69` | `#BEAD9B` (294 px, a flat plain disc) | 14 / 33 / 50 |
+| Front central rock | `#A79A95` | `#B0A29F` | 9 / 8 / 10 |
+| Front small rocks L / R | `#82797A` / `#8C7E77` | `#938784` / `#766A5F` | 17 / 14 / 10 · 22 / 20 / 24 |
+| Rock base part vs exploded base | `#9C8E88` | `#A79A96` | 11 / 12 / 14 |
+| **Side rocks** | `#9C8D86` (warm) | **`#807676`** (neutral) | 28 / 23 / 16 |
+| **Rear rocks** | `#8D817C` / lit `#B1A29C` (warm) | **`#91898C`** / **`#A59C9F`** (B > G, mauve) | 4 / 8 / 16; lit hue wrong |
+| Top rocks | `#7B7270` | `#9C9190` | 33 / 31 / 32 |
+
+### Judging the modeller's misses
+
+- **Cream share low in the front and f34** (K 17.3 / 16.2 against 24.5 / 23.3): **lighting, accepted.** The class
+  map shows that the missing cream is the shaded faces of the stalks (the right halves, under the kit's left key)
+  and the shaded side of the drum, which fall under the cream mask's v 0.55. Lit stalk colours match within 12. The
+  side, with the light behind, is within 1.3.
+- **Top cap share 89 % against 60–75:** **accepted.** It follows from the decided size and the front-view cap
+  sizes. The sheet's top cell is drawn rotated and mirrored (§3.3).
+- **Rear (C −7.6, K +5.9), side D : H 0.90, f34 W : H 1.12:** **accepted as a consequence of the composition and
+  camera.**
+  - The outward lean lifts the small caps' backs (rear h .40–.56). From behind, the medium cap merges into the big
+    cap's rim.
+  - The medium and small caps overhang the rock ring at both silhouette ends (front top profile f 0 .46 against
+    .08, f 1 .36 against .27).
+- **Side and rear caps 25–34 darker:** **lighting** (kit key direction). The key is right: front within 2.
+
+### Blockers
+
+1. **Underside (gill) colour blows out wherever it is lit.**
+   - What's wrong:
+     - Pass 2 multiplied `m031_gill` by 3.5 to brighten the shadowed front band, which is painting light. The key
+       is now `#E8BF92`, lighter than the stalk key `#CABBAA`. The sheet's underside is always darker than the
+       stalk.
+     - In the rear and side, and on the Underside part, the drum reads as a bright butter-peach collar: rear band
+       `#E2BB8C` against `#AA8969`, Underside part `#FFDEA0` against the exploded disc `#BDA489` (Δ 66 / 58 / 23).
+     - In Studio, every lit cap will show this yellow ring.
+   - Fix:
+     - Drop the 3.5× gain. Re-run `K.calibrate({GILL: ((0xBD, 0xA4, 0x89), "brown")})` on the parts-shot drum,
+       starting from the pass-1 key; pass 1 rendered (167,131,96) on the test dome.
+     - Keep hue 29–31° and the key's luminance at least 15 % below `m031_stalk`.
+   - Accept, and record as light, a front band darker than the sheet.
+   - Check:
+     - `part_underside` median within 15 of `#BDA489`;
+     - rear_sheet band (the verifier's `band.py`) within 15 of `#AA8969`;
+     - side band lit quartile no lighter than about `#C8A888`.
+2. **Rock keys are mauve, not warm.**
+   - What's wrong:
+     - `m031_rock` `#999296` and `m031_rock_small` `#7C7679` have B > G (hue ≈ 325°). The spec (§5.4,
+       pitfall 8) requires hue 8–22° with R > G > B.
+     - The front only reads warm because of the warm key light. Side rocks render `#807676` (sheet `#9C8D86`),
+       rear lit `#A59C9F` (sheet `#B1A29C`), and under Roblox's neutral light they will read lilac.
+   - Fix:
+     - Set warm starting keys, about `#9E928C` and `#80766F`.
+     - Calibrate `rock` on the parts-shot central rock against `#A19592`, and `rock_small` on a pebble against
+       `#857B78`.
+     - Keep the two families 25–35 apart, and keep the ×1.46 / ×1.4 floor-bounce gains only if the front still
+       needs them.
+   - Check: side_sheet and rear_sheet rock medians have R > G > B, and are within 12 of `#9C8D86` / `#8D817C`.
+3. **Rocks are upright slabs, not squat boulders.**
+   - What's wrong:
+     - `ROCK_RINGS` = (0, 1.0) → (0.4 h, 0.9) → (0.78 h, 0.64) → (1.0 h, 0.38 with 4 points). That gives
+       near-vertical lower walls and a broad flat 4-point top.
+     - Several rocks are as tall as or taller than wide: P5 h/w 1.17, P2 1.01, P3 0.88, R2 0.81, R3 0.79.
+     - In the rear, side and Rock Base part renders the ring reads as a row of standing stones or teeth. The sheet
+       shows rounded faceted domes ("lumpy ring of warm-grey boulders"; the exploded base).
+     - 30 % of the RockBase's non-floor area faces within 15° of horizontal (walls).
+   - Fix:
+     - Use the study's bulged dome recipe, for example `((0.0, 0.92, 7), (0.3, 1.0, 7), (0.62, 0.84, 7), (0.86,
+       0.5, 6), (1.0, 0.15, 3))`.
+     - Cap the small rocks at h/w ≤ 0.75: P2 h 0.85 → 0.62, P3 0.70 → 0.55, P5 0.70 → 0.50 (w and d 0.70),
+       P6 0.60 → 0.52.
+     - Lower R2 to 0.88 (w 1.40) and R3 to 0.82.
+     - Keep R1 and R6.
+   - Check:
+     - rear_sheet, side_sheet and the Rock Base part read as rounded squat domes against the exploded base;
+     - front rock-band top profile within ±0.06 of the sheet (.14–.31);
+     - h .0–.2 at least 85 % rock in front, side and rear;
+     - the hero is still one shell with 0 NM, bowtie and boundary, and its size is unchanged;
+     - wall-facing area share about 0.20 or less.
+
+### Minors (record; fix only if cheap while doing the blockers)
+
+- Front big-cap W : H 1.87 is 0.02 over its band (the sheet's dipping lip end). The f34 and rear are inside.
+- The drum reads as a straight-walled collar with a hard, straight bottom edge, where the sheet's underside band
+  has a soft, concave lower edge. This is per decision 3, and should read acceptably once blocker 1 is fixed.
+- The Cap part's underside, seen from below, is a near-flat plain disc (the gill annulus rises only 0.04 H), with
+  none of the close-up's radial tan facets. It is never seen in the hero.
+- The stalks' lit faces show a warm specular sheen (a gold, glossy gradient on the big stalk's left faces in the
+  front and f34). The sheet's stalks are matte. Specular 0.5 → about 0.2 on the stalk and gill keys.
+- The Cap part renders 10–19 lighter than the exploded cap (`#C56946` against `#B25F3E`). The hero cap is within 2.
+- The composition misses are all accepted, as judged above:
+  - the medium and small caps overhang the rock ring at the silhouette ends;
+  - rear small caps sit high, and the medium cap merges into the big cap's rim from behind;
+  - top cap share 89 %;
+  - the medium cap shows behind the small one in the side (§3.2).
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-29. Background session on port 9880 with `wip/M031.blend` (saved after the final build). The
+builder `m031.py` is still the source of truth; all changes are in it. Scratch tools are in
+`scratchpad/m031_r2/`: `r2.py` (rock-band top profile, bottom-20 % rock share and R-class medians per view),
+`band.py` (the verifier's band and parts script, pointed at `renders/models/M031/`), `bot.py` (class map of the
+bottom band), `pair.py` (side-by-side crops `pairs_fsr.png` and `pairs_parts.png`). The final numbers are in
+`final_meas.txt`. The modeller's `m031_mod/meas.py` / `reg.py` were re-run unchanged.
+
+**Changes**
+- **B1, gill.** Dropped the ×3.5 gain. Starting from pass 1's `#856C52`, linear steps on two targets: the
+  part_underside median against the exploded disc `#BDA489`, and the rear_sheet band against `#AA8969`. They pull
+  R in opposite directions (the parts shot lights the drum warm; the rear lights it cool), so the key sits between
+  them. Final **`m031_gill #A08870`**: hue 30°, sat 0.30, relative luminance 0.26 against the stalk key's 0.51
+  (47 % darker).
+- **B2, rocks.** The keys are now warm with R > G > B. Final **`m031_rock #9B9290`** (hue 11°, sat 0.07) and
+  **`m031_rock_small #7E7775`** (hue 13°, sat 0.07), 29 levels apart.
+  - Started from `#9E928C` / `#80766F`. On the warm studio key light these rendered the front rocks at hue 29°,
+    sat 0.21.
+  - The lit front rock faces then fell into the cream mask (K: hue ≥ 26°, sat ≥ 0.13). The front bottom 20 % read
+    only 49 % rock.
+  - The saturation was stepped down until the front R median sat at hue 22–26° and sat 0.14, and the part_rockbase
+    median sat within 6 of `#A19592`.
+- **B3, rock shape.**
+  - `ROCK_RINGS` is now the bulged dome `((0, .92, 7), (.3, 1.0, 7), (.62, .84, 7), (.86, .5, 6), (1, .15, 3))`.
+  - Heights as asked: P3 0.55, P5 0.50 (0.70 × 0.70), P6 0.52, R2 0.88 (w 1.40), R3 0.82.
+  - Three rocks differ from the verifier's list, to hold the sheet's front rock-band profile; all stay at h / w
+    ≤ 0.75:
+    - **P2 0.96 × 0.96 × 0.72**, not 0.62. At 0.62 the front's far-left column read h .16 against the sheet's .28.
+    - **P1 0.54, P4 0.56** (P4 0.78 × 0.75). At 0.42 / 0.45 the medium and small stalks showed into the bottom
+      band: front 84.5 % rock.
+    - **R4 0.62.** 0.72 was tried: it is hidden behind the medium stalk and changed nothing.
+  - h / w (height over the smaller footprint side): R1 0.42, R2 0.73, R3 0.71, R4 0.62, R5 0.42, P1 0.73, P2 0.75,
+    P3 0.73, P4 0.75, P5 0.71, P6 0.74, R6 0.78 (R6 was kept, as asked).
+- **Minors.**
+  - Specular 0.5 → 0.2 on every `m031_stalk*` and `m031_gill` material (`SPEC`, applied by `_spec()` in
+    `palette()` and after the build). It made no measurable difference: the gold gradient on the big stalk's left
+    faces is the soft edge of the cap's shadow (it renders the same at 0.2).
+  - Big cap H 1.45 → 1.48 (the crown stays at z 3.60; the lip drops 0.03). 1.50 gave front W : H 1.82 but f34 1.68.
+- **Tried and reverted.** An undercut rock base ring (0.84) plus a flatter R1 recipe. RockBase wall share went
+  0.264 → 0.235, but the front rocks darkened, the side worsened and the hero needed attempt 2 (1712 tris).
+
+**Final audit** (`build()`; problems `[]`, `K.check` clean, baked-shading corr 0.00 on every object; hero and
+RockBase guard passed on attempt 1; build 31.6 s plus 19 s of renders)
+
+| Object | Tris | Size | Shells | NM e / v | Boundary | Self-hits | Inverted | Min corner | UV islands / overlaps / gap |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CaveFungusNode | 1648 / 4000 | 4.57 × 3.60 × 3.60 | 1 | 0 / 0 | 0 | 0 | 0 | 5.03° | 283 / 0 / 0.016 |
+| CaveFungusCap | 108 | 3.04 × 2.82 × 1.49 | 1 | 0 / 0 | 0 | 0 | 0 | 15.25° | 10 / 0 / 0.018 |
+| CaveFungusUnderside | 94 | 2.02 × 2.02 × 0.58 | 1 | 0 / 0 | 0 | 0 | 0 | 15.0° | 7 / 0 / 0.016 |
+| CaveFungusStalk | 112 | 1.47 × 1.48 × 1.72 | 1 | 0 / 0 | 0 | 0 | 0 | 9.9° | 15 / 0 / 0.016 |
+| CaveFungusRockBase | 870 / 1000 | 4.52 × 3.58 × 1.00 | 1 | 0 / 0 | 0 | 0 | 0 | 5.03° | 141 / 0 / 0.016 |
+
+Hero size against 4.4 × 3.5 × 3.6: W +0.17 (tol 0.25), D +0.10 (0.3), H 0. The width grew with the wider P2.
+Margin 0.008 on every object, density 1.0, no wire, loose or zero-area elements, no n-gons, rotation 0, scale 1.
+
+**Checks against the verifier's list** (sheet → ours)
+
+| Check | Target | Result |
+| --- | --- | --- |
+| B1 part_underside median | within 15 of `#BDA489` | `#CDA782`: Δ 16 / 3 / 7 (R one over) |
+| B1 rear_sheet band | within 15 of `#AA8969` | `#9C816C`: Δ 14 / 8 / 3 ✓ |
+| B1 side band lit quartile | no lighter than ≈ `#C8A888` | `#BAAA97` ✓ (round 1 `#FDCF9D`) |
+| B1 key hue / vs stalk | 29–31°, ≥ 15 % darker | 30°, 47 % darker ✓ |
+| B2 side rocks | R > G > B, within 12 of `#9C8D86` | `#827974` R > G > B ✓; Δ 26 / 20 / 18 ✗ |
+| B2 rear rocks | R > G > B, within 12 of `#8D817C` | `#918783` ✓ Δ 4 / 6 / 7 |
+| B2 front rocks | (spec §5.7) | `#958980` against `#A0928A`, Δ 11 / 9 / 10 |
+| B2 part_rockbase | `#A19592` | `#A7988F`, Δ 6 / 3 / 3 (exploded base `#9C8E88`: Δ 11 / 10 / 7) |
+| B3 front rock-band top | ±0.06 of the sheet | 15 of 19 interior columns within ±0.06; f .05 +.07, .30 / .35 −.09, .40 −.08, .45 +.10 |
+| B3 bottom 20 % rock | ≥ 85 % | front 87.5, side 90.7, rear 98.1 ✓ |
+| B3 hero shell, size | one clean shell, decided size | ✓ |
+| B3 wall-facing area (RockBase) | about 0.20 | 0.264 (round 1 0.30) |
+| Minor: front big-cap W : H | 1.70–1.85 | 1.83 ✓ (f34 1.69, rear 1.79) |
+| Minor: Cap part | exploded `#B25F3E` | `#C46846` unchanged |
+
+Notes on the misses:
+- **Side rocks** are 18–26 darker than the sheet's. The side caps are 31 darker for the same reason (the kit key
+  lights the model from the front-left, so from +X the rocks' visible faces are in shade). The keys are right in
+  the front (Δ ≤ 11), the rear (Δ ≤ 7) and the parts shot (Δ ≤ 6). The side's lit quartile `#A49A96` is within 15
+  of the sheet's `#B3A49F`. Lighting, not paint.
+- **Rock-band profile outliers** are mask leaks, not rock height. The class map (`m031_r2/cls_front_sheet.png`)
+  shows the big stalk's shaded lower half falling into R (f .40–.45, too high). The medium stalk leans in front of
+  R4 at f .30–.35, so the rock behind it can't show (too low; raising R4 changed nothing). The end columns (f 0 and
+  1.0) are the caps' overhang, accepted in round 1.
+- **Underside part R +16** (one over) against rear R −14: the two targets conflict in the red channel under the
+  studio lights. Every other channel is inside.
+- **Cap part** not fixed. It renders `#C46846` from every parts-shot angle tried ((−10, 12), (−20, 15), (−10, 15),
+  (0, 12): ±4) and with the floor hidden (the same). The hero cap uses the same keys and is within 2 of the sheet
+  (`#B96242` against `#BA6441`). Darkening only the part would make a reusable cap that no longer matches the
+  hero's caps.
+- **Front / f34 cream share** is now 14.8 / 14.2 (round 1 17.3 / 16.2). The drum's band now renders at its true
+  tan, `#5E4D3B` in the front, in the cap's shadow, so it falls under the cream mask's v 0.55. This is the darker
+  front band that was accepted as lighting. The rear and side bands match (above).
+- The rest of round 1's accepted misses are unchanged: top cap share 87 %, side D : H 0.92, f34 W : H 1.15, the rear
+  small caps sitting high, and the medium cap showing behind the small one in the side.
+
+## Stage 7 — Verification (round 2)
+
+Fresh verifier, read-only; it did no other stage and was not the round-1 verifier. Background session on port 9880 with
+`wip/M031_verify.blend` (not saved; `build()` not called). Fresh renders come from `m031.render_views()` with
+`M.MODEL_RENDERS` pointed at `scratchpad/m031_ver2/renders/`. The measuring scripts are copies of the modeller's
+`band.py` / `r2.py` / `meas.py` and the round-1 `geo.py` / `geo2.py` / `mats.py`, re-pointed at those renders. The
+side-by-side crops are `scratchpad/m031_ver2/p_fsr.png`, `p_34.png`, `p_top_expl.png`, `p_parts1.png`, `p_parts2.png`,
+`p_under.png` and `z_stalk.png`. Every number the modeller recorded reproduces exactly.
+
+**Result: PASS, 7.5 / 10.** B1–B3 are fixed. What remains is lighting, or comes from the decisions. Nothing is broken.
+
+### Re-measured (own bmesh scripts plus `M.audit`)
+
+| Object | Tris | Size (studs) | Shells | NM e / v (bowtie) | Boundary | Wire / loose / dup | n-gons / zero-area | Min corner | Self-hits | Inverted / interior (5-ray) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CaveFungusNode | 1648 / 4000 | 4.568 × 3.597 × 3.600 | 1 | 0 / 0 | 0 | 0 / 0 / 0 | 0 / 0 | 5.03° | 0 | 0 / 0 |
+| CaveFungusCap | 108 / 1000 | 3.043 × 2.815 × 1.489 | 1 | 0 / 0 | 0 | 0 / 0 / 0 | 0 / 0 | 15.25° | 0 | 0 / 0 |
+| CaveFungusUnderside | 94 / 1000 | 2.019 × 2.020 × 0.578 | 1 | 0 / 0 | 0 | 0 / 0 / 0 | 0 / 0 | 15.0° | 0 | 0 / 0 |
+| CaveFungusStalk | 112 / 1000 | 1.466 × 1.480 × 1.720 | 1 | 0 / 0 | 0 | 0 / 0 / 0 | 0 / 0 | 9.9° | 0 | 0 / 0 |
+| CaveFungusRockBase | 870 / 1000 | 4.525 × 3.576 × 1.000 | 1 | 0 / 0 | 0 | 0 / 0 / 0 | 0 / 0 | 5.03° | 0 | 0 / 0 |
+
+- **Size.** Against 4.4 × 3.5 × 3.6: W +0.17 (tolerance ±0.25), D +0.10 (±0.3), H 0.
+- **Interior faces.** A single-ray parity test flags one RockBase face. The 5-ray majority vote on both sides gives 0, so
+  it is a false positive (as in round 1).
+- **Origin and transforms.** On all five objects the local bbox is centred on x/y 0 with min z 0, rotation is 0 and
+  scale is 1. There are no modifiers, parents, children, VFX sockets or custom normals. All faces are flat-shaded, and
+  the volume is positive.
+- **UV.** Each object has one layer, with range 0.008–0.992. Islands: hero 283, cap 10, underside 7, stalk 15, base
+  141. Rasterised at 1024², there are **0 overlapping texels**. There are 0 flipped and 0 zero-area UV faces. Density
+  p5–p95 is 0.95–1.06 of the median.
+- **Materials.** There are 14 `m031_*` slots, all used. `m031_cap` `#985031`, `gill` `#A08870`, `stalk` `#CABBAA` /
+  `stalk_low` `#BAA995`, `rock` `#9B9290`, `rock_small` `#7E7775`; both rock keys are R > G > B, hue 11–13°. Roughness:
+  cap 0.75, gill / stalk 0.85, rock 0.92. Specular 0.2 on every stalk and gill material, 0.5 elsewhere. Metal 0,
+  emission 0. `K.check` reports nothing. Tint is a corner attribute from 0.93 to 1.06.
+- **No colour by facing.**
+  - The builder paints by position only: cap by ring height, stalk by height above the visible foot, rocks by height,
+    neighbour distance and a noise field.
+  - Rock key luminance correlates 0.52 with face height and 0.24 with normal z. The cap's 0.89 normal-z correlation is
+    the ring-height lip band, as round 1 found.
+
+### Blockers from round 1
+
+| Item | Check | Result | Verdict |
+| --- | --- | --- | --- |
+| B1 underside colour | part_underside within 15 of `#BDA489` | `#CDA782`, Δ 16 / 3 / 7 | Pass. R is one level over; the rear band pulls R the other way, so these are conflicting light targets. |
+| | rear_sheet band within 15 of `#AA8969` | `#9C816C`, Δ 14 / 8 / 3 | pass |
+| | side band lit quartile ≤ ≈ `#C8A888` | `#BAAA97` (round 1 `#FDCF9D`) | pass |
+| | key hue 29–31°, ≥ 15 % darker than the stalk | 30°; luminance 0.26 against 0.51 | pass |
+| B2 rock hue | side / rear R > G > B | `#827974` / `#918783`, both warm (21° / 17°) | pass |
+| | within 12 of `#9C8D86` / `#8D817C` | side Δ 26 / 20 / 18 ✗; rear Δ 4 / 6 / 7 ✓ | Pass (side is lighting, see below) |
+| B3 rock shape | rounded squat domes against the exploded base | rear, side and RockBase all read as rounded faceted boulders (`p_parts1`, `p_fsr`) | pass |
+| | h / w ≤ 0.75 | all ≤ 0.75 except R6 0.78 (kept as asked) | pass |
+| | h .0–.2 ≥ 85 % rock | front 87.5, side 90.7, rear 98.1 | pass |
+| | front rock-band top ±0.06 | 15 of 21 columns. Outliers: f .30 / .35 −.09, .40 −.08, .45 +.10, f 1.0 +.27 (cap overhang). The class map puts these on mask leaks: the shaded stalk reads as R, and the medium stalk covers R4. | pass |
+| | one clean shell, size unchanged | yes, W +0.17 (inside tolerance) | pass |
+| | wall-facing area ≈ 0.20 | RockBase 0.264, hero rocks 0.305 | Minor. The prescribed bulged-dome recipe itself gives about 20° walls between rings 0.3 and 0.62, and it reads as domes. |
+
+### Views against the sheet (side-by-side crops)
+
+- **Front, f34 and r34.**
+  - The caps are faceted domes with a dark lip band, shoulder kites and a crown. The stalks are fat cream bells. The
+    small caps lean outward.
+  - Big cap W : H: front 1.83 (sheet 1.75, band 1.70–1.85), f34 1.69 (sheet 1.82).
+  - Big cap extents: front f .24–.88, h .585–1.0 (sheet .235–.927, .52–1.0).
+  - Medium cap: f .02–.35, h .37–.64 (sheet .03–.39, .32–.63). Small cap: f .74–1.0, h .27–.48 (sheet .70–.99,
+    .23–.47).
+  - The rocks read as warm-grey boulders.
+  - The visible difference is under the big cap. The drum and the upper stalk sit in the kit key light's cap shadow and
+    render olive-grey (band `#5E4D3B` against `#A27C58`), with a soft penumbra gradient that reads slightly bronze
+    (`z_stalk.png`). The sheet lights the underside. The keys are right, so this is lighting.
+- **Side.** The caps and rocks are about 14 % darker than in the front, by the same factor (cap `#9D553B` against
+  `#BC6441`, rocks `#827974` against `#9C8D86`). The stalks match (`#B7A693` against `#BBA38D`). One factor across two
+  different keys means the key light's direction, not paint. The medium cap shows behind the small one (§3.2,
+  accepted).
+- **Rear.** Rocks `#918783` against `#8D817C` (Δ ≤ 7). The small caps sit higher (h .40–.56), as accepted in round 1.
+  The rock band is lower behind the medium stalk (f .30 / .35: −.16 / −.11) and higher at f .15–.20 (+.11). Minor.
+- **Top.** Cap share 87 % against 63.5 % (rock 12 against 36.5): accepted in round 1 (decided size, and the sheet's cell
+  is mirrored and rotated).
+- **Exploded and parts.**
+  - The rock base is a lumpy ring of rounded boulders, as on the sheet.
+  - The stalk bell matches, with its peg.
+  - The cap dome matches.
+  - The underside part is a thick puck (t / Ø 0.29). The sheet's disc is thinner (about 0.12) and paler.
+  - The Cap part's underside renders as a flat, dark, shadowed disc.
+
+### Colours (median / lit quartile / shade quartile, sheet → ours)
+
+| Region | Sheet | Ours | Δ median |
+| --- | --- | --- | --- |
+| Front big cap | `#B8633F` / `#DB7D55` / `#783E21` | `#BB6442` / `#D7754E` / `#6D361E` | 3 / 1 / 3 |
+| F34 big cap | `#B9633F` | `#BC6542` | 3 / 2 / 3 |
+| R34 caps (vs f34 render) | `#B6623F` | `#BC6542` | 6 / 3 / 3 |
+| Side / rear caps | `#BC6441` / `#B5603E` | `#9D553B` / `#9F553B` | 31 / 15 / 6 · 22 / 11 / 3 (light direction) |
+| Top caps | `#B5603D` | `#B75E41` | 2 / 2 / 4 |
+| Front cream (stalks + band) | `#C3AB94` / `#F7DEC6` | `#CAB29A` / `#F4DABC` | 7 / 7 / 6 |
+| Front underside band | `#A27C58` | `#5E4D3B` | 68 / 47 / 29 (cap shadow) |
+| Side / rear underside band | `#A37E5B` / `#AA8969` | `#857161` / `#9C816C` | 30 / 13 / 6 · 14 / 8 / 3 |
+| Front / f34 rocks | `#A0928A` / `#9B8C85` | `#958980` / `#968981` | 11 / 9 / 10 · 5 / 3 / 4 |
+| Side / rear rocks | `#9C8D86` / `#8D817C` | `#827974` / `#918783` | 26 / 20 / 18 · 4 / 6 / 7 |
+| Top rocks | `#7B7270` | `#A1948D` | 38 / 34 / 29 lighter (lit from above) |
+| Cap part / exploded cap | `#B25F3E` | `#C46846` | 18 / 9 / 8 |
+| Underside part / exploded disc | `#BDA489` | `#CDA782` | 16 / 3 / 7 |
+| Stalk part / exploded stalk | `#ECD6BD` | `#F8DEBF` | 12 / 8 / 2 |
+| Rock base part / exploded base | `#9C8E88` | `#A7988F` | 11 / 10 / 7 |
+
+### Judging the remaining misses
+
+- **Side rocks 18–26 darker: lighting.**
+  - In the same render the caps are 31 darker, by the same factor of about 0.86.
+  - In the front, f34, rear and parts shot the same rock keys are within 11.
+  - Repainting would break those views.
+- **Underside part R +16: lighting / conflicting targets.**
+  - The parts shot lights the drum warm; the rear band wants more red, not less.
+  - The key's hue and luminance are right.
+- **Cream share 14.8 / 14.2 against 24.5 / 23.3 (front / f34): lighting.**
+  - The class map shows the missing cream is the big stalk's upper and right faces and the drum, inside the cap's cast
+    shadow. Those pixels fall under the cream mask's v 0.55.
+  - The lit cream matches within 7. The side (K 20.3 against 24.2) and rear (25.3 against 19.4) are not short.
+  - Brightening the keys would be painting light.
+  - The other share misses (front R +5.5, C +4.2; f34 C +6.5; rear C −5.7) are the same pixels moving class, plus the
+    accepted composition.
+- **Front band 68 darker: lighting**, accepted in round 1 (it sits in the cap's shadow). The rear and side bands match.
+
+### Blockers
+
+None.
+
+### Minors (record; none needs another round)
+
+1. The Underside part is a thick puck (t / Ø 0.29) where the sheet's exploded disc is about 0.12 and paler. This
+   follows decision 3 / §3.5 (the drum hangs 0.3–0.4 below the lip). If it is ever revisited, the cheap fix is
+   to keep the hero drum and build the part with a thinner `side_top` / `t`.
+2. Wall-facing rock area: 0.264 on the RockBase against about 0.20. The rocks read as domes.
+3. The Cap part's underside (gill annulus) renders as a flat, dark, shadowed disc, unlike the close-up's light radial
+   facets. It is never seen in the hero from normal angles. This is unchanged from round 1.
+4. The Cap part renders 18 / 9 / 8 lighter than the exploded cap. The hero caps are within 3.
+5. In the front and f34, the underside drum and the upper big stalk look olive / bronze in the cap's shadow (studio
+   key). Check this in Studio under Emberhollow Caves lighting together with the existing stage-5 note.
+6. Rear rock band −.16 / −.11 at f .30–.35 (behind the medium stalk).
+7. R6's h / w is 0.78.
+8. Round 1's composition misses are still accepted:
+   - top cap share 87 %;
+   - f34 W : H 1.15 and side D : H 0.92;
+   - the rear small caps sit high;
+   - the medium cap shows behind the small one in the side;
+   - the small caps overhang the rock ring at the silhouette ends.
+
+**Requires Manual Validation (Studio):** cap rust-orange, cream stalks and the tan underside under the zone's
+lighting (minor 5). Export size 4.57 × 3.60 × 3.60 studs.

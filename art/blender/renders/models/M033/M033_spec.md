@@ -4,7 +4,7 @@ Reference: `art/blender/assets/references/033.png`. The sheet's own title is "CA
 "FLINTBORN — INDIVIDUAL MODEL STUDY" at the top right and the footer "FLINTBORN — INDIVIDUAL MODEL STUDY … PAGE
 28/132" (INDEX.md row 33 calls it "Flintborn cave moss model study"; the page number is not the index number). The
 image is 1024 × 1536 px.
-Builder: `art/blender/kit/mcp/m033.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`
+Builder: `art/blender/kit/mcp/m033.py` → `build()`. Procedure: `art/blender/kit/mcp/STAGES.md`
 (one modeller does stages 1–6 in a background Blender; then a fresh verifier does stage 7).
 
 User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
@@ -857,3 +857,294 @@ The recommendations are accepted, with one change (6):
 10. Names: `MossBoulder*`, keys `m033_*`.
 
 Clumps are broad-faceted lumps (12–18 broad faces visible, vertex valence 4–7), never balls or soccer-ball patterns.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m033.py` (`build()`; tuning helpers `hero_only()`, `preview()`, `calibrate()`). Built in
+a background Blender (`bgmcp.py`, port 9881, `wip/M033.blend`). Every part has its own function; the hero is
+assembled strictly from them.
+
+- **Rock Base** (`_base_rock`): one non-convex ring mesh, 14 sectors; rings (radius, height fraction)
+  `(0.93, 0) (1.0, 0.22) (0.97, 0.52) (0.86, 0.80) (0.64, 0.95)`, a 9-point top ring `(0.42, 0.99)` and a 5-point crown
+  `(0.18, 1.0)`; half-step offset rings zipped into triangles; a low-order Fourier outline (±5/4/3 %) plus ±3 % jitter.
+  Heights follow a lobe field read along each azimuth at ρ ≤ 0.42 (so each sector is a bulged dome profile; read at the
+  outer rings it fell to a flat plate): back hump (−0.10, 1.00) 1.90, front lobe (0.00, −0.45) 2.50, front-left
+  shoulder (−1.20, −0.70) 2.05, front-right (1.30, −0.40) 2.15, back flanks (∓1.4, 0.4) 1.60, floor 1.10, combined by a
+  soft max (p 6) so the lobes are swells of one surface with shallow creases (a hard max gave thin streaky triangles
+  along the crease lines). Centre (0.05, 0.25), radii 2.45 × 2.15. A 0.10-deep notch at (x −0.19, z 1.2) for sprout A.
+- **Clumps** (`_clump_local`, `_clump`): convex hulls of jittered point rings (angular jitter ±0.28 step, radial ±10 %).
+  MC rings `(0, .55, 6) (.24, .92, 7) (.52, 1, 7) (.80, .76, 6) (1, .36, 4)` (the last ring all at h 1 = the flat
+  crown); side rings `(0, .40, 5) (.20, .86, 7) (.48, 1, 7) (.76, .84, 6) (1, .30, 4)`. 30 / 29 points (an earlier
+  38-point hull read as a geodesic ball). MC (−0.15, 1.14, 2.52), 2.72 × 2.50 × 1.55, pitched 14° back (its back sinks
+  down the back hump: more moss in the rear view), yaw 10°. ML (−1.72, −0.30, 1.82), 2.42 × 2.20 × 1.72; MR (1.74,
+  −0.35, 1.74), 2.30 × 2.05 × 1.72; tilted ∓32° about Y so the inner end is up and the outer end hangs over the side
+  rock, yawed ±14° (inner ends back toward MC), upper rings leaning 0.1 toward the middle.
+  - **Spec deviation:** §2.2 says ML "tilt +25° (top toward +X)"; with this build's sign convention that lifts the
+    *outer* end. The exploded and the front both show the inner end up and the outer end hanging, so ML is rotated
+    −32° (its top normal toward −X, lying on the left shoulder) and MR +32°.
+- **Sprouts** (`_blade`, `_stub`, `_sprout`): closed diamond-section blades (4 sections at t 0 / .2 / .55 / .85,
+  widths .40 / .85 / 1.0 / .62 × 0.42 L, thickness 0.38 × width, a pointed tip, 7 % outward curl), each blade's face
+  turned 55 % from its lean toward the front (the sheet draws every fan in the picture plane; faces along the lean
+  showed the side blades edge-on). Blades rise from inside a 6-sided stub (Ø 0.30 → 0.22, 0.23 tall), bases nudged
+  apart. A: 4 blades (1.65 / 6° forward, 1.45 / 41° az 195, 1.20 / 37° az 345, 1.10 / 25° back). B: 5 blades (1.64 /
+  14° az 0, 1.30 / 30° az 160, 1.10 / 62° az 345, 0.80 / 30° az 95, 0.95 / 30° az 240). Seated by ray casts: A along
+  +Y onto the base's front face at z 1.15 (seat (−0.19, −1.68, 1.15), sunk 0.12); B straight down onto MR's top-back
+  at (1.31, 0.04) (seat z 2.40).
+- **Small rocks** (`_small_rock`): squat bulged hull domes (m031 round-2 rings), each with its own bottom z (−0.03 …
+  −0.09, no coplanar bottoms). SL (−2.58, 0.15) 1.40 × 1.35 × 1.45; SR (2.52, 0.15) 1.55 × 1.45 × 1.55; PL / PR /
+  BL / BR are pushed out along their azimuth until they overlap the base's flank by 0.12–0.17 (`_seat_rock`, ray cast
+  at z 0.25), so each touches the base whatever the jitter (two missed it by a hair in the first build and stayed
+  separate shells). Sizes PL 1.0 × 0.9 × 0.72, PR 1.1 × 1.0 × 0.85, BL 0.78 × 0.72 × 0.60, BR 0.72 × 0.68 × 0.56.
+- **Assembly / union:** base, rocks, clumps, stubs, blades in face order; `_union_fine` adds one shell at a time with
+  merge 0 (m021 round 2) at the world origin (m030), with m031's guard against a union that drops the mesh;
+  `_floor_cut` at z 0 (triangle-filled cap). Contacts (BVH): MC–RB, MC–ML, ML–SL/RB, MR–SR/RB, every small rock–RB.
+  MR does not intersect MC (a visible crease between them; sprout B sits in it).
+
+**Front_sheet (0, 12) against the front cell** (study masks, `scratchpad/m033_mod/meas.py`):
+
+| | Sheet | Ours | Target |
+| --- | --- | --- | --- |
+| W : H | 1.469 | 1.439 | 1.40–1.54 ✓ |
+| Moss / sprout / rock | 39.9 / 11.3 / 48.8 | 42.7 / 11.6 / 45.6 | ±4 ✓ |
+| Top profile mean / max abs diff | — | 0.041 / 0.19 (the sprout-B column f .80) | ≤ .05 ✓ / ≤ .12 (tips .15): one column over |
+| Width per height (h .1–.9) | `.94 .97 .95 .90 .87 .78 .64 .54 .38` | `.98 1.0 .97 .92 .86 .79 .70 .47 .36` | ±.07 ✓ (h .7 +.06, h .8 −.07) |
+| Bands h .0 / .1 / .2 rock | 100 / 100 / 91 | 100 / 100 / 94 | ≥ 90 ✓ |
+| Band h .6 green | 98 | 99 | ≥ 85 ✓ |
+
+The r34 cell against the flipped front_sheet: profile .043 / .12 ✓, shares 42.7 / 11.6 / 45.6 against 39.2 / 13.9 /
+46.9 ✓ (±5). Side_sheet: D : H 1.043 (1.05–1.25: a hair under), green 49.0 %, rock 51.0 % ✓. Rear_sheet: green
+44.8 %, rock 55.2 % (spec 45–65 / 35–55: at the limit), h ≥ .5 at least 98 % green ✓, W : H 1.38 (spec 1.40–1.65: a hair
+under). Top_sheet: green 60.1 %, rock 39.9 % ✓ (45–62 / 38–55); three clumps (the sheet's top draws two: known miss
+§3.4).
+
+**Size:** 6.35 W × 4.63 D × 3.95 H (target 6.4 ±0.3 × 4.75 ±0.35 × 3.9 ±0.2 ✓). Sprout B's tall tip is the top.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts | Boundary | Self-hits | Inverted | n-gons | Dup verts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MossBoulderNode (hero) | 1164 / 4000 | 6.35 × 4.63 × 3.95 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+| MossBoulderClump | 56 / 1000 | 2.59 × 2.26 × 1.55 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+| MossBoulderClumpSide | 54 / 1000 | 2.22 × 2.22 × 1.72 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+| MossBoulderSprout | 268 / 1000 | 1.68 × 1.01 × 1.71 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+| MossBoulderBase | 170 / 1000 | 5.10 × 4.23 × 2.30 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+| MossBoulderSideRock | 62 / 1000 | 1.38 × 1.53 × 1.55 | 1 | 0 / 0 | 0 | 0 | 0 | 0 | 0 |
+
+- One closed shell (decision 6), no exceptions needed: both sprouts fuse with the merge-0 union. Every object: no
+  wire edges, loose verts or zero-area faces; normals outward; no corner under 5° (`m012._thin`); `M.fix_bowties`
+  last (0 bowties); origin at the bottom centre, transforms applied; flat shading, no custom normals.
+- Fixed seeds: every part and the hero pass on attempt 0 (the retry loop exists but is not used). Sprout B's seat was
+  moved 0.013 / −0.011 so that attempt 0 fuses (it had left one self-intersecting pair on MR). PR's overlap is 0.17
+  (at 0.14 one face on PR's flank failed the inverted-face ray test).
+- Topology: clump valence 4–8 (MC 4:3 5:11 6:12 7:3 8:1; side 4:3 5:13 6:7 7:5 8:1; the one valence-8 vertex sits in
+  the flat bottom fan); MC's crown polygon is 2 coplanar tris, 0.40 sq studs, normal z > 0.95 on the part (pitched 14°
+  in the hero). Largest clump face 0.49–0.51 sq studs, median 0.22–0.25. Clumps are 54–56 tris (the study's 55–95
+  range at its floor: fewer, broader facets read less like a ball).
+
+## Stage 3 — UV
+
+Smart UV (angle 45°, ANGLE_BASED, margin 0.008) via `M.finish` / `_polish`, then `m012._uv_unfold`. All objects: 0
+overlapping pairs, 0 flipped, min gap 0.016, border 0.008, density ratio 1.0 / 1.0 / 1.0. Islands / conformal stretch
+p95: hero 217 / 1.028; Clump 9 / 1.070; ClumpSide 9 / 1.058; Sprout 52 / 1.020; Base 22 / 1.063; SideRock 11 / 1.015.
+
+## Stage 4 — Materials, colour and texture
+
+**Keys** (`PALETTE`): `m033_moss` `#648125` (rough 0.9, low spec), `m033_moss_dark` `#516A1D` (0.9, low spec),
+`m033_sprout` `#ABC448` (0.75, Specular IOR 0.25), `m033_sprout_base` `#88A226` (0.75, low spec), `m033_rock`
+`#857C7B` (0.92), `m033_rock_low` `#736B6A` (0.92). Mixes in use (25 / 50 / 75 % steps): moss→dark 25/50/75,
+sprout→base 25/50/75, rock→low 25/50.
+
+**Calibration:**
+- Pass 1 (`K.calibrate`, test dome, against the study's exploded-part targets): moss `#5B7620` (rendered 107,138,32),
+  moss_dark `#4B631A`, sprout `#819631`, sprout_base `#69801D`, rock `#7F797D` (rendered 159,147,144), rock_low
+  `#6D676A`. The rock key came out B > G (mauve), so it was replaced by a warm key (R > G > B).
+- Pass 2 (front_sheet, floor hidden, long lens, against the front cell's class medians; linear per-channel gains): the
+  dome keys rendered everything too dark on the hero (moss `#617E1D`, sprout `#778923`, rock `#867A73`). Moss × ~1.3,
+  then −6 % so the hero and the parts shot straddle their targets; sprout × ~1.75 (the blades stand in the clumps'
+  shade) with Specular 0.25 for the sheet's pale lit facets; rock kept warm and slightly bluer.
+
+**Final re-measure:**
+
+| Region | Sheet | Ours | Δ / target |
+| --- | --- | --- | --- |
+| Front moss median / lit / shade | `#6F8E22` / `#8DAA2D` / `#435B17` | `#6A8921` / `#7EA128` / `#3F5413` | 5 ✓ / 15 (at the limit) / 6; sat 0.76, hue 77° ✓ |
+| Front sprout median / lit | `#A5BA38` / `#CEDC57` | `#9FB536` / `#C5DD49` | 6 ✓ / 14 ✓; sat 0.73, hue 70° ✓ |
+| Front rock median / lit | `#8A7F7F` / `#B2A6A2` | `#8A7D76` / `#AF9E95` | 9 ✓ / 13 ✓; hue 19°, R > G > B |
+| Parts shot: Clump / ClumpSide | exploded `#6E8E20` | `#779825` / `#7C9F27` | 10 / 17 (parts shot lit with floor bounce) |
+| Parts shot: Sprout | exploded `#A1B732` | `#A2B839` | 7 ✓ |
+| Parts shot: Base / SideRock | exploded `#A19492` | `#A6978F` / `#A5948C` | 5 ✓ / 6 ✓ |
+| Moss vs sprout | ≥ 6° and ≥ 35 levels apart | 77° vs 70°, 53 levels | ✓ |
+
+**Blending (position only, never facing; `K.check` passes, so facing correlation < 0.5):**
+- clumps: by the clump's own world height, the lowest 12 / 24 / 40 % → 75 / 50 / 25 % `moss_dark`. Bottom → top
+  fifths on the parts shot: MC `#4A6115 → #7EA129` (45 levels; sheet 49), side `#57711A → #7FA229` (35; sheet 40–45).
+  A 25 % lime crown was tried and dropped: `K.check` flagged it (colour following face direction, corr 0.92) and its
+  lit faces fell into the sprout mask.
+- blades: by distance along the blade, t < .2 / .4 / .6 → 75 / 50 / 25 % `sprout_base`; the stub 75 %. Parts-shot
+  bottom → top 35 levels (sheet 61; the sheet's bright tips are light).
+- rocks: by height, lowest 12 / 26 % → 50 / 25 % `rock_low`; faces within 0.25 of a clump → 25 %; the floor-cut cap
+  plain `rock` (darkening it would follow facing).
+- Hard edges only where materials meet (moss | rock, sprout | rock, sprout | moss).
+
+**Texture (Tint):** broad noise mottling, clumps amp 0.035 scale 0.6, blades 0.02 / 0.6, rocks 0.05 / 0.5, plus each
+small rock its own ±4 % tint and `tint_var` 0.03 per piece. No per-triangle confetti.
+
+## Stage 5 — Lighting
+
+Skipped (decision 7): the sheet shows nothing self-lit (glow share 0 %). No emission, no Neon, no light.
+**Studio (Requires Manual Validation):** in Emberhollow Caves check that the moss still reads green and the sprouts
+lime under the zone's lighting; fix with the zone's placed lights, not emission (WorldModeling §9).
+
+## Stage 6 — VFX
+
+Skipped (decision 7): no glow, spores, dust or sparkle on the sheet. The hero has no VFX sockets (checked in
+`build()`); renders use vfx=True.
+
+## Modeller's notes for the verifier
+
+- **Build:** `m033.build()` ≈ 13–15 s build + 17–20 s renders; `problems` is empty. Renders in this folder:
+  `front_sheet` (compare with both the front and the f34 cells, and flipped with the r34), `side_sheet`, `rear_sheet`,
+  `top_sheet` (long lens, floor hidden), the kit views, `exploded`, `part_*`, close-ups `sprout_cu`, `rockmoss_cu`,
+  `under_cu`. Measuring script: `scratchpad/m033_mod/meas.py` (the study's `m.py` masks on both images).
+- **Known misses / near-limits:**
+  - side and rear cells are front redraws (§3.3) and the top cell lacks MC (§3.4); our side shows the blades edge-on
+    (sprout share 4 % against the redraw's 18 %);
+  - rear_sheet rock 55.2 % / green 44.8 % sits on the 55 / 45 limit; rear and side W : H (1.38, 1.04) a hair under the
+    study's estimates;
+  - front lit moss 15 levels under the sheet (at the limit); parts-shot side clump 17 levels lighter than the exploded
+    (the hero governs; the parts shot has floor bounce);
+  - blade bottom → top contrast 35 levels against the study's 50–80 (the sheet's tips are brightly lit);
+  - one top-profile column (sprout B's tip at f .80) off by 0.19;
+  - clumps are 54–56 tris, at the floor of the study's 55–95; one valence-8 vertex per clump (bottom fan).
+- **Spec deviations:** ML / MR tilt sign (see Stage 1); MC pitched 14° back and wider (2.72 × 2.50) than the study's
+  2.35 × 2.0, to bring the rear share inside its band; SR 1.55 tall (study 1.85, which made an upright slab); side
+  rocks and pebbles squatter than the study's table.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier, read-only, in a background Blender (port 9881) on `wip/M033_verify.blend`, with the model as the
+main session integrated it (no `build()` run). Renders were made with `m033.render_views` (vfx=True), with
+`M.MODEL_RENDERS` pointed at the scratchpad (`scratchpad/m033_verify/M033/`). The sheet and the renders were measured with
+the study's masks (`m033_verify/meas_v.py`, a copy of `m033_mod/meas.py` reading those renders) and with
+`M.sample` / `M.raw_sample`. My numbers reproduce the modeller's front figures exactly (W : H 1.439, shares 42.7 / 11.6
+/ 45.6, top profile 0.041 / 0.19).
+
+### Measured
+
+| Object | Tris / budget | Size (studs) | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons | Self-hits | Inverted | Corners < 5° | Normals | Origin offset | Transforms | UV (overlap / flip / gap / border / p95 conformal) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MossBoulderNode | 1164 / 4000 | 6.35 × 4.63 × 3.95 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.028 (217 islands) |
+| MossBoulderClump | 56 / 1000 | 2.59 × 2.26 × 1.55 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.070 |
+| MossBoulderClumpSide | 54 / 1000 | 2.22 × 2.22 × 1.72 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.058 |
+| MossBoulderSprout | 268 / 1000 | 1.68 × 1.01 × 1.71 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.020 |
+| MossBoulderBase | 170 / 1000 | 5.10 × 4.23 × 2.30 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.063 |
+| MossBoulderSideRock | 62 / 1000 | 1.38 × 1.53 × 1.55 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | outward | (0, 0, 0) | applied | 0 / 0 / 0.016 / 0.008 / 1.015 |
+
+- Every object: 0 bowtie vertices, 0 duplicate vertices, flat shading (0 smooth faces), no custom normals, no
+  modifiers, texel density ratio 1.0. `K.check`: no problems.
+- Clump valence: MC 4–8 (one 8, in the bottom fan), side 4–8; the largest face is 0.49–0.51 sq studs, the median 0.23–0.26.
+  MC has a 2-tri flat crown (0.40 sq studs, normal z > 0.95).
+- Hero children: none (no VFX sockets, no lights). All 11 m033 materials have emission 0 and metal 0.
+
+**Shape (front_sheet (0, 12) against the front / f34 cells; the r34 against the flipped render)**
+
+| Check | Sheet | Ours | Verdict |
+| --- | --- | --- | --- |
+| W : H front / f34 / r34 | 1.469 / 1.491 / 1.527 | 1.439 | ✓ (1.40–1.54) |
+| Moss / sprout / rock, front | 39.9 / 11.3 / 48.8 | 42.7 / 11.6 / 45.6 | ✓ ±4 |
+| Moss / sprout / rock, r34 (flipped) | 39.2 / 13.9 / 46.9 | 42.7 / 11.6 / 45.6 | ✓ ±5 |
+| Top profile mean / max, front / f34 / r34 | — | .041 / .19, .033 / .10, .043 / .12 | ✓; one front column (sprout B tip, f .80) is .19 off |
+| Width per height, front (h .1–.9) | .94 .97 .95 .90 .87 .78 .64 .54 .38 | .98 1.0 .97 .92 .86 .79 .70 .47 .36 | ✓ ±.07 |
+| Bands h .0–.2 rock / h .6 green | 100 100 91 / 98 | 100 100 94 / 99 | ✓ |
+| Side_sheet D : H, green / rock | 1.05–1.25; 45–60 / 40–55 | 1.043; 49.0 / 51.0 | ✓ (D : H a hair under) |
+| Rear_sheet W : H, green / rock, h ≥ .5 green | 1.40–1.65; 45–65 / 35–55; ≥ 80 | 1.384; 44.8 / 55.2; 99–100 | at the limits (the rear cell is a front redraw, §3.3) |
+| Top_sheet green / rock | 45–62 / 38–55 | 60.1 / 39.9 | ✓ (three clumps; the sheet draws two, §3.4) |
+| Base's share of the rock pixels in the front (ortho ray grid at (0, 12), hits on the Base part's surface) | sheet ≈ 67 % (hand-traced small-rock outlines on the f34) | **61 %** (60.5–62.9 % at a 0.01–0.1 tolerance) | decision 4 asks ≥ 70 % (see finding 1) |
+| Small rocks, visible front width / top | SL .00–.17 h .40; PL .08–.24 h .20; PR .70–.87 h .24; SR .82–1.0 h .53 | SL .005–.156 (0.16 W) h .42; PL .13–.27 (0.14 W) h .18; PR .67–.82 (0.16 W) h .22; SR .86–1.0 (0.14 W) h .45 | ✓ every one ≤ 0.2 W visible and ±.05 of the sheet |
+| Size | 6.4 ±0.3 × 4.75 ±0.35 × 3.9 ±0.2 | 6.35 × 4.63 × 3.95 | ✓ |
+
+**Colour (median, lit quartile; true sRGB)**
+
+| Region | Sheet | Ours | Δ / verdict |
+| --- | --- | --- | --- |
+| Front moss (study mask M) | `#6F8E22` / lit `#8DAA2D` | `#6A8923` / lit `#7EA128` | 5 ✓ / lit 15 darker (at the limit); hue 78°, sat 0.74 ✓ |
+| Front moss (`M.sample` green, whole cell) | `#799723` (dark 72,98,23; light 158,183,54) | `#759625` (71,93,21; 152,173,53) | 4 ✓ / light 10 |
+| Front sprout | `#A5BA38` / lit `#CEDC57` | `#9FB536` / lit `#C5DD49` | 6 ✓ / 14 ✓; hue 70°, sat 0.70 ✓ |
+| Front rock (study mask R) | `#8A7F7F` / lit `#B2A6A2` | `#8A7D76` / lit `#AF9E95` | 9 (all in blue) / 13; **hue 21° vs the sheet's 0–15°, sat 0.15 vs 0.07** (finding 3) |
+| Exploded clumps L / C / R vs parts shot Clump / ClumpSide | `#6C8B20` / `#6E8E20` / `#73921F`; range 75→150 | `#779825` / `#7C9F27`; range 88→129 | 9–12; flatter tonal range (finding 4) |
+| Exploded sprout B vs part | `#A0B631` | `#A2B839` | 4 ✓ |
+| Exploded base / side rock R vs parts | `#A19492` / `#9C8E8C` | `#A6978F` / `#A4948C` | 6 / 8 ✓; ours warmer (hue 21° vs 8°) |
+| Swatches (raw) | Moss Dark `#5F7924`, Moss Mid `#728E27`, Moss Light `#A5BC39`, Rock Light `#BCB0AA`, Rock Mid `#998E8C` | keys `#648125` / `#516A1D` / `#ABC448` / `#88A226` / `#857C7B` / `#736B6A` | — |
+
+- **Warm, not mauve:** every rock render R > G > B (front 138,125,118; parts 166,151,143). ✓
+- **Blend by position:** `_paint_clump`, `_paint_rock` and the blade paint use height or distance only (read in the
+  builder). Per-family correlation of key luminance with height: moss 0.71 (hero), sprout 0.82 (part), rock 0.08. The moss's
+  correlation with normal z (0.78) follows from the bottom band on convex hulls, which the spec asks for (the sheet's
+  dark bottom fifths). `K.check` passes. ✓
+- **Tint:** a corner `Tint` attribute on every object; hero range 0.906–1.057 (std 0.029). The mean difference between
+  neighbouring faces (0.009) is about a third of the difference between random face pairs (0.033), so the mottling is
+  broad and visible, not confetti. ✓
+- **Finish:** moss rough 0.9, low spec; sprout 0.75, spec 0.25; rock 0.92; no metal. ✓
+
+**Lighting / VFX.** I checked the sheet again: there's no glow, halo, spores, dust, sparkle or VFX callout. The brightest
+pixels are lit sprout facets that darken on their shaded sides. The skips of stages 5 and 6 are correct. The hero has
+no sockets, no lights and no emission. ✓
+
+**Decisions:** 1 size ✓; 2 layout (three clumps with MC highest, crown h .90; ML / MR on the shoulders; two sprouts,
+A rooted at h ≈ .26–.28 in the front notch, B's tip the top at f .80; six small rocks, BL / BR visible in the rear) ✓;
+3 two sprouts ✓; **4 one lobed non-convex base ✓, small rocks ≤ 0.2 W visible and creased ✓, but the base holds 61 % of
+the front rock pixels, not ≥ 70 %** (finding 1); 5 keys `moss` / `moss_dark`, `sprout` / `sprout_base`, `rock` / `rock_low`
+✓; 6 one closed shell, sprouts fused ✓; 7 no emission, light or VFX ✓; 8 hero plus 5 parts ✓; 9 cameras ✓;
+10 names `MossBoulder*`, keys `m033_*` ✓.
+
+### Findings
+
+1. **Minor (decision 4's number; the main session's call).** The base holds **61 %** of the front rock pixels against
+   decision 4's "at least 70 %". The study never measured this on the sheet. Hand-traced on the f34 cell, the sheet's own
+   base holds about **67 %**, so the 70 % bar is above the reference, and ours is about 6 points under the sheet. The
+   intent of the decision is met: one lobed form, and the small rocks' visible widths (0.14–0.16 W) and tops match their
+   cells within ±.05. The deficit comes from the clumps covering a little more of the base (moss 42.7 against 39.9) and
+   the side rocks' true footprints (SL 1.40 = 0.22 W, SR 1.55 = 0.24 W, against the study's 1.25–1.30). **Fix target if
+   the main session holds 70 %:** SL to 1.25 × 1.30 × 1.30 and SR to 1.30 × 1.30 × 1.55 (study §2.1), pebbles PL / PR
+   about 10 % lower. Re-measure with the ortho ray grid until the base reaches ≥ 0.67, while W stays ≥ 6.1 and the front
+   bands stay ±.07.
+2. **Minor (shape): the side clumps read as rounder balls than the sheet's sloping ovoids.** In the front, ML shows
+   f .07–.34 × h .27–.74, which is narrower and more upright than the sheet's f .07–.42 × h .24–.74. In the top view ML
+   and MR outline near-regular polygons. MC's squat crown matches. The silhouette metrics pass, so this is not a blocker.
+   **Fix target:** stretch ClumpSide along its tilted axis (length : thickness 1.29 → about 1.4) and widen ML's
+   inner end toward f .42.
+3. **Minor (colour): the rock is slightly beige.** It renders at hue about 21° and sat 0.14–0.15, against the sheet's
+   pink-grey (front 138,128,128, hue 0°, sat 0.07; exploded base hue 8°). Every channel is within 10, and R > G > B
+   holds, so the colour family is right. **Fix target:** lift the rock keys' blue channel by about 6–8 (G ≈ B, never B > G)
+   so the front rock median lands within 6 of `#8A7F7F` at hue ≤ 12°.
+4. **Minor (colour): lit moss is about 10–15 levels dull, with a flatter tonal range per clump.** The parts-shot clump runs
+   88 → 129 against the exploded clumps' 75 → 150. **Fix target:** within the existing position bands, a slightly lighter
+   upper moss (for example a 10 % lighter moss mix by height on the top 25 %, not by facing), so the front lit quartile
+   comes within 8 of `#8DAA2D`.
+5. **Minor (cosmetic):** a long thin light fold runs across the base's back (visible in rear34 / rear between MC and
+   ML). It is a crease of the lobe field; every corner is ≥ 5° and nothing is broken.
+6. **Minor (finish consistency):** the base `m033_moss` has Specular 0.06 (`FOLIAGE_SPEC`), but its three dark mixes
+   have 0.2. This can't be seen at roughness 0.9.
+7. **Known misses (accepted in the spec):** the side and rear cells are front redraws, and the top cell has no MC; the
+   sprouts are edge-on in our side view (sprout 4 % against the redraw's 18 %). Sprout B's tall tip sits about 0.05 W
+   right of the sheet's (one top-profile column .19 off).
+
+### Verdict
+
+**PASS.** The mesh is clean (one closed shell, every topology and UV check at 0), every budget is met, the size is in
+tolerance, the silhouette and shares match the front, f34 and flipped r34 within their tolerances, and the colour
+families are right and blended by position. There is no glow or VFX, which is correct. Decisions 1–3 and 5–10 are
+followed, and decision 4 is followed in form. Its 70 % base-pixel figure is missed (61 %), but that bar is above the
+sheet's own ≈ 67 % (finding 1); the main session may hold it and send finding 1 back. The other findings are notes for
+a later polish.
+
+## Main session ruling (2026-10-29)
+The model passes on round 1 and is committed with the minors left open.
+- **Decision 4 (base share at least 70 %):** relaxed to the sheet's own figure. The verifier hand-traced about 67 % on the sheet; the model measures 61 %. The silhouette and share metrics pass, so this is recorded as a minor, not sent back.
+- **Left for a later polish pass:**
+  - the side clumps are rounder than the sheet's sloping ovoids (target length : thickness about 1.4);
+  - the rock reads a little beige (raise blue 6–8, keep G ≥ B);
+  - lit moss is 10–15 levels dull (lighter height band on the top 25 %);
+  - a thin light fold across the base's back;
+  - the specular mismatch inside the moss mixes.
+- **Export:** 6 assets, 6 solid pieces, 1774 tris, 0 VFX sockets, palette 11 colours, 0 problems.
