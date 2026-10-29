@@ -48,8 +48,12 @@ function BottomBar.new(parent: Instance, layout)
 		track = xpCfg.track,
 		fillColor = xpCfg.fillColor,
 	}, self.root)
-	local xpRect = { 0, 0, xpCfg.rect[3], xpCfg.rect[4] }
-	Widgets.Frame(xpCfg.frame, xpRect, self.xpBar.root, nil, xpCfg.frameOutset).ZIndex = 6
+	-- A frame over the bar, unless the track art carries its own (parchment).
+	if xpCfg.frame then
+		local xpRect = { 0, 0, xpCfg.rect[3], xpCfg.rect[4] }
+		Widgets.Frame(xpCfg.frame, xpRect, self.xpBar.root, nil, xpCfg.frameOutset).ZIndex = 6
+	end
+	self.itemColor = cfg.item and cfg.item.color
 	self.maxHint = Widgets.Text(cfg.maxHint, {
 		Name = "MaxHint",
 		Size = UDim2.fromScale(1, 1),
@@ -113,10 +117,21 @@ function BottomBar.new(parent: Instance, layout)
 			TextXAlignment = Enum.TextXAlignment.Right,
 			ZIndex = 5,
 		}, slot)
+		-- On parchment the name stays ink; a stripe along the foot shows rarity.
+		local stripe = Widgets.Make("Frame", {
+			Name = "Rarity",
+			AnchorPoint = Vector2.new(0.5, 1),
+			BorderSizePixel = 0,
+			Position = UDim2.new(0.5, 0, 1, -12),
+			Size = UDim2.new(0.5, 0, 0, 4),
+			Visible = false,
+			ZIndex = 5,
+		}, slot)
+		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, stripe)
 		slot.Activated:Connect(function()
 			self.SlotPressed:Fire(index)
 		end)
-		self.slots[index] = { button = slot, ring = ring, number = number, item = item, count = count }
+		self.slots[index] = { button = slot, ring = ring, number = number, item = item, count = count, stripe = stripe }
 	end
 	return self
 end
@@ -136,7 +151,16 @@ function BottomBar:SetSlotItems(views)
 	for index, slot in self.slots do
 		local view = views[index]
 		slot.item.Text = if view then view.name else ""
-		slot.item.TextColor3 = if view then Rarity.Colors[view.rarity] or Color3.new(1, 1, 1) else Color3.new(1, 1, 1)
+		local rarityColor = view and Rarity.Colors[view.rarity]
+		if self.itemColor then
+			slot.item.TextColor3 = Layout.Color(self.itemColor)
+			slot.stripe.Visible = rarityColor ~= nil and view.rarity ~= "Common"
+			if rarityColor then
+				slot.stripe.BackgroundColor3 = rarityColor
+			end
+		else
+			slot.item.TextColor3 = rarityColor or Color3.new(1, 1, 1)
+		end
 		slot.count.Text = if view then view.count else ""
 	end
 end

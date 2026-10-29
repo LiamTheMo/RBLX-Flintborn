@@ -12,7 +12,7 @@ Parchment-and-leather UI from the reference sheets in `art/reference/ui/parchmen
 | Settings | 10_settings | ✅ [SettingsScreen.md](SettingsScreen.md) | ✅ sliced (upload ⏳) | ✅ | ✅ | n/a (instant) | ✅ new settings live through attributes | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | Market, Progress, Trade + notice cards | 11_panel_layouts | ✅ [ListWindows.md](ListWindows.md) | ✅ sliced (upload ⏳); item icons later | ✅ | ✅ | n/a | ✅ Shop / Sell / Offers / Codes, perks, rebirth, trades, notices | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
 | World map | 11_panel_layouts + Journal map | ✅ in [ListWindows.md](ListWindows.md) | ✅ sliced + painted map (upload ⏳) | ✅ | ✅ | n/a | ✅ portals, events, camps, you | capture ✅, Studio ⏳ | fit ✅, devices ⏳ | ⏳ | Built; upload and in-game checks remain |
-| In-world HUD (parchment) | 12_hud_master, 05_widgets | — | — | — | — | — | — | — | — | — | Not started (hotbar is six slots now, GDD §56) |
+| In-world HUD (parchment) | 12_hud_master | ✅ [HudScreen.md](HudScreen.md) | ✅ sliced (upload ⏳) | ✅ | ✅ | bars ease | ✅ same HudController data | capture ✅, Studio ⏳ | scale ✅, devices ⏳ | ⏳ | Built (six slots, GDD §56); upload and in-game checks remain |
 | Kit sheets | 01, 03–06, 11, 14–16 | — | partial (lobby pieces) | — | — | — | — | — | — | — | Sliced as screens need them |
 
 ## Notes and blockers

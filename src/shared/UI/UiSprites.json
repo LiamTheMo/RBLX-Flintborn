@@ -1104,6 +1104,66 @@
     "slice": null,
     "w": 23
   },
+  "pm_hud_card": {
+    "h": 216,
+    "slice": [
+      82,
+      50,
+      36,
+      46
+    ],
+    "w": 296
+  },
+  "pm_hud_compass": {
+    "h": 44,
+    "slice": [
+      36,
+      16,
+      36,
+      16
+    ],
+    "w": 485
+  },
+  "pm_hud_food": {
+    "h": 58,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_health": {
+    "h": 57,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_slot": {
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "w": 127
+  },
+  "pm_hud_slot_selected": {
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "w": 127
+  },
+  "pm_hud_stamina": {
+    "h": 57,
+    "slice": null,
+    "w": 334
+  },
+  "pm_hud_xp": {
+    "h": 44,
+    "slice": null,
+    "w": 519
+  },
   "pm_icon_add_friend": {
     "h": 143,
     "slice": null,

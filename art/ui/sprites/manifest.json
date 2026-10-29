@@ -1320,6 +1320,74 @@
     "h": 32,
     "slice": null
   },
+  "pm_hud_card": {
+    "file": "pm_hud_card.png",
+    "w": 296,
+    "h": 216,
+    "slice": [
+      82,
+      50,
+      36,
+      46
+    ]
+  },
+  "pm_hud_compass": {
+    "file": "pm_hud_compass.png",
+    "w": 485,
+    "h": 44,
+    "slice": [
+      36,
+      16,
+      36,
+      16
+    ]
+  },
+  "pm_hud_food": {
+    "file": "pm_hud_food.png",
+    "w": 334,
+    "h": 58,
+    "slice": null
+  },
+  "pm_hud_health": {
+    "file": "pm_hud_health.png",
+    "w": 334,
+    "h": 57,
+    "slice": null
+  },
+  "pm_hud_slot": {
+    "file": "pm_hud_slot.png",
+    "w": 127,
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ]
+  },
+  "pm_hud_slot_selected": {
+    "file": "pm_hud_slot_selected.png",
+    "w": 127,
+    "h": 124,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ]
+  },
+  "pm_hud_stamina": {
+    "file": "pm_hud_stamina.png",
+    "w": 334,
+    "h": 57,
+    "slice": null
+  },
+  "pm_hud_xp": {
+    "file": "pm_hud_xp.png",
+    "w": 519,
+    "h": 44,
+    "slice": null
+  },
   "pm_icon_add_friend": {
     "file": "pm_icon_add_friend.png",
     "w": 179,

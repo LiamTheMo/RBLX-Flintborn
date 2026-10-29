@@ -674,3 +674,13 @@ Studio and live checks:
 - [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
 - [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.
 - [ ] World map (run): N / DPadDown opens it centred on you; pins name the camps and landmarks; active portals and events show and update; zoom follows you until you drag; the safe-camp card appears inside a camp and leaves outside it.
+
+## Parchment in-world HUD (GDD §11, §25.4, §56)
+
+How it's built: the same HUD modules (`Hud/Compass`, `Vitals`, `ObjectivePanel`, `EventPanel`, `PartyFrames`, `BottomBar`) with the parchment layout in `HudLayout.json`. Spec: `docs/ui/HudScreen.md`. Automated: `capture.py hud`.
+
+- [ ] In a run: the compass letters scroll with the camera over the parchment strip; waypoints sit under it.
+- [ ] Health, Stamina and Food fill and drain smoothly inside their bars, with the number readable.
+- [ ] The objective and world event cards appear and update under the vitals; party members show with headshots.
+- [ ] The backpack button opens and closes the backpack; the six hotbar slots select with keys, taps and the bumper; the chosen slot glows gold.
+- [ ] Phone and console sizes keep everything on screen and readable.
