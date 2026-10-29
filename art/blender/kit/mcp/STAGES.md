@@ -19,9 +19,10 @@
 
 Each modeller drives its own live Blender. The open GUI (`FlintbornWorldKit.blend`, the MCP tool, port 9876)
 belongs to the main session for integration and verification. Modellers use background Blender processes running
-the same MCP bridge on their own ports (modellers 9877–9879, verifiers 9880 and up), driven through
-`bgmcp.py` (tested 2026-10-28: an M014 build there gave the same tris, sizes and renders as the GUI, mean pixel
-difference 0.02/255):
+the same MCP bridge on their own ports, driven through `bgmcp.py`. The main session gives each agent a port that no
+running session holds; check with `Get-CimInstance Win32_Process -Filter "Name='blender.exe'"` before assigning one
+(a 024 verifier was once given 9880 while 027's modeller held it). Tested 2026-10-28: an M014 build there gave the
+same tris, sizes and renders as the GUI, mean pixel difference 0.02/255.
 
 ```bash
 PY=C:/Users/Orang/.local/bin/python3.14.exe
@@ -55,6 +56,7 @@ session (the GUI or a background one) is driven by only one agent at a time.
   - M: `mk`, `union_loose`, `carve`, `merge_in`, `finish`, `audit`, `views`, `display`, `sample`, `raw_sample`, `drop_specks`.
   - K: `hull_rock`, `blend`, `mix_key`, `noise_field`, `texture`, `refine`, `set_colour`, `calibrate`, `socket`, `check`.
 - **Check every step through the MCP.** Never assume a script worked. Read back the counts, sizes and materials.
+- **Bowtie vertices.** `M.audit()` reports `nonmanifold_verts`: two closed face fans meeting at one vertex, which edge checks miss. It must be 0 on every object. `M.fix_bowties(o)` repairs them (019, 020 and 021 had them at leaf hubs).
 - **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps.
 - **Look at the renders.** `build()` writes `art/blender/renders/models/MNNN/` (single views plus `MNNN_views.png`). Open them with the Read tool and compare them with the reference, view by view.
 - **No commits, pushes or exports.** The main session does those.

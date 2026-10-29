@@ -819,3 +819,815 @@ All recommendations are accepted:
 12. Names as proposed: `EmberbloomNode`, `EmberbloomPod`, `EmberbloomPetal`, `EmberbloomRockBase`.
 
 Leaves are crystal shards with real points at both ends, never balls or tents. The boulder ring stays readable: the bottom 20 % of the front, side and rear views is at least 90 % rock.
+
+## Stage 1 - Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m025.py` → `build()` (about 36 s with renders, 25 s without; fixed seeds, the same
+result every run). Background session port 9880, work file `art/blender/assets/kit/wip/M025.blend`.
+
+Camera handedness: `build_kit.frame_box` puts the camera at (sin az cos el, -cos az cos el, sin el), so the f34 camera
+at az -20 sits front-left (the left side nearer, as the sheet's f34 draws it) and the r34 at az 200 sits back-left
+(screen right = -X nearer). The side camera at az 90 sits at +X (screen right = the back).
+
+**Parts, each from its own function:**
+- `EmberbloomPod` (`_seed`): 8 sides and 9 rings, each turned half a step. Each ring edge is shared by one up and one
+  down triangle, which together form one **diamond facet**: about five rows, four across.
+  - Rings (height fraction, radius fraction): (0, .11) and (.03, .11) for the nub, then (.10, .45), (.25, .82),
+    (.43, 1.0), (.60, .96), (.74, .78), (.86, .47), (.95, .18), and the tip.
+  - Radius 1.0 (Ø 2.0). The study's Ø 2.25 put the seed share 5–7 points over the sheet in every view.
+  - It runs from z 0.95 to 5.5. 144 tris.
+  - The hero seed uses the same rings, but its lower cone runs on down into the slab (a ring at z 0.40, r 0.6), which
+    hides the leaf hub.
+- `EmberbloomPetal` (`_leaf`): the convex hull of these points:
+  - a pointed outline: half-width / L of .062, .155, .21, .18 and .088 at .12, .30, .48, .65 and .84 of the length;
+  - each outline point split into an upper and a lower edge (a side band of ±0.24 T), so the section is a flattened
+    hexagon with a deep side face, like the exploded leaves;
+  - a top ridge at .18, .45 and .68 L, raised .38, .6 and .4 T;
+  - a keel at .25, .5 and .72 L, lowered .28, .4 and .26 T. T = 0.34 L.
+
+  **Both ends are real points** (about 58° at the base and 55° at the tip, in plan). W : L is 0.42–0.45. The part
+  adds its hexagonal peg along -X under the base. 100 tris.
+- `EmberbloomRockBase` (`_slab`, `_boulders`, `_mount`). 866 tris.
+  - A 14-sided slab: rx 2.45, ry 2.15, sloped sides, a raised faceted top up to z 0.52.
+  - A **shallow faceted recess in the slab's underside**: rim at 0.62 R, apex 0.3 up. It is built into the slab mesh;
+    no boolean.
+  - Ten squat dome boulders (hull rocks with 4 rings, d 1.5–2.1, h 0.92–1.15) on an oval ring (rx 2.55, ry 2.2).
+  - Three pebbles in front, and the seed's 8-sided mount post.
+
+**Hero (`EmberbloomNode`):** 1438 tris, **6.97 W × 5.69 D × 5.50 H**. Built in this order:
+1. Base, then the six leaves, then the seed, united one shell at a time by `_union_fine`: exact booleans, a 0.002
+   post-merge, and a guard that undoes and retries (with a 0.004 nudge) any union that loses most of the mesh.
+2. Floor cut at z 0 by `_floor_cut`: a triangle fill of all the cut loops together, so the recess stays open.
+3. The m016 cleanup, the m023-style finish and polish, then `M.fix_bowties`.
+
+**Leaf layout.** Each leaf: tip, roll and cross. The bases sit at r 0.35, z 0.42 (inside the slab), shifted `cross`
+sideways.
+- P1, right: tip (3.52, 0, 2.62), roll 38.
+- P2, left: tip (-3.45, 0, 2.85), roll -38.
+- P3, front right: tip (2.55, -2.9, 2.75), roll -48, cross -0.5. P4, front left, mirrors it.
+- P5, back right: tip (2.0, 2.62, 3.65), roll 48, cross 0.5. P6, back left, mirrors it.
+
+Decisions taken while matching the views:
+- **Crossed, rolled leaves.** The study's flat tangential leaves read as needles in every elevation view (front leaves
+  32–36 % against the sheet's 49 %). The sheet's front and rear cells show the front and back pairs **crossing in a V**
+  in front of and behind the seed's foot, with their inner edges raised, cupping its lower half; the side leaves show
+  broad faces. So:
+  - the front and back pairs cross (±0.5) and roll 48°;
+  - the side pair roll 38°;
+  - the leaves are thicker (T 0.34 L).
+- **Root points.** Each hero leaf's hull also takes one hidden root point inside the seed's foot (z 0.6, 0.12 out along
+  its azimuth), so every leaf overlaps the seed and the union is one shell. Each root is its own: a root point shared
+  by two leaves made the exact union drop the whole base.
+- **Seed foot cone.** The seed's foot cone (r 0.6 at z 0.4) swallows the hub where the leaf roots meet the slab. With a
+  thin post there, the union left 23 crossing sliver pairs at the hub.
+- **Boulders.** Squatter and wider than the study (h/d 0.55–0.6), so the ring reads as one continuous low band.
+
+**Measured against the sheet** with `m025.measure()`, using the study's masks on both images.
+- Sheet cameras: front (0, 8), side (90, 8), rear (180, 8), f34 (-20, 14), r34 (200, 14), top (0, 89), top_tilt (0, 70).
+- 3× lens; VFX off.
+
+| View | Seed S (sheet / ours) | Leaves L | Rock R | Bottom 20 % rock | Top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- |
+| Front | 22.0 / 22.9 | 48.6 / 46.6 | 29.4 / 30.5 | 96.6 % | 0.037 / 0.20 |
+| F34 | 16.1 / 20.9 | 54.7 / 48.6 | 29.2 / 30.5 | 98.2 % | 0.088 / 0.27 |
+| Side | 20.4 / 24.5 | 49.0 / 43.7 | 30.6 / 31.8 | 97.1 % | 0.063 / 0.30 |
+| Rear | 17.9 / 16.9 | 50.8 / 53.3 | 31.3 / 29.8 | 93.6 % | 0.078 / 0.25 |
+| R34 | 16.0 / 16.9 | 53.6 / 51.0 | 30.4 / 32.1 | 97.8 % | 0.064 / 0.22 |
+| Top | 11.2 / 11.7 | 59.5 / 66.3 | 29.3 / 22.0 | - | 0.066 / 0.14 |
+| Top tilt (70) | 11.2 / 13.1 | 59.5 / 63.4 | 29.3 / 23.5 | - | 0.102 / 0.22 |
+
+- **Front, rear, r34:** within ±4 on every share.
+- **Side and f34:** seed +4.1 and leaves -5.3 on the side; seed +4.8 and leaves -6.1 on the f34.
+  - The sheet draws its f34 about 15 % wider (W : H 1.45 against our 1.10). Spec 3.1 says to judge the f34 by shares
+    and leaf points.
+  - The sheet's side view draws its near leaf broader than one lotus geometry can be from both the front and the side.
+- **Top:** the sheet's top cell draws 5 leaves; we build 6 (decision 2). So the leaf share is 7 over and the rock 7–8
+  under (tolerance ±6). The boulders show between every pair of leaf tips.
+- **Front W : H:** 1.16 against the sheet's 1.27. The sheet's object is wider than 7.0 × 5.5 allows; the size decision
+  governs.
+
+## Stage 2 - Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts (bowties) | Boundary | Self-intersecting pairs | Smallest corner |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberbloomNode (hero) | 1438 / 4000 | 6.97 × 5.69 × 5.50 | 1 | 0 / 0 | 0 | 0 | 5.01° |
+| EmberbloomPod | 144 / 1000 | 2.04 × 2.02 × 4.57 | 1 | 0 / 0 | 0 | 0 | 8.65° |
+| EmberbloomPetal | 100 / 1000 | 4.67 × 1.75 × 1.46 | 1 | 0 / 0 | 0 | 0 | 5.40° |
+| EmberbloomRockBase | 866 / 1000 | 6.41 × 5.69 × 1.15 | 1 | 0 / 0 | 0 | 0 | 5.02° |
+
+All four objects also pass these checks:
+- no wire edges, loose verts, zero-area faces, n-gons or duplicate verts;
+- normals outward; no inverted faces (volume positive, normals recalculated);
+- origin at the bottom centre (offset 0, 0, 0); transforms applied;
+- no modifiers, no custom normals, flat shading.
+
+`build()` puts every one of these checks into its `problems` list, and the list is empty.
+
+## Stage 3 - UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED re-unwrap, margin 0.008), then m012's overlap unfold:
+
+| Object | Islands | Overlap pairs | Flipped | Min gap | Border | Density min / med / max | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Hero | 246 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.022 |
+| Pod | 25 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.029 |
+| Petal | 24 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.049 |
+| RockBase | 148 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.024 |
+
+## Stage 4 - Materials, colour and texture
+
+**Keys** (`PALETTE`, calibrated hexes; the targets are in `TARGETS`):
+
+| Key | Hex | Target (sheet) | Finish |
+| --- | --- | --- | --- |
+| m025_seed_deep | #F24C18 | deep medians #F44C18–#F74F1B | Neon, emission 1.0, rough 0.5 |
+| m025_seed | #FC7425 | mid medians #FD7124–#FD7925 | Neon, emission 1.0 |
+| m025_seed_hot | #FDA835 | hot medians #FD9D2F–#FDA835 | Neon, emission 1.0 |
+| m025_leaf | #8F0E18 | #BE2930 (unshadowed), #85191D (front) | rough 0.65 |
+| m025_leaf_tip | #A31722 | #DC333B | rough 0.65 |
+| m025_leaf_dark | #78020B | #A02229 | rough 0.7 |
+| m025_rock | #69524B | #7C5E51 / front #70594E | rough 0.92 |
+| m025_rock_light | #7E675E | #957465 | rough 0.92 |
+| m025_rock_dark | #4F403C | #5E4A42 | rough 0.92 |
+| m025_dirt | #55413B | #634B41 | rough 0.95 |
+
+**Pass 1** (`calibrate()`, on the kit's test dome):
+
+| Key | Result | Dome render against target |
+| --- | --- | --- |
+| leaf | #981520 | 191,46,51 against #BE2930 |
+| leaf_tip | #AE202C | |
+| leaf_dark | #800310 | |
+| rock | #624D46 | 123,94,82 against #7C5E51 |
+| rock_light | #766058 | |
+| dirt | #4F3D37 | |
+| rock_dark | #4A3C38 | its last dome sample fell out of the brown mask; the rock key's own gain gives the same value |
+
+**Pass 2** (the hero's seven sheet views against the sheet's medians, using linear-light geometric-mean gains):
+- leaves × (0.87, 0.60, 0.62): the elevation views were 15–25 levels light and less saturated, and the f34 and top
+  11–13 dark;
+- rock and dirt × 1.15.
+
+**Re-measured** (VFX off; sheet / ours):
+
+| View | Leaves | Rock |
+| --- | --- | --- |
+| Front | #85191D / #941D21 | #70594E / #72594F |
+| Side | #8B1A1E / #7E1F20 | #765C52 / #5C4842 |
+| Rear | #7F1A1F / #8D1F23 | #775E52 / #67514A |
+| R34 | #81191E / #912226 | – |
+| F34 | #B6262B / #9F2226 | #674F46 / #7A5F53 |
+| Top | #C5252C / #AE2D32 | #645049 / #6D564D |
+
+- Seed, f34: #FC7024 / #FF741E, within 12.
+- The leaf medians straddle the sheet's by ±13–21. The sheet lights its leaf tops harder and shades them harder than
+  the studio: its lit quartile is #E9353F–#F83D44, against our #D83B3E. Paint can't copy that, because colour may never
+  follow facing.
+
+**Blending, by position only:**
+- **Seed.** Each whole diamond takes one Neon key from u = height fraction + 0.04 × lateral toward (+X, -Y) + 0.10 ×
+  broad noise ± 0.18 at random per diamond. Deep below 0.53, hot above 0.77. There are no mixes between Neon keys (a mix
+  would not be Neon).
+
+  Seed bands per view (deep / mid / hot; the sheet is about 26 / 50 / 24):
+
+  | Front | F34 | Side | Rear | R34 |
+  | --- | --- | --- | --- | --- |
+  | 32 / 51 / 17 | 22 / 58 / 20 | 35 / 37 / 29 | 15 / 58 / 27 | 19 / 55 / 26 |
+
+- **Leaves.** Along each leaf's own length t: dark base → leaf → bright tip, over 9 keys (25 / 50 / 75 % mixes), with
+  ±0.08 noise.
+  - Faces within 0.45 of the seed are two steps darker (occlusion).
+  - The back pair shift 0.05 toward the tip.
+- **Rock.**
+  - Broad noise patches go up to 75 % toward rock_light.
+  - The ground band (under half of each boulder's height, ramped) goes up to 50 % toward rock_dark.
+  - Faces within 0.25 of a neighbouring rock are at least 35 % dark.
+  - Pebbles are 50–75 % dark.
+- **Dirt.** Plain, with 25 % toward rock_dark on noise patches near the boulders. The floor-cut cap is plain rock.
+
+**Tint:**
+- per piece ±3 %;
+- broad mottling: leaves amp 0.03, scale 0.5; rock and dirt amp 0.06, scale 0.45;
+- seed faces exactly Tint 1.0 (checked 1.0–1.0 on the hero and the Pod).
+
+**`K.check`:** baked shading 0.24 on the hero (limit 0.5) and 0 on the parts. The plain dirt cap first gave 0.54 for the
+dirt family, so the cap is now the rock key.
+
+## Stage 5 - Lighting
+
+- **Neon seed.** The three seed keys are Neon: emission 1.0, `flintkit_spec` [0.5, 0, 1.0]. In Blender, `_glow_mats`
+  previews them unlit, as Roblox shows Neon. The export should give 3 glow pieces.
+- **Seed bright share** (v ≥ 0.9): 99.5–99.9 % in every view. The sheet's is 95–97 % (87 % on the top).
+- **Glow share** (the seed's share of the silhouette):
+
+  | | Front | F34 | Side | Rear | R34 | Top |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | Sheet | 22.0 | 16.1 | 20.4 | 17.9 | 16.0 | 11.2 |
+  | Ours | 22.9 | 20.9 | 24.5 | 16.9 | 16.9 | 11.7 |
+
+- **Light.** `crystal_glow` at build (0, -1.2, 6.0), 1.26 clear of the mesh: #FF8A2A, brightness 0.6, range 9, shadows
+  on, no flicker. With the light on, the front leaf median moves from #941D21 to #961D21 and the rock doesn't move: no
+  orange spill.
+- **Studio (Requires Manual Validation):** the halo leans on the place's default Bloom. Check that the three seed bands
+  stay distinct under Neon bloom.
+
+## Stage 6 - VFX
+
+| Socket | Kind and settings | Build point | Roblox XYZ (hero-local) | Clearance | Inside the mesh | Spawn points inside |
+| --- | --- | --- | --- | --- | --- | --- |
+| VFX_EmberbloomNode_crystal_glow_1 | crystal_glow, light only | (0, -1.2, 6.0) | (-0.03, 6.0, 1.01) | 1.26 | no | – |
+| VFX_EmberbloomNode_crystal_halo_1 | crystal_halo, scale 0.45, #FFD9A8 → #FF9A3C | (0, 0.3, 4.4) | (-0.03, 4.4, -0.49) | 0.34 | yes, by design | – |
+| VFX_EmberbloomNode_embers_1 | embers with `spark_diamond`, #FFE34A → #FECE16, size 0.8 → 0.3, rate 1.5, shape 2.0 × 0.6 × 2.0 | (0, 0, 6.2) | (-0.03, 6.2, -0.19) | 0.70 | no | 0 of 125 |
+
+- `fx_check()` (m015's ray-parity test) checks these inside `build()`.
+- Renders use `vfx=True`. The halo's preview stand-in shows only in `vfx_halo.png` (m014's practice): its blobs veil
+  the model, where a Roblox billboard inside the seed would not.
+- No fire, smoke, dust, heat_glow or harvest sockets (decisions 8 and 9).
+
+## Modeller's notes for the verifier
+
+- **Renders** are in `art/blender/renders/models/M025/`:
+  - the contact sheet `M025_views.png`;
+  - the sheet shots `*_sheet.png` and `top_tilt.png`;
+  - `vfx_halo.png`, `exploded.png`, and `part_pod.png`, `part_petal.png`, `part_rockbase.png`.
+- **Re-measure** with `m025.measure()` after `m025.preview(vfx=False)`. For the side-by-side crops I compared the sheet
+  cell's bounding box against our render's.
+- **Known differences, judged and left:**
+  - f34 and side leaf shares 5–6 points under: the sheet draws its f34 wider and its near side leaf broader;
+  - top rock share 7 under: 6 leaves against the top cell's 5;
+  - seed Ø 2.0, not the study's 2.25, to keep the seed shares in line;
+  - the Petal part is 3.85 long to its base point, plus the peg. The hero leaves run 3.7–3.95, their inner ends buried;
+  - leaf medians straddle the sheet by ±13–21 (lighting contrast);
+  - rear view seed deep share 15 % against 29 %: the back leaves cup the seed's lower, deep facets.
+- **Hidden parts.** The leaf hub, the seed foot and the leaf roots are hidden inside the seed's foot cone and the slab.
+  The underside shows the recess and the boulders' flat bottoms (`underside.png`).
+- **Clean build.** `build()` returns an empty `problems` list and an empty `log.union_retries` (the union guard did not
+  fire).
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-28. Read-only: background session on port 9881 with
+`art/blender/assets/kit/wip/M025_verify.blend` (not saved; `build()` not called). Fresh renders went to a scratch
+folder (`M.MODEL_RENDERS` redirected), so `art/blender/renders/models/M025/` was not touched. Everything below was
+re-measured; nothing was taken from the stage sections.
+
+**Verdict: FAIL, 6.5 / 10.** The technical side is clean. Two things read clearly unlike the sheet: the seed's visible
+shape (a slim flame tongue instead of a plump gem cupped by the leaves), and the leaf red (dull crimson instead of the
+sheet's saturated red).
+
+### Technical checks (all pass)
+
+| Object | Tris | Size (studs) | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons | Self-intersecting pairs (BVH, m016) | Inverted faces (ray parity) | Min corner | Volume |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberbloomNode | 1438 / 4000 | 6.973 × 5.687 × 5.500 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 5.01° | +44.29 |
+| EmberbloomPod | 144 / 1000 | 2.038 × 2.018 × 4.570 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 8.65° | +7.09 |
+| EmberbloomPetal | 100 / 1000 | 4.674 × 1.751 × 1.456 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 5.40° | +3.52 |
+| EmberbloomRockBase | 866 / 1000 | 6.406 × 5.687 × 1.150 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 5.02° | +16.35 |
+
+- **Size:** 6.97 × 5.69 × 5.50 against the decided 7.0 × 5.7 × 5.5 (±0.35 / ±0.4 / ±0.25). Pass.
+- **Other checks:** no duplicate verts and no interior faces (every face's outward ray hits an even number of
+  surfaces). Origin at the bbox bottom centre (offset 0, 0, 0). Rotation 0, scale 1, no modifiers, no custom normals,
+  all faces flat. `K.check` returns no problems.
+- **UV:** one `UVMap` each, with 0 overlaps, 0 flipped, min gap 0.016, border 0.008 and density 1.0 / 1.0 / 1.0.
+  Conformal stretch p95 is 1.022 (hero), 1.029 (pod), 1.049 (petal) and 1.024 (base).
+- **Neon:** `FB_m025_seed_deep` `#F24C18`, `FB_m025_seed` `#FC7425` and `FB_m025_seed_hot` `#FDA835`. Each has
+  `flintkit_spec` emission 1.0 and an unshaded node set (BSDF and output only, no Tint mix). Each is one flat colour.
+  The seed's Tint is exactly 1.0 on every corner of the hero and the pod.
+- **Solid keys:** emission 0, and Tint 0.909–1.057 on the other faces (a broad range).
+- **Paint fields:** leaves follow t along each leaf, and rocks follow boulder height and patches. Nothing is
+  coloured by facing (`K.check` baked shading is under its limit).
+- **Sockets** (`fx_check`, run by me): 3 in all, the kinds and places that decision 8 set.
+
+  | Socket | Build point | Clearance | Inside | Spawn points inside |
+  | --- | --- | --- | --- | --- |
+  | `crystal_glow` (light only: `#FF8A2A`, 0.6, range 9, shadows, no flicker) | (0, −1.2, 6.0) | 1.26 | no | – |
+  | `crystal_halo` (vfx_scale 0.45, `#FFD9A8` → `#FF9A3C`) | (0, 0.3, 4.4) | 0.34 | yes (by design) | – |
+  | `embers` (`spark_diamond`, `#FFE34A` → `#FECE16`, 2.0 × 0.6 × 2.0 box) | (0, 0, 6.2) | 0.70 | no | 0 / 125 |
+
+  The parts carry no sockets.
+- **No light spill.** With VFX on against off, the leaf median moves by at most 2 levels in any elevation view and the
+  rock median does not move.
+
+### Views against the sheet (VFX off, sheet cameras, the study's masks on both images)
+
+| View | Seed S (sheet / ours) | Leaves L | Rock R | Seed bright ≥ 0.9 | Bottom 20 % rock | Seed deep / mid / hot (sheet → ours) | Top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Front | 22.0 / 22.9 | 48.6 / 46.6 | 29.4 / 30.5 | 95.7 / 99.8 | 95.8 / 96.6 | 26/52/23 → 32/51/17 | 0.037 / 0.20 |
+| F34 | 16.1 / **20.9** | 54.7 / **48.6** | 29.2 / 30.5 | 97.4 / 99.5 | 97.4 / 98.2 | 26/50/25 → 22/58/20 | 0.088 / 0.27 |
+| Side | 20.4 / **24.5** | 49.0 / **43.7** | 30.6 / 31.8 | 95.9 / 99.9 | 96.7 / 97.1 | 28/48/24 → 35/**37**/29 | 0.065 / 0.30 |
+| Rear | 17.9 / 16.9 | 50.8 / 53.3 | 31.3 / 29.8 | 95.5 / 99.7 | 98.8 / 93.6 | 29/48/23 → **15**/58/27 | 0.078 / 0.25 |
+| R34 | 16.0 / 16.9 | 53.6 / 51.0 | 30.4 / 32.1 | 96.9 / 99.6 | 99.3 / 97.8 | 33/39/27 → **19**/**55**/26 | 0.064 / 0.22 |
+| Top | 11.2 / 11.7 | 59.5 / **66.3** | 29.3 / **22.0** | 87.2 / 98.7 | – | 20/48/32 → **6**/44/**50** | 0.066 / 0.14 |
+
+- Bold marks values outside the spec's tolerance: shares ±4 (top ±6), seed bands ±8.
+- W : H is 1.16 against 1.27 (front), 1.10 against 1.45 (f34), 0.97 against 1.04 (side) and 1.17 against 1.20 (rear).
+- Six leaves show in every view. The seed is the only thing above h .73 in the front, side and rear.
+- The boulder ring reads as an unbroken low band in every elevation view, and boulders show between all six leaf tips
+  from the top.
+
+**Seed visible shape** (seed mask; widths as a fraction of the silhouette W):
+
+| View | Seed visible from h (sheet / ours) | Visible seed W : H | Max width | Seed px in the bottom 25 % |
+| --- | --- | --- | --- | --- |
+| Front | .39 / .23 | 0.66 / 0.42 | .32 / .28 | 0 / 47 |
+| F34 | .48 / .31 | 0.80 / 0.46 | .27 / .29 | 0 / 0 |
+| Side | .48 / .17 | 0.74 / 0.37 | .37 / .32 | 0 / 125 |
+| Rear | .50 / .16 | 0.79 / 0.37 | .33 / .27 | 0 / 54 |
+| R34 | .52 / .18 | 0.81 / 0.38 | .29 / .29 | 0 / 98 |
+
+Above the widest point, the profiles agree within 0.03 (front, from the widest point to the tip: sheet .30 .29 .25
+.17 .10 .01; ours .28 .27 .23 .18 .10 .01). The difference is below it:
+- **On the sheet,** the leaves hide everything below the seed's widest ring, so the visible seed is a plump gem sitting
+  in the leaf cup.
+- **In our model,** the front and back pairs leave a V open down to the rock band, so the seed's long lower cone shows
+  as a tapering flame tongue.
+- **Orange specks at ground level.** The hero has 71 seed faces with centres below z 1.6, down to z 0.51 at r 0.54.
+  Most are slivers of 0.002–0.06 stud² between the leaf bases and the slab, left by the seed foot cone (`SEED_POST_R`
+  0.6 at z 0.40). They show as orange specks just above the boulders in the side, rear and r34 views. The sheet has
+  none.
+
+### Colour (sheet → ours, with the per-channel difference)
+
+| Region | Sheet | Ours | Δ R, G, B |
+| --- | --- | --- | --- |
+| Seed deep (front shade quartile) | `#F65117` | `#FF4711` | +9, −10, −6 |
+| Seed mid (front median) | `#FC7926` | `#FF741E` | +3, −5, −8 |
+| Seed hot (front lit quartile) | `#FDA736` | `#FFB02E` | +2, +9, −8 |
+| Seed f34 median / lit / shade | `#FC7024` / `#FDC23D` / `#F64F1A` | `#FF741E` / `#FFB02E` / `#FF4711` | +3,+4,−6 / +2,−18,−15 / +9,−8,−9 |
+| Seed, exploded median | `#FC7C27` | `#FF731D` | +3, −9, −10 |
+| Leaf, parts shot / breakdown median | `#BC2930` | `#AA2F30` | **−18**, +6, 0 |
+| Leaf, exploded median / lit | `#C02931` / `#F03A43` | `#A32E2F` / `#CC3C3F` | **−29**, +5, −2 / **−36**, +2, −4 |
+| Leaf, front median / lit | `#85191D` / `#E9353F` | `#941D21` / `#D53B3E` | +15, +4, +4 / −20, +6, −1 |
+| Leaf, f34 median / lit | `#B6262B` / `#F83D44` | `#9F2226` / `#D73F41` | **−23**, −4, −5 / **−33**, +2, −3 |
+| Leaf, side lit | `#DB323A` | `#AE3A3E` | **−45**, +8, +4 |
+| Leaf, rear lit / r34 lit | `#D42F37` / `#E2353D` | `#A72E32` / `#B03337` | **−45**, −1, −5 / **−50**, −2, −6 |
+| Leaf, top median / lit | `#C5252C` / `#F1343C` | `#AE2D32` / `#D34044` | **−23**, +8, +6 / **−30**, +12, +8 |
+| Rock, front median | `#70594E` | `#72594F` | +2, 0, +1 |
+| Rock, exploded / parts shot | `#7C5E51` | `#785E53` / `#7B6054` | −4, 0, +2 / −1, +2, +3 |
+| Rock, side / rear median | `#765C52` / `#775E52` | `#5C4842` / `#67514A` | −26, −20, −16 / −16, −13, −8 |
+| Rock, f34 / top median | `#674F46` / `#645049` | `#7A5F53` / `#6D564D` | +19, +16, +13 / +9, +6, +4 |
+| Rock lit quartile (front / rear) | `#9F7B6C` / `#A98574` | `#8B6C5E` / `#7C6359` | −20, −15, −14 / −45, −34, −27 |
+| Dirt floor (exploded, lit floor) | `#7C5C4F`–`#815E50` | `#725A51`–`#745C52` | about −9, −3, +2 |
+
+- **Seed:** within about 10 of the sheet on every band (the f34's hottest facets are 18 less yellow). The three keys
+  stay distinct.
+- **Rock and dirt:** match where they are unshadowed (front, exploded, parts). The side and rear medians are the studio
+  shade.
+- **Leaves:** the medians straddle the sheet, but the lit faces are 20–50 levels darker in R and less saturated
+  (sat 0.67–0.72 against 0.76–0.78) in every view. The unshadowed parts-shot median misses the spec's own target
+  (within 12 of `#BE2930`) by 18. The leaves read as dull crimson; the sheet's are a bright, saturated red ("Leaf
+  (Primary): Saturated red").
+
+### Findings
+
+**Blockers**
+
+1. **B1. The seed reads as a slim flame tongue, not the sheet's plump gem in a leaf cup.**
+   - **Evidence.** The visible seed's W : H is 0.37–0.46 against the sheet's 0.66–0.81, and it shows from h .16–.31
+     against .39–.52. Its max width is 0.27–0.32 W against 0.32–0.37. Orange seed-foot slivers show at ground level
+     in four views (47–125 px in the bottom 25 %; sheet 0).
+   - **Knock-on effects.** The seed is over in the f34 and side (+4.8 and +4.1), and the leaves are under (−6.1 and
+     −5.3).
+   - **Fix,** in `m025.py`:
+     - **(a) Seed body.** Widen to `SEED["r"]` 1.1 (Ø 2.2) and make the shoulders rounder below the widest ring,
+       for example `SEED_RINGS` (0.25, 0.90) and (0.43, 1.0), so the part reads as the sheet's gem (aim for pod W : H
+       0.50 or more).
+     - **(b) Leaf cup.** Close the leaf cup over the seed's lower half: the front pair (P3/P4) and back pair (P5/P6)
+       should cross in front of and behind the seed at h ≈ .38–.42, not open a V to the rocks. Reduce their `cross`
+       (±0.5 → about ±0.2) and/or raise their inner edges (more roll, or root points higher on the seed). Check on
+       front_sheet that the seed's lowest visible pixel is at h .36–.44, and that its visible W : H is 0.60 or more in
+       the front, side and rear.
+     - **(c) Seed foot.** Shrink the foot cone so no seed face is exposed near the ground: `SEED_POST_R` 0.6 → 0.3 or
+       less, or keep the post wholly inside the slab and leaf hub. Accept when no seed-material face has its centre
+       below z 1.4 outside the leaf bases, and every view has 0 seed pixels in its bottom 25 %.
+     - **Check:** re-measure the seed share against §1.2 (±4); the wider seed and the closed cup roughly cancel.
+2. **B2. The leaf red is dull crimson where the sheet's is a bright, saturated red.**
+   - **Evidence.** The parts-shot median is `#AA2F30` against `#BC2930` (−18; the spec allows 12). The exploded median
+     is `#A32E2F` against `#C02931` (−29). The lit quartile is 20–50 under in R in every view, with saturation 0.67–0.72
+     against 0.76–0.78.
+   - **Cause.** Pass 2's leaf gain × (0.87, 0.60, 0.62), plus the white specular sheen on the lit facets.
+   - **Fix:**
+     - Set the leaf keys from the pass 1 dome calibration again (`#981520` / `#AE202C` / `#800310`), or nudge from
+       there.
+     - Turn the leaf keys' specular down (`low_spec=True` in `PALETTE`) so the lit facets stay saturated.
+     - Recheck the parts-shot leaf median within 12 of `#BE2930`, its lit quartile at `#E0353D` or above, and
+       saturation 0.75 or more.
+     - Accept the elevation medians running up to about 20 lighter than the sheet's. That is the sheet's harder
+       shade, and the plan's own rule says lighting is not paint.
+     - Keep the base → tip ramp (dark → leaf → tip).
+
+**Minors** (fix if cheap; otherwise record)
+
+3. **Seed band split.** These views fall outside ±8:
+   - side mid 37 against 48;
+   - rear deep 15 against 29;
+   - r34 deep 19 against 33, and mid 55 against 39;
+   - top: hot 50 against 32, and deep 6 against 20 (the whole tip cone is hot from above).
+
+   The f34's hot facets sit centre-left; the sheet puts them upper right. Fix in `SEED_COL`: lower `hot` toward 0.80
+   on the tip ring only, with mid facets mixed in, so the top view is mostly mid with hot on one side. Raise `lat` (0.04
+   → about 0.12) so hot leans to +X / −Y and deep shows round the back's lower belt. B1(b) will also change the rear and
+   side splits.
+4. **Top view rock share** 22.0 against 29.3 (tolerance ±6) and leaves 66 against 60. This was expected from 6 leaves
+   against the top cell's 5 (decision 2). Narrowing the leaves a little (`LEAF_W` 0.95) would help, but it is optional.
+5. **Front W : H** 1.16 against 1.27, and f34 1.10 against 1.45. The size decision governs; record it.
+6. **Rock contrast.** The lit quartiles are 20–45 under the sheet's (`rock_light` patches are subtle), and the side
+   and rear medians sit in the studio shade (−16 to −26). The unshadowed medians match. Optionally, lift `rock_light`
+   about 8 % and let its patches reach the crowns more often.
+7. **Seed slivers.** The seed foot is split into many tiny faces (71 faces below z 1.6, most under 0.02 stud²). They
+   waste tris but break no check. B1(c) removes most of them.
+8. **Petal part length.** The part is 4.67 long including the peg (the study planned L 3.5 plus the peg); the modeller
+   recorded this. Its W : L and both points are fine.
+9. **Pod part.** W : H 0.45 against the exploded 0.62 and breakdown 0.69. This follows decision 3 (the hero's taller
+   seed), but at Ø 2.0 it is narrower than the decided Ø 2.25. B1(a) brings it closer.
+
+**Passes worth keeping as they are:**
+- the six thick shard leaves, pointed at both ends, in a lotus layout (front pair low, back pair upright);
+- the boulder ring (bottom 20 %: 94–98 % rock);
+- the underside recess;
+- the three Neon keys at their decided hexes, with the seed at 99.5 % or more bright;
+- the three sockets, correctly placed, with no light spill;
+- clean topology, UVs, origin and transforms.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-28. Background session on port 9881 with `art/blender/assets/kit/wip/M025.blend` (saved after
+the final build). All changes are in `art/blender/kit/mcp/m025.py`; no shared helper was touched. `build()` takes about
+40 s with renders (fixed seeds), and returns an empty `problems` list and an empty `union_retries` list.
+
+### B1. Seed shape: fixed
+
+- **(a) Seed body.** `SEED["r"]` 1.0 → **1.15** (Ø 2.3), with rings (0.25, **0.90**) and (0.43, 1.0). The verifier's
+  r 1.1 gave a visible W : H of 0.58–0.59, under the 0.60 target, so I went one step further. The Pod part is now
+  2.34 × 2.32 × 4.57 (**W : H 0.51**, was 0.45).
+- **(b) Leaf cup.** I first tried reducing the front pair's `cross` to ±0.2. That made the V *lower*: in the front
+  view the seed showed from h .23, with 175 px in the bottom 25 %. The V's bottom is where the two leaves' raised
+  inner edges cross, so a *larger* cross lifts it. I swept cross ±0.9 / ±1.3 / ±1.6, roll 48–62, and raised bases.
+  - **P3 / P4 cross ±1.6** (roll ±48 kept). Each base sits past the mid-line, in front of the seed's foot, and the
+    inner edges meet at h .43.
+  - **P1, the near leaf in the side view:** tip (3.52, 0, 3.25) (was z 2.62), roll 20 (was 38), width ×1.15
+    (`LEAF_WS`). It now covers the seed's foot in the side view, the way the sheet's side cell draws its near leaves.
+  - **Not kept:**
+    - Raising every leaf base to z 0.9–1.3 bared the seed's lower cone between the boulders (270–800 px in the
+      bottom 25 %).
+    - `LEAF_W` 0.9, for the top cell's rock share, cost 2–4 points of leaf in every elevation view, made 4
+      self-intersecting pairs, and gained only 3 points on the top.
+  - The back pair are unchanged (±0.5). With the wider seed they already close the rear and r34 cups.
+- **(c) Seed foot.** `SEED_POST_R` 0.6 → **0.3**.
+  - The hero seed's diamonds centred below z 1.5 (`SEED_FOOT_Z`) take the **dirt** key. There are 16 of them, all
+    hidden in the cup. The sheet's Seedpod Mount close-up shows the seed sitting on a dirt-coloured peg. At z 1.2, one
+    orange speck still showed under P1 in the side view.
+  - The Pod part stays all Neon.
+  - The hero has **0 seed-key faces with a centre below z 1.4**; the lowest is at 1.73. Round 1 had 71 faces, down to
+    z 0.51.
+- **Petal part.** It now has its own length, `PETAL_L` 3.9, because the crossed hero P3 runs 4.5 to its buried base.
+  With its peg the part is 4.33 × 1.61 × 1.34 (was 4.67; minor 8).
+
+**Seed visible shape.** VFX off, sheet cameras, measured the verifier's way:
+- "visible from": the lowest row with at least 3 seed px;
+- W : H: the widest seed row over the visible height;
+- the seed px in the bottom 25 %.
+
+| View | Seed visible from h (sheet / round 1 / now) | Visible W : H (sheet / r1 / now) | Max width (sheet / r1 / now) | Bottom 25 % seed px (sheet / r1 / now) |
+| --- | --- | --- | --- | --- |
+| Front | .39 / .23 / **.433** | 0.66 / 0.42 / **0.65** | .32 / .28 / .32 | 0 / 47 / **0** |
+| F34 | .48 / .31 / **.433** | 0.80 / 0.46 / **0.64** | .27 / .29 / .33 | 0 / 0 / **0** |
+| Side | .48 / .17 / **.431** | 0.74 / 0.37 / **0.64** | .37 / .32 / .37 | 0 / 125 / **0** |
+| Rear | .50 / .16 / **.403** | 0.79 / 0.37 / **0.63** | .33 / .27 / .32 | 0 / 54 / **0** |
+| R34 | .52 / .18 / **.457** | 0.81 / 0.38 / **0.70** | .29 / .29 / .36 | 0 / 98 / **0** |
+
+### Shares, bands and checks per view (sheet / ours; VFX off)
+
+| View | Seed S | Leaves L | Rock R | Bottom 20 % rock | Seed deep / mid / hot (sheet → ours) | W : H | Top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Front | 22.0 / 21.6 | 48.6 / 49.8 | 29.4 / 28.6 | 92.9 % | 25/51/22 → 24/50/24 | 1.27 / 1.16 | 0.039 / 0.17 |
+| F34 | 16.1 / **21.7** | 54.7 / 50.8 | 29.2 / 27.4 | 95.3 % | 25/49/24 → 20/49/30 | 1.45 / 1.09 | 0.076 / 0.19 |
+| Side | 20.4 / 21.9 | 49.0 / 48.0 | 30.6 / 30.1 | 97.5 % | 28/47/24 → **48/30/21** | 1.04 / 0.97 | 0.057 / 0.18 |
+| Rear | 17.9 / 18.4 | 50.8 / 51.5 | 31.3 / 30.1 | 94.4 % | 29/48/22 → 24/54/20 | 1.20 / 1.17 | 0.071 / 0.12 |
+| R34 | 16.0 / 18.7 | 53.6 / 49.9 | 30.4 / 31.4 | 98.2 % | 33/39/27 → 27/48/24 | 1.29 / 1.05 | 0.069 / 0.22 |
+| Top | 11.2 / 15.0 | 59.5 / **66.2** | 29.3 / **18.7** | – | 19/48/32 → 18/37/43 | 1.13 / 1.24 | 0.064 / 0.12 |
+| Top tilt | 11.2 / 16.4 | 59.5 / 62.9 | 29.3 / 20.7 | – | 19/48/32 → 19/41/38 | 1.13 / 1.11 | 0.094 / 0.22 |
+
+- **Seed share:**
+  - Within ±4 in the front, side, rear and r34; the side went from +4.1 to +1.5. The top is +3.8 (tolerance ±6).
+  - **F34 is +5.6** (round 1 +4.8). The sheet draws its f34 33 % wider (W : H 1.45 against 1.09), which shrinks every
+    share except the leaves'.
+- **Top rock share: 18.7 against 29.3** (round 1 22.0).
+  - Causes: six leaves against the top cell's five (decision 2), the broader P1, and the crossed front pair. From
+    straight above, that crossing reads as an X.
+  - Narrowing the leaves did not pay (see B1b).
+- The seed is the only thing above h .73 in the front, side and rear. Six leaves show in every view, and the boulder
+  ring stays an unbroken low band.
+
+### B2. Leaf red: partly fixed
+
+- Pass 2's leaf gain is dropped, and the three leaf keys are `low_spec=True` (Specular IOR level 0.06 on the keys and
+  all their mixes).
+- With low specular, the first-pass hexes (`#981520` / `#AE202C` / `#800310`) rendered dark and over-saturated: part
+  shot `#AC1018`, saturation 0.91.
+- So I re-ran the dome calibration with low_spec: leaf `#9A252F`, tip `#B02F3A`, dark `#831C28`. The dome renders
+  were 191,40,48 / 221,51,60 / 160,31,41 against the targets.
+- Then leaf ×1.03 and tip ×1.05. **Final: leaf `#9F2731`, leaf_tip `#B8323D`, leaf_dark `#831C28`.**
+- Also tried: ×1.07 / ×1.15 with a darker base. That pushed the front median to +53 and read pink.
+
+| Region | Sheet | Round 1 | Now | Target |
+| --- | --- | --- | --- | --- |
+| Parts shot (Leaf cell) median | `#BC2931` | `#AA2F30` | **`#B0252E`** (−12, −4, −3) | within 12 of `#BE2930`: met (just) |
+| Parts shot lit quartile | `#E9373F` | – | `#C62B33` | ≥ `#E0353D`: **not met** |
+| Parts shot saturation (median / lit) | 0.78 / 0.76 | 0.72 | **0.79 / 0.78** | ≥ 0.75: met |
+| Exploded median / lit | `#C02931` / `#F03A43` | `#A32E2F` / `#CC3C3F` | `#AF252E` / **`#E0363F`** | lit met |
+| Front median / lit | `#85191D` / `#E9353F` | `#941D21` / `#D53B3E` | `#AB232B` / **`#ED3942`** | median +38 |
+| F34 median / lit | `#B6262B` / `#F83D44` | `#9F2226` / `#D73F41` | **`#BD2B32`** / `#EE3943` | |
+| Side median / lit | `#8B1A1E` / `#DB323A` | `#7E1F20` / `#AE3A3E` | `#8E1F25` / `#BB2F38` | |
+| Rear median / lit | `#7F1A1F` / `#D42F37` | `#8D1F23` / `#A72E32` | `#9F232B` / `#C12E38` | median +32 |
+| R34 median / lit | `#81191E` / `#E2353D` | `#912226` / `#B03337` | `#9F212A` / `#C32E38` | median +30 |
+| Top median / lit | `#C5252C` / `#F1343C` | `#AE2D32` / `#D34044` | **`#C22F38`** / **`#ED3943`** | |
+
+- **What improved.** The red is now saturated (0.76–0.79; the sheet's is 0.76–0.78). The lit quartiles are within
+  4–10 of the sheet in the front, f34, top and exploded views; in round 1 they were 20–36 under.
+- **The trade-off.** The part shot (the leaf lying flat, softly lit) wants brighter keys. But the front, rear and r34
+  medians are already 30–38 lighter than the sheet's, whose leaves sit in hard shade there. That is past the
+  verifier's ~20 allowance, and brighter keys would push them further.
+- **Why the part shot's lit quartile stays under target.** The flat part has no strongly lit facets in the studio
+  light. Paint can't add that contrast without colouring by facing.
+- The base → tip ramp (dark → leaf → tip) is kept.
+
+### Minors
+
+- **3. Seed bands: partly fixed.**
+  - **Tip cap.** For diamonds above h .72, the height term is flattened (× 0.3) and the colour leans by direction
+    (`lat_top` 0.25). From above the tip is now mixed, not one hot disc: top hot 50 → 43, deep 6 → 18.
+  - **Thresholds.** With the cup closed, the deep belt is hidden, so `deep` 0.53 → 0.58 and `hot` 0.77 → 0.78.
+  - **Lateral lean.** The verifier's `lat` 0.12 toward (+X, −Y) made the rear and r34 44–47 % deep with 10 % hot.
+    Final: `lat` 0.03 toward (−X, −0.3 Y).
+  - **What I swept:** `lat` 0–0.12, four directions, deep 0.53–0.62, hot 0.76–0.81, chk 0.14–0.18 and five noise
+    seeds.
+  - **Result.** Five views land within ±9; the front, f34 and rear are within ±6.
+  - **Still out:** the side stays deep-heavy (48/30/21) in every variant, because a few big diamonds face that
+    camera. The top is hot +11 and mid −11.
+- **4. Top rock share:** recorded above (−10.6).
+- **5. W : H:** front 1.16 against 1.27, f34 1.09 against 1.45. The size decision governs. The hero is
+  6.96 × 5.69 × 5.50.
+- **6. Rock contrast: tried, little effect.**
+  - Change: `rock_light` `#7E675E` → `#886F66` (+8 %).
+  - The rock medians are unchanged within 2.
+  - The lit quartiles are still 10–25 under the sheet's (front `#8B6C5E` against `#9F7B6C`), because the patches mix
+    toward `rock_light` by 75 % at most.
+- **7. Seed slivers: fixed** by B1(c); no seed face sits below z 1.73.
+- **8. Petal length: fixed** (4.33 with the peg).
+- **9. Pod W : H:** 0.51, was 0.45. The exploded seed is 0.62 and the breakdown 0.69; the hero's seed is taller per
+  decision 3.
+
+### Checks (all re-measured after the final build)
+
+| Object | Tris | Size (studs) | Shells | NM edges / verts | Boundary | Self-intersecting pairs | Min corner | Volume |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberbloomNode | 1470 / 4000 | 6.96 × 5.69 × 5.50 | 1 | 0 / 0 | 0 | 0 | 5.02° | +49.08 |
+| EmberbloomPod | 144 / 1000 | 2.34 × 2.32 × 4.57 | 1 | 0 / 0 | 0 | 0 | 9.40° | +9.75 |
+| EmberbloomPetal | 100 / 1000 | 4.33 × 1.61 × 1.34 | 1 | 0 / 0 | 0 | 0 | 5.40° | +2.75 |
+| EmberbloomRockBase | 866 / 1000 | 6.41 × 5.69 × 1.15 | 1 | 0 / 0 | 0 | 0 | 5.02° | +16.35 |
+
+- **Topology, all four objects:** no wire edges, loose verts, zero-area faces, n-gons or duplicate verts. Normals
+  point outward, and the origin is at the bottom centre (offset 0, 0, 0).
+- **Build path:** the union guard, the merge-0.002 union and `M.fix_bowties` are kept. No bowties needed fixing, and
+  the guard made no union retries.
+- **UV** (margin 0.008): 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0 everywhere. Conformal stretch
+  p95 is 1.026 (hero, 279 islands), 1.046 (pod), 1.049 (petal) and 1.024 (base).
+- **`K.check`:** no problems.
+- **Neon:** `m025_seed_deep` `#F24C18`, `m025_seed` `#FC7425` and `m025_seed_hot` `#FDA835`. Each has emission 1.0 and
+  one flat colour, with Tint exactly 1.0 on every seed corner (hero and Pod).
+- **`fx_check`** (re-run after the seed changes):
+
+  | Socket | Build point | Clearance | Inside | Spawn points inside |
+  | --- | --- | --- | --- | --- |
+  | crystal_glow | (0, −1.2, 6.0) | 1.24 | no | – |
+  | crystal_halo | (0, 0.3, 4.4) | 0.43 | yes (by design) | – |
+  | embers | (0, 0, 6.2) | 0.70 | no | 0 / 125 |
+
+### Kept as they were
+
+- The six thick double-pointed shard leaves in a lotus (front pair low, back pair upright).
+- The boulder ring and the underside recess.
+- The Neon set-up and the three sockets.
+
+### Renders
+
+- **Where:** `art/blender/renders/models/M025/`.
+- **From `build()`, VFX on:** `M025_views.png`, the `*_sheet.png` shots and `top_tilt.png`.
+- **Also:** `exploded.png`, the `part_*.png` shots, `underside.png` and `vfx_halo.png`.
+- **To re-measure:** run `m025.preview(vfx=False)`, then `m025.measure()`.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not the round 1 verifier), 2026-10-28. Read-only: a background session on port 9881 with
+`art/blender/assets/kit/wip/M025_verify.blend` (the main session's rebuild). The file was not saved and `build()` was
+not called. All renders went to a scratch folder (`M.MODEL_RENDERS` redirected), so `art/blender/renders/models/M025/`
+was not touched. Every number below is my own re-measurement.
+
+**Verdict: PASS, 7.5 / 10.**
+- Both blockers are met against their stated targets.
+- The technical side is clean.
+- What is left are minors, and each has a cheap fix if the main session wants one.
+
+### Technical checks
+
+| Object | Tris | Size (studs) | Shells | NM edges / verts | Boundary / wire / loose | Zero-area / n-gons / dup | Self-hit pairs | Min corner | Volume | UV islands / overlap / flipped / gap / border / density / stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EmberbloomNode | 1470 / 4000 | 6.96 × 5.69 × 5.50 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.02° | +49.08 | 264 / 0 / 0 / 0.016 / 0.008 / 1.0 / 1.024 |
+| EmberbloomPod | 144 / 1000 | 2.34 × 2.32 × 4.57 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 9.40° | +9.75 | 29 / 0 / 0 / 0.016 / 0.008 / 1.0 / 1.046 |
+| EmberbloomPetal | 100 / 1000 | 4.33 × 1.61 × 1.34 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.40° | +2.75 | 23 / 0 / 0 / 0.016 / 0.008 / 1.0 / 1.049 |
+| EmberbloomRockBase | 866 / 1000 | 6.41 × 5.69 × 1.15 | 1 | 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 | 0 | 5.02° | +16.35 | 148 / 0 / 0 / 0.016 / 0.008 / 1.0 / 1.024 |
+
+- **Size:** within the decided 7.0 × 5.7 × 5.5 (±0.35 / ±0.4 / ±0.25).
+- **Origin and transforms:** the origin is at the bbox bottom centre (offset 0, 0, 0.0000). Rotation 0 and scale 1 on
+  all four objects. No modifiers, no custom normals and 0 smooth faces. One `UVMap` each. `M.audit` reports normals
+  outward, and `K.check` returns `[]`.
+- **Inverted faces.** Ray parity, one ray per face along its normal, re-tested with 7 jittered rays.
+  - The parts have 0.
+  - The hero has **1**: face 896, a 0.007 stud² dirt sliver at (−0.28, −1.13, 0.47), folded back-to-back under P4's
+    base where the leaf meets the slab.
+  - The hero also has **12 back-to-back edge pairs** (zero-angle creases), and the RockBase has 1.
+    - 11 of the hero's pairs are at the leaf-base / slab seam at z 0.46–0.49. Ray tests find all of them invisible
+      from every direction.
+    - One is where back leaf P6 touches the seed at (−0.4, 1.04, 2.1), a crevice.
+  - The bowtie, self-hit and manifold checks miss these by design. They are harmless in Roblox. Minor m6.
+- **Neon.** `FB_m025_seed_deep` `#F24C18`, `FB_m025_seed` `#FC7425` and `FB_m025_seed_hot` `#FDA835` each have
+  `flintkit_spec` [0.5, 0, **1.0**], Emission Strength 1.0, emission colour equal to the base colour, and nodes BSDF +
+  Output only (no Tint mix), so each is one flat colour. Tint is exactly 1.000–1.000 on every seed corner of the hero
+  and the Pod.
+- **Solid keys:** emission 0. Tint runs 0.909–1.057 (rock and dirt) and 0.962–1.051 (leaf). The leaf keys have Specular
+  IOR level 0.06 (`low_spec`).
+- **No colour by facing.** Within each family, the key luminance does not correlate with normal z (r = 0 for leaf, rock
+  and seed). `K.check` baked shading is within its limit.
+- **Seed foot (B1c):** 104 seed-key faces, the lowest centre at **z 1.733**; 0 below z 1.4. 37 dirt-keyed foot faces sit
+  above z 0.9 (z up to 1.68).
+- **Sockets** (`fx_check`, run by me):
+
+  | Socket | Settings | Build point | Clearance | Inside | Spawn points inside |
+  | --- | --- | --- | --- | --- | --- |
+  | `crystal_glow` | light only, `#FF8A2A`, 0.6, range 9, shadows, no flicker | (0, −1.2, 6.0) | 1.24 | no | – |
+  | `crystal_halo` | `glow_soft`, `#FFD9A8` → `#FF9A3C` | (0, 0.3, 4.4) | 0.43 | yes (by design) | – |
+  | `embers` | "Crystals", `spark_diamond`, `#FFE34A` → `#FECE16`, box 2.0 × 0.6 × 2.0 | (0, 0, 6.2) | 0.70 | no | 0 / 125 |
+
+  This is exactly decision 8: no `heat_glow` and no harvest sockets, and the parts carry no sockets.
+
+### B1 and B2 against their targets
+
+**B1. Seed shape: met.**
+
+Measured with VFX off, the sheet cameras, and the study's masks on both images.
+
+| View | Seed visible from h (sheet / ours) | Visible W : H | Max width / W | Seed px in the bottom 25 % |
+| --- | --- | --- | --- | --- |
+| Front | .395 / **.433** | 0.67 / **0.65** | .32 / .32 | 0 / **0** |
+| F34 | .45 / .433 | 0.71 / 0.64 | .27 / .33 | 0 / 0 |
+| Side | .489 / .431 | 0.76 / **0.64** | .37 / .37 | 0 / **0** |
+| Rear | .50 / .403 | 0.79 / **0.62** | .33 / .32 | 0 / **0** |
+| R34 | .503 / .457 | 0.76 / 0.70 | .29 / .36 | 0 / 0 |
+
+- **Targets.**
+  - The front's lowest visible seed is at h .36–.44: met (.433).
+  - Visible W : H is 0.60 or more in the front, side and rear: met (0.65 / 0.64 / 0.62).
+  - Every view has 0 seed px in its bottom 25 %: met.
+  - No seed face centre is below z 1.4: met (lowest 1.733).
+  - The seed share is within ±4 of §1.2 in the front, side, rear and r34: met (−0.4, +1.5, +0.5, +2.7).
+- **Front width profile** (seed width / visible height, from the bottom of the visible seed to the tip):
+  - sheet .03 .36 .61 .67 .66 .64 .59 .50 .34 .21 .03;
+  - ours .04 .55 .64 .65 .65 .62 .55 .46 .34 .19 .02.
+
+  This is a near match: a plump gem in the leaf cup, no longer a flame tongue.
+- **Side:** the same shape, about 15 % slimmer (max .63 against .75).
+- **Rear and r34:** the bottom 20 % of the visible seed is still a narrow wedge in the V between the back pair (rear .08
+  / .22 against the sheet's .70 / .77). The rest matches. Minor m2.
+
+**B2. Leaf red: resolved in substance; the part-shot lit target is not met.**
+
+| Region | Sheet | Ours | Δ R, G, B | Target |
+| --- | --- | --- | --- | --- |
+| Parts shot, Leaf cell: median | `#BC2931` | `#B0252E` | −12, −4, −3 | within 12 of `#BE2930`: **met (at the edge)** |
+| Parts shot: lit quartile | `#E9373F` | `#C62B33` | −35, −12, −12 | ≥ `#E0353D`: **not met** |
+| Parts shot: saturation, median / lit | 0.78 / 0.76 | 0.80 / 0.78 | | ≥ 0.75: **met** |
+| Exploded: median / lit | `#C02931` / `#F03A43` | `#AF252E` / `#E0363F` | −17,−4,−3 / −16,−4,−4 | |
+| Front: median / lit | `#85191D` / `#E9353F` | `#AB232B` / `#ED3942` | +38,+10,+14 / +4,+4,+3 | |
+| F34: median / lit | `#B6262B` / `#F83D44` | `#BD2B32` / `#EE3943` | +7,+5,+7 / −10,−4,−1 | |
+| Side: median / lit | `#8B1A1E` / `#DB323A` | `#8E1F25` / `#BB2F38` | +3,+5,+7 / −32,−3,−2 | |
+| Rear: median / lit | `#7F1A1F` / `#D42F37` | `#9F232B` / `#C12E38` | +32,+9,+12 / −19,−1,+1 | |
+| R34: median / lit | `#81191E` / `#E2353D` | `#9F212A` / `#C32E38` | +30,+8,+12 / −31,−7,−5 | |
+| Top: median / lit | `#C5252C` / `#F1343C` | `#C22F38` / `#ED3943` | −3,+10,+12 / −4,+5,+7 | |
+
+- **Judgement: the trade-off is accepted.**
+  - Hue and saturation now match the sheet's "saturated red" in every view: 0.76–0.80 against 0.76–0.78.
+  - The lit quartile matches where the studio light falls squarely: front, f34, top and exploded, all within 16.
+  - The misses are lightness only, and they go both ways:
+    - The front, rear and r34 medians are 30–38 *lighter* than the sheet's, whose leaves sit in harder shade.
+    - The side, r34 and part-shot lit quartiles are 19–35 *darker*, because no facet faces the studio key.
+  - Paint can't serve both without colouring by facing. Side by side, the leaves now read as the same red.
+
+### Views against the sheet
+
+Side-by-side crops of the sheet cell's bbox against our render's bbox, for all six sheet views, top_tilt, the parts,
+the exploded view, the underside and the VFX panel. Shares are with VFX off; bold marks values out of tolerance.
+
+| View | Seed S (sheet / ours) | Leaves L | Rock R | Bottom 20 % rock | Seed deep / mid / hot (sheet → ours) | W : H | Top-profile error mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Front | 22.0 / 21.6 | 48.6 / 49.8 | 29.4 / 28.6 | 95.8 / 92.9 | 26/52/23 → 25/50/25 | 1.27 / 1.16 | 0.039 / 0.17 |
+| F34 | 16.1 / **21.7** | 54.7 / 50.8 | 29.2 / 27.4 | 97.4 / 95.3 | 26/50/25 → 20/50/30 | 1.45 / 1.09 | 0.076 / 0.19 |
+| Side | 20.4 / 21.9 | 49.0 / 48.0 | 30.6 / 30.1 | 96.7 / 97.5 | 28/48/24 → **48/30/22** | 1.04 / 0.97 | 0.057 / 0.18 |
+| Rear | 17.9 / 18.4 | 50.8 / 51.5 | 31.3 / 30.1 | 98.8 / 94.4 | 29/48/23 → 25/55/21 | 1.20 / 1.17 | 0.071 / 0.12 |
+| R34 | 16.0 / 18.7 | 53.6 / 49.9 | 30.4 / 31.4 | 99.3 / 98.2 | 33/39/27 → 27/48/24 | 1.29 / 1.05 | 0.069 / 0.22 |
+| Top | 11.2 / 15.0 | 59.5 / **66.2** | 29.3 / **18.7** | – | 20/48/32 → 19/38/44 | 1.13 / 1.24 | 0.064 / 0.12 |
+| Top tilt | 11.2 / 16.4 | 59.5 / 62.9 | 29.3 / **20.7** | – | 20/48/32 → 19/42/39 | 1.13 / 1.11 | 0.094 / 0.22 |
+
+- **Front, rear and r34:** a lotus of thick double-pointed shards round a plump faceted gem, with the boulder band below.
+  - Silhouette error is 0.04–0.07 mean.
+  - The front pair (cross ±1.6) meets in a V at the centre, like the sheet's front cell.
+  - The silhouette is narrower (size decision 1).
+- **F34:** reads as the front from slightly left. The sheet's f34 is drawn 33 % wider, so its seed share is +5.6 (as
+  recorded; the size decision governs).
+- **Side:** the broadened, raised P1 covers the seed's foot as the sheet's near leaf does. The silhouette is a little
+  lopsided (the back pair stand taller on the right), but the profile error is only 0.057.
+- **Top:** six leaves against the sheet's five (decision 2). The crossed front pair reads as two near-parallel leaves
+  pointing to the front, so boulders show only at the sides and back. Minor m1.
+- **Parts.**
+  - Pod: W : H 0.51 against 0.62–0.69 (decision 3).
+  - Petal: double-pointed, with its hex peg; its base end is fuller than the sheet's long base point.
+  - RockBase: boulder ring, dirt floor and mount post. The sheet draws a raised slab rim as well.
+  - The exploded and underside views read like the sheet. The VFX halo and the diamond crystals match the VFX panel.
+
+### Colour (sheet → ours, Δ R, G, B)
+
+| Region | Sheet | Ours | Δ |
+| --- | --- | --- | --- |
+| Seed mid (front median) | `#FC7926` | `#FF741E` | +3, −5, −8 |
+| Seed hot (front lit) | `#FDA736` | `#FFB02E` | +2, +9, −8 |
+| Seed deep (front shade) | `#F65117` | `#FF4711` | +9, −10, −6 |
+| Seed f34 lit | `#FDC23D` | `#FFB02E` | +2, −18, −15 |
+| Pod part median | `#FD7628` | `#FF731D` | +2, −3, −11 |
+| Exploded seed median | `#FC7C27` | `#FF4B13` | +3, **−49**, −20 (deep-heavy, m3) |
+| Rock front median / lit | `#70594E` / `#9F7B6C` | `#70574D` / `#8B6C5E` | 0,−2,−1 / −20,−15,−14 |
+| Rock exploded median | `#795C50` | `#785E53` | −1, +2, +3 |
+| Rock base part median | `#836459` | `#7B6054` | −8, −4, −5 |
+| Rock side / rear median | `#765C52` / `#775E52` | `#5B4841` / `#69534B` | −27,−20,−17 / −14,−11,−7 (studio shade) |
+| Rock f34 / top median | `#674F46` / `#645049` | `#795E52` / `#6C554E` | +18,+15,+12 / +8,+5,+5 |
+| Leaves | see the B2 table | | |
+
+### Modeller's deviations: rulings
+
+- **Leaf-cup crossing (P3 / P4 cross ±1.6): accepted.**
+  - It is what closes the front cup: the seed is visible from h .433, with 0 px low.
+  - It costs the top view its even five-point star (m1).
+  - It leaves the cup open at the diagonals (m2).
+- **Dirt-keyed seed foot (16 diamonds below z 1.5): accepted.**
+  - It matches the sheet's Seedpod Mount (the seed on a dirt peg).
+  - The Pod part stays all Neon.
+  - Ray tests show 30 of the 37 dirt foot faces visible from some direction (az 45–60° and 285–315°, el 8–45°)
+    *through the gaps between the leaves*. In renders at those angles they read as a dark wedge of ground under the
+    seed. That is far better than round 1's orange specks.
+- **Leaf-red trade-off: accepted** (see B2).
+
+### Findings
+
+**Blockers: none.**
+
+**Minors** (record, or fix cheaply in `m025.py`):
+
+1. **m1. Top rock share 18.7 against 29.3** (top_tilt 20.7). Six leaves (decision 2) plus the crossed front pair cover
+   the ring from above.
+   - Cheap fix if wanted: shorten the leaf tips' reach about 5 % (`LEAVES` tip radii × 0.95) for the four side and back
+     leaves only.
+   - Check that the front, side and rear leaf shares stay within ±4.
+2. **m2. The seed's lower cone shows between leaves at diagonal angles.**
+   - In the rear and r34, the lowest 20 % of the visible seed is a narrow wedge in the back pair's V.
+   - At az 45° and 300° (not sheet views), the seed tapers down to the dark foot: a hint of the round 1 flame tongue.
+   - Cheap fix: fill the lower cone, e.g. `SEED_RINGS` (0.10, 0.45) → (0.10, 0.60), so what shows between the leaves
+     is gem, not taper. This also widens the Pod part's bottom toward the sheet's.
+3. **m3. The Pod part (and the exploded seed) is deep-heavy:** 46 / 27 / 27 against the sheet's 22 / 55 / 23. The
+   hero's `deep` 0.58 is tuned for a seed whose lower half is hidden, but the part shows its whole height, so half of
+   it is red-orange.
+   - Cheap fix: give `_paint_seed` a threshold override for `pod_part` (e.g. `deep` 0.35, `hot` 0.72).
+   - Target: the part's bands within ±8 of the sheet's.
+4. **m4. Side-view seed bands** 48 / 30 / 22 against 28 / 48 / 24 (as the modeller recorded: a few big diamonds face
+   that camera). The top is hot +12, mid −10. Leave it.
+5. **m5. Rock contrast:** the lit quartiles are 15–25 under (front `#8B6C5E` against `#9F7B6C`), and the side and rear
+   medians sit in studio shade. The unshadowed medians match within 8. Leave it.
+6. **m6. Degenerate creases.** One folded dirt sliver (0.007 stud², odd ray parity) and 11 back-to-back face pairs at
+   the leaf-base / slab seam (z 0.46–0.49), all invisible from every direction; one crease where P6 touches the seed.
+   The RockBase has one between two boulders. No check fails and nothing shows.
+   - Optional: dissolve faces under 0.01 stud² at that seam in `_finish`.
+7. **m7. W : H** 1.16 / 1.09 against the sheet's 1.27 / 1.45 (front / f34): size decision 1. Record.
+8. **m8. Part shapes.** The Pod's W : H is 0.51 (decision 3). The Petal's base end is fuller than the sheet's long base
+   point. The RockBase has no raised slab rim. Record.
+
+**Kept as they are:**
+- the six thick double-pointed shard leaves;
+- the plump seed cupped at h ≈ .43;
+- the boulder band (bottom 20 % at 93–98 % rock);
+- the underside recess;
+- the three Neon keys at their decided hexes (99.8 % or more bright);
+- the three sockets;
+- clean topology, UVs, origin and transforms.
+
+## Main session after verification round 2 (2026-10-28)
+
+Applied m3: `POD_PART_BANDS` (deep 0.2, hot 0.74) for the Pod part only. Face keys went from 60/52/32 at deep 0.35 to 46/72/26 (deep / mid / hot), against the sheet's mostly-mid part. The hero is unchanged: 1470 tris, one shell, 0 bowties, `problems` empty. Export: 0 problems. m1, m2 and m4–m8 are recorded in MODEL_PROGRESS.md.

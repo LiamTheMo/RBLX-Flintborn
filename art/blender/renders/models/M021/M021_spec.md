@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/021.png`. The sheet's own title is "ROOT CLUSTER — Stylized Environment Asset",
 top right "FLINTBORN — Environment Art Reference", footer "FLINTBORN — INDIVIDUAL MODEL STUDY, PAGE 24/132". INDEX.md
 row 21 calls it "Flintborn Root Cluster Study". The image is 1024 × 1536 px.
-Builder: `art/blender/kit/mcp/m021.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`
+Builder: `art/blender/kit/mcp/m021.py` → `build()` (stages 1–6 done; see the stage sections at the end). Procedure: `art/blender/kit/mcp/STAGES.md`
 (one modeller does stages 1–6 in a background Blender; the main session does stage 7).
 
 User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
@@ -759,3 +759,590 @@ All recommendations are accepted:
 9. Comparison cameras: `f34_sheet (0,20)`, `r34_sheet (−12,15)`, `side_sheet (90,8)`, `top_sheet (0,50)`.
 10. One ring loop on each tip's end face.
 11. Names as proposed: `ArchedRootCluster` with `Mound`, `RootA`, `RootFork` and `LeafModule`.
+
+## Stage 1 — Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m021.py` → `build()`; worked in a background Blender (`bgmcp.py`, port 9877, work file
+`art/blender/assets/kit/wip/M021.blend`). Every part has its own function; the hero pastes the fused parts.
+
+- **Dirt Mound (Base)** `mound_raw` → `ArchedRootClusterMound`:
+  - `_dome`: one lofted 18-gon dome (8 rings, top 3.45, plan semi-axes 3.42 × 3.30 after `MOUND_SXY` / `MOUND_SY`),
+    the back and side lumps of §2.1 as broad deliberate swellings (0.5 stud, Gaussian over each lump's footprint), so
+    it reads as the sheet's rounded lumpy earth dome, not a pile of boulders. A first "core + 15 hull lumps" build
+    looked like a rock pile; it is kept as `MOUND_STYLE = "lumps"`.
+  - Ten flat-topped hull rocks (`ROCK_LUMPS`): crown, upper-left and front-shoulder stones (stone-painted tops), the
+    front foot boulder (flat-topped trapezoid), the pebble, the left foot and four flank lumps (the boulder ring round
+    the foot).
+  - **Supports** (`plan_supports`, §3.6 "flat joining surfaces"): the roots' centre lines are drawn from the sheet;
+    wherever a stretch of root would float above the bare mound, a flat-topped hull lump goes under it (top tilted
+    with the root, turned along it, 0.2 Ø above the root's underside), and the mound is fused again. Two rounds (this
+    build: 5 + 1 supports).
+  - Exact unions (`M.union_loose`), floor cut at z 0 (`m016._floor_cut`, triangle fill), limited dissolve of
+    near-coplanar faces (10°, colour edges kept), m016 / m012 cleanup.
+- **Root Module (A)** `root_a` → `ArchedRootClusterRootA`: one 10-sided tube along a Catmull-Rom path whose control
+  points were read off the sheet's hero (front, e 20) with depths from the plan: the front tip at (−1.95, −3.25), the
+  front leg bulging toward the centre at mid-height (the S-curve), the knee on the crown (centre about z 4.1), the
+  left leg over the left shoulder to a tip pointing back-left. Ø 1.15 → 1.32 at the knee.
+- **Root Modules (B + C)** `root_fork` → `ArchedRootClusterRootFork`: C (10 sides, Ø 1.2 → 1.05) from a blunt domed
+  bark stub at the crown (facing front-left), through the fork elbow, down the front-right; B (9 sides, Ø 1.0 → 0.9)
+  springs from C's conformed centre line at the fork, continues the stub's line up and back and runs down the
+  back-right (the side view's arch). Unioned into one piece.
+- **Tube details** (`_root`): rings about 0.62 apart (0.42 round bends), ±6 % radius, ±8° twist, ±0.04 vertex jitter,
+  ±0.06 along the axis, so the long facets break into irregular triangles. **Conform** (`_conform`): stations that lie
+  on the mound (within 0.12 of it) drop along the root's own local down until the underside sinks 0.2 Ø; the others
+  keep their drawn height (supports bed them). Bends are relaxed to at least 1.3 × the tube radius so no inner side
+  folds through.
+- **Cut tips**: the last 1.2 Ø is pale cut wood: a **slanted, zig-zag collar** ring (offset 0.35 r cos θ ± 0.1 r along
+  the axis), rings at 50 % (0.94 r) and 80 % (0.74 r), an end rim at 0.46 r, then a flat end face with **one cut_ring
+  loop** (rim → 0.62 cut, 0.62 → 0.30 cut_ring, centre fan cut). Each tip aims at the drawn end point (at most 32°
+  off the root's run); tip undersides rest 0.1–0.18 above the ground.
+- **Leaf Module** `leaf_part` → `ArchedRootClusterLeafModule`: eight broad kite leaves (the M019 recipe: 8-point
+  outline, midrib ridge, keel) round a small dark 5-sided hub cone. Hero modules: left (span 2.3, in A's knee /
+  left-leg crevice), top (2.2, the crown crevice behind the stub, standing 0.35 up on a bark stalk, leaves rising
+  28–48°), right (2.2, in the B/C crotch on the right shoulder). Each is pre-fused to one shell; hubs drop along their
+  own axis onto the first surface (none floats).
+- **Hero** `ArchedRootCluster`: mound + A + fork + 3 leaf modules pasted, exact union shell by shell, floor cut,
+  cleanup. Guards: mound fuse retries (support seed, dissolve angle), root fuse retries (facet seed), clump fuse
+  retries, hero retries (the clumps turned 9° per try, up to 10).
+
+**Stage 1 acceptance** (study masks on the kit renders; perspective kit camera):
+
+| Check | Sheet | Ours | Verdict |
+| --- | --- | --- | --- |
+| Size W × D × H | 9.4 × 7.7 × 5.0 (±0.4 / ±0.4 / ±0.25) | 9.30 × 7.49 × 4.96 | pass |
+| f34_sheet W : H | 1.413 (accept 1.36–1.50) | 1.29 | **miss** (perspective camera; r34_sheet gives 1.44 against the sheet's 1.406) |
+| f34 shares L / C / R / M+rock | 8.9 / 6.7 / 35.2 / 49.2 | 7.2 / 4.7 / 36.3 / 51.7 | pass (C −2.0, on the edge) |
+| f34 tips A-front, C | (.315, .247), (.909, .215) | (.262, .185), (.919, .261) | pass (A-front dy −0.06, on the edge) |
+| f34 A-left tip hidden | hidden | a 0.3 % sliver at the far-left edge (.016, .47) | pass (≤ 0.5 %) |
+| f34 leaf clumps | (.197, .631) (.566, .897) (.750, .793) | (.189, .605) (.515, .923) (.757, .816) | pass |
+| f34 stones | (.318, .574) (.598, .541) | (.276, .632); the A/C stone shows in r34 (.646, .587) | partial |
+| r34 shares | 11.4 / 6.0 / 38.5 / 45.0 | 6.7 / 5.2 / 35.3 / 52.8 | leaves −4.7 (the sheet's r34 has a 4th clump; decision 4 is three) |
+| side_sheet | arch, tips far left and far right; W : H 1.17 | the B/C arch (C left, B right); W : H 1.18 | pass (B's tip is in shade, outside the cut mask) |
+| top_sheet tips | (.043, .456) (.281, .120) (.911, .238) (.929, .638) | (.015, .55) (.29, .14) (.925, .23); B under the right clump | 3 of 4 |
+| Roots bedded | 0.15–0.25 Ø | every station −0.14 … −0.38 Ø (most −0.20) | pass |
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Budget | Size (studs) | Shells | Non-manifold / boundary / wire / loose | Zero-area / n-gons | Normals | Self-hits | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ArchedRootCluster (hero) | 3100 | 4000 | 9.30 × 7.49 × 4.96 | 1 | 0 / 0 / 0 / 0 | 0 / 0 | outward | 0 | 5.0° |
+| ArchedRootClusterMound | 810 | 1000 | 8.63 × 7.49 × 3.94 | 1 | 0 | 0 | outward | 0 | 5.1° |
+| ArchedRootClusterRootA | 508 | 1000 | 4.81 × 4.94 × 4.62 | 1 | 0 | 0 | outward | 0 | 12.7° |
+| ArchedRootClusterRootFork | 594 | 1000 | 4.54 × 5.63 × 4.38 | 1 | 0 | 0 | outward | 0 | 5.3° |
+| ArchedRootClusterLeafModule | 278 | 1000 | 1.75 × 1.76 × 0.57 | 1 | 0 | 0 | outward | 0 | 5.0° |
+
+- Origin at the bottom centre of every object; transforms applied; flat shading; no custom normals. The fused
+  temporaries (`_m021_*`) are removed after the build. `K.check`: no problems.
+- No faces under 5° (`m012._force_slivers`, `POLISH_LIM`); the mound's union slivers merged by the limited dissolve.
+- Tip collars, the 9/10-sided root sections and the leaves' 8-point outlines are kept intact.
+
+## Stage 3 — UV
+
+Smart UV, angle-based, 45°, margin 0.008 (`UV` in the builder), plus `m012._uv_unfold` for any overlap.
+
+| Object | Islands | Overlaps | Flipped | Min gap | Density (min / med / max) | Conformal stretch p95 |
+| --- | --- | --- | --- | --- | --- | --- |
+| hero | 509 | 0 | 0 | 0.016 | 1.0 / 1.0 / 1.0 | 1.03 |
+| Mound | 147 | 0 | 0 | 0.016 | 1.0 | 1.03 |
+| RootA | 54 | 0 | 0 | 0.016 | 1.0 | 1.04 |
+| RootFork | 71 | 0 | 0 | 0.016 | 1.0 | 1.04 |
+| LeafModule | 61 | 0 | 0 | 0.016 | 1.0 | 1.01 |
+
+(The exporter writes its own palette UVs; this layer is clean.)
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.** Pass 1: `m021.calibrate()` (`K.calibrate` on the kit dome) against the §5.4 targets gave bark
+`#764B31`, bark_dark `#684228`, bark_light `#82553A`, cut `#B69878`, cut_ring `#B18F66`, mound `#654E45`, stone
+`#6D5A54`, mound_dark `#55423B`, leaf `#467820`, leaf_tip `#608E2B`, leaf_base `#396C15` (stem rendered at the dome's
+black floor; set by hand to `#2A1406`). Pass 2: the f34_sheet region medians against the sheet's, per family in
+linear light (bark ×1.26 / 1.22 / 1.10, mound ×1.25 / 1.09 / 1.03, leaves ×1.26 / 1.17 / 0.60); the stone lifted by
+hand so the crevice stones read lighter and greyer than the dirt; bark_dark deepened so the legs darken toward their
+tips (the exploded A's 24-level fall).
+
+| Key | Final hex | Roughness | Where |
+| --- | --- | --- | --- |
+| m021_bark | `#835334` | 0.90 | roots, the default |
+| m021_bark_dark | `#683F25` | 0.92 | toward each collar (from 45 % of the leg, up to 75 %), the lower 35 % of each section, the top module's stalk |
+| m021_bark_light | `#915D3D` | 0.90 | within 1.5 of the crown (40 %), broad patches |
+| m021_cut | `#B69878` | 0.85 | tip caps and end faces |
+| m021_cut_ring | `#B18F66` | 0.85 | the ring loop on each end face |
+| m021_mound | `#705246` | 0.95 | dirt, the default; ground caps |
+| m021_stone | `#8C7166` | 0.90 | stone-lump tops (crown, upper-left, front shoulder 75 %, foot boulder 50 %, pebble), support tops 50 %, upper-dome patches 25 % |
+| m021_mound_dark | `#5F453C` | 0.95 | z < 0.35 (40 %); within 0.5 of a root's surface (up to 45 %, 3 steps; stone faces exempt) |
+| m021_leaf / _tip / _base | `#4E8117` / `#6B9920` / `#40740E` | 0.80, FOLIAGE_SPEC | base → mid → tip along each leaf, keel toward the base |
+| m021_stem | `#2A1406` | 0.90 | leaf hubs |
+
+**Re-measured** (final renders, study masks):
+
+| Region | Sheet | Ours | Tolerance |
+| --- | --- | --- | --- |
+| f34 root bark median | `#A06440` | `#9A5F3D` | ±10, pass |
+| f34 mound median | `#835E4D` | `#85604F` | ±10, pass (mound sat 0.41 ≤ 0.45; bark sat 0.60 ≥ 0.55) |
+| f34 cut median | `#E7BD8E` | `#E8BB8C` | ±10, pass |
+| f34 leaf median | `#609C1C` | `#609D1B` | ±12, pass |
+| r34 bark / mound / cut / leaf | `#A3643F` / `#865F4C` / `#E8BD8F` / `#5A961B` | `#9D613E` / `#886150` / `#E8BB8C` / `#619E1C` | pass |
+| Part A median; top vs bottom third | `#955B3B`; bottom ≥ 12 darker | `#9C603D`; `#A96843` → `#905738` (25 darker) | pass |
+| Mound part top fifth vs middle sat | ≤ 0.34 against 0.38 | 0.36 against 0.41 | greyer top, 0.02 over |
+| Crevice stones | lighter and greyer | found as the light "rock" class in f34, r34 and top | pass |
+| Leaves tip vs base | lighter tips | `#7AB220` tips against `#5F9E1B` | pass |
+
+- Blending: every gradient is a `K.mix_key` ladder over a position field (arc length from the crown, section height
+  in the root's own frame, lump-relative height, distance to a root's centre line, world z). Hard edges only at the
+  bark | cut collar and hub | leaves. Never by facing: `baked_shading` hero 0.09, mound 0.14, A 0.0, fork 0.02, leaf
+  module 0.46 (limit 0.5; the leaf ramp runs base → tip).
+- Tint: roots amp 0.05 / scale 0.5, mound 0.06 / 0.6, cut 0.025, leaves 0.035: broad patches, no confetti.
+- The ground caps take the plain mound key (a dark underside correlates with face direction and failed `K.check`).
+
+## Stage 5 — Lighting
+
+Skipped by decision 8: the sheet shows no glow, no emissive faces and no light. No Neon pieces, no PointLight.
+Studio note (Requires Manual Validation): under the game's sun, check that the roots stay warmer and more saturated
+than the mound, that the crevice stones read lighter, and that the leaf base → tip ramp survives the palette export.
+
+## Stage 6 — VFX
+
+Skipped by decision 8: the sheet shows none (no dust, chips, glow or sparkle). No sockets. Renders made with
+`vfx=True` (nothing to realise).
+
+## Modeller's notes for the verifier
+
+- **Cameras.** Compare the f34 and front cells with `f34_sheet (0, 20)`, the r34 with `r34_sheet (−12, 15)`, the side
+  with `side_sheet (90, 8)` and the top with `top_sheet (0, 50)`. The kit camera is perspective, which is why the f34
+  W : H reads 1.29 (sheet 1.413) while the r34 reads 1.44 (sheet 1.406). Tip and leaf positions were tuned on these
+  renders.
+- **Known misses:** the f34 W : H; the rear cell (§3.4, cannot be reproduced; ours shows the mound's back with A-left's
+  and B's tips at the sides and the top module's short bark stalk); B's tip hidden under the right leaf module in
+  `top_sheet`; the r34 leaf share is low (three modules by decision 4); A-left's tip shows a 0.3 % sliver at the
+  far-left edge of the f34; the mound part's top fifth is sat 0.36 (target ≤ 0.34).
+- **Supports** are the "flat joining surfaces". In the mound part they show as flat-topped rocks on the upper slope,
+  where A's knee and left leg and the B/C crown run lie in the hero.
+- **Robustness:** the exact unions are guarded (Stage 1). A build logs `log["prepare"]["mound"]["retry"]` and
+  `log["hero"]["attempt"]` (this build: hero attempt 5 of 10). Seeds are fixed, so a GUI rebuild gives the same result.
+- **Close-ups:** `junction_cu.png` (C on the right shoulder: one clean contact line, no gap), `tip_cu.png` (A's
+  front tip: slanted collar, ring loop on the end face). Parts: `part_*.png`; exploded: `exploded.png`.
+- Scratch measurement tools (study masks): `m021w\meas.py`, `cmp.py` and `parts_meas.py` in the session scratchpad.
+
+## Stage 7 — Verification (round 1)
+
+Independent verifier, 2026-10-28. Read-only background Blender on port 9881 with `wip/M021_verify.blend` (not saved,
+`build()` not called). Fresh renders went to the verifier's scratchpad (`v021/renders/M021/`), not to this folder.
+Measurements were independent bmesh code (`v021/geo.py`), the study masks re-implemented (`v021/cmp.py`), and an
+orthographic painter's-algorithm projection of the hero's triangles (`v021/ortho.py`) to separate perspective from
+shape.
+
+**Verdict: FAIL, 6/10.** The technical side is clean, and so are the colours and the root and tip language. Two
+things clearly unlike the sheet: the mound reads as a **rock pile**, and the leaf modules are **flat rosettes**. There
+is also one technical defect: bowtie vertices at a leaf hub.
+
+### Re-measured numbers
+
+| Object | Tris | Size W × D × H | Shells | NM edges / **NM verts** / boundary / wire / loose | n-gons / zero-area | Winding / odd-parity faces | Self-hits | Min corner (< 5° / < 8°) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ArchedRootCluster | 3100 / 4000 | 9.30 × 7.49 × 4.96 | 1 | 0 / **2** / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 5.01° (0 / 129) |
+| …Mound | 810 / 1000 | 8.63 × 7.49 × 3.94 | 1 | all 0 | 0 / 0 | 0 / 0 | 0 | 5.10° (0 / 35) |
+| …RootA | 508 | 4.81 × 4.94 × 4.62 | 1 | all 0 | 0 / 0 | 0 / 0 | 0 | 12.7° |
+| …RootFork | 594 | 4.54 × 5.63 × 4.38 | 1 | all 0 | 0 / 0 | 0 / 0 | 0 | 5.28° (0 / 4) |
+| …LeafModule | 278 | 1.76 × 1.76 × 0.57 | 1 | 0 / **1** / 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 | 5.03° (0 / 9) |
+
+- **Size:** within the decided 9.4 × 7.7 × 5.0 (±0.4 / ±0.4 / ±0.25): W −0.10, D −0.21, H −0.04.
+- **Origin and transforms:** the local bbox is centred at (0, 0) with z min 0 on all five objects. Rotation 0, scale
+  1, no modifiers, no custom normals, all faces flat.
+- **Normals:** all faces outward (ray parity along each face normal: 0 odd). Signed volumes are positive. Winding is
+  consistent.
+- **UV** (`M.uv_stats` plus my own check): one `UVMap` layer, 0 overlaps, 0 flipped, 0 zero-area faces, min gap
+  0.016, border 0.008. Density p5/p95 0.97–1.03 of the median. Conformal stretch p95 1.01–1.04.
+- **Materials:** 26 slots on the hero, all used; base keys plus `K.mix_key` ladders. `K.check` reports no problems.
+  `kit_baked_shading`: hero 0.09, mound 0.14, A 0.00, fork 0.01, leaf 0.46 (limit 0.5). No colouring by facing.
+- **Non-manifold vertices (bowties):** hero (0.449, 0.770, 4.108) and (0.386, 0.832, 4.056), on the crown module,
+  where `leaf_base` faces meet the `bark_dark` hub stalk; leaf part (−0.015, 0.187, 0.113) at the hub. The edges are
+  manifold, but two face fans share one vertex. `M.audit` and `_fused_ok` don't count this.
+- **Root contact:** down-facing bark area 5.5 st²; 1.43 st² of it lies more than 0.4 above the next surface. Most of
+  that is C's lower leg overhanging the mound edge to its tip (expected) and A's arch over the left-clump hollow,
+  a gap of up to 1.1 at (−2.75, 0.78, 2.56). Elsewhere the roots are bedded.
+- **Tip end faces:** 4 ring loops (cut_ring, 13–18 faces each). The end faces are only 0.14–0.18 in radius and point
+  32–40° from straight down, so the ring sits in shade under the tip and can't be read in any view.
+
+### Views against the sheet (kit perspective renders, plus orthographic for silhouette)
+
+| Check | Sheet | Ours | Verdict |
+| --- | --- | --- | --- |
+| f34 W : H | 1.445 | 1.337 perspective; **1.453 orthographic** | pass (the gap is the kit's perspective) |
+| f34 top profile, f .05 / .10 / .15 | .39 / .56 / .63 | ortho .54 / .64 / .74; perspective .61 / .73 / .83 | minor: left shoulder +0.10 H (A's left leg drops nearly vertically at the far left) |
+| f34 shares L / C / R / M | 8.9 / 6.7 / 35.2 / 49.2 | 7.2 / 4.7 / 36.3 / 51.7 | pass (C −2.0, at the edge) |
+| f34 visible tips | 2 (A-front, C) | 2, plus an A-left sliver at the far left | pass |
+| r34_sheet shares | 11.4 / 6.0 / 38.5 / 44.1 | 6.7 / 5.2 / 35.3 / 52.8 | leaves −4.7 (3 modules by decision 4) |
+| side_sheet | B/C arch, 2 tips | B/C arch, 2 tips; tips in shade | pass |
+| top_sheet tips | 4 radiating from the hub | perspective: 2 visible (A-left and B hidden); ortho: 4 at (.03,.54) (.33,.13) (.89,.22) (.97,.72) | minor |
+| rear | can't be reproduced (§3.4) | two arches over the back dome, tips at the sides | known miss |
+| underside | flat lobed base, 4 tips past it | flat base, 4 tips past it; renders near-black (lit from above) | pass |
+| **Mound (hero and part)** | a broad, low, continuous dome of big flat facets with low-contrast tone breaks; a few boulders round the foot; two small greyish stones in the crevices | **a heap of big separate angular hull rocks** with dark V-gaps between them up to h .6 in front: `front_left`, `front_right`, a tall pointed `front_shoulder` between A and C, `left_shoulder`, `right_front` and the root supports. The part's outline is studded with flat-topped support rocks. | **blocker** |
+| **Leaf modules** | upright eight-leaf stars, leaves rising 25–50°, hub hidden | flat rosettes (part height : span 0.32). The left clump faces the camera with its dark hub showing as a hole; the right one is also tipped toward the camera. | **blocker** |
+| Roots | thick, faceted; A's knee on the crown; B/C forked with a stub; pale tapered tips | thickness and facets OK; A's knee and the stub are at the crown; the slanted collar reads; the stub is domed bark | pass |
+| Root paths | A's left leg drapes diagonally over the left shoulder; the left clump sits on it; a stone in the hollow between A's legs | A is a high round hoop; the left clump fills the hollow under it, hiding the stone | minor |
+| Exploded | B and C read as two limbs | the fork is seen end-on at (−20, 15): only one limb reads | minor (presentation) |
+
+### Colours (median / lit quartile / shade quartile, study masks; Δ = ours − sheet per channel)
+
+| Region | Sheet | Ours | Δ median | Verdict |
+| --- | --- | --- | --- | --- |
+| f34 bark | `#A06440` / `#C47F54` / `#633D28` | `#9A5F3D` / `#B06D47` / `#6A412A` | −6, −5, −3 | pass; minor: lit quartile −20, −18, −13 (less contrast) |
+| f34 mound | `#835E4D` / `#9D745F` / `#61473A` (s .41) | `#85604F` / `#A27B65` / `#614438` (s .41) | +2, +2, +2 | pass |
+| f34 cut | `#E7BD8E` / `#FCDCB1` / `#D2A575` | `#E8BB8C` / `#F8C997` / `#D5AB7F` | +1, −2, −2 | pass; minor: lit quartile −4, −19, −26 (oranger than the sheet's near-white) |
+| f34 leaf | `#609C1C` / `#8BBD2A` / `#315C14` | `#609E1D` / `#82B926` / `#3D6711` | 0, +2, +1 | pass |
+| Stones | under A's bend `#9C7A69`, A/C `#A78675`, pebble `#99786A` (s .30–.33) | front-shoulder lit face `#B68B76` (s .35), foot boulder `#A37A66` (s .37) | A/C stone +15, +5, +1 | minor: pinker and more saturated, not greyer |
+| Exploded A bark | `#955B3B` | part `#9B603D`; thirds `#AB6A44` → `#995F3D` → `#8D5638` | +6, +5, +2 | pass (darkens toward the tips) |
+| Exploded B+C bark | `#975E3D` | part `#7E4F35` | −25, −15, −8 | minor (partly the part camera's shaded side) |
+| Exploded mound | `#816151` (s .37); top fifth greyer (s .30) | part `#8B6352` (s .41); top fifth `#9D7360` s .39 | +10, +2, +1 | minor: pinker; top not greyer |
+| Exploded leaf | `#5A9821` | `#61A120` | +7, +9, −1 | pass |
+| Exploded cut | A `#E2BA8C`, B+C `#F4CFA1` | `#E7BA8C`, `#E4BA8C` | +5, 0, 0 / −16, −21, −21 | pass |
+
+The colours blend: ladders run along the roots (light at the crown, dark toward the tips), and lump stone fades into
+dirt. Hard edges appear only at the collar and the hub. There's no per-triangle confetti.
+
+### Itemised findings
+
+**Blockers**
+
+1. **The mound reads as a rock pile, not the sheet's lumpy dome** (hero f34, front, r34, top, exploded, and the part).
+   Fix in `m021.py`:
+   - Take `front_left`, `front_right`, `left_shoulder` and `right_front` out of `ROCK_LUMPS`, so they become broad dome
+     bumps through `_bumps()`. If the front still looks flat, raise `DOME_BUMP` to about 0.6–0.7.
+   - Shrink `front_shoulder` to a crevice stone: footprint about 1.4 × 1.2, standing no more than 0.35 above the dome,
+     no pointed top.
+   - Keep `crown` and `upper_left` as small stones, no more than about 0.4 proud.
+   - Keep only `front_foot`, `pebble` and `left_foot` as foot boulders.
+   - Make the supports low (top no more than 0.15 above the dome surface, `SUPPORT_DEPTH` deeper) so their top facets
+     merge into the dome instead of showing as flat-topped rocks.
+   - **Goal:** in `f34_sheet` the mound between and below A and C shows broad continuous facets (0.6–1.0 stud) with
+     shallow creases. Dark gaps appear only under the roots. The mound part's outline is a smooth dome with a crown
+     lump, like the exploded cell.
+   - Re-check root bedding and the 1000-tri part limit after the change.
+2. **The leaf modules are flat rosettes, not upright stars.** Fix:
+   - Set `LEAF_RISE` to (25, 50) (spec §1.4) and `LEAF_PITCH` to about (15, 30), with the same rise range in `CLUMPS`
+     for left and right.
+   - Tilt the left and right clump normals toward +Z, for example left (−0.25, −0.25, 0.93) and right (0.25, −0.3,
+     0.92), so no hub faces the camera.
+   - Move the left clump onto A's left leg or the left shoulder (sheet f34 (.197, .631), leaves fanning up and left
+     over the root), so the hollow under A's arch shows its stone as on the sheet.
+   - **Goal:** the part's height-to-span ratio is about 0.5 or more; no dark hub reads in f34 or r34.
+3. **Bowtie (non-manifold) vertices,** 2 on the hero's crown module and 1 on the leaf part, at the hub. They fail the
+   "zero non-manifold" rule. Fix:
+   - In `_leaf_module`, start each leaf's base `b0` inside the hub cone (radius about 0.6 × `HUB_R` × s, below the
+     `mid` ring), so the union cuts a full loop instead of touching at one vertex.
+   - Add `any(not v.is_manifold for v in bm.verts)` to `_fused_ok`, so the hero guard retries such a build.
+
+**Minors** (fix if they come cheaply with the above; otherwise record them)
+
+4. A's left leg falls almost vertically at the far left (ortho top profile +0.10 H at f .05–.15). Ease its last
+   control points outward and lower so it drapes diagonally over the left shoulder.
+5. The stones aren't greyer than the dirt (A/C stone `#B68B76`, sat .35, against the sheet's `#A78675`, sat .30). The
+   mound part's top fifth is sat .39 against the sheet's .30. Lower the `m021_stone` saturation by about 0.05 and keep
+   its value.
+6. The lit bark is about 20 levels darker than the sheet's lit quartile, and the lit tips are oranger (`#F8C997`
+   against `#FCDCB1`). Lift `m021_bark_light` and the lit end of `m021_cut` slightly.
+7. The fork part is darker than the exploded B+C (−25 on R): less `bark_dark` mix on B's upper arch.
+8. The tip end faces (r 0.14–0.18) face the ground, so the decision-10 ring never reads. Accepted, since the hero tips
+   are tapered (§3.9).
+9. In `top_sheet` (perspective) only 2 of the 4 tips show; the orthographic projection shows all 4. In `r34_sheet` the
+   leaf share is −4.7 (three modules by decision).
+10. In the exploded render the fork is seen end-on. Turn it about 60° in `EXPL` or `_exploded`, so B and C read as two
+    limbs.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, 2026-10-28. Background Blender on port 9881 with `wip/M021.blend`, saved after the final build.
+Everything is in the builder (`m021.py`); no shared helper was touched. Scratch tools are in `m021r2\` in the session
+scratchpad (`t_full.py`, `fin.sh`, `col.py`, `gap.py`, `diag_rocks.py`, `leafexp.py`), plus round 1's `m021w\meas.py`,
+`cmp.py` and `parts_meas.py`.
+
+### Findings
+
+**1. The mound reads as a rock pile: fixed.**
+- Changes:
+  - `ROCK_LUMPS` is now crown, upper_left, front_shoulder, front_foot, pebble and left_foot.
+  - front_left, front_right, left_shoulder and right_front are now dome bumps (`DOME_BUMP` 0.65). `BUMP_AMP` raises
+    right_front to 0.85 and left_shoulder to 0.95, for the sheet's flank swellings.
+  - The dome is finer: 22 around, 10 rings, jitter 0.06, dz 0.12. It is a broad rounded dome with sloping flanks,
+    not a bun.
+  - `_stone()` places the three crevice stones along the dome's own surface normal:
+    - `STONES` proud: crown 0.22, upper_left 0.31, front_shoulder 0.29;
+    - `STONE_DEPTH` 0.8;
+    - rounded caps through `LUMP_SHAPE`.
+  - front_shoulder is 1.4 × 1.2 and sits right of A's front leg, at sheet f .60.
+  - The new bumps had swallowed two rocks, so they moved out: the front foot boulder to y −3.45 and the pebble to
+    (−3.4, −2.45).
+  - `CONFORM_REACH` 0.12 → 1.6: the roots lie on the dome, so **no supports are built** (log `supports [0]`).
+    `SUPPORT_MAX` 0.15 caps the top of any future support.
+  - The mound's x scale went from 0.9 to 0.96, for the width.
+- Measured:
+  - **Stones,** as the largest distance to the dome surface: crown 0.40, upper_left 0.35, front_shoulder 0.32.
+    Measured vertically on the slope: 0.41 / 0.63 / 0.65.
+  - **Foot boulders:** front_foot 1.0 tall, pebble 0.7. left_foot sits mostly inside the left bump.
+  - **Root bedding:** every conformed station is sunk −0.13 … −0.39 Ø, most −0.20 … −0.30.
+  - **Overhang:** 0.69 st² of 3.78 st² of down-facing bark lies more than 0.4 above the next surface (round 1: 1.43 of
+    5.5). The worst spot is A's front leg lifting off the front slope toward its tip (1.1).
+
+**2. The leaf modules are flat rosettes: fixed.**
+- Changes:
+  - `LEAF_RISE` (25, 50).
+  - `LEAF_PITCH` (15, 30), capped at `PITCH_MAX` 84°.
+  - `LEAF_ALT`: neighbouring leaves alternate low and high (12 % and 88 % of the rise range), so no two leaves graze.
+  - In CLUMPS, the left and right modules rise (25, 50). Their normals are left (−0.25, −0.25, 0.93) and right (0.25,
+    −0.3, 0.92).
+  - The left module moved out of the hollow onto the front flank of A's left leg (hub (−2.6, −0.6, 2.76)).
+  - Spans: left 2.45, top 2.3, right 2.4.
+- Measured:
+  - Leaf part 1.58 × 1.62 × 0.88: height : span 0.55 (round 1: 0.32).
+  - f34_sheet clumps (.190, .690), (.504, .927), (.716, .844); the sheet has (.197, .631), (.566, .897), (.750, .793).
+  - No hub reads in f34 or r34. The top view shows the hubs, as the sheet's top cell shows its knob.
+
+**3. Bowtie (non-manifold) vertices: fixed.**
+- Root cause:
+  - After the boolean, `M.union_loose` merges vertices within 0.01.
+  - At a hub, the leaves' intersection curves converge closer than that, and the weld made bowties and folds.
+  - The exact union itself is clean: 8 of 8 seeds were clean with merge 0, and 0 of 8 with merge 0.002 or more.
+- Changes:
+  - The builder has its own `_union_fine`: the same exact union, with merge `FINE_MERGE` / `HERO_MERGE` = 0. The
+    clumps, the leaf part and the hero use it.
+  - `_split_bowties` runs as a last guard. It found none.
+  - Leaf bases start inside the hub, at `HUB_IN` 0.6 × `HUB_R` × s.
+  - `_fused_ok` fails any `nonmanifold_verts`.
+  - The leaf part is now fused and guarded like the clumps (`fuse_leaf_part`).
+- Measured: `nonmanifold_verts` is 0 on all five objects (`M.audit`).
+
+**4. A's left leg falls near-vertically: fixed.**
+- Change: the left leg's control points moved outward and lower: (−2.85, 0.3, 3.0), (−3.65, 0.55, 1.85), (−4.1,
+  0.95, 1.0), tip (−4.35, 1.6, 0.25). With the conform, the leg drapes over the left shoulder bump.
+- Measured: the f34 root top line at f .10 / .15 / .20 is .69 / .77 / .82. The sheet has .58 / .67 / .78; round 1 had
+  .73 / .83 / .87 (perspective).
+
+**5. The stones aren't greyer: fixed.**
+- Changes:
+  - `m021_stone` desaturated from `#8C7166` (s .27) to `#8C7971` (s .19), same value.
+  - The dome's upper part greys toward stone with height: `TOP_GREY` 2.75 → 3.3, from 25 % to 50 % stone.
+  - The front foot boulder's stone fraction went from 0.5 to 0.25.
+  - Contact darkening now skips only faces that are at least 50 % stone.
+- Measured:
+  - f34 stones: under A's bend `#967D70` s .25 (sheet `#9E7C6B` s .32); between A and C `#B59888` s .25 (sheet
+    `#B69E8E` s .22).
+  - Mound part: top fifth sat .30 against .40 in the middle (sheet .30 / .38).
+
+**6. Lit bark too dark, lit tips too orange: partly fixed.**
+- Changes:
+  - The bark family is scaled by the f34 median ratio.
+  - `m021_bark_light` gets a further +25 % (linear).
+  - The cut keys' green and blue are lifted × 1.05 / 1.12 (linear).
+- Measured:
+  - f34 lit bark quartile `#BA764B` against the sheet's `#C47F54`: −10, −9, −9 (round 1: −20, −18, −13).
+  - Lit cut `#F8CD9E` against `#FCDBB1`: −4, −14, −19 (round 1: −4, −19, −26).
+
+**7. The fork part is darker than the sheet's B+C: partly fixed.**
+- Change: C and B now darken toward their tips from 62 % of their length, up to 60 %. A keeps 45 % and 75 %.
+- Measured:
+  - Fork part median `#8A5639` against the sheet's exploded B+C `#975E3D`: −13, −8, −4 (round 1: −25, −15, −8).
+  - Part A is `#A0633F` against the sheet's `#955B3B`.
+  - The part camera (40, 28) sees the shaded side of B and C.
+
+**8. The tip end rings face the ground: not changed.** This was accepted in round 1 (§3.9).
+
+**9. top_sheet tips and the r34 leaf share: not changed.** They come from the perspective camera and decision 4.
+- top_sheet shows 2 tips: A-front (.285, .177) and C (.904, .202).
+- r34 leaves are 7.3 % (sheet 11.4, within ±5).
+
+**10. The exploded fork is seen end-on: fixed.** `EXPL_ROT` turns the fork −45° about its own origin in the exploded
+shot. In `exploded.png`, B and C hang from the stub as two limbs.
+
+**Other changes**
+- **Roots:**
+  - `ROOT_SCALE` 1.15 multiplies every drawn diameter: A 1.32 → 1.52 at the knee, C 1.38, B 1.15. Lying on the dome,
+    the drawn 1.0–1.3 roots read thinner against the mound than the sheet's (f34 bark share 32 %).
+  - The middle control points of A's front leg moved +0.3 … +0.35 in x: the sheet's S-curve bulges toward the stub.
+  - C's tip end is now (4.2, −2.95, 0.22) and B's is (4.15, 2.95, 0.3), so B's tip stays hidden in f34.
+  - `TIP_LEN` 1.2 → 1.35 Ø.
+- **Mound part:** it takes the fused mound from before the hero's root-contact darkening (`_m021_mound_bare`), so the
+  part has no dark bands where no root lies. The hero keeps them.
+- **Build time:**
+  - The round-1 build needed hero attempt 5. Now every guard succeeds on attempt 0:
+    - the clump seeds are the ones that fuse clean first (22081, 24082, 22083);
+    - `HERO_YAW0` is 27°, the first hero yaw that fuses clean;
+    - the leaf part fuses on its first seed.
+  - `build()` takes **about 40–45 s** in the background session. That covers the fuse, the four parts, the hero, every
+    render and the close-ups.
+  - The retry guards and `view_layer.update()` calls are unchanged.
+
+### Checks (final build)
+
+| Object | Tris | Size W × D × H | Shells | NM edges / NM verts / boundary / wire / loose | Zero-area / n-gons | Normals | Self-hits | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ArchedRootCluster | 2774 / 4000 | 9.14 × 7.74 × 5.01 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 | outward | 0 | 5.02° |
+| …Mound | 700 / 1000 | 9.09 × 7.74 × 3.77 | 1 | all 0 | 0 / 0 | outward | 0 | 5.05° |
+| …RootA | 500 | 5.25 × 5.45 × 4.40 | 1 | all 0 | 0 / 0 | outward | 0 | 6.35° |
+| …RootFork | 600 | 4.51 × 6.30 × 4.49 | 1 | all 0 | 0 / 0 | outward | 0 | 5.71° |
+| …LeafModule | 314 | 1.58 × 1.62 × 0.88 | 1 | all 0 | 0 / 0 | outward | 0 | 5.13° |
+
+- **Size** against the decision (9.4 × 7.7 × 5.0, ±0.4 / ±0.4 / ±0.25): W −0.26, D +0.04, H +0.01.
+- **UV:** 0 overlaps, 0 flipped, min gap 0.016 (margin 0.008), density 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.05.
+- **Checks:** `K.check` reports no problems and `problems` is empty. No VFX (decision 8).
+
+### Views against the sheet (study masks, kit renders)
+
+| Check | Sheet | Ours | Verdict |
+| --- | --- | --- | --- |
+| f34_sheet shares L / C / R / M+rock | 8.9 / 6.7 / 35.2 / 49.2 | 8.1 / 7.4 / 33.4 / 51.1 | pass (±4, C ±2) |
+| f34 tips A-front, C | (.315, .247), (.909, .215) | (.278, .249), (.898, .249) | pass |
+| f34 A-left and B tips hidden | hidden | A-left a 0.30 % sliver at the far left; B hidden | pass (≤ 0.5 %) |
+| f34 stones | (.318, .574), (.598, .541) | (.295, .617), (.621, .590) | pass |
+| f34 W : H (perspective) | 1.413 | 1.344 (round 1: 1.29) | the kit camera's perspective |
+| f34 medians R / M / C / L | `#A06440` / `#835E4D` / `#E7BD8E` / `#609C1C` | `#A16441` / `#835F4E` / `#EAC094` / `#5D991B` | pass (±10 / ±12) |
+| r34_sheet shares | 11.4 / 6.0 / 38.5 / 44.1 | 7.3 / 8.5 / 31.5 / 52.6 | off: leaves −4.1, bark −7.0, mound +8.5 |
+| r34 A-left tip at the far left | .036, .375 | .030, .426 | pass |
+| side_sheet | B/C arch, 2 tips | B/C arch; C's tip at the far left (.095, .365); B's tip in shade | as round 1 |
+
+### Calibrated hexes (`PALETTE`)
+
+- Pass 2: matched to the f34_sheet region medians, by family ratios in linear light.
+- Re-measured on two further builds: the medians stayed within 1–6 levels.
+- Pass 1 (`K.calibrate` on the kit dome) was not re-run, because its targets did not change.
+
+| Key | Round 1 | Round 2 |
+| --- | --- | --- |
+| m021_bark / _dark / _light | `#835334` / `#683F25` / `#915D3D` | `#875736` / `#694025` / `#A66C46` |
+| m021_cut / _ring | `#B69878` / `#B18F66` | `#B69B7E` / `#B1926C` |
+| m021_mound / _dark | `#705246` / `#5F453C` | `#694E42` / `#594139` |
+| m021_stone | `#8C7166` | `#8C7971` |
+| m021_leaf / _tip / _base | `#4E8117` / `#6B9920` / `#40740E` | `#558B1B` / `#74A525` / `#467D11` |
+| m021_stem | `#2A1406` | `#2A1406` |
+
+### Left for the verifier
+
+- **r34_sheet shares are off:** bark 31.5 and mound 52.6, against the sheet's 38.5 and 44.1. The roots now lie on the
+  dome, so from az −12 more mound shows between them than on the sheet.
+- **Crown module stalk:** it stands on a short bark stalk (`CLUMP_FLOAT` 0.35), which shows in the rear and rear34
+  views.
+- **f34 W : H:** the kit's perspective camera keeps it at 1.34.
+
+## Stage 7 — Verification (round 2)
+
+Independent verifier (not round 1's), 2026-10-28. Read-only background Blender on port 9881 with
+`wip/M021_verify.blend`: not saved, `build()` not called, session stopped. Fresh renders went to the verifier's
+scratchpad (`v021r2/renders/M021/`; `kit_models.MODEL_RENDERS` redirected), not to this folder. Measurements: an
+independent bmesh pass (`geo.py`), `M.audit` / `M.uv_stats` / `K.check`, a full-mesh **generalised winding-number
+scan** (numpy, every face tested 0.003 along its normal), the study masks (`cmp.py`, `comps.py`, `mnd.py`,
+`parts.py`), and an orthographic painter's projection (`ortho.py`) to separate perspective from shape.
+
+**Verdict: PASS, 7.5/10.** All three round-1 blockers are fixed. The mound now reads as one lumpy dome with three
+small crevice stones and foot boulders; the leaf modules are upright stars with no hub in view; there are no bowtie
+vertices. The leftovers are minors. One of them is new and technical: three tiny buried faces (item 4).
+
+### Re-measured numbers
+
+| Object | Tris | Size W × D × H | Shells | NM edges / NM verts / boundary / wire / loose | n-gons / zero-area / dup verts | Winding / signed vol | Self-hits | Min corner (< 5° / < 8°) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ArchedRootCluster | 2774 / 4000 | 9.14 × 7.74 × 5.01 | 1 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | 0 bad / +131.7 | 0 | 5.02° (0 / 130) |
+| …Mound | 700 / 1000 | 9.09 × 7.74 × 3.77 | 1 | all 0 | 0 / 0 / 0 | 0 / +108.9 | 0 | 5.05° (0 / 30) |
+| …RootA | 500 / 1000 | 5.25 × 5.45 × 4.40 | 1 | all 0 | 0 / 0 / 0 | 0 / +15.3 | 0 | 6.35° (0 / 2) |
+| …RootFork | 600 / 1000 | 4.51 × 6.30 × 4.49 | 1 | all 0 | 0 / 0 / 0 | 0 / +12.4 | 0 | 5.71° (0 / 4) |
+| …LeafModule | 314 / 1000 | 1.58 × 1.62 × 0.88 | 1 | all 0 | 0 / 0 / 0 | 0 / +0.19 | 0 | 5.13° (0 / 13) |
+
+- **Size** against decision 1 (9.4 × 7.7 × 5.0, ±0.4 / ±0.4 / ±0.25): W −0.26, D +0.04, H +0.01. Pass.
+- **Origin and transforms:** all five have a local bbox centred on (0, 0) with z min 0. Rotation 0, scale 1, no
+  modifiers, no custom normals, 0 smooth faces. No `_m021_` temporaries or orphan meshes are left.
+- **Interior faces (new):** the winding-number scan finds **3 hero faces with the solid on both sides** (winding 1
+  in front and behind), 0.018 st² in all: face 2107 (`leaf_base`, 0.006 st²) is a sliver of the right leaf module
+  buried inside root C at (2.33, −0.33, 3.69); faces 172 and 2358 (`mound_x_dark_50`, 0.012 st²) are a mound flap
+  buried inside A-left's cut tip at (−3.6, 0.9, 0.45). The parts have none. Round 1 had none; this probably comes
+  from the round-2 zero-merge union (`HERO_MERGE` 0). They are invisible and don't make the mesh non-manifold.
+- **UV** (`M.uv_stats`): one `UVMap` layer. Islands: hero 415, mound 87, A 54, fork 55, leaf 60. 0 overlaps,
+  0 flipped, 0 zero-area. Min gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch p95 1.005–1.041.
+- **Materials:** the hero has 26 slots, all used, plus `K.mix_key` ladders. `K.check` reports no problems.
+  `kit_baked_shading`: hero 0.15, mound 0.34, A 0.00, fork 0.00, leaf 0.49 (limit 0.5).
+- **No colouring by facing.** In the builder, every `normal` use is geometric (stone bedding, tube frames, leaf frames,
+  recalc). The paint fields are positions: arc length, section height, z, and distance to a root. Area-weighted
+  correlation of the key's luminance with normal z: hero 0.10, A −0.16, fork −0.04, leaf 0.22, mound 0.43. The mound
+  value comes from the height-based `TOP_GREY` and the stone caps, not from facing.
+- **Root contact:** of the down-facing bark and cut (11.3 st²), 4.2 st² is more than 0.4 above the next surface.
+  Almost all of it is the cut tips sloping to the ground past the mound edge (53 of 61 faces), which is expected. Only
+  8 bark faces overhang; the worst is A's front leg lifting off the front slope toward its tip (gap 1.1 at
+  (0.16, −2.56, 2.12)). Elsewhere the roots lie on the dome.
+
+### Round-1 items
+
+| # | Round-1 finding | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | Mound reads as a rock pile (blocker) | **fixed** | f34, r34 and the part show one continuous faceted dome; no dark V-gaps between lumps. Three small crevice stones (under A's bend, between A and C, crown) and three foot boulders. f34 stones at (.289, .613) and (.606, .586); the sheet has (.335, .570) and (.607, .538). |
+| 2 | Leaf modules are flat rosettes (blocker) | **fixed** | Leaf part height : span 0.55 (round 1 0.32). f34 and r34 show upright leaf stars, and no hub reads in either. f34 clumps at (.187, .686), (.493, .922), (.699, .839); the sheet has (.217, .627), (.576, .892), (.755, .788). |
+| 3 | Bowtie vertices (blocker) | **fixed** | `nonmanifold_verts` 0 on all five (bmesh `is_manifold` and `M.audit`). |
+| 4 | A's left leg falls vertically | not fixed (minor) | Orthographic f34 top profile at f .05 / .10 / .15 is .54 / .64 / .72; the sheet has .39 / .56 / .63 and round 1 had .54 / .64 / .74. The perspective numbers improved; the shape barely moved. |
+| 5 | Stones not greyer | fixed, slight overshoot | f34 rock class `#A88C7C` s .26; the sheet has `#9E7E6D` s .31. The mound part's top fifth is s .31 against the middle's .40 (sheet .29 / .38). |
+| 6 | Lit bark dark, lit tips orange | partly fixed | Lit bark `#BA764B` against `#C47F54`: −10, −9, −9. Lit cut `#F9CD9F` against `#FCDCB1`: −3, −15, −18. |
+| 7 | Fork part darker than the exploded B+C | partly fixed | `#8A5639` against `#975E3D`: −13, −8, −4. |
+| 8 | Tip end rings unreadable | accepted (§3.9) | The end faces still point at the ground; in `tip_cu` the ring is only a dark rim under the tip. |
+| 9 | top_sheet tips; r34 leaf share | unchanged | top_sheet shows 2 of 4 tips (the orthographic projection shows all 4). r34 shares are below. |
+| 10 | Exploded fork seen end-on | changed, still weak | The fork now shows two parallel hooks, while A reads as one hook and the leaf module is tiny. Presentation only. |
+
+### Views against the sheet (kit renders; sheet crops side by side)
+
+| Check | Sheet | Ours | Verdict |
+| --- | --- | --- | --- |
+| f34 W : H | 1.445 | 1.373 perspective; 1.403 orthographic | pass |
+| f34 shares L / C / R / M+rock | 8.9 / 6.7 / 35.2 / 49.2 | 8.1 / 7.4 / 33.4 / 51.1 | pass |
+| f34 visible tips | A-front (.332, .245), C (.909, .214) | (.273, .248), (.875, .248); A-left a sliver at the far left | pass |
+| f34 clump shape (px w : h) | left 1.11, top 1.28, right 1.24 | 1.53, 1.82, 1.27 | minor: left and top clumps lower and wider |
+| r34 shares | 11.4 / 6.0 / 38.5 / 44.1 | 7.3 / 8.5 / 31.5 / 52.6 | minor: L −4.1, R −7.0, M +8.5 (three modules by decision 4; roots lie lower on the dome) |
+| side_sheet | B/C arch, 2 tips | B/C arch, 2 tips, crown clump on top | pass |
+| rear | can't be reproduced (§3.4) | the mound's back with two side arches; the top module's bark stalk shows as a thin stick | known miss; the stalk is a minor |
+| top_sheet | 4 tips radiating from a crown knob | 2 tips in perspective (4 orthographic); hubs visible from straight above | minor |
+| Mound part | a peaked lumpy dome with a crown lump and lobes | a continuous dome, flatter on top, with steep low flanks; the crown and upper-left stones read as small nubs | minor |
+| Roots | thick and faceted; A an inverted J with a knee; B+C forked with a stub | thick, lying on the dome; stub at the crown. Part A reads as a smooth round U-hoop rather than a knee'd J | minor |
+| Junction close-up | the root lies on the mound with a pale cut tip | C lies on the right shoulder with one clean contact line | pass |
+| Underside | a flat lobed base with tips past it | a flat base with 4 tips past it | pass |
+
+### Colours (median / lit quartile / shade quartile, study masks; Δ = ours − sheet per channel)
+
+| Region | Sheet | Ours | Δ median | Verdict |
+| --- | --- | --- | --- | --- |
+| f34 bark | `#A06440` / `#C47F54` / `#633D28` | `#A16440` / `#BA764B` / `#70442A` | +1, 0, 0 | pass (lit −10, −9, −9) |
+| f34 mound | `#835E4D` / `#9D745F` / `#61473A` (s .41) | `#835F4E` / `#9D7B67` / `#5B4237` (s .40) | 0, +1, +1 | pass |
+| f34 cut | `#E7BD8E` / `#FCDCB1` / `#D2A575` | `#EAC094` / `#F9CD9F` / `#DAB38A` | +3, +3, +6 | pass (lit −3, −15, −18) |
+| f34 leaf | `#609C1C` / `#8BBD2A` / `#315C14` | `#5D991B` / `#8CC628` / `#2E510B` | −3, −3, −1 | pass |
+| f34 stones (rock class) | `#9E7E6D` s .31 | `#A88C7C` s .26 | +10, +14, +15 | minor: a little light and grey |
+| r34 bark / mound / cut / leaf | `#A3643F` / `#865F4C` / `#E8BD8F` / `#5A961B` | `#A16541` / `#84614F` / `#E9C094` / `#5F9C1B` | −2, +1, +2 / −2, +2, +3 / +1, +3, +5 / +5, +6, 0 | pass |
+| top_sheet bark / mound / leaf | `#9A603F` / `#77584A` / `#5E9821` | `#A66843` / `#84614F` / `#68A71F` | +12, +8, +4 / +13, +9, +5 / +10, +15, −2 | pass (the sheet's top cell is darker overall) |
+| Exploded A bark | `#955B3B` | `#A0633F` | +11, +8, +4 | pass |
+| Exploded B+C bark | `#975E3D` | `#8A5639` | −13, −8, −4 | minor |
+| Exploded mound | `#816151` (s .37) | `#876250` (s .41) | +6, +1, −1 | pass |
+| Exploded leaf | `#5A9821` | `#67AB1E` | +13, +19, −3 | minor: the part is a little brighter |
+| Exploded cut A / B+C | `#E2BA8C` / `#F4CFA1` | `#E8BF93` / `#E6C196` | +6, +5, +7 / −14, −14, −11 | pass |
+
+The colours blend: bark runs light at the crown to dark toward the tips, and stone fades into dirt. Hard edges only
+at the collars and hubs. There's no per-triangle confetti.
+
+### Itemised findings
+
+**Blockers:** none.
+
+**Minors** (none is broken or clearly unlike the sheet; cheap fixes if the main session wants them):
+1. **Mound silhouette:** flatter-topped, with steeper low flanks than the sheet's peaked dome, and no crown lump in
+   the part. Fix: raise the top `DOME_RINGS` radius fractions slightly toward a peak, or `DOME["top"]` +0.15.
+2. **Left shoulder:** A's left leg still stands high at the far left (orthographic top profile +0.15 / +0.08 / +0.09
+   at f .05 / .10 / .15). Fix: lower A-left's two last control points by about 0.3.
+3. **Leaf clumps:** squatter than the sheet's (w : h 1.5–1.8 against 1.1–1.3); the top clump sits 0.08 W left of
+   the sheet's. Fix: `LEAF_RISE` (35, 55) for the left and top modules; move the top hub +0.4 in x.
+4. **Interior faces (new, technical):** 3 buried hero faces (0.018 st²): one leaf sliver inside root C, and a mound
+   flap inside A-left's tip. Invisible; no export or render effect. Fix: in the hero guard, reject any build where a
+   face's normal-offset point has winding number ≥ 0.5 (a 10-line numpy check, like this verifier's scan), so the
+   yaw retry picks a clean build. Or fall back to `HERO_MERGE` 0.002 for the hero only, if that stays bowtie-free.
+5. **Top module stalk:** shows as a thin bark stick in the rear and rear34 views. Fix: `CLUMP_FLOAT["top"]`
+   0.35 → 0.15.
+6. **Colours:** lit bark −10; lit cut −15 / −18 on G / B; stones +10 … +15 lighter; fork part −13 on R. Fix: lift
+   `m021_bark_light` a further ~8 %; take the stone back toward `#887066`.
+7. **Root A part** reads as a round U-hoop, not a knee'd inverted J. Accept, or tighten the knee's control points.
+8. **Exploded render:** A end-on, fork as two parallel hooks, tiny leaf module. Presentation only: camera az about
+   −35 and a larger leaf offset.
+9. **Known and accepted:** f34 perspective W : H, rear cell (§3.4), top_sheet 2 of 4 tips, r34 shares (decision 4),
+   unreadable end rings (§3.9).
+
+## Main session after verification round 2 (2026-10-28)
+
+Applied minor 5: `CLUMP_FLOAT["top"]` 0.35 → 0.15. The rebuild in the kit file passed the hero guard at attempt 1, giving a hero of 2816 tris, 9.14 × 7.74 × 4.84 (H inside ±0.25), one shell, 0 non-manifold verts, `problems` empty, `K.check` clean. Export: 0 problems. The other minors are recorded in MODEL_PROGRESS.md for a polish pass.

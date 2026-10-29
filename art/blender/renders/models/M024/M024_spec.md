@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/024.png`. The sheet's own title is "THORN SHRUB", top right "FLINTBORN —
 INDIVIDUAL MODEL STUDY, PAGE 20/132" (INDEX.md row 24 calls it "Flintborn Thorn Shrub Study"; the page number on the
 sheet is not the index number). The image is 1024 × 1536 px.
-Builder: `art/blender/kit/mcp/m024.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`
+Builder: `art/blender/kit/mcp/m024.py` → `build()` (stages 1–6 done, see below). Procedure: `art/blender/kit/mcp/STAGES.md`
 (one modeller does stages 1–6 in a background Blender; then a fresh verifier does stage 7).
 
 User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
@@ -778,3 +778,618 @@ All recommendations are accepted:
 12. Names: `ThornBushNode`, `ThornBushBranchCore`, `ThornBushLeafCluster`, `ThornBushThorn`.
 
 The wood must stay warm and visible: the two crossing front limbs show as separate runs, as the study's targets require.
+
+## Stage 1 — Modelling (modeller, 2026-10-28)
+
+Builder `art/blender/kit/mcp/m024.py` (`build()` returns a dict with `problems`; empty on the final build, 60–85 s
+with renders). Work file `art/blender/assets/kit/wip/M024.blend`, background Blender on port 9877.
+
+**Parts, each from its own function:**
+- `lobe_mesh`, the unit: a 6-sided pointed gem (bottom apex, ring A, girdle B rotated 30°, crown ring C rotated 30°
+  again, top apex offset ±0.06 D), 36 tris. **Deviation from §1.4:** the spec's ring spacing (A .28/.42 D, B .50/.50 D,
+  C .74/.36 D) rendered as icosphere balls from every side (rounds 1–2). The crown ring now hugs the girdle
+  (`GEM`: A .22/.40, B .45/.50, C .57/.44), so the top half is a long straight 6-faced pyramid, the long point the
+  sheet's lobes show (`z_f34_top.png`). The girdle is clamped to at most L / 1.15 (`LOBE_LD`), so every lobe shows a
+  point side-on.
+- `apex_lobes` / `CLUSTERS`: **each lobe is placed by its apex**, read off the f34 for the front half, the rear cell
+  for the back and the top for the ring. It runs from 0.1 out of its cluster's hub to that apex. The spec's az/el
+  table with every bottom apex on the hub (round 1) gave nine separate balls with paper between them. 11 clusters,
+  30 lobes: K1 crown (spindle + 4), K2 front centre (2), K3 upper left (4), K4 low left (3), K5 right (3), K6 low right
+  (3), K7 low back left (2), K8 back left (3), K9 back right (2), K10 low front (1, on the trunk), K11 rear centre (1,
+  off the C limb), K12 low back right (1, on the extra `BK` limb).
+- `_hub`: a hidden 6-sided frustum from the host limb's nearest axis point to the hub, run on 0.22 past it so each
+  lobe's bottom apex sits inside it. A hub ending on a limb's end cap left coplanar faces that the union didn't join.
+- `tube` / `skeleton`: an 8-sided flared foot (z −0.12 … 1.2) and 7-sided kinked limbs (straight segments, knuckle
+  ring +8 %, ±6 % radius, ±8° twist, flat caps). Hero limbs FL, FR, C, BR, BL, LL, RL, K7, BK (9).
+  **Changes from §2.1:** the two front limbs come forward (y −0.6 … −0.95) and are thicker (Ø 0.66 → 0.48), so they
+  pass in front of the side clusters (the round 2 f34 wood share was 0.18). FR rises from the trunk and runs nearly
+  level to the right under K5. BR swings out to X 1.55, then crooks in to TA (the rear cell's +X arm at f .14–.24).
+  A low back limb BK was added (the rear cell's wood spans f .27–.66 at h .15).
+- `thorn_mesh`: a straight 5-sided pyramid with a flat pentagonal base sunk 0.15 and three coplanar colour rings on
+  the flanks (the outline is unchanged; the rings carry the base → tip blend), 38 tris. The hero thorns have base
+  Ø 1.0–1.15 and L 1.5–1.75: the spec's 0.95 × 1.7 measured T 0.086 in the f34 against the sheet's 0.129, so the
+  sheet's thorns are fatter than the spec states.
+- Parts: `core_part` (the exploded 4-limb core: UL, UR, the CS stub with a pale cut top, LO), `cluster_part` (the key
+  part's 4-lobe fan through `apex_lobes`), `thorn_part` (L 1.9, base 1.1, the hero thorns' size).
+
+**Comparison cameras** (decision 9): `f34_sheet (0,13)`, `front_sheet (0,10)`, `rear_sheet (180,10)`,
+`side_sheet (90,10)`, `r34_sheet (180,15)`, `top_tilt_sheet (0,70)`, each with a ×3 long lens; the kit views;
+`exploded (−12,12)`; `part_* (−20,15)`. `m024.measure()` runs the study's masks on the sheet and the render;
+`m024.compare()` writes `M024_sheet_compare.png`.
+
+**Final measurements** (`measure()`, study masks; sheet → ours):
+
+| View | W : H | Leaves | Thorns | Wood |
+| --- | --- | --- | --- | --- |
+| f34 | 1.338 → 1.298 | .609 → .620 | .129 → .142 | .262 → .238 |
+| front | 1.259 → 1.321 | .610 → .619 | .133 → .133 | .257 → .248 |
+| rear | 1.217 → 1.251 | .602 → .611 | .113 → .141 | .285 → .245 |
+| r34 | 1.346 → 1.240 | .617 → .629 | .151 → .144 | .232 → .224 |
+| side | 0.984 → 1.107 | .612 → .598 | .146 → .139 | .242 → .263 |
+| top (tilt 70) | 1.101 → 1.220 | .762 → .738 | .174 → .186 | .064 → .076 |
+
+- f34 wood runs: h .35 `.23–.37 | .49–.68` (the sheet has 3 runs); h .45 `.20–.33 | .53–.76`; h .50
+  `.16–.25 | .60–.82`. **The two crossing front limbs show as separate runs** (sheet h .45 `.25–.35 | .56–.81`).
+- f34 top profile `.34 .69 .83 .82 .81 .79 .82 .91 .91 .97 .97 .90 .95 .91 .86 .88 .91 .94 .65 .36 .36`: scalloped,
+  with peaks at f .10, .35, .45–.50, .60 and .85. The strict counter finds 4 inside f .15–.95; the sheet has 5.
+- Hero size **4.74 W × 3.78 D × 3.60 H** (target 4.8 × 4.0 × 3.6; all inside tolerance).
+
+## Stage 2 — Optimisation and cleanup
+
+- Guarded union (copied from M022, then extended): shells are united one at a time with exact booleans. A result is
+  kept only if the volume test passes **and the result is still one shell**, because a touching, non-overlapping
+  piece passed the volume test and stayed loose. A failing shell is retried nudged, then once more after all the
+  others (K5's right lobe needed that). Then the floor cut, the guarded `_clean_mesh`, `_finish` and `_polish`
+  (M022's), then `M.fix_bowties` (the main session's check; 0–1 bowtie per build at lobe hubs, split).
+- Final audit of all four objects: 0 non-manifold edges, 0 boundary edges, **0 non-manifold (bowtie) verts**, 0 wire
+  edges, 0 loose elements, 0 zero-area faces, 0 n-gons, 0 duplicate verts, 1 shell, normals outward, 0 inverted faces
+  (ray parity), 0 crossing face pairs, origin at the bottom centre, transforms applied, no modifiers, smallest corner
+  angle ≥ 5.1°.
+- Tris: **ThornBushNode 2640** (budget 4000), ThornBushBranchCore 232, ThornBushLeafCluster 228, ThornBushThorn 38.
+
+## Stage 3 — UV
+
+Smart UV through `M.smart_uv` (ANGLE_BASED, angle 45, margin 0.008) and M012's overlap unfold. Hero: 743 islands,
+0 overlap pairs, 0 flipped, min gap 0.016, density (1.0, 1.0, 1.019), conformal stretch p95 1.0. Parts: 46 / 58 / 6
+islands, 0 overlaps, stretch p95 ≤ 1.003.
+
+## Stage 4 — Materials, colour and texture
+
+- **Keys:** `m024_leaf`, `_leaf_light`, `_leaf_cool`, `_leaf_olive`, `_thorn`, `_thorn_tip`, `_thorn_base`, `_wood`,
+  `_wood_dark`, `_wood_cut`. Finish: leaves roughness 0.8 with `FOLIAGE_SPEC`; thorns 0.7; wood 0.9; cut ends 0.85;
+  no metal.
+- **Calibration pass 1** (`m024.calibrate()`, test dome, 6 iterations): every key within 6 of its §5.4 target.
+- **Pass 2** (hero): with the dome hexes, the f34 / front / rear / r34 medians read leaves `#546F31`, thorns
+  `#CAAF8E` and wood `#6B4D35`, because the lobes shade each other and the wood. Each family was corrected in linear
+  light by the mean sheet / ours ratio over those views: leaves ×(1.60, 1.31, 0.92), then ×(0.94, 0.955, 1.0) on the
+  residual; thorns ×(1.46, 1.39, 1.29); wood ×(1.59, 1.47, 1.30).
+- **Final palette:** leaf `#667732`, leaf_light `#798E3A`, leaf_cool `#59713A`, leaf_olive `#667135`, thorn `#DAB995`,
+  thorn_tip `#E2C9A9`, thorn_base `#D3B28B`, wood `#896141`, wood_dark `#64462D`, wood_cut `#C2A993`.
+- **Re-measured (f34 medians, sheet → ours):** leaves `#62772E` → `#687B2F` (max channel difference 6), thorns
+  `#E7C09A` → `#EEC496` (7), wood `#7A5538` → `#835A3B` (9; hue 25°, sat 0.55, warm). Front: `#68782E` / `#EDC395` /
+  `#83593A`. Rear: `#5A6F2D` / `#E1BC92` / `#735036`. Leaf height bands in the f34 (h 0 → 1): `#5C712E #687E2F
+  #546223 #6F7F31 #809335`; the crown is lightest, as on the sheet.
+- **Blends** (by position only, never by facing; `K.check` is clean):
+  - each lobe along its own axis t: below 0.30, 50 % toward cool; below 0.42, 25 % toward cool; the middle in its
+    key; above 0.70, 25 % toward light; above 0.78, 50 % toward light (±0.08 broad noise);
+  - lobe keys by cluster: K1's spindle light, the low clusters' downward lobes cool, every third lobe olive;
+  - thorns base → 50 % → mid → 75 % tip by ring; the base cap `thorn_base`; T5 shifted 0.1 toward the base;
+  - wood: `wood`, with 50 % / 25 % `wood_dark` within 0.55 / 0.85 of the crotch (0.12, 0.06, 1.0) and within
+    0.3 / 0.55 of a hub, and broad noise patches whose edges ramp 25 % → 12 % → 6 %; flat caps `wood_cut` (hard edge);
+    no darkening at the foot.
+  - 22 keys are used on the hero.
+- **Tint:** per-face broad noise (leaves amp 0.035 at scale 0.5, thorns 0.02, wood 0.05 at scale 0.35) times a
+  per-piece ±4 %.
+
+## Stage 5 — Lighting
+
+Skipped by decision 7: the sheet shows an ordinary sunlit shrub, so there is no emissive key and no light.
+Requires Manual Validation in Studio: check that the thorns' lit faces don't clip to white and that the per-lobe
+colour variation survives the palette export.
+
+## Stage 6 — VFX
+
+Skipped by decision 7: the sheet shows no glow, sparkle, falling leaves or dust, so there is no socket. The renders
+use `vfx=True`, with nothing to realise.
+
+## Modeller's notes for the verifier
+
+- Compare with the `*_sheet` renders (long lens), not the kit `front34` / `rear34`, which have no sheet counterpart
+  (§3.1). `m024.measure()` and `m024.compare()` reproduce the numbers above.
+- **The lobe recipe deviates from §1.4's ring spacing on purpose** (see Stage 1). It is still 6 sides, 3 rings and
+  2 apexes, 36 tris, with the axis pointing out from the centre.
+- **The thorns are bigger than §1.4** (base Ø 1.0–1.15) to reach the sheet's thorn share; the part matches the hero.
+- **Lobes are placed by their apexes**, so the "clusters" are hubs on limb ends with 1–5 lobes radiating. The
+  exported `ThornBushLeafCluster` is the key part's 4-lobe fan, built by the same function.
+- Known leftovers:
+  - the side view is wider than the sheet's (W : H 1.11 against 0.98): the spec's 4.0 depth and the side cell
+    disagree, and D stays at 3.78, inside tolerance;
+  - rear wood is 0.245 against 0.285 (−4 points, at the tolerance edge);
+  - TC's tip shows higher in the f34 than the sheet's sliver (decision 11: the rear governs);
+  - the strict peak counter finds 4 crown peaks inside f .15–.95 (5 with the f .10 shoulder);
+  - the low lobes read darker than the sheet's (leaf_cool plus the studio's ground shadow);
+  - the lobes overall read slightly smaller and more separate than the sheet's dense mass, with some dark interior
+    gaps between them.
+
+## Stage 7 — Verification (round 1)
+
+Fresh verifier, read-only, background Blender on port 9877 with `wip/M024_verify.blend` (not saved; `build()` not
+called). Fresh renders went to the scratchpad (`.../scratchpad/v024/renders/`), never to this folder. Extra renders:
+the six `*_sheet` cameras again **with the studio floor hidden** (`renders/ns/`), so the ground shadow can't enter
+the silhouette box; 960 × 800 versions (`renders/hi/`); a `(−90, 10)` side as a handedness check. Colours and
+silhouettes are re-measured with the study's own masks on both images. The bounding box uses L/T/W pixels only.
+
+**Verdict: FAIL, 5.5 / 10.** The technical side is clean. The hero and rear read as a low splayed "nest" of limbs,
+not the sheet's trunk column and Y.
+
+### Technical (all re-measured; all pass)
+
+| Check | ThornBushNode | BranchCore | LeafCluster | Thorn |
+| --- | --- | --- | --- | --- |
+| Tris (budget) | 2640 (4000) | 232 (1000) | 228 (1000) | 38 (1000) |
+| Size (studs) | 4.742 × 3.784 × 3.600 (target 4.8 ± 0.3 × 4.0 ± 0.4 × 3.6 ± 0.2: in) | 1.89 × 0.97 × 1.67 | 1.92 × 1.28 × 1.60 | 1.05 × 1.06 × 1.90 |
+| Shells / non-manifold edges / bowtie verts / boundary / wire / loose / zero-area / dup | 1 / 0 / 0 / 0 / 0 / 0 / 0 / 0 | same | same | same |
+| N-gons / min corner angle | 0 / 5.10° | 0 / 6.35° | 0 / 5.17° | 0 / 16.6° |
+| Normals; faces pointing inward (my own ray-parity test from every face) | outward; 0 | outward; 0 | outward; 0 | outward; 0 |
+| Self-intersections (BVH overlap of non-adjacent faces) | 0 | 0 | 0 | 0 |
+| Origin (bbox bottom centre); rot/scale; modifiers | exact; 0 / 1; none | exact | exact | exact |
+| UV: islands / overlaps / flipped / min gap / density / stretch p95 | 743 / 0 / 0 / 0.016 / 1.0–1.019 / 1.00 | 46 / 0 / 0 / 0.016 / 1.0 / 1.003 | 58 / 0 / 0 / 0.016 / 1.0 / 1.002 | 6 / 0 / 0 / 0.016 / 1.0 / 1.0 |
+| Materials | 22 used, 0 unused slots; no emission, no metal | 4 | 9 | 4 |
+
+- **Colour by facing:** none. The correlation of key luminance with normal z is leaf 0.07, thorn 0.05, wood 0.10.
+  `K.check` is clean.
+- **Interior faces:** none. No face lies inside the volume and there is one shell.
+- **Stage 5/6:** no emissive key, light or socket, as decided (decision 7). Correct.
+- **Keys:** leaf `#667732`, light `#798E3A`, cool `#59713A`, olive `#667135`, thorn `#DAB995`, base `#D3B28B`,
+  tip mix `#E0C5A4`, wood `#896141`, dark mixes `#805A3C` / `#765437`, cut `#C2A993`. Every key is multiplied by
+  a Tint corner attribute.
+
+### Views against the sheet (floor hidden, sheet → ours)
+
+| View | W : H | Leaves | Thorns | Wood | Peaks |
+| --- | --- | --- | --- | --- | --- |
+| f34 | 1.356 → **1.226** (spec check 1.30–1.40) | .609 → .620 | .129 → .142 | .262 → .238 | 5 → 5 |
+| front | 1.269 → 1.242 | .610 → .619 | .133 → .133 | .257 → .248 | 5 → 5 |
+| rear | 1.232 → 1.313 | .602 → .614 | .113 → .141 | .285 → .244 | 4 → 4 |
+| r34 | 1.365 → 1.282 | .617 → .632 | .151 → .144 | .232 → .224 | 5 → 4 |
+| side | 0.995 → 0.997 | .612 → .598 | .146 → .139 | .242 → .262 | 4 → 3 |
+| top (tilt 70) | 1.114 → 1.236 | .762 → .738 | .174 → .186 | .064 → .075 | 4 → 3 |
+
+- `m024.measure()` reports W : H 1.298 (f34), 1.107 (side) and 1.251 (rear). These are inflated or distorted
+  because `stats()` counts class O (the grey ground shadow) as object. With the floor hidden, the f34 is 1.23.
+- Every view is within ±4 points on the shares except the rear wood, at −4.1.
+
+### Items
+
+**B1 — BLOCKER: the skeleton reads as a low, splayed nest, not a trunk column with crossing limbs (front) and a Y
+(rear).**
+
+What the sheet shows:
+- **f34.** A thick trunk column stands fully visible at f .43–.60 from the ground to h .35. The F-L limb rises from
+  it as a long S to TB's base. The F-R limb rises to h .48, then sweeps right.
+- **Rear.** The same column splits at h .35–.4 into two thick arms at about 45° to TA's base (screen left) and TC's
+  base (screen right).
+
+What ours shows:
+- **The split is too low.** All nine limbs leave the trunk at z 0.45–0.9, so the crotch sits at h ≈ .12–.2. Four of
+  them (`LL`, `RL`, `K7`, `BK`) run nearly level at z 0.45–0.85.
+- **`BR` swings out level** to X 1.55 before turning up.
+- **The trunk foot is hidden in the f34.** The single `K10` lobe (apex (−0.7, −1.65, 0.15)) sits in front of it,
+  leaving only a stub at f .47–.58, h 0–.12.
+- **The F-L limb is a short stub** that disappears behind TB within about 0.8 studs.
+- **The rear reads as a solid wood band.** At h .35 the wood is one run f .28–.78. The sheet has two runs there:
+  f .26–.30 (left arm) and f .43–.62 (trunk), with leaves between. The low back limbs read as horizontal spokes
+  at h .2–.3.
+- **The sheet's three-quarter shape is lost.** Seen in `hi/f34_sheet.png` and `hi/rear_sheet.png`, it reads as a
+  bowl of limbs with lobes sitting on its rim.
+
+Fix (in `m024.py`, `TRUNK` / `LIMBS` / `CLUSTERS`):
+1. **Trunk.** Make it a visible column. Keep radius about 0.45 up to z 1.0–1.15 (about h .3), then split. Raise every
+   main limb's root: FL and FR to z 0.8–1.0; C, BR and BL to z 1.0–1.15.
+2. **FL.** Make it a steep rising S, for example (−0.05, −0.25, 0.8) → (−0.55, −0.62, 1.25) → (−0.9, −0.68, 1.7) →
+   (−0.95, −0.6, 2.05). Keep it forward of K3/K4's lobes so it shows from h .25 to h .6 (f .25–.36).
+3. **FR.** Rise first, then go level, for example (0.15, −0.25, 0.95) → (0.55, −0.85, 1.55) → (1.15, −0.9, 1.75) →
+   (1.8, −0.5, 2.05).
+4. **BR / BL (the rear Y).** Run them straight at about 45° from z ≈ 1.1 to the TA / TC bases, for example
+   BR (0.15, 0.25, 1.05) → (0.75, 0.62, 1.6) → (1.2, 0.85, 2.2) and BL mirrored to (−1.05, 0.8, 2.15). Drop BR's
+   outward swing to X 1.55.
+5. **Low limbs.** Shorten `LL` and `RL` to a single 0.5–0.6 stud segment rising at least 25°, tucked behind their
+   lobes. Delete the `BK` and `K7` limbs, and hang `K12` / `K7` (and T5) from short hubs off BR / BL at z about
+   1.0–1.2, or off the trunk's back face. No limb may show as a level spoke in the rear.
+6. **Trunk foot.** Remove `K10`, or move its hub and apex to X ≤ −0.9 behind FL, so the foot shows.
+7. **Acceptance** (floor hidden, study masks):
+   - f34 wood at h .06 and h .15 is one trunk run at about f .42–.62;
+   - f34 h .35 wood has 3–4 runs;
+   - rear wood at h .35 has at least 2 runs, with the trunk at about f .43–.62, and h .45 has two arms (sheet
+     .15–.25 | .49–.76);
+   - rear wood share is at least .25;
+   - the rear visibly reads as a Y.
+
+**B2 — BLOCKER: the hero silhouette is too narrow. The f34 W : H is 1.226, against the spec's own 1.30–1.40 check
+(sheet 1.356).**
+
+The body is pinched at mid-height. The width per height at h .2/.3/.4 is .83/.86/.80, against the sheet's
+.91/.95/.93. The right edge is TA's tip at the top (f .95, h .96), because the right-hand lobes stop short. The sheet's
+right edge is lobes at h .35–.65, with TA's tip inside at f .92. The left shoulder is high (f .10–.15 at h .75–.81,
+against .65–.67).
+
+Fix:
+- **Right side.** Push K5 / K6 lobe apexes out to X +2.35 … +2.45 at z 1.2–2.2. For example, K5's (2.3, 0.1, 1.3)
+  goes to (2.45, −0.3, 1.5), and a K6 lobe goes to about (2.4, −0.6, 1.1).
+- **Left side.** Add or extend left-edge lobes at z 0.8–2.0 to X −2.4.
+- **Upper left.** Lower the K3 / TC lobes so nothing at X < −1.5 rises above z 2.7.
+- **Acceptance.** f34 W : H 1.30–1.40 with the floor hidden; width at h .2–.5 at least .90.
+
+**Minors** (fix if cheap; otherwise record them):
+1. **TA points almost due east in plan** (13° off +X), not NE. Move the tip to about (2.05, 1.6, 3.35). TC is low
+   and flat in the rear (h .47–.71, against .58–.86): raise its tip to z about 3.1, per §2.3. TB in the f34 is
+   nearly level: tip h about .6, against the sheet's .67.
+2. **Side view.** TD dominates (share .081 at h 0–.39, against .011 at h .04–.19) and TB is hidden behind the near
+   lobes. A `(−90, 10)` render matches worse, so the side camera is right. TD's tip just points too much toward +X:
+   (2.3, −1.75) could become about (2.0, −2.0).
+3. **T5 is too prominent in the rear** (.017 against .004). Shrink it to L 0.6.
+4. **Leaf colour:**
+   - `leaf_olive` (`#667135`) is within 3 of `leaf` (`#667732`), so there are effectively only 3 lobe colours. Move
+     olive toward swatch 3 `#637539` with lower value, or toward a distinct hue.
+   - The crown is too dull and the base too light. Leaf height bands in the f34, bottom → top: sheet `#4B5C26` …
+     `#88A040`, ours `#5C712F` … `#7F9335`. That is Δ (+17, +21, +9) at the bottom and (−9, −13, −11) at the top.
+   - The lit quartile is `#97A945` → `#879A3B` (Δ −16, −15, −10).
+   - The parts are yellower than the sheet's: key cluster `#688A3B` (hue 86°) → `#7B8D33` (73°); exploded
+     `#607D33` → `#718330`.
+   - From behind the leaves are dull: rear lit `#91A43F` → `#6E8133` (Δ −35, −35, −12). That is mostly the studio's
+     back-lighting.
+5. **Thorns wash out from above.** In the top view the median is `#DDB78D` → `#FFD9A5` (Δ +34, +34, +24). In the part
+   shot it is `#F2CCA1` → `#FFE8AD`. In the f34, the shade quartile `#C49F76` → `#D9B080` is too light, so there is
+   less contrast. The f34 median is fine: `#E7C09A` → `#EEC496`.
+   - Fix: lower the thorn specular from 0.5 to about 0.25 and take about 6 levels off `thorn_tip`.
+6. **Wood:**
+   - Medians are good: f34 `#7A5538` → `#82593A` (+8, +4, +2); exploded `#8E6445` → `#906745`; key core `#8B6143` →
+     `#926442`.
+   - About 73 % of the wood faces are `wood_dark` mixes (dark-25: 322, dark-50: 113, plain: 162), against "dark only
+     in crotches".
+   - The side wood is dark: `#7F5B3D` → `#674830`.
+   - The two upper f34 wood bands read grey-tan (`#8E6D50`, `#947D64`; the cut caps and thorn bases bleed in).
+   - Cut key: `#C2A993` against `#C9AF99` (Δ −7, −6, −6). OK.
+7. **The `ThornBushLeafCluster` part's lobes look like flat ivy leaves** with long sharp tips. The key part's lobes
+   are fat, rounded faceted gems with short points. The hero lobes are closer to the sheet.
+8. **The low lobes look like round balls** seen end-on (K4, K6, K7, K12, K10), and they sit apart, with dark gaps
+   between neighbours. The sheet's mass is denser.
+9. **Top view.** The plan is a rectangle with wood showing in a channel on the right (the FR limb). The sheet's is a
+   round star with a big central apex-on lobe and a ring of 14–16 outward lobes. W : D is 1.236 against 1.114, and
+   D 3.78 sits at the low end of its tolerance. B1 / B2 plus about 0.3 more depth should improve this.
+10. **Thorn part** L : D is 1.8, against the key part's 1.6: it reads slimmer. Acceptable.
+11. **`m024.measure()` lets the ground shadow into the silhouette box** (class O in `stats()`). Measure with
+    `FB_Ground.hide_render = True` or with a box on L/T/W pixels only, or the side/rear/top W : H are wrong.
+
+**Passed items:**
+- every technical requirement;
+- size;
+- shares within ±4 in every view except the rear wood (−4.1);
+- crown peaks: 5 in the f34 and front, like the sheet;
+- the two front limbs show as separate runs at h .45 / .50 (f .20–.33 | .53–.76; .16–.25 | .60–.82);
+- five thorns on the right diagonals (TA back right, TB front left, TC back left, TD front right low, T5 back low);
+- pointed gem lobes on the crown;
+- f34 colour medians (leaves Δ ≤ 7, thorns Δ ≤ 7, wood Δ ≤ 8);
+- the exploded core part matches its cell well;
+- no VFX, as decided.
+
+## Round 2 fixes (modeller)
+
+Fresh modeller, background Blender on port 9877 with `wip/M024.blend` (saved after every good build). Every number
+below is `m024.measure()` on the final build (the bbox now uses L/T/W pixels only, see minor 11); the f34, front,
+rear, side and r34 were also re-rendered with the floor hidden and gave the same W : H, shares and wood runs
+(f34 1.367, rear 1.350). Build time with all renders: 55–62 s (hero only about 45 s).
+
+### B1 — skeleton (fixed, one criterion partly)
+
+- **Trunk:** an 8-sided column, radius 0.58 at the flare, 0.49 → 0.47 → 0.42 up to z 1.22, leaning slightly to +X.
+- **Main limbs leave the column at z 0.8–1.05:** FL (root z 0.82) runs left, then steeply up and back in (the S) to
+  TB's base; FR rises from z 0.95 to (0.55, −0.85, 1.55), then runs nearly level to (1.85, −0.6, 2.15) under K5;
+  C goes up the middle to K1; BL runs straight at about 45° to TC's base at (−1.05, 0.85, 2.3); BR rises at 26° to
+  (1.15, 0.6, 1.45), then at 56° to TA's base at (1.55, 0.9, 2.25). BR keeps one kink because the sheet's rear
+  needs the +X arm at f .15–.25 at h .45 (a straight 45° arm sits at f .35). Both arms are thick (r 0.45 → 0.33).
+- **Low limbs:** LL and RL are single segments rising about 28° (about 0.75 long, half inside the trunk). The `K7`
+  and old `BK` spokes are gone. Two short **back root stubs** (`BK` to +X, `BKL` to −X, rising 28–30°) carry the
+  low back clusters K12 and K7. Hubs off the trunk showed as bare green bars from behind, and the rear needs the
+  sheet's low root wood (h .15 run .26–.65; ours .28–.66).
+- **K10 removed**, so the trunk foot shows in the hero.
+- **Lobes moved so the arms show:** K11 moved up (rear f .30–.45, above BR's first segment); K2 moved up; a small
+  K2 lobe now sits between the front limbs, and a small K12 lobe in the rear crotch, as the sheet's leaf gaps.
+
+| Criterion (floor hidden) | Sheet | Ours | |
+| --- | --- | --- | --- |
+| f34 wood h .06 / h .15 one trunk run about f .42–.62 | .42–.69 / .43–.62 | .40–.60 / .41–.63 (+ TD base sliver .80) | pass |
+| f34 wood h .35: 3–4 runs | 4 | **2** (.23–.42 \| leaf gap \| .53–.74) | **partly** |
+| f34 h .45 / .50: two separate limb runs | .26–.36 \| .56–.82 | .28–.36 \| .57–.83; .30–.35 \| .60–.88 | pass |
+| rear h .35: ≥ 2 runs, trunk about .43–.62 | .22–.30 \| .43–.62 | .17–.29 \| .35–.67 | pass (trunk run wider: BR root) |
+| rear h .45: two arms | .15–.25 \| .48–.76 | .14–.28 \| .45–.71 | pass |
+| rear wood share ≥ .25 | .285 | **.255** | pass |
+| rear reads as a Y | — | yes: column, two arms to TA and TC, C limb between | pass |
+
+The h .35 front row stays at 2 runs: at z ≈ 1.3 the thick BL root sits right behind FL's kink, so the two merge on
+screen, and the C limb merges with the FR root. Separating them would mean splitting lower, which the round-1 finding
+ruled out.
+
+### B2 — silhouette width (fixed)
+
+- The edge lobes go out to X ±2.42: K4 (−2.42, −0.5, 0.8), K3 (−2.4, −0.4, 1.75), K6 (2.42, −0.7, 0.85),
+  K5 (2.42, −0.15, 1.35) and (2.38, −0.25, 1.95). K12 and K7 reach X ±2.2–2.3 at the back.
+- **TA's tip** came down from z 3.35 to 3.2: it was the f34's highest point (top 1.00 at f .90; it is now .98).
+- The crown spindle is now z 3.5. TD's tip and K6's low lobe were lifted so the screen height doesn't sag below the
+  foot.
+
+| Criterion | Sheet | Ours |
+| --- | --- | --- |
+| f34 W : H (floor hidden; spec 1.30–1.40) | 1.356 | **1.367** |
+| f34 width at h .2 / .3 / .4 (≥ .90) | .91 / .95 / .93 | **.94 / .91 / .93** |
+| Size (W 4.8 ± 0.3, D 4.0 ± 0.4, H 3.6 ± 0.2) | — | **4.84 × 3.73 × 3.50** |
+| Upper left: nothing at X < −1.5 above z 2.7 | — | partly: TB tip z 2.75, TC tip z 3.0 (see minor 1) |
+
+The f34 left shoulder is still high (top at f .10 / .15 = .74 / .80 against .67 / .65). Lowering K3's lobes and
+TB's tip did not move it, and it broke one union, so I reverted that.
+
+### Minors
+
+1. **Thorn directions (fixed, with one conflict).** TA's tip is (2.15, 1.7, 3.2), 49° from +X in plan (NE). TB's tip
+   is (−2.15, −1.5, 2.75), raised. TC's base moved up the arm to z 2.3 and its tip to (−1.6, 1.75, 3.0), which is
+   steeper (rise 0.7 over 1.0). The rear wants it higher still, but the f34 wants the upper left lower, so I left
+   it between. TD's tip is (2.05, −1.95, 0.45), more toward the front.
+2. **Side view:** TD is still the biggest thorn from the side. It sits on the camera side (+X), so it reads large.
+   Side D : H is 1.09 (spec 0.95–1.15).
+3. **T5 (fixed):** base Ø 0.4, length about 0.65, now on the trunk's back face at z 1.2 (rear f .55–.62,
+   h .27).
+4. **Leaf colour (mostly fixed):**
+   - Olive `#5C6831` is now distinct from leaf `#647A36` by (8, 18, 5).
+   - f34 leaf height bands, bottom → top: `#546A2C #576E31 #556727 #647730 #8EAC45`, against the sheet's
+     `#4B5C26 … #88A040`. The crown is now the lightest (+6, +12, +5), and the base went from +17 too light to
+     (+9, +14, +6).
+   - The part lobes come from a 50 % leaf / cool mix: the key cluster renders `#6D8436` against `#688A3B` (max Δ 6;
+     hue 78° against 86°), and the exploded leaves `#647A32` against `#607D33`.
+5. **Thorns (partly fixed):**
+   - `THORN_SPEC` is 0.25 on every thorn key, mix keys included, and the tip is 6 levels lower.
+   - f34 thorn median `#E3BB94` against `#E7C09A` (Δ −4, −5, −6), and the exploded thorns `#F2C99D` against
+     `#EAC39B`.
+   - Still washed out from directly above: top median `#FAD0A3` against `#DDB78D`, and the single-thorn part shot
+     `#FFE3AE` against `#F2CCA1`. That light comes from the sun's diffuse on up-facing faces, not from specular.
+6. **Wood (fixed):**
+   - Dark mixes are now 138 of 505 bark faces on the hero (27 %, was 73 %): crotch radius 0.35 / 0.55 around
+     (0.12, −0.03, 1.12), hubs 0.22 / 0.38, and broad patches only above noise level 0.42.
+   - f34 wood `#735034` against `#7A5538` (Δ −7, −5, −4; hue 25°).
+   - The core part is rendered unshaded and read about 20 levels light, so it paints a 25 % dark mix as its base
+     (50 % in the crotch): exploded `#976C4A` against `#8E6445`.
+   - Side wood is still dark (`#63442D` against `#7F5B3D`), in the shade of the side lighting.
+7. **Leaf cluster part (fixed):** the lobes are fat faceted gems (`GEM_FAT`: rings 0.2/0.42, 0.42/0.5, 0.64/0.42;
+   L/D about 1.0–1.2; apex about 88°), size 1.98 × 1.35 × 1.6, 214 tris. Its paint uses only 25 % mixes at the hub
+   end and the tip. The full ramp tripped the `K.check` facing correlation (0.59) on the upright fan; it now passes.
+8. **Low lobes as balls:** not changed. The K4 and K6 front lobes still read rounded end-on.
+9. **Top:** W : D 1.089 (sheet 1.114). The FR limb still shows as a channel from above; top wood is .111, against
+   the sheet's .064 and the "≤ 10 %" target.
+10. **Thorn part:** unchanged (L : D 1.8).
+11. **`measure()` (fixed):** `stats()` builds the silhouette box and profiles from L/T/W pixels only, so the grey
+    ground shadow (class O) no longer counts.
+
+### Final views (sheet → ours, `measure()`)
+
+| View | W : H | Leaves | Thorns | Wood | Medians L / T / W (ours) |
+| --- | --- | --- | --- | --- | --- |
+| f34 | 1.356 → 1.367 | .609 → .593 | .129 → .158 | .262 → .249 | `#607531` / `#E3BB94` / `#735034` |
+| front | 1.269 → 1.370 | .610 → .588 | .133 → .156 | .257 → .256 | `#5F7330` / `#E2BA90` / `#6F4D32` |
+| side | 0.995 → 1.089 | .612 → .655 | .146 → .159 | .242 → .185 | `#54692D` / `#CBAC8B` / `#63442D` |
+| rear | 1.232 → 1.346 | .602 → .621 | .113 → .124 | .285 → .255 | `#546B2E` / `#CBA884` / `#805A3D` |
+| r34 | 1.365 → 1.364 | .617 → .639 | .151 → .127 | .232 → .234 | `#566D2F` / `#CBA885` / `#815B3F` |
+| top (tilt 70) | 1.114 → 1.089 | .762 → .700 | .174 → .189 | .064 → .111 | `#708838` / `#FAD0A3` / `#865D3F` |
+
+- f34 leaf median `#607531`: hue 79°, sat 0.59.
+- f34 crown peaks: 5.
+- Out of the ±4 tolerance: side wood −5.7 and side leaves +4.3; rear W : H +0.11, from the wider low back lobes.
+
+### Calibration (two passes) and final palette
+
+- **Pass 1** (`m024.calibrate()`, test dome, olive target darkened to `#5A6A32`):
+  - leaf `#546C35`, light `#647F3D`, cool `#4A673F`, olive `#4C5C31`;
+  - thorn `#B9A187`, tip `#C3AD98`, base `#B39A7E`;
+  - wood `#6F5138`, dark `#503A26`, cut `#9D8E83`.
+- **Pass 2** (a hero build with the dome hexes; linear sheet / ours medians over f34, front, rear and r34):
+  - leaves ×(1.65, 1.29, 0.82), applied at 0.6 hue strength, ×(1.50, 1.29, 0.98);
+  - leaf_light ×(1.68, 1.45, 1.10), cool ×(1.35, 1.16, 0.89), for the height bands;
+  - thorns ×(1.39, 1.33, 1.30), tip ×(1.32, 1.26, 1.23);
+  - wood ×(1.60, 1.52, 1.40);
+  - then leaf and light were nudged 3–4° cooler for the parts.
+- **Final:**
+  - leaf `#647A36`, leaf_light `#7C9C44`, leaf_cool `#4F6433`, leaf_olive `#5C6831`;
+  - thorn `#D6B798`, thorn_tip `#DDC0A7`, thorn_base `#CFAF8E`;
+  - wood `#8A6343`, wood_dark `#64482E`, wood_cut `#C2AC99`.
+
+### Checks (final build)
+
+| | ThornBushNode | BranchCore | LeafCluster | Thorn |
+| --- | --- | --- | --- | --- |
+| Tris (budget) | 2596 (4000) | 232 (1000) | 214 (1000) | 38 (1000) |
+| Size | 4.84 × 3.73 × 3.50 | 1.89 × 0.97 × 1.67 | 1.98 × 1.35 × 1.60 | 1.05 × 1.06 × 1.90 |
+| Shells / non-manifold edges / bowtie verts / boundary | 1 / 0 / 0 / 0 | same | same | same |
+| Inverted faces / self-intersections | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 |
+| Min corner | 5.10° | 6.35° | 5.13° | 16.57° |
+| UV islands / overlaps / flipped / min gap | 709 / 0 / 0 / 0.016 | 46 / 0 / 0 / 0.016 | 58 / 0 / 0 / 0.016 | 6 / 0 / 0 / 0.016 |
+
+`K.check` is clean, `problems` is empty, and no union left out a shell (hero 33 lobes, 11 clusters, 9 limbs and
+stubs, 5 thorns). The guarded unions and `M.fix_bowties` are unchanged.
+
+**Union fragility:** two intermediate layouts dropped one shell in the guarded union: a back stub starting near the
+trunk surface, and a K3 lobe after its hub moved. Both were fixed by moving geometry, not by changing the union.
+Any further layout edit must re-check `union_failed`.
+
+## Stage 7 — Verification (round 2)
+
+Fresh verifier (not the round-1 verifier; no other stage), read-only. Background Blender on **port 9883** with
+`wip/M024_verify.blend`, not saved, `build()` not called. Port 9880 was already serving the M027 session (PID 114816),
+so my first launch there could not bind. That orphan process (PID 112824, `M024_verify.blend --port 9880`) is still
+running and idle, because I wasn't allowed to stop it; the main session should end it. My launch also truncated
+`art/blender/logs/bgmcp-9880.log`. Fresh renders went to `.../scratchpad/v024r2/renders/M024/` via
+`kit_models.MODEL_RENDERS`; nothing in this folder was overwritten. I used the builder's `measure()` (L/T/W bbox)
+and `compare()` there, plus my own Pillow side-by-sides (`sbs_*.png`), a hole count (enclosed paper inside the
+silhouette) and three elevated "game camera" shots (`hi/game_angles.png`).
+
+**Verdict: PASS, 7 / 10.** Both round-1 blockers meet their criteria, apart from one sub-criterion that is only
+partly met. The technical side is clean. The hero, front and rear-three-quarter views read as the sheet's shrub:
+- a trunk column with two limbs in front;
+- a Y from behind;
+- pointed gem lobes;
+- five fat cream thorns on the diagonals.
+
+What remains is secondary-view and finish work, listed below as minors.
+
+### Technical (my own code; all pass)
+
+| Check | ThornBushNode | BranchCore | LeafCluster | Thorn |
+| --- | --- | --- | --- | --- |
+| Tris (budget) | 2596 (4000) | 232 (1000) | 214 (1000) | 38 (1000) |
+| Size W × D × H (studs) | 4.840 × 3.729 × 3.500 (4.8 ± 0.3 × 4.0 ± 0.4 × 3.6 ± 0.2: all in) | 1.891 × 0.966 × 1.670 | 1.982 × 1.354 × 1.604 | 1.049 × 1.058 × 1.900 |
+| Shells / non-manifold edges / bowtie verts (my fan walk and `M.audit`) / boundary / wire / loose | 1 / 0 / 0, 0 / 0 / 0 / 0 | same | same | same |
+| N-gons / zero-area / duplicate verts / min corner | 0 / 0 / 0 / 5.10° | 0 / 0 / 0 / 6.35° | 0 / 0 / 0 / 5.13° | 0 / 0 / 0 / 16.57° |
+| Signed volume; inverted faces (my ray parity); self-intersections (BVH, non-adjacent) | +13.71; 0; 0 | +0.82; 0; 0 | +1.50; 0; 0 | +0.47; 0; 0 |
+| Origin: bbox centre xy / min z; rotation / scale; modifiers; parent | (0, 0) / 0.000; 0 / 1; none; none | same | same | same |
+| UV: islands / overlaps / flipped / min gap / density / stretch p95 | 709 / 0 / 0 / 0.016 / 1.0–1.045 / 1.00 | 46 / 0 / 0 / 0.016 / 1.0 / 1.003 | 58 / 0 / 0 / 0.016 / 1.0 / 1.00 | 6 / 0 / 0 / 0.016 / 1.0 / 1.00 |
+| Materials used | 24 slots, all used; no emission, no metal | 3 | 5 | 4 |
+
+- **Tint attribute** present on all four.
+- `K.check` is clean; `m024.inverted` and `_self_hits` are 0 everywhere; `_thin` has 0 faces under the limit.
+- **Colour by facing:** none. The correlation of key luminance with normal z, excluding the `wood_cut` caps and the
+  `thorn_base` region (genuinely separate materials), is:
+  - hero: wood −0.09, leaf 0.07, thorn −0.02;
+  - parts: core −0.19, cluster −0.03, thorn 0.00.
+
+  Including the caps, the hero wood is 0.31, which comes only from the flat cut ends being `wood_cut`. That is
+  correct.
+- **Wood paint:** dark mixes are 138 of 505 bark faces (27 %), confirmed.
+- **Leaf paint:** `leaf_cool` is the single biggest key (736 of about 1750 leaf faces) plus 54 % of the mixes. This is
+  why the low lobes read dark (see minor 4).
+- **Stages 5 / 6:** no emissive key, light or socket, as decision 7 says. Correct.
+
+### Round-1 blockers against their criteria (`measure()`, L/T/W bbox; sheet → ours)
+
+| Criterion | Sheet | Ours | |
+| --- | --- | --- | --- |
+| B1 f34 wood h .06 / h .15: one trunk run at about f .42–.62 | .42–.69 / .43–.62 | .40–.60 / .41–.63 (+ TD sliver .80) | pass |
+| B1 f34 h .35: 3–4 runs | 4 | 2 (.23–.42 \| .53–.74) | partly (accepted; see below) |
+| B1 f34 h .45 / .50: two separate limb runs | .26–.36 \| .56–.82 | .28–.36 \| .57–.83; .30–.35 \| .60–.88 | pass |
+| B1 rear h .35: ≥ 2 runs, trunk about .43–.62 | .22–.30 \| .43–.62 | .17–.30 \| .34–.68 | pass (trunk run wider) |
+| B1 rear h .45: two arms | .15–.25 \| .48–.76 | .14–.28 \| .45–.70 | pass |
+| B1 rear wood share ≥ .25 | .285 | .255 | pass |
+| B1 rear reads as a Y | — | yes in rear and r34: column, left arm to TA, right arm to TC, C limb between; the two low root stubs widen it into a short fan at h .15–.3 | pass |
+| B1 trunk foot visible in the f34 (K10 removed) | — | yes, h 0–.15 at f .40–.63 | pass |
+| B2 f34 W : H 1.30–1.40 | 1.356 | 1.367 | pass |
+| B2 f34 width at h .2 / .3 / .4 / .5 (≥ .90) | .91 / .95 / .93 / .95 | .94 / .91 / .93 / .97 | pass |
+
+**Side by side (f34, front).** The sheet's trunk leans right and runs on as the F-R limb up to TA's base, and the
+F-L limb leaves low and goes left as an S to TB.
+
+Ours has:
+- a short column;
+- FR rising, then running level to the right (thick, clearly warm);
+- FL rising up-left to TB.
+
+The crossing reads, but FL is a straighter, less prominent diagonal than the sheet's S. The h .35 row merges FL
+with BL behind it. This is a fair outcome given the "split higher" constraint, not a blocker.
+
+**Rear / r34.** Round 1 saw a "bowl of limbs". From the sheet's elevations it is now a column with two thick
+45° arms to the two rear thorns, which reads as the sheet's Y. The wood is a broader wedge than the sheet's
+separate sinuous limbs, because the low stubs fan out at h .15–.3, but that is a style difference, not a misread.
+
+### Deviations (modeller's), judged
+
+- **BK / BKL root stubs: accepted.** The sheet's rear has low root wood (h .15 run .26–.65; ours .28–.66). The stubs
+  carry K12 / K7 instead of bare hub bars. They add to the fan look in the rear, but stay inside the sheet's own
+  low-wood band.
+- **BR's kink: accepted.** It puts the +X rear arm at f .14–.28 at h .45 (sheet .15–.25). A straight 45° arm would
+  land at f .35.
+- **TC compromise (tip z 3.0): accepted.** In the rear and r34, TC rises to about h .8 against TA's .85; the sheet has
+  both at about .85. In the f34 it stays a modest upper-left spike, as on the sheet. Raising it further would
+  re-raise the f34's high left shoulder.
+
+### Views, all (sheet → ours)
+
+| View | W : H | Leaves | Thorns | Wood | Peaks | Enclosed holes |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.356 → 1.367 | .609 → .593 | .129 → .158 | .262 → .249 | 5 → 5 | .0002 → .0021 |
+| front | 1.269 → 1.370 | .610 → .588 | .133 → .156 | .257 → .256 | 5 → 5 | .0003 → .0016 |
+| side | 0.995 → 1.089 | .612 → .656 | .146 → .158 | .242 → .186 | 4 → 4 | 0 → 0 |
+| rear | 1.232 → 1.346 | .602 → .621 | .113 → .124 | .285 → .255 | 4 → 4 | 0 → 0 |
+| r34 | 1.365 → 1.364 | .617 → .639 | .151 → .127 | .232 → .234 | 5 → 3 | .0004 → .0002 |
+| top (tilt 70) | 1.114 → 1.089 | .762 → .699 | .174 → .190 | .064 → .111 | 4 → 6 | 0 → **.0216** |
+
+### Colours (median / lit quartile / shade quartile; sheet → ours, Δ RGB)
+
+| View | Leaves | Thorns | Wood |
+| --- | --- | --- | --- |
+| f34 med | `#62772E` → `#607531` (−2, −2, +3) | `#E7C09A` → `#E3BB94` (−4, −5, −6) | `#7A5538` → `#735034` (−7, −5, −4) |
+| f34 lit | `#97A945` → `#87A341` (−16, −6, −4) | `#FDE0B7` → `#FFE9B6` (+2, +9, −1) | `#A67753` → `#AA7950` (+4, +2, −3) |
+| f34 shade | `#3C4F20` → `#354319` (−7, −12, −7) | `#C49F76` → `#C19F7B` (−3, 0, +5) | `#392B1C` → `#503623` (+23, +11, +7) |
+| front med | `#62772F` → `#5F7330` (−3, −4, +1) | `#E9C69D` → `#E2BA90` (−7, −12, −13) | `#7B573B` → `#6F4D32` (−12, −10, −9) |
+| rear med | `#64782E` → `#546B2E` (−16, −13, 0) | `#EBC397` → `#CBA884` (−32, −27, −19) | `#765439` → `#805A3D` (+10, +6, +4) |
+| r34 med | `#5D712C` → `#566D2F` (−7, −4, +3) | `#E6BE94` → `#CBA885` (−27, −22, −15) | `#865E3F` → `#815B3F` (−5, −3, 0) |
+| side med | `#60762C` → `#55692D` (−11, −13, +1) | `#E5C198` → `#CBAC8B` (−26, −21, −13) | `#7F5B3D` → `#63442D` (−28, −23, −16) |
+| top med | `#63772C` → `#708838` (+13, +17, +12) | `#DDB78D` → `#FBD0A3` (+30, +25, +22) | `#7A6041` → `#865E3F` (+12, −2, −2) |
+
+- **The hero (f34 / front) medians are within 13 on every family.** The rear / r34 / side thorn and leaf deficits
+  and the top's excess come from the studio's light direction on the same keys: the sheet lights every cell from
+  the front. They are not a palette fault.
+- **f34 leaf height bands, bottom → top:** sheet `#4B5C26 #66792E #637730 #617830 #88A040`, ours `#546A2C #576E31
+  #556727 #647730 #8EAC45`. The crown is the lightest, as on the sheet. The middle bands are 10–15 levels dull.
+- **Palette keys as stored:** leaf `#647A36`, light `#7C9C44`, cool `#4F6433`, olive `#5C6831`; thorn `#D6B798`,
+  tip `#DDC0A7`, base `#CFAF8E`; wood `#8A6343`, dark `#64482E`, cut `#C2AC99`.
+
+### Items (none is a blocker)
+
+1. **Minor — the top view reads as a ring, not the sheet's dense star.**
+   - From the 70° top and from about 45° in front (`hi/game_angles.png`), you can see the brown limb interior and
+     the ground through gaps between the crown and the outer ring. Enclosed holes are .022 against 0, and top wood
+     is .111 against .064 (the target is ≤ .10).
+   - The FR limb shows as a channel on the right.
+   - This is the leftover of round 1's "bowl". It no longer shows at the sheet's 10–15° views.
+   - Cheap fix, if the main session wants it before commit: add 2–3 upward lobes (36 tris each, about 1400 tris of
+     headroom) between the crown and the ring:
+     - one on FR's level run at about (1.0, −0.75, 2.2), pointing up and out;
+     - one over the FL / BL crotch at about (−0.7, −0.2, 2.3);
+     - one behind K1 at about (0.3, 0.6, 2.6).
+   - Re-check `union_failed` and the f34 wood runs afterwards.
+2. **Minor — the upper silhouette is boxier than the sheet's dome.**
+   - f34 width at h .7 / .8 / .9 is .88 / .74 / .71, against .69 / .56 / .59.
+   - The top profile is flat at .86–.97 across f .2–.9; the sheet peaks at the crown, at f .45–.5.
+   - The left shoulder is high at f .15–.25 (.74–.93 against .65–.75), as round 2 already noted.
+   - Leave it unless item 1's lobes are added; if they are, keep them inside z 2.6 at |X| > 1.2.
+3. **Minor — the side view.**
+   - W : H is 1.089 against 0.995. The width is pinched at h .4–.5 (.70–.72 against .92–.90).
+   - TD reads as the big low-left spike, whereas the sheet's big spike is upper left.
+   - Wood is .186 against .242 (−5.6) and leaves .656 against .612 (+4.4).
+   - This was a known round-1 minor. Record it.
+4. **Minor — the low lobes read dark and somewhat ball-like and separate.** `leaf_cool` dominates the hero, and the
+   low K4 / K6 / K7 / K12 lobes read dark olive balls end-on. The sheet's low lobes are as bright as its mid lobes.
+   Bottom band `#546A2C` against `#4B5C26` is fine on the median, but the lit quartile is −16 red. Record it.
+5. **Minor — thorns wash out from directly above** (top median +30, +25, +22). This is diffuse light on up-facing
+   faces; the f34 and front medians are within 13. Requires Manual Validation in Studio.
+6. **Minor — rear W : H is 1.346 against 1.232.** The low back lobes reach the ground at both sides; width at h .1 is
+   .89 against .65. Record it.
+7. **Minor — the f34 h .35 row has 2 wood runs against the sheet's 4** (B1's partly-met sub-criterion). FL merges
+   with BL behind it. The f34 still shows the trunk column plus two separate limbs at h .45 / .50. Record it.
+8. **Minor — parts.**
+   - Core part: matches the key part (trunk, low left limb, two upper limbs, cut centre stub).
+   - Cluster part: fatter than in round 1, but its lobes have broad flat front facets (blockier than the sheet's
+     faceted gems). Acceptable.
+   - Thorn part: L : D 1.8, slimmer than the key thorn's about 1.6. Acceptable.
+
+**Passed:**
+- every technical requirement;
+- size;
+- both blockers' acceptance criteria (except item 7);
+- f34 / front shares within ±3;
+- crown peaks 5 / 5;
+- five thorns on the right diagonals;
+- pointed gem lobes on the crown;
+- hero colour medians within 13;
+- warm wood (hue 25°);
+- no colour by facing;
+- no VFX, as decided.
+
+**For the main session:**
+- Commit with items 1–8 recorded. Item 1 is the only one worth a quick optional pass.
+- End the orphan PID 112824.
