@@ -845,6 +845,12 @@ function Methods:Create(object, info, goal)
 	function tween.Pause() end
 	return tween
 end
+-- A scene may set __fetchStatus[content] = "AssetFetchStatus.Failure" etc.;
+-- everything else reads as loaded.
+function Methods:GetAssetFetchStatus(content)
+	local statuses = __fetchStatus or {}
+	return statuses[content] or "AssetFetchStatus.Success"
+end
 function Methods:PreloadAsync(list, callback)
 	if callback then
 		for _, item in list do
