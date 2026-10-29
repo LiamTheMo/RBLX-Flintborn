@@ -1033,3 +1033,519 @@ All 13 recommendations are accepted.
 13. **Budget:** 4000, with about 3400 planned.
 
 Bushes are rounded leafy domes, not palm stars and not spiky (M040 m2, M039). The f34 shares in §1 are binding within ±4.
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m043.py` (`build()`; quick loops `hero_only()`, `preview()`), built in a background
+Blender (port 9880, `wip/M043.blend`). It imports M040's generic helpers (CDT caps, Steiner points, hull pieces, dome
+heart, prism, `_touch`, `_Guard`, the shell / contact / rock-metric reports and `measure()`); nothing in `m040.py` or
+the shared helpers was edited. The final check ran in a freshly restarted session.
+
+- **Body (`body()`, Main Cliff Base).** One closed shell: the surface of L ∪ U built **directly** with shared
+  vertices. That is decision 5's union without an exact boolean, so the STAGES boolean crash risk and the float
+  slivers don't arise. It is made of:
+  - the lower front wall: 7 columns, with a foot, a staggered mid ring and a top at 4.4;
+  - the upper front wall: 6 columns, with a foot at 4.4, two staggered mid rings and a top at 9.2;
+  - the back and end walls: the back has 7 full-height columns, with creases at y 6.62 and ridge faces on y 7.0, and
+    its mid rings are pushed inward ≤ 0.28;
+  - the two planar lower-step end faces;
+  - the hidden flat tops at 4.4 and 9.2, and the flat bottom at z 0, all CDT with interior points.
+
+  Its details:
+  - Each column has a dark left return face, two lit front faces either side of its ridge, and a right return into a
+    crease 0.5 deep. The batter is 0.32 (the top ring sits behind the foot).
+  - The lower front-corner chamfers run c 1.0 → 1.4.
+  - The upper corners have leaning chamfers (±8, −1) → (±10, +1), with c 2.0 → 2.6. Each is split by a mid vertex
+    pushed out 0.22, so it shows as two tall facets.
+  - The +X end steps in to x 9.62 behind the 0.2 groove (y 1.6–1.8) in front of the plate.
+- **Foot rocks.**
+  - FR1 is pointed: 2.4 × 1.6 × 2.3, with its apex leaning 0.4 into the face.
+  - FR2–FR4 are small flat-crowned blocks.
+  - All four are separate closed shells standing on z 0. None is sunk below the ground, because the bbox bottom must
+    stay at the ground to keep the 5.6 / 10.4 levels.
+- **Slabs (`slab()`).** Both are closed. Their front follows each column's top ring exactly, offset 0.10 out, so every
+  crease carries on up through the rim (the fix for M040's table-top slab). From the bottom up:
+  - **rim:** 4.37 → 5.12 (cap 9.17 → 9.92);
+  - **pale bevel band:** slopes in 0.24 to the turf edge, 5.12 → 5.42 (cap 9.92 → 10.22). This is the lit band of the
+    thickness close-up;
+  - **turf band:** 0.18 thick, 5.42 → 5.6 (cap 10.22 → 10.4).
+
+  The rest of each slab:
+  - Ends are planar on the seams, with no bevel there.
+  - The lower shelf's back edge follows the upper face's foot ring, tucked 0.22 into it.
+  - The cap's underside is an annulus of rim round a flat joining face, recessed to 9.55; the inner wall slopes in 0.3.
+  - The lower shelf's underside is flat.
+- **Corner filler (`filler()`).** A 5-sided wedge pillar in the −X pocket, centred at (−8.95, −0.35):
+  - its foot is 0.1 through the lower turf (z 5.5);
+  - a notch step sits on its front flank at 7.05–7.3;
+  - its top facet slopes from 8.4 at the outer front to 9.0 at the inner back, so the top (8.93) stays under 9.17;
+  - it leans 0.25 / 0.2 into the chamfer, with x ≥ −9.95;
+  - 36 tris, w/h 0.68.
+- **Connector (`plate()`).** x 9.6–10.0, y 1.8–7.0, z 0–10.05. Both faces are dead flat. It is a CDT profile, resampled
+  at 1.9, extruded in X. It has:
+  - three front slots 0.35 deep, at z 0.8–1.6, 3.0–3.8 and 6.4–7.2;
+  - three back tabs reaching y 7.35, at z 1.4–2.4, 4.8–5.8 and 8.0–9.0;
+  - a top notch 0.4 × 0.35.
+- **Bushes (`bush()`): rounded leafy domes, per the decision and the M040 m2 fix.**
+  - A small hidden faceted heart dome, its point down to the turf.
+  - Broad rounded leaves (`_tleaf`: a blunt 5-point outline, tip corners about 116°, 10 tris) laid **tangent on the
+    dome**, faces turned outward, in tiers:
+    - dark: a crown of 3 at 24° from the top, a middle tier of 3 at 64°, and a skirt of 3 at 98° flaring out to the
+      turf;
+    - lime: 3 + 4;
+    - small: 2 + 3.
+  - Each leaf is slid onto the heart (`_touch`) and guarded out of the rock (no more than 0.05 in).
+  - Dark bushes have a 3-sided brown trunk; the skirt hides it, so at most about 0.2 of it shows.
+  - Yellow-flowered bushes carry 4 broad rounded yellow petals on the crown.
+  - Every bush is scaled 1.3 (H 1.18) over the study's sizes (`BUSH_SCALE`), to match the sheet's bush mass and the f34
+    F share. Final sizes: dark 2.2–2.8 across and 2.0–2.2 tall; lime 1.9–2.5; foot 1.3–1.9.
+- **Sprigs:** 3 rounded leaves from one root, sunk into the turf. LS1 has 2 yellow buds and LS4 has 1.
+- **Lawn boulders** (UB1–3, LB1–2): rounded-angular hulls of three rings with a flat crown, sunk 0.1.
+- **Small dressing:** 14 three-sided pebbles, and three jagged lime aprons 0.17 thick along the foot (front ≥ −8.15).
+- **Changes to the §2.3 positions:**
+  - LL5 moved to (8.3, −2.0), out of the chamfer face;
+  - the foot dressing pulled in to y −7.4 … −7.55 (shorter side-view depth);
+  - F7 dropped, for the budget;
+  - no end sprigs past the seams, for tiling.
+- **Hero `StoneTerrace`:** the body, foot rocks, shelf, cap, filler, plate and all the dressing in one object of closed
+  shells (195 shells), with no booleans between pieces.
+- **Cameras:**
+  - **f34_sheet:** probed az −8 / −12 / −15 / −20 × e 16 / 18 / 20 / 24 and kept **(−20, 18)**: W:H 1.317 with every
+    share within ±4. At (−15, 20) the W:H is 1.269.
+  - **front_sheet:** probed e 12 / 16 / 20 and kept **e 12**: W:H 1.386, green fifths within 2.
+  - Others: side (90, 8), rear (180, 14), r34 (215, 20), top (0, 89).
+  - Every `*_sheet` shot uses a 3× lens with the floor hidden.
+
+## Stage 2: Optimisation and cleanup (modeller)
+
+| Object | Tris (limit) | Size W × D × H | Shells | Non-manifold edges / verts, boundary, wire, loose, zero-area, n-gons, dup verts | Normals | Corners < 5° |
+| --- | --- | --- | --- | --- | --- | --- |
+| StoneTerrace | **3916** (4000) | 20.20 × 15.81 × 12.59 | 195 | all 0 | outward | 0 (min 5.77°) |
+| StoneTerraceBase | 720 (1000) | 20.00 × 15.27 × 9.20 | 5 (body + 4 foot rocks) | all 0 | outward | 0 |
+| StoneTerraceLowerShelf | 988 (1000) | 20.00 × 8.07 × 3.28 | 54 | all 0 | outward | 0 |
+| StoneTerraceUpperCap | 994 (1000) | 20.00 × 8.11 × 3.42 | 46 | all 0 | outward | 0 |
+| StoneTerraceCornerFiller | 36 | 2.32 × 2.05 × 3.43 | 1 | all 0 | outward | 0 |
+| StoneTerraceSideConnector | 148 | 0.40 × 5.55 × 10.05 | 1 | all 0 | outward | 0 |
+
+- **Shells.** Per shell (`shells_report`):
+  - 0 non-manifold edges and verts;
+  - 0 boundary edges;
+  - 0 self-intersecting pairs and 0 inverted faces;
+  - a positive volume.
+- **Bowties.** `M.fix_bowties` found 0 on every object.
+- **Hero tris by kind** (the body shell is 642):
+
+  | Kind | Shells | Tris |
+  | --- | --- | --- |
+  | rock | 25 | 998 |
+  | slabs | 2 | 916 |
+  | plate | 1 | 148 |
+  | leaves, petals and hearts | 157 | 1654 |
+  | trunks | 7 | 56 |
+  | aprons | 3 | 144 |
+- **Hero-only pieces** (the parts stay under 1000): LS2, LS3, LS4, LL3, UL5, UL6, UB3, and pebbles lp4, up1, up2, up4.
+- **Floating dressing** (`contact_report`, tolerance 0.03):
+  - 0 floating and 0 unchained on the hero (195 shells), on the Base, on the Shelf and on the Cap;
+  - the largest gap anywhere is 0.000;
+  - the guard moved 15 leaves out of the rock.
+- **Capping (`capping_report`).**
+  - **Exposed column-top area is 0.000 studs².** The test covered 135 candidate body faces with n.z > 0.5 above z 4,
+    each ray-tested at 9 points.
+  - `cover_report`: every top-ring vertex is inside its slab's outline; the rim is 0.100–0.125 proud; the lower shelf's
+    back edge is inside the upper face.
+  - Seen from straight above inside the tile (a 0.1 grid), in studs²:
+
+    | Kind | Area |
+    | --- | --- |
+    | lawn | 211.3 |
+    | plants | 38.2 |
+    | slab bevel band / rim | 13.9 |
+    | body (battered column faces, which lean back) | 6.8 |
+    | boulders, pebbles, filler, foot rocks | 8.8 |
+    | **rock total** | **29.5** (limit ≤ 30) |
+- **Seams (`seam_report`, build frame).**
+  - No rock, slab or plate vertex lies past x ±10.
+  - 44 / 73 vertices lie on the two seam planes, worst distance 0.0000.
+  - The lower slab's front at both seams is y −5.95; the cap's front at both seams is y +0.90.
+  - The turf is exactly 5.600 and 10.400 within 1 stud of both seams.
+  - Foliage overhang is −X 0.203 and +X 0.000.
+- **Pivot (record this in the export notes).** In the hero's object frame:
+  - the seams are at x −9.898 / +10.102;
+  - the back plane is at y +7.556;
+  - the build frame's origin is at object (+0.102, +0.556, 0), since `m043_offset` is (−0.102, −0.556, 0).
+
+  This is metadata only: tiles at a 20-stud pitch keep the same offset, so the three-tile shot meets exactly.
+- **Rock metrics** (Base, M040's `rock_metrics`):
+  - area CV 1.42;
+  - 99.1 % of the side area within 20° of vertical;
+  - top-5 front facets h/w 2.05 / 2.18 / 2.66 / 1.83 / 3.91 (4.4 tall, 1.1–2.2 wide).
+- **Transforms:** applied; origin at the bbox bottom centre; flat shading; no modifiers or custom normals.
+
+## Stage 3: UV (modeller)
+
+`M.smart_uv` (ANGLE_BASED, angle 45, margin 0.008), then `m012._uv_unfold`. On all six objects:
+- 0 overlapping pairs and 0 flipped triangles;
+- minimum island gap 0.016 and border 0.008;
+- density 1.0 / 1.0 / 1.0;
+- conformal stretch p95 at most 1.035.
+
+Islands: hero 1091, Base 83, Shelf 291, Cap 257, Filler 7, Connector 32.
+
+## Stage 4: Materials, colour and texture (modeller)
+
+**Pass 1: `m043.calibrate()`.** This runs `K.calibrate` on the kit test dome against §5.4's targets.
+
+| Key | Calibrated | Rendered | Target |
+| --- | --- | --- | --- |
+| rock | `#A48D85` → `#A48F85` | (208,172,155) | `#CFAD9B` |
+| rock_light | `#B29F93` | (226,195,172) | `#E2C3AC` |
+| rock_deep | `#92837C` → `#978279` | (184,160,144) | `#BA9C8C` |
+| grass | `#A5B40C` | (206,219,14) | `#CEDB12` |
+| grass_light | `#B4BE12` | (227,233,28) | |
+| grass_deep | `#8E9F01` | (175,192,6) | |
+| leaf | `#456E19` | (79,128,25) | `#4F801A` |
+| leaf_lit | `#67982C` | (123,183,44) | |
+| leaf_deep | `#255D1F` | (41,106,31) | |
+| leaf_lime | `#89A203` → `#8DA603` | (168,196,7) | `#AAC305` |
+| flower | `#B1AA2A` | (222,206,43) | `#E0CF2C` |
+| trunk | `#552200` | (106,50,29) | `#6A3210` |
+| connector | `#7C777C` → `#7E7978` | (155,145,144) | `#9C908F` |
+
+The three adjusted keys:
+- **Mauve guard.** The calibrated rock came out at hue 15.5°, at the edge, so it was turned to hue 20° at the same value
+  and saturation (`#A48F85`). rock_deep was given R − B 30 (`#978279`). Every rock key is now R > G > B, hue 18–23°, with
+  R − B ≥ 30. Rock (Shadow) is never used.
+- **Connector.** Turned to R > G > B (`#7E7978`): sat 0.05, R − B 6.
+
+**Pass 2: the lime key.** It was lifted one step, to `#8DA603`. The lime bushes share the lawn's hue family, and the
+darker lime leaves made the shelf part's grass-family brightness follow n.z (kit check 0.52, over the 0.5 limit). It is
+now 0.48.
+
+**Blends** are by position or role, never by facing.
+- **Rock:**
+  - `rock_light` rises to 40 % over the top 40 % of each face band (lower 0–4.4, upper 4.4–9.2; back and ends 0–9.2 at
+    30 %), with a noise drift;
+  - `rock_deep` adds 15 % noise patches below 1.5;
+  - each column gets a Tint factor of 0.97–1.03, plus a facet mottle (amplitude 0.04, scale 0.3);
+  - the hidden tops and the bottom are plain rock.
+- **Slab:**
+  - the rim takes 40–50 % `rock_light`, which continues the colour of the column tops;
+  - the bevel band takes 60 %;
+  - the lawn and its turf band share one lawn colour, set by position:
+    - 5 / 15 % patches of `grass_light`;
+    - `grass_deep` at 10 / 20 % within 0.6 of roots and boulders, and within 0.35 / 0.7 of the upper face's foot;
+  - the underside is plain rock.
+- **Leaves:**
+  - dark bushes: crown `leaf`→`leaf_lit` 40 %, middle `leaf`, skirt `leaf`→`leaf_deep` 40 %;
+  - lime: one key, with ±0.04 Tint per plant;
+  - hearts: dark green, or dark brown under the yellow petals;
+  - petals and buds use `flower`.
+
+**Tint** is applied per facet, never per triangle: rock 0.04, lawn 0.035, leaves 0.04, pebbles 0.03, plate 0.02.
+
+**Finish:**
+- rock: rough 0.9, metal 0;
+- lawn and leaves: low spec, rough 0.85;
+- petals: rough 0.8;
+- trunk: rough 0.95;
+- plate: rough 0.7;
+- no emission.
+
+**Kit check `baked_shading`:** hero 0.35, Shelf 0.48, Cap 0.02, the others 0.0. `K.check` reports no problems.
+
+**Re-measure** of the final renders (`measure()`, the study's masks). "Lit half" is the brighter half of the rock pixels,
+standing in for the sheet's warm lit faces. Sheet values are in brackets.
+
+| View | W:H | R / G / L / F / D / C % | Green fifths | Rock all / lit half | Lawn | Bush |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 (−20, 18) | 1.317 (1.375) ✓ | 67.7 / 32.3 / 23.9 / 8.4 / 0.0 / 0 (64.8 / 34.8 / 23.6 / 11.2 / 0.4) ✓ | 13.1 / 5.2 / 39.0 / 13.1 / **29.6** (13.8 / 8.4 / 43.3 / 14.3 / 20.2) | `#C2A490` / `#CFAF9B` (`#C1A393` / `#D7B09C`) ✓ | `#D1DF1B` (`#D7E10F`) ✓ | `#54831B` (`#4D7E19`) ✓ |
+| front (0, 12) | 1.386 (1.359) ✓ | 71.2 / 28.8 / 18.9 / 9.8 (72.0 / 27.7 / 19.1 / 8.6) ✓ | 16.1 / 1.3 / 43.7 / 3.3 / 35.6 (18.2 / 0.8 / 42.8 / 3.1 / 35.1) ✓ | `#C1A38F` / `#CEAE9A` (`#BB9E92` / `#D4AE98`) ✓ | `#CEDC1F` (`#D6DE0B`) ✓ | `#538018` |
+| side (90, 8) | **1.173** (0.995) | R 44.4 / G 22.2 / **C 33.5** (≈50 / 12.8 / 36.5) | — | `#8B776C` (in shade) | `#C8D422` | plate `#6B6664` (in shade; sheet `#9C908F`) |
+| rear (180, 14) | 1.536 (1.238) | 83.0 / 15.7 (84.0 / 15.8) | 0 / 0 / 0 / 39.7 / 60.3 | `#A99185` (`#B09992`) | `#D3E120` | |
+| r34 (215, 20) | 1.498 (1.146) | 77.6 / 21.6 (74.4 / 25.3) | | `#AB9284` | `#D2E118` | |
+| top | 1.333 (1.026) | 9.3 / 90.7 (33.2 / 66.3) | | | `#D2E10F` (`#BCD11B`) | |
+
+Every rock median is R > G > B, hue 20–24°, in every view including the side and rear, so there is no mauve. The front
+view's cliff-band fifths are 1.3 and 3.3 (limit ≤ 5).
+
+## Stage 5: Lighting (modeller)
+
+Skipped (decision 11): the sheet shows no glow or light, so there are no emissive faces and no lights.
+
+Studio checks needing manual validation (§7):
+- the rock stays peach next to an M040 tile;
+- the faces stay flat-shaded;
+- the lawns stay yellow-lime and the flowers yellow;
+- the plate reads neutral grey;
+- a run of three tiles shows no seam gap;
+- a character can jump from the ground to the lower lawn (5.6), then to the upper lawn (+4.8).
+
+## Stage 6: VFX (modeller)
+
+Skipped (decision 11): the sheet shows no effect. The hero has no sockets and no children; `build()` treats any socket
+as a problem.
+
+Collision tags follow decision 12:
+- `precise`: the hero, Base, LowerShelf and UpperCap;
+- `hull`: CornerFiller;
+- `box`: SideConnector.
+
+## Modeller's notes for the verifier
+
+- **Renders** are in `art/blender/renders/models/M043/`:
+  - the `M043_views.png` contact sheet and the default views;
+  - six `*_sheet` views;
+  - five part shots plus `part_connector_face`;
+  - `cap_underside` (the joining surface) and `base_bottom` (close-up B);
+  - `exploded`;
+  - the tiling shots:
+    - `tiling_f34` and `tiling_top`: three tiles at a 20 pitch;
+    - `tiling_m040`: this tile, a copy at −20, and M040's StoneCliff at the +X end with the back planes aligned;
+  - `scale`: three 5.5-stud markers on the ground, the lower lawn and the upper lawn;
+  - close-ups `junc_cu`, `thick_cu` and `conn_cu`.
+- **The body is one closed shell built directly** as the union surface of L and U, not an exact boolean. The shell
+  checks above apply to it.
+- **Known misses** (decision-driven, or recorded in the study):
+  1. **f34 green, fifth 5: 29.6 against 20.2** (+9.4, outside ±7). The upper lawn is 8 deep (M040's depth, decision 1),
+     so at the f34 elevation it fills more screen than the sheet's. All the binding shares are within ±4.
+  2. **f34 top profile: mean error 0.125**, against a target of ≤ 0.05. The sheet's silhouette drops at both ends
+     because its upper block is inset over its whole depth. Decision 2 keeps the upper block reaching the seams
+     behind the chamfers (§3.2, "known miss").
+  3. **Side W:H 1.173 against 0.995.** The body alone (14 deep, 12.6 high at e 8) gives about 1.0. The foot dressing
+     (to y −8.15) and the plate tabs (to y +7.35) add the depth. The plate share (33.5 %) and the step profile match.
+  4. **Plate colour in the side view: `#6B6664` against `#9C908F`.** The studio key light comes from the front-left, so
+     the +X end is in shade (as on M040). On the lit test dome the key renders (155,145,144) against (156,144,143).
+  5. **Rear, r34 and top proportions** are judged loosely (§3.3, §3.4): a flat back with no wedges and no low back
+     step; the top view shows both levels.
+  6. **Planar seam ends.** The −X end and the lower step's +X end are flat rock faces where the sheet draws columns.
+     The tiling contract requires this, and a −X run end shows flat rock ends (§2.1).
+  7. **D share 0.0 %** (sheet 0.4 %). The skirts hide the trunks; brown shows only in the hearts of the yellow-flowered
+     bushes.
+  8. **Front facets.** Two of the five largest front facets have h/w under 2.5 (2.05 and 2.18; they are 2 wide by 4.4
+     tall). Area CV and verticality pass.
+  9. **Hero at 3916 tris:** over the ~3400 plan but under 4000. The pebbles (14) and sprigs (7) are at the §4.3 floor.
+- **Not done here:** no commit, push or export. The work file `wip/M043.blend` is saved.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh agent did this check, read-only, in a background Blender (port 9880, `wip/M043_verify.blend`, the integrated
+model). Nothing was built, edited or saved. Every number below was re-measured with the verifier's own bmesh / BVH
+code. The renders (960 × 800 cells, the floor hidden on `*_sheet`) are in the scratchpad folder `m043_verify/`, and
+the study's masks (`m043_study/m.py`) were run on both the renders and the sheet cells.
+
+### Measured
+
+**Mesh** (own bmesh pass; self-intersection is a BVH tri–tri test inside each shell, skipping pairs that share a
+vertex):
+
+| Object | Tris (limit) | Local bbox (studs) | Shells | Non-manifold / boundary / wire / loose / zero-area / n-gons / bowtie / dup verts | Open or inverted shells | Self-intersecting pairs | Origin |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| StoneTerrace | **3916** (4000) | 20.20 × 15.81 × 12.59 | 195 | all 0 | 0 / 0 | 0 | bbox bottom centre (0, 0, 0) |
+| StoneTerraceBase | 720 (1000) | 20.00 × 15.27 × 9.20 | 5 | all 0 | 0 / 0 | 0 | ✓ |
+| StoneTerraceLowerShelf | 988 (1000) | 20.00 × 8.07 × 3.28 | 54 | all 0 | 0 / 0 | 0 | ✓ |
+| StoneTerraceUpperCap | 994 (1000) | 20.00 × 8.11 × 3.42 | 46 | all 0 | 0 / 0 | 0 | ✓ |
+| StoneTerraceCornerFiller | 36 | 2.32 × 2.05 × 3.43 | 1 | all 0 | 0 / 0 | 0 | ✓ |
+| StoneTerraceSideConnector | 148 | 0.40 × 5.55 × 10.05 | 1 | all 0 | 0 / 0 | 0 | ✓ |
+
+- **Transforms** are applied on all six objects (rotation 0, scale 1). There are no modifiers, no custom normals and no
+  smooth faces. The UV map is present, with 0 flipped, 0 zero-area and 0 out-of-bounds UV faces.
+- **Body** is one closed shell of 642 tris.
+  - Its back plane is at y 7.000, with the back relief reaching in to y 6.526 (≤ 0.5).
+  - The upper face's front corners are at x ±8.0 at z 4.4 and ±7.4 at z 9.2, so the chamfer is 2.0 → 2.6.
+  - All lower tops are at 4.4 and all upper tops at 9.2.
+- **Filler:** x −9.95 … −7.63, z 5.5 … 8.93 (under the cap's 9.17).
+
+**Floating dressing** (own code: BVH overlap, else the nearest vertex-to-surface distance both ways; tolerance 0.03;
+ground chaining by BFS):
+
+| Object | Shells | On the ground | > 0.03 from everything | Not chained to the ground | Largest gap |
+| --- | --- | --- | --- | --- | --- |
+| StoneTerrace | 195 | 27 | **0** | **0** | 0.000 |
+| LowerShelf | 54 | 1 (slab) | 0 | 0 | 0.000 |
+| UpperCap | 46 | 1 (slab) | 0 | 0 | 0.000 |
+| Base | 5 | 5 | 0 | 0 | 0.000 |
+
+**Capping** (own ray test: each body face with n.z > 0.5 got 9 sample points, cast from z 30):
+- **135 candidates, exposed area 0.000 studs²** on both levels.
+- Top raster over the tile (0.1 grid, studs²):
+
+  | Kind | Area |
+  | --- | --- |
+  | slab lawn | 211.3 |
+  | slab rim / bevel | 13.9 |
+  | body (battered faces) | 6.8 |
+  | boulders, pebbles, filler, foot rocks | 8.8 |
+  | leaves and flowers | 37.2 |
+  | **rock total** | **29.5** (≤ 30) |
+
+**Seams** (build frame = object + `m043_offset`, where the offset is (−0.102, −0.556, 0)):
+- **No rock, slab or plate vertex lies past x ±10.**
+- **Lawn heights.** Raycasts at x ±9.98, ±9.5 and ±9.0 hit lawn at exactly 5.600 (lower) and 10.400 (upper) at both
+  seams. At +9.98 the upper rays fall on the plate top behind y 1.8, because the cap stops at x 9.98 over the plate, as
+  designed.
+- **Seam faces.** These are exactly on the planes, with these areas (studs²):
+
+  | Piece | −X seam | +X seam |
+  | --- | --- | --- |
+  | body | 85.5 | 36.2, with the rest covered by the plate's outer face at x 10.0 |
+  | slabs | 16.1 | 9.4 |
+
+- **The lower step's front edge on the two seams differs by up to 0.16.** At z 2–3 the edge is at y −5.84 on −X and
+  y −6.01 on +X. At z 0 and at z ≥ 4.4 the two match. See m4.
+- **The plate is on +X only:** x 9.6 … 10.0, y 1.8 … 7.35 (tabs included), z 0 … 10.05.
+- **Foliage overhang:** −X 0.203, +X 0.000.
+- **Three-tile shots** (front, f34 and top at a 20 pitch):
+  - no gap and no rock overlap;
+  - the lawns flush and level;
+  - V bays of lower lawn at the joints;
+  - the plates hidden in the joints. Only the back tabs show, as dark ticks behind the back plane.
+- **Pivot offset (+0.102, +0.556) doesn't affect tiling.**
+  - Every copy carries the same offset. With the same rotation at a 20-stud pitch, the −X seam of tile N+1
+    (−9.898 + 20) lands exactly on tile N's +X seam (10.102). This was verified in the renders.
+  - It only matters for:
+    - grid snapping: the seams sit 0.102 off the 4-stud grid;
+    - 180°-rotated tiles: the offset flips, so the shift is 0.204;
+    - lining up with M040 by back plane: the back is at y +7.556 in object space.
+  - So it is an export-notes item (m3).
+
+**Colour** (study masks on the renders and the sheet cells, same code for both):
+
+| View | W:H | R / L / F / G / D % | Green fifths | Rock all / lit half | Lawn | Bush (F) | Yellow |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Sheet f34 | 1.375 | 64.8 / 23.6 / 11.2 / 34.8 / 0.4 | 13.8 / 8.4 / 43.3 / 14.3 / 20.2 | `#C1A393` / warm `#D7B09C` | `#D7E10F` | `#4D7E19` | `#E1D226` |
+| f34 (−20, 18), used | 1.316 ✓ | 67.9 / 23.2 / 8.9 / 32.1 / 0.0 ✓ (all ±4) | 12.9 / 5.2 / 38.9 / 12.7 / **30.3** | `#C2A490` / `#CEAF9B` ✓ | `#D2E11E` | `#54851E` ✓ | `#E1D232` ✓ |
+| f34 (−15, 20) | 1.270 (−0.105) | 65.8 / 25.1 / 9.1 / 34.2 / 0.0 ✓ | 12.8 / 6.1 / 38.1 / 12.4 / 30.5 | `#C3A490` / `#CFAF9B` | `#D2E11C` | `#54851D` | |
+| Sheet front | 1.359 | 72.0 / 19.1 / 8.6 / 27.7 | 18.2 / 0.8 / 42.8 / 3.1 / 35.1 | `#BB9E92` / warm `#D4AE98` | `#D6DE0B` | `#4E7B1A` | |
+| front (0, 12), used | 1.387 ✓ | 71.5 / 18.2 / 10.3 / 28.5 ✓ | 16.0 / 0.8 / 44.3 / 2.7 / 36.3 ✓ | `#C1A38F` / `#CEAE9A` ✓ | `#D2E020` | `#53831D` | |
+| front (0, 16) | 1.318 ✓ | 68.1 / 21.6 / 10.2 / 31.8 | 14.4 / 6.8 / 38.2 / 7.0 / 33.5 | `#C1A390` / `#CEAE9A` | | | |
+| side (90, 8) vs sheet | **1.173** (0.995) | R 43.6, G 22.2, plate 34.2 (sheet ≈ 50 / 12.8 / 36.5) | | `#8B776C` (shade) | `#D4E224` | | plate `#6B6664` (shade) |
+| rear (180, 14) | 1.533 (1.238) | 84.3 / 15.7 (84.0 / 15.8) | | `#A99185` | `#D4E221` | `#436E1A` | |
+| r34 (215, 20) | 1.497 (1.146) | 78.5 / 21.5 (74.4 / 25.3) | | `#AB9284` | `#D3E119` | `#4C7919` | |
+| top | 1.332 (1.026) | R 9.5 / G 90.5 (33.2 / 66.3) | | | `#D2E10F` (`#BCD11B`) | `#668D1F` | |
+
+- **Rock.**
+  - Every rendered rock median is R > G > B, with hue 19–24° in every view, side and rear included. None is mauve.
+  - The f34 lit half is `#CEAF9B` against the sheet's warm `#D7B09C` (Δ 9 / 1 / 1), and the front `#CEAE9A` against
+    `#D4AE98` (Δ 6 / 0 / 2).
+  - Every rock key (`#A48F85` … `#AC998D`, deep `#A28D83`) is R > G > B with R − B ≥ 31.
+  - Rock (Shadow) `#828779` is used nowhere.
+- **Lawn:** `#D2E11E` against `#D7E10F`, hue 64.6°, sat 0.87 (B +15, 1 over the ±14 tolerance; sat just under 0.88).
+- **Foliage:**
+  - dark bushes `#54851E`, hue 88°;
+  - lime leaves key `#8DA603` (renders (168, 196, 7));
+  - flowers `#E1D232`, hue 55°.
+- **Connector:** key `#7E7978`, R ≥ G ≥ B, sat 0.05. It renders (155, 145, 144) lit and `#6B6664` in the side view's
+  shade, so it reads grey.
+- **Facing.** Own per-key area-weighted correlation of colour value × Tint against n.z and against the key-light
+  direction:
+  - hero: rock 0.10, grass 0.01, leaf 0.01, lime 0.00;
+  - Base: 0.00 / 0.05.
+- **Shelf 0.48.** The kit's 0.48 on the Shelf is its hue clustering putting the lawn (`grass`, v 0.71, n.z = 1) and the
+  lime bush leaves (`leaf_lime`, v 0.65, every normal) in one family. Within each key the correlation is −0.01 (grass)
+  and 0.02 (lime). It is two materials, not light painted by facing.
+- **Slab rock.** The slab rock's correlation with n.z is 0.76 with the hidden flat underside included, and 0.27–0.32
+  without it. The bevel band, 60 % light by role, is only about 1.2 % brighter than the rim. The kit skips both as flat
+  (CV 0.02).
+- **Tint** is a CORNER `Tint` layer, with a spread of 1.14 on the hero (limit 1.25). The rock mottle is visible per
+  facet, and there is no confetti.
+- **Lighting and VFX:** no emission on any of the 26 materials, no lights, no sockets and no children. Both stages are
+  recorded as skipped. ✓
+
+### Shape against the sheet, view by view
+
+- **f34 / front.**
+  - Two flat lime terraces, one above the other, on two palisades of columns: 7 lower and 6 upper, with dark full-height
+    creases.
+  - The lower lawn wraps both ends of the upper block, with bush groups in the −X and +X pockets.
+  - There is a pointed foot rock FR1, the apron, and the foot bushes.
+  - The lawn lines are level: the front-cell green fifths are within 2 of the sheet, and the cliff bands hold
+    0.8 / 2.7 % green.
+- **The rim steps per column.** It isn't M040's table-top slab.
+  - The rim follows every column's top ring 0.10 proud, the creases continue up through it, and the turf edge is
+    scalloped column by column.
+  - A pale bevel band sits between the turf and the rim (close-ups `cu_rim_front`, `cu_lawn_mid`), as in the
+    thickness close-up.
+- **Bushes are rounded leafy domes, not palm stars.**
+  - The dark bushes read as faceted round domes of broad leaves with a lit crown and a deep skirt.
+  - The lime bushes (UL4, LL5, F6) and the lime parts of LL2 / F2 have skirt leaves flared out to the turf (flare
+    0.85). From the side and in close-ups they read a little like a tent on legs (m6).
+- **Lawn patches.** These are large whole-triangle tone patches, `grass_x_light_5/15` and `grass_x_deep_10/20/30`.
+  - At sheet distance they are invisible.
+  - From straight above and in close-ups the big CDT triangles show faintly as lighter or deeper lime facets. They are
+    not confetti and not M040's shards, but they are visible (m7).
+- **Boulders** are rounded-angular hulls with flat crowns, not eggs. FR1 is pointed. ✓
+- **Corner cuts and pockets** are present at both ends. The −X end and the upper block's ends are planar seam faces, so
+  the f34's left silhouette is a full-height flat wall where the sheet steps down to the lower lawn. This is decision 2
+  and spec §3.2; it is the f34 top-profile miss (m1).
+- **Filler.**
+  - It is a 5-sided pillar with a notch band, standing in the −X pocket against the chamfer.
+  - Its top slopes only 0.6 over 2 studs (about 17°), so in `parts_filler` it reads as a flat-topped box column.
+  - The sheet's Corner Filler is a wedge whose top falls steeply from a high back-left apex (m5).
+- **Connector.** A flat grey plate on the +X end with 3 slots, 3 tabs and a top notch, matching close-up C. ✓
+  - In the side cell the sheet's plate is stepped: below the lower lawn it reaches about 0.6 of the depth, and only
+    above it does it narrow to about 0.4.
+  - Ours is one 5.2-deep rectangle, per decision 7 (m8).
+- **Side.**
+  - The step profile matches: the lower terrace in front, the step at f .45 (sheet .50), and the plate behind.
+  - The W:H is 1.173 against 0.995. Only about 0.04 of that is the body; the rest is foot dressing standing about 1.2–1.5
+    in front of the lower face (F1 / F6 bushes and the apron to y −8.46) plus the 0.35 tabs (m2).
+- **Rear / r34** (judged loosely, decision 3).
+  - A flat full-height back with 7 inward column reliefs, the upper lawn and its bushes on top. ✓
+  - The reliefs are very regular, evenly spaced identical grooves, so the back reads more as a fluted panel than as the
+    sheet's irregular columns (m9).
+- **Undersides.**
+  - The cap underside is one flat dark joining face with the scalloped rim along the front. ✓
+  - The base bottom is flat. ✓
+- **Tiling shots.** Clean (see Seams). ✓
+
+### Modeller's leftovers, judged
+
+| Leftover | Judgement |
+| --- | --- |
+| f34 top green fifth 29.6 against 20.2 | Confirmed at 30.3. It follows from the 8-deep upper lawn (decision 1) seen at e 18. Minor, accepted. |
+| f34 top-profile mean error 0.125 | Confirmed at 0.127. Almost all of it is at f .00–.15 (errors .62 / .54 / .40 / .36), where the upper block's planar −X end reaches the seam (decision 2). The middle of the profile is within ±.05. Minor, accepted. |
+| Side W:H 1.173 against 0.995 | Confirmed. The body alone is about 1.04. The excess is foot dressing in front, which is fixable (m2). Minor: the silhouette isn't wrong, only padded. |
+| Two facets at h/w 2.05 / 2.18 (< 2.5) | Accepted. They are the 2-wide columns at full 4.4 height, and the facets read as tall strips in every view. |
+| Hero at 3916 tris | Under 4000 (84 to spare). OK, but there is no room to add anything without removing something. |
+| Plate shaded in the side view | Accepted. The lit key renders (155, 145, 144) against `#9C908F`. |
+
+### Findings
+
+There are **no blockers.** The mesh is clean, everything is within budget, nothing floats, the columns are fully
+capped, the seams tile, the silhouette and parts are right, the colour family is right, nothing is coloured by facing,
+and every decision was followed.
+
+Every finding below is **minor**:
+
+| # | Finding | Fix target |
+| --- | --- | --- |
+| m1 | f34 / front end silhouettes stay full height to the seams (decision 2). | None this round; keep it in the export notes. |
+| m2 | Side W:H 1.173 (±0.06 target). | Pull the foot dressing in: F1 / F6 / apron front edge to y ≥ −7.9 (sheet: the foot plants hug the face). Target side W:H ≤ 1.08. F1 also makes the −X overhang (see m3). |
+| m3 | Pivot offset (+0.102, +0.556). The x part comes only from F1 overhanging −X by 0.203 while +X has 0. | Keep F1 inside x ≥ −9.95 so the overhang is symmetric (0 / 0). The hero's seams then sit at exactly ±10 in object space. Record the y offset in the export notes. |
+| m4 | The lower step's seam front edge differs by ≤ 0.16 between −X and +X at z 2–3. | Give both end faces the same front-edge vertices (mirror the seam ring) so the joint shows no 0.16 step in the V bay. |
+| m5 | The filler reads as a flat-topped box pillar, not the sheet's wedge. | Make the top facet fall about 35–45° from a back-inner apex at about 9.0 to about 7.6 at the outer front, still under 9.17. |
+| m6 | The lime bush skirts flare out like legs. | Lime / small tiers: skirt flare 0.85 → about 0.4–0.5 and polar angle 84° → about 70°, so the leaf tips tuck to the dome. |
+| m7 | Faint large-triangle lawn tone patches are visible from above. | Average the patch value across neighbouring lawn faces before quantising (spec §5.5), or halve the `grass_light` / `grass_deep` step. |
+| m8 | The plate is a rectangle where the side cell steps it forward below the lower lawn. | Accepted under decision 7. Note it. |
+| m9 | The back reliefs are too regular. | Vary the groove spacing (±0.5) and depth (0.25–0.5), and give one or two broader shallow wedge facets (decision 3's alternative, still inside y 7.0). |
+| m10 | The lawn is `#D2E11E`, 1 over the ±14 B tolerance against `#D7E10F`, at sat 0.87. Flowers are only about 0.2 % of the f34 (sheet 0.6–1.7 %). D is 0.0 % (sheet 0.4). | Raise the grass saturation by a step (`grass` B down by about 6). Add 4–6 small yellow buds to the lawn sprigs or bushes if the budget allows. |
+
+**Score: 8 / 10.**
+
+**Verdict: PASS.** The main session can integrate, export and commit. m2–m7 are cheap polish for a later pass.
+
+## Main session ruling (2026-10-29)
+Passed in round 1 (8/10) and committed.
+
+**Pivot:** the offset (+0.102, +0.556) doesn't affect tiling at a 20-stud pitch. The x part comes from F1 hanging past −X, so keep F1 at x ≥ −9.95 in a polish pass. Record the PivotOffset in the export notes.
+
+**Left for a later polish pass:**
+- Side W:H is 1.173. Pull the foot dressing in to y ≥ −7.9.
+- The lower step's front edge differs by 0.16 between the two seams. Mirror the seam ring.
+- The filler reads as a box pillar. Slope its top 35–45°.
+- The lime bush skirts flare like legs. Set the flare to 0.45 and the angle to 70°.
+- Faint lawn triangle patches show.
+- The back grooves are too regular.
+- There are too few flowers and no brown.
+
+**Export:** 6 assets, 6 solid pieces, 6802 tris, 0 VFX sockets, palette 26 colours, 0 problems.
