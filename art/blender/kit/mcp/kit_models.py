@@ -291,6 +291,29 @@ def _shells(bm):
     return n
 
 
+def fix_bowties(o, nudge=0.012):
+    """Split each bowtie vertex (two closed face fans meeting at one point; every edge is manifold but the vertex
+    isn't) into one vertex per fan, then move each copy `nudge` toward its own fan's face centres so the copies
+    don't coincide. Each fan stays closed, so no hole opens. Returns the number of bowtie verts fixed."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bows = [v for v in bm.verts if v.link_faces and not v.is_manifold and all(e.is_manifold for e in v.link_edges)]
+    for v in bows:
+        # no cut edges: the fans already share none at v, so this only parts the disconnected fans
+        for nv in bmesh.utils.vert_separate(v, []):
+            if nv.link_faces:
+                c = sum((f.calc_center_median() for f in nv.link_faces), Vector()) / len(nv.link_faces)
+                d = c - nv.co
+                if d.length > 1e-6:
+                    nv.co += d.normalized() * min(nudge, 0.5 * d.length)
+    if bows:
+        bm.normal_update()
+        bm.to_mesh(o.data)
+        o.data.update()
+    bm.free()
+    return len(bows)
+
+
 def audit(o):
     """The skill's 2d inspection for one object: counts, non-manifold / boundary / wire edges, loose verts,
     zero-area faces, duplicate verts, n-gons, shells, outward normals, origin, size, materials, UVs."""
@@ -306,6 +329,8 @@ def audit(o):
     res = {"name": o.name, "tris": sum(len(f.verts) - 2 for f in bm.faces), "faces": len(bm.faces),
            "verts": len(bm.verts), "ngons": sum(1 for f in bm.faces if len(f.verts) > 4),
            "nonmanifold_edges": sum(1 for e in bm.edges if not e.is_manifold),
+           # bowtie verts (two fans meeting at one vertex) have only manifold edges, so count them on their own
+           "nonmanifold_verts": sum(1 for v in bm.verts if v.link_faces and not v.is_manifold),
            "boundary_edges": sum(1 for e in bm.edges if e.is_boundary),
            "wire_edges": sum(1 for e in bm.edges if e.is_wire),
            "loose_verts": sum(1 for v in bm.verts if not v.link_faces),
