@@ -1,0 +1,10 @@
+05_play hotbar corr 0.851 dx +0 dy +29
+05_play xpbar corr 0.924 dx +0 dy +33
+05_play tiles corr 0.893 dx +0 dy +0
+05_play card corr 0.636 dx +0 dy -1
+05_play currency corr 0.935 dx +0 dy +0
+04_party hotbar corr 0.964 dx +0 dy +14
+04_party xpbar corr 0.889 dx +0 dy +17
+04_party tiles corr 0.891 dx +0 dy +0
+04_party card corr 0.966 dx +0 dy +0
+04_party currency corr 0.954 dx +0 dy +0
