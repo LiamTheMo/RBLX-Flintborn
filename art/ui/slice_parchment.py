@@ -741,10 +741,12 @@ def build_inventory():
     win = erase(win, box(g.shape, (824, 86, 868, 100)), amount=1.0, feather=2, texture="hide")
     for rect in ((206, 131, 830, 614), (843, 130, 941, 617), (955, 131, 1592, 614), (210, 627, 1586, 771)):
         win = erase(win, box(g.shape, rect), amount=0.8, feather=3)
-    # The category tabs are drawn on their own: clear what of them overlaps the
-    # window's left edge.
+    # The category tabs are drawn on their own as separate tiles: the window's
+    # left edge, hidden under the reference's wooden tab spine, is the right
+    # edge mirrored.
     win = win.copy()
-    win[105:650, :163, 3] = 0.0
+    win[105:650, :176] = 0.0
+    win[105:650, 150:176] = g[105:650, 1640:1614:-1]
     s["pm_window_inventory"] = (cut_clean(win, (150, 8, 1490, 782)), None)
     # Category tabs down the left: backgrounds with the icon erased, and the icons.
     tabs = {"all": (48, 114, 122, 124), "tools": (44, 250, 120, 124), "materials": (44, 380, 120, 124),
@@ -752,14 +754,9 @@ def build_inventory():
     for key, rect in tabs.items():
         tab = cut_clean(g, rect)
         s["pm_cat_" + key] = (extract_icon(tab, 14, 26), None)
-    # The whole tab column (wooden spine, ropes and four plain tiles, icons
-    # erased): the first tile's glow is replaced by a copy of the second tile, so
-    # the glowing tile can be laid on whichever tab is chosen.
-    column = g.copy()
-    column[110:244, 36:172] = g[246:380, 36:172]
-    for y0, y1 in ((122, 236), (258, 370), (388, 500), (518, 636)):
-        column = erase(column, box(g.shape, (64, y0, 150, y1)), amount=1.0, feather=4)
-    s["pm_side_column"] = (cut_clean(column, (20, 95, 152, 565)), None)
+    # One plain tile (the Tools tab, icon erased) for each unchosen tab.
+    tile = rounded_cut(g, (50, 252, 112, 120), 16)
+    s["pm_side_tab"] = (erase(tile, box(tile.shape, (16, 12, 96, 108)), amount=1.0, feather=4), None)
     glow = rounded_cut(g, (50, 112, 118, 130), 16)
     s["pm_side_tab_selected"] = (erase(glow, box(glow.shape, (16, 12, 104, 120)), amount=1.0, feather=4), None)
     # Slots and controls.
