@@ -27,7 +27,7 @@ Art.GLYPHS = {
 	gem = "◆",
 	gear = "⚙",
 	gear_alt = "⚙",
-	backpack = "⛺",
+	backpack = "▤",
 	portal = "◎",
 	scroll = "✉",
 	market = "⌂",
@@ -61,13 +61,17 @@ Art.GLYPHS = {
 	tree = "♣",
 }
 
--- The sprite of an icon id: lk_icon_<id>, else lk_glyph_<id>, else the id itself
--- when it already names a sprite. nil when the kit has no such art.
-function Art.IconSprite(id: string): string?
+-- The sprite of an icon id: lk_icon_<id>, else lk_glyph_<id> (the flat glyph
+-- first when `preferGlyph`, as on square buttons), else the id itself when it
+-- already names a sprite. nil when the kit has no such art.
+function Art.IconSprite(id: string, preferGlyph: boolean?): string?
 	if string.sub(id, 1, 3) == "lk_" then
 		return id
 	end
-	for _, name in { "lk_icon_" .. id, "lk_glyph_" .. id } do
+	local order = if preferGlyph
+		then { "lk_glyph_" .. id, "lk_icon_" .. id }
+		else { "lk_icon_" .. id, "lk_glyph_" .. id }
+	for _, name in order do
 		if UiAssets.sprite(name) or Widgets.HasArt(name) then
 			return name
 		end
@@ -156,7 +160,8 @@ local function paintStandIn(frame: Frame, roleName: string, state: string, w: nu
 	local round = Tokens.Space("fallbackCorner", 8)
 	local strokeKey, thickness = "paperEdge", Tokens.Space("fallbackStroke", 2)
 	if material == "window" then
-		round, strokeKey, thickness = Tokens.Space("fallbackCornerWindow", 10), "rail", Tokens.Space("fallbackStrokeWindow", 3)
+		round, strokeKey, thickness =
+			Tokens.Space("fallbackCornerWindow", 10), "rail", Tokens.Space("fallbackStrokeWindow", 3)
 	elseif material == "slot" then
 		round = Tokens.Space("fallbackCornerSlot", 6)
 	elseif leather then
@@ -223,7 +228,7 @@ local function standIn(roleName: string, w: number, h: number, parent: Instance,
 		Visible = false,
 		ZIndex = z + 1,
 	}, frame)
-	glyph.FontFace = Tokens.Font("heading")
+	glyph.FontFace = Tokens.Font("symbol")
 	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(w, h) * 0.7)))
 	paintStandIn(frame, roleName, "normal", w, h)
 	return frame :: Frame
@@ -374,11 +379,15 @@ function PlateMethods:Destroy()
 	self.holder:Destroy()
 end
 
+-- Glyphs drawn white (for leather); on paper they are tinted ink.
+Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_backpack_white = true }
+
 -- An icon by id (lk_icon_<id> / lk_glyph_<id>) at rect, fitted. opts: tint
--- (colour token), z, name. Before upload it is its glyph in ink.
+-- (colour token), glyph (prefer the flat glyph), z, name. Before upload it is
+-- its glyph in ink.
 function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
-	local sprite = Art.IconSprite(id)
+	local sprite = Art.IconSprite(id, opts.glyph)
 	local z = opts.z or 5
 	if sprite and Widgets.HasArt(sprite) then
 		local image = Art.Sprite(sprite, rect[3], rect[4], parent, {
@@ -403,7 +412,7 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 		TextScaled = true,
 		ZIndex = z,
 	}, parent)
-	glyph.FontFace = Tokens.Font("heading")
+	glyph.FontFace = Tokens.Font("symbol")
 	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * 0.8)))
 	return glyph
 end

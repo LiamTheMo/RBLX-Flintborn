@@ -720,7 +720,9 @@ def render(tree, out_path, background="scene"):
     root.size = (width, height)
     layout(root, width, height)
     bg = None
-    if background == "scene":
+    if tree.get("background"):
+        bg = Image.open(ROOT / tree["background"]).convert("RGBA").resize((width, height), Image.LANCZOS)
+    elif background == "scene":
         top, bottom = (78, 112, 92), (36, 48, 40)
         col = np.linspace(0, 1, height)[:, None]
         arr = np.zeros((height, width, 4), np.uint8)

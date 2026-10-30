@@ -28,7 +28,8 @@ function Checkbox.new(parent: Instance, props)
 	local roles = ROLES[variant] or ROLES.box
 	local w, h = Core.Size(props, 320, 40)
 	local base = Core.Root(parent, "Checkbox", roles[1], props, w, h)
-	local self = setmetatable({ root = base.root, base = base, checked = props.checked == true, roles = roles }, Checkbox)
+	local self =
+		setmetatable({ root = base.root, base = base, checked = props.checked == true, roles = roles }, Checkbox)
 	local box = props.boxSize or math.min(h, 36)
 	local top = if props.description then 2 else (h - box) / 2
 	local holder = Core.Make("Frame", {

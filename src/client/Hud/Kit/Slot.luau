@@ -51,7 +51,7 @@ function Slot.new(parent: Instance, props)
 		role = "count",
 		align = "Right",
 		yAlign = "Bottom",
-		rect = { 8, 8, w - 17, h - 16 },
+		rect = { 8, 6, w - 18, h - 16 },
 		z = base.z + 3,
 	})
 	self.star = Core.Make("Frame", {
@@ -72,9 +72,18 @@ function Slot.new(parent: Instance, props)
 		end,
 		render = function(state)
 			self.plate:Show(state)
-			local dim = state == "disabled" or state == "locked"
-			self.icon.root.Visible = not (state == "locked")
+			-- Locked art carries its own lock: the item and count give way to it.
+			local locked = state == "locked"
+			local dim = state == "disabled"
+			self.icon.root.Visible = not locked
+			self.star.Visible = not locked and self.item ~= nil and self.item.permanent == true
+			self.count.Visible = not locked
 			self.count.TextTransparency = if dim then 0.4 else 0
+			for _, part in self.icon.root:GetDescendants() do
+				if part:IsA("ImageLabel") then
+					part.ImageTransparency = if dim then 0.4 else 0
+				end
+			end
 		end,
 	})
 	if props.hotkey then

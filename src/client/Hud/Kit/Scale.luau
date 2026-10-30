@@ -112,7 +112,14 @@ function Scale.Window(screen): () -> ()
 	local player = Players.LocalPlayer
 	local function fit()
 		local size = viewport(gui)
-		local k, centre = Scale.WindowFit(size.X, size.Y, Scale.WindowTop(gui), screen.size[1], screen.size[2], player:GetAttribute("UiScale"))
+		local k, centre = Scale.WindowFit(
+			size.X,
+			size.Y,
+			Scale.WindowTop(gui),
+			screen.size[1],
+			screen.size[2],
+			player:GetAttribute("UiScale")
+		)
 		screen.scale.Scale = k
 		screen.holder.Position = UDim2.fromOffset(centre.X, centre.Y)
 	end

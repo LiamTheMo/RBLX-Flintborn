@@ -40,9 +40,20 @@ function IconButton.new(parent: Instance, props)
 	if props.icon and not BAKED[variant] then
 		local share = ICON_SHARE[variant] or 0.55
 		local s = math.floor(math.min(w, h) * share)
+		-- Squares carry flat glyphs (+ − ✓ ✕ arrows): dark on paper, cream on
+		-- leather. Tiles and HUD buttons carry full-colour icons.
+		local square = variant == "paper" or variant == "small" or variant == "leather" or variant == "round"
+		local sprite = Art.IconSprite(props.icon, square)
+		local tint = props.tint
+		if tint == nil and variant == "leather" then
+			tint = "cream"
+		elseif tint == nil and sprite and Art.WHITE_GLYPHS[sprite] then
+			tint = "ink"
+		end
 		self.icon = Art.Icon(base.visual, props.icon, { (w - s) / 2, (h - s) / 2, s, s }, {
 			z = base.z + 2,
-			tint = props.tint or (if variant == "leather" then "cream" else nil),
+			glyph = square,
+			tint = tint,
 			name = "Icon",
 		})
 	end

@@ -27,7 +27,10 @@ end
 -- ("cap" | "flat"), onPress(cap), zIndex, name.
 function KeyCap.new(parent: Instance, props)
 	local variant = props.variant or "cap"
-	local h = if props.rect then props.rect[4] elseif type(props.size) == "table" then props.size[2] else (props.height or 56)
+	local h = if props.rect
+		then props.rect[4]
+		elseif type(props.size) == "table" then props.size[2]
+		else (props.height or 56)
 	local given = if props.rect then props.rect[3] elseif type(props.size) == "table" then props.size[1] else 0
 	local w = if given and given > 0 then given else KeyCap.Width(props.text or "", h)
 	local role = if variant == "flat" then "keycap.flat" elseif w > h * 1.4 then "keycap.wide" else "keycap.cap"

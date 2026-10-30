@@ -55,7 +55,13 @@ function Slider.new(parent: Instance, props)
 		Size = UDim2.fromOffset(trackW, th),
 		ZIndex = base.z,
 	}, base.visual)
-	Art.Plate(self.track, if props.track == "paper" then "slider.trackPaper" else "slider.track", trackW, th, { z = base.z })
+	Art.Plate(
+		self.track,
+		if props.track == "paper" then "slider.trackPaper" else "slider.track",
+		trackW,
+		th,
+		{ z = base.z }
+	)
 	self.fill = Core.Make("Frame", {
 		Name = "Fill",
 		BackgroundTransparency = 1,
@@ -73,7 +79,8 @@ function Slider.new(parent: Instance, props)
 		ZIndex = base.z + 3,
 	}, base.visual)
 	self.knobScale = Core.Make("UIScale", { Scale = 1 }, self.knob)
-	self.knobPlate = Art.Plate(self.knob, if knobRound then "slider.knobRound" else "slider.knob", kw, kh, { z = base.z + 3 })
+	self.knobPlate =
+		Art.Plate(self.knob, if knobRound then "slider.knobRound" else "slider.knob", kw, kh, { z = base.z + 3 })
 	if boxW > 0 then
 		local box = Core.Make("Frame", {
 			Name = "ValueBox",

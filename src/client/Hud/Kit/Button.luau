@@ -45,31 +45,21 @@ function Button.new(parent: Instance, props)
 	local base = Core.Root(parent, "Button", ROLE[variant] or ROLE.primary, props, w, h)
 	local self = setmetatable({ root = base.root, base = base, variant = variant, w = w, h = h }, Button)
 	self.plate = Art.Plate(base.visual, ROLE[variant] or ROLE.primary, w, h, { z = base.z })
-	local role = props.textRole or class.role
-	local label = props.label or ""
-	-- Text clear of the plate's rivets, centred with its icon.
-	local iconSize = if props.icon then math.floor(h * 0.5) else 0
-	local gap = if props.icon then 12 else 0
-	local textW = math.min(Text.Width(label, role, props.textSize), w - 2 * math.max(16, h * 0.35) - iconSize - gap)
-	local groupW = iconSize + gap + textW
-	local left = (w - groupW) / 2
-	if props.icon then
-		self.icon = Art.Icon(base.visual, props.icon, { left, (h - iconSize) / 2, iconSize, iconSize }, {
-			z = base.z + 2,
-			name = "Icon",
-		})
-	end
+	self.textRole = props.textRole or class.role
+	self.textSize = props.textSize
+	self.iconId = props.icon
 	self.label = Core.Label(base.visual, {
 		name = "Label",
-		text = label,
-		role = role,
+		text = props.label or "",
+		role = self.textRole,
 		size = props.textSize,
 		align = "Center",
 		scaled = true,
-		rect = { left + iconSize + gap, 0, textW, h - 3 },
+		rect = { 0, 0, w, h - 3 },
 		z = base.z + 2,
 	})
-	self.text = label
+	self.text = props.label or ""
+	self:_layout()
 	self.control = Interact.attach(base, {
 		onPress = function()
 			if props.onPress then
@@ -83,12 +73,36 @@ function Button.new(parent: Instance, props)
 	return self
 end
 
+-- Centres the icon and label together, clear of the plate's rivets.
+function Button:_layout()
+	local w, h = self.w, self.h
+	local iconSize = if self.iconId then math.floor(h * 0.5) else 0
+	local gap = if self.iconId then 12 else 0
+	local room = w - 2 * math.max(16, h * 0.35) - iconSize - gap
+	local textW = math.min(Text.Width(self.text, self.textRole, self.textSize) + 4, room)
+	local left = (w - (iconSize + gap + textW)) / 2
+	if self.iconId and self.icon == nil then
+		self.icon = Art.Icon(self.base.visual, self.iconId, { 0, 0, iconSize, iconSize }, {
+			z = self.base.z + 2,
+			tint = if onLeather(self.variant) then nil else "ink",
+			name = "Icon",
+		})
+	end
+	if self.icon then
+		self.icon.Position = UDim2.fromOffset(left, (h - iconSize) / 2)
+	end
+	self.label.Position = UDim2.fromOffset(left + iconSize + gap, 0)
+	self.label.Size = UDim2.fromOffset(textW, h - 3)
+end
+
 function Button:_render(state: string)
 	self.plate:Show(state)
 	local leather = onLeather(self.variant)
 	local color = if leather then "cream" else "ink"
 	if state == "disabled" or state == "locked" then
-		color = if leather then "paperDisabled" else "inkSoft"
+		-- Only the primary plate stays leather when disabled; the notched
+		-- plaque's disabled art is pale.
+		color = if self.variant == "primary" then "paperDisabled" else "inkSoft"
 	end
 	self.label.TextColor3 = Tokens.Color(color)
 	local shown = if state == "busy" then "…" else self.text
@@ -100,6 +114,7 @@ end
 
 function Button:SetLabel(text: string)
 	self.text = text
+	self:_layout()
 	self.control:Refresh()
 end
 

@@ -1131,8 +1131,11 @@ local function dumpNode(object)
 	return { props = props, children = children }
 end
 
-function __dump(root, width, height)
-	print("@@GUI@@" .. __json({ width = width, height = height, root = dumpNode(root) }) .. "@@END@@")
+-- opts.background: an image (path from the repo root) drawn behind the page,
+-- such as the lobby mockup behind a window.
+function __dump(root, width, height, opts)
+	local background = opts and opts.background or nil
+	print("@@GUI@@" .. __json({ width = width, height = height, background = background, root = dumpNode(root) }) .. "@@END@@")
 end
 
 function __screen(width, height)

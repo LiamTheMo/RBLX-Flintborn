@@ -50,7 +50,8 @@ function Tab.new(parent: Instance, props)
 	-- The category tab's arrow reaches past its row (M02: body to 475, tip at 486).
 	self.plate = Art.Plate(base.visual, role, w, h, { z = base.z })
 	local textRole = if variant == "large" then "tabLarge" else "tab"
-	local x = if variant == "side" then 0 else 14
+	-- The arrow tab's leather strap takes its left edge.
+	local x = if variant == "side" then 0 elseif variant == "arrow" then 30 else 14
 	if props.icon then
 		local s = if variant == "side" then math.floor(math.min(w, h) * 0.62) else math.floor(h * 0.62)
 		local ix = if variant == "side" then (w - s) / 2 else (if variant == "large" then 22 else 12)
@@ -83,7 +84,11 @@ function Tab.new(parent: Instance, props)
 end
 
 function Tab:_render(state: string)
-	self.plate:Show(state)
+	-- A category row has no plate until selected; under the pointer it shows
+	-- the selected plate faintly.
+	local faint = self.variant == "category" and (state == "hover" or state == "focused" or state == "pressed")
+	self.plate.alpha = if faint then 0.55 else 0
+	self.plate:Show(if faint then "selected" else state)
 	local onLeather = state == "selected" and LEATHER_SELECTED[self.variant]
 	local color = if onLeather then "cream" elseif state == "disabled" then "inkSoft" else "inkLabel"
 	if self.label then

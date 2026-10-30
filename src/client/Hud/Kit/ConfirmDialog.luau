@@ -48,7 +48,7 @@ function ConfirmDialog.new(parent: Instance, props)
 		caps = true,
 		align = "Center",
 		scaled = true,
-		rect = { 70, 24, w - 140, 44 },
+		rect = { 84, 24, w - 168, 44 },
 		z = z + 1,
 	})
 	Divider.new(base.visual, { name = "Rule", rect = { 60, 72, w - 120, 26 }, variant = "ornate", zIndex = z + 1 })
@@ -95,9 +95,11 @@ function ConfirmDialog.new(parent: Instance, props)
 		icon = if props.danger then nil else "check_white",
 		rect = { w / 2 + 12, y, bw, buttonH },
 		zIndex = z + 2,
-		onPress = if hold then nil else function()
-			self:_confirm()
-		end,
+		onPress = if hold
+			then nil
+			else function()
+				self:_confirm()
+			end,
 	})
 	if hold then
 		self:_holdToConfirm(hold, bw, buttonH)

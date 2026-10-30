@@ -40,7 +40,8 @@ function SectionHeader.new(parent: Instance, props)
 		})
 	end
 	if props.rule ~= false then
-		self.rule = Divider.new(base.visual, { name = "Rule", rect = { 0, h - 9, w, 16 }, variant = "header", zIndex = base.z })
+		self.rule =
+			Divider.new(base.visual, { name = "Rule", rect = { 0, h - 9, w, 16 }, variant = "header", zIndex = base.z })
 	end
 	return self
 end

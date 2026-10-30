@@ -129,7 +129,10 @@ local function show(owner, target: GuiObject, text: string, side: string)
 	-- Kept on screen.
 	x = math.clamp(x, 8, math.max(8, size.X / k - w - 8))
 	y = math.clamp(y, 8, math.max(8, size.Y / k - h - 8))
-	local tip = Tooltip.new(holder, { rect = { x, y, w, h }, text = text, tail = if side == "right" then "none" else "bottom", zIndex = 5 })
+	local tip = Tooltip.new(
+		holder,
+		{ rect = { x, y, w, h }, text = text, tail = if side == "right" then "none" else "bottom", zIndex = 5 }
+	)
 	current = { owner = owner, tip = tip, holder = holder }
 end
 

@@ -67,7 +67,10 @@ function Window.new(target, props: Props)
 	if clasps then
 		local cw, ch = Art.SizeOf("lk_clasp_left")
 		cw, ch = cw or 22, ch or 52
-		local sides = if clasps == "left" then { "left" } elseif clasps == "right" then { "right" } else { "left", "right" }
+		local sides = if clasps == "left"
+			then { "left" }
+			elseif clasps == "right" then { "right" }
+			else { "left", "right" }
 		for _, side in sides do
 			for index, fy in props.claspYs or { 0.2, 0.86 } do
 				local x = if side == "left" then -cw / 2 + 3 else w - cw / 2 - 3
@@ -155,7 +158,12 @@ function Window.new(target, props: Props)
 		local iconSize = Tokens.Space("windowIcon", 76)
 		local titleX = if props.icon then Tokens.Space("windowTitleX", 140) else 44
 		if props.icon then
-			self.icon = Art.Icon(base.visual, props.icon, { 40, 12, iconSize, iconSize }, { z = titleZ, name = "HeaderIcon" })
+			self.icon = Art.Icon(
+				base.visual,
+				props.icon,
+				{ 40, 12, iconSize, iconSize },
+				{ z = titleZ, name = "HeaderIcon" }
+			)
 		end
 		local titleW = w - titleX - closeInset - closeSize - 20
 		local hasSub = props.subtitle ~= nil

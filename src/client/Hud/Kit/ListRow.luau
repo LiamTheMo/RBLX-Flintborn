@@ -16,6 +16,7 @@ local Core = require(script.Parent.Core)
 local Divider = require(script.Parent.Divider)
 local Interact = require(script.Parent.Interact)
 local ItemIcon = require(script.Parent.ItemIcon)
+local Text = require(script.Parent.Text)
 local Tokens = require(script.Parent.Tokens)
 
 local ListRow = {}
@@ -77,16 +78,19 @@ function ListRow.new(parent: Instance, props)
 	}, base.visual)
 	Art.Plate(self.lock, "mark.lock", markSize, markSize, { z = base.z + 2 })
 	if props.value then
+		-- The value keeps its full width; the title gives way.
+		local vw = math.max(40, math.ceil(Text.Width(props.value, "value")) + 6)
 		self.value = Core.Label(base.visual, {
 			name = "Value",
 			text = props.value,
 			role = "value",
 			color = props.valueColor,
 			align = "Right",
-			rect = { right - 140, 0, 140, h },
+			rect = { right - vw, 0, vw, h },
 			z = base.z + 1,
 		})
-		right -= 150
+		self.valueWidth = vw
+		right -= vw + 10
 	end
 	local hasSub = props.subtitle ~= nil
 	local titleRole = if variant == "line" then "rowLabel" else "rowTitle"

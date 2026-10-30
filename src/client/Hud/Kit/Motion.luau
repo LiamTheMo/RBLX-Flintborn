@@ -103,7 +103,7 @@ end
 -- Sets `goal` at once, cancelling any running tween on those properties.
 function Motion.Set(instance: Instance, goal: { [string]: any })
 	for property, value in goal do
-		cancel(instance, property)
+		cancel(instance, property);
 		(instance :: any)[property] = value
 	end
 end

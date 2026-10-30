@@ -29,9 +29,7 @@ function Divider.new(parent: Instance, props)
 	local nw, nh = Art.SizeOf(sprite)
 	local vertical = variant == "vertical"
 	local thick = if vertical then (nw or 18) else (nh or 15)
-	local rect = if vertical
-		then { (w - thick) / 2, 0, thick, h }
-		else { 0, (h - thick) / 2, w, thick }
+	local rect = if vertical then { (w - thick) / 2, 0, thick, h } else { 0, (h - thick) / 2, w, thick }
 	local plate = Art.Plate(base.visual, role, rect[3], rect[4], { rect = rect, z = base.z })
 	if variant == "ornate" then
 		-- The centre diamond is not sliced: stretch the whole rule.

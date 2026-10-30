@@ -44,7 +44,8 @@ Bar.FRAMES = {
 }
 
 -- props: rect | size, fill, frame ("track"), icon (stat frame), text (value
--- text; stat frame's value box, else over the bar), value (0-1), zIndex, name.
+-- text; stat frame's value box, else over the bar in textColor, default ink),
+-- value (0-1), zIndex, name.
 function Bar.new(parent: Instance, props)
 	local fillKey = Bar.FILLS[props.fill or "xp"] or "yellow"
 	local fillRole = "bar.fill." .. fillKey
@@ -106,7 +107,7 @@ function Bar.new(parent: Instance, props)
 			name = "Value",
 			text = props.text,
 			role = "hudSmall",
-			color = "cream",
+			color = props.textColor or "ink",
 			align = "Center",
 			scaled = true,
 			rect = { 0, 0, w, h },

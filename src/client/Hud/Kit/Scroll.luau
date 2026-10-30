@@ -24,7 +24,8 @@ function Scroll.new(parent: Instance, props)
 	local w, h = Core.Size(props, 300, 300)
 	local base = Core.Root(parent, "Scroll", "scroll.track", props, w, h)
 	local rail = Scroll.RAIL
-	local self = setmetatable({ root = base.root, base = base, w = w, h = h, contentHeight = props.contentHeight }, Scroll)
+	local self =
+		setmetatable({ root = base.root, base = base, w = w, h = h, contentHeight = props.contentHeight }, Scroll)
 	local frame = Core.Make("ScrollingFrame", {
 		Name = "List",
 		Active = true,

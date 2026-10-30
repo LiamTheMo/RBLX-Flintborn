@@ -114,8 +114,10 @@ function Core.Style(label: TextLabel | TextButton | TextBox, role: string, color
 	return style
 end
 
-local ALIGN_X = { Left = Enum.TextXAlignment.Left, Center = Enum.TextXAlignment.Center, Right = Enum.TextXAlignment.Right }
-local ALIGN_Y = { Top = Enum.TextYAlignment.Top, Center = Enum.TextYAlignment.Center, Bottom = Enum.TextYAlignment.Bottom }
+local ALIGN_X =
+	{ Left = Enum.TextXAlignment.Left, Center = Enum.TextXAlignment.Center, Right = Enum.TextXAlignment.Right }
+local ALIGN_Y =
+	{ Top = Enum.TextYAlignment.Top, Center = Enum.TextYAlignment.Center, Bottom = Enum.TextYAlignment.Bottom }
 
 -- A TextLabel in a type role. opts: text, role, rect {x, y, w, h} (or size and
 -- position), align ("Left" | "Center" | "Right"), yAlign, wrap, scaled (shrink
