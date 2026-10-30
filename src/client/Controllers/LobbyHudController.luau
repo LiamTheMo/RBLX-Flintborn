@@ -1,23 +1,24 @@
--- The lobby screen (GDD §11, §25; docs/ui/LobbyScreen.md): the profile with level
--- and XP, the navigation tiles, Coins, Gems and Settings, the party panel and the
--- Enter button with the server dropdown, built by Hud/LobbyHud from
--- HudLayout.json's "lobby" section.
+-- The lobby's always-on HUD (GDD §11, §25; docs/ui/LobbyScreen.md, ARCHITECTURE
+-- §4.1): the player card, Coins, Gems and Settings, the menu tiles, the Party
+-- panel, the XP bar and the hotbar that shows the deploy loadout, drawn by
+-- Hud/Screens/LobbyHud from the shared Kit. There is no Enter button or server
+-- choice here: the Play tile opens the Play window, which deploys.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
 -- If the HUD fails to build, the lobby falls back to those older visuals.
 --
--- Everything acts through the existing controllers: LobbyController deploys,
--- reads the deploy preview and runs party actions; the buttons open the Vault,
--- Journal (quests), Market (Shop tab), Forge, Trade, Progress and Settings panels.
+-- Everything acts through the existing controllers: the tiles open the
+-- Inventory (VaultController), Play (PlayController), Quests (JournalController),
+-- Shop (WalletController), Forge and Trade; the card opens Progress, the pills the
+-- Shop, the gear Settings, the Party panel the Party window (PartyController).
+-- Functions other screens are still adding (PartyController, PlayController,
+-- VaultController.Open / Changed) are looked up when pressed, so a missing one
+-- does nothing.
 
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SocialService = game:GetService("SocialService")
-local UserInputService = game:GetService("UserInputService")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
-local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
-local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local ForgeController = require(script.Parent.ForgeController)
 local JournalController = require(script.Parent.JournalController)
 local LobbyController = require(script.Parent.LobbyController)
@@ -28,80 +29,53 @@ local VaultController = require(script.Parent.VaultController)
 local WalletController = require(script.Parent.WalletController)
 local Hud = script.Parent.Parent.Hud
 local HudMode = require(Hud.HudMode)
-local Layout = require(Hud.Layout)
-local LobbyHud = require(Hud.LobbyHud)
-local LobbyPopups = require(Hud.LobbyPopups)
-local Parchment = require(Hud.Parchment)
-local Theme = require(script.Parent.Parent.Ui.Theme)
+local Kit = require(Hud.Kit)
+local LobbyHud = require(Hud.Screens.LobbyHud)
 
 local LobbyHudController = {}
 
--- How long a status message stays in the status strip.
+-- How long a status message toast stays.
 LobbyHudController.STATUS_SECONDS = 6
 
 local player = Players.LocalPlayer
-local layout, gui, root, uiScale, hud, popups
-local statusToken = 0
--- userId -> headshot image, or a list of callbacks while the fetch runs.
-local thumbnails = {}
--- Which button last opened the vault panel (Inventory and Vault both open it).
-local vaultOpener = nil
+local gui, root, hud
 
-local function steady(): boolean
-	return Theme.ReducedMotion()
-end
-
--- A headshot for userId, fetched once. While it loads this returns nil and `done`
--- runs when it arrives; a failed fetch is forgotten, so the next ask retries.
-local function thumbnail(userId: number, done: (() -> ())?): string?
-	local cached = thumbnails[userId]
-	if type(cached) == "string" then
-		return cached
-	end
-	if type(cached) == "table" then
-		if done then
-			table.insert(cached, done)
-		end
+-- A sibling controller another screen owns, once it exists (nil until then).
+local function optional(name: string)
+	local module = script.Parent:FindFirstChild(name)
+	if module == nil or not module:IsA("ModuleScript") then
 		return nil
 	end
-	local waiting = if done then { done } else {}
-	thumbnails[userId] = waiting
-	task.spawn(function()
-		local ok, image = pcall(function()
-			return Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
-		end)
-		if ok and type(image) == "string" then
-			thumbnails[userId] = image
-			for _, callback in waiting do
-				task.spawn(callback)
-			end
-		else
-			thumbnails[userId] = nil
-		end
-	end)
-	return nil
+	local ok, result = pcall(require, module)
+	return if ok and type(result) == "table" then result else nil
 end
 
-local function openVault(id: string)
-	-- Inventory then Vault (or back) keeps the panel open instead of closing it.
-	if VaultController.IsOpen() and vaultOpener ~= id then
-		vaultOpener = id
-		return
+-- Calls controller[name](...) when both exist. Returns whether it ran.
+local function call(controller, name: string, ...): boolean
+	local fn = controller and controller[name]
+	if type(fn) ~= "function" then
+		return false
 	end
-	vaultOpener = id
-	VaultController.Toggle()
+	fn(...)
+	return true
 end
 
-local NAV_ACTIONS = {
-	-- The lobby backpack lives in the vault panel, beside the vault itself.
-	Inventory = function()
-		openVault("Inventory")
-	end,
-	Vault = function()
-		openVault("Vault")
+-- The lobby backpack lives in the Inventory window beside the vault.
+local function openInventory()
+	if not call(VaultController, "Open", "Backpack") and not VaultController.IsOpen() then
+		VaultController.Toggle()
+	end
+end
+
+local TILE_ACTIONS = {
+	Inventory = openInventory,
+	Play = function()
+		call(optional("PlayController"), "Open")
 	end,
 	Quests = function()
-		JournalController.Toggle()
+		if not call(JournalController, "Open") then
+			JournalController.Toggle()
+		end
 	end,
 	Shop = function()
 		WalletController.Open("Shop")
@@ -114,216 +88,46 @@ local NAV_ACTIONS = {
 	end,
 }
 
--- How far down the Roblox top bar (menu and chat buttons) reaches into this
--- ScreenGui, in screen pixels (Parchment.TopInset), never less than the
--- buttons' own height.
-LobbyHudController.MIN_TOP = 52
-local function topInset(): number
-	return math.max(LobbyHudController.MIN_TOP, Parchment.TopInset(gui))
+local function openParty(section: string?)
+	call(optional("PartyController"), "Open", section)
 end
 
--- On a short touch screen (a phone held sideways) the lobby draws a little
--- smaller than the fit, so the Enter plate and profile leave room for the game.
-LobbyHudController.PHONE_HEIGHT = 500
-LobbyHudController.PHONE_FACTOR = 0.9
-
-local function applyScale()
-	local size = gui.AbsoluteSize
-	local scale = HudModel.HudScale(
-		size.X,
-		size.Y,
-		layout.reference.width,
-		layout.reference.height,
-		layout.scale.min,
-		layout.scale.max,
-		player:GetAttribute("UiScale")
+local function refreshParty()
+	hud:SetParty(
+		LobbyHudModel.Party(LobbyController.PartyView(), { userId = player.UserId, name = player.DisplayName })
 	)
-	if
-		UserInputService.TouchEnabled
-		and not UserInputService.KeyboardEnabled
-		and size.Y < LobbyHudController.PHONE_HEIGHT
-	then
-		scale *= LobbyHudController.PHONE_FACTOR
-	end
-	uiScale.Scale = scale
-	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
-	local top = topInset() / scale
-	hud:Fit(size.X / scale, size.Y / scale, top, scale)
-	popups:SetScreen(size.Y / scale, top, scale)
 end
 
-local refreshParty
-
-local function refreshProfile()
-	hud:SetProfile(player.DisplayName, thumbnail(player.UserId, refreshProfile))
+local function refreshHotbar()
+	hud:SetHotbar(LobbyHudModel.Hotbar(LobbyController.Preview()))
 end
 
-refreshParty = function()
-	local view = LobbyController.PartyView()
-	local party = view.party
-	local members = {}
-	if party then
-		for _, member in party.members do
-			table.insert(members, {
-				userId = member.userId,
-				name = member.name,
-				leader = member.userId == party.leader,
-				thumbnail = thumbnail(member.userId, refreshParty),
-			})
-		end
-	else
-		-- Alone: a party of one, led by you.
-		table.insert(members, {
-			userId = player.UserId,
-			name = player.DisplayName,
-			leader = true,
-			thumbnail = thumbnail(player.UserId, refreshParty),
-		})
-	end
-	local leads = party == nil or party.leader == player.UserId
-	local canInvite = leads and #members < PartyRules.MAX_SIZE
-	hud:SetParty(members, view.invites or {}, PartyRules.MAX_SIZE, canInvite, party ~= nil)
+local function refreshCurrency(instant: boolean?)
+	hud:SetCurrency(player:GetAttribute("Coins"), player:GetAttribute("Gems"), instant)
 end
 
-local function refreshCurrency()
-	hud:SetCurrency(player:GetAttribute("Coins"), player:GetAttribute("Gems"))
+-- The game-update notice plaque while it applies; its status line is not
+-- toasted again.
+local function refreshNotice()
+	hud:SetNotice(if player:GetAttribute("MaintenanceNotice") then LobbyController.MAINTENANCE_TEXT else nil)
 end
 
--- The status strip between messages: empty, or the game-update notice
--- while it applies.
-local function idleLine(): string?
-	return if player:GetAttribute("MaintenanceNotice") then LobbyController.MAINTENANCE_TEXT else nil
-end
-
--- Shows a status message in the status strip for a few seconds.
-local function showStatus(text: string)
-	statusToken += 1
-	local token = statusToken
-	hud:SetServerLine(text)
-	task.delay(LobbyHudController.STATUS_SECONDS, function()
-		if token == statusToken and not LobbyController.IsDeploying() then
-			hud:SetServerLine(idleLine())
-		end
-	end)
-end
-
-local function deploy()
-	popups:Hide()
-	hud:SetEnterBusy(true)
-	task.spawn(function()
-		LobbyController.Deploy()
-		hud:SetEnterBusy(false)
-	end)
-end
-
-local function confirm(title: string, lines: { string }, enterLabel: string)
-	popups:Show({
-		title = title,
-		lines = lines,
-		buttons = {
-			{ label = enterLabel, primary = true, onPress = deploy },
-			{
-				label = "CANCEL",
-				onPress = function()
-					popups:Hide()
-				end,
-			},
-		},
-	})
-end
-
--- Enter: reads the deploy preview fresh, and when anything goes with you lists it
--- first and asks (GDD Q155). With an empty backpack it deploys straight away.
-local entering = false
-local function onEnter()
-	if entering or LobbyController.IsDeploying() then
+local function showStatus()
+	local text = LobbyController.Status()
+	if text == "" or text == LobbyController.MAINTENANCE_TEXT then
 		return
 	end
-	entering = true
-	hud:SetEnterBusy(true)
-	task.spawn(function()
-		local items = LobbyController.FetchPreview()
-		hud:SetEnterBusy(false)
-		entering = false
-		if items == nil then
-			confirm("COULD NOT READ YOUR BACKPACK", {
-				"The item list did not load. Everything you carry except ★ Permanent items can be lost in the run.",
-				"Items in your vault always stay safe.",
-			}, "ENTER ANYWAY")
-			return
-		end
-		if #items == 0 then
-			deploy()
-			return
-		end
-		local lines, atRisk = {}, false
-		for _, item in items do
-			local def = ItemCatalog.Get(item.catalogId)
-			local name = def and def.name or tostring(item.catalogId)
-			local count = if item.quantity then " ×" .. item.quantity else ""
-			atRisk = atRisk or not item.permanent
-			table.insert(lines, (if item.permanent then "★ " else "• ") .. name .. count)
-		end
-		if atRisk then
-			table.insert(lines, "Everything except ★ Permanent items can be lost in the run.")
-		end
-		table.insert(lines, "Items in your vault always stay safe.")
-		confirm("TAKE THESE INTO THE RUN?", lines, "ENTER")
-	end)
-end
-
-local function inviteRoblox()
-	popups:Hide()
-	local ok, canInvite = pcall(function()
-		return SocialService:CanSendGameInviteAsync(player)
-	end)
-	if ok and canInvite then
-		pcall(function()
-			SocialService:PromptGameInvite(player)
-		end)
-	else
-		showStatus("Roblox invites are not available right now.")
-	end
-end
-
-local function onInvite()
-	local rows = {}
-	for _, other in LobbyController.Invitable() do
-		table.insert(rows, {
-			text = other.DisplayName,
-			thumbnail = thumbnail(other.UserId) or "",
-			action = "INVITE",
-			onPress = function()
-				popups:Hide()
-				task.spawn(LobbyController.PartyAction, "invite", other.UserId)
-				showStatus("Party invite sent to " .. other.DisplayName .. ".")
-			end,
-		})
-	end
-	popups:Show({
-		title = "INVITE TO YOUR PARTY",
-		lines = if #rows == 0 then { "No one else is in this lobby server yet." } else {},
-		rows = rows,
-		buttons = { { label = "INVITE ROBLOX FRIENDS", primary = true, onPress = inviteRoblox } },
-	})
-end
-
-local function onServer()
-	popups:Show({
-		title = "CHOOSE SERVER",
-		rows = { { text = "✓  Best match (automatic)" } },
-		lines = { "Your party joins the best open world together, and the leader starts it." },
-	})
+	Kit.Toast.Show({ kind = "info", title = "Lobby", text = text, duration = LobbyHudController.STATUS_SECONDS })
 end
 
 local function build()
 	gui = Instance.new("ScreenGui")
 	gui.Name = "FlintbornLobbyHud"
 	gui.ResetOnSpawn = false
-	gui.DisplayOrder = 1
+	gui.DisplayOrder = Kit.Tokens.Order("hud")
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses the master's full-screen coordinates and keeps clear of the
-	-- top bar itself (LobbyHud:Fit); device cut-outs (notches) stay excluded.
+	-- The layout uses the mockup's full-screen coordinates and keeps clear of the
+	-- top bar itself (LobbyHud:SetTopInset); device cut-outs stay excluded.
 	gui.IgnoreGuiInset = true
 	pcall(function()
 		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
@@ -333,74 +137,86 @@ local function build()
 	root.BackgroundTransparency = 1
 	root.Size = UDim2.fromScale(1, 1)
 	root.Parent = gui
-	uiScale = Instance.new("UIScale")
-	uiScale.Parent = root
-	hud = LobbyHud.new(root, layout, steady)
-	popups = LobbyPopups.new(root, layout)
-	-- XP pop-ups appear beside the navigation tiles.
-	local host = Instance.new("Frame")
-	host.Name = "XpPopups"
-	host.BackgroundTransparency = 1
-	host.Parent = root
-	hud:AddTopWidget(host, { anchor = { 0, 0 }, pos = { 0, 48, 0, 232 }, size = { 320, 120 } }, "XpPopups")
-	ProgressionController.MountPopups(host)
+	hud = LobbyHud.new(root, {
+		onProfile = function()
+			ProgressionController.Toggle()
+		end,
+		onCurrency = function()
+			WalletController.Open("Shop")
+		end,
+		onSettings = function()
+			SettingsController.Toggle()
+		end,
+		onTile = function(id: string)
+			local action = TILE_ACTIONS[id]
+			if action then
+				action()
+			end
+		end,
+		onParty = openParty,
+		onAnswer = function(partyId: string, accept: boolean)
+			task.spawn(LobbyController.PartyAction, if accept then "accept" else "decline", partyId)
+		end,
+		onSlot = openInventory,
+	})
+	ProgressionController.MountPopups(hud.popups)
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
 
-local function start()
-	layout = Layout.Get()
-	build()
-	applyScale()
-	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(applyScale)
-	pcall(function()
-		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(applyScale)
-	end)
-	player:GetAttributeChangedSignal("UiScale"):Connect(function()
-		task.defer(applyScale)
-	end)
-
-	refreshProfile()
-	local view = ProgressionController.View()
-	if view then
-		hud:SetProgress(view, true)
+-- Root scale (HudModel.HudScale, × 0.9 on short touch screens) and the top bar's
+-- reach in design px.
+local function watchScale()
+	Kit.Scale.Hud(gui, root)
+	local scale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
+	local function inset()
+		hud:SetTopInset(Kit.Scale.WindowTop(gui) / math.max(scale.Scale, 0.01))
 	end
-	ProgressionController.Changed:Connect(function(progress)
-		hud:SetProgress(progress, steady())
+	scale:GetPropertyChangedSignal("Scale"):Connect(inset)
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(inset)
+	pcall(function()
+		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(inset)
 	end)
-	refreshCurrency()
+	inset()
+end
+
+local function start()
+	build()
+	watchScale()
+
+	hud:SetProfile(player.DisplayName, player.UserId)
+	hud:SetProgress(ProgressionController.View(), true)
+	ProgressionController.Changed:Connect(function(view)
+		hud:SetProgress(view, Kit.Motion.Reduced())
+	end)
+	refreshCurrency(true)
 	player:GetAttributeChangedSignal("Coins"):Connect(refreshCurrency)
 	player:GetAttributeChangedSignal("Gems"):Connect(refreshCurrency)
+	refreshNotice()
+	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refreshNotice)
 
 	refreshParty()
-	hud:SetServerLine(idleLine())
-	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(function()
-		hud:SetServerLine(idleLine())
-	end)
+	refreshHotbar()
 	LobbyController.Changed:Connect(function(what)
 		if what == "party" then
 			refreshParty()
+		elseif what == "preview" then
+			refreshHotbar()
 		elseif what == "status" then
-			showStatus(LobbyController.Status())
+			showStatus()
 		end
 	end)
+	-- A backpack or vault change re-reads the deploy preview (and so the hotbar).
+	local changed = (VaultController :: any).Changed
+	if type(changed) == "table" and changed.Connect then
+		changed:Connect(function()
+			LobbyController.RefreshPreview()
+		end)
+	end
+end
 
-	hud.NavPressed:Connect(function(id)
-		local action = NAV_ACTIONS[id]
-		if action then
-			action()
-		end
-	end)
-	hud.ProfilePressed:Connect(ProgressionController.Toggle)
-	hud.SettingsPressed:Connect(SettingsController.Toggle)
-	hud.EnterPressed:Connect(onEnter)
-	hud.ServerPressed:Connect(onServer)
-	hud.InvitePressed:Connect(onInvite)
-	hud.LeavePressed:Connect(function()
-		task.spawn(LobbyController.PartyAction, "leave")
-	end)
-	hud.InviteAnswered:Connect(function(partyId, accept)
-		task.spawn(LobbyController.PartyAction, if accept then "accept" else "decline", partyId)
-	end)
+-- The HUD screen object (scenes and verifiers), or nil before Start.
+function LobbyHudController.Hud()
+	return hud
 end
 
 function LobbyHudController.Start()

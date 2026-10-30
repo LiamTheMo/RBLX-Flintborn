@@ -1,12 +1,13 @@
--- Settings (GDD §25, §11, §46): the parchment Settings window (Hud/SettingsPanel)
--- with its five tabs — volumes, camera sensitivity and inversion, damage numbers,
--- names, graphics quality, UI scale, colour-blind palette, reduced motion,
--- subtitles, replaying the tutorial and keyboard controls. The Settings key (O by
+-- Settings (GDD §25, §11, §46): the Settings window (Hud/Screens/SettingsWindow)
+-- with its four tabs — volumes, camera sensitivity and inversion, damage numbers,
+-- names, subtitles, graphics quality, UI scale, colour-blind palette, reduced
+-- motion, keyboard controls and replaying the tutorial. The Settings key (O by
 -- default) or a ⚙ button opens it. Changes collect in a draft: APPLY saves them to
 -- the profile (the server echoes them back as player attributes, and every
 -- controller reacts to those), RESET puts the open tab back to its defaults and
--- closing discards the draft. To rebind, click a key and press the new one
--- (clicking it again cancels); a key another action uses swaps with it.
+-- closing (✕, Escape, gamepad B) discards the draft. To rebind, click a key and
+-- press the new one (Escape, or clicking it again, cancels); a key another
+-- action uses swaps with it.
 --
 -- This module also applies two settings itself: UI scale on every ScreenGui that
 -- does not fit itself, and the colour-blind rarity palette.
@@ -22,8 +23,8 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
-local SettingsPanel = require(script.Parent.Parent.Hud.SettingsPanel)
-local Widgets = require(script.Parent.Parent.Hud.Widgets)
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local SettingsWindow = require(script.Parent.Parent.Hud.Screens.SettingsWindow)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -41,7 +42,6 @@ local capturing = nil
 local keyNote = ""
 
 local CAPTURE_ACTION = "FlintbornKeyCapture"
-local CLOSE_ACTION = "FlintbornSettingsClose"
 
 local make = Theme.Make
 
@@ -156,10 +156,10 @@ local function startCapture(id: string)
 			local overrides = Keybinds.Assign(keyDraft, id, key)
 			if overrides then
 				keyDraft = overrides
-				keyNote = ("%s → %s"):format(Keybinds.Get(id).label, SettingsPanel.KeyText(key))
+				keyNote = ("%s → %s"):format(Keybinds.Get(id).label, SettingsWindow.KeyText(key))
 			end
 		else
-			keyNote = ("%s is kept for movement, chat or menus."):format(SettingsPanel.KeyText(key))
+			keyNote = ("%s is kept for movement, chat or menus."):format(SettingsWindow.KeyText(key))
 		end
 		stopCapture()
 		refresh()
@@ -177,14 +177,10 @@ local function loadDraft()
 	refresh()
 end
 
+-- Closes the window; onClosed below drops the draft's key capture. Kit.Modal
+-- gives back the gamepad selection the window took.
 local function close()
-	stopCapture()
-	ContextActionService:UnbindAction(CLOSE_ACTION)
-	local selected = GuiService.SelectedObject
-	if selected and selected:IsDescendantOf(panel.screen.gui) then
-		GuiService.SelectedObject = nil
-	end
-	panel.screen:SetOpen(false)
+	panel.screen:Close()
 end
 
 local function apply()
@@ -207,10 +203,10 @@ end
 -- draft; APPLY saves them).
 local function reset(tab: string)
 	stopCapture()
-	for _, key in SettingsPanel.TAB_SETTINGS[tab] or {} do
-		draft[key] = SettingsRules.Get(key).default
+	for _, key in SettingsWindow.TAB_SETTINGS[tab] or {} do
+		draft[key] = (SettingsRules.Get(key) :: any).default
 	end
-	local keys = SettingsPanel.TAB_KEYS[tab]
+	local keys = SettingsWindow.TAB_KEYS[tab]
 	if keys == "all" then
 		keyDraft = {}
 	elseif keys then
@@ -224,8 +220,8 @@ local function reset(tab: string)
 end
 
 local function build()
-	panel = SettingsPanel.new(playerGui, {
-		onClose = close,
+	panel = SettingsWindow.new(playerGui, {
+		onClosed = stopCapture,
 		onApply = apply,
 		onReset = reset,
 		onChange = function(key: string, value)
@@ -233,7 +229,7 @@ local function build()
 			refresh()
 		end,
 		onRebind = function(id: string)
-			-- Clicking the waiting key again cancels (Roblox keeps Esc for its menu).
+			-- Clicking the waiting key again cancels, as Escape does.
 			if capturing == id then
 				stopCapture()
 				refresh()
@@ -258,27 +254,32 @@ local function build()
 	})
 	panel.screen:Watch()
 
-	-- A small always-visible button, so touch players can reach settings in the
-	-- world too. The lobby HUD has its own gear button, so this one stays hidden there.
-	local gui =
-		make("ScreenGui", { Name = "FlintbornSettingsButton", ResetOnSpawn = false, DisplayOrder = 5 }, playerGui)
-	local open = Widgets.Sprite("pm_lobby_gear", {
-		Name = "Open",
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(1, -12, 1, -12),
-		Size = UDim2.fromOffset(Theme.TOUCH_TARGET, Theme.TOUCH_TARGET),
-		Visible = not HudMode.ReplacesLobby(),
-	}, gui)
-	local press = make("TextButton", {
-		Name = "Press",
-		Text = "",
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		ZIndex = 3,
-	}, open)
-	press.Activated:Connect(function()
-		SettingsController.Toggle()
-	end)
+	-- A small always-visible ⚙ button (the kit's settings button), so touch
+	-- players can reach settings in the world too. The lobby HUD has its own gear
+	-- button, so this one stays hidden there.
+	local gui = make("ScreenGui", {
+		Name = "FlintbornSettingsButton",
+		ResetOnSpawn = false,
+		DisplayOrder = Kit.Tokens.Order("topStack"),
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, playerGui)
+	local size = math.max(Theme.TOUCH_TARGET, 52)
+	Kit.IconButton.new(gui, {
+		name = "Open",
+		variant = "settings",
+		size = { size, size },
+		position = UDim2.new(1, -12, 1, -12),
+		anchorPoint = Vector2.new(1, 1),
+		visible = not HudMode.ReplacesLobby(),
+		onPress = function()
+			SettingsController.Toggle()
+		end,
+	})
+end
+
+-- The window (Hud/Screens/SettingsWindow), for scenes and verifiers.
+function SettingsController.View()
+	return panel
 end
 
 -- Opens or closes the window (keys, the ⚙ buttons).
@@ -289,17 +290,10 @@ function SettingsController.Toggle()
 	end
 	loadDraft()
 	panel:SelectTab(panel.tab or "Gameplay")
-	panel.screen:SetOpen(true)
-	-- Gamepad B closes it, like the other parchment menus.
-	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin and not panel:CloseDropdowns() then
-			close()
-		end
-		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.ButtonB)
-	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
-		GuiService.SelectedObject = panel.tabs[panel.tab].button
-	end
+	-- A gamepad starts on the open tab; Escape and B close (Kit.Modal), an open
+	-- dropdown list first.
+	panel.screen:SetDefaultSelection(panel.tabs[panel.tab].control.hit)
+	panel.screen:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
 end
 
 function SettingsController.Start()

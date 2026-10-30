@@ -1,17 +1,18 @@
 -- The painted island map (art/ui/map/island.png, uploaded as pm_map_island) inside
 -- a clipped frame: zoom in and out, drag to pan, pins for places with a name
--- plate on the chosen one, and an optional live marker. The Journal's map panel
--- uses it. The image covers MAP_SPAN studs centred on the island with −Z (north)
--- up, the span render_island.py paints (it refuses to run if the two differ). It
--- shows the generated island; an authored world would need its own painting.
+-- plate on the chosen one, and an optional live marker. Drawn from the UI kit
+-- (pins, plate, zoom buttons, marker); the Journal's map tab, the world Map and
+-- the Play window use it. The image covers MAP_SPAN studs centred on the island
+-- with −Z (north) up, the span render_island.py paints (it refuses to run if the
+-- two differ). It shows the generated island; an authored world would need its
+-- own painting.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
-local Layout = require(script.Parent.Layout)
-local Parchment = require(script.Parent.Parchment)
-local Widgets = require(script.Parent.Widgets)
+local Kit = require(script.Parent.Kit)
 
 local IslandMap = {}
 IslandMap.__index = IslandMap
@@ -22,6 +23,8 @@ IslandMap.ZOOMS = { 1, 1.4, 2 }
 IslandMap.PIN = 50
 -- Extra touch room round a pin, in map pixels.
 IslandMap.PIN_PAD = 12
+-- The painting itself (the map is art, not a kit role).
+IslandMap.IMAGE = "pm_map_island"
 
 -- Landmarks big enough to find your way by; the rest stay off the map so it
 -- does not crowd.
@@ -54,47 +57,116 @@ function IslandMap.ToMap(x: number, z: number): (number, number)
 end
 
 -- `r` = {x, y, w, h} of the visible map in the parent's pixels. opts: zoomButtons
--- ({in, out} rects in the parent), places (default IslandMap.Places()).
+-- ({in, out} rects in the parent), places (default IslandMap.Places()), zIndex
+-- (default 3).
 function IslandMap.new(parent: Instance, r, opts)
 	opts = opts or {}
 	local self = setmetatable({}, IslandMap)
+	self.maid = KitModel.Maid()
 	self.size = { r[3], r[4] }
 	self.zoomIndex = 1
 	self.focus = { 0.5, 0.5 }
-	local clip = Widgets.Make("Frame", {
+	local z = opts.zIndex or 3
+	local clip = Kit.Core.Make("Frame", {
 		Name = "Map",
-		BackgroundColor3 = Layout.Color("paper"),
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 		Position = UDim2.fromOffset(r[1], r[2]),
 		Size = UDim2.fromOffset(r[3], r[4]),
-		ZIndex = 3,
+		ZIndex = z,
 	}, parent)
+	self.maid:Give(clip)
 	self.clip = clip
 	-- The square image fills the frame's longer side at zoom 1.
 	local side = math.max(r[3], r[4])
 	self.side = side
-	local canvas = Widgets.Make("Frame", {
+	local canvas = Kit.Core.Make("Frame", {
 		Name = "Canvas",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromOffset(side, side),
-		ZIndex = 3,
+		ZIndex = z,
 	}, clip)
 	self.canvas = canvas
-	Widgets.Sprite("pm_map_island", { Name = "Island", Size = UDim2.fromScale(1, 1), ZIndex = 3 }, canvas)
+	Kit.Art.Sprite(IslandMap.IMAGE, side, side, canvas, {
+		Name = "Island",
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = z,
+	})
 	self.pins = {}
 	for _, place in opts.places or IslandMap.Places() do
-		local u, v = IslandMap.ToMap(place.x, place.z)
-		local pin = Widgets.Make("Frame", {
-			Name = place.id,
-			AnchorPoint = Vector2.new(0.5, 1),
-			BackgroundTransparency = 1,
-			Position = UDim2.fromScale(u, v),
-			Size = UDim2.fromOffset(IslandMap.PIN, IslandMap.PIN * 1.05),
-			ZIndex = 5,
-		}, canvas)
-		Widgets.Sprite("pm_map_pin", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 5 }, pin)
-		local press = Parchment.Pressable(pin, nil, function()
+		self:_pin(place, z)
+	end
+	-- The name plate for the chosen pin.
+	self.label = Kit.Core.Make("Frame", {
+		Name = "Label",
+		AnchorPoint = Vector2.new(0.12, 0),
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(196, 56),
+		Visible = false,
+		ZIndex = z + 4,
+	}, canvas)
+	Kit.Art.Plate(self.label, "panel.plaque", 196, 56, { z = z + 4 })
+	self.labelText = Kit.Text.new(self.label, {
+		name = "Name",
+		rect = { 16, 4, 164, 46 },
+		text = "",
+		role = "rowTitle",
+		align = "Center",
+		scaled = true,
+		zIndex = z + 5,
+	}).root
+	-- The player's own position (world Map), hidden until SetMarker.
+	self.marker = Kit.Icon.new(canvas, {
+		name = "You",
+		size = { 36, 36 },
+		icon = "compass_arrow",
+		anchorPoint = Vector2.new(0.5, 0.5),
+		visible = false,
+		zIndex = z + 6,
+	}).root
+	if opts.zoomButtons then
+		self.zoomIn = Kit.IconButton.new(parent, {
+			name = "ZoomIn",
+			rect = opts.zoomButtons[1],
+			variant = "plus",
+			zIndex = z + 5,
+			onPress = function()
+				self:Zoom(1)
+			end,
+		})
+		self.zoomOut = Kit.IconButton.new(parent, {
+			name = "ZoomOut",
+			rect = opts.zoomButtons[2],
+			variant = "minus",
+			zIndex = z + 5,
+			onPress = function()
+				self:Zoom(-1)
+			end,
+		})
+		self.maid:Give(self.zoomIn)
+		self.maid:Give(self.zoomOut)
+	end
+	self:_drag(clip)
+	self:_place()
+	return self
+end
+
+-- A pressable pin for `place`: tap to show its name, tap again to hide it.
+function IslandMap:_pin(place, z: number)
+	local u, v = IslandMap.ToMap(place.x, place.z)
+	local w, h = IslandMap.PIN, math.floor(IslandMap.PIN * 1.12)
+	local base = Kit.Core.Root(self.canvas, "MapPin", "map.pin", {
+		name = place.id,
+		size = { w, h },
+		position = UDim2.fromScale(u, v),
+		anchorPoint = Vector2.new(0.5, 1),
+		zIndex = z + 2,
+	}, w, h)
+	Kit.Art.Icon(base.visual, "map_pin", { 0, 0, w, h }, { z = z + 2, name = "Art" })
+	local control = Kit.Interact.attach(base, {
+		pad = IslandMap.PIN_PAD,
+		hoverScale = true,
+		onPress = function()
 			if self.selected == place.id then
 				self:Select(nil)
 			else
@@ -104,55 +176,10 @@ function IslandMap.new(parent: Instance, r, opts)
 					self:Focus(place.x, place.z)
 				end
 			end
-		end, IslandMap.PIN_PAD)
-		press.ZIndex = 6
-		self.pins[place.id] = { frame = pin, place = place }
-	end
-	-- The name plate for the chosen pin.
-	self.label = Widgets.Make("Frame", {
-		Name = "Label",
-		AnchorPoint = Vector2.new(0.12, 0),
-		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(196, 70),
-		Visible = false,
-		ZIndex = 7,
-	}, canvas)
-	Widgets.Sprite(
-		"pm_map_label",
-		{ Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 7 },
-		self.label,
-		Parchment.SliceFor("pm_map_label", { 0, 0, 196, 70 })
-	)
-	self.labelText = Parchment.Text("", { 28, 14, 140, 28 }, self.label, {
-		size = 18,
-		align = "Center",
-		scaled = true,
-		minSize = 10,
-		z = 8,
+		end,
 	})
-	-- The player's own position (world Map), hidden until SetMarker.
-	self.marker = Widgets.Make("Frame", {
-		Name = "You",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		BackgroundColor3 = Layout.Color("cream"),
-		BorderSizePixel = 0,
-		Size = UDim2.fromOffset(24, 24),
-		Visible = false,
-		ZIndex = 9,
-	}, canvas)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, self.marker)
-	Widgets.Make("UIStroke", { Color = Layout.Color("leather"), Thickness = 4 }, self.marker)
-	if opts.zoomButtons then
-		self.zoomIn = Parchment.Button("pm_button_zoom_in", opts.zoomButtons[1], parent, function()
-			self:Zoom(1)
-		end, { name = "ZoomIn", z = 8, pad = 6 })
-		self.zoomOut = Parchment.Button("pm_button_zoom_out", opts.zoomButtons[2], parent, function()
-			self:Zoom(-1)
-		end, { name = "ZoomOut", z = 8, pad = 6 })
-	end
-	self:_drag(clip)
-	self:_place()
-	return self
+	self.maid:Give(base.maid)
+	self.pins[place.id] = { frame = base.root, place = place, control = control }
 end
 
 -- Positions the canvas so `focus` sits in the middle (kept inside the image).
@@ -165,33 +192,33 @@ function IslandMap:_place()
 	self.canvas.Size = UDim2.fromOffset(side, side)
 	self.canvas.Position = UDim2.fromOffset(x, y)
 	if self.zoomIn then
-		self.zoomIn.SetEnabled(self.zoomIndex < #IslandMap.ZOOMS)
-		self.zoomOut.SetEnabled(self.zoomIndex > 1)
+		self.zoomIn:SetEnabled(self.zoomIndex < #IslandMap.ZOOMS)
+		self.zoomOut:SetEnabled(self.zoomIndex > 1)
 	end
 end
 
 -- Dragging the map (mouse or finger) pans it while zoomed in.
 function IslandMap:_drag(clip: Frame)
-	local drag = Widgets.Make("TextButton", {
+	local drag = Kit.Core.Make("TextButton", {
 		Name = "Drag",
 		Text = "",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,
 		Selectable = false,
 		Size = UDim2.fromScale(1, 1),
-		ZIndex = 4,
+		ZIndex = clip.ZIndex + 1,
 	}, clip) :: TextButton
 	local active: InputObject? = nil
 	local last: Vector3? = nil
-	drag.InputBegan:Connect(function(input: InputObject)
+	self.maid:Give(drag.InputBegan:Connect(function(input: InputObject)
 		local kind = input.UserInputType
 		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
 			active, last = input, input.Position
 			-- Whoever follows a moving marker leaves the map alone meanwhile.
 			self.dragging = true
 		end
-	end)
-	UserInputService.InputChanged:Connect(function(input: InputObject)
+	end))
+	self.maid:Give(UserInputService.InputChanged:Connect(function(input: InputObject)
 		if active == nil or last == nil then
 			return
 		end
@@ -210,13 +237,13 @@ function IslandMap:_drag(clip: Frame)
 			math.clamp(self.focus[2] - delta.Y / side, 0, 1),
 		}
 		self:_place()
-	end)
-	UserInputService.InputEnded:Connect(function(input: InputObject)
+	end))
+	self.maid:Give(UserInputService.InputEnded:Connect(function(input: InputObject)
 		if input == active or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			active, last = nil, nil
 			self.dragging = false
 		end
-	end)
+	end))
 end
 
 function IslandMap:Zoom(step: number)
@@ -231,9 +258,12 @@ function IslandMap:Focus(x: number, z: number)
 	self:_place()
 end
 
--- Shows the name plate on pin `id` (nil hides it).
+-- Shows the name plate on pin `id` (nil hides it); the pin draws selected.
 function IslandMap:Select(id: string?)
 	self.selected = id
+	for pinId, pin in self.pins do
+		pin.control:SetSelected(pinId == id)
+	end
 	local entry = id and self.pins[id]
 	self.label.Visible = entry ~= nil
 	if entry then
@@ -248,7 +278,7 @@ function IslandMap:Select(id: string?)
 end
 
 -- Live markers (the world Map's portals and events): {{id, x, z, name, color}},
--- each a small tinted diamond with its name beside it. Replaces the last set.
+-- each a small dot in its colour with its name beside it. Replaces the last set.
 function IslandMap:SetMarkers(markers)
 	for _, old in self.extra or {} do
 		old:Destroy()
@@ -256,7 +286,7 @@ function IslandMap:SetMarkers(markers)
 	self.extra = {}
 	for _, entry in markers do
 		local u, v = IslandMap.ToMap(entry.x, entry.z)
-		local holder = Widgets.Make("Frame", {
+		local holder = Kit.Core.Make("Frame", {
 			Name = entry.id,
 			AnchorPoint = Vector2.new(0, 0.5),
 			BackgroundTransparency = 1,
@@ -264,15 +294,22 @@ function IslandMap:SetMarkers(markers)
 			Size = UDim2.fromOffset(200, 28),
 			ZIndex = 8,
 		}, self.canvas)
-		Widgets.Sprite("pm_glyph_diamond", {
+		local dot = Kit.Core.Make("Frame", {
 			Name = "Mark",
-			ImageColor3 = entry.color or Layout.Color("ink"),
-			Position = UDim2.fromOffset(0, 0),
-			Size = UDim2.fromOffset(26, 28),
+			BackgroundTransparency = 1,
+			Position = UDim2.fromOffset(2, 3),
+			Size = UDim2.fromOffset(22, 22),
 			ZIndex = 8,
 		}, holder)
-		local text = Parchment.Text(entry.name, { 30, 0, 170, 28 }, holder, { size = 18, z = 8, name = "Name" })
-		text.TextStrokeColor3 = Layout.Color("cream")
+		Kit.Art.Plate(dot, "dot.yellow", 22, 22, { z = 8, tint = entry.color })
+		local text = Kit.Text.new(holder, {
+			name = "Name",
+			rect = { 30, 0, 170, 28 },
+			text = entry.name,
+			role = "hudSmall",
+			zIndex = 8,
+		}).root
+		text.TextStrokeColor3 = Kit.Tokens.Color("cream")
 		text.TextStrokeTransparency = 0.2
 		table.insert(self.extra, holder)
 	end
@@ -285,6 +322,14 @@ function IslandMap:SetMarker(x: number?, z: number?)
 		local u, v = IslandMap.ToMap(x, z)
 		self.marker.Position = UDim2.fromScale(u, v)
 	end
+end
+
+function IslandMap:Destroy()
+	for _, old in self.extra or {} do
+		old:Destroy()
+	end
+	self.extra = {}
+	self.maid:Clean()
 end
 
 return IslandMap

@@ -1,230 +1,143 @@
--- Ancestral Forge (GDD §15–16, §25.3) in the parchment recipe window
--- (Hud/CraftingPanel, forge mode). The Forge navigation button opens it in the
--- lobby: one tab per category, counts are vault-only Owned/Needed, and locked
--- recipes show what unlocks them. A Permanent conversion lists the vault gear it
--- can use (that gear first in the list) and asks for confirmation, naming the
--- exact item and the Permanent rules, before anything is spent. Lobby place only.
+-- Ancestral Forge (GDD §15–16, §25.3) in the recipe window (Hud/Screens/
+-- RecipeWindow, forge mode). The Forge tile opens it in the lobby. Counts are
+-- vault-only Owned/Needed; a special recipe may be forged in a batch (QUANTITY,
+-- up to the snapshot's maxCount, all paid for in one request or none of it);
+-- locked recipes show what unlocks them. A Permanent conversion names the exact
+-- vault item (the player picks one when there are several) and the Permanent
+-- rules, and CONVERT is press-and-hold before anything is spent. The snapshot is
+-- fetched when the window opens and after each request. Lobby place only.
 
-local ContextActionService = game:GetService("ContextActionService")
-local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local ForgeRecipes = require(ReplicatedStorage.Shared.Crafting.ForgeRecipes)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local CraftingPanel = require(script.Parent.Parent.Hud.CraftingPanel)
+local RecipeWindow = require(script.Parent.Parent.Hud.Screens.RecipeWindow)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local ForgeController = {}
 
-ForgeController.CONFIRM_DELAY = 1.5
-
--- Category tabs and their glyphs.
-ForgeController.GLYPHS = {
-	Tools = "pm_glyph_tools",
-	Weapons = "pm_glyph_sword",
-	Armor = "pm_glyph_armor",
-	Supplies = "pm_glyph_bag",
-	Permanent = "pm_glyph_diamond",
-}
+-- How long CONVERT is held before a Permanent conversion is sent.
+ForgeController.CONFIRM_DELAY = RecipeWindow.CONVERT_HOLD
 
 local player = Players.LocalPlayer
-local panel = nil
+local window = nil
 local busy = false
-
-local CLOSE_ACTION = "FlintbornForgeClose"
+local loaded = false
 
 local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
+	local ok, success, result = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
 	if not ok then
 		return false, "Request failed"
 	end
-	return success, reason
+	return success, result
 end
 
-local function rollText(roll: number?): string
-	return if roll and roll ~= 0 then ("%+.1f%%"):format(roll * 100) else ""
-end
-
--- A snapshot recipe as the window lists it.
-local function entryFor(recipe)
-	local inputs, can = {}, CraftingPanel.MAX_BATCH
-	for _, input in recipe.inputs do
-		table.insert(inputs, { id = input.catalogId, name = input.name, owned = input.owned, needed = input.needed })
-		can = math.min(can, if input.needed > 0 then input.owned // input.needed else can)
+-- Player-facing text for a refusal code.
+local function reasonText(code: any): string
+	local text = Reasons.Text(code)
+	if text == tostring(code) and RecipeModel.REASONS[code] then
+		return RecipeModel.REASONS[code]
 	end
-	local permanent = recipe.kind == ForgeRecipes.Kinds.Permanent
-	local sources = nil
-	if permanent then
-		sources = {}
-		for _, source in recipe.sources or {} do
-			table.insert(sources, { id = source.instanceId, name = source.name, detail = rollText(source.qualityRoll) })
+	return text
+end
+
+local function refresh()
+	local ok, view = pcall(function()
+		return Remotes.Get("ForgeSnapshot"):InvokeServer()
+	end)
+	if not ok or type(view) ~= "table" then
+		-- The list stays as it was; say so only before the first snapshot.
+		if not loaded then
+			window:SetStatus("Still loading", "Your data is still loading. Try again in a moment.", "warn")
 		end
+		return
 	end
-	return {
-		id = recipe.id,
-		output = recipe.output,
-		name = recipe.name,
-		quantity = recipe.quantity,
-		category = recipe.category,
-		inputs = inputs,
-		can = can,
-		here = true,
-		where = "From your vault",
-		timed = false,
-		locked = not recipe.unlocked,
-		lockText = if recipe.requirement ~= "" then recipe.requirement else "Locked",
-		verb = if permanent then "CONVERT" else "FORGE",
-		sources = sources,
-		raw = recipe,
-	}
+	loaded = true
+	local entries = RecipeModel.ForgeEntries(view)
+	window:SetEntries(entries, RecipeModel.Materials(entries))
 end
+ForgeController.Refresh = refresh
 
-local refresh
-
-local function submit(recipeId: string, sourceId: string?)
-	busy = true
-	panel:SetBusy(true)
-	-- One nonce per confirmed request; a retry of the same request reuses it.
-	local nonce = HttpService:GenerateGUID(false)
-	local ok, result = invoke("ForgeCraft", recipeId, sourceId, nonce)
-	if not ok and result == "Request failed" then
-		ok, result = invoke("ForgeCraft", recipeId, sourceId, nonce)
+-- Sends one forge request: `count` crafts of `entry` (a Permanent conversion
+-- always 1, with its source item). One nonce per request; a transport retry
+-- reuses it so the server never charges twice.
+local function submit(entry, count: number, sourceId: string?)
+	if busy then
+		return
 	end
-	panel:SetStatus(
-		if ok then "Forged. Check your lobby backpack or vault." else ("Not forged: " .. Reasons.Text(result))
-	)
+	busy = true
+	window:SetBusy(true)
+	local nonce = HttpService:GenerateGUID(false)
+	local ok, result = invoke("ForgeCraft", entry.id, sourceId, nonce, count)
+	if not ok and result == "Request failed" then
+		ok, result = invoke("ForgeCraft", entry.id, sourceId, nonce, count)
+	end
+	if ok then
+		local title, text = RecipeModel.ForgeReceipt(entry, result, count)
+		window:SetStatus(title, text, "item")
+	else
+		window:SetStatus(
+			if entry.kind == ForgeRecipes.Kinds.Permanent then "Not converted" else "Not forged",
+			reasonText(result),
+			"warn"
+		)
+	end
 	refresh()
 	busy = false
-	panel:SetBusy(false)
+	window:SetBusy(false)
 end
 
-local function confirm(entry, sourceId: string)
-	local source = nil
-	for _, candidate in entry.raw.sources or {} do
-		if candidate.instanceId == sourceId then
-			source = candidate
-		end
-	end
-	if source == nil then
+local function onForge(entry, count: number)
+	if busy then
 		return
 	end
-	local spend = {}
-	for _, input in entry.inputs do
-		table.insert(spend, ("%s ×%d"):format(input.name, input.needed))
+	if entry.kind == ForgeRecipes.Kinds.Permanent then
+		window:ConfirmConversion(entry, function(sourceId: string)
+			task.spawn(submit, entry, 1, sourceId)
+		end)
+	else
+		task.spawn(submit, entry, count, nil)
 	end
-	local roll = rollText(source.qualityRoll)
-	panel:Confirm(
-		("Convert this %s%s into a Permanent item?\n\nSpends from your vault: %s.\n\n"):format(
-			source.name,
-			if roll ~= "" then (" (quality %s, kept exactly)"):format(roll) else "",
-			table.concat(spend, ", ")
-		)
-			.. "Permanent items stay with you when you die. Dropping one lets whoever picks it up own it, "
-			.. "and trading transfers it. The ordinary version is consumed. This cannot be undone.",
-		"CONVERT",
-		ForgeController.CONFIRM_DELAY,
-		function()
-			task.spawn(submit, entry.id, sourceId)
-		end
-	)
-end
-
-function refresh()
-	local view = invoke("ForgeSnapshot")
-	if type(view) ~= "table" then
-		-- Keeps a forge result on screen; the list just stays as it was.
-		if panel.card.status.Text == "" then
-			panel:SetStatus("Your data is still loading.")
-		end
-		return
-	end
-	local entries = {}
-	for _, recipe in view.recipes do
-		table.insert(entries, entryFor(recipe))
-	end
-	-- Permanent conversions for gear already in the vault come first.
-	local order = {}
-	for index, entry in entries do
-		order[entry] = index
-	end
-	table.sort(entries, function(a, b)
-		local aHas = a.sources ~= nil and #a.sources > 0
-		local bHas = b.sources ~= nil and #b.sources > 0
-		if aHas ~= bHas then
-			return aHas
-		end
-		return order[a] < order[b]
-	end)
-	panel:SetEntries(entries)
-end
-
-local function close()
-	ContextActionService:UnbindAction(CLOSE_ACTION)
-	panel:HideConfirm()
-	local focus = GuiService.SelectedObject
-	if focus and focus:IsDescendantOf(panel.screen.gui) then
-		GuiService.SelectedObject = nil
-	end
-	panel.screen:SetOpen(false)
 end
 
 local function build()
 	local categories = {}
 	for _, id in ForgeRecipes.Categories do
-		table.insert(categories, { id = id, label = id, glyph = ForgeController.GLYPHS[id] or "pm_glyph_bench" })
+		table.insert(categories, { id = id, label = id })
 	end
-	panel = CraftingPanel.new(player:WaitForChild("PlayerGui"), {
-		onClose = close,
-		onCraft = function(entry, _, sourceId)
-			if busy then
-				return
-			end
-			if entry.sources then
-				if sourceId then
-					confirm(entry, sourceId)
-				end
-			else
-				task.spawn(submit, entry.id, nil)
-			end
-		end,
-		onStop = function() end,
-	}, {
+	window = RecipeWindow.new({
 		mode = "forge",
 		name = "FlintbornForge",
-		window = "pm_window_forge",
-		title = "ANCESTRAL FORGE",
+		title = "Ancestral Forge",
+		subtitle = "Turn raw materials into tools for the island.",
+		icon = "anvil_hammer",
 		categories = categories,
+		parent = player:WaitForChild("PlayerGui"),
+		onForge = onForge,
 	})
-	panel.screen:Watch()
+	window:Watch()
+	ForgeController.window = window
 end
 
--- Opens or closes the window (the Forge navigation button).
+-- Opens or closes the window (the Forge tile). Escape / B close it (Kit.Modal).
 function ForgeController.Toggle()
-	if panel.screen:IsOpen() then
-		close()
+	if window == nil then
 		return
 	end
-	panel:SetStatus("")
-	panel:HideConfirm()
-	panel.screen:SetOpen(true)
-	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin then
-			if panel:IsConfirming() then
-				panel:HideConfirm()
-			else
-				close()
-			end
-		end
-		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.ButtonB)
-	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
-		GuiService.SelectedObject = panel.close
+	if window:IsOpen() then
+		window:Close()
+		return
 	end
+	window:Open()
 	task.spawn(refresh)
+end
+
+function ForgeController.IsOpen(): boolean
+	return window ~= nil and window:IsOpen()
 end
 
 function ForgeController.Start()
@@ -232,6 +145,16 @@ function ForgeController.Start()
 		return
 	end
 	build()
+	-- The vault changing elsewhere (a deposit or withdrawal) refreshes the counts.
+	local ok, VaultController = pcall(require, script.Parent.VaultController)
+	local changed = ok and type(VaultController) == "table" and (VaultController :: any).Changed
+	if changed and changed.Connect then
+		changed:Connect(function()
+			if window:IsOpen() and not busy then
+				task.spawn(refresh)
+			end
+		end)
+	end
 end
 
 return ForgeController
