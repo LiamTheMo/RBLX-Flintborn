@@ -1001,3 +1001,825 @@ All 15 recommendations are accepted.
 15. **Budget:** about 2400–2700 tris, ceiling 3200.
 
 **Binding checks.** The §1.5 checks that set it apart from M042 (scale, slab plates, peg joints, smooth trunk, broad rosettes, pale rocks) are binding. So are the f34 shares, within ±4.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m045.py` (`build()`), work file `art/blender/assets/kit/wip/M045.blend`, background
+session on port 9881. Patterns copied from m042 (not imported): cut tests, contact report, `_post`, the trunk union
+through `m033._union_fine`. `m033._zip` was **not** reused: it skips a vertex of the inner ring that lies just before
+the outer ring's first vertex (it left a triangle over the recess corner, a self-intersection), so m045 has its own
+`_zip` that starts both rings from a common reference angle.
+
+**Parts, each from its own function:**
+- `plate()`: one closed 34-tri paddle slab, **0.20 thick everywhere** (straight side walls under the whole outline).
+  Stations at 0 / 0.45 / 0.78 / 1.0 L with half-widths 0.08 / 0.50 / 0.425 / 0.09 W: a narrow buried root, widest at
+  0.45 L, and a **chisel tip 0.18 W wide**. A midrib fold is raised 0.11 W on stations 1-3. The outer part bends down by
+  `droop` in two steps (at 0.45 and 0.78 L), and the plate is rolled about its own axis. The chord is fitted so the tip
+  anchor lands on the requested (r1, z1).
+- `_core(kind)`: one closed shell per tier.
+  - Lower / middle: an octagonal peg on a flat cap, a pleated frustum (corners at the row-A azimuths ±0.1), an underside
+    down to a flat ring, and a **square recess turned 45°** (a diamond from the front). Its walls and ceiling are faces
+    of the same shell.
+  - Crown: the 4 + 4-ridge star cone (apex 10.0, rim z 8.6), its underside, the flat ring and the square recess.
+  - Recess half-side = the entering piece's apothem + 0.045 (wall clearance 0.045-0.065).
+- `tier(kind)`: the core, then row A, then row B.
+  - Every plate is tested against the plates already placed, and against the plates of the tier below (`_below`, a
+    probe build, so a part built alone equals the hero's tier).
+  - The test is a **cut depth**: the deepest sample of either slab inside the other, ignoring samples hidden in the
+    core.
+  - A plate cutting more than 0.05 is rolled further. A lift / sink plate is first moved whole, then turned about its
+    root. Narrowing (×0.96) is the last resort.
+- `trunk_body()` + `root()` ×6:
+  - **Body:** 8-sided and tapered, with a face toward −Y. Rings (z / width across flats): 0.04 / 2.30, 1.0 / 2.10,
+    1.5 / 1.60, 2.0 / 1.37, 2.5 / 1.25, 3.1 / 1.19, 3.8 / 1.14, 4.4 / 1.10. Vertex jitter ±0.035, with the top two
+    rings exact for the recess.
+  - **2 knots:** a facet inset 0.11 and pulled in 0.05, front-right at z 2.8 and left-back at z 2.25.
+  - A flat top (the peg) and a flat bottom.
+  - **Six short blunt root flares:** pentagon-section blocks with an off-centre top ridge, flat cut ends 0.35 × 0.30,
+    bottoms at z 0.08. RFR 315° r 2.5, RF 255° r 1.6, RL 200° r 1.9, RBL 145° r 1.8, RB 85° r 2.0, RR 355° r 1.8.
+  - The roots are exact-unioned in one at a time at the world origin: one closed shell.
+- `patch()`: a 12-point lobed outline (ellipse 3.45 × 2.95 with lobes, let out 0.2 beyond every item's footprint), a flat
+  crest at z 0.12, a bevel 0.35 wide down to 0.03, a short side and a flat underside at z 0.
+- `rock()` ×4: the hull of ring stacks, jitter 6 %.
+  - Rings: base 0.90 / 6 points, widest 1.0 at 0.22 h / 7, shoulder 0.95 at 0.74 h / 6, flat crown 0.70 at h / 5. The
+    crown slopes 10-14 % to one side.
+  - Sizes: RM 1.9 × 1.6 × 1.15, RS1 1.5 × 1.2 × 0.95, RS2 1.1 × 0.95 × 0.72, RS3 1.0 × 0.9 × 0.62 (W : H 1.4-1.65).
+  - Each is sunk 0.08 into the patch top under it (`_patch_z`).
+- `rosette()` ×4 and `sprig()` ×3:
+  - Five-sided hub pyramids sunk 0.03 into the patch.
+  - Leaves are closed 12-tri broad pointed ovals (`_leaf12`): widest (W) at 0.4 L, L : W 1.55, a V fold of 16°, the tip
+    arching out. The outer ring is pitched 46-58°, the inner ring 64-78°.
+  - A leaf that would cut a rock, the trunk or a root is turned or shortened. P4 and S3 each dropped one leaf: 51
+    leaves.
+
+**Tiers as built.** These were tuned on the renders; the spec's §2.2 numbers were changed where the renders showed it.
+
+| Tier | Row A (long, one at −Y) | Row B | Core: cap / peg / recess mouth |
+| --- | --- | --- | --- |
+| Lower | 7, root (0.75, 5.85) → tip (3.80, 2.75), front 2.45, W 2.0, droop 15 | 7 **sink**, (0.70, 5.50) → (2.90, 3.35), W 1.75 | cap r 0.85 @ 6.10, peg Ø 0.9 → 6.50, mouth 3.80 (ceiling 4.415) |
+| Middle | 7, (0.60, 7.50) → (3.00, 5.15), front 4.85, W 1.65 | 7 **sink**, (0.55, 7.15) → (2.30, 5.40), W 1.4 | cap r 0.70 @ 7.90, peg Ø 0.75 → 8.25, mouth 6.115 (ceiling 6.515) |
+| Crown | 4 long hem, (0.50, 8.75) → (1.75, 7.25), front 7.05, W 1.3 | 4 short hem **sink**, (0.45, 8.55) → (1.48, 7.38), W 1.1; 4 upper **lift**, (0.30, 9.05) → (1.22, 8.25), W 0.95 | star cone apex 10.0, rim 8.6, mouth 7.915 (ceiling 8.265) |
+
+Why the changes (each was tried and measured):
+1. **Row B sits under row A ("sink"), not on it.**
+   - With row B resting on row A (the spec), the 0.20 slabs plus the rolled A edges at the seams (about 0.4 above the
+     cone) forced row B 0.5-0.65 higher.
+   - The tiers then became fat domes with no waists (front waist widths .66-.76 against the sheet's .49), or, with lifted
+     tips, flat cabbage tops.
+   - With row A as the outer cone through the sheet's waist (lower tier r 1.7 at z 4.9), and row B tucked about 0.3
+     under it, every front / side / rear hem lands within 0.03 of the sheet (table below). The B plates show in the V
+     gaps between the A roots and tips, a step higher than the A tips.
+   - Trade-off: from the f34 (e 16) the upper ring of plates the sheet draws **on top** of each tier is not seen; the f34
+     reads as long hem plates.
+2. **Row A is 13 % narrower than the spec (2.0 / 1.65 instead of 2.3 / 1.9).** At 2.3, seven plates overlap 0.6 at
+   their widest. The rolls that needed (up to 22°) lifted the edges and caused every row-B conflict. At 2.0 the rolls are
+   6-12°.
+3. **The cores are taller, so the stack seats moved** (lower cap 6.10, middle mouth 6.115, middle cap 7.90, crown mouth
+   7.915): the 45° row-A roots sit higher than the spec's caps.
+4. **The hem tips are lower and wider** (lower 2.75 at r 3.8, middle 5.15 at r 3.0, crown 7.25). Our widest row is the
+   plates' 0.78 L corners, above the tips; with the tips moved, the measured hems match the sheet.
+5. **Hero depth 7.7 (the spec's bbox said 6.8).** The canopy (tips r 3.8) is now the deepest thing, not the patch (the
+   patch is 6.9 × 6.4). `TARGET_SIZE` is 7.9 ± 0.4 × 7.6 ± 0.4 × 10.0 ± 0.2.
+
+**Hero `PineSapling`** = patch + rocks + plants + the lower, middle and crown tiers, with the unioned trunk joined in. It
+is one object of 107 closed shells: patch 1, trunk 1, cores 3, plates 40, rocks 4, hubs 7, leaves 51.
+
+**Parts:** `PineSaplingTopTier`, `…MiddleTier`, `…LowerTier`, `…Trunk`, `…GroundFoliage` (rosette P1 + hub),
+`…RockMedium` (RM) and `…RockSmall` (RS2). Each sits at the origin (bottom centre); `o["m045_offset"]` is that origin in
+the build frame.
+
+**Measured on the renders** (`m045w/tiers_r.py`, the study's masks; floor hidden, 3× lens):
+
+| View | Hems h / width (sheet) | Waists h / width (sheet) | Canopy W / H |
+| --- | --- | --- | --- |
+| front_sheet (0, 5) | .749 / .49 (.749 / .48); .551 / .82 (.529 / .81); .326 / 1.0 (.309) | .720 / .35 (.722 / .29); .509 / .58 (.486 / .49) | .720 (.714) |
+| side_sheet (90, 5) | .749 / .47 (.746 / .48); .520 / .78 (.542 / .77); .303 (.304) | .491 / .65 (.492 / .46) | .731 (.700) |
+| rear_sheet (180, 5) | .749 / .48 (.746 / .45); .546 / .81 (.531 / .81); .317 (.312) | .720 / .35 (.727 / .29); .514 / .54 (.492 / .50) | .737 (.708) |
+| f34_sheet (−15, 16) | .766 / .48 (.762 / .50); .563 / .81 (.577 / .81); .340 / 1.0 (.379) | .729 / .42 (.731 / .33); .514 / .66 (.526 / .50) | W : H .693 (.726) |
+
+- **Trunk widths** (front cell, as a fraction of the canopy W): h .25 .179 (.178), .20 .202 (.195), .15 .262 (.227),
+  .10 .286 (.303).
+- Bark shows from h 0 to .27-.33 in every side view (sheet .30-.34).
+
+## Stage 2 — Optimisation and cleanup
+
+- **Tris:** hero **2910** (plan 2400-2700, ceiling 3200, limit 4000).
+  - By shell type: plates 1360 (40 × 34), leaves 612 (51 × 12), trunk 348 (body + 6 unioned roots), cores 262, rocks
+    176, patch 96, hubs 56.
+  - Parts: TopTier 470, MiddleTier 576, LowerTier 576, Trunk 348, GroundFoliage 140, RockMedium 44, RockSmall 44. All
+    are under 1000.
+- **`M.audit` on all 8 objects:** non-manifold edges 0, **bowtie / non-manifold verts 0**, boundary 0, wire 0, loose 0,
+  zero-area 0, n-gons 0, duplicate verts 0, normals outward, transforms applied, origin at the bottom centre.
+  - The hero's bbox centre is the origin; its build-frame offset is (0.095, −0.24, 0).
+  - Per-shell report: every shell is closed and outward (volume > 0), with 0 self-intersections.
+  - Trunk: 1 shell, 6 unions, 0 union retries, 22 slivers collapsed.
+- **Thin triangles:** the parts have none under 2° (trunk minimum 2.04°). The hero has 24 faces under 2° (minimum
+  0.9°), on the joined trunk copy after the hero's triangulate pass. Not an error; listed for the verifier.
+- **Sizes:** hero 7.76 × 7.70 × 10.00; TopTier 3.73 × 3.78 × 3.09; MiddleTier 6.23 × 5.93 × 3.49; LowerTier 7.64 ×
+  7.68 × 4.15; Trunk 3.64 × 3.97 × 4.36; GroundFoliage 2.21 × 2.54 × 1.37; RockMedium 1.83 × 1.55 × 1.27; RockSmall
+  1.03 × 0.94 × 0.78.
+- **Contact (no floating dressing):**
+  - Hero: floating 0, unchained 0, max gap 0.000.
+  - Core seats **0.015 / 0.015 / 0.015** (trunk top → lower recess ceiling, lower peg → middle, middle peg → crown), with
+    0 core / trunk intersections: the pegs clear the recess walls.
+  - 41 plate pairs touch and **0 cut more than 0.05** (deepest 0.048). 0 leaves cut a rock or the trunk.
+  - Each tier part: floating 0, unchained 0, deepest cut 0.035 / 0.047 / 0.048.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED, margin 0.008), then `m012._uv_unfold`.
+- Every object: 0 overlapping pairs, 0 flipped, minimum island gap 0.016, border 0.008, texel density min / median / max
+  1.0 / 1.0 / 1.0, conformal stretch p95 1.00-1.03.
+- Islands: hero 939, TopTier 179, MiddleTier 191, LowerTier 182, Trunk 52, GroundFoliage 44, rocks 11 / 8.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration:** `K.calibrate` (6 iterations) against the spec's §5.4 targets gave:
+
+  | Key | Calibrated | Rendered (target) |
+  | --- | --- | --- |
+  | needle | #80A233 | 156,196,52 (#9EC534) |
+  | needle_light | #88A635 | |
+  | needle_deep | #25663D | 41,118,63 (#28723F) |
+  | bark | #8C5116 | 176,99,41 (#B06325) |
+  | bark_light | #BB7428 | |
+  | bark_deep | #5A3218 | |
+  | rock | #A49C96 | 207,191,175 (#CEC0B4) |
+  | rock_light | #B0A8A0 | |
+  | rock_deep | #8C8A89 | |
+  | sand | #BCAA88 | 238,208,157 (#EFD19D) |
+  | sand_deep | #B6A381 | |
+  | plant | #8FA41C | 176,198,28 (#AFC518) |
+  | plant_deep | #436B25 | |
+  | plant_dark | #1E4A26 | |
+- **Pass 2 on the f34_sheet render.** As m042 found, the studio lights both halves of the canopy almost alike, so a
+  needle base calibrated to the sheet's lit half made the whole canopy lime (median #88B736 against #519037). Final
+  `PALETTE`:
+  - needle **#4B8034**, needle_light **#B4C82C**, needle_deep **#1E5A3A**;
+  - bark **#B06624**, bark_light #C47A2C, bark_deep #643A1C;
+  - rock **#A49D99**, rock_light #B0A9A4, rock_deep #8C8A89;
+  - sand #BCAA88, sand_deep #B6A381;
+  - plant **#879C1A**, plant_deep #436B25, plant_dark **#2A5A2C**.
+- **Blends** (position and role only, `_mix` in 25 % steps):
+  - **Plates:** each plate has three bands along its own axis (root / middle / tip), on the deep ↔ light axis:
+    - lower A (−.5, −.25, +.25), lower B (−.5, −.25, 0);
+    - middle A (−.25, 0, +.5), middle B (−.25, 0, +.25);
+    - crown long (+.25, +.5, +.75), crown short (0, +.25, +.5), crown upper (+.25, +.5, +.75).
+    The crown is the lightest tier.
+  - **Cores:** needle_deep 75 % (peg 50 %); the flat joining ring 25 % (the lighter ring of close-up 1); recess pockets
+    bark_deep (hard: a socket). The crown cone is needle_light 75 %.
+  - **Trunk:** bark; the lowest band (z < 1) and the bottom 25 % deep; knots bark_deep, with their inset walls 50 %.
+    Root faces below z 0.5 are 25 % deep and the cut ends 50 % deep.
+  - **Rocks:** the top 25 % of the height +50 % light, the next 15 % +25 % light, the lowest 25 % +25 % deep.
+  - **Sand:** the bevel 50 % deep; within 0.35 of the trunk, roots, rocks and hubs 25 % deep.
+  - **Plants (by role):** the outer ring alternates lime and green, the inner ring is mostly dark, and the sprigs are
+    lime (one green). Each leaf's base faces are a step deeper. Hubs are plant_dark / bark_deep 25 %.
+- **Nothing is coloured by facing.**
+  - The trunk's flat top was bark_light and its bottom 75 % deep. K.check flagged that as baked lighting (corr 0.78), so
+    both now keep the body's colour at their height. The root-ridge highlights were dropped for the same reason.
+  - Final baked-shading correlations: hero 0.00, TopTier 0.21, Trunk 0.38 (limit 0.5), the others 0.00.
+- **Tint:** per-plate tone ±0.04 plus broad mottling 0.03 (scale 0.6); cores 0.03; bark per facet column ±0.04 plus a
+  0.04 mottle; roots 0.04; rocks 0.04 (scale 0.4); sand 0.03 (scale 0.15); leaves ±0.04 per leaf.
+- **Finish:** plates and plants rough 0.85 with low specular; bark 0.9, bark deep 0.95; rock 0.85; sand 0.95; no metal,
+  no emission.
+- **Re-measured on f34_sheet** (`m045w/col.py`):
+
+  | Region | Ours | Sheet | Check |
+  | --- | --- | --- | --- |
+  | Canopy median | #529535 | #519037 | within 15 ✓ |
+  | Canopy v > .7 | #9FC835 (hue 77, sat .74) | #A5C935 | within 12 ✓ |
+  | Crown right / lower right | #91BB30 / #498935 | | crown lighter ✓ |
+  | Trunk lit half | #A55C27 | #B06325 | within 12 ✓, R > G > B |
+  | Trunk v > .7 | #C66E2E | #E48230 | |
+  | Rock v > .7 | #CCC2B0 (hue 39) | #CDC2B5 | R ≥ G ≥ B ✓ |
+  | Sand | #F1D2A0 | #EFD19D | ✓ |
+  | Plants v > .7 | #B2C91D | #AFC518 | ✓ |
+  | Plant hue split lime / green / dark | 47 / 37 / 16 | 38 / 39 / 23 | within ±10 ✓ |
+
+  Canopies in the other views (ours | sheet): side #447829 | #5B9635, rear #477F2E | #519237, r34 #467F2D | #5A9636.
+  The near-level views read a little darker.
+- **Shares on f34_sheet** (ours | sheet): G 76.8 | 77.2, T 8.6 | 10.8, S 5.1 | 3.1, R 7.7 | 7.7. All are within the
+  binding ±4; S is at the edge of the spec's ±2.
+  - Front (ours | sheet): G 79.5 | 80.4, T 7.7 | 10.1, S 3.3 | 2.0, R 8.3 | 5.4.
+- **Known misses:**
+  - The sheet's shade half is a deep teal (hue 139) because its light comes from the right. Our studio lights the left of
+    the canopy, so our "shade half" reads hue ~101. Not painted (no colour by facing).
+  - The thin lime rim on the plate edges (close-up 2) is light, not paint, and is not reproduced.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing glowing and no light (spec §7). No emission, no PointLight.
+
+Studio notes (Requires Manual Validation): under the game's sun, check that the canopy reads lime in light and deep green
+in shade, the bark a saturated orange (not red), and the rock a pale neutral grey.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (spec §7). The hero has no VFX sockets (checked by `build()`).
+
+## Modeller's notes for the verifier
+
+**Renders** are in `art/blender/renders/models/M045/`; the contact sheet is `M045_views.png`.
+- Kit views: `front34`, `rear34`, `front`, `side`, `rear`, `top`, `underside`.
+- Sheet views: `f34_sheet` (−15/16), `r34_sheet` (165/16), `front_sheet` / `side_sheet` / `rear_sheet` (e 5),
+  `top_sheet`.
+- Parts: `part_toptier` … `part_rocksmall` (−15/20), plus `exploded` and `scale` (with a 5.5-stud marker).
+- Close-ups:
+  - `join_cu`: the lower tier lifted 1.4 off its trunk, seen from below: the flat lighter ring and the dark diamond
+    recess.
+  - `plate_cu`: lower-tier plates from −60/15: slab thickness and chisel tips.
+  - `underside_cu`: the hero without the patch, from below.
+  - `root_cu`.
+
+**Measuring scripts** (scratchpad `m045w/`):
+- `tiers_r.py <png> [cell]`: hems, waists and trunk widths with the study's masks.
+- `col.py <png> <cell>`: colour regions and shares.
+- `sbs.py <cell> <png> <out>`: side by side.
+- `cuts.py`: plate cut locations per tier.
+- `m045_study/measure_render.py` also works on our renders.
+
+**§1.5 differences from 042, as built:**
+- Height 10.0 (042: 16). Canopy tips r 3.8 (silhouette 7.2-7.6).
+- Trunk width 1.10 at the peg, 1.25 at z 2.5, 2.30 at the foot: ×2.1 from top to flare (042: ×1.6).
+- **0.20-thick constant slabs** with straight walls, a midrib fold and a 0.18 W chisel end (042: thin kites with a keel).
+- Plates 4 + 8 / 14 / 14 (042: 8 / 12 / 16).
+- **A peg and square recess at every joint**, seats 0.015 (042: flat caps and hubs).
+- **A smooth 8-sided trunk with 2 knots and 6 short blunt flares, r 1.6-2.5** (042: planked, with slits and long kinked
+  roots).
+- Rosettes of broad pointed-oval leaves, L : W 1.55 (042: lanceolate).
+- 4 pale neutral rocks, lit #CCC2B0, and no pebbles.
+- Bark lit half #A55C27, more saturated than 042's #BE6F30 target family.
+
+**Plate length : width (a binding check, not fully met):**
+- The visible length : width is about 1.4-1.5 on the crown and 1.75 on row B.
+- On the lower and middle row A it is **1.95-2.1** (lower A chord 4.35, width 2.0; middle A 3.36 / 1.65).
+- The sheet's 1.5 ratio with 0.20 slabs could not be kept together with the hem positions and the no-cut rule (Stage 1,
+  changes 1-2). The plates still read clearly as thick blunt slabs, not 042's kites, but they are narrower than the
+  sheet's.
+
+**Other leftovers:**
+- The f34 lower hem reads at h .340 (sheet .379); the front view matches.
+- The lower waists are wider than the sheet's (front .58 vs .49, side .65 vs .46): the middle tier's diagonal tips hang
+  into the waist band.
+- The f34 does not show row B on top of each tier, because row B is tucked under row A (Stage 1, change 1).
+- The top view shows only the canopy (G 97 %, R 2 %). With tips at r 3.8 the rocks at r 2.4-2.9 are covered, while the
+  sheet's top cell draws a smaller canopy than its front cell (spec §3.3).
+- The GroundFoliage part from −15/20 still reads somewhat spiky, because the outer leaves are seen edge-on.
+- The trunk part is a bright orange in the open studio. The hero's trunk is shaded by the canopy and matches the sheet.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier, read-only, background Blender on port 9881 (`kit/wip/M045_verify.blend`, which also holds M042). Every
+number below was re-measured with the verifier's own code (bmesh / BVH), not the builder's reports. Renders, side by
+sides and scripts are in the scratchpad `m045_verify/`: `f34_sheet`, `r34_sheet`, `front_sheet`, `side_sheet`,
+`rear_sheet`, `top_sheet`, `fir_*` (M042 at the same cameras), `cmp_*.png` (sheet cell | ours | 042), `cu_*.png`.
+
+### Measured
+
+| Object | Tris | Shells | Size (studs) | Boundary / non-manifold / wire / loose | Bowties | Zero-area / n-gons | Winding errors | Neg-volume shells | Self-isect (in shell) | Floating / unchained |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PineSapling (hero) | **2910** / 4000 (ceiling 3200) | 107 | 7.76 × 7.70 × 10.00 | 0 / 0 / 0 / 0 | 0 | 0 / 0 | **0** | 0 | 0 | **0 / 0** |
+| TopTier | 470 | 13 | 3.73 × 3.78 × 3.09 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| MiddleTier | 576 | 15 | 6.23 × 5.93 × 3.49 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| LowerTier | 576 | 15 | 7.64 × 7.68 × 4.15 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| Trunk | 348 | 1 | 3.64 × 3.97 × 4.36 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| GroundFoliage | 140 | 12 | 2.21 × 2.54 × 1.37 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| RockMedium | 44 | 1 | 1.83 × 1.55 × 1.27 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| RockSmall | 44 | 1 | 1.03 × 0.94 × 0.78 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+
+- **Winding:** every manifold edge was checked for opposite traversal by its two faces: 0 errors on all 8 objects. Every
+  shell has a positive signed volume.
+- **Transforms and origin:** rotation 0, scale 1, no modifiers, no custom normals, and one clean `UVMap` on each. Each
+  local bbox is symmetric in X and Y with z min 0, so the origin is at the bottom centre on all 8.
+- **Contact** (the verifier's own BVH code, tolerance 0.03, chained from the ground): the hero has 107 shells, 0
+  floating and 0 unchained; each part also has 0 / 0.
+  - Peg seats: trunk top → lower core **0.015**, lower core → middle core **0.015**, middle core → crown core
+    **0.015**.
+  - No core intersects the trunk or another core, so the pegs clear the recess walls.
+  - The trunk is sunk into the patch, and the rocks are sunk (they overlap it).
+- **Thin triangles:** 24 under 2° (0.90–1.06°, area 0.028 each), **all on the sand patch** (shell 0). They sit on its
+  0.03-high outer side wall at z 0.01–0.02 (12 segments × 2), not on the trunk as the modeller's notes say. Harmless.
+- **No lighting or VFX:** no emission and no VFX children.
+- **Collision:** hero `precise`; tiers, trunk and rocks `hull`; GroundFoliage `box`.
+- **Plates:** the crown has 12 plates plus its core, the middle 14 and the lower 14. The slabs measure 0.27 through the
+  fold centre (the 0.20 slab plus the midrib raise), so the thickness is constant (also seen in `plate_cu`).
+
+**Shape** (the study's masks, `measure_render.py` / `tiers_r.py`, on the verifier's renders):
+
+| View | W : H (sheet) | G / T / S / R (sheet) | Hems h / W (sheet) | Waists h / W (sheet) |
+| --- | --- | --- | --- | --- |
+| f34 (−15, 16) | .691 (.726) | **77.4 / 8.7 / 5.3 / 6.8** (77.2 / 10.8 / 3.1 / 7.7): all within the binding ±4 | .763/.48, .564/.81, **.342**/1.0 (.762/.50, .577/.81, .379/1.0) | .73/.42 (.73/.33); **.514/.66** (.526/.50) |
+| front (0, 5) | .724 (.723) | 80.3 / 7.8 / 3.5 / 7.3 | .746/.49, .551/.82, .328/1.0 (.749/.48, .529/.81, .309) | .720/.36 (.722/.29); **.511/.57** (.486/.49) |
+| side (90, 5) | .735 (.701) | 79.0 / 8.4 / 0.9 / 8.0 | .749/.47, .532/.77, .305/1.0 (.746/.48, .542/.77, .304) | .705/.39 (.723/.28); **.500/.64** (.492/.46) |
+| rear (180, 5) | .744 (.724) | 74.6 / 11.8 / 1.3 / 8.6 | .748/.48, .547/.82, .318/1.0 (.746/.45, .531/.81, .312) | .720/.35 (.727/.29); .518/.53 (.492/.50) |
+| r34 (165, 16) | .689 (.676) | 75.2 / 9.7 / 2.0 / 7.8 | crown hem **not found**, .571/.83, .357/1.0 (.782/.48, .560/.77, .372) | .728/.41; **.544/.72** (.512/.55) |
+| top (0, 89) | 1.00 (.99) | G **97.5** / R **1.7** (85.1 / 13.3) | | |
+
+**Colour** (medians of the same mask bands, f34, ours | sheet):
+
+| Region | Ours | Sheet | |
+| --- | --- | --- | --- |
+| Crown band | #94C037 (v .75) | #5D9B3F (v .61) | lightest ✓, but much more lime than the sheet |
+| Middle band | #569738 | #579335 | ✓ |
+| Lower band | #4B8B3A | #508F39 | ✓ |
+| Trunk right (lit) half / v > .7 | #A65C26 / #C66E2D | #B56525 / #E48230 | orange ✓, about 15 darker |
+| Rock v > .7 / median | #CCBFAF / #BAAE9F | #CDC2B5 / #B0AFA7 | R ≥ G ≥ B ✓, not mauve; a little warmer than the sheet |
+| Sand | #F1D3A0 | #EFD19D | ✓ |
+| Plants (G below 0.2 H) | **#465913 (h 76, v .35)**; front #41530F (v .33) | #558021 (h 87, v .50); front #5C831F | dark olive against lime-green |
+| Plant hue split lime / green / dark | 46 / 38 / 16 | 38 / 39 / 23 | ✓ within ±10 |
+
+- **Colour by facing: none.**
+  - Per material family, the verifier removed each shell's own position field (a plate's colour along its axis, a rock's
+    by height). The residual colour then correlates with normal z at **0.09 for plates** and **−0.03 for rocks**.
+  - Plate undersides are not darker than their tops: the mean top − bottom luminance is −0.06, and the axial bands
+    explain it.
+  - Raw correlations with height bands: rocks 0.91 (the spec's height bands, steps of about 4 %), sand 0.79 (the bevel
+    role, about 1.5 %), trunk 0.39 (under 0.5).
+  - `K.check` reports no problems. Stored baked-shading values: 0.00, TopTier 0.21, Trunk 0.38.
+- **Tint mottling** is broad (per plate and per facet). No confetti shows in the renders.
+
+### Findings
+
+1. **Blocker: the three tiers don't read as three distinct tiers from the side, rear and r34.**
+   - **The middle → lower waist is far too wide:** f34 .66 (sheet .50), side .64 (.46), r34 .72 (.55), front .57 (.49).
+     All but the rear are outside the spec's ±.06.
+   - **Why:** row B is tucked under row A, so each tier shows one ring of long plates running from the core to the hem.
+     The sheet shows two visible rows per tier: an upper ring whose tips stop mid-tier over the hem row, and a dark crease
+     under each hem.
+   - **The result:** in `side_sheet`, `rear_sheet` and `r34_sheet` the middle and lower tiers merge into one drooping
+     skirt. The tree reads as "crown + skirt", not the sheet's crisp three-step spire, and in the r34 the tier finder
+     finds no crown hem at all. This is the model's defining silhouette (spec §1.1 "must read as three distinct tiers",
+     pitfall 3).
+   - **Fix target:**
+     - Row B visible on top of each tier, its tips at about 0.5–0.6 of the tier's slope, with the row-A tips forming the
+       hem below.
+     - The lower tier's visible waist pulled in to W ≤ .56 in the f34, front and side views.
+     - A crown hem that the tier finder detects in the r34.
+     - The hems kept where they are now: they match within .02, except the f34 lower hem (finding 4).
+   - **Possible routes.** Don't lift row B onto the rolled row-A edges: that made fat domes. Either:
+     - shorten row A and root it further out (from r ≈ 1.3–1.5, under row B's mid-length), chained by contact to row B
+       and the core; or
+     - pitch row B steeper than row A, so it clears the row-A seams.
+2. **Blocker (decision 4, §1.5): the plate proportions.**
+   - **What:** row A on the lower and middle tiers is L : W 1.95–2.1, against the decided ≈ 1.5.
+   - **How it reads:** at hero scale these plates read as long hanging blades and fingers, most clearly the side plates
+     of both tiers in the f34. Close up (`plate_cu`) they are clearly thick, blunt, chisel-ended slabs. At no distance do
+     they read as 042's thin pointed kites, so the §1.5 difference from 042 holds, but the decided paddle shape does not.
+   - **Fix target:** a visible L : W ≤ 1.6 on every row. This follows from finding 1's two visible rows: each row covers
+     about half the slope, so plates about 2.2–2.6 long and 1.6–2.0 wide.
+3. **Blocker (§1.5 binding, pitfalls 4 and 9): the ground rosettes don't read as the sheet's broad-oval rosettes, and
+   they look like 042's clumps.**
+   - **Ours** (`cmp_base.png`, the `part_groundfoliage` render): low, splayed, dark-olive stars with pointed tips, an
+     agave look. They read almost the same as 042's lanceolate clumps beside them.
+   - **The sheet's:** upright fans of broad, round-tipped leaves, bright lime outside and green inside, standing taller
+     than the rocks.
+   - **Colour:** in the hero they are also darker than the sheet: median v .33–.35 against .50, hue 76 against 83–87.
+   - **Fix target:**
+     - Leaves with a rounded or blunt-oval tip, not a point, widest at 0.4–0.5 L, L : W ≈ 2.0–2.2.
+     - The outer ring pitched 60–75° and the inner ring 75–85°, so the fan stands up.
+     - P1 and P2 at least as tall as RS1 (≥ 1.3 visible).
+     - Re-measure on `f34_sheet`: the plant median within 15 of `#558021` and the v > .7 median near `#AFC518`. The
+       canopy shades the plants, so calibrate in the hero render, not the part.
+4. **Minor: the f34 lower hem is at h .342,** against the sheet's .379 (outside ±.03). The near-level views match. It
+   will likely move with finding 1. Target ±.03.
+5. **Minor: the crown is too lime.** Its band median is #94C037 (v .75) against the sheet's #5D9B3F (v .61), so the crown
+   reads as a separate yellow cap.
+   - Target: lower the crown's offsets by one step (for example the long plates 0 / +.25 / +.5, and the upper plates the
+     same).
+   - Keep the crown lighter than the lower tier, with the crown band median within 20 of #5D9B3F.
+6. **Minor: the bark is a little dark.** The lit half is #A65C26 against #B56525 (about 15 off; the spec allows 12), and
+   the v > .7 median is #C66E2D against #E48230. The front view's trunk falls to #83471C under the canopy. Target: raise
+   `m045_bark` about 6 % if the plates change the shading.
+7. **Minor: the top view.** The canopy is a rounded rosette (G 97.5 %, R 1.7 %) with no 8-point star outline. No rocks or
+   plants show beyond the canopy (sheet G 85 / R 13). The crown's 4-point star does read. A narrower, shorter row A
+   (findings 1 and 2) should help. It isn't binding on its own (spec §3.3).
+8. **Minor: the canopy tips reach r 3.8, against the decided r 3.5** (decision 1). The front W : H .72 is still in range,
+   and the hero is 7.7 deep. Acceptable as recorded; re-check after finding 1.
+9. **Minor: the rocks are a touch warm.** The median is #BAAE9F (hue 33°, sat .15) against the sheet's near-neutral
+   #B0AFA7.
+   - They meet the spec's lit target (#CCBFAF against #CEC0B4), are R ≥ G ≥ B and are never mauve.
+   - RockMedium is a chunky faceted block with a flat base, not an egg.
+   - No change required.
+10. **Minor: the 24 thin triangles are on the patch's 0.03-high side wall,** not the trunk; the modeller's notes
+    misattribute them. They are harmless at ground level. Optional fix: drop the side wall so the bevel runs straight to
+    z 0.
+11. **Passed:**
+    - the budgets, every mesh-hygiene check and the winding;
+    - floating dressing 0;
+    - the peg-and-recess seats of 0.015 with a square, diamond-turned recess (`join_cu` matches close-up 1);
+    - the constant 0.20 slab thickness with chisel ends (`plate_cu` matches close-up 2);
+    - the smooth, tapered 8-sided trunk with its knots and 6 blunt flares, which read in the f34, front, side and r34
+      and in `underside_cu`;
+    - the f34 shares, within ±4;
+    - the colour families (canopy, orange bark, R ≥ G ≥ B rock, sand), with nothing coloured by facing;
+    - no lighting and no VFX.
+
+    **Decisions:**
+    - 1, 2, 3, 5, 6, 7, 8, 10, 12, 13, 14 and 15 were followed.
+    - 4 was missed on L : W (finding 2).
+    - 9 was missed on "broad-oval rosettes" (finding 3).
+    - 11 was followed, but the crown is too lime (finding 5).
+12. **§1.5 against M042, side by side** (`cmp_f34.png`, `cmp_side.png`):
+    - **It differs on:** size (10 against 16); thick, blunt slabs against thin, pointed kites; the smooth trunk with
+      blunt flares against planks and kinked roots; the peg joints; and the bark.
+    - **It doesn't differ on the ground plants** (finding 3).
+    - Both canopies also use the same construction, one ring of long plates per tier, which brings them closer together
+      than the two sheets are. Finding 1 fixes that.
+
+**Score: 6 / 10.** The mesh, contact and colour discipline are clean. The defining tier read and the rosettes do not yet
+match the sheet.
+
+**Verdict: FAIL.** Blockers 1–3 go back to a fresh modeller: the stage 1 tier construction and the rosette leaves, then
+a stage 4 re-measure of the plants and the crown.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+A fresh fix modeller worked in a background Blender on port 9881 (`kit/wip/M045.blend`, saved after the final build).
+`m045.py` was edited. The final check ran in a freshly restarted session, and `build()`'s problems list is empty.
+Scratch work and measuring scripts are in the scratchpad folder `m045fix/`:
+- `it.py`: the tuning loop.
+- `env.py`: silhouette envelopes.
+- `meas.sh`: `tiers_r.py` on all five side views.
+- `col.sh`: the verifier's `bands.py` plus `col.py`.
+- `prof.py`: width profiles.
+- `cmp_042.png`: the side-by-side with M042.
+
+### What changed
+
+1. **Two visible rings per tier (blocker 1).** Round 1 tucked row B under row A, so each tier was one ring of long
+   plates, and the middle and lower tiers merged into one skirt. The lower and middle tiers are now built like this:
+   - **Row B (the upper ring, 7 plates over the A seams) is built first and lies on top.**
+     - Its roots are buried in the core. The core's pleated widest ring now reaches out to the waist: lower r 1.65 at
+       z 4.6, middle r 0.98 at z 7.0.
+     - The plates leave the core just under the hem above, at their narrow roots, so the waist stays narrow.
+     - The tips stop at about 0.55 of the tier's slope: lower z 3.9, middle z 6.3.
+     - The rows are steep: about 42° on the lower tier and 45° on the middle.
+   - **Row A (the hem ring, 7 plates, one aimed at the front) is built second, as a sink row.**
+     - It lies about 0.36 (normal) under row B's line and is rooted in the core's underside.
+     - A plate that still cuts row B is first turned down (`tip_first`), then moved whole.
+     - Its tips form the hem. The plate bends up 16-18° at 0.45 L, a slight flare, so the hem reaches the sheet's width
+       without widening the waist. Its chisel tip droops 14° at 0.78 L.
+   - **New plate mode.** `plate(..., length=L)` lays the unbent inner part from the root toward an aim point, L long,
+     so both rows are parallel layers. `droop` may also be a pair: the bend at 0.45 L and the bend at 0.78 L.
+   - **Rolls.** Row B rolls only 0-6°, because the rings barely overlap. Aim rows may roll up to +24° before any
+     narrowing.
+   - **Midrib fold.** `RIDGE` is now 0.08 W (spec 0.07; round 1 had 0.11), which leaves room for the stacking.
+   - **Crown.** It keeps its round-1 construction: 4 long hem plates, 4 short and 4 upper on the star cone. The long hem
+     plates are now 1.38 wide (was 1.3), and the front one's tip is at 7.15 (was 7.05).
+   - **Hems held.** The lower row A aims at z 3.2 and the middle at 4.62. With the flare and droop, the hems land at
+     front h .317 / .560.
+2. **Plate proportions (blocker 2).** These follow from the two rings: every plate is about half the slope long.
+   - Whole-slab L : W per plate, root to tip including the buried root, from the build log:
+
+     | Row | L : W |
+     | --- | --- |
+     | Lower B | 1.34-1.50 |
+     | Lower A | 1.48-1.58 |
+     | Middle B | 1.32-1.49 |
+     | Middle A | 1.36-1.58 |
+     | Crown | 1.21-1.57 |
+
+   - The visible part is shorter: the roots are buried 0.2-0.4 in the core, and row A's upper part is under row B.
+   - The plates are still 0.20-thick constant slabs with chisel tips.
+3. **Ground rosettes (blocker 3).**
+   - **Leaf shape.** `_leaf12` is now a 14-tri **round-tipped oval**: widest (W) at 0.42 L, 0.84 W at 0.8 L, then a
+     short blunt end 0.34 W wide, with no point. L : W is 2.0 (`LEAF_LW`), and the midrib fold is 22°.
+   - **Pitch.**
+     - The outer ring is pitched 60-72° and arches out at the tip (curl 0.26-0.34 L). The length is compensated, so the
+       fan keeps its height.
+     - The inner ring is pitched 75-85°.
+     - P1 and P2 are 1.6 tall.
+   - **Roles.** The outer ring is 2-3 lime leaves plus green ones, and the inner ring is dark and green. Each leaf's base
+     is a step deeper.
+   - **Colour.** The keys were recalibrated on the hero f34 render:
+     - `m045_plant_deep` #62AA40 (was #436B25);
+     - `m045_plant_dark` #2E7C48 (was #2A5A2C);
+     - `m045_plant` #879C1A, unchanged.
+   - **Leaf count.** 51 leaves; P4 and S3 still each drop one at a rock.
+4. **Minors.**
+   - **Crown colour.** The cone is `needle_light` 25 % (was 75 %), and the crown plate bands are one to two steps darker.
+   - **Bark.** `m045_bark` is #BA6C26 (was #B06624).
+   - **Dark crease under each hem.** Row B's root band is 75 % deep on the lower tier and 50 % on the middle. This is
+     colour by position, not by facing.
+   - **Hem tips.** Lower row A's tip band is +0.5 light (was +0.25).
+   - **Winding check.** `shells_report` now counts winding errors per shell (a manifold edge walked the same way by both
+     faces), and `check()` lists any in its problems.
+   - **Target size.** `TARGET_SIZE` is 7.6 ± 0.4 × 7.3 ± 0.4 × 10.0 ± 0.2.
+
+### Measured (final build, fresh session)
+
+| Check | Round 1 | Fix round 1 | Target |
+| --- | --- | --- | --- |
+| Lower waist W: f34 / front / side / rear / r34 | .66 / .57 / .64 / .53 / .72 | **.55 / .49 / .47 / .42 / .50** | ≤ .56 in every view (sheet .50 / .49 / .46 / .50 / .55) |
+| Crown hem in the r34 | not found | **h .754 / W .48** | found (sheet .782 / .48) |
+| Front hems h (crown / middle / lower) | .749 / .551 / .326 | .746 / .560 / .317 | keep .749 / .551 / .326 (sheet .749 / .529 / .309) |
+| Side, rear and r34 hems h (middle; lower) | .532; .305 / .547; .318 / .571; .357 | .570; .32 / .557; .32 / .580; .326 | sheet .542; .304 / .531; .312 / .560; .372 |
+| f34 hems h (crown / middle / lower) | .763 / .564 / .342 | .763 / .560 / .323 | sheet .762 / .577 / .379 (minor) |
+| Middle hem W: f34 / front / side / rear / r34 | .81 / .82 / .77 / .82 / .83 | .73 / .79 / .74 / .80 / .74 | sheet .81 / .81 / .77 / .81 / .77 |
+| Crown waist W: front / side / rear | .36 / .39 / .35 | .37 / .41 / .37 | sheet .29 / .28 / .29 |
+| Canopy W / H: front / side | .720 / .731 | .694 / .697 | 0.68-0.74 |
+| Plate L : W (whole slab) | row A 1.95-2.1 | **1.21-1.58** | ≤ 1.6 on every row |
+| Deepest plate cut (hero / parts) | 0.048 | 0.049 / ≤ 0.049 | ≤ 0.05 |
+| Rosette leaf | pointed, L : W 1.55, pitch 46-58 / 64-78° | **round tip, L : W 2.0, pitch 60-72 / 75-85°** | round, 2.0-2.2, 60-85° |
+| P1 / P2 top z against the rocks | 1.37 (part) | **1.59 / 1.58**, against RM 1.31 and RS1 1.06 | at least as tall as the rocks |
+| f34 plants: median / v > .7 | #465913 / — | **#54751D** (Δ 1, 11, 4) / #A1C722 | median within 15 of #558021; v > .7 near #AFC518 |
+| Plant split lime / green / dark | 46 / 38 / 16 | 42 / 44 / 14 | 38 / 39 / 23 ± 10 |
+| f34 crown band | #94C037 | **#5B9937** | within 20 of #5D9B3F, and lighter than the lower band (#4C8836 ✓) |
+| f34 middle / lower bands | #569738 / #4B8B3A | #589736 / #4C8836 | #579335 / #508F39 |
+| f34 canopy: median / v > .7 | #529535 / #9FC835 | #599836 / #A0CB35 | #519037 ± 15 / #A5C935 ± 12 |
+| f34 bark: lit half / v > .7 | #A65C26 / #C66E2D | #BD692C / #D0752F (`col.py`) | #B56525-#BF6926 / #E48230 |
+| f34 rock v > .7 | #CCBFAF | #CDC5B0 | #CDC2B5, R ≥ G ≥ B |
+| f34 shares G / T / S / R | 77.4 / 8.7 / 5.3 / 6.8 | 74.6 / 9.5 / 5.6 / 8.4 | 77.2 / 10.8 / 3.1 / 7.7 (binding ± 4) |
+| Hero tris | 2910 | 3012 | ≤ 3200 ceiling |
+| Hero size | 7.76 × 7.70 × 10.00 | 7.65 × 7.47 × 10.00 | canopy tips toward r 3.5 (now r 3.6-3.8) |
+
+- **Tris.**
+  - Hero 3012: plates 1360, leaves 714, trunk 348, cores 262, rocks 176, patch 96, hubs 56.
+  - Parts: TopTier 470, MiddleTier 576, LowerTier 576, Trunk 348, GroundFoliage 162, RockMedium 44, RockSmall 44. All
+    are under 1000.
+- **Mesh checks, every object.**
+  - Non-manifold edges, bowtie verts, boundary, wire, loose, zero-area, n-gons and duplicate verts are all 0.
+  - Normals are outward and transforms applied. The origin is at the bbox bottom centre; the hero's offset is
+    (0.14, −0.17, 0).
+  - Per shell: every shell is closed with a positive volume, with 0 self-intersections and **0 winding errors** (the new
+    check).
+  - The hero still has 24 thin triangles (0.9°) on the sand patch's 0.03-high side wall. This is unchanged (verifier
+    finding 10).
+- **Contact.**
+  - The hero has 107 shells: patch 1, trunk 1, cores 3, plates 40, rocks 4, hubs 7, leaves 51. Floating 0, unchained 0.
+  - Core seats are 0.015 / 0.015 / 0.015, with 0 core or trunk intersections.
+  - 0 plate pairs cut more than 0.05 (deepest 0.049), and 0 leaves cut a rock or the trunk.
+  - Each tier part and GroundFoliage: floating 0, unchained 0.
+- **UV, every object:** 0 overlapping pairs, 0 flipped, minimum island gap 0.016, border 0.008, conformal stretch p95
+  1.00-1.03.
+- **`K.check`:** no problems. Baked-shading correlations: hero 0.00, tiers 0.00, Trunk 0.38, GroundFoliage 0.02.
+- **Lighting and VFX:** none (unchanged).
+
+### Compared with the sheet and with M042
+
+- **Front, side, rear and r34.** The tree shows three distinct steps: the crown hem, the middle hem and the lower hem.
+  Each tier shows an upper ring whose tips lie over the hem ring, with a dark band under each hem. The hem plates flare
+  a little and droop at the tip.
+- **Against M042** (`cmp_042.png` in the scratchpad: sheet | 045 | M042 at the f34, side and top). They read as
+  different kit pieces:
+  - 045: broad, round-ended slabs in two rings per tier, on a smooth flared trunk, with upright broad-leaf fans.
+  - 042: one ring of thin, pointed kites per tier, with spiky lanceolate clumps.
+- **Top view.**
+  - The outline has 7 points, because row A has 7 plates (the spec decided 7 + 7), with row B between them.
+  - The 4-point crown star shows, with a ridge at −Y.
+  - A corner of RM and a little of P4 show beyond the canopy.
+  - Shares are G 96 / R 2 / S 1 (sheet 85 / 13); the sheet's top cell draws the canopy smaller (§3.3).
+
+### Leftovers
+
+- On the f34, the middle hem is .73 wide (sheet .81) and the lower hem sits at h .323 (sheet .379). The near-level
+  views match better.
+- In the front and side views, the middle hem is .03-.04 higher than the sheet's.
+- The crown waist is .37-.41 (sheet .28-.29), as in round 1.
+- The f34 G share is 74.6 (sheet 77.2), inside the binding ± 4. S is 5.6, above the spec's 5.1 maximum (± 2).
+- The side and rear canopy medians read darker than the sheet (#437429 against #5B9635), as in round 1 (the studio
+  light).
+- From −15 / 20, the GroundFoliage part still shows one or two outer leaves edge-on. In the hero, the fans read as
+  upright broad leaves.
+- The top view shows 7 outer points, not 8, and the rocks and plants barely show beyond the canopy.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+Fresh verifier, read-only, background Blender on port 9881 (`kit/wip/M045_verify.blend`, the fixed and integrated
+model plus M042 `TieredFir` and M047). Nothing was built, edited or saved. Every number below comes from the verifier's
+own scripts (bmesh / BVH / ray parity in Blender, and the study's `m.py` masks with the verifier's own profile and
+colour code on the images). Renders, side-by-sides and scripts are in the scratchpad folder `m045_verify2/`:
+- renders: `f34_sheet`, `r34_sheet`, `front_sheet`, `side_sheet`, `rear_sheet`, `top_sheet`, `fir_*` (M042 at the same
+  cameras), `part_*`;
+- side by sides: `cmp_f34`, `cmp_side`, `cmp_top` (sheet | 045 | 042), `cmp_r34`, `cmp_front_rear`, `cmp_parts`,
+  `cmp_gf`, `cmp_base`, `cmp_cu`;
+- scripts: `mesh.py`, `contact.py`, `plates2.py`, `roots.py`, `leaves.py`, `facing.py`, `prof.py`, `col.py`.
+
+### Measured
+
+**Mesh** (every object; a winding error is a manifold edge walked the same way by both faces):
+
+| Object | Tris | Shells | Size | Bnd / NM / wire / loose | Bowties | Zero-area / n-gons | Winding | Neg-vol shells | Self-isect in shell | Floating / unchained |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| PineSapling | **3012** / 4000 (ceiling 3200) | 107 | 7.65 × 7.47 × 10.00 | 0 / 0 / 0 / 0 | 0 | 0 / 0 | **0** | 0 | 0 | **0 / 0** |
+| TopTier | 470 | 13 | 3.67 × 3.72 × 2.99 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| MiddleTier | 576 | 15 | 5.77 × 5.45 × 3.39 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| LowerTier | 576 | 15 | 7.55 × 7.46 × 4.11 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| Trunk | 348 | 1 | 3.64 × 3.97 × 4.36 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | — |
+| GroundFoliage | 162 | 12 | 2.19 × 2.64 × 1.50 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | 0 / 0 |
+| RockMedium | 44 | 1 | 1.83 × 1.55 × 1.27 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | — |
+| RockSmall | 44 | 1 | 1.03 × 0.94 × 0.78 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | — |
+
+- **Faces and transforms:**
+  - All faces are triangles.
+  - Rotation 0, scale 1, no modifiers, no custom normals, one `UVMap`.
+  - The local bbox is centred in X / Y with z min 0 on all 8, so the origin is at the bottom centre.
+  - Normals are outward: every shell has a positive volume and 0 winding errors.
+- **Hero shells:** patch 1, trunk 1, cores 3, plates 40 (lower 7 + 7, middle 7 + 7, crown 4 upper + 4 short + 4 long),
+  rocks 4, hubs 7 (4 rosettes + 3 sprigs), leaves 51.
+- **Peg seats:** trunk top → lower core **0.015**, lower peg → middle core **0.015**, middle peg → crown core
+  **0.015**, with no overlap between any of them.
+- **Plate cuts:**
+  - 44 plate pairs touch in the hero. The deepest cut is **0.049**; it is 0.053 only if samples hidden inside a core
+    are counted.
+  - 0 pairs cut more than 0.05. The parts' deepest cuts are 0.049 / 0.045 / 0.049.
+  - No leaf cuts a rock or the trunk.
+- **Plate roots:** every plate overlaps its core. Buried depth: lower 0.22–0.36, middle B 0.18–0.25, middle A
+  0.115–0.14 (just under the spec's 0.15), crown 0.05–0.30.
+- **Thin triangles:** 24 under 2°, all on the patch's 0.03-high side wall (unchanged from round 1).
+- **Collision:** hero `precise`; tiers, trunk and rocks `hull`; GroundFoliage `box`. No emission, no VFX children.
+
+**Plates** (per shell; L = root centroid to tip centroid, W = the widest point across):
+
+| Row | L : W (whole slab) | L : W outside the core | Tip r / z | Through-slab thickness (median / p90) |
+| --- | --- | --- | --- | --- |
+| Lower A (hem) | 1.46–1.57 | 1.14–1.23 | 3.62–3.87 / 2.56–2.94 | 0.26 / 0.31 |
+| Lower B (upper) | 1.34–1.49 | 1.04–1.16 | 2.50–2.63 / 3.77–3.88 | 0.25 / 0.28 |
+| Middle A | 1.34–1.56 | 1.34–1.56 | 2.60–2.86 / 5.02–5.38 | 0.25 / 0.29 |
+| Middle B | 1.28–1.48 | 1.08–1.19 | 1.91–2.02 / 6.19–6.42 | 0.24 / 0.27 |
+| Crown (12) | 1.13–1.49 | 0.91–1.55 | 1.18–1.82 / 7.26–8.43 | 0.23–0.24 / 0.26–0.28 |
+
+The walls are 0.20; the through-slab figure includes the midrib raise (0.08 W). Max L : W is **1.57** (target ≤ 1.6).
+
+**Silhouette** (study masks, the verifier's own width profile; canopy rows above h .22):
+
+| View | W : H canopy (sheet) | Crown hem h / W | Crown waist W | Middle hem h / W | **Lower waist W** | Lower hem h |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | .667 (.651) | .763 / .48 (.762 / .50) | .41 (.33) | .569 / **.73** (.577 / .81) | **.53** (.50) | **.326** (.382) |
+| r34 | .683 (.618) | **.756 / .48 found** (.785 / .48) | .38 (.34) | .585 / .74 (.560 / .77) | **.50** (.54) | .324 (.375) |
+| front | .690 (.714) | .745 / .50 (.745 / .49) | .36 (.29) | .561 / .79 (.529 / .81) | **.49** (.48) | .316 (.313) |
+| side | .692 (.700) | .747 / .50 (.746 / .48) | .42 (.28) | .572 / .74 (.542 / .77) | **.47** (.45) | .323 (.308) |
+| rear | .695 (.708) | .747 / .50 (.746 / .45) | .36 (.28) | .561 / .79 (.535 / .81) | **.42** (.48) | .312 (.315) |
+
+- **Two rings on each lower and middle tier.** Row B's tips sit over row A's hem tips:
+
+  | Tier | Row B tips (r / z) | Row A hem tips (r / z) |
+  | --- | --- | --- |
+  | Lower | 2.5–2.6 / 3.8–3.9 | 3.6–3.9 / 2.6–2.9 |
+  | Middle | 1.9–2.0 / 6.2–6.4 | 2.6–2.9 / 5.0–5.4 |
+
+- **Trunk widths** (front view, as a fraction of the canopy W):
+
+  | h | .25 | .20 | .15 | .10 |
+  | --- | --- | --- | --- | --- |
+  | Ours | .186 | .214 | .276 | .300 |
+  | Sheet | .178 | .195 | .227 | .303 |
+
+**Ground rosettes** (per leaf, the verifier's own mesh code):
+- Leaf L : W **2.03–2.20**; blunt end 0.33–0.34 W wide (a round-tipped oval, no point).
+- **Pitch of the inner part:**
+
+  | Group | Outer ring | Inner ring |
+  | --- | --- | --- |
+  | P1 / P2 | 56–67° | 85–90° |
+  | P3 / P4 | 56–65° | 85–89° |
+  | Sprigs | 62–81° | |
+
+- **Tops:** **P1 1.59, P2 1.58**, P3 1.25, P4 1.13, sprigs 0.75–0.99. Rocks: RM 1.31, RS1 1.06, RS2 0.82, RS3 0.70.
+
+**Colour** (f34 unless named; ours | sheet):
+
+| Region | Ours | Sheet | |
+| --- | --- | --- | --- |
+| Canopy median / v > .7 | #579836 / #A0CB35 | #529037 / #A5C935 | ✓ / ✓ |
+| Crown band / middle / lower | **#5B9937** (v .60) / #589736 (v .59) / #4A8836 (v .53) | #5D9B3F / #579335 / #508F39 | crown within 6 of the sheet; lighter than the lower ✓ |
+| Trunk lit (right) half / v > .7 | #BD692C (h 25) / #D1742F | #BF6926 / #E48230 | orange ✓; v > .7 a little dark |
+| Rock v > .7 / median | #CCC1B0 (h 36, s .14) / #BBB1A0 | #CDC2B5 / #B0AFA7 | R ≥ G ≥ B ✓, not mauve; median a touch warm |
+| Sand | #F1D3A0 | #EFD19D | ✓ |
+| **Plants median** / v > .7 | **#52751D** (Δ 3, 11, 4) / #A7C81E | #558021 / #AFC618 | within 15 ✓ |
+| Plants, front cell | #3F621B | #5C831F | darker (shaded by the canopy) |
+| Plant split lime / green / dark | 41 / 43 / 15 | 38 / 39 / 23 | ✓ ±10 |
+| **Shares G / T / S / R** | **75.1 / 9.6 / 5.7 / 7.6** | 77.2 / 10.8 / 3.1 / 7.7 | all within the binding ±4 |
+
+- **Other views** (canopy median, ours | sheet):
+
+  | View | Ours | Sheet | |
+  | --- | --- | --- | --- |
+  | Front | #529032 | #508F38 | ✓ |
+  | Side | #427329 | #639A36 | darker |
+  | Rear | #457A2C | #539337 | darker |
+  | r34 | #437A2C | #5A9636 | darker |
+
+  The studio light leaves the near-level and rear views darker, as in round 1.
+- **Colour by facing: none.**
+  - `K.check` returns no problems. Baked-shading values: hero 0.00, tiers 0.00, Trunk 0.38, GroundFoliage 0.02.
+  - Over the hero, face key luminance correlates with normal z at −0.09.
+  - Per plate, the up-facing faces are on average 0.065 *darker* than the down-facing ones, so there are no dark
+    undersides. Rocks: +0.05, from the spec's height bands.
+  - The builder has no `normal`-based paint selection. A `grep` finds only `recalc_face_normals` and leaf geometry.
+  - Plate colour comes from `plate(..., tones=(root, middle, tip))` bands along the plate. Row B's darker root band
+    (lower −0.75, middle −0.5) is therefore chosen by position.
+
+### Findings
+
+**Round-1 blockers, re-checked:**
+1. **Distinct tiers: fixed.**
+   - The lower waist is .42–.53 in every view (target ≤ .56).
+   - The crown hem is found in the r34 (.756 / .48).
+   - Each lower and middle tier shows two rings: row B on top, its tips over the row A hem.
+   - The front, side, rear and r34 outlines step in three times.
+   - The f34 interior reads as many rows of short scales, but its outline still steps at the crown, middle and lower
+     hems.
+2. **Plate proportions: fixed.** L : W is ≤ 1.57 on every plate (1.04–1.56 outside the core). The plates have 0.20
+   walls, chisel ends and a midrib fold. `plate_cu` and `cmp_parts` show thick blunt slabs.
+3. **Ground rosettes: fixed.**
+   - The leaves are round-tipped ovals, L : W 2.03–2.2, standing up (inner rings 85–90°).
+   - P1 and P2 are 1.58–1.59 tall, above every rock.
+   - The f34 plant median is within 15 of `#558021`.
+   - In `cmp_f34`, `cmp_side` and `cmp_base`, 045's upright broad-leaf fans read clearly unlike 042's spiky lanceolate
+     stars.
+
+**§1.5 against M042, side by side** (`cmp_f34`, `cmp_side`, `cmp_top`, `cmp_base`). They are different kit pieces on
+every binding point:
+
+| | 045 Pine Sapling | 042 Young Fir |
+| --- | --- | --- |
+| Height | 10 | 16 |
+| Plates | 0.20 blunt slabs, two rings per tier | thin pointed kites |
+| Joints | peg and recess | flat caps and hubs |
+| Trunk | smooth, flared, 6 short flares | planked, long roots |
+| Ground plants | broad-leaf fans | lanceolate clumps |
+| Rocks | pale, neutral | warm beige |
+
+Only the top views stay alike: both are a rounded rosette of plates round a 4 + 4 crown star.
+
+**Remaining, all minor:**
+1. **Minor: the f34 middle hem is .73 wide** (sheet .81, tolerance ±.05). The r34 and side read .74 (sheet .77), and
+   the front and rear .79 (.81).
+   - Fix target: an f34 middle hem of at least .77.
+   - For example, make the middle row A's side plates 5–8 % longer, or flare them 3–4° more.
+2. **Minor: the f34 and r34 lower hems sit at h .326 and .324** (sheet .382 and .375).
+   - The front, side and rear match within .015 (.316 / .323 / .312).
+   - The sheet's hero cells are perspective drawings, so no change is required.
+3. **Minor: the crown waist is .36–.42** (sheet .28–.34), so the step from the crown to the middle tier is shallower
+   than the sheet's.
+   - Fix target: ≤ .34.
+   - Either start the middle row B 0.1–0.15 lower, or root it 0.1 further in.
+4. **Minor: the middle hem sits .025–.03 high** in the front, side, rear and r34 (front .561 against .529). The target
+   is ±.03, and it is at the edge.
+5. **Minor: the profile plates read as thin fingers.**
+   - What: the middle and lower row A plates seen lengthwise, at the left and right edges of the f34 and side views,
+     show as thin horizontal sticks.
+   - Why: their flat tops are edge-on to the camera.
+   - Fix target: roll those plates 10–15° more, or pitch the hem row 5° steeper, so their folded top shows in profile.
+6. **Minor: every plate has a lime tip band,** so the f34 reads as six even rows of scales rather than three skirts.
+   - Fix target (optional): give the lower tier's row B a tip band of +0.25 instead of +0.5, so the hem rows carry the
+     light.
+7. **Minor: sand is 5.7 %** of the f34 (sheet 3.1). That meets the binding ±4 but not the spec's ±2.
+   - Optional: pull the patch outline in 0.15–0.2 at the front lobes.
+8. **Minor: the top view.** It has 7 outer points against the study's "about 8"; row A has 7 plates, as decided.
+   - Shares are G 96.7 / R 1.9 / S 1.1 against the sheet's 85 / 13.
+   - Accepted under §3.3; no change.
+9. **Minor: the GroundFoliage part** seen from −15 / 20 (`cmp_gf`) shows two outer leaves edge-on as spikes. In the
+   hero, the fans read as broad upright leaves.
+   - Optional: yaw the part's outer ring 15–20°, so no leaf is edge-on to the part camera.
+10. **Minor: the front cell's plants** read darker than the sheet's (#3F621B against #5C831F), because the canopy shades
+    them. The f34 meets the target.
+11. **Minor: the trunk and rock colours are a little off.** No change is required.
+    - The trunk's v > .7 median is #D1742F against #E48230; the lit half matches.
+    - The rock median is a touch warm (#BBB1A0 against #B0AFA7).
+12. **Minor, carried over:**
+    - The row-A tips reach r 3.6–3.9, against the decided 3.5. The canopy W : H is still in range.
+    - A few outer rosette leaves are pitched 56–59° (target 60–85°).
+    - The middle row A roots are buried 0.115–0.14 (spec 0.15–0.3), but they chain.
+    - 24 thin triangles remain on the patch side wall.
+
+**Passed:**
+- the budgets (3012 of 3200; every part ≤ 576);
+- every mesh check, with **0 winding errors**;
+- 0 floating or unchained shells;
+- the three 0.015 peg seats;
+- plate cuts ≤ 0.049;
+- the f34 shares, within ±4;
+- the colour families:
+  - the canopy, with the crown lighter than the lower tier and within 6 of the sheet's crown;
+  - orange bark;
+  - R ≥ G ≥ B rock that is never mauve;
+  - sand;
+  - the plants;
+- nothing coloured by facing;
+- no lighting or VFX.
+
+**Decisions:** 1–15 are all followed.
+- Decision 1's tip radius (3.5) is exceeded by 0.1–0.4. This was recorded and accepted in round 1.
+- Decision 4 is now met: L : W ≤ 1.57, plate counts 4 + 8 / 7 + 7 / 7 + 7, and one plate at the front on every tier.
+- Decision 9's rosettes are now broad ovals.
+
+**Score: 8 / 10.** The mesh, contact and colour discipline are clean. The three blockers are fixed, and the model
+differs from 042. What is left:
+- the tiers are less crisp in the f34 (the middle hem's width and the shallow crown waist);
+- the profile plates read as thin fingers.
+
+**Verdict: PASS.** Commit with the minors above noted.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 2 (8/10) and committed. Round 1 failed (6/10): the tiers merged, the plates were long blades, and the rosettes looked like 042's.
+- **Left for a later polish pass:**
+  - The f34 middle hem is .73 wide; target ≥ .77.
+  - The crown waist is .36–.42; target ≤ .34.
+  - Side-on plates read as thin sticks.
+  - Every plate has a lime tip band that reads as rows of scales. Use +0.25 on the lower row B.
+  - Sand is 5.7 %.
+  - Two edge-on leaves on GroundFoliage.
+  - The trunk highlight is slightly dark.
+- **Export:** 8 assets, 8 solid pieces, 5232 tris, 0 VFX sockets, palette 23 colours, 0 problems.
