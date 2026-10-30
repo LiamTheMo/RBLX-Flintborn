@@ -56,6 +56,7 @@ local L = {
 	picture = { 470, 178, 242, 233 },
 	description = { 400, 416, 324, 56 },
 	descriptionSize = 21,
+	descriptionLine = 0.86,
 	divider1 = { 389, 469, 356, 16 },
 	requiresHead = { 401, 482, 200, 30 },
 	smallHeadSize = 16,
@@ -207,6 +208,8 @@ function RecipeWindow.new(props)
 		wrap = true,
 		zIndex = z,
 	}, L.descriptionSize)
+	-- The mockup's two lines sit 25 px apart.
+	self.description.root.LineHeight = L.descriptionLine
 	Kit.Divider.new(v, { name = "Divider1", rect = L.divider1, variant = "rule", zIndex = z })
 	label(v, {
 		name = "RequiresHead",
@@ -634,7 +637,7 @@ function RecipeWindow:_wideCards(cost)
 		local c = card.base.visual
 		local z = card.base.z + 1
 		Kit.ItemIcon.new(c, {
-			rect = { 13, 8, 54, 49 },
+			rect = { 16, 12, 54, 49 },
 			catalogId = item.catalogId,
 			icon = RecipeModel.Icon(item.catalogId),
 			zIndex = z,
