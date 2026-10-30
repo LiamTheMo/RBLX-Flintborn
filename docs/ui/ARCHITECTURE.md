@@ -724,7 +724,7 @@ earlier section or a screen spec, this section wins.
 | D5 | Party size | Real cap 8 ("1/8"). The list shows 7 rows at the mockup pitch and scrolls for the 8th. |
 | D6 | Party details | No "Play Style" row. Join Type reads "Invite Only". Created uses `createdAt`. |
 | D7 | Play window | No server selection anywhere. Rows show only real data (region, biome from BiomeCatalog if it has one, and honest derived rows); no invented difficulty or recommended level. |
-| D8 | Dim overlay | Measured by three analysts: near-black at about 68 % opacity. Veil color `#0A0806`, `BackgroundTransparency 0.32` (replaces 0.42 in §1.3). The HUD behind a window stays where it is in 01_hud; the shifted hotbar in the window mockups is ignored. |
+| D8 | Dim overlay | Measured by three analysts: near-black at about 68 % opacity. Veil color `#050403`, `BackgroundTransparency 0.30` (fits 0.29–0.32 across all seven mockups; replaces 0.42 in §1.3). The HUD behind a window stays where it is in 01_hud; the shifted hotbar in the window mockups is ignored. |
 | D9 | Blur | On for Medium and High graphics, Size 8; never in captures. |
 | D10 | Item descriptions | Short authored descriptions live in the UI layer (`ItemInfo`, owned by S2), not in gameplay modules; items without one show their derived line. |
 | D11 | Inventory categories | All, Tools, Materials, Food, Plants (only if `ItemInfo` can classify plant items reliably from catalog data, otherwise dropped), Misc. |
@@ -732,3 +732,8 @@ earlier section or a screen spec, this section wins.
 | D13 | Fonts | Merriweather Heavy for titles (Bold fallback), Merriweather Bold for labels and headings, Merriweather Regular for row labels and descriptions; Patrick Hand for the Forge subtitle and other handwritten notes. Forge title uses fake small caps via size steps. |
 | D14 | UI sounds | Silent unless the repo already has UI sound ids; the Kit keeps the hook. |
 | D15 | Unity | Every screen, including the restyled ones, is built only from Kit components and `lk_` art. No screen draws its own frame, button, slot, bar or tab. |
+| D16 | Who presses Play | Anyone may press Play solo; in a party only the leader deploys, and Ready never blocks it (D3). Specs that say "all members ready" are overridden. |
+| D17 | Opening the Party window | The HUD party panel's title row and its add-player button, and the Journal party tab. |
+| D18 | Ready controls | Each member's row shows a Ready tag (green dot, "Ready") or a Not Ready tag (grey dot, "Not Ready"). The local player toggles it with a Ready / Not Ready button in the Readied Status card. Invite buttons show "Invited" (disabled paper) while an invite is pending. |
+| D19 | Missing art | Where a mockup shows art the kit lacks (Party header tent and trees, Settings sketches, flat glyphs), use the closest `lk_` art (e.g. `icon_tree`, `icon_campfire`, emblems) and list it as a deviation; never draw ad-hoc shapes. The Play window's map is the game's real island map art. |
+| D20 | XP and counts | Bars always show the real fraction, not the mockup's drawn fill. |
