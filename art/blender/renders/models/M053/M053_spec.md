@@ -870,3 +870,463 @@ All 15 recommendations are accepted.
 **Packaging.** Every shell is manifold with **0 winding errors**. **No floating dressing**, and no dressing more than 0.05 into rock or wood. The trunk twists; it must not read as a straight column. Rocks must not be eggs.
 
 **Binding.** The silhouette shares in §1 (wood 77–79 %, ±4) and the fill check (0.41–0.44) on the f34 and front views.
+
+## Stage 1 — Modelling (modeller, 2026-10-29/30)
+
+Builder `art/blender/kit/mcp/m053.py` (`build()`), background session port 9881 on `wip/M053.blend` (saved after every
+good build). Final numbers below come from a **freshly restarted session** (`kit_mcp.install(); m053.build()`).
+Every exploded part has its own function and the hero is assembled from exactly those functions:
+- **`trunk_body()`**: six rope strands = 18 columns (a pulled-in groove vertex 0.42 deep, two crest vertices per
+  strand, alternating strands 1.0–1.08 thick), 9 rings (z 0 / 2.0 / 4.2 / 5.6 / 6.9 / 8.4 / 9.8 / 11.0 / 11.9, Ø 6.4 →
+  5.0 waist → 2.4 top), twisted **82° counter-clockwise** from foot to top (the front grooves climb "/"). A flat underside with a
+  square pin hole; a flat cut top face tilted 10° toward az 58 (perpendicular to the leader) round the square leader
+  socket (0.62 sq, 0.35 deep).
+- **Deviation from decision 6 / spec 4.1-7 (budget): no booleans for the collars, stubs or knot.** Exact-unioned
+  collars and stubs cost about 25 tris per seam (first try: 1566 tris, over the 1000 part limit). Instead every feature is
+  *grown out of the facet grid*: `_block()` takes a block of body facets, deletes it and walks its boundary loop (by
+  angle) to the feature's ring. The trunk core stays one closed manifold shell with no boolean seams:
+  - `knot()`: the 2 × 2 block round the crest vertex nearest (z 6.9, az 327) → an oval ring set: swell, raised pale
+    rim (two rings), a hole 0.32 deep with walls and floor. `_boss()`: a raised pale square boss on the crest facet below.
+  - `collar()` ×5 (LM, L1, R, FR, TL): the free 2 × 2 block nearest each bark point (conflicts resolved automatically)
+    → a six-sided ring at F = bark point + axis × out, a pale cut face with a square socket (hollow walls and floor).
+  - `stub()` ×6: each strand's three columns over the two lowest bands → the root section, upright, at plan distance
+    4.0 with its flat bottom on the ground: the **buttress from the strand down onto the ground** (the strand → root
+    continuity the spec asks for). Five carry a square socket; RT3's ring runs straight on as the built-in front root.
+  - Only RT3's two toes are exact-unioned (at the origin, `m033._union_fine`, 0 retries).
+- **`chain()`**: the one limb primitive: rings in each kink's mitre plane (the bisector), parallel-transported frames,
+  so every waypoint is a hard kink that doesn't pinch. `cap()` makes the end caps: flat, cut (pale rim), dark (rim and a sunk hollow), snap
+  (a jagged pale break round a sunk dark centre) or socket.
+- **`branch_module(name)`** ×6 (LEAD the top V, TL = Branch B, LM = Branch A the big Y with the snapped end, L1 = Branch C
+  the comb, R the riser, FR the Y-fork). Each has:
+  - a peg;
+  - a six-sided main chain: its base face sits 0.015 off the collar face and 0.02 wider, and a shoulder runs along the socket axis, long enough that its mitre never cuts back;
+  - side branches and tines as closed 4–5-sided shells, each started on the parent's axis so the parent's radius buries it;
+  - bore pits.
+
+  There are 30 tine and branch ends in all.
+- **`root_chain(name)`**: Root A is used twice (RT1, RT6), Root B twice (RT2, RT5) and Root C once (RT4); RT6 and RT5 are turned ∓4°. Each root has:
+  - a peg;
+  - a six-sided section (a top plank, upper flanks, splayed lower flanks and a flat bottom on z 0) through 4 stations, with a plan kink of ±6–8° at the ground;
+  - 2–3 blunt five-sided toes with flat ends, hollow on every other toe;
+  - 2 bore pits.
+- **`pit()`**: a bore pit on any facet: a square (≤ 0.34, inside the facet), walked round from the facet's outline,
+  sunk 0.06–0.07, with a hollow floor (+8 tris each).
+- **`base_dressing()`**:
+  - 6 rocks: ring-stack hulls with flat bases, never `hull_rock` balls. RK1 and RK2 are tall, blunt-pointed and lean toward the trunk; the others are low with sloping tops.
+  - 5 pebbles and 10 lobed moss pads.
+  - 9 tufts: pointed, folded lanceolate blades (8 tris each), turned toward the front cameras, round a 5-sided hub.
+
+  A placement guard runs from the start (`_Solids`, ray parity):
+  - rocks walk out 0.15 at a time while they cut a root by more than 0.03;
+  - moss pads and tuft hubs search a ring pattern round their planned spot (`_SEARCH`) for the nearest clear spot, with hubs at least 0.3 clear;
+  - blades retry, and are dropped if they still cut.
+
+Iterations, compared side by side against the sheet cells (scratch `m053w/cmp.py`) and measured with `m053w/mr.py` (the study masks):
+1. Booleans gave a 1566-tri core; I rebuilt it as grown blocks (860 → 880).
+2. The first hero had pipes that were too thin, roots that were low runners and only a slight trunk twist. I made the limbs thicker and the roots bigger (stub face at 4.0), raised the twist from 62° to 82°, and deepened the grooves from 0.34 to 0.42.
+3. The shares were T 87 %, G 3.7 % and R 8 %. I made the rocks blunter and larger, the tufts and pads larger, and the blades broader (L : W 3.3).
+4. The crown read as fat pipes with stub ends. I made the tine and toe ends single flat cut faces (−290 tris), slimmed the main limbs to × 0.85 and the tines to × 0.9, and added five more tines. I lowered L1 to fill the h .5 row and narrowed the upper trunk (Ø 3.7 / 2.85 / 2.4).
+5. The checks found these, all fixed:
+   - pit squares collapsed on faces that had no normal yet (`normal_update`);
+   - LM's collar face dipped into the bark (out 0.75 → 1.0);
+   - RootB's last segment was only 0.21 long (minimum now 0.8);
+   - L1's collar took LM's block.
+
+**Comparison cameras (decision 10, spec 3.2 probe).** I probed the f34 at az −20 / 0 / +20 × e 6 / 10 / 14:
+- W : H at az −20: 0.967 / 0.934 / 0.906;
+- at az 0: 0.920 / 0.892 / 0.868;
+- at az +20: 0.868 and lower.
+
+**`f34_sheet` = (−20, 10)**, chosen over e 6 because the sheet's f34 shows a deeper ground band than its front. `r34_sheet` = (160, 10); front, side and rear are (0 / 90 / 180, 4); top is (0, 89). Every `*_sheet` shot hides the floor and uses a 3× lens (`m033._long_lens`).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| TwistedSnag (hero) | **3562** (ceiling 3800) | 17.89 × 17.06 × 18.18 | 142 |
+| TwistedSnagTrunkCore | 880 | 8.86 × 11.76 × 12.10 | 1 |
+| TwistedSnagBranchA | 216 | 5.94 × 9.27 × 7.10 | 5 |
+| TwistedSnagBranchB | 172 | 4.08 × 3.85 × 6.85 | 5 |
+| TwistedSnagBranchC | 152 | 6.77 × 2.98 × 2.93 | 5 |
+| TwistedSnagRootA | 120 | 4.75 × 2.89 × 2.21 | 5 |
+| TwistedSnagRootB | 104 | 3.92 × 4.70 × 2.05 | 4 |
+| TwistedSnagRootC | 120 | 4.77 × 2.79 × 2.13 | 5 |
+
+- Hero tris by shell kind:
+  - trunk: 880 (1 shell);
+  - limbs, branches, tines, root modules and toes: 1508 (42);
+  - pegs: 132 (11, hidden);
+  - rocks and pebbles: 246 (11);
+  - moss pads: 260 (10);
+  - blades and hubs: 536 (67).
+- Size against the targets:
+  - height 18.18 (18 ± 0.4) ✓;
+  - width 17.89 (17.6 ± 0.9) ✓;
+  - depth 17.06, against the spec's "about 15": the FR limb runs to y −7.9, and the back roots and RK6 run to +8.5.
+
+  The origin is at the bottom centre; the hero offset is (0.144, −0.183, 0) from the trunk axis.
+- Every object has:
+  - 0 non-manifold edges and **0 bowtie verts**;
+  - 0 boundary, wire, loose, zero-area, n-gon or duplicate verts;
+  - outward normals and applied transforms;
+  - its origin at the bottom centre (`o["m053_offset"]`).
+- Per shell, in all eight objects: **0 winding errors** (`BMEdge.is_contiguous`), **0 self-intersections**, and volume > 0.
+- `K.check` is clean. Baked-shading correlation (limit 0.5): hero 0.15, core 0.28, roots 0.13–0.34, branches 0.0.
+- **Contact:** 0 floating and 0 unchained in all eight objects (tolerance 0.03). The hero, core and roots chain to the ground; the branch parts chain to their main chain.
+- **Buried:**
+  - 0 of 77 dressing shells sit more than 0.05 inside wood or rock (max 0.028, a moss pad edge at the trunk foot);
+  - 0 rocks sit more than 0.05 into the roots (all six were placed at 0.0 depth; none had to move).
+- **Pegs** (`plug_report`): every peg corner is 0.015–0.122 from the socket walls and floor, and none is inside the trunk solid.
+- Smallest corners:
+  - trunk core: 2.14° (`m012._force_slivers` forced 14 slivers open);
+  - hero: 0.5° on 22 faces, at the pit-square zips and mitred tine starts in the branch shells. They are flat, opaque and harmless (a leftover).
+
+## Stage 3 — UV
+
+`M.smart_uv` angle-based (45°, margin 0.008) plus `m012._uv_unfold` (6 faces cut free on the hero). All eight objects have:
+- 0 overlaps and 0 flipped;
+- a minimum island gap of 0.016 and a border of 0.008;
+- density 1.0 / 1.0 / 1.0;
+- conformal stretch p95 ≤ 1.089 (BranchC; the others are ≤ 1.029).
+
+Islands: hero 1116, core 222, branches 56 / 39 / 40, roots 31 / 25 / 30.
+
+## Stage 4 — Materials, colour and texture
+
+1. **`K.calibrate`** on the dome to the spec 5.4 targets; every key rendered within 6 of its target:
+
+   | Key | Calibrated |
+   | --- | --- |
+   | wood | `#90532B` |
+   | wood_dark | `#6A4427` |
+   | wood_light | `#C69B60` |
+   | hollow | `#170100` (set by hand to `#1E0E06`: the calibrated value was too red-black) |
+   | rock | `#9B9894` |
+   | rock_light | `#A39E9A` |
+   | rock_deep | `#7A787B` (B > G, so set warm by hand to `#7C7974`) |
+   | moss | `#9E9610` |
+   | grass | `#979E0D` |
+   | grass_deep | `#40530C` |
+2. **Re-measured on the renders** (study masks) and nudged:
+   - wood → `#985B2D`: its lit tone was 28 low;
+   - grass → `#8F9E10`: greener, per the spec's "lime, not yellow-olive".
+
+   **Final `PALETTE`:** wood `#985B2D`, wood_dark `#6A4427`, wood_light `#C69B60`, hollow `#1E0E06`, rock `#9B9894`,
+   rock_light `#A39E9A`, rock_deep `#7C7974`, moss `#9E9610`, grass `#8F9E10`, grass_deep `#40530C`.
+3. **Roles (never by facing).** `.normal` is used only for pit geometry, never for colour.
+   - Trunk:
+     - the flank facets (touching two pulled-in groove verts) and the buttress walls in the grooves are 30 % wood_dark;
+     - low buttress faces (centre z < 0.42) are 30 % dark;
+     - the underside disc is wood_dark;
+     - cut faces (the top, collar and stub faces, the knot rim, the boss) are wood_light;
+     - every hole (sockets, the top socket, the pin, the knot, the pits) is hollow;
+     - Tint: ±0.05 per plank, held up each strand column, plus a broad mottle (0.03 / 0.35).
+   - Limbs:
+     - the base segment is 30 % dark (under the collar);
+     - each later segment is 0–12 % lighter toward the tips (position along the limb);
+     - tines and side branches are 10 % light;
+     - tine ends are pale (cut) or hollow (dark), about half each;
+     - LM's snapped end is jagged pale facets round a hollow centre;
+     - pits are hollow;
+     - Tint: ±0.04 per segment plus mottle (0.04 / 0.4).
+   - Roots:
+     - faces low on the root are 30 % dark;
+     - the top plank is 15 % light (its place on the section);
+     - the end is deep, the base face pale, the pits hollow;
+     - on the toes, the low faces are 30 % dark and the ends alternate hollow and pale.
+   - Rocks go by height band: the top 30 % → light 60 %, the next band → light 30 %, the lowest 22 % → deep 30 %, plus ±0.03 Tint per facet.
+   - Moss pads have a 20 % grass rim.
+   - Blades: the tallest are lime (grass); the lower and inner ones are grass → deep 55 %. Hubs are deep.
+   - I did not darken a ring at each kink (spec 5.5). Each limb segment is a single facet band, so a ring at a kink would darken a whole segment. The kinks read through the pits and the lighting instead.
+4. **Finish:**
+   - wood 0.9 (dark 0.95), cut wood 0.85, hollow 1.0;
+   - rock 0.85 (deep 0.9);
+   - grass and moss low spec;
+   - no emission.
+
+**Measured against the sheet** (ours / sheet, study masks, `mr.py`):
+
+| View | W : H | T | G | R | fill |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet (−20, 10) | 0.932 / 0.971 | 79.2 / 78.0 | 7.3 / 7.9 | 13.3 / 12.2 | 0.442 / 0.437 |
+| front_sheet (0, 4) | 0.938 / 0.976 | 80.5 / 77.1 | 6.9 / 8.6 | 12.4 / 11.7 | 0.464 / 0.432 |
+| rear_sheet (180, 4) | 0.926 / 0.976 | 80.1 / 79.2 | 6.1 / 7.7 | 13.5 / 10.5 | 0.462 / 0.435 |
+| r34_sheet (160, 10) | 0.955 / 0.958 | 78.3 / 78.2 | 7.2 / 8.0 | 14.3 / 11.5 | 0.439 / 0.420 |
+| side_sheet (90, 4) | 0.858 / 0.850 | 82.5 / 78.3 | 5.2 / 7.5 | 11.7 / 11.2 | 0.402 / 0.409 |
+| top_sheet | W : D 1.123 / 1.015 | 74.6 / 73.0 | 13.6 / 12.1 | 11.8 / 13.2 | |
+
+- **Binding (the decisions' "Binding" rule): on the f34 and front, every share is within tolerance (T ±4, G and R ±3) and fill is within ±0.04, so both pass.** The closest margins are front T +3.4 and front fill +0.032. Rear R is +3.0 (at the edge) and r34 R is +2.8.
+- Front width per height (h .0 → 1.0):
+  - ours: .10 .92 .73 .30 .29 .72 .73 .89 .77 .35 .02;
+  - sheet: .49 .91 .77 .32 .30 .65 .72 .88 .68 .42 .02.
+
+  Every row from h .2 to .9 is within ±0.10. **The bare-trunk rows h .3 / .4 are .30 / .29** (≤ .36).
+- Front top profile:
+  - ours: .56 .78 .95 .92 .72 .97 .98 .78 .79 .87 .70;
+  - sheet: .52 .77 .82 .91 .78 .74 .90 .95 .77 .86 .69.
+- Front T fifths: ours 23 / 16 / 27 / 25 / 9, sheet 26 / 21 / 24 / 22 / 7. Fifth 2 is low (see the leftovers).
+- Colours (f34):
+  - wood median: `#B86C3A` against `#B26634` (6 / 6 / 6 off; R > G > B, hue 24°);
+  - wood median, front: `#AD6637` against `#B66936`;
+  - wood v > .7: `#C5743F` against `#DA8340`, low by 21 / 15 / 1 because the studio lights both sides (as in 042 and 047);
+  - grass and moss v > .7: `#BFC019` against `#BEC20D` (lime);
+  - rock v > .7: `#CFC3B3` against `#C5B9AD` (R ≥ G ≥ B, warm, not mauve).
+
+## Stage 5 — Lighting
+
+Skipped (decision 14): the sheet shows no emission or light. Studio notes (Requires Manual Validation): under the game sun,
+- the wood should stay orange-brown, not red;
+- the pits, knot and sockets should read dark;
+- the cut faces should read pale;
+- the rocks should read pale warm grey and the grass lime.
+
+## Stage 6 — VFX
+
+Skipped (decision 14): the sheet shows no effect. No object has sockets (`build()` checks this).
+
+## Renders
+
+All in `art/blender/renders/models/M053/`:
+- `M053_views.png`: the contact sheet.
+- The kit views: `front`, `side`, `rear`, `top`, `underside`.
+- The sheet comparisons: `f34_sheet`, `r34_sheet`, `front_sheet`, `side_sheet`, `rear_sheet`, `top_sheet`.
+- `front34` / `rear34`, at (−28 / 152, 12).
+- `part_*`: the seven parts, at (−25, 18).
+- `exploded`: the core in the middle, the six branch modules drawn out along their socket axes, the five root modules along their stub axes.
+- `scale`: a 5.5-stud marker at (−6.6, 0.4) under L1. L1's lowest tine, at z 8.4, clears its head by about 2.9.
+- Close-ups:
+  - `twist_cu`: the crossing strands;
+  - `kink_cu`: LM's elbow;
+  - `tines_cu`: the leader V and the TL tips;
+  - `knot_cu`: a round dark hole in a raised pale ring, with the boss below;
+  - `root_cu`: the RT3 and RT4 toes;
+  - `base_cu`: the foot, rocks, moss and tufts;
+  - `join_cu`: the core's LM collar, a pale cut face round a dark square socket (close-up 1);
+  - `peg_cu`: Branch A's peg end;
+  - `under_cu`: the dark underside disc with the pin, and the six roots (close-up 2).
+
+## Modeller's notes for the verifier
+
+- **Rebuilding.** In a fresh session run `import kit_mcp; kit_mcp.install(); import m053; m053.build()`. It takes about 1 min to build and about 1 min to render.
+  - These re-measure everything: `m053.shells_report(o)`, `contact_report(o)`, `bury_report(h)`, `plug_report(h)` and `limb_visibility(h)`.
+  - `build()["problems"]` is empty.
+- **Visible limb lengths** (`limb_visibility`; the main chain from the shoulder to the end, as visible 3D / on screen / total, in studs):
+
+  | Limb | Front | Rear | Side | F34 |
+  | --- | --- | --- | --- | --- |
+  | LEAD | 7.2 / 6.5 / 7.2 | 7.2 / 6.1 | 7.2 / 6.5 | 7.2 / 6.5 |
+  | TL | 7.0 / 6.6 | | 6.9 | |
+  | LM | 10.8 / 7.2 | 10.8 / 6.2 | 5.8 / 5.8 (its base is behind the trunk) | 10.8 / 8.5 |
+  | L1 | 6.4 / 6.2 | 6.4 / 6.1 | **3.1 / 1.8** (L1 runs along −X, behind the trunk and LM from +X) | |
+  | R | 9.2 / 8.4 | 9.2 / 8.1 | 9.2 / 6.9 | |
+  | FR | 6.8 / 3.7 (it points at the camera, as on the sheet) | | 6.8 / 6.3 | |
+
+  Tine ends seen per view (not hidden by the trunk or dressing): LEAD 4, TL 4, LM 4, L1 4 (3 in the side view), R 5, FR 3. That is all 24.
+- Bore pits: 12 on the trunk, 27 on the limbs and 10 on the roots, about 49 in all (40–55 ✓).
+- **Leftovers:**
+  1. **Deviation from decision 6.** The core's collars, stubs and knot are grown from the body grid rather than unioned; only RT3's toes are booleans. The 1000-tri part limit forced this, and the core is still one clean manifold shell. The stubs are horizontal buttresses with a flat bottom on the ground, rather than prisms angled 25–35° down and out.
+  2. The crown still reads as a slightly more upright vase than the sheet's spread. The limbs leave the upper trunk fairly steeply, and the trunk above the crotch (z 9–12) is a touch wide. Front T fifth 2 (h .2–.4) is 16 % against 21 %, and the crown fifths are a little heavy (27 / 25 against 24 / 22).
+  3. The lit wood (v > .7) is 15–21 levels below the sheet's lit half, because the studio lights both sides. The medians match.
+  4. The side and top are judged for content (decision 9).
+     - Side: FR shows out front, LM's stem and TL out back, LEAD and TL up the middle, with roots on both sides.
+     - Top: W : D is 1.12, every arm end is seen, and rock and green show between them. The limbs cross near the centre, though, rather than forming the sheet's clean nine-armed star.
+  5. The hero is 17.06 deep, against the spec's "about 15", and the rear R share is 13.5, at the edge of ±3.
+  6. 22 hero corners are under 2° (min 0.5°), at the pit zips and tine starts. The core's smallest corner is 2.14°.
+  7. The part shots at (−25, 18) hide some of Branch A's side branch behind its main stem. The root parts are short and framed close.
+  8. No kink-ring wood_dark, because each segment is a single facet band (see Stage 4).
+- I made no commits, pushes or exports.
+
+- **Main session (2026-10-30):** the decision-6 deviation is accepted. The collars, root stubs and knot are grown from the body's facet grid instead of unioned, which keeps the core one clean shell at 880 tris.
+
+## Verification round 1 (verifier, 2026-10-30)
+
+Fresh stage-7 verifier, read-only on port 9881 (`wip/M053_verify.blend`, the integrated model; nothing built, edited or
+saved). Everything below was re-measured with my own code (scratch `m053_verify/v_mesh.py`, `v_contact.py`,
+`v_colour.py`, `v_limbs.py`, `v_cross.py`, `meas.py`); renders went to the scratchpad only (`m053_verify/*_sheet.png`,
+`c_*.png`). Shares and colours use the study's own `cls()` masks on both the sheet cells and our renders (our paper
+`#F2E8D9`, sampled from the render corners).
+
+### Measured: mesh
+
+| Object | Tris | Size (studs) | Shells | Bnd / NM / wire / loose / zero / n-gon / dup | Bowties | Winding errs | Self-x | Vol < 0 | Min corner (< 2°) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| TwistedSnag | **3562** / 3800 | 17.90 × 17.06 × 18.18 | 142 | 0 / 0 / 0 / 0 / 0 / 0 / 0 | 0 | 0 | 0 | 0 | 0.50° (22) |
+| TrunkCore | 880 | 8.86 × 11.76 × 12.10 | 1 | all 0 | 0 | 0 | 0 | 0 | 2.14° (0) |
+| BranchA | 216 | 5.94 × 9.27 × 7.10 | 5 | all 0 | 0 | 0 | 0 | 0 | 1.24° (5) |
+| BranchB | 172 | 4.08 × 3.85 × 6.85 | 5 | all 0 | 0 | 0 | 0 | 0 | 0.52° (4) |
+| BranchC | 152 | 6.77 × 2.98 × 2.93 | 5 | all 0 | 0 | 0 | 0 | 0 | 0.50° (4) |
+| RootA | 120 | 4.75 × 2.89 × 2.21 | 5 | all 0 | 0 | 0 | 0 | 0 | 5.68° |
+| RootB | 104 | 3.92 × 4.70 × 2.05 | 4 | all 0 | 0 | 0 | 0 | 0 | 5.50° |
+| RootC | 120 | 4.77 × 2.79 × 2.13 | 5 | all 0 | 0 | 0 | 0 | 0 | 5.53° |
+
+- Every object: bbox centre (0, 0) and min z 0 (origin bottom centre), rotation 0, scale 1, no modifiers, no custom
+  normals, flat shading, one UV layer. Winding is checked per edge (`is_contiguous`); with every shell's volume > 0 the
+  normals are outward. Self-intersection is a per-shell BVH overlap of non-adjacent faces.
+- **The 22 hero corners under 2°** (5 under 1°) are all on tine and side-branch side bands (`wood_x_light_5/10`), not
+  pit zips: strips 1.0–2.3 long and 0.011–0.038 wide, folded 2–18° against their neighbours. Not zero-area and not a
+  topology fault; at 0.01–0.04 wide they can't be seen. Judged harmless (minor 7).
+- Shell kinds (by material): wood 54 (core, 10 module main chains, kids, 11 pegs, RT3 toes), rock 11, moss 10, grass 67.
+  Modules: 11 contact groups (6 branch, 5 root), no module intersecting another module or the core.
+
+### Measured: contact
+
+| Check | Result |
+| --- | --- |
+| Floating (nearest > 0.03 to any shell or the ground), all 8 objects | **0** |
+| Unchained to the ground (hero, core, roots) / to the main chain (branch parts) | **0** |
+| Buried dressing: rock / moss / grass vertices inside wood or rock (3-ray parity, 2 of 3), 88 dressing shells | 8 touch, max **0.016** (a blade at (−2.1, 6.1)), **0 over 0.05** |
+| Pegs (11): overlap with the core / verts inside the core solid / gap to the socket | 0 / 0 / 0.015 each |
+| Joints in the hero (renders `c_joint_LM/R/FR`) | no pale ring at any collar; the module base hides the collar face |
+| Bore pits (2-tri hollow floors) | 52 (+ sockets, knot, dark ends: 82 hollow islands) |
+
+### Measured: silhouette against the sheet (ours / sheet)
+
+| View (camera) | W : H | T | G | R | fill |
+| --- | --- | --- | --- | --- | --- |
+| **f34_sheet (−20, 10)** | 0.932 / 0.971 | **78.7** / 78.0 | 7.3 / 7.9 | 13.9 / 12.2 | **0.445** / 0.434 |
+| f34 at (0, 12) (check) | 0.881 / 0.971 | 79.0 | 7.2 | 13.6 | 0.463 |
+| **front_sheet (0, 4)** | 0.943 / 0.976 | **80.0** / 77.1 | 6.8 / 8.6 | 12.9 / 11.7 | **0.464** / 0.432 |
+| rear_sheet (180, 4) | 0.926 / 0.971 | 79.6 / 79.2 | 6.1 / 7.7 | 14.0 / 10.5 | 0.465 / 0.433 |
+| r34_sheet (160, 10) | 0.955 / 0.958 | 77.8 / 78.2 | 7.2 / 8.0 | 14.9 / 11.5 | 0.442 / 0.420 |
+| side_sheet (90, 4) | 0.861 / 0.855 | 82.0 / 78.3 | 5.2 / 7.5 | 12.2 / 11.2 | 0.403 / 0.406 |
+| top_sheet (0, 89) | W : D 1.119 / 1.015 | 74.1 / 73.0 | 13.5 / 12.1 | 12.4 / 13.2 | 0.531 / 0.404 |
+
+- **Binding (f34 and front): T and fill are inside ±4 / ±0.04 on both.** Front T +2.9 and front fill +0.032 are the
+  closest margins. G and R are inside ±3 on both.
+- Front width per height h .2–.9: ours .73 .30 .29 .72 .72 .88 .77 .35, sheet .76 .32 .30 .65 .73 .88 .68 .42: every
+  row within ±0.10; bare-trunk rows .30 / .29 (≤ .36).
+- f34 width per height: h .6 **.84 / .51** and h .9 **.34 / .73** are outside ±0.10; the other rows pass. Front top
+  profile f .5 **.97 / .75** and f .7 **.78 / .95** are outside ±0.08 (the leader V sits about 1–1.5 studs left of the
+  sheet's, so our peak is where the sheet has its centre dip).
+- T fifths, f34: 22.6 / 17.7 / 25.6 / 25.8 / 8.3 against 25.6 / 21.3 / 23.7 / 22.0 / 7.4 (all within ±6).
+- Rear R +3.5 and r34 R +3.4 are just outside ±3 (non-governing views).
+
+### Measured: skeleton
+
+- **Trunk:** six strands with deep V grooves climbing "/" on the front (`c_twist`, `front_sheet`); it reads twisted and
+  planked, not a straight column. Waist rows .30 / .29 of W as on the sheet.
+- **Limbs** (my own ray test: main chain centreline toward the camera, blocked by anything including other limbs, so
+  stricter than the modeller's `limb_visibility`; visible 3D / on screen, studs):
+
+  | Limb (total) | Front | Rear | Side | f34 | Top |
+  | --- | --- | --- | --- | --- | --- |
+  | LEAD (7.5) | 5.5 / 5.0 | 6.7 / 5.8 | 3.7 / 3.3 | 4.2 / 4.0 | 3.2 / 2.2 |
+  | TL (7.9) | 5.7 / 5.4 | 6.0 / 5.4 | 2.5 / 2.3 | 5.9 / 5.9 | 4.7 / 2.8 |
+  | LM (11.2) | 3.7 / 2.7 | 2.6 / 2.0 | 4.3 / 4.3 | 7.7 / 5.8 | 9.5 / 8.3 |
+  | L1 (6.9) | 3.1 / 3.0 | 4.7 / 4.4 | 1.0 / 0.7 | 3.5 / 3.5 | 4.6 / 4.2 |
+  | R (9.6) | 5.4 / 5.0 | 8.2 / 7.4 | 3.7 / 2.8 | 6.5 / 6.0 | 6.0 / 4.4 |
+  | FR (7.2) | 1.6 / 1.1 | 1.6 / 1.2 | 6.0 / 5.6 | 5.0 / 3.5 | 5.6 / 4.8 |
+
+  Every limb has a readable run in the governing f34 (3.5–7.7). The low numbers are geometric and match the sheet: FR
+  points at the front and rear cameras, L1 is behind the trunk from +X, and LM's base is behind L1 and its own elbow in
+  front and rear. Kinks are hard mitres between straight 6-sided prisms; tines and side branches are 4–5-sided with flat
+  square-cut ends, about half pale and half hollow (`c_crown_f34`, `c_crown_rear`). 30 tine and branch ends; 13–15 read
+  against the sky in front and f34.
+- **Roots:** six (5 modules + the built-in RT3), each ending in 2–3 blunt split toes (`c_under`, `c_roots_front/rear`).
+- **Bore pits:** 52, dark squares on facet centres, at kinks and along limbs.
+- **Knot:** a ringed hole (dark recess, pale raised rim, pale boss below). It's round and clear in the side view. In
+  `front_sheet` it sits on the right flank and reads as a narrow dark oval (about 0.4 : 1) with a thin pale rim, much as
+  the sheet's front cell draws it. In `f34_sheet (−20, 10)` it is **hidden** behind the flank, though the sheet's f34
+  shows it as its clearest detail (minor 1).
+- **Snapped end** on LM: pale broken facets round a dark centre (`c_snap`). It reads as a cut more than a jagged break
+  at cell scale.
+
+### Measured: colour (ours / sheet, study masks)
+
+| Region | f34 | front | Notes |
+| --- | --- | --- | --- |
+| Wood median | `#B86C3A` / `#B26634` | `#AD6637` / `#B66936` | hue 23.5°, R > G > B, orange-brown ✓ |
+| Wood v > .7 | `#C5743F` / `#DA8340` | `#C4743F` / `#DC8644` | **21–24 low in R**, 15–18 in G (minor 3) |
+| Rock v > .7 | `#D1C5B5` / `#C8BBAF` | `#D1C5B5` / `#CBC3B4` | warm, R ≥ G ≥ B, hue 34°, sat .12; never mauve ✓ |
+| Moss (G, h < .03) | `#C8B91E` / `#C8B810` | `#C6B920` / `#C2B620` | matches the sheet's moss (55°) in the lit views |
+| Blades v > .7 | `#B7C414` / `#BEC20D` | `#B6C11A` / `#C0BC1B` | lime, 65° ✓ |
+| Moss in shaded views | rear `#969118`, r34 `#8C8514`, side `#8D8619` | sheet rear `#BAB414` | reads olive-mustard there and in the top view (minor 4) |
+
+- **Wood dark by position only.** The builder uses `.normal` only for pit geometry (line 252) and the shell-volume
+  report; no paint selection reads a normal. Wood lightness against normal: corr z 0.24, x −0.02, y 0.02 (< 0.5). The
+  positive z correlation comes from the dark underside disc and the low root faces (both by position).
+- `K.check` on all eight objects: **[]** (clean). `kit_baked_shading` 0.15.
+- **Tint:** a per-corner `Tint` colour attribute, 0.94–1.08, sd 0.019. The mean neighbour difference is 0.0036 against
+  0.0205 for random face pairs, so it is broad and coherent, not confetti. Wood sd 0.023, rock 0.023, grass 0.024 (by
+  blade), moss 0.008.
+- Finish: wood 0.9, dark 0.95, cut 0.85, hollow 1.0, rock 0.85; metal 0; emission 0 everywhere.
+
+### Lighting, VFX, decisions
+
+- No lights in the collection, no emission, no child sockets on any object: stages 5 and 6 skipped as decided ✓.
+- Decisions: 1 size ✓ (18.18 tall, 17.90 wide; 17.06 deep against "about 15", minor 5). 2 names ✓ (no `DeadTree*`).
+  3 six modules as tabled, no seventh ✓. 4 six roots, A ×2, B ×2, C ×1 + RT3 ✓. 5 pegs and sockets modelled, hidden,
+  no pale ring ✓. 6 ring-stack limbs, kids as buried closed shells; core booleans replaced by grown blocks (the main
+  session accepted this) ✓. 7 pits 52 ✓; knot is a hole, not a slot, but hidden in f34 (minor 1). 8 top ring pale
+  (`c_topcentre`: broken into fragments by the TL and LEAD bases, not a band in the f34) ✓. 9 side and top judged for
+  content ✓. 10 cameras ✓ (f34 at (−20, 10), recorded). 11 collision: hero and core precise, modules hull ✓. 12 the
+  hero + seven parts ✓. 13 colour: median ✓, lit tone low (minor 3), wood dark by position ✓. 14 stages 5 and 6
+  skipped ✓. 15 budget 3562 ✓, parts 104–880 ✓. Packaging: manifold, 0 winding, 0 floating, 0 buried ✓; rocks are
+  angular ring-stack hulls, not eggs ✓.
+
+### Findings
+
+No blockers.
+
+1. **minor: the knot is hidden in the governing f34.** It's correct as a ringed hole and reads in front and side, but
+   it is the sheet f34's clearest detail. Fix target: turn the knot about 15–25° toward the front (centre az ≈ 305–310
+   on the trunk surface, z 6.9). Check that it shows in `f34_sheet (−20, 10)` as a dark oval with a pale rim, with an
+   aspect ≥ 0.55 in `front_sheet`.
+2. **minor: the crown is chunkier and less branched than the sheet.** The sheet's limbs taper strongly and end in Y
+   forks of two or three blunt tines with small side twigs. Ours stay thick to the end (pipe-like). R and L1 end in
+   down-hooked last segments, and several tines are short perpendicular spurs. The mass is right (T, fill and the front
+   width rows pass), but the character is heavier. Fix targets:
+   - taper every main chain to ≤ 0.45 × its base radius at the end;
+   - turn R's and L1's hooked last segments into Y forks of two tines (spec 2.4 tips);
+   - give each limb end a two-tine fork;
+   - restore the leader V's centre dip in the front (move LEAD's left tine about 1 stud to +X, so the front top profile
+     f .5 is ≤ .83 and f .7 ≥ .87);
+   - keep fill within 0.43 ± 0.04.
+3. **minor: the lit wood is 21–24 levels low in R** (v > .7 `#C5743F` against `#DA8340`). The medians match, and the
+   studio lights both sides (the same bias as 042 and 047). Fix target, if the main session wants it: more lit-tone
+   spread, for example `wood` toward `#A0612F` with the groove share of `wood_x_dark_30` kept, re-checking that the
+   median stays within 20 of `#B26634`.
+4. **minor: the moss pads read olive-mustard in the shaded and top views** (rear `#969118`, r34 `#8C8514`; the top view
+   shows large yellow pads where the sheet's top cell shows lime clumps at 66°). They match the sheet's moss in the lit
+   views. Fix target: `moss` toward 58–60° with V +10 %, and shrink the pads that show between the arms from above
+   (top G share 13.5 against 12.1).
+5. **minor: the hero is 17.06 deep against about 15**, and rear and r34 R are 14.0 and 14.9 (just over +3). FR's tines
+   reach y −7.9, and the back roots and RK6 reach +8.5. Fix target: pull RK6 and the back pebbles in by 0.8–1.0, and
+   shrink RK1, RK2 or RK6 by about 10 % so that rear R ≤ 13.5.
+6. **minor: the top view is tangled.** The limbs cross over the centre and the pale top ring shows only as fragments,
+   rather than the sheet's clean nine-armed star round a pale disc. This is judged for content (decision 9): 8+ arm
+   ends, rock and green between, a pale centre. Accepted.
+7. **minor: 22 sliver corners under 2° (5 under 1°)** on tine and side-branch side bands (0.011–0.038 wide). Harmless.
+   If touched, collapse those under 1° with `m012._force_slivers`, as on the core.
+8. **minor: the f34 crown's width rows** h .6 (.84 / .51) and h .9 (.34 / .73) are outside ±0.10 at (−20, 10). The
+   sheet's f34 is wider high up (its TL and R tips reach h .88–.90 at the edges). Fix 2 (forked ends) would raise R's
+   upper tips. Not binding: the front passes everywhere.
+9. **minor: no wood_dark kink rings** (spec 5.5; not in the decisions). The kinks read through the light and the pits.
+   Accepted.
+
+Modeller's leftovers judged:
+- **"Upright vase":** not confirmed. In the front, every width row from h .2 to .9 is within ±0.10. In the f34 the crown
+  is wider at h .6 and narrower at h .9 than the sheet (a flatter spread, finding 8).
+- **Lit wood low:** confirmed, 21–24 (finding 3).
+- **Top view limbs crossing:** confirmed (finding 6).
+- **17.1 deep:** confirmed (finding 5).
+- **No darker kink rings:** confirmed and accepted (finding 9).
+- The modeller called the slivers "pit zips". They are actually on tine side bands, and are still harmless.
+
+### Score and verdict
+
+**7 / 10. PASS.** The mesh is clean on every count, and contact, pegs, budget, decisions, the binding shares and the
+colour family are all met. The skeleton reads as a twisted, kinked, square-tined dead tree in every view. The two
+findings most worth a round 2 are 1 (the knot in the f34) and 2 (tapering and forking the limb ends).
+
+## Main session ruling (2026-10-30)
+- **Verdict:** passed in round 1 (7/10) and committed.
+- **Left for a later polish pass** (the verifier's main targets first):
+  - The knot is hidden at the f34 camera. Turn it to about az 305–310.
+  - The crown is chunkier and less branched than the sheet. Taper each limb to ≤ 0.45 of its base, give it a Y-fork end, and move the leader's left tine toward +X.
+  - Lit wood reads 21–24 levels low.
+  - Moss reads olive in shade. Shift it toward 58–60° and raise its value by 10 %.
+  - The hero is 17 deep; pull the back rocks in.
+  - The top view is tangled.
+  - Collapse the 5 slivers under 1°.
+- **Export:** 8 assets, 8 solid pieces, 5326 tris, 0 VFX sockets, palette 18 colours, 0 problems.
