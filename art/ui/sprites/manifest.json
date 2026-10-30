@@ -932,13 +932,27 @@
     "file": "pm_arrow_left.png",
     "w": 86,
     "h": 74,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      0,
+      933,
+      86,
+      74
+    ]
   },
   "pm_arrow_right": {
     "file": "pm_arrow_right.png",
     "w": 86,
     "h": 75,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      924,
+      191,
+      86,
+      75
+    ]
   },
   "pm_banner": {
     "file": "pm_banner.png",
@@ -960,6 +974,13 @@
       26,
       40,
       26
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      693,
+      191,
+      227,
+      85
     ]
   },
   "pm_button_add_friend": {
@@ -979,13 +1000,27 @@
     "file": "pm_button_apply.png",
     "w": 276,
     "h": 89,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      693,
+      98,
+      276,
+      89
+    ]
   },
   "pm_button_check": {
     "file": "pm_button_check.png",
     "w": 155,
     "h": 150,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      749,
+      155,
+      150
+    ]
   },
   "pm_button_claim": {
     "file": "pm_button_claim.png",
@@ -996,6 +1031,13 @@
       26,
       70,
       26
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      0,
+      528,
+      391,
+      82
     ]
   },
   "pm_button_craft": {
@@ -1007,6 +1049,13 @@
       26,
       70,
       26
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      693,
+      0,
+      282,
+      94
     ]
   },
   "pm_button_leather": {
@@ -1018,6 +1067,13 @@
       44,
       64,
       44
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      0,
+      384,
+      401,
+      140
     ]
   },
   "pm_button_leather_disabled": {
@@ -1080,6 +1136,13 @@
       48,
       56,
       48
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      500,
+      386,
+      159
     ]
   },
   "pm_button_parchment_disabled": {
@@ -1119,7 +1182,14 @@
     "file": "pm_button_reset.png",
     "w": 212,
     "h": 77,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      768,
+      500,
+      212,
+      77
+    ]
   },
   "pm_button_square": {
     "file": "pm_button_square.png",
@@ -1130,6 +1200,13 @@
       26,
       26,
       26
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      736,
+      674,
+      116,
+      93
     ]
   },
   "pm_button_strip": {
@@ -1141,13 +1218,27 @@
       26,
       64,
       26
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      849,
+      357,
+      80
     ]
   },
   "pm_button_x": {
     "file": "pm_button_x.png",
     "w": 155,
     "h": 150,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      721,
+      644,
+      155,
+      150
+    ]
   },
   "pm_button_x_leather": {
     "file": "pm_button_x_leather.png",
@@ -1159,13 +1250,27 @@
     "file": "pm_button_zoom_in.png",
     "w": 62,
     "h": 62,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      370,
+      879,
+      62,
+      62
+    ]
   },
   "pm_button_zoom_out": {
     "file": "pm_button_zoom_out.png",
     "w": 62,
     "h": 63,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      304,
+      879,
+      62,
+      63
+    ]
   },
   "pm_card": {
     "file": "pm_card.png",
@@ -1176,55 +1281,118 @@
       48,
       40,
       40
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      492,
+      314,
+      148
     ]
   },
   "pm_cat_all": {
     "file": "pm_cat_all.png",
     "w": 74,
     "h": 83,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      856,
+      581,
+      74,
+      83
+    ]
   },
   "pm_cat_food": {
     "file": "pm_cat_food.png",
     "w": 79,
     "h": 73,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      736,
+      821,
+      79,
+      73
+    ]
   },
   "pm_cat_materials": {
     "file": "pm_cat_materials.png",
     "w": 78,
     "h": 68,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      942,
+      674,
+      78,
+      68
+    ]
   },
   "pm_cat_tools": {
     "file": "pm_cat_tools.png",
     "w": 84,
     "h": 85,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      768,
+      581,
+      84,
+      85
+    ]
   },
   "pm_check_green": {
     "file": "pm_check_green.png",
     "w": 32,
     "h": 32,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      363,
+      936,
+      32,
+      32
+    ]
   },
   "pm_check_off": {
     "file": "pm_check_off.png",
     "w": 58,
     "h": 61,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      898,
+      384,
+      58,
+      61
+    ]
   },
   "pm_check_on": {
     "file": "pm_check_on.png",
     "w": 70,
     "h": 71,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      927,
+      0,
+      70,
+      71
+    ]
   },
   "pm_compass_rose": {
     "file": "pm_compass_rose.png",
     "w": 93,
     "h": 117,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      866,
+      542,
+      93,
+      117
+    ]
   },
   "pm_ctab": {
     "file": "pm_ctab.png",
@@ -1235,6 +1403,13 @@
       14,
       16,
       14
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      856,
+      674,
+      82,
+      64
     ]
   },
   "pm_ctab_selected": {
@@ -1246,6 +1421,13 @@
       14,
       16,
       14
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      934,
+      581,
+      83,
+      64
     ]
   },
   "pm_dropdown": {
@@ -1257,6 +1439,13 @@
       26,
       72,
       26
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      0,
+      936,
+      239,
+      73
     ]
   },
   "pm_fill_xp": {
@@ -1286,6 +1475,13 @@
       112,
       96,
       122
+    ],
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      0,
+      542,
+      774,
+      333
     ]
   },
   "pm_frame_window": {
@@ -1297,103 +1493,222 @@
       112,
       96,
       122
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      0,
+      0,
+      743,
+      380
     ]
   },
   "pm_glyph_armor": {
     "file": "pm_glyph_armor.png",
     "w": 39,
     "h": 37,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      836,
+      342,
+      39,
+      37
+    ]
   },
   "pm_glyph_bag": {
     "file": "pm_glyph_bag.png",
     "w": 32,
     "h": 37,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      522,
+      903,
+      32,
+      37
+    ]
   },
   "pm_glyph_bench": {
     "file": "pm_glyph_bench.png",
     "w": 41,
     "h": 35,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      747,
+      342,
+      41,
+      35
+    ]
   },
   "pm_glyph_diamond": {
     "file": "pm_glyph_diamond.png",
     "w": 24,
     "h": 27,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      464,
+      993,
+      24,
+      27
+    ]
   },
   "pm_glyph_gamepad": {
     "file": "pm_glyph_gamepad.png",
     "w": 58,
     "h": 42,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      960,
+      446,
+      58,
+      42
+    ]
   },
   "pm_glyph_gear": {
     "file": "pm_glyph_gear.png",
     "w": 53,
     "h": 54,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      954,
+      53,
+      54
+    ]
   },
   "pm_glyph_hammer": {
     "file": "pm_glyph_hammer.png",
     "w": 27,
     "h": 32,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      363,
+      972,
+      27,
+      32
+    ]
   },
   "pm_glyph_heart": {
     "file": "pm_glyph_heart.png",
     "w": 160,
     "h": 135,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      723,
+      492,
+      160,
+      135
+    ]
   },
   "pm_glyph_monitor": {
     "file": "pm_glyph_monitor.png",
     "w": 54,
     "h": 51,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      464,
+      903,
+      54,
+      51
+    ]
   },
   "pm_glyph_mountain": {
     "file": "pm_glyph_mountain.png",
     "w": 44,
     "h": 27,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      830,
+      453,
+      44,
+      27
+    ]
   },
   "pm_glyph_person": {
     "file": "pm_glyph_person.png",
     "w": 50,
     "h": 60,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      968,
+      568,
+      50,
+      60
+    ]
   },
   "pm_glyph_sound": {
     "file": "pm_glyph_sound.png",
     "w": 55,
     "h": 47,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      903,
+      55,
+      47
+    ]
   },
   "pm_glyph_sword": {
     "file": "pm_glyph_sword.png",
     "w": 27,
     "h": 31,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      464,
+      958,
+      27,
+      31
+    ]
   },
   "pm_glyph_tent": {
     "file": "pm_glyph_tent.png",
     "w": 40,
     "h": 35,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      792,
+      342,
+      40,
+      35
+    ]
   },
   "pm_glyph_tools": {
     "file": "pm_glyph_tools.png",
     "w": 40,
     "h": 39,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      898,
+      449,
+      40,
+      39
+    ]
   },
   "pm_glyph_weight": {
     "file": "pm_glyph_weight.png",
     "w": 23,
     "h": 32,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      997,
+      492,
+      23,
+      32
+    ]
   },
   "pm_hud_card": {
     "file": "pm_hud_card.png",
@@ -1529,19 +1844,40 @@
     "file": "pm_icon_bolt.png",
     "w": 130,
     "h": 160,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      550,
+      842,
+      130,
+      160
+    ]
   },
   "pm_icon_chest": {
     "file": "pm_icon_chest.png",
     "w": 214,
     "h": 170,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      550,
+      500,
+      214,
+      170
+    ]
   },
   "pm_icon_coin": {
     "file": "pm_icon_coin.png",
     "w": 176,
     "h": 166,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      747,
+      0,
+      176,
+      166
+    ]
   },
   "pm_icon_crown": {
     "file": "pm_icon_crown.png",
@@ -1560,13 +1896,27 @@
     "file": "pm_icon_gem.png",
     "w": 128,
     "h": 168,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      747,
+      170,
+      128,
+      168
+    ]
   },
   "pm_icon_scroll": {
     "file": "pm_icon_scroll.png",
     "w": 182,
     "h": 164,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      550,
+      674,
+      182,
+      164
+    ]
   },
   "pm_inset": {
     "file": "pm_inset.png",
@@ -1577,6 +1927,13 @@
       22,
       22,
       22
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      0,
+      614,
+      376,
+      318
     ]
   },
   "pm_item_slot": {
@@ -1588,6 +1945,13 @@
       20,
       20,
       20
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      729,
+      384,
+      97,
+      96
     ]
   },
   "pm_jtab_leather": {
@@ -1599,6 +1963,13 @@
       16,
       20,
       8
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      0,
+      871,
+      126,
+      58
     ]
   },
   "pm_jtab_paper": {
@@ -1610,6 +1981,13 @@
       16,
       20,
       8
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      394,
+      933,
+      129,
+      54
     ]
   },
   "pm_keycap": {
@@ -1621,6 +1999,13 @@
       22,
       22,
       26
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      243,
+      936,
+      116,
+      71
     ]
   },
   "pm_keycap_small": {
@@ -1735,13 +2120,27 @@
       30,
       40,
       30
+    ],
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      0,
+      879,
+      300,
+      108
     ]
   },
   "pm_map_pin": {
     "file": "pm_map_pin.png",
     "w": 84,
     "h": 118,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      778,
+      542,
+      84,
+      118
+    ]
   },
   "pm_panel": {
     "file": "pm_panel.png",
@@ -1752,6 +2151,13 @@
       62,
       70,
       62
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      0,
+      529,
+      314
     ]
   },
   "pm_quest_row": {
@@ -1763,6 +2169,13 @@
       30,
       40,
       30
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      757,
+      362,
+      88
     ]
   },
   "pm_quest_row_selected": {
@@ -1774,13 +2187,27 @@
       30,
       40,
       30
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      663,
+      364,
+      90
     ]
   },
   "pm_queue_empty": {
     "file": "pm_queue_empty.png",
     "w": 404,
     "h": 96,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      568,
+      398,
+      404,
+      96
+    ]
   },
   "pm_queue_row": {
     "file": "pm_queue_row.png",
@@ -1791,6 +2218,13 @@
       24,
       60,
       24
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      398,
+      404,
+      98
     ]
   },
   "pm_recipe_row": {
@@ -1802,6 +2236,13 @@
       24,
       60,
       24
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      569,
+      318,
+      405,
+      74
     ]
   },
   "pm_recipe_row_selected": {
@@ -1813,6 +2254,13 @@
       24,
       60,
       24
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      318,
+      405,
+      76
     ]
   },
   "pm_req_card": {
@@ -1824,6 +2272,13 @@
       18,
       18,
       18
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      0,
+      573,
+      106,
+      156
     ]
   },
   "pm_search_box": {
@@ -1835,31 +2290,66 @@
       14,
       14,
       14
+    ],
+    "atlas": "atlas_screens",
+    "rect": [
+      160,
+      933,
+      230,
+      46
     ]
   },
   "pm_side_column": {
     "file": "pm_side_column.png",
     "w": 156,
     "h": 569,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      0,
+      0,
+      156,
+      569
+    ]
   },
   "pm_side_tab_selected": {
     "file": "pm_side_tab_selected.png",
     "w": 122,
     "h": 134,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      0,
+      733,
+      122,
+      134
+    ]
   },
   "pm_slider_knob": {
     "file": "pm_slider_knob.png",
     "w": 58,
     "h": 58,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      960,
+      384,
+      58,
+      58
+    ]
   },
   "pm_sort_button": {
     "file": "pm_sort_button.png",
     "w": 81,
     "h": 46,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_screens",
+    "rect": [
+      736,
+      771,
+      81,
+      46
+    ]
   },
   "pm_stat_chip": {
     "file": "pm_stat_chip.png",
@@ -1888,6 +2378,13 @@
       18,
       18,
       18
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      887,
+      492,
+      106,
+      72
     ]
   },
   "pm_stepper_field": {
@@ -1899,19 +2396,40 @@
       10,
       10,
       10
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      887,
+      568,
+      77,
+      62
     ]
   },
   "pm_stepper_minus": {
     "file": "pm_stepper_minus.png",
     "w": 64,
     "h": 65,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      927,
+      75,
+      64,
+      65
+    ]
   },
   "pm_stepper_plus": {
     "file": "pm_stepper_plus.png",
     "w": 64,
     "h": 65,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_ui",
+    "rect": [
+      830,
+      384,
+      64,
+      65
+    ]
   },
   "pm_tab_leather": {
     "file": "pm_tab_leather.png",
@@ -1922,6 +2440,13 @@
       30,
       52,
       30
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      384,
+      320,
+      104
     ]
   },
   "pm_tab_paper": {
@@ -1933,6 +2458,13 @@
       30,
       52,
       30
+    ],
+    "atlas": "atlas_ui",
+    "rect": [
+      405,
+      644,
+      312,
+      101
     ]
   },
   "pm_tile_forge": {
@@ -2045,6 +2577,13 @@
         817,
         742
       ]
+    ],
+    "atlas": "atlas_windows_craft",
+    "rect": [
+      0,
+      0,
+      1023,
+      466
     ]
   },
   "pm_window_forge__1_1": {
@@ -2079,6 +2618,13 @@
         817,
         742
       ]
+    ],
+    "atlas": "atlas_windows_craft",
+    "rect": [
+      0,
+      470,
+      1023,
+      466
     ]
   },
   "pm_window_inventory__1_1": {
@@ -2113,6 +2659,13 @@
         749,
         786
       ]
+    ],
+    "atlas": "atlas_windows_bag",
+    "rect": [
+      0,
+      0,
+      1024,
+      538
     ]
   },
   "pm_window_journal__1_1": {
@@ -2147,6 +2700,13 @@
         818,
         772
       ]
+    ],
+    "atlas": "atlas_windows_menu",
+    "rect": [
+      0,
+      0,
+      1024,
+      484
     ]
   },
   "pm_window_settings__1_1": {
@@ -2181,6 +2741,43 @@
         817,
         706
       ]
+    ],
+    "atlas": "atlas_windows_menu",
+    "rect": [
+      0,
+      488,
+      1024,
+      443
     ]
+  },
+  "atlas_ui": {
+    "file": "atlas_ui.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_screens": {
+    "file": "atlas_screens.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_craft": {
+    "file": "atlas_windows_craft.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_menu": {
+    "file": "atlas_windows_menu.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_bag": {
+    "file": "atlas_windows_bag.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
   }
 }
