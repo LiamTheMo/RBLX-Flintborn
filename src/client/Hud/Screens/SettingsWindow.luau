@@ -180,7 +180,7 @@ function SettingsWindow.new(parent: Instance?, handlers)
 	self.close = Kit.IconButton.new(visual, {
 		name = "Close",
 		variant = "close",
-		rect = { 1017, 14.5, 66, 64 },
+		rect = { 1014, 14.5, 66, 64 },
 		zIndex = 9,
 		onPress = function()
 			screen:Close()
