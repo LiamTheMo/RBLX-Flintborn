@@ -399,8 +399,37 @@ function RecipeWindow:Select(id: string?)
 	for rowId, row in self.rows do
 		row:SetSelected(rowId == id)
 	end
+	self:_reveal(id)
 	self:_renderDetail()
 	self:_renderMaterials()
+end
+
+-- Scrolls the recipe list so the chosen row is in view.
+function RecipeWindow:_reveal(id: string?)
+	local index = nil
+	for i, entry in self.filtered do
+		if entry.id == id then
+			index = i
+		end
+	end
+	if index == nil then
+		return
+	end
+	local frame = self.recipeList:Content()
+	local rowH, viewH = L.recipeRow[2], L.recipeList[4]
+	local top = (index - 1) * (rowH + L.recipeGap)
+	-- CanvasPosition is in screen px, the layout in design px (as Kit.Scroll reads it).
+	local window = frame.AbsoluteWindowSize.Y
+	local k = if window > 0 then window / viewH else 1
+	local y = frame.CanvasPosition.Y / k
+	if top < y then
+		y = top
+	elseif top + rowH + 14 > y + viewH then
+		y = top + rowH + 14 - viewH
+	else
+		return
+	end
+	frame.CanvasPosition = Vector2.new(0, math.max(0, y) * k)
 end
 
 function RecipeWindow:Selected()

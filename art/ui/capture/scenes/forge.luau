@@ -238,7 +238,11 @@ window.confirm.Close()
 view = snapshot(VAULT, UNLOCKED)
 ForgeController.Refresh()
 window:Select("ForgeIronPickaxe")
-screen:Fit(844, 390, 36, 1)
+-- A touch-only phone: the window fills the screen below the top bar.
+local UserInputService = game:GetService("UserInputService")
+UserInputService.TouchEnabled = true
+UserInputService.KeyboardEnabled = false
+screen:Fit(844, 390, 52, 1)
 __dump(player.PlayerGui, 844, 390)
 
 print(__failed and "FORGE SCENE FAILED" or "FORGE SCENE OK")
