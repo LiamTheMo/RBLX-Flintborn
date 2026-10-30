@@ -276,7 +276,8 @@ end
 --   party = nil | {id, leader, createdAt (server os.time, or nil), members =
 --     {{userId, name, ready}}, invited = {userId} (the leader's pending invites;
 --     empty for other members)},
---   invites = {{partyId, from}} (invites waiting for you),
+--   invites = {{partyId, from, fromUserId}} (invites waiting for you; from is
+--     the inviting leader's display name),
 --   ready = boolean (yours, also when solo),
 --   maxSize = 8,
 -- }

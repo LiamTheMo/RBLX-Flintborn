@@ -61,7 +61,11 @@ local function viewFor(player: Player)
 	for id, other in state.parties do
 		if other.invites[player.UserId] then
 			local leader = Players:GetPlayerByUserId(other.leader)
-			table.insert(view.invites, { partyId = id, from = leader and leader.DisplayName or tostring(other.leader) })
+			table.insert(view.invites, {
+				partyId = id,
+				from = leader and leader.DisplayName or tostring(other.leader),
+				fromUserId = other.leader,
+			})
 		end
 	end
 	return view

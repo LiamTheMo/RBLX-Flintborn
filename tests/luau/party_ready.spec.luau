@@ -214,6 +214,8 @@ test("the party view carries ready flags, createdAt, cap and the leader's invite
 	expectEq(inviteeView.party, nil, "an invitee sees no party details")
 	expectEq(#inviteeView.invites, 1, "only the invite")
 	expectEq(inviteeView.invites[1].from, "Name1", "from the leader's display name")
+	expectEq(inviteeView.invites[1].fromUserId, 1, "and the leader's user id")
+	expectEq(inviteeView.invites[1].partyId, partyId, "for the leader's party")
 	expectEq(inviteeView.invites[1].members, nil, "no member list leaks with an invite")
 
 	local soloView = sent[4]
