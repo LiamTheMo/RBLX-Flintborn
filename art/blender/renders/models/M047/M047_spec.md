@@ -830,3 +830,702 @@ All 14 recommendations are accepted.
 14. **Budget:** a limit of 4000, with a planning ceiling of 3800.
 
 **Binding checks:** §1.5, which separates this tree from M042, M045 and W04, and the f34 shares (green 48.2 %, bark 37.6 % ± 4).
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m047.py` (`build()`), background session port 9880 on `wip/M047.blend`. Every exploded part has
+its own function and the hero is assembled from exactly those functions:
+- `trunk_body()` (planked body: 9 sides each split once = 18 facets, grooves pulled in / proud planks pushed out, rings
+  twisted 3° per level, the flare offset to −X so the trunk leans to +X; the leader top is a 9-corner ring with a socket
+  hole tilted 18° back toward the crown pad), `knot()` (the front knot cut into one plank facet: raised rim + 0.28 deep
+  hole, built into the body, no boolean), `stub()` (four hexagonal socket stubs with walled holes: lf, rf, lr, ul; the back
+  hollow stub), `root()` ×7 (four-sided buttress prisms, kinked once, ridge rising inside the trunk). Only the stubs and
+  roots are exact-unioned into the body, one at a time at the world origin (`m033._union_fine`, merge 0) → one shell.
+  **Deviation from decision 6:** the fork stubs are unioned closed hex prisms, not hand-bridged ring stacks; the result is
+  still one manifold trunk shell with no seam shells and 0 bowties.
+- `limb()` (hex tube: hollow plug end in the hole, a thin shoulder 0.05–0.09 over the rim slightly wider than the stub
+  so it hides the rim, elbows, flat twig-fork end), `twigs()` (4-sided, roots buried in the limb end, tips buried 0.32
+  in the core lobe), `cut_stub()` (crown limb), `pad()` (core + lower ring + upper ring + top lobes; `lobe()` = 22-tri
+  hexagonal faceted dome, core 18 tris). `branch_piece()` = limb + twigs (+ stub) + pad.
+- `root_base_part()`: `patch()`, `rock()` ×6 + `pebble()` ×4 (ring-stack hulls with a sloping crown, not balls),
+  `clump()` ×11 (bush B1, tufts T1 T2a T2b T3 T4 T5, sprigs S1–S4; closed 8-tri leaves round a buried hub).
+
+Layout as built (build frame): pads C (1.7, 3.9) 15.2→20.0 W 8.0; UL (−3.4, 4.1) 14.4→18.6 W 6.0; UR (7.4, 1.6)
+13.5→17.4 W 6.4; L (−5.4, −3.0) 8.7→14.3 W 9.2; R (7.2, −3.3) 7.7→12.3 W 7.2. Lobes: C 13, UL 10, UR 11, L 13, R 12 = 59
+(more, smaller lobes than the study's 37: the sheet's lobes are about a third of the pad wide). Socket faces: top
+(1.85, 0.6, 13.5), lf (−2.38, −0.47, 8.34), rf (4.30, 0.95, 12.64; it protrudes 1.9 so its whole hole clears the leader),
+lr (3.74, −1.62, 8.05), ul (−0.59, 1.54, 12.49); back stub face (1.55, 3.55, 9.69); knot (0.94, −1.92, 9.5).
+Roots reach 5.6 / 5.9 / 6.4 / 6.8 / 7.2 / 7.4 / 8.6 (RT1, front-right, the longest).
+
+Iterations (side by side against the sheet cells, scratch `m047w/cmp.py`):
+1. Pads of 6–9 big gem lobes read as separate balls → 59 smaller hexagonal lobes in three tiers, ring lobes tilted out.
+2. The trunk read as a column with swallowed roots → asymmetric flare, narrower foot (r 4.2), taller and wider roots;
+   the fork widening removed so the trunk tapers like the sheet.
+3. Stubby hidden limbs → limb shoulder wider than the stub, elbows, inner lower lobes lifted so the limbs show.
+4. Top view covered → pads spread a little in Y (decision 7) so the brown limb star shows (top T 18 %).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| GnarledPine (hero) | **3746** (ceiling 3800) | 20.35 × 15.99 × 19.98 | 150 |
+| GnarledPineForkedTrunk | 976 | 14.01 × 12.47 × 13.73 | 1 |
+| GnarledPineCrownCanopy | 446 | 8.04 × 7.43 × 7.07 | 18 |
+| GnarledPineCanopyTier | 310 | 6.12 × 5.73 × 6.94 | 13 |
+| GnarledPineBranchAngled | 400 | 8.49 × 7.41 × 6.99 | 17 |
+| GnarledPineRootBase | 904 | 17.83 × 15.99 × 3.64 | 72 |
+
+- Hero tris by shell kind: trunk 976, lobes 59 / 1278, limbs 5 / 398, cut stub 46, twigs 12 / 144, rocks + pebbles
+  10 / 320, patch 96, leaves + hubs 61 / 488.
+- Budget savings: knot built as an inset (−60 against a union), 4-sided roots and twigs, 2-segment RT2 / RT4, a
+  9-corner leader top, 5-sided core lobes, a 16-point patch.
+- Every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose / zero-area / n-gon / duplicate verts,
+  normals outward, transforms applied, origin bottom centre (offsets in `o["m047_offset"]`; hero 0.49, −0.29, 0).
+- Per shell, all six objects: **0 winding errors** (manifold edges whose two faces disagree, `BMEdge.is_contiguous`),
+  0 self-intersections, volume > 0. Smallest corner 2.01° (trunk union seams; slivers under 2° forced). `K.check`: clean.
+- **Contact (no floating dressing):** floating 0, unchained 0 in all six objects (tol 0.03; chained to the patch in the
+  hero and root base, to the trunk or limb in the parts). Plugs (`plug_report`): every plug corner 0.015–0.053 from the
+  socket walls / floor, none inside the trunk solid.
+
+## Stage 3 — UV
+
+`M.smart_uv` angle-based (45°, margin 0.008) + `m012._uv_unfold`: all six objects 0 overlaps, 0 flipped, min island gap
+0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.026. Islands: hero 1482, trunk 166, crown 187,
+tier 126, angled 183, base 385.
+
+## Stage 4 — Materials, colour and texture
+
+1. **`K.calibrate`** (dome) to TARGETS: leaf `#4F7830`, leaf_light `#8DA031`, leaf_deep `#294C40` (kind "all": the
+   green mask rejects the teal), bark `#7E481D`, bark_light `#955E2D`, bark_deep `#301606`, rock `#A9A29A`, rock_light
+   `#B4ADA4`, rock_deep (calibrated `#8C8E90` came out blue: set warm `#8E8A85` by hand), sand `#B2A283`, sand_deep
+   `#A69175`, plant `#7E9526`, plant_mid `#426526`, plant_deep `#214D33`. Each rendered within 6 of its target on the dome.
+2. **Re-measured on the f34_sheet render** (scratch `m047w/col47.py`, the study's masks): the tree renders darker than
+   the dome (lobes and trunk shade each other), so the families were scaled in linear light (leaf ×1.5, bark ×1.45,
+   plant mid / deep ×1.4) and the hues set so plant is ≥ 8° yellower than leaf_light (63.8° vs 71.8°).
+   **Final `PALETTE`:** leaf `#5F903A`, leaf_light `#A6C234`, leaf_deep `#2D5346`, bark `#955522`, bark_light `#B06F35`,
+   bark_deep `#341807`, rock `#A9A29A`, rock_light `#B4ADA4`, rock_deep `#8E8A85`, sand `#B2A283`, sand_deep `#A69175`,
+   plant `#919824`, plant_mid `#558331`, plant_deep `#265A3B`.
+3. **Roles (never facing):**
+   - Pads: tone C 0.75, UL / UR 0.25, L / R 0. Top lobes leaf→light 0.5 + tone/2; upper ring 0.25 + tone/2; lower ring
+     by plan side: outer (away from the trunk) tone/2, side lobes deep 25 %, inner lobes deep 50 %; cores deep 75 %.
+   - Bark: grooves (pulled-in plank verts) and the foot below z 1 deep 25 %; root ridge strips light 25 %; limb last
+     segment light 25 %; cut faces (socket rims, plug and stub ends, knot rim, leader top) bark_light, hard; every hole
+     interior (socket walls / floors, plug pits, stub pits, knot hole) bark_deep, hard: a geometric region.
+   - Rocks by height band (light top, deep foot); sand deep on the bevel and within 0.5 of trunk / roots / rocks;
+     plants per leaf (tallest lime, then mid; the bush mostly deep with 4 mid outer leaves).
+4. **Tint:** per lobe ±0.04 and pad mottle 0.03 / 0.5; bark per plank column ±0.04 + mottle 0.04 / 0.35; limbs, roots,
+   rocks and sand mottled as §5.6; leaves ±0.04. Facing correlation (`kit_baked_shading`): hero 0.02, parts ≤ 0.06.
+5. **Finish:** pads and plants rough 0.85, low spec; bark 0.9 (deep 0.95); rock 0.85; sand 0.95; no emission.
+
+**Measured against the sheet** (ours / sheet, same masks):
+
+| View | W : H | G | T | S | R |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet (+25, 10) | 0.943 / 0.949 | 48.7 / 48.2 | 38.4 / 37.6 | 4.1 / 3.4 | 7.8 / 9.3 |
+| front_sheet (0, 6) | 0.977 / 1.005 | 47.5 / 49.1 | 41.3 / 37.8 | 3.4 / 1.6 | 7.4 / 9.7 |
+| rear_sheet (180, 6) | 0.943 / 1.010 | 44.5 / 48.6 | 44.0 / 39.6 | 1.8 / 2.0 | 8.1 / 8.1 |
+| r34_sheet (205, 11) | 0.966 / 0.952 | 43.1 / 46.6 | 43.0 / 40.8 | 2.7 / 3.3 | 8.7 / 7.7 |
+| side_sheet (90, 6) | 0.739 / 0.714 (content only) | 46.2 | 41.7 | 2.1 | 8.4 |
+| top_sheet | W : D 1.379 / 1.138 | 69.8 / 76.9 | 18.3 / 9.2 | | |
+
+- Colours (f34): canopy median `#517D30` vs `#50822F`; G v>.7 `#9AC53B` vs `#AFC330`; trunk median `#915128` vs
+  `#8B4E2A`, right (lit) half `#965328` vs `#A05829` (10 levels), v>.7 `#C26E37` vs `#DB843B`; rock v>.7 `#D3C8B2` vs
+  `#DBCCB6` (R > G > B); sand `#E3C69A` vs `#E2C698`; plants v>.7 `#BCBF29` vs `#ABBD29`, dark share 25 % vs 33 %.
+- Crown lightest pad (f34 crops): C lum 91, L 84, R 73 (sheet 105 / 79 / 87).
+- Top profile (front, every 0.1 W): .51 .70 .78 .93 .85 .99 1.0 .85 .87 .84 .46 vs sheet .54 .67 .70 .89 .94 .99 1.0
+  .92 .86 .82 .50. Width per height (front): .27 .79 .82 .30 .65 .97 .84 .86 .71 .46 vs .36 .81 .67 .33 .69 1.0 .87 .82
+  .72 .42; the bare-trunk row at h .3 is kept (.30).
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows no emission or light. Studio notes (Requires Manual Validation): pads should read lime on top
+and deep green below under the game sun; bark orange-brown, not red; holes dark; rocks warm grey.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect. No sockets on any object (checked in `build()`).
+
+## Renders
+
+`art/blender/renders/models/M047/`:
+- `M047_views.png` (contact sheet); kit `front` `side` `rear` `top` `underside`; `f34_sheet` `r34_sheet` `front_sheet`
+  `side_sheet` `rear_sheet` `top_sheet` (floor hidden, long lens); `front34` / `rear34` (25 / 205, 12).
+- The five part shots `part_*`; `exploded` (the five branch pieces drawn out of their sockets, the trunk lifted).
+- `scale`: a 5.5-stud marker at (8.4, −4.6), inside the R pad's footprint; the R pad's lowest point is 7.7.
+- Close-ups: `join_cu` (rf and leader-top sockets from above: hex rims round dark holes, close-up 1), `plug_cu` (the
+  angled branch's hollow plug end), `base_cu` (trunk foot, roots, rocks, tufts; close-up 2), `foliage_cu` (the L limb's
+  twigs rising into the pad's underside; close-up 3), `stub_cu` (crown cut stub, knot), `back_cu` (back hollow stub).
+
+## §1.5 differences, as measured
+
+| | 047 as built |
+| --- | --- |
+| Size | 20.35 × 15.99 × 19.98; f34 W : H 0.943, front 0.977 |
+| Silhouette | five separate pads with sky between (front top profile above); no tiers, flaps or plates |
+| Bark share (f34) | **T 38.4 %** (042 12.8, 045 10.8) |
+| Trunk | corner r 3.05 at z 6 (Ø ≈ 6.1), planked 18 facets, centre −0.55 → 1.85 (lean ≈ 8° above z 4), forks at z 8–12.6, leader to 13.5 |
+| Branches | five hex-socket limbs (plugs 0.015–0.053 from the walls), 12 twigs (C and L 3; UL, UR and R 2) |
+| Foliage | 59 faceted lobes in 5 pads (13 / 10 / 11 / 13 / 12) |
+| Roots | 7 buttress roots, reach 5.6–8.6, RT1 8.6 front-right |
+| Joints | 5 walled sockets, hollow plug ends, hollow cut stub, hollow back stub, inset knot |
+| Top view | rosettes round an exposed limb star: T 18.3 %, G 69.8 % |
+| Rocks | lit `#D3C8B2`, warm grey, R > G > B |
+| Ground plants | dark broad-leaf bush B1, lime / green tufts, sprigs |
+
+## Modeller's notes for the verifier
+
+- Rebuild in a fresh session: `import kit_mcp; kit_mcp.install(); import m047; m047.build()`.
+  `m047.plug_report(bpy.data.objects["GnarledPine"])` gives the plug seats; `shells_report()` includes `winding_errors`.
+- Known leftovers:
+  1. **Top W : D 1.38** (target 1.05–1.35): decision 7's moderate pad spread keeps the depth near the patch's; the top
+     cell's front pad is not modelled (§3.3).
+  2. Lime highlights are fewer than on the sheet (f34 canopy lime 19 % vs 31 %, dark 16 % vs 40 %): the sheet's strong
+     sun / shade split is light, not paint, and the kit studio lights both sides.
+  3. The plants' brightest leaves are a little yellower than the sheet's (`#BCBF29` vs `#ABBD29`), from the rule that
+     plant is ≥ 8° yellower than leaf_light.
+  4. Front / rear T 41–44 % (sheet 38–40): the trunk foot is a touch broad from those angles; f34 is on target.
+  5. The fork stubs are unioned prisms rather than bridged ring stacks (Stage 1); the trunk is still one manifold shell.
+  6. Two `plug_gaps` of 0.0 in the hero's contact report are limbs whose shoulders touch the bark beside their sockets,
+     not the plugs (`plug_report` is clean).
+- No commits, pushes or exports were made.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh verifier, read-only on port 9880 (`wip/M047_verify.blend`; nothing built, edited or saved). All numbers were
+re-measured with my own bmesh / BVH code (not `shells_report` / `plug_report`). Renders and montages are in the
+session scratchpad `m047_verify/` (`cmp_<view>.png` sheet | ours, `cmp_conifers.png` 042 | 045 | 047, `big_*`,
+`cu_*`, `part_*`).
+
+### Measured
+
+| Object | Tris | Size (studs) | Shells | Non-man. / bound. / wire / loose | Bowtie | Winding | Zero-area / n-gon / dup | Self-hits | Min corner (< 3°) | Origin |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GnarledPine | **3746** / 4000 (ceiling 3800) | 20.35 × 15.99 × 19.98 | 150 | 0 / 0 / 0 / 0 | 0 | **0** | 0 / 0 / 0 | 0 | 2.01° (42) | bottom centre, rot 0, scale 1 |
+| GnarledPineForkedTrunk | 976 | 14.01 × 12.47 × 13.73 | 1 | 0 | 0 | 0 | 0 | 0 | 2.01° (42) | ok |
+| GnarledPineCrownCanopy | 446 | 8.04 × 7.43 × 7.07 | 18 | 0 | 0 | 0 | 0 | 0 | 8.4° | ok |
+| GnarledPineCanopyTier | 310 | 6.12 × 5.73 × 6.94 | 13 | 0 | 0 | 0 | 0 | 0 | 9.9° | ok |
+| GnarledPineBranchAngled | 400 | 8.49 × 7.41 × 6.99 | 17 | 0 | 0 | 0 | 0 | 0 | 8.0° | ok |
+| GnarledPineRootBase | 904 | 17.83 × 15.99 × 3.64 | 72 | 0 | 0 | 0 | 0 | 0 | 4.4° | ok |
+
+- Every shell of every object has positive volume (normals outward). No modifiers, no custom normals, UVMap present.
+- Hero shells: trunk 1, limbs 5, cut stub 1, twigs 12, lobes 59, leaves + hubs 61, rocks + pebbles 10, patch 1.
+- **Floating dressing:** 0 shells more than 0.03 from everything, 0 unchained, in all six objects (hero and base
+  anchored on the patch, parts on the trunk or limb).
+- **Plugs:** all five limbs' nearest corners are 0.015 from the socket walls; no plug corner inside the trunk solid
+  (ray parity + nearest-normal test). A few limb **shoulder** corners (UR limb at rf 1, crown limb at the leader top
+  2, plus 2 more by the sign test) sit 0.11–0.165 inside the cut rims: hidden under the shoulder sleeve, harmless.
+- `K.check`: no problems. `kit_baked_shading` 0.02. Tint (corner) 0.926–1.072, sd 0.021: broad, not confetti.
+- No children or VFX sockets, no emission on any of the 23 materials (stages 5–6 skipped as decided).
+- Lobes: 59, 18 / 22 tris, height : width median **0.74** (range 0.39–1.07; study 0.55–0.70).
+- Trunk sections (ForkedTrunk part, build frame): r_med 4.1 at z 1.2, 2.93 at z 6.0 (Ø ≈ 5.9), 2.29 at z 10.2
+  (Ø ≈ 4.6), 1.57 at z 13.2; centre x 0.3 → 1.66 (lean ≈ 7°). Matches §2.2.
+- Limb runs, socket face → twig fork (from `LIMBS` / `SOCK` as built): C ≈ 2.5, UL ≈ 3.1, **UR ≈ 2.4 (plan 5.1)**,
+  L ≈ 3.2 (rises ≈ 17°), **R ≈ 2.7 (plan 4.3)**.
+
+Views (study masks, `measure_render.py`, floor hidden; ours / sheet):
+
+| View | W : H | G | T | S | R |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet (+25, 10) | 0.943 / 0.949 | **48.7 / 48.2** | **38.4 / 37.6** | 4.1 / 3.4 | 7.8 / 9.3 |
+| front_sheet (0, 6) | 0.977 / 1.005 | 47.4 / 49.1 | 41.3 / 37.8 | 3.4 / 1.6 | 7.4 / 9.7 |
+| rear_sheet (180, 6) | 0.943 / 1.010 | 44.5 / 48.6 | 44.0 / 39.6 (+4.4) | 1.8 / 2.0 | 8.1 / 8.1 |
+| r34_sheet (205, 11) | 0.966 / 0.952 | 43.1 / 46.6 | 43.0 / 40.8 | 2.7 / 3.3 | 8.7 / 7.7 |
+| side_sheet (90, 6) | 0.739 (0.72–0.9) | 46.2 | 41.7 | 2.1 | 8.4 |
+| top_sheet | W : D 1.379 / 1.138 | 69.8 / 76.9 | 18.3 / 9.2 | | |
+| 042 TieredFir at (+25, 10) | 0.653 | 71.5 | 11.8 | | |
+| 045 PineSapling at (+25, 10) | 0.741 | 76.7 | 9.7 | | |
+
+Colours (f34, ours / sheet): canopy median `#52772F` / `#50822F`; canopy lit quartile `#90BB3E` (81°) / `#ACC230`
+(69°); trunk median `#915128` / `#8B4E2A`, lit `#C36E37`; sand `#E3C69A` / `#E2C698`; rock median `#B0A790`, lit
+`#DED4BD` (42°, R > G > B, not mauve) / lit `#DBCCB6` (36°).
+
+### Findings
+
+**Passed:** mesh, winding, budget, origin and transforms on all six objects; no floating dressing; plugs seated;
+f34 shares (G +0.5, T +0.8) and W : H; §1.5 differences: next to 042 and 045 it is unmistakably a different tree
+(W : H 0.94 against 0.65 / 0.74, T 38 % against 12 / 10 %, massive planked leaning trunk, five pads with sky between,
+seven buttress roots, sockets, hollows, a bark star from above); it is nothing like W04's slender `OldPine`. Colour
+family right (orange-brown bark, warm-grey rock, sand, green pads with a lime crown), hollows are geometric
+`bark_deep` regions, no facing-based paint anywhere in `m047.py` (only geometric `.normal` uses), no lime cap per lobe.
+Knot, back stub and the ForkedTrunk part's hex sockets read clearly.
+
+1. **Blocker: the limbs and twigs don't read; the skeleton is the subject of this sheet (spec §1, user tree rule).**
+   - In the f34, front, rear and r34, the limbs are short, thick, near-level stubs that run straight into the pads.
+     UR and R are about half their planned length (2.4 and 2.7 against 5.1 and 4.3), and the L limb rises only about
+     17° (the sheet shows 30–45°, with an elbow). The 12 twigs are hidden in every view except two under UL.
+   - Close-up 3 (a limb splitting into three twigs under a flat pad underside) has no counterpart: `cu_foliage_L`
+     shows the limb disappearing into drooping lower lobes.
+   - The `BranchAngled` part reads as a heap of lobes with a stub behind it, where the sheet's "Branch (angled)" is a
+     long elbowed limb with the pad on its end.
+   - **Fix target:**
+     - Bring back the planned runs: UR from a lower right fork (z ≈ 10.4) about 5 long, R about 4.3, L rising 30–40°
+       after one elbow.
+     - Seat each pad so 1.5–2.5 studs of limb show between the bark and the pad in the front, rear and f34, and the
+       2–3 twigs (Ø 0.6–0.75) show under every pad.
+     - Raise or remove the inner lower-ring lobes that hide the twig fork, so each pad has the near-flat underside the
+       twigs enter (§2.3).
+     - Check: the twigs are visible under at least L, R and UR in `front_sheet`, and `foliage_cu` matches close-up 3.
+2. **Blocker: the pads read as bunches of separate faceted balls, not scalloped cloud mounds (pitfall 4, the class
+   failure of M036 / M038).**
+   - Each lobe is a d20-like gem (height : width median 0.74, up to 1.07), and the 59 lobes stay distinct.
+   - The lower ring's role colour puts a dark band through the middle of each pad, with lighter outer lobes below it.
+     The sheet's pads are one mound: a lit rosette top, scalloped sides, and the darkest tone at the bottom.
+   - **Fix target:**
+     - Flatten the lobes to height : width 0.55–0.65.
+     - Overlap them more (ring lobes 0.4–0.6 into the core), so each pad reads as one dome with a scalloped outline.
+     - Give each pad a broad top rosette of large flat facets (decision 3's 6–9 lobes per pad is the reference
+       count; 59 is past it).
+     - Order the role tones by height within the pad: the lowest lobes deepest, the ring at the pad's tone, the top
+       light. That is by role, not by facing, and keeps C the lightest pad.
+3. **Minor: spiky ground plants.** The bush B1 is a pointed star, and the tufts look like agave. The sheet shows a
+   mound of broad leaves and broad upright tufts (pitfall 11, and the "spiky where the master is broad" lesson).
+   **Fix target:** broad ovate leaves with rounded tips, and the bush as a domed mass of 10–12 overlapping leaves.
+4. **Minor: the crown cut stub doesn't read.** It is hidden by the crown limb and pad in the f34 and front.
+   **Fix target:** move it out so its hollow end faces the f34 camera at about (2.9, 1.2, 15.1) (§2.3), with a dark
+   pit and a light rim visible.
+5. **Minor: 42 corners under 3° (min 2.01°) on the trunk union seams.** Pitfall 13 asked for none under 3°. It does
+   no harm on an opaque, flat-shaded solid in Roblox. Collapse them if the trunk is rebuilt.
+6. **Minor (main session to rule): decision 6 deviation.** The fork stubs are exact-unioned prisms, not ring stacks
+   built into the body. The result is clean (1 shell, 0 bowties, 0 self-hits, 0 winding errors), and the junctions
+   read as joins rather than seams. I accept it on outcome. It is the source of item 5.
+7. **Minor (main session to rule): decision 3 lobe counts.** The pads have 13 / 10 / 11 / 13 / 12 lobes, against the
+   decided 9 / 6 / 7 / 8 / 7. This feeds item 2.
+8. **Minor: top view.** W : D is 1.38 (the target is 1.05–1.35). The pads crowd each other, so the rosettes are not
+   clearly separate from above. The limb star does show (T 18 %). Accepted as a leftover, but item 1's pad moves
+   should open the gaps.
+9. **Minor: lime highlights.** The f34 canopy lit quartile is `#90BB3E` (81°) against `#ACC230` (69°): too few, and
+   too green. This is partly the two-sided studio light (the modeller's note 2). Item 2's top rosettes on C and UR
+   should carry more `leaf_light`. The plants' slight yellow (note 3) is accepted.
+10. **Minor: front and rear bark at 41.3 % and 44.0 %** (sheet 37.8 and 39.6; the rear is 0.4 outside ±4). The f34,
+    which is binding, is on target. Re-measure after item 1.
+11. **Minor: other shapes.**
+    - The rocks are faceted domes, a little rounded, and a touch yellow (42° against 36°). They are still R > G > B
+      and not eggs. Give RK1 a flatter, more angular top.
+    - The knot reads as a dark rectangular slot. A rounder hex rim would read as a knot.
+    - The trunk lacks the sheet's gentle S-curve, though its lean and sections match §2.2.
+    - The patch is 16 deep against about 14 in the plan.
+
+**Decisions:**
+- 1, 2, 4, 5, 8, 9 (counts: 6 rocks, 4 pebbles, 1 bush, 6 tuft clumps (T2 counted as two clumps), 4 sprigs), 10, 11,
+  12, 13 and 14 were followed.
+- 3: no floating lobes, twigs or plugs, and no pad booleans, but the lobe counts depart from the decision (item 7).
+- 6: deviates (item 6).
+- 7: moderate depth, and the limb star shows.
+
+**Score: 6.5 / 10.** The mesh is clean and the colour, shares and §1.5 separation are good. The skeleton and pad
+form don't match the sheet yet.
+
+**Verdict: FAIL.** Fix blockers 1 and 2: the visible limbs, twigs and flat pad undersides, and the pads as flattened,
+overlapping single mounds. Pick up minors 3 and 4 in the same pass. Then a fresh verifier runs round 2.
+
+## Main session ruling after round 1 (2026-10-29)
+- **Item 6 (fork stubs exact-unioned):** accepted on outcome. The trunk is one clean manifold shell. The sub-3° seam corners are minor.
+- **Item 7 (lobe counts):** reduce toward decision 3's 9/6/7/8/7, to at most 1.5× those counts (14/9/11/12/11). Use fewer, larger, flatter lobes that overlap, so each pad reads as one dome. This feeds blocker 2.
+- Fix round 1 covers blockers 1 and 2 and minors 3 and 4, with targets as in Verification round 1.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m047.py` edited (the source of truth); port 9880 on `wip/M047.blend` (saved). Final numbers come
+from a freshly restarted session (`kit_mcp.install(); m047.build()`), measured with the study masks
+(`measure_render.py`, `col47.py`) and the builder's own checks. Scratch: `m047fix/` (`final.json`, `cmp3.png` sheet |
+ours for f34 / front / rear / r34, `big_*.png`). No commits, pushes or exports.
+
+### Changes
+
+1. **Skeleton (blocker 1).**
+   - Sockets moved so each limb has a real run and rise: right fork `rf` face (4.12, 0.79, **10.49**), was 12.64 and
+     protruding 1.9; low right `lr` face (3.73, −1.71, **4.94**), was 8.05; left fork `lf` face (−2.88, −0.68,
+     **6.59**), was 8.34. `out` raised on `rf` / `lr` / `lf` (0.95 / 0.85 / 1.0) so no plug corner sits inside the bark
+     (`plug_report` inside_solid 0 everywhere).
+   - New `LIMBS` waypoints: every limb leaves along its socket axis, bends at an elbow, then rises 30–46° to a twig
+     fork placed 1.2–1.5 below its pad's flat core underside, so the 2–3 twigs (now Ø 0.74 → 0.56; three on L, R, UR
+     and C, two on UL) show under the pads.
+   - Pads re-seated outward and lower (L c (−5.6, −3.0) core 9.6; R (7.2, −3.2) core 8.75; UR (7.6, 1.6) core 14.2;
+     UL core 15.2), so the limbs show between the bark and the pads instead of running straight into them.
+   - Inner ring lobes (toward the trunk) lifted 0.5 above the core underside; the rim only droops on the pad's outer
+     side in X (the lobes facing the −Y cameras stay up), so the underside is near-flat where the twigs enter.
+   - Branch-piece part shots now from (33, 6) (side-on to the limbs) and `foliage_cu` from (33, −6), side-on to the L
+     limb, like close-up 3.
+2. **Pads as single domed clouds (blocker 2).** `pad()` rewritten: one broad flat-bottomed core (h : w 0.5–0.6, 6
+   sides), a ring of 5–7 flattened lobes (0.44 W wide, h : w 0.54, centres 0.31 W out, overlapping the core by about
+   half their width, tilted out 7°), an upper ring of 2–4 lobes over the core's shoulder (0.38 W) and one broad 7-sided
+   top lobe (0.46 W; the rosette from above). Ring and upper lobes are 5-sided (18 tris: bigger facets, fewer tris).
+   Colour by **lobe mid height within the pad** (`_pad_key`): the lowest lobes `leaf_deep` 50 % (25 % on the crown
+   pad), then 25 % deep, the middle at the pad's tone, the upper ring light 25–50 %, the top lobe light 75–100 %; C
+   (tone 0.75) lightest. Position and role only; no normal is used for colour.
+3. **Ground plants (minor 3).** `_rleaf` (m044's `_dleaf`: a 10-tri broad round-tipped leaf with a raised midrib and a
+   flat underside) replaces the pointed `_leaf8` on every tuft and sprig; tufts L : W 2.0. The dark bush B1 is now
+   `bush()`, m044's dome bush on the flat patch: a hidden 16-tri heart dome clad in ten round-tipped leaves (crown 3
+   mid green, middle 3 and skirt 4 deep), every leaf slid to touch the heart; skirt leaves climb the dome if they would
+   cut the sand or a root (`_trunk_guard`, a BVH of the built trunk). Tuft counts trimmed (T1 5, T2a 5, T5 4) and one
+   deep leaf added per larger tuft, to keep RootBase under 1000 and the plants' dark share ≥ 20 %.
+4. **Crown cut stub (minor 4).** `CUT_STUB` r 0.5, 1.9 long, from 0.6 along the crown limb's first segment, pointing
+   az 325° tilted 52°: its end (3.08, −0.12, 15.1) faces the f34 and front cameras below the crown pad; hollow 0.6 ×
+   0.3 (a `bark_deep` pit in a `bark_light` rim). Reads as a dark hole in `f34_sheet`, `front_sheet` and `stub_cu`.
+5. New checks in the builder: `limb_visibility()` (per limb and view, the centreline length not hidden behind pads,
+   trunk or base, and the twigs at least half seen), `lobe_report()` (lobe height : width as the round-1 verifier
+   measured it), `STUB_INFO`; `_kind` classifies 10-tri leaves and 8 / 16-tri hubs.
+
+### Before → after
+
+| Measure | Round 1 | Fix round 1 | Target |
+| --- | --- | --- | --- |
+| Hero tris | 3746 | **3590** | ≤ 3800 |
+| Parts: trunk / crown / tier / angled / base | 976 / 446 / 310 / 400 / 904 | 960 / 410 / 280 / 328 / 992 | < 1000 |
+| Hero size | 20.35 × 15.99 × 19.98 | 20.93 × 15.99 × 20.00 | 20.3 ± 0.8, H 20 ± 0.4 |
+| Lobes per pad C / UL / UR / L / R | 13 / 10 / 11 / 13 / 12 (59) | **13 / 9 / 10 / 11 / 10 (53)** | ≤ 14 / 9 / 11 / 12 / 11 |
+| Lobe h : w median (min–max) | 0.74 (0.39–1.07) | **0.607 (0.53–0.66)** | 0.55–0.65 |
+| Limb run, socket face → twig fork: C / UL / UR / L / R | 2.5 / 3.1 / 2.4 / 3.2 / 2.7 | 2.27 / 3.13 / **3.92** / 3.27 / **4.13** | UR ≈ 5, R ≈ 4.3 |
+| Rise, last segment (overall): UR / L / R | – / ≈ 17° / – | 46° (36°) / 35° (29°) / 34° (36°) | 30–45° |
+| Visible limb, front (3D, not hidden by pads / trunk): C / UL / UR / L / R | stubs | 2.4 / 2.8 / 3.9 / 3.3 / 4.1 | 1.5–2.5+ |
+| … rear | | 2.5 / 3.1 / 3.9 / 3.2 / 3.8 | |
+| … f34 | | 2.5 / 2.6 / 2.3 / 3.3 / 4.1 | |
+| Twigs at least half seen, front (L / R / UR / UL / C) | hidden (2 under UL only) | **3 / 3 / 3 / 2 / 3** | L, R, UR visible |
+| … f34 ; rear | | 1 / 1 / 3 / 2 / 3 ; 3 / 3 / 3 / 2 / 1 | |
+| f34 W : H | 0.943 | 0.977 | 0.89–1.01 (sheet 0.949) |
+| f34 G / T / S / R | 48.7 / 38.4 / 4.1 / 7.8 | **47.0 / 40.6** / 3.7 / 7.6 | 48.2 ± 4 / 37.6 ± 4 |
+| front G / T, W : H | 47.5 / 41.3, 0.977 | 45.0 / 43.9, 1.000 | 49 ± 5 / 38 ± 4 (minor) |
+| rear G / T | 44.5 / 44.0 | 41.5 / 46.9 | 48.6 / 39.6 (minor) |
+| r34 G / T | 43.1 / 43.0 | 40.9 / 45.4 | T 40.8 ± 5 |
+| side W : H | 0.739 | 0.750 | 0.72–0.9 |
+| top W : D, G, T | 1.379, 69.8, 18.3 | 1.356, 75.3, 16.2 | 1.05–1.35, ≥ 70, ≥ 5 |
+| f34 canopy median / lit (v > .7) / lime share | `#52772F` / `#90BB3E` / 19 % | `#5D8D30` / `#A2C93A` / 30 % | `#50822F` ± 15 / `#B0C431` ± 12 / 31 % |
+| Pad lightness, front (C top mass / L / R) | | 122 / 118 / 117 | C lightest |
+| f34 trunk median / v > .7 | `#915128` / `#C26E37` | `#8A4E28` / `#C36E37` | `#8B4E2A` / `#DB843B` |
+| f34 rock v > .7, sand | `#D3C8B2`, `#E3C69A` | `#D4C7B2`, `#E3C69A` | `#DBCCB6` ± 10, `#E2C698` ± 8 |
+| f34 plants v > .7, dark share | `#BCBF29`, 25 % | `#BDBE2B`, 21 % | `#ABBD29`, ≥ 20 % |
+| Floating / unchained shells (all 6 objects) | 0 / 0 | **0 / 0** | 0 |
+| Non-manifold / bowtie / boundary / winding / self-hits (every shell, all 6) | 0 | **0** | 0 |
+| Plugs: corner gap, inside solid | 0.015–0.053, 0 | 0.015–0.053, **0** | seated |
+| `K.check`; baked shading hero / parts | clean; 0.02 / ≤ 0.06 | **clean**; 0.03 / ≤ 0.14 | < 0.5 |
+| UV overlaps / flipped, min gap | 0 / 0, 0.016 | 0 / 0, 0.016 | |
+| Min corner | 2.01° (trunk seams) | 2.01° (trunk seams) | minor 5 (accepted) |
+
+Hero shells: trunk 1 (960 tris), limbs 5 (410), cut stub 1 (46), twigs 14 (168), lobes 53 (1014), leaves 48 (480),
+hubs and the bush heart 11 (96), rocks and pebbles 10 (320), patch 1 (96). Origins at the bottom centre (hero offset
+0.327, −0.293, 0). §1.5 still holds: 20 tall, W : H 0.95–1.0, T 40.6 % in the f34 (042 12.8, 045 10.8), a massive
+planked leaning trunk, five plug-in limbs with twigs, five separate domed pads with sky between, seven buttress roots,
+hollow stubs and a knot, a brown limb star from above (top T 16 %).
+
+### Left over (for the verifier)
+
+- **UR and R runs** are 3.9 and 4.1 from socket face to fork (plan 5.1 / 4.3); from the bark they are about 4.9 and 5.0
+  (the stubs protrude 0.95 / 0.85). Longer runs would push the UR pad down into the R pad, or the R socket into the
+  roots.
+- **Twigs in the f34:** L and R show one twig each at (+25, 10); their pads' near lobes hang in front of the other two.
+  All three show in the front, rear, underside and `foliage_cu`.
+- **Front and rear bark share** is 43.9 / 46.9 % (sheet 37.8 / 39.6), from the visible limbs and the massive trunk.
+  The binding f34 is in tolerance (T +3.0). The pads are a little smaller than the sheet's (fewer, larger lobes, as
+  ruled).
+- **f34 lit canopy** `#A2C93A` is 14 levels off `#B0C431` in R (G and B within 9): the two-sided studio light.
+- **Top view** W : D 1.356 (target ≤ 1.35); the rosettes touch at their rims.
+- **RootBase** is 992 / 1000 tris, so there is no headroom for more leaves.
+- Unchanged from round 1 (outside this round's scope): the trunk's sub-3° union seam corners, the knot's slot shape,
+  the rocks' slight yellow, the patch depth 16 (plan 14), and no S-curve in the trunk.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+Fresh verifier, read-only on port 9880 (`wip/M047_verify.blend`, holding the fix-round model plus M042 and M045). I
+built, edited and saved nothing. Every number below comes from my own bmesh / BVH / ray-parity code and my own renders
+(800 × 700, long lens, floor hidden for `*_sheet`), not from `shells_report`, `plug_report` or `limb_visibility`.
+Scratch: `m047_verify2/` in the session scratchpad. It holds `cmp_<view>.png` (sheet | ours), `cmp_conifers.png`
+(042 | 045 | 047), `m_foliage.png`, `m_base.png` and `m_join.png` (sheet close-up | ours), `m_parts.png`, and the
+scripts `audit.py`, `contact.py`, `buried.py`, `skel.py` and `col.py`.
+
+### Measured
+
+| Object | Tris | Size (studs) | Shells | Non-man. / bound. / wire / loose | Bowtie | Winding | Zero-area / n-gon | Self-hits | Min corner (< 3°) | Origin, transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GnarledPine | **3590** / 3800 | 20.93 × 15.99 × 20.00 | 144 | 0 / 0 / 0 / 0 | 0 | **0** | 0 / 0 | 0 | 2.01° (43) | bottom centre, rot 0, scale 1 |
+| GnarledPineForkedTrunk | 960 | 14.01 × 12.47 × 13.73 | 1 | 0 | 0 | 0 | 0 | 0 | 2.01° (43) | ok |
+| GnarledPineCrownCanopy | 410 | 8.69 × 8.24 × 7.09 | 18 | 0 | 0 | 0 | 0 | 0 | 8.6° | ok |
+| GnarledPineCanopyTier | 280 | 5.90 × 6.23 × 6.94 | 12 | 0 | 0 | 0 | 0 | 0 | 10.5° | ok |
+| GnarledPineBranchAngled | 328 | 9.36 × 7.21 × 8.80 | 15 | 0 | 0 | 0 | 0 | 0 | 8.5° | ok |
+| GnarledPineRootBase | 992 | 17.81 × 15.99 × 3.27 | 70 | 0 | 0 | 0 | 0 | 0 | 4.4° | ok |
+
+- Every shell of every object has positive volume, so the normals point outward. No object has modifiers, custom
+  normals, children or sockets. Each has a UVMap. `K.check` finds no problems on all six. No material is emissive.
+- **Hero shells:** trunk 1, limbs 5, cut stub 1, twigs 14, lobes 53, plant leaves and hubs 58, bush heart 1, rocks and
+  pebbles 10, patch 1.
+- **Floating:** 0 shells more than 0.03 from everything, and 0 unchained, in all six objects.
+- **Plugs:** every limb's nearest corner is 0.015 from its socket, with 12 corners within 0.03. No plug corner is
+  inside the trunk solid. Two shoulder corners of the crown limb sit 0.165 inside the leader-top rim, under the
+  sleeve, as in round 1.
+- **Buried (ray parity in two directions, checked again by the nearest-face normal sign and by
+  `m044._rock_depth`):** this fails. See blocker 1.
+
+| Shell (hero local) | Into | Verts inside | Depth |
+| --- | --- | --- | --- |
+| T2b hub (4.97, −2.61, 0.18) | root | **6 / 6 (the whole hub)** | 0.38 |
+| T2a / T2b leaves (5.37, −2.36), (4.78, −2.04), (4.52, −2.80), (5.40, −3.42) | roots RT1 / RT2 | 3–5 / 7 | 0.22 / **0.80** / 0.40 / 0.37 |
+| B1 bush leaves (−2.52, −2.91), (−0.46, −4.39), (−0.92, −4.22), (−3.19, −3.53) | trunk foot / roots RT3–RT4 | 1–3 / 7 | **0.88** / **0.77** / 0.56 / 0.035 |
+| B1 leaves (−4.27, −4.74), (−3.54, −4.99), (−2.52, −6.30) | rock RK1 | 1–3 / 7 | 0.32 / 0.15 / 0.14 |
+| B1 heart dome | rock RK1 | 2 / 10 | 0.10 |
+| S4 sprig leaf (1.81, 6.03) | rock RK5 | 2 / 7 | 0.10 |
+| Rocks RK3 (6.11, −5.14), RK6 (−2.92, 5.52) | roots | 2–3 / 22 | 0.23 / 0.14 |
+
+- **Lobes (53, in pads of 13 / 9 / 10 / 11 / 10 by `PADS`):** within the ruling's 14 / 9 / 11 / 12 / 11.
+  - Height : width per pad: medians C 0.63, UL 0.58, UR 0.60, L 0.62, R 0.62. The range is 0.529–0.656: one UR lobe
+    is 0.02 under 0.55, and two lobes are a hair over 0.65.
+  - Every non-core lobe cuts 0.07–1.26 into its pad's core, typically 0.6–1.0.
+  - One C ring lobe, at local (−1.62, 4.41, 16.07), is entirely inside the UL and C lobes: 18 tris that never show.
+- **Tone ordered by height within each pad.** Lobe luminance against mid height correlates at 0.91 / 0.96 / 0.98 /
+  0.98 / 0.98 (C / UL / UR / L / R), from the deepest at the bottom to the lime top lobe. Each lobe is a single
+  material. Pad luminance is C 139, UR 133, R 130, L 128, UL 121, so C is the lightest.
+- **No colour by facing.** Across all leaf faces, luminance against normal.z correlates at −0.01; across the bark,
+  0.05 (normal.z) and 0.00 (normal.x). Every `normal` in `m047.py` is geometric: lobe tilt, the bush's leaf frames
+  and recalculation. No paint is selected by normals.
+- **Skeleton** (my own: limb faces that face the camera and are unoccluded per ray cast, binned at 0.2 along the limb
+  axis). Twigs count as seen when at least half their camera-facing faces are unoccluded.
+
+| View | Visible limb C / UL / UR / L / R (studs) | Twigs seen C / UL / UR / L / R |
+| --- | --- | --- |
+| front (0, 6) | 2.4 / 3.2 / 4.0 / 3.4 / 4.0 | 0/3 / 2/2 / 2/3 / 1/3 / 2/3 |
+| rear (180, 6) | 2.8 / 3.2 / 4.4 / 3.8 / 4.0 | 0/3 / 2/2 / 2/3 / 2/3 / 2/3 |
+| f34 (25, 10) | 3.6 / 3.4 / 4.2 / 3.8 / 4.0 | 0/3 / 2/2 / 2/3 / 0/3 / 0/3 |
+| r34 (205, 11) | 3.2 / 3.4 / 4.2 / 3.8 / 3.2 | 0/3 / 1/2 / 1/3 / 0/3 / 1/3 |
+
+  - Limb lengths, plug to fork: C 3.65, UL 3.69, UR 4.59, L 4.11, R 4.76.
+  - Last-segment rises from `LIMBS`: UR 46°, L 35°, R 33°.
+  - In the `underside` render, all three twigs show under L and under R.
+
+**Views** (study masks, `measure_render.py` and `col.py`; ours / sheet):
+
+| View | W : H | G | T | S | R |
+| --- | --- | --- | --- | --- | --- |
+| f34_sheet (+25, 10) | 0.974 / 0.949 | **47.5 / 48.2** | **41.0 / 37.6 (+3.4, in ±4)** | 3.9 / 3.4 | 6.6 / 9.3 |
+| front_sheet (0, 6) | 1.003 / 1.005 | 45.5 / 49.1 | 44.5 / 37.8 | 3.3 / 1.6 | 6.4 / 9.7 |
+| rear_sheet (180, 6) | 0.987 / 1.010 | 41.9 / 48.6 | 47.4 / 39.6 | 1.4 / 2.0 | 7.8 / 8.1 |
+| r34_sheet (205, 11) | 1.000 / 0.952 | 41.3 / 46.6 | 45.7 / 40.8 | 2.3 / 3.3 | 7.9 / 7.7 |
+| side_sheet (90, 6) | 0.750 (0.72–0.9) | 46.6 | 42.2 | 1.8 | 7.7 |
+| top_sheet | W : D 1.354 / 1.138 | 75.5 / 76.9 | 16.2 / 9.2 | | |
+| 042 TieredFir (+25, 10) | 0.653 | 72.5 | 11.9 | | |
+| 045 PineSapling (+25, 10) | 0.734 | 76.4 | 10.7 | | |
+
+**Colour** (f34, the same masks on both; ours / sheet):
+
+| Region | Ours | Sheet | Verdict |
+| --- | --- | --- | --- |
+| Canopy median | `#5B8D30` | `#51822F` | within 15 |
+| Canopy v > .7 | `#A1CB3D` | `#AFC431` | R −14, B +12: just outside ±12 |
+| Canopy lime / green / dark (%) | 31 / 66 / 3 | 31 / 30 / 39 | the sheet's dark share is its light (§3.9) |
+| Trunk median | `#8A4E27` (24°, .72) | `#8B4E2A` (22°, .70) | match |
+| Trunk v > .7 | `#C46E37` | `#DB843B` | 23 levels low; studio light |
+| Rock v > .7 | `#D4C6B2` (35°, .16) | `#DDCDB6` (35°, .18) | within 10; R > G > B, no longer yellow |
+| Sand | `#E3C699` | `#E2C698` | match |
+| Plants v > .7 | `#C2C42B` | `#AABD26` | **R +24: too yellow** |
+| Plants dark share | 23 % | 34 % | ≥ 20 |
+
+- **Front:** canopy `#5F8E31` against `#4B802F`; rock lit `#D4C5B1` against `#DBCCB4`.
+- **Rear:** canopy `#538331` against `#50842F`.
+- **Hues:** bark keys 26°, R > G > B. Hollows `bark_deep` `#341807`, a geometric region in every hole.
+
+### Findings
+
+**Round-1 blockers, re-judged:**
+- **Skeleton reads (blocker 1 of round 1, resolved).**
+  - Each limb now shows 2.4–4.4 studs of bare bark between the trunk and its pad in the front, rear, f34 and r34.
+    That meets the 1.5–2.5+ target.
+  - Each limb leaves its socket along the axis, bends at an elbow, and rises 33–46°.
+  - Twigs show under UL, UR and R in the front and rear, and under all pads from below.
+  - `cu_foliage_L` matches close-up 3: a limb rising into three twigs under a flat dark underside.
+- **Pads read as single domed clouds (blocker 2 of round 1, resolved).**
+  - Each pad is one dome: a flat underside, a scalloped ring, an upper ring and a broad lime top lobe.
+  - From above each pad is a rosette (`cmp_top_sheet`). Lobes are flattened and heavily overlapped, and tone follows
+    height.
+  - They no longer read as bunches of balls.
+- **Minors 3 and 4 of round 1, fixed.**
+  - The bush B1 is a rounded dark dome of broad leaves, and the tufts are broad round-tipped leaves.
+  - The crown cut stub shows a dark pit in a light rim facing the f34 and front cameras (`m_join`, panel 3).
+
+**§1.5 (binding): passes.**
+- Beside 042 and 045 (`cmp_conifers.png`) this is unmistakably a different tree:
+  - W : H 0.97 against 0.65 / 0.73, and T 41 % against 12 / 11 %;
+  - a massive planked leaning trunk with five plug-in limbs and five separate pads with sky between;
+  - seven buttress roots, hex sockets, hollow stubs, a knot, and a brown limb star from above (top T 16 %).
+- It is nothing like W04's slender fluted `OldPine`.
+- The f34 shares are in tolerance: G −0.7 and T +3.4 against ±4.
+
+1. **Blocker: buried dressing (STAGES "No floating dressing", spec §2.4 "cut ≤ 0.05").** This is new in the fix
+   round's plant rebuild. The fix log says skirt leaves "climb the dome if they would cut ... a root"; they don't.
+   - **T2b's whole hub is inside a root**, 0.38 deep: the tuft grows out of the root.
+   - Eight leaves cut 0.22–0.88 into the trunk foot and roots RT1 / RT2 / RT3 / RT4: four from B1 and four from T2a
+     and T2b.
+   - Three B1 leaves cut 0.14–0.32 into RK1, the B1 heart 0.10 into RK1, and an S4 leaf 0.10 into RK5.
+   - It is visible in `m_base.png`: the bush is pushed into the root flare, and T2's leaves pass through the root.
+   - Cause, from the builder:
+     - `clump()` retries a guarded leaf once, then keeps it even if it still cuts.
+     - `bush()` gives up after a 36° climb.
+     - Hubs are never guarded.
+     - Rocks are never in the guard.
+   - **Fix target (round 3, this item only):**
+     - Move T2b clear of RT1 / RT2: its hub must be at least 0.3 outside the root surface, for example
+       about 1.0 further out along its own azimuth. Or drop T2b; RootBase is at 992 tris.
+     - Move B1 about 0.8 out from the foot, away from RT3 / RT4 and RK1, or shrink its inner skirt.
+     - Make the guard reject: drop any leaf that still cuts more than 0.05 after its retries, rather than keeping it.
+     - Include the rocks in the guard BVH.
+     - Re-measure every plant shell by ray parity against the hero's trunk and rock shells after the final
+       placement: 0 more than 0.05 inside.
+2. **Minor: twigs under L, R and C.** By my strict count, the f34 shows none under L or R. The front shows one under
+   L. C's three twigs are hidden in every side view behind the leader top and the crown limb. They all show from
+   below. **Target, if touched:** turn one L twig and one R twig toward +X / −Y so they clear the near ring lobes.
+3. **Minor: front, rear and r34 bark** are T 44.5 / 47.4 / 45.7 against 37.8 / 39.6 / 40.8, which is +6.7, +7.8 and
+   +4.9. The trunk is a heavy, almost straight column, and the pads are smaller relative to it than on the sheet. The
+   binding f34 is in tolerance. Accept as a leftover.
+4. **Minor: colour leftovers.** All three are accepted.
+   - The lit canopy is `#A1CB3D` against `#AFC431` (R −14), and the lit trunk is 23 levels low. Both come from the
+     two-sided studio light.
+   - **The plants are too yellow:** v > .7 `#C2C42B` against `#AABD26`. The tufts read olive-yellow beside the sheet's
+     fresh green. Target: `m047_plant` hue about 70° rather than 64°.
+5. **Minor: top view.** W : D is 1.354, 0.004 over the 1.35 limit. The rosettes touch at their rims, where the sheet
+   shows four with gaps. The limb star shows (T 16 %). Accept.
+6. **Minor: UR and R runs** are 4.6 / 4.8 plug to fork, with 4.0–4.4 visible. That is short of the plan's 5.1 from the
+   socket face, but it reads. Accept.
+7. **Minor: wasted geometry.** One C ring lobe, at hero local (−1.62, 4.41, 16.07), is fully enclosed by the UL and C
+   lobes: 18 tris that never show. Remove it or move it outward if the builder is touched.
+8. **Minor: rocks RK3 and RK6 cut 0.23 and 0.14 into roots.** They read as nestled. Pull them out 0.2 if round 3
+   touches the base.
+9. **Minor: the BranchAngled part.** From the sheet's exploded angle (0, 20) the pad hides the limb. The limb is about
+   0.45 of the pad's width; the exploded shows about 1.0, with a visible elbow. It reads correctly from the modeller's
+   (33, 6) shot. Accept.
+10. **Minor, unchanged from round 1 (all accepted):**
+    - the knot reads as a rectangular slot;
+    - the trunk is a near-straight column with no S-curve;
+    - the roots read as a flared skirt rather than the sheet's long separate prisms (`m_base`, close-up 2);
+    - the patch is 16 deep;
+    - 43 trunk-seam corners are under 3°.
+
+**Decisions:**
+- Followed:
+  - **1** (20.0 tall, canopy 20.93 within 20.3 ± 0.8);
+  - **2**;
+  - **3** (13 / 9 / 10 / 11 / 10 lobes within the ruling, no booleans, no floating lobes, twigs or plugs);
+  - **4** (plugs seated at 0.015);
+  - **5**;
+  - **6** (deviation accepted by the ruling);
+  - **7**;
+  - **8**;
+  - **10**;
+  - **11** (calibrated keys, C the lightest, role and height colour, no facing, no lime cap on every lobe, geometric
+    hollows, warm-grey rock, sand);
+  - **12** (no emission, no sockets);
+  - **13** (hero precise);
+  - **14** (3590 / 3800, parts < 1000).
+- **9 is not met.** The counts are right (6 rocks, 4 pebbles, 1 bush, tufts T1 / T2a / T2b / T3 / T4 / T5, and 4
+  sprigs), but "all seated" fails because T2b and several leaves are buried (blocker 1).
+
+**Score: 7.5 / 10.**
+- The mesh, winding, budget and contact chain are clean.
+- Both round-1 blockers are fixed, so the skeleton and the cloud pads now read like the sheet.
+- §1.5 and the f34 shares pass, and the colour is in family and never by facing.
+- One new placement fault remains: plants buried in the roots and rocks.
+
+**Verdict: FAIL.** There is one narrow blocker, buried dressing (item 1). STAGES allows a targeted third round that
+fixes only that blocker. Re-measure with ray parity against the hero's trunk and rocks, then commit with items 2–10
+noted as leftovers. Nothing else needs another modelling pass.
+
+## Fix round 2 (targeted, fix modeller, 2026-10-29)
+
+Scope: verification round 2's one blocker, buried ground dressing. Nothing else about the model was changed: the
+skeleton, pads, lobes, trunk, limbs, colours and every other placement are as in round 2. Builder
+`art/blender/kit/mcp/m047.py` edited; port 9880 on `wip/M047.blend` (saved). The final numbers come from a freshly
+restarted session (`kit_mcp.install(); m047.build()`), which also rewrote the renders in this folder. Scratch:
+`m047fix2/` in the session scratchpad (`final_build.json`, `final_full.json`, `second.py`, `buried_v2.json`, `b_*.png`).
+No commits, pushes or exports.
+
+### Changes
+
+1. **Placement guard (`_Solids`, `_trunk_guard`).** It is now the built trunk part (body and the seven roots) plus
+   every rock and pebble, added one by one as `root_base_part` builds them. Depth is tested by **ray parity**
+   (m046's three skewed rays, two of three must agree) over every vert and face centre, measured as the distance to
+   that shell's surface. The old guard was the trunk's BVH only, tested by the nearest face's normal sign.
+   Placement accepts a piece at ≤ `BURY_PLACE` 0.03, leaving a margin under the 0.05 limit (`BURY`).
+2. **Tufts and sprigs (`clump`).** A guarded leaf now has seven tries: as built, then stood up 16° at 0.9 size,
+   then turned ±0.35 rad, then turned ±0.7 rad at 0.85, then stood at 80° at 0.75. If it still cuts, it is
+   **dropped**, never kept. The tries draw no rng, so leaves that were clear stay exactly as they were. The hub's
+   depth is recorded (`BASE_INFO`).
+3. **Bush (`bush`).** The heart dome is guarded too: it narrows (rx × 0.93 per step) until it clears, ending at rx
+   1.17 instead of 1.8. Each leaf tries, in order:
+   - shortening (× 0.85, × 0.72);
+   - climbing the dome 6° at a time, up to 36°;
+   - turning ±0.3 rad at 0.85, then ±0.6 rad at 0.75;
+   - 0.65 length;
+   - as a last resort, moving ±0.9 or ±1.2 rad round the dome onto the bush's free front.
+
+   A leaf that clears none of these is dropped. In the final build none was dropped: all 10 leaves stay (7
+   re-seated), so the bush keeps its leaf count, its dark share and its dome outline.
+4. **Placements (`CLUMPS`, `ROCKS`).**
+   - **T2b** moved from (5.3, −2.9), which was on top of RT1, to **(7.2, −3.0)**: between RT1 and the T2a tuft, its hub
+     0.34 clear of the root surface.
+   - **B1** moved from (−1.9, −5.0) to **(−1.0, −5.9)**, 1.3 out of the notch between RT3, RT4 and RK1. The pocket
+     there is only about 1 stud wide at heart height, so no position within 0.8 cleared a 1.8 heart. B1 still sits
+     between RK1 and RT3, with its back leaves touching the root (spec §2.4).
+   - **RK3** moved 0.3 to (6.4, −5.7), off RT1's tip, and **RK6** 0.4 to (−2.6, 5.6), off RT6's tip.
+   - The patch outline lets itself out for T2b, so RootBase is now 18.21 wide (was 17.81). The hero is unchanged.
+5. **`bury_report(o)` in `build()`.** It runs on the hero and on RootBase. Every plant shell (leaf, hub, bush heart)
+   is tested by ray parity against the trunk shell and each rock and pebble shell; RootBase, which has no trunk
+   shell, is tested against the trunk part brought into its frame. Each rock is also tested against the trunk. Any
+   plant shell, or any rock, more than 0.05 in is a `problem`. `build()` returns `bury` and `base_info`.
+
+### Before → after
+
+| Measure | Round 2 | Fix round 2 | Target |
+| --- | --- | --- | --- |
+| Plant shells > 0.05 inside trunk / roots / rocks: builder parity (verts + face centres) | 13, max 0.88 | **0, max 0.027** | 0 |
+| … second method: angle-weighted pseudo-normal sign (own code, `second.py`) | | **0, max 0.027** | 0 |
+| … third: verifier round 2's `buried.py` (two-ray parity, verts) | fail (its table above), max 0.88 | **0 plants > 0.05** (max 0.027; the only other row is the crown limb plug shoulder, 0.165, unchanged) | 0 |
+| T2b hub | whole hub 0.38 inside RT1 | **0.34 clear** of the root surface | ≥ 0.3 clear |
+| B1 heart | 0.10 into RK1 (verifier); 0.59 by face centres | 0.027 (rx 1.17) | ≤ 0.05 |
+| B1 leaves cutting trunk foot / RT3–RT4 / RK1 | 7 (0.14–0.88) | **0** (10 leaves kept, 7 re-seated) | 0 |
+| T2a / T2b leaves cutting RT1 / RT2 | 4 (0.22–0.80) | **0** (one T2a leaf re-seated) | 0 |
+| S4 sprig leaf in RK5 | 0.10 | 0 (stood up) | 0 |
+| Rocks into roots: RK3 / RK6 | 0.23 / 0.14 (verifier); 0.28 / 0.26 by face centres | **0.005 / 0** | ≤ 0.05 |
+| Floating / unchained (all six objects) | 0 / 0 | **0 / 0** | 0 |
+| Non-manifold / boundary / winding / self-hits; `K.check` | 0; clean | **0; clean** | 0 |
+| Hero tris; RootBase | 3590; 992 | **3590; 992** | ≤ 3800; < 1000 |
+| Hero size | 20.93 × 15.99 × 20.00 | 20.93 × 15.99 × 20.00 | |
+| Plugs: corner gap, inside solid | 0.015–0.053, 0 | 0.015–0.053, 0 | seated |
+| Lobes (C / UL / UR / L / R), h : w median (min–max) | 53 (13/9/10/11/10), 0.607 (0.529–0.656) | unchanged | |
+| f34 G / T (`measure_render.py`) | 47.5 / 41.0 | **47.1 / 40.3** | 48.2 ± 4 / 37.6 ± 4 |
+| front / rear / r34 G / T | 45.5/44.5, 41.9/47.4, 41.3/45.7 | 45.8/43.0, 42.4/46.3, 41.6/44.9 | (minor 3, leftover) |
+| side W : H; top W : D | 0.750; 1.354 | 0.750; 1.356 | |
+| f34 plants v > .7, dark share (`col47.py`, same tool on both renders) | `#BEC02A`, 22 % | `#BFC12B`, 20 % | dark ≥ 20 % |
+
+`base_cu.png` and the scratch close-ups (`b_bush.png`, `b_bushF.png`, `b_t2.png`) show the change:
+- B1 is a dark leafy dome standing on the sand between RK1 and RT3, no longer pushed into the root flare.
+- The T2a / T2b pair grows beside RT1, not through it.
+- RK3 and RK6 sit beside their roots' tips.
+
+### Left over (unchanged, outside this round)
+
+Verifier round 2's minors 2–10 stand as written, including:
+- the C ring lobe enclosed by the UL and C lobes;
+- the plants' yellow lean;
+- twigs under L and R in the f34;
+- the front, rear and r34 bark share.
+
+One new note: B1 now sits about 1.3 from its round-2 spot (the verifier suggested about 0.8) and its hidden heart
+is narrower (rx 1.17). The leaves keep the outline a dome.
+
+## Main session ruling (2026-10-29)
+- **Committed** after a targeted round 3 that fixed only the round-2 blocker.
+- **Rounds:**
+
+  | Round | Score | Outcome |
+  |---|---|---|
+  | 1 | 6.5 | Failed: the skeleton didn't read and the pads looked like balls |
+  | 2 | 7.5 | Failed: the plant rebuild buried 13 plant shells in the roots and rocks |
+  | 3 | — | The buried-plant blocker is fixed |
+
+- **Round-3 check:** the main session's GUI rebuild found 0 of 59 plant shells more than 0.05 in (max 0.027). The fix modeller's two methods and the round-2 verifier's own script agree.
+- **Left for a later polish pass** (from verification round 2):
+  - no twigs show under L and R in the f34;
+  - bark share is high in the front, rear and r34;
+  - the plants lean yellow (aim around 70° hue);
+  - the lit canopy and trunk read low, from the studio light;
+  - the top W:D is 1.354;
+  - one crown lobe is enclosed;
+  - the knot is a slot;
+  - the trunk is a straight column;
+  - the patch is 16 deep.
+- **Export:** 6 assets, 6 solid pieces, 6560 tris, 0 VFX sockets, palette 23 colours, 0 problems.

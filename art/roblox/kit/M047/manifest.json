@@ -1,0 +1,890 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M047",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m047_bark",
+    "hex": "#955522",
+    "levels": [
+     0.93382,
+     0.96469,
+     0.97101,
+     0.97496,
+     0.9792,
+     0.98255,
+     0.98534,
+     0.98786,
+     0.99071,
+     0.99176,
+     0.99516,
+     0.99655,
+     0.99858,
+     0.99904,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00041,
+     1.00142,
+     1.00309,
+     1.00619,
+     1.00798,
+     1.01109,
+     1.01331,
+     1.01659,
+     1.02063,
+     1.02272,
+     1.02549,
+     1.02818,
+     1.03465,
+     1.05534
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_bark_deep",
+    "hex": "#341807",
+    "levels": [
+     0.9862,
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_bark_light",
+    "hex": "#B06F35",
+    "levels": [
+     0.9862,
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_bark_x_deep_25",
+    "hex": "#7D461B",
+    "levels": [
+     0.92586,
+     0.93521,
+     0.95105,
+     0.95176,
+     0.96398,
+     0.96639,
+     0.96832,
+     0.97211,
+     0.97643,
+     0.9799,
+     0.98489,
+     0.98744,
+     0.99078,
+     0.99169,
+     0.99434,
+     0.99589,
+     0.99961,
+     1.00238,
+     1.00428,
+     1.00748,
+     1.01152,
+     1.01359,
+     1.0139,
+     1.01826,
+     1.0226,
+     1.02676,
+     1.02701,
+     1.03007,
+     1.03367,
+     1.04202,
+     1.05007,
+     1.0717
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_bark_x_light_25",
+    "hex": "#9C5C27",
+    "levels": [
+     0.97158,
+     0.98845,
+     0.99108,
+     0.99374,
+     0.99866,
+     1.00709,
+     1.00888,
+     1.01424,
+     1.0183,
+     1.02092,
+     1.02409,
+     1.03353,
+     1.0456
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf",
+    "hex": "#5F903A",
+    "levels": [
+     0.94259,
+     0.95678,
+     0.96167,
+     0.96735,
+     0.97014,
+     0.97096,
+     0.97512,
+     0.97808,
+     0.98174,
+     0.98441,
+     0.98605,
+     0.99033,
+     0.99288,
+     0.99783,
+     0.99931,
+     1.00304,
+     1.00572,
+     1.00881,
+     1.01364,
+     1.01599,
+     1.01689,
+     1.0195,
+     1.02167,
+     1.02432,
+     1.02541,
+     1.02815,
+     1.02925,
+     1.0333,
+     1.03729,
+     1.03995,
+     1.04403,
+     1.05857
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_light",
+    "hex": "#A6C234",
+    "levels": [
+     0.98821,
+     0.99207,
+     0.99396,
+     0.99615,
+     1.00001,
+     1.00268,
+     1.00792,
+     1.01658,
+     1.02518,
+     1.03338
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_x_deep_25",
+    "hex": "#52813D",
+    "levels": [
+     0.93674,
+     0.95419,
+     0.96012,
+     0.96593,
+     0.9701,
+     0.97401,
+     0.97723,
+     0.98222,
+     0.98642,
+     0.98933,
+     0.99289,
+     0.99371,
+     0.99642,
+     1.00187,
+     1.00505,
+     1.00885,
+     1.01158,
+     1.01522,
+     1.01673,
+     1.01872,
+     1.02089,
+     1.02295,
+     1.0241,
+     1.02604,
+     1.02803,
+     1.03007,
+     1.03281,
+     1.03764,
+     1.04128,
+     1.04337,
+     1.04858,
+     1.06687
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_x_deep_50",
+    "hex": "#467240",
+    "levels": [
+     0.94936,
+     0.95101,
+     0.95346,
+     0.95678,
+     0.95987,
+     0.96213,
+     0.96944,
+     0.97392,
+     0.97661,
+     0.98518,
+     0.9875,
+     0.9896,
+     0.99525,
+     0.99929,
+     1.00204,
+     1.00449,
+     1.00702,
+     1.01168,
+     1.0151,
+     1.01759,
+     1.02033,
+     1.02349,
+     1.02713,
+     1.02974,
+     1.03179,
+     1.03519,
+     1.03845,
+     1.04181,
+     1.04438,
+     1.04637,
+     1.04986,
+     1.05328
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_x_light_25",
+    "hex": "#719C38",
+    "levels": [
+     0.94578,
+     0.95661,
+     0.96025,
+     0.96734,
+     0.97064,
+     0.97544,
+     0.97796,
+     0.98056,
+     0.983,
+     0.9847,
+     0.9891,
+     0.99148,
+     0.99426,
+     0.99699,
+     0.99951,
+     1.00241,
+     1.00444,
+     1.00642,
+     1.00923,
+     1.01197,
+     1.01693,
+     1.02001,
+     1.02233,
+     1.02442,
+     1.02683,
+     1.03468,
+     1.03795,
+     1.04104,
+     1.04337,
+     1.05004,
+     1.0532
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_x_light_50",
+    "hex": "#82A937",
+    "levels": [
+     0.94648,
+     0.95454,
+     0.96344,
+     0.96829,
+     0.97061,
+     0.97237,
+     0.97461,
+     0.97648,
+     0.98167,
+     0.98204,
+     0.98418,
+     0.98694,
+     0.99109,
+     0.99496,
+     0.99736,
+     1.0005,
+     1.00319,
+     1.00531,
+     1.00819,
+     1.00915,
+     1.0116,
+     1.01459,
+     1.01565,
+     1.01757,
+     1.01973,
+     1.02085,
+     1.02321,
+     1.02851,
+     1.03961,
+     1.03976,
+     1.04165,
+     1.05336
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_leaf_x_light_75",
+    "hex": "#94B636",
+    "levels": [
+     0.94429,
+     0.9519,
+     0.95548,
+     0.9587,
+     0.96079,
+     0.96361,
+     0.96448,
+     0.96448,
+     0.96539,
+     0.96698,
+     0.96798,
+     0.97058,
+     0.97185,
+     0.97303,
+     0.97655,
+     0.97832,
+     0.98101,
+     0.98425,
+     0.98624,
+     0.98924,
+     0.994,
+     1.00689,
+     1.0207,
+     1.02172,
+     1.02868,
+     1.03243,
+     1.03674,
+     1.04118,
+     1.04239,
+     1.04358,
+     1.04358,
+     1.06077
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_plant",
+    "hex": "#919824",
+    "levels": [
+     0.9639,
+     0.97182,
+     0.97557,
+     0.97906,
+     0.98178,
+     0.98371,
+     0.98699,
+     0.9967,
+     0.99928,
+     1.00493,
+     1.00893,
+     1.01083,
+     1.0155,
+     1.01804,
+     1.02614
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_plant_deep",
+    "hex": "#265A3B",
+    "levels": [
+     0.9637,
+     0.96585,
+     0.98559,
+     0.99127,
+     0.99939,
+     1.00894,
+     1.01546,
+     1.0199,
+     1.02984,
+     1.03278
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_plant_deep_x_bark_deep_25",
+    "hex": "#2A4A2E",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_plant_mid",
+    "hex": "#558331",
+    "levels": [
+     0.96078,
+     0.96631,
+     0.96836,
+     0.98825,
+     0.99106,
+     0.99539,
+     1.00561,
+     1.0279,
+     1.031,
+     1.03782
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_rock",
+    "hex": "#A9A29A",
+    "levels": [
+     0.96416,
+     0.97022,
+     0.97465,
+     0.97711,
+     0.98086,
+     0.98336,
+     0.98732,
+     0.99056,
+     0.9925,
+     0.99521,
+     0.99767,
+     1.00067,
+     1.00352,
+     1.00577,
+     1.00858,
+     1.0108,
+     1.01283,
+     1.01513,
+     1.01734,
+     1.01932,
+     1.02502,
+     1.02623,
+     1.03286
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_rock_x_deep_25",
+    "hex": "#A29C95",
+    "levels": [
+     0.96454,
+     0.96662,
+     0.96861,
+     0.97052,
+     0.97385,
+     0.97809,
+     0.98032,
+     0.98246,
+     0.98459,
+     0.98806,
+     0.99012,
+     0.99242,
+     0.99436,
+     0.99601,
+     0.99935,
+     1.00203,
+     1.00399,
+     1.00646,
+     1.008,
+     1.01066,
+     1.01344,
+     1.01606,
+     1.01747,
+     1.02195,
+     1.02529,
+     1.02878,
+     1.03121,
+     1.0334,
+     1.03701
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_rock_x_light_25",
+    "hex": "#ACA59C",
+    "levels": [
+     0.96817,
+     0.97036,
+     0.97231,
+     0.97948,
+     0.9829,
+     0.98542,
+     0.98957,
+     0.9917,
+     0.99619,
+     0.99854,
+     1.00127,
+     1.00362,
+     1.00554,
+     1.01162,
+     1.01332,
+     1.01488,
+     1.0195,
+     1.02444,
+     1.02764,
+     1.03033
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_rock_x_light_50",
+    "hex": "#AEA89F",
+    "levels": [
+     0.96685,
+     0.97025,
+     0.97318,
+     0.97951,
+     0.98262,
+     0.98469,
+     0.98821,
+     0.99025,
+     0.9928,
+     0.99584,
+     0.99826,
+     1.00076,
+     1.00278,
+     1.00711,
+     1.00833,
+     1.01146,
+     1.01299,
+     1.01591,
+     1.02017,
+     1.02403,
+     1.02712,
+     1.02926,
+     1.03141
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_sand",
+    "hex": "#B2A283",
+    "levels": [
+     0.9778,
+     0.97973,
+     0.9851,
+     0.98814,
+     0.99123,
+     0.99371,
+     0.99949,
+     1.00396,
+     1.00525,
+     1.00918,
+     1.01608,
+     1.02049,
+     1.02684
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_sand_x_deep_25",
+    "hex": "#AF9E80",
+    "levels": [
+     0.9689,
+     0.97602,
+     0.97864,
+     0.98347,
+     0.98669,
+     0.9901,
+     0.99311,
+     0.99882,
+     1.00086,
+     1.00496,
+     1.00841,
+     1.01218,
+     1.01597,
+     1.02161,
+     1.02385,
+     1.02665
+    ],
+    "used": true
+   },
+   {
+    "key": "m047_sand_x_deep_50",
+    "hex": "#AC9A7C",
+    "levels": [
+     0.96743,
+     0.98165,
+     0.98402,
+     0.98963,
+     0.99111,
+     0.99594,
+     0.99849,
+     1.00541,
+     1.00764,
+     1.01239,
+     1.01815,
+     1.0205,
+     1.02448
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "GnarledPine",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "hero",
+   "size": [
+    20.9326,
+    20.0,
+    15.9913
+   ],
+   "tris": 3590,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPine.glb",
+     "kind": "solid",
+     "tris": 3590,
+     "offset": [
+      0.0,
+      10.0,
+      0.0
+     ],
+     "size": [
+      20.9326,
+      20.0,
+      15.9913
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Old Pine: a squat cloud-pad pine on a massive leaning planked orange-brown trunk forking into five elbowed limbs plugged into hexagonal sockets, each limb's twigs carrying a separate faceted lobe pad (sky between them); a hollow cut stub, a back stub and a knot; seven buttress roots on a sand patch with warm-grey rocks, a dark broad-leaf bush, lime tufts and sprigs. No VFX"
+  },
+  {
+   "name": "GnarledPineBranchAngled",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "part",
+   "size": [
+    9.3564,
+    8.804,
+    7.2089
+   ],
+   "tris": 328,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPineBranchAngled.glb",
+     "kind": "solid",
+     "tris": 328,
+     "offset": [
+      0.0,
+      4.402,
+      0.0
+     ],
+     "size": [
+      9.3564,
+      8.804,
+      7.2089
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch (angled): the long elbowed lower-left limb (hollow plug end) with three twigs carrying its pad"
+  },
+  {
+   "name": "GnarledPineCanopyTier",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "part",
+   "size": [
+    5.8976,
+    6.9427,
+    6.2256
+   ],
+   "tris": 280,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPineCanopyTier.glb",
+     "kind": "solid",
+     "tris": 280,
+     "offset": [
+      0.0,
+      3.4713,
+      0.0
+     ],
+     "size": [
+      5.8976,
+      6.9427,
+      6.2256
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Canopy Tier: the upper-left limb (hollow plug end) with two twigs carrying its pad"
+  },
+  {
+   "name": "GnarledPineCrownCanopy",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "part",
+   "size": [
+    8.6923,
+    7.0942,
+    8.239
+   ],
+   "tris": 410,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPineCrownCanopy.glb",
+     "kind": "solid",
+     "tris": 410,
+     "offset": [
+      0.0,
+      3.5471,
+      0.0
+     ],
+     "size": [
+      8.6923,
+      7.0942,
+      8.239
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crown Canopy: the crown limb (hollow plug end, cut stub) with three twigs carrying the crown pad"
+  },
+  {
+   "name": "GnarledPineForkedTrunk",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "part",
+   "size": [
+    14.0079,
+    13.731,
+    12.4664
+   ],
+   "tris": 960,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPineForkedTrunk.glb",
+     "kind": "solid",
+     "tris": 960,
+     "offset": [
+      0.0,
+      6.8655,
+      0.0
+     ],
+     "size": [
+      14.0079,
+      13.731,
+      12.4664
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Forked Trunk: planked leaning body with a socket top, two fork stubs, two side sockets, a back hollow stub, a knot and seven buttress roots unioned in"
+  },
+  {
+   "name": "GnarledPineRootBase",
+   "sheet": "M047",
+   "subject": "Old Pine",
+   "role": "part",
+   "size": [
+    18.2099,
+    3.3134,
+    15.9913
+   ],
+   "tris": 992,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/GnarledPineRootBase.glb",
+     "kind": "solid",
+     "tris": 992,
+     "offset": [
+      0.0,
+      1.6567,
+      0.0
+     ],
+     "size": [
+      18.2099,
+      3.3134,
+      15.9913
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rocks / Base: thin lobed sand patch, 6 angular warm-grey rocks, 4 pebbles, a dark broad-leaf bush, 6 lime / green tufts and 4 sprigs"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 6560,
+  "vfxSockets": 0,
+  "paletteColours": 23,
+  "paletteLevels": 455,
+  "meshBytes": 610828
+ },
+ "problems": []
+}
