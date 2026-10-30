@@ -9,6 +9,31 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_screens": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_ui": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_windows_bag": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_windows_craft": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_windows_menu": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "button_add_friend": {
     "h": 163,
     "slice": null,
@@ -767,12 +792,26 @@
     "w": 194
   },
   "pm_arrow_left": {
+    "atlas": "atlas_screens",
     "h": 74,
+    "rect": [
+      0,
+      933,
+      86,
+      74
+    ],
     "slice": null,
     "w": 86
   },
   "pm_arrow_right": {
+    "atlas": "atlas_screens",
     "h": 75,
+    "rect": [
+      924,
+      191,
+      86,
+      75
+    ],
     "slice": null,
     "w": 86
   },
@@ -787,7 +826,14 @@
     "w": 948
   },
   "pm_button_action": {
+    "atlas": "atlas_screens",
     "h": 85,
+    "rect": [
+      693,
+      191,
+      227,
+      85
+    ],
     "slice": [
       40,
       26,
@@ -809,17 +855,38 @@
     "w": 68
   },
   "pm_button_apply": {
+    "atlas": "atlas_screens",
     "h": 89,
+    "rect": [
+      693,
+      98,
+      276,
+      89
+    ],
     "slice": null,
     "w": 276
   },
   "pm_button_check": {
+    "atlas": "atlas_ui",
     "h": 150,
+    "rect": [
+      405,
+      749,
+      155,
+      150
+    ],
     "slice": null,
     "w": 155
   },
   "pm_button_claim": {
+    "atlas": "atlas_ui",
     "h": 82,
+    "rect": [
+      0,
+      528,
+      391,
+      82
+    ],
     "slice": [
       70,
       26,
@@ -829,7 +896,14 @@
     "w": 391
   },
   "pm_button_craft": {
+    "atlas": "atlas_screens",
     "h": 94,
+    "rect": [
+      693,
+      0,
+      282,
+      94
+    ],
     "slice": [
       70,
       26,
@@ -839,7 +913,14 @@
     "w": 282
   },
   "pm_button_leather": {
+    "atlas": "atlas_ui",
     "h": 140,
+    "rect": [
+      0,
+      384,
+      401,
+      140
+    ],
     "slice": [
       64,
       44,
@@ -896,7 +977,14 @@
     "w": 129
   },
   "pm_button_parchment": {
+    "atlas": "atlas_screens",
     "h": 159,
+    "rect": [
+      160,
+      500,
+      386,
+      159
+    ],
     "slice": [
       56,
       48,
@@ -936,12 +1024,26 @@
     "w": 385
   },
   "pm_button_reset": {
+    "atlas": "atlas_screens",
     "h": 77,
+    "rect": [
+      768,
+      500,
+      212,
+      77
+    ],
     "slice": null,
     "w": 212
   },
   "pm_button_square": {
+    "atlas": "atlas_screens",
     "h": 93,
+    "rect": [
+      736,
+      674,
+      116,
+      93
+    ],
     "slice": [
       26,
       26,
@@ -951,7 +1053,14 @@
     "w": 116
   },
   "pm_button_strip": {
+    "atlas": "atlas_screens",
     "h": 80,
+    "rect": [
+      160,
+      849,
+      357,
+      80
+    ],
     "slice": [
       64,
       26,
@@ -961,7 +1070,14 @@
     "w": 357
   },
   "pm_button_x": {
+    "atlas": "atlas_ui",
     "h": 150,
+    "rect": [
+      721,
+      644,
+      155,
+      150
+    ],
     "slice": null,
     "w": 155
   },
@@ -971,17 +1087,38 @@
     "w": 55
   },
   "pm_button_zoom_in": {
+    "atlas": "atlas_windows_bag",
     "h": 62,
+    "rect": [
+      370,
+      879,
+      62,
+      62
+    ],
     "slice": null,
     "w": 62
   },
   "pm_button_zoom_out": {
+    "atlas": "atlas_windows_bag",
     "h": 63,
+    "rect": [
+      304,
+      879,
+      62,
+      63
+    ],
     "slice": null,
     "w": 62
   },
   "pm_card": {
+    "atlas": "atlas_ui",
     "h": 148,
+    "rect": [
+      405,
+      492,
+      314,
+      148
+    ],
     "slice": [
       56,
       48,
@@ -991,47 +1128,110 @@
     "w": 314
   },
   "pm_cat_all": {
+    "atlas": "atlas_screens",
     "h": 83,
+    "rect": [
+      856,
+      581,
+      74,
+      83
+    ],
     "slice": null,
     "w": 74
   },
   "pm_cat_food": {
+    "atlas": "atlas_screens",
     "h": 73,
+    "rect": [
+      736,
+      821,
+      79,
+      73
+    ],
     "slice": null,
     "w": 79
   },
   "pm_cat_materials": {
+    "atlas": "atlas_screens",
     "h": 68,
+    "rect": [
+      942,
+      674,
+      78,
+      68
+    ],
     "slice": null,
     "w": 78
   },
   "pm_cat_tools": {
+    "atlas": "atlas_screens",
     "h": 85,
+    "rect": [
+      768,
+      581,
+      84,
+      85
+    ],
     "slice": null,
     "w": 84
   },
   "pm_check_green": {
+    "atlas": "atlas_ui",
     "h": 32,
+    "rect": [
+      363,
+      936,
+      32,
+      32
+    ],
     "slice": null,
     "w": 32
   },
   "pm_check_off": {
+    "atlas": "atlas_ui",
     "h": 61,
+    "rect": [
+      898,
+      384,
+      58,
+      61
+    ],
     "slice": null,
     "w": 58
   },
   "pm_check_on": {
+    "atlas": "atlas_ui",
     "h": 71,
+    "rect": [
+      927,
+      0,
+      70,
+      71
+    ],
     "slice": null,
     "w": 70
   },
   "pm_compass_rose": {
+    "atlas": "atlas_windows_bag",
     "h": 117,
+    "rect": [
+      866,
+      542,
+      93,
+      117
+    ],
     "slice": null,
     "w": 93
   },
   "pm_ctab": {
+    "atlas": "atlas_screens",
     "h": 64,
+    "rect": [
+      856,
+      674,
+      82,
+      64
+    ],
     "slice": [
       16,
       14,
@@ -1041,7 +1241,14 @@
     "w": 82
   },
   "pm_ctab_selected": {
+    "atlas": "atlas_screens",
     "h": 64,
+    "rect": [
+      934,
+      581,
+      83,
+      64
+    ],
     "slice": [
       16,
       14,
@@ -1051,7 +1258,14 @@
     "w": 83
   },
   "pm_dropdown": {
+    "atlas": "atlas_ui",
     "h": 73,
+    "rect": [
+      0,
+      936,
+      239,
+      73
+    ],
     "slice": [
       30,
       26,
@@ -1078,7 +1292,14 @@
     "w": 176
   },
   "pm_frame_hollow": {
+    "atlas": "atlas_windows_bag",
     "h": 333,
+    "rect": [
+      0,
+      542,
+      774,
+      333
+    ],
     "slice": [
       96,
       112,
@@ -1088,7 +1309,14 @@
     "w": 774
   },
   "pm_frame_window": {
+    "atlas": "atlas_ui",
     "h": 380,
+    "rect": [
+      0,
+      0,
+      743,
+      380
+    ],
     "slice": [
       96,
       112,
@@ -1098,82 +1326,194 @@
     "w": 743
   },
   "pm_glyph_armor": {
+    "atlas": "atlas_ui",
     "h": 37,
+    "rect": [
+      836,
+      342,
+      39,
+      37
+    ],
     "slice": null,
     "w": 39
   },
   "pm_glyph_bag": {
+    "atlas": "atlas_ui",
     "h": 37,
+    "rect": [
+      522,
+      903,
+      32,
+      37
+    ],
     "slice": null,
     "w": 32
   },
   "pm_glyph_bench": {
+    "atlas": "atlas_ui",
     "h": 35,
+    "rect": [
+      747,
+      342,
+      41,
+      35
+    ],
     "slice": null,
     "w": 41
   },
   "pm_glyph_diamond": {
+    "atlas": "atlas_ui",
     "h": 27,
+    "rect": [
+      464,
+      993,
+      24,
+      27
+    ],
     "slice": null,
     "w": 24
   },
   "pm_glyph_gamepad": {
+    "atlas": "atlas_ui",
     "h": 42,
+    "rect": [
+      960,
+      446,
+      58,
+      42
+    ],
     "slice": null,
     "w": 58
   },
   "pm_glyph_gear": {
+    "atlas": "atlas_ui",
     "h": 54,
+    "rect": [
+      405,
+      954,
+      53,
+      54
+    ],
     "slice": null,
     "w": 53
   },
   "pm_glyph_hammer": {
+    "atlas": "atlas_ui",
     "h": 32,
+    "rect": [
+      363,
+      972,
+      27,
+      32
+    ],
     "slice": null,
     "w": 27
   },
   "pm_glyph_heart": {
+    "atlas": "atlas_ui",
     "h": 135,
+    "rect": [
+      723,
+      492,
+      160,
+      135
+    ],
     "slice": null,
     "w": 160
   },
   "pm_glyph_monitor": {
+    "atlas": "atlas_ui",
     "h": 51,
+    "rect": [
+      464,
+      903,
+      54,
+      51
+    ],
     "slice": null,
     "w": 54
   },
   "pm_glyph_mountain": {
+    "atlas": "atlas_ui",
     "h": 27,
+    "rect": [
+      830,
+      453,
+      44,
+      27
+    ],
     "slice": null,
     "w": 44
   },
   "pm_glyph_person": {
+    "atlas": "atlas_ui",
     "h": 60,
+    "rect": [
+      968,
+      568,
+      50,
+      60
+    ],
     "slice": null,
     "w": 50
   },
   "pm_glyph_sound": {
+    "atlas": "atlas_ui",
     "h": 47,
+    "rect": [
+      405,
+      903,
+      55,
+      47
+    ],
     "slice": null,
     "w": 55
   },
   "pm_glyph_sword": {
+    "atlas": "atlas_ui",
     "h": 31,
+    "rect": [
+      464,
+      958,
+      27,
+      31
+    ],
     "slice": null,
     "w": 27
   },
   "pm_glyph_tent": {
+    "atlas": "atlas_ui",
     "h": 35,
+    "rect": [
+      792,
+      342,
+      40,
+      35
+    ],
     "slice": null,
     "w": 40
   },
   "pm_glyph_tools": {
+    "atlas": "atlas_ui",
     "h": 39,
+    "rect": [
+      898,
+      449,
+      40,
+      39
+    ],
     "slice": null,
     "w": 40
   },
   "pm_glyph_weight": {
+    "atlas": "atlas_ui",
     "h": 32,
+    "rect": [
+      997,
+      492,
+      23,
+      32
+    ],
     "slice": null,
     "w": 23
   },
@@ -1299,17 +1639,38 @@
     "w": 179
   },
   "pm_icon_bolt": {
+    "atlas": "atlas_screens",
     "h": 160,
+    "rect": [
+      550,
+      842,
+      130,
+      160
+    ],
     "slice": null,
     "w": 130
   },
   "pm_icon_chest": {
+    "atlas": "atlas_screens",
     "h": 170,
+    "rect": [
+      550,
+      500,
+      214,
+      170
+    ],
     "slice": null,
     "w": 214
   },
   "pm_icon_coin": {
+    "atlas": "atlas_ui",
     "h": 166,
+    "rect": [
+      747,
+      0,
+      176,
+      166
+    ],
     "slice": null,
     "w": 176
   },
@@ -1326,17 +1687,38 @@
     "w": 168
   },
   "pm_icon_gem": {
+    "atlas": "atlas_ui",
     "h": 168,
+    "rect": [
+      747,
+      170,
+      128,
+      168
+    ],
     "slice": null,
     "w": 128
   },
   "pm_icon_scroll": {
+    "atlas": "atlas_screens",
     "h": 164,
+    "rect": [
+      550,
+      674,
+      182,
+      164
+    ],
     "slice": null,
     "w": 182
   },
   "pm_inset": {
+    "atlas": "atlas_ui",
     "h": 318,
+    "rect": [
+      0,
+      614,
+      376,
+      318
+    ],
     "slice": [
       22,
       22,
@@ -1346,7 +1728,14 @@
     "w": 376
   },
   "pm_item_slot": {
+    "atlas": "atlas_ui",
     "h": 96,
+    "rect": [
+      729,
+      384,
+      97,
+      96
+    ],
     "slice": [
       20,
       20,
@@ -1356,7 +1745,14 @@
     "w": 97
   },
   "pm_jtab_leather": {
+    "atlas": "atlas_screens",
     "h": 58,
+    "rect": [
+      0,
+      871,
+      126,
+      58
+    ],
     "slice": [
       20,
       16,
@@ -1366,7 +1762,14 @@
     "w": 126
   },
   "pm_jtab_paper": {
+    "atlas": "atlas_screens",
     "h": 54,
+    "rect": [
+      394,
+      933,
+      129,
+      54
+    ],
     "slice": [
       20,
       16,
@@ -1376,7 +1779,14 @@
     "w": 129
   },
   "pm_keycap": {
+    "atlas": "atlas_ui",
     "h": 71,
+    "rect": [
+      243,
+      936,
+      116,
+      71
+    ],
     "slice": [
       22,
       22,
@@ -1480,7 +1890,14 @@
     "w": 1000
   },
   "pm_map_label": {
+    "atlas": "atlas_windows_bag",
     "h": 108,
+    "rect": [
+      0,
+      879,
+      300,
+      108
+    ],
     "slice": [
       40,
       30,
@@ -1490,12 +1907,26 @@
     "w": 300
   },
   "pm_map_pin": {
+    "atlas": "atlas_windows_bag",
     "h": 118,
+    "rect": [
+      778,
+      542,
+      84,
+      118
+    ],
     "slice": null,
     "w": 84
   },
   "pm_panel": {
+    "atlas": "atlas_screens",
     "h": 314,
+    "rect": [
+      160,
+      0,
+      529,
+      314
+    ],
     "slice": [
       70,
       62,
@@ -1505,7 +1936,14 @@
     "w": 529
   },
   "pm_quest_row": {
+    "atlas": "atlas_screens",
     "h": 88,
+    "rect": [
+      160,
+      757,
+      362,
+      88
+    ],
     "slice": [
       40,
       30,
@@ -1515,7 +1953,14 @@
     "w": 362
   },
   "pm_quest_row_selected": {
+    "atlas": "atlas_screens",
     "h": 90,
+    "rect": [
+      160,
+      663,
+      364,
+      90
+    ],
     "slice": [
       40,
       30,
@@ -1525,12 +1970,26 @@
     "w": 364
   },
   "pm_queue_empty": {
+    "atlas": "atlas_screens",
     "h": 96,
+    "rect": [
+      568,
+      398,
+      404,
+      96
+    ],
     "slice": null,
     "w": 404
   },
   "pm_queue_row": {
+    "atlas": "atlas_screens",
     "h": 98,
+    "rect": [
+      160,
+      398,
+      404,
+      98
+    ],
     "slice": [
       24,
       24,
@@ -1540,7 +1999,14 @@
     "w": 404
   },
   "pm_recipe_row": {
+    "atlas": "atlas_screens",
     "h": 74,
+    "rect": [
+      569,
+      318,
+      405,
+      74
+    ],
     "slice": [
       30,
       24,
@@ -1550,7 +2016,14 @@
     "w": 405
   },
   "pm_recipe_row_selected": {
+    "atlas": "atlas_screens",
     "h": 76,
+    "rect": [
+      160,
+      318,
+      405,
+      76
+    ],
     "slice": [
       30,
       24,
@@ -1560,7 +2033,14 @@
     "w": 405
   },
   "pm_req_card": {
+    "atlas": "atlas_screens",
     "h": 156,
+    "rect": [
+      0,
+      573,
+      106,
+      156
+    ],
     "slice": [
       18,
       18,
@@ -1570,7 +2050,14 @@
     "w": 106
   },
   "pm_search_box": {
+    "atlas": "atlas_screens",
     "h": 46,
+    "rect": [
+      160,
+      933,
+      230,
+      46
+    ],
     "slice": [
       40,
       14,
@@ -1580,22 +2067,50 @@
     "w": 230
   },
   "pm_side_column": {
+    "atlas": "atlas_screens",
     "h": 569,
+    "rect": [
+      0,
+      0,
+      156,
+      569
+    ],
     "slice": null,
     "w": 156
   },
   "pm_side_tab_selected": {
+    "atlas": "atlas_screens",
     "h": 134,
+    "rect": [
+      0,
+      733,
+      122,
+      134
+    ],
     "slice": null,
     "w": 122
   },
   "pm_slider_knob": {
+    "atlas": "atlas_ui",
     "h": 58,
+    "rect": [
+      960,
+      384,
+      58,
+      58
+    ],
     "slice": null,
     "w": 58
   },
   "pm_sort_button": {
+    "atlas": "atlas_screens",
     "h": 46,
+    "rect": [
+      736,
+      771,
+      81,
+      46
+    ],
     "slice": null,
     "w": 81
   },
@@ -1617,7 +2132,14 @@
     "w": 104
   },
   "pm_stat_chip_tall": {
+    "atlas": "atlas_ui",
     "h": 72,
+    "rect": [
+      887,
+      492,
+      106,
+      72
+    ],
     "slice": [
       18,
       18,
@@ -1627,7 +2149,14 @@
     "w": 106
   },
   "pm_stepper_field": {
+    "atlas": "atlas_ui",
     "h": 62,
+    "rect": [
+      887,
+      568,
+      77,
+      62
+    ],
     "slice": [
       10,
       10,
@@ -1637,17 +2166,38 @@
     "w": 77
   },
   "pm_stepper_minus": {
+    "atlas": "atlas_ui",
     "h": 65,
+    "rect": [
+      927,
+      75,
+      64,
+      65
+    ],
     "slice": null,
     "w": 64
   },
   "pm_stepper_plus": {
+    "atlas": "atlas_ui",
     "h": 65,
+    "rect": [
+      830,
+      384,
+      64,
+      65
+    ],
     "slice": null,
     "w": 64
   },
   "pm_tab_leather": {
+    "atlas": "atlas_ui",
     "h": 104,
+    "rect": [
+      405,
+      384,
+      320,
+      104
+    ],
     "slice": [
       40,
       30,
@@ -1657,7 +2207,14 @@
     "w": 320
   },
   "pm_tab_paper": {
+    "atlas": "atlas_ui",
     "h": 101,
+    "rect": [
+      405,
+      644,
+      312,
+      101
+    ],
     "slice": [
       40,
       30,
@@ -1739,7 +2296,14 @@
     "w": 146
   },
   "pm_window_crafting": {
+    "atlas": "atlas_windows_craft",
     "h": 742,
+    "rect": [
+      0,
+      0,
+      1023,
+      466
+    ],
     "slice": null,
     "tiles": [
       [
@@ -1770,7 +2334,14 @@
     "w": 817
   },
   "pm_window_forge": {
+    "atlas": "atlas_windows_craft",
     "h": 742,
+    "rect": [
+      0,
+      470,
+      1023,
+      466
+    ],
     "slice": null,
     "tiles": [
       [
@@ -1801,7 +2372,14 @@
     "w": 817
   },
   "pm_window_inventory": {
+    "atlas": "atlas_windows_bag",
     "h": 786,
+    "rect": [
+      0,
+      0,
+      1024,
+      538
+    ],
     "slice": null,
     "tiles": [
       [
@@ -1832,7 +2410,14 @@
     "w": 749
   },
   "pm_window_journal": {
+    "atlas": "atlas_windows_menu",
     "h": 772,
+    "rect": [
+      0,
+      0,
+      1024,
+      484
+    ],
     "slice": null,
     "tiles": [
       [
@@ -1863,7 +2448,14 @@
     "w": 818
   },
   "pm_window_settings": {
+    "atlas": "atlas_windows_menu",
     "h": 706,
+    "rect": [
+      0,
+      488,
+      1024,
+      443
+    ],
     "slice": null,
     "tiles": [
       [

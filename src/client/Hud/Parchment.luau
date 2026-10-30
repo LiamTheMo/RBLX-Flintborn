@@ -691,6 +691,23 @@ export type Screen = {
 local ScreenMethods = {}
 ScreenMethods.__index = ScreenMethods
 
+-- How far the Roblox top bar reaches into `gui` (a ScreenGui), in screen
+-- pixels. Absolute positions are measured from below the classic GUI inset, so
+-- a gui that ignores the inset reports AbsolutePosition.Y = -inset; its top on
+-- screen is that plus the inset. (Subtracting AbsolutePosition alone counted
+-- the bar twice and pushed everything under it a bar's height too low.)
+function Parchment.TopInset(gui: GuiBase2d): number
+	local guiInset = GuiService:GetGuiInset().Y
+	local bar = guiInset
+	local ok, value = pcall(function()
+		return GuiService.TopbarInset.Max.Y
+	end)
+	if ok and type(value) == "number" and value > 0 then
+		bar = value
+	end
+	return math.max(0, bar - (gui.AbsolutePosition.Y + guiInset))
+end
+
 function Parchment.Screen(name: string, size: { number }, displayOrder: number?, parent: Instance?): Screen
 	local gui = Instance.new("ScreenGui")
 	gui.Name = name
@@ -751,13 +768,8 @@ function ScreenMethods:Watch()
 	local gui = self.gui
 	local player = Players.LocalPlayer
 	local function fit()
-		local inset = 0
-		local ok, value = pcall(function()
-			return GuiService.TopbarInset.Max.Y
-		end)
-		inset = if ok and type(value) == "number" then value else GuiService:GetGuiInset().Y
 		local size = gui.AbsoluteSize
-		self:Fit(size.X, size.Y, math.max(0, inset - gui.AbsolutePosition.Y), player:GetAttribute("UiScale"))
+		self:Fit(size.X, size.Y, Parchment.TopInset(gui), player:GetAttribute("UiScale"))
 	end
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit)
 	pcall(function()
