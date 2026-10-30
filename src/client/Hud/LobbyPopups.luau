@@ -53,9 +53,12 @@ local function lineHeight(entry, text: string, width: number): number
 end
 
 -- A footer or row button on the leather (primary) or paper art, swapping to its
--- hover and pressed art when those are uploaded.
+-- hover and pressed art when those are uploaded and the base is not drawn from
+-- an atlas (then it is tinted).
 local function button(cfg, parent: Instance, label: string, primary: boolean, props, onPress)
 	local base = if primary then "pm_button_leather" else "pm_button_parchment"
+	local baseSprite = UiAssets.sprite(base)
+	local atlased = baseSprite ~= nil and type(baseSprite.atlas) == "string" and UiAssets.image(baseSprite.atlas) ~= nil
 	local holder = Widgets.Make("Frame", { Name = label, BackgroundTransparency = 1 }, parent)
 	for key, value in props do
 		(holder :: any)[key] = value
@@ -89,7 +92,9 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 	local restColor = if face:IsA("Frame") then face.BackgroundColor3 else nil
 	local function show(state: string?)
 		local name = if state then base .. "_" .. state else base
-		local id = UiAssets.image(name)
+		-- Art drawn from an atlas keeps its image (the state art is separate
+		-- images, which phones may not load) and is tinted instead.
+		local id = if atlased then nil else UiAssets.image(name)
 		if face:IsA("ImageLabel") then
 			if id then
 				-- The state art is a few pixels off the base size: its own slice centre.
