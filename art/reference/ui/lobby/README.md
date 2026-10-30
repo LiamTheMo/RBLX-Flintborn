@@ -36,6 +36,11 @@ assets from these. Use the screen mockups above for layout and size.
 | `13_popups_notices.png` | Confirm dialog, empty dialog, Quest Complete and Item Received toasts, tooltip boxes with tails, count-badged frames, status dots, lock, warning, check, cross, cursor |
 | `14_ornaments.png` | Corner pieces, clasps, folded corner, round and octagonal frames, rivets and spikes, rope knots, leather and parchment strips, dividers, list rows, leaf and rune emblems, plaques and arrow tabs |
 | `15_play_party_parts.png` | Play window with map, party list and hotbar; party window; portal; backpack button; frame; crown; invite button; search and player rows; plain map |
+| `16_icons_status_items.png` | 20 icons: heart, lightning, drumstick, star, crown, exclamation, warning, check, cross, hourglass, clock, scroll, gift, backpack, stone axe, log, stone, plant fiber, up arrow, speech bubble |
+| `17_icons_world.png` | 20 world icons: mountain, tree, cave, campfire, ruin arch, rocks, crystals, magma ore, berry bush, anvil, totem, rune stone, treasure chest, paw, tusk, map pin, compass arrow, rope bridge, wave, hut |
+| `18_stat_bars_states.png` | Health, stamina, food and XP bars at 0, 50 and 100 %; empty and plain bar frames; the four fills |
+| `19_progress_bars_badges.png` | Progress bars (XP, plant, wood timer, trade), empty bar, five fill colours, ring progress at 0/50/100 %, framed status tiles (check, hourglass, clock, flag, build, search) |
+| `20_stat_bars_widths.png` | Health, stamina, food and XP bars at three widths; framed stat icon tiles |
 
 These sheets came from background removal. Two consequences for slicing:
 - Fills sit at alpha 250–254 rather than 255.
