@@ -314,9 +314,6 @@ local function fallback(name: string, props, parent: Instance?)
 	return applyFrame(frame, props)
 end
 
--- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
--- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
--- share of the whole, so the sprite still resizes as one image.
 -- The uploaded atlas holding sprite `name` (art/ui/pack_atlas.py), or nil.
 local function atlasImage(name: string): string?
 	local sprite = UiAssets.sprite(name)
@@ -326,6 +323,71 @@ local function atlasImage(name: string): string?
 	return nil
 end
 
+-- Image properties a nine-piece sprite's holder passes on to its pieces.
+local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
+
+-- A 9-sliced sprite from an atlas, drawn as nine plain pieces: each its own
+-- rectangle of the atlas, stretched (corners keep their size, edges stretch one
+-- way, the centre both). Phones drew Roblox's Slice of an atlas rectangle wrongly
+-- (pieces cut, shifted, or taken from neighbouring sprites), while plain atlas
+-- rectangles draw right everywhere. The holder is an ImageLabel without an image
+-- of its own whose tint, transparency and ZIndex pass on to the pieces, so callers
+-- treat it as any sprite.
+local function nineSlice(name: string, sprite, id: string, props, parent: Instance?, sliceScale: number?): GuiObject
+	local holder = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = "" }, parent)
+	local width, height = targetSize(props)
+	local scale = sliceScale
+		or (if width > 0 and height > 0 then HudModel.SliceScale(sprite.w, sprite.h, width, height) else 1)
+	local l, t, r, b = sprite.slice[1], sprite.slice[2], sprite.slice[3], sprite.slice[4]
+	local rx, ry = sprite.rect[1], sprite.rect[2]
+	local xs = { 0, l, sprite.w - r, sprite.w }
+	local ys = { 0, t, sprite.h - b, sprite.h }
+	-- Each column (row): {scale, offset} of its position and of its size.
+	local columns = {
+		{ 0, 0, 0, l * scale },
+		{ 0, l * scale, 1, -(l + r) * scale },
+		{ 1, -r * scale, 0, r * scale },
+	}
+	local rows = {
+		{ 0, 0, 0, t * scale },
+		{ 0, t * scale, 1, -(t + b) * scale },
+		{ 1, -b * scale, 0, b * scale },
+	}
+	local pieces = {}
+	for i = 1, 3 do
+		for j = 1, 3 do
+			local w, h = xs[i + 1] - xs[i], ys[j + 1] - ys[j]
+			if w > 0 and h > 0 then
+				local column, row = columns[i], rows[j]
+				local piece = Widgets.Make("ImageLabel", {
+					Name = "Piece" .. i .. j,
+					BackgroundTransparency = 1,
+					ImageRectOffset = Vector2.new(rx + xs[i], ry + ys[j]),
+					ImageRectSize = Vector2.new(w, h),
+					Position = UDim2.new(column[1], column[2], row[1], row[2]),
+					ScaleType = Enum.ScaleType.Stretch,
+					Size = UDim2.new(column[3], column[4], row[3], row[4]),
+				}, holder)
+				SpriteLoader.Assign(piece, id)
+				table.insert(pieces, piece)
+			end
+		end
+	end
+	for _, key in PASSED_ON do
+		local function pass()
+			for _, piece in pieces do
+				(piece :: any)[key] = (holder :: any)[key]
+			end
+		end
+		holder:GetPropertyChangedSignal(key):Connect(pass)
+		pass()
+	end
+	return apply(holder, props)
+end
+
+-- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
+-- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
+-- share of the whole, so the sprite still resizes as one image.
 local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	local ids = {}
 	for _, tile in sprite.tiles do
@@ -372,23 +434,19 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 	if id == nil then
 		return fallback(name, props, parent)
 	end
+	local center = UiAssets.sliceCenter(name)
+	if atlas and center then
+		return nineSlice(name, whole, atlas, props, parent, sliceScale)
+	end
 	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
 	if atlas then
-		-- The 9-slice centre below is relative to this rectangle.
 		image.ImageRectOffset = Vector2.new(whole.rect[1], whole.rect[2])
 		image.ImageRectSize = Vector2.new(whole.rect[3], whole.rect[4])
 	end
 	SpriteLoader.Assign(image, id)
-	local center = UiAssets.sliceCenter(name)
 	local sprite = UiAssets.sprite(name)
 	if center and sprite then
 		image.ScaleType = Enum.ScaleType.Slice
-		if atlas then
-			-- Roblox reads SliceCenter in the whole image's pixels, not relative to
-			-- ImageRectOffset: move the centre to the sprite's place in the atlas.
-			local offset = Vector2.new(whole.rect[1], whole.rect[2])
-			center = Rect.new(center.Min + offset, center.Max + offset)
-		end
 		image.SliceCenter = center
 		local width, height = targetSize(props)
 		if sliceScale then
