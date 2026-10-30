@@ -1,0 +1,685 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M050",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m050_peg",
+    "hex": "#E8C47E",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_rope",
+    "hex": "#EEC677",
+    "levels": [
+     0.98046,
+     0.98358,
+     0.98643,
+     0.99367,
+     0.99693,
+     0.99937,
+     1.0014,
+     1.0059,
+     1.0103,
+     1.01334,
+     1.01841
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_rope_x_dark_45",
+    "hex": "#C8984D",
+    "levels": [
+     0.98233,
+     0.98541,
+     0.98698,
+     0.99367,
+     0.99693,
+     0.99937,
+     1.0014,
+     1.00595,
+     1.0103,
+     1.01334,
+     1.01841
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_rope_x_dark_70",
+    "hex": "#B27F36",
+    "levels": [
+     0.98233,
+     0.98541,
+     0.98698,
+     0.99367,
+     0.99693,
+     0.99937,
+     1.0014,
+     1.00595,
+     1.0103,
+     1.01334,
+     1.01841
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_rope_x_dark_85",
+    "hex": "#A66F28",
+    "levels": [
+     0.98233,
+     0.98541,
+     0.98698,
+     0.99367,
+     0.99693,
+     0.99937,
+     1.0014,
+     1.00595,
+     1.0103,
+     1.01334,
+     1.01841
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood",
+    "hex": "#BB722E",
+    "levels": [
+     0.96632,
+     0.96848,
+     0.97279,
+     0.97523,
+     0.97819,
+     0.97999,
+     0.98246,
+     0.98413,
+     0.98639,
+     0.98917,
+     0.99224,
+     0.99486,
+     0.99718,
+     1.00035,
+     1.00366,
+     1.00795,
+     1.01308,
+     1.01426,
+     1.01901,
+     1.02052,
+     1.02336,
+     1.02626,
+     1.02847,
+     1.03017,
+     1.03282,
+     1.03498,
+     1.0381,
+     1.04048
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_dark",
+    "hex": "#65361A",
+    "levels": [
+     0.97422,
+     0.97917,
+     0.9902,
+     0.99839,
+     1.01146,
+     1.02872,
+     1.03584
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep",
+    "hex": "#80410F",
+    "levels": [
+     0.96621,
+     0.97412,
+     0.97678,
+     0.98195,
+     0.98505,
+     0.99179,
+     0.99457,
+     1.00405,
+     1.00624,
+     1.0084,
+     1.01044,
+     1.01422,
+     1.0161,
+     1.02184,
+     1.02444,
+     1.03654,
+     1.04606
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep_x_wood_15",
+    "hex": "#894814",
+    "levels": [
+     0.96381,
+     0.96802,
+     0.97161,
+     0.97642,
+     0.98207,
+     0.98565,
+     0.98835,
+     0.99074,
+     0.99292,
+     0.9965,
+     0.99922,
+     1.00164,
+     1.00491,
+     1.00869,
+     1.01124,
+     1.01491,
+     1.01743,
+     1.02022,
+     1.02379,
+     1.02584,
+     1.03149
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep_x_wood_dark_15",
+    "hex": "#7C3F11",
+    "levels": [
+     0.95929,
+     0.96156,
+     0.96942,
+     0.97132,
+     0.97528,
+     0.97797,
+     0.98334,
+     0.98818,
+     0.99347,
+     0.99874,
+     1.00325,
+     1.00681,
+     1.00887,
+     1.01513,
+     1.01747,
+     1.02291,
+     1.02615,
+     1.02744,
+     1.02997,
+     1.0386,
+     1.04214
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep_x_wood_dark_35",
+    "hex": "#773D13",
+    "levels": [
+     0.95218,
+     0.96117,
+     0.96974,
+     0.97045,
+     0.97592,
+     0.97749,
+     0.98154,
+     0.98504,
+     0.98864,
+     0.98935,
+     0.99244,
+     0.99483,
+     0.99522,
+     0.99633,
+     0.99724,
+     0.99928,
+     1.00033,
+     1.0028,
+     1.00663,
+     1.00766,
+     1.01167,
+     1.01517,
+     1.01617,
+     1.01875,
+     1.02295,
+     1.02443,
+     1.02555,
+     1.02842,
+     1.03026,
+     1.03559,
+     1.03889,
+     1.04489
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep_x_wood_dark_50",
+    "hex": "#723C14",
+    "levels": [
+     0.93993,
+     0.94765,
+     0.95983,
+     0.96514,
+     0.96846,
+     0.9719,
+     0.97529,
+     0.97806,
+     0.98249,
+     0.98557,
+     0.98781,
+     0.9913,
+     0.99534,
+     1.00086,
+     1.00523,
+     1.00801,
+     1.01298,
+     1.01567,
+     1.01815,
+     1.02264,
+     1.02814,
+     1.03153,
+     1.035,
+     1.03789
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_deep_x_wood_dark_60",
+    "hex": "#703A16",
+    "levels": [
+     0.96042,
+     0.96445,
+     0.96764,
+     0.97109,
+     0.97283,
+     0.97693,
+     0.97969,
+     0.98316,
+     0.98733,
+     0.98906,
+     0.99174,
+     0.99395,
+     0.99629,
+     0.99968,
+     1.00286,
+     1.00458,
+     1.0096,
+     1.02624,
+     1.0277,
+     1.0396
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_light",
+    "hex": "#C57A35",
+    "levels": [
+     0.97067,
+     0.97386,
+     0.97642,
+     0.97929,
+     0.98153,
+     0.9844,
+     0.98744,
+     0.9913,
+     0.99494,
+     0.99715,
+     0.9987,
+     1.00131,
+     1.00416,
+     1.00623,
+     1.00794,
+     1.0128,
+     1.01901,
+     1.02376,
+     1.02612,
+     1.0307,
+     1.03374,
+     1.03672,
+     1.03771
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_x_deep_15",
+    "hex": "#B26B29",
+    "levels": [
+     0.96847,
+     0.97106,
+     0.97517,
+     0.97815,
+     0.98349,
+     0.98525,
+     0.98741,
+     1.00881
+    ],
+    "used": true
+   },
+   {
+    "key": "m050_wood_x_light_15",
+    "hex": "#BC732F",
+    "levels": [
+     0.96987,
+     0.97464,
+     0.98913,
+     0.99483,
+     0.99819,
+     1.00103,
+     1.00425,
+     1.00616,
+     1.00877,
+     1.01071,
+     1.0124,
+     1.01509,
+     1.01808,
+     1.02208
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TimberBridge",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "hero",
+   "size": [
+    32.0,
+    8.85,
+    11.0
+   ],
+   "tris": 3860,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridge.glb",
+     "kind": "solid",
+     "tris": 3860,
+     "offset": [
+      0.0,
+      4.425,
+      0.0
+     ],
+     "size": [
+      32.0,
+      8.85,
+      11.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Timber bridge (post centres 8 across x 3 bays of 9.14, deck 32 long, top 5.6, posts to 8.85; about 32.0 x 11.0 x 8.85): a level trestle footbridge on eight square posts, fourteen crisp orange boards across the width (notched round the posts), stringers and crossbeams under the deck, peg blocks with pale-gold wooden pegs, knee braces in the end bays and an X brace at each end, two twisted rope wraps on every post and six low twisted swags along the long sides (both ends open). Seams: feet z 0, deck top 5.6 (M048's dock deck, M043's lower lawn), open ends x +-16. No VFX"
+  },
+  {
+   "name": "TimberBridgeBrace",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    3.0895,
+    2.7925,
+    0.45
+   ],
+   "tris": 12,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgeBrace.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      1.3962,
+      0.0
+     ],
+     "size": [
+      3.0895,
+      2.7925,
+      0.45
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Brace (reusable): a knee brace, ends cut to the leg face and the stringer underside"
+  },
+  {
+   "name": "TimberBridgeCrossbeam",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    0.9,
+    1.32,
+    6.54
+   ],
+   "tris": 12,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgeCrossbeam.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.66,
+      0.0
+     ],
+     "size": [
+      0.9,
+      1.32,
+      6.54
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crossbeam (reusable): a 0.9 x 1.32 crossbeam between the stringers"
+  },
+  {
+   "name": "TimberBridgePlank",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    2.1965,
+    0.8587,
+    9.5025
+   ],
+   "tris": 12,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgePlank.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.4294,
+      0.0
+     ],
+     "size": [
+      2.1965,
+      0.8587,
+      9.5025
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Plank (reusable): one crisp 2.19 x 0.85 x 9.5 deck board"
+  },
+  {
+   "name": "TimberBridgePost",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    2.0307,
+    8.85,
+    2.5153
+   ],
+   "tris": 286,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgePost.glb",
+     "kind": "solid",
+     "tris": 286,
+     "offset": [
+      0.0,
+      4.425,
+      0.0
+     ],
+     "size": [
+      2.0307,
+      8.85,
+      2.5153
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Post (reusable): a 1.5-square post, ground to an 8.85 chamfered cap with a peg dot, two peg blocks with wooden pegs and two twisted rope wraps; legs darker below the stringers"
+  },
+  {
+   "name": "TimberBridgeRope",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    8.1029,
+    1.5714,
+    0.6
+   ],
+   "tris": 224,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgeRope.glb",
+     "kind": "solid",
+     "tris": 224,
+     "offset": [
+      0.0,
+      0.7857,
+      0.0
+     ],
+     "size": [
+      8.1029,
+      1.5714,
+      0.6
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rope Segment (reusable): one sagging three-ply twisted rope swag with round knob ends"
+  },
+  {
+   "name": "TimberBridgeStringer",
+   "sheet": "M050",
+   "subject": "Timber Bridge",
+   "role": "part",
+   "size": [
+    7.6829,
+    1.32,
+    0.9
+   ],
+   "tris": 12,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBridgeStringer.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.66,
+      0.0
+     ],
+     "size": [
+      7.6829,
+      1.32,
+      0.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stringer (reusable): a 0.9 x 1.32 stringer span between two posts, 7.7 long"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 4418,
+  "vfxSockets": 0,
+  "paletteColours": 16,
+  "paletteLevels": 260,
+  "meshBytes": 393436
+ },
+ "problems": []
+}
