@@ -48,34 +48,23 @@ function ListWindow.new(parent: Instance?, opts)
 	self.order = 0
 	self.tabs = {}
 
-	Widgets.Sprite("pm_frame_window", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 1 }, window, 1)
-	Widgets.Sprite("pm_button_leather", {
-		Name = "TitlePlate",
-		Position = UDim2.fromOffset(W / 2 - 250, 6),
-		Size = UDim2.fromOffset(500, 116),
-		ZIndex = 3,
-	}, window, Parchment.SliceFor("pm_button_leather", { 0, 0, 500, 116 }))
-	self.title = Parchment.Text(opts.title or "", { W / 2 - 190, 22, 380, 62 }, window, {
-		size = 40,
-		color = "cream",
-		align = "Center",
-		scaled = true,
-		name = "Title",
-		z = 4,
-	})
-	self.close = Parchment.Button("pm_button_x", { W - 126, 52, 64, 62 }, window, function()
+	local chrome = Parchment.Window(window, opts.title or "", function()
 		opts.onClose()
-	end, { name = "Close", pad = 6 }).button
-	-- Currencies or a short summary in the band left of the title plate.
+	end)
+	self.title = chrome.title
+	self.close = chrome.close
+	-- Currencies or a short summary along the top edge, left of the X.
 	self.corner = Widgets.Make("Frame", {
 		Name = "Corner",
+		AnchorPoint = Vector2.new(1, 0),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(56, 58),
-		Size = UDim2.fromOffset(W / 2 - 250 - 56, 48),
+		Position = UDim2.new(1, -120, 0, 58),
+		Size = UDim2.fromOffset(W - Parchment.PLAQUE_X - 700, 48),
 		ZIndex = 4,
 	}, window)
 	Widgets.Make("UIListLayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Right,
 		Padding = UDim.new(0, 12),
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -83,8 +72,7 @@ function ListWindow.new(parent: Instance?, opts)
 
 	local pageRect = { 44, TOP, W - 88, BOTTOM - TOP }
 	if opts.tabs and #opts.tabs > 0 then
-		local column = Widgets.Sprite("pm_inset", { Name = "TabColumn", ZIndex = 2 }, window)
-		place(column, TAB_COLUMN)
+		Parchment.Panel(TAB_COLUMN, window).Name = "TabColumn"
 		for index, tab in opts.tabs do
 			local y = TAB_COLUMN[2] + 16 + (index - 1) * TAB_PITCH
 			self.tabs[tab.id] = Parchment.Tab({ 56, y, 280, TAB_HEIGHT }, window, tab.label, tab.glyph, function()
@@ -93,8 +81,7 @@ function ListWindow.new(parent: Instance?, opts)
 		end
 		pageRect = { TAB_COLUMN[1] + TAB_COLUMN[3] + 14, TOP, W - 88 - TAB_COLUMN[3] - 14, BOTTOM - TOP }
 	end
-	local page = Widgets.Sprite("pm_inset", { Name = "Page", ZIndex = 2 }, window)
-	place(page, pageRect)
+	Parchment.Panel(pageRect, window).Name = "Page"
 	self.pageRect = pageRect
 	local list = Widgets.Make("ScrollingFrame", {
 		Name = "List",

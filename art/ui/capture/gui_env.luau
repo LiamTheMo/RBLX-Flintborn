@@ -16,6 +16,16 @@ local function typed(kind, fields, meta)
 	return setmetatable(fields, meta)
 end
 
+-- Roblox's typeof for the stand-in datatypes (UDim2, Vector2, Color3...), so
+-- code that checks types takes the same branch as on a device.
+local rawTypeof = typeof
+typeof = function(value)
+	if type(value) == "table" and type(rawget(value, "__type")) == "string" then
+		return rawget(value, "__type")
+	end
+	return rawTypeof(value)
+end
+
 local UDimMeta = {}
 UDimMeta.__index = UDimMeta
 UDim = {}

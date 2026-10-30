@@ -681,6 +681,7 @@ def build_journal():
     # frame from the stretch beside it.
     win[738:792, 1246:1350] = win[738:792, 1126:1230]
     s["pm_window_journal"] = (cut_clean(win, (22, 20, 1628, 768)), None)
+    s.update(build_window_kit(s["pm_window_journal"][0], g))
     # Category tabs: selected leather, normal paper, labels erased.
     tab = cut_clean(g, (63, 144, 122, 54))
     s["pm_jtab_leather"] = (erase_ink(tab, (14, 8, 112, 50), dark=False, texture="hide"), [20, 16, 20, 8])
@@ -725,6 +726,69 @@ def build_journal():
     s["pm_icon_gem"] = (cut_clean(i, (1318, 488, 124, 164)), None)
     s["pm_icon_bolt"] = (cut_clean(i, (838, 662, 126, 156)), None)
     return s
+
+
+def build_window_kit(j, g):
+    """The Journal's look as a kit every menu window is built from (Parchment.Window):
+    the frame, the title plaque and the inner panel. `j` is the Journal window
+    sprite (J coordinates: the sheet's minus (20, 18)), `g` its sheet.
+
+    pm_window_frame: the Journal's left side and its mirror image, the top edge
+    under the title plaque taken from the plain stretch of edge right of it, and
+    the Journal's own top-right corner with its X put back; 9-sliced so the X and
+    the leather corners keep their size at any window size.
+    pm_window_plaque: the title plaque with its word and marks erased, sliced so
+    only its middle stretches with the title.
+    pm_window_panel: the quest card's frame (rope-tied corners), its top half and
+    that half mirrored, as the inner panel of every window."""
+    kit = {}
+    a = j.copy()
+    # The top edge under the plaque, from the clean edge right of it.
+    a[0:62, 112:650] = j[0:62, 660:1198]
+    # The plaque's hanging ropes below that: blank, repainted with the paper below.
+    a[56:120, 108:420, :3] = 1.0
+    a[56:120, 108:420, 3] = 1.0
+    a[100:120, 40:108, :3] = 1.0
+    left = a[:, 0:420]
+    frame = np.concatenate([left, left[:, ::-1]], 1)
+    # The Journal's top-right corner with the X.
+    w = frame.shape[1]
+    corner = j[0:116, 1518:1632].copy()
+    # The map panel's top rule beside and under the corner.
+    corner[98:116, 0:14, :3] = 1.0
+    corner[107:116, 0:88, :3] = 1.0
+    frame[0:116, w - 114 : w] = corner
+    # One even parchment inside the frame (the pieces above came from paper of
+    # different tones): every paper-light pixel inside the edges is repainted,
+    # the frame's dark edges, ropes and corners are kept.
+    h = frame.shape[0]
+    inside = box(frame.shape, (22, 54, w - 22, h - 22))
+    paper = inside & (lum(frame) > 0.62) & (frame[..., 3] > 0.9)
+    tone = np.median(frame[paper][:, :3], 0)
+    g0 = grain("paper")
+    tex = np.tile(np.concatenate([g0, g0[:, ::-1]], 1), (h // g0.shape[0] + 2, w // g0.shape[1] + 2, 1))[:h, :w]
+    soft = np.clip(box_blur(paper.astype(np.float32), 1) * 1.2, 0, 1)[..., None]
+    frame[..., :3] = frame[..., :3] * (1 - soft) + (tone + tex * 0.8) * soft
+    kit["pm_window_frame"] = (frame, [130, 130, 130, 110])
+    # Title plaque as it sits on the frame (the frame's edge and paper behind it
+    # match the frame it is drawn on, so its middle can stretch for a longer
+    # title), word and marks erased. Below its lower edge, between the ropes,
+    # nothing of the Journal behind it is kept.
+    plaque = j[0:106, 108:650].copy()
+    plaque = erase_ink(plaque, (64, 20, 486, 92), dark=True, threshold=0.6, grow=3)
+    plaque[101:, 64:478, 3] = 0.0
+    plaque[101:, 546:, 3] = 0.0
+    plaque[92:, :, 3] = np.where(lum(plaque[92:]) > 0.6, 0.0, plaque[92:, :, 3])
+    # Beside the plaque its backing is the Journal's paper: the frame's tone.
+    backing = (lum(plaque) > 0.62) & (plaque[..., 3] > 0.9)
+    backing[:, 44:488] = False
+    ph, pw = plaque.shape[:2]
+    plaque[..., :3] = np.where(backing[..., None], tone + tex[:ph, :pw] * 0.8, plaque[..., :3])
+    kit["pm_window_plaque"] = (plaque, [80, 20, 80, 20])
+    # Inner panel: the quest card's frame, top half mirrored down.
+    top = j[100:420, 420:932]
+    kit["pm_window_panel"] = (np.concatenate([top, top[::-1]], 0), [44, 44, 44, 44])
+    return kit
 
 
 def build_inventory():

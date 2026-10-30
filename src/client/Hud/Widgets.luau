@@ -115,9 +115,11 @@ function Widgets.TextCap(label: GuiObject, maxSize: number, minSize: number?)
 	return cap
 end
 
+-- A sprite's size in layout pixels when `props` gives it as a pure offset; 0, 0
+-- when it is unknown (none given, or relative to the parent).
 local function targetSize(props): (number, number)
 	local size = props and props.Size
-	if typeof(size) == "UDim2" then
+	if typeof(size) == "UDim2" and size.X.Scale == 0 and size.Y.Scale == 0 then
 		return size.X.Offset, size.Y.Offset
 	end
 	return 0, 0
@@ -323,6 +325,9 @@ local function atlasImage(name: string): string?
 	return nil
 end
 
+-- How far (layout pixels) a nine-piece sprite's neighbouring pieces overlap.
+local SEAM_OVERLAP = 2
+
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
 local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
 
@@ -342,16 +347,19 @@ local function nineSlice(name: string, sprite, id: string, props, parent: Instan
 	local rx, ry = sprite.rect[1], sprite.rect[2]
 	local xs = { 0, l, sprite.w - r, sprite.w }
 	local ys = { 0, t, sprite.h - b, sprite.h }
-	-- Each column (row): {scale, offset} of its position and of its size.
+	-- Each column (row): {scale, offset} of its position and of its size. Pieces
+	-- reach SEAM_OVERLAP / 2 into their neighbours: a device rounds each piece's
+	-- position and size on its own, which left one-pixel gaps between them.
+	local h = SEAM_OVERLAP / 2
 	local columns = {
-		{ 0, 0, 0, l * scale },
-		{ 0, l * scale, 1, -(l + r) * scale },
-		{ 1, -r * scale, 0, r * scale },
+		{ 0, 0, 0, l * scale + h },
+		{ 0, l * scale - h, 1, -(l + r) * scale + 2 * h },
+		{ 1, -r * scale - h, 0, r * scale + h },
 	}
 	local rows = {
-		{ 0, 0, 0, t * scale },
-		{ 0, t * scale, 1, -(t + b) * scale },
-		{ 1, -b * scale, 0, b * scale },
+		{ 0, 0, 0, t * scale + h },
+		{ 0, t * scale - h, 1, -(t + b) * scale + 2 * h },
+		{ 1, -b * scale - h, 0, b * scale + h },
 	}
 	local pieces = {}
 	for i = 1, 3 do

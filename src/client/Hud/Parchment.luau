@@ -10,6 +10,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
 local UserInputService = game:GetService("UserInputService")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
@@ -211,6 +212,84 @@ local function pressable(holder: GuiObject, art: GuiObject?, onPress, pad: numbe
 		end
 end
 Parchment.Pressable = pressable
+
+-- Every menu window wears the Journal's look (art/ui/slice_parchment.py
+-- build_window_kit): its frame over the whole window, its title plaque on the
+-- frame's top-left edge and its leather X corner as the close button, all where
+-- the Journal has them. Positions are window reference pixels.
+Parchment.PLAQUE_X = 108
+Parchment.PLAQUE_H = 106
+local PLAQUE_ENDS = 64 -- each end's ropes, before the title's room starts
+local PLAQUE_MIN = 542 -- the Journal's plaque
+local TITLE_SIZE = 46
+local MARK_W, MARK_H, MARK_GAP = 50, 26, 16
+-- The X corner's touch area, from the window's top-right.
+local CLOSE = { 92, 32, 90, 84 }
+
+local function titleWidth(text: string): number
+	local ok, size = pcall(function()
+		return TextService:GetTextSize(text, TITLE_SIZE, Layout.Font(SERIF), Vector2.new(4000, 200))
+	end)
+	-- The bold face runs wider than the regular one measured.
+	return if ok then size.X * 1.12 else utf8.len(text) * TITLE_SIZE * 0.72
+end
+
+-- Dresses `window` (a Screen's window) in the Journal's frame with `title` on
+-- the plaque and the X corner calling onClose. Returns {title, plaque, close}.
+function Parchment.Window(window: GuiObject, title: string, onClose)
+	Widgets.Sprite("pm_window_frame", { Name = "Art", Size = UDim2.fromScale(1, 1), ZIndex = 1 }, window, 1)
+	local width = math.max(PLAQUE_MIN, math.ceil(titleWidth(title)) + 2 * (MARK_W + MARK_GAP) + 2 * PLAQUE_ENDS)
+	local plaque = Widgets.Sprite("pm_window_plaque", {
+		Name = "Plaque",
+		Position = UDim2.fromOffset(Parchment.PLAQUE_X, 0),
+		Size = UDim2.fromOffset(width, Parchment.PLAQUE_H),
+		ZIndex = 6,
+	}, window, 1)
+	local room = width - 2 * PLAQUE_ENDS
+	local label = Parchment.Text(title, { PLAQUE_ENDS + MARK_W + MARK_GAP, 20, room - 2 * (MARK_W + MARK_GAP), 70 }, plaque, {
+		size = TITLE_SIZE,
+		align = "Center",
+		scaled = true,
+		minSize = 20,
+		name = "Title",
+		z = 7,
+	})
+	for side = 0, 1 do
+		Widgets.Sprite("pm_glyph_mountain", {
+			Name = if side == 0 then "MarkLeft" else "MarkRight",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(
+				if side == 0 then PLAQUE_ENDS + MARK_W / 2 else width - PLAQUE_ENDS - MARK_W / 2,
+				56
+			),
+			Size = UDim2.fromOffset(MARK_W, MARK_H),
+			ImageColor3 = Layout.Color("leather"),
+			ZIndex = 7,
+		}, plaque)
+	end
+	local close = Widgets.Make("TextButton", {
+		Name = "Close",
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, -CLOSE[1], 0, CLOSE[2]),
+		Size = UDim2.fromOffset(CLOSE[3], CLOSE[4]),
+		ZIndex = 10,
+	}, window) :: TextButton
+	close.Activated:Connect(onClose)
+	return { title = label, plaque = plaque, close = close }
+end
+
+-- An inner panel of a window (the Journal's quest card frame) at `r`.
+function Parchment.Panel(r, parent: Instance, z: number?): GuiObject
+	local position, extent = rect(r)
+	return Widgets.Sprite("pm_window_panel", {
+		Name = "Panel",
+		Position = position,
+		Size = extent,
+		ZIndex = z or 2,
+	}, parent, 1)
+end
 
 -- A sprite button at `r`. opts: label (centred text), color, size, pad (extra
 -- touch room), z. Returns {holder, art, button, label, SetEnabled}.
