@@ -52,6 +52,9 @@ local function deploy(player: Player)
 		deploying[member] = true
 		setState(member, SessionStates.TeleportPending)
 	end
+	-- Ready is advisory and only means "ready for this deploy": it never carries
+	-- over, even when the deploy fails and the group stays in the lobby.
+	PartyService.ClearReady(group)
 
 	local reservations = {}
 	local userIds = {}

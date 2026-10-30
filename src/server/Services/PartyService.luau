@@ -2,7 +2,9 @@
 -- so a group deploys into the same world, where it starts as one tribe. Invitees
 -- see a party's id, so a deploy also writes who actually went to a short-lived
 -- MemoryStore record under a fresh token; the world trusts only that record and
--- treats anything it cannot verify as solo. Party state is lobby only.
+-- treats anything it cannot verify as solo. Party state is lobby only. Each player
+-- also has an advisory Ready flag ("ready", bool); solo players can set it too,
+-- and it never blocks a deploy.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -26,17 +28,35 @@ local function newPartyId()
 	return HttpService:GenerateGUID(false)
 end
 
--- What one player sees: their party and the invites waiting for them.
+-- What one player sees: their party (members with their ready flags, when it was
+-- created, and for the leader only the invites still pending), the invites waiting
+-- for them, their own ready flag (solo players can be ready) and the size cap.
+-- Nothing about players outside their party is included beyond who invited them.
 local function viewFor(player: Player)
-	local view = { party = nil, invites = {} }
+	local view = {
+		party = nil,
+		invites = {},
+		ready = PartyRules.IsReady(state, player.UserId),
+		maxSize = PartyRules.MAX_SIZE,
+	}
 	local party = PartyRules.PartyOf(state, player.UserId)
 	if party then
 		local members = {}
 		for _, userId in party.members do
 			local member = Players:GetPlayerByUserId(userId)
-			table.insert(members, { userId = userId, name = member and member.DisplayName or tostring(userId) })
+			table.insert(members, {
+				userId = userId,
+				name = member and member.DisplayName or tostring(userId),
+				ready = PartyRules.IsReady(state, userId),
+			})
 		end
-		view.party = { id = party.id, leader = party.leader, members = members }
+		view.party = {
+			id = party.id,
+			leader = party.leader,
+			members = members,
+			createdAt = party.createdAt,
+			invited = if party.leader == player.UserId then PartyRules.PendingInvites(party) else {},
+		}
 	end
 	for id, other in state.parties do
 		if other.invites[player.UserId] then
@@ -52,6 +72,17 @@ local function broadcast()
 	for _, player in Players:GetPlayers() do
 		changed:FireClient(player, viewFor(player))
 	end
+end
+
+-- Clears the ready flag of everyone in `group` (a deploy is starting) and tells
+-- every client.
+function PartyService.ClearReady(group: { Player })
+	local userIds = {}
+	for _, member in group do
+		table.insert(userIds, member.UserId)
+	end
+	PartyRules.ClearReady(state, userIds)
+	broadcast()
 end
 
 -- The party ID a deploy carries into the world, where the party becomes a tribe.
@@ -158,13 +189,15 @@ local function handle(player: Player, action: any, argument: any)
 		if Players:GetPlayerByUserId(argument) == nil then
 			return false, "PlayerNotHere"
 		end
-		ok, reason = PartyRules.Invite(state, player.UserId, argument, newPartyId())
+		ok, reason = PartyRules.Invite(state, player.UserId, argument, newPartyId(), os.time())
 	elseif action == "accept" and type(argument) == "string" then
 		ok, reason = PartyRules.Accept(state, player.UserId, argument)
 	elseif action == "decline" and type(argument) == "string" then
 		ok, reason = PartyRules.Decline(state, player.UserId, argument)
 	elseif action == "leave" then
 		ok, reason = PartyRules.Leave(state, player.UserId)
+	elseif action == "ready" and type(argument) == "boolean" then
+		ok, reason = PartyRules.SetReady(state, player.UserId, argument)
 	else
 		return false, "BadRequest"
 	end

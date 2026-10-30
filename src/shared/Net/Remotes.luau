@@ -15,8 +15,9 @@ local DEFINITIONS = {
 	-- Diagnostics
 	ReportUiImages = "RemoteEvent", -- client -> server: (summary, lines) how HUD images are loading
 	-- Lobby
-	PartyAction = "RemoteFunction", -- (action, argument) -> ok, reason
-	PartyChanged = "RemoteEvent", -- server -> client: party snapshot
+	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave") | ("ready", bool) -> ok, reason
+	PartyAction = "RemoteFunction",
+	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, ready, maxSize}
 	Deploy = "RemoteFunction", -- () -> ok, reason
 	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run
 	-- World
@@ -50,7 +51,9 @@ local DEFINITIONS = {
 	VaultWithdrawMaterial = "RemoteFunction", -- (catalogId, quantity) -> ok, reason
 	ExtractionReceipt = "RemoteEvent", -- server -> client: the latest extraction receipt
 	ForgeSnapshot = "RemoteFunction", -- () -> recipes with vault counts and unlock state
-	ForgeCraft = "RemoteFunction", -- (recipeId, sourceInstanceId?, nonce) -> ok, receipt or reason
+	-- (recipeId, sourceInstanceId?, nonce, count?) -> ok, receipt or reason; count is a whole
+	-- 1..ForgeRules.MAX_BATCH (default 1, Permanent conversions only 1), all paid for or none
+	ForgeCraft = "RemoteFunction",
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
 	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
 	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach

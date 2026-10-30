@@ -292,3 +292,119 @@ test("a full lobby backpack never deletes an extracted Permanent item", function
 	expectEq(receipt.deleted.StonePickaxe, nil, "never listed as deleted")
 	expectEq(receipt.deleted.StoneDagger, 1, "the ordinary dagger overflows")
 end)
+
+-- Batch forging (UI rebuild D4) -----------------------------------------------------
+
+local function batch(recipeId, count, operationId)
+	local req = request(recipeId, nil, operationId)
+	req.count = count
+	return req
+end
+
+local function pickaxeProfile(ironBars)
+	local profile = ProfileSchema.Default(0)
+	profile.vault.materials = { IronBar = ironBars, Wood = 200 }
+	ForgeRules.RefreshUnlocks(profile, 1)
+	return profile
+end
+
+test("a batch must be a whole count from 1 to MAX_BATCH", function()
+	expectEq(ForgeRules.MAX_BATCH, 10, "batch cap")
+	for _, bad in { 0, -1, 11, 2.5, 0 / 0, math.huge, "3", true, {} } do
+		local profile = pickaxeProfile(1000)
+		local receipt, reason = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", bad))
+		expect(receipt == nil and reason == "BadQuantity", "refused " .. tostring(bad))
+		expectEq(profile.vault.materials.IronBar, 1000, tostring(bad) .. ": nothing charged")
+		expectEq(#profile.lobbyBackpack.slots, 0, tostring(bad) .. ": nothing granted")
+	end
+	local profile = pickaxeProfile(1000)
+	local receipt = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", nil))
+	expect(receipt ~= nil and receipt.count == 1, "no count means one")
+	expectEq(profile.vault.materials.IronBar, 980, "one craft charged")
+end)
+
+test("a batch charges and grants all N crafts at once", function()
+	local profile = pickaxeProfile(205)
+	local receipt = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 10))
+	expect(receipt ~= nil, "crafted")
+	expectEq(receipt.count, 10, "receipt count")
+	expectEq(receipt.inputs.IronBar, 200, "receipt lists the total spent")
+	expectEq(profile.vault.materials.IronBar, 5, "200 bars spent")
+	expectEq(profile.vault.materials.Wood, 100, "100 wood spent")
+	expectEq(#profile.lobbyBackpack.slots, 10, "ten pickaxes")
+	local seen = {}
+	for _, item in profile.lobbyBackpack.slots do
+		expect(item.catalogId == "IronPickaxe" and item.qualityRoll == 0, "default-quality pickaxe")
+		expect(not seen[item.instanceId], "unique instance")
+		seen[item.instanceId] = true
+	end
+	expectEq(#receipt.output.instanceIds, 10, "every instance on the receipt")
+	expectEq(receipt.output.instanceId, receipt.output.instanceIds[1], "first instance kept for old readers")
+
+	profile = ProfileSchema.Default(0)
+	profile.vault.materials = { Wood = 120, Flint = 40, Fiber = 80 }
+	ForgeRules.RefreshUnlocks(profile, 1)
+	receipt = ForgeRules.Craft(profile, batch("ForgeArrows", 10))
+	expect(receipt ~= nil, "arrows crafted")
+	expectEq(receipt.output.quantity, 500, "ten crafts of 50 arrows")
+	expectEq(#profile.lobbyBackpack.slots, 1, "one stack")
+	expectEq(profile.lobbyBackpack.slots[1].quantity, 500, "stacked")
+	expectEq(profile.vault.materials.Wood, nil, "wood used up")
+end)
+
+test("a batch the vault cannot fully pay for changes nothing", function()
+	local profile = pickaxeProfile(199)
+	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 9, "materials allow nine")
+	local receipt, reason = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 10))
+	expect(receipt == nil and reason == "MissingMaterials", "ten refused")
+	expectEq(profile.vault.materials.IronBar, 199, "nothing charged")
+	expectEq(profile.vault.materials.Wood, 200, "no wood charged")
+	expectEq(#profile.lobbyBackpack.slots, 0, "nothing granted")
+	expect(ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 9)) ~= nil, "nine fit")
+	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 0, "none left")
+	expectEq(ForgeRules.MaxCount(pickaxeProfile(10000), ForgeRecipes.Get("ForgeIronPickaxe")), 10, "capped")
+end)
+
+test("a batch that does not all fit the lobby backpack is refused whole", function()
+	local profile = pickaxeProfile(1000)
+	for i = 1, 45 do
+		profile.lobbyBackpack.slots[i] = { instanceId = "x" .. i, catalogId = "StoneDagger", ownerId = OWNER }
+	end
+	local receipt, reason = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 6))
+	expect(receipt == nil and reason == "BackpackFull", "six do not fit in five slots")
+	expectEq(#profile.lobbyBackpack.slots, 45, "none added")
+	expectEq(profile.vault.materials.IronBar, 1000, "nothing charged")
+	expect(ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 5)) ~= nil, "five fit")
+	expectEq(#profile.lobbyBackpack.slots, 50, "backpack full")
+end)
+
+test("a Permanent conversion is always exactly one", function()
+	local profile = readyProfile()
+	local recipe = ForgeRecipes.Get("PermanentStonePickaxe")
+	expectEq(ForgeRules.MaxCount(profile, recipe), 1, "one source per conversion")
+	local receipt, reason = ForgeRules.Craft(profile, batch("PermanentStonePickaxe", 2))
+	expect(receipt == nil and reason == "BadQuantity", "two refused")
+	expectEq(profile.vault.materials.Stone, 200, "nothing charged")
+	local req = batch("PermanentStonePickaxe", 1)
+	req.sourceId = "p1"
+	expect(ForgeRules.Craft(profile, req) ~= nil, "one converts")
+end)
+
+test("a retried batch nonce returns the first receipt and charges once", function()
+	local profile = pickaxeProfile(1000)
+	local function run(count)
+		return function(working)
+			local receipt, reason = ForgeRules.Craft(working, batch("ForgeIronPickaxe", count, "forge:batch"))
+			if receipt == nil then
+				error(reason, 0)
+			end
+			return receipt
+		end
+	end
+	local first, applied = OperationJournal.Run(profile, "forge:batch", "Forge", 1, run(4))
+	expect(applied and first.count == 4, "first commit")
+	local again, appliedAgain = OperationJournal.Run(profile, "forge:batch", "Forge", 2, run(10))
+	expect(not appliedAgain and again.count == 4, "a retry, even with another count, is the first receipt")
+	expectEq(profile.vault.materials.IronBar, 920, "charged for four, once")
+	expectEq(#profile.lobbyBackpack.slots, 4, "four pickaxes")
+end)
