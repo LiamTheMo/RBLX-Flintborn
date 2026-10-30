@@ -1,0 +1,786 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M053",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m053_grass",
+    "hex": "#8F9E10",
+    "levels": [
+     0.96095,
+     0.96547,
+     0.96757,
+     0.97047,
+     0.97419,
+     0.97786,
+     0.98357,
+     0.99904,
+     1.00151,
+     1.01047,
+     1.01253,
+     1.01888,
+     1.02281,
+     1.02551,
+     1.02887,
+     1.03148,
+     1.03739,
+     1.0398
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_grass_deep_x_wood_dark_25",
+    "hex": "#4A4F13",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_grass_x_deep_55",
+    "hex": "#64750E",
+    "levels": [
+     0.96916,
+     0.98057,
+     0.98711,
+     0.99168,
+     0.99565,
+     0.99772,
+     1.00692,
+     1.00857,
+     1.01624,
+     1.01939,
+     1.02202,
+     1.02558,
+     1.02794,
+     1.03726
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_hollow",
+    "hex": "#1E0E06",
+    "levels": [
+     0.97337,
+     0.98447,
+     0.99105,
+     1.0,
+     1.0027,
+     1.00701,
+     1.01189,
+     1.02818
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_moss",
+    "hex": "#9E9610",
+    "levels": [
+     0.96356,
+     0.9678,
+     0.97177,
+     0.97954,
+     0.98269,
+     0.98528,
+     0.98722,
+     0.98943,
+     0.99232,
+     0.99398,
+     0.99821,
+     1.00008,
+     1.00357,
+     1.00661,
+     1.00934,
+     1.01152,
+     1.01396,
+     1.01619,
+     1.01842
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_moss_x_grass_20",
+    "hex": "#9B9810",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_rock",
+    "hex": "#9B9894",
+    "levels": [
+     0.95108,
+     0.95388,
+     0.95858,
+     0.96115,
+     0.96716,
+     0.97165,
+     0.97598,
+     0.97873,
+     0.98109,
+     0.98556,
+     0.98846,
+     0.99144,
+     0.99532,
+     0.99964,
+     1.00317,
+     1.00616,
+     1.00978,
+     1.01236,
+     1.01486,
+     1.01843,
+     1.02115,
+     1.02416,
+     1.02637,
+     1.02758,
+     1.03357,
+     1.0374,
+     1.04177
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_rock_x_deep_30",
+    "hex": "#928F8A",
+    "levels": [
+     0.94712,
+     0.95466,
+     0.95863,
+     0.96337,
+     0.96905,
+     0.97187,
+     0.97681,
+     0.97899,
+     0.98059,
+     0.98334,
+     0.98521,
+     0.98865,
+     0.98985,
+     0.99396,
+     0.99602,
+     0.99896,
+     1.00098,
+     1.00278,
+     1.00611,
+     1.0105,
+     1.01479,
+     1.02024,
+     1.02432,
+     1.02792,
+     1.03046,
+     1.0335,
+     1.03659,
+     1.04025
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_rock_x_light_30",
+    "hex": "#9D9A96",
+    "levels": [
+     0.95406,
+     0.95696,
+     0.96806,
+     0.97714,
+     0.98093,
+     0.98345,
+     0.98556,
+     0.98871,
+     0.99083,
+     0.99364,
+     0.99613,
+     0.9971,
+     1.00717,
+     1.00897,
+     1.01243,
+     1.01517,
+     1.02289,
+     1.02698,
+     1.03211,
+     1.03338,
+     1.04352,
+     1.05
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_rock_x_light_60",
+    "hex": "#A09C98",
+    "levels": [
+     0.94097,
+     0.9468,
+     0.96148,
+     0.96679,
+     0.97238,
+     0.97479,
+     0.97614,
+     0.97937,
+     0.98142,
+     0.98393,
+     0.98644,
+     0.98851,
+     0.99139,
+     0.99402,
+     0.99741,
+     1.00021,
+     1.00573,
+     1.00802,
+     1.01393,
+     1.01673,
+     1.01866,
+     1.02025,
+     1.02275,
+     1.02693,
+     1.03387,
+     1.03819,
+     1.04298,
+     1.04653,
+     1.05423
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood",
+    "hex": "#985B2D",
+    "levels": [
+     0.94297,
+     0.95866,
+     0.96546,
+     0.96812,
+     0.96989,
+     0.97466,
+     0.97844,
+     0.98228,
+     0.98418,
+     0.98695,
+     0.99032,
+     0.99403,
+     0.99663,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00059,
+     1.00426,
+     1.00765,
+     1.00914,
+     1.01287,
+     1.01551,
+     1.02,
+     1.03354,
+     1.03905,
+     1.05478
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_dark",
+    "hex": "#6A4427",
+    "levels": [
+     0.98127,
+     0.98325,
+     0.99229,
+     0.99762,
+     1.0,
+     1.00381,
+     1.00735,
+     1.01088,
+     1.0238
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_light",
+    "hex": "#C69B60",
+    "levels": [
+     0.96646,
+     0.99999,
+     1.00455,
+     1.00842,
+     1.01044,
+     1.02724
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_light_x_wood_40",
+    "hex": "#B4814C",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_x_dark_30",
+    "hex": "#8A542B",
+    "levels": [
+     0.95583,
+     0.96131,
+     0.96546,
+     0.96707,
+     0.97299,
+     0.97728,
+     0.98168,
+     0.9842,
+     0.98611,
+     0.98974,
+     0.991,
+     0.99333,
+     0.99519,
+     0.99557,
+     0.9984,
+     1.00195,
+     1.00729,
+     1.00864,
+     1.01045,
+     1.01171,
+     1.01373,
+     1.01554,
+     1.01721,
+     1.01785,
+     1.01941,
+     1.02225,
+     1.02621,
+     1.03304,
+     1.0352,
+     1.03827,
+     1.04286,
+     1.05088
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_x_light_10",
+    "hex": "#9D6132",
+    "levels": [
+     0.9587,
+     0.97239,
+     0.97568,
+     0.98275,
+     0.98807,
+     0.99122,
+     0.99346,
+     0.99995,
+     1.0012,
+     1.00526,
+     1.00653,
+     1.01039,
+     1.01286,
+     1.0163,
+     1.01977,
+     1.02221,
+     1.02557,
+     1.02819,
+     1.03085,
+     1.03386,
+     1.03663,
+     1.03995,
+     1.04145,
+     1.04554,
+     1.04754,
+     1.05101,
+     1.05355
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_x_light_15",
+    "hex": "#9F6535",
+    "levels": [
+     0.97647,
+     0.98652,
+     0.99053,
+     0.99281,
+     0.99561,
+     1.00337,
+     1.01224,
+     1.02414,
+     1.03848
+    ],
+    "used": true
+   },
+   {
+    "key": "m053_wood_x_light_5",
+    "hex": "#9A5E30",
+    "levels": [
+     0.94682,
+     0.96135,
+     0.97528,
+     0.97793,
+     0.98058,
+     0.98425,
+     0.98802,
+     0.99203,
+     0.99994,
+     1.00671,
+     1.00885,
+     1.01603,
+     1.02021,
+     1.02197,
+     1.02528,
+     1.02822,
+     1.02977,
+     1.0322,
+     1.03613,
+     1.03919,
+     1.04154,
+     1.05189,
+     1.05696,
+     1.06767,
+     1.07576
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TwistedSnag",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "hero",
+   "size": [
+    17.8949,
+    18.181,
+    17.0587
+   ],
+   "tris": 3562,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnag.glb",
+     "kind": "solid",
+     "tris": 3562,
+     "offset": [
+      0.0,
+      9.0905,
+      0.0
+     ],
+     "size": [
+      17.8949,
+      18.181,
+      17.0587
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Dead Tree: a bare chunky snag on a massive twisted six-strand orange-brown trunk; six plug-in branch modules of straight faceted prisms with hard kinks and blunt square-cut tines; six roots with split toes; bore pits, an oval knot with a pale rim, a snapped pale limb end; pale grey rocks, lime moss and grass tufts at the foot. No VFX"
+  },
+  {
+   "name": "TwistedSnagBranchA",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    5.9411,
+    7.1014,
+    9.2682
+   ],
+   "tris": 216,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagBranchA.glb",
+     "kind": "solid",
+     "tris": 216,
+     "offset": [
+      0.0,
+      3.5507,
+      0.0
+     ],
+     "size": [
+      5.9411,
+      7.1014,
+      9.2682
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch Module A: the big Y (left major limb) with its peg, a forked side branch and a snapped pale end"
+  },
+  {
+   "name": "TwistedSnagBranchB",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    4.0751,
+    6.8538,
+    3.8467
+   ],
+   "tris": 172,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagBranchB.glb",
+     "kind": "solid",
+     "tris": 172,
+     "offset": [
+      0.0,
+      3.4269,
+      0.0
+     ],
+     "size": [
+      4.0751,
+      6.8538,
+      3.8467
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch Module B: the kinked up-left limb with its peg, a spur at the elbow and a two-tine tip"
+  },
+  {
+   "name": "TwistedSnagBranchC",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    6.7665,
+    2.9325,
+    2.9809
+   ],
+   "tris": 152,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagBranchC.glb",
+     "kind": "solid",
+     "tris": 152,
+     "offset": [
+      0.0,
+      1.4662,
+      0.0
+     ],
+     "size": [
+      6.7665,
+      2.9325,
+      2.9809
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch Module C: the comb (low left limb) with its peg, two comb twigs and a forked tip"
+  },
+  {
+   "name": "TwistedSnagRootA",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    4.7534,
+    2.207,
+    2.8933
+   ],
+   "tris": 120,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagRootA.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      1.1035,
+      0.0
+     ],
+     "size": [
+      4.7534,
+      2.207,
+      2.8933
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module A: thick tapering root with its peg, arching onto the ground and splitting into three toes"
+  },
+  {
+   "name": "TwistedSnagRootB",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    3.9193,
+    2.045,
+    4.6956
+   ],
+   "tris": 104,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagRootB.glb",
+     "kind": "solid",
+     "tris": 104,
+     "offset": [
+      0.0,
+      1.0225,
+      0.0
+     ],
+     "size": [
+      3.9193,
+      2.045,
+      4.6956
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module B: medium root with its peg, splitting into two toes"
+  },
+  {
+   "name": "TwistedSnagRootC",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    4.7695,
+    2.126,
+    2.7878
+   ],
+   "tris": 120,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagRootC.glb",
+     "kind": "solid",
+     "tris": 120,
+     "offset": [
+      0.0,
+      1.063,
+      0.0
+     ],
+     "size": [
+      4.7695,
+      2.126,
+      2.7878
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module C: long root with its peg, splitting into three toes"
+  },
+  {
+   "name": "TwistedSnagTrunkCore",
+   "sheet": "M053",
+   "subject": "Dead Tree",
+   "role": "part",
+   "size": [
+    8.859,
+    12.1009,
+    11.7556
+   ],
+   "tris": 880,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedSnagTrunkCore.glb",
+     "kind": "solid",
+     "tris": 880,
+     "offset": [
+      0.0,
+      6.0505,
+      0.0
+     ],
+     "size": [
+      8.859,
+      12.1009,
+      11.7556
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Trunk Core: twisted six-strand body with a square top socket, five socket collars, five root stubs, the built-in front root with two toes, the knot, bore pits and a flat underside with a pin hole"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 5326,
+  "vfxSockets": 0,
+  "paletteColours": 18,
+  "paletteLevels": 308,
+  "meshBytes": 473696
+ },
+ "problems": []
+}
