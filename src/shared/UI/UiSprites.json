@@ -1,4 +1,14 @@
 {
+  "atlas_hud": {
+    "h": 512,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lobby": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "button_add_friend": {
     "h": 163,
     "slice": null,
@@ -80,7 +90,14 @@
     "w": 184
   },
   "compass_marker": {
+    "atlas": "atlas_hud",
     "h": 30,
+    "rect": [
+      0,
+      445,
+      32,
+      30
+    ],
     "slice": null,
     "w": 32
   },
@@ -490,7 +507,14 @@
     "w": 131
   },
   "icon_mountain": {
+    "atlas": "atlas_hud",
     "h": 99,
+    "rect": [
+      100,
+      220,
+      158,
+      99
+    ],
     "slice": null,
     "w": 158
   },
@@ -525,7 +549,14 @@
     "w": 74
   },
   "icon_run": {
+    "atlas": "atlas_hud",
     "h": 128,
+    "rect": [
+      300,
+      0,
+      124,
+      128
+    ],
     "slice": null,
     "w": 124
   },
@@ -585,7 +616,14 @@
     "w": 130
   },
   "icon_storm": {
+    "atlas": "atlas_hud",
     "h": 122,
+    "rect": [
+      690,
+      0,
+      115,
+      122
+    ],
     "slice": null,
     "w": 115
   },
@@ -600,7 +638,14 @@
     "w": 135
   },
   "icon_tower": {
+    "atlas": "atlas_hud",
     "h": 112,
+    "rect": [
+      809,
+      0,
+      132,
+      112
+    ],
     "slice": null,
     "w": 132
   },
@@ -625,7 +670,14 @@
     "w": 112
   },
   "icon_waypoint": {
+    "atlas": "atlas_hud",
     "h": 112,
+    "rect": [
+      0,
+      220,
+      96,
+      112
+    ],
     "slice": null,
     "w": 96
   },
@@ -745,7 +797,14 @@
     "w": 227
   },
   "pm_button_add_friend": {
+    "atlas": "atlas_lobby",
     "h": 52,
+    "rect": [
+      387,
+      869,
+      68,
+      52
+    ],
     "slice": null,
     "w": 68
   },
@@ -820,7 +879,14 @@
     "w": 404
   },
   "pm_button_paper": {
+    "atlas": "atlas_hud",
     "h": 64,
+    "rect": [
+      262,
+      220,
+      129,
+      64
+    ],
     "slice": [
       22,
       18,
@@ -995,7 +1061,14 @@
     "w": 239
   },
   "pm_fill_xp": {
+    "atlas": "atlas_lobby",
     "h": 14,
+    "rect": [
+      459,
+      869,
+      176,
+      14
+    ],
     "slice": [
       7,
       6,
@@ -1105,7 +1178,14 @@
     "w": 23
   },
   "pm_hud_card": {
+    "atlas": "atlas_hud",
     "h": 216,
+    "rect": [
+      0,
+      0,
+      296,
+      216
+    ],
     "slice": [
       82,
       50,
@@ -1115,7 +1195,14 @@
     "w": 296
   },
   "pm_hud_compass": {
+    "atlas": "atlas_hud",
     "h": 44,
+    "rect": [
+      523,
+      397,
+      485,
+      44
+    ],
     "slice": [
       36,
       16,
@@ -1125,17 +1212,38 @@
     "w": 485
   },
   "pm_hud_food": {
+    "atlas": "atlas_hud",
     "h": 58,
+    "rect": [
+      395,
+      220,
+      334,
+      58
+    ],
     "slice": null,
     "w": 334
   },
   "pm_hud_health": {
+    "atlas": "atlas_hud",
     "h": 57,
+    "rect": [
+      0,
+      336,
+      334,
+      57
+    ],
     "slice": null,
     "w": 334
   },
   "pm_hud_slot": {
+    "atlas": "atlas_hud",
     "h": 124,
+    "rect": [
+      428,
+      0,
+      127,
+      124
+    ],
     "slice": [
       40,
       40,
@@ -1145,7 +1253,14 @@
     "w": 127
   },
   "pm_hud_slot_selected": {
+    "atlas": "atlas_hud",
     "h": 124,
+    "rect": [
+      559,
+      0,
+      127,
+      124
+    ],
     "slice": [
       40,
       40,
@@ -1155,12 +1270,26 @@
     "w": 127
   },
   "pm_hud_stamina": {
+    "atlas": "atlas_hud",
     "h": 57,
+    "rect": [
+      338,
+      336,
+      334,
+      57
+    ],
     "slice": null,
     "w": 334
   },
   "pm_hud_xp": {
+    "atlas": "atlas_hud",
     "h": 44,
+    "rect": [
+      0,
+      397,
+      519,
+      44
+    ],
     "slice": null,
     "w": 519
   },
@@ -1185,7 +1314,14 @@
     "w": 176
   },
   "pm_icon_crown": {
+    "atlas": "atlas_lobby",
     "h": 131,
+    "rect": [
+      537,
+      726,
+      168,
+      131
+    ],
     "slice": null,
     "w": 168
   },
@@ -1255,37 +1391,86 @@
     "w": 79
   },
   "pm_lobby_coins": {
+    "atlas": "atlas_lobby",
     "h": 70,
+    "rect": [
+      0,
+      869,
+      166,
+      70
+    ],
     "slice": null,
     "w": 166
   },
   "pm_lobby_enter": {
+    "atlas": "atlas_lobby",
     "h": 184,
+    "rect": [
+      0,
+      389,
+      626,
+      184
+    ],
     "slice": null,
     "w": 626
   },
   "pm_lobby_gear": {
+    "atlas": "atlas_lobby",
     "h": 70,
+    "rect": [
+      310,
+      869,
+      73,
+      70
+    ],
     "slice": null,
     "w": 73
   },
   "pm_lobby_gems": {
+    "atlas": "atlas_lobby",
     "h": 70,
+    "rect": [
+      170,
+      869,
+      136,
+      70
+    ],
     "slice": null,
     "w": 136
   },
   "pm_lobby_party": {
+    "atlas": "atlas_lobby",
     "h": 385,
+    "rect": [
+      0,
+      0,
+      437,
+      385
+    ],
     "slice": null,
     "w": 437
   },
   "pm_lobby_profile": {
+    "atlas": "atlas_lobby",
     "h": 139,
+    "rect": [
+      0,
+      726,
+      533,
+      139
+    ],
     "slice": null,
     "w": 533
   },
   "pm_lobby_server": {
+    "atlas": "atlas_lobby",
     "h": 75,
+    "rect": [
+      709,
+      726,
+      255,
+      75
+    ],
     "slice": null,
     "w": 255
   },
@@ -1415,7 +1600,14 @@
     "w": 81
   },
   "pm_stat_chip": {
+    "atlas": "atlas_hud",
     "h": 47,
+    "rect": [
+      676,
+      336,
+      104,
+      47
+    ],
     "slice": [
       16,
       14,
@@ -1475,32 +1667,74 @@
     "w": 312
   },
   "pm_tile_forge": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      630,
+      389,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },
   "pm_tile_inventory": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      780,
+      389,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },
   "pm_tile_quests": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      0,
+      577,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },
   "pm_tile_shop": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      150,
+      577,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },
   "pm_tile_trade": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      300,
+      577,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },
   "pm_tile_vault": {
+    "atlas": "atlas_lobby",
     "h": 145,
+    "rect": [
+      450,
+      577,
+      146,
+      145
+    ],
     "slice": null,
     "w": 146
   },

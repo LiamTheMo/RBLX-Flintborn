@@ -3,7 +3,14 @@
     "file": "compass_marker.png",
     "w": 32,
     "h": 30,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      0,
+      445,
+      32,
+      30
+    ]
   },
   "slot_lock": {
     "file": "slot_lock.png",
@@ -740,7 +747,14 @@
     "file": "icon_waypoint.png",
     "w": 96,
     "h": 112,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      0,
+      220,
+      96,
+      112
+    ]
   },
   "icon_eye": {
     "file": "icon_eye.png",
@@ -758,25 +772,53 @@
     "file": "icon_run.png",
     "w": 124,
     "h": 128,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      300,
+      0,
+      124,
+      128
+    ]
   },
   "icon_storm": {
     "file": "icon_storm.png",
     "w": 115,
     "h": 122,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      690,
+      0,
+      115,
+      122
+    ]
   },
   "icon_mountain": {
     "file": "icon_mountain.png",
     "w": 158,
     "h": 99,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      100,
+      220,
+      158,
+      99
+    ]
   },
   "icon_tower": {
     "file": "icon_tower.png",
     "w": 132,
     "h": 112,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      809,
+      0,
+      132,
+      112
+    ]
   },
   "button_backpack": {
     "file": "button_backpack.png",
@@ -874,6 +916,18 @@
     "h": 164,
     "slice": null
   },
+  "atlas_lobby": {
+    "file": "atlas_lobby.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_hud": {
+    "file": "atlas_hud.png",
+    "w": 1024,
+    "h": 512,
+    "slice": null
+  },
   "pm_arrow_left": {
     "file": "pm_arrow_left.png",
     "w": 86,
@@ -912,7 +966,14 @@
     "file": "pm_button_add_friend.png",
     "w": 68,
     "h": 52,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      387,
+      869,
+      68,
+      52
+    ]
   },
   "pm_button_apply": {
     "file": "pm_button_apply.png",
@@ -1001,6 +1062,13 @@
       18,
       22,
       18
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      262,
+      220,
+      129,
+      64
     ]
   },
   "pm_button_parchment": {
@@ -1200,6 +1268,13 @@
       6,
       7,
       6
+    ],
+    "atlas": "atlas_lobby",
+    "rect": [
+      459,
+      869,
+      176,
+      14
     ]
   },
   "pm_frame_hollow": {
@@ -1329,6 +1404,13 @@
       50,
       36,
       46
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      0,
+      0,
+      296,
+      216
     ]
   },
   "pm_hud_compass": {
@@ -1340,19 +1422,40 @@
       16,
       36,
       16
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      523,
+      397,
+      485,
+      44
     ]
   },
   "pm_hud_food": {
     "file": "pm_hud_food.png",
     "w": 334,
     "h": 58,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      395,
+      220,
+      334,
+      58
+    ]
   },
   "pm_hud_health": {
     "file": "pm_hud_health.png",
     "w": 334,
     "h": 57,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      0,
+      336,
+      334,
+      57
+    ]
   },
   "pm_hud_slot": {
     "file": "pm_hud_slot.png",
@@ -1363,6 +1466,13 @@
       40,
       40,
       40
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      428,
+      0,
+      127,
+      124
     ]
   },
   "pm_hud_slot_selected": {
@@ -1374,19 +1484,40 @@
       40,
       40,
       40
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      559,
+      0,
+      127,
+      124
     ]
   },
   "pm_hud_stamina": {
     "file": "pm_hud_stamina.png",
     "w": 334,
     "h": 57,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      338,
+      336,
+      334,
+      57
+    ]
   },
   "pm_hud_xp": {
     "file": "pm_hud_xp.png",
     "w": 519,
     "h": 44,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_hud",
+    "rect": [
+      0,
+      397,
+      519,
+      44
+    ]
   },
   "pm_icon_add_friend": {
     "file": "pm_icon_add_friend.png",
@@ -1416,7 +1547,14 @@
     "file": "pm_icon_crown.png",
     "w": 168,
     "h": 131,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      537,
+      726,
+      168,
+      131
+    ]
   },
   "pm_icon_gem": {
     "file": "pm_icon_gem.png",
@@ -1495,43 +1633,92 @@
     "file": "pm_lobby_coins.png",
     "w": 166,
     "h": 70,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      0,
+      869,
+      166,
+      70
+    ]
   },
   "pm_lobby_enter": {
     "file": "pm_lobby_enter.png",
     "w": 626,
     "h": 184,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      0,
+      389,
+      626,
+      184
+    ]
   },
   "pm_lobby_gear": {
     "file": "pm_lobby_gear.png",
     "w": 73,
     "h": 70,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      310,
+      869,
+      73,
+      70
+    ]
   },
   "pm_lobby_gems": {
     "file": "pm_lobby_gems.png",
     "w": 136,
     "h": 70,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      170,
+      869,
+      136,
+      70
+    ]
   },
   "pm_lobby_party": {
     "file": "pm_lobby_party.png",
     "w": 437,
     "h": 385,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      0,
+      0,
+      437,
+      385
+    ]
   },
   "pm_lobby_profile": {
     "file": "pm_lobby_profile.png",
     "w": 533,
     "h": 139,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      0,
+      726,
+      533,
+      139
+    ]
   },
   "pm_lobby_server": {
     "file": "pm_lobby_server.png",
     "w": 255,
     "h": 75,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      709,
+      726,
+      255,
+      75
+    ]
   },
   "pm_map_island": {
     "file": "pm_map_island.png",
@@ -1683,6 +1870,13 @@
       14,
       16,
       14
+    ],
+    "atlas": "atlas_hud",
+    "rect": [
+      676,
+      336,
+      104,
+      47
     ]
   },
   "pm_stat_chip_tall": {
@@ -1745,37 +1939,79 @@
     "file": "pm_tile_forge.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      630,
+      389,
+      146,
+      145
+    ]
   },
   "pm_tile_inventory": {
     "file": "pm_tile_inventory.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      780,
+      389,
+      146,
+      145
+    ]
   },
   "pm_tile_quests": {
     "file": "pm_tile_quests.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      0,
+      577,
+      146,
+      145
+    ]
   },
   "pm_tile_shop": {
     "file": "pm_tile_shop.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      150,
+      577,
+      146,
+      145
+    ]
   },
   "pm_tile_trade": {
     "file": "pm_tile_trade.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      300,
+      577,
+      146,
+      145
+    ]
   },
   "pm_tile_vault": {
     "file": "pm_tile_vault.png",
     "w": 146,
     "h": 145,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lobby",
+    "rect": [
+      450,
+      577,
+      146,
+      145
+    ]
   },
   "pm_window_crafting__1_1": {
     "file": "pm_window_crafting__1_1.png",
