@@ -13,6 +13,7 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SocialService = game:GetService("SocialService")
+local UserInputService = game:GetService("UserInputService")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
@@ -113,17 +114,25 @@ local NAV_ACTIONS = {
 }
 
 -- How far down the Roblox top bar (menu and chat buttons) reaches into this
--- ScreenGui, in screen pixels.
+-- ScreenGui, in screen pixels. Phones reported a TopbarInset twice the height
+-- of the buttons (the profile sat far below them), so the smaller of it and the
+-- classic GUI inset is used, never less than the buttons' own height.
+LobbyHudController.MIN_TOP = 52
 local function topInset(): number
-	local ok, inset = pcall(function()
+	local inset = GuiService:GetGuiInset().Y
+	local ok, bar = pcall(function()
 		return GuiService.TopbarInset.Max.Y
 	end)
-	if not ok or type(inset) ~= "number" then
-		-- Older clients without TopbarInset: the classic GUI inset.
-		inset = GuiService:GetGuiInset().Y
+	if ok and type(bar) == "number" and bar > 0 then
+		inset = if inset > 0 then math.min(inset, bar) else bar
 	end
-	return math.max(0, inset - gui.AbsolutePosition.Y)
+	return math.max(LobbyHudController.MIN_TOP, inset - gui.AbsolutePosition.Y)
 end
+
+-- On a short touch screen (a phone held sideways) the lobby draws a little
+-- smaller than the fit, so the Enter plate and profile leave room for the game.
+LobbyHudController.PHONE_HEIGHT = 500
+LobbyHudController.PHONE_FACTOR = 0.9
 
 local function applyScale()
 	local size = gui.AbsoluteSize
@@ -136,6 +145,13 @@ local function applyScale()
 		layout.scale.max,
 		player:GetAttribute("UiScale")
 	)
+	if
+		UserInputService.TouchEnabled
+		and not UserInputService.KeyboardEnabled
+		and size.Y < LobbyHudController.PHONE_HEIGHT
+	then
+		scale *= LobbyHudController.PHONE_FACTOR
+	end
 	uiScale.Scale = scale
 	root.Size = UDim2.fromScale(1 / scale, 1 / scale)
 	local top = topInset() / scale

@@ -969,6 +969,10 @@ def main():
         print(f"{name:28s} {w:4d}x{h:<4d} slice={insets}" + (" (tiled)" if w > MAX_SIDE or h > MAX_SIDE else ""))
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     contact(sprites, OUT / "_parchment_contact.png")
+    # The manifest was rewritten: pack the lobby and HUD atlases again.
+    import pack_atlas
+    MANIFEST.write_text(json.dumps(pack_atlas.build(json.loads(MANIFEST.read_text(encoding="utf-8"))), indent=2) + "\n",
+                        encoding="utf-8")
     print(f"{len(sprites)} parchment sprites -> {OUT.relative_to(ROOT)}")
 
 
