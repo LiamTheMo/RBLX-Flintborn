@@ -31,6 +31,9 @@ local TOP_GAP = 8
 -- Roblox menu button's own margin), and between the top-right pills.
 local EDGE = 12
 local ROW_GAP = 10
+-- Between the profile and the navigation grid, and Coins and the party panel,
+-- in design px.
+local COLUMN_GAP = 14
 -- Coins, Gems and Settings sit in the Roblox top bar's row, right to left.
 local TOP_ROW = { "Settings", "Gems", "Coins" }
 -- Smallest touch target on screen, in points (Roblox's mobile guidance).
@@ -456,20 +459,22 @@ function LobbyHud:_spriteButton(name: string, entry, parent: Instance, onPress)
 	return frame
 end
 
--- Adds a widget (from the controller) that moves down with the top row.
-function LobbyHud:AddTopWidget(frame: GuiObject, entry)
+-- Adds a widget (from the controller) that Fit places by name: "XpPopups"
+-- beside the navigation grid.
+function LobbyHud:AddTopWidget(frame: GuiObject, entry, name: string?)
 	Layout.Place(frame, entry)
-	table.insert(self.topWidgets, { frame, entry })
+	table.insert(self.topWidgets, { frame, entry, name })
 end
 
 -- Fits the screen to `width` × `height` reference pixels drawn at `screenScale`,
 -- with the Roblox top bar ending `topInset` reference pixels down:
--- * Coins, Gems and Settings sit in the top bar's row at the right edge;
--- * the profile sits right under the top bar's buttons at the left edge, and
---   the other top-left widgets keep their places relative to it;
--- * the navigation grid shrinks to end above the bottom edge;
--- * the party panel moves up under Coins, and only then shrinks, to end above
---   the Enter group under it (neither below half size);
+-- * Coins, Gems and Settings sit at the very top of the right edge, level with
+--   the top bar's buttons;
+-- * the profile sits right under the top bar's buttons at the left edge, with
+--   the navigation grid right under it (shrunk to end above the bottom edge)
+--   and the XP pop-ups beside the grid;
+-- * the party panel sits right under Coins, shrinking only to end above the
+--   Enter group under it (never below half size);
 -- * the status strip sits between the profile and Coins when there is room,
 --   else above Enter;
 -- * small buttons' touch areas grow to MIN_TAP points.
@@ -478,62 +483,57 @@ function LobbyHud:Fit(width: number, height: number, topInset: number?, screenSc
 	self.screenScale = screenScale or 1
 	local top = topInset or 0
 	local edge = EDGE / self.screenScale
-	-- The profile right under the top bar; the left column follows it.
-	local drop = top + TOP_GAP - cfg.profile.pos[4]
-	local shift = edge - cfg.profile.pos[2]
-	local inRow = {}
-	for _, name in TOP_ROW do
-		inRow[name] = true
-	end
-	for _, item in self.topWidgets do
-		local frame, entry, name = item[1], item[2], item[3]
-		if not inRow[name] then
-			local left = entry.anchor[1] == 0 and entry.pos[1] == 0
-			frame.Position = UDim2.new(
-				entry.pos[1],
-				if left then math.max(edge, entry.pos[2] + shift) else entry.pos[2],
-				entry.pos[3],
-				entry.pos[4] + drop
-			)
-		end
-	end
-	-- Coins, Gems and Settings in the top bar's row, right to left.
+	local navCfg, partyCfg = cfg.nav, cfg.party
+
+	-- The left column: profile, then the navigation grid.
+	local profileTop = top + TOP_GAP
+	local profileBottom = profileTop + cfg.profile.size[2]
+	local navTop = profileBottom + COLUMN_GAP
+	local navRoom = height - navCfg.bottomMargin - navTop
+	self.navScale.Scale = math.clamp(navRoom / self.navHeight, 0.5, 1)
+	local navWidth = (navCfg.pitch[1] * (navCfg.columns - 1) + navCfg.tile[1]) * self.navScale.Scale
+	-- Coins, Gems and Settings right to left along the top edge.
 	local x = -edge
+	local rowTop = edge
 	local rowBottom = 0
 	for _, name in TOP_ROW do
 		local item = self.topByName[name]
 		if item then
 			local frame, entry = item[1], item[2]
-			local y = math.max(4, (top - entry.size[2]) / 2)
 			frame.AnchorPoint = Vector2.new(1, 0)
-			frame.Position = UDim2.new(1, x, 0, y)
+			frame.Position = UDim2.new(1, x, 0, rowTop)
 			x -= entry.size[1] + ROW_GAP
-			rowBottom = math.max(rowBottom, y + entry.size[2])
+			rowBottom = math.max(rowBottom, rowTop + entry.size[2])
 		end
 	end
-	local navCfg, partyCfg = cfg.nav, cfg.party
-	local navRoom = height - navCfg.bottomMargin - navCfg.pos[4] - drop
-	self.navScale.Scale = math.clamp(navRoom / self.navHeight, 0.5, 1)
+	for _, item in self.topWidgets do
+		local frame, name = item[1], item[3]
+		if name == "Profile" then
+			frame.Position = UDim2.fromOffset(edge, profileTop)
+		elseif name == "Navigation" then
+			frame.Position = UDim2.fromOffset(edge, navTop)
+		elseif name == "XpPopups" then
+			frame.Position = UDim2.fromOffset(edge + navWidth + COLUMN_GAP, navTop)
+		end
+	end
 
 	local below = if width < NARROW_WIDTH
 		then cfg.enter.size[2] - cfg.enter.pos[4]
 		else cfg.server.size[2] - cfg.server.pos[4]
 	local bottom = height - below - 10
-	local partyTop = partyCfg.pos[4] + drop
-	if partyTop + partyCfg.size[2] > bottom then
-		partyTop = math.max(rowBottom + 10, bottom - partyCfg.size[2])
-	end
+	local partyTop = rowBottom + COLUMN_GAP
 	self.partyScale.Scale = math.clamp((bottom - partyTop) / partyCfg.size[2], 0.5, 1)
-	self.party.Position = UDim2.new(partyCfg.pos[1], partyCfg.pos[2], partyCfg.pos[3], partyTop)
+	self.party.AnchorPoint = Vector2.new(1, 0)
+	self.party.Position = UDim2.new(1, -edge, 0, partyTop)
 
 	local statusCfg = cfg.status
 	local left = edge + cfg.profile.size[1] + STATUS_GAP
-	local right = width - edge - STATUS_GAP
+	local right = width + x - STATUS_GAP
 	local room = right - left
 	if room >= statusCfg.minWidth then
 		local stripWidth = math.min(statusCfg.size[1], room)
 		self.status.AnchorPoint = Vector2.new(0.5, 0)
-		self.status.Position = UDim2.fromOffset((left + right) / 2, statusCfg.pos[4] + drop)
+		self.status.Position = UDim2.fromOffset((left + right) / 2, rowTop)
 		self.status.Size = UDim2.fromOffset(stripWidth, statusCfg.size[2])
 	else
 		self.status.AnchorPoint = Vector2.new(0.5, 1)

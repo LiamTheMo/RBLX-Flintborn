@@ -31,6 +31,7 @@ local HudMode = require(Hud.HudMode)
 local Layout = require(Hud.Layout)
 local LobbyHud = require(Hud.LobbyHud)
 local LobbyPopups = require(Hud.LobbyPopups)
+local Parchment = require(Hud.Parchment)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local LobbyHudController = {}
@@ -114,19 +115,11 @@ local NAV_ACTIONS = {
 }
 
 -- How far down the Roblox top bar (menu and chat buttons) reaches into this
--- ScreenGui, in screen pixels. Phones reported a TopbarInset twice the height
--- of the buttons (the profile sat far below them), so the smaller of it and the
--- classic GUI inset is used, never less than the buttons' own height.
+-- ScreenGui, in screen pixels (Parchment.TopInset), never less than the
+-- buttons' own height.
 LobbyHudController.MIN_TOP = 52
 local function topInset(): number
-	local inset = GuiService:GetGuiInset().Y
-	local ok, bar = pcall(function()
-		return GuiService.TopbarInset.Max.Y
-	end)
-	if ok and type(bar) == "number" and bar > 0 then
-		inset = if inset > 0 then math.min(inset, bar) else bar
-	end
-	return math.max(LobbyHudController.MIN_TOP, inset - gui.AbsolutePosition.Y)
+	return math.max(LobbyHudController.MIN_TOP, Parchment.TopInset(gui))
 end
 
 -- On a short touch screen (a phone held sideways) the lobby draws a little
@@ -344,12 +337,12 @@ local function build()
 	uiScale.Parent = root
 	hud = LobbyHud.new(root, layout, steady)
 	popups = LobbyPopups.new(root, layout)
-	-- XP pop-ups appear under the profile panel, above the navigation tiles.
+	-- XP pop-ups appear beside the navigation tiles.
 	local host = Instance.new("Frame")
 	host.Name = "XpPopups"
 	host.BackgroundTransparency = 1
 	host.Parent = root
-	hud:AddTopWidget(host, { anchor = { 0, 0 }, pos = { 0, 48, 0, 232 }, size = { 320, 120 } })
+	hud:AddTopWidget(host, { anchor = { 0, 0 }, pos = { 0, 48, 0, 232 }, size = { 320, 120 } }, "XpPopups")
 	ProgressionController.MountPopups(host)
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
