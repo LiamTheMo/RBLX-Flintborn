@@ -960,3 +960,776 @@ All 14 recommendations are accepted.
 14. **Budget.** 4000 limit, 3600 ceiling, RootFoot ≤ 960.
 
 **Binding.** The seven §1.5 differences from M042, M045 and M047, and the f34 shares (green 69.1, trunk 15.5, each ±4).
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m049.py` (`build()`), work file `art/blender/assets/kit/wip/M049.blend` (saved after the
+final build), background session on port 9881. The final check ran in a freshly restarted session; `build()`'s problems
+list is empty. Cut tests, the contact report, `_post` and the leaf / hub / rock patterns are copied (not imported) from
+m045. **No booleans anywhere:** every piece is a closed shell built explicitly. Scratch scripts and side-by-sides are in
+the scratchpad folder `m049w/` (`prof.py` width profiles, `tiers_r.py` hems / waists, `col.py` colours, `sbs.py`,
+`cus.py`).
+
+**Parts, each from its own function:**
+- `blade()`: one closed **18-tri** shell (spec §2.3): a root point; section A (left, ridge 0.08 W, right, keel 0.12 W);
+  section B at 0.75 L with the **same width** (ridge and keel 0.8×); two tip points 0.26 W apart (a short chisel point).
+  Root fan 4, band A→B 8, tip 6. The outer part bends down `droop` in two steps, and the blade is rolled about its own
+  axis. The chord is fitted so the tip lands on the requested (r, z). Per row the taper length can change (`sa`): the
+  inner rows put A at 0.50 L, so their roots are narrow where they converge near the cap (outer rows 0.30 L).
+- `_core(kind)`: one closed shell per ring:
+  - an octagonal top peg on a flat cap;
+  - a pleated cone to the rim (corners at the outer-row azimuths ±0.12);
+  - an underside in to a **hex sleeve**, then the sleeve's flat bottom and a **blind octagonal hole** (walls and ceiling
+    in the same shell).
+  - Crown: a **five-ridge star cone** (ridges r 2.0, valleys 1.45 at z 18.6, apex 22.0, one ridge at −Y) with the same
+    sleeve and hole.
+- `ring(kind)`: the core, the outer row, then the inner row on top.
+  - Every blade is tested against the blades placed before it, against the ring below (`_below`, a probe build, so a part
+    equals the hero's ring) and against the core below.
+  - A blade cutting more than 0.05 outside a core has its tip turned up about its buried root, then it is rolled, then
+    narrowed. **Roots never move**, so no blade can float.
+- `trunk()`: **one closed lofted shell** (decision 7: the roots are part of the trunk mesh, with no union).
+  - Six root-region rings (z 0.05 / 0.95 / 1.65 / 2.5 / 3.4 / 4.4) carry, per root, flank / crest / crest / flank
+    vertices, plus valley points in each gap (one per ~30°). Each root is a log 0.95 high near its blunt tip (0.36 w
+    wide), rising as a buttress rib into the trunk. Flanks are capped at 0.4 of the gap to a neighbour (an early build
+    self-intersected where two roots were 30° apart).
+  - Then a 16-vertex planked octagon at z 5.4 / 7.0 / 8.8 / 11.0: each side split, the split pushed out 0.06–0.10; three
+    splits pushed in 0.10 are the grooves (0°, 135°, 225°).
+  - A knot slit: a half-facet inset 0.16 and pressed in 0.08, front-right, z 5.4–7.0.
+  - The flat rim (z 11.0), a dished recess (corner r 1.0, floor 10.65), the octagonal peg (apothem 0.425, top 12.2,
+    leaning +0.05 X) and its cut top with an inset pith octagon.
+- `patch()`, `rock()` ×5, `pebble()` ×3, `bush()` ×2, `cluster()` ×6 and `sprig()` ×2:
+  - Bush lobes (`lobe()`): hulls of a bottom ring of 4, a widest ring of 5 at 0.42 h and a top of 3 at 0.88 h, 20 tris
+    each: gem-like faceted mounds.
+  - Leaves: closed 10-tri broad leaves with a blunt end 0.24 W wide, L : W 1.75, an 18° V fold. The outer ring is
+    pitched 60–70° and arches out; the inner ring 75–85°. They stand on 4-sided hub pyramids.
+  - A leaf that would cross a rock or the trunk is turned or shortened: **all 39 leaves were placed, none dropped**.
+
+**Stack as built.** The spec's §2.1 heights did not work: Tier 1 upper's cap at 15.0 sat below its own hole ceiling. The
+heights were re-derived so each blind hole swallows the peg below with 0.1 head room and 0.125 radial clearance at the
+flats (hole apothem 0.55, peg apothem 0.425).
+
+| Piece | Seat (sleeve bottom) | On | Hole ceiling | Cap | Top peg |
+| --- | --- | --- | --- | --- | --- |
+| Trunk | z 0.05 (sunk 0.10) | patch | — | rim 11.0, recess floor 10.65 | 12.2 |
+| Tier 1 lower | 11.015 | trunk rim | 12.30 | 14.50 | 14.95 |
+| Tier 1 upper | 14.515 | T1L cap | 15.05 | 15.40 | 15.85 |
+| Tier 2 | 15.415 | T1U cap | 15.95 | 18.20 | 18.65 |
+| Crown | 18.215 | T2 cap | 18.75 | apex 22.0 | — |
+
+**Rings as built** (tuned on the renders; root (r, z) → tip (r, z)):
+
+| Ring | Outer row | Inner row (on top) |
+| --- | --- | --- |
+| Crown | 5 long blades along the ridges, (0.25, 21.45) → (3.10, 17.45), front 17.30, W 2.0, droop −12 (the tips flare: a concave spire) | 5 short blades in the valleys, sunk under the long ones, (0.55, 20.10) → (2.75, 17.60), W 1.25 |
+| Tier 2 | 8, (1.75, 16.90) → (5.60, 13.10), front 12.85, W 3.0, roll 8 | 8, (0.80, 17.90) → (2.90, 16.15), W 2.3, roll 18, A at 0.5 L |
+| Tier 1 upper | 9, (1.90, 14.30) → (7.45, 9.30), front 9.00, W 3.2, roll 5 | 9, (0.85, 15.10) → (3.40, 13.55), W 2.6, roll 18 |
+| Tier 1 lower | 11, (2.60, 12.30) → (8.30, 7.70), front 7.20, W 3.8, roll 8 | 11, (0.90, 13.95) → (3.95, 11.55), W 2.6, roll 18 |
+
+Why the changes from §2.2:
+1. **Wider blades** (T1L outer 2.5 → 3.8, T1U 2.2 → 3.2, T2 1.9 → 3.0, crown 1.25 → 2.0). At the spec widths the rings
+   read as separate hanging "legs" with gaps between them; the sheet's tiers are closed fans of overlapping boards.
+2. **Shorter, lower inner rows** (tips at 0.39–0.48 of the outer radius; spec 0.6–0.65). At the spec's lengths the cut
+   test lifted each inner row up to 0.9 (it rests on the rolled outer row). That made every tier fat at the top and lost
+   both waists (front waist .64 at h .58 against the sheet's .48). Tier 1 lower's inner row is hidden under Tier 1 upper
+   in the hero anyway; it shows on the part.
+3. **The crown is a cone of blades.** Five long blades lie along the cone's ridges from just under the apex to the hem
+   (the sheet draws the crown's faces as blades), with five short ones tucked between. The first build (hem blades only,
+   under the rim) showed a bare lime pyramid.
+4. **Trunk Ø ≈ 3.7 at z 5–7** (corner radii 1.93 / 1.85 / 1.74 / 1.58 at z 5.4 / 7.0 / 8.8 / 11.0: 3.57 across the
+   flats plus the planks). At 3.2 the trunk read clearly thinner than the sheet's in every side view.
+5. **Dressing moved off the roots** (the spec's plan put BA, C3, C4 and R2 on roots):
+   - Roots: RF 268° r 4.1, RFR 292° r 5.2, **RR 318° r 6.5 (the long front-right root)**, RB1 70° r 4.6, RB2 128° r 5.0,
+     RL 176° r 4.3, RFL 238° r 4.4.
+   - Bushes: BA (5.0, −0.6), 6 lobes, top 4.35; BB (8.0, 0.1), 5 lobes, top 3.5.
+   - Rocks: R1 (−5.8, −1.5) 3.6 × 2.9 × 2.4; R2 (−0.9, −6.2) 3.8 × 3.1 × 2.5; R3 (2.6, 5.2) 2.7 × 2.2 × 1.8; R4 (8.3,
+     3.4); R5 (−6.9, 3.2).
+   - Clusters and sprigs moved: C2 (−8.0, −3.5), C4 (3.4, −4.8), S1 (2.0, −6.7).
+   - Rock / root cut 0.000.
+
+**Hero `TallPine`** = ground + trunk + T1L + T1U + T2 + crown, one object of **138 closed shells**: patch 1, trunk 1,
+cores 4, blades 66, rocks 5, pebbles 3, lobes 11, hubs 8, leaves 39.
+- Parts: `TallPineCanopyTier3`, `…CanopyTier2`, `…CanopyTier1Upper`, `…CanopyTier1Lower`, `…Trunk`, `…RootFoot`, each at
+  the origin (bbox bottom centre).
+- `o["m049_offset"]` is that origin in the build frame: hero (0.29, −0.04, 0); T1L (0.08, −0.04, 7.17); Trunk (0.63,
+  −0.37, 0.05).
+
+**Measured on the renders** (floor hidden, 3× lens; `m049w/tiers_r.py` and `prof.py` with the study's masks):
+
+| View | Hems h / W (sheet) | Waists h / W (sheet) | Canopy W / H (sheet) |
+| --- | --- | --- | --- |
+| front_sheet (0, 7) | .814 / .36 (.801 / .35); .631 / .68 (.610 / .66); .397 / 1.0 (.386 / .99) | .794 / .32 (.780 / .23); .609 / .51 (.577 / .43) | .706 (.732) |
+| rear_sheet (180, 7) | .819 / .35 (.783 / .41); .633 / .67 (.614 / .68); .387 / 1.0 | .802 / .30 (.764 / .29); .605 / .51 (.583 / .48) | .719 (.646) |
+| side_sheet (90, 7) | .634 / .67 (.587 / .70); .39 / 1.0 (.356) | .611 / .57 (.547 / .50) | .706 (.668) |
+| r34_sheet (165, 12) | .829 / .34; .414 / 1.0 (.367) | .806 / .30 (.765 / .27); .600 / .61 (.574 / .46) | .686 (.723) |
+| f34_sheet (−15, 12) | width profile within ±.07 of the sheet at every h from .36 to .98 (h .60: .58 / .53; .70: .56 / .60; .78: .33 / .32; .84: .33 / .34); the sub-hem at h .44 is .93 wide (sheet 1.0) | .603 / .57 (.612 / .49) | .691 (.679) |
+
+- f34 shares **G 70.2 / T 13.8 / S 6.0 / R 8.4** (sheet 69.0 / 15.5 / 4.4 / 8.7); front 71.3 / 13.1 / 4.7 / 9.4 (sheet
+  72.0 / 14.2 / 3.2 / 7.7).
+- Trunk widths (front, as a fraction of the canopy W): h .25 .239 (sheet .200); h .20 .263 (.239).
+- Top (0, 89): W : D 1.08; G 94 / S 2.3 / R 2.0 (sheet 86 / 0 / 11).
+
+## Stage 2 — Optimisation and cleanup
+
+- **Tris: hero 3304** (ceiling 3600, limit 4000): blades 1188 (66 × 18), trunk 704, cores 494, leaves 390 (39 × 10),
+  lobes 220, rocks 180, patch 56, hubs 48, pebbles 24.
+  - Parts: CanopyTier3 254, CanopyTier2 420, CanopyTier1Upper 462, CanopyTier1Lower 546, Trunk 704, **RootFoot 918**
+    (≤ 960). All are under 1000.
+- **`M.audit`, all 7 objects:** non-manifold edges 0, **bowtie / non-manifold verts 0**, boundary 0, wire 0, loose 0,
+  zero-area 0, n-gons 0, duplicate verts 0, normals outward, transforms applied, origin at the bbox bottom centre.
+- **Per shell (`shells_report`, every object):** every shell is closed with a positive volume, with 0
+  self-intersections and **0 winding errors**.
+- **Thin triangles:** none under 2° on any object (smallest corner 2.15°, on the trunk). The patch's 0.04-high side wall
+  gave 28 slivers (0.5°), so it was removed: the bevel now runs to the outline at the ground.
+- **Sizes:** hero 19.45 × 16.99 × 22.00 (patch 19.45 × 15.4, canopy 16.8 × 17.0); T3 6.10 × 5.78 × 4.67; T2 11.59 ×
+  11.58 × 5.88; T1U 14.46 × 14.56 × 6.75; T1L 16.78 × 16.99 × 7.78; Trunk 9.83 × 9.39 × 12.15; RootFoot 19.45 × 15.37 ×
+  4.02.
+- **Contact (no floating dressing):**
+  - Hero: floating **0**, unchained **0**, worst gap 0.002.
+  - Ring seats **0.015 ×4**, with 0 core / trunk intersections (the pegs clear the holes).
+  - 65 blade pairs touch, and **0 cut more than 0.05** (deepest 0.050).
+  - Leaves crossing a rock, a lobe or the trunk: 0. **Dressing buried in rock or trunk: max 0.000.** Rock / root cut
+    0.000.
+  - Each part: floating 0, unchained 0, deepest blade cut 0.042–0.050.
+- Blade fixes in the final build (lifts / rolls / narrowings): T1L 23 / 13 / 0; T1U 91 / 12 / 1; T2 19 / 2 / 0; crown
+  0 / 0 / 0.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED, margin 0.008), then `m012._uv_unfold`.
+- Every object: **0 overlapping pairs, 0 flipped**, minimum island gap 0.016, border 0.008, texel density min / median /
+  max 1.0 / 1.0 / 1.0, conformal stretch p95 1.008–1.027.
+- Islands: hero 920, T3 58, T2 83, T1U 84, T1L 105, Trunk 90, RootFoot about 400.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration:** `K.calibrate` (6 iterations, the spec's §5.4 targets), then a pass on the hero f34 render for the light
+  key and the plant and bush deep keys. Final `PALETTE`:
+
+  | Key | Hex | Dome render (target) |
+  | --- | --- | --- |
+  | needle | **#416E31** | 74,128,50 (#4C8232) |
+  | needle_light | **#ACC22A** (calibrated #8CA634; raised because the f34 v > .7 lime read grey) | 172,201,53 at #8CA634 (#B0CD34) |
+  | needle_deep | #274D39 | 44,88,60 (#2B583B) |
+  | bark | **#9B5D1D** | 195,113,46 (#C5712A) |
+  | bark_light | #B47B3B | 228,149,72 (#E59548) |
+  | bark_deep | #6F411E | 138,80,44 (#8B512E) |
+  | rock | #B0A496 | 217,202,182 (#DCCBB6) |
+  | rock_light | #BEB2A2 | 227,212,191 |
+  | rock_deep | #878382 | 170,159,151 |
+  | sand | #BCAA88 | 238,208,157 (#EFD3A1) |
+  | sand_deep | #B29E7B | 225,193,142 |
+  | bush | #8EA625 | 175,201,37 (#B0C825) |
+  | bush_deep | **#568A2A** (calibrated #446922; raised because the plants rendered olive, v .40) | |
+  | plant | #8CA012 | 172,193,19 (#ABC013) |
+  | plant_deep | **#66A02A** (calibrated #496A16; raised for the same reason) | |
+
+- **Blends (by position and role only, in 25 % steps; never by facing):**
+  - **Blades:** three bands along each blade (root fan, A→B, tip) on the deep ↔ light axis: T1L (−.5, −.25, −.25), T1U
+    (−.5, 0, 0), T2 (−.25, +.25, +.25), crown long (0, +.25, +.25), crown short (0, 0, +.25). **No lime cap:** the tip
+    band equals the body, except on the crown's short blades. Per-blade Tint ±0.04, plus a broad mottle of 0.03 (scale
+    0.6).
+  - **Cores:** needle_deep 75 %; the crown cone needle_light 25 %, its underside −25 %; top pegs bark; sleeves bark_deep
+    75 %; holes bark_deep (a cavity, hard).
+  - **Trunk:** bark; the ground band and the bottom 25 % deep; the two plank columns beside each groove 25 % deep; the
+    recess 50 % deep; the knot bark_deep with its walls 50 %; the peg's cut top bark_light and the pith bark_deep. Plank
+    columns Tint ±0.04, mottle 0.04 (scale 0.35).
+  - **Rocks:** the top 22 % of the height +50 % light, the next 16 % +25 % light, the lowest 25 % +25 % deep; mottle 0.04.
+  - **Sand:** the bevel and underside 50 % deep; within 0.4 of the trunk, roots, rocks, lobes and hubs 25 % deep; mottle
+    0.03.
+  - **Bushes:** per lobe, by the height of its top in the mound (the top lobe bush, middle lobes 50 %, low lobes 25 % bush
+    over bush_deep); each lobe's lowest quarter a step deeper (by height); ±0.04 per lobe.
+  - **Clusters:** outer leaves plant (every third plant_deep), inner leaves alternating plant_deep and plant; each leaf's
+    base faces a step deeper; ±0.04 per leaf.
+- **`K.check`:** no problems. Baked-shading (facing) correlation: hero 0.33, T3 0.03, T2 / T1U / T1L / Trunk 0.00,
+  RootFoot 0.14 (limit 0.5).
+- **Finish:** blades, bushes and leaves rough 0.85 with low specular; bark 0.9 (deep 0.95); rock 0.85; sand 0.95. No
+  metal, no emission.
+- **Re-measured** (`m049w/col.py`, ours | sheet):
+
+  | Region | f34 | front |
+  | --- | --- | --- |
+  | Canopy median | **#4C8233** \| #528832 ✓ | #497F31 \| #548D31 ✓ |
+  | Crown / T2 / skirt | #689531 / #6A9733 / #487E35 \| #578C33 / #5F9732 / #498032 | #5D8B2E / #618C2F / #457932 \| #508C35 / #5C9630 / #4D8730 |
+  | Band v (crown / T2 / skirt) | .584 / .592 / .494 \| .549 / .592 / .502 (crown ≥ skirt + .08 ✓) | .545 / .549 / .475 |
+  | Canopy v > .7 | #A3B77E \| #B0CD34 (✗: few pixels, desaturated by the studio's specular) | #A6BC80 \| #ABCA32 |
+  | Trunk v > .7 | **#C3712E** \| lit-half target #C5712A ✓ (sheet v > .7 #E08835) | #C2712F \| #DB8836 |
+  | Rock v > .7 | #D7C8B0 \| #DACBB7 ✓ (R > G > B, G − B 24) | #D3C6AC \| #D4C8B3 |
+  | Sand | #F1D2A1 \| #EFD3A1 ✓ | #F0D1A1 \| #EDD0A1 |
+  | Plants (h < .3) | #5D7613 \| #5B7F1D ✓ (v .46) | #597113 \| #567B1F |
+
+  The side, rear and r34 canopies read darker than the sheet (#356226–#3B6A2B against #478633–#559031). The studio's key
+  light is front-left, so views from the side and behind see the shaded side (M045 found the same). Not painted.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing glowing and no light (spec §7). No emission, no PointLight.
+
+Studio notes (Requires Manual Validation): under the game's sun, check that the canopy reads lime on the lit side and deep
+green in shade, the bark orange-brown (not red) and the rocks warm pale grey (not pink).
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (spec §7). `build()` checks that the hero has no VFX sockets.
+
+Collision: hero precise; the four canopy parts and the Trunk hull; RootFoot precise.
+
+## Modeller's notes for the verifier
+
+**Renders** are in `art/blender/renders/models/M049/`; the contact sheet is `M049_views.png`.
+- Kit views: `front34`, `rear34`, `front`, `side`, `rear`, `top`, `underside`.
+- Sheet views: `f34_sheet` (−15/12), `r34_sheet` (165/12), `front_sheet` / `side_sheet` / `rear_sheet` (e 7),
+  `top_sheet` (floor hidden, 3× lens).
+- Parts: `part_canopytier3` … `part_rootfoot` (−20/20), plus `exploded` and `scale`. The scale shot has a 5.5-stud marker
+  under the skirt at (−3.6, −6.6); its head clears the lowest tips (z 7.2).
+- Close-ups:
+  - `ring_under`: Tier 1 lower from −40, blades round the bark hex sleeve and its dark hole (close-up 1);
+  - `trunk_cu`: the rim, dished recess and peg, with a light cut top and a dark pith (close-up 2);
+  - `root_cu` (close-up 3), `blade_cu` (edge thickness and chisel tips), `skirt_cu`.
+- `cmp_conifers.png`: 042 / 045 / 047 / 049 at true scale from the f34 camera (`m049.compare_conifers()`).
+
+**§1.5 differences, as built:**
+- **Size:** 22.0 tall (042 16, 045 10, 047 20); canopy 16.8 × 17.0 (tips at r 8.3–8.5); trunk Ø ≈ 3.7 at z 5–7, 2.9 at
+  the rim.
+- **Lowest skirt tips z 7.17** (the front blade) to 7.7: above a 5.5 character's head (`scale`).
+- **Silhouette:** a small crown (front hem .36 wide at h .81), Tier 2 (.68 at h .63), and the skirt (1.0 at h .40), with
+  Tier 1 upper's tips 1.6–2.4 above and about 0.9 inside Tier 1 lower's.
+- **Four rings: crown 10 + Tier 2 16 + Tier 1 upper 18 + Tier 1 lower 22 = 66 blades.** One outer blade (and one crown
+  ridge) points at −Y on every ring.
+- **Blade:** an 18-tri parallel-sided board, ridge 0.08 W, keel 0.12 W (the edge thickness), chisel point 0.26 W.
+  Whole-blade chord : width (root to tip, root buried): T1L outer 1.9, T1U 2.3, T2 1.8, crown long 2.5, inner rows 1.3–1.7
+  (see the leftovers).
+- **Crown from above:** five long blades on the five cone ridges, a 5-ridge star (042: 4 + 4; 045: 4).
+- **Joint:** the trunk's rim, recess and peg; every ring a bark hex sleeve with a blind hole over the peg below; seats
+  0.015, head room 0.1, radial clearance 0.125.
+- **Trunk:** a planked octagon with 3 grooves and a knot slit, bare from the sand to z 7.2 (front tips) or about 9 (the
+  sides). **Seven buttress roots in the same shell**, ribs rising to z 3.4–4.4, reaching r 4.1–6.5. f34 T share 13.8 %.
+- **Ground:** two faceted bush mounds (right), six upright broad-leaf clusters and two sprigs; five chunky warm pale grey
+  rocks (two big ones at the front-left: R1 2.4 tall, R2 2.5) and three pebbles.
+
+**Leftovers:**
+- Blade L : W is 1.8–2.5 on the outer rows, below §1.5's 2.6–3.0. At the spec's widths the rings read as separate
+  hanging blades with gaps (the first two builds). The blades are still parallel boards with chisel points, unlike 042's
+  kites and 045's paddles (`cmp_conifers.png`).
+- Inner-row tips sit at 0.39–0.48 of the outer radius (spec 0.6–0.65), to keep the waists (Stage 1, change 2).
+- The front and side waist under Tier 2 is .51–.57 wide (sheet .43–.50). The governing f34 matches (.57 against the f34
+  sheet's .53 at h .60): the sheet's front and side cells draw a narrower skirt top than its own f34.
+- In the f34 the sub-hem reads as a shoulder (.93 wide at h .44) rather than a second 1.0-wide peak.
+- Top view: the rocks barely peek past the skirt (R 2 %, sheet 11 %), and the blade ends read rounder than the sheet's
+  points.
+- The canopy's v > .7 pixels are greyer than the sheet's lime (the studio's specular). The side, rear and r34 canopies
+  read darker (the studio light).
+- In the f34, about 12 bark pixels (the crown's sleeve) show between the crown hem and Tier 2.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier ran this round read-only, in a background Blender on port 9881 (`wip/M049_verify.blend`, not saved).
+Every number below was re-measured with my own code (bmesh shells, BVH overlap and nearest, 3-ray parity), not taken
+from `build()`'s report. Renders, side-by-sides and scripts are in the scratchpad folder `m049_verify/`:
+- `sbs_34.png`, `sbs_ortho.png`, `sbs_tops.png`, `sbs_parts.png`, `sbs_cu.png`, `zoom_f34_top.png`, `cmp_conifers.png`;
+- `prof.py` and `col.py`, which apply the study's own masks to both the sheet cells and the renders.
+
+### Measured
+
+| Check | Result | Target | |
+| --- | --- | --- | --- |
+| Tris: hero / T3 / T2 / T1U / T1L / Trunk / RootFoot | 3304 / 254 / 420 / 462 / 546 / 704 / 918 | ≤ 3600 / < 1000 / RootFoot ≤ 960 | ✓ |
+| Shells: hero / parts | 138 / 11, 17, 19, 23, 1, 67 | | ✓ |
+| Non-manifold edges, boundary, wire, loose, bowtie verts, zero-area, n-gons (all 7 objects) | 0 everywhere | 0 | ✓ |
+| Winding errors (edges walked the same way by both faces) | 0 everywhere | 0 | ✓ |
+| Shells with volume ≤ 0 / self-intersecting face pairs within a shell | 0 / 0 | 0 | ✓ |
+| Smallest triangle corner | 2.15° (trunk) | > 2° | ✓ |
+| Origin and transforms (every object) | origin at the bbox bottom centre (offset 0.000); rotation 0, scale 1; no modifiers; UVMap present, with 0 zero-area or out-of-range UV faces | | ✓ |
+| Sizes (hero) | 19.45 × 16.99 × 22.00; canopy 16.8 × 17.0 | 22 ± 0.4; canopy 16.4 ± 0.6 | ✓ (17.0 at the limit) |
+| Floating shells (> 0.03 from everything; overlap counts as contact) / unchained | hero 0 / 0; every part 0 / 0; worst gap 0.002 | 0 / 0 | ✓ |
+| Dressing inside rock or trunk (ray parity on vertices, face centres and edge midpoints) | Leaves, hubs, lobes, pebbles, blades: **none inside at all**. The only overlap is the sand patch's top under the sunk rocks (0.08) and trunk (0.10), the intended seats. | ≤ 0.05 | ✓ |
+| Blade-into-blade cut outside the cores | 65 touching pairs, deepest 0.050 | ≤ 0.05 | ✓ |
+| Blade into a foreign core or the trunk | 0 | 0 | ✓ |
+| Ring seats (sleeve to the rim or cap below, BVH nearest) | 0.015 × 4; no core / trunk / peg overlap | 0.015, pegs clear | ✓ |
+| Blades | 66, all 18 tris (10 + 16 + 18 + 22) | | ✓ |
+| Blade L : W (PCA box, whole / visible past the core) | Outer rows: T1L 1.95 / 1.87, T1U 2.25 / 2.11, T2 1.86 / 1.68, crown 2.49 / 1.62. **Inner rows: T1L 1.44, T1U 0.97, T2 1.04** (visible 0.37–0.77). | 2.6–3.0 (decision 4, §1.5) | ✗ |
+| Lowest skirt tips | z 7.29–7.87 (the builder gives the front blade 7.17) | 6.8–7.7, above 5.5 | ✓ |
+| Front-aimed blade per ring | T1L 273°, T1U 263°, T2 270.5°, crown 261°; crown ridges at 62 / 131 / 195 / 262 / 340° | 270 ± 4 | ~ |
+| f34 shares | G 70.2, T 13.8, S 6.0, R 8.5 | G 69.1 ± 4, T 15.5 ± 4 | ✓ |
+| f34 W : H (whole silhouette) | 0.744 | self-test 0.872–0.915 (0.82–0.92) | ✗ minor |
+| Front / side / rear / r34 W : H | 0.830 / 0.719 / 0.818 / 0.764 | | ✓ |
+| Top (0, 89) shares | G 94.1, S 2.3, R 2.0 | R ≥ 3 | ✗ minor |
+
+**Hems and waists.** Canopy G width per height, as a fraction of the canopy's widest row; the same script ran on the
+sheet and the render. Each cell gives sheet / ours.
+
+| View | Crown hem (h / W) | Waist 1 (h / W) | Dip | Tier 2 hem (h / W) | Waist 2 (h / W) | Dip |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 | .82 / .38 / .83 / .33 | .79 / .29 / .78 / .32 | .09 / **.01** | .64 / .68 / .63 / .63 | .60 / .53 / .59 / .58 | .15 / **.05** |
+| r34 | .81 / .35 / .83 / .34 | .75 / .31 / .79 / .32 | .04–.09 / **.02** | .62 / .66 / .63 / .66 | .58 / .49 / .60 / .62 | .17 / **.04** |
+| front | .80 / .36 / .81 / .37 | .77 / .24 / .77 / .34 | .12 / **.03** | .61 / .67 / .64 / .70 | .57 / .47 / .60 / .55 | .20 / .15 |
+| side | .78 / .38 / **no hem** | .75 / .27 / **no waist** (.33 .32 .31, monotonic) | .11 / **0** | .59 / .70 / .64 / .67 | .55 / .50 / .61 / .59 | .20 / **.08** |
+| rear | .78 / .41 / **no hem** | .75 / .32 / **no waist** (.33 .31 .31) | .09 / **0** | .60 / .68 / .64 / .66 | .57 / .49 / .59 / .53 | .19 / .13 |
+
+- The skirt hem (1.0) sits at h .39–.42, against the sheet's .36–.44: ✓.
+- The f34 sub-step is a shoulder (.97 → .90, no second peak). The sheet's is a small second peak (.99 / .94 / .98).
+
+**Colour** (study masks, ours | sheet):
+
+| Region | f34 | front | side / rear / r34 |
+| --- | --- | --- | --- |
+| Canopy median | #4E8336 \| #528832 ✓ | #4D8034 \| #548D31 ✓ | #39632A / #3B6A2F / #3B6A2E \| #518B30 / #559031 / #478633 (15–20 dark) |
+| Crown / T2 / skirt v | .596 / .596 / .502 \| .580 / .592 / .486 ✓ (lighter top, deeper skirt) | .580 / .557 / .478 ✓ | ✓ same order |
+| Canopy v > .7 | 0.1 % of pixels \| 33 % (#B0CD34) | 0.4 % \| 33 % | about 0 % \| 28–36 % |
+| Right / left half | #4C8033 / #4F8438 \| #A8C931 / #1D6933 | | |
+| Trunk lit quartile | #C5722F \| lit-half target #C5712A ✓ | #C2712F | |
+| Rock median / lit | #B6AB92 / #EAD6BD, R > G > B, G − B 25 ✓ (warm, not pink) | #B3A48D, G − B 23 ✓ | G − B 20–22 ✓ |
+| Sand | #F1D2A1 \| #EFD3A1 ✓ | #F0D1A1 ✓ | |
+| Plants (h < .3) | #5D7714, hue 71, v .47 \| #5B7F1D, 81, .50 | #597114 \| #567B1F | |
+
+- **No lime cap:** the blade tip band equals the body, except on the crown's short blades ✓.
+- **Facing:**
+  - `K.check` reports no problems.
+  - A grep of `m049.py` finds no `normal`-based paint selection. The only `.normal` is the shell-volume sum in
+    `shells_report`.
+  - My own luminance-against-normal correlation per family: needle −0.08, plant 0.03, bark 0.33, bush 0.40, rock 0.68.
+  - Rock, bush and bark are painted in **height** bands, as the spec prescribes. `rock()` picks faces by
+    `calc_center_median().z`, bushes go by lobe height, and bark by the ground band and the rim and peg cut faces.
+  - The rock figure is high only because each rock's top band is its flat crown. Painting is by position, so ✓.
+
+### Findings
+
+1. **Blocker: the tiers merge (decision 3, §9 pitfall 2).**
+   - **Waist 1.** The crown does not separate from Tier 2. Under the crown there is no waist in the side and rear views,
+     and only a .01–.03 dip in the f34, r34 and front. The sheet's waist is .09–.12 deep, down to .24–.32 wide.
+   - **Waist 2.** The Tier 2 / Tier 1 waist is only .04–.08 deep and .58–.62 wide in the f34, r34 and side. The
+     sheet's is .15–.20 deep and .49–.53 wide.
+   - **How it reads.** In the side and r34 renders the canopy is one continuous cone of hanging boards. The sheet's tiers
+     read as three crisp, stepped umbrellas (`sbs_ortho.png`, `zoom_f34_top.png`).
+   - **Cause, waist 1.** Tier 2's inner row fills the band just under the crown hem (z 17.3–17.6). Those blades are pads
+     W 2.3–2.4 with tips at r 2.3–3.0, z 16.1–17.4.
+   - **Cause, waist 2.** The T1U and T2 boards are 3.0–3.2 wide, so each edge sits about 1.5 to the side of the blade's
+     axis. T1U's silhouette therefore already reaches about r 5 at the height of the T2 hem.
+   - **Fix target.** Measure in the f34, front, side and rear renders, and loosely in the r34.
+     - Waist 1 at h .77 ± .03, width ≤ .32, at least .07 narrower than the crown hem.
+     - Waist 2 at h .58 ± .03, width ≤ .53, at least .12 narrower than the Tier 2 hem.
+     - At z 16.8 the visible width must stay within r 2.4. Lower and shorten Tier 2's inner row (tips z ≤ 16.3,
+       r ≤ 2.6), or seat it nearer the core.
+     - Narrowing the boards (finding 2) clears waist 2.
+     - A dark crease band should show under each hem.
+2. **Blocker: the blades are broad shields and pads, not long boards (decision 4; the binding §1.5 "Foliage element"
+   row).**
+   - The outer rows measure L : W 1.86–2.25, and 1.68–2.11 visible past the core. Decided: 2.6–3.0.
+   - The inner rows are square pads, L : W 0.97–1.44 (visible 0.37–0.77). Decision 4 says "not kites, paddles or pads".
+   - The chisel ends are 0.26 W on blades 3–3.8 wide, so every tip reads as a rounded hexagon.
+   - The parts shot shows bells of hanging shields, where the exploded view shows wide umbrellas of narrow blades
+     (`sbs_parts.png`). This is the "steep tents" miss from W04 R7-7.
+   - **Fix target.**
+     - Outer blades at least 2.5 L : W visible. Widths: T1L about 2.6–2.8, T1U 2.3–2.5, T2 2.0–2.2, crown about 1.3.
+     - Close any gaps with more blades, not more width. About 300 tris of headroom allows 16 more blades (+2 T1L and
+       +2 T1U per the spec's §4.3 note).
+     - Inner rows at least 2.0 L : W, with tips 0.35 W.
+3. **Blocker: the top view is a round rosette, and the 5-ridge crown star does not read (binding §1.5 "Crown from
+   above"; §2.5; §9 pitfall 14; W04 R7-6).**
+   - In `top_sheet` and `sbs_tops.png` the crown is a small dark star about 0.15 of the canopy across, ringed by five
+     lighter pads.
+   - The outline is a ring of rounded hexagonal plate ends with no pointed star points.
+   - 042 and 045 both read as a crisp central star from above, so the current 049 reads less like the sheet's star
+     than they do.
+   - **Fix target.**
+     - The top render shows at least 11 pointed outer star points, with the second row's tips between them.
+     - The 5-ridge crown star reads lime and spans at least 0.3 of the canopy. Its ridges show as distinct lit and shaded
+       facet pairs.
+     - Build it either from narrow crown blades on the ridges, or as the bare ridged cone with short hem blades, as in
+       the exploded view's Tier 3.
+     - Most of this follows from finding 2.
+4. **Minor: from above, the rocks barely show past the skirt** (R 2.0 %, sheet 11 %).
+   - **Fix target:** R at least 3 % in the top view. Push R4, R5 and R1 out to r ≥ 8.6 inside the patch, or enlarge R4.
+5. **Minor: f34 W : H is 0.744** (sheet 0.87–0.92; the front's 0.830 is fine).
+   - At az −15 the base reads narrower than the sheet's. On screen the sheet's patch is 1.29 × the canopy width; ours is
+     1.08 ×.
+   - **Fix target:** lengthen the patch along X toward ±10.5, or move BB and C2 outward.
+6. **Minor: there is no lime lit side.**
+   - The canopy's v > .7 share is 0.1 % (sheet 33 %), and the right and left halves are equal.
+   - The side, rear and r34 canopy medians are 15–20 levels darker than the sheet's.
+   - This is the studio's front-left key light, and painting it in would be colour by facing. Leave it as **Requires
+     Manual Validation** under the Studio sun. The medians and the band order pass.
+7. **Minor: the f34 sub-step is a shoulder** (.97 → .90), not the sheet's small second peak.
+   - Re-measure after finding 2: narrower T1U boards should let T1U's tips stand out.
+8. **Minor: the trunk is Ø ≈ 3.7 at z 5–7**, against the binding table's 3.2.
+   - It is still clearly distinct from 042's 2.0, and the f34 T share passes.
+9. **Minor: two small mismatches.**
+   - T1U's front-aimed blade and the crown's front ridge sit 7–9° off −Y (jitter limit ±4).
+   - In `ring_under` the sleeve hole doesn't read as a dark hole; close-up 1 shows one clearly.
+10. **Passed; leave these alone in the fix.**
+    - Mesh hygiene and winding.
+    - Contacts: 0 floating, 0 unchained, nothing buried, seats 0.015, pegs clear.
+    - The stack and joints.
+    - The trunk: its seven roots are in one shell with it, and the rim, recess and peg match close-up 2 (`trunk_cu`).
+    - The bush mounds, the clusters, the warm rocks and the sand.
+    - The colour medians and blends.
+    - Names, collision (hero precise, T1L and Trunk hull, RootFoot precise), no sockets, and the budgets.
+
+**Decisions:**
+
+| # | Decision | Status |
+| --- | --- | --- |
+| 1 | Size | ✓ |
+| 2 | Names and keys | ✓ |
+| 3 | Rings | **✗** The tiers merge (finding 1). The counts are right and the inner rows lie on top. |
+| 4 | Blades | **✗** L : W is too low and the inner rows are pads (finding 2). 18 tris, parallel sides, cut-off tips and edge thickness are all right. |
+| 5 | Tier 1 exported as two parts | ✓ |
+| 6 | Joints, no floating dressing, winding, burial | ✓ |
+| 7 | Roots | ✓ |
+| 8 | Branches | ✓ |
+| 9 | Dressing | ✓ |
+| 10 | Cameras | ✓ |
+| 11 | Colour | ✓ by position (lit half: finding 6) |
+| 12 | Lighting and VFX skipped | ✓ |
+| 13 | Collision | ✓ |
+| 14 | Budget | ✓ |
+
+**§1.5 differences from 042, 045 and 047** (`cmp_conifers.png`). 049 does read as a different kit piece from all three.
+
+| Row | Status |
+| --- | --- |
+| Size | ✓ |
+| Lowest tips | ✓ |
+| Canopy pieces | ✓ |
+| Joint | ✓ |
+| Trunk | ✓ |
+| f34 bark share | ✓ |
+| Ground plants | ✓ |
+| Rocks | ✓ |
+| Silhouette | **✗** the crown and Tier 2 merge |
+| Foliage element | **✗** shields and pads |
+| Crown from above | **✗** no readable 5-ridge star |
+
+### Score and verdict
+
+**6 / 10.** The engineering is clean: mesh, winding, contacts, joints, stack, budget and colour medians all pass. The
+canopy's defining read is missing: three stepped umbrellas of long, narrow blades that show a star from above.
+
+**FAIL (round 1).**
+- Blockers 1–3 go back to a fresh modeller for stages 1 and 4.
+- Change only the ring and blade geometry. Then re-run the contact and winding checks, and re-calibrate if the blade
+  areas change.
+- Minors 4–9 can go in the same pass, or stay as leftovers.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+A fresh fix modeller worked in a background Blender on port 9881 (`kit/wip/M049.blend`, saved after the final build).
+Only the ring and blade geometry changed (stages 1 and 4), plus three of the verifier's cheap minors. The final build
+ran in a freshly restarted session, and `build()`'s problems list is empty. Scratch scripts are in the scratchpad
+folder `m049fix/`:
+- `it2.py` / `tune.py` / `run.sh`: the tuning loop;
+- `prof.py` and `fine.py`: the verifier's width profile and a 0.01 h table;
+- `col.py`: the verifier's colour script;
+- `lw.py`: blade L : W (whole and visible past the own core, the verifier's method);
+- `geo.py`: the plan radius at given heights and the front blades' azimuths;
+- `sil.py`: which shell sets the silhouette edge at a given screen height;
+- `pts.py`: outer star points in the top views;
+- `m049_round1.py` and `before/`: the round-1 builder and renders.
+
+### What changed
+
+1. **The tiers no longer merge (blocker 1).** This follows M045's fix round 1: row B on top, narrow waists.
+   - **Every tier builds its inner row first.** The inner row lies on its core, with roots under the cap. The outer
+     (hem) row is then built as a **sink row** under it: a blade that cuts the inner row has its tip turned down
+     about its buried root. The inner row still lies on top (decision 3).
+   - **The cores are steeper**, so the inner blades leave them early:
+     - T1L rim r 3.4 @ 12.25 → 1.75 @ 13.2;
+     - T1U 2.5 @ 14.0 → 2.0 @ 13.85;
+     - T2 2.2 @ 16.6 → 1.7 @ 16.75.
+   - **The rim has one corner per outer blade.** The 2n-corner pleat is gone. It is hidden under the blades, and its
+     tris paid for the extra blades.
+   - **The outer rows flare.** A new `bend=(deg at A, deg at B)` in `blade()` replaces the two-step droop. A negative
+     first angle flares the blade up at A, so the waist above stays narrow while the hem keeps its width. The second
+     angle droops the tip. Bends: T1L (−14, −4), T1U (−14, −6), T2 (−16, −6).
+   - **Tier 2's inner row** is shorter and lower: root (0.55, 18.0) → tip (3.4, 15.2), W 1.35. Round 1 had pads lifted
+     to z 16.1–17.4 just under the crown hem.
+   - **The T1L inner row is lowered**: (0.6, 14.15) → (3.7, 11.2). This clears the T1U outer row, so the T1U blades
+     are no longer lifted into waist 2.
+   - **The T2 hem** sits at r 5.85 @ 13.3, with the front blade at 13.0.
+2. **Blades, not shields or pads (blocker 2).**
+   - **Widths:** outer T1L 2.8 / T1U 2.5 / T2 2.05 / crown 1.3; inner 1.3 / 1.5 / 1.35; crown short 0.9.
+   - **Counts:** crown 5 + 5, Tier 2 10 + 10, T1U 12 + 11, T1L 14 + 13. That is 80 blades, 14 more than round 1.
+   - **Tip:** section B moved to 0.72 L (was 0.75) and TIPW to 0.24 W (was 0.26). The sides are still parallel from A
+     to B, and the tip is still cut off. It now reads pointed from above.
+   - **Ridge:** a per-row `ridge` setting. The crown's long blades use 0.35 W for distinct lit and shaded halves; every
+     other row keeps 0.08 W.
+3. **Top-view star (blocker 3).**
+   - **The crown cone is a deep five-ridge star:** ridges r 2.3, valleys 1.5, rim z 18.3 (was 2.0 / 1.45 / 18.6). It is
+     painted base needle (was 25 % light).
+   - **Five long, narrow, lime blades lie just above its ridges**, from the apex (root (0.05, 21.8)) to the hem tips at
+     r 3.5 @ 17.3. Their tones are (0.25, 0.5, 0.5): no tip cap, the tip equals the body.
+   - **The five short valley blades** are tucked under them: tips r 2.45 @ 17.7, W 0.9.
+4. **Minors.**
+   - **Rocks:** R1 moved to (−7.2, −1.0), R4 to (9.1, 3.7) at 2.4 × 2.0 × 1.6, R5 to (−8.4, 3.9) at 1.8 × 1.5 × 1.1.
+     Pebble P3 moved to (−8.2, 1.2) so it stays on the patch crest.
+   - **Sleeve holes:** a new key, `m049_hole` #2E1C10. The holes now read near-black in `ring_under`. This is the
+     hole's own faces, a geometric region.
+   - **Front blades:** every ring's front blade is now at 269–272°, and the crown ridge is at exactly 270°.
+5. **Not changed:** the trunk, roots, bushes, clusters, the sand patch shape and the calibrated palette keys.
+   - The needle keys were not re-calibrated: the dome calibration does not depend on blade area.
+   - The rendered medians were re-measured instead (below). Only the crown band moved, deliberately, for the lime star.
+
+### Measured (final build, fresh session)
+
+Widths are fractions of the canopy's widest row; h is a fraction of the silhouette height. Both use the verifier's
+`prof.py` on the `*_sheet` renders.
+
+| Check | Round 1 | Fix round 1 | Target |
+| --- | --- | --- | --- |
+| Waist 1 h / W: f34 | .78 / .32, dip .01 | **.78 / .26**, crown hem .81 / .39, dip .13 | h .77 ± .03, W ≤ .32, ≥ .07 below the hem |
+| Waist 1: r34 | .79 / .32, dip .02 | **.79 / .23**, hem .82 / .39, dip .16 | the same |
+| Waist 1: front | .77 / .34, dip .03 | **.78 / .26**, hem .81 / .41, dip .15 | the same |
+| Waist 1: side | none | **.79 / .22**, hem .81 / .38, dip .16 | the same |
+| Waist 1: rear | none | **.78 / .25**, hem .81 / .41, dip .16 | the same |
+| Waist 2 h / W: f34 | .59 / .58, dip .05 | **.60 / .49**, T2 hem .65 / .67, dip .18 | h .58 ± .03, W ≤ .53, ≥ .12 below the hem |
+| Waist 2: r34 | .60 / .62, dip .04 | **.60 / .49**, hem .65 / .66, dip .17 | the same |
+| Waist 2: front | .60 / .55 | **.61 / .46**, hem .64 / .69, dip .23 | the same |
+| Waist 2: side | .61 / .59, dip .08 | **.60 / .49**, hem .64 / .67, dip .18 | the same |
+| Waist 2: rear | .59 / .53 | **.59 / .47**, hem .64 / .69, dip .22 | the same |
+| Visible plan r at z 16.8 / 17.0 / 17.4 | T2 inner tips r 2.3–3.0 there | **2.15** / 1.88 / 3.66 (crown hem) | ≤ 2.4 at 16.8 |
+| Outer blade L : W, visible (min / mean), mean W | T1L 1.87 (W 3.8), T1U 2.11 (3.2), T2 1.68 (3.0), crown 1.62 (2.0) | **T1L 2.81 / 3.34 (W 2.63); T1U 2.90 / 3.19 (2.46); T2 2.58 / 2.74 (2.04); crown 3.70 / 4.00 (1.32)** | ≥ 2.5; W 2.6–2.8 / 2.3–2.5 / 2.0–2.2 / ≈ 1.3 |
+| Inner blade L : W, whole (visible), min | T1L 1.44 (0.37), T1U 0.97, T2 1.04 (0.37–0.77) | **T1L 3.07 (2.01), T1U 2.70 (2.04), T2 2.71 (2.03)**; crown short 3.24 (2.31) | ≥ 2.0 |
+| Blades | 66 | 80 (+14) | about +16 |
+| Top: outer star points (`pts.py`) | 11, rounded hexagonal plate ends | **12, pointed** (sheet 13) | ≥ 11 pointed |
+| Top: crown star | dark, about 0.15 across | **lime five-ridge star with lit / shaded ridges, about 0.38 across** (tips r 3.5) | lime, ≥ 0.3 |
+| Top shares R / S | 2.0 / 2.3 | **3.2** / 4.6 | R ≥ 3; S ≤ 3 |
+| f34 shares G / T / S / R | 70.2 / 13.8 / 6.0 / 8.5 | **67.6 / 14.6** / 7.1 / 8.9 | G 69.1 ± 4, T 15.5 ± 4 |
+| f34 W : H (whole) | 0.744 | 0.807 | 0.82–0.92 |
+| Front-aimed blade azimuth: crown / T2 / T1U / T1L | 261 / 270.5 / 263 / 273 | 268.7 / 272.2 / 271.6 / 271.6; crown ridge 270.0 | 270 ± 4 |
+| Hero tris; parts T3 / T2 / T1U / T1L / Trunk / RootFoot | 3304; 254 / 420 / 462 / 546 / 704 / 918 | **3532**; 254 / 484 / 546 / 626 / 704 / 918 | ≤ 3600; < 1000; RootFoot ≤ 960 |
+
+- **Mesh, all 7 objects:** `M.audit` reports 0 non-manifold edges, 0 bowtie verts, 0 boundary, 0 wire, 0 loose,
+  0 zero-area faces and 0 n-gons; normals outward; origin at the bbox bottom centre. Per shell, every shell is closed
+  with a positive volume, 0 self-intersections and **0 winding errors**. The smallest triangle corner is 2.15° (the
+  trunk, unchanged).
+- **Contact (`contact_report` and the verifier's 3-ray `analyse`):**
+  - Hero 152 shells: floating 0, unchained 0, worst gap 0.002.
+  - Ring seats 0.015 × 4, with 0 core / trunk intersections; `core_vs_below` 0 on every ring.
+  - Blade-into-blade cuts are at most 0.049, with 0 pairs over 0.05. Blade fixes: 0 unresolved.
+  - Leaf cuts 0; leaves dropped 0.
+  - **Dressing buried: 0.** The only overlaps are the intended seats: the patch under the sunk rocks (0.08) and under
+    the trunk (0.10).
+  - Every part: floating 0, unchained 0.
+- **Sizes:**
+  - Hero 19.7 × 16.8 × 22.0, origin offset (0.32, 0.10, 0).
+  - T3 6.8 × 6.4 × 4.8; T2 11.4 × 11.7 × 5.7; T1U 14.2 × 14.9 × 6.8; T1L 16.4 × 16.8 × 7.8.
+  - The lowest skirt tips are at z 7.18 (the front blade) to 7.9.
+- **Colour** (`col.py`, ours | sheet):
+  - **f34:** canopy median #4D8333 | #528832 ✓; band v crown .631 | .580, T2 .612 | .592, skirt .490 | .486.
+  - **front:** crown .588 | .561, T2 .584 | .584, skirt .475 | .525.
+  - **The crown band is about .03–.05 lighter than the sheet.** This is the price of the lime star from above. The
+    order (crown and T2 lighter than the skirt) holds.
+  - **Lit share:** canopy v > .7 is now 4.6 % in the f34 (round 1: 0.1 %).
+  - Rocks are still warm (G − B 19–25); plants are unchanged.
+  - `K.check` reports no problems. Facing is never used.
+- **Renders:** `M049_views.png`, `*_sheet`, `top_sheet`, `ring_under`, `exploded`, the parts, and `cmp_conifers.png`
+  (042 / 045 / 047 / 049 at the f34 camera). From the f34 / front / side / rear, the canopy reads as a crown, Tier 2 and
+  a double skirt, with a dark crease under each hem. From above it reads as a lime five-point star in a ring of
+  pointed blade tips, with rocks peeking out at the left and right.
+
+### Leftovers
+
+- **The skirt reads spikier than the sheet.**
+  - At the hems, the narrower boards with pointed tips leave notches between the tips, where the sheet draws closed
+    fans of broad boards.
+  - The parts shot shows steep bells: T1U part W : H 2.19 (exploded 2.57); T1L 2.15 (2.39).
+  - Closing the notches needs more blades. The hero has 68 tris of headroom (3532 / 3600), about 3 blades.
+- **The f34 sub-step is still a shoulder:** .95 at h .42, .89 at .45, against the sheet's second peak at .44.
+- **The crown is slightly fat just above its hem in the side view:** .38 → .34 over h .81–.85, where the sheet goes
+  .39 → .26. A concave crown (droop −14, rim z 18.0) was tried and changed nothing measurable, so it was reverted.
+- **The T2 hem sits at h .64–.65** against the sheet's .59–.64. The side view is the furthest off: .64 against .59.
+- **Sand shows more:** f34 S 7.1 (sheet 4.4 ± 2) and top S 4.6 (≤ 3). The rocks moved out, so the patch grew.
+- **Unchanged from round 1:** the trunk (Ø ≈ 3.7); the studio-light darkening of the side, rear and r34 canopies
+  (Requires Manual Validation under the Studio sun).
+
+## Verification round 2 (verifier, 2026-10-29)
+
+A fresh verifier ran this round read-only, in a background Blender on port 9881 (`wip/M049_verify.blend`, not saved:
+its mtime is unchanged). Every number was re-measured with my own code, not taken from the fix modeller's report or
+`build()`. Scripts, renders and side-by-sides are in the scratchpad folder `m049_verify2/`:
+- `mesh.py` (per-object and per-shell audit), `contact.py` (BVH overlap and nearest, 3-ray parity), `blades.py` (PCA
+  blade L : W, visible length past the own core, A / B widths, tip width);
+- `prof2.py` (hems, waists and shares with the study's masks, on both the sheet cells and the renders), `col2.py`
+  (colour), `pts.py` (top-view star points and radial colour);
+- `sbs_34.png`, `sbs_ortho.png`, `sbs_top.png`, `sbs_parts.png`, `sbs_cu.png`, `big_sbs_f34.png`, `big_sbs_side.png`,
+  `cmp_conifers.png`.
+
+### Measured
+
+| Check | Result | Target | |
+| --- | --- | --- | --- |
+| Tris: hero / T3 / T2 / T1U / T1L / Trunk / RootFoot | 3532 / 254 / 484 / 546 / 626 / 704 / 918 | ≤ 3600 / < 1000 / RootFoot ≤ 960 | ✓ |
+| Shells: hero / parts | 152 (patch 1, trunk 1, cores 4, blades 80, rocks 5, pebbles 3, lobes 11, hubs 8, leaves 39) / 11, 21, 24, 28, 1, 67 | | ✓ |
+| Non-manifold, boundary, wire, loose, bowtie verts, zero-area, quads / n-gons, duplicate verts (all 7 objects) | 0 everywhere | 0 | ✓ |
+| Winding errors (an edge walked the same way by both its faces) | **0** on all 7 objects | 0 | ✓ |
+| Shells with volume ≤ 0 / self-intersecting face pairs within a shell | 0 / 0 | 0 | ✓ |
+| Smallest triangle corner | 2.15° (trunk) | > 2° | ✓ |
+| Origin, transforms, modifiers, UV | bbox bottom centre at 0.000 on every object; rotation 0, scale 1; no modifiers; `UVMap` present | | ✓ |
+| Sizes | hero 19.70 × 16.84 × 22.00; T1L (canopy) 16.44 × 16.84 | 22 ± 0.4; canopy 16.4 ± 0.6 | ✓ |
+| Floating / unchained shells (> 0.03; overlap counts as contact) | hero 0 / 0, worst gap 0.002; every part 0 / 0 | 0 / 0 | ✓ |
+| Buried dressing (leaves, hubs, lobes, pebbles and blades inside rock or trunk; parity on verts, face centres, edge midpoints) | **0.000**: nothing inside at all | ≤ 0.05 | ✓ |
+| Ring seats (each core to the trunk or cap below) | 0.015 × 4, 0 overlapping face pairs | 0.015, pegs clear | ✓ |
+| Blade-into-blade cuts | 70 touching pairs, deepest 0.049, 0 over 0.05 | ≤ 0.05 | ✓ |
+| Blade into a foreign core or the trunk | 0: every blade enters only its own core | 0 | ✓ |
+| Inner row on top (rays up from the inner blades' outer half, per ring part: T2 / T1U / T1L) | covered by an outer blade 0 / 30, 0 / 33, 0 / 39; inner tips over an outer blade 7 / 10, 11 / 11, 13 / 13 | inner on top | ✓ |
+| Outer blades: mean W; L : W whole / **visible past the core** (min) | T1L 2.63; 2.87 / **2.81**. T1U 2.46; 2.90 / **2.69**. T2 2.04; 2.71 / **2.52**. Crown long 1.32; 4.07 / **3.50** | visible ≥ 2.5 | ✓ |
+| Inner blades: L : W whole (min); visible past the core (min / mean) | T1L 3.07; 1.98 / 2.15. T1U 2.70; 1.84 / 2.08. T2 2.71; 1.90 / 2.07. Crown short 3.24; 2.48 / 2.58 | ≥ 2.0 | ✓ (means; a few at 1.84–1.98) |
+| Parallel sides (width at B / width at A); tip | 1.00 on every blade; tip 0.24 W, flat | parallel; cut-off tip | ✓ |
+| Front-aimed blade: crown / T2 / T1U / T1L | 271.5 / 269.7 / 269.1 / 269.1° | 270 ± 4 | ✓ |
+| Lowest skirt tips | z 7.15–7.79 | 6.8–7.7, above 5.5 | ✓ |
+| Top: outer star points (polar radius peaks, the same script on both images) | 11 (`top_sheet`), 12 (kit top); sheet 12 | ≥ 11, pointed | ✓ |
+| Top: crown star | five long lime blades on the five ridges, tips at r 3.33–3.67 against the canopy's 7.9–8.5: **0.42** across; centre ring hue 86, v .59 (sheet 87, .60) | lime, ≥ 0.3 | ✓ |
+| Top shares G / S / R | 87.5 / 4.6 / 3.2 (sheet 86.3 / 0 / 11.3) | R ≥ 3, S ≤ 3 | ✓ R; S minor |
+| f34 shares G / T / S / R | 67.5 / 14.6 / **7.1** / 8.9 (sheet 69.0 / 15.5 / 4.4 / 8.7) | G 69.1 ± 4, T 15.5 ± 4, S ± 2 | ✓ G, T; S minor |
+| f34 W : H (whole silhouette) | 0.811 (sheet 0.874) | 0.82–0.92 | minor |
+
+**Waists.** G width per height, as a fraction of the canopy's widest row. The same script ran on both images; each
+cell gives sheet | ours.
+
+| View | Crown hem h / W | Waist 1 h / W / dip | Tier 2 hem h / W | Waist 2 h / W / dip |
+| --- | --- | --- | --- | --- |
+| f34 | .82 / .38 \| .81 / .39 | .80 / .27 / .11 \| **.78 / .26 / .13** | .64 / .68 \| .65 / .68 | .61 / .49 / .19 \| **.60 / .49 / .19** |
+| r34 | .80 / .37 \| .82 / .39 | .76 / .29 / .08 \| **.79 / .23 / .16** | .61 / .67 \| .65 / .66 | .59 / .48 / .18 \| **.60 / .49 / .17** |
+| front | .80 / .36 \| .81 / .41 | .78 / .24 / .11 \| **.78 / .26 / .16** | .61 / .67 \| .63 / .70 | .58 / .46 / .21 \| **.60 / .46 / .24** |
+| side | .77 / .39 \| .82 / .37 | .75 / .27 / .12 \| **.79 / .22 / .16** | .58 / .70 \| .63 / .69 | .54 / .50 / .20 \| **.61 / .45 / .24** |
+| rear | .78 / .41 \| .81 / .42 | .76 / .30 / .11 \| **.79 / .25 / .17** | .60 / .68 \| .64 / .69 | .57 / .49 / .19 \| **.60 / .47 / .22** |
+
+- Every view meets the targets.
+  - Waist 1 sits at h .78–.79 (target .77 ± .03), W .22–.26 (≤ .32), .13–.17 below the crown hem (≥ .07).
+  - Waist 2 sits at h .60–.61 (.58 ± .03), W .45–.49 (≤ .53), .17–.24 below the Tier 2 hem (≥ .12).
+  - The side and r34 renders read as a crown, Tier 2 and a skirt with a dark crease under each hem, not as one cone.
+- The f34 skirt rows (h .36–.44) are .69 .99 .98 .94 1.00 on the sheet, a second peak at .44; ours are .77 .89 1.00
+  .95 .91, a shoulder.
+- Between the Tier 2 hem and the crown ours narrows faster (f34 h .66–.74: .64 .59 .52 .43 .36 against the sheet's .66
+  .63 .59 .51 .44). Tier 2 is a steeper bell than the sheet's.
+
+**Colour** (study masks; each cell gives sheet | ours):
+
+| Region | f34 | front | side / rear / r34 |
+| --- | --- | --- | --- |
+| Canopy median | #528832 \| #4D8333 ✓ | #548D31 \| #497E30 ✓ | #518B30 / #559031 / #478633 \| #386527 / #3C6B2B / #3C6B2B (the studio light, as in round 1) |
+| Band v, crown / T2 / skirt | .580 / .592 / .486 \| **.635** / .612 / .490 | .561 / .584 / .525 \| .592 / .584 / .475 | order kept |
+| Canopy v > .7 share | 33 % \| 4.6 % (#9DC639) | 33 % \| 4.1 % | 28–36 % \| 0.1–0.2 % |
+| Trunk lit quartile | #E68D38 (lit-half target #C5712A) \| #C5722F, hue 27 ✓ | #C2712F ✓ | |
+| Rock median / lit | #AAA197 / #DACBB7 \| #C2B79E / #D7C8AF; R > G > B, G − B 25, hue 33 ✓ | G − B 25 ✓ | G − B 19–22 ✓ |
+| Sand | #EFD3A1 \| #F1D3A2 ✓ | #F0D2A2 ✓ | |
+| Plants (h < .3) | #5B7F1D, hue 81, v .50 \| #648215, hue 72, v .51 | #617D14, v .49 | v .52–.57 (not olive) |
+
+- **No lime cap.** Per blade, the root / mid / tip materials are:
+  - 27 × deep 50 / deep 25 / deep 25;
+  - 23 × deep 50 / needle / needle;
+  - 20 × deep 25 / light 25 / light 25;
+  - 5 × light 25 / light 50 / light 50;
+  - 5 × needle / light 25 / light 25.
+
+  The tip always equals the body.
+- **Hole key `#2E1C10`.** 88 faces carry it, 22 per core. Every one lies within r 0.555 of the axis and is either a
+  hole wall facing the axis or the downward-facing ceiling. These are the blind hole's own faces, a geometric region ✓.
+- **Facing.**
+  - `K.check` reports no problems.
+  - A grep of `m049.py` finds no `normal`-based paint selection. The only `.normal` uses are blade and leaf geometry
+    and the shell-volume sum.
+  - My own key-luminance against normal correlation: needle −0.09, plant 0.03, sand 0.33, bush 0.40, bark 0.46, rock
+    0.68 (z).
+  - The rock, bush and bark figures come from height bands and role faces. `rock()` picks faces by
+    `calc_center_median().z`, bushes go by lobe height, and bark by the ground band, the rim and the peg's cut top.
+    This is colour by position, so ✓.
+
+### Findings
+
+**No blockers.** The mesh, winding, contacts, burial, stack, budget and names all pass, and so do the three round-1
+blockers.
+
+1. **Minor: the skirt and Tier 2 read spikier than the sheet** (`big_sbs_f34.png`, `big_sbs_side.png`).
+   - The sheet draws closed fans of broad overlapping boards with short scalloped hems. Ours are longer, narrower boards
+     with notches between the tips, so the hems read as a ragged spray.
+   - The crown reads as a tuft of five long flaring blades, where the sheet draws a solid ridged cone with a short hem.
+   - **Fix target (a later pass):**
+     - Close the hem notches: 2–3 more outer blades on T1L and T1U within the 68-tri headroom, or outer boards 5–8 %
+       wider.
+     - Give the crown cone more of the silhouette above z 19.5: lay the crown's long blades flatter on the ridges, with
+       their tips no more than 0.3 proud.
+2. **Minor: the parts read as steep bells** (`sbs_parts.png`).
+   - Object W : H is close to the spec: T1L 2.09, T1U 2.08, T2 2.01, T3 1.41 (spec 2.4 / 2.25 / 1.9 / 1.24).
+   - On screen at (−20, 20), though, the parts measure 1.31 / 1.24 / 1.28 / 1.03, against the exploded view's 2.39 /
+     2.57 / 2.02 / 1.15. The blades hang steeply from a tall core peak.
+   - **Fix target:** lower the core peaks and the blade root pitch by about 8–10°, so the T1L and T1U parts reach a
+     screen W : H of at least 1.8.
+3. **Minor: the crown band is lighter than the sheet.**
+   - f34 v .635 against .580 (+.055); front +.031. The order (crown and T2 above the skirt) holds.
+   - **Fix target:** crown long blades from tones (0.25, 0.5, 0.5) to (0, 0.25, 0.25), once the star has been judged in
+     Studio.
+4. **Minor: the f34 sub-step is a shoulder.**
+   - Ours runs .89 → 1.00 → .95 → .91 over h .38–.44. The sheet has a second peak, .94 → 1.00 at h .44.
+   - **Fix target:** T1U's outer tips 0.3 further out (r ≈ 7.7) or 0.3 lower.
+5. **Minor: the Tier 2 hem sits high.**
+   - It is at h .63–.65, against the sheet's .58–.64. The side view is the furthest off: .63 against .58.
+   - **Fix target:** T2's outer tips from z 13.24 to about 12.8.
+6. **Minor: sand shows more than on the sheet.**
+   - f34 S is 7.1 (target 4.4 ± 2) and top S 4.6 (≤ 3). The f34 W : H is 0.811 (0.82–0.92).
+   - **Fix target:** trim the patch bevel by 0.3–0.5 toward the camera, or bring the outer edge in where no rock sits.
+7. **Minor: the inner rows' visible L : W** is 1.84–1.98 on a few blades (means 2.07–2.15; whole blades 2.7–3.3).
+   - The rows read as boards in the renders. Leave this.
+8. **Minor: the blade counts differ from decision 3's literal numbers.**
+   - As built: crown 5 + 5, Tier 2 10 + 10, T1U 12 + 11, T1L 14 + 13. Decision 3: crown 10, Tier 2 8 + 8, T1U 9 + 9,
+     T1L 11 + 11.
+   - Round 1's fix target asked for more blades instead of more width, §4.3 allows it, and the sheet's top shows 12–13
+     points.
+   - Everything else in decision 3 holds: four rings, the inner row on top, a front-aimed blade, no merge, and a
+     sub-step (as a shoulder).
+   - Recommend the main session records the new counts as an accepted change to decision 3.
+9. **Minor, unchanged, Requires Manual Validation:**
+   - A sliver of the crown's bark sleeve shows under the crown hem in the side and f34 renders.
+   - The lit lime share (4.6 % against 33 %) and the darker side, rear and r34 canopies come from the studio's
+     front-left key light. Painting them in would be colour by facing. Check them under the Studio sun.
+
+**Decisions:**
+
+| # | Decision | Status |
+| --- | --- | --- |
+| 1 | Size: 22 tall, canopy 16.4–16.8, tips 7.15–7.8 | ✓ |
+| 2 | Names `TallPine*`, keys `m049_*` | ✓ |
+| 3 | Four rings, inner row on top, front blade, no merge, sub-step | ✓ (counts raised: finding 8) |
+| 4 | 18-tri parallel-sided blades, cut-off tips, edge thickness, ridge; not pads | ✓ |
+| 5 | Tier 1 as two parts | ✓ |
+| 6 | Peg and sleeve, seats 0.015, one hero object, no floating dressing, 0 winding errors, no burial | ✓ |
+| 7 | Seven roots in the trunk shell | ✓ |
+| 8 | No branches | ✓ |
+| 9 | Dressing: faceted bush mounds, upright broad-leaf clusters, not olive | ✓ |
+| 10 | Cameras | ✓ |
+| 11 | Colour: canopy median, band order, no lime cap, bark, warm rock, sand, never by facing | ✓ (crown band +.03–.05: finding 3) |
+| 12 | Lighting and VFX skipped | ✓ |
+| 13 | Collision: hero precise | ✓ |
+| 14 | Budget: 3532 / 3600, RootFoot 918 | ✓ |
+
+**§1.5 differences from 042, 045 and 047** (`cmp_conifers.png`, true scale, f34 camera). 049 reads as its own kit
+piece:
+- the tallest (22, against 16 / 10 / 20);
+- a small crown over Tier 2 over a long double skirt;
+- long parallel boards, where 042 has lime-tipped kites, 045 paddles and 047 lobe pads;
+- a thick planked trunk, bare up to the skirt, with buttress roots;
+- faceted bush mounds and pale warm rocks.
+
+Every row passes: size, lowest tips, silhouette, canopy pieces, foliage element, crown from above, joint, trunk, f34
+bark share, ground plants and rocks.
+
+### Score and verdict
+
+**7.5 / 10.** The round-1 blockers are fixed and measured in every view: two clean waists, long parallel boards, and
+from above a pointed outline round a lime five-ridge star. The engineering is clean throughout. What remains is style:
+the hems are spikier and the parts steeper than the sheet's closed umbrellas.
+
+**PASS (round 2).** Commit with findings 1–9 noted as leftovers.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed round 2 (7.5/10) and committed. Round 1 failed (6/10) on merged tiers, shield-shaped blades and a round top.
+- **Decision 3 amended:** blade counts are now crown 5+5, T2 10+10, T1U 12+11, T1L 14+13. Round 1 asked for this, and §4.3 allows it.
+- **Left for a later polish pass:**
+  - The hems are spikier than the sheet's closed fans, and the crown reads as a tuft.
+  - The parts read as steep bells.
+  - The crown is +.055 lighter.
+  - The f34 sub-step reads as a shoulder.
+  - The T2 hem sits high.
+  - The f34 sand share is 7.1 %.
+- **Studio checks:** the crown sleeve sliver, and the lit lime share and darker back views, which come from the key light.
+- **Export:** 7 assets, 7 solid pieces, 7064 tris, 0 VFX sockets, palette 27 colours, 0 problems.
