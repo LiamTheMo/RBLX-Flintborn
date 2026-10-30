@@ -825,3 +825,308 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - Greens are not olive or yellow-brown.
     - Rocks are warm grey with R > G > B, never lavender.
 14. **Budget.** Small-prop class: hero ceiling 900 (plan 530–600), every part under 1000.
+
+## Stage 1 — Modelling (modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m059.py` (`build()`, `hero_only()`, `preview()`), background Blender on port 9881, work file
+`art/blender/assets/kit/wip/M059.blend`. Every exploded part has its own function and the hero is assembled strictly from
+them: `post` + `arm` (→ `root_base`), `blade` (B1–B6 from the `BLADES` table), `leaf` / `_gem` (N1–N3), `sprout` (S1, S2),
+`rock` (A, B, C, C2). The hero is one object of 20 separate closed shells (no booleans).
+
+- **Blades.** Each blade is a polyline from its seat on its joining face to its tip with two bends (half the first bend at
+  0.40 L and half at 0.62 L, the second at 0.82 L), fitted so it lands exactly on its tip. Five stations (0, .18, .40,
+  .62, .82 L) of a **6-vert folded-plate section** (left edge front / midrib / right edge front / right edge back / back
+  groove / left edge back) and a tip point: two broad front planes meet at a midrib raised 0.45 × the half-width (about 24°
+  each side, so one plane catches the light and one falls in shade, as close-up 2), the back follows the fold one plate
+  thickness behind (a V groove), and each edge is a narrow band of that thickness (close-up 2's "consistent thickness").
+  Plate thickness 0.12 W (0.066–0.086 studs); fold depth seen side-on 0.13–0.17 studs. The base station is a thick convex
+  sheath (0.31 W deep) whose face leans half-way toward its joining face, so it covers the arm end / post top.
+  - **Roll** (`roll` 0–1): a blend between the natural face (up and in toward the centre; reads in the top view and on
+    the diagonal blades B2, B6) and the front camera (B3 0.7 and B4 0.7 lean sideways and would be edge-on; B5 0.5, B1 0.35).
+  - Width profiles per station from the exploded's width profiles (§1.4): base 0.50–0.68, widest 1.0 at 0.40 L, 0.82 L
+    0.47–0.60 of the half-width; B6 the narrowest (W 0.55, L : W 4.2).
+- **Root base.** 8-sided post Ø 0.36 across the flats, z −0.03 … 0.36 with a 0.045 chamfer; four 6-sided arms (azimuths
+  166 / 346 / 76 / 256°, each pointing at its blade), centreline z 0.07 rising 10°, from 0.05 (0.13 buried in the post) to
+  0.34 out, flat end faces. Joining faces: post top (B1), the post's +X flat at z 0.17 (B3), the four arm ends.
+- **Base leaves** (N1–N3): 5-sided gems (flat underside, flanks, top ridge) at 0 / 0.4 / 0.75 L plus a tip, root on the
+  ground. N1 and N3 lie lower and flatter than §2.4 (tips z 0.48 / 0.45) so they fill the front's full width at h .1–.2
+  as the sheet does. N2 moved to x 0.04 (the sheet's front box −0.21 … +0.28) and W 0.50, so it hides the post foot.
+- **Sprouts**: 4-sided two-stage spears, 0.18 / 0.15 tall, 14 tris.
+- **Rocks / pebbles**: hulls of jittered ring stacks (`m033._ring_pts`), flat bases sunk 0.02, sloping tops; 38 / 38 / 22 / 22
+  tris.
+- **Placement guard**: `m047._Solids` holds the root members and rocks as they are built; every leaf and sprout is tested
+  by ray parity and moved outward if more than 0.03 inside (none needed moving).
+
+**Measured (front_sheet / sheet front):** W : H 1.203 / 1.256 (band 1.19–1.33 ✓); fill 0.589 / 0.590; G 88.0 / 90.4,
+R 9.8 / 8.3, T 2.0 / 1.3 (≤ 2.5 ✓); top profile f .1–.9 `.62 .83 .73 .83 .64 .84 .96 .66 .69` vs `.60 .56 .77 .84 .64 .85
+.95 .64 .67` (all within .08 except f .2, see notes); runs at h .70 **three** `[−.38 −.22] [−.20 −.05] [.04 .27]` vs
+`[−.32 −.19] [−.17 −.06] [.03 .25]`; at h .85 B6 `[−.18 −.14]` and B1 `[.13 .29]` (sheet `[−.18 −.14] [.13 .30]`) plus a
+one-pixel touch of B2's tip at −.39. f34_sheet W : H 1.197 (1.18–1.31 ✓). side_sheet W : H 0.997 (0.98–1.15 ✓). top_sheet
+W : D 1.045 (1.05–1.25: at the edge). rear_sheet 1.241, r34_sheet 1.213 (1.20–1.40 ✓).
+
+**Hero size 3.04 × 2.68 × 2.43** (targets 3.0 ± 0.2, 2.55 ± 0.2, 2.4 ± 0.1 ✓). Origin offset from the post (0.039, 0, −0.025).
+
+| Blade | Seat | L | W | L : W | Lean / az | Seat depth | Fold / plate | Lowest z past 0.15 L | Max share inside another blade |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| B1 | post top | 2.34 | 0.72 | 3.24 | 27° / 36° | 0.043 | 0.172 / 0.086 | 0.65 | 0.06 |
+| B2 | arm 256° | 2.25 | 0.64 | 3.52 | 35° / 234° | 0.033 | 0.154 / 0.077 | 0.46 | 0 |
+| B6 | arm 76° | 2.32 | 0.55 | 4.21 | 30° / 115° | 0.032 | 0.134 / 0.066 | 0.49 | 0 |
+| B3 | post +X flat | 1.92 | 0.66 | 2.90 | 41° / 7° | 0.046 | 0.159 / 0.079 | 0.31 | 0.06 |
+| B4 | arm 166° | 1.86 | 0.68 | 2.74 | 45° / 151° | 0.031 | 0.163 / 0.082 | 0.26 | 0 |
+| B5 | arm 346° | 1.66 | 0.62 | 2.67 | 61° / 328° | 0.032 | 0.150 / 0.074 | 0.10 | 0 |
+
+## Stage 2 — Optimisation and cleanup
+
+`_post()` per object: triangulate, recalc normals per shell, flat shading, no custom normals, origin at the bbox bottom
+centre (`o["m059_offset"]` = the origin in the build frame), `M.fix_bowties`, UVs.
+
+| Object | Tris | Size (studs) | Shells | Collision |
+| --- | --- | --- | --- | --- |
+| BroadGrassClump (hero) | **704** / 900 | 3.04 × 2.68 × 2.43 | 20 (root 5, blades 6, leaves 3, sprouts 2, rocks 2, pebbles 2) | none |
+| BroadGrassClumpBladeCenter | 58 | 1.06 × 0.81 × 2.11 | 1 | none |
+| BroadGrassClumpBladeLeftTall | 58 | 0.93 × 1.15 × 1.93 | 1 | none |
+| BroadGrassClumpBladeRightTall | 58 | 1.35 × 0.38 × 1.62 | 1 | none |
+| BroadGrassClumpBladeLeftShort | 58 | 1.25 × 0.76 × 1.46 | 1 | none |
+| BroadGrassClumpBladeRightShort | 58 | 1.28 × 0.94 × 0.96 | 1 | none |
+| BroadGrassClumpRootBase | 124 | 0.71 × 0.71 × 0.39 | 5 | none |
+| BroadGrassClumpRockLarge | 38 | 0.84 × 0.66 × 0.41 | 1 | hull |
+| BroadGrassClumpRockMedium | 38 | 0.60 × 0.54 × 0.33 | 1 | hull |
+| BroadGrassClumpRockSmall | 22 | 0.31 × 0.28 × 0.18 | 1 | none |
+
+Hero tri split: blades 348, root 124, leaves 84, rocks 76, pebbles 44, sprouts 28. Every object: 0 non-manifold edges, 0
+non-manifold (bowtie) verts, 0 boundary / wire / loose, 0 zero-area faces, 0 n-gons, 0 duplicate verts, normals outward,
+transforms applied, origin offset (0, 0, 0); **0 winding errors** and 0 self-intersections in every shell; every shell
+volume positive; smallest corner 7.4° (0 under 2°). `K.check` problems: none.
+
+**Contact / float / bury** (`contact_report`, `bury_report`, `root_clearance`, `_blade_checks`): hero floating shells 0,
+unchained 0 (blades chain through their root member; leaves, sprouts, rocks, pebbles and the root sit on the ground);
+deepest sink −0.025 (decision 10: ≤ 0.03 ✓); dressing shells more than 0.05 inside a rock or the root: 0 (max 0.0); rocks
+inside the root or each other: 0; rock / pebble clearance from the root base 0.37 / 0.39 / 0.44 / 0.56 (≥ 0.05 ✓); no
+blade vertex in a rock; every blade seated 0.031–0.046 inside its member (0.03–0.06 ✓); no blade more than 6 % of its verts
+inside another (≤ 30 % ✓); no blade vertex past 0.15 L below z 0.10 (≥ 0.05 ✓). The leaf guard moved nothing.
+
+## Stage 3 — UV
+
+`M.smart_uv(angle 45, ANGLE_BASED, margin 0.008)` + `m012._uv_unfold`: every object 0 overlaps, 0 flipped, min island gap
+0.016, border 0.008, texel density min / median / max 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.043 (blades), 1.0 elsewhere.
+Hero 199 islands. The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.** `m059.calibrate()` (`K.calibrate` on the faceted dome, 6 iterations) against the §5.4 targets gave
+light `#80AD2A` (rendered 156,210,43), mid `#507C19` (93,146,25), dark `#325F19` (56,109,25), deep `#294F18` (45,89,24),
+root `#7D5835` (157,107,66), root_light `#A67B58` (210,150,103), pebble `#7D6145` (157,118,82), rock `#888481`
+(171,161,150), rock_light `#9F999A` (201,187,180), rock_deep `#716E6B` (142,133,123). Then corrected on the hero's own
+renders (the dome is not the tuft: blades shade each other and the blades' green light bounces onto the rocks):
+
+| Key | Final hex | Why changed from the dome value |
+| --- | --- | --- |
+| `m059_grass_light` | `#80AD2A` | unchanged (front light-tone median `#A6DE2F` vs sheet `#A1D12B`) |
+| `m059_grass_mid` | `#5D8F1C` | the dome value rendered the hero's mid tone `#547F18` (sheet `#609619`); raised so the front all-green median sits within 15 |
+| `m059_grass_dark` | `#325F19` | unchanged (front dark median `#426D18` vs `#386C19`) |
+| `m059_grass_deep` | `#294F18` | unchanged (used only in the 75 % deep→dark mix at the B4 / B6 bases) |
+| `m059_root` / `_light` | `#7D5835` / `#A67B58` | unchanged |
+| `m059_pebble` | `#8E7050` | rendered `#806341` on the hero against `#A17447`–`#957858`; now `#9A7252` front, `#A07952` f34 |
+| `m059_rock` | `#99908D` | the dome value rendered yellow-green on the hero (`#A8A191`, bounce from the blades) |
+| `m059_rock_light` | `#A69D9A` | the dome's `#9F999A` had B > G (lavender rule); R > G > B now |
+| `m059_rock_deep` | `#746C68` | kept R > G > B |
+
+All rock keys R > G > B; greens: light 81°, mid 86°, dark 99°, deep 101° (no olive key).
+
+**Colour by role and position along the blade (never by facing).** Each station band takes one tone from the blade's
+ramp on the ladder deep 0 / dark 1 / mid 2 / light 3 (25 % mix steps): B1 mid → light from 0.35 L; B2 dark-mid base →
+mid → 75 % light upper; B5 mid-light → light from 0.3 L; B3 dark → 75 % mid tip; B4 deep-dark base → dark → 50 % mid tip;
+B6 deep-dark → dark → 75 % mid tip. Leaves: N1 mid → light tip, N2 light over a mid base, N3 dark base → mid. Root: root
+with root_light joining faces (post top and chamfer, arm ends, 50 % on B3's flat). **Rocks and pebbles: broad noise
+patches** (`K.noise_field`, a few facets across) of rock_light / rock / rock_deep (pebble / 50 % root), not height bands:
+the first build used §5.3's height bands and `K.check` flagged both rock parts (corr 0.92–0.93, lighting painted in), since
+on a squat block the top faces are the up-facing ones. **Tint:** per blade ±0.04 and per station band ±0.02, leaves
+±0.04, root ±0.03 per member, rocks ±0.04 / pebbles ±0.03 per facet. Finish: grass rough 0.8–0.85 low-spec, root 0.85–0.9,
+rocks 0.85–0.9, no metal, no emission. `kit_baked_shading` hero 0.04, blades 0.0–0.17, root base 0.38, rocks 0.0.
+
+**Re-measured on the final renders (same masks):**
+
+| | Sheet | Ours | Tolerance |
+| --- | --- | --- | --- |
+| front tones light / mid / dark | 25 / 32 / 43 | **22 / 36 / 42** | ± 8 ✓ |
+| f34 tones | 23 / 37 / 39 | **26 / 37 / 38** | ± 8 ✓ |
+| front top band light (h > .75) | 69 % | 60 % | ≥ 55 ✓ |
+| front low band dark (h < .25) | 48 % | 48 % | ≥ 38 ✓ |
+| front all-green median | `#58901E` | `#548219` | within 15 ✓ (G 14) |
+| front green v > .7 | `#9ACC2C` | `#A4DB2E` | within 12: G 15 high (the lit lime planes are brighter) |
+| front rock median / lit | `#ABA196` / `#C8BBB3` | `#A2968A` / `#CFC2B2` | median 9–12 darker (partly in blade shade); f34 `#A69E8D` vs `#ABA194` ✓ |
+| pebbles (f34) | `#A17447` | `#A07952` | within 15 ✓ |
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing glowing and no light (§7). No emission anywhere. Studio-side notes (Requires Manual
+Validation): the blades keep lime tips and green bodies under the game sun (not olive); the dark blades stay green, not
+black; rocks warm grey, pebbles tan. B2 leans toward the kit studio's key light and renders a dull mid there; under a sun
+from the upper right, as on the sheet, its lit plane reads lime.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (§7); no sockets (checked in `build()`'s problems). A wind sway would be a Studio-side
+script (decision 11).
+
+## Modeller's notes for the verifier
+
+- **Cameras.** `front_sheet (0, 5)` governs positions. `f34_sheet` is **(−8, 10)**, chosen by probing az −15 … +15 × e 6 /
+  10 / 14 (score = top-profile + width-profile error + W : H error against the sheet's f34): (−8, 6) scored best (0.202) but
+  is barely above the front; (−8, 10) scored 0.219 with W : H 1.195. The study's e 15 gave W : H 1.10 (our 2.68 depth shows
+  too much ground plane). `r34_sheet (172, 10)`; `front34` / `rear34` the same. All `*_sheet` shots use the 3× lens with the
+  floor hidden.
+- **Rear / r34 / side tones** read 0 % light (rear 0 / 39 / 61 vs sheet 19 / 39 / 42): the kit studio's key comes from the
+  front-left and the rear views get only the shadowless fill; painting the back faces lighter would be colour by facing.
+- **Root visibility.** T (brown) front 2.0 %, f34 2.2, rear 2.0, r34 1.7, side 3.2, of which the two tan pebbles are
+  about 1 % (the sheet's T is pebbles only: front 1.3, side 2.1). A sliver of root still shows: the post's foot between Rock
+  B and the blade bases in the side view, and the back arm's underside under B6 in the rear. To hide most of it the arms are
+  thinner (0.16 across the flats, spec 0.22), shorter (0.34 out, spec 0.50) and lower (centreline z 0.07, spec 0.10), the
+  post top is 0.36 (spec 0.40) and B3's joining face sits at z 0.17 (spec 0.28). The RootBase part shot and `root_under`
+  still show the cross + post with flat end faces.
+- **Blade shape.** The folded plate (not §2.3's shouldered section) was chosen after the first renders: the shouldered
+  convex section read as crystal shards and its facets barely changed tone under the studio light. With the fold, every
+  blade shows a lit plane and a shade plane down its length (`blade_cu`), an edge band (`blade_edge`), and thickness side-on
+  (`edge_side`). Tips close from the 0.82 L station (half-width 0.47–0.60) to a point: about 45–50° included angle, pointed
+  but not a needle.
+- **Depth (Y).** Tips pushed back / forward beyond §2.3 to reach the side's W : H and the depth target: B1 y +0.62 (spec
+  +0.55; the side shows +0.68), B2 −1.34 (−1.20), B6 +1.34 (+1.15), B4 +0.72 (+0.55), B5 −0.85 (−0.80). Hero depth 2.68
+  (2.55 ± 0.2 ✓).
+- **Front top profile f .2** reads .83 against the sheet's .56: our B2 tip (x −0.82) lands in that sampling column, the
+  sheet's just right of it. Moving B2's tip right to −0.74 merged the B2 and B6 runs at h .70 (two runs instead of three),
+  so it stays at −0.82; the tip heights and runs match.
+- **Top view.** A five-leaf star with B1 upright in the middle; N3 (behind Rock B) shows as a separate dark gem at the back
+  right and Rock A sits front-left (the front governs rock placement, §3.4), so the sheet's "rocks at four corners" holds
+  only for the front pebbles and Rock B.
+- **Exploded shot** is a temp build (`EXPLODE["on"]`): blades drawn 0.9 off their joining faces along their axes, leaves
+  lifted over the rocks, rocks and pebbles drawn out. Close-ups: `blade_cu` (−30, 20), `blade_edge` (B1 part edge-on),
+  `edge_side` (90, 0), `root_under` (−20, −55, part), `root_cu` (−15, 15); `scale` (−20, 6) with a 5.5-stud marker (top at
+  0.44 of it).
+- **Blade parts** are built exactly as they sit in the hero (same lean, roll and colour); their origins are their own bbox
+  bottom centres (offsets in `o["m059_offset"]`).
+- Scratch: measuring scripts `meas.py`, `tonemap.py`, `pscore.py` and `final_meas.txt` in
+  `C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m059w\`
+  (run with `uv run --no-project --with pillow --with numpy python meas.py front_sheet sheet:front …`).
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only, background Blender on port 9881 on `wip/M059_verify.blend` (not saved). Renders in
+`art/blender/renders/models/M059/verify/`: the `*_sheet` shots use the long lens with the floor hidden, plus the four
+diagonals `az045/135/225/315_sheet`, `sideL_sheet`, `*_keyflip_sheet` and close-ups. Side-by-side montages:
+`cmp_0..2.png`, `cmp_az8.png`, `cmp_cu.png`, `cmp_rear_keyflip.png`. My scripts are in the session scratchpad `m059v\`:
+`a1.py` topology, `a2.py` shells / contact / ray-parity bury, `vis.py` 8-azimuth ray grid, `a3.py` / `a4.py` check, UV
+and facing correlation, `meas.py` (the modeller's masks pointed at `verify/`).
+
+**Verdict: PASS, 8 / 10.** No blockers. The front and f34 read like the sheet; the geometry is clean; nothing floats or
+is buried; colour is by blade role and position, never by facing. The leftovers are below.
+
+### Technical (re-measured)
+
+| Check | Result |
+| --- | --- |
+| Tris | hero **704 / 900**; blades 58 each, RootBase 124, RockLarge / RockMedium 38, RockSmall 22 |
+| Size | hero 3.038 × 2.680 × 2.425 (targets 3.0 ± 0.2, 2.55 ± 0.2, 2.4 ± 0.1 ✓); parts as in stage 2 |
+| Origin / transforms | every object's bbox bottom centre at its origin (offset 0, 0, 0); rotation 0, scale 1; no modifiers; hero offset from the post (0.039, 0, −0.025) |
+| Topology (all 10 objects) | 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose, 0 zero-area, 0 n-gons or quads, 0 duplicate verts, no custom normals, all flat |
+| Shells (hero 20) | root 5, rocks 2, pebbles 2, blades 6, leaves 3, sprouts 2; **0 winding errors and 0 self-intersecting face pairs in every shell**; every volume positive |
+| Floating | 0 (nearest gap of any non-ground shell 0.0); unchained 0. Blades touch their member: B1 post, B2 arm 256°, B6 arm 76°, B3 post (+ arm 346°), B4 arm 166°, B5 arm 346° |
+| Buried | 0 leaves, sprouts, pebbles or rocks inside a rock or the root (all 0.000, ray parity, 3 rays); no blade in a rock; max blade share inside another blade 0.06. Deepest blade vertex in the root: B3 **0.080**, B1 0.062 (others 0.013–0.024); spec ≤ 0.06 at the base face; invisible |
+| Sink | lowest point −0.025 (≤ 0.03 ✓); rocks / pebbles / leaves / sprouts −0.020; B3–B5 base rings −0.009 / −0.017 |
+| Clearances | rocks and pebbles ≥ 0.067 from every other shell (root ≥ 0.05 ✓) |
+| UV | 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0, stretch p95 ≤ 1.043 |
+| `K.check` | no problems (KITSTAT ok on all ten) |
+| Collision tags | hero, blades, RootBase, RockSmall `none`; RockLarge / RockMedium `hull` (decision 8 ✓) |
+
+**Blade shape (measured from the rings):** L / W max / L : W are B1 2.34 / 0.72 / 3.25, B2 2.25 / 0.64 / 3.52, B6
+2.32 / 0.55 / **4.21**, B3 1.92 / 0.66 / 2.90, B4 1.86 / 0.68 / 2.74, B5 1.66 / 0.62 / 2.67 (exploded 3.2 / 3.3 / 3.7 /
+2.8 / 2.3 / 2.5). Plate 0.066–0.086, section depth at mid 0.17–0.22, so each blade has real thickness side-on
+(`blade_edge.png` shows a solid sliver, not a card). Tip included angle 43–52° (spec 25–35°): pointed, not needles, a
+little blunter than the sheet.
+
+### Eight azimuths (`vis.py`, ray grid on the hero)
+
+| View | Blade px within 12° / 20° of edge-on | Root share of visible px | Narrowest blade (projected / true width) |
+| --- | --- | --- | --- |
+| front (0, 5) | 0.6 / 3.6 % | 0.4 % | B5 0.67 |
+| az45 | 2.7 / 14.4 | 2.8 | B2 0.24, B1 0.33 |
+| side 90 | 5.1 / 9.9 | 1.5 | B6 0.42 |
+| az135 | 3.9 / 7.9 | 2.3 | B6 0.39 |
+| rear (180, 5) | 0.6 / 1.7 | 1.8 | B5 0.54 |
+| az225 | 1.8 / 6.3 | 3.0 | B1 0.14 (mostly hidden) |
+| side 270 | 6.2 / 17.2 | 1.9 | B6 0.42 |
+| az315 | 1.9 / 4.7 | 0.9 | B6 0.39 |
+| top | 2.9 / 10.8 | 1.2 | all ≥ 0.81 |
+
+Edge-on blade area is at most 6.2 % in every view (target ≤ 10 ✓). From every azimuth the blades read as broad, thick,
+ridged lanceolates of different lengths and leans. There are no hedgehog or agave fans, needles or flat cards.
+
+### Views against the sheet (same masks; sheet / ours)
+
+| View | W : H | G / R / T | Tones light / mid / dark | Notes |
+| --- | --- | --- | --- | --- |
+| front (0, 5) | 1.256 / **1.203** ✓ | 90.4 / 88.0, 8.3 / 9.8, 1.3 / 2.0 ✓ | 25/32/43 / **22/36/42** ✓; top band light 69 / 60 ✓; low band dark 48 / 48 ✓ | three runs at h .70 ✓ (−.38…−.22, −.20…−.05, +.04…+.27); top profile within .08 except f .0 (.27 / .16) and **f .2 (.83 / .56)** |
+| f34 (−8, 10) | 1.245 / **1.197** ✓ | 92.6 / 88.6 (edge of ±4), 6.8 / 9.3 ✓ | 23/37/39 / **26/37/38** ✓ | at the study's (0, 15): W : H 1.10 (out of band) |
+| rear (180, 5) | 1.381 / 1.241 ✓ | 91.1 / 91.5 ✓ | 19/39/42 / **0/37/62** ✗ | |
+| r34 (172, 10) | 1.247 / 1.213 ✓ | 92.2 / 92.9 ✓ | 15/52/33 / **0/38/62** ✗ | |
+| side (90, 5) | 1.06 / **0.997** ✓ | T 2.1 / **3.2** | 10/50/40 / 0/49/51 | top profile f .4 **.33 / .83** (a notch where the sheet has its narrow mid blade), f 1.0 **.88 / .62** |
+| top (0, 89) | 1.137 / **1.045** (band 1.05–1.25, 0.005 under) | | 14/58/27 / 24/42/34 | a rough, irregular five-leaf star |
+
+**Colours** (rendered medians):
+- **Greens.** Front green `#558420` vs `#58901E` (G 12 ✓ ≤ 15). Front v > .7 `#A4DB2F` vs `#9ACC2C` (**G +15**,
+  tolerance 12). Light `#A6DE2F` vs `#A1D12B` (G +13). Mid `#5B8A1E` (86°, s .78) vs `#609619`. Dark `#446D1A` (**90°**,
+  s .76) vs `#386C19` (98°): a little yellower than the sheet's dark, but still a saturated green, not olive.
+- **Rocks.** Front `#A2978A` / f34 `#A89E8F` vs `#ABA194` (f34 ✓, front 9–14 darker); rock lit `#CABDAE` vs `#C9BDB4` ✓.
+  Every rock key is R > G > B (`#99908D`, `#A69D9A`, `#746C68`, mixes `#A09694` / `#867E7A`): **never lavender**.
+- **Pebbles.** Front `#9B7252` / f34 `#A07952` vs `#957858` / `#9D7045` ✓.
+- **Keys.** Light `#80AD2A` 81°, mid `#5D8F1C` 86°, dark `#325F19` 99°, deep mixes 100°.
+
+**Facing check (code and numbers).** The builder paints by position and role only; nothing reads a normal:
+- blades per station band by `BLADES[...]["tone"]` (role and fraction of L);
+- leaves per band;
+- root by member (joining faces lighter);
+- rocks and pebbles by `K.noise_field` of the face centre (position).
+
+Correlation of painted luminance with normal z: hero grass 0.08; blade parts 0.10–0.31 (their luminance follows height
+along the blade, 0.74–0.96, by design). Hero rocks −0.30, and −0.51 with the key light (RockMedium −0.70): the noise
+patches happen to put the darker keys on the key-lit faces. That is chance, not facing paint, though it slightly flattens
+Rock B's shading.
+
+### The modeller's deviations and leftovers
+
+| Item | Verdict | Visible against the sheet? |
+| --- | --- | --- |
+| Folded-plate section instead of §2.3's shouldered one | **Accept.** Each blade shows a lit plane and a shade plane meeting at a midrib, an edge band and real thickness (section depth 0.17–0.22): close-up 2's read | Numeric only (closer to the sheet than the spec) |
+| Root base only mostly hidden (decision 4: never visible) | **Minor.** T (brown) is front 2.0, f34 2.2, rear 2.0, side 3.2 %. The root alone is 0.4 % of the front and 1.5–3.0 % of the side, diagonal and rear views. A brown post stub shows between the blade bases in side, az45, az135 (`az135_sheet`, `root_cu135`) and rear. The sheet's close-up 3 does show the post top, so this fits the sheet but not decision 4 | Visible in the non-governing views; not in front / f34 |
+| Root arms shortened (0.34 out, 0.16 across) to hide them | **Minor.** The `BroadGrassClumpRootBase` part reads as a stump with stubby arms; the exploded / key-parts cell shows a cross whose arms reach well past the post. It is an exported reuse part | Visible on the part |
+| Tip positions moved for depth (B1 +0.62, B2 −1.34, B6 +1.34, B4 +0.72, B5 −0.85) | **Accept with a note.** Front X / Z are unchanged; depth 2.68 ✓. On the side, B6's tip makes the far-back peak h .88 where the sheet's back blade is h .62. The sheet's mid blade at h .83 has no partner here (notch .33 at f .4) | Visible on the side only |
+| N1 / N3 lower, N2 moved | **Minor.** N2 reads like the sheet's lime pyramid. In the front, N1 shows only as a thin lime sliver behind Rock A, and N3 hides behind Rock B; the sheet's front and f34 show three chunky gems at the foot. N3 is dark (dark → mid ramp) and shows as a separate dark lump in the side, az45, top and r34 | Visible at the foot |
+| f34 camera (−8, 10) | **Accept.** It is inside the spec's probe range (az ±20, e 10–20, at the low edge); W : H 1.197 ✓. The sheet's f34 shows more ground and more of the rock tops | Camera choice; slight |
+| Rear / r34 / side at 0 % light "because of the studio key light" | **Minor; the light is only part of the cause.** The key does come from the front-left (direction −0.49, −0.59, 0.64). But with the key turned 180° (`rear_keyflip_sheet`) the rear still reads 2 / 41 / 57 (r34 3 / 43 / 55). From behind, the dark blades B6 (19.6 % of the rear's pixels), B4 (18.4) and B3 (17.0) stand in front with B1 behind them; the sheet's rear has lime B1 in front and dominant. So the rear is darker because of the composition and the blade roles, not just the light | **Visible:** rear and r34 read darker than the sheet (dark 62 vs 42 %) |
+| B2 dull mid green | **Accept.** B2's body renders `#567D19` (83°, s .80), a mid green, not olive; the sheet's B2 has a lime face | Slight |
+| Top view: N3 a separate dark gem | **Minor** (as above). Top W : D is 1.045, 0.005 under its band | Visible on the top |
+| Front top profile at f .2 (.83 vs .56) | **Accept.** B2's tip lands in that column; the tip heights and the three runs at h .70 match | Numeric only |
+| Softer blade facet contrast | **Accept.** The value spread per height band matches (h .5–.75 v p10/50/90 .40/.52/.86 vs .43/.63/.87). The lit and shade planes inside one blade are less crisp than close-up 2's lime and mid faces | Slight |
+| Lit greens G +15 | **Accept.** The v > .7 median is G +15 (tolerance 12) and the light median G +13: a slightly brighter lime | Numeric only |
+
+### Minors to fix if a round 2 is run (none blocks)
+
+1. **Rear tone (the most visible leftover).** Make the rear read like the sheet's, with lime B1 in front. Either give B6
+   a mid tip and a narrower face toward the rear, or turn B1 / B6 so that from 180° B1 is not behind B6 and B3. Target
+   under the kit studio: rear light ≥ 11 %, dark ≤ 50 %.
+2. **Root stub.** 1.5–3 % brown shows in the side, diagonal and rear views (decision 4 says never). Bring B3's sheath or
+   a base leaf over the post's back flank, or lower the post top behind B1.
+3. **RootBase part.** Its arms are stubby against the exploded cross (0.34 out vs about 0.5).
+4. **N1 / N3.** Make them visible chunky gems at the foot in the front and f34, and colour N3 mid green rather than dark.
+5. **Numeric:**
+   - B6 L : W 4.21 (exploded 3.7);
+   - B3's deepest point 0.08 inside the post (≤ 0.06);
+   - dark-tone hue 90° (≥ 95);
+   - top W : D 1.045 (≥ 1.05).
+
+### Main session ruling (2026-10-30)
+Round 1 PASSED at 8/10, so the model is committed.
+- **Deviations accepted:** the folded-plate blade section, the moved tips, and the f34 camera at (−8, 10).
+- **Decision 4 amended:** a small root-post stub may show at the side, diagonal and rear (0.4 % front, 1.5–3 % elsewhere). The sheet's root close-up shows the post too.
+- **Recorded for polish:** verifier minors 1–5, chiefly bringing lime B1 forward in the rear view, longer RootBase part arms, and chunkier N1/N3.
+
+Export: 10 assets, 1216 tris, 0 problems.
