@@ -930,3 +930,554 @@ All 12 recommendations are accepted.
 12. **Cameras:** the f34 at (−46, 14) governs. The rear three-quarter is judged on content only.
 
 **Colour:** M050's timber family, set by role and position, **never facing**, and never red. The legs are not painted darker than the posts. **Packaging:** every piece is its own closed shell, with **no floating pieces** and **0 winding errors**. Check winding carefully on the sawtooth stair stringers and the notched planks. **Binding targets:** the f34 shares in §1, within ±4, and the deck must be walkable.
+
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m052.py` (`build()`), run in a background session (port 9877, `wip/M052.blend`); the
+final numbers below come from a freshly restarted session. Geometry helpers imported from `m048.py`: `_solid`,
+`_brace_quad`, `_tube`, `_knob`, `_tri_ngons`, `winding_report` (no M048 constants; nothing from `m050` / `m051`).
+New helpers in `m052.py`:
+- `_ext`: a prism of a 2D region from explicit cap polygons and a directed boundary;
+- `_cells`: a vertical prism over kept grid cells, every cap a quad and every boundary edge one side quad (planks,
+  boxes, blocks);
+- `_earclip` + `_slab`: best-ear clipping for the stringers' sawtooth and the braces;
+- `_bolt`: m048's bolt with this sheet's larger hex head;
+- `_post_solid`: post rings, cap chamfer, inset peg dot;
+- `_resample`: rope path subdivision.
+
+**Built as decided** (decisions 1–12), every piece its own closed shell, no booleans:
+- **Posts:**
+  - 6 full-height rail posts (far row x ±4.706 / ±14.118 at y +4, near corners at y −4), 1.5 square, z 0 → 9.0, with a
+    0.10 cap chamfer and a 0.44 brass peg dot inset 0.03 in the cap;
+  - 2 support posts at (±4.706, −4), up to 4.77 (0.02 into the planks);
+  - 12 bolt blocks (every post's outer long face, plus the 4 corner posts' end faces), 0.5 proud, z 3.52 → 4.72, sunk
+    0.02, each with a brass hex bolt head at z 4.12 (sunk 0.03).
+- **Framing:**
+  - side beams |y| 2.37 → 3.27 (0.02 into the posts' inner faces), x ±15.98, z 3.45 → 4.77 (0.02 into the planks);
+  - crossbeams on the 4 post rows, 0.9 wide, ends 0.02 into the side beams;
+  - end headers x ±15.08 → ±15.98.
+- **Deck:**
+  - 17 planks across the width, pitch 1.8824, seams on the post rows, y ±4.75, z 4.75 → 5.60 (top jitter ±0.015, no
+    yaw);
+  - planks 0, 1, 15 and 16 notched at both ends, planks 5, 6, 10 and 11 at the +Y end only;
+  - each notch an open L, 0.02 clear of the post faces, built as grid cells (no non-convex cap, no fan).
+- **Rails:**
+  - back rail (3 planks, y 3.70 → 4.30) and end rail (x 13.818 → 14.418, y ±3.27), z 6.85 → 7.75, end faces 0.02 into
+    the post faces (close-up C);
+  - 4 stubs 0.35 proud (far-left −X, far-right +X and +Y, near-right −Y).
+- **Braces (symmetric set):**
+  - 4 end V braces, from the leg's inner face at z 1.70 to the end crossbeam's underside at |y| 1.15;
+  - 4 end-leg knee braces inward (x ±13.368 → ±11.27);
+  - 4 middle-leg knee braces toward the centre (x ±3.956 → ±1.856);
+  - 2 X braces under the middle rows: 2 boards each (0.6 × 0.35), z 0.45 → 3.30, overlapping 0.02 at the crossing, a hex
+    bolt at each crossing (z 1.875) on the board facing the nearer deck end.
+- **Stairs (−X end):**
+  - 4 treads, each two 0.70 boards with a 0.06 gap, 8.0 wide, tops 4.48 / 3.36 / 2.24 / 1.12;
+  - T1's back face at x −15.96 (0.02 into the header and the side-beam ends); the lower treads stop 0.01 clear of the
+    risers;
+  - 2 cut stringers (|y| 2.60 → 3.10), each an 11-vertex sawtooth (x, z) profile, ear-clipped:
+    - seats 0.02 into the tread bottoms (3.75 / 2.63 / 1.51 / 0.39);
+    - foot at x −21.80 on z 0;
+    - the sloped bottom 0.60 under the notch corners;
+    - the back face 0.02 into the side-beam ends (z 2.99 → 3.75, overlapping the beam's 3.45 → 4.77).
+- **Rope tie:**
+  - a twisted ring round the near-right post (14.118, −4) at z 6.45: a rounded square, corner bend radius 0.24, flats
+    0.015 into the shaft;
+  - a tail from inside the ring curving down onto the planks toward −X (x 13.22 → 10.27), lying with a ring vertex at
+    most 0.035 into the planks;
+  - a knob at its end (r 0.24, sunk 0.03).
+
+**Deviations from the plan.** All are deliberate and come from comparing the renders with the sheet:
+1. **Plank gaps 0.14** instead of 0.10, so the planks are 1.742 wide (the end planks still reach ±16.0). This is the
+   spec's upper limit; it makes the deck read as separate planks, not one slab (M050 finding 2).
+2. **A mid-length value step on 12 of 17 planks.** Each plank's cap is split at y 0 and one half is 15 % toward
+   `wood_deep`; the side is chosen by plank index and seed. This shows the f34's "planks broken at mid-width" as value,
+   not geometry (§3.6). It costs about +170 tris.
+3. **Treads 0.75 thick** instead of 0.55 (open riser 0.37). The f34 and close-up A draw chunky, blocky treads; at 0.55
+   they read as thin slats.
+4. **Bolt heads Ø 0.72** instead of 0.55: 6-sided, 0.24 proud plus a 0.08 dome, from my own `_bolt`. The sheet's heads
+   are about 0.45 of the post width (f34, close-up A). The bbox width becomes 11.14 (target updated).
+5. **Peg dot 0.44** instead of 0.30, so the top cell's dots read clearly.
+6. **Rope Ø 0.40, 6 sides, rings at most 0.36 apart, `twist=True`, pinch 0.10, smooth-shaded**, instead of Ø 0.30 × 5
+   × 8.
+   - The f34's rope is about a quarter of the post's width.
+   - The denser rings make the twist and the groove strands spiral visibly.
+   - Smooth shading answers the M048 / M050 "faceted collar / plates" findings.
+   - The rope is 476 tris.
+7. **Blocks 3.52 → 4.72** instead of 3.50 → 4.75, so there is no coplanar contact with the plank undersides.
+8. **Stair foot at x −21.80** instead of −21.84: 4 × 1.46 from T1's back face at −15.96.
+9. **The RailPost part** is a rail post at (−4.706, −4), so its one block faces the parts camera, like the key's post.
+
+**Stage 1 acceptance (§4.2):**
+- **Overall read:** a long, level plank walkway on square posts; the chunky rail along the back and across +X; the −Y
+  side open; four treads stepping down from −X; a block with a hex bolt at every post; braces underneath. ✓
+  (`f34_sheet`, `r34_sheet`, `front_sheet`, `side_sheet`, `rear_sheet`, `top_sheet`)
+- **Levels** (hero mesh + offset):
+
+  | Item | Measured |
+  | --- | --- |
+  | Plank tops (17 planks) | 5.586 – 5.615 |
+  | Post tops / support posts | 9.00 / 4.77 |
+  | Beam band | 3.45 → 4.77 |
+  | Rail | 6.85 → 7.75 |
+  | Bolts | 4.12 |
+  | Tread tops | 4.48 / 3.36 / 2.24 / 1.12 |
+  | Stair foot | x −21.80 |
+  | X-brace crossings | z 1.875 |
+- **Views:**
+  - `front_sheet` matches the front cell element for element: 4 post peaks, the rail through all four, the plank band, 4
+    blocks with bolts, and the stairs stepping down at the left.
+  - `side_sheet` matches the side cell: two posts, the end rail with a stub on each outer face, the deck end, blocks and
+    bolts on both end faces, and the V braces. The X braces show through the open legs.
+  - `top_sheet` shows 17 planks, 6 capped posts with pale dots, the rail strips, and the stairs at the left.
+- **Close-ups:**
+  - `stair_cu` against close-up A: two-board treads, open risers, stringers, the corner post's block and hex bolt;
+  - `under_cu` against close-up B: plank bottoms on the beams and crossbeams, knee braces;
+  - `xbrace_cu`: the X with its bolt;
+  - `rail_cu` against close-up C: the back and end rails butting the far-right post's faces, and the stubs;
+  - `bolt_cu` and `rope_cu`.
+- **Scale** (`scale.png`): 5.5-stud stand-ins on the deck by the open edge and by the rail, on tread T2, and on the
+  ground at the stair foot. The deck is just over a character's height; the rail is at thigh height and the posts at hip
+  height above the deck.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold edges / verts | Boundary / wire / loose | Zero-area / n-gons | Winding errors | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `TimberBoardwalk` | **2484 / 4000** | 37.80 × 11.14 × 9.00 | 96 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | **0** (0 unpaired) | 5.1° |
+| `TimberBoardwalkRailPost` | 102 | 1.50 × 2.32 × 9.00 | 3 | 0 / 0 | 0 | 0 | 0 | 30° |
+| `TimberBoardwalkSupportPost` | 62 | 1.50 × 2.32 × 4.77 | 3 | 0 / 0 | 0 | 0 | 0 | 30° |
+| `TimberBoardwalkRailPlank` | 12 | 7.95 × 0.60 × 0.90 | 1 | 0 | 0 | 0 | 0 | 90° |
+| `TimberBoardwalkFloorPlank` | 12 | 1.74 × 9.50 × 0.85 | 1 | 0 | 0 | 0 | 0 | 90° |
+| `TimberBoardwalkStairs` | 176 | 5.84 × 8.00 × 4.48 | 10 | 0 | 0 | 0 | 0 | 10.6° |
+| `TimberBoardwalkCrossbeam` | 12 | 0.90 × 4.78 × 1.32 | 1 | 0 | 0 | 0 | 0 | 90° |
+| `TimberBoardwalkBrace` | 24 | 3.52 × 1.50 × 2.40 | 2 | 0 | 0 | 0 | 0 | 14.6° |
+
+- **Hero shells (96):**
+  - 6 posts, 68 tris each (wood plus the brass dot);
+  - 73 wood: 2 support posts, 12 blocks, 2 side beams, 4 crossbeams, 2 headers, 17 planks, 4 rail planks, 4 stubs, 16
+    brace boards, 8 tread boards, 2 stringers;
+  - 14 bolts, 22 tris each;
+  - 3 rope pieces (wrap, tail, knob), 476 tris in all.
+
+  Every shell is closed with positive volume, 0 self-hits and 0 inverted faces (m040 parity). No shell mixes materials;
+  the posts' wood plus brass dot is the allowed "post" kind.
+- **Bowties:** `nonmanifold_verts` is 0 everywhere (`M.fix_bowties` moved nothing). Duplicate verts 0. Transforms are
+  applied and the origin is at the bbox bottom centre.
+- **Hero offset (−2.90, 0, 0):** object coordinates + offset = build frame, so the deck centre sits at **x +2.90** in
+  the object frame. The docstring and NOTES record this.
+- **Winding:** `winding_report` (directed edges used twice, or unpaired) is 0 on every object, including the stringers'
+  ear-clipped sawtooth caps and the notched planks' grid caps.
+- **Contact (no floating dressing):** the hero's 96 shells have **0 floating and 0 unchained** (the largest gap from any
+  shell is 0.00). The multi-shell parts (RailPost, SupportPost, Stairs, Brace) are also 0 / 0.
+- **Buried shells** (ray parity plus nearest distance, more than 0.05 inside another shell): none is fully buried. Only
+  rope verts go deeper than their stated sink:
+  - the tail's first ring, inside the wrap by design (2 of 84 verts);
+  - 2 of 144 wrap verts, 0.086 into the post at a corner;
+  - 1 of 14 knob verts, 0.066 deep.
+
+  Everything else stays at its stated sink: bolts 0.03; blocks, rails, beams, braces and treads 0.02.
+- **Walkability** (downward rays at 10 742 deck samples clear of the posts, from x −15.95 to the end rail):
+  - deck top 5.586 – 5.615, **largest step between neighbouring samples 0.00**, 0 obstacles above the deck (the rope
+    tail by the near-right post is excluded);
+  - **stairs: tread tops 4.48 / 3.36 / 2.24 / 1.12, five risers of 1.12** (deck to T1, through to T4 to the ground),
+    run 1.46, 8.0 wide, a 37.5° flight;
+  - clear width 8.45 from the open edge to the rail, 6.5 between the corner posts.
+
+  Whether a default character climbs 1.12 risers without jumping is a Studio check (Requires Manual Validation,
+  decision 4).
+- The `checks()` problems list is **empty**.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle-based, angle 45, margin 0.008) plus `m012._uv_unfold` on every object.
+- **Hero:** 808 islands, **0 overlapping pairs, 0 flipped**, min gap 0.016, border 0.008, density spread 1.0, conformal
+  stretch p95 1.00.
+- **Parts:** 0 overlaps, 0 flipped, p95 ≤ 1.03.
+
+The exporter writes its own palette UVs; this layer is clean.
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration** (`m052.calibrate()`, `K.calibrate` dome, targets from §5.4):
+
+| Key | Target | Dome-calibrated hex (rendered) | Final hex in `PALETTE` |
+| --- | --- | --- | --- |
+| `m052_wood` | `#DE8336` | `#B17035` (222, 131, 54) | `#B26C2B` |
+| `m052_wood_light` | `#F2963F` | `#BF7E39` (241, 149, 59) | `#D88A40` |
+| `m052_wood_deep` | `#9A4A16` | `#7E4315` (153, 74, 22) | `#7E4315` |
+| `m052_wood_dark` | `#65321A` | `#532B15` (97, 46, 21) | `#5C3018` |
+| `m052_rope` | `#DA8231` | `#AD6F31` (217, 129, 49) | `#AD6F31` |
+| `m052_brass` | `#F6C886` | `#EEC994` (246, 200, 137) | `#F2CC86` (metal 0.4, rough 0.35) |
+
+I started from M050's family (wood `#BB722E`, light `#C57A35`, deep `#80410F`, dark `#65361A`), then set the final hexes
+from the hero renders (`region_report()`):
+- `wood` is a step darker than M050's, so the f34 plank tops land within 5;
+- `wood_light` is raised so the caps read lighter than the planks;
+- `wood_deep` is the dome value (the f34 and front post faces land within 2–5);
+- `wood_dark` sits between the dome value and M050's;
+- brass is a touch yellower, so the heads class as gold (h 36–40).
+
+**Colour by role and position only, never facing.** No paint selection reads a normal; the `normal`s in the builder are
+geometry (bolt axis, block face).
+- **Planks:** `wood`.
+  - A broad lighter field along the deck: noise on x, 35 % toward `wood_light`, strong enough to see (M050 finding 6).
+  - Planks 3, 9 and 14 are 15 % toward `wood_deep`.
+  - The mid-length value step: one half of 12 planks 15 % deeper (30 % on the planks that are already deep).
+  - Tint ±0.04 per plank, plus `K.texture` 0.02 (scale 0.3, no per-face jitter).
+- **Treads:** `wood`; Tint ±0.03 per board, plus texture 0.02.
+- **Posts:** `wood_deep`, varied by face-centre height.
+  - The legs are **lighter**: 20 % toward `wood` below 2.85 and 10 % up to the beam bottom. The sheet's legs are the post
+    faces' colour or lighter (§3.10), and the studio's under-deck shade darkens them. This is the opposite of M048's
+    dark legs.
+  - From the rail top up the cap, then on the chamfer and top: 20 / 45 / 75 % toward `wood_light`.
+  - The peg dot is brass.
+  - Tint ±0.03, plus texture 0.03.
+- **Framing** (Tint ±0.03 per member, plus texture 0.03):
+  - blocks `wood_deep` + 40 % `wood`;
+  - rails and stubs `wood_deep` + 50 % `wood`;
+  - beams, crossbeams, headers and stringers `wood_deep` + 35 % `wood_dark`;
+  - braces `wood_deep` + 60 % `wood_dark`.
+- **Rope:** `rope`, with two of the six strands (0 and 3, chosen by their place in the twist) 70 % toward `wood_deep`.
+  Two dark grooves spiral round an orange-amber rope. Tint ±0.02. No gold.
+- **Brass:** bolt heads and peg dots, no Tint.
+- **Finish:**
+  - wood roughness 0.85 (dark 0.9), metal 0, low specular;
+  - rope roughness 0.95, low specular;
+  - brass metal 0.4, roughness 0.35;
+  - no emission anywhere.
+- **Shading check:** `K.check` reports 0 problems. Baked-shading correlation: hero 0.02, RailPost 0.32 (the cap bands
+  sit on the top faces), the rest 0.0.
+
+**Re-measured on the final renders** (480 × 400, floor hidden, the study's masks; sheet in brackets):
+
+| View | W : H | W % | K % | Y % | W median | K median | Y median | Top err mean / max |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **f34 (−46, 14), governing** | **1.972** (1.958) | **61.7** (52.7) | **37.5** (45.2) | **0.8** (2.1) | `#CD772F` (`#D77F32`) | `#884114` (`#7B3A14`) | `#EEC074` (`#FAC77C`) | 0.040 / 0.36 |
+| f34 probe (−46, 12) | 2.104 | 59.2 | 40.0 | 0.8 | | | | |
+| f34 probe (−40, 10) | 2.474 | 54.6 | 44.6 | 0.8 | | | | |
+| f34 probes (−52, 12) / (−46, 17) | 1.905 / 1.819 | 61.2 / 66.0 | 38.0 / 33.3 | 0.7 | | | | |
+| r34 (134, 15) | 1.981 (1.982) | 32.0 (52.8) | 66.8 (45.5) | 1.2 (1.8) | `#CB7732` | `#7C3D14` | `#CEA969` | 0.10 |
+| front (0, 0) | 4.178 (3.288, §3.1) | 40.5 (40.9) | 58.4 (57.4) | 1.0 (1.7) | `#B96724` (`#B05C20`) | `#7E4012` (`#7C3D17`) | `#E7BA6F` | 0.09 |
+| side (90, 0) | 1.230 (1.588, §3.1) | 1.3 (31.2) | 96.8 (67.5) | 1.9 (1.2) | `#B37232` | `#703913` (`#7A3B19`) | | 0.06 |
+| rear (180, 0) | 4.22 (2.862) | 21.1 (37.7) | 77.9 (60.7) | 1.0 (1.5) | `#B46624` | `#814217` (`#713918`) | | 0.14 |
+| top (0, 89.9), L : W | 3.349 (1.992) | 90.8 (70.3) | 8.4 (28.9) | 0.8 (0.8) | `#E1802D` (`#D77D35`) | | | |
+
+**Region samples** (`region_report()`, 5 × 5 px medians at projected build-frame points):
+
+| Region | Ours | Sheet | Max channel diff |
+| --- | --- | --- | --- |
+| f34 plank tops (21 points) | `#E08135` (27°, .76, .88) | `#DB8133` | 5 |
+| f34 cap tops | `#FE9E51` | `#F59B48` | 9 (lighter than the planks ✓) |
+| f34 post faces | `#9D501A` | `#9C4B16` | 5 |
+| f34 legs (support posts, lit) | `#974C1C` | `#AE581E` | 23 |
+| f34 tread tops | `#E08133` | `#E88F40` | 14 |
+| front plank ends | `#C66E25` | `#C36726` | 7 |
+| front post faces | `#9D4F19` | `#9D4D19` | 2 |
+| front legs | `#964C1C` (v .59) | `#A2511B` | 12 |
+| front rail | `#A8581B` | `#B25D20` | 10 |
+| front blocks | `#A1541F` | `#AF5D1D` | 14 |
+| front beam | `#6E3310` | `#7D3D18` | 14 |
+| front braces | `#713615` | `#602F14` | 16 |
+| side post faces / legs | `#793D12` / `#723A14` | `#984D1C` / `#9A4E1E` | 31 / 40 (the +X faces are the studio's shade side) |
+| top plank tops / caps | `#E3802C` / `#FE953E` | `#D87E37` / `#CA702A` | 10 / 51 (the top cell draws its caps darker than its planks, the f34 lighter; the f34 governs) |
+
+- **Wood:** hue 22–28° everywhere, one orange family, **not red**. The f34 plank-top R − G is 95 (`#E08135`), at the
+  limit.
+- **Value order** in front_sheet: plank ends (.78) > rail (.66) > blocks (.63) ≥ posts (.62) ≈ legs (.59) > braces
+  (.44) ≈ beams (.43).
+- **Legs / posts value:** 0.95 in front_sheet, 0.94 in side_sheet (`#723A14` / `#793D12`), 0.96 in the f34 (sheet front
+  1.03). There is no painted darkening; the legs are lifted to offset the under-deck shade.
+- **Rope:** renders orange-amber like the planks, with dark groove spirals. It adds about 0 Y (its pixels class W or K).
+- **Brass:** pale gold (Y median `#EEC074`, h 36–40), not cream and not grey.
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no emissive part, glow or light, so there are no emissive faces and no lights. To check in Studio
+(Requires Manual Validation):
+- **Colour:** the planks read warm orange (not red, not brown), the posts a step deeper, the legs the posts' colour, the
+  braces and beams darker, and the caps lighter. The bolts read pale gold and the rope orange with dark twist lines.
+- **Walking:** a default character walks from the ground up the four treads (risers 1.12) onto the deck **without
+  jumping**, along the deck, and off across the open −Y side onto a 5.6 surface. The back rail and the end rail stop it.
+  If the character can't climb the treads, add a Studio-side invisible ramp wedge over the stairs, or fall back to the
+  decision-4 alternatives.
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect, water or foam. The hero has no sockets, and `checks()` flags any. Collision:
+- hero `precise`;
+- RailPost, SupportPost, Stairs and Brace `hull`;
+- RailPlank, FloorPlank and Crossbeam `box`.
+
+**Export notes** (the seam contract; repeat these in the export):
+- The origin is the bbox bottom centre, so the deck centre sits at object x +2.90 (offset −2.90, 0, 0).
+- Feet and the stair foot are at z 0; the deck top is 5.6 ± 0.015.
+- The open side is at y −4.75.
+- The deck ends are at object x −13.10 (stairs end, build −16) and +18.90 (railed end, build +16); the stairs run to
+  object x −18.90.
+
+## Modeller's notes for the verifier
+
+- **Rebuild:** `import importlib, kit_models, m052; importlib.reload(kit_models); importlib.reload(m052); m052.build()`
+  (about 5 s to build and 35 s to render).
+  - `build()` returns `audit`, `uv`, `materials`, `views`, `contact`, `winding`, `buried`, `levels`, `walk`, `measure`
+    and `problems` (empty).
+  - `m052.region_report()` re-renders into `renders/models/M052/regions/` and samples the §5.4 regions.
+  - `m052.calibrate()` runs the dome calibration; `m052.preview()` renders chosen sheet views.
+- **Known misses:**
+  1. **The f34 shares are outside the binding ±4 at (−46, 14):** W / K 61.7 / 37.5 against 52.7 / 45.2 (+9.0 / −7.7).
+     **This needs a main-session ruling.**
+     - W : H (1.972), the top profile (0.040 mean) and the W / K / Y medians all match.
+     - Cause 1: decision 1's deck (W / bay 0.85) shows far more lit plank top than the sheet's f34, whose fitted W / bay
+       is 0.61 (§1.1).
+     - Cause 2: the sheet paints about 17 % of its deck top as dark streaks and seams (measured in deck boxes: W 78–84,
+       K 15–20, K median `#854119`). Flat-shaded faces can't carry that without a texture.
+     - A lower camera trades W : H for the shares: at (−40, 10) W / K are in band, but W : H is 2.47.
+     - The mid-length value step and the 0.14 gaps bring the deck closer to the sheet's look but move the shares by
+       less than 1. Making half-planks dark enough to class K would paint dark planks the sheet doesn't have.
+  2. **f34 Y is 0.8 against 2.1** (−1.3, inside ±1.5 and ±4). The bolts are already 0.72 across; the sheet's extra Y is
+     pale plank-top highlights (painting).
+  3. **Ortho cells** (§3.1: each cell is drawn at its own scale; the study predicted 4.20 / 1.17):
+     - front / rear W : H 4.18 / 4.22 against 3.29 / 2.86;
+     - side 1.23 against 1.59;
+     - top L : W 3.35 against 1.99.
+
+     The side_sheet's W of 1.3 is because the +X faces are on the studio's shade side; its K median matches. The r34's
+     W / K miss has the same cause, and the r34 isn't binding (§3.9).
+  4. **Sheet conflicts kept as decided:** 4 treads (the f34 draws 2); the stairs at −X (the top cell and the r34 put
+     them elsewhere); no caps on the near middle posts (the top cell draws them); symmetric braces (the cells draw an
+     asymmetric set).
+  5. **Buried rope verts:** the tail's first ring sits inside the wrap by design; 2 wrap verts reach 0.086 into the post
+     at a corner; 1 knob vert is 0.066 deep. Nothing else goes deeper than its stated sink.
+  6. **Stringers** are hidden by the 8.0-wide treads from most angles. The stairs part and `stair_cu` show them.
+- **Judge by eye:**
+  - `f34_sheet` against the f34 cell;
+  - `stair_cu` against close-up A;
+  - `under_cu` and `xbrace_cu` against close-up B;
+  - `rail_cu` against close-up C;
+  - `rope_cu` against the f34's rope;
+  - the parts against the key column;
+  - `scale.png` for the character scale.
+
+## Main session ruling before verification (2026-10-29)
+- **The f34 lit/dark wood split (W/K) is not binding for this model.** Decision 1 fixes the deck proportions: kit widths and one tile. Those show more lit plank top than the sheet's f34 framing does. The sheet also paints dark streaks onto its deck, which flat faces can't carry without colouring by facing. No camera passes both W:H and W/K.
+- **Still binding:** total wood (W+K), Y, W:H, the top profile, and the W, K and Y colour medians.
+- **Optional positional fix:** darker edge bands along each plank's long edges, chosen by position within the plank. The verifier may suggest this as a polish target.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+Fresh stage-7 verifier, read-only, in a background session (port 9877, `wip/M052_verify.blend`; nothing was built,
+edited or saved). All numbers below come from my own bmesh / BVH / ray code and my own renders. The renders were at
+960 × 720 with `CELL` raised in memory only, and they are in the session scratchpad (`m052_verify/`). They were not
+written into the repo.
+
+### Measured
+
+**Mesh** (triangulated; my winding check counts directed edges per shell; self-intersection is a BVH overlap of
+non-adjacent triangles within one shell):
+
+| Object | Tris / budget | Size (studs) | Shells | NM edges / bowtie verts | Boundary / wire / loose | Zero-area / n-gons | Winding errors | Neg-volume shells | Self-x in shell | Origin (local bbox bottom centre) | Rot / scale |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `TimberBoardwalk` | **2484 / 4000** | 37.80 × 11.14 × 9.00 | 96 | 0 / 0 | 0 / 0 / 0 | 0 / 0 | **0** | 0 | 0 | (0, 0, 0); offset (−2.90, 0, 0) | 0 / 1 |
+| `…RailPost` | 102 / 1000 | 1.50 × 2.32 × 9.00 | 3 | 0 / 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…SupportPost` | 62 | 1.50 × 2.32 × 4.77 | 3 | 0 / 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…RailPlank` | 12 | 7.95 × 0.60 × 0.90 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…FloorPlank` | 12 | 1.74 × 9.50 × 0.85 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…Stairs` | 176 | 5.84 × 8.00 × 4.48 | 10 | 0 | 0 | 0 | **0** (sawtooth stringers) | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…Crossbeam` | 12 | 0.90 × 4.78 × 1.32 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+| `…Brace` | 24 | 3.52 × 1.50 × 2.40 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | (0, 0, 0) | 0 / 1 |
+
+- **Normals:** every shell is closed with positive volume and 0 winding errors, so the normals point outward. The
+  notched planks (0, 1, 15, 16 at 48 tris; 5, 6, 10, 11 at 40) and both stringers pass.
+- **Modifiers and UV:** no modifiers; one `UVMap` on every object. UVs: 0 overlaps, 0 flipped, gaps 0.016, border
+  0.008, p95 stretch ≤ 1.03.
+- **Hero shell census:**
+  - 6 full posts at (±4.706, +4), (±14.118, ±4), and 2 support posts at (±4.706, −4), tops 4.77;
+  - 12 blocks and 14 bolts (z 4.12, plus 2 at X-brace crossings at z 1.88; heads 0.72 across, to |y| 5.57);
+  - 2 side beams, 4 crossbeams, 2 headers;
+  - 17 planks, 4 rails and 4 stubs;
+  - 16 brace boards (4 V, 8 knee, 4 X), 8 tread boards, 2 stringers;
+  - 3 rope pieces: wrap 288 tris, tail 164, knob 24.
+
+**Contact** (tolerance 0.03; contact counts as BVH overlap or vertex–surface distance; chained from z ≤ 0.03):
+- **Hero:** 96 shells, 10 on the ground, **0 floating, 0 unchained**, largest gap to any neighbour 0.00. RailPost,
+  SupportPost, Stairs and Brace are also 0 / 0.
+- **Buried** (ray parity on 3 rays, depth = distance to the containing shell's surface): nothing goes deeper than
+  0.035 except at rope-to-rope joins. Those are by design and only a few vertices each:
+  - the tail's first ring is 0.151 inside the wrap (4 of 84 vertices);
+  - the wrap is 0.086 into the tail (2 of 144);
+  - the knob is 0.066 into the tail end (3 of 14).
+
+  No bolt, block, stub, tread or rope piece is buried in timber past its sink, and no shell is fully buried.
+
+**Walkability** (downward rays every 0.1 over the deck, clear of the posts, rails and rope):
+- **Deck:** 25 807 samples, tops **5.586 – 5.615**, 0 obstacles above the deck. There are 16 gaps of **0.14**, so the
+  17 planks are separate. The largest step between neighbouring planks is 0.023, between planks 4 and 5 (jitter).
+- **Clear width:** from the open edge (y −4.75) to the rail's inner face (y 3.70) is **8.45**. Between the corner
+  posts at −X it is **6.50**. The end rail's inner face is at x 13.818.
+- **Stairs:** tread tops 4.48 / 3.36 / 2.24 / 1.12, so 5 risers of **1.12** (the last 1.134 against the 5.614 end
+  plank). Each run is 1.46: two 0.70 boards with a 0.05–0.06 gap. The foot is at x −21.80, and the flight is 37.5°.
+- **5.5-stud box walk:** a 2 (y) × 1 (x) × 5.5 box was walked from the ground at x −23 onto the deck at x −12, at
+  y −2, 0 and +2. It met exactly 5 step-ups of 1.12–1.134 and nothing else. No geometry was within 5.45 above its feet
+  anywhere on the flight or at the deck end.
+- **What Roblox would need:**
+  - A default humanoid has to step up 1.12 without jumping. This is well under its hip height and is expected to work,
+    but it varies with rig and avatar scale, so it is a Studio check (**Requires Manual Validation**, decision 4).
+  - If the humanoid snags, add an invisible CanCollide `WedgePart` over the flight. Running along the tread nosings
+    (−21.80, 1.12) → (−16.0, 5.6) gives 37.5°; foot to deck edge gives 44°. Both are well under the default
+    `MaxSlopeAngle` of 89°.
+
+**Shape against the sheet** (my renders against the sheet cells; masks from `m052.measure`):
+
+| View | W : H | W / K / Y % | W / K / Y median | Top-profile error mean / max | Sheet |
+| --- | --- | --- | --- | --- | --- |
+| **f34 (−46, 14)** | **1.977** | 61.6 / 37.6 / **0.7** (W+K 99.2) | `#CC7631` / `#884116` / `#EABD71` | **0.041** / 0.36 (f .10, the stairs) | 1.958; 52.7 / 45.2 / 2.1 (W+K 97.9); `#D77F32` / `#7B3A14` / `#FAC77C` |
+| r34 (134, 15) | 1.981 | 31.3 / 67.5 / 1.2 | `#D07B37` / `#7C3D19` / `#CDA969` | 0.099 / 0.21 | 1.982 (content only, §3.9) |
+| front (0, 0) | 4.188 | 40.6 / 58.3 / 1.1 | `#B76625` / `#7D3F19` / `#E9BC71` | 0.091 / 0.49 | 3.288; 40.9 / 57.4 / 1.7 (§3.1 scale miss) |
+| side (90, 0) | 1.230 | 1.1 / 97.0 / 1.9 | `#C27232` / `#703914` | 0.065 / 0.14 | 1.588; 31.2 / 67.5 (the studio's shade side) |
+| rear (180, 0) | 4.183 | 19.5 / 79.6 / 0.9 | `#B46625` / `#7F4019` | 0.146 / 0.74 (stairs) | 2.862 |
+| top (0, 89.9) | 3.384 | 91.0 / 8.3 / 0.8 | `#E1802E` | — | 1.992 |
+
+**Colour regions** (9 × 9 px medians at projected build-frame points):
+
+| Region | Ours | Sheet |
+| --- | --- | --- |
+| f34 plank tops | `#E18337` (27°, .76, .88) | `#DB8133` |
+| f34 tread tops | `#E48335` | `#E88F40` |
+| f34 cap tops | `#FF9A4C` (v 1.00) | `#F59B48` |
+| f34 post faces (mostly the above-rail band) | `#9D521F` | `#9C4B16` |
+| f34 legs (support / corner) | `#974D1C` / `#944C1C` (v .59 / .58) | `#AE581E` lit |
+| f34 rope | `#C87430` (27°, .76, .78) | median `#C36A22`, lit `#E28A38` |
+| f34 / front bolts | `#E5B970` / `#EFC174` (38°, .51) | `#FAC77C` / `#F2C38B` |
+| front plank ends | `#C97026` | `#C36726` |
+| front post faces above the rail / between the deck and the rail | `#9E521F` (v .62) / `#874012` (v .53) | `#9D4D19` |
+| front legs | `#964C1C` (v .59) | `#A2511B` |
+| front rail / blocks | `#A95A21` / `#A2541F` | `#B25D20` / `#AF5D1D` |
+| front beam / braces | `#733817` / `#73391A` | `#7D3D18` / `#602F14` |
+| side post faces / legs / plank ends | `#7A4018` / `#723A14` / `#98551C` | `#984D1C` / `#9A4E1E` |
+| top plank tops / caps | `#E3802D` / `#FE953E` | `#D87E37` / `#CA702A` |
+
+**Facing checks:**
+- `K.check` reports **0 problems**. Baked-shading values: hero 0.02, RailPost 0.32, every other part 0.0.
+- My own correlation of face colour (material hex × Tint) with the face normal, rope and brass excluded:
+  - hero: x 0.01, y −0.01, z 0.09, |z| 0.25;
+  - RailPost: z 0.71. This is the cap's height bands. The chamfer and top are chosen by face-centre height (z ≥ 8.9),
+    which spec §5.5 asks for.
+- Grepping the builder for `normal` finds only geometry: the bolt axis, the block face and the tube frames. The rope
+  groove is chosen by strand index. Nothing chooses paint by facing.
+
+**Lighting and VFX:** every material has emission 0. The hero has no children and no sockets.
+
+### Findings
+
+**Blockers: none.**
+
+**Minor** (each with a fix target, for a polish pass or later):
+1. **The deck reads smoother than the sheet's.** The f34 W/K is 61.6 / 37.6 against 52.7 / 45.2; this is not binding
+   under the main-session ruling, and W+K, W:H, the top profile and the medians all pass. The sheet's planks carry
+   dark seam streaks.
+   - *Polish target (the ruling's positional fix):* split each plank's top cap at 0.18 from both long (±x) edges and
+     blend those two edge bands 30 % toward `wood_deep`, chosen by the cap cell's x position within the plank, never by
+     normal.
+   - Expected effect: about +200–300 tris (the hero stays under 2800), W −3 to −5, K +3 to +5. The planks' seams
+     would read in the f34 the way the sheet's do.
+2. **f34 Y is 0.7 against 2.1** (−1.4: inside ±1.5, but at the edge). *Target:* Y ≥ 1.0. Brighten the bolt and dot
+   brass slightly, toward `#F6C886` rendered (now `#EABD71`), or add the plank edge bands (1), which also lift the
+   sheet's pale plank-edge highlights. Don't make the rope gold.
+3. **A value step on the posts at the rail top.** Between the deck and the rail the posts are pure `wood_deep` (front
+   `#874012`, v .53). Above the rail the 20 % band is `#9E521F` (v .62), so a hard band shows (`rail_cu`). The legs
+   (v .59) are lighter than that middle band.
+   - The legs are **not darker** than the posts, as decision 3.10 requires.
+   - *Target:* lift the deck-to-rail band about 10 % toward `wood`, and/or cut the leg lift from 20 / 10 % to 10 / 5 %,
+     so that legs ≈ post body ≈ sheet `#9D4D19` (± 12).
+4. **Cap tops and peg dots blow out.** The f34 cap top is `#FF9A4C` (v 1.00, R clipped); the top view's Y median is
+   `#FFD283`, and in `rail_cu` the dot reads nearly white.
+   - *Target:* use the spec's 60 % cap-top blend instead of 75 %, and dot brass ≤ v 0.95.
+5. **The top profile misses at f .10 (0.36):** decision 4's longer 4-tread flight moves the far-left post inward on
+   screen. This is a recorded consequence of the decision; no fix.
+6. **Ortho cells:** front, rear and top W:H, and the side's dark +X faces (W 1.1), are the §3.1 scale misses and the
+   studio's shade side, as predicted. Recorded; no fix.
+7. **Plank-to-plank step of 0.023** (planks 4 → 5) against the spec's "no step above 0.02". The modeller's "largest
+   step 0.00" understates this. It has no effect on walking. *Target:* top jitter ±0.010 if wanted.
+8. **The Brace part's leg is a stubby 1.5 × 1.5 × 2.4 block**, where the key draws a slender leg about 1 : 4. It
+   follows the spec's §4.1 wording. *Optional:* a 0.6 × 0.6 leg.
+9. **Correction to the modeller's notes:** the 0.086 "wrap verts into the post" are wrap vertices inside the **tail**
+   (a rope-to-rope join). The wrap sits on the post at its stated 0.015–0.02. No fix.
+10. **Triangulated minimum angle is 1.6°** on the 31.96-long side beams, against the modeller's 5.1° measured on quads.
+    This is inherent to long boxes and not a defect; recorded only.
+
+**Modeller's deviations (judged):**
+- Accepted:
+  - 0.14 gaps: the planks read as separate in the top, front and f34 views;
+  - the positional mid-length value step;
+  - treads 0.75 thick: chunkier, closer to close-up A;
+  - 0.72 hex bolts: they match the sheet's large heads;
+  - 0.44 dot (but see 4);
+  - rope Ø 0.40, 6 sides, smooth: `rope_cu` shows a twisted rope with spiral grooves and a knob, not a collar;
+  - blocks 3.52 → 4.72;
+  - stair foot −21.80;
+  - the RailPost part's placement.
+- Sheet conflicts kept as decided: 4 treads, the stairs at −X, no caps on the near middle posts, the symmetric braces,
+  and the beams inside the post lines (the sheet's front beam band shows as under-deck shade). All are acceptable.
+
+**Shape by view:**
+- **f34:** a long level plank deck rising to the upper right. It has the back rail on four posts, the end rail closing
+  +X, an open front with bolt blocks on its posts, stairs stepping down at the lower left, and the rope on the
+  near-right post. ✓
+- **front:** 4 post peaks, the rail, the plank band with visible gaps, 4 blocks with bolts, knee braces, and the stairs
+  at the left. ✓
+- **side:** two posts, the end rail with stubs on both outer faces, blocks and bolts on both end faces, and the V braces
+  with the X brace behind. ✓
+- **rear:** the mirror of the front, with the stairs at the right. ✓
+- **top:** 17 planks, 6 dotted caps, and the stairs at the left. ✓
+- **Close-ups:**
+  - A (`stair_cu`): two-board treads, open risers, stringers, and the corner post's two blocks with hex bolts. ✓
+  - B (`under_cu`, `xbrace_cu`): plank bottoms on the beams, crossbeams, knee braces, and the X with its bolt. ✓
+  - C (`rail_cu`): back and end rails butted flat into the far-right post, with stubs. ✓
+- **Parts** against the key column: post, support post, rail plank, floor plank, the 4-tread stairs on sawtooth
+  stringers, the crossbeam, and the L brace. ✓
+
+**Decisions (as amended by the main-session ruling): all followed.**
+1. Post centres 8 × 3 × 9.412; deck 32 × 9.5 with its top at 5.6; posts 9.0; rail 6.85–7.75. ✓
+2. Origin at the bbox bottom centre; offset −2.90 recorded in the docstring and NOTES. ✓
+3. Rails on +Y and +X; 6 full posts; −Y open. ✓
+4. Stairs at −X: 4 treads, 1.12 risers, 8.0 wide. ✓ (Studio validation pending.)
+5. 17 crisp planks, 8 notched with 0.02 clearance. ✓
+6. Symmetric braces: 4 V, 8 knee, 4 X. ✓
+7. Twisted orange-amber rope tie; the rope adds no Y (hue 27°). ✓
+8. Brass hex heads, metal 0.4, roughness 0.35. ✓
+9. Helpers come from `m048` (plus the committed `m012`, `m033` and `m040` utilities); no constants; nothing from
+   `m050` / `m051`. ✓
+10. Seven parts; stages 5 and 6 skipped and recorded. ✓
+11. `TimberBoardwalk*`, `m052_*`, collection `Kit/M052 Boardwalk`. ✓
+12. Cameras as decided. ✓
+
+**Colour summary:**
+- The wood is M050's family: plank-top hue 27°, R − G 94, **not red**. The posts are a step deeper, the beams and
+  braces darker, and the legs are not darker than the posts.
+- The rope is orange-amber; the bolts are pale brass.
+- Colour is set by role and position, never by facing.
+
+### Score and verdict
+
+**8 / 10. PASS.**
+- The mesh is clean on every object, with 0 winding errors, including the stringers and the notched planks.
+- Nothing floats or is buried.
+- The deck is flat at 5.6 and the stairs have even 1.12 risers.
+- Every view matches its sheet cell apart from the recorded decisions.
+- The binding f34 W:H, W+K, Y, top profile and colour medians are all inside tolerance.
+- Polish items 1–4 would bring the deck's look and the post values closer to the sheet. Studio has to confirm the
+  1.12 risers walk without jumping (Requires Manual Validation).
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 1 (8/10) and committed. All of the modeller's deviations are accepted.
+- **Requires manual validation in Studio:** a default character must walk up the 1.12 risers without jumping. If it can't, the fallback is an invisible wedge over the stairs at about 37.5°.
+- **Left for a later polish pass:**
+  - Deck edge bands, 0.18 wide at 30 % toward `wood_deep`, set by position. These recover the sheet's streaks.
+  - Raise Y toward 1.0 or more, using brass only.
+  - The posts' middle value band is too dark.
+  - The cap tops and peg dots blow out. Use a 60 % cap blend.
+  - Plank top jitter of ±0.023 makes a step against the 0.02 limit.
+  - The Brace part's leg is stubby.
+- **Export:** 8 assets, 8 solid pieces, 2884 tris, 0 VFX sockets, palette 18 colours, 0 problems.
