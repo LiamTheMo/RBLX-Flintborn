@@ -6,8 +6,9 @@ UIPadding, UIListLayout and UIGridLayout, AutomaticSize, UISizeConstraint,
 UIAspectRatioConstraint, ScrollingFrame canvases and scroll bars,
 ClipsDescendants, sibling ZIndex order, Frame fills with UICorner, UIStroke and
 UIGradient, ImageLabel sprites (Stretch, Fit, Crop, Slice) with ImageColor3,
-and TextLabel text (FontFace, TextScaled with UITextSizeConstraint, wrapping,
-truncation, alignment, stroke). Images resolve through
+and TextLabel text (FontFace with Merriweather Regular / Bold / Black and Patrick
+Hand, TextScaled with UITextSizeConstraint, wrapping, truncation, alignment,
+stroke, RichText <font size> and <font color> runs on one line). Images resolve through
 src/shared/UI/UiAssetIds.json to art/ui/sprites; avatar thumbnails draw as a
 grey head placeholder.
 """
@@ -26,9 +27,16 @@ IDS = json.loads((ROOT / "src" / "shared" / "UI" / "UiAssetIds.json").read_text(
 BY_ID = {str(v): k for k, v in IDS.items()}
 SS = 2  # supersampling for anti-aliased shapes
 
+# Font files per (family, weight class). Roblox draws Merriweather Heavy
+# (900) from the family's Black face; Bold stands in where a heavier face is
+# missing. Patrick Hand has one weight.
 FONT_FILES = {
-    ("merriweather", True): ["Merriweather-Bold.woff", "Merriweather-Bold.ttf"],
-    ("merriweather", False): ["Merriweather-Regular.woff", "Merriweather-Regular.ttf"],
+    ("merriweather", "black"): ["Merriweather-Black.ttf", "Merriweather-Bold.woff", "Merriweather-Bold.ttf"],
+    ("merriweather", "bold"): ["Merriweather-Bold.woff", "Merriweather-Bold.ttf"],
+    ("merriweather", "regular"): ["Merriweather-Regular.woff", "Merriweather-Regular.ttf"],
+    ("patrickhand", "regular"): ["PatrickHand-Regular.ttf"],
+    ("patrickhand", "bold"): ["PatrickHand-Regular.ttf"],
+    ("patrickhand", "black"): ["PatrickHand-Regular.ttf"],
 }
 FALLBACK = {
     True: ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "C:/Windows/Fonts/arialbd.ttf"],
@@ -39,6 +47,7 @@ SERIF_FALLBACK = {
     False: ["/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", "C:/Windows/Fonts/georgia.ttf"],
 }
 BOLD_WEIGHTS = ("SemiBold", "Bold", "ExtraBold", "Heavy")
+BLACK_WEIGHTS = ("ExtraBold", "Heavy")
 BOLD_ENUMS = ("Bold", "Black", "Heavy", "FredokaOne", "LuckiestGuy", "Bangers")
 
 # --------------------------------------------------------------------------- utils
@@ -61,20 +70,25 @@ def ud(value, size):
 _font_cache = {}
 
 
-def font_for(props, size):
+def font_for(props, size, weight_override=None):
     face = props.get("FontFace") or {}
     family = str(face.get("Family", "")).lower()
-    weight = enum(face.get("Weight", ""))
+    weight = weight_override or enum(face.get("Weight", ""))
     legacy = enum(props.get("Font", ""))
     if "legacyarial" in family or not family:
         family = legacy.lower()
     bold = weight in BOLD_WEIGHTS or any(b.lower() in family for b in BOLD_ENUMS) or "bold" in legacy.lower()
+    klass = "black" if weight in BLACK_WEIGHTS else ("bold" if bold else "regular")
     serif = "merriweather" in family
-    key = (family, bold, size)
+    hand = "patrickhand" in family
+    key = (family, klass, size)
     if key not in _font_cache:
         paths = []
-        if serif:
-            paths = [FONTS / n for n in FONT_FILES[("merriweather", bold)]] + [Path(p) for p in SERIF_FALLBACK[bold]]
+        if serif or hand:
+            name = "merriweather" if serif else "patrickhand"
+            paths = [FONTS / n for n in FONT_FILES[(name, klass)]]
+        if serif or hand:
+            paths += [Path(p) for p in SERIF_FALLBACK[bold]]
         paths += [Path(p) for p in FALLBACK[bold]]
         font = None
         for path in paths:
@@ -83,6 +97,19 @@ def font_for(props, size):
                 break
         _font_cache[key] = font or ImageFont.load_default()
     return _font_cache[key]
+
+
+def text_widths():
+    """Advance widths (per 1 px of TextSize) of printable ASCII in the fonts
+    the env's TextService:GetTextSize measures: {"Font.Merriweather": {...}}."""
+    out = {}
+    for enum_name, file in (("Font.Merriweather", "Merriweather-Regular.woff"),
+                            ("Font.PatrickHand", "PatrickHand-Regular.ttf")):
+        path = FONTS / file
+        if path.is_file():
+            font = ImageFont.truetype(str(path), 100)
+            out[enum_name] = {chr(c): round(font.getlength(chr(c)) / 100, 4) for c in range(32, 127)}
+    return out
 
 
 _sprite_cache = {}
@@ -140,10 +167,12 @@ class Node:
     @property
     def gui(self):
         return self.cls in ("Frame", "ScrollingFrame", "CanvasGroup", "TextLabel", "TextButton", "TextBox",
-                            "ImageLabel", "ImageButton", "ViewportFrame")
+                            "ImageLabel", "ImageButton", "ViewportFrame", "ScreenGui")
 
     @property
     def visible(self):
+        if self.cls == "ScreenGui":
+            return self.props.get("Enabled", True) is not False
         return self.props.get("Visible", True) is not False
 
 
@@ -160,6 +189,52 @@ def text_bounds(node, width_limit=None):
 
 def strip_rich(text):
     return re.sub(r"<[^>]+>", "", text)
+
+
+RICH_TAG = re.compile(r"<font\s+([^>]*)>(.*?)</font>", re.S)
+
+
+def rich_runs(text, size, color):
+    """RichText as runs [(text, size, colour)]: honours <font size="n"> and
+    <font color="#rrggbb">; other tags are dropped."""
+    runs, pos = [], 0
+    for m in RICH_TAG.finditer(text):
+        if m.start() > pos:
+            runs.append((strip_rich(text[pos:m.start()]), size, color))
+        attrs = dict(re.findall(r'(\w+)\s*=\s*"([^"]*)"', m.group(1)))
+        run_size = float(attrs["size"]) if "size" in attrs else size
+        run_color = color
+        if attrs.get("color", "").startswith("#") and len(attrs["color"]) == 7:
+            h = attrs["color"]
+            run_color = (int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16), color[3])
+        runs.append((strip_rich(m.group(2)), run_size, run_color))
+        pos = m.end()
+    if pos < len(text):
+        runs.append((strip_rich(text[pos:]), size, color))
+    return [r for r in runs if r[0]]
+
+
+def draw_rich(painter, node, box, clip, runs, k):
+    """One line of mixed-size runs on a shared baseline."""
+    p = node.props
+    x, y, w, h = box
+    fonts = [font_for(p, size * k) for _, size, _ in runs]
+    widths = [f.getlength(t) for f, (t, _, _) in zip(fonts, runs)]
+    ascent = max(f.getmetrics()[0] for f in fonts)
+    descent = max(f.getmetrics()[1] for f in fonts)
+    total_w = sum(widths)
+    xa, ya = enum(p.get("TextXAlignment")), enum(p.get("TextYAlignment"))
+    lx = {"Left": 0, "Right": w - total_w}.get(xa, (w - total_w) / 2)
+    line_h = ascent + descent
+    ty = {"Top": 0, "Bottom": h - line_h}.get(ya, (h - line_h) / 2)
+    pad = int(max(s for _, s, _ in runs) * k) + 8
+    layer = Image.new("RGBA", (int(w) + pad * 2, int(line_h) + pad * 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    cx = pad + lx
+    for font, width, (text, _, color) in zip(fonts, widths, runs):
+        d.text((cx, pad + ascent - font.getmetrics()[0]), text, font=font, fill=color)
+        cx += width
+    painter.composite(layer, clip, (x - pad, y + ty - pad))
 
 
 def wrap(text, font, width):
@@ -208,6 +283,9 @@ def layout(node, pw, ph):
     else:
         for child in kids:
             w, h = child.size
+            if child.cls == "ScreenGui":
+                child.rect = (0, 0, w, h)
+                continue
             pos, anchor = child.props["Position"], child.props["AnchorPoint"]
             x = ud(pos["X"], pw) - anchor["X"] * w + left
             y = ud(pos["Y"], ph) - anchor["Y"] * h + top
@@ -226,6 +304,10 @@ def layout(node, pw, ph):
 
 
 def size_child(child, pw, ph):
+    if child.cls == "ScreenGui":
+        # A nested ScreenGui (several guis dumped from PlayerGui) covers the screen.
+        child.size = (pw, ph)
+        return
     size = child.props["Size"]
     w, h = ud(size["X"], pw), ud(size["Y"], ph)
     ratio = child.first("UIAspectRatioConstraint")
@@ -526,13 +608,21 @@ def fit_text_size(node, w, h):
 
 def draw_text(painter, node, box, clip):
     p = node.props
-    text = strip_rich(str(p.get("Text", "")))
+    raw = str(p.get("Text", ""))
+    text = strip_rich(raw)
+    color_key = "TextColor3"
     if not text and node.cls == "TextBox":
         text = str(p.get("PlaceholderText", ""))
+        if p.get("PlaceholderColor3"):
+            color_key = "PlaceholderColor3"
     if not text or p.get("TextTransparency", 0) >= 1:
         return
     x, y, w, h = box
     k = node.scale_total
+    if p.get("RichText") and "<font" in raw and not p.get("TextScaled"):
+        color = c3(p.get(color_key), round(255 * (1 - p.get("TextTransparency", 0))))
+        draw_rich(painter, node, box, clip, rich_runs(raw, p.get("TextSize", 14), color), k)
+        return
     size = fit_text_size(node, w / k, h / k) * k
     font = font_for(p, size)
     ascent, descent = font.getmetrics()
@@ -549,7 +639,7 @@ def draw_text(painter, node, box, clip):
     ya = enum(p.get("TextYAlignment"))
     ty = y + {"Top": 0, "Bottom": h - total}.get(ya, (h - total) / 2)
     xa = enum(p.get("TextXAlignment"))
-    color = c3(p.get("TextColor3"), round(255 * (1 - p.get("TextTransparency", 0))))
+    color = c3(p.get(color_key), round(255 * (1 - p.get("TextTransparency", 0))))
     pad = int(size) + 8
     layer = Image.new("RGBA", (int(w) + pad * 2, int(total) + pad * 2), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
@@ -600,7 +690,7 @@ def paint(painter, node, origin, scale, clip):
         child_clip = intersect(clip, (box[0], box[1], box[0] + box[2], box[1] + box[3]))
     pad = node.first("UIPadding")
     kids = [c for c in node.children if c.gui and c.visible]
-    kids.sort(key=lambda c: c.props.get("ZIndex", 1))
+    kids.sort(key=lambda c: c.props.get("DisplayOrder", 0) if c.cls == "ScreenGui" else c.props.get("ZIndex", 1))
     for child in kids:
         paint(painter, child, (box[0], box[1]), k, child_clip)
     if node.cls == "ScrollingFrame":

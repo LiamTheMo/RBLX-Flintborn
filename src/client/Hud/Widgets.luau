@@ -323,6 +323,22 @@ local function atlasImage(name: string): string?
 	return nil
 end
 
+-- True when sprite `name` can draw as art (an uploaded image or an uploaded
+-- atlas holding it, or uploaded tiles); false means Widgets.Sprite would draw a
+-- stand-in. The kit (Hud/Kit/Art) draws its own stand-ins in the kit's style.
+function Widgets.HasArt(name: string): boolean
+	local whole = UiAssets.sprite(name)
+	if whole and type(whole.tiles) == "table" then
+		for _, tile in whole.tiles do
+			if atlasImage(tile[1]) == nil and UiAssets.image(tile[1]) == nil then
+				return false
+			end
+		end
+		return true
+	end
+	return atlasImage(name) ~= nil or UiAssets.image(name) ~= nil
+end
+
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
 local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
 

@@ -862,8 +862,19 @@ function Methods:PreloadAsync(list, callback)
 		end
 	end
 end
-function Methods:GetTextSize(text, size, _font, frame)
-	local width = #tostring(text) * size * 0.55
+-- capture.py injects __textWidths: advance widths per px of TextSize for the
+-- legacy fonts the kit measures with (Merriweather, Patrick Hand), read from
+-- the same font files render.py draws with. Other fonts use an average width.
+function Methods:GetTextSize(text, size, font, frame)
+	local widths = (__textWidths or {})[tostring(font)]
+	local width = 0
+	if widths then
+		for _, code in utf8.codes(tostring(text)) do
+			width += (widths[utf8.char(code)] or 0.6) * size
+		end
+	else
+		width = #tostring(text) * size * 0.55
+	end
 	local lines = 1
 	if frame and frame.X < width then
 		lines = math.ceil(width / math.max(1, frame.X))
