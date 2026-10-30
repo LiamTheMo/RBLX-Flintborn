@@ -793,3 +793,437 @@ All 11 recommendations are accepted.
 11. **Cameras.** As listed. The f34 at (47, 16.5) governs.
 
 **Packaging.** No booleans. Every piece is its own closed shell, seated by contact or sunk 0.02. That means **no floating boards, coils or bolts**, and **0 winding errors**. The hero stays under 4000 tris; if it goes over, cut the rope coils first.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m048.py`, constants:
+- `W` 8, `BAY` 8, `DECK_TOP` 5.6, `POST_TOP` 8.3;
+- `POST` 1.3, `PLANK_T` 0.85, `BEAM_W` / `BEAM_D` 0.9 / 1.3.
+
+`build()` builds the six parts and the hero, runs every check and renders. Every piece is its own closed shell built
+from explicit vertex lists (`_prism`, `_box`, `_plank2d`, `_tube`, `_bolt`, `_knob`), and `_solid` checks each
+shell's signed volume. There are no booleans and no unions.
+
+- **Posts (6):**
+  - 1.3 square, z 0 → 8.3, with a 0.12 cap chamfer.
+  - Extra rings at 2.85 / 3.15 / 3.45 (the leg blend) and 7.2 / 7.75 (the cap blend) only carry colour bands.
+  - One shell per post (decision 5).
+- **Bolt blocks (10):** 1.3 × 1.0 × 0.35 proud, z 3.55–4.55, sunk 0.02 into the outer long face of every post and the
+  end face of the four corner posts.
+- **Bolts (11):** 8-sided heads, r 0.275, 0.22 proud with a 0.06 dome, sunk 0.03 into the blocks. The eleventh bolt
+  sits at the X-brace crossing.
+- **Deck (10 boards):**
+  - 1.83 × 0.85 boards with 0.10 gaps over y −9.6 … +9.6 and x ±5.1, with a 0.06 top chamfer and a seam at y 0.
+  - Board bottoms are sunk 0.02 into the beams (z 4.73).
+  - Tops are jittered ±0.02 (measured 5.583–5.614), and the six un-notched boards are yawed ±0.4°.
+  - **Deviation from §2.3:** the six boards that meet a post row are **notched** round the post (an open notch to the
+    deck edge, 0.02 clear), instead of being cut back to x ±3.33 across their whole width. Cutting them back would
+    leave holes in the deck edge beside every post. With the notch, the board ends continue on both sides of the post,
+    as the junction close-up draws.
+  - Each notch's inner corner is also joined straight across the board, so the top and bottom faces split into
+    near-rectangles and no sliver triangles form.
+- **Beams:**
+  - 2 side beams: x ±2.45 … ±3.37 (sunk into the posts' inner faces), y ±9.15, z 3.45–4.75.
+  - 3 crossbeams at y −8 / 0 / +8, with their ends sunk 0.02 into the side beams.
+- **Braces:**
+  - **4 long-side knee braces:** from the corner legs' inner faces at z 1.1 to the beam underside at y ±4.6. Centred
+    on x ±3.35, 0.45 thick.
+  - **2 knee braces on the +Y end:** from the corner legs (x ±3.35) to C+Y's underside at x ±0.9, y 7.6–8.05.
+  - **X brace on the −Y end:** two boards (y −7.75…−8.11 and −8.09…−8.45), each running from z 0.45 on one leg to a
+    3.40 top on the other. They cross at z 1.93, with a bolt at the crossing.
+  - All brace ends are cut to the faces they meet and sunk 0.02.
+- **Rope:**
+  - **Coils (12):** 6-sided tubes along a 12-point rounded-square path, the centreline 0.845 off the post axis on the
+    flats, at z 6.52 / 6.92. They are sunk into the post faces, and the two coils on each post touch.
+  - **Swags (5):** 5-sided tubes on a catenary, 12 segments. Their ends sit inside the coils at z 6.72. Low points are
+    6.15 on the long sides and 6.05 on the +Y end. There is no swag across the −Y end.
+  - **Knot:** two fat 5-sided loops (tube r 0.15) round the +Y swag at x 2.78 / 2.46, beside the +X corner post's
+    coil.
+  - **Section:** circumradius 0.22, which reads 0.38–0.44 thick.
+  - **How the rope got here:**
+    - 6-sided antiprism with 8-point coils read as flat stacked plates.
+    - A 4-sided twisted cord read as a ribbon.
+    - 5-sided antiprism coils read as crumpled paper.
+    - **Final:** the coils use aligned rings with the twist carried by colour strands (stage 4), and the swags keep
+      the half-turn antiprism twist, which reads as twisted rope at sheet scale.
+- **Parts:**
+  - `TimberDockPost`: the +X/−Y corner post with both blocks and bolts and two coils.
+  - `TimberDockDeck`: the 10 boards.
+  - `TimberDockBeam`: the +X side beam.
+  - `TimberDockCrossbeam`: a plain crossbeam.
+  - `TimberDockBrace`: one long-side knee brace.
+  - `TimberDockRope`: one long-side swag with two 8 × 4 ball knobs (r 0.3).
+  - The exploded shot uses copies: 4 posts turned so their blocks face out, the deck lifted 5, the beams spread, the
+    crossbeams below, the brace in front and the rope above.
+- **Renders** (`renders/models/M048/`):
+  - the kit's seven default views;
+  - `f34_sheet (47, 16.5)`, `r34_sheet (−41, 17)`, `front_sheet (90, 3)`, `side_sheet (180, 3)`, `rear_sheet (−90, 6)`
+    and `top_sheet (0, 89)`, all with the floor hidden;
+  - six part shots at (−35, 25), `exploded` (−35, 25), and `scale` (5.5 markers on the deck at y 0 and on the ground
+    beside a +X leg);
+  - close-ups `junc_cu`, `rope_cu`, `bolt_cu`, `under_cu`, `knot_cu`, `xbrace_cu`;
+  - everything together in `M048_views.png`.
+- **Lens probe** (f34; lens 1 / 1.8 / 3× × az 47 / 54 × e 16.5 / 21): the sheet's three-quarters are near-orthographic.
+  At 3× and (47, 16.5) the f34 gives W : H 1.559 (sheet 1.575) and a top-profile error of 0.035 mean / 0.13 max. So
+  `LENS` is 3× for f34 / r34, and 8× for the level orthos (so the far post row hides behind the near one).
+
+## Stage 2 — Optimisation and cleanup
+
+Final build, run in a freshly restarted session:
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| `TimberDock` | **3860 / 4000** | 10.56 × 19.20 × 8.30 | 69 |
+| `TimberDockPost` | 432 | 2.30 × 2.30 × 8.30 | 7 |
+| `TimberDockDeck` | 416 | 10.21 × 19.20 × 0.88 | 10 |
+| `TimberDockBeam` | 12 | 0.92 × 18.30 × 1.30 | 1 |
+| `TimberDockCrossbeam` | 12 | 4.94 × 0.90 × 1.30 | 1 |
+| `TimberDockBrace` | 12 | 0.45 × 3.26 × 2.78 | 1 |
+| `TimberDockRope` | 222 | 0.60 × 6.95 × 1.09 | 3 |
+
+- **Hero tris by kind:**
+  - wood: 39 shells, 1052 tris;
+  - brass: 11 shells, 330 tris;
+  - rope: 19 shells, 2478 tris (12 coils × 144, 5 swags × 130, 2 knot loops × 60).
+- **Every object:**
+  - zero non-manifold edges, bowtie verts, boundary, wire or loose elements, zero-area faces, n-gons and duplicate
+    verts;
+  - normals outward, transforms applied, origin at the bottom centre (hero offset 0, 0, 0);
+  - per shell (`m040.shells_report`): 0 self-hits and 0 inverted faces;
+  - smallest corner 17.5° (no face under 5°).
+- **Winding:** 0 errors and 0 unpaired edges on every object (directed-edge check).
+- **Contact:** 0 floating and 0 unchained shells at tol 0.03 and 0.1 (hero, post, deck and rope parts). The chains:
+  - boards → beams → posts → ground;
+  - coils → posts; swags → coils; knot → swag and coil;
+  - blocks → posts; bolts → blocks; braces → legs and beams.
+- **Levels:**
+
+  | Item | Measured |
+  | --- | --- |
+  | Feet | z 0.00 |
+  | Beams | 3.45–4.75 |
+  | Board tops | 5.583–5.614 (all 10 within 5.60 ± 0.02) |
+  | Coils | 6.52 / 6.92 |
+  | Swag lows | 6.15 ×4, 6.05 |
+  | Post tops | 8.30 |
+  | X-brace crossing | 1.93 |
+
+  No rope runs across the open −Y end.
+- **Budget:** under 3900, so no cut was needed.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, `ANGLE_BASED`, margin 0.008) followed by `m012._uv_unfold`.
+
+| Object | Islands | Overlaps | Flipped | Min gap | Border | Density (min / med / max) | Conformal p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `TimberDock` | 821 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.04 |
+| `TimberDockRope` | 45 | 0 | 0 | 0.016 | 0.008 | 0.979 / 1.002 / 1.002 | 1.091 |
+| Other parts | — | 0 | 0 | 0.016 | 0.008 | 1.0 | ≤ 1.015 |
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration** (`m048.calibrate()`, `K.calibrate` dome):
+
+| Key | Target | Calibrated hex | Rendered median |
+| --- | --- | --- | --- |
+| `wood` | `#E19044` | `#B27B41` | 223, 145, 68 |
+| `wood_light` | `#EDA052` | `#BB874D` | 235, 160, 82 |
+| `wood_deep` | `#8D4212` (the front cell's post faces, not the flat swatch) | `#753D11` | 141, 67, 18 |
+| `wood_dark` | `#6C3D1E` (legs) | `#5C391E` | 108, 62, 30 |
+| `rope` | `#F8D088` | `#CBAB7A` | 255, 208, 136 |
+| `rope_dark` | `#BE7019` (the sheet's groove strands: front swag lower quartile; coil median `#C2761A`) | `#99601A` | 190, 110, 25 |
+| `brass` | `#F7D894` | `#EFD9A0` | 247, 217, 148 |
+
+**Adjusted afterwards on the hero renders** (the dome median doesn't match the model's lit areas):
+- `wood` `#BB722E` and `wood_light` `#C97E37`: redder and more saturated, so the f34 board tops land on the sheet (the
+  dome key rendered tan);
+- `wood_deep` `#88491A` and `wood_dark` `#633D20`: a compromise between the f34, which matched, and the level orthos,
+  which were too dark;
+- `rope` `#F4CF80`: golden, not cream;
+- `brass` `#EBC772`: the calibrated key rendered pale cream with metal 0.5; this one reads gold.
+
+**Finish:**
+- wood: roughness 0.85 (legs 0.9), metal 0, low specular;
+- rope: roughness 0.95, low specular;
+- brass: metal 0.5, roughness 0.4.
+
+**Colour by role and position only, never facing.** `K.check` baked-shading correlation: hero 0.03, post part 0.11,
+everything else 0.0.
+- **Boards:** `wood`. Boards 2 and 7 at 15 % `wood_deep`, and boards inside a broad noise field at 15 % `wood_light`.
+  - Per-board Tint ±0.03 plus K.texture 0.02.
+  - One key per board, with hard edges only between boards.
+- **Posts:** `wood_deep`, varied by height:
+  - full `wood_dark` below 2.85, then 65 % / 35 % dark in the bands up to the beam bottom at 3.45;
+  - 20 % / 40 % `wood_light` above the coils (7.2 / 7.75), and 60 % on the chamfer and top;
+  - Tint ±0.03, texture 0.03.
+- **Blocks, beams and crossbeams:** `wood_deep`, with Tint ±0.03 per member.
+- **Braces:** 60 % `wood_dark`.
+- **Bolts:** `brass`.
+- **Rope:** strands are coloured by their place in the twist, never by facing.
+  - **Coils:** (side − ring) mod 3 gives three plies, `rope_dark` / 45 % amber / golden `rope`, which spiral like a
+    three-ply rope. (An even / odd split made a checkerboard.)
+  - **Swags and knot:** strand 0 is `rope_dark`, strand 2 is 90 % amber, the rest are golden. About half the rope reads
+    amber and half golden, as on the sheet.
+
+**Re-measured** on the final renders against the sheet, with the study masks:
+
+| View | W : H | W % | K % | Y % | W median | K median | Y median |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 | 1.559 (1.575) | 39.2 (35.9) | 52.2 (58.2) | **8.6 (5.9)** | `#DD8334` (`#D77D34`) | `#703716` (`#6D3411`) | `#E2BA66` (`#F8CF7C`) |
+| r34 | 1.472 (1.543) | 49.6 (30.7) | 41.9 (63.2) | 8.6 (6.1) | `#E18535` | `#6B3B19` (`#713714`) | — |
+| front | 2.208 (1.871, recorded) | 21.6 (24.1) | 67.6 (69.9) | 10.8 (5.9) | `#AC6528` (`#B35C19`) | `#713613` (`#7C4219`) | — |
+| side | 1.188 (1.560, recorded) | 30.7 (22.2) | 60.8 (72.2) | 8.5 (5.6) | — | `#854119` (`#7C411B`) | — |
+| top | 0.551 (0.575) | 83.0 (72.8) | 8.9 (26.8) | 8.0 (0.4) | — | — | — |
+
+Top profile error (mean / max):
+
+| View | Mean | Max |
+| --- | --- | --- |
+| f34 | 0.035 | 0.13 |
+| r34 | 0.026 | 0.08 |
+| front | 0.030 | — |
+| side | 0.046 | — |
+
+Region samples (`region_report()`):
+
+| Region | Ours | Sheet | Max channel diff |
+| --- | --- | --- | --- |
+| f34 board tops (24-point median) | `#D18738` (31°, 0.73, 0.82) | `#DF8C3E` | 14 |
+| f34 cap top | `#E3843D` | `#D07C4A` | 19 |
+| f34 legs | `#5C3419` | `#62371C` | 6 |
+| front board ends | `#A15A22` | `#A95015` | 12 |
+| front post face | `#70350F` | `#8D4212` | 28 |
+| front beam | `#72360F` | `#89451B` | 22 |
+| front legs | `#4E2B13` | `#764521` | 40 |
+
+- The value order board ends > post faces > legs holds.
+- The front cell's +X faces sit in the studio's darker side light. The f34, which governs, matches on legs and board
+  tops.
+- Wood hue is 23–31° everywhere: not red. The board tops' R − G is 74.
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no emissive part, glow or light (decision 9), so there are no emissive faces and no lights. To check in
+Studio (Requires Manual Validation):
+- the boards read warm orange, not red;
+- the legs read clearly darker than the posts;
+- the rope reads golden and the bolts brass;
+- a character walks on from a 5.6 surface and is stopped by the swags at the sides.
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect and no water or foam (decision 9). The hero has no sockets; `checks()` flags any.
+
+## Modeller's notes for the verifier
+
+- **Rebuild:**
+  `import importlib, kit_models, m048; importlib.reload(kit_models); importlib.reload(m048); m048.build()`.
+  - `m048.measure_views()` gives the W / K / Y shares; `build()` returns them under `measure`.
+  - `m048.region_report()` gives the spec 5.4 region samples.
+- **Known misses:**
+  1. **Y share on the f34: 8.6 against 5.9** (tolerance ±1.5).
+     - Bolts are 1.4 of that (a probe with the rope recoloured blue left Y at 1.4).
+     - The sheet's rope falls into deep amber (W) on its shade side. Our studio light keeps more of the golden strands
+       bright, even with half the strands amber.
+     - Thinning the rope below Ø 0.38 would break decision 7 ("not thin"), so I didn't.
+     - The Y median `#E2BA66` is darker than the sheet's `#F8CF7C`.
+  2. **f34 K: 52.2 against 58.2**, right at the edge (the lighter boards push into W).
+     - The r34 W / K 49.6 / 41.9 is well off the sheet's 30.7 / 63.2, because the studio key light lights the faces
+       that camera sees.
+     - The medians themselves match within 6–7.
+  3. **Ortho cells:** the front, side and rear cells are drawn at their own horizontal scales, so their W : H (2.21 /
+     1.19 against 1.87 / 1.56) is the recorded miss from §3.1.
+     - At e 3 the side and front shots show the far post row's tops just above the near row.
+     - The front_sheet framing is darker than the sheet (post face −28, legs −40) because of the light direction.
+  4. **Not modelled:**
+     - the cap peg dots and the faint vertical split line on the posts (a shallow V reads as nothing under flat
+       shading);
+     - the r34's mid-span knot (§3.7: the knot is at the post);
+     - the rear cell's literal X brace and missing leg (§3.4).
+  5. **Board notches** deviate from §2.3 (see Stage 1).
+  6. **Hero budget:** 3860 tris, 2478 of them rope. More rope detail would need the §4.3 cut order.
+- **Judge the rope by eye:** compare `rope_cu`, `junc_cu` and `knot_cu` with the junction close-up and the f34. The
+  coils are round twisted rings with spiral plies; the swags are twisted 5-sided cords.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier, read-only. It used a background session on port 9877 with `wip/M048_verify.blend`. It ran no
+`build()`, edited no code and saved nothing. Every number below was re-measured with the verifier's own bmesh, BVH
+and numpy code; `M.audit`, `M.uv_stats` and `K.check` were used only as cross-checks. Renders went to the scratchpad
+(`…/scratchpad/m048_verify/`), not to `renders/models/M048/`. The sheet cells were measured with the verifier's own
+implementation of the §1.2 masks, which reproduces §1.2 on the f34 cell: W : H 1.568, W 35.9, K 58.2, Y 5.9.
+
+### Mesh
+
+| Object | Tris / budget | Size | Shells | Non-manifold, boundary, wire, loose, zero-area, n-gons, dup verts | Winding (dup directed / unpaired) | Bowtie verts | Self-hits per shell | Inward faces (triangulated, per-shell ray parity) | Min corner | Origin / transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `TimberDock` | **3860 / 4000** | 10.56 × 19.20 × 8.30 | 69 | all 0 | 0 / 0 | 0 | 0 | 0 | 17.5° | bbox x ±5.28, y ±9.6, z 0–8.3; rot 0, scale 1 |
+| `TimberDockPost` | 432 / 1000 | 2.30 × 2.30 × 8.30 | 7 | all 0 | 0 / 0 | 0 | 0 | 0 | 17.5° | centred, z 0 |
+| `TimberDockDeck` | 416 / 1000 | 10.21 × 19.20 × 0.88 | 10 | all 0 | 0 / 0 | 0 | 0 | 0 | 54.7° | centred, z 0 |
+| `TimberDockBeam` | 12 | 0.92 × 18.30 × 1.30 | 1 | all 0 | 0 / 0 | 0 | 0 | 0 | 90° | centred, z 0 |
+| `TimberDockCrossbeam` | 12 | 4.94 × 0.90 × 1.30 | 1 | all 0 | 0 / 0 | 0 | 0 | 0 | 90° | centred, z 0 |
+| `TimberDockBrace` | 12 | 0.45 × 3.26 × 2.78 | 1 | all 0 | 0 / 0 | 0 | 0 | 0 | 40.5° | centred, z 0 |
+| `TimberDockRope` | 222 / 1000 | 0.60 × 6.95 × 1.09 | 3 | all 0 | 0 / 0 | 0 | 0 | 0 | 25.5° | centred, z 0 |
+
+- **Hero shells:** 69, as specified: 6 posts, 10 blocks, 11 bolts, 10 boards, 2 beams, 3 crossbeams, 8 brace boards, 12
+  coils, 5 swags and 2 knot loops. Every shell has a positive signed volume, and no shell mixes materials.
+- **Quads:** every hero quad is planar. In the rope part, 32 knob quads are non-planar by up to 0.035. Triangulated,
+  their normals are still outward.
+- **UV:** 0 overlaps and 0 flipped islands on every object; min gap 0.016, border 0.008, density 1.0. The rope part's
+  conformal p95 is 1.09.
+- **Other:** no modifiers or children; no emission anywhere; no `water` key. Collision is precise on the hero, hull on
+  the post, beam, crossbeam and brace, box on the deck, and none on the rope.
+
+### Contact and levels
+
+- **Floating:** 0 shells floating at tol 0.03, and 0 without a chain to the ground (hero, post, deck and rope part).
+  - **Boards:** every board sits on the beams (distance 0: bottoms 4.73 against beam tops 4.75). The six notched
+    boards stand 0.020 clear of the posts. No two boards overlap.
+  - **Coils:** all 12 touch their posts, sunk at most 0.016.
+  - **Swags:** they end inside the coils, 0.10 short of the post faces, and come no closer to a board than 0.24 (the
+    +Y swag) or 0.33 (the long sides).
+- **Levels:**
+  - leg feet z 0.00 and post tops 8.30;
+  - board tops 5.583–5.614 (all within 5.60 ± 0.02);
+  - beams and crossbeams 3.45–4.75;
+  - coils z 6.30–7.14;
+  - swag bottoms 5.93–5.95 on the long sides and 5.85 on the +Y end (centre lows about 6.15 and 6.05);
+  - the X brace runs z 0.45–3.40, with its bolt at z 1.67–2.18.
+- **Open −Y end:** the only rope past y −7.25 is the two −Y posts' own coils, and no brace reaches above z 3.4. No
+  rope crosses the open end.
+- **Walking:** the deck is flat to ±0.02 with 0.10 gaps. The posts leave 6.7 clear between their inner faces, and the
+  coils, 0.7 above the deck, leave 5.96. A 5.5 character fits on the deck (the `deck_walk` and scale views agree).
+
+### Views and shares (f34 at lens 3×; masks per §1.2; sheet values from the verifier's own re-measure)
+
+| View | W : H ours (sheet) | W ours (sheet) | K | Y | Top-profile error mean / max | W median | K median | Y median |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **f34 (47, 16.5)** | 1.563 (1.568) | 39.2 (35.9) | **52.2 (58.2)** | **8.6 (5.9)** | 0.036 / 0.12 | `#DD8334` (`#D77D34`) | `#703716` (`#6D3411`) | `#E2BA66` (`#F8CF7C`) |
+| f34 probe (40, 12) | 1.623 | 35.7 | 56.1 | 8.2 | 0.047 / 0.15 | | | |
+| f34 probe (54, 12) | 1.788 | 32.2 | 59.3 | 8.6 | 0.058 / 0.17 | | | |
+| f34 probe (40, 16.5) | 1.476 | 40.7 | 51.1 | 8.2 | 0.030 / 0.12 | | | |
+| f34 probe (54, 16.5) | 1.629 | 37.9 | 53.2 | 8.9 | 0.046 / 0.15 | | | |
+| r34 (−41, 17) | 1.470 (1.548) | 49.5 (30.7) | 41.9 (63.2) | 8.6 (6.1) | 0.022 / 0.07 | `#E18535` (`#DD8D40`) | `#6B3B19` (`#713714`) | `#FFD678` (`#F8CC7A`) |
+| front (90, 3) | 2.221 (1.871, §3.1) | 21.6 (24.1) | 67.6 (69.9) | 10.8 (5.9) | 0.021 / 0.12 | `#AC6528` (`#B35C19`) | `#713613` (`#7C4219`) | |
+| side (180, 3) | 1.188 (1.571, §3.1) | 30.7 (22.2) | 60.8 (72.2) | 8.5 (5.6) | 0.052 / 0.17 | | `#854119` (`#7C411B`) | |
+| top (0, 89) | 0.548 (0.575) | 83.0 (72.8) | 8.9 (26.8) | 8.1 (0.4) | — | | | |
+
+- **Where the gold comes from** (f34, probes with the rope or the brass temporarily recoloured blue, then restored;
+  materials verified restored):
+  - the rope makes 7.6–7.7 of the 8.6 Y points, and the bolts 1.0;
+  - the rope covers 13.6 % of the silhouette, and about 56 % of its pixels class as Y (the amber plies fall into W/K);
+  - the sheet's four visible bolts are about 0.5 (estimated).
+  - So the +2.7 excess is mostly **rope (about +2.2)**, with the bolts about +0.5.
+- **Region samples** (f34 (47, 16.5), 5 × 5 medians at build-frame points; front_sheet the same way):
+
+  | Region | Ours | Sheet |
+  | --- | --- | --- |
+  | Board tops | `#D58637` (30°, 0.74, 0.83) | `#DF8C3E`, Δ10 |
+  | Cap top | `#E3843E` | `#D07C4A` |
+  | Post above deck | `#713711` (23°) | |
+  | Board ends | `#A05A22` | `#A95015` |
+  | Beam | `#723711` | |
+  | Legs, +X face | `#4E2B14` (v 0.31) | f34 `#62371C` |
+  | Legs, −Y face | `#683B1C` | |
+  | Brace | `#5D3319` | |
+  | front_sheet: board end / post face / leg | `#A15A22` / `#713610` / `#4D2B13` | `#A95015` / `#8D4212` / `#764521` |
+
+  - Wood hue is 22–31° everywhere: **one orange family, not red**. The board tops' R − G is 90 (limit 95).
+  - Rope 40–42°; brass is gold, metal 0.5, rough 0.4.
+- **Colour by role and position, never facing:**
+  - `K.check`: 0 problems; baked shading hero 0.03, post part 0.11, the others 0.
+  - **Grep:** the builder's only `normal` uses are geometry (`_solid` winding, tube frames, bolt axes, block faces).
+    No paint selection uses a normal. Posts use face-centre height (`_post_colour`), coils and swags use strand index
+    (`_strands`), and boards use one key per board.
+  - **Correlations:** wood lightness rank against normal z is 0.24 raw, but **−0.004 once height is regressed out**.
+    Rope-dark share against normal z is −0.009. No post height band mixes materials.
+  - **Legs:** `wood_dark` below 2.85, then 65 % and 35 % up to the beam bottom at 3.45. That is by height only.
+- **Tint:** a corner float colour.
+  - **Wood:** 0.955–1.057, sd 0.020. Board means differ from 0.986 to 1.029, and within a board the sd is about 0.007
+    (gentle, no confetti). Its correlation with normal z is −0.003.
+  - **Rope:** 0.981–1.018.
+
+### Shape against the sheet (every cell compared at matching angles)
+
+- **Matches:**
+  - the f34 / r34 silhouette and layout (open end at the left of the f34 and the right of the r34, five swags, six
+    square posts with chamfered caps, board ends as blocks along both long edges);
+  - beams and crossbeams; bolt blocks with round brass heads;
+  - legs darker below the beams; knee braces on the long sides (front cell) and the +Y end (side cell); the X brace
+    with its crossing bolt on the −Y end (r34);
+  - the top view's ten boards and caps;
+  - the underside (boards on the beams, knee brace from leg to beam, nothing floating);
+  - the six parts against the key parts and the exploded view.
+- **Swags:** twisted, golden and amber, sagging to just above the deck. They read as rope, not outlines.
+- **Coils:** fat double bands (0.84 tall, 0.37 proud of the post), not outlines. Close up (`junc_cu`, `coil_cu`) they
+  read as **faceted octagonal collars with a stepped two-tone ply pattern** rather than the sheet's braided rope rings.
+  At the sheet's scale they read as golden rope bands.
+
+### Findings
+
+1. **minor — coil read.** The coils use aligned rings, so the twist is carried only by the triangulation diagonals and
+   the colour plies. Close up they look like brass-gold washers more than braided rope (junction close-up, key "Mooring
+   Post").
+   - **Fix target:** give the coils a geometric twist, either a ring rotation of half a side per ring (§2.5) or strand
+     bumps that break the octagon silhouette, so the junction close-up reads as rope. Keep 6 sides and stay under 4000
+     (§4.3 cut order).
+2. **minor — decision 7, partly met.** Decision 7 asks for six-sided tubes with spiralled facets.
+   - The swags and knot loops are **5-sided**.
+   - The coils are 6-sided but have no spiralled facets (finding 1).
+   - At 3860, 6-sided swags would land at about 3990, still under 4000, so the cut wasn't forced. It was a reorder of
+     the §4.3 cut order (swags before coils), and the modeller didn't list it as a known miss.
+   - The intent of the decision (thick, twisted, not an outline) is met.
+   - **Fix target:** 6-sided swags, or the main session accepts 5 and records it.
+3. **minor — f34 Y 8.6 against 5.9 (+2.7).** That is outside the spec's ±1.5 but inside the binding ±4.
+   - About +2.2 of the excess is rope and about +0.5 is bolts.
+   - **Fix target, if wanted:** raise the coils' amber-ply share (by strand index, never facing), or thin the coils'
+     golden ply.
+4. **minor — f34 K 52.2 against 58.2 (−6.0) at the governing camera.** That is outside the binding ±4 there, and at
+   the spec's ±6 edge.
+   - At the §2.6 probe (40, 12), all three shares are within ±4 (W 35.7, K 56.1, Y 8.2), and W : H 1.623 is within
+     ±0.08.
+   - The W and K medians match the sheet within 3–6 per channel, so this is the studio light's lit/dark split, not a
+     key error.
+   - **Fix target:** none needed. Record (40, 12) as the in-band probe.
+5. **minor — r34 W / K 49.5 / 41.9 against 30.7 / 63.2.** The studio key lights the −X faces; the medians match (K
+   `#6B3B19` against `#713714`). The top view's W 83 against 72.8 has the same cause. The r34 isn't binding. Accept.
+6. **minor — board notches instead of the §2.3 cut-back.** Judged correct: the junction close-up draws the boards
+   continuing on both sides of the post. They leave 0.02 of clearance and no holes in the deck edge. Accept.
+7. **minor — legs a little too dark in side-lit views.** The front legs are `#4D2B13` against `#764521` (Δ41), and the
+   f34 +X face Δ20. The leg / post value ratio is 0.70 against the sheet's 0.84.
+   - **Fix target (optional):** lighten `wood_dark` about 10 %. Keep the legs clearly darker than the posts.
+8. **minor — f34 rope Y median `#E2BA66` against `#F8CF7C` (Δ22, a touch dull).** In the r34 it is `#FFD678`, so this
+   is light-dependent. Optional.
+9. **minor — knot reads boxy.** It is two small wraps, not the side cell's lumpy loop at the post. Optional.
+10. **minor — rope part's knob quads are non-planar (≤ 0.035).** Harmless once triangulated. Optional: build the
+    knob bands as triangles.
+11. **minor (recorded) — ortho cells.** The front, side and rear W : H misses come from §3.1. The side_sheet also
+    shows the −Y X brace through the open legs, which is consistent in 3D; the side cell doesn't draw it.
+12. **minor — bolt blocks barely read in the front view.** They are the beam's colour and only 0.35 proud, where the
+    sheet's blocks read as distinct squares. Optional.
+
+**Decisions:**
+- 1 (size), 3, 4, 5, 6, 8, 9, 10, 11 and Packaging are followed exactly.
+- 2: followed. The boards are 1.83 wide rather than 1.82, so ten boards with 0.10 gaps fill 19.2.
+- 7: partly met (finding 2).
+
+**No blockers.** The mesh and winding are clean, the model is under budget, nothing floats, the silhouette and parts
+are right, the rope is thick, the colour is one orange family, and nothing is coloured by facing.
+
+**Score: 8 / 10.** **Verdict: PASS.** Findings 1–2 (the coils' rope read and 6-sided swags) are the most worthwhile
+polish if a round 2 is run.
+
+## Main session ruling (2026-10-29)
+- **Verdict:** passed in round 1 (8/10) and committed.
+- **Decision 7:** 5-sided swags and knot loops are accepted. The rope still reads thick and twisted, which was the decision's intent. Recorded here as a known deviation.
+- **Board notches** instead of the cut-back are accepted. They match the junction close-up.
+- **Left for a later polish pass:**
+  - Coils read as faceted octagonal collars. Give them a geometric twist.
+  - The f34 gold share is +2.7, mostly rope. Use a larger amber-ply share on the coils.
+  - The f34 dark wood is −6.0 at the governing camera, which is lighting; it passes at (40, 12).
+  - The legs are a little dark in side light.
+  - The rope median is slightly dull.
+  - The knot is boxy.
+  - The bolt blocks barely read from the front.
+- **Export:** 7 assets, 7 solid pieces, 4966 tris, 0 VFX sockets, palette 16 colours, 0 problems.

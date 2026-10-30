@@ -1,0 +1,902 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M045",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m045_bark",
+    "hex": "#BA6C26",
+    "levels": [
+     0.97358,
+     0.97561,
+     0.98072,
+     0.98566,
+     0.98775,
+     0.98958,
+     0.992,
+     0.99491,
+     0.99961,
+     1.00113,
+     1.00328,
+     1.01024,
+     1.01467,
+     1.01733,
+     1.02327,
+     1.02673,
+     1.02946,
+     1.03114,
+     1.03612,
+     1.03995,
+     1.04327,
+     1.0481,
+     1.05456,
+     1.05955,
+     1.06634,
+     1.0783,
+     1.0831
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_bark_deep",
+    "hex": "#643A1C",
+    "levels": [
+     1.0,
+     1.01326,
+     1.05604
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_bark_x_deep_25",
+    "hex": "#A46024",
+    "levels": [
+     0.96474,
+     0.97003,
+     0.97336,
+     0.97527,
+     0.97807,
+     0.98032,
+     0.98363,
+     0.98685,
+     0.98892,
+     0.9915,
+     0.99334,
+     0.99666,
+     1.00035,
+     1.00235,
+     1.00418,
+     1.00729,
+     1.0099,
+     1.01363,
+     1.04743,
+     1.06706
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_bark_x_deep_50",
+    "hex": "#8F5321",
+    "levels": [
+     0.97654,
+     0.98009,
+     0.98477,
+     0.98769,
+     0.99012,
+     0.99233,
+     0.99486,
+     0.99798,
+     1.00261,
+     1.01326,
+     1.05604
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle",
+    "hex": "#4B8034",
+    "levels": [
+     0.93884,
+     0.95166,
+     0.95605,
+     0.96183,
+     0.96567,
+     0.97351,
+     0.9789,
+     0.98167,
+     0.98345,
+     0.98545,
+     0.98745,
+     0.98956,
+     0.99191,
+     0.99358,
+     0.99726,
+     0.99894,
+     1.00163,
+     1.00322,
+     1.00657,
+     1.00895,
+     1.01015,
+     1.01245,
+     1.01391,
+     1.01609,
+     1.01778,
+     1.02201,
+     1.02854,
+     1.03727,
+     1.04243,
+     1.04628,
+     1.05155,
+     1.06631
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle_x_deep_25",
+    "hex": "#407636",
+    "levels": [
+     0.93548,
+     0.94659,
+     0.95319,
+     0.95813,
+     0.96383,
+     0.96791,
+     0.97426,
+     0.97973,
+     0.98552,
+     0.99005,
+     0.99542,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00092,
+     1.00334,
+     1.00618,
+     1.00803,
+     1.01057,
+     1.0135,
+     1.01658,
+     1.01895,
+     1.0217,
+     1.02453,
+     1.02557,
+     1.02951,
+     1.03176,
+     1.03323,
+     1.03804,
+     1.04739,
+     1.0733
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle_x_deep_50",
+    "hex": "#346D37",
+    "levels": [
+     0.94457,
+     0.9627,
+     0.96823,
+     0.97171,
+     0.97422,
+     0.9778,
+     0.98409,
+     0.98794,
+     0.98895,
+     0.99467,
+     0.9972,
+     0.99963,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00163,
+     1.00349,
+     1.00545,
+     1.00918,
+     1.01268,
+     1.01429,
+     1.0171,
+     1.01954,
+     1.02288,
+     1.02639,
+     1.03814,
+     1.04958,
+     1.0549,
+     1.06223
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle_x_deep_75",
+    "hex": "#296438",
+    "levels": [
+     0.95305,
+     0.9613,
+     0.97067,
+     0.97335,
+     0.97628,
+     0.97955,
+     0.98137,
+     0.98388,
+     0.98477,
+     0.98589,
+     0.98715,
+     0.9888,
+     0.99076,
+     0.99242,
+     0.99369,
+     0.99468,
+     0.9958,
+     0.99651,
+     0.99916,
+     1.00264,
+     1.00585,
+     1.00741,
+     1.00902,
+     1.01158,
+     1.01388,
+     1.01522,
+     1.01775,
+     1.02159,
+     1.0334,
+     1.03548,
+     1.03848,
+     1.04643
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle_x_light_25",
+    "hex": "#659232",
+    "levels": [
+     0.94959,
+     0.95775,
+     0.96127,
+     0.9637,
+     0.96773,
+     0.96891,
+     0.97096,
+     0.97344,
+     0.97645,
+     0.97817,
+     0.9793,
+     0.98058,
+     0.9828,
+     0.98542,
+     0.98748,
+     0.98829,
+     0.99175,
+     0.99418,
+     0.99681,
+     0.99879,
+     1.00159,
+     1.00204,
+     1.00332,
+     1.00477,
+     1.00817,
+     1.01063,
+     1.01352,
+     1.0196,
+     1.02663,
+     1.02964,
+     1.03239,
+     1.03566
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_needle_x_light_50",
+    "hex": "#80A430",
+    "levels": [
+     0.94292,
+     0.95136,
+     0.95831,
+     0.96214,
+     0.97354,
+     0.9792,
+     0.98369,
+     0.98612,
+     0.98847,
+     0.98995,
+     0.99114,
+     0.99205,
+     0.99319,
+     0.99522,
+     0.99823,
+     1.00308,
+     1.00617,
+     1.01167,
+     1.01475,
+     1.01764,
+     1.01842,
+     1.0209,
+     1.0225,
+     1.0245,
+     1.02566,
+     1.02865,
+     1.03119,
+     1.03383,
+     1.0387,
+     1.04392,
+     1.05109,
+     1.06221
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant",
+    "hex": "#879C1A",
+    "levels": [
+     0.96505,
+     0.9731,
+     0.98409,
+     0.98984,
+     0.99637,
+     1.00104,
+     1.00715,
+     1.01337,
+     1.02462,
+     1.03014
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant_dark",
+    "hex": "#2E7C48",
+    "levels": [
+     0.96537,
+     0.97782,
+     0.98296,
+     0.99275,
+     1.01517,
+     1.02143,
+     1.02573
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant_dark_x_bark_deep_25",
+    "hex": "#3C6C3D",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant_deep",
+    "hex": "#62AA40",
+    "levels": [
+     0.96172,
+     0.96403,
+     0.97465,
+     0.97699,
+     0.98751,
+     0.98988,
+     0.99479,
+     0.9979,
+     0.99987,
+     1.0075,
+     1.00912,
+     1.01256,
+     1.01729,
+     1.02093,
+     1.02499,
+     1.02888
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant_deep_x_plant_dark_50",
+    "hex": "#489344",
+    "levels": [
+     0.96172,
+     0.97465,
+     0.97699,
+     0.98751,
+     0.9968,
+     0.99965,
+     1.00876,
+     1.01256,
+     1.01809,
+     1.02093,
+     1.02499,
+     1.02966
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_plant_x_deep_50",
+    "hex": "#74A32D",
+    "levels": [
+     0.96607,
+     0.9731,
+     0.98477,
+     0.99637,
+     1.00715,
+     1.01408,
+     1.02448
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_rock",
+    "hex": "#A49D99",
+    "levels": [
+     0.95982,
+     0.9619,
+     0.96935,
+     0.98446,
+     0.98745,
+     0.98977,
+     0.9922,
+     0.99389,
+     0.9973,
+     1.00015,
+     1.00189,
+     1.00483,
+     1.00667,
+     1.00876,
+     1.0106,
+     1.01288,
+     1.01578
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_rock_x_deep_25",
+    "hex": "#9E9895",
+    "levels": [
+     0.96177,
+     0.96772,
+     0.97018,
+     0.97158,
+     0.97672,
+     0.97998,
+     0.98285,
+     0.98707,
+     0.98902,
+     0.99124,
+     0.99386,
+     0.99604,
+     0.99778,
+     1.00129,
+     1.00258,
+     1.005,
+     1.0072,
+     1.01011,
+     1.01371,
+     1.01535
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_rock_x_light_25",
+    "hex": "#A7A09C",
+    "levels": [
+     0.96135,
+     0.98492,
+     0.98663,
+     0.98904,
+     0.9946,
+     1.01011
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_rock_x_light_50",
+    "hex": "#AAA39E",
+    "levels": [
+     0.96508,
+     0.96934,
+     0.97425,
+     0.97575,
+     0.97991,
+     0.98236,
+     0.98523,
+     0.98735,
+     0.98873,
+     0.99137,
+     0.99435,
+     0.99641,
+     0.99829,
+     1.00081,
+     1.00298,
+     1.00537,
+     1.00792
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_sand",
+    "hex": "#BCAA88",
+    "levels": [
+     0.98782
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_sand_x_deep_25",
+    "hex": "#BAA886",
+    "levels": [
+     0.97805,
+     0.98029,
+     0.98243,
+     0.98522,
+     0.98709,
+     0.98996,
+     0.99186,
+     0.99479,
+     0.99824,
+     0.99954,
+     1.00265
+    ],
+    "used": true
+   },
+   {
+    "key": "m045_sand_x_deep_50",
+    "hex": "#B9A684",
+    "levels": [
+     0.97817,
+     0.98176,
+     0.98397,
+     0.98687,
+     0.98896,
+     0.99146,
+     0.99334,
+     0.99677,
+     1.00041,
+     1.00219,
+     1.00609
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "PineSapling",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "hero",
+   "size": [
+    7.6513,
+    10.0,
+    7.4745
+   ],
+   "tris": 3012,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSapling.glb",
+     "kind": "solid",
+     "tris": 3012,
+     "offset": [
+      0.0,
+      5.0,
+      0.0
+     ],
+     "size": [
+      7.6513,
+      10.0,
+      7.4745
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Pine Sapling: three foliage tiers of thick paddle slab plates (crown star cone + 12, middle 14, lower 14, two rows each) stacked by peg and square recess on a smooth tapered orange trunk with two knots and six blunt root flares, on a thin sand patch with 4 pale grey rocks, 4 broad-leaf rosettes and 3 sprigs. No VFX"
+  },
+  {
+   "name": "PineSaplingGroundFoliage",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    2.193,
+    1.496,
+    2.6363
+   ],
+   "tris": 162,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingGroundFoliage.glb",
+     "kind": "solid",
+     "tris": 162,
+     "offset": [
+      0.0,
+      0.748,
+      0.0
+     ],
+     "size": [
+      2.193,
+      1.496,
+      2.6363
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ground Foliage: an upright fan of 11 broad round-tipped oval leaves (lime and green outside, dark and green inside) on a hub"
+  },
+  {
+   "name": "PineSaplingLowerTier",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    7.5541,
+    4.1055,
+    7.4578
+   ],
+   "tris": 576,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingLowerTier.glb",
+     "kind": "solid",
+     "tris": 576,
+     "offset": [
+      0.0,
+      2.0527,
+      0.0
+     ],
+     "size": [
+      7.5541,
+      4.1055,
+      7.4578
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Lower Foliage Tier: pleated core with a square recess, a flat cap and an octagonal peg, 14 plates in two rows"
+  },
+  {
+   "name": "PineSaplingMiddleTier",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    5.7721,
+    3.3947,
+    5.4466
+   ],
+   "tris": 576,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingMiddleTier.glb",
+     "kind": "solid",
+     "tris": 576,
+     "offset": [
+      0.0,
+      1.6973,
+      0.0
+     ],
+     "size": [
+      5.7721,
+      3.3947,
+      5.4466
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Middle Tier: the lower tier's construction at 0.8 (core with recess, flat cap and peg, 14 plates in two rows)"
+  },
+  {
+   "name": "PineSaplingRockMedium",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    1.8265,
+    1.2663,
+    1.5496
+   ],
+   "tris": 44,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingRockMedium.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.6332,
+      0.0
+     ],
+     "size": [
+      1.8265,
+      1.2663,
+      1.5496
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock (Medium): chunky faceted pale grey block with a flat sloping crown"
+  },
+  {
+   "name": "PineSaplingRockSmall",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    1.0284,
+    0.7787,
+    0.9363
+   ],
+   "tris": 44,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingRockSmall.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.3894,
+      0.0
+     ],
+     "size": [
+      1.0284,
+      0.7787,
+      0.9363
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock (Small): chunky faceted pale grey block with a flat sloping crown"
+  },
+  {
+   "name": "PineSaplingTopTier",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    3.6738,
+    2.9928,
+    3.7216
+   ],
+   "tris": 470,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingTopTier.glb",
+     "kind": "solid",
+     "tris": 470,
+     "offset": [
+      0.0,
+      1.4964,
+      0.0
+     ],
+     "size": [
+      3.6738,
+      2.9928,
+      3.7216
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Top Foliage Tier: 4 + 4-ridge star cone with 8 hem plates and 4 upper plates, square recess underneath"
+  },
+  {
+   "name": "PineSaplingTrunk",
+   "sheet": "M045",
+   "subject": "Pine Sapling",
+   "role": "part",
+   "size": [
+    3.6419,
+    4.36,
+    3.9686
+   ],
+   "tris": 348,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/PineSaplingTrunk.glb",
+     "kind": "solid",
+     "tris": 348,
+     "offset": [
+      0.0,
+      2.18,
+      0.0
+     ],
+     "size": [
+      3.6419,
+      4.36,
+      3.9686
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Trunk: smooth 8-sided tapered stump with two knots, a flat top (the peg) and six blunt root flares"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 5232,
+  "vfxSockets": 0,
+  "paletteColours": 23,
+  "paletteLevels": 389,
+  "meshBytes": 508764
+ },
+ "problems": []
+}

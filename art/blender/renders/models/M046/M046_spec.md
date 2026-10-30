@@ -4,7 +4,7 @@ Reference: `art/blender/assets/references/046.png` (1024 × 1536 px). The sheet'
 "FLINTBORN ENVIRONMENT MODEL CATALOG / STYLIZED • MODULAR • GAME-READY (BLENDER / ROBLOX)" at the top right. Its page
 number reads "PAGE 44/132" (bottom right), two less than the file number; INDEX.md row 46 calls it "Flintborn Natural
 Arch Model Study". The footer reads "FLINTBORN — INDIVIDUAL MODEL STUDY".
-Builder: `art/blender/kit/mcp/m046.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m046.py` → `build()` (stages 1–6 done 2026-10-29). Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session then puts the
 model into the kit file, exports and commits.
 
@@ -932,3 +932,1017 @@ All 14 recommendations are accepted, with notes on 7 and 10.
 14. **Names:** `StoneGate*`, keys `m046_*`.
 
 **Binding targets:** the f34 shares in §1 (within ±4) and the front-cell opening numbers.
+
+## Stage 1: Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m046.py` (`build()`; quick loops `hero_only()`, `preview()`), built in a background Blender
+(port 9882, `wip/M046.blend`). It imports M040's generic helpers (CDT, Steiner points, hull pieces, dome heart, prism,
+`_touch`, `_Guard`, the shell / contact / rock-metric reports) and M043's rounded leaves (`_tleaf`, `_rleaf`). Nothing
+in `m040.py`, `m043.py` or the shared helpers was edited. The final check ran in a freshly restarted session.
+
+- **Mass cores (`mass_core(sx)`, Left / Right Rock Mass): each ONE closed shell built directly, with no boolean.**
+  - A chain of 31 column points runs round a base path: front jamb corner → front → a radius-3.2 corner → end → corner →
+    back → back jamb corner → 3 jamb-face points.
+  - There are 9 columns per mass: 3 on the front (including the jamb column), 3 round the end and 3 on the back. Each
+    column has a crease (pushed in 0.64–0.84), a face and a ridge (pushed out 0.24–0.36).
+  - Each chain point is a vertical column of verts, and neighbouring columns are zipped into quads and tris.
+  - **Stacked blocks.** Each column has its own three levels, shared by all its points, so the facet breaks run across
+    the column (the sheet's lumpy stacked columns):
+    - a lower bulge at 1.9–3.1;
+    - a block joint at 4.4–6.2, set back 0.12–0.22;
+    - an upper bulge at 7.4–9.6.
+  - Batter by height follows `S_FRONT` and `S_END` (the spec §2.3 table).
+  - The column tops are solved onto the dome `zt(x, y)`: 13.4 over the middle, the shoulders falling over the ends and
+    the rims rounding front and back. Creases and ridges take the top height of their un-pushed path point, so the top
+    ring does not zigzag.
+  - **The opening side.** The jamb face is vertical (x 3.5–3.75, relief only into the rock) from 0 to the spring at 5.4.
+    The haunch then runs to the tip at x ±2.25 at 8.0 through (±3.2, 6.2), (±2.85, 7.0) and (±2.55, 7.6).
+  - **Hidden joining surfaces:**
+    - the flat ledge at z 8.0 (a CDT from the haunch tips out to x ±6.7);
+    - the flat joining face at x ±6.7 (z 8.0 up to the dome);
+    - the top under the lawn (a CDT with interior points on the dome);
+    - the flat bottom.
+  - The joint lines at x ±6.7 (front and back) are shared with the span's end rings.
+- **Skirt blocks (8) and foot boulders (8)** are closed hulls.
+  - Skirts are 2.6–3.2 along the face, 1.6–1.7 deep and 4.0–5.7 tall. Each has a 5-sided foot, its widest ring at 0.32 h,
+    a 4-point shoulder at 0.68 h and a pitched ridge top (two points at ±0.28 w).
+  - Three skirts (SK_L2, SK_L3, SK_R2) have a small flat crown (≤ 1.2) under a lime ledge pad.
+  - Boulders are chunky gems: a 5-sided foot, widest at 0.42 h, a 3-point crown ring at 0.8 h (0.64 W) and an off-centre
+    apex. H/W is 1.05–1.23, and each long axis runs along its face.
+  - A piece whose hull would have a corner under 5° is rebuilt with the next seed.
+- **Top span (`span()`): ONE closed shell.** It is a loft of 13 rings along X (±6.75, ±5.0, ±3.35, ±2.3, ±1.85, ±1.2, 0).
+  - **Faces.** The front and back faces have rings at the bottom, 10.0, 11.8 and the top, with four lumps per face. The
+    front peaks at ±5.0 and ±1.2 with creases at ±3.35 and 0; the back is staggered. The lumps bulge most at mid
+    height.
+  - **Bottom.** It is flat at the seat (z 7.98) for |x| ≥ 2.3, sunk 0.02 into the ledges. The soffit runs (2.3, 7.98) →
+    (1.85, 8.3) → (1.2, 8.7) → (0, 9.44–9.49), with ±0.12 relief across the depth.
+  - **Top.** A CDT on the dome.
+  - **Ends.** The end rings sit 0.05 inside the masses (at x ±6.75, the joint line moved 0.03 in), so the span and mass
+    joints overlap and cannot crack.
+- **Lawn caps (`lawn_cap`), one per part.**
+  - **Outline.** The rock top ring pushed out 0.18–0.28 (the lip foot), with the lawn's top edge 0.15 outside the rim.
+  - **Lip.** It drops 0.38–0.62 below the rim, so the lawn caps every rock top and its underside dips below the rim all
+    round.
+  - **Top.** A CDT with an inner ring 0.95 inside the edge plus interior points; the lawn is 14.0 in the middle.
+  - **Seams at x ±6.7.** Both caps use the same seam points (the corners, ±3.3 and 0) and overlap by 0.03. They can't
+    share the points, because the kit merges coincident verts.
+- **Sill (`sill()`, Ground Sill): 12 sand flagstones.**
+  - The tiles are Voronoi cells of three convex pieces: the tunnel strip (x ±3.7, y ±4.8) and the two mouth flares (to
+    x ±5.8 at y ±6.8).
+  - Short and straight corners are cleaned off, and each cell is inset 0.025 (seams 0.05).
+  - Each tile is a closed slab with its top at 0.40 ± 0.02, running 0.2 under each jamb foot.
+- **Dressing:**
+  - 8 rim dome bushes, 2.3–3.0 across and 2.0–2.5 tall (4 on the span, 2 per mass);
+  - a jamb-foot dark bush, 7 small foot bushes and 3 pad bushes;
+  - 4 sprigs (2 on the apron, 2 along the tunnel wall feet);
+  - 10 pebbles (3 on the span, 1 per mass, 2 on the apron, 3 on the floor) and 8 five-point yellow flowers;
+  - two lime aprons (bevelled strips 0.7–1.25 wide, tucked 0.45 under the rock) and two lime strips along the tunnel's
+    wall feet.
+- **How the bushes are built:**
+  - a hidden faceted heart, its underside soil-dark;
+  - broad rounded leaves laid tangent on the heart: dark bushes 3 crown + 4 skirt, small 2 + 3, pad 2 + 2;
+  - each leaf is slid onto the heart, guarded out of the rock (≤ 0.05 in) and kept above the turf it sits on.
+- **Hero `StoneGate`:** the four parts plus the hero-only foot dressing, as one object of 204 closed shells, with no
+  booleans.
+- **Cameras:**
+  - **`f34_sheet`:** probed az −25 / −28 / −30 / −35 × e 14 / 18, with the long lens and with perspective, and kept
+    **(−28, 18)**, which is in decision 9's probe set.
+    - At (−28, 18) the W:H is 1.254, the shares are within ±4, and a sliver of paper shows through the tunnel.
+    - At −35 the W:H is 1.208, under the 1.22 floor.
+  - **`f34_see_sheet` (−22, 18), extra.** A 12-deep tunnel with a 7-wide mouth can only be seen through below about
+    az −30, so this view shows the see-through (the hole is 0.09 × 0.19 of the frame, centred at 0.507).
+  - **`front_sheet`** stays at (0, 8) as decided.
+  - **`front_level_sheet` (0, 4), extra.** It is the level end of the study's e 4–12 fit, and carries the hole numbers.
+  - **Others:** side (90, 8), rear (180, 8), r34 (145, 18), top (0, 60).
+  - Every `*_sheet` view uses a 3× lens with the floor hidden.
+
+## Stage 2: Optimisation and cleanup (modeller)
+
+| Object | Tris (limit) | Size W × D × H | Shells |
+| --- | --- | --- | --- |
+| `StoneGate` (hero) | **3932** (4000) | 25.62 × 14.14 × 16.00 | 204 |
+| `StoneGateSpan` | 862 (1000) | 13.50 × 11.76 × 8.02 | 39 |
+| `StoneGateMassL` | 966 (1000) | 10.49 × 13.23 × 15.21 | 39 |
+| `StoneGateMassR` | 900 (1000) | 10.51 × 13.34 × 15.37 | 33 |
+| `StoneGateSill` | 184 (1000) | 11.48 × 13.55 × 0.50 | 15 |
+
+- **Hero tris by kind:**
+
+  | Kind | Shells | Tris | Breakdown |
+  | --- | --- | --- | --- |
+  | rock | 19 | 1400 | cores 338 / 340, span 294, skirts 28–32, boulders 24 |
+  | lawn | 10 | 728 | caps 196 / 112 / 112, aprons, pads, strips |
+  | tiles | 12 | 160 | |
+  | leaves and petals | 153 | 1564 | |
+  | pebbles | 10 | 80 | |
+
+- **Every object** has:
+  - 0 non-manifold edges and **0 non-manifold (bowtie) verts**;
+  - 0 boundary or wire edges, 0 loose verts, 0 zero-area faces, 0 n-gons and 0 duplicate verts;
+  - normals outward and transforms applied;
+  - every shell closed with positive volume, with 0 self-intersecting pairs and 0 inverted faces (ray parity).
+- **Winding (STAGES, the 044 lesson): 0 winding errors and 0 unpaired edges on every object.**
+  - `winding_report` counts directed edges used twice or without a partner.
+  - The span, cores and tiles are hand-built. Every shell's normals are recalculated and then checked this way.
+  - `build()` lists any winding error as a problem.
+- **No face has a corner under 5°** on any object. The smallest are 5.45° (hero), 7.88° (span) and 8.27° / 6.41°
+  (masses). Getting there took four changes:
+  - the span's top is a CDT, not long loft strips;
+  - the tile top bevel ring was dropped: a 0.06 bevel along 2–4-stud edges can only be built from slivers, so the 0.4
+    side carries the darker sand band instead;
+  - the aprons and tunnel strips have bevelled edges;
+  - the column levels are shared between the jamb-side columns and the joints.
+- **Origins** are at the bottom centre. The offsets of the build frame (`m046_offset`):
+
+  | Object | Offset | Note |
+  | --- | --- | --- |
+  | hero | (−0.011, −0.101, 0.0) | the y part is the dressing's front / back asymmetry |
+  | span | (0, 0.015, 7.98) | |
+  | MassL | (−7.495, 0.027, 0) | |
+  | MassR | (7.504, −0.119, 0) | |
+  | sill | (0, 0, 0) | |
+
+- **Floating shells: 0** on every object (`contact_report`). For the hero: 204 shells, worst gap 0.0, max gap 0.003,
+  and 0 unchained at both 0.03 and 0.1. The span chains through its seats to the masses.
+- **Capping.**
+  - Flat rock (n.z > 0.85) seen from straight above **above z 12: 0.0 studs²**.
+  - Flat rock seen from above anywhere: 4.9 studs². This is:
+    - thin strips of the hidden ledge at z 8.0, showing in front of and behind the span where a mass column stands proud
+      of the span's foot;
+    - boulder and skirt crown facets.
+  - Everything seen from above inside the footprint, in studs²:
+
+    | Lawn | Leaves | Rock (z ≤ 12) | Rock (z > 12) | Tiles |
+    | --- | --- | --- | --- | --- |
+    | 147.9 | 48.0 | 84.3 | 6.7 | 12.3 |
+
+    The rock below z 12 is battered faces, skirts and boulders. The rock above z 12 is sloped battered faces just under
+    the lip; none of it is flat.
+  - Every rock top-ring point lies inside its cap's top edge, by ≥ 0.14 on the span and ≥ 0.051 on the masses.
+  - The lip reaches ≥ 0.38 below the rim.
+- **No light leaks.**
+  - `crack_report` casts 972 rays at points 0.15 inside the solid, from the six sheet cameras plus three more.
+  - The targets lie along the span / mass joint lines, the seat line, the cap seams and the floor / jamb joins.
+  - Result: **0 leaks and 0 see-through.**
+  - The only see-through is the opening. The enclosed background "specks" in the renders are gaps between bush leaves
+    above the lawn (checked with a mask).
+- **Walk test (rock only).**
+  - **Clear width:**
+
+    | z | 0.6 | 2.0 | 4.0 | 5.4 | 6.2 | 7.0 | 7.6 | 8.0 | 8.3 |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | width | 7.08 | 7.14 | 7.11 | 7.05 | 6.43 | **5.72** | 5.11 | 4.54 | 3.61 |
+
+  - **Clear height over the floor:**
+
+    | x | 0 | ±1 | ±2 | ±3.2 | ±3.4 |
+    | --- | --- | --- | --- | --- | --- |
+    | height | **9.05** | 8.32 / 8.37 | 7.71 / 7.81 | 5.82 / 5.85 | 5.30 / 5.34 |
+
+  - The apex is at 9.44–9.49, and the floor top at 0.386–0.419 (p5–p95).
+  - The tallest dressing on the floor is 0.25 (strips and sprigs).
+  - The lawn over the central 14 × 6, skipping bush footprints, is **13.60–14.00**, with a slope p95 of 22.9°.
+- **Rock metrics** (`m040.rock_metrics`):
+  - area CV 1.05 / 0.93 on the masses and 1.70 on the span;
+  - 74 % of the masses' side faces within 20° of vertical (the shoulders and haunch round over);
+  - the largest front facets are 1.6–2.2 wide by 3–6 tall.
+
+## Stage 3: UV (modeller)
+
+- Smart UV on every object (angle-based, 45°, margin 0.008), then `m012._uv_unfold` (0 faces cut).
+- Result: 0 overlapping pairs and 0 flipped; minimum island gap 0.016; border 0.008; even density (1.0 / 1.0 / 1.0);
+  conformal stretch p95 ≤ 1.02.
+- The exporter writes its own palette UVs; this layer is clean.
+
+## Stage 4: Materials, colour and texture (modeller)
+
+**Calibration (`m046.calibrate()`: `K.calibrate` on the kit test dome against §5.4's targets):**
+
+| Key | Hex | Dome render | Target |
+| --- | --- | --- | --- |
+| rock | `#A08B81` (19°, R − B 31) | (202,170,150) | `#C9AA9A` |
+| rock_light | `#B6A498` (24°) | (231,201,178) | `#E6CBB7` |
+| rock_deep | `#8E7A75` → **`#8F7A70`** | (179,148,136) | `#B39587` |
+| floor | `#C39D75` | (246,189,130) | `#F6BC82` |
+| floor_deep | `#A08470` | (199,156,124) | `#C69C7A` |
+| grass | `#A3B20A` → **`#A3B300`** | (203,217,13) | `#CCD60A` |
+| grass_light | `#AFBA0F` → **`#AFBA06`** | (219,227,16) | `#D9E30F` |
+| grass_deep | `#8D9D04` → **`#8D9D00`** | (174,189,8) | `#ADBC09` |
+| leaf | `#3A6815` | (66,120,22) | `#407616` |
+| leaf_lit | `#6C9F32` | (130,192,51) | `#82C032` |
+| leaf_deep | `#205D1F` | (36,106,31) | `#1F6A21` |
+| flower | `#B5B21A` | (227,217,27) | `#E2DB1A` |
+| pebble | `#AEAEA7` | (221,214,196) | `#DDD6C3` |
+| trunk (soil) | `#381000` | (74,38,29) | `#4A2607` |
+
+Three adjustments after calibration:
+- **Mauve guard.** The calibrated rock_deep came out at hue 12°, R − B 25, so it was turned to hue 19° at the same
+  value (`#8F7A70`, R − B 31). Every rock key is now R > G > B, hue 19–24°, R − B ≥ 30. The Rock Light and Rock Shadow
+  swatches are never keys.
+- **Grass.** In the scene the lawn rendered with B about 26 against the sheet's 9, so the blue channel of all three
+  grass keys was taken to 0. The lawn now renders `#CEDD09` against `#CFD809`.
+- **Leaves.** The dark bush tiers were shifted fresher, so the bush median lands in the sheet's 94° family instead of
+  108°:
+  - crown: leaf → lit at 80 %;
+  - middle: leaf → lit at 20 %;
+  - skirt: leaf → deep at 45 %.
+
+**Blends** are by position or role, never by facing.
+- **Rock:**
+  - rock_light rises to 40 % over the upper 40 % of each column's own height, with a noise drift;
+  - rock_deep adds 15 % patches below 1.5;
+  - each column gets a Tint factor of 0.97–1.03, plus a facet mottle (amplitude 0.04, scale 0.3);
+  - the span gets lighter toward its top (z 10.6 → 13); the soffit is plain stone with 10 % deep noise patches;
+  - hidden caps are plain stone;
+  - skirts and boulders are lighter at the crown and deeper at the foot.
+- **Floor:**
+  - sand tops with 10 % deep noise patches;
+  - the 0.4 sides in floor_deep, a band set by its place in the tile;
+  - hidden bottoms in plain sand;
+  - a per-tile Tint of ±0.04 and a broad mottle.
+- **Lawn:**
+  - one noise field across every cap, so there is no colour step at the seams;
+  - vertex noise values averaged per face, so the patches follow no triangle;
+  - 10 / 20 % grass_light patches, and 10 / 25 % grass_deep within 0.8 of a bush root;
+  - the aprons 30 % deeper where they tuck under the rock, the tunnel strips 25 % deep.
+- **Bushes:**
+  - two tones by role: crown fresh, skirt emerald;
+  - a soil-dark heart underside;
+  - sprigs in leaf_lit and a 30 % grass mix;
+  - flowers and buds yellow; pebbles cream-grey.
+
+**Kit check `baked_shading`:** hero 0.13, span 0.10, masses 0.19, sill 0.0 (limit 0.5). `K.check` reports no problems.
+
+**Re-measure** of the final renders, using the study's masks.
+
+*Shape and shares* (sheet values in brackets):
+
+| View | W:H | R / P / L / F / G / D % |
+| --- | --- | --- |
+| f34 (−28, 18) | 1.254 (1.295) | **67.6 / 5.4 / 14.8 / 11.4 / 26.2 / 0.8** (64.5 / 6.6 / 15.2 / 13.3 / 28.5 / 0.4) |
+| f34_see (−22, 18) | 1.301 | 66.8 / 5.6 / 14.5 / 11.6 / 26.1 / 1.5 |
+| front (0, 8) | 1.489 (1.508) | 71.0 / 4.6 / 10.5 / 12.1 / 22.6 / 1.9 (68.1 / 4.7 / 14.8 / 12.1 / 26.9 / 0.3) |
+| front_level (0, 4) | 1.533 | 74.4 / 3.7 / 8.8 / 11.9 / 20.7 / 1.2 |
+| side (90, 8) | 0.762 (0.785) | 70.4 / 0.0 / 13.2 / 16.4 / 29.6 (74.7 / 1.2 / 11.8 / 11.9 / 23.7) |
+| rear (180, 8) | 1.477 (1.450) | 72.8 / 3.6 / 10.1 / 10.9 / 21.0 (67.9 / 4.6 / 15.1 / 12.1 / 27.2) |
+| r34 (145, 18) | 1.211 (1.262) | 69.4 / 1.0 / 13.6 / 12.2 / 25.8 (67.1 / 3.6 / 15.4 / 13.4 / 28.8) |
+| top (0, 60) | 1.449 (1.356) | 38.8 / 8.8 / 35.1 / 16.4 / 51.5 (41.3 / 1.4 / 38.7 / 18.1 / 56.8) |
+
+*Colour medians* (sheet values in brackets; the rock column is the lit half of the rock pixels):
+
+| View | Rock lit half | Floor | Lawn | Bush |
+| --- | --- | --- | --- | --- |
+| f34 (−28, 18) | `#CCAC98` (`#C7A99A`) | `#F6BF86` (`#F6BA80`) | `#CEDD09` (`#CFD809`) | `#3F7822` (`#407616`) |
+| f34_see (−22, 18) | `#CCAC97` | `#F5BF86` | `#CEDD0A` | `#3E7822` |
+| front (0, 8) | `#CAAA96` (`#CCAC9B`) | `#C99D74` | `#CCDA0A` (`#C9D30A`) | `#3D7421` |
+| front_level (0, 4) | `#CAAA96` | | `#CAD80A` | |
+| side (90, 8) | `#A68F81` (in shade) | | `#A8B906` | |
+| rear (180, 8) | `#AF968A` | | `#ADBE08` | |
+| r34 (145, 18) | `#AE9689` | | `#AEC007` | |
+| top (0, 60) | `#CDAD99` | `#F9C187` | `#CEDE06` | `#6B9128` |
+
+- **Binding f34 shares (±4): all inside.** R 67.6 (+3.1), G 26.2 (−2.3), L 14.8, F 11.4, P 5.4.
+- **Front-cell opening (binding).**
+
+  | Camera | w / W | h / H | top | bottom |
+  | --- | --- | --- | --- | --- |
+  | sheet | 0.264 | 0.475 | 0.580 | 0.110 |
+  | front (0, 8) | **0.260** | **0.408** | **0.580** | 0.173 |
+  | front_level (0, 4) | **0.260** | **0.471** | **0.593** | 0.124 |
+
+  - At (0, 8) the hole is centred at 0.496 and the jambs are vertical over its lower half: the row widths are 0.258,
+    0.260 and 0.258 at 0.1, 0.3 and 0.5 of the hole's height. The h/H is 0.027 short of the ±0.04 tolerance, because at
+    e 8 the far floor rises into the hole.
+  - At (0, 4), the level end of the study's camera fit, every number is within tolerance.
+  - In studs (ray-cast): 7.05–7.14 wide up to the 5.4 spring, the apex at 9.44–9.49, and 9.05 clear over the floor.
+- Every rock median is R > G > B at hue 19–24° in every view, including the side, the rear and the tunnel: no mauve and
+  no olive.
+
+## Stage 5: Lighting (modeller)
+
+Skipped (decision 11): the sheet shows no glow or light, so there are no emissive faces and no lights.
+
+Studio checks needing manual validation (§7):
+- the rock stays warm beige, not lilac, next to an M040 / M043 tile;
+- the tunnel reads in shade but not black;
+- the floor reads as warm sand, clearly apart from the rock;
+- the column facets stay flat-shaded;
+- a character walks through the tunnel (9.05 clear, 7.0 wide) without snagging, and reaches the lawn top (14.0) from a
+  10.4 plateau with one jump;
+- the lawn stays yellow-lime and the flowers yellow.
+
+## Stage 6: VFX (modeller)
+
+Skipped (decision 11): the sheet shows no effect. The hero has no sockets and no children, and `build()` treats any
+socket as a problem.
+
+Collision tags follow decision 12: the hero is `precise`, the span and both masses are `hull`, and the sill is `box`.
+
+## Modeller's notes for the verifier
+
+- **Renders** are in `art/blender/renders/models/M046/`:
+  - `M046_views.png`, the contact sheet, and the default views;
+  - the `*_sheet` views: f34 (−28, 18), front (0, 8), side, rear, r34 and top (0, 60), plus `f34_see_sheet` (−22, 18)
+    and `front_level_sheet` (0, 4);
+  - the part shots `part_span`, `part_massl`, `part_massr` and `part_sill`;
+  - `span_underside` (e −30: the flat seats and the soffit);
+  - `exploded`;
+  - `scale`: 5.5-stud markers in the tunnel, on the apron and on the lawn;
+  - `tunnel`: looking into the opening, with the marker;
+  - `hole_cu`;
+  - `junc_cu`: the span lifted 0.8 off the left mass's ledge;
+  - `floor_cu`: the tile thickness.
+- **`build()` returns** `audit`, `uv`, `materials`, `views`, `contact`, `capping` and `problems` (empty). It also
+  returns `cover`, `opening`, `cracks`, `lawn`, `winding`, `shells`, `thin`, `rock_metrics`, `baked_shading`, `offsets`
+  and `measure`.
+- **Known misses and choices:**
+  1. **The f34 camera is at (−28, 18), not (−35, 18).** It is within decision 9's probe set.
+     - At −35 the W:H is 1.208 (under 1.22), and nothing shows through the tunnel.
+     - The sheet's f34 shows paper through the hole at an angle that a 12-deep tunnel with a 7-wide mouth cannot give.
+       `f34_see_sheet` (−22) shows the see-through.
+  2. **Front hole h/H is 0.408 at e 8**, 0.027 outside the ±0.04 tolerance. At e 4 every opening number passes (see
+     stage 4), and the 3D opening matches the spec: 7.0 wide, 9.05 clear, spring 5.4, apex 9.44.
+  3. **Green fifths in the f34** are 8.8 / 5.6 / 1.0 / 42.6 / 42.0 against the sheet's 20.9 / 20.7 / 1.3 / 19.8 / 37.3.
+     - The sheet carries far more foot greenery than the budget and the 13.8 depth limit allow.
+     - The middle fifth is bare (1.0), as required.
+     - The lawn's shoulder drapes and the rim bushes put more green in fifth 4.
+  4. **Front and rear R is 71–73 % against 68 ± 4.** The front is just inside; the rear is 4.9 over. L is 10 % in both:
+     the near-level views see little of the lawn top. G is within 5.
+  5. **D is 1.9–3.8 % in the front, rear and r34** (sheet 0.3–0.5). The tile sides (floor_deep) fall in the dirt mask
+     where they sit in the studio's shade. On the lit dome they render (199,156,124), the sheet's tile-side colour.
+  6. **The tile top bevel was dropped,** since it would have made sub-5° slivers; the sides carry the darker band. There
+     are no explicit notched sill ends: the tunnel tiles run 0.2 under each jamb foot, out of sight.
+  7. **Rock seen from above is 84 + 6.7 studs²** against a target of ≤ 70. It is the battered faces, skirts and
+     boulders; none of it is a flat top.
+  8. **Hero at 3932 tris,** against a plan of about 3600. Leaves account for 1564 of them. MassL is at 966 of 1000.
+  9. **Hero bbox is 25.62 × 14.14 × 16.00** against a target of 25.6 × 13.8 × 15.9. The foot bushes and leaves reach
+     y ±7.2.
+  10. **The f34 bush median is `#3F7822`** against the sheet's `#407616`: B is 12 higher, inside the 14 tolerance.
+- **Not done here:** no commit, push or export. The work file `wip/M046.blend` is saved.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier, read-only, in a background Blender on port 9882 (`wip/M046_verify.blend`). Nothing was built, edited
+or saved. Every number below comes from the verifier's own bmesh / BVH / ray-cast code and its own image masks, not from
+`build()`'s reports. Renders and scripts are in the session scratchpad `m046_verify\`.
+
+### Measured
+
+**Mesh**
+
+| Object | Tris (limit) | Size W × D × H | Shells | Open / non-manifold / boundary / wire / loose | Bowtie verts | Winding (dup / unpaired) | Zero-area / n-gons | Self-x in a shell | Neg-volume shells | Origin | Transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `StoneGate` | 3932 (4000) | 25.62 × 14.14 × 16.00 | 204 | 0 / 0 / 0 / 0 / 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | bbox bottom centre (0, 0, 0) | applied |
+| `StoneGateSpan` | 862 (1000) | 13.50 × 11.76 × 8.02 | 39 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateMassL` | 966 (1000) | 10.49 × 13.23 × 15.21 | 39 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateMassR` | 900 (1000) | 10.51 × 13.34 × 15.37 | 33 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateSill` | 184 (1000) | 11.48 × 13.55 × 0.50 | 15 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | bottom centre | applied |
+
+- Every shell is closed, consistently wound and of positive volume, so the normals point outward.
+- **UV:** 0 overlapping pairs, 0 flipped, 0 zero-area, inside 0.008–0.992 on every object.
+- **Rock footprint at the ground** (skirts and boulders included): x −12.61 … +12.74, y −6.46 … +6.64. Lawn top 14.01.
+
+**Joints (ray-cast, rock + lawn + tiles only).**
+- Points on the span/mass joint planes at x ±6.72 (z 8–13.6), the seat plane at z 7.98 (x ±2.3…±6.7) and the cap seams
+  at x ±6.7: 128k samples, of which 110k are enclosed.
+- Full lines were cast both ways through every enclosed point, along 18 directions: the 8 sheet cameras, −35 / −28 /
+  −22 f34, grazing at e 0.3 from all four sides, straight down, (−45, 30), (−145, 18) and the underside at e −30.
+- Result: **0 see-through**.
+- Ground under the jamb feet (x ±3.3…±3.95): 0 of 2828 samples are visible from any camera.
+
+**Floating dressing.**
+- Hero: 204 shells, 48 on the ground, **0 floating**, 0 unchained. Every off-ground shell is ≤ 0.01 from a neighbour, or
+  intersects one.
+- Parts: span 0 / 0, MassL 0 / 0, MassR 0 / 0, sill 0 / 0.
+
+**Capping.**
+- Seen from straight above inside the footprint, in studs²: lawn 149.2, leaves 51.8, rock 96.0 (89.3 at z ≤ 12 and 6.7
+  above it, all sloped faces), tiles 23.3.
+- **Flat rock above z 12: 0.** Flat rock anywhere: 4.0 studs², all of it the hidden seat ledge at z 8.0.
+  - These are slivers where a mass column stands proud of the span's foot: (±2.9, ∓4.4), (±5.6, ∓5.3), (±5.9, ±4.1).
+  - 2.5–3.1 studs² of them are visible from each sheet camera.
+
+**Opening (rock only, then everything).**
+
+| Measure | Value |
+| --- | --- |
+| Clear width | 7.03 / 7.05 / 7.09 / 7.11 / 7.07 / 7.02 / 7.02 at z 0.6 / 1 / 2 / 3 / 4 / 5 / 5.4; 6.64 at z 5.9 (head height over the floor); 5.71 at 7.0; 4.54 at 8.0 |
+| Rock apex | 9.43 |
+| Clear height over the floor | **9.04** at x 0; 8.31 / 8.38 at ±1; 7.70 / 7.82 at ±2 |
+| Floor top | p5 0.386, median 0.395 |
+| Dressing in the tunnel | at most 0.33 above the floor (the strips and sprigs) |
+| Walk test | a 2 × 1 × 5.5 character box sweeps through at x −2, −1, 0, +1 and +2 without touching anything |
+| Lawn over the central 14 × 6 | 13.57–14.01, slope p95 22.7° |
+
+**Dressing cut into rock (per-shell ray parity against each rock shell).**
+- **Hero: 33 dressing shells more than 0.05 inside rock**: 28 more than 0.10 and 24 more than 0.20.
+- **The worst is 0.81 deep, and several leaves lie entirely inside a mass core**: 7 of 7 verts in, at (8.11, −5.47,
+  0.95), (−8.62, 5.89, 0.88) and (7.81, −5.39, 0.42).
+- Axis rays confirm it. The leaf at (−8.31, 4.97, 0.42) has rock out to y 6.52, and the one at (8.11, −5.47) has rock
+  out to y −5.83.
+- All of these are hero-only foot bushes: J1, F2, F3, F4, F6 and F7.
+- Parts: span, MassL and MassR all have 0.
+
+**Shape and shares** (the verifier's own masks; sheet values in brackets):
+
+| View | W:H | R / P / L / F / G / D % | Green fifths, bottom → top | Top profile |
+| --- | --- | --- | --- | --- |
+| f34 (−28, 18) | 1.253 (1.295) | 67.6 / 5.4 / 14.1 / 12.0 / 26.1 / 0.8 (64.5 / 6.6 / 15.2 / 13.3 / 28.5 / 0.4) | 8.6 / 5.5 / 0.9 / 41.8 / 43.2 (20.9 / 20.7 / 1.3 / 19.8 / 37.3) | f .05–.15 at .57 / .75 / .87 (.35 / .54 / .74); max dev 0.22, mean 0.06 |
+| f34 (−35, 18) | 1.199 | 68.1 / 5.0 / 14.8 / 11.9 / 26.7 / 0.2 | 7.7 / 6.2 / 1.5 / 43.0 / 41.7 | similar |
+| front (0, 8) | 1.488 (1.492) | 70.8 / 4.7 / 10.0 / 12.4 / 22.4 / 2.0 (67.7 / 4.8 / 15.0 / 12.2 / 27.2 / 0.3) | 11.4 / 4.4 / 1.3 / 21.1 / 61.8 (30.3 / 6.2 / 0.4 / 25.8 / 37.3) | f .05–.15 at .43 / .85 / .90 (.28 / .68 / .80); width at h .85 / .95 is .79 / .55 (.65 / .24) |
+| front (0, 4) | 1.531 | 74.2 / 3.8 / 8.7 / 12.0 / 20.7 / 1.3 | | |
+| side (90, 8) | 0.764 (0.785) | 70.5 / 0 / 14.0 / 15.5 / 29.5 (74.4 / 1.2 / 11.9 / 12.0 / 23.9) | | bottom-row width .98 (.77) |
+| rear (180, 8) | 1.474 (1.450) | 72.4 / 3.8 / 10.1 / 10.9 / 21.0 (67.5 / 4.7 / 15.3 / 12.2 / 27.5) | | |
+| r34 (145, 18) | 1.212 (1.262) | 69.1 / 1.2 / 13.4 / 12.4 / 25.8 (66.8 / 3.6 / 15.5 / 13.5 / 29.0) | | |
+| top (0, 60) | 1.454 (1.356) | 38.8 / 8.9 / 34.2 / 17.2 / 51.4 (40.9 / 1.5 / 38.9 / 18.2 / 57.1) | | |
+
+**Front-cell opening (binding).**
+
+| Camera | w / W | h / H | top | bottom | centre |
+| --- | --- | --- | --- | --- | --- |
+| sheet | 0.264 | 0.470 | 0.574 | 0.109 | 0.48 |
+| (0, 8) | 0.262 | **0.414** | 0.581 | 0.169 | 0.496 |
+| (0, 4) | 0.262 | 0.476 | 0.594 | 0.120 | 0.496 |
+
+**f34 see-through:** 0.04 × 0.13 at (−28, 18), top at 0.47; none at −35. The sheet shows 0.151 × 0.317.
+
+**Colour.**
+- **Rock keys:** all 7 are R > G > B at hue 19–21° and R − B 30–31. Base `#A08B81`. None is mauve or olive.
+- **Rendered rock (lit half):** f34 `#CDAC98` against the sheet's `#CDADA0` (hue 22.6°, sat 0.26), front `#CAAA96`
+  against `#CEAE9F`.
+- **Other rendered colours:**
+
+  | Material | Ours (f34) | Sheet |
+  | --- | --- | --- |
+  | Floor | `#F7BF86` | `#F6BA80` |
+  | Lawn | `#CEDD15` | `#D0D809` |
+  | Foliage | `#3B7622` | `#407616` |
+  | Yellow | `#EBE01F` | `#E0DB1B` |
+
+- **Facing correlation** (area-weighted, painted lightness against the normal):
+
+  | Object | Rock n.z | Lawn | Floor | Leaves | Other axes |
+  | --- | --- | --- | --- | --- | --- |
+  | Hero | 0.14 | 0.01 | −0.01 | 0.11 | |
+  | Span | 0.21 | | | | |
+  | Masses | 0.12–0.13 | | | | |
+  | All | | | | | n.x / n.y ≤ 0.12 |
+
+- `K.check` reports no problems.
+- **Builder:**
+  - every paint choice uses position or role: column height, the noise field, the bush tier, the heart below its centre
+    and the tile side by vertex z;
+  - `normal` appears only in the geometry (leaf orientation, outlines) and in `capping_report`.
+  - No paint is chosen by facing (unlike 044).
+- **Tint:** per corner, 0.93–1.09, sd 0.025, per facet. No confetti on the renders.
+- **Finish:** rock / floor 0.9, lawn and leaves 0.85, flower 0.8, metal 0. No emission, no sockets, no children.
+
+### Findings
+
+1. **Blocker: dressing buried in rock (decision 7, "Dressing cuts at most 0.05 into rock"; spec pitfall 13).**
+   - 33 hero dressing shells cut more than 0.05 into rock: 24 more than 0.2, the worst 0.81, several entirely inside a
+     mass core. They are the hero-only foot bushes J1, F2, F3, F4, F6 and F7.
+   - Stage 1 states the opposite ("guarded out of the rock (≤ 0.05 in)"). The guard either doesn't see the core and skirt
+     at these positions, or its push is undone by `_keep_up` or the `zmin` shift.
+   - The buried leaves are also hidden faces: about 240 wasted tris in a 3932 / 4000 hero.
+   - **Fix target:**
+     - move each foot-bush centre outside the rock footprint by at least 0.7 R (onto the apron);
+     - re-check every leaf after its final placement with a ray-parity test against the full hero rock;
+     - report 0 shells more than 0.05 inside rock.
+   - Spend the freed tris on visible foot greenery (finding 2).
+2. **Minor: foot greenery much too sparse (§2.6 green fifths, ±7).**
+   - The f34 bottom two fifths are 8.6 / 5.5 % green against 20.9 / 20.7; fifth 4 is +22.
+   - The front's bottom fifth is 11.4 against 30.3.
+   - The sheet's foot is a lush lime apron with many small bushes, sprigs and flowers; ours reads as bare rock to the
+     ground.
+   - **Target:**
+     - widen the apron to 1.2–2.0 on the front and back faces;
+     - add 4–6 small foot bushes and 4 sprigs (paid for by finding 1 and the leaf trims in finding 4);
+     - f34 fifths 1–2 at ≥ 14 % each.
+3. **Minor: the outline is boxier than the sheet's dome.**
+   - The f34 top profile rises too fast at the left end: at f .05–.15 it is .57 / .75 / .87 against .35 / .54 / .74
+     (max deviation 0.22, mean 0.06; the target is ±0.08 and mean ≤ 0.05).
+   - The front is +0.15 at f .05–.10. Its top is too broad: width .79 / .55 at h .85 / .95 against .65 / .24.
+   - The shoulder bushes L1, L2, R1 and R2 sit high on the rim edge, and pad bushes P1 / P2 stand on tall pointed end
+     skirts (they read as potted plants on spikes in the front and rear).
+   - **Target:**
+     - move the shoulder bushes 0.8–1.5 down the drape, as §2.4 placed them (−10.0, −1.5) and (+10.0, +1.2);
+     - lower or drop the pads on the end skirts;
+     - get the front width at h .85 to ≤ .72 and the f34 top profile within ±0.08.
+4. **Minor: the bushes are large flat-leaf "cabbage" domes, not the sheet's dense rounded clumps (decision 10).**
+   - Each has 7 big pentagonal leaves with pointed tips. Some skirt leaves hang as edge-on flaps, and 18 % of the leaf
+     area is within 12° of edge-on at the f34 (target ≤ 12 %).
+   - Dark heart wedges show under several rim bushes.
+   - **Target:**
+     - 9–11 smaller rounded leaves (0.6–0.7 R) in 3 tiers;
+     - no drooping edge-on skirt leaves;
+     - the heart hidden from the f34 and front;
+     - edge-on ≤ 12 %.
+5. **Minor: the span's four lumps don't read.**
+   - The front face above the hole reads as more columns. The sheet's span is 4 big bulging, rounded boulders (f34,
+     exploded, underside), and our `part_span` reads as a box with a lawn.
+   - The bulges are only 0.2–0.65.
+   - **Target:**
+     - lump bulge 0.8–1.2, with creases 0.6–0.8 between lumps;
+     - rounded upper shoulders on each lump under the lip;
+     - keep the apex V.
+   - The pillar rock likewise reads as many narrow facets rather than "broad flat faces, chunky": merge the strip
+     triangles into fewer, broader planes where the budget allows.
+6. **Minor: the lawn reads as a thick overhanging slab in the side and top views.**
+   - In the side view especially, the lip (0.38–0.62 drop plus the overhang) reads as a separate green cap.
+   - **Target:** a lip drop of 0.25–0.35, the overhang ≤ 0.2, and the column tops rounding up to meet the lawn edge.
+7. **Minor (accept and record): the front hole h/H is 0.414 at (0, 8)**, against 0.47 ± 0.04.
+   - At (0, 4) all four numbers pass: 0.262 / 0.476 / 0.594 / 0.120. The sheet's hole bottom (0.109) matches e 4 (0.120),
+     not e 8 (0.169), so the sheet's front camera is nearer e 4.
+   - In 3D the opening is exact: 7.02–7.11 wide to the 5.4 spring, apex 9.43, 9.04 clear.
+   - The main session should rule e 4 the front camera.
+8. **Minor (accept): the f34 camera is at (−28, 18).**
+   - It is in decision 9's probe set. At −35 the W:H is 1.199, under 1.22.
+   - The binding f34 shares pass at both: R +3.1 / +3.6, G −2.4 / −1.8, P −1.2 / −1.6.
+   - The sheet's big f34 see-through (0.15 × 0.32) can't be had through a 12-deep tunnel at this angle. That is a sheet
+     perspective conflict, not a model fault.
+9. **Minor: the hidden seat ledge shows** as flat slivers at z 8.0: 2.5–3.1 studs² visible from each sheet camera, at
+   the haunch tips and in front of / behind the span feet. Close them with the span's lower front / back edge (or the
+   lump overhang of §2.2), so the joint reads as a crease.
+10. **Minor:**
+    - Front and rear R are 70.8 / 72.4 against 67.7 / 67.5, and L is 10 against 15, at near-level cameras. Finding 6
+      (a thinner lip that shows more lawn top) and finding 2 help.
+    - Rock seen from above is 96 studs² against the study's ≤ 70. The top cell's R matches (38.8 against 40.9), so
+      accept.
+11. **Minor:**
+    - **Sill:**
+      - there is no tile bevel and no notched ends (recommendation 4 lists "notched sill ends"); this is invisible in
+        the hero;
+      - `kit_notes` still says "(bevelled tops)";
+      - **target:** fix the note, and optionally add the two-step notch to the part's ends.
+    - **Depth:**
+      - the hero is 14.14 deep (inside 13.8 ± 0.7);
+      - the side view's bottom row is .98 wide against .77, from foot bushes past the footprint;
+      - the boulders reach x ±12.7 and y ±6.6 against the planned ±12.1 / ±6.0.
+12. **Passes:**
+    - the mesh on all five objects;
+    - the budget;
+    - no cracks;
+    - no floating dressing;
+    - capping (0 flat rock above z 12);
+    - the opening and the walk test;
+    - colour family and calibration;
+    - no colour by facing;
+    - no lighting or VFX;
+    - collision tags, names and keys.
+    - Decisions 1–6 and 8–14 are followed. Decision 4's notched sill ends are only partly done (finding 11), and decision
+      9's camera choices are covered by findings 7 and 8.
+
+### Score and verdict
+
+**6.5 / 10. FAIL (round 1)**, on one blocker: finding 1, buried foot-bush dressing, a missed decision 7 and hidden faces.
+
+- **Round 2:** fix finding 1, and use its freed budget for finding 2. Findings 3–5 are the main visual gaps against the
+  sheet and are worth taking in the same round.
+- **Sound as it stands:** the arch itself (opening, joints, capping, mesh, colour).
+
+## Main session ruling after round 1 (2026-10-29)
+- **Front camera:** `front_sheet` is now (0, 4). The sheet's hole bottom matches e 4, and every binding opening number passes there.
+- **f34 camera:** (−28, 18) is accepted from the probe set.
+- **Rock seen from above:** 96 studs² is accepted, because the top cell's rock share matches.
+- **Fix round 1 scope:**
+  - blocker 1, dressing buried in rock: 0 shells more than 0.05 into rock, re-checked after final placement;
+  - the minors, using the tris freed by blocker 1:
+    - 2, foot greenery;
+    - 3, outline toward the dome;
+    - 4, rounded clump bushes;
+    - 5, span lumps;
+    - 6, a thinner lawn lip;
+    - 9, seat-ledge slivers;
+    - 11, a `kit_notes` correction.
+
+## Fix round 1 (fix modeller, 2026-10-29)
+
+A fresh fix modeller in a background Blender (port 9882, `wip/M046.blend`). It edited only `m046.py`; no shared
+helpers changed. The final check ran in a freshly restarted session: `build()` with parts, checks and renders gave
+**problems: []**. The work file is saved. Nothing was committed, pushed or exported.
+
+### Changes
+
+1. **Blocker, dressing buried in rock.**
+   - **Cause.** `m040._Guard` judges "inside" by the nearest face's normal. Where a skirt or boulder is sunk into a
+     core, the nearest surface is the skirt's outside, so a leaf deep in the core read as "outside".
+   - **New checks** in `m046.py`:
+     - `_parity_in` / `_Rocks`: each closed rock shell (span, both cores, 8 skirts, 8 boulders: 19) is tested on its
+       own, by ray parity in three skewed directions with a majority vote;
+     - depth is the distance to that shell's surface.
+   - **Placement.**
+     - `_foot_spot` moves every hero foot plant's centre out from the rock until the rock is at least **0.7 R** away
+       horizontally at 0.15 / 0.45 H / 0.85 H. Sprigs, pebbles and flowers use the same rule with a smaller clearance.
+     - Pad bushes move off their core by at most 0.45 (so they stay on the pad).
+     - Every leaf is placed first (slid onto the heart, `_keep_up`, the z-min shift), and only then tested against the
+       full rock by parity. A leaf more than 0.05 in climbs the dome 10° at a time, and is dropped if it still cuts in.
+     - A heart that cuts in is narrowed (×0.82, up to 5 times).
+   - **Report.** `bury_report(o)` runs per object in `checks()`. Any dressing shell more than 0.05 inside rock is now
+     a `build()` problem.
+   - **Guard removed.** The old `_Guard` is no longer used for plants.
+2. **Foot greenery.**
+   - **Apron:** 1.2–1.5 wide from the base path (was 0.7–1.25). See "Left over" for why not 2.0.
+   - **Foot plants** (hero-only):
+     - **Bushes:** J1 (dark, about 1.5 across) plus 8 small bushes F1–F5 and F8–F10. They sit on the front and back
+       faces, not past the ends, so they don't widen the front silhouette.
+     - **Pad bushes:** P1, P2 and P3 on turfed corner and front skirts (the sheet's f34 ledge pads); P2 and P3 are new.
+     - **Sprigs:** 7, of which SP3, SP4, SP7, SP8 and SP9 are new or moved to the ends.
+   - **Reach limit.** A foot bush shrinks (to 0.62 R at least) to keep its leaves inside |x| 13.0 and |y| 7.4
+     (`FOOT_REACH`).
+3. **Outline toward the dome.**
+   - **Shoulder bushes:**
+     - L1 / R2 moved down the drape to x ±9.3 (on the cap's outer ridge points; the cap ends at x ±9.0–10.1), and made
+       smaller (about 2.1 across, 1.55 tall);
+     - L2 / R1 pulled in to x −7.0 / +7.3 and lowered (1.7 tall).
+   - **Rim bushes:** the two centre bushes S2 / S3 are the tallest (2.16). S1 / S4 are lower (about 1.7).
+   - **End skirts:** SK_L3 and SK_R2 are lower (5.0 / 4.8 → 3.5 / 3.4), pitched, with no pad and no pad bush. The
+     corner skirt SK_R1 (4.4) and the front skirt SK_L1 (4.8) now carry the turfed pads instead.
+4. **Bushes as dense rounded clumps** (`bush()`, `TIERS`, a new 8-tri leaf `_cleaf` with a flat underside fanned from
+   the stem).
+   - **Leaves:** 9–10 per rim bush, 6 per small bush, 0.62–0.74 R long.
+     - A crown of 3–4 flat leaves fans out from the dome's top, half sunk in the heart.
+     - A ring of 6 upright side leaves stands round the heart, tips curled in over it.
+     - There are no hanging flaps.
+   - **Why these two orientations.** At e 18, a leaf is within 12° of edge-on whenever its tilt is between about 6°
+     and 60°. A uniform dome of leaves gives about 21 % edge-on, and the round-1 bushes measured 17.2 % with this
+     metric (the verifier measured 18 %). Only near-flat and near-upright leaves stay clear.
+   - **Hearts:** coloured as foliage by height (fresh above, emerald below), never the soil colour. Small bushes use a
+     6-tri bipyramid heart.
+   - **Size:** the clump's real width is about 1.5 R, so R was raised. Rim bushes are now 2.0–3.0 across.
+5. **Span lumps.**
+   - **Rings:** `SPAN_X` gains rings at ±4.15 and ±5.9, so the outer lumps have rounded flanks, not a tent.
+   - **Bulges:** the peak bump is 0.80–0.88 × GZ 1.25, about **1.0–1.1 proud** at z 10. The creases are −0.50 to
+     −0.55 × 1.25, about **0.63–0.69 in**. GZ is a little fuller at the top and bottom.
+   - **Pillars:** each column face is now **two broad facets meeting at a mid ridge** (the third "face" strip is gone;
+     spec 2.3). Cores went from 338 / 340 to 252 / 256 tris, and the front facets are 1.8–2.9 wide by 3–6 tall.
+6. **Lawn lip** (`cap_outline`, `_seam`).
+   - **Drop:** 0.25–0.35 below the rim (was 0.38–0.62).
+   - **Overhang:** 0.15–0.19 (was 0.18–0.28).
+   - **Miter offsets.** The offsets are now miters, so the outline's edges stay parallel to the rim's. This keeps every
+     rim point inside on the sharper two-facet scallops: proud_min is 0.093 or more.
+   - **Support points.** Two or three lawn support points at x ±7.0–7.1 keep the walkable lawn at 13.6 or more.
+7. **Seat-ledge slivers.**
+   - The span's bottom edge on each ring at |x| ≥ 2.3 now reaches past the ledge's outer edge (`_ledge_edge`,
+     `_ledge_need`, +0.07). It covers the worst ledge point over the neighbouring ring interval.
+8. **kit_notes.** `StoneGateSill` now reads "square-edged slabs, darker sand sides"; the module docstring was fixed too.
+
+**Also changed:**
+- **Front camera.** `front_sheet` is now (0, 4), per the ruling. The old (0, 8) view is kept as the extra
+  `front_e8_sheet`; `front_level_sheet` is gone from the builder.
+  - The file `front_level_sheet.png` in this folder is a **stale round-1 render**. It is no longer written; ignore it.
+- **`edge_on_report`** is new in `checks()`. It reports area-weighted leaf faces within 12° of edge-on per camera, both
+  all leaves and visible ones only.
+- **`TARGET_SIZE` depth** went from 13.8 ± 0.7 to 15.0 ± 0.6 (see "Left over").
+
+### Before → after (round-1 verifier numbers → fix round, fresh-session `build()` and own masks)
+
+| Item | Target | Round 1 | Fix round 1 |
+| --- | --- | --- | --- |
+| Dressing shells > 0.05 in rock (hero, ray parity) | 0 | 33 (max 0.81) | **0** (max 0.041; parts 0 / 0.026 / 0) |
+| Floating / unchained shells | 0 | 0 / 0 | **0 / 0** on all five objects |
+| Winding errors / unpaired edges | 0 | 0 / 0 | **0 / 0** on all five |
+| Non-manifold, bowtie, boundary, n-gons, zero-area, sub-5° corners, inverted shells | 0 | 0 | **0** |
+| Hero tris (limit 4000) | < 4000 | 3932 | **3960** (rock 1312, lawn 716, tiles 160, leaves 1692, pebbles 80) |
+| Parts tris (limit 1000) | < 1000 | 862 / 966 / 900 / 184 | **986 / 872 / 808 / 184** (span / L / R / sill) |
+| Hero bbox W × D × H | | 25.62 × 14.14 × 16.00 | **26.12 × 15.21 × 16.10** |
+| Joint leaks / see-through | 0 | 0 | **0 / 0** (936 rays) |
+| Flat rock top above z 12 / anywhere | 0 | 0 / 4.0 | **0 / 0.0** |
+| Seat ledge visible from each sheet camera (studs²) | 0 | 2.5–3.1 | **0.0** from all 6 |
+| Lip drop / overhang | 0.25–0.35 / ≤ 0.2 | 0.38–0.62 / 0.18–0.28 | **0.25–0.35 / 0.15–0.19** |
+| Span lump bulge / crease | 0.8–1.2 / 0.6–0.8 | 0.2–0.65 | **1.0–1.1 / 0.63–0.69** (design values) |
+| Leaf edge-on at f34 (all leaves / visible) | ≤ 12 % | 18 % (17.2 own metric) | **11.5 / 11.5 %** |
+| Opening width to 5.4 / clear over floor / apex | 7.0 / 9.0 / 9.4 | 7.02 / 9.04 / 9.43 | **7.05–7.14 / 9.02 / 9.43–9.52** |
+| Lawn over the central 14 × 6 | ≥ 13.6, ≤ 25° | 13.57, p95 22.7° | **13.68, p95 19.3°** |
+| f34 (−28, 18) W:H | 1.22–1.37 | 1.253 | **1.306** |
+| f34 shares R / P / L / F / G / D | 64.5 / 6.6 / 15.2 / 13.3 / 28.5 / 0.4 (±4) | 67.6 / 5.4 / 14.1 / 12.0 / 26.1 / 0.8 | **68.4 / 5.3 / 16.1 / 9.6 / 25.7 / 0.7** |
+| f34 green fifths, bottom → top | 1–2 ≥ 14 each; middle ≤ 4 | 8.6 / 5.5 / 0.9 / 41.8 / 43.2 | **11.4 / 6.7 / 1.5 / 39.1 / 41.3** |
+| f34 top profile at f .05 / .10 / .15 | .35 / .54 / .74 | .57 / .75 / .87 | **.37 / .72 / .80** (whole profile: mean 0.051, max 0.18) |
+| Front (0, 4) hole w / h / top / bottom | .264 / .475 / .58 / .11 (±.03 / ±.04 / ±.04) | .262 / .476 / .594 / .120 | **.255 / .471 / .590 / .122** |
+| Front (0, 4) width at h .85 / .95 | .65 / .24 | .79 / .55 (at e 8) | **.58 / .64** (at e 8: .60 / .56) |
+| Front (0, 4) bottom green fifth | toward 30 | 11.4 (e 8) | **16.1** (e 8: 15.6) |
+| Front (0, 4) W:H / R / G | 1.508 ± .08 / 68 ± 4 / 27 ± 4 | 1.531 / 74.2 / 20.7 | **1.559 / 75.5 / 19.6** |
+| Side (90, 8) W:H | 0.72–0.85 | 0.764 | **0.861** |
+| Top (0, 60) R / L / F | 41 / 39 / 18 (±5 / ±5 / ±4) | 38.8 / 34.2 / 17.2 | **37.9 / 38.4 / 14.5** |
+| Rock colour | R > G > B | keys hue 19–21° | **unchanged keys**; rendered lit rock f34 `#CCAC97`, front `#C9A995`, side `#AA9285` (all R > G > B) |
+| `K.check` / baked shading (limit 0.5) | no problems / < 0.5 | none / 0.10–0.19 | **none / hero 0.01, span 0.27, masses 0.0, sill 0.0** |
+| UV | no overlaps or flips | 0 / 0 | **0 / 0**, gap 0.016, p95 stretch ≤ 1.032 |
+
+### Left over (for the verifier and the main session)
+
+1. **f34 green fifths 1–2 are 11.4 / 6.7, against ≥ 14 each** (round 1: 8.6 / 5.5).
+   - **What limits them:**
+     - the 4000 budget, which leaves about 40 tris spare;
+     - the depth: the foot bushes, kept 0.7 R clear of boulders that already stand at y ±6.7, reach y ±7.4;
+     - the pad-bush "potted plant" read. A fourth pad bush on the left end skirt was tried and dropped, because the
+       front view showed a row of potted plants.
+   - **Shares.** F is 9.6 against 13.3 ± 3, 0.7 short. G (25.7) and R (68.4) are inside ±4. The smaller, denser clumps
+     that round 1 asked for cost foliage area against the round-1 "cabbages".
+2. **The outline at h .95 is still wide** (front .64 against .24).
+   - Decision 8's walkable lawn (13.6 or more over the central 14 × 6) holds the lawn flat at 13.7–14.0 to x ±7.
+   - Every rim bush therefore sits within 0.4 of the centre ones, and at about 1.6 tall (the sheet's 1.6–2.0) their
+     tops all clear h .95.
+   - The sheet's rounder lawn dome would mean lowering the walkable top.
+   - The improvements are h .85 (.79 → .58) and the f34 profile at f .05 / .15.
+   - The f34 profile at f .10 (.72 against .54) is the left end's column tops. The rock dome there matches the study's
+     front-cell outline numbers (§1.2), so it was left alone.
+3. **Depth 15.21** (13.8 ± 0.7 in the study; `TARGET_SIZE` was moved to 15.0 ± 0.6).
+   - The rock alone is 13.4 deep. The extra is the foot bushes in front of the boulders and skirts (fix target 2 with
+     the 0.7 R clearance).
+   - **The apron stops at 1.5** (not 2.0) on the front and back for the same reason: 2.0 would add another 1.0 of
+     depth and width.
+   - The side W:H is 0.861 against 0.785 ± 0.08 (0.865 at most).
+4. **Front and rear at near-level cameras** read R 74–76 and G about 20 (round 1 the same: 74.2 / 20.7).
+   - At e 4 the lawn top is barely seen (L 8.5). The thinner lip that round 1 asked for shows less lime from the front.
+5. **Front-view leaf edge-on is about 45 %.** At e 4 the flat crown leaves are edge-on by geometry. The binding target
+   is the f34 (11.5 %).
+
+- **Main session (2026-10-29):** TARGET_SIZE depth 15.0 ± 0.6 is accepted, so the foot bushes stay clear of the boulders.
+
+## Verification round 2 (verifier, 2026-10-29)
+
+A fresh verifier, read-only, in a background Blender on port 9882 (`wip/M046_verify.blend`, the fixed and integrated
+model). Nothing was built, edited or saved. Every number below comes from the verifier's own bmesh / BVH / ray-parity
+code and its own HSV masks (the study's class definitions, re-implemented). Only the shell-kind labels (`m046._kind`)
+and the UV overlap count (`M.uv_stats`) were borrowed. Renders and scripts are in the session scratchpad
+`m046_verify2\`. The sheet's own cells were re-measured with the same masks: the f34 came out at R 65.3 / P 6.5 / L 14.8
+/ F 13.0, with green fifths 20.9 / 20.7 / 1.3 / 19.8 / 37.3, which confirms the study's numbers.
+
+### Measured
+
+**Mesh**
+
+| Object | Tris (limit) | Size W × D × H | Shells | Non-manifold / boundary / wire / loose | Bowties | Winding (dup / unpaired) | Zero-area / n-gons / dup verts | Self-x in a shell | Neg-volume shells | Origin | Transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `StoneGate` | 3960 (4000) | 26.12 × 15.21 × 16.10 | 259 | 0 / 0 / 0 / 0 | 0 | 0 / 0 | 0 / 0 / 0 | 0 | 0 | bbox bottom centre (0, 0, 0) | applied |
+| `StoneGateSpan` | 986 (1000) | 13.54 × 12.23 × 8.12 | 47 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateMassL` | 872 (1000) | 10.49 × 13.56 × 15.40 | 48 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateMassR` | 808 (1000) | 10.51 × 13.34 × 15.30 | 40 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | bottom centre | applied |
+| `StoneGateSill` | 184 (1000) | 11.48 × 13.55 × 0.50 | 15 | 0 | 0 | 0 / 0 | 0 | 0 | 0 | bottom centre | applied |
+
+- **Normals.** Every shell is closed and consistently wound, with positive volume (the smallest is 0.0008), so the
+  normals point outward.
+- **Hero by kind:** rock 19 shells / 1312 tris; lawn 10 / 716; tiles 12 / 160; leaves and petals 208 / 1692; pebbles
+  10 / 80.
+- **UV:** 0 flipped, 0 zero-area, all inside 0.008–0.992; 0 overlapping pairs; minimum gap 0.016, on every object.
+- **Sizes against the targets:** W 26.12 (25.6 ± 0.8), D 15.21 (15.0 ± 0.6, the ruled target) and H 16.10 (15.9 ±
+  0.6) are all inside.
+  - The mass cores are 24.4 × 12.4 (x ±12.19, y ±6.2), against 24 × 12.
+  - The skirts and boulders reach x ±12.75 and y −6.79 … +6.64, against the planned ±12.1 / ±6.0.
+  - The lawn top is 14.007.
+
+**Dressing buried in rock (the round-1 blocker).** Each dressing shell was ray-tested against each of the 19 rock
+shells on its own. The test runs on every vertex and face centre of the shell, with a majority vote over three skewed
+directions. The depth is the distance to that rock shell's surface.
+
+| Object | Dressing shells | > 0.03 | **> 0.05** | > 0.10 | Max |
+| --- | --- | --- | --- | --- | --- |
+| Hero | 218 (leaves, petals, pebbles) | 2 | **0** | 0 | **0.041** |
+| Span / MassL / MassR / Sill | 45 / 36 / 29 / 3 | 0 | **0** | 0 | 0.0 / 0.026 / 0.0 / 0.0 |
+
+- For information, the lawn and tiles sink into rock by design:
+  - the caps' lip feet are 0.10–0.28 into the rim;
+  - the aprons are tucked under the foot;
+  - the tunnel tiles run 0.2 under each jamb foot;
+  - one front-left ledge pad is up to 0.35 inside its skirt, at about (−7.9, −5.6, 4.8).
+
+**Floating dressing (own contact graph).** Shells are in contact when they intersect (BVH overlap) or lie within 0.03
+(vertex to surface, both ways). A shell chains when contact leads from it to the ground.
+
+| Object | Shells | On ground | Floating | Unchained | Worst off-ground gap |
+| --- | --- | --- | --- | --- | --- |
+| Hero | 259 | 56 | **0** | **0** | 0.003 |
+| Span / MassL / MassR / Sill | 47 / 48 / 40 / 15 | — | 0 | 0 | 0.0 |
+
+**Joints and cracks (rock + lawn + tiles only, no dressing).**
+- **Samples.** 14,784 sample points sit just off the joint planes: x ±6.69 / ±6.75 for z 7.8–14, y ±6.5, and z 7.95 /
+  8.01 on the seat. 10,959 of them are enclosed.
+- **Line test.** Full lines were cast from both sides through every enclosed point, with 3 jitters, in 19 directions:
+  - the 8 sheet cameras;
+  - −35 and −22 f34;
+  - (−90, 8);
+  - grazing at e 0.3 from all four sides;
+  - straight down;
+  - the underside at e −30;
+  - (−45, 30), (−145, 18) and (35, 18).
+- **Line-test result.** It flagged 2 points, and both were false alarms:
+  - (−6.75, 5.11, 8.21) lies 0.005 from the rock surface with rock above it;
+  - (−6.75, −1.89, 13.81) lies just above the lawn top (13.806).
+  - Both were parity ties on a surface, not gaps.
+- **Isolated-miss test.** A miss with at least 7 of 8 neighbours at 0.2 hitting was flagged in 5 places. A 0.025-grid
+  scan of each showed it was the open edge of the opening or the silhouette, not a crack.
+- **Result: 0 see-through cracks.**
+- **Jamb feet.** 1876 ground points under the jamb feet (x ±3.30 … ±3.95) were tested. **0** are visible from any
+  camera.
+
+**Capping (straight down, 0.1 grid over x ±12.4, y ±6.2).**
+- **Area seen from above (studs²):** lawn 161.0, rock 96.0, leaves 37.3, tiles 10.6, pebbles 0.3.
+- **Flat rock (n.z > 0.85):** **0.0 above z 12**, and 0.0 anywhere.
+- **Other rock above z 12:** 9.7 studs², all sloped faces under the lip. None above z 13.
+- **The lawn caps every rock top.** A downward scan along both cap seams (x ±6.55 … ±6.85) finds rock only at |y| ≥ 4.4,
+  on the sloped faces under the lip edge.
+- **The seat ledge.** It is 18 flat faces (98.4 studs²) at z 8.0, and **0.00 studs² of it is visible** from the f34, f34
+  (−22), front, side, rear, r34 and top cameras. The round-1 slivers are gone.
+
+**Opening and walk (ray-cast along Y through the full depth).**
+
+| Measure | Value |
+| --- | --- |
+| Clear width, rock | 7.02 / 7.04 / 7.08 / 7.09 / 7.05 / 7.00 / **6.98** at z 0.5 / 1 / 2 / 3 / 4 / 5 / 5.4; 6.62 at 5.9; 5.68 at 7.0; 4.52 at 8.0 |
+| Clear width, everything | the same from z 1.0 up; 6.09 at 0.5 (the 0.08 tunnel strips and sprigs at the wall feet) |
+| Rock apex / clear over the floor | apex 9.43–9.52; **9.02** at x 0; 8.37 / 8.43 at ±1; 7.75 at ±2; 5.76 / 5.81 at ±3.2; 5.20 / 5.26 at ±3.4 |
+| Floor top | p5 0.386, median 0.393, p95 0.419 |
+| Tallest dressing in the tunnel | 0.34 over the floor |
+| Walk box 2 × 1 × 5.5 | clear against rock at x −2 … +2. Against everything, clear at −1 … +1, and at ±2 above 0.6, where it only touches the wall-foot strips |
+| Lawn over the central 14 × 6 | 13.66–14.00 |
+
+**Shape and shares (own masks).** Sheet values are in brackets; the f34 sheet values are the verifier's own
+re-measure.
+
+| View | W:H | R / P / L / F / G / D % | Green fifths, bottom → top | Top profile against §1.2 |
+| --- | --- | --- | --- | --- |
+| **f34 (−28, 18)** | 1.306 (1.295) | **68.3 / 5.3 / 15.9 / 9.8 / 25.7 / 0.7** (65.3 / 6.5 / 14.8 / 13.0 / 27.8 / 0.4) | **11.1 / 6.5** / 1.5 / 38.5 / 42.4 (20.9 / 20.7 / 1.3 / 19.8 / 37.3) | mean 0.050, max 0.18 at f .10 (.72 against .54) |
+| f34 (−35, 18) | 1.282 | 68.6 / 4.9 / 16.5 / 9.9 / 26.4 / 0.1 | 9.7 / 8.1 / 1.9 / 39.4 / 40.9 | |
+| f34 (−22, 18) | 1.314 | 67.6 / 5.6 / 15.5 / 10.0 / 25.5 / 1.3 | 12.1 / 5.5 / 0.9 / 38.7 / 42.8 | |
+| **front (0, 4)** | 1.555 (1.508) | 75.3 / 3.8 / 8.4 / 11.4 / 19.8 / 1.1 (68.1 / 4.7 / 14.8 / 12.1 / 26.9 / 0.3) | 15.6 / 6.4 / 0.0 / 14.3 / 63.7 (30.3 / 6.2 / 0.3 / 23.3 / 39.9) | mean 0.047, max 0.09; **width at h .85 / .95: .58 / .64** (.65 / .24) |
+| front (0, 8) | 1.489 | 71.7 / 4.7 / 10.3 / 11.4 / 21.7 / 1.9 | | |
+| side (90, 8) | 0.860 (0.785) | 71.4 / 0.0 / 15.0 / 13.6 / 28.6 (74.7 / 1.2 / 11.8 / 11.9 / 23.7) | | mean 0.082, max 0.39 at f .90 |
+| rear (180, 8) | 1.505 (1.450) | 73.6 / 3.9 / 10.7 / 9.3 / 20.0 / 2.5 (67.9 / 4.6 / 15.1 / 12.1 / 27.2) | | mean 0.034 |
+| r34 (145, 18) | 1.266 (1.262) | 70.2 / 1.1 / 15.3 / 9.7 / 25.0 / 3.7 (67.1 / 3.6 / 15.4 / 13.4 / 28.8) | | |
+| top (0, 60) | 1.336 (1.356) | 37.9 / 8.5 / 38.3 / 14.4 / 52.7 (41.3 / 1.4 / 38.7 / 18.1 / 56.8) | | mean 0.045 |
+
+- **Yellow flowers** (h 46–60, s ≥ 0.6, v ≥ 0.85): 0.06 % of the f34 and 0.03 % of the front, against 0.61 / 0.96 %.
+
+**Front-cell opening (binding, at the ruled (0, 4)).**
+
+| | w / W | h / H | top | bottom | centre | Row widths at 0.1 / 0.3 / 0.5 of the hole |
+| --- | --- | --- | --- | --- | --- | --- |
+| Sheet | 0.264 | 0.475 | 0.580 | 0.110 | 0.48–0.50 | vertical jambs |
+| **(0, 4)** | **0.257** ✓ | **0.472** ✓ | **0.591** ✓ | **0.120** ✓ | 0.500 | 0.254 / 0.257 / 0.254 (vertical) |
+
+- **f34 see-through:** 0.039 × 0.136 at (−28, 18), 0.090 × 0.194 at (−22, 18), and none at (−35, 18). The sheet shows
+  0.144 × 0.261 (the round-1 perspective conflict; ruled).
+
+**Leaf edge-on** (own code: 176 leaf shells; area within 12° of edge-on):
+
+| View | All leaves | Visible leaves |
+| --- | --- | --- |
+| **f34** | **11.5 %** | **11.5 %** (target ≤ 12) |
+| front (0, 4) | 44.8 % | 41.0 % |
+| top | 18.5 % | 20.2 % |
+| side | 48.0 % | 48.5 % |
+
+**Colour.**
+- **Keys:**
+  - all 7 rock keys are R > G > B at hue 19–21° and sat 0.18–0.20, base `#A08B81`;
+  - floor `#C39D75` (31°) and `#A08470` (25°);
+  - grass `#A3B300` (65°);
+  - leaf mixes from 79° to 107°;
+  - flower `#B5B21A` (59°) and pebble `#AEAEA7`.
+- **Finish:** rough 0.9 / 0.85 / 0.8, metal 0, emission 0 on every material. No sockets and no children.
+- **Rendered medians, ours against the sheet (own masks):**
+
+  | Material | Ours, f34 | Sheet, f34 | Ours, front (0, 4) | Sheet, front |
+  | --- | --- | --- | --- | --- |
+  | Rock, warm (h ≤ 60) | `#C4A491` | `#C7A99A` | | |
+  | Rock, lit half | `#CCAC97` | `#CFB0A2` | `#C9A995` | `#D0B0A1` |
+  | Floor | `#F7BF86` | `#F6BA80` | | |
+  | Lawn | `#CFDF15` | `#D0D809` | | |
+  | Bush | `#3A721F` | `#407616` | | |
+
+  - The rock in the side, rear and r34 views (`#AA9286`, `#AE9689`, `#AF9689`) stays R > G > B: no mauve and no olive.
+- **Leaf hue split in the f34 (F pixels):**
+  - p10 / p50 / p90 at 68° / 101° / 105°;
+  - 18 % of them at ≤ 88° (the fresh tone);
+  - **0 % at ≥ 115°** (no emerald).
+- **Facing.** Area-weighted correlation of painted lightness (diffuse × Tint) against the normal:
+  - **Rock:** n.z 0.10 on the hero, 0.17 on the span and 0.07–0.10 on the masses; n.x and n.y ≤ 0.12.
+  - **Lawn:** n.z −0.07.
+  - **Floor:** n.z −0.02. Its |n.z| correlation of 0.99 is the tile-side band, which `tile()` picks by vertex z (top /
+    bottom / side by the role of each face in the slab), not by normal.
+  - **Leaves:** n.z 0.21. Their |n.z| correlation of 0.76 comes from the tier roles (flat crown leaves fresh, upright
+    side leaves deep), not from facing.
+- **`K.check`:** no problems.
+- **Builder grep.** `normal` occurs only in geometry (path normals, leaf orientation, outline offsets,
+  `recalc_face_normals`) and in the reports. No paint is chosen by facing.
+
+### Fix round 1 claims, checked
+
+| Claim | Verified |
+| --- | --- |
+| 0 dressing shells > 0.05 in rock, max 0.041 | **yes**: 0, max 0.041 (hero); parts 0 / 0.026 / 0 |
+| 0 floating / unchained | **yes** on all five objects |
+| 0 winding / non-manifold / bowtie / n-gon / zero-area / inverted | **yes** |
+| Hero 3960, parts 986 / 872 / 808 / 184 | **yes** |
+| 0 joint leaks | **yes** (own line and isolated-miss tests) |
+| Seat ledge visible 0.0 from every sheet camera | **yes** (0.00 from 7 cameras) |
+| Leaf edge-on at the f34 11.5 % | **yes**, 11.5 % |
+| Opening 7.05–7.14 / 9.02 / 9.43–9.52 | **yes**: 6.98–7.09 to 5.4, 9.02 clear, apex 9.43–9.52 |
+| Lawn over the central 14 × 6 ≥ 13.68 | 13.66 (≥ 13.6, inside the target) |
+| f34 shares 68.4 / 5.3 / 16.1 / 9.6 | **yes** within 0.3 (68.3 / 5.3 / 15.9 / 9.8) |
+| f34 green fifths 11.4 / 6.7 | **yes** (11.1 / 6.5) |
+| Front (0, 4) hole .255 / .471 / .590 / .122 | **yes** (.257 / .472 / .591 / .120) |
+| Front width at h .85 / .95 .58 / .64 | **yes** (.58 / .64) |
+
+### Findings
+
+No blockers.
+
+1. **Minor: foot greenery is still sparse** (round 1's finding 2, partly fixed).
+   - The f34 green fifths 1–2 are 11.1 / 6.5, against ≥ 14 each and the sheet's 20.9 / 20.7.
+   - F is 9.8, against 13.3 ± 3: 0.5 short.
+   - The front's bottom fifth is 15.6 against 30.3.
+   - The sheet's foot is a lush lime apron with many small bushes; ours is a thin lime band with a dozen small clumps.
+   - G (25.7) and the binding f34 shares are inside ±4.
+   - **Target, if the main session wants it:**
+     - widen the apron on the front and back to 1.8–2.0, staying inside the ruled 15.0 ± 0.6 depth;
+     - replace 2–3 lawn pebbles or rim-bush crown leaves with 3–4 low foot sprigs;
+     - aim for f34 fifths 1–2 at ≥ 14.
+2. **Minor: the yellow flowers are effectively invisible.**
+   - The f34 shows 0.06 % yellow and the front 0.03 %, against the sheet's 0.61 / 0.96 %.
+   - **Target:** 6–8 flowers 0.5–0.6 across on the apron and the lawn rim, so the f34 reaches ≥ 0.3 %.
+3. **Minor: the bushes lack the sheet's emerald.**
+   - The f34 F pixels run p10 / p50 / p90 at 68° / 101° / 105°, and 0 % of them reach hue 115° or more.
+   - The deepest mix used is `leaf_x_deep_60` at 107°, and the pure `leaf_deep` key (`#205D1F`, about 118°) is never
+     used.
+   - Decision 10's two-tone `#82C032` / `#1F6A21` therefore reads as fresh plus mid-green, not fresh plus emerald. The
+     bush median (`#3A721F` against `#407616`) is still inside 14.
+   - **Target:** skirt / inner tier and lower hearts at `leaf_deep` ≥ 80 %, so that ≥ 15 % of the f34's F pixels sit at
+     ≥ 115°.
+4. **Minor: the bush form.**
+   - The clumps read as dark faceted hearts with a few flat lime plates. In the front (e 4) and side views the crown
+     plates stand out as horizontal blades: edge-on 45 % / 48 %.
+   - The binding f34 is at 11.5 %, and there are no palm stars, cabbages or hanging flaps, so this is accepted.
+   - **Optional target:** crown leaves tilted 8–15° up at the tips, so the e 4 silhouette is rounder.
+5. **Minor: the ledge pads read as shelves.**
+   - P1 and P3 on the front skirts (and the right corner pad) sit below the skirts' pitched peaks. In `cu_footl` and the
+     front view they read as lime planks bolted onto the side of a spike, with a bush on top ("potted plant on a shelf").
+   - One pad is up to 0.35 inside its skirt, which hides some faces.
+   - **Target:** sit each pad on a flat skirt crown at the crown's height (the skirt's peak cut to the pad), or drop
+     the pads and put the bushes at the skirt feet.
+6. **Minor: the outline (round 1's finding 3, partly fixed).**
+   - The front width at h .95 is .64 against .24, because the rim-bush tops form a level row over decision 8's walkable
+     lawn.
+   - The f34 profile at f .10 is .72 against .54 (max 0.18; mean 0.050 is on the limit).
+   - The side profile falls one bin early at f .90 (.29 against .68; max 0.39), and the side W:H is 0.860 against
+     0.785 ± 0.08. Both come from foot bushes past the footprint.
+   - These are trade-offs against decision 8 and the ruled depth.
+   - **Target, if revisited:** lower the four outer rim bushes by 0.3–0.4 down the lip drape, so the front width at
+     h .95 is ≤ .45.
+7. **Minor: the lawn edge in the top view has sawtooth points on both shoulders.**
+   - Sharp lime triangles stand out where the cap drapes. The sheet's edge is softly scalloped.
+   - **Target:** shoulder outline points spaced ≥ 0.8 apart with offsets alternating ≤ 0.15.
+8. **Minor: the front and rear shares at near-level cameras.**
+   - The front (0, 4) is R 75.3 / G 19.8 against 68 ± 4 / 27 ± 4, and the rear R 73.6 / G 20.0.
+   - These views see little lawn top (L 8.4–10.7). This is not binding (§2.6), and findings 1 and 6 would help.
+9. **Minor (known, accepted): the span lumps** read on `part_span` and over the hole in the f34. In the front and rear
+   the span face still reads as more columns with a horizontal crease at z 8, rather than the sheet's 4 rounded
+   boulders. Nothing more is asked this round.
+10. **Minor (record): the boulders reach x ±12.75 and y −6.8.** The cores are 24.4 × 12.4. Accepted with the ruled depth.
+11. **Passes:**
+    - the mesh, winding and topology on all five objects;
+    - the budget (3960 / 986 / 872 / 808 / 184);
+    - 0 buried dressing (max 0.041);
+    - 0 floating or unchained shells;
+    - 0 see-through cracks and no ground showing at the jamb feet;
+    - capping: 0 flat rock exposed, and the lawn over every top;
+    - the seat-ledge slivers are hidden;
+    - the opening: 7.0 wide, 9.02 clear, apex 9.43, vertical jambs to 5.4;
+    - every front-cell number at (0, 4);
+    - the walk test and the lawn ≥ 13.6;
+    - the thinner lip;
+    - the f34 W:H and the binding f34 shares (R +3.8, G −2.8, L +0.7, P −1.3; F 0.5 short of its own ±3);
+    - edge-on 11.5 % at the f34;
+    - the warm rock R > G > B in every view, and the floor, lawn and bush medians inside their tolerances;
+    - no colour by facing (`K.check` clean, and the grep);
+    - UV clean;
+    - no lighting or VFX;
+    - the collision tags, names and keys.
+    - Decisions 1–14 as amended are followed. Decision 10's emerald tone is weak (finding 3), but the colour family and
+      the two-tone split are present.
+
+**Defining read.** In the front, rear, top and f34 the model reads as a squat, columned stone arch with a walk-through
+tunnel, a sand floor, a lime lawn dome and bushes on top. The f34's opening is a narrow slit, against the sheet's clear
+see-through. That is the ruled perspective conflict, and the tunnel and its floor are plainly visible.
+
+### Score and verdict
+
+**7.5 / 10. PASS (round 2).**
+- The round-1 blocker is fixed and verified independently: 0 dressing shells more than 0.05 in rock.
+- Nothing is broken.
+- The remaining items (1–10) are visual gaps against the sheet's dressing density, flowers, emerald tone and outline.
+  They are recorded for the commit notes.
+
+## Main session ruling (2026-10-29)
+- **Verdict:** passed in round 2 (7.5/10) and committed. Round 1 failed (6.5/10) because 33 foot-bush shells were buried in rock.
+- **Left for a later polish pass:**
+  - Foot greenery is sparse: f34 fifths 1–2 are 11.1 / 6.5 against a target of 14.
+  - Yellow flowers are invisible.
+  - The bushes have no emerald.
+  - Crown leaves read as horizontal blades in the front view.
+  - Ledge pads read as shelves.
+  - The front width at h .95 is .64 (the rim bushes stand in a level row).
+  - The lawn edge has sawtooth points.
+  - The span lumps read as columns from the front.
+  - The skirts reach x ±12.75.
+- **Export:** 5 assets, 5 solid pieces, 6810 tris, 0 VFX sockets, palette 27 colours, 0 problems.
