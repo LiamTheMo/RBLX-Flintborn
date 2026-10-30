@@ -73,7 +73,7 @@ end
 -- Text that shrinks to fit its box, from the entry's size down to `minSize`.
 local function fitted(label: TextLabel, maxSize: number, minSize: number?): TextLabel
 	label.TextScaled = true
-	Widgets.Make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = minSize or 12 }, label)
+	Widgets.TextCap(label, maxSize, minSize or 12)
 	return label
 end
 

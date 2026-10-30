@@ -14,9 +14,8 @@ files and ids as the fallback while an atlas is not uploaded.
 
     python3 art/ui/pack_atlas.py
 
-Art too big for one image (the screens' window frames, stored as tiles) is
-packed whole, scaled down to fit the atlas; it is drawn stretched over the
-window, so only its resolution changes.
+Art too big for one image (the screens' window frames) is packed as its
+tiles, each at full resolution.
 
 slice_parchment.py runs this after slicing, since it rewrites the manifest.
 """
@@ -61,22 +60,30 @@ GROUPS = {
     ],
     # The pieces of the Crafting, Forge, Inventory, Journal and Settings screens
     # and the lobby's popups.
-    "atlas_screens": [
+    "atlas_pieces": [
         "pm_panel", "pm_button_parchment", "pm_recipe_row", "pm_recipe_row_selected", "pm_queue_row",
         "pm_queue_empty", "pm_req_card", "pm_search_box", "pm_ctab", "pm_ctab_selected",
-        "pm_button_craft", "pm_side_column", "pm_side_tab_selected", "pm_sort_button", "pm_cat_all",
+        "pm_button_craft", "pm_side_tab", "pm_side_tab_selected", "pm_sort_button", "pm_cat_all",
         "pm_cat_food", "pm_cat_materials", "pm_cat_tools", "pm_button_action", "pm_button_square",
         "pm_arrow_left", "pm_arrow_right", "pm_icon_chest", "pm_quest_row", "pm_quest_row_selected",
         "pm_jtab_leather", "pm_jtab_paper", "pm_button_strip", "pm_icon_bolt", "pm_icon_scroll",
         "pm_button_apply", "pm_button_reset",
     ],
-    # The screens' window frames, scaled to fit, and the map's pieces.
-    "atlas_windows_craft": ["pm_window_crafting", "pm_window_forge"],
-    "atlas_windows_menu": ["pm_window_settings", "pm_window_journal"],
-    "atlas_windows_bag": [
-        "pm_window_inventory", "pm_frame_hollow", "pm_compass_rose", "pm_map_pin", "pm_map_label",
-        "pm_button_zoom_in", "pm_button_zoom_out",
+    # The world map's frame, the map pieces the Journal shares, and the run's
+    # interaction prompt frame.
+    "atlas_map": [
+        "pm_frame_hollow", "pm_compass_rose", "pm_map_pin", "pm_map_label", "pm_button_zoom_in",
+        "pm_button_zoom_out", "frame_bar_hollow",
     ],
+    # The island map painting (Journal and world map).
+    "atlas_island": ["pm_map_island"],
+    # Each screen's window frame is two tiles (too wide for one image), each in
+    # an atlas of its own at full resolution.
+    **{
+        f"atlas_window_{screen}_{half}": [f"pm_window_{screen}__1_{half}"]
+        for screen in ("crafting", "forge", "inventory", "journal", "settings")
+        for half in (1, 2)
+    },
 }
 
 
@@ -125,25 +132,12 @@ def pack_tight(sizes):
     return placed, bottom
 
 
-def picture(entry):
-    """A sprite's image, scaled to fit one atlas: tiled art is put back together."""
-    if not entry.get("tiles"):
-        return Image.open(SPRITES / entry["file"]).convert("RGBA")
-    whole = Image.new("RGBA", (entry["w"], entry["h"]), (0, 0, 0, 0))
-    for tile, x, y, _, _ in entry["tiles"]:
-        whole.alpha_composite(Image.open(SPRITES / f"{tile}.png").convert("RGBA"), (x, y))
-    fit = min(1.0, SIDE / whole.width, SIDE / whole.height)
-    if fit < 1:
-        whole = whole.resize((int(whole.width * fit), int(whole.height * fit)), Image.LANCZOS)
-    return whole
-
-
 def build(manifest):
     for entry in manifest.values():
         entry.pop("atlas", None)
         entry.pop("rect", None)
     for group, names in GROUPS.items():
-        images = {name: picture(manifest[name]) for name in names}
+        images = {name: Image.open(SPRITES / manifest[name]["file"]).convert("RGBA") for name in names}
         sizes = {name: image.size for name, image in images.items()}
         try:
             placed, height = pack(sizes)
