@@ -27,6 +27,12 @@ local SPRITE_PAD = 2
 local NARROW_WIDTH = 1544
 -- Clearance kept under the Roblox top bar, in design pixels.
 local TOP_GAP = 8
+-- Room kept from the screen's left and right edges, in screen pixels (the
+-- Roblox menu button's own margin), and between the top-right pills.
+local EDGE = 12
+local ROW_GAP = 10
+-- Coins, Gems and Settings sit in the Roblox top bar's row, right to left.
+local TOP_ROW = { "Settings", "Gems", "Coins" }
 -- Smallest touch target on screen, in points (Roblox's mobile guidance).
 local MIN_TAP = 44
 -- Room kept clear on each side of the status strip at the top, in design px.
@@ -206,9 +212,11 @@ function LobbyHud.new(parent: Instance, layout, steady: () -> boolean)
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 	}, parent)
+	self.topByName = {}
 	local function top(name: string, entry): Frame
 		local frame = holder(name, entry, self.root)
-		table.insert(self.topWidgets, { frame, entry })
+		table.insert(self.topWidgets, { frame, entry, name })
+		self.topByName[name] = { frame, entry }
 		return frame
 	end
 
@@ -456,8 +464,9 @@ end
 
 -- Fits the screen to `width` × `height` reference pixels drawn at `screenScale`,
 -- with the Roblox top bar ending `topInset` reference pixels down:
--- * the top widgets move down when the bar would cover the profile (phones,
---   where the screen is drawn small);
+-- * Coins, Gems and Settings sit in the top bar's row at the right edge;
+-- * the profile sits right under the top bar's buttons at the left edge, and
+--   the other top-left widgets keep their places relative to it;
 -- * the navigation grid shrinks to end above the bottom edge;
 -- * the party panel moves up under Coins, and only then shrinks, to end above
 --   the Enter group under it (neither below half size);
@@ -467,10 +476,40 @@ end
 function LobbyHud:Fit(width: number, height: number, topInset: number?, screenScale: number?)
 	local cfg = self.cfg
 	self.screenScale = screenScale or 1
-	local drop = math.max(0, (topInset or 0) + TOP_GAP - cfg.profile.pos[4])
+	local top = topInset or 0
+	local edge = EDGE / self.screenScale
+	-- The profile right under the top bar; the left column follows it.
+	local drop = top + TOP_GAP - cfg.profile.pos[4]
+	local shift = edge - cfg.profile.pos[2]
+	local inRow = {}
+	for _, name in TOP_ROW do
+		inRow[name] = true
+	end
 	for _, item in self.topWidgets do
-		local frame, entry = item[1], item[2]
-		frame.Position = UDim2.new(entry.pos[1], entry.pos[2], entry.pos[3], entry.pos[4] + drop)
+		local frame, entry, name = item[1], item[2], item[3]
+		if not inRow[name] then
+			local left = entry.anchor[1] == 0 and entry.pos[1] == 0
+			frame.Position = UDim2.new(
+				entry.pos[1],
+				if left then math.max(edge, entry.pos[2] + shift) else entry.pos[2],
+				entry.pos[3],
+				entry.pos[4] + drop
+			)
+		end
+	end
+	-- Coins, Gems and Settings in the top bar's row, right to left.
+	local x = -edge
+	local rowBottom = 0
+	for _, name in TOP_ROW do
+		local item = self.topByName[name]
+		if item then
+			local frame, entry = item[1], item[2]
+			local y = math.max(4, (top - entry.size[2]) / 2)
+			frame.AnchorPoint = Vector2.new(1, 0)
+			frame.Position = UDim2.new(1, x, 0, y)
+			x -= entry.size[1] + ROW_GAP
+			rowBottom = math.max(rowBottom, y + entry.size[2])
+		end
 	end
 	local navCfg, partyCfg = cfg.nav, cfg.party
 	local navRoom = height - navCfg.bottomMargin - navCfg.pos[4] - drop
@@ -482,15 +521,14 @@ function LobbyHud:Fit(width: number, height: number, topInset: number?, screenSc
 	local bottom = height - below - 10
 	local partyTop = partyCfg.pos[4] + drop
 	if partyTop + partyCfg.size[2] > bottom then
-		local coinsBottom = cfg.coins.pos[4] + cfg.coins.size[2] + drop
-		partyTop = math.max(coinsBottom + 10, bottom - partyCfg.size[2])
+		partyTop = math.max(rowBottom + 10, bottom - partyCfg.size[2])
 	end
 	self.partyScale.Scale = math.clamp((bottom - partyTop) / partyCfg.size[2], 0.5, 1)
 	self.party.Position = UDim2.new(partyCfg.pos[1], partyCfg.pos[2], partyCfg.pos[3], partyTop)
 
 	local statusCfg = cfg.status
-	local left = cfg.profile.pos[2] + cfg.profile.size[1] + STATUS_GAP
-	local right = width + cfg.coins.pos[2] - cfg.coins.size[1] - STATUS_GAP
+	local left = edge + cfg.profile.size[1] + STATUS_GAP
+	local right = width - edge - STATUS_GAP
 	local room = right - left
 	if room >= statusCfg.minWidth then
 		local stripWidth = math.min(statusCfg.size[1], room)

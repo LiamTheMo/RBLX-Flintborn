@@ -309,18 +309,30 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	return holder
 end
 
--- An image from the art sheets by sprite name, or its styled fallback.
+-- An image from the art sheets by sprite name, or its styled fallback. A sprite
+-- packed into an uploaded atlas (art/ui/pack_atlas.py) is drawn as its
+-- rectangle of the atlas, so a screen fetches one image for many sprites (phones
+-- refuse bursts of separate downloads); otherwise it is its own image.
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
 	local whole = UiAssets.sprite(name)
 	if whole and type(whole.tiles) == "table" then
 		return tiled(name, whole, props, parent) or fallback(name, props, parent)
 	end
-	local id = UiAssets.image(name)
+	local atlas = whole
+		and type(whole.atlas) == "string"
+		and type(whole.rect) == "table"
+		and UiAssets.image(whole.atlas)
+	local id = atlas or UiAssets.image(name)
 	if id == nil then
 		return fallback(name, props, parent)
 	end
 	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
+	if atlas then
+		-- The 9-slice centre below is relative to this rectangle.
+		image.ImageRectOffset = Vector2.new(whole.rect[1], whole.rect[2])
+		image.ImageRectSize = Vector2.new(whole.rect[3], whole.rect[4])
+	end
 	SpriteLoader.Assign(image, id)
 	local center = UiAssets.sliceCenter(name)
 	local sprite = UiAssets.sprite(name)
