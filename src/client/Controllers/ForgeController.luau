@@ -36,13 +36,13 @@ local function invoke(name: string, ...)
 	return success, result
 end
 
--- Player-facing text for a refusal code.
+-- Player-facing text for a refusal code, as a sentence.
 local function reasonText(code: any): string
 	local text = Reasons.Text(code)
 	if text == tostring(code) and RecipeModel.REASONS[code] then
-		return RecipeModel.REASONS[code]
+		text = RecipeModel.REASONS[code]
 	end
-	return text
+	return (string.gsub(text, "^%l", string.upper)) .. (if string.find(text, "[%.!?]$") then "" else ".")
 end
 
 local function refresh()

@@ -53,7 +53,8 @@ local L = {
 	rowSubtitleSize = 15,
 	name = { 418, 128, 330, 38 },
 	nameSize = 30,
-	picture = { 470, 178, 242, 233 },
+	-- The item art has a margin: this rect puts its ink on the mockup's 243 × 233.
+	picture = { 464, 167, 254, 255 },
 	description = { 400, 416, 324, 56 },
 	descriptionSize = 21,
 	descriptionLine = 0.86,
@@ -79,7 +80,7 @@ local L = {
 	craft = {
 		stepper = { 483, 610, 222, 44 },
 		button = { 713, 599, 220, 66 },
-		materialList = { 776, 165, 305, 278 },
+		materialList = { 776, 165, 305, 268 },
 		smeltHead = { 782, 446, 276, 26 },
 		job = { 782, 472, 276, 24 },
 		bar = { 782, 502, 190, 20 },
@@ -277,8 +278,9 @@ function RecipeWindow.new(props)
 		self:_buildCraftingExtras(v, z)
 	end
 
-	-- Gamepad: rows lead right to the main button, which leads back to the row.
-	window.close.root.Name = "Close"
+	-- Gamepad: rows lead right to the main button and it leads back to the
+	-- chosen row (set as rows are built); until there are rows, close is first.
+	screen:SetDefaultSelection(window.close.control.hit)
 	self:_renderDetail()
 	return self
 end
@@ -671,7 +673,16 @@ function RecipeWindow:_wideCards(cost)
 			icon = RecipeModel.Icon(item.catalogId),
 			zIndex = z,
 		})
-		label(c, { name = "Name", rect = { 86, 12, w - 92, 24 }, text = item.name, role = "rowTitle", zIndex = z }, 15)
+		-- hudSmall: Merriweather Bold at 15, shrinking to fit a long name.
+		label(c, {
+			name = "Name",
+			rect = { 86, 12, w - 92, 24 },
+			text = item.name,
+			role = "hudSmall",
+			color = "inkLabel",
+			scaled = true,
+			zIndex = z,
+		})
 		label(c, {
 			name = "Count",
 			rect = { 86, 35, w - 92, 28 },

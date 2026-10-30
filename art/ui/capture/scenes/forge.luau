@@ -220,6 +220,8 @@ view = snapshot(permanentVault, unlocked, {
 	{ instanceId = "pick-2", catalogId = "IronPickaxe", qualityRoll = -0.012 },
 })
 ForgeController.Refresh()
+-- The capture cannot scroll a list, so show the Permanent category.
+window:SetCategory("Permanent")
 window:Select("PermanentIronPickaxe")
 check(not window.stepper.root.Visible, "no stepper for a Permanent conversion")
 check(window.button.text == "Convert", "the button says CONVERT")
@@ -233,6 +235,7 @@ check(dialog ~= nil and dialog.Enabled, "a conversion asks first")
 check(window.confirm and window.confirm.dialog.body:FindFirstChild("Sources", true) ~= nil, "two vault items: pick one")
 __dump(player.PlayerGui, W, H, BACKGROUND)
 window.confirm.Close()
+window:SetCategory("All")
 
 -- 9 phone --------------------------------------------------------------------------------
 view = snapshot(VAULT, UNLOCKED)
