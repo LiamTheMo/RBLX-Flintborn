@@ -50,7 +50,7 @@ function ItemSlot.new(parent: Instance, props, onPress)
 		TextXAlignment = Enum.TextXAlignment.Center,
 		ZIndex = z + 1,
 	}, holder)
-	Widgets.Make("UITextSizeConstraint", { MaxTextSize = 17, MinTextSize = 9 }, self.name)
+	Widgets.TextCap(self.name, 17, 9)
 	self.stripe = Widgets.Make("Frame", {
 		Name = "Rarity",
 		AnchorPoint = Vector2.new(0, 1),
