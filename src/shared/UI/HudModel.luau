@@ -256,14 +256,9 @@ function HudModel.KeyLabel(inputType: string, keyName: string?, fallbackKey: str
 	return KEY_NAMES[keyName] or Keybinds.Display(keyName :: string)
 end
 
--- Medicine lock, pending food healing, hunger slow and crouching: what only the
+-- Medicine lock, pending food healing and hunger slow: what only the
 -- old survival HUD showed in words.
-function HudModel.SurvivalStatus(
-	medicineLockLeft: number?,
-	foodHealing: number?,
-	slowed: boolean?,
-	crouching: boolean?
-): string
+function HudModel.SurvivalStatus(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?): string
 	local parts = {}
 	if (medicineLockLeft or 0) > 0 then
 		table.insert(parts, ("Medicine ready in %.1f s"):format(medicineLockLeft))
@@ -273,9 +268,6 @@ function HudModel.SurvivalStatus(
 	end
 	if slowed then
 		table.insert(parts, "! Hungry: slowed")
-	end
-	if crouching then
-		table.insert(parts, "Crouching")
 	end
 	return table.concat(parts, "  ·  ")
 end

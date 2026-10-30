@@ -422,7 +422,7 @@ card listing the receipt.
 |---|---|---|
 | 4 tabs (Gameplay, Audio, Graphics, Controls) | 5 tabs, incl. Accessibility | **Recommend 4 tabs (1:1).** Graphics gets UI Scale, Colour-blind palette and Reduced Motion; Audio gets Subtitles. Alternative: a 5th large tab, at the cost of a tighter tab pitch and dropping the plant ornament |
 | Gameplay: Camera Sensitivity, FOV, Interaction Range, Auto Loot, Show Item Notifications, Language | Camera Sensitivity, Invert Camera, Show Damage, Show Names | Show the real ones in the mockup's controls. Slider: Camera Sensitivity 10–100. Checkboxes with descriptions: Show Damage Numbers, Show Names, Invert Camera. **FOV, Interaction Range, Auto Loot, Item Notifications and Language are not shown** (no source; Roblox owns language) |
-| Key Binds: W/S/A/D/Space/E/B/M/Shift/Ctrl | 18 rebindable actions (Interact F, Backpack Tab, Map N, Sprint LeftShift, Crouch C, …); movement keys are Roblox's and not rebindable | Gameplay's right column lists the first 10 rebindable actions with live keys. Controls lists all of them (Scroll) plus Replay Tutorial and the "gamepad buttons are fixed" note |
+| Key Binds: W/S/A/D/Space/E/B/M/Shift/Ctrl | 17 rebindable actions (Interact E, Backpack B, Map M, Sprint LeftShift, …; no crouch since GDD 1.24); movement keys are Roblox's and not rebindable | Gameplay's right column lists the first 10 rebindable actions with live keys. Controls lists all of them (Scroll) plus Replay Tutorial and the "gamepad buttons are fixed" note |
 | RESET / APPLY | same semantics (`SetDirty`) | keep |
 
 ### 4.4 Party (04)
@@ -737,3 +737,4 @@ earlier section or a screen spec, this section wins.
 | D18 | Ready controls | Each member's row shows a Ready tag (green dot, "Ready") or a Not Ready tag (grey dot, "Not Ready"). The local player toggles it with a Ready / Not Ready button in the Readied Status card. Invite buttons show "Invited" (disabled paper) while an invite is pending. |
 | D19 | Missing art | Where a mockup shows art the kit lacks (Party header tent and trees, Settings sketches, flat glyphs), use the closest `lk_` art (e.g. `icon_tree`, `icon_campfire`, emblems) and list it as a deviation; never draw ad-hoc shapes. The Play window's map is the game's real island map art. |
 | D20 | XP and counts | Bars always show the real fraction, not the mockup's drawn fill. |
+| D21 | Controls | Crouch is removed from the game (GDD 1.24). Defaults: Interact E, Backpack B, Map M, so the mockup's key rows match except the dropped Crouch row. |

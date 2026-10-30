@@ -205,11 +205,11 @@ Graphics, Controls, Accessibility).
 | Show Item Notifications checkbox | **none** | — |
 | Language dropdown | **none** | Roblox picks the locale; the game has no language setting or `LocalizationService` use |
 | Key: Move Forward / Backward / Left / Right (W S A D), Jump (Space) | not rebindable | `Keybinds.IsAllowed` keeps W A S D and Space with Roblox; show as fixed (current code shows Move W A S D as fixed caps) |
-| Key: Interact · E | `Interact` (default **F**) | mock default differs |
-| Key: Open Backpack · B | `Backpack` (default **Tab**) | mock default differs |
-| Key: Open Map · M | `Map` (default **N**) | mock default differs |
+| Key: Interact · E | `Interact` (default **E**) | matches (defaults changed in GDD 1.24) |
+| Key: Open Backpack · B | `Backpack` (default **B**) | matches |
+| Key: Open Map · M | `Map` (default **M**) | matches |
 | Key: Sprint · Left Shift | `Sprint` (default LeftShift) | matches; display text differs: `Keybinds.Display` → "Shift", `SettingsPanel.KeyText` → "SHIFT", mock "Left Shift" |
-| Key: Crouch · Left Ctrl | `Crouch` (default **C**) | mock default differs |
+| Key: Crouch · Left Ctrl | **removed** (GDD 1.24: the game has no crouch) | row dropped; the key list ends at Sprint |
 | RESET / APPLY | `SettingsController` reset (open tab) / apply | match |
 
 ### Real settings with no place in the mock (proposed placement, same row styles)

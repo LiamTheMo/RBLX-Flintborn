@@ -179,7 +179,7 @@ test("prompt keycaps name the key for the input in use", function()
 	expectEq(HudModel.KeyLabel("Gamepad", "ButtonX"), "X", "gamepad button")
 	expectEq(HudModel.KeyLabel("Touch", "E"), "TAP", "touch")
 	expectEq(HudModel.KeyLabel("Keyboard", "LeftShift"), "Shift", "rebindable keys read as in Settings")
-	expectEq(HudModel.KeyLabel("Keyboard", "Unknown"), "F", "unknown falls back to the default Interact key")
+	expectEq(HudModel.KeyLabel("Keyboard", "Unknown"), "E", "unknown falls back to the default Interact key")
 	expectEq(HudModel.KeyLabel("Keyboard", nil, "G"), "G", "or to the player's bound Interact key")
 end)
 
@@ -191,7 +191,6 @@ test("survival status keeps the medicine lock and food healing", function()
 		"Medicine ready in 1.0 s  ·  Food healing +5  ·  ! Hungry: slowed",
 		"all three"
 	)
-	expectEq(HudModel.SurvivalStatus(0, 0, false, true), "Crouching", "crouching")
 end)
 
 test("the extraction objective tracks reaching and holding the zone", function()

@@ -1,6 +1,6 @@
 -- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53) in the parchment
 -- Inventory & Vault window (Hud/InventoryPanel). The Inventory and Vault tiles,
--- or the Backpack key (Tab by default, GDD §46), open it: the lobby backpack on
+-- or the Backpack key (B by default, GDD §46), open it: the lobby backpack on
 -- the left, the vault's items and materials on the right. Choose a slot, then
 -- STORE (or →) puts a backpack item in the vault and TAKE (or ←) brings a vault
 -- entry out; a vault material comes out in the amount picked (1, 10, 100 or all)

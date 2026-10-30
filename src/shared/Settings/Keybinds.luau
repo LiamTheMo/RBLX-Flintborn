@@ -13,9 +13,8 @@ local Keybinds = {}
 -- while the key is held.
 Keybinds.Actions = {
 	{ id = "Sprint", label = "Sprint (hold)", default = "LeftShift", gamepad = { "ButtonL3" }, hold = true },
-	{ id = "Crouch", label = "Crouch", default = "C", gamepad = { "ButtonR3" } },
-	{ id = "Interact", label = "Interact / pick up", default = "F", gamepad = {} },
-	{ id = "Backpack", label = "Backpack / inventory", default = "Tab", gamepad = { "ButtonY" } },
+	{ id = "Interact", label = "Interact / pick up", default = "E", gamepad = {} },
+	{ id = "Backpack", label = "Backpack / inventory", default = "B", gamepad = { "ButtonY" } },
 	{ id = "Drop", label = "Drop item", default = "Q", gamepad = { "ButtonL1" } },
 	{ id = "Hotbar1", label = "Hotbar slot 1", default = "One", gamepad = {} },
 	{ id = "Hotbar2", label = "Hotbar slot 2", default = "Two", gamepad = {} },
@@ -27,7 +26,7 @@ Keybinds.Actions = {
 	{ id = "Build", label = "Build mode", default = "X", gamepad = { "DPadRight" } },
 	{ id = "Rotate", label = "Rotate piece", default = "R", gamepad = { "ButtonL2" } },
 	{ id = "Tribe", label = "Tribe", default = "T", gamepad = { "DPadLeft" } },
-	{ id = "Map", label = "Map", default = "N", gamepad = { "DPadDown" } },
+	{ id = "Map", label = "Map", default = "M", gamepad = { "DPadDown" } },
 	{ id = "Progression", label = "Progress", default = "P", gamepad = { "ButtonSelect" } },
 	{ id = "Settings", label = "Settings", default = "O", gamepad = {} },
 }

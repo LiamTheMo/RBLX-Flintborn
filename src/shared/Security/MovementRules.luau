@@ -1,6 +1,6 @@
 -- Server movement sanity (GDD §24, §21.4). Horizontal travel between two server
 -- samples may not exceed the speed the server currently allows the player (walk,
--- sprint, crouch or a downed crawl, as set on their Humanoid) with a generous
+-- sprint or a downed crawl, as set on their Humanoid) with a generous
 -- allowance for latency; vertical motion (falls, jumps) is ignored. The latency
 -- allowance is a budget: overruns spend it and slower samples refill it, so it
 -- cannot be claimed every sample for a sustained speed-up. A move far beyond the
@@ -31,7 +31,7 @@ function MovementRules.MaxSpeed(downed: boolean, swimBonus: number?): number
 end
 
 -- The speed the player is allowed right now: the server-set Humanoid walk speed
--- (it already includes sprint, crouch, hunger and water modifiers), or the crawl
+-- (it already includes sprint, hunger and water modifiers), or the crawl
 -- while downed. `previous` (last sample's allowance) covers the latency of a
 -- change, e.g. stamina running out mid-sprint.
 function MovementRules.AllowedSpeed(downed: boolean, walkSpeed: number?, previous: number?): number

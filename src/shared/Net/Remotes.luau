@@ -23,7 +23,7 @@ local DEFINITIONS = {
 	-- World
 	RequestPlay = "RemoteFunction", -- (requestId) -> ok, reason
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
-	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld, crouching)
+	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld)
 	UseConsumable = "RemoteFunction", -- (requestId, catalogId) -> ok, reason
 	InventoryChanged = "RemoteEvent", -- server -> client: inventory snapshot
 	MoveItem = "RemoteFunction", -- (fromArea, fromIndex, toArea, toIndex) -> ok, reason

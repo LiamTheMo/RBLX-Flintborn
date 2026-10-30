@@ -173,8 +173,7 @@ local function updateStatus()
 	local food = player:GetAttribute("Food")
 	local lockLeft = (player:GetAttribute("MedicineLockUntil") or 0) - workspace:GetServerTimeNow()
 	local slowed = type(food) == "number" and GameConstants.IsFoodSlowed(food)
-	local crouching = player:GetAttribute("Crouching") == true
-	local text = HudModel.SurvivalStatus(lockLeft, player:GetAttribute("FoodHealing") or 0, slowed, crouching)
+	local text = HudModel.SurvivalStatus(lockLeft, player:GetAttribute("FoodHealing") or 0, slowed)
 	widgets.vitals:SetStatus(text)
 end
 

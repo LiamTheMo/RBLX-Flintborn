@@ -43,12 +43,11 @@ Live checks (GDD §31.7), all on the published places:
 
 ## v0.04 — Survival core: health, stamina, food and healing
 
-Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the strict-25% slow, crouch and sprint speeds, instant medicine with animation lock, 10 s food heals, hit halving with the ≤10 HP cutoff, stacking, and downed clearing. Deployed and verified on both places (2026-10-23).
+Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the strict-25% slow, walk and sprint speeds, instant medicine with animation lock, 10 s food heals, hit halving with the ≤10 HP cutoff, stacking, and downed clearing. Deployed and verified on both places (2026-10-23).
 
 Studio and live checks (until crafting arrives in v0.05, a Studio run starts with a test kit of medicine and food; live runs only carry what was in the lobby backpack):
 
-- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee, crouching and standing still never drain it.
-- [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
+- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee and standing still never drain it.
 - [ ] Food drains to 0 in 60 minutes (half after 30); below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
 - [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
@@ -65,7 +64,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
+- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -325,7 +324,7 @@ Studio and live checks:
 - [ ] Kill a world server within a second of pressing Play: the loadout is restored once.
 - [ ] Shut down a server while a Play is loading: the loadout stays in the lobby. A `/safekick` whose save fails retries and kicks once saved.
 - [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
-- [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
+- [ ] On a phone, the touch thumbstick, jump and Sprint buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
 
 ## Q164 — Materials stay in the lobby (superseded by GDD §53)
 
@@ -354,7 +353,7 @@ Studio and live checks:
 
 ## Keyboard controls and rebinding
 
-Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots (1–6 since the six-slot hotbar, §56), Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots (1–6 since the six-slot hotbar, §56), Q to drop and E to interact or pick up (F in revisions 1.12–1.23); revision 1.24 moved the backpack to B and the map to M and removed crouch, with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
 
 Automated (`keybinds.spec.luau`, 7 cases):
 - The requested defaults, with every default allowed and unique.
@@ -365,8 +364,8 @@ Automated (`keybinds.spec.luau`, 7 cases):
 
 Studio and live checks:
 
-- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–6 select hotbar slots (7–9 do nothing), Q drops, and F picks up a dropped item, loots a body and harvests a node.
-- [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
+- [ ] Fresh profile: Shift sprints while held, B opens and closes the backpack, M opens the map, 1–6 select hotbar slots (7–9 do nothing), Q drops, C does nothing, and E picks up a dropped item, loots a body and harvests a node.
+- [ ] Settings → Controls: rebind Backpack to Tab. B stops opening it, Tab opens it, and the Backpack button and navigation bar read "(Tab)". Rejoin: the binding is kept, in both the lobby and the world.
 - [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; clicking the waiting key again cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
