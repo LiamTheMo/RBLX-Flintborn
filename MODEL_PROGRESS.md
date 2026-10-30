@@ -244,7 +244,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 045 | Flintborn pine sapling model study | World & resources | ✅ | 3012; parts 470 / 576 / 576 / 348 / 162 / 44 / 44 | modeller + fresh verifiers; R1 FAIL 6 (tiers merged, long plates, rosettes like 042's), R2 PASS 8 | minors: f34 middle hem narrow; crown waist wide; side-on plates read as sticks; lime tip band reads as scales; sand share high; two edge-on GroundFoliage leaves |
 | 046 | Flintborn Natural Arch Model Study | World & resources | ⬜ | | | |
 | 047 | Old Pine Flintborn model study | World & resources | ⬜ | | | |
-| 048 | Flintborn dock model study | World & resources | ⬜ | | | |
+| 048 | Flintborn dock model study | World & resources | ✅ | 3860; parts 432 / 416 / 12 / 12 / 12 / 222 | modeller + fresh verifier; R1 PASS 8 | minors: coils read as faceted collars (twist only in colour); 5-sided swags (accepted); f34 gold +2.7 (rope); legs dark in side light; knot boxy; bolt blocks faint from the front |
 | 049 | Classic Pine construction study | World & resources | ⬜ | | | |
 | 050 | Flintborn timber bridge model study | World & resources | ⬜ | | | |
 | 051 | Flintborn rope crossing model study | World & resources | ⬜ | | | |
@@ -427,3 +427,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-29: 043 Terraced Ledge built by a parallel modeller: a 20 × 14 tile of pale column rock stepping up in two lime lawns at 5.6 and 10.4, rims stepping per column with a pale bevel band, column tops fully capped, rounded dome bushes with flowers, a corner filler and a slotted +X connector plate. Seams tile cleanly. R1 PASS 8 on the first round.
 - 2026-10-29: 044 Natural Ramp built by parallel modellers: a 16 × 20 flagstone ramp climbing 29.9° from ground to the 10.4 plateau, bevelled 2-across tiles on a stone wedge, stepped column cliffs with peaked tips in a thin outer strip, draped lime borders with round dome bushes and flowers; walkable and flush with M040. R1 FAIL 6, R2 PASS 8.
 - 2026-10-29: 045 Pine Sapling built by parallel modellers: a 10-stud pine of three distinct tiers of thick 0.20 chisel-tipped paddle slabs in two visible rings, peg-and-recess joints, a smooth flared orange trunk with blunt root flares, and upright oval-leaf rosettes with pale rocks; clearly distinct from M042. R1 FAIL 6, R2 PASS 8.
+- 2026-10-29: 048 Dock built by a parallel modeller: the kit's first timber piece, a raised two-bay pier on six square posts with chunky cross boards at 5.6, side beams, crossbeams, knee and X braces, brass bolts, rope coils on every post and twisted swags along three sides, open walk-on end. R1 PASS 8 on the first round.
