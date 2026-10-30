@@ -1,0 +1,756 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M056",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m056_ivy_dark",
+    "hex": "#215A20",
+    "levels": [
+     0.96111,
+     0.96491,
+     0.96827,
+     0.97202,
+     0.97472,
+     0.97686,
+     0.98001,
+     0.98526,
+     0.98788,
+     0.9902,
+     0.99403,
+     0.99777,
+     1.00151,
+     1.00912,
+     1.0129,
+     1.01769,
+     1.02087,
+     1.02467,
+     1.02621,
+     1.02929,
+     1.03282,
+     1.03522,
+     1.03788
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_ivy_green",
+    "hex": "#447619",
+    "levels": [
+     0.9,
+     0.96226,
+     0.96585,
+     0.96877,
+     0.97167,
+     0.97724,
+     0.98016,
+     0.98222,
+     0.98539,
+     0.99022,
+     0.99471,
+     0.99754,
+     0.99998,
+     1.00306,
+     1.00652,
+     1.00901,
+     1.01143,
+     1.01426,
+     1.02075,
+     1.02288,
+     1.02682,
+     1.03032,
+     1.0344,
+     1.03777
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_ivy_lime",
+    "hex": "#A5BF0D",
+    "levels": [
+     0.96138,
+     0.9628,
+     0.9657,
+     0.96811,
+     0.97055,
+     0.97309,
+     0.98024,
+     0.98202,
+     0.98415,
+     0.98857,
+     0.9938,
+     0.99672,
+     1.00036,
+     1.00238,
+     1.0058,
+     1.01087,
+     1.01273,
+     1.01593,
+     1.02319,
+     1.02766,
+     1.03142,
+     1.03864
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_moss",
+    "hex": "#9AAF10",
+    "levels": [
+     0.96612,
+     0.97563,
+     0.97854,
+     0.98049,
+     0.9832,
+     0.98685,
+     0.98863,
+     0.99105,
+     0.99368,
+     0.99617,
+     0.99992,
+     1.00287,
+     1.0043,
+     1.00527,
+     1.00641,
+     1.00736,
+     1.00772,
+     1.01078,
+     1.01163,
+     1.01299,
+     1.01349,
+     1.01412,
+     1.01561,
+     1.01651,
+     1.01874,
+     1.02096,
+     1.02332,
+     1.02612,
+     1.02859,
+     1.03343,
+     1.04057,
+     1.0476
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_moss_deep",
+    "hex": "#4F7301",
+    "levels": [
+     0.96413,
+     0.97586,
+     0.98113,
+     0.98267,
+     0.9839,
+     0.98734,
+     0.98869,
+     0.99111,
+     0.992,
+     0.99324,
+     0.99627,
+     0.99813,
+     1.00081,
+     1.00346,
+     1.00559,
+     1.00686,
+     1.00835,
+     1.00947,
+     1.01065,
+     1.01227,
+     1.01424,
+     1.01636,
+     1.01856,
+     1.02054,
+     1.02244,
+     1.02356,
+     1.02467,
+     1.02704,
+     1.02945,
+     1.03388,
+     1.03879,
+     1.05131
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_moss_x_deep_25",
+    "hex": "#87A00C",
+    "levels": [
+     0.96809,
+     0.97108,
+     0.97457,
+     0.97841,
+     0.98193,
+     0.98505,
+     0.98766,
+     0.98927,
+     0.99192,
+     0.99596,
+     0.99832,
+     1.00058,
+     1.00265,
+     1.00512,
+     1.0087,
+     1.01181,
+     1.0134,
+     1.01568,
+     1.01781,
+     1.02011,
+     1.02291,
+     1.02527,
+     1.02753,
+     1.02947,
+     1.03185,
+     1.03471,
+     1.03672,
+     1.03934
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_moss_x_deep_50",
+    "hex": "#749108",
+    "levels": [
+     0.96988,
+     0.97198,
+     0.97561,
+     0.98315,
+     0.98639,
+     0.98856,
+     0.99155,
+     0.99417,
+     0.99697,
+     0.99899,
+     1.00126,
+     1.00291,
+     1.00521,
+     1.00799,
+     1.01119,
+     1.0137,
+     1.01685,
+     1.01887,
+     1.02177,
+     1.0244,
+     1.02575,
+     1.03019,
+     1.03279,
+     1.03557,
+     1.03954
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_moss_x_deep_75",
+    "hex": "#628205",
+    "levels": [
+     0.96194,
+     0.9702,
+     0.97531,
+     0.97771,
+     0.97873,
+     0.98302,
+     0.98475,
+     0.98792,
+     0.98924,
+     0.99186,
+     0.99379,
+     0.99672,
+     0.99938,
+     1.00205,
+     1.00373,
+     1.00442,
+     1.00634,
+     1.00878,
+     1.01,
+     1.01176,
+     1.01288,
+     1.01498,
+     1.01782,
+     1.0194,
+     1.02025,
+     1.02253,
+     1.02362,
+     1.02636,
+     1.02813,
+     1.03175,
+     1.03657,
+     1.04391
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_stem",
+    "hex": "#6E4B22",
+    "levels": [
+     0.95255,
+     0.96095,
+     0.96863,
+     0.97143,
+     0.97499,
+     0.97791,
+     0.982,
+     0.98341,
+     0.98624,
+     0.98974,
+     0.99265,
+     0.99414,
+     0.99732,
+     0.99991,
+     1.00444,
+     1.00647,
+     1.00882,
+     1.01002,
+     1.01362,
+     1.0169,
+     1.01943,
+     1.02284,
+     1.02793,
+     1.02952,
+     1.03435,
+     1.03777,
+     1.04956,
+     1.04967,
+     1.05,
+     1.05,
+     1.06838,
+     1.06849
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_stone",
+    "hex": "#B29A84",
+    "levels": [
+     0.95364,
+     0.95954,
+     0.96315,
+     0.96497,
+     0.96913,
+     0.9711,
+     0.97234,
+     0.97516,
+     0.97815,
+     0.98005,
+     0.98735,
+     0.98827,
+     0.99038,
+     0.99262,
+     0.9954,
+     0.99921,
+     1.00259,
+     1.00447,
+     1.00617,
+     1.0066,
+     1.00735,
+     1.00889,
+     1.01094,
+     1.01293,
+     1.01554,
+     1.01969,
+     1.02287,
+     1.0281,
+     1.03332,
+     1.03536,
+     1.04108,
+     1.04905
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_stone_x_deep_50",
+    "hex": "#9B8C7C",
+    "levels": [
+     0.95706,
+     0.96132,
+     0.96385,
+     0.96562,
+     0.96707,
+     0.96855,
+     0.96912,
+     0.97026,
+     0.9726,
+     0.97486,
+     0.977,
+     0.97919,
+     0.9809,
+     0.98516,
+     0.99197,
+     0.99986,
+     1.00795,
+     1.01312,
+     1.01472,
+     1.01563,
+     1.0174,
+     1.01911,
+     1.02185,
+     1.02282,
+     1.02354,
+     1.02501,
+     1.02937,
+     1.03363,
+     1.0373,
+     1.0404,
+     1.04614,
+     1.05272
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_stone_x_light_25",
+    "hex": "#B29C87",
+    "levels": [
+     0.9759,
+     0.97992,
+     0.98156,
+     0.98474,
+     0.98617,
+     0.98854,
+     0.99097,
+     0.99332,
+     0.99517,
+     0.99677,
+     0.9993,
+     1.00109,
+     1.00373,
+     1.00672,
+     1.00963,
+     1.01241,
+     1.0142,
+     1.01652,
+     1.01943,
+     1.02173,
+     1.02449,
+     1.02844,
+     1.03089,
+     1.03331,
+     1.03561,
+     1.03865,
+     1.04013,
+     1.04682,
+     1.0497
+    ],
+    "used": true
+   },
+   {
+    "key": "m056_stone_x_light_50",
+    "hex": "#B29E8A",
+    "levels": [
+     0.97789,
+     0.98328,
+     0.98575,
+     0.98936,
+     0.99191,
+     0.99437,
+     1.00285,
+     1.0076,
+     1.01051
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "OvergrowthIvyCluster",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    3.3224,
+    2.7507,
+    0.3769
+   ],
+   "tris": 456,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthIvyCluster.glb",
+     "kind": "solid",
+     "tris": 456,
+     "offset": [
+      0.0,
+      1.3754,
+      0.0
+     ],
+     "size": [
+      3.3224,
+      2.7507,
+      0.3769
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: top centre of the back plane y 0, facing -Y; back flat on a wall face, top at or under the wall top. No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthIvyCorner",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    1.9232,
+    3.2825,
+    2.7324
+   ],
+   "tris": 352,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthIvyCorner.glb",
+     "kind": "solid",
+     "tris": 352,
+     "offset": [
+      0.0,
+      1.6413,
+      0.0
+     ],
+     "size": [
+      1.9232,
+      3.2825,
+      2.7324
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: the edge line (X axis), top plane z 0 toward +Y, face plane y 0 toward -Z; any 90 deg outside top edge. No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthIvyLeaf",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    1.0304,
+    1.25,
+    0.0644
+   ],
+   "tris": 28,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthIvyLeaf.glb",
+     "kind": "solid",
+     "tris": 28,
+     "offset": [
+      0.0,
+      0.625,
+      0.0
+     ],
+     "size": [
+      1.0304,
+      1.25,
+      0.0644
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: stalk base, blade in the XZ plane facing -Y, hanging; scatter or hand-place. No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthIvyTendril",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    1.5525,
+    4.3029,
+    0.3463
+   ],
+   "tris": 192,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthIvyTendril.glb",
+     "kind": "solid",
+     "tris": 192,
+     "offset": [
+      0.0,
+      2.1515,
+      0.0
+     ],
+     "size": [
+      1.5525,
+      4.3029,
+      0.3463
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: pad centre on the back plane y 0, stem down -Z; the next segment's pad hides this flat-cut end. No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthMossCushionLarge",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    2.925,
+    1.25,
+    2.3711
+   ],
+   "tris": 414,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthMossCushionLarge.glb",
+     "kind": "solid",
+     "tris": 414,
+     "offset": [
+      0.0,
+      0.625,
+      0.0
+     ],
+     "size": [
+      2.925,
+      1.25,
+      2.3711
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: base centre, base plane z 0 (sink 0.02-0.05 into an up-facing surface; slopes <= 15 deg). No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthMossCushionSmall",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "part",
+   "size": [
+    1.7477,
+    0.8,
+    1.4454
+   ],
+   "tris": 280,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthMossCushionSmall.glb",
+     "kind": "solid",
+     "tris": 280,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      1.7477,
+      0.8,
+      1.4454
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 overlay part. attach: base centre, base plane z 0 (sink 0.02-0.05 into an up-facing surface; slopes <= 15 deg). No collision: it dresses other assets."
+  },
+  {
+   "name": "OvergrowthRuinBlock",
+   "sheet": "M056",
+   "subject": "Moss and Ivy",
+   "role": "hero",
+   "size": [
+    11.1325,
+    6.1445,
+    8.1205
+   ],
+   "tris": 3850,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/OvergrowthRuinBlock.glb",
+     "kind": "solid",
+     "tris": 3850,
+     "offset": [
+      0.0,
+      3.0723,
+      0.0
+     ],
+     "size": [
+      11.1325,
+      6.1445,
+      8.1205
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "056 Moss and Ivy hero: a 7.8 x 4.0 x 4.8 three-course chamfered-brick ruin block (26 bricks, running bond) with lumpy moss cushions on top, four ivy runs of flat five-point leaves on square stems lipping over the edges, cushions, rocks and ivy sprays at the foot. Players can stand on the top. No VFX (the sheet shows none)."
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 5572,
+  "vfxSockets": 0,
+  "paletteColours": 13,
+  "paletteLevels": 352,
+  "meshBytes": 538904
+ },
+ "problems": []
+}
