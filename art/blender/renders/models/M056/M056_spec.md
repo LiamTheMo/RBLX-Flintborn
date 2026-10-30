@@ -916,3 +916,588 @@ All 14 recommendations are accepted.
 14. **Budget.** Ceiling 3850. If it runs over, cut the joint strips first, then leaves at the back.
 
 **Packaging.** Every shell is closed and manifold, with **0 winding errors**. **No floating leaves.** **No leaf, stem or cushion more than 0.05 inside the stone.** Watch the brick joints, and ray-check every leaf after final placement. Each overlay part carries its attach frame and origin as described.
+
+## Stage 1 — Modelling (modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m056.py` (`build()`, plus `hero_only()` / `preview()` for tuning). Built in the background
+session on port 9881 (`wip/M056.blend`); the final check ran in a freshly restarted session. Build frame as §1.1 /
+decision 2: long faces ±Y, ends ±X, ground z 0, core centred. Every part has its own function; the hero is assembled
+from them.
+
+- **Stone core** (`brick_shell`, `stone_core`): 26 bricks, 3 rows × 3 courses, running bond exactly as §2.2 (front
+  2.6/2.6/2.6 – 1.3/2.6/2.6/1.3 – 2.6/2.6/2.6, back offset half a brick, middle row two 7.8 bars then three 2.6
+  bricks). Joints 0.015, top at z 4.785, bottom course sunk 0.02. A brick is an octagon section (0.16 chamfers on the
+  four vertical edges) with a chamfered top band and a flat top, square bottom edges: 36 tris. Facet crease: one bottom
+  corner of each long face pushed in 0.03, so the face folds on its diagonal (alternating per brick). Jitter x ±0.005,
+  y ±0.012, yaw ±0.5° (less than §2.2's ±0.03 / ±1°, so neighbours never cross the 0.015 joint). Broken corners are
+  built into the ring: front row top-right brick, corner +x−y, 0.35; back row top-left, −x+y, 0.25. Hidden pieces are
+  cheaper: the middle-row bars of courses 1–2 are plain boxes (12 tris; only their end faces show); the middle-row top
+  bricks have only their top edges chamfered (20 tris; their sides are hidden).
+- **Moss cushions** (`cushion_shell`): one closed shell each: a flat base (one vert per lump), a mid ring at ≈ 0.4 h
+  alternating lump (full radius, higher) and valley (0.70–0.76, lower) so the outline scallops, an upper ring of one
+  vert per lump at 0.74–0.86 h, and a 3–4 vert crown. H : W 0.40–0.45 on every cushion, widest in the lower half,
+  flat base.
+  - Top: CT1 3.4 × 2.6 × 1.35 (7 lumps) at (−0.3, 0.15); CT2 2.8 × 2.3 × 1.15 at (−2.55, −0.35); CT3 2.6 × 2.0 × 1.1 at
+    (1.3, 0.85); CT4 2.0 × 1.5 × 0.86 on the front edge at (−1.2, −1.4). Bases 0.02 into the top.
+  - Base: CB1 3.3 × 2.4 × 1.4 (front, at the curtain foot), CB2 2.6 × 2.0 × 1.1, CB3 2.2 × 1.8 × 0.95, CB4
+    1.75 × 2.4 × 1.03 (left end), CB5 2.3 × 1.9 × 1.0 (back-left), CB6 1.8 × 2.4 × 1.03 (right end). Each is pressed
+    into its wall, then backed off along the wall normal until no vert, face centre or edge midpoint is more than 0.03
+    inside stone (back-offs 0.07–0.27).
+  - All are a little larger than §2.3: the sheet's crown and base read bigger, and size was the free way to the G share.
+- **Rocks**: 4 rocks (5/5/3 rings, flat base, sloping 3-vert top, 22 tris): RK1 (−4.55, −2.5); the RK2 pair at
+  (4.5, −1.5) and (3.6, −2.4), moved from §2.5's corner spots so they don't widen the r34 / rear silhouettes and leave
+  room for the foot spray; RK3 big (0.05, 2.95). 3 pebbles (14 tris). All sunk 0.03.
+- **Ivy** (`RUNS`, `_run_geometry`, `stem_shell`, `pad_shell`, `place_leaf`):
+  - Leaf: the 16-tri lens (8-point outline: tip, two notches, side lobes, basal lobes, stalk notch; top fan raised
+    0.05 for the midrib crease, bottom fan 0.02 under). The outline is chunkier than §2.4 (notches ≈ 0.12 deep, side
+    lobes ±0.56 W): the first renders read as spiky stars. Width 1.03–1.10 (median 1.07). §2.4 says 0.8–1.1 with median
+    0.92, but the sheet's leaves measure ≈ 1.1–1.2 studs against the brick courses, so I took the top of the range.
+  - Stems: square section (main Ø 0.26, branches Ø 0.14), straight segments with mitred flat-junction kinks. Each
+    point's depth comes from the proudest stone under its segments (ray-cast, ±r across) plus 0.012. Lips run pad on
+    the top → near-edge point → outside-corner point → down the face. R2 has a branch that wraps the back-right corner
+    onto the back face (§1.3).
+  - Pads: R1, R2 and R3 top pads (chamfer-top frustum, 12 tris) and the fully chamfered front-face pad pinning R1's left
+    branch at (−0.3, z 3.3) (20 tris). That is **4 pads, not 5**: R4 climbs from the ground and has no top anchor
+    (§2.4), so there are only three top anchors.
+  - Runs: R1 front (main, branch A to the pad, A2, B to the foot spray, C) 42 leaves; R2 right end (main, A, W wrap)
+    31; R3 back (main with foot spray, L, Rb) 37, its stem at X ≈ −1.0 with its pad at (−1.0, 1.55) clear of CT1; R4
+    left patch 11. **121 leaves** (99 wall, 14 top/lip, 8 ground).
+  - Placement: stations along each stem, sides alternating. Each station tries 12 candidate leaves (side × angle) and
+    keeps the one whose centre is farthest from the run's leaves so far, which spreads the curtain instead of stacking
+    it on the stem. Lime wall leaves (and 55 % of green ones) hang over the stem's front face to hide it; dark leaves
+    sit nearest the stone and spread widest. Each leaf is then pushed along its normal until all 34 samples (outline,
+    centres, edge midpoints) are ≥ 0.012 clear of every brick, rock and the ground (signed distance by ray parity). A
+    leaf needing more than 0.3 is dropped: 0 dropped; 19 pushed, max 0.29. Lip and top leaves tilt 24–38° toward the
+    edge.
+- **Overlay parts** (attach frames per §2.6). `o["m056_attach"]` is the attach point in object coordinates; the object
+  origin stays at the bbox bottom centre, as `K.check` requires.
+  - `OvergrowthMossCushionLarge` 2.83 × 2.43 × 1.25 (7 lumps) and `OvergrowthMossCushionSmall` 1.59 × 1.39 × 0.77 (5
+    lumps): attach at the base centre, base plane z 0.
+  - `OvergrowthIvyCluster` 3.32 × 0.38 × 2.75: one pad 0.85 below the attach top, three stems fanning down, 22 leaves
+    (two on the pad itself, so the mat has no hole), lime fanning up and out at the top, a dark hanging point.
+    Everything sits in y −0.38…0 and below z 0.
+  - `OvergrowthIvyTendril` 1.55 × 0.35 × 4.3: the pad at the attach point, a square stem down −Z with kinks, a flat-cut
+    bottom, 8 leaves alternating, tips down. The sheet cell's W : H is 0.33 (≈ 1.45 wide at 4.4 tall), so §2.6's 1.1
+    width can't be reached with 1-stud leaves.
+  - `OvergrowthIvyCorner` 1.82 × 2.95 × 2.96: a pad on the top plane, one stem bent 90° over the edge, 8 lime leaves on
+    the top arm and 10 darker ones on the hanging arm. The hanging arm is shortened to ≈ 2.6 so the part stays under
+    §2.6's 2.8.
+  - `OvergrowthIvyLeaf` 1.03 × 0.06 × 1.18: one green leaf plus a 3-sided stalk (8 tris) seated in its notch.
+- Shots in `renders/models/M056/`, all also in `M056_views.png`:
+  - sheet views: `f34_sheet` (−47, 12), `r34_sheet` (133, 12), `front_sheet` (−44, 8), `rear_sheet` (128, 8),
+    `side_sheet` (111, 8), `top_sheet`;
+  - true orthos `front`, `side`, `rear`, `top`, `underside`; `front34` / `rear34` with the floor;
+  - one `part_*` per part; `exploded` (four double bricks, two cushions, the cluster and the tendril); `attach` (each
+    part on plain boxes in its attach frame); `scale` (5.5-stud markers at (−2, −3.4) and standing on the top at
+    (2.4, 0));
+  - close-ups `moss_cu`, `curtain_cu`, `pad_cu`, `junction_cu` (back-right corner), `lip_cu`, `corner_cu`, `leaf_cu`,
+    `cushion_cu`.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| OvergrowthRuinBlock | **3818** (ceiling 3850) | 11.13 × 8.13 × 6.14 | 181 |
+| OvergrowthMossCushionLarge | 60 | 2.83 × 2.43 × 1.25 | 1 |
+| OvergrowthMossCushionSmall | 42 | 1.59 × 1.39 × 0.77 | 1 |
+| OvergrowthIvyCluster | 456 | 3.32 × 0.38 × 2.75 | 26 |
+| OvergrowthIvyTendril | 192 | 1.55 × 0.35 × 4.30 | 10 |
+| OvergrowthIvyCorner | 352 | 1.82 × 2.95 × 2.96 | 20 |
+| OvergrowthIvyLeaf | 24 | 1.03 × 0.06 × 1.18 | 2 |
+
+- Hero by kind (shells / tris): bricks 26 / 840, rocks 7 / 130, moss 10 / 468, stems and pads 17 / 444, leaves
+  121 / 1936.
+- Every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary or wire edges, 0 loose verts, 0 zero-area faces,
+  0 n-gons, 0 duplicate verts; normals outward; transforms applied; origin at the bbox bottom centre.
+- Per shell: **0 winding errors**, 0 self-intersections, every volume positive. Shells are built outward and checked by
+  signed volume; nothing recalculates the thin leaves. No booleans anywhere.
+- Hero origin: build-frame offset (0.063, −0.241, −0.03), within 0.25 of the core centre. The ground (build z 0) sits
+  0.03 above the object's lowest point (rocks and cushions are sunk 0.03).
+- **Contact** (`contact_report`, tolerance 0.03, ground = build z 0): hero 0 floating, 0 unchained; every part 0 / 0
+  (anchors: the cushion base on z 0; the ivy parts' main stem).
+- **Buried** (`bury_report`: ray parity of every vert and face centre of every leaf, stem, pad and cushion against
+  every brick and rock, after the final placement): **0 over 0.05**, max 0.02 (the cushions' designed 0.02 seat). Rocks
+  in bricks: 0.
+- Leaves: 0 wall leaves more than 75° from both 3/4 cameras; edge-on share at f34 (R1, R4) 0.0; 0 undersides facing
+  both cameras. Four non-wall leaves are more than 75° from both cameras: one top leaf behind CT1 and three R3
+  foot-spray leaves lying on the ground (ground leaves face up, which the e 12 cameras see at 78°).
+
+## Stage 3 — UV
+
+Angle-based islands (`M.smart_uv`: angle 45, ANGLE_BASED, margin 0.008), then `m012._uv_unfold` (0 faces cut). Every
+object: 0 overlapping pairs, 0 flipped, min island gap 0.016, border 0.008, texel density min / median / max
+1.0 / 1.0 / 1.0, conformal stretch p95 1.006 (cushions 1.05–1.08). Hero 1007 islands. The exporter writes its own
+palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration.** `K.calibrate` on the test dome gave stone `#A4907D`, stone_deep `#7D7772`, stone_light `#AB9B8B`,
+  moss `#9AAF10`, moss_deep `#4F7301`, ivy_lime `#9EB80C`, ivy_green `#447619`, ivy_dark `#194818`, stem `#6E4B22`.
+  I then corrected them on the hero's own `f34_sheet` render against the sheet (same masks, `m056_study/mr.py`):
+  - stone raised so the lit front face lands near the sheet's, then lowered 2 % so the lit block tops stay under
+    v 0.92 (brighter tops flood into the masks' background glow and shrink the measured silhouette);
+  - ivy_lime +4 % (the curtain lime class was 16 under); ivy_dark lighter (the deep class was too black).
+- **Final `PALETTE`**: stone `#B29A84`, stone_deep `#847D74`, stone_light `#B3A190`, moss `#9AAF10`, moss_deep
+  `#4F7301`, ivy_lime `#A5BF0D`, ivy_green `#447619`, ivy_dark `#215A20`, stem `#6E4B22`. Roughness: stone 0.9 (deep
+  0.95), moss 0.95, leaves 0.8 (dark 0.85), stem 0.9. Moss and leaves low specular. No metal, no emission.
+- **Blends** (by height and role only):
+  - Bricks: bottom course `stone_x_deep_50`, middle course stone, top course `stone_x_light_25`. This is per brick,
+    because a brick face spans the whole course: per course is the finest height band the geometry allows without
+    extra rings. Chip faces `stone_x_light_50` (fresh break).
+  - Rocks: lowest quarter `stone_x_deep_50`.
+  - Cushions: moss → moss_deep by height within each cushion, `t = (0.85 − h) / 0.5` in quarter steps (base and lowest
+    band deep, mid band 25–75 %, upper ring and crown lime).
+  - Leaves: one key each by height rank, **34 % lime / 38 % green / 28 % dark**. Lip and upper leaves are lime; foot
+    sprays dark or green.
+  - Pads: stem with Tint × 1.05.
+- **Tint**: per brick ±0.04 plus 0.02 broad mottling; per cushion ±0.03 plus 0.025 mottling; per leaf ±0.04; stems
+  ±0.03 plus 0.03 mottling.
+- **`kit_shading_ok`** is set on the hero and both cushion parts, with the reason "moss lime over a darker lower band
+  by height" (spec 5.3). `K.check` measures the cushion parts' brightness–normal correlation at 0.75–0.78, because a
+  dome's lower band faces sideways. The hero measures 0.37 (under the 0.5 limit).
+
+**Re-measured on the final renders** (sheet in brackets). Our renders have no black outlines, so O is 0 against the
+sheet's 2.2–2.9 %.
+
+| View | W : H | G | R | T | fill | green median (hue) | green shade quartile |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34_sheet (−47, 12) | 1.213 (1.282) | 48.1 (52.6) | 49.8 (43.1) | 2.1 (1.4) | 0.740 (0.715) | `#779A0F` 75° (77°) | 87° (96°) |
+| r34_sheet (133, 12) | 1.256 (1.216) | 46.5 (52.0) | 50.1 (43.3) | 3.4 (2.1) | 0.706 (0.742) | `#5C790D` 76° (78°) | 95° |
+| front_sheet (−44, 8) | 1.294 (1.244) | 48.2 (51.9) | 50.0 | 1.8 | 0.747 | 75° | 87° |
+| rear_sheet (128, 8) | 1.294 (1.191) | 47.3 (51.0) | 49.3 | 3.3 | 0.693 | 79° | 95° |
+| top_sheet | — | 61.2 (74.3; target ≥ 55) | 35.1 | 3.7 | | | |
+
+- **f34 x-fifths.** G [12.9, 16.3, 21.8, **33.4**, 15.6] (sheet [9.5, 23.5, 24.3, 36.7, 6.1]); R [19.7, 31.9, 30.9,
+  9.5, 8.0]. The fourth fifth (the front curtain) is green-dominant, as on the sheet. The fifth fifth has more green
+  than the sheet's (the foot spray and the base moss).
+- **f34 colours.**
+  - Lit front-face stone `#CAAA8B` (30°, sat 0.31) against `#D3B595`.
+  - Left end `#C0A284`: the studio lights the end. The sheet's shaded `#746A6A` comes from its lighting, and the end is
+    never painted darker.
+  - **B ≤ G on every stone median** (hue 29–34°, never mauve).
+  - Moss crown lime `#C2D914` (67°) against `#CEE113`; moss lower band (yg class) `#749908` (75°) against `#5D8802`
+    (79°); crown shade quartile `#507704` (80°).
+  - Curtain lime `#C2DC0F` against `#CAE10E`; green `#477E16` (92°) against `#417710`–`#52911C`; dark `#205A1B`
+    (115°) against `#19541A`–`#1D4F14`.
+  - Stem `#77502B` (29°), R > G > B.
+  - Green class shares: lime 36 / yg 41 / green 18 / deep 5 (sheet 41 / 33 / 14 / 12).
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing glowing and no light (§7). No emission anywhere. Studio-side notes (Requires Manual
+Validation): the stone should read pale warm beige on lit faces and warm grey in shade, never pink; the moss lime, not
+neon; the three ivy tones distinct under the game sun. Leaves are closed lenses, so they read from both sides.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (no spores, falling leaves or insects). No VFX sockets on any object (checked in
+`build()`). Collision: hero `hull`; all six overlay parts `none` (decision 10).
+
+## Modeller's notes for the verifier
+
+- **Rebuild:** `import importlib, kit_models, m056; importlib.reload(kit_models); importlib.reload(m056); m056.build()`
+  (about 7 s to build and 37 s to render). `build()` returns audit, uv, materials, views, contact, bury, winding,
+  leaves and problems; problems is empty on the final build. Measure renders with `scratchpad/m056_study/mr.py` (the
+  study's `m.py` masks; the render background is the corner pixel).
+- **Near misses against §2.7**, each within about 1 point or 0.03:
+  - f34 G 48.1 (needs ≥ 48.6); r34 G 46.5 (≥ 47); r34 T 3.4 (≤ 3);
+  - rear_sheet W : H 1.294 (≤ 1.27);
+  - f34 green median hue 75° (76–79°);
+  - lit front-face stone 9–11 under `#D3B595` per channel (just inside ± 12).
+  - The G shortfall is budget-bound: the hero is at 3818 / 3850, and every spare tri went into leaves. I enlarged the
+    cushions instead, which costs nothing.
+  - The f34 and rear W : H pull against each other. The r34 is the f34 turned 180°, so its width is the same and only
+    the heights differ; moving the front-right dressing out widens the f34 and the rear together.
+- **Lighting difference:** the kit studio lights both 3/4 faces and the tops strongly, so the shaded end and the stone
+  share read lighter and larger than on the sheet. I did not paint by facing. The bright tops were kept just under the
+  masks' glow threshold (v 0.91).
+- **Leaves:** at the top of §2.4's size range (median 1.07), and 121 rather than about 110. Tones are 34 / 38 / 28
+  rather than 40 / 35 / 25, because more lime pushed the f34 green median further toward yellow.
+- **Pads:** 4, not 5 (R4 has no top anchor). R2 has 31 leaves (spec 24) because it also wraps the back-right corner.
+- **Moss cushions** read as lumpy faceted domes with scalloped outlines. Real separate sub-lumps would cost about 110
+  more hero tris. Compare `cushion_cu.png` and `part_mosscushion*.png` with the sheet's two cushion cells.
+- **Close-up 2** (`pad_cu.png`): from below, R1's leaves hide most of the front pad. The pads and the stems' square
+  sections show better in `lip_cu.png` and the top views.
+- **Not done:** no commit, export or kit-file change (the main session does those). The work file
+  `art/blender/assets/kit/wip/M056.blend` is saved with the final build.
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only. Background session on port 9881 on `wip/M056_verify.blend` (not saved). Every number below
+was re-measured with my own scripts, not the builder's reports. My renders are in `renders/models/M056/verify/M056/`
+(the modeller's renders were not touched). Colours and shares were measured with the study masks (`m056_study/mr.py`),
+on the sheet cells and on my renders side by side.
+
+**Verdict: FAIL (one narrow blocker: the two cushion parts). Sheet match 7/10.**
+
+### Technical (all pass)
+
+| Object | Tris | Size | Shells | Winding-error shells | Self-intersecting shells | Floating / unchained | Buried > 0.05 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| OvergrowthRuinBlock | 3818 (≤ 3850) | 11.13 × 8.13 × 6.14 | 181 (26 bricks, 7 rocks, 10 moss, 17 stem/pad, 121 leaves) | 0 | 0 | 0 / 0 (max gap 0.014) | 0 (max 0.026, a base cushion in a brick; the 11 shells that touch stone at all are moss seats, each ≤ 0.026) |
+| MossCushionLarge | 60 | 2.83 × 2.43 × 1.25 | 1 | 0 | 0 | 0 / 0 | – |
+| MossCushionSmall | 42 | 1.59 × 1.39 × 0.77 | 1 | 0 | 0 | 0 / 0 | – |
+| IvyCluster | 456 | 3.32 × 0.38 × 2.75 | 26 | 0 | 0 | 0 / 0 | – |
+| IvyTendril | 192 | 1.55 × 0.35 × 4.30 | 10 | 0 | 0 | 0 / 0 | – |
+| IvyCorner | 352 | 1.82 × 2.95 × 2.96 | 20 | 0 | 0 | 0 / 0 | – |
+| IvyLeaf | 24 | 1.03 × 0.06 × 1.18 | 2 | 0 | 0 | 0 / 0 | – |
+
+- **`M.audit`, every object:**
+  - 0 non-manifold edges, 0 bowtie verts, 0 boundary, wire or loose elements;
+  - 0 zero-area faces, 0 n-gons, 0 duplicate verts;
+  - normals outward, every shell's volume positive;
+  - transforms applied (rotation 0, scale 1), no modifiers, no custom normals;
+  - origin at the bbox bottom centre: the local bbox is symmetric in X and Y, with z min 0.
+- **Hero placement.** Build offset (0.063, −0.241, −0.03). Moss top 6.115 in the build frame (target 6.0 ± 0.3). The
+  overall size is inside §1.1's ±0.5.
+- **How floating was checked.** For each pair of shells: triangle overlap, or the nearest distance from verts, face
+  centres and edge midpoints ≤ 0.03. Each shell must chain by contact to the ground shells (build z 0).
+- **How buried was checked.** Ray parity (three skewed rays, two of three agree) of every vert, face centre and edge
+  midpoint of every non-brick shell, against each brick and each rock separately. Depth is the distance to that solid's
+  surface.
+- **UV (`M.uv_stats`), every object:** 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0. Hero
+  conformal stretch p95 1.006, worst 1.076; cushions p95 1.05–1.08.
+- **`K.check` on all seven:** no problems. Collision: hero `hull`, parts `none`. No VFX sockets.
+- **Hero leaves** (my count from the shells): 121 (lime 41 / green 46 / dark 34, so 34 / 38 / 28 %).
+  - Outline width 1.03–1.10, median 1.07. 7 lie on the ground.
+  - Edge-on (within 12°) area share of the non-ground leaves: 4.4 % at f34, 1.7 % at r34 (target ≤ 12 %).
+  - 4 leaves are more than 75° from both cameras: one top leaf behind CT1 at (−1.3, 2.0, 4.85), and three R3 foot-spray
+    leaves lying flat on the ground.
+- **Pads:** 4. Three on the top at 12 tris each; one on the front face at 20 tris, at (−0.3, −2.06, 3.3), 0.55 square.
+
+### Colour code (read in `m056.py`): no colour by facing
+
+- **Bricks:** one key per course (`COURSE_KEY`, by course index, so by height). Chip faces are lighter by role.
+- **Rocks:** faces whose centre lies in the lowest 25 % of the rock's height get `stone_x_deep_50`.
+- **Cushions:** `t = (0.85 − face-centre height fraction) / 0.5` within each cushion, in quarter steps (`_cushion`,
+  lines 450–454).
+  - **The band is chosen by height, not facing.**
+  - `K.check` measures a 0.75–0.78 brightness–normal correlation on the cushion parts because a dome's low faces point
+    sideways.
+  - **The `kit_shading_ok` waiver is justified.**
+- **Leaves:** by height rank plus role (lip and top leaves rank highest, so they are lime; ground sprays are 60 % dark,
+  40 % green). The parts use height or position along the stem.
+- **Stems and pads:** `stem`.
+- No paint path reads a face normal.
+
+### Sheet comparison, view by view (same masks; the sheet's O is outlines and dark joints, ours is 0)
+
+| View | W : H ours (sheet) | G | R | R + O | T | green median | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 (−47, 12) | 1.213 (1.294) | 48.1 (52.6) | 49.8 (43.1) | 49.8 (45.9) | 2.1 (1.4) | 75° (77°) | green classes lime / yg / green / deep 36 / 42 / 18 / 5 (sheet 41 / 33 / 14 / 12) |
+| r34 (133, 12) | 1.256 (1.189) | 46.5 (52.5) | 50.1 (42.8) | 50.1 (45.3) | 3.4 (2.2) | 76° (78°) | the whole view is darker: green median v 0.47 (0.63), lit stone `#B89F87` (`#D0B293`). This is the studio light, not the paint |
+| front_sheet (−44, 8) | 1.294 (1.234) | 48.2 (52.5) | 50.0 | 50.0 (45.9) | 1.8 | 75° | |
+| rear_sheet (128, 8) | 1.294 (1.185) | 47.3 (51.1) | 49.3 | 49.3 (47.2) | 3.3 | 78° | |
+| f34 probes e 8 / e 16 | 1.142 / 1.043 | 46.2 / 47.6 | | | | | e 12 is the best |
+
+**Stone.**
+- f34 lit faces `#C8A889` (30°, s 0.31) against `#D1B292`: 9 / 10 / 9 under, inside ± 12.
+- The whole-view stone median is `#C7A687` against the sheet's `#786E6F`. That misses §5.4's "within 20" by about 80 in
+  R. The cause is the studio lighting the −X end, which the sheet shades grey (`#746A6A`).
+- R > G > B and B ≤ G on every one of our stone medians: **not mauve**.
+
+**Moss crown** (G pixels in the top 20 % of the silhouette).
+- f34: ours `#9ABD14` (72°, v 0.74, lime 51 %), sheet `#B4CE08` (68°, v 0.81, lime 65 %).
+- r34: ours `#6F8A0F` (v 0.54) against `#B2CE09`. It is darker because the studio lights the far side.
+
+**Visual reading.** In every view it reads as the sheet's subject:
+- a pale chamfered three-course brick wall chunk in running bond;
+- lumpy lime cushions on the left two-thirds of the top;
+- the front curtain on the right half of the front face, lipping over the top;
+- the +X-end curtain and the back curtain in the r34, rear and side views;
+- the patch on the left end;
+- base cushions, rocks and pebbles;
+- square brown stems between the leaves.
+
+In the close-ups (`curtain_f.png`, `moss_cu.png`) the leaves read as five-point ivy. The top and side views match the
+sheet's content.
+
+**What differs visibly:**
+- the ivy runs are thinner and more spaced (stringy) than the sheet's dense columns, so more bare stone shows, especially
+  in the r34 and rear;
+- the stone reads uniformly tan, because the studio light leaves no shaded end;
+- the base cushions read as faceted mounds, not lumpy clusters.
+
+### Parts against their cells
+
+| Part | Ruling |
+| --- | --- |
+| MossCushionLarge / Small | **Blocker.** See Blockers below. |
+| IvyCluster | OK: a fanned lime top, a dark hanging point, about 22 leaves. Ours is a little starrier and more crowded (minor). |
+| IvyTendril | OK: a square stem with a flat cut, a pad on top, 8 alternating leaves. W : H 1.55 / 4.30 = 0.36 against the cell's 0.33: fine. |
+| IvyCorner | Minor. The top arm's 8 lime leaves lie flat in z 0 (tilt −8…+6°). At the cell's angle they read as a thin flat sliver; the cell shows them tilted up and fanning. Tilting them 15–30° up off the top plane would match better. |
+| IvyLeaf | Minor. The 0.12-deep notches make the blade read as a blunt pentagon at the parts-shot angle. The cell's leaf has deep notches between the terminal lobe and the side lobes. Fine in the hero at viewing distance. |
+| Exploded / attach shots | OK: four double bricks, two cushions, the cluster and the tendril. Each part sits correctly in its attach frame. |
+
+### The modeller's near misses, ruled
+
+| Item | Measured | Ruling |
+| --- | --- | --- |
+| f34 G 48.1 (needs ≥ 48.6) | 48.1 (sheet 52.6); R + O 49.8 against 45.9 | **Visible, minor.** It shows as more bare stone, mostly because the curtains are thinner than the sheet's. It is budget-bound at 3818 / 3850. |
+| r34 G 46.5 (needs ≥ 47) | 46.5 (sheet 52.5); R + O +4.8 | **Visible, minor:** the back and end runs read stringy. Same cause. If a fix round runs anyway, move leaves from the f34 lip (14 top leaves) to the middle band of the r34 curtains. |
+| r34 T 3.4 (≤ 3) | 3.4 (sheet 2.2) | Mostly numeric. The stems show because the leaves are spaced, the same root cause as the G miss. Minor. |
+| rear_sheet W : H 1.294 (≤ 1.27) | 1.294 (sheet 1.185) | Numeric only. The rear cell is a redraw, the r34 is in range (1.256), and the outline reads the same. Minor. |
+| f34 green median 75° (76–79°) | 75° (sheet 77°) | Numeric only; not visible. The f34 deep-green class is 5 % against 12 %, so the dark under-layer reads a little weaker. Minor. |
+| Cushions as lumpy faceted domes | see the parts table | **Parts: blocker. Hero: minor.** The three overlapping top cushions do make a lumpy crown; the base cushions read as gem mounds. |
+| pad_cu: R1's leaves hide the front pad | `verify/M056/pad_lo.png`: the pad is fully hidden from below and from the front | Minor. The pad exists (20 tris, 0.55 square, at (−0.3, −2.06, 3.3)), and the square stems show in `lip_cu`. Optionally clear one leaf over it. |
+| 4 pads, not 5 | 4 measured | Accepted: R4 has no top anchor. |
+| 121 leaves, 1.03–1.10 | 121 measured, median 1.07 | Accepted. |
+| Tendril 1.55 wide | 1.553 | Accepted: the cell's W : H allows it. |
+| RK2 moved | rocks at (4.5, −1.5) and (3.6, −2.4) | Accepted; the f34 still shows the pale pair at the front-right. |
+| `kit_shading_ok` on the hero and cushions | band by face-centre height (lines 450–454) | **Confirmed: by height.** The waiver stands. |
+
+### Blockers
+
+1. **MossCushionLarge and MossCushionSmall read as faceted gems or pebbles, not as the sheet's lumpy cushions.**
+   - **What the sheet shows:** cauliflower-like clusters of rounded sub-domes, 6–7 on the large cell and 4–5 on the
+     small one.
+   - **What ours are:** one faceted mound each, 60 and 42 tris. The broad triangular facets read as a cut gem or a
+     pebble, and the scallop barely shows in the outline (`verify/M056/part_mosscushion*.png`, `cushion_cu.png`).
+   - **Budget is no excuse:** each part has about 940 tris of headroom, and the hero's budget doesn't apply to them.
+   - **Fix:**
+     - build each cushion from overlapping sub-lumps, or deepen the lobes of a lobed dome;
+     - give each lump its own rounded bulge of 2–3 facet rings, with the same height colour band;
+     - target about 250–400 tris for the large and 150–250 for the small;
+     - change only `part_cushion_large` / `part_cushion_small`, so the hero is unchanged. If a shared cushion recipe
+       changes, keep the hero ≤ 3850.
+
+### Minors (noted, not blocking)
+
+1. The ivy runs are thinner than the sheet's: G −4.5 (f34) and −6.0 (r34); R + O +3.9 / +4.8. This is budget-bound.
+2. The stone reads uniformly tan: the whole-view median is `#C7A687` against `#786E6F`.
+   - The studio lights the −X end. The end is correctly not painted darker.
+   - Requires a Studio check.
+3. The moss crown is a little darker and less lime: `#9ABD14` against `#B4CE08`; lime class 51 % against 65 %.
+4. The f34 deep-green class is 5 % against 12 %, and the green median is 75° against 77°.
+5. r34 T is 3.4 against 2.2; rear_sheet W : H is 1.294 against 1.185.
+6. The front pad is hidden in close-up 2's view.
+7. IvyCorner's top arm lies flat and reads as a sliver at the cell's angle.
+8. IvyLeaf's notches are shallow compared with the cell's.
+9. In the hero, the base cushions read as faceted mounds.
+
+## Fix round 1 (fix modeller, 2026-10-30)
+
+Fresh fix modeller, background session on port 9881 (`wip/M056.blend`, saved after the final build; session stopped).
+Every change is in `m056.py`; the hero's base and top cushions keep their old recipe (`cushion_shell` / `_cushion`).
+
+**Blocker: the cushion parts are now lumpy clusters.**
+- `CUSHION_LUMPS`, `_lump_shell`, `_union_cut`, `_paint_cushion`, `lumpy_cushion`; `part_cushion_large` / `_small`
+  call `lumpy_cushion`.
+- Each part is a table of sub-domes: a broad high crown (an ellipsoid cap, centre 0.15 h below the ground) and
+  6 (large) or 4 (small) rounded side lumps round it (centre 0.05 h below the ground, so their widest ring sits at the
+  base). Each lump has 4 jittered rings (latitudes −40 / 12 / 40 / 66°, alternate rings offset half a facet) and an
+  apex; crown 7 sides, side lumps 5 (small: 6 / 5).
+- The lumps are triangulated (planar faces in), unioned with exact booleans on temporary objects at the origin,
+  bisected at z 0 (everything below removed), capped flat (`triangle_fill`), and the 2-valent seam verts the union
+  leaves are dissolved before triangulating (they made duplicate zero-area slivers). The result is one closed shell
+  with sharp creases between the lumps, as in the sheet's cells. No coplanar faces go into the booleans: every lump
+  reaches below z 0 and the flat base is made by the bisect.
+- Colour by face-centre height only: `moss` above 0.58 H, blending to `moss_deep` over the next 0.45 H in quarter
+  steps (the parts' own band, spec 5.3's "lime upper, darker lower band"). Per-lump Tint ±0.02 (each face takes its
+  nearest lump's), per-cushion ±0.03, broad mottling 0.025. `kit_shading_ok` stays (height band, not facing).
+- The small part's front lump was moved forward and lowered so it no longer grazes the crown (a grazing seam showed as
+  a dark crack).
+- Side by side: `renders/models/M056/cushion_sbs.png` (sheet cells on top, `part_mosscushion*.png` below).
+
+**Minors done.**
+- *Minor 2 (r34 green).* Lip / top leaves 14 → 12 (R1 lip 6 → 4; R2 and R3 lips kept, because they face the r34),
+  and with the 32 spare tris, 4 leaves added to the r34 curtains' middle band (R2 branch A +2, R3 branch L +2). The
+  middle-band branches were also widened at no cost: R3 L to X −3.05 (was −2.75), R3 Rb to X +0.8 (was +0.5), R2 A to
+  Y −1.45 (was −1.2), and on the front R1 C to X +3.1 and A2 to X −0.55 / −0.6. A first try that also took the R2 and
+  R3 lip leaves lowered the r34 G to 45.6, so those stay. Leaves 121 → 123; hero 3818 → **3850** (= the ceiling).
+- *Hero base cushions as sub-lumps:* **not done.** A sub-lump cushion costs 250–400 tris against 47 now; the hero is
+  at 3850, and every leaf is already needed for the G share.
+- *IvyCorner (verifier minor 7):* the top arm's 8 lime leaves now point back along the top (+Y) and tilt up 15–30°
+  (were toward the edge, −8…+6°), so they rise and fan toward the viewer as in the CORNER PIECE cell. The part's
+  height grows to 3.28 (the leaves rise 0.32 above the top plane); the attach frame is unchanged.
+- *IvyLeaf (verifier minor 8):* a part-only 10-point outline (`LEAF_OUT_PART`): deeper notches between the terminal
+  lobe and the side lobes, side lobes pointing out, a shallow notch above each basal lobe. 20 + 8 (stalk) tris. It
+  reads as a three-lobed ivy leaf, not a pentagon (`leaf_cu.png`, `part_ivyleaf.png`). The hero keeps its 16-tri leaf.
+
+**Measured, before → after** (my build; renders measured with `m056_study/mr.py`; part colours with the same green mask
+on the sheet cells and on `part_mosscushion*.png`).
+
+| Item | Round 1 | Fix round 1 | Sheet / target |
+| --- | --- | --- | --- |
+| MossCushionLarge tris / size | 60 / 2.83 × 2.43 × 1.25 | **414** (visible 383 + 31 base cap) / 2.92 × 2.37 × 1.25 | aim 250–400, < 1000 |
+| MossCushionSmall tris / size | 42 / 1.59 × 1.39 × 0.77 | **280** (visible ≈ 259 + 21 cap) / 1.75 × 1.45 × 0.80 | aim 150–250, < 1000 |
+| Cushion lumps (large / small) | one mound each | **7 / 5** sub-domes, one closed shell each | 6–7 / 4–5 |
+| CushionLarge green median / lit / shade quartile | `#81AA12` / `#C0D615` / `#4F7405` | `#A4BF0D` / `#CBE213` / `#5D8905` | cell `#9ABE04` / `#D2E424` / `#4F7A02` |
+| CushionSmall median / lit / shade | – | `#9BBF0D` / `#C7DE12` / `#577D06` | cell `#98BC05` / `#D6E622` / `#4A7703` |
+| Cushion green classes lime / yg / green / deep | 28 / 72 / 0 / 0 (large) | 56 / 44 / 0 / 0 (large), 55 / 45 / 0 / 0 (small) | 53 / 43 / 4 / 0, 51 / 42 / 7 / 1 |
+| Hero tris / leaves (wall / top / ground) | 3818 / 121 (99 / 14 / 8) | **3850** / 123 (103 / 12 / 8) | ≤ 3850 |
+| Runs R1 / R2 / R3 / R4 | 42 / 31 / 37 / 11 | 40 / 33 / 39 / 11 | |
+| f34_sheet W : H, G, R, T, fill | 1.213, 48.1, 49.8, 2.1, 0.740 | 1.217, **48.4**, 49.4, 2.2, 0.744 | 1.282, 52.6, 43.1, 1.4, 0.715 |
+| r34_sheet W : H, G, R, T, fill | 1.256, 46.5, 50.1, 3.4, 0.706 | 1.249, **47.6**, 49.5, **2.9**, 0.710 | 1.216, 52.0, 43.3, 2.1, 0.742 (G ≥ 47, T ≤ 3) |
+| front_sheet W : H, G, T | 1.294, 48.2, 1.8 | 1.299, 48.6, 1.9 | 1.244, 51.9 |
+| rear_sheet W : H, G, T | 1.294, 47.3, 3.3 | 1.306, 48.4, 2.8 | 1.191, 51.0 |
+| top_sheet G | 61.2 | 60.6 | ≥ 55 |
+| f34 green median hue / classes | 75° / 36 / 41 / 18 / 5 | **76°** / 38 / 41 / 15 / 6 | 76–79° / 41 / 33 / 14 / 12 |
+| f34 lit stone | `#CAAA8B` | `#C8A889` (30°, B ≤ G) | `#D3B595` ± 12 |
+| IvyCorner tris / size | 352 / 1.82 × 2.95 × 2.96 | 352 / 1.92 × 2.73 × 3.28 | < 1000 |
+| IvyLeaf tris / size | 24 / 1.03 × 0.06 × 1.18 | 28 / 1.03 × 0.06 × 1.25 | < 1000 |
+
+**Checks after the final build** (`build()`, then saved):
+- `problems` []; `K.check` clean on all seven; KITSTAT ok for each.
+- Every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose, 0 zero-area faces, 0 n-gons,
+  0 duplicate verts; normals outward; transforms applied; origin at the bbox bottom centre.
+- Per shell: 0 winding errors and 0 self-intersections on every object. Each cushion part is 1 shell (volumes 3.45
+  and 0.71).
+- Contact: 0 floating and 0 unchained on every object. Buried: 0 over 0.05 (max 0.02, the cushion seats), rocks in
+  bricks 0.
+- Leaves: 0 dropped (max push 0.26); 0 wall leaves more than 75° from both cameras; edge-on share at f34 (R1, R4) 0.0;
+  0 undersides facing both cameras. Tones 34 / 36 / 30 % lime / green / dark.
+- UV: 0 overlaps or flips on every object, min gap 0.016, density 1.0; cushion parts 62 / 43 islands, stretch p95
+  1.034 / 1.021.
+- No VFX sockets; collision unchanged (hero `hull`, parts `none`).
+
+**Left over.**
+- The hero's base and top cushions keep the faceted-mound recipe (budget; see above). The verifier called this minor.
+- The cushion parts are a little over the tri aim (414 / 280, of which 31 / 21 are the hidden flat base cap), well
+  under 1000. A 3-ring try (≈ 370 / 250 tris) gave pointed, gem-like lump tops, so the fourth ring stays.
+- One shallow crease on the small part (its front lump against the crown) shows as a thin dark line in the close
+  part shot. It is a real seam, not a hole (the shell is closed).
+- f34 G 48.4 and r34 G 47.6 are still 4–5 under the sheet; this is budget-bound at 3850. rear_sheet W : H 1.306 is
+  still over 1.27 (numeric only, as ruled). The stone colour and studio-lighting minors are unchanged.
+- No commit, export or kit-file change.
+
+## Verification round 2 (verifier, 2026-10-30)
+
+Fresh verifier, read-only. Background session on port 9881 on `wip/M056_verify.blend` (the kit copy after the main
+session's fixed `m056.build()`; not saved, session stopped). Every number below is my own measurement. Renders are in
+`renders/models/M056/verify2/M056/`; scripts in the scratchpad `v056r2/`. Colours and shares use the study masks
+(`m056_study/mr.py`) on the sheet cells and my renders side by side.
+
+**Verdict: PASS. Sheet match 8/10.** The round-1 blocker is fixed; nothing is broken; the leftovers are the round-1
+minors, which are budget- or lighting-bound.
+
+### The blocker: the cushion parts
+
+- **Shape.** Each part is now a cauliflower cluster of rounded faceted sub-domes: 7 on the large part (a broad crown
+  plus 6 side lumps), 5 on the small one (crown plus 4). Compare `cushL_az*.png` / `cushS_az*.png` (four azimuths plus
+  a top view) with the sheet's cells (`v056r2/cmpL.png`, `cmpS.png`). Lumps read from every side. The outline scallops,
+  the sides bulge widest near the flat base, and the creases between the lumps are sharp, as in the cells.
+  - W : H on the part shot: large 1.50 (cell 1.47), small 1.42 (cell 1.39).
+  - The lumps are a little more regular and icosphere-like than the cell's hand-cut lumps. That is minor; they no longer
+    read as one gem or pebble. **Blocker fixed.**
+- **Colour by height, not facing.** The band is `(0.58 - z / H) / 0.45` from the face-centre height (`_paint_cushion`;
+  no normal read). Measured on the mesh, every height decile carries one key or two adjacent keys: lime above 0.52 H,
+  `x_deep_25` 0.41–0.52, `x_deep_50` 0.30–0.41, `x_deep_75` 0.19–0.30, `deep` below 0.18 and on the base cap. That is
+  monotonic in height. The `kit_shading_ok` waiver stands.
+- **Colour against the cells** (green pixels; median / lit quartile / shade quartile; top 30 % / bottom 30 % of the
+  height; lime share).
+
+  | | Median | Lit | Shade | Top 30 % | Bottom 30 % | Lime |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | Large cell | `#9ABE04` | `#D2E424` | `#4F7A02` | `#CCDF1A` | `#5B8602` | 53 % |
+  | Large part | `#A4BF0D` | `#CBE213` | `#5D8905` | `#C8DF12` | `#5D8905` | 56 % |
+  | Small cell | `#98BC05` | `#D6E622` | `#4A7703` | `#CEE11C` | `#547E03` | 50 % |
+  | Small part | `#9BBF0D` | `#C7DE12` | `#577D06` | `#C6DC12` | `#668707` | 55 % |
+
+  Every channel is within about 12; the hue is 67–72° on top and 75–80° low, as on the sheet.
+- **One clean closed shell each.**
+  - Large: 414 tris, 209 verts; small: 280 tris, 142 verts. Each is 1 shell.
+  - 0 non-manifold, boundary, wire or loose elements; 0 bowtie verts; 0 n-gons; 0 zero-area or duplicate verts.
+  - 0 winding errors; 0 self-intersecting triangle pairs (BVH overlap, faces sharing a vert excluded); volumes 3.445
+    and 0.710.
+  - **0 interior or inward faces.** Ray parity was taken from every face centre nudged 2e-4 along its normal (3 rays,
+    2 of 3 must agree); every face looks out.
+  - Base caps are flat at z 0, facing down: 31 and 22 tris, 4.80 and 1.52 sq studs.
+- **Slivers left by the booleans (minor).** Large: 16 tris under 2° minimum angle and 47 under 5°, smallest 0.51°;
+  smallest area 1.3e-5, 3 under 1e-4; shortest edge 0.0049, 22 edges under 0.02. Small: 12 under 2°, 29 under 5°,
+  smallest 0.57°; shortest edge 0.0033.
+  - Every object is flat-shaded (0 smooth faces), so the slivers cannot smear normals. They lie along the lump seams.
+  - The only visible effect is the line below.
+- **The small part's dark seam: a crease, not a hole.** `cushS_seam.png` (zoomed in `v056r2/seamzoom.png`) shows a 1–2
+  px dark line where the crown dips into the front lump's top, at about (0.0, −0.25, 0.45). There is also a dark V-groove
+  between the crown and the right lump.
+  - The mesh is closed (0 boundary edges) and has no inward faces.
+  - The sharpest concave dihedrals there are 115° (normal turn) on 0.004–0.06 long edges at (−0.35, −0.26, 0.24) and
+    (0.30, −0.30, 0.30). That is a narrow V-crease seen edge-on.
+  - It reads as a deep join between lumps. Minor and cosmetic.
+- Part budgets: 414 and 280 against the 250–400 and 150–250 aim (31 and 21 of them are the hidden base cap). Well under
+  1000. Accepted.
+
+### Minor fixes: any regressions?
+
+- **r34 leaves.** Hero 3850 tris (= the ceiling), 123 leaves (lime 42, green 44, dark 37), widths 1.030–1.097 (median
+  1.067), 8 on the ground. Edge-on area share 3.5 % at f34 and 1.8 % at r34 (≤ 12 %). Four leaves are more than 75° from
+  both cameras: one top leaf at the +X end (3.61, 0.06, 4.99) and three R3 ground leaves. That is the same count as
+  round 1. No regression.
+- **IvyCorner.** The top arm's 8 lime leaves now have their normals 60–73° above horizontal, so they are tilted 17–30°
+  off the top plane. They sit at z 0.20–0.64 above the top plane and are chained by contact to the stem (0 floating).
+  Nothing is inside the attach solid: minimum signed distance +0.005.
+  - At the parts angle (−25, 20) the arm reads as a lime fan on top of the dark hanging arm.
+  - From the side (`corner_az-70.png`, `corner_az-110.png`) it is still a hard L with the stem bare along the top. The
+    lime leaves stand up as a crest, not the cell's rounded arc. Better than round 1's flat sliver; still minor.
+- **IvyLeaf.** 28 tris (20 blade + 8 stalk), 1.03 × 0.06 × 1.25. Front view (`leaf_front.png` against the cell in
+  `v056r2/cmpCL.png`): it now reads as a three-lobed ivy leaf with a stalk, not a pentagon. Its lobes are narrower and
+  sharper than the cell's broad, chunky lobes, a little star-like. Minor.
+- IvyCluster and IvyTendril: geometry and placement unchanged (456 / 192 tris, 0 points inside the wall, minimum signed
+  distance +0.005).
+
+### Technical re-measure (all seven)
+
+| Object | Tris | Size | Shells | Wind err | Self-x | Float / unchained | Buried > 0.05 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| OvergrowthRuinBlock | 3850 (≤ 3850) | 11.13 × 8.12 × 6.14 | 183 (26 bricks, 7 rocks, 10 moss, 17 stem/pad, 123 leaves) | 0 | 0 | 0 / 0 (max gap 0.014) | 0 (max 0.026, moss seats only; 11 shells touch stone) |
+| MossCushionLarge | 414 | 2.92 × 2.37 × 1.25 | 1 | 0 | 0 | 0 / 0 | – |
+| MossCushionSmall | 280 | 1.75 × 1.45 × 0.80 | 1 | 0 | 0 | 0 / 0 | – |
+| IvyCluster | 456 | 3.32 × 0.38 × 2.75 | 26 | 0 | 0 | 0 / 0 | – |
+| IvyTendril | 192 | 1.55 × 0.35 × 4.30 | 10 | 0 | 0 | 0 / 0 | – |
+| IvyCorner | 352 | 1.92 × 2.73 × 3.28 | 20 | 0 | 0 | 0 / 0 | – |
+| IvyLeaf | 28 | 1.03 × 0.06 × 1.25 | 2 | 0 | 0 | 0 / 0 | – |
+
+- **`M.audit`, every object:** 0 non-manifold edges and bowtie verts; 0 boundary, wire or loose elements; 0 zero-area
+  faces, n-gons or duplicate verts. Normals outward and every shell's volume positive. Rotation 0, scale 1, no
+  modifiers, no custom normals. Origin at the bbox bottom centre (local bbox symmetric in X and Y, z min 0). Flat shaded.
+- **Hero placement:** build offset (0.063, −0.245, −0.03). The overall size is within §1.1's ±0.5.
+- **UV (`M.uv_stats`):** 0 overlaps and 0 flips on all seven; min gap 0.016, border 0.008, density 1.0.
+  - Islands: hero 998, cushions 62 / 43.
+  - Conformal stretch p95: hero 1.006, cushions 1.034 / 1.021; worst anywhere 1.128 (cluster).
+- **`K.check` on all seven:** `[]`; KITSTAT ok for each. Collision: hero `hull`, parts `none`. No VFX sockets; no
+  emission.
+
+### Sheet comparison (same masks; ours has no outlines, so O is 0)
+
+| View | W : H ours (sheet) | G | R | T | Green median | Lit stone | Stone hue |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 (−47, 12) | 1.217 (1.294) | 48.4 (52.6) | 49.4 (43.1) | 2.2 (1.4) | `#789D0E` 76° (77°) | `#C8A889` (`#D1B292`) | 30°, R > G > B |
+| r34 (133, 12) | 1.249 (1.189) | 47.6 (52.5) | 49.5 (42.8) | 2.9 (2.2) | `#5E7F0D` 77° (78°) | `#B89F87` (`#D0B293`) | 29°, R > G > B |
+| front_sheet | 1.299 (1.234) | 48.6 (52.5) | 49.5 | 1.9 | 75° | `#C8A889` | 30° |
+| rear_sheet | 1.306 (1.185) | 48.4 (51.1) | 48.8 | 2.8 | 76° | `#B89F87` | 29° |
+| top_sheet | – | 60.6 (74.9) | 35.7 | 3.7 | 68° | – | 30° |
+
+- **Stone:** every stone median, lit and shade, in every view is warm, with R > G > B and hue 29–34°. **Never mauve.**
+- f34 green classes lime / yg / green / deep: 38 / 41 / 15 / 6 (sheet 41 / 33 / 14 / 12).
+- These match the fix modeller's report to the decimal.
+
+### Blockers
+
+None.
+
+### Minors (carried to the commit notes)
+
+1. **The ivy is thinner than the sheet's** (budget-bound at 3850 / 3850). G is −4.2 at f34 and −4.9 at r34; R is
+   +6.3 / +6.7. The r34 back and end curtains still read stringy against the sheet's dense columns (`v056r2/cmpH.png`).
+2. **The stone reads uniformly tan:** no shaded end, because the studio lights it. The sheet's shade is `#746A6A`; ours
+   is `#A18D72`–`#9B8973`. Correctly not painted by facing. Requires Manual Validation in Studio.
+3. f34 deep-green class 6 % against 12 %. The moss crown on the top view is more lime (67 % lime against 39 %).
+4. rear_sheet W : H 1.306 against 1.185 (numeric only; r34 in range). r34 T 2.9 against 2.2.
+5. The hero's base and top cushions keep the single faceted-mound recipe (budget). They read as gem mounds next to the
+   new lumpy parts.
+6. Cushion parts: 16 / 12 sliver tris under 2° along the boolean seams (flat shaded, harmless). There is one thin dark
+   crease line on the small part where the crown meets the front lump: a closed crease, not a hole.
+7. The cushion lumps are a little regular and icosphere-like against the cell's hand-cut lumps.
+8. IvyCorner: tilted top leaves help, but from the side the piece is a hard L with a bare top stem and an upright lime
+   crest, not the cell's rounded arc.
+9. IvyLeaf: three-lobed now, but its lobes are narrower and sharper than the cell's chunky lobes.
+10. The front pad is still hidden behind R1's leaves in close-up 2's view (round-1 minor 6, unchanged).
+
+### Main session ruling (2026-10-30)
+Round 2 PASSED at 8/10, so the model is committed. The verifier's round-2 minors 1–10 are recorded for polish. The main follow-ups:
+- the ivy is thinner than the sheet's because of the 3850 ceiling;
+- the stone's shaded end needs a check under Studio lighting;
+- the hero cushions still use the single-mound recipe.
+
+The `kit_shading_ok` waiver on the hero and both cushion parts is confirmed, because the cushion band is chosen by height and not by facing. Export: 7 assets, 5572 tris, 0 VFX sockets, 0 problems.
