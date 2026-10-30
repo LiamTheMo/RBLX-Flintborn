@@ -140,12 +140,16 @@ stand-in and the lobby adds the words the art would carry (tile names, ENTER).
 - Scaling: design-resolution offsets with the root UIScale from
   `HudModel.HudScale` (existing). The lobby ScreenGui ignores the top-bar inset so
   the master's full-screen coordinates apply, keeps device cut-outs excluded
-  (`ScreenInsets = DeviceSafeInsets`), and `LobbyHud:Fit` moves every top widget
-  down when the Roblox top bar would reach the profile (phones, where the screen
-  is drawn at half size).
+  (`ScreenInsets = DeviceSafeInsets`). `LobbyHud:Fit` stacks each side from the
+  top: the profile right under the Roblox top bar's buttons with the nav grid
+  right under it (XP pop-ups beside the grid); Coins, Gems and Settings along the
+  very top of the right edge, level with the top bar's buttons, with the party
+  panel right under them. The top bar's depth comes from `Parchment.TopInset`.
 - Regions: profile and nav top-left; Coins, Gems, Settings and Party top-right;
   Enter and the server dropdown bottom-centre. `LobbyHud:Fit` shrinks the nav grid
-  and the party panel on short screens so they never meet the Enter group.
+  and the party panel on short screens so they never meet the bottom edge or the
+  Enter group. The master positions in the table above are the reference
+  drawing; on screen the stacking above places them.
 - Authoring: code-built (`src/client/Hud/LobbyHud.luau`, `LobbyPopups.luau`,
   `Widgets.luau`) from `HudLayout.json`, synced by Rojo. No Studio-only UI.
 - Preview: `art/ui/preview_lobby.py` composites the layout with the sprites the
