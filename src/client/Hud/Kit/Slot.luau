@@ -19,7 +19,9 @@ local ItemIcon = require(script.Parent.ItemIcon)
 local Slot = {}
 Slot.__index = Slot
 
-export type Item = { catalogId: string?, quantity: number?, permanent: boolean?, icon: string? }
+-- `itemId` is accepted for `catalogId`. Art and tint always come from
+-- ItemInfo.Icon(id); `icon` is used (untinted) only when ItemInfo has none.
+export type Item = { catalogId: string?, itemId: string?, quantity: number?, permanent: boolean?, icon: string? }
 
 -- props: rect | size (default 90), variant ("item" | "hotbar"), item, count,
 -- hotkey (badge text), countStyle ("text" | "plaque"), onPress(slot),
@@ -99,7 +101,9 @@ end
 -- Shows an item ({catalogId, quantity, permanent, icon}) or nil for empty.
 function Slot:SetItem(item: Item?)
 	self.item = item
-	self.icon:SetItem(item and item.catalogId, item and item.icon)
+	self.icon:SetItem(item and (item.catalogId or item.itemId), item and item.icon)
+	-- A pooled slot shows a new item: a press on it is a fresh press.
+	self.control.lastPress = -math.huge
 	self.star.Visible = item ~= nil and item.permanent == true
 	self:SetCount(item and item.quantity)
 	self.control:Set("empty", item == nil)

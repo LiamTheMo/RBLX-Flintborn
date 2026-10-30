@@ -110,6 +110,27 @@ function Interact.attach(base, opts: Options)
 	hitButton.SelectionImageObject = empty
 	local maid = base.maid
 	maid:Give(empty)
+	if opts.hit == nil then
+		-- On touch screens the invisible hit pad grows until the control takes
+		-- at least touchMin screen px, whatever the window's scale (phones draw
+		-- windows small); the art does not change.
+		local function fitTouch()
+			if not UserInputService.TouchEnabled then
+				return
+			end
+			local shown = root.AbsoluteSize
+			if shown.X <= 0 or w <= 0 then
+				return
+			end
+			local k = shown.X / w
+			local need = math.max(pad, (touchMin / k - math.min(w, h)) / 2, 0)
+			self.touchPad = need
+			hitButton.Position = UDim2.fromOffset(-need, -need)
+			hitButton.Size = UDim2.new(1, need * 2, 1, need * 2)
+		end
+		maid:Give(root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitTouch))
+		fitTouch()
+	end
 	maid:Give(function()
 		pressing[self] = nil
 	end)

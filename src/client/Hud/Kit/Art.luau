@@ -464,17 +464,21 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	return glyph
 end
 
--- The icon id (and optional Color3 tint) ItemInfo.Icon gives a catalog item,
--- when the kit can draw it; nil otherwise.
+-- The sprite (and optional Color3 tint) ItemInfo.Icon / ItemInfo.Sprite give a
+-- catalog item, when the kit can draw it; nil otherwise.
 function Art.ItemIcon(catalogId: string?): (string?, Color3?)
 	if catalogId == nil then
 		return nil, nil
 	end
 	local ok, icon, tint = pcall(ItemInfo.Icon, catalogId)
-	if not ok or type(icon) ~= "string" or Art.IconSprite(icon) == nil then
+	if not ok or type(icon) ~= "string" then
 		return nil, nil
 	end
-	return icon, if typeof(tint) == "Color3" then tint else nil
+	local sprite = ItemInfo.Sprite(icon)
+	if UiAssets.sprite(sprite) == nil and not Widgets.HasArt(sprite) then
+		return nil, nil
+	end
+	return sprite, if typeof(tint) == "Color3" then tint else nil
 end
 
 -- The sprite of a catalog item: lk_item_<id>, then item_<id>; nil when neither

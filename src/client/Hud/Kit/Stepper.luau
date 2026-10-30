@@ -15,7 +15,8 @@ local Stepper = {}
 Stepper.__index = Stepper
 
 -- props: rect | size, min, max, value, step (1), allLabel (adds a button that
--- sets the max), onChange(value), zIndex, name.
+-- sets the max), buttons ("paper" default | "leather": the M06 leather − / +),
+-- valueSize, onChange(value), zIndex, name.
 function Stepper.new(parent: Instance, props)
 	local w, h = Core.Size(props, 160, 48)
 	local base = Core.Root(parent, "Stepper", "field.value", props, w, h)
@@ -30,9 +31,11 @@ function Stepper.new(parent: Instance, props)
 	local bw = h
 	local allW = if props.allLabel then 70 else 0
 	local fieldW = w - bw * 2 - 16 - (if allW > 0 then allW + 8 else 0)
+	local leather = props.buttons == "leather"
 	self.minus = IconButton.new(base.visual, {
 		name = "Minus",
-		variant = "minus",
+		variant = if leather then "leather" else "minus",
+		icon = if leather then "minus" else nil,
 		rect = { 0, 0, bw, h },
 		zIndex = base.z + 1,
 		onPress = function()
@@ -51,6 +54,7 @@ function Stepper.new(parent: Instance, props)
 		name = "Value",
 		text = "",
 		role = "itemTitle",
+		size = props.valueSize,
 		align = "Center",
 		scaled = true,
 		rect = { 4, 2, fieldW - 8, h - 6 },
@@ -58,7 +62,8 @@ function Stepper.new(parent: Instance, props)
 	})
 	self.plus = IconButton.new(base.visual, {
 		name = "Plus",
-		variant = "plus",
+		variant = if leather then "leather" else "plus",
+		icon = if leather then "plus" else nil,
 		rect = { bw + 16 + fieldW, 0, bw, h },
 		zIndex = base.z + 1,
 		onPress = function()

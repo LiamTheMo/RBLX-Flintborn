@@ -2907,6 +2907,210 @@
     "h": 1024,
     "slice": null
   },
+  "lk_glyph_ink_gamepad": {
+    "file": "lk_glyph_ink_gamepad.png",
+    "w": 101,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_gamepad": {
+    "file": "lk_glyph_white_gamepad.png",
+    "w": 101,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_speaker": {
+    "file": "lk_glyph_ink_speaker.png",
+    "w": 116,
+    "h": 101,
+    "slice": null
+  },
+  "lk_glyph_white_speaker": {
+    "file": "lk_glyph_white_speaker.png",
+    "w": 116,
+    "h": 101,
+    "slice": null
+  },
+  "lk_glyph_ink_monitor": {
+    "file": "lk_glyph_ink_monitor.png",
+    "w": 116,
+    "h": 105,
+    "slice": null
+  },
+  "lk_glyph_white_monitor": {
+    "file": "lk_glyph_white_monitor.png",
+    "w": 116,
+    "h": 105,
+    "slice": null
+  },
+  "lk_glyph_ink_gears": {
+    "file": "lk_glyph_ink_gears.png",
+    "w": 114,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_gears": {
+    "file": "lk_glyph_white_gears.png",
+    "w": 114,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_refresh": {
+    "file": "lk_glyph_ink_refresh.png",
+    "w": 100,
+    "h": 100,
+    "slice": null
+  },
+  "lk_glyph_white_refresh": {
+    "file": "lk_glyph_white_refresh.png",
+    "w": 100,
+    "h": 100,
+    "slice": null
+  },
+  "lk_glyph_ink_people": {
+    "file": "lk_glyph_ink_people.png",
+    "w": 116,
+    "h": 89,
+    "slice": null
+  },
+  "lk_glyph_white_people": {
+    "file": "lk_glyph_white_people.png",
+    "w": 116,
+    "h": 89,
+    "slice": null
+  },
+  "lk_glyph_ink_magnifier": {
+    "file": "lk_glyph_ink_magnifier.png",
+    "w": 111,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_magnifier": {
+    "file": "lk_glyph_white_magnifier.png",
+    "w": 111,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_info": {
+    "file": "lk_glyph_ink_info.png",
+    "w": 57,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_info": {
+    "file": "lk_glyph_white_info.png",
+    "w": 57,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_check": {
+    "file": "lk_glyph_ink_check.png",
+    "w": 116,
+    "h": 93,
+    "slice": null
+  },
+  "lk_glyph_white_check": {
+    "file": "lk_glyph_white_check.png",
+    "w": 116,
+    "h": 93,
+    "slice": null
+  },
+  "lk_glyph_ink_anvil": {
+    "file": "lk_glyph_ink_anvil.png",
+    "w": 116,
+    "h": 102,
+    "slice": null
+  },
+  "lk_glyph_white_anvil": {
+    "file": "lk_glyph_white_anvil.png",
+    "w": 116,
+    "h": 102,
+    "slice": null
+  },
+  "lk_glyph_ink_book": {
+    "file": "lk_glyph_ink_book.png",
+    "w": 104,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_book": {
+    "file": "lk_glyph_white_book.png",
+    "w": 104,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_trophy": {
+    "file": "lk_glyph_ink_trophy.png",
+    "w": 116,
+    "h": 103,
+    "slice": null
+  },
+  "lk_glyph_white_trophy": {
+    "file": "lk_glyph_white_trophy.png",
+    "w": 116,
+    "h": 103,
+    "slice": null
+  },
+  "lk_glyph_ink_map_pin": {
+    "file": "lk_glyph_ink_map_pin.png",
+    "w": 89,
+    "h": 100,
+    "slice": null
+  },
+  "lk_glyph_white_map_pin": {
+    "file": "lk_glyph_white_map_pin.png",
+    "w": 89,
+    "h": 100,
+    "slice": null
+  },
+  "lk_glyph_ink_backpack": {
+    "file": "lk_glyph_ink_backpack.png",
+    "w": 115,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_backpack": {
+    "file": "lk_glyph_white_backpack.png",
+    "w": 115,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_ink_chest": {
+    "file": "lk_glyph_ink_chest.png",
+    "w": 116,
+    "h": 91,
+    "slice": null
+  },
+  "lk_glyph_white_chest": {
+    "file": "lk_glyph_white_chest.png",
+    "w": 116,
+    "h": 91,
+    "slice": null
+  },
+  "lk_glyph_ink_hammer": {
+    "file": "lk_glyph_ink_hammer.png",
+    "w": 116,
+    "h": 115,
+    "slice": null
+  },
+  "lk_glyph_white_hammer": {
+    "file": "lk_glyph_white_hammer.png",
+    "w": 116,
+    "h": 115,
+    "slice": null
+  },
+  "lk_glyph_ink_compass": {
+    "file": "lk_glyph_ink_compass.png",
+    "w": 101,
+    "h": 116,
+    "slice": null
+  },
+  "lk_glyph_white_compass": {
+    "file": "lk_glyph_white_compass.png",
+    "w": 101,
+    "h": 116,
+    "slice": null
+  },
   "lk_badge_count": {
     "file": "lk_badge_count.png",
     "w": 48,

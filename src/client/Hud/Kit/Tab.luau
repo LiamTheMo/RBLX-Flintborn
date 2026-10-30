@@ -32,7 +32,10 @@ local ROLE = {
 -- Sprites drawn as leather (cream text and icon on them).
 local LEATHER_SELECTED = { arrow = true, horizontal = true, large = true }
 
--- props: id, rect | size, label, icon, variant, onPress, zIndex, name.
+-- props: id, rect | size, label, icon, variant, onPress, zIndex, name, and:
+--   selectedIcon  icon shown while selected ("white:gamepad", "backpack_white")
+--   iconTint / selectedIconTint  colour tokens laid over the icon
+--   iconSize, iconX, labelX  (design px; defaults per variant), textSize
 function Tab.new(parent: Instance, props)
 	local variant = props.variant or "horizontal"
 	local role = ROLE[variant] or ROLE.horizontal
@@ -52,17 +55,31 @@ function Tab.new(parent: Instance, props)
 	local textRole = if variant == "large" then "tabLarge" else "tab"
 	-- The arrow tab's leather strap takes its left edge.
 	local x = if variant == "side" then 0 elseif variant == "arrow" then 30 else 14
+	self.iconTint = props.iconTint
+	self.selectedIconTint = props.selectedIconTint
 	if props.icon then
-		local s = if variant == "side" then math.floor(math.min(w, h) * 0.62) else math.floor(h * 0.62)
-		local ix = if variant == "side" then (w - s) / 2 else (if variant == "large" then 22 else 12)
-		self.icon = Art.Icon(base.visual, props.icon, { ix, (h - s) / 2, s, s }, { z = base.z + 2, name = "Icon" })
+		local s = props.iconSize
+			or (if variant == "side" then math.floor(math.min(w, h) * 0.62) else math.floor(h * 0.62))
+		local ix = props.iconX or (if variant == "side" then (w - s) / 2 else (if variant == "large" then 22 else 12))
+		local rect = { ix, (h - s) / 2, s, s }
+		self.icon = Art.Icon(base.visual, props.icon, rect, { z = base.z + 2, name = "Icon", tint = props.iconTint })
+		if props.selectedIcon then
+			self.selectedIcon = Art.Icon(base.visual, props.selectedIcon, rect, {
+				z = base.z + 2,
+				name = "SelectedIcon",
+				tint = props.selectedIconTint,
+			})
+			self.selectedIcon.Visible = false
+		end
 		x = ix + s + (if variant == "large" then 22 else 12)
 	end
+	x = props.labelX or x
 	if props.label and variant ~= "side" then
 		self.label = Core.Label(base.visual, {
 			name = "Label",
 			text = props.label,
 			role = textRole,
+			size = props.textSize,
 			scaled = true,
 			rect = { x, 0, w - x - (if variant == "category" or variant == "arrow" then 34 else 12), h - 2 },
 			z = base.z + 2,
@@ -94,8 +111,16 @@ function Tab:_render(state: string)
 	if self.label then
 		self.label.TextColor3 = Tokens.Color(color)
 	end
+	if self.selectedIcon then
+		self.selectedIcon.Visible = state == "selected"
+		self.icon.Visible = state ~= "selected"
+	end
 	if self.icon then
 		if self.icon:IsA("ImageLabel") then
+			local tint = if state == "selected" and self.selectedIconTint then self.selectedIconTint else self.iconTint
+			if tint and not self.selectedIcon then
+				(self.icon :: ImageLabel).ImageColor3 = Tokens.Color(tint)
+			end
 			-- Art icons draw as given (a leather tab passes a white icon such as
 			-- "backpack_white"); a glyph stand-in turns cream on leather.
 			(self.icon :: ImageLabel).ImageTransparency = if state == "disabled" then 0.45 else 0

@@ -11,13 +11,13 @@ local Core = require(script.Parent.Core)
 local ItemIcon = {}
 ItemIcon.__index = ItemIcon
 
--- props: rect | size, catalogId, icon (an icon id shown instead when the item
--- has no art of its own), zIndex, name.
+-- props: rect | size, catalogId (or itemId), icon (an icon id shown untinted
+-- only when ItemInfo has no art for the item), zIndex, name.
 function ItemIcon.new(parent: Instance, props)
 	local w, h = Core.Size(props, 70, 70)
 	local base = Core.Root(parent, "ItemIcon", "item", props, w, h)
 	local self = setmetatable({ root = base.root, base = base, w = w, h = h, image = nil }, ItemIcon)
-	self:SetItem(props.catalogId, props.icon)
+	self:SetItem(props.catalogId or props.itemId, props.icon)
 	return self
 end
 

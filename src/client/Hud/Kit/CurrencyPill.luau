@@ -18,13 +18,14 @@ CurrencyPill.__index = CurrencyPill
 
 CurrencyPill.ICONS = { coins = "coin", gems = "gem" }
 
--- props: rect | size, currency ("coins" | "gems"), value, onPress, zIndex, name.
+-- props: rect | size, currency ("coins" | "gems"), value, textSize, iconSize,
+-- onPress, zIndex, name.
 function CurrencyPill.new(parent: Instance, props)
 	local w, h = Core.Size(props, 112, 46)
 	local base = Core.Root(parent, "CurrencyPill", "currency.pill", props, w, h)
 	local self = setmetatable({ root = base.root, base = base, value = 0 }, CurrencyPill)
 	self.plate = Art.Plate(base.visual, "currency.pill", w, h, { z = base.z })
-	local s = math.floor(h * 0.66)
+	local s = props.iconSize or math.floor(h * 0.66)
 	Art.Icon(base.visual, CurrencyPill.ICONS[props.currency or "coins"] or "coin", { 10, (h - s) / 2, s, s }, {
 		z = base.z + 1,
 		name = "Icon",
@@ -33,6 +34,7 @@ function CurrencyPill.new(parent: Instance, props)
 		name = "Value",
 		text = "",
 		role = "currency",
+		size = props.textSize,
 		align = "Center",
 		scaled = true,
 		rect = { 10 + s + 4, 0, w - s - 24, h - 2 },

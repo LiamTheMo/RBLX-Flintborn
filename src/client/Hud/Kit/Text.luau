@@ -22,15 +22,28 @@ function Text.SmallCaps(text: string, role: string?, ratio: number?): string
 	return KitModel.SmallCaps(text, size, math.floor(size * (ratio or 40 / 46) + 0.5))
 end
 
+-- Small caps from props: smallCapsSizes {initials, rest}, else the role size
+-- (or textSize) and 40 / 46 of it.
+function Text._smallCaps(text: string, props): string
+	local sizes = props.smallCapsSizes
+	if sizes then
+		return KitModel.SmallCaps(text, sizes[1], sizes[2])
+	end
+	local size = props.textSize or Tokens.TextStyle(props.role or "windowTitle").size
+	return KitModel.SmallCaps(text, size, math.floor(size * 40 / 46 + 0.5))
+end
+
 -- The width of `text` in a role, in design px.
 Text.Width = Core.TextWidth
 
--- props: rect | size (+ layoutOrder), text, role, align, yAlign, wrap, scaled,
--- color (token), caps (overrides the role), smallCaps, zIndex, name.
+-- props: rect | size (+ layoutOrder), text, role, textSize (overrides the
+-- role's size), align, yAlign, wrap, scaled, color (token), caps (overrides the
+-- role), smallCaps, smallCapsSizes ({initials, rest} px), zIndex, name.
 function Text.new(parent: Instance, props)
 	local w, h = Core.Size(props, 100, 24)
 	local label = Core.Label(parent, {
-		text = if props.smallCaps then Text.SmallCaps(props.text or "", props.role) else props.text,
+		text = if props.smallCaps then Text._smallCaps(props.text or "", props) else props.text,
+		size = props.textSize,
 		role = props.role or "body",
 		align = props.align,
 		yAlign = props.yAlign,
@@ -47,12 +60,18 @@ function Text.new(parent: Instance, props)
 	label:SetAttribute("KitComponent", "Text")
 	label:SetAttribute("KitRole", "text." .. (props.role or "body"))
 	label:SetAttribute("KitState", "normal")
-	return setmetatable({ root = label, role = props.role or "body", smallCaps = props.smallCaps }, Text)
+	return setmetatable({
+		root = label,
+		role = props.role or "body",
+		smallCaps = props.smallCaps,
+		smallCapsSizes = props.smallCapsSizes,
+		textSize = props.textSize,
+	}, Text)
 end
 
 function Text:SetText(text: string)
 	if self.smallCaps then
-		self.root.Text = Text.SmallCaps(text, self.role)
+		self.root.Text = Text._smallCaps(text, self)
 	else
 		Core.SetText(self.root, text)
 	end

@@ -61,28 +61,22 @@ do
 		Kit.Window.new(screen, { title = "Inventory", icon = "backpack", clasps = "right", claspYs = { 0.18, 0.9 } })
 	local v = window.base.visual
 	local tabs = {
-		Kit.Tab.new(
-			v,
-			{
-				id = "backpack",
-				rect = { 19, 108, 170, 58 },
-				label = "Backpack",
-				icon = "backpack_white",
-				variant = "horizontal",
-				zIndex = 8,
-			}
-		),
-		Kit.Tab.new(
-			v,
-			{
-				id = "vault",
-				rect = { 198, 109, 165, 56 },
-				label = "Vault",
-				icon = "chest",
-				variant = "horizontal",
-				zIndex = 8,
-			}
-		),
+		Kit.Tab.new(v, {
+			id = "backpack",
+			rect = { 19, 108, 170, 58 },
+			label = "Backpack",
+			icon = "backpack_white",
+			variant = "horizontal",
+			zIndex = 8,
+		}),
+		Kit.Tab.new(v, {
+			id = "vault",
+			rect = { 198, 109, 165, 56 },
+			label = "Vault",
+			icon = "chest",
+			variant = "horizontal",
+			zIndex = 8,
+		}),
 	}
 	Kit.TabGroup.new(tabs):Select("backpack")
 	Kit.SearchBox.new(v, { rect = { 23, 179, 215, 41 }, placeholder = "Search items...", zIndex = 8 })
@@ -191,14 +185,11 @@ do
 		for c, state in states do
 			local x, y = 30 + (c - 1) * 250, 70 + (r - 1) * 92
 			force(
-				Kit.Button.new(
-					root,
-					{
-						rect = { x, y, 230, 61 },
-						label = if variant == "secondary" then "Reset" else "Equip",
-						variant = variant,
-					}
-				),
+				Kit.Button.new(root, {
+					rect = { x, y, 230, 61 },
+					label = if variant == "secondary" then "Reset" else "Equip",
+					variant = variant,
+				}),
 				state
 			)
 			caption(root, variant .. " · " .. state, x, y + 62)
@@ -321,14 +312,11 @@ do
 		)
 	end
 	caption(root, "count plaque", 830, 578)
-	Kit.Slot.new(
-		root,
-		{
-			rect = { 830, 600, 92, 99 },
-			item = { catalogId = "G", icon = "stones", quantity = 99 },
-			countStyle = "plaque",
-		}
-	)
+	Kit.Slot.new(root, {
+		rect = { 830, 600, 92, 99 },
+		item = { catalogId = "G", icon = "stones", quantity = 99 },
+		countStyle = "plaque",
+	})
 	caption(root, "hotbar empty 6", 830, 700)
 	Kit.Slot.new(root, { rect = { 830, 720, 86, 86 }, variant = "hotbar", hotkey = "6" })
 
@@ -401,16 +389,13 @@ do
 		caption(root, state, x, 566)
 		force(Kit.Checkbox.new(root, { rect = { x, 590, 230, 36 }, label = "Show Names", checked = false }), state)
 		force(
-			Kit.Checkbox.new(
-				root,
-				{
-					rect = { x, 636, 240, 50 },
-					label = "Show Damage",
-					description = "Numbers over hits",
-					checked = true,
-					variant = "gold",
-				}
-			),
+			Kit.Checkbox.new(root, {
+				rect = { x, 636, 240, 50 },
+				label = "Show Damage",
+				description = "Numbers over hits",
+				checked = true,
+				variant = "gold",
+			}),
 			state
 		)
 		force(
@@ -522,16 +507,13 @@ do
 		root,
 		{ rect = { 760, 112, 360, 56 }, userId = 2, name = "ForestRanger", level = 15, action = { label = "Invite" } }
 	)
-	Kit.PlayerRow.new(
-		root,
-		{
-			rect = { 760, 172, 360, 56 },
-			userId = 3,
-			name = "SunnyVale",
-			level = 8,
-			action = { label = "Invited", variant = "secondary", enabled = false },
-		}
-	)
+	Kit.PlayerRow.new(root, {
+		rect = { 760, 172, 360, 56 },
+		userId = 3,
+		name = "SunnyVale",
+		level = 8,
+		action = { label = "Invited", variant = "secondary", enabled = false },
+	})
 	Kit.PlayerRow.new(root, { rect = { 760, 232, 360, 56 }, userId = 1, name = "LiamTheMo", badge = "ready" })
 	Kit.PlayerRow.new(root, { rect = { 760, 292, 360, 56 }, userId = 2, name = "ForestRanger", badge = "notReady" })
 	Kit.PlayerRow.new(root, { rect = { 760, 352, 360, 52 }, empty = true })
@@ -549,30 +531,24 @@ do
 	Kit.Portrait.new(root, { rect = { 1380, 52, 56, 56 }, userId = 1 })
 
 	heading(root, "Panel inset / card / plaque, SectionHeader, Scroll", 30, 560)
-	local inset = Kit.Panel.new(
-		root,
-		{
-			rect = { 30, 600, 360, 320 },
-			title = "Your Party",
-			icon = "party",
-			count = "1/8",
-			scroll = true,
-			contentHeight = 600,
-		}
-	)
+	local inset = Kit.Panel.new(root, {
+		rect = { 30, 600, 360, 320 },
+		title = "Your Party",
+		icon = "party",
+		count = "1/8",
+		scroll = true,
+		contentHeight = 600,
+	})
 	for i = 1, 5 do
-		Kit.PlayerRow.new(
-			inset:Content(),
-			{
-				size = { 300, 52 },
-				layoutOrder = i,
-				empty = i > 1,
-				userId = 1,
-				name = "LiamTheMo",
-				level = 12,
-				leader = i == 1,
-			}
-		)
+		Kit.PlayerRow.new(inset:Content(), {
+			size = { 300, 52 },
+			layoutOrder = i,
+			empty = i > 1,
+			userId = 1,
+			name = "LiamTheMo",
+			level = 12,
+			leader = i == 1,
+		})
 	end
 	local card = Kit.Panel.new(
 		root,
@@ -589,25 +565,19 @@ do
 	Kit.Panel.new(root, { rect = { 810, 600, 420, 66 }, variant = "plaque", text = "Shattered Crater" })
 	Kit.SectionHeader.new(root, { rect = { 810, 700, 400, 34 }, text = "Requires", icon = nil })
 	Kit.SectionHeader.new(root, { rect = { 810, 760, 400, 34 }, text = "Invite Players", icon = "magnifier" })
-	Kit.Text.new(
-		root,
-		{
-			rect = { 810, 820, 500, 56 },
-			text = "Ancestral Forge",
-			role = "windowTitle",
-			smallCaps = true,
-			color = "cream",
-		}
-	)
-	Kit.Text.new(
-		root,
-		{
-			rect = { 810, 876, 500, 26 },
-			text = "Turn raw materials into tools for the island.",
-			role = "subtitleHand",
-			color = "cream",
-		}
-	)
+	Kit.Text.new(root, {
+		rect = { 810, 820, 500, 56 },
+		text = "Ancestral Forge",
+		role = "windowTitle",
+		smallCaps = true,
+		color = "cream",
+	})
+	Kit.Text.new(root, {
+		rect = { 810, 876, 500, 26 },
+		text = "Turn raw materials into tools for the island.",
+		role = "subtitleHand",
+		color = "cream",
+	})
 	__dump(gui, W, H)
 	gui:Destroy()
 end
@@ -621,16 +591,13 @@ do
 		root,
 		{ rect = { 30, 50, 430, 84 }, kind = "quest", title = "Quest Complete", text = "Gather Supplies" }
 	)
-	Kit.Toast.new(
-		root,
-		{
-			rect = { 30, 144, 430, 84 },
-			kind = "item",
-			title = "Items Received",
-			text = "3 items from your run",
-			actions = { { label = "View" } },
-		}
-	)
+	Kit.Toast.new(root, {
+		rect = { 30, 144, 430, 84 },
+		kind = "item",
+		title = "Items Received",
+		text = "3 items from your run",
+		actions = { { label = "View" } },
+	})
 	Kit.Toast.new(
 		root,
 		{ rect = { 30, 238, 430, 84 }, kind = "info", title = "Party invite", text = "ForestRanger invited you" }
@@ -659,16 +626,13 @@ do
 
 	heading(root, "Window headers: plaque / centred / banner with subtitle", 420, 420)
 	Kit.Window.new(root, { rect = { 420, 460, 400, 240 }, title = "Play", header = "plaque", showClose = true })
-	Kit.Window.new(
-		root,
-		{
-			rect = { 840, 460, 400, 240 },
-			title = "Party",
-			header = "centered",
-			ornaments = { "tree", "tree" },
-			showClose = false,
-		}
-	)
+	Kit.Window.new(root, {
+		rect = { 840, 460, 400, 240 },
+		title = "Party",
+		header = "centered",
+		ornaments = { "tree", "tree" },
+		showClose = false,
+	})
 	Kit.Window.new(root, {
 		rect = { 1260, 460, 400, 240 },
 		title = "Forge",
@@ -677,6 +641,215 @@ do
 		icon = "anvil",
 		clasps = true,
 	})
+	__dump(gui, W, H)
+	gui:Destroy()
+end
+
+-- Page 7: the fix round -----------------------------------------------------------------
+
+do
+	local gui, root = page()
+	heading(root, "Window header options, plain rules, glyphs", 30, 14)
+	Kit.Window.new(root, {
+		rect = { 30, 50, 560, 250 },
+		title = "Ancestral Forge",
+		icon = "anvil_hammer",
+		iconRect = { 34, 14, 96, 80 },
+		titleX = 150,
+		smallCaps = true,
+		smallCapsSizes = { 44, 36 },
+		subtitle = "Turn raw materials into tools.",
+		rule = "full",
+		closeRect = { 486, 18, 52, 50 },
+	})
+	caption(root, "iconRect, titleX, smallCapsSizes, rule = full, closeRect", 30, 304, 560)
+	Kit.Window.new(
+		root,
+		{
+			rect = { 620, 50, 420, 250 },
+			title = "Party",
+			header = "centered",
+			titleSize = 40,
+			titleY = 22,
+			ornaments = { "ink:people", "ink:people" },
+			ornamentSize = 40,
+			showClose = false,
+		}
+	)
+	caption(root, "centered: titleSize, titleY, ornament glyphs", 620, 304, 420)
+	Kit.Window.new(
+		root,
+		{
+			rect = { 1070, 50, 570, 250 },
+			title = "Play",
+			header = "plaque",
+			plaqueRect = { 40, 22, 240, 80 },
+			titleSize = 52,
+		}
+	)
+	caption(root, "plaque: plaqueRect, titleSize", 1070, 304, 400)
+
+	heading(root, "Divider ink / hairline / rule", 30, 340)
+	local paper = Kit.Panel.new(root, { rect = { 30, 380, 560, 120 }, variant = "inset" })
+	Kit.Divider.new(paper.base.visual, { rect = { 20, 26, 520, 2 }, variant = "ink" })
+	Kit.Divider.new(paper.base.visual, { rect = { 20, 56, 520, 2 }, variant = "hairline" })
+	Kit.Divider.new(paper.base.visual, { rect = { 20, 78, 520, 16 }, variant = "rule" })
+
+	heading(root, "Flat glyphs: ink / white", 620, 340)
+	local glyphs = {
+		"gamepad",
+		"speaker",
+		"monitor",
+		"gears",
+		"refresh",
+		"people",
+		"magnifier",
+		"info",
+		"check",
+		"anvil",
+		"book",
+		"trophy",
+		"map_pin",
+		"backpack",
+		"chest",
+		"hammer",
+		"compass",
+	}
+	local strip = Kit.Panel.new(root, { rect = { 620, 380, 1020, 60 }, variant = "inset" })
+	local dark = Kit.Panel.new(root, { rect = { 620, 446, 1020, 60 }, variant = "plain" })
+	Kit.Button
+		.new(dark.base.visual, { rect = { 0, 0, 1020, 60 }, label = "", variant = "flat" }).root
+		:SetAttribute("DebugState", "selected")
+	for i, id in glyphs do
+		Kit.Icon.new(strip.base.visual, { rect = { 10 + (i - 1) * 59, 10, 40, 40 }, icon = "ink:" .. id })
+		Kit.Icon.new(dark.base.visual, { rect = { 10 + (i - 1) * 59, 10, 40, 40 }, icon = "white:" .. id, zIndex = 12 })
+	end
+
+	heading(root, "Rows", 30, 520)
+	local soft = Kit.ListRow.new(
+		root,
+		{
+			rect = { 30, 560, 300, 72 },
+			variant = "soft",
+			icon = "pickaxe",
+			title = "Iron Pickaxe",
+			subtitle = "Mine stone and ore.",
+			subtitleHand = true,
+			onPress = function() end,
+		}
+	)
+	local picked = Kit.ListRow.new(
+		root,
+		{
+			rect = { 30, 642, 300, 72 },
+			variant = "soft",
+			icon = "hatchet",
+			title = "Iron Hatchet",
+			subtitle = "Locked: level 5",
+			onPress = function() end,
+		}
+	)
+	picked:SetSelected(true)
+	picked:SetState("locked")
+	local objective = Kit.ListRow.new(
+		root,
+		{
+			rect = { 30, 724, 300, 56 },
+			variant = "soft",
+			icon = "logs",
+			iconSize = 40,
+			textX = 70,
+			title = "Collect Wood",
+			value = "12 / 20",
+			trailing = 30,
+		}
+	)
+	Kit.Checkbox.new(objective:Trailing(), { rect = { 0, 13, 30, 30 }, variant = "ring", readOnly = true })
+	local done = Kit.ListRow.new(
+		root,
+		{
+			rect = { 30, 790, 300, 56 },
+			variant = "soft",
+			icon = "stones",
+			iconSize = 40,
+			textX = 70,
+			title = "Collect Stone",
+			value = "15 / 15",
+			trailing = 30,
+		}
+	)
+	Kit.Checkbox.new(done:Trailing(), { rect = { 0, 13, 30, 30 }, variant = "ring", readOnly = true, checked = true })
+	local _ = soft
+
+	heading(root, "PlayerRow, thin rail", 360, 520)
+	local list = Kit.Panel.new(root, { rect = { 360, 560, 300, 230 }, variant = "card" })
+	local scroll = Kit.Scroll.new(
+		list.base.visual,
+		{ rect = { 14, 14, 272, 200 }, rail = "thin", railOverlay = true, gap = 2, contentHeight = 400 }
+	)
+	Kit.PlayerRow.new(
+		scroll:Content(),
+		{
+			size = { 250, 40 },
+			layoutOrder = 1,
+			compact = true,
+			userId = 1,
+			name = "LiamTheMo",
+			leader = true,
+			status = "ready",
+		}
+	)
+	for i = 2, 6 do
+		Kit.PlayerRow.new(
+			scroll:Content(),
+			{ size = { 250, 36 }, layoutOrder = i, compact = true, empty = true, emptyIndent = 10, nameX = 44 }
+		)
+	end
+	Kit.PlayerRow.new(
+		root,
+		{
+			rect = { 690, 560, 360, 56 },
+			userId = 2,
+			name = "ForestRangerWithALongName",
+			level = 15,
+			action = { label = "Invite", size = { 108, 45 } },
+		}
+	)
+	Kit.PlayerRow.new(root, { rect = { 690, 620, 360, 52 }, empty = true, emptyIndent = 14, nameX = 74 })
+
+	heading(root, "Stepper leather, play hover, roles, item art", 1080, 520)
+	Kit.Stepper.new(root, { rect = { 1080, 560, 160, 48 }, min = 1, max = 10, value = 2, buttons = "leather" })
+	force(
+		Kit.Button.new(
+			root,
+			{
+				rect = { 1260, 556, 260, 62 },
+				label = "Forge",
+				icon = "white:anvil",
+				iconSize = 34,
+				iconGap = 14,
+				variant = "play",
+			}
+		),
+		"hover"
+	)
+	Kit.Picture.new(root, { rect = { 690, 690, 359, 86 }, role = "hud.playerCard" })
+	Kit.Picture.new(root, { rect = { 1000, 700, 39, 76 }, role = "hud.leaf" })
+	Kit.Picture.new(root, { rect = { 1080, 640, 150, 150 }, role = "map.island" })
+	Kit.Picture.new(root, { rect = { 1250, 640, 200, 150 }, role = "panel.party" })
+	local items = { "StoneAxe", "StoneSpear", "IronOre", "Clay", "Resin", "Herbs" }
+	for i, id in items do
+		Kit.Slot.new(
+			root,
+			{
+				rect = { 1080 + (i - 1) * 92, 810, 86, 86 },
+				variant = "hotbar",
+				hotkey = tostring(i),
+				item = { itemId = id, quantity = i },
+			}
+		)
+	end
+	scroll:ScrollToRow(3)
 	__dump(gui, W, H)
 	gui:Destroy()
 end

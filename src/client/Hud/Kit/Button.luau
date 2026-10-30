@@ -37,7 +37,9 @@ local function onLeather(variant: string): boolean
 end
 
 -- props: rect | size, label, variant, sizeClass ("s" | "m" | "l"), icon,
--- textRole, textSize, onPress, zIndex, name.
+-- textRole, textSize, iconSize (px, default half the height), iconGap (12),
+-- onPress, zIndex, name. The play variant has no hover art: it lifts (scales
+-- to 1.03) under the pointer.
 function Button.new(parent: Instance, props)
 	local variant = props.variant or "primary"
 	local class = Button.SIZES[props.sizeClass or "m"] or Button.SIZES.m
@@ -48,6 +50,8 @@ function Button.new(parent: Instance, props)
 	self.textRole = props.textRole or class.role
 	self.textSize = props.textSize
 	self.iconId = props.icon
+	self.iconSizeProp = props.iconSize
+	self.iconGap = props.iconGap
 	self.label = Core.Label(base.visual, {
 		name = "Label",
 		text = props.label or "",
@@ -61,6 +65,7 @@ function Button.new(parent: Instance, props)
 	self.text = props.label or ""
 	self:_layout()
 	self.control = Interact.attach(base, {
+		hoverScale = variant == "play" or variant == "playSecondary",
 		onPress = function()
 			if props.onPress then
 				props.onPress(self)
@@ -76,8 +81,8 @@ end
 -- Centres the icon and label together, clear of the plate's rivets.
 function Button:_layout()
 	local w, h = self.w, self.h
-	local iconSize = if self.iconId then math.floor(h * 0.5) else 0
-	local gap = if self.iconId then 12 else 0
+	local iconSize = if self.iconId then (self.iconSizeProp or math.floor(h * 0.5)) else 0
+	local gap = if self.iconId then (self.iconGap or 12) else 0
 	local room = w - 2 * math.max(16, h * 0.35) - iconSize - gap
 	local textW = math.min(Text.Width(self.text, self.textRole, self.textSize) + 4, room)
 	local left = (w - (iconSize + gap + textW)) / 2

@@ -92,6 +92,17 @@ local USED = {
 	"mark.star",
 	"mark.chevron",
 	"mark.cross",
+	"divider.ink",
+	"divider.hairline",
+	"row.soft",
+	"check.ringOff",
+	"check.ringOn",
+	"scroll.thinTrack",
+	"scroll.thinThumb",
+	"hud.playerCard",
+	"hud.leaf",
+	"panel.party",
+	"map.island",
 }
 
 test("every role a component draws is in the table", function()
@@ -105,11 +116,21 @@ test("every role names lk_ art, a known material and known states", function()
 	for _, state in KitModel.STATES do
 		valid[state] = true
 	end
+	-- Painted art from outside the lk_ kit that a role may name.
+	local PAINTED = { pm_map_island = true }
 	for name, role in KitModel.ROLES do
-		expect(role.sprite ~= nil or role.states ~= nil, name .. " has art")
+		if role.native then
+			expect(role.sprite == nil and role.states == nil, name .. " is drawn natively, without art")
+			expect(type(role.fill) == "string", name .. " has a colour")
+		else
+			expect(role.sprite ~= nil or role.states ~= nil, name .. " has art")
+		end
 		expect(MATERIALS[role.material] == true, name .. " material " .. tostring(role.material))
 		if role.sprite then
-			expect(string.match(role.sprite, "^lk_[%w_]+$") ~= nil, name .. " sprite " .. role.sprite)
+			expect(
+				string.match(role.sprite, "^lk_[%w_]+$") ~= nil or PAINTED[role.sprite],
+				name .. " sprite " .. role.sprite
+			)
 		end
 		for state, sprite in role.states or {} do
 			expect(valid[state] == true, name .. " state " .. tostring(state))
@@ -141,6 +162,33 @@ test("state families keep one plate per state (sheets 03, 05, 09)", function()
 		expect(hotbar[state] ~= nil, "hotbar slot " .. state)
 	end
 	expectEq(KitModel.ROLES["tab.horizontal"].states.selected, "lk_button_leather_normal", "a selected tab is leather")
+end)
+
+test("every plate sprite has its visible-edge margin", function()
+	-- Lines, fills, dots and glyphs are placed as stored (Art.Outset).
+	local asStored = { rule = true, fill = true, dot = true, glyph = true }
+	for name, role in KitModel.ROLES do
+		local sprite = role.sprite
+		if
+			not asStored[role.material]
+			and sprite
+			and string.sub(sprite, 1, 3) == "lk_"
+			and role.edge ~= false
+			and not string.find(sprite, "^lk_icon_")
+			and not string.find(sprite, "^lk_glyph_")
+			and not string.find(sprite, "^lk_dot_")
+		then
+			local edge = KitModel.EDGES[sprite]
+			expect(edge ~= nil, name .. " has EDGES for " .. sprite)
+			if edge then
+				for i = 1, 4 do
+					expect(edge[i] >= 0 and edge[i] <= 12, name .. " edge " .. i)
+				end
+			end
+		end
+	end
+	expectEq(KitModel.Edge("lk_window_frame")[1], 5, "the window frame's edge is 5 px in")
+	expectEq(KitModel.Edge(nil)[1], 0, "unknown sprites have no margin")
 end)
 
 test("the sprite list is sorted and unique", function()

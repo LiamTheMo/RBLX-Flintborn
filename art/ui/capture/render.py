@@ -691,8 +691,13 @@ def paint(painter, node, origin, scale, clip):
     pad = node.first("UIPadding")
     kids = [c for c in node.children if c.gui and c.visible]
     kids.sort(key=lambda c: c.props.get("DisplayOrder", 0) if c.cls == "ScreenGui" else c.props.get("ZIndex", 1))
+    origin = (box[0], box[1])
+    if node.cls == "ScrollingFrame":
+        # The canvas scrolls by CanvasPosition (canvas px, scaled like the frame).
+        cpos = node.props.get("CanvasPosition") or {"X": 0, "Y": 0}
+        origin = (box[0] - cpos["X"] * k, box[1] - cpos["Y"] * k)
     for child in kids:
-        paint(painter, child, (box[0], box[1]), k, child_clip)
+        paint(painter, child, origin, k, child_clip)
     if node.cls == "ScrollingFrame":
         draw_scrollbar(painter, node, box, k, clip)
 

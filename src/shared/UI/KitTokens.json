@@ -126,6 +126,7 @@
     "tooltipPad": 14,
     "longPress": 0.5,
     "windowMargin": 8,
+    "phoneMargin": 4,
     "topInsetMin": 52,
     "debounce": 0.15
   },

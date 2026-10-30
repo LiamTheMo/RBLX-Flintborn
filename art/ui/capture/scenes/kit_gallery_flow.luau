@@ -200,15 +200,12 @@ do
 				{ rect = { 0, 0, 60, 58 }, variant = "tile", icon = "backpack", badge = { variant = "dot" } }
 			),
 			Kit.Tab.new(parent, { rect = { 0, 0, 170, 58 }, label = "T", icon = "chest" }),
-			Kit.Slot.new(
-				parent,
-				{
-					rect = { 0, 0, 92, 99 },
-					hotkey = "1",
-					item = { catalogId = "X", quantity = 3 },
-					countStyle = "plaque",
-				}
-			),
+			Kit.Slot.new(parent, {
+				rect = { 0, 0, 92, 99 },
+				hotkey = "1",
+				item = { catalogId = "X", quantity = 3 },
+				countStyle = "plaque",
+			}),
 			Kit.Bar.new(parent, { rect = { 0, 0, 300, 65 }, frame = "stat", icon = "heart", text = "5", value = 0.5 }),
 			Kit.Checkbox.new(parent, { rect = { 0, 0, 200, 40 }, label = "C" }),
 			Kit.Toggle.new(parent, { rect = { 0, 0, 89, 49 } }),
@@ -222,18 +219,15 @@ do
 				parent,
 				{ rect = { 0, 0, 300, 72 }, variant = "card", title = "R", chevron = true, onPress = function() end }
 			),
-			Kit.PlayerRow.new(
-				parent,
-				{
-					rect = { 0, 0, 330, 52 },
-					userId = 1,
-					name = "P",
-					level = 2,
-					badge = "ready",
-					action = { label = "Invite" },
-					onPress = function() end,
-				}
-			),
+			Kit.PlayerRow.new(parent, {
+				rect = { 0, 0, 330, 52 },
+				userId = 1,
+				name = "P",
+				level = 2,
+				badge = "ready",
+				action = { label = "Invite" },
+				onPress = function() end,
+			}),
 			Kit.Badge.new(parent, { rect = { 0, 0, 0, 30 }, variant = "leader" }),
 			Kit.CurrencyPill.new(parent, { rect = { 0, 0, 112, 46 }, value = 5, onPress = function() end }),
 			Kit.Portrait.new(parent, { rect = { 0, 0, 60, 60 }, userId = 1 }),

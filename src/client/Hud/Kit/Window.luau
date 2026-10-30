@@ -31,6 +31,24 @@ export type Props = {
 	clasps: (boolean | string)?,
 	claspYs: { number }?,
 	ornaments: { string }?,
+	ornamentSize: number?,
+	ornamentGap: number?,
+	iconRect: { number }?,
+	iconSize: number?,
+	titleX: number?,
+	titleY: number?,
+	titleRect: { number }?,
+	titleSize: number?,
+	smallCapsSizes: { number }?,
+	subtitleRect: { number }?,
+	subtitleSize: number?,
+	rule: (boolean | string)?,
+	ruleVariant: string?,
+	ruleRect: { number }?,
+	ruleFade: boolean?,
+	closeRect: { number }?,
+	plaqueRect: { number }?,
+	bodyTop: number?,
 	showClose: boolean?,
 	onClose: (() -> ())?,
 	rect: { number }?,
@@ -73,7 +91,7 @@ function Window.new(target, props: Props)
 			else { "left", "right" }
 		for _, side in sides do
 			for index, fy in props.claspYs or { 0.2, 0.86 } do
-				local x = if side == "left" then -cw / 2 + 3 else w - cw / 2 - 3
+				local x = if side == "left" then -cw / 2 else w - cw / 2
 				local role = if side == "left" then "window.claspLeft" else "window.claspRight"
 				local holder = Core.Make("Frame", {
 					Name = "Clasp" .. side .. index,
@@ -89,11 +107,12 @@ function Window.new(target, props: Props)
 
 	local closeSize = Tokens.Space("closeButton", 60)
 	local closeInset = Tokens.Space("closeInset", 22)
+	local closeRect = props.closeRect or { w - closeInset - closeSize, closeInset - 4, closeSize, closeSize }
 	if props.showClose ~= false then
 		self.close = IconButton.new(base.visual, {
 			name = "Close",
 			variant = "close",
-			rect = { w - closeInset - closeSize, closeInset - 4, closeSize, closeSize },
+			rect = closeRect,
 			zIndex = z + 4,
 			onPress = function()
 				if props.onClose then
@@ -110,10 +129,35 @@ function Window.new(target, props: Props)
 
 	local header = self.header
 	local titleZ = z + 3
-	local bodyTop = Tokens.Space("windowHeaderH", 100)
+	local titleSize = props.titleSize
+	local bodyTop = props.bodyTop or Tokens.Space("windowHeaderH", 100)
+	-- The underline: props.rule false hides it, "full" spans the window,
+	-- or a Divider variant ("ink" default; "rule" the diamond-ended art).
+	local function underline(defaultRect)
+		if props.rule == false then
+			return
+		end
+		local variant = props.ruleVariant
+			or (if type(props.rule) == "string" and props.rule ~= "full" then props.rule else "ink")
+		local native = variant == "ink" or variant == "hairline"
+		local rect = props.ruleRect
+		if rect == nil then
+			rect = if props.rule == "full" then { 40, defaultRect[2], w - 80, defaultRect[4] } else defaultRect
+			if native then
+				rect = { rect[1], rect[2] + rect[4] / 2 - 1, rect[3], 2 }
+			end
+		end
+		self.rule = Divider.new(base.visual, {
+			name = "TitleRule",
+			rect = rect,
+			variant = variant,
+			fade = props.ruleFade ~= false,
+			zIndex = z + 2,
+		})
+	end
 	if header == "plaque" then
-		local tw = Text.Width(props.title, "windowTitle") + 80
-		local plaqueRect = { 44, 24, math.max(220, tw), 86 }
+		local tw = Text.Width(props.title, "windowTitle", titleSize) + 80
+		local plaqueRect = props.plaqueRect or { 44, 24, math.max(220, tw), 86 }
 		local plaque = Core.Make("Frame", {
 			Name = "TitlePlaque",
 			BackgroundTransparency = 1,
@@ -122,76 +166,73 @@ function Window.new(target, props: Props)
 			ZIndex = z + 2,
 		}, base.visual)
 		Art.Plate(plaque, "window.plaque", plaqueRect[3], plaqueRect[4], { z = z + 2 })
+		self.plaque = plaque
 		self.title = Text.new(plaque, {
 			name = "Title",
-			rect = { 0, 0, plaqueRect[3], plaqueRect[4] - 4 },
+			rect = props.titleRect or { 0, 0, plaqueRect[3], plaqueRect[4] - 4 },
 			text = props.title,
 			role = "windowTitle",
+			textSize = titleSize,
 			align = "Center",
 			zIndex = titleZ,
 		})
-		bodyTop = plaqueRect[2] + plaqueRect[4] + 10
+		if props.bodyTop == nil then
+			bodyTop = plaqueRect[2] + plaqueRect[4] + 10
+		end
 	elseif header == "centered" then
-		local tw = Text.Width(props.title, "windowTitle")
+		local tw = Text.Width(props.title, "windowTitle", titleSize)
 		local cx = w / 2
+		local ty = props.titleY or 18
 		self.title = Text.new(base.visual, {
 			name = "Title",
-			rect = { cx - tw / 2 - 10, 18, tw + 20, 60 },
+			-- Room to spare: the heavy face runs a little wider than measured.
+			rect = props.titleRect or { cx - tw / 2 - 40, ty, tw + 80, 60 },
 			text = props.title,
 			role = "windowTitle",
+			textSize = titleSize,
 			align = "Center",
 			zIndex = titleZ,
 		})
 		local ornaments = props.ornaments or { props.icon or "tree", props.icon or "tree" }
-		local size = 56
+		local size = props.ornamentSize or 56
+		local gap = props.ornamentGap or 20
 		for index, id in ornaments do
-			local x = if index == 1 then cx - tw / 2 - 20 - size else cx + tw / 2 + 20
-			Art.Icon(base.visual, id, { x, 20, size, size }, { z = titleZ, name = "Ornament" .. index })
+			local x = if index == 1 then cx - tw / 2 - gap - size else cx + tw / 2 + gap
+			Art.Icon(base.visual, id, { x, ty + 2, size, size }, { z = titleZ, name = "Ornament" .. index })
 		end
-		self.rule = Divider.new(base.visual, {
-			name = "TitleRule",
-			rect = { 60, 74, w - 120, 16 },
-			variant = "rule",
-			zIndex = z + 2,
-		})
+		underline({ 60, ty + 56, w - 120, 16 })
 	else
-		local iconSize = Tokens.Space("windowIcon", 76)
-		local titleX = if props.icon then Tokens.Space("windowTitleX", 140) else 44
+		local iconSize = props.iconSize or Tokens.Space("windowIcon", 76)
+		local iconRect = props.iconRect or { 40, 12, iconSize, iconSize }
+		local titleX = props.titleX or (if props.icon then Tokens.Space("windowTitleX", 140) else 44)
 		if props.icon then
-			self.icon = Art.Icon(
-				base.visual,
-				props.icon,
-				{ 40, 12, iconSize, iconSize },
-				{ z = titleZ, name = "HeaderIcon" }
-			)
+			self.icon = Art.Icon(base.visual, props.icon, iconRect, { z = titleZ, name = "HeaderIcon" })
 		end
-		local titleW = w - titleX - closeInset - closeSize - 20
+		local titleW = closeRect[1] - titleX - 20
 		local hasSub = props.subtitle ~= nil
 		self.title = Text.new(base.visual, {
 			name = "Title",
-			rect = { titleX, if hasSub then 14 else 24, titleW, if hasSub then 50 else 54 },
+			rect = props.titleRect or { titleX, if hasSub then 14 else 24, titleW, if hasSub then 50 else 54 },
 			text = props.title,
 			role = "windowTitle",
+			textSize = titleSize,
 			smallCaps = props.smallCaps,
+			smallCapsSizes = props.smallCapsSizes,
 			caps = if props.smallCaps then false else nil,
 			zIndex = titleZ,
 		})
 		if hasSub then
 			self.subtitle = Text.new(base.visual, {
 				name = "Subtitle",
-				rect = { titleX + 2, 62, titleW, 26 },
+				rect = props.subtitleRect or { titleX + 2, 62, titleW, 26 },
 				text = props.subtitle :: string,
 				role = "subtitleHand",
+				textSize = props.subtitleSize,
 				zIndex = titleZ,
 			})
 		end
 		local ruleX = titleX - 13
-		self.rule = Divider.new(base.visual, {
-			name = "TitleRule",
-			rect = { ruleX, 80, w - ruleX - closeInset - closeSize - 8, 16 },
-			variant = "header",
-			zIndex = z + 2,
-		})
+		underline({ ruleX, 80, closeRect[1] - 8 - ruleX, 16 })
 	end
 
 	local pad = Tokens.Space("windowPad", 24)

@@ -90,10 +90,25 @@ end
 
 -- The scale and centre of a window w × h on a screen W × H whose top `top` px
 -- belong to the Roblox top bar.
-function Scale.WindowFit(screenW: number, screenH: number, top: number, w: number, h: number, userScale: number?)
-	local margin = Tokens.Space("windowMargin", 8)
+-- On a short touch screen (a landscape phone) a window takes the whole
+-- screen height, over the top bar and the HUD, at the largest scale that fits,
+-- so its text is as large as it can be.
+function Scale.WindowFit(
+	screenW: number,
+	screenH: number,
+	top: number,
+	w: number,
+	h: number,
+	userScale: number?,
+	smallTouch: boolean?
+)
+	local small = if smallTouch == nil then Scale.IsSmallTouch(screenH) else smallTouch
+	local margin = Tokens.Space(if small then "phoneMargin" else "windowMargin", if small then 4 else 8)
+	if small then
+		top = 0
+	end
 	local ref = Tokens.Data.reference
-	local k = KitModel.WindowScale(screenW, screenH, top, w, h, userScale, Scale.IsSmallTouch(screenH), {
+	local k = KitModel.WindowScale(screenW, screenH, top, w, h, userScale, small, {
 		margin = margin,
 		refW = ref.width,
 		refH = ref.height,

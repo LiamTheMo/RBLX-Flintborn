@@ -41,7 +41,7 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)`, `Window(screen)`, `IsSmallTouch(h)` |
 | `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore, blur |
 | `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)`, `Find(root, role)` |
-| Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
+| Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Picture Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
 
 ## 2. Conventions
 
@@ -175,6 +175,8 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `button.primary` | `lk_button_leather_normal` | disabled `lk_button_leather_disabled`, hover `lk_button_leather_hover`, pressed `lk_button_leather_pressed` | leather |
 | `button.secondary` | `lk_button_paper_normal` | disabled `lk_button_paper_disabled`, hover `lk_button_paper_hover`, pressed `lk_button_paper_pressed` | paper |
 | `button.small` | `lk_button_paper_small_normal` | disabled `lk_button_paper_small_disabled`, hover `lk_button_paper_small_hover` | paper |
+| `check.ringOff` | `lk_ring_track` | — | none |
+| `check.ringOn` | `lk_ring_full` | — | fill |
 | `check.tileOff` | `lk_tile_check_off` | — | paper |
 | `check.tileOn` | `lk_tile_check_on` | — | paper |
 | `checkbox.off` | `lk_checkbox_off` | — | paper |
@@ -182,6 +184,8 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `currency.pill` | `lk_currency_pill` | — | paper |
 | `dialog.frame` | `lk_dialog_frame` | — | window |
 | `divider.diamond` | `lk_divider_diamond` | — | rule |
+| `divider.hairline` | native (hairline) | — | rule |
+| `divider.ink` | native (ruleDark) | — | rule |
 | `divider.ornate` | `lk_divider_ornament` | — | rule |
 | `divider.rule` | `lk_divider_line` | — | rule |
 | `divider.vertical` | `lk_divider_vertical` | — | rule |
@@ -192,6 +196,8 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `dropdown.field` | `lk_dropdown` | — | paper |
 | `dropdown.list` | `lk_tooltip` | — | paper |
 | `field.value` | `lk_button_paper_small_normal` | — | paper |
+| `hud.leaf` | `lk_emblem_leaf` | — | glyph |
+| `hud.playerCard` | `lk_player_card` | — | paper |
 | `iconButton.close` | `lk_button_close_normal` | disabled `lk_button_close_disabled`, hover `lk_button_close_hover`, pressed `lk_button_close_pressed` | leather |
 | `iconButton.dropdown` | `lk_dropdown_button` | — | paper |
 | `iconButton.hud` | `lk_button_hud` | selected `lk_button_paper_small_hover` | paper |
@@ -207,6 +213,7 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `keycap.cap` | `lk_keycap` | — | paper |
 | `keycap.flat` | `lk_button_paper_small_normal` | disabled `lk_button_paper_small_disabled`, hover `lk_button_paper_small_hover` | paper |
 | `keycap.wide` | `lk_keycap_wide` | — | paper |
+| `map.island` | `pm_map_island` | — | paper |
 | `mark.check` | `lk_glyph_checkmark` | — | glyph |
 | `mark.chevron` | `lk_glyph_chevron_right` | — | glyph |
 | `mark.confirm` | `lk_glyph_check_white` | — | glyph |
@@ -217,12 +224,16 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `mark.star` | `lk_icon_star` | — | glyph |
 | `panel.card` | `lk_panel` | — | paper |
 | `panel.inset` | `lk_panel_inset` | — | paper |
+| `panel.party` | `lk_window_frame` | — | window |
 | `panel.plaque` | `lk_plaque_small` | — | paper |
-| `portrait.empty` | `lk_frame_round_paper` | — | dot |
+| `portrait.empty` | native (emptyDot) | — | dot |
 | `portrait.round` | `lk_frame_hollow_circle` | — | none |
 | `portrait.square` | `lk_portrait_frame` | — | none |
 | `row.bullet` | `lk_row_bullet` | — | paper |
 | `row.plate` | `lk_row_normal` | disabled `lk_row_disabled`, locked `lk_row_disabled`, selected `lk_row_hover` | paper |
+| `row.soft` | `lk_panel_inset` | disabled `lk_row_disabled`, locked `lk_row_disabled`, selected `lk_row_hover` | paper |
+| `scroll.thinThumb` | native (railThumb) | — | fill |
+| `scroll.thinTrack` | native (railTrack) | — | fill |
 | `scroll.thumb` | `lk_scroll_thumb` | — | leather |
 | `scroll.track` | `lk_scroll_track` | — | track |
 | `search.field` | `lk_search` | — | paper |
@@ -250,8 +261,19 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `window.rule` | `lk_divider_line` | — | rule |
 
 Icons are not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, then
-`lk_glyph_<id>` (square buttons prefer the glyph). Item art: `lk_item_<CatalogId>`,
-then `item_<CatalogId>`, then the item's name in ink.
+`lk_glyph_<id>` (square buttons prefer the glyph). `"ink:<id>"` and
+`"white:<id>"` name the flat glyphs (§10). Item art comes from
+`ItemInfo.Icon(itemId)` (icon name and optional tint, the one item-to-art
+source) through `ItemInfo.Sprite`, then `lk_item_<id>` / `item_<id>`, then the
+`icon` prop (untinted), then the item's name in ink.
+
+**Exact edges.** Every plate is drawn outset by its sprite's transparent
+margin (`KitModel.EDGES`, regenerate with `capture.py --edges`) times its
+scale, so the art's visible edge lies exactly on the component's rect (the
+window frame's edge was 5 px inside before). Lines, fills, dots and glyphs,
+the scroll rail, the tooltip tail and the island map keep their stored
+placement. `Art.Plate(..., {exact = false})` / `Kit.Picture {exact = false}`
+draws the old way. Screens that compensated by 4–7 px should drop that.
 
 ## 6. Components
 
@@ -498,17 +520,16 @@ from `art/ui/sprites/manifest.json` until then.
 
 | Where | Mockup | Kit |
 |---|---|---|
-| Window title underline | plain tapering rule | `lk_divider_line` (diamond ends) |
 | Slider knob (M03) | small paper knob | `lk_button_paper_small_normal` at 23 × 26 (`knob = "round"` for the sheet-09 ball) |
 | Slider track (M03) | dark track, yellow fill | `lk_bar_track` + `lk_bar_fill_yellow` |
 | Ticked checkbox (M03) | gold box | `lk_checkbox_on` tinted `checkTint` (variant "gold") |
 | Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` |
 | Ready tag (M04) | yellow-green pill | `lk_pill_value` (untinted: a multiply tint cannot lighten green) + `lk_dot_green` |
 | Not Ready dot | grey dot | `lk_dot_brown` |
-| Empty party slot dot | muted disc | `lk_frame_round_paper` |
+| Empty party slot dot | muted disc | native flat tan disc (`portrait.empty`, by request) |
 | Party header trees (M04) | tent and trees | `lk_icon_tree` ornaments |
 | Category icons (M02) | grid, apple, leaf, sack | closest icons (`chest`, `drumstick`, `plant_fiber`, `gift`); screens choose |
-| Rows / tags rules | plain thin rules | `lk_divider_line` |
+| Settings tab glyphs, info glyph | gamepad, speaker, monitor, refresh, circled i | flat glyphs built from the closest icons (§10) |
 
 ## 9. Capture notes and limits
 
@@ -534,3 +555,104 @@ from `art/ui/sprites/manifest.json` until then.
 - `KitModel` specs cannot read the sprite manifest (the spec runner mounts only
   Luau modules), so "every role resolves to a manifest sprite" is asserted by
   `kit_gallery` (`Kit.Art.Missing()` must be empty) on every capture.
+
+## 10. Fix round: new props and roles (all additive; defaults noted)
+
+**Window**: `iconRect`, `iconSize`, `titleX`, `titleY` (centered), `titleRect`,
+`titleSize`, `smallCapsSizes = {initials, rest}`, `subtitleRect`,
+`subtitleSize`, `rule` (`false`, `"full"` for the window's width, or a Divider
+variant), `ruleVariant`, `ruleRect`, `ruleFade` (default true), `closeRect`,
+`plaqueRect`, `ornamentSize`, `ornamentGap`, `bodyTop`; `.plaque`. The
+underline **defaults to the plain ink rule** (with tapering ends) instead of the
+diamond-ended art; pass `rule = "rule"` for the old look. Clasps now sit centred
+on the frame's edge.
+
+**Divider**: variants `"ink"` (2 px dark rule) and `"hairline"` (2 px faint
+rule), with `thickness`, `color`, `fade`. A vertical one is a rect taller
+than wide.
+
+**SectionHeader**: `textSize`, `textX`, `iconRect`, `countGap`, `rule` (a
+variant; **default `"ink"`**), `ruleRect`.
+
+**Text**: `textSize`, `smallCapsSizes`. **CurrencyPill**: `textSize`, `iconSize`.
+
+**Tab**: `selectedIcon`, `iconTint`, `selectedIconTint`, `iconSize`, `iconX`,
+`labelX` (S2 category: `iconX = 16, labelX = 73`), `textSize`.
+
+**Button**: `iconSize`, `iconGap`. The `play` / `playSecondary` plates lift
+(scale 1.03) on hover instead of darkening (they have no hover art).
+Glyph icons such as `"white:anvil"` work as button icons.
+
+**Checkbox**: `variant = "ring"` (the objective's round check: empty ring /
+filled ring with a check), `readOnly` (draws only, not selectable), `boxX`,
+`textSize`, `descriptionSize`.
+
+**ListRow**: `variant = "soft"` (the mockups' soft cards: thin inset border,
+gold glow when selected), `iconRect`, `iconSize`, `textX`, `titleSize`
+(`textSize`), `subtitleSize`, `subtitleHand` (Patrick Hand subtitle),
+`valueSize`, `trailing = <width>` with `:Trailing()` (a frame after the value
+for a badge or check), `rule` (line rows; **default `"hairline"`**),
+`onLocked(row)`, `itemId`. Locked + selected draws the selected plate with the
+lock; `KitState` stays `"locked"` and `KitSelected` is true.
+
+**PlayerRow**: `compact` (HUD: crown 20, name 15, no level line), `status =
+"ready" | "notReady"` (a bare dot), `action.size = {108, 45}`,
+`action.textSize`, `nameX`, `emptyIndent`, `nameSize`, `levelSize`,
+`crownSize`, `portraitSize`, `shrinkName` (**default true**: long names
+shrink), `rule` (**default `"hairline"`**). The empty row's marker is a flat
+tan disc (`portrait.empty`, native).
+
+**Stepper**: `buttons = "leather"` (leather − / + with cream glyphs),
+`valueSize`.
+
+**Scroll**: `rail = "thin"` (flat 8 px rail, M01 party list), `railOverlay`
+(the rail over the list's edge), `railInset`; `:ScrollToRow(rowOrIndex,
+{center?})` (design-px canvas position).
+
+**Slot**: `item.itemId` accepted; `SetItem` resets the press debounce (pooled
+slots). Art and tint always come from `ItemInfo.Icon`.
+
+**ItemIcon**: `itemId` accepted; tint from `ItemInfo.Icon`; `icon` is used
+untinted only when ItemInfo has no art.
+
+**Picture** (new): `Kit.Picture.new(parent, {rect, role, tint?, exact?})`,
+`:SetState`. Draws a role as a picture: `hud.playerCard` (lk_player_card),
+`hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
+lk_window_frame), `map.island` (pm_map_island).
+
+**New roles**: `divider.ink`, `divider.hairline`, `row.soft`, `check.ringOff`
+(lk_ring_track), `check.ringOn` (lk_ring_full), `scroll.thinTrack`,
+`scroll.thinThumb`, `hud.playerCard`, `hud.leaf`, `panel.party`, `map.island`;
+`portrait.empty` is now the native tan disc. Native roles (`native = true`)
+draw as flat kit shapes by design. New colour tokens: `emptyDot` #DFB791,
+`hairline` #EECBA4, `railTrack`, `railThumb` (sampled from M01 / M04).
+
+**Flat glyphs** (`"ink:<id>"`, `"white:<id>"`; built from lk_ icons by
+`art/ui/capture/glyphs.py` into `art/ui/sprites/lk_glyph_{ink,white}_*.png`):
+gears, people, magnifier, check, anvil, book, trophy, map_pin, backpack, chest,
+hammer, compass, and stand-ins where the sheets have no such drawing:
+`gamepad` (compass), `speaker` (speech bubble), `monitor` (map), `refresh`
+(compass arrow), `info` ("!", no circled i). The asset artist still has to add
+these 34 PNGs to `manifest.json` and an atlas group (the script prints the
+entries).
+
+**Touch**: on touch screens each control's invisible hit pad grows until it
+covers at least 44 screen px at the window's real scale (no visual change).
+
+**Phones**: on a short touch screen (height < 500, no keyboard) a window uses
+the whole screen height, over the top bar and HUD, at the largest scale that
+fits (4 px margin). At 844 × 390: Inventory 0.586, Journal (1172 × 688) 0.555,
+Party (1136 × 642) 0.595, Play (1064 × 675) 0.566, Forge (1102 × 682) 0.560,
+Settings (1110 × 666) 0.574, ConfirmDialog (560 × 330) 1.158. A 15 px body
+line is then about 8.5 screen px; the 9 px floor applies to scaled labels only,
+so phone-critical text should use `scaled = true` or larger sizes.
+
+**Capture harness**: ScrollingFrame `CanvasPosition` renders; Enum items are
+shared objects with `.Name`, `.Value` (Roblox numbers for priorities and font
+weights), `.EnumType` and `typeof(x) == "EnumItem"`; `HttpService:JSONDecode`;
+`Players:GetPlayerByUserId` answers any id; `task.wait` returns at once
+(time does not pass in captures).
+
+**Reasons** (`src/client/Ui/Reasons.luau`): MissingMaterials, Locked,
+WrongSource added; BadQuantity and BackpackFull already had text.
+

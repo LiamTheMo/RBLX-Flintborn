@@ -22,14 +22,26 @@ local PlayerRow = {}
 PlayerRow.__index = PlayerRow
 
 -- props: rect | size, userId, name, level, leader (crown), badge ("leader" |
--- "ready" | "notReady"), action ({label, onPress, variant}), empty,
--- emptyText, rule (true), frame ("square" | "round"), onPress(row), zIndex, name.
+-- "ready" | "notReady"), status ("ready" | "notReady": a bare dot, compact
+-- rows), action ({label, onPress, variant, enabled, size = {108, 45}}), empty,
+-- emptyText, emptyIndent (px from the left to the disc), nameX (px), nameSize,
+-- levelSize, crownSize, portraitSize, shrinkName (true: long names shrink to
+-- fit, down to minTextPx), compact (the HUD party list: smaller crown and
+-- text, no level line), rule ("hairline" default; true = hairline, false,
+-- or a Divider variant), frame ("square" | "round"), onPress(row), zIndex, name.
 function PlayerRow.new(parent: Instance, props)
 	local w, h = Core.Size(props, 330, 52)
 	local base = Core.Root(parent, "PlayerRow", "row.player", props, w, h)
 	local self = setmetatable({ root = base.root, base = base, w = w, h = h, props = props }, PlayerRow)
 	if props.rule ~= false then
-		Divider.new(base.visual, { name = "Rule", rect = { 0, h - 8, w, 16 }, variant = "rule", zIndex = base.z })
+		local rule = if type(props.rule) == "string" then props.rule else "hairline"
+		local native = rule == "ink" or rule == "hairline"
+		Divider.new(base.visual, {
+			name = "Rule",
+			rect = if native then { 0, h - 2, w, 2 } else { 0, h - 8, w, 16 },
+			variant = rule,
+			zIndex = base.z,
+		})
 	end
 	self.content = Core.Make("Frame", {
 		Name = "Content",
@@ -60,7 +72,8 @@ function PlayerRow.new(parent: Instance, props)
 	return self
 end
 
--- Redraws the row from `data` (same fields as the props).
+-- Redraws the row from `data` (same fields as the props; layout options not
+-- in `data` keep their constructor values).
 function PlayerRow:Set(data)
 	for _, child in self.content:GetChildren() do
 		child:Destroy()
@@ -69,52 +82,68 @@ function PlayerRow:Set(data)
 		self.action:Destroy()
 		self.action = nil
 	end
+	local props = self.props
+	local function opt(key: string): any
+		local value = data[key]
+		if value == nil then
+			return props[key]
+		end
+		return value
+	end
 	local w, h = self.w, self.h
 	local z = self.base.z + 1
+	local compact = opt("compact") == true
 	self.empty = data.empty == true
 	self.root:SetAttribute("KitState", if self.empty then "empty" else "normal")
-	local ps = h - 6
+	local ps = opt("portraitSize") or (h - 6)
+	local nameSize = opt("nameSize") or (if compact then 15 else nil)
 	if self.empty then
-		local d = math.floor(h * 0.62)
+		local d = math.floor(ps * (if compact then 0.6 else 0.66))
+		local indent = opt("emptyIndent") or ((ps - d) / 2 + 2)
 		local disc = Core.Make("Frame", {
 			Name = "EmptyDot",
 			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset((ps - d) / 2 + 2, (h - d) / 2 - 2),
+			Position = UDim2.fromOffset(indent, (h - d) / 2 - 1),
 			Size = UDim2.fromOffset(d, d),
 			ZIndex = z,
 		}, self.content)
 		Art.Plate(disc, "portrait.empty", d, d, { z = z })
+		local tx = opt("nameX") or (ps + 16)
 		Core.Label(self.content, {
 			name = "Name",
-			text = data.emptyText or "Empty Slot",
+			text = data.emptyText or props.emptyText or "Empty Slot",
 			role = "muted",
-			rect = { ps + 16, 0, w - ps - 16, h - 4 },
+			size = nameSize,
+			rect = { tx, 0, w - tx, h - 2 },
 			z = z,
 		})
 		return
 	end
 	self.portrait = Portrait.new(self.content, {
 		name = "Portrait",
-		rect = { 0, 1, ps, ps },
+		rect = { 0, (h - ps) / 2, ps, ps },
 		userId = data.userId,
-		frame = data.frame,
+		frame = opt("frame"),
 		zIndex = z,
 	})
-	local x = ps + 14
+	local x = opt("nameX") or (ps + 14)
 	local right = w - 4
-	if data.action then
-		local bw = math.max(96, math.ceil(Text.Width(data.action.label, "buttonS")) + 40)
-		local bh = math.min(42, h - 10)
+	local action = data.action
+	if action then
+		local size = action.size
+		local bw = if size then size[1] else math.max(96, math.ceil(Text.Width(action.label, "buttonS")) + 40)
+		local bh = if size then size[2] else math.min(42, h - 10)
 		self.action = Button.new(self.content, {
 			name = "Action",
-			variant = data.action.variant or "primary",
+			variant = action.variant or "primary",
 			sizeClass = "s",
-			label = data.action.label,
-			rect = { right - bw, (h - bh) / 2 - 2, bw, bh },
+			label = action.label,
+			textSize = action.textSize,
+			rect = { right - bw, (h - bh) / 2 - 1, bw, bh },
 			zIndex = z + 1,
-			onPress = data.action.onPress,
+			onPress = action.onPress,
 		})
-		if data.action.enabled == false then
+		if action.enabled == false then
 			self.action:SetEnabled(false)
 		end
 		right -= bw + 10
@@ -127,28 +156,45 @@ function PlayerRow:Set(data)
 			zIndex = z + 1,
 		})
 		local bw = self.badge.root.Size.X.Offset
-		self.badge.root.Position = UDim2.fromOffset(right - bw, (h - 32) / 2 - 2)
+		self.badge.root.Position = UDim2.fromOffset(right - bw, (h - 32) / 2 - 1)
 		right -= bw + 10
 	end
+	local status = data.status
+	if status then
+		-- A bare status dot (the HUD party list).
+		local d = if compact then 14 else 18
+		local dot = Core.Make("Frame", {
+			Name = "Status",
+			BackgroundTransparency = 1,
+			Position = UDim2.fromOffset(right - d, (h - d) / 2),
+			Size = UDim2.fromOffset(d, d),
+			ZIndex = z,
+		}, self.content)
+		Art.Plate(dot, if status == "ready" then "dot.green" else "dot.grey", d, d, { z = z })
+		right -= d + 8
+	end
 	if data.leader then
-		local c = 28
+		local c = opt("crownSize") or (if compact then 20 else 28)
 		local crown = Core.Make("Frame", {
 			Name = "Crown",
 			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(right - c, (h - c) / 2 - 2),
+			Position = UDim2.fromOffset(right - c, (h - c) / 2 - 1),
 			Size = UDim2.fromOffset(c, c),
 			ZIndex = z,
 		}, self.content)
 		Art.Plate(crown, "mark.crown", c, c, { z = z })
-		right -= c + 10
+		right -= c + 8
 	end
-	local hasLevel = data.level ~= nil
+	local hasLevel = data.level ~= nil and not compact
+	local shrink = opt("shrinkName") ~= false
 	Core.Label(self.content, {
 		name = "Name",
 		text = data.name or "",
 		role = "rowTitle",
+		size = nameSize,
 		color = "ink",
-		rect = if hasLevel then { x, h * 0.1, right - x, h * 0.46 } else { x, 0, right - x, h - 4 },
+		scaled = shrink,
+		rect = if hasLevel then { x, h * 0.1, right - x, h * 0.46 } else { x, 0, right - x, h - 2 },
 		z = z,
 	})
 	if hasLevel then
@@ -156,6 +202,7 @@ function PlayerRow:Set(data)
 			name = "Level",
 			text = ("LV. %d"):format(data.level),
 			role = "small",
+			size = opt("levelSize"),
 			color = "inkBody",
 			rect = { x, h * 0.54, right - x, h * 0.34 },
 			z = z,
