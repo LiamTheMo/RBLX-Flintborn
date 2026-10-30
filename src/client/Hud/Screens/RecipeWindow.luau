@@ -34,7 +34,7 @@ RecipeWindow.SIZE = { 1102, 682 }
 -- Window-local layout (design px).
 local L = {
 	icon = { 53, 15, 101, 89 },
-	title = { 184, 14, 560, 64 },
+	title = { 184, 17, 560, 64 },
 	titleSizes = { 46, 40 },
 	subtitle = { 184, 72, 600, 30 },
 	subtitleSize = 24,
@@ -43,13 +43,14 @@ local L = {
 	columnRules = { { 363, 118, 18, 540 }, { 752, 118, 18, 550 } },
 	clasps = { 0.242, 0.895 },
 	recipesHead = { 58, 128, 140, 30 },
-	headSize = 18,
+	headSize = 19,
 	dropdown = { 196, 124, 160, 38 },
-	recipeList = { 53, 162, 324, 460 },
-	recipeRow = { 302, 69 },
-	recipeGap = 7,
-	rowIcon = { 12, 3, 64, 64 },
-	rowTextX = 101,
+	recipeList = { 50, 160, 329, 470 },
+	recipeRow = { 305, 73 },
+	recipeGap = 3,
+	rowIcon = { 14, 5, 64, 64 },
+	rowTextX = 103,
+	rowSubtitleSize = 15,
 	name = { 418, 128, 330, 38 },
 	nameSize = 30,
 	picture = { 470, 178, 242, 233 },
@@ -57,27 +58,27 @@ local L = {
 	descriptionSize = 21,
 	divider1 = { 389, 469, 356, 16 },
 	requiresHead = { 401, 482, 200, 30 },
-	smallHeadSize = 17,
-	cards = { 396, 513, 349, 65 },
-	cardGap = 9,
+	smallHeadSize = 16,
+	cards = { 393, 511, 349, 69 },
+	cardGap = 5,
 	divider2 = { 388, 583, 371, 16 },
 	quantityHead = { 391, 616, 100, 30 },
 	stepper = { 493, 610, 158, 44 },
 	button = { 673, 599, 260, 66 },
 	buttonSize = 25,
 	materialsHead = { 782, 129, 260, 30 },
-	materialsSize = 20,
-	materialList = { 779, 165, 300, 400 },
-	materialRow = { 278, 59 },
-	materialGap = 8,
-	materialIcon = { 13, 7, 53, 46 },
-	materialTextX = 84,
+	materialsSize = 19,
+	materialList = { 776, 165, 305, 412 },
+	materialRow = { 281, 62 },
+	materialGap = 5,
+	materialIcon = { 15, 8, 53, 46 },
+	materialTextX = 86,
 	-- Crafting mode: the stepper carries All, so the button narrows; the right
 	-- column keeps room for the smelt and the stations in reach.
 	craft = {
 		stepper = { 483, 610, 222, 44 },
 		button = { 713, 599, 220, 66 },
-		materialList = { 779, 165, 300, 276 },
+		materialList = { 776, 165, 305, 278 },
 		smeltHead = { 782, 446, 276, 26 },
 		job = { 782, 472, 276, 24 },
 		bar = { 782, 502, 190, 20 },
@@ -101,6 +102,11 @@ local function label(parent: Instance, props, size: number?)
 		text.root.TextSize = size
 	end
 	return text
+end
+
+-- A Kit.Scroll's content height: rows, gaps and its top and bottom padding.
+local function listHeight(count: number, rowH: number, gap: number): number
+	return if count > 0 then count * rowH + (count - 1) * gap + 14 else 0
 end
 
 -- Dims an item picture the way ListRow dims its own icon.
@@ -295,9 +301,14 @@ function RecipeWindow:_placeHeader()
 	local close = window.close.root
 	close.Position = UDim2.fromOffset(L.close[1], L.close[2])
 	close.Size = UDim2.fromOffset(L.close[3], L.close[4])
-	local rule = window.rule.root
-	rule.Position = UDim2.fromOffset(L.topRule[1], L.topRule[2])
-	rule.Size = UDim2.fromOffset(L.topRule[3], L.topRule[4])
+	-- The banner's own rule stops at the close button; this one spans the window.
+	window.rule.root.Visible = false
+	self.topRule = Kit.Divider.new(window.base.visual, {
+		name = "TopRule",
+		rect = L.topRule,
+		variant = "rule",
+		zIndex = window.base.z + 2,
+	})
 end
 
 function RecipeWindow:_buildCraftingExtras(v, z: number)
@@ -469,7 +480,10 @@ function RecipeWindow:_rowFor(entry)
 	row.title.Position = UDim2.fromOffset(x, size[2] * 0.12)
 	row.title.Size = UDim2.fromOffset(right - x, size[2] * 0.46)
 	if row.subtitle then
-		row.subtitle.Position = UDim2.fromOffset(x, size[2] * 0.54)
+		-- The mockup's row descriptions are handwritten notes (D13).
+		Kit.Core.Style(row.subtitle, "subtitleHand")
+		row.subtitle.TextSize = L.rowSubtitleSize
+		row.subtitle.Position = UDim2.fromOffset(x, size[2] * 0.54 - 3)
 		row.subtitle.Size = UDim2.fromOffset(right - x, size[2] * 0.36)
 	end
 	row.base.maid:Give(row.root:GetAttributeChangedSignal("KitState"):Connect(function()
@@ -502,8 +516,7 @@ function RecipeWindow:_renderList()
 			self.rows[id] = nil
 		end
 	end
-	local pitch = L.recipeRow[2] + L.recipeGap
-	self.recipeList:SetContentHeight(#list * pitch)
+	self.recipeList:SetContentHeight(listHeight(#list, L.recipeRow[2], L.recipeGap))
 	-- Keep the chosen recipe when it is still listed, else take the first.
 	local keep = self.selectedId and used[self.selectedId]
 	local first = list[1]
@@ -554,7 +567,7 @@ function RecipeWindow:_renderMaterials()
 			self.materialRows[id] = nil
 		end
 	end
-	self.materialList:SetContentHeight(#self.materials * (size[2] + L.materialGap))
+	self.materialList:SetContentHeight(listHeight(#self.materials, size[2], L.materialGap))
 end
 
 function RecipeWindow:_renderDetail()
@@ -626,15 +639,15 @@ function RecipeWindow:_wideCards(cost)
 			icon = RecipeModel.Icon(item.catalogId),
 			zIndex = z,
 		})
-		label(c, { name = "Name", rect = { 84, 8, w - 90, 24 }, text = item.name, role = "rowTitle", zIndex = z }, 15)
+		label(c, { name = "Name", rect = { 86, 12, w - 92, 24 }, text = item.name, role = "rowTitle", zIndex = z }, 15)
 		label(c, {
 			name = "Count",
-			rect = { 84, 31, w - 90, 28 },
+			rect = { 86, 35, w - 92, 28 },
 			text = countText(item),
 			role = "count",
 			rich = true,
 			zIndex = z,
-		}, 21)
+		}, 20)
 		card.root:SetAttribute("KitState", if item.short then "short" else "normal")
 		table.insert(self.cards, card)
 	end

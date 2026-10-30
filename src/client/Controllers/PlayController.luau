@@ -41,6 +41,8 @@ local statusToken = 0
 -- Requests in flight: reading the preview for PLAY, or setting Ready.
 local entering = false
 local readying = false
+-- The role the window was last drawn for: a new role drops the last message.
+local shownRole: string? = nil
 -- Level attribute watchers for the party's players, by userId.
 local levelWatch: { [number]: RBXScriptConnection } = {}
 
@@ -52,8 +54,17 @@ local function role(): string
 	return PlayModel.Role(LobbyController.PartyView(), player.UserId)
 end
 
+local function playerOf(userId: number): Player?
+	for _, other in Players:GetPlayers() do
+		if other.UserId == userId then
+			return other
+		end
+	end
+	return nil
+end
+
 local function levelOf(userId: number): number?
-	local other = Players:GetPlayerByUserId(userId)
+	local other = playerOf(userId)
 	local level = other and other:GetAttribute("Level")
 	return if type(level) == "number" then level else nil
 end
@@ -99,7 +110,13 @@ local function refreshButton()
 		return
 	end
 	local deploying = LobbyController.IsDeploying()
-	window:SetMode(role(), LobbyController.IsReady())
+	local current = role()
+	if current ~= shownRole then
+		shownRole = current
+		statusText = nil
+		statusToken += 1
+	end
+	window:SetMode(current, LobbyController.IsReady())
 	window:SetBusy(entering or readying or deploying)
 	-- Once the server is teleporting the player there is nothing left to press.
 	window:SetEnabled(not (travelling() and not deploying and not entering))
@@ -117,7 +134,7 @@ local function watchLevels(rows)
 		end
 	end
 	for userId in wanted do
-		local other = Players:GetPlayerByUserId(userId)
+		local other = playerOf(userId)
 		if levelWatch[userId] == nil and other then
 			levelWatch[userId] = other:GetAttributeChangedSignal("Level"):Connect(function()
 				PlayController.RefreshParty()

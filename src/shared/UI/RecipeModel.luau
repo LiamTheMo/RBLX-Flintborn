@@ -19,29 +19,6 @@ local RecipeModel = {}
 
 RecipeModel.ALL = "All"
 
--- Kit icons that show an item until it has art of its own (Kit.ItemIcon's
--- `icon`). Only icons that depict the item, or its kind, are listed; anything
--- else shows its name.
-RecipeModel.MATERIAL_ICONS = {
-	Wood = "logs",
-	Stone = "stones",
-	Fiber = "plant_fiber",
-	Hide = "hide",
-	DireHide = "hide",
-	Bone = "bone",
-	RawMeat = "drumstick",
-	CookedMeat = "drumstick",
-	CaveMushroom = "mushroom",
-	RedcapMushroom = "mushroom",
-	ChestnutMushroom = "mushroom",
-	JuniperBerry = "berries",
-	Elderberry = "berries",
-	Raspberry = "berries",
-	Redberry = "berries",
-	Amethyst = "crystals",
-}
-RecipeModel.KIND_ICONS = { Pickaxe = "pickaxe", Axe = "hatchet", Spear = "spear" }
-
 -- Codes the shared Reasons table does not word (forge refusals).
 RecipeModel.REASONS = {
 	MissingMaterials = "your vault doesn't hold enough materials for that",
@@ -58,64 +35,25 @@ function RecipeModel.NameOf(catalogId: string?): string
 	return def and def.name or tostring(catalogId)
 end
 
--- The stand-in icon id for an item, or nil.
+-- The kit icon that depicts an item while it has no art of its own
+-- (Kit.ItemIcon's `icon`), or nil: ItemInfo.Icon, the one source.
 function RecipeModel.Icon(catalogId: string?): string?
-	if catalogId == nil then
-		return nil
-	end
-	local icon = RecipeModel.MATERIAL_ICONS[catalogId]
-	if icon then
-		return icon
-	end
-	local def = ItemCatalog.Get(catalogId)
-	if def == nil then
-		return nil
-	end
-	local kind = (def.tool and def.tool.kind) or (def.weapon and def.weapon.family)
-	return kind and RecipeModel.KIND_ICONS[kind] or nil
+	return ItemInfo.Icon(catalogId)
 end
 
--- The item's short stat line ("Tier 3 · Pickaxe"), from ItemInfo (StatRows when
--- the inventory screen provides it, else the stat chips).
-function RecipeModel.StatLine(catalogId: string?): string
+-- The item's stat line from ItemInfo.StatRows, at most `max` rows
+-- ("Harvest Power 5 per hit · Tool Tier 3").
+function RecipeModel.StatLine(catalogId: string?, max: number?): string
 	if catalogId == nil then
 		return ""
 	end
-	local rows = nil
-	local statRows = (ItemInfo :: any).StatRows
-	if type(statRows) == "function" then
-		local ok, result = pcall(statRows, { catalogId = catalogId })
-		rows = if ok and type(result) == "table" then result else nil
-	end
-	if rows == nil then
-		rows = ItemInfo.Stats({ catalogId = catalogId })
-	end
 	local parts = {}
-	for _, row in rows do
-		local text = nil
-		if type(row) == "table" then
-			if type(row.text) == "string" then
-				text = row.text
-			elseif type(row.label) == "string" and row.value ~= nil then
-				text = row.label .. " " .. tostring(row.value)
-			end
-		end
-		if text and text ~= "" and #parts < 2 then
-			table.insert(parts, text)
+	for _, row in ItemInfo.StatRows({ catalogId = catalogId }) do
+		if #parts < (max or 2) then
+			table.insert(parts, row.label .. " " .. row.value)
 		end
 	end
 	return table.concat(parts, " · ")
-end
-
-local function authored(catalogId: string?): string?
-	local describe = (ItemInfo :: any).Description
-	if type(describe) == "function" then
-		local ok, text = pcall(describe, catalogId)
-		if ok and type(text) == "string" and text ~= "" then
-			return text
-		end
-	end
-	return nil
 end
 
 local function displayName(name: string, quantity: number?): string
@@ -128,9 +66,9 @@ function RecipeModel.Subtitle(entry): string
 		return if entry.requirement ~= "" then entry.requirement else "Locked"
 	end
 	if entry.kind == "Permanent" then
-		return "Permanent: stays yours when you die"
+		return "Permanent: kept when you die"
 	end
-	local line = RecipeModel.StatLine(entry.output)
+	local line = RecipeModel.StatLine(entry.output, 1)
 	if entry.kind == "Craft" then
 		local where = if entry.station then entry.station else "By hand"
 		if entry.timed then
@@ -144,15 +82,15 @@ end
 -- The centre column's description: authored text (ItemInfo, D10) or a line
 -- derived from the item's stats and how it is made.
 function RecipeModel.Description(entry): string
-	local text = authored(entry.output)
-	local line = RecipeModel.StatLine(entry.output)
-	local tail
 	if entry.kind == "Permanent" then
-		tail = ("Turns one %s from your vault into a Permanent item that stays yours when you die."):format(
+		return ("Makes one %s from your vault Permanent: it stays yours when you die."):format(
 			RecipeModel.NameOf(entry.output)
 		)
-		line = ""
-	elseif entry.kind == "Craft" then
+	end
+	local text = ItemInfo.Description(entry.output)
+	local line = RecipeModel.StatLine(entry.output)
+	local tail
+	if entry.kind == "Craft" then
 		tail = if entry.timed
 			then ("Smelts one every %s s at a %s."):format(tostring(entry.seconds), entry.station or "Furnace")
 			elseif entry.station then ("Made at a %s."):format(entry.station)

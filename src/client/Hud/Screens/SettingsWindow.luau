@@ -628,7 +628,7 @@ function SettingsWindow:SetKeys(map, capturing: string?, note: string?, canRebin
 			then "Press a key, or Escape to cancel."
 			elseif note and note ~= "" then note
 			elseif canRebind then "Click a key to change it."
-			else ""
+			else "Connect a keyboard to change keys."
 	)
 end
 

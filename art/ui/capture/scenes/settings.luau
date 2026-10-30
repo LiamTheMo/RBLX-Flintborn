@@ -13,6 +13,8 @@
 --     close hover
 --   6 Graphics with the quality dropdown open, its field focused
 --   7 no keyboard: key caps disabled, the Controls note says why
+--   8 the Controls list's last rows (what scrolling reveals)
+--   9 a landscape phone, 844 × 390, touch only
 
 local Players = game:GetService("Players")
 local Shared = game:GetService("ReplicatedStorage").Shared
@@ -101,3 +103,29 @@ view.dropdowns[1]:SetOpen(false)
 view:SelectTab("Controls")
 view:SetKeys(keys, nil, nil, false)
 dump()
+
+-- Page 8: the rest of the Controls list, down to Settings. The renderer draws a
+-- ScrollingFrame from its top (CanvasPosition is not drawn), so the first 11
+-- rows are hidden for this page to show the rows a scroll reveals.
+view:SetKeys(keys, nil, nil, true)
+local rows = {}
+for _, row in view.keyList:Content():GetChildren() do
+	if row:IsA("Frame") and row.LayoutOrder <= 11 then
+		row.Visible = false
+		table.insert(rows, row)
+	end
+end
+dump()
+for _, row in rows do
+	row.Visible = true
+end
+
+-- Page 9: a landscape phone (844 × 390, touch only): the window fills the
+-- room under the top bar, as Kit.Scale fits it in game.
+local UserInputService = game:GetService("UserInputService")
+UserInputService.TouchEnabled = true
+UserInputService.KeyboardEnabled = false
+view:SelectTab("Gameplay")
+view:SetKeys(keys, nil, nil, false)
+view.screen:Fit(844, 390, 52, 1)
+__dump(Players.LocalPlayer.PlayerGui, 844, 390, BACKGROUND)

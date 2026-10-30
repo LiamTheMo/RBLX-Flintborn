@@ -13,6 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local JournalModel = require(ReplicatedStorage.Shared.UI.JournalModel)
+local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local JournalWindow = require(script.Parent.Parent.Hud.Screens.JournalWindow)
@@ -61,7 +62,8 @@ local function progression()
 	return if ok and type(controller) == "table" then controller else nil
 end
 
--- The Party window's controller, when it is in this build (lobby).
+-- The Party window's controller (lobby only), required when the party tab is
+-- pressed so the two controllers never require each other while loading.
 local function partyController()
 	local module = script.Parent:FindFirstChild("PartyController")
 	if module == nil then
@@ -223,14 +225,16 @@ function JournalController.Start()
 		end,
 		onParty = function()
 			local party = partyController()
-			if party then
-				party.Open()
+			if party == nil then
+				return
+			end
+			local ok, err = pcall(party.Open)
+			if not ok then
+				warn("[Journal] the Party window did not open: " .. tostring(err))
 			end
 		end,
 	})
-	-- Required only when pressed, so the two controllers never require each
-	-- other while loading.
-	window:SetPartyAvailable(script.Parent:FindFirstChild("PartyController") ~= nil)
+	window:SetPartyAvailable(PlaceConfig.IsLobby() and script.Parent:FindFirstChild("PartyController") ~= nil)
 	window.screen:Watch()
 	window.screen.Opened:Connect(onOpened)
 	window.screen.Closed:Connect(function()

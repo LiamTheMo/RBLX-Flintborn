@@ -76,7 +76,7 @@ check(not VaultController.IsOpen(), "starts closed")
 VaultController.Open("Backpack")
 local gui = player.PlayerGui:FindFirstChild("FlintbornInventory")
 local window = VaultController.window
-check(gui and gui.Enabled and VaultController.IsOpen(), "Open(\"Backpack\") opens the window")
+check(gui and gui.Enabled and VaultController.IsOpen(), 'Open("Backpack") opens the window')
 check(snapshots == 1 and changed == 1, "opening fetches one snapshot and fires Changed")
 check(window:SlotFor("b1") ~= nil and window:SlotFor("be50") ~= nil, "fifty backpack slots, filled and empty")
 check(window.selectedId == "b1" and window.detailName.root.Text == "Stone Axe", "the first item is chosen on open")

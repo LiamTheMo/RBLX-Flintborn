@@ -51,8 +51,12 @@ local RECT = {
 	regionPlaque = { 583, 93, 428, 76 },
 	sectionRule = { 588, 332, 419, 15 },
 	partyHeading = { 590, 350, 300, 26 },
-	party = { 587, 378, 441, 58 },
+	-- One row tall; more members scroll (the rail sits right of the rows).
+	party = { 584, 375, 446, 63 },
+	-- The row as the mockup measures it, and how far the inset art's visible
+	-- edge sits inside its plate (left/top, and the extra width/height).
 	partyRow = { 421, 56 },
+	partyRowArt = { 3, 3, 5, 5 },
 	equipHeading = { 589, 446, 260, 28 },
 	more = { 760, 446, 248, 28 },
 	slotY = 477,
@@ -163,7 +167,7 @@ function PlayWindow.new(props: Props)
 		rect = RECT.party,
 		gap = 6,
 		padBottom = 0,
-		contentHeight = RECT.partyRow[2],
+		contentHeight = RECT.partyRow[2] + RECT.partyRowArt[4],
 		zIndex = z,
 	})
 	self.equipHeading = Kit.Text.new(v, {
@@ -179,6 +183,7 @@ function PlayWindow.new(props: Props)
 		text = "",
 		role = "small",
 		align = "Right",
+		scaled = true,
 		zIndex = z,
 	})
 	self.slots = {}
@@ -308,6 +313,8 @@ function PlayWindow:_details(v: Frame, z: number)
 			text = "",
 			role = "rowTitle",
 			size = TEXT_SIZE.detail,
+			-- Scaled text keeps the Kit's 9 screen-px floor on phones.
+			scaled = true,
 			rect = { DETAIL.label[1], cy - 11, DETAIL.label[2], 24 },
 			z = z,
 		})
@@ -353,15 +360,23 @@ end
 -- One party row: crown (leader), headshot, name, ready dot (in a party), level.
 local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
-	local holder = Kit.Core.Make("Frame", {
+	local art = RECT.partyRowArt
+	local outer = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
 		BackgroundTransparency = 1,
 		LayoutOrder = order,
-		Size = UDim2.fromOffset(w, h),
+		Size = UDim2.fromOffset(w + art[3], h + art[4]),
 	}, parent)
-	holder:SetAttribute("UserId", row.userId)
+	outer:SetAttribute("UserId", row.userId)
 	-- The mockup's row is a light inset box, not the list-row plate.
-	Kit.Art.Plate(holder, "panel.inset", w, h, { z = 5 })
+	Kit.Art.Plate(outer, "panel.inset", w + art[3], h + art[4], { z = 5 })
+	local holder = Kit.Core.Make("Frame", {
+		Name = "Inside",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(art[1], art[2]),
+		Size = UDim2.fromOffset(w, h),
+		ZIndex = 6,
+	}, outer)
 	if row.leader then
 		Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 })
 	end
@@ -372,6 +387,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		role = "rowTitle",
 		color = "ink",
 		size = TEXT_SIZE.name,
+		scaled = true,
 		rect = { 120, 2, 200, h - 2 },
 		z = 6,
 	})
@@ -381,6 +397,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		text = levelText,
 		role = "hudSmall",
 		size = TEXT_SIZE.level,
+		scaled = true,
 		align = "Right",
 		rect = { w - 120, 2, 101, h - 2 },
 		z = 6,
@@ -397,7 +414,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		}, holder)
 		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
 	end
-	return holder
+	return outer
 end
 
 -- The party rows (leader first; PlayModel.Members). `showReady` adds each
@@ -412,7 +429,7 @@ function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
 	for order, row in rows do
 		partyRow(content, row, order, showReady)
 	end
-	local h = RECT.partyRow[2]
+	local h = RECT.partyRow[2] + RECT.partyRowArt[4]
 	self.partyList:SetContentHeight(#rows * h + math.max(0, #rows - 1) * 6)
 	self.rows = rows
 end
