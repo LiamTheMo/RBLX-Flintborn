@@ -103,22 +103,23 @@ function InventoryPanel.new(parent: Instance?, handlers)
 	return self
 end
 
--- The tab column: the wooden spine with four plain tiles (one sprite), the
--- glowing tile laid over the chosen tab, and each tab's icon.
+-- The tab column: a plain tile for each tab, the glowing tile on the chosen
+-- one, and each tab's icon.
 function InventoryPanel:_tabs(window: Instance)
-	local columnW, columnH = natural("pm_side_column", { 156, 569 })
-	Widgets.Sprite("pm_side_column", {
-		Name = "TabColumn",
-		Position = UDim2.fromOffset(18 - ORIGIN[1], 93 - ORIGIN[2]),
-		Size = UDim2.fromOffset(columnW, columnH),
-		ZIndex = 2,
-	}, window)
+	local tileW, tileH = natural("pm_side_tab", { 116, 124 })
 	local glowW, glowH = natural("pm_side_tab_selected", { 122, 134 })
 	self.tabs = {}
 	for _, tab in InventoryPanel.TABS do
 		local r = tab.rect
 		local holder = Widgets.Make("Frame", { Name = tab.id, BackgroundTransparency = 1, ZIndex = 2 }, window)
 		place(holder, at(r[1], r[2], r[3], r[4]))
+		local off = Widgets.Sprite("pm_side_tab", {
+			Name = "Off",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(tileW, tileH),
+			ZIndex = 2,
+		}, holder)
 		local on = Widgets.Sprite("pm_side_tab_selected", {
 			Name = "On",
 			AnchorPoint = Vector2.new(0.5, 0.5),
@@ -138,7 +139,7 @@ function InventoryPanel:_tabs(window: Instance)
 		local button = Parchment.Pressable(holder, icon, function()
 			self:SelectTab(tab.id)
 		end, 6)
-		self.tabs[tab.id] = { on = on, button = button }
+		self.tabs[tab.id] = { on = on, off = off, button = button }
 	end
 end
 
@@ -524,6 +525,7 @@ function InventoryPanel:SelectTab(id: string)
 	self.category = id
 	for name, tab in self.tabs do
 		tab.on.Visible = name == id
+		tab.off.Visible = name ~= id
 	end
 	self:_refilter()
 	if self.handlers.onTab then

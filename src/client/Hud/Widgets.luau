@@ -82,6 +82,39 @@ function Widgets.Make(className: string, props, parent: Instance?)
 	return object
 end
 
+-- The capture harness (art/ui/capture) applies text caps in layout pixels.
+local CAPTURE = (__FlintbornCapture :: any) == true
+
+-- Caps scaled text at `maxSize` layout pixels (and keeps it at least `minSize`
+-- screen pixels). Roblox applies a UITextSizeConstraint in screen pixels, after
+-- any UIScale, so on a window drawn smaller (phones) a cap in layout pixels let
+-- text grow far past its design; the cap follows the UIScales above the label.
+function Widgets.TextCap(label: GuiObject, maxSize: number, minSize: number?)
+	local floor = minSize or 1
+	local cap = Widgets.Make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = floor }, label)
+	if CAPTURE then
+		return cap
+	end
+	local function update()
+		local k = 1
+		local node: Instance? = label
+		while node do
+			local scale = node:FindFirstChildWhichIsA("UIScale")
+			if scale then
+				k *= scale.Scale
+			end
+			node = node.Parent
+		end
+		local top = math.max(1, math.floor(maxSize * k + 0.5))
+		cap.MaxTextSize = top
+		cap.MinTextSize = math.min(floor, top)
+	end
+	label:GetPropertyChangedSignal("AbsoluteSize"):Connect(update)
+	label.AncestryChanged:Connect(update)
+	update()
+	return cap
+end
+
 local function targetSize(props): (number, number)
 	local size = props and props.Size
 	if typeof(size) == "UDim2" then
@@ -181,7 +214,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+		Widgets.TextCap(mark, 40)
 	end
 	local words = Widgets.PARCHMENT_LABELS[name]
 	if words then
@@ -197,7 +230,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 44 }, label)
+		Widgets.TextCap(label, 44)
 		if window then
 			-- The window art's close button: a ✕ where it is painted.
 			local close = Widgets.Make("TextLabel", {
@@ -212,7 +245,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 				Font = Enum.Font.GothamBold,
 				ZIndex = (props and props.ZIndex or 1) + 1,
 			}, frame)
-			Widgets.Make("UITextSizeConstraint", { MaxTextSize = 48 }, close)
+			Widgets.TextCap(close, 48)
 		end
 	end
 	local glyph = Widgets.PARCHMENT_GLYPHS[name]
@@ -231,7 +264,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+		Widgets.TextCap(mark, 40)
 	end
 	return applyFrame(frame, props)
 end
@@ -284,10 +317,19 @@ end
 -- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
 -- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
 -- share of the whole, so the sprite still resizes as one image.
+-- The uploaded atlas holding sprite `name` (art/ui/pack_atlas.py), or nil.
+local function atlasImage(name: string): string?
+	local sprite = UiAssets.sprite(name)
+	if sprite and type(sprite.atlas) == "string" and type(sprite.rect) == "table" then
+		return UiAssets.image(sprite.atlas)
+	end
+	return nil
+end
+
 local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	local ids = {}
 	for _, tile in sprite.tiles do
-		local id = UiAssets.image(tile[1])
+		local id = atlasImage(tile[1]) or UiAssets.image(tile[1])
 		if id == nil then
 			return nil
 		end
@@ -304,6 +346,11 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 			Size = UDim2.fromScale(tile[4] / sprite.w, tile[5] / sprite.h),
 			ZIndex = holder.ZIndex,
 		}, holder)
+		local piece = UiAssets.sprite(tile[1])
+		if atlasImage(tile[1]) and piece then
+			image.ImageRectOffset = Vector2.new(piece.rect[1], piece.rect[2])
+			image.ImageRectSize = Vector2.new(piece.rect[3], piece.rect[4])
+		end
 		SpriteLoader.Assign(image, ids[tile[1]])
 	end
 	return holder
@@ -316,16 +363,11 @@ end
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	local atlas = whole
-		and type(whole.atlas) == "string"
-		and type(whole.rect) == "table"
-		and UiAssets.image(whole.atlas)
-	-- Art too big for one image is drawn from its scaled-down atlas copy when
-	-- that is uploaded, else from its tiles.
-	local wasTiled = whole and type(whole.tiles) == "table"
-	if wasTiled and not atlas then
+	-- Art too big for one image is laid together from its tiles.
+	if whole and type(whole.tiles) == "table" then
 		return tiled(name, whole, props, parent) or fallback(name, props, parent)
 	end
+	local atlas = atlasImage(name)
 	local id = atlas or UiAssets.image(name)
 	if id == nil then
 		return fallback(name, props, parent)
@@ -341,6 +383,12 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 	local sprite = UiAssets.sprite(name)
 	if center and sprite then
 		image.ScaleType = Enum.ScaleType.Slice
+		if atlas then
+			-- Roblox reads SliceCenter in the whole image's pixels, not relative to
+			-- ImageRectOffset: move the centre to the sprite's place in the atlas.
+			local offset = Vector2.new(whole.rect[1], whole.rect[2])
+			center = Rect.new(center.Min + offset, center.Max + offset)
+		end
 		image.SliceCenter = center
 		local width, height = targetSize(props)
 		if sliceScale then
@@ -348,7 +396,7 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 		elseif width > 0 and height > 0 then
 			image.SliceScale = HudModel.SliceScale(sprite.w, sprite.h, width, height)
 		end
-	elseif wasTiled or string.sub(name, 1, 5) == "fill_" then
+	elseif string.sub(name, 1, 5) == "fill_" then
 		image.ScaleType = Enum.ScaleType.Stretch
 	else
 		image.ScaleType = Enum.ScaleType.Fit
