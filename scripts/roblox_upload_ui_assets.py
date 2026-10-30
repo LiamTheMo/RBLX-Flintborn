@@ -92,7 +92,8 @@ def creator_from_env():
 
 
 def sync_sprites():
-    """UiSprites.json = {name: {w, h, slice}} copied from the slicer's manifest."""
+    """UiSprites.json = {name: {w, h, slice}} copied from the slicer's manifest,
+    with "atlas" and "rect" for sprites packed into an atlas (pack_atlas.py)."""
     manifest = load_json(MANIFEST)
     if not manifest:
         raise ValueError(f"No manifest at {MANIFEST}")
@@ -105,6 +106,10 @@ def sync_sprites():
         if entry.get("tiles"):
             # Art too big for one image: [tile name, x, y, w, h] pieces.
             out[name]["tiles"] = entry["tiles"]
+        if entry.get("atlas"):
+            # Also drawn from an atlas image at rect [x, y, w, h].
+            out[name]["atlas"] = entry["atlas"]
+            out[name]["rect"] = entry["rect"]
     write_json(SPRITES_FILE, out)
     sliced = sum(1 for v in out.values() if v["slice"])
     print(f"Wrote {SPRITES_FILE.relative_to(ROOT)}: {len(out)} sprites ({sliced} 9-sliced)")
