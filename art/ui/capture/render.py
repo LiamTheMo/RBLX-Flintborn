@@ -476,12 +476,18 @@ def draw_image(painter, node, box, clip):
     if w < 1 or h < 1:
         return
     rect_size = p.get("ImageRectSize") or {"X": 0, "Y": 0}
+    off = {"X": 0, "Y": 0}
     if rect_size["X"] > 0 and rect_size["Y"] > 0:
-        off = p.get("ImageRectOffset")
+        off = p.get("ImageRectOffset") or off
         img = img.crop((off["X"], off["Y"], off["X"] + rect_size["X"], off["Y"] + rect_size["Y"]))
     mode = enum(p.get("ScaleType"))
     if mode == "Slice":
-        out = nine_slice(img, p["SliceCenter"], p.get("SliceScale", 1) * node.scale_total, w, h)
+        # Roblox reads SliceCenter in the whole image's pixels, not relative to
+        # ImageRectOffset (its warning checks the centre against the rect's bounds).
+        center = p["SliceCenter"]
+        center = {"Min": {"X": center["Min"]["X"] - off["X"], "Y": center["Min"]["Y"] - off["Y"]},
+                  "Max": {"X": center["Max"]["X"] - off["X"], "Y": center["Max"]["Y"] - off["Y"]}}
+        out = nine_slice(img, center, p.get("SliceScale", 1) * node.scale_total, w, h)
         ox, oy = x, y
     elif mode in ("Fit", "Crop"):
         k = (min if mode == "Fit" else max)(w / img.width, h / img.height)

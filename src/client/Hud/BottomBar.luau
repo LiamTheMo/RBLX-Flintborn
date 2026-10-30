@@ -107,7 +107,7 @@ function BottomBar.new(parent: Instance, layout)
 			TextTruncate = Enum.TextTruncate.None,
 			ZIndex = 5,
 		}, slot)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 15, MinTextSize = 8 }, item)
+		Widgets.TextCap(item, 15, 8)
 		local count = Widgets.Text(cfg.slotNumber, {
 			Name = "Count",
 			Text = "",

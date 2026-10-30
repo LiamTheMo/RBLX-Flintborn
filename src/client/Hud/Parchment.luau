@@ -74,7 +74,7 @@ function Parchment.Text(text: string, r, parent: Instance, opts): TextLabel
 	}, parent)
 	if opts.scaled then
 		label.TextScaled = true
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = size, MinTextSize = opts.minSize or 12 }, label)
+		Widgets.TextCap(label, size, opts.minSize or 12)
 	end
 	return label
 end
