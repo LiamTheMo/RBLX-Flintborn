@@ -1,5 +1,5 @@
 -- Inventory screen item info: category tabs, search, descriptions, stat rows,
--- icons and stat chips.
+-- item art (every catalog item) and stat chips.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local ItemInfo = require(Shared.Items.ItemInfo)
@@ -92,12 +92,37 @@ test("stat rows are labelled and real", function()
 	end
 end)
 
-test("icons only where the art depicts the item", function()
-	expectEq(ItemInfo.Icon("StoneAxe"), "stone_axe", "the stone axe has its own icon")
-	expectEq(ItemInfo.Icon("IronPickaxe"), "pickaxe", "pickaxes share the pickaxe")
+test("every item resolves to kit art", function()
+	local name, tint = ItemInfo.Icon("StoneAxe")
+	expectEq(name, "stone_axe", "the stone axe has its own icon")
+	expectEq(tint, nil, "drawn as it is")
+	expectEq(ItemInfo.Icon("IronPickaxe"), "pickaxe", "the iron pickaxe is the pickaxe art")
+	local ore, oreTint = ItemInfo.Icon("IronOre")
+	expectEq(ore, "rocks", "iron ore is rocks")
+	expect(oreTint ~= nil, "tinted iron-grey")
 	expectEq(ItemInfo.Icon("Wood"), "logs", "wood shows logs")
-	expectEq(ItemInfo.Icon("Clay"), nil, "clay has none yet")
 	expectEq(ItemInfo.Icon("Nope"), nil, "unknown items have none")
+	expectEq(ItemInfo.ArtStatus("Wood"), "exact", "wood is exact")
+	expectEq(ItemInfo.ArtStatus("Clay"), "stand-in", "clay is a stand-in")
+	expectEq(ItemInfo.ArtStatus("WoodenBow"), "none", "bows have no art yet")
+	local sprites = {}
+	for _, sprite in ItemInfo.ART_SPRITES do
+		sprites[sprite] = true
+	end
+	local none = {}
+	for id, def in ItemCatalog.Items do
+		local icon = ItemInfo.Icon(id)
+		if icon == nil then
+			table.insert(none, id)
+			expect(def.weapon ~= nil and def.weapon.family == "Bow", id .. " is a bow, the only gear without art")
+		else
+			expect(sprites[ItemInfo.Sprite(icon)] == true, id .. " uses listed kit art (" .. icon .. ")")
+		end
+		if ItemInfo.EXACT[id] then
+			expectEq(ItemInfo.TINTS[id], nil, id .. " is exact, so untinted")
+		end
+	end
+	expect(#none <= 7, "only the bows lack art")
 end)
 
 test("stat chips describe the item", function()

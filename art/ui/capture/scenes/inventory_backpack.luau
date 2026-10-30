@@ -9,6 +9,13 @@ local InventoryWindow = require(Client.Hud.Screens.InventoryWindow)
 
 local W, H = 1672, 941
 
+-- Every kit sprite item art may use is in the sprite manifest (the item_info
+-- spec checks every item resolves to one of them).
+local Kit = require(Client.Hud.Kit)
+for _, sprite in ItemInfo.ART_SPRITES do
+	assert(Kit.Art.SizeOf(sprite) ~= nil, "item art missing from the manifest: " .. sprite)
+end
+
 -- Sample backpack in the mockup's order (real catalog items; ones without kit
 -- art draw the kit's fallback, their name in ink).
 local SAMPLE = {
