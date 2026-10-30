@@ -11,7 +11,10 @@ local Text = require(script.Parent.Text)
 local SectionHeader = {}
 SectionHeader.__index = SectionHeader
 
--- props: rect | size, text, icon, count, rule (default true), zIndex, name.
+-- props: rect | size, text, icon (an icon id; "ink:people" for the mockups'
+-- flat glyphs), iconRect {x, y, w, h}, count, countGap (22), textSize,
+-- textX, rule (true | false | a Divider variant; default "ink"), ruleRect
+-- {x, y, w, h}, zIndex, name.
 function SectionHeader.new(parent: Instance, props)
 	local w, h = Core.Size(props, 300, 34)
 	local base = Core.Root(parent, "SectionHeader", "header.section", props, w, h)
@@ -19,14 +22,18 @@ function SectionHeader.new(parent: Instance, props)
 	local x = 0
 	if props.icon then
 		local s = math.floor(h * 0.95)
-		self.icon = Art.Icon(base.visual, props.icon, { 0, (h - s) / 2 - 3, s, s }, { z = base.z + 1, name = "Icon" })
-		x = s + 10
+		local rect = props.iconRect or { 0, (h - s) / 2 - 3, s, s }
+		self.icon = Art.Icon(base.visual, props.icon, rect, { z = base.z + 1, name = "Icon" })
+		x = rect[1] + rect[3] + 10
 	end
-	local textW = Text.Width(props.text or "", "sectionHeader")
+	x = props.textX or x
+	local size = props.textSize
+	local textW = Text.Width(props.text or "", "sectionHeader", size)
 	self.label = Core.Label(base.visual, {
 		name = "Label",
 		text = props.text,
 		role = "sectionHeader",
+		size = size,
 		rect = { x, 0, math.min(textW + 4, w - x), h - 6 },
 		z = base.z + 1,
 	})
@@ -35,13 +42,16 @@ function SectionHeader.new(parent: Instance, props)
 			name = "Count",
 			text = props.count,
 			role = "sectionHeader",
-			rect = { x + textW + 22, 0, 120, h - 6 },
+			size = size,
+			rect = { x + textW + (props.countGap or 22), 0, 120, h - 6 },
 			z = base.z + 1,
 		})
 	end
 	if props.rule ~= false then
-		self.rule =
-			Divider.new(base.visual, { name = "Rule", rect = { 0, h - 9, w, 16 }, variant = "header", zIndex = base.z })
+		local variant = if type(props.rule) == "string" then props.rule else "ink"
+		local native = variant == "ink" or variant == "hairline"
+		local rect = props.ruleRect or (if native then { 0, h - 3, w, 2 } else { 0, h - 9, w, 16 })
+		self.rule = Divider.new(base.visual, { name = "Rule", rect = rect, variant = variant, zIndex = base.z })
 	end
 	return self
 end

@@ -61,11 +61,16 @@ function Bar.new(parent: Instance, props)
 		local nw, nh = Art.SizeOf(sprite)
 		local k = HudModel.SliceScale(nw or w, nh or h, w, h)
 		Art.Plate(base.visual, frame[1], w, h, { z = base.z })
+		-- The well is measured from the sprite's corner; the plate is drawn
+		-- outset so its visible edge sits on the rect.
+		local out = Art.Outset(frame[1], sprite, w, h)
+		local l, t = frame[2] * k - out[1], frame[3] * k - out[2]
+		local r, b = frame[4] * k - out[3], frame[5] * k - out[4]
 		well = {
-			math.floor(frame[2] * k + 0.5),
-			math.floor(frame[3] * k + 0.5),
-			w - math.floor((frame[2] + frame[4]) * k + 0.5),
-			h - math.floor((frame[3] + frame[5]) * k + 0.5),
+			math.floor(l + 0.5),
+			math.floor(t + 0.5),
+			w - math.floor(l + r + 0.5),
+			h - math.floor(t + b + 0.5),
 		}
 		if frameKey == "stat" then
 			-- The icon box is the left inset, the value box the right one.

@@ -46,7 +46,11 @@
     "black": "#000000",
     "leaderTint": "#FFF0D2",
     "checkTint": "#FFD52A",
-    "notReadyTint": "#C8C8C8"
+    "notReadyTint": "#C8C8C8",
+    "emptyDot": "#DFB791",
+    "hairline": "#EECBA4",
+    "railTrack": "#E8C49A",
+    "railThumb": "#9F6F4C"
   },
   "veil": { "color": "veil", "transparency": 0.3 },
   "tints": { "hover": 0.93, "pressed": 0.8, "disabled": 0.72, "locked": 0.72 },

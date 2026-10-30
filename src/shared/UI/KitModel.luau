@@ -11,7 +11,10 @@ local KitModel = {}
 -- while the art is not uploaded (paper, leather, slot, window, track, fill,
 -- glyph, rule, none); `fill` is the stand-in colour of a bar fill and `glyph` the
 -- text of a glyph stand-in; `grow` draws a state's sprite that many px larger
--- per side (glow rings sit outside the plate). Screens never name sprites: they name roles.
+-- per side (glow rings sit outside the plate). `native` roles are drawn as
+-- flat kit shapes by design (the mockups' plain discs and rails), never as a
+-- sprite; `edge = false` keeps a sprite at its rect instead of placing its
+-- visible edge there (see EDGES). Screens never name sprites: they name roles.
 KitModel.ROLES = {
 	-- Windows, dialogs and panels
 	["window.frame"] = { sprite = "lk_window_frame", material = "window" },
@@ -22,10 +25,16 @@ KitModel.ROLES = {
 	["dialog.frame"] = { sprite = "lk_dialog_frame", material = "window" },
 	["toast.frame"] = { sprite = "lk_toast_frame", material = "paper" },
 	["tooltip.box"] = { sprite = "lk_tooltip", material = "paper" },
-	["tooltip.tail"] = { sprite = "lk_tooltip_tail", material = "none" },
+	["tooltip.tail"] = { sprite = "lk_tooltip_tail", material = "none", edge = false },
 	["panel.inset"] = { sprite = "lk_panel_inset", material = "paper" },
 	["panel.card"] = { sprite = "lk_panel", material = "paper" },
 	["panel.plaque"] = { sprite = "lk_plaque_small", material = "paper" },
+	-- The HUD's party panel (M01): the window frame's parchment and corners.
+	["panel.party"] = { sprite = "lk_window_frame", material = "window" },
+	["hud.playerCard"] = { sprite = "lk_player_card", material = "paper" },
+	["hud.leaf"] = { sprite = "lk_emblem_leaf", material = "glyph", glyph = "❦", edge = false },
+	-- The painted island (Play window, Journal map page, world map).
+	["map.island"] = { sprite = "pm_map_island", material = "paper", edge = false },
 
 	-- Buttons
 	["button.primary"] = {
@@ -50,6 +59,8 @@ KitModel.ROLES = {
 		sprite = "lk_plaque_notched_leather",
 		material = "leather",
 		states = { disabled = "lk_plaque_notched_disabled" },
+		-- No hover art: the plate lifts (scale) instead of darkening.
+		untinted = { hover = true, focused = true },
 	},
 	["button.playSecondary"] = {
 		sprite = "lk_plaque_notched_paper",
@@ -181,6 +192,10 @@ KitModel.ROLES = {
 	["checkbox.on"] = { sprite = "lk_checkbox_on", material = "paper", glyph = "✓" },
 	["check.tileOff"] = { sprite = "lk_tile_check_off", material = "paper" },
 	["check.tileOn"] = { sprite = "lk_tile_check_on", material = "paper", glyph = "✓" },
+	-- The quest objective's round check (M07): the empty ring, and the ring
+	-- filled when done (a check mark is laid over it).
+	["check.ringOff"] = { sprite = "lk_ring_track", material = "none" },
+	["check.ringOn"] = { sprite = "lk_ring_full", material = "fill", fill = "gold" },
 	["toggle.off"] = { sprite = "lk_toggle_off", material = "paper" },
 	["toggle.on"] = { sprite = "lk_toggle_on", material = "fill", fill = "toggleOn" },
 	["slider.track"] = { sprite = "lk_bar_track", material = "track" },
@@ -199,18 +214,32 @@ KitModel.ROLES = {
 		material = "paper",
 		states = { hover = "lk_button_paper_small_hover", disabled = "lk_button_paper_small_disabled" },
 	},
-	["scroll.track"] = { sprite = "lk_scroll_track", material = "track" },
-	["scroll.thumb"] = { sprite = "lk_scroll_thumb", material = "leather" },
+	["scroll.track"] = { sprite = "lk_scroll_track", material = "track", edge = false },
+	["scroll.thumb"] = { sprite = "lk_scroll_thumb", material = "leather", edge = false },
+	-- The thin flat rail of the HUD party list and long lists (about 8 px).
+	["scroll.thinTrack"] = { native = true, material = "fill", fill = "railTrack" },
+	["scroll.thinThumb"] = { native = true, material = "fill", fill = "railThumb" },
 
 	-- Dividers
 	["divider.rule"] = { sprite = "lk_divider_line", material = "rule" },
 	["divider.ornate"] = { sprite = "lk_divider_ornament", material = "rule" },
 	["divider.diamond"] = { sprite = "lk_divider_diamond", material = "rule" },
 	["divider.vertical"] = { sprite = "lk_divider_vertical", material = "rule" },
+	-- Plain rules: most mockup rules are a thin ink line or a faint hairline.
+	["divider.ink"] = { native = true, material = "rule", fill = "ruleDark" },
+	["divider.hairline"] = { native = true, material = "rule", fill = "hairline" },
 
 	-- Rows
 	["row.plate"] = {
 		sprite = "lk_row_normal",
+		material = "paper",
+		states = { selected = "lk_row_hover", disabled = "lk_row_disabled", locked = "lk_row_disabled" },
+		grow = { lk_row_hover = 2 },
+	},
+	-- The mockups' soft cards (M06 recipes and materials, M07 quests): the thin
+	-- inset border, gold glow when selected.
+	["row.soft"] = {
+		sprite = "lk_panel_inset",
 		material = "paper",
 		states = { selected = "lk_row_hover", disabled = "lk_row_disabled", locked = "lk_row_disabled" },
 		grow = { lk_row_hover = 2 },
@@ -221,7 +250,8 @@ KitModel.ROLES = {
 	["currency.pill"] = { sprite = "lk_currency_pill", material = "paper" },
 	["portrait.square"] = { sprite = "lk_portrait_frame", material = "none" },
 	["portrait.round"] = { sprite = "lk_frame_hollow_circle", material = "none" },
-	["portrait.empty"] = { sprite = "lk_frame_round_paper", material = "dot", fill = "paperDisabled" },
+	-- The empty party slot (M01, M04): a flat tan disc.
+	["portrait.empty"] = { native = true, material = "dot", fill = "emptyDot" },
 
 	-- Marks drawn on top of other parts
 	["mark.lock"] = { sprite = "lk_icon_lock", material = "glyph", glyph = "🔒" },
@@ -315,10 +345,180 @@ function KitModel.ArtFor(roleName: string, state: string): (string?, boolean)
 			return states[other], false
 		end
 	end
-	return role.sprite, state ~= "normal" and state ~= "selected" and state ~= "empty"
+	local untinted = role.untinted and role.untinted[state]
+	return role.sprite, not untinted and state ~= "normal" and state ~= "selected" and state ~= "empty"
 end
 
--- Every lk_* name the role table uses, sorted.
+-- The transparent margin [left, top, right, bottom] round each lk_ plate's
+-- visible edge, in the sprite's own px (middle row and column, alpha > 128).
+-- Plates are drawn outset by it (times their scale), so the art's visible edge
+-- lands exactly on the component's rect. Regenerate with
+-- `python3 art/ui/capture/capture.py --edges`.
+KitModel.EDGES = {
+	lk_badge_count = { 2, 2, 2, 2 },
+	lk_badge_count_wide = { 2, 3, 2, 2 },
+	lk_badge_number = { 2, 2, 2, 2 },
+	lk_banner_leather = { 2, 3, 2, 4 },
+	lk_banner_paper = { 5, 5, 5, 7 },
+	lk_bar_fill_blue = { 2, 2, 2, 2 },
+	lk_bar_fill_green = { 2, 2, 2, 2 },
+	lk_bar_fill_orange = { 2, 2, 2, 2 },
+	lk_bar_fill_red = { 2, 3, 2, 2 },
+	lk_bar_fill_yellow = { 2, 2, 2, 2 },
+	lk_bar_frame = { 3, 5, 3, 4 },
+	lk_bar_frame_plain = { 3, 5, 3, 4 },
+	lk_bar_frame_thin = { 2, 2, 2, 2 },
+	lk_bar_track = { 2, 2, 2, 3 },
+	lk_button_close_disabled = { 3, 2, 2, 2 },
+	lk_button_close_hover = { 2, 2, 2, 3 },
+	lk_button_close_normal = { 2, 2, 2, 2 },
+	lk_button_close_pressed = { 3, 2, 2, 2 },
+	lk_button_flat_disabled = { 3, 2, 2, 3 },
+	lk_button_flat_leather = { 3, 2, 2, 2 },
+	lk_button_flat_paper = { 2, 2, 3, 3 },
+	lk_button_hud = { 2, 2, 2, 2 },
+	lk_button_invite = { 2, 2, 2, 2 },
+	lk_button_invite_card = { 4, 5, 4, 4 },
+	lk_button_leather_disabled = { 3, 2, 3, 2 },
+	lk_button_leather_hover = { 2, 3, 2, 3 },
+	lk_button_leather_normal = { 3, 3, 2, 3 },
+	lk_button_leather_pressed = { 3, 2, 2, 3 },
+	lk_button_paper_disabled = { 2, 2, 3, 2 },
+	lk_button_paper_hover = { 2, 2, 2, 2 },
+	lk_button_paper_normal = { 2, 2, 2, 2 },
+	lk_button_paper_pressed = { 2, 3, 2, 3 },
+	lk_button_paper_small_disabled = { 2, 2, 2, 2 },
+	lk_button_paper_small_hover = { 3, 2, 2, 2 },
+	lk_button_paper_small_normal = { 2, 2, 2, 2 },
+	lk_button_play_square = { 2, 2, 2, 2 },
+	lk_button_settings = { 2, 2, 3, 2 },
+	lk_button_square_leather = { 2, 2, 2, 3 },
+	lk_button_square_paper = { 2, 2, 2, 2 },
+	lk_button_square_small = { 3, 3, 3, 2 },
+	lk_button_stepper_minus = { 2, 2, 2, 2 },
+	lk_button_stepper_plus = { 2, 2, 2, 2 },
+	lk_card_detail = { 3, 3, 2, 2 },
+	lk_checkbox_off = { 2, 2, 2, 2 },
+	lk_checkbox_on = { 2, 2, 2, 2 },
+	lk_clasp_left = { 2, 3, 2, 3 },
+	lk_clasp_right = { 2, 4, 2, 4 },
+	lk_corner_bl = { 2, 15, 12, 2 },
+	lk_corner_br = { 10, 13, 2, 2 },
+	lk_corner_fold = { 19, 4, 2, 23 },
+	lk_corner_ornate_bl = { 2, 21, 23, 2 },
+	lk_corner_ornate_br = { 23, 21, 3, 2 },
+	lk_corner_ornate_tl = { 2, 3, 24, 22 },
+	lk_corner_ornate_tr = { 24, 2, 3, 22 },
+	lk_corner_tl = { 2, 2, 13, 14 },
+	lk_corner_tr = { 13, 2, 2, 12 },
+	lk_currency_pill = { 3, 3, 2, 2 },
+	lk_dialog_frame = { 5, 9, 7, 6 },
+	lk_divider_diamond = { 2, 9, 2, 8 },
+	lk_divider_line = { 2, 7, 2, 6 },
+	lk_divider_ornament = { 3, 0, 233, 0 },
+	lk_divider_vertical = { 8, 2, 8, 3 },
+	lk_dropdown = { 3, 3, 3, 3 },
+	lk_dropdown_button = { 2, 2, 2, 2 },
+	lk_emblem_leaf = { 6, 3, 6, 3 },
+	lk_emblem_rune = { 18, 2, 18, 2 },
+	lk_frame_capped_hollow = { 2, 4, 2, 3 },
+	lk_frame_hollow = { 4, 3, 4, 3 },
+	lk_frame_hollow_bar = { 3, 3, 3, 3 },
+	lk_frame_hollow_capped = { 3, 3, 3, 3 },
+	lk_frame_hollow_circle = { 3, 3, 3, 3 },
+	lk_frame_hollow_large = { 3, 3, 4, 2 },
+	lk_frame_hollow_small = { 2, 3, 3, 3 },
+	lk_frame_hollow_speech = { 3, 3, 3, 12 },
+	lk_frame_hollow_wide = { 3, 3, 3, 3 },
+	lk_frame_rails = { 3, 3, 3, 3 },
+	lk_frame_ring = { 2, 2, 3, 2 },
+	lk_frame_ring_leaves = { 7, 3, 6, 2 },
+	lk_frame_round = { 2, 2, 2, 2 },
+	lk_frame_round_paper = { 2, 2, 2, 2 },
+	lk_keycap = { 3, 2, 2, 2 },
+	lk_keycap_wide = { 2, 3, 2, 2 },
+	lk_map_parchment = { 7, 5, 7, 6 },
+	lk_medallion_octagon = { 4, 2, 4, 2 },
+	lk_medallion_round = { 3, 2, 4, 2 },
+	lk_medallion_square = { 4, 4, 4, 4 },
+	lk_nail = { 7, 2, 7, 2 },
+	lk_panel = { 4, 3, 3, 3 },
+	lk_panel_inset = { 2, 2, 2, 2 },
+	lk_pill_value = { 2, 3, 2, 3 },
+	lk_plaque_capped = { 3, 4, 2, 3 },
+	lk_plaque_leather = { 2, 2, 3, 3 },
+	lk_plaque_leather_bar = { 3, 3, 2, 3 },
+	lk_plaque_notched_disabled = { 2, 2, 2, 3 },
+	lk_plaque_notched_leather = { 2, 2, 2, 2 },
+	lk_plaque_notched_paper = { 2, 2, 2, 3 },
+	lk_plaque_paper = { 4, 3, 4, 3 },
+	lk_plaque_paper_bar = { 2, 3, 2, 3 },
+	lk_plaque_rivet_leather = { 2, 3, 2, 2 },
+	lk_plaque_rivet_paper = { 2, 3, 2, 3 },
+	lk_plaque_small = { 3, 3, 2, 3 },
+	lk_player_card = { 3, 8, 5, 10 },
+	lk_portrait_frame = { 4, 4, 4, 3 },
+	lk_portrait_plaque = { 3, 7, 3, 7 },
+	lk_rail_h = { 3, 3, 2, 3 },
+	lk_rail_v = { 3, 2, 3, 3 },
+	lk_ring_full = { 2, 2, 2, 2 },
+	lk_ring_half = { 2, 2, 2, 2 },
+	lk_ring_track = { 2, 2, 2, 2 },
+	lk_rivet = { 2, 2, 2, 2 },
+	lk_rope_cross = { 10, 2, 3, 3 },
+	lk_rope_knot = { 9, 8, 2, 13 },
+	lk_rope_ring = { 2, 3, 2, 2 },
+	lk_row_bullet = { 2, 2, 2, 3 },
+	lk_row_check_off = { 2, 2, 2, 3 },
+	lk_row_check_on = { 2, 2, 2, 3 },
+	lk_row_disabled = { 2, 2, 2, 2 },
+	lk_row_hover = { 3, 3, 3, 3 },
+	lk_row_normal = { 2, 3, 3, 3 },
+	lk_scroll_thumb = { 2, 2, 2, 2 },
+	lk_scroll_track = { 2, 2, 2, 2 },
+	lk_search = { 3, 3, 2, 3 },
+	lk_slider_knob = { 2, 2, 2, 2 },
+	lk_slider_track = { 2, 2, 2, 2 },
+	lk_slot_disabled = { 2, 3, 2, 2 },
+	lk_slot_hotbar = { 2, 3, 3, 2 },
+	lk_slot_hover = { 2, 4, 2, 2 },
+	lk_slot_item_normal = { 2, 2, 3, 3 },
+	lk_slot_item_selected = { 2, 2, 2, 2 },
+	lk_slot_locked = { 2, 3, 2, 2 },
+	lk_slot_normal = { 2, 3, 2, 2 },
+	lk_slot_selected = { 2, 2, 2, 2 },
+	lk_spike = { 4, 2, 4, 2 },
+	lk_statbar_frame = { 3, 8, 3, 6 },
+	lk_stepper_box = { 3, 3, 2, 2 },
+	lk_strap_leather = { 3, 5, 3, 4 },
+	lk_strap_leather_short = { 3, 4, 3, 4 },
+	lk_tab_arrow_leather = { 3, 2, 2, 2 },
+	lk_tab_arrow_paper = { 3, 3, 2, 3 },
+	lk_tab_category = { 3, 4, 3, 5 },
+	lk_tile_blank = { 2, 2, 2, 3 },
+	lk_tile_check_off = { 2, 3, 2, 3 },
+	lk_tile_check_on = { 2, 3, 2, 3 },
+	lk_tile_frame = { 3, 3, 3, 3 },
+	lk_tile_header = { 3, 2, 3, 3 },
+	lk_tile_paper = { 3, 3, 3, 3 },
+	lk_tile_rail = { 4, 3, 3, 3 },
+	lk_tile_small = { 3, 3, 2, 2 },
+	lk_tile_tab = { 3, 2, 3, 3 },
+	lk_toast_frame = { 4, 6, 3, 5 },
+	lk_toggle_off = { 2, 2, 2, 2 },
+	lk_toggle_on = { 2, 2, 2, 2 },
+	lk_tooltip = { 3, 3, 3, 3 },
+	lk_tooltip_tail = { 8, 2, 8, 2 },
+	lk_window_clasp_frame = { 4, 5, 5, 4 },
+	lk_window_frame = { 5, 5, 5, 5 },
+}
+
+-- The margin of `sprite` (zeros when unknown).
+function KitModel.Edge(sprite: string?): { number }
+	return sprite and KitModel.EDGES[sprite] or { 0, 0, 0, 0 }
+end
+
+-- Every sprite name the role table uses, sorted (native roles have none).
 function KitModel.Sprites(): { string }
 	local seen, list = {}, {}
 	local function add(name)

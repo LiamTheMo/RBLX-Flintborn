@@ -1,5 +1,7 @@
--- A catalog item's picture: lk_item_<CatalogId>, then item_<CatalogId>; with
--- neither, the item's name in ink (as ItemSlot did), so nothing reads blank.
+-- A catalog item's picture, from ItemInfo.Icon(catalogId) (the single
+-- item-to-icon source; it may return a tint too), then lk_item_<CatalogId> /
+-- item_<CatalogId>, then the `icon` prop; with none, the item's name in ink,
+-- so nothing reads blank.
 --
 --   Kit.ItemIcon.new(slot, { rect = { 10, 10, 70, 70 }, catalogId = "StoneAxe" })
 
@@ -26,16 +28,24 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 	end
 	self.catalogId = catalogId
 	local z = self.base.z + 1
-	local sprite = Art.ItemSprite(catalogId)
-	if sprite then
+	-- ItemInfo.Icon is the one item-to-art source (owned with the item data);
+	-- its optional tint recolours shared art (an ore drawn from the stone icon).
+	local artIcon, tint = Art.ItemIcon(catalogId)
+	local sprite = if artIcon then nil else Art.ItemSprite(catalogId)
+	self.root:SetAttribute("KitRole", "item." .. tostring(artIcon or sprite or icon or catalogId))
+	if artIcon or (sprite == nil and icon) then
+		self.image = Art.Icon(self.base.visual, artIcon or icon :: string, { 0, 0, self.w, self.h }, {
+			z = z,
+			name = "Item",
+			color = if artIcon then tint else nil,
+		})
+	elseif sprite then
 		self.image = Art.Sprite(sprite, self.w, self.h, self.base.visual, {
 			Name = "Item",
 			Size = UDim2.fromScale(1, 1),
 			ZIndex = z,
 			ScaleType = Enum.ScaleType.Fit,
 		})
-	elseif icon then
-		self.image = Art.Icon(self.base.visual, icon, { 0, 0, self.w, self.h }, { z = z, name = "Item" })
 	elseif catalogId then
 		self.image = Core.Label(self.base.visual, {
 			name = "ItemName",

@@ -140,6 +140,29 @@ def run_scene(name: str, extra_ids):
     return [json.loads(d) for d in dumps]
 
 
+def edges():
+    """Prints KitModel.EDGES: for every lk_ plate sprite, the transparent margin
+    [left, top, right, bottom] between the image edge and the art's edge at the
+    middle row and column (alpha > 128), so the kit can draw the art's visible
+    edge exactly on a component's rect."""
+    from PIL import Image
+    import numpy as np
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    lines = []
+    for name in sorted(manifest):
+        if not name.startswith("lk_") or name.startswith(("lk_icon_", "lk_glyph_", "lk_dot_", "lk_item_")):
+            continue
+        alpha = np.asarray(Image.open(SPRITES / f"{name}.png").convert("RGBA"))[..., 3]
+        h, w = alpha.shape
+        out = []
+        for line in (alpha[h // 2], alpha[:, w // 2]):
+            idx = np.where(line > 128)[0]
+            out.append((int(idx[0]), int(len(line) - 1 - idx[-1])) if len(idx) else (0, 0))
+        (l, r), (t, b) = out
+        lines.append(f"\t{name} = {{ {l}, {t}, {r}, {b} }},")
+    print("KitModel.EDGES = {\n" + "\n".join(lines) + "\n}")
+
+
 def compare(capture: Path, reference: Path, crop=None):
     """Side by side and a 50 % overlay of a capture and its reference."""
     from PIL import Image, ImageDraw
@@ -177,7 +200,11 @@ def main():
     parser.add_argument("--compare", help="reference image to put beside each capture")
     parser.add_argument("--page", type=int, help="only write this page (1-based) of a multi-page scene")
     parser.add_argument("--crop", type=int, nargs=4, metavar=("X", "Y", "W", "H"), help="crop for --compare")
+    parser.add_argument("--edges", action="store_true", help="print KitModel.EDGES from the lk_ sprites")
     args = parser.parse_args()
+    if args.edges:
+        edges()
+        return
     extra_ids = {} if args.uploaded_only else preview_ids()
     if extra_ids:
         print(f"previewing {len(extra_ids)} sprites that are not uploaded yet")

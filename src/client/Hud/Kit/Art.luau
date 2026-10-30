@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local Widgets = require(script.Parent.Parent.Widgets)
@@ -63,10 +64,16 @@ Art.GLYPHS = {
 
 -- The sprite of an icon id: lk_icon_<id>, else lk_glyph_<id> (the flat glyph
 -- first when `preferGlyph`, as on square buttons), else the id itself when it
--- already names a sprite. nil when the kit has no such art.
+-- already names a sprite. "ink:<id>" and "white:<id>" name the flat glyphs
+-- built by art/ui/capture/glyphs.py (lk_glyph_ink_<id>, lk_glyph_white_<id>).
+-- nil when the kit has no such art.
 function Art.IconSprite(id: string, preferGlyph: boolean?): string?
 	if string.sub(id, 1, 3) == "lk_" then
 		return id
+	end
+	local colour, glyph = string.match(id, "^(%a+):([%w_]+)$")
+	if colour then
+		return "lk_glyph_" .. colour .. "_" .. glyph
 	end
 	local order = if preferGlyph
 		then { "lk_glyph_" .. id, "lk_icon_" .. id }
@@ -185,7 +192,9 @@ local function paintStandIn(frame: Frame, roleName: string, state: string, w: nu
 	rule.Visible = material == "rule"
 	if material == "rule" then
 		local vertical = h > w
-		rule.Size = if vertical then UDim2.new(0, 2, 1, 0) else UDim2.new(1, 0, 0, 2)
+		local thick = role.thickness or 2
+		rule.Size = if vertical then UDim2.new(0, thick, 1, 0) else UDim2.new(1, 0, 0, thick)
+		rule.BackgroundColor3 = Tokens.Color(role.fill or "divider")
 	end
 	local text = role.glyph
 	if text == nil and material == "glyph" then
@@ -265,7 +274,9 @@ PlateMethods.__index = PlateMethods
 -- The art of a role in all its states, at design size w × h, filling
 -- `parent` (or opts.rect). Each state's sprite is built the first time it is
 -- shown and then only toggled, so a state change never rebuilds or refetches.
--- opts: rect {x, y, w, h}, z, tint (a Color3 laid over every state).
+-- opts: rect {x, y, w, h}, z, tint (a Color3 laid over every state), exact
+-- (default true: the art's visible edge sits on the rect; false draws the
+-- sprite image itself at the rect, its transparent margin inside).
 function Art.Plate(parent: Instance, roleName: string, w: number, h: number, opts): Plate
 	opts = opts or {}
 	local holder = Core.Make("Frame", {
@@ -287,6 +298,7 @@ function Art.Plate(parent: Instance, roleName: string, w: number, h: number, opt
 		h = h,
 		z = opts.z or 4,
 		tint = opts.tint,
+		exact = opts.exact ~= false,
 		alpha = 0,
 		variants = {},
 	}, PlateMethods)
@@ -294,19 +306,44 @@ function Art.Plate(parent: Instance, roleName: string, w: number, h: number, opt
 	return self :: any
 end
 
+-- Materials whose art is placed as stored (lines, fills, dots and glyphs
+-- sit inside their rect by design).
+local AS_STORED = { rule = true, fill = true, dot = true, glyph = true }
+
+-- How far (design px per side) a sprite is drawn outside the plate so its
+-- visible edge lands on the plate's rect: KitModel.EDGES at the sprite's scale.
+function Art.Outset(roleName: string, sprite: string, w: number, h: number): { number }
+	local role = Art.ROLES[roleName]
+	if role == nil or role.edge == false or AS_STORED[role.material] then
+		return { 0, 0, 0, 0 }
+	end
+	local edge = KitModel.Edge(sprite)
+	local nw, nh = Art.SizeOf(sprite)
+	if nw == nil or nh == nil then
+		return { 0, 0, 0, 0 }
+	end
+	-- 9-sliced art keeps its corners at the slice scale; fitted art scales whole.
+	local k = Art.SliceScale(sprite, w, h) or math.min(w / nw, h / nh)
+	return { edge[1] * k, edge[2] * k, edge[3] * k, edge[4] * k }
+end
+
 function PlateMethods:_variant(sprite: string): GuiObject
 	local variant = self.variants[sprite]
 	if variant then
 		return variant
 	end
-	if Widgets.HasArt(sprite) then
-		-- A state's art may be drawn larger than the plate (a slot's glow ring).
+	if sprite ~= "native" and Widgets.HasArt(sprite) then
+		-- A state's art may be drawn larger than the plate (a slot's glow ring),
+		-- and every plate is outset so its visible edge sits on the rect.
 		local role = Art.ROLES[self.role]
 		local grow = role and role.grow and role.grow[sprite] or 0
-		variant = Art.Sprite(sprite, self.w + grow * 2, self.h + grow * 2, self.holder, {
+		local out = if self.exact then Art.Outset(self.role, sprite, self.w, self.h) else { 0, 0, 0, 0 }
+		local l, t = grow + out[1], grow + out[2]
+		local dw, dh = grow * 2 + out[1] + out[3], grow * 2 + out[2] + out[4]
+		variant = Art.Sprite(sprite, self.w + dw, self.h + dh, self.holder, {
 			Name = sprite,
-			Position = UDim2.fromOffset(-grow, -grow),
-			Size = UDim2.new(1, grow * 2, 1, grow * 2),
+			Position = UDim2.fromOffset(-l, -t),
+			Size = UDim2.new(1, dw, 1, dh),
 			ZIndex = self.z,
 		})
 	else
@@ -328,7 +365,12 @@ end
 -- Draws the role in `state`.
 function PlateMethods:Show(state: string)
 	self.state = state
+	local role = Art.ROLES[self.role]
 	local sprite, borrowed = KitModel.ArtFor(self.role, state)
+	if role and role.native then
+		-- Drawn as a flat kit shape by design (plain rules, discs, thin rails).
+		sprite, borrowed = "native", false
+	end
 	local shown = sprite and self:_variant(sprite)
 	for _, variant in self.variants do
 		variant.Visible = variant == shown
@@ -382,9 +424,10 @@ end
 -- Glyphs drawn white (for leather); on paper they are tinted ink.
 Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_backpack_white = true }
 
--- An icon by id (lk_icon_<id> / lk_glyph_<id>) at rect, fitted. opts: tint
--- (colour token), glyph (prefer the flat glyph), z, name. Before upload it is
--- its glyph in ink.
+-- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>")
+-- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
+-- recolours), glyph (prefer the flat glyph), z, name. Before upload it is its
+-- glyph in ink.
 function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
 	local sprite = Art.IconSprite(id, opts.glyph)
@@ -396,8 +439,12 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 			ZIndex = z,
 			ScaleType = Enum.ScaleType.Fit,
 		})
-		if opts.tint and image:IsA("ImageLabel") then
-			image.ImageColor3 = Tokens.Color(opts.tint)
+		if image:IsA("ImageLabel") then
+			if opts.tint then
+				image.ImageColor3 = Tokens.Color(opts.tint)
+			elseif opts.color then
+				image.ImageColor3 = opts.color
+			end
 		end
 		return image
 	end
@@ -415,6 +462,19 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	glyph.FontFace = Tokens.Font("symbol")
 	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * 0.8)))
 	return glyph
+end
+
+-- The icon id (and optional Color3 tint) ItemInfo.Icon gives a catalog item,
+-- when the kit can draw it; nil otherwise.
+function Art.ItemIcon(catalogId: string?): (string?, Color3?)
+	if catalogId == nil then
+		return nil, nil
+	end
+	local ok, icon, tint = pcall(ItemInfo.Icon, catalogId)
+	if not ok or type(icon) ~= "string" or Art.IconSprite(icon) == nil then
+		return nil, nil
+	end
+	return icon, if typeof(tint) == "Color3" then tint else nil
 end
 
 -- The sprite of a catalog item: lk_item_<id>, then item_<id>; nil when neither
