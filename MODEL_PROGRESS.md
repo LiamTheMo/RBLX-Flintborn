@@ -251,11 +251,11 @@ Skill vs design doc / repo (design doc wins, reported):
 | 052 | Flintborn Boardwalk model study | World & resources | ✅ | 2484; parts 102 / 62 / 12 / 12 / 176 / 12 / 24 | modeller + fresh verifier; R1 PASS 8 | Studio check: 1.12 stair risers walkable; minors: deck smoother than the sheet (edge bands); gold share low; post middle band dark; caps blow out; Brace part stubby |
 | 053 | Flintborn dead tree asset study | World & resources | ✅ | 3562; parts 880 / 216 / 172 / 152 / 120 / 104 / 120 | modeller + fresh verifier; R1 PASS 7 | minors: knot hidden at the f34; crown chunkier and less branched (taper, Y-fork tips); lit wood low; moss olive in shade; hero 17 deep; top view tangled |
 | 054 | Flintborn broadleaf tree study | World & resources | ⬜ | | | |
-| 055 | Fallen Log Model Study | World & resources | ⬜ | | | |
-| 056 | Moss and Ivy model study | World & resources | ⬜ | | | |
+| 055 | Fallen Log Model Study | World & resources | ✅ | 3558; parts 956 / 410 / 112 / 260 / 30 / 72 | modeller + fresh verifier; R1 PASS 8 | minors: f34 fill low (dressing past the log ends); f34 bore reads brown; branch fork barely reads; +X flank dark (studio light); cap grain ring missing (main session fixed the rock_dark key, B ≤ G + 4) |
+| 056 | Moss and Ivy model study | World & resources | ✅ | 3850 (+6 parts) | V1 FAIL 7/10 (cushion parts), V2 PASS 8/10 | ivy thinner than the sheet (budget); stone tan under the studio light; hero cushions single mounds |
 | 057 | Flintborn Ancient Tree Model Study | World & resources | ⬜ | | | |
 | 058 | Flintborn Low Bush Study | World & resources | ⬜ | | | |
-| 059 | Flintborn grass tuft model study | World & resources | ⬜ | | | |
+| 059 | Flintborn grass tuft model study | World & resources | ✅ | 704 (+9 parts) | V1 PASS 8/10 | rear reads dark (dark blades in front); root stub shows from side/rear; RootBase part arms short |
 | 060 | Broadleaf Fern Model Study | World & resources | ⬜ | | | |
 | 061 | Flintborn Meadow Herb Study | World & resources | ⬜ | | | |
 | 062 | Flintborn Ground Scatter Study | World & resources | ⬜ | | | |
@@ -435,3 +435,6 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-29: 051 Rope Crossing built by a parallel modeller: a sagging 10-plank rope footbridge between four faceted anchor stones under timber posts with twisted rope coils, red cloth wraps and backstays, main ropes with hangers, diagonals and links, a low end sill and open walk-on ends; walkable within 17° and 0.08 steps. R1 PASS 8 on the first round.
 - 2026-10-29: 052 Boardwalk built by a parallel modeller: a 32 × 9.5 timber walkway at deck 5.6 on square posts, 17 gapped planks notched round the posts, a back and +X end rail, open front for joins, 4-tread stairs to the ground, symmetric braces, brass hex bolts and a twisted rope tie. R1 PASS 8 on the first round.
 - 2026-10-30: 053 Dead Tree built by a parallel modeller: an 18-stud bare twisted snag of six rope strands with "/" grooves, six plug-in kinked limb modules with blunt square-cut tines, six split-toe roots, about 50 bore pits, a ringed knot hole and a snapped limb, with pale rocks, lime tufts and moss at the foot. R1 PASS 7 on the first round.
+- 2026-10-30: 055 Fallen Log built by a parallel modeller: a Ø 5 × 14 hollow log of 12 planked staves with V grooves, an open broken end of staggered blocks round a round black bore, a cracked cut-end cap, a Y branch stub, 63 flat lobed moss leaves in rosettes and chains, neutral faceted rocks and lime tufts; climbable and walkable along the top. R1 PASS 8 on the first round.
+- 2026-10-30: 056 Moss and Ivy built by a parallel modeller: an 11-stud ruin block of 26 chamfered running-bond bricks with broken corners, four ivy runs of 123 lobed leaves with lips over the top edge, flat-based moss cushions and warm rocks; lumpy sub-dome moss cushion parts and an ivy cluster, tendril, corner and leaf. R1 FAIL 7 (cushion parts read as gems), R2 PASS 8.
+- 2026-10-30: 059 Grass Tuft built by a parallel modeller: a 2.4-stud broad-leaf clump of six folded-plate blades with a midrib on a hidden cross-and-post root, three chunky base leaves, two warm-grey rocks and two tan pebbles; small-prop class, 704 tris. R1 PASS 8 on the first round.

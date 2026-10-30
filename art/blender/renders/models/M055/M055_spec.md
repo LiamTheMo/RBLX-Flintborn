@@ -765,3 +765,384 @@ All 15 recommendations are accepted.
 15. **Budget.** Limit 4000, ceiling 3600.
 
 **Shell and dressing.** The log reads as a staved barrel, not a smooth cylinder. 0 winding errors. **No floating dressing, and nothing buried**: ray-check every moss lobe tip.
+
+## Stage 1 — Modelling (modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m055.py` (`build()`); background session port 9877 on `wip/M055.blend`. Every part has
+its own function and the hero is assembled from those same functions (no booleans anywhere).
+
+- **Frame.** Log axis along Y at x 0, z `AXZ` = 2.515 (computed so the lowest plank edge sinks 0.04 below ground z 0).
+  Open end −Y, cap +Y, branch on the +X shoulder. Everything on the ground sinks 0.03–0.04 (rocks and pebbles −0.04,
+  tuft hubs −0.03), so all grounded shells share one floor within 0.01.
+- **Shell (`shell_body`, one closed shell).** 12 staves, 3 verts each (a groove vertex 0.17 inside the stave radius
+  and two plank edges at ±10°): a flat plank top 20° wide with a 5° chamfer into a dark V groove each side;
+  alternating stave thickness +0.04/−0.03. Stations: front section Y −5.6 → −2.95 (R 2.50 / 2.48, twist 0 → 3°), the
+  half-stave seam (a zip of the front ring to the body ring at −2.85, offset 15°, body 0.06 proud), body −2.85 → 1.0 →
+  4.2 → 6.65 (R 2.54 / 2.52 / 2.50 / 2.48, twist 3 → 8°). Flat back face; front annulus at Y −5.6; a 12-sided planked
+  bore R 1.68 (Ø 3.36) from −5.6 to a dark plug at −1.9; six plank splits (long narrow V slits, 1.0–1.4 long, 0.065
+  wide, 0.075 deep) on body plank tops. `m047._zip` wrapped a triangle across the middle when the two rings' first
+  vertices straddled its start angle (210 self-intersections at the seam on the first build), so m055 has its own
+  `_zip` that starts ring B at A's start angle.
+- **Broken end (`end_block` ×12).** Each stave continues as a separate closed chamfered block seated 0.015 off the
+  shell's front face (spec §4.1 fallback, which the spec allows): the stave section (plank top, chamfers, joint walls
+  1.3° in from the joint so dark gaps show between blocks, bore face), staggered ends −6.6 … −7.1 per the spec list,
+  a 0.12 chamfer round the cut end face, and broken corners on three blocks (k 3, 7, 10).
+- **Cap (`cap_disc`, `rim_block` ×12).** A 12-sided disc R 1.705 seated on the back face (Y 6.665 → 6.95; it sits on
+  the face rather than plugging 0.3 into a bore, because the bore stops at the plug at −1.9). The disc face has nine
+  narrow radial V cracks (r 0.34 → 1.52, 0.07 deep) round a raised nine-sided pip, built as planar regions. Twelve
+  chamfered rim blocks (r 1.725 → 2.62, faces at Y 7.07–7.12, 0.10 chamfer) are aligned to the body staves, and the
+  bottom ones are clipped above the ground.
+- **Branch (`branch`, option A).** A 7-sided prism with two pulled-in crease columns runs from 0.35 inside the bark
+  through a collar (r 1.25) that flares out of the bark, a neck (r 1.0), a hard kink at the fork (2.16, 3.14, 6.45;
+  r 0.78) and the main prong to a flat chamfered cut end at (2.12, 3.95, 7.78). The 6-sided side prong is a closed
+  shell from the stem axis to (3.55, 3.25, 7.42). Lean: 50° above horizontal, 15° toward +X (decision 3). The spec's
+  §2.4 points gave 62°, so they were re-aimed. Tips were lowered so the hero is 8.07 tall.
+- **Moss (`leaf`, `moss_clump`).** 63 flat lobed leaves (5 lobes, a 10-point outline with notches at 0.70, a raised
+  centre 0.07 on top and a centre 0.02 down underneath; closed, 20 tris). Each leaf is wrapped round the log at the
+  radius of the highest bark under its footprint (radial ray casts against the shell, blocks and cap), so it bridges
+  grooves and never cuts the bark. Layers lift 0.008/0.016/0.024. Some leaves stand 15–55° off the bark, and a
+  standing leaf is lowered until its closest vertex is 0.016 off the bark (contact). Clumps: M1 big +X drape (13), M2
+  crest band to the branch foot (6), M3 +X drape (9), M4 upright top-back (5), M5 −X drape (11), M6 −X shoulder at
+  the cap (7), M7 −X mid drape (6, added for the r34), M8 two standing leaves on the +X shoulder at the cap (rear
+  cell), MF four standing leaves on the broken end's top and right (front cell). A leaf that cuts the branch or a
+  rock more than 0.03 is nudged, shrunk or dropped (2 nudged, 0 dropped).
+- **Rocks and tufts.** Seven ring-stack hull boulders (tall RK1/RK5 lean toward the log, the others have sloping
+  faceted tops, 24–30 tris, flat sunk bases) and four pebbles, at the spec's positions, guarded off the log (0 moved).
+  Nine tufts of folded lanceolate blades (8 tris, L : W 2.7) round sunk 5-sided hubs, faced toward the f34 / r34
+  camera on their side; m053's hub and blade guard, plus probes at the hub ring (a pebble once sat between the
+  outer probes: fix). Positions follow §2.6, with T1, T2, T4b and pebble 4 moved out 0.5–1.6 in X so the front width
+  reaches 11.6.
+- **Part objects:** `MossyHollowLogShell` (shell + 12 blocks), `…CutEndCap`, `…BranchStub`, `…MossClump` (M1 as it
+  lies on the log; the log is built for placement, then deleted), `…Rock` (RK1), `…FoliageClump` (T3).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Non-manifold e / v | Boundary | Winding errors | Min corner |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| MossyHollowLog | **3558** / 3600 | 11.63 × 14.48 × 8.07 | 173 | 0 / 0 | 0 | 0 | 2.21° |
+| …Shell | 956 | 5.14 × 13.75 × 5.11 | 13 | 0 / 0 | 0 | 0 | 2.21° |
+| …CutEndCap | 410 | 5.18 × 0.45 × 5.06 | 13 | 0 / 0 | 0 | 0 | 6.0° |
+| …BranchStub | 112 | 3.37 × 4.13 × 4.55 | 2 | 0 / 0 | 0 | 0 | 14.6° |
+| …MossClump | 260 | 3.96 × 3.89 × 4.00 | 13 | 0 / 0 | 0 | 0 | 31.7° |
+| …Rock | 30 | 2.44 × 2.10 × 2.30 | 1 | 0 / 0 | 0 | 0 | 18.7° |
+| …FoliageClump | 72 | 2.72 × 2.84 × 2.84 | 9 | 0 / 0 | 0 | 0 | 15.1° |
+
+- Every object: 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 duplicate verts, normals outward, no self-intersections
+  inside any shell, every shell closed with positive volume, 0 bowties (`M.fix_bowties` found none), origin at the
+  bbox bottom centre, transforms applied. `K.check` is clean.
+- Hero shells: log 1 (572 tris); other wood 27 (12 end blocks, disc, 12 rim blocks, 2 branch, 906 tris); rock 11
+  (252); moss leaves 63 (1260); plants 71 (9 hubs + 62 blades, 568). The smallest corner is 2.21°, in the
+  shell's seam zip (`m012._thin`); none are under 2°.
+- **Contact (STAGES "No floating dressing"):** 0 floating and 0 unchained shells at 0.03, in the hero and in every part.
+- **Buried:** with ray parity against every wood shell and every rock, 0 dressing shells are more than 0.05 in (max
+  0.031: a leaf underside centre); 0 rocks are in the log (every rock guard depth 0.0).
+- **Moss lobe tips** (`lobe_tip_report`, all 315): 0 tips are inside wood or rock by parity, and 0 are over open air.
+  The radial gap from each tip to the bark is min 0.008, median 0.082, max 1.12 (standing leaves); 72 tips are more
+  than 0.2 off, all on standing leaves or leaves bridging a groove.
+- Hero: 11.63 × 14.48 × 8.07 against the target 11.5 × 14.6 × 8.1, all within tolerance. Log Ø 5.08 (plank tops)
+  with its top at z 5.06; the branch tip is at 8.07. Build-frame origin offset is (0.46, 0.0, −0.04).
+
+## Stage 3 — UV
+
+`M.smart_uv` angle-based (45°, margin 0.008) plus `m012._uv_unfold`. Every object has 0 overlaps and 0 flipped
+faces, min island gap 0.016, border 0.008, and texel density 1.0 (min / median / max). Conformal stretch p95: hero
+1.015, shell 1.0, cap 1.0, branch 1.059, moss 1.015, rock 1.0, foliage 1.037. Hero islands 1166 (the exporter writes
+its own palette UVs).
+
+## Stage 4 — Materials, colour, texture
+
+**Calibration** (`m055.calibrate()`, `K.calibrate` on the kit dome against the spec §5.4 targets) gave the first set of
+keys. The final palette is those values, raised from the measured renders (step 3 below).
+
+| Key | Target (rendered) | Calibrated | Final in `PALETTE` | Use |
+| --- | --- | --- | --- | --- |
+| m055_wood | #B86C34 | #915929 (dome #B66C37) | **#B77136** | plank tops, branch |
+| m055_wood_deep | #502A11 | #3E1700 | #3E1700 | groove chamfers 30 %, ground band 25–55 %, seam 50 %, bore mouth, block inner faces |
+| m055_wood_cut | #E48C35 | #B67326 | **#C87F2A** | block end faces, rim faces, prong ends; chamfers 35 % to wood |
+| m055_wood_end | #CA702E | #9F5C23 | **#B76A28** | cap disc |
+| m055_hollow | #140B04 | #010000 (dome floor #1F1D1B) | #010000 | plug, deep bore 65 %, cracks 55 %, splits 50 % |
+| m055_leaf_lime | #CEDB09 | #A5B306 (dome #CEDA0A) | **#B2C106** (64.8°) | top leaves, tall blades (10 % green) |
+| m055_leaf_green | #6CA433 | #598732 (dome #69A033) | #598732 | under-layer leaves, drape bottoms, blade bases and inner blades |
+| m055_rock | neutral #B4B1AE | #8E9094 | #8E9094 | rocks, pebbles |
+| m055_rock_light | #CBC8C5 | #A0A3A8 | #A0A3A8 | broad pale noise patches, 50 % |
+| m055_rock_dark | #868586 | #6A6D74 | #6A6D74 | the foot band (lowest 16 %), 35 % |
+
+1. **Blend by role and position, never by facing.**
+   - Wood: groove chamfers are the faces touching a pulled-in groove vertex. The ground band is faces below z 0.45;
+     the bore is coloured by depth (stations).
+   - Moss: by layer (0 → 45 % green, 1 → 10 %, 2 → lime) plus 15 % green for leaves centred below z 3.0.
+   - Blades: two-tone by role, the faces at the blade base deep green, the tip half lime.
+   - Rocks: broad position noise patches between rock and rock_light, and a dark foot band on side faces only.
+     The first height-band scheme (light top 35 %, dark base) tripped `K.check` at a 0.81 facing correlation,
+     mostly from the hidden flat base being painted dark, so it was replaced.
+   - Final `K.check` facing correlation: hero 0.39, shell 0.10, everything else 0.0–0.1 (limit 0.5).
+2. **Texture.** Each stave column carries its own Tint (±0.045, held along the stave) plus broad mottle 0.03 at
+   scale 0.35. Cap regions mottle 0.035; branch 0.04; rocks 0.04 broad plus ±0.035 per facet; leaves ±0.04 per
+   leaf; blades ±0.04 per blade.
+3. **Measured against the sheet.** The sheet masks are `m055_study/m.py`, measured with `measure_render.py` and
+   `cmpcol.py` in the study folder. The calibrated wood rendered 20–30 levels darker than the sheet in five of six
+   views, so wood, cut and end were raised (about ×1.13 in sRGB) and lime ×1.08.
+
+| View | T median ours / sheet | G median ours / sheet | R median ours / sheet |
+| --- | --- | --- | --- |
+| front | #C77633 / #D08435 | #85980F / #9CB009 | #7E7E78 / #988F93 |
+| f34 | #9D5D2E / #B96E34 | #94A40A / #B7CC06 | #878887 / #AFA0A0 |
+| r34 | #B96B32 / #A56232 | #B8CE0F / #A2BF04 | #BDBAB5 / #A2959A |
+| side | #9A5A2B / #B26933 | #869609 / #B4C704 | #8A8B8C / #B1A1A0 |
+| rear | #BE6A2D / #C86F2F | #85950D / #88A109 | #9FA29C / #A79D9A |
+| top | #C57339 / #CB8340 | #B5CE0D / #B6C806 | #9FA1A1 / #9D9496 |
+
+- Front cut blocks v > .7: #E58A33 against #E8913C / #E48C35 (within 4).
+- Hues: wood 25°, cut 28°, green median 65–67° (lime ≥ 62°, never yellow).
+- Rock medians are neutral (R, G, B within 6) and never mauve.
+- **The f34 and side views** look at the +X flank, which faces away from the kit studio's key light (KEY_DIR
+  front-left). There the wood reads 25–30 darker than the sheet, whose views are all evenly bright. The −X (r34) view
+  reads about 20 lighter. This is a lighting difference, not paint: the same key renders front, rear and top within
+  5–15.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows no glow or light. No emission. Studio notes (Requires Manual Validation):
+- the bore must stay black under the game sun (the plug is `hollow`, so no sky shows through);
+- wood stays orange-brown, not red;
+- cut ends read lighter orange;
+- rocks stay neutral grey;
+- moss is lime over green.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect. The hero has no VFX sockets (`build()` checks).
+
+## Renders and sheet measurements (final build)
+
+`art/blender/renders/models/M055/`:
+- `M055_views.png`;
+- `*_sheet` views (long lens, floor hidden): f34 (55, 22), r34 (−46, 10), front (0, 3), side (90, 3), rear (180, 3),
+  top;
+- kit views: front, side, rear, top, underside, front34, rear34;
+- `part_*` (the cap from (150, 15) so its cracked face shows), `exploded` (55, 22);
+- `scale`: a 5.5-stud marker beside the log at Y −1 and one standing on the crest at Y −4 — the log top is at 0.91 of
+  the marker;
+- close-ups `bore_cu` (A), `branch_cu` (B), `section_cu` (C: the shell part end-on, one stave thick all round),
+  `cap_cu`, `moss_cu`, `base_cu`.
+
+The cameras were probed:
+- f34: e 18 gave W : H 1.64, so e 22 was chosen.
+- r34: e 18 gave 1.35 at every az from −35 to −60. The sheet's r34 is a low view: e 10 gave 1.54.
+
+| View | W : H ours (sheet) | T | G | R | O |
+| --- | --- | --- | --- | --- | --- |
+| f34 | 1.563 (1.503) | 57.6 (55.7) | 29.5 (27.8) | 12.7 (12.4) | 0.1 |
+| r34 | 1.563 (1.596) | 59.5 (55.9) | 27.5 (29.4) | 12.4 (11.8) | 0.5 |
+| front | 1.407 (1.385) | 40.4 (44.3) | 23.6 (22.9) | 16.6 (15.5) | **19.4** (17.4) |
+| side | 1.758 (1.764) | 58.2 (58.4) | 28.1 (25.1) | 13.6 (13.7) | 0.2 |
+| rear | 1.397 (1.268) | 62.0 (60.2) | 23.7 (23.9) | 14.2 (13.2) | 0.2 |
+| top (content) | 0.795 | 38.7 (42.9) | 45.2 (35.4) | 15.9 (20.3) | 0.2 |
+
+All the governing numbers are within the §2.7 tolerances. These are not:
+- rear W : H 1.40, against 1.18–1.36. Front and rear both see the full X width; the sheet's rear cell is narrower
+  than its front cell, which is inconsistent.
+- top G 45, against 35 ± 8. The top is judged on content only (decision 9).
+- side G 28.1, at the edge of 25 ± 3.
+
+## Modeller's notes for the verifier
+
+1. **Rebuild:** `import importlib, kit_models, m055; importlib.reload(kit_models); importlib.reload(m055); m055.build()`.
+   It takes about 7 s to build and 30 s to render. The final numbers above come from a freshly restarted session.
+   - The very first `build()` after a fresh `start` once failed inside `M.views`; the message was cut off and
+     couldn't be recovered.
+   - The same call in the next fresh session, and every run after it, worked. If it happens, run `build()` again.
+2. **Shell structure:** one closed log shell plus 12 seated end blocks, which spec §4.1 / §6 allows. The blocks sit
+   0.015 off the shell's front face, and that seam shows as a fine crack line 1.0–1.5 behind each block's cut end.
+3. **The cap disc sits on the shell's back face; it is not a 0.3 plug.** The bore stops at the dark plug at
+   Y −1.9 (decision 5), so there is no back bore to plug into.
+4. **Branch:** re-aimed to a true 50° lean (the spec's point table gave 62°). The side and exploded views are judged
+   on content: the lean mirrors the side cell's (decision 3).
+5. **Leaves:** 63 leaves, more than the planned ~50.
+   - They were added for the G shares in the front, r34 and rear views. The extra leaves are clumps M7, M8 and MF;
+     MF's leaves stand so they show round the ring in the front view.
+   - Each leaf is a closed 20-tri lobed star wrapped to the log.
+   - Lobe tips were checked by parity: 0 inside wood or rock.
+6. **Colour:** the f34 and side views see the +X flank in the studio's shade, so their wood and green medians read
+   20–30 darker than the sheet. The r34 (lit side) reads about 15–20 lighter. See stage 4.
+7. **Not done:**
+   - the cap's faint grain ring at r 0.9 (no ring of verts there);
+   - the r34's second small stub (decision 4: one stub).
+   Tuft T5 (5 low blades) is small, as on the sheet.
+8. **Scratch tools** are in the session scratchpad:
+   - `m055_study/measure_render.py`, `cmpcol.py` and `cmpimg.py` (sheet comparisons);
+   - `m055_build/` (build scripts, `full.json` with every number above, the camera probes).
+
+- **Main session (2026-10-30):** all four deviations are accepted:
+  - the broken end as seated blocks (§4.1 allows it);
+  - the cap disc on the back face;
+  - a true 50° branch lean;
+  - 63 moss leaves.
+
+## Verification round 1 (verifier, 2026-10-30)
+
+A fresh stage-7 verifier worked read-only on port 9877 (`wip/M055_verify.blend`, the integrated model). Every number
+below was re-measured with the verifier's own code: a bmesh audit, a shell contact graph, ray-parity burial and lobe-tip
+tests, and the study masks (`m055_study/m.py`) applied to new renders of the sheet cells and to our renders. Nothing was
+rebuilt, edited or saved. Scratch files are in `scratchpad/m055_verify/`.
+
+### Mesh
+
+| Object | Tris (budget) | Size (studs) | Shells | Boundary / non-manifold e / bowties | Winding errors | Zero-area / n-gons / loose / wire / dup | Self-hits in a shell | Neg-volume shells | Origin / transforms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| MossyHollowLog | **3558** (3600 ceiling) | 11.63 × 14.48 × 8.07 | 173 | 0 / 0 / 0 | **0** | 0 / 0 / 0 / 0 / 0 | 0 | 0 | bottom centre (0, 0, 0); rot 0, scale 1 |
+| …Shell | 956 (< 1000) | 5.14 × 13.75 × 5.11 | 13 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+| …CutEndCap | 410 | 5.18 × 0.45 × 5.06 | 13 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+| …BranchStub | 112 | 3.37 × 4.13 × 4.55 | 2 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+| …MossClump | 260 | 3.96 × 3.89 × 4.00 | 13 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+| …Rock | 30 | 2.44 × 2.10 × 2.30 | 1 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+| …FoliageClump | 72 | 2.72 × 2.84 × 2.84 | 9 | 0 / 0 / 0 | 0 | 0 | 0 | 0 | ok |
+
+- Every object is all triangles, has no modifiers and no custom normals, and keeps a `UVMap` layer. The hero has no
+  VFX children. `K.check` returns no problems.
+- **Hero shells:** 28 wood (the log, 12 end blocks, the disc, 12 rim blocks, the stem and the side prong), 11 rock,
+  63 leaves, 9 hubs and 62 blades.
+- **Size:** the log runs 14.22 from the block tips (−7.1) to the cap faces (+7.12), against 14.2. It is Ø 5.1 with its
+  top at z 5.06. The branch tip is at 8.07. Everything is within tolerance.
+
+### Contact
+
+| Check | Result |
+| --- | --- |
+| Floating shells (gap > 0.03 from every other shell and the ground), hero / every part | **0** / 0 |
+| Unchained (no contact chain at 0.03 to the ground) | **0** (the worst non-ground gap is 0.024, a leaf) |
+| Buried dressing: leaf, blade, hub or rock points inside any wood or rock shell, 3-ray parity | 20 shells touch, **0 are over 0.05**. The maximum is 0.031, a crest leaf's underside. |
+| Moss lobe tips (630 outline verts, the 5 tips and 5 notches of all 63 leaves) | **0 inside** wood or rock. Gap to the bark: min 0.006, median 0.077, max 1.02 (standing leaves). |
+| Tuft hubs to rock or wood | min 0.39 (target ≥ 0.3) |
+| Blades intersecting rock or wood | 0 |
+| Rocks inside the log | 0 |
+
+### Views against the sheet (the verifier's renders; sheet cells re-measured with the same masks)
+
+| View (az, el) | W : H ours (sheet) | T | G | R | O | Fill |
+| --- | --- | --- | --- | --- | --- | --- |
+| f34 (55, 22) | 1.563 (1.507) | 57.6 (55.7) | 29.5 (27.8) | 12.8 (12.4) | 0.1 (4.0) | 0.504 (0.610) |
+| f34 (55, 18), as decided | 1.627 | 58.2 | 28.9 | 12.8 | 0.2 | 0.514 |
+| front (0, 3) | 1.407 (1.406) | 40.4 (44.3) | 23.6 (22.9) | 16.6 (15.5) | **19.4** (17.4) | 0.446 (0.500) |
+| r34 (−46, 10) | 1.563 (1.596) | 59.5 (55.9) | 27.5 (29.4) | 12.4 (11.8) | 0.5 (3.0) | 0.517 (0.636) |
+| r34 (−48, 18), as decided | 1.370 | 59.1 | 28.5 | 12.2 | 0.2 | 0.485 |
+| side (90, 3) | 1.758 (1.764) | 58.2 (58.4) | 28.0 (25.1) | 13.6 (13.7) | 0.2 | 0.648 (0.650) |
+| rear (180, 3) | 1.397 (1.268) | 62.0 (60.2) | 23.7 (23.9) | 14.2 (13.2) | 0.2 | 0.454 (0.524) |
+| top (0, 89), content only | — | 38.8 (42.9) | 45.1 (35.4) | 15.9 (20.3) | 0.2 | — |
+
+- **Binding shares (f34 and front, ±4):** all are within tolerance. The largest difference is the front T, −3.9.
+- **The bore:** in the front view it is a round black disc (the dark core is 151 × 151 px, w : h 1.00) inside a ring of
+  12 chunky orange blocks. It is not a slot.
+
+### Colour (medians: ours / sheet)
+
+| View | Wood T | Green G | Rock R (B − G) |
+| --- | --- | --- | --- |
+| f34 | #9D5D2E / #B96E34 (hue 25 / 26) | #95A412 / #B7CC06 (66.5° / 64.8°) | #878887 / #AFA0A0 (−1) |
+| r34 | #B96B32 / #A56232 | #B9CE18 / #A2BF04 | #BDBAB5 (−5) |
+| front | #C77633 / #D08435 | #879817 / #9CB009 | #7E7E78 (−6) |
+| side | #9A5A2B / #B26933 | #87960F / #B4C704 | #8A8B8C (+1) |
+| rear | #BE6A2D / #C86F2F | #859615 / #88A109 | #9FA29C (−6) |
+| top | #C57339 / #CB8340 | #B6CF18 / #B6C806 | #9FA1A1 (0) |
+
+- **Wood** is orange-brown in every view (hue 25°, R > G > B). The cut faces in the front view read #E58A33 (v > .7)
+  against #E48C35.
+- **Greens** read 65–67° in every view, the same as the sheet (65–70°): lime, never yellow, over a green under-layer.
+- **Rocks** are neutral: the spread is ≤ 8 and B − G is ≤ +1 in every render, so they never read mauve.
+- **No colour by facing.**
+  - A grep of `m055.py` finds no paint selection based on normals. The only `normal` uses are split geometry and the
+    tuft camera aim.
+  - Paint is chosen by groove vertex, height band, depth station, leaf layer and blade role.
+  - The verifier also correlated face colour with face normal z: hero all 0.01, wood 0.05, leaves 0.04, rocks 0.38.
+    `kit_baked_shading` reads 0.39 on the hero.
+
+### Shape (judged against every cell)
+
+- **Barrel, not a cylinder:** pass. The log has 12 planked staves with dark V grooves (side and f34). The half-stave
+  step seam reads clearly in the r34. There are six dark plank splits on the flank, and each stave has its own tint.
+- **Broken open end:** pass. Twelve chamfered orange blocks are staggered 0–0.5, and the +X ones stand proud (r34 and
+  `bore_cu`). The bore shows the planked dark-brown inner wall going black at depth, as in close-up A. Front view as
+  above.
+- **Cracked cap:** pass. The rear view shows 12 rim blocks round a disc with 9 radial cracks and a pip. The faint grain
+  ring is missing (minor 6).
+- **Branch:** pass. One Y stub on the +X shoulder leans toward +Y in the f34 and r34, and its collar flares into the
+  bark (close-up B). The fork reads clearly in the front, rear and r34 views (minor 3).
+- **Moss:** pass. 63 flat, 5-lobed leaves lie in rosettes along the crest and in hanging chains down both flanks. There
+  are no lumps or balls.
+- **Rocks and tufts:** pass. The rocks are neutral grey faceted boulders, not eggs, with flat bases and broad facets.
+  The tufts are folded lanceolate blades, lime outside and green inside.
+- **Walkability:** pass.
+  - Down-rays along the crest find a top surface at z 4.7–5.5. Over the leaves, the steps are ≤ 0.6.
+  - The band within 0.5 of the top is 2–3 studs wide.
+  - The branch occupies the +X half only at Y +2…+4, which leaves the −X crest clear.
+  - The log top (5.06) is under the 7.2 jump. On the +X flank, RK2 (1.7) and RK1 (2.3) give a two-hop climb.
+  - The bore (Ø 3.36) is decoration.
+
+### Findings
+
+1. **minor:** The f34 fill is 0.50 against 0.61 ± 0.05, and the r34 fill is 0.52 against 0.64.
+   - Cause: the T4 tuft pair (4.6, +6.2) and pebble 4 (−4.6, −6.5) push the bbox past the log ends, so the right
+     tenth of the f34 is low tufts (top .40 / .60 at f 1.0 / .9, against .21 / .78) where the sheet shows the cap end.
+   - The dressing is also sparse: thin blades and gaps between rocks.
+   - Fix target: pull T4b in to Y ≤ 5.6 and x ≤ 4.2, move pebble 4 in by 0.6, and close the gaps between the base
+     rocks and tufts along the flanks.
+2. **minor:** The f34 bore reads dark brown more than black: O is 0.1 % against the sheet's 4.0 %. The camera sees
+   mostly the `wood_deep` mouth wall.
+   - It is an oval opening with a planked wall, not a slot, so it meets the spec's wording.
+   - Fix target: start the `wood_deep` → `hollow` blend at the shell face (Y −5.6) instead of over the first 2.5 studs,
+     so a black core shows at 55°.
+3. **minor:** The branch's Y fork barely reads in the f34 and side views. The side prong points +X, toward the f34
+   camera, so it is foreshortened, and in the side view it hides behind the main prong.
+   - Fix target: turn the side prong about 25° toward +Y and up, keeping the front tips at x +2.4 / +3.3, so it shows
+     as a second prong to the right of the main one in the f34, as on the sheet.
+4. **minor (modeller leftover, accepted):** Wood on the +X flank renders 25–30 levels darker than the sheet in the f34
+   and side views. The −X (r34) view is 15–20 lighter than its cell.
+   - The paint is the same on both sides, so this is the studio key light (front-left), not paint. The front, rear and
+     top views are within 5–10.
+   - No change needed. Record it for the Studio check (Requires Manual Validation).
+5. **minor (leftovers, accepted):**
+   - The rear W : H is 1.40 against 1.18–1.36. Our front matches the sheet's front exactly (1.407 / 1.406), and front
+     and rear see the same X width, so the sheet is inconsistent.
+   - The top G is 45 against 35 ± 8, but decision 9 judges the top on content only.
+   - The side G is 28.0, at the edge of 25.1 ± 3.
+6. **minor:** The cap disc lacks the faint grain ring at r 0.9. Fix target: an edge loop with a 0.02 step, about
+   +24 tris.
+7. **minor:**
+   - The r34 camera is at (−46, 10), not the decided (−48, 18). At e 18 the W : H reads 1.37, outside 1.50–1.68.
+   - The f34 is at e 22, not 18. That is inside the decision's probe range of 12–24, and e 18 gives W : H 1.63, just
+     outside 1.42–1.58.
+   - Record both cameras.
+8. **minor:** The palette key `m055_rock_dark` is #6A6D74 (B = G + 7). Its only use, the 35 % mix `rock_x_dark_35`,
+   is #818489 (B = G + 5), one level over the "B ≤ G + 4" rule.
+   - Every rendered rock median is B − G ≤ +1, so nothing reads mauve.
+   - Fix target: `m055_rock_dark` #6B6D71.
+9. **minor:** The end blocks are seated 0.015 off the shell's front face, which shows a fine crack line 1.0–1.5 behind
+   each block's cut end. This is the accepted deviation and is harmless.
+
+**Decisions:** all 15 were followed, with the four accepted deviations:
+- the broken end as seated blocks;
+- the cap disc on the back face;
+- a true 50° lean;
+- 63 leaves.
+
+The names are `MossyHollowLog*` with keys `m055_*`. Collision is precise for the hero and shell, hull for the rest.
+There are no VFX sockets, and stages 5 and 6 are recorded as skipped.
+
+**Score: 8 / 10.** The mesh is clean everywhere: 0 winding errors, 0 floating and 0 buried. The model reads as the
+sheet's staved hollow log, with a round black bore, a cracked cap, a +Y Y-branch, lobed moss and grey rocks. What
+remains is composition polish: the f34 fill, the bore's darkness at 55°, and how well the fork reads.
+
+**Verdict: PASS.** There are no blockers. Findings 1–3 are worth a quick pass only if a round 2 happens for another
+reason.
+
+## Main session ruling (2026-10-30)
+- **Verdict:** passed in round 1 (8/10) and committed.
+- **Main-session tweak (finding 8):** `m055_rock_dark` changed from `#6A6D74` to `#6B6D71`, so that B ≤ G + 4. Rebuilt in the GUI kit; tris and shells are unchanged.
+- **Cameras:** recorded as built. r34 is at (−46, 10) and f34 at e 22.
+- **Left for a later polish pass:**
+  - f34 fill is 0.50: pull in T4b and pebble 4.
+  - The f34 bore reads dark brown: start the hollow blend at the shell face.
+  - The branch fork barely reads: turn the prong about 25° toward +Y.
+  - The +X flank renders dark under the studio key; check it in Studio.
+  - The cap's grain ring is missing.
+- **Export:** 7 assets, 7 solid pieces, 5398 tris, 0 VFX sockets, palette 29 colours, 0 problems.
