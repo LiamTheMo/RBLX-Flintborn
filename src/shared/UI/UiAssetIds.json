@@ -1,6 +1,11 @@
 {
   "atlas_hud": 124627132257659,
   "atlas_lobby": 103282133904860,
+  "atlas_screens": 122676375612859,
+  "atlas_ui": 105485220670813,
+  "atlas_windows_bag": 122287438917414,
+  "atlas_windows_craft": 71444822676312,
+  "atlas_windows_menu": 77155926778498,
   "button_add_friend": 107069040664873,
   "button_back": 105186266455737,
   "button_backpack": 86608664825456,
