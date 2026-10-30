@@ -23,45 +23,36 @@ local PlayWindow = {}
 PlayWindow.__index = PlayWindow
 
 PlayWindow.GUI_NAME = "FlintbornPlay"
--- The mockup's window is 1053 × 665 from outline to outline. The frame art's
--- outline sits ART_INSET px inside its rect, so the window is drawn that much
--- larger and its content offset by it (layout below stays in mockup px).
-PlayWindow.ART_INSET = { 6, 5 }
-PlayWindow.CONTENT = { 1053, 665 }
-PlayWindow.SIZE = { 1053 + 11, 665 + 10 }
--- The game's own island painting (D19), shared with the Journal and Map
--- (atlas_island). It has no Kit role yet, so it is named here.
-PlayWindow.MAP_ART = "pm_map_island"
+-- The mockup's window, outline to outline (309..1361 × 127..791).
+PlayWindow.SIZE = { 1053, 665 }
 
 -- Window design px, measured from the mockup (PlayScreen.md element tree, minus
--- the window's top-left 309, 127). Art with a transparent margin (plaques, slots,
--- the close and PLAY plates) gets a rect that much larger, so its visible edge
--- lands on the mockup's.
+-- the window's top-left 309, 127). Kit plates draw their visible edge on the rect.
 local RECT = {
-	titlePlaque = { 43, 27, 284, 94 },
-	-- The title's ink sits a little left of and below the plaque's centre.
-	titleShift = { -4, 3 },
-	close = { 983, 8, 58, 55 },
+	titlePlaque = { 47, 30, 276, 87 },
+	-- The title's ink sits a little left of the plaque's centre.
+	title = { -4, 1, 276, 83 },
+	close = { 985, 9, 54, 52 },
 	map = { 41, 92, 520, 542 },
 	mapInset = 6,
 	marker = 28,
 	-- The rune the mockup paints in the map's top-left corner (sea there).
 	rune = { 76, 154, 41, 69 },
 	status = { 60, 636, 500, 20 },
-	regionPlaque = { 583, 93, 428, 76 },
-	sectionRule = { 588, 332, 419, 15 },
+	regionPlaque = { 585, 96, 423, 70 },
+	sectionRule = { 588, 339, 419, 2 },
 	partyHeading = { 590, 350, 300, 26 },
 	-- One row tall; more members scroll (the rail sits right of the rows).
-	party = { 584, 375, 446, 63 },
-	-- The row as the mockup measures it, and how far the inset art's visible
-	-- edge sits inside its plate (left/top, and the extra width/height).
+	party = { 587, 378, 441, 58 },
 	partyRow = { 421, 56 },
-	partyRowArt = { 3, 3, 5, 5 },
 	equipHeading = { 589, 446, 260, 28 },
 	more = { 760, 446, 248, 28 },
-	slotY = 477,
-	slotSize = { 75, 81 },
-	play = { 586, 567, 420, 77 },
+	slotY = 479,
+	slotSize = { 71, 77 },
+	play = { 586, 569, 416, 72 },
+	-- The play glyph (29 × 35 in the mockup) and its gap to the label.
+	playIcon = 35,
+	playGap = 22,
 }
 -- Detail rows: centre y of each row, the icon / label / value columns, rules.
 local DETAIL = {
@@ -72,7 +63,7 @@ local DETAIL = {
 	rule = { 648, 354 },
 	ruleY = { 211, 250, 290 },
 }
-PlayWindow.SLOT_X = { 576, 651, 726, 801, 874, 948 }
+PlayWindow.SLOT_X = { 578, 653, 728, 803, 876, 950 }
 
 -- Mockup text sizes (ink-height matched; PlayScreen.md measurements log).
 local TEXT_SIZE = {
@@ -109,30 +100,25 @@ function PlayWindow.new(props: Props)
 		onClose = props.onClose,
 	})
 	self.screen = screen
-	-- The close button is drawn at the mockup's spot below (showClose = false).
-	local window = Kit.Window.new(screen, { title = "Play", header = "plaque", showClose = false })
+	local window = Kit.Window.new(screen, {
+		title = "Play",
+		header = "plaque",
+		plaqueRect = RECT.titlePlaque,
+		titleRect = RECT.title,
+		titleSize = TEXT_SIZE.title,
+		closeRect = RECT.close,
+	})
 	self.window = window
-	local inset = PlayWindow.ART_INSET
+	self.close = window.close
 	-- Under the title plaque, which overlaps the map's top edge as in the mockup.
 	local v = Kit.Core.Make("Frame", {
 		Name = "Content",
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(inset[1], inset[2]),
-		Size = UDim2.fromOffset(PlayWindow.CONTENT[1], PlayWindow.CONTENT[2]),
+		Size = UDim2.fromScale(1, 1),
 		ZIndex = window.base.z + 1,
 	}, window.base.visual)
 	self.visual = v
 	local z = window.base.z + 3
-	self:_titlePlaque()
-	self.close = Kit.IconButton.new(v, {
-		name = "Close",
-		variant = "close",
-		rect = RECT.close,
-		zIndex = z + 4,
-		onPress = function()
-			screen:Close()
-		end,
-	})
 	self:_map(v, z)
 	self.regionPlaque = Kit.Panel.new(v, {
 		name = "RegionPlaque",
@@ -154,7 +140,7 @@ function PlayWindow.new(props: Props)
 		z = z + 1,
 	})
 	self:_details(v, z)
-	Kit.Divider.new(v, { name = "SectionRule", rect = RECT.sectionRule, variant = "rule", zIndex = z })
+	Kit.Divider.new(v, { name = "SectionRule", rect = RECT.sectionRule, variant = "hairline", zIndex = z })
 	self.partyHeading = Kit.Text.new(v, {
 		name = "PartyHeading",
 		rect = RECT.partyHeading,
@@ -167,7 +153,7 @@ function PlayWindow.new(props: Props)
 		rect = RECT.party,
 		gap = 6,
 		padBottom = 0,
-		contentHeight = RECT.partyRow[2] + RECT.partyRowArt[4],
+		contentHeight = RECT.partyRow[2],
 		zIndex = z,
 	})
 	self.equipHeading = Kit.Text.new(v, {
@@ -207,6 +193,8 @@ function PlayWindow.new(props: Props)
 		variant = "play",
 		sizeClass = "l",
 		textSize = TEXT_SIZE.play,
+		iconSize = RECT.playIcon,
+		iconGap = RECT.playGap,
 		zIndex = z + 1,
 		onPress = function()
 			if props.onPlay then
@@ -250,20 +238,6 @@ function PlayWindow.new(props: Props)
 	return self
 end
 
--- The Kit plaque header, at the mockup's size with its 64 px title (Kit.Window
--- draws the plaque at 44, 24 and the title at windowTitle size).
-function PlayWindow:_titlePlaque()
-	local title = self.window.title
-	local plaque = title.root.Parent :: Frame
-	local r = RECT.titlePlaque
-	local inset = PlayWindow.ART_INSET
-	plaque.Position = UDim2.fromOffset(r[1] + inset[1], r[2] + inset[2])
-	plaque.Size = UDim2.fromOffset(r[3], r[4])
-	title.root.Position = UDim2.fromOffset(RECT.titleShift[1], RECT.titleShift[2])
-	title.root.Size = UDim2.fromOffset(r[3], r[4] - 4)
-	title.root.TextSize = TEXT_SIZE.title
-end
-
 -- The island painting in an inset frame, cropped to fill it, with the crater
 -- the world is named for marked on it.
 function PlayWindow:_map(v: Frame, z: number)
@@ -282,12 +256,8 @@ function PlayWindow:_map(v: Frame, z: number)
 	}, frame.base.visual)
 	local side = math.max(w, h)
 	local left, top = (w - side) / 2, (h - side) / 2
-	self.mapArt = Kit.Art.Sprite(PlayWindow.MAP_ART, side, side, clip, {
-		Name = "Island",
-		Position = UDim2.fromOffset(left, top),
-		Size = UDim2.fromOffset(side, side),
-		ZIndex = z,
-	})
+	-- The game's own island painting (D19), shared with the Journal and Map.
+	self.mapArt = Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
 	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", zIndex = z + 1 })
 	local u, vv = PlayModel.MarkerUV(IslandMap.MAP_SPAN)
 	local m = RECT.marker
@@ -330,10 +300,12 @@ function PlayWindow:_details(v: Frame, z: number)
 		self.details[index] = { icon = icon, label = label, value = value }
 	end
 	for index, y in DETAIL.ruleY do
+		-- The mockup's faint 1 px rules between the rows.
 		Kit.Divider.new(v, {
 			name = "DetailRule" .. index,
-			rect = { DETAIL.rule[1], y - 7, DETAIL.rule[2], 15 },
-			variant = "rule",
+			rect = { DETAIL.rule[1], y, DETAIL.rule[2], 1 },
+			variant = "hairline",
+			thickness = 1,
 			zIndex = z - 1,
 		})
 	end
@@ -360,23 +332,15 @@ end
 -- One party row: crown (leader), headshot, name, ready dot (in a party), level.
 local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
-	local art = RECT.partyRowArt
-	local outer = Kit.Core.Make("Frame", {
+	local holder = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
 		BackgroundTransparency = 1,
 		LayoutOrder = order,
-		Size = UDim2.fromOffset(w + art[3], h + art[4]),
-	}, parent)
-	outer:SetAttribute("UserId", row.userId)
-	-- The mockup's row is a light inset box, not the list-row plate.
-	Kit.Art.Plate(outer, "panel.inset", w + art[3], h + art[4], { z = 5 })
-	local holder = Kit.Core.Make("Frame", {
-		Name = "Inside",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(art[1], art[2]),
 		Size = UDim2.fromOffset(w, h),
-		ZIndex = 6,
-	}, outer)
+	}, parent)
+	holder:SetAttribute("UserId", row.userId)
+	-- The mockup's row is a light inset box, not the list-row plate.
+	Kit.Art.Plate(holder, "panel.inset", w, h, { z = 5 })
 	if row.leader then
 		Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 })
 	end
@@ -414,7 +378,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		}, holder)
 		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
 	end
-	return outer
+	return holder
 end
 
 -- The party rows (leader first; PlayModel.Members). `showReady` adds each
@@ -429,7 +393,7 @@ function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
 	for order, row in rows do
 		partyRow(content, row, order, showReady)
 	end
-	local h = RECT.partyRow[2] + RECT.partyRowArt[4]
+	local h = RECT.partyRow[2]
 	self.partyList:SetContentHeight(#rows * h + math.max(0, #rows - 1) * 6)
 	self.rows = rows
 end
@@ -438,7 +402,11 @@ end
 -- stacks go to the backpack.
 function PlayWindow:SetLoadout(hotbar, more: number?)
 	for index, slot in self.slots do
-		slot:SetItem(hotbar[index])
+		local item = hotbar[index]
+		-- itemId: the slot takes its art and tint from ItemInfo.
+		slot:SetItem(if item
+			then { itemId = item.catalogId, quantity = item.quantity, permanent = item.permanent }
+			else nil)
 	end
 	self.more:SetText(PlayModel.MoreText(more) or "")
 end

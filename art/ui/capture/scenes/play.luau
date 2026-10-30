@@ -29,8 +29,6 @@ window:SetLoadout(PlayModel.LoadoutHotbar(preview))
 window:SetMode("solo")
 window:Open()
 -- The mockup's window: 309..1361 × 127..791.
-local inset = PlayWindow.ART_INSET
-window.screen.holder.Position =
-	UDim2.fromOffset(309 - inset[1] + PlayWindow.SIZE[1] / 2, 127 - inset[2] + PlayWindow.SIZE[2] / 2)
+window.screen.holder.Position = UDim2.fromOffset(309 + PlayWindow.SIZE[1] / 2, 127 + PlayWindow.SIZE[2] / 2)
 window.screen.scale.Scale = 1
 __dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })

@@ -17,7 +17,6 @@
 --       actions = { { id = "store", label = "Store" } } })
 --   window:Open()
 
-local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -40,15 +39,14 @@ InventoryWindow.CATEGORY_ICONS = {
 	Misc = "gift",
 }
 
--- Slot rects are drawn 2 px larger on each side than the outline the mockup
--- shows (the kit art's margin): outlines 91 × 99 at a 99.6 × 107.33 pitch.
+-- Slots 91 × 99 at a 99.6 × 107.33 pitch, the first at (250, 181).
 local COLUMNS = 6
-local CELL = { 95, 103 }
+local CELL = { 91, 99 }
 local PITCH = { 99.6, 107.33 }
 -- The grid's scroll area: the slots start a few px in, so the selected glow
--- (3 px outside a slot) is not clipped, and the kit rail lands on the column
+-- (3 px outside a slot) is not clipped, and the thin rail lands on the column
 -- divider. Four rows show; more scroll.
-local GRID = { 244, 174, 620, 434 }
+local GRID = { 246, 176, 611, 429 }
 local INSET = { 4, 3 }
 local GRID_W = (COLUMNS - 1) * PITCH[1] + CELL[1]
 local HEADER_H = 34
@@ -59,15 +57,12 @@ local TAB_RECTS = { { 19, 108, 170, 58 }, { 198, 109, 165, 56 } }
 -- middle four.
 local CATEGORY_YS = { 236, 297, 363, 426, 491, 555 }
 local CATEGORY_RULES = { 354, 419, 483, 547 }
--- The detail card: the inset art draws its border 6 px inside its rect, so the
--- rect grows by 6 and card contents are placed from the mockup's card corner.
-local CARD_PAD = 6
-local CARD = { 869 - CARD_PAD, 109 - CARD_PAD, 296 + CARD_PAD * 2, 520 + CARD_PAD * 2 }
+local CARD = { 869, 109, 296, 520 }
 local ROW_TOP, ROW_PITCH = 313, 41
 
--- A rect in the card, from the mockup card's top-left corner.
+-- A rect in the card, from its top-left corner.
 local function inCard(x: number, y: number, w: number, h: number): { number }
-	return { x + CARD_PAD, y + CARD_PAD, w, h }
+	return { x, y, w, h }
 end
 
 export type Cell = {
@@ -146,9 +141,11 @@ function InventoryWindow.new(props)
 			Kit.Tab.new(v, {
 				id = id,
 				name = "Category" .. id,
-				rect = { 24, y, 232, 54 },
+				rect = { 24, y, 219, 54 },
 				label = id,
 				icon = InventoryWindow.CATEGORY_ICONS[id] or "chest",
+				iconX = 16,
+				labelX = 73,
 				variant = "category",
 				zIndex = 8,
 			})
@@ -157,7 +154,7 @@ function InventoryWindow.new(props)
 	for index, y in CATEGORY_RULES do
 		Kit.Divider.new(
 			v,
-			{ name = "CategoryRule" .. index, rect = { 27, y - 8, 202, 16 }, variant = "rule", zIndex = 7 }
+			{ name = "CategoryRule" .. index, rect = { 27, y - 8, 203, 16 }, variant = "hairline", zIndex = 7 }
 		)
 	end
 	self.categories = Kit.TabGroup.new(categories, function(id)
@@ -171,10 +168,11 @@ function InventoryWindow.new(props)
 		rect = GRID,
 		gap = false,
 		padBottom = 8,
+		rail = "thin",
 		zIndex = 8,
 	})
 	self.content = self.grid:Content()
-	Kit.Divider.new(v, { name = "GridDivider", rect = { 845, 111, 18, 516 }, variant = "vertical", zIndex = 7 })
+	Kit.Divider.new(v, { name = "GridDivider", rect = { 852, 111, 2, 516 }, variant = "hairline", zIndex = 7 })
 
 	self:_buildCard()
 	self:_buildTabs(self.tabDefs[1] and self.tabDefs[1].id)
@@ -188,27 +186,18 @@ end
 
 -- Tabs ------------------------------------------------------------------------------------
 
--- Tabs are rebuilt when the selection moves, so each shows the icon for its
--- state (a cream icon on leather, a coloured one on parchment).
+-- The tabs (Backpack / Vault or Backpack / Equipped); a selected tab shows its
+-- cream icon on leather.
 function InventoryWindow:_buildTabs(selectedId: string?)
-	local focused = nil
-	for _, tab in self.tabs do
-		if tab.control and GuiService.SelectedObject == tab.control.hit then
-			focused = tab.id
-		end
-		tab:Destroy()
-	end
-	self.tabs = {}
 	local built = {}
 	for index, def in self.tabDefs do
-		local rect = TAB_RECTS[index] or { 19 + (index - 1) * 179, 108, 170, 58 }
-		local selected = def.id == selectedId
 		local tab = Kit.Tab.new(self.visual, {
 			id = def.id,
 			name = "Tab" .. def.id,
-			rect = rect,
+			rect = TAB_RECTS[index] or { 19 + (index - 1) * 179, 108, 170, 58 },
 			label = def.label,
-			icon = if selected then def.iconSelected or def.icon else def.icon,
+			icon = def.icon,
+			selectedIcon = def.iconSelected,
 			variant = "horizontal",
 			zIndex = 8,
 		})
@@ -216,24 +205,19 @@ function InventoryWindow:_buildTabs(selectedId: string?)
 		table.insert(built, tab)
 	end
 	self.tabGroup = Kit.TabGroup.new(built, function(id)
-		self:SelectTab(id)
+		self.tabId = id
 		if self.props.onTab then
 			self.props.onTab(id)
 		end
 	end)
-	if selectedId then
-		self.tabGroup:Select(selectedId)
-	end
-	self.tabId = selectedId
-	if focused and self.tabs[focused] then
-		GuiService.SelectedObject = self.tabs[focused].control.hit
-	end
+	self:SelectTab(selectedId)
 end
 
 -- Shows tab `id` as selected (scripted; onTab is not called).
-function InventoryWindow:SelectTab(id: string)
-	if id ~= self.tabId then
-		self:_buildTabs(id)
+function InventoryWindow:SelectTab(id: string?)
+	self.tabId = id
+	if id then
+		self.tabGroup:Select(id)
 	end
 end
 
@@ -428,7 +412,6 @@ function InventoryWindow:_layout()
 				catalogId = item.catalogId,
 				quantity = item.quantity,
 				permanent = item.permanent,
-				icon = ItemInfo.Icon(item.catalogId),
 			})
 			slot:SetHotkey(cell.hotkey)
 			slot:SetState(cell.state or "normal")
@@ -517,7 +500,7 @@ function InventoryWindow:_buildCard()
 		zIndex = 9,
 	})
 	self.detailRule =
-		Kit.Divider.new(c, { name = "TopRule", rect = inCard(19, ROW_TOP - 8, 258, 16), variant = "rule", zIndex = 9 })
+		Kit.Divider.new(c, { name = "TopRule", rect = inCard(19, ROW_TOP - 8, 258, 16), variant = "hairline", zIndex = 9 })
 	self.hint = Kit.Text.new(c, {
 		name = "Hint",
 		rect = inCard(24, 180, 248, 90),
@@ -558,7 +541,7 @@ function InventoryWindow:SetDetail(detail: Detail?)
 		return
 	end
 	local d = detail :: Detail
-	self.detailIcon:SetItem(d.catalogId, ItemInfo.Icon(d.catalogId))
+	self.detailIcon:SetItem(d.catalogId)
 	self.detailName:SetText(d.name or "")
 	self.detailText:SetText(d.text or "")
 	local actions = d.actions or {}
@@ -627,7 +610,7 @@ function InventoryWindow:SetDetail(detail: Detail?)
 	if main then
 		self.primary = Kit.Button.new(c, {
 			name = "Action" .. main.id,
-			rect = inCard(12, 447, 274, 67),
+			rect = inCard(14, 450, 270, 61),
 			label = main.label,
 			variant = main.variant or "primary",
 			zIndex = 9,

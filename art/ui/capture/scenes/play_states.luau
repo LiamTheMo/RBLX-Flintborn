@@ -55,9 +55,7 @@ local function page(opts)
 		opts.setup(window)
 	end
 	window:Open()
-	local inset = PlayWindow.ART_INSET
-	window.screen.holder.Position =
-		UDim2.fromOffset(309 - inset[1] + PlayWindow.SIZE[1] / 2, 127 - inset[2] + PlayWindow.SIZE[2] / 2)
+	window.screen.holder.Position = UDim2.fromOffset(309 + PlayWindow.SIZE[1] / 2, 127 + PlayWindow.SIZE[2] / 2)
 	window.screen.scale.Scale = 1
 	if opts.check then
 		opts.check(window)
