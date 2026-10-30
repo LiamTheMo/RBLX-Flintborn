@@ -1,0 +1,774 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M051",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m051_cloth",
+    "hex": "#8F2210",
+    "levels": [
+     0.935,
+     0.94485,
+     0.95468,
+     0.96538,
+     0.98463,
+     0.98629,
+     0.99458,
+     1.01631
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_peg",
+    "hex": "#C0A870",
+    "levels": [
+     0.96553,
+     0.96802,
+     0.9746,
+     0.9784,
+     0.98121,
+     0.9857,
+     1.00005,
+     1.0035,
+     1.00876,
+     1.01266,
+     1.01668,
+     1.02001,
+     1.02436,
+     1.02823
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_rope",
+    "hex": "#CEA261",
+    "levels": [
+     0.98132,
+     0.98433,
+     0.98715,
+     0.98959,
+     0.99198,
+     0.99468,
+     0.99588,
+     0.99973,
+     1.00156,
+     1.00439,
+     1.00723,
+     1.00996,
+     1.0133,
+     1.01765,
+     1.01941
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_rope_dark",
+    "hex": "#A16720",
+    "levels": [
+     0.98128,
+     0.98433,
+     0.98715,
+     0.98959,
+     0.99212,
+     0.99457,
+     0.99586,
+     0.99981,
+     1.00135,
+     1.00439,
+     1.00723,
+     1.00996,
+     1.01303,
+     1.0176,
+     1.01941
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_rope_x_dark_50",
+    "hex": "#B88440",
+    "levels": [
+     0.98
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_rope_x_dark_60",
+    "hex": "#B37F3A",
+    "levels": [
+     0.98123,
+     0.98433,
+     0.98714,
+     0.98959,
+     0.99178,
+     0.99425,
+     0.99583,
+     0.99967,
+     1.00121,
+     1.00439,
+     1.00723,
+     1.01001,
+     1.01233,
+     1.01754,
+     1.0194
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_stone",
+    "hex": "#ABA5A2",
+    "levels": [
+     0.94894,
+     0.95172,
+     0.95449,
+     0.95721,
+     0.9601,
+     0.96311,
+     0.96447,
+     0.96748,
+     0.96988,
+     0.97195,
+     0.9743,
+     0.97669,
+     0.97881,
+     0.98099,
+     0.98384,
+     0.98586,
+     0.99878,
+     1.00127,
+     1.00446,
+     1.00677,
+     1.00912,
+     1.01227,
+     1.01517
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_stone_x_mid_15",
+    "hex": "#A39F9E",
+    "levels": [
+     0.95569,
+     0.96142,
+     0.96707,
+     0.9707,
+     0.97675,
+     0.97945,
+     0.98138,
+     0.98432,
+     0.98926,
+     0.9913,
+     0.99659,
+     0.9991,
+     1.00202,
+     1.00463,
+     1.01256,
+     1.01532,
+     1.02269,
+     1.02531
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_stone_x_mid_30",
+    "hex": "#9B9899",
+    "levels": [
+     0.95219,
+     0.9555,
+     0.95765,
+     0.96964,
+     0.97454,
+     0.97832,
+     0.98157,
+     0.98385,
+     1.01847,
+     1.02429
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_stone_x_mid_40",
+    "hex": "#969496",
+    "levels": [
+     0.96039,
+     0.96254,
+     0.96471,
+     0.96774,
+     0.97294,
+     0.9767,
+     0.97834,
+     0.98086,
+     0.98257,
+     0.98548,
+     0.98723,
+     0.99034,
+     0.9942,
+     0.9961,
+     0.99851,
+     1.00096,
+     1.00534,
+     1.00732,
+     1.0096,
+     1.01186,
+     1.01422,
+     1.01693,
+     1.02296,
+     1.03029,
+     1.03168
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_stone_x_mid_50",
+    "hex": "#909094",
+    "levels": [
+     0.95356,
+     0.95536,
+     0.95699,
+     0.98502,
+     0.98653,
+     0.98799,
+     0.99281,
+     0.99487,
+     0.9967,
+     0.99992,
+     1.00176,
+     1.00314,
+     1.00722,
+     1.00936,
+     1.01155,
+     1.01351,
+     1.01538
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood",
+    "hex": "#B66D2A",
+    "levels": [
+     0.9704,
+     0.97308,
+     0.97528,
+     0.97723,
+     0.98694,
+     0.99461,
+     1.00335,
+     1.00495,
+     1.00803,
+     1.01194,
+     1.0152,
+     1.01793,
+     1.02058,
+     1.028
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_dark",
+    "hex": "#5C3014",
+    "levels": [
+     1.00575,
+     1.00846,
+     1.01486,
+     1.02394
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_deep",
+    "hex": "#894315",
+    "levels": [
+     0.97042,
+     0.97238,
+     0.97588,
+     0.98001,
+     0.98232,
+     0.98519,
+     0.98734,
+     0.98937,
+     0.99241,
+     0.99657,
+     0.9991,
+     1.00114,
+     1.00335,
+     1.00533,
+     1.00767,
+     1.00971,
+     1.01206,
+     1.0144,
+     1.01594,
+     1.01843,
+     1.02095,
+     1.02467,
+     1.02653,
+     1.03098,
+     1.03263,
+     1.03567,
+     1.04118
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_deep_x_wood_dark_10",
+    "hex": "#844115",
+    "levels": [
+     0.97788,
+     0.9804,
+     0.98438,
+     0.9902,
+     1.0047,
+     1.01145,
+     1.02787,
+     1.03218,
+     1.03533,
+     1.04062,
+     1.04427,
+     1.0502,
+     1.05868
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_deep_x_wood_dark_15",
+    "hex": "#824015",
+    "levels": [
+     0.95613,
+     0.96063,
+     0.96637,
+     0.97589,
+     0.97943,
+     0.98388,
+     0.98747,
+     0.99111,
+     0.99446,
+     0.99705,
+     0.99852,
+     1.00284,
+     1.0091,
+     1.01263,
+     1.01921,
+     1.03457
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_x_dark_50",
+    "hex": "#894E1F",
+    "levels": [
+     0.96232,
+     0.96436,
+     0.9666,
+     0.9686,
+     0.97069,
+     0.9731,
+     0.97602,
+     0.97786,
+     0.97989,
+     0.98255,
+     0.98456,
+     0.98662,
+     0.98885,
+     0.99076,
+     0.99957,
+     1.00266,
+     1.00479,
+     1.00725,
+     1.00909,
+     1.01107,
+     1.01314,
+     1.01549,
+     1.01742,
+     1.02026,
+     1.02195,
+     1.0243,
+     1.02675,
+     1.02866,
+     1.03155,
+     1.03365
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_x_deep_15",
+    "hex": "#AF6727",
+    "levels": [
+     0.94811,
+     0.95381,
+     0.95484,
+     0.96631,
+     0.96887,
+     0.97128,
+     0.98069,
+     0.98394
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_wood_x_peg_10",
+    "hex": "#B77331",
+    "levels": [
+     0.96842,
+     0.9729,
+     0.97576,
+     0.97824,
+     0.98098,
+     0.98422,
+     0.99149,
+     0.99661,
+     1.00657,
+     1.0117,
+     1.01506,
+     1.01634,
+     1.01895,
+     1.02484,
+     1.02691,
+     1.03244
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "RopeBridge",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "hero",
+   "size": [
+    27.4106,
+    11.0,
+    12.331
+   ],
+   "tris": 3896,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridge.glb",
+     "kind": "solid",
+     "tris": 3896,
+     "offset": [
+      0.0,
+      5.5,
+      0.0
+     ],
+     "size": [
+      27.4106,
+      11.0,
+      12.331
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rope crossing (post centres 18 x 6, stone tops 5.6, posts to 11.0, deck sagging from 5.6 to 4.5; about 26 x 11.2 x 11): a sagging plank footbridge between two pairs of square timber posts on four faceted anchor stones; twisted rope coils and red cloth wraps on the posts, two main ropes with knot collars, hangers to ten tilted planks with lugs, diagonals, backstays to the stones, rope links between the lugs, low brace sills and peg blocks at the ends. Seams: stone tops and deck ends 5.6, ground 0, both ends open. No VFX"
+  },
+  {
+   "name": "RopeBridgeAnchorStone",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    6.8004,
+    5.6,
+    6.1104
+   ],
+   "tris": 130,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeAnchorStone.glb",
+     "kind": "solid",
+     "tris": 130,
+     "offset": [
+      0.0,
+      2.8,
+      0.0
+     ],
+     "size": [
+      6.8004,
+      5.6,
+      6.1104
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Anchor Stone (reusable): a tapered faceted anchor stone with a flat 5.6 top and loose chunks at its foot"
+  },
+  {
+   "name": "RopeBridgeBrace",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    1.0,
+    0.37,
+    4.04
+   ],
+   "tris": 12,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeBrace.glb",
+     "kind": "solid",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.185,
+      0.0
+     ],
+     "size": [
+      1.0,
+      0.37,
+      4.04
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Brace (reusable): the 1.0 x 4.0 x 0.37 end sill between the base blocks"
+  },
+  {
+   "name": "RopeBridgeEndPost",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    2.0,
+    5.42,
+    2.0
+   ],
+   "tris": 68,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeEndPost.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      2.71,
+      0.0
+     ],
+     "size": [
+      2.0,
+      5.42,
+      2.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "End Post (reusable): a 1.6-square timber post on a 2.0 base block, a 1.7 chamfered cap with a peg hole and a side peg"
+  },
+  {
+   "name": "RopeBridgeHangerRope",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    0.41,
+    3.0,
+    0.3984
+   ],
+   "tris": 68,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeHangerRope.glb",
+     "kind": "solid",
+     "tris": 68,
+     "offset": [
+      0.0,
+      1.5,
+      0.0
+     ],
+     "size": [
+      0.41,
+      3.0,
+      0.3984
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Hanger Rope (reusable): a 3.0 twisted hanger rope with three knots"
+  },
+  {
+   "name": "RopeBridgeMainRope",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    8.5196,
+    1.1153,
+    0.636
+   ],
+   "tris": 154,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeMainRope.glb",
+     "kind": "solid",
+     "tris": 154,
+     "offset": [
+      0.0,
+      0.5577,
+      0.0
+     ],
+     "size": [
+      8.5196,
+      1.1153,
+      0.636
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Main Rope (reusable): a sagging twisted rope with knot collars and round knob ends"
+  },
+  {
+   "name": "RopeBridgePegBlock",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    0.81,
+    0.8,
+    0.9
+   ],
+   "tris": 24,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgePegBlock.glb",
+     "kind": "solid",
+     "tris": 24,
+     "offset": [
+      0.0,
+      0.4,
+      0.0
+     ],
+     "size": [
+      0.81,
+      0.8,
+      0.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Peg Block (reusable): a timber block with a square peg that anchors a rope"
+  },
+  {
+   "name": "RopeBridgePlank",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    1.15,
+    1.15,
+    6.2
+   ],
+   "tris": 44,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgePlank.glb",
+     "kind": "solid",
+     "tris": 44,
+     "offset": [
+      0.0,
+      0.575,
+      0.0
+     ],
+     "size": [
+      1.15,
+      1.15,
+      6.2
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Plank (reusable): a 1.15 x 0.80 x 6.2 plank with a deeper lug at each end and pale peg dots"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 4396,
+  "vfxSockets": 0,
+  "paletteColours": 19,
+  "paletteLevels": 289,
+  "meshBytes": 413740
+ },
+ "problems": []
+}
