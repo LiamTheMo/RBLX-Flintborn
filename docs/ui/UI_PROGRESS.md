@@ -1,6 +1,12 @@
 # UI progress
 
-Parchment-and-leather UI from the reference sheets in `art/reference/ui/parchment/`.
+> **Rebuild pending.** All of the lobby UI will be rebuilt from the new mockups
+> in [`art/reference/ui/lobby/`](../../art/reference/ui/lobby/README.md). The
+> parchment reference sheets that the table below cites (`art/reference/ui/parchment/`)
+> have been removed. The live UI and its uploaded sprites stay in place until
+> the rebuild replaces them. This table records the previous build.
+
+Parchment-and-leather UI from the old reference sheets (removed).
 
 | Screen / component | Reference | Spec | Assets | Static build | States | Motion | Integration | Visual | Platform | Code review | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
