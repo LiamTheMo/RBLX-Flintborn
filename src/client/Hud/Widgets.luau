@@ -316,13 +316,16 @@ end
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	if whole and type(whole.tiles) == "table" then
-		return tiled(name, whole, props, parent) or fallback(name, props, parent)
-	end
 	local atlas = whole
 		and type(whole.atlas) == "string"
 		and type(whole.rect) == "table"
 		and UiAssets.image(whole.atlas)
+	-- Art too big for one image is drawn from its scaled-down atlas copy when
+	-- that is uploaded, else from its tiles.
+	local wasTiled = whole and type(whole.tiles) == "table"
+	if wasTiled and not atlas then
+		return tiled(name, whole, props, parent) or fallback(name, props, parent)
+	end
 	local id = atlas or UiAssets.image(name)
 	if id == nil then
 		return fallback(name, props, parent)
@@ -345,7 +348,7 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 		elseif width > 0 and height > 0 then
 			image.SliceScale = HudModel.SliceScale(sprite.w, sprite.h, width, height)
 		end
-	elseif string.sub(name, 1, 5) == "fill_" then
+	elseif wasTiled or string.sub(name, 1, 5) == "fill_" then
 		image.ScaleType = Enum.ScaleType.Stretch
 	else
 		image.ScaleType = Enum.ScaleType.Fit
