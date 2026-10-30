@@ -200,6 +200,13 @@
       36,
       47,
       37
+    ],
+    "atlas": "atlas_map",
+    "rect": [
+      0,
+      337,
+      425,
+      111
     ]
   },
   "frame_panel_large_hollow": {
@@ -928,15 +935,117 @@
     "h": 512,
     "slice": null
   },
+  "atlas_ui": {
+    "file": "atlas_ui.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_screens": {
+    "file": "atlas_screens.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_craft": {
+    "file": "atlas_windows_craft.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_menu": {
+    "file": "atlas_windows_menu.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_windows_bag": {
+    "file": "atlas_windows_bag.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_pieces": {
+    "file": "atlas_pieces.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_map": {
+    "file": "atlas_map.png",
+    "w": 1024,
+    "h": 512,
+    "slice": null
+  },
+  "atlas_window_crafting_1": {
+    "file": "atlas_window_crafting_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_crafting_2": {
+    "file": "atlas_window_crafting_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_forge_1": {
+    "file": "atlas_window_forge_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_forge_2": {
+    "file": "atlas_window_forge_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_inventory_1": {
+    "file": "atlas_window_inventory_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_inventory_2": {
+    "file": "atlas_window_inventory_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_journal_1": {
+    "file": "atlas_window_journal_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_journal_2": {
+    "file": "atlas_window_journal_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_settings_1": {
+    "file": "atlas_window_settings_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_window_settings_2": {
+    "file": "atlas_window_settings_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
   "pm_arrow_left": {
     "file": "pm_arrow_left.png",
     "w": 86,
     "h": 74,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      0,
-      933,
+      908,
+      862,
       86,
       74
     ]
@@ -946,10 +1055,10 @@
     "w": 86,
     "h": 75,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      924,
-      191,
+      409,
+      862,
       86,
       75
     ]
@@ -975,10 +1084,10 @@
       40,
       26
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      693,
-      191,
+      646,
+      682,
       227,
       85
     ]
@@ -1001,10 +1110,10 @@
     "w": 276,
     "h": 89,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      693,
-      98,
+      0,
+      682,
       276,
       89
     ]
@@ -1050,10 +1159,10 @@
       70,
       26
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      693,
       0,
+      584,
       282,
       94
     ]
@@ -1137,10 +1246,10 @@
       56,
       48
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      500,
+      134,
+      318,
       386,
       159
     ]
@@ -1183,10 +1292,10 @@
     "w": 212,
     "h": 77,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      768,
-      500,
+      439,
+      775,
       212,
       77
     ]
@@ -1201,10 +1310,10 @@
       26,
       26
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      736,
-      674,
+      286,
+      584,
       116,
       93
     ]
@@ -1219,10 +1328,10 @@
       64,
       26
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      849,
+      78,
+      775,
       357,
       80
     ]
@@ -1251,10 +1360,10 @@
     "w": 62,
     "h": 62,
     "slice": null,
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
-      370,
-      879,
+      799,
+      337,
       62,
       62
     ]
@@ -1264,10 +1373,10 @@
     "w": 62,
     "h": 63,
     "slice": null,
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
-      304,
-      879,
+      733,
+      337,
       62,
       63
     ]
@@ -1295,10 +1404,10 @@
     "w": 74,
     "h": 83,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      856,
-      581,
+      0,
+      775,
       74,
       83
     ]
@@ -1308,10 +1417,10 @@
     "w": 79,
     "h": 73,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      736,
-      821,
+      0,
+      942,
       79,
       73
     ]
@@ -1321,10 +1430,10 @@
     "w": 78,
     "h": 68,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
+      83,
       942,
-      674,
       78,
       68
     ]
@@ -1334,10 +1443,10 @@
     "w": 84,
     "h": 85,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      768,
-      581,
+      877,
+      682,
       84,
       85
     ]
@@ -1386,10 +1495,10 @@
     "w": 93,
     "h": 117,
     "slice": null,
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
       866,
-      542,
+      0,
       93,
       117
     ]
@@ -1404,10 +1513,10 @@
       16,
       14
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      856,
-      674,
+      252,
+      942,
       82,
       64
     ]
@@ -1422,10 +1531,10 @@
       16,
       14
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      934,
-      581,
+      165,
+      942,
       83,
       64
     ]
@@ -1476,10 +1585,10 @@
       96,
       122
     ],
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
       0,
-      542,
+      0,
       774,
       333
     ]
@@ -1845,10 +1954,10 @@
     "w": 130,
     "h": 160,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      550,
-      842,
+      0,
+      318,
       130,
       160
     ]
@@ -1858,10 +1967,10 @@
     "w": 214,
     "h": 170,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      550,
-      500,
+      533,
+      0,
       214,
       170
     ]
@@ -1910,10 +2019,10 @@
     "w": 182,
     "h": 164,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      550,
-      674,
+      751,
+      0,
       182,
       164
     ]
@@ -1964,10 +2073,10 @@
       20,
       8
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      0,
-      871,
+      338,
+      942,
       126,
       58
     ]
@@ -1982,10 +2091,10 @@
       20,
       8
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      394,
-      933,
+      468,
+      942,
       129,
       54
     ]
@@ -2109,7 +2218,14 @@
     "file": "pm_map_island.png",
     "w": 1000,
     "h": 1000,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_island",
+    "rect": [
+      0,
+      0,
+      1000,
+      1000
+    ]
   },
   "pm_map_label": {
     "file": "pm_map_label.png",
@@ -2121,10 +2237,10 @@
       40,
       30
     ],
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
-      0,
-      879,
+      429,
+      337,
       300,
       108
     ]
@@ -2134,10 +2250,10 @@
     "w": 84,
     "h": 118,
     "slice": null,
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "rect": [
       778,
-      542,
+      0,
       84,
       118
     ]
@@ -2152,9 +2268,9 @@
       70,
       62
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
+      0,
       0,
       529,
       314
@@ -2170,10 +2286,10 @@
       40,
       30
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      757,
+      280,
+      682,
       362,
       88
     ]
@@ -2188,10 +2304,10 @@
       40,
       30
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      663,
+      406,
+      584,
       364,
       90
     ]
@@ -2201,10 +2317,10 @@
     "w": 404,
     "h": 96,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      568,
-      398,
+      408,
+      482,
       404,
       96
     ]
@@ -2219,10 +2335,10 @@
       60,
       24
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      398,
+      0,
+      482,
       404,
       98
     ]
@@ -2237,10 +2353,10 @@
       60,
       24
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      569,
-      318,
+      499,
+      862,
       405,
       74
     ]
@@ -2255,10 +2371,10 @@
       60,
       24
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      318,
+      0,
+      862,
       405,
       76
     ]
@@ -2273,10 +2389,10 @@
       18,
       18
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      0,
-      573,
+      524,
+      318,
       106,
       156
     ]
@@ -2291,25 +2407,25 @@
       14,
       14
     ],
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      160,
-      933,
+      601,
+      942,
       230,
       46
     ]
   },
-  "pm_side_column": {
-    "file": "pm_side_column.png",
-    "w": 156,
-    "h": 569,
+  "pm_side_tab": {
+    "file": "pm_side_tab.png",
+    "w": 116,
+    "h": 124,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      0,
-      0,
-      156,
-      569
+      760,
+      318,
+      116,
+      124
     ]
   },
   "pm_side_tab_selected": {
@@ -2317,10 +2433,10 @@
     "w": 122,
     "h": 134,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      0,
-      733,
+      634,
+      318,
       122,
       134
     ]
@@ -2343,10 +2459,10 @@
     "w": 81,
     "h": 46,
     "slice": null,
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "rect": [
-      736,
-      771,
+      835,
+      942,
       81,
       46
     ]
@@ -2549,13 +2665,27 @@
     "file": "pm_window_crafting__1_1.png",
     "w": 816,
     "h": 742,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_crafting_1",
+    "rect": [
+      0,
+      0,
+      816,
+      742
+    ]
   },
   "pm_window_crafting__1_2": {
     "file": "pm_window_crafting__1_2.png",
     "w": 817,
     "h": 742,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_crafting_2",
+    "rect": [
+      0,
+      0,
+      817,
+      742
+    ]
   },
   "pm_window_crafting": {
     "file": null,
@@ -2577,26 +2707,33 @@
         817,
         742
       ]
-    ],
-    "atlas": "atlas_windows_craft",
-    "rect": [
-      0,
-      0,
-      1023,
-      466
     ]
   },
   "pm_window_forge__1_1": {
     "file": "pm_window_forge__1_1.png",
     "w": 816,
     "h": 742,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_forge_1",
+    "rect": [
+      0,
+      0,
+      816,
+      742
+    ]
   },
   "pm_window_forge__1_2": {
     "file": "pm_window_forge__1_2.png",
     "w": 817,
     "h": 742,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_forge_2",
+    "rect": [
+      0,
+      0,
+      817,
+      742
+    ]
   },
   "pm_window_forge": {
     "file": null,
@@ -2618,26 +2755,33 @@
         817,
         742
       ]
-    ],
-    "atlas": "atlas_windows_craft",
-    "rect": [
-      0,
-      470,
-      1023,
-      466
     ]
   },
   "pm_window_inventory__1_1": {
     "file": "pm_window_inventory__1_1.png",
     "w": 749,
     "h": 786,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_inventory_1",
+    "rect": [
+      0,
+      0,
+      749,
+      786
+    ]
   },
   "pm_window_inventory__1_2": {
     "file": "pm_window_inventory__1_2.png",
     "w": 749,
     "h": 786,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_inventory_2",
+    "rect": [
+      0,
+      0,
+      749,
+      786
+    ]
   },
   "pm_window_inventory": {
     "file": null,
@@ -2659,26 +2803,33 @@
         749,
         786
       ]
-    ],
-    "atlas": "atlas_windows_bag",
-    "rect": [
-      0,
-      0,
-      1024,
-      538
     ]
   },
   "pm_window_journal__1_1": {
     "file": "pm_window_journal__1_1.png",
     "w": 818,
     "h": 772,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_journal_1",
+    "rect": [
+      0,
+      0,
+      818,
+      772
+    ]
   },
   "pm_window_journal__1_2": {
     "file": "pm_window_journal__1_2.png",
     "w": 818,
     "h": 772,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_journal_2",
+    "rect": [
+      0,
+      0,
+      818,
+      772
+    ]
   },
   "pm_window_journal": {
     "file": null,
@@ -2700,26 +2851,33 @@
         818,
         772
       ]
-    ],
-    "atlas": "atlas_windows_menu",
-    "rect": [
-      0,
-      0,
-      1024,
-      484
     ]
   },
   "pm_window_settings__1_1": {
     "file": "pm_window_settings__1_1.png",
     "w": 817,
     "h": 706,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_settings_1",
+    "rect": [
+      0,
+      0,
+      817,
+      706
+    ]
   },
   "pm_window_settings__1_2": {
     "file": "pm_window_settings__1_2.png",
     "w": 817,
     "h": 706,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_window_settings_2",
+    "rect": [
+      0,
+      0,
+      817,
+      706
+    ]
   },
   "pm_window_settings": {
     "file": null,
@@ -2741,41 +2899,10 @@
         817,
         706
       ]
-    ],
-    "atlas": "atlas_windows_menu",
-    "rect": [
-      0,
-      488,
-      1024,
-      443
     ]
   },
-  "atlas_ui": {
-    "file": "atlas_ui.png",
-    "w": 1024,
-    "h": 1024,
-    "slice": null
-  },
-  "atlas_screens": {
-    "file": "atlas_screens.png",
-    "w": 1024,
-    "h": 1024,
-    "slice": null
-  },
-  "atlas_windows_craft": {
-    "file": "atlas_windows_craft.png",
-    "w": 1024,
-    "h": 1024,
-    "slice": null
-  },
-  "atlas_windows_menu": {
-    "file": "atlas_windows_menu.png",
-    "w": 1024,
-    "h": 1024,
-    "slice": null
-  },
-  "atlas_windows_bag": {
-    "file": "atlas_windows_bag.png",
+  "atlas_island": {
+    "file": "atlas_island.png",
     "w": 1024,
     "h": 1024,
     "slice": null

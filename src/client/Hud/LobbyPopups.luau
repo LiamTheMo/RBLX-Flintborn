@@ -80,7 +80,7 @@ local function button(cfg, parent: Instance, label: string, primary: boolean, pr
 		TextScaled = true,
 		ZIndex = z + 1,
 	}, holder)
-	Widgets.Make("UITextSizeConstraint", { MaxTextSize = cfg.textSize, MinTextSize = 11 }, text)
+	Widgets.TextCap(text, cfg.textSize, 11)
 	local hit = Widgets.Make("TextButton", {
 		Name = "Press",
 		Text = "",
@@ -246,11 +246,7 @@ function LobbyPopups:Show(spec)
 		TextScaled = true,
 		ZIndex = BASE_Z + 3,
 	}, card)
-	Widgets.Make(
-		"UITextSizeConstraint",
-		{ MaxTextSize = cfg.title.textSize, MinTextSize = 14 },
-		card:FindFirstChild("Title")
-	)
+	Widgets.TextCap(card:FindFirstChild("Title") :: GuiObject, cfg.title.textSize, 14)
 	local close = Widgets.Make("Frame", {
 		Name = "Close",
 		BackgroundTransparency = 1,

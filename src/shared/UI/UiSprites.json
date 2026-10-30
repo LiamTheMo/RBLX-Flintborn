@@ -4,7 +4,22 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_island": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lobby": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_map": {
+    "h": 512,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_pieces": {
     "h": 1024,
     "slice": null,
     "w": 1024
@@ -15,6 +30,56 @@
     "w": 1024
   },
   "atlas_ui": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_crafting_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_crafting_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_forge_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_forge_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_inventory_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_inventory_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_journal_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_journal_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_settings_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_window_settings_2": {
     "h": 1024,
     "slice": null,
     "w": 1024
@@ -207,7 +272,14 @@
     "w": 425
   },
   "frame_bar_hollow": {
+    "atlas": "atlas_map",
     "h": 111,
+    "rect": [
+      0,
+      337,
+      425,
+      111
+    ],
     "slice": [
       48,
       36,
@@ -792,11 +864,11 @@
     "w": 194
   },
   "pm_arrow_left": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 74,
     "rect": [
-      0,
-      933,
+      908,
+      862,
       86,
       74
     ],
@@ -804,11 +876,11 @@
     "w": 86
   },
   "pm_arrow_right": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 75,
     "rect": [
-      924,
-      191,
+      409,
+      862,
       86,
       75
     ],
@@ -826,11 +898,11 @@
     "w": 948
   },
   "pm_button_action": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 85,
     "rect": [
-      693,
-      191,
+      646,
+      682,
       227,
       85
     ],
@@ -855,11 +927,11 @@
     "w": 68
   },
   "pm_button_apply": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 89,
     "rect": [
-      693,
-      98,
+      0,
+      682,
       276,
       89
     ],
@@ -896,11 +968,11 @@
     "w": 391
   },
   "pm_button_craft": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 94,
     "rect": [
-      693,
       0,
+      584,
       282,
       94
     ],
@@ -977,11 +1049,11 @@
     "w": 129
   },
   "pm_button_parchment": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 159,
     "rect": [
-      160,
-      500,
+      134,
+      318,
       386,
       159
     ],
@@ -1024,11 +1096,11 @@
     "w": 385
   },
   "pm_button_reset": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 77,
     "rect": [
-      768,
-      500,
+      439,
+      775,
       212,
       77
     ],
@@ -1036,11 +1108,11 @@
     "w": 212
   },
   "pm_button_square": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 93,
     "rect": [
-      736,
-      674,
+      286,
+      584,
       116,
       93
     ],
@@ -1053,11 +1125,11 @@
     "w": 116
   },
   "pm_button_strip": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 80,
     "rect": [
-      160,
-      849,
+      78,
+      775,
       357,
       80
     ],
@@ -1087,11 +1159,11 @@
     "w": 55
   },
   "pm_button_zoom_in": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 62,
     "rect": [
-      370,
-      879,
+      799,
+      337,
       62,
       62
     ],
@@ -1099,11 +1171,11 @@
     "w": 62
   },
   "pm_button_zoom_out": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 63,
     "rect": [
-      304,
-      879,
+      733,
+      337,
       62,
       63
     ],
@@ -1128,11 +1200,11 @@
     "w": 314
   },
   "pm_cat_all": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 83,
     "rect": [
-      856,
-      581,
+      0,
+      775,
       74,
       83
     ],
@@ -1140,11 +1212,11 @@
     "w": 74
   },
   "pm_cat_food": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 73,
     "rect": [
-      736,
-      821,
+      0,
+      942,
       79,
       73
     ],
@@ -1152,11 +1224,11 @@
     "w": 79
   },
   "pm_cat_materials": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 68,
     "rect": [
+      83,
       942,
-      674,
       78,
       68
     ],
@@ -1164,11 +1236,11 @@
     "w": 78
   },
   "pm_cat_tools": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 85,
     "rect": [
-      768,
-      581,
+      877,
+      682,
       84,
       85
     ],
@@ -1212,11 +1284,11 @@
     "w": 70
   },
   "pm_compass_rose": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 117,
     "rect": [
       866,
-      542,
+      0,
       93,
       117
     ],
@@ -1224,11 +1296,11 @@
     "w": 93
   },
   "pm_ctab": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 64,
     "rect": [
-      856,
-      674,
+      252,
+      942,
       82,
       64
     ],
@@ -1241,11 +1313,11 @@
     "w": 82
   },
   "pm_ctab_selected": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 64,
     "rect": [
-      934,
-      581,
+      165,
+      942,
       83,
       64
     ],
@@ -1292,11 +1364,11 @@
     "w": 176
   },
   "pm_frame_hollow": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 333,
     "rect": [
       0,
-      542,
+      0,
       774,
       333
     ],
@@ -1639,11 +1711,11 @@
     "w": 179
   },
   "pm_icon_bolt": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 160,
     "rect": [
-      550,
-      842,
+      0,
+      318,
       130,
       160
     ],
@@ -1651,11 +1723,11 @@
     "w": 130
   },
   "pm_icon_chest": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 170,
     "rect": [
-      550,
-      500,
+      533,
+      0,
       214,
       170
     ],
@@ -1699,11 +1771,11 @@
     "w": 128
   },
   "pm_icon_scroll": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 164,
     "rect": [
-      550,
-      674,
+      751,
+      0,
       182,
       164
     ],
@@ -1745,11 +1817,11 @@
     "w": 97
   },
   "pm_jtab_leather": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 58,
     "rect": [
-      0,
-      871,
+      338,
+      942,
       126,
       58
     ],
@@ -1762,11 +1834,11 @@
     "w": 126
   },
   "pm_jtab_paper": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 54,
     "rect": [
-      394,
-      933,
+      468,
+      942,
       129,
       54
     ],
@@ -1885,16 +1957,23 @@
     "w": 255
   },
   "pm_map_island": {
+    "atlas": "atlas_island",
     "h": 1000,
+    "rect": [
+      0,
+      0,
+      1000,
+      1000
+    ],
     "slice": null,
     "w": 1000
   },
   "pm_map_label": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 108,
     "rect": [
-      0,
-      879,
+      429,
+      337,
       300,
       108
     ],
@@ -1907,11 +1986,11 @@
     "w": 300
   },
   "pm_map_pin": {
-    "atlas": "atlas_windows_bag",
+    "atlas": "atlas_map",
     "h": 118,
     "rect": [
       778,
-      542,
+      0,
       84,
       118
     ],
@@ -1919,10 +1998,10 @@
     "w": 84
   },
   "pm_panel": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 314,
     "rect": [
-      160,
+      0,
       0,
       529,
       314
@@ -1936,11 +2015,11 @@
     "w": 529
   },
   "pm_quest_row": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 88,
     "rect": [
-      160,
-      757,
+      280,
+      682,
       362,
       88
     ],
@@ -1953,11 +2032,11 @@
     "w": 362
   },
   "pm_quest_row_selected": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 90,
     "rect": [
-      160,
-      663,
+      406,
+      584,
       364,
       90
     ],
@@ -1970,11 +2049,11 @@
     "w": 364
   },
   "pm_queue_empty": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 96,
     "rect": [
-      568,
-      398,
+      408,
+      482,
       404,
       96
     ],
@@ -1982,11 +2061,11 @@
     "w": 404
   },
   "pm_queue_row": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 98,
     "rect": [
-      160,
-      398,
+      0,
+      482,
       404,
       98
     ],
@@ -1999,11 +2078,11 @@
     "w": 404
   },
   "pm_recipe_row": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 74,
     "rect": [
-      569,
-      318,
+      499,
+      862,
       405,
       74
     ],
@@ -2016,11 +2095,11 @@
     "w": 405
   },
   "pm_recipe_row_selected": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 76,
     "rect": [
-      160,
-      318,
+      0,
+      862,
       405,
       76
     ],
@@ -2033,11 +2112,11 @@
     "w": 405
   },
   "pm_req_card": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 156,
     "rect": [
-      0,
-      573,
+      524,
+      318,
       106,
       156
     ],
@@ -2050,11 +2129,11 @@
     "w": 106
   },
   "pm_search_box": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 46,
     "rect": [
-      160,
-      933,
+      601,
+      942,
       230,
       46
     ],
@@ -2066,24 +2145,24 @@
     ],
     "w": 230
   },
-  "pm_side_column": {
-    "atlas": "atlas_screens",
-    "h": 569,
+  "pm_side_tab": {
+    "atlas": "atlas_pieces",
+    "h": 124,
     "rect": [
-      0,
-      0,
-      156,
-      569
+      760,
+      318,
+      116,
+      124
     ],
     "slice": null,
-    "w": 156
+    "w": 116
   },
   "pm_side_tab_selected": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 134,
     "rect": [
-      0,
-      733,
+      634,
+      318,
       122,
       134
     ],
@@ -2103,11 +2182,11 @@
     "w": 58
   },
   "pm_sort_button": {
-    "atlas": "atlas_screens",
+    "atlas": "atlas_pieces",
     "h": 46,
     "rect": [
-      736,
-      771,
+      835,
+      942,
       81,
       46
     ],
@@ -2296,14 +2375,7 @@
     "w": 146
   },
   "pm_window_crafting": {
-    "atlas": "atlas_windows_craft",
     "h": 742,
-    "rect": [
-      0,
-      0,
-      1023,
-      466
-    ],
     "slice": null,
     "tiles": [
       [
@@ -2324,24 +2396,31 @@
     "w": 1629
   },
   "pm_window_crafting__1_1": {
+    "atlas": "atlas_window_crafting_1",
     "h": 742,
+    "rect": [
+      0,
+      0,
+      816,
+      742
+    ],
     "slice": null,
     "w": 816
   },
   "pm_window_crafting__1_2": {
+    "atlas": "atlas_window_crafting_2",
     "h": 742,
+    "rect": [
+      0,
+      0,
+      817,
+      742
+    ],
     "slice": null,
     "w": 817
   },
   "pm_window_forge": {
-    "atlas": "atlas_windows_craft",
     "h": 742,
-    "rect": [
-      0,
-      470,
-      1023,
-      466
-    ],
     "slice": null,
     "tiles": [
       [
@@ -2362,24 +2441,31 @@
     "w": 1629
   },
   "pm_window_forge__1_1": {
+    "atlas": "atlas_window_forge_1",
     "h": 742,
+    "rect": [
+      0,
+      0,
+      816,
+      742
+    ],
     "slice": null,
     "w": 816
   },
   "pm_window_forge__1_2": {
+    "atlas": "atlas_window_forge_2",
     "h": 742,
+    "rect": [
+      0,
+      0,
+      817,
+      742
+    ],
     "slice": null,
     "w": 817
   },
   "pm_window_inventory": {
-    "atlas": "atlas_windows_bag",
     "h": 786,
-    "rect": [
-      0,
-      0,
-      1024,
-      538
-    ],
     "slice": null,
     "tiles": [
       [
@@ -2400,24 +2486,31 @@
     "w": 1494
   },
   "pm_window_inventory__1_1": {
+    "atlas": "atlas_window_inventory_1",
     "h": 786,
+    "rect": [
+      0,
+      0,
+      749,
+      786
+    ],
     "slice": null,
     "w": 749
   },
   "pm_window_inventory__1_2": {
+    "atlas": "atlas_window_inventory_2",
     "h": 786,
+    "rect": [
+      0,
+      0,
+      749,
+      786
+    ],
     "slice": null,
     "w": 749
   },
   "pm_window_journal": {
-    "atlas": "atlas_windows_menu",
     "h": 772,
-    "rect": [
-      0,
-      0,
-      1024,
-      484
-    ],
     "slice": null,
     "tiles": [
       [
@@ -2438,24 +2531,31 @@
     "w": 1632
   },
   "pm_window_journal__1_1": {
+    "atlas": "atlas_window_journal_1",
     "h": 772,
+    "rect": [
+      0,
+      0,
+      818,
+      772
+    ],
     "slice": null,
     "w": 818
   },
   "pm_window_journal__1_2": {
+    "atlas": "atlas_window_journal_2",
     "h": 772,
+    "rect": [
+      0,
+      0,
+      818,
+      772
+    ],
     "slice": null,
     "w": 818
   },
   "pm_window_settings": {
-    "atlas": "atlas_windows_menu",
     "h": 706,
-    "rect": [
-      0,
-      488,
-      1024,
-      443
-    ],
     "slice": null,
     "tiles": [
       [
@@ -2476,12 +2576,26 @@
     "w": 1630
   },
   "pm_window_settings__1_1": {
+    "atlas": "atlas_window_settings_1",
     "h": 706,
+    "rect": [
+      0,
+      0,
+      817,
+      706
+    ],
     "slice": null,
     "w": 817
   },
   "pm_window_settings__1_2": {
+    "atlas": "atlas_window_settings_2",
     "h": 706,
+    "rect": [
+      0,
+      0,
+      817,
+      706
+    ],
     "slice": null,
     "w": 817
   },
