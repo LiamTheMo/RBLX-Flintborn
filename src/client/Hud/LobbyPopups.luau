@@ -53,7 +53,8 @@ local function lineHeight(entry, text: string, width: number): number
 end
 
 -- A footer or row button on the leather (primary) or paper art, swapping to its
--- hover and pressed art when those are uploaded.
+-- hover and pressed art when those are uploaded and the base is not drawn from
+-- an atlas (then it is tinted).
 local function button(cfg, parent: Instance, label: string, primary: boolean, props, onPress)
 	local base = if primary then "pm_button_leather" else "pm_button_parchment"
 	local baseSprite = UiAssets.sprite(base)
