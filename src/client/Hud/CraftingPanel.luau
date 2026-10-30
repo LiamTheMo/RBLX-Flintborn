@@ -609,7 +609,7 @@ function CraftingPanel:_drawNeeds(entry, count: number): boolean
 			TextXAlignment = Enum.TextXAlignment.Center,
 			ZIndex = 4,
 		}, holder)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 21, MinTextSize = 10 }, counts)
+		Widgets.TextCap(counts, 21, 10)
 	end
 	return enough
 end

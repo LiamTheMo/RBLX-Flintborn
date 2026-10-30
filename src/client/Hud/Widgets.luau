@@ -82,6 +82,39 @@ function Widgets.Make(className: string, props, parent: Instance?)
 	return object
 end
 
+-- The capture harness (art/ui/capture) applies text caps in layout pixels.
+local CAPTURE = (__FlintbornCapture :: any) == true
+
+-- Caps scaled text at `maxSize` layout pixels (and keeps it at least `minSize`
+-- screen pixels). Roblox applies a UITextSizeConstraint in screen pixels, after
+-- any UIScale, so on a window drawn smaller (phones) a cap in layout pixels let
+-- text grow far past its design; the cap follows the UIScales above the label.
+function Widgets.TextCap(label: GuiObject, maxSize: number, minSize: number?)
+	local floor = minSize or 1
+	local cap = Widgets.Make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = floor }, label)
+	if CAPTURE then
+		return cap
+	end
+	local function update()
+		local k = 1
+		local node: Instance? = label
+		while node do
+			local scale = node:FindFirstChildWhichIsA("UIScale")
+			if scale then
+				k *= scale.Scale
+			end
+			node = node.Parent
+		end
+		local top = math.max(1, math.floor(maxSize * k + 0.5))
+		cap.MaxTextSize = top
+		cap.MinTextSize = math.min(floor, top)
+	end
+	label:GetPropertyChangedSignal("AbsoluteSize"):Connect(update)
+	label.AncestryChanged:Connect(update)
+	update()
+	return cap
+end
+
 local function targetSize(props): (number, number)
 	local size = props and props.Size
 	if typeof(size) == "UDim2" then
@@ -181,7 +214,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+		Widgets.TextCap(mark, 40)
 	end
 	local words = Widgets.PARCHMENT_LABELS[name]
 	if words then
@@ -197,7 +230,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 44 }, label)
+		Widgets.TextCap(label, 44)
 		if window then
 			-- The window art's close button: a ✕ where it is painted.
 			local close = Widgets.Make("TextLabel", {
@@ -212,7 +245,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 				Font = Enum.Font.GothamBold,
 				ZIndex = (props and props.ZIndex or 1) + 1,
 			}, frame)
-			Widgets.Make("UITextSizeConstraint", { MaxTextSize = 48 }, close)
+			Widgets.TextCap(close, 48)
 		end
 	end
 	local glyph = Widgets.PARCHMENT_GLYPHS[name]
@@ -231,7 +264,7 @@ local function parchmentFallback(name: string, props, parent: Instance?)
 			Font = Enum.Font.GothamBold,
 			ZIndex = (props and props.ZIndex or 1) + 1,
 		}, frame)
-		Widgets.Make("UITextSizeConstraint", { MaxTextSize = 40 }, mark)
+		Widgets.TextCap(mark, 40)
 	end
 	return applyFrame(frame, props)
 end
@@ -281,13 +314,84 @@ local function fallback(name: string, props, parent: Instance?)
 	return applyFrame(frame, props)
 end
 
+-- The uploaded atlas holding sprite `name` (art/ui/pack_atlas.py), or nil.
+local function atlasImage(name: string): string?
+	local sprite = UiAssets.sprite(name)
+	if sprite and type(sprite.atlas) == "string" and type(sprite.rect) == "table" then
+		return UiAssets.image(sprite.atlas)
+	end
+	return nil
+end
+
+-- Image properties a nine-piece sprite's holder passes on to its pieces.
+local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
+
+-- A 9-sliced sprite from an atlas, drawn as nine plain pieces: each its own
+-- rectangle of the atlas, stretched (corners keep their size, edges stretch one
+-- way, the centre both). Phones drew Roblox's Slice of an atlas rectangle wrongly
+-- (pieces cut, shifted, or taken from neighbouring sprites), while plain atlas
+-- rectangles draw right everywhere. The holder is an ImageLabel without an image
+-- of its own whose tint, transparency and ZIndex pass on to the pieces, so callers
+-- treat it as any sprite.
+local function nineSlice(name: string, sprite, id: string, props, parent: Instance?, sliceScale: number?): GuiObject
+	local holder = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = "" }, parent)
+	local width, height = targetSize(props)
+	local scale = sliceScale
+		or (if width > 0 and height > 0 then HudModel.SliceScale(sprite.w, sprite.h, width, height) else 1)
+	local l, t, r, b = sprite.slice[1], sprite.slice[2], sprite.slice[3], sprite.slice[4]
+	local rx, ry = sprite.rect[1], sprite.rect[2]
+	local xs = { 0, l, sprite.w - r, sprite.w }
+	local ys = { 0, t, sprite.h - b, sprite.h }
+	-- Each column (row): {scale, offset} of its position and of its size.
+	local columns = {
+		{ 0, 0, 0, l * scale },
+		{ 0, l * scale, 1, -(l + r) * scale },
+		{ 1, -r * scale, 0, r * scale },
+	}
+	local rows = {
+		{ 0, 0, 0, t * scale },
+		{ 0, t * scale, 1, -(t + b) * scale },
+		{ 1, -b * scale, 0, b * scale },
+	}
+	local pieces = {}
+	for i = 1, 3 do
+		for j = 1, 3 do
+			local w, h = xs[i + 1] - xs[i], ys[j + 1] - ys[j]
+			if w > 0 and h > 0 then
+				local column, row = columns[i], rows[j]
+				local piece = Widgets.Make("ImageLabel", {
+					Name = "Piece" .. i .. j,
+					BackgroundTransparency = 1,
+					ImageRectOffset = Vector2.new(rx + xs[i], ry + ys[j]),
+					ImageRectSize = Vector2.new(w, h),
+					Position = UDim2.new(column[1], column[2], row[1], row[2]),
+					ScaleType = Enum.ScaleType.Stretch,
+					Size = UDim2.new(column[3], column[4], row[3], row[4]),
+				}, holder)
+				SpriteLoader.Assign(piece, id)
+				table.insert(pieces, piece)
+			end
+		end
+	end
+	for _, key in PASSED_ON do
+		local function pass()
+			for _, piece in pieces do
+				(piece :: any)[key] = (holder :: any)[key]
+			end
+		end
+		holder:GetPropertyChangedSignal(key):Connect(pass)
+		pass()
+	end
+	return apply(holder, props)
+end
+
 -- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
 -- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
 -- share of the whole, so the sprite still resizes as one image.
 local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	local ids = {}
 	for _, tile in sprite.tiles do
-		local id = UiAssets.image(tile[1])
+		local id = atlasImage(tile[1]) or UiAssets.image(tile[1])
 		if id == nil then
 			return nil
 		end
@@ -304,6 +408,11 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 			Size = UDim2.fromScale(tile[4] / sprite.w, tile[5] / sprite.h),
 			ZIndex = holder.ZIndex,
 		}, holder)
+		local piece = UiAssets.sprite(tile[1])
+		if atlasImage(tile[1]) and piece then
+			image.ImageRectOffset = Vector2.new(piece.rect[1], piece.rect[2])
+			image.ImageRectSize = Vector2.new(piece.rect[3], piece.rect[4])
+		end
 		SpriteLoader.Assign(image, ids[tile[1]])
 	end
 	return holder
@@ -316,28 +425,25 @@ end
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	local atlas = whole
-		and type(whole.atlas) == "string"
-		and type(whole.rect) == "table"
-		and UiAssets.image(whole.atlas)
-	-- Art too big for one image is drawn from its scaled-down atlas copy when
-	-- that is uploaded, else from its tiles.
-	local wasTiled = whole and type(whole.tiles) == "table"
-	if wasTiled and not atlas then
+	-- Art too big for one image is laid together from its tiles.
+	if whole and type(whole.tiles) == "table" then
 		return tiled(name, whole, props, parent) or fallback(name, props, parent)
 	end
+	local atlas = atlasImage(name)
 	local id = atlas or UiAssets.image(name)
 	if id == nil then
 		return fallback(name, props, parent)
 	end
+	local center = UiAssets.sliceCenter(name)
+	if atlas and center then
+		return nineSlice(name, whole, atlas, props, parent, sliceScale)
+	end
 	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
 	if atlas then
-		-- The 9-slice centre below is relative to this rectangle.
 		image.ImageRectOffset = Vector2.new(whole.rect[1], whole.rect[2])
 		image.ImageRectSize = Vector2.new(whole.rect[3], whole.rect[4])
 	end
 	SpriteLoader.Assign(image, id)
-	local center = UiAssets.sliceCenter(name)
 	local sprite = UiAssets.sprite(name)
 	if center and sprite then
 		image.ScaleType = Enum.ScaleType.Slice
@@ -348,7 +454,7 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 		elseif width > 0 and height > 0 then
 			image.SliceScale = HudModel.SliceScale(sprite.w, sprite.h, width, height)
 		end
-	elseif wasTiled or string.sub(name, 1, 5) == "fill_" then
+	elseif string.sub(name, 1, 5) == "fill_" then
 		image.ScaleType = Enum.ScaleType.Stretch
 	else
 		image.ScaleType = Enum.ScaleType.Fit

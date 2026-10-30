@@ -18,23 +18,22 @@
 -- reassigning it on everything that uses it so the engine asks again.
 
 local ContentProvider = game:GetService("ContentProvider")
-local UserInputService = game:GetService("UserInputService")
 
 local SpriteLoader = {}
 
 -- Pacing for HUD images: a tick every TICK seconds while images wait (IDLE
 -- otherwise); one fetch in flight at a time, given up after FETCH_TIMEOUT. A
 -- failed image is asked again after FIRST_WAIT, doubling up to MAX_WAIT.
--- Touch-only devices (phones, tablets) fetch a menu's art when it opens: the
--- menus' window art is several megapixels, which a phone's texture memory should
--- not hold unused; other devices prefetch it after what is on screen.
+-- Every device prefetches the art of closed menus after what is on screen, so a
+-- menu opens with its art already there: with the art packed into atlases that is
+-- a few images, one at a time.
 SpriteLoader.TICK = 0.05
 SpriteLoader.IDLE = 0.5
 SpriteLoader.FETCH_TIMEOUT = 20
 SpriteLoader.FIRST_WAIT = 4
 SpriteLoader.MAX_WAIT = 60
 SpriteLoader.SHOW_AFTER = 3
-SpriteLoader.PREFETCH_HIDDEN = not (UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled)
+SpriteLoader.PREFETCH_HIDDEN = true
 
 SpriteLoader.RETRIES = 6
 SpriteLoader.FIRST_DELAY = 1
