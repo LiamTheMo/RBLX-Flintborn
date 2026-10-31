@@ -137,9 +137,9 @@ function Bar.new(parent: Instance, props)
 	local _, fh = Art.SizeOf(fillSprite)
 	local fillScale = well[4] / (fh or well[4])
 	self.minWidth = 24 * fillScale
-	-- The fill is a clipping frame as wide as the value over a sliced plate
-	-- never narrower than its two end caps: a low value (under about a fifth)
-	-- shows a short clipped stub instead of vanishing.
+	-- The fill is the full-length plate behind a clipping frame as wide as the
+	-- value: the bar is cut at the value, never squeezed, so its end caps and
+	-- texture keep their shape at every value.
 	self.fill = Core.Make("Frame", {
 		Name = "Fill",
 		BackgroundTransparency = 1,
@@ -183,15 +183,12 @@ function Bar:Set(fraction: number, instant: boolean?)
 	local width = KitModel.FillWidth(fraction, self.well[3], self.minWidth)
 	local visible = fraction > 0
 	local goal = { Size = UDim2.fromOffset(width, self.well[4]) }
-	local plateGoal = { Size = UDim2.fromOffset(math.max(width, self.minWidth), self.well[4]) }
 	if instant then
 		Motion.Set(self.fill, goal)
-		Motion.Set(self.fillPlate, plateGoal)
 		self.fill.Visible = visible
 		return
 	end
 	self.fill.Visible = true
-	Motion.Play(self.fillPlate, "bar", plateGoal)
 	Motion.Play(self.fill, "bar", goal, function()
 		self.fill.Visible = visible
 	end)
