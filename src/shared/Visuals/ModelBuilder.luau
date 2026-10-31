@@ -108,7 +108,9 @@ end
 -- Welds the recipe's parts onto `host`, measured from host.CFrame * (options.offset
 -- or identity). A `normalized` recipe is scaled by the host's size. The parts are
 -- non-colliding, non-querying and massless; they go under options.parent (default
--- the host). Returns the parts.
+-- the host). With options.anchored the parts are anchored in place instead of
+-- welded: half the instances, for hosts that never move (nodes, event props).
+-- Returns the parts.
 function ModelBuilder.Decorate(host: BasePart, recipe, options): { BasePart }
 	options = options or {}
 	local scale = if recipe.normalized then host.Size else options.scale
@@ -117,12 +119,16 @@ function ModelBuilder.Decorate(host: BasePart, recipe, options): { BasePart }
 	for _, spec in recipe.parts do
 		local part = ModelBuilder.MakePart(spec, base * ModelBuilder.LocalCFrame(spec, scale), scale)
 		passive(part)
-		part.Anchored = false
-		local weld = Instance.new("Weld")
-		weld.Part0 = host
-		weld.Part1 = part
-		weld.C0 = host.CFrame:ToObjectSpace(part.CFrame)
-		weld.Parent = part
+		if options.anchored then
+			part.Anchored = true
+		else
+			part.Anchored = false
+			local weld = Instance.new("Weld")
+			weld.Part0 = host
+			weld.Part1 = part
+			weld.C0 = host.CFrame:ToObjectSpace(part.CFrame)
+			weld.Parent = part
+		end
 		part.Parent = options.parent or host
 		table.insert(parts, part)
 	end
