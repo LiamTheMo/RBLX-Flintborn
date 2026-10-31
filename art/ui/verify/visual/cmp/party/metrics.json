@@ -1,0 +1,17 @@
+{
+  "reference": "art/reference/ui/lobby/04_party.png",
+  "capture": "art/ui/verify/visual/cap/party.png",
+  "size": [
+    1672,
+    941
+  ],
+  "threshold_delta_e": 3.0,
+  "overall": {
+    "mean_abs_diff": 14.108,
+    "mean_delta_e": 6.115,
+    "p95_delta_e": 19.658,
+    "pct_pixels_delta_e_over_threshold": 55.541,
+    "ssim_global": 0.943
+  },
+  "regions": []
+}

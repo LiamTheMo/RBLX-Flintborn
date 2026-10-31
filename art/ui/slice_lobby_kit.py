@@ -1136,19 +1136,25 @@ def main():
     # The flat ink and white glyphs are built from these sprites by
     # art/ui/capture/glyphs.py, which owns their files and entries.
     owned = lambda n: n.startswith(PREFIX) and not n.startswith(GLYPH_PREFIXES)  # noqa: E731
-    previous = {n: e for n, e in manifest.items() if owned(n)}
-    manifest = {n: e for n, e in manifest.items() if not owned(n)}
     for old in OUT.glob(f"{PREFIX}*.png"):
         if old.stem not in info and owned(old.stem):
             old.unlink()
-    for name in sorted(info):
+
+    def entry(name):
         w, h, _ = info[name]
-        entry = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets[name]}
-        prev = previous.get(name, {})
+        out = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets[name]}
+        prev = manifest.get(name, {})
         if prev.get("atlas") and prev.get("w") == w and prev.get("h") == h:
             # Keep an atlas placement pack_atlas.py made for this sprite.
-            entry["atlas"], entry["rect"] = prev["atlas"], prev["rect"]
-        manifest[name] = entry
+            out["atlas"], out["rect"] = prev["atlas"], prev["rect"]
+        return out
+
+    # Owned entries are rewritten in place (dropped when their part is gone),
+    # new parts are appended in name order, so re-runs keep the file's order.
+    manifest = {n: (entry(n) if owned(n) else e) for n, e in manifest.items() if not owned(n) or n in info}
+    for name in sorted(info):
+        if name not in manifest:
+            manifest[name] = entry(name)
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     contact(sprites, DOCS / "contact_dark.png", (0x20, 0x20, 0x20))
     contact(sprites, DOCS / "contact_light.png", (0xF0, 0xE6, 0xD2))

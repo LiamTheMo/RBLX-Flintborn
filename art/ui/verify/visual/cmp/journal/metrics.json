@@ -1,0 +1,17 @@
+{
+  "reference": "art/reference/ui/lobby/07_quest_journal.png",
+  "capture": "art/ui/verify/visual/cap/journal.png",
+  "size": [
+    1672,
+    941
+  ],
+  "threshold_delta_e": 3.0,
+  "overall": {
+    "mean_abs_diff": 17.585,
+    "mean_delta_e": 7.204,
+    "p95_delta_e": 32.165,
+    "pct_pixels_delta_e_over_threshold": 51.405,
+    "ssim_global": 0.899
+  },
+  "regions": []
+}

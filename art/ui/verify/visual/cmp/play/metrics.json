@@ -1,0 +1,17 @@
+{
+  "reference": "art/reference/ui/lobby/05_play.png",
+  "capture": "art/ui/verify/visual/cap/play.png",
+  "size": [
+    1672,
+    941
+  ],
+  "threshold_delta_e": 3.0,
+  "overall": {
+    "mean_abs_diff": 20.013,
+    "mean_delta_e": 9.244,
+    "p95_delta_e": 39.466,
+    "pct_pixels_delta_e_over_threshold": 45.749,
+    "ssim_global": 0.8806
+  },
+  "regions": []
+}

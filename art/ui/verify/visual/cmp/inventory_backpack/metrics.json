@@ -1,0 +1,17 @@
+{
+  "reference": "art/reference/ui/lobby/02_inventory.png",
+  "capture": "art/ui/verify/visual/cap/inventory_backpack.png",
+  "size": [
+    1672,
+    941
+  ],
+  "threshold_delta_e": 3.0,
+  "overall": {
+    "mean_abs_diff": 17.757,
+    "mean_delta_e": 7.136,
+    "p95_delta_e": 32.18,
+    "pct_pixels_delta_e_over_threshold": 50.418,
+    "ssim_global": 0.8961
+  },
+  "regions": []
+}

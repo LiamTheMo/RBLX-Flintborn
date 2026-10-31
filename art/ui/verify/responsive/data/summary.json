@@ -1,0 +1,1525 @@
+{
+ "lobby_hud__desk1080": {
+  "pages": [
+   {
+    "min_text_px": 13.77,
+    "median_text_px": 18.36,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 28,
+     "unselectable": [],
+     "with_nav": 17,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "defaultSelectionCalledByController": false
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/lobby_hud/desk1080.png"
+   },
+   {
+    "min_text_px": 10.33,
+    "median_text_px": 16.07,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [
+     {
+      "path": "/Root/PlayerCard/Visual/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 21.81,
+      "status": "truncated",
+      "box": [
+       170,
+       88,
+       230,
+       28
+      ]
+     },
+     {
+      "path": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Visual/Content/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       1619,
+       362,
+       119,
+       56
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       1619,
+       420,
+       88,
+       56
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row3/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       1619,
+       537,
+       119,
+       56
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Xp",
+      "text": "123456/999999 XP",
+      "px": 19.51,
+      "status": "truncated",
+      "box": [
+       1146,
+       877,
+       184,
+       28
+      ]
+     }
+    ],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 28,
+     "unselectable": [],
+     "with_nav": 17,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "defaultSelectionCalledByController": false
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/lobby_hud/desk1080_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "lobby_hud__phone844": {
+  "pages": [
+   {
+    "min_text_px": 6.0,
+    "median_text_px": 8.0,
+    "small_text": [
+     {
+      "path": "/Root/Party/Pinned/Row0/LiamTheMo/Visual/Content/Name",
+      "text": "LiamTheMo",
+      "px": 6.0,
+      "status": "ok",
+      "box": [
+       713,
+       186,
+       38,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row1/ForestRanger/Visual/Content/Name",
+      "text": "ForestRanger",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       713,
+       212,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Visual/Content/Name",
+      "text": "StoneSeeker",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       713,
+       238,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/PlayerCard/Visual/Level",
+      "text": "LV. 12",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       74,
+       81,
+       24,
+       10
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot1/Visual/Badge/Visual/Label",
+      "text": "1",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       282,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot2/Visual/Badge/Visual/Label",
+      "text": "2",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       330,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot3/Visual/Badge/Visual/Label",
+      "text": "3",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       379,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot4/Visual/Badge/Visual/Label",
+      "text": "4",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       427,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot5/Visual/Badge/Visual/Label",
+      "text": "5",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       476,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot6/Visual/Badge/Visual/Label",
+      "text": "6",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       524,
+       320,
+       9,
+       12
+      ]
+     }
+    ],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [
+     {
+      "pad": "/Root/Party/Title/Hit",
+      "covers": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+      "share": 0.49
+     },
+     {
+      "pad": "/Root/Party/Title/Hit",
+      "covers": "/Root/Party/Pinned/Row0/Invite/Hit",
+      "share": 0.5
+     },
+     {
+      "pad": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+      "covers": "/Root/Party/Title/Hit",
+      "share": 0.42
+     },
+     {
+      "pad": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+      "covers": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+      "share": 0.28
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row3/Decline/Hit",
+      "share": 0.62
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row3/Decline/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+      "share": 0.62
+     }
+    ],
+    "gamepad": {
+     "buttons": 28,
+     "unselectable": [],
+     "with_nav": 17,
+     "selected": null,
+     "extra": {
+      "scale": 0.5,
+      "defaultSelectionCalledByController": false
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/lobby_hud/phone844.png"
+   },
+   {
+    "min_text_px": 4.5,
+    "median_text_px": 8.0,
+    "small_text": [
+     {
+      "path": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Visual/Content/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       186,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       212,
+       38,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row2/Explorer_Of_Isles_3/Visual/Content/Name",
+      "text": "Explorer_Of_Isles_3",
+      "px": 4.5,
+      "status": "ok",
+      "box": [
+       713,
+       238,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row3/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       263,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/TopRight/Coins/Visual/Value",
+      "text": "9,999,999",
+      "px": 5.5,
+      "status": "ok",
+      "box": [
+       688,
+       64,
+       31,
+       22
+      ]
+     },
+     {
+      "path": "/Root/TopRight/Gems/Visual/Value",
+      "text": "999,999",
+      "px": 5.5,
+      "status": "ok",
+      "box": [
+       755,
+       64,
+       24,
+       22
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Notice/Plaque/Visual/Label",
+      "text": "Game update: your items were saved and return on your next P",
+      "px": 5.5,
+      "status": "ok",
+      "box": [
+       291,
+       274,
+       262,
+       21
+      ]
+     },
+     {
+      "path": "/Root/PlayerCard/Visual/Level",
+      "text": "LV. 100",
+      "px": 6.5,
+      "status": "ok",
+      "box": [
+       74,
+       81,
+       24,
+       10
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot4/Visual/Item/Visual/ItemName",
+      "text": "Wooden Bow",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       430,
+       325,
+       32,
+       32
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot1/Visual/Badge/Visual/Label",
+      "text": "1",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       282,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot2/Visual/Badge/Visual/Label",
+      "text": "2",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       330,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot3/Visual/Badge/Visual/Label",
+      "text": "3",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       379,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot4/Visual/Badge/Visual/Label",
+      "text": "4",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       427,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot5/Visual/Badge/Visual/Label",
+      "text": "5",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       476,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Slot6/Visual/Badge/Visual/Label",
+      "text": "6",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       524,
+       320,
+       9,
+       12
+      ]
+     }
+    ],
+    "overflow": [],
+    "truncated": [
+     {
+      "path": "/Root/PlayerCard/Visual/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 11.4,
+      "status": "truncated",
+      "box": [
+       74,
+       68,
+       100,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Visual/Content/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       186,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       212,
+       38,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Party/List/Visual/List/Row3/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       713,
+       263,
+       52,
+       24
+      ]
+     },
+     {
+      "path": "/Root/Bottom/Xp",
+      "text": "123456/999999 XP",
+      "px": 10.2,
+      "status": "truncated",
+      "box": [
+       503,
+       302,
+       80,
+       12
+      ]
+     }
+    ],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [
+     {
+      "pad": "/Root/Party/Title/Hit",
+      "covers": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Hit",
+      "share": 0.49
+     },
+     {
+      "pad": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Hit",
+      "covers": "/Root/Party/Title/Hit",
+      "share": 0.42
+     },
+     {
+      "pad": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "covers": "/Root/Party/Pinned/Row0/MightyWarriorQueen99/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row2/Explorer_Of_Isles_3/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row2/Explorer_Of_Isles_3/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row1/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row2/Explorer_Of_Isles_3/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row3/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "share": 0.36
+     },
+     {
+      "pad": "/Root/Party/List/Visual/List/Row3/WWWWWWWWWWWWWWWWWWWW/Hit",
+      "covers": "/Root/Party/List/Visual/List/Row2/Explorer_Of_Isles_3/Hit",
+      "share": 0.36
+     }
+    ],
+    "gamepad": {
+     "buttons": 28,
+     "unselectable": [],
+     "with_nav": 17,
+     "selected": null,
+     "extra": {
+      "scale": 0.5,
+      "defaultSelectionCalledByController": false
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/lobby_hud/phone844_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "world_hud__desk1080": {
+  "pages": [
+   {
+    "min_text_px": 13.77,
+    "median_text_px": 17.22,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 12,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "smallTouch": false,
+      "phone": false,
+      "shift": 0.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/desk1080.png"
+   },
+   {
+    "min_text_px": 10.33,
+    "median_text_px": 17.22,
+    "small_text": [],
+    "overflow": [
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+      "text": "Legendary \u00b7 Rare plants have sprouted across the island's ea",
+      "px": 14.92,
+      "status": "overflow-v",
+      "box": [
+       1523,
+       648,
+       311,
+       41
+      ]
+     }
+    ],
+    "truncated": [
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member2/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       139,
+       196,
+       207,
+       25
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task1",
+      "text": "Reach The Forgotten Quarry of the Northern Ridge",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       1557,
+       453,
+       122,
+       34
+      ]
+     }
+    ],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 12,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "smallTouch": false,
+      "phone": false,
+      "shift": 0.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/desk1080_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "world_hud__phone844": {
+  "pages": [
+   {
+    "min_text_px": 6.0,
+    "median_text_px": 9.0,
+    "small_text": [
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task1",
+      "text": "Reach Old Quarry",
+      "px": 6.0,
+      "status": "ok",
+      "box": [
+       686,
+       226,
+       53,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Distance",
+      "text": "452 m",
+      "px": 6.5,
+      "status": "ok",
+      "box": [
+       748,
+       226,
+       21,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task2",
+      "text": "Hold the zone for 2:00",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       686,
+       242,
+       82,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Progress",
+      "text": "0:00/2:00",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       770,
+       242,
+       36,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Prompt/Object",
+      "text": "Redberry Bush",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       519,
+       230,
+       56,
+       8
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter2",
+      "text": "NW",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       337,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter8",
+      "text": "NE",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       426,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter14",
+      "text": "SE",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       515,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+      "text": "Rare \u00b7 Rare plants have sprouted \u00b7 NE, 312 m",
+      "px": 7.8,
+      "status": "ok",
+      "box": [
+       671,
+       312,
+       136,
+       18
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot1/Visual/Badge/Visual/Label",
+      "text": "1",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       282,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot2/Visual/Badge/Visual/Label",
+      "text": "2",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       330,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot3/Visual/Badge/Visual/Label",
+      "text": "3",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       379,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot4/Visual/Badge/Visual/Label",
+      "text": "4",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       427,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot5/Visual/Badge/Visual/Label",
+      "text": "5",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       476,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot6/Visual/Badge/Visual/Label",
+      "text": "6",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       524,
+       320,
+       9,
+       12
+      ]
+     }
+    ],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 13,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 0.5,
+      "smallTouch": true,
+      "phone": true,
+      "shift": 58.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/phone844.png"
+   },
+   {
+    "min_text_px": 4.5,
+    "median_text_px": 9.0,
+    "small_text": [
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member2/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       60,
+       114,
+       90,
+       11
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task1",
+      "text": "Reach The Forgotten Quarry of the Northern Ridge",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       686,
+       226,
+       53,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Distance",
+      "text": "452 m",
+      "px": 6.5,
+      "status": "ok",
+      "box": [
+       748,
+       226,
+       21,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member1/MightyWarriorQueen99/Visual/Content/Name",
+      "text": "MightyWarriorQueen99",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       60,
+       90,
+       90,
+       11
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task2",
+      "text": "Hold the zone for 2:00",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       686,
+       242,
+       82,
+       15
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Progress",
+      "text": "0:00/2:00",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       770,
+       242,
+       36,
+       15
+      ]
+     },
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/EventName",
+      "text": "Bloodroot Bloom of the Ancient Grove",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       671,
+       298,
+       136,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Prompt/Object",
+      "text": "Permanent Portable Extraction Rune",
+      "px": 7.0,
+      "status": "ok",
+      "box": [
+       519,
+       230,
+       142,
+       8
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter2",
+      "text": "NW",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       337,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter8",
+      "text": "NE",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       426,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/Compass/Track/Letter14",
+      "text": "SE",
+      "px": 7.5,
+      "status": "ok",
+      "box": [
+       515,
+       65,
+       22,
+       12
+      ]
+     },
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+      "text": "Legendary \u00b7 Rare plants have sprouted across the island's ea",
+      "px": 7.8,
+      "status": "overflow-v",
+      "box": [
+       671,
+       312,
+       136,
+       18
+      ]
+     },
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member3/Explorer_Of_Isles_7/Visual/Content/Name",
+      "text": "Explorer_Of_Isles_7",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       60,
+       140,
+       90,
+       11
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot1/Visual/Badge/Visual/Label",
+      "text": "1",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       282,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot2/Visual/Badge/Visual/Label",
+      "text": "2",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       330,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot3/Visual/Badge/Visual/Label",
+      "text": "3",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       379,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot4/Visual/Badge/Visual/Label",
+      "text": "4",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       427,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot5/Visual/Badge/Visual/Label",
+      "text": "5",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       476,
+       320,
+       9,
+       12
+      ]
+     },
+     {
+      "path": "/Root/BottomBar/Hotbar/Slot6/Visual/Badge/Visual/Label",
+      "text": "6",
+      "px": 8.0,
+      "status": "ok",
+      "box": [
+       524,
+       320,
+       9,
+       12
+      ]
+     }
+    ],
+    "overflow": [
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+      "text": "Legendary \u00b7 Rare plants have sprouted across the island's ea",
+      "px": 7.8,
+      "status": "overflow-v",
+      "box": [
+       671,
+       312,
+       136,
+       18
+      ]
+     }
+    ],
+    "truncated": [
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member2/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       60,
+       114,
+       90,
+       11
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task1",
+      "text": "Reach The Forgotten Quarry of the Northern Ridge",
+      "px": 4.5,
+      "status": "truncated",
+      "box": [
+       686,
+       226,
+       53,
+       15
+      ]
+     }
+    ],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 13,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 0.5,
+      "smallTouch": true,
+      "phone": true,
+      "shift": 58.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/phone844_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "world_hud__console1080": {
+  "pages": [
+   {
+    "min_text_px": 13.77,
+    "median_text_px": 17.22,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 12,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "smallTouch": false,
+      "phone": false,
+      "shift": 0.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/console1080.png"
+   },
+   {
+    "min_text_px": 10.33,
+    "median_text_px": 17.22,
+    "small_text": [],
+    "overflow": [
+     {
+      "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+      "text": "Legendary \u00b7 Rare plants have sprouted across the island's ea",
+      "px": 14.92,
+      "status": "overflow-v",
+      "box": [
+       1523,
+       648,
+       311,
+       41
+      ]
+     }
+    ],
+    "truncated": [
+     {
+      "path": "/Root/Party/Panel/Visual/Content/Member2/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+      "text": "WWWWWWWWWWWWWWWWWWWW",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       139,
+       196,
+       207,
+       25
+      ]
+     },
+     {
+      "path": "/Root/Objective/Panel/Visual/Content/Task1",
+      "text": "Reach The Forgotten Quarry of the Northern Ridge",
+      "px": 10.33,
+      "status": "truncated",
+      "box": [
+       1557,
+       453,
+       122,
+       34
+      ]
+     }
+    ],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 12,
+     "unselectable": [],
+     "with_nav": 12,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "smallTouch": false,
+      "phone": false,
+      "shift": 0.0
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/world_hud/console1080_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "play__desk1080": {
+  "pages": [
+   {
+    "min_text_px": 16.07,
+    "median_text_px": 18.36,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/desk1080.png"
+   },
+   {
+    "min_text_px": 14.92,
+    "median_text_px": 18.36,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/desk1080_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "play__phone844": {
+  "pages": [
+   {
+    "min_text_px": 9.22,
+    "median_text_px": 10.95,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [
+     {
+      "path": "/FlintbornPlay/Holder/Window/Window/Visual/TitlePlaque/Title",
+      "box": [
+       143,
+       23,
+       302,
+       71
+      ],
+      "unibar": true,
+      "text": "PLAY"
+     }
+    ],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 0.5762,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/phone844.png"
+   },
+   {
+    "min_text_px": 8.64,
+    "median_text_px": 10.95,
+    "small_text": [
+     {
+      "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/More",
+      "text": "+1 more in your backpack",
+      "px": 8.64,
+      "status": "ok",
+      "box": [
+       557,
+       261,
+       143,
+       16
+      ]
+     }
+    ],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [
+     {
+      "path": "/FlintbornPlay/Holder/Window/Window/Visual/TitlePlaque/Title",
+      "box": [
+       143,
+       23,
+       302,
+       71
+      ],
+      "unibar": true,
+      "text": "PLAY"
+     }
+    ],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 0.5762,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/phone844_p2.png"
+   }
+  ],
+  "log": []
+ },
+ "play__console1080": {
+  "pages": [
+   {
+    "min_text_px": 16.07,
+    "median_text_px": 18.36,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/console1080.png"
+   },
+   {
+    "min_text_px": 14.92,
+    "median_text_px": 18.36,
+    "small_text": [],
+    "overflow": [],
+    "truncated": [],
+    "offscreen": [],
+    "topbar": [],
+    "touch_small": [],
+    "pad_conflicts": [],
+    "gamepad": {
+     "buttons": 8,
+     "unselectable": [
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+      "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit"
+     ],
+     "with_nav": 2,
+     "selected": null,
+     "extra": {
+      "scale": 1.1477,
+      "default": "Hit"
+     }
+    },
+    "capture": "art/ui/verify/responsive/captures/play/console1080_p2.png"
+   }
+  ],
+  "log": []
+ }
+}

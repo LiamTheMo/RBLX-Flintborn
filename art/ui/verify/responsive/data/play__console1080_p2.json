@@ -1,0 +1,496 @@
+{
+ "texts": [
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/TitlePlaque/Title",
+   "text": "PLAY",
+   "px": 73.45,
+   "status": "ok",
+   "box": [
+    405,
+    197,
+    317,
+    95
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/RegionTitle",
+   "text": "Shattered Crater",
+   "px": 51.65,
+   "status": "ok",
+   "box": [
+    1023,
+    271,
+    485,
+    76
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailLabel1",
+   "text": "Region",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1111,
+    366,
+    184,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailValue1",
+   "text": "Shattered Crater",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1308,
+    366,
+    202,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailLabel2",
+   "text": "Zones",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1111,
+    411,
+    184,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailValue2",
+   "text": "10 \u00b7 Low to Extreme",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1308,
+    411,
+    202,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailLabel3",
+   "text": "Spawn",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1111,
+    456,
+    184,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailValue3",
+   "text": "Random location",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1308,
+    456,
+    202,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailLabel4",
+   "text": "Carrying",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1111,
+    500,
+    184,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/DetailValue4",
+   "text": "3 items, 3 at risk",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1308,
+    500,
+    202,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/PartyHeading",
+   "text": "YOUR PARTY",
+   "px": 22.95,
+   "status": "ok",
+   "box": [
+    1033,
+    561,
+    344,
+    30
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Party/Visual/List/Member1/Inside/Name",
+   "text": "MightyWarriorQueen91",
+   "px": 18.36,
+   "status": "ok",
+   "box": [
+    1167,
+    598,
+    230,
+    62
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Party/Visual/List/Member1/Inside/Level",
+   "text": "LV. 100",
+   "px": 17.22,
+   "status": "ok",
+   "box": [
+    1375,
+    598,
+    116,
+    62
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/EquipmentHeading",
+   "text": "YOUR EQUIPMENT",
+   "px": 22.95,
+   "status": "ok",
+   "box": [
+    1032,
+    671,
+    298,
+    32
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/More",
+   "text": "+1 more in your backpack",
+   "px": 14.92,
+   "status": "ok",
+   "box": [
+    1228,
+    671,
+    285,
+    32
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Visual/Badge/Visual/Label",
+   "text": "1",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1027,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Visual/Badge/Visual/Label",
+   "text": "2",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1113,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Visual/Count",
+   "text": "50",
+   "px": 21.81,
+   "status": "ok",
+   "box": [
+    1200,
+    716,
+    61,
+    70
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Visual/Badge/Visual/Label",
+   "text": "3",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1199,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Visual/Badge/Visual/Label",
+   "text": "4",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1285,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Visual/Badge/Visual/Label",
+   "text": "5",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1369,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Visual/Badge/Visual/Label",
+   "text": "6",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    1454,
+    713,
+    21,
+    28
+   ]
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Play/Visual/Label",
+   "text": "PLAY",
+   "px": 45.91,
+   "status": "ok",
+   "box": [
+    1238,
+    813,
+    127,
+    79
+   ]
+  }
+ ],
+ "offscreen": [],
+ "topbar": [],
+ "touch": [
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Close/Hit",
+   "hit": [
+    1486.2,
+    169.9,
+    62.0,
+    59.7
+   ],
+   "art": [
+    1486.2,
+    169.9,
+    1548.2,
+    229.5
+   ],
+   "min": 59.7,
+   "kitpad": true,
+   "artmin": 59.7,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+   "hit": [
+    1019.1,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1019.1,
+    709.3,
+    1100.6,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+   "hit": [
+    1105.2,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1105.2,
+    709.3,
+    1186.7,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+   "hit": [
+    1191.3,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1191.3,
+    709.3,
+    1272.7,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+   "hit": [
+    1277.3,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1277.3,
+    709.3,
+    1358.8,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+   "hit": [
+    1361.1,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1361.1,
+    709.3,
+    1442.6,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit",
+   "hit": [
+    1446.1,
+    709.3,
+    81.5,
+    88.4
+   ],
+   "art": [
+    1446.1,
+    709.3,
+    1527.5,
+    797.7
+   ],
+   "min": 81.5,
+   "kitpad": true,
+   "artmin": 81.5,
+   "z": 15.0
+  },
+  {
+   "path": "/FlintbornPlay/Holder/Window/Window/Visual/Content/Play/Hit",
+   "hit": [
+    1028.3,
+    812.6,
+    477.4,
+    82.6
+   ],
+   "art": [
+    1028.3,
+    812.6,
+    1505.7,
+    895.2
+   ],
+   "min": 82.6,
+   "kitpad": true,
+   "artmin": 82.6,
+   "z": 16.0
+  }
+ ],
+ "pads": [],
+ "flags": [],
+ "qa": [
+  {
+   "extra": {
+    "scale": 1.1477,
+    "default": "Hit"
+   },
+   "buttons": [
+    {
+     "selectable": true,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Close/Hit",
+     "nav": 1.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot1/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot2/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot3/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot4/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot5/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Slot6/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornPlay/Holder/Window/Window/Visual/Content/Play/Hit",
+     "nav": 1.0,
+     "interactable": true
+    }
+   ]
+  }
+ ]
+}

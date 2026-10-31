@@ -1,0 +1,904 @@
+{
+ "texts": [
+  {
+   "path": "/Root/PlayerCard/Visual/Name",
+   "text": "LiamTheMo",
+   "px": 11.4,
+   "status": "ok",
+   "box": [
+    74,
+    68,
+    100,
+    12
+   ]
+  },
+  {
+   "path": "/Root/PlayerCard/Visual/Level",
+   "text": "LV. 12",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    74,
+    81,
+    24,
+    10
+   ]
+  },
+  {
+   "path": "/Root/TopRight/Coins/Visual/Value",
+   "text": "2,450",
+   "px": 10.5,
+   "status": "ok",
+   "box": [
+    688,
+    64,
+    31,
+    22
+   ]
+  },
+  {
+   "path": "/Root/TopRight/Gems/Visual/Value",
+   "text": "125",
+   "px": 10.5,
+   "status": "ok",
+   "box": [
+    755,
+    64,
+    24,
+    22
+   ]
+  },
+  {
+   "path": "/Root/Party/Title/Visual/Label",
+   "text": "PARTY",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    686,
+    169,
+    45,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Party/Title/Visual/Count",
+   "text": "3/8",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    730,
+    169,
+    35,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Party/Pinned/Row0/LiamTheMo/Visual/Content/Name",
+   "text": "LiamTheMo",
+   "px": 6.0,
+   "status": "ok",
+   "box": [
+    713,
+    186,
+    38,
+    24
+   ]
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row1/ForestRanger/Visual/Content/Name",
+   "text": "ForestRanger",
+   "px": 7.5,
+   "status": "ok",
+   "box": [
+    713,
+    212,
+    52,
+    24
+   ]
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Visual/Content/Name",
+   "text": "StoneSeeker",
+   "px": 7.5,
+   "status": "ok",
+   "box": [
+    713,
+    238,
+    52,
+    24
+   ]
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row3/InviteFrom/Visual/Title",
+   "text": "RiverFox",
+   "px": 9.6,
+   "status": "ok",
+   "box": [
+    708,
+    266,
+    47,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Level",
+   "text": "LV. 12",
+   "px": 10.2,
+   "status": "ok",
+   "box": [
+    259,
+    302,
+    57,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Xp",
+   "text": "450/750 XP",
+   "px": 10.2,
+   "status": "ok",
+   "box": [
+    503,
+    302,
+    80,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot1/Visual/Badge/Visual/Label",
+   "text": "1",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    282,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot2/Visual/Badge/Visual/Label",
+   "text": "2",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    330,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot3/Visual/Count",
+   "text": "5",
+   "px": 11.4,
+   "status": "ok",
+   "box": [
+    380,
+    322,
+    36,
+    38
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot3/Visual/Badge/Visual/Label",
+   "text": "3",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    379,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot4/Visual/Badge/Visual/Label",
+   "text": "4",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    427,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot5/Visual/Badge/Visual/Label",
+   "text": "5",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    476,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Bottom/Slot6/Visual/Badge/Visual/Label",
+   "text": "6",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    524,
+    320,
+    9,
+    12
+   ]
+  }
+ ],
+ "offscreen": [],
+ "topbar": [],
+ "touch": [
+  {
+   "path": "/Root/PlayerCard/Hit",
+   "hit": [
+    17.8,
+    57.2,
+    183.0,
+    44.0
+   ],
+   "art": [
+    19.5,
+    59.0,
+    199.0,
+    99.5
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 40.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/TopRight/Coins/Hit",
+   "hit": [
+    656.0,
+    53.5,
+    79.0,
+    44.0
+   ],
+   "art": [
+    666.5,
+    64.0,
+    724.5,
+    87.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 23.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/TopRight/Gems/Hit",
+   "hit": [
+    722.5,
+    53.5,
+    71.5,
+    44.0
+   ],
+   "art": [
+    733.0,
+    64.0,
+    783.5,
+    87.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 23.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/TopRight/Settings/Hit",
+   "hit": [
+    781.0,
+    53.5,
+    47.0,
+    44.0
+   ],
+   "art": [
+    791.5,
+    64.0,
+    817.5,
+    87.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 23.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Inventory/Hit",
+   "hit": [
+    33.0,
+    116.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    117.7,
+    78.0,
+    159.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Play/Hit",
+   "hit": [
+    84.0,
+    116.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    117.7,
+    129.0,
+    159.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Quests/Hit",
+   "hit": [
+    33.0,
+    163.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    164.7,
+    78.0,
+    206.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Shop/Hit",
+   "hit": [
+    84.0,
+    163.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    164.7,
+    129.0,
+    206.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Forge/Hit",
+   "hit": [
+    33.0,
+    210.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    211.7,
+    78.0,
+    253.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Trade/Hit",
+   "hit": [
+    84.0,
+    210.7,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    211.7,
+    129.0,
+    253.7
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Party/Title/Hit",
+   "hit": [
+    671.5,
+    155.0,
+    145.0,
+    44.0
+   ],
+   "art": [
+    683.5,
+    167.0,
+    804.5,
+    187.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 20.0,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+   "hit": [
+    675.2,
+    177.2,
+    112.0,
+    44.0
+   ],
+   "art": [
+    684.5,
+    186.5,
+    778.0,
+    212.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 25.5,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Party/Pinned/Row0/Invite/Hit",
+   "hit": [
+    769.0,
+    177.0,
+    49.5,
+    44.0
+   ],
+   "art": [
+    782.5,
+    190.5,
+    805.0,
+    207.5
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 17.0,
+   "z": 15.0
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+   "hit": [
+    675.2,
+    202.8,
+    112.0,
+    44.0
+   ],
+   "art": [
+    684.5,
+    212.0,
+    778.0,
+    237.5
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 25.5,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+   "hit": [
+    675.2,
+    228.2,
+    112.0,
+    44.0
+   ],
+   "art": [
+    684.5,
+    237.5,
+    778.0,
+    263.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 25.5,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+   "hit": [
+    744.5,
+    254.0,
+    44.0,
+    44.0
+   ],
+   "art": [
+    758.0,
+    267.5,
+    775.0,
+    284.5
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 17.0,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Party/List/Visual/List/Row3/Decline/Hit",
+   "hit": [
+    764.5,
+    254.0,
+    44.0,
+    44.0
+   ],
+   "art": [
+    778.0,
+    267.5,
+    795.0,
+    284.5
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 17.0,
+   "z": 14.0
+  },
+  {
+   "path": "/Root/Bottom/Slot1/Hit",
+   "hit": [
+    279.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    279.0,
+    319.0,
+    323.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Bottom/Slot2/Hit",
+   "hit": [
+    327.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    327.0,
+    319.0,
+    371.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Bottom/Slot3/Hit",
+   "hit": [
+    375.5,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    375.5,
+    319.0,
+    420.0,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Bottom/Slot4/Hit",
+   "hit": [
+    423.5,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    423.5,
+    319.0,
+    468.0,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Bottom/Slot5/Hit",
+   "hit": [
+    472.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    472.0,
+    319.0,
+    516.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Bottom/Slot6/Hit",
+   "hit": [
+    520.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    520.0,
+    319.0,
+    564.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  }
+ ],
+ "pads": [
+  {
+   "pad": "/Root/Party/Title/Hit",
+   "covers": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+   "share": 0.49
+  },
+  {
+   "pad": "/Root/Party/Title/Hit",
+   "covers": "/Root/Party/Pinned/Row0/Invite/Hit",
+   "share": 0.5
+  },
+  {
+   "pad": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+   "covers": "/Root/Party/Title/Hit",
+   "share": 0.42
+  },
+  {
+   "pad": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+   "share": 0.36
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+   "covers": "/Root/Party/Pinned/Row0/LiamTheMo/Hit",
+   "share": 0.36
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+   "share": 0.36
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+   "share": 0.36
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+   "share": 0.28
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row3/Decline/Hit",
+   "share": 0.62
+  },
+  {
+   "pad": "/Root/Party/List/Visual/List/Row3/Decline/Hit",
+   "covers": "/Root/Party/List/Visual/List/Row3/Accept/Hit",
+   "share": 0.62
+  }
+ ],
+ "flags": [],
+ "qa": [
+  {
+   "extra": {
+    "scale": 0.5,
+    "defaultSelectionCalledByController": false
+   },
+   "buttons": [
+    {
+     "selectable": true,
+     "path": "Root/PlayerCard/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/TopRight/Coins/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/TopRight/Gems/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/TopRight/Settings/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Inventory/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Play/Hit",
+     "nav": 4.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Quests/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Shop/Hit",
+     "nav": 4.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Forge/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Trade/Hit",
+     "nav": 4.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/Title/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/Pinned/Row0/LiamTheMo/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/Pinned/Row0/Invite/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row1/ForestRanger/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row2/StoneSeeker/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row3/Accept/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row3/Decline/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row4/Empty/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row5/Empty/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row6/Empty/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row7/Empty/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Party/List/Visual/List/Row8/Empty/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot1/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot2/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot3/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot4/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot5/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Bottom/Slot6/Hit",
+     "nav": 2.0,
+     "interactable": true
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,803 @@
+{
+ "texts": [
+  {
+   "path": "/Root/Party/Panel/Visual/Content/Header/Visual/Label",
+   "text": "TRIBE",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    54,
+    68,
+    38,
+    14
+   ]
+  },
+  {
+   "path": "/Root/Party/Panel/Visual/Content/Header/Visual/Count",
+   "text": "2",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    99,
+    68,
+    60,
+    14
+   ]
+  },
+  {
+   "path": "/Root/Party/Panel/Visual/Content/Member1/MightyWarriorQueen99/Visual/Content/Name",
+   "text": "MightyWarriorQueen99",
+   "px": 7.0,
+   "status": "ok",
+   "box": [
+    60,
+    90,
+    90,
+    11
+   ]
+  },
+  {
+   "path": "/Root/Party/Panel/Visual/Content/Member2/WWWWWWWWWWWWWWWWWWWW/Visual/Content/Name",
+   "text": "WWWWWWWWWWWWWWWWWWWW",
+   "px": 4.5,
+   "status": "truncated",
+   "box": [
+    60,
+    114,
+    90,
+    11
+   ]
+  },
+  {
+   "path": "/Root/Party/Panel/Visual/Content/Member3/Explorer_Of_Isles_7/Visual/Content/Name",
+   "text": "Explorer_Of_Isles_7",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    60,
+    140,
+    90,
+    11
+   ]
+  },
+  {
+   "path": "/Root/Compass/Track/Letter2",
+   "text": "NW",
+   "px": 7.5,
+   "status": "ok",
+   "box": [
+    337,
+    65,
+    22,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Compass/Track/Letter5",
+   "text": "N",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    381,
+    64,
+    22,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Compass/Track/Letter8",
+   "text": "NE",
+   "px": 7.5,
+   "status": "ok",
+   "box": [
+    426,
+    65,
+    22,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Compass/Track/Letter11",
+   "text": "E",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    471,
+    64,
+    22,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Compass/Track/Letter14",
+   "text": "SE",
+   "px": 7.5,
+   "status": "ok",
+   "box": [
+    515,
+    65,
+    22,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Vitals/Health/Visual/Value",
+   "text": "85/100",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    776,
+    59,
+    38,
+    32
+   ]
+  },
+  {
+   "path": "/Root/Vitals/Stamina/Visual/Value",
+   "text": "62/100",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    776,
+    97,
+    38,
+    32
+   ]
+  },
+  {
+   "path": "/Root/Vitals/Food/Visual/Value",
+   "text": "48/100",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    776,
+    135,
+    38,
+    32
+   ]
+  },
+  {
+   "path": "/Root/SurvivalStatus/Status1/Visual/Content/Text",
+   "text": "Medicine ready in 12.4 s",
+   "px": 9.0,
+   "status": "ok",
+   "box": [
+    698,
+    174,
+    115,
+    19
+   ]
+  },
+  {
+   "path": "/Root/SurvivalStatus/Status2/Visual/Content/Text",
+   "text": "Food healing +3",
+   "px": 9.0,
+   "status": "ok",
+   "box": [
+    584,
+    174,
+    85,
+    19
+   ]
+  },
+  {
+   "path": "/Root/SurvivalStatus/Status3/Visual/Content/Text",
+   "text": "Hungry: slowed",
+   "px": 9.0,
+   "status": "ok",
+   "box": [
+    470,
+    174,
+    85,
+    19
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Header/Visual/Label",
+   "text": "FIND EXTRACTION",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    692,
+    206,
+    114,
+    14
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Task1",
+   "text": "Reach The Forgotten Quarry of the Northern Ridge",
+   "px": 4.5,
+   "status": "truncated",
+   "box": [
+    686,
+    226,
+    53,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Progress",
+   "text": "0/1",
+   "px": 9.0,
+   "status": "ok",
+   "box": [
+    770,
+    226,
+    36,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Distance",
+   "text": "452 m",
+   "px": 6.5,
+   "status": "ok",
+   "box": [
+    748,
+    226,
+    21,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Task2",
+   "text": "Hold the zone for 2:00",
+   "px": 7.0,
+   "status": "ok",
+   "box": [
+    686,
+    242,
+    82,
+    15
+   ]
+  },
+  {
+   "path": "/Root/Objective/Panel/Visual/Content/Progress",
+   "text": "0:00/2:00",
+   "px": 7.0,
+   "status": "ok",
+   "box": [
+    770,
+    242,
+    36,
+    15
+   ]
+  },
+  {
+   "path": "/Root/WorldEvent/Panel/Visual/Content/EventName",
+   "text": "Bloodroot Bloom of the Ancient Grove",
+   "px": 7.0,
+   "status": "ok",
+   "box": [
+    671,
+    298,
+    136,
+    12
+   ]
+  },
+  {
+   "path": "/Root/WorldEvent/Panel/Visual/Content/Description",
+   "text": "Legendary \u00b7 Rare plants have sprouted across the island's ea",
+   "px": 7.8,
+   "status": "overflow-v",
+   "box": [
+    671,
+    312,
+    136,
+    18
+   ]
+  },
+  {
+   "path": "/Root/WorldEvent/Panel/Visual/Content/Header/Visual/Label",
+   "text": "WORLD EVENT",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    692,
+    278,
+    85,
+    14
+   ]
+  },
+  {
+   "path": "/Root/WorldEvent/Panel/Visual/Content/Header/Visual/Count",
+   "text": "6:12",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    746,
+    278,
+    60,
+    14
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Level",
+   "text": "LV. 100",
+   "px": 10.2,
+   "status": "ok",
+   "box": [
+    259,
+    302,
+    57,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Xp",
+   "text": "123456/999999 XP",
+   "px": 10.0,
+   "status": "ok",
+   "box": [
+    503,
+    302,
+    110,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot1/Visual/Badge/Visual/Label",
+   "text": "1",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    282,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot2/Visual/Badge/Visual/Label",
+   "text": "2",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    330,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot3/Visual/Count",
+   "text": "999",
+   "px": 11.4,
+   "status": "ok",
+   "box": [
+    380,
+    322,
+    36,
+    38
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot3/Visual/Badge/Visual/Label",
+   "text": "3",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    379,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot4/Visual/Badge/Visual/Label",
+   "text": "4",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    427,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot5/Visual/Badge/Visual/Label",
+   "text": "5",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    476,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot6/Visual/Badge/Visual/Label",
+   "text": "6",
+   "px": 8.0,
+   "status": "ok",
+   "box": [
+    524,
+    320,
+    9,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Prompt/Key/Visual/Key",
+   "text": "TAP",
+   "px": 11.0,
+   "status": "ok",
+   "box": [
+    473,
+    219,
+    37,
+    20
+   ]
+  },
+  {
+   "path": "/Root/Prompt/Action",
+   "text": "Gather carefully",
+   "px": 9.5,
+   "status": "ok",
+   "box": [
+    519,
+    219,
+    142,
+    12
+   ]
+  },
+  {
+   "path": "/Root/Prompt/Object",
+   "text": "Permanent Portable Extraction Rune",
+   "px": 7.0,
+   "status": "ok",
+   "box": [
+    519,
+    230,
+    142,
+    8
+   ]
+  }
+ ],
+ "offscreen": [],
+ "topbar": [],
+ "touch": [
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot1/Hit",
+   "hit": [
+    279.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    279.0,
+    319.0,
+    323.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot2/Hit",
+   "hit": [
+    327.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    327.0,
+    319.0,
+    371.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot3/Hit",
+   "hit": [
+    375.5,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    375.5,
+    319.0,
+    420.0,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot4/Hit",
+   "hit": [
+    423.5,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    423.5,
+    319.0,
+    468.0,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot5/Hit",
+   "hit": [
+    472.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    472.0,
+    319.0,
+    516.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/BottomBar/Hotbar/Slot6/Hit",
+   "hit": [
+    520.0,
+    319.0,
+    44.5,
+    46.5
+   ],
+   "art": [
+    520.0,
+    319.0,
+    564.5,
+    365.5
+   ],
+   "min": 44.5,
+   "kitpad": true,
+   "artmin": 44.5,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Backpack/Hit",
+   "hit": [
+    33.0,
+    241.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    242.0,
+    78.0,
+    284.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Craft/Hit",
+   "hit": [
+    84.0,
+    241.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    242.0,
+    129.0,
+    284.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Build/Hit",
+   "hit": [
+    33.0,
+    288.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    289.0,
+    78.0,
+    331.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Tribe/Hit",
+   "hit": [
+    84.0,
+    288.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    289.0,
+    129.0,
+    331.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Map/Hit",
+   "hit": [
+    33.0,
+    335.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    34.0,
+    336.0,
+    78.0,
+    378.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Tiles/Progress/Hit",
+   "hit": [
+    84.0,
+    335.0,
+    46.0,
+    44.0
+   ],
+   "art": [
+    85.0,
+    336.0,
+    129.0,
+    378.0
+   ],
+   "min": 44.0,
+   "kitpad": true,
+   "artmin": 42.0,
+   "z": 12.0
+  },
+  {
+   "path": "/Root/Attack/IconButton/Hit",
+   "hit": [
+    584.0,
+    313.0,
+    65.0,
+    62.0
+   ],
+   "art": [
+    584.0,
+    313.0,
+    649.0,
+    375.0
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 12.0
+  }
+ ],
+ "pads": [],
+ "flags": [],
+ "qa": [
+  {
+   "extra": {
+    "scale": 0.5,
+    "smallTouch": true,
+    "phone": true,
+    "shift": 58.0
+   },
+   "buttons": [
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot1/Hit",
+     "nav": 1.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot2/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot3/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot4/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot5/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/BottomBar/Hotbar/Slot6/Hit",
+     "nav": 1.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Backpack/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Craft/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Build/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Tribe/Hit",
+     "nav": 3.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Map/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Tiles/Progress/Hit",
+     "nav": 2.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "Root/Attack/IconButton/Hit",
+     "nav": 0.0,
+     "interactable": true
+    }
+   ]
+  }
+ ]
+}
