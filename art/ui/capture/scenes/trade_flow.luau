@@ -145,25 +145,33 @@ press(find(find(gui, "Player2"), "Invite"))
 check(calls[1] and calls[1][2] == 2, "Invite asks that player")
 __dump(player.PlayerGui, W, H, BG)
 
--- An invite arrives: a toast, its View opens Accept / Decline.
+-- An invite arrives: a toast with Accept and Decline on it.
 changed.OnClientEvent:Fire({ kind = "Invite", id = "t0", from = "SunnyVale" })
 local toasts = player.PlayerGui:FindFirstChild("KitToasts")
-check(toasts ~= nil and find(toasts, "Action1") ~= nil, "an invite shows a toast with View")
+local accept, decline = toasts and find(toasts, "Action1"), toasts and find(toasts, "Action2")
+check(accept ~= nil and decline ~= nil, "an invite shows a toast with Accept and Decline")
+check(accept:FindFirstChild("Label", true).Text:upper() == "ACCEPT", "Accept is the primary action")
 __dump(player.PlayerGui, W, H, BG)
+press(decline)
+check(calls[#calls][1] == "TradeRespond" and calls[#calls][2] == "t0" and calls[#calls][3] == false, "Decline answers")
+check(find(toasts, "Action1") == nil, "answering closes the invite toast")
+-- Another invite: Accept straight from the toast.
+changed.OnClientEvent:Fire({ kind = "Invite", id = "t0b", from = "SunnyVale" })
 press(find(toasts, "Action1"))
-check(dialog() ~= nil, "View asks Accept or Decline")
-press(find(dialog(), "Confirm"))
-check(calls[#calls][1] == "TradeRespond" and calls[#calls][3] == true, "Accept answers the invite")
+check(
+	calls[#calls][1] == "TradeRespond" and calls[#calls][2] == "t0b" and calls[#calls][3] == true,
+	"Accept answers the invite"
+)
 
 local session = {
 	kind = "Session",
 	id = "t1",
 	partner = "ForestRanger",
-	mine = { items = { { key = "b1", name = "Redberry", quantity = 3 } }, gems = 0 },
+	mine = { items = { { key = "b1", catalogId = "Redberry", name = "Redberry", quantity = 3 } }, gems = 0 },
 	theirs = {
 		items = {
-			{ key = "mat:Amethyst", name = "Amethyst", quantity = 10 },
-			{ key = "x9", name = "Stone Axe" },
+			{ key = "mat:Amethyst", catalogId = "Amethyst", name = "Amethyst", quantity = 10 },
+			{ key = "x9", catalogId = "StoneAxe", name = "Stone Axe" },
 		},
 		gems = 15,
 	},

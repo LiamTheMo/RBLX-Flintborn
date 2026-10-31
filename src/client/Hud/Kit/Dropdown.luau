@@ -6,6 +6,8 @@
 --   Kit.Dropdown.new(page, { rect = { 140, 500, 236, 43 }, options = { "All", "Tools", "Weapons" },
 --       value = "All", onSelect = filter })
 
+local GuiService = game:GetService("GuiService")
+
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Interact = require(script.Parent.Interact)
@@ -102,6 +104,7 @@ function Dropdown.new(parent: Instance, props)
 end
 
 function Dropdown:SetOpen(open: boolean)
+	local wasOpen = self.open
 	self.open = open
 	self.list.Visible = open
 	self.catcher.Visible = open
@@ -110,6 +113,17 @@ function Dropdown:SetOpen(open: boolean)
 		self.layer.ZIndex = if open then self.layerZ + 30 else self.layerZ
 	end
 	self.control:Set("open", open)
+	-- Gamepad: selection moves into the options (the chosen one) and comes
+	-- back to the field when the list closes.
+	local selected = GuiService.SelectedObject
+	if open and not wasOpen and selected ~= nil then
+		local row = self.rows[self.value] or select(2, next(self.rows))
+		if row then
+			GuiService.SelectedObject = row.control.hit
+		end
+	elseif not open and wasOpen and selected ~= nil and selected:IsDescendantOf(self.list) then
+		GuiService.SelectedObject = self.control.hit
+	end
 end
 
 function Dropdown:IsOpen(): boolean

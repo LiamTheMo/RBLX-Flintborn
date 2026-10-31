@@ -9,6 +9,7 @@
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Interact = require(script.Parent.Interact)
+local Input = require(script.Parent.Input)
 local Motion = require(script.Parent.Motion)
 
 local KeyCap = {}
@@ -24,7 +25,8 @@ function KeyCap.Width(text: string, height: number?): number
 end
 
 -- props: text, rect | size | height (a width of 0 fits the text), variant
--- ("cap" | "flat"), onPress(cap), zIndex, name.
+-- ("cap" | "flat"), gamepadKey (KeyCode name shown on a gamepad), hideOnTouch,
+-- onPress(cap), zIndex, name.
 function KeyCap.new(parent: Instance, props)
 	local variant = props.variant or "cap"
 	local h = if props.rect
@@ -53,6 +55,17 @@ function KeyCap.new(parent: Instance, props)
 		rect = { 6, 0, w - 12, h - lift * 2 },
 		z = base.z + 1,
 	})
+	-- Input-aware hints: gamepadKey (a KeyCode name such as "ButtonX") shows the
+	-- button's name on a gamepad; hideOnTouch hides the cap on touch.
+	if props.gamepadKey or props.hideOnTouch then
+		self.keyboardText = props.text or ""
+		self.gamepadKey = props.gamepadKey
+		self.hideOnTouch = props.hideOnTouch
+		base.maid:Give(Input.Watch(function()
+			self:_hint()
+		end))
+		self:_hint()
+	end
 	if props.onPress then
 		self.control = Interact.attach(base, {
 			onPress = function()
@@ -85,7 +98,21 @@ function KeyCap:_render(state: string)
 end
 
 function KeyCap:SetText(text: string)
+	self.keyboardText = text
 	self.label.Text = text
+	if self.gamepadKey or self.hideOnTouch then
+		self:_hint()
+	end
+end
+
+function KeyCap:_hint()
+	local kind = Input.Type()
+	self.root.Visible = not (self.hideOnTouch and kind == "touch")
+	local text = if kind == "gamepad" and self.gamepadKey
+		then Input.GAMEPAD_NAMES[self.gamepadKey] or self.gamepadKey
+		else self.keyboardText
+	self.label.Text = text
+	self.root:SetAttribute("KitInput", kind)
 end
 
 -- Waiting for a key: the cap shows "…" until SetText.

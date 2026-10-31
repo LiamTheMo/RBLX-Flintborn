@@ -290,7 +290,6 @@ KitModel.STATES = {
 
 -- A state with no art of its own draws the art of these states, in order.
 KitModel.ART_FALLBACK = {
-	focused = { "hover" },
 	capturing = { "hover" },
 	open = { "hover" },
 	locked = { "disabled" },
@@ -300,7 +299,6 @@ KitModel.ART_FALLBACK = {
 -- Image tint (a tints token key) for a state drawn with borrowed art.
 KitModel.STATE_TINT = {
 	hover = "hover",
-	focused = "hover",
 	capturing = "hover",
 	open = "hover",
 	pressed = "pressed",

@@ -38,9 +38,9 @@ local DEFINITIONS = {
 	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
-	-- server -> client: (corpseId, {{index, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
+	-- server -> client: (corpseId, {{index, key, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
 	CorpseOpened = "RemoteEvent",
-	CorpseTake = "RemoteFunction", -- (corpseId, index) -> ok, reason
+	CorpseTake = "RemoteFunction", -- (corpseId, index, key) -> ok, reason; key from CorpseOpened (ListingKeys)
 	DeathSummary = "RemoteEvent", -- server -> client: what dropped and what was kept
 	ExtractionEvent = "RemoteEvent", -- server -> all: an extraction countdown started
 	ExtractionEnded = "RemoteEvent", -- server -> all: (eventId)
@@ -58,8 +58,8 @@ local DEFINITIONS = {
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
 	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
 	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach
-	ChestOpened = "RemoteEvent", -- server -> client: (chestId, {{index, catalogId, name, rarity, quantity?, permanent?}})
-	ChestTake = "RemoteFunction", -- (chestId, index) -> ok, reason
+	ChestOpened = "RemoteEvent", -- server -> client: (chestId, {{index, key, catalogId, name, rarity, quantity?, permanent?}})
+	ChestTake = "RemoteFunction", -- (chestId, index, key) -> ok, reason; key from ChestOpened (ListingKeys)
 	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
 	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
 	EventEnded = "RemoteEvent", -- server -> all: (eventId)

@@ -14,6 +14,7 @@ local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Art = require(script.Parent.Art)
 local Button = require(script.Parent.Button)
 local Core = require(script.Parent.Core)
+local Modal = require(script.Parent.Modal)
 local Motion = require(script.Parent.Motion)
 local Scale = require(script.Parent.Scale)
 local Tokens = require(script.Parent.Tokens)
@@ -78,18 +79,20 @@ function Toast.new(parent: Instance, props)
 			z = base.z + 1,
 		})
 	end
+	-- The ✕ mark is 22 px; its button pads it to touchMin.
 	local c = 22
+	local pad = math.max(0, (Tokens.Space("touchMin", 44) - c) / 2)
 	self.close = Core.Make("TextButton", {
 		Visible = not props.hideClose,
 		Name = "Close",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(w - c - 18, 14),
-		Size = UDim2.fromOffset(c, c),
+		Position = UDim2.fromOffset(w - c - 18 - pad, 14 - pad),
+		Size = UDim2.fromOffset(c + pad * 2, c + pad * 2),
 		Text = "",
 		ZIndex = base.z + 3,
 	}, base.visual)
-	Art.Plate(self.close, "mark.cross", c, c, { z = base.z + 3 })
+	Art.Plate(self.close, "mark.cross", c, c, { z = base.z + 3, rect = { pad, pad, c, c } })
 	base.maid:Give(self.close.Activated:Connect(function()
 		if self.onClose then
 			self.onClose(self)
@@ -121,6 +124,35 @@ end
 -- The managed column ----------------------------------------------------------------
 
 local column: Frame? = nil
+local relayout: (() -> ())? = nil
+local avoid: GuiObject? = nil
+
+-- The column's top (screen px): below the top bar, below a part the column must
+-- keep clear of (Toast.Avoid: the server notice card), and below the title
+-- band of an open window, so toasts never cover a window's title.
+function Toast.LaneTop(gui: GuiBase2d): number
+	local y = Scale.WindowTop(gui) + 8
+	if avoid and avoid.Parent and avoid.Visible then
+		y = math.max(y, avoid.AbsolutePosition.Y + avoid.AbsoluteSize.Y + 8)
+	end
+	local top = Modal.Top()
+	if top and top.holder and top.scale then
+		local header = Tokens.Space("windowHeaderH", 100) * top.scale.Scale
+		local windowTop = top.holder.AbsolutePosition.Y
+		if windowTop + header > y then
+			y = windowTop + header
+		end
+	end
+	return y
+end
+
+-- Keeps the toast column below `object` (nil clears it), e.g. the notice card.
+function Toast.Avoid(object: GuiObject?)
+	avoid = object
+	if relayout then
+		relayout()
+	end
+end
 local shown: { any } = {}
 
 local function host(): Frame
@@ -145,10 +177,17 @@ local function host(): Frame
 	local function fit()
 		local size = gui.AbsoluteSize
 		local ref = Tokens.Data.reference
-		scale.Scale = HudModel.HudScale(size.X, size.Y, ref.width, ref.height, Tokens.Scale("hudMin"), 1.2, nil)
-		root.Position = UDim2.new(0.5, 0, 0, Scale.WindowTop(gui) + 8)
+		local k = HudModel.HudScale(size.X, size.Y, ref.width, ref.height, Tokens.Scale("hudMin"), 1.2, nil)
+		if Scale.IsSmallTouch() then
+			k = math.max(k, Scale.PhoneFloor("overlay"))
+		end
+		scale.Scale = k
+		root.Position = UDim2.new(0.5, 0, 0, Toast.LaneTop(gui))
 	end
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit)
+	Modal.OnChanged(fit)
+	Scale.OnFormFactorChanged(fit)
+	relayout = fit
 	fit()
 	Core.Make("UIListLayout", {
 		Padding = UDim.new(0, Tokens.Space("toastGap", 10)),
@@ -165,6 +204,9 @@ local order = 0
 -- Returns a handle with Close().
 function Toast.Show(props)
 	local parent = host()
+	if relayout then
+		relayout()
+	end
 	order += 1
 	local w, h = Tokens.Space("toastW", 430), Tokens.Space("toastH", 84)
 	-- A CanvasGroup so the whole card fades as one.

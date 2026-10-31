@@ -33,7 +33,12 @@ end
 -- ForgeService.snapshot for a sample profile: vault materials, unlocked recipe
 -- ids, and vault gear ({instanceId, catalogId, qualityRoll}).
 local function snapshot(materials, unlocked, items)
-	local profile = { vault = { materials = materials, items = items or {} }, recipes = { unlocked = {} } }
+	-- An empty lobby backpack: MaxCount also caps a batch by its room.
+	local profile = {
+		vault = { materials = materials, items = items or {} },
+		recipes = { unlocked = {} },
+		lobbyBackpack = { slots = {} },
+	}
 	for _, id in unlocked do
 		profile.recipes.unlocked[id] = { unlockSource = "Discovery", unlockedAt = 0 }
 	end

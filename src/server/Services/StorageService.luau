@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ListingKeys = require(ReplicatedStorage.Shared.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
@@ -30,6 +31,7 @@ local function view(chest)
 		local def = ItemCatalog.Get(item.catalogId)
 		table.insert(entries, {
 			index = index,
+			key = ListingKeys.KeyOf(item),
 			catalogId = item.catalogId,
 			name = def and def.name or item.catalogId,
 			rarity = def and def.rarity or "Common",
@@ -78,15 +80,19 @@ local function store(chest, item): boolean
 	return InventoryRules.Store(chest.slots, item, StructureCatalog.CHEST_SLOTS)
 end
 
-local function take(player: Player, id: any, index: any)
+-- (chestId, index, key): the entry `key` names (ListingKeys), so a stale index
+-- never takes a different item.
+local function take(player: Player, id: any, index: any, key: any)
 	local chest = type(id) == "string" and chests[id]
 	if not chest or not canReach(player, chest) then
 		return false, "TooFar"
 	end
-	local entry = type(index) == "number" and chest.slots[index]
-	if not entry then
-		return false, "Empty"
+	local found, problem = ListingKeys.Resolve(chest.slots, index, key)
+	if found == nil then
+		return false, problem
 	end
+	index = found
+	local entry = chest.slots[index]
 	local copy = DropService.PrepareClaim(player, entry)
 	local remaining, carried = InventoryService.Add(player, copy)
 	if remaining > 0 and (copy.instanceId or remaining == entry.quantity) then

@@ -10,6 +10,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local LootController = {}
@@ -17,13 +18,46 @@ local LootController = {}
 LootController.SIZE = { 600, 560 }
 LootController.ROW_H = 64
 
+-- Player-facing text for a refused take or store (other codes go to Reasons).
+LootController.REFUSED = {
+	Gone = "someone else took it first",
+	Empty = "someone else took it first",
+	TooFar = "you are too far away",
+	NoRoom = "you have no room for it",
+	ChestFull = "the chest is full",
+}
+
 local player = Players.LocalPlayer
 local ui = {}
 local openBodyId = nil
+-- True while a Take is waiting for the server: further presses are ignored.
+local taking = false
 
--- One item row: the item's art, name, rarity and count, and an action button
--- over the row's right end. `entry.catalogId` (sent by the server with every body
--- and chest entry) picks the art.
+function LootController.RefusedText(reason: any): string
+	return LootController.REFUSED[reason] or Reasons.Text(reason or "request failed")
+end
+
+-- Runs `request` (which yields) once at a time across every row: a second press
+-- while one is in flight does nothing, and the pressed button shows busy.
+function LootController.Guard(button, request: () -> ())
+	if taking then
+		return
+	end
+	taking = true
+	if button then
+		button:SetBusy(true)
+	end
+	local ok = pcall(request)
+	taking = false
+	if button and button.root and button.root.Parent then
+		button:SetBusy(false)
+	end
+	return ok
+end
+
+-- One item row: the item's art with its rarity dot, name, rarity and count, and
+-- an action button over the row's right end. `entry.catalogId` (sent by the
+-- server with every body and chest entry) picks the art. Returns (holder, button).
 function LootController.ItemRow(parent: Instance, order: number, w: number, entry, action: string, onAction)
 	local h = LootController.ROW_H
 	local holder = Kit.Core.Make("Frame", {
@@ -41,15 +75,30 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 		value = if entry.quantity then "×" .. entry.quantity else nil,
 		trailing = 112,
 	})
-	Kit.Button.new(holder, {
+	-- The rarity dot sits on the icon's lower-right corner (the icon is 62 % of the
+	-- row height, 14 px in: Kit.ListRow).
+	local icon = math.floor(h * 0.62)
+	if entry.catalogId then
+		Kit.Badge.new(holder, {
+			name = "Rarity",
+			variant = "rarity",
+			rarity = entry.rarity,
+			rect = { 14 + icon - 10, (h - icon) / 2 + icon - 10, 12, 12 },
+			zIndex = 7,
+		})
+	end
+	local button
+	button = Kit.Button.new(holder, {
 		name = action,
 		rect = { w - 14 - 112, (h - 42) / 2, 112, 42 },
 		label = action,
 		sizeClass = "s",
 		zIndex = 6,
-		onPress = onAction,
+		onPress = function()
+			onAction(button)
+		end,
 	})
-	return holder
+	return holder, button
 end
 
 local function clear()
@@ -76,19 +125,25 @@ local function render(bodyId: string, entries)
 			}).root
 		)
 	end
+	local first = nil
 	for order, entry in entries do
-		table.insert(
-			ui.rows,
-			LootController.ItemRow(ui.list, order, w, entry, "Take", function()
+		local holder, button = LootController.ItemRow(ui.list, order, w, entry, "Take", function(button)
+			local bodyId = openBodyId
+			LootController.Guard(button, function()
+				-- The key names this exact entry, so a stale index takes nothing else.
 				local ok, success, reason = pcall(function()
-					return Remotes.Get("CorpseTake"):InvokeServer(openBodyId, entry.index)
+					return Remotes.Get("CorpseTake"):InvokeServer(bodyId, entry.index, entry.key)
 				end)
 				if not ok or not success then
-					ui.status:SetText("Could not take that (" .. tostring(reason) .. ")")
+					ui.status:SetText("Could not take that: " .. LootController.RefusedText(reason) .. ".")
 				end
 			end)
-		)
+		end)
+		table.insert(ui.rows, holder)
+		first = first or button
 	end
+	-- A gamepad lands on the first Take (or the ✕ when the body is empty).
+	ui.screen:SetDefaultSelection(if first then first.control.hit else ui.window.close.control.hit)
 	ui.panel.scroll:SetContentHeight(math.max(1, #entries) * (LootController.ROW_H + 6))
 	ui.status:SetText("")
 	ui.screen:Open()
@@ -99,6 +154,7 @@ local function build()
 	ui.rows = {}
 	ui.screen = Kit.Screen.new("FlintbornLoot", { size = LootController.SIZE })
 	local window = Kit.Window.new(ui.screen, { title = "Body", icon = "bone" })
+	ui.window = window
 	local body = window:Body()
 	local bw, bh = window.bodyRect[3], window.bodyRect[4]
 	ui.panel =

@@ -37,15 +37,18 @@ local function clear(column)
 	table.clear(column.rows)
 end
 
+-- Returns the first row's button (nil for an empty column).
 local function fill(column, entries, action: string, onAction)
 	clear(column)
+	local first = nil
 	for order, entry in entries do
-		table.insert(
-			column.rows,
-			LootController.ItemRow(column.list, order, column.w, entry, action, function()
+		local holder, button = LootController.ItemRow(column.list, order, column.w, entry, action, function(button)
+			LootController.Guard(button, function()
 				onAction(entry)
 			end)
-		)
+		end)
+		table.insert(column.rows, holder)
+		first = first or button
 	end
 	if #entries == 0 then
 		table.insert(
@@ -61,16 +64,18 @@ local function fill(column, entries, action: string, onAction)
 		)
 	end
 	column.panel.scroll:SetContentHeight(math.max(1, #entries) * (LootController.ROW_H + 6))
+	return first
 end
 
 local function render()
 	if openChestId == nil then
 		return
 	end
-	fill(ui.chest, contents, "Take", function(entry)
-		local ok, reason = invoke("ChestTake", openChestId, entry.index)
+	local firstTake = fill(ui.chest, contents, "Take", function(entry)
+		-- The key names this exact entry, so a stale index takes nothing else.
+		local ok, reason = invoke("ChestTake", openChestId, entry.index, entry.key)
 		if not ok then
-			ui.status:SetText("Could not take that (" .. tostring(reason) .. ")")
+			ui.status:SetText("Could not take that: " .. LootController.RefusedText(reason) .. ".")
 		end
 	end)
 	local carried = {}
@@ -87,12 +92,15 @@ local function render()
 			})
 		end
 	end
-	fill(ui.mine, carried, "Store", function(entry)
+	local firstStore = fill(ui.mine, carried, "Store", function(entry)
 		local ok, reason = invoke("ChestPut", openChestId, entry.slot.area, entry.slot.index)
 		if not ok then
-			ui.status:SetText("Could not store that (" .. tostring(reason) .. ")")
+			ui.status:SetText("Could not store that: " .. LootController.RefusedText(reason) .. ".")
 		end
 	end)
+	-- A gamepad lands on the first Take, else the first Store, else the ✕.
+	local first = firstTake or firstStore
+	ui.screen:SetDefaultSelection(if first then first.control.hit else ui.window.close.control.hit)
 	ui.screen:Open()
 end
 
@@ -111,6 +119,7 @@ local function build()
 		subtitle = "Public: anyone who reaches it can take items.",
 		icon = "chest",
 	})
+	ui.window = window
 	local body = window:Body()
 	local bw, bh = window.bodyRect[3], window.bodyRect[4]
 	local gap = Kit.Tokens.Space("colGap", 14)

@@ -396,6 +396,11 @@ function PlateMethods:Show(state: string)
 		if self.tint then
 			color = Tokens.Multiply(color, self.tint)
 		end
+		-- The sheets' leather reads brighter than the mockups' (ΔE 5-10):
+		-- every leather sprite draws under the leatherTint token.
+		if isLeather(sprite, "") then
+			color = Tokens.Multiply(color, Tokens.Color("leatherTint"))
+		end
 		shown.ImageColor3 = color
 		shown.ImageTransparency = self.alpha
 	elseif shown:IsA("Frame") and shown.Name == sprite and shown:FindFirstChild("Edge") then
@@ -506,6 +511,22 @@ function Art.ItemSprite(catalogId: string?): string?
 		end
 	end
 	return nil
+end
+
+-- The neutral glyph for an item without art, by its kind: tools and weapons
+-- a hammer, armour a backpack, food a drumstick, everything else a chest.
+function Art.KindGlyph(catalogId: string?): string
+	local entry = catalogId and ItemCatalog.Get(catalogId)
+	if entry == nil then
+		return "ink:chest"
+	elseif entry.weapon or entry.tool then
+		return "ink:hammer"
+	elseif entry.armor then
+		return "ink:backpack"
+	elseif entry.consumable then
+		return "drumstick"
+	end
+	return "ink:chest"
 end
 
 function Art.ItemName(catalogId: string?): string

@@ -612,6 +612,7 @@ local EVENTS = {
 	PlayerRemoving = true,
 	CharacterAdded = true,
 	CharacterRemoving = true,
+	LastInputTypeChanged = true,
 	Move = true,
 	Button1Down = true,
 	Button1Up = true,

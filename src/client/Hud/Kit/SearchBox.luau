@@ -5,6 +5,7 @@
 --   Kit.SearchBox.new(column, { rect = { 0, 0, 215, 41 }, placeholder = "Search items...", onChanged = filter })
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Art = require(script.Parent.Art)
@@ -61,6 +62,22 @@ function SearchBox.new(parent: Instance, props)
 	end
 	box.PlaceholderColor3 = Tokens.Color("placeholder")
 	self.box = box
+	-- Touch: the TextBox (text centred in it) grows to at least touchMin screen
+	-- px tall at the field's real scale; the field itself does not change.
+	local function fitTouch()
+		if not UserInputService.TouchEnabled then
+			return
+		end
+		local shown = base.root.AbsoluteSize
+		if shown.Y <= 0 or h <= 0 then
+			return
+		end
+		local need = math.max(h, Tokens.Space("touchMin", 44) / (shown.Y / h))
+		box.Position = UDim2.fromOffset(left, (h - need) / 2)
+		box.Size = UDim2.fromOffset(w - left - clear - 16, need)
+	end
+	base.maid:Give(base.root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitTouch))
+	fitTouch()
 	self.clear = Core.Make("TextButton", {
 		Name = "Clear",
 		AutoButtonColor = false,

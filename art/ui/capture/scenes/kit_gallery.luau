@@ -874,44 +874,35 @@ do
 
 	heading(root, "Portrait none, PlayerRow badge width and lines, ListRow lines", 30, 400)
 	Kit.Portrait.new(root, { rect = { 30, 440, 56, 56 }, userId = 1, frame = "none" })
-	Kit.PlayerRow.new(
-		root,
-		{
-			rect = { 110, 440, 400, 60 },
-			userId = 1,
-			name = "LiamTheMo",
-			level = 12,
-			badge = "ready",
-			badgeWidth = 90,
-			nameY = 6,
-			levelY = 34,
-			frame = "none",
-		}
-	)
-	Kit.ListRow.new(
-		root,
-		{
-			rect = { 540, 436, 330, 72 },
-			variant = "soft",
-			icon = "pickaxe",
-			title = "Iron Pickaxe",
-			titleY = 6,
-			subtitle = "Mine stone and ore.",
-			subtitleY = 40,
-			onPress = function() end,
-		}
-	)
-	local selected = Kit.ListRow.new(
-		root,
-		{
-			rect = { 900, 436, 330, 72 },
-			variant = "soft",
-			icon = "hatchet",
-			title = "Selected card",
-			subtitle = "Thin glow on the edge",
-			onPress = function() end,
-		}
-	)
+	Kit.PlayerRow.new(root, {
+		rect = { 110, 440, 400, 60 },
+		userId = 1,
+		name = "LiamTheMo",
+		level = 12,
+		badge = "ready",
+		badgeWidth = 90,
+		nameY = 6,
+		levelY = 34,
+		frame = "none",
+	})
+	Kit.ListRow.new(root, {
+		rect = { 540, 436, 330, 72 },
+		variant = "soft",
+		icon = "pickaxe",
+		title = "Iron Pickaxe",
+		titleY = 6,
+		subtitle = "Mine stone and ore.",
+		subtitleY = 40,
+		onPress = function() end,
+	})
+	local selected = Kit.ListRow.new(root, {
+		rect = { 900, 436, 330, 72 },
+		variant = "soft",
+		icon = "hatchet",
+		title = "Selected card",
+		subtitle = "Thin glow on the edge",
+		onPress = function() end,
+	})
 	selected:SetSelected(true)
 	local tabs = Kit.Tab.new(root, { rect = { 1260, 430, 82, 84 }, variant = "side", icon = "ink:book" })
 	tabs:SetSelected(true)

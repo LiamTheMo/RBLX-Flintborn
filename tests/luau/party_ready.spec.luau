@@ -137,8 +137,9 @@ end
 local PlaceConfig = require(Shared.Config.PlaceConfig)
 local Remotes = require(Shared.Net.Remotes)
 local handlers = {}
--- The latest view each player was sent, by UserId.
+-- The latest view each player was sent, and how many views, by UserId.
 local sent = {}
+local fires = {}
 Remotes.Handle = function(name, fn)
 	handlers[name] = fn
 end
@@ -146,6 +147,7 @@ Remotes.Get = function()
 	return {
 		FireClient = function(_, player, view)
 			sent[player.UserId] = view
+			fires[player.UserId] = (fires[player.UserId] or 0) + 1
 		end,
 	}
 end
@@ -260,6 +262,44 @@ test("the per-player cooldown still applies to ready", function()
 	expect(not ok and reason == "TooFast", "spam refused")
 	expectEq(sent[5].ready, true, "the refused request changed nothing")
 	PartyService.REQUEST_COOLDOWN_SECONDS = -1
+end)
+
+test("only players whose view changed are sent one; no-ops send nothing", function()
+	local function snapshot()
+		return table.clone(fires)
+	end
+	local function delta(before, userId)
+		return (fires[userId] or 0) - (before[userId] or 0)
+	end
+	-- leader (1) and invitee (3) are in one party; solo (4) and 5 are alone.
+	handlers.PartyAction(invitee, "ready", false)
+	local before = snapshot()
+	handlers.PartyAction(invitee, "ready", false)
+	expectEq(delta(before, 3), 0, "an unchanged ready flag sends nothing")
+	handlers.PartyAction(solo, "leave")
+	handlers.PartyAction(solo, "decline", "no-such-party")
+	expectEq(delta(before, 4), 0, "a leave or decline that changes nothing sends nothing")
+
+	before = snapshot()
+	handlers.PartyAction(leader, "ready", true)
+	expectEq(delta(before, 1), 1, "the player who changed hears once")
+	expectEq(delta(before, 4), 0, "a stranger hears nothing")
+	expectEq(delta(before, 5), 0, "nor does anyone else outside the party")
+
+	before = snapshot()
+	handlers.PartyAction(leader, "invite", 4)
+	expectEq(delta(before, 1), 1, "the leader sees the invite go out")
+	expectEq(delta(before, 4), 1, "the invitee sees the invite")
+	expectEq(delta(before, 5), 0, "others hear nothing")
+	before = snapshot()
+	handlers.PartyAction(solo, "decline", PartyService.PartyIdOf(leader))
+	expect(delta(before, 1) == 1 and delta(before, 4) == 1, "a decline reaches the leader and the invitee")
+	expectEq(delta(before, 5), 0, "and no one else")
+
+	before = snapshot()
+	newPlayer(6)
+	expectEq(delta(before, 6), 1, "a joining player gets their first view")
+	expectEq(delta(before, 1), 0, "a join changes no one else's view")
 end)
 
 test("unknown actions are refused", function()

@@ -365,13 +365,23 @@ local function hideInvite()
 end
 
 -- The invite: a toast (KitToasts sits above the windows, so it can be answered
--- with a menu open) whose View opens the question with Accept and Decline.
+-- with a menu open) with Accept and Decline on it; pressing the card itself opens
+-- the same question as a dialog (easier to reach with a gamepad).
 local function showInvite(from: string)
 	hideInvite()
 	local function answer(accept: boolean)
+		hideInvite()
+		if answering then
+			answering.Close()
+			answering = nil
+		end
 		if inviteId then
-			invoke("TradeRespond", inviteId, accept)
+			local id = inviteId
 			inviteId = nil
+			local ok, reason = invoke("TradeRespond", id, accept)
+			if not ok and accept then
+				window:SetStatus("Couldn't accept: " .. Reasons.Text(reason), "warn")
+			end
 		end
 	end
 	local function ask()
@@ -401,7 +411,23 @@ local function showInvite(from: string)
 		text = from .. " wants to trade.",
 		duration = TradeController.INVITE_SECONDS,
 		onPress = ask,
-		actions = { { label = "View", onPress = ask } },
+		hideClose = true,
+		-- Laid out right to left: Accept (primary) on the right, Decline beside it.
+		actions = {
+			{
+				label = "Accept",
+				onPress = function()
+					answer(true)
+				end,
+			},
+			{
+				label = "Decline",
+				variant = "secondary",
+				onPress = function()
+					answer(false)
+				end,
+			},
+		},
 	})
 end
 

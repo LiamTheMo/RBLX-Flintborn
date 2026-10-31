@@ -13,6 +13,7 @@ local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Interact = require(script.Parent.Interact)
+local Scale = require(script.Parent.Scale)
 local Tokens = require(script.Parent.Tokens)
 
 local Tooltip = {}
@@ -111,6 +112,10 @@ local function show(owner, target: GuiObject, text: string, side: string)
 	local size = screen.AbsoluteSize
 	local ref = Tokens.Data.reference
 	local k = HudModel.HudScale(size.X, size.Y, ref.width, ref.height, Tokens.Scale("hudMin"), 1.2, nil)
+	if Scale.IsSmallTouch() then
+		-- Phones and tablets: never below the overlay floor.
+		k = math.max(k, Scale.PhoneFloor("overlay"))
+	end
 	local holder = Core.Make("Frame", {
 		Name = "Tip",
 		BackgroundTransparency = 1,

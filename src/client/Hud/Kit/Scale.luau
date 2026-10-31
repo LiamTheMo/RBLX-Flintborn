@@ -34,10 +34,69 @@ function Scale.WindowTop(gui: GuiBase2d): number
 end
 
 -- True on a touch-only screen shorter than the phone height.
-function Scale.IsSmallTouch(height: number): boolean
-	return UserInputService.TouchEnabled
-		and not UserInputService.KeyboardEnabled
-		and height < Tokens.Scale("phoneHeight")
+-- The device's form factor: "phone" (touch only, viewport shorter than
+-- phoneHeight), "tablet" (touch only, short side under tabletShortSide) or
+-- "desktop" (everything with a keyboard, consoles, big touch screens). Sizes
+-- default to the current viewport.
+function Scale.FormFactor(height: number?, width: number?): string
+	if not UserInputService.TouchEnabled or UserInputService.KeyboardEnabled then
+		return "desktop"
+	end
+	local camera = workspace.CurrentCamera
+	local size = if camera then camera.ViewportSize else Vector2.new(1672, 941)
+	local h = height or size.Y
+	local w = width or size.X
+	if h > 0 and h < Tokens.Scale("phoneHeight") then
+		return "phone"
+	end
+	if math.min(w, h) > 0 and math.min(w, h) < Tokens.Scale("tabletShortSide") then
+		return "tablet"
+	end
+	return "desktop"
+end
+
+-- True on touch-only phones and tablets: windows fill the screen there and
+-- body text is boosted. (Before this round only phones counted.)
+function Scale.IsSmallTouch(height: number?, width: number?): boolean
+	return Scale.FormFactor(height, width) ~= "desktop"
+end
+
+-- The one phone floor table (tokens "phoneFloor"): the least scale for "hud"
+-- or "overlay" (toasts, tooltips, notice cards) on phones.
+function Scale.PhoneFloor(kind: string): number
+	return Tokens.Data.phoneFloor[kind] or Tokens.Data.phoneFloor.overlay
+end
+
+-- Fires (with the new form factor) when the viewport or the input devices
+-- change it, so phone and tablet decisions are not frozen at build time.
+local listeners: { [any]: boolean } = {}
+local current: string? = nil
+local watching = false
+local function recheck()
+	local now = Scale.FormFactor()
+	if now ~= current then
+		current = now
+		for fn in table.clone(listeners) do
+			task.spawn(fn, now)
+		end
+	end
+end
+function Scale.OnFormFactorChanged(fn: (string) -> ()): () -> ()
+	if not watching then
+		watching = true
+		current = Scale.FormFactor()
+		local camera = workspace.CurrentCamera
+		if camera then
+			camera:GetPropertyChangedSignal("ViewportSize"):Connect(recheck)
+		end
+		UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(recheck)
+		UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(recheck)
+		UserInputService.LastInputTypeChanged:Connect(recheck)
+	end
+	listeners[fn] = true
+	return function()
+		listeners[fn] = nil
+	end
 end
 
 local function viewport(gui: GuiBase2d): Vector2
@@ -70,10 +129,10 @@ function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
 			Tokens.Scale("hudMax"),
 			player:GetAttribute("UiScale")
 		)
-		if Scale.IsSmallTouch(size.Y) then
-			-- Phones: never below phoneHudMin, so HUD text stays readable; the
-			-- regions are pinned to the screen edges and make room for it.
-			k = math.max(k * Tokens.Scale("phoneHud"), Tokens.Scale("phoneHudMin"))
+		if Scale.IsSmallTouch(size.Y, size.X) then
+			-- Phones and touch tablets: never below the HUD phone floor, so HUD
+			-- text stays readable; the regions are pinned to the screen edges.
+			k = math.max(k * Tokens.Scale("phoneHud"), Scale.PhoneFloor("hud"))
 		end
 		uiScale.Scale = k
 		root.Size = UDim2.fromScale(1 / k, 1 / k)
@@ -82,6 +141,8 @@ function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
 		gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(apply),
 		player:GetAttributeChangedSignal("UiScale"):Connect(apply),
 	}
+	local stopForm = Scale.OnFormFactorChanged(apply)
+	table.insert(connections, { Disconnect = stopForm })
 	apply()
 	return function()
 		for _, connection in connections do
@@ -92,9 +153,9 @@ end
 
 -- The scale and centre of a window w × h on a screen W × H whose top `top` px
 -- belong to the Roblox top bar.
--- On a short touch screen (a landscape phone) a window takes the whole
--- screen height, over the top bar and the HUD, at the largest scale that fits,
--- so its text is as large as it can be.
+-- On a touch phone or tablet a window takes all the room below the top bar
+-- (over the HUD) at the largest scale that fits, so its text is as large as it
+-- can be; it never draws under the Roblox top bar.
 function Scale.WindowFit(
 	screenW: number,
 	screenH: number,
@@ -104,11 +165,8 @@ function Scale.WindowFit(
 	userScale: number?,
 	smallTouch: boolean?
 )
-	local small = if smallTouch == nil then Scale.IsSmallTouch(screenH) else smallTouch
+	local small = if smallTouch == nil then Scale.IsSmallTouch(screenH, screenW) else smallTouch
 	local margin = Tokens.Space(if small then "phoneMargin" else "windowMargin", if small then 4 else 8)
-	if small then
-		top = 0
-	end
 	local ref = Tokens.Data.reference
 	local k = KitModel.WindowScale(screenW, screenH, top, w, h, userScale, small, {
 		margin = margin,
@@ -149,6 +207,7 @@ function Scale.Window(screen): () -> ()
 	pcall(function()
 		table.insert(connections, GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(fit))
 	end)
+	table.insert(connections, { Disconnect = Scale.OnFormFactorChanged(fit) })
 	fit()
 	return function()
 		for _, connection in connections do

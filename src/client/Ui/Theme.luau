@@ -95,7 +95,8 @@ local topStack = nil
 
 -- The least scale overlay cards get on a phone, so their body text stays near
 -- the 9 px floor (the HUD formula gives about 0.37 at 844 × 390).
-Theme.PHONE_MIN_SCALE = 0.6
+-- Kept for readers; the value lives in the kit tokens (phoneFloor.overlay).
+Theme.PHONE_MIN_SCALE = KitTokens.Data.phoneFloor.overlay
 
 -- The overlays' scale for a gui: the kit's HUD formula with the player's UI
 -- scale; on phones (KitScale.IsSmallTouch) the kit's phone factor, but never
@@ -117,7 +118,7 @@ function Theme.HudScale(gui: GuiBase2d): number
 		Players.LocalPlayer:GetAttribute("UiScale")
 	)
 	if KitScale.IsSmallTouch(size.Y) then
-		k = math.max(k * KitTokens.Scale("phoneHud"), Theme.PHONE_MIN_SCALE)
+		k = math.max(k * KitTokens.Scale("phoneHud"), KitScale.PhoneFloor("overlay"))
 	end
 	return k
 end

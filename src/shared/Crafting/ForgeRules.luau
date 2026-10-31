@@ -77,18 +77,8 @@ end
 
 -- Vaulted quantity of a material. The lobby backpack never counts (§25.3).
 function ForgeRules.Owned(profile, catalogId: string): number
-	return profile.vault.materials[catalogId] or 0
-end
-
--- How many crafts of `recipe` one request may ask for: up to MAX_BATCH (1 for a
--- Permanent conversion) and no more than the vault's materials pay for. 0 when
--- even one is short. Lobby backpack room is checked by Craft (BackpackFull).
-function ForgeRules.MaxCount(profile, recipe): number
-	local limit = if recipe.kind == ForgeRecipes.Kinds.Permanent then 1 else ForgeRules.MAX_BATCH
-	for catalogId, quantity in recipe.inputs do
-		limit = math.min(limit, math.floor(ForgeRules.Owned(profile, catalogId) / quantity))
-	end
-	return limit
+	local materials = profile.vault and profile.vault.materials
+	return materials and materials[catalogId] or 0
 end
 
 function ForgeRules.RequirementsMet(profile, recipe): boolean
@@ -169,6 +159,52 @@ local function backpackFits(profile, outputs): boolean
 	return true
 end
 
+-- The results `count` crafts of a special recipe make: one stack, or one item each.
+local function outputsOf(recipe, count: number, ownerId: number?, newId: () -> string)
+	if ItemCatalog.IsStackable(recipe.output) then
+		return { { catalogId = recipe.output, quantity = recipe.quantity * count } }
+	end
+	local outputs = {}
+	for _ = 1, count do
+		table.insert(outputs, {
+			instanceId = newId(),
+			catalogId = recipe.output,
+			ownerId = ownerId,
+			location = "LobbyBackpack",
+			qualityRoll = 0,
+		})
+	end
+	return outputs
+end
+
+local function trialId(): string
+	return "trial"
+end
+
+-- How many crafts of `recipe` one request may ask for right now: up to MAX_BATCH
+-- (1 for a Permanent conversion), no more than the vault's materials pay for, and
+-- for special recipes no more than the lobby backpack has room for. 0 when even
+-- one would be refused. Craft re-checks everything; this only guides the client.
+-- A profile-like table without a lobby backpack (a client-side snapshot) puts no
+-- room limit on the count: only the server's full profile knows the backpack.
+function ForgeRules.MaxCount(profile, recipe): number
+	local limit = if recipe.kind == ForgeRecipes.Kinds.Permanent then 1 else ForgeRules.MAX_BATCH
+	for catalogId, quantity in recipe.inputs do
+		limit = math.min(limit, math.floor(ForgeRules.Owned(profile, catalogId) / quantity))
+	end
+	local backpack = profile.lobbyBackpack
+	if
+		recipe.kind ~= ForgeRecipes.Kinds.Permanent
+		and type(backpack) == "table"
+		and type(backpack.slots) == "table"
+	then
+		while limit > 0 and not backpackFits(profile, outputsOf(recipe, limit, nil, trialId)) do
+			limit -= 1
+		end
+	end
+	return limit
+end
+
 -- Applies one Forge request. `request` = {recipeId, sourceId?, count?, ownerId,
 -- operationId, now, newId}. `count` (default 1) crafts are checked, charged and
 -- granted together. Returns (receipt, nil) or (nil, reason) with the profile untouched.
@@ -213,18 +249,8 @@ function ForgeRules.Craft(profile, request)
 		if source.catalogId ~= recipe.source then
 			return nil, "WrongSource"
 		end
-	elseif ItemCatalog.IsStackable(recipe.output) then
-		outputs[1] = { catalogId = recipe.output, quantity = recipe.quantity * count }
 	else
-		for _ = 1, count do
-			table.insert(outputs, {
-				instanceId = request.newId(),
-				catalogId = recipe.output,
-				ownerId = request.ownerId,
-				location = "LobbyBackpack",
-				qualityRoll = 0,
-			})
-		end
+		outputs = outputsOf(recipe, count, request.ownerId, request.newId)
 	end
 	if not backpackFits(profile, outputs) then
 		return nil, "BackpackFull"

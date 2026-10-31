@@ -47,6 +47,7 @@
     "leaderTint": "#FFF0D2",
     "checkTint": "#FFD52A",
     "notReadyTint": "#C8C8C8",
+    "leatherTint": "#D1D4FF",
     "emptyDot": "#CC9F77",
     "photoBackdrop": "#C9B19B",
     "rarityCommon": "#A99A88",
@@ -120,6 +121,8 @@
     "fallbackStroke": 2,
     "fallbackStrokeWindow": 3,
     "glowStroke": 3,
+    "focusStroke": 3,
+    "focusOutset": 3,
     "windowHeaderH": 100,
     "windowTitleX": 140,
     "windowIcon": 76,
@@ -147,6 +150,7 @@
     "phoneHeight": 500,
     "phoneHud": 0.9,
     "phoneHudMin": 0.5,
+    "tabletShortSide": 900,
     "hover": 1.03,
     "pressed": 0.96,
     "windowFrom": 0.94
@@ -175,6 +179,7 @@
     "subtitles": 50
   },
   "blur": { "size": 8, "minQuality": 4 },
+  "phoneFloor": { "hud": 0.5, "overlay": 0.6 },
   "phoneText": {
     "scale": 1.2,
     "roles": ["body", "bodySoft", "small", "muted", "rowLabel", "rowTitle", "value", "count", "hudName", "hudSmall", "currency", "keycap", "tag", "label", "placeholder", "buttonS", "tab", "badgeNum"]

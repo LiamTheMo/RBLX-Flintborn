@@ -9,10 +9,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextService = game:GetService("TextService")
-local UserInputService = game:GetService("UserInputService")
 
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Widgets = require(script.Parent.Parent.Widgets)
+local Scale = require(script.Parent.Scale)
 local Tokens = require(script.Parent.Tokens)
 
 local Core = {}
@@ -118,24 +118,33 @@ function Core.TextBoost(role: string): number
 	if not phoneRoles[role] then
 		return 1
 	end
-	local camera = workspace.CurrentCamera
-	local height = if camera then camera.ViewportSize.Y else 0
-	if
-		UserInputService.TouchEnabled
-		and not UserInputService.KeyboardEnabled
-		and height > 0
-		and height < Tokens.Scale("phoneHeight")
-	then
-		return Tokens.Data.phoneText.scale
-	end
-	return 1
+	return if Scale.IsSmallTouch() then Tokens.Data.phoneText.scale else 1
 end
+
+-- Boosted labels and their unboosted sizes, so a change of form factor (a
+-- rotated or resized screen, a keyboard attached) re-applies the boost.
+local boosted: { [Instance]: number } = setmetatable({}, { __mode = "k" }) :: any
+local function track(label: Instance, role: string, size: number)
+	if phoneRoles[role] then
+		boosted[label] = size
+	end
+end
+Scale.OnFormFactorChanged(function()
+	for label, size in boosted do
+		if label.Parent then
+			local role = label:GetAttribute("KitTextRole");
+			(label :: any).TextSize = size * Core.TextBoost(role or "body")
+		end
+	end
+end)
 
 -- Applies a text role (font, size, colour) to a label.
 function Core.Style(label: TextLabel | TextButton | TextBox, role: string, colorKey: string?)
 	local style = Tokens.TextStyle(role)
 	label.FontFace = style.face
 	label.TextSize = style.size * Core.TextBoost(role)
+	label:SetAttribute("KitTextRole", role)
+	track(label, role, style.size)
 	label.TextColor3 = Tokens.Color(colorKey or style.color)
 	return style
 end
@@ -166,6 +175,7 @@ function Core.Label(parent: Instance, opts): TextLabel
 	local style = Core.Style(label, role, opts.color)
 	if opts.size then
 		label.TextSize = opts.size * Core.TextBoost(role)
+		track(label, role, opts.size)
 	end
 	if opts.outline then
 		-- Text over the world: a thin outline (paper behind ink, ink behind

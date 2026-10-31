@@ -22,6 +22,8 @@ PartyService.STORE_ATTEMPTS = 2
 
 local state = PartyRules.NewState()
 local lastRequest = {}
+-- The view each player was last sent, so only players whose view changed hear again.
+local lastSent = setmetatable({}, { __mode = "k" })
 local deployMap = nil
 
 local function newPartyId()
@@ -71,15 +73,41 @@ local function viewFor(player: Player)
 	return view
 end
 
+-- Views are plain data (strings, numbers, booleans and nested tables).
+local function same(a: any, b: any): boolean
+	if type(a) ~= "table" or type(b) ~= "table" then
+		return a == b
+	end
+	for key, value in a do
+		if not same(value, b[key]) then
+			return false
+		end
+	end
+	for key in b do
+		if a[key] == nil then
+			return false
+		end
+	end
+	return true
+end
+
+-- Sends each player their view when it differs from the last one they were sent.
+-- A no-op (an unchanged ready flag, a decline with no invite) sends nothing, and a
+-- change inside one party reaches only the players it shows to: its members, and
+-- whoever it invited or who invited it.
 local function broadcast()
 	local changed = Remotes.Get("PartyChanged")
 	for _, player in Players:GetPlayers() do
-		changed:FireClient(player, viewFor(player))
+		local view = viewFor(player)
+		if not same(view, lastSent[player]) then
+			lastSent[player] = view
+			changed:FireClient(player, view)
+		end
 	end
 end
 
 -- Clears the ready flag of everyone in `group` (a deploy is starting) and tells
--- every client.
+-- the players whose view changed.
 function PartyService.ClearReady(group: { Player })
 	local userIds = {}
 	for _, member in group do
@@ -221,6 +249,7 @@ function PartyService.Start()
 		PartyRules.Forget(state, player.UserId)
 		lastRequest[player] = nil
 		broadcast()
+		lastSent[player] = nil
 	end)
 end
 

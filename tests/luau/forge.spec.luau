@@ -374,8 +374,25 @@ test("a batch that does not all fit the lobby backpack is refused whole", functi
 	expect(receipt == nil and reason == "BackpackFull", "six do not fit in five slots")
 	expectEq(#profile.lobbyBackpack.slots, 45, "none added")
 	expectEq(profile.vault.materials.IronBar, 1000, "nothing charged")
+	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 5, "MaxCount offers only what fits")
 	expect(ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 5)) ~= nil, "five fit")
+	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 0, "a full backpack offers none")
+	local arrows = ProfileSchema.Default(0)
+	arrows.vault.materials = { Wood = 1000, Flint = 1000, Fiber = 1000 }
+	arrows.lobbyBackpack.slots = { { catalogId = "FlintArrow", quantity = 380 } }
+	ForgeRules.RefreshUnlocks(arrows, 1)
+	expectEq(ForgeRules.MaxCount(arrows, ForgeRecipes.Get("ForgeArrows")), 2, "a stack's room: 120 more arrows")
 	expectEq(#profile.lobbyBackpack.slots, 50, "backpack full")
+end)
+
+test("MaxCount works on a snapshot without a lobby backpack or vault", function()
+	local recipe = ForgeRecipes.Get("ForgeIronPickaxe")
+	local snapshot = { vault = { materials = { IronBar = 65, Wood = 200 } } }
+	expectEq(ForgeRules.MaxCount(snapshot, recipe), 3, "materials only: no backpack, no room limit")
+	snapshot.lobbyBackpack = {}
+	expectEq(ForgeRules.MaxCount(snapshot, recipe), 3, "a backpack without slots is no limit either")
+	expectEq(ForgeRules.MaxCount({}, recipe), 0, "no vault: nothing owned")
+	expectEq(ForgeRules.MaxCount(snapshot, ForgeRecipes.Get("PermanentStonePickaxe")), 0, "conversions too")
 end)
 
 test("a Permanent conversion is always exactly one", function()

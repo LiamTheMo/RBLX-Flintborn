@@ -11,6 +11,7 @@ local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
+local Input = require(script.Parent.Input)
 local Motion = require(script.Parent.Motion)
 local Tokens = require(script.Parent.Tokens)
 
@@ -70,7 +71,24 @@ local function onBack(_, state)
 	return Enum.ContextActionResult.Sink
 end
 
+-- Functions told when a layer opens or closes (the toast column moves clear of
+-- an open window's title).
+local changed: { [any]: boolean } = {}
+function Modal.OnChanged(fn: () -> ()): () -> ()
+	changed[fn] = true
+	return function()
+		changed[fn] = nil
+	end
+end
+
+local function notify()
+	for fn in table.clone(changed) do
+		task.spawn(fn)
+	end
+end
+
 local function bind()
+	notify()
 	local open = stack:Count() > 0
 	if open and not bound then
 		bound = true
@@ -113,8 +131,10 @@ function Modal.Open(entry, layer: string?, gamepad: boolean?)
 		blur(true)
 	end
 	bind()
+	-- A gamepad player always lands on the default control (opened with a
+	-- gamepad, the last input a gamepad, or something already selected).
 	local default = entry.defaultSelection
-	if default and (gamepad or GuiService.SelectedObject ~= nil) then
+	if default and (gamepad or Input.IsGamepad() or GuiService.SelectedObject ~= nil) then
 		GuiService.SelectedObject = default
 	end
 end

@@ -724,3 +724,43 @@ an image's UIGradient transparency.
 
 **Strings**: no ★ or → in UI strings (Merriweather has neither): Permanent
 items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
+
+## 12. Fix round 3
+
+- **Seams**: atlas nine-piece sprites use whole-pixel corners and edge/centre
+  pieces overlapping by 1 px (no seams at fractional slice scales).
+- **Form factor** (`Kit.Scale.FormFactor() → "phone" | "tablet" | "desktop"`):
+  touch-only screens with a short side under `tabletShortSide` (900) count as
+  tablets; `IsSmallTouch` is true for phones and tablets (window fill, text
+  boost, HUD floor). `Kit.Scale.OnFormFactorChanged(fn)` fires on viewport or
+  input-device changes; HUD and window scales and boosted labels re-apply.
+- **One phone floor token** `phoneFloor = {hud = 0.5, overlay = 0.6}` read by
+  `Kit.Scale.PhoneFloor(kind)`: HUD roots, toasts, tooltips and
+  `Theme.HudScale` overlays (Theme.PHONE_MIN_SCALE now reads it).
+- **Windows on phones** stay below the Roblox top bar (Party at 844 × 390:
+  0.513).
+- **Toasts**: ✕ padded to 44 px; phone floor; the column keeps below an open
+  window's title band and below `Kit.Toast.Avoid(guiObject)` (the notice card).
+  `Kit.Modal.OnChanged(fn)` tells listeners when layers open or close.
+- **Input** (`Kit.Input`): `Type()` ("mouse" | "keyboard" | "touch" |
+  "gamepad"), `IsGamepad()`, `IsTouch()`, `Hint(keyboardText, gamepadKey)`
+  (nil on touch), `Watch(fn)`, `GAMEPAD_NAMES`, `SetHudDefault(guiObject)`
+  (selection lands there when a gamepad is picked up with nothing selected).
+  KeyCap `gamepadKey` / `hideOnTouch` switch by themselves.
+- **Gamepad**: Kit.Modal selects a window's default control whenever the last
+  input is a gamepad (ConfirmDialog included). Focus is now distinct from hover:
+  a gold focus ring (the selection image, inset to the visible control) over the
+  normal art. Dropdowns move selection into their options and back.
+- **Touch**: SearchBox / TextField boxes grow to 44 screen px tall on touch.
+- **Colour**: leather sprites draw under `leatherTint` (#D1D4FF; buttons now
+  ΔE ≈ 1 vs M04's CLOSE). The HUD card, currency pill and XP track differ in
+  blue (the art is more saturated than the mockup); a multiply tint cannot add
+  blue, so those need recoloured art.
+- **Items without art** show a neutral ink kind glyph (tools / weapons hammer,
+  armour backpack, food drumstick, else chest), never their name; the name is
+  in the `KitItemName` attribute for tooltips and detail cards (`KitStandIn`
+  marks the glyph).
+- **Widgets** keeps only Make, TextCap, HasArt and Sprite; the old Panel, Text,
+  Bar, SelectionRing, Pin, SetBar, Fill and Frame builders and the parchment
+  stand-ins are gone.
+- **Reasons**: TooFast, PlayerNotHere, Rejected, NotReady.

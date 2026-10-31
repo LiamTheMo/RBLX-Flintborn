@@ -1,12 +1,14 @@
 -- A catalog item's picture, from ItemInfo.Icon(catalogId) (the single
 -- item-to-icon source; it may return a tint too), then lk_item_<CatalogId> /
 -- item_<CatalogId>, then the `icon` prop; with none, the item's name in ink,
--- so nothing reads blank.
+-- then a neutral glyph for the item's kind (KitItemName carries the name for
+-- tooltips), so nothing reads blank and no slot prints text.
 --
 --   Kit.ItemIcon.new(slot, { rect = { 10, 10, 70, 70 }, catalogId = "StoneAxe" })
 
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
+local Tokens = require(script.Parent.Tokens)
 
 local ItemIcon = {}
 ItemIcon.__index = ItemIcon
@@ -47,18 +49,18 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 			ScaleType = Enum.ScaleType.Fit,
 		})
 	elseif catalogId then
-		self.image = Core.Label(self.base.visual, {
-			name = "ItemName",
-			text = Art.ItemName(catalogId),
-			role = "small",
-			color = "ink",
-			align = "Center",
-			wrap = true,
-			scaled = true,
-			rect = { 0, 0, self.w, self.h },
-			z = z,
-		})
+		-- No art for this item: a neutral kind glyph, never its name in the slot
+		-- (the name is in KitItemName for tooltips and detail cards).
+		local s = math.floor(math.min(self.w, self.h) * 0.62)
+		self.image = Art.Icon(self.base.visual, Art.KindGlyph(catalogId), {
+			(self.w - s) / 2,
+			(self.h - s) / 2,
+			s,
+			s,
+		}, { z = z, name = "Item", color = Tokens.Color("inkSoft") })
+		self.root:SetAttribute("KitStandIn", true)
 	end
+	self.root:SetAttribute("KitItemName", if catalogId then Art.ItemName(catalogId) else nil)
 end
 
 function ItemIcon:Destroy()

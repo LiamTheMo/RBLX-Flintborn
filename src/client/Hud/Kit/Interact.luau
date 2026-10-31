@@ -105,11 +105,30 @@ function Interact.attach(base, opts: Options)
 	self.hit = hitButton
 	hitButton.AutoButtonColor = false
 	hitButton.Selectable = opts.selectable ~= false
-	-- The kit's hover state is the gamepad selection cue.
-	local empty = Core.Make("Frame", { Name = "NoSelectionImage", BackgroundTransparency = 1, Visible = false }, nil)
-	hitButton.SelectionImageObject = empty
+	-- Gamepad focus is its own cue, distinct from hover: a gold ring round the
+	-- control's visible rect (the selection image is placed relative to the
+	-- padded hit button, so it is inset by the pad).
+	local ring = Core.Make("Frame", {
+		Name = "FocusRing",
+		BackgroundTransparency = 1,
+		ZIndex = 20,
+	}, nil)
+	Core.Make("UICorner", { CornerRadius = UDim.new(0, Tokens.Space("fallbackCorner", 8)) }, ring)
+	Core.Make("UIStroke", {
+		Color = Tokens.Color("glow"),
+		Thickness = Tokens.Space("focusStroke", 3),
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	}, ring)
+	local function placeRing(p: number)
+		local out = Tokens.Space("focusOutset", 3)
+		ring.Position = UDim2.fromOffset(p - out, p - out)
+		ring.Size = UDim2.new(1, -2 * p + 2 * out, 1, -2 * p + 2 * out)
+	end
+	placeRing(if opts.hit then 0 else pad)
+	self.placeRing = placeRing
+	hitButton.SelectionImageObject = ring
 	local maid = base.maid
-	maid:Give(empty)
+	maid:Give(ring)
 	if opts.hit == nil then
 		-- On touch screens the invisible hit pad grows until the control takes
 		-- at least touchMin screen px, whatever the window's scale (phones draw
@@ -125,6 +144,7 @@ function Interact.attach(base, opts: Options)
 			local k = shown.X / w
 			local need = math.max(pad, (touchMin / k - math.min(w, h)) / 2, 0)
 			self.touchPad = need
+			placeRing(need)
 			hitButton.Position = UDim2.fromOffset(-need, -need)
 			hitButton.Size = UDim2.new(1, need * 2, 1, need * 2)
 		end
