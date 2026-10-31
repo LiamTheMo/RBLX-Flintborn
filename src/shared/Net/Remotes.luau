@@ -36,7 +36,8 @@ local DEFINITIONS = {
 	UnequipArmor = "RemoteFunction", -- (slot) -> ok, reason
 	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection); also throws/sets a held siege item
 	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
-	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
+	-- server -> client: ("Hit" | "Hurt", amount, hitPosition?) | ("Harvest", quantity, nodeCenter, catalogId)
+	CombatFeedback = "RemoteEvent",
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
 	-- server -> client: (corpseId, {{index, key, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})

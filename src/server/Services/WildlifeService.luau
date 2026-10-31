@@ -74,9 +74,17 @@ local function groundParams()
 	return params
 end
 
-local function standingAt(position: Vector3, params): Vector3
-	local hit = WorldState.Standing(position + Vector3.new(0, 30, 0), 80, params)
-	return if hit then hit.Position else position
+-- The ground (or bed, under shallow water) below `position`, and whether it is
+-- wet; nil when the map has nothing there. The ray starts above the terrain's
+-- surface, so a spot beside a hill never starts inside it; a cave floor casts from
+-- just above itself, under the roof.
+local function standingAt(position: Vector3, params, indoors: boolean): (Vector3?, boolean)
+	local top = position.Y + 30
+	if not indoors then
+		top = math.max(top, IslandLayout.HeightAt(position.X, position.Z) + 30)
+	end
+	local hit, wet = WorldState.Standing(Vector3.new(position.X, top, position.Z), top - position.Y + 50, params)
+	return if hit then hit.Position else nil, wet
 end
 
 local function despawn(group)
@@ -141,12 +149,22 @@ local function fill(slot): boolean
 		return false
 	end
 	local params = groundParams()
+	local indoors = entry.habitat == "Cave"
+	local anchor, anchorWet = standingAt(center, params, indoors)
+	if anchor == nil then
+		return false
+	end
 	local herd = NpcService.NewGroup(true)
 	local group = { slot = slot, members = {}, size = size, lastNear = now() }
 	for _ = 1, size do
 		local spread = WildlifeRules.GROUP_SPREAD
 		local offset = Vector3.new(rng:NextNumber(-spread, spread), 0, rng:NextNumber(-spread, spread))
-		local npc = NpcService.Spawn(entry.enemy, standingAt(center + offset, params), false, nil, herd)
+		-- A member never starts in a pond or over the map's edge when the spot is dry land.
+		local spot, wet = standingAt(center + offset, params, indoors)
+		if spot == nil or (wet and not anchorWet) then
+			spot = anchor
+		end
+		local npc = NpcService.Spawn(entry.enemy, spot, false, nil, herd)
 		group.members[npc] = true
 		owners[npc] = group
 		alive += 1
@@ -176,9 +194,18 @@ end
 function WildlifeService.Tick()
 	watch()
 	local at = now()
+	-- A few groups per tick, so a cold start does not build every creature in one frame.
+	local filled = 0
 	for _, slot in slots do
-		if slot.group == nil and at >= slot.readyAt and not fill(slot) then
-			slot.readyAt = at + WildlifeRules.RETRY_SECONDS
+		if slot.group == nil and at >= slot.readyAt then
+			if filled >= WildlifeRules.MAX_FILLS_PER_TICK then
+				break
+			end
+			if fill(slot) then
+				filled += 1
+			else
+				slot.readyAt = at + WildlifeRules.RETRY_SECONDS
+			end
 		end
 	end
 end

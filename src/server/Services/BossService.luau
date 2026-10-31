@@ -8,6 +8,11 @@
 -- targeted. Everyone who damaged it is in boss.contributors. It walks on the
 -- ground like other enemies. Loot spills on death as physical, contested drops.
 -- World place only.
+--
+-- A boss is an anchored, invisible hitbox Part (`boss.npc.body`, the part
+-- weapons hit and the boss bar reads) with its placeholder model welded on
+-- (CreatureModels). A shielded boss also wears a translucent bubble. The hitbox
+-- rests on the ground and turns to face its target.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -18,7 +23,9 @@ local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
 local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
 local BossScaling = require(ReplicatedStorage.Shared.Bosses.BossScaling)
+local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local DropService = require(script.Parent.DropService)
@@ -71,8 +78,20 @@ local function population()
 	return entries
 end
 
+-- Puts the shield bubble on a shielded boss and takes it off when it drops.
+local function showShield(boss)
+	local shielded = boss.npc.invulnerable == true
+	if shielded and boss.shield == nil then
+		boss.shield = ModelBuilder.Decorate(boss.npc.body, CreatureModels.Shield())[1]
+	elseif not shielded and boss.shield then
+		boss.shield:Destroy()
+		boss.shield = nil
+	end
+end
+
 local function publish(boss)
 	local body = boss.npc.body
+	showShield(boss)
 	body:SetAttribute("HP", math.max(0, math.ceil(boss.npc.health)))
 	body:SetAttribute("MaxHP", boss.npc.maxHealth)
 	body:SetAttribute("Phase", boss.phase)
@@ -212,14 +231,19 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 	local def = BossCatalog.Get(bossId)
 	assert(def, "Unknown boss " .. tostring(bossId))
 	local snapshot = BossScaling.Snapshot(population())
+	-- The hitbox: invisible, never blocks anyone, but arrows and rays still find it.
 	local body = Instance.new("Part")
 	body.Name = def.name
 	body.Anchored = true
 	body.CanCollide = false
+	body.CanQuery = true
+	body.CanTouch = false
+	body.Transparency = 1
 	body.Size = def.size
+	-- The bolts take their colour from it.
 	body.Color = def.color
-	body.Material = if def.source == "Ritual" then Enum.Material.Neon else Enum.Material.Slate
 	body.CFrame = CFrame.new(position + Vector3.new(0, def.size.Y / 2, 0))
+	ModelBuilder.Decorate(body, CreatureModels.ForBoss(bossId))
 	body:SetAttribute("BossName", def.name)
 	body:SetAttribute("Source", def.source)
 	body:SetAttribute("Scaling", snapshot.multiplier)
@@ -314,6 +338,8 @@ local function step(dt: number)
 	for _, boss in bosses do
 		local body = boss.npc.body
 		local position = body.Position
+		-- Where the hitbox stands: its bottom, on the ground.
+		local feet = position - Vector3.new(0, body.Size.Y / 2, 0)
 		local target, best = nil, BossService.AGGRO
 		for _, player in Players:GetPlayers() do
 			local root = rootOf(player)
@@ -355,8 +381,12 @@ local function step(dt: number)
 		end
 		if flat.Magnitude > (if target then boss.reach * 0.8 else 2) then
 			local move = flat.Unit * math.min(boss.def.speed * dt, flat.Magnitude)
-			local standing = groundAt(position + move, params) + Vector3.new(0, body.Size.Y / 2, 0)
+			-- Cast from the feet, which is also where it stays if the map ends here.
+			local standing = groundAt(feet + move, params) + Vector3.new(0, body.Size.Y / 2, 0)
 			body.CFrame = CFrame.lookAt(standing, standing + flat.Unit)
+		elseif target and flat.Magnitude > 0.1 then
+			-- Within reach it still turns to face whom it fights.
+			body.CFrame = CFrame.lookAt(position, position + flat.Unit)
 		end
 	end
 end

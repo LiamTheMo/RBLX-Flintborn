@@ -3,10 +3,12 @@
 -- ServerStorage.Maps); otherwise builds the placeholder island at startup from
 -- IslandLayout as smooth Terrain: a 6,144-stud ocean, the 4,096-stud island with
 -- per-zone materials, Crater Lake and its river, the Emberhollow hill with an
--- enterable cave, and a few simple placeholder structures (the Keep's walled
--- courtyard, the Fallen Temple ruins, Timberwatch's tower, bridges, camps). Every
--- gameplay POI is a tagged part so the other services read the map without
--- coordinates. The build runs in the background from Init, yielding between
+-- enterable cave, and a few simple placeholder structures (the Keep's walled and
+-- battlemented courtyard, the Fallen Temple ruins, Timberwatch's tower, bridges,
+-- camps with tents and fire pits), dressed with decorative scenery (forest clumps,
+-- boulders, grass and fern tufts, fallen logs; SceneryModels) so the world reads as
+-- a place. Scenery is never harvestable and never blocks a ray. Every gameplay POI
+-- is a tagged part so the other services read the map without coordinates. The build runs in the background from Init, yielding between
 -- terrain chunks, so every other service starts at once (matchmaking keeps
 -- reporting); services that read the map's terrain or tagged parts, and Play
 -- admission, wait for WorldState's ready flag. A generated island saved into the
@@ -19,15 +21,17 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
 local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
+local SceneryModels = require(ReplicatedStorage.Shared.Visuals.SceneryModels)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 
 local WorldBuildService = {}
 
 WorldBuildService.MAP_NAME = "ShatteredCrater"
 -- Bump when the generated layout changes, so islands saved into a place rebuild.
-WorldBuildService.LAYOUT_VERSION = 3
+WorldBuildService.LAYOUT_VERSION = 4
 -- Terrain is written in square chunks (16 × 16 voxel columns).
 WorldBuildService.CHUNK = 64
 WorldBuildService.OCEAN_TILE = 1024
@@ -290,6 +294,11 @@ end
 local STONE = Color3.fromRGB(150, 146, 136)
 local DARK_STONE = Color3.fromRGB(92, 88, 96)
 local WOOD = Color3.fromRGB(110, 78, 50)
+local TOWER_ROOF = Color3.fromRGB(80, 56, 36)
+local LIGHT_STONE = Color3.fromRGB(176, 170, 156)
+local MERLON_STONE = Color3.fromRGB(112, 108, 116)
+local MERLON_SPACING = 10
+local MERLON_HEIGHT = 4
 
 local function model(name: string, attributes)
 	local instance = Instance.new("Model")
@@ -339,16 +348,63 @@ local function wall(parent, a: Vector3, b: Vector3, height: number, gap: number?
 	for _, piece in pieces do
 		local from, to = piece[1], piece[2]
 		local mid = a + direction * ((from + to) / 2)
+		local frame =
+			CFrame.lookAt(mid + Vector3.new(0, height / 2, 0), mid + Vector3.new(0, height / 2, 0) + direction)
+		block(parent, "Wall", frame, Vector3.new(6, height, to - from), DARK_STONE, Enum.Material.Slate)
+		-- Battlements: a merlon every MERLON_SPACING studs along the top.
+		local span = to - from
+		local merlons = math.max(1, math.floor(span / MERLON_SPACING))
+		for index = 1, merlons do
+			local along = -span / 2 + (index - 0.5) * span / merlons
+			block(
+				parent,
+				"Battlement",
+				frame * CFrame.new(0, height / 2 + MERLON_HEIGHT / 2, along),
+				Vector3.new(6.6, MERLON_HEIGHT, 5),
+				MERLON_STONE,
+				Enum.Material.Slate
+			)
+		end
+	end
+end
+
+-- Column pairs (by index around the temple ring) that kept their lintel.
+local TEMPLE_ARCHITRAVES = { { 1, 2 }, { 4, 5 }, { 7, 8 }, { 10, 11 } }
+
+-- A tower's flat top (`width` studs square): a slab overhanging by a stud with a
+-- merlon on each corner.
+local function towerTop(parent, centre: Vector3, width: number)
+	block(
+		parent,
+		"TowerCap",
+		CFrame.new(centre + Vector3.new(0, 1.5, 0)),
+		Vector3.new(width + 2, 3, width + 2),
+		DARK_STONE,
+		Enum.Material.Slate
+	)
+	for _, corner in { { -1, -1 }, { 1, -1 }, { -1, 1 }, { 1, 1 } } do
 		block(
 			parent,
-			"Wall",
-			CFrame.lookAt(mid + Vector3.new(0, height / 2, 0), mid + Vector3.new(0, height / 2, 0) + direction),
-			Vector3.new(6, height, to - from),
-			DARK_STONE,
+			"Battlement",
+			CFrame.new(
+				centre + Vector3.new(corner[1] * (width / 2 - 1), 3 + MERLON_HEIGHT / 2, corner[2] * (width / 2 - 1))
+			),
+			Vector3.new(4, MERLON_HEIGHT, 4),
+			MERLON_STONE,
 			Enum.Material.Slate
 		)
 	end
 end
+
+-- A dark opening or slit set flush on a wall: decoration, never an obstacle.
+local function opening(parent, name: string, cframe: CFrame, size: Vector3)
+	local hole = block(parent, name, cframe, size, Color3.fromRGB(28, 26, 32), Enum.Material.Slate)
+	hole.CanCollide = false
+	return hole
+end
+
+-- Heights of the broken keep tower's four corner stumps (studs above its top).
+local KEEP_CROWN = { 10, 6, 12, 4 }
 
 -- The Keep's walled courtyard (the Guardian's arena) with corner towers, gates on
 -- the south (toward the ramp) and the north, and the broken keep tower behind it.
@@ -371,6 +427,7 @@ local function keep(entry)
 			DARK_STONE,
 			Enum.Material.Slate
 		)
+		towerTop(keepModel, Vector3.new(corner[1], y + 36, corner[2]), 14)
 	end
 	local base = groundAt(entry.x, entry.z)
 	block(
@@ -381,6 +438,31 @@ local function keep(entry)
 		STONE,
 		Enum.Material.Cobblestone
 	)
+	-- A broken crown of uneven corner stumps, buttresses at the foot, and the gate
+	-- and slit windows on the face that looks over the courtyard (south).
+	for index, corner in { { -1, -1 }, { 1, -1 }, { -1, 1 }, { 1, 1 } } do
+		local stump = KEEP_CROWN[index]
+		block(
+			keepModel,
+			"Crown",
+			CFrame.new(base + Vector3.new(corner[1] * 10.5, 70 + stump / 2, corner[2] * 10.5)),
+			Vector3.new(9, stump, 9),
+			STONE,
+			Enum.Material.Cobblestone
+		)
+		block(
+			keepModel,
+			"Buttress",
+			CFrame.new(base + Vector3.new(corner[1] * 17, 8, corner[2] * 17)),
+			Vector3.new(6, 16, 6),
+			STONE,
+			Enum.Material.Cobblestone
+		)
+	end
+	opening(keepModel, "Gate", CFrame.new(base + Vector3.new(0, 7, 15.3)), Vector3.new(9, 14, 1))
+	for _, slit in { { -8, 32 }, { 8, 32 }, { -8, 52 }, { 8, 52 } } do
+		opening(keepModel, "Window", CFrame.new(base + Vector3.new(slit[1], slit[2], 15.3)), Vector3.new(2, 7, 1))
+	end
 	-- Fallen stones along the tower's east face, clear of the north gate.
 	for index = 1, 3 do
 		block(
@@ -400,10 +482,12 @@ local function temple(entry)
 	local templeModel = model(entry.name, { Landmark = entry.name })
 	local mound = IslandLayout.TempleMound
 	local y = mound.height
+	local columns = {}
 	for index = 1, 12 do
 		local angle = math.rad(index * 30)
 		local height = if index % 3 == 0 then 8 else 22 + (index % 2) * 8
 		local at = Vector3.new(mound.x + math.cos(angle) * 52, y, mound.z + math.sin(angle) * 52)
+		columns[index] = { at = at, height = height }
 		block(
 			templeModel,
 			"Column",
@@ -412,7 +496,49 @@ local function temple(entry)
 			STONE,
 			Enum.Material.Limestone
 		)
+		-- Every standing column keeps its capital.
+		if height > 10 then
+			block(
+				templeModel,
+				"Capital",
+				CFrame.new(at + Vector3.new(0, height + 1, 0)),
+				Vector3.new(8, 2, 8),
+				LIGHT_STONE,
+				Enum.Material.Limestone
+			)
+		end
 	end
+	-- Architraves still span the pairs of tall columns that stood side by side,
+	-- resting on the shorter capital.
+	for _, pair in TEMPLE_ARCHITRAVES do
+		local a, b = columns[pair[1]], columns[pair[2]]
+		local mid = (a.at + b.at) / 2 + Vector3.new(0, math.min(a.height, b.height) + 3.5, 0)
+		block(
+			templeModel,
+			"Architrave",
+			CFrame.lookAt(mid, mid + (b.at - a.at)),
+			Vector3.new(5, 3, (b.at - a.at).Magnitude),
+			LIGHT_STONE,
+			Enum.Material.Limestone
+		)
+	end
+	-- Two worn steps around the altar.
+	block(
+		templeModel,
+		"AltarStep",
+		CFrame.new(mound.x, y + 0.5, mound.z),
+		Vector3.new(22, 1, 17),
+		LIGHT_STONE,
+		Enum.Material.Limestone
+	)
+	block(
+		templeModel,
+		"AltarStep",
+		CFrame.new(mound.x, y + 1.5, mound.z),
+		Vector3.new(16, 1, 12),
+		STONE,
+		Enum.Material.Limestone
+	)
 	block(
 		templeModel,
 		"FallenColumn",
@@ -465,9 +591,49 @@ local function tower(entry)
 		"Roof",
 		CFrame.new(base + Vector3.new(0, 50, 0)),
 		Vector3.new(20, 1.5, 20),
-		Color3.fromRGB(80, 56, 36),
+		TOWER_ROOF,
 		Enum.Material.WoodPlanks
 	)
+	-- Rails round the lookout, posts up to the roof and a stepped, tapering roof.
+	for _, side in { -1, 1 } do
+		block(
+			towerModel,
+			"Rail",
+			CFrame.new(base + Vector3.new(0, 42, side * 8.75)),
+			Vector3.new(18, 2.5, 0.5),
+			WOOD,
+			Enum.Material.Wood
+		)
+		block(
+			towerModel,
+			"Rail",
+			CFrame.new(base + Vector3.new(side * 8.75, 42, 0)),
+			Vector3.new(0.5, 2.5, 18),
+			WOOD,
+			Enum.Material.Wood
+		)
+	end
+	for _, corner in { { -8.5, -8.5 }, { 8.5, -8.5 }, { -8.5, 8.5 }, { 8.5, 8.5 } } do
+		block(
+			towerModel,
+			"RoofPost",
+			CFrame.new(base + Vector3.new(corner[1], 45, corner[2])),
+			Vector3.new(1.2, 8.5, 1.2),
+			WOOD,
+			Enum.Material.Wood
+		)
+	end
+	for step = 1, 3 do
+		local width = 20 - step * 5
+		block(
+			towerModel,
+			"RoofStep",
+			CFrame.new(base + Vector3.new(0, 50.75 + step * 1.5 - 0.75, 0)),
+			Vector3.new(width, 1.5, width),
+			if step % 2 == 0 then TOWER_ROOF else TOWER_ROOF:Lerp(Color3.new(1, 1, 1), 0.2),
+			Enum.Material.WoodPlanks
+		)
+	end
 end
 
 -- Basalt pillars and a lintel framing the tunnel, and glowing crystals inside.
@@ -594,8 +760,45 @@ local function lighthouse(entry)
 		Enum.Material.Cobblestone
 	)
 	shaft.Shape = Enum.PartType.Cylinder
+	-- Two red bands round the shaft, a gallery under the lamp and a stepped cap over it.
+	for _, bandY in { 10, 30 } do
+		local band = block(
+			lighthouseModel,
+			"Band",
+			CFrame.new(base + Vector3.new(0, bandY, 0)) * CFrame.Angles(0, 0, math.rad(90)),
+			Vector3.new(6, 14.6, 14.6),
+			Color3.fromRGB(190, 60, 50),
+			Enum.Material.SmoothPlastic
+		)
+		band.Shape = Enum.PartType.Cylinder
+		band.CanCollide = false
+	end
+	block(
+		lighthouseModel,
+		"Gallery",
+		CFrame.new(base + Vector3.new(0, 46.6, 0)),
+		Vector3.new(13, 1.2, 13),
+		DARK_STONE,
+		Enum.Material.Slate
+	)
 	local lamp = glow(lighthouseModel, base + Vector3.new(0, 48, 0), Color3.fromRGB(255, 230, 160), 80)
 	lamp.Size = Vector3.new(6, 6, 6)
+	block(
+		lighthouseModel,
+		"Cap",
+		CFrame.new(base + Vector3.new(0, 52.75, 0)),
+		Vector3.new(9, 1.5, 9),
+		Color3.fromRGB(190, 60, 50),
+		Enum.Material.SmoothPlastic
+	)
+	block(
+		lighthouseModel,
+		"Cap",
+		CFrame.new(base + Vector3.new(0, 54.5, 0)),
+		Vector3.new(4.5, 2, 4.5),
+		Color3.fromRGB(190, 60, 50),
+		Enum.Material.SmoothPlastic
+	)
 end
 
 local function roots(entry)
@@ -648,6 +851,113 @@ local LANDMARKS = {
 	Monoliths = monoliths,
 }
 
+-- Camp props ------------------------------------------------------------------------
+
+-- An open A-frame tent (two slanted cloth panels over a ridge pole) turned `yaw` degrees.
+local TENT_PANEL = Vector3.new(6.4, 0.4, 9)
+
+local function tent(parent, x: number, z: number, yaw: number, cloth: Color3)
+	local frame = CFrame.new(groundAt(x, z)) * CFrame.Angles(0, math.rad(yaw), 0)
+	for _, side in { -1, 1 } do
+		block(
+			parent,
+			"Tent",
+			frame * CFrame.new(side * 2.05, 2.45, 0) * CFrame.Angles(0, 0, math.rad(-side * 50)),
+			TENT_PANEL,
+			cloth,
+			Enum.Material.Fabric
+		)
+	end
+	block(parent, "TentPole", frame * CFrame.new(0, 4.95, 0), Vector3.new(0.5, 0.5, 10.4), WOOD, Enum.Material.Wood)
+	local floor = block(
+		parent,
+		"TentFloor",
+		frame * CFrame.new(0, 0.15, 0),
+		Vector3.new(8.4, 0.3, 9.4),
+		Color3.fromRGB(110, 92, 70),
+		Enum.Material.Fabric
+	)
+	floor.CanCollide = false
+end
+
+-- A ring of stones round three crossed logs and a glowing flame (lit: Neon + light).
+local function firePit(parent, x: number, z: number)
+	local at = groundAt(x, z)
+	for index = 1, 8 do
+		local angle = math.rad(index * 45)
+		local stone = block(
+			parent,
+			"FireStone",
+			CFrame.new(at + Vector3.new(math.cos(angle) * 2.4, 0.4, math.sin(angle) * 2.4))
+				* CFrame.Angles(0, -angle, 0),
+			Vector3.new(1.2, 0.9, 1.6),
+			if index % 2 == 0 then STONE else DARK_STONE,
+			Enum.Material.Slate
+		)
+		stone.CanCollide = false
+	end
+	for index = 1, 3 do
+		local log = block(
+			parent,
+			"FireLog",
+			CFrame.new(at + Vector3.new(0, 0.5, 0)) * CFrame.Angles(0, math.rad(index * 60), math.rad(12)),
+			Vector3.new(3.4, 0.7, 0.7),
+			WOOD,
+			Enum.Material.Wood
+		)
+		log.CanCollide = false
+	end
+	local flame = block(
+		parent,
+		"Flame",
+		CFrame.new(at + Vector3.new(0, 1.6, 0)),
+		Vector3.new(1.4, 2, 1.4),
+		Color3.fromRGB(255, 150, 50),
+		Enum.Material.Neon
+	)
+	flame.CanCollide = false
+	local light = Instance.new("PointLight")
+	light.Color = Color3.fromRGB(255, 160, 80)
+	light.Range = 24
+	light.Brightness = 1.5
+	light.Parent = flame
+end
+
+-- A trader's stall: a counter under a red awning on four posts, with crates.
+local function stall(parent, x: number, z: number, yaw: number)
+	local frame = CFrame.new(groundAt(x, z)) * CFrame.Angles(0, math.rad(yaw), 0)
+	block(parent, "Counter", frame * CFrame.new(0, 1.5, 0.8), Vector3.new(7, 3, 2), WOOD, Enum.Material.WoodPlanks)
+	for _, post in { { -3.6, -2 }, { 3.6, -2 }, { -3.6, 2 }, { 3.6, 2 } } do
+		block(
+			parent,
+			"StallPost",
+			frame * CFrame.new(post[1], 3.6, post[2]),
+			Vector3.new(0.5, 7.2, 0.5),
+			WOOD,
+			Enum.Material.Wood
+		)
+	end
+	local awning = block(
+		parent,
+		"Awning",
+		frame * CFrame.new(0, 7.4, 0),
+		Vector3.new(8.6, 0.4, 5.6),
+		Color3.fromRGB(190, 60, 50),
+		Enum.Material.Fabric
+	)
+	awning.CanCollide = false
+	for index, crate in { { 5.6, 1.4 }, { 6.2, -1.2 } } do
+		block(
+			parent,
+			"Crate",
+			frame * CFrame.new(crate[1], 1.25, crate[2]) * CFrame.Angles(0, math.rad(index * 25), 0),
+			Vector3.new(2.5, 2.5, 2.5),
+			Color3.fromRGB(140, 104, 66),
+			Enum.Material.WoodPlanks
+		)
+	end
+end
+
 local function safeCamp(entry)
 	local center = groundAt(entry.x, entry.z)
 	-- The server-side volume nobody can fight inside (SafeZoneService).
@@ -673,19 +983,20 @@ local function safeCamp(entry)
 			Material = Enum.Material.SmoothPlastic,
 		}, { "GeneratedStructure" })
 	end
-	part({
-		Name = "Tent",
-		Size = Vector3.new(10, 6, 10),
-		CFrame = CFrame.new(center + Vector3.new(-12, 2, -8)) * CFrame.Angles(0, math.rad(30), 0),
-		Color = Color3.fromRGB(196, 170, 120),
-		Material = Enum.Material.Fabric,
-	}, { "GeneratedStructure" })
+	-- A small camp: two tents, a fire pit and a trader's stall.
+	local props = model(entry.name .. " Props")
+	tent(props, entry.x - 12, entry.z - 8, 30, Color3.fromRGB(196, 170, 120))
+	tent(props, entry.x - 10, entry.z + 11, 70, Color3.fromRGB(158, 98, 84))
+	firePit(props, entry.x + 8, entry.z + 9)
+	stall(props, entry.x + 12, entry.z - 9, -25)
 	local sign = part({
 		Name = "CampSign",
 		Size = Vector3.new(1, 1, 1),
 		CFrame = CFrame.new(center + Vector3.new(0, 14, 0)),
 		Transparency = 1,
 		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
 	})
 	local billboard = Instance.new("BillboardGui")
 	billboard.Size = UDim2.fromOffset(220, 40)
@@ -700,6 +1011,199 @@ local function safeCamp(entry)
 	label.Font = Enum.Font.GothamBold
 	label.TextSize = 16
 	label.Parent = billboard
+end
+
+-- Scenery -------------------------------------------------------------------------
+
+-- Decorative extras (SceneryModels): deterministic, never harvestable, and never
+-- queryable, so combat, harvest and the other services' ground rays pass straight
+-- through. Only trunks, boulders and logs collide (SceneryModels.SOLID_PARTS); grass
+-- and fern tufts are walk-through. They sit in a "Scenery" folder under the map.
+WorldBuildService.SCENERY_FOLDER = "Scenery"
+-- Each zone draws from Random.new(SCENERY_SEED + its place in BiomeCatalog.ZONE_IDS).
+WorldBuildService.SCENERY_SEED = 5417
+-- Extra studs kept clear round camps, structures, portals and the cave tunnel.
+local SCENERY_MARGIN = 6
+-- Studs kept clear round every player spawn point.
+local SPAWN_CLEARANCE = 14
+-- Steepest ground (rise per stud) a tree or a prop stands on.
+local TREE_MAX_SLOPE = 0.55
+local PROP_MAX_SLOPE = 1
+-- Trunks in one clump keep this far apart (studs).
+local TREE_SPACING = 7
+-- Attempts to place one tree in its clump, and to find one prop spot.
+local TREE_TRIES = 6
+local PROP_TRIES = 4
+-- The Keep island's causeway and ramp run south from the courtyard along the Keep's
+-- centre line: scenery stays this far to either side of it (x) until CAUSEWAY_END
+-- studs south of the Keep's centre (past the end of the land bridge).
+local CAUSEWAY_HALF_WIDTH = 50
+local CAUSEWAY_END = 740
+
+local KEEP_SHAPE = BiomeCatalog.Zones.ShatteredKeep.shape
+local FOOTPRINT = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+
+local function nearSpawn(x: number, z: number): boolean
+	for _, spawn in IslandLayout.SpawnCandidates() do
+		local dx, dz = x - spawn.X, z - spawn.Z
+		if dx * dx + dz * dz < SPAWN_CLEARANCE * SPAWN_CLEARANCE then
+			return true
+		end
+	end
+	return false
+end
+
+local function onCauseway(x: number, z: number): boolean
+	local court = IslandLayout.Courtyard
+	return math.abs(x - KEEP_SHAPE.x) < CAUSEWAY_HALF_WIDTH
+		and z > court.z + court.halfZ
+		and z < KEEP_SHAPE.z + CAUSEWAY_END
+end
+
+-- Scenery may stand at (x, z) in `zoneId`: dry, off camps and structures, on
+-- ground that is not a cliff, off the causeway and spawn points.
+local function usable(zoneId: string, x: number, z: number, maxSlope: number): boolean
+	return BiomeCatalog.ZoneAt(x, z) == zoneId
+		and IslandLayout.IsDry(x, z)
+		and not IslandLayout.KeepOut(x, z, SCENERY_MARGIN)
+		and IslandLayout.SlopeAt(x, z) <= maxSlope
+		and not onCauseway(x, z)
+		and not nearSpawn(x, z)
+end
+
+-- The lowest ground under a footprint of `radius` studs, so a piece sits in its
+-- slope rather than hovering on the downhill side.
+local function footingAt(x: number, z: number, radius: number): number
+	local low = IslandLayout.HeightAt(x, z)
+	for _, offset in FOOTPRINT do
+		low = math.min(low, IslandLayout.HeightAt(x + offset[1] * radius, z + offset[2] * radius))
+	end
+	return low
+end
+
+local sceneryCount = { models = 0, parts = 0 }
+
+-- One model of `kind` at (x, z), turned and sized at random within its kind's range.
+local function place(parent: Instance, kind: string, paletteId: string, rng: Random, x: number, z: number)
+	local info = SceneryModels.Kinds[kind]
+	local scale = rng:NextNumber(info.scale[1], info.scale[2])
+	local recipe = SceneryModels.Get(kind, paletteId, rng:NextInteger(1, info.variants))
+	local origin = CFrame.new(x, footingAt(x, z, info.radius * scale), z)
+		* CFrame.Angles(0, rng:NextNumber(0, math.pi * 2), 0)
+	local built = ModelBuilder.Build(recipe, origin, { name = kind, parent = parent, scale = Vector3.one * scale })
+	for _, child in built:GetChildren() do
+		if info.solid then
+			child.CanCollide = SceneryModels.SOLID_PARTS[child.Name] == true
+		else
+			-- Hundreds of tiny tufts are not worth a shadow each.
+			child.CastShadow = false
+		end
+	end
+	sceneryCount.models += 1
+	sceneryCount.parts += #recipe.parts
+	breathe()
+end
+
+-- The first habitat in `habitats` that the zone offers (nil when none).
+local function habitatIn(zoneId: string, habitats: { string }): string?
+	for _, habitat in habitats do
+		if BiomeCatalog.HasHabitat(zoneId, habitat) then
+			return habitat
+		end
+	end
+	return nil
+end
+
+-- A spot for one prop (a boulder, tuft or log) in `zoneId`, preferring `habitat`.
+local function propSpot(zoneId: string, rng: Random, habitat: string?): (number?, number?)
+	for _ = 1, PROP_TRIES do
+		local point = IslandLayout.RandomPointIn(zoneId, rng, habitat)
+		if point == nil and habitat then
+			point = IslandLayout.RandomPointIn(zoneId, rng, nil)
+		end
+		if point and usable(zoneId, point.X, point.Z, PROP_MAX_SLOPE) then
+			return point.X, point.Z
+		end
+	end
+	return nil, nil
+end
+
+local function scatter(
+	parent: Instance,
+	zoneId: string,
+	paletteId: string,
+	rng: Random,
+	kind: string,
+	count: number,
+	habitat: string?
+)
+	for _ = 1, count do
+		local x, z = propSpot(zoneId, rng, habitat)
+		if x and z then
+			place(parent, kind, paletteId, rng, x, z)
+		end
+	end
+end
+
+-- Forest clumps: trees of one kind scattered round a centre in forest, kept apart.
+local function clump(parent: Instance, zoneId: string, zone, kind: string, rng: Random, habitat: string?)
+	local centre = IslandLayout.RandomPointIn(zoneId, rng, habitat)
+	if centre == nil and habitat then
+		centre = IslandLayout.RandomPointIn(zoneId, rng, nil)
+	end
+	if centre == nil then
+		return
+	end
+	local trunks = {}
+	for _ = 1, rng:NextInteger(zone.clumpSize[1], zone.clumpSize[2]) do
+		for _ = 1, TREE_TRIES do
+			local angle, reach = rng:NextNumber(0, math.pi * 2), zone.clumpRadius * math.sqrt(rng:NextNumber())
+			local x, z = centre.X + math.cos(angle) * reach, centre.Z + math.sin(angle) * reach
+			local crowded = false
+			for _, other in trunks do
+				if (x - other[1]) ^ 2 + (z - other[2]) ^ 2 < TREE_SPACING * TREE_SPACING then
+					crowded = true
+					break
+				end
+			end
+			if not crowded and usable(zoneId, x, z, TREE_MAX_SLOPE) then
+				table.insert(trunks, { x, z })
+				place(parent, kind, zone.palette, rng, x, z)
+				break
+			end
+		end
+	end
+end
+
+local function scenery()
+	local parent = Instance.new("Folder")
+	parent.Name = WorldBuildService.SCENERY_FOLDER
+	parent.Parent = folder
+	for index, zoneId in BiomeCatalog.ZONE_IDS do
+		local zone = SceneryModels.Zones[zoneId]
+		if zone then
+			local rng = Random.new(WorldBuildService.SCENERY_SEED + index)
+			local forest = habitatIn(zoneId, { "Forest", "Jungle" })
+			for _, entry in zone.clumps do
+				for _ = 1, entry[2] do
+					clump(parent, zoneId, zone, entry[1], rng, forest)
+				end
+			end
+			scatter(parent, zoneId, zone.palette, rng, "Boulder", zone.boulders, habitatIn(zoneId, { "Rocky" }))
+			for _, cover in zone.groundcover do
+				scatter(
+					parent,
+					zoneId,
+					zone.palette,
+					rng,
+					cover[1],
+					cover[2],
+					habitatIn(zoneId, { "Meadow", "Grassland", "Clearing" })
+				)
+			end
+			scatter(parent, zoneId, zone.palette, rng, "Log", zone.logs, forest)
+		end
+	end
 end
 
 local function generate()
@@ -742,7 +1246,15 @@ local function generate()
 			Zone = BiomeCatalog.ZoneAt(position.X, position.Z),
 		})
 	end
-	print(("[WorldBuildService] Built the placeholder island in %.1f s"):format(os.clock() - started))
+	sceneryCount = { models = 0, parts = 0 }
+	scenery()
+	print(
+		("[WorldBuildService] Built the placeholder island in %.1f s (%d scenery models, %d parts)"):format(
+			os.clock() - started,
+			sceneryCount.models,
+			sceneryCount.parts
+		)
+	)
 end
 
 -- Builds the placeholder island now (yields). Also usable from Studio's command bar

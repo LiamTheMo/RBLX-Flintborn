@@ -9,16 +9,25 @@
 -- through the same combat validation as PvP (injected by CombatService), and they
 -- drop physical, contested loot when killed. Wildlife far from every player stands
 -- still to save work. World place only.
+--
+-- A creature is an anchored, invisible hitbox Part (the record's `body`) with a
+-- placeholder model welded onto it (CreatureModels, ModelBuilder.Decorate). The
+-- hitbox decides every hit and carries the overhead label; the model only
+-- decorates it, so moving the hitbox moves the creature. The hitbox rests on the
+-- ground and turns to face where the creature walks (its front is -Z).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
+local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Recipe = require(ReplicatedStorage.Shared.Visuals.Recipe)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
@@ -33,6 +42,10 @@ local NpcService = {}
 
 NpcService.STEP_SECONDS = 0.1
 NpcService.HIT_ALLOWANCE = 2
+-- The overhead label floats this far above the top of the model.
+NpcService.LABEL_CLEARANCE = 1.5
+-- Folders of other bodies and structures that are never ground for a creature.
+local NOT_GROUND = { "Bosses", "GuardianArena", "WorldEvents", "PlayerStructures", "Arrows", "ResourceNodes" }
 
 -- Set by CombatService: (player, rawDamage) -> boolean, applying PvP safety rules.
 NpcService.DamagePlayer = function(_player: Player, _rawDamage: number): boolean
@@ -47,15 +60,19 @@ local byPart = {}
 local folder = nil
 local rng = Random.new()
 
--- Map ground only: creatures, characters and resource nodes are see-through, so
--- nobody stands on a tree or a rock node.
+-- Map ground only: creatures, bosses and their pillars, player structures, events,
+-- characters and resource nodes are see-through, so nobody stands on a tree, a
+-- wall or another body (a boss's hitbox would otherwise lift a wolf onto its head).
 local function groundParams()
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.RespectCanCollide = true
 	local ignore = { folder }
-	local nodes = workspace:FindFirstChild("ResourceNodes")
-	if nodes then
-		table.insert(ignore, nodes)
+	for _, name in NOT_GROUND do
+		local other = workspace:FindFirstChild(name)
+		if other then
+			table.insert(ignore, other)
+		end
 	end
 	for _, player in Players:GetPlayers() do
 		if player.Character then
@@ -109,16 +126,22 @@ function NpcService.Spawn(enemyId: string, position: Vector3, elite: boolean?, e
 	assert(def, "Unknown enemy " .. tostring(enemyId))
 	group = group or NpcService.NewGroup()
 	local scale = if elite then EnemyCatalog.ELITE.size else 1
+	-- The hitbox: invisible, never blocks anyone, but arrows and rays still find it.
 	local body = Instance.new("Part")
 	body.Name = def.name
 	body.Anchored = true
 	body.CanCollide = false
+	body.CanQuery = true
+	body.CanTouch = false
+	body.Transparency = 1
 	body.Size = def.size * scale
 	body.Color = def.color
-	body.Material = if def.theme == "Elemental" then Enum.Material.Neon else Enum.Material.SmoothPlastic
+	local recipe = CreatureModels.For(enemyId)
+	local _, top = Recipe.Bounds(recipe)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Size = UDim2.fromOffset(140, 36)
-	billboard.StudsOffset = Vector3.new(0, body.Size.Y / 2 + 1.5, 0)
+	-- Measured from the hitbox centre: above the highest part of the model.
+	billboard.StudsOffset = Vector3.new(0, math.max(top[2], 0.5) * body.Size.Y + NpcService.LABEL_CLEARANCE, 0)
 	billboard.MaxDistance = 120
 	billboard.Parent = body
 	local text = Instance.new("TextLabel")
@@ -149,7 +172,10 @@ function NpcService.Spawn(enemyId: string, position: Vector3, elite: boolean?, e
 	}
 	body:SetAttribute("Enemy", enemyId)
 	body:SetAttribute("Behaviour", npc.behaviour)
+	-- Standing on the ground, facing a random way.
 	body.CFrame = CFrame.new(position + Vector3.new(0, body.Size.Y / 2, 0))
+		* CFrame.Angles(0, rng:NextNumber(0, math.pi * 2), 0)
+	ModelBuilder.Decorate(body, recipe)
 	body.Parent = folder
 	npcs[npc] = true
 	byPart[body] = npc
@@ -378,6 +404,8 @@ local function step(dt: number)
 			continue
 		end
 		local position = npc.body.Position
+		-- Where the hitbox stands: its bottom, on the ground.
+		local feet = position - Vector3.new(0, npc.body.Size.Y / 2, 0)
 		if npc.wildlife and not WildlifeRules.AnyNear({ position }, rootPositions, WildlifeRules.SLEEP_RADIUS) then
 			continue
 		end
@@ -405,17 +433,20 @@ local function step(dt: number)
 					AggroRules.Anger(npc.group, target, now)
 				end
 			end
+			-- It faces what it is fighting even while standing still.
+			if flat.Magnitude > 0.1 then
+				npc.body.CFrame = CFrame.lookAt(position, position + flat.Unit)
+			end
 		elseif flat.Magnitude > 1 then
 			if npc.inWater then
 				speed *= NpcService.WATER_SPEED_MULTIPLIER
 			end
 			local move = flat.Unit * math.min(speed * dt, flat.Magnitude)
-			local ground, wet = groundAt(position + move, params)
+			-- Cast from the feet, which is also where it stays if the map ends here.
+			local ground, wet = groundAt(feet + move, params)
 			npc.inWater = wet
-			npc.body.CFrame = CFrame.lookAt(
-				ground + Vector3.new(0, npc.body.Size.Y / 2, 0),
-				ground + Vector3.new(0, npc.body.Size.Y / 2, 0) + flat.Unit
-			)
+			local centre = ground + Vector3.new(0, npc.body.Size.Y / 2, 0)
+			npc.body.CFrame = CFrame.lookAt(centre, centre + flat.Unit)
 		end
 	end
 end
