@@ -46,7 +46,7 @@ function Vitals.new(parent: Instance, layout)
 			zIndex = 12,
 		})
 		mark.root.Visible = false
-		self.rows[rowCfg.key] = { bar = bar, mark = mark, isLow = false }
+		self.rows[rowCfg.key] = { bar = bar, mark = mark, state = "ok" }
 	end
 
 	-- Status plaques, right-aligned under the bars.
@@ -67,21 +67,50 @@ function Vitals:Set(key: string, fraction: number, valueText: string, instant: b
 	end
 	row.bar:Set(fraction, instant)
 	row.bar:SetText(valueText)
-	local low = fraction <= self.low
-	row.bar.root:SetAttribute("HudLow", low)
-	if low == row.isLow then
+	-- "ok", "low" (at or under the low share: warning mark, pulsing icon) or
+	-- "empty" (nothing left: warning mark, icon greyed out and still).
+	local state = if fraction <= 0 then "empty" elseif fraction <= self.low then "low" else "ok"
+	row.bar.root:SetAttribute("HudLow", state ~= "ok")
+	row.bar.root:SetAttribute("HudEmpty", state == "empty")
+	if state == row.state then
 		return
 	end
-	row.isLow = low
-	row.mark.root.Visible = low
+	row.state = state
+	row.mark.root.Visible = state ~= "ok"
 	if row.stopPulse then
 		row.stopPulse()
 		row.stopPulse = nil
 	end
-	local icon = row.bar.icon
-	if low and icon and icon:IsA("ImageLabel") then
-		row.stopPulse = Kit.Motion.Pulse(icon, "ImageTransparency", 0.45, 0)
+	local images = Vitals.IconImages(row.bar.icon)
+	for _, image in images do
+		image.ImageColor3 = if state == "empty" then Vitals.EMPTY_TINT else Color3.new(1, 1, 1)
+		image.ImageTransparency = if state == "empty" then Vitals.EMPTY_FADE else 0
 	end
+	if state == "low" and images[1] then
+		row.stopPulse = Kit.Motion.Pulse(images[1], "ImageTransparency", 0.45, 0)
+	end
+end
+
+-- An empty bar's icon: darkened toward grey and faded.
+Vitals.EMPTY_TINT = Color3.fromRGB(120, 116, 110)
+Vitals.EMPTY_FADE = 0.35
+
+-- The image labels that draw a stat icon: the icon itself, or the pieces of a
+-- holder frame (atlas art can draw as a frame of images).
+function Vitals.IconImages(icon: Instance?): { ImageLabel }
+	local images = {}
+	if icon == nil then
+		return images
+	end
+	if icon:IsA("ImageLabel") then
+		table.insert(images, icon)
+	end
+	for _, child in icon:GetDescendants() do
+		if child:IsA("ImageLabel") then
+			table.insert(images, child)
+		end
+	end
+	return images
 end
 
 -- chips: array of {icon, text}; an empty array hides the row. Plaques are
