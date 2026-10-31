@@ -84,10 +84,10 @@ end
 -- slots keep their 52.4 px pitch as plain PlayerRows.
 PartyWindow.ROW = 52.4
 PartyWindow.FRAMES = {
-	leader = { h = 74, inner = { 0, 7, 334, 59 }, rule = { 0, 71, 328 } },
-	member = { h = 52.4, inner = { 0, 0, 334, 52.4 }, rule = { 0, 50.4, 328 } },
-	invite = { h = 66, inner = { 0, 8, 337, 51 }, rule = { 0, 65, 334 } },
-	ready = { h = 64, inner = { 0, 0, 295, 64 }, rule = { 0, 62, 289 } },
+	leader = { h = 74, inner = { 0, 7, 314, 59 }, rule = { 0, 71, 328 } },
+	member = { h = 52.4, inner = { 0, 0, 314, 52.4 }, rule = { 0, 50.4, 328 } },
+	invite = { h = 66, inner = { 0, 8, 323, 51 }, rule = { 0, 65, 334 } },
+	ready = { h = 64, inner = { 0, 0, 275, 64 }, rule = { 0, 62, 289 } },
 }
 PartyWindow.LIST_W = { party = 328, invite = 337, ready = 289 }
 
