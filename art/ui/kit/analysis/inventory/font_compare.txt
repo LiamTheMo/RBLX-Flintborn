@@ -1,0 +1,42 @@
+## INVENTORY
+MerriweatherBold       size@H= 43.0 natural width 264 vs mock 276 (0.957) IoU=0.690 ink 0.439 vs mock 0.419
+MerriweatherRegular    size@H= 43.0 natural width 261 vs mock 276 (0.946) IoU=0.633 ink 0.351 vs mock 0.419
+DejaVuSerifBold        size@H= 43.5 natural width 302 vs mock 276 (1.094) IoU=0.638 ink 0.425 vs mock 0.419
+LiberationSerifBold    size@H= 49.5 natural width 297 vs mock 276 (1.076) IoU=0.655 ink 0.406 vs mock 0.419
+CrimsonProBold         size@H= 56.0 natural width 293 vs mock 276 (1.062) IoU=0.715 ink 0.434 vs mock 0.419
+IBMPlexSerifBold       size@H= 46.5 natural width 283 vs mock 276 (1.025) IoU=0.737 ink 0.453 vs mock 0.419
+## Stone Axe
+MerriweatherBold       size@H= 27.0 natural width 131 vs mock 131 (1.000) IoU=0.599 ink 0.393 vs mock 0.335
+MerriweatherRegular    size@H= 27.0 natural width 128 vs mock 131 (0.977) IoU=0.513 ink 0.324 vs mock 0.335
+DejaVuSerifBold        size@H= 28.5 natural width 156 vs mock 131 (1.191) IoU=0.609 ink 0.398 vs mock 0.335
+LiberationSerifBold    size@H= 31.5 natural width 131 vs mock 131 (1.000) IoU=0.633 ink 0.386 vs mock 0.335
+CrimsonProBold         size@H= 33.0 natural width 132 vs mock 131 (1.008) IoU=0.567 ink 0.424 vs mock 0.335
+IBMPlexSerifBold       size@H= 29.5 natural width 142 vs mock 131 (1.084) IoU=0.604 ink 0.399 vs mock 0.335
+## Harvest Power
+MerriweatherBold       size@H= 15.0 natural width 109 vs mock 104 (1.048) IoU=0.472 ink 0.368 vs mock 0.255
+MerriweatherRegular    size@H= 15.0 natural width 107 vs mock 104 (1.029) IoU=0.519 ink 0.329 vs mock 0.255
+DejaVuSerifBold        size@H= 15.5 natural width 126 vs mock 104 (1.212) IoU=0.438 ink 0.426 vs mock 0.255
+LiberationSerifBold    size@H= 17.5 natural width 112 vs mock 104 (1.077) IoU=0.314 ink 0.383 vs mock 0.255
+CrimsonProBold         size@H= 19.5 natural width 119 vs mock 104 (1.144) IoU=0.480 ink 0.410 vs mock 0.255
+IBMPlexSerifBold       size@H= 16.5 natural width 119 vs mock 104 (1.144) IoU=0.416 ink 0.378 vs mock 0.255
+## SETTINGS
+MerriweatherBold       size@H= 45.0 natural width 232 vs mock 231 (1.004) IoU=0.615 ink 0.428 vs mock 0.394
+MerriweatherRegular    size@H= 45.0 natural width 228 vs mock 231 (0.987) IoU=0.601 ink 0.339 vs mock 0.394
+DejaVuSerifBold        size@H= 44.5 natural width 257 vs mock 231 (1.113) IoU=0.626 ink 0.434 vs mock 0.394
+LiberationSerifBold    size@H= 50.5 natural width 248 vs mock 231 (1.074) IoU=0.598 ink 0.375 vs mock 0.394
+CrimsonProBold         size@H= 56.0 natural width 244 vs mock 231 (1.056) IoU=0.700 ink 0.446 vs mock 0.394
+IBMPlexSerifBold       size@H= 47.5 natural width 248 vs mock 231 (1.074) IoU=0.521 ink 0.458 vs mock 0.394
+## Camera Sensitivity
+MerriweatherBold       size@H= 15.0 natural width 141 vs mock 146 (0.966) IoU=0.474 ink 0.270 vs mock 0.238
+MerriweatherRegular    size@H= 15.0 natural width 138 vs mock 146 (0.945) IoU=0.549 ink 0.247 vs mock 0.238
+DejaVuSerifBold        size@H= 17.5 natural width 184 vs mock 146 (1.260) IoU=0.545 ink 0.290 vs mock 0.238
+LiberationSerifBold    size@H= 17.5 natural width 142 vs mock 146 (0.973) IoU=0.397 ink 0.280 vs mock 0.238
+CrimsonProBold         size@H= 19.5 natural width 154 vs mock 146 (1.055) IoU=0.542 ink 0.277 vs mock 0.238
+IBMPlexSerifBold       size@H= 17.5 natural width 162 vs mock 146 (1.110) IoU=0.514 ink 0.293 vs mock 0.238
+## Automatically pick up nearby items
+MerriweatherBold       size@H= 13.0 natural width 230 vs mock 230 (1.000) IoU=0.340 ink 0.286 vs mock 0.212
+MerriweatherRegular    size@H= 13.0 natural width 227 vs mock 230 (0.987) IoU=0.285 ink 0.259 vs mock 0.212
+DejaVuSerifBold        size@H= 15.5 natural width 308 vs mock 230 (1.339) IoU=0.442 ink 0.319 vs mock 0.212
+LiberationSerifBold    size@H= 15.5 natural width 237 vs mock 230 (1.030) IoU=0.301 ink 0.321 vs mock 0.212
+CrimsonProBold         size@H= 15.0 natural width 225 vs mock 230 (0.978) IoU=0.310 ink 0.292 vs mock 0.212
+IBMPlexSerifBold       size@H= 14.5 natural width 252 vs mock 230 (1.096) IoU=0.454 ink 0.320 vs mock 0.212

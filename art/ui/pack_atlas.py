@@ -84,6 +84,73 @@ GROUPS = {
         for screen in ("crafting", "forge", "inventory", "journal", "settings")
         for half in (1, 2)
     },
+    # Lobby kit (lk_): everything the lobby HUD draws on join except item art, and
+    # what the run HUD and every window share with it (slot, row, small-button and
+    # dot states, badges, bars, stat frame, rings), so the lobby's first screen
+    # needs this atlas and atlas_lk_items only (docs/ui/ARCHITECTURE.md §6).
+    "atlas_lk_lobby": [
+        "lk_badge_count", "lk_badge_count_wide", "lk_badge_number", "lk_bar_fill_blue", "lk_bar_fill_green",
+        "lk_bar_fill_orange", "lk_bar_fill_red", "lk_bar_fill_yellow", "lk_bar_frame", "lk_bar_frame_plain",
+        "lk_bar_frame_thin", "lk_bar_track", "lk_button_invite", "lk_button_paper_disabled",
+        "lk_button_paper_hover", "lk_button_paper_normal", "lk_button_paper_pressed",
+        "lk_button_paper_small_disabled", "lk_button_paper_small_hover", "lk_button_paper_small_normal",
+        "lk_button_settings", "lk_button_square_small", "lk_currency_pill", "lk_dot_brown", "lk_dot_green",
+        "lk_dot_red", "lk_dot_yellow", "lk_frame_hollow_circle", "lk_frame_round", "lk_glyph_check",
+        "lk_glyph_cross", "lk_glyph_ink_hammer", "lk_icon_anvil", "lk_icon_backpack", "lk_icon_coin",
+        "lk_icon_crown", "lk_icon_exclamation", "lk_icon_gem", "lk_icon_lock", "lk_icon_market",
+        "lk_icon_party", "lk_icon_portal", "lk_icon_scroll", "lk_icon_trade", "lk_keycap", "lk_keycap_wide",
+        "lk_panel", "lk_plaque_paper", "lk_player_card", "lk_portrait_frame", "lk_ring_full", "lk_ring_track",
+        "lk_row_disabled", "lk_row_hover", "lk_row_normal", "lk_slot_disabled", "lk_slot_hover",
+        "lk_slot_item_normal", "lk_slot_item_selected", "lk_slot_locked", "lk_slot_normal", "lk_slot_selected",
+        "lk_statbar_frame", "lk_tile_blank", "lk_tile_frame", "lk_toast_frame", "lk_window_frame",
+    ],
+    # Each window's own parts and controls: frames, buttons and their states, tabs,
+    # rows, dividers, fields, checkboxes, toggles, sliders, tooltips, dialog. The
+    # planned atlas_lk_controls fits in here, and the planned atlas_lk_slots and
+    # atlas_lk_hud_world fit in atlas_lk_lobby, so a window needs one atlas less.
+    "atlas_lk_window": [
+        "lk_button_close_disabled", "lk_button_close_hover", "lk_button_close_normal",
+        "lk_button_close_pressed", "lk_button_flat_disabled", "lk_button_flat_leather", "lk_button_flat_paper",
+        "lk_button_hud", "lk_button_leather_disabled", "lk_button_leather_hover", "lk_button_leather_normal",
+        "lk_button_leather_pressed", "lk_button_square_leather", "lk_button_square_paper",
+        "lk_button_stepper_minus", "lk_button_stepper_plus", "lk_checkbox_off", "lk_checkbox_on",
+        "lk_clasp_left", "lk_clasp_right", "lk_dialog_frame", "lk_divider_diamond", "lk_divider_line",
+        "lk_divider_ornament", "lk_divider_vertical", "lk_dropdown", "lk_dropdown_button", "lk_emblem_leaf",
+        "lk_emblem_rune", "lk_panel_inset", "lk_pill_value", "lk_plaque_notched_disabled",
+        "lk_plaque_notched_leather", "lk_plaque_notched_paper", "lk_plaque_small", "lk_row_bullet",
+        "lk_scroll_thumb", "lk_scroll_track", "lk_search", "lk_slider_knob", "lk_slider_track",
+        "lk_tab_arrow_leather", "lk_tab_arrow_paper", "lk_tab_category", "lk_tile_check_off",
+        "lk_tile_check_on", "lk_toggle_off", "lk_toggle_on", "lk_tooltip", "lk_tooltip_tail",
+    ],
+    # Menu, section and status icons and the flat ink / white glyphs.
+    "atlas_lk_icons": [
+        "lk_glyph_arrow_down", "lk_glyph_arrow_left", "lk_glyph_arrow_right", "lk_glyph_arrow_up",
+        "lk_glyph_check_white", "lk_glyph_checkmark", "lk_glyph_chevron_right", "lk_glyph_ink_anvil",
+        "lk_glyph_ink_backpack", "lk_glyph_ink_book", "lk_glyph_ink_check", "lk_glyph_ink_chest",
+        "lk_glyph_ink_compass", "lk_glyph_ink_compass_rose", "lk_glyph_ink_gamepad", "lk_glyph_ink_gears",
+        "lk_glyph_ink_info", "lk_glyph_ink_magnifier", "lk_glyph_ink_map_pin", "lk_glyph_ink_monitor",
+        "lk_glyph_ink_people", "lk_glyph_ink_refresh", "lk_glyph_ink_speaker", "lk_glyph_ink_trophy",
+        "lk_glyph_invite", "lk_glyph_minus", "lk_glyph_play", "lk_glyph_plus", "lk_glyph_white_anvil",
+        "lk_glyph_white_backpack", "lk_glyph_white_book", "lk_glyph_white_check", "lk_glyph_white_chest",
+        "lk_glyph_white_compass", "lk_glyph_white_gamepad", "lk_glyph_white_gears", "lk_glyph_white_hammer",
+        "lk_glyph_white_info", "lk_glyph_white_magnifier", "lk_glyph_white_map_pin", "lk_glyph_white_monitor",
+        "lk_glyph_white_people", "lk_glyph_white_refresh", "lk_glyph_white_speaker", "lk_glyph_white_trophy",
+        "lk_icon_anvil_hammer", "lk_icon_backpack_small", "lk_icon_backpack_white", "lk_icon_berry_bush",
+        "lk_icon_check", "lk_icon_chest", "lk_icon_clock", "lk_icon_compass", "lk_icon_compass_arrow",
+        "lk_icon_cross", "lk_icon_crown_gem", "lk_icon_exit", "lk_icon_flag", "lk_icon_gear", "lk_icon_gift",
+        "lk_icon_hammer", "lk_icon_hourglass", "lk_icon_journal", "lk_icon_log", "lk_icon_magnifier",
+        "lk_icon_mail", "lk_icon_map", "lk_icon_map_pin", "lk_icon_mountain", "lk_icon_paw", "lk_icon_ruin",
+        "lk_icon_totem", "lk_icon_treasure", "lk_icon_tree", "lk_icon_trophy",
+    ],
+    # Item art (ItemInfo.ART_SPRITES): hotbar, inventory, forge, journal, rewards.
+    "atlas_lk_items": [
+        "lk_icon_berries", "lk_icon_bone", "lk_icon_build", "lk_icon_campfire", "lk_icon_crystals",
+        "lk_icon_drumstick", "lk_icon_hatchet", "lk_icon_heart", "lk_icon_hide", "lk_icon_lightning",
+        "lk_icon_logs", "lk_icon_magma_ore", "lk_icon_mushroom", "lk_icon_pickaxe", "lk_icon_plank",
+        "lk_icon_plant_fiber", "lk_icon_rocks", "lk_icon_rope", "lk_icon_runestone", "lk_icon_spear",
+        "lk_icon_star", "lk_icon_stone", "lk_icon_stone_axe", "lk_icon_stones", "lk_icon_torch", "lk_icon_tusk",
+        "lk_icon_warning",
+    ],
 }
 
 

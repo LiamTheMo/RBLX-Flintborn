@@ -42,6 +42,19 @@ class CloudPublishSafetyTests(unittest.TestCase):
         self.assertIn('child.Name == "RbxCharacterSounds" and child:IsA("LocalScript")', cloud.SAVE_PLACE)
         self.assertNotIn("versionType=Published", script)
 
+    def test_every_script_deleted_from_git_is_retired(self):
+        # Each removed parchment-UI module is listed, sits under a managed root and
+        # is no longer published, so the deploy removes it from the places.
+        client = ("StarterPlayer", "StarterPlayerScripts", "Client")
+        for name in ("CraftingPanel", "InventoryPanel", "ItemSlot", "JournalPanel", "LobbyHud",
+                     "LobbyPopups", "Parchment", "SettingsPanel"):
+            self.assertIn(client + ("Hud", name), cloud.RETIRED)
+        self.assertNotIn(client + ("Hud", "Screens", "LobbyHud"), cloud.RETIRED)
+        retired = cloud.retired_paths(cloud.spec_list())
+        script = cloud.make_script([], retired=retired)
+        for path in retired:
+            self.assertIn("{" + ",".join(cloud.lua_string(part) for part in path) + "}", script)
+
     def test_retired_paths_stay_inside_managed_roots(self):
         with patch.object(cloud, "RETIRED", (("Workspace", "Map", "Danger"),)):
             with self.assertRaisesRegex(ValueError, "outside the managed"):

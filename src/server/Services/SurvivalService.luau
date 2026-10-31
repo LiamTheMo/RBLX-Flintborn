@@ -1,6 +1,6 @@
 -- Health, stamina and food for players in an active run (GDD §4.3, §5.4). One
--- Heartbeat loop steps every meter on the server; clients only send sprint and
--- crouch intent. Whether a player is moving (and so whether a sprint drains
+-- Heartbeat loop steps every meter on the server; clients only send sprint
+-- intent. Whether a player is moving (and so whether a sprint drains
 -- stamina) comes from server-observed root travel, never the client-replicated
 -- MoveDirection, and travel at sprint pace drains stamina even without a sprint
 -- request. Walking through water is 30% slower (GDD §55): the server checks for
@@ -60,7 +60,6 @@ local function publish(player: Player, entry)
 	local rules = entry.rules
 	player:SetAttribute("Stamina", math.round(rules.stamina * 100) / 100)
 	player:SetAttribute("Food", math.round(rules.food * 1000) / 1000)
-	player:SetAttribute("Crouching", rules.crouching)
 	player:SetAttribute("Sprinting", entry.sprinting)
 	player:SetAttribute("MedicineLockUntil", rules.medicineLockUntil)
 	player:SetAttribute("FoodHealing", math.round(SurvivalRules.PendingFoodHealing(rules)))
@@ -190,13 +189,12 @@ function SurvivalService.Start()
 	Players.PlayerRemoving:Connect(function(player)
 		entries[player] = nil
 	end)
-	Remotes.Listen("SetMovement", function(player, sprintHeld, crouching)
+	Remotes.Listen("SetMovement", function(player, sprintHeld)
 		local entry = entries[player]
-		if entry == nil or type(sprintHeld) ~= "boolean" or type(crouching) ~= "boolean" then
+		if entry == nil or type(sprintHeld) ~= "boolean" then
 			return
 		end
 		entry.rules.sprintIntent = sprintHeld
-		entry.rules.crouching = crouching
 	end)
 	RunService.Heartbeat:Connect(step)
 end

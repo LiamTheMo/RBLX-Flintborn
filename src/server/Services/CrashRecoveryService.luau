@@ -25,7 +25,9 @@ local function notify(player: Player, receipt)
 	if player.Parent and receipt.restored > 0 then
 		Remotes.Get("Notice"):FireClient(player, {
 			title = "Server crashed — your items were recovered",
-			text = ("%d item stack(s) are back in your lobby backpack."):format(receipt.restored),
+			text = if receipt.restored == 1
+				then "1 item stack is back in your lobby backpack."
+				else ("%d item stacks are back in your lobby backpack."):format(receipt.restored),
 		})
 	end
 end

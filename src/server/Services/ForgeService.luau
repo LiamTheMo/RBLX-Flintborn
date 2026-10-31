@@ -2,9 +2,11 @@
 -- vault-only Owned/Needed counts and its unlock state (Permanent conversions sorted
 -- and tagged with their source's tier and family for grouping), and commits special crafts
 -- and Permanent conversions as exactly-once operations keyed by the client's nonce,
--- so a retried request returns the first result instead of charging again. Crafts
--- wait while the player is in an open trade, or while a settled trade may still
--- roll back ("TradeSettling", ForgeRules).
+-- so a retried request returns the first result instead of charging again. A special
+-- craft may ask for a batch (count 1..ForgeRules.MAX_BATCH): all of it is paid for
+-- and granted in that one operation, or none of it. Crafts wait while the player is
+-- in an open trade, or while a settled trade may still roll back ("TradeSettling",
+-- ForgeRules).
 
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -29,7 +31,8 @@ end
 local function requirementText(recipe): string
 	local parts = {}
 	if (recipe.unlock.extractions or 0) > 0 then
-		table.insert(parts, ("extract %d time(s)"):format(recipe.unlock.extractions))
+		local count = recipe.unlock.extractions
+		table.insert(parts, if count == 1 then "extract once" else ("extract %d times"):format(count))
 	end
 	for _, catalogId in recipe.unlock.discovered or {} do
 		table.insert(parts, "extract " .. nameOf(catalogId))
@@ -83,6 +86,8 @@ local function snapshot(player: Player)
 			unlocked = ForgeRules.IsUnlocked(profile, recipe.id),
 			requirement = requirementText(recipe),
 			inputs = inputs,
+			-- The most one request may forge right now (materials and batch cap).
+			maxCount = ForgeRules.MaxCount(profile, recipe),
 		}
 		if recipe.kind == ForgeRecipes.Kinds.Permanent then
 			local def = ItemCatalog.Get(recipe.output)
@@ -99,15 +104,24 @@ local function snapshot(player: Player)
 		end
 		table.insert(recipes, view)
 	end
-	return { recipes = recipes, categories = ForgeRecipes.Categories, tiers = ForgeRules.TIER_ORDER }
+	return {
+		recipes = recipes,
+		categories = ForgeRecipes.Categories,
+		tiers = ForgeRules.TIER_ORDER,
+		maxBatch = ForgeRules.MAX_BATCH,
+	}
 end
 
-local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
+local function craft(player: Player, recipeId: any, sourceId: any, nonce: any, count: any)
 	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsId(nonce) or #nonce > 50 then
 		return false, "BadRequest"
 	end
 	if sourceId ~= nil and not Validation.IsId(sourceId) then
 		return false, "BadRequest"
+	end
+	count = if count == nil then 1 else count
+	if not Validation.IsQuantity(count, 1, ForgeRules.MAX_BATCH) then
+		return false, "BadQuantity"
 	end
 	if TradeService.InSession(player) then
 		return false, "InTrade"
@@ -119,6 +133,7 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 		local receipt, reason = ForgeRules.Craft(profile, {
 			recipeId = recipeId,
 			sourceId = sourceId,
+			count = count,
 			ownerId = player.UserId,
 			operationId = operationId,
 			now = now,
@@ -135,9 +150,11 @@ local function craft(player: Player, recipeId: any, sourceId: any, nonce: any)
 		return false, tostring(result)
 	end
 	if applied then
-		-- A retried nonce returns the same receipt without granting XP again.
-		ProgressionService.GrantXp(player, "Forge", "Forging")
-		ProgressionService.GrantMastery(player, "Crafting", 2)
+		-- A retried nonce returns the same receipt without granting XP again. A batch
+		-- earns what the same crafts made one at a time would.
+		local crafted = result.count or 1
+		ProgressionService.GrantXp(player, "Forge", "Forging", if crafted > 1 then crafted else nil)
+		ProgressionService.GrantMastery(player, "Crafting", 2 * crafted)
 	end
 	return true, result
 end

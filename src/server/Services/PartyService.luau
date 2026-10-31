@@ -2,7 +2,9 @@
 -- so a group deploys into the same world, where it starts as one tribe. Invitees
 -- see a party's id, so a deploy also writes who actually went to a short-lived
 -- MemoryStore record under a fresh token; the world trusts only that record and
--- treats anything it cannot verify as solo. Party state is lobby only.
+-- treats anything it cannot verify as solo. Party state is lobby only. Each player
+-- also has an advisory Ready flag ("ready", bool); solo players can set it too,
+-- and it never blocks a deploy.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -20,38 +22,108 @@ PartyService.STORE_ATTEMPTS = 2
 
 local state = PartyRules.NewState()
 local lastRequest = {}
+-- The view each player was last sent, so only players whose view changed hear again.
+local lastSent = setmetatable({}, { __mode = "k" })
 local deployMap = nil
 
 local function newPartyId()
 	return HttpService:GenerateGUID(false)
 end
 
--- What one player sees: their party and the invites waiting for them.
+-- What one player sees: their party (members with their ready flags, when it was
+-- created, and for the leader only the invites still pending), the invites waiting
+-- for them, their own ready flag (solo players can be ready) and the size cap.
+-- Nothing about players outside their party is included beyond who invited them.
 local function viewFor(player: Player)
-	local view = { party = nil, invites = {} }
+	local view = {
+		party = nil,
+		invites = {},
+		ready = PartyRules.IsReady(state, player.UserId),
+		maxSize = PartyRules.MAX_SIZE,
+	}
 	local party = PartyRules.PartyOf(state, player.UserId)
 	if party then
 		local members = {}
 		for _, userId in party.members do
 			local member = Players:GetPlayerByUserId(userId)
-			table.insert(members, { userId = userId, name = member and member.DisplayName or tostring(userId) })
+			table.insert(members, {
+				userId = userId,
+				name = member and member.DisplayName or tostring(userId),
+				ready = PartyRules.IsReady(state, userId),
+			})
 		end
-		view.party = { id = party.id, leader = party.leader, members = members }
+		view.party = {
+			id = party.id,
+			leader = party.leader,
+			members = members,
+			createdAt = party.createdAt,
+			invited = if party.leader == player.UserId then PartyRules.PendingInvites(party) else {},
+		}
 	end
 	for id, other in state.parties do
 		if other.invites[player.UserId] then
 			local leader = Players:GetPlayerByUserId(other.leader)
-			table.insert(view.invites, { partyId = id, from = leader and leader.DisplayName or tostring(other.leader) })
+			table.insert(view.invites, {
+				partyId = id,
+				from = leader and leader.DisplayName or tostring(other.leader),
+				fromUserId = other.leader,
+			})
 		end
 	end
 	return view
 end
 
+-- Views are plain data (strings, numbers, booleans and nested tables).
+local function same(a: any, b: any): boolean
+	if type(a) ~= "table" or type(b) ~= "table" then
+		return a == b
+	end
+	for key, value in a do
+		if not same(value, b[key]) then
+			return false
+		end
+	end
+	for key in b do
+		if a[key] == nil then
+			return false
+		end
+	end
+	return true
+end
+
+-- Sends each player their view when it differs from the last one they were sent.
+-- A no-op (an unchanged ready flag, a decline with no invite) sends nothing, and a
+-- change inside one party reaches only the players it shows to: its members, and
+-- whoever it invited or who invited it.
 local function broadcast()
 	local changed = Remotes.Get("PartyChanged")
 	for _, player in Players:GetPlayers() do
-		changed:FireClient(player, viewFor(player))
+		local view = viewFor(player)
+		if not same(view, lastSent[player]) then
+			lastSent[player] = view
+			changed:FireClient(player, view)
+		end
 	end
+end
+
+-- Sends `player` their current view even when it equals the last one sent: the
+-- client asks for it on start ("view"), in case the view fired on PlayerAdded
+-- arrived before its listener was connected.
+local function resend(player: Player)
+	local view = viewFor(player)
+	lastSent[player] = view
+	Remotes.Get("PartyChanged"):FireClient(player, view)
+end
+
+-- Clears the ready flag of everyone in `group` (a deploy is starting) and tells
+-- the players whose view changed.
+function PartyService.ClearReady(group: { Player })
+	local userIds = {}
+	for _, member in group do
+		table.insert(userIds, member.UserId)
+	end
+	PartyRules.ClearReady(state, userIds)
+	broadcast()
 end
 
 -- The party ID a deploy carries into the world, where the party becomes a tribe.
@@ -158,13 +230,19 @@ local function handle(player: Player, action: any, argument: any)
 		if Players:GetPlayerByUserId(argument) == nil then
 			return false, "PlayerNotHere"
 		end
-		ok, reason = PartyRules.Invite(state, player.UserId, argument, newPartyId())
+		ok, reason = PartyRules.Invite(state, player.UserId, argument, newPartyId(), os.time())
 	elseif action == "accept" and type(argument) == "string" then
 		ok, reason = PartyRules.Accept(state, player.UserId, argument)
 	elseif action == "decline" and type(argument) == "string" then
 		ok, reason = PartyRules.Decline(state, player.UserId, argument)
 	elseif action == "leave" then
 		ok, reason = PartyRules.Leave(state, player.UserId)
+	elseif action == "ready" and type(argument) == "boolean" then
+		ok, reason = PartyRules.SetReady(state, player.UserId, argument)
+	elseif action == "view" and argument == nil then
+		-- Changes nothing: only this player hears, whatever was sent before.
+		resend(player)
+		return true, nil
 	else
 		return false, "BadRequest"
 	end
@@ -184,6 +262,7 @@ function PartyService.Start()
 		PartyRules.Forget(state, player.UserId)
 		lastRequest[player] = nil
 		broadcast()
+		lastSent[player] = nil
 	end)
 end
 

@@ -197,7 +197,11 @@ local function keepInLobby(player: Player, leftovers)
 	task.spawn(ProfileService.SaveNow, player)
 	InventoryService.Notify(
 		player,
-		("%d item stack(s) did not fit and stayed in your lobby backpack."):format(#leftovers)
+		(
+			if #leftovers == 1
+				then "1 item stack did not fit and stayed in your lobby backpack."
+				else ("%d item stacks did not fit and stayed in your lobby backpack."):format(#leftovers)
+		)
 	)
 end
 

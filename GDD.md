@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.23  
-> **Last updated:** 2026-10-28  
+> **Design revision:** 1.24  
+> **Last updated:** 2026-10-30  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -184,7 +184,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 4.3 Survival attributes — Confirmed and Open
 
 - **Health:** **100 base maximum HP**, with gear/upgrades allowed to change the cap; exact bonus sources and caps remain Open. Effective damage is transformed through the equipped armor **effective-HP multiplier** (§21.5), not a simple flat subtraction from normal HP. Medical items heal immediately subject to the *current modified* maximum HP. Tribe downing at 0 HP uses a separate **20-HP downed pool**, protected by armor (§5.3).
-- **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, crouching, gathering, bow shots, raiding and ordinary movement do not. **Recovery stops the moment a sprint starts and resumes 3 seconds after it ends (§47).** Sprint speed and stamina UI granularity remain Open.
+- **Stamina:** A full bar allows **3 seconds of continuous sprint**; **5 seconds to recover from empty to full**. **Only sprinting spends stamina**. Melee, gathering, bow shots, raiding and ordinary movement do not. **Recovery stops the moment a sprint starts and resumes 3 seconds after it ends (§47).** Sprint speed and stamina UI granularity remain Open.
 - **Food:** A full food meter falls from **100% to 0% over 3,600 seconds (60 minutes)** under the baseline drain (§49; was 5 minutes). **When strictly below 25%**, apply **10% movement-speed reduction**; it remains while below threshold. Food items grant item-specific healing totals over **10 seconds**. Incoming damage halves *remaining unapplied* HoT healing; if the remainder **after halving is ≤10 HP**, clear it to zero. No food-caused extra HP above the current max has been approved. **Confirmed Q160:** reaching **0% food has no additional effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Drain modifiers and refill quantities are Open.
 - **Excluded at launch:** Thirst, temperature, magical energy/mana, shield meters, equipment durability and weather survival stats unless explicitly approved in a later revision.
 
@@ -218,7 +218,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 ### 5.1 Launch combat baseline — Confirmed / Open
 
 - **Confirmed:** Click-to-attack melee and slow crafted physical bow arrows. **Working Q66 damage baselines: rock hit 5 damage at high attack cadence; wooden spear ~15 at slower cadence and longer reach; stone spear ~25** before armor. Wooden/stone spear figures are **tentative playtest targets** (the owner said “maybe”), not locked final values. Approximate attack cooldowns are rock **0.3 s**, dagger **0.4 s**, sword **0.7 s**, spear **0.9 s** (Q133). Precise reach, projectile damage/velocity and hitboxes remain Open.
-- **Confirmed:** Players can **sprint and crouch**. Stamina decreases **only while sprinting**; crouching and attacks do not require stamina. No dodge-roll or sliding system has been approved.
+- **Confirmed:** Players can **sprint**; there is no crouch (removed in 1.24). Stamina decreases **only while sprinting**; attacks do not require stamina. No dodge-roll or sliding system has been approved.
 - **Confirmed:** No usable shield, blocking/guard-meter combat mechanic, player-cast magic or magical attacks for launch. Advanced weapon combos and alternate ranged families remain possible future decisions.
 - **Confirmed:** PvP is enabled **everywhere in the active play world except clearly designated safe-zone POIs**. Random world spawning must honor safe player-admission initialization but does not automatically guarantee PvP immunity.
 - **Proposed:** All damage and hit detection are server-validated with bounded latency compensation, distance/arc checks and rate limits. Different ordinary weapons may vary in reach, cadence or damage without needing complicated launch combat.
@@ -251,7 +251,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Medical item or potion:** Server confirms valid consumable, **immediately heals** and deducts one item exactly once. Begin **after-heal animation cooldown**; cannot immediately chain another medical item before cooldown ends.
 - **Food:** Every food grants its item-specific healing total over **10 seconds**; each damaging hit halves the *remaining unapplied* healing, cancelling it if the post-hit remainder is **≤10 HP**. Previously healed HP is not taken away by this cancellation rule.
-- **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **60 minutes** to go from full to empty (§49); below **25%**, walking/running movement speed is **10% lower**. Crouching, attacks, harvesting and building do not cost stamina.
+- **Movement:** Sprint lasts **3 continuous seconds** from full stamina; empty-to-full regeneration takes **5 seconds**, and only sprint drains stamina. Food takes **60 minutes** to go from full to empty (§49); below **25%**, walking/running movement speed is **10% lower**. Attacks, harvesting and building do not cost stamina.
 - **Downed (Q159):** Players may only **crawl very slowly**; no medicine, food or other healing, and any running food HoT is cleared on downing. Pending revive and death rules supersede all other inputs.
 
 ### 5.5 Combat integrity and spawn safety
@@ -603,7 +603,7 @@ Full island art, every biome, weather, extensive equipment and premium offers, *
 | **P0** | Authenticated maintenance safe-kick inventory recovery and two-minute contested extraction handoff into disconnect-safe animation | Preserve loot across planned updates and protect extraction without duplication |
 | **P0** | Center extraction **2× all materials and XP** with idempotent receipts, correct vault capacity and shared 120s timing | Core extraction risk and rare material economy correctness |
 | **P0** | Server population, solo/tribe sizes, and PvP rules | Map size, reward access, balance and performance |
-| **P1** | Click melee, slow bow projectiles and crafted arrows, sprint-only stamina, crouch, instant medical cooldown, partial food HoT interruption | Launch PvP readability and mobile input; **no player magic, dodge-roll or gear wear in MVP** |
+| **P1** | Click melee, slow bow projectiles and crafted arrows, sprint-only stamina, instant medical cooldown, partial food HoT interruption | Launch PvP readability and mobile input; **no player magic, dodge-roll or gear wear in MVP** |
 | **P1** | Totem radius/overlap ownership, ~4–6-minute unclaimed decay, accessible storage and any-time tool raids | Totem shields against decay only, never raids; radius/claim priority Open |
 | **P1** | Weighted event tick/rarity, public announcements, biome-random spawns, ritual/event/structure boss resets and level/gear scaling | Event variety, server fairness, contestable loot, scalable performance |
 | **P1** | Biomes, distances, terrain elevation, portals and spawn points | World prototyping and movement |
@@ -843,7 +843,7 @@ A veteran equips an owned **Permanent sword** alongside ordinary armor, instant-
 - **Click melee:** Raw hit damage starting points remain rock **5**, wooden spear **~15**, stone spear **~25**, prior to armor. **Q133 provisional attack cooldowns:** Rock **0.3s**, Dagger **0.4s**, Sword **0.7s**, Spear **0.9s**. These cadence numbers were accepted as approximate, not per-archetype locked; exact reach/animation windows, dagger/sword damage and stone-vs-wood spear differences remain Open. Melee spends no stamina.
 - **Bows:** **Both bow and arrow tier contribute to arrow damage**. Projectile is deliberately slow and follows a **slight gravity arc**. Holding fire **pulls back/charges the bow animation**, increasing arrow launch strength/range with longer held duration; **damage stays unchanged at any draw duration**. Shorter holds result in less travel distance, not reduced damage. Exact hold minimum/maximum, launch speed/flight distance formula, bow+arrow damage combination, arrow count and client/mobile input remain Open. Shooting consumes no stamina.
 - **Sprinting:** At full stamina a player can sprint **3 continuous seconds**. From empty to full, stamina **recovers in 5 seconds**. Only sprint spends stamina; **recovery waits 3 seconds after a sprint ends (§47)**; partial-sprint behavior, pace and speed remain Open.
-- **Crouching:** Low profile/stealth/movement choice; does not consume stamina. Sprinting and crouch interactions are implementation choices.
+- **Crouching:** Not in the game (removed in 1.24).
 - **Medicine:** Basic **+10 HP** with **0.5s animation**, advanced **+25 HP** with **1.0s animation**, potion **+50 HP** with **1.5s animation**. Healing applies **immediately**, then the animation is the **ONLY cooldown**; another medical use is prohibited until animation completes. The server blocks replayed/parallel remotes, including latency abuse. No additional hidden cooldown.
 - **Food:** Full meter decays in **60 minutes** (§49); below **25%** gives **−10% speed**. **Accepted starter food examples (Q137):** Berries replenish **10% of hunger and heal 10 HP over 10 seconds**; Cooked Meat replenishes **35% hunger and heals 30 HP over 10 seconds**. Actual launch recipe/catalog still subject to naming. Each damaging hit halves pending food healing; if new remaining heal ≤10 HP, cancel it entirely.
 - **Armor:** Armor modifies **effective HP (EHP)** using a multiplier, not direct flat damage reduction: **EHP = current HP × armor factor** and damage applies to EHP; convert back to displayed actual HP (§21.5). Early armor multipliers are slightly different but visibly useful. Equipment remains indefinitely durable; magical/special resistance is future-only.
@@ -1206,7 +1206,7 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | 1. Design agreement | Choose Permanent death model, rarity/eligibility, vault semantics and precise ActiveRun admission authority | Explicit signed-off GDD decisions (not just proposed paragraphs); confirmed pre-spawn safety preserved |
 | 2. Risk loop vertical slice | Protected world menu/Play readiness, then gather, fight/heal, corpse, shared 120s timer and protected animation | Teleport failures safe; death kicks/ejects; corpse 600s; roaming countdown and deadline-only zone qualification; individual protected receipts |
 | 3. Forge / ownership proof | Ordinary special recipe, one eligible source conversion, bind slot, recovery | Verified exactly-once crafting under retries, real rejoin/death tests |
-| 4. Social / PvP slice | Click spear/sword, slow arrow-projectile bow, crafted arrows, sprint/crouch, instant medicine, food HoT, 60-second tribe revive | Validate solo immediate death, revive pause/resume, no respawn, PvP everywhere except safe POIs; no magic |
+| 4. Social / PvP slice | Click spear/sword, slow arrow-projectile bow, crafted arrows, sprint, instant medicine, food HoT, 60-second tribe revive | Validate solo immediate death, revive pause/resume, no respawn, PvP everywhere except safe POIs; no magic |
 | 5. World + raids | Random map spawning; Booga Booga wood/stone/iron, totems/decay, open storage, crops/trees and raids | Owner leaves but base remains, totem stops natural decay, no special raid tool, farming progresses while server active |
 | 6. Broadcast event | Weighted event tick, **all events publicly announced**, biome-random resources, boss ritual/event/structure sources and rare carry burden | Server event distributions measurable, PvP loot contested and still requires extraction |
 | 7. Crater Guardian | 15–20-minute cadence, horn, pillars, fight, 25%-HP drop | One mid-fight Legendary and accurate telegraphs; no auto-vault |
@@ -1540,7 +1540,7 @@ These answers supersede earlier proposals where conflicting. Specific balancing 
 | --- | --- | --- | --- |
 | **25** | Survival attributes | **Health, stamina and food only**. "Gathering" means harvesting trees, ore, stone, shrubs, crops and creature materials, **not a meter**. | Food meter depletion, hunger penalty, rates |
 | **26** | Attacks | **Simple click attacks** and **bow shots with slow projectiles** for launch; combat expansion undetermined | Swing speed, projectile velocity, damage, combo prospects |
-| **27** | Movement | **Sprinting and crouching**; **stamina only restricts sprint duration**. | Speed, stamina regeneration, control bindings |
+| **27** | Movement | **Sprinting** (crouching removed in 1.24); **stamina only restricts sprint duration**. | Speed, stamina regeneration, control bindings |
 | **28** | Ranged gear | **Ranged weapons exist; arrows must be crafted**. Bow baseline; extra ranged archetypes not all confirmed | Arrow recipes, stack caps, projectile gravity/recovery |
 | **29** | Magic | **No player magic for now**; future release possibility, not launch | Whether/when added; enemy elementals allowed |
 | **30** | Medicine and food | **Medical items and potions heal instantly on use; the following animation is the cooldown**. **Food grants healing over time; taking damage partially interrupts HoT**. | Instant heal size; animation lengths; precise damage interruption amount |
@@ -1799,7 +1799,7 @@ Let the current actual health be H, and let A be the valid positive effective-HP
 ### 37.4 Verification and anti-exploit cases
 
 1. Full HP defaults to **100**, but valid account/gear upgrades raise maximum HP; medicine cannot exceed the current modified max HP.
-2. Full sprint runs **3 seconds**, stamina from empty fully returns in **5 seconds**; combat/crouching/gathering spend no stamina.
+2. Full sprint runs **3 seconds**, stamina from empty fully returns in **5 seconds**; combat and gathering spend no stamina.
 3. At food exactly 25%, the **below-25%** speed penalty has not yet triggered; 24.99% triggers **10% movement slow**; full meter empties in **3,600 seconds** (§49).
 4. Basic medicine immediately heals **10**, advanced **25**, potion **50**, followed by tier-specific animation/reuse lock. Spammed remotes do not repeat healing.
 5. Food HoT completes after **10 seconds** absent hits, with food-dependent total. A hit halves remaining heal, and if post-hit remainder ≤10 HP, cancel rest, without retroactive health loss.
@@ -2184,6 +2184,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
 | **1.22** | 2026-10-28 | Owner decision (§56): the hotbar has **6 slots** for now (keys 1–6), replacing Q126's nine. |
+| **1.24** | 2026-10-30 | Owner decisions (§46): **crouching is removed** from the game (no key, touch button, speed or HUD text); default keys change to **E** for Interact, **B** for Backpack and **M** for Map. |
 | **1.23** | 2026-10-28 | Owner decision (§57): the parchment Settings screen with five tabs and new settings — Music and Effects volumes, Camera Sensitivity, Invert Camera, Show Damage (floating damage numbers), Show Names and Graphics Quality — saved through APPLY. |
 | **1.21** | 2026-10-28 | Owner decision (§55): no swimming; all water is knee-deep and slows walking by 30%. |
 | **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
@@ -2229,34 +2230,33 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 ## 46. Keyboard controls and rebinding (2026-10-23)
 
-**Owner request:** default key binds for every keyboard action, changeable by each player in Settings. Revised in 1.12: Interact on F, and no lobby panel keys.
+**Owner request:** default key binds for every keyboard action, changeable by each player in Settings. Revised in 1.12: Interact on F, and no lobby panel keys. Revised in 1.24: crouch removed; Interact on E, Backpack on B, Map on M.
 
 | Action | Default key | Gamepad (fixed) |
 | --- | --- | --- |
 | Sprint (hold) | Shift | L3 |
-| Crouch | C | R3 |
-| Interact / pick up (proximity prompts) | F | prompt default |
-| Backpack / inventory | Tab | Y |
+| Interact / pick up (proximity prompts) | E | prompt default |
+| Backpack / inventory | B | Y |
 | Drop item | Q | L1 |
 | Hotbar slots 1–6 | 1–6 (§56) | — |
 | Crafting | V | D-pad up |
 | Build mode / rotate piece | X / R | D-pad right / L2 |
 | Tribe | T | D-pad left |
-| Map | N | D-pad down |
+| Map | M | D-pad down |
 | Progress | P | Select |
 | Settings | O | ⚙ button |
 
 **Rules**
 
-1. Every keyboard action has the default above. **Roblox's player list is hidden in both places** so Tab only opens the inventory: the run backpack in the world, the backpack and vault panel in the lobby (1.18). **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
+1. Every keyboard action has the default above. **Roblox's player list is hidden in both places** (1.18, when the Backpack key was Tab), and the Backpack key (B since 1.24) opens the inventory: the run backpack in the world, the backpack and vault panel in the lobby (1.18). **Lobby panels (vault, Forge, market, trade) have no keys** (1.12): they open from the lobby's navigation buttons, which touch and controller players already use. Settings → Controls lists every action; clicking one and pressing a key rebinds it (Esc cancels), and **Reset controls to defaults** restores them all. Attacking and placing stay on the mouse button; gamepad buttons are fixed.
 2. **No two actions share a key.** Choosing a key another action already uses swaps the two.
 3. **Reserved keys** stay with Roblox: W A S D and Space (movement), / (chat), Esc, Enter and Backspace. Function keys are not bindable.
 4. Choices save to the player's profile (only the keys that differ from the defaults) and follow them to every server and both places. The server validates every save; a malformed or conflicting save falls back to the defaults.
 5. Every on-screen hint names the player's current key: the navigation bar, the Backpack/Drop/Craft buttons, hotbar slot numbers and tutorial hints.
-6. **Interact** retargets every proximity prompt authored on E, Roblox's default (gathering, pickups, chests, bodies, caches). A prompt that offers a second choice on another key keeps it, unless that is the Interact key, in which case it takes E: a planter's three crops read F / R / E with the default binds.
+6. **Interact** retargets every proximity prompt authored on E, Roblox's default (gathering, pickups, chests, bodies, caches). A prompt that offers a second choice on another key keeps it, unless that is the Interact key, in which case it takes E: a planter's crops read E / R / F with the default binds.
 7. A save made before a default changed keeps every rebind that still fits; only a rebind that now clashes with another action's key returns to its default.
 
-**QA:** fresh profiles get exactly the defaults above; rebinding Drop to F moves Interact to Q; a save naming W, an unknown action or two actions on one key is cleaned on the server; rebinding updates hint text without rejoining.
+**QA:** fresh profiles get exactly the defaults above; rebinding Drop to E moves Interact to Q; a save naming W, an unknown action or two actions on one key is cleaned on the server; rebinding updates hint text without rejoining.
 
 ## 47. Owner answer: stamina recovery delay (2026-10-23)
 

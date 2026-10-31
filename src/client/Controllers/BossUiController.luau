@@ -1,6 +1,8 @@
 -- Boss UI (GDD §8, §25.4). Shows a health bar for the nearest boss with its phase
 -- and remaining pillars, the Guardian's Horn of War countdown (styled apart from
 -- event and cache banners), and a clear "Legendary released" cue. World only.
+-- The bar and the horn are kit notice cards in the shared top-centre column; the
+-- cue is a kit plaque across the upper screen.
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -9,12 +11,15 @@ local SoundService = game:GetService("SoundService")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local BossUiController = {}
 
 BossUiController.SHOW_DISTANCE = 250
 BossUiController.CUE_SOUND = "rbxasset://sounds/electronicpingshort.wav"
+BossUiController.CUE_SECONDS = 5
 
 local PHASE_TEXT = {
 	Pillars = "Shielded — destroy the energy pillars",
@@ -36,13 +41,18 @@ local function make(className: string, props, parent)
 	return instance
 end
 
-local function cue(text: string, color: Color3)
-	ui.cue.Text = text
-	ui.cue.TextColor3 = color
-	ui.cue.Visible = true
-	task.delay(5, function()
-		if ui.cue.Text == text then
-			ui.cue.Visible = false
+local function cue(text: string)
+	if ui.cue then
+		ui.cue:Destroy()
+	end
+	local w = math.min(Kit.Text.Width(text, "detailTitle") + 120, 900)
+	ui.cueHolder.Size = UDim2.fromOffset(w, 86)
+	ui.cue = Kit.Panel.new(ui.cueHolder, { name = "Cue", rect = { 0, 0, w, 86 }, variant = "plaque", text = text })
+	ui.cueText = text
+	task.delay(BossUiController.CUE_SECONDS, function()
+		if ui.cueText == text and ui.cue then
+			ui.cue:Destroy()
+			ui.cue = nil
 		end
 	end)
 	local sound = make("Sound", { SoundId = BossUiController.CUE_SOUND, Volume = 1, PlaybackSpeed = 0.7 }, SoundService)
@@ -72,93 +82,65 @@ end
 
 local function update()
 	local body = nearestBoss()
-	ui.bar.Visible = body ~= nil
 	if body then
 		local hp, maxHp = body:GetAttribute("HP") or 0, body:GetAttribute("MaxHP") or 1
-		ui.fill.Size = UDim2.fromScale(math.clamp(hp / maxHp, 0, 1), 1)
-		ui.fill.BackgroundColor3 = if body:GetAttribute("Shielded")
-			then Color3.fromRGB(120, 200, 255)
-			else Color3.fromRGB(200, 50, 40)
+		local shielded = body:GetAttribute("Shielded") == true
 		local phase = PHASE_TEXT[body:GetAttribute("Phase")] or ""
 		local pillars = body:GetAttribute("PillarsLeft")
 		if body:GetAttribute("Phase") == "Pillars" and pillars then
 			phase ..= (" (%d left)"):format(pillars)
 		end
-		ui.name.Text = ("%s — %d / %d%s"):format(
-			body:GetAttribute("BossName"),
-			hp,
-			maxHp,
-			if phase ~= "" then "  ·  " .. phase else ""
-		)
+		-- Shielded reads in words as well as the blue fill.
+		ui.bar:SetBar(hp / maxHp, if shielded then "blue" else "red", ("%d / %d"):format(hp, maxHp))
+		ui.bar:Show(phase, body:GetAttribute("BossName"))
+	else
+		ui.bar:Hide()
 	end
 	if hornSpawnAt then
 		local left = math.max(0, math.floor(hornSpawnAt - workspace:GetServerTimeNow()))
-		ui.horn.Text = ("⚔ HORN OF WAR — the Guardian rises in the Center Crater in %d:%02d"):format(
-			left // 60,
-			left % 60
-		)
-		ui.horn.Visible = left > 0
+		if left > 0 then
+			ui.horn:Show(("The Guardian rises in the Center Crater in %d:%02d"):format(left // 60, left % 60))
+		else
+			ui.horn:Hide()
+		end
 	else
-		ui.horn.Visible = false
+		ui.horn:Hide()
 	end
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "BossUi", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	local gui = make("ScreenGui", {
+		Name = "BossUi",
+		ResetOnSpawn = false,
+		-- The cue stands over the banner column for its few seconds.
+		DisplayOrder = 6,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
 	-- The bar and the horn live in the shared top-centre column with the other banners.
 	local stack = Theme.TopStack()
-	ui.bar = make("Frame", {
-		Size = UDim2.fromOffset(520, 38),
-		BackgroundColor3 = Color3.fromRGB(20, 16, 14),
-		BackgroundTransparency = 0.2,
-		LayoutOrder = Theme.TopOrder.BossBar,
-		Visible = false,
-	}, stack)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.bar)
-	local track = make("Frame", {
-		Position = UDim2.new(0, 8, 1, -12),
-		Size = UDim2.new(1, -16, 0, 6),
-		BackgroundColor3 = Color3.fromRGB(60, 50, 44),
-	}, ui.bar)
-	ui.fill = make("Frame", { Size = UDim2.fromScale(1, 1), BorderSizePixel = 0 }, track)
-	ui.name = make("TextLabel", {
-		Position = UDim2.fromOffset(8, 2),
-		Size = UDim2.new(1, -16, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		TextColor3 = Color3.fromRGB(250, 235, 220),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.bar)
-	ui.horn = make("TextLabel", {
-		Size = UDim2.fromOffset(600, 36),
-		LayoutOrder = Theme.TopOrder.Horn,
-		TextWrapped = true,
-		BackgroundColor3 = Color3.fromRGB(90, 14, 14),
-		BackgroundTransparency = 0.1,
-		TextColor3 = Color3.fromRGB(255, 220, 200),
-		Font = Enum.Font.GothamBlack,
-		TextSize = 16,
-		Visible = false,
-	}, stack)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.horn)
-	-- Border mode outlines the frame; the default (Contextual) would outline the text.
-	make(
-		"UIStroke",
-		{ Color = Color3.fromRGB(255, 120, 80), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border },
-		ui.horn
-	)
-	ui.cue = make("TextLabel", {
+	ui.bar = NoticeCard.new(stack, {
+		name = "BossBar",
+		width = 560,
+		layoutOrder = Theme.TopOrder.BossBar,
+		title = "",
+		icon = "tusk",
+	})
+	ui.horn = NoticeCard.new(stack, {
+		name = "Horn",
+		width = 600,
+		layoutOrder = Theme.TopOrder.Horn,
+		title = "Horn of War",
+		icon = "warning",
+	})
+	ui.horn:SetTone("short")
+	ui.cueHolder = make("Frame", {
+		Name = "CueHolder",
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.3),
-		Size = UDim2.fromOffset(560, 48),
 		BackgroundTransparency = 1,
-		Font = Enum.Font.GothamBlack,
-		TextSize = 28,
-		TextStrokeTransparency = 0.2,
-		Visible = false,
+		Position = UDim2.fromScale(0.5, 0.3),
+		Size = UDim2.fromOffset(600, 86),
 	}, gui)
+	Theme.FitHud(gui, make("UIScale", { Name = "Fit" }, ui.cueHolder))
 end
 
 function BossUiController.Start()
@@ -169,22 +151,23 @@ function BossUiController.Start()
 	Remotes.Get("BossAlert").OnClientEvent:Connect(function(payload)
 		if payload.kind == "Horn" then
 			hornSpawnAt = payload.spawnAt
-			cue("⚔ The Horn of War sounds", Color3.fromRGB(255, 120, 80))
+			cue("The Horn of War sounds")
 		elseif payload.kind == "Spawned" then
 			hornSpawnAt = nil
-			cue("The Guardian has risen", Color3.fromRGB(255, 120, 80))
+			cue("The Guardian has risen")
 		elseif payload.kind == "Phase" then
-			cue("The Guardian's shield is down!", Color3.fromRGB(120, 200, 255))
+			cue("The Guardian's shield is down!")
 		elseif payload.kind == "Legendary" then
-			cue("★ LEGENDARY RELEASED ★", Color3.fromRGB(240, 170, 40))
+			cue("Legendary released")
 		elseif payload.kind == "Ended" then
 			hornSpawnAt = nil
 		end
+		update()
 	end)
 	task.spawn(function()
 		while true do
-			task.wait(0.25)
 			update()
+			task.wait(0.25)
 		end
 	end)
 end
