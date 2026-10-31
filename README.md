@@ -11,7 +11,7 @@
 - **[Manual validation](docs/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
 - **[Release checklist](docs/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
 
-**Current phase:** all phases v0.01–v0.18 are shipped and deployed. Next: the manual [release checklist](docs/RELEASE_CHECKLIST.md), then the permanent `v1.00` branch. Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** v0.19, the first fully playable build: placeholder models for every item, node, creature, event and structure, and click to chop, mine and gather (GDD §58). Phases v0.01–v0.18 are shipped and deployed. Next: the manual [release checklist](docs/RELEASE_CHECKLIST.md), then the permanent `v1.00` branch. Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 

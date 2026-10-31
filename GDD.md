@@ -2184,6 +2184,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
 | **1.22** | 2026-10-28 | Owner decision (§56): the hotbar has **6 slots** for now (keys 1–6), replacing Q126's nine. |
+| **1.25** | 2026-10-31 | Owner decision (§58): the first fully playable build (v0.19). Gathering uses the attack input (click, tap or RT) instead of an Interact prompt: axes chop, pickaxes mine, empty hands gather plants. Every item, node, creature, boss, event and structure gets a placeholder model until the real art arrives. |
 | **1.24** | 2026-10-30 | Owner decisions (§46): **crouching is removed** from the game (no key, touch button, speed or HUD text); default keys change to **E** for Interact, **B** for Backpack and **M** for Map. |
 | **1.23** | 2026-10-28 | Owner decision (§57): the parchment Settings screen with five tabs and new settings — Music and Effects volumes, Camera Sensitivity, Invert Camera, Show Damage (floating damage numbers), Show Names and Graphics Quality — saved through APPLY. |
 | **1.21** | 2026-10-28 | Owner decision (§55): no swimming; all water is knee-deep and slows walking by 30%. |
@@ -2454,6 +2455,13 @@ The Settings window is rebuilt from the parchment reference (`art/reference/ui/p
 6. **Graphics Quality** Low / Medium / High (default High): Low keeps a quarter of decorative particles and turns shadows off, Medium keeps 60% with shadows, High keeps everything.
 7. Changes collect in a draft: **APPLY** saves them, **RESET** returns the open tab's settings and keys to their defaults, and closing the window discards unsaved changes. The existing settings (UI scale, colour-blind palette, reduced motion, subtitles, tutorial replay, key rebinds, §46) keep their rules and move into the tabs.
 8. The server accepts only known settings with valid values (`SettingsRules`), as before.
+
+
+## 58. Owner decision: the first playable build and click gathering (2026-10-31)
+
+1. **Gathering is a swing.** Clicking (or tapping the attack button, or pressing RT) with whatever is held does the natural thing: weapons attack, an **axe chops** trees, a **pickaxe mines** rocks, ores and gems, and **empty hands gather** plants and berries. Resource nodes no longer show an Interact prompt; on desktop, pointing at a node within reach shows its name, the action and any pickaxe gate. Every rule of §53 and §51 is unchanged: the same reach, cadence, tool gates, drops, XP, mastery and regrowth, all decided by the server.
+2. **Target order for one swing:** players, then creatures; then, holding a tool or nothing, a resource node before a structure, and holding a weapon, a structure before a node. Inside a safe zone a swing can only gather.
+3. **Placeholder models.** Until the authored art arrives, every held tool and weapon shows in the hand, worn armor shows on the body, dropped gear shows a small model, and resource nodes, creatures, bosses, event sites, caches, meteors and the generated island's structures and scenery are built from simple primitive shapes coloured by tier and type. They are data recipes (`src/shared/Visuals`), so real models replace them without gameplay changes.
 
 ---
 

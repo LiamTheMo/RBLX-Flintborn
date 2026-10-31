@@ -3,7 +3,10 @@
 -- shared 120 s countdown that everyone can see; players may roam, fight and heal,
 -- and only living, non-downed players inside the zone at zero extract (strangers
 -- included; the activator's fate is irrelevant). Portable runes run 30 s anywhere
--- except inside structures and never grant the Center bonus. World place only.
+-- except inside structures and never grant the Center bonus. Each site is its
+-- glowing disc (the gameplay part, with the prompt and the PortalKind and
+-- ZoneRadius the HUD reads) ringed with stones and totems by PropModels. World
+-- place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -15,8 +18,11 @@ local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRu
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
+local Recipe = require(ReplicatedStorage.Shared.Visuals.Recipe)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AntiExploitService = require(script.Parent.AntiExploitService)
@@ -227,6 +233,14 @@ local function registerSite(position: Vector3, kind: string, radius: number, nam
 	-- The real zone radius, so the HUD can tell when a player has reached the site.
 	portal:SetAttribute("ZoneRadius", radius)
 	portal.Parent = workspace
+	-- The ring and totems are welded on as children of the disc, never workspace
+	-- parts of their own (the HUD and map scan workspace for PortalKind parts). The
+	-- disc is turned on its side, so the dressing is turned back to world axes.
+	ModelBuilder.Decorate(
+		portal,
+		PropModels.Portal(Recipe.Rgb(portal.Color)),
+		{ offset = CFrame.Angles(0, 0, math.rad(-90)), anchored = true }
+	)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Start extraction"
 	prompt.ObjectText = name .. (kind == ExtractionRules.Kinds.Center and " (2× materials)" or "")
@@ -264,7 +278,8 @@ local function setupSites()
 		if part:IsA("BasePart") then
 			local kind = part:GetAttribute("Kind") or ExtractionRules.Kinds.Fixed
 			local entry = {
-				position = part.Position,
+				-- The marker's base is the ground; the portal disc lies on it.
+				position = part.Position - Vector3.new(0, part.Size.Y / 2, 0),
 				kind = kind,
 				radius = part:GetAttribute("ZoneRadius") or ExtractionService.DEFAULT_ZONE_RADIUS[kind] or 12,
 				name = part.Name,
