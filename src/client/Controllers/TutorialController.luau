@@ -1,13 +1,16 @@
 -- Tutorial hints (GDD §25.5, §36.5). Shows the current step with its hint, a
 -- "Got it" button for explanation steps, Skip after the safe Play step, and a
 -- marker over the nearest relevant thing (a resource node, an event, a portal).
--- The marker bobs unless reduced motion is on. Works in both places.
+-- The marker bobs unless reduced motion is on. Works in both places. The hint is a
+-- kit notice card with key caps for the keys it names (the player's own binds).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -87,16 +90,8 @@ local function updateMarker(dt: number)
 		return
 	end
 	if marker == nil then
-		marker = make("BillboardGui", { Size = UDim2.fromOffset(40, 40), AlwaysOnTop = true }, nil)
-		make("TextLabel", {
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			Text = "▼",
-			TextColor3 = Theme.Colors.Heading,
-			TextStrokeTransparency = 0.2,
-			Font = Theme.Fonts.Title,
-			TextSize = 30,
-		}, marker)
+		marker = make("BillboardGui", { Name = "TutorialMarker", Size = UDim2.fromOffset(44, 44), AlwaysOnTop = true }, nil)
+		Kit.Icon.new(marker, { name = "Pin", rect = { 0, 0, 44, 44 }, icon = "map_pin" })
 		marker.Parent = player:WaitForChild("PlayerGui")
 	end
 	marker.Enabled = true
@@ -105,79 +100,53 @@ local function updateMarker(dt: number)
 	marker.StudsOffset = Vector3.new(0, target.Size.Y / 2 + 3 + bob, 0)
 end
 
+-- The actions a hint names ({Interact}, {Build}…), in order, once each.
+local function hintKeys(hint: string)
+	local keys, seen = {}, {}
+	for id in string.gmatch(hint, "{(%w+)}") do
+		if not seen[id] then
+			seen[id] = true
+			local ok, key = pcall(Binds.Label, id)
+			if ok and key ~= "?" then
+				table.insert(keys, { key = key, label = id })
+			end
+		end
+	end
+	return keys
+end
+
 local function render()
 	local visible = state ~= nil and not state.done and not state.skipped and state.id ~= nil
-	ui.card.Visible = visible
 	if not visible then
+		ui.card:Hide()
 		return
 	end
-	ui.title.Text = ("Tutorial %d/%d · %s"):format(state.index, state.total, state.title)
-	ui.hint.Text = Binds.Format(state.hint)
-	ui.ack.Visible = state.ack
-	ui.skip.Visible = state.index > 1
+	ui.card:SetButtonVisible(ui.ack, state.ack == true)
+	ui.card:SetButtonVisible(ui.skip, state.index > 1)
+	ui.card:SetKeys(hintKeys(state.hint or ""))
+	ui.card:Show(Binds.Format(state.hint or ""), ("Tutorial %d/%d · %s"):format(state.index, state.total, state.title))
 end
 
 local function build()
 	-- In the shared top-centre column, so Got it / Skip stay on-screen on phones
 	-- and the card never overlaps other banners.
-	ui.card = make("Frame", {
-		Size = UDim2.fromOffset(330, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = Theme.Colors.Card,
-		BackgroundTransparency = 0.1,
-		Active = true,
-		LayoutOrder = Theme.TopOrder.Tutorial,
-		Visible = false,
-	}, Theme.TopStack())
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.card)
-	make("UIPadding", {
-		PaddingTop = UDim.new(0, 8),
-		PaddingBottom = UDim.new(0, 8),
-		PaddingLeft = UDim.new(0, 10),
-		PaddingRight = UDim.new(0, 10),
-	}, ui.card)
-	make("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, ui.card)
-	ui.title = make("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Theme.Colors.Heading,
-		Font = Theme.Fonts.Bold,
-		TextSize = Theme.TextSize.Heading,
-		LayoutOrder = 1,
-	}, ui.card)
-	ui.hint = make("TextLabel", {
-		Size = UDim2.new(1, 0, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		TextColor3 = Theme.Colors.Text,
-		Font = Theme.Fonts.Body,
-		TextSize = Theme.TextSize.Body,
-		LayoutOrder = 2,
-	}, ui.card)
-	local function action(text: string, order: number, name: string)
-		local b = make("TextButton", {
-			Text = text,
-			Size = UDim2.new(1, 0, 0, Theme.TOUCH_TARGET - 8),
-			BackgroundColor3 = Theme.Colors.Button,
-			TextColor3 = Theme.Colors.Text,
-			Font = Theme.Fonts.Bold,
-			TextSize = Theme.TextSize.Body,
-			LayoutOrder = order,
-		}, ui.card)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(function()
+	ui.card = NoticeCard.new(Theme.TopStack(), {
+		name = "Tutorial",
+		width = 500,
+		layoutOrder = Theme.TopOrder.Tutorial,
+		title = "",
+		icon = "scroll",
+	})
+	ui.card.frame.Active = true
+	local function action(text: string, kind: string?, name: string)
+		return ui.card:AddButton(text, kind, function()
 			pcall(function()
 				Remotes.Get("TutorialAction"):InvokeServer(name)
 			end)
 		end)
-		return b
 	end
-	ui.ack = action("Got it", 3, "Ack")
-	ui.skip = action("Skip tutorial", 4, "Skip")
-	ui.skip.BackgroundColor3 = Theme.Colors.ButtonDisabled
+	ui.ack = action("Got it", nil, "Ack")
+	ui.skip = action("Skip tutorial", "paper", "Skip")
 end
 
 function TutorialController.Start()

@@ -22,6 +22,7 @@ local GAP = 6
 local BAR_H = 26
 local BUTTON_H = 46
 local BUTTON_W = 160
+local KEY_H = 34
 
 -- Layout colour keys the older callers pass to SetTone, as kit tokens.
 local TONES = { haveEnough = "toggleOn", haveShort = "short" }
@@ -151,7 +152,12 @@ function NoticeCard:_layout()
 		self.bar.root.Position = UDim2.fromOffset(self.textX, y)
 		y += BAR_H
 	end
-	if self.buttons then
+	if self.keys then
+		y += GAP + 2
+		self.keys.Position = UDim2.fromOffset(self.textX, y)
+		y += KEY_H
+	end
+	if self.buttons and self.buttons.Visible then
 		y += GAP + 6
 		self.buttons.Position = UDim2.fromOffset(self.textX, y)
 		y += BUTTON_H
@@ -178,10 +184,9 @@ function NoticeCard:AddButton(label: string, kind: string?, onPress)
 			ZIndex = 7,
 		}, self.body)
 	end
-	local index = #self.buttonList
 	local button = Kit.Button.new(self.buttons, {
 		name = label,
-		rect = { index * (BUTTON_W + 12), 0, BUTTON_W, BUTTON_H },
+		rect = { 0, 0, BUTTON_W, BUTTON_H },
 		label = label,
 		variant = if kind == "paper" then "secondary" else "primary",
 		sizeClass = "s",
@@ -189,8 +194,74 @@ function NoticeCard:AddButton(label: string, kind: string?, onPress)
 		onPress = onPress,
 	})
 	table.insert(self.buttonList, button)
-	self:_layout()
+	self:_flowButtons()
 	return button
+end
+
+-- Places the visible buttons side by side; the row takes no room without any.
+function NoticeCard:_flowButtons()
+	local x = 0
+	for _, button in self.buttonList do
+		if button.root.Visible then
+			button.root.Position = UDim2.fromOffset(x, 0)
+			x += BUTTON_W + 12
+		end
+	end
+	self.buttons.Visible = x > 0
+	self:_layout()
+end
+
+-- Shows or hides a button AddButton returned.
+function NoticeCard:SetButtonVisible(button, visible: boolean)
+	if button.root.Visible ~= visible then
+		button.root.Visible = visible
+		self:_flowButtons()
+	end
+end
+
+-- Key hints under the text: {{key = "E", label = "Interact"}, …}, drawn as
+-- kit key caps; an empty list removes them.
+function NoticeCard:SetKeys(keys: { { key: string, label: string } })
+	local signature = ""
+	for _, entry in keys do
+		signature ..= entry.key .. "=" .. entry.label .. ";"
+	end
+	if signature == self.keySignature then
+		return
+	end
+	self.keySignature = signature
+	if self.keys then
+		self.keys:Destroy()
+		self.keys = nil
+	end
+	if #keys > 0 then
+		self.keys = Kit.Core.Make("Frame", {
+			Name = "Keys",
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(self.textW, KEY_H),
+			ZIndex = 7,
+		}, self.body)
+		local x = 0
+		for index, entry in keys do
+			local cap = Kit.KeyCap.new(self.keys, {
+				name = "Key" .. index,
+				rect = { x, 0, 0, KEY_H },
+				text = entry.key,
+				zIndex = 8,
+			})
+			x += cap.w + 8
+			local labelW = math.ceil(Kit.Text.Width(entry.label, "rowLabel")) + 4
+			Kit.Text.new(self.keys, {
+				name = "KeyLabel" .. index,
+				rect = { x, 0, labelW, KEY_H },
+				text = entry.label,
+				role = "rowLabel",
+				zIndex = 8,
+			})
+			x += labelW + 18
+		end
+	end
+	self:_layout()
 end
 
 -- A progress bar under the text (fill: a Kit.Bar fill); nil removes it.

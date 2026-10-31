@@ -1,13 +1,13 @@
 -- Compass, map and safe-zone notice (GDD §3, §25, §54). A compass strip shows
--- your heading; the Map key (N by default; DPadDown) opens the parchment world
--- map: the painted island (Hud/IslandMap, the Journal's map) in the hollow map
--- frame, with pins for the safe camps and main landmarks, the active portals and
--- announced events, and your position, followed while zoomed in. An authored
--- map (not the generated island) shows plain parchment with its live markers.
+-- your heading; the Map key (N by default; DPadDown) opens the world map in a
+-- kit window (docs/ui/ListWindows.md): the painted island (Hud/IslandMap, the
+-- Journal's map) in an inset panel with zoom buttons, pins for the safe camps
+-- and main landmarks, the active portals and announced events, and your
+-- position, followed while zoomed in, with a legend underneath. An authored
+-- map (not the generated island) shows the bare panel with its live markers.
 -- Entering a safe camp shows a clear notice. World place only.
 
 local CollectionService = game:GetService("CollectionService")
-local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -20,29 +20,30 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local IslandMap = require(script.Parent.Parent.Hud.IslandMap)
-local Layout = require(script.Parent.Parent.Hud.Layout)
+local Kit = require(script.Parent.Parent.Hud.Kit)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
-local Parchment = require(script.Parent.Parent.Hud.Parchment)
-local Widgets = require(script.Parent.Parent.Hud.Widgets)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local MapController = {}
 
--- The window's design size and the map inside the hollow frame's opening.
-MapController.SIZE = { 900, 880 }
-MapController.MAP_RECT = { 22, 44, 856, 816 }
+-- The window's design size, the inset panel and the map inside it.
+MapController.SIZE = { 1000, 860 }
+MapController.PANEL_RECT = { 28, 104, 944, 680 }
+MapController.MAP_RECT = { 36, 112, 928, 664 }
+-- Marker colours (kit tokens): camps on an authored map, portals.
+MapController.CAMP_COLOR = "toggleOn"
+MapController.PORTAL_COLOR = "blue"
 MapController.SAFE_CHECK_SECONDS = 0.25
 
 local player = Players.LocalPlayer
 local ui = {}
 local screen = nil
 local map = nil
-local close = nil
+local window = nil
 local safeCard = nil
 local following = true
 
-local CLOSE_ACTION = "FlintbornMapClose"
 local events = {}
 local safeZones = {}
 local sinceSafeCheck = math.huge
@@ -70,7 +71,7 @@ local function renderMarkers()
 					x = zone.Position.X,
 					z = zone.Position.Z,
 					name = zone:GetAttribute("SafeName") or zone.Name,
-					color = Layout.Color("haveEnough"),
+					color = Kit.Tokens.Color(MapController.CAMP_COLOR),
 				})
 			end
 		end
@@ -83,7 +84,7 @@ local function renderMarkers()
 				x = part.Position.X,
 				z = part.Position.Z,
 				name = part.Name,
-				color = Color3.fromRGB(40, 110, 170),
+				color = Kit.Tokens.Color(MapController.PORTAL_COLOR),
 			})
 		end
 	end
@@ -93,7 +94,7 @@ local function renderMarkers()
 			x = view.position.X,
 			z = view.position.Z,
 			name = view.name,
-			color = Rarity.Colors[view.rarity] or Layout.Color("ink"),
+			color = Rarity.Colors[view.rarity] or Kit.Tokens.Color("ink"),
 		})
 	end
 	map:SetMarkers(markers)
@@ -180,47 +181,61 @@ local function build()
 	safeCard.frame.Position = UDim2.new(0.5, 0, 1, -150)
 	safeCard:SetTone("haveEnough")
 
-	screen = Parchment.Screen("FlintbornMap", MapController.SIZE, 20, player:WaitForChild("PlayerGui"))
-	local window = screen.window
+	screen = Kit.Screen.new("FlintbornMap", { size = MapController.SIZE, parent = player:WaitForChild("PlayerGui") })
+	window = Kit.Window.new(screen, {
+		title = "Map",
+		icon = "map",
+		clasps = "right",
+		claspYs = { 0.18, 0.9 },
+		onClose = function()
+			MapController.Toggle()
+		end,
+	})
+	local v = window.base.visual
+	local panel = MapController.PANEL_RECT
+	Kit.Panel.new(v, { name = "MapPanel", rect = panel, variant = "inset", zIndex = 6 })
 	local r = MapController.MAP_RECT
-	local paper = Widgets.Make("Frame", {
-		Name = "Paper",
-		BackgroundColor3 = Layout.Color("paper"),
-		BorderSizePixel = 0,
-		Position = UDim2.fromOffset(r[1], r[2]),
-		Size = UDim2.fromOffset(r[3], r[4]),
-		ZIndex = 2,
-	}, window)
-	map = IslandMap.new(window, r, {
+	map = IslandMap.new(v, r, {
+		zIndex = 7,
 		zoomButtons = {
-			{ r[1] + r[3] - 84, r[2] + r[4] - 160, 62, 62 },
-			{ r[1] + r[3] - 84, r[2] + r[4] - 94, 62, 63 },
+			{ r[1] + r[3] - 70, r[2] + r[4] - 134, 58, 58 },
+			{ r[1] + r[3] - 70, r[2] + r[4] - 70, 58, 58 },
 		},
 	})
-	Widgets.Sprite("pm_frame_hollow", { Name = "Frame", Size = UDim2.fromScale(1, 1), ZIndex = 9 }, window, 1)
-	Widgets.Sprite("pm_compass_rose", {
-		Name = "Compass",
-		Position = UDim2.fromOffset(r[1] + 18, r[2] + 74),
-		Size = UDim2.fromOffset(93, 117),
-		ImageColor3 = Layout.Color("ink"),
-		ZIndex = 9,
-	}, window)
-	Widgets.Sprite("pm_button_leather", {
-		Name = "TitlePlate",
-		Position = UDim2.fromOffset(MapController.SIZE[1] / 2 - 170, 0),
-		Size = UDim2.fromOffset(340, 86),
-		ZIndex = 10,
-	}, window, Parchment.SliceFor("pm_button_leather", { 0, 0, 340, 86 }))
-	Parchment.Text("MAP", { MapController.SIZE[1] / 2 - 120, 12, 240, 50 }, window, {
-		size = 34,
-		color = "cream",
-		align = "Center",
-		name = "Title",
-		z = 11,
-	})
-	close = Parchment.Button("pm_button_x", { r[1] + r[3] - 78, r[2] + 64, 58, 56 }, window, function()
-		MapController.Toggle()
-	end, { name = "Close", pad = 6, z = 10 }).button
+	-- North is up: the compass in the map's top-left corner says so.
+	Kit.Icon.new(v, { name = "Compass", rect = { r[1] + 12, r[2] + 12, 72, 72 }, icon = "compass", zIndex = 14 })
+	-- The legend: your arrow, the pins, and the coloured live markers.
+	local legend = {
+		{ icon = "compass_arrow", text = "You" },
+		{ icon = "map_pin", text = "Camps and landmarks" },
+		{ dot = MapController.PORTAL_COLOR, text = "Portals" },
+		{ dot = "glow", text = "Events (by rarity)" },
+	}
+	local x = panel[1] + 8
+	local y = panel[2] + panel[4] + 16
+	for index, entry in legend do
+		if entry.icon then
+			Kit.Icon.new(v, { name = "LegendIcon" .. index, rect = { x, y + 2, 32, 32 }, icon = entry.icon, zIndex = 8 })
+		else
+			Kit.Picture.new(v, {
+				name = "LegendDot" .. index,
+				rect = { x + 6, y + 8, 20, 20 },
+				role = "dot.yellow",
+				tint = entry.dot,
+				zIndex = 8,
+			})
+		end
+		local tw = math.ceil(Kit.Text.Width(entry.text, "rowLabel")) + 6
+		Kit.Text.new(v, {
+			name = "Legend" .. index,
+			rect = { x + 40, y, tw, 36 },
+			text = entry.text,
+			role = "rowLabel",
+			zIndex = 8,
+		})
+		x += 40 + tw + 28
+	end
+	screen:SetDefaultSelection(window.close.control.hit)
 	-- The painting is of the generated island; an authored map shows parchment.
 	task.spawn(function()
 		WorldState.WaitUntilReady()
@@ -231,20 +246,15 @@ local function build()
 				pin.frame.Visible = false
 			end
 		end
-		paper.Visible = not WorldState.IsGenerated()
 	end)
 	screen:Watch()
 end
 
 -- Opens or closes this panel (keys, and the on-screen navigation bar).
 function MapController.Toggle()
+	-- Escape and gamepad B close it too (Kit.Modal).
 	if screen:IsOpen() then
-		ContextActionService:UnbindAction(CLOSE_ACTION)
-		local focus = GuiService.SelectedObject
-		if focus and focus:IsDescendantOf(screen.gui) then
-			GuiService.SelectedObject = nil
-		end
-		screen:SetOpen(false)
+		screen:Close()
 		return
 	end
 	renderMarkers()
@@ -254,16 +264,7 @@ function MapController.Toggle()
 		map:SetMarker(root.Position.X, root.Position.Z)
 		map:Focus(root.Position.X, root.Position.Z)
 	end
-	screen:SetOpen(true)
-	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin then
-			MapController.Toggle()
-		end
-		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.ButtonB)
-	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
-		GuiService.SelectedObject = close
-	end
+	screen:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
 end
 
 function MapController.Start()
