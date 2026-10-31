@@ -63,7 +63,7 @@ LobbyHud.PHONE = {
 	memberName = 15,
 	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, settings = { 298, 0, 52, 46 }, w = 350 },
 	noticeH = 72,
-	respond = { 118, 6, 105, 40 },
+	respond = { 98, 6, 125, 40 },
 	-- The add-player button moves into the title row (panel px), so the first
 	-- member's row has the panel's width for the larger name.
 	invite = { 222, 21, 45, 34 },
@@ -71,7 +71,7 @@ LobbyHud.PHONE = {
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
 -- The card's level label and XP bar share x 109..320; the bar starts after
 -- the label, which widens when its text needs it (a long level, phone text).
-LobbyHud.CARD_LEVEL = { x = 109, y = 44, w = 48, h = 20, barY = 49, barH = 12, right = 320, gap = 2 }
+LobbyHud.CARD_LEVEL = { x = 109, y = 42, w = 48, h = 24, barY = 49, barH = 12, right = 320, gap = 2 }
 
 local function region(parent: Instance, name: string, props): Frame
 	local frame = Instance.new("Frame")
@@ -362,7 +362,8 @@ end
 -- Widens the card's level label to its text (never below the mockup's 48).
 function LobbyHud:_fitLevel(text: string)
 	local cl = LobbyHud.CARD_LEVEL
-	local need = if text == "" then 0 else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel)) + 2
+	-- A little slack over the measured width: the label must never shrink.
+	local need = if text == "" then 0 else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel) * 1.1) + 4
 	local w = math.clamp(need, cl.w, 110)
 	if w ~= self.levelW then
 		self.levelW = w

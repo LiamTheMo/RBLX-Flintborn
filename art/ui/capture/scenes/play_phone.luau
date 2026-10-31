@@ -12,6 +12,10 @@ local W, H = 844, 390
 workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
+-- The last input was a touch (Kit.Input: no keyboard hotkey badges).
+UserInputService.GetLastInputType = function()
+	return Enum.UserInputType.Touch
+end
 
 local preview = {
 	{ catalogId = "StoneAxe" },

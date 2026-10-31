@@ -18,6 +18,10 @@ local NOW = 20000 * 86400 - 3 * 3600
 workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
+-- The last input was a touch (Kit.Input: no keyboard hotkey badges).
+UserInputService.GetLastInputType = function()
+	return Enum.UserInputType.Touch
+end
 UserInputService.MouseEnabled = false
 
 local quests = {}

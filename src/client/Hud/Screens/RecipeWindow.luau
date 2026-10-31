@@ -57,10 +57,10 @@ local L = {
 	rowTitleSize = 18,
 	rowSubtitleSize = 15,
 	-- Phones and touch tablets: the handwritten row notes at 9 screen px or
-	-- more at the window's phone scale (about 0.51).
-	rowSubtitlePhone = 18,
+	-- more at the window's phone scale (0.48–0.51 below the top bar).
+	rowSubtitlePhone = 19,
 	-- A row note too long for one line wraps onto two under a raised title.
-	rowTwoLine = { titleY = 3, titleH = 28, subtitleY = 29, subtitleH = 38 },
+	rowTwoLine = { titleY = 1, titleH = 25, subtitleY = 24, subtitleH = 45 },
 	-- The Permanent mark on a conversion's icon corner (as a slot's star).
 	rowMark = { 60, 2, 20, 20 },
 	-- Room the lock takes at a locked row's right.
@@ -544,7 +544,7 @@ function RecipeWindow:_fitSubtitle(row, text: string, locked: boolean)
 		subtitle.Position = UDim2.fromOffset(row.subtitleRect[1].X.Offset, two.subtitleY)
 		subtitle.Size = UDim2.fromOffset(width, two.subtitleH)
 		subtitle.TextYAlignment = Enum.TextYAlignment.Top
-		subtitle.LineHeight = 0.9
+		subtitle.LineHeight = 0.85
 	else
 		row.title.Position, row.title.Size = row.titleRect[1], row.titleRect[2]
 		subtitle.Position = row.subtitleRect[1]

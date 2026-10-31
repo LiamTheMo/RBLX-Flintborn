@@ -446,6 +446,9 @@ end
 -- "Main") in its top-right corner; on the icon's corner a red dot while a
 -- reward waits and a check once it is claimed.
 function JournalWindow:_row(content: Instance, entry, order: number)
+	-- Phones and touch tablets: the tag and the line large enough for 9
+	-- screen px at the window's phone scale (0.48–0.51 below the top bar).
+	local phone = Kit.Scale.IsSmallTouch()
 	local row = self.listParts:Give(Kit.ListRow.new(content, {
 		name = entry.id,
 		size = ROW,
@@ -458,7 +461,7 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		titleSize = 19,
 		titleY = QUEST_TEXT_Y[1],
 		subtitle = entry.subtitle,
-		subtitleSize = 15,
+		subtitleSize = if phone then 16 else 15,
 		subtitleY = QUEST_TEXT_Y[2],
 		chevron = true,
 		zIndex = Z + 1,
@@ -470,15 +473,12 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 	row:SetSelected(entry.id == self.selected[tab])
 	local v = row.base.visual
 	if entry.tag then
-		-- Phones and touch tablets: large enough for 9 screen px at the
-		-- window's phone scale.
-		local phone = Kit.Scale.IsSmallTouch()
 		Kit.Text.new(v, {
 			name = "Group",
 			rect = if phone then { 224, 1, 120, 20 } else { 240, 3, 104, 16 },
 			text = entry.tag,
 			role = "tag",
-			textSize = if phone then 15 else 12,
+			textSize = if phone then 16 else 12,
 			color = "inkSoft",
 			align = "Right",
 			zIndex = Z + 3,
@@ -556,7 +556,7 @@ function JournalWindow:_objective(content: Instance, objective, index: number)
 		title = objective.title,
 		titleSize = 18,
 		subtitle = objective.description,
-		subtitleSize = 14,
+		subtitleSize = if Kit.Scale.IsSmallTouch() then 16 else 14,
 		value = if hasCount then ("%d / %d"):format(objective.count, objective.needed) else nil,
 		valueSize = 19,
 		trailing = 44,
