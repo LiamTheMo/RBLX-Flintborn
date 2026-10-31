@@ -318,11 +318,44 @@ local function spawnStructure(event, position: Vector3)
 end
 
 -- Spawns what `event` is made of, by kind. False for a kind it does not know.
-local function populate(event, done): boolean
+local function build(event, done): boolean
 	local entry, position, model = event.entry, event.position, event.model
+	local kind = entry.kind
+	if kind == EventCatalog.Kinds.Node then
+		spawnNode(event, entry.loot, position, entry.minRank, done)
+	elseif kind == EventCatalog.Kinds.Cache then
+		CacheService.Spawn(entry, position, model, done)
+	elseif kind == EventCatalog.Kinds.Meteor then
+		MeteorService.Spawn(entry, position, model, done)
+	elseif kind == EventCatalog.Kinds.Npc then
+		spawnGroup(event, entry.group, position)
+	elseif kind == EventCatalog.Kinds.Structure then
+		spawnStructure(event, position)
+	elseif kind == EventCatalog.Kinds.Boss then
+		event.boss = BossService.Spawn(entry.boss, position, {
+			source = "Event",
+			expired = function()
+				return events[event.id] ~= event
+			end,
+			onEnded = function(_, reason)
+				if reason == "Defeated" then
+					event.boss = nil
+					done()
+				end
+			end,
+		})
+	else
+		return false
+	end
+	return true
+end
+
+-- Builds a placed event, starts its lifetime and announces it.
+local function populate(event, done): boolean
+	local entry, position = event.entry, event.position
 	-- A failure while building (or an unknown kind) takes the half-made event down
 	-- again instead of leaving a silent, unannounced one behind.
-	local built, result = pcall(populate, event, done)
+	local built, result = pcall(build, event, done)
 	if not built or result ~= true then
 		warn(
 			("[EventDirector] Could not build %s: %s"):format(
@@ -350,6 +383,40 @@ local function populate(event, done): boolean
 	local key = entry.category .. ":" .. entry.rarity
 	EventDirectorService.Stats[key] = (EventDirectorService.Stats[key] or 0) + 1
 	return true
+end
+
+-- Places and starts one rolled event; false when it is over budget or has no valid spot.
+local function start(entry): boolean
+	local large = 0
+	for _, event in events do
+		if event.entry.footprint >= EventRules.LARGE_FOOTPRINT then
+			large += 1
+		end
+	end
+	local npcCount = EventRules.NpcCount(entry.group) + EventRules.NpcCount(entry.defenders)
+	if not EventRules.WithinBudget(entry, large, NpcService.Count(), npcCount) then
+		return false
+	end
+	local position = place(entry)
+	if position == nil then
+		return false
+	end
+	local model = Instance.new("Model")
+	model.Name = entry.name
+	model.Parent = folder
+	local event = {
+		id = HttpService:GenerateGUID(false),
+		entry = entry,
+		position = position,
+		model = model,
+		npcs = {},
+		endsAt = now() + entry.lifetime,
+	}
+	events[event.id] = event
+	local function done()
+		finish(event)
+	end
+	return populate(event, done)
 end
 
 -- One director tick: every category rolls independently (Q141), and so does every

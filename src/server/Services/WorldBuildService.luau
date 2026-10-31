@@ -7,7 +7,7 @@
 -- battlemented courtyard, the Fallen Temple ruins, Timberwatch's tower, bridges,
 -- camps with tents and fire pits), dressed with decorative scenery (forest clumps,
 -- boulders, grass and fern tufts, fallen logs; SceneryModels) so the world reads as
--- a place. Scenery is never harvestable and never blocks a ray. Every gameplay POI
+-- a place. Scenery is never harvestable; only its trunks, boulders and logs collide or can be queried. Every gameplay POI
 -- is a tagged part so the other services read the map without coordinates. The build runs in the background from Init, yielding between
 -- terrain chunks, so every other service starts at once (matchmaking keeps
 -- reporting); services that read the map's terrain or tagged parts, and Play
@@ -29,7 +29,7 @@ local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 
 local WorldBuildService = {}
 
-WorldBuildService.MAP_NAME = "ShatteredCrater"
+WorldBuildService.MAP_NAME = WorldState.MAP_NAME
 -- Bump when the generated layout changes, so islands saved into a place rebuild.
 WorldBuildService.LAYOUT_VERSION = 4
 -- Terrain is written in square chunks (16 × 16 voxel columns).
@@ -321,6 +321,22 @@ local function block(parent, name: string, cframe: CFrame, size: Vector3, color:
 	}, { "GeneratedStructure" })
 end
 
+-- Pure decoration (a painted opening, a flame, a tent floor): no tag, no collision,
+-- no query, so it never blocks building, rays or projectiles.
+local function decor(parent, name: string, cframe: CFrame, size: Vector3, color: Color3, mat: Enum.Material)
+	return part({
+		Name = name,
+		CFrame = cframe,
+		Size = size,
+		Color = color,
+		Material = mat,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Parent = parent,
+	})
+end
+
 local function glow(parent, position: Vector3, color: Color3, range: number)
 	local crystal = block(
 		parent,
@@ -398,9 +414,7 @@ end
 
 -- A dark opening or slit set flush on a wall: decoration, never an obstacle.
 local function opening(parent, name: string, cframe: CFrame, size: Vector3)
-	local hole = block(parent, name, cframe, size, Color3.fromRGB(28, 26, 32), Enum.Material.Slate)
-	hole.CanCollide = false
-	return hole
+	return decor(parent, name, cframe, size, Color3.fromRGB(28, 26, 32), Enum.Material.Slate)
 end
 
 -- Heights of the broken keep tower's four corner stumps (studs above its top).
@@ -762,7 +776,7 @@ local function lighthouse(entry)
 	shaft.Shape = Enum.PartType.Cylinder
 	-- Two red bands round the shaft, a gallery under the lamp and a stepped cap over it.
 	for _, bandY in { 10, 30 } do
-		local band = block(
+		local band = decor(
 			lighthouseModel,
 			"Band",
 			CFrame.new(base + Vector3.new(0, bandY, 0)) * CFrame.Angles(0, 0, math.rad(90)),
@@ -771,7 +785,6 @@ local function lighthouse(entry)
 			Enum.Material.SmoothPlastic
 		)
 		band.Shape = Enum.PartType.Cylinder
-		band.CanCollide = false
 	end
 	block(
 		lighthouseModel,
@@ -869,7 +882,7 @@ local function tent(parent, x: number, z: number, yaw: number, cloth: Color3)
 		)
 	end
 	block(parent, "TentPole", frame * CFrame.new(0, 4.95, 0), Vector3.new(0.5, 0.5, 10.4), WOOD, Enum.Material.Wood)
-	local floor = block(
+	decor(
 		parent,
 		"TentFloor",
 		frame * CFrame.new(0, 0.15, 0),
@@ -877,7 +890,6 @@ local function tent(parent, x: number, z: number, yaw: number, cloth: Color3)
 		Color3.fromRGB(110, 92, 70),
 		Enum.Material.Fabric
 	)
-	floor.CanCollide = false
 end
 
 -- A ring of stones round three crossed logs and a glowing flame (lit: Neon + light).
@@ -885,7 +897,7 @@ local function firePit(parent, x: number, z: number)
 	local at = groundAt(x, z)
 	for index = 1, 8 do
 		local angle = math.rad(index * 45)
-		local stone = block(
+		decor(
 			parent,
 			"FireStone",
 			CFrame.new(at + Vector3.new(math.cos(angle) * 2.4, 0.4, math.sin(angle) * 2.4))
@@ -894,10 +906,9 @@ local function firePit(parent, x: number, z: number)
 			if index % 2 == 0 then STONE else DARK_STONE,
 			Enum.Material.Slate
 		)
-		stone.CanCollide = false
 	end
 	for index = 1, 3 do
-		local log = block(
+		decor(
 			parent,
 			"FireLog",
 			CFrame.new(at + Vector3.new(0, 0.5, 0)) * CFrame.Angles(0, math.rad(index * 60), math.rad(12)),
@@ -905,9 +916,8 @@ local function firePit(parent, x: number, z: number)
 			WOOD,
 			Enum.Material.Wood
 		)
-		log.CanCollide = false
 	end
-	local flame = block(
+	local flame = decor(
 		parent,
 		"Flame",
 		CFrame.new(at + Vector3.new(0, 1.6, 0)),
@@ -915,7 +925,6 @@ local function firePit(parent, x: number, z: number)
 		Color3.fromRGB(255, 150, 50),
 		Enum.Material.Neon
 	)
-	flame.CanCollide = false
 	local light = Instance.new("PointLight")
 	light.Color = Color3.fromRGB(255, 160, 80)
 	light.Range = 24
@@ -937,7 +946,7 @@ local function stall(parent, x: number, z: number, yaw: number)
 			Enum.Material.Wood
 		)
 	end
-	local awning = block(
+	decor(
 		parent,
 		"Awning",
 		frame * CFrame.new(0, 7.4, 0),
@@ -945,7 +954,6 @@ local function stall(parent, x: number, z: number, yaw: number)
 		Color3.fromRGB(190, 60, 50),
 		Enum.Material.Fabric
 	)
-	awning.CanCollide = false
 	for index, crate in { { 5.6, 1.4 }, { 6.2, -1.2 } } do
 		block(
 			parent,
@@ -1015,11 +1023,11 @@ end
 
 -- Scenery -------------------------------------------------------------------------
 
--- Decorative extras (SceneryModels): deterministic, never harvestable, and never
--- queryable, so combat, harvest and the other services' ground rays pass straight
--- through. Only trunks, boulders and logs collide (SceneryModels.SOLID_PARTS); grass
--- and fern tufts are walk-through. They sit in a "Scenery" folder under the map.
-WorldBuildService.SCENERY_FOLDER = "Scenery"
+-- Decorative extras (SceneryModels): deterministic and never harvestable. Only
+-- trunks, boulders and logs (SceneryModels.SOLID_PARTS) collide, and they stay
+-- queryable so building placement and floor detection see them; canopies, tufts and
+-- the rest are walk-through and unqueryable. They sit in the map's scenery folder
+-- (WorldState.SCENERY_FOLDER), which the services' ground rays exclude.
 -- Each zone draws from Random.new(SCENERY_SEED + its place in BiomeCatalog.ZONE_IDS).
 WorldBuildService.SCENERY_SEED = 5417
 -- Extra studs kept clear round camps, structures, portals and the cave tunnel.
@@ -1092,9 +1100,12 @@ local function place(parent: Instance, kind: string, paletteId: string, rng: Ran
 		* CFrame.Angles(0, rng:NextNumber(0, math.pi * 2), 0)
 	local built = ModelBuilder.Build(recipe, origin, { name = kind, parent = parent, scale = Vector3.one * scale })
 	for _, child in built:GetChildren() do
-		if info.solid then
-			child.CanCollide = SceneryModels.SOLID_PARTS[child.Name] == true
-		else
+		if info.solid and SceneryModels.SOLID_PARTS[child.Name] then
+			-- Trunks, boulders and logs block movement and are real obstacles for building
+			-- and floor detection, so they stay queryable; the rest is decoration.
+			child.CanCollide = true
+			child.CanQuery = true
+		elseif not info.solid then
 			-- Hundreds of tiny tufts are not worth a shadow each.
 			child.CastShadow = false
 		end
@@ -1177,7 +1188,7 @@ end
 
 local function scenery()
 	local parent = Instance.new("Folder")
-	parent.Name = WorldBuildService.SCENERY_FOLDER
+	parent.Name = WorldState.SCENERY_FOLDER
 	parent.Parent = folder
 	for index, zoneId in BiomeCatalog.ZONE_IDS do
 		local zone = SceneryModels.Zones[zoneId]

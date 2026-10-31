@@ -20,7 +20,8 @@
 --   Wall(style, h)    the centre of one 10 x h x 1.5 wall segment, -Z the inside.
 --   Chest(accent)     the centre of the 4 x 3 x 3 cache hitbox.
 --   Meteor            the event centre on the ground (the crater floor).
---   OreNode / PlantNode / LootPile   the centre of the node's hitbox.
+--   OreNode / PlantNode / LootPile   the centre of the node's hitbox (HITBOX).
+--   METEOR_CORE       the solid core's ball, sized to the drawn Rock.
 --   Altar             the centre of the 6 x 3 x 6 altar slab.
 --   Portal(accent)    the centre of the portal's 6-stud disc, world-aligned.
 -- Rotations are single-axis (or Y only) so they read the same whatever Euler order
@@ -52,6 +53,17 @@ PropModels.CHEST_HINGE = { 0, 0.2, 1.4 }
 PropModels.CHEST_OPEN_DEGREES = 110
 PropModels.LID_PREFIX = "Lid"
 PropModels.CHEST_GLOW = { Glow = true, LidGem = true }
+
+-- The node hitboxes the director builds (size in studs, bottom on the ground). A
+-- solid one is cut to the drawn stone so players never hit air above or beside it.
+PropModels.HITBOX = {
+	Ore = { 5.6, 4.2, 5.4 },
+	Pile = { 3.6, 2.5, 3.4 },
+	Plant = { 4, 4, 4 },
+}
+-- The meteor's invisible solid core: a ball of this diameter, centred `lift` above
+-- the ground, inside the drawn Rock (a 12 x 10 ellipsoid centred 3.5 up).
+PropModels.METEOR_CORE = { diameter = 10, lift = 3.5 }
 
 -- The altar's lit parts, and the colours the ritual swaps them between.
 PropModels.ALTAR_GLOW = "Glow"
@@ -617,7 +629,7 @@ PropModels.Meteor = { parts = meteor() }
 -- Rare event nodes -------------------------------------------------------------
 
 -- A cluster of rock with Neon crystals in `accent` (the event's rarity colour),
--- on the 6 x 5 x 6 hitbox: 12 parts.
+-- on the HITBOX.Ore hitbox: 12 parts.
 function PropModels.OreNode(accent: { number })
 	local rock = mix({ 104, 100, 98 }, accent, 0.25)
 	local crystal = shade(accent, 1.1)
@@ -657,7 +669,7 @@ function PropModels.OreNode(accent: { number })
 	do
 		add(parts, part("Block", spec[1], spec[2], crystal, "Neon", spec[3], { name = "Crystal" }))
 	end
-	return { parts = lifted(parts, -2.5) }
+	return { parts = lifted(parts, -PropModels.HITBOX.Ore[2] / 2) }
 end
 
 -- The plant variant an event node uses (a Patch unless PLANT_VARIANTS says so).
@@ -775,7 +787,7 @@ function PropModels.PlantNode(variant: string, accent: { number })
 end
 
 -- A heap of broken stone, a smashed crate and a hide scrap: the search spot in a
--- ruin, on the 4 x 3 x 4 hitbox. 7 parts.
+-- ruin, on the HITBOX.Pile hitbox. 7 parts.
 PropModels.LootPile = {
 	parts = lifted({
 		part("Block", { 3.4, 1.4, 3.2 }, { 0, 0.7, 0 }, STONE, "Cobblestone", { 0, 15, 0 }, { name = "Heap" }),
@@ -793,7 +805,7 @@ PropModels.LootPile = {
 		part("Block", { 1.8, 0.15, 0.4 }, { -1.2, 1.3, 1.3 }, WOOD_LIGHT, "Wood", { 0, 0, 15 }, { name = "Plank" }),
 		part("Block", { 1.4, 0.1, 1 }, { 1.4, 1.2, 0.9 }, HIDE, "Fabric", { 0, 20, 0 }, { name = "Hide" }),
 		part("Block", { 1, 0.6, 1 }, { 2, 0.3, 1.4 }, STONE, "Cobblestone", { 0, 50, 0 }, { name = "Rubble" }),
-	}, -1.5),
+	}, -PropModels.HITBOX.Pile[2] / 2),
 }
 
 -- Ritual altar -------------------------------------------------------------------

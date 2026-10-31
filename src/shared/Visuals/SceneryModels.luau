@@ -12,7 +12,7 @@
 -- SceneryModels.Zones: per-zone palette and counts (named constants), kept in step
 -- with the budget (PART_BUDGET, checked by WorstCaseParts).
 -- Parts named in SOLID_PARTS may collide (trunks, boulders, logs); everything else
--- is walk-through. Nothing is ever queryable (rays pass), see WorldBuildService.
+-- is walk-through and unqueryable (rays pass); see WorldBuildService.
 
 local Recipe = require(script.Parent.Recipe)
 
