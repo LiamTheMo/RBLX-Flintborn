@@ -44,16 +44,25 @@ end
 -- One part from a spec, placed at `cframe`, sizes multiplied by `scale`.
 function ModelBuilder.MakePart(spec, cframe: CFrame, scale: Vector3?): BasePart
 	local s = scale or Vector3.one
-	local part = Instance.new(CLASS[spec.shape] or "Part") :: BasePart
-	if SHAPE[spec.shape] then
-		(part :: Part).Shape = SHAPE[spec.shape]
-	end
-	part.Name = spec.name or spec.shape
-	part.Size = Vector3.new(
+	local size = Vector3.new(
 		math.max(0.05, spec.size[1] * s.X),
 		math.max(0.05, spec.size[2] * s.Y),
 		math.max(0.05, spec.size[3] * s.Z)
 	)
+	-- Roblox forces a Ball part to equal sides, so an uneven ball (a squat bush, a
+	-- round body) is a block drawn by a sphere mesh, which fills the part's box.
+	local ellipsoid = spec.shape == "Ball" and not (size.X == size.Y and size.Y == size.Z)
+	local part = Instance.new(CLASS[spec.shape] or "Part") :: BasePart
+	if SHAPE[spec.shape] and not ellipsoid then
+		(part :: Part).Shape = SHAPE[spec.shape]
+	end
+	part.Name = spec.name or spec.shape
+	part.Size = size
+	if ellipsoid then
+		local mesh = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.Sphere
+		mesh.Parent = part
+	end
 	part.Color = Color3.fromRGB(spec.color[1], spec.color[2], spec.color[3])
 	part.Material = material(spec.material)
 	part.Transparency = spec.transparency or 0
