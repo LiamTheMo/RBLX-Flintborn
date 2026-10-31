@@ -31,14 +31,14 @@ local view = {
 		},
 		invited = { 4 },
 	},
-	invites = { { partyId = "p9", from = "RiverFox" } },
+	invites = { { partyId = "p9", from = "RiverFox", fromUserId = 6 } },
 	ready = true,
 	maxSize = 8,
 }
 local data = PartyModel.WindowData(view, { userId = 1, name = "LiamTheMo" }, {
 	{ userId = 4, name = "Emberwick", userName = "Emberwick" },
 	{ userId = 5, name = "MossyStone", userName = "MossyStone" },
-}, { now = NOW, levels = { [1] = 12, [2] = 15, [3] = 8, [4] = 21, [5] = 3 } }, { 6 })
+}, { now = NOW, levels = { [1] = 12, [2] = 15, [3] = 8, [4] = 21, [5] = 3, [6] = 9 } })
 
 local window = PartyWindow.new({})
 window:SetData(data)
@@ -47,6 +47,6 @@ local screen = window.screen
 -- The capture env has no AbsoluteSize: fit the way Scale.Window does in game.
 screen:Fit(W, H, 58, 1)
 local k = screen.scale.Scale
-print(("party_phone: window scale %.3f -> %d x %d screen px"):format(k, 1136 * k, 642 * k))
+print(("party_phone: window scale %.3f -> %d x %d screen px"):format(k, 1124 * k, 637 * k))
 __dump(Players.LocalPlayer.PlayerGui, W, H)
 window:Destroy()

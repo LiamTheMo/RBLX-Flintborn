@@ -10,9 +10,6 @@
 -- Inventory (VaultController), Play (PlayController), Quests (JournalController),
 -- Shop (WalletController), Forge and Trade; the card opens Progress, the pills the
 -- Shop, the gear Settings, the Party panel the Party window (PartyController).
--- Functions other screens are still adding (PartyController, PlayController,
--- VaultController.Open / Changed) are looked up when pressed, so a missing one
--- does nothing.
 
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
@@ -22,6 +19,8 @@ local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local ForgeController = require(script.Parent.ForgeController)
 local JournalController = require(script.Parent.JournalController)
 local LobbyController = require(script.Parent.LobbyController)
+local PartyController = require(script.Parent.PartyController)
+local PlayController = require(script.Parent.PlayController)
 local ProgressionController = require(script.Parent.ProgressionController)
 local SettingsController = require(script.Parent.SettingsController)
 local TradeController = require(script.Parent.TradeController)
@@ -40,42 +39,18 @@ LobbyHudController.STATUS_SECONDS = 6
 local player = Players.LocalPlayer
 local gui, root, hud
 
--- A sibling controller another screen owns, once it exists (nil until then).
-local function optional(name: string)
-	local module = script.Parent:FindFirstChild(name)
-	if module == nil or not module:IsA("ModuleScript") then
-		return nil
-	end
-	local ok, result = pcall(require, module)
-	return if ok and type(result) == "table" then result else nil
-end
-
--- Calls controller[name](...) when both exist. Returns whether it ran.
-local function call(controller, name: string, ...): boolean
-	local fn = controller and controller[name]
-	if type(fn) ~= "function" then
-		return false
-	end
-	fn(...)
-	return true
-end
-
 -- The lobby backpack lives in the Inventory window beside the vault.
 local function openInventory()
-	if not call(VaultController, "Open", "Backpack") and not VaultController.IsOpen() then
-		VaultController.Toggle()
-	end
+	VaultController.Open("Backpack")
 end
 
 local TILE_ACTIONS = {
 	Inventory = openInventory,
 	Play = function()
-		call(optional("PlayController"), "Open")
+		PlayController.Open()
 	end,
 	Quests = function()
-		if not call(JournalController, "Open") then
-			JournalController.Toggle()
-		end
+		JournalController.Open()
 	end,
 	Shop = function()
 		WalletController.Open("Shop")
@@ -89,7 +64,7 @@ local TILE_ACTIONS = {
 }
 
 local function openParty(section: string?)
-	call(optional("PartyController"), "Open", section)
+	PartyController.Open(section)
 end
 
 local function refreshParty()
@@ -206,12 +181,9 @@ local function start()
 		end
 	end)
 	-- A backpack or vault change re-reads the deploy preview (and so the hotbar).
-	local changed = (VaultController :: any).Changed
-	if type(changed) == "table" and changed.Connect then
-		changed:Connect(function()
-			LobbyController.RefreshPreview()
-		end)
-	end
+	VaultController.Changed:Connect(function()
+		LobbyController.RefreshPreview()
+	end)
 end
 
 -- The HUD screen object (scenes and verifiers), or nil before Start.

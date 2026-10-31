@@ -19,7 +19,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
-local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Kit = require(script.Parent.Parent.Kit)
 
@@ -31,25 +30,30 @@ RecipeWindow.CONVERT_HOLD = 1.5
 
 RecipeWindow.SIZE = { 1102, 682 }
 
--- Window-local layout (design px).
+-- Window-local layout (design px). Kit plates draw their visible edge on their
+-- rect, so these are the mockup's bounds less the window's 285, 132.
 local L = {
-	icon = { 53, 15, 101, 89 },
+	-- The anvil art has a margin: this rect puts its ink on the mockup's 101 × 95.
+	icon = { 50, 8, 107, 97 },
 	title = { 184, 17, 560, 64 },
 	titleSizes = { 46, 40 },
 	subtitle = { 184, 72, 600, 30 },
 	subtitleSize = 24,
 	close = { 1004, 26, 63, 61 },
-	topRule = { 37, 109, 1028, 16 },
-	columnRules = { { 363, 118, 18, 540 }, { 752, 118, 18, 550 } },
+	topRule = { 37, 116, 1028, 2 },
+	-- The column rules: left (faint, fading out), centre-left, centre-right.
+	columnRules = { { 34, 118, 2, 518 }, { 371, 118, 2, 537 }, { 760, 118, 2, 547 } },
 	clasps = { 0.242, 0.895 },
 	recipesHead = { 58, 128, 140, 30 },
 	headSize = 19,
 	dropdown = { 196, 124, 160, 38 },
-	recipeList = { 50, 160, 329, 456 },
-	recipeRow = { 305, 73 },
-	recipeGap = 3,
-	rowIcon = { 14, 5, 64, 64 },
-	rowTextX = 103,
+	-- The rail sits in the gutter between the rows and the column rule.
+	recipeList = { 38, 161, 333, 456 },
+	recipeRow = { 301, 69 },
+	recipeGap = 7,
+	rowIcon = { 12, 2, 66, 64 },
+	rowTextX = 101,
+	rowTitleSize = 18,
 	rowSubtitleSize = 15,
 	name = { 418, 128, 330, 38 },
 	nameSize = 30,
@@ -61,26 +65,33 @@ local L = {
 	divider1 = { 389, 469, 356, 16 },
 	requiresHead = { 401, 482, 200, 30 },
 	smallHeadSize = 16,
-	cards = { 393, 511, 349, 69 },
-	cardGap = 5,
+	cards = { 396, 513, 347, 65 },
+	cardGap = 9,
+	cardIcon = { 14, 10, 54, 48 },
+	cardTextX = 84,
 	divider2 = { 388, 583, 371, 16 },
 	quantityHead = { 391, 616, 100, 30 },
 	stepper = { 493, 610, 158, 44 },
+	stepperValueSize = 32,
 	button = { 673, 599, 260, 66 },
 	buttonSize = 25,
+	buttonIcon = 39,
+	buttonIconGap = 23,
 	materialsHead = { 782, 129, 260, 30 },
 	materialsSize = 19,
-	materialList = { 776, 165, 305, 412 },
-	materialRow = { 281, 62 },
-	materialGap = 5,
-	materialIcon = { 15, 8, 53, 46 },
-	materialTextX = 86,
+	materialList = { 763, 165, 312, 398 },
+	materialRow = { 278, 59 },
+	materialGap = 8,
+	materialIcon = { 13, 7, 53, 46 },
+	materialTextX = 84,
+	materialTitleSize = 18,
+	materialValueSize = 20,
 	-- Crafting mode: the stepper carries All, so the button narrows; the right
 	-- column keeps room for the smelt and the stations in reach.
 	craft = {
 		stepper = { 483, 610, 222, 44 },
 		button = { 713, 599, 220, 66 },
-		materialList = { 776, 165, 305, 268 },
+		materialList = { 763, 165, 312, 262 },
 		smeltHead = { 782, 446, 276, 26 },
 		job = { 782, 472, 276, 24 },
 		bar = { 782, 502, 190, 20 },
@@ -99,11 +110,10 @@ local function hex(color: Color3): string
 end
 
 local function label(parent: Instance, props, size: number?)
-	local text = Kit.Text.new(parent, props)
 	if size then
-		text.root.TextSize = size
+		props.textSize = size
 	end
-	return text
+	return Kit.Text.new(parent, props)
 end
 
 -- A Kit.Scroll's content height: rows, gaps and its top and bottom padding.
@@ -111,7 +121,7 @@ local function listHeight(count: number, rowH: number, gap: number): number
 	return if count > 0 then count * rowH + (count - 1) * gap + 14 else 0
 end
 
--- Dims an item picture the way ListRow dims its own icon.
+-- Dims the big item picture for a locked recipe, as ListRow dims its icon.
 local function dimIcon(icon, dim: boolean)
 	local image = icon and icon.image
 	if image == nil then
@@ -145,11 +155,21 @@ function RecipeWindow.new(props)
 	}, RecipeWindow)
 	local screen = Kit.Screen.new(props.name or "FlintbornRecipes", { size = RecipeWindow.SIZE, parent = props.parent })
 	self.screen = screen
+	-- The header as the mockup places it: the anvil, the small-caps title (D13)
+	-- and the handwritten subtitle, the close button; the full-width rule
+	-- under them is drawn below in the column rules' colour.
 	local window = Kit.Window.new(screen, {
 		title = props.title or "Ancestral Forge",
 		subtitle = props.subtitle,
 		icon = props.icon or "anvil_hammer",
+		iconRect = L.icon,
+		titleRect = L.title,
 		smallCaps = true,
+		smallCapsSizes = L.titleSizes,
+		subtitleRect = L.subtitle,
+		subtitleSize = L.subtitleSize,
+		closeRect = L.close,
+		rule = false,
 		clasps = true,
 		claspYs = L.clasps,
 	})
@@ -157,10 +177,16 @@ function RecipeWindow.new(props)
 	local v = window.base.visual
 	local z = window.base.z + 3
 	self.visual = v
-	self:_placeHeader()
-
+	Kit.Divider.new(v, { name = "TopRule", rect = L.topRule, variant = "ink", color = "rule", zIndex = z })
 	for index, rect in L.columnRules do
-		Kit.Divider.new(v, { name = "ColumnRule" .. index, rect = rect, variant = "vertical", zIndex = z })
+		Kit.Divider.new(v, {
+			name = "ColumnRule" .. index,
+			rect = rect,
+			variant = if index == 1 then "hairline" else "ink",
+			color = if index == 1 then nil else "rule",
+			fade = index == 1,
+			zIndex = z,
+		})
 	end
 
 	-- RECIPES -------------------------------------------------------------------
@@ -187,7 +213,13 @@ function RecipeWindow.new(props)
 			self:SetCategory(labelToId[value] or RecipeModel.ALL)
 		end,
 	})
-	self.recipeList = Kit.Scroll.new(v, { name = "Recipes", rect = L.recipeList, gap = L.recipeGap, zIndex = z })
+	self.recipeList = Kit.Scroll.new(v, {
+		name = "Recipes",
+		rect = L.recipeList,
+		gap = L.recipeGap,
+		railOverlay = true,
+		zIndex = z,
+	})
 
 	-- The chosen recipe ------------------------------------------------------------
 	self.nameText = label(v, {
@@ -242,6 +274,8 @@ function RecipeWindow.new(props)
 		max = 1,
 		value = 1,
 		allLabel = if crafting then "All" else nil,
+		buttons = "leather",
+		valueSize = L.stepperValueSize,
 		zIndex = z,
 		onChange = function(value)
 			self.count = value
@@ -252,7 +286,9 @@ function RecipeWindow.new(props)
 		name = "Forge",
 		rect = if crafting then L.craft.button else L.button,
 		label = if crafting then "Craft" else "Forge",
-		icon = if crafting then "hammer" else "anvil",
+		icon = if crafting then "white:hammer" else "white:anvil",
+		iconSize = L.buttonIcon,
+		iconGap = L.buttonIconGap,
 		textSize = L.buttonSize,
 		zIndex = z + 1,
 		onPress = function()
@@ -272,6 +308,7 @@ function RecipeWindow.new(props)
 		name = "Materials",
 		rect = if crafting then L.craft.materialList else L.materialList,
 		gap = L.materialGap,
+		railOverlay = true,
 		zIndex = z,
 	})
 	if crafting then
@@ -283,37 +320,6 @@ function RecipeWindow.new(props)
 	screen:SetDefaultSelection(window.close.control.hit)
 	self:_renderDetail()
 	return self
-end
-
--- The header as the mockup places it: the anvil, the small-caps title and the
--- handwritten subtitle, the close button, and the full-width rule under them.
-function RecipeWindow:_placeHeader()
-	local window = self.window
-	if window.icon then
-		window.icon.Position = UDim2.fromOffset(L.icon[1], L.icon[2])
-		window.icon.Size = UDim2.fromOffset(L.icon[3], L.icon[4])
-	end
-	local title = window.title.root
-	title.Position = UDim2.fromOffset(L.title[1], L.title[2])
-	title.Size = UDim2.fromOffset(L.title[3], L.title[4])
-	self:SetTitle(self.props.title or "Ancestral Forge")
-	if window.subtitle then
-		local subtitle = window.subtitle.root
-		subtitle.Position = UDim2.fromOffset(L.subtitle[1], L.subtitle[2])
-		subtitle.Size = UDim2.fromOffset(L.subtitle[3], L.subtitle[4])
-		subtitle.TextSize = L.subtitleSize
-	end
-	local close = window.close.root
-	close.Position = UDim2.fromOffset(L.close[1], L.close[2])
-	close.Size = UDim2.fromOffset(L.close[3], L.close[4])
-	-- The banner's own rule stops at the close button; this one spans the window.
-	window.rule.root.Visible = false
-	self.topRule = Kit.Divider.new(window.base.visual, {
-		name = "TopRule",
-		rect = L.topRule,
-		variant = "rule",
-		zIndex = window.base.z + 2,
-	})
 end
 
 function RecipeWindow:_buildCraftingExtras(v, z: number)
@@ -366,7 +372,7 @@ end
 
 -- The window title in faux small caps (D13).
 function RecipeWindow:SetTitle(text: string)
-	self.window.title.root.Text = KitModel.SmallCaps(text, L.titleSizes[1], L.titleSizes[2])
+	self.window:SetTitle(text)
 end
 
 -- Data --------------------------------------------------------------------------------
@@ -392,46 +398,22 @@ function RecipeWindow:SetCategory(id: string)
 	self:_renderList()
 end
 
--- Chooses a recipe; the quantity starts again at 1.
-function RecipeWindow:Select(id: string?)
+-- Chooses a recipe; the quantity starts again at 1. A recipe chosen by code
+-- (not by pressing its row) is scrolled into view.
+function RecipeWindow:Select(id: string?, pressed: boolean?)
 	if id ~= self.selectedId then
 		self.count = 1
+		local row = id and self.rows[id]
+		if row and not pressed then
+			self.recipeList:ScrollToRow(row.root, { center = true })
+		end
 	end
 	self.selectedId = id
 	for rowId, row in self.rows do
 		row:SetSelected(rowId == id)
 	end
-	self:_reveal(id)
 	self:_renderDetail()
 	self:_renderMaterials()
-end
-
--- Scrolls the recipe list so the chosen row is in view.
-function RecipeWindow:_reveal(id: string?)
-	local index = nil
-	for i, entry in self.filtered do
-		if entry.id == id then
-			index = i
-		end
-	end
-	if index == nil then
-		return
-	end
-	local frame = self.recipeList:Content()
-	local rowH, viewH = L.recipeRow[2], L.recipeList[4]
-	local top = (index - 1) * (rowH + L.recipeGap)
-	-- CanvasPosition is in screen px, the layout in design px (as Kit.Scroll reads it).
-	local window = frame.AbsoluteWindowSize.Y
-	local k = if window > 0 then window / viewH else 1
-	local y = frame.CanvasPosition.Y / k
-	if top < y then
-		y = top
-	elseif top + rowH + 14 > y + viewH then
-		y = top + rowH + 14 - viewH
-	else
-		return
-	end
-	frame.CanvasPosition = Vector2.new(0, math.max(0, y) * k)
 end
 
 function RecipeWindow:Selected()
@@ -486,44 +468,26 @@ function RecipeWindow:_rowFor(entry)
 	if row then
 		return row
 	end
-	local size = L.recipeRow
+	local function choose()
+		self:Select(entry.id, true)
+	end
 	row = Kit.ListRow.new(self.recipeList:Content(), {
 		name = entry.id,
-		size = size,
-		variant = "card",
+		size = L.recipeRow,
+		variant = "soft",
+		itemId = entry.output,
+		iconRect = L.rowIcon,
+		textX = L.rowTextX,
 		title = entry.name,
-		subtitle = entry.subtitle or "",
-		onPress = function()
-			self:Select(entry.id)
-		end,
-	})
-	-- A locked recipe is still chosen, so its unlock text shows.
-	row.control.opts.onLocked = function()
-		self:Select(entry.id)
-	end
-	local r = L.rowIcon
-	row.picture = Kit.ItemIcon.new(row.base.visual, {
-		name = "Picture",
-		rect = r,
-		catalogId = entry.output,
-		icon = RecipeModel.Icon(entry.output),
-		zIndex = row.base.z + 1,
-	})
-	local x = L.rowTextX
-	local right = size[1] - 14
-	row.title.Position = UDim2.fromOffset(x, size[2] * 0.12)
-	row.title.Size = UDim2.fromOffset(right - x, size[2] * 0.46)
-	if row.subtitle then
+		titleSize = L.rowTitleSize,
 		-- The mockup's row descriptions are handwritten notes (D13).
-		Kit.Core.Style(row.subtitle, "subtitleHand")
-		row.subtitle.TextSize = L.rowSubtitleSize
-		row.subtitle.Position = UDim2.fromOffset(x, size[2] * 0.54 - 3)
-		row.subtitle.Size = UDim2.fromOffset(right - x, size[2] * 0.36)
-	end
-	row.base.maid:Give(row.root:GetAttributeChangedSignal("KitState"):Connect(function()
-		local state = row.root:GetAttribute("KitState")
-		dimIcon(row.picture, state == "locked" or state == "disabled")
-	end))
+		subtitle = entry.subtitle or "",
+		subtitleHand = true,
+		subtitleSize = L.rowSubtitleSize,
+		onPress = choose,
+		-- A locked recipe is still chosen, so its unlock text shows.
+		onLocked = choose,
+	})
 	-- Gamepad: right goes to the main button.
 	row.control.hit.NextSelectionRight = self.button.control.hit
 	self.rows[entry.id] = row
@@ -541,11 +505,9 @@ function RecipeWindow:_renderList()
 		row:SetTitle(entry.name)
 		row:SetSubtitle(entry.subtitle or "")
 		row:SetState(if entry.locked then "locked" else "normal")
-		dimIcon(row.picture, entry.locked)
 	end
 	for id, row in self.rows do
 		if not used[id] then
-			row.picture:Destroy()
 			row:Destroy()
 			self.rows[id] = nil
 		end
@@ -570,33 +532,24 @@ function RecipeWindow:_renderMaterials()
 			row = Kit.ListRow.new(self.materialList:Content(), {
 				name = material.catalogId,
 				size = size,
-				variant = "row",
+				variant = "soft",
+				itemId = material.catalogId,
+				iconRect = L.materialIcon,
+				textX = L.materialTextX,
 				title = material.name,
+				titleSize = L.materialTitleSize,
 				value = tostring(material.quantity),
+				valueSize = L.materialValueSize,
 			})
-			row.picture = Kit.ItemIcon.new(row.base.visual, {
-				name = "Picture",
-				rect = L.materialIcon,
-				catalogId = material.catalogId,
-				icon = RecipeModel.Icon(material.catalogId),
-				zIndex = row.base.z + 1,
-			})
-			local x = L.materialTextX
-			row.title.Position = UDim2.fromOffset(x, 0)
-			row.title.Size = UDim2.fromOffset(size[1] - 14 - row.valueWidth - 10 - x, size[2])
-			row.title.TextSize = 18
-			row.value.TextSize = 20
 			self.materialRows[material.catalogId] = row
 		end
 		used[material.catalogId] = true
 		row.root.LayoutOrder = index
 		row:SetValue(tostring(material.quantity))
-		row.value.TextSize = 20
 		row:SetSelected(needed[material.catalogId] == true)
 	end
 	for id, row in self.materialRows do
 		if not used[id] then
-			row.picture:Destroy()
 			row:Destroy()
 			self.materialRows[id] = nil
 		end
@@ -612,7 +565,7 @@ function RecipeWindow:_renderDetail()
 		self.description:SetText(if #self.entries == 0 then "" else "Nothing here yet.")
 	else
 		self.nameText:SetText(RecipeModel.NameOf(entry.output))
-		self.picture:SetItem(entry.output, RecipeModel.Icon(entry.output))
+		self.picture:SetItem(entry.output)
 		dimIcon(self.picture, entry.locked)
 		local blocked = entry.locked or (entry.kind == "Permanent" and #(entry.sources or {}) == 0)
 		self.description:SetText(
@@ -667,16 +620,11 @@ function RecipeWindow:_wideCards(cost)
 		})
 		local c = card.base.visual
 		local z = card.base.z + 1
-		Kit.ItemIcon.new(c, {
-			rect = { 16, 12, 54, 49 },
-			catalogId = item.catalogId,
-			icon = RecipeModel.Icon(item.catalogId),
-			zIndex = z,
-		})
+		Kit.ItemIcon.new(c, { rect = L.cardIcon, itemId = item.catalogId, zIndex = z })
 		-- hudSmall: Merriweather Bold at 15, shrinking to fit a long name.
 		label(c, {
 			name = "Name",
-			rect = { 86, 12, w - 92, 24 },
+			rect = { L.cardTextX, 12, w - L.cardTextX - 6, 24 },
 			text = item.name,
 			role = "hudSmall",
 			color = "inkLabel",
@@ -685,7 +633,7 @@ function RecipeWindow:_wideCards(cost)
 		})
 		label(c, {
 			name = "Count",
-			rect = { 86, 35, w - 92, 28 },
+			rect = { L.cardTextX, 35, w - L.cardTextX - 6, 28 },
 			text = countText(item),
 			role = "count",
 			rich = true,
@@ -712,12 +660,7 @@ function RecipeWindow:_compactCards(cost)
 		})
 		local c = card.base.visual
 		local z = card.base.z + 1
-		Kit.ItemIcon.new(c, {
-			rect = { 4, 2, h - 4, h - 4 },
-			catalogId = item.catalogId,
-			icon = RecipeModel.Icon(item.catalogId),
-			zIndex = z,
-		})
+		Kit.ItemIcon.new(c, { rect = { 4, 2, h - 4, h - 4 }, itemId = item.catalogId, zIndex = z })
 		local countW = math.ceil(Kit.Text.Width(("%d / %d"):format(item.owned, item.need), "count", 13)) + 4
 		label(c, {
 			name = "Name",

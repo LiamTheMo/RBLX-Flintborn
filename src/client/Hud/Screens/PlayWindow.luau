@@ -31,7 +31,7 @@ PlayWindow.SIZE = { 1053, 665 }
 local RECT = {
 	titlePlaque = { 47, 30, 276, 87 },
 	-- The title's ink sits a little left of the plaque's centre.
-	title = { -4, 1, 276, 83 },
+	title = { -4, 3, 276, 83 },
 	close = { 985, 9, 54, 52 },
 	map = { 41, 92, 520, 542 },
 	mapInset = 6,
@@ -43,16 +43,21 @@ local RECT = {
 	sectionRule = { 588, 339, 419, 2 },
 	partyHeading = { 590, 350, 300, 26 },
 	-- One row tall; more members scroll (the rail sits right of the rows).
-	party = { 587, 378, 441, 58 },
-	partyRow = { 421, 56 },
+	party = { 585, 375, 444, 63 },
+	-- The row's plate: the inset art's border sits 2–3 px inside it, so the
+	-- plate is larger than the mockup's 421 × 56 box (896, 507) by `rowArt`,
+	-- and the row's content keeps the box's own coordinates.
+	partyRow = { 424, 61 },
+	rowArt = { 2, 3 },
 	equipHeading = { 589, 446, 260, 28 },
 	more = { 760, 446, 248, 28 },
 	slotY = 479,
 	slotSize = { 71, 77 },
 	play = { 586, 569, 416, 72 },
-	-- The play glyph (29 × 35 in the mockup) and its gap to the label.
-	playIcon = 35,
-	playGap = 22,
+	-- The play glyph: its cream fill is 29 × 35 in the mockup (the art's dark
+	-- outline and margin make the square larger), and its gap to the label.
+	playIcon = 46,
+	playGap = 15,
 }
 -- Detail rows: centre y of each row, the icon / label / value columns, rules.
 local DETAIL = {
@@ -136,7 +141,7 @@ function PlayWindow.new(props: Props)
 		size = TEXT_SIZE.region,
 		align = "Center",
 		-- Centred 4 px left of the plaque's centre, as the mockup draws it.
-		rect = { rp[1] - 4, rp[2], rp[3], rp[4] - 4 },
+		rect = { rp[1] - 4, rp[2] + 1, rp[3], rp[4] - 4 },
 		z = z + 1,
 	})
 	self:_details(v, z)
@@ -257,7 +262,8 @@ function PlayWindow:_map(v: Frame, z: number)
 	local side = math.max(w, h)
 	local left, top = (w - side) / 2, (h - side) / 2
 	-- The game's own island painting (D19), shared with the Journal and Map.
-	self.mapArt = Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
+	self.mapArt =
+		Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
 	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", zIndex = z + 1 })
 	local u, vv = PlayModel.MarkerUV(IslandMap.MAP_SPAN)
 	local m = RECT.marker
@@ -332,15 +338,24 @@ end
 -- One party row: crown (leader), headshot, name, ready dot (in a party), level.
 local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
-	local holder = Kit.Core.Make("Frame", {
+	local outer = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
 		BackgroundTransparency = 1,
 		LayoutOrder = order,
 		Size = UDim2.fromOffset(w, h),
 	}, parent)
-	holder:SetAttribute("UserId", row.userId)
+	outer:SetAttribute("UserId", row.userId)
 	-- The mockup's row is a light inset box, not the list-row plate.
-	Kit.Art.Plate(holder, "panel.inset", w, h, { z = 5 })
+	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5 })
+	local art = RECT.rowArt
+	w, h = 421, 56
+	local holder = Kit.Core.Make("Frame", {
+		Name = "Inside",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(art[1], art[2]),
+		Size = UDim2.fromOffset(w, h),
+		ZIndex = 6,
+	}, outer)
 	if row.leader then
 		Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 })
 	end
@@ -378,7 +393,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		}, holder)
 		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
 	end
-	return holder
+	return outer
 end
 
 -- The party rows (leader first; PlayModel.Members). `showReady` adds each
@@ -404,9 +419,9 @@ function PlayWindow:SetLoadout(hotbar, more: number?)
 	for index, slot in self.slots do
 		local item = hotbar[index]
 		-- itemId: the slot takes its art and tint from ItemInfo.
-		slot:SetItem(if item
-			then { itemId = item.catalogId, quantity = item.quantity, permanent = item.permanent }
-			else nil)
+		slot:SetItem(
+			if item then { itemId = item.catalogId, quantity = item.quantity, permanent = item.permanent } else nil
+		)
 	end
 	self.more:SetText(PlayModel.MoreText(more) or "")
 end

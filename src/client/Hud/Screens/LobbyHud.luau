@@ -32,15 +32,24 @@ LobbyHud.TOP_GAP = 2
 -- Hotbar slot lefts in the bottom region (mockup pitch 96.4).
 LobbyHud.SLOT_X = { 0, 96, 193, 289, 386, 482 }
 
--- Party list row heights (member row, empty-slot row; mockup pitch 51 / 35.6).
+-- The headshot's window in the player card art.
+LobbyHud.CARD_WINDOW = { 10, 9, 67, 63 }
+
+-- Party panel parts in the panel's px: the pinned first row and the scrolling
+-- list under it (its thin rail at x 1588..1596 of the mockup).
+LobbyHud.PIN = { 28, 55, 242, 51 }
+LobbyHud.LIST = { 28, 106, 243, 113 }
+-- Row heights (member row, empty-slot row; mockup pitch 51 / 35.6), the rule
+-- width (the rules stop short of the rail) and the member row's layout.
 LobbyHud.ROW_H = 51
 LobbyHud.EMPTY_H = 36
--- The add-player button's width in the first member row, and the gap before it.
-LobbyHud.INVITE_W = 45
-LobbyHud.INVITE_GAP = 6
+LobbyHud.RULE_W = 223
+LobbyHud.ROW = { w = 187, portrait = 41, nameX = 57, crown = 19, emptyDot = 22, emptyIndent = 5 }
+-- The add-player button in the first member row.
+LobbyHud.INVITE = { 196, 8, 45, 34 }
 
--- Spec text sizes where they differ from the kit role by more than ±1 px.
-LobbyHud.TEXT = { cardName = 19, cardLevel = 16, memberName = 13, barText = 17 }
+-- Spec text sizes (TextSize ≈ cap height ÷ 0.743, LobbyScreen.md).
+LobbyHud.TEXT = { cardName = 19, cardLevel = 16, currency = 18, partyTitle = 20, memberName = 13, barText = 17 }
 
 local function region(parent: Instance, name: string, props): Frame
 	local frame = Instance.new("Frame")
@@ -52,11 +61,6 @@ local function region(parent: Instance, name: string, props): Frame
 	end
 	frame.Parent = parent
 	return frame
-end
-
-local function sized(text, size: number)
-	text.root.TextSize = size
-	return text
 end
 
 -- actions: onProfile, onCurrency(id), onSettings, onTile(id), onParty(section?),
@@ -79,34 +83,52 @@ function LobbyHud.new(parent: Instance, actions)
 	end
 	self.fire = fire
 
-	-- Top left: the player card. A press opens Progress.
+	-- Top left: the player card (sheet 07 art, the headshot in its window). A
+	-- press opens Progress.
 	local c = LobbyHud.CARD
 	local card = Kit.Core.Root(parent, "PlayerCard", "card.player", { rect = c, name = "PlayerCard" }, c[3], c[4])
 	self.card = card
-	self.portrait = Kit.Portrait.new(card.visual, { name = "Portrait", rect = { 0, 0, 87, 81 }, frame = "square" })
-	self.plate = Kit.Panel.new(card.visual, { name = "Plate", rect = { 91, 2, 268, 76 }, variant = "plaque", pad = 0 })
-	self.name = sized(
-		Kit.Text.new(
-			card.visual,
-			{ name = "Name", rect = { 109, 17, 200, 24 }, text = "", role = "hudName", zIndex = 6 }
-		),
-		LobbyHud.TEXT.cardName
+	local win = LobbyHud.CARD_WINDOW
+	self.portrait = Kit.Portrait.new(card.visual, { name = "Portrait", rect = win, zIndex = 4 })
+	-- The card's own frame surrounds the headshot: the portrait's frame stays
+	-- hidden and the headshot fills its window on the photo backdrop.
+	self.portrait.headshot.Position = UDim2.fromScale(0, 0)
+	self.portrait.headshot.Size = UDim2.fromScale(1, 1)
+	self.portrait.headshot.BackgroundTransparency = 0
+	self.portrait.headshot.BackgroundColor3 = Kit.Tokens.Color("paperDisabled")
+	for _, child in self.portrait.base.visual:GetChildren() do
+		if child ~= self.portrait.headshot and child:IsA("GuiObject") then
+			child.Visible = false
+		end
+	end
+	self.plate = Kit.Picture.new(
+		card.visual,
+		{ name = "Card", rect = { 0, 0, c[3], c[4] }, role = "hud.playerCard", zIndex = 5 }
 	)
-	self.level = sized(
-		Kit.Text.new(
-			card.visual,
-			{ name = "Level", rect = { 109, 44, 48, 20 }, text = "", role = "hudSmall", zIndex = 6 }
-		),
-		LobbyHud.TEXT.cardLevel
-	)
-	self.cardBar = Kit.Bar.new(card.visual, { name = "XpBar", rect = { 159, 49, 161, 12 }, fill = "xp", zIndex = 6 })
+	self.name = Kit.Text.new(card.visual, {
+		name = "Name",
+		rect = { 109, 17, 200, 24 },
+		text = "",
+		role = "hudName",
+		textSize = LobbyHud.TEXT.cardName,
+		zIndex = 7,
+	})
+	self.level = Kit.Text.new(card.visual, {
+		name = "Level",
+		rect = { 109, 44, 48, 20 },
+		text = "",
+		role = "hudSmall",
+		textSize = LobbyHud.TEXT.cardLevel,
+		zIndex = 7,
+	})
+	self.cardBar = Kit.Bar.new(card.visual, { name = "XpBar", rect = { 159, 49, 161, 12 }, fill = "xp", zIndex = 7 })
 	self.cardControl = Kit.Interact.attach(card, {
 		hoverScale = false,
 		onPress = function()
 			fire("onProfile")
 		end,
 		render = function(state)
-			self.plate.plate:Show(state)
+			self.plate:SetState(state)
 		end,
 	})
 	self.parts.card = card.root
@@ -121,6 +143,8 @@ function LobbyHud.new(parent: Instance, actions)
 		name = "Coins",
 		rect = { 0, 0, 116, 46 },
 		currency = "coins",
+		textSize = LobbyHud.TEXT.currency,
+		iconSize = 30,
 		onPress = function()
 			fire("onCurrency", "coins")
 		end,
@@ -129,6 +153,8 @@ function LobbyHud.new(parent: Instance, actions)
 		name = "Gems",
 		rect = { 133, 0, 101, 46 },
 		currency = "gems",
+		textSize = LobbyHud.TEXT.currency,
+		iconSize = 30,
 		onPress = function()
 			fire("onCurrency", "gems")
 		end,
@@ -170,23 +196,34 @@ function LobbyHud.new(parent: Instance, actions)
 		Size = UDim2.fromOffset(320, t.h),
 	})
 
-	-- Right: the Party panel. The title row opens the Party window (D17).
+	-- Right: the Party panel (the 01 frame). The title row opens the Party
+	-- window (D17). The first member's row (with the add-player button) stays
+	-- put; the rest of the party, invites and free places scroll beside the
+	-- thin rail under it, as the mockup draws the rail.
 	local p = LobbyHud.PARTY
 	self.partyRegion = region(parent, "Party", {
 		Position = UDim2.new(1, -(p.right + p.w), 0, p.y),
 		Size = UDim2.fromOffset(p.w, p.h),
 	})
-	self.panel =
-		Kit.Panel.new(self.partyRegion, { name = "Panel", rect = { 0, 0, p.w, p.h }, variant = "card", pad = 0 })
-	local body = self.panel:Content()
-	local title =
-		Kit.Core.Root(body, "PartyTitle", "row.title", { name = "Title", rect = { 26, 18, 242, 40 } }, 242, 40)
+	self.panel = Kit.Picture.new(self.partyRegion, { name = "Panel", rect = { 0, 0, p.w, p.h }, role = "panel.party" })
+	local body = self.partyRegion
+	local title = Kit.Core.Root(
+		body,
+		"PartyTitle",
+		"row.title",
+		{ name = "Title", rect = { 26, 18, 242, 40 }, zIndex = 6 },
+		242,
+		40
+	)
 	self.titleRow = title
 	self.header = Kit.SectionHeader.new(title.visual, {
 		name = "Header",
 		rect = { 3, 3, 235, 34 },
 		text = "Party",
 		count = "1/8",
+		textSize = LobbyHud.TEXT.partyTitle,
+		rule = "hairline",
+		ruleRect = { 0, 32, 235, 2 },
 		zIndex = title.z + 1,
 	})
 	local lit = Kit.Art.Plate(title.visual, "row.plate", 242, 40, { z = title.z })
@@ -205,7 +242,22 @@ function LobbyHud.new(parent: Instance, actions)
 		end,
 	})
 	self.parts.partyTitle = title.root
-	self.list = Kit.Scroll.new(body, { name = "List", rect = { 28, 53, 256, 180 }, gap = 0, padBottom = 4 })
+	local pin = LobbyHud.PIN
+	self.pinned = region(body, "Pinned", {
+		Position = UDim2.fromOffset(pin[1], pin[2]),
+		Size = UDim2.fromOffset(pin[3], pin[4]),
+		ZIndex = 6,
+	})
+	local l = LobbyHud.LIST
+	self.list = Kit.Scroll.new(body, {
+		name = "List",
+		rect = l,
+		gap = 0,
+		padBottom = 0,
+		rail = "thin",
+		railOverlay = true,
+		zIndex = 6,
+	})
 
 	-- Bottom centre: level, XP bar and value, and the hotbar.
 	local b = LobbyHud.BOTTOM
@@ -214,21 +266,22 @@ function LobbyHud.new(parent: Instance, actions)
 		Position = UDim2.new(0.5, 0, 1, -b.bottom),
 		Size = UDim2.fromOffset(b.w, b.h),
 	})
-	self.barLevel = sized(
-		Kit.Text.new(self.bottom, {
-			name = "Level",
-			rect = { -40, -4, 114, 24 },
-			text = "",
-			role = "hudSmall",
-			align = "Right",
-		}),
-		LobbyHud.TEXT.barText
-	)
+	self.barLevel = Kit.Text.new(self.bottom, {
+		name = "Level",
+		rect = { -40, -4, 114, 24 },
+		text = "",
+		role = "hudSmall",
+		textSize = LobbyHud.TEXT.barText,
+		align = "Right",
+	})
 	self.bar = Kit.Bar.new(self.bottom, { name = "XpBar", rect = { 81, 0, 356, 16 }, fill = "xp" })
-	self.barText = sized(
-		Kit.Text.new(self.bottom, { name = "Xp", rect = { 448, -4, 160, 24 }, text = "", role = "hudSmall" }),
-		LobbyHud.TEXT.barText
-	)
+	self.barText = Kit.Text.new(self.bottom, {
+		name = "Xp",
+		rect = { 448, -4, 160, 24 },
+		text = "",
+		role = "hudSmall",
+		textSize = LobbyHud.TEXT.barText,
+	})
 	for index, x in LobbyHud.SLOT_X do
 		local slot = Kit.Slot.new(self.bottom, {
 			name = "Slot" .. index,
@@ -342,21 +395,62 @@ function LobbyHud:_clearRows()
 	table.clear(self.rows)
 	self.parts.members, self.parts.empty, self.parts.invite, self.parts.answers = {}, {}, nil, {}
 	self.invite = nil
-	for _, child in self.list:Content():GetChildren() do
-		if child:IsA("GuiObject") and child:GetAttribute("LobbyRow") then
-			child:Destroy()
+	for _, holder in { self.pinned, self.list:Content() } do
+		for _, child in holder:GetChildren() do
+			if child:IsA("GuiObject") and child:GetAttribute("LobbyRow") then
+				child:Destroy()
+			end
 		end
 	end
 end
 
--- A transparent row holder in the list (rows and their side buttons share it).
+-- A transparent row holder in the list, left-aligned (rows and their side
+-- buttons share it).
 function LobbyHud:_holder(order: number, height: number): Frame
 	local holder = region(self.list:Content(), "Row" .. order, {
 		LayoutOrder = order,
-		Size = UDim2.fromOffset(self.list.w - Kit.Scroll.RAIL - 6, height),
+		Size = UDim2.fromOffset(LobbyHud.LIST[3], height),
 	})
 	holder:SetAttribute("LobbyRow", true)
 	return holder
+end
+
+function LobbyHud:_member(holder: Frame, member, showReady: boolean)
+	local fire = self.fire
+	local r = LobbyHud.ROW
+	-- PlayerRow names its root after the player (`name` is both).
+	local row = Kit.PlayerRow.new(holder, {
+		rect = { 0, 0, r.w, LobbyHud.ROW_H },
+		userId = member.userId,
+		name = member.name,
+		leader = member.leader,
+		compact = true,
+		status = if showReady then (if member.ready then "ready" else "notReady") else nil,
+		portraitSize = r.portrait,
+		nameX = r.nameX,
+		nameSize = LobbyHud.TEXT.memberName,
+		crownSize = r.crown,
+		rule = false,
+		zIndex = 6,
+		onPress = function()
+			fire("onParty", nil)
+		end,
+	})
+	row.root:SetAttribute("LobbyUserId", member.userId)
+	row.root:SetAttribute("LobbyReady", member.ready)
+	-- The rule runs on under the add-player button.
+	table.insert(
+		self.rows,
+		Kit.Divider.new(holder, {
+			name = "Rule",
+			rect = { 0, LobbyHud.ROW_H - 2, LobbyHud.RULE_W, 2 },
+			variant = "hairline",
+			zIndex = 6,
+		})
+	)
+	table.insert(self.rows, row)
+	table.insert(self.parts.members, row.root)
+	return row
 end
 
 -- party: LobbyHudModel.Party(...) — members, incoming invites, free rows and
@@ -365,59 +459,31 @@ function LobbyHud:SetParty(party)
 	self:_clearRows()
 	self.header:SetCount(party.count)
 	local fire = self.fire
-	local width = self.list.w - Kit.Scroll.RAIL - 6
-	local rowW = width - LobbyHud.INVITE_W - LobbyHud.INVITE_GAP
+	local width = LobbyHud.RULE_W
+	-- The first member stays at the top with the add-player button.
+	local pinned = region(self.pinned, "Row0", { Size = UDim2.fromScale(1, 1) })
+	pinned:SetAttribute("LobbyRow", true)
+	local first = self:_member(pinned, party.members[1], party.showReady)
+	local invite = Kit.IconButton.new(pinned, {
+		name = "Invite",
+		rect = LobbyHud.INVITE,
+		variant = "invite",
+		zIndex = 7,
+		onPress = function()
+			fire("onParty", "invite")
+		end,
+	})
+	invite:SetEnabled(party.canInvite)
+	self.invite = invite
+	self.parts.invite = invite.root
+	table.insert(self.rows, invite)
 	local order, height = 0, 0
-	for index, member in party.members do
+	for index = 2, #party.members do
 		order += 1
-		local holder = self:_holder(order, LobbyHud.ROW_H)
-		-- PlayerRow names its root after the player (`name` is both).
-		local row = Kit.PlayerRow.new(holder, {
-			rect = { 0, 0, rowW, LobbyHud.ROW_H },
-			userId = member.userId,
-			name = member.name,
-			leader = member.leader,
-			rule = false,
-			onPress = function()
-				fire("onParty", nil)
-			end,
-		})
-		local label = row.content:FindFirstChild("Name")
-		if label then
-			label.TextSize = LobbyHud.TEXT.memberName
-		end
-		row.root:SetAttribute("LobbyUserId", member.userId)
-		row.root:SetAttribute("LobbyReady", member.ready)
-		-- Ready (green) or not ready (grey) on the headshot's corner (D18).
-		local d = 13
-		local ps = LobbyHud.ROW_H - 6
-		local dot = region(row.content, "Ready", {
-			Position = UDim2.fromOffset(ps - d + 1, ps - d + 2),
-			Size = UDim2.fromOffset(d, d),
-			ZIndex = row.base.z + 4,
-		})
-		Kit.Art.Plate(dot, if member.ready then "dot.green" else "dot.grey", d, d, { z = row.base.z + 4 })
-		-- The rule runs under the add-player button too.
-		table.insert(self.rows, Kit.Divider.new(holder, { name = "Rule", rect = { 0, LobbyHud.ROW_H - 8, width, 16 } }))
-		table.insert(self.rows, row)
-		table.insert(self.parts.members, row.root)
-		if index == 1 then
-			local invite = Kit.IconButton.new(holder, {
-				name = "Invite",
-				rect = { width - LobbyHud.INVITE_W, 8, LobbyHud.INVITE_W, 34 },
-				variant = "invite",
-				onPress = function()
-					fire("onParty", "invite")
-				end,
-			})
-			invite:SetEnabled(party.canInvite)
-			self.invite = invite
-			self.parts.invite = invite.root
-			table.insert(self.rows, invite)
-		end
+		self:_member(self:_holder(order, LobbyHud.ROW_H), party.members[index], party.showReady)
 		height += LobbyHud.ROW_H
 	end
-	for _, invite in party.invites do
+	for _, from in party.invites do
 		order += 1
 		local holder = self:_holder(order, LobbyHud.ROW_H)
 		local row = Kit.ListRow.new(holder, {
@@ -425,16 +491,18 @@ function LobbyHud:SetParty(party)
 			rect = { 0, 0, width - 80, LobbyHud.ROW_H },
 			variant = "line",
 			icon = "party",
-			title = invite.from,
+			title = from.from,
 			subtitle = "Party invite",
+			zIndex = 6,
 		})
 		local accept = Kit.IconButton.new(holder, {
 			name = "Accept",
 			rect = { width - 76, 9, 34, 34 },
 			variant = "small",
 			icon = "check",
+			zIndex = 6,
 			onPress = function()
-				fire("onAnswer", invite.partyId, true)
+				fire("onAnswer", from.partyId, true)
 			end,
 		})
 		local decline = Kit.IconButton.new(holder, {
@@ -442,8 +510,9 @@ function LobbyHud:SetParty(party)
 			rect = { width - 36, 9, 34, 34 },
 			variant = "small",
 			icon = "cross",
+			zIndex = 6,
 			onPress = function()
-				fire("onAnswer", invite.partyId, false)
+				fire("onAnswer", from.partyId, false)
 			end,
 		})
 		table.insert(self.rows, row)
@@ -453,6 +522,7 @@ function LobbyHud:SetParty(party)
 		table.insert(self.parts.answers, decline.root)
 		height += LobbyHud.ROW_H
 	end
+	local r = LobbyHud.ROW
 	for _ = 1, party.free do
 		order += 1
 		local holder = self:_holder(order, LobbyHud.EMPTY_H)
@@ -461,6 +531,10 @@ function LobbyHud:SetParty(party)
 			rect = { 0, 0, width, LobbyHud.EMPTY_H },
 			empty = true,
 			emptyText = "",
+			compact = true,
+			portraitSize = r.emptyDot,
+			emptyIndent = r.emptyIndent,
+			zIndex = 6,
 			onPress = function()
 				fire("onParty", if party.canInvite then "invite" else nil)
 			end,
@@ -469,10 +543,9 @@ function LobbyHud:SetParty(party)
 		table.insert(self.parts.empty, row.root)
 		height += LobbyHud.EMPTY_H
 	end
-	self.list:SetContentHeight(height + 6)
+	self.list:SetContentHeight(height + 2)
 	if self.titleControl then
-		local first = self.rows[1]
-		self.titleControl.hit.NextSelectionDown = first and first.control and first.control.hit or nil
+		self.titleControl.hit.NextSelectionDown = first.control and first.control.hit or nil
 	end
 end
 
@@ -506,6 +579,7 @@ function LobbyHud:Destroy()
 	self.bar:Destroy()
 	self.list:Destroy()
 	self.panel:Destroy()
+	self.pinned:Destroy()
 	self.notice:Destroy()
 	self.card.maid:Clean()
 	self.titleRow.maid:Clean()

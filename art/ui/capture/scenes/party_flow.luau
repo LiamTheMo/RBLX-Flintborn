@@ -122,7 +122,7 @@ local function dump()
 end
 
 local function place(window)
-	window.screen.holder.Position = UDim2.fromOffset(268 + 1136 / 2, 139 + 642 / 2)
+	window.screen.holder.Position = UDim2.fromOffset(274 + 1124 / 2, 143 + 637 / 2)
 	window.screen.scale.Scale = 1
 end
 
@@ -232,7 +232,7 @@ broadcast(view({
 	createdAt = NOW,
 	members = { { userId = 1, name = "LiamTheMo" }, { userId = 2, name = "ForestRanger" } },
 	invited = {},
-}, { invites = { { partyId = "p9", from = "Emberwick" } } }))
+}, { invites = { { partyId = "p9", from = "Emberwick", fromUserId = 4 } } }))
 check(window.selectables["invites:accept:p9"] ~= nil, "the invitation shows Accept")
 check(window.selectables["invites:decline:p9"] ~= nil, "and a decline button")
 place(window)

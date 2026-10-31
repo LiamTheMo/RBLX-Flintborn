@@ -57,12 +57,16 @@ local TAB_RECTS = { { 19, 108, 170, 58 }, { 198, 109, 165, 56 } }
 -- middle four.
 local CATEGORY_YS = { 236, 297, 363, 426, 491, 555 }
 local CATEGORY_RULES = { 354, 419, 483, 547 }
-local CARD = { 869, 109, 296, 520 }
+-- The detail card: the inset art's visible border sits 4 px inside its rect,
+-- so the rect grows by 4 and card contents are placed from the mockup's card
+-- corner.
+local CARD_PAD = 4
+local CARD = { 869 - CARD_PAD, 109 - CARD_PAD, 296 + CARD_PAD * 2, 520 + CARD_PAD * 2 }
 local ROW_TOP, ROW_PITCH = 313, 41
 
--- A rect in the card, from its top-left corner.
+-- A rect in the card, from the mockup card's top-left corner.
 local function inCard(x: number, y: number, w: number, h: number): { number }
-	return { x, y, w, h }
+	return { x + CARD_PAD, y + CARD_PAD, w, h }
 end
 
 export type Cell = {
@@ -409,7 +413,7 @@ function InventoryWindow:_layout()
 			slot.root.Visible = true
 			local item = cell.item
 			slot:SetItem(item and {
-				catalogId = item.catalogId,
+				itemId = item.catalogId,
 				quantity = item.quantity,
 				permanent = item.permanent,
 			})
@@ -499,8 +503,10 @@ function InventoryWindow:_buildCard()
 		yAlign = "Top",
 		zIndex = 9,
 	})
-	self.detailRule =
-		Kit.Divider.new(c, { name = "TopRule", rect = inCard(19, ROW_TOP - 8, 258, 16), variant = "hairline", zIndex = 9 })
+	self.detailRule = Kit.Divider.new(
+		c,
+		{ name = "TopRule", rect = inCard(19, ROW_TOP - 8, 258, 16), variant = "hairline", zIndex = 9 }
+	)
 	self.hint = Kit.Text.new(c, {
 		name = "Hint",
 		rect = inCard(24, 180, 248, 90),
@@ -555,9 +561,12 @@ function InventoryWindow:SetDetail(detail: Detail?)
 			self.rows,
 			Kit.ListRow.new(c, {
 				name = "Stat" .. index,
-				rect = inCard(29, ROW_TOP + (index - 1) * ROW_PITCH, 246, 40),
+				rect = inCard(19, ROW_TOP + (index - 1) * ROW_PITCH, 258, 40),
 				variant = "line",
 				icon = stat.icon,
+				iconRect = { 12, 10, 23, 23 },
+				textX = 50,
+				titleSize = 15,
 				title = stat.label,
 				value = stat.value,
 				zIndex = 9,

@@ -1,7 +1,8 @@
 -- The Quest Journal window (art/reference/ui/lobby/07_quest_journal.png, spec
 -- docs/ui/JournalScreen.md, ARCHITECTURE §4.7 and D12), built only from the UI
 -- kit. Four side tabs hang off the frame's left edge:
---   book    quests: the list (daily first, then main, under section headers)
+--   book    quests: the list (daily first, then main; each row tagged with
+--           its group)
 --           and the chosen quest's page: illustration, name, description,
 --           OBJECTIVES with progress and a check, REWARDS tiles, CLAIM, and the
 --           QUEST PROGRESS bar along the bottom
@@ -30,11 +31,6 @@ JournalWindow.__index = JournalWindow
 JournalWindow.FRAME = { 1072, 688 }
 JournalWindow.MARGIN = 50
 JournalWindow.SIZE = { 1072 + 2 * 50, 688 }
--- The kit frame's art sits a little inside its rect at the top, right and
--- bottom: this rect draws its edges on the mockup's (300–1372, 150–838).
-JournalWindow.FRAME_RECT = { 50, -4, 1078, 698 }
--- Where the mockup's window corner (300, 150) falls inside that frame.
-JournalWindow.ORIGIN = { 0, 4 }
 
 -- Side tabs: {id, y}. The party tab opens another window.
 JournalWindow.TAB_X = -45
@@ -44,23 +40,14 @@ JournalWindow.TAB_YS = { quests = 101, progress = 195, map = 288, party = 383 }
 local Z = 8
 local ROW = { 357, 95 }
 local ROW_GAP = 9
-local HEADER_H = 30
-local LIST = { 62, 109, 380, 512 }
+-- The thin rail sits on the mockup's scroll rule (x 735).
+local LIST = { 59, 109, 380, 512 }
 local OBJECTIVE = { 590, 59 }
 local OBJECTIVE_GAP = 6
-local OBJECTIVES = { 452, 280, 610, 197 }
+local OBJECTIVES = { 452, 280, 604, 197 }
 local TILE = { 92, 104 }
 local TILE_PITCH = 98
 local MAP = { 51, 108, 991, 512 }
-
--- Moves a kit label to a mockup rect, optionally at another text size.
-local function nudge(label: GuiObject, rect, size: number?)
-	label.Position = UDim2.fromOffset(rect[1], rect[2])
-	label.Size = UDim2.fromOffset(rect[3], rect[4])
-	if size then
-		(label :: TextLabel).TextSize = size
-	end
-end
 
 -- parent: where the ScreenGui goes (PlayerGui by default). handlers: onClose(),
 -- onTab(id), onSelect(id), onClaim(id), onParty().
@@ -74,10 +61,18 @@ function JournalWindow.new(parent: Instance?, handlers)
 	local screen = Kit.Screen.new("FlintbornJournal", { size = JournalWindow.SIZE, parent = parent })
 	self.screen = screen
 	self.maid:Give(screen)
+	-- The header as the mockup draws it: the flat compass, QUEST JOURNAL, the
+	-- rule under both the full width, and the ✕.
 	local window = Kit.Window.new(screen.window, {
-		rect = JournalWindow.FRAME_RECT,
+		rect = { JournalWindow.MARGIN, 0, JournalWindow.FRAME[1], JournalWindow.FRAME[2] },
 		title = "Quest Journal",
-		icon = "compass",
+		icon = "ink:compass",
+		iconRect = { 64, 9, 84, 88 },
+		titleRect = { 155, 16, 700, 70 },
+		titleSize = 47,
+		rule = "full",
+		ruleRect = { 39, 92, 992, 2 },
+		closeRect = { 995, 20, 60, 60 },
 		onClose = function()
 			if self.handlers.onClose then
 				self.handlers.onClose()
@@ -90,33 +85,13 @@ function JournalWindow.new(parent: Instance?, handlers)
 	self.maid:Give(window)
 	screen:SetDefaultSelection(window.close.control.hit)
 	-- Everything below is placed in mockup px less (300, 150).
-	local v = Kit.Core.Make("Frame", {
-		Name = "Content",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(JournalWindow.ORIGIN[1], JournalWindow.ORIGIN[2]),
-		Size = UDim2.fromOffset(JournalWindow.FRAME[1], JournalWindow.FRAME[2]),
-		ZIndex = Z,
-	}, window.base.visual)
+	local v = window.base.visual
 	self.visual = v
-	self:_header(v)
 	self:_tabs(v)
 	self:_entriesPage(v)
 	self:_footer(v)
 	self:SelectTab("quests")
 	return self
-end
-
--- The header as the mockup draws it: the compass, QUEST JOURNAL and the rule
--- under both, and the ✕.
-function JournalWindow:_header(v: Frame)
-	local window = self.window
-	local ox, oy = JournalWindow.ORIGIN[1], JournalWindow.ORIGIN[2]
-	nudge(window.icon, { 64 + ox, 9 + oy, 84, 88 })
-	nudge(window.title.root, { 155 + ox, 16 + oy, 700, 70 }, 47)
-	-- The rule runs under the compass too, the full width of the header.
-	window.rule.root.Visible = false
-	Kit.Divider.new(v, { name = "HeaderRule", rect = { 39, 85, 992, 16 }, variant = "header", zIndex = Z })
-	window.close.root.Position = UDim2.fromOffset(995 + ox, 20 + oy)
 end
 
 function JournalWindow:_tabs(v: Frame)
@@ -132,7 +107,10 @@ function JournalWindow:_tabs(v: Frame)
 				JournalWindow.TAB_SIZE[1],
 				JournalWindow.TAB_SIZE[2],
 			},
-			icon = JournalModel.TAB_ICONS[id],
+			icon = "ink:" .. JournalModel.TAB_ICONS[id],
+			selectedIcon = "white:" .. JournalModel.TAB_ICONS[id],
+			selectedIconTint = "leather",
+			iconSize = 50,
 			variant = "side",
 			zIndex = Z + 4,
 		})
@@ -155,7 +133,8 @@ function JournalWindow:_tabs(v: Frame)
 			JournalWindow.TAB_SIZE[1],
 			JournalWindow.TAB_SIZE[2],
 		},
-		icon = JournalModel.TAB_ICONS.party,
+		icon = "ink:" .. JournalModel.TAB_ICONS.party,
+		iconSize = 50,
 		variant = "side",
 		zIndex = Z + 4,
 		onPress = function()
@@ -177,9 +156,18 @@ function JournalWindow:_entriesPage(v: Frame)
 		ZIndex = Z,
 	}, v)
 	self.entriesFrame = page
-	Kit.Divider.new(page, { name = "ListRule", rect = { 43, 110, 16, 506 }, variant = "vertical", zIndex = Z })
-	Kit.Divider.new(page, { name = "ScrollRule", rect = { 427, 110, 16, 506 }, variant = "vertical", zIndex = Z })
-	self.list = Kit.Scroll.new(page, { name = "Quests", rect = LIST, gap = ROW_GAP, padBottom = 6, zIndex = Z })
+	-- The mockup's thin rules: left of the list, and the scroll rule the
+	-- list's thin rail runs on.
+	Kit.Divider.new(page, { name = "ListRule", rect = { 50, 110, 2, 506 }, variant = "hairline", zIndex = Z })
+	Kit.Divider.new(page, { name = "ScrollRule", rect = { 434, 110, 2, 506 }, variant = "hairline", zIndex = Z })
+	self.list = Kit.Scroll.new(page, {
+		name = "Quests",
+		rect = LIST,
+		gap = ROW_GAP,
+		padBottom = 6,
+		rail = "thin",
+		zIndex = Z,
+	})
 	self.rows = {}
 	self.listParts = KitModel.Maid()
 	self.empty = Kit.Text.new(page, {
@@ -204,41 +192,42 @@ function JournalWindow:_entriesPage(v: Frame)
 		rect = { 679, 112, 350, 50 },
 		text = "",
 		role = "detailTitle",
+		textSize = 36,
 		scaled = true,
 		zIndex = Z,
 	})
-	self.heading.root.TextSize = 36
 	self.description = Kit.Text.new(detail, {
 		name = "Description",
 		rect = { 684, 163, 350, 60 },
 		text = "",
 		role = "body",
+		textSize = 18,
 		wrap = true,
 		yAlign = "Top",
 		zIndex = Z,
 	})
-	self.description.root.TextSize = 18
 	self.description.root.LineHeight = 1.12
-	Kit.Divider.new(detail, { name = "DetailRule", rect = { 455, 238, 587, 16 }, variant = "rule", zIndex = Z })
+	Kit.Divider.new(detail, { name = "DetailRule", rect = { 455, 245, 587, 2 }, variant = "hairline", zIndex = Z })
 	self.objectivesHead = Kit.Text.new(detail, {
 		name = "ObjectivesHead",
 		rect = { 455, 250, 300, 28 },
 		text = "Objectives",
 		role = "sectionHeader",
+		textSize = 18,
 		zIndex = Z,
 	})
-	self.objectivesHead.root.TextSize = 18
 	self.objectives = Kit.Scroll.new(detail, {
 		name = "Objectives",
 		rect = OBJECTIVES,
 		gap = OBJECTIVE_GAP,
 		padBottom = 2,
+		rail = "thin",
 		zIndex = Z,
 	})
 	self.rewardsRule = Kit.Divider.new(detail, {
 		name = "RewardsRule",
-		rect = { 452, 470, 590, 16 },
-		variant = "rule",
+		rect = { 452, 477, 590, 2 },
+		variant = "hairline",
 		zIndex = Z,
 	})
 	self.rewardsHead = Kit.Text.new(detail, {
@@ -246,9 +235,9 @@ function JournalWindow:_entriesPage(v: Frame)
 		rect = { 456, 480, 300, 28 },
 		text = "Rewards",
 		role = "sectionHeader",
+		textSize = 18,
 		zIndex = Z,
 	})
-	self.rewardsHead.root.TextSize = 18
 	self.detailParts = KitModel.Maid()
 	self.claim = Kit.Button.new(detail, {
 		name = "Claim",
@@ -269,25 +258,25 @@ end
 
 -- The progress line along the bottom: label, bar and count.
 function JournalWindow:_footer(v: Frame)
-	Kit.Divider.new(v, { name = "FooterRule", rect = { 50, 619, 980, 16 }, variant = "rule", zIndex = Z })
+	Kit.Divider.new(v, { name = "FooterRule", rect = { 50, 626, 980, 2 }, variant = "hairline", zIndex = Z })
 	self.footerLabel = Kit.Text.new(v, {
 		name = "ProgressLabel",
 		rect = { 90, 634, 252, 32 },
 		text = "",
 		role = "sectionHeader",
+		textSize = 17,
 		align = "Right",
 		zIndex = Z,
 	})
-	self.footerLabel.root.TextSize = 17
 	self.footerBar = Kit.Bar.new(v, { name = "ProgressBar", rect = { 357, 640, 375, 18 }, fill = "xp", zIndex = Z })
 	self.footerText = Kit.Text.new(v, {
 		name = "ProgressText",
 		rect = { 749, 634, 300, 32 },
 		text = "",
 		role = "value",
+		textSize = 19,
 		zIndex = Z,
 	})
-	self.footerText.root.TextSize = 19
 end
 
 -- The map page, built the first time the map tab opens.
@@ -420,23 +409,6 @@ function JournalWindow:_drawList(page, tab: string)
 	local groups = page and page.groups or {}
 	local selectedHit = nil
 	for _, group in groups do
-		if group.title then
-			order += 1
-			local header = self.listParts:Give(Kit.SectionHeader.new(content, {
-				name = "Group" .. group.id,
-				size = { ROW[1], HEADER_H },
-				layoutOrder = order,
-				text = group.title,
-				count = group.note,
-				zIndex = Z + 1,
-			}))
-			if header.count then
-				header.count.TextSize = 14
-				header.count.TextColor3 = Kit.Tokens.Color("inkSoft")
-				header.count.Size = UDim2.fromOffset(200, HEADER_H - 6)
-			end
-			height += HEADER_H + ROW_GAP
-		end
 		for _, entry in group.entries do
 			order += 1
 			local row = self:_row(content, entry, order)
@@ -458,32 +430,47 @@ function JournalWindow:_drawList(page, tab: string)
 	self:_navigation(selectedHit)
 end
 
--- One list row: icon, title, line, chevron; a red dot while a reward waits and a
--- check once it is claimed.
+-- One list row: icon, title, line, chevron and the group tag ("Daily" /
+-- "Main") in its top-right corner; on the icon's corner a red dot while a
+-- reward waits and a check once it is claimed.
 function JournalWindow:_row(content: Instance, entry, order: number)
 	local row = self.listParts:Give(Kit.ListRow.new(content, {
 		name = entry.id,
 		size = ROW,
 		layoutOrder = order,
-		variant = "card",
+		variant = "soft",
 		icon = entry.icon,
+		iconRect = { 8, 12, 96, 72 },
+		textX = 119,
 		title = entry.title,
+		titleSize = 19,
 		subtitle = entry.subtitle,
+		subtitleSize = 15,
 		chevron = true,
 		zIndex = Z + 1,
 		onPress = function()
 			self:Select(entry.id)
 		end,
 	}))
-	nudge(row.icon, { 10, 11, 92, 72 })
-	nudge(row.title, { 119, 12, 205, 36 }, 19)
-	nudge(row.subtitle, { 120, 46, 200, 28 }, 15)
 	local tab = if self.tab == "map" then "quests" else self.tab
 	row:SetSelected(entry.id == self.selected[tab])
+	local v = row.base.visual
+	if entry.tag then
+		Kit.Text.new(v, {
+			name = "Group",
+			rect = { 240, 4, 104, 16 },
+			text = entry.tag,
+			role = "tag",
+			textSize = 12,
+			color = "inkSoft",
+			align = "Right",
+			zIndex = Z + 3,
+		})
+	end
 	if entry.status == "ready" then
-		Kit.Badge.new(row.base.visual, { name = "Ready", variant = "dot", rect = { 331, 9, 16, 16 }, zIndex = Z + 4 })
+		Kit.Badge.new(v, { name = "Ready", variant = "dot", rect = { 88, 8, 16, 16 }, zIndex = Z + 4 })
 	elseif entry.status == "claimed" then
-		Kit.Icon.new(row.base.visual, { name = "Claimed", rect = { 323, 8, 26, 22 }, icon = "check", zIndex = Z + 4 })
+		Kit.Icon.new(v, { name = "Claimed", rect = { 82, 6, 26, 22 }, icon = "check", zIndex = Z + 4 })
 	end
 	return row
 end
@@ -538,36 +525,35 @@ function JournalWindow:_drawDetail(entry)
 	end
 end
 
--- One objective row: icon, title, description, n / m and the check.
+-- One objective row: icon, title, description, n / m and the ring check.
 function JournalWindow:_objective(content: Instance, objective, index: number)
 	local hasCount = objective.count ~= nil and objective.needed ~= nil
 	local row = self.detailParts:Give(Kit.ListRow.new(content, {
 		name = "Objective" .. index,
 		size = OBJECTIVE,
 		layoutOrder = index,
-		variant = "row",
+		variant = "soft",
 		icon = objective.icon,
+		iconRect = { 10, 7, 54, 45 },
+		textX = 84,
 		title = objective.title,
+		titleSize = 18,
 		subtitle = objective.description,
+		subtitleSize = 14,
 		value = if hasCount then ("%d / %d"):format(objective.count, objective.needed) else nil,
+		valueSize = 19,
+		trailing = 44,
 		zIndex = Z + 1,
 	}))
-	nudge(row.icon, { 10, 7, 54, 45 })
-	nudge(row.title, { 84, 6, 330, 26 }, 18)
-	nudge(row.subtitle, { 84, 31, 380, 20 }, 14)
-	if row.value then
-		nudge(row.value, { 412, 0, 110, OBJECTIVE[2] }, 19)
-	end
-	local check = Kit.Checkbox.new(row.base.visual, {
+	-- A display, not a control: the server decides when an objective is done.
+	Kit.Checkbox.new(row:Trailing(), {
 		name = "Check",
-		rect = { 542, 14, 32, 32 },
-		variant = "tile",
+		rect = { 12, 14, 30, 30 },
+		variant = "ring",
+		readOnly = true,
 		checked = objective.done == true,
 		zIndex = Z + 3,
 	})
-	-- A display, not a control: the server decides when an objective is done.
-	check.control.hit.Visible = false
-	check.control.hit.Selectable = false
 	return row
 end
 
@@ -583,26 +569,26 @@ function JournalWindow:_reward(reward, index: number)
 	}))
 	local c = tile.base.visual
 	Kit.Icon.new(c, { name = "Icon", rect = { 12, 12, 58, 50 }, icon = reward.icon, zIndex = Z + 1 })
-	local amount = Kit.Text.new(c, {
+	Kit.Text.new(c, {
 		name = "Amount",
 		rect = { 4, 55, TILE[1] - 12, 20 },
 		text = reward.amount,
 		role = "count",
+		textSize = 18,
 		align = "Right",
 		zIndex = Z + 2,
 	})
-	amount.root.TextSize = 18
-	local label = Kit.Text.new(c, {
+	Kit.Text.new(c, {
 		name = "Label",
 		rect = { 3, 75, TILE[1] - 6, 24 },
 		text = reward.label,
 		role = "value",
+		textSize = 15,
 		align = "Center",
 		wrap = true,
 		scaled = true,
 		zIndex = Z + 2,
 	})
-	label.root.TextSize = 15
 end
 
 -- On the map tab: the chosen quest's place gets its name plate and the map

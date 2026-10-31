@@ -1,5 +1,4 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local ItemInfo = require(Shared.Items.ItemInfo)
 local LobbyHudModel = require(Shared.UI.LobbyHudModel)
 
 local ME = { userId = 1, name = "LiamTheMo" }
@@ -36,6 +35,7 @@ test("solo: a party of one led by you, with your ready flag", function()
 	expectEq(party.members[1].self, true, "self")
 	expectEq(party.free, 7, "free rows up to the cap")
 	expectEq(party.canInvite, true, "solo can invite")
+	expectEq(party.showReady, false, "no ready dot alone (matches M01)")
 end)
 
 test("in a party: leader crown, ready flags, invite rights", function()
@@ -60,6 +60,7 @@ test("in a party: leader crown, ready flags, invite rights", function()
 	expectEq(party.members[2].self, true, "you")
 	expectEq(party.free, 6, "free rows")
 	expectEq(party.canInvite, false, "only the leader invites")
+	expectEq(party.showReady, true, "ready dots in a party")
 	expectEq(#party.invites, 1, "incoming invites pass through")
 	view.party.leader = 1
 	expectEq(LobbyHudModel.Party(view, ME).canInvite, true, "leader invites")
@@ -81,10 +82,9 @@ test("hotbar shows what lands in the run's hotbar", function()
 		{ catalogId = "StoneSpear", quantity = 1 },
 	})
 	-- Tools and weapons prefer the hotbar; materials go to the backpack first.
-	expectEq(slots[1] and slots[1].catalogId, "StoneAxe", "axe first")
+	expectEq(slots[1] and slots[1].itemId, "StoneAxe", "axe first")
 	expectEq(slots[1] and slots[1].permanent, true, "permanent kept")
-	expectEq(slots[1] and slots[1].icon, ItemInfo.Icon("StoneAxe"), "icon id for art-less items")
-	expectEq(slots[2] and slots[2].catalogId, "StoneSpear", "spear second")
+	expectEq(slots[2] and slots[2].itemId, "StoneSpear", "spear second")
 	expectEq(slots[3], false, "wood stays in the backpack")
 	local many = {}
 	for _ = 1, 8 do

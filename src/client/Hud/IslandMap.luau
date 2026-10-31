@@ -1,4 +1,4 @@
--- The painted island map (art/ui/map/island.png, uploaded as pm_map_island) inside
+-- The painted island map (art/ui/map/island.png, the kit role map.island) inside
 -- a clipped frame: zoom in and out, drag to pan, pins for places with a name
 -- plate on the chosen one, and an optional live marker. Drawn from the UI kit
 -- (pins, plate, zoom buttons, marker); the Journal's map tab, the world Map and
@@ -23,8 +23,6 @@ IslandMap.ZOOMS = { 1, 1.4, 2 }
 IslandMap.PIN = 50
 -- Extra touch room round a pin, in map pixels.
 IslandMap.PIN_PAD = 12
--- The painting itself (the map is art, not a kit role).
-IslandMap.IMAGE = "pm_map_island"
 
 -- Landmarks big enough to find your way by; the rest stay off the map so it
 -- does not crowd.
@@ -87,11 +85,10 @@ function IslandMap.new(parent: Instance, r, opts)
 		ZIndex = z,
 	}, clip)
 	self.canvas = canvas
-	Kit.Art.Sprite(IslandMap.IMAGE, side, side, canvas, {
-		Name = "Island",
-		Size = UDim2.fromScale(1, 1),
-		ZIndex = z,
-	})
+	local island = Kit.Picture.new(canvas, { name = "Island", size = { side, side }, role = "map.island", zIndex = z })
+	-- It follows the canvas as it zooms.
+	island.root.Size = UDim2.fromScale(1, 1)
+	self.maid:Give(island)
 	self.pins = {}
 	for _, place in opts.places or IslandMap.Places() do
 		self:_pin(place, z)

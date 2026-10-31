@@ -55,12 +55,7 @@ local function role(): string
 end
 
 local function playerOf(userId: number): Player?
-	for _, other in Players:GetPlayers() do
-		if other.UserId == userId then
-			return other
-		end
-	end
-	return nil
+	return Players:GetPlayerByUserId(userId)
 end
 
 local function levelOf(userId: number): number?

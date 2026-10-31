@@ -19,19 +19,17 @@ local Kit = require(script.Parent.Parent.Kit)
 local SettingsWindow = {}
 SettingsWindow.__index = SettingsWindow
 
--- The frame art draws its outline about 6 px inside its rect, so the window is
--- that much larger than the mockup's outline (1098 × 656) and its content sits
--- in a frame offset by INSET, in the mockup's window px.
-SettingsWindow.SIZE = { 1110, 666 }
-SettingsWindow.INSET = { 6, 5 }
+-- The mockup's window outline (287, 150, 1098 × 656).
+SettingsWindow.SIZE = { 1098, 656 }
 
--- Tab icons: the kit's closest art to the mockup's gamepad, speaker, monitor
--- and gears glyphs (D19).
+-- Tab icons: the kit's flat glyphs, dark on parchment and white on the
+-- selected leather tab, as the mockup draws its gamepad, speaker, monitor and
+-- gears (the kit's gamepad, speaker and monitor are stand-in drawings, D19).
 SettingsWindow.TABS = {
-	{ id = "Gameplay", icon = "compass" },
-	{ id = "Audio", icon = "speech" },
-	{ id = "Graphics", icon = "mountain" },
-	{ id = "Controls", icon = "gear_alt" },
+	{ id = "Gameplay", icon = "gamepad" },
+	{ id = "Audio", icon = "speaker" },
+	{ id = "Graphics", icon = "monitor" },
+	{ id = "Controls", icon = "gears" },
 }
 
 -- What RESET puts back on each tab: its settings and its keys.
@@ -81,6 +79,9 @@ function SettingsWindow.KeyText(key: string?): string
 	end
 	return KEY_TEXT[key] or Keybinds.Display(key)
 end
+
+-- The title label's place (its ink lands at 422, 188 on screen).
+local HEADER = { titleX = 133, titleY = 26 }
 
 -- Columns (window px). The left column holds the page's settings, the right
 -- one KEY BINDS (Gameplay) or the page's notes.
@@ -151,41 +152,21 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		end
 	end
 	screen.window.SelectionGroup = true
-	local window = Kit.Window.new(screen, { title = "Settings", icon = "gear", showClose = false })
-	self.window = window
-	local visual = Kit.Core.Make("Frame", {
-		Name = "Content",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(SettingsWindow.INSET[1], SettingsWindow.INSET[2]),
-		Size = UDim2.fromOffset(1098, 656),
-		ZIndex = window.base.z + 2,
-	}, window.base.visual)
-	-- The banner header placed as M03 draws it (spec: gear 337, 172, 63 × 65;
-	-- SETTINGS cap 34 px from x 422; the rule at y 237 from x 317; close
-	-- 1304, 169, 61 × 57). The gear is the mockup's dark solid glyph: the kit
-	-- gear in ink.
-	local inset = SettingsWindow.INSET
-	if window.icon then
-		window.icon.Position = UDim2.fromOffset(inset[1] + 47.5, inset[2] + 20.5)
-		window.icon.Size = UDim2.fromOffset(68, 68)
-		if window.icon:IsA("ImageLabel") then
-			(window.icon :: ImageLabel).ImageColor3 = Kit.Tokens.Color("ink")
-		end
-	end
-	local title = window.title.root :: TextLabel
-	title.TextSize = 44
-	title.Position = UDim2.fromOffset(title.Position.X.Offset, title.Position.Y.Offset + 9)
-	window.rule.root.Visible = false
-	Kit.Divider.new(visual, { name = "TitleRule", rect = { 30, 80, 973, 14 }, variant = "header", zIndex = 5 })
-	self.close = Kit.IconButton.new(visual, {
-		name = "Close",
-		variant = "close",
-		rect = { 1014, 14.5, 66, 64 },
-		zIndex = 9,
-		onPress = function()
-			screen:Close()
-		end,
+	-- The banner header as M03 draws it (spec: the dark gear 337, 172, 63 × 65;
+	-- SETTINGS cap 34 px from x 422; the rule at y 237 from x 317 to 1290;
+	-- close 1304, 169, 61 × 57).
+	local window = Kit.Window.new(screen, {
+		title = "Settings",
+		icon = "ink:gears",
+		iconRect = { 50, 22, 63, 65 },
+		titleSize = 44,
+		titleRect = { HEADER.titleX, HEADER.titleY, 600, 54 },
+		ruleRect = { 30, 86, 973, 2 },
+		closeRect = { 1017, 19, 61, 57 },
 	})
+	self.window = window
+	self.close = window.close
+	local visual = window.base.visual
 	self.visual = visual
 
 	local tabs = {}
@@ -193,11 +174,14 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		local item = Kit.Tab.new(visual, {
 			id = tab.id,
 			name = tab.id,
-			-- The plate art sits 3–4 px inside its rect (mockup tabs 316–549 × 80,
-			-- tops 259, 353, 446, 539).
-			rect = { 26, 106 + (index - 1) * 93.33, 241, 87 },
+			-- Mockup tabs 316–549 × 80, tops 259, 353, 446, 539.
+			rect = { 29, 109 + (index - 1) * 93.33, 234, 80 },
 			label = tab.id,
-			icon = tab.icon,
+			icon = "ink:" .. tab.icon,
+			selectedIcon = "white:" .. tab.icon,
+			iconSize = 46,
+			iconX = 22,
+			labelX = 92,
 			variant = "large",
 			zIndex = 8,
 		})
@@ -216,20 +200,37 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		self:SelectTab(id)
 	end)
 
-	Kit.Divider.new(visual, { name = "TabDivider", rect = { 268, 109, 18, 442 }, variant = "vertical", zIndex = 7 })
+	-- Rule.Column: 1 px at x 564 on screen.
+	Kit.Divider.new(visual, {
+		name = "TabDivider",
+		rect = { 277, 109, 1, 442 },
+		variant = "ink",
+		color = "rule",
+		thickness = 1,
+		zIndex = 7,
+	})
 	self:_gameplay(self.pages.Gameplay)
 	self:_audio(self.pages.Audio)
 	self:_graphics(self.pages.Graphics)
 	self:_controlsPage(self.pages.Controls)
 
 	-- The rule above the buttons, the plant sketch and RESET / APPLY.
-	Kit.Divider.new(visual, { name = "BottomRule", rect = { 115, 560, 948, 14 }, variant = "rule", zIndex = 7 })
+	Kit.Divider.new(visual, {
+		name = "BottomRule",
+		rect = { 115, 567, 948, 2 },
+		variant = "ink",
+		color = "inkSoft",
+		zIndex = 7,
+	})
 	Kit.Icon.new(visual, { name = "Sketch", rect = { 70, 522, 44, 118 }, icon = "lk_emblem_leaf", zIndex = 7 })
 	self.reset = Kit.Button.new(visual, {
 		name = "Reset",
 		rect = { 551, 581, 232, 55 },
 		label = "Reset",
 		variant = "secondary",
+		icon = "ink:refresh",
+		iconSize = 28,
+		iconGap = 15,
 		zIndex = 8,
 		onPress = function()
 			self:CloseDropdowns()
@@ -276,12 +277,28 @@ end
 
 -- A section header with its rule (GAMEPLAY, KEY BINDS) and the line-art emblem
 -- the mockup draws beside it.
-local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?)
-	local heading =
-		Kit.SectionHeader.new(page, { name = "Header", rect = { x, HEADER_Y, w, HEADER_H }, text = text, zIndex = 7 })
-	-- The spec's heading size (cap 16–17 px).
-	heading.label.TextSize = 22
-	heading.label.Size = UDim2.fromOffset(w, HEADER_H - 6)
+-- The heading is the spec's size (cap 16–17 px); its rule is Rule.Heading
+-- (#C49061, 2 px), 40 px under the header's top.
+local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?, y: number?)
+	local top = y or HEADER_Y
+	-- A Kit.Text heading rather than a SectionHeader: the header sizes its label
+	-- to a measured width that comes out short for Merriweather Bold at 22 px
+	-- and cuts the word off ("GAMEP…").
+	Kit.Text.new(page, {
+		name = "Header",
+		rect = { x, top, w, HEADER_H - 6 },
+		text = text,
+		role = "sectionHeader",
+		textSize = 22,
+		zIndex = 7,
+	})
+	Kit.Divider.new(page, {
+		name = "HeaderRule",
+		rect = { x, top + 39, w, 2 },
+		variant = "ink",
+		color = "rule",
+		zIndex = 7,
+	})
 	if emblem then
 		Kit.Icon.new(page, { name = "Emblem", rect = emblem[2], icon = emblem[1], zIndex = 7 })
 	end
@@ -336,13 +353,14 @@ end
 function SettingsWindow:_check(page: Instance, top: number, label: string, description: string, key: string)
 	local box = Kit.Checkbox.new(page, {
 		name = key,
-		-- The box art sits about 3 px inside its 38 px rect (mockup box 33 px).
-		rect = { LABEL_X - 2, top - 5, LEFT_W - 20, 41 },
+		rect = { LABEL_X + 2, top - 2, LEFT_W - 24, 40 },
 		label = label,
 		description = description,
 		checked = self.values[key] == true,
 		variant = "gold",
-		boxSize = 38,
+		boxSize = 33,
+		textSize = 17,
+		descriptionSize = 14,
 		zIndex = 7,
 		onToggle = function(checked)
 			self:_change(key, checked)
@@ -355,9 +373,16 @@ function SettingsWindow:_check(page: Instance, top: number, label: string, descr
 	return box
 end
 
--- The thin rule between a page's sliders and its checkboxes.
+-- The thin rule between a page's sliders and its checkboxes (Rule.Section, 1 px).
 local function sectionRule(page: Instance, y: number)
-	Kit.Divider.new(page, { name = "SectionRule", rect = { LEFT_X - 1, y - 7, 385, 14 }, variant = "rule", zIndex = 7 })
+	Kit.Divider.new(page, {
+		name = "SectionRule",
+		rect = { LEFT_X - 1, y, 385, 1 },
+		variant = "ink",
+		color = "rule",
+		thickness = 1,
+		zIndex = 7,
+	})
 end
 
 -- The right column's notes: a header and wrapped text.
@@ -374,14 +399,20 @@ local function notes(page: Instance, title: string, text: string, y: number?, h:
 	})
 end
 
--- A key row: label and one cap. `id` is the rebindable action
+-- A key row: label, a hairline under it and one cap. `id` is the rebindable action
 -- (nil for the fixed movement keys, whose caps take no presses).
 function SettingsWindow:_keyRow(parent: Instance, page: Instance, y: number, label: string, id: string?, fixed: string?)
 	local x = if parent == page then 744 else 10
 	local capX = if parent == page then KEY_X else LEFT_W - 22 - KEY_W
-	-- The mockup's faint hairlines between key rows are left out: the kit's only
-	-- rule (lk_divider_line) is far darker and would stripe the list.
 	rowLabel(parent, label, { x, y, capX - x - 14, KEY_H }, "Label_" .. (id or label), 15)
+	-- Rule.Key: a faint 1 px line under the label, 31 px below the row's top.
+	Kit.Divider.new(parent, {
+		name = "Rule",
+		rect = { x - 1, y + 31, capX - x - 6, 1 },
+		variant = "hairline",
+		thickness = 1,
+		zIndex = 6,
+	})
 	local cap = Kit.KeyCap.new(parent, {
 		name = "Key_" .. (id or label),
 		rect = { capX, y, KEY_W, KEY_H },
@@ -537,10 +568,7 @@ function SettingsWindow:_controlsPage(page: Instance)
 		end,
 	})
 	self:_control(page, replay, "replayTutorial")
-	Kit.SectionHeader.new(
-		page,
-		{ name = "KeysHeader", rect = { RIGHT_X, 310, 263, HEADER_H }, text = "Changing Keys", zIndex = 7 }
-	)
+	header(page, RIGHT_X, 263, "Changing Keys", nil, 310)
 	self.notes.Controls = Kit.Text.new(page, {
 		name = "KeyNote",
 		rect = { RIGHT_X + 12, 364, RIGHT_W - 12, 180 },
@@ -554,7 +582,14 @@ end
 
 -- The column divider between a page's two columns.
 function SettingsWindow:_divider(page: Instance)
-	Kit.Divider.new(page, { name = "ColumnDivider", rect = { 697, 109, 18, 442 }, variant = "vertical", zIndex = 7 })
+	-- Rule.Column: 2 px at x 993 on screen.
+	Kit.Divider.new(page, {
+		name = "ColumnDivider",
+		rect = { 706, 109, 2, 442 },
+		variant = "ink",
+		color = "rule",
+		zIndex = 7,
+	})
 end
 
 -- Gamepad order on the open page: tabs up and down the left; right from a tab

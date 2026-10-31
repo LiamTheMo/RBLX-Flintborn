@@ -38,7 +38,7 @@ local view = SettingsWindow.new(Players.LocalPlayer.PlayerGui, {
 view.screen:Open()
 -- Pinned to the mockup's scale and place (in game Kit.Scale fits and centres it).
 view.screen.scale.Scale = 1
-view.screen.holder.Position = UDim2.fromOffset(287 - 6 + 1110 / 2, 150 - 5 + 666 / 2)
+view.screen.holder.Position = UDim2.fromOffset(287 + 1098 / 2, 150 + 656 / 2)
 
 local values = SettingsRules.Resolve(nil)
 view:SetValues(values)

@@ -46,14 +46,14 @@ local function member(id, ready)
 end
 
 -- Builds the window for `view`, lets `after(window)` force states, dumps a page.
-local function page(view, candidates, opts, after, fromIds)
+local function page(view, candidates, opts, after)
 	opts = opts or {}
 	opts.now = opts.now or NOW
 	opts.levels = LEVELS
 	local window = PartyWindow.new({})
-	window:SetData(PartyModel.WindowData(view, ME, candidates, opts, fromIds))
+	window:SetData(PartyModel.WindowData(view, ME, candidates, opts))
 	window:Open()
-	window.screen.holder.Position = UDim2.fromOffset(268 + 1136 / 2, 139 + 642 / 2)
+	window.screen.holder.Position = UDim2.fromOffset(274 + 1124 / 2, 143 + 637 / 2)
 	window.screen.scale.Scale = 1
 	if after then
 		after(window)
@@ -120,10 +120,10 @@ page({
 		members = { member(2, true), member(1, false) },
 		invited = {},
 	},
-	invites = { { partyId = "p3", from = "Emberwick" } },
+	invites = { { partyId = "p3", from = "Emberwick", fromUserId = 4 } },
 	ready = false,
 	maxSize = 8,
-}, {}, {}, nil, { 4 })
+}, {}, {})
 
 -- 4. Alone, nobody else here ---------------------------------------------------------------
 page({ party = nil, invites = {}, ready = false, maxSize = 8 }, {}, {})

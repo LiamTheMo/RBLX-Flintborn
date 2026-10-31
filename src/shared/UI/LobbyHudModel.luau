@@ -5,7 +5,6 @@
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
-local ItemInfo = require(script.Parent.Parent.Items.ItemInfo)
 local HudModel = require(script.Parent.HudModel)
 
 local LobbyHudModel = {}
@@ -47,7 +46,8 @@ export type Member = { userId: number, name: string, leader: boolean, ready: boo
 
 -- The party panel from LobbyController.PartyView() and you ({userId, name}):
 -- {count = "1/8", members = {Member}, free = empty rows, invites = {{partyId,
--- from}}, canInvite}. Alone you are a party of one, led by you; your ready flag
+-- from}}, canInvite, showReady}. Ready dots show only in a party of two or more,
+-- where the leader reads them before Play (alone the row matches M01). Alone you are a party of one, led by you; your ready flag
 -- counts then too (it works without a party). Only the leader (or a solo
 -- player) can invite, and only while there is room.
 function LobbyHudModel.Party(view, me: { userId: number, name: string })
@@ -82,15 +82,16 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string })
 		free = math.max(0, maxSize - #members),
 		invites = view.invites or {},
 		canInvite = leads and #members < maxSize,
+		showReady = #members > 1,
 	}
 end
 
 -- What lands in the run's hotbar for the deploy preview ({catalogId, quantity,
 -- permanent}[]): the same packing the server applies at run start
 -- (InventoryRules.FromItems, as LoadoutService does). A list of
--- HOTBAR_SLOTS entries, each an item ({catalogId, quantity, permanent, icon}:
--- `icon` is the ItemInfo icon shown until the item has art of its own) or false
--- for an empty slot; all empty while the preview is unknown (nil).
+-- HOTBAR_SLOTS entries, each an item ({itemId, quantity, permanent}; the Kit
+-- takes its art and tint from ItemInfo) or false for an empty slot; all empty
+-- while the preview is unknown (nil).
 function LobbyHudModel.Hotbar(items): { any }
 	local slots = table.create(LobbyHudModel.HOTBAR_SLOTS, false)
 	if type(items) ~= "table" then
@@ -101,10 +102,9 @@ function LobbyHudModel.Hotbar(items): { any }
 		local entry = inventory.hotbar[index]
 		if entry then
 			slots[index] = {
-				catalogId = entry.catalogId,
+				itemId = entry.catalogId,
 				quantity = entry.quantity,
 				permanent = entry.permanent == true,
-				icon = ItemInfo.Icon(entry.catalogId),
 			}
 		end
 	end

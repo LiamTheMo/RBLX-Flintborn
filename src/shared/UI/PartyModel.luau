@@ -6,7 +6,7 @@
 --
 -- `view` is LobbyController.PartyView():
 --   { party = nil | {id, leader, createdAt, members = {{userId, name, ready}},
---     invited = {userId}}, invites = {{partyId, from}}, ready, maxSize }
+--     invited = {userId}}, invites = {{partyId, from, fromUserId}}, ready, maxSize }
 
 local PartyModel = {}
 
@@ -243,9 +243,9 @@ export type Options = {
 -- Everything the Party window draws (PartyWindow:SetData) from the party view,
 -- you ({userId, name}), the players you could invite and the controller's
 -- in-flight requests. `levels` maps userId to the Level attribute (missing
--- levels are left out, never guessed); `invites[i].userId` is filled from
--- `fromUserIds[i]` when the controller could tell who sent it.
-function PartyModel.WindowData(view, me, candidates: { Candidate }, opts: Options?, fromUserIds: { number? }?)
+-- levels are left out, never guessed); each invite's inviter comes from the
+-- view's `fromUserId`.
+function PartyModel.WindowData(view, me, candidates: { Candidate }, opts: Options?)
 	opts = opts or {}
 	local levels = opts.levels or {}
 	local maxSize = maxOf(view)
@@ -258,8 +258,8 @@ function PartyModel.WindowData(view, me, candidates: { Candidate }, opts: Option
 		row.level = row.level or levels[row.userId]
 	end
 	local invites = {}
-	for i, invite in view and view.invites or {} do
-		local from = fromUserIds and fromUserIds[i]
+	for _, invite in view and view.invites or {} do
+		local from = if type(invite.fromUserId) == "number" then invite.fromUserId else nil
 		table.insert(invites, {
 			partyId = invite.partyId,
 			from = invite.from,

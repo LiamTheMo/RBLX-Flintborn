@@ -69,22 +69,6 @@ local function candidates(): { PartyModel.Candidate }
 	return list
 end
 
--- Who sent each invite: the view names the leader by display name only, so
--- a player is matched only when exactly one in this server has that name.
-local function inviterIds(view): { number? }
-	local ids = {}
-	for i, invite in view.invites or {} do
-		local found, count = nil, 0
-		for _, other in Players:GetPlayers() do
-			if other.DisplayName == invite.from then
-				found, count = other.UserId, count + 1
-			end
-		end
-		ids[i] = if count == 1 then found else nil
-	end
-	return ids
-end
-
 local function data()
 	local view = LobbyController.PartyView()
 	return PartyModel.WindowData(view, { userId = player.UserId, name = player.DisplayName }, candidates(), {
@@ -96,7 +80,7 @@ local function data()
 		readyPending = readyPending,
 		leaveBusy = leaveBusy,
 		friends = friendsAllowed,
-	}, inviterIds(view))
+	})
 end
 
 local function refresh()
@@ -227,16 +211,15 @@ end
 local function startClock()
 	clockToken += 1
 	local token = clockToken
-	task.spawn(function()
-		while true do
-			task.wait(PartyController.CLOCK_SECONDS)
-			if token ~= clockToken or window == nil or not window:IsOpen() then
-				return
-			end
-			local party = LobbyController.PartyView().party
-			window:SetCreated(PartyModel.RelativeTime(party and party.createdAt, now()))
+	local function tick()
+		if token ~= clockToken or window == nil or not window:IsOpen() then
+			return
 		end
-	end)
+		local party = LobbyController.PartyView().party
+		window:SetCreated(PartyModel.RelativeTime(party and party.createdAt, now()))
+		task.delay(PartyController.CLOCK_SECONDS, tick)
+	end
+	task.delay(PartyController.CLOCK_SECONDS, tick)
 end
 
 local function ensureWindow()

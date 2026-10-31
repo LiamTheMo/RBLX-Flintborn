@@ -80,13 +80,9 @@ spy(JournalController, "Toggle", "Journal.Toggle")
 spy(VaultController, "Open", "Vault.Open")
 spy(VaultController, "Toggle", "Vault.Toggle")
 spy(ProgressionController, "Toggle", "Progress.Toggle")
--- Party and Play are being added by their own screens: spy on them when present.
-for _, name in { "PartyController", "PlayController" } do
-	local module = Controllers:FindFirstChild(name)
-	if module then
-		spy(require(module), "Open", name .. ".Open")
-	end
-end
+spy(require(Controllers.PartyController), "Open", "PartyController.Open")
+spy(require(Controllers.PlayController), "Open", "PlayController.Open")
+local VaultChanged = VaultController.Changed
 local function last()
 	return opened[#opened] and opened[#opened][1]
 end
@@ -109,12 +105,12 @@ check(math.abs(hud.bar.fraction - 0.6) < 1e-6 and math.abs(hud.cardBar.fraction 
 player:SetAttribute("Coins", 2450)
 player:SetAttribute("Gems", 125)
 check(hud.coins.label.Text == "2,450" and hud.gems.label.Text == "125", "currency from attributes")
-check(hud.slots[1].item and hud.slots[1].item.catalogId == "StoneAxe", "hotbar slot 1 from the deploy preview")
-check(hud.slots[2].item and hud.slots[2].item.catalogId == "StoneSpear", "hotbar slot 2 from the deploy preview")
+check(hud.slots[1].item and hud.slots[1].item.itemId == "StoneAxe", "hotbar slot 1 from the deploy preview")
+check(hud.slots[2].item and hud.slots[2].item.itemId == "StoneSpear", "hotbar slot 2 from the deploy preview")
 check(hud.slots[3].item == nil, "materials stay out of the hotbar")
 preview = { { catalogId = "StonePickaxe", quantity = 1 } }
 LobbyController.FetchPreview()
-check(hud.slots[1].item and hud.slots[1].item.catalogId == "StonePickaxe", "a new preview redraws the hotbar")
+check(hud.slots[1].item and hud.slots[1].item.itemId == "StonePickaxe", "a new preview redraws the hotbar")
 check(hud.slots[2].item == nil, "and empties the rest")
 
 -- Party view from the server.
@@ -156,29 +152,27 @@ check(last() == "Trade.Toggle", "Trade tile toggles Trade")
 press(hud.tiles.Quests)
 check(last() == "Journal.Open", "Quests tile opens the Journal")
 press(hud.tiles.Inventory)
-check(last() == "Vault.Open" or last() == "Vault.Toggle", "Inventory tile opens the Inventory")
-local before = #opened
+check(last() == "Vault.Open" and opened[#opened][2] == "Backpack", "Inventory tile opens the Backpack tab")
 press(hud.tiles.Play)
-local play = Controllers:FindFirstChild("PlayController")
-check(
-	if play then last() == "PlayController.Open" else #opened == before,
-	"Play tile opens the Play window (nothing until PlayController exists)"
-)
+check(last() == "PlayController.Open", "Play tile opens the Play window")
 press(hud.coins)
 check(last() == "Wallet.Open", "Coins open the Shop")
 press(hud.settings)
 check(last() == "Settings.Toggle", "the gear toggles Settings")
 hud.cardControl:Activate()
 check(last() == "Progress.Toggle", "the card opens Progress")
-before = #opened
 hud.titleControl:Activate()
-local party = Controllers:FindFirstChild("PartyController")
+check(last() == "PartyController.Open" and opened[#opened][2] == nil, "the Party title opens the Party window")
+press(hud.invite)
 check(
-	if party then last() == "PartyController.Open" else #opened == before,
-	"the Party title opens the Party window (nothing until PartyController exists)"
+	last() == "PartyController.Open" and opened[#opened][2] == "invite",
+	"the add-player button opens its invite list"
 )
 press(hud.slots[1])
-check(last() == "Vault.Open" or last() == "Vault.Toggle", "a hotbar slot opens the Inventory")
+check(last() == "Vault.Open", "a hotbar slot opens the Inventory")
+preview = { { catalogId = "StoneSpear", quantity = 1 } }
+VaultChanged:Fire({})
+check(hud.slots[1].item and hud.slots[1].item.itemId == "StoneSpear", "VaultController.Changed refreshes the hotbar")
 
 -- Answering an invite runs the party action.
 local accept

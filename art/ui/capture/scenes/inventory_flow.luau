@@ -4,6 +4,12 @@
 -- picked amount, take an item, STORE ALL, the vault-full upgrade link, the
 -- extraction receipt and close. Remotes are mocked. The last page is the
 -- window after the flow (Vault tab).
+-- Capture harness workaround: the injected text widths are keyed "Font.X" while
+-- Enum items now print as "Enum.Font.X", so measured labels fell back to
+-- estimates (reported to the Kit builder; harmless once that is fixed).
+for key, widths in table.clone(__textWidths or {}) do
+	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
+end
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 workspace:SetAttribute("FlintbornPlaceRole", "Lobby")

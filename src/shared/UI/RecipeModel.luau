@@ -19,11 +19,8 @@ local RecipeModel = {}
 
 RecipeModel.ALL = "All"
 
--- Codes the shared Reasons table does not word (forge refusals).
+-- Forge refusal codes the shared Reasons table does not word.
 RecipeModel.REASONS = {
-	MissingMaterials = "your vault doesn't hold enough materials for that",
-	Locked = "you haven't unlocked that recipe yet",
-	WrongSource = "that item can't be converted by this recipe",
 	InTrade = "finish your trade first",
 	InTransit = "your items are still on their way",
 	UnknownRecipe = "that recipe no longer exists",
@@ -33,12 +30,6 @@ RecipeModel.REASONS = {
 function RecipeModel.NameOf(catalogId: string?): string
 	local def = ItemCatalog.Get(catalogId)
 	return def and def.name or tostring(catalogId)
-end
-
--- The kit icon that depicts an item while it has no art of its own
--- (Kit.ItemIcon's `icon`), or nil: ItemInfo.Icon, the one source.
-function RecipeModel.Icon(catalogId: string?): string?
-	return ItemInfo.Icon(catalogId)
 end
 
 -- The item's stat line from ItemInfo.StatRows, at most `max` rows

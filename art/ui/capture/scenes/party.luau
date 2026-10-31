@@ -39,7 +39,7 @@ local window = PartyWindow.new({})
 window:SetData(data)
 window:Open()
 -- Where the mockup draws the window (its centre is 836, 461.5).
-window.screen.holder.Position = UDim2.fromOffset(268 + 1136 / 2, 139 + 642 / 2)
+window.screen.holder.Position = UDim2.fromOffset(274 + 1124 / 2, 143 + 637 / 2)
 window.screen.scale.Scale = 1
 __dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })
 window:Destroy()

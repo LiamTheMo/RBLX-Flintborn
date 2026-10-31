@@ -20,7 +20,8 @@ local JournalModel = {}
 
 -- The side tabs, top to bottom. "party" opens the Party window instead of a page.
 JournalModel.TABS = { "quests", "progress", "map", "party" }
-JournalModel.TAB_ICONS = { quests = "journal", progress = "trophy", map = "map_pin", party = "party" }
+-- Flat glyph ids (drawn "ink:<id>", the selected tab "white:<id>" in leather).
+JournalModel.TAB_ICONS = { quests = "book", progress = "trophy", map = "map_pin", party = "people" }
 
 -- Per quest action: the row icon, the detail illustration, the row's line, and
 -- the objective's title and description (what the server counts).
@@ -96,6 +97,8 @@ JournalModel.TRACK_ICONS = {
 }
 
 -- Groups in list order: daily quests first (they reset), then main quests.
+-- Each quest entry carries its group as `tag` ("Daily" | "Main"), drawn small
+-- on its row, so the grouping reads without headers pushing the rows down.
 JournalModel.GROUPS = {
 	{ id = "Daily", title = "Daily Quests" },
 	{ id = "Once", title = "Main Quests" },
@@ -226,6 +229,7 @@ function JournalModel.QuestEntry(quest, now: number, claiming: boolean?)
 		icon = action.icon,
 		title = quest.name or quest.id,
 		subtitle = action.line,
+		tag = if quest.repeats == "Daily" then "Daily" else "Main",
 		status = JournalModel.Status(quest),
 		illustration = action.illustration,
 		heading = quest.name or quest.id,
@@ -247,7 +251,7 @@ function JournalModel.QuestEntry(quest, now: number, claiming: boolean?)
 	}
 end
 
--- The book tab: groups of entries ({id, title, note, entries}) and the footer.
+-- The book tab: groups of entries ({id, entries}, daily first) and the footer.
 function JournalModel.QuestPage(quests, now: number, claimingId: string?)
 	local groups = {}
 	for _, group in JournalModel.Groups(quests) do
@@ -255,14 +259,7 @@ function JournalModel.QuestPage(quests, now: number, claimingId: string?)
 		for _, quest in group.quests do
 			table.insert(entries, JournalModel.QuestEntry(quest, now, claimingId == quest.id))
 		end
-		table.insert(groups, {
-			id = group.id,
-			title = group.title,
-			note = if group.id == "Daily"
-				then "Resets in " .. JournalModel.Duration(JournalModel.SecondsToReset(now))
-				else "Pays once",
-			entries = entries,
-		})
+		table.insert(groups, { id = group.id, entries = entries })
 	end
 	local done, total, fraction = JournalModel.Progress(quests)
 	return {
