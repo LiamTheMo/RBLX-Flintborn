@@ -45,3 +45,8 @@ art/ui/captures/
 
 # Measurement crops from the UI reference analysis (the scripts beside them rebuild them)
 art/ui/kit/analysis/**/*.png
+
+# Verifier working files (captures, crops, data); only the reports are kept
+art/ui/verify/**
+!art/ui/verify/*/
+!art/ui/verify/*/REPORT.md
