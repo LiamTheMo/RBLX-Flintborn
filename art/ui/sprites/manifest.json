@@ -6668,5 +6668,29 @@
     "w": 1024,
     "h": 512,
     "slice": null
+  },
+  "lk_icon_play_rune": {
+    "file": "lk_icon_play_rune.png",
+    "w": 89,
+    "h": 116,
+    "slice": null
+  },
+  "lk_icon_play_rune_small": {
+    "file": "lk_icon_play_rune_small.png",
+    "w": 50,
+    "h": 64,
+    "slice": null
+  },
+  "lk_pillar_rune_left": {
+    "file": "lk_pillar_rune_left.png",
+    "w": 88,
+    "h": 160,
+    "slice": null
+  },
+  "lk_pillar_rune_right": {
+    "file": "lk_pillar_rune_right.png",
+    "w": 87,
+    "h": 160,
+    "slice": null
   }
 }
