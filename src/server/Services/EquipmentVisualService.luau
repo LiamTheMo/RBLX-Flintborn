@@ -12,11 +12,15 @@
 -- inventory goes away (RunEnded, player leaves) every model is removed. World place
 -- only; the lobby has no inventory.
 --
--- Grip: an R6 hand is at "Right Arm" * CFrame.new(0, -1, 0). A Roblox Tool sits in the
--- RightGrip with its handle's +Y pointing forward, so the recipe is turned by
--- Rx(-90): +Y (the business end) points along the arm's -Z, which is the way the
--- character faces. Bows are held upright in the "Left Arm" instead, belly forward,
--- so a bow never covers the sword arm. Characters without R6 parts show nothing.
+-- Grip: an R6 hand is at "Right Arm" * CFrame.new(0, -1, 0), and the recipe is turned
+-- by Rx(-90) there, exactly like a Roblox Tool in the RightGrip: the handle's +Y (the
+-- business end) points along the arm's -Z and the blade edge faces the way the
+-- character faces. The client plays the stock R6 hold pose (toolnone) for any held
+-- non-bow item, which raises the right arm, so blades point up and forward from the
+-- fist. If that animation does not load, the arm hangs and the item juts out forward
+-- at hip height instead; it stays attached either way. Bows are held upright in the
+-- "Left Arm", belly forward, so a bow never covers the sword arm and needs no pose.
+-- Characters without R6 parts show nothing.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -42,7 +46,11 @@ local TOOL_GRIP = HAND * CFrame.Angles(math.rad(-90), 0, 0)
 local BOW_GRIP = HAND
 
 -- state[player] = { character, held = {id, model}?, armor = { [slot] = {id, model} } }
-local states = {}
+-- Weak-keyed so a departed player's entry can never outlive the player.
+local states = setmetatable({}, { __mode = "k" })
+-- Players who are leaving: InventoryService still publishes while a player is in
+-- PlayerRemoving (their run ends afterwards), and that must not rebuild their models.
+local leaving = setmetatable({}, { __mode = "k" })
 
 local function clearModel(slot)
 	if slot and slot.model then
@@ -130,7 +138,7 @@ end
 local function refresh(player: Player)
 	local inventory = InventoryService.Get(player)
 	local character = player.Character
-	if inventory == nil or character == nil or character.Parent == nil then
+	if leaving[player] or player.Parent == nil or inventory == nil or character == nil or character.Parent == nil then
 		clear(player)
 		return
 	end
@@ -176,7 +184,10 @@ function EquipmentVisualService.Start()
 	-- later Changed that never comes.
 	WorldAdmissionService.RunEnded:Connect(clear)
 	Players.PlayerAdded:Connect(watch)
-	Players.PlayerRemoving:Connect(clear)
+	Players.PlayerRemoving:Connect(function(player)
+		leaving[player] = true
+		clear(player)
+	end)
 	for _, player in Players:GetPlayers() do
 		watch(player)
 	end

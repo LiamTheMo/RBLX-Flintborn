@@ -28,6 +28,7 @@ local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -310,11 +311,16 @@ local function groundParams()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	local ignore = { folder }
 	-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
-	for _, name in { "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures" } do
+	for _, name in { "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures", "ResourceNodes" } do
 		local other = workspace:FindFirstChild(name)
 		if other then
 			table.insert(ignore, other)
 		end
+	end
+	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
 	end
 	for _, player in Players:GetPlayers() do
 		if player.Character then

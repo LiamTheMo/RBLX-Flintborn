@@ -62,6 +62,11 @@ local function groundParams()
 			table.insert(ignore, other)
 		end
 	end
+	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
+	end
 	for _, player in Players:GetPlayers() do
 		if player.Character then
 			table.insert(ignore, player.Character)
