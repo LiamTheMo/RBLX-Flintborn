@@ -145,7 +145,12 @@ local function describe(profile, offer)
 		local catalogId = TradeRules.MaterialOf(entry.key)
 		if catalogId then
 			local def = ItemCatalog.Get(catalogId)
-			table.insert(list, { key = entry.key, name = def and def.name or catalogId, quantity = entry.quantity })
+			table.insert(list, {
+				key = entry.key,
+				catalogId = catalogId,
+				name = def and def.name or catalogId,
+				quantity = entry.quantity,
+			})
 			continue
 		end
 		for _, item in profile.lobbyBackpack.slots do
@@ -153,8 +158,10 @@ local function describe(profile, offer)
 				local def = ItemCatalog.Get(item.catalogId)
 				table.insert(list, {
 					key = entry.key,
+					catalogId = item.catalogId,
 					name = (item.permanent and "★ " or "") .. (def and def.name or item.catalogId),
 					quantity = entry.quantity,
+					permanent = item.permanent,
 				})
 				break
 			end

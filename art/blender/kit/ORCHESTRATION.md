@@ -60,7 +60,7 @@ The user supplied 34 master reference sheets in `art/reference/kit/`: World `W01
 
    If many agents stop with "session limit", the next hourly cron check relaunches after the reset.
 
-Use the Python at `C:/Users/Orang/.local/bin/python3.14.exe`. Run Blender only through `art/blender/run.sh` (see CLAUDE.md).
+Use the Python at `C:/Users/Orang/.local/bin/python3.14.exe`. Run Blender only through `art/blender/run.sh` (see AGENTS.md).
 
 ## State at handoff (2026-10-26)
 

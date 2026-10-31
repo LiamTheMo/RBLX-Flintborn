@@ -69,7 +69,7 @@ y 578 / 837 with dividers x 265, 511, 761; lower frames y 842–843 / 1378–137
   and the moss band all land in their classes.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m057_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m057_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, boxes, `silhouette()`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps_053.py` (`label()`), `woodmap.py`, `tonemap.py` (054's, pointed at 057).

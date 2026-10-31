@@ -251,13 +251,13 @@ end
 
 Font = {}
 function Font.new(family, weight, style)
-	return { __type = "Font", Family = family, Weight = weight or "FontWeight.Regular", Style = style }
+	return { __type = "Font", Family = family, Weight = weight or __enum("FontWeight.Regular"), Style = style }
 end
 function Font.fromName(name, weight, style)
 	return Font.new("rbxasset://fonts/families/" .. name .. ".json", weight, style)
 end
 function Font.fromEnum(enum)
-	return Font.new(tostring(enum), "FontWeight.Regular")
+	return Font.new(tostring(enum), __enum("FontWeight.Regular"))
 end
 
 DateTime = {}
@@ -265,20 +265,82 @@ function DateTime.now()
 	return { UnixTimestamp = 0, UnixTimestampMillis = 0 }
 end
 
--- Enum items are their "Enum.Item" names (comparable, and readable by render.py).
+-- Enum items are shared tables (Name, Value, EnumType), so they compare,
+-- index tables and read .Name / .Value as in Roblox; they dump as "Enum.Item"
+-- strings for render.py. Value is Roblox's number for the enums the game reads
+-- (priorities, font weights), else the order of first use.
+local KNOWN_VALUES = {
+	ContextActionPriority = { Low = 1000, Medium = 2000, Default = 2000, High = 3000 },
+	FontWeight = {
+		Thin = 100,
+		ExtraLight = 200,
+		Light = 300,
+		Regular = 400,
+		Medium = 500,
+		SemiBold = 600,
+		Bold = 700,
+		ExtraBold = 800,
+		Heavy = 900,
+	},
+	SavedQualitySetting = { Automatic = 0 },
+}
+local EnumItemMeta = {}
+EnumItemMeta.__tostring = function(item)
+	return "Enum." .. item.EnumType .. "." .. item.Name
+end
+EnumItemMeta.__index = {
+	IsA = function(item, enumName)
+		return item.EnumType == enumName
+	end,
+}
 Enum = setmetatable({}, {
-	__index = function(_, enumName)
+	__index = function(enums, enumName)
+		local list = {}
 		local items = setmetatable({}, {
-			__index = function(_, itemName)
-				return enumName .. "." .. itemName
+			__index = function(itemsTable, itemName)
+				local known = KNOWN_VALUES[enumName]
+				local item = setmetatable({
+					Name = itemName,
+					Value = known and known[itemName] or #list,
+					EnumType = enumName,
+					__enum = enumName .. "." .. itemName,
+				}, EnumItemMeta)
+				table.insert(list, item)
+				rawset(itemsTable, itemName, item)
+				return item
 			end,
 		})
-		function items.GetEnumItems()
-			return {}
-		end
+		rawset(items, "GetEnumItems", function()
+			return table.clone(list)
+		end)
+		rawset(enums, enumName, items)
 		return items
 	end,
 })
+
+-- typeof as Roblox answers it: "EnumItem", "Instance" and datatype names.
+local builtinTypeof = typeof
+function typeof(value)
+	if type(value) == "table" then
+		if rawget(value, "__enum") then
+			return "EnumItem"
+		elseif rawget(value, "__props") then
+			return "Instance"
+		elseif rawget(value, "__type") then
+			return rawget(value, "__type")
+		end
+	end
+	return builtinTypeof(value)
+end
+
+-- "Type.Item" -> Enum.Type.Item (a string a scene passes stays usable).
+function __enum(value)
+	if type(value) ~= "string" then
+		return value
+	end
+	local enumName, itemName = string.match(value, "^([%w_]+)%.([%w_]+)$")
+	return if enumName then Enum[enumName][itemName] else value
+end
 
 -- Signals ------------------------------------------------------------------------
 
@@ -404,7 +466,7 @@ local function defaults(className)
 		BackgroundTransparency = 0,
 		BorderSizePixel = 1,
 		ClipsDescendants = false,
-		AutomaticSize = "AutomaticSize.None",
+		AutomaticSize = __enum("AutomaticSize.None"),
 		Active = false,
 		Selectable = false,
 		Interactable = true,
@@ -420,10 +482,10 @@ local function defaults(className)
 		p.TextStrokeColor3 = Color3.new(0, 0, 0)
 		p.TextScaled = false
 		p.TextWrapped = false
-		p.TextXAlignment = "TextXAlignment.Center"
-		p.TextYAlignment = "TextYAlignment.Center"
-		p.TextTruncate = "TextTruncate.None"
-		p.Font = "Font.Legacy"
+		p.TextXAlignment = __enum("TextXAlignment.Center")
+		p.TextYAlignment = __enum("TextYAlignment.Center")
+		p.TextTruncate = __enum("TextTruncate.None")
+		p.Font = __enum("Font.Legacy")
 		p.FontFace = Font.new("rbxasset://fonts/families/LegacyArial.json")
 		p.RichText = false
 		p.LineHeight = 1
@@ -435,7 +497,7 @@ local function defaults(className)
 		p.Image = ""
 		p.ImageColor3 = Color3.new(1, 1, 1)
 		p.ImageTransparency = 0
-		p.ScaleType = "ScaleType.Stretch"
+		p.ScaleType = __enum("ScaleType.Stretch")
 		p.SliceCenter = Rect.new(0, 0, 0, 0)
 		p.SliceScale = 1
 		p.ImageRectOffset = Vector2.new(0, 0)
@@ -450,12 +512,12 @@ local function defaults(className)
 	if className == "ScrollingFrame" then
 		p.CanvasSize = UDim2.new(0, 0, 2, 0)
 		p.CanvasPosition = Vector2.new(0, 0)
-		p.AutomaticCanvasSize = "AutomaticSize.None"
+		p.AutomaticCanvasSize = __enum("AutomaticSize.None")
 		p.ScrollBarThickness = 12
 		p.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 		p.ScrollBarImageTransparency = 0
-		p.ScrollingDirection = "ScrollingDirection.XY"
-		p.VerticalScrollBarInset = "ScrollBarInset.None"
+		p.ScrollingDirection = __enum("ScrollingDirection.XY")
+		p.VerticalScrollBarInset = __enum("ScrollBarInset.None")
 		p.AbsoluteCanvasSize = Vector2.new(0, 0)
 		p.AbsoluteWindowSize = Vector2.new(0, 0)
 	end
@@ -466,10 +528,11 @@ local function defaults(className)
 		p.ResetOnSpawn = true
 	end
 	if className == "UIListLayout" or className == "UIGridLayout" then
-		p.FillDirection = className == "UIListLayout" and "FillDirection.Vertical" or "FillDirection.Horizontal"
-		p.HorizontalAlignment = "HorizontalAlignment.Left"
-		p.VerticalAlignment = "VerticalAlignment.Top"
-		p.SortOrder = "SortOrder.LayoutOrder"
+		p.FillDirection = className == "UIListLayout" and __enum("FillDirection.Vertical")
+			or __enum("FillDirection.Horizontal")
+		p.HorizontalAlignment = __enum("HorizontalAlignment.Left")
+		p.VerticalAlignment = __enum("VerticalAlignment.Top")
+		p.SortOrder = __enum("SortOrder.LayoutOrder")
 		p.Padding = UDim.new(0, 0)
 		p.CellSize = UDim2.new(0, 100, 0, 100)
 		p.CellPadding = UDim2.new(0, 5, 0, 5)
@@ -489,7 +552,7 @@ local function defaults(className)
 		p.Color = Color3.new(0, 0, 0)
 		p.Thickness = 1
 		p.Transparency = 0
-		p.ApplyStrokeMode = "ApplyStrokeMode.Contextual"
+		p.ApplyStrokeMode = __enum("ApplyStrokeMode.Contextual")
 		p.Enabled = true
 	end
 	if className == "UIScale" then
@@ -512,8 +575,8 @@ local function defaults(className)
 	end
 	if className == "UIAspectRatioConstraint" then
 		p.AspectRatio = 1
-		p.DominantAxis = "DominantAxis.Width"
-		p.AspectType = "AspectType.FitWithinMaxSize"
+		p.DominantAxis = __enum("DominantAxis.Width")
+		p.AspectType = __enum("AspectType.FitWithinMaxSize")
 	end
 	return p
 end
@@ -548,6 +611,15 @@ local EVENTS = {
 	PlayerAdded = true,
 	PlayerRemoving = true,
 	CharacterAdded = true,
+	CharacterRemoving = true,
+	LastInputTypeChanged = true,
+	Move = true,
+	Button1Down = true,
+	Button1Up = true,
+	WheelForward = true,
+	WheelBackward = true,
+	HealthChanged = true,
+	Died = true,
 	OnClientEvent = true,
 	OnClientInvoke = true,
 	RenderStepped = true,
@@ -828,8 +900,29 @@ function Methods:GetPlayers()
 	end
 	return if #list > 0 then list else { LocalPlayer }
 end
+-- Any user id resolves: the local player (1), a Player a scene parented to
+-- Players, else a stand-in "Player<id>" (not in GetPlayers).
+local strangers = {}
 function Methods:GetPlayerByUserId(id)
-	return if id == 1 then LocalPlayer else nil
+	if id == 1 then
+		return LocalPlayer
+	end
+	for _, child in Players:GetChildren() do
+		if child.ClassName == "Player" and child.UserId == id then
+			return child
+		end
+	end
+	if type(id) ~= "number" then
+		return nil
+	end
+	if strangers[id] == nil then
+		local player = Instance.new("Player")
+		rawProps(player).Name = "Player" .. id
+		rawProps(player).DisplayName = "Player" .. id
+		rawProps(player).UserId = id
+		strangers[id] = player
+	end
+	return strangers[id]
 end
 
 function Methods:Create(object, info, goal)
@@ -839,7 +932,7 @@ function Methods:Create(object, info, goal)
 		for key, value in goal do
 			object[key] = value
 		end
-		tween.Completed:Fire("PlaybackState.Completed")
+		tween.Completed:Fire(__enum("PlaybackState.Completed"))
 	end
 	function tween.Cancel() end
 	function tween.Pause() end
@@ -847,9 +940,15 @@ function Methods:Create(object, info, goal)
 end
 -- A scene may set __fetchStatus[content] = "AssetFetchStatus.Failure" etc.;
 -- everything else reads as loaded.
+-- __failImages = true (or {[content] = true}) makes every (or the listed)
+-- uploaded image report Failure: the "uploaded but not served" case, where the
+-- kit must fall back to its own stand-ins.
 function Methods:GetAssetFetchStatus(content)
+	if __failImages == true or (type(__failImages) == "table" and __failImages[content]) then
+		return __enum("AssetFetchStatus.Failure")
+	end
 	local statuses = __fetchStatus or {}
-	return statuses[content] or "AssetFetchStatus.Success"
+	return __enum(statuses[content]) or __enum("AssetFetchStatus.Success")
 end
 -- A scene may set __preloadStatus[content] = "AssetFetchStatus.Failure" etc.;
 -- everything else preloads.
@@ -858,12 +957,25 @@ function Methods:PreloadAsync(list, callback)
 		for _, item in list do
 			local content = if type(item) == "string" then item else item.Image or ""
 			local statuses = __preloadStatus or {}
-			callback(content, statuses[content] or "AssetFetchStatus.Success")
+			callback(content, __enum(statuses[content]) or __enum("AssetFetchStatus.Success"))
 		end
 	end
 end
-function Methods:GetTextSize(text, size, _font, frame)
-	local width = #tostring(text) * size * 0.55
+-- capture.py injects __textWidths: advance widths per px of TextSize for the
+-- legacy fonts the kit measures with (Merriweather, Patrick Hand), read from
+-- the same font files render.py draws with. Other fonts use an average width.
+function Methods:GetTextSize(text, size, font, frame)
+	-- Enum items print as "Enum.Font.X"; the width table is keyed "Font.X".
+	local key = string.gsub(tostring(font), "^Enum%.", "")
+	local widths = (__textWidths or {})[key]
+	local width = 0
+	if widths then
+		for _, code in utf8.codes(tostring(text)) do
+			width += (widths[utf8.char(code)] or 0.6) * size
+		end
+	else
+		width = #tostring(text) * size * 0.55
+	end
 	local lines = 1
 	if frame and frame.X < width then
 		lines = math.ceil(width / math.max(1, frame.X))
@@ -875,13 +987,21 @@ function Methods:BindAction() end
 function Methods:BindActionAtPriority() end
 function Methods:UnbindAction() end
 function Methods:GetLastInputType()
-	return "UserInputType.MouseMovement"
+	return __enum("UserInputType.MouseMovement")
 end
 function Methods:GetGuiInset()
 	return Vector2.new(0, 58), Vector2.new(0, 0)
 end
 function Methods:IsKeyDown()
 	return false
+end
+-- Player:GetMouse(): a mouse at the screen's centre with fireable signals.
+function Methods:GetMouse()
+	local mouse = Instance.new("Mouse")
+	rawProps(mouse).X = 836
+	rawProps(mouse).Y = 470
+	rawProps(mouse).Hit = rawProps(rawProps(service("Workspace")).CurrentCamera).CFrame
+	return mouse
 end
 function Methods:GetMouseLocation()
 	return Vector2.new(0, 0)
@@ -899,6 +1019,101 @@ function Methods:IsServer()
 end
 function Methods:JSONEncode(value)
 	return __json(value)
+end
+
+-- A plain JSON reader (objects, arrays, strings with escapes, numbers,
+-- true / false / null).
+function Methods:JSONDecode(text)
+	local pos = 1
+	local function skip()
+		pos = string.find(text, "[^%s]", pos) or #text + 1
+	end
+	local value
+	local function str()
+		local out = {}
+		pos += 1
+		while true do
+			local c = string.sub(text, pos, pos)
+			if c == "" then
+				error("unterminated JSON string")
+			elseif c == '"' then
+				pos += 1
+				return table.concat(out)
+			elseif c == "\\" then
+				local e = string.sub(text, pos + 1, pos + 1)
+				if e == "u" then
+					table.insert(out, utf8.char(tonumber(string.sub(text, pos + 2, pos + 5), 16)))
+					pos += 6
+				else
+					local map = { n = "\n", t = "\t", r = "\r", b = "\b", f = "\f" }
+					table.insert(out, map[e] or e)
+					pos += 2
+				end
+			else
+				table.insert(out, c)
+				pos += 1
+			end
+		end
+	end
+	function value()
+		skip()
+		local c = string.sub(text, pos, pos)
+		if c == "{" then
+			local out = {}
+			pos += 1
+			skip()
+			if string.sub(text, pos, pos) == "}" then
+				pos += 1
+				return out
+			end
+			while true do
+				skip()
+				local key = str()
+				skip()
+				pos += 1 -- :
+				out[key] = value()
+				skip()
+				local d = string.sub(text, pos, pos)
+				pos += 1
+				if d == "}" then
+					return out
+				end
+			end
+		elseif c == "[" then
+			local out = {}
+			pos += 1
+			skip()
+			if string.sub(text, pos, pos) == "]" then
+				pos += 1
+				return out
+			end
+			while true do
+				table.insert(out, value())
+				skip()
+				local d = string.sub(text, pos, pos)
+				pos += 1
+				if d == "]" then
+					return out
+				end
+			end
+		elseif c == '"' then
+			return str()
+		elseif string.sub(text, pos, pos + 3) == "true" then
+			pos += 4
+			return true
+		elseif string.sub(text, pos, pos + 4) == "false" then
+			pos += 5
+			return false
+		elseif string.sub(text, pos, pos + 3) == "null" then
+			pos += 4
+			return nil
+		end
+		local number = string.match(text, "^-?%d+%.?%d*[eE]?[-+]?%d*", pos)
+		assert(number and number ~= "", "bad JSON at " .. pos)
+		pos += #number
+		return tonumber(number)
+	end
+	return value()
 end
 function Methods:GenerateGUID()
 	serial += 1
@@ -963,6 +1178,19 @@ rawProps(service("GuiService")).TopbarInset = Rect.new(0, 0, 1672, 58)
 rawProps(service("GuiService")).ReducedMotionEnabled = false
 rawProps(service("Workspace")).CurrentCamera = Instance.new("Camera")
 rawProps(rawProps(service("Workspace")).CurrentCamera).ViewportSize = Vector2.new(1672, 941)
+-- A camera looking north from above the island's middle (CFrame, LookVector,
+-- Position), enough for HUD code that reads the view.
+rawProps(rawProps(service("Workspace")).CurrentCamera).CFrame = {
+	__type = "CFrame",
+	Position = Vector3.new(0, 50, 0),
+	LookVector = Vector3.new(0, 0, -1),
+	RightVector = Vector3.new(1, 0, 0),
+	UpVector = Vector3.new(0, 1, 0),
+	X = 0,
+	Y = 50,
+	Z = 0,
+}
+rawProps(rawProps(service("Workspace")).CurrentCamera).FieldOfView = 70
 
 -- Module tree and require ---------------------------------------------------------------
 
@@ -1082,6 +1310,9 @@ function __json(value)
 	elseif kind == "string" then
 		return jsonString(value)
 	elseif kind == "table" then
+		if rawget(value, "__enum") then
+			return jsonString(rawget(value, "__enum"))
+		end
 		if rawget(value, "__props") then
 			return jsonString("<" .. rawProps(value).ClassName .. ">")
 		end
@@ -1120,8 +1351,15 @@ local function dumpNode(object)
 	return { props = props, children = children }
 end
 
-function __dump(root, width, height)
-	print("@@GUI@@" .. __json({ width = width, height = height, root = dumpNode(root) }) .. "@@END@@")
+-- opts.background: an image (path from the repo root) drawn behind the page,
+-- such as the lobby mockup behind a window.
+function __dump(root, width, height, opts)
+	local background = opts and opts.background or nil
+	print(
+		"@@GUI@@"
+			.. __json({ width = width, height = height, background = background, root = dumpNode(root) })
+			.. "@@END@@"
+	)
 end
 
 function __screen(width, height)

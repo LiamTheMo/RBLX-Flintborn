@@ -1,9 +1,13 @@
 -- Reads the HUD layout (src/shared/UI/HudLayout.json) and turns its entries into
--- UDim2s, colours and fonts. Every position is in reference pixels on a
--- 1672×941 canvas; the HUD root's UIScale maps them to the real screen. The
--- preview compositor (art/ui/preview_hud.py) reads the same JSON.
+-- UDim2s, colours and fonts. Every position is in design px on the 1672×941
+-- canvas the Kit is built at; the HUD root's UIScale (Kit.Scale.Hud) maps them
+-- to the real screen. The world HUD's sections hold only places and sizes: its
+-- art, type and colours come from the Kit (docs/ui/HudScreen.md). The colour
+-- and font tables still serve the older Widgets and Parchment screens.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local KitScale = require(script.Parent.Kit.Scale)
 
 local Layout = {}
 
@@ -28,10 +32,53 @@ function Layout.Get()
 	return cached
 end
 
--- Places a top-level widget: {anchor = [ax, ay], pos = [sx, ox, sy, oy], size = [w, h]}.
+-- True on a phone (the kit's "phone" form factor: touch only, a short
+-- landscape screen), where the HUD canvas is short and the regions take their
+-- entries' "phone" overrides. Tablets keep the desktop arrangement.
+function Layout.IsPhone(): boolean
+	return KitScale.FormFactor() == "phone"
+end
+
+-- True on touch-only phones and tablets (Kit.Scale.IsSmallTouch): the HUD
+-- draws small there and body text is boosted, so text-heavy regions take their
+-- entries' "touch" overrides (bigger text, two-line rows).
+function Layout.IsTouchScreen(): boolean
+	return KitScale.IsSmallTouch()
+end
+
+-- `entry` for this screen: on phones and tablets the fields of its "touch"
+-- table replace the desktop ones (text sizes, row shapes), and on phones those
+-- of its "phone" table too (positions and sizes for the short canvas).
+function Layout.ForScreen(entry)
+	if type(entry) ~= "table" or (entry.touch == nil and entry.phone == nil) then
+		return entry
+	end
+	local touch = if type(entry.touch) == "table" and Layout.IsTouchScreen() then entry.touch else nil
+	local phone = if type(entry.phone) == "table" and Layout.IsPhone() then entry.phone else nil
+	if touch == nil and phone == nil then
+		return entry
+	end
+	local merged = table.clone(entry)
+	for _, override in { touch or {}, phone or {} } do
+		for key, value in override do
+			merged[key] = value
+		end
+	end
+	return merged
+end
+
+-- The layout section `key` for this screen (Layout.ForScreen).
+function Layout.Section(layout, key: string)
+	return Layout.ForScreen(layout[key])
+end
+
+-- Places a top-level widget: {anchor = [ax, ay], pos = [sx, ox, sy, oy], size =
+-- [w, h], phone? = {anchor?, pos?, size?}} (the phone override wins on phones).
 function Layout.Place(object: GuiObject, entry)
+	entry = Layout.ForScreen(entry)
 	object.AnchorPoint = Vector2.new(entry.anchor[1], entry.anchor[2])
-	object.Position = UDim2.new(entry.pos[1], entry.pos[2], entry.pos[3], entry.pos[4])
+	local pos = entry.pos
+	object.Position = UDim2.new(pos[1], pos[2], pos[3], pos[4])
 	object.Size = UDim2.fromOffset(entry.size[1], entry.size[2])
 end
 

@@ -27,6 +27,11 @@ ANCHORS = (
 # and the next deploy removes it.
 RETIRED = (
     ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "AssetProbeController"),
+    # The parchment UI, replaced by the shared kit (docs/ui/ARCHITECTURE.md §9).
+    *(("StarterPlayer", "StarterPlayerScripts", "Client", "Hud", name) for name in (
+        "CraftingPanel", "InventoryPanel", "ItemSlot", "JournalPanel", "LobbyHud", "LobbyPopups",
+        "Parchment", "SettingsPanel",
+    )),
 )
 # Every cloud save goes through this. Each Luau task's server inserts the engine's
 # default player scripts (a PlayerModule in StarterPlayer, RbxCharacterSounds in

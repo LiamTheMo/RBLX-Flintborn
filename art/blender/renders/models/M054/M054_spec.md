@@ -60,7 +60,7 @@ and 1209–1210.
   below h 0.20.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m054_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m054_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, boxes, `silhouette()`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps_053.py` (`label()`), `woodmap.py` (wood-only map: T kept, leaves pale; `woodmap.py front 4 x0 y0 x1 y1`),

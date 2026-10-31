@@ -307,9 +307,16 @@ local handlers = {}
 Remotes.Handle = function(name, fn)
 	handlers[name] = fn
 end
-local silentRemote = { FireClient = function() end, FireAllClients = function() end }
-Remotes.Get = function()
-	return silentRemote
+-- The last payload each remote sent to each player: sent[name][player] = {...}.
+local sent = {}
+Remotes.Get = function(name)
+	sent[name] = sent[name] or {}
+	return {
+		FireClient = function(_, player, ...)
+			sent[name][player] = table.pack(...)
+		end,
+		FireAllClients = function() end,
+	}
 end
 
 local InventoryService = require(Server.Services.InventoryService)
@@ -440,16 +447,41 @@ test("a body looted by another player keeps each stack's carried units", functio
 	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
 	local bodyId = lastGuid
 	local main = inRun({ stack("IronBar", 700) })
-	local ok, reason = handlers.CorpseTake(main, bodyId, 1)
+	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
 	expect(ok, "looted: " .. tostring(reason))
 	expectEq(held(main, "IronBar").quantity, 1000, "300 of the 500 fit")
 	expectEq(held(main, "IronBar").carried, 300, "all 300 carried")
 	local other = inRun({})
-	expect(handlers.CorpseTake(other, bodyId, 1), "the rest looted")
+	expect(handlers.CorpseTake(other, bodyId, 1, "stack:IronBar"), "the rest looted")
 	expectEq(held(other, "IronBar").quantity, 200, "200 left on the body")
 	expectEq(held(other, "IronBar").carried, 100, "with the other 100 carried")
-	expect(handlers.CorpseTake(other, bodyId, 1), "the Wood looted")
+	expect(handlers.CorpseTake(other, bodyId, 1, "stack:Wood"), "the Wood looted")
 	expectEq(held(other, "Wood").carried, nil, "gathered Wood stays eligible")
+end)
+
+test("body and chest listings name each item by its catalog id", function()
+	local alt = inRun({ stack("IronBar", 50), stack("Wood", 40) })
+	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
+	local bodyId = lastGuid
+	local main = inRun({})
+	expect(handlers.CorpseTake(main, bodyId, 1, "stack:IronBar"), "looted")
+	local payload = sent.CorpseOpened[main]
+	expectEq(payload and payload[1], bodyId, "the body's id")
+	local entry = payload and payload[2][1]
+	expectEq(entry and entry.catalogId, "Wood", "the remaining entry carries its catalog id")
+	expectEq(entry and entry.key, "stack:Wood", "and its stable key")
+	expectEq(entry and entry.name, "Wood", "and its display name")
+	expectEq(entry and entry.index, 1, "and its index")
+
+	local part = { Position = Vector3.new(3, 5, 0) }
+	stubs.BuildingService.Placed:Fire({ id = "chest-ids", pieceId = "Chest", part = part, position = part.Position })
+	local storer = inRun({ stack("IronOre", 5) })
+	expect(handlers.ChestPut(storer, "chest-ids", slotOf(storer, "IronOre")), "stored")
+	payload = sent.ChestOpened[storer]
+	expectEq(payload and payload[1], "chest-ids", "the chest's id")
+	entry = payload and payload[2][1]
+	expectEq(entry and entry.catalogId, "IronOre", "chest entries carry catalog ids")
+	expectEq(entry and entry.quantity, 5, "and quantities")
 end)
 
 test("a chest keeps the carried units of what goes in and comes out", function()
@@ -461,11 +493,43 @@ test("a chest keeps the carried units of what goes in and comes out", function()
 	local gatherer = inRun({ stack("IronOre", 100) })
 	expect(handlers.ChestPut(gatherer, "chest-1", slotOf(gatherer, "IronOre")), "gathered ore joins it")
 	local main = inRun({})
-	expect(handlers.ChestTake(main, "chest-1", 1), "taken")
+	expect(handlers.ChestTake(main, "chest-1", 1, "stack:IronOre"), "taken")
 	local ore = held(main, "IronOre")
 	expectEq(ore.quantity, 600, "one chest stack of 600")
 	expectEq(ore.carried, 500, "the 500 carried come out carried")
 	expectEq(centerYield(InventoryService.Items(main), "IronOre"), 500 + 100 * 2, "only the 100 gathered double")
+end)
+
+test("a take names its entry by key, so a double press or stale index takes nothing else", function()
+	local alt = inRun({ stack("IronBar", 10), stack("Wood", 40), stack("Stone", 5) })
+	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
+	local bodyId = lastGuid
+	local main = inRun({})
+	expect(handlers.CorpseTake(main, bodyId, 1, "stack:IronBar"), "first press takes the bars")
+	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
+	expect(not ok and reason == "Gone", "the second press finds them gone")
+	expectEq(held(main, "Wood"), nil, "and does not take the Wood that moved into index 1")
+	expect(handlers.CorpseTake(main, bodyId, 1, "stack:Stone"), "a stale index still finds the Stone")
+	expectEq(held(main, "Stone") and held(main, "Stone").quantity, 5, "the Stone, not the Wood")
+	for _, bad in { { 1, nil }, { 1, 5 }, { 1.5, "stack:Wood" }, { "1", "stack:Wood" }, { 1, string.rep("x", 200) } } do
+		ok, reason = handlers.CorpseTake(main, bodyId, bad[1], bad[2])
+		expect(
+			not ok and reason == "BadRequest",
+			"malformed take refused: " .. tostring(bad[1]) .. "/" .. tostring(bad[2])
+		)
+	end
+	expectEq(held(main, "Wood"), nil, "nothing taken by malformed requests")
+
+	local part = { Position = Vector3.new(3, 5, 0) }
+	stubs.BuildingService.Placed:Fire({ id = "chest-keys", pieceId = "Chest", part = part, position = part.Position })
+	local storer = inRun({ stack("IronOre", 5), stack("Wood", 3) })
+	handlers.ChestPut(storer, "chest-keys", slotOf(storer, "IronOre"))
+	handlers.ChestPut(storer, "chest-keys", slotOf(storer, "Wood"))
+	local taker = inRun({})
+	expect(handlers.ChestTake(taker, "chest-keys", 1, "stack:IronOre"), "ore taken")
+	ok, reason = handlers.ChestTake(taker, "chest-keys", 1, "stack:IronOre")
+	expect(not ok and reason == "Gone", "a repeated chest take finds it gone")
+	expectEq(held(taker, "Wood"), nil, "the Wood in index 1 is untouched")
 end)
 
 test("no service handler errored", function()

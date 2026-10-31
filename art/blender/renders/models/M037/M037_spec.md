@@ -73,7 +73,7 @@ painted out (`TITLES` in `m.py`). The masks are `cls()` in `m.py` (HSV, h in deg
   background: measure renders made with `FB_Ground.hide_render = True` (§2.6).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m037_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m037_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, exploded and close-up boxes `X`, `preview()`), `lab.py` (connected
   components), `zoom.py` (crop + upscale), `grid.py` → `g_*.png` (10 % grids over each view's silhouette, red = centre

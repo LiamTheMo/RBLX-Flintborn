@@ -82,7 +82,7 @@ ortho title bar y 463–495, cells y 495–756, dividers x 275, 511, 760; explod
     for content only (§3.3).
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m061_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m061_study\`.
 Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `masks`, `petal_cand`, `cls`, `tones`, `clsimg`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale
   out.png [grid]`), `probe2.py` (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw.py` (swatches).

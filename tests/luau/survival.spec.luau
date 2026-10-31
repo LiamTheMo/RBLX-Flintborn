@@ -117,10 +117,6 @@ test("only sprinting spends stamina", function()
 	state.sprintIntent = true
 	SurvivalRules.StepStamina(state, 1, false)
 	expect(state.stamina > 0.5, "standing still with sprint held regenerates")
-	state.stamina = 0.5
-	state.crouching = true
-	SurvivalRules.StepStamina(state, 1, true)
-	expect(state.stamina > 0.5, "crouching never spends stamina")
 end)
 
 test("food empties in 60 minutes and slows strictly below 25% with nothing worse at 0%", function()
@@ -141,15 +137,15 @@ test("food empties in 60 minutes and slows strictly below 25% with nothing worse
 	expectNear(SurvivalRules.MoveSpeed(state, true), SurvivalRules.WALK_SPEED * 0.9, 1e-9, "below 25% is slowed")
 end)
 
-test("crouch and sprint speeds", function()
+test("walk and sprint speeds", function()
 	local state = SurvivalRules.NewState()
+	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.WALK_SPEED, "walk")
 	state.sprintIntent = true
 	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.SPRINT_SPEED, "sprint")
-	state.crouching = true
-	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.CROUCH_SPEED, "crouch wins over sprint")
+	expectEq(SurvivalRules.CROUCH_SPEED, nil, "there is no crouch")
 end)
 
-test("walking through water is 30% slower, on top of sprint, crouch and hunger (GDD §55)", function()
+test("walking through water is 30% slower, on top of sprint and hunger (GDD §55)", function()
 	local state = SurvivalRules.NewState()
 	local walk, water = SurvivalRules.WALK_SPEED, SurvivalRules.WATER_SPEED_MULTIPLIER
 	expectEq(water, 0.7, "30% slower")
@@ -164,9 +160,7 @@ test("walking through water is 30% slower, on top of sprint, crouch and hunger (
 		1e-9,
 		"hungry sprint in water"
 	)
-	state.sprintIntent, state.crouching, state.food = false, true, 1
-	expectNear(SurvivalRules.MoveSpeed(state, true, true), SurvivalRules.CROUCH_SPEED * 0.7, 1e-9, "crouching in water")
-	state.crouching = false
+	state.sprintIntent, state.food = false, 1
 	expectNear(SurvivalRules.MoveSpeed(state, true, true, 0.2), walk * 0.7 * 1.2, 1e-9, "Tidewalker helps in water")
 	expectEq(SurvivalRules.MoveSpeed(state, true, false, 0.2), walk, "but not on land")
 	expectNear(SurvivalRules.WalkPace(true), walk * 0.7, 1e-9, "walking pace in water")

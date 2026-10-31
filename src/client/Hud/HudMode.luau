@@ -22,13 +22,15 @@ function HudMode.ReplacesLegacy(): boolean
 	return PlaceConfig.IsWorld() and Layout.Get() ~= nil
 end
 
--- The lobby's counterpart: true in the lobby place when the layout has its lobby
--- section. Then LobbyHudController draws the profile, currency, party, navigation
--- and Enter button, and the older lobby panel, wallet label, navigation bar, XP
--- bar and settings button stay hidden.
+-- The lobby's counterpart: true in the lobby place unless the lobby HUD failed to
+-- build. Then LobbyHudController draws the profile, currency, party, navigation
+-- and Play entry, and the older lobby panel, wallet label, navigation bar, XP bar
+-- and settings button stay hidden. HudLayout's lobby section is not consulted:
+-- the lobby HUD brings its own layout, and when it cannot build (for example a
+-- missing layout) it calls SetLobbyFailed and LobbyController builds the fallback
+-- panel, so the lobby is never left without Deploy.
 function HudMode.ReplacesLobby(): boolean
-	local layout = Layout.Get()
-	return PlaceConfig.IsLobby() and layout ~= nil and layout.lobby ~= nil and not lobbyFailed
+	return PlaceConfig.IsLobby() and not lobbyFailed
 end
 
 -- LobbyHudController calls this when the lobby HUD fails to build, so the

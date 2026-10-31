@@ -1,0 +1,4 @@
+05_play per-channel k ['0.316', '0.277', '0.289'] offset ['1.8', '6.5', '4.7'] max resid ['8.6', '8.4', '6.7']
+   overlay alpha 0.706 (BackgroundTransparency 0.29), overlay colour RGB [3, 9, 7]
+04_party per-channel k ['0.296', '0.272', '0.287'] offset ['0.4', '3.7', '3.3'] max resid ['6.1', '7.3', '4.2']
+   overlay alpha 0.715 (BackgroundTransparency 0.28), overlay colour RGB [1, 5, 5]

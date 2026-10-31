@@ -346,6 +346,7 @@ test("a session offers vault material by quantity and settles it vault to vault"
 	expectEq(theirs and theirs.key, "mat:" .. EMBER, "the partner sees the material")
 	expectEq(theirs and theirs.quantity, 4, "with its quantity")
 	expectEq(theirs and theirs.name, ItemCatalog.Get(EMBER).name, "and its name")
+	expectEq(theirs and theirs.catalogId, EMBER, "and its catalog id")
 	expect(lockAndConfirm(a, b, id), "confirmed")
 	expectEq(pushed[a].kind, "Closed", "session closed")
 	expectEq(pushed[a].reason, "Completed", "completed")

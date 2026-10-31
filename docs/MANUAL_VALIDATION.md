@@ -33,9 +33,9 @@ Place setup still to confirm:
 
 Live checks (GDD §31.7), all on the published places:
 
-- [ ] Join the lobby, press **Deploy**: you land on the world menu ("You are safe until you enter the world"), **Play** unlocks once loaded, and pressing it spawns you with "Entering world — items are now at risk".
+- [ ] Join the lobby, open the portal tile (Play window) and press **PLAY** (Deploy): you land on the world menu ("You are safe until you enter the world"), **Play** unlocks once loaded, and pressing it spawns you with "Entering world — items are now at risk".
 - [ ] No character exists before Play; leaving from the world menu or pressing **Return to lobby** loses nothing.
-- [ ] Party: invite, accept and deploy as leader; every member lands in the same world. A non-leader's Deploy is refused.
+- [ ] Party: invite, accept and deploy as leader; every member lands in the same world. A non-leader sees the Ready toggle in place of PLAY, and the server refuses a non-leader's Deploy.
 - [ ] Two players spawn at least 150 studs apart.
 - [ ] Double-click Play: one character only.
 - [ ] Joining the play-map place directly (not through the lobby) sends you back to the lobby.
@@ -43,12 +43,11 @@ Live checks (GDD §31.7), all on the published places:
 
 ## v0.04 — Survival core: health, stamina, food and healing
 
-Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the strict-25% slow, crouch and sprint speeds, instant medicine with animation lock, 10 s food heals, hit halving with the ≤10 HP cutoff, stacking, and downed clearing. Deployed and verified on both places (2026-10-23).
+Automated: 9 specs cover sprint timing, sprint-only stamina, food drain and the strict-25% slow, walk and sprint speeds, instant medicine with animation lock, 10 s food heals, hit halving with the ≤10 HP cutoff, stacking, and downed clearing. Deployed and verified on both places (2026-10-23).
 
 Studio and live checks (until crafting arrives in v0.05, a Studio run starts with a test kit of medicine and food; live runs only carry what was in the lobby backpack):
 
-- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee, crouching and standing still never drain it.
-- [ ] Toggle crouch with C (or R3 / touch): slower movement, no stamina use.
+- [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee and standing still never drain it.
 - [ ] Food drains to 0 in 60 minutes (half after 30); below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
 - [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
 - [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
@@ -65,7 +64,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; Tab (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
+- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -240,7 +239,7 @@ Studio and live checks (desktop, touch and controller):
 - [ ] The marker points at the nearest node, event or portal and does not bob with reduced motion on.
 - [ ] The first extraction pays 250 Coins once; replaying the tutorial from settings pays nothing again.
 - [ ] ⚙ / O opens settings: UI scale applies to every screen at once; the colour-blind palette changes rarity colours everywhere (names still shown); subtitles caption event, extraction and Guardian alerts; choices persist after rejoining.
-- [ ] The on-screen navigation bar opens every panel (vault, Forge, market, trade, progress in the lobby; backpack, craft, build, tribe, map, progress in a run) without a keyboard.
+- [ ] Without a keyboard, the lobby HUD's tiles and buttons open every window (Inventory with its Vault tab, Play, Journal, Market, Forge, Trade; Progress from the player card; Party from the party panel; Settings from the gear), and the in-run navigation tiles open backpack, craft, build, tribe, map and progress.
 - [ ] Testers can explain Vaulted vs Permanent; a colour-blind simulation pass over every screen.
 
 ## v0.17 — Live-ops hardening
@@ -325,7 +324,7 @@ Studio and live checks:
 - [ ] Kill a world server within a second of pressing Play: the loadout is restored once.
 - [ ] Shut down a server while a Play is loading: the loadout stays in the lobby. A `/safekick` whose save fails retries and kicks once saved.
 - [ ] Trade, then immediately try to sell, Forge, spend Gems or deploy: refused with the "recent trade" message, then allowed after the save lands.
-- [ ] On a phone, the touch thumbstick, jump and Sprint/Crouch buttons are full size; the lobby panel and nav bar don't block the jump button or camera drag.
+- [ ] On a phone, the touch thumbstick, jump and Sprint buttons are full size; the lobby HUD's tiles, party panel and hotbar don't block the jump button or camera drag.
 
 ## Q164 — Materials stay in the lobby (superseded by GDD §53)
 
@@ -354,7 +353,7 @@ Studio and live checks:
 
 ## Keyboard controls and rebinding
 
-Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots (1–6 since the six-slot hotbar, §56), Q to drop and F to interact or pick up (changed from E in revision 1.12), with every keyboard action rebindable in Settings. Lobby panels have no keys; the navigation buttons open them.
+Owner request (GDD §46): defaults of hold Shift to sprint, Tab for the backpack, 1–9 for hotbar slots (1–6 since the six-slot hotbar, §56), Q to drop and E to interact or pick up (F in revisions 1.12–1.23); revision 1.24 moved the backpack to B and the map to M and removed crouch, with every keyboard action rebindable in Settings. Lobby windows have no keys (besides Tab for the Inventory); the lobby HUD's tiles open them.
 
 Automated (`keybinds.spec.luau`, 7 cases):
 - The requested defaults, with every default allowed and unique.
@@ -365,15 +364,15 @@ Automated (`keybinds.spec.luau`, 7 cases):
 
 Studio and live checks:
 
-- [ ] Fresh profile: Shift sprints while held, Tab opens and closes the backpack, 1–6 select hotbar slots (7–9 do nothing), Q drops, and F picks up a dropped item, loots a body and harvests a node.
-- [ ] Settings → Controls: rebind Backpack to B. Tab stops opening it, B opens it, and the Backpack button and navigation bar read "(B)". Rejoin: the binding is kept, in both the lobby and the world.
+- [ ] Fresh profile: Shift sprints while held, B opens and closes the backpack, M opens the map, 1–6 select hotbar slots (7–9 do nothing), Q drops, C does nothing, and E picks up a dropped item, loots a body and harvests a node.
+- [ ] Settings → Controls: rebind Backpack to Tab. B stops opening it, Tab opens it, and every on-screen key hint for the backpack reads Tab. Rejoin: the binding is kept, in both the lobby and the world.
 - [ ] Rebind Drop to F: Interact moves to Q, and prompts show and accept Q.
 - [ ] Pressing a reserved key (W, Space, /) while rebinding shows "reserved" and changes nothing; clicking the waiting key again cancels.
 - [ ] Pressing Tab while rebinding doesn't open the backpack.
 - [ ] Reset controls to defaults restores everything.
-- [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the backpack and vault panel in the lobby, and Tab again closes it.
+- [ ] Roblox's player list never appears in either place (GDD §52); Tab opens the backpack in the world and the Inventory window (Backpack and Vault tabs) in the lobby, and Tab again closes it.
 - [ ] Planters offer their three crops on F / R / E with the default binds, and no two share a key after rebinding Interact.
-- [ ] In the lobby, G / F / M / Y do nothing; the navigation buttons open the vault, Forge, market and trade, and Settings → Controls doesn't list them.
+- [ ] In the lobby, G / F / M / Y do nothing; the HUD tiles open the Inventory, Forge, Market and Trade, and Settings → Controls doesn't list them.
 - [ ] The tutorial hints name the current keys after a rebind.
 
 ## Stamina recovery delay and walk-after-sprint fix
@@ -598,96 +597,47 @@ Studio and live checks:
 - [ ] The river's small step-down "rapids" and the shorelines look acceptable; the ocean surface meets the shelf without a seam.
 - [ ] Creatures wade on the bed at reduced speed.
 
-## Parchment Settings screen and new settings (GDD §57)
+## Rebuilt UI: the shared kit and the seven lobby screens
 
-How it's built: `Hud/SettingsPanel` draws the window from the parchment kit (`Hud/Parchment`); `SettingsController` keeps the draft and saves on APPLY; `PreferencesController` applies volumes, camera sensitivity and inversion, names and graphics quality; `Hud/DamageNumbers` floats hit damage. Spec: `docs/ui/SettingsScreen.md`.
+How it's built: every screen comes from one kit (`src/client/Hud/Kit`, tokens in `src/shared/UI/KitTokens.json`) and the `lk_` sprites; the lobby screens live in `src/client/Hud/Screens/` (`LobbyHud`, `InventoryWindow`, `SettingsWindow`, `PartyWindow`, `PlayWindow`, `RecipeWindow`, `JournalWindow`) and are driven by their controllers. Contract: `docs/ui/ARCHITECTURE.md` (§12 decisions win); per-screen specs in `docs/ui/`; status in `docs/ui/UI_PROGRESS.md`. Until the `lk_` sprites are uploaded, screens in game draw the kit's fallback look (flat paper and leather plates).
 
-Automated: `settings.spec` (defaults, ranges, the server accepting only known, valid values, saved junk falling back to defaults); `art/ui/capture/capture.py settings` renders every tab and `settings_flow` drives open → change → APPLY → RESET → close and checks what is sent.
+Automated: `tests/luau/run.py` (`party_ready`, `followup_party`, `forge`, `forge_batch`, `party_model`, `lobby_hud_model`, `item_info`, `settings`, `hud_model` and the rest); `python3 art/ui/capture/capture.py <scene>` renders `kit_gallery`, `lobby_hud*`, `inventory_*`, `settings*`, `party*`, `play*`, `forge*`, `crafting*`, `journal*`, `world_hud*`, `world_overlays*`, `notices`, `world_menu`, `market_flow`, `trade_flow`, `progress_flow` and `map_flow`, and the `*_flow` scenes drive each controller against mocked remotes.
 
-Studio and live checks (desktop, touch and controller):
+Studio and live checks (desktop, touch and controller unless stated):
 
-- [ ] The gear (lobby), ⚙ (world) and O open the window centred below the top bar; it fits on a phone in landscape (text is small at 0.3–0.5×; note whether it stays readable) and on a large monitor.
-- [ ] Each tab shows its page; the selected tab turns leather with cream text. Close (✕) and gamepad B close it.
-- [ ] Sliders drag with mouse and touch and step with a gamepad's d-pad; the dropdown opens upward on Gameplay and downward on Graphics, and closes on a choice.
-- [ ] APPLY is dimmed until something changes, saves, and the values are still there after rejoining. RESET puts back only the open tab's settings and keys. Closing without APPLY keeps the old values.
-- [ ] Music and Effects change volume at once after APPLY (Effects: hits, alerts, world sounds). Music has no soundtrack yet, so check it with a sound tagged `Music`.
-- [ ] Camera Sensitivity 10 / 50 / 100 makes mouse look slow / normal / fast.
-- [ ] Invert Camera flips mouse, touch and right-stick vertical look; off restores it. If Roblox's PlayerModule changed and it does nothing, the client logs "Invert Camera is unavailable".
-- [ ] Show Damage on: damage numbers float up from creatures, players and structures you hit (still, with reduced motion); off: hit markers without numbers.
-- [ ] Show Names off hides other players' name tags for you only.
-- [ ] Graphics Quality Low turns shadows off and thins fires and effects; High restores them.
-- [ ] Rebinding from the Gameplay key list and from Controls works, swaps clashing keys, refuses reserved ones with a note, and saves on APPLY.
+- [ ] **Lobby HUD:** player card, Coins, Gems, gear, the 2 × 3 tiles, the PARTY n/8 panel, the XP bar and the six-slot hotbar sit where `01_hud.png` has them and stay clear of the Roblox top bar; the hotbar shows what the next run's hotbar will hold.
+- [ ] **One window at a time:** opening any window closes the one before; the world behind dims (and blurs on Medium and High graphics); ✕, Escape and gamepad B close the top layer, a confirm dialog before its window.
+- [ ] **Play window deploy flow (leader or solo):** the portal tile opens PLAY; the rows show the real party (crown, level, ready dot) and the predicted hotbar plus "+N more in backpack". PLAY with an empty backpack deploys at once; otherwise the "TAKE THESE INTO THE RUN?" dialog lists every item (★ Permanent, ×quantity) and ENTER deploys while CANCEL changes nothing. With a party not all ready the dialog adds "k of n party members are ready" but ENTER still works. While the deploy runs the button is busy; a failed deploy says why and nothing is lost. If the backpack cannot be read, "COULD NOT READ YOUR BACKPACK" offers ENTER ANYWAY.
+- [ ] **Play window (party member):** the big button is the READY / NOT READY toggle with "The party leader starts the run"; it never deploys.
+- [ ] **Party Ready toggle:** your own badge in READIED STATUS toggles Ready for you only, also when solo, and every member sees the change within a moment. Ready clears for everyone involved when someone accepts an invite, leaves or disconnects, and for the whole group when the leader deploys (also after a failed deploy). Spamming the toggle is throttled, never desynchronised.
+- [ ] **Party window:** YOUR PARTY lists members with Leader badge and crown, then Empty Slot rows (seven visible, the eighth scrolls); INVITE PLAYERS searches by name; a leader's Invite turns to "Invited" (disabled) until the player answers; non-leaders read "Only the party leader can invite"; incoming invitations show Accept / Decline with the inviter's name; PARTY DETAILS shows Party Leader, Members n / 8, Join Type "Invite Only" and Created ("Just now", "5 min ago"); LEAVE PARTY appears only in a party of two or more.
+- [ ] **Batch forging:** in the Forge, QUANTITY steps from 1 up to the most the vault can pay for (at most 10) and is hidden for Permanent conversions; FORGE ×N charges N times the inputs and puts all N results in the lobby backpack, or refuses the whole batch (short materials or a full backpack) without spending anything; a slow connection never charges twice; XP and Crafting mastery match N single crafts.
+- [ ] **Forge, other states:** locked recipes show what unlocks them and cannot be forged; short inputs show their owned count in red; a Permanent conversion picks the source item, asks through the confirm dialog naming the exact item and the Permanent rules, arms after the delay and converts only that piece.
+- [ ] **Field crafting (run):** V opens the same window in crafting mode; counts follow the backpack live; nearby stations enable their recipes; smelting takes the stepper's batch or Craft all; the job bar shows progress and STOP keeps the bars made.
+- [ ] **Inventory Store / Take (lobby):** Tab and the backpack tile open Inventory on the Backpack tab; STORE IN VAULT moves the chosen item; on the Vault tab (its label shows used / capacity) TAKE brings an item back and a material's stepper takes the chosen amount or All; STORE ALL vaults what fits and says how many overflowed; a near-full material deposit asks first and deletes only what it said; a full vault links to Shop → Offers.
+- [ ] **Inventory (run):** the window shows the 50 backpack slots, the six hotbar slots with their keys and the three armour slots; EQUIP, wear, USE and DROP work; categories All / Tools / Materials / Food / Misc and search filter the grid; item icons show for every item.
+- [ ] **Settings tabs:** Gameplay, Audio, Graphics and Controls each show their page (Accessibility options live under Graphics and Audio); the selected tab is the leather one; APPLY stays disabled until something changes, saves, and survives a rejoin; RESET restores only the open tab; closing without APPLY keeps the old values; rebinding from Gameplay and Controls swaps clashing keys and refuses reserved ones; Replay Tutorial works.
+- [ ] **Quest Journal:** the scroll tile opens it; the book tab lists quests (Daily first), trophy shows progression, the map pin the island map and the party tab opens the Party window; CLAIM pays a finished quest once and then reads CLAIMED; the progress line counts completed quests.
+- [ ] **Restyled windows:** Market (Shop, Sell, Offers, Codes), Trade, Progress, world map, loot (body) and storage chest windows use the kit plates; body, chest and trade rows show each item's own icon (from the server's catalog id), including the partner's offer; body and chest rows add a rarity dot on the icon.
+- [ ] **Loot and chest takes:** double-tap Take on a body or chest row: one item comes out, the next row is untouched, and the button shows busy until the server answers. With two players looting one body, the slower one reads "someone else took it first" instead of getting a different item. A gamepad opening a body or chest lands on the first Take.
+- [ ] **Trade invite toast:** an invite shows Accept and Decline on the toast itself (no ✕); either answers once and closes the toast; tapping the card opens the same question as a dialog.
+- [ ] **Phone touch targets and readability (844 × 390 and a small phone):** every window fills the screen; buttons, tabs, rows, steppers, ✕ and the Ready toggle are tappable without hitting a neighbour (about 44 screen px); body text stays readable (note any line under about 9 px); nothing sits under the notch or the Roblox top bar; tooltips appear on long-press.
+- [ ] **Gamepad navigation:** opening a window selects its default control and closing it returns selection to where it was; the D-pad reaches every tile, tab, row, slot, stepper and button in a sensible order (lobby HUD: card → tiles → hotbar, top-right → party panel); A presses, B closes; the selection cue is the kit's hover look, never Roblox's default box.
+Device-only checks from the round-2 re-verification (the headless captures cannot show these):
 
-## Parchment Journal (GDD §10.1, §25)
+- [ ] **Toast lane:** with a window open, toasts appear below its header and tab row, never over the title or tabs; on phones they never cover the server notice card's title, and the ✕ is easy to hit (44 screen px).
+- [ ] **SearchBox touch growth:** on a phone, tapping the Party, Inventory or Market search box opens the keyboard on the first tap anywhere in its padded area, and the field stays visible above the keyboard.
+- [ ] **Top-bar and jump clearance:** on phones (notched and not), no window title, ✕, HUD control or the world settings gear sits under the Roblox top bar, and nothing sits under the jump button.
+- [ ] **Thumbstick vs tribe frames:** in a run on 844 × 390 and 667 × 375 phones, the tribe/party frames and the HUD tiles stay clear of the thumbstick and jump zones while moving and jumping.
+- [ ] **Lobby gamepad entry:** with a controller and no window open, the bound button moves selection onto the lobby HUD tiles (its hint shows), the D-pad walks tiles, hotbar and party panel, and B leaves HUD navigation; the HUD never takes selection by itself.
+- [ ] **Party view on join:** join a lobby where a party already exists and you hold an invite: the party panel and the invite appear within a couple of seconds, without anyone else changing anything (the client asks for its view on start).
+- [ ] **Blur and motion:** on Medium and High graphics a window blurs and dims the world, and Low only dims it; closing a window always removes the blur (open and close quickly ten times); windows, toasts and bars animate smoothly, and Reduced Motion makes them instant.
 
-How it's built: `Hud/JournalPanel` (view), `Hud/IslandMap` (the painted map, also for the world Map), `JournalController` (QuestView / QuestClaim). The map image comes from `art/ui/map/render_island.py`. Spec: `docs/ui/JournalScreen.md`.
-
-Automated: `capture.py journal` renders every tab; `journal_flow` checks that an unfinished quest cannot be claimed, a finished one sends its id, the card then reads CLAIMED, and the tabs filter.
-
-Studio and live checks:
-
-- [ ] The lobby's Quests tile opens the Journal; ✕ and gamepad B close it.
-- [ ] The list shows every quest with the right dot (gold: claim waiting, grey: under way, green: claimed); All / Daily / Main filter it; the list scrolls.
-- [ ] Progress moves while the Journal is open (it refreshes every 5 s); CLAIM pays a finished quest once and then reads CLAIMED; Coins and Gems update.
-- [ ] The map matches the island in play (coast, Crater Lake and the Keep, river, Frostpeak's snow, Emberhollow); pins sit on their places; zoom works; the Keep's plate shows for the Guardian quest.
-- [ ] Phones: the window fits; rows, tabs and CLAIM are tappable.
-
-## Parchment Inventory & Vault (GDD §10.3, §25.4, §53)
-
-How it's built: one window (`Hud/InventoryPanel`, slots `Hud/ItemSlot`, item text `ItemInfo`) driven by `VaultController` in the lobby and `InventoryController` in a run. Spec: `docs/ui/InventoryScreen.md`. Item icons are not drawn yet; slots show names until `item_<catalogId>` sprites are uploaded.
-
-Automated: `item_info.spec` (tabs, search, stat chips); `capture.py inventory`; `vault_flow` and `inventory_flow` drive both controllers.
-
-Studio and live checks:
-
-- [ ] Lobby: the Inventory and Vault tiles and Tab open the window; STORE / → vault the chosen backpack item; TAKE / ← bring a vault item or the picked amount of a material out; STORE ALL vaults everything that fits and says how many overflowed; a near-full material deposit asks first and deletes only what it said.
-- [ ] Lobby: tabs and search filter both panes; sort cycles Saved / Name / Count; the capacity bar matches the vault's item slots.
-- [ ] Run: Tab opens the window with the 50 backpack slots, the six hotbar slots (with their keys) and the three armour slots; a slot then another moves or swaps; → sends to the first free hotbar slot (armour to its slot); ← sends back to the backpack; WEAR / TAKE OFF / EQUIP / USE / DROP work; the equipped hotbar slot has a leather ring.
-- [ ] Run: Tab closes it again, Q drops, 1–6 still select hotbar slots (hotfix 2026-10-28: the six-slot change had stopped Tab and Q from binding in runs).
-- [ ] Gamepad: B closes; slots, tabs and buttons are reachable with the D-pad.
-
-## Parchment Crafting and Forge (GDD §15–16, §25.3)
-
-How it's built: one recipe window (`Hud/CraftingPanel`) used by `CraftingController` in runs and `ForgeController` in the lobby. Spec: `docs/ui/CraftingScreen.md`.
-
-Automated: `capture.py crafting`, `crafting_flow`, `forge_flow`.
-
-Studio and live checks:
-
-- [ ] Run: V (Craft) opens it; tabs filter (the chosen tab again shows all); search works; counts follow the backpack live; walking up to a Workbench, Furnace, Anvil or Cauldron ticks it under STATIONS NEARBY and enables its recipes.
-- [ ] Run: CRAFT makes one; smelting takes the stepper's batch or Craft all; the job row shows progress and time left; ✕ stops it and keeps the bars made.
-- [ ] Lobby: the Forge tile opens ANCESTRAL FORGE with vault counts; locked recipes say what unlocks them; FORGE puts the item in the lobby backpack.
-- [ ] Lobby: a Permanent recipe lists the vault gear it can convert; CONVERT asks first, arms after 1.5 s, and converts the chosen piece only.
-
-## Parchment Market, Progress, Trade and notice cards (GDD §10, §33, §37, §34.1)
-
-How it's built: one list window (`Hud/ListWindow`) for the Market (`WalletController`), Progress (`ProgressionController`) and Trade (`TradeController`); notices, trade invites, toasts and receipts on `Hud/NoticeCard`. Spec: `docs/ui/ListWindows.md`.
-
-Automated: `capture.py market_flow`, `progress_flow`, `trade_flow`, `notices`.
-
-Studio and live checks:
-
-- [ ] Market: the Shop tile and nav button open it; Coins and Gems in the corner follow purchases; BUY, SELL, SELL 10 and SELL ALL move the right amounts; respec asks first; a Robux offer prompts the real product; a code redeems once.
-- [ ] Progress: P opens it in lobby and run; perk BUY spends tokens; REVIEW REBIRTH arms after 1.5 s and rebirths; Perks and Rebirth say they are lobby-only in a run.
-- [ ] Trade: inviting a second player shows them the ACCEPT / DECLINE card; both offers update live; any change unlocks both; the countdown runs after both lock; CONFIRM completes; typing gems while the partner changes their offer keeps what you typed.
-- [ ] Phones (844 × 390): the list windows draw at about half size, so row details read at roughly 9–10 px; judge on a device whether they need a larger phone text size.
-- [ ] Notices: a server notice, a run toast and an extraction receipt read clearly over the game at phone and desktop sizes and dismiss on tap.
-- [ ] Gamepad: every list button is reachable, B closes a question before the window, focus survives a redraw.
-- [ ] World map (run): N / DPadDown opens it centred on you; pins name the camps and landmarks; active portals and events show and update; zoom follows you until you drag; the safe-camp card appears inside a camp and leaves outside it.
-
-## Parchment in-world HUD (GDD §11, §25.4, §56)
-
-How it's built: the same HUD modules (`Hud/Compass`, `Vitals`, `ObjectivePanel`, `EventPanel`, `PartyFrames`, `BottomBar`) with the parchment layout in `HudLayout.json`. Spec: `docs/ui/HudScreen.md`. Automated: `capture.py hud`.
-
-- [ ] In a run: the compass letters scroll with the camera over the parchment strip; waypoints sit under it.
-- [ ] Health, Stamina and Food fill and drain smoothly inside their bars, with the number readable.
-- [ ] The objective and world event cards appear and update under the vitals; party members show with headshots.
-- [ ] The backpack button opens and closes the backpack; the six hotbar slots select with keys, taps and the bumper; the chosen slot glows gold.
-- [ ] Phone and console sizes keep everything on screen and readable.
+- [ ] **In-world HUD and overlays:** vitals, compass, objective and event cards, party frames, the hotbar and notices use the kit look and stay readable on phone, desktop and console sizes.
 
 ## UI images on phones (SpriteLoader pacing)
 
-How it's built: `Hud/SpriteLoader` fetches HUD images one at a time (a single preload in flight), images on screen first, then hands each to every label that uses it; phones fetch a menu's art when it opens; a failed fetch is asked again later under the other spelling of the asset, and its labels try on their own after a few failures. Phones refused bursts of image requests (the first handful loaded, the rest failed), so the sprites are also packed into atlas images (`art/ui/pack_atlas.py`): `atlas_lobby` and `atlas_hud` for the lobby and the run HUD, `atlas_ui` for the kit every window shares (the Market, Progress and Trade windows need only it), `atlas_pieces` for the Crafting, Forge, Inventory, Journal and Settings pieces, `atlas_map` and `atlas_island` for the maps, and `atlas_window_<screen>_1/_2` holding each screen's window frame as two full-resolution tiles. Once uploaded, a screen fetches one to four images and draws every sprite as its rectangle of one. Phones drew Roblox's own 9-slice of an atlas rectangle wrongly (pieces cut, shifted or taken from neighbouring sprites), so `Widgets.Sprite` draws a sliced atlas sprite as nine plain atlas rectangles; every device also prefetches closed menus' atlases after what is on screen, so menus open with their art loaded. Roblox applies text-size caps in screen pixels after UIScale, so `Widgets.TextCap` scales each cap with the window. Automated: `capture.py sprite_loader_flow`. Device reports: each client sends its image states 30 s and 2 min after joining; the "Probe UI images in a live place" workflow on main prints them (reports = true).
+How it's built: `Hud/SpriteLoader` fetches HUD images one at a time (a single preload in flight), images on screen first, then hands each to every label that uses it; phones fetch a menu's art when it opens; a failed fetch is asked again later under the other spelling of the asset, and its labels try on their own after a few failures. Phones refused bursts of image requests (the first handful loaded, the rest failed), so the sprites are also packed into atlas images (`art/ui/pack_atlas.py`): `atlas_lobby` and `atlas_hud` for the lobby and the run HUD, `atlas_ui` for the kit every window shares (the Market, Progress and Trade windows need only it), `atlas_pieces` for the Crafting, Forge, Inventory, Journal and Settings pieces, `atlas_map` and `atlas_island` for the maps, and `atlas_window_<screen>_1/_2` holding each screen's window frame as two full-resolution tiles. Once uploaded, a screen fetches one to four images and draws every sprite as its rectangle of one. Phones drew Roblox's own 9-slice of an atlas rectangle wrongly (pieces cut, shifted or taken from neighbouring sprites), so `Widgets.Sprite` draws a sliced atlas sprite as nine plain atlas rectangles; every device also prefetches closed menus' atlases after what is on screen, so menus open with their art loaded. Roblox applies text-size caps in screen pixels after UIScale, so `Widgets.TextCap` scales each cap with the window. The rebuilt screens draw the kit's `lk_` sprites from the `atlas_lk_*` atlases (ARCHITECTURE §6) once uploaded; the older atlases stay until then. Automated: `capture.py sprite_loader_flow`. Device reports: each client sends its image states 30 s and 2 min after joining; the "Probe UI images in a live place" workflow on main prints them (reports = true).
 
 - [ ] On a phone, on a fresh server: every lobby plate, tile, coin and gem appears within a few seconds of joining.
 - [ ] On a phone, each menu's art appears within a second or two of opening it, and the in-world HUD's art appears when a run starts.

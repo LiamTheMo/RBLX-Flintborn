@@ -64,7 +64,7 @@ masks are `cls()` in `m.py` (HSV, h in degrees):
   shadow as background when measuring ours.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m032_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m032_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, exploded and close-up boxes `X`, `preview()`), `zoom.py` (crop +
   upscale), `grid.py` (10 % grids `g_*.png`, red = centre lines), `bb.json` (silhouette boxes).

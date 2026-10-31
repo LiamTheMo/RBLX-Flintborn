@@ -49,3 +49,10 @@ category glyph.
 `crafting_flow` (an instant craft sends no count, nothing without a furnace, the
 stepper sets the batch, Craft all, ✕ stops); `forge_flow` (FORGE, a conversion asks
 first and arms only after its delay, cancel, a locked recipe).
+
+## Fix round 3
+
+Shares the recipe window with the Forge (ForgeScreen.md, fix round 3): phone
+row notes, wrapped long notes, gamepad selection kept on re-render, selectable
+material rows. The ×20 open/close check in `crafting_flow` counts instances
+and connections.

@@ -53,7 +53,7 @@ Sheet text:
 - **O, other:** dark creases, outlines and anti-aliasing; in silhouettes but not in the shares (3.0–3.6 %).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m036_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m036_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14 with Pillow and numpy; no scipy, so `m.py` has
 its own `label()`).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V` and `X`, `preview()`, `label()`), `zoom.py` (crop + upscale),

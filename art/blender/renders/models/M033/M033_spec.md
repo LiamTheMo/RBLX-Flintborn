@@ -61,7 +61,7 @@ masks are `cls()` in `m.py` (HSV; background = within 14 of the paper):
   - a few lit moss pixels on the clump crowns next to sprout B (hue 72–73°, v 0.68–0.70) fall into L (< 0.3 points).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m033_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m033_study\`.
 Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, label blanking, `stats`), `comps.py` (connected components
   `label()`), `bb.json` (silhouette boxes), `crop.py`, `gridcrop.py` (crop with a sheet-pixel grid), `grid.py`.

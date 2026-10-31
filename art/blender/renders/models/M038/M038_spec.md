@@ -73,7 +73,7 @@ side (272,485,510,664), rear (513,485,760,664), top (763,476,1009,664), exploded
 VFX overlay (566,1366,1009,1495). Swatch boxes 30 × 32 px at x 714 / 775 / 836 / 897 / 957, y 52–84.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m038_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m038_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14 with Pillow and numpy; no scipy, so `m.py` has
 its own `label()`).
 - **Helpers:** `m.py` (masks `cls()`, cell boxes `V` / `X`, swatches `SW`, `label()`, `preview()`), `zoom.py` (crop +

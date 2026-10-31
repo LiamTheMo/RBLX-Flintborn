@@ -1,6 +1,11 @@
 -- Lobby parties (GDD Q161c): players group in the lobby and deploy into the same
 -- world together. Pure state transitions over a parties table, so the server and
 -- specs share one definition. Every function returns (ok, reason?).
+--
+-- Ready is advisory and lobby only: a per-player flag kept apart from parties, so a
+-- solo player can be ready without creating a party (a party of one would write a
+-- deploy record and start a tribe). Any membership change clears it for everyone
+-- in the parties involved; the deploy and leaving the server clear it too.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 
@@ -8,11 +13,17 @@ local PartyRules = {}
 
 PartyRules.MAX_SIZE = GameConstants.MAX_TRIBE_SIZE
 
-export type Party = { id: string, leader: number, members: { number }, invites: { [number]: boolean } }
-export type State = { parties: { [string]: Party }, memberOf: { [number]: string } }
+export type Party = {
+	id: string,
+	leader: number,
+	members: { number },
+	invites: { [number]: boolean },
+	createdAt: number?,
+}
+export type State = { parties: { [string]: Party }, memberOf: { [number]: string }, ready: { [number]: boolean } }
 
 function PartyRules.NewState(): State
-	return { parties = {}, memberOf = {} }
+	return { parties = {}, memberOf = {}, ready = {} }
 end
 
 function PartyRules.PartyOf(state: State, userId: number): Party?
@@ -20,23 +31,53 @@ function PartyRules.PartyOf(state: State, userId: number): Party?
 	return id and state.parties[id] or nil
 end
 
--- A player with no party leads a party of one.
-function PartyRules.Ensure(state: State, userId: number, partyId: string): Party
+function PartyRules.IsReady(state: State, userId: number): boolean
+	return state.ready[userId] == true
+end
+
+-- Sets the player's own ready flag. Only a boolean is accepted.
+function PartyRules.SetReady(state: State, userId: number, ready: any)
+	if type(ready) ~= "boolean" then
+		return false, "BadRequest"
+	end
+	state.ready[userId] = if ready then true else nil
+	return true, nil
+end
+
+function PartyRules.ClearReady(state: State, userIds: { number })
+	for _, userId in userIds do
+		state.ready[userId] = nil
+	end
+end
+
+-- Leader's invites still waiting for an answer, as sorted user ids.
+function PartyRules.PendingInvites(party: Party): { number }
+	local userIds = {}
+	for userId in party.invites do
+		table.insert(userIds, userId)
+	end
+	table.sort(userIds)
+	return userIds
+end
+
+-- A player with no party leads a party of one, created at `now` (the caller's
+-- clock, so this module stays pure).
+function PartyRules.Ensure(state: State, userId: number, partyId: string, now: number?): Party
 	local party = PartyRules.PartyOf(state, userId)
 	if party then
 		return party
 	end
-	party = { id = partyId, leader = userId, members = { userId }, invites = {} }
+	party = { id = partyId, leader = userId, members = { userId }, invites = {}, createdAt = now }
 	state.parties[partyId] = party
 	state.memberOf[userId] = partyId
 	return party
 end
 
-function PartyRules.Invite(state: State, fromUserId: number, toUserId: number, newPartyId: string)
+function PartyRules.Invite(state: State, fromUserId: number, toUserId: number, newPartyId: string, now: number?)
 	if fromUserId == toUserId then
 		return false, "CannotInviteSelf"
 	end
-	local party = PartyRules.Ensure(state, fromUserId, newPartyId)
+	local party = PartyRules.Ensure(state, fromUserId, newPartyId, now)
 	if party.leader ~= fromUserId then
 		return false, "NotLeader"
 	end
@@ -58,10 +99,12 @@ function PartyRules.Accept(state: State, userId: number, partyId: string)
 	if #party.members >= PartyRules.MAX_SIZE then
 		return false, "PartyFull"
 	end
+	-- Leaving the old party clears ready there; the party joined is cleared here.
 	PartyRules.Leave(state, userId)
 	party.invites[userId] = nil
 	table.insert(party.members, userId)
 	state.memberOf[userId] = partyId
+	PartyRules.ClearReady(state, party.members)
 	return true, nil
 end
 
@@ -74,11 +117,13 @@ function PartyRules.Decline(state: State, userId: number, partyId: string)
 end
 
 -- Leaving hands leadership to the next member, and an empty party is removed.
+-- Everyone who was in the party, the leaver too, is no longer ready.
 function PartyRules.Leave(state: State, userId: number)
 	local party = PartyRules.PartyOf(state, userId)
 	if party == nil then
 		return true, nil
 	end
+	PartyRules.ClearReady(state, party.members)
 	local index = table.find(party.members, userId)
 	if index then
 		table.remove(party.members, index)
@@ -125,9 +170,11 @@ function PartyRules.VerifiedPartyId(record: any, userId: number, worldId: string
 	return record.partyId
 end
 
--- Clears a player's pending invites everywhere (when they leave the lobby server).
+-- Clears a player's pending invites and ready flag everywhere (when they leave the
+-- lobby server); their party's members are no longer ready either.
 function PartyRules.Forget(state: State, userId: number)
 	PartyRules.Leave(state, userId)
+	state.ready[userId] = nil
 	for _, party in state.parties do
 		party.invites[userId] = nil
 	end

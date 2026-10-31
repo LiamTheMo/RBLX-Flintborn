@@ -11,8 +11,13 @@ local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
 local ForgeRecipes = require(script.Parent.ForgeRecipes)
 local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 local Tiers = require(script.Parent.Parent.Items.Tiers)
+local Validation = require(script.Parent.Parent.Data.Validation)
 
 local ForgeRules = {}
+
+-- Most crafts of one special recipe in a single request. A Permanent conversion
+-- always takes exactly one source item, so its batch is 1.
+ForgeRules.MAX_BATCH = 10
 
 -- Permanent conversions are browsed by their source's tier, weakest first (power,
 -- then ladder order); gear without a tier (the Guardian's Fang) comes last.
@@ -72,7 +77,8 @@ end
 
 -- Vaulted quantity of a material. The lobby backpack never counts (§25.3).
 function ForgeRules.Owned(profile, catalogId: string): number
-	return profile.vault.materials[catalogId] or 0
+	local materials = profile.vault and profile.vault.materials
+	return materials and materials[catalogId] or 0
 end
 
 function ForgeRules.RequirementsMet(profile, recipe): boolean
@@ -140,20 +146,79 @@ function ForgeRules.Sources(profile, recipe, ownerId: number)
 	return sources
 end
 
-local function backpackFits(profile, item): boolean
+local function backpackFits(profile, outputs): boolean
 	local trial = table.clone(profile.lobbyBackpack.slots)
 	for index, slot in trial do
 		trial[index] = table.clone(slot)
 	end
-	return ExtractionRules.AddToLobbyBackpack(trial, table.clone(item)) == 0
+	for _, item in outputs do
+		if ExtractionRules.AddToLobbyBackpack(trial, table.clone(item)) ~= 0 then
+			return false
+		end
+	end
+	return true
 end
 
--- Applies one Forge request. `request` = {recipeId, sourceId?, ownerId, operationId,
--- now, newId}. Returns (receipt, nil) or (nil, reason) with the profile untouched.
+-- The results `count` crafts of a special recipe make: one stack, or one item each.
+local function outputsOf(recipe, count: number, ownerId: number?, newId: () -> string)
+	if ItemCatalog.IsStackable(recipe.output) then
+		return { { catalogId = recipe.output, quantity = recipe.quantity * count } }
+	end
+	local outputs = {}
+	for _ = 1, count do
+		table.insert(outputs, {
+			instanceId = newId(),
+			catalogId = recipe.output,
+			ownerId = ownerId,
+			location = "LobbyBackpack",
+			qualityRoll = 0,
+		})
+	end
+	return outputs
+end
+
+local function trialId(): string
+	return "trial"
+end
+
+-- How many crafts of `recipe` one request may ask for right now: up to MAX_BATCH
+-- (1 for a Permanent conversion), no more than the vault's materials pay for, and
+-- for special recipes no more than the lobby backpack has room for. 0 when even
+-- one would be refused. Craft re-checks everything; this only guides the client.
+-- A profile-like table without a lobby backpack (a client-side snapshot) puts no
+-- room limit on the count: only the server's full profile knows the backpack.
+function ForgeRules.MaxCount(profile, recipe): number
+	local limit = if recipe.kind == ForgeRecipes.Kinds.Permanent then 1 else ForgeRules.MAX_BATCH
+	for catalogId, quantity in recipe.inputs do
+		limit = math.min(limit, math.floor(ForgeRules.Owned(profile, catalogId) / quantity))
+	end
+	local backpack = profile.lobbyBackpack
+	if
+		recipe.kind ~= ForgeRecipes.Kinds.Permanent
+		and type(backpack) == "table"
+		and type(backpack.slots) == "table"
+	then
+		while limit > 0 and not backpackFits(profile, outputsOf(recipe, limit, nil, trialId)) do
+			limit -= 1
+		end
+	end
+	return limit
+end
+
+-- Applies one Forge request. `request` = {recipeId, sourceId?, count?, ownerId,
+-- operationId, now, newId}. `count` (default 1) crafts are checked, charged and
+-- granted together. Returns (receipt, nil) or (nil, reason) with the profile untouched.
 function ForgeRules.Craft(profile, request)
 	local recipe = ForgeRecipes.Get(request.recipeId)
 	if recipe == nil then
 		return nil, "UnknownRecipe"
+	end
+	local count = if request.count == nil then 1 else request.count
+	if not Validation.IsQuantity(count, 1, ForgeRules.MAX_BATCH) then
+		return nil, "BadQuantity"
+	end
+	if recipe.kind == ForgeRecipes.Kinds.Permanent and count ~= 1 then
+		return nil, "BadQuantity"
 	end
 	if profile.transit ~= nil then
 		return nil, "InTransit"
@@ -165,13 +230,15 @@ function ForgeRules.Craft(profile, request)
 	if not ForgeRules.IsUnlocked(profile, recipe.id) then
 		return nil, "Locked"
 	end
+	local spend = {}
 	for catalogId, quantity in recipe.inputs do
-		if ForgeRules.Owned(profile, catalogId) < quantity then
+		spend[catalogId] = quantity * count
+		if ForgeRules.Owned(profile, catalogId) < spend[catalogId] then
 			return nil, "MissingMaterials"
 		end
 	end
 
-	local output, sourceIndex
+	local outputs, sourceIndex = {}, nil
 	if recipe.kind == ForgeRecipes.Kinds.Permanent then
 		sourceIndex = vaultIndexOf(profile, request.sourceId)
 		local source = sourceIndex and profile.vault.items[sourceIndex]
@@ -182,23 +249,16 @@ function ForgeRules.Craft(profile, request)
 		if source.catalogId ~= recipe.source then
 			return nil, "WrongSource"
 		end
-	elseif ItemCatalog.IsStackable(recipe.output) then
-		output = { catalogId = recipe.output, quantity = recipe.quantity }
 	else
-		output = {
-			instanceId = request.newId(),
-			catalogId = recipe.output,
-			ownerId = request.ownerId,
-			location = "LobbyBackpack",
-			qualityRoll = 0,
-		}
+		outputs = outputsOf(recipe, count, request.ownerId, request.newId)
 	end
-	if output and not backpackFits(profile, output) then
+	if not backpackFits(profile, outputs) then
 		return nil, "BackpackFull"
 	end
 
-	-- Everything checked: charge the inputs and create exactly one result.
-	for catalogId, quantity in recipe.inputs do
+	-- Everything checked: charge the inputs for all `count` crafts and create
+	-- exactly their results.
+	for catalogId, quantity in spend do
 		local remaining = ForgeRules.Owned(profile, catalogId) - quantity
 		profile.vault.materials[catalogId] = if remaining > 0 then remaining else nil
 	end
@@ -206,7 +266,8 @@ function ForgeRules.Craft(profile, request)
 		at = request.now,
 		recipeId = recipe.id,
 		recipeVersion = recipe.version,
-		inputs = table.clone(recipe.inputs),
+		count = count,
+		inputs = spend,
 		status = "Committed",
 	}
 	if sourceIndex then
@@ -215,8 +276,18 @@ function ForgeRules.Craft(profile, request)
 		receipt.sourceId = item.instanceId
 		receipt.output = { catalogId = item.catalogId, instanceId = item.instanceId, permanent = true }
 	else
-		ExtractionRules.AddToLobbyBackpack(profile.lobbyBackpack.slots, output)
-		receipt.output = { catalogId = output.catalogId, quantity = output.quantity, instanceId = output.instanceId }
+		local instanceIds = {}
+		for _, output in outputs do
+			ExtractionRules.AddToLobbyBackpack(profile.lobbyBackpack.slots, output)
+			table.insert(instanceIds, output.instanceId)
+		end
+		local first = outputs[1]
+		receipt.output = {
+			catalogId = first.catalogId,
+			quantity = first.quantity,
+			instanceId = first.instanceId,
+			instanceIds = if #instanceIds > 0 then instanceIds else nil,
+		}
 	end
 	Receipts.Store(profile.receipts.forge, request.operationId, receipt)
 	return receipt, nil

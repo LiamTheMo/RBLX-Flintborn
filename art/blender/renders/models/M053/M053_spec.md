@@ -59,7 +59,7 @@ ortho dividers x 264 / 511 / 759; exploded | close-ups x 663; close-up and palet
   - **O, other:** outlines, bore holes, the darkest creases.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m053_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m053_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy; no scipy / skimage).
 - **Helpers:** `m.py` (masks, boxes, `silhouette()`, `preview()`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png
   [grid]`), `comps.py` (`label()`, connected components; `comps.py front rear f34` lists rock and plant blobs).

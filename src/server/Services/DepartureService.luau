@@ -14,6 +14,7 @@ local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecove
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ListingKeys = require(ReplicatedStorage.Shared.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -37,10 +38,13 @@ local function view(contents)
 		local def = ItemCatalog.Get(item.catalogId)
 		table.insert(entries, {
 			index = index,
+			key = ListingKeys.KeyOf(item),
+			catalogId = item.catalogId,
 			name = def and def.name or item.catalogId,
 			rarity = def and def.rarity or "Common",
 			quantity = item.quantity,
 			qualityRoll = item.qualityRoll,
+			permanent = item.permanent,
 		})
 	end
 	return entries
@@ -89,7 +93,9 @@ local function createBody(position: Vector3, contents, ownerName: string)
 	return body
 end
 
-local function take(looter: Player, bodyId: any, index: any)
+-- (bodyId, index, key): the entry `key` names (ListingKeys), so a stale index
+-- never takes a different item.
+local function take(looter: Player, bodyId: any, index: any, key: any)
 	if not Validation.IsId(bodyId) then
 		return false, "BadRequest"
 	end
@@ -100,10 +106,12 @@ local function take(looter: Player, bodyId: any, index: any)
 	if not canLoot(looter, body) then
 		return false, "TooFar"
 	end
-	local entry = body.contents[index]
-	if entry == nil then
-		return false, "Empty"
+	local found, problem = ListingKeys.Resolve(body.contents, index, key)
+	if found == nil then
+		return false, problem
 	end
+	index = found
+	local entry = body.contents[index]
 	local copy = ProfileSchema.DeepCopy(entry)
 	if copy.instanceId then
 		-- A looted unique item now belongs to the looter (still unsecured).

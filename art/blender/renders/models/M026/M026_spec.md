@@ -43,7 +43,7 @@ close-ups cut end (15,1290,370,1520), junction (375,1290,700,1520), underside (7
 - **O, other:** ground shadow, dark bark slits, text; not counted in the shares.
 
 **Scratch study material** (pure Python, numpy + Pillow, no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m026_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m026_study\`.
 Run with `...\scratchpad\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, view boxes `V`, `label()` connected components), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` (bboxes, shares, mask previews `cls_*.png`); `comps.py` (cut-face and clump

@@ -1,4 +1,4 @@
--- Sprint (hold) and crouch (toggle) input on keyboard, gamepad and touch (GDD §5.1,
+-- Sprint (hold) input on keyboard, gamepad and touch (GDD §5.1,
 -- Q27). Sends intent only; the server owns stamina and movement speed (including
 -- the 30% slow in water). Nobody swims (GDD §55): this client owns its
 -- character's humanoid state, so it turns Swimming off on every character. World
@@ -16,10 +16,9 @@ local MovementController = {}
 
 local player = Players.LocalPlayer
 local sprintHeld = false
-local crouching = false
 
 local function send()
-	Remotes.Get("SetMovement"):FireServer(sprintHeld, crouching)
+	Remotes.Get("SetMovement"):FireServer(sprintHeld)
 end
 
 local function onSprint(_, inputState)
@@ -35,27 +34,17 @@ local function onSprint(_, inputState)
 	return Enum.ContextActionResult.Sink
 end
 
-local function onCrouch(_, inputState)
-	if inputState == Enum.UserInputState.Begin then
-		crouching = not crouching
-		send()
-	end
-	return Enum.ContextActionResult.Sink
-end
-
 local function bind()
 	Binds.Bind(
 		"Sprint",
 		onSprint,
 		{ priority = Enum.ContextActionPriority.High.Value, touchButton = true, title = "Sprint" }
 	)
-	Binds.Bind("Crouch", onCrouch, { touchButton = true, title = "Crouch" })
 end
 
 local function unbind()
 	Binds.Unbind("Sprint")
-	Binds.Unbind("Crouch")
-	sprintHeld, crouching = false, false
+	sprintHeld = false
 end
 
 local function refresh()

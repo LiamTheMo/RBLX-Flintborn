@@ -58,7 +58,7 @@ Sheet text:
   y 266 / 307 / 349 / 390 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m043_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m043_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `CONN` / `SW` / `TITLES`, `label`, `main_obj`), `zoom.py` (crop, optional
   sheet grid), `px.py` (pixel probe), `prev.py` (mask previews `cls_*.png`), `blendall.py` (name search in every `.blend`).

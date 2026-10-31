@@ -7,7 +7,7 @@
 
 ## Repository integration — read before the generic recipes
 
-This guide supplements [visuals.md](visuals.md). [GDD.md](GDD.md) remains the gameplay authority; [Modeling.md](Modeling.md) covers the R6 survivor and creature pipeline. Follow [CLAUDE.md](CLAUDE.md) and [art/blender/README.md](art/blender/README.md) for the actual repository build and export contracts. If a generic example below differs from those contracts, **the repository contracts win**.
+This guide supplements [visuals.md](visuals.md). [GDD.md](GDD.md) remains the gameplay authority; [Modeling.md](Modeling.md) covers the R6 survivor and creature pipeline. Follow [AGENTS.md](AGENTS.md) and [art/blender/README.md](art/blender/README.md) for the actual repository build and export contracts. If a generic example below differs from those contracts, **the repository contracts win**.
 
 The current production pipeline already establishes:
 
@@ -878,7 +878,7 @@ Classify checks as `Completed / Passed`, `Requires Manual Validation`, or `Incom
 
 Do not respond to any of these failures by indiscriminately adding detail. Change the smallest structural parameter that explains the mismatch, render again, and compare.
 
-## 19. Ready-to-paste task prompt for Claude or another Blender MCP LLM
+## 19. Ready-to-paste task prompt for a Blender MCP assistant
 
 ```text
 Read WorldModeling.md before operating Blender. Use the attached selected asset
@@ -886,7 +886,7 @@ reference as the visual target. Build one representative asset first, not a
 whole biome. Treat the guide's numerical ranges as starting proposals and
 preserve existing project scale/material decisions when present.
 
-In RBLX-Flintborn, read CLAUDE.md and art/blender/README.md first. Use flintkit's
+In RBLX-Flintborn, read AGENTS.md and art/blender/README.md first. Use flintkit's
 palette and Tint data, the existing sheet dimensions and 32-stud terrain grid,
 the run.sh wrapper, and one finished mesh per static library asset. Keep editable
 parts in authoring sources; use the existing GLB/manifest export contract.

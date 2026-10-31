@@ -76,7 +76,7 @@ frame bottom y 705, cell dividers x 269, 507, 758–759; exploded frame y 742–
   - **Leaf tones:** light = h < 80 and v ≥ 0.55; dark = (h ≥ 93 or v < 0.45) and not light; mid = the rest.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m059_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m059_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (boxes, `cls9`, `silhouette`, `hsv`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `mont.py`, `probe.py` (`probe.py x,y …`), `comps.py` (`label()`).
@@ -1005,7 +1005,7 @@ script (decision 11).
 - **Blade parts** are built exactly as they sit in the hero (same lean, roll and colour); their origins are their own bbox
   bottom centres (offsets in `o["m059_offset"]`).
 - Scratch: measuring scripts `meas.py`, `tonemap.py`, `pscore.py` and `final_meas.txt` in
-  `C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m059w\`
+  `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m059w\`
   (run with `uv run --no-project --with pillow --with numpy python meas.py front_sheet sheet:front …`).
 
 ## Stage 7 verification (round 1)

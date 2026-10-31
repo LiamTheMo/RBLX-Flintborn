@@ -2200,7 +2200,7 @@ SHEET_BOX = {"f34": (20, 130, 460, 445), "r34": (470, 150, 845, 445), "front": (
              "side": (276, 508, 510, 716), "rear": (516, 508, 767, 716), "top": (773, 508, 1003, 716)}
 REPORT_VIEWS = {"front": (0, 7), "side": (90, 7), "rear": (180, 7), "top": (0, 78), "f34": (-14, 10),
                 "r34": (166, 10)}
-REPORT_DIR = "C:/Users/Orang/AppData/Local/Temp/claude/D--Projects-Roblox-RBLX-Flintborn/m015_s4"
+REPORT_DIR = K.TEMP_ROOT + "m015_s4"
 LABEL_RGB = {"shell": (0.0, 1.0, 0.0), "rim": (1.0, 0.0, 1.0), "slot": (1.0, 1.0, 0.0), "core": (0.0, 0.0, 1.0),
              "rock": (1.0, 0.0, 0.0), "crack": (0.0, 1.0, 1.0)}
 # (Stage 4-6 round 2) the sheet's crack boxes (M015_spec.md §5.2): crack 1 and crack 2 front, the BR crack side and

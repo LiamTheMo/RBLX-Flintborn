@@ -1,69 +1,53 @@
--- Crafting menu (GDD §25.3, §16.8, §51) in the parchment Crafting window
--- (Hud/CraftingPanel). Recipes are listed by category (tabs) and tier, with a
--- search box; the chosen recipe shows what it needs against what you carry
--- (from the live inventory) and the station it needs, marked when none is in
--- reach. Smelting takes a batch (the stepper, or Craft all for as many as the ore
--- allows) and shows its progress on the right with a Stop button (the server
--- publishes it as Smelt* player attributes), beside which stations are within
--- reach. The server decides; this only sends the request. World place only.
+-- Field crafting (GDD §25.3, §16.8, §51) in the recipe window (Hud/Screens/
+-- RecipeWindow, crafting mode). Recipes are listed by category (the dropdown)
+-- and tier; the chosen one shows what it needs against what you carry (the live
+-- inventory) and the station it needs, and its button says when none is in
+-- reach. Smelting takes a batch (QUANTITY, or All for as many as the ore allows;
+-- other recipes make one per request, CraftingRules.BatchCount) and shows its
+-- progress on the right with a Stop button (the server publishes it as Smelt*
+-- player attributes), beside which stations are within reach. The server
+-- decides; this only sends the request. World place only.
 
 local CollectionService = game:GetService("CollectionService")
-local ContextActionService = game:GetService("ContextActionService")
-local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local InventoryController = require(script.Parent.InventoryController)
-local CraftingPanel = require(script.Parent.Parent.Hud.CraftingPanel)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local RecipeWindow = require(script.Parent.Parent.Hud.Screens.RecipeWindow)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local CraftingController = {}
 
+-- How often the open window rechecks which stations are in reach, and ticks a
+-- running smelt's time left (there is no event for either).
+CraftingController.WATCH_SECONDS = 0.5
+
 local player = Players.LocalPlayer
 local make = Theme.Make
 local ui = {}
-local panel = nil
+local window = nil
 local nearbyKey = ""
-local smeltConnection = nil
-
-local CLOSE_ACTION = "FlintbornCraftingClose"
-
--- Category tabs and their glyphs.
-CraftingController.GLYPHS = {
-	Weapons = "pm_glyph_sword",
-	Tools = "pm_glyph_tools",
-	Armor = "pm_glyph_armor",
-	Bars = "pm_glyph_bag",
-	Consumables = "pm_glyph_heart",
-	Other = "pm_glyph_bench",
-}
+local watching = nil
 
 local sortedRecipes = CraftingRules.Sorted(Recipes.List)
 
 local REASON_TEXT = {
-	Busy = "You are already smelting. Wait for it or press ✕ to stop.",
+	Busy = "You are already smelting. Wait for it or press Stop.",
 	TooFast = "Slow down a moment.",
 	MissingIngredients = "You don't have the ingredients.",
 	InventoryFull = "No room in your inventory for that.",
 	Downed = "You can't craft while downed.",
 	NotInRun = "You can only craft during a run.",
 }
-
-local function nameOf(catalogId: string): string
-	local def = ItemCatalog.Get(catalogId)
-	return def and def.name or catalogId
-end
 
 local function stationHint(station: string): string
 	local verb = if station == Recipes.Cauldron
@@ -105,74 +89,44 @@ local function keyOf(set): string
 	return table.concat(parts, ",")
 end
 
--- A recipe as the window lists it, with what the player carries and whether a
--- station for it is in reach.
-local function entryFor(recipe, nearby)
-	local inputs = {}
-	local can = CraftingRules.MAX_BATCH
-	for input, amount in recipe.inputs do
-		local owned = InventoryController.Count(input)
-		can = math.min(can, owned // amount)
-		table.insert(inputs, { id = input, name = nameOf(input), owned = owned, needed = amount })
-	end
-	table.sort(inputs, function(a, b)
-		return a.name < b.name
-	end)
-	local timed = CraftingRules.IsTimed(recipe)
-	local station = CraftingRules.StationFor(recipe)
-	local here = CraftingRules.AvailableHere(recipe, nearby)
-	return {
-		id = recipe.id,
-		output = recipe.output,
-		name = nameOf(recipe.output),
-		quantity = recipe.quantity,
-		category = CraftingRules.Category(recipe),
-		inputs = inputs,
-		can = can,
-		here = here,
-		where = (station or "Anywhere") .. (if timed then (" · %s s each"):format(tostring(recipe.seconds)) else ""),
-		timed = timed,
-		verb = if not here and station
-			then ("NEED %s"):format(string.upper(station))
-			elseif timed then "SMELT"
-			else "CRAFT",
-	}
-end
-
 local function refresh()
 	local nearby = stationsNearby()
 	nearbyKey = keyOf(nearby)
-	local entries = {}
-	for _, recipe in sortedRecipes do
-		table.insert(entries, entryFor(recipe, nearby))
-	end
-	panel:SetNearby(nearby)
-	panel:SetEntries(entries)
+	window:SetEntries(
+		RecipeModel.CraftEntries(sortedRecipes, InventoryController.Count, nearby),
+		RecipeModel.Carried(InventoryController.Snapshot.slots)
+	)
+	window:SetStations(RecipeModel.StationsText(nearby))
 end
+CraftingController.Refresh = refresh
 
-local function craft(entry, count: number?)
+local function craft(entry, count: number)
 	local recipe = Recipes.Get(entry.id)
 	if recipe == nil then
 		return
 	end
-	panel:SetBusy(true)
+	-- Only timed recipes take a count (CraftingRules.BatchCount).
+	local batch = if entry.timed then count else nil
+	window:SetBusy(true)
 	local ok, success, reason = pcall(function()
-		return Remotes.Get("Craft"):InvokeServer(HttpService:GenerateGUID(false), recipe.id, count)
+		return Remotes.Get("Craft"):InvokeServer(HttpService:GenerateGUID(false), recipe.id, batch)
 	end)
-	panel:SetBusy(false)
+	window:SetBusy(false)
+	local name = RecipeModel.NameOf(recipe.output)
 	if ok and success then
-		panel:SetStatus(
-			if count
-				then ("Smelting %d %s…"):format(count, nameOf(recipe.output))
-				else "Crafted " .. nameOf(recipe.output) .. (recipe.quantity > 1 and (" ×" .. recipe.quantity) or "")
-		)
+		if batch then
+			window:SetStatus("Smelting", ("%d %s on the way."):format(batch, name), "info")
+		else
+			window:SetStatus("Crafted", name .. (if recipe.quantity > 1 then " ×" .. recipe.quantity else ""), "item")
+		end
 		return
 	end
 	local station = type(reason) == "string" and string.match(reason, "^Needs(%a+)$")
 	if station and CraftingRules.IsStation(station) then
-		panel:SetStatus(stationHint(station))
+		window:SetStatus("Not crafted", stationHint(station), "warn")
 	else
-		panel:SetStatus(REASON_TEXT[reason] or ("Could not craft: " .. tostring(reason or success)))
+		local code = if ok then reason or success else "Request failed"
+		window:SetStatus("Not crafted", REASON_TEXT[code] or Reasons.Text(code), "warn")
 	end
 end
 
@@ -184,11 +138,11 @@ local function stopSmelt()
 	local ok, stopped, reason = pcall(function()
 		return Remotes.Get("Craft"):InvokeServer(HttpService:GenerateGUID(false), recipeId, 0)
 	end)
-	panel:SetStatus(
-		if ok and stopped
-			then "Smelting stopped. Bars already made are yours."
-			else ("Not stopped: " .. Reasons.Text(if ok then reason else "Request failed"))
-	)
+	if ok and stopped then
+		window:SetStatus("Smelting stopped", "Bars already made are yours.", "info")
+	else
+		window:SetStatus("Not stopped", Reasons.Text(if ok then reason else "Request failed"), "warn")
+	end
 end
 
 -- Smelting progress ----------------------------------------------------------
@@ -196,7 +150,7 @@ end
 local function renderSmelt()
 	local recipe = Recipes.Get(player:GetAttribute("SmeltRecipe"))
 	if recipe == nil then
-		panel:SetJob(nil)
+		window:SetJob(nil)
 		return
 	end
 	local count = player:GetAttribute("SmeltCount") or 1
@@ -205,74 +159,63 @@ local function renderSmelt()
 	local endsAt = player:GetAttribute("SmeltEndsAt") or 0
 	local progress, left = CraftingRules.Progress(done, count, endsAt, seconds, workspace:GetServerTimeNow())
 	-- Time left for the whole batch: this unit's rest plus the units after it.
-	local total = left + math.max(0, count - done - 1) * seconds
-	panel:SetJob({
-		entry = entryFor(recipe, {}),
+	window:SetJob({
+		name = RecipeModel.NameOf(recipe.output),
 		count = count,
 		done = done,
 		progress = progress,
-		left = total,
+		left = left + math.max(0, count - done - 1) * seconds,
 	})
 end
 
-local function onSmeltChanged()
-	local active = player:GetAttribute("SmeltRecipe") ~= nil
-	if active and smeltConnection == nil then
-		smeltConnection = RunService.RenderStepped:Connect(function()
-			if panel.screen:IsOpen() then
+-- While the window is open: stations walked up to (or away from) change what
+-- can be made here, and a running smelt's time left ticks down.
+local function watch()
+	local token = {}
+	watching = token
+	task.spawn(function()
+		while watching == token do
+			task.wait(CraftingController.WATCH_SECONDS)
+			if watching ~= token then
+				return
+			end
+			if keyOf(stationsNearby()) ~= nearbyKey then
+				refresh()
+			end
+			if player:GetAttribute("SmeltRecipe") ~= nil then
 				renderSmelt()
 			end
-		end)
-	elseif not active and smeltConnection then
-		smeltConnection:Disconnect()
-		smeltConnection = nil
-	end
-	renderSmelt()
+		end
+	end)
 end
 
 -- Building --------------------------------------------------------------------
 
-local function close()
-	ContextActionService:UnbindAction(CLOSE_ACTION)
-	local focus = GuiService.SelectedObject
-	if focus and focus:IsDescendantOf(panel.screen.gui) then
-		GuiService.SelectedObject = nil
-	end
-	panel.screen:SetOpen(false)
-end
-
 local function build()
 	local categories = {}
 	for _, category in CraftingRules.CATEGORIES do
-		table.insert(categories, {
-			id = category.id,
-			label = category.label,
-			glyph = CraftingController.GLYPHS[category.id] or "pm_glyph_bench",
-		})
+		table.insert(categories, { id = category.id, label = category.label })
 	end
-	panel = CraftingPanel.new(player:WaitForChild("PlayerGui"), {
-		onClose = close,
-		onCraft = function(entry, count)
+	window = RecipeWindow.new({
+		mode = "crafting",
+		name = "FlintbornCrafting",
+		title = "Field Crafting",
+		subtitle = "Make tools and supplies from what you carry.",
+		icon = "build",
+		categories = categories,
+		parent = player:WaitForChild("PlayerGui"),
+		onForge = function(entry, count)
 			task.spawn(craft, entry, count)
 		end,
 		onStop = function()
 			task.spawn(stopSmelt)
 		end,
-		onEmpty = function()
-			panel:SelectCategory("Bars")
-		end,
-	}, { mode = "crafting", name = "FlintbornCrafting", window = "pm_window_crafting", categories = categories })
-	panel:SetStations(CraftingRules.STATIONS)
-	panel.screen:Watch()
-	local function hint()
-		panel:SetHint(
-			("Stand within %d studs of a station to use its recipes. Build stations with %s."):format(
-				CraftingRules.STATION_RANGE,
-				Binds.Label("Build")
-			)
-		)
-	end
-	hint()
+	})
+	window:Watch()
+	window.screen.Closed:Connect(function()
+		watching = nil
+	end)
+	CraftingController.window = window
 
 	-- The legacy HUD's Craft button (the new HUD's nav bar has its own).
 	local gui = make("ScreenGui", { Name = "Crafting", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
@@ -290,7 +233,6 @@ local function build()
 	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.toggle)
 	Binds.Changed:Connect(function()
 		ui.toggle.Text = "Craft (" .. Binds.Label("Craft") .. ")"
-		hint()
 	end)
 	ui.toggle.Activated:Connect(function()
 		CraftingController.Toggle()
@@ -301,7 +243,7 @@ local function setInRun(inRun: boolean)
 	-- With the new HUD the hotbar spans this spot; the nav bar keeps a Craft button.
 	ui.toggle.Visible = inRun and not HudMode.ReplacesLegacy()
 	if not inRun then
-		close()
+		window:Close()
 		Binds.Unbind("Craft")
 		return
 	end
@@ -313,25 +255,24 @@ local function setInRun(inRun: boolean)
 	end)
 end
 
--- Opens or closes the window (keys, and the on-screen navigation bar).
+-- Opens or closes the window (the Craft key, and the on-screen navigation bar).
+-- Escape / B close it (Kit.Modal).
 function CraftingController.Toggle()
-	if panel.screen:IsOpen() then
-		close()
+	if window == nil then
 		return
 	end
-	panel:SetStatus("")
+	if window:IsOpen() then
+		window:Close()
+		return
+	end
 	refresh()
 	renderSmelt()
-	panel.screen:SetOpen(true)
-	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin then
-			close()
-		end
-		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.ButtonB)
-	if GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled then
-		GuiService.SelectedObject = panel.close
-	end
+	window:Open()
+	watch()
+end
+
+function CraftingController.IsOpen(): boolean
+	return window ~= nil and window:IsOpen()
 end
 
 function CraftingController.Start()
@@ -340,7 +281,7 @@ function CraftingController.Start()
 	end
 	build()
 	InventoryController.Changed:Connect(function()
-		if panel.screen:IsOpen() then
+		if window:IsOpen() then
 			refresh()
 		end
 	end)
@@ -348,19 +289,10 @@ function CraftingController.Start()
 		setInRun(player:GetAttribute("SessionState") == "ActiveRun")
 	end)
 	setInRun(player:GetAttribute("SessionState") == "ActiveRun")
-	for _, name in { "SmeltRecipe", "SmeltDone", "SmeltCount" } do
-		player:GetAttributeChangedSignal(name):Connect(onSmeltChanged)
+	for _, name in { "SmeltRecipe", "SmeltDone", "SmeltCount", "SmeltEndsAt" } do
+		player:GetAttributeChangedSignal(name):Connect(renderSmelt)
 	end
-	onSmeltChanged()
-	-- Walking up to (or away from) a station changes what can be crafted here.
-	task.spawn(function()
-		while true do
-			task.wait(0.5)
-			if panel.screen:IsOpen() and keyOf(stationsNearby()) ~= nearbyKey then
-				refresh()
-			end
-		end
-	end)
+	renderSmelt()
 end
 
 return CraftingController

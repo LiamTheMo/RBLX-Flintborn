@@ -1,8 +1,20 @@
--- Drives MapController headlessly: the parchment world map with the painted
--- island, camp and landmark pins, a portal and an event marker, your position,
--- zoom and close.
+-- Drives MapController headlessly: the world map in its kit window
+-- (docs/ui/ListWindows.md) with the painted island, camp and landmark pins, a
+-- portal and an event marker, your position, a chosen pin's name plate, zoom
+-- and close.
+--
+--   python3 art/ui/capture/capture.py map_flow
+--
+-- Pages: 1 the map, 2 zoomed in on you with a pin chosen, 3 forced states,
+-- 4 phone 844 × 390 (the wide phone window).
+
+for key, widths in table.clone(__textWidths or {}) do
+	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
+end
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 workspace:SetAttribute("FlintbornPlaceRole", "World")
 workspace:SetAttribute("FlintbornWorldReady", true)
 workspace:SetAttribute("FlintbornGeneratedIsland", true)
@@ -27,6 +39,7 @@ portal.Position = Vector3.new(1400, 10, -200)
 portal:SetAttribute("PortalKind", "Edge")
 portal.Parent = workspace
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
+local Kit = require(Client.Hud.Kit)
 local MapController = require(Client.Controllers.MapController)
 MapController.Start()
 folder.EventAnnounced.OnClientEvent:Fire({
@@ -43,21 +56,163 @@ local function check(cond, msg)
 		__failed = true
 	end
 end
+local function find(target: Instance?, name: string): Instance?
+	return target and target:FindFirstChild(name, true)
+end
+local function press(component: Instance?)
+	local hit = component and component:FindFirstChild("Hit")
+	assert(hit, "nothing to press")
+	-- Past the kit's press debounce (time only passes for real here).
+	local start = os.clock()
+	while os.clock() - start < 0.16 do
+	end
+	hit.Activated:Fire()
+end
+
 check(gui and gui.Enabled, "the map opens")
-local window = gui.Window
-local canvas = window.Map.Canvas
+local canvas = find(gui, "Canvas")
 check(canvas:FindFirstChild("Portal" .. portal.Name) ~= nil, "active portals are marked")
 check(canvas:FindFirstChild("Evente1") ~= nil, "announced events are marked")
 check(canvas.You.Visible, "your position is marked")
-window.ZoomIn.Press.Activated:Fire()
-check(canvas.Size.X.Offset > 856, "zoom in enlarges the map")
+local side = canvas.Size.X.Offset
+press(find(gui, "ZoomIn"))
+check(canvas.Size.X.Offset > side, "zoom in enlarges the map")
+check(find(gui, "ZoomIn"):GetAttribute("KitState") ~= "disabled", "zoom in stays on below the top zoom")
+press(find(gui, "ZoomOut"))
+check(canvas.Size.X.Offset == side, "zoom out returns")
+check(find(gui, "ZoomOut"):GetAttribute("KitState") == "disabled", "zoom out is off at the widest view")
 print(__failed and "FLOW FAILED" or "FLOW OK")
-window.ZoomOut.Press.Activated:Fire()
-window.UIScale.Scale = 1
-window.Position = UDim2.fromOffset(640, 460)
-__dump(gui, 1280, 920)
+
+local W, H = 1672, 941
+local function centre()
+	gui.Holder.Fit.Scale = 0.98
+	gui.Holder.Position = UDim2.fromOffset(W / 2, H / 2 + 26)
+end
+centre()
+__dump(player.PlayerGui, W, H)
+press(find(gui, "ZoomIn"))
+local pin = canvas:FindFirstChildWhichIsA("Frame")
+for _, child in canvas:GetChildren() do
+	if child:GetAttribute("KitComponent") == "MapPin" then
+		pin = child
+		break
+	end
+end
+press(pin)
+check(find(canvas, "Label").Visible, "a chosen pin shows its name")
+__dump(player.PlayerGui, W, H)
+press(find(gui, "ZoomOut"))
+find(gui, "ZoomIn"):SetAttribute("DebugState", "hover")
+find(gui, "Close"):SetAttribute("DebugState", "pressed")
+__dump(player.PlayerGui, W, H)
+for _, part in player.PlayerGui:GetDescendants() do
+	if part:GetAttribute("DebugState") then
+		part:SetAttribute("DebugState", "")
+	end
+end
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
+end
+
+-- ×20 open / close: no instances and no connections left behind (the Map window).
 MapController.Toggle()
-check(not gui.Enabled, "the map closes")
+MapController.Toggle()
+local instancesBefore, connectionsBefore = leakCounts()
+for _ = 1, 20 do
+	MapController.Toggle()
+	MapController.Toggle()
+end
+local instancesAfter, connectionsAfter = leakCounts()
+check(
+	instancesAfter == instancesBefore,
+	("open/close ×20 leaves the instances as they were (%d → %d)"):format(instancesBefore, instancesAfter)
+)
+check(
+	connectionsAfter == connectionsBefore,
+	("open/close ×20 leaves the connections as they were (%d → %d)"):format(connectionsBefore, connectionsAfter)
+)
+
+workspace.CurrentCamera.ViewportSize = Vector2.new(844, 390)
+UserInputService.TouchEnabled = true
+UserInputService.KeyboardEnabled = false
+UserInputService.MouseEnabled = false
+-- The screen became a phone: MapController rebuilt the window in its phone
+-- arrangement (legend beside the map). Reopen it and fit it as the game does.
+gui = player.PlayerGui:FindFirstChild("FlintbornMap")
+check(gui ~= nil and gui:FindFirstChild("Holder") ~= nil, "a phone gets the wide map window")
+if not gui:GetAttribute("KitState") or gui:GetAttribute("KitState") == "closed" then
+	MapController.Toggle()
+end
+local size = MapController.LAYOUTS.phone.size
+local k, c = Kit.Scale.WindowFit(844, 390, 58, size[1], size[2], 1)
+gui.Holder.Fit.Scale = k
+gui.Holder.Position = UDim2.fromOffset(c.X, c.Y)
+print(("map phone: window scale %.3f"):format(k))
+__dump(player.PlayerGui, 844, 390)
+MapController.Toggle()
+check(not gui:GetAttribute("KitState") or gui:GetAttribute("KitState") == "closed", "the map closes")
 if __failed then
 	error("map flow failed")
 end
