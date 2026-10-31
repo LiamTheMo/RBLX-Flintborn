@@ -1,12 +1,11 @@
 -- Pure rules behind the Party window (docs/ui/PartyScreen.md, ARCHITECTURE §4.4
--- and decisions D3, D5, D6, D18): who is listed and in what order, the counts,
--- the relative "Created" time, the ready tally, who may be invited and how
--- each Invite button reads, and the ready toggle's label. No instances or
--- services, so specs cover it (tests/luau/party_model.spec.luau).
+-- and decisions D5, D6, D24): who is listed and in what order, the counts, the
+-- relative "Created" time, who may be invited and how each Invite button reads.
+-- No instances or services, so specs cover it (tests/luau/party_model.spec.luau).
 --
 -- `view` is LobbyController.PartyView():
---   { party = nil | {id, leader, createdAt, members = {{userId, name, ready}},
---     invited = {userId}}, invites = {{partyId, from, fromUserId}}, ready, maxSize }
+--   { party = nil | {id, leader, createdAt, members = {{userId, name}},
+--     invited = {userId}}, invites = {{partyId, from, fromUserId}}, maxSize }
 
 local PartyModel = {}
 
@@ -16,7 +15,7 @@ PartyModel.VISIBLE_ROWS = 7
 PartyModel.JOIN_TYPE = "Invite Only"
 PartyModel.NO_TIME = "—"
 
-export type Member = { userId: number, name: string, leader: boolean, ready: boolean, isSelf: boolean }
+export type Member = { userId: number, name: string, leader: boolean, isSelf: boolean }
 export type Candidate = { userId: number, name: string, userName: string?, level: number? }
 export type InviteRow = { userId: number, name: string, level: number?, state: string }
 
@@ -25,8 +24,7 @@ local function maxOf(view): number
 end
 
 -- The members to list, the leader first and the rest in joining order. Without
--- a party you are listed alone, as the leader of a party of one, with your own
--- ready flag (a solo player can be ready, D3).
+-- a party you are listed alone, as the leader of a party of one.
 function PartyModel.Members(view, selfId: number, selfName: string): { Member }
 	local party = view and view.party
 	if party == nil then
@@ -35,7 +33,6 @@ function PartyModel.Members(view, selfId: number, selfName: string): { Member }
 				userId = selfId,
 				name = selfName,
 				leader = true,
-				ready = view ~= nil and view.ready == true,
 				isSelf = true,
 			},
 		}
@@ -46,7 +43,6 @@ function PartyModel.Members(view, selfId: number, selfName: string): { Member }
 			userId = member.userId,
 			name = member.name or tostring(member.userId),
 			leader = member.userId == party.leader,
-			ready = member.ready == true,
 			isSelf = member.userId == selfId,
 		}
 		if entry.leader then
@@ -92,17 +88,6 @@ function PartyModel.RelativeTime(createdAt: number?, now: number?): string
 		return ("%d h ago"):format(math.floor(age / 3600))
 	end
 	return ("%d d ago"):format(math.floor(age / 86400))
-end
-
--- (ready, total) over the listed members.
-function PartyModel.ReadyCount(members: { Member }): (number, number)
-	local ready = 0
-	for _, member in members do
-		if member.ready then
-			ready += 1
-		end
-	end
-	return ready, #members
 end
 
 -- The leader's display name: the leader member's name, or yours when alone.
@@ -205,24 +190,6 @@ function PartyModel.InviteNote(view, selfId: number, candidateCount: number, que
 	return nil
 end
 
--- The ready toggle in the Readied Status card (D18): its label, variant and
--- whether it waits for the server. `pending` is the value asked for (nil when
--- nothing is in flight).
-function PartyModel.ReadyButton(ready: boolean, pending: boolean?): { label: string, variant: string, busy: boolean }
-	local shown = if pending ~= nil then pending else ready
-	return {
-		label = if shown then "Not Ready" else "Ready",
-		variant = if shown then "secondary" else "primary",
-		busy = pending ~= nil,
-	}
-end
-
--- Whether a pending ready request is answered by `view` (its own flag reached
--- the asked value).
-function PartyModel.ReadySettled(view, pending: boolean?): boolean
-	return pending == nil or (view ~= nil and (view.ready == true) == pending)
-end
-
 -- Leave shows when you are in a party with someone else (ARCHITECTURE §4.4).
 function PartyModel.CanLeave(view): boolean
 	local party = view and view.party
@@ -235,7 +202,6 @@ export type Options = {
 	levels: { [number]: number }?,
 	pendingInvites: { [number]: boolean }?,
 	busyInvites: { [string]: boolean }?,
-	readyPending: boolean?,
 	leaveBusy: boolean?,
 	friends: boolean?,
 }
@@ -268,7 +234,6 @@ function PartyModel.WindowData(view, me, candidates: { Candidate }, opts: Option
 			busy = opts.busyInvites ~= nil and opts.busyInvites[invite.partyId] == true,
 		})
 	end
-	local selfReady = view ~= nil and view.ready == true
 	local canInvite = PartyModel.CanInvite(view, me.userId)
 	local party = view and view.party
 	return {
@@ -279,9 +244,6 @@ function PartyModel.WindowData(view, me, candidates: { Candidate }, opts: Option
 		leaderName = PartyModel.LeaderName(members),
 		joinType = PartyModel.JOIN_TYPE,
 		createdText = PartyModel.RelativeTime(party and party.createdAt, opts.now),
-		selfReady = selfReady,
-		readyPending = opts.readyPending,
-		readyButton = PartyModel.ReadyButton(selfReady, opts.readyPending),
 		inviteRows = rows,
 		inviteNote = if #rows == 0 then PartyModel.InviteNote(view, me.userId, #candidates, opts.query) else nil,
 		canInvite = canInvite or (party ~= nil and party.leader == me.userId),

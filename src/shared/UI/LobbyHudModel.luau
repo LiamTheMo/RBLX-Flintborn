@@ -43,15 +43,12 @@ function LobbyHudModel.Progress(view): { level: string, fraction: number, text: 
 	}
 end
 
-export type Member = { userId: number, name: string, leader: boolean, ready: boolean, self: boolean }
+export type Member = { userId: number, name: string, leader: boolean, self: boolean }
 
 -- The party panel from LobbyController.PartyView() and you ({userId, name}):
 -- {count = "1/8", members = {Member}, free = empty rows, invites = {{partyId,
--- from, busy}}, canInvite, showReady}. Ready dots show only in a party of two
--- or more, where the leader reads them before Play (alone the row matches
--- M01). Alone you are a party of one, led by you; your ready flag counts then
--- too (it works without a party). Only the leader (or a solo player) can
--- invite, and only while there is room. `busy` maps the partyIds whose answer
+-- from, busy}}, canInvite}. Alone you are a party of one, led by you. Only
+-- the leader (or a solo player) can invite, and only while there is room. `busy` maps the partyIds whose answer
 -- is on its way (PartyController.AnswerBusy); those invites are marked busy.
 function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: { [string]: boolean }?)
 	view = view or {}
@@ -64,7 +61,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 				userId = member.userId,
 				name = member.name or tostring(member.userId),
 				leader = member.userId == party.leader,
-				ready = member.ready == true,
 				self = member.userId == me.userId,
 			})
 		end
@@ -74,7 +70,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 			userId = me.userId,
 			name = me.name,
 			leader = true,
-			ready = view.ready == true,
 			self = true,
 		})
 	end
@@ -92,7 +87,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 		free = math.max(0, maxSize - #members),
 		invites = invites,
 		canInvite = leads and #members < maxSize,
-		showReady = #members > 1,
 	}
 end
 

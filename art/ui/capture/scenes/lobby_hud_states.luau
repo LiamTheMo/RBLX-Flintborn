@@ -24,9 +24,8 @@ for _, state in { "hover", "pressed", "disabled", "focused", "selected" } do
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party({
-		party = { id = "p1", leader = 1, members = { { userId = 1, name = "LiamTheMo", ready = true } } },
+		party = { id = "p1", leader = 1, members = { { userId = 1, name = "LiamTheMo" } } },
 		invites = { { partyId = "p9", from = "RiverFox" } },
-		ready = true,
 		maxSize = 8,
 	}, ME))
 	hud:SetHotbar(LobbyHudModel.Hotbar({ { catalogId = "StoneAxe", quantity = 1 } }))

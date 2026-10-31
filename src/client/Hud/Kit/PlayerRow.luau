@@ -1,10 +1,10 @@
 -- A player row (sheets 01, 15; M04 party and invite lists, M05 party):
--- portrait, name, "LV. n" under it, a crown for the leader, a tag (Leader,
--- Ready, Not Ready) and an optional action button (Invite). The empty variant
+-- portrait, name, "LV. n" under it, a crown for the leader, an optional tag
+-- (a Badge) and an optional action button (Invite). The empty variant
 -- is a muted disc and "Empty Slot". A rule runs under each row.
 --
 --   local row = Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = "LiamTheMo",
---       level = 12, leader = true, badge = "leader" })
+--       level = 12, leader = true })
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, name = "ForestRanger", level = 15,
 --       action = { label = "Invite", onPress = invite } })
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, empty = true })
@@ -28,8 +28,8 @@ local Tooltip = require(script.Parent.Tooltip)
 local PlayerRow = {}
 PlayerRow.__index = PlayerRow
 
--- props: rect | size, userId, name, level, leader (crown), badge ("leader" |
--- "ready" | "notReady"), status ("ready" | "notReady": a bare dot, compact
+-- props: rect | size, userId, name, level, leader (crown), badge (a Badge
+-- variant), status ("ready" | "notReady": a bare dot, compact
 -- rows), action ({label, onPress, variant, enabled, size = {108, 45}}), empty,
 -- emptyText, emptyIndent (px from the left to the disc), nameX, nameY, levelY
 -- (line tops, px), badgeWidth / badgeHeight / badgeTextSize, nameSize,

@@ -1,15 +1,15 @@
 -- The Play window (docs/ui/PlayScreen.md, mockup art/reference/ui/lobby/05_play.png):
 -- the island map with the crater marked, the world's name and detail rows, YOUR
--- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, or the Ready toggle
--- for a party member who does not lead (ARCHITECTURE §4.5, D16). There is no
--- server picker (D7). Built only from Kit components at the mockup's 1053 × 665
+-- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, which only a solo
+-- player or the party leader can press (ARCHITECTURE §4.5, D24); other members
+-- see it disabled. There is no server picker (D7). Built only from Kit components at the mockup's 1053 × 665
 -- window size, in window design px.
 --
 -- Display only: PlayController feeds it through the setters and reacts to the
--- callbacks (onPlay, onReady, onClose).
+-- callbacks (onPlay, onClose).
 --
---   local window = PlayWindow.new({ onPlay = play, onReady = toggleReady })
---   window:SetParty(rows, true)
+--   local window = PlayWindow.new({ onPlay = play })
+--   window:SetParty(rows)
 --   window:Open()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -98,7 +98,6 @@ local TEXT_SIZE = {
 export type Props = {
 	parent: Instance?,
 	onPlay: (() -> ())?,
-	onReady: (() -> ())?,
 	onClose: (() -> ())?,
 }
 
@@ -110,7 +109,6 @@ export type PartyRow = {
 	name: string,
 	level: number?,
 	leader: boolean,
-	ready: boolean?,
 }
 
 function PlayWindow.new(props: Props)
@@ -120,7 +118,7 @@ function PlayWindow.new(props: Props)
 		rowMaids = {},
 		loadout = {},
 		mode = "solo",
-		ready = false,
+		enabled = true,
 		moreText = "",
 		phone = Kit.Scale.IsSmallTouch(),
 		maid = KitModel.Maid(),
@@ -230,21 +228,6 @@ function PlayWindow.new(props: Props)
 			end
 		end,
 	})
-	self.readyButton = Kit.Button.new(v, {
-		name = "Ready",
-		rect = RECT.play,
-		label = "Ready",
-		variant = "play",
-		sizeClass = "l",
-		textSize = TEXT_SIZE.play,
-		zIndex = z + 1,
-		visible = false,
-		onPress = function()
-			if props.onReady then
-				props.onReady()
-			end
-		end,
-	})
 	local sp = RECT.statusPlaque
 	self.statusPlaque = Kit.Panel.new(v, {
 		name = "StatusPlaque",
@@ -266,11 +249,8 @@ function PlayWindow.new(props: Props)
 		z = z + 3,
 	})
 	self.status.Visible = false
-	-- Gamepad: PLAY (or Ready) first; up reaches the loadout slots, then the
-	-- close button.
-	for _, button in { self.play, self.readyButton } do
-		button.control.hit.NextSelectionUp = self.slots[1].control.hit
-	end
+	-- Gamepad: PLAY first; up reaches the loadout slots, then the close button.
+	self.play.control.hit.NextSelectionUp = self.slots[1].control.hit
 	for index, slot in self.slots do
 		local hit = slot.control.hit
 		hit.NextSelectionLeft = if self.slots[index - 1] then self.slots[index - 1].control.hit else nil
@@ -426,9 +406,9 @@ function PlayWindow:SetDetails(rows)
 	end
 end
 
--- One party row: crown (leader), headshot, name, ready dot (in a party), level.
--- Every part goes into `maid`, so cleaning it takes the row apart.
-local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean, maid)
+-- One party row: crown (leader), headshot, name, level. Every part goes into
+-- `maid`, so cleaning it takes the row apart.
+local function partyRow(parent: Instance, row: PartyRow, order: number, maid)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
 	local outer = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
@@ -482,25 +462,12 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		rect = { w - 120, 2, 101, h - 2 },
 		z = 6,
 	})
-	if showReady then
-		local levelW = Kit.Text.Width(levelText, "hudSmall", TEXT_SIZE.level)
-		local d = 16
-		local dot = Kit.Core.Make("Frame", {
-			Name = if row.ready then "Ready" else "NotReady",
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(w - 20 - levelW - 10 - d, (h - d) / 2 - 1),
-			Size = UDim2.fromOffset(d, d),
-			ZIndex = 6,
-		}, holder)
-		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
-	end
 	return outer
 end
 
--- The party rows (leader first; PlayModel.Members). `showReady` adds each
--- member's ready dot (in a party; a solo player has none, as in the mockup).
--- The old rows are taken apart through their maids (Kit components included).
-function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
+-- The party rows (leader first; PlayModel.Members). The old rows are taken
+-- apart through their maids (Kit components included).
+function PlayWindow:SetParty(rows: { PartyRow })
 	local content = self.partyList:Content()
 	for _, maid in self.rowMaids do
 		maid:Clean()
@@ -508,7 +475,7 @@ function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
 	table.clear(self.rowMaids)
 	for order, row in rows do
 		local maid = KitModel.Maid()
-		partyRow(content, row, order, showReady, maid)
+		partyRow(content, row, order, maid)
 		table.insert(self.rowMaids, maid)
 	end
 	local h = RECT.partyRow[2]
@@ -542,30 +509,21 @@ function PlayWindow:_slotText(index: number): string?
 	return if (item.quantity or 1) > 1 then ("%s ×%d"):format(name, item.quantity) else name
 end
 
--- "solo" / "leader": the PLAY button; "member": the Ready toggle (leather READY
--- while not ready, parchment NOT READY once ready).
-function PlayWindow:SetMode(mode: string, ready: boolean?)
+-- "solo" / "leader": PLAY can be pressed; "member": PLAY shows disabled (only
+-- the leader starts the run; the status line says so).
+function PlayWindow:SetMode(mode: string)
 	self.mode = mode
-	self.ready = ready == true
-	local member = mode == "member"
-	self.play.root.Visible = not member
-	self.readyButton.root.Visible = member
-	if member then
-		self.readyButton:SetVariant(if self.ready then "playSecondary" else "play")
-		self.readyButton:SetLabel(if self.ready then "Not Ready" else "Ready")
-	end
-	self.screen:SetDefaultSelection((if member then self.readyButton else self.play).control.hit)
+	self.play:SetEnabled(self.enabled and mode ~= "member")
 end
 
 -- The big button's busy state (a request in flight).
 function PlayWindow:SetBusy(busy: boolean)
 	self.play:SetBusy(busy)
-	self.readyButton:SetBusy(busy)
 end
 
 function PlayWindow:SetEnabled(enabled: boolean)
-	self.play:SetEnabled(enabled)
-	self.readyButton:SetEnabled(enabled)
+	self.enabled = enabled
+	self.play:SetEnabled(enabled and self.mode ~= "member")
 end
 
 -- The status line under the map (deploy progress, failures, maintenance, the
@@ -610,7 +568,6 @@ function PlayWindow:Destroy()
 		slot:Destroy()
 	end
 	self.play:Destroy()
-	self.readyButton:Destroy()
 	self.close:Destroy()
 	self.partyList:Destroy()
 	self.window:Destroy()

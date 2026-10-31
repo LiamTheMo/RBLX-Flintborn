@@ -15,10 +15,10 @@ local DEFINITIONS = {
 	-- Diagnostics
 	ReportUiImages = "RemoteEvent", -- client -> server: (summary, lines) how HUD images are loading
 	-- Lobby
-	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave") | ("ready", bool)
+	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave")
 	-- | ("view": resend my party view on PartyChanged) -> ok, reason
 	PartyAction = "RemoteFunction",
-	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, ready, maxSize}
+	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, maxSize}
 	Deploy = "RemoteFunction", -- () -> ok, reason
 	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run
 	-- World

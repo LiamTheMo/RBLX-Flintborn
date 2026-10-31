@@ -29,7 +29,7 @@ end
 -- 1: the mockup.
 do
 	local _, root, hud = page()
-	hud:SetParty(LobbyHudModel.Party({ party = nil, invites = {}, ready = false, maxSize = 8 }, ME))
+	hud:SetParty(LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME))
 	hud:SetHotbar(LobbyHudModel.Hotbar({
 		{ catalogId = "StoneAxe", quantity = 1 },
 		{ catalogId = "StoneSpear", quantity = 1 },
@@ -48,13 +48,12 @@ do
 			id = "p1",
 			leader = 2,
 			members = {
-				{ userId = 2, name = "ForestRanger", ready = true },
-				{ userId = 1, name = "LiamTheMo", ready = false },
-				{ userId = 3, name = "StoneSeeker", ready = true },
+				{ userId = 2, name = "ForestRanger" },
+				{ userId = 1, name = "LiamTheMo" },
+				{ userId = 3, name = "StoneSeeker" },
 			},
 		},
 		invites = { { partyId = "p9", from = "RiverFox" } },
-		ready = false,
 		maxSize = 8,
 	}, ME))
 	hud:SetProgress({ level = 50, xp = 0 }, true)

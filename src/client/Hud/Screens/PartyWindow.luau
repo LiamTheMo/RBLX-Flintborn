@@ -1,25 +1,24 @@
 -- The Party window (docs/ui/PartyScreen.md, mockup 04; ARCHITECTURE §4.4 and
--- decisions D5, D6, D18, D19), built only from Kit components at the mockup's
+-- decisions D5, D6, D19, D24), built only from Kit components at the mockup's
 -- 1124 × 637 window size. Display only: PartyController feeds it SetData and
 -- answers its callbacks.
 --
---   YOUR PARTY n/8   the leader (crown, Leader tag), members (Ready / Not Ready
---                    tag) and Empty Slot rows; 8 rows, 7 visible, then scrolls
+--   YOUR PARTY n/8   the leader (crown), members and Empty Slot rows; 8 rows,
+--                    7 visible, then scrolls
 --   INVITE PLAYERS   incoming invitations (Accept / ✕), the search box and the
 --                    players you may invite (Invite / Invited)
 --   PARTY DETAILS    Party Leader, Members, Join Type, Created (no Play Style, D6;
---                    the freed row stays empty, PartyScreen open question 3a)
---   READIED STATUS   one row per member (one shows; the list scrolls), the
---                    ready tally and your Ready / Not Ready toggle (D18)
+--                    the freed row stays empty, PartyScreen open question 3a);
+--                    the panel takes the whole right column (D24)
 --   footer           CLOSE, and LEAVE PARTY while you share a party
 --
---   local window = PartyWindow.new({ onInvite = invite, onReady = setReady, ... })
+--   local window = PartyWindow.new({ onInvite = invite, onLeave = leave, ... })
 --   window:SetData(data) -- see SetData
 --   window:Open()
 --
 -- SetData updates rows in place: a row whose player and contents are unchanged
 -- stays as it is (only its order moves); changed rows are redrawn and rows that
--- left are removed, so a search keystroke or one member's Ready redraws only
+-- left are removed, so a search keystroke or one member's level redraws only
 -- what changed. On phones and touch tablets (Kit.Scale.IsSmallTouch) names and
 -- level lines draw larger and long names end in "…" rather than shrinking
 -- below 9 screen px.
@@ -41,8 +40,8 @@ PartyWindow.MOCKUP = {
 	closeX = { 1324, 168, 56, 53 },
 	party = { 304, 245, 360, 448 },
 	invite = { 670, 245, 371, 448 },
-	details = { 1047, 245, 322, 265 },
-	ready = { 1047, 507, 322, 186 },
+	-- The mockup's two right-hand cards, as one panel (D24).
+	details = { 1047, 245, 322, 448 },
 	close = { 711, 703, 250, 60 },
 	leave = { 1103, 706, 240, 54 },
 }
@@ -87,17 +86,16 @@ PartyWindow.FRAMES = {
 	leader = { h = 74, inner = { 0, 7, 314, 59 }, rule = { 0, 71, 328 } },
 	member = { h = 52.4, inner = { 0, 0, 314, 52.4 }, rule = { 0, 50.4, 328 } },
 	invite = { h = 66, inner = { 0, 8, 323, 51 }, rule = { 0, 65, 334 } },
-	ready = { h = 64, inner = { 0, 0, 275, 64 }, rule = { 0, 62, 289 } },
 }
-PartyWindow.LIST_W = { party = 328, invite = 337, ready = 289 }
+PartyWindow.LIST_W = { party = 328, invite = 337 }
 
 local Z = 6
 
 -- Text sizes, desktop and phone (phone sizes keep names, levels and button
 -- labels at 9 screen px or more at the phone window scale, about 0.51).
 PartyWindow.TEXT = {
-	desktop = { name = 17, level = 15, inviteLevel = 13, action = nil, detail = 15, emptyName = 14, readyName = 16 },
-	phone = { name = 15, level = 15, inviteLevel = 15, action = 15, detail = 15, emptyName = 15, readyName = 15 },
+	desktop = { name = 17, level = 15, inviteLevel = 13, action = nil, detail = 15, emptyName = 14 },
+	phone = { name = 15, level = 15, inviteLevel = 15, action = 15, detail = 15, emptyName = 15 },
 }
 -- How long the search box waits after the last keystroke.
 PartyWindow.SEARCH_DEBOUNCE = 0.3
@@ -132,7 +130,6 @@ export type Props = {
 	onAccept: ((partyId: string) -> ())?,
 	onDecline: ((partyId: string) -> ())?,
 	onLeave: (() -> ())?,
-	onReady: ((ready: boolean) -> ())?,
 	onInviteFriends: (() -> ())?,
 	onSearch: ((text: string) -> ())?,
 	onClosed: (() -> ())?,
@@ -265,32 +262,6 @@ function PartyWindow.new(props: Props)
 	self.detailsVisual = dv
 	self.detailRows = {}
 
-	-- Readied Status ------------------------------------------------------------------
-	local rv = panel(v, "ReadiedStatus", M.ready)
-	header(rv, 322, "Readied Status", { "ink:check", 17, 16, 31, 31 }, 63, { 16, 53, 290 })
-	-- One row shows, as in the mockup; more members scroll.
-	self.readyList = list(rv, "Ready", { 16, 57, PartyWindow.LIST_W.ready, 68 }, 0)
-	self.tally = Kit.Text.new(rv, {
-		name = "Tally",
-		rect = { 18, 134, 120, 42 },
-		text = "",
-		role = "bodySoft",
-		zIndex = Z + 1,
-	})
-	self.readyButton = Kit.Button.new(rv, {
-		name = "ReadyToggle",
-		rect = { 150, 134, 155, 42 },
-		label = "Ready",
-		sizeClass = "s",
-		zIndex = Z + 2,
-		onPress = function()
-			local data = self.data
-			if data and props.onReady and data.readyPending == nil then
-				props.onReady(not data.selfReady)
-			end
-		end,
-	})
-
 	-- Footer --------------------------------------------------------------------------
 	self.closeButton = Kit.Button.new(v, {
 		name = "CloseButton",
@@ -318,7 +289,7 @@ function PartyWindow.new(props: Props)
 			end
 		end,
 	})
-	screen:SetDefaultSelection(self.readyButton.control.hit)
+	screen:SetDefaultSelection(self.closeButton.control.hit)
 	self.maid:Give(screen.Closed:Connect(function()
 		if props.onClosed then
 			props.onClosed()
@@ -450,17 +421,15 @@ function PartyWindow:_members(data)
 	local height = 0
 	for i, member in data.members do
 		local leaderRow = i == 1
-		local badge = if member.leader then "leader" elseif member.ready then "ready" else "notReady"
 		table.insert(rows, {
 			key = "member:" .. member.userId,
-			sig = signature(member.name, member.level, member.leader, badge, leaderRow),
+			sig = signature(member.name, member.level, member.leader, leaderRow),
 			build = function(order: number)
 				local rowProps = {
 					userId = member.userId,
 					name = member.name,
 					level = member.level,
 					leader = member.leader,
-					badge = badge,
 					nameX = 75,
 					nameSize = text.name,
 					levelSize = text.level,
@@ -680,47 +649,10 @@ function PartyWindow:_invites(data)
 	self.inviteNote.root.Position = UDim2.fromOffset(20, self.inviteListRect[2] + 12 + height)
 end
 
-function PartyWindow:_ready(data)
-	local content = self.readyList:Content()
-	local text = self:_text()
-	local rows = {}
-	for _, member in data.members do
-		local badge = if member.ready then "ready" else "notReady"
-		table.insert(rows, {
-			key = "ready:" .. member.userId,
-			sig = signature(member.name, badge),
-			build = function(order: number)
-				return self:_framed(content, "ready", order, {
-					userId = member.userId,
-					name = member.name,
-					badge = badge,
-					portraitSize = 48,
-					nameX = 65,
-					nameSize = text.readyName,
-				})
-			end,
-		})
-	end
-	self:_sync("ready", rows)
-	self.readyList:SetContentHeight(#data.members * PartyWindow.FRAMES.ready.h + 2)
-	local count = 0
-	for _, member in data.members do
-		if member.ready then
-			count += 1
-		end
-	end
-	self.tally:SetText(("%d of %d ready"):format(count, #data.members))
-	local button = data.readyButton
-	self.readyButton:SetVariant(button.variant)
-	self.readyButton:SetLabel(button.label)
-	self.readyButton:SetBusy(button.busy)
-end
-
 -- Draws everything from `data` (PartyController builds it with PartyModel):
---   members      {{userId, name, level?, leader, ready, isSelf}} leader first
+--   members      {{userId, name, level?, leader, isSelf}} leader first
 --   maxSize      the cap (8)
 --   leaderName, membersText, countText, createdText
---   readyButton  PartyModel.ReadyButton(...); selfReady, readyPending
 --   inviteRows   PartyModel.InviteRows(...) plus level
 --   inviteNote   text for an empty invite list, or nil
 --   canInvite    false greys the search box
@@ -734,7 +666,6 @@ function PartyWindow:SetData(data)
 	self:_details(data)
 	self:_members(data)
 	self:_invites(data)
-	self:_ready(data)
 	self.search:SetEnabled(data.canInvite)
 	-- Invite Friends takes the bottom of the invite column when it shows.
 	local friends = data.friends == true
@@ -745,7 +676,7 @@ function PartyWindow:SetData(data)
 	self.leaveButton:SetBusy(data.leaveBusy == true)
 	if key and GuiService.SelectedObject == nil and self.screen:IsOpen() then
 		local again = self.selectables[key]
-		GuiService.SelectedObject = if again then again else self.readyButton.control.hit
+		GuiService.SelectedObject = if again then again else self.closeButton.control.hit
 	end
 end
 
@@ -757,7 +688,7 @@ function PartyWindow:SetCreated(text: string)
 	end
 end
 
--- The components of list `name` ("members", "invites", "details", "ready")
+-- The components of list `name` ("members", "invites", "details")
 -- in their shown order (scenes and verifiers).
 function PartyWindow:Rows(name: string)
 	local list = {}
@@ -774,10 +705,10 @@ function PartyWindow:SearchText(): string
 	return self.search:GetText()
 end
 
--- Opens the window. `section` ("invite" | "ready" | "party") picks the control
--- gamepad selection starts on.
+-- Opens the window. `section` ("invite" | "party") picks the control gamepad
+-- selection starts on (CLOSE otherwise).
 function PartyWindow:Open(section: string?, gamepad: boolean?)
-	local default = self.readyButton.control.hit
+	local default = self.closeButton.control.hit
 	if section == "invite" then
 		local first = nil
 		for key, hit in self.selectables do

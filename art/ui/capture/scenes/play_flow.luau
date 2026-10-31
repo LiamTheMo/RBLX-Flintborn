@@ -1,11 +1,11 @@
 -- Drives PlayController headlessly through LobbyController with mocked remotes:
--- open the window as a party leader (2 of 3 ready), press PLAY, the deploy check
--- lists the loadout with the ready note, ENTER deploys (busy while the server
--- answers), the server refuses with a reason shown under the map; then a member's
--- Ready toggle, the close button, and an open/close leak check.
+-- open the window as a party leader, press PLAY, the deploy check lists the
+-- loadout, ENTER deploys (busy while the server answers), the server refuses with
+-- a reason shown under the map; then a member's disabled PLAY (only the leader
+-- starts the run, D24), the close button, and an open/close leak check.
 --
 --   1 opened as leader   2 deploy check   3 deploying (busy)   4 deploy failed
---   5 member, not ready  6 member, ready
+--   5 member: PLAY disabled
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 workspace:SetAttribute("FlintbornPlaceRole", "Lobby")
@@ -108,15 +108,14 @@ local function texts(root)
 	return table.concat(list, "\n")
 end
 
-local function party(leader, readyIds, selfReady)
+local function party(leader)
 	local members = {}
 	for _, entry in { { 1, "LiamTheMo" }, { 2, "ForestRanger" }, { 3, "StoneSeeker" } } do
-		table.insert(members, { userId = entry[1], name = entry[2], ready = readyIds[entry[1]] == true })
+		table.insert(members, { userId = entry[1], name = entry[2] })
 	end
 	return {
 		party = { id = "p1", leader = leader, createdAt = 0, members = members, invited = {} },
 		invites = {},
-		ready = selfReady,
 		maxSize = 8,
 	}
 end
@@ -127,7 +126,7 @@ local PlayController = require(Client.Controllers.PlayController)
 local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 LobbyController.Start()
 PlayController.Start()
-partyChanged.OnClientEvent:Fire(party(1, { [1] = true, [3] = true }, true))
+partyChanged.OnClientEvent:Fire(party(1))
 
 -- 1. Open as the leader.
 check(not PlayController.IsOpen(), "closed before the tile is pressed")
@@ -136,7 +135,10 @@ check(PlayController.IsOpen(), "Open() shows the window")
 local window = PlayController.Window()
 local gui = player.PlayerGui:FindFirstChild("FlintbornPlay")
 check(gui ~= nil and gui.Enabled, "the window's gui is enabled")
-check(window.play.root.Visible and not window.readyButton.root.Visible, "the leader gets PLAY")
+check(window.play.root.Visible and window.readyButton == nil, "the leader gets PLAY, and there is no Ready")
+check(window.play.root:GetAttribute("KitState") == "normal", "PLAY can be pressed")
+check(gui:FindFirstChild("Ready", true) == nil and gui:FindFirstChild("NotReady", true) == nil, "no ready dots")
+check(gui:FindFirstChild("Tag", true) == nil, "no Leader tag")
 check(#window.partyList:Content():GetChildren() >= 3, "three party rows")
 local shown = texts(gui)
 check(string.find(shown, "ForestRanger", 1, true) ~= nil, "member names come from the party view")
@@ -157,7 +159,7 @@ local dialogText = dialogGui and texts(dialogGui) or ""
 check(string.find(dialogText, "TAKE THESE INTO THE RUN?", 1, true) ~= nil, "titled as before")
 check(string.find(dialogText, "Stone Axe", 1, true) ~= nil, "lists the items")
 check(string.find(dialogText, "Wood ×40", 1, true) ~= nil, "with quantities")
-check(string.find(dialogText, "2 of 3 party members are ready.", 1, true) ~= nil, "advisory ready count (D3)")
+check(string.find(string.lower(dialogText), "ready", 1, true) == nil, "no ready count in the check")
 check(count("Deploy") == 0, "nothing deploys before ENTER")
 dump()
 
@@ -187,22 +189,18 @@ check(
 )
 dump()
 
--- 5. A member who does not lead gets the Ready toggle.
-partyChanged.OnClientEvent:Fire(party(2, { [2] = true }, false))
-check(not window.play.root.Visible and window.readyButton.root.Visible, "members get Ready instead of PLAY")
-check(string.find(texts(gui), "READY", 1, true) ~= nil, "it reads READY")
+-- 5. A member who does not lead sees PLAY disabled and the leader caption.
+local actions = count("PartyAction")
+partyChanged.OnClientEvent:Fire(party(2))
+check(window.play.root.Visible, "members still see PLAY")
+check(window.play.root:GetAttribute("KitState") == "disabled", "but disabled")
 check(string.find(texts(gui), PlayModel.MEMBER_CAPTION, 1, true) ~= nil, "caption: the leader starts the run")
-window.readyButton.control:Activate()
-local ready = last("PartyAction")
-check(ready ~= nil and ready[2] == "ready" and ready[3] == true, "Ready sends PartyAction ready true")
 window.play.control:Activate()
-check(count("Deploy") == 1, "PLAY is not offered to members")
+check(count("Deploy") == 1 and count("DeployPreview") == reads + 1, "PLAY does nothing for members")
+check(count("PartyAction") == actions, "and nothing is sent to the party")
 dump()
-
--- 6. The server confirms: the toggle flips to NOT READY.
-partyChanged.OnClientEvent:Fire(party(2, { [1] = true, [2] = true }, true))
-check(string.find(texts(gui), "NOT READY", 1, true) ~= nil, "now reads NOT READY")
-dump()
+partyChanged.OnClientEvent:Fire(party(1))
+check(window.play.root:GetAttribute("KitState") == "normal", "leading again enables PLAY")
 
 -- Close with the ✕, then Toggle; open and close 20 times without growing.
 press(window.close.root)
