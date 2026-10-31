@@ -1,11 +1,13 @@
--- In-world HUD (GDD §11, §25.4), laid out from src/shared/UI/HudLayout.json and
--- drawn from the UI art sheets (art/ui/sprites, uploaded ids in UiAssetIds.json,
--- styled Frames until then). Party frames, compass with waypoints, extraction
--- objective, world event, vitals, level/XP bar, the hotbar (its items; a tap
--- uses a slot like its key) and the custom interaction prompt. It only displays what the server already
--- replicated: Humanoid health, the Stamina/Food/MedicineLockUntil/FoodHealing
--- attributes, progression snapshots, TribeId attributes, and the extraction and
--- event remotes (through their controllers). World place only, during a run.
+-- In-world HUD (GDD §11, §25.4; docs/ui/HudScreen.md), built only from the shared
+-- Kit like the lobby HUD (ARCHITECTURE §4.8, D15) and placed from
+-- src/shared/UI/HudLayout.json: tribe frames, compass with waypoints, the
+-- vitals as the kit's stat bars, status plaques, extraction objective, world
+-- event, the menu tiles, level/XP bar, the hotbar (its items; a tap uses a slot
+-- like its key) and the custom interaction prompt. It only displays what the
+-- server already replicated: Humanoid health, the Stamina/Food/MedicineLockUntil/
+-- FoodHealing attributes, progression snapshots, TribeId attributes, and the
+-- extraction and event remotes (through their controllers). World place only,
+-- during a run.
 
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
@@ -14,6 +16,7 @@ local RunService = game:GetService("RunService")
 
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local GuiService = game:GetService("GuiService")
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
@@ -28,13 +31,12 @@ local BottomBar = require(Hud.BottomBar)
 local Compass = require(Hud.Compass)
 local EventPanel = require(Hud.EventPanel)
 local HudMode = require(Hud.HudMode)
+local Kit = require(Hud.Kit)
 local InteractionPrompt = require(Hud.InteractionPrompt)
 local Layout = require(Hud.Layout)
-local Parchment = require(Hud.Parchment)
 local ObjectivePanel = require(Hud.ObjectivePanel)
 local PartyFrames = require(Hud.PartyFrames)
 local Vitals = require(Hud.Vitals)
-local Widgets = require(Hud.Widgets)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -44,13 +46,16 @@ local HudController = {}
 -- equipped slot, and every key press or tap on a slot also uses it.
 HudController.SelectionChanged = Signal.new()
 
--- The in-HUD menu row: {label, controller, function}.
+-- The menu tiles (left, the lobby's 2 × 3 grid): {id, icon, bind action for
+-- the tooltip's key, controller, function}. Touch players have no keys, so
+-- every panel with a key has a tile.
 HudController.MENU = {
-	{ "CRAFT", "CraftingController", "Toggle" },
-	{ "BUILD", "BuildController", "Toggle" },
-	{ "TRIBE", "TribeController", "Toggle" },
-	{ "MAP", "MapController", "Toggle" },
-	{ "PROGRESS", "ProgressionController", "Toggle" },
+	{ "Backpack", "backpack", "Backpack", "InventoryController", "ToggleBackpack" },
+	{ "Craft", "hammer", "Craft", "CraftingController", "Toggle" },
+	{ "Build", "build", "Build", "BuildController", "Toggle" },
+	{ "Tribe", "party", "Tribe", "TribeController", "Toggle" },
+	{ "Map", "map", "Map", "MapController", "Toggle" },
+	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },
 }
 HudController.Selected = 1
 
@@ -63,6 +68,15 @@ HudController.SLOW_SECONDS = 0.25
 HudController.DEFAULT_ZONE_RADIUS = 10
 -- Where Theme's shared top column sits when the HUD is not pushing it down.
 HudController.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
+-- Design px kept between the Roblox top bar and the top regions.
+HudController.TOP_GAP = 2
+-- Compass waypoint icons per kind of point.
+HudController.WAYPOINT_ICONS = {
+	landmark = "mountain",
+	camp = "campfire",
+	portal = "portal",
+	extract = "exit",
+}
 
 -- The right bumper steps the selection forward, wrapping. The left bumper is left to
 -- InventoryController's Drop, so one press never does two things. Gamepad buttons

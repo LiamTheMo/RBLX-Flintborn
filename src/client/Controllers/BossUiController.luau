@@ -92,7 +92,7 @@ local function update()
 		end
 		-- Shielded reads in words as well as the blue fill.
 		ui.bar:SetBar(hp / maxHp, if shielded then "blue" else "red", ("%d / %d"):format(hp, maxHp))
-		ui.bar:Show(if phase ~= "" then phase else "Fighting", body:GetAttribute("BossName"))
+		ui.bar:Show(phase, body:GetAttribute("BossName"))
 	else
 		ui.bar:Hide()
 	end
