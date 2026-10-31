@@ -302,6 +302,43 @@ test("only players whose view changed are sent one; no-ops send nothing", functi
 	expectEq(delta(before, 1), 0, "a join changes no one else's view")
 end)
 
+test("a client that missed its first view gets it again on request", function()
+	local late = newPlayer(7)
+	local first = sent[7]
+	expect(first ~= nil, "the join sends a view")
+	-- The client connected its listener too late and lost that view; nothing has
+	-- changed since, so only an explicit request sends it again.
+	local before = fires[7]
+	local ok = handlers.PartyAction(late, "view")
+	expect(ok, "the request is accepted")
+	expectEq(fires[7], before + 1, "the unchanged view is sent again")
+	expectEq(sent[7].maxSize, 8, "a full view")
+	local others = table.clone(fires)
+	handlers.PartyAction(late, "view")
+	for userId, count in others do
+		if userId ~= 7 then
+			expectEq(fires[userId], count, "no one else hears a view request")
+		end
+	end
+	-- Later broadcasts still skip the unchanged view.
+	before = fires[7]
+	handlers.PartyAction(solo, "ready", not sent[4].ready)
+	expectEq(fires[7], before, "a change elsewhere does not resend it")
+	local bad, reason = handlers.PartyAction(late, "view", "extra")
+	expect(not bad and reason == "BadRequest", "a view request takes no argument")
+end)
+
+test("view requests share the per-player cooldown", function()
+	PartyService.REQUEST_COOLDOWN_SECONDS = COOLDOWN
+	local spammer = newPlayer(8)
+	local before = fires[8]
+	expect(handlers.PartyAction(spammer, "view"), "first request")
+	local ok, reason = handlers.PartyAction(spammer, "view")
+	expect(not ok and reason == "TooFast", "spam refused")
+	expectEq(fires[8], before + 1, "only one resend")
+	PartyService.REQUEST_COOLDOWN_SECONDS = -1
+end)
+
 test("unknown actions are refused", function()
 	local ok, reason = handlers.PartyAction(solo, "kick", 1)
 	expect(not ok and reason == "BadRequest", "no kick action")

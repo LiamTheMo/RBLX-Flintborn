@@ -623,6 +623,16 @@ Studio and live checks (desktop, touch and controller unless stated):
 - [ ] **Trade invite toast:** an invite shows Accept and Decline on the toast itself (no ✕); either answers once and closes the toast; tapping the card opens the same question as a dialog.
 - [ ] **Phone touch targets and readability (844 × 390 and a small phone):** every window fills the screen; buttons, tabs, rows, steppers, ✕ and the Ready toggle are tappable without hitting a neighbour (about 44 screen px); body text stays readable (note any line under about 9 px); nothing sits under the notch or the Roblox top bar; tooltips appear on long-press.
 - [ ] **Gamepad navigation:** opening a window selects its default control and closing it returns selection to where it was; the D-pad reaches every tile, tab, row, slot, stepper and button in a sensible order (lobby HUD: card → tiles → hotbar, top-right → party panel); A presses, B closes; the selection cue is the kit's hover look, never Roblox's default box.
+Device-only checks from the round-2 re-verification (the headless captures cannot show these):
+
+- [ ] **Toast lane:** with a window open, toasts appear below its header and tab row, never over the title or tabs; on phones they never cover the server notice card's title, and the ✕ is easy to hit (44 screen px).
+- [ ] **SearchBox touch growth:** on a phone, tapping the Party, Inventory or Market search box opens the keyboard on the first tap anywhere in its padded area, and the field stays visible above the keyboard.
+- [ ] **Top-bar and jump clearance:** on phones (notched and not), no window title, ✕, HUD control or the world settings gear sits under the Roblox top bar, and nothing sits under the jump button.
+- [ ] **Thumbstick vs tribe frames:** in a run on 844 × 390 and 667 × 375 phones, the tribe/party frames and the HUD tiles stay clear of the thumbstick and jump zones while moving and jumping.
+- [ ] **Lobby gamepad entry:** with a controller and no window open, the bound button moves selection onto the lobby HUD tiles (its hint shows), the D-pad walks tiles, hotbar and party panel, and B leaves HUD navigation; the HUD never takes selection by itself.
+- [ ] **Party view on join:** join a lobby where a party already exists and you hold an invite: the party panel and the invite appear within a couple of seconds, without anyone else changing anything (the client asks for its view on start).
+- [ ] **Blur and motion:** on Medium and High graphics a window blurs and dims the world, and Low only dims it; closing a window always removes the blur (open and close quickly ten times); windows, toasts and bars animate smoothly, and Reduced Motion makes them instant.
+
 - [ ] **In-world HUD and overlays:** vitals, compass, objective and event cards, party frames, the hotbar and notices use the kit look and stay readable on phone, desktop and console sizes.
 
 ## UI images on phones (SpriteLoader pacing)

@@ -139,6 +139,8 @@ local function requestPreview()
 end
 
 LobbyController.PREVIEW_REFRESH_SECONDS = 30
+-- Tries for the party view on start (PartyAction "view").
+LobbyController.VIEW_ATTEMPTS = 3
 LobbyController.MAINTENANCE_TEXT = "Game update: your items were saved and return on your next Play."
 
 -- Returns (success, reason?) as the server answered.
@@ -425,6 +427,20 @@ function LobbyController.Start()
 		refreshParty()
 	end)
 	refreshParty()
+	-- Ask for the party view now that the listener is connected: the one the
+	-- server sent on join may have arrived first. Quiet (no status line), and
+	-- retried a few times if the server is busy or still starting.
+	task.spawn(function()
+		for attempt = 1, LobbyController.VIEW_ATTEMPTS do
+			local ok, success = pcall(function()
+				return Remotes.Get("PartyAction"):InvokeServer("view")
+			end)
+			if ok and success then
+				return
+			end
+			task.wait(attempt)
+		end
+	end)
 	-- Never block later controllers' Start on a server round trip. The profile may
 	-- still be loading now, and every vault, shop or trade change marks a save, so
 	-- the save status changing is the cue to re-read; a slow timer backs it up.

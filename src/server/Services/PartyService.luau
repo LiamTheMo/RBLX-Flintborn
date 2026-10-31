@@ -106,6 +106,15 @@ local function broadcast()
 	end
 end
 
+-- Sends `player` their current view even when it equals the last one sent: the
+-- client asks for it on start ("view"), in case the view fired on PlayerAdded
+-- arrived before its listener was connected.
+local function resend(player: Player)
+	local view = viewFor(player)
+	lastSent[player] = view
+	Remotes.Get("PartyChanged"):FireClient(player, view)
+end
+
 -- Clears the ready flag of everyone in `group` (a deploy is starting) and tells
 -- the players whose view changed.
 function PartyService.ClearReady(group: { Player })
@@ -230,6 +239,10 @@ local function handle(player: Player, action: any, argument: any)
 		ok, reason = PartyRules.Leave(state, player.UserId)
 	elseif action == "ready" and type(argument) == "boolean" then
 		ok, reason = PartyRules.SetReady(state, player.UserId, argument)
+	elseif action == "view" and argument == nil then
+		-- Changes nothing: only this player hears, whatever was sent before.
+		resend(player)
+		return true, nil
 	else
 		return false, "BadRequest"
 	end
