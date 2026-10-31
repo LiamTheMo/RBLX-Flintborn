@@ -1,7 +1,8 @@
 -- Small tags and badges (sheets 01, 05, 13; M04):
 --   "leader"   the Leader plaque (value pill, gold tint)
---   "ready"    green dot + "Ready" on the value pill (D18)
---   "notReady" grey dot + "Not Ready" on the value pill (D18)
+--   "ready"    green dot on the light green pill (a status that is set: trade
+--              locked, data saved; default text "Ready")
+--   "notReady" grey dot on the value pill (the status not yet set)
 --   "count"    stack count plaque, "number" the leather hotbar number badge
 --   "new"      wide count plaque with "NEW", "dot" a red notification dot.
 -- Pill widths follow their text. `anchor = "topRight"` pins the badge over
@@ -22,9 +23,7 @@ Badge.__index = Badge
 -- role and colour, a tint over the plate, and the default size.
 Badge.VARIANTS = {
 	leader = { role = "badge.pill", text = "Leader", textRole = "tag", tint = "leaderTint", h = 34 },
-	-- Ready is the green pill (M04); readyPill names it explicitly.
 	ready = { role = "badge.ready", dot = "dot.green", text = "Ready", textRole = "tag", h = 34 },
-	readyPill = { role = "badge.ready", dot = "dot.green", text = "Ready", textRole = "tag", h = 34 },
 	notReady = { role = "badge.pill", dot = "dot.grey", text = "Not Ready", textRole = "tag", h = 34 },
 	count = { role = "badge.count", text = "", textRole = "count", w = 34, h = 31 },
 	number = { role = "badge.number", text = "", textRole = "badgeNum", w = 26, h = 26 },

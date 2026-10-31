@@ -172,7 +172,7 @@ KitModel.ROLES = {
 	["badge.count"] = { sprite = "lk_badge_count", material = "paper" },
 	["badge.countWide"] = { sprite = "lk_badge_count_wide", material = "paper" },
 	["badge.pill"] = { sprite = "lk_pill_value", material = "paper" },
-	-- The Ready pill (M04 Readied Status): a light green fill with a green
+	-- The green status pill (M04's look): a light green fill with a green
 	-- edge; the kit's pill art cannot be tinted lighter, so it is flat.
 	["badge.ready"] = { native = true, material = "pill", fill = "readyFill", stroke = "readyEdge" },
 	["dot.green"] = { sprite = "lk_dot_green", material = "dot", fill = "readyDot" },

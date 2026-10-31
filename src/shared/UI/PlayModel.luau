@@ -1,7 +1,6 @@
 -- Pure display rules for the Play window (docs/ui/PlayScreen.md, ARCHITECTURE
 -- §4.5): the run hotbar the deploy preview packs into, what the player carries,
--- the party list and its advisory ready count (D3), who may press Play (D16), the
--- deploy check's wording and the world's honest detail rows (D7). No Instances
+-- the party list, who may press Play (D24), the deploy check's wording and the world's honest detail rows (D7). No Instances
 -- here, so the headless specs and the window share one definition. The server
 -- decides everything; these only describe what it will do.
 
@@ -27,14 +26,11 @@ PlayModel.RISK_ORDER = { "Low", "Medium", "High", "Extreme" }
 
 PlayModel.TITLE_CHECK = "Take these into the run?"
 PlayModel.TITLE_UNREAD = "Could not read your backpack"
-PlayModel.TITLE_START = "Start the run?"
 PlayModel.LINE_AT_RISK = "Everything except ★ Permanent items can be lost in the run."
 PlayModel.LINE_UNREAD =
 	"The item list did not load. Everything you carry except ★ Permanent items can be lost in the run."
 PlayModel.LINE_VAULT = "Items in your vault always stay safe."
-PlayModel.LINE_NOTHING = "Nothing from your backpack goes with you."
 PlayModel.MEMBER_CAPTION = "The party leader starts the run."
-PlayModel.MEMBER_READY_CAPTION = "You are ready. The party leader starts the run."
 
 -- The run hotbar `items` (the deploy preview, {catalogId, quantity, permanent}[])
 -- lands in: InventoryRules.FromItems, the packing InventoryService applies at run
@@ -150,8 +146,8 @@ function PlayModel.MarkerUV(span: number): (number, number)
 	return 0.5 + x / span, 0.5 + z / span
 end
 
--- "solo", "leader" or "member": who presses what (D16). Solo players and leaders
--- press PLAY; other members get the Ready toggle.
+-- "solo", "leader" or "member": who may press PLAY (D24). Solo players and
+-- leaders press it; other members see it disabled.
 function PlayModel.Role(view, userId: number): string
 	local party = type(view) == "table" and view.party or nil
 	if party == nil then
@@ -160,14 +156,12 @@ function PlayModel.Role(view, userId: number): string
 	return if party.leader == userId then "leader" else "member"
 end
 
--- The party as rows, leader first: {userId, name, leader, ready}. Alone, a party
--- of one led by `me` ({userId, name}).
-function PlayModel.Members(view, me): { { userId: number, name: string, leader: boolean, ready: boolean } }
+-- The party as rows, leader first: {userId, name, leader}. Alone, a party of
+-- one led by `me` ({userId, name}).
+function PlayModel.Members(view, me): { { userId: number, name: string, leader: boolean } }
 	local party = type(view) == "table" and view.party or nil
 	if party == nil then
-		return {
-			{ userId = me.userId, name = me.name, leader = true, ready = type(view) == "table" and view.ready == true },
-		}
+		return { { userId = me.userId, name = me.name, leader = true } }
 	end
 	local rows = {}
 	for _, member in party.members or {} do
@@ -175,7 +169,6 @@ function PlayModel.Members(view, me): { { userId: number, name: string, leader: 
 			userId = member.userId,
 			name = member.name or tostring(member.userId),
 			leader = member.userId == party.leader,
-			ready = member.ready == true,
 		}
 		if row.leader then
 			table.insert(rows, 1, row)
@@ -184,29 +177,6 @@ function PlayModel.Members(view, me): { { userId: number, name: string, leader: 
 		end
 	end
 	return rows
-end
-
--- How many of the party are ready, and its size (a solo player counts alone).
-function PlayModel.ReadyCounts(view, me): (number, number)
-	local ready, total = 0, 0
-	for _, row in PlayModel.Members(view, me) do
-		total += 1
-		if row.ready then
-			ready += 1
-		end
-	end
-	return ready, total
-end
-
--- The advisory note in the leader's deploy check (D3), or nil for a solo player.
-function PlayModel.ReadyNote(ready: number, total: number): string?
-	if total <= 1 then
-		return nil
-	end
-	if ready >= total then
-		return ("All %d party members are ready."):format(total)
-	end
-	return ("%d of %d party members are ready."):format(ready, total)
 end
 
 -- One line per item in the deploy check: "★ Stone Axe", "• Wood ×20".
@@ -219,27 +189,18 @@ end
 
 -- What Play asks before deploying (GDD Q155), or nil to deploy at once:
 -- {title, lines, notes, confirmLabel}. `items` is the fresh preview (nil when it
--- could not be read); `note` the ready note. An empty backpack with nothing to
--- point out deploys straight away.
-function PlayModel.DeployCheck(items, note: string?, allReady: boolean?)
+-- could not be read). An empty backpack deploys straight away.
+function PlayModel.DeployCheck(items)
 	if type(items) ~= "table" then
 		return {
 			title = PlayModel.TITLE_UNREAD,
 			lines = {},
-			notes = { PlayModel.LINE_UNREAD, PlayModel.LINE_VAULT, note },
+			notes = { PlayModel.LINE_UNREAD, PlayModel.LINE_VAULT },
 			confirmLabel = "Enter anyway",
 		}
 	end
 	if #items == 0 then
-		if note == nil or allReady then
-			return nil
-		end
-		return {
-			title = PlayModel.TITLE_START,
-			lines = {},
-			notes = { PlayModel.LINE_NOTHING, note },
-			confirmLabel = "Enter",
-		}
+		return nil
 	end
 	local lines, atRisk = {}, false
 	for _, item in items do
@@ -251,9 +212,6 @@ function PlayModel.DeployCheck(items, note: string?, allReady: boolean?)
 		table.insert(notes, PlayModel.LINE_AT_RISK)
 	end
 	table.insert(notes, PlayModel.LINE_VAULT)
-	if note then
-		table.insert(notes, note)
-	end
 	return { title = PlayModel.TITLE_CHECK, lines = lines, notes = notes, confirmLabel = "Enter" }
 end
 

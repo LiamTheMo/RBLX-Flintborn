@@ -486,7 +486,7 @@ function LobbyHud:_holder(order: number, height: number): Frame
 	return holder
 end
 
-function LobbyHud:_member(holder: Frame, member, showReady: boolean)
+function LobbyHud:_member(holder: Frame, member)
 	local fire = self.fire
 	local r = LobbyHud.ROW
 	-- On phones a row takes the panel's width (the add-player button sits in
@@ -499,7 +499,6 @@ function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 		name = member.name,
 		leader = member.leader,
 		compact = true,
-		status = if showReady then (if member.ready then "ready" else "notReady") else nil,
 		portraitSize = r.portrait,
 		nameX = r.nameX,
 		nameSize = if self.phone then LobbyHud.PHONE.memberName else LobbyHud.TEXT.memberName,
@@ -518,7 +517,6 @@ function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 		end,
 	})
 	row.root:SetAttribute("LobbyUserId", member.userId)
-	row.root:SetAttribute("LobbyReady", member.ready)
 	-- The rule runs on under the add-player button.
 	table.insert(
 		self.rows,
@@ -545,7 +543,7 @@ function LobbyHud:SetParty(party)
 	-- The first member stays at the top with the add-player button.
 	local pinned = region(self.pinned, "Row0", { Size = UDim2.fromScale(1, 1) })
 	pinned:SetAttribute("LobbyRow", true)
-	local first = self:_member(pinned, party.members[1], party.showReady)
+	local first = self:_member(pinned, party.members[1])
 	-- On phones the list shows few rows: with three or more members a waiting
 	-- invite is below the fold, so the add-player button carries a dot.
 	local hiddenInvite = self.phone and #party.invites > 0 and #party.members >= 3
@@ -566,7 +564,7 @@ function LobbyHud:SetParty(party)
 	local order, height = 0, 0
 	for index = 2, #party.members do
 		order += 1
-		self:_member(self:_holder(order, LobbyHud.ROW_H), party.members[index], party.showReady)
+		self:_member(self:_holder(order, LobbyHud.ROW_H), party.members[index])
 		height += LobbyHud.ROW_H
 	end
 	for _, from in party.invites do

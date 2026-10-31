@@ -40,18 +40,17 @@ local function page(view)
 	__dump(gui, W, H)
 end
 
-page({ party = nil, invites = {}, ready = false, maxSize = 8 })
+page({ party = nil, invites = {}, maxSize = 8 })
 page({
 	party = {
 		id = "p1",
 		leader = 1,
 		members = {
-			{ userId = 1, name = "LiamTheMo", ready = true },
-			{ userId = 2, name = "ForestRanger", ready = true },
-			{ userId = 3, name = "StoneSeeker", ready = false },
+			{ userId = 1, name = "LiamTheMo" },
+			{ userId = 2, name = "ForestRanger" },
+			{ userId = 3, name = "StoneSeeker" },
 		},
 	},
 	invites = { { partyId = "p9", from = "RiverFox" } },
-	ready = true,
 	maxSize = 8,
 })

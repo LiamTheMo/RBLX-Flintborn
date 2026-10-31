@@ -1,5 +1,5 @@
--- Play window rules: the run hotbar, carrying summary, party rows, ready counts,
--- who presses Play and the deploy check.
+-- Play window rules: the run hotbar, carrying summary, party rows, who presses
+-- Play and the deploy check.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local PlayModel = require(Shared.UI.PlayModel)
@@ -83,48 +83,33 @@ end)
 
 test("who presses Play", function()
 	expectEq(PlayModel.Role({ party = nil }, 1), "solo", "alone")
-	local party =
-		{ leader = 1, members = { { userId = 2, name = "Ana", ready = true }, { userId = 1, name = "Liam" } } }
+	local party = { leader = 1, members = { { userId = 2, name = "Ana" }, { userId = 1, name = "Liam" } } }
 	expectEq(PlayModel.Role({ party = party }, 1), "leader", "leader")
 	expectEq(PlayModel.Role({ party = party }, 2), "member", "member")
 	local rows = PlayModel.Members({ party = party }, ME)
 	expectEq(rows[1].userId, 1, "leader first")
 	expectEq(rows[1].leader, true, "crowned")
-	expectEq(rows[2].ready, true, "ready flag")
-end)
-
-test("ready counts and the advisory note", function()
-	local solo = PlayModel.Members({ party = nil, ready = true }, ME)
-	expectEq(#solo, 1, "solo is a party of one")
-	expectEq(solo[1].ready, true, "solo ready")
-	local party =
-		{ leader = 1, members = { { userId = 1, ready = true }, { userId = 2 }, { userId = 3, ready = true } } }
-	local ready, total = PlayModel.ReadyCounts({ party = party }, ME)
-	expectEq(ready, 2, "two ready")
-	expectEq(total, 3, "of three")
-	expectEq(PlayModel.ReadyNote(2, 3), "2 of 3 party members are ready.", "note")
-	expectEq(PlayModel.ReadyNote(3, 3), "All 3 party members are ready.", "all ready")
-	expectEq(PlayModel.ReadyNote(1, 1), nil, "no note when solo")
+	expectEq(rows[2].ready, nil, "no ready flag")
+	local solo = PlayModel.Members({ party = nil }, ME)
+	expect(#solo == 1 and solo[1].leader, "solo is a party of one, led by you")
+	expectEq(PlayModel.ReadyCounts, nil, "no ready count")
+	expectEq(PlayModel.ReadyNote, nil, "no ready note")
 end)
 
 test("deploy check", function()
-	expectEq(PlayModel.DeployCheck({}, nil, true), nil, "empty and solo deploys at once")
-	expectEq(PlayModel.DeployCheck({}, "All 2 party members are ready.", true), nil, "empty and all ready")
-	local waiting = PlayModel.DeployCheck({}, "1 of 2 party members are ready.", false)
-	expectEq(waiting.title, PlayModel.TITLE_START, "asks when someone is not ready")
-	expectEq(waiting.notes[2], "1 of 2 party members are ready.", "with the note")
-	local unread = PlayModel.DeployCheck(nil, nil, true)
+	expectEq(PlayModel.DeployCheck({}), nil, "an empty backpack deploys at once")
+	local unread = PlayModel.DeployCheck(nil)
 	expectEq(unread.title, PlayModel.TITLE_UNREAD, "unread preview")
 	expectEq(unread.confirmLabel, "Enter anyway", "enter anyway")
 	local check = PlayModel.DeployCheck({
 		{ catalogId = "StoneAxe", permanent = true },
 		{ catalogId = "Wood", quantity = 20 },
-	}, "2 of 3 party members are ready.", false)
+	})
 	expectEq(check.title, PlayModel.TITLE_CHECK, "lists the items")
 	expectEq(check.lines[1], "★ Stone Axe", "permanent star")
 	expectEq(check.lines[2], "• Wood ×20", "quantity")
 	expectEq(check.notes[1], PlayModel.LINE_AT_RISK, "risk warning")
-	expectEq(check.notes[3], "2 of 3 party members are ready.", "ready note last")
-	local safe = PlayModel.DeployCheck({ { catalogId = "StoneAxe", permanent = true } }, nil, true)
+	expectEq(#check.notes, 2, "the risk warning and the vault line only")
+	local safe = PlayModel.DeployCheck({ { catalogId = "StoneAxe", permanent = true } })
 	expectEq(safe.notes[1], PlayModel.LINE_VAULT, "no risk warning when all Permanent")
 end)

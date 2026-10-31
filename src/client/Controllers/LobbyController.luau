@@ -4,7 +4,7 @@
 --
 -- With the lobby HUD (HudMode.ReplacesLobby) this keeps the logic and the HUD and
 -- the Party and Play windows draw it: Deploy(), PartyAction() and its wrappers
--- (Invite, Accept, Decline, Leave, SetReady), PartyView(), IsReady(), IsInvited(),
+-- (Invite, Accept, Decline, Leave), PartyView(), IsInvited(),
 -- Preview(), Invitable(), Status(), Changed and PartyChanged. Otherwise it also
 -- builds its own panel.
 
@@ -27,7 +27,7 @@ LobbyController.Changed = Signal.new()
 LobbyController.PartyChanged = Signal.new()
 
 local player = Players.LocalPlayer
-local partyView = { party = nil, invites = {}, ready = false, maxSize = PartyRules.MAX_SIZE }
+local partyView = { party = nil, invites = {}, maxSize = PartyRules.MAX_SIZE }
 -- The deploy preview: {catalogId, quantity, permanent}[] once read, or nil.
 local previewItems = nil
 local statusText = "You are safe in the lobby."
@@ -246,7 +246,7 @@ function LobbyController.IsDeploying(): boolean
 	return deploying
 end
 
--- "invite" + userId, "accept"/"decline" + partyId, "leave", or "ready" + bool.
+-- "invite" + userId, "accept"/"decline" + partyId, or "leave".
 -- Yields; returns (success, reason?). A failure also shows in Status().
 function LobbyController.PartyAction(action: string, argument: any?): (boolean, string?)
 	return partyAction(action, argument)
@@ -268,38 +268,16 @@ function LobbyController.Leave(): (boolean, string?)
 	return partyAction("leave")
 end
 
--- Sets your own advisory ready flag (works without a party). The view updates
--- when the server confirms. Yields.
-function LobbyController.SetReady(ready: boolean): (boolean, string?)
-	return partyAction("ready", ready == true)
-end
-
 -- {
 --   party = nil | {id, leader, createdAt (server os.time, or nil), members =
---     {{userId, name, ready}}, invited = {userId} (the leader's pending invites;
+--     {{userId, name}}, invited = {userId} (the leader's pending invites;
 --     empty for other members)},
 --   invites = {{partyId, from, fromUserId}} (invites waiting for you; from is
 --     the inviting leader's display name),
---   ready = boolean (yours, also when solo),
 --   maxSize = 8,
 -- }
 function LobbyController.PartyView()
 	return partyView
-end
-
--- Whether `userId` (default: you) is ready. Only you and your party's members
--- are known; anyone else reads false.
-function LobbyController.IsReady(userId: number?): boolean
-	if userId == nil or userId == player.UserId then
-		return partyView.ready == true
-	end
-	local party = partyView.party
-	for _, member in party and party.members or {} do
-		if member.userId == userId then
-			return member.ready == true
-		end
-	end
-	return false
 end
 
 -- True while your party has an unanswered invite out to `userId` (leader only).

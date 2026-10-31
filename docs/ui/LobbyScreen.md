@@ -146,6 +146,9 @@ one frame for all six, slice an empty frame from 01 slot frames
 | Scrollbar.Track | PartyPanel | 1588,366,8,111 | Color.ScrollTrack, fully rounded | — | 09 scrollbar track (1520,461,47,266) is a framed version; mockup is flat |
 | Scrollbar.Thumb | Track | 1588,366,8,63 at the mock position | Color.ScrollThumb, fully rounded | list scroll position | 09 thumb (1601,477,47,144) is leather; mockup is flat |
 
+Member rows show no ready dot and no Leader tag: the crown alone marks the
+leader (D24).
+
 The list area (member row + empty rows) is a scroll region from y 313 to the
 panel's inner bottom (≈ y 489): 1 member row (51 px) + 3 visible empty rows
 (35–36 px each). With the cap at 8 there are 7 rows after the member row, so the

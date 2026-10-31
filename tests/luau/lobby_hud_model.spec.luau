@@ -26,41 +26,38 @@ test("level and XP lines", function()
 	expectEq(LobbyHudModel.Progress({ level = 3, xp = 12.7, xpToNext = 100 }).text, "12/100 XP", "whole numbers")
 end)
 
-test("solo: a party of one led by you, with your ready flag", function()
-	local party = LobbyHudModel.Party({ party = nil, invites = {}, ready = true, maxSize = 8 }, ME)
+test("solo: a party of one led by you", function()
+	local party = LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME)
 	expectEq(party.count, "1/8", "count")
 	expectEq(#party.members, 1, "one row")
 	expectEq(party.members[1].leader, true, "you lead")
-	expectEq(party.members[1].ready, true, "solo ready shows")
 	expectEq(party.members[1].self, true, "self")
 	expectEq(party.free, 7, "free rows up to the cap")
 	expectEq(party.canInvite, true, "solo can invite")
-	expectEq(party.showReady, false, "no ready dot alone (matches M01)")
 end)
 
-test("in a party: leader crown, ready flags, invite rights", function()
+test("in a party: leader crown, no ready state, invite rights", function()
 	local view = {
 		party = {
 			id = "p1",
 			leader = 2,
 			members = {
-				{ userId = 2, name = "Ranger", ready = true },
-				{ userId = 1, name = "LiamTheMo", ready = false },
+				{ userId = 2, name = "Ranger" },
+				{ userId = 1, name = "LiamTheMo" },
 			},
 		},
 		invites = { { partyId = "p9", from = "Bob" } },
-		ready = false,
 		maxSize = 8,
 	}
 	local party = LobbyHudModel.Party(view, ME)
 	expectEq(party.count, "2/8", "count")
 	expectEq(party.members[1].leader, true, "leader marked")
-	expectEq(party.members[1].ready, true, "member ready")
+	expectEq(party.members[1].ready, nil, "no ready flag")
 	expectEq(party.members[2].leader, false, "not leader")
 	expectEq(party.members[2].self, true, "you")
 	expectEq(party.free, 6, "free rows")
 	expectEq(party.canInvite, false, "only the leader invites")
-	expectEq(party.showReady, true, "ready dots in a party")
+	expectEq(party.showReady, nil, "no ready dots")
 	expectEq(#party.invites, 1, "incoming invites pass through")
 	expectEq(party.invites[1].busy, false, "an invite with no answer on its way")
 	local answering = LobbyHudModel.Party(view, ME, { p9 = true })

@@ -2,13 +2,12 @@
 -- from the lobby. It replaces the lobby's old Enter button, its server dropdown
 -- (there is no server choice, D7) and the deploy check that went with them.
 --
--- PLAY reads the deploy preview fresh and, when anything goes with you (or the
--- party is not all ready), lists it in a Kit.ConfirmDialog before deploying (GDD
--- Q155); with nothing to point out it deploys straight away. Solo players and
--- party leaders press PLAY; other members get a Ready toggle instead, since only
--- the leader deploys (D16) and Ready is advisory (D3). Everything goes through
--- LobbyController (Deploy, FetchPreview) and PartyController (SetReady, which
--- owns the pending ready state for every screen); the server decides.
+-- PLAY reads the deploy preview fresh and, when anything goes with you, lists it
+-- in a Kit.ConfirmDialog before deploying (GDD Q155); with nothing to point out
+-- it deploys straight away. Only solo players and party leaders can press PLAY;
+-- other members see it disabled with "The party leader starts the run.", since
+-- only the leader deploys (D24). Everything goes through LobbyController
+-- (Deploy, FetchPreview); the server decides.
 --
 -- Contract (§4.9): Open(), Toggle(), IsOpen(). Lobby place only, with the lobby
 -- HUD in charge (HudMode.ReplacesLobby); otherwise LobbyController's own panel
@@ -20,7 +19,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 local LobbyController = require(script.Parent.LobbyController)
-local PartyController = require(script.Parent.PartyController)
 local Hud = script.Parent.Parent.Hud
 local HudMode = require(Hud.HudMode)
 local Kit = require(Hud.Kit)
@@ -40,7 +38,7 @@ local dialog = nil
 -- A message showing under the map (nil: the idle line) and its token.
 local statusText: string? = nil
 local statusToken = 0
--- Reading the preview for PLAY (a ready toggle in flight is PartyController's).
+-- Reading the preview for PLAY.
 local entering = false
 -- The role the window was last drawn for: a new role drops the last message.
 local shownRole: string? = nil
@@ -77,7 +75,7 @@ local function idleLine(): string?
 		return LobbyController.MAINTENANCE_TEXT
 	end
 	if role() == "member" then
-		return if PartyController.ShownReady() then PlayModel.MEMBER_READY_CAPTION else PlayModel.MEMBER_CAPTION
+		return PlayModel.MEMBER_CAPTION
 	end
 	return nil
 end
@@ -112,8 +110,8 @@ local function refreshButton()
 		statusText = nil
 		statusToken += 1
 	end
-	window:SetMode(current, PartyController.ShownReady())
-	window:SetBusy(entering or PartyController.ReadyPending() ~= nil or deploying)
+	window:SetMode(current)
+	window:SetBusy(entering or deploying)
 	-- Once the server is teleporting the player there is nothing left to press.
 	window:SetEnabled(not (travelling() and not deploying and not entering))
 end
@@ -140,7 +138,7 @@ local function watchLevels(rows)
 end
 
 -- Party rows: leader first, each with the player's Level attribute (set by
--- ProgressionService.Publish) and, in a party, their ready dot.
+-- ProgressionService.Publish).
 function PlayController.RefreshParty()
 	if window == nil then
 		return
@@ -151,7 +149,7 @@ function PlayController.RefreshParty()
 		row.level = levelOf(row.userId)
 	end
 	watchLevels(rows)
-	window:SetParty(rows, view.party ~= nil)
+	window:SetParty(rows)
 end
 
 -- The run hotbar and the detail rows from the latest deploy preview.
@@ -194,7 +192,7 @@ local function deploy()
 end
 
 -- The deploy check's body: one line per item (scrolling when long), then the
--- notes (what can be lost, the vault, the ready count).
+-- notes (what can be lost, the vault).
 local function buildCheck(check)
 	return function(body: Frame, w: number, h: number)
 		local noteH = 0
@@ -282,8 +280,7 @@ local function onPlay()
 		if window == nil or not window:IsOpen() then
 			return
 		end
-		local ready, total = PlayModel.ReadyCounts(LobbyController.PartyView(), me())
-		local check = PlayModel.DeployCheck(items, PlayModel.ReadyNote(ready, total), ready >= total)
+		local check = PlayModel.DeployCheck(items)
 		if check == nil then
 			deploy()
 		else
@@ -292,19 +289,9 @@ local function onPlay()
 	end)
 end
 
--- The member's Ready toggle; the view updates when the server confirms. A
--- refusal shows under the map (LobbyController's status line), not as a toast.
-local function onReady()
-	if PartyController.ReadyPending() ~= nil then
-		return
-	end
-	PartyController.SetReady(not PartyController.ShownReady(), function() end)
-end
-
 local function build()
 	window = PlayWindow.new({
 		onPlay = onPlay,
-		onReady = onReady,
 		onClose = closeDialog,
 	})
 	window.screen:Watch()
@@ -351,8 +338,6 @@ function PlayController.Start()
 		return
 	end
 	started = true
-	-- The shared ready state settles on the party view PartyController watches.
-	PartyController.Start()
 	LobbyController.Changed:Connect(function(what)
 		if what == "party" then
 			PlayController.RefreshParty()
@@ -366,11 +351,6 @@ function PlayController.Start()
 				showStatus(LobbyController.Status())
 			end
 		end
-	end)
-	-- A ready toggle starting or ending (from any screen).
-	PartyController.Changed:Connect(function()
-		refreshButton()
-		refreshStatus()
 	end)
 	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refreshStatus)
 	player:GetAttributeChangedSignal("SessionState"):Connect(refreshButton)
