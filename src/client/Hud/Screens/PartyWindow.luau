@@ -44,6 +44,32 @@ local function inWindow(r: { number }): { number }
 	return { r[1] - o[1], r[2] - o[2], r[3], r[4] }
 end
 
+-- The inset panel art still draws its border 4 px inside the rect's left and
+-- top and 3 px inside its right and bottom (measured against M04); the plate
+-- grows by that much and the panel's contents keep the mockup panel's origin.
+PartyWindow.PANEL_ART = { 4, 4, 3, 3 }
+
+-- An inset panel on the mockup rect `r`; returns the frame its contents go in
+-- (design px from the mockup panel's top-left).
+local function panel(parent: Instance, name: string, r: { number }): Frame
+	local a = PartyWindow.PANEL_ART
+	local o = inWindow(r)
+	local plate = Kit.Panel.new(parent, {
+		name = name,
+		rect = { o[1] - a[1], o[2] - a[2], o[3] + a[1] + a[3], o[4] + a[2] + a[4] },
+		variant = "inset",
+		zIndex = Z,
+	})
+	local inner = Kit.Panel.new(plate.base.visual, {
+		name = "Inner",
+		rect = { a[1], a[2], o[3], o[4] },
+		variant = "plain",
+		pad = 0,
+		zIndex = Z,
+	})
+	return inner.base.visual
+end
+
 -- Row heights (M04): the leader row from the heading rule to the first row
 -- rule, the empty slots' 52.4 px pitch, invite rows on 66 px and the readied
 -- row of 64 px.
@@ -110,7 +136,9 @@ function PartyWindow.new(props: Props)
 		title = "Party",
 		header = "centered",
 		titleSize = 48,
-		titleY = 20,
+		titleY = 25,
+		-- The mockup centres its title 7.5 px right of the window's centre.
+		titleRect = { 843.5 - 274 - 120, 25, 240, 60 },
 		-- D19: the mockup's tent and pines are not in the kit; the tree icon is
 		-- the closest kit art (KIT.md §8).
 		ornaments = { "tree", "tree" },
@@ -125,16 +153,13 @@ function PartyWindow.new(props: Props)
 	local v = self.window.base.visual
 
 	-- Your Party ----------------------------------------------------------------------
-	local party = Kit.Panel.new(v, { name = "YourParty", rect = inWindow(M.party), variant = "inset", zIndex = Z })
-	local pv = party.base.visual
+	local pv = panel(v, "YourParty", M.party)
 	self.partyHeader = header(pv, 360, "Your Party", { "ink:people", 19, 18, 36, 26 }, 69, { 16, 52, 329 }, "1/8")
 	-- 7 rows show (the leader row and six at the mockup pitch); the 8th scrolls.
 	self.memberList = list(pv, "Members", { 16, 55, PartyWindow.LIST_W.party, 391 }, 0)
 
 	-- Invite Players ------------------------------------------------------------------
-	local invite =
-		Kit.Panel.new(v, { name = "InvitePlayers", rect = inWindow(M.invite), variant = "inset", zIndex = Z })
-	local iv = invite.base.visual
+	local iv = panel(v, "InvitePlayers", M.invite)
 	self.inviteHeader = header(iv, 371, "Invite Players", { "ink:magnifier", 23, 17, 26, 27 }, 67, { 17, 52, 336 })
 	self.search = Kit.SearchBox.new(iv, {
 		name = "Search",
@@ -178,17 +203,14 @@ function PartyWindow.new(props: Props)
 	})
 
 	-- Party Details -------------------------------------------------------------------
-	local details =
-		Kit.Panel.new(v, { name = "PartyDetails", rect = inWindow(M.details), variant = "inset", zIndex = Z })
-	local dv = details.base.visual
+	local dv = panel(v, "PartyDetails", M.details)
 	header(dv, 322, "Party Details", { "ink:info", 17, 16, 31, 30 }, 63, { 16, 52, 290 })
 	-- The rows are drawn by SetData (a line row sizes its value when built).
 	self.detailsVisual = dv
 	self.detailRows = {}
 
 	-- Readied Status ------------------------------------------------------------------
-	local ready = Kit.Panel.new(v, { name = "ReadiedStatus", rect = inWindow(M.ready), variant = "inset", zIndex = Z })
-	local rv = ready.base.visual
+	local rv = panel(v, "ReadiedStatus", M.ready)
 	header(rv, 322, "Readied Status", { "ink:check", 17, 16, 31, 31 }, 63, { 16, 53, 290 })
 	-- One row shows, as in the mockup; more members scroll.
 	self.readyList = list(rv, "Ready", { 16, 57, PartyWindow.LIST_W.ready, 68 }, 0)

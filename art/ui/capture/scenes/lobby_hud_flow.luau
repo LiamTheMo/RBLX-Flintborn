@@ -114,9 +114,14 @@ check(hud.slots[1].item and hud.slots[1].item.itemId == "StonePickaxe", "a new p
 check(hud.slots[2].item == nil, "and empties the rest")
 
 -- Party view from the server.
-check(hud.header.count.Text == "1/8", "solo party 1/8")
+check(hud.countText.root.Text == "1/8", "solo party 1/8")
 check(#hud.parts.members == 1 and #hud.parts.empty == 7, "one member row and seven empty rows")
 check(hud.invite and hud.invite.control.flags.enabled ~= false, "solo can invite")
+hud.invite.control:Activate()
+check(
+	last() == "PartyController.Open" and opened[#opened][2] == "invite",
+	"the add-player button opens its invite list"
+)
 local fire = partyChanged.OnClientEvent.Fire
 fire(partyChanged.OnClientEvent, {
 	party = {
@@ -132,7 +137,7 @@ fire(partyChanged.OnClientEvent, {
 	ready = false,
 	maxSize = 8,
 })
-check(hud.header.count.Text == "2/8", "party count from PartyChanged")
+check(hud.countText.root.Text == "2/8", "party count from PartyChanged")
 check(#hud.parts.members == 2 and #hud.parts.empty == 6, "two members, six free")
 check(hud.parts.members[1]:GetAttribute("LobbyReady") == true, "leader's ready flag")
 check(hud.parts.members[2]:GetAttribute("LobbyReady") == false, "your not-ready flag")
@@ -163,11 +168,9 @@ hud.cardControl:Activate()
 check(last() == "Progress.Toggle", "the card opens Progress")
 hud.titleControl:Activate()
 check(last() == "PartyController.Open" and opened[#opened][2] == nil, "the Party title opens the Party window")
+local before = #opened
 press(hud.invite)
-check(
-	last() == "PartyController.Open" and opened[#opened][2] == "invite",
-	"the add-player button opens its invite list"
-)
+check(#opened == before, "a non-leader's disabled add-player button does nothing")
 press(hud.slots[1])
 check(last() == "Vault.Open", "a hotbar slot opens the Inventory")
 preview = { { catalogId = "StoneSpear", quantity = 1 } }

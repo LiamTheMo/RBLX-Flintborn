@@ -5,6 +5,13 @@
 --
 --   python3 art/ui/capture/capture.py party --compare art/reference/ui/lobby/04_party.png
 
+-- The env keys measured widths by "Font.X" while Enum items now print as
+-- "Enum.Font.X"; alias them so text measures as in game (reported to the kit
+-- builder, whose harness this is).
+for key, widths in table.clone(__textWidths or {}) do
+	__textWidths["Enum." .. key] = widths
+end
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud

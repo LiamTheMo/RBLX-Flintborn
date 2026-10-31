@@ -38,6 +38,8 @@ LobbyHud.CARD_WINDOW = { 10, 9, 67, 63 }
 -- Party panel parts in the panel's px: the pinned first row and the scrolling
 -- list under it (its thin rail at x 1588..1596 of the mockup).
 LobbyHud.PIN = { 28, 55, 242, 51 }
+-- The title row's parts in the title row's px (the row starts at 26, 18).
+LobbyHud.TITLE = { label = { 5, 4, 90, 30 }, count = { 92, 4, 70, 30 }, rule = { 3, 35, 235, 2 } }
 LobbyHud.LIST = { 28, 106, 243, 113 }
 -- Row heights (member row, empty-slot row; mockup pitch 51 / 35.6), the rule
 -- width (the rules stop short of the rail) and the member row's layout.
@@ -216,14 +218,31 @@ function LobbyHud.new(parent: Instance, actions)
 		40
 	)
 	self.titleRow = title
-	self.header = Kit.SectionHeader.new(title.visual, {
-		name = "Header",
-		rect = { 3, 3, 235, 34 },
+	-- "PARTY" and the count as two labels over a hairline (the mockup's title
+	-- row; SectionHeader cuts "PARTY" short at this size).
+	local th = LobbyHud.TITLE
+	self.titleText = Kit.Text.new(title.visual, {
+		name = "Label",
+		rect = th.label,
 		text = "Party",
-		count = "1/8",
+		role = "sectionHeader",
+		color = "ink",
 		textSize = LobbyHud.TEXT.partyTitle,
-		rule = "hairline",
-		ruleRect = { 0, 32, 235, 2 },
+		zIndex = title.z + 1,
+	})
+	self.countText = Kit.Text.new(title.visual, {
+		name = "Count",
+		rect = th.count,
+		text = "1/8",
+		role = "sectionHeader",
+		color = "ink",
+		textSize = LobbyHud.TEXT.partyTitle,
+		zIndex = title.z + 1,
+	})
+	self.titleRule = Kit.Divider.new(title.visual, {
+		name = "Rule",
+		rect = th.rule,
+		variant = "hairline",
 		zIndex = title.z + 1,
 	})
 	local lit = Kit.Art.Plate(title.visual, "row.plate", 242, 40, { z = title.z })
@@ -457,7 +476,7 @@ end
 -- whether you may invite.
 function LobbyHud:SetParty(party)
 	self:_clearRows()
-	self.header:SetCount(party.count)
+	self.countText:SetText(party.count)
 	local fire = self.fire
 	local width = LobbyHud.RULE_W
 	-- The first member stays at the top with the add-player button.
@@ -567,7 +586,7 @@ end
 
 function LobbyHud:Destroy()
 	self:_clearRows()
-	for _, part in { self.portrait, self.plate, self.cardBar, self.coins, self.gems, self.settings, self.header } do
+	for _, part in { self.portrait, self.plate, self.cardBar, self.coins, self.gems, self.settings, self.titleText, self.countText, self.titleRule } do
 		part:Destroy()
 	end
 	for _, tile in ipairs(self.tiles) do

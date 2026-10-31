@@ -81,7 +81,7 @@ function SettingsWindow.KeyText(key: string?): string
 end
 
 -- The title label's place (its ink lands at 422, 188 on screen).
-local HEADER = { titleX = 133, titleY = 26 }
+local HEADER = { titleX = 132, titleY = 29.5 }
 
 -- Columns (window px). The left column holds the page's settings, the right
 -- one KEY BINDS (Gameplay) or the page's notes.
@@ -161,7 +161,7 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		iconRect = { 50, 22, 63, 65 },
 		titleSize = 44,
 		titleRect = { HEADER.titleX, HEADER.titleY, 600, 54 },
-		ruleRect = { 30, 86, 973, 2 },
+		ruleRect = { 30, 87, 973, 2 },
 		closeRect = { 1017, 19, 61, 57 },
 	})
 	self.window = window
@@ -229,7 +229,7 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		label = "Reset",
 		variant = "secondary",
 		icon = "ink:refresh",
-		iconSize = 28,
+		iconSize = 30,
 		iconGap = 15,
 		zIndex = 8,
 		onPress = function()
@@ -294,7 +294,7 @@ local function header(page: Instance, x: number, w: number, text: string, emblem
 	})
 	Kit.Divider.new(page, {
 		name = "HeaderRule",
-		rect = { x, top + 39, w, 2 },
+		rect = { x, top + 40, w, 2 },
 		variant = "ink",
 		color = "rule",
 		zIndex = 7,

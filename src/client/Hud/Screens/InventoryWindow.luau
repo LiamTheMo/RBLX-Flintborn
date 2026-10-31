@@ -120,8 +120,14 @@ function InventoryWindow.new(props)
 		icon = "backpack",
 		clasps = "right",
 		claspYs = { 0.18, 0.9 },
-		-- The mockup's underline: 370–1323 at y 235 on screen.
-		ruleRect = { 127, 78, 953, 16 },
+		-- The mockup's underline (370–1340 at y 235 on screen; the ends fade).
+		ruleRect = { 113, 78, 995, 16 },
+		-- Measured from the mockup: the backpack, the title's cap height (32 px)
+		-- and the close button.
+		iconRect = { 40, 15, 71, 77 },
+		titleX = 138,
+		titleSize = 44,
+		closeRect = { 1103, 18, 60, 57 },
 		onClose = function()
 			screen:Close()
 		end,
