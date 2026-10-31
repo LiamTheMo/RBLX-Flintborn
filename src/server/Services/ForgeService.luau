@@ -31,7 +31,8 @@ end
 local function requirementText(recipe): string
 	local parts = {}
 	if (recipe.unlock.extractions or 0) > 0 then
-		table.insert(parts, ("extract %d time(s)"):format(recipe.unlock.extractions))
+		local count = recipe.unlock.extractions
+		table.insert(parts, if count == 1 then "extract once" else ("extract %d times"):format(count))
 	end
 	for _, catalogId in recipe.unlock.discovered or {} do
 		table.insert(parts, "extract " .. nameOf(catalogId))

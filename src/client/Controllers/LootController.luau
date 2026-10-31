@@ -200,9 +200,11 @@ function LootController.Start()
 	build()
 	Remotes.Get("CorpseOpened").OnClientEvent:Connect(render)
 	Remotes.Get("DeathSummary").OnClientEvent:Connect(function(summary)
+		local dropped = summary.dropped or 0
 		ui.summary:Show(
-			("Dropped and lootable: %d item(s) in your body (10 minutes)\nSafe in vault: unchanged\nPermanent: %d kept\nReturning to the lobby…"):format(
-				summary.dropped or 0,
+			("Dropped and lootable: %d %s in your body (10 minutes)\nSafe in vault: unchanged\nPermanent: %d kept\nReturning to the lobby…"):format(
+				dropped,
+				if dropped == 1 then "item" else "items",
 				summary.kept or 0
 			)
 		)
