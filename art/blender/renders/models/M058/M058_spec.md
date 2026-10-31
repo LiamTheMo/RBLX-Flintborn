@@ -1238,7 +1238,7 @@ All in `art/blender/renders/models/M058/`:
   trunk reach 0.5.
 - **Re-run:** `import importlib, kit_models, m058; importlib.reload(kit_models); importlib.reload(m058); m058.build()`
   (about 10 s to build, about 40 s to render). The measuring script used here is
-  `C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058w\meas.py`
+  `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058w\meas.py`
   (the study's masks), with `sbs.py` in the same folder for side-by-sides.
 
 ### Main session ruling on the modeller's deviations (2026-10-30)
