@@ -23,6 +23,8 @@ Why: bare `blender --python` exits 0 even when the script crashes, and a trailin
 
 Pass extra script arguments with `BLENDER_ARGS="--audit <dir>"`, and environment flags (for example `FB_ONLY=Name`) as usual. Don't pipe its output through `grep`.
 
+**Never write tool scratch or temp-folder paths into committed files** (specs, docs, scripts). Write `<temp>/...` for a scratch file, or keep the script in the repo. Commit messages and committed files never name the coding assistant or its vendor.
+
 **Edit code with the Edit tool, not `sed -i`/`perl -pi`.** A substitution whose pattern doesn't match changes nothing and reports nothing, so the fix silently isn't applied. If you do use one, confirm the change with a `grep` that is expected to match.
 
 Sheet scripts in `art/blender/scripts/` each own one `.blend` in `art/blender/assets/`. The lobby (`build_lobby.py`) links those libraries, so rebuild a sheet first and then the lobby. Only the main session drives the open Blender GUI through the Blender MCP.
