@@ -145,8 +145,7 @@ local function answer(partyId: string, accept: boolean)
 	busyInvites[partyId] = true
 	changed()
 	task.spawn(function()
-		local ok, reason =
-			request(if accept then LobbyController.Accept else LobbyController.Decline, partyId)
+		local ok, reason = request(if accept then LobbyController.Accept else LobbyController.Decline, partyId)
 		busyInvites[partyId] = nil
 		if not ok then
 			failed(reason)
