@@ -62,14 +62,23 @@ function Slider.new(parent: Instance, props)
 		th,
 		{ z = base.z }
 	)
+	-- The full-length fill behind a clipping frame as wide as the value: cut at
+	-- the knob, never squeezed.
 	self.fill = Core.Make("Frame", {
 		Name = "Fill",
 		BackgroundTransparency = 1,
+		ClipsDescendants = true,
 		Position = UDim2.fromOffset(1, 1),
 		Size = UDim2.fromOffset(trackW - 2, th - 2),
 		ZIndex = base.z + 1,
 	}, self.track)
-	Art.Plate(self.fill, "slider.fill", trackW - 2, th - 2, { z = base.z + 1 })
+	local fillPlate = Core.Make("Frame", {
+		Name = "Plate",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(trackW - 2, th - 2),
+		ZIndex = base.z + 1,
+	}, self.fill)
+	Art.Plate(fillPlate, "slider.fill", trackW - 2, th - 2, { z = base.z + 1 })
 	self.knob = Core.Make("Frame", {
 		Name = "Knob",
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -218,7 +227,7 @@ function Slider:SetValue(value: number)
 	local fraction = KitModel.Fraction(self.value, self.min, self.max)
 	local x = self.inset + (self.trackW - self.inset * 2) * fraction
 	self.knob.Position = UDim2.new(0, x, 0.5, 0)
-	self.fill.Size = UDim2.fromOffset(math.max(Slider.TRACK_H, x), Slider.TRACK_H - 2)
+	self.fill.Size = UDim2.fromOffset(math.max(0, x - 1), self.fill.Size.Y.Offset)
 	if self.valueLabel then
 		local text
 		if self.format then
