@@ -97,15 +97,60 @@ test("target priority: fights first, then nodes for gear and hands, structures f
 	expectEq(table.concat(HarvestRules.TargetOrder(false, true), ">"), "Node", "safe zone, hands")
 end)
 
-test("harvest cadence and client swing pacing", function()
+test("harvest cadence is strict and the client paces node swings just above it", function()
+	local interval = NodeCatalog.HARVEST_INTERVAL
+	expectEq(interval, 0.4, "v0.19 cadence")
 	expect(HarvestRules.CadenceReady(nil, 0), "first hit")
 	expect(not HarvestRules.CadenceReady(10, 10.2), "too soon")
-	expect(HarvestRules.CadenceReady(10, 10 + NodeCatalog.HARVEST_INTERVAL), "on the interval")
-	expect(HarvestRules.CadenceReady(10, 10 + NodeCatalog.HARVEST_INTERVAL - 0.03), "jitter slack")
+	expect(HarvestRules.CadenceReady(10, 10 + interval), "on the interval")
+	expect(not HarvestRules.CadenceReady(10, 10 + interval - 0.03), "no jitter slack on the server")
 	-- Bare hands swing every 0.3 s, but wait for the harvest cadence at a node.
 	expectEq(HarvestRules.SwingInterval(0.3, false), 0.3, "fighting pace")
-	expectEq(HarvestRules.SwingInterval(0.3, true), NodeCatalog.HARVEST_INTERVAL, "gathering pace")
+	local paced = HarvestRules.SwingInterval(0.3, true)
+	expect(paced > interval, "honest node swings arrive after the cadence")
+	expectNear(paced, interval + HarvestRules.SWING_SLACK, 1e-9, "gathering pace")
 	expectEq(HarvestRules.SwingInterval(0.9, true), 0.9, "a slow weapon keeps its own pace")
+end)
+
+test("a fight in front keeps the item's own pace", function()
+	expect(HarvestRules.FightInFront(NORTH, Vector3.new(0, 0, -4), 4, 5), "a creature ahead in reach")
+	expect(not HarvestRules.FightInFront(NORTH, Vector3.new(0, 0, 4), 4, 5), "behind")
+	expect(not HarvestRules.FightInFront(NORTH, Vector3.new(0, 0, -12), 12, 5), "out of reach")
+	expect(HarvestRules.FightInFront(NORTH, Vector3.new(0, 0, 0.5), 0.5, 5), "touching")
+end)
+
+-- The held tool's view of nodes for Choose: gated nodes are marked `gated`.
+local function canHarvest(candidate)
+	return not candidate.gated
+end
+
+test("a gated ore beside a wall never shields the wall from a raider", function()
+	-- A Mithril deposit 2 studs away; another tribe's wall 3 studs away.
+	local mithril = node(0, -3, 2, 2, 2)
+	mithril.gated = true
+	local node1, gated = HarvestRules.Choose(ORIGIN, NORTH, 7, { mithril }, canHarvest, nil, 3)
+	expect(node1 == nil and gated == nil, "the wall takes the swing, no gate notice")
+	-- With no structure in front, the gated node takes the swing for its notice.
+	node1, gated = HarvestRules.Choose(ORIGIN, NORTH, 7, { mithril }, canHarvest, nil, nil)
+	expect(node1 == nil and gated == mithril, "gate notice when the ore is the only target")
+end)
+
+test("a gatherable node beats a structure only when it is nearer", function()
+	local tree = node(0, -3, 2, 2, 2) -- its side is 2 studs away
+	expect(HarvestRules.Choose(ORIGIN, NORTH, 7, { tree }, canHarvest, nil, 4) == tree, "tree nearer than the wall")
+	expect(HarvestRules.Choose(ORIGIN, NORTH, 7, { tree }, canHarvest, nil, 1) == nil, "wall nearer than the tree")
+	expect(HarvestRules.Choose(ORIGIN, NORTH, 7, { tree }, canHarvest, nil, nil) == tree, "no structure at all")
+	-- A gated ore in front of a gatherable rock: the rock is mined, no notice.
+	local ore = node(0, -2.5, 2, 2, 2)
+	ore.gated = true
+	local rock = node(1, -5, 2, 2, 2)
+	local picked, gated = HarvestRules.Choose(ORIGIN, NORTH, 7, { ore, rock }, canHarvest, nil, nil)
+	expect(picked == rock and gated == nil, "the tool works the node it can gather")
+	-- Line of sight still applies to the gated pick.
+	local _, hidden = HarvestRules.Choose(ORIGIN, NORTH, 7, { ore }, canHarvest, function()
+		return false
+	end, nil)
+	expect(hidden == nil, "no notice for a node out of sight")
 end)
 
 test("hover labels name the action, the node and its pickaxe gate", function()

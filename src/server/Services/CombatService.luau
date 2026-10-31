@@ -17,7 +17,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
-local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
@@ -227,37 +226,11 @@ local function bestPlayer(player: Player, root: BasePart, flatAim: Vector3, prof
 	return best
 end
 
--- Horizontal distance to the structure BuildingService.Hit would pick for this
--- swing (same reach, height, arc, ownership and sight rules), or nil. Lets a node
--- win over a structure only when it is nearer (HarvestRules.Choose).
+-- How far away the structure this swing would otherwise hit is (BuildingService's
+-- own pick), or nil when there is none.
 local function structureDistance(player: Player, origin: Vector3, flatAim: Vector3, reach: number, canSee): number?
-	local folder = workspace:FindFirstChild(BuildingService.FOLDER_NAME)
-	if folder == nil or SafeZoneService.Contains(origin) then
-		return nil
-	end
-	local params = OverlapParams.new()
-	params.FilterType = Enum.RaycastFilterType.Include
-	params.FilterDescendantsInstances = { folder }
-	local allowance = BuildingService.HIT_ALLOWANCE
-	local best = nil
-	for _, part in workspace:GetPartBoundsInRadius(origin, reach + allowance + 6, params) do
-		local record = BuildingService.Get(part)
-		if record == nil or BuildingService.IsOwnedBy(player, record) then
-			continue
-		end
-		local distance = BuildRules.HorizontalDistance(origin, record.position, record.half)
-		local offset = record.position - origin
-		if
-			distance <= reach + allowance
-			and (best == nil or distance < best)
-			and math.abs(offset.Y) <= record.half.Y + 6
-			and (distance < 1 or DamageRules.WithinArc(flatAim, Vector3.new(offset.X, 0, offset.Z), 120))
-			and canSee(part)
-		then
-			best = distance
-		end
-	end
-	return best
+	local record, distance = BuildingService.Pick(player, origin, flatAim, reach, canSee)
+	return if record then distance else nil
 end
 
 local function melee(player: Player, sequence: any, direction: any)
