@@ -11,6 +11,9 @@
 --   4 bars, checkboxes, toggles, sliders, dropdown, search, stepper
 --   5 list rows, player rows, portraits, panels, section headers, scroll
 --   6 toast, confirm dialog, tooltip, plaque and centred window headers
+--   7 the fix round   8 the polish round
+--   9 the Play rune art (sheet 21, D26): tile and header icon, PLAY between
+--     its rune pillars in every state
 
 local Players = game:GetService("Players")
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
@@ -921,6 +924,53 @@ do
 		root,
 		{ rect = { 400, 540, 260, 62 }, label = "Play", icon = "play", variant = "play", contentOffset = { 0, -3 } }
 	)
+	__dump(gui, W, H)
+	gui:Destroy()
+end
+
+-- Page 9: the Play rune art (sheet 21, ARCHITECTURE D26) -----------------------------------
+-- The stone-and-crystal play icon (icon.playRune) on the HUD tile and as a
+-- window header icon, and the PLAY button with the crystal glyph
+-- (mark.playRune) between its two rune pillars (deco.pillarLeft / Right), as
+-- PlayWindow builds it, in every state. With --uploaded-only (before
+-- atlas_lk_play is uploaded) the tile and header show the portal icon, the
+-- button the white play glyph, and the pillars are not drawn.
+
+do
+	local gui, root = page()
+	heading(root, "Play rune icon: HUD tile states, header", 30, 14)
+	for s, state in { "normal", "hover", "pressed", "disabled", "selected" } do
+		local x = 30 + (s - 1) * 110
+		force(Kit.IconButton.new(root, { rect = { x, 60, 88, 84 }, variant = "tile", icon = "icon.playRune" }), state)
+		caption(root, state, x, 150, 100)
+	end
+	Kit.Icon.new(root, { rect = { 620, 60, 71, 77 }, icon = "icon.playRune" })
+	caption(root, "header 71 × 77", 610, 150, 140)
+
+	heading(root, "PLAY between the rune pillars, every state", 30, 200)
+	for s, state in { "normal", "hover", "pressed", "disabled", "busy" } do
+		local col, row = (s - 1) % 3, (s - 1) // 3
+		local x, y = 30 + col * 420, 250 + row * 170
+		local button = Kit.Button.new(root, {
+			rect = { x + 36, y + 21, 298, 60 },
+			label = "Play",
+			icon = "mark.playRune",
+			sizeClass = "l",
+			textSize = 34,
+			iconSize = 40,
+			iconGap = 12,
+			zIndex = 5,
+		})
+		force(button, state)
+		for side, dx in { Left = 0, Right = 317 } do
+			local pillar =
+				Kit.Picture.new(root, { rect = { x + dx, y, 53, 96 }, role = "deco.pillar" .. side, zIndex = 8 })
+			if state == "disabled" then
+				pillar:SetState("disabled")
+			end
+		end
+		caption(root, state, x, y + 104, 200)
+	end
 	__dump(gui, W, H)
 	gui:Destroy()
 end

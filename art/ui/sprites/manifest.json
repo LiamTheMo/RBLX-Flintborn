@@ -6668,5 +6668,63 @@
     "w": 1024,
     "h": 512,
     "slice": null
+  },
+  "lk_icon_play_rune": {
+    "file": "lk_icon_play_rune.png",
+    "w": 89,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      183,
+      0,
+      89,
+      116
+    ]
+  },
+  "lk_icon_play_rune_small": {
+    "file": "lk_icon_play_rune_small.png",
+    "w": 50,
+    "h": 64,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      276,
+      0,
+      50,
+      64
+    ]
+  },
+  "lk_pillar_rune_left": {
+    "file": "lk_pillar_rune_left.png",
+    "w": 88,
+    "h": 160,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      0,
+      0,
+      88,
+      160
+    ]
+  },
+  "lk_pillar_rune_right": {
+    "file": "lk_pillar_rune_right.png",
+    "w": 87,
+    "h": 160,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      92,
+      0,
+      87,
+      160
+    ]
+  },
+  "atlas_lk_play": {
+    "file": "atlas_lk_play.png",
+    "w": 1024,
+    "h": 256,
+    "slice": null
   }
 }

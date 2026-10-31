@@ -74,7 +74,7 @@ exploded x 11–755, y 703–1205 (title bar to y 732); part list x 761–1012, 
     (studio floor hidden, plain background).
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m062_study\`.
+`<temp>\m062_study\`.
 Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `cls`, `clsimg`, `hsv`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`), `probe2.py`
   (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw2.py` (swatches).

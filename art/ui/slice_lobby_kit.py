@@ -762,6 +762,25 @@ part("glyph_invite", "06", (1340, 462, 1585, 688), 0.2, ops=[("lift", (1340, 462
      min_area=400,
      role="Person+ glyph (invite)", note="Dark; tint with ImageColor3.")
 
+# ---- sheet 21: the Play rune art (ARCHITECTURE D26) ---------------------------------
+# The stone-framed crystal arrow at two sizes: the Play tile and the Play window's
+# header (~70-77 px on screen) and the PLAY button's glyph (~40 px), each stored
+# at about 1.5x. The two rune pillars stand at the PLAY button's ends (about
+# 1.6x the button's height on screen, stored at about 1.5x that).
+PLAY_RUNE = (559, 317, 967, 853)
+part("icon_play_rune", "21", PLAY_RUNE, size=ICON, keep="largest",
+     role="Play icon: the HUD Play tile and the Play window's header (icon.playRune)",
+     note="Full colour; replaces lk_icon_portal for Play.")
+part("icon_play_rune_small", "21", PLAY_RUNE, size=60, keep="largest",
+     role="Crystal play glyph on the PLAY button (mark.playRune)",
+     note="Full colour; replaces the white lk_glyph_play on the PLAY button.")
+part("pillar_rune_left", "21", (108, 75, 636, 1063), size=156, keep="largest",
+     role="Rune pillar at the PLAY button's left end (deco.pillarLeft)",
+     note="Overlaps the button's left end like a post holding a banner.")
+part("pillar_rune_right", "21", (857, 76, 1382, 1063), size=156, keep="largest",
+     role="Rune pillar at the PLAY button's right end (deco.pillarRight)",
+     note="Near mirror image of lk_pillar_rune_left (the sheet's own right pillar).")
+
 
 # ---------------------------------------------------------------------------
 # build
