@@ -211,7 +211,7 @@ sourceId?, nonce)`. Counts come from the vault only (`ForgeRules.Owned`).
 | Locked recipes | — | `unlocked == false`, `requirement` ("Unlock: extract 1 time(s), …") | not shown in the mockup; a locked row state and where the unlock text goes are needed |
 | RequiresCards | one card per input: icon, name, owned / needed | `inputs[]` (sorted by name on the server) | Iron Pickaxe really needs Iron Bar 20 + Wood 10; the mockup shows Iron Ore 4 + Wood 3. Two cards fit; Flint Arrow has 3 inputs, Permanent conversions up to 4–5 (e.g. Guardian's Fang: Ancient Ember, Guardian Heart, Charged Core, Glow-Fur), so the card row must take more cards or wrap. |
 | ReqCount colour | red have count | today: `haveEnough` #2E7D24 / `haveShort` #A3271B on the have number | in the mockup 6 / 4 is red although 6 ≥ 4, and 12 / 3 is plain ink, not green. See Open questions. |
-| QUANTITY stepper | how many to forge | **no server support** | `ForgeCraft` takes no count and `ForgeRules.Craft` makes exactly one result per request (one nonce, one receipt). `CraftingPanel.MAX_BATCH` (50) is used for smelting only; forge mode hides the stepper today. Options: N sequential requests, each with its own nonce, stopping at the first failure; a server change adding a validated count; hide the stepper. Upper bound if kept: `min(owned // needed)` over inputs (the entry's `can`), also bounded by lobby backpack space (`BackpackFull`). Not the same as `recipe.quantity` (items per craft, e.g. 50 arrows). |
+| QUANTITY stepper | how many to forge | `ForgeCraft(recipeId, sourceId, nonce, count)` (D4) | Server-validated batch: 1..`ForgeRules.MAX_BATCH` (10), also capped by what the vault's materials pay for and, for special recipes, by lobby backpack room (`ForgeRules.MaxCount`, sent as each recipe's `maxCount`); all N are checked and spent together. Permanent conversions are always 1 (no stepper). Not the same as `recipe.quantity` (items per craft, e.g. 50 arrows). |
 | ForgeButton | sends the craft | `ForgeCraft(recipeId, sourceId, nonce)`, retried once with the same nonce on transport failure | label "FORGE"; Permanent recipes use "CONVERT" and first open a confirmation naming the exact source item (`CraftingPanel:Confirm`, 1.5 s arm delay). Enabled only when every input is covered, unlocked, not busy, and (Permanent) a source is chosen. Server reasons shown via `Reasons.Text`: InTrade, TradeSettling, InTransit, Locked, MissingMaterials, BackpackFull, WrongSource. |
 | Status line | "Forged. Check your lobby backpack or vault." / "Not forged: …" | `ForgeController.submit` | no place for it in the mockup |
 | Permanent sources | vault gear the conversion can use | `recipe.sources[]` (`instanceId, name, qualityRoll`) | today the right column lists them; the mockup's right column is YOUR MATERIALS. Needs a place (options: in the centre column under REQUIRES, a picker popup, or the right column switches content for Permanent recipes). |
@@ -263,3 +263,20 @@ sourceId?, nonce)`. Counts come from the vault only (`ForgeRules.Owned`).
 - Small caps are faked with RichText size tags (Roblox has no small-caps feature).
 - No letter-spacing control in Roblox: the subtitle's generous spacing is approximated by
   the font's own width.
+
+## Fix round 3
+
+- **Permanent rows** (V8): named after the item (no "Permanent " prefix) with a
+  star mark on the icon's corner; notes too long for one line wrap onto two
+  under a raised title, clear of the lock. Unlock lines read "extract once" /
+  "extract 3 times" (`RecipeModel.Requirement`; the server still writes
+  "time(s)").
+- **Phones** (R9): row notes at 20 with a smaller icon (9 screen px or more at
+  the phone window scale, 0.46–0.51).
+- **Gamepad**: the window opens on the chosen recipe once the snapshot arrives
+  (not on ✕, R23); a re-render that removes the selected row moves selection
+  to the chosen recipe (R15); material rows are selectable and a press picks
+  the first listed recipe that uses that material (R20).
+- **Errors** (L8): whatever fails after a request, the window leaves its busy
+  state.
+- QUANTITY: see the table (D4, server-validated batch).

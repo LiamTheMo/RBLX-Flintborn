@@ -322,3 +322,15 @@ Each has the default that will be used if unanswered.
   (rivets stay in the corners).
 - The mockup's gentle ground shadow under the detail icon is part of the item art
   (or a separate soft ellipse image); no native equivalent.
+
+## Fix round 3
+
+- **Rarity**: a small rarity dot (Kit rarity badge) on each slot's bottom left
+  for Uncommon and rarer items, and after the item's name in the detail card
+  for every item.
+- **All** uses the scroll icon (the chest read as the Vault; the mockup's grid
+  is not in the kit).
+- **Gamepad** (R23): when the slots arrive after the window opened on a
+  gamepad, selection moves to the first slot rather than staying on ✕.
+- Items without kit art (bows, swords, daggers, armour) show the Kit's neutral
+  kind glyph; their names are in the tooltip and detail card (ITEM_ART.md).

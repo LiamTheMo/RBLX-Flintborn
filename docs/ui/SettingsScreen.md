@@ -307,3 +307,19 @@ Each has the default that will be used if unanswered.
 - Title weight may be lighter if Merriweather Black is not available.
 - Kit parts differ where noted (slider knob, gold checkbox, flat key caps,
   corner lashings, line-art sketches, dark glyph icons).
+
+## Fix round 3
+
+- **Gameplay** holds only gameplay controls (V3): Camera Sensitivity, then the
+  three checkboxes at the Audio page's pitch; Music and Effects live on Audio
+  only, and RESET on Gameplay no longer touches them.
+- **Tab icons** (V15): the kit has no gamepad, speaker or monitor drawing, and
+  its stand-ins (compass, speech bubble, map) read as something else, so only
+  Gameplay (gears) and Graphics (magnifier) show a glyph; Audio and Controls
+  show their label in the same column. RESET has no icon (the "refresh"
+  stand-in read as a rune).
+- **World ⚙** (R4): on a HUD-scaled root (Kit.Scale.Hud, so it follows the HUD
+  and UI Scale) in the HUD's top row, 14 px left of the vitals, moved below
+  the Roblox top bar where it reaches down; it no longer sits on the phone
+  jump button. `SettingsController.GEAR` holds its place.
+- Opens with the gamepad flag when the last input is a gamepad.

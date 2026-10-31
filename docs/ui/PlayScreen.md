@@ -170,3 +170,19 @@ There is no server picker (owner decision).
 - Headings "YOUR PARTY" / "YOUR EQUIPMENT" are ≈9 % wider than Merriweather Bold at
   the same height (wider tracking); Roblox text has no tracking control, so they
   render slightly narrower.
+
+## Fix round 3
+
+- **Map** (V14): the painting sits on the paper sheet with a 17 px margin; the
+  rune is drawn in ink so it reads on the sea. The painting itself is the
+  game's island art (D19), not the mockup's.
+- **Messages** sit on a paper plaque over the map's bottom edge (two lines when
+  needed), clear of the window frame.
+- **Loadout slots** are selectable: a gamepad reaches them (PLAY up → slots →
+  ✕) and the tooltip names the item and its count (R20). Their 1–6 badges show
+  only with a mouse or keyboard.
+- **Ready** uses PartyController's shared pending state (M2); a refusal shows
+  under the map only (no second toast, M1).
+- **Phones**: "+n more in your backpack" at 16; detail values start further
+  left so "10 · Low to Extreme" keeps 9 screen px.
+- Party rows are taken apart through maids (Kit components included, L10).

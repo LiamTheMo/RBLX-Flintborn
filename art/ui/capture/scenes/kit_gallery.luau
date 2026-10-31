@@ -372,28 +372,22 @@ do
 		root,
 		{ rect = { 30, 400, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "85/100", value = 0.85 }
 	)
-	Kit.Bar.new(
-		root,
-		{
-			rect = { 360, 400, 315, 65 },
-			fill = "stamina",
-			frame = "stat",
-			icon = "lightning",
-			text = "60/100",
-			value = 0.6,
-		}
-	)
-	Kit.Bar.new(
-		root,
-		{
-			rect = { 690, 400, 315, 65 },
-			fill = "food",
-			frame = "stat",
-			icon = "drumstick",
-			text = "30/100",
-			value = 0.3,
-		}
-	)
+	Kit.Bar.new(root, {
+		rect = { 360, 400, 315, 65 },
+		fill = "stamina",
+		frame = "stat",
+		icon = "lightning",
+		text = "60/100",
+		value = 0.6,
+	})
+	Kit.Bar.new(root, {
+		rect = { 690, 400, 315, 65 },
+		fill = "food",
+		frame = "stat",
+		icon = "drumstick",
+		text = "30/100",
+		value = 0.3,
+	})
 	Kit.Bar.new(root, { rect = { 30, 485, 500, 18 }, fill = "xp", value = 450 / 750, text = "450/750 XP" })
 
 	heading(root, "Checkbox box / gold / tile, Toggle × normal, hover, pressed, disabled", 30, 530)

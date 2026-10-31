@@ -363,7 +363,9 @@ end
 function LobbyHud:_fitLevel(text: string)
 	local cl = LobbyHud.CARD_LEVEL
 	-- A little slack over the measured width: the label must never shrink.
-	local need = if text == "" then 0 else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel) * 1.1) + 4
+	local need = if text == ""
+		then 0
+		else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel) * 1.1) + 4
 	local w = math.clamp(need, cl.w, 110)
 	if w ~= self.levelW then
 		self.levelW = w

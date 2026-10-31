@@ -57,8 +57,11 @@ local L = {
 	rowTitleSize = 18,
 	rowSubtitleSize = 15,
 	-- Phones and touch tablets: the handwritten row notes at 9 screen px or
-	-- more at the window's phone scale (0.48–0.51 below the top bar).
-	rowSubtitlePhone = 19,
+	-- more at the window's phone scale (0.46–0.51 below the top bar).
+	rowSubtitlePhone = 20,
+	-- ...with a smaller icon there, so a two-line note has the room it needs.
+	rowIconPhone = { 6, 10, 50, 48 },
+	rowTextXPhone = 70,
 	-- A row note too long for one line wraps onto two under a raised title.
 	rowTwoLine = { titleY = 1, titleH = 25, subtitleY = 24, subtitleH = 45 },
 	-- The Permanent mark on a conversion's icon corner (as a slot's star).
@@ -500,8 +503,8 @@ function RecipeWindow:_rowFor(entry)
 		size = L.recipeRow,
 		variant = "soft",
 		itemId = entry.output,
-		iconRect = L.rowIcon,
-		textX = L.rowTextX,
+		iconRect = if self.phone then L.rowIconPhone else L.rowIcon,
+		textX = if self.phone then L.rowTextXPhone else L.rowTextX,
 		title = entry.name,
 		titleSize = L.rowTitleSize,
 		-- The mockup's row descriptions are handwritten notes (D13).

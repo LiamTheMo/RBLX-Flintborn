@@ -257,3 +257,19 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
   than in the HUD mockup; keep the HUD positions.
 - The world behind the overlay is a darker, bluer, softened render in the mockup;
   see LobbyScreen open question 1.
+
+## Fix round 3
+
+- **Rows update in place** (M3): `SetData` keys every row (member, invite,
+  player, empty slot, detail, ready) by its player or label and keeps a row
+  whose contents did not change; only changed rows are rebuilt, gamepad
+  targets follow (`PartyWindow:Rows(list)` returns a list in order). Search
+  waits 0.3 s after the last keystroke.
+- **Pending state** lives in PartyController (`SetReady`, `Answer`,
+  `ReadyPending`, `ShownReady`, `AnswerBusy`, `Changed`); the HUD and the Play
+  window use it (M2).
+- **Phones**: names, levels and button labels at 15 (9 screen px or more);
+  long names end in "…"; "Invited" fits its button (V9); a long Party Leader
+  value ends in "…" so "Party Leader" keeps its room (R12).
+- **Party Details icon**: the book glyph (the "!" read as a warning, V15).
+- Opens with the gamepad flag when the last input is a gamepad (R6).

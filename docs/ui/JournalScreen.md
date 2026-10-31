@@ -237,3 +237,13 @@ gems?, booster?, count, needed, claimed, repeats ("Daily" | "Once"), action`.
 
 - Serif text sets wider in Merriweather than in the mockup at equal cap height (see Fonts).
 - No letter-spacing control in Roblox.
+
+## Fix round 3
+
+- **Rewards** (V6): a long amount ("x250") moves the tile's icon up and left so
+  the two never overlap.
+- **Description** (V7): shrinks to fit its box instead of running into the
+  OBJECTIVES rule.
+- **Phones** (R9): the Daily / Main tag at 16, row lines at 16 and objective
+  lines at 16 (9 screen px or more at the phone window scale).
+- Opens with the gamepad flag when the last input is a gamepad.

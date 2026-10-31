@@ -296,3 +296,29 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
   none. No UIStroke on HUD text.
 - Merriweather has no letter-spacing control; where the mockup is tighter or looser
   (±5–10 %), keep the font's default spacing.
+
+## Fix round 3
+
+- **Phones and touch tablets** (`Kit.Scale.IsSmallTouch`, re-applied on
+  `Kit.Scale.OnFormFactorChanged`): party names draw at 15 (9 screen px at the
+  0.5 HUD floor) at one size for every row (`shrinkName = false`; a long name
+  ends in "…", so the leader's name no longer shrinks below the others, V13),
+  rows take the panel's width and the add-player button moves into the title
+  row beside the count; the Coins and Gems pills widen (150 / 124) for long
+  values; the game-update plaque grows to 72 px and wraps onto two lines.
+- **Invites on touch** (R7): one "Respond" button (touch-sized) opens the Party
+  window's invitations instead of the 34 px ✓ / ✕ pair whose 44 px pads
+  overlapped. Desktop keeps ✓ / ✕; both disable while the answer is on its way
+  (`PartyController.AnswerBusy`).
+- **Card level**: the label widens to its text and the card's XP bar starts
+  after it; at the level cap the card reads the level number (the XP line says
+  "Max level").
+- **Hotbar badges** 1–6 show only while a mouse or keyboard is the input
+  (`Kit.Input.Watch`); touch and gamepad have no number keys.
+- **Gamepad** (R6): `Kit.Input.SetHudDefault(<Inventory tile>)` registers the
+  HUD's entry point; the HUD never takes selection at build or spawn.
+- **One feedback per refusal** (M1, M2): answers go through
+  `PartyController.Answer`; while PartyController reports a request
+  (`Reporting()`) the HUD does not toast LobbyController's "Party: …" status.
+- A failed start disconnects everything it connected and destroys the HUD
+  before falling back (L9).
