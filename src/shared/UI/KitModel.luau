@@ -9,7 +9,7 @@ local KitModel = {}
 -- Role -> art. `sprite` is the normal art and `states` the art of other states
 -- (lk_* names from art/ui/kit/CATALOG.md). `material` picks the drawn stand-in
 -- while the art is not uploaded (paper, leather, slot, window, track, fill,
--- glyph, rule, none); `fill` is the stand-in colour of a bar fill and `glyph` the
+-- glyph, rule, pill, dot, none; deco draws nothing); `fill` is the stand-in colour of a bar fill and `glyph` the
 -- text of a glyph stand-in; `grow` draws a state's sprite that many px larger
 -- per side (glow rings sit outside the plate). `native` roles are drawn as
 -- flat kit shapes by design (the mockups' plain discs and rails), never as a
@@ -275,6 +275,21 @@ KitModel.ROLES = {
 	["mark.check"] = { sprite = "lk_glyph_checkmark", material = "glyph", glyph = "✓" },
 	["mark.play"] = { sprite = "lk_glyph_play", material = "glyph", glyph = "▶" },
 	["mark.confirm"] = { sprite = "lk_glyph_check_white", material = "glyph", glyph = "✓" },
+
+	-- The Play rune art (sheet 21, ARCHITECTURE D26). Icon roles are passed as
+	-- an icon id (Kit.Icon, IconButton, Window, Button `icon`); `fallback` is
+	-- the icon drawn while the role's own art is not uploaded yet (the portal
+	-- tile icon, the white play glyph). Decorations (`deco`) draw nothing
+	-- until their art arrives: they are never a stand-in shape.
+	["icon.playRune"] = { sprite = "lk_icon_play_rune", material = "glyph", glyph = "▶", fallback = "portal" },
+	["mark.playRune"] = {
+		sprite = "lk_icon_play_rune_small",
+		material = "glyph",
+		glyph = "▶",
+		fallback = "lk_glyph_play",
+	},
+	["deco.pillarLeft"] = { sprite = "lk_pillar_rune_left", material = "deco", edge = false },
+	["deco.pillarRight"] = { sprite = "lk_pillar_rune_right", material = "deco", edge = false },
 }
 
 -- Every state a component can draw, from strongest to weakest: when several

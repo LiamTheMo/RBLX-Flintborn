@@ -3,6 +3,9 @@
 Reference: `art/reference/ui/lobby/05_play.png`; kit sheets in `art/reference/ui/lobby/kit/`
 (index: `art/reference/ui/lobby/README.md`).
 Design resolution: 1672 × 941. Status: Draft (measured; open questions at the end).
+The built window follows ARCHITECTURE D25 (Inventory chrome) and D26 (the
+sheet-21 rune art); see "Deviations from reference" and "Play rune art (D26)"
+below. The look and tokens in general: [STYLE_GUIDE.md](STYLE_GUIDE.md).
 Source of truth for build: the reference. Raw measurements and crops:
 `art/ui/kit/analysis/play/` (scripts shared from `art/ui/kit/analysis/lobby/tools/`).
 
@@ -162,14 +165,17 @@ There is no server picker (owner decision).
 
 - **Owner decision D25 (window chrome):** the window uses the Inventory
   window's size (1187 × 650) and chrome instead of mockup 05's plaque style:
-  the portal icon, "PLAY" at Inventory's title size and position, the plain
+  the header icon (the portal until D26, now the rune play icon), "PLAY" at
+  Inventory's title size and position, the plain
   ink underline, Inventory's clasps and close-button corner, and no raised
   title plaque. The map sits in an inset panel (Inventory's detail-card
   style) with the real island art and crater marker. The right column opens
   with a "SHATTERED CRATER" section heading over a hairline (no plaque), then
   the detail rows with hairlines, YOUR PARTY and YOUR EQUIPMENT as standard
-  section headers, the six slots and the primary leather PLAY button with the
-  play glyph at the bottom right. The element tree above records the mockup.
+  section headers, the six slots and the primary leather PLAY button at the bottom
+  right (its glyph and pillars: D26). The element tree above records the
+  mockup.
+- **Owner decision D26 (Play rune art):** see the next section.
 - Owner decision: no server picker (the old lobby had one; the mockup has none).
 - Owner decision: the HUD's Play tile opens this window.
 - In the mockup the HUD hotbar and XP bar under the overlay sit 29–33 px lower than
@@ -195,3 +201,39 @@ There is no server picker (owner decision).
 - **Phones**: "+n more in your backpack" at 16; detail values start further
   left so "10 · Low to Extreme" keeps 9 screen px.
 - Party rows are taken apart through maids (Kit components included, L10).
+
+## Play rune art (D26)
+
+The owner's kit sheet `art/reference/ui/lobby/kit/21_play_rune_stones.png`
+supplies the Play art, used in full:
+
+| Part | Sprite (stored size) | Role | Where | Window px |
+|---|---|---|---|---|
+| Header icon | `lk_icon_play_rune` (89 × 116) | `icon.playRune` | the Play window's header (replaces the portal); also the HUD's Play tile | icon rect 40, 15, 71, 77 (fitted: 59 × 77) |
+| PLAY glyph | `lk_icon_play_rune_small` (50 × 64) | `mark.playRune` | left of "PLAY" on the button (replaces the white play glyph) | 40 px tall, 12 px gap to the label |
+| Left pillar | `lk_pillar_rune_left` (88 × 160) | `deco.pillarLeft` | the button's left end | 790, 541, 53, 96 |
+| Right pillar | `lk_pillar_rune_right` (87 × 160) | `deco.pillarRight` | the button's right end | 1107, 541, 53, 96 |
+| PLAY button | `lk_button_leather_*` (primary) | `button.primary` | between the pillars | 826, 562, 298, 60 |
+
+- The pillars are 1.6 × the button's height and overlap each end by 17 px,
+  drawn in front of the button like posts holding a banner. They are
+  decoration only: the button keeps its own rect as its hit area (the pillars
+  take no input), and its touch pad (44 screen px) stays clear of the slots'
+  pads at the 844 × 390 phone's window scale (0.51) and the 667 × 375
+  phone's (0.48).
+- They stand under the loadout slots (slot bottoms at 535, 538 with a selected
+  slot's glow), end at 637 inside the frame's paper margin (the rail starts at
+  about 642) and keep 5 px inside the right column (1165), clear of the
+  frame's lower right clasp and corner.
+- States: hover, pressed and busy change only the button; disabled (member
+  view, a deploy running) dims the pillars with it (`tints.disabled` 0.72) and
+  fades the crystal glyph (transparency 0.35).
+- Before `atlas_lk_play` is uploaded the header and the Play tile show the
+  portal icon, the button the white play glyph, and the pillars draw nothing
+  (`fallback` and material `deco` in `KitModel.ROLES`), which is the D25 look.
+  Once it is uploaded, an image that fails or is slow shows the Kit's ink ▶
+  stand-in on the tile, header and button, and still no pillars
+  (`lobby_hud_failed`).
+- Captures: `play`, `play_states` (every state), `play_phone` (844 × 390 and
+  2000 × 924), `play_flow`, `kit_gallery` page 9; `--uploaded-only` for the
+  fallback.

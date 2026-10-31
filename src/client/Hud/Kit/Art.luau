@@ -61,14 +61,25 @@ Art.GLYPHS = {
 	invite = "+",
 	chevron_right = "›",
 	tree = "♣",
+	play_rune = "▶",
+	play_rune_small = "▶",
 }
 
 -- The sprite of an icon id: lk_icon_<id>, else lk_glyph_<id> (the flat glyph
 -- first when `preferGlyph`, as on square buttons), else the id itself when it
 -- already names a sprite. "ink:<id>" and "white:<id>" name the flat glyphs
 -- built by art/ui/capture/glyphs.py (lk_glyph_ink_<id>, lk_glyph_white_<id>).
--- nil when the kit has no such art.
+-- A role name ("icon.playRune") gives the role's sprite, or its `fallback`
+-- icon while that sprite has no art (not uploaded yet). nil when the kit has
+-- no such art.
 function Art.IconSprite(id: string, preferGlyph: boolean?): string?
+	local role = KitModel.ROLES[id]
+	if role and role.sprite then
+		if role.fallback and not Widgets.HasArt(role.sprite) then
+			return Art.IconSprite(role.fallback, preferGlyph) or role.sprite
+		end
+		return role.sprite
+	end
 	if string.sub(id, 1, 3) == "lk_" then
 		return id
 	end
@@ -135,7 +146,7 @@ local function standInFill(material: string, leather: boolean, state: string, ro
 		return role.fill or "xp"
 	elseif material == "track" then
 		return "track"
-	elseif material == "rule" or material == "glyph" or material == "none" then
+	elseif material == "rule" or material == "glyph" or material == "none" or material == "deco" then
 		return nil
 	elseif leather then
 		return ({
@@ -198,8 +209,13 @@ local function paintStandIn(frame: Frame, roleName: string, state: string, w: nu
 	-- Hover, focus and selection add the gold glow; tracks, fills, dots, rules and
 	-- glyphs carry no edge.
 	local glowing = state == "hover" or state == "focused" or state == "selected" or state == "capturing"
-	local edged = material ~= "fill" and material ~= "dot" and material ~= "rule" and material ~= "glyph"
-	stroke.Enabled = edged or glowing
+	-- Decorations (pillars) draw nothing at all until their art arrives.
+	local edged = material ~= "fill"
+		and material ~= "dot"
+		and material ~= "rule"
+		and material ~= "glyph"
+		and material ~= "deco"
+	stroke.Enabled = edged or (glowing and material ~= "deco")
 	stroke.Color = Tokens.Color(if glowing then "glow" else strokeKey)
 	stroke.Thickness = if glowing then Tokens.Space("glowStroke", 3) else thickness
 	if material == "none" and not glowing then
@@ -327,7 +343,7 @@ end
 
 -- Materials whose art is placed as stored (lines, fills, dots and glyphs
 -- sit inside their rect by design).
-local AS_STORED = { rule = true, fill = true, dot = true, glyph = true }
+local AS_STORED = { rule = true, fill = true, dot = true, glyph = true, deco = true }
 
 -- How far (design px per side) a sprite is drawn outside the plate so its
 -- visible edge lands on the plate's rect: KitModel.EDGES at the sprite's scale.

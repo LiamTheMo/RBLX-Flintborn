@@ -10,10 +10,10 @@ local HudModel = require(script.Parent.HudModel)
 local LobbyHudModel = {}
 
 -- The 2 × 3 menu grid, left to right and top to bottom (M01): what each tile
--- opens and its icon id.
+-- opens and its icon id (a role name for the Play tile's rune art, D26).
 LobbyHudModel.TILES = {
 	{ id = "Inventory", icon = "backpack" },
-	{ id = "Play", icon = "portal" },
+	{ id = "Play", icon = "icon.playRune" },
 	{ id = "Quests", icon = "scroll" },
 	{ id = "Shop", icon = "market" },
 	{ id = "Forge", icon = "anvil" },

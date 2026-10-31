@@ -31,7 +31,7 @@ Contact sheets: `contact_dark.png` (on #202020) and `contact_light.png` (on #F0E
 
 ## Totals
 
-259 sprites, 2,705,597 px in all (2.58 x 1024x1024 before packing gaps; about 3-4 atlases once packed).
+263 sprites, 2,747,121 px in all (2.62 x 1024x1024 before packing gaps; about 3-4 atlases once packed).
 
 | Family | Count |
 |---|---|
@@ -51,13 +51,14 @@ Contact sheets: `contact_dark.png` (on #202020) and `contact_light.png` (on #F0E
 | emblem | 2 |
 | frame | 14 |
 | glyph | 13 |
-| icon | 86 |
+| icon | 88 |
 | keycap | 2 |
 | map | 1 |
 | medallion | 3 |
 | nail | 1 |
 | panel | 2 |
 | pill | 1 |
+| pillar | 2 |
 | plaque | 11 |
 | player | 1 |
 | portrait | 2 |
@@ -81,7 +82,7 @@ Contact sheets: `contact_dark.png` (on #202020) and `contact_light.png` (on #F0E
 | tooltip | 2 |
 | window | 2 |
 
-Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 147 of them more than 2 px inside a silhouette (icon glows and thin glyphs). Interiors are 255; nothing below the keying fringe survives.
+Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 147 of them more than 2 px inside a silhouette (icon glows and thin glyphs). Interiors are 255; nothing below the keying fringe survives.
 
 ## Sprites
 
@@ -98,7 +99,7 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_bar_fill_red` | 18_stat_bars_states.png (963, 640, 1407, 688) | 226x29 | [12, 10, 12, 10] | X | atlas_lk_lobby | Bar fill (health red, stamina green, food orange, XP yellow, timer blue) | Scale X with the value; keep at least l+r px wide. |
 | `lk_bar_fill_yellow` | 18_stat_bars_states.png (963, 811, 1407, 862) | 226x30 | [12, 10, 12, 10] | X | atlas_lk_lobby | Bar fill (health red, stamina green, food orange, XP yellow, timer blue) | Scale X with the value; keep at least l+r px wide. |
 | `lk_bar_frame` | 18_stat_bars_states.png (270, 643, 867, 745) | 303x55 | [24, 20, 24, 20] | X, Y | atlas_lk_lobby | Paper bar frame with dark well | |
-| `lk_bar_frame_plain` | 18_stat_bars_states.png (270, 764, 866, 871) | 303x58 | [24, 20, 24, 20] | X, Y | | Plain paper bar frame | |
+| `lk_bar_frame_plain` | 18_stat_bars_states.png (270, 764, 866, 871) | 303x58 | [24, 20, 24, 20] | X, Y | atlas_lk_lobby | Plain paper bar frame | |
 | `lk_bar_frame_thin` | 12_quest_forge_parts.png (45, 567, 341, 614) | 182x32 | [16, 12, 16, 12] | X, Y | atlas_lk_lobby | Thin paper bar frame with dark well (quest rows) | |
 | `lk_bar_track` | 05_slots_badges_bars.png (198, 845, 1089, 904) | 361x28 | [12, 10, 12, 10] | X | atlas_lk_lobby | XP / progress bar track (HUD XP bar, Quest progress) | |
 | `lk_button_close_disabled` | 03_buttons_states.png (932, 328, 1074, 466) | 69x67 | | | atlas_lk_window | Window close button (top right) | |
@@ -115,10 +116,10 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_button_leather_hover` | 03_buttons_states.png (409, 63, 753, 170) | 210x69 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Primary action (Equip, Claim, Forge, Apply, Invite, Close, Play) | |
 | `lk_button_leather_normal` | 03_buttons_states.png (43, 63, 390, 170) | 212x69 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Primary action (Equip, Claim, Forge, Apply, Invite, Close, Play) | |
 | `lk_button_leather_pressed` | 03_buttons_states.png (773, 63, 1126, 170) | 216x68 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Primary action (Equip, Claim, Forge, Apply, Invite, Close, Play) | |
-| `lk_button_paper_disabled` | 03_buttons_states.png (1145, 198, 1492, 306) | 213x67 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Secondary action (Reset, Cancel), inactive tabs | |
-| `lk_button_paper_hover` | 03_buttons_states.png (407, 198, 753, 306) | 212x68 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Secondary action (Reset, Cancel), inactive tabs | |
-| `lk_button_paper_normal` | 03_buttons_states.png (44, 198, 389, 306) | 211x68 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Secondary action (Reset, Cancel), inactive tabs | |
-| `lk_button_paper_pressed` | 03_buttons_states.png (770, 198, 1126, 306) | 218x69 | [26, 24, 26, 24] | X, Y | atlas_lk_window | Secondary action (Reset, Cancel), inactive tabs | |
+| `lk_button_paper_disabled` | 03_buttons_states.png (1145, 198, 1492, 306) | 213x67 | [26, 24, 26, 24] | X, Y | atlas_lk_lobby | Secondary action (Reset, Cancel), inactive tabs | |
+| `lk_button_paper_hover` | 03_buttons_states.png (407, 198, 753, 306) | 212x68 | [26, 24, 26, 24] | X, Y | atlas_lk_lobby | Secondary action (Reset, Cancel), inactive tabs | |
+| `lk_button_paper_normal` | 03_buttons_states.png (44, 198, 389, 306) | 211x68 | [26, 24, 26, 24] | X, Y | atlas_lk_lobby | Secondary action (Reset, Cancel), inactive tabs | |
+| `lk_button_paper_pressed` | 03_buttons_states.png (770, 198, 1126, 306) | 218x69 | [26, 24, 26, 24] | X, Y | atlas_lk_lobby | Secondary action (Reset, Cancel), inactive tabs | |
 | `lk_button_paper_small_disabled` | 03_buttons_states.png (1279, 816, 1498, 930) | 103x55 | [18, 18, 18, 18] | X, Y | atlas_lk_lobby | Small paper button / value box (key binds, slider values) | |
 | `lk_button_paper_small_hover` | 03_buttons_states.png (804, 816, 1026, 930) | 104x56 | [18, 18, 18, 18] | X, Y | atlas_lk_lobby | Small paper button / value box (key binds, slider values) | |
 | `lk_button_paper_small_normal` | 03_buttons_states.png (1041, 816, 1262, 930) | 103x56 | [18, 18, 18, 18] | X, Y | atlas_lk_lobby | Small paper button / value box (key binds, slider values) | |
@@ -174,7 +175,7 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_glyph_arrow_down` | 03_buttons_states.png (1143, 508, 1245, 607) | 30x32 | | | atlas_lk_icons | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
 | `lk_glyph_arrow_left` | 03_buttons_states.png (681, 508, 783, 607) | 32x30 | | | atlas_lk_icons | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
 | `lk_glyph_arrow_right` | 03_buttons_states.png (834, 508, 936, 607) | 32x30 | | | atlas_lk_icons | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
-| `lk_glyph_arrow_up` | 03_buttons_states.png (988, 508, 1090, 607) | 30x32 | | | | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
+| `lk_glyph_arrow_up` | 03_buttons_states.png (988, 508, 1090, 607) | 30x32 | | | atlas_lk_icons | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
 | `lk_glyph_check` | 03_buttons_states.png (368, 508, 470, 607) | 34x30 | | | atlas_lk_lobby | Dark glyph for lk_button_square_paper / steppers | Dark brown; tint with ImageColor3. |
 | `lk_glyph_check_white` | 03_buttons_states.png (462, 834, 556, 912) | 36x32 | | | atlas_lk_icons | White check for CONFIRM buttons | From the CONFIRM button (text not taken). |
 | `lk_glyph_checkmark` | 09_controls.png (305, 477, 391, 551) | 43x38 | | | atlas_lk_icons | Loose dark check mark | |
@@ -214,7 +215,7 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_icon_exclamation` | 16_icons_status_items.png (85, 336, 189, 562) | 57x116 | | | atlas_lk_lobby | Status / stat / item icon | |
 | `lk_icon_exit` | 11_icons_extra.png (577, 833, 833, 1066) | 116x106 | | | atlas_lk_icons | Menu / side-tab icon | |
 | `lk_icon_flag` | 19_progress_bars_badges.png (773, 767, 970, 949) | 93x97 | | | atlas_lk_icons | Status icon | Lifted off its framed tile. |
-| `lk_icon_gear` | 06_menu_icons.png (907, 411, 1193, 691) | 116x114 | | | | Menu / currency icon | |
+| `lk_icon_gear` | 06_menu_icons.png (907, 411, 1193, 691) | 116x114 | | | atlas_lk_icons | Menu / currency icon | |
 | `lk_icon_gear_alt` | 11_icons_extra.png (327, 334, 550, 560) | 114x116 | | | | Menu / side-tab icon | |
 | `lk_icon_gem` | 06_menu_icons.png (605, 700, 764, 915) | 87x116 | | | atlas_lk_lobby | Menu / currency icon | |
 | `lk_icon_gift` | 16_icons_status_items.png (601, 607, 815, 832) | 111x116 | | | atlas_lk_icons | Status / stat / item icon | |
@@ -225,13 +226,13 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_icon_hourglass` | 16_icons_status_items.png (1184, 336, 1342, 560) | 83x116 | | | atlas_lk_icons | Status / stat / item icon | |
 | `lk_icon_house` | 11_icons_extra.png (42, 835, 301, 1067) | 116x104 | | | | Menu / side-tab icon | |
 | `lk_icon_hut` | 17_icons_world.png (1130, 834, 1370, 1065) | 100x96 | | | | World / map icon | |
-| `lk_icon_journal` | 11_icons_extra.png (881, 831, 1101, 1076) | 104x116 | | | | Menu / side-tab icon | |
+| `lk_icon_journal` | 11_icons_extra.png (881, 831, 1101, 1076) | 104x116 | | | atlas_lk_icons | Menu / side-tab icon | |
 | `lk_icon_lightning` | 16_icons_status_items.png (343, 73, 503, 293) | 86x116 | | | atlas_lk_items | Status / stat / item icon | |
 | `lk_icon_lock` | 13_popups_notices.png (1136, 805, 1200, 888) | 68x88 | | | atlas_lk_lobby | Locked status | |
-| `lk_icon_log` | 16_icons_status_items.png (30, 883, 275, 1083) | 116x96 | | | | Status / stat / item icon | |
+| `lk_icon_log` | 16_icons_status_items.png (30, 883, 275, 1083) | 116x96 | | | atlas_lk_icons | Status / stat / item icon | |
 | `lk_icon_logs` | 10_inventory_parts.png (763, 830, 868, 921) | 110x95 | | | atlas_lk_items | Material icon (inventory, forge, rewards) | |
 | `lk_icon_magma_ore` | 17_icons_world.png (575, 346, 810, 549) | 100x87 | | | atlas_lk_items | World / map icon | |
-| `lk_icon_magnifier` | 11_icons_extra.png (1144, 837, 1359, 1064) | 111x116 | | | | Menu / side-tab icon | |
+| `lk_icon_magnifier` | 11_icons_extra.png (1144, 837, 1359, 1064) | 111x116 | | | atlas_lk_icons | Menu / side-tab icon | |
 | `lk_icon_mail` | 11_icons_extra.png (50, 625, 273, 784) | 116x84 | | | atlas_lk_icons | Menu / side-tab icon | |
 | `lk_icon_map` | 11_icons_extra.png (850, 334, 1103, 561) | 116x105 | | | atlas_lk_icons | Menu / side-tab icon | |
 | `lk_icon_map_pin` | 17_icons_world.png (69, 841, 271, 1070) | 89x100 | | | atlas_lk_icons | World / map icon | |
@@ -244,6 +245,8 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_icon_pickaxe` | 12_quest_forge_parts.png (1170, 648, 1300, 768) | 135x124 | | | atlas_lk_items | Tool icon (forge recipes / detail) | |
 | `lk_icon_plank` | 10_inventory_parts.png (1040, 826, 1141, 924) | 106x102 | | | atlas_lk_items | Material icon (inventory, forge, rewards) | |
 | `lk_icon_plant_fiber` | 16_icons_status_items.png (594, 862, 831, 1090) | 116x113 | | | atlas_lk_items | Status / stat / item icon | |
+| `lk_icon_play_rune` | 21_play_rune_stones.png (559, 317, 967, 853) | 89x116 | | | atlas_lk_play | Play icon: the HUD Play tile and the Play window's header (icon.playRune) | Full colour; replaces lk_icon_portal for Play. |
+| `lk_icon_play_rune_small` | 21_play_rune_stones.png (559, 317, 967, 853) | 50x64 | | | atlas_lk_play | Crystal play glyph on the PLAY button (mark.playRune) | Full colour; replaces the white lk_glyph_play on the PLAY button. |
 | `lk_icon_portal` | 06_menu_icons.png (438, 48, 843, 372) | 116x94 | | | atlas_lk_lobby | Menu / currency icon | |
 | `lk_icon_portal_alt` | 11_icons_extra.png (281, 57, 562, 297) | 116x100 | | | | Menu / side-tab icon | |
 | `lk_icon_rocks` | 17_icons_world.png (42, 339, 291, 542) | 100x83 | | | atlas_lk_items | World / map icon | |
@@ -280,6 +283,8 @@ Alpha after clean-up: 2,009,585 visible px, 127,681 semi-transparent (6.4 %), 14
 | `lk_panel` | 12_quest_forge_parts.png (327, 774, 845, 985) | 264x110 | [30, 28, 30, 28] | X, Y | atlas_lk_lobby | Inner panels (Party columns, Forge columns, Quest details) | |
 | `lk_panel_inset` | 01_panel_layouts.png (716, 378, 982, 516) | 204x108 | [14, 14, 14, 14] | X, Y | atlas_lk_window | Inset card drawn on parchment (rows, sub-panels) | Opaque parchment around a thin rounded inset border; place it on parchment. |
 | `lk_pill_value` | 08_stat_bars.png (1090, 576, 1252, 633) | 101x39 | [14, 12, 14, 12] | X, Y | atlas_lk_window | Value pill ("450/750 XP", "LV. 12") | Text painted out. |
+| `lk_pillar_rune_left` | 21_play_rune_stones.png (108, 75, 636, 1063) | 88x160 | | | atlas_lk_play | Rune pillar at the PLAY button's left end (deco.pillarLeft) | Overlaps the button's left end like a post holding a banner. |
+| `lk_pillar_rune_right` | 21_play_rune_stones.png (857, 76, 1382, 1063) | 87x160 | | | atlas_lk_play | Rune pillar at the PLAY button's right end (deco.pillarRight) | Near mirror image of lk_pillar_rune_left (the sheet's own right pillar). |
 | `lk_plaque_capped` | 01_panel_layouts.png (1141, 676, 1507, 730) | 224x38 | [24, 14, 24, 14] | X, Y | | Paper plaque with leather end caps | |
 | `lk_plaque_leather` | 14_ornaments.png (379, 848, 667, 950) | 177x65 | [30, 26, 30, 26] | X, Y | | Stitched leather plaque | |
 | `lk_plaque_leather_bar` | 01_panel_layouts.png (33, 671, 299, 734) | 191x50 | [18, 16, 18, 16] | X, Y | | Leather bar plaque | |

@@ -1,5 +1,7 @@
 # The UI kit (`src/client/Hud/Kit`)
 
+> New here? Read [STYLE_GUIDE.md](STYLE_GUIDE.md) first: the look, tokens, components, art pipeline and QA in one place; this file is the API reference.
+
 Every screen is built from these components and nothing else (ARCHITECTURE §12
 D15). Screens never name sprites, colours or fonts: they pick components, roles
 and tokens. This document is the API reference; `docs/ui/ARCHITECTURE.md` §2 is
@@ -14,8 +16,8 @@ screen:Watch()
 screen:Open()
 ```
 
-Galleries: `art/ui/captures/kit_gallery.png` and `kit_gallery_2.png` … `_6.png`
-(every component in every state), `kit_gallery_*_fallback.png` (the stand-ins
+Galleries: `art/ui/captures/kit_gallery.png` and `kit_gallery_2.png` … `_9.png`
+(every component in every state; page 9 the sheet-21 Play art, §15), `kit_gallery_*_fallback.png` (the stand-ins
 drawn before upload) and `kit_gallery_flow.png` (a window with a dialog and the
 toast column). Rebuild them with:
 
@@ -76,7 +78,7 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 |---|---|---|
 | `normal` | — | normal art |
 | `hover` | MouseEnter while the mouse is the input (`Interact.UsingMouse`) | hover art, else normal art tinted `tints.hover` (0.93); tiles, slots, icon buttons and pills scale to 1.03 |
-| `focused` | gamepad `SelectionGained` | as hover (the selection image is an empty frame) |
+| `focused` | gamepad `SelectionGained` | normal art with the gold focus ring (the selection image, §12); scales to 1.03 where hover does |
 | `pressed` | `InputBegan` (MouseButton1, Touch, ButtonA) until its `InputEnded`; leaving the button or releasing anywhere else cancels | pressed art, else tint 0.80; scale 0.96, Back-out release |
 | `selected` | `:SetSelected(true)` | selected art (gold glow on slots, rows, side tabs; leather on tabs) |
 | `disabled` | `:SetEnabled(false)` | disabled art, else tint 0.72; `Interactable = false`, `Selectable = false` |
@@ -105,8 +107,10 @@ Flows can also fire real events (the capture env's signals are fireable):
 ## 4. Tokens (`KitTokens.json`)
 
 - `colors`: the palette of ARCHITECTURE §3.2, plus `veil` `#050403`,
-  `white`/`black`, and tints laid over art: `leaderTint` (Leader tag gold),
-  `checkTint` (M03 gold checkbox), `notReadyTint`.
+  `white`/`black`, and tints laid over art: `leaderTint` (the Badge "leader"
+  plaque, unused by the party since D24), `checkTint` (M03 gold checkbox),
+  `notReadyTint` (no reader left), the leather tones and the later additions
+  (STYLE_GUIDE.md §3 lists every token with its use).
 - `veil`: colour key and `BackgroundTransparency` **0.30** (D8, as updated).
 - `tints`: grey multipliers for borrowed state art (hover 0.93, pressed 0.80,
   disabled / locked 0.72).
@@ -149,7 +153,7 @@ Flows can also fire real events (the capture env's signals are fireable):
 ## 5. Roles (`KitModel.ROLES`)
 
 The one place a role names its art. States without their own sprite borrow
-(`KitModel.ART_FALLBACK`: focused / capturing / open → hover, locked / busy →
+(`KitModel.ART_FALLBACK`: capturing / open → hover, locked / busy →
 disabled) or draw the normal sprite tinted. `grow` draws a state's sprite larger
 per side (glow rings outside the plate: slot and side-tab selected +3 px, row
 selected +2 px, tile selected +3 px). `material` picks the stand-in.
@@ -260,8 +264,16 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `window.plaque` | `lk_plaque_paper` | — | paper |
 | `window.rule` | `lk_divider_line` | — | rule |
 
-Icons are not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, then
-`lk_glyph_<id>` (square buttons prefer the glyph). `"ink:<id>"` and
+| `icon.playRune` | `lk_icon_play_rune` (fallback icon `portal`) | — | glyph ▶ |
+| `mark.playRune` | `lk_icon_play_rune_small` (fallback `lk_glyph_play`) | — | glyph ▶ |
+| `deco.pillarLeft` | `lk_pillar_rune_left` | — | deco (nothing) |
+| `deco.pillarRight` | `lk_pillar_rune_right` | — | deco (nothing) |
+
+Icons are mostly not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, then
+`lk_glyph_<id>` (square buttons prefer the glyph). A role name is also an icon
+id (`icon = "icon.playRune"` on Kit.Icon, IconButton, Window or Button): it
+draws the role's sprite, or the role's `fallback` icon while that sprite has
+no art yet (§15). `"ink:<id>"` and
 `"white:<id>"` name the flat glyphs (§10). Item art comes from
 `ItemInfo.Icon(itemId)` (icon name and optional tint, the one item-to-art
 source) through `ItemInfo.Sprite`, then `lk_item_<id>` / `item_<id>`, then the
@@ -298,7 +310,8 @@ screen.Closed:Connect(function() PartyController.OnClosed() end)
 `:Body()`, `.bodyRect`, `:SetTitle(text)`, `.close` (IconButton), `.title`.
 Banner: icon 76 px at (40, 12), title at x 140 in `windowTitle`, subtitle in
 `subtitleHand`, underline rule at y 80 up to the close button. Plaque (M05): the
-title on `window.plaque` at top left. Centered (M04): the title centred with two
+title on `window.plaque` at top left (no screen uses it since D25: the Play
+window has Inventory's banner header). Centered (M04): the title centred with two
 ornament icons (`tree` by default, D19) and a full rule. The close button sits
 22 px in from the top-right corner and closes the screen (or calls `onClose`).
 ```lua
@@ -532,8 +545,8 @@ from `art/ui/sprites/manifest.json` until then.
 | Slider knob (M03) | small paper knob | `lk_button_paper_small_normal` at 23 × 26 (`knob = "round"` for the sheet-09 ball) |
 | Slider track (M03) | dark track, yellow fill | `lk_bar_track` + `lk_bar_fill_yellow` |
 | Ticked checkbox (M03) | gold box | `lk_checkbox_on` tinted `checkTint` (variant "gold") |
-| Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` |
-| Ready tag (M04) | yellow-green pill | `lk_pill_value` (untinted: a multiply tint cannot lighten green) + `lk_dot_green` |
+| Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` (Badge "leader"; the party no longer shows it, D24) |
+| Ready tag (M04) | yellow-green pill | flat `badge.ready` pill + `lk_dot_green` (generic status pill; no party Ready since D24) |
 | Not Ready dot | grey dot | `lk_dot_brown` |
 | Empty party slot dot | muted disc | native flat tan disc (`portrait.empty`, by request) |
 | Party header trees (M04) | tent and trees | `lk_icon_tree` ornaments |
@@ -633,7 +646,7 @@ lk_window_frame), `map.island` (pm_map_island).
 (lk_ring_track), `check.ringOn` (lk_ring_full), `scroll.thinTrack`,
 `scroll.thinThumb`, `hud.playerCard`, `hud.leaf`, `panel.party`, `map.island`;
 `portrait.empty` is now the native tan disc. Native roles (`native = true`)
-draw as flat kit shapes by design. New colour tokens: `emptyDot` #DFB791,
+draw as flat kit shapes by design. New colour tokens: `emptyDot` (now #CC9F77, §11),
 `hairline` #EECBA4, `railTrack`, `railThumb` (sampled from M01 / M04).
 
 **Flat glyphs** (`"ink:<id>"`, `"white:<id>"`; built from lk_ icons by
@@ -641,9 +654,8 @@ draw as flat kit shapes by design. New colour tokens: `emptyDot` #DFB791,
 gears, people, magnifier, check, anvil, book, trophy, map_pin, backpack, chest,
 hammer, compass, and stand-ins where the sheets have no such drawing:
 `gamepad` (compass), `speaker` (speech bubble), `monitor` (map), `refresh`
-(compass arrow), `info` ("!", no circled i). The asset artist still has to add
-these 34 PNGs to `manifest.json` and an atlas group (the script prints the
-entries).
+(compass arrow), `info` ("!", no circled i). They are in `manifest.json` and
+packed in `atlas_lk_icons` (`glyphs.py` prints the entries for new ones).
 
 **Touch**: on touch screens each control's invisible hit pad grows until it
 covers at least 44 screen px at the window's real scale (no visual change).
@@ -652,7 +664,9 @@ covers at least 44 screen px at the window's real scale (no visual change).
 the whole screen height, over the top bar and HUD, at the largest scale that
 fits (4 px margin). At 844 × 390: Inventory 0.586, Journal (1172 × 688) 0.555,
 Party (1136 × 642) 0.595, Play (1064 × 675) 0.566, Forge (1102 × 682) 0.560,
-Settings (1110 × 666) 0.574, ConfirmDialog (560 × 330) 1.158. A 15 px body
+Settings (1110 × 666) 0.574, ConfirmDialog (560 × 330) 1.158. (Sizes of this
+round; Play is 1187 × 650 since D25 and windows stay below the top bar since
+fix round 3, so today's phone scales are lower: Play 0.508 at 844 × 390.) A 15 px body
 line is then about 8.5 screen px; the 9 px floor applies to scaled labels only,
 so phone-critical text should use `scaled = true` or larger sizes.
 
@@ -761,7 +775,7 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   a gold focus ring (the selection image, inset to the visible control) over the
   normal art. Dropdowns move selection into their options and back.
 - **Touch**: SearchBox / TextField boxes grow to 44 screen px tall on touch.
-- **Colour**: leather sprites draw under `leatherTint` (#D1D4FF; buttons now
+- **Colour**: leather sprites draw under `leatherTint` (then #D1D4FF, now #DEFFFF, §14; buttons now
   ΔE ≈ 1 vs M04's CLOSE). The HUD card, currency pill and XP track differ in
   blue (the art is more saturated than the mockup); a multiply tint cannot add
   blue, so those need recoloured art.
@@ -784,7 +798,7 @@ The value text is centred in the track, over the fill and the empty part, in
 cream with a 2 px ink outline (`textSize` overrides its size). The baked value
 plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
 
-## 13. Fix round 4
+## 14. Fix round 4
 
 - **Items without art**: the kind glyph (tools and weapons a hammer, armour a
   backpack, the rest a chest) draws faded (`Art.STAND_IN_FADE`, 0.6) in ink,
@@ -806,3 +820,21 @@ plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
   shows it whole in a tooltip.
 - **SectionHeader** labels shrink to fit (the phone boost no longer truncates).
 - **Art.Icon** `transparency`; **Plate** `:SetTone`.
+
+## 15. Play rune art (sheet 21, ARCHITECTURE D26)
+
+- **Roles**: `icon.playRune` (`lk_icon_play_rune`, 89 × 116) is the Play
+  tile's and the Play window header's icon; `mark.playRune`
+  (`lk_icon_play_rune_small`, 50 × 64) the PLAY button's crystal glyph;
+  `deco.pillarLeft` / `deco.pillarRight` (`lk_pillar_rune_left` 88 × 160 /
+  `_right` 87 × 160) the rune pillars at the button's ends, drawn with
+  `Kit.Picture` and dimmed with `:SetState("disabled")`.
+- **`fallback`** (role field): the icon id drawn while the role's sprite has no
+  art (not uploaded): `portal` for `icon.playRune`, `lk_glyph_play` for
+  `mark.playRune`. `Art.IconSprite` resolves role names and applies it.
+- **Material `deco`**: decorations draw no stand-in at all (no plate, stroke or
+  glyph) until their art arrives, and are placed as stored (`edge = false`).
+- **Atlas**: the four sprites are `atlas_lk_play` (1024 × 256), a group of
+  their own so the uploaded atlases keep their rects and bytes.
+- Usage and measurements: PlayScreen.md "Play rune art (D26)", LobbyScreen.md;
+  gallery page 9 (`kit_gallery_9.png`, `_fallback`).
