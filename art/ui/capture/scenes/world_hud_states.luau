@@ -10,6 +10,7 @@ local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
 local HudController = require(Client.Controllers.HudController)
 local Layout = require(Client.Hud.Layout)
+local Vitals = require(Client.Hud.Vitals)
 
 local W, H = 1672, 941
 -- Stand-in background: art/reference/lobby_map.png is the lobby village (the
@@ -47,6 +48,10 @@ do
 	check(hud.vitals.rows.health.bar.root:GetAttribute("HudLow") == true, "health 18% reads low")
 	check(hud.vitals.rows.health.mark.root.Visible, "the low mark shows over the heart")
 	check(hud.vitals.rows.stamina.mark.root.Visible, "spent stamina shows the mark")
+	check(hud.vitals.rows.stamina.bar.root:GetAttribute("HudEmpty") == true, "spent stamina reads empty")
+	local spent = Vitals.IconImages(hud.vitals.rows.stamina.bar.icon)
+	check(#spent > 0 and spent[1].ImageTransparency == Vitals.EMPTY_FADE, "the spent stamina icon is greyed out")
+	check(hud.vitals.rows.health.bar.root:GetAttribute("HudEmpty") == false, "low health is not empty")
 	check(#hud.vitals.chips == 2, "hunger slow and food healing plaques")
 	hud.objective:Set(HudModel.ExtractionObjective({
 		name = "Old Quarry",
