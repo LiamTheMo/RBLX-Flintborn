@@ -38,7 +38,6 @@ local tab = "Shop"
 -- Bumped by every render; a render that yielded and is no longer the latest drops.
 local renderToken = 0
 
-
 local function invoke(name: string, ...)
 	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
 	if not ok then

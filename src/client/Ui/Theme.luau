@@ -143,6 +143,19 @@ function Theme.FitHud(gui: ScreenGui, uiScale: UIScale): () -> ()
 	end
 end
 
+-- A full-screen frame in `gui` in the HUD's design px (KitScale.Hud): regions
+-- placed inside it by scale and design-px offsets keep to the screen's edges.
+function Theme.HudRoot(gui: ScreenGui): Frame
+	gui:SetAttribute("FitsItself", true)
+	local root = Theme.Make("Frame", {
+		Name = "Root",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+	}, gui)
+	KitScale.Hud(gui, root)
+	return root
+end
+
 function Theme.TopStack()
 	if topStack == nil then
 		local gui = Theme.Make("ScreenGui", {
@@ -203,7 +216,8 @@ function Theme.Subtitle(text: string)
 	end
 	local w, h = Kit.Tooltip.Measure(shown)
 	subtitle.holder.Size = UDim2.fromOffset(w, h)
-	subtitle.box = Kit.Tooltip.new(subtitle.holder, { name = "Box", rect = { 0, 0, w, h }, text = shown, tail = "none" })
+	subtitle.box =
+		Kit.Tooltip.new(subtitle.holder, { name = "Box", rect = { 0, 0, w, h }, text = shown, tail = "none" })
 	subtitle.text = shown
 	subtitle.holder.Visible = true
 	task.delay(4, function()

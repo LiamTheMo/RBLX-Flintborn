@@ -55,7 +55,6 @@
     "headerRule": "#9E6B42",
     "sliderTrack": "#50311D",
     "sliderFill": "#FDB335",
-    "damage": "#FFE1A0",
     "listPaper": "#E2BC86",
     "listEdge": "#C59462",
     "slotEdge": "#D4A069",
@@ -92,17 +91,17 @@
     "halfSpan": 108,
     "minorStep": 15,
     "minorLimit": 90,
-    "majorTick": { "y": 4, "h": 7 },
+    "majorTick": { "y": 4, "h": 9 },
     "minorTick": { "y": 16, "h": 10 },
     "letter": { "y": 10, "h": 24, "size": 15, "cardinalSize": 20, "raise": 1 },
-    "marker": [231, -9, 19, 16],
+    "marker": [228, -12, 25, 20],
     "waypoints": { "y": 52, "size": 30 }
   },
   "vitals": {
     "anchor": [1, 0],
     "pos": [1, -53, 0, 60],
     "size": [315, 65],
-    "pitch": 72,
+    "pitch": 76,
     "low": 0.25,
     "lowMark": [42, 36, 24],
     "rows": [
@@ -113,27 +112,27 @@
   },
   "status": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 276],
+    "pos": [1, -53, 0, 289],
     "size": [315, 38],
     "gap": 8
   },
   "objective": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 324],
+    "pos": [1, -53, 0, 337],
     "size": [315, 134],
     "header": [22, 16, 271, 34],
     "rowTop": 58,
     "rowHeight": 30,
     "check": 22,
-    "textW": 110,
-    "textSize": 14,
+    "textW": 106,
+    "textSize": 15,
     "pin": 16,
-    "distanceW": 52,
-    "progressW": 58
+    "distanceW": 46,
+    "progressW": 72
   },
   "event": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 470],
+    "pos": [1, -53, 0, 483],
     "size": [315, 128],
     "header": [22, 16, 271, 34],
     "nameY": 56,

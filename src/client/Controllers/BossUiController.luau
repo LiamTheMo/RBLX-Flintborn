@@ -112,6 +112,8 @@ local function build()
 	local gui = make("ScreenGui", {
 		Name = "BossUi",
 		ResetOnSpawn = false,
+		-- The cue stands over the banner column for its few seconds.
+		DisplayOrder = 6,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, player:WaitForChild("PlayerGui"))
 	-- The bar and the horn live in the shared top-centre column with the other banners.
@@ -160,11 +162,12 @@ function BossUiController.Start()
 		elseif payload.kind == "Ended" then
 			hornSpawnAt = nil
 		end
+		update()
 	end)
 	task.spawn(function()
 		while true do
-			task.wait(0.25)
 			update()
+			task.wait(0.25)
 		end
 	end)
 end

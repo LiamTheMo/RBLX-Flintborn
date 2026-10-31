@@ -267,6 +267,9 @@ end
 -- one, else the first tab or the close button.
 function ListWindow:Finish()
 	self.scroll:SetContentHeight(self.height)
+	-- The engine measures the canvas itself (AutomaticCanvasSize); this floor
+	-- is the same sum, for where nothing measures (captures).
+	self.list.CanvasSize = UDim2.fromOffset(0, self.height + 14)
 	local first, match = nil, nil
 	for _, entry in self.buttons do
 		if entry.button.control.flags.enabled ~= false then
@@ -466,7 +469,10 @@ function ListWindow:Row(spec)
 		x -= 16 + valueW
 		local textLeft = x
 		if spec.valueIcon then
-			Kit.Icon.new(c, { name = "ValueIcon", rect = { x, (h - 30) / 2, 30, 30 }, icon = spec.valueIcon, zIndex = Z + 1 })
+			Kit.Icon.new(
+				c,
+				{ name = "ValueIcon", rect = { x, (h - 30) / 2, 30, 30 }, icon = spec.valueIcon, zIndex = Z + 1 }
+			)
 			textLeft += 36
 		end
 		Kit.Text.new(c, {
@@ -513,7 +519,7 @@ end
 
 -- A row of buttons, right-aligned: {{label, key, enabled, onPress, kind, width?}}.
 function ListWindow:Buttons(specs)
-	local holder = self:_holder("Buttons" .. (self.order + 1), BUTTON_H + 6)
+	local holder = self:_holder("Buttons", BUTTON_H + 6)
 	local x = self.contentW - 4
 	for index = #specs, 1, -1 do
 		local spec = specs[index]

@@ -46,7 +46,6 @@ local popupHost = nil
 local window = nil
 local tab = "Overview"
 
-
 -- The latest progression snapshot {level, xp, xpToNext, ...}, or nil while loading.
 function ProgressionController.View()
 	return view
@@ -68,7 +67,6 @@ function ProgressionController.MountPopups(host: GuiObject)
 	popupHost = host
 	placePopups()
 end
-
 
 local function invoke(name: string, ...)
 	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
@@ -101,28 +99,22 @@ local function confirmRebirth()
 		window:SetStatus("The rebirth preview could not load. Try again.", "warn")
 		return
 	end
-	window:Confirm(
-		"",
-		"Rebirth",
-		ProgressionController.CONFIRM_DELAY,
-		function()
-			local ok, reason = invoke("Rebirth", HttpService:GenerateGUID(false))
-			window:SetStatus(
-				if ok then "Reborn. Your tokens are ready to spend." else ("Not reborn: " .. Reasons.Text(reason)),
-				if ok then "good" else "warn"
-			)
-		end,
-		{
-			title = "Rebirth?",
-			size = { 640, 440 },
-			rows = {
-				{ label = "Reset", text = table.concat(preview.reset, "; ") },
-				{ label = "Kept", text = table.concat(preview.kept, "; ") },
-				{ label = "Gained", text = table.concat(preview.gained, "; ") },
-				{ label = "Hold to confirm", text = "Hold Rebirth until its bar fills." },
-			},
-		}
-	)
+	window:Confirm("", "Rebirth", ProgressionController.CONFIRM_DELAY, function()
+		local ok, reason = invoke("Rebirth", HttpService:GenerateGUID(false))
+		window:SetStatus(
+			if ok then "Reborn. Your tokens are ready to spend." else ("Not reborn: " .. Reasons.Text(reason)),
+			if ok then "good" else "warn"
+		)
+	end, {
+		title = "Rebirth?",
+		size = { 640, 440 },
+		rows = {
+			{ label = "Reset", text = table.concat(preview.reset, "; ") },
+			{ label = "Kept", text = table.concat(preview.kept, "; ") },
+			{ label = "Gained", text = table.concat(preview.gained, "; ") },
+			{ label = "Hold to confirm", text = "Hold Rebirth until its bar fills." },
+		},
+	})
 end
 
 local function drawOverview()

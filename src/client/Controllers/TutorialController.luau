@@ -90,7 +90,8 @@ local function updateMarker(dt: number)
 		return
 	end
 	if marker == nil then
-		marker = make("BillboardGui", { Name = "TutorialMarker", Size = UDim2.fromOffset(44, 44), AlwaysOnTop = true }, nil)
+		marker =
+			make("BillboardGui", { Name = "TutorialMarker", Size = UDim2.fromOffset(44, 44), AlwaysOnTop = true }, nil)
 		Kit.Icon.new(marker, { name = "Pin", rect = { 0, 0, 44, 44 }, icon = "map_pin" })
 		marker.Parent = player:WaitForChild("PlayerGui")
 	end

@@ -6,7 +6,9 @@
 -- shows ✓/✕ with colour. R / L2 / the Rotate button turns it; click, R1 or the Place button
 -- builds. No-build auras around portals and totem radii are drawn while building,
 -- and hovering a structure shows its HP, owner and decay timer. The server decides
--- every placement. World place only.
+-- every placement. World place only. The palette is a kit card at the bottom
+-- centre: piece tabs, the tier stepper, Rotate and Place buttons, the cost and
+-- key caps with the player's own keys; the hover line is a kit tooltip.
 
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
@@ -19,6 +21,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local InventoryController = require(script.Parent.InventoryController)
+local Kit = require(script.Parent.Parent.Hud.Kit)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
@@ -32,13 +35,14 @@ local visuals = {}
 local renderConnection = nil
 
 local OK_COLOR = Color3.fromRGB(110, 220, 120)
--- Pieces sit in one row that scrolls sideways, so new pieces never push the
--- palette under the tier row; buttons are touch-sized.
-local PIECE_WIDTH = 78
-local ROW_HEIGHT = 40
 local BAD_COLOR = Color3.fromRGB(230, 90, 80)
-local SELECTED = Color3.fromRGB(110, 70, 30)
-local UNSELECTED = Color3.fromRGB(46, 38, 30)
+
+-- The palette in design px: piece tabs in rows of PIECES_PER_ROW, then the tier
+-- row, then the cost and status lines. Controls are touch-sized.
+BuildController.SIZE = { 812, 244 }
+local PIECES_PER_ROW = 7
+local PIECE_W, PIECE_H, PIECE_GAP = 104, 42, 6
+local ROW_HEIGHT = 46
 
 local function make(className: string, props, parent)
 	local instance = Instance.new(className)
@@ -76,7 +80,7 @@ local function costLine(cost): string
 		local owned = InventoryController.Count(catalogId)
 		local text = ("%s %d/%d"):format(def and def.name or catalogId, math.min(owned, quantity), quantity)
 		if owned < quantity then
-			text = ('<font color="#FFAA78">%s</font>'):format(text)
+			text = ('<font color="%s">%s</font>'):format(Kit.Tokens.Data.colors.short, text)
 		end
 		table.insert(parts, { key = catalogId, text = text })
 	end
@@ -165,6 +169,27 @@ local function describeHover(target: Instance?): string
 	return text
 end
 
+-- The hover line: a kit tooltip over the palette, rebuilt only when it changes.
+local function setHover(text: string)
+	if text == ui.hoverText then
+		return
+	end
+	ui.hoverText = text
+	if ui.hover then
+		ui.hover:Destroy()
+		ui.hover = nil
+	end
+	if text ~= "" then
+		local w, h = Kit.Tooltip.Measure(text)
+		ui.hover = Kit.Tooltip.new(ui.holder, {
+			name = "Hover",
+			rect = { (BuildController.SIZE[1] - w) / 2, -h - 12, w, h },
+			text = text,
+			tail = "bottom",
+		})
+	end
+end
+
 local function update()
 	local piece, tierStats = stats()
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -176,7 +201,7 @@ local function update()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { player.Character, ui.ghost, workspace.CurrentCamera }
 	local hit = workspace:Raycast(origin, direction * 200, params)
-	ui.hover.Text = describeHover(hit and hit.Instance)
+	setHover(describeHover(hit and hit.Instance))
 	if hit == nil then
 		ui.ghost.Transparency = 1
 		state.base = nil
@@ -199,10 +224,11 @@ local function update()
 	ui.ghost.CFrame = CFrame.new(center)
 	ui.ghost.Transparency = 0.5
 	ui.ghost.Color = if state.valid then OK_COLOR else BAD_COLOR
-	ui.mark.Text = if state.valid then "✓" else "✕"
-	ui.mark.TextColor3 = ui.ghost.Color
-	ui.status.Text = reason
-		or ("Place " .. (if BuildRules.IsTiered(state.piece) then currentTier() .. " " else "") .. state.piece)
+	ui.markOk.Visible = state.valid
+	ui.markBad.Visible = not state.valid
+	ui.status:SetText(
+		reason or ("Place " .. (if BuildRules.IsTiered(state.piece) then currentTier() .. " " else "") .. state.piece)
+	)
 end
 
 local function place()
@@ -213,7 +239,7 @@ local function place()
 		return Remotes.Get("Build"):InvokeServer(state.piece, currentTier(), state.base, state.steps)
 	end)
 	if not ok or not success then
-		ui.status.Text = "Can't build here (" .. tostring(reason or success) .. ")"
+		ui.status:SetText("Can't build here (" .. tostring(reason or success) .. ")")
 	elseif state.piece == "Totem" then
 		drawZones()
 	end
@@ -224,6 +250,7 @@ local function rotate()
 end
 
 local renderPalette
+local refreshKeys
 
 local function select(pieceId: string)
 	state.piece = pieceId
@@ -239,26 +266,28 @@ local function cycleTier(delta: number)
 end
 
 function renderPalette()
-	for pieceId, button in ui.pieceButtons do
-		button.BackgroundColor3 = if pieceId == state.piece then SELECTED else UNSELECTED
-	end
+	ui.pieces:Select(state.piece)
 	local tiered = BuildRules.IsTiered(state.piece)
 	local tier = currentTier()
 	local _, tierStats = stats()
-	ui.tierDown.Visible = tiered
-	ui.tierUp.Visible = tiered
+	ui.tierDown.root.Visible = tiered
+	ui.tierUp.root.Visible = tiered
 	if tiered then
 		local tiers = BuildRules.TiersOf(state.piece)
-		ui.tierLabel.Text = ("%s  %d/%d  · %d HP"):format(tier, table.find(tiers, tier) or 1, #tiers, tierStats.hp)
+		ui.tierLabel:SetText(("%s  %d/%d  · %d HP"):format(tier, table.find(tiers, tier) or 1, #tiers, tierStats.hp))
 	else
-		ui.tierLabel.Text = ("%s  · %d HP"):format(state.piece, tierStats.hp)
+		ui.tierLabel:SetText(("%s  · %d HP"):format(state.piece, tierStats.hp))
 	end
-	ui.cost.Text = "Cost: " .. costLine(tierStats.cost)
+	ui.cost:SetText("Cost: " .. costLine(tierStats.cost))
+	refreshKeys()
 end
 
 local function setActive(active: boolean)
 	state.active = active
-	ui.panel.Visible = active
+	ui.holder.Visible = active
+	if not active then
+		setHover("")
+	end
 	ui.ghost.Parent = if active then workspace.CurrentCamera else nil
 	if renderConnection then
 		renderConnection:Disconnect()
@@ -292,115 +321,145 @@ local function setActive(active: boolean)
 	end
 end
 
+-- Key caps for the player's own Rotate and Build keys.
+function refreshKeys()
+	local keys = { Binds.Label("Rotate"), Binds.Label("Build") }
+	local signature = table.concat(keys, ";")
+	if signature == ui.keySignature then
+		return
+	end
+	ui.keySignature = signature
+	if ui.keys then
+		ui.keys:Destroy()
+	end
+	local w = BuildController.SIZE[1]
+	ui.keys = Kit.Core.Make("Frame", {
+		Name = "Keys",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(w - 360, 196),
+		Size = UDim2.fromOffset(340, 34),
+		ZIndex = 6,
+	}, ui.card.root)
+	local x = 340
+	for index = #keys, 1, -1 do
+		local label = if index == 1 then "Rotate" else "Close"
+		local labelW = math.ceil(Kit.Text.Width(label, "rowLabel")) + 4
+		x -= labelW
+		Kit.Text.new(ui.keys, { name = "Label" .. index, rect = { x, 0, labelW, 34 }, text = label, role = "rowLabel" })
+		local capW = Kit.KeyCap.Width(keys[index], 34)
+		x -= capW + 8
+		Kit.KeyCap.new(ui.keys, { name = "Key" .. index, rect = { x, 0, capW, 34 }, text = keys[index] })
+		x -= 18
+	end
+end
+
 local function build()
-	local gui = make("ScreenGui", { Name = "Build", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	ui.panel = make("Frame", {
+	local w, h = BuildController.SIZE[1], BuildController.SIZE[2]
+	local gui = make("ScreenGui", {
+		Name = "Build",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
+	ui.holder = make("Frame", {
+		Name = "Palette",
 		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -96),
-		Size = UDim2.fromOffset(460, 156),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		BackgroundTransparency = 0.1,
-		-- Active panels swallow clicks, so a tap on the panel never places behind it.
-		Active = true,
+		BackgroundTransparency = 1,
+		-- Above the world HUD's XP bar and hotbar.
+		Position = UDim2.new(0.5, 0, 1, -182),
+		Size = UDim2.fromOffset(w, h),
 		Visible = false,
 	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	ui.pieces = make("ScrollingFrame", {
-		Position = UDim2.fromOffset(8, 8),
-		Size = UDim2.new(1, -16, 0, ROW_HEIGHT + 6),
-		BackgroundTransparency = 1,
-		Active = true,
-		ScrollingDirection = Enum.ScrollingDirection.X,
-		AutomaticCanvasSize = Enum.AutomaticSize.X,
-		CanvasSize = UDim2.new(),
-		ScrollBarThickness = 4,
-	}, ui.panel)
-	make("UIListLayout", {
-		FillDirection = Enum.FillDirection.Horizontal,
-		Padding = UDim.new(0, 4),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, ui.pieces)
-	ui.pieceButtons = {}
+	ui.holder.Parent = Theme.HudRoot(gui)
+	ui.card = Kit.Panel.new(ui.holder, { name = "Card", rect = { 0, 0, w, h }, variant = "card" })
+	-- Active panels swallow clicks, so a tap on the panel never places behind it.
+	ui.card.root.Active = true
+	local card = ui.card.root
+	local tabs = {}
 	for order, pieceId in StructureCatalog.ORDER do
-		local b = make("TextButton", {
-			Text = pieceId,
-			Size = UDim2.fromOffset(PIECE_WIDTH, ROW_HEIGHT),
-			LayoutOrder = order,
-			BackgroundColor3 = UNSELECTED,
-			TextColor3 = Color3.fromRGB(245, 236, 222),
-			Font = Enum.Font.GothamMedium,
-			TextSize = 12,
-		}, ui.pieces)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(function()
-			select(pieceId)
-		end)
-		ui.pieceButtons[pieceId] = b
+		local column = (order - 1) % PIECES_PER_ROW
+		local row = (order - 1) // PIECES_PER_ROW
+		table.insert(
+			tabs,
+			Kit.Tab.new(card, {
+				id = pieceId,
+				name = pieceId,
+				rect = { 20 + column * (PIECE_W + PIECE_GAP), 16 + row * (PIECE_H + PIECE_GAP), PIECE_W, PIECE_H },
+				label = pieceId,
+				variant = "horizontal",
+				textSize = 15,
+				zIndex = 6,
+			})
+		)
 	end
-	local function button(text: string, position: UDim2, width: number, onClick)
-		local b = make("TextButton", {
-			Text = text,
-			Position = position,
-			Size = UDim2.fromOffset(width, ROW_HEIGHT),
-			BackgroundColor3 = SELECTED,
-			TextColor3 = Color3.fromRGB(255, 240, 220),
-			Font = Enum.Font.GothamBold,
-			TextSize = 13,
-		}, ui.panel)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(onClick)
-		return b
-	end
+	ui.pieces = Kit.TabGroup.new(tabs, select)
 	-- Tier stepper: ◀ Copper 3/8 · 1000 HP ▶ (hidden arrows for one-tier pieces).
-	local rowY = ROW_HEIGHT + 18
-	ui.tierDown = button("◀", UDim2.fromOffset(8, rowY), 44, function()
-		cycleTier(-1)
-	end)
-	ui.tierLabel = make("TextLabel", {
-		Position = UDim2.fromOffset(56, rowY),
-		Size = UDim2.fromOffset(170, ROW_HEIGHT),
-		BackgroundTransparency = 1,
-		TextColor3 = Color3.fromRGB(255, 230, 190),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-	}, ui.panel)
-	ui.tierUp = button("▶", UDim2.fromOffset(230, rowY), 44, function()
-		cycleTier(1)
-	end)
+	local rowY = 16 + 2 * (PIECE_H + PIECE_GAP) + 4
+	ui.tierDown = Kit.IconButton.new(card, {
+		name = "TierDown",
+		rect = { 20, rowY, ROW_HEIGHT, ROW_HEIGHT },
+		variant = "small",
+		icon = "arrow_left",
+		zIndex = 6,
+		onPress = function()
+			cycleTier(-1)
+		end,
+	})
+	ui.tierLabel = Kit.Text.new(card, {
+		name = "Tier",
+		rect = { 20 + ROW_HEIGHT + 8, rowY, 270, ROW_HEIGHT },
+		text = "",
+		role = "rowTitle",
+		align = "Center",
+		scaled = true,
+		zIndex = 6,
+	})
+	ui.tierUp = Kit.IconButton.new(card, {
+		name = "TierUp",
+		rect = { 20 + ROW_HEIGHT + 286, rowY, ROW_HEIGHT, ROW_HEIGHT },
+		variant = "small",
+		icon = "arrow_right",
+		zIndex = 6,
+		onPress = function()
+			cycleTier(1)
+		end,
+	})
 	-- Touch and controller players build with buttons instead of precise dragging.
-	button("Rotate", UDim2.new(1, -172, 0, rowY), 80, rotate)
-	button("Place", UDim2.new(1, -88, 0, rowY), 80, place)
-	ui.cost = make("TextLabel", {
-		Position = UDim2.fromOffset(8, rowY + ROW_HEIGHT + 6),
-		Size = UDim2.new(1, -16, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(230, 220, 200),
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-		RichText = true,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-	}, ui.panel)
-	ui.status = make("TextLabel", {
-		Position = UDim2.fromOffset(8, rowY + ROW_HEIGHT + 28),
-		Size = UDim2.new(1, -16, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(255, 214, 150),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-	}, ui.panel)
-	ui.hover = make("TextLabel", {
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 0, -6),
-		Size = UDim2.new(1, 0, 0, 20),
-		BackgroundTransparency = 1,
-		TextColor3 = Color3.fromRGB(240, 232, 220),
-		TextStrokeTransparency = 0.4,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 13,
-	}, ui.panel)
+	Kit.Button.new(card, {
+		name = "Rotate",
+		rect = { w - 20 - 150 - 12 - 150, rowY, 150, ROW_HEIGHT },
+		label = "Rotate",
+		variant = "secondary",
+		sizeClass = "s",
+		zIndex = 6,
+		onPress = rotate,
+	})
+	Kit.Button.new(card, {
+		name = "Place",
+		rect = { w - 20 - 150, rowY, 150, ROW_HEIGHT },
+		label = "Place",
+		icon = "build",
+		sizeClass = "s",
+		zIndex = 6,
+		onPress = place,
+	})
+	ui.cost = Kit.Text.new(card, {
+		name = "Cost",
+		rect = { 22, rowY + ROW_HEIGHT + 10, w - 44, 26 },
+		text = "",
+		role = "rowLabel",
+		rich = true,
+		zIndex = 6,
+	})
+	ui.status = Kit.Text.new(card, {
+		name = "Status",
+		rect = { 22, 196, w - 400, 34 },
+		text = "",
+		role = "rowTitle",
+		scaled = true,
+		zIndex = 6,
+	})
+	refreshKeys()
+	Binds.Changed:Connect(refreshKeys)
 	ui.ghost = make("Part", {
 		Anchored = true,
 		CanCollide = false,
@@ -413,13 +472,11 @@ local function build()
 		Size = UDim2.fromOffset(40, 40),
 		AlwaysOnTop = true,
 	}, ui.ghost)
-	ui.mark = make("TextLabel", {
-		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
-		Font = Enum.Font.GothamBlack,
-		TextSize = 30,
-		TextStrokeTransparency = 0.3,
-	}, billboard)
+	-- The sheet-13 status icons: a green check or a red cross, with the words in
+	-- the palette's status line.
+	ui.markOk = Kit.Icon.new(billboard, { name = "Ok", rect = { 0, 0, 40, 40 }, icon = "check" }).root
+	ui.markBad = Kit.Icon.new(billboard, { name = "Bad", rect = { 0, 0, 40, 40 }, icon = "cross" }).root
+	ui.markBad.Visible = false
 end
 
 -- Opens or closes this panel (keys, and the on-screen navigation bar).

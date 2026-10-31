@@ -215,7 +215,10 @@ local function build()
 	local y = panel[2] + panel[4] + 16
 	for index, entry in legend do
 		if entry.icon then
-			Kit.Icon.new(v, { name = "LegendIcon" .. index, rect = { x, y + 2, 32, 32 }, icon = entry.icon, zIndex = 8 })
+			Kit.Icon.new(
+				v,
+				{ name = "LegendIcon" .. index, rect = { x, y + 2, 32, 32 }, icon = entry.icon, zIndex = 8 }
+			)
 		else
 			Kit.Picture.new(v, {
 				name = "LegendDot" .. index,

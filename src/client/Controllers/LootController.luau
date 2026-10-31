@@ -1,135 +1,156 @@
 -- Body looting (GDD §29.2) and the death summary (GDD §25.4). Interacting with a
--- body opens its contents; take items one by one while in range. After your own
--- death, a summary separates what dropped from what you kept. World place only.
+-- body opens its contents in a kit window; take items one by one while in range.
+-- After your own death, a kit notice card separates what dropped from what you
+-- kept. World place only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local LootController = {}
+
+LootController.SIZE = { 600, 560 }
+LootController.ROW_H = 64
 
 local player = Players.LocalPlayer
 local ui = {}
 local openBodyId = nil
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
+-- The catalog id of an item the server names only by its display name, when
+-- exactly one catalog item has that name (for its icon); nil otherwise.
+local byName = nil
+function LootController.CatalogIdFor(name: string?): string?
+	if byName == nil then
+		byName = {}
+		for catalogId, def in ItemCatalog.Items do
+			if type(def) == "table" and def.name then
+				byName[def.name] = if byName[def.name] == nil then catalogId else false
+			end
+		end
 	end
-	instance.Parent = parent
-	return instance
+	local found = name and byName[name]
+	return if type(found) == "string" then found else nil
+end
+
+-- One item row: the item's art, name, rarity and count, and an action button
+-- over the row's right end.
+function LootController.ItemRow(parent: Instance, order: number, w: number, entry, action: string, onAction)
+	local h = LootController.ROW_H
+	local holder = Kit.Core.Make("Frame", {
+		Name = "Item" .. order,
+		BackgroundTransparency = 1,
+		LayoutOrder = order,
+		Size = UDim2.fromOffset(w, h),
+	}, parent)
+	Kit.ListRow.new(holder, {
+		name = "Row",
+		rect = { 0, 0, w, h },
+		itemId = entry.catalogId or LootController.CatalogIdFor(entry.name) or entry.name,
+		title = entry.name,
+		subtitle = entry.rarity .. (if entry.permanent then " · Permanent" else ""),
+		value = if entry.quantity then "×" .. entry.quantity else nil,
+		trailing = 112,
+	})
+	Kit.Button.new(holder, {
+		name = action,
+		rect = { w - 14 - 112, (h - 42) / 2, 112, 42 },
+		label = action,
+		sizeClass = "s",
+		zIndex = 6,
+		onPress = onAction,
+	})
+	return holder
+end
+
+local function clear()
+	for _, part in ui.rows do
+		part:Destroy()
+	end
+	table.clear(ui.rows)
 end
 
 local function render(bodyId: string, entries)
 	openBodyId = bodyId
-	for _, child in ui.list:GetChildren() do
-		if not child:IsA("UIListLayout") then
-			child:Destroy()
-		end
-	end
+	clear()
+	local w = ui.listW
 	if #entries == 0 then
-		make("TextLabel", {
-			Text = "Nothing left.",
-			Size = UDim2.new(1, 0, 0, 24),
-			BackgroundTransparency = 1,
-			TextColor3 = Color3.fromRGB(220, 210, 196),
-			Font = Enum.Font.Gotham,
-			TextSize = 14,
-		}, ui.list)
+		table.insert(
+			ui.rows,
+			Kit.Text.new(ui.list, {
+				name = "Empty",
+				size = { w, 40 },
+				layoutOrder = 1,
+				text = "Nothing left.",
+				role = "muted",
+				align = "Center",
+			}).root
+		)
 	end
-	for _, entry in entries do
-		local text = entry.name .. (entry.quantity and (" ×" .. entry.quantity) or "") .. "  · " .. entry.rarity
-		local b = make("TextButton", {
-			Text = "Take: " .. text,
-			Size = UDim2.new(1, 0, 0, 30),
-			BackgroundColor3 = Color3.fromRGB(46, 38, 30),
-			TextColor3 = Rarity.Colors[entry.rarity] or Color3.fromRGB(240, 232, 220),
-			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = Enum.Font.GothamMedium,
-			TextSize = 13,
-		}, ui.list)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-		b.Activated:Connect(function()
-			local ok, success, reason = pcall(function()
-				return Remotes.Get("CorpseTake"):InvokeServer(openBodyId, entry.index)
+	for order, entry in entries do
+		table.insert(
+			ui.rows,
+			LootController.ItemRow(ui.list, order, w, entry, "Take", function()
+				local ok, success, reason = pcall(function()
+					return Remotes.Get("CorpseTake"):InvokeServer(openBodyId, entry.index)
+				end)
+				if not ok or not success then
+					ui.status:SetText("Could not take that (" .. tostring(reason) .. ")")
+				end
 			end)
-			if not ok or not success then
-				ui.title.Text = "Could not take that (" .. tostring(reason) .. ")"
-			end
-		end)
+		)
 	end
-	ui.panel.Visible = true
+	ui.panel.scroll:SetContentHeight(math.max(1, #entries) * (LootController.ROW_H + 6))
+	ui.status:SetText("")
+	ui.screen:Open()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Loot", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	-- Sized to the screen (up to 340×320), so the ✕ stays reachable on phones.
-	ui.panel = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.new(0.9, 0, 1, -24),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		Active = true,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(340, 320), MinSize = Vector2.new(260, 200) }, ui.panel)
-	make(
-		"UIPadding",
-		{ PaddingTop = UDim.new(0, 8), PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) },
-		ui.panel
-	)
-	ui.title = make("TextLabel", {
-		Text = "Body",
-		Size = UDim2.new(1, -40, 0, 24),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(255, 220, 170),
-		Font = Enum.Font.GothamBold,
-		TextSize = 15,
-	}, ui.panel)
-	local close = make("TextButton", {
-		Text = "✕",
-		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, 0, 0, 0),
-		Size = UDim2.fromOffset(28, 24),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.panel)
-	close.Activated:Connect(function()
-		ui.panel.Visible = false
+	local w, h = LootController.SIZE[1], LootController.SIZE[2]
+	ui.rows = {}
+	ui.screen = Kit.Screen.new("FlintbornLoot", { size = LootController.SIZE })
+	local window = Kit.Window.new(ui.screen, { title = "Body", icon = "bone" })
+	local body = window:Body()
+	local bw, bh = window.bodyRect[3], window.bodyRect[4]
+	ui.panel =
+		Kit.Panel.new(body, { name = "Contents", rect = { 0, 0, bw, bh - 44 }, variant = "inset", scroll = true })
+	ui.list = ui.panel:Content()
+	ui.listW = ui.panel.contentRect[3] - 14
+	ui.status = Kit.Text.new(body, {
+		name = "Status",
+		rect = { 4, bh - 38, bw - 8, 34 },
+		text = "",
+		role = "body",
+		color = "short",
+	})
+	ui.screen:Watch()
+	ui.screen.Closed:Connect(function()
 		openBodyId = nil
 	end)
-	ui.list = make("ScrollingFrame", {
-		Position = UDim2.fromOffset(0, 30),
-		Size = UDim2.new(1, 0, 1, -38),
-		BackgroundTransparency = 1,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(),
-		ScrollBarThickness = 6,
-	}, ui.panel)
-	make("UIListLayout", { Padding = UDim.new(0, 4) }, ui.list)
 
-	ui.summary = make("TextLabel", {
+	-- The death summary: centred, until the teleport to the lobby.
+	local gui = Theme.Make("ScreenGui", {
+		Name = "Loot",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
+	local holder = Theme.Make("Frame", {
+		Name = "Holder",
 		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
 		Position = UDim2.fromScale(0.5, 0.35),
-		Size = UDim2.fromOffset(460, 110),
-		BackgroundColor3 = Color3.fromRGB(30, 22, 20),
-		BackgroundTransparency = 0.1,
-		Active = true,
-		TextColor3 = Color3.fromRGB(255, 236, 220),
-		TextWrapped = true,
-		Font = Enum.Font.GothamBold,
-		TextSize = 16,
-		Visible = false,
+		Size = UDim2.fromOffset(w, 0),
 	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.summary)
+	Theme.FitHud(gui, Theme.Make("UIScale", { Name = "Fit" }, holder))
+	ui.summary = NoticeCard.new(holder, { name = "Summary", width = w, title = "You died", icon = "bone" })
+	ui.summary.frame.AnchorPoint = Vector2.new(0, 0.5)
+	ui.summary.frame.Active = true
+	ui.summary:SetTone("short")
 end
 
 function LootController.Start()
@@ -139,11 +160,12 @@ function LootController.Start()
 	build()
 	Remotes.Get("CorpseOpened").OnClientEvent:Connect(render)
 	Remotes.Get("DeathSummary").OnClientEvent:Connect(function(summary)
-		ui.summary.Text = ("You died.\n✕ Dropped and lootable: %d item(s) in your body (10 minutes)\n✓ Safe in vault: unchanged\n✓ Permanent: %d kept\nReturning to the lobby…"):format(
-			summary.dropped or 0,
-			summary.kept or 0
+		ui.summary:Show(
+			("Dropped and lootable: %d item(s) in your body (10 minutes)\nSafe in vault: unchanged\nPermanent: %d kept\nReturning to the lobby…"):format(
+				summary.dropped or 0,
+				summary.kept or 0
+			)
 		)
-		ui.summary.Visible = true
 	end)
 end
 

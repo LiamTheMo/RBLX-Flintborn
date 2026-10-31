@@ -9,7 +9,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
-local Layout = require(script.Parent.Parent.Hud.Layout)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -45,9 +44,10 @@ function NavController.Start()
 	if not PlaceConfig.IsLobby() and not PlaceConfig.IsWorld() then
 		return
 	end
-	-- The lobby HUD has its own navigation buttons (LobbyHudController), and the
-	-- world HUD its backpack button and MENU row (HudController).
-	if HudMode.ReplacesLobby() or (HudMode.ReplacesLegacy() and Layout.Get().menu ~= nil) then
+	-- The lobby HUD (LobbyHudController) and the world HUD (HudController) draw
+	-- these buttons as the Kit's menu tiles. This plain bar is only the fallback
+	-- for a place where those HUDs cannot build, so it must not depend on the Kit.
+	if HudMode.ReplacesLobby() or HudMode.ReplacesLegacy() then
 		return
 	end
 	local gui = make("ScreenGui", { Name = "Navigation", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))

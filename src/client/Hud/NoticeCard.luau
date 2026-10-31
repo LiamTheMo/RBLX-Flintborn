@@ -82,6 +82,7 @@ function NoticeCard.new(parent: Instance, opts)
 		text = opts.title or "",
 		role = "itemTitle",
 		textSize = 24,
+		caps = true,
 		scaled = true,
 		zIndex = 7,
 	})
@@ -98,7 +99,8 @@ function NoticeCard.new(parent: Instance, opts)
 	})
 	self.text = self.lines.root
 	if self.icon then
-		self.emblem = Kit.Icon.new(self.body, { name = "Emblem", rect = { PAD_X, PAD_TOP, ICON, ICON }, icon = self.icon })
+		self.emblem =
+			Kit.Icon.new(self.body, { name = "Emblem", rect = { PAD_X, PAD_TOP, ICON, ICON }, icon = self.icon })
 	end
 	if opts.onPress then
 		local press = Kit.Core.Make("TextButton", {
@@ -169,7 +171,8 @@ function NoticeCard:_layout()
 		if self.panel then
 			self.panel:Destroy()
 		end
-		self.panel = Kit.Panel.new(self.frame, { name = "Card", rect = { 0, 0, self.w, h }, variant = "card", zIndex = 2 })
+		self.panel =
+			Kit.Panel.new(self.frame, { name = "Card", rect = { 0, 0, self.w, h }, variant = "card", zIndex = 2 })
 	end
 end
 

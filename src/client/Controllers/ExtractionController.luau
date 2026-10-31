@@ -35,7 +35,7 @@ local function build()
 	}, player:WaitForChild("PlayerGui"))
 	-- The countdown list lives in the shared top-centre column with the other banners.
 	ui.list = NoticeCard.new(Theme.TopStack(), {
-		name = "Extraction",
+		name = "ExtractionList",
 		width = 500,
 		layoutOrder = Theme.TopOrder.Extraction,
 		title = "Extraction",

@@ -57,18 +57,23 @@ local function build()
 		DisplayOrder = 4,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, player:WaitForChild("PlayerGui"))
-	-- Left edge, mid-height: clear of the party frames above and the vitals below.
+	-- Bottom left, growing upwards: clear of the party frames and menu tiles above
+	-- and of the XP bar and hotbar to the right.
 	ui.root = make("Frame", {
-		Name = "Boosts",
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 16, 0.5, -40),
+		Name = "BoostList",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 16, 1, -20),
 		Size = UDim2.fromOffset(BoostHudController.WIDTH, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		Visible = false,
 	}, gui)
-	Theme.FitHud(gui, make("UIScale", { Name = "Fit" }, ui.root))
-	make("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }, ui.root)
+	ui.root.Parent = Theme.HudRoot(gui)
+	make("UIListLayout", {
+		Padding = UDim.new(0, 8),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		VerticalAlignment = Enum.VerticalAlignment.Bottom,
+	}, ui.root)
 	for order, kind in BoostRules.ORDER do
 		ui.rows[kind] = NoticeCard.new(ui.root, {
 			name = kind,

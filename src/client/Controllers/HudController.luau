@@ -168,25 +168,43 @@ end
 
 -- Scale and top inset ----------------------------------------------------------
 
--- How far the top regions move down so the Roblox top bar never covers them
--- (phones), in design px, as the lobby HUD does.
-function HudController.TopShift(insetDesignPx: number): number
+-- The regions pinned to the top edge, with their layout positions:
+-- {{object, base}}. They move down together below the Roblox top bar.
+function HudController.TopRegions(mounted)
+	local regions = {}
+	for _, object in
+		{
+			mounted.party.root,
+			mounted.compass.root,
+			mounted.vitals.root,
+			mounted.vitals.status,
+			mounted.objective.root,
+			mounted.event.root,
+		}
+	do
+		table.insert(regions, { object = object, base = object.Position })
+	end
+	return regions
+end
+
+-- Moves the top regions down so the Roblox top bar, reaching `insetDesignPx`
+-- into the screen, never covers them (phones), as the lobby HUD does. Returns
+-- the shift in design px.
+function HudController.PlaceTop(regions, insetDesignPx: number): number
 	local top = math.huge
-	for _, entry in tops do
+	for _, entry in regions do
 		top = math.min(top, entry.base.Y.Offset)
 	end
-	if top == math.huge then
-		return 0
+	local shift = if top == math.huge then 0 else math.max(0, math.ceil(insetDesignPx + HudController.TOP_GAP - top))
+	for _, entry in regions do
+		entry.object.Position = entry.base + UDim2.fromOffset(0, shift)
 	end
-	return math.max(0, math.ceil(insetDesignPx + HudController.TOP_GAP - top))
+	return shift
 end
 
 local function applyTop()
 	scale = uiScale.Scale
-	local shift = HudController.TopShift(Kit.Scale.TopInset(gui) / math.max(scale, 0.01))
-	for _, entry in tops do
-		entry.object.Position = entry.base + UDim2.fromOffset(0, shift)
-	end
+	local shift = HudController.PlaceTop(tops, Kit.Scale.TopInset(gui) / math.max(scale, 0.01))
 	-- While the HUD shows, banners in the shared top column start below the
 	-- compass and its waypoints; otherwise they keep their usual place.
 	local stack = Theme.TopStack()
@@ -522,32 +540,35 @@ function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
 	return region, tiles
 end
 
+-- Builds every HUD region into `parent` (a design-px root) and returns them:
+-- {party, compass, vitals, objective, event, bottom, tileRegion, tiles}.
+-- `open(entry)` runs a menu tile; the capture scenes build the HUD this way.
+function HudController.Mount(parent: Instance, hudLayout, open: (any) -> ())
+	local mounted = {}
+	mounted.party = PartyFrames.new(parent, hudLayout)
+	mounted.compass = Compass.new(parent, hudLayout)
+	mounted.vitals = Vitals.new(parent, hudLayout)
+	mounted.objective = ObjectivePanel.new(parent, hudLayout)
+	mounted.event = EventPanel.new(parent, hudLayout)
+	mounted.bottom = BottomBar.new(parent, hudLayout)
+	mounted.tileRegion, mounted.tiles = HudController.BuildTiles(parent, hudLayout.tiles, open)
+	return mounted
+end
+
+-- The live HUD's regions (nil before Start), for scenes and diagnostics.
+function HudController.Widgets()
+	return if gui then widgets else nil
+end
+
 local function build()
 	local controllers = script.Parent
 	gui, root = newGui("FlintbornHud", Kit.Tokens.Order("hud"))
 	gui.Enabled = false
-	widgets.party = PartyFrames.new(root, layout)
-	widgets.compass = Compass.new(root, layout)
-	widgets.vitals = Vitals.new(root, layout)
-	widgets.objective = ObjectivePanel.new(root, layout)
-	widgets.event = EventPanel.new(root, layout)
-	widgets.bottom = BottomBar.new(root, layout)
-	widgets.tileRegion, widgets.tiles = HudController.BuildTiles(root, layout.tiles, function(entry)
+	widgets = HudController.Mount(root, layout, function(entry)
 		-- Required on use: these controllers start after the HUD.
 		(require(controllers[entry[4]]) :: any)[entry[5]]()
 	end)
-	for _, object in
-		{
-			widgets.party.root,
-			widgets.compass.root,
-			widgets.vitals.root,
-			widgets.vitals.status,
-			widgets.objective.root,
-			widgets.event.root,
-		}
-	do
-		table.insert(tops, { object = object, base = object.Position })
-	end
+	tops = HudController.TopRegions(widgets)
 	gui.Parent = player:WaitForChild("PlayerGui")
 	Kit.Scale.Hud(gui, root)
 	uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
