@@ -104,6 +104,11 @@ local function dropPoint(node, from: Vector3): Vector3
 			table.insert(ignore, folder)
 		end
 	end
+	-- Nor on a boulder or trunk of the island's scenery.
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
+	end
 	for _, other in Players:GetPlayers() do
 		if other.Character then
 			table.insert(ignore, other.Character)

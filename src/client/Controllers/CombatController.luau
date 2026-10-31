@@ -345,6 +345,8 @@ local function updateHover(dt: number)
 		hover.billboard.Adornee = part
 		hover.highlight.Adornee = part:FindFirstChild(HarvestRules.LOOK_MODEL) or part
 		hover.press.Visible = touch
+		-- Only a tappable plaque takes input; with a mouse, a click on it still swings.
+		hover.billboard.Active = touch
 	end
 	local height = HarvestRules.LabelHeight(node.center.Y, node.half.Y, root.Position.Y) - node.center.Y
 	hover.billboard.StudsOffsetWorldSpace = Vector3.new(0, height, 0)
