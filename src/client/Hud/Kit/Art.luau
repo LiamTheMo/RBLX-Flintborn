@@ -526,8 +526,30 @@ Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_
 
 -- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>")
 -- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
--- recolours), glyph (prefer the flat glyph), z, name. Before upload it is its
--- glyph in ink.
+-- recolours), glyph (prefer the flat glyph), transparency, standInScale (the
+-- ink glyph's size as a share of the rect, 0.8), z, name. Before upload, or
+-- while its uploaded image is not served, it is its glyph in ink.
+local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
+	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
+	short = string.gsub(short, "^%a+_", function(prefix)
+		return if prefix == "ink_" or prefix == "white_" then "" else prefix
+	end)
+	short = string.gsub(short, "_white$", "")
+	local glyph = Core.Make("TextLabel", {
+		Name = opts.name or "Icon",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(rect[1], rect[2]),
+		Size = UDim2.fromOffset(rect[3], rect[4]),
+		Text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1)),
+		TextColor3 = Tokens.Color(opts.tint or "ink"),
+		TextScaled = true,
+		ZIndex = z,
+	}, parent)
+	glyph.FontFace = Tokens.Font("symbol")
+	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * (opts.standInScale or 0.8))))
+	return glyph
+end
+
 function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
 	local sprite = Art.IconSprite(id, opts.glyph)
@@ -549,22 +571,42 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 				image.ImageTransparency = opts.transparency
 			end
 		end
+		-- An image not loaded yet: its ink glyph stands in (after the grace, or at
+		-- once when the fetch failed) until the art arrives.
+		local imageId = Widgets.ImageId(sprite)
+		if imageId and SpriteLoader.State(imageId) ~= "loaded" then
+			local born = os.clock()
+			local glyph = glyphLabel(parent, sprite, id, rect, opts, z)
+			glyph.Name = (opts.name or "Icon") .. "StandIn"
+			local function update()
+				local ready = Art.ArtReady(imageId, born)
+				image.Visible = ready
+				glyph.Visible = not ready
+			end
+			local stop = SpriteLoader.OnState(imageId, update)
+			task.delay(Art.GRACE, function()
+				if image.Parent then
+					update()
+				end
+			end)
+			-- The glyph follows the image when its owner moves it (a button's
+			-- icon is placed after it is made).
+			for _, key in { "Position", "Size", "Visible" } do
+				if key ~= "Visible" then
+					image:GetPropertyChangedSignal(key):Connect(function()
+						(glyph :: any)[key] = (image :: any)[key]
+					end)
+				end
+			end
+			image.Destroying:Connect(function()
+				stop()
+				glyph:Destroy()
+			end)
+			update()
+		end
 		return image
 	end
-	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
-	local glyph = Core.Make("TextLabel", {
-		Name = opts.name or "Icon",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(rect[1], rect[2]),
-		Size = UDim2.fromOffset(rect[3], rect[4]),
-		Text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1)),
-		TextColor3 = Tokens.Color(opts.tint or "ink"),
-		TextScaled = true,
-		ZIndex = z,
-	}, parent)
-	glyph.FontFace = Tokens.Font("symbol")
-	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * 0.8)))
-	return glyph
+	return glyphLabel(parent, sprite, id, rect, opts, z)
 end
 
 -- The sprite (and optional Color3 tint) ItemInfo.Icon / ItemInfo.Sprite give a

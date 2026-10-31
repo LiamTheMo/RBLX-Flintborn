@@ -940,7 +940,13 @@ function Methods:Create(object, info, goal)
 end
 -- A scene may set __fetchStatus[content] = "AssetFetchStatus.Failure" etc.;
 -- everything else reads as loaded.
+-- __failImages = true (or {[content] = true}) makes every (or the listed)
+-- uploaded image report Failure: the "uploaded but not served" case, where the
+-- kit must fall back to its own stand-ins.
 function Methods:GetAssetFetchStatus(content)
+	if __failImages == true or (type(__failImages) == "table" and __failImages[content]) then
+		return __enum("AssetFetchStatus.Failure")
+	end
 	local statuses = __fetchStatus or {}
 	return __enum(statuses[content]) or __enum("AssetFetchStatus.Success")
 end
