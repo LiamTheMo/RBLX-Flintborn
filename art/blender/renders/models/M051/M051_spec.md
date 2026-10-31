@@ -867,3 +867,538 @@ All 12 recommendations are accepted.
     - Collision, stages 5 and 6 skipped, the budget cut order, and the names `RopeBridge*` with keys `m051_*`.
 
 **Walkability is binding.** Plank tilt is at most 17°. Steps between planks are at most 0.08. The only raised step is the 0.35 sill.
+
+## Stage 1 — Modelling (modeller, 2026-10-29)
+
+Builder `art/blender/kit/mcp/m051.py`. `build()` builds the seven parts and the hero, runs every check, renders and
+measures. It returns `audit`, `uv`, `materials`, `views`, `measure`, `contact`, `bury`, `winding`, `walk`, `levels` and
+`problems`. Constants are as in §2 (`L` 18, `W` 6, `STONE_TOP` 5.6, `POST_TOP` 11.0, `NP` 10, `PITCH` 1.40, `SAG` 1.10,
+`ROPE_LOW` 6.86). From M048 it imports only the geometry helpers `_box`, `_knob`, `_solid`, `_tri_ngons`, `_tube` and
+`winding_report`; no constants. Nothing comes from `m050.py`. Every piece is its own closed shell from explicit vertex
+lists, with no booleans and no unions.
+
+- **Anchor stones (4):** lofted rings, not convex hulls.
+  - Each stone has 9 points per ring, at z 0, 1.3, 3.8 and 5.35, plus the flat top at 5.6. The sides are quads between
+    the rings, and the top and bottom caps are centroid fans.
+  - A first version used convex hulls of jittered points. Collinear hull points gave zero-area faces and 2–3° slivers,
+    which dissolving and beautifying didn't remove. The loft has none (smallest corner 10.2° on the stone part).
+  - Shape as §2.2:
+    - the deck-side face is the vertical plane |x| 7.26 from 3.8 up, flaring to 6.8 at the ground;
+    - the cleft face is the leaning plane |y| 0.05 (top) → 1.3 (ground), so each pair has a 0.10 seam at the top and
+      the V gap below;
+    - the outer x face runs 12.0 → 12.85, and the outer y face 4.9 → 5.35;
+    - the outer top edges have a 0.25 chamfer, and the outer corner a 0.4–0.6 chamfer.
+  - **Facets:** two facet columns per outer face, each pushed out (+0.15–0.32) or in (−0.12–0.28) by one amount from
+    the ground to 3.8, and by 0.45× above. They give vertical ridges and grooves (the sheet's vertical facet breaks)
+    with broad flat faces between.
+  - **Deviation:** the outer base is 12.85 / 5.35 instead of 13.0 / 5.6. This leaves room for the spurs inside the
+    §1.1 extents of 27.2 × 12.0.
+- **Spurs (8, 2 per stone):** chunky 12-point hull blocks, 1.4–1.7 along the face, 1.0–1.3 tall and 0.78 deep, on the
+  ground against the outer x or outer y face. Each is pushed out by bisection until the two hulls overlap by exactly
+  0.03. The overlap is measured both ways on vertices, edge midpoints and face centres, because a stone corner can poke
+  into a spur face between its vertices. The first version measured spur vertices only and buried spur faces 0.09–0.13.
+- **Posts (4):** a 2.0 base block from z 5.58 to 6.70; a 1.6 shaft (sunk 0.02) stepping out to a 1.7 cap from 9.92 to
+  11.0 with a 0.10 chamfer; a flush dark 0.30 peg-hole square on the cap top. One shaft-and-cap shell of 44 tris.
+- **Coils (8):** two per post, centres at z 9.22 and 9.62, on a 16-point rounded square round the shaft (0.99 off the
+  axis on the flats, corners at 0.93 / 0.93). The section is a twisted **3-sided** tube (r 0.265, reading 0.40–0.46
+  thick), turned half a side per ring, with alternate rings 8 % thinner.
+  - How the coil got here, tried in renders of one post:
+    - the 5-sided 8-segment antiprism read as stacked flat plates;
+    - a 6-vertex three-ply star section turned one side per ring (8 segments) still read as plates, because the
+      segments were too long for the radius;
+    - 16 short segments: 3-sided read as a twisted wrapped rope, 4-sided as a twisted cord, 5-sided as a smooth ring.
+  - The final coil has the geometric twist the M048 ruling asked for, at 96 tris (the plan had 80).
+- **Cloth (4):** an L-shaped slab (0.08 thick, inner face sunk 0.01) round each post's −X and +Y faces, z 8.20–9.00.
+  Its caps are two quads each, so there are no sliver triangles. A knot lump sits on the −X face near the corner. Two
+  tapered tails with pointed feet hang to about z 6.9 and 7.25 (one on each face, 0.02 off the shaft).
+  - The band is taller than §2.6's 8.55–9.00, to bring the f34 red share up.
+  - The swallowtail foot became a point: the notch's concave cap gave 4.7° slivers.
+- **Brace sills (2):** x ±(8.5…9.5), y ±2.02 (sunk into the base blocks), z 5.58 → 5.95.
+- **Peg blocks (4):** x ±(7.31…8.02), y ±(2.30…3.20), z 5.58 → 6.38, with a 0.28 peg 0.10 proud at z 6.15 on the
+  span-facing face.
+- **Planks (10):** the U prism of §2.4 (1.15 wide, 0.80 body, 1.15 lugs, 6.2 long).
+  - The caps are ear-clipped into 6 triangles each (smallest corner 8.6°).
+  - A flush pale peg-dot square (0.26) sits in a frame on each lug's end face.
+  - Each plank's top centre sits on `z_top(x)`, pitched to the slope, with yaw ±0.4° and roll ±0.1°.
+  - **The end planks are pitched 0.55° steeper about their outer top edge.** That edge stays at 5.585, and the step
+    down to plank 2 drops from 0.083 to 0.068. With §2.4's ±1° / ±0.8° jitter the step was 0.083, over the binding
+    0.08.
+- **Main ropes (2):** y ±2.75, from (±8.0, 9.42) between the two coils, on the catenary through 6.87 at x 0.
+  - 5-sided twisted antiprism, Ø 0.45.
+  - 28 rings: the ends, two mid rings at ±6.45, and a knot collar at each hanger (rings ±0.2 at Ø 0.45 round a Ø 0.70
+    ring).
+- **Hangers (16):** at planks 2–9, y ±2.75, vertical from the lug top (knot bulge sunk 0.03) to 0.15 inside the
+  collar.
+  - Twisted 3-sided (r 0.16, reading 0.24–0.28 thick), 5 rings, lengths 2.21–2.54.
+  - **Deviation from §2.5's 4 sides:** the 4-sided twisted hanger's long segment made 4.8° sliver triangles. The 3-ply
+    hanger with a mid ring has none, is cheaper (26 tris against 28 / 36), and matches the coils.
+- **Diagonals (4):** from (±8.0, ±2.9, 9.1) in the lower coil down to the end plank's lug top, with a knot bulge. The
+  neck is at 0.45: at 0.36 it gave 4.9° slivers.
+- **Backstays (4):** from the lower coil's outer corner (±9.93, ±3.93, 9.22) to a 6 × 3 knob (r 0.30) sunk 0.03 into
+  the stone top at (±10.7, ±4.3). They clear the base blocks.
+- **Links (18) and end ties (4):** 3-sided, r 0.15, one segment.
+  - The links run lug face to lug face at |y| 2.65, mid-lug height, each end sunk 0.08.
+  - The end ties run from the end plank's lug top to the peg block's face at z 5.85. They clear the stone's top corner
+    by 0.064.
+- **Not built, as decided:**
+  - the rope across each end (decision 6; the check `rope_across_open_end` is 0);
+  - the stone socket hole (hidden under the post);
+  - the side peg in the hero (cut order 2; it is on the End Post part).
+- **Parts:**
+  - `RopeBridgeEndPost`: bare, with base block, shaft and cap, peg hole and side peg.
+  - `RopeBridgeBrace`.
+  - `RopeBridgePegBlock` (block and peg).
+  - `RopeBridgePlank`: one level plank.
+  - `RopeBridgeMainRope`: 8 long, with a collar near each end and Ø 0.6 knob ends.
+  - `RopeBridgeHangerRope`: 3.0 long, with three knots.
+  - `RopeBridgeAnchorStone`: the −X / −Y stone and its 2 spurs.
+- **Renders:**
+  - the seven default views;
+  - `f34_sheet (−20, 15)`, `r34_sheet (160, 22)`, `front_sheet (0, 0)`, `side_sheet (90, 0)`, `rear_sheet (180, 0)`
+    and `top_sheet (0, 89.9)`, all with the floor hidden;
+  - seven part shots;
+  - `exploded`: per end, two stones pulled apart, the posts lifted, the brace and peg block, the planks in a row, and a
+    main rope with hangers above;
+  - `scale`: 5.5 markers at mid-span, on the +X end plank, on the −X stone top between the brace and the deck, and on
+    the ground;
+  - close-ups `junc_cu`, `plank_cu`, `under_cu`, `rope_cu`, `knot_cu`, `cloth_cu`, `stone_cu` and `end_cu` (the open
+    walk-on end);
+  - all of them together in `M051_views.png`.
+- **Lens probe:**
+  - **f34**, lens 1.8 / 3 / 6× by az −20 / −25 by e 12 / 15 / 20. At (−20, 15) and 6× the W : H is 1.855 (sheet
+    1.894), so `LENS` is 6× for both three-quarters.
+  - **r34**, az 155 / 160 / 165 by e 18 / 22 / 25. At (160, 18) the W : H was 1.76, outside the spec's 1.53–1.69 band,
+    so the r34 moved to **(160, 22)**: W : H 1.68.
+  - The level orthos use 8×.
+
+## Stage 2 — Optimisation and cleanup
+
+Final build, run in a freshly restarted session (port 9880):
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| `RopeBridge` | **3896 / 4000** | 27.41 × 12.33 × 11.00 | 116 |
+| `RopeBridgeEndPost` | 68 | 2.00 × 2.00 × 5.42 | 3 |
+| `RopeBridgeBrace` | 12 | 1.00 × 4.04 × 0.37 | 1 |
+| `RopeBridgePegBlock` | 24 | 0.81 × 0.90 × 0.80 | 2 |
+| `RopeBridgePlank` | 44 | 1.15 × 6.20 × 1.15 | 1 |
+| `RopeBridgeMainRope` | 154 | 8.52 × 0.64 × 1.12 | 3 |
+| `RopeBridgeHangerRope` | 68 | 0.41 × 0.40 × 3.00 | 1 |
+| `RopeBridgeAnchorStone` | 130 | 6.80 × 6.11 × 5.60 | 3 |
+
+- **Hero tris by kind:**
+  - stone: 12 shells, 520 tris (4 stones × 90, 8 spurs × 20);
+  - wood: 24 shells, 736 tris (4 × 56 posts, 2 × 12 braces, 4 × 12 peg blocks, 10 × 44 planks);
+  - peg: 4 shells, 48 tris;
+  - cloth: 16 shells, 256 tris;
+  - rope: 60 shells, 2336 tris (coils 768, main ropes 552, hangers 416, backstays and knobs 240, diagonals 184, links
+    144, ties 32).
+- **Budget:** the first full build was 4032. Two changes brought it down:
+  - the hangers went to the plan's ring count, then to 3-ply;
+  - the links and ties went to 3-ply.
+
+  It is now under 3900, so no cut-order item was needed. The side peg stays off the hero and on the part (cut 2).
+- **Every object:**
+  - zero non-manifold edges, bowtie verts, boundary, wire or loose elements, zero-area faces, n-gons and duplicate
+    verts;
+  - normals outward, transforms applied, 0 bowties fixed;
+  - hero origin at the bbox bottom centre (offset −0.002, 0.005, 0);
+  - smallest corner 5.03° on the hero (no face under 5°).
+- **Winding:** 0 errors and 0 unpaired edges on every object (directed-edge check). Per shell (`m040.shells_report`):
+  0 self-hits, 0 inverted faces, all volumes positive, no mixed-material shell.
+- **Contact (tol 0.03):** 0 floating and 0 unchained shells on the hero, post, peg block, main rope and stone parts.
+  The chains:
+  - stones → ground; spurs → stones; base blocks → stones; shafts → base blocks;
+  - coils and cloth → shafts; main ropes → coils; hangers → collars and lugs;
+  - planks → hangers, diagonals and links; ties → peg blocks → base blocks;
+  - backstays → coils and knobs → stones.
+- **Buried (`bury_report`, ray parity per shell, against stated sink + 0.05):** 0 over the limit and 0 fully hidden.
+  Worst depths:
+
+  | Pair | Depth | What it is |
+  | --- | --- | --- |
+  | spur in stone | 0.03 | the spur seat |
+  | rope in wood | 0.131 | the coils at the shaft corners |
+  | rope in rope | 0.15 | rope ends inside the coils and collars |
+  | rope in stone | 0.03 | the knobs |
+  | cloth in wood | 0.01 | the wrap |
+  | peg in wood | 0.03 | the pegs |
+  | wood in stone | 0.02 | the base blocks, braces and peg blocks |
+
+- **Levels:**
+
+  | Item | Measured |
+  | --- | --- |
+  | Stone tops | 5.600 ×4 |
+  | Post tops | 11.00 ×4 |
+  | Base blocks | 5.58–6.70 |
+  | Coils | 9.22 / 9.62 |
+  | Main-rope low | 6.869 (target 6.86 ± 0.05) |
+  | Deck mid top | 4.511 (4.50 ± 0.03) |
+  | End planks' top outer edges | 5.585 |
+  | Brace top | 5.95 |
+  | Hanger lengths | 2.21–2.54 |
+
+- **Walk (binding):**
+
+  | Item | Measured |
+  | --- | --- |
+  | Plank tilt | 16.89 / 12.85 / 9.25 / 5.58 / 1.87° (max **16.89 ≤ 17**) |
+  | Steps between planks | 0.068 / 0.061 / 0.039 / 0.021 / 0.006 / 0.023 / 0.040 / 0.057 / 0.066 (max **0.068 ≤ 0.08**) |
+  | Gaps | 0.234–0.288 |
+  | End step from the stone top | 0.013–0.016, across 0.40–0.42 gaps |
+  | Sill | **0.35** |
+  | Clear width | 4.0 between the base blocks, 4.4 between the shafts |
+  | Rope across an end | none |
+
+- **Extents:** 27.41 × 12.33 against §1.1's 27.2 × 12.0 with spurs (tolerance ±0.4).
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, `ANGLE_BASED`, margin 0.008) then `m012._uv_unfold` (2 faces cut free on the hero).
+
+| Object | Islands | Overlaps | Flipped | Min gap | Border | Density | Conformal p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `RopeBridge` | 2066 | 0 | 0 | 0.016 | 0.008 | 0.999 / 1.0 / 1.0 | 1.00 |
+| Parts | 6–67 | 0 | 0 | 0.016 | 0.008 | 1.0 | ≤ 1.027 |
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration** (`m051.calibrate()`, the `K.calibrate` dome, 6 iterations, starting from M048's palette):
+
+| Key | Target | Dome-calibrated | Final in `PALETTE` | Why changed |
+| --- | --- | --- | --- | --- |
+| `wood` | `#D87E34` | `#AC6C33` | **`#B66D2A`** | f34 plank tops were under-saturated (`#CD7C3B`); linear-ratio correction |
+| `wood_deep` | `#9D4D18` | `#804518` | **`#894315`** | front posts were 16 dark, f34 posts too yellow; averaged |
+| `wood_dark` | `#6E3514` | `#5C3014` | `#5C3014` | |
+| `rope` | `#F8C46A` | `#CEA261` | `#CEA261` | |
+| `rope_dark` | `#C8761F` | `#A16720` | `#A16720` | |
+| `peg` | `#F2CC80` | `#C0A870` | `#C0A870` | |
+| `cloth` | `#B42411` | `#8F2210` | `#8F2210` | |
+| `stone` | `#BCB5B0` | `#9B9A9D` | **`#ABA5A2`** | faces 12–20 dark and too neutral against the sheet's warm grey |
+| `stone_mid` | `#939398` | `#767A85` | `#767A85` | |
+
+**Finish:**
+- wood: rough 0.85 (dark 0.9), metal 0, low specular;
+- rope: rough 0.95, low specular;
+- peg: rough 0.55;
+- cloth: rough 0.9, low specular;
+- stone: rough 0.92, low specular.
+
+**Colour is by role and position, never by facing.** The builder selects no paint by a face normal (normals are used
+only for winding and tube frames). `K.check` baked-shading correlation: hero 0.07, plank part 0.22, main rope part
+0.25, the others 0.
+- **Planks:** `wood`.
+  - Planks 3 and 8 are 15 % `wood_deep`; planks inside a broad noise field along x are 10 % toward `peg` (a lighter
+    field).
+  - **Lug faces** (lug bottoms, inner walls, cap lug triangles and end-face frames) are 50 % `wood_dark`, by position.
+    That is up from §5.5's 35 %, because the f34 lug sides were 38 lighter than the sheet's.
+  - The peg dots are `peg`.
+  - Per-plank Tint ±0.03, plus `K.texture` 0.02.
+- **Posts:** `wood_deep`. The base blocks are 15 % `wood_dark`, the peg holes `wood_dark`, the brace 10 % `wood_dark`
+  and the peg blocks `wood_deep`. Tint ±0.03, texture 0.03.
+- **Stones:** `stone`, with `stone_mid` by height:
+  - 40 % on the ground band (faces centred below 1.2), 15 % on the 1.3–3.8 band, none above;
+  - 30 % in the cleft (|y| < 1.0);
+  - spurs 50 %;
+  - Tint ±0.03 per stone, plus a broad noise field at 0.03 (scale 0.15).
+- **Rope strands are chosen by index round the twist (decision 8):**
+  - the main ropes, diagonals and backstays (5 strands) have gold `rope` on 1, a blend on 1 (60 % toward amber) and
+    `rope_dark` on 3;
+  - the coils (3 strands) have gold 1, blend 1 and amber 1;
+  - the hangers, links and ties are blend and amber only.
+  - **Why:** a probe recoloured each rope family.
+    - With gold on the thin ropes too, the f34 gold share was 4.3; without it, 2.6. Coil gold is worth 1.0 and
+      main-rope gold 1.4.
+    - With 2 of 5 golden on the main ropes it was 5.7, and before calibration 9.7.
+    - The blend strand stays amber-side (hue < 36°, class W), as the sheet's amber strands do.
+- **Cloth:** `cloth`, Tint 0.95–0.97 on the tails and knot.
+
+**Re-measured** on the final renders against the sheet (study masks, floor hidden):
+
+| View | W : H ours (sheet) | W | K | Y | R | S | Top-profile error mean |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **f34 (−20, 15)** | **1.839 (1.894)** | 23.7 (22.6) | 25.3 (23.8) | **2.8 (2.8)** | 1.0 (1.7) | 47.2 (49.0) | 0.079 |
+| r34 (160, 22) | 1.683 (1.61) | 23.1 (21.8) | 25.3 (23.4) | 2.5 (2.9) | 2.1 (1.6) | 47.0 (50.3) | 0.058 |
+| front (0, 0) | 2.459 (2.431) | 13.2 (19.0) | 28.7 (19.4) | 2.6 (4.4) | 0.3 (0.1) | 55.1 (57.2) | 0.059 |
+| side (90, 0) | 1.102 (1.016) | 3.3 (26.3) | 28.7 (21.0) | 0.4 (1.8) | 0.4 (0.0) | 67.2 (50.9) | 0.126 |
+| rear (180, 0) | 2.453 (1.984) | 11.7 (19.8) | 28.0 (15.6) | 2.6 (3.7) | 2.7 (3.6) | 55.0 (57.4) | 0.085 |
+| top | 2.226 (2.096) | 46.7 (41.5) | 6.9 (20.7) | 1.9 (0.7) | 0.0 (0.0) | 44.5 (37.2) | — |
+
+- **f34 medians** (ours against the sheet's regions):
+  - W `#CA7E32` against plank tops `#DA7E31`;
+  - K `#954214` against post faces `#9D4A16`;
+  - Y `#F5B765` against `#F4C26A`;
+  - R `#922011` against `#98200F`;
+  - S `#BCB1A8` against faces `#C1B7AF`.
+- **f34 Y fifths:** 0 / 5.1 / 21.4 / 61.9 / 11.5 (sheet 0 / 0.6 / 28.8 / 56.5 / 14.2; each within ±10).
+- **Region samples** (`region_report()`, 5 × 5 medians at build-frame points):
+
+  | Region | Ours | Sheet | Max channel diff |
+  | --- | --- | --- | --- |
+  | f34 plank tops (24 points) | `#D67F32` (28°, 0.77, 0.84) | `#DA7E31` | **4** |
+  | f34 cap top | `#AF5224` | `#A6521C` | 9 |
+  | f34 post faces | `#AB6627` | `#9D4A16` | 27 (lit side brighter) |
+  | front post face | `#984212` | `#9D4D17` | 11 |
+  | front lug ends | `#974F20` | `#9D4B1B` | 6 |
+  | f34 stone faces | `#B9AEA5` | `#C1B7AF` | 10 |
+  | front stone faces | `#BAAFA6` | `#B9B1AC` | 6 |
+  | f34 stone tops | `#D7CABF` | `#F3E8DB` | 29 (the sheet's lit tops are near white) |
+  | f34 lug sides | `#934D1E` | `#6B3413` | 39 (the sheet's −X lug sides are in shade) |
+
+  The `cloth` region sample lands on the post at that angle. Use the R median instead.
+- **Hue checks:** wood 20–28° everywhere (not red, not tan; plank-top R − G is 87); rope 33–40°; cloth 4–8°; stone
+  hue 28°, sat 0.11 (warm light grey) with cool `stone_mid` low down.
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no emissive part, glow or light, so there are no emissive faces and no lights. To check in Studio
+(Requires Manual Validation):
+- the planks read warm orange (not red), the posts a little deeper, the stones light warm grey with cool shade;
+- the rope reads golden over amber, and the cloth deep red;
+- a character walks from a 5.6 surface onto a stone top, over the 0.35 sill, down the sagging deck and up the other
+  side without jumping (precise collision on the hero). The main ropes are hip-height hand-lines, not a guard.
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect, water or foam. The hero has no sockets, and `checks()` flags any.
+
+## Modeller's notes for the verifier
+
+- **Rebuild:**
+  `import importlib, kit_models, m051; importlib.reload(kit_models); importlib.reload(m051); m051.build()`.
+  - `m051.measure_views()` gives the study-mask shares, and `m051.region_report()` the region samples.
+  - `m051.walk_report()`, `m051.bury_report(o)` and `m051.levels_report(h)` cover the binding checks. Run them after a
+    `build()`: they read `PLANK_INFO` and `GEO`.
+- **Decisions followed:** 1–12 as written. Known deviations:
+  1. **Stone bases** are 12.85 / 5.35 instead of 13.0 / 5.6, so the chunky spurs stay near §1.1's 27.2 × 12.0. The hero
+     is 27.41 × 12.33 (tolerance ±0.4).
+  2. **The end planks are pitched 0.55° steeper** (16.89°) about their outer top edge, and the jitter is ±0.4° yaw
+     and ±0.1° roll. This keeps the binding step limit: 0.068 against 0.083 with §2.4's jitter.
+  3. **Rope geometry:**
+     - the coils are 16-segment twisted **3-sided** tubes (spec: 5 sides × 8, twisted). The 5-sided and 6-ply 8-segment
+       versions read as stacked plates (see Stage 1). The coils are 96 tris each.
+     - the hangers, links and ties are 3-sided (spec: 4). The 4-sided hanger made slivers, and the coils, hangers and
+       links now share one twisted 3-ply look.
+  4. **Gold is 1 of 5 strands** on the main ropes and backstays, 1 of 3 on the coils, and 0 on the thin ropes
+     (decision: "only 2 of 5–6"). This was set by the f34 gold-share probe: f34 Y 2.8 against 2.8.
+  5. **Lugs** are 50 % `wood_dark` instead of 35 %. **Cloth** is z 8.20–9.00 instead of 8.55–9.00. The **swallowtail
+     tails** have a pointed foot.
+  6. **The r34 camera** is (160, 22) instead of (160, 18), to bring W : H inside the spec band.
+  7. **Not modelled:** the rope across the ends (decision 6, a deliberate miss in the f34, side and top cells), the
+     stone socket hole, the hero side pegs (cut order 2), plank grain lines, and the post split line (§3.7).
+- **Known misses (lighting, not paint):**
+  - **front / side / rear W and K:** the studio lights the −Y, +X and +Y faces less than the sheet does. For example,
+    the side cell is W 3.3 against 26.3, but the K median `#71310C` is still in the wood family.
+  - **top S 44.5 against 37.2:** the stone tops are broad in plan, and the sheet's top cell crops its pale tops into B.
+  - **f34 R 1.0 against 1.7:** inside ±1.0. The L-wrap's −X faces are seen at a grazing angle from (−20, 15), and the
+    sheet's f34 draws the cloth round the far faces too. This follows decision 9.
+  - **f34 top-profile error 0.079 mean:** the sheet's f34 perspective draws the left posts lower (§3.1). W : H and
+    every share are in band.
+- **Judge the rope by eye** in `junc_cu`, `cloth_cu`, `rope_cu` and `plank_cu`: the coils are twisted rope rings, not
+  faceted collars; the main ropes are twisted 5-sided tubes with fat knot collars; the hangers are twisted 3-ply with
+  knot bulges seated on the lugs.
+
+## Verification round 1 (verifier, 2026-10-29)
+
+A fresh verifier ran this round read-only on `wip/M051_verify.blend` (port 9880). It ran no `build()`, edited no builder and saved
+nothing. Every number below comes from the verifier's own bmesh/BVH code, not from the builder's reports. Renders and
+scripts are in the scratchpad `m051_verify/`. Each render was compared with the matching sheet cell and measured with the
+study's `measure_render.py` (paper `#F2E8D9`).
+
+### Measured
+
+| Object | Tris | Size | Shells | Non-manifold / boundary / wire / loose | Bowties | Winding (dup. directed / unpaired) | Zero-area / n-gons | Self-hits in shell | Inward faces (tri parity) | Min corner | Origin offset |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `RopeBridge` | **3896 / 4000** | 27.41 × 12.33 × 11.00 | 116 | 0 / 0 / 0 / 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 5.03° | 0, 0, 0 |
+| `RopeBridgeEndPost` | 68 | 2.00 × 2.00 × 5.42 | 3 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 45° | 0 |
+| `RopeBridgeBrace` | 12 | 1.00 × 4.04 × 0.37 | 1 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 90° | 0 |
+| `RopeBridgePegBlock` | 24 | 0.81 × 0.90 × 0.80 | 2 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 90° | 0 |
+| `RopeBridgePlank` | 44 | 1.15 × 6.20 × 1.15 | 1 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 8.6° | 0 |
+| `RopeBridgeMainRope` | 154 | 8.52 × 0.64 × 1.12 | 3 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 9.3° | 0 |
+| `RopeBridgeHangerRope` | 68 | 0.41 × 0.40 × 3.00 | 1 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 23.8° | 0 |
+| `RopeBridgeAnchorStone` | 130 | 6.80 × 6.11 × 5.60 | 3 | 0 | 0 | 0 / 0 | 0 / 0 | 0 | 0 | 10.2° | 0 |
+
+Every shell has positive volume, and transforms are applied on every object. There are no modifiers or custom normals,
+each object has one `UVMap` and a CORNER `Tint` attribute. A parity test on the untriangulated quads first flagged 48
+"inward" faces. They come from 104 non-planar quads (worst deviation 0.079, on the stones). On the triangulated mesh
+there are **0** inward faces.
+
+Hero shell census: stone 12 (4 stones and 8 spurs); wood 24 (4 base blocks, 4 shafts, 2 braces, 4 peg blocks and 10 planks);
+peg 4; cloth 16; rope 60 (8 coils, 2 main ropes, 16 hangers, 4 diagonals, 4 backstays, 4 knobs, 18 links and 4 ties).
+
+**Contact** (tolerance 0.03, with BVH overlap or proximity, chained from the ground): **floating 0, unchained 0** on the
+hero, post, peg block, main rope and stone parts. No shell is fully hidden.
+
+**Buried** depth was measured by nearest-normal plus 7-ray parity, as the deepest point of each shell inside another:
+
+| Pair | Measured | Stated sink | Limit (sink + 0.05) |
+| --- | --- | --- | --- |
+| Spur in stone | 0.025 | 0.03 | 0.08 |
+| Base block, brace or peg block in stone | 0.02 | 0.02 | 0.07 |
+| Knob in stone | 0.03 | 0.03 | 0.08 |
+| Peg in wood | 0.03 | 0.03 | 0.08 |
+| Cloth in wood | 0.01 | 0.01 | 0.06 |
+| Links in lugs | 0.082–0.089 | 0.08 | 0.13 |
+| Hanger tops in collars | 0.125–0.137 | 0.10 (0.15 in builder) | 0.15 |
+| End ties in peg blocks | 0.108–0.119 | 0.08 | 0.13 |
+| Backstays in coils | 0.137–0.148 | "sunk" | — |
+| Backstay ends in knobs | 0.205 | (end inside knob) | — |
+| **Lower coil in shaft** | **0.075** | 0.02 | 0.07 (+0.005) |
+| **Upper coil in shaft** | **0.106** | 0.02 | 0.07 (+0.036) |
+| **Diagonal foot in end-plank lug** | **0.128–0.131** | 0.03 | 0.08 (+0.05) |
+
+**Levels:**
+
+| Item | Measured |
+| --- | --- |
+| Stone tops | 5.600 ×4 |
+| Post centres | (±9.0, ±3.0) |
+| Shafts and caps | 6.68 → 11.00 |
+| Braces | x ±(8.5…9.5), y −2.03…2.01, z 5.58 → 5.95 |
+| Peg blocks | x ±(7.31…8.02), 5.58 → 6.38 |
+| Main-rope centre at x 0 | 6.875 (bottom 6.653, Ø 0.45; collars Ø 0.70) |
+| Deck top at mid-span | 4.512 |
+| End planks' outer top edges | 5.583–5.585 at \|x\| 6.86 |
+| Plank to stone clearance | 0.065 |
+
+**Walkability** (binding), measured on the mesh:
+- Plank tilts: 16.89 / 12.85 / 9.25 / 5.58 / 1.87° (max **16.89 ≤ 17**).
+- Steps between plank top edges across \|y\| ≤ 2: max **0.052 ≤ 0.08**.
+- Gaps: 0.219–0.271.
+- End step from the stone top: 0.015.
+- No geometry above z 6.0 over the end walk (\|y\| ≤ 1.6, \|x\| 7.3–12.2), so **no rope crosses either end**.
+
+**Character walk:** a 2.0 (y) × 1.0 (x) × 5.5 box was stepped 0.1 at a time from x −11.5 to +11.5 in lanes y −0.7, 0
+and +0.7 (box out to \|y\| 1.7). The floor was found by downward rays.
+- The largest step up or down is **0.35**, at the sill only. The floor runs 5.60 → 5.95 → 5.56 … 4.51 … 5.56 → 5.95 → 5.60.
+- **0 collisions** in the box above floor + 0.36 in any lane.
+- Clear width: 4.0 between the base blocks and 3.49 between the coils at head height. Both ends are open.
+
+**Shares** (study masks; sheet in brackets):
+
+| View | W : H | W | K | Y | R | S |
+| --- | --- | --- | --- | --- | --- | --- |
+| **f34 (−20, 15), 6×** | **1.840** (1.894) | 22.6 (22.6) | 26.4 (23.8) | 3.1 (2.8) | 1.0 (1.7) | 46.8 (49.0) |
+| r34 (160, 22) | 1.681 (1.61; band 1.53–1.69) | 22.4 | 26.0 | 2.8 (2.9) | 2.3 (1.6) | 46.5 |
+| r34 (160, 18) | 1.766 | 21.0 | 26.8 | 2.6 | 2.3 | 47.2 |
+| front | 2.457 (2.431) | 12.1 | 30.6 | 3.0 (4.4) | 0.4 (0.0) | 54.0 (57.2) |
+| side | **1.104** (1.016 ± 0.08) | 3.5 | 28.5 | 0.4 | 0.5 | 67.1 |
+| rear | 2.457 (1.984) | 11.7 | 28.7 | 2.8 | 3.0 (3.6) | 53.8 |
+| top | 2.222 (2.096) | 47.5 | 6.7 | 2.2 | 0.0 | 43.6 |
+
+- Every f34 share is within the binding ±4. The largest gap is K +2.6.
+- f34 Y fifths: 0 / 5.7 / 21.8 / 60.8 / 11.7. The sheet's are 0 / 0.6 / 28.8 / 56.5 / 14.2, so each is within ±10.
+
+**Colour** (f34 medians against the sheet):
+
+| Class | Ours | Sheet | Note |
+| --- | --- | --- | --- |
+| W | `#CC8033` (30°) | plank tops `#DA7E31` | |
+| K | `#944117` (20°) | posts `#9D4A16` (23°) | |
+| Y | `#F7B966` | `#F4C26A` | |
+| R | `#921F11` (6.5°) | `#98200F` | |
+| S | `#BBAFA8` (warm, sat 0.10) | `#C1B7AF` | |
+
+- Wood is in the M048/M050 family: `wood #B66D2A` / `deep #894315` against M048's `#BB722E` / `#88491A`. It is never red.
+- The rope's Y share is 3.1 against 2.8, so there is no gold excess. The amber strands carry most of the rope.
+- `K.check` reports no problems, and `kit_baked_shading` is 0.07.
+- **Facing correlation** (own code, normal z against material × Tint luminance): hero all faces 0.07; wood 0.10; rope −0.04;
+  plank part 0.22; main rope part 0.23; post part −0.02.
+  - Stone is 0.47 (bottoms excluded), and 0.56 in the 1.4–5.5 band. The cause is position, not facing: the spec's cleft rule
+    (\|y\| < 1.0, 30 % `stone_mid`) lands on the leaning cleft faces, which point downward.
+  - A grep of the builder finds **no paint selected by a normal**. `_stone_colour` uses the face centre's z and \|y\|. The
+    normals are used only in winding, tube frames, spur placement and `walk_report`.
+- **No lighting, VFX or water:** no emissive materials, no lights, no children or sockets, no water or foam keys.
+
+### Shape against the sheet
+
+| Area | What the renders show | Result |
+| --- | --- | --- |
+| Overall | Front, rear and top match their cells' composition. The f34 and r34 read as the sheet's: two stone pairs, four posts with coils, the swooping main ropes with the hanger fence, ten tilted lug planks and backstays. | Good |
+| Anchor stones | Four faceted, tapered, flat-topped blocks with vertical facet columns and chamfered outer top edges. Not eggs. The side view shows the V gap with a 0.10 seam at the top. | Good |
+| Posts | A wider base block, a cap block a step wider with a dark peg hole, and a visible cap line in the close-ups. | Good |
+| Coils | Two twisted 3-ply wraps per post: twisted and two distinct wraps, not smooth octagon collars. | Minor 1 |
+| Cloth wraps | An L-wrap with tails on −X / +Y. Red shows in the rear and r34 (R 3.0 / 2.3) and on all four posts' far faces in the f34. Front 0.4, side 0.5. | Good |
+| Backstays | Run to knobs on the stone tops. | Good |
+| Main ropes | Sag to 6.875 between the coils, with fat collars at each hanger. | Good |
+| Hangers | 16, twisted, with bulges seated on the lugs. | Good |
+| Diagonals | 4, to the end planks. | Good |
+| Links | 18 between the lugs. | Good |
+| Planks | 10 tilted planks with deep end lugs and pale peg dots. They read like the plank close-up. | Good |
+| Sill and peg blocks | The sill and the four peg blocks are present. | Good |
+| Underside | Matches cell 7 in content. | Good |
+
+### Findings
+
+1. **minor** (the claimed deviation, judged acceptable): **the coils read as jagged diamond-faceted bands** in the f34, `c_junc` and
+   `c_coil`, where the sheet draws two round, fat rope wraps with strand grooves. They are clearly twisted rope rings,
+   not flat octagon collars, so this is not the M048 failure. The 3-sided choice is accepted.
+   - **Fix target (polish):** soften the facets. Raise the coil `pinch` or ring count, or try 4 sides × 20 segments
+     (≤ 100 tris each), so each wrap reads rounder.
+2. **minor:** **the upper coils sit 0.106 into the shaft and the lower ones 0.075**, against the stated 0.02 sink (limit
+   0.07). Most of each coil is visible, so nothing is hidden.
+   - **Fix target:** move `COIL_D` / `COIL_C` out by about 0.04 at the upper ring (or both rings). Otherwise, record the
+     coil sink as 0.10 in §6.
+3. **minor:** **the diagonal feet sink 0.13 into the end-plank lugs** (stated 0.03). The knot bulge still shows.
+   - **Fix target:** end the diagonal path 0.08 higher (`diagonal()` contact point), or record the sink.
+4. **minor: the stone spurs are small pointed shards.** The sheet's f34, exploded view and key draw chunky, cube-like
+   loose blocks at the stone feet (up to about a quarter of the stone height). In the top view the spurs also read as
+   detached pebbles.
+   - **Fix target:** make the spurs blockier (fewer, flatter-topped hull points) and taller, 1.4–1.8. Check the overlap
+     again afterwards.
+5. **minor: the stones' cool lower tone sits in hard horizontal bands.** It is 40 % below z 1.2 and 15 % to 3.0,
+   visible as stripes in `c_stone`. Spec §5.5 asked for a 3-step blend to z 2.2.
+   - **Fix target:** use `K.blend` steps across 1.2–2.2.
+6. **minor: the side view W : H is 1.104**, against 1.016 ± 0.08 (0.008 over). The side view's W / K split (3.5 / 28.5
+   against 26.3 / 21.0) is the studio lighting on the +X faces, as the notes say. The K hue is still in the wood family.
+7. **minor: the `RopeBridgePegBlock` part** has one peg and no top peg hole. The key draws a hole on top and pegs on two
+   faces.
+   - **Fix target:** add the top inset, and optionally a second peg (+20 tris).
+8. **minor: 104 non-planar quads** on the hero (worst 0.079, on the stone loft rings). They are not a defect in Blender.
+   The exporter or Roblox's triangulation may pick the other diagonal, which changes the facet shading a little.
+   - **Fix target (optional):** triangulate the stone sides at build time.
+9. **noted, not a finding:**
+   - The r34 at e 22 is accepted. It puts W : H inside the spec's band; e 18 gives 1.766.
+   - Gold on 1 of 5 strands on the main ropes, diagonals and backstays and 1 of 3 on the coils is accepted. The decision
+     said 2 of 5–6, but the f34 Y share of 3.1 against 2.8 shows the change avoided a gold excess.
+   - The end planks 0.55° steeper is accepted. Tilt is 16.89 ≤ 17, and the step limit holds.
+   - The smaller stone bases (12.85 / 5.35) are accepted. The extents are 27.41 × 12.33, within ±0.4 of 27.2 × 12.0.
+
+### Decisions check
+
+1. Size and levels: followed.
+2. Long axis X, symmetric except the cloth: followed.
+3. Four stones with a 0.10 seam and the V gap: followed.
+4. Builder constants: followed.
+5. Sill 1.0 × 0.37, a 0.35 step: followed.
+6. **No rope across the ends:** followed; 0 hits over the end walk. This is a known miss against the f34, side and top
+   cells, and it is recorded.
+7. 10 planks, 8 hangers a side, 4 diagonals and 18 links: followed.
+8. Twisted rope everywhere; coils not under 5 sides: the coils are **3-sided**. This is the modeller's justified deviation,
+   and it is judged acceptable (finding 1). Gold by strand index: followed.
+9. L-wrap cloth `#8F2210`, rendering `#921F11`: followed.
+10. Bare End Post: followed.
+11. Only M048 geometry helpers imported, nothing from `m050`: followed.
+12. Colour by role and position, closed shells, 0 floating, 0 winding errors, names `RopeBridge*` / `m051_*`, collision
+    precise / hull / box / none, stages 5 and 6 skipped: followed.
+
+### Score and verdict
+
+**8 / 10. PASS.**
+- Mesh, winding, budget, contact, walkability and colour family are all clean. The f34 shares are within ±4, and every
+  decision is followed or justified.
+- The leftovers are polish: rounder coils, chunkier spurs, a blended stone band, small sink overruns at the coils and
+  diagonal feet, and the peg-block part details. None of them blocks a commit.
+
+## Main session ruling (2026-10-29)
+- **Result:** passed in round 1 (8/10) and committed. All five modeller deviations are accepted. The missing end rope stays the recorded known miss.
+- **Left for a later polish pass:**
+  - Coils read as jagged faceted bands. Use 4 sides × 20 segments, or a softer pinch.
+  - Coils sink 0.075 / 0.106 against 0.07. Move them out about 0.04.
+  - Diagonal feet sink 0.13. Raise them about 0.08.
+  - Loose foot rocks are small shards. Make them blockier, 1.4–1.8 tall.
+  - The stones' cool band is hard-edged. Use a 3-step blend.
+  - The PegBlock part lacks its peg hole and second peg.
+  - Triangulate the stone sides at build time; 104 non-planar quads.
+- **Export:** 8 assets, 8 solid pieces, 4396 tris, 0 VFX sockets, palette 19 colours, 0 problems.

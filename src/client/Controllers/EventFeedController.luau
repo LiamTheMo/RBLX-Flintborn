@@ -3,6 +3,8 @@
 -- sound. Running events stay listed with their time left, and each one's area is
 -- drawn as a faint circle on the ground. World place only. With the new HUD
 -- (HudMode) the running list is hidden; the world event panel reads ActiveViews().
+-- The banner is a kit toast in the shared top-centre column and the list a kit
+-- notice card.
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -14,20 +16,24 @@ local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local EventFeedController = {}
 
 EventFeedController.ALERT_SOUND = "rbxasset://sounds/electronicpingshort.wav"
+EventFeedController.BANNER_SECONDS = 6
 
-local ICONS = {
-	Vegetation = "🌿",
-	Ore = "⛏",
-	Npc = "🐺",
-	Cache = "📦",
-	Meteor = "☄",
-	Structure = "🏚",
-	Boss = "💀",
+-- The kit icon for each event category.
+EventFeedController.ICONS = {
+	Vegetation = "berry_bush",
+	Ore = "pickaxe",
+	Npc = "paw",
+	Cache = "treasure",
+	Meteor = "magma_ore",
+	Structure = "ruin",
+	Boss = "tusk",
 }
 
 local COMPASS = { "E", "NE", "N", "NW", "W", "SW", "S", "SE" }
@@ -72,7 +78,7 @@ local function bearing(position: Vector3): string
 end
 
 local function title(view): string
-	return ("%s %s %s"):format(ICONS[view.category] or "✦", view.rarity, view.name)
+	return ("%s %s"):format(view.rarity, view.name)
 end
 
 local function areaCircle(view)
@@ -93,13 +99,30 @@ local function areaCircle(view)
 end
 
 local function banner(view)
-	ui.banner.Text = ("%s appeared — %s"):format(title(view), bearing(view.position))
-	ui.banner.TextColor3 = Rarity.Colors[view.rarity] or Color3.new(1, 1, 1)
-	ui.banner.Visible = true
-	local shown = ui.banner.Text
-	task.delay(6, function()
-		if ui.banner.Text == shown then
-			ui.banner.Visible = false
+	if ui.banner then
+		ui.banner:Destroy()
+	end
+	local toast
+	toast = Kit.Toast.new(Theme.TopStack(), {
+		name = "EventBanner",
+		size = { 560, 84 },
+		layoutOrder = Theme.TopOrder.EventBanner,
+		kind = "warn",
+		icon = EventFeedController.ICONS[view.category] or "exclamation",
+		title = title(view) .. " appeared",
+		text = bearing(view.position),
+		onClose = function()
+			toast:Destroy()
+			if ui.banner == toast then
+				ui.banner = nil
+			end
+		end,
+	})
+	ui.banner = toast
+	task.delay(EventFeedController.BANNER_SECONDS, function()
+		if ui.banner == toast then
+			toast:Destroy()
+			ui.banner = nil
 		end
 	end)
 	local sound = make("Sound", { SoundId = EventFeedController.ALERT_SOUND, Volume = 0.8 }, SoundService)
@@ -120,44 +143,28 @@ local function refreshList()
 		)
 	end
 	table.sort(lines)
-	ui.list.Text = table.concat(lines, "\n")
-	ui.list.Visible = #lines > 0 and not HudMode.ReplacesLegacy()
+	if #lines > 0 and not HudMode.ReplacesLegacy() then
+		ui.list:Show(table.concat(lines, "\n"))
+	else
+		ui.list:Hide()
+	end
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "EventFeed", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	-- The banner lives in the shared top-centre column with the other banners.
-	ui.banner = make("TextLabel", {
-		Size = UDim2.fromOffset(520, 34),
-		LayoutOrder = Theme.TopOrder.EventBanner,
-		BackgroundColor3 = Color3.fromRGB(20, 18, 16),
-		BackgroundTransparency = 0.15,
-		TextWrapped = true,
-		Font = Enum.Font.GothamBold,
-		TextSize = 16,
-		Visible = false,
-	}, Theme.TopStack())
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.banner)
-	ui.list = make("TextLabel", {
+	local gui = make("ScreenGui", {
+		Name = "EventFeed",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
+	-- The running list sits at the left, under the party frames' corner.
+	local holder = make("Frame", {
+		Name = "Holder",
+		BackgroundTransparency = 1,
 		Position = UDim2.fromOffset(12, 120),
-		Size = UDim2.fromOffset(330, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = Color3.fromRGB(20, 18, 16),
-		BackgroundTransparency = 0.35,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextYAlignment = Enum.TextYAlignment.Top,
-		TextColor3 = Color3.fromRGB(235, 226, 212),
-		TextWrapped = true,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 12,
-		Visible = false,
+		Size = UDim2.fromOffset(400, 0),
 	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.list)
-	make("UIPadding", {
-		PaddingTop = UDim.new(0, 4),
-		PaddingBottom = UDim.new(0, 4),
-		PaddingLeft = UDim.new(0, 6),
-	}, ui.list)
+	Theme.FitHud(gui, make("UIScale", { Name = "Fit" }, holder))
+	ui.list = NoticeCard.new(holder, { name = "Events", width = 400, title = "World events", icon = "map_pin" })
 end
 
 function EventFeedController.Start()

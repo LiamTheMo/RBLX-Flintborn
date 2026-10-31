@@ -2,15 +2,19 @@
 -- its strength and time left, e.g. "✦ XP +25% · 9:41 left". The server replicates
 -- each boost as player attributes (ModifierService); this only counts down. Every
 -- line says what it is in words, and the last 30 seconds add "ending soon" as well
--- as the warning colour. Shown only during a run. World place only.
+-- as the warning colour. Shown only during a run. World place only. Each boost is
+-- a kit notice card at the left edge whose bar shows the time left out of the
+-- boost's full length (the matching draught or berry's duration).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
+local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local BoostHudController = {}
@@ -18,7 +22,10 @@ local BoostHudController = {}
 BoostHudController.ENDING_SECONDS = 30
 BoostHudController.REFRESH_SECONDS = 0.25
 
-local SYMBOLS = { XP = "✦", Luck = "☘" }
+BoostHudController.WIDTH = 340
+
+local ICONS = { XP = "star", Luck = "treasure" }
+local FILLS = { XP = "xp", Luck = "green" }
 local NAMES = { XP = "XP", Luck = "Luck" }
 local SUFFIXES = { XP = "", Luck = " rare drops" }
 
@@ -26,36 +33,55 @@ local player = Players.LocalPlayer
 local make = Theme.Make
 local ui = { rows = {} }
 
+-- The full length of a running boost: the shortest consumable of its kind and
+-- strength that lasts at least the time left when it was first seen (so a 10-
+-- and a 15-minute draught of equal strength each fill the bar when fresh).
+-- Remembered per boost, so the bar empties as it runs.
+local lengths = {}
+
+function BoostHudController.Length(kind: string, amount: number, left: number): number
+	local best = nil
+	for _, item in Consumables.Catalog do
+		local boost = item.boost
+		if boost and boost.kind == kind and math.abs(boost.amount - amount) < 1e-6 and boost.seconds >= left - 1 then
+			best = if best then math.min(best, boost.seconds) else boost.seconds
+		end
+	end
+	return math.max(best or left, left, 1)
+end
+
 local function build()
-	local gui =
-		make("ScreenGui", { Name = "Boosts", ResetOnSpawn = false, DisplayOrder = 4 }, player:WaitForChild("PlayerGui"))
-	-- Left edge, mid-height: clear of the party frames above and the vitals below.
-	ui.root = make("Frame", {
+	local gui = make("ScreenGui", {
 		Name = "Boosts",
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 16, 0.5, -40),
-		Size = UDim2.fromOffset(250, 0),
+		ResetOnSpawn = false,
+		DisplayOrder = 4,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
+	-- Bottom left, growing upwards: clear of the party frames and menu tiles above
+	-- and of the XP bar and hotbar to the right.
+	ui.root = make("Frame", {
+		Name = "BoostList",
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 16, 1, -20),
+		Size = UDim2.fromOffset(BoostHudController.WIDTH, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		Visible = false,
 	}, gui)
-	make("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }, ui.root)
+	ui.root.Parent = Theme.HudRoot(gui)
+	make("UIListLayout", {
+		Padding = UDim.new(0, 8),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		VerticalAlignment = Enum.VerticalAlignment.Bottom,
+	}, ui.root)
 	for order, kind in BoostRules.ORDER do
-		local row = make("TextLabel", {
-			Name = kind,
-			Size = UDim2.new(1, 0, 0, 26),
-			BackgroundColor3 = Theme.Colors.Card,
-			BackgroundTransparency = 0.15,
-			TextColor3 = Theme.Colors.Text,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = Theme.Fonts.Bold,
-			TextSize = Theme.TextSize.Body,
-			LayoutOrder = order,
-			Visible = false,
-		}, ui.root)
-		make("UICorner", { CornerRadius = UDim.new(0, 6) }, row)
-		make("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }, row)
-		ui.rows[kind] = row
+		ui.rows[kind] = NoticeCard.new(ui.root, {
+			name = kind,
+			width = BoostHudController.WIDTH,
+			layoutOrder = order,
+			title = "",
+			icon = ICONS[kind] or "lightning",
+		})
 	end
 end
 
@@ -68,19 +94,21 @@ local function update()
 		local amount = player:GetAttribute(amountName)
 		local endsAt = player:GetAttribute(untilName)
 		local left = if type(amount) == "number" and type(endsAt) == "number" then endsAt - now else 0
-		row.Visible = inRun and left > 0
-		if row.Visible then
+		if inRun and left > 0 then
 			any = true
+			local key = ("%s:%s:%s"):format(kind, tostring(amount), tostring(endsAt))
+			if lengths[kind] == nil or lengths[kind].key ~= key then
+				lengths[kind] = { key = key, seconds = BoostHudController.Length(kind, amount, left) }
+			end
 			local ending = left <= BoostHudController.ENDING_SECONDS
-			row.Text = ("%s %s %s%s · %s left%s"):format(
-				SYMBOLS[kind] or "•",
-				NAMES[kind] or kind,
-				BoostRules.Percent(amount),
-				SUFFIXES[kind] or "",
-				BoostRules.FormatTime(left),
-				if ending then " · ending soon" else ""
+			row:SetTone(if ending then "short" else "ink")
+			row:SetBar(left / lengths[kind].seconds, if ending then "red" else FILLS[kind] or "xp")
+			row:Show(
+				("%s left%s"):format(BoostRules.FormatTime(left), if ending then " · ending soon" else ""),
+				("%s %s%s"):format(NAMES[kind] or kind, BoostRules.Percent(amount), SUFFIXES[kind] or "")
 			)
-			row.TextColor3 = if ending then Theme.Colors.Warn else Theme.Colors.Good
+		else
+			row:Hide()
 		end
 	end
 	ui.root.Visible = any

@@ -680,6 +680,13 @@ test("a session trades Sunberries and Moonpetal, merging into the partner's stac
 	ok, reason = handlers.TradeOffer(a, id, { "stack:Sunberry" }, 0, { Moonpetal = 3 })
 	expect(ok, "Sunberries and Moonpetal offered: " .. tostring(reason))
 	expectEq(#pushed[b].theirs.items, 2, "the partner sees both")
+	local offered = {}
+	for _, item in pushed[b].theirs.items do
+		offered[item.key] = item.catalogId
+	end
+	expectEq(offered["stack:Sunberry"], "Sunberry", "a backpack stack carries its catalog id")
+	expectEq(offered["mat:Moonpetal"], "Moonpetal", "a vault material carries its catalog id")
+	expectEq(pushed[a].mine.items[1].catalogId ~= nil, true, "my own side too")
 	handlers.TradeLock(a, id)
 	handlers.TradeLock(b, id)
 	advance(TradeService.COUNTDOWN_SECONDS)

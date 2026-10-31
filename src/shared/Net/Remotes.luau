@@ -15,14 +15,16 @@ local DEFINITIONS = {
 	-- Diagnostics
 	ReportUiImages = "RemoteEvent", -- client -> server: (summary, lines) how HUD images are loading
 	-- Lobby
-	PartyAction = "RemoteFunction", -- (action, argument) -> ok, reason
-	PartyChanged = "RemoteEvent", -- server -> client: party snapshot
+	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave") | ("ready", bool)
+	-- | ("view": resend my party view on PartyChanged) -> ok, reason
+	PartyAction = "RemoteFunction",
+	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, ready, maxSize}
 	Deploy = "RemoteFunction", -- () -> ok, reason
 	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run
 	-- World
 	RequestPlay = "RemoteFunction", -- (requestId) -> ok, reason
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
-	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld, crouching)
+	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld)
 	UseConsumable = "RemoteFunction", -- (requestId, catalogId) -> ok, reason
 	InventoryChanged = "RemoteEvent", -- server -> client: inventory snapshot
 	MoveItem = "RemoteFunction", -- (fromArea, fromIndex, toArea, toIndex) -> ok, reason
@@ -37,8 +39,9 @@ local DEFINITIONS = {
 	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
-	CorpseOpened = "RemoteEvent", -- server -> client: (corpseId, contents)
-	CorpseTake = "RemoteFunction", -- (corpseId, index) -> ok, reason
+	-- server -> client: (corpseId, {{index, key, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
+	CorpseOpened = "RemoteEvent",
+	CorpseTake = "RemoteFunction", -- (corpseId, index, key) -> ok, reason; key from CorpseOpened (ListingKeys)
 	DeathSummary = "RemoteEvent", -- server -> client: what dropped and what was kept
 	ExtractionEvent = "RemoteEvent", -- server -> all: an extraction countdown started
 	ExtractionEnded = "RemoteEvent", -- server -> all: (eventId)
@@ -50,12 +53,14 @@ local DEFINITIONS = {
 	VaultWithdrawMaterial = "RemoteFunction", -- (catalogId, quantity) -> ok, reason
 	ExtractionReceipt = "RemoteEvent", -- server -> client: the latest extraction receipt
 	ForgeSnapshot = "RemoteFunction", -- () -> recipes with vault counts and unlock state
-	ForgeCraft = "RemoteFunction", -- (recipeId, sourceInstanceId?, nonce) -> ok, receipt or reason
+	-- (recipeId, sourceInstanceId?, nonce, count?) -> ok, receipt or reason; count is a whole
+	-- 1..ForgeRules.MAX_BATCH (default 1, Permanent conversions only 1), all paid for or none
+	ForgeCraft = "RemoteFunction",
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
 	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
 	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach
-	ChestOpened = "RemoteEvent", -- server -> client: (chestId, contents)
-	ChestTake = "RemoteFunction", -- (chestId, index) -> ok, reason
+	ChestOpened = "RemoteEvent", -- server -> client: (chestId, {{index, key, catalogId, name, rarity, quantity?, permanent?}})
+	ChestTake = "RemoteFunction", -- (chestId, index, key) -> ok, reason; key from ChestOpened (ListingKeys)
 	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
 	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
 	EventEnded = "RemoteEvent", -- server -> all: (eventId)
@@ -80,7 +85,8 @@ local DEFINITIONS = {
 	TradeLock = "RemoteFunction", -- (sessionId) -> ok, reason
 	TradeConfirm = "RemoteFunction", -- (sessionId) -> ok, reason
 	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
-	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
+	-- server -> client: invite, session state (offer items {key, catalogId, name, quantity?, permanent?}), closed
+	TradeChanged = "RemoteEvent",
 	SaveCamera = "RemoteEvent", -- client -> server: (zoom) preference, throttled
 	SaveSettings = "RemoteEvent", -- client -> server: {settingKey = value} changes (SettingsRules)
 	SaveKeybinds = "RemoteEvent", -- client -> server: {actionId = keyName} overrides of the default keys

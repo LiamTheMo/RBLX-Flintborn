@@ -13,6 +13,13 @@ local TEXT = {
 	BackpackFull = "your lobby backpack has no room for that",
 	NotEnough = "your vault doesn't hold that many",
 	VaultWouldOverflow = "your vault can't hold all of that material",
+	MissingMaterials = "you don't have enough materials for that",
+	Locked = "that recipe is still locked",
+	WrongSource = "that item can't be used for this",
+	TooFast = "slow down a little and try again",
+	PlayerNotHere = "that player isn't in this server any more",
+	Rejected = "the request was turned down",
+	NotReady = "not everyone is ready yet",
 }
 
 function Reasons.Text(code: any): string

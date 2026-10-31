@@ -1,31 +1,26 @@
 -- Storage chests (GDD §6.1, Q39). Opening a chest shows its contents next to your
--- carried items: take from the chest or store from your inventory. Chests are
--- public, so anything stored can be taken by anyone who reaches it. World only.
+-- carried items in a kit window: take from the chest or store from your
+-- inventory. Chests are public, so anything stored can be taken by anyone who
+-- reaches it. World only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Kit = require(script.Parent.Parent.Hud.Kit)
 local InventoryController = require(script.Parent.InventoryController)
+local LootController = require(script.Parent.LootController)
 
 local StorageController = {}
+
+StorageController.SIZE = { 1000, 600 }
 
 local player = Players.LocalPlayer
 local ui = {}
 local openChestId = nil
 local contents = {}
-
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
 
 local function invoke(name: string, ...)
 	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
@@ -35,138 +30,113 @@ local function invoke(name: string, ...)
 	return success, reason
 end
 
-local function clear(frame)
-	for _, child in frame:GetChildren() do
-		if not child:IsA("UIListLayout") then
-			child:Destroy()
-		end
+local function clear(column)
+	for _, part in column.rows do
+		part:Destroy()
 	end
+	table.clear(column.rows)
 end
 
-local function row(parent, text: string, color: Color3, onClick)
-	local b = make("TextButton", {
-		Text = text,
-		Size = UDim2.new(1, 0, 0, 26),
-		BackgroundColor3 = Color3.fromRGB(46, 38, 30),
-		TextColor3 = color,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 13,
-	}, parent)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, b)
-	b.Activated:Connect(onClick)
-end
-
-local function label(entry): string
-	return (entry.permanent and "★ " or "") .. entry.name .. (entry.quantity and (" ×" .. entry.quantity) or "")
+-- Returns the first row's hit button (nil for an empty column).
+local function fill(column, entries, action: string, onAction)
+	clear(column)
+	local first = nil
+	for order, entry in entries do
+		local holder, _, hit = LootController.ItemRow(column.list, order, column.w, entry, action, function(button)
+			LootController.Guard(button, function()
+				onAction(entry)
+			end)
+		end)
+		table.insert(column.rows, holder)
+		first = first or hit
+	end
+	if #entries == 0 then
+		table.insert(
+			column.rows,
+			Kit.Text.new(column.list, {
+				name = "Empty",
+				size = { column.w, 40 },
+				layoutOrder = 1,
+				text = "Nothing here.",
+				role = "muted",
+				align = "Center",
+			}).root
+		)
+	end
+	column.panel.scroll:SetContentHeight(math.max(1, #entries) * (LootController.ROW_H + 6))
+	return first
 end
 
 local function render()
 	if openChestId == nil then
 		return
 	end
-	clear(ui.chest)
-	clear(ui.mine)
-	for _, entry in contents do
-		row(ui.chest, "Take: " .. label(entry), Rarity.Colors[entry.rarity] or Color3.new(1, 1, 1), function()
-			local ok, reason = invoke("ChestTake", openChestId, entry.index)
-			if not ok then
-				ui.status.Text = "Could not take that (" .. tostring(reason) .. ")"
-			end
-		end)
-	end
+	local firstTake = fill(ui.chest, contents, "Take", function(entry)
+		-- The key names this exact entry, so a stale index takes nothing else.
+		local ok, reason = invoke("ChestTake", openChestId, entry.index, entry.key)
+		if not ok then
+			ui.status:SetText("Could not take that: " .. LootController.RefusedText(reason) .. ".")
+		end
+	end)
+	local carried = {}
 	for _, slot in InventoryController.Snapshot.slots do
 		if slot.area ~= "armor" then
 			local def = ItemCatalog.Get(slot.catalogId)
-			local entry =
-				{ name = def and def.name or slot.catalogId, quantity = slot.quantity, permanent = slot.permanent }
-			local color = Rarity.Colors[def and def.rarity or "Common"] or Color3.new(1, 1, 1)
-			row(ui.mine, "Store: " .. label(entry), color, function()
-				local ok, reason = invoke("ChestPut", openChestId, slot.area, slot.index)
-				if not ok then
-					ui.status.Text = "Could not store that (" .. tostring(reason) .. ")"
-				end
-			end)
+			table.insert(carried, {
+				catalogId = slot.catalogId,
+				name = def and def.name or slot.catalogId,
+				rarity = def and def.rarity or "Common",
+				quantity = slot.quantity,
+				permanent = slot.permanent,
+				slot = slot,
+			})
 		end
 	end
-	ui.panel.Visible = true
+	local firstStore = fill(ui.mine, carried, "Store", function(entry)
+		local ok, reason = invoke("ChestPut", openChestId, entry.slot.area, entry.slot.index)
+		if not ok then
+			ui.status:SetText("Could not store that: " .. LootController.RefusedText(reason) .. ".")
+		end
+	end)
+	-- A gamepad lands on the first Take, else the first Store, else the ✕.
+	local first = firstTake or firstStore
+	ui.screen:SetDefaultSelection(first or ui.window.close.control.hit)
+	ui.screen:Open()
 end
 
-local function column(parent, x: number, title: string)
-	make("TextLabel", {
-		Text = title,
-		Position = UDim2.new(x, 4, 0, 34),
-		Size = UDim2.new(0.5, -8, 0, 20),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(255, 220, 170),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-	}, parent)
-	local list = make("ScrollingFrame", {
-		Position = UDim2.new(x, 4, 0, 58),
-		Size = UDim2.new(0.5, -8, 1, -90),
-		BackgroundTransparency = 1,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-		CanvasSize = UDim2.new(),
-		ScrollBarThickness = 6,
-	}, parent)
-	make("UIListLayout", { Padding = UDim.new(0, 3) }, list)
-	return list
+local function column(body, x: number, w: number, h: number, title: string, icon: string)
+	local panel = Kit.Panel.new(
+		body,
+		{ name = title, rect = { x, 0, w, h }, variant = "inset", title = title, icon = icon, scroll = true }
+	)
+	return { panel = panel, list = panel:Content(), w = panel.contentRect[3] - 14, rows = {} }
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Storage", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	-- Sized to the screen (up to 520×360), so the ✕ stays reachable on phones.
-	ui.panel = make("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.new(0.9, 0, 1, -24),
-		BackgroundColor3 = Color3.fromRGB(24, 20, 17),
-		Active = true,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.panel)
-	make("UISizeConstraint", { MaxSize = Vector2.new(520, 360), MinSize = Vector2.new(300, 200) }, ui.panel)
-	make("TextLabel", {
-		Text = "Storage chest — public: anyone who reaches it can take items",
-		Position = UDim2.fromOffset(10, 6),
-		Size = UDim2.new(1, -50, 0, 24),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		TextColor3 = Color3.fromRGB(255, 214, 150),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.panel)
-	local close = make("TextButton", {
-		Text = "✕",
-		AnchorPoint = Vector2.new(1, 0),
-		Position = UDim2.new(1, -6, 0, 6),
-		Size = UDim2.fromOffset(28, 24),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 14,
-	}, ui.panel)
-	close.Activated:Connect(function()
-		ui.panel.Visible = false
+	ui.screen = Kit.Screen.new("FlintbornStorage", { size = StorageController.SIZE })
+	local window = Kit.Window.new(ui.screen, {
+		title = "Storage chest",
+		subtitle = "Public: anyone who reaches it can take items.",
+		icon = "chest",
+	})
+	ui.window = window
+	local body = window:Body()
+	local bw, bh = window.bodyRect[3], window.bodyRect[4]
+	local gap = Kit.Tokens.Space("colGap", 14)
+	local cw = (bw - gap) / 2
+	ui.chest = column(body, 0, cw, bh - 44, "In the chest", "chest")
+	ui.mine = column(body, cw + gap, cw, bh - 44, "Carried", "backpack")
+	ui.status = Kit.Text.new(body, {
+		name = "Status",
+		rect = { 4, bh - 38, bw - 8, 34 },
+		text = "",
+		role = "body",
+		color = "short",
+	})
+	ui.screen:Watch()
+	ui.screen.Closed:Connect(function()
 		openChestId = nil
 	end)
-	ui.chest = column(ui.panel, 0, "In the chest")
-	ui.mine = column(ui.panel, 0.5, "Carried")
-	ui.status = make("TextLabel", {
-		Text = "",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 10, 1, -6),
-		Size = UDim2.new(1, -20, 0, 22),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(220, 210, 196),
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-	}, ui.panel)
 end
 
 function StorageController.Start()
@@ -177,17 +147,17 @@ function StorageController.Start()
 	Remotes.Get("ChestOpened").OnClientEvent:Connect(function(chestId, entries)
 		openChestId = chestId
 		contents = entries
-		ui.status.Text = ""
+		ui.status:SetText("")
 		render()
 	end)
 	InventoryController.Changed:Connect(function()
-		if openChestId and ui.panel.Visible then
+		if openChestId and ui.screen:IsOpen() then
 			render()
 		end
 	end)
 	-- Walking away or ending the run closes the chest view.
 	player:GetAttributeChangedSignal("SessionState"):Connect(function()
-		ui.panel.Visible = false
+		ui.screen:Close()
 		openChestId = nil
 	end)
 end

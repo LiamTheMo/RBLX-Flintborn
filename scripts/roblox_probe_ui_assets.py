@@ -56,13 +56,22 @@ try("ui assets", function()
 		tostring(UiAssets.image("pm_panel")), tostring(UiAssets.image("pm_hud_slot")),
 		tostring(window and window.tiles and #window.tiles))
 end)
-try("hud layout lobby section", function()
-	return tostring(require(Shared.UI.HudLayout).lobby ~= nil)
+try("kit tokens", function()
+	local tokens = require(Shared.UI.KitTokens)
+	local colors = 0
+	for _ in tokens.colors or {} do
+		colors += 1
+	end
+	return ("%d colors; reference %s x %s"):format(colors, tostring(tokens.reference and tokens.reference.width),
+		tostring(tokens.reference and tokens.reference.height))
 end)
 try("client modules", function()
 	local client = game:GetService("StarterPlayer").StarterPlayerScripts:FindFirstChild("Client")
 	local found = {}
-	for _, path in { "Hud/LobbyHud", "Hud/Parchment", "Hud/Widgets", "Hud/SpriteLoader", "Hud/ListWindow",
+	for _, path in { "Hud/Kit", "Hud/Kit/Art", "Hud/Kit/Tokens", "Hud/Kit/Screen", "Hud/Kit/Window",
+		"Hud/Screens/LobbyHud", "Hud/Screens/InventoryWindow", "Hud/Screens/SettingsWindow",
+		"Hud/Screens/PartyWindow", "Hud/Screens/PlayWindow", "Hud/Screens/RecipeWindow",
+		"Hud/Screens/JournalWindow", "Hud/Widgets", "Hud/SpriteLoader", "Hud/ListWindow",
 		"Controllers/LobbyHudController", "Controllers/HudController" } do
 		local node = client
 		for part in string.gmatch(path, "[^/]+") do

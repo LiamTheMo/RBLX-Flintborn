@@ -9,6 +9,26 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_lk_icons": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_items": {
+    "h": 512,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_lobby": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_window": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lobby": {
     "h": 1024,
     "slice": null,
@@ -792,6 +812,3449 @@
       39
     ],
     "w": 165
+  },
+  "lk_badge_count": {
+    "atlas": "atlas_lk_lobby",
+    "h": 44,
+    "rect": [
+      817,
+      793,
+      48,
+      44
+    ],
+    "slice": null,
+    "w": 48
+  },
+  "lk_badge_count_wide": {
+    "atlas": "atlas_lk_lobby",
+    "h": 42,
+    "rect": [
+      869,
+      793,
+      86,
+      42
+    ],
+    "slice": [
+      12,
+      12,
+      12,
+      12
+    ],
+    "w": 86
+  },
+  "lk_badge_number": {
+    "atlas": "atlas_lk_lobby",
+    "h": 40,
+    "rect": [
+      959,
+      793,
+      40,
+      40
+    ],
+    "slice": null,
+    "w": 40
+  },
+  "lk_banner_leather": {
+    "h": 56,
+    "slice": [
+      26,
+      22,
+      26,
+      22
+    ],
+    "w": 573
+  },
+  "lk_banner_paper": {
+    "h": 65,
+    "slice": [
+      36,
+      28,
+      36,
+      28
+    ],
+    "w": 573
+  },
+  "lk_bar_fill_blue": {
+    "atlas": "atlas_lk_lobby",
+    "h": 29,
+    "rect": [
+      0,
+      889,
+      169,
+      29
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 169
+  },
+  "lk_bar_fill_green": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      538,
+      889,
+      226,
+      28
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 226
+  },
+  "lk_bar_fill_orange": {
+    "atlas": "atlas_lk_lobby",
+    "h": 29,
+    "rect": [
+      488,
+      853,
+      226,
+      29
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 226
+  },
+  "lk_bar_fill_red": {
+    "atlas": "atlas_lk_lobby",
+    "h": 29,
+    "rect": [
+      718,
+      853,
+      226,
+      29
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 226
+  },
+  "lk_bar_fill_yellow": {
+    "atlas": "atlas_lk_lobby",
+    "h": 30,
+    "rect": [
+      220,
+      853,
+      226,
+      30
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 226
+  },
+  "lk_bar_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 55,
+    "rect": [
+      277,
+      793,
+      303,
+      55
+    ],
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "w": 303
+  },
+  "lk_bar_frame_plain": {
+    "atlas": "atlas_lk_lobby",
+    "h": 58,
+    "rect": [
+      319,
+      724,
+      303,
+      58
+    ],
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "w": 303
+  },
+  "lk_bar_frame_thin": {
+    "atlas": "atlas_lk_lobby",
+    "h": 32,
+    "rect": [
+      0,
+      853,
+      182,
+      32
+    ],
+    "slice": [
+      16,
+      12,
+      16,
+      12
+    ],
+    "w": 182
+  },
+  "lk_bar_track": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      173,
+      889,
+      361,
+      28
+    ],
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "w": 361
+  },
+  "lk_button_close_disabled": {
+    "atlas": "atlas_lk_window",
+    "h": 67,
+    "rect": [
+      363,
+      351,
+      69,
+      67
+    ],
+    "slice": null,
+    "w": 69
+  },
+  "lk_button_close_hover": {
+    "atlas": "atlas_lk_window",
+    "h": 68,
+    "rect": [
+      216,
+      351,
+      69,
+      68
+    ],
+    "slice": null,
+    "w": 69
+  },
+  "lk_button_close_normal": {
+    "atlas": "atlas_lk_window",
+    "h": 67,
+    "rect": [
+      436,
+      351,
+      69,
+      67
+    ],
+    "slice": null,
+    "w": 69
+  },
+  "lk_button_close_pressed": {
+    "atlas": "atlas_lk_window",
+    "h": 67,
+    "rect": [
+      289,
+      351,
+      70,
+      67
+    ],
+    "slice": null,
+    "w": 70
+  },
+  "lk_button_flat_disabled": {
+    "atlas": "atlas_lk_window",
+    "h": 52,
+    "rect": [
+      691,
+      493,
+      217,
+      52
+    ],
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "w": 217
+  },
+  "lk_button_flat_leather": {
+    "atlas": "atlas_lk_window",
+    "h": 51,
+    "rect": [
+      266,
+      555,
+      197,
+      51
+    ],
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "w": 197
+  },
+  "lk_button_flat_paper": {
+    "atlas": "atlas_lk_window",
+    "h": 52,
+    "rect": [
+      459,
+      493,
+      228,
+      52
+    ],
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "w": 228
+  },
+  "lk_button_hud": {
+    "atlas": "atlas_lk_window",
+    "h": 56,
+    "rect": [
+      64,
+      493,
+      64,
+      56
+    ],
+    "slice": null,
+    "w": 64
+  },
+  "lk_button_invite": {
+    "atlas": "atlas_lk_lobby",
+    "h": 49,
+    "rect": [
+      753,
+      793,
+      60,
+      49
+    ],
+    "slice": null,
+    "w": 60
+  },
+  "lk_button_invite_card": {
+    "h": 113,
+    "slice": null,
+    "w": 123
+  },
+  "lk_button_leather_disabled": {
+    "atlas": "atlas_lk_window",
+    "h": 68,
+    "rect": [
+      0,
+      351,
+      212,
+      68
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 212
+  },
+  "lk_button_leather_hover": {
+    "atlas": "atlas_lk_window",
+    "h": 69,
+    "rect": [
+      472,
+      251,
+      210,
+      69
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 210
+  },
+  "lk_button_leather_normal": {
+    "atlas": "atlas_lk_window",
+    "h": 69,
+    "rect": [
+      256,
+      251,
+      212,
+      69
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 212
+  },
+  "lk_button_leather_pressed": {
+    "atlas": "atlas_lk_window",
+    "h": 68,
+    "rect": [
+      686,
+      251,
+      216,
+      68
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 216
+  },
+  "lk_button_paper_disabled": {
+    "atlas": "atlas_lk_lobby",
+    "h": 67,
+    "rect": [
+      431,
+      652,
+      213,
+      67
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 213
+  },
+  "lk_button_paper_hover": {
+    "atlas": "atlas_lk_lobby",
+    "h": 68,
+    "rect": [
+      0,
+      652,
+      212,
+      68
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 212
+  },
+  "lk_button_paper_normal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 68,
+    "rect": [
+      216,
+      652,
+      211,
+      68
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 211
+  },
+  "lk_button_paper_pressed": {
+    "atlas": "atlas_lk_lobby",
+    "h": 69,
+    "rect": [
+      743,
+      566,
+      218,
+      69
+    ],
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "w": 218
+  },
+  "lk_button_paper_small_disabled": {
+    "atlas": "atlas_lk_lobby",
+    "h": 55,
+    "rect": [
+      584,
+      793,
+      103,
+      55
+    ],
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 103
+  },
+  "lk_button_paper_small_hover": {
+    "atlas": "atlas_lk_lobby",
+    "h": 56,
+    "rect": [
+      0,
+      793,
+      104,
+      56
+    ],
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 104
+  },
+  "lk_button_paper_small_normal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 56,
+    "rect": [
+      108,
+      793,
+      103,
+      56
+    ],
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 103
+  },
+  "lk_button_play_square": {
+    "h": 56,
+    "slice": null,
+    "w": 64
+  },
+  "lk_button_settings": {
+    "atlas": "atlas_lk_lobby",
+    "h": 58,
+    "rect": [
+      738,
+      724,
+      64,
+      58
+    ],
+    "slice": null,
+    "w": 64
+  },
+  "lk_button_square_leather": {
+    "atlas": "atlas_lk_window",
+    "h": 51,
+    "rect": [
+      467,
+      555,
+      57,
+      51
+    ],
+    "slice": null,
+    "w": 57
+  },
+  "lk_button_square_paper": {
+    "atlas": "atlas_lk_window",
+    "h": 58,
+    "rect": [
+      0,
+      493,
+      60,
+      58
+    ],
+    "slice": null,
+    "w": 60
+  },
+  "lk_button_square_small": {
+    "atlas": "atlas_lk_lobby",
+    "h": 51,
+    "rect": [
+      691,
+      793,
+      58,
+      51
+    ],
+    "slice": null,
+    "w": 58
+  },
+  "lk_button_stepper_minus": {
+    "atlas": "atlas_lk_window",
+    "h": 48,
+    "rect": [
+      710,
+      555,
+      50,
+      48
+    ],
+    "slice": null,
+    "w": 50
+  },
+  "lk_button_stepper_plus": {
+    "atlas": "atlas_lk_window",
+    "h": 48,
+    "rect": [
+      818,
+      555,
+      49,
+      48
+    ],
+    "slice": null,
+    "w": 49
+  },
+  "lk_card_detail": {
+    "h": 219,
+    "slice": null,
+    "w": 152
+  },
+  "lk_checkbox_off": {
+    "atlas": "atlas_lk_window",
+    "h": 45,
+    "rect": [
+      871,
+      555,
+      46,
+      45
+    ],
+    "slice": null,
+    "w": 46
+  },
+  "lk_checkbox_on": {
+    "atlas": "atlas_lk_window",
+    "h": 45,
+    "rect": [
+      921,
+      555,
+      46,
+      45
+    ],
+    "slice": null,
+    "w": 46
+  },
+  "lk_clasp_left": {
+    "atlas": "atlas_lk_window",
+    "h": 52,
+    "rect": [
+      214,
+      555,
+      22,
+      52
+    ],
+    "slice": null,
+    "w": 22
+  },
+  "lk_clasp_right": {
+    "atlas": "atlas_lk_window",
+    "h": 52,
+    "rect": [
+      240,
+      555,
+      22,
+      52
+    ],
+    "slice": null,
+    "w": 22
+  },
+  "lk_corner_bl": {
+    "h": 46,
+    "slice": null,
+    "w": 45
+  },
+  "lk_corner_br": {
+    "h": 46,
+    "slice": null,
+    "w": 46
+  },
+  "lk_corner_fold": {
+    "h": 108,
+    "slice": null,
+    "w": 93
+  },
+  "lk_corner_ornate_bl": {
+    "h": 45,
+    "slice": null,
+    "w": 49
+  },
+  "lk_corner_ornate_br": {
+    "h": 45,
+    "slice": null,
+    "w": 50
+  },
+  "lk_corner_ornate_tl": {
+    "h": 46,
+    "slice": null,
+    "w": 49
+  },
+  "lk_corner_ornate_tr": {
+    "h": 45,
+    "slice": null,
+    "w": 50
+  },
+  "lk_corner_tl": {
+    "h": 47,
+    "slice": null,
+    "w": 46
+  },
+  "lk_corner_tr": {
+    "h": 47,
+    "slice": null,
+    "w": 46
+  },
+  "lk_currency_pill": {
+    "atlas": "atlas_lk_lobby",
+    "h": 57,
+    "rect": [
+      806,
+      724,
+      127,
+      57
+    ],
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 127
+  },
+  "lk_dialog_frame": {
+    "atlas": "atlas_lk_window",
+    "h": 247,
+    "rect": [
+      0,
+      0,
+      448,
+      247
+    ],
+    "slice": [
+      46,
+      42,
+      46,
+      42
+    ],
+    "w": 448
+  },
+  "lk_divider_diamond": {
+    "atlas": "atlas_lk_window",
+    "h": 22,
+    "rect": [
+      0,
+      654,
+      420,
+      22
+    ],
+    "slice": [
+      16,
+      4,
+      16,
+      4
+    ],
+    "w": 420
+  },
+  "lk_divider_line": {
+    "atlas": "atlas_lk_window",
+    "h": 15,
+    "rect": [
+      0,
+      680,
+      476,
+      15
+    ],
+    "slice": [
+      14,
+      4,
+      14,
+      4
+    ],
+    "w": 476
+  },
+  "lk_divider_ornament": {
+    "atlas": "atlas_lk_window",
+    "h": 25,
+    "rect": [
+      105,
+      611,
+      476,
+      25
+    ],
+    "slice": null,
+    "w": 476
+  },
+  "lk_divider_vertical": {
+    "atlas": "atlas_lk_window",
+    "h": 162,
+    "rect": [
+      452,
+      0,
+      18,
+      162
+    ],
+    "slice": [
+      4,
+      16,
+      4,
+      16
+    ],
+    "w": 18
+  },
+  "lk_dot_brown": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      768,
+      889,
+      28,
+      28
+    ],
+    "slice": null,
+    "w": 28
+  },
+  "lk_dot_green": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      864,
+      889,
+      27,
+      28
+    ],
+    "slice": null,
+    "w": 27
+  },
+  "lk_dot_red": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      800,
+      889,
+      28,
+      28
+    ],
+    "slice": null,
+    "w": 28
+  },
+  "lk_dot_yellow": {
+    "atlas": "atlas_lk_lobby",
+    "h": 28,
+    "rect": [
+      832,
+      889,
+      28,
+      28
+    ],
+    "slice": null,
+    "w": 28
+  },
+  "lk_dropdown": {
+    "atlas": "atlas_lk_window",
+    "h": 52,
+    "rect": [
+      0,
+      555,
+      210,
+      52
+    ],
+    "slice": [
+      18,
+      18,
+      44,
+      18
+    ],
+    "w": 210
+  },
+  "lk_dropdown_button": {
+    "atlas": "atlas_lk_window",
+    "h": 48,
+    "rect": [
+      764,
+      555,
+      50,
+      48
+    ],
+    "slice": null,
+    "w": 50
+  },
+  "lk_emblem_leaf": {
+    "atlas": "atlas_lk_window",
+    "h": 127,
+    "rect": [
+      528,
+      0,
+      39,
+      127
+    ],
+    "slice": null,
+    "w": 39
+  },
+  "lk_emblem_rune": {
+    "atlas": "atlas_lk_window",
+    "h": 136,
+    "rect": [
+      474,
+      0,
+      50,
+      136
+    ],
+    "slice": null,
+    "w": 50
+  },
+  "lk_frame_capped_hollow": {
+    "h": 36,
+    "slice": [
+      24,
+      14,
+      24,
+      14
+    ],
+    "w": 222
+  },
+  "lk_frame_hollow": {
+    "h": 108,
+    "slice": [
+      30,
+      28,
+      30,
+      28
+    ],
+    "w": 132
+  },
+  "lk_frame_hollow_bar": {
+    "h": 63,
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ],
+    "w": 438
+  },
+  "lk_frame_hollow_capped": {
+    "h": 90,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 92
+  },
+  "lk_frame_hollow_circle": {
+    "atlas": "atlas_lk_lobby",
+    "h": 83,
+    "rect": [
+      881,
+      478,
+      82,
+      83
+    ],
+    "slice": null,
+    "w": 82
+  },
+  "lk_frame_hollow_large": {
+    "h": 179,
+    "slice": [
+      32,
+      30,
+      32,
+      30
+    ],
+    "w": 341
+  },
+  "lk_frame_hollow_small": {
+    "h": 89,
+    "slice": [
+      26,
+      26,
+      26,
+      26
+    ],
+    "w": 92
+  },
+  "lk_frame_hollow_speech": {
+    "h": 92,
+    "slice": null,
+    "w": 197
+  },
+  "lk_frame_hollow_wide": {
+    "h": 83,
+    "slice": null,
+    "w": 82
+  },
+  "lk_frame_rails": {
+    "h": 82,
+    "slice": null,
+    "w": 82
+  },
+  "lk_frame_ring": {
+    "h": 88,
+    "slice": null,
+    "w": 87
+  },
+  "lk_frame_ring_leaves": {
+    "h": 88,
+    "slice": null,
+    "w": 100
+  },
+  "lk_frame_round": {
+    "atlas": "atlas_lk_lobby",
+    "h": 82,
+    "rect": [
+      0,
+      566,
+      82,
+      82
+    ],
+    "slice": null,
+    "w": 82
+  },
+  "lk_frame_round_paper": {
+    "h": 88,
+    "slice": null,
+    "w": 87
+  },
+  "lk_glyph_arrow_down": {
+    "atlas": "atlas_lk_icons",
+    "h": 32,
+    "rect": [
+      591,
+      775,
+      30,
+      32
+    ],
+    "slice": null,
+    "w": 30
+  },
+  "lk_glyph_arrow_left": {
+    "atlas": "atlas_lk_icons",
+    "h": 30,
+    "rect": [
+      659,
+      775,
+      32,
+      30
+    ],
+    "slice": null,
+    "w": 32
+  },
+  "lk_glyph_arrow_right": {
+    "atlas": "atlas_lk_icons",
+    "h": 30,
+    "rect": [
+      695,
+      775,
+      32,
+      30
+    ],
+    "slice": null,
+    "w": 32
+  },
+  "lk_glyph_arrow_up": {
+    "atlas": "atlas_lk_icons",
+    "h": 32,
+    "rect": [
+      625,
+      775,
+      30,
+      32
+    ],
+    "slice": null,
+    "w": 30
+  },
+  "lk_glyph_check": {
+    "atlas": "atlas_lk_lobby",
+    "h": 30,
+    "rect": [
+      450,
+      853,
+      34,
+      30
+    ],
+    "slice": null,
+    "w": 34
+  },
+  "lk_glyph_check_white": {
+    "atlas": "atlas_lk_icons",
+    "h": 32,
+    "rect": [
+      551,
+      775,
+      36,
+      32
+    ],
+    "slice": null,
+    "w": 36
+  },
+  "lk_glyph_checkmark": {
+    "atlas": "atlas_lk_icons",
+    "h": 38,
+    "rect": [
+      435,
+      775,
+      43,
+      38
+    ],
+    "slice": null,
+    "w": 43
+  },
+  "lk_glyph_chevron_right": {
+    "atlas": "atlas_lk_icons",
+    "h": 27,
+    "rect": [
+      731,
+      775,
+      18,
+      27
+    ],
+    "slice": null,
+    "w": 18
+  },
+  "lk_glyph_cross": {
+    "atlas": "atlas_lk_lobby",
+    "h": 31,
+    "rect": [
+      186,
+      853,
+      30,
+      31
+    ],
+    "slice": null,
+    "w": 30
+  },
+  "lk_glyph_ink_anvil": {
+    "atlas": "atlas_lk_icons",
+    "h": 102,
+    "rect": [
+      840,
+      360,
+      116,
+      102
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_backpack": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      120,
+      0,
+      115,
+      116
+    ],
+    "slice": null,
+    "w": 115
+  },
+  "lk_glyph_ink_book": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      230,
+      120,
+      104,
+      116
+    ],
+    "slice": null,
+    "w": 104
+  },
+  "lk_glyph_ink_check": {
+    "atlas": "atlas_lk_icons",
+    "h": 93,
+    "rect": [
+      590,
+      575,
+      116,
+      93
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_chest": {
+    "atlas": "atlas_lk_icons",
+    "h": 91,
+    "rect": [
+      104,
+      679,
+      116,
+      91
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_compass": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      554,
+      120,
+      101,
+      116
+    ],
+    "slice": null,
+    "w": 101
+  },
+  "lk_glyph_ink_compass_rose": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      360,
+      469,
+      100,
+      100
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_glyph_ink_gamepad": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      659,
+      120,
+      101,
+      116
+    ],
+    "slice": null,
+    "w": 101
+  },
+  "lk_glyph_ink_gears": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      358,
+      0,
+      114,
+      116
+    ],
+    "slice": null,
+    "w": 114
+  },
+  "lk_glyph_ink_hammer": {
+    "atlas": "atlas_lk_lobby",
+    "h": 115,
+    "rect": [
+      565,
+      0,
+      116,
+      115
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_info": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      192,
+      240,
+      57,
+      116
+    ],
+    "slice": null,
+    "w": 57
+  },
+  "lk_glyph_ink_magnifier": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      711,
+      0,
+      111,
+      116
+    ],
+    "slice": null,
+    "w": 111
+  },
+  "lk_glyph_ink_map_pin": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      94,
+      575,
+      89,
+      100
+    ],
+    "slice": null,
+    "w": 89
+  },
+  "lk_glyph_ink_monitor": {
+    "atlas": "atlas_lk_icons",
+    "h": 105,
+    "rect": [
+      0,
+      360,
+      116,
+      105
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_people": {
+    "atlas": "atlas_lk_icons",
+    "h": 89,
+    "rect": [
+      464,
+      679,
+      116,
+      89
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_refresh": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      464,
+      469,
+      100,
+      100
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_glyph_ink_speaker": {
+    "atlas": "atlas_lk_icons",
+    "h": 101,
+    "rect": [
+      120,
+      469,
+      116,
+      101
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_ink_trophy": {
+    "atlas": "atlas_lk_icons",
+    "h": 103,
+    "rect": [
+      480,
+      360,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_invite": {
+    "atlas": "atlas_lk_icons",
+    "h": 44,
+    "rect": [
+      385,
+      775,
+      46,
+      44
+    ],
+    "slice": null,
+    "w": 46
+  },
+  "lk_glyph_minus": {
+    "atlas": "atlas_lk_icons",
+    "h": 13,
+    "rect": [
+      753,
+      775,
+      32,
+      13
+    ],
+    "slice": null,
+    "w": 32
+  },
+  "lk_glyph_play": {
+    "atlas": "atlas_lk_icons",
+    "h": 34,
+    "rect": [
+      518,
+      775,
+      29,
+      34
+    ],
+    "slice": null,
+    "w": 29
+  },
+  "lk_glyph_plus": {
+    "atlas": "atlas_lk_icons",
+    "h": 34,
+    "rect": [
+      482,
+      775,
+      32,
+      34
+    ],
+    "slice": null,
+    "w": 32
+  },
+  "lk_glyph_white_anvil": {
+    "atlas": "atlas_lk_icons",
+    "h": 102,
+    "rect": [
+      0,
+      469,
+      116,
+      102
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_backpack": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      239,
+      0,
+      115,
+      116
+    ],
+    "slice": null,
+    "w": 115
+  },
+  "lk_glyph_white_book": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      338,
+      120,
+      104,
+      116
+    ],
+    "slice": null,
+    "w": 104
+  },
+  "lk_glyph_white_check": {
+    "atlas": "atlas_lk_icons",
+    "h": 93,
+    "rect": [
+      710,
+      575,
+      116,
+      93
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_chest": {
+    "atlas": "atlas_lk_icons",
+    "h": 91,
+    "rect": [
+      224,
+      679,
+      116,
+      91
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_compass": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      764,
+      120,
+      101,
+      116
+    ],
+    "slice": null,
+    "w": 101
+  },
+  "lk_glyph_white_compass_rose": {
+    "h": 100,
+    "slice": null,
+    "w": 100
+  },
+  "lk_glyph_white_gamepad": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      869,
+      120,
+      101,
+      116
+    ],
+    "slice": null,
+    "w": 101
+  },
+  "lk_glyph_white_gears": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      476,
+      0,
+      114,
+      116
+    ],
+    "slice": null,
+    "w": 114
+  },
+  "lk_glyph_white_hammer": {
+    "atlas": "atlas_lk_icons",
+    "h": 115,
+    "rect": [
+      314,
+      240,
+      116,
+      115
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_info": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      253,
+      240,
+      57,
+      116
+    ],
+    "slice": null,
+    "w": 57
+  },
+  "lk_glyph_white_magnifier": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      826,
+      0,
+      111,
+      116
+    ],
+    "slice": null,
+    "w": 111
+  },
+  "lk_glyph_white_map_pin": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      187,
+      575,
+      89,
+      100
+    ],
+    "slice": null,
+    "w": 89
+  },
+  "lk_glyph_white_monitor": {
+    "atlas": "atlas_lk_icons",
+    "h": 105,
+    "rect": [
+      120,
+      360,
+      116,
+      105
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_people": {
+    "atlas": "atlas_lk_icons",
+    "h": 89,
+    "rect": [
+      584,
+      679,
+      116,
+      89
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_refresh": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      568,
+      469,
+      100,
+      100
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_glyph_white_speaker": {
+    "atlas": "atlas_lk_icons",
+    "h": 101,
+    "rect": [
+      240,
+      469,
+      116,
+      101
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_glyph_white_trophy": {
+    "atlas": "atlas_lk_icons",
+    "h": 103,
+    "rect": [
+      600,
+      360,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_anvil": {
+    "atlas": "atlas_lk_lobby",
+    "h": 102,
+    "rect": [
+      448,
+      270,
+      116,
+      102
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_anvil_alt": {
+    "h": 104,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_anvil_hammer": {
+    "atlas": "atlas_lk_icons",
+    "h": 89,
+    "rect": [
+      704,
+      679,
+      100,
+      89
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_arrow_up": {
+    "h": 116,
+    "slice": null,
+    "w": 109
+  },
+  "lk_icon_backpack": {
+    "atlas": "atlas_lk_lobby",
+    "h": 116,
+    "rect": [
+      294,
+      0,
+      115,
+      116
+    ],
+    "slice": null,
+    "w": 115
+  },
+  "lk_icon_backpack_alt": {
+    "h": 116,
+    "slice": null,
+    "w": 109
+  },
+  "lk_icon_backpack_small": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      0,
+      0,
+      116,
+      116
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_backpack_white": {
+    "atlas": "atlas_lk_icons",
+    "h": 55,
+    "rect": [
+      328,
+      775,
+      53,
+      55
+    ],
+    "slice": null,
+    "w": 53
+  },
+  "lk_icon_berries": {
+    "atlas": "atlas_lk_items",
+    "h": 73,
+    "rect": [
+      771,
+      307,
+      78,
+      73
+    ],
+    "slice": null,
+    "w": 78
+  },
+  "lk_icon_berry_bush": {
+    "atlas": "atlas_lk_icons",
+    "h": 92,
+    "rect": [
+      0,
+      679,
+      100,
+      92
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_bone": {
+    "atlas": "atlas_lk_items",
+    "h": 79,
+    "rect": [
+      428,
+      307,
+      87,
+      79
+    ],
+    "slice": null,
+    "w": 87
+  },
+  "lk_icon_bridge": {
+    "h": 63,
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_build": {
+    "atlas": "atlas_lk_items",
+    "h": 97,
+    "rect": [
+      871,
+      200,
+      108,
+      97
+    ],
+    "slice": null,
+    "w": 108
+  },
+  "lk_icon_campfire": {
+    "atlas": "atlas_lk_items",
+    "h": 100,
+    "rect": [
+      590,
+      200,
+      95,
+      100
+    ],
+    "slice": null,
+    "w": 95
+  },
+  "lk_icon_cave": {
+    "h": 74,
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_check": {
+    "atlas": "atlas_lk_icons",
+    "h": 93,
+    "rect": [
+      830,
+      575,
+      116,
+      93
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_chest": {
+    "atlas": "atlas_lk_icons",
+    "h": 91,
+    "rect": [
+      344,
+      679,
+      116,
+      91
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_clock": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      594,
+      0,
+      113,
+      116
+    ],
+    "slice": null,
+    "w": 113
+  },
+  "lk_icon_coin": {
+    "atlas": "atlas_lk_lobby",
+    "h": 113,
+    "rect": [
+      685,
+      0,
+      116,
+      113
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_compass": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      0,
+      240,
+      101,
+      116
+    ],
+    "slice": null,
+    "w": 101
+  },
+  "lk_icon_compass_arrow": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      672,
+      469,
+      100,
+      100
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_cross": {
+    "atlas": "atlas_lk_icons",
+    "h": 112,
+    "rect": [
+      674,
+      240,
+      116,
+      112
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_crown": {
+    "atlas": "atlas_lk_lobby",
+    "h": 97,
+    "rect": [
+      906,
+      270,
+      116,
+      97
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_crown_gem": {
+    "atlas": "atlas_lk_icons",
+    "h": 104,
+    "rect": [
+      360,
+      360,
+      116,
+      104
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_crystals": {
+    "atlas": "atlas_lk_items",
+    "h": 100,
+    "rect": [
+      689,
+      200,
+      94,
+      100
+    ],
+    "slice": null,
+    "w": 94
+  },
+  "lk_icon_cursor": {
+    "h": 96,
+    "slice": null,
+    "w": 70
+  },
+  "lk_icon_drumstick": {
+    "atlas": "atlas_lk_items",
+    "h": 103,
+    "rect": [
+      0,
+      200,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_exclamation": {
+    "atlas": "atlas_lk_lobby",
+    "h": 116,
+    "rect": [
+      504,
+      0,
+      57,
+      116
+    ],
+    "slice": null,
+    "w": 57
+  },
+  "lk_icon_exit": {
+    "atlas": "atlas_lk_icons",
+    "h": 106,
+    "rect": [
+      794,
+      240,
+      116,
+      106
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_flag": {
+    "atlas": "atlas_lk_icons",
+    "h": 97,
+    "rect": [
+      373,
+      575,
+      93,
+      97
+    ],
+    "slice": null,
+    "w": 93
+  },
+  "lk_icon_gear": {
+    "atlas": "atlas_lk_icons",
+    "h": 114,
+    "rect": [
+      554,
+      240,
+      116,
+      114
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_gear_alt": {
+    "h": 116,
+    "slice": null,
+    "w": 114
+  },
+  "lk_icon_gem": {
+    "atlas": "atlas_lk_lobby",
+    "h": 116,
+    "rect": [
+      413,
+      0,
+      87,
+      116
+    ],
+    "slice": null,
+    "w": 87
+  },
+  "lk_icon_gift": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      0,
+      120,
+      111,
+      116
+    ],
+    "slice": null,
+    "w": 111
+  },
+  "lk_icon_hammer": {
+    "atlas": "atlas_lk_icons",
+    "h": 115,
+    "rect": [
+      434,
+      240,
+      116,
+      115
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_hatchet": {
+    "atlas": "atlas_lk_items",
+    "h": 127,
+    "rect": [
+      160,
+      0,
+      133,
+      127
+    ],
+    "slice": null,
+    "w": 133
+  },
+  "lk_icon_heart": {
+    "atlas": "atlas_lk_items",
+    "h": 103,
+    "rect": [
+      120,
+      200,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_hide": {
+    "atlas": "atlas_lk_items",
+    "h": 75,
+    "rect": [
+      608,
+      307,
+      79,
+      75
+    ],
+    "slice": null,
+    "w": 79
+  },
+  "lk_icon_hourglass": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      105,
+      240,
+      83,
+      116
+    ],
+    "slice": null,
+    "w": 83
+  },
+  "lk_icon_house": {
+    "h": 104,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_hut": {
+    "h": 96,
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_journal": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      446,
+      120,
+      104,
+      116
+    ],
+    "slice": null,
+    "w": 104
+  },
+  "lk_icon_lightning": {
+    "atlas": "atlas_lk_items",
+    "h": 116,
+    "rect": [
+      552,
+      0,
+      86,
+      116
+    ],
+    "slice": null,
+    "w": 86
+  },
+  "lk_icon_lock": {
+    "atlas": "atlas_lk_lobby",
+    "h": 88,
+    "rect": [
+      240,
+      380,
+      68,
+      88
+    ],
+    "slice": null,
+    "w": 68
+  },
+  "lk_icon_log": {
+    "atlas": "atlas_lk_icons",
+    "h": 96,
+    "rect": [
+      470,
+      575,
+      116,
+      96
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_logs": {
+    "atlas": "atlas_lk_items",
+    "h": 95,
+    "rect": [
+      0,
+      307,
+      110,
+      95
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_icon_magma_ore": {
+    "atlas": "atlas_lk_items",
+    "h": 87,
+    "rect": [
+      220,
+      307,
+      100,
+      87
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_magnifier": {
+    "atlas": "atlas_lk_icons",
+    "h": 116,
+    "rect": [
+      115,
+      120,
+      111,
+      116
+    ],
+    "slice": null,
+    "w": 111
+  },
+  "lk_icon_mail": {
+    "atlas": "atlas_lk_icons",
+    "h": 84,
+    "rect": [
+      0,
+      775,
+      116,
+      84
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_map": {
+    "atlas": "atlas_lk_icons",
+    "h": 105,
+    "rect": [
+      240,
+      360,
+      116,
+      105
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_map_pin": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      280,
+      575,
+      89,
+      100
+    ],
+    "slice": null,
+    "w": 89
+  },
+  "lk_icon_market": {
+    "atlas": "atlas_lk_lobby",
+    "h": 102,
+    "rect": [
+      568,
+      270,
+      116,
+      102
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_market_alt": {
+    "h": 100,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_mountain": {
+    "atlas": "atlas_lk_icons",
+    "h": 82,
+    "rect": [
+      120,
+      775,
+      100,
+      82
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_mushroom": {
+    "atlas": "atlas_lk_items",
+    "h": 73,
+    "rect": [
+      853,
+      307,
+      72,
+      73
+    ],
+    "slice": null,
+    "w": 72
+  },
+  "lk_icon_party": {
+    "atlas": "atlas_lk_lobby",
+    "h": 89,
+    "rect": [
+      120,
+      380,
+      116,
+      89
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_paw": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      776,
+      469,
+      97,
+      100
+    ],
+    "slice": null,
+    "w": 97
+  },
+  "lk_icon_pickaxe": {
+    "atlas": "atlas_lk_items",
+    "h": 124,
+    "rect": [
+      297,
+      0,
+      135,
+      124
+    ],
+    "slice": null,
+    "w": 135
+  },
+  "lk_icon_plank": {
+    "atlas": "atlas_lk_items",
+    "h": 102,
+    "rect": [
+      360,
+      200,
+      106,
+      102
+    ],
+    "slice": null,
+    "w": 106
+  },
+  "lk_icon_plant_fiber": {
+    "atlas": "atlas_lk_items",
+    "h": 113,
+    "rect": [
+      729,
+      0,
+      116,
+      113
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_portal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 94,
+    "rect": [
+      0,
+      380,
+      116,
+      94
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_portal_alt": {
+    "h": 100,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_rocks": {
+    "atlas": "atlas_lk_items",
+    "h": 83,
+    "rect": [
+      324,
+      307,
+      100,
+      83
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_rope": {
+    "atlas": "atlas_lk_items",
+    "h": 75,
+    "rect": [
+      691,
+      307,
+      76,
+      75
+    ],
+    "slice": null,
+    "w": 76
+  },
+  "lk_icon_ruin": {
+    "atlas": "atlas_lk_icons",
+    "h": 86,
+    "rect": [
+      808,
+      679,
+      100,
+      86
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_runestone": {
+    "atlas": "atlas_lk_items",
+    "h": 116,
+    "rect": [
+      436,
+      0,
+      112,
+      116
+    ],
+    "slice": null,
+    "w": 112
+  },
+  "lk_icon_runestone_world": {
+    "h": 100,
+    "slice": null,
+    "w": 99
+  },
+  "lk_icon_scroll": {
+    "atlas": "atlas_lk_lobby",
+    "h": 103,
+    "rect": [
+      223,
+      270,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_scroll_alt": {
+    "h": 115,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_scroll_small": {
+    "h": 110,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_spear": {
+    "atlas": "atlas_lk_items",
+    "h": 76,
+    "rect": [
+      519,
+      307,
+      85,
+      76
+    ],
+    "slice": null,
+    "w": 85
+  },
+  "lk_icon_speech": {
+    "h": 101,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_star": {
+    "atlas": "atlas_lk_items",
+    "h": 113,
+    "rect": [
+      849,
+      0,
+      116,
+      113
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_stone": {
+    "atlas": "atlas_lk_items",
+    "h": 103,
+    "rect": [
+      240,
+      200,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_stone_axe": {
+    "atlas": "atlas_lk_items",
+    "h": 196,
+    "rect": [
+      0,
+      0,
+      156,
+      196
+    ],
+    "slice": null,
+    "w": 156
+  },
+  "lk_icon_stones": {
+    "atlas": "atlas_lk_items",
+    "h": 92,
+    "rect": [
+      114,
+      307,
+      102,
+      92
+    ],
+    "slice": null,
+    "w": 102
+  },
+  "lk_icon_torch": {
+    "atlas": "atlas_lk_items",
+    "h": 116,
+    "rect": [
+      642,
+      0,
+      83,
+      116
+    ],
+    "slice": null,
+    "w": 83
+  },
+  "lk_icon_totem": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      0,
+      575,
+      90,
+      100
+    ],
+    "slice": null,
+    "w": 90
+  },
+  "lk_icon_trade": {
+    "atlas": "atlas_lk_lobby",
+    "h": 84,
+    "rect": [
+      431,
+      478,
+      116,
+      84
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_trade_alt": {
+    "h": 94,
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_treasure": {
+    "atlas": "atlas_lk_icons",
+    "h": 70,
+    "rect": [
+      224,
+      775,
+      100,
+      70
+    ],
+    "slice": null,
+    "w": 100
+  },
+  "lk_icon_tree": {
+    "atlas": "atlas_lk_icons",
+    "h": 100,
+    "rect": [
+      877,
+      469,
+      92,
+      100
+    ],
+    "slice": null,
+    "w": 92
+  },
+  "lk_icon_trophy": {
+    "atlas": "atlas_lk_icons",
+    "h": 103,
+    "rect": [
+      720,
+      360,
+      116,
+      103
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_tusk": {
+    "atlas": "atlas_lk_items",
+    "h": 100,
+    "rect": [
+      787,
+      200,
+      80,
+      100
+    ],
+    "slice": null,
+    "w": 80
+  },
+  "lk_icon_warning": {
+    "atlas": "atlas_lk_items",
+    "h": 101,
+    "rect": [
+      470,
+      200,
+      116,
+      101
+    ],
+    "slice": null,
+    "w": 116
+  },
+  "lk_icon_wave": {
+    "h": 76,
+    "slice": null,
+    "w": 100
+  },
+  "lk_keycap": {
+    "atlas": "atlas_lk_lobby",
+    "h": 56,
+    "rect": [
+      215,
+      793,
+      58,
+      56
+    ],
+    "slice": [
+      16,
+      14,
+      16,
+      20
+    ],
+    "w": 58
+  },
+  "lk_keycap_wide": {
+    "atlas": "atlas_lk_lobby",
+    "h": 58,
+    "rect": [
+      626,
+      724,
+      108,
+      58
+    ],
+    "slice": [
+      16,
+      14,
+      16,
+      20
+    ],
+    "w": 108
+  },
+  "lk_map_parchment": {
+    "h": 264,
+    "slice": null,
+    "w": 273
+  },
+  "lk_medallion_octagon": {
+    "h": 100,
+    "slice": null,
+    "w": 84
+  },
+  "lk_medallion_round": {
+    "h": 98,
+    "slice": null,
+    "w": 100
+  },
+  "lk_medallion_square": {
+    "h": 84,
+    "slice": null,
+    "w": 82
+  },
+  "lk_nail": {
+    "h": 33,
+    "slice": null,
+    "w": 26
+  },
+  "lk_panel": {
+    "atlas": "atlas_lk_lobby",
+    "h": 110,
+    "rect": [
+      0,
+      156,
+      264,
+      110
+    ],
+    "slice": [
+      30,
+      28,
+      30,
+      28
+    ],
+    "w": 264
+  },
+  "lk_panel_inset": {
+    "atlas": "atlas_lk_window",
+    "h": 108,
+    "rect": [
+      598,
+      0,
+      204,
+      108
+    ],
+    "slice": [
+      14,
+      14,
+      14,
+      14
+    ],
+    "w": 204
+  },
+  "lk_pill_value": {
+    "atlas": "atlas_lk_window",
+    "h": 39,
+    "rect": [
+      0,
+      611,
+      101,
+      39
+    ],
+    "slice": [
+      14,
+      12,
+      14,
+      12
+    ],
+    "w": 101
+  },
+  "lk_plaque_capped": {
+    "h": 38,
+    "slice": [
+      24,
+      14,
+      24,
+      14
+    ],
+    "w": 224
+  },
+  "lk_plaque_leather": {
+    "h": 65,
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ],
+    "w": 177
+  },
+  "lk_plaque_leather_bar": {
+    "h": 50,
+    "slice": [
+      18,
+      16,
+      18,
+      16
+    ],
+    "w": 191
+  },
+  "lk_plaque_notched_disabled": {
+    "atlas": "atlas_lk_window",
+    "h": 66,
+    "rect": [
+      509,
+      351,
+      226,
+      66
+    ],
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "w": 226
+  },
+  "lk_plaque_notched_leather": {
+    "atlas": "atlas_lk_window",
+    "h": 66,
+    "rect": [
+      739,
+      351,
+      226,
+      66
+    ],
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "w": 226
+  },
+  "lk_plaque_notched_paper": {
+    "atlas": "atlas_lk_window",
+    "h": 66,
+    "rect": [
+      0,
+      423,
+      225,
+      66
+    ],
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "w": 225
+  },
+  "lk_plaque_paper": {
+    "atlas": "atlas_lk_lobby",
+    "h": 66,
+    "rect": [
+      648,
+      652,
+      179,
+      66
+    ],
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ],
+    "w": 179
+  },
+  "lk_plaque_paper_bar": {
+    "h": 50,
+    "slice": [
+      18,
+      16,
+      18,
+      16
+    ],
+    "w": 174
+  },
+  "lk_plaque_rivet_leather": {
+    "h": 53,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 213
+  },
+  "lk_plaque_rivet_paper": {
+    "h": 54,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "w": 182
+  },
+  "lk_plaque_small": {
+    "atlas": "atlas_lk_window",
+    "h": 64,
+    "rect": [
+      229,
+      423,
+      166,
+      64
+    ],
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "w": 166
+  },
+  "lk_player_card": {
+    "atlas": "atlas_lk_lobby",
+    "h": 86,
+    "rect": [
+      312,
+      380,
+      359,
+      86
+    ],
+    "slice": null,
+    "w": 359
+  },
+  "lk_portrait_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 103,
+    "rect": [
+      343,
+      270,
+      101,
+      103
+    ],
+    "slice": [
+      30,
+      30,
+      30,
+      30
+    ],
+    "w": 101
+  },
+  "lk_portrait_plaque": {
+    "h": 66,
+    "slice": null,
+    "w": 290
+  },
+  "lk_rail_h": {
+    "h": 23,
+    "slice": [
+      12,
+      6,
+      12,
+      6
+    ],
+    "w": 186
+  },
+  "lk_rail_v": {
+    "h": 103,
+    "slice": [
+      6,
+      12,
+      6,
+      12
+    ],
+    "w": 19
+  },
+  "lk_ring_full": {
+    "atlas": "atlas_lk_lobby",
+    "h": 108,
+    "rect": [
+      854,
+      156,
+      106,
+      108
+    ],
+    "slice": null,
+    "w": 106
+  },
+  "lk_ring_half": {
+    "h": 108,
+    "slice": null,
+    "w": 106
+  },
+  "lk_ring_track": {
+    "atlas": "atlas_lk_lobby",
+    "h": 106,
+    "rect": [
+      113,
+      270,
+      106,
+      106
+    ],
+    "slice": null,
+    "w": 106
+  },
+  "lk_rivet": {
+    "h": 28,
+    "slice": null,
+    "w": 28
+  },
+  "lk_rope_cross": {
+    "h": 68,
+    "slice": null,
+    "w": 72
+  },
+  "lk_rope_knot": {
+    "h": 58,
+    "slice": null,
+    "w": 51
+  },
+  "lk_rope_ring": {
+    "h": 58,
+    "slice": null,
+    "w": 60
+  },
+  "lk_row_bullet": {
+    "atlas": "atlas_lk_window",
+    "h": 23,
+    "rect": [
+      585,
+      611,
+      270,
+      23
+    ],
+    "slice": [
+      24,
+      8,
+      12,
+      8
+    ],
+    "w": 270
+  },
+  "lk_row_check_off": {
+    "h": 54,
+    "slice": [
+      44,
+      16,
+      16,
+      16
+    ],
+    "w": 240
+  },
+  "lk_row_check_on": {
+    "h": 54,
+    "slice": [
+      44,
+      16,
+      16,
+      16
+    ],
+    "w": 238
+  },
+  "lk_row_disabled": {
+    "atlas": "atlas_lk_lobby",
+    "h": 79,
+    "rect": [
+      86,
+      566,
+      327,
+      79
+    ],
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "w": 327
+  },
+  "lk_row_hover": {
+    "atlas": "atlas_lk_lobby",
+    "h": 83,
+    "rect": [
+      551,
+      478,
+      326,
+      83
+    ],
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "w": 326
+  },
+  "lk_row_normal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 79,
+    "rect": [
+      417,
+      566,
+      322,
+      79
+    ],
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "w": 322
+  },
+  "lk_scroll_thumb": {
+    "atlas": "atlas_lk_window",
+    "h": 62,
+    "rect": [
+      727,
+      423,
+      23,
+      62
+    ],
+    "slice": [
+      8,
+      10,
+      8,
+      10
+    ],
+    "w": 23
+  },
+  "lk_scroll_track": {
+    "atlas": "atlas_lk_window",
+    "h": 111,
+    "rect": [
+      571,
+      0,
+      23,
+      111
+    ],
+    "slice": [
+      8,
+      10,
+      8,
+      10
+    ],
+    "w": 23
+  },
+  "lk_search": {
+    "atlas": "atlas_lk_window",
+    "h": 53,
+    "rect": [
+      245,
+      493,
+      210,
+      53
+    ],
+    "slice": [
+      44,
+      18,
+      18,
+      18
+    ],
+    "w": 210
+  },
+  "lk_slider_knob": {
+    "atlas": "atlas_lk_window",
+    "h": 40,
+    "rect": [
+      971,
+      555,
+      39,
+      40
+    ],
+    "slice": null,
+    "w": 39
+  },
+  "lk_slider_track": {
+    "atlas": "atlas_lk_window",
+    "h": 21,
+    "rect": [
+      424,
+      654,
+      184,
+      21
+    ],
+    "slice": [
+      9,
+      7,
+      9,
+      7
+    ],
+    "w": 184
+  },
+  "lk_slot_disabled": {
+    "atlas": "atlas_lk_lobby",
+    "h": 108,
+    "rect": [
+      623,
+      156,
+      113,
+      108
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 113
+  },
+  "lk_slot_hotbar": {
+    "h": 98,
+    "slice": null,
+    "w": 99
+  },
+  "lk_slot_hover": {
+    "atlas": "atlas_lk_lobby",
+    "h": 109,
+    "rect": [
+      390,
+      156,
+      113,
+      109
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 113
+  },
+  "lk_slot_item_normal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 101,
+    "rect": [
+      798,
+      270,
+      104,
+      101
+    ],
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "w": 104
+  },
+  "lk_slot_item_selected": {
+    "atlas": "atlas_lk_lobby",
+    "h": 106,
+    "rect": [
+      0,
+      270,
+      109,
+      106
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 109
+  },
+  "lk_slot_locked": {
+    "atlas": "atlas_lk_lobby",
+    "h": 108,
+    "rect": [
+      740,
+      156,
+      110,
+      108
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_slot_normal": {
+    "atlas": "atlas_lk_lobby",
+    "h": 109,
+    "rect": [
+      507,
+      156,
+      112,
+      109
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 112
+  },
+  "lk_slot_selected": {
+    "atlas": "atlas_lk_lobby",
+    "h": 110,
+    "rect": [
+      268,
+      156,
+      118,
+      110
+    ],
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "w": 118
+  },
+  "lk_spike": {
+    "h": 25,
+    "slice": null,
+    "w": 26
+  },
+  "lk_statbar_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 65,
+    "rect": [
+      0,
+      724,
+      315,
+      65
+    ],
+    "slice": [
+      66,
+      20,
+      84,
+      20
+    ],
+    "w": 315
+  },
+  "lk_stepper_box": {
+    "h": 52,
+    "slice": [
+      14,
+      14,
+      30,
+      14
+    ],
+    "w": 153
+  },
+  "lk_strap_leather": {
+    "h": 47,
+    "slice": [
+      24,
+      18,
+      24,
+      18
+    ],
+    "w": 318
+  },
+  "lk_strap_leather_short": {
+    "h": 40,
+    "slice": [
+      22,
+      16,
+      22,
+      16
+    ],
+    "w": 146
+  },
+  "lk_tab_arrow_leather": {
+    "atlas": "atlas_lk_window",
+    "h": 63,
+    "rect": [
+      559,
+      423,
+      164,
+      63
+    ],
+    "slice": [
+      30,
+      20,
+      40,
+      20
+    ],
+    "w": 164
+  },
+  "lk_tab_arrow_paper": {
+    "atlas": "atlas_lk_window",
+    "h": 64,
+    "rect": [
+      399,
+      423,
+      156,
+      64
+    ],
+    "slice": [
+      30,
+      20,
+      40,
+      20
+    ],
+    "w": 156
+  },
+  "lk_tab_category": {
+    "atlas": "atlas_lk_window",
+    "h": 59,
+    "rect": [
+      754,
+      423,
+      228,
+      59
+    ],
+    "slice": [
+      20,
+      16,
+      34,
+      16
+    ],
+    "w": 228
+  },
+  "lk_tile_blank": {
+    "atlas": "atlas_lk_lobby",
+    "h": 66,
+    "rect": [
+      831,
+      652,
+      66,
+      66
+    ],
+    "slice": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "w": 66
+  },
+  "lk_tile_check_off": {
+    "atlas": "atlas_lk_window",
+    "h": 56,
+    "rect": [
+      132,
+      493,
+      53,
+      56
+    ],
+    "slice": null,
+    "w": 53
+  },
+  "lk_tile_check_on": {
+    "atlas": "atlas_lk_window",
+    "h": 54,
+    "rect": [
+      189,
+      493,
+      52,
+      54
+    ],
+    "slice": null,
+    "w": 52
+  },
+  "lk_tile_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 102,
+    "rect": [
+      688,
+      270,
+      106,
+      102
+    ],
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "w": 106
+  },
+  "lk_tile_header": {
+    "h": 84,
+    "slice": null,
+    "w": 83
+  },
+  "lk_tile_paper": {
+    "h": 83,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "w": 82
+  },
+  "lk_tile_rail": {
+    "h": 84,
+    "slice": null,
+    "w": 83
+  },
+  "lk_tile_small": {
+    "h": 50,
+    "slice": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "w": 63
+  },
+  "lk_tile_tab": {
+    "h": 88,
+    "slice": null,
+    "w": 82
+  },
+  "lk_toast_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 84,
+    "rect": [
+      0,
+      478,
+      427,
+      84
+    ],
+    "slice": [
+      36,
+      30,
+      36,
+      30
+    ],
+    "w": 427
+  },
+  "lk_toggle_off": {
+    "atlas": "atlas_lk_window",
+    "h": 49,
+    "rect": [
+      528,
+      555,
+      89,
+      49
+    ],
+    "slice": null,
+    "w": 89
+  },
+  "lk_toggle_on": {
+    "atlas": "atlas_lk_window",
+    "h": 49,
+    "rect": [
+      621,
+      555,
+      85,
+      49
+    ],
+    "slice": null,
+    "w": 85
+  },
+  "lk_tooltip": {
+    "atlas": "atlas_lk_window",
+    "h": 96,
+    "rect": [
+      0,
+      251,
+      252,
+      96
+    ],
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "w": 252
+  },
+  "lk_tooltip_tail": {
+    "atlas": "atlas_lk_window",
+    "h": 21,
+    "rect": [
+      612,
+      654,
+      32,
+      21
+    ],
+    "slice": null,
+    "w": 32
+  },
+  "lk_window_clasp_frame": {
+    "h": 261,
+    "slice": null,
+    "w": 281
+  },
+  "lk_window_frame": {
+    "atlas": "atlas_lk_lobby",
+    "h": 152,
+    "rect": [
+      0,
+      0,
+      290,
+      152
+    ],
+    "slice": [
+      40,
+      38,
+      40,
+      38
+    ],
+    "w": 290
   },
   "nine_corner_bl": {
     "h": 117,

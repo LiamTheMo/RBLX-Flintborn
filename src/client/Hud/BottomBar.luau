@@ -1,191 +1,142 @@
--- Bottom-centre group: the "LV. n" badge with a long XP bar, and the 6-slot
--- hotbar. Each slot shows its item's name (in its rarity colour) and stack count;
--- tapping a slot fires SlotPressed, which HudController turns into the same use
--- as its key. At the level cap the badge reads MAX over a full bar with a short
--- rebirth hint.
+-- Bottom-centre group, the same parts and measures as the lobby HUD's (Kit
+-- XP track with "LV. n" before it and "450/750 XP" after it, then six hotbar
+-- slots with leather number badges): the run's hotbar items as their art
+-- (ItemInfo through Kit.ItemIcon), stack counts, the Permanent star and the
+-- selected slot's gold glow. The badges name the bound keys and show only
+-- while a keyboard or mouse is in use (touch taps the slot, a gamepad steps
+-- with RB). A press fires SlotPressed, which HudController turns into the
+-- same use as the key. At the level cap the bar is full and reads "Max level"
+-- beside the real level.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
-local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
+local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
-local Widgets = require(script.Parent.Widgets)
 
 local BottomBar = {}
 BottomBar.__index = BottomBar
 
+-- Beside the full bar at the level cap (short, so it stays over the hotbar;
+-- the Progress window explains rebirth).
+BottomBar.MAX_TEXT = "Max level"
+
 function BottomBar.new(parent: Instance, layout)
-	local cfg = layout.bottom
-	local self = setmetatable({ slots = {}, selected = nil, level = nil }, BottomBar)
+	local cfg = Layout.Section(layout, "bottom")
+	local self = setmetatable({ slots = {}, selected = nil, level = nil, labels = {} }, BottomBar)
 	-- Fires (index) when a slot is tapped or clicked.
 	self.SlotPressed = Signal.new()
-	self.root = Widgets.Make("Frame", { Name = "BottomBar", BackgroundTransparency = 1 }, parent)
+	self.root = Instance.new("Frame")
+	self.root.Name = "BottomBar"
+	self.root.BackgroundTransparency = 1
 	Layout.Place(self.root, cfg)
+	self.root.Parent = parent
 
-	local badgeCfg = cfg.badge
-	local badge = Widgets.Sprite(badgeCfg.sprite, {
-		Name = "LevelBadge",
-		Position = Layout.Position(badgeCfg.rect),
-		Size = Layout.Size(badgeCfg.rect),
-		ZIndex = 6,
-	}, self.root)
-	self.levelText = Widgets.Text(badgeCfg, {
-		Name = "Level",
-		Text = "LV.",
-		Size = UDim2.fromScale(1, 1),
-		TextXAlignment = Enum.TextXAlignment.Center,
-		ZIndex = 7,
-	}, badge)
+	self.levelText = Kit.Text.new(self.root, {
+		name = "Level",
+		rect = cfg.level,
+		text = "",
+		role = "hudSmall",
+		textSize = cfg.textSize,
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
+		align = "Right",
+	})
+	self.xpBar = Kit.Bar.new(self.root, { name = "XpBar", rect = cfg.xp, fill = "xp" })
+	self.xpText = Kit.Text.new(self.root, {
+		name = "Xp",
+		rect = cfg.xpText,
+		text = "",
+		role = "hudSmall",
+		textSize = cfg.textSize,
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
+		scaled = true,
+	})
 
-	local xpCfg = cfg.xp
-	local inset = xpCfg.inset
-	self.xpBar = Widgets.Bar({
-		rect = xpCfg.rect,
-		inset = inset[2],
-		insetX = inset[1],
-		maxWidth = xpCfg.rect[3] - inset[1] - inset[3],
-		track = xpCfg.track,
-		fillColor = xpCfg.fillColor,
-	}, self.root)
-	-- A frame over the bar, unless the track art carries its own (parchment).
-	if xpCfg.frame then
-		local xpRect = { 0, 0, xpCfg.rect[3], xpCfg.rect[4] }
-		Widgets.Frame(xpCfg.frame, xpRect, self.xpBar.root, nil, xpCfg.frameOutset).ZIndex = 6
+	local hotbar = cfg.hotbar
+	self.hotbar = Instance.new("Frame")
+	self.hotbar.Name = "Hotbar"
+	self.hotbar.BackgroundTransparency = 1
+	self.hotbar.Position = UDim2.fromOffset(0, hotbar.y)
+	self.hotbar.Size = UDim2.fromOffset(cfg.size[1], hotbar.slot[2])
+	self.hotbar.Parent = self.root
+	for index = 1, hotbar.count do
+		local slot = Kit.Slot.new(self.hotbar, {
+			name = "Slot" .. index,
+			rect = { hotbar.x[index], 0, hotbar.slot[1], hotbar.slot[2] },
+			variant = "hotbar",
+			onPress = function()
+				self.SlotPressed:Fire(index)
+			end,
+		})
+		self.slots[index] = slot
 	end
-	self.itemColor = cfg.item and cfg.item.color
-	self.maxHint = Widgets.Text(cfg.maxHint, {
-		Name = "MaxHint",
-		Size = UDim2.fromScale(1, 1),
-		TextXAlignment = Enum.TextXAlignment.Center,
-		TextStrokeTransparency = 0.3,
-		Visible = false,
-		ZIndex = 7,
-	}, self.xpBar.root)
-
-	local hotbarCfg = cfg.hotbar
-	local slotWidth, slotHeight = hotbarCfg.slot[1], hotbarCfg.slot[2]
-	self.hotbar = Widgets.Make("Frame", {
-		Name = "Hotbar",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(hotbarCfg.x, hotbarCfg.y),
-		Size = UDim2.fromOffset(hotbarCfg.pitch * (hotbarCfg.count - 1) + slotWidth, slotHeight),
-	}, self.root)
-	for index = 1, hotbarCfg.count do
-		local slot = Widgets.Make("TextButton", {
-			Name = "Slot" .. index,
-			Text = "",
-			AutoButtonColor = false,
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset((index - 1) * hotbarCfg.pitch, 0),
-			Size = UDim2.fromOffset(slotWidth, slotHeight),
-		}, self.hotbar)
-		local slotRect = { 0, 0, slotWidth, slotHeight }
-		local frame = Widgets.Frame(hotbarCfg.frame, slotRect, slot, hotbarCfg.sliceScale, hotbarCfg.frameOutset)
-		frame.ZIndex = 2
-		local ring = Widgets.SelectionRing(cfg.selected, hotbarCfg.slot, slot)
-		ring.ZIndex = 3
-		local number = Widgets.Text(cfg.slotNumber, {
-			Name = "Number",
-			Text = tostring(index),
-			Position = Layout.Position(cfg.slotNumber.rect),
-			Size = Layout.Size(cfg.slotNumber.rect),
-			TextTruncate = Enum.TextTruncate.None,
-			ZIndex = 5,
-		}, slot)
-		-- The item: its name, wrapped and shrunk to fit, and its stack count.
-		local item = Widgets.Text(cfg.slotNumber, {
-			Name = "Item",
-			Text = "",
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			-- Between the key number (top-left) and the count (bottom-right).
-			Position = UDim2.fromScale(0.5, 0.55),
-			Size = UDim2.new(1, -12, 0.4, 0),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextWrapped = true,
-			TextScaled = true,
-			TextTruncate = Enum.TextTruncate.None,
-			ZIndex = 5,
-		}, slot)
-		Widgets.TextCap(item, 15, 8)
-		local count = Widgets.Text(cfg.slotNumber, {
-			Name = "Count",
-			Text = "",
-			AnchorPoint = Vector2.new(1, 1),
-			Position = UDim2.new(1, -8, 1, -5),
-			Size = UDim2.fromOffset(slotWidth - 16, 18),
-			TextXAlignment = Enum.TextXAlignment.Right,
-			ZIndex = 5,
-		}, slot)
-		-- On parchment the name stays ink; a stripe along the foot shows rarity.
-		local stripe = Widgets.Make("Frame", {
-			Name = "Rarity",
-			AnchorPoint = Vector2.new(0.5, 1),
-			BorderSizePixel = 0,
-			Position = UDim2.new(0.5, 0, 1, -12),
-			Size = UDim2.new(0.5, 0, 0, 4),
-			Visible = false,
-			ZIndex = 5,
-		}, slot)
-		Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, stripe)
-		slot.Activated:Connect(function()
-			self.SlotPressed:Fire(index)
-		end)
-		self.slots[index] = { button = slot, ring = ring, number = number, item = item, count = count, stripe = stripe }
+	for index, slot in self.slots do
+		local hit = slot.control.hit
+		local left, right = self.slots[index - 1], self.slots[index + 1]
+		hit.NextSelectionLeft = left and left.control.hit
+		hit.NextSelectionRight = right and right.control.hit
 	end
+	self:SetSlotLabels({})
+	-- The badges follow the input in use.
+	self.stopWatching = Kit.Input.Watch(function()
+		self:_showLabels()
+	end)
 	return self
+end
+
+-- True while key badges mean something: a keyboard or mouse is in use.
+function BottomBar.ShowsKeys(): boolean
+	local kind = Kit.Input.Type()
+	return kind == "keyboard" or kind == "mouse"
 end
 
 -- labels[index]: the key that selects each slot ("1", or a rebound key).
 function BottomBar:SetSlotLabels(labels: { string })
+	self.labels = labels
+	self:_showLabels()
+end
+
+function BottomBar:_showLabels()
+	local show = BottomBar.ShowsKeys()
 	for index, slot in self.slots do
-		local text = labels[index] or tostring(index)
-		slot.number.Text = text
-		-- A long key name ("Right Shift") shrinks to fit the slot corner.
-		slot.number.TextScaled = #text > 2
+		slot:SetHotkey(if show then self.labels[index] or tostring(index) else nil)
 	end
 end
 
--- views[index]: {name, count, rarity} from HudModel.HotbarSlots, nil when empty.
-function BottomBar:SetSlotItems(views)
+-- items[index]: {itemId, quantity, permanent} or nil/false for an empty slot.
+function BottomBar:SetSlotItems(items)
 	for index, slot in self.slots do
-		local view = views[index]
-		slot.item.Text = if view then view.name else ""
-		local rarityColor = view and Rarity.Colors[view.rarity]
-		if self.itemColor then
-			slot.item.TextColor3 = Layout.Color(self.itemColor)
-			slot.stripe.Visible = rarityColor ~= nil and view.rarity ~= "Common"
-			if rarityColor then
-				slot.stripe.BackgroundColor3 = rarityColor
-			end
-		else
-			slot.item.TextColor3 = rarityColor or Color3.new(1, 1, 1)
-		end
-		slot.count.Text = if view then view.count else ""
+		local item = items[index]
+		slot:SetItem(if item then item else nil)
 	end
 end
 
 function BottomBar:Select(index: number)
 	self.selected = index
 	for slotIndex, slot in self.slots do
-		slot.ring.Visible = slotIndex == index
+		slot:SetSelected(slotIndex == index)
 	end
 end
 
 -- view: the progression snapshot {level, xp, xpToNext}; no xpToNext = level cap.
 function BottomBar:SetProgress(view, instant: boolean?)
-	local isMax = view.xpToNext == nil
-	local fraction = HudModel.XpFraction(view.xp, view.xpToNext)
-	local levelledUp = self.level ~= nil and view.level > self.level
-	self.level = view.level
-	self.levelText.Text = HudModel.LevelText(view.level, isMax)
-	self.maxHint.Visible = isMax
-	self.maxHint.Text = if isMax then HudModel.MaxLevelHint(view.level) else ""
+	local progress = LobbyHudModel.Progress(view)
+	local isMax = type(view) == "table" and view.xpToNext == nil
+	local levelledUp = self.level ~= nil and type(view) == "table" and (view.level or 0) > self.level
+	self.level = if type(view) == "table" then view.level else nil
+	-- The real level at the cap too ("LV. 100", not "MAX").
+	local level = if isMax then HudModel.LevelText(view.level) else progress.level
+	self.levelText:SetText(level)
+	self.xpText:SetText(if isMax then BottomBar.MAX_TEXT else progress.text)
 	if levelledUp and not instant then
 		-- Start the new level's bar from empty so the gain reads as a level-up.
-		Widgets.SetBar(self.xpBar, 0, true)
+		self.xpBar:Set(0, true)
 	end
-	Widgets.SetBar(self.xpBar, fraction, instant)
+	self.xpBar:Set(progress.fraction, instant)
 end
 
 return BottomBar

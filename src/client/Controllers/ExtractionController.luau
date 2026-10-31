@@ -1,7 +1,8 @@
 -- Extraction HUD (GDD §9, §25.3). Lists every running countdown in the world with
 -- its distance and whether you are inside its zone, and confirms protection once
 -- you extract. World place only. With the new HUD (HudMode) the list is hidden and
--- the objective panel shows the nearest countdown from `Events` instead.
+-- the objective panel shows the nearest countdown from `Events` instead. Both the
+-- list and the protection notice are kit notice cards.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -12,6 +13,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
+local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local ExtractionController = {}
@@ -25,45 +27,31 @@ local ui = {}
 ExtractionController.Events = events
 ExtractionController.Changed = Signal.new()
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
-
 local function build()
-	local gui = make("ScreenGui", { Name = "Extraction", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
+	local gui = Theme.Make("ScreenGui", {
+		Name = "Extraction",
+		ResetOnSpawn = false,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, player:WaitForChild("PlayerGui"))
 	-- The countdown list lives in the shared top-centre column with the other banners.
-	ui.list = make("TextLabel", {
-		Size = UDim2.fromOffset(420, 0),
-		LayoutOrder = Theme.TopOrder.Extraction,
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundColor3 = Color3.fromRGB(16, 30, 38),
-		BackgroundTransparency = 0.2,
-		TextColor3 = Color3.fromRGB(190, 236, 255),
-		TextWrapped = true,
-		Font = Enum.Font.GothamBold,
-		TextSize = 15,
-		Visible = false,
-	}, Theme.TopStack())
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.list)
-	make("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 6) }, ui.list)
-	ui.protected = make("TextLabel", {
+	ui.list = NoticeCard.new(Theme.TopStack(), {
+		name = "ExtractionList",
+		width = 500,
+		layoutOrder = Theme.TopOrder.Extraction,
+		title = "Extraction",
+		icon = "portal",
+	})
+	local holder = Theme.Make("Frame", {
+		Name = "Holder",
 		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
 		Position = UDim2.fromScale(0.5, 0.4),
-		Size = UDim2.fromOffset(420, 70),
-		BackgroundColor3 = Color3.fromRGB(16, 38, 30),
-		BackgroundTransparency = 0.1,
-		Text = "Protected: extracting.\nReturning to the lobby…",
-		TextColor3 = Color3.fromRGB(190, 255, 214),
-		Font = Enum.Font.GothamBold,
-		TextSize = 18,
-		Visible = false,
+		Size = UDim2.fromOffset(460, 0),
 	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 8) }, ui.protected)
+	Theme.FitHud(gui, Theme.Make("UIScale", { Name = "Fit" }, holder))
+	ui.protected = NoticeCard.new(holder, { name = "Protected", width = 460, title = "Protected", icon = "check" })
+	ui.protected.frame.AnchorPoint = Vector2.new(0, 0.5)
+	ui.protected:SetTone("toggleOn")
 end
 
 local function update()
@@ -76,14 +64,18 @@ local function update()
 		if root then
 			local inside = ExtractionRules.InZone(root.Position, event.position, event.radius)
 			where = if inside
-				then "  ✓ IN ZONE — stay alive"
-				else ("  · %d studs away"):format(math.floor((root.Position - event.position).Magnitude))
+				then " · IN ZONE — stay alive"
+				else (" · %d studs away"):format(math.floor((root.Position - event.position).Magnitude))
 		end
 		local bonus = event.kind == ExtractionRules.Kinds.Center and " (2× materials)" or ""
-		table.insert(lines, ("⟁ %s%s — %ds%s"):format(event.name, bonus, remaining, where))
+		table.insert(lines, ("%s%s — %ds%s"):format(event.name, bonus, remaining, where))
 	end
-	ui.list.Visible = #lines > 0 and not HudMode.ReplacesLegacy()
-	ui.list.Text = table.concat(lines, "\n")
+	if #lines > 0 and not HudMode.ReplacesLegacy() then
+		table.sort(lines)
+		ui.list:Show(table.concat(lines, "\n"))
+	else
+		ui.list:Hide()
+	end
 end
 
 function ExtractionController.Start()
@@ -104,7 +96,11 @@ function ExtractionController.Start()
 		ExtractionController.Changed:Fire()
 	end)
 	player:GetAttributeChangedSignal("SessionState"):Connect(function()
-		ui.protected.Visible = player:GetAttribute("SessionState") == "ExtractionProtected"
+		if player:GetAttribute("SessionState") == "ExtractionProtected" then
+			ui.protected:Show("Extracting. Returning to the lobby…")
+		else
+			ui.protected:Hide()
+		end
 	end)
 	RunService.Heartbeat:Connect(update)
 end

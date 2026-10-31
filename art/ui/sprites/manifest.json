@@ -2906,5 +2906,3767 @@
     "w": 1024,
     "h": 1024,
     "slice": null
+  },
+  "lk_glyph_ink_gamepad": {
+    "file": "lk_glyph_ink_gamepad.png",
+    "w": 101,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      659,
+      120,
+      101,
+      116
+    ]
+  },
+  "lk_glyph_white_gamepad": {
+    "file": "lk_glyph_white_gamepad.png",
+    "w": 101,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      869,
+      120,
+      101,
+      116
+    ]
+  },
+  "lk_glyph_ink_speaker": {
+    "file": "lk_glyph_ink_speaker.png",
+    "w": 116,
+    "h": 101,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      120,
+      469,
+      116,
+      101
+    ]
+  },
+  "lk_glyph_white_speaker": {
+    "file": "lk_glyph_white_speaker.png",
+    "w": 116,
+    "h": 101,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      240,
+      469,
+      116,
+      101
+    ]
+  },
+  "lk_glyph_ink_monitor": {
+    "file": "lk_glyph_ink_monitor.png",
+    "w": 116,
+    "h": 105,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      360,
+      116,
+      105
+    ]
+  },
+  "lk_glyph_white_monitor": {
+    "file": "lk_glyph_white_monitor.png",
+    "w": 116,
+    "h": 105,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      120,
+      360,
+      116,
+      105
+    ]
+  },
+  "lk_glyph_ink_gears": {
+    "file": "lk_glyph_ink_gears.png",
+    "w": 114,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      358,
+      0,
+      114,
+      116
+    ]
+  },
+  "lk_glyph_white_gears": {
+    "file": "lk_glyph_white_gears.png",
+    "w": 114,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      476,
+      0,
+      114,
+      116
+    ]
+  },
+  "lk_glyph_ink_refresh": {
+    "file": "lk_glyph_ink_refresh.png",
+    "w": 100,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      464,
+      469,
+      100,
+      100
+    ]
+  },
+  "lk_glyph_white_refresh": {
+    "file": "lk_glyph_white_refresh.png",
+    "w": 100,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      568,
+      469,
+      100,
+      100
+    ]
+  },
+  "lk_glyph_ink_people": {
+    "file": "lk_glyph_ink_people.png",
+    "w": 116,
+    "h": 89,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      464,
+      679,
+      116,
+      89
+    ]
+  },
+  "lk_glyph_white_people": {
+    "file": "lk_glyph_white_people.png",
+    "w": 116,
+    "h": 89,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      584,
+      679,
+      116,
+      89
+    ]
+  },
+  "lk_glyph_ink_magnifier": {
+    "file": "lk_glyph_ink_magnifier.png",
+    "w": 111,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      711,
+      0,
+      111,
+      116
+    ]
+  },
+  "lk_glyph_white_magnifier": {
+    "file": "lk_glyph_white_magnifier.png",
+    "w": 111,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      826,
+      0,
+      111,
+      116
+    ]
+  },
+  "lk_glyph_ink_info": {
+    "file": "lk_glyph_ink_info.png",
+    "w": 57,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      192,
+      240,
+      57,
+      116
+    ]
+  },
+  "lk_glyph_white_info": {
+    "file": "lk_glyph_white_info.png",
+    "w": 57,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      253,
+      240,
+      57,
+      116
+    ]
+  },
+  "lk_glyph_ink_check": {
+    "file": "lk_glyph_ink_check.png",
+    "w": 116,
+    "h": 93,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      590,
+      575,
+      116,
+      93
+    ]
+  },
+  "lk_glyph_white_check": {
+    "file": "lk_glyph_white_check.png",
+    "w": 116,
+    "h": 93,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      710,
+      575,
+      116,
+      93
+    ]
+  },
+  "lk_glyph_ink_anvil": {
+    "file": "lk_glyph_ink_anvil.png",
+    "w": 116,
+    "h": 102,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      840,
+      360,
+      116,
+      102
+    ]
+  },
+  "lk_glyph_white_anvil": {
+    "file": "lk_glyph_white_anvil.png",
+    "w": 116,
+    "h": 102,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      469,
+      116,
+      102
+    ]
+  },
+  "lk_glyph_ink_book": {
+    "file": "lk_glyph_ink_book.png",
+    "w": 104,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      230,
+      120,
+      104,
+      116
+    ]
+  },
+  "lk_glyph_white_book": {
+    "file": "lk_glyph_white_book.png",
+    "w": 104,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      338,
+      120,
+      104,
+      116
+    ]
+  },
+  "lk_glyph_ink_trophy": {
+    "file": "lk_glyph_ink_trophy.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      480,
+      360,
+      116,
+      103
+    ]
+  },
+  "lk_glyph_white_trophy": {
+    "file": "lk_glyph_white_trophy.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      600,
+      360,
+      116,
+      103
+    ]
+  },
+  "lk_glyph_ink_map_pin": {
+    "file": "lk_glyph_ink_map_pin.png",
+    "w": 89,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      94,
+      575,
+      89,
+      100
+    ]
+  },
+  "lk_glyph_white_map_pin": {
+    "file": "lk_glyph_white_map_pin.png",
+    "w": 89,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      187,
+      575,
+      89,
+      100
+    ]
+  },
+  "lk_glyph_ink_backpack": {
+    "file": "lk_glyph_ink_backpack.png",
+    "w": 115,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      120,
+      0,
+      115,
+      116
+    ]
+  },
+  "lk_glyph_white_backpack": {
+    "file": "lk_glyph_white_backpack.png",
+    "w": 115,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      239,
+      0,
+      115,
+      116
+    ]
+  },
+  "lk_glyph_ink_chest": {
+    "file": "lk_glyph_ink_chest.png",
+    "w": 116,
+    "h": 91,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      104,
+      679,
+      116,
+      91
+    ]
+  },
+  "lk_glyph_white_chest": {
+    "file": "lk_glyph_white_chest.png",
+    "w": 116,
+    "h": 91,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      224,
+      679,
+      116,
+      91
+    ]
+  },
+  "lk_glyph_ink_hammer": {
+    "file": "lk_glyph_ink_hammer.png",
+    "w": 116,
+    "h": 115,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      565,
+      0,
+      116,
+      115
+    ]
+  },
+  "lk_glyph_white_hammer": {
+    "file": "lk_glyph_white_hammer.png",
+    "w": 116,
+    "h": 115,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      314,
+      240,
+      116,
+      115
+    ]
+  },
+  "lk_glyph_ink_compass": {
+    "file": "lk_glyph_ink_compass.png",
+    "w": 101,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      554,
+      120,
+      101,
+      116
+    ]
+  },
+  "lk_glyph_white_compass": {
+    "file": "lk_glyph_white_compass.png",
+    "w": 101,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      764,
+      120,
+      101,
+      116
+    ]
+  },
+  "lk_badge_count": {
+    "file": "lk_badge_count.png",
+    "w": 48,
+    "h": 44,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      817,
+      793,
+      48,
+      44
+    ]
+  },
+  "lk_badge_count_wide": {
+    "file": "lk_badge_count_wide.png",
+    "w": 86,
+    "h": 42,
+    "slice": [
+      12,
+      12,
+      12,
+      12
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      869,
+      793,
+      86,
+      42
+    ]
+  },
+  "lk_badge_number": {
+    "file": "lk_badge_number.png",
+    "w": 40,
+    "h": 40,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      959,
+      793,
+      40,
+      40
+    ]
+  },
+  "lk_banner_leather": {
+    "file": "lk_banner_leather.png",
+    "w": 573,
+    "h": 56,
+    "slice": [
+      26,
+      22,
+      26,
+      22
+    ]
+  },
+  "lk_banner_paper": {
+    "file": "lk_banner_paper.png",
+    "w": 573,
+    "h": 65,
+    "slice": [
+      36,
+      28,
+      36,
+      28
+    ]
+  },
+  "lk_bar_fill_blue": {
+    "file": "lk_bar_fill_blue.png",
+    "w": 169,
+    "h": 29,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      889,
+      169,
+      29
+    ]
+  },
+  "lk_bar_fill_green": {
+    "file": "lk_bar_fill_green.png",
+    "w": 226,
+    "h": 28,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      538,
+      889,
+      226,
+      28
+    ]
+  },
+  "lk_bar_fill_orange": {
+    "file": "lk_bar_fill_orange.png",
+    "w": 226,
+    "h": 29,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      488,
+      853,
+      226,
+      29
+    ]
+  },
+  "lk_bar_fill_red": {
+    "file": "lk_bar_fill_red.png",
+    "w": 226,
+    "h": 29,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      718,
+      853,
+      226,
+      29
+    ]
+  },
+  "lk_bar_fill_yellow": {
+    "file": "lk_bar_fill_yellow.png",
+    "w": 226,
+    "h": 30,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      220,
+      853,
+      226,
+      30
+    ]
+  },
+  "lk_bar_frame": {
+    "file": "lk_bar_frame.png",
+    "w": 303,
+    "h": 55,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      277,
+      793,
+      303,
+      55
+    ]
+  },
+  "lk_bar_frame_plain": {
+    "file": "lk_bar_frame_plain.png",
+    "w": 303,
+    "h": 58,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      319,
+      724,
+      303,
+      58
+    ]
+  },
+  "lk_bar_frame_thin": {
+    "file": "lk_bar_frame_thin.png",
+    "w": 182,
+    "h": 32,
+    "slice": [
+      16,
+      12,
+      16,
+      12
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      853,
+      182,
+      32
+    ]
+  },
+  "lk_bar_track": {
+    "file": "lk_bar_track.png",
+    "w": 361,
+    "h": 28,
+    "slice": [
+      12,
+      10,
+      12,
+      10
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      173,
+      889,
+      361,
+      28
+    ]
+  },
+  "lk_button_close_disabled": {
+    "file": "lk_button_close_disabled.png",
+    "w": 69,
+    "h": 67,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      363,
+      351,
+      69,
+      67
+    ]
+  },
+  "lk_button_close_hover": {
+    "file": "lk_button_close_hover.png",
+    "w": 69,
+    "h": 68,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      216,
+      351,
+      69,
+      68
+    ]
+  },
+  "lk_button_close_normal": {
+    "file": "lk_button_close_normal.png",
+    "w": 69,
+    "h": 67,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      436,
+      351,
+      69,
+      67
+    ]
+  },
+  "lk_button_close_pressed": {
+    "file": "lk_button_close_pressed.png",
+    "w": 70,
+    "h": 67,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      289,
+      351,
+      70,
+      67
+    ]
+  },
+  "lk_button_flat_disabled": {
+    "file": "lk_button_flat_disabled.png",
+    "w": 217,
+    "h": 52,
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      691,
+      493,
+      217,
+      52
+    ]
+  },
+  "lk_button_flat_leather": {
+    "file": "lk_button_flat_leather.png",
+    "w": 197,
+    "h": 51,
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      266,
+      555,
+      197,
+      51
+    ]
+  },
+  "lk_button_flat_paper": {
+    "file": "lk_button_flat_paper.png",
+    "w": 228,
+    "h": 52,
+    "slice": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      459,
+      493,
+      228,
+      52
+    ]
+  },
+  "lk_button_hud": {
+    "file": "lk_button_hud.png",
+    "w": 64,
+    "h": 56,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      64,
+      493,
+      64,
+      56
+    ]
+  },
+  "lk_button_invite": {
+    "file": "lk_button_invite.png",
+    "w": 60,
+    "h": 49,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      753,
+      793,
+      60,
+      49
+    ]
+  },
+  "lk_button_invite_card": {
+    "file": "lk_button_invite_card.png",
+    "w": 123,
+    "h": 113,
+    "slice": null
+  },
+  "lk_button_leather_disabled": {
+    "file": "lk_button_leather_disabled.png",
+    "w": 212,
+    "h": 68,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      351,
+      212,
+      68
+    ]
+  },
+  "lk_button_leather_hover": {
+    "file": "lk_button_leather_hover.png",
+    "w": 210,
+    "h": 69,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      472,
+      251,
+      210,
+      69
+    ]
+  },
+  "lk_button_leather_normal": {
+    "file": "lk_button_leather_normal.png",
+    "w": 212,
+    "h": 69,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      256,
+      251,
+      212,
+      69
+    ]
+  },
+  "lk_button_leather_pressed": {
+    "file": "lk_button_leather_pressed.png",
+    "w": 216,
+    "h": 68,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      686,
+      251,
+      216,
+      68
+    ]
+  },
+  "lk_button_paper_disabled": {
+    "file": "lk_button_paper_disabled.png",
+    "w": 213,
+    "h": 67,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      431,
+      652,
+      213,
+      67
+    ]
+  },
+  "lk_button_paper_hover": {
+    "file": "lk_button_paper_hover.png",
+    "w": 212,
+    "h": 68,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      652,
+      212,
+      68
+    ]
+  },
+  "lk_button_paper_normal": {
+    "file": "lk_button_paper_normal.png",
+    "w": 211,
+    "h": 68,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      216,
+      652,
+      211,
+      68
+    ]
+  },
+  "lk_button_paper_pressed": {
+    "file": "lk_button_paper_pressed.png",
+    "w": 218,
+    "h": 69,
+    "slice": [
+      26,
+      24,
+      26,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      743,
+      566,
+      218,
+      69
+    ]
+  },
+  "lk_button_paper_small_disabled": {
+    "file": "lk_button_paper_small_disabled.png",
+    "w": 103,
+    "h": 55,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      584,
+      793,
+      103,
+      55
+    ]
+  },
+  "lk_button_paper_small_hover": {
+    "file": "lk_button_paper_small_hover.png",
+    "w": 104,
+    "h": 56,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      793,
+      104,
+      56
+    ]
+  },
+  "lk_button_paper_small_normal": {
+    "file": "lk_button_paper_small_normal.png",
+    "w": 103,
+    "h": 56,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      108,
+      793,
+      103,
+      56
+    ]
+  },
+  "lk_button_play_square": {
+    "file": "lk_button_play_square.png",
+    "w": 64,
+    "h": 56,
+    "slice": null
+  },
+  "lk_button_settings": {
+    "file": "lk_button_settings.png",
+    "w": 64,
+    "h": 58,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      738,
+      724,
+      64,
+      58
+    ]
+  },
+  "lk_button_square_leather": {
+    "file": "lk_button_square_leather.png",
+    "w": 57,
+    "h": 51,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      467,
+      555,
+      57,
+      51
+    ]
+  },
+  "lk_button_square_paper": {
+    "file": "lk_button_square_paper.png",
+    "w": 60,
+    "h": 58,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      493,
+      60,
+      58
+    ]
+  },
+  "lk_button_square_small": {
+    "file": "lk_button_square_small.png",
+    "w": 58,
+    "h": 51,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      691,
+      793,
+      58,
+      51
+    ]
+  },
+  "lk_button_stepper_minus": {
+    "file": "lk_button_stepper_minus.png",
+    "w": 50,
+    "h": 48,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      710,
+      555,
+      50,
+      48
+    ]
+  },
+  "lk_button_stepper_plus": {
+    "file": "lk_button_stepper_plus.png",
+    "w": 49,
+    "h": 48,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      818,
+      555,
+      49,
+      48
+    ]
+  },
+  "lk_card_detail": {
+    "file": "lk_card_detail.png",
+    "w": 152,
+    "h": 219,
+    "slice": null
+  },
+  "lk_checkbox_off": {
+    "file": "lk_checkbox_off.png",
+    "w": 46,
+    "h": 45,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      871,
+      555,
+      46,
+      45
+    ]
+  },
+  "lk_checkbox_on": {
+    "file": "lk_checkbox_on.png",
+    "w": 46,
+    "h": 45,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      921,
+      555,
+      46,
+      45
+    ]
+  },
+  "lk_clasp_left": {
+    "file": "lk_clasp_left.png",
+    "w": 22,
+    "h": 52,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      214,
+      555,
+      22,
+      52
+    ]
+  },
+  "lk_clasp_right": {
+    "file": "lk_clasp_right.png",
+    "w": 22,
+    "h": 52,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      240,
+      555,
+      22,
+      52
+    ]
+  },
+  "lk_corner_bl": {
+    "file": "lk_corner_bl.png",
+    "w": 45,
+    "h": 46,
+    "slice": null
+  },
+  "lk_corner_br": {
+    "file": "lk_corner_br.png",
+    "w": 46,
+    "h": 46,
+    "slice": null
+  },
+  "lk_corner_fold": {
+    "file": "lk_corner_fold.png",
+    "w": 93,
+    "h": 108,
+    "slice": null
+  },
+  "lk_corner_ornate_bl": {
+    "file": "lk_corner_ornate_bl.png",
+    "w": 49,
+    "h": 45,
+    "slice": null
+  },
+  "lk_corner_ornate_br": {
+    "file": "lk_corner_ornate_br.png",
+    "w": 50,
+    "h": 45,
+    "slice": null
+  },
+  "lk_corner_ornate_tl": {
+    "file": "lk_corner_ornate_tl.png",
+    "w": 49,
+    "h": 46,
+    "slice": null
+  },
+  "lk_corner_ornate_tr": {
+    "file": "lk_corner_ornate_tr.png",
+    "w": 50,
+    "h": 45,
+    "slice": null
+  },
+  "lk_corner_tl": {
+    "file": "lk_corner_tl.png",
+    "w": 46,
+    "h": 47,
+    "slice": null
+  },
+  "lk_corner_tr": {
+    "file": "lk_corner_tr.png",
+    "w": 46,
+    "h": 47,
+    "slice": null
+  },
+  "lk_currency_pill": {
+    "file": "lk_currency_pill.png",
+    "w": 127,
+    "h": 57,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      806,
+      724,
+      127,
+      57
+    ]
+  },
+  "lk_dialog_frame": {
+    "file": "lk_dialog_frame.png",
+    "w": 448,
+    "h": 247,
+    "slice": [
+      46,
+      42,
+      46,
+      42
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      0,
+      448,
+      247
+    ]
+  },
+  "lk_divider_diamond": {
+    "file": "lk_divider_diamond.png",
+    "w": 420,
+    "h": 22,
+    "slice": [
+      16,
+      4,
+      16,
+      4
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      654,
+      420,
+      22
+    ]
+  },
+  "lk_divider_line": {
+    "file": "lk_divider_line.png",
+    "w": 476,
+    "h": 15,
+    "slice": [
+      14,
+      4,
+      14,
+      4
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      680,
+      476,
+      15
+    ]
+  },
+  "lk_divider_ornament": {
+    "file": "lk_divider_ornament.png",
+    "w": 476,
+    "h": 25,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      105,
+      611,
+      476,
+      25
+    ]
+  },
+  "lk_divider_vertical": {
+    "file": "lk_divider_vertical.png",
+    "w": 18,
+    "h": 162,
+    "slice": [
+      4,
+      16,
+      4,
+      16
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      452,
+      0,
+      18,
+      162
+    ]
+  },
+  "lk_dot_brown": {
+    "file": "lk_dot_brown.png",
+    "w": 28,
+    "h": 28,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      768,
+      889,
+      28,
+      28
+    ]
+  },
+  "lk_dot_green": {
+    "file": "lk_dot_green.png",
+    "w": 27,
+    "h": 28,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      864,
+      889,
+      27,
+      28
+    ]
+  },
+  "lk_dot_red": {
+    "file": "lk_dot_red.png",
+    "w": 28,
+    "h": 28,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      800,
+      889,
+      28,
+      28
+    ]
+  },
+  "lk_dot_yellow": {
+    "file": "lk_dot_yellow.png",
+    "w": 28,
+    "h": 28,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      832,
+      889,
+      28,
+      28
+    ]
+  },
+  "lk_dropdown": {
+    "file": "lk_dropdown.png",
+    "w": 210,
+    "h": 52,
+    "slice": [
+      18,
+      18,
+      44,
+      18
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      555,
+      210,
+      52
+    ]
+  },
+  "lk_dropdown_button": {
+    "file": "lk_dropdown_button.png",
+    "w": 50,
+    "h": 48,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      764,
+      555,
+      50,
+      48
+    ]
+  },
+  "lk_emblem_leaf": {
+    "file": "lk_emblem_leaf.png",
+    "w": 39,
+    "h": 127,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      528,
+      0,
+      39,
+      127
+    ]
+  },
+  "lk_emblem_rune": {
+    "file": "lk_emblem_rune.png",
+    "w": 50,
+    "h": 136,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      474,
+      0,
+      50,
+      136
+    ]
+  },
+  "lk_frame_capped_hollow": {
+    "file": "lk_frame_capped_hollow.png",
+    "w": 222,
+    "h": 36,
+    "slice": [
+      24,
+      14,
+      24,
+      14
+    ]
+  },
+  "lk_frame_hollow": {
+    "file": "lk_frame_hollow.png",
+    "w": 132,
+    "h": 108,
+    "slice": [
+      30,
+      28,
+      30,
+      28
+    ]
+  },
+  "lk_frame_hollow_bar": {
+    "file": "lk_frame_hollow_bar.png",
+    "w": 438,
+    "h": 63,
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ]
+  },
+  "lk_frame_hollow_capped": {
+    "file": "lk_frame_hollow_capped.png",
+    "w": 92,
+    "h": 90,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ]
+  },
+  "lk_frame_hollow_circle": {
+    "file": "lk_frame_hollow_circle.png",
+    "w": 82,
+    "h": 83,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      881,
+      478,
+      82,
+      83
+    ]
+  },
+  "lk_frame_hollow_large": {
+    "file": "lk_frame_hollow_large.png",
+    "w": 341,
+    "h": 179,
+    "slice": [
+      32,
+      30,
+      32,
+      30
+    ]
+  },
+  "lk_frame_hollow_small": {
+    "file": "lk_frame_hollow_small.png",
+    "w": 92,
+    "h": 89,
+    "slice": [
+      26,
+      26,
+      26,
+      26
+    ]
+  },
+  "lk_frame_hollow_speech": {
+    "file": "lk_frame_hollow_speech.png",
+    "w": 197,
+    "h": 92,
+    "slice": null
+  },
+  "lk_frame_hollow_wide": {
+    "file": "lk_frame_hollow_wide.png",
+    "w": 82,
+    "h": 83,
+    "slice": null
+  },
+  "lk_frame_rails": {
+    "file": "lk_frame_rails.png",
+    "w": 82,
+    "h": 82,
+    "slice": null
+  },
+  "lk_frame_ring": {
+    "file": "lk_frame_ring.png",
+    "w": 87,
+    "h": 88,
+    "slice": null
+  },
+  "lk_frame_ring_leaves": {
+    "file": "lk_frame_ring_leaves.png",
+    "w": 100,
+    "h": 88,
+    "slice": null
+  },
+  "lk_frame_round": {
+    "file": "lk_frame_round.png",
+    "w": 82,
+    "h": 82,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      566,
+      82,
+      82
+    ]
+  },
+  "lk_frame_round_paper": {
+    "file": "lk_frame_round_paper.png",
+    "w": 87,
+    "h": 88,
+    "slice": null
+  },
+  "lk_glyph_arrow_down": {
+    "file": "lk_glyph_arrow_down.png",
+    "w": 30,
+    "h": 32,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      591,
+      775,
+      30,
+      32
+    ]
+  },
+  "lk_glyph_arrow_left": {
+    "file": "lk_glyph_arrow_left.png",
+    "w": 32,
+    "h": 30,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      659,
+      775,
+      32,
+      30
+    ]
+  },
+  "lk_glyph_arrow_right": {
+    "file": "lk_glyph_arrow_right.png",
+    "w": 32,
+    "h": 30,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      695,
+      775,
+      32,
+      30
+    ]
+  },
+  "lk_glyph_arrow_up": {
+    "file": "lk_glyph_arrow_up.png",
+    "w": 30,
+    "h": 32,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      625,
+      775,
+      30,
+      32
+    ]
+  },
+  "lk_glyph_check": {
+    "file": "lk_glyph_check.png",
+    "w": 34,
+    "h": 30,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      450,
+      853,
+      34,
+      30
+    ]
+  },
+  "lk_glyph_check_white": {
+    "file": "lk_glyph_check_white.png",
+    "w": 36,
+    "h": 32,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      551,
+      775,
+      36,
+      32
+    ]
+  },
+  "lk_glyph_checkmark": {
+    "file": "lk_glyph_checkmark.png",
+    "w": 43,
+    "h": 38,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      435,
+      775,
+      43,
+      38
+    ]
+  },
+  "lk_glyph_chevron_right": {
+    "file": "lk_glyph_chevron_right.png",
+    "w": 18,
+    "h": 27,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      731,
+      775,
+      18,
+      27
+    ]
+  },
+  "lk_glyph_cross": {
+    "file": "lk_glyph_cross.png",
+    "w": 30,
+    "h": 31,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      186,
+      853,
+      30,
+      31
+    ]
+  },
+  "lk_glyph_invite": {
+    "file": "lk_glyph_invite.png",
+    "w": 46,
+    "h": 44,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      385,
+      775,
+      46,
+      44
+    ]
+  },
+  "lk_glyph_minus": {
+    "file": "lk_glyph_minus.png",
+    "w": 32,
+    "h": 13,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      753,
+      775,
+      32,
+      13
+    ]
+  },
+  "lk_glyph_play": {
+    "file": "lk_glyph_play.png",
+    "w": 29,
+    "h": 34,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      518,
+      775,
+      29,
+      34
+    ]
+  },
+  "lk_glyph_plus": {
+    "file": "lk_glyph_plus.png",
+    "w": 32,
+    "h": 34,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      482,
+      775,
+      32,
+      34
+    ]
+  },
+  "lk_icon_anvil": {
+    "file": "lk_icon_anvil.png",
+    "w": 116,
+    "h": 102,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      448,
+      270,
+      116,
+      102
+    ]
+  },
+  "lk_icon_anvil_alt": {
+    "file": "lk_icon_anvil_alt.png",
+    "w": 116,
+    "h": 104,
+    "slice": null
+  },
+  "lk_icon_anvil_hammer": {
+    "file": "lk_icon_anvil_hammer.png",
+    "w": 100,
+    "h": 89,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      704,
+      679,
+      100,
+      89
+    ]
+  },
+  "lk_icon_arrow_up": {
+    "file": "lk_icon_arrow_up.png",
+    "w": 109,
+    "h": 116,
+    "slice": null
+  },
+  "lk_icon_backpack": {
+    "file": "lk_icon_backpack.png",
+    "w": 115,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      294,
+      0,
+      115,
+      116
+    ]
+  },
+  "lk_icon_backpack_alt": {
+    "file": "lk_icon_backpack_alt.png",
+    "w": 109,
+    "h": 116,
+    "slice": null
+  },
+  "lk_icon_backpack_small": {
+    "file": "lk_icon_backpack_small.png",
+    "w": 116,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      0,
+      116,
+      116
+    ]
+  },
+  "lk_icon_backpack_white": {
+    "file": "lk_icon_backpack_white.png",
+    "w": 53,
+    "h": 55,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      328,
+      775,
+      53,
+      55
+    ]
+  },
+  "lk_icon_berries": {
+    "file": "lk_icon_berries.png",
+    "w": 78,
+    "h": 73,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      771,
+      307,
+      78,
+      73
+    ]
+  },
+  "lk_icon_berry_bush": {
+    "file": "lk_icon_berry_bush.png",
+    "w": 100,
+    "h": 92,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      679,
+      100,
+      92
+    ]
+  },
+  "lk_icon_bone": {
+    "file": "lk_icon_bone.png",
+    "w": 87,
+    "h": 79,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      428,
+      307,
+      87,
+      79
+    ]
+  },
+  "lk_icon_bridge": {
+    "file": "lk_icon_bridge.png",
+    "w": 100,
+    "h": 63,
+    "slice": null
+  },
+  "lk_icon_build": {
+    "file": "lk_icon_build.png",
+    "w": 108,
+    "h": 97,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      871,
+      200,
+      108,
+      97
+    ]
+  },
+  "lk_icon_campfire": {
+    "file": "lk_icon_campfire.png",
+    "w": 95,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      590,
+      200,
+      95,
+      100
+    ]
+  },
+  "lk_icon_cave": {
+    "file": "lk_icon_cave.png",
+    "w": 100,
+    "h": 74,
+    "slice": null
+  },
+  "lk_icon_check": {
+    "file": "lk_icon_check.png",
+    "w": 116,
+    "h": 93,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      830,
+      575,
+      116,
+      93
+    ]
+  },
+  "lk_icon_chest": {
+    "file": "lk_icon_chest.png",
+    "w": 116,
+    "h": 91,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      344,
+      679,
+      116,
+      91
+    ]
+  },
+  "lk_icon_clock": {
+    "file": "lk_icon_clock.png",
+    "w": 113,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      594,
+      0,
+      113,
+      116
+    ]
+  },
+  "lk_icon_coin": {
+    "file": "lk_icon_coin.png",
+    "w": 116,
+    "h": 113,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      685,
+      0,
+      116,
+      113
+    ]
+  },
+  "lk_icon_compass": {
+    "file": "lk_icon_compass.png",
+    "w": 101,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      240,
+      101,
+      116
+    ]
+  },
+  "lk_icon_compass_arrow": {
+    "file": "lk_icon_compass_arrow.png",
+    "w": 100,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      672,
+      469,
+      100,
+      100
+    ]
+  },
+  "lk_icon_cross": {
+    "file": "lk_icon_cross.png",
+    "w": 116,
+    "h": 112,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      674,
+      240,
+      116,
+      112
+    ]
+  },
+  "lk_icon_crown": {
+    "file": "lk_icon_crown.png",
+    "w": 116,
+    "h": 97,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      906,
+      270,
+      116,
+      97
+    ]
+  },
+  "lk_icon_crown_gem": {
+    "file": "lk_icon_crown_gem.png",
+    "w": 116,
+    "h": 104,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      360,
+      360,
+      116,
+      104
+    ]
+  },
+  "lk_icon_crystals": {
+    "file": "lk_icon_crystals.png",
+    "w": 94,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      689,
+      200,
+      94,
+      100
+    ]
+  },
+  "lk_icon_cursor": {
+    "file": "lk_icon_cursor.png",
+    "w": 70,
+    "h": 96,
+    "slice": null
+  },
+  "lk_icon_drumstick": {
+    "file": "lk_icon_drumstick.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      0,
+      200,
+      116,
+      103
+    ]
+  },
+  "lk_icon_exclamation": {
+    "file": "lk_icon_exclamation.png",
+    "w": 57,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      504,
+      0,
+      57,
+      116
+    ]
+  },
+  "lk_icon_exit": {
+    "file": "lk_icon_exit.png",
+    "w": 116,
+    "h": 106,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      794,
+      240,
+      116,
+      106
+    ]
+  },
+  "lk_icon_flag": {
+    "file": "lk_icon_flag.png",
+    "w": 93,
+    "h": 97,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      373,
+      575,
+      93,
+      97
+    ]
+  },
+  "lk_icon_gear": {
+    "file": "lk_icon_gear.png",
+    "w": 116,
+    "h": 114,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      554,
+      240,
+      116,
+      114
+    ]
+  },
+  "lk_icon_gear_alt": {
+    "file": "lk_icon_gear_alt.png",
+    "w": 114,
+    "h": 116,
+    "slice": null
+  },
+  "lk_icon_gem": {
+    "file": "lk_icon_gem.png",
+    "w": 87,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      413,
+      0,
+      87,
+      116
+    ]
+  },
+  "lk_icon_gift": {
+    "file": "lk_icon_gift.png",
+    "w": 111,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      120,
+      111,
+      116
+    ]
+  },
+  "lk_icon_hammer": {
+    "file": "lk_icon_hammer.png",
+    "w": 116,
+    "h": 115,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      434,
+      240,
+      116,
+      115
+    ]
+  },
+  "lk_icon_hatchet": {
+    "file": "lk_icon_hatchet.png",
+    "w": 133,
+    "h": 127,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      160,
+      0,
+      133,
+      127
+    ]
+  },
+  "lk_icon_heart": {
+    "file": "lk_icon_heart.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      120,
+      200,
+      116,
+      103
+    ]
+  },
+  "lk_icon_hide": {
+    "file": "lk_icon_hide.png",
+    "w": 79,
+    "h": 75,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      608,
+      307,
+      79,
+      75
+    ]
+  },
+  "lk_icon_hourglass": {
+    "file": "lk_icon_hourglass.png",
+    "w": 83,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      105,
+      240,
+      83,
+      116
+    ]
+  },
+  "lk_icon_house": {
+    "file": "lk_icon_house.png",
+    "w": 116,
+    "h": 104,
+    "slice": null
+  },
+  "lk_icon_hut": {
+    "file": "lk_icon_hut.png",
+    "w": 100,
+    "h": 96,
+    "slice": null
+  },
+  "lk_icon_journal": {
+    "file": "lk_icon_journal.png",
+    "w": 104,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      446,
+      120,
+      104,
+      116
+    ]
+  },
+  "lk_icon_lightning": {
+    "file": "lk_icon_lightning.png",
+    "w": 86,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      552,
+      0,
+      86,
+      116
+    ]
+  },
+  "lk_icon_lock": {
+    "file": "lk_icon_lock.png",
+    "w": 68,
+    "h": 88,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      240,
+      380,
+      68,
+      88
+    ]
+  },
+  "lk_icon_log": {
+    "file": "lk_icon_log.png",
+    "w": 116,
+    "h": 96,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      470,
+      575,
+      116,
+      96
+    ]
+  },
+  "lk_icon_logs": {
+    "file": "lk_icon_logs.png",
+    "w": 110,
+    "h": 95,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      0,
+      307,
+      110,
+      95
+    ]
+  },
+  "lk_icon_magma_ore": {
+    "file": "lk_icon_magma_ore.png",
+    "w": 100,
+    "h": 87,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      220,
+      307,
+      100,
+      87
+    ]
+  },
+  "lk_icon_magnifier": {
+    "file": "lk_icon_magnifier.png",
+    "w": 111,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      115,
+      120,
+      111,
+      116
+    ]
+  },
+  "lk_icon_mail": {
+    "file": "lk_icon_mail.png",
+    "w": 116,
+    "h": 84,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      775,
+      116,
+      84
+    ]
+  },
+  "lk_icon_map": {
+    "file": "lk_icon_map.png",
+    "w": 116,
+    "h": 105,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      240,
+      360,
+      116,
+      105
+    ]
+  },
+  "lk_icon_map_pin": {
+    "file": "lk_icon_map_pin.png",
+    "w": 89,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      280,
+      575,
+      89,
+      100
+    ]
+  },
+  "lk_icon_market": {
+    "file": "lk_icon_market.png",
+    "w": 116,
+    "h": 102,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      568,
+      270,
+      116,
+      102
+    ]
+  },
+  "lk_icon_market_alt": {
+    "file": "lk_icon_market_alt.png",
+    "w": 116,
+    "h": 100,
+    "slice": null
+  },
+  "lk_icon_mountain": {
+    "file": "lk_icon_mountain.png",
+    "w": 100,
+    "h": 82,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      120,
+      775,
+      100,
+      82
+    ]
+  },
+  "lk_icon_mushroom": {
+    "file": "lk_icon_mushroom.png",
+    "w": 72,
+    "h": 73,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      853,
+      307,
+      72,
+      73
+    ]
+  },
+  "lk_icon_party": {
+    "file": "lk_icon_party.png",
+    "w": 116,
+    "h": 89,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      120,
+      380,
+      116,
+      89
+    ]
+  },
+  "lk_icon_paw": {
+    "file": "lk_icon_paw.png",
+    "w": 97,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      776,
+      469,
+      97,
+      100
+    ]
+  },
+  "lk_icon_pickaxe": {
+    "file": "lk_icon_pickaxe.png",
+    "w": 135,
+    "h": 124,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      297,
+      0,
+      135,
+      124
+    ]
+  },
+  "lk_icon_plank": {
+    "file": "lk_icon_plank.png",
+    "w": 106,
+    "h": 102,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      360,
+      200,
+      106,
+      102
+    ]
+  },
+  "lk_icon_plant_fiber": {
+    "file": "lk_icon_plant_fiber.png",
+    "w": 116,
+    "h": 113,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      729,
+      0,
+      116,
+      113
+    ]
+  },
+  "lk_icon_portal": {
+    "file": "lk_icon_portal.png",
+    "w": 116,
+    "h": 94,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      380,
+      116,
+      94
+    ]
+  },
+  "lk_icon_portal_alt": {
+    "file": "lk_icon_portal_alt.png",
+    "w": 116,
+    "h": 100,
+    "slice": null
+  },
+  "lk_icon_rocks": {
+    "file": "lk_icon_rocks.png",
+    "w": 100,
+    "h": 83,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      324,
+      307,
+      100,
+      83
+    ]
+  },
+  "lk_icon_rope": {
+    "file": "lk_icon_rope.png",
+    "w": 76,
+    "h": 75,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      691,
+      307,
+      76,
+      75
+    ]
+  },
+  "lk_icon_ruin": {
+    "file": "lk_icon_ruin.png",
+    "w": 100,
+    "h": 86,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      808,
+      679,
+      100,
+      86
+    ]
+  },
+  "lk_icon_runestone": {
+    "file": "lk_icon_runestone.png",
+    "w": 112,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      436,
+      0,
+      112,
+      116
+    ]
+  },
+  "lk_icon_runestone_world": {
+    "file": "lk_icon_runestone_world.png",
+    "w": 99,
+    "h": 100,
+    "slice": null
+  },
+  "lk_icon_scroll": {
+    "file": "lk_icon_scroll.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      223,
+      270,
+      116,
+      103
+    ]
+  },
+  "lk_icon_scroll_alt": {
+    "file": "lk_icon_scroll_alt.png",
+    "w": 116,
+    "h": 115,
+    "slice": null
+  },
+  "lk_icon_scroll_small": {
+    "file": "lk_icon_scroll_small.png",
+    "w": 116,
+    "h": 110,
+    "slice": null
+  },
+  "lk_icon_spear": {
+    "file": "lk_icon_spear.png",
+    "w": 85,
+    "h": 76,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      519,
+      307,
+      85,
+      76
+    ]
+  },
+  "lk_icon_speech": {
+    "file": "lk_icon_speech.png",
+    "w": 116,
+    "h": 101,
+    "slice": null
+  },
+  "lk_icon_star": {
+    "file": "lk_icon_star.png",
+    "w": 116,
+    "h": 113,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      849,
+      0,
+      116,
+      113
+    ]
+  },
+  "lk_icon_stone": {
+    "file": "lk_icon_stone.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      240,
+      200,
+      116,
+      103
+    ]
+  },
+  "lk_icon_stone_axe": {
+    "file": "lk_icon_stone_axe.png",
+    "w": 156,
+    "h": 196,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      0,
+      0,
+      156,
+      196
+    ]
+  },
+  "lk_icon_stones": {
+    "file": "lk_icon_stones.png",
+    "w": 102,
+    "h": 92,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      114,
+      307,
+      102,
+      92
+    ]
+  },
+  "lk_icon_torch": {
+    "file": "lk_icon_torch.png",
+    "w": 83,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      642,
+      0,
+      83,
+      116
+    ]
+  },
+  "lk_icon_totem": {
+    "file": "lk_icon_totem.png",
+    "w": 90,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      0,
+      575,
+      90,
+      100
+    ]
+  },
+  "lk_icon_trade": {
+    "file": "lk_icon_trade.png",
+    "w": 116,
+    "h": 84,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      431,
+      478,
+      116,
+      84
+    ]
+  },
+  "lk_icon_trade_alt": {
+    "file": "lk_icon_trade_alt.png",
+    "w": 116,
+    "h": 94,
+    "slice": null
+  },
+  "lk_icon_treasure": {
+    "file": "lk_icon_treasure.png",
+    "w": 100,
+    "h": 70,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      224,
+      775,
+      100,
+      70
+    ]
+  },
+  "lk_icon_tree": {
+    "file": "lk_icon_tree.png",
+    "w": 92,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      877,
+      469,
+      92,
+      100
+    ]
+  },
+  "lk_icon_trophy": {
+    "file": "lk_icon_trophy.png",
+    "w": 116,
+    "h": 103,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      720,
+      360,
+      116,
+      103
+    ]
+  },
+  "lk_icon_tusk": {
+    "file": "lk_icon_tusk.png",
+    "w": 80,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      787,
+      200,
+      80,
+      100
+    ]
+  },
+  "lk_icon_warning": {
+    "file": "lk_icon_warning.png",
+    "w": 116,
+    "h": 101,
+    "slice": null,
+    "atlas": "atlas_lk_items",
+    "rect": [
+      470,
+      200,
+      116,
+      101
+    ]
+  },
+  "lk_icon_wave": {
+    "file": "lk_icon_wave.png",
+    "w": 100,
+    "h": 76,
+    "slice": null
+  },
+  "lk_keycap": {
+    "file": "lk_keycap.png",
+    "w": 58,
+    "h": 56,
+    "slice": [
+      16,
+      14,
+      16,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      215,
+      793,
+      58,
+      56
+    ]
+  },
+  "lk_keycap_wide": {
+    "file": "lk_keycap_wide.png",
+    "w": 108,
+    "h": 58,
+    "slice": [
+      16,
+      14,
+      16,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      626,
+      724,
+      108,
+      58
+    ]
+  },
+  "lk_map_parchment": {
+    "file": "lk_map_parchment.png",
+    "w": 273,
+    "h": 264,
+    "slice": null
+  },
+  "lk_medallion_octagon": {
+    "file": "lk_medallion_octagon.png",
+    "w": 84,
+    "h": 100,
+    "slice": null
+  },
+  "lk_medallion_round": {
+    "file": "lk_medallion_round.png",
+    "w": 100,
+    "h": 98,
+    "slice": null
+  },
+  "lk_medallion_square": {
+    "file": "lk_medallion_square.png",
+    "w": 82,
+    "h": 84,
+    "slice": null
+  },
+  "lk_nail": {
+    "file": "lk_nail.png",
+    "w": 26,
+    "h": 33,
+    "slice": null
+  },
+  "lk_panel": {
+    "file": "lk_panel.png",
+    "w": 264,
+    "h": 110,
+    "slice": [
+      30,
+      28,
+      30,
+      28
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      156,
+      264,
+      110
+    ]
+  },
+  "lk_panel_inset": {
+    "file": "lk_panel_inset.png",
+    "w": 204,
+    "h": 108,
+    "slice": [
+      14,
+      14,
+      14,
+      14
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      598,
+      0,
+      204,
+      108
+    ]
+  },
+  "lk_pill_value": {
+    "file": "lk_pill_value.png",
+    "w": 101,
+    "h": 39,
+    "slice": [
+      14,
+      12,
+      14,
+      12
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      611,
+      101,
+      39
+    ]
+  },
+  "lk_plaque_capped": {
+    "file": "lk_plaque_capped.png",
+    "w": 224,
+    "h": 38,
+    "slice": [
+      24,
+      14,
+      24,
+      14
+    ]
+  },
+  "lk_plaque_leather": {
+    "file": "lk_plaque_leather.png",
+    "w": 177,
+    "h": 65,
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ]
+  },
+  "lk_plaque_leather_bar": {
+    "file": "lk_plaque_leather_bar.png",
+    "w": 191,
+    "h": 50,
+    "slice": [
+      18,
+      16,
+      18,
+      16
+    ]
+  },
+  "lk_plaque_notched_disabled": {
+    "file": "lk_plaque_notched_disabled.png",
+    "w": 226,
+    "h": 66,
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      509,
+      351,
+      226,
+      66
+    ]
+  },
+  "lk_plaque_notched_leather": {
+    "file": "lk_plaque_notched_leather.png",
+    "w": 226,
+    "h": 66,
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      739,
+      351,
+      226,
+      66
+    ]
+  },
+  "lk_plaque_notched_paper": {
+    "file": "lk_plaque_notched_paper.png",
+    "w": 225,
+    "h": 66,
+    "slice": [
+      28,
+      24,
+      28,
+      24
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      423,
+      225,
+      66
+    ]
+  },
+  "lk_plaque_paper": {
+    "file": "lk_plaque_paper.png",
+    "w": 179,
+    "h": 66,
+    "slice": [
+      30,
+      26,
+      30,
+      26
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      648,
+      652,
+      179,
+      66
+    ]
+  },
+  "lk_plaque_paper_bar": {
+    "file": "lk_plaque_paper_bar.png",
+    "w": 174,
+    "h": 50,
+    "slice": [
+      18,
+      16,
+      18,
+      16
+    ]
+  },
+  "lk_plaque_rivet_leather": {
+    "file": "lk_plaque_rivet_leather.png",
+    "w": 213,
+    "h": 53,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ]
+  },
+  "lk_plaque_rivet_paper": {
+    "file": "lk_plaque_rivet_paper.png",
+    "w": 182,
+    "h": 54,
+    "slice": [
+      18,
+      18,
+      18,
+      18
+    ]
+  },
+  "lk_plaque_small": {
+    "file": "lk_plaque_small.png",
+    "w": 166,
+    "h": 64,
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      229,
+      423,
+      166,
+      64
+    ]
+  },
+  "lk_player_card": {
+    "file": "lk_player_card.png",
+    "w": 359,
+    "h": 86,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      312,
+      380,
+      359,
+      86
+    ]
+  },
+  "lk_portrait_frame": {
+    "file": "lk_portrait_frame.png",
+    "w": 101,
+    "h": 103,
+    "slice": [
+      30,
+      30,
+      30,
+      30
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      343,
+      270,
+      101,
+      103
+    ]
+  },
+  "lk_portrait_plaque": {
+    "file": "lk_portrait_plaque.png",
+    "w": 290,
+    "h": 66,
+    "slice": null
+  },
+  "lk_rail_h": {
+    "file": "lk_rail_h.png",
+    "w": 186,
+    "h": 23,
+    "slice": [
+      12,
+      6,
+      12,
+      6
+    ]
+  },
+  "lk_rail_v": {
+    "file": "lk_rail_v.png",
+    "w": 19,
+    "h": 103,
+    "slice": [
+      6,
+      12,
+      6,
+      12
+    ]
+  },
+  "lk_ring_full": {
+    "file": "lk_ring_full.png",
+    "w": 106,
+    "h": 108,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      854,
+      156,
+      106,
+      108
+    ]
+  },
+  "lk_ring_half": {
+    "file": "lk_ring_half.png",
+    "w": 106,
+    "h": 108,
+    "slice": null
+  },
+  "lk_ring_track": {
+    "file": "lk_ring_track.png",
+    "w": 106,
+    "h": 106,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      113,
+      270,
+      106,
+      106
+    ]
+  },
+  "lk_rivet": {
+    "file": "lk_rivet.png",
+    "w": 28,
+    "h": 28,
+    "slice": null
+  },
+  "lk_rope_cross": {
+    "file": "lk_rope_cross.png",
+    "w": 72,
+    "h": 68,
+    "slice": null
+  },
+  "lk_rope_knot": {
+    "file": "lk_rope_knot.png",
+    "w": 51,
+    "h": 58,
+    "slice": null
+  },
+  "lk_rope_ring": {
+    "file": "lk_rope_ring.png",
+    "w": 60,
+    "h": 58,
+    "slice": null
+  },
+  "lk_row_bullet": {
+    "file": "lk_row_bullet.png",
+    "w": 270,
+    "h": 23,
+    "slice": [
+      24,
+      8,
+      12,
+      8
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      585,
+      611,
+      270,
+      23
+    ]
+  },
+  "lk_row_check_off": {
+    "file": "lk_row_check_off.png",
+    "w": 240,
+    "h": 54,
+    "slice": [
+      44,
+      16,
+      16,
+      16
+    ]
+  },
+  "lk_row_check_on": {
+    "file": "lk_row_check_on.png",
+    "w": 238,
+    "h": 54,
+    "slice": [
+      44,
+      16,
+      16,
+      16
+    ]
+  },
+  "lk_row_disabled": {
+    "file": "lk_row_disabled.png",
+    "w": 327,
+    "h": 79,
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      86,
+      566,
+      327,
+      79
+    ]
+  },
+  "lk_row_hover": {
+    "file": "lk_row_hover.png",
+    "w": 326,
+    "h": 83,
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      551,
+      478,
+      326,
+      83
+    ]
+  },
+  "lk_row_normal": {
+    "file": "lk_row_normal.png",
+    "w": 322,
+    "h": 79,
+    "slice": [
+      24,
+      22,
+      24,
+      22
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      417,
+      566,
+      322,
+      79
+    ]
+  },
+  "lk_scroll_thumb": {
+    "file": "lk_scroll_thumb.png",
+    "w": 23,
+    "h": 62,
+    "slice": [
+      8,
+      10,
+      8,
+      10
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      727,
+      423,
+      23,
+      62
+    ]
+  },
+  "lk_scroll_track": {
+    "file": "lk_scroll_track.png",
+    "w": 23,
+    "h": 111,
+    "slice": [
+      8,
+      10,
+      8,
+      10
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      571,
+      0,
+      23,
+      111
+    ]
+  },
+  "lk_search": {
+    "file": "lk_search.png",
+    "w": 210,
+    "h": 53,
+    "slice": [
+      44,
+      18,
+      18,
+      18
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      245,
+      493,
+      210,
+      53
+    ]
+  },
+  "lk_slider_knob": {
+    "file": "lk_slider_knob.png",
+    "w": 39,
+    "h": 40,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      971,
+      555,
+      39,
+      40
+    ]
+  },
+  "lk_slider_track": {
+    "file": "lk_slider_track.png",
+    "w": 184,
+    "h": 21,
+    "slice": [
+      9,
+      7,
+      9,
+      7
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      424,
+      654,
+      184,
+      21
+    ]
+  },
+  "lk_slot_disabled": {
+    "file": "lk_slot_disabled.png",
+    "w": 113,
+    "h": 108,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      623,
+      156,
+      113,
+      108
+    ]
+  },
+  "lk_slot_hotbar": {
+    "file": "lk_slot_hotbar.png",
+    "w": 99,
+    "h": 98,
+    "slice": null
+  },
+  "lk_slot_hover": {
+    "file": "lk_slot_hover.png",
+    "w": 113,
+    "h": 109,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      390,
+      156,
+      113,
+      109
+    ]
+  },
+  "lk_slot_item_normal": {
+    "file": "lk_slot_item_normal.png",
+    "w": 104,
+    "h": 101,
+    "slice": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      798,
+      270,
+      104,
+      101
+    ]
+  },
+  "lk_slot_item_selected": {
+    "file": "lk_slot_item_selected.png",
+    "w": 109,
+    "h": 106,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      270,
+      109,
+      106
+    ]
+  },
+  "lk_slot_locked": {
+    "file": "lk_slot_locked.png",
+    "w": 110,
+    "h": 108,
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      740,
+      156,
+      110,
+      108
+    ]
+  },
+  "lk_slot_normal": {
+    "file": "lk_slot_normal.png",
+    "w": 112,
+    "h": 109,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      507,
+      156,
+      112,
+      109
+    ]
+  },
+  "lk_slot_selected": {
+    "file": "lk_slot_selected.png",
+    "w": 118,
+    "h": 110,
+    "slice": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      268,
+      156,
+      118,
+      110
+    ]
+  },
+  "lk_spike": {
+    "file": "lk_spike.png",
+    "w": 26,
+    "h": 25,
+    "slice": null
+  },
+  "lk_statbar_frame": {
+    "file": "lk_statbar_frame.png",
+    "w": 315,
+    "h": 65,
+    "slice": [
+      66,
+      20,
+      84,
+      20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      724,
+      315,
+      65
+    ]
+  },
+  "lk_stepper_box": {
+    "file": "lk_stepper_box.png",
+    "w": 153,
+    "h": 52,
+    "slice": [
+      14,
+      14,
+      30,
+      14
+    ]
+  },
+  "lk_strap_leather": {
+    "file": "lk_strap_leather.png",
+    "w": 318,
+    "h": 47,
+    "slice": [
+      24,
+      18,
+      24,
+      18
+    ]
+  },
+  "lk_strap_leather_short": {
+    "file": "lk_strap_leather_short.png",
+    "w": 146,
+    "h": 40,
+    "slice": [
+      22,
+      16,
+      22,
+      16
+    ]
+  },
+  "lk_tab_arrow_leather": {
+    "file": "lk_tab_arrow_leather.png",
+    "w": 164,
+    "h": 63,
+    "slice": [
+      30,
+      20,
+      40,
+      20
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      559,
+      423,
+      164,
+      63
+    ]
+  },
+  "lk_tab_arrow_paper": {
+    "file": "lk_tab_arrow_paper.png",
+    "w": 156,
+    "h": 64,
+    "slice": [
+      30,
+      20,
+      40,
+      20
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      399,
+      423,
+      156,
+      64
+    ]
+  },
+  "lk_tab_category": {
+    "file": "lk_tab_category.png",
+    "w": 228,
+    "h": 59,
+    "slice": [
+      20,
+      16,
+      34,
+      16
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      754,
+      423,
+      228,
+      59
+    ]
+  },
+  "lk_tile_blank": {
+    "file": "lk_tile_blank.png",
+    "w": 66,
+    "h": 66,
+    "slice": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      831,
+      652,
+      66,
+      66
+    ]
+  },
+  "lk_tile_check_off": {
+    "file": "lk_tile_check_off.png",
+    "w": 53,
+    "h": 56,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      132,
+      493,
+      53,
+      56
+    ]
+  },
+  "lk_tile_check_on": {
+    "file": "lk_tile_check_on.png",
+    "w": 52,
+    "h": 54,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      189,
+      493,
+      52,
+      54
+    ]
+  },
+  "lk_tile_frame": {
+    "file": "lk_tile_frame.png",
+    "w": 106,
+    "h": 102,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      688,
+      270,
+      106,
+      102
+    ]
+  },
+  "lk_tile_header": {
+    "file": "lk_tile_header.png",
+    "w": 83,
+    "h": 84,
+    "slice": null
+  },
+  "lk_tile_paper": {
+    "file": "lk_tile_paper.png",
+    "w": 82,
+    "h": 83,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ]
+  },
+  "lk_tile_rail": {
+    "file": "lk_tile_rail.png",
+    "w": 83,
+    "h": 84,
+    "slice": null
+  },
+  "lk_tile_small": {
+    "file": "lk_tile_small.png",
+    "w": 63,
+    "h": 50,
+    "slice": [
+      16,
+      16,
+      16,
+      16
+    ]
+  },
+  "lk_tile_tab": {
+    "file": "lk_tile_tab.png",
+    "w": 82,
+    "h": 88,
+    "slice": null
+  },
+  "lk_toast_frame": {
+    "file": "lk_toast_frame.png",
+    "w": 427,
+    "h": 84,
+    "slice": [
+      36,
+      30,
+      36,
+      30
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      478,
+      427,
+      84
+    ]
+  },
+  "lk_toggle_off": {
+    "file": "lk_toggle_off.png",
+    "w": 89,
+    "h": 49,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      528,
+      555,
+      89,
+      49
+    ]
+  },
+  "lk_toggle_on": {
+    "file": "lk_toggle_on.png",
+    "w": 85,
+    "h": 49,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      621,
+      555,
+      85,
+      49
+    ]
+  },
+  "lk_tooltip": {
+    "file": "lk_tooltip.png",
+    "w": 252,
+    "h": 96,
+    "slice": [
+      22,
+      22,
+      22,
+      22
+    ],
+    "atlas": "atlas_lk_window",
+    "rect": [
+      0,
+      251,
+      252,
+      96
+    ]
+  },
+  "lk_tooltip_tail": {
+    "file": "lk_tooltip_tail.png",
+    "w": 32,
+    "h": 21,
+    "slice": null,
+    "atlas": "atlas_lk_window",
+    "rect": [
+      612,
+      654,
+      32,
+      21
+    ]
+  },
+  "lk_window_clasp_frame": {
+    "file": "lk_window_clasp_frame.png",
+    "w": 281,
+    "h": 261,
+    "slice": null
+  },
+  "lk_window_frame": {
+    "file": "lk_window_frame.png",
+    "w": 290,
+    "h": 152,
+    "slice": [
+      40,
+      38,
+      40,
+      38
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      0,
+      0,
+      290,
+      152
+    ]
+  },
+  "lk_glyph_ink_compass_rose": {
+    "file": "lk_glyph_ink_compass_rose.png",
+    "w": 100,
+    "h": 100,
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      360,
+      469,
+      100,
+      100
+    ]
+  },
+  "lk_glyph_white_compass_rose": {
+    "file": "lk_glyph_white_compass_rose.png",
+    "w": 100,
+    "h": 100,
+    "slice": null
+  },
+  "atlas_lk_lobby": {
+    "file": "atlas_lk_lobby.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_window": {
+    "file": "atlas_lk_window.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_icons": {
+    "file": "atlas_lk_icons.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items": {
+    "file": "atlas_lk_items.png",
+    "w": 1024,
+    "h": 512,
+    "slice": null
   }
 }

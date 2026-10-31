@@ -180,3 +180,18 @@ test("a solo player records nothing", function()
 	expectEq(PartyService.RecordDeploy(stranger, { stranger }, "world-1"), nil, "no party, no token")
 	expectEq(memory.writes, before, "no write")
 end)
+
+test("ready is advisory: it never changes who deploys or what is recorded", function()
+	local cooldown = PartyService.REQUEST_COOLDOWN_SECONDS
+	PartyService.REQUEST_COOLDOWN_SECONDS = -1
+	expect(handlers.PartyAction(member, "ready", true), "member ready")
+	local group = PartyService.DeployGroup(leader)
+	expectEq(#group, 2, "the leader deploys a not-ready party")
+	local token = PartyService.RecordDeploy(leader, group, "world-1")
+	expectEq(memory.data[token].ready, nil, "the deploy record carries no ready state")
+	PartyService.ClearReady(group)
+	expectEq(#PartyService.DeployGroup(leader), 2, "clearing ready keeps the party together")
+	local ok, reason = handlers.PartyAction(member, "ready", "yes")
+	expect(not ok and reason == "BadRequest", "a non-boolean flag is refused")
+	PartyService.REQUEST_COOLDOWN_SECONDS = cooldown
+end)

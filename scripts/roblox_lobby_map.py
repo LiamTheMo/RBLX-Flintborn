@@ -17,6 +17,9 @@ unique mesh, palette.png, manifest.json). This script:
              parts' TextureID, to find import orientation or texture problems
   --lighting set the lobby's Lighting to match the Blender scene (sun angle and
              colour, ambient, atmosphere, bloom, colour grade, sun rays) and save
+  --uiprobe  build the Kit lobby HUD (Hud/Screens/LobbyHud) in the place and
+             report what its tiles and currency pills draw and whether each
+             image it uses loads
 
 Loading fast: each unique mesh is loaded ONCE and cloned for every placement, so
 a client downloads ~130 meshes and one palette texture for 2,400+ parts. Small
@@ -722,9 +725,10 @@ end
 return HttpService:JSONEncode({ meshes = out, placed = placed })
 '''
 
-# Builds the lobby HUD inside the place (server side, never parented to a
-# player) with the deployed modules and reports what each navigation button and
-# the currency icons hold, to debug sprites that do not show.
+# Builds the lobby HUD (Hud/Screens/LobbyHud, the Kit build) inside the place
+# (server side, never parented to a player) with the deployed modules, reports
+# what each menu tile and the currency pills draw, and checks that every image
+# the HUD uses can load, to debug sprites that do not show.
 UI_PROBE = r'''
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -734,46 +738,49 @@ local ok, err = pcall(function()
   local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
   report.idCount = 0
   for _ in UiAssets.Ids do report.idCount += 1 end
-  report.backpackId = UiAssets.image("icon_backpack")
-  report.frameSlotId = UiAssets.image("frame_slot")
   local hudFolder = StarterPlayer.StarterPlayerScripts.Client.Hud
-  local Layout = require(hudFolder.Layout)
-  local LobbyHud = require(hudFolder.LobbyHud)
+  local LobbyHud = require(hudFolder.Screens.LobbyHud)
   local holder = Instance.new("ScreenGui")
   holder.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-  local hud = LobbyHud.new(holder, Layout.Get(), function() return true end)
+  local root = Instance.new("Frame")
+  root.Name = "Root"
+  root.Size = UDim2.fromOffset(1672, 941)
+  root.BackgroundTransparency = 1
+  root.Parent = holder
+  local hud = LobbyHud.new(root, {})
+  local images = {}
   local function describe(object)
     local items = {}
-    for _, child in object:GetChildren() do
-      local entry = { name = child.Name, class = child.ClassName }
-      if child:IsA("GuiObject") then
-        entry.z = child.ZIndex
-        entry.size = tostring(child.AbsoluteSize) .. " / " .. tostring(child.Size)
-        entry.visible = child.Visible
-      end
+    for _, child in object:GetDescendants() do
       if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-        entry.image = child.Image
-        entry.scaleType = child.ScaleType.Name
-        entry.transparency = child.ImageTransparency
+        table.insert(items, { name = child.Name, image = child.Image, rect = tostring(child.ImageRectOffset),
+          scaleType = child.ScaleType.Name, transparency = child.ImageTransparency, visible = child.Visible })
+      elseif child:IsA("TextLabel") or child:IsA("TextButton") then
+        table.insert(items, { name = child.Name, text = child.Text })
       end
-      if child:IsA("TextLabel") or child:IsA("TextButton") then entry.text = child.Text end
-      table.insert(items, entry)
     end
     return items
   end
-  local nav = hud.root:FindFirstChild("Navigation")
-  report.inventory = describe(nav:FindFirstChild("Inventory"))
-  report.coins = describe(hud.root:FindFirstChild("Coins"))
-  report.gems = describe(hud.root:FindFirstChild("Gems"))
+  report.tiles = {}
+  for _, tile in hud.tileRegion:GetChildren() do
+    report.tiles[tile.Name] = describe(tile)
+  end
+  report.coins = describe(hud.coins.root)
+  report.gems = describe(hud.gems.root)
+  for _, d in root:GetDescendants() do
+    if (d:IsA("ImageLabel") or d:IsA("ImageButton")) and d.Image ~= "" and not string.find(d.Image, "^rbxthumb") then
+      images[d.Image] = true
+    end
+  end
+  hud:Destroy()
   holder:Destroy()
   -- Can the place load the image content? EditableImage loads respect asset
   -- permissions, and PreloadAsync reports each asset's fetch status.
   local AssetService = game:GetService("AssetService")
   local ContentProvider = game:GetService("ContentProvider")
   report.loads = {}
-  for _, name in { "pm_lobby_profile", "pm_lobby_coins", "pm_lobby_gems", "pm_lobby_gear", "pm_lobby_party", "pm_lobby_enter", "pm_lobby_server", "pm_tile_inventory", "pm_tile_vault", "pm_tile_quests", "pm_tile_shop", "pm_tile_forge", "pm_tile_trade", "pm_icon_crown", "pm_button_add_friend" } do
-    local id = UiAssets.image(name)
-    local entry = { id = id }
+  for id in images do
+    local entry = {}
     local okImage, result = pcall(function()
       return AssetService:CreateEditableImageAsync(Content.fromUri(id))
     end)
@@ -783,7 +790,7 @@ local ok, err = pcall(function()
         entry.preload = status.Name
       end)
     end)
-    report.loads[name] = entry
+    report.loads[id] = entry
   end
 end)
 report.ok = ok

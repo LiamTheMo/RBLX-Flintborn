@@ -63,10 +63,7 @@ local function update()
 
 	local stamina = player:GetAttribute("Stamina") or 1
 	ui.stamina.fill.Size = UDim2.fromScale(stamina, 1)
-	ui.stamina.text.Text = ("⚡ Stamina %d%%%s"):format(
-		math.round(stamina * 100),
-		player:GetAttribute("Crouching") and " · crouching" or ""
-	)
+	ui.stamina.text.Text = ("⚡ Stamina %d%%"):format(math.round(stamina * 100))
 
 	local food = player:GetAttribute("Food") or 1
 	ui.food.fill.Size = UDim2.fromScale(food, 1)

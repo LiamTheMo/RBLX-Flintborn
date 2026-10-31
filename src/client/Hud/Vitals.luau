@@ -1,103 +1,150 @@
--- Vitals: Health, Stamina and Food rows (the parchment HUD draws each row as one
--- art piece, its icon plate and empty bar, with the coloured fill and number
--- over it; a row without art has an icon, label and track), plus a small status
--- pill for the medicine lock, food healing and hunger slow. Display only.
+-- Vitals: Health, Stamina and Food as the kit's stat bars (one paper plate with
+-- the icon, then the track with the value centred in it), stacked at the top right,
+-- and a row of status plaques under them for the medicine lock, food healing
+-- and hunger slow. A bar at or under the layout's `low` share shows a warning
+-- mark over its icon tile and pulses the icon, so a low state never rests on
+-- colour alone. Display only; HudController feeds the values.
+--
+--   local vitals = Vitals.new(root, layout)
+--   vitals:Set("health", 0.85, "85/100")
+--   vitals:SetStatus({ { icon = "hourglass", text = "Medicine 12.0 s" } })
 
+local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
-local Widgets = require(script.Parent.Widgets)
 
 local Vitals = {}
 Vitals.__index = Vitals
 
 function Vitals.new(parent: Instance, layout)
-	local cfg = layout.vitals
-	local self = setmetatable({ rows = {} }, Vitals)
-	self.root = Widgets.Panel(cfg, {
-		Name = "Vitals",
-		Size = UDim2.fromOffset(cfg.size[1], cfg.size[2]),
-	}, parent)
-	Layout.Place(self.root, cfg)
+	local cfg = Layout.Section(layout, "vitals")
+	local count = #cfg.rows
+	local statusCfg = Layout.Section(layout, "status")
+	local self = setmetatable({ rows = {}, low = cfg.low, statusCfg = statusCfg, chips = {} }, Vitals)
+	self.root = Instance.new("Frame")
+	self.root.Name = "Vitals"
+	self.root.BackgroundTransparency = 1
+	Layout.Place(self.root, {
+		anchor = cfg.anchor,
+		pos = cfg.pos,
+		size = { cfg.size[1], cfg.pitch * (count - 1) + cfg.size[2] },
+	})
+	self.root.Parent = parent
 	for index, rowCfg in cfg.rows do
-		local top = cfg.rowTop + (index - 1) * cfg.rowPitch
-		local centreY = top + cfg.rowHeight / 2
-		if rowCfg.art then
-			Widgets.Sprite(rowCfg.art, {
-				Name = rowCfg.label .. "Row",
-				Position = UDim2.fromOffset(0, top),
-				Size = UDim2.fromOffset(cfg.rowSize[1], cfg.rowSize[2]),
-				ZIndex = 3,
-			}, self.root)
-		end
-		if rowCfg.icon then
-			Widgets.Sprite(rowCfg.icon, {
-				Name = rowCfg.label .. "Icon",
-				AnchorPoint = Vector2.new(0, 0.5),
-				Position = UDim2.fromOffset(cfg.icon.x, centreY),
-				Size = UDim2.fromOffset(cfg.icon.size, cfg.icon.size),
-				ZIndex = 4,
-			}, self.root)
-		end
-		if cfg.label then
-			Widgets.Text(cfg.label, {
-				Name = rowCfg.label .. "Label",
-				Text = rowCfg.label,
-				Position = UDim2.fromOffset(cfg.label.x, top),
-				Size = UDim2.fromOffset(cfg.label.w, cfg.rowHeight),
-			}, self.root)
-		end
-		local trackTop = centreY - cfg.track.h / 2
-		local bar = Widgets.Bar({
-			rect = { cfg.track.x, trackTop, cfg.track.w, cfg.track.h },
-			inset = cfg.fillBar.inset,
-			maxWidth = cfg.fillBar.w,
-			track = cfg.track.sprite,
-			fillColor = rowCfg.color,
-		}, self.root)
-		bar.root.Name = rowCfg.label .. "Bar"
-		local value = Widgets.Text(cfg.value, {
-			Name = rowCfg.label .. "Value",
-			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.fromOffset(cfg.value.right, top),
-			Size = UDim2.fromOffset(cfg.value.w, cfg.rowHeight),
-			TextXAlignment = Enum.TextXAlignment.Right,
-			ZIndex = 6,
-		}, self.root)
-		self.rows[rowCfg.key] = { bar = bar, value = value }
+		local bar = Kit.Bar.new(self.root, {
+			name = rowCfg.label,
+			rect = { 0, (index - 1) * cfg.pitch, cfg.size[1], cfg.size[2] },
+			fill = rowCfg.fill,
+			frame = "stat",
+			icon = rowCfg.icon,
+			text = "",
+		})
+		-- The low-state mark sits on the icon tile's corner.
+		local mark = Kit.Icon.new(bar.root, {
+			name = "Low",
+			rect = { cfg.lowMark[1], cfg.lowMark[2], cfg.lowMark[3], cfg.lowMark[3] },
+			icon = "warning",
+			zIndex = 12,
+		})
+		mark.root.Visible = false
+		self.rows[rowCfg.key] = { bar = bar, mark = mark, isLow = false }
 	end
 
-	local statusCfg = layout.status
-	self.status = Widgets.Make("Frame", {
-		Name = "SurvivalStatus",
-		BackgroundTransparency = 1,
-		Visible = false,
-	}, parent)
+	-- Status plaques, right-aligned under the bars.
+	self.status = Instance.new("Frame")
+	self.status.Name = "SurvivalStatus"
+	self.status.BackgroundTransparency = 1
+	self.status.Visible = false
 	Layout.Place(self.status, statusCfg)
-	local pill = Widgets.Sprite(statusCfg.panel, {
-		Name = "Pill",
-		Size = UDim2.fromOffset(statusCfg.size[1], statusCfg.size[2]),
-		ZIndex = 1,
-	}, self.status)
-	pill.Size = UDim2.fromScale(1, 1)
-	self.statusText = Widgets.Text(statusCfg, {
-		Name = "Text",
-		Position = UDim2.fromOffset(10, 0),
-		Size = UDim2.new(1, -20, 1, 0),
-	}, self.status)
+	self.status.Parent = parent
 	return self
 end
 
--- key: "health" | "stamina" | "food"
+-- key: "health" | "stamina" | "food"; valueText is the plaque's text ("85/100").
 function Vitals:Set(key: string, fraction: number, valueText: string, instant: boolean?)
 	local row = self.rows[key]
-	if row then
-		Widgets.SetBar(row.bar, fraction, instant)
-		row.value.Text = valueText
+	if row == nil then
+		return
+	end
+	row.bar:Set(fraction, instant)
+	row.bar:SetText(valueText)
+	local low = fraction <= self.low
+	row.bar.root:SetAttribute("HudLow", low)
+	if low == row.isLow then
+		return
+	end
+	row.isLow = low
+	row.mark.root.Visible = low
+	if row.stopPulse then
+		row.stopPulse()
+		row.stopPulse = nil
+	end
+	local icon = row.bar.icon
+	if low and icon and icon:IsA("ImageLabel") then
+		row.stopPulse = Kit.Motion.Pulse(icon, "ImageTransparency", 0.45, 0)
 	end
 end
 
-function Vitals:SetStatus(text: string)
-	self.status.Visible = text ~= ""
-	self.statusText.Text = text
+-- chips: array of {icon, text}; an empty array hides the row. Plaques are
+-- rebuilt only when their texts change.
+function Vitals:SetStatus(chips)
+	local key = {}
+	for _, chip in chips do
+		table.insert(key, chip.icon .. "|" .. chip.text)
+	end
+	local signature = table.concat(key, "\n")
+	if signature == self.signature then
+		return
+	end
+	-- Same chips with new numbers (the medicine countdown): only the texts move.
+	local sameShape = #chips == #self.chips
+	for index, chip in chips do
+		local old = self.chips[index]
+		if not (old and old.icon == chip.icon and old.width == self:_chipWidth(chip.text)) then
+			sameShape = false
+		end
+	end
+	self.signature = signature
+	self.status.Visible = #chips > 0
+	if sameShape then
+		for index, chip in chips do
+			self.chips[index].text:SetText(chip.text)
+		end
+		return
+	end
+	for _, old in self.chips do
+		old.panel:Destroy()
+	end
+	table.clear(self.chips)
+	local cfg = self.statusCfg
+	local h = cfg.size[2]
+	local right = cfg.size[1]
+	for index, chip in chips do
+		local w = self:_chipWidth(chip.text)
+		local panel = Kit.Panel.new(self.status, {
+			name = "Status" .. index,
+			rect = { right - w, 0, w, h },
+			variant = "plaque",
+			pad = 0,
+		})
+		local s = h - 12
+		Kit.Icon.new(panel:Content(), { name = "Icon", rect = { 10, 6, s, s }, icon = chip.icon, zIndex = 8 })
+		local text = Kit.Text.new(panel:Content(), {
+			name = "Text",
+			rect = { 14 + s, 0, w - s - 24, h },
+			text = chip.text,
+			role = "hudSmall",
+			zIndex = 8,
+		})
+		table.insert(self.chips, { panel = panel, text = text, icon = chip.icon, width = w })
+		right -= w + cfg.gap
+	end
+end
+
+-- A plaque's width for its text, in steps of 20 px so a ticking number keeps it.
+function Vitals:_chipWidth(text: string): number
+	local h = self.statusCfg.size[2]
+	local raw = Kit.Text.Width(text, "hudSmall") + h + 22
+	return math.ceil(raw / 20) * 20
 end
 
 return Vitals

@@ -1,58 +1,76 @@
 -- Small persistent indicator of the player's profile save state, driven by the
--- SaveStatus attribute the server sets. Uses words plus a symbol, never colour alone.
+-- SaveStatus attribute the server sets: a kit status tag (a dot and words, never
+-- colour alone) at the bottom right.
 
 local Players = game:GetService("Players")
+
+local Kit = require(script.Parent.Parent.Hud.Kit)
+local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local SaveStatusController = {}
 
 local STATUS_ATTRIBUTE = "SaveStatus"
+local HEIGHT = 34
 
 local LABELS = {
-	Loading = "… Loading data",
-	Saved = "✓ Saved",
-	Saving = "… Saving",
-	Pending = "! Save pending",
-	LeaseLost = "✕ Data in use on another server",
-	Error = "✕ Data error",
+	Loading = "Loading data…",
+	Saved = "Saved",
+	Saving = "Saving…",
+	Pending = "Save pending",
+	LeaseLost = "Data in use on another server",
+	Error = "Data error",
 }
 
-local label
+-- The green dot only when the data is safely saved; every other state the grey one.
+SaveStatusController.VARIANTS = { Saved = "ready" }
+
+local holder = nil
+local badge = nil
+local shown = nil
 
 local function refresh()
 	local status = Players.LocalPlayer:GetAttribute(STATUS_ATTRIBUTE)
-	label.Text = LABELS[status] or ""
-	label.Visible = status ~= nil
+	local text = LABELS[status] or ""
+	holder.Visible = status ~= nil and text ~= ""
+	if text == shown then
+		return
+	end
+	shown = text
+	if badge then
+		badge:Destroy()
+		badge = nil
+	end
+	if text ~= "" then
+		badge = Kit.Badge.new(holder, {
+			name = "Status",
+			variant = SaveStatusController.VARIANTS[status] or "notReady",
+			text = text,
+			rect = { 0, 0, 0, HEIGHT },
+		})
+		holder.Size = UDim2.fromOffset(badge.root.Size.X.Offset, HEIGHT)
+	end
 end
 
 function SaveStatusController.Start()
 	local player = Players.LocalPlayer
-	local gui = Instance.new("ScreenGui")
-	gui.Name = "SaveStatus"
-	gui.ResetOnSpawn = false
-	gui.IgnoreGuiInset = false
-	gui.DisplayOrder = 10
-
-	label = Instance.new("TextLabel")
-	label.Name = "Status"
+	local gui = Theme.Make("ScreenGui", {
+		Name = "SaveStatus",
+		ResetOnSpawn = false,
+		IgnoreGuiInset = false,
+		DisplayOrder = 10,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	}, nil)
 	-- Bottom-right above the settings button: the XP bar owns the bottom-left.
-	label.AnchorPoint = Vector2.new(1, 1)
-	label.Position = UDim2.new(1, -12, 1, -84)
-	label.Size = UDim2.fromOffset(0, 24)
-	label.AutomaticSize = Enum.AutomaticSize.X
-	label.BackgroundTransparency = 0.4
-	label.BackgroundColor3 = Color3.fromRGB(20, 18, 16)
-	label.TextColor3 = Color3.fromRGB(240, 232, 220)
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.Font = Enum.Font.GothamMedium
-	label.TextSize = 14
-	label.Parent = gui
-
-	local padding = Instance.new("UIPadding")
-	padding.PaddingLeft = UDim.new(0, 8)
-	padding.PaddingRight = UDim.new(0, 8)
-	padding.Parent = label
-
+	holder = Theme.Make("Frame", {
+		Name = "Holder",
+		AnchorPoint = Vector2.new(1, 1),
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, -12, 1, -84),
+		Size = UDim2.fromOffset(0, HEIGHT),
+		Visible = false,
+	}, gui)
 	gui.Parent = player:WaitForChild("PlayerGui")
+	holder.Parent = Theme.HudRoot(gui)
 	player:GetAttributeChangedSignal(STATUS_ATTRIBUTE):Connect(refresh)
 	refresh()
 end

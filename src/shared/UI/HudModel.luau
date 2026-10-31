@@ -73,6 +73,24 @@ function HudModel.Thousands(value: number?): string
 	return (formatted:gsub("^,", ""))
 end
 
+-- A currency amount that fits a pill: separators below 100,000 (2,450), then
+-- one decimal with K, M or B (250K, 1.2M, 3.4B); the decimal drops when it is 0.
+function HudModel.Compact(value: number?): string
+	local n = math.max(0, math.floor(value or 0))
+	if n < 100000 then
+		return HudModel.Thousands(n)
+	end
+	for _, unit in { { 1e9, "B" }, { 1e6, "M" }, { 1e3, "K" } } do
+		if n >= unit[1] then
+			-- Rounded down, so 999,999 never reads 1000K.
+			local tenths = math.floor(n / unit[1] * 10) / 10
+			local text = if tenths >= 100 or tenths % 1 == 0 then ("%d"):format(tenths) else ("%.1f"):format(tenths)
+			return text .. unit[2]
+		end
+	end
+	return HudModel.Thousands(n)
+end
+
 -- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
 -- of one).
 function HudModel.PartyCount(members: number?, maxSize: number): string
@@ -184,8 +202,7 @@ function HudModel.HudScale(
 end
 
 -- 9-slice corner scale for a sprite of natural size (w, h) drawn at (tw, th), so
--- rope corners shrink with small widgets instead of overlapping. The preview
--- (art/ui/preview_hud.py) uses the same formula.
+-- rope corners shrink with small widgets instead of overlapping.
 function HudModel.SliceScale(width: number, height: number, targetWidth: number, targetHeight: number): number
 	if width <= 0 or height <= 0 then
 		return 1
@@ -256,14 +273,9 @@ function HudModel.KeyLabel(inputType: string, keyName: string?, fallbackKey: str
 	return KEY_NAMES[keyName] or Keybinds.Display(keyName :: string)
 end
 
--- Medicine lock, pending food healing, hunger slow and crouching: what only the
+-- Medicine lock, pending food healing and hunger slow: what only the
 -- old survival HUD showed in words.
-function HudModel.SurvivalStatus(
-	medicineLockLeft: number?,
-	foodHealing: number?,
-	slowed: boolean?,
-	crouching: boolean?
-): string
+function HudModel.SurvivalStatus(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?): string
 	local parts = {}
 	if (medicineLockLeft or 0) > 0 then
 		table.insert(parts, ("Medicine ready in %.1f s"):format(medicineLockLeft))
@@ -273,9 +285,6 @@ function HudModel.SurvivalStatus(
 	end
 	if slowed then
 		table.insert(parts, "! Hungry: slowed")
-	end
-	if crouching then
-		table.insert(parts, "Crouching")
 	end
 	return table.concat(parts, "  ·  ")
 end
