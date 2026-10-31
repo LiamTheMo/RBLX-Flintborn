@@ -136,4 +136,8 @@ check(hud.objective.titleText ~= nil, "the objective refreshed")
 player:SetAttribute("SessionState", "Lobby")
 check(not gui.Enabled and not HudMode.IsVisible(), "hidden when the run ends")
 player:SetAttribute("SessionState", "ActiveRun")
+-- Stand-in background for this page: art/reference/lobby_map.png is the lobby village (the
+-- repo has no in-world screenshot). The world HUD never shows in the lobby: it
+-- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
+-- a run (SessionStates.IsAtRisk).
 __dump(player.PlayerGui, 1672, 941, { background = "art/reference/lobby_map.png" })

@@ -364,21 +364,35 @@ do
 			)
 		end
 	end
-	heading(root, "Frames: none / well / thin / stat", 30, 290)
+	heading(root, "Frames: none / well / thin / stat (icon tile + bar, value in the bar)", 30, 290)
 	Kit.Bar.new(root, { rect = { 30, 335, 300, 22 }, fill = "orange", frame = "none", value = 0.7 })
 	Kit.Bar.new(root, { rect = { 360, 325, 303, 55 }, fill = "green", frame = "well", value = 0.6 })
 	Kit.Bar.new(root, { rect = { 690, 335, 182, 32 }, fill = "yellow", frame = "thin", value = 0.4 })
 	Kit.Bar.new(
 		root,
-		{ rect = { 30, 400, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "85", value = 0.85 }
+		{ rect = { 30, 400, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "85/100", value = 0.85 }
 	)
 	Kit.Bar.new(
 		root,
-		{ rect = { 360, 400, 315, 65 }, fill = "stamina", frame = "stat", icon = "lightning", text = "60", value = 0.6 }
+		{
+			rect = { 360, 400, 315, 65 },
+			fill = "stamina",
+			frame = "stat",
+			icon = "lightning",
+			text = "60/100",
+			value = 0.6,
+		}
 	)
 	Kit.Bar.new(
 		root,
-		{ rect = { 690, 400, 315, 65 }, fill = "food", frame = "stat", icon = "drumstick", text = "30", value = 0.3 }
+		{
+			rect = { 690, 400, 315, 65 },
+			fill = "food",
+			frame = "stat",
+			icon = "drumstick",
+			text = "30/100",
+			value = 0.3,
+		}
 	)
 	Kit.Bar.new(root, { rect = { 30, 485, 500, 18 }, fill = "xp", value = 450 / 750, text = "450/750 XP" })
 
@@ -840,7 +854,7 @@ do
 	Kit.TextField.new(root, { rect = { 780, 50, 260, 41 }, text = "SUMMER-2026", maxLength = 20 })
 	Kit.Bar.new(
 		root,
-		{ rect = { 500, 110, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "8", value = 0.08 }
+		{ rect = { 500, 110, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "8/100", value = 0.08 }
 	)
 	Kit.Bar.new(root, { rect = { 840, 125, 300, 28 }, fill = "xp", value = 0.12 })
 	for i, variant in { "dotRed", "dotYellow", "dotGreen", "dotGrey" } do

@@ -11,6 +11,10 @@ local Layout = require(Client.Hud.Layout)
 
 local W, H = 2560, 1080
 local TOP_BAR = 58
+-- Stand-in background: art/reference/lobby_map.png is the lobby village (the
+-- repo has no in-world screenshot). The world HUD never shows in the lobby: it
+-- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
+-- a run (SessionStates.IsAtRisk).
 local BACKGROUND = { background = "art/reference/lobby_map.png" }
 workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = false

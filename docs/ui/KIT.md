@@ -710,8 +710,8 @@ have no rose).
 **Phones** (short touch screens: height < 500, no keyboard):
 - The HUD scale never drops below 0.5 (was 0.373 at 844 × 390); the regions
   stay pinned to the edges. On the world HUD the menu tiles sit at the bottom
-  left and the touch attack button uses HudLayout `attack.phonePos`
-  (`Layout.Place` honours `phonePos` on phones).
+  left and the touch attack button uses HudLayout `attack.phone.pos`
+  (`Layout.Place` merges an entry's `touch` and `phone` overrides).
 - Body and label roles (`phoneText.roles`) draw 1.2× larger
   (`Core.TextBoost`); labels that could overflow shrink to fit or truncate.
 - Effective text at 844 × 390: HUD small text 15 × 1.2 × 0.5 = 9 px, HUD names
@@ -764,3 +764,12 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   Bar, SelectionRing, Pin, SetBar, Fill and Frame builders and the parchment
   stand-ins are gone.
 - **Reasons**: TooFast, PlayerNotHere, Rejected, NotReady.
+
+## 13. Stat bar
+
+`Bar` frame `"stat"` is now built from separate pieces: a framed icon tile
+(`bar.statTile`, `lk_tile_paper`, sheets 08 / 20) as wide as the bar is tall,
+a 4 px gap, then the plain paper bar frame (`bar.frame`) with its fill. The
+value text sits in the bar, centred over the fill and the empty well, in cream
+with a 2 px ink outline, at 0.6 of the well's height (`textSize` overrides).
+The baked value plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.

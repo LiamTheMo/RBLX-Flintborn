@@ -1,6 +1,6 @@
 -- The in-world HUD (HudController.Mount, docs/ui/HudScreen.md) at the 1672 × 941
--- design size with sample data, over a world picture without UI
--- (art/reference/lobby_map.png).
+-- design size with sample data, over a stand-in background (the lobby village,
+-- art/reference/lobby_map.png; see below).
 --   1 a run in a tribe of four: three tribe-mates, the compass with waypoints,
 --     vitals, a medicine lock, the extraction objective, a world event, LV 12
 --     450/750 XP, the hotbar with slot 1 selected, and an interaction prompt
@@ -14,6 +14,10 @@ local InteractionPrompt = require(Hud.InteractionPrompt)
 local Layout = require(Hud.Layout)
 
 local W, H = 1672, 941
+-- Stand-in background: art/reference/lobby_map.png is the lobby village (the
+-- repo has no in-world screenshot). The world HUD never shows in the lobby: it
+-- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
+-- a run (SessionStates.IsAtRisk).
 local BACKGROUND = { background = "art/reference/lobby_map.png" }
 local layout = Layout.Get()
 

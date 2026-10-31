@@ -189,6 +189,8 @@ KitModel.ROLES = {
 	["bar.frame"] = { sprite = "lk_bar_frame", material = "paper" },
 	["bar.frameThin"] = { sprite = "lk_bar_frame_thin", material = "paper" },
 	["bar.stat"] = { sprite = "lk_statbar_frame", material = "paper" },
+	-- The stat bar's framed icon tile (sheets 08, 20); the bar beside it is bar.frame.
+	["bar.statTile"] = { sprite = "lk_tile_paper", material = "paper" },
 
 	-- Controls
 	["checkbox.off"] = { sprite = "lk_checkbox_off", material = "paper" },

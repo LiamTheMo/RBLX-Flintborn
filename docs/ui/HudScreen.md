@@ -36,7 +36,7 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 |---|---|---|---|
 | Tribe frames | top left (39, 60), 294 wide, 58 + 50 per row | `Panel` card, `SectionHeader` "TRIBE n" (party icon), per member a compact `PlayerRow` (portrait 40, name) and a `Bar` health fill on the track | tribe-mates on this server (`TribeId`), alphabetical, up to 3 rows; n counts them all; hidden when none |
 | Compass | top centre, y 60, 481 × 46 | `Panel` plaque, ink `Divider` ticks, `Text` letters (`hudSmall`, cardinals 20), leather `Icon` arrow_down marker, waypoint `Icon`s under it | camera yaw; landmarks (mountain), camps (campfire), portals (portal), extraction countdowns (exit), events (category icon) |
-| Vitals | top right (right 53, y 60), 315 × 65, pitch 76 | `Bar` frame "stat" (sheets 08, 18, 20: icon tile, fill, value plaque): heart/health, lightning/stamina, drumstick/food | Humanoid `Health`/`MaxHealth` ("85/100"); `Stamina`, `Food` fractions shown out of 100 |
+| Vitals | top right (right 53, y 60), 315 × 65, pitch 76 | `Bar` frame "stat": a framed icon tile (`lk_tile_paper`, sheets 08, 20) and the paper bar frame (`lk_bar_frame`) with its fill and the value ("85/100") centred in the bar in cream with an ink outline; no value plaque: heart/health, lightning/stamina, drumstick/food | Humanoid `Health`/`MaxHealth` ("85/100"); `Stamina`, `Food` fractions shown out of 100 |
 | Low state | on a stat bar at ≤ 25 % | warning `Icon` on the icon tile, the icon pulses (`Motion.Pulse`; steady with reduced motion) | same values |
 | Status | right-aligned under the vitals, y 289, 38 high | one `Panel` plaque per line with an `Icon` and `Text` | medicine lock (hourglass, "Medicine ready in 12.4 s"), `FoodHealing` (heart), hunger slow (warning) |
 | Objective | right, y 337, 315 × 134 (touch: 315 × 162, each task on two lines: the task, then pin, distance and progress) | `Panel` card, `SectionHeader` (exit icon, "FIND EXTRACTION"), per task a `Checkbox` ring (read only), `Text`, map_pin `Icon` + distance, progress; a task too long shrinks to 70 % and then ends in "…" | `HudModel.ExtractionObjective` (nearest countdown, else nearest portal) |
@@ -102,7 +102,11 @@ python3 art/ui/capture/capture.py world_hud_wide     # 2560 × 1080
 python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks)
 ```
 
-The scenes draw over `art/reference/lobby_map.png` (a world picture without UI).
+The scenes draw over `art/reference/lobby_map.png`, a stand-in: it is the lobby
+village, because the repo has no in-world screenshot. In game the world HUD
+(vitals, objective, world event and the rest) is built only in the world place
+(`HudMode.ReplacesLegacy`) and shown only during a run (`SessionStates.IsAtRisk`);
+the lobby never shows it.
 
 ## Known limits (Kit requests)
 
