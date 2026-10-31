@@ -9,6 +9,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
+-- Members' replicated level and progress (PlayerRow levelBar reads them).
+for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
+	local member = game:GetService("Players"):GetPlayerByUserId(userId)
+	member:SetAttribute("Level", level[1])
+	member:SetAttribute("LevelProgress", level[2])
+end
 local PartyModel = require(ReplicatedStorage.Shared.UI.PartyModel)
 local PartyWindow = require(Hud.Screens.PartyWindow)
 

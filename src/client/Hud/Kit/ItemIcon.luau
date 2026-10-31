@@ -40,6 +40,8 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 			z = z,
 			name = "Item",
 			color = if artIcon then tint else nil,
+			-- While the art is not served: a small letter, not a slot-filling one.
+			standInScale = 0.45,
 		})
 	elseif sprite then
 		self.image = Art.Sprite(sprite, self.w, self.h, self.base.visual, {

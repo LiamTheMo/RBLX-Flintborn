@@ -452,9 +452,15 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 	if row.leader then
 		maid:Give(Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 }))
 	end
-	maid:Give(
-		Kit.Portrait.new(holder, { name = "Portrait", rect = { 51, 2, 52, 52 }, userId = row.userId, zIndex = 6 })
-	)
+	maid:Give(Kit.Portrait.new(holder, {
+		name = "Portrait",
+		rect = { 51, 2, 52, 52 },
+		userId = row.userId,
+		-- The headshot fills its box over the row's paper.
+		frame = "none",
+		backdrop = false,
+		zIndex = 6,
+	}))
 	Kit.Core.Label(holder, {
 		name = "Name",
 		text = row.name,

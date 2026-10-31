@@ -74,6 +74,10 @@ Z-order: listed parents draw under their children; HUD regions do not overlap.
 
 ### Top-left: player card (anchor: top-left)
 
+**Removed from the game HUD** (owner decision): the lobby HUD draws no player
+card. Each party member's row in the Party panel shows their level and a small
+XP bar instead. The table below records the mockup only.
+
 | Element | Parent | Bounds | Appearance | Content / data | Kit part |
 |---|---|---|---|---|---|
 | PlayerCard | HUD | 39,60,359,81 | union of portrait frame and name plate | — | 07 player card (95,33,771,178): portrait frame + plate in one image. Kit is 0.466× scale of the mockup, same proportions (771×178 → 359×83) |

@@ -197,6 +197,20 @@ local function now(): number
 	return os.clock()
 end
 
+-- image id -> {fn = true}: who wants to hear when the image loads or fails
+-- (the kit draws its stand-in until art arrives).
+local watchers: { [string]: { [any]: boolean } } = {}
+
+local function notify(id: string, state: string)
+	local set = watchers[id]
+	if set == nil then
+		return
+	end
+	for fn in table.clone(set) do
+		task.spawn(fn, state)
+	end
+end
+
 local function hold(label: GuiObject, entry)
 	local fresh = labels[label] == nil
 	labels[label] = entry
@@ -295,9 +309,11 @@ local function fetch(id: string)
 		if image.status == "Success" then
 			image.state = "loaded"
 			hand(id)
+			notify(id, "loaded")
 			return
 		end
 		image.state = "failed"
+		notify(id, "failed")
 		image.tries += 1
 		image.retryAt = now() + waitFor(image.tries)
 		image.content = otherSpelling(image.content) or image.content
@@ -314,12 +330,14 @@ end
 local function tick(): boolean
 	local time = now()
 	if inFlight and time - inFlight.started > SpriteLoader.FETCH_TIMEOUT then
-		local image = hudImages[inFlight.id]
+		local timedOut = inFlight.id
+		local image = hudImages[timedOut]
 		inFlight = nil
 		image.state = "failed"
 		image.status = "TimedOut"
 		image.tries += 1
 		image.retryAt = time + waitFor(image.tries)
+		notify(timedOut, "failed")
 	end
 	local waiting = false
 	local best, bestShown = nil, false
@@ -337,6 +355,18 @@ local function tick(): boolean
 						best = entry.id
 					end
 				end
+			end
+		end
+	end
+	-- Images a stand-in is waiting on keep being fetched (paced by retryAt) even
+	-- after their labels were handed the image, so the art replaces the
+	-- stand-in as soon as it loads.
+	for id, set in watchers do
+		local image = hudImages[id]
+		if next(set) and image and image.state ~= "loaded" then
+			waiting = true
+			if best == nil and image.state ~= "loading" and time >= image.retryAt then
+				best = id
 			end
 		end
 	end
@@ -435,6 +465,40 @@ function SpriteLoader.Assign(label: ImageLabel, id: string)
 	label.Image = ""
 	hold(label, { id = id, pending = true })
 	pump()
+end
+
+-- The load state of image `id`: "loaded", "failed" (the last fetch failed;
+-- it is still retried), or "waiting" / "loading". In the headless capture an
+-- image is loaded unless the scene makes ContentProvider report it failed.
+function SpriteLoader.State(id: string): string
+	if CAPTURE then
+		local status = ContentProvider:GetAssetFetchStatus(id)
+		return if statusName(status) == "Failure" then "failed" else "loaded"
+	end
+	local image = hudImages[id]
+	return if image then image.state else "waiting"
+end
+
+-- Calls fn(state) whenever image `id` loads ("loaded") or a fetch of it fails
+-- ("failed"); it is fetched (and retried) while watched. Returns a function
+-- that stops watching.
+function SpriteLoader.OnState(id: string, fn: (string) -> ()): () -> ()
+	local set = watchers[id]
+	if set == nil then
+		set = {}
+		watchers[id] = set
+	end
+	set[fn] = true
+	if not CAPTURE then
+		imageFor(id)
+		pump()
+	end
+	return function()
+		set[fn] = nil
+		if next(set) == nil and watchers[id] == set then
+			watchers[id] = nil
+		end
+	end
 end
 
 -- Lists a label whose image was set elsewhere (a headshot) in the diagnostics.

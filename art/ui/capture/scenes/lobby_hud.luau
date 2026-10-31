@@ -6,6 +6,12 @@
 --   2 a party of three with an incoming invite, a non-leader's view, the
 --     game-update notice and a full hotbar
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
+-- Members' replicated level and progress (PlayerRow levelBar reads them).
+for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
+	local member = game:GetService("Players"):GetPlayerByUserId(userId)
+	member:SetAttribute("Level", level[1])
+	member:SetAttribute("LevelProgress", level[2])
+end
 local Shared = game:GetService("ReplicatedStorage").Shared
 local LobbyHud = require(Hud.Screens.LobbyHud)
 local LobbyHudModel = require(Shared.UI.LobbyHudModel)
@@ -18,7 +24,6 @@ local function page()
 	local gui, root = __screen(W, H)
 	local hud = LobbyHud.new(root, {})
 	hud:SetTopInset(58)
-	hud:SetProfile(ME.name, ME.userId)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	return gui, root, hud

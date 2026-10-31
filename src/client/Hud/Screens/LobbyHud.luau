@@ -1,8 +1,9 @@
 -- The lobby's always-on HUD (docs/ui/LobbyScreen.md, art/reference/ui/lobby/01_hud.png,
 -- ARCHITECTURE §4.1), built only from Kit components at the 1672 × 941 design
--- size: the player card (portrait, name, level, XP bar), Coins, Gems and
--- Settings, the 2 × 3 menu tiles, the Party panel, the level/XP bar and the
--- six-slot hotbar that shows the deploy loadout.
+-- size: Coins, Gems and Settings, the 2 × 3 menu tiles, the Party panel (each
+-- member with their level and XP bar), the level/XP bar and the six-slot
+-- hotbar that shows the deploy loadout. (The mockup's top-left player card is
+-- left out.)
 --
 -- Display only: LobbyHudController feeds it through the setters and handles the
 -- presses it reports through `actions`. Regions are pinned to the screen edges
@@ -21,8 +22,9 @@ LobbyHud.__index = LobbyHud
 
 -- Region origins and sizes in design px (measured on the mockup; the spec's
 -- element tree). Top regions move down together when the Roblox top bar
--- reaches past the card's top (phones), keeping TOP_GAP below it.
-LobbyHud.CARD = { 39, 60, 359, 81 }
+-- reaches past the mockup's top margin TOP_Y (phones), keeping TOP_GAP below
+-- it.
+LobbyHud.TOP_Y = 60
 LobbyHud.TOP_RIGHT = { right = 53, y = 70, w = 302, h = 46 }
 LobbyHud.TILES = { x = 68, centreY = 448 / 941, w = 190, h = 272, pitchX = 102, pitchY = 94, tileW = 88, tileH = 84 }
 LobbyHud.PARTY = { right = 53, y = 258, w = 294, h = 244 }
@@ -31,9 +33,6 @@ LobbyHud.TOP_GAP = 2
 
 -- Hotbar slot lefts in the bottom region (mockup pitch 96.4).
 LobbyHud.SLOT_X = { 0, 96, 193, 289, 386, 482 }
-
--- The headshot's window in the player card art.
-LobbyHud.CARD_WINDOW = { 10, 9, 67, 63 }
 
 -- Party panel parts in the panel's px: the pinned first row and the scrolling
 -- list under it (its thin rail at x 1588..1596 of the mockup).
@@ -46,12 +45,13 @@ LobbyHud.LIST = { 28, 106, 243, 113 }
 LobbyHud.ROW_H = 51
 LobbyHud.EMPTY_H = 36
 LobbyHud.RULE_W = 223
-LobbyHud.ROW = { w = 187, portrait = 41, nameX = 57, crown = 19, emptyDot = 22, emptyIndent = 5 }
+LobbyHud.ROW =
+	{ w = 187, portrait = 41, nameX = 57, crown = 19, emptyDot = 22, emptyIndent = 5, levelSize = 11, barH = 7 }
 -- The add-player button in the first member row.
 LobbyHud.INVITE = { 196, 8, 45, 34 }
 
 -- Spec text sizes (TextSize ≈ cap height ÷ 0.743, LobbyScreen.md).
-LobbyHud.TEXT = { cardName = 19, cardLevel = 16, currency = 18, partyTitle = 20, memberName = 13, barText = 17 }
+LobbyHud.TEXT = { currency = 18, partyTitle = 20, memberName = 13, barText = 17 }
 
 -- Phones and touch tablets (Kit.Scale.IsSmallTouch): the HUD draws at its
 -- 0.5 floor there, so party names grow to stay at 9 screen px or more, rows
@@ -61,6 +61,7 @@ LobbyHud.TEXT = { cardName = 19, cardLevel = 16, currency = 18, partyTitle = 20,
 -- pads would overlap.
 LobbyHud.PHONE = {
 	memberName = 15,
+	memberLevel = 13,
 	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, settings = { 298, 0, 52, 46 }, w = 350 },
 	noticeH = 72,
 	respond = { 98, 6, 125, 40 },
@@ -69,9 +70,6 @@ LobbyHud.PHONE = {
 	invite = { 222, 21, 45, 34 },
 }
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
--- The card's level label and XP bar share x 109..320; the bar starts after
--- the label, which widens when its text needs it (a long level, phone text).
-LobbyHud.CARD_LEVEL = { x = 109, y = 42, w = 48, h = 24, barY = 49, barH = 12, right = 320, gap = 2 }
 
 local function region(parent: Instance, name: string, props): Frame
 	local frame = Instance.new("Frame")
@@ -85,7 +83,7 @@ local function region(parent: Instance, name: string, props): Frame
 	return frame
 end
 
--- actions: onProfile, onCurrency(id), onSettings, onTile(id), onParty(section?),
+-- actions: onCurrency(id), onSettings, onTile(id), onParty(section?),
 -- onAnswer(partyId, accept), onSlot(index). Every one is optional.
 function LobbyHud.new(parent: Instance, actions)
 	actions = actions or {}
@@ -97,8 +95,6 @@ function LobbyHud.new(parent: Instance, actions)
 		rows = {},
 		parts = {},
 		phone = Kit.Scale.IsSmallTouch(),
-		levelW = LobbyHud.CARD_LEVEL.w,
-		cardFraction = 0,
 		coinValue = 0,
 		gemValue = 0,
 	}, LobbyHud)
@@ -109,59 +105,6 @@ function LobbyHud.new(parent: Instance, actions)
 		end
 	end
 	self.fire = fire
-
-	-- Top left: the player card (sheet 07 art, the headshot in its window). A
-	-- press opens Progress.
-	local c = LobbyHud.CARD
-	local card = Kit.Core.Root(parent, "PlayerCard", "card.player", { rect = c, name = "PlayerCard" }, c[3], c[4])
-	self.card = card
-	local win = LobbyHud.CARD_WINDOW
-	self.portrait = Kit.Portrait.new(card.visual, { name = "Portrait", rect = win, zIndex = 4 })
-	-- The card's own frame surrounds the headshot: the portrait's frame stays
-	-- hidden and the headshot fills its window on the photo backdrop.
-	self.portrait.headshot.Position = UDim2.fromScale(0, 0)
-	self.portrait.headshot.Size = UDim2.fromScale(1, 1)
-	self.portrait.headshot.BackgroundTransparency = 0
-	self.portrait.headshot.BackgroundColor3 = Kit.Tokens.Color("paperDisabled")
-	for _, child in self.portrait.base.visual:GetChildren() do
-		if child ~= self.portrait.headshot and child:IsA("GuiObject") then
-			child.Visible = false
-		end
-	end
-	self.plate = Kit.Picture.new(
-		card.visual,
-		{ name = "Card", rect = { 0, 0, c[3], c[4] }, role = "hud.playerCard", zIndex = 5 }
-	)
-	self.name = Kit.Text.new(card.visual, {
-		name = "Name",
-		rect = { 109, 17, 200, 24 },
-		text = "",
-		role = "hudName",
-		textSize = LobbyHud.TEXT.cardName,
-		zIndex = 7,
-	})
-	local cl = LobbyHud.CARD_LEVEL
-	self.level = Kit.Text.new(card.visual, {
-		name = "Level",
-		rect = { cl.x, cl.y, cl.w, cl.h },
-		text = "",
-		role = "hudSmall",
-		textSize = LobbyHud.TEXT.cardLevel,
-		-- Shrinks to fit when phones boost the text size.
-		scaled = true,
-		zIndex = 7,
-	})
-	self:_cardBar()
-	self.cardControl = Kit.Interact.attach(card, {
-		hoverScale = false,
-		onPress = function()
-			fire("onProfile")
-		end,
-		render = function(state)
-			self.plate:SetState(state)
-		end,
-	})
-	self.parts.card = card.root
 
 	-- Top right: Coins, Gems, Settings.
 	local tr = LobbyHud.TOP_RIGHT
@@ -358,37 +301,6 @@ function LobbyHud.new(parent: Instance, actions)
 	return self
 end
 
--- The card's XP bar after the level label (rebuilt when the label widens).
-function LobbyHud:_cardBar()
-	local cl = LobbyHud.CARD_LEVEL
-	if self.cardBar then
-		self.cardBar:Destroy()
-	end
-	local x = cl.x + self.levelW + cl.gap
-	self.cardBar = Kit.Bar.new(self.card.visual, {
-		name = "XpBar",
-		rect = { x, cl.barY, cl.right - x, cl.barH },
-		fill = "xp",
-		zIndex = 7,
-	})
-	self.cardBar:Set(self.cardFraction, true)
-end
-
--- Widens the card's level label to its text (never below the mockup's 48).
-function LobbyHud:_fitLevel(text: string)
-	local cl = LobbyHud.CARD_LEVEL
-	-- A little slack over the measured width: the label must never shrink.
-	local need = if text == ""
-		then 0
-		else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel) * 1.1) + 4
-	local w = math.clamp(need, cl.w, 110)
-	if w ~= self.levelW then
-		self.levelW = w
-		self.level.root.Size = UDim2.fromOffset(w, cl.h)
-		self:_cardBar()
-	end
-end
-
 -- Coins, Gems and Settings (rebuilt when the form factor changes).
 function LobbyHud:_buildTopRight()
 	for _, part in { self.coins, self.gems, self.settings } do
@@ -490,16 +402,14 @@ function LobbyHud:_link()
 	for index, tile in ipairs(self.tiles) do
 		local n = LobbyHudModel.TileNeighbours(index)
 		local button = hit(tile) :: GuiButton
-		button.NextSelectionUp = if n.up then hit(self.tiles[n.up]) else self.cardControl.hit
+		button.NextSelectionUp = if n.up then hit(self.tiles[n.up]) else hit(self.coins)
 		button.NextSelectionDown = if n.down then hit(self.tiles[n.down]) else hit(self.slots[1])
 		button.NextSelectionLeft = if n.left then hit(self.tiles[n.left]) else nil
 		button.NextSelectionRight = if n.right then hit(self.tiles[n.right]) else self.titleControl.hit
 	end
-	self.cardControl.hit.NextSelectionDown = hit(self.tiles[1])
-	self.cardControl.hit.NextSelectionRight = hit(self.coins)
 	local top = { hit(self.coins), hit(self.gems), hit(self.settings) }
 	for index, button in top do
-		button.NextSelectionLeft = top[index - 1] or self.cardControl.hit
+		button.NextSelectionLeft = top[index - 1] or hit(self.tiles[2])
 		button.NextSelectionRight = top[index + 1]
 		button.NextSelectionDown = self.titleControl.hit
 	end
@@ -526,31 +436,19 @@ end
 -- How far the Roblox top bar reaches down, in design px: the top regions move
 -- below it when it reaches past the mockup's top margin.
 function LobbyHud:SetTopInset(designPx: number)
-	local shift = math.max(0, math.ceil(designPx + LobbyHud.TOP_GAP - LobbyHud.CARD[2]))
-	self.shift = shift
-	local c = LobbyHud.CARD
-	self.card.root.Position = UDim2.fromOffset(c[1], c[2] + shift)
 	local tr, p = LobbyHud.TOP_RIGHT, LobbyHud.PARTY
+	local shift = math.max(0, math.ceil(designPx + LobbyHud.TOP_GAP - LobbyHud.TOP_Y))
+	self.shift = shift
 	local w = (if self.phone then LobbyHud.PHONE.pills else LobbyHud.PILLS).w
 	self.topRight.Position = UDim2.new(1, -(tr.right + w), 0, tr.y + shift)
 	self.partyRegion.Position = UDim2.new(1, -(p.right + p.w), 0, p.y + shift)
 end
 
--- The local player's name and headshot.
-function LobbyHud:SetProfile(name: string, userId: number?)
-	self.name:SetText(name)
-	self.portrait:SetUser(userId)
-end
-
 -- view: the progression snapshot {level, xp, xpToNext} (nil while loading).
 function LobbyHud:SetProgress(view, instant: boolean?)
 	local progress = LobbyHudModel.Progress(view)
-	self.cardFraction = progress.fraction
-	self:_fitLevel(progress.level)
-	self.level:SetText(progress.level)
 	self.barLevel:SetText(progress.level)
 	self.barText:SetText(progress.text)
-	self.cardBar:Set(progress.fraction, instant)
 	self.bar:Set(progress.fraction, instant)
 end
 
@@ -605,6 +503,11 @@ function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 		portraitSize = r.portrait,
 		nameX = r.nameX,
 		nameSize = if self.phone then LobbyHud.PHONE.memberName else LobbyHud.TEXT.memberName,
+		-- "LV. n" and the member's XP bar under the name (their replicated
+		-- Level / LevelProgress attributes).
+		levelBar = true,
+		levelSize = if self.phone then LobbyHud.PHONE.memberLevel else r.levelSize,
+		barHeight = r.barH,
 		-- Desktop shrinks a long name to fit (down to the text floor); touch
 		-- keeps the size, ends in "…" and shows the whole name in a tooltip.
 		crownSize = r.crown,
@@ -777,9 +680,6 @@ function LobbyHud:Destroy()
 	self:_clearRows()
 	for _, part in
 		{
-			self.portrait,
-			self.plate,
-			self.cardBar,
 			self.coins,
 			self.gems,
 			self.settings,
@@ -801,7 +701,6 @@ function LobbyHud:Destroy()
 	self.panel:Destroy()
 	self.pinned:Destroy()
 	self.notice:Destroy()
-	self.card.maid:Clean()
 	self.titleRow.maid:Clean()
 	for _, frame in { self.topRight, self.tileRegion, self.partyRegion, self.bottom } do
 		frame:Destroy()

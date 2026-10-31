@@ -8,13 +8,18 @@
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, name = "ForestRanger", level = 15,
 --       action = { label = "Invite", onPress = invite } })
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, empty = true })
+--   Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = "LiamTheMo", levelBar = true })
+
+local Players = game:GetService("Players")
 
 local Art = require(script.Parent.Art)
 local Badge = require(script.Parent.Badge)
+local Bar = require(script.Parent.Bar)
 local Button = require(script.Parent.Button)
 local Core = require(script.Parent.Core)
 local Divider = require(script.Parent.Divider)
 local Interact = require(script.Parent.Interact)
+local Motion = require(script.Parent.Motion)
 local Portrait = require(script.Parent.Portrait)
 local Scale = require(script.Parent.Scale)
 local Text = require(script.Parent.Text)
@@ -32,7 +37,12 @@ PlayerRow.__index = PlayerRow
 -- fit, down to minTextPx; false: "…"; default: shrink on desktop, "…" plus a
 -- tooltip with the whole name on touch), compact (the HUD party list: smaller crown and
 -- text, no level line), rule ("hairline" default; true = hairline, false,
--- or a Divider variant), frame ("square" | "round"), onPress(row), zIndex, name.
+-- or a Divider variant), frame ("none" default: the headshot fills its box with
+-- no backdrop; "square" | "round"), backdrop (Portrait's), levelBar (true:
+-- under the name "LV. n" and a small XP bar, compact rows too; the level and
+-- `progress` (0-1) follow the player's Level / LevelProgress attributes while
+-- they are in the server), progress, barHeight (px, default 8), onPress(row),
+-- zIndex, name.
 function PlayerRow.new(parent: Instance, props)
 	local w, h = Core.Size(props, 330, 52)
 	local base = Core.Root(parent, "PlayerRow", "row.player", props, w, h)
@@ -83,6 +93,12 @@ end
 -- Redraws the row from `data` (same fields as the props; layout options not
 -- in `data` keep their constructor values).
 function PlayerRow:Set(data)
+	self:_unfollow()
+	if self.levelBar then
+		self.levelBar:Destroy()
+		self.levelBar = nil
+	end
+	self.levelLabel = nil
 	for _, child in self.content:GetChildren() do
 		child:Destroy()
 	end
@@ -131,7 +147,8 @@ function PlayerRow:Set(data)
 		name = "Portrait",
 		rect = { 0, (h - ps) / 2, ps, ps },
 		userId = data.userId,
-		frame = opt("frame"),
+		frame = opt("frame") or "none",
+		backdrop = if opt("backdrop") ~= nil then opt("backdrop") else false,
 		zIndex = z,
 	})
 	local x = opt("nameX") or (ps + 14)
@@ -195,7 +212,8 @@ function PlayerRow:Set(data)
 		Art.Plate(crown, "mark.crown", c, c, { z = z })
 		right -= c + 8
 	end
-	local hasLevel = data.level ~= nil and not compact
+	local withBar = opt("levelBar") == true
+	local hasLevel = withBar or (data.level ~= nil and not compact)
 	-- shrinkName: true / false, or unset: shrink to fit (down to the text
 	-- floor) on desktop, keep the size and end in "…" on touch, where a
 	-- pressable row shows the whole name in a tooltip.
@@ -220,19 +238,90 @@ function PlayerRow:Set(data)
 		z = z,
 	})
 	if hasLevel then
-		Core.Label(self.content, {
+		local ly, lh = opt("levelY") or h * 0.54, h * 0.34
+		self.levelLabel = Core.Label(self.content, {
 			name = "Level",
-			text = ("LV. %d"):format(data.level),
+			text = if data.level then ("LV. %d"):format(data.level) else "",
 			role = "small",
 			size = opt("levelSize"),
 			color = "inkBody",
-			rect = { x, opt("levelY") or h * 0.54, right - x, h * 0.34 },
+			rect = { x, ly, right - x, lh },
 			z = z,
 		})
+		if withBar then
+			self.barHeight = opt("barHeight") or 8
+			self.levelSize = opt("levelSize")
+			self.level, self.progress = data.level, opt("progress") or 0
+			self:_buildBar()
+			self:_follow(data.userId)
+		end
 	end
 	if self.control then
 		self.control:Refresh()
 	end
+end
+
+-- The XP bar on the level line, after the label's text (rebuilt when the
+-- text's width changes).
+function PlayerRow:_buildBar()
+	local label = self.levelLabel
+	if self.levelBar then
+		self.levelBar:Destroy()
+	end
+	local x, y = label.Position.X.Offset, label.Position.Y.Offset
+	local lw, lh = label.Size.X.Offset, label.Size.Y.Offset
+	local gap = if label.Text == "" then 0 else math.ceil(Text.Width(label.Text, "small", self.levelSize)) + 6
+	local bh = self.barHeight
+	self.levelBar = Bar.new(self.content, {
+		name = "XpBar",
+		rect = { x + gap, math.floor(y + (lh - bh) / 2 + 0.5), math.max(0, lw - gap), bh },
+		fill = "xp",
+		frame = "track",
+		zIndex = label.ZIndex,
+	})
+	self.levelBar:Set(math.clamp(self.progress or 0, 0, 1), true)
+end
+
+-- Updates the level line and its XP bar in place (nil keeps a value).
+function PlayerRow:SetLevel(level: number?, progress: number?)
+	if not self.levelBar then
+		return
+	end
+	self.level = level or self.level
+	self.progress = progress or self.progress
+	local text = if self.level then ("LV. %d"):format(self.level) else ""
+	if self.levelLabel.Text ~= text then
+		self.levelLabel.Text = text
+		self:_buildBar()
+	end
+	self.levelBar:Set(math.clamp(self.progress or 0, 0, 1), Motion.Reduced())
+end
+
+-- Follows the player's replicated Level / LevelProgress attributes.
+function PlayerRow:_follow(userId: number?)
+	local player = if userId and userId > 0 then Players:GetPlayerByUserId(userId) else nil
+	if not player then
+		return
+	end
+	local function read()
+		local level, progress = player:GetAttribute("Level"), player:GetAttribute("LevelProgress")
+		self:SetLevel(
+			if type(level) == "number" then level else nil,
+			if type(progress) == "number" then progress else nil
+		)
+	end
+	self.follows = {
+		player:GetAttributeChangedSignal("Level"):Connect(read),
+		player:GetAttributeChangedSignal("LevelProgress"):Connect(read),
+	}
+	read()
+end
+
+function PlayerRow:_unfollow()
+	for _, connection in self.follows or {} do
+		connection:Disconnect()
+	end
+	self.follows = nil
 end
 
 function PlayerRow:SetSelected(selected: boolean)
@@ -242,6 +331,10 @@ function PlayerRow:SetSelected(selected: boolean)
 end
 
 function PlayerRow:Destroy()
+	self:_unfollow()
+	if self.levelBar then
+		self.levelBar:Destroy()
+	end
 	if self.action then
 		self.action:Destroy()
 	end
