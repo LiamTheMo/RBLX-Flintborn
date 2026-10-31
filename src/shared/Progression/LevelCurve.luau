@@ -9,6 +9,15 @@ function LevelCurve.XpForLevel(level: number): number
 	return math.floor(100 * level ^ 1.5)
 end
 
+-- The fraction (0..1) of the way from `level` to the next one, for XP bars that
+-- other players see (the LevelProgress attribute). Full at the cap.
+function LevelCurve.Progress(level: number, xp: number): number
+	if level >= LevelCurve.MAX_LEVEL then
+		return 1
+	end
+	return math.clamp(xp / LevelCurve.XpForLevel(level), 0, 1)
+end
+
 -- Adds XP and returns (level, xp, levelsGained). XP past the cap is kept as a
 -- total but no further levels are gained until rebirth.
 function LevelCurve.Add(level: number, xp: number, amount: number)

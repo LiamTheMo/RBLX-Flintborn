@@ -435,8 +435,14 @@ Kit.ListRow.new(list, { size = { 300, 72 }, layoutOrder = i, variant = "card", i
 
 ### PlayerRow
 `Kit.PlayerRow.new(parent, {rect | size, userId?, name?, level?, leader?, badge? ("leader" | "ready" | "notReady"), action? ({label, onPress, variant?, enabled?}), empty?, emptyText?, rule = true, frame?, onPress?})`;
-`:Set(data)` redraws, `:SetSelected`. The empty row is a muted disc and
-"Empty Slot".
+`:Set(data)` redraws, `:SetSelected`, `:SetLevel(level?, progress?)`. The
+empty row is a muted disc and "Empty Slot". The headshot fills its box with no
+frame or backdrop (`frame = "none"`, `backdrop = false` by default; pass
+`frame = "square"` for the old framed look). `levelBar = true` (compact rows
+too) puts "LV. n" and a small XP bar (Bar, `track` frame, `xp` fill,
+`barHeight` px, default 8) under the name; the level and `progress` (0-1)
+follow the player's replicated `Level` / `LevelProgress` attributes while
+they are in the server (attribute signals, no polling), else the props.
 ```lua
 Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = level, leader = isLeader, badge = if ready then "ready" else "notReady" })
 ```
@@ -451,7 +457,8 @@ Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = 
 `:SetValue(n, instant?)` counts up with thousands separators.
 
 ### Portrait
-`Kit.Portrait.new(parent, {rect, userId, frame = "square" | "round"})`; `:SetUser(id)`.
+`Kit.Portrait.new(parent, {rect, userId, frame = "square" | "round" | "none", backdrop?})`; `:SetUser(id)`.
+`backdrop = false` draws no colour behind the transparent headshot.
 Headshot `rbxthumb://type=AvatarHeadShot&id=<id>&w=150&h=150` behind the frame,
 reported to `SpriteLoader.Track`.
 

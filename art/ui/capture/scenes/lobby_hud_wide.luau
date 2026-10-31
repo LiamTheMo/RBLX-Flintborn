@@ -3,6 +3,12 @@
 -- mockup's sample data; page 2 is the same screen in a party of three with an
 -- invite waiting.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
+-- Members' replicated level and progress (PlayerRow levelBar reads them).
+for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
+	local member = game:GetService("Players"):GetPlayerByUserId(userId)
+	member:SetAttribute("Level", level[1])
+	member:SetAttribute("LevelProgress", level[2])
+end
 local Shared = game:GetService("ReplicatedStorage").Shared
 local UserInputService = game:GetService("UserInputService")
 local Kit = require(Hud.Kit)
@@ -22,7 +28,6 @@ local function page(view)
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 	hud:SetTopInset(TOP_BAR / scale)
-	hud:SetProfile(ME.name, ME.userId)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party(view, ME))

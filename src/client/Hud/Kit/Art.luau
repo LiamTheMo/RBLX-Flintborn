@@ -591,12 +591,11 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 			end)
 			-- The glyph follows the image when its owner moves it (a button's
 			-- icon is placed after it is made).
-			for _, key in { "Position", "Size", "Visible" } do
-				if key ~= "Visible" then
-					image:GetPropertyChangedSignal(key):Connect(function()
-						(glyph :: any)[key] = (image :: any)[key]
-					end)
-				end
+			for _, key in { "Position", "Size", "AnchorPoint" } do
+				image:GetPropertyChangedSignal(key):Connect(function()
+					local value = (image :: any)[key];
+					(glyph :: any)[key] = value
+				end)
 			end
 			image.Destroying:Connect(function()
 				stop()

@@ -464,6 +464,10 @@ function PartyWindow:_members(data)
 					nameX = 75,
 					nameSize = text.name,
 					levelSize = text.level,
+					-- The member's XP bar after "LV. n" (their replicated
+					-- Level / LevelProgress attributes).
+					levelBar = true,
+					barHeight = 8,
 					crownSize = 26,
 					portraitSize = if leaderRow then 56 else nil,
 				}
