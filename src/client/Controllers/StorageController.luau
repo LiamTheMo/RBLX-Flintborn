@@ -37,18 +37,18 @@ local function clear(column)
 	table.clear(column.rows)
 end
 
--- Returns the first row's button (nil for an empty column).
+-- Returns the first row's hit button (nil for an empty column).
 local function fill(column, entries, action: string, onAction)
 	clear(column)
 	local first = nil
 	for order, entry in entries do
-		local holder, button = LootController.ItemRow(column.list, order, column.w, entry, action, function(button)
+		local holder, _, hit = LootController.ItemRow(column.list, order, column.w, entry, action, function(button)
 			LootController.Guard(button, function()
 				onAction(entry)
 			end)
 		end)
 		table.insert(column.rows, holder)
-		first = first or button
+		first = first or hit
 	end
 	if #entries == 0 then
 		table.insert(
@@ -100,7 +100,7 @@ local function render()
 	end)
 	-- A gamepad lands on the first Take, else the first Store, else the ✕.
 	local first = firstTake or firstStore
-	ui.screen:SetDefaultSelection(if first then first.control.hit else ui.window.close.control.hit)
+	ui.screen:SetDefaultSelection(first or ui.window.close.control.hit)
 	ui.screen:Open()
 end
 

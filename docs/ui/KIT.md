@@ -774,3 +774,26 @@ The icon sits on it at the left (0.66 of the bar's height), then the dark track
 The value text is centred in the track, over the fill and the empty part, in
 cream with a 2 px ink outline (`textSize` overrides its size). The baked value
 plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
+
+## 13. Fix round 4
+
+- **Items without art**: the kind glyph (tools and weapons a hammer, armour a
+  backpack, the rest a chest) draws faded (`Art.STAND_IN_FADE`, 0.6) in ink,
+  in slots, rows and detail pictures alike: it reads as "picture missing".
+- **Leather tones**: Button `tone = "bright" | "primary" | "dark"` (tokens
+  `leatherBright` = the sprite's own, `leatherTint` #DEFFFF, `leatherDark`
+  #D5E0FF); `:SetTone`. The play plaque defaults to bright. Measured ΔE2000 vs
+  the mockups: EQUIP 1.5, Invite 2.5, FORGE 0.7, CLOSE 2.2; APPLY 3.2 and PLAY
+  4.5 are limited by the art (the mockups' bright leather is lighter and bluer
+  than the sprite, and a tint can only darken).
+- **Tab** `align = "Center"` (text-only tabs) and `:SetCount(text)` (a count
+  plaque on the tab's corner, so labels keep one size: "Vault" + "23/25").
+- **Toast**: the ✕ hit area is touchMin SCREEN px at the toast's real scale.
+  With a window open the column sits below the window when a toast fits there,
+  else below its title and tab band (`Screen.toastClear`, default 180 design px).
+- **PlayerRow** `shrinkName` default: desktop shrinks long names to fit (down
+  to the text floor); touch keeps the size with "…" and a pressable row shows
+  the whole name in a tooltip. **ListRow**: a pressable row whose title is cut
+  shows it whole in a tooltip.
+- **SectionHeader** labels shrink to fit (the phone boost no longer truncates).
+- **Art.Icon** `transparency`; **Plate** `:SetTone`.

@@ -57,7 +57,8 @@ end
 
 -- One item row: the item's art with its rarity dot, name, rarity and count, and
 -- an action button over the row's right end. `entry.catalogId` (sent by the
--- server with every body and chest entry) picks the art. Returns (holder, button).
+-- server with every body and chest entry) picks the art. Returns (holder, button,
+-- the row's hit button: the press and gamepad target).
 function LootController.ItemRow(parent: Instance, order: number, w: number, entry, action: string, onAction)
 	local h = LootController.ROW_H
 	local holder = Kit.Core.Make("Frame", {
@@ -66,7 +67,10 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 		LayoutOrder = order,
 		Size = UDim2.fromOffset(w, h),
 	}, parent)
-	Kit.ListRow.new(holder, {
+	-- The whole row is the one hit target (its press is the action), so no touch
+	-- pad overlaps another: the action button only shows what a press does.
+	local button
+	local row = Kit.ListRow.new(holder, {
 		name = "Row",
 		rect = { 0, 0, w, h },
 		itemId = entry.catalogId,
@@ -74,6 +78,9 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 		subtitle = entry.rarity .. (if entry.permanent then " · Permanent" else ""),
 		value = if entry.quantity then "×" .. entry.quantity else nil,
 		trailing = 112,
+		onPress = function()
+			onAction(button)
+		end,
 	})
 	-- The rarity dot sits on the icon's lower-right corner (the icon is 62 % of the
 	-- row height, 14 px in: Kit.ListRow).
@@ -87,7 +94,6 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 			zIndex = 7,
 		})
 	end
-	local button
 	button = Kit.Button.new(holder, {
 		name = action,
 		rect = { w - 14 - 112, (h - 42) / 2, 112, 42 },
@@ -98,7 +104,10 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 			onAction(button)
 		end,
 	})
-	return holder, button
+	-- Presses land on the row underneath: the button's own hit is hidden, so the
+	-- two never stack touch pads (Guard keeps one take in flight either way).
+	button.control.hit.Visible = false
+	return holder, button, row.control.hit
 end
 
 local function clear()
@@ -127,7 +136,7 @@ local function render(bodyId: string, entries)
 	end
 	local first = nil
 	for order, entry in entries do
-		local holder, button = LootController.ItemRow(ui.list, order, w, entry, "Take", function(button)
+		local holder, _, hit = LootController.ItemRow(ui.list, order, w, entry, "Take", function(button)
 			local bodyId = openBodyId
 			LootController.Guard(button, function()
 				-- The key names this exact entry, so a stale index takes nothing else.
@@ -140,10 +149,10 @@ local function render(bodyId: string, entries)
 			end)
 		end)
 		table.insert(ui.rows, holder)
-		first = first or button
+		first = first or hit
 	end
 	-- A gamepad lands on the first Take (or the ✕ when the body is empty).
-	ui.screen:SetDefaultSelection(if first then first.control.hit else ui.window.close.control.hit)
+	ui.screen:SetDefaultSelection(first or ui.window.close.control.hit)
 	ui.panel.scroll:SetContentHeight(math.max(1, #entries) * (LootController.ROW_H + 6))
 	ui.status:SetText("")
 	ui.screen:Open()
