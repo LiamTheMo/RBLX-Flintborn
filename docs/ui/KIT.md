@@ -744,7 +744,7 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   `Kit.Modal.OnChanged(fn)` tells listeners when layers open or close.
 - **Input** (`Kit.Input`): `Type()` ("mouse" | "keyboard" | "touch" |
   "gamepad"), `IsGamepad()`, `IsTouch()`, `Hint(keyboardText, gamepadKey)`
-  (nil on touch), `Watch(fn)`, `GAMEPAD_NAMES`, `SetHudDefault(guiObject)`
+  (nil on touch), `Watch(fn)`, `GAMEPAD_NAMES`, `SetHudDefault(guiObject)` (registers the HUD's navigation target; never selects on its own), `EnterHud()` (selects it on an explicit menu action)
   (selection lands there when a gamepad is picked up with nothing selected).
   KeyCap `gamepadKey` / `hideOnTouch` switch by themselves.
 - **Gamepad**: Kit.Modal selects a window's default control whenever the last

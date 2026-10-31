@@ -5,7 +5,7 @@
 --
 --   Kit.Input.Hint("B", "ButtonX")   -- "B" with a keyboard, "X" on a gamepad, nil on touch
 --   local stop = Kit.Input.Watch(function(kind) refreshHints(kind) end)
---   Kit.Input.SetHudDefault(hud.tiles[1].control.hit) -- gamepad lands here when nothing is selected
+--   Kit.Input.SetHudDefault(hud.tiles[1].control.hit) -- target for deliberate UI navigation
 
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
@@ -113,10 +113,6 @@ local function hook()
 			return
 		end
 		current = now
-		-- A gamepad picked up with nothing selected lands on the HUD default.
-		if now == "gamepad" and GuiService.SelectedObject == nil and hudDefault and hudDefault.Parent then
-			GuiService.SelectedObject = hudDefault
-		end
 		for fn in table.clone(listeners) do
 			task.spawn(fn, now)
 		end
@@ -131,14 +127,23 @@ function Input.Watch(fn: (string) -> ()): () -> ()
 	end
 end
 
--- The control gamepad selection goes to when a gamepad is picked up and
--- nothing is selected (the HUD's first menu tile). nil clears it.
+-- The HUD control that deliberate UI navigation starts from (the first menu
+-- tile). It is only registered: the HUD never takes the selection on its own,
+-- because a selected control turns the stick into menu navigation and the
+-- player could not walk. nil clears it.
 function Input.SetHudDefault(object: GuiObject?)
 	hook()
 	hudDefault = object
-	if object and Input.IsGamepad() and GuiService.SelectedObject == nil then
-		GuiService.SelectedObject = object
+end
+
+-- Moves gamepad selection onto the HUD default, for an explicit "enter the
+-- menu" action. Returns whether it did.
+function Input.EnterHud(): boolean
+	if hudDefault and hudDefault.Parent and GuiService.SelectedObject == nil then
+		GuiService.SelectedObject = hudDefault
+		return true
 	end
+	return false
 end
 
 return Input

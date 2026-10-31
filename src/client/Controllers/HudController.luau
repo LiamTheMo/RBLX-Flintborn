@@ -628,13 +628,19 @@ end
 
 -- Gamepad entry to the HUD (docs/ui/HudScreen.md, "Gamepad"). ButtonSelect stays
 -- on Progress, and every tile has its own button (Y, the D-pad, View), so the
--- HUD needs no menu button. While the HUD shows, a gamepad picked up with
--- nothing selected lands on the first tile (Kit.Input.SetHudDefault), and B
--- hands the stick back to walking: with a control selected the stick moves the
--- selection, not the character. Windows' own B (Kit.Modal, higher priority)
--- still closes them first.
+-- HUD needs no menu button. The HUD never takes the selection by itself (a
+-- gamepad player walks as soon as the run starts): its first tile is only
+-- registered as the target for when the player enters UI navigation
+-- (Kit.Input.SetHudDefault), and B hands the stick back to walking, since with
+-- a control selected the stick moves the selection, not the character.
+-- Windows' own B (Kit.Modal, higher priority) still closes them first.
 local releaseBound = false
 local remounted = Signal.new()
+
+-- Registers `object` as the HUD's navigation target (it is never selected here).
+local function registerHudDefault(object: GuiObject?)
+	Kit.Input.SetHudDefault(object)
+end
 -- The form factor ("phone", "tablet", "desktop") the regions were mounted for.
 local mountedForm = "desktop"
 local function bindRelease(active: boolean)
@@ -642,7 +648,7 @@ local function bindRelease(active: boolean)
 		return
 	end
 	releaseBound = active
-	Kit.Input.SetHudDefault(if active then widgets.tiles[1].control.hit else nil)
+	registerHudDefault(if active then widgets.tiles[1].control.hit else nil)
 	if not active then
 		ContextActionService:UnbindAction("FlintbornHudRelease")
 		local selected = GuiService.SelectedObject
@@ -690,7 +696,7 @@ local function remount()
 	widgets.popups = popups
 	tops = HudController.TopRegions(widgets)
 	if releaseBound then
-		Kit.Input.SetHudDefault(widgets.tiles[1].control.hit)
+		registerHudDefault(widgets.tiles[1].control.hit)
 	end
 	remounted:Fire()
 	applyTop()
