@@ -531,6 +531,21 @@ function KitModel.Edge(sprite: string?): { number }
 	return sprite and KitModel.EDGES[sprite] or { 0, 0, 0, 0 }
 end
 
+-- Whether a part shows its art or the kit's stand-in, from the image's load
+-- state (SpriteLoader: "loaded" | "failed" | "waiting" | "loading") and how
+-- long the part has waited: art once loaded; the stand-in when the fetch
+-- failed, or while it is still not loaded after `grace` seconds (a slow or
+-- refused image never leaves a bare screen). Before the grace runs out the
+-- art (still blank) is kept, so a normal load never flashes the stand-in.
+function KitModel.ArtMode(state: string?, waited: number, grace: number): string
+	if state == "loaded" then
+		return "art"
+	elseif state == "failed" then
+		return "standIn"
+	end
+	return if waited >= grace then "standIn" else "art"
+end
+
 -- Every sprite name the role table uses, sorted (native roles have none).
 function KitModel.Sprites(): { string }
 	local seen, list = {}, {}

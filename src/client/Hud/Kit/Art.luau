@@ -14,6 +14,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
+local SpriteLoader = require(script.Parent.Parent.SpriteLoader)
 local Widgets = require(script.Parent.Parent.Widgets)
 local Core = require(script.Parent.Core)
 local Tokens = require(script.Parent.Tokens)
@@ -88,6 +89,16 @@ end
 
 -- True when `sprite` draws as art (uploaded, or previewed in a capture).
 Art.HasArt = Widgets.HasArt
+
+-- Seconds an uploaded image may take before its part shows the kit's
+-- stand-in instead of nothing.
+Art.GRACE = 2
+
+-- Whether image `id` may be drawn for a part made at os.clock() `born`
+-- (KitModel.ArtMode over SpriteLoader's state).
+function Art.ArtReady(id: string, born: number): boolean
+	return KitModel.ArtMode(SpriteLoader.State(id), os.clock() - born, Art.GRACE) == "art"
+end
 
 -- The natural size {w, h} of a sprite, or nil when the manifest lacks it.
 function Art.SizeOf(sprite: string?): (number?, number?)
@@ -307,6 +318,8 @@ function Art.Plate(parent: Instance, roleName: string, w: number, h: number, opt
 		exact = opts.exact ~= false,
 		alpha = 0,
 		variants = {},
+		born = os.clock(),
+		watches = {},
 	}, PlateMethods)
 	self:Show("normal")
 	return self :: any
@@ -386,7 +399,13 @@ function PlateMethods:Show(state: string)
 		-- Drawn as a flat kit shape by design (plain rules, discs, thin rails).
 		sprite, borrowed = "native", false
 	end
-	local shown = sprite and self:_variant(sprite)
+	local shown = nil
+	if sprite and sprite ~= "native" and Widgets.HasArt(sprite) and not self:_artReady(sprite) then
+		-- Uploaded art that has not arrived (or failed): the kit's stand-in.
+		shown = self:_standIn()
+	else
+		shown = sprite and self:_variant(sprite)
+	end
 	for _, variant in self.variants do
 		variant.Visible = variant == shown
 	end
@@ -407,7 +426,7 @@ function PlateMethods:Show(state: string)
 		end
 		shown.ImageColor3 = color
 		shown.ImageTransparency = self.alpha
-	elseif shown:IsA("Frame") and shown.Name == sprite and shown:FindFirstChild("Edge") then
+	elseif shown:IsA("Frame") and shown:FindFirstChild("Edge") then
 		paintStandIn(shown :: Frame, self.role, state, self.w, self.h)
 		if self.tint and shown.BackgroundTransparency < 1 then
 			shown.BackgroundColor3 = Tokens.Multiply(shown.BackgroundColor3, self.tint)
@@ -446,7 +465,60 @@ function PlateMethods:SetTransparency(value: number)
 end
 
 function PlateMethods:Destroy()
+	self:_unwatch()
 	self.holder:Destroy()
+end
+
+-- The one stand-in frame this plate draws while its art's image is missing.
+function PlateMethods:_standIn(): GuiObject
+	local frame = self.variants.__standIn
+	if frame == nil then
+		frame = standIn(self.role, self.w, self.h, self.holder, self.z)
+		frame.Name = "StandIn"
+		self.variants.__standIn = frame
+	end
+	return frame
+end
+
+-- Whether `sprite`'s image may be drawn now (Art.ArtReady); watches the
+-- image so the plate redraws when it loads or fails.
+function PlateMethods:_artReady(sprite: string): boolean
+	local id = Widgets.ImageId(sprite)
+	if id == nil then
+		return true
+	end
+	local ready = Art.ArtReady(id, self.born)
+	if not ready or SpriteLoader.State(id) ~= "loaded" then
+		self:_watch(id)
+	end
+	return ready
+end
+
+function PlateMethods:_watch(id: string)
+	if self.watches[id] then
+		return
+	end
+	local function redraw()
+		if self.holder.Parent then
+			self:Show(self.state)
+		end
+	end
+	local stop = SpriteLoader.OnState(id, redraw)
+	self.watches[id] = stop
+	-- Past the grace period a still-missing image shows the stand-in.
+	task.delay(Art.GRACE, redraw)
+	if self.unwatchOnDestroy == nil then
+		self.unwatchOnDestroy = self.holder.Destroying:Connect(function()
+			self:_unwatch()
+		end)
+	end
+end
+
+function PlateMethods:_unwatch()
+	for id, stop in self.watches do
+		stop()
+		self.watches[id] = nil
+	end
 end
 
 -- Glyphs drawn white (for leather); on paper they are tinted ink.
