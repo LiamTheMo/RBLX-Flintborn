@@ -239,7 +239,7 @@ local function registerSite(position: Vector3, kind: string, radius: number, nam
 	ModelBuilder.Decorate(
 		portal,
 		PropModels.Portal(Recipe.Rgb(portal.Color)),
-		{ offset = CFrame.Angles(0, 0, math.rad(-90)) }
+		{ offset = CFrame.Angles(0, 0, math.rad(-90)), anchored = true }
 	)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Start extraction"

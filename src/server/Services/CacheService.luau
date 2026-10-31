@@ -2,7 +2,7 @@
 -- interaction; letting go, walking off or being hit restarts the channel. The
 -- loot is rolled once on the server and spills out as physical, contested drops.
 -- The plain hitbox part keeps the prompt and the interaction; PropModels draws a
--- wood chest over it whose lid swings open when the cache is looted. World place only.
+-- wood chest over it whose lid swings open (its lock and gem go out) when the cache is looted. World place only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -51,7 +51,7 @@ function CacheService.CanInteract(player: Player, part: BasePart, reach: number)
 	return validated == nil or (validated - part.Position).Magnitude <= reach + CacheService.VALIDATED_SLACK
 end
 
--- Swings the chest's lid open about its hinge and darkens the lit parts.
+-- Swings the chest's lid open about its hinge and hides the lit parts.
 local function openChest(dressing: { BasePart })
 	local hinge = CFrame.new(PropModels.CHEST_HINGE[1], PropModels.CHEST_HINGE[2], PropModels.CHEST_HINGE[3])
 	local swing = hinge * CFrame.Angles(math.rad(PropModels.CHEST_OPEN_DEGREES), 0, 0) * hinge:Inverse()

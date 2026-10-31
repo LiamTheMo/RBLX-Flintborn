@@ -16,6 +16,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local EventCatalog = require(ReplicatedStorage.Shared.Events.EventCatalog)
+local EventKinds = require(ReplicatedStorage.Shared.Events.EventKinds)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
@@ -76,6 +77,11 @@ local function groundParams()
 		if other then
 			table.insert(ignore, other)
 		end
+	end
+	-- Trunks, boulders and logs are solid and queryable: events never stand on them.
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
 	end
 	for _, player in Players:GetPlayers() do
 		if player.Character then
@@ -170,10 +176,14 @@ local function spill(loot, position: Vector3, luck: number?)
 end
 
 -- The hitbox of each node look: size, whether it blocks walking, and the prompt's action.
+local function hitbox(name: string): Vector3
+	local size = PropModels.HITBOX[name]
+	return Vector3.new(size[1], size[2], size[3])
+end
 local NODE_LOOKS = {
-	Ore = { size = Vector3.new(6, 5, 6), solid = true, action = "Mine" },
-	Plant = { size = Vector3.new(4, 4, 4), solid = false, action = "Harvest" },
-	Pile = { size = Vector3.new(4, 3, 4), solid = true, action = "Search" },
+	Ore = { size = hitbox("Ore"), solid = true, action = "Mine" },
+	Plant = { size = hitbox("Plant"), solid = false, action = "Harvest" },
+	Pile = { size = hitbox("Pile"), solid = true, action = "Search" },
 }
 
 -- The accent colour props are lit in for an event's rarity.
@@ -203,7 +213,7 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 		then PropModels.LootPile
 		elseif isOre then PropModels.OreNode(accentOf(event.entry))
 		else PropModels.PlantNode(PropModels.PlantVariant(event.entry.id), accentOf(event.entry))
-	ModelBuilder.Decorate(part, recipe)
+	ModelBuilder.Decorate(part, recipe, { anchored = true })
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = look.action
 	prompt.ObjectText = if isOre
@@ -286,7 +296,7 @@ local function spawnStructure(event, position: Vector3)
 			if not look.hostVisible then
 				wall.Transparency = 1
 			end
-			ModelBuilder.Decorate(wall, look)
+			ModelBuilder.Decorate(wall, look, { anchored = true })
 		end
 	end
 	local base = position - Vector3.new(0, PropModels.STRUCTURE_SINK, 0)
@@ -317,22 +327,25 @@ local function spawnStructure(event, position: Vector3)
 	end
 end
 
--- Spawns what `event` is made of, by kind. False for a kind it does not know.
-local function build(event, done): boolean
-	local entry, position, model = event.entry, event.position, event.model
-	local kind = entry.kind
-	if kind == EventCatalog.Kinds.Node then
-		spawnNode(event, entry.loot, position, entry.minRank, done)
-	elseif kind == EventCatalog.Kinds.Cache then
-		CacheService.Spawn(entry, position, model, done)
-	elseif kind == EventCatalog.Kinds.Meteor then
-		MeteorService.Spawn(entry, position, model, done)
-	elseif kind == EventCatalog.Kinds.Npc then
-		spawnGroup(event, entry.group, position)
-	elseif kind == EventCatalog.Kinds.Structure then
-		spawnStructure(event, position)
-	elseif kind == EventCatalog.Kinds.Boss then
-		event.boss = BossService.Spawn(entry.boss, position, {
+-- What each event kind is made of: one builder per EventKinds.Built entry.
+local BUILDERS = {
+	[EventCatalog.Kinds.Node] = function(event, done)
+		spawnNode(event, event.entry.loot, event.position, event.entry.minRank, done)
+	end,
+	[EventCatalog.Kinds.Cache] = function(event, done)
+		CacheService.Spawn(event.entry, event.position, event.model, done)
+	end,
+	[EventCatalog.Kinds.Meteor] = function(event, done)
+		MeteorService.Spawn(event.entry, event.position, event.model, done)
+	end,
+	[EventCatalog.Kinds.Npc] = function(event)
+		spawnGroup(event, event.entry.group, event.position)
+	end,
+	[EventCatalog.Kinds.Structure] = function(event)
+		spawnStructure(event, event.position)
+	end,
+	[EventCatalog.Kinds.Boss] = function(event, done)
+		event.boss = BossService.Spawn(event.entry.boss, event.position, {
 			source = "Event",
 			expired = function()
 				return events[event.id] ~= event
@@ -344,9 +357,29 @@ local function build(event, done): boolean
 				end
 			end,
 		})
-	else
+	end,
+}
+-- The builders and the shared list of kinds (checked by event_props.spec) agree. A
+-- warning, never an error: services load without pcall, so a throw here would stop
+-- every service on the server, not just events.
+for _, kind in EventKinds.Built do
+	if BUILDERS[kind] == nil then
+		warn("[EventDirector] No builder for event kind " .. kind)
+	end
+end
+for kind in BUILDERS do
+	if not EventKinds.IsBuilt(kind) then
+		warn("[EventDirector] Builder for unlisted event kind " .. kind)
+	end
+end
+
+-- Spawns what `event` is made of, by kind. False for a kind it does not know.
+local function build(event, done): boolean
+	local builder = BUILDERS[event.entry.kind]
+	if builder == nil then
 		return false
 	end
+	builder(event, done)
 	return true
 end
 

@@ -783,7 +783,7 @@ local PLANTS = { Patch = patch, Bloom = bloom, Sapling = sapling }
 -- petals or fruit lit in `accent`.
 function PropModels.PlantNode(variant: string, accent: { number })
 	local build = PLANTS[variant] or patch
-	return { parts = lifted(build(shade(accent, 1.1)), -2) }
+	return { parts = lifted(build(shade(accent, 1.1)), -PropModels.HITBOX.Plant[2] / 2) }
 end
 
 -- A heap of broken stone, a smashed crate and a hide scrap: the search spot in a

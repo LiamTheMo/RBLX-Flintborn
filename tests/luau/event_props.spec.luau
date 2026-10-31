@@ -2,6 +2,7 @@ local Shared = game:GetService("ReplicatedStorage").Shared
 local BossCatalog = require(Shared.Bosses.BossCatalog)
 local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
 local EventCatalog = require(Shared.Events.EventCatalog)
+local EventKinds = require(Shared.Events.EventKinds)
 local EventRules = require(Shared.Events.EventRules)
 local GameConstants = require(Shared.GameConstants)
 local HudModel = require(Shared.UI.HudModel)
@@ -12,19 +13,6 @@ local PropModels = require(Shared.Visuals.PropModels)
 local Rarity = require(Shared.Items.Rarity)
 local Recipe = require(Shared.Visuals.Recipe)
 local Tiers = require(Shared.Items.Tiers)
-
--- What EventDirectorService.start() builds for each kind, and the category each
--- kind belongs to (kept in step with its populate()).
-local HANDLED = { Node = true, Cache = true, Meteor = true, Npc = true, Structure = true, Boss = true }
-local KIND_OF_CATEGORY = {
-	Vegetation = "Node",
-	Ore = "Node",
-	Npc = "Npc",
-	Cache = "Cache",
-	Meteor = "Meteor",
-	Structure = "Structure",
-	Boss = "Boss",
-}
 
 local function accents()
 	local list = {}
@@ -260,16 +248,29 @@ test("every event kind is built by the director, in its own category", function(
 		expect(table.find(EventCatalog.Categories, category) ~= nil, category .. " is a director category")
 		expect(#entries > 0, category .. " has entries")
 		for _, entry in entries do
-			expect(HANDLED[entry.kind], entry.id .. " kind " .. tostring(entry.kind) .. " is built by start()")
-			expectEq(entry.kind, KIND_OF_CATEGORY[category], entry.id .. " kind matches its category")
+			expect(
+				EventKinds.IsBuilt(entry.kind),
+				entry.id .. " kind " .. tostring(entry.kind) .. " is built by start()"
+			)
+			expectEq(entry.kind, EventKinds.OfCategory[category], entry.id .. " kind matches its category")
 			expectEq(entry.category, category, entry.id .. " knows its category")
 		end
 	end
 	for _, category in EventCatalog.Categories do
 		expect(EventCatalog.Entries[category] ~= nil, category .. " has an entry list")
 	end
-	for kind in EventCatalog.Kinds do
-		expect(HANDLED[kind], kind .. " is handled")
+	-- Every kind the catalog defines is one the director has a builder for, and back.
+	for _, kind in EventCatalog.Kinds do
+		expect(EventKinds.IsBuilt(kind), kind .. " has a builder")
+	end
+	for _, kind in EventKinds.Built do
+		expect(EventCatalog.Kinds[kind] == kind, kind .. " is a catalog kind")
+	end
+	for category in EventKinds.OfCategory do
+		expect(EventCatalog.Entries[category] ~= nil, category .. " is a catalog category")
+	end
+	for _, category in EventCatalog.Categories do
+		expect(EventKinds.OfCategory[category] ~= nil, category .. " has a kind")
 	end
 end)
 
@@ -459,4 +460,38 @@ test("announcements carry what the event feed, map and compass read", function()
 	local gone =
 		{ id = "g", name = "Gone", rarity = "Rare", category = "Cache", position = Vector3.new(0, 0, 0), endsAt = 5 }
 	expectEq(HudModel.WorldEvent({ gone }, 10, 0, 0), nil, "expired events are hidden")
+end)
+
+test("solid hitboxes match the drawn stone", function()
+	-- The part of a recipe that is solid, by name: the extent players walk into.
+	local function solid(recipe, name: string)
+		local picked = { parts = {} }
+		for _, spec in recipe.parts do
+			if spec.name == name then
+				table.insert(picked.parts, spec)
+			end
+		end
+		return extent(picked)
+	end
+	for _, case in
+		{ { "Ore", PropModels.OreNode({ 120, 180, 255 }), "Boulder" }, { "Pile", PropModels.LootPile, "Heap" } }
+	do
+		local size, recipe, name = PropModels.HITBOX[case[1]], case[2], case[3]
+		local low, high = solid(recipe, name)
+		expect(
+			size[1] / 2 <= high[1] + 0.2 and -size[1] / 2 >= low[1] - 0.2,
+			case[1] .. " hitbox is no wider than its stone (x)"
+		)
+		expect(
+			size[3] / 2 <= high[3] + 0.2 and -size[3] / 2 >= low[3] - 0.2,
+			case[1] .. " hitbox is no wider than its stone (z)"
+		)
+		expect(size[2] / 2 <= high[2] + 0.1, case[1] .. " hitbox is no taller than its stone")
+		expect(low[2] >= -size[2] / 2 - 0.1, case[1] .. " stone sits on the hitbox floor")
+	end
+	local core = PropModels.METEOR_CORE
+	local low, high = solid(PropModels.Meteor, "Rock")
+	expect(core.lift + core.diameter / 2 <= high[2] + 0.05, "the meteor core is no taller than the rock")
+	expect(core.diameter / 2 <= (high[1] - low[1]) / 2, "the meteor core is no wider than the rock")
+	expect(core.lift - core.diameter / 2 >= low[2] - 0.05, "the meteor core sinks no deeper than the rock")
 end)

@@ -177,7 +177,7 @@ local function register(position: Vector3, name: string)
 	CollectionService:AddTag(part, "GeneratedStructure")
 	part.Parent = workspace
 	local glow = {}
-	for _, piece in ModelBuilder.Decorate(part, PropModels.Altar) do
+	for _, piece in ModelBuilder.Decorate(part, PropModels.Altar, { anchored = true }) do
 		if piece.Name == PropModels.ALTAR_GLOW then
 			piece.Color = RitualService.GLOW_COLOR
 			table.insert(glow, piece)

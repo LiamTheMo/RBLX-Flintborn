@@ -33,10 +33,11 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 	core.Name = entry.name
 	core.Shape = Enum.PartType.Ball
 	core.Anchored = true
-	core.Size = Vector3.new(14, 14, 14)
-	-- The solid, invisible core; the rock and crater rim are drawn around it.
+	local diameter = PropModels.METEOR_CORE.diameter
+	core.Size = Vector3.new(diameter, diameter, diameter)
+	-- The solid, invisible core, sized to the drawn rock; the crater rim is drawn around it.
 	core.Transparency = 1
-	core.CFrame = CFrame.new(position + Vector3.new(0, 4, 0))
+	core.CFrame = CFrame.new(position + Vector3.new(0, PropModels.METEOR_CORE.lift, 0))
 	core.Parent = parent
 	ModelBuilder.Build(PropModels.Meteor, CFrame.new(position), { name = "Crater", parent = parent })
 	local glow = Instance.new("PointLight")
