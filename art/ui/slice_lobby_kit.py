@@ -411,11 +411,14 @@ PARTS = []
 
 
 def part(name, sid, box, scale=None, size=None, slice_=None, role="", note="", ops=(),
-         keep="inside", min_area=40, fill="small", hole_max=150):
+         keep="inside", min_area=40, fill="small", hole_max=150, recolor=None):
     """box = (x0, y0, x1, y1) on sheet `sid`. Either `scale` (output / source)
-    or `size` (output long side). `slice_` = [l, t, r, b] in output pixels."""
+    or `size` (output long side). `slice_` = [l, t, r, b] in output pixels.
+    `recolor` = (fill box as fractions of the output, target RGB, sigma): see
+    recolor_fill."""
     PARTS.append(dict(name=PREFIX + name, sid=sid, box=box, scale=scale, size=size, slice=slice_, role=role,
-                      note=note, ops=list(ops), keep=keep, min_area=min_area, fill=fill, hole_max=hole_max))
+                      note=note, ops=list(ops), keep=keep, min_area=min_area, fill=fill, hole_max=hole_max,
+                      recolor=recolor))
 
 
 # ---- windows, panels, frames ----------------------------------------------
@@ -553,10 +556,11 @@ part("pill_value", "08", (1090, 576, 1252, 633), 0.6, slice_=[14, 12, 14, 12], k
      ops=[("erase_mask", (1104, 586, 1238, 623), "dark", 0.5, 2, "paper")],
      role="Value pill (\"450/750 XP\", \"LV. 12\")", note="Text painted out.")
 part("currency_pill", "07", (915, 85, 1160, 190), 0.5, slice_=[18, 18, 18, 18], keep="largest",
-     ops=[("erase", (934, 102, 1141, 173), "paper")],
+     ops=[("erase", (934, 102, 1141, 173), "paper")], recolor=((0.2, 0.3, 0.8, 0.7), (250, 210, 167), 60),
      role="HUD currency pill (coins, gems)", note="Coin and amount painted out; add lk_icon_coin/gem + text.")
 part("player_card", "07", (95, 33, 866, 211), 0.46, keep="largest",
      ops=[("erase", (300, 60, 781, 182), "paper"), ("clear", (121, 58, 258, 186))],
+     recolor=((0.31, 0.17, 0.89, 0.81), (250, 209, 164), 60),
      role="HUD player card (portrait, name, level bar, leaf)",
      note="Name, level, XP bar and headshot painted out: overlay the headshot, text and lk_bar_track/fill.")
 
@@ -594,6 +598,7 @@ part("banner_leather", "14", (65, 726, 1203, 830), 0.5, slice_=[26, 22, 26, 22],
 
 # ---- bars ---------------------------------------------------------------------------
 part("bar_track", "05", (198, 845, 1089, 904), 0.4, slice_=[12, 10, 12, 10], keep="largest",
+     recolor=((0.2, 0.4, 0.8, 0.6), (91, 43, 11), 40),
      role="XP / progress bar track (HUD XP bar, Quest progress)")
 for col, (sid, box) in {"red": ("18", (963, 640, 1407, 688)), "green": ("18", (963, 696, 1407, 745)),
                         "orange": ("18", (963, 752, 1407, 801)), "yellow": ("18", (963, 811, 1407, 862)),
@@ -763,6 +768,23 @@ part("glyph_invite", "06", (1340, 462, 1585, 688), 0.2, ops=[("lift", (1340, 462
 # ---------------------------------------------------------------------------
 
 
+def recolor_fill(a, box, target, sigma):
+    """Moves a part's flat fill to the mockup's colour: per-channel gains that
+    take the fill's median (inside `box`, fractions of the sprite) to `target`
+    (0-255 RGB), applied with a weight that falls off with colour distance from
+    that median, so outlines, rivets and leather keep their colour."""
+    h, w = a.shape[:2]
+    x0, y0, x1, y1 = int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h)
+    region = a[y0:y1, x0:x1]
+    fill = np.median(region[..., :3][region[..., 3] > 0.99], axis=0)
+    gain = (np.asarray(target, np.float32) / 255.0) / np.maximum(fill, 1e-3)
+    dist = np.linalg.norm(a[..., :3] - fill, axis=-1) * 255.0
+    weight = np.exp(-((dist / sigma) ** 2))[..., None]
+    a = a.copy()
+    a[..., :3] = np.clip(a[..., :3] * (1 + weight * (gain - 1)), 0, 1)
+    return a
+
+
 def build_part(p):
     src = sheet(p["sid"])
     H, W = src.shape[:2]
@@ -828,7 +850,10 @@ def build_part(p):
     h, w = a.shape[:2]
     scale = p["scale"] if p["scale"] is not None else p["size"] / max(w, h)
     ow, oh = max(1, round(w * scale)), max(1, round(h * scale))
-    a = finish(resize(a, ow, oh))
+    a = resize(a, ow, oh)
+    if p["recolor"]:
+        a = recolor_fill(a, *p["recolor"])
+    a = finish(a)
     if max(a.shape[:2]) > MAX_SIDE:
         raise ValueError(f"{p['name']} is larger than {MAX_SIDE} px")
     return a, scale
