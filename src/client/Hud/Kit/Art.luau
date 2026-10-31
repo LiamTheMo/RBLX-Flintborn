@@ -14,6 +14,7 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
+local SpriteLoader = require(script.Parent.Parent.SpriteLoader)
 local Widgets = require(script.Parent.Parent.Widgets)
 local Core = require(script.Parent.Core)
 local Tokens = require(script.Parent.Tokens)
@@ -88,6 +89,16 @@ end
 
 -- True when `sprite` draws as art (uploaded, or previewed in a capture).
 Art.HasArt = Widgets.HasArt
+
+-- Seconds an uploaded image may take before its part shows the kit's
+-- stand-in instead of nothing.
+Art.GRACE = 2
+
+-- Whether image `id` may be drawn for a part made at os.clock() `born`
+-- (KitModel.ArtMode over SpriteLoader's state).
+function Art.ArtReady(id: string, born: number): boolean
+	return KitModel.ArtMode(SpriteLoader.State(id), os.clock() - born, Art.GRACE) == "art"
+end
 
 -- The natural size {w, h} of a sprite, or nil when the manifest lacks it.
 function Art.SizeOf(sprite: string?): (number?, number?)
@@ -307,6 +318,8 @@ function Art.Plate(parent: Instance, roleName: string, w: number, h: number, opt
 		exact = opts.exact ~= false,
 		alpha = 0,
 		variants = {},
+		born = os.clock(),
+		watches = {},
 	}, PlateMethods)
 	self:Show("normal")
 	return self :: any
@@ -386,7 +399,13 @@ function PlateMethods:Show(state: string)
 		-- Drawn as a flat kit shape by design (plain rules, discs, thin rails).
 		sprite, borrowed = "native", false
 	end
-	local shown = sprite and self:_variant(sprite)
+	local shown = nil
+	if sprite and sprite ~= "native" and Widgets.HasArt(sprite) and not self:_artReady(sprite) then
+		-- Uploaded art that has not arrived (or failed): the kit's stand-in.
+		shown = self:_standIn()
+	else
+		shown = sprite and self:_variant(sprite)
+	end
 	for _, variant in self.variants do
 		variant.Visible = variant == shown
 	end
@@ -407,7 +426,7 @@ function PlateMethods:Show(state: string)
 		end
 		shown.ImageColor3 = color
 		shown.ImageTransparency = self.alpha
-	elseif shown:IsA("Frame") and shown.Name == sprite and shown:FindFirstChild("Edge") then
+	elseif shown:IsA("Frame") and shown:FindFirstChild("Edge") then
 		paintStandIn(shown :: Frame, self.role, state, self.w, self.h)
 		if self.tint and shown.BackgroundTransparency < 1 then
 			shown.BackgroundColor3 = Tokens.Multiply(shown.BackgroundColor3, self.tint)
@@ -446,7 +465,60 @@ function PlateMethods:SetTransparency(value: number)
 end
 
 function PlateMethods:Destroy()
+	self:_unwatch()
 	self.holder:Destroy()
+end
+
+-- The one stand-in frame this plate draws while its art's image is missing.
+function PlateMethods:_standIn(): GuiObject
+	local frame = self.variants.__standIn
+	if frame == nil then
+		frame = standIn(self.role, self.w, self.h, self.holder, self.z)
+		frame.Name = "StandIn"
+		self.variants.__standIn = frame
+	end
+	return frame
+end
+
+-- Whether `sprite`'s image may be drawn now (Art.ArtReady); watches the
+-- image so the plate redraws when it loads or fails.
+function PlateMethods:_artReady(sprite: string): boolean
+	local id = Widgets.ImageId(sprite)
+	if id == nil then
+		return true
+	end
+	local ready = Art.ArtReady(id, self.born)
+	if not ready or SpriteLoader.State(id) ~= "loaded" then
+		self:_watch(id)
+	end
+	return ready
+end
+
+function PlateMethods:_watch(id: string)
+	if self.watches[id] then
+		return
+	end
+	local function redraw()
+		if self.holder.Parent then
+			self:Show(self.state)
+		end
+	end
+	local stop = SpriteLoader.OnState(id, redraw)
+	self.watches[id] = stop
+	-- Past the grace period a still-missing image shows the stand-in.
+	task.delay(Art.GRACE, redraw)
+	if self.unwatchOnDestroy == nil then
+		self.unwatchOnDestroy = self.holder.Destroying:Connect(function()
+			self:_unwatch()
+		end)
+	end
+end
+
+function PlateMethods:_unwatch()
+	for id, stop in self.watches do
+		stop()
+		self.watches[id] = nil
+	end
 end
 
 -- Glyphs drawn white (for leather); on paper they are tinted ink.
@@ -454,8 +526,30 @@ Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_
 
 -- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>")
 -- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
--- recolours), glyph (prefer the flat glyph), z, name. Before upload it is its
--- glyph in ink.
+-- recolours), glyph (prefer the flat glyph), transparency, standInScale (the
+-- ink glyph's size as a share of the rect, 0.8), z, name. Before upload, or
+-- while its uploaded image is not served, it is its glyph in ink.
+local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
+	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
+	short = string.gsub(short, "^%a+_", function(prefix)
+		return if prefix == "ink_" or prefix == "white_" then "" else prefix
+	end)
+	short = string.gsub(short, "_white$", "")
+	local glyph = Core.Make("TextLabel", {
+		Name = opts.name or "Icon",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(rect[1], rect[2]),
+		Size = UDim2.fromOffset(rect[3], rect[4]),
+		Text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1)),
+		TextColor3 = Tokens.Color(opts.tint or "ink"),
+		TextScaled = true,
+		ZIndex = z,
+	}, parent)
+	glyph.FontFace = Tokens.Font("symbol")
+	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * (opts.standInScale or 0.8))))
+	return glyph
+end
+
 function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
 	local sprite = Art.IconSprite(id, opts.glyph)
@@ -477,22 +571,41 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 				image.ImageTransparency = opts.transparency
 			end
 		end
+		-- An image not loaded yet: its ink glyph stands in (after the grace, or at
+		-- once when the fetch failed) until the art arrives.
+		local imageId = Widgets.ImageId(sprite)
+		if imageId and SpriteLoader.State(imageId) ~= "loaded" then
+			local born = os.clock()
+			local glyph = glyphLabel(parent, sprite, id, rect, opts, z)
+			glyph.Name = (opts.name or "Icon") .. "StandIn"
+			local function update()
+				local ready = Art.ArtReady(imageId, born)
+				image.Visible = ready
+				glyph.Visible = not ready
+			end
+			local stop = SpriteLoader.OnState(imageId, update)
+			task.delay(Art.GRACE, function()
+				if image.Parent then
+					update()
+				end
+			end)
+			-- The glyph follows the image when its owner moves it (a button's
+			-- icon is placed after it is made).
+			for _, key in { "Position", "Size", "AnchorPoint" } do
+				image:GetPropertyChangedSignal(key):Connect(function()
+					local value = (image :: any)[key];
+					(glyph :: any)[key] = value
+				end)
+			end
+			image.Destroying:Connect(function()
+				stop()
+				glyph:Destroy()
+			end)
+			update()
+		end
 		return image
 	end
-	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
-	local glyph = Core.Make("TextLabel", {
-		Name = opts.name or "Icon",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(rect[1], rect[2]),
-		Size = UDim2.fromOffset(rect[3], rect[4]),
-		Text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1)),
-		TextColor3 = Tokens.Color(opts.tint or "ink"),
-		TextScaled = true,
-		ZIndex = z,
-	}, parent)
-	glyph.FontFace = Tokens.Font("symbol")
-	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * 0.8)))
-	return glyph
+	return glyphLabel(parent, sprite, id, rect, opts, z)
 end
 
 -- The sprite (and optional Color3 tint) ItemInfo.Icon / ItemInfo.Sprite give a

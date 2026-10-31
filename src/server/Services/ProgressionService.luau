@@ -152,6 +152,7 @@ function ProgressionService.Publish(player: Player)
 	if view and player.Parent then
 		Remotes.Get("ProgressionChanged"):FireClient(player, view)
 		player:SetAttribute("Level", view.level)
+		player:SetAttribute("LevelProgress", LevelCurve.Progress(view.level, view.xp))
 		nameplate(player)
 	end
 end

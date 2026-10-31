@@ -131,9 +131,6 @@ local function build()
 	root.Size = UDim2.fromScale(1, 1)
 	root.Parent = gui
 	hud = LobbyHud.new(root, {
-		onProfile = function()
-			ProgressionController.Toggle()
-		end,
 		onCurrency = function()
 			WalletController.Open("Shop")
 		end,
@@ -219,7 +216,6 @@ local function start()
 	Kit.Input.SetHudDefault(hud:DefaultSelection())
 	bindGamepadMenu()
 
-	hud:SetProfile(player.DisplayName, player.UserId)
 	hud:SetProgress(ProgressionController.View(), true)
 	keep(ProgressionController.Changed:Connect(function(view)
 		hud:SetProgress(view, Kit.Motion.Reduced())

@@ -57,7 +57,7 @@ Sheet text:
   `m.SW`). The f34 bushes touch the header bar at y 112, so the f34 top may be clipped by 1–2 px.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m040_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m040_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks `cls()`/`cellcls()`, boxes `V`/`X`/`CONN`/`SW`, `label()`, `main_obj()`, `preview()`),
   `zoom.py`, `prev.py` (mask previews `cls_*.png`), `borders.py` (cell borders).

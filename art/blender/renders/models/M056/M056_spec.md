@@ -73,7 +73,7 @@ Swatches (`m.SW`, y 220–255): S1 (20–51), S2 (55–86), S3 (90–121), S4 (1
   low on the sheet. Apply the same masks to our renders and the bias cancels.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m056_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m056_study\`.
 Run the scripts with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes, swatches, `cellcls()`, `silhouette()`, `preview()`) and `zoom.py` (`zoom.py x0 y0
   x1 y1 scale out.png [grid]`).

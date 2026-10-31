@@ -62,7 +62,7 @@ share or profile:
 - "Canopy" below means rows above h 0.45; "base" below it.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m028_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m028_study\`.
 Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy; no scipy, so `m.py` has its own
 `label()`).
 - **Helpers:** `m.py` (masks `cls`, `cls2`, `cls3`, view boxes `V`, `LABELS`, `stats`, `label`), `bb.json` (silhouette

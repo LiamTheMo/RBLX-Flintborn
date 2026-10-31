@@ -1,6 +1,6 @@
 -- Drives the lobby HUD through LobbyHudController headlessly with real events:
 -- progression, currency, party and preview updates arrive through their
--- signals and remotes; tiles, pills, the gear, the card, the Party panel and an
+-- signals and remotes; tiles, pills, the gear, the Party panel and an
 -- invite answer are pressed through their buttons' Activated events. Remotes are
 -- mocked as vault_flow does. Ends with a capture of the whole PlayerGui.
 local Players = game:GetService("Players")
@@ -96,12 +96,12 @@ check(gui ~= nil and hud ~= nil, "the HUD builds in the lobby")
 check(gui and gui.DisplayOrder == 1 and gui.IgnoreGuiInset == true and gui.ResetOnSpawn == false, "gui setup")
 
 -- Data arrives through change signals, never polled.
-check(hud.name.root.Text == player.DisplayName, "card shows the display name")
-check(hud.level.root.Text == "", "level is blank while progression loads")
+check(hud.barLevel.root.Text == "", "level is blank while progression loads")
+check(hud.parts.card == nil and gui:FindFirstChild("PlayerCard", true) == nil, "no player card")
 ProgressionController.Changed:Fire({ level = 12, xp = 450, xpToNext = 750 })
-check(hud.level.root.Text == "LV. 12" and hud.barLevel.root.Text == "LV. 12", "level from ProgressionChanged")
+check(hud.barLevel.root.Text == "LV. 12", "level from ProgressionChanged")
 check(hud.barText.root.Text == "450/750 XP", "XP text from ProgressionChanged")
-check(math.abs(hud.bar.fraction - 0.6) < 1e-6 and math.abs(hud.cardBar.fraction - 0.6) < 1e-6, "both bars at 0.6")
+check(math.abs(hud.bar.fraction - 0.6) < 1e-6, "the bar at 0.6")
 player:SetAttribute("Coins", 2450)
 player:SetAttribute("Gems", 125)
 check(hud.coins.label.Text == "2,450" and hud.gems.label.Text == "125", "currency from attributes")
@@ -123,6 +123,10 @@ check(
 	"the add-player button opens its invite list"
 )
 local fire = partyChanged.OnClientEvent.Fire
+-- Members' levels and XP come from their replicated attributes.
+local ranger = Players:GetPlayerByUserId(2)
+ranger:SetAttribute("Level", 15)
+ranger:SetAttribute("LevelProgress", 0.25)
 fire(partyChanged.OnClientEvent, {
 	party = {
 		id = "p1",
@@ -141,6 +145,25 @@ check(hud.countText.root.Text == "2/8", "party count from PartyChanged")
 check(#hud.parts.members == 2 and #hud.parts.empty == 6, "two members, six free")
 check(hud.parts.members[1]:GetAttribute("LobbyReady") == true, "leader's ready flag")
 check(hud.parts.members[2]:GetAttribute("LobbyReady") == false, "your not-ready flag")
+local function rowFor(root)
+	for _, row in hud.rows do
+		if row.root == root then
+			return row
+		end
+	end
+	return nil
+end
+local rangerRow = rowFor(hud.parts.members[1])
+check(
+	rangerRow.levelLabel.Text == "LV. 15" and math.abs(rangerRow.levelBar.fraction - 0.25) < 1e-6,
+	"a member row shows the member's level and XP"
+)
+ranger:SetAttribute("LevelProgress", 0.5)
+ranger:SetAttribute("Level", 16)
+check(
+	rangerRow.levelLabel.Text == "LV. 16" and math.abs(rangerRow.levelBar.fraction - 0.5) < 1e-6,
+	"a member's level and XP follow their attribute changes"
+)
 check(hud.invite.control.flags.enabled == false, "a non-leader's add button is disabled")
 check(#hud.parts.answers == 2, "the incoming invite offers accept and decline")
 
@@ -164,8 +187,6 @@ press(hud.coins)
 check(last() == "Wallet.Open", "Coins open the Shop")
 press(hud.settings)
 check(last() == "Settings.Toggle", "the gear toggles Settings")
-hud.cardControl:Activate()
-check(last() == "Progress.Toggle", "the card opens Progress")
 hud.titleControl:Activate()
 check(last() == "PartyController.Open" and opened[#opened][2] == nil, "the Party title opens the Party window")
 local before = #opened

@@ -116,6 +116,17 @@ local function atlasImage(name: string): string?
 	return nil
 end
 
+-- The image id sprite `name` draws from: its uploaded atlas, else its own
+-- uploaded image; nil when it has neither (tiled art reports its first tile).
+function Widgets.ImageId(name: string): string?
+	local whole = UiAssets.sprite(name)
+	if whole and type(whole.tiles) == "table" and whole.tiles[1] then
+		local tile = whole.tiles[1][1]
+		return atlasImage(tile) or UiAssets.image(tile)
+	end
+	return atlasImage(name) or UiAssets.image(name)
+end
+
 -- True when sprite `name` can draw as art (an uploaded image or an uploaded
 -- atlas holding it, or uploaded tiles); false means Widgets.Sprite would draw a
 -- stand-in. The kit (Hud/Kit/Art) draws its own stand-ins in the kit's style.

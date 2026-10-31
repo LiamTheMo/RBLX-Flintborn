@@ -57,7 +57,7 @@ in degrees; assigned in this order):
   x 856–882, y 143 / 194 / 245 / 296 / 347 / 398 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m042_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m042_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks `cls()`, `silhouette()`, boxes `V` / `X` / `SW`), `zoom.py` (crop with a 10-px sheet grid),
   `px.py` (pixel probe), `rows.py` (per-row class extents), `blendall.py` (name search in every `.blend`).

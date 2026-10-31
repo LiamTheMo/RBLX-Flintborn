@@ -44,7 +44,7 @@ Sheet text:
   rosy lump in the top view (§3.4) is S.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m023_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m023_study\`.
 Run with the scratch venv `..\venv\Scripts\python.exe` (uv venv of `C:/Users/Orang/.local/bin/python3.14.exe` with
 Pillow 13 and numpy 2.5; the uv-managed interpreter itself refuses package installs).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, `preview()`), `zoom.py` (crop + upscale), `bb.json` (silhouette

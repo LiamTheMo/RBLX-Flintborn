@@ -56,7 +56,7 @@ in `m.py`). Masks are `cls()` in `m.py` (HSV, h in degrees):
   1303 / 1351 / 1399 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m044_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m044_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`, `main_obj`), `zoom.py` (crop with sheet grid),
   `px.py` (pixel probe), `blendall.py` (name search in every `.blend`), `lines.py` (cell borders).

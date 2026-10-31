@@ -26,8 +26,9 @@ function Portrait.Content(userId: number): string
 end
 
 -- props: rect | size, userId, frame ("square" | "round" | "none": the bare
--- photo on its backdrop, as the M04 / M05 rows draw it), backdrop (colour
--- token behind the photo; default photoBackdrop for "none"), zIndex, name.
+-- photo filling the box, as party lists draw it), backdrop (colour token
+-- behind the photo; default photoBackdrop for "none"; false: none, so the
+-- panel shows through the transparent headshot), zIndex, name.
 function Portrait.new(parent: Instance, props)
 	local frame = props.frame or "square"
 	local role = if frame == "round" then "portrait.round" else "portrait.square"
@@ -44,7 +45,10 @@ function Portrait.new(parent: Instance, props)
 		Size = UDim2.fromScale(window[3], window[4]),
 		ZIndex = base.z,
 	}, base.visual)
-	local backdrop = props.backdrop or (if frame == "none" then "photoBackdrop" else nil)
+	local backdrop = props.backdrop
+	if backdrop == nil then
+		backdrop = if frame == "none" then "photoBackdrop" else nil
+	end
 	if backdrop then
 		self.headshot.BackgroundTransparency = 0
 		self.headshot.BackgroundColor3 = Tokens.Color(backdrop)

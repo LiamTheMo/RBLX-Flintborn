@@ -15,4 +15,4 @@ L9 LobbyHudController.start partial failure leaves signals bound to destroyed HU
 L10 inconsistent cleanup (only JournalWindow uses Maid; PlayWindow:SetParty destroys raw instances).
 L12 selene not installed/in CI.
 L13 (pre-existing) Take buttons for corpse/chest lack in-flight guard; index-based take may take next item on double press.
-I1 51 pre-existing tracked files mention the assistant/vendor (CLAUDE.md, .claude/skills/, WorldModeling.md, art/blender/kit/*) - outside diff.
+I1 pre-existing tracked files named the coding assistant (agent instructions, skill folder, docs, Blender kit scripts) - outside diff; cleaned up separately.
