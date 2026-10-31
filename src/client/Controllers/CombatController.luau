@@ -3,15 +3,17 @@
 -- point; with a bow the press starts a draw and release fires, and a longer draw
 -- shoots farther (never harder). The server decides every hit. World place only.
 -- The same swing chops trees, mines rocks and ores and gathers plants (GDD §4.1,
--- §53; HarvestRules): on desktop the node under the mouse, when in reach, gets a
--- prompt plaque (InteractionPrompt's look: a CLICK key cap, the action, the node
--- and its pickaxe gate, the gate in red while the held tool falls short) and an
--- outline in the kit's colours. Touch and gamepad aim along the camera with no
--- hover. A gather shows "+2 Wood" on the hit marker.
--- Swings are paced to the item's cooldown (the harvest cadence while a node is in
--- front, so no swing is wasted) and play the stock R6 tool slash; any held item
--- but a bow is held out with the R6 tool pose. Both play on the Animator the server
--- made, so everyone sees them.
+-- §53; HarvestRules) with a tool or empty hands: on desktop the node under the
+-- mouse, when in reach, gets a prompt plaque (InteractionPrompt's look: a CLICK
+-- key cap, the action, the node and its pickaxe gate, the gate in red while the
+-- held tool falls short) and an outline in the kit's colours. Touch and gamepad
+-- aim along the camera: the node a swing would land on gets the same plaque (TAP,
+-- which swings when pressed, or RT), without the outline. Nothing shows in build
+-- mode. A gather shows "+2 Wood" on the hit marker.
+-- Swings are paced to the item's cooldown (just above the harvest cadence while a
+-- node is in front and no fight is, so no swing is wasted) and play the stock R6
+-- tool slash; any held item but a bow is held out with the R6 tool pose. Both play
+-- on the Animator the server made, so everyone sees them.
 -- On touch screens the attack is a Kit round button beside the jump button
 -- (its touch pad comes from the Kit), showing an axe or pickaxe while one is held;
 -- the hit marker is a Kit plaque and the bow draw a Kit bar, at the HUD's scale.
@@ -25,10 +27,12 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local DamageNumbers = require(script.Parent.Parent.Hud.DamageNumbers)
@@ -45,12 +49,16 @@ CombatController.DRAW = { y = 48, w = 280, h = 36 }
 -- The touch attack button when the HUD layout has no entry for it.
 CombatController.ATTACK = { anchor = { 1, 1 }, pos = { 1, -300, 1, -60 }, size = { 130, 124 } }
 -- Roblox's stock R6 tool animations: the slash, and the arm held out.
-CombatController.SWING_ANIMATION = "rbxassetid://129967478"
+CombatController.SWING_ANIMATION = "rbxassetid://129967390"
 CombatController.HOLD_ANIMATION = "rbxassetid://182393478"
 -- The hover plaque's key cap for the mouse.
 CombatController.CLICK_KEY = "CLICK"
 -- How far the hover ray looks past the camera for a node.
 CombatController.HOVER_RAY = 300
+-- Touch and gamepad look for the node in front this often (seconds).
+CombatController.SCAN_SECONDS = 0.1
+-- BuildController's click-to-place action: bound only in build mode.
+CombatController.BUILD_ACTION = "FlintbornPlace"
 
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
@@ -61,6 +69,7 @@ local bound = false
 local ui = {}
 local tracks = {}
 local hover = {}
+local onAttack
 
 local function nextSequence(): number
 	sequence += 1
@@ -124,12 +133,12 @@ local function candidate(part: BasePart)
 	}
 end
 
--- True when a swing with `profile` along the aim would land on a node (the
--- server's pick, without line of sight), so the swing waits for the harvest cadence.
-local function nodeInFront(profile): boolean
+-- The node a swing with `profile` along the aim would land on (the server's
+-- pick, without line of sight), or nil.
+local function nodeInFront(profile)
 	local root = rootPart()
 	if root == nil then
-		return false
+		return nil
 	end
 	local params = OverlapParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
@@ -141,11 +150,58 @@ local function nodeInFront(profile): boolean
 		end
 	end
 	if #candidates == 0 then
+		return nil
+	end
+	local aim = aimDirection()
+	local flatAim = Vector3.new(aim.X, 0, aim.Z)
+	return (HarvestRules.Pick(root.Position, flatAim, HarvestRules.Reach(profile.reach), candidates))
+end
+
+-- True when an at-risk player of another tribe or a creature is in front within
+-- the item's reach, so a swing keeps the item's own pace (the server decides).
+local function fightInFront(profile): boolean
+	local root = rootPart()
+	if root == nil then
 		return false
 	end
 	local aim = aimDirection()
 	local flatAim = Vector3.new(aim.X, 0, aim.Z)
-	return HarvestRules.Pick(root.Position, flatAim, HarvestRules.Reach(profile.reach), candidates) ~= nil
+	local tribe = player:GetAttribute("TribeId")
+	for _, other in Players:GetPlayers() do
+		local otherRoot = other ~= player and other.Character and other.Character:FindFirstChild("HumanoidRootPart")
+		local otherTribe = other:GetAttribute("TribeId")
+		if
+			otherRoot
+			and SessionStates.IsAtRisk(other:GetAttribute("SessionState"))
+			and (tribe == nil or otherTribe ~= tribe)
+		then
+			local offset = (otherRoot :: BasePart).Position - root.Position
+			local flat = Vector3.new(offset.X, 0, offset.Z)
+			if HarvestRules.FightInFront(flatAim, flat, flat.Magnitude, profile.reach) then
+				return true
+			end
+		end
+	end
+	local enemies = workspace:FindFirstChild("EventEnemies")
+	for _, body in if enemies then enemies:GetChildren() else {} do
+		if body:IsA("BasePart") and body:GetAttribute("Enemy") ~= nil then
+			local offset = body.Position - root.Position
+			local flat = Vector3.new(offset.X, 0, offset.Z)
+			local side = math.max(flat.Magnitude - math.max(body.Size.X, body.Size.Z) / 2, 0)
+			if HarvestRules.FightInFront(flatAim, flat, side, profile.reach) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- True while BuildController's build mode owns the click.
+local function inBuildMode(): boolean
+	local ok, info = pcall(function()
+		return ContextActionService:GetBoundActionInfo(CombatController.BUILD_ACTION)
+	end)
+	return ok and type(info) == "table" and info.inputTypes ~= nil
 end
 
 -- True when the held item swings (not a bow, not a siege item to throw).
@@ -175,6 +231,21 @@ local function buildHover()
 	content.Parent = billboard
 	local scale = Instance.new("UIScale")
 	scale.Parent = content
+	-- On touch screens the plaque itself swings, like a tapped prompt.
+	local press = Instance.new("TextButton")
+	press.Name = "Press"
+	press.Text = ""
+	press.BackgroundTransparency = 1
+	press.Size = UDim2.fromScale(1, 1)
+	press.ZIndex = 20
+	press.Visible = false
+	press.Parent = content
+	press.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.Touch then
+			onAttack(nil, Enum.UserInputState.Begin)
+		end
+	end)
+	billboard.Active = true
 	-- One outline at a time, in the kit's glow over a faint paper fill.
 	local highlight = Instance.new("Highlight")
 	highlight.Name = "FlintbornNodeOutline"
@@ -186,6 +257,7 @@ local function buildHover()
 	highlight.OutlineTransparency = 0
 	highlight.Parent = workspace.CurrentCamera
 	hover.billboard, hover.content, hover.scale, hover.highlight = billboard, content, scale, highlight
+	hover.press = press
 	billboard.Parent = player:WaitForChild("PlayerGui")
 end
 
@@ -208,14 +280,41 @@ local function hoveredNode(profile, root: BasePart)
 	return part, node
 end
 
-local function updateHover()
+-- The key cap for the current input: CLICK, TAP or the gamepad's RT.
+local function keyLabel(usingMouse: boolean): (string, boolean)
+	if usingMouse then
+		return CombatController.CLICK_KEY, false
+	end
+	if string.find(UserInputService:GetLastInputType().Name, "Gamepad") then
+		return HudModel.KeyLabel("Gamepad", Enum.KeyCode.ButtonR2.Name), false
+	end
+	return HudModel.KeyLabel("Touch", nil), true
+end
+
+local function updateHover(dt: number)
 	local root = rootPart()
 	local profile = equippedProfile()
-	if not bound or root == nil or not Theme.UsingMouse() or not swingsAtNodes(profile) then
+	if not bound or root == nil or not swingsAtNodes(profile) or inBuildMode() then
 		hideHover()
 		return
 	end
-	local part, node = hoveredNode(profile, root)
+	local usingMouse = Theme.UsingMouse()
+	local part, node
+	if usingMouse then
+		part, node = hoveredNode(profile, root)
+	else
+		-- Touch and gamepad: the node a swing would land on, a few times a second.
+		hover.sinceScan = (hover.sinceScan or math.huge) + dt
+		if hover.sinceScan >= CombatController.SCAN_SECONDS then
+			hover.sinceScan = 0
+			hover.scanned = nodeInFront(profile)
+		end
+		node = hover.scanned
+		part = node and node.part
+		if part and (part.Parent == nil or part:GetAttribute("Active") == false) then
+			part, node = nil, nil
+		end
+	end
 	if part == nil then
 		hideHover()
 		return
@@ -225,18 +324,15 @@ local function updateHover()
 	local label = part:GetAttribute("NodeLabel")
 	local short = type(nodeType) == "string" and NodeCatalog.GateNotice(nodeType, equippedTool()) ~= nil
 	local scale = ui.uiScale and ui.uiScale.Scale or 1
-	local signature = table.concat({ action, tostring(label), tostring(short), tostring(scale) }, "|")
+	local key, touch = keyLabel(usingMouse)
+	local signature = table.concat({ key, action, tostring(label), tostring(short), tostring(scale) }, "|")
 	if hover.part ~= part or hover.signature ~= signature then
 		if hover.drawn then
 			for _, drawnPart in hover.drawn.parts do
 				drawnPart:Destroy()
 			end
 		end
-		local drawn = InteractionPrompt.Draw(hover.content, {
-			key = CombatController.CLICK_KEY,
-			action = action,
-			object = label,
-		})
+		local drawn = InteractionPrompt.Draw(hover.content, { key = key, action = action, object = label })
 		-- The object line (after plaque, key and title) turns red below the gate.
 		local object = drawn.parts[4]
 		if short and object then
@@ -248,11 +344,13 @@ local function updateHover()
 		hover.billboard.Size = UDim2.fromOffset(drawn.width * scale, drawn.height * scale)
 		hover.billboard.Adornee = part
 		hover.highlight.Adornee = part:FindFirstChild(HarvestRules.LOOK_MODEL) or part
+		hover.press.Visible = touch
 	end
 	local height = HarvestRules.LabelHeight(node.center.Y, node.half.Y, root.Position.Y) - node.center.Y
 	hover.billboard.StudsOffsetWorldSpace = Vector3.new(0, height, 0)
 	hover.billboard.Enabled = true
-	hover.highlight.Enabled = true
+	-- The outline is for the mouse only; the plaque is enough elsewhere.
+	hover.highlight.Enabled = usingMouse
 end
 
 -- Animations ---------------------------------------------------------------------
@@ -297,11 +395,12 @@ local function loadTracks(character: Model)
 	refreshHold()
 end
 
--- True when a swing may go now (paced to the item, or to the harvest cadence
--- while a node is in front); plays the slash.
+-- True when a swing may go now (paced to the item, or just above the harvest
+-- cadence while a node is in front and no fight is); plays the slash.
 local function swing(profile): boolean
 	local now = os.clock()
-	local interval = HarvestRules.SwingInterval(profile.cooldown, nodeInFront(profile))
+	local atNode = not fightInFront(profile) and nodeInFront(profile) ~= nil
+	local interval = HarvestRules.SwingInterval(profile.cooldown, atNode)
 	if lastSwingAt and now - lastSwingAt < interval then
 		return false
 	end
@@ -314,7 +413,7 @@ end
 
 -- Input --------------------------------------------------------------------------
 
-local function onAttack(_, inputState)
+function onAttack(_, inputState)
 	local profile = equippedProfile()
 	if profile.kind == "Bow" then
 		if inputState == Enum.UserInputState.Begin then
@@ -479,13 +578,13 @@ function CombatController.Start()
 			flash(("+%d %s"):format(amount, item and item.name or tostring(catalogId)), "ink")
 		end
 	end)
-	RunService.RenderStepped:Connect(function()
+	RunService.RenderStepped:Connect(function(dt)
 		if drawStartedAt then
 			local t = math.clamp((os.clock() - drawStartedAt) / WeaponCatalog.FULL_DRAW_SECONDS, 0, 1)
 			ui.drawBar:Set(t, true)
 			ui.drawBar:SetText(("Range %d%%"):format(math.round(t * 100)))
 		end
-		updateHover()
+		updateHover(dt)
 	end)
 	local function refresh()
 		bind(player:GetAttribute("SessionState") == "ActiveRun")

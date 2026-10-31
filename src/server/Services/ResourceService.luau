@@ -39,6 +39,8 @@ local ResourceService = {}
 
 ResourceService.TAG = "ResourceNode"
 ResourceService.DEFAULT_MAP_RADIUS = 2048
+-- Placeholder nodes built per frame while scattering.
+ResourceService.NODES_PER_FRAME = 40
 
 local nodes = {}
 local lastHit = {}
@@ -211,7 +213,8 @@ local function makeModelled(folder: Folder, nodeType: string, position: Vector3)
 	hitbox.CFrame = CFrame.new(position + Vector3.new(0, size.Y / 2, 0))
 	local model = Instance.new("Model")
 	model.Name = HarvestRules.LOOK_MODEL
-	local look = ModelBuilder.Decorate(hitbox, entry.recipe, { parent = model })
+	-- Nodes never move: anchored decoration needs no welds.
+	local look = ModelBuilder.Decorate(hitbox, entry.recipe, { parent = model, anchored = true })
 	model.Parent = hitbox
 	hitbox.Parent = folder
 	register(hitbox, nodeType, look)
@@ -309,12 +312,18 @@ local function scatter()
 	local generated = WorldState.IsGenerated()
 	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
 	local scale = radius / BiomeCatalog.MAP_RADIUS
+	local made = 0
 	for _, zoneId in BiomeCatalog.ZONE_IDS do
 		for nodeType, count in BiomeCatalog.Zones[zoneId].resources do
 			for _ = 1, count do
 				local position = if generated then generatedSpot(zoneId, nodeType) else authoredSpot(zoneId, scale)
 				if position then
 					makeNode(folder, nodeType, position)
+					-- About 1,000 nodes: spread the build over frames, not one long hitch.
+					made += 1
+					if made % ResourceService.NODES_PER_FRAME == 0 then
+						task.wait()
+					end
 				end
 			end
 		end
@@ -323,26 +332,36 @@ end
 
 -- A swing from `origin` along `flatAim` (CombatService, after players and
 -- creatures): harvests the closest active node in front within `reach` (the held
--- item's, HarvestRules.Reach) of its surface that `canSee(part)` allows. True
--- when a node took the swing, even when it gave nothing (cadence, a pickaxe
--- gate), so the swing never falls through to a structure behind the node.
+-- item's, HarvestRules.Reach) of its surface that `canSee(part)` allows and the
+-- held tool can gather, when it is nearer than `structureDistance` (the structure
+-- the swing would otherwise hit, nil for none; HarvestRules.Choose). With no
+-- structure in the way, a node the tool cannot gather takes the swing for its
+-- gate notice ("Needs a Copper Pickaxe or better"). True when a node took it.
 function ResourceService.Hit(
 	player: Player,
 	origin: Vector3,
 	flatAim: Vector3,
 	reach: number,
-	canSee: ((BasePart) -> boolean)?
+	canSee: ((BasePart) -> boolean)?,
+	structureDistance: number?
 ): boolean
+	local tool = InventoryService.EquippedTool(player)
+	local function canHarvest(node): boolean
+		return NodeCatalog.CanHarvest(node.nodeType, tool)
+	end
 	local visible = if canSee
 		then function(node)
 			return canSee(node.part)
 		end
 		else nil
-	local node = HarvestRules.Pick(origin, flatAim, HarvestRules.Reach(reach), nodes, visible)
-	if node == nil then
+	local node, gated =
+		HarvestRules.Choose(origin, flatAim, HarvestRules.Reach(reach), nodes, canHarvest, visible, structureDistance)
+	-- harvest() validates everything again and gives a gated node its notice.
+	local target = node or gated
+	if target == nil then
 		return false
 	end
-	harvest(player, node)
+	harvest(player, target)
 	return true
 end
 

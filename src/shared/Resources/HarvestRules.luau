@@ -9,8 +9,11 @@
 -- Target priority for one swing (CombatService): players and creatures always
 -- come first, so a tool never ignores a fight. After that, gathering gear (axes,
 -- pickaxes, empty hands) prefers the node in front over a structure, and weapons
--- prefer the structure (raiding, GDD Q38). Inside a safe zone nothing takes
--- damage (§3.2), so a swing can only gather, as the old node prompt allowed.
+-- prefer the structure (raiding, GDD Q38). A node only beats a structure when the
+-- held tool can actually gather it and it is the nearer of the two (Choose), so a
+-- gated ore beside a wall never shields the wall from a raider's pickaxe. Inside a
+-- safe zone nothing takes damage (§3.2), so a swing can only gather, as the old
+-- node prompt allowed. A held bow or siege item does not swing, so it never gathers.
 -- Pure: plain numbers and Vector3-like values (X, Y, Z, Magnitude, Dot).
 
 local DamageRules = require(script.Parent.Parent.Combat.DamageRules)
@@ -31,6 +34,9 @@ HarvestRules.LABEL_ABOVE_TOP = 1
 -- A modelled node's look: a Model of this name under its invisible hitbox (the
 -- client outlines it, not the hitbox).
 HarvestRules.LOOK_MODEL = "Look"
+-- The client paces node swings this much above the server's harvest cadence, so
+-- network jitter never makes an honest swing arrive early.
+HarvestRules.SWING_SLACK = 0.05
 
 HarvestRules.TARGETS = {
 	-- Gathering gear and empty hands: the node before a structure.
@@ -123,16 +129,62 @@ function HarvestRules.Pick(origin, flatAim, reach: number, candidates, canSee: (
 	return best, bestDistance
 end
 
--- True when a player who last harvested at `lastAt` may harvest again at `now`
--- (the harvest cadence, with the same jitter slack as attack cooldowns).
-function HarvestRules.CadenceReady(lastAt: number?, now: number): boolean
-	return DamageRules.CooldownReady(lastAt, now, NodeCatalog.HARVEST_INTERVAL)
+-- What one swing does among nodes (server). `canHarvest(candidate)` says whether
+-- the held tool can gather it (NodeCatalog.CanHarvest); `structureDistance` is the
+-- horizontal distance to the structure this swing would otherwise hit (nil: none).
+-- Returns (node to harvest?, gated node?): the closest node the tool can gather,
+-- when it is nearer than the structure; otherwise, only when no structure takes
+-- the swing, the node in front the tool cannot gather, for its gate notice.
+function HarvestRules.Choose(
+	origin,
+	flatAim,
+	reach: number,
+	candidates,
+	canHarvest: (any) -> boolean,
+	canSee: ((any) -> boolean)?,
+	structureDistance: number?
+): (any, any)
+	local node = HarvestRules.Pick(origin, flatAim, reach, candidates, function(candidate)
+		return canHarvest(candidate) and (canSee == nil or canSee(candidate))
+	end)
+	if
+		node
+		and (structureDistance == nil or HarvestRules.FlatDistance(origin, node.center, node.half) < structureDistance)
+	then
+		return node, nil
+	end
+	if structureDistance ~= nil then
+		return nil, nil
+	end
+	local gated = HarvestRules.Pick(origin, flatAim, reach, candidates, canSee)
+	if gated and not canHarvest(gated) then
+		return nil, gated
+	end
+	return nil, nil
 end
 
--- Seconds between the client's swings: the item's cooldown, slowed to the
--- harvest cadence while a node is in front so no swing is wasted.
+-- True when a player who last harvested at `lastAt` may harvest again at `now`
+-- (strict: no jitter slack, so a scripted client gains no yield).
+function HarvestRules.CadenceReady(lastAt: number?, now: number): boolean
+	return lastAt == nil or now - lastAt >= NodeCatalog.HARVEST_INTERVAL
+end
+
+-- Seconds between the client's swings: the item's cooldown, slowed to just above
+-- the harvest cadence while a node is in front (and no fight is) so no swing is
+-- wasted.
 function HarvestRules.SwingInterval(cooldown: number, atNode: boolean): number
-	return if atNode then math.max(cooldown, NodeCatalog.HARVEST_INTERVAL) else cooldown
+	return if atNode then math.max(cooldown, NodeCatalog.HARVEST_INTERVAL + HarvestRules.SWING_SLACK) else cooldown
+end
+
+-- True when a creature or player whose body is `flatDistance` studs away
+-- (horizontally, to its side) along `offset` is one a swing with `reach` would
+-- hit (the client's guess: a fight in front keeps the item's own pace).
+function HarvestRules.FightInFront(flatAim, offset, flatDistance: number, reach: number): boolean
+	return flatDistance <= reach + HarvestRules.REACH_ALLOWANCE
+		and (
+			flatDistance < HarvestRules.TOUCH_DISTANCE
+			or DamageRules.WithinArc(flatAim, Vector3.new(offset.X, 0, offset.Z), HarvestRules.ARC)
+		)
 end
 
 -- "IronDeposit" -> "Iron Deposit".

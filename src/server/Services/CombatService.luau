@@ -8,7 +8,8 @@
 -- item equipped the attack input throws or sets it instead (SiegeService).
 -- The same swing also chops, mines and gathers (GDD §4.1, §53): after players and
 -- creatures, gathering gear and empty hands try the node in front before a
--- structure, weapons the structure first (HarvestRules.TargetOrder). Inside a safe
+-- structure, weapons the structure first (HarvestRules.TargetOrder); a node only
+-- beats a structure when the tool can gather it and it is nearer. Inside a safe
 -- zone a swing can only gather, as the old node prompt allowed. Every character
 -- gets a server-made Animator so the client's swing animation replicates. World only.
 
@@ -16,6 +17,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
+local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
@@ -50,11 +52,12 @@ CombatService.VALIDATED_SLACK = 12
 -- item (Fire Bomb, Breaching Charge) is equipped. Kept as a hook so CombatService
 -- does not require SiegeService (which uses ApplyHit).
 CombatService.SiegeAttack = nil :: ((Player, Vector3) -> ())?
--- Set by ResourceService: `(player, origin, flatAim, reach, canSee)` harvests the
--- node a swing lands on and returns true when one took it. A hook because
+-- Set by ResourceService: `(player, origin, flatAim, reach, canSee,
+-- structureDistance?)` harvests the node a swing lands on (only one nearer than
+-- that structure) and returns true when one took it. A hook because
 -- ResourceService → ProgressionService → CombatService would otherwise be a
 -- require cycle.
-CombatService.HarvestHit = nil :: ((Player, Vector3, Vector3, number, (BasePart) -> boolean) -> boolean)?
+CombatService.HarvestHit = nil :: ((Player, Vector3, Vector3, number, (BasePart) -> boolean, number?) -> boolean)?
 
 local lastAttack = {}
 local lastSequence = {}
@@ -224,6 +227,39 @@ local function bestPlayer(player: Player, root: BasePart, flatAim: Vector3, prof
 	return best
 end
 
+-- Horizontal distance to the structure BuildingService.Hit would pick for this
+-- swing (same reach, height, arc, ownership and sight rules), or nil. Lets a node
+-- win over a structure only when it is nearer (HarvestRules.Choose).
+local function structureDistance(player: Player, origin: Vector3, flatAim: Vector3, reach: number, canSee): number?
+	local folder = workspace:FindFirstChild(BuildingService.FOLDER_NAME)
+	if folder == nil or SafeZoneService.Contains(origin) then
+		return nil
+	end
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { folder }
+	local allowance = BuildingService.HIT_ALLOWANCE
+	local best = nil
+	for _, part in workspace:GetPartBoundsInRadius(origin, reach + allowance + 6, params) do
+		local record = BuildingService.Get(part)
+		if record == nil or BuildingService.IsOwnedBy(player, record) then
+			continue
+		end
+		local distance = BuildRules.HorizontalDistance(origin, record.position, record.half)
+		local offset = record.position - origin
+		if
+			distance <= reach + allowance
+			and (best == nil or distance < best)
+			and math.abs(offset.Y) <= record.half.Y + 6
+			and (distance < 1 or DamageRules.WithinArc(flatAim, Vector3.new(offset.X, 0, offset.Z), 120))
+			and canSee(part)
+		then
+			best = distance
+		end
+	end
+	return best
+end
+
 local function melee(player: Player, sequence: any, direction: any)
 	local aim = validDirection(direction)
 	local root = rootOf(player)
@@ -258,6 +294,8 @@ local function melee(player: Player, sequence: any, direction: any)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
 	-- Each kind of target returns true when it took the swing. Inside a safe zone
 	-- only Node is tried: nobody deals damage there (§3.2), but gathering is fine.
+	-- True while a structure is still to be tried after the current kind.
+	local structureNext = false
 	local targets = {
 		Player = function(): boolean
 			local best = bestPlayer(player, root, flatAim, profile, canSee)
@@ -271,8 +309,16 @@ local function melee(player: Player, sequence: any, direction: any)
 		end,
 		Node = function(): boolean
 			-- ResourceService enforces its own harvest cadence, range and tool gates.
+			-- Before a structure (gathering gear), a node must be gatherable and
+			-- nearer than the structure, so an ore beside a wall never shields it.
 			local harvestHit = CombatService.HarvestHit
-			return harvestHit ~= nil and harvestHit(player, root.Position, flatAim, profile.reach, canSee)
+			if harvestHit == nil then
+				return false
+			end
+			local beyond = if structureNext
+				then structureDistance(player, root.Position, flatAim, profile.reach, canSee)
+				else nil
+			return harvestHit(player, root.Position, flatAim, profile.reach, canSee, beyond)
 		end,
 		Structure = function(): boolean
 			-- Raiding: the same swing damages another tribe's structures (GDD Q38).
@@ -280,7 +326,9 @@ local function melee(player: Player, sequence: any, direction: any)
 		end,
 	}
 	local isWeapon = profile ~= WeaponCatalog.Hand
-	for _, kind in HarvestRules.TargetOrder(isWeapon, inSafeZone(player)) do
+	local order = HarvestRules.TargetOrder(isWeapon, inSafeZone(player))
+	for index, kind in order do
+		structureNext = table.find(order, "Structure", index) ~= nil
 		if targets[kind]() then
 			return
 		end
