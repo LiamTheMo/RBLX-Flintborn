@@ -950,7 +950,9 @@ end
 -- legacy fonts the kit measures with (Merriweather, Patrick Hand), read from
 -- the same font files render.py draws with. Other fonts use an average width.
 function Methods:GetTextSize(text, size, font, frame)
-	local widths = (__textWidths or {})[tostring(font)]
+	-- Enum items print as "Enum.Font.X"; the width table is keyed "Font.X".
+	local key = string.gsub(tostring(font), "^Enum%.", "")
+	local widths = (__textWidths or {})[key]
 	local width = 0
 	if widths then
 		for _, code in utf8.codes(tostring(text)) do
