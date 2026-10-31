@@ -173,7 +173,10 @@ local session = {
 changed.OnClientEvent:Fire(session)
 check(find(gui, "Pair") ~= nil, "both offers show")
 check(find(find(gui, "Right"), "State"):GetAttribute("KitVariant") == "ready", "their lock shows")
-check(find(find(gui, "Slotb1"), "Toggle"):FindFirstChild("Label", true).Text == "Remove", "an offered item can be removed")
+check(
+	find(find(gui, "Slotb1"), "Toggle"):FindFirstChild("Label", true).Text == "Remove",
+	"an offered item can be removed"
+)
 press(find(find(gui, "Slotb2"), "Toggle"))
 local offer = calls[#calls]
 check(offer[1] == "TradeOffer" and table.find(offer[2], "b2") ~= nil, "Add puts the item in the offer")

@@ -100,9 +100,13 @@ Theme.TOP_WIDTH = 640
 
 local topStack = nil
 
--- The HUD scale for a gui: the kit's HUD formula with the player's UI scale,
--- a little smaller on phones (KitScale.Hud's rule, for a frame that is not the
--- whole screen).
+-- The least scale overlay cards get on a phone, so their body text stays near
+-- the 9 px floor (the HUD formula gives about 0.37 at 844 × 390).
+Theme.PHONE_MIN_SCALE = 0.6
+
+-- The overlays' scale for a gui: the kit's HUD formula with the player's UI
+-- scale; on phones (KitScale.IsSmallTouch) the kit's phone factor, but never
+-- under PHONE_MIN_SCALE so notices stay readable.
 function Theme.HudScale(gui: GuiBase2d): number
 	local size = gui.AbsoluteSize
 	if size.X <= 0 or size.Y <= 0 then
@@ -120,7 +124,7 @@ function Theme.HudScale(gui: GuiBase2d): number
 		Players.LocalPlayer:GetAttribute("UiScale")
 	)
 	if KitScale.IsSmallTouch(size.Y) then
-		k *= KitTokens.Scale("phoneHud")
+		k = math.max(k * KitTokens.Scale("phoneHud"), Theme.PHONE_MIN_SCALE)
 	end
 	return k
 end
@@ -143,8 +147,9 @@ function Theme.FitHud(gui: ScreenGui, uiScale: UIScale): () -> ()
 	end
 end
 
--- A full-screen frame in `gui` in the HUD's design px (KitScale.Hud): regions
--- placed inside it by scale and design-px offsets keep to the screen's edges.
+-- A full-screen frame in `gui` in design px at Theme.HudScale (as KitScale.Hud
+-- does for the HUD): regions placed inside it by scale and design-px offsets
+-- keep to the screen's edges.
 function Theme.HudRoot(gui: ScreenGui): Frame
 	gui:SetAttribute("FitsItself", true)
 	local root = Theme.Make("Frame", {
@@ -152,7 +157,15 @@ function Theme.HudRoot(gui: ScreenGui): Frame
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 	}, gui)
-	KitScale.Hud(gui, root)
+	local uiScale = Theme.Make("UIScale", { Name = "Fit" }, root)
+	local function apply()
+		local k = Theme.HudScale(gui)
+		uiScale.Scale = k
+		root.Size = UDim2.fromScale(1 / k, 1 / k)
+	end
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(apply)
+	Players.LocalPlayer:GetAttributeChangedSignal("UiScale"):Connect(apply)
+	apply()
 	return root
 end
 

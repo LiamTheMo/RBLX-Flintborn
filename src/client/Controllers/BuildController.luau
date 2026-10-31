@@ -14,6 +14,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -321,10 +322,13 @@ local function setActive(active: boolean)
 	end
 end
 
--- Key caps for the player's own Rotate and Build keys.
+-- Key caps for the player's own Rotate and Build keys (with a keyboard only).
 function refreshKeys()
 	local keys = { Binds.Label("Rotate"), Binds.Label("Build") }
-	local signature = table.concat(keys, ";")
+	local signature = if UserInputService.KeyboardEnabled then table.concat(keys, ";") else ""
+	if signature == "" then
+		keys = {}
+	end
 	if signature == ui.keySignature then
 		return
 	end

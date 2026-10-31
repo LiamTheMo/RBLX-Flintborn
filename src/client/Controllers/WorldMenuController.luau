@@ -21,7 +21,7 @@ local WorldMenuController = {}
 local STATE_ATTRIBUTE = "SessionState"
 local TRANSITION_SECONDS = 3
 
-WorldMenuController.SIZE = { 640, 500 }
+WorldMenuController.SIZE = { 640, 450 }
 
 local player = Players.LocalPlayer
 local ui = {}

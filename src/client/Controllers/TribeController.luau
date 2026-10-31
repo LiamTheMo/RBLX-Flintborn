@@ -6,6 +6,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -227,6 +228,9 @@ local function build()
 		text = "Open or close",
 		role = "rowLabel",
 	})
+	-- Key hints only where there is a keyboard.
+	ui.key.root.Visible = UserInputService.KeyboardEnabled
+	body:FindFirstChild("KeyLabel").Visible = UserInputService.KeyboardEnabled
 	ui.screen:Watch()
 end
 

@@ -24,12 +24,13 @@ local function build()
 		DisplayOrder = 30,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, player:WaitForChild("PlayerGui"))
-	-- Top centre, clear of the top bar; scaled with the HUD.
+	-- Upper middle, under the kit's toast column (up to three toasts); scaled
+	-- with the HUD.
 	local holder = Theme.Make("Frame", {
 		Name = "Holder",
 		AnchorPoint = Vector2.new(0.5, 0),
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0.5, 0, 0, 90),
+		Position = UDim2.fromScale(0.5, 0.38),
 		Size = UDim2.fromOffset(NoticeController.WIDTH, 0),
 	}, gui)
 	Theme.FitHud(gui, Theme.Make("UIScale", { Name = "Fit" }, holder))
