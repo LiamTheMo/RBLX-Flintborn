@@ -333,6 +333,9 @@ local function populate(event, done): boolean
 		finish(event)
 		return false
 	end
+	-- The lifetime starts before the announcement, so nothing after it can leave an event
+	-- that never expires.
+	task.delay(entry.lifetime, done)
 	local kind = entry.kind
 	AnnouncementService.Announce({
 		id = event.id,
@@ -344,7 +347,6 @@ local function populate(event, done): boolean
 		radius = entry.footprint,
 		endsAt = event.endsAt,
 	})
-	task.delay(entry.lifetime, done)
 	local key = entry.category .. ":" .. entry.rarity
 	EventDirectorService.Stats[key] = (EventDirectorService.Stats[key] or 0) + 1
 	return true

@@ -44,6 +44,35 @@ local function named(recipe, name: string): number
 	return count
 end
 
+-- A part's axis-aligned box once rotated (the recipes only turn parts about one
+-- axis at a time; Recipe.Bounds ignores rotation, which turns every standing log
+-- on its side): centre and half sizes.
+local function box(spec)
+	local half = { spec.size[1] / 2, spec.size[2] / 2, spec.size[3] / 2 }
+	for axis = 1, 3 do
+		local angle = math.rad(spec.rot and spec.rot[axis] or 0)
+		if angle ~= 0 then
+			local sin, cos = math.abs(math.sin(angle)), math.abs(math.cos(angle))
+			local a, b = if axis == 1 then 2 else 1, if axis == 3 then 2 else 3
+			half[a], half[b] = cos * half[a] + sin * half[b], sin * half[a] + cos * half[b]
+		end
+	end
+	return spec.pos, half
+end
+
+-- The extent of a whole recipe: {minX, minY, minZ}, {maxX, maxY, maxZ}.
+local function extent(recipe)
+	local low, high = { math.huge, math.huge, math.huge }, { -math.huge, -math.huge, -math.huge }
+	for _, spec in recipe.parts do
+		local pos, half = box(spec)
+		for axis = 1, 3 do
+			low[axis] = math.min(low[axis], pos[axis] - half[axis])
+			high[axis] = math.max(high[axis], pos[axis] + half[axis])
+		end
+	end
+	return low, high
+end
+
 -- Recipes ------------------------------------------------------------------------
 
 test("every structure style in the catalog has dressing, a gate and walls", function()
@@ -70,24 +99,31 @@ test("every prop recipe is buildable and within the part limit", function()
 	for _, item in all do
 		local problems = Recipe.Problems(item.recipe, 25)
 		expect(#problems == 0, item.name .. ": " .. table.concat(problems, "; "))
-		for _, spec in item.recipe.parts do
-			expect(spec.pos[2] - spec.size[2] / 2 > -12, item.name .. " stays near its origin")
-		end
+		local low, high = extent(item.recipe)
+		expect(low[2] > -12 and high[2] < 16, item.name .. " stays near its origin")
+		expect(
+			low[1] > -20 and high[1] < 20 and low[3] > -20 and high[3] < 20,
+			item.name .. " stays within the footprint"
+		)
 	end
 end)
 
 test("walls cover their gameplay part and ruins keep their stone", function()
 	local ring = PropModels.RING
 	for _, style in PropModels.STYLES do
-		for _, height in { PropModels.RUIN_HEIGHT[1], 5, PropModels.RUIN_HEIGHT[2], ring.height } do
+		-- Ruin walls crumble to any height in range; the others are always full height.
+		local heights = if style == "Ruin"
+			then { PropModels.RUIN_HEIGHT[1], 5, PropModels.RUIN_HEIGHT[2] }
+			else { ring.height }
+		for _, height in heights do
 			local wall = PropModels.Wall(style, height)
-			local low, high = Recipe.Bounds(wall)
+			local low, high = extent(wall)
 			expect(
 				low[1] >= -ring.width / 2 - 0.2 and high[1] <= ring.width / 2 + 0.2,
 				style .. " wall stays in its segment"
 			)
 			expect(low[2] >= -height / 2 - 0.6, style .. " wall reaches the ground")
-			expect(high[2] <= height / 2 + 1.5, style .. " wall stays near the part's top")
+			expect(high[2] <= height / 2 + 1.5, style .. " wall stays near the part's top ")
 			expect(type(wall.hostVisible) == "boolean", style .. " says whether the part stays drawn")
 			if not wall.hostVisible and style ~= "Ruin" then
 				-- An invisible wall must be drawn all the way up.
@@ -137,14 +173,14 @@ end)
 test("structure dressing leaves the cache, loot node and boss spots free", function()
 	for style, recipe in PropModels.Structure do
 		for _, spec in recipe.parts do
-			local top = spec.pos[2] + spec.size[2] / 2
-			local reach = math.max(spec.size[1], spec.size[3]) / 2
-			local fromCentre = math.sqrt(spec.pos[1] ^ 2 + spec.pos[3] ^ 2)
-			if top > 0.5 then
+			local pos, half = box(spec)
+			local reach = math.max(half[1], half[3])
+			if pos[2] + half[2] > 0.5 then
+				local fromCentre = math.sqrt(pos[1] ^ 2 + pos[3] ^ 2)
 				expect(fromCentre - reach > 1.5, style .. " " .. tostring(spec.name) .. " keeps clear of the cache")
 				-- The Warlord stands 6 studs on (EventDirectorService).
 				if style == "Fort" then
-					local fromBoss = math.sqrt(spec.pos[1] ^ 2 + (spec.pos[3] - 6) ^ 2)
+					local fromBoss = math.sqrt(pos[1] ^ 2 + (pos[3] - 6) ^ 2)
 					expect(fromBoss - reach > 2, style .. " " .. tostring(spec.name) .. " keeps clear of the boss")
 				end
 			end
@@ -166,7 +202,7 @@ test("the chest, altar and nodes carry the parts their services drive", function
 				)
 			end
 		end
-		local low, high = Recipe.Bounds(chest)
+		local low, high = extent(chest)
 		expect(
 			low[1] >= -2.3 and high[1] <= 2.3 and low[3] >= -1.8 and high[3] <= 1.8,
 			"the chest stays near its 4 x 3 hitbox"
@@ -207,7 +243,7 @@ test("the portal ring fits every extraction zone", function()
 		smallest = math.min(smallest, portal.zoneRadius)
 	end
 	for _, accent in { { 255, 170, 60 }, { 120, 220, 255 } } do
-		local low, high = Recipe.Bounds(PropModels.Portal(accent))
+		local low, high = extent(PropModels.Portal(accent))
 		for axis in { 1, 3 } do
 			expect(
 				low[axis] > -smallest and high[axis] < smallest,
