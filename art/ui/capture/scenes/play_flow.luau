@@ -211,17 +211,85 @@ PlayController.Toggle()
 check(PlayController.IsOpen(), "Toggle opens it again")
 PlayController.Toggle()
 check(not PlayController.IsOpen(), "Toggle closes it")
-local function descendants()
-	return #player.PlayerGui:GetDescendants()
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
 end
+
 PlayController.Open()
 PlayController.Toggle()
-local before = descendants()
+local before, beforeConnections = leakCounts()
 for _ = 1, 20 do
 	PlayController.Open()
 	PlayController.Toggle()
 end
-check(descendants() == before, ("no growth over 20 open/close cycles (%d → %d)"):format(before, descendants()))
+local after, afterConnections = leakCounts()
+check(after == before, ("no instance growth over 20 open/close cycles (%d → %d)"):format(before, after))
+check(
+	afterConnections == beforeConnections,
+	("no connection growth over 20 open/close cycles (%d → %d)"):format(beforeConnections, afterConnections)
+)
 if __failed then
 	error("play_flow checks failed")
 end

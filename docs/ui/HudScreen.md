@@ -73,12 +73,14 @@ compass letters included).
 - Every tile has its own button: Backpack Y, Craft D-Up, Build D-Right,
   Tribe D-Left, Map D-Down, Progress View (ButtonSelect stays on Progress).
   Tile tooltips name them while a gamepad is in use.
-- While the HUD shows, its first tile is the HUD default
-  (`Kit.Input.SetHudDefault`): a gamepad picked up with nothing selected lands
-  there, and the D-pad moves through tiles and slots (linked grids). With a
-  control selected the stick moves the selection instead of the character, so
-  **B** hands the stick back (`FlintbornHudRelease`, below Kit.Modal's B, which
-  still closes windows first).
+- The HUD never takes the selection by itself: a gamepad player walks as soon
+  as the run starts. While the HUD shows, its first tile is only registered as
+  the target for UI navigation (`Kit.Input.SetHudDefault`, with its immediate
+  selection undone), and the D-pad moves through tiles and slots (linked
+  grids). With a control selected the stick moves the selection instead of the
+  character, so **B** hands the stick back (`FlintbornHudRelease`, below
+  Kit.Modal's B, which still closes windows first). Windows still select their
+  default control when opened with a gamepad.
 - The right bumper steps the hotbar selection.
 - Build mode opens with the current piece selected; B leaves the palette and
   B again goes back into it.

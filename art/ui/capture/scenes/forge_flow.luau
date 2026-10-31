@@ -198,6 +198,90 @@ check(string.find(toasts(), "Permanent", 1, true) ~= nil, "the receipt says it i
 -- Escape / B (Kit.Modal) and the tile close it again.
 ForgeController.Toggle()
 check(not window:IsOpen(), "the tile closes it")
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
+end
+
+-- ×20 open / close: no instances and no connections left behind (the Forge).
+ForgeController.Toggle()
+ForgeController.Toggle()
+local instancesBefore, connectionsBefore = leakCounts()
+for _ = 1, 20 do
+	ForgeController.Toggle()
+	ForgeController.Toggle()
+end
+local instancesAfter, connectionsAfter = leakCounts()
+check(
+	instancesAfter == instancesBefore,
+	("open/close ×20 leaves the instances as they were (%d → %d)"):format(instancesBefore, instancesAfter)
+)
+check(
+	connectionsAfter == connectionsBefore,
+	("open/close ×20 leaves the connections as they were (%d → %d)"):format(connectionsBefore, connectionsAfter)
+)
+
 ForgeController.Toggle()
 window.rows.ForgeIronAxe.control.hit.Activated:Fire()
 

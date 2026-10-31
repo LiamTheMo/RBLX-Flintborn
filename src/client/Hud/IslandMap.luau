@@ -121,12 +121,16 @@ function IslandMap.new(parent: Instance, r, opts)
 		visible = false,
 		zIndex = z + 6,
 	}).root
+	-- The drag pad first, so the zoom buttons (drawn later and higher) take
+	-- presses over it.
+	self:_drag(clip)
 	if opts.zoomButtons then
 		self.zoomIn = Kit.IconButton.new(parent, {
 			name = "ZoomIn",
 			rect = opts.zoomButtons[1],
+			-- Above the map and its drag pad (z + 1), so they stay tappable.
 			variant = "plus",
-			zIndex = z + 5,
+			zIndex = z + 8,
 			onPress = function()
 				self:Zoom(1)
 			end,
@@ -135,7 +139,7 @@ function IslandMap.new(parent: Instance, r, opts)
 			name = "ZoomOut",
 			rect = opts.zoomButtons[2],
 			variant = "minus",
-			zIndex = z + 5,
+			zIndex = z + 8,
 			onPress = function()
 				self:Zoom(-1)
 			end,
@@ -143,7 +147,6 @@ function IslandMap.new(parent: Instance, r, opts)
 		self.maid:Give(self.zoomIn)
 		self.maid:Give(self.zoomOut)
 	end
-	self:_drag(clip)
 	self:_place()
 	return self
 end
@@ -299,15 +302,16 @@ function IslandMap:SetMarkers(markers)
 			ZIndex = 8,
 		}, holder)
 		Kit.Art.Plate(dot, "dot.yellow", 22, 22, { z = 8, tint = entry.color })
-		local text = Kit.Text.new(holder, {
+		-- Names over the painting: the Kit's paper outline keeps them readable.
+		Kit.Text.new(holder, {
 			name = "Name",
 			rect = { 30, 0, 170, 28 },
 			text = entry.name,
 			role = "hudSmall",
+			outline = true,
+			outlineThickness = 2,
 			zIndex = 8,
-		}).root
-		text.TextStrokeColor3 = Kit.Tokens.Color("cream")
-		text.TextStrokeTransparency = 0.2
+		})
 		table.insert(self.extra, holder)
 	end
 end

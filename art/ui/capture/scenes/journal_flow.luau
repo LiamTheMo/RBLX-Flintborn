@@ -208,18 +208,86 @@ JournalController.Open("map")
 check(JournalController.IsOpen() and window:Tab() == "map", "Open(tab) opens on that tab")
 JournalController.Close()
 
--- Leak check: twenty opens and closes leave the same instance count.
-local function count()
-	return #player.PlayerGui:GetDescendants()
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
 end
+
+-- Leak check: twenty opens and closes leave the same instance and connection counts.
 JournalController.Open("quests")
 JournalController.Close()
-local base = count()
+local base, baseConnections = leakCounts()
 for _ = 1, 20 do
 	JournalController.Open("quests")
 	JournalController.Close()
 end
-check(count() == base, ("no leak over 20 opens (%d → %d)"):format(base, count()))
+local after, afterConnections = leakCounts()
+check(after == base, ("no instance leak over 20 opens (%d → %d)"):format(base, after))
+check(
+	afterConnections == baseConnections,
+	("no connection leak over 20 opens (%d → %d)"):format(baseConnections, afterConnections)
+)
 
 print(__failed and "FLOW FAILED" or "FLOW OK")
 if __failed then
