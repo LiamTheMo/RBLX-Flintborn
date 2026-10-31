@@ -1,0 +1,1202 @@
+{
+ "texts": [
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Title",
+   "text": "INVENTORY",
+   "px": 50.5,
+   "status": "ok",
+   "box": [
+    437,
+    195,
+    1085,
+    62
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryAll/Visual/Label",
+   "text": "All",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    438,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryTools/Visual/Label",
+   "text": "Tools",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    508,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryMaterials/Visual/Label",
+   "text": "Materials",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    584,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryFood/Visual/Label",
+   "text": "Food",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    656,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryPlants/Visual/Label",
+   "text": "Plants",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    731,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryMisc/Visual/Label",
+   "text": "Misc",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    390,
+    804,
+    129,
+    60
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti4/Visual/Item/Visual/ItemName",
+   "text": "Wooden Bow",
+   "px": 14.92,
+   "status": "ok",
+   "box": [
+    922,
+    437,
+    77,
+    77
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sectionitems",
+   "text": "ITEMS 4/25",
+   "px": 22.95,
+   "status": "ok",
+   "box": [
+    568,
+    375,
+    676,
+    39
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/ItemName",
+   "text": "Permanent Portable Extraction Rune",
+   "px": 30.99,
+   "status": "truncated",
+   "box": [
+    1298,
+    540,
+    296,
+    39
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/ItemText",
+   "text": "Wide swings at a steady pace.",
+   "px": 17.22,
+   "status": "ok",
+   "box": [
+    1298,
+    586,
+    296,
+    57
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat1/Visual/Value",
+   "text": "56",
+   "px": 19.51,
+   "status": "ok",
+   "box": [
+    1546,
+    651,
+    46,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat1/Visual/Title",
+   "text": "Damage",
+   "px": 17.22,
+   "status": "ok",
+   "box": [
+    1355,
+    651,
+    179,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat2/Visual/Value",
+   "text": "0.7s",
+   "px": 19.51,
+   "status": "ok",
+   "box": [
+    1545,
+    698,
+    47,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat2/Visual/Title",
+   "text": "Attack Speed",
+   "px": 17.22,
+   "status": "ok",
+   "box": [
+    1355,
+    698,
+    178,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat3/Visual/Value",
+   "text": "+99.0%",
+   "px": 19.51,
+   "status": "ok",
+   "box": [
+    1506,
+    745,
+    86,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Stat3/Visual/Title",
+   "text": "Quality",
+   "px": 17.22,
+   "status": "ok",
+   "box": [
+    1355,
+    745,
+    139,
+    46
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Actiontake/Visual/Label",
+   "text": "TAKE",
+   "px": 27.54,
+   "status": "ok",
+   "box": [
+    1406,
+    809,
+    82,
+    67
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/TabBackpack/Visual/Label",
+   "text": "Backpack",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    375,
+    291,
+    107,
+    64
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/TabVault/Visual/Label",
+   "text": "Vault 4/25",
+   "px": 16.07,
+   "status": "ok",
+   "box": [
+    597,
+    292,
+    85,
+    62
+   ]
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Toolsort/Visual/Label",
+   "text": "Sort: Saved",
+   "px": 20.66,
+   "status": "ok",
+   "box": [
+    1099,
+    300,
+    121,
+    45
+   ]
+  }
+ ],
+ "offscreen": [],
+ "topbar": [],
+ "touch": [
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Close/Hit",
+   "hit": [
+    1544.8,
+    187.7,
+    68.9,
+    65.4
+   ],
+   "art": [
+    1544.8,
+    187.7,
+    1613.6,
+    253.1
+   ],
+   "min": 65.4,
+   "kitpad": true,
+   "artmin": 65.4,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Search/Visual/Input",
+   "hit": [
+    348.8,
+    372.4,
+    165.3,
+    47.1
+   ],
+   "art": [
+    348.8,
+    372.4,
+    514.1,
+    419.5
+   ],
+   "min": 47.1,
+   "kitpad": false,
+   "artmin": 47.1,
+   "z": 10.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryAll/Hit",
+   "hit": [
+    306.4,
+    437.9,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    437.9,
+    557.7,
+    499.8
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryTools/Hit",
+   "hit": [
+    306.4,
+    507.9,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    507.9,
+    557.7,
+    569.8
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryMaterials/Hit",
+   "hit": [
+    306.4,
+    583.6,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    583.6,
+    557.7,
+    645.6
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryFood/Hit",
+   "hit": [
+    306.4,
+    655.9,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    655.9,
+    557.7,
+    717.9
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryPlants/Hit",
+   "hit": [
+    306.4,
+    730.5,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    730.5,
+    557.7,
+    792.5
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/CategoryMisc/Hit",
+   "hit": [
+    306.4,
+    804.0,
+    251.3,
+    62.0
+   ],
+   "art": [
+    306.4,
+    804.0,
+    557.7,
+    865.9
+   ],
+   "min": 62.0,
+   "kitpad": true,
+   "artmin": 62.0,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti1/Hit",
+   "hit": [
+    565.8,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    565.8,
+    420.6,
+    670.2,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti2/Hit",
+   "hit": [
+    680.1,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    680.1,
+    420.6,
+    784.5,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti3/Hit",
+   "hit": [
+    794.4,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    794.4,
+    420.6,
+    898.8,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti4/Hit",
+   "hit": [
+    908.7,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    908.7,
+    420.6,
+    1013.1,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie5/Hit",
+   "hit": [
+    1023.0,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1023.0,
+    420.6,
+    1127.4,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie6/Hit",
+   "hit": [
+    1137.3,
+    420.6,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1137.3,
+    420.6,
+    1241.8,
+    534.3
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie7/Hit",
+   "hit": [
+    565.8,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    565.8,
+    543.8,
+    670.2,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie8/Hit",
+   "hit": [
+    680.1,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    680.1,
+    543.8,
+    784.5,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie9/Hit",
+   "hit": [
+    794.4,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    794.4,
+    543.8,
+    898.8,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie10/Hit",
+   "hit": [
+    908.7,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    908.7,
+    543.8,
+    1013.1,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie11/Hit",
+   "hit": [
+    1023.0,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1023.0,
+    543.8,
+    1127.4,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie12/Hit",
+   "hit": [
+    1137.3,
+    543.8,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1137.3,
+    543.8,
+    1241.8,
+    657.4
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie13/Hit",
+   "hit": [
+    565.8,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    565.8,
+    667.0,
+    670.2,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie14/Hit",
+   "hit": [
+    680.1,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    680.1,
+    667.0,
+    784.5,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie15/Hit",
+   "hit": [
+    794.4,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    794.4,
+    667.0,
+    898.8,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie16/Hit",
+   "hit": [
+    908.7,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    908.7,
+    667.0,
+    1013.1,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie17/Hit",
+   "hit": [
+    1023.0,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1023.0,
+    667.0,
+    1127.4,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie18/Hit",
+   "hit": [
+    1137.3,
+    667.0,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1137.3,
+    667.0,
+    1241.8,
+    780.6
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie19/Hit",
+   "hit": [
+    565.8,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    565.8,
+    790.2,
+    670.2,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie20/Hit",
+   "hit": [
+    680.1,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    680.1,
+    790.2,
+    784.5,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie21/Hit",
+   "hit": [
+    794.4,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    794.4,
+    790.2,
+    898.8,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie22/Hit",
+   "hit": [
+    908.7,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    908.7,
+    790.2,
+    1013.1,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie23/Hit",
+   "hit": [
+    1023.0,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1023.0,
+    790.2,
+    1127.4,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie24/Hit",
+   "hit": [
+    1137.3,
+    790.2,
+    104.4,
+    113.6
+   ],
+   "art": [
+    1137.3,
+    790.2,
+    1241.8,
+    903.8
+   ],
+   "min": 104.4,
+   "kitpad": true,
+   "artmin": 104.4,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Actiontake/Hit",
+   "hit": [
+    1292.3,
+    808.6,
+    309.9,
+    70.0
+   ],
+   "art": [
+    1292.3,
+    808.6,
+    1602.1,
+    878.6
+   ],
+   "min": 70.0,
+   "kitpad": true,
+   "artmin": 70.0,
+   "z": 17.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/TabBackpack/Hit",
+   "hit": [
+    300.6,
+    290.9,
+    195.1,
+    66.6
+   ],
+   "art": [
+    300.6,
+    290.9,
+    495.8,
+    357.5
+   ],
+   "min": 66.6,
+   "kitpad": true,
+   "artmin": 66.6,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/TabVault/Hit",
+   "hit": [
+    506.1,
+    292.1,
+    189.4,
+    64.3
+   ],
+   "art": [
+    506.1,
+    292.1,
+    695.5,
+    356.4
+   ],
+   "min": 64.3,
+   "kitpad": true,
+   "artmin": 64.3,
+   "z": 16.0
+  },
+  {
+   "path": "/FlintbornInventory/Holder/Window/Window/Visual/Toolsort/Hit",
+   "hit": [
+    1074.2,
+    299.0,
+    169.9,
+    50.5
+   ],
+   "art": [
+    1075.3,
+    300.1,
+    1242.9,
+    348.3
+   ],
+   "min": 50.5,
+   "kitpad": true,
+   "artmin": 48.2,
+   "z": 16.0
+  }
+ ],
+ "pads": [],
+ "flags": [],
+ "qa": [
+  {
+   "extra": {
+    "scale": 1.1477
+   },
+   "selected": "FlintbornInventory/Holder/Window/Window/Visual/Close/Hit",
+   "buttons": [
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Close/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": false,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Search/Visual/Input",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryAll/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryTools/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryMaterials/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryFood/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryPlants/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/CategoryMisc/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti1/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti2/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti3/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Sloti4/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie5/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie6/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie7/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie8/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie9/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie10/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie11/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie12/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie13/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie14/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie15/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie16/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie17/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie18/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie19/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie20/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie21/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie22/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie23/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie24/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/Slotie25/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/SlotmStone/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/SlotmWood/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Grid/Visual/List/SlotmFiber/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Detail/Visual/Actiontake/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/TabBackpack/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/TabVault/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "FlintbornInventory/Holder/Window/Window/Visual/Toolsort/Hit",
+     "nav": 0.0,
+     "interactable": true
+    },
+    {
+     "selectable": true,
+     "path": "HudTile",
+     "nav": 0.0,
+     "interactable": true
+    }
+   ]
+  }
+ ]
+}
