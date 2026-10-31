@@ -14,9 +14,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local GearModels = require(ReplicatedStorage.Shared.Visuals.GearModels)
 local GroundDrops = require(ReplicatedStorage.Shared.Resources.GroundDrops)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
@@ -117,6 +119,13 @@ function DropService.Spawn(item, position: Vector3, gathered: { ownerId: number,
 	-- Many small gathered drops never block rays, placement or line of sight.
 	part.CanQuery = gathered == nil
 	part.Parent = workspace
+	-- Dropped gear shows its placeholder model; the box stays as the pickup hitbox
+	-- (a faint glow for a Permanent item, invisible otherwise).
+	local look = if gathered then nil else GearModels.Drop(item.catalogId)
+	if look then
+		ModelBuilder.Decorate(part, look)
+		part.Transparency = if item.permanent then 0.75 else 1
+	end
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Pick up"
 	prompt.ObjectText = label(item)
