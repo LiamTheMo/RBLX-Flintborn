@@ -7,7 +7,8 @@
 -- Q155); with nothing to point out it deploys straight away. Solo players and
 -- party leaders press PLAY; other members get a Ready toggle instead, since only
 -- the leader deploys (D16) and Ready is advisory (D3). Everything goes through
--- LobbyController (Deploy, FetchPreview, SetReady); the server decides.
+-- LobbyController (Deploy, FetchPreview) and PartyController (SetReady, which
+-- owns the pending ready state for every screen); the server decides.
 --
 -- Contract (§4.9): Open(), Toggle(), IsOpen(). Lobby place only, with the lobby
 -- HUD in charge (HudMode.ReplacesLobby); otherwise LobbyController's own panel
@@ -19,6 +20,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 local LobbyController = require(script.Parent.LobbyController)
+local PartyController = require(script.Parent.PartyController)
 local Hud = script.Parent.Parent.Hud
 local HudMode = require(Hud.HudMode)
 local Kit = require(Hud.Kit)
@@ -38,9 +40,8 @@ local dialog = nil
 -- A message showing under the map (nil: the idle line) and its token.
 local statusText: string? = nil
 local statusToken = 0
--- Requests in flight: reading the preview for PLAY, or setting Ready.
+-- Reading the preview for PLAY (a ready toggle in flight is PartyController's).
 local entering = false
-local readying = false
 -- The role the window was last drawn for: a new role drops the last message.
 local shownRole: string? = nil
 -- Level attribute watchers for the party's players, by userId.
@@ -76,7 +77,7 @@ local function idleLine(): string?
 		return LobbyController.MAINTENANCE_TEXT
 	end
 	if role() == "member" then
-		return if LobbyController.IsReady() then PlayModel.MEMBER_READY_CAPTION else PlayModel.MEMBER_CAPTION
+		return if PartyController.ShownReady() then PlayModel.MEMBER_READY_CAPTION else PlayModel.MEMBER_CAPTION
 	end
 	return nil
 end
@@ -111,8 +112,8 @@ local function refreshButton()
 		statusText = nil
 		statusToken += 1
 	end
-	window:SetMode(current, LobbyController.IsReady())
-	window:SetBusy(entering or readying or deploying)
+	window:SetMode(current, PartyController.ShownReady())
+	window:SetBusy(entering or PartyController.ReadyPending() ~= nil or deploying)
 	-- Once the server is teleporting the player there is nothing left to press.
 	window:SetEnabled(not (travelling() and not deploying and not entering))
 end
@@ -291,19 +292,13 @@ local function onPlay()
 	end)
 end
 
--- The member's Ready toggle; the view updates when the server confirms.
+-- The member's Ready toggle; the view updates when the server confirms. A
+-- refusal shows under the map (LobbyController's status line), not as a toast.
 local function onReady()
-	if readying then
+	if PartyController.ReadyPending() ~= nil then
 		return
 	end
-	readying = true
-	refreshButton()
-	task.spawn(function()
-		LobbyController.SetReady(not LobbyController.IsReady())
-		readying = false
-		refreshButton()
-		refreshStatus()
-	end)
+	PartyController.SetReady(not PartyController.ShownReady(), function() end)
 end
 
 local function build()
@@ -315,7 +310,7 @@ local function build()
 	window.screen:Watch()
 end
 
--- Opens the Play window (the HUD's Play tile).
+-- Opens the Play window (the HUD's Play tile). A gamepad lands on PLAY.
 function PlayController.Open()
 	if not started then
 		return
@@ -329,7 +324,7 @@ function PlayController.Open()
 		end
 	end
 	refreshAll()
-	window:Open()
+	window:Open(Kit.Input.IsGamepad())
 	-- The backpack may have changed since the last read.
 	LobbyController.RefreshPreview()
 end
@@ -369,6 +364,11 @@ function PlayController.Start()
 				showStatus(LobbyController.Status())
 			end
 		end
+	end)
+	-- A ready toggle starting or ending (from any screen).
+	PartyController.Changed:Connect(function()
+		refreshButton()
+		refreshStatus()
 	end)
 	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refreshStatus)
 	player:GetAttributeChangedSignal("SessionState"):Connect(refreshButton)

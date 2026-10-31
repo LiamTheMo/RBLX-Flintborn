@@ -23,15 +23,16 @@ LobbyHudModel.TILES = {
 LobbyHudModel.HOTBAR_SLOTS = GameConstants.HOTBAR_SLOTS
 
 -- The level and XP lines for a progression snapshot {level, xp, xpToNext}
--- (no xpToNext = the level cap). While the snapshot loads (nil) the lines are
--- blank and the bars empty, rather than a made-up level.
+-- (no xpToNext = the level cap: the level still reads as its number, the XP
+-- line says so). While the snapshot loads (nil) the lines are blank and the
+-- bars empty, rather than a made-up level.
 function LobbyHudModel.Progress(view): { level: string, fraction: number, text: string }
 	if type(view) ~= "table" then
 		return { level = "", fraction = 0, text = "" }
 	end
 	local isMax = view.xpToNext == nil
 	if isMax then
-		return { level = HudModel.LevelText(view.level, true), fraction = 1, text = "Max level" }
+		return { level = HudModel.LevelText(view.level), fraction = 1, text = "Max level" }
 	end
 	local xp = math.max(0, math.floor(view.xp or 0))
 	local need = math.max(0, math.floor(view.xpToNext))
@@ -46,11 +47,13 @@ export type Member = { userId: number, name: string, leader: boolean, ready: boo
 
 -- The party panel from LobbyController.PartyView() and you ({userId, name}):
 -- {count = "1/8", members = {Member}, free = empty rows, invites = {{partyId,
--- from}}, canInvite, showReady}. Ready dots show only in a party of two or more,
--- where the leader reads them before Play (alone the row matches M01). Alone you are a party of one, led by you; your ready flag
--- counts then too (it works without a party). Only the leader (or a solo
--- player) can invite, and only while there is room.
-function LobbyHudModel.Party(view, me: { userId: number, name: string })
+-- from, busy}}, canInvite, showReady}. Ready dots show only in a party of two
+-- or more, where the leader reads them before Play (alone the row matches
+-- M01). Alone you are a party of one, led by you; your ready flag counts then
+-- too (it works without a party). Only the leader (or a solo player) can
+-- invite, and only while there is room. `busy` maps the partyIds whose answer
+-- is on its way (PartyController.AnswerBusy); those invites are marked busy.
+function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: { [string]: boolean }?)
 	view = view or {}
 	local maxSize = view.maxSize or 8
 	local party = view.party
@@ -76,11 +79,18 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string })
 		})
 	end
 	local leads = party == nil or party.leader == me.userId
+	-- Copies: the view's own tables stay untouched.
+	local invites = {}
+	for _, invite in view.invites or {} do
+		local entry = table.clone(invite)
+		entry.busy = busy ~= nil and busy[invite.partyId] == true
+		table.insert(invites, entry)
+	end
 	return {
 		count = HudModel.PartyCount(#members, maxSize),
 		members = members,
 		free = math.max(0, maxSize - #members),
-		invites = view.invites or {},
+		invites = invites,
 		canInvite = leads and #members < maxSize,
 		showReady = #members > 1,
 	}

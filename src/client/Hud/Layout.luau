@@ -7,6 +7,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local KitScale = require(script.Parent.Kit.Scale)
+
 local Layout = {}
 
 local cached = nil
@@ -30,23 +32,37 @@ function Layout.Get()
 	return cached
 end
 
--- True on a short touch-only screen (a landscape phone), where the HUD canvas
--- is short and some regions move (an entry's "phonePos").
+-- True on a phone (the kit's "phone" form factor: touch only, a short
+-- landscape screen), where the HUD canvas is short and the regions take their
+-- entries' "phone" overrides. Tablets keep the desktop arrangement.
 function Layout.IsPhone(): boolean
-	local UserInputService = game:GetService("UserInputService")
-	local camera = workspace.CurrentCamera
-	return UserInputService.TouchEnabled
-		and not UserInputService.KeyboardEnabled
-		and camera ~= nil
-		and camera.ViewportSize.Y > 0
-		and camera.ViewportSize.Y < 500
+	return KitScale.FormFactor() == "phone"
+end
+
+-- `entry` for this screen: on phones the fields of its "phone" table replace
+-- the desktop ones (positions, sizes, row heights, text sizes).
+function Layout.ForScreen(entry)
+	if type(entry) ~= "table" or type(entry.phone) ~= "table" or not Layout.IsPhone() then
+		return entry
+	end
+	local merged = table.clone(entry)
+	for key, value in entry.phone do
+		merged[key] = value
+	end
+	return merged
+end
+
+-- The layout section `key` for this screen (Layout.ForScreen).
+function Layout.Section(layout, key: string)
+	return Layout.ForScreen(layout[key])
 end
 
 -- Places a top-level widget: {anchor = [ax, ay], pos = [sx, ox, sy, oy], size =
--- [w, h], phonePos? (the position on phones)}.
+-- [w, h], phone? = {anchor?, pos?, size?}} (the phone override wins on phones).
 function Layout.Place(object: GuiObject, entry)
+	entry = Layout.ForScreen(entry)
 	object.AnchorPoint = Vector2.new(entry.anchor[1], entry.anchor[2])
-	local pos = if entry.phonePos and Layout.IsPhone() then entry.phonePos else entry.pos
+	local pos = entry.pos
 	object.Position = UDim2.new(pos[1], pos[2], pos[3], pos[4])
 	object.Size = UDim2.fromOffset(entry.size[1], entry.size[2])
 end

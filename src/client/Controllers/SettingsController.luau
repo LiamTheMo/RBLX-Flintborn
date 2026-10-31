@@ -293,7 +293,7 @@ function SettingsController.Toggle()
 	-- A gamepad starts on the open tab; Escape and B close (Kit.Modal), an open
 	-- dropdown list first.
 	panel.screen:SetDefaultSelection(panel.tabs[panel.tab].control.hit)
-	panel.screen:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
+	panel.screen:Open(GuiService.SelectedObject ~= nil or Kit.Input.IsGamepad())
 end
 
 function SettingsController.Start()

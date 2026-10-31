@@ -12,12 +12,20 @@
 -- Nothing polls: the window redraws on PartyChanged, players joining or
 -- leaving, a Level change, a search, or an answer to a request. The only timer
 -- is the "Created" clock, which ticks once a minute while the window is open.
+--
+-- This is the one place that sends ready toggles and invite answers and keeps
+-- their pending state (the HUD and the Play window call SetReady / Answer and
+-- read ReadyPending / ShownReady / AnswerBusy; Changed fires when it moves).
+-- A refusal is reported once: here as a toast (or by the caller when it asks
+-- for `quiet`), while Reporting() tells the HUD not to toast the same
+-- LobbyController status line again.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SocialService = game:GetService("SocialService")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local PartyModel = require(ReplicatedStorage.Shared.UI.PartyModel)
 local LobbyController = require(script.Parent.LobbyController)
 local Hud = script.Parent.Parent.Hud
@@ -25,6 +33,9 @@ local Kit = require(Hud.Kit)
 local PartyWindow = require(Hud.Screens.PartyWindow)
 
 local PartyController = {}
+
+-- Fires when a ready toggle or an invite answer starts or ends.
+PartyController.Changed = Signal.new()
 
 PartyController.CLOCK_SECONDS = 60
 -- A ready request whose view never arrives stops waiting after this long.
@@ -40,6 +51,8 @@ local busyInvites: { [string]: boolean } = {}
 local readyPending: boolean? = nil
 local readyToken = 0
 local leaveBusy = false
+-- Requests in flight whose refusal this module reports itself.
+local reporting = 0
 local friendsAllowed = false
 local friendsChecked = false
 local clockToken = 0
@@ -93,6 +106,22 @@ local function failed(reason: string?)
 	Kit.Toast.Show({ kind = "warn", title = "Party", text = PartyModel.ReasonText(reason) })
 end
 
+-- Runs a LobbyController party request (yields) while Reporting() is true.
+local function request(fn, ...): (boolean, string?)
+	reporting += 1
+	local ok, okOrErr, reason = pcall(fn, ...)
+	reporting -= 1
+	if not ok then
+		return false, "RequestFailed"
+	end
+	return okOrErr, reason
+end
+
+local function changed()
+	refresh()
+	PartyController.Changed:Fire()
+end
+
 local function invite(userId: number)
 	if pendingInvites[userId] then
 		return
@@ -100,7 +129,7 @@ local function invite(userId: number)
 	pendingInvites[userId] = true
 	refresh()
 	task.spawn(function()
-		local ok, reason = LobbyController.Invite(userId)
+		local ok, reason = request(LobbyController.Invite, userId)
 		pendingInvites[userId] = nil
 		if not ok then
 			failed(reason)
@@ -114,48 +143,50 @@ local function answer(partyId: string, accept: boolean)
 		return
 	end
 	busyInvites[partyId] = true
-	refresh()
+	changed()
 	task.spawn(function()
-		local ok, reason
-		if accept then
-			ok, reason = LobbyController.Accept(partyId)
-		else
-			ok, reason = LobbyController.Decline(partyId)
-		end
+		local ok, reason =
+			request(if accept then LobbyController.Accept else LobbyController.Decline, partyId)
 		busyInvites[partyId] = nil
 		if not ok then
 			failed(reason)
 		end
-		refresh()
+		changed()
 	end)
 end
 
-local function setReady(ready: boolean)
+-- Asks for your ready flag; `onFailed(reason)` replaces the toast (the Play
+-- window shows refusals under its map instead).
+local function setReady(ready: boolean, onFailed: ((string?) -> ())?)
 	if readyPending ~= nil then
 		return
 	end
 	readyPending = ready
 	readyToken += 1
 	local token = readyToken
-	refresh()
+	changed()
 	task.spawn(function()
-		local ok, reason = LobbyController.SetReady(ready)
+		local ok, reason = request(LobbyController.SetReady, ready)
 		if token ~= readyToken then
 			return
 		end
 		if not ok then
 			readyPending = nil
-			failed(reason)
+			if onFailed then
+				onFailed(reason)
+			else
+				failed(reason)
+			end
 		elseif PartyModel.ReadySettled(LobbyController.PartyView(), readyPending) then
 			readyPending = nil
 		end
-		refresh()
+		changed()
 	end)
 	-- The server's view normally lands before the answer; never wait forever.
 	task.delay(PartyController.READY_TIMEOUT, function()
 		if token == readyToken and readyPending ~= nil then
 			readyPending = nil
-			refresh()
+			changed()
 		end
 	end)
 end
@@ -173,7 +204,7 @@ local function leave()
 			leaveBusy = true
 			refresh()
 			task.spawn(function()
-				local ok, reason = LobbyController.Leave()
+				local ok, reason = request(LobbyController.Leave)
 				leaveBusy = false
 				if not ok then
 					failed(reason)
@@ -233,7 +264,9 @@ local function ensureWindow()
 				answer(partyId, false)
 			end,
 			onLeave = leave,
-			onReady = setReady,
+			onReady = function(ready: boolean)
+				setReady(ready)
+			end,
 			onInviteFriends = inviteFriends,
 			onSearch = function(text)
 				query = text
@@ -249,8 +282,10 @@ local function ensureWindow()
 end
 
 local function onView(view)
-	if PartyModel.ReadySettled(view, readyPending) then
+	if readyPending ~= nil and PartyModel.ReadySettled(view, readyPending) then
 		readyPending = nil
+		changed()
+		return
 	end
 	refresh()
 end
@@ -259,6 +294,43 @@ local function watchLevel(other: Player)
 	if levelWatch[other] == nil then
 		levelWatch[other] = other:GetAttributeChangedSignal("Level"):Connect(refresh)
 	end
+end
+
+-- Sets your advisory ready flag through the server (one request at a time;
+-- the HUD, the Party window and the Play window share it). `onFailed(reason)`
+-- reports a refusal instead of the toast.
+function PartyController.SetReady(ready: boolean, onFailed: ((string?) -> ())?)
+	setReady(ready, onFailed)
+end
+
+-- Accepts or declines an invite (one answer per invite at a time).
+function PartyController.Answer(partyId: string, accept: boolean)
+	answer(partyId, accept)
+end
+
+-- The ready value on its way to the server, or nil.
+function PartyController.ReadyPending(): boolean?
+	return readyPending
+end
+
+-- Your ready flag as the screens show it: the asked value while it is on its
+-- way, else the server's.
+function PartyController.ShownReady(): boolean
+	if readyPending ~= nil then
+		return readyPending
+	end
+	return LobbyController.IsReady()
+end
+
+-- The invites whose answer is on its way ({[partyId] = true}).
+function PartyController.AnswerBusy(): { [string]: boolean }
+	return busyInvites
+end
+
+-- True while a party request this module reports on is in flight (the HUD
+-- skips the LobbyController status toast for it).
+function PartyController.Reporting(): boolean
+	return reporting > 0
 end
 
 -- Opens the Party window (lobby only). `section` "invite" puts gamepad
@@ -273,7 +345,7 @@ function PartyController.Open(section: string?)
 	local wasOpen = w:IsOpen()
 	-- Drawn before it opens, so the section's control exists to select.
 	w:SetData(data())
-	w:Open(section)
+	w:Open(section, Kit.Input.IsGamepad())
 	if not wasOpen then
 		startClock()
 	end

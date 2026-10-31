@@ -8,6 +8,7 @@
 -- input type when the player switches input, so the key cap follows keyboard,
 -- gamepad and touch. Binds retargets prompts authored on E to the player's
 -- Interact key (GDD §46), and the cap redraws whenever that key is rebound.
+-- On phones the layout's "phone" sizes keep the object line at 9 screen px.
 
 local Players = game:GetService("Players")
 local ProximityPromptService = game:GetService("ProximityPromptService")
@@ -62,7 +63,7 @@ end
 -- {key, action, object, hold}. Returns {width, parts, hold (Kit.Bar?)}; the
 -- capture scenes call it directly.
 function InteractionPrompt.Draw(content: Instance, texts)
-	local cfg = Layout.Get().prompt
+	local cfg = Layout.Section(Layout.Get(), "prompt")
 	local height = cfg.size[2]
 	local cap = cfg.keycap
 	local capW = math.max(cap[3], Kit.KeyCap.Width(texts.key, cap[4]))
@@ -121,7 +122,7 @@ function InteractionPrompt.Draw(content: Instance, texts)
 end
 
 local function build(prompt: ProximityPrompt, inputType: Enum.ProximityPromptInputType, scale: number)
-	local cfg = Layout.Get().prompt
+	local cfg = Layout.Section(Layout.Get(), "prompt")
 	local adornee = adorneeFor(prompt)
 	if adornee == nil then
 		return nil

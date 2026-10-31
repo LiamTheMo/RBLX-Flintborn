@@ -159,7 +159,8 @@ local function build()
 	ui.attack.Name = "Attack"
 	ui.attack.BackgroundTransparency = 1
 	ui.attack.Visible = false
-	-- On phones the layout's phonePos keeps it clear of the event panel.
+	-- On phones the layout's phone position puts it right of the hotbar and
+	-- left of the Roblox jump button.
 	Layout.Place(ui.attack, cfg)
 	ui.attack.Parent = root
 	local button = Kit.IconButton.new(ui.attack, {

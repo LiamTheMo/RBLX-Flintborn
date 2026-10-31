@@ -17,7 +17,7 @@
 --   window:Open()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
 
 local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Kit = require(script.Parent.Parent.Kit)
@@ -354,7 +354,7 @@ end
 -- Opening and closing ------------------------------------------------------------------
 
 function RecipeWindow:Open()
-	self.screen:Open(UserInputService.GamepadEnabled)
+	self.screen:Open(Kit.Input.IsGamepad())
 end
 
 function RecipeWindow:Close()

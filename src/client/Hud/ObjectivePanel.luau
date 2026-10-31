@@ -1,8 +1,10 @@
 -- Top-right objective card ("FIND EXTRACTION"): a Kit.Panel "card" with a
 -- section header (exit icon and the title) and up to two task lines, each the
 -- quest journal's round check (Kit.Checkbox "ring", read only), the task, a
--- map pin and distance, and the progress at the right. Fed by
--- HudModel.ExtractionObjective; display only.
+-- map pin and distance, and the progress at the right. On phones (the layout's
+-- "twoLine") each task takes two lines, so its words keep the 9 px floor: the
+-- task on the first, the pin, distance and progress under it; a task too long
+-- for the line ends in "…". Fed by HudModel.ExtractionObjective; display only.
 
 local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
@@ -11,7 +13,7 @@ local ObjectivePanel = {}
 ObjectivePanel.__index = ObjectivePanel
 
 function ObjectivePanel.new(parent: Instance, layout)
-	local cfg = layout.objective
+	local cfg = Layout.Section(layout, "objective")
 	local self = setmetatable({ cfg = cfg, rows = {}, titleText = nil }, ObjectivePanel)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Objective"
@@ -29,50 +31,58 @@ function ObjectivePanel.new(parent: Instance, layout)
 		zIndex = 8,
 	})
 	local x, rowW = cfg.header[1], cfg.header[3]
+	local twoLine = cfg.twoLine == true
+	self.twoLine = twoLine
 	for index = 1, 2 do
 		local y = cfg.rowTop + (index - 1) * cfg.rowHeight
 		local rh = cfg.rowHeight
+		-- One line per row, or (twoLine) the task line and the detail line.
+		local lineH = if twoLine then rh / 2 else rh
+		local detailY = if twoLine then y + lineH else y
+		local textX = x + cfg.check + 8
 		local check = Kit.Checkbox.new(body, {
 			name = "Check" .. index,
-			rect = { x, y + (rh - cfg.check) / 2, cfg.check, cfg.check },
+			rect = { x, y + (lineH - cfg.check) / 2, cfg.check, cfg.check },
 			variant = "ring",
 			readOnly = true,
 			checked = false,
 			zIndex = 8,
 		})
+		local wide = rowW - cfg.check - 8
 		local text = Kit.Text.new(body, {
 			name = "Task" .. index,
-			rect = { x + cfg.check + 8, y, cfg.textW, rh },
+			rect = { textX, y, if twoLine then wide else cfg.textW, lineH },
 			text = "",
 			role = "rowLabel",
 			textSize = cfg.textSize,
-			scaled = true,
+			scaled = not twoLine,
 			zIndex = 8,
 		})
 		local progress = Kit.Text.new(body, {
 			name = "Progress",
-			rect = { x + rowW - cfg.progressW, y, cfg.progressW, rh },
+			rect = { x + rowW - cfg.progressW, detailY, cfg.progressW, lineH },
 			text = "",
 			role = "value",
 			textSize = cfg.textSize,
 			align = "Right",
-			scaled = true,
+			scaled = not twoLine,
 			zIndex = 8,
 		})
-		local pinX = x + rowW - cfg.progressW - cfg.distanceW - cfg.pin
+		local pinX = if twoLine then textX else x + rowW - cfg.progressW - cfg.distanceW - cfg.pin
 		local pin = Kit.Icon.new(body, {
 			name = "Pin",
-			rect = { pinX, y + (rh - cfg.pin) / 2, cfg.pin, cfg.pin },
+			rect = { pinX, detailY + (lineH - cfg.pin) / 2, cfg.pin, cfg.pin },
 			icon = "map_pin",
 			zIndex = 8,
 		})
+		local distanceW = if twoLine then rowW - cfg.check - 8 - cfg.pin - 2 - cfg.progressW - 6 else cfg.distanceW - 4
 		local distance = Kit.Text.new(body, {
 			name = "Distance",
-			rect = { pinX + cfg.pin + 2, y, cfg.distanceW - 4, rh },
+			rect = { pinX + cfg.pin + 2, detailY, distanceW, lineH },
 			text = "",
 			role = "small",
 			textSize = cfg.textSize,
-			scaled = true,
+			scaled = not twoLine,
 			zIndex = 8,
 		})
 		local rule = Kit.Divider.new(body, {
@@ -89,9 +99,9 @@ function ObjectivePanel.new(parent: Instance, layout)
 			pin = pin,
 			distance = distance,
 			rule = rule,
-			x = x + cfg.check + 8,
-			narrow = cfg.textW,
-			wide = rowW - cfg.check - 8 - cfg.progressW - 6,
+			x = textX,
+			narrow = if twoLine then wide else cfg.textW,
+			wide = if twoLine then wide else rowW - cfg.check - 8 - cfg.progressW - 6,
 		}
 	end
 	return self

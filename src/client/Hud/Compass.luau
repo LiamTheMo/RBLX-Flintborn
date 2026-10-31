@@ -13,12 +13,22 @@ local Layout = require(script.Parent.Layout)
 local Compass = {}
 Compass.__index = Compass
 
--- Letters fade out over the outer part of the strip.
-Compass.FADE_FROM = 0.8
+-- Letters fade out over the outer part of the strip and are gone before the
+-- strip's edge would cut them.
+Compass.FADE_FROM = 0.7
 
 function Compass.new(parent: Instance, layout)
-	local cfg = layout.compass
-	local self = setmetatable({ cfg = cfg, marks = {}, waypoints = {} }, Compass)
+	local cfg = Layout.Section(layout, "compass")
+	-- Letter sizes as drawn (body text grows on phones, Kit.Core.TextBoost).
+	local boost = Kit.Core.TextBoost("hudSmall")
+	local self = setmetatable({
+		cfg = cfg,
+		marks = {},
+		waypoints = {},
+		letterSize = cfg.letter.size * boost,
+		cardinalSize = cfg.letter.cardinalSize * boost,
+		widths = {},
+	}, Compass)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Compass"
 	self.root.BackgroundTransparency = 1
@@ -103,6 +113,17 @@ function Compass:SetWaypoints(list)
 	end
 end
 
+-- Half a letter's drawn width (measured once per label and size).
+function Compass:_halfWidth(label: string, size: number): number
+	local key = label .. "@" .. size
+	local width = self.widths[key]
+	if width == nil then
+		width = Kit.Text.Width(label, "hudSmall", size / Kit.Core.TextBoost("hudSmall"))
+		self.widths[key] = width
+	end
+	return width / 2
+end
+
 -- heading: camera degrees clockwise from north. bearings: {[waypointId] = degrees}.
 function Compass:Update(heading: number, bearings)
 	local cfg = self.cfg
@@ -117,13 +138,18 @@ function Compass:Update(heading: number, bearings)
 			slot.notch.Position = UDim2.fromOffset(x, tick.y)
 			slot.notch.Size = UDim2.fromOffset(2, tick.h)
 			if mark.label then
-				local edge = math.abs(mark.offset) / cfg.halfSpan
-				local fade = math.clamp((edge - Compass.FADE_FROM) / (1 - Compass.FADE_FROM), 0, 1)
 				local cardinal = #mark.label == 1
+				local size = if cardinal then self.cardinalSize else self.letterSize
+				-- The letter fades towards the edge and is hidden before the
+				-- strip's edge would cut it (no half letters such as "SI").
+				local room = self.centre - self:_halfWidth(mark.label, size) - 2
+				local edge = math.abs(x - self.centre) / math.max(room, 1)
+				local fade = math.clamp((edge - Compass.FADE_FROM) / (1 - Compass.FADE_FROM), 0, 1)
+				slot.letter.Visible = edge < 1
 				slot.letter.Text = mark.label
-				slot.letter.TextSize = if cardinal then cfg.letter.cardinalSize else cfg.letter.size
+				slot.letter.TextSize = size
 				slot.letter.Position = UDim2.fromOffset(x, cfg.letter.y - (if cardinal then cfg.letter.raise else 0))
-				slot.letter.TextTransparency = fade * 0.8
+				slot.letter.TextTransparency = fade * 0.85
 			end
 		end
 	end

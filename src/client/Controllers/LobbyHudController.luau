@@ -38,10 +38,19 @@ LobbyHudController.STATUS_SECONDS = 6
 
 local player = Players.LocalPlayer
 local gui, root, hud
+-- Everything start() connected, so a failed start leaves nothing bound to a
+-- destroyed HUD.
+local connections = {}
+local stops = {}
+
+local function keep(connection)
+	table.insert(connections, connection)
+	return connection
+end
 
 -- The lobby backpack lives in the Inventory window beside the vault.
 local function openInventory()
-	VaultController.Open("Backpack")
+	VaultController.Open("Backpack", Kit.Input.IsGamepad())
 end
 
 local TILE_ACTIONS = {
@@ -69,7 +78,11 @@ end
 
 local function refreshParty()
 	hud:SetParty(
-		LobbyHudModel.Party(LobbyController.PartyView(), { userId = player.UserId, name = player.DisplayName })
+		LobbyHudModel.Party(
+			LobbyController.PartyView(),
+			{ userId = player.UserId, name = player.DisplayName },
+			PartyController.AnswerBusy()
+		)
 	)
 end
 
@@ -90,6 +103,10 @@ end
 local function showStatus()
 	local text = LobbyController.Status()
 	if text == "" or text == LobbyController.MAINTENANCE_TEXT then
+		return
+	end
+	-- A party request PartyController sent reports its own refusal (once).
+	if PartyController.Reporting() then
 		return
 	end
 	Kit.Toast.Show({ kind = "info", title = "Lobby", text = text, duration = LobbyHudController.STATUS_SECONDS })
@@ -130,7 +147,7 @@ local function build()
 		end,
 		onParty = openParty,
 		onAnswer = function(partyId: string, accept: boolean)
-			task.spawn(LobbyController.PartyAction, if accept then "accept" else "decline", partyId)
+			PartyController.Answer(partyId, accept)
 		end,
 		onSlot = openInventory,
 	})
@@ -141,15 +158,15 @@ end
 -- Root scale (HudModel.HudScale, × 0.9 on short touch screens) and the top bar's
 -- reach in design px.
 local function watchScale()
-	Kit.Scale.Hud(gui, root)
+	table.insert(stops, Kit.Scale.Hud(gui, root))
 	local scale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function inset()
 		hud:SetTopInset(Kit.Scale.WindowTop(gui) / math.max(scale.Scale, 0.01))
 	end
-	scale:GetPropertyChangedSignal("Scale"):Connect(inset)
-	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(inset)
+	keep(scale:GetPropertyChangedSignal("Scale"):Connect(inset))
+	keep(gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(inset))
 	pcall(function()
-		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(inset)
+		keep(GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(inset))
 	end)
 	inset()
 end
@@ -157,21 +174,25 @@ end
 local function start()
 	build()
 	watchScale()
+	-- A gamepad picked up with nothing selected lands on the first menu tile.
+	Kit.Input.SetHudDefault(hud:DefaultSelection())
 
 	hud:SetProfile(player.DisplayName, player.UserId)
 	hud:SetProgress(ProgressionController.View(), true)
-	ProgressionController.Changed:Connect(function(view)
+	keep(ProgressionController.Changed:Connect(function(view)
 		hud:SetProgress(view, Kit.Motion.Reduced())
-	end)
+	end))
 	refreshCurrency(true)
-	player:GetAttributeChangedSignal("Coins"):Connect(refreshCurrency)
-	player:GetAttributeChangedSignal("Gems"):Connect(refreshCurrency)
+	keep(player:GetAttributeChangedSignal("Coins"):Connect(refreshCurrency))
+	keep(player:GetAttributeChangedSignal("Gems"):Connect(refreshCurrency))
 	refreshNotice()
-	player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refreshNotice)
+	keep(player:GetAttributeChangedSignal("MaintenanceNotice"):Connect(refreshNotice))
 
 	refreshParty()
 	refreshHotbar()
-	LobbyController.Changed:Connect(function(what)
+	-- An invite answer starting or ending (busy buttons).
+	keep(PartyController.Changed:Connect(refreshParty))
+	keep(LobbyController.Changed:Connect(function(what)
 		if what == "party" then
 			refreshParty()
 		elseif what == "preview" then
@@ -179,11 +200,32 @@ local function start()
 		elseif what == "status" then
 			showStatus()
 		end
-	end)
+	end))
 	-- A backpack or vault change re-reads the deploy preview (and so the hotbar).
-	VaultController.Changed:Connect(function()
+	keep(VaultController.Changed:Connect(function()
 		LobbyController.RefreshPreview()
-	end)
+	end))
+end
+
+-- Undoes a partial start: every connection, the scale watcher and the HUD.
+local function teardown()
+	for _, connection in connections do
+		connection:Disconnect()
+	end
+	table.clear(connections)
+	for _, stop in stops do
+		stop()
+	end
+	table.clear(stops)
+	Kit.Input.SetHudDefault(nil)
+	if hud then
+		pcall(hud.Destroy, hud)
+		hud = nil
+	end
+	if gui then
+		gui:Destroy()
+		gui = nil
+	end
 end
 
 -- The HUD screen object (scenes and verifiers), or nil before Start.
@@ -199,9 +241,7 @@ function LobbyHudController.Start()
 	if not ok then
 		-- Never leave the lobby without Deploy: hand it back to the older visuals.
 		warn("[LobbyHud] failed to build, using the older lobby screen: " .. tostring(err))
-		if gui then
-			gui:Destroy()
-		end
+		teardown()
 		HudMode.SetLobbyFailed()
 		LobbyController.BuildFallback()
 	end

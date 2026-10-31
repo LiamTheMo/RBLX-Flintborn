@@ -19,6 +19,7 @@ local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRu
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
+local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
@@ -169,7 +170,8 @@ end
 -- Scale and top inset ----------------------------------------------------------
 
 -- The regions pinned to the top edge, with their layout positions:
--- {{object, base}}. They move down together below the Roblox top bar.
+-- {{object, base}}. They move down together below the Roblox top bar. Regions
+-- pinned to the bottom (on phones the tribe frames) stay where they are.
 function HudController.TopRegions(mounted)
 	local regions = {}
 	for _, object in
@@ -180,9 +182,12 @@ function HudController.TopRegions(mounted)
 			mounted.vitals.status,
 			mounted.objective.root,
 			mounted.event.root,
+			mounted.tileRegion,
 		}
 	do
-		table.insert(regions, { object = object, base = object.Position })
+		if object and object.Position.Y.Scale == 0 and object.AnchorPoint.Y == 0 then
+			table.insert(regions, { object = object, base = object.Position })
+		end
 	end
 	return regions
 end
@@ -500,26 +505,45 @@ local function newGui(name: string, order: number): (ScreenGui, Frame)
 	return screen, frame
 end
 
--- The menu tiles in the lobby's grid. Each tile's tooltip names its key, which
--- follows the player's rebinds. `open(entry)` runs a tile's action.
+-- The gamepad button bound to a menu tile's action (a KeyCode name), if any.
+function HudController.GamepadKey(action: string): string?
+	local bind = Keybinds.Get(action)
+	return bind and bind.gamepad and bind.gamepad[1] or nil
+end
+
+-- A tile's tooltip for the input in use: its key ("Backpack (B)"), its
+-- gamepad button ("Backpack (Y)"), or just its name on touch.
+function HudController.TileHint(entry): string
+	local hint = Kit.Input.Hint(Binds.Label(entry[3]), HudController.GamepadKey(entry[3]))
+	return if hint then ("%s (%s)"):format(entry[1], hint) else entry[1]
+end
+
+-- The menu tiles in the lobby's grid (2 × 3 at the left; on phones 3 × 2 at the
+-- top left, above the thumbstick's touch zone). Each tile's tooltip names its
+-- key or gamepad button, which follows the player's rebinds. `open(entry)`
+-- runs a tile's action.
 function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
+	cfg = Layout.ForScreen(cfg)
+	local columns = cfg.columns or 2
+	local rows = math.ceil(#HudController.MENU / columns)
 	local region = Instance.new("Frame")
 	region.Name = "Tiles"
 	region.BackgroundTransparency = 1
-	region.AnchorPoint = Vector2.new(0, 0.5)
-	region.Position = UDim2.new(0, cfg.x, cfg.centreY, 0)
-	local camera = workspace.CurrentCamera
-	if camera and Kit.Scale.IsSmallTouch(camera.ViewportSize.Y) then
-		-- Phones: the HUD canvas is short, so the grid sits low on the left,
-		-- clear of the party panel above it and left of the hotbar.
-		region.AnchorPoint = Vector2.new(0, 1)
-		region.Position = UDim2.new(0, cfg.x, 1, -24)
+	if cfg.pos then
+		region.AnchorPoint = Vector2.new(cfg.anchor[1], cfg.anchor[2])
+		region.Position = UDim2.new(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4])
+	else
+		region.AnchorPoint = Vector2.new(0, 0.5)
+		region.Position = UDim2.new(0, cfg.x, cfg.centreY, 0)
 	end
-	region.Size = UDim2.fromOffset(cfg.size[1], cfg.size[2])
+	region.Size = UDim2.fromOffset(
+		(columns - 1) * cfg.pitch[1] + cfg.tile[1],
+		math.max((rows - 1) * cfg.pitch[2] + cfg.tile[2], if cfg.pos then 0 else cfg.size[2])
+	)
 	region.Parent = parent
 	local tiles = {}
 	for index, entry in HudController.MENU do
-		local column, row = (index - 1) % 2, (index - 1) // 2
+		local column, row = (index - 1) % columns, (index - 1) // columns
 		local tile = Kit.IconButton.new(region, {
 			name = entry[1],
 			rect = { column * cfg.pitch[1], row * cfg.pitch[2], cfg.tile[1], cfg.tile[2] },
@@ -530,8 +554,8 @@ function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
 			end,
 		})
 		Kit.Tooltip.Attach(tile, function()
-			return ("%s (%s)"):format(entry[1], Binds.Label(entry[3]))
-		end, { side = "right" })
+			return HudController.TileHint(entry)
+		end, { side = if columns > 2 then "top" else "right" })
 		tiles[index] = tile
 	end
 	for index, tile in tiles do
@@ -539,10 +563,11 @@ function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
 		local function at(i: number)
 			return tiles[i] and tiles[i].control.hit
 		end
-		hit.NextSelectionUp = at(index - 2)
-		hit.NextSelectionDown = at(index + 2)
-		hit.NextSelectionLeft = if index % 2 == 0 then at(index - 1) else nil
-		hit.NextSelectionRight = if index % 2 == 1 then at(index + 1) else nil
+		local column = (index - 1) % columns
+		hit.NextSelectionUp = at(index - columns)
+		hit.NextSelectionDown = at(index + columns)
+		hit.NextSelectionLeft = if column > 0 then at(index - 1) else nil
+		hit.NextSelectionRight = if column < columns - 1 then at(index + 1) else nil
 	end
 	return region, tiles
 end
@@ -600,10 +625,43 @@ local function build()
 	Kit.Scale.Hud(overlay, overlayRoot)
 end
 
+-- Gamepad entry to the HUD (docs/ui/HudScreen.md, "Gamepad"). ButtonSelect stays
+-- on Progress, and every tile has its own button (Y, the D-pad, View), so the
+-- HUD needs no menu button. While the HUD shows, a gamepad picked up with
+-- nothing selected lands on the first tile (Kit.Input.SetHudDefault), and B
+-- hands the stick back to walking: with a control selected the stick moves the
+-- selection, not the character. Windows' own B (Kit.Modal, higher priority)
+-- still closes them first.
+local releaseBound = false
+local function bindRelease(active: boolean)
+	if active == releaseBound then
+		return
+	end
+	releaseBound = active
+	Kit.Input.SetHudDefault(if active then widgets.tiles[1].control.hit else nil)
+	if not active then
+		ContextActionService:UnbindAction("FlintbornHudRelease")
+		local selected = GuiService.SelectedObject
+		if selected and selected:IsDescendantOf(gui) then
+			GuiService.SelectedObject = nil
+		end
+		return
+	end
+	ContextActionService:BindActionAtPriority("FlintbornHudRelease", function(_, state)
+		local selected = GuiService.SelectedObject
+		if state == Enum.UserInputState.Begin and selected and selected:IsDescendantOf(gui) then
+			GuiService.SelectedObject = nil
+			return Enum.ContextActionResult.Sink
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.ContextActionPriority.Medium.Value, Enum.KeyCode.ButtonB)
+end
+
 local function refreshVisible()
 	local visible = SessionStates.IsAtRisk(player:GetAttribute("SessionState"))
 	gui.Enabled = visible
 	bindHotbar(visible)
+	bindRelease(visible)
 	-- Re-places (or resets) the shared banner column for the new state.
 	applyTop()
 	HudMode.SetVisible(visible)

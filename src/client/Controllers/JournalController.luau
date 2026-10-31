@@ -10,7 +10,6 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local JournalModel = require(ReplicatedStorage.Shared.UI.JournalModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -195,7 +194,7 @@ function JournalController.Open(tab: string?)
 		window:SelectTab(tab)
 	end
 	if not window.screen:IsOpen() then
-		window.screen:Open(UserInputService.GamepadEnabled)
+		window.screen:Open(Kit.Input.IsGamepad())
 	end
 end
 

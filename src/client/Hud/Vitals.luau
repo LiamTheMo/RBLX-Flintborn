@@ -16,9 +16,10 @@ local Vitals = {}
 Vitals.__index = Vitals
 
 function Vitals.new(parent: Instance, layout)
-	local cfg = layout.vitals
+	local cfg = Layout.Section(layout, "vitals")
 	local count = #cfg.rows
-	local self = setmetatable({ rows = {}, low = cfg.low, statusCfg = layout.status, chips = {} }, Vitals)
+	local statusCfg = Layout.Section(layout, "status")
+	local self = setmetatable({ rows = {}, low = cfg.low, statusCfg = statusCfg, chips = {} }, Vitals)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Vitals"
 	self.root.BackgroundTransparency = 1
@@ -49,7 +50,6 @@ function Vitals.new(parent: Instance, layout)
 	end
 
 	-- Status plaques, right-aligned under the bars.
-	local statusCfg = layout.status
 	self.status = Instance.new("Frame")
 	self.status.Name = "SurvivalStatus"
 	self.status.BackgroundTransparency = 1

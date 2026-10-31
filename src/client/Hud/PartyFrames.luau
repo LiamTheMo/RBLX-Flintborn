@@ -1,8 +1,10 @@
 -- Top-left tribe frames: the lobby party panel's card (Kit.Panel "card" with a
 -- "TRIBE n" section header) listing up to the layout's row count of tribe-mates
 -- on this server, each a compact Kit.PlayerRow (headshot, name) with a small
--- Kit health bar under the name. Hidden while no tribe-mate is here. Display
--- only; HudController feeds the members.
+-- Kit health bar under the name. Long names shrink a little on bigger screens;
+-- on phones (already at the 9 px floor) they keep their size and end in "…".
+-- Hidden while no tribe-mate is here. Display only; HudController feeds the
+-- members. On phones the panel sits at the bottom left and grows upwards.
 
 local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
@@ -11,8 +13,8 @@ local PartyFrames = {}
 PartyFrames.__index = PartyFrames
 
 function PartyFrames.new(parent: Instance, layout)
-	local cfg = layout.party
-	local self = setmetatable({ cfg = cfg, rows = {}, shown = 0 }, PartyFrames)
+	local cfg = Layout.Section(layout, "party")
+	local self = setmetatable({ cfg = cfg, rows = {}, shown = 0, shrink = not Layout.IsPhone() }, PartyFrames)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Party"
 	self.root.BackgroundTransparency = 1
@@ -92,6 +94,7 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 				rect = { 0, 0, cfg.header[3], cfg.rowHeight },
 				userId = member.userId,
 				compact = true,
+				shrinkName = self.shrink,
 				portraitSize = cfg.portrait,
 				rule = if index < count then "hairline" else false,
 				zIndex = 8,
