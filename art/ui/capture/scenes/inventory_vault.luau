@@ -3,12 +3,6 @@
 --   1 the Vault tab with a material chosen: the amount stepper and TAKE
 --   2 a full vault: "More Space" links to vault upgrades; an item chosen
 --   3 an empty backpack and vault: empty slots, empty-section text and the hint
--- Capture harness workaround: the injected text widths are keyed "Font.X" while
--- Enum items now print as "Enum.Font.X", so measured labels fell back to
--- estimates (reported to the Kit builder; harmless once that is fixed).
-for key, widths in table.clone(__textWidths or {}) do
-	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
-end
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 workspace:SetAttribute("FlintbornPlaceRole", "Lobby")

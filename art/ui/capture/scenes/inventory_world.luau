@@ -3,12 +3,6 @@
 -- slot, WEAR armour, the Equipped tab (hotbar keys, armour), TAKE OFF, USE,
 -- DROP, search and close. Remotes are mocked; the server's snapshots are pushed
 -- through InventoryChanged as in game. The page is the Equipped tab.
--- Capture harness workaround: the injected text widths are keyed "Font.X" while
--- Enum items now print as "Enum.Font.X", so measured labels fell back to
--- estimates (reported to the Kit builder; harmless once that is fixed).
-for key, widths in table.clone(__textWidths or {}) do
-	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
-end
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 workspace:SetAttribute("FlintbornPlaceRole", "World")

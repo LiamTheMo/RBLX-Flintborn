@@ -2,12 +2,6 @@
 -- built by Hud/Screens/InventoryWindow with sample data, placed where the
 -- mockup has it over the lobby HUD mockup. Compare with:
 --   python3 art/ui/capture/capture.py inventory_backpack --compare art/reference/ui/lobby/02_inventory.png
--- Capture harness workaround: the injected text widths are keyed "Font.X" while
--- Enum items now print as "Enum.Font.X", so measured labels fell back to
--- estimates (reported to the Kit builder; harmless once that is fixed).
-for key, widths in table.clone(__textWidths or {}) do
-	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
-end
 local Players = game:GetService("Players")
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local ItemInfo = require(game:GetService("ReplicatedStorage").Shared.Items.ItemInfo)

@@ -229,8 +229,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		label = "Reset",
 		variant = "secondary",
 		icon = "ink:refresh",
-		iconSize = 28,
-		iconGap = 17,
+		iconSize = 30,
+		iconGap = 14,
 		-- Width-matched to the mockup's RESET (65 px; Merriweather Bold is wider).
 		textSize = 20.5,
 		zIndex = 8,

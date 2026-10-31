@@ -70,13 +70,16 @@ local function panel(parent: Instance, name: string, r: { number }): Frame
 	return inner.base.visual
 end
 
--- Row heights (M04): the leader row from the heading rule to the first row
--- rule, the empty slots' 52.4 px pitch, invite rows on 66 px and the readied
--- row of 64 px.
-PartyWindow.LEADER_ROW = 74
+-- Rows (M04). A framed row is a slot of `h` in its list holding a PlayerRow at
+-- `inner` ({x, y, w, h}; its name and level lines sit where the mockup's do)
+-- and the hairline `rule` ({x, y, w}) the mockup draws under it. The empty
+-- slots keep their 52.4 px pitch as plain PlayerRows.
 PartyWindow.ROW = 52.4
-PartyWindow.INVITE_ROW = 66
-PartyWindow.READY_ROW = 64
+PartyWindow.FRAMES = {
+	leader = { h = 74, inner = { 0, 6, 332, 59 }, rule = { 0, 71, 328 } },
+	invite = { h = 66, inner = { 0, 8, 337, 51 }, rule = { 0, 65, 334 } },
+	ready = { h = 64, inner = { 0, 0, 295, 64 }, rule = { 0, 62, 289 } },
+}
 PartyWindow.LIST_W = { party = 328, invite = 337, ready = 289 }
 
 local Z = 6
@@ -156,7 +159,7 @@ function PartyWindow.new(props: Props)
 	local pv = panel(v, "YourParty", M.party)
 	self.partyHeader = header(pv, 360, "Your Party", { "ink:people", 19, 18, 36, 26 }, 69, { 16, 52, 329 }, "1/8")
 	-- 7 rows show (the leader row and six at the mockup pitch); the 8th scrolls.
-	self.memberList = list(pv, "Members", { 16, 55, PartyWindow.LIST_W.party, 391 }, 0)
+	self.memberList = list(pv, "Members", { 16, 57, PartyWindow.LIST_W.party, 389 }, 0)
 
 	-- Invite Players ------------------------------------------------------------------
 	local iv = panel(v, "InvitePlayers", M.invite)
@@ -173,7 +176,7 @@ function PartyWindow.new(props: Props)
 		end,
 	})
 	Kit.Divider.new(iv, { name = "ListRule", rect = { 16, 121, 337, 2 }, variant = "hairline", zIndex = Z + 1 })
-	self.inviteListRect = { 16, 120, PartyWindow.LIST_W.invite, 325 }
+	self.inviteListRect = { 18, 120, PartyWindow.LIST_W.invite, 325 }
 	self.inviteList = list(iv, "Players", self.inviteListRect, 0)
 	-- Roblox friends who are not in this server (SocialService), shown only
 	-- where the platform allows game invites.
@@ -302,34 +305,73 @@ function PartyWindow:_add(name: string, component)
 	return component
 end
 
+-- A framed row (PartyWindow.FRAMES[kind]) added to list `listName`; returns the
+-- holder, whose `.row` is the PlayerRow.
+function PartyWindow:_framed(listName: string, content: Instance, kind: string, order: number, rowProps, w: number?)
+	local frame = PartyWindow.FRAMES[kind]
+	local width = w or frame.inner[3]
+	local holder = self:_add(
+		listName,
+		Kit.Panel.new(content, {
+			name = "Row" .. order,
+			size = { PartyWindow.LIST_W[if kind == "leader" then "party" else kind], frame.h },
+			layoutOrder = order,
+			variant = "plain",
+			pad = 0,
+			zIndex = Z + 2,
+		})
+	)
+	local props = table.clone(rowProps)
+	props.rect = { frame.inner[1], frame.inner[2], width, frame.inner[4] }
+	props.rule = false
+	props.zIndex = Z + 2
+	local row = Kit.PlayerRow.new(holder.base.visual, props)
+	local rule = Kit.Divider.new(holder.base.visual, {
+		name = "Rule",
+		rect = { frame.rule[1], frame.rule[2], frame.rule[3], 2 },
+		variant = "hairline",
+		zIndex = Z + 2,
+	})
+	holder.row = row
+	holder.props = row.props
+	holder.action = row.action
+	holder.base.maid:Give(function()
+		row:Destroy()
+		rule:Destroy()
+	end)
+	return holder
+end
+
 function PartyWindow:_members(data)
 	self:_clear("members")
 	local content = self.memberList:Content()
 	local height = 0
 	for i, member in data.members do
-		local h = if i == 1 then PartyWindow.LEADER_ROW else PartyWindow.ROW
-		self:_add(
-			"members",
-			Kit.PlayerRow.new(content, {
-				size = { PartyWindow.LIST_W.party, h },
-				layoutOrder = i,
-				userId = member.userId,
-				name = member.name,
-				level = member.level,
-				leader = member.leader,
-				badge = if member.leader then "leader" elseif member.ready then "ready" else "notReady",
-				portraitSize = if i == 1 then 56 else nil,
-				nameX = 75,
-				nameSize = 17,
-				levelSize = 15,
-				crownSize = 26,
-				zIndex = Z + 2,
-			})
-		)
-		height += h
+		local rowProps = {
+			userId = member.userId,
+			name = member.name,
+			level = member.level,
+			leader = member.leader,
+			badge = if member.leader then "leader" elseif member.ready then "ready" else "notReady",
+			nameX = 75,
+			nameSize = 17,
+			levelSize = 15,
+			crownSize = 26,
+		}
+		if i == 1 then
+			rowProps.portraitSize = 56
+			self:_framed("members", content, "leader", i, rowProps)
+			height += PartyWindow.FRAMES.leader.h
+		else
+			rowProps.size = { PartyWindow.LIST_W.party, PartyWindow.ROW }
+			rowProps.layoutOrder = i
+			rowProps.zIndex = Z + 2
+			self:_add("members", Kit.PlayerRow.new(content, rowProps))
+			height += PartyWindow.ROW
+		end
 	end
 	for i = #data.members + 1, data.maxSize do
-		local h = if i == 1 then PartyWindow.LEADER_ROW else PartyWindow.ROW
+		local h = PartyWindow.ROW
 		self:_add(
 			"members",
 			Kit.PlayerRow.new(content, {
