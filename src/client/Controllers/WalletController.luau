@@ -89,7 +89,7 @@ local function drawShop(view)
 		for _, entry in byCategory[category] do
 			window:Row({
 				key = entry.id,
-				title = entry.name .. (if entry.quantity then (" ×" .. entry.quantity) else ""),
+				title = entry.name .. (if (entry.quantity or 1) > 1 then (" ×" .. entry.quantity) else ""),
 				detail = entry.note,
 				icon = entry.catalogId,
 				glyph = if entry.catalogId then nil elseif category == "Titles" then "crown" else "market",
@@ -104,7 +104,8 @@ local function drawShop(view)
 							key = "Buy",
 							enabled = coins >= entry.price,
 							onPress = function()
-								local what = entry.name .. (if entry.quantity then (" ×" .. entry.quantity) else "")
+								local what = entry.name
+									.. (if (entry.quantity or 1) > 1 then (" ×" .. entry.quantity) else "")
 								window:Confirm(
 									("Buy %s for %s Coins? It goes to your lobby backpack."):format(
 										what,
