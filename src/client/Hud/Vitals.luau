@@ -1,5 +1,5 @@
--- Vitals: Health, Stamina and Food as the kit's stat bars (a framed icon tile,
--- then the bar with the value centred in it), stacked at the top right,
+-- Vitals: Health, Stamina and Food as the kit's stat bars (one paper plate with
+-- the icon, then the track with the value centred in it), stacked at the top right,
 -- and a row of status plaques under them for the medicine lock, food healing
 -- and hunger slow. A bar at or under the layout's `low` share shows a warning
 -- mark over its icon tile and pulses the icon, so a low state never rests on

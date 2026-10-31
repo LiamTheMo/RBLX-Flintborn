@@ -767,9 +767,10 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
 
 ## 13. Stat bar
 
-`Bar` frame `"stat"` is now built from separate pieces: a framed icon tile
-(`bar.statTile`, `lk_tile_paper`, sheets 08 / 20) as wide as the bar is tall,
-a 4 px gap, then the plain paper bar frame (`bar.frame`) with its fill. The
-value text sits in the bar, centred over the fill and the empty well, in cream
-with a 2 px ink outline, at 0.6 of the well's height (`textSize` overrides).
-The baked value plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
+`Bar` frame `"stat"` is one paper plate across the whole bar (`bar.statPlate`,
+the 9-sliced `lk_bar_frame_plain`; sheets 08 / 18 without the value plaque).
+The icon sits on it at the left (0.66 of the bar's height), then the dark track
+(`bar.track`) with the fill runs to the right edge, inset 0.22 of the height.
+The value text is centred in the track, over the fill and the empty part, in
+cream with a 2 px ink outline (`textSize` overrides its size). The baked value
+plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.

@@ -58,7 +58,7 @@ local USED = {
 	"bar.frame",
 	"bar.frameThin",
 	"bar.stat",
-	"bar.statTile",
+	"bar.statPlate",
 	"checkbox.off",
 	"checkbox.on",
 	"check.tileOff",
