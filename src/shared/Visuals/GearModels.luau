@@ -101,25 +101,9 @@ local function spear(look)
 		parts = {
 			shaft(-1.5, 4.7, 0.28, HANDLE, "Wood"),
 			Part("Cylinder", { 0.3, 0.36, 0.36 }, { 0, 4.55, 0 }, WRAP, "Fabric", UPRIGHT, { name = "Binding" }),
-			Part(
-				"Block",
-				{ 0.14, 1.1, 0.5 },
-				{ 0, 5.15, 0 },
-				look.color,
-				look.material,
-				nil,
-				{ name = "Head" }
-			),
+			Part("Block", { 0.14, 1.1, 0.5 }, { 0, 5.15, 0 }, look.color, look.material, nil, { name = "Head" }),
 			tip(5.7, 0.14, 0.5, look, "Tip"),
-			Part(
-				"Block",
-				{ 0.2, 0.3, 0.3 },
-				{ 0, -1.5, 0 },
-				look.trim,
-				look.material,
-				nil,
-				{ name = "Butt" }
-			),
+			Part("Block", { 0.2, 0.3, 0.3 }, { 0, -1.5, 0 }, look.trim, look.material, nil, { name = "Butt" }),
 		},
 	}
 end
@@ -214,8 +198,24 @@ local function bow(look)
 				name = "LimbLower",
 			}),
 			Part("Block", { 0.04, 3.7, 0.04 }, { 0, 0, 0.38 }, STRING, "Fabric", nil, { name = "String" }),
-			Part("Ball", { 0.28, 0.28, 0.28 }, { 0, 1.95, 0.38 }, look.trim, look.material, nil, { name = "NockUpper" }),
-			Part("Ball", { 0.28, 0.28, 0.28 }, { 0, -1.95, 0.38 }, look.trim, look.material, nil, { name = "NockLower" }),
+			Part(
+				"Ball",
+				{ 0.28, 0.28, 0.28 },
+				{ 0, 1.95, 0.38 },
+				look.trim,
+				look.material,
+				nil,
+				{ name = "NockUpper" }
+			),
+			Part(
+				"Ball",
+				{ 0.28, 0.28, 0.28 },
+				{ 0, -1.95, 0.38 },
+				look.trim,
+				look.material,
+				nil,
+				{ name = "NockLower" }
+			),
 		},
 	}
 end
@@ -411,7 +411,15 @@ local function chestplate(tierId: string?)
 		for index, y in { 0.55, 0.05 } do
 			table.insert(
 				parts,
-				Part("Block", { 1.7, 0.16, 0.12 }, { 0, y, -0.58 }, look.trim, look.material, nil, { name = "Rib" .. index })
+				Part(
+					"Block",
+					{ 1.7, 0.16, 0.12 },
+					{ 0, y, -0.58 },
+					look.trim,
+					look.material,
+					nil,
+					{ name = "Rib" .. index }
+				)
 			)
 		end
 	else
@@ -428,8 +436,24 @@ local function shoulder(tierId: string?, side: number)
 	local look = armorStyle(tierId)
 	return {
 		parts = {
-			Part("Block", { 1.2, 0.45, 1.2 }, { side * 0.08, 0.72, 0 }, look.color, look.material, nil, { name = "Pad" }),
-			Part("Block", { 1.28, 0.12, 1.28 }, { side * 0.08, 0.48, 0 }, look.trim, look.material, nil, { name = "Trim" }),
+			Part(
+				"Block",
+				{ 1.2, 0.45, 1.2 },
+				{ side * 0.08, 0.72, 0 },
+				look.color,
+				look.material,
+				nil,
+				{ name = "Pad" }
+			),
+			Part(
+				"Block",
+				{ 1.28, 0.12, 1.28 },
+				{ side * 0.08, 0.48, 0 },
+				look.trim,
+				look.material,
+				nil,
+				{ name = "Trim" }
+			),
 		},
 	}
 end
@@ -487,66 +511,99 @@ end
 -- Dropped models are scaled to fit the 1.4 stud pickup box and rest on its floor.
 local DROP_SCALE = 0.7
 local DROP_FLOOR = -0.7
+-- Long gear (a spear) is shrunk further so it stays within a few studs on the ground.
+local DROP_MAX_LENGTH = 3.2
 
--- `held` lying on its side: +Y (the business end) points along -Z, i.e. the whole
--- recipe turned by Rx(-90). Only X-axis rotations and the upright Cylinder occur in
--- held recipes, so the composed rotation stays a single Euler triple.
-local function layFlat(held)
-	local parts = {}
-	local lowest = math.huge
-	for _, spec in held.parts do
-		local size = { spec.size[1] * DROP_SCALE, spec.size[2] * DROP_SCALE, spec.size[3] * DROP_SCALE }
-		local pos = { spec.pos[1] * DROP_SCALE, spec.pos[3] * DROP_SCALE, -spec.pos[2] * DROP_SCALE }
-		local rot
-		local source = spec.rot
-		if source == nil then
-			rot = { -90, 0, 0 }
-		elseif source[2] == 0 and source[3] == 0 then
-			rot = { source[1] - 90, 0, 0 }
-		else
-			-- The upright Cylinder: its axis Y becomes Z.
-			rot = { 0, 90, 0 }
-		end
-		local copy = table.clone(spec)
-		copy.size = size
-		copy.pos = pos
-		copy.rot = rot
-		-- Conservative resting height: the part's largest half-extent below its centre.
-		local reach = math.max(size[1], size[2], size[3]) / 2
-		lowest = math.min(lowest, pos[2] - math.min(reach, size[3] / 2 + 0.1))
-		table.insert(parts, copy)
+-- Extent of a part in recipe axes, honouring the few rotations recipes here use: none,
+-- X-axis turns, an upright Cylinder ({0, 0, 90}), and for Drop a quarter turn about Z
+-- followed by a turn about Y ({0, b, -90}).
+local function halfExtents(spec): (number, number, number)
+	local sx, sy, sz = spec.size[1] / 2, spec.size[2] / 2, spec.size[3] / 2
+	local rot = spec.rot
+	if rot == nil then
+		return sx, sy, sz
+	elseif rot[2] == 0 and rot[3] == 0 then
+		local c, s = math.abs(math.cos(math.rad(rot[1]))), math.abs(math.sin(math.rad(rot[1])))
+		return sx, c * sy + s * sz, s * sy + c * sz
+	elseif rot[1] == 0 and rot[2] == 0 and rot[3] == 90 then
+		return sy, sx, sz
+	elseif rot[1] == 0 and rot[3] == -90 then
+		-- Rz(-90) swaps x and y; Ry(b) then mixes x and z.
+		local c, s = math.abs(math.cos(math.rad(rot[2]))), math.abs(math.sin(math.rad(rot[2])))
+		return c * sy + s * sz, sx, s * sy + c * sz
 	end
-	local lift = DROP_FLOOR - lowest
-	local nearest, farthest = math.huge, -math.huge
-	for _, spec in parts do
-		nearest = math.min(nearest, spec.pos[3])
-		farthest = math.max(farthest, spec.pos[3])
-	end
-	local centre = (nearest + farthest) / 2
-	for _, spec in parts do
-		spec.pos = { spec.pos[1], spec.pos[2] + lift, spec.pos[3] - centre }
-	end
-	return { parts = parts }
+	local reach = math.sqrt(sx * sx + sy * sy + sz * sz)
+	return reach, reach, reach
 end
 
--- Centres `parts` (an armor recipe of one body part) and shrinks it to fit the box.
-local function shrink(recipe)
+-- The recipe's true axis-aligned extent ({min}, {max}), rotations included (Recipe.Bounds
+-- ignores them).
+function GearModels.Extent(recipe): ({ number }, { number })
+	local low = { math.huge, math.huge, math.huge }
+	local high = { -math.huge, -math.huge, -math.huge }
+	for _, spec in recipe.parts do
+		local half = { halfExtents(spec) }
+		for axis = 1, 3 do
+			low[axis] = math.min(low[axis], spec.pos[axis] - half[axis])
+			high[axis] = math.max(high[axis], spec.pos[axis] + half[axis])
+		end
+	end
+	return low, high
+end
+
+-- Moves every part of `recipe` by `shift`.
+local function moved(recipe, shift: { number })
+	for _, spec in recipe.parts do
+		spec.pos = { spec.pos[1] + shift[1], spec.pos[2] + shift[2], spec.pos[3] + shift[3] }
+	end
+	return recipe
+end
+
+-- `held` lying on its side: +Y (the business end) points along +X, the whole recipe
+-- turned by Rz(-90), shrunk, centred over the box and resting on its floor, so blades
+-- lie flat and a pickaxe's bar stays horizontal. Held recipes only use X-axis
+-- rotations and the upright Cylinder, and Rz(-90) * Rx(a) is the single Euler triple
+-- {0, -a, -90}, so the composed rotation stays one CFrame.Angles.
+local function layFlat(held)
 	local parts = {}
-	local low, high = Recipe.Bounds(recipe)
-	local centre = { (low[1] + high[1]) / 2, (low[2] + high[2]) / 2, (low[3] + high[3]) / 2 }
+	local heldLow, heldHigh = GearModels.Extent(held)
+	local scale = math.min(DROP_SCALE, DROP_MAX_LENGTH / (heldHigh[2] - heldLow[2]))
+	for _, spec in held.parts do
+		local copy = table.clone(spec)
+		copy.size = { spec.size[1] * scale, spec.size[2] * scale, spec.size[3] * scale }
+		copy.pos = { spec.pos[2] * scale, -spec.pos[1] * scale, spec.pos[3] * scale }
+		local source = spec.rot
+		if source == nil then
+			copy.rot = { 0, 0, -90 }
+		elseif source[2] == 0 and source[3] == 0 then
+			copy.rot = { 0, -source[1], -90 }
+		else
+			-- The upright Cylinder: its axis Y becomes X, which is where a Cylinder starts.
+			copy.rot = nil
+		end
+		table.insert(parts, copy)
+	end
+	local recipe = { parts = parts }
+	local low, high = GearModels.Extent(recipe)
+	return moved(recipe, { -(low[1] + high[1]) / 2, DROP_FLOOR - low[2], -(low[3] + high[3]) / 2 })
+end
+
+-- Shrinks an upright recipe (an armor piece, a siege item) to fit the box and sets it
+-- on the floor.
+local function shrink(recipe)
+	local low, high = GearModels.Extent(recipe)
 	local biggest = math.max(high[1] - low[1], high[2] - low[2], high[3] - low[3])
 	local scale = math.min(1, 1.3 / biggest)
+	local parts = {}
 	for _, spec in recipe.parts do
 		local copy = table.clone(spec)
 		copy.size = { spec.size[1] * scale, spec.size[2] * scale, spec.size[3] * scale }
-		copy.pos = {
-			(spec.pos[1] - centre[1]) * scale,
-			(spec.pos[2] - centre[2]) * scale + (DROP_FLOOR + (high[2] - low[2]) * scale / 2),
-			(spec.pos[3] - centre[3]) * scale,
-		}
+		copy.pos = { spec.pos[1] * scale, spec.pos[2] * scale, spec.pos[3] * scale }
 		table.insert(parts, copy)
 	end
-	return { parts = parts }
+	local scaled = { parts = parts }
+	local newLow, newHigh = GearModels.Extent(scaled)
+	return moved(scaled, { -(newLow[1] + newHigh[1]) / 2, DROP_FLOOR - newLow[2], -(newLow[3] + newHigh[3]) / 2 })
 end
 
 local dropCache = {}
