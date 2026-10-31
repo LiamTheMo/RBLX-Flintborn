@@ -3,9 +3,11 @@
 -- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, which only a solo
 -- player or the party leader can press (ARCHITECTURE §4.5, D24); other members
 -- see it disabled. There is no server picker (D7). Built only from Kit
--- components with the Inventory window's size and chrome (D25: portal icon,
+-- components with the Inventory window's size and chrome (D25: header icon,
 -- title, ink underline and close button as in InventoryWindow, the map in an
--- inset panel, section headings instead of plaques), in window design px.
+-- inset panel, section headings instead of plaques), in window design px. The
+-- owner's Play rune art (sheet 21, D26) is the header icon and the PLAY
+-- button's crystal glyph, and two rune pillars stand at the button's ends.
 --
 -- Display only: PlayController feeds it through the setters and reacts to the
 -- callbacks (onPlay, onClose).
@@ -37,7 +39,7 @@ PlayWindow.SIZE = { 1187, 650 }
 -- Inventory detail card's 109..629).
 local RIGHT_X, RIGHT_W = 575, 590
 local RECT = {
-	-- InventoryWindow's header: portal icon, title, underline, close button.
+	-- InventoryWindow's header: the rune play icon, title, underline, close button.
 	icon = { 40, 15, 71, 77 },
 	titleX = 138,
 	rule = { 113, 78, 995, 16 },
@@ -65,10 +67,21 @@ local RECT = {
 	more = { RIGHT_X + RIGHT_W - 262, 417, 260, 26 },
 	slotY = 458,
 	slotSize = { 71, 77 },
-	play = { RIGHT_X + RIGHT_W - 360, 556, 360, 72 },
-	-- The play glyph and its gap to the label.
+	-- The PLAY button between its two rune pillars (D26). The pillars
+	-- (lk_pillar_rune_*, 88 x 160 stored) are about 1.6x the button's height
+	-- and overlap each end by 17 px, like posts holding a banner. They stand
+	-- under the loadout slots (bottom 535, 538 with a selected slot's glow),
+	-- end inside the window's paper margin (637; the rail starts at about
+	-- 642) and keep 5 px inside the right column (1165), clear of the frame's
+	-- lower right clasp and corner. The button keeps its own rect as its hit
+	-- area; it sits low enough that its touch pad (44 screen px at the
+	-- 844 x 390 phone's 0.51 window scale) does not reach the slots' pads.
+	play = { 826, 562, 298, 60 },
+	pillarLeft = { 790, 541, 53, 96 },
+	pillarRight = { 1107, 541, 53, 96 },
+	-- The crystal glyph and its gap to the label.
 	playIcon = 40,
-	playGap = 14,
+	playGap = 12,
 }
 -- Detail rows: centre y of each row, the icon / label / value columns, rules.
 local DETAIL = {
@@ -138,11 +151,12 @@ function PlayWindow.new(props: Props)
 		onClose = props.onClose,
 	})
 	self.screen = screen
-	-- The same header as InventoryWindow (D25): the Play tile's portal icon,
-	-- the title, the plain ink underline and the close button in its corner.
+	-- The same header as InventoryWindow (D25): the Play tile's rune icon
+	-- (D26), the title, the plain ink underline and the close button in its
+	-- corner.
 	local window = Kit.Window.new(screen, {
 		title = "Play",
-		icon = "portal",
+		icon = "icon.playRune",
 		clasps = "right",
 		claspYs = { 0.18, 0.9 },
 		ruleRect = RECT.rule,
@@ -219,7 +233,8 @@ function PlayWindow.new(props: Props)
 		name = "Play",
 		rect = RECT.play,
 		label = "Play",
-		icon = "play",
+		-- The crystal arrow (D26); the white play glyph until it is uploaded.
+		icon = "mark.playRune",
 		-- The primary leather button, as the other menus' main actions.
 		variant = "primary",
 		sizeClass = "l",
@@ -233,6 +248,16 @@ function PlayWindow.new(props: Props)
 			end
 		end,
 	})
+	-- The rune pillars stand in front of the button's ends (decoration only:
+	-- not interactive, so presses on them reach nothing and the button keeps
+	-- its own hit area). They draw nothing until their art is loaded.
+	self.pillars = {
+		Kit.Picture.new(v, { name = "PillarLeft", rect = RECT.pillarLeft, role = "deco.pillarLeft", zIndex = z + 3 }),
+		Kit.Picture.new(
+			v,
+			{ name = "PillarRight", rect = RECT.pillarRight, role = "deco.pillarRight", zIndex = z + 3 }
+		),
+	}
 	local sp = RECT.statusPlaque
 	self.statusPlaque = Kit.Panel.new(v, {
 		name = "StatusPlaque",
@@ -525,7 +550,16 @@ end
 -- the leader starts the run; the status line says so).
 function PlayWindow:SetMode(mode: string)
 	self.mode = mode
-	self.play:SetEnabled(self.enabled and mode ~= "member")
+	self:_syncPlay()
+end
+
+-- PLAY's enabled state; its pillars dim with it.
+function PlayWindow:_syncPlay()
+	local enabled = self.enabled and self.mode ~= "member"
+	self.play:SetEnabled(enabled)
+	for _, pillar in self.pillars do
+		pillar:SetState(if enabled then "normal" else "disabled")
+	end
 end
 
 -- The big button's busy state (a request in flight).
@@ -535,7 +569,7 @@ end
 
 function PlayWindow:SetEnabled(enabled: boolean)
 	self.enabled = enabled
-	self.play:SetEnabled(enabled and self.mode ~= "member")
+	self:_syncPlay()
 end
 
 -- The status line under the map (deploy progress, failures, maintenance, the
@@ -580,6 +614,9 @@ function PlayWindow:Destroy()
 		slot:Destroy()
 	end
 	self.play:Destroy()
+	for _, pillar in self.pillars do
+		pillar:Destroy()
+	end
 	self.close:Destroy()
 	self.partyList:Destroy()
 	self.window:Destroy()

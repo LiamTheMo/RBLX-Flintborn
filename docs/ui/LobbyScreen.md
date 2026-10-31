@@ -12,9 +12,10 @@ sheets and an Enter button with a server dropdown. Neither exists in the new UI.
 
 ## Overview
 
-The lobby place's always-on, non-modal HUD. Top left: the player card (portrait,
-name, level, XP bar, leaf emblem). Top right: Coins pill, Gems pill, settings
-button. Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
+The lobby place's always-on, non-modal HUD. Top left in the mockup: the player
+card (portrait, name, level, XP bar, leaf emblem); **the game leaves it out**
+(owner decision: each Party panel row shows the member's level and XP bar
+instead). Top right: Coins pill, Gems pill, settings button. Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
 the Party panel (title with count, member rows, empty-slot rows, scrollbar).
 Bottom centre: the level/XP bar and the six-slot hotbar.
 
@@ -114,7 +115,7 @@ y 448.5 (screen centre 470.5).
 | Element | Bounds | Icon (approx. bounds, ±4) | Opens | Kit part (tile / icon) |
 |---|---|---|---|---|
 | Tile.Inventory | 68,312,88,84 | backpack 84,326,55,61 | Inventory window | 07 tile (771,239,203,196) / 06 backpack (47,41,339,342) |
-| Tile.Play | 170,312,88,84 | stone portal with orange play triangle 182,322,64,68 | Play window | 07 tile (1011,239,205,196) / 06 portal (438,48,405,324) |
+| Tile.Play | 170,312,88,84 | stone portal with orange play triangle 182,322,64,68 (the game draws the sheet-21 crystal play arrow instead, D26) | Play window | 07 tile (1011,239,205,196); icon `lk_icon_play_rune` (role `icon.playRune`, 21 (559,317,408,536)), the 06 portal (438,48,405,324) until `atlas_lk_play` is uploaded |
 | Tile.Quests | 68,406,88,84 | rolled scroll 80,420,61,58 | Quest Journal | 07 tile (1253,239,204,196) / 06 scroll (872,70,333,295) |
 | Tile.Shop | 170,406,88,84 | striped market stall 182,420,64,59 | Shop | 07 tile (771,462,203,188) / 06 market (1276,59,345,304) |
 | Tile.Forge | 68,500,88,84 | anvil and hammer 77,512,68,62 | Forge | 07 tile (1009,462,205,189) / 06 anvil (62,399,340,296) |
@@ -257,11 +258,11 @@ components; `tsize.py`: Merriweather render matching). Full output in
 
 | Asset | Source (sheet: x,y,w,h in sheet px) | Shown at (design px) | Notes |
 |---|---|---|---|
-| Player card | 07: 95,33,771,178 | 359 × 81 | portrait window must be cut out for the live headshot |
+| Player card | 07: 95,33,771,178 | 359 × 81 | not drawn in the game (owner decision); sliced as `lk_player_card` |
 | Pill frame | 07: 915,85,245,105 (coins) | 116 × 46 / 101 × 46 | 9-slice; same frame for Gems |
 | Square HUD button | 07: 1458,82,118,108 | 52 × 46 | settings |
 | Menu tile frame | 07 tiles (771..1457 × 239..650) or 05 slot normal | 88 × 84 | icon layered on top if the frame is shared |
-| Menu icons | 06: backpack, portal, scroll, market, anvil, trade | ≈ 55–71 px | also in 11 (row 1) |
+| Menu icons | 06: backpack, portal, scroll, market, anvil, trade; 21: the crystal play arrow for Play (D26) | ≈ 55–71 px | also in 11 (row 1) |
 | Party panel frame | 07: 153,235,549,428 | 294 × 244 | 9-slice (taller than kit) |
 | Crown | 06: 945,721,193,160 | 19 × 14 | |
 | Add-friend button | 15: 955,764,124,100 | 45 × 34 | |
@@ -289,7 +290,9 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 4. Add-friend button for non-leaders and a full party: hide, or show disabled?
    Default: disabled (kit 03 disabled look).
 5. Play tile icon. In `04`/`05` the dimmed Play tile shows a bare play triangle
-   instead of the portal. Default: keep the portal from `01` (one icon).
+   instead of the portal. **Resolved (D26):** the owner's sheet-21 crystal play
+   arrow on every screen (tile and Play window header); the portal shows only
+   until its atlas is uploaded.
 6. Should the tile of the open window stay highlighted? Default: no.
 7. XP fills in the mockup (0.74 card, 0.67 bar) do not match 450/750 (0.60).
    Default: both bars use the real fraction.
@@ -298,6 +301,14 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 
 - Owner decision: party count shows the real cap, **"1/8"**, not "1/10".
 - Owner decision: the Play tile opens the Play window.
+- Owner decision (D26): the Play tile's icon is the stone-framed crystal play
+  arrow from kit sheet 21 (`icon.playRune`), not the portal. It sits in the
+  tile at the menu icons' share (0.72 of the tile, 60 px), fitted, so it draws
+  46 × 60.
+- Owner decision: no player card (top left). The XP bar at the bottom and the
+  party rows' level and XP bars carry the progression.
+- No ready dots and no Leader tag in the Party panel (D24): the crown alone
+  marks the leader.
 - Hotbar and XP bar keep their `01_hud.png` positions under modals (q. 2 default).
 - The mockup's text has a soft dark halo from the image generator; TextLabels have
   none. No UIStroke on HUD text.

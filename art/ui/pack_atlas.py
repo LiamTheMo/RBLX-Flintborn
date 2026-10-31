@@ -151,6 +151,14 @@ GROUPS = {
         "lk_icon_star", "lk_icon_stone", "lk_icon_stone_axe", "lk_icon_stones", "lk_icon_torch", "lk_icon_tusk",
         "lk_icon_warning",
     ],
+    # The Play rune art (sheet 21, ARCHITECTURE D26): the Play tile and Play
+    # window icon, the PLAY button's crystal glyph and its two pillars. An atlas
+    # of its own, so the four uploaded lk_ atlases keep their rects and bytes;
+    # until it is uploaded the Kit draws the portal icon and the white play
+    # glyph (KitModel.ROLES `fallback`) and no pillars.
+    "atlas_lk_play": [
+        "lk_icon_play_rune", "lk_icon_play_rune_small", "lk_pillar_rune_left", "lk_pillar_rune_right",
+    ],
 }
 
 

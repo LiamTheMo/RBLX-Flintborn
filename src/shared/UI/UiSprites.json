@@ -24,6 +24,11 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_lk_play": {
+    "h": 256,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lk_window": {
     "h": 1024,
     "slice": null,
@@ -3060,6 +3065,30 @@
     "slice": null,
     "w": 116
   },
+  "lk_icon_play_rune": {
+    "atlas": "atlas_lk_play",
+    "h": 116,
+    "rect": [
+      183,
+      0,
+      89,
+      116
+    ],
+    "slice": null,
+    "w": 89
+  },
+  "lk_icon_play_rune_small": {
+    "atlas": "atlas_lk_play",
+    "h": 64,
+    "rect": [
+      276,
+      0,
+      50,
+      64
+    ],
+    "slice": null,
+    "w": 50
+  },
   "lk_icon_portal": {
     "atlas": "atlas_lk_lobby",
     "h": 94,
@@ -3432,6 +3461,30 @@
       12
     ],
     "w": 101
+  },
+  "lk_pillar_rune_left": {
+    "atlas": "atlas_lk_play",
+    "h": 160,
+    "rect": [
+      0,
+      0,
+      88,
+      160
+    ],
+    "slice": null,
+    "w": 88
+  },
+  "lk_pillar_rune_right": {
+    "atlas": "atlas_lk_play",
+    "h": 160,
+    "rect": [
+      92,
+      0,
+      87,
+      160
+    ],
+    "slice": null,
+    "w": 87
   },
   "lk_plaque_capped": {
     "h": 38,

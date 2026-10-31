@@ -1,5 +1,7 @@
 # UI architecture: the unified parchment-and-leather kit
 
+> New here? Read [STYLE_GUIDE.md](STYLE_GUIDE.md) first: the single entry point to the UI's look, tokens, components, art pipeline and QA.
+
 Every screen in the game is rebuilt from one shared kit. The seven mockups in
 [`art/reference/ui/lobby/`](../../art/reference/ui/lobby/README.md) are matched 1:1.
 Every other screen is restyled with the same components and sprites. This document is
@@ -25,14 +27,16 @@ screen edges.
 
 | Surface | Root scale | Anchoring | Notes |
 |---|---|---|---|
-| Lobby HUD (01) and world HUD | `HudModel.HudScale(screenW, screenH, 1672, 941, min 0.34, max 1.6, UiScale attr)`. On touch-only screens shorter than 500 px it is multiplied by 0.9 (as `LobbyHudController.applyScale` does today). | Root frame `Size = 1/scale` and regions placed by anchor. Player card: top-left. Currencies and settings: top-right. Tile grid: left, vertically centred (y ≈ 0.48). Party panel: right (top ≈ 258). XP bar and hotbar: bottom-centre. | Keep the top region clear of the Roblox top bar: `Kit.Scale.TopInset(gui)` (moved from `Parchment.TopInset`), never less than 52 screen px. |
+| Lobby HUD (01) and world HUD | `HudModel.HudScale(screenW, screenH, 1672, 941, min 0.34, max 1.6, UiScale attr)`. On touch-only phones and tablets (`Kit.Scale.IsSmallTouch`) it is multiplied by 0.9 and never drops below the HUD phone floor 0.5 (`Kit.Scale.Hud`). | Root frame `Size = 1/scale` and regions placed by anchor. Player card: top-left. Currencies and settings: top-right. Tile grid: left, vertically centred (y ≈ 0.48). Party panel: right (top ≈ 258). XP bar and hotbar: bottom-centre. | Keep the top region clear of the Roblox top bar: `Kit.Scale.TopInset(gui)` (moved from `Parchment.TopInset`), never less than 52 screen px. |
 | Windows (02–07 and every restyled window) | **Desktop and tablet:** `min(fitRoom, canvasFit × UiScale)`, so at 1672 × 941 a window draws exactly as large as in the mockup. **Touch-only with height < 500:** `fitRoom`, which fills the screen for readability. Clamped to 0.3–1.4. | Window centred on the screen centre (mockups centre windows at about (836, 470)). The top edge is clamped below the top inset plus an 8 px margin. | `fitRoom = min((W − 16)/w, (H − top − 16)/h)`, as in `Parchment.Screen:Fit`. `canvasFit = min(W/1672, H/941)`. |
 | Toasts, tooltips, dialogs | Same scale as windows (dialogs) or HUD (toasts, tooltips) | Toasts: top-centre below the top inset. Dialog: centred. Tooltip: beside its target. | |
 
 Approximate window sizes (outer frame, design px, from the mockups; specs give the
 exact values): Inventory ≈ 1184 × 650, Settings ≈ 1096 × 658, Party ≈ 1124 × 635,
 Play ≈ 1054 × 668, Forge ≈ 1102 × 679, Journal ≈ 1072 × 688 plus side tabs reaching
-50 px left of the frame.
+50 px left of the frame. As built (`<Screen>.SIZE`): Inventory and Play 1187 × 650
+(D25), Settings 1098 × 656, Party 1120 × 631, Forge 1102 × 680, Journal
+1172 × 688 (side tabs included), list windows 1180 × 690.
 
 Text stays readable on phones because windows fill the screen there. `Kit.Text`
 applies `Widgets.TextCap` (layout-px caps that follow parent UIScales) with a
@@ -198,7 +202,7 @@ Sheet numbers refer to `art/reference/ui/lobby/kit/NN_*.png`. "M" means the mock
 | **Divider** | `Kit.Divider.new(parent, {rect, variant="rule"\|"ornate"\|"vertical"\|"header"})` | line or ornate rule with diamond ends | — | 09, 14, 01 (column rules) |
 | **ListRow** | `Kit.ListRow.new(parent, {size, icon?, title, subtitle?, value?, chevron?, variant="row"\|"card", onPress})` | plate, icon, title, subtitle, right value, chevron | normal, hover, pressed, selected, disabled, locked | 09 (3 states), 12 (objective rows), M06 recipe cards, M07 quest rows |
 | **PlayerRow** | `Kit.PlayerRow.new(parent, {size, userId?, name?, level?, leader?, badge?, action?, empty?})`; `:Set(data)` | `Kit.Portrait`, name, "LV. n", crown, Badge, action Button; empty variant: dot + "Empty Slot" | normal, hover, selected, empty | 01, 15 (player rows, round frames), 06 (crown) |
-| **Badge** | `Kit.Badge.new(parent, {text?, variant="leader"\|"ready"\|"notReady"\|"count"\|"number"\|"dot"\|"new"})` | plaque or pill, status dot | — | 01 (status dots, plaques), 13 (dots), 05 (number and count badges); M04 Leader/Ready |
+| **Badge** | `Kit.Badge.new(parent, {text?, variant="leader"\|"ready"\|"notReady"\|"count"\|"number"\|"dot"\|"new"})` | plaque or pill, status dot | — | 01 (status dots, plaques), 13 (dots), 05 (number and count badges); M04 Leader/Ready (the party uses neither since D24) |
 | **CurrencyPill** | `Kit.CurrencyPill.new(parent, {rect, currency="coins"\|"gems", value, onPress?})`; `:SetValue(n, instant?)` | plaque, coin or gem icon, value (`HudModel.Thousands`) | normal, hover, pressed | 07, 06 |
 | **Portrait** | `Kit.Portrait.new(parent, {rect, userId, frame="square"\|"round"})` | frame and headshot. The headshot uses the content URL `rbxthumb://type=AvatarHeadShot&id=<id>&w=150&h=150` (no yield; the capture draws its placeholder head), reported to `SpriteLoader.Track` | — | 01, 15, 07 |
 | **Icon** / **ItemIcon** | `Kit.Icon.new(parent, {rect, icon=id, tint?})`; `Kit.ItemIcon.new(parent, {rect, catalogId})` | icon id → `lk_icon_*`. For items: `lk_item_<catalogId>`, then `item_<catalogId>`, else the item name in ink (the current `ItemSlot.IconFor` hook) | — | 06, 11, 16, 17; item art on 02, 10, 12, 16 |
@@ -256,7 +260,11 @@ nothing reads them.
 
 ### 3.2 Colors
 
-Sampled with PIL as box medians from the mockups and kit sheets.
+Sampled with PIL as box medians from the mockups and kit sheets. This table is
+the original plan: `src/shared/UI/KitTokens.json` holds the values in use (for
+example `veil` is `#050403` at 0.30 since D8, and the empty dot, hairline,
+rail, tone and rarity tokens were added later); STYLE_GUIDE.md §3 lists every
+token as it is now.
 
 | Token | Hex | Source |
 |---|---|---|
@@ -318,7 +326,9 @@ ships `art/ui/fonts/Merriweather-{Regular,Bold}.woff`.
 
 ### 3.4 Text roles
 
-Sizes are design px. TextSize ≈ cap height / 0.72, measured from the mockups.
+Sizes are design px. TextSize ≈ cap height / 0.72, measured from the mockups. The
+sizes in use are a little smaller (Merriweather runs wider than the mockup
+face): see `KitTokens.json` `text`, KIT.md §4 and STYLE_GUIDE.md §4.
 
 | Role | Font | Size | Color | Example (cap px) |
 |---|---|---|---|---|
@@ -376,11 +386,11 @@ place and keeps its public API.
 
 | Element | Data source |
 |---|---|
-| Player card (portrait, name, LV, mini XP) | `player.DisplayName`; `Kit.Portrait(UserId)`; `ProgressionController.View()` + `.Changed` (`ProgressionChanged`); `HudModel.XpFraction`, `HudModel.LevelText`. Press → `ProgressionController.Toggle` |
+| ~~Player card~~ | **Removed** (owner decision): the lobby HUD has no player card; each Party panel row shows the member's level and a small XP bar instead (LobbyScreen.md) |
 | Coins / Gems | attributes `Coins`, `Gems` (CurrencyService). Press → `WalletController.Open("Shop")` |
 | Settings | `SettingsController.Toggle` |
-| Tile grid, 2 × 3 | backpack → `VaultController.Open("Backpack")`; portal → `PlayController.Toggle`; scroll → `JournalController.Toggle`; market → `WalletController.Open("Shop")`; anvil → `ForgeController.Toggle`; trade → `TradeController.Toggle`. Optional Badge "dot" on scroll when a quest is claimable (one `QuestView` on join) |
-| Party panel "PARTY n/8" | `LobbyController.PartyView()` + `Changed("party")`; `PartyRules.MAX_SIZE` (8). Rows: portrait, name, crown, ready dot. Add-person button → `PartyController.Open("invite")`. Row press → `PartyController.Open()`. Incoming invites show as rows with ✓/✕ (`PartyAction` accept/decline) |
+| Tile grid, 2 × 3 | backpack → `VaultController.Open("Backpack")`; Play (the sheet-21 rune play icon, D26) → `PlayController.Toggle`; scroll → `JournalController.Toggle`; market → `WalletController.Open("Shop")`; anvil → `ForgeController.Toggle`; trade → `TradeController.Toggle`. Optional Badge "dot" on scroll when a quest is claimable (one `QuestView` on join) |
+| Party panel "PARTY n/8" | `LobbyController.PartyView()` + `Changed("party")`; `PartyRules.MAX_SIZE` (8). Rows: portrait, name, crown, level and XP bar (no ready dot, D24). Add-person button → `PartyController.Open("invite")`. Row press → `PartyController.Open()`. Incoming invites show as rows with ✓/✕ (`PartyAction` accept/decline) |
 | XP bar "LV. 12 … 450/750 XP" | progression view |
 | Hotbar 1–6 | `PlayModel.LoadoutHotbar(LobbyController.Preview())` = `InventoryRules.FromItems(items).hotbar`. This is the same packing `InventoryService` applies at run start (`LoadoutService.carriedPart`), so it shows exactly what lands in the run's hotbar. Badges read 1–6. A press opens the Inventory |
 | Status / maintenance | `Kit.Toast` (info) for `LobbyController.Status()`. A small plaque in `TopStack` while `MaintenanceNotice` is set |
@@ -431,14 +441,14 @@ card listing the receipt.
 |---|---|
 | Module | `Hud/Screens/PartyWindow.luau` (New) |
 | Controller | `Controllers/PartyController.luau` (New): `Open(section?)`, `Toggle()`, `IsOpen()` |
-| Data | `LobbyController.PartyView()` (with the §5 fields), `LobbyController.Invitable()`, each player's `Level` attribute (set by `ProgressionService.Publish`, already replicated), `LobbyController.PartyAction("invite"\|"accept"\|"decline"\|"leave"\|"ready", arg)`, `SocialService:PromptGameInvite` |
+| Data | `LobbyController.PartyView()` (with the §5 fields), `LobbyController.Invitable()`, each player's `Level` attribute (set by `ProgressionService.Publish`, already replicated), `LobbyController.PartyAction("invite"\|"accept"\|"decline"\|"leave"\|"view", arg)` (no `"ready"` since D24), `SocialService:PromptGameInvite` |
 
 | Column | Content |
 |---|---|
-| YOUR PARTY n/8 | 8 rows: members (PlayerRow with Leader badge and crown) and "Empty Slot" rows. The mockup shows 7 rows at its pitch; the spec fits 8 by tightening the pitch to about 46 or scrolling |
+| YOUR PARTY n/8 | 8 rows: members (PlayerRow with the crown; no Leader badge since D24) and "Empty Slot" rows. The mockup shows 7 rows at its pitch; the spec fits 8 by tightening the pitch to about 46 or scrolling |
 | INVITE PLAYERS | SearchBox (DisplayName or Name contains the query); Invitable list (portrait, name, LV, Invite button). The button reads "Invited" and is disabled while `party.invited` holds that player. Non-leaders see "Only the party leader can invite". An "Invitations" block lists incoming invites with Accept/Decline. Footer: "Invite Roblox friends" (secondary) |
 | PARTY DETAILS | Party Leader; Members n / 8; Join Type "Invite Only" (true: joining is only by invite); Created (relative time from `createdAt` via `workspace:GetServerTimeNow()`: "Just now", "5 min ago", "2 h ago"). **No Play Style row** |
-| READIED STATUS | One row per member with Ready / Not ready badge. Your own badge is a toggle (`PartyAction("ready", bool)`). Solo players can be Ready too |
+| ~~READIED STATUS~~ | **Removed (D24):** no Ready anywhere; Party Details takes the whole right column |
 | Footer | CLOSE (as in the mockup), plus LEAVE PARTY (secondary) when in a party of 2 or more. **No kick**: the game has no kick |
 
 ### 4.5 Play (05)
@@ -454,10 +464,10 @@ card listing the receipt.
 | Island painting | The real painted island (`pm_map_island` via `IslandMap` in a static, non-zoom mode, or `Kit.Icon`-style image) in the play-map frame. **No X mark**: spawns are random (GDD §3.1) |
 | Title "Shattered Crater" | True: it is the world's name (GDD §3) |
 | Region / Biome / Difficulty / Recommended Level 10+ | **Recommended level has no source.** Proposed honest rows (owner to confirm): Regions "Outer Rim · Inner Ring · Center Crater"; Spawn "Random, away from other players"; Mode "PvPvE extraction"; **Carrying "N items · M at risk"** (from the preview). Icons from sheet 17 |
-| YOUR PARTY | Rows: crown, portrait, name, LV n, ready dot |
+| YOUR PARTY | Rows: crown, portrait, name, LV n (no ready dot, D24) |
 | YOUR EQUIPMENT 1–6 | `PlayModel.LoadoutHotbar(preview)`, the predicted run hotbar, plus "+N more in backpack" |
-| PLAY | Leader: PLAY → `FetchPreview()`. An empty list deploys at once. Otherwise **ConfirmDialog "TAKE THESE INTO THE RUN?"** (restyled deploy check) lists every item (★ Permanent, ×qty), "Everything except ★ Permanent items can be lost in the run." and "Items in your vault always stay safe.", with ENTER / CANCEL. When the preview is nil: "COULD NOT READ YOUR BACKPACK" with ENTER ANYWAY. When not every member is ready, the dialog adds "k of n party members are ready" (advisory; see open questions). The button is busy while `IsDeploying()` |
-| (non-leader) | The big button becomes the Ready toggle (leather "READY" / parchment "NOT READY") with the caption "The party leader starts the run" (the server refuses with `OnlyLeaderDeploys`) |
+| PLAY | Leader: PLAY → `FetchPreview()`. An empty list deploys at once. Otherwise **ConfirmDialog "TAKE THESE INTO THE RUN?"** (restyled deploy check) lists every item (★ Permanent, ×qty), "Everything except ★ Permanent items can be lost in the run." and "Items in your vault always stay safe.", with ENTER / CANCEL. When the preview is nil: "COULD NOT READ YOUR BACKPACK" with ENTER ANYWAY. There is no ready line (D24). The button is busy while `IsDeploying()`. Since D25 / D26 the button is the primary leather button with the crystal glyph, between two rune pillars |
+| (non-leader) | **Superseded by D24:** PLAY shows disabled with the caption "The party leader starts the run" (the server refuses with `OnlyLeaderDeploys`); there is no Ready toggle |
 
 There is no server selection anywhere.
 
@@ -527,11 +537,16 @@ These controller functions must exist; the owner of each controller provides the
 | JournalController | `Toggle()`, `Open(tab?)` | `Open` is new |
 | ForgeController, TradeController, SettingsController, ProgressionController | `Toggle()` | existing |
 | WalletController | `Open(tab)` | existing |
-| LobbyController | `PartyView()`, `Invitable()`, `PartyAction()`, `SetReady(bool)`, `IsReady(userId)`, `Deploy()`, `IsDeploying()`, `Preview()`, `RefreshPreview()`, `FetchPreview()`, `Status()`, `Changed` | `SetReady` and `IsReady` are new |
+| LobbyController | `PartyView()`, `Invitable()`, `PartyAction()`, `Deploy()`, `IsDeploying()`, `Preview()`, `RefreshPreview()`, `FetchPreview()`, `Status()`, `Changed` | `SetReady` / `IsReady` were removed with Ready (D24) |
 
 ---
 
 ## 5. Server work
+
+**Superseded in part by D24:** the Ready rows below (Ready state, reset rules,
+action `ready`, the ready view fields, the deploy clear and
+`party_ready.spec`) were built and then removed; `createdAt` and `invited`
+remain. The table is kept as the record of the original plan.
 
 There is no new remote. Everything rides the existing guarded `PartyAction` /
 `PartyChanged` pair: `Remotes.Handle` rate bucket + `RemoteGuard` argument check +
@@ -576,6 +591,13 @@ by the asset artist). Rules:
 | `atlas_lk_items` | item icons from sheets 02, 10, 12, 16 (only where the art truly depicts that catalog item: `lk_item_<CatalogId>`), at 96 px; sheet 17 world icons for quest and Play art at 96–128 px | inventory, forge, journal, hotbar |
 | `atlas_lk_hud_world` | world-only parts: compass plaque, prompt frame, objective and event panels, boss and downed bar frames (anything not already in `atlas_lk_slots`) | run start |
 | `atlas_island` (existing) | `pm_map_island` painting, reused by Play, Journal and Map | Play, Journal, Map |
+| `atlas_lk_play` (D26) | the sheet-21 Play art: `lk_icon_play_rune`, `lk_icon_play_rune_small`, `lk_pillar_rune_left`, `lk_pillar_rune_right` (1024 × 256) | lobby join (Play tile) |
+
+As built (`art/ui/pack_atlas.py` GROUPS): `atlas_lk_lobby`, `atlas_lk_window`,
+`atlas_lk_icons` and `atlas_lk_items` (uploaded; the planned controls, slots
+and world-HUD atlases fit into the lobby and window ones), plus
+`atlas_lk_play` (D26, its own atlas so the four uploaded ones keep their bytes
+and rects).
 
 Old `atlas_lobby`, `atlas_hud`, `atlas_ui`, `atlas_pieces`, `atlas_map` and
 `atlas_window_*` stay until §9.
@@ -591,12 +613,12 @@ calls `__dump`, once per state page.
 
 | Scene | Owner | Pages |
 |---|---|---|
-| `kit_gallery.luau` | Kit builder | one page per family: buttons and icon buttons × every state; tabs; slots (all states, counts, badges, lock); bars (every fill at 0/50/100, stat frames); controls (checkbox, toggle, slider, dropdown open, search, stepper, keycaps); rows, player rows, badges, pills; toast, dialog, tooltip; window header variants; plus a fallback page (`--uploaded-only`) |
+| `kit_gallery.luau` | Kit builder | one page per family: buttons and icon buttons × every state; tabs; slots (all states, counts, badges, lock); bars (every fill at 0/50/100, stat frames); controls (checkbox, toggle, slider, dropdown open, search, stepper, keycaps); rows, player rows, badges, pills; toast, dialog, tooltip; window header variants; page 9 the sheet-21 Play art (D26); plus fallback pages (`--uploaded-only`) and `kit_gallery_failed` |
 | `lobby_hud`, `lobby_hud_phone` (844 × 390), `lobby_hud_wide` (2560 × 1080) | S1 | invites present; maintenance |
 | `inventory_backpack`, `inventory_vault`, `inventory_world`, `inventory_flow` | S2 | each category; selected item; material stepper; full vault |
 | `settings` (each tab), `settings_flow` | S3 | dirty state; capturing key |
-| `party`, `party_invites`, `party_member` (non-leader) | S4 | ready / not ready; Invited |
-| `play`, `play_deploy_check`, `play_member` | S5 | busy; nil preview |
+| `party`, `party_states`, `party_phone`, `party_flow` | S4 | Invited; member view (no Ready since D24) |
+| `play`, `play_states`, `play_phone` (844 × 390 and 2000 × 924), `play_flow` | S5 | busy; nil preview; member; deploy check |
 | `forge`, `forge_permanent`, `crafting`, `crafting_flow` | S6 | locked; short; job running |
 | `journal`, `journal_map`, `journal_flow` | S7 | claimable; claimed |
 | `world_hud`, `world_hud_phone` | W1 | low health; selected slot |
@@ -698,7 +720,7 @@ Uploaded decals stay on Roblox; that is harmless.
 1. **Settings tabs:** merge Accessibility into Graphics and Audio (4 tabs, 1:1), or a 5th tab?
 2. **Mockup-only settings** (FOV, Interaction Range, Auto Loot, Item Notifications, Language): omit (proposed), or build them as real features, as GDD §57 did for the last mockup?
 3. **Play info rows:** there is no "Recommended level" or difficulty data. Are the proposed honest rows (Regions, Spawn, Mode, Carrying) acceptable?
-4. **Ready:** advisory (proposed: the leader's Play dialog says "k of n ready"), or should the server refuse Deploy until everyone is ready?
+4. **Ready:** ~~advisory, or server-enforced?~~ Resolved by D24: there is no Ready.
 5. **Item descriptions:** add authored text to ItemCatalog (content work), or keep the derived lines?
 6. **Forge quantity:** keep hidden, or add a count to `ForgeCraft` server-side?
 7. **Journal party tab:** hidden (proposed). Is there a party-quest feature planned?
@@ -741,4 +763,5 @@ earlier section or a screen spec, this section wins.
 | D22 | Fix round 3 (server, loot, trade) | Party views go only to players whose view changed; an unchanged Ready flag or another no-op sends nothing. Body and chest takes name the entry by a stable key (`ListingKeys`: instance id, or `stack:<catalogId>`) besides its index, and the server refuses a take whose entry is gone, so a double press or a stale list never takes a different item; Take buttons ignore presses while one is in flight. Loot and chest rows show the item's art and a rarity dot from the server's `catalogId`. `ForgeSnapshot` `maxCount` also counts lobby backpack room, so the quantity stepper never offers a batch that would fail BackpackFull. A Forge batch is one Forge action for analytics, the tutorial and quests; XP and Crafting mastery scale with the count. A trade invite toast answers directly (Accept primary, Decline secondary, no ✕); pressing the card opens the same question as a dialog. |
 | D23 | Fix round 4 | The lobby HUD never takes gamepad selection by itself; a controller player enters it with an explicit lobby-only button (hint shown) and leaves with B. Items without their own art show a neutral "picture missing" placeholder (never a glyph that looks like a real item) in slots, rows and detail pictures; the name stays in tooltips and detail text. Leather buttons use two tones sampled from the mockups: the bright primary is the sprite's own colour, the darker one a token tint. Settings tabs follow one rule for all four (an icon for each, or text only for each). The client asks for its party view on start (`PartyAction("view")`, rate-limited like every party action); the server resends it even when unchanged. |
 | D24 | Party Ready removed (supersedes D3, D16, D18) | There is no Ready flag anywhere. The server has no `PartyAction("ready")`, no per-player ready state and no `ready` fields in the party view; deploys and membership changes no longer clear it. The Party window drops the Readied Status card, its toggle and the "k of n ready" tally, and Party Details takes the whole right column (mockup top y 245, bottom y 693). Member rows carry no Ready / Not Ready tags and the HUD party panel no ready dots. Only a solo player or the party leader can press Play; other members see Play disabled with "The party leader starts the run." The deploy check has no ready line. The leader is marked only by the crown next to the name: no Leader tag on any screen. |
-| D25 | Play window chrome (deviation from mockup 05) | The Play window looks like the other menus, with Inventory as the model: the same window size (1187 × 650), header (the Play tile's portal icon, "PLAY" at Inventory's title size and position, the plain ink underline), clasps and close-button corner. No raised title plaque. The map sits in an inset panel like Inventory's detail card (the real island art and crater marker). The right column opens with a section heading "SHATTERED CRATER" over a hairline (no plaque), then the detail rows with hairlines, YOUR PARTY and YOUR EQUIPMENT as standard SectionHeaders, the six slots, and the primary leather PLAY button with the play glyph at the bottom right. |
+| D25 | Play window chrome (deviation from mockup 05) | The Play window looks like the other menus, with Inventory as the model: the same window size (1187 × 650), header (the Play tile's portal icon, "PLAY" at Inventory's title size and position, the plain ink underline), clasps and close-button corner. No raised title plaque. The map sits in an inset panel like Inventory's detail card (the real island art and crater marker). The right column opens with a section heading "SHATTERED CRATER" over a hairline (no plaque), then the detail rows with hairlines, YOUR PARTY and YOUR EQUIPMENT as standard SectionHeaders, the six slots, and the primary leather PLAY button with the play glyph at the bottom right. (The header icon and the PLAY button's glyph and pillars changed with D26.) |
+| D26 | Play rune art (owner's kit sheet 21) | The owner's sheet `21_play_rune_stones.png` (two rune pillars and a stone-framed crystal play arrow) is used in full. The crystal arrow (`lk_icon_play_rune`, role `icon.playRune`) is the icon of the HUD's Play tile and of the Play window's header, replacing the portal there (the portal icon stays for other uses). On the Play window's primary PLAY button the arrow (`lk_icon_play_rune_small`, `mark.playRune`) replaces the white play glyph, and the two rune pillars (`lk_pillar_rune_left` / `_right`, `deco.pillarLeft` / `deco.pillarRight`) stand at the button's ends, about 1.6 × its height and overlapping each end by 17 px like posts holding a banner; they dim with the button when it is disabled. The button is 298 × 60 at (826, 562) and the pillars 53 × 96 at x 790 and 1107, y 541, under the loadout slots and inside the frame (PlayScreen.md). The four parts are packed in a new atlas `atlas_lk_play`, so the four uploaded `atlas_lk_*` atlases keep their bytes; until it is uploaded the Kit draws the portal icon and the white glyph (`fallback` in the roles) and no pillars (material `deco`). |

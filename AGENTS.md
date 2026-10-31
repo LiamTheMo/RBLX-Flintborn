@@ -1,5 +1,7 @@
 # Working in this repo
 
+**Game UI** (screens, the Kit, UI art): start with [`docs/ui/STYLE_GUIDE.md`](docs/ui/STYLE_GUIDE.md).
+
 ## Shell commands (Bash tool)
 - **Never run a command that reads stdin without input.** A bare `cat > file`, `read`, or a tool that waits for input blocks forever: the shell's stdin stays open, so the command hits the timeout and is killed. Write files with the Write/Edit tools or a heredoc (`cat > file <<'EOF' ... EOF`). Add `< /dev/null` to anything that might prompt.
 - **Give long commands a long timeout.** The Bash default is 120 s. Blender builds and renders often take longer: pass `timeout: 600000` (10 min), or run with `run_in_background: true` and wait for the completion notification. Don't stop a backgrounded Blender run just because it is slow; check its output file first.

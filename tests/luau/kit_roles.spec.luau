@@ -13,6 +13,7 @@ local MATERIALS = {
 	glyph = true,
 	none = true,
 	pill = true,
+	deco = true,
 }
 
 -- Roles every component draws from; a missing one would draw nothing.
@@ -105,6 +106,10 @@ local USED = {
 	"hud.leaf",
 	"panel.party",
 	"map.island",
+	"icon.playRune",
+	"mark.playRune",
+	"deco.pillarLeft",
+	"deco.pillarRight",
 }
 
 test("every role a component draws is in the table", function()
@@ -198,5 +203,22 @@ test("the sprite list is sorted and unique", function()
 	expect(#list > 60, "many sprites")
 	for i = 2, #list do
 		expect(list[i - 1] < list[i], "sorted and unique at " .. list[i])
+	end
+end)
+
+test("icon roles fall back to art the kit already has (sheet 21, D26)", function()
+	for name, role in KitModel.ROLES do
+		if role.fallback ~= nil then
+			expect(type(role.fallback) == "string" and role.fallback ~= "", name .. " fallback is an icon id")
+			expect(KitModel.ROLES[role.fallback] == nil, name .. " falls back to an icon, not another role")
+		end
+	end
+	expectEq(KitModel.ROLES["icon.playRune"].sprite, "lk_icon_play_rune", "Play tile and header icon")
+	expectEq(KitModel.ROLES["icon.playRune"].fallback, "portal", "the portal icon until the rune art is uploaded")
+	expectEq(KitModel.ROLES["mark.playRune"].fallback, "lk_glyph_play", "the white play glyph until then")
+	for _, side in { "Left", "Right" } do
+		local role = KitModel.ROLES["deco.pillar" .. side]
+		expectEq(role.material, "deco", side .. " pillar draws no stand-in")
+		expectEq(role.edge, false, side .. " pillar is placed as stored")
 	end
 end)

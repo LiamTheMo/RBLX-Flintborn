@@ -245,8 +245,8 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_pickaxe` | 12_quest_forge_parts.png (1170, 648, 1300, 768) | 135x124 | | | atlas_lk_items | Tool icon (forge recipes / detail) | |
 | `lk_icon_plank` | 10_inventory_parts.png (1040, 826, 1141, 924) | 106x102 | | | atlas_lk_items | Material icon (inventory, forge, rewards) | |
 | `lk_icon_plant_fiber` | 16_icons_status_items.png (594, 862, 831, 1090) | 116x113 | | | atlas_lk_items | Status / stat / item icon | |
-| `lk_icon_play_rune` | 21_play_rune_stones.png (559, 317, 967, 853) | 89x116 | | | | Play icon: the HUD Play tile and the Play window's header (icon.playRune) | Full colour; replaces lk_icon_portal for Play. |
-| `lk_icon_play_rune_small` | 21_play_rune_stones.png (559, 317, 967, 853) | 50x64 | | | | Crystal play glyph on the PLAY button (mark.playRune) | Full colour; replaces the white lk_glyph_play on the PLAY button. |
+| `lk_icon_play_rune` | 21_play_rune_stones.png (559, 317, 967, 853) | 89x116 | | | atlas_lk_play | Play icon: the HUD Play tile and the Play window's header (icon.playRune) | Full colour; replaces lk_icon_portal for Play. |
+| `lk_icon_play_rune_small` | 21_play_rune_stones.png (559, 317, 967, 853) | 50x64 | | | atlas_lk_play | Crystal play glyph on the PLAY button (mark.playRune) | Full colour; replaces the white lk_glyph_play on the PLAY button. |
 | `lk_icon_portal` | 06_menu_icons.png (438, 48, 843, 372) | 116x94 | | | atlas_lk_lobby | Menu / currency icon | |
 | `lk_icon_portal_alt` | 11_icons_extra.png (281, 57, 562, 297) | 116x100 | | | | Menu / side-tab icon | |
 | `lk_icon_rocks` | 17_icons_world.png (42, 339, 291, 542) | 100x83 | | | atlas_lk_items | World / map icon | |
@@ -283,8 +283,8 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_panel` | 12_quest_forge_parts.png (327, 774, 845, 985) | 264x110 | [30, 28, 30, 28] | X, Y | atlas_lk_lobby | Inner panels (Party columns, Forge columns, Quest details) | |
 | `lk_panel_inset` | 01_panel_layouts.png (716, 378, 982, 516) | 204x108 | [14, 14, 14, 14] | X, Y | atlas_lk_window | Inset card drawn on parchment (rows, sub-panels) | Opaque parchment around a thin rounded inset border; place it on parchment. |
 | `lk_pill_value` | 08_stat_bars.png (1090, 576, 1252, 633) | 101x39 | [14, 12, 14, 12] | X, Y | atlas_lk_window | Value pill ("450/750 XP", "LV. 12") | Text painted out. |
-| `lk_pillar_rune_left` | 21_play_rune_stones.png (108, 75, 636, 1063) | 88x160 | | | | Rune pillar at the PLAY button's left end (deco.pillarLeft) | Overlaps the button's left end like a post holding a banner. |
-| `lk_pillar_rune_right` | 21_play_rune_stones.png (857, 76, 1382, 1063) | 87x160 | | | | Rune pillar at the PLAY button's right end (deco.pillarRight) | Near mirror image of lk_pillar_rune_left (the sheet's own right pillar). |
+| `lk_pillar_rune_left` | 21_play_rune_stones.png (108, 75, 636, 1063) | 88x160 | | | atlas_lk_play | Rune pillar at the PLAY button's left end (deco.pillarLeft) | Overlaps the button's left end like a post holding a banner. |
+| `lk_pillar_rune_right` | 21_play_rune_stones.png (857, 76, 1382, 1063) | 87x160 | | | atlas_lk_play | Rune pillar at the PLAY button's right end (deco.pillarRight) | Near mirror image of lk_pillar_rune_left (the sheet's own right pillar). |
 | `lk_plaque_capped` | 01_panel_layouts.png (1141, 676, 1507, 730) | 224x38 | [24, 14, 24, 14] | X, Y | | Paper plaque with leather end caps | |
 | `lk_plaque_leather` | 14_ornaments.png (379, 848, 667, 950) | 177x65 | [30, 26, 30, 26] | X, Y | | Stitched leather plaque | |
 | `lk_plaque_leather_bar` | 01_panel_layouts.png (33, 671, 299, 734) | 191x50 | [18, 16, 18, 16] | X, Y | | Leather bar plaque | |
