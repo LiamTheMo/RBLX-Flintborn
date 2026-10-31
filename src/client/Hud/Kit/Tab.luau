@@ -14,6 +14,7 @@
 --   group:Select("backpack")
 
 local Art = require(script.Parent.Art)
+local Badge = require(script.Parent.Badge)
 local Core = require(script.Parent.Core)
 local Interact = require(script.Parent.Interact)
 local Tokens = require(script.Parent.Tokens)
@@ -136,6 +137,24 @@ end
 
 function Tab:SetEnabled(enabled: boolean)
 	self.control:SetEnabled(enabled)
+end
+
+-- A small count plaque over the tab's top-right corner ("23/25"), so the label
+-- keeps its size; nil hides it.
+function Tab:SetCount(text: string?)
+	if self.countBadge then
+		self.countBadge:Destroy()
+		self.countBadge = nil
+	end
+	if text and text ~= "" then
+		self.countBadge = Badge.new(self.base.visual, {
+			name = "Count",
+			variant = "new",
+			text = text,
+			anchor = "topRight",
+			zIndex = self.base.z + 6,
+		})
+	end
 end
 
 function Tab:SetLabel(text: string)

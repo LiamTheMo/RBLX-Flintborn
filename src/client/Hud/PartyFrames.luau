@@ -4,7 +4,9 @@
 -- Kit health bar under the name. Long names shrink a little on bigger screens;
 -- on phones and tablets (at the 9 px floor) they keep their size and end in "…".
 -- Hidden while no tribe-mate is here. Display only; HudController feeds the
--- members. On phones the panel sits at the bottom left and grows upwards.
+-- members. On phones (the layout's "strip") the members sit side by side in
+-- one short card under the compass, with the tribe icon and count at its left,
+-- so the frames stay above the thumbstick's zone and clear of the jump button.
 
 local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
@@ -19,14 +21,29 @@ function PartyFrames.new(parent: Instance, layout)
 	self.root.Name = "Party"
 	self.root.BackgroundTransparency = 1
 	self.root.Visible = false
-	Layout.Place(self.root, { anchor = cfg.anchor, pos = cfg.pos, size = { cfg.width, PartyFrames.Height(cfg, 1) } })
+	Layout.Place(self.root, {
+		anchor = cfg.anchor,
+		pos = cfg.pos,
+		size = { PartyFrames.Width(cfg, 1), PartyFrames.Height(cfg, 1) },
+	})
 	self.root.Parent = parent
 	return self
 end
 
--- The panel's height for `count` rows.
+-- The panel's height for `count` rows (a strip: one row).
 function PartyFrames.Height(cfg, count: number): number
+	if cfg.strip then
+		return cfg.height
+	end
 	return cfg.listTop + count * cfg.rowHeight + cfg.padBottom
+end
+
+-- The panel's width for `count` members (a strip grows sideways).
+function PartyFrames.Width(cfg, count: number): number
+	if cfg.strip then
+		return cfg.cellX + count * cfg.cellW + 10
+	end
+	return cfg.width
 end
 
 -- Rebuilds the card for `count` rows (the plate is drawn at its size).
@@ -37,25 +54,45 @@ function PartyFrames:_build(count: number)
 	end
 	table.clear(self.rows)
 	local h = PartyFrames.Height(cfg, count)
-	self.root.Size = UDim2.fromOffset(cfg.width, h)
-	self.panel = Kit.Panel.new(self.root, { name = "Panel", rect = { 0, 0, cfg.width, h }, variant = "card", pad = 0 })
+	local width = PartyFrames.Width(cfg, count)
+	self.root.Size = UDim2.fromOffset(width, h)
+	self.panel = Kit.Panel.new(self.root, { name = "Panel", rect = { 0, 0, width, h }, variant = "card", pad = 0 })
 	local body = self.panel:Content()
-	self.header = Kit.SectionHeader.new(body, {
-		name = "Header",
-		rect = cfg.header,
-		text = "Tribe",
-		icon = "party",
-		count = "",
-		zIndex = 8,
-	})
 	local x, w = cfg.header[1], cfg.header[3]
+	if cfg.strip then
+		-- The tribe icon and the count, then one cell per member.
+		local s = h - 18
+		Kit.Icon.new(body, { name = "TribeIcon", rect = { 14, 9, s, s }, icon = "party", zIndex = 8 })
+		self.countText = Kit.Text.new(body, {
+			name = "Count",
+			rect = { 14 + s + 4, 0, cfg.cellX - s - 20, h },
+			text = "",
+			role = "sectionHeader",
+			zIndex = 8,
+		})
+		self.header = nil
+		w = cfg.cellW - 8
+	else
+		self.countText = nil
+		self.header = Kit.SectionHeader.new(body, {
+			name = "Header",
+			rect = cfg.header,
+			text = "Tribe",
+			icon = "party",
+			count = "",
+			zIndex = 8,
+		})
+	end
 	for index = 1, count do
-		local y = cfg.listTop + (index - 1) * cfg.rowHeight
+		local rx, y = x, cfg.listTop + (index - 1) * cfg.rowHeight
+		if cfg.strip then
+			rx, y = cfg.cellX + (index - 1) * cfg.cellW, 0
+		end
 		local holder = Instance.new("Frame")
 		holder.Name = "Member" .. index
 		holder.BackgroundTransparency = 1
-		holder.Position = UDim2.fromOffset(x, y)
-		holder.Size = UDim2.fromOffset(w, cfg.rowHeight)
+		holder.Position = UDim2.fromOffset(rx, y)
+		holder.Size = UDim2.fromOffset(w, if cfg.strip then h else cfg.rowHeight)
 		holder.Parent = body
 		local bar = Kit.Bar.new(holder, {
 			name = "Health",
@@ -79,7 +116,11 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 	if count ~= self.shown then
 		self:_build(count)
 	end
-	self.header:SetCount(tostring(total or #members))
+	if self.header then
+		self.header:SetCount(tostring(total or #members))
+	else
+		self.countText:SetText(tostring(total or #members))
+	end
 	local cfg = self.cfg
 	for index, entry in self.rows do
 		local member = members[index]
@@ -91,12 +132,14 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 			entry.row = Kit.PlayerRow.new(entry.holder, {
 				-- PlayerRow names its root after the player (`name` is both).
 				name = member.name,
-				rect = { 0, 0, cfg.header[3], cfg.rowHeight },
+				rect = if cfg.strip
+					then { 0, 0, cfg.cellW - 8, cfg.height }
+					else { 0, 0, cfg.header[3], cfg.rowHeight },
 				userId = member.userId,
 				compact = true,
 				shrinkName = self.shrink,
 				portraitSize = cfg.portrait,
-				rule = if index < count then "hairline" else false,
+				rule = if index < count and not cfg.strip then "hairline" else false,
 				zIndex = 8,
 			})
 			-- The name sits over the health bar instead of centred on the row.

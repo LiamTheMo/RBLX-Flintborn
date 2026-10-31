@@ -17,6 +17,7 @@ local Divider = require(script.Parent.Divider)
 local Interact = require(script.Parent.Interact)
 local ItemIcon = require(script.Parent.ItemIcon)
 local Text = require(script.Parent.Text)
+local Tooltip = require(script.Parent.Tooltip)
 local Tokens = require(script.Parent.Tokens)
 
 local ListRow = {}
@@ -167,6 +168,15 @@ function ListRow.new(parent: Instance, props)
 		})
 		if props.onPress == nil then
 			self.control.hit.Active = false
+		else
+			-- A title cut short ("…", phones) shows whole in a tooltip.
+			local titleW = self.title.Size.X.Offset
+			local full = props.title or ""
+			self.titleCut = Text.Width(full, titleRole, props.titleSize or props.textSize) > titleW - 2
+			self.fullTitle = full
+			base.maid:Give(Tooltip.Attach(self, function()
+				return if self.titleCut then self.fullTitle else nil
+			end))
 		end
 	end
 	return self

@@ -82,7 +82,20 @@
     "barX": 54,
     "barY": 29,
     "barH": 11,
-    "phone": { "anchor": [0, 1], "pos": [0, 39, 1, -24] }
+    "phone": {
+      "anchor": [0.5, 0],
+      "pos": [0.5, 0, 0, 142],
+      "strip": true,
+      "height": 50,
+      "cellX": 76,
+      "cellW": 150,
+      "portrait": 32,
+      "nameY": 3,
+      "nameH": 22,
+      "barX": 42,
+      "barY": 30,
+      "barH": 9
+    }
   },
   "compass": {
     "anchor": [0.5, 0],

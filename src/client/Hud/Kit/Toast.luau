@@ -81,18 +81,36 @@ function Toast.new(parent: Instance, props)
 	end
 	-- The ✕ mark is 22 px; its button pads it to touchMin.
 	local c = 22
-	local pad = math.max(0, (Tokens.Space("touchMin", 44) - c) / 2)
+	local cx, cy = w - c / 2 - 18, 14 + c / 2
+	local mark = Core.Make("Frame", {
+		Name = "CloseMark",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(cx - c / 2, cy - c / 2),
+		Size = UDim2.fromOffset(c, c),
+		Visible = not props.hideClose,
+		ZIndex = base.z + 3,
+	}, base.visual)
+	Art.Plate(mark, "mark.cross", c, c, { z = base.z + 3 })
 	self.close = Core.Make("TextButton", {
 		Visible = not props.hideClose,
 		Name = "Close",
 		AutoButtonColor = false,
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(w - c - 18 - pad, 14 - pad),
-		Size = UDim2.fromOffset(c + pad * 2, c + pad * 2),
+		Position = UDim2.fromOffset(cx, cy),
+		Size = UDim2.fromOffset(c, c),
 		Text = "",
-		ZIndex = base.z + 3,
+		ZIndex = base.z + 4,
 	}, base.visual)
-	Art.Plate(self.close, "mark.cross", c, c, { z = base.z + 3, rect = { pad, pad, c, c } })
+	-- The ✕'s hit area: at least touchMin SCREEN px at the toast's real scale.
+	local function fitClose()
+		local shown = base.root.AbsoluteSize.X
+		local k = if shown > 0 then shown / w else 1
+		local side = math.max(c, Tokens.Space("touchMin", 44) / k)
+		self.close.Size = UDim2.fromOffset(side, side)
+	end
+	base.maid:Give(base.root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitClose))
+	fitClose()
 	base.maid:Give(self.close.Activated:Connect(function()
 		if self.onClose then
 			self.onClose(self)
@@ -125,6 +143,7 @@ end
 
 local column: Frame? = nil
 local relayout: (() -> ())? = nil
+local columnScale = 1
 local avoid: GuiObject? = nil
 
 -- The column's top (screen px): below the top bar, below a part the column must
@@ -137,10 +156,17 @@ function Toast.LaneTop(gui: GuiBase2d): number
 	end
 	local top = Modal.Top()
 	if top and top.holder and top.scale then
-		local header = Tokens.Space("windowHeaderH", 100) * top.scale.Scale
+		-- Below the open window when one toast fits under it; else below its
+		-- title and tab band (Screen.toastClear design px, default 180).
 		local windowTop = top.holder.AbsolutePosition.Y
-		if windowTop + header > y then
-			y = windowTop + header
+		local windowBottom = windowTop + top.holder.AbsoluteSize.Y
+		local toastH = Tokens.Space("toastH", 84) * columnScale
+		if gui.AbsoluteSize.Y - windowBottom >= toastH + 16 then
+			return math.max(y, windowBottom + 8)
+		end
+		local clear = (top.toastClear or Tokens.Space("toastClear", 180)) * top.scale.Scale
+		if windowTop + clear > y then
+			y = windowTop + clear
 		end
 	end
 	return y
@@ -182,6 +208,7 @@ local function host(): Frame
 			k = math.max(k, Scale.PhoneFloor("overlay"))
 		end
 		scale.Scale = k
+		columnScale = k
 		root.Position = UDim2.new(0.5, 0, 0, Toast.LaneTop(gui))
 	end
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit)

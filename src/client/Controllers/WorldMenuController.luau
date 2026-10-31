@@ -27,6 +27,16 @@ local TRANSITION_SECONDS = 3
 WorldMenuController.SIZE = { 640, 450 }
 -- Shown when a request errors instead of answering (never the raw error).
 WorldMenuController.NO_ANSWER = "the server did not answer"
+-- Reasons that mean something particular on this menu. NotReady here is the
+-- player's own session (WorldAdmissionService: not yet in the ready state),
+-- not a party; other reasons use the shared texts (Ui/Reasons).
+WorldMenuController.REASONS = {
+	NotReady = "your session is still loading, try again in a moment",
+}
+
+function WorldMenuController.ReasonText(code: any): string
+	return WorldMenuController.REASONS[code] or Reasons.Text(code)
+end
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -97,7 +107,7 @@ local function play()
 	if not ok or not success then
 		setError(
 			"Could not enter the world ("
-				.. (if ok then Reasons.Text(reason or success) else WorldMenuController.NO_ANSWER)
+				.. (if ok then WorldMenuController.ReasonText(reason or success) else WorldMenuController.NO_ANSWER)
 				.. "). You are still safe — try again."
 		)
 	else
@@ -114,7 +124,7 @@ local function returnToLobby()
 	if not ok or not success then
 		setError(
 			"Could not return to the lobby ("
-				.. (if ok then Reasons.Text(reason or success) else WorldMenuController.NO_ANSWER)
+				.. (if ok then WorldMenuController.ReasonText(reason or success) else WorldMenuController.NO_ANSWER)
 				.. "). You are still safe."
 		)
 	end

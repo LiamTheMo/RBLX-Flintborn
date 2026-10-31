@@ -212,6 +212,10 @@ end
 function InventoryWindow:_buildTabs(selectedId: string?)
 	local built = {}
 	for index, def in self.tabDefs do
+		local word, count = string.match(def.label or "", "^(.-)%s+(%d+%s*/%s*%d+)$")
+		if word then
+			def.label, def.count = word, count
+		end
 		local tab = Kit.Tab.new(self.visual, {
 			id = def.id,
 			name = "Tab" .. def.id,
@@ -226,6 +230,7 @@ function InventoryWindow:_buildTabs(selectedId: string?)
 			zIndex = 8,
 		})
 		self.tabs[def.id] = tab
+		tab:SetCount(def.count)
 		table.insert(built, tab)
 	end
 	self.tabGroup = Kit.TabGroup.new(built, function(id)
@@ -245,16 +250,21 @@ function InventoryWindow:SelectTab(id: string?)
 	end
 end
 
--- Changes a tab's label (the vault's "Vault 23/25").
+-- Changes a tab's label (the vault's "Vault 23/25"). A trailing count goes on
+-- the tab's count plaque, so every tab label keeps the same size.
 function InventoryWindow:SetTabLabel(id: string, label: string)
+	local word, count = string.match(label, "^(.-)%s+(%d+%s*/%s*%d+)$")
+	local text = word or label
 	for _, def in self.tabDefs do
 		if def.id == id then
-			def.label = label
+			def.label = text
+			def.count = count
 		end
 	end
 	local tab = self.tabs[id]
 	if tab then
-		tab:SetLabel(label)
+		tab:SetLabel(text)
+		tab:SetCount(count)
 	end
 end
 

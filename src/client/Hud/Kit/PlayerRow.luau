@@ -16,7 +16,9 @@ local Core = require(script.Parent.Core)
 local Divider = require(script.Parent.Divider)
 local Interact = require(script.Parent.Interact)
 local Portrait = require(script.Parent.Portrait)
+local Scale = require(script.Parent.Scale)
 local Text = require(script.Parent.Text)
+local Tooltip = require(script.Parent.Tooltip)
 
 local PlayerRow = {}
 PlayerRow.__index = PlayerRow
@@ -27,7 +29,8 @@ PlayerRow.__index = PlayerRow
 -- emptyText, emptyIndent (px from the left to the disc), nameX, nameY, levelY
 -- (line tops, px), badgeWidth / badgeHeight / badgeTextSize, nameSize,
 -- levelSize, crownSize, portraitSize, shrinkName (true: long names shrink to
--- fit, down to minTextPx), compact (the HUD party list: smaller crown and
+-- fit, down to minTextPx; false: "…"; default: shrink on desktop, "…" plus a
+-- tooltip with the whole name on touch), compact (the HUD party list: smaller crown and
 -- text, no level line), rule ("hairline" default; true = hairline, false,
 -- or a Divider variant), frame ("square" | "round"), onPress(row), zIndex, name.
 function PlayerRow.new(parent: Instance, props)
@@ -69,6 +72,10 @@ function PlayerRow.new(parent: Instance, props)
 				self.root:SetAttribute("KitState", if self.empty and state == "normal" then "empty" else state)
 			end,
 		})
+		-- The whole name when the row shows it cut short (touch).
+		base.maid:Give(Tooltip.Attach(self, function()
+			return if self.nameCut then self.fullName else nil
+		end))
 	end
 	return self
 end
@@ -189,7 +196,17 @@ function PlayerRow:Set(data)
 		right -= c + 8
 	end
 	local hasLevel = data.level ~= nil and not compact
-	local shrink = opt("shrinkName") ~= false
+	-- shrinkName: true / false, or unset: shrink to fit (down to the text
+	-- floor) on desktop, keep the size and end in "…" on touch, where a
+	-- pressable row shows the whole name in a tooltip.
+	local shrink = opt("shrinkName")
+	if shrink == nil then
+		shrink = not Scale.IsSmallTouch()
+	end
+	local nameRight = right
+	self.fullName = data.name or ""
+	self.nameCut = not shrink
+		and Text.Width(self.fullName, "rowTitle", nameSize) > nameRight - x - 2
 	Core.Label(self.content, {
 		name = "Name",
 		text = data.name or "",

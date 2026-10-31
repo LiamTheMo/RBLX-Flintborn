@@ -15,8 +15,10 @@ tooltips and detail cards (`KitStandIn` marks the glyph).
   multiply, so it darkens or shifts a hue; it cannot lighten. These items need
   real icon art.
 - **none**: nothing in the kit reads as the item (a borrowed picture would
-  mislead); the slot shows the neutral kind glyph and the name is in the
-  tooltip and detail card.
+  mislead); slots, rows and the big detail pictures show the item's kind
+  glyph faded to 40 % (tools and weapons a hammer, armour a backpack, the rest
+  a chest), which reads as "picture missing" rather than as a real item; the
+  name is in the tooltip and detail card (KitItemName).
 
 Totals: 144 items, 12 exact, 83 stand-in, 49 none.
 

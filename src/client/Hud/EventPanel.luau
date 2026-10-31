@@ -102,6 +102,25 @@ function EventPanel.new(parent: Instance, layout)
 	return self
 end
 
+EventPanel.TITLE = "World Event"
+-- The widest countdown the header keeps room for, and the gap before it.
+EventPanel.TIMER_SAMPLE = "00:00"
+EventPanel.TIMER_GAP = 14
+
+-- The header's text size (before the touch boost): the role's, or smaller so
+-- the title and the countdown share the header's width without touching
+-- (touch screens draw headers 1.2 × larger).
+function EventPanel.HeaderSize(width: number, height: number): number
+	local size = Kit.Tokens.TextStyle("sectionHeader").size
+	local iconW = math.floor(height * 0.95) + 10
+	local room = width - iconW - Kit.Text.Width(EventPanel.TIMER_SAMPLE, "sectionHeader", size) - EventPanel.TIMER_GAP
+	local need = Kit.Text.Width(EventPanel.TITLE, "sectionHeader", size) * 1.06 + 8
+	if need <= room then
+		return size
+	end
+	return math.floor(size * room / need)
+end
+
 -- One description line, in design px.
 function EventPanel:_lineHeight(): number
 	return math.ceil(self.cfg.descriptionSize * Kit.Core.TextBoost("bodySoft") * EventPanel.LINE)
@@ -115,9 +134,10 @@ function EventPanel:_header(icon: string)
 	self.header = Kit.SectionHeader.new(self.body, {
 		name = "Header",
 		rect = self.cfg.header,
-		text = "World Event",
+		text = EventPanel.TITLE,
 		icon = icon,
 		count = "",
+		textSize = EventPanel.HeaderSize(self.cfg.header[3], self.cfg.header[4]),
 		zIndex = 8,
 	})
 	-- The countdown sits at the header's right end.

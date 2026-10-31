@@ -222,6 +222,11 @@ local function applyTop()
 	local factor = if stackScale and stackScale:IsA("UIScale") and stackScale.Scale > 0 then stackScale.Scale else 1
 	local compass = layout.compass
 	local below = compass.pos[4] + shift + compass.waypoints.y + compass.waypoints.size + 4
+	-- Phones: the tribe strip sits under the compass, so banners start below it.
+	local party = Layout.Section(layout, "party")
+	if party.strip then
+		below = math.max(below, party.pos[4] + shift + party.height + 6)
+	end
 	stack.Position = UDim2.new(0.5, 0, 0, below * scale / factor)
 end
 

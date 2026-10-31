@@ -17,6 +17,8 @@ local Tokens = require(script.Parent.Tokens)
 local Button = {}
 Button.__index = Button
 
+Button.TONES = { bright = "leatherBright", primary = "leatherTint", dark = "leatherDark" }
+
 local ROLE = {
 	primary = "button.primary",
 	secondary = "button.secondary",
@@ -39,6 +41,7 @@ end
 -- props: rect | size, label, variant, sizeClass ("s" | "m" | "l"), icon,
 -- textRole, textSize, iconSize (px, default half the height), iconGap (12),
 -- contentOffset ({x, y}: moves icon and label together, e.g. up off a lip),
+-- tone ("bright" | "primary" | "dark": the leather's shade),
 -- onPress, zIndex, name. The play variant has no hover art: it lifts (scales
 -- to 1.03) under the pointer.
 function Button.new(parent: Instance, props)
@@ -48,6 +51,10 @@ function Button.new(parent: Instance, props)
 	local base = Core.Root(parent, "Button", ROLE[variant] or ROLE.primary, props, w, h)
 	local self = setmetatable({ root = base.root, base = base, variant = variant, w = w, h = h }, Button)
 	self.plate = Art.Plate(base.visual, ROLE[variant] or ROLE.primary, w, h, { z = base.z })
+	-- Leather tone: "bright" (the sprite's own: PLAY, APPLY), "primary"
+	-- (default: EQUIP, CLAIM, Invite), "dark" (FORGE, Party CLOSE).
+	self.plate.tone = Button.TONES[props.tone or "primary"]
+	self.plate:Show("normal")
 	self.textRole = props.textRole or class.role
 	self.textSize = props.textSize
 	self.iconId = props.icon
@@ -127,6 +134,11 @@ function Button:SetLabel(text: string)
 end
 
 -- Switches between primary / secondary / play looks (an invite turned "Invited").
+-- Sets the leather tone ("bright" | "primary" | "dark").
+function Button:SetTone(tone: string)
+	self.plate:SetTone(Button.TONES[tone] or Button.TONES.primary)
+end
+
 function Button:SetVariant(variant: string)
 	self.variant = variant
 	self.plate:SetRole(ROLE[variant] or ROLE.primary)

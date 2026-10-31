@@ -57,7 +57,7 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 			(self.h - s) / 2,
 			s,
 			s,
-		}, { z = z, name = "Item", color = Tokens.Color("inkSoft") })
+		}, { z = z, name = "Item", tint = "inkSoft", transparency = Art.STAND_IN_FADE })
 		self.root:SetAttribute("KitStandIn", true)
 	end
 	self.root:SetAttribute("KitItemName", if catalogId then Art.ItemName(catalogId) else nil)
