@@ -38,13 +38,18 @@ JournalWindow.TAB_SIZE = { 82, 84 }
 JournalWindow.TAB_YS = { quests = 101, progress = 195, map = 288, party = 383 }
 
 local Z = 8
-local ROW = { 357, 95 }
-local ROW_GAP = 9
+-- The soft row plate draws its edge 4 px (sides) and 5 px (top, bottom) inside
+-- its rect, so rows are built that much larger to show the mockup's 357 × 95
+-- cards at its 104 px pitch.
+local ROW = { 365, 104 }
+local ROW_GAP = 0
 -- The thin rail sits on the mockup's scroll rule (x 735).
-local LIST = { 59, 109, 380, 512 }
-local OBJECTIVE = { 590, 59 }
-local OBJECTIVE_GAP = 6
-local OBJECTIVES = { 452, 280, 604, 197 }
+local LIST = { 59, 101, 379, 515 }
+local OBJECTIVE = { 594, 62 }
+local OBJECTIVE_GAP = 3
+local OBJECTIVES = { 450, 278, 608, 199 }
+-- Where a row's subtitle sits (the kit row centres it lower than the mockup).
+local SUBTITLE_Y = { quest = 49, objective = 34 }
 local TILE = { 92, 104 }
 local TILE_PITCH = 98
 local MAP = { 51, 108, 991, 512 }
@@ -440,8 +445,8 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		layoutOrder = order,
 		variant = "soft",
 		icon = entry.icon,
-		iconRect = { 8, 12, 96, 72 },
-		textX = 119,
+		iconRect = { 9, 16, 96, 72 },
+		textX = 123,
 		title = entry.title,
 		titleSize = 19,
 		subtitle = entry.subtitle,
@@ -452,13 +457,14 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 			self:Select(entry.id)
 		end,
 	}))
+	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, SUBTITLE_Y.quest)
 	local tab = if self.tab == "map" then "quests" else self.tab
 	row:SetSelected(entry.id == self.selected[tab])
 	local v = row.base.visual
 	if entry.tag then
 		Kit.Text.new(v, {
 			name = "Group",
-			rect = { 240, 4, 104, 16 },
+			rect = { 244, 8, 104, 16 },
 			text = entry.tag,
 			role = "tag",
 			textSize = 12,
@@ -468,9 +474,9 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		})
 	end
 	if entry.status == "ready" then
-		Kit.Badge.new(v, { name = "Ready", variant = "dot", rect = { 88, 8, 16, 16 }, zIndex = Z + 4 })
+		Kit.Badge.new(v, { name = "Ready", variant = "dot", rect = { 92, 12, 16, 16 }, zIndex = Z + 4 })
 	elseif entry.status == "claimed" then
-		Kit.Icon.new(v, { name = "Claimed", rect = { 82, 6, 26, 22 }, icon = "check", zIndex = Z + 4 })
+		Kit.Icon.new(v, { name = "Claimed", rect = { 86, 10, 26, 22 }, icon = "check", zIndex = Z + 4 })
 	end
 	return row
 end
@@ -534,8 +540,8 @@ function JournalWindow:_objective(content: Instance, objective, index: number)
 		layoutOrder = index,
 		variant = "soft",
 		icon = objective.icon,
-		iconRect = { 10, 7, 54, 45 },
-		textX = 84,
+		iconRect = { 12, 9, 54, 45 },
+		textX = 86,
 		title = objective.title,
 		titleSize = 18,
 		subtitle = objective.description,
@@ -545,10 +551,11 @@ function JournalWindow:_objective(content: Instance, objective, index: number)
 		trailing = 44,
 		zIndex = Z + 1,
 	}))
+	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, SUBTITLE_Y.objective)
 	-- A display, not a control: the server decides when an objective is done.
 	Kit.Checkbox.new(row:Trailing(), {
 		name = "Check",
-		rect = { 12, 14, 30, 30 },
+		rect = { 12, 17, 28, 28 },
 		variant = "ring",
 		readOnly = true,
 		checked = objective.done == true,

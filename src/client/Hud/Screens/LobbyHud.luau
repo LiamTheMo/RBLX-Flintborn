@@ -37,7 +37,7 @@ LobbyHud.CARD_WINDOW = { 10, 9, 67, 63 }
 
 -- Party panel parts in the panel's px: the pinned first row and the scrolling
 -- list under it (its thin rail at x 1588..1596 of the mockup).
-LobbyHud.PIN = { 28, 55, 242, 51 }
+LobbyHud.PIN = { 28, 57, 242, 51 }
 -- The title row's parts in the title row's px (the row starts at 26, 18).
 LobbyHud.TITLE = { label = { 5, 4, 90, 30 }, count = { 92, 4, 70, 30 }, rule = { 3, 35, 235, 2 } }
 LobbyHud.LIST = { 28, 106, 243, 113 }
@@ -586,7 +586,19 @@ end
 
 function LobbyHud:Destroy()
 	self:_clearRows()
-	for _, part in { self.portrait, self.plate, self.cardBar, self.coins, self.gems, self.settings, self.titleText, self.countText, self.titleRule } do
+	for _, part in
+		{
+			self.portrait,
+			self.plate,
+			self.cardBar,
+			self.coins,
+			self.gems,
+			self.settings,
+			self.titleText,
+			self.countText,
+			self.titleRule,
+		}
+	do
 		part:Destroy()
 	end
 	for _, tile in ipairs(self.tiles) do

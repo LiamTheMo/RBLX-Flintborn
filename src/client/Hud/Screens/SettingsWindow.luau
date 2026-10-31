@@ -229,8 +229,9 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		label = "Reset",
 		variant = "secondary",
 		icon = "ink:refresh",
-		iconSize = 30,
-		iconGap = 15,
+		iconSize = 28,
+		iconGap = 17,
+		textSize = 22,
 		zIndex = 8,
 		onPress = function()
 			self:CloseDropdowns()

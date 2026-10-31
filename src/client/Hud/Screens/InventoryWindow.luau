@@ -53,6 +53,9 @@ local HEADER_H = 34
 local CAPTION_H = 22
 local SECTION_GAP = 12
 local TAB_RECTS = { { 19, 108, 170, 58 }, { 198, 109, 165, 56 } }
+-- Icon and label placement in each tab, measured from the mockup (the
+-- backpack is tall, the chest wide).
+local TAB_LAYOUT = { { iconX = 15, iconSize = 40, labelX = 65 }, { iconX = 19, iconSize = 44, labelX = 79 } }
 -- Category rows (the mockup's spacing is uneven) and the rules under the
 -- middle four.
 local CATEGORY_YS = { 236, 297, 363, 426, 491, 555 }
@@ -210,6 +213,9 @@ function InventoryWindow:_buildTabs(selectedId: string?)
 			label = def.label,
 			icon = def.icon,
 			selectedIcon = def.iconSelected,
+			iconX = TAB_LAYOUT[index] and TAB_LAYOUT[index].iconX,
+			iconSize = TAB_LAYOUT[index] and TAB_LAYOUT[index].iconSize,
+			labelX = TAB_LAYOUT[index] and TAB_LAYOUT[index].labelX,
 			variant = "horizontal",
 			zIndex = 8,
 		})
