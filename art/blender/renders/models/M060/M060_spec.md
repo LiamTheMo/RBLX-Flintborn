@@ -932,3 +932,652 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - Keep strong contrast between the dark fern green and the lime, which W06 lacked.
     - Rocks are warm grey, never lavender; the sage is a stain on the back rocks only.
 14. **Budget.** Full-asset class: ceiling 3800, plan 2900–3300, every part under 1000.
+
+## Stage 1 — Modelling (modeller, 2026-10-31)
+Builder `art/blender/kit/mcp/m060.py` → `build()`, built in the background Blender on port 9881 (`wip/M060.blend`, saved).
+- **Construction.** Each frond and skirt leaf is **two closed shells**:
+  1. A lobed blade: a 2D outline (u along the spine, v across, in studs), triangulated as fans from the rachis stations
+     (one per lobe hub), mapped onto an arched cubic spine with roll, a V-fold and thickness, with rim walls all round.
+  2. A 4-sided diamond tube. It is the stalk below the blade and continues **inside the blade as the raised rachis**: it
+     pokes out 0.036 → 0.018 above and 0.03 → 0.012 below the blade surfaces and ends in a point at 0.93 L. The tube's
+     joint ring bisects the kink between stalk and blade.
+- **Lobes.** Blunt tongues with two outer corners (the leading one chamfered to 0.94), leaning toward the tip (30° on
+  fronds, 26° on leaves).
+  - **U-slots with two verts** separate them (bottom 0.28 of the lobe pitch).
+  - Notches reach 0.62–0.66 of the half-width on fronds and 0.57–0.59 on leaves.
+  - Single-vertex notches were tried first and always read as a sawtooth (one vertical side, one slanted). The spec
+    allows "one or two verts", so two were used.
+- **Fronds (6 stalks, 8 blades).** F1 / F2 tall (5 outer + 4 inner lobes, inner side 0.8 wide), F3 / F4 arching lime,
+  F3b / F4b dark forks seated 0.6 up their parent stalk, F5 / F6 small lime.
+  - Foot, base, tip and apex come from §2.3. An apex search fits the spine to apex − 0.10, so the blade top lands on
+    the table.
+  - Measured: L 1.45–2.36, L : W 2.1–3.1, tip angle 56–80°.
+  - Apexes: F1 2.93, F2 2.80, F3b 2.15, F4 2.10, F3 2.04, F6 1.81, F4b 1.77, F5 1.54. Tips land exactly on the table.
+- **Skirt (9 lobed broad leaves).** A petiole leaves the hub rim (r 0.18, z 0.38) rising 62° for 0.58. The blade leaves
+  it already heading 38° down and droops to 62° at the tip. The result is a dome, so the leaves hang outward and face
+  every view, as in the sheet's front, side and rear.
+  - L 1.18–1.58, L : W 1.18–1.21, 4 lobes a side.
+  - **N9 (az 0°) was added** to fill the right side of the skirt (see deviations).
+  - Tips were pulled in from §2.4 to r 1.5 (front and back) and 1.85 (sides), so the leaves hang steeply instead of
+    lying flat.
+- **Root crown.** An 8-sided hub (Ø 0.70 → 0.44, top 0.45, chamfered top ring) and a 6-sided peg to 0.58.
+  - 7 five-sided roots, two segments each with a knee at 60 % and a flat cut end on the ground.
+  - Roots at 15 / 65 / 120 / 170 / 215 / 268 / 320°, reaching r 0.70–0.85.
+- **Rocks (7).** Ring-stack hulls (`m033._ring_pts` / `_hull`), 30–34 tris each.
+  - R1–R4 and R7 are low (0.31–0.48 tall).
+  - R5 / R6 are tall and pointed, 0.80 / 1.00 (decision 5).
+- **Sprigs (6).** 2–3 thick gem leaves of 10 tris each, on the ground.
+- **Parts.** Each is built by the same functions as the hero: LargeFrond = F1, MediumFrond = F3 + F3b, SmallFrond = F5,
+  RootCrown, BroadLeaf = N1, Rock = R1, GroundLeaf = S1 (3 gems).
+- **Reading from all eight azimuths.**
+  - Rolls were set by a greedy search over the ray-grid measure (`vis_bm`), with a V-fold of 12.5° a half and a 6°
+    lobe wave (alternate tongues lifted or dropped).
+  - Spin sheet `M060_spin.png`: two tall fronds stand apart and the blades show their lobes from every azimuth. No view
+    reads as a ball with flaps.
+
+## Stage 2 — Optimisation and cleanup
+- **Budget.** Hero **3764 tris** (ceiling 3800): 17 blade shells 2660, 17 tubes of about 30 each (502), crown 262,
+  rocks 210, sprigs 130. Parts 30–428.
+  - The two-vert slots and N9 were paid for by trimming tube stations (frond blade stations 3 → 2, leaf stations to 1)
+    and cutting sprigs to 2 gems (S1 keeps 3).
+- **Topology.** Every shell is closed. All 8 objects have 0 non-manifold edges and verts (bowties), and 0 boundary,
+  wire or loose elements, zero-area faces, n-gons and duplicate verts.
+  - **0 winding errors** in every shell, and normals point outward.
+  - 0 self-intersections per shell. A sweep cap and a fan-validity clamp in `_side_outline` stopped the leaves' fans
+    folding over a slot.
+  - Smallest corner 3.2°.
+- **Origin.** At the bbox bottom centre, with transforms applied. The hero's origin is offset (0.009, 0.057) from the
+  crown axis; sink −0.02.
+
+## Stage 3 — UV
+`M.smart_uv(angle 45, ANGLE_BASED, margin 0.008)` followed by `m012._uv_unfold`:
+- 0 overlaps, 0 flipped faces, minimum gap 0.016, border 0.008.
+- Density 1.0 / 1.0 / 1.0; conformal stretch p95 1.008 on the hero (≤ 1.038 on the parts).
+- 1337 islands on the hero, one per flat facet group. The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour, texture
+- **Calibration.** `m060.calibrate()` ran on the kit dome for 6 iterations against the §5.4 targets, with three
+  changed targets:
+  - FRESH aimed at `#92CC28` (81°), so the lime skirt reads as the sheet's light tone.
+  - DARK `#33702A` and DEEP `#244E1B`.
+  - ROCK `#928E89`.
+- **Adjustments after calibration.**
+  - The dome renders brighter than the self-shaded fern (the warning in §5.4), so the greens were moved ⅔ of the way
+    back toward the uncalibrated keys until the hero's own front render matched the sheet.
+  - ROCK calibrated to `#737375` (B > R), so it was replaced by the warm `#888582`.
+  - SAGE did not converge with the stone mask, so it was set by hand.
+- **Final palette.** Greens: rough 0.8–0.9, low spec. Root and rock: rough 0.85–0.95.
+
+| Key | Hex |
+| --- | --- |
+| frond_light | `#9ECA22` |
+| leaf_fresh | `#84BB2B` |
+| frond_mid | `#5E9221` |
+| frond_dark | `#346D2B` |
+| green_deep | `#244C1C` |
+| stalk | `#735B00` |
+| root | `#7A4D27` |
+| root_light | `#96693C` |
+| root_deep | `#472A10` |
+| rock | `#888582` |
+| rock_deep | `#6E6B68` |
+| rock_sage | `#858C74` |
+
+- **Painting (never by facing).**
+  - Blades are painted per lobe band along their length, from a ramp on the ladder deep → dark → mid → fresh → light:
+
+    | Blade | Ramp |
+    | --- | --- |
+    | F1 | deep → dark → 1.5 |
+    | F2 | deep → dark → mid → 2.75 |
+    | Lime fronds | mid → light |
+    | Forks | deep → dark → mid tip |
+    | Front skirt N1 / N2 | mid → light |
+    | N3 | mid → fresh-light |
+    | N4 / N6 | dark |
+    | N5 / N8 / N9 | dark → mid or fresh |
+    | N7 | lime, as the sheet's rear centre leaf |
+
+  - Each rachis tube is one step darker than its band. Stalks run root → ochre → blade base.
+  - The crown is painted by member: the top ring, peg top and cut ends take root_light; the lowest band takes a
+    root_deep mix.
+  - Rocks get deep stone in noise patches. R5 / R6 are sage on the upper half and on R6's −X side; R1 / R7 have a sage
+    band at the top back.
+  - Tint: ±0.04 per blade plus ±0.02 per band, ±0.03 on tubes and crown, ±0.04 per rock facet.
+  - `K.check` baked shading is 0.27 on the hero. A height foot band on the rocks gave 0.56, so it was replaced by noise
+    patches.
+- **Re-measured** (final renders against the sheet, same masks):
+
+| View | W : H | fill | G / T / R % | tones l / m / d | green median | light | mid | rock median / lit |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front sheet | 1.283 | .626 | 81.5 / 3.8 / 8.9 | 31 / 29 / 40 | `#5D961C` | `#A8D722` | `#69A520` | `#7F7C76` / `#C0BDA8` |
+| front ours | 1.185 | .527 | 82.6 / 3.4 / 14.0 | 23 / 36 / 41 | `#5B891E` | `#A9DE23` | `#6C9B24` | `#7D786F` / `#B9B0A3` |
+| f34 sheet | 1.353 | .588 | 80.0 / 4.6 / 10.7 | 33 / 29 / 38 | `#61991C` | `#A9D51F` | `#68A120` | |
+| f34 ours (0, 20) | 1.040 | .487 | 85.8 / 2.4 / 11.8 | 26 / 39 / 35 | `#659920` | `#AADF23` | `#6CA026` | `#938D80` |
+| side sheet | 1.163 | .563 | 84.6 / 4.8 / 6.4 | 38 / 34 / 28 | `#6A9F0F` | | | |
+| side ours | 1.040 | .526 | 79.3 / 4.6 / 16.2 | 25 / 38 / 37 | `#59871C` | | | |
+| rear sheet | 1.327 | .642 | 82.3 / 4.1 / 8.5 | 28 / 28 / 44 | | | | |
+| rear ours | 1.170 | .534 | 75.3 / 5.6 / 19.1 | 14 / 40 / 47 | | | | |
+
+- **Front details.**
+  - The tall fronds give two separate runs at h .85 and .95.
+  - Dark median `#2D5F16` vs `#1B5116`: the sheet's dark tone is mostly cast shade.
+  - Root median in shade `#49341C` vs `#684324`: darker, because the hub sits under the skirt.
+
+## Stage 5 — Lighting
+Skipped: the sheet shows no emission or light. Studio notes (Requires Manual Validation):
+- The lime fronds and front skirt must stay lime, and F1 / F2 dark green, under the game sun.
+- The stalks stay ochre and the root orange-brown.
+- The rocks stay warm grey, with sage only on R5 / R6 and the tops of R1 / R7.
+
+## Stage 6 — VFX
+Skipped: the sheet shows no effect (decision 11), and no object has sockets. Collision: hero, fronds, leaf and ground
+leaf `none`; RootCrown and Rock `hull`.
+
+## Modeller's notes for the verifier
+- **Checks (the `build()` result).**
+  - Contact: 62 shells, **0 floating, 0 unchained**.
+  - Bury: 0 shells over 0.05. The maximum is 0.029, where N8 lies over R6 and N6 over R5; the guard lifted N8's tip
+    0.30 and N6's 0.06.
+  - No rock goes into the crown or another rock.
+  - Tube feet sit 0.049–0.066 in the hub; the forks seat in their parent tube.
+  - No blade has more than 11 % of its verts inside another (the N9 / N3 overlap at the right).
+  - The problems list holds only the two eight-azimuth items below.
+- **Eight azimuths.** Ray grid 0.025, facet normals. Each cell is the % of visible foliage within 20° / 12° of edge-on:
+
+  | Azimuth | 0° | 45° | 90° | 135° | 180° | 225° | 270° | 315° |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | el 5 | 8.5 / 3.3 | 9.7 / 2.4 | 9.6 / 3.3 | **10.9** / 4.4 | 8.6 / 3.0 | **10.4** / 3.3 | 9.2 / 3.2 | 8.8 / 3.2 |
+
+  - At el 20 every azimuth is 8.1–13.9 / 2.3–3.7.
+  - Bare core (tubes + crown): 7.6–13.3 % of foliage + core.
+- **Deviations from the Decisions and spec, with reasons.**
+  1. **9 skirt leaves, not 8** (N9 at 0°). The right side of the front view was open; the leaf was paid for by the tube
+     and sprig trims.
+  2. **Skirt leaves L : W ≈ 1.2** (spec 1.5), with tips at r 1.5–1.85 (spec up to 2.0). The sheet's front, side and rear
+     leaves are broad and hang steeply. With the spec's tips they lay flat and read as shelves and edge-on cards.
+     - Leaf tip angle is 82° (spec 45–60°); frond tip angles are 56–80° (spec 35–50°).
+  3. **Notches 0.57–0.66 deep** (spec 0.40–0.60), with two-vert U-slots. Shallower notches vanished in the renders.
+  4. **The rachis is the stalk tube continued through the blade.** The spec asks for a ridge in the blade mesh and a
+     stalk ending 0.06–0.12 inside it. The tube is cheaper and gives the ridge, keel and stalk one continuous line.
+  5. **N7 is painted lime** (spec: dark). The sheet's rear view has a lime leaf front-centre, pointing down.
+  6. **Rocks.**
+     - No height foot band: it gave a facing correlation of 0.56.
+     - R5 / R6 footprints narrowed to 0.56 × 0.50 / 0.62 × 0.54. Their heights stay 0.80 / 1.00; they sit at
+       (−1.15, 0.78) / (1.08, 0.88).
+     - The low rocks are about 8 % smaller and pulled in.
+  7. **Sprigs** sit at 0.85 × the spec radii. S2–S6 have two gems; S1 has three.
+- **Leftovers.**
+  - Front fill 0.53 vs 0.63.
+  - Front W : H 1.185 is inside the 1.18–1.32 band, at its low end; side W : H 1.04 vs 1.15.
+  - The rock share is too high outside the front: the tall R5 / R6 stand clear of the skirt from the rear and sides
+    (the conflict in spec §3.9; the decision keeps their heights).
+
+    | View | Ours | Sheet |
+    | --- | --- | --- |
+    | Front | 14.0 % | 8.9 % |
+    | Side | 16.2 % | 6.4 % |
+    | Rear | 19.1 % | 8.5 % |
+
+  - Edge-on at el 5 is just over 10 % at 135° (10.9) and 225° (10.4).
+  - f34 tones are 26 / 39 / 35, with mid 10 points above the sheet's 29.
+  - `thickness_cu` is a near edge-on view of the LargeFrond part.
+  - `junction_cu` mostly shows leaf bases and rocks, because the hub sits under the skirt.
+
+## Stage 7 verification (round 1)
+Fresh verifier, 2026-10-31. Read-only, in a background Blender on port 9881 on `wip/M060_verify.blend` (not saved). My
+renders and side-by-side comparisons are in `renders/models/M060/verify/`: `cmp_0..2.png` (sheet cell next to ours),
+`spin_row0/1.png`, and `big_*.png` at 900 × 700. The scripts are in the scratchpad `m060_verify/`: `audit.py`,
+`contact.py`, `uvov.py`, `vis.py`, `meas.py`; `meas.py` uses the study's `measure.py` masks.
+
+**Verdict: FAIL, 5/10.** The model is technically clean and the front reads as a lobed fern. From the back half,
+though, it does not read like the sheet.
+
+### Technical re-measure (all pass)
+- **Tris.** Hero 3764 (ceiling 3800). Parts: Large 210, Medium 428, Small 214, RootCrown 262, BroadLeaf 162, Rock 30,
+  GroundLeaf 30.
+- **Size.** Hero 3.711 × 3.356 × 2.946, inside 3.85 ± 0.2 / 3.45 ± 0.2 / 3.0 ± 0.1.
+- **Origin and transforms.** On all 8 objects the origin is at the bbox bottom centre (0, 0, 0). Rotation 0, scale 1,
+  delta transforms identity, no modifiers. No custom normals, all faces flat. The hero is offset (0.009, 0.048) from
+  the crown axis (limit 0.15); it sinks 0.02.
+- **Topology.** On every object, 0 for each of:
+  - non-manifold, boundary and wire edges;
+  - loose verts and duplicate verts;
+  - zero-area faces and n-gons (everything is triangulated);
+  - bowtie verts and winding errors;
+  - shells with negative volume;
+  - self-intersections within a shell.
+  - The hero has 63 shells: 17 blades, 17 tubes, 9 crown pieces, 7 rocks and 13 sprig gems.
+  - The smallest corner is 2.92° on the hero (spec ≥ 3°; the builder's thin check uses 2°). Numeric only.
+- **Contact.** My own BVH pass, tolerance 0.03, chained to the ground:
+  - 0 floating and 0 unchained shells. Every blade touches its own tube, and every tube touches the hub; the forks
+    F3b / F4b seat in their parent tubes.
+  - Tube feet sit 0.052–0.078 inside the hub.
+  - Buried: only N8 in R6, 0.029 deep (limit 0.05). Nothing is below z −0.025.
+- **UV.** Rasterised at 1024²: 0 overlapping cells and 0 flipped faces. Texel density p5 / p95 is within ±1.4 % on
+  every object; the islands sit inside 0.008–0.992.
+- **Colour assignment (code read).**
+  - Blades are painted per lobe band along u, by role.
+  - Tubes are painted per segment, rocks by noise field plus height and position, and the crown by member and height
+    band. The hub top ring and the root cut ends take root_light, as §5.3 asks.
+  - Nothing is chosen by face normal. `kit_baked_shading` is 0.27 on the hero and 0.31 on RootCrown (under 0.5).
+- **Eight azimuths.** My ray grid (0.025, facet normals) shows edge-on (within 20°) at el 5:
+
+  | Azimuth | 0° | 45° | 90° | 135° | 180° | 225° | 270° | 315° |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | Edge-on % | 8.5 | 9.7 | 9.7 | 11.0 | 8.6 | 10.5 | 9.1 | 8.8 |
+
+  - At el 20 the range is 8.2–13.8 %, with az0 the highest.
+  - By eye at 900 px:
+    - az135: N7 / N8 show partly edge-on.
+    - az225: several lobe tongues of F3 / F3b show as thin fins, and N6 / N4 as stacked shelves.
+    - These are sliver tongues, not whole flat-card flaps. **Minor; acceptable.**
+
+### Blockers
+1. **The tall rocks are the reverse of §3.9.** The spec has R5 / R6 mostly behind the back skirt, peeking 0.10–0.25
+   above it in the front and f34. Instead:
+   - **In the front and f34 they do not show.** No sage peak is visible; the f34 has none of the sheet's two tall sage
+     rocks.
+   - **From the right side, the rear and the back diagonals they stand fully bare.** They read as two grey obelisks
+     beside the plant. The narrowed footprints (0.56 × 0.50 and 0.62 × 0.54 for 0.8 / 1.0 tall) make them spires, not
+     the sheet's broad pyramid blocks.
+   - Ray-grid hits on R5 / R6 are 138 / 252 at az0 and **461 / 692 at az180**.
+   - Rock share of the silhouette:
+
+     | View | Ours | Sheet (tolerance ±3) |
+     | --- | --- | --- |
+     | Front | 14.6 % | 8.9 % |
+     | Side | 16.6 % | 6.4 % |
+     | Rear | 20.6 % | 8.5 % |
+     | r34 | 17.8 % | 8.3 % |
+     | az135 | 24.0 % | — |
+     | az225 | 22.3 % | — |
+
+   - The rock share is out of tolerance in every view, the front included.
+2. **The rear half has a bare root star and a thin back skirt.** In the rear, r34, az135 and az225 the seven roots
+   splay over open ground like the parts-row stump (`big_rear.png`). The back skirt leaves hang steeply beside the
+   crown and don't cover the base. The sheet's rear and r34 show a full skirt of big lobed leaves down to the ground,
+   with the brown crown seen under them and only low rocks.
+   - Silhouette, ours against the sheet:
+
+     | View | Fill | W : H | Sheet fill | Sheet W : H |
+     | --- | --- | --- | --- | --- |
+     | Front | 0.552 | 1.172 | 0.649 | 1.251 |
+     | f34 (0, 20) | 0.507 | 1.019 | 0.621 | 1.305 |
+     | Rear | 0.557 | 1.152 | 0.642 | 1.327 |
+     | r34 (180, 20) | 0.506 | 1.010 | 0.638 | 1.367 |
+
+   - Every fill is outside ±0.05. Every W : H is outside its band (front 1.18–1.32, f34 1.24–1.37, rear and r34
+     1.26–1.40).
+   - The plant reads as a sparse fan on rocks, not the sheet's lush rounded mound.
+
+### Minors (visible unless marked numeric)
+- **Lobe shape.** Lobes are straight-cut rectangular tongues swept toward the tip with square U-slots, so the tall
+  fronds read as a stepped ratchet or staircase edge. The sheet's lobes are rounded scallops with rounded notches.
+  - They still read as one solid lobed blade with thickness, a rachis ridge and a V-fold (`cmp_0`, `big_front`), not
+    a comb or spikes.
+  - Fix: round the tongue ends (chamfer both outer corners, or add a mid vertex), and use less sweep.
+- **Leaf tones.** Light / mid / dark shares (sheet in brackets; tolerance ±8):
+
+  | View | Ours | Sheet |
+  | --- | --- | --- |
+  | Front | 23 / 37 / 39 | 31 / 29 / 40 |
+  | f34 | 27 / 40 / 33 | 33 / 29 / 38 |
+  | Rear | 14 / 41 / 45 | 28 / 28 / 44 |
+
+  - The front sits on the edge of tolerance. The f34 mid (+11) and the rear light (−14) and mid (+13) are out.
+- **Root in the front reads near black** (T, v ≥ .25): front `#4A341C`, f34 `#523A1C`, sheet `#684324` / `#6E4B17`.
+  The rear is right (`#6D4529`).
+- **Greens are in range, not olive.**
+  - Front all-green `#608D21` vs `#5D961C`; v > .7 `#A3D62C` vs `#A1D224`.
+  - Light `#AADC27` (76°), mid `#6D9C28` (84°, 2° under the §5.4 floor of 86°), dark `#2E5F1A` (103°, floor 105°).
+    Numeric only.
+  - The dark-vs-lime contrast is strong: F1 is dark, the arching fronds and front skirt are lime.
+- **Rocks are warm grey, never lavender.**
+  - Front median `#878076` vs `#7F7C76`; rear v > .7 `#D3CBBB`; R ≥ G ≥ B everywhere.
+  - The sage `#858C74` sits on the R5 / R6 upper halves and reads only faintly.
+- **Parts against their cells.**
+  - RootCrown matches the parts-row stump with splayed legs. Large frond, BroadLeaf (lobed, decision 5) and Rock
+    (W : H 1.35 vs 1.4) are fine.
+  - MediumFrond: lime main blade with a dark fork; the sheet's pair is all mid green. It follows the hero roles;
+    minor.
+  - The SmallFrond part shot at (0, 15) sees F5 end-on and reads as a flat folded panel. That is presentation, not the
+    mesh.
+  - GroundLeaf is three pointed gem pyramids; the sheet draws three small rounded leaves. Tiny, minor.
+
+### The modeller's deviations
+1. **9 skirt leaves, not 8.** Numeric only; accepted.
+2. **Broader, steeper skirt leaves with blunter tips.** Visible. They look fine in the front, but the steep hang is
+   part of Blocker 2 (base uncovered, narrow silhouette at the back). Spread the back leaves outward and lower.
+3. **Deeper two-vertex notches (0.57–0.66).** The depth is close to the sheet's. The square slot and straight tongue
+   give the ratchet look; minor, visible.
+4. **Rachis as the stalk tube.** The ridge and keel read correctly; numeric deviation only. Accepted.
+5. **Lime N7.** Visible and correct: it matches the sheet's rear front-centre lime leaf. Accepted.
+6. **Rock changes.**
+   - No foot band: invisible, accepted.
+   - R5 / R6 narrowed: visible, part of Blocker 1.
+   - Smaller low rocks: fine.
+7. **Sprigs pulled in.** Numeric; fine.
+8. **Front fill 0.53 (I measure 0.552) vs 0.63–0.65.** Visible, out of tolerance; Blocker 2.
+9. **Side W : H 1.04 vs 1.15.** Out of the 1.08–1.22 band; mostly numeric, and it follows from Blocker 2.
+10. **Too much rock outside the front.** Visible; Blocker 1. The front is also out (14.6 vs 8.9).
+11. **f34 mid tone high.** Out of tolerance (+11), and the rear more so; minor, visible as a less lime-lit read.
+12. **Dark root in front.** Visible minor (above).
+
+### For the fix modeller (targeted)
+- **Tall rocks.** Pull R5 / R6 in under the back skirt, or widen the back skirt leaves and lay them flatter so they
+  drape over the rocks. Restore broader footprints (about 0.70 × 0.60 / 0.80 × 0.65) so they read as pyramid blocks.
+  Aim for rock ≤ 12 % in the side and rear, and for the peaks to show 0.1–0.25 above the skirt in the front and f34.
+- **Back skirt and roots.** Give the back and side skirt leaves (N4–N9) more outward spread and lower tips so they
+  cover the root arms. Fill the rear at h < 0.4 so that rear and r34 fill reach ≥ 0.60 and W : H ≥ 1.25.
+- **Lobe ends.** Round the lobe ends (secondary).
+- **Re-check after the fix.** Bury (N8 / N6 over R5 / R6), rock share and the eight azimuths.
+
+## Fix round 1 (fix modeller, 2026-10-31)
+A fresh modeller, in the background Blender on port 9881 (`wip/M060.blend`, saved). It edited only `m060.py`; the
+shared helpers are untouched. The scripts are in the scratchpad `m060_fix/`: `meas.py` uses the study's masks and the
+verifier's cameras; `search*.py` / `rolls*.py` are parameter searches over the ray grid. Renders of this round:
+`renders/models/M060/fix1/` (`cmp_all.png` puts each sheet cell beside ours; `big_*.png` at 900 × 700). `build()`
+rewrote the usual `M060/` renders.
+
+### What changed
+1. **Back and side skirt as a lush mound (blocker 2).**
+   - Leaves now spread around the crown more evenly: N9 18°, N8 52°, N7 95°, N6 128°, N4 176° (front N5 214°, N2 245°,
+     N1 288°, N3 332°). Before, the back half had only three leaves.
+   - **N4 and N6–N9 are "curtain" leaves.** Each is W 1.40, with a longer and steeper petiole (N6 0.64 / 66°, N8 0.70 /
+     68°, N4 / N9 0.72 / 68°). The blade leaves it nearly level (lean 4–12°), arches out and drops (droop 70°, fuller
+     Bezier handles 0.48 / 0.34) to a tip on the ground at r 1.7–2.0.
+   - `CURTAIN_ENV` keeps them broad down to the ground: 0.92 at 0.66 L and 0.58 at 0.82 L, so no triangular gaps open
+     between neighbouring tips.
+   - **Curtain leaves have 3 bigger lobes a side** (depth 0.30) instead of 4. On these big leaves the 4 small scallops
+     vanished against the same-coloured leaves behind. This saves 180 tris.
+   - The front leaves (N1, N3, N5) also reach lower and further out, with tips at z 0.04–0.06.
+   - New per-leaf keys in `LEAVES`: `pet`, `rise`, `lean`, `droop`, `hk`, `curtain`.
+   - The root arms now sit under the skirt. One long back root (80°, r 1.30) and R7 at the skirt edge (0.45, 1.46),
+     0.60 × 0.50 × 0.38, show at the rear foot, as the sheet's rear does.
+2. **Tall rocks (blocker 1).**
+   - R5 is 0.70 × 0.60 × 0.80 and R6 0.80 × 0.65 × 1.00 (decision heights). They are broad pyramid blocks.
+   - They sit at az 130° / 50°, r 0.90, i.e. (−0.58, 0.69) / (0.58, 0.69), right under the raised arches of N6 / N8.
+     No leaf is lifted and nothing is buried.
+   - The curtains of N9 / N8 / N7 / N6 / N4 cover them from the side, rear and diagonals. Roots were re-routed out of
+     their sectors: 0 / 80 / 170 / 208 / 248 / 288 / 326°.
+   - A search over position (az 35–75°, r 0.7–1.35), height (×0.8–1.25), leaf azimuths and widths picked this layout:
+     its worst R5 + R6 share over the seven non-front views is the lowest.
+3. **Scalloped lobes (ruling).**
+   - Each lobe is now two shoulder verts (±0.35 of the pitch, at 0.84 of the envelope) plus a crown vert on the
+     envelope, and one V-notch vert sits between lobes.
+   - Before, each lobe was a two-vert U-slot plus a straight two-corner tongue: the square ratchet.
+   - The first lobe rises from the base vert, so the vert and tri counts per blade are unchanged.
+   - Sweep is lower: 16° on fronds, 14° on leaves (was 30 / 26). Notch depth: fronds 0.64, leaves 0.66, curtain leaves
+     0.70 of the half-width.
+4. **Front root colour (ruling).** In the hero only, the root arms (root_light, then a 75 % mix) and the hub's two
+   lower bands (a 50 % root / root_light mix, then root_light) are one step lighter. This is by member and height band,
+   never by facing. The RootCrown part keeps the parts-row brown.
+5. **GroundLeaf: rounded leaves (ruling).** `_pad`: a domed hexagonal pad, cupped at the side corners, lying 16–21° off
+   the ground. It is 12 tris (was a 10-tri pointed gem). The hero's 13 pads cost +26 tris.
+6. **MediumFrond part coloured as its cell (ruling).** `MEDIUM_PART_TONE` (mid green, fresh tips) on both blades of the
+   part only. The hero's F3 / F3b keep their roles.
+7. **Rear tones.** N7 now runs to light at its tip (the sheet's lime rear centre leaf). N8, N9 and N3 tips are one step
+   lighter.
+8. **Eight azimuths.** Two greedy roll passes on the ray grid set these rolls:
+
+   | Blade | Roll |
+   | --- | --- |
+   | N3 | −56 |
+   | N4 | 10 |
+   | N5 | 13 |
+   | N6 | 10 |
+   | N8 | −7 |
+   | N9 | 33 |
+   | F1 | (33, 18) |
+   | F3 | 27 |
+   | F4b | −33 |
+   | F5 | −58 |
+
+   F3 / F4 tips moved to (−1.96, 0.45, 1.80) / (1.99, −0.50, 1.95), and the F2 apex to 2.86 (spec 2.86), to widen the
+   rear.
+
+### Before → after
+Before = stage-7 round 1 (verifier). After = this build, measured the same way: verifier cameras, study masks, floor
+hidden.
+
+| Check | Before | After | Target |
+| --- | --- | --- | --- |
+| Rock share, front | 14.6 % | **10.9** | 8.9 ± 3 |
+| Rock, side (right) | 16.6 | **8.2** | 6.4 ± 3 |
+| Rock, rear | 20.6 | **9.0** | 8.5 ± 3 |
+| Rock, r34 | 17.8 | **5.8** | 8.3 ± 3 |
+| Rock, az135 / az225 | 24.0 / 22.3 | **9.8 / 8.0** | ≤ ~12 |
+| Rock, side (left) / az045 / az315 | 15.9 / — / — | 10.3 / 12.3 / 13.7 | (no sheet cell) |
+| R5 + R6 ray-grid share, az0 / 90 / 135 / 180 / 225 / 270 | — | 1.5 / 2.2 / 4.7 / 5.1 / 2.1 / 5.0 % | |
+| Fill, front / f34 | 0.552 / 0.507 | **0.577 / 0.520** | 0.649 / 0.621 (toward) |
+| Fill, rear / r34 | 0.557 / 0.506 | **0.584 / 0.564** | ≥ 0.60 |
+| W : H, front / f34 | 1.172 / 1.019 | **1.276 / 1.096** | 1.18–1.32 / toward 1.305 |
+| W : H, rear / r34 | 1.152 / 1.010 | **1.256 / 1.062** | ≥ 1.25 |
+| W : H, side | 1.038 | **1.096** | 1.08–1.22 |
+| Rear root (T) / r34 T | 5.4 / 4.4 (bare star) | 0.9 / 0.4 | 4.1 / 5.8 |
+| Front T | 3.3 | 3.1 | 3.8 ± 1.5 |
+| Root colour, front T (v ≥ .25) | `#4A341C` | `#52371D` | `#684324` |
+| Tones front / f34 / rear / r34 (l / m / d) | 23/37/39, 27/40/33, 14/41/45, 15/40/45 | **27/36/37, 29/41/30, 22/36/42, 24/34/42** | 31/29/40, 33/29/38, 28/28/44, 37/26/37 |
+| Front green / light / mid | `#608D21` / `#AADC27` / `#6D9C28` | `#63941E` / `#A5D422` / `#6D9D20` | `#5D961C` / `#A8D722` / `#69A520` |
+| Front rock median | `#878076` | `#7F7B70` | `#7F7C76` |
+| Edge-on (20°) at el 5, az 0 … 315 | 8.5 / 9.7 / 9.7 / 11.0 / 8.6 / 10.5 / 9.1 / 8.8 | **8.5 / 8.8 / 7.8 / 9.8 / 5.2 / 8.5 / 8.3 / 8.5** | ≤ 10 |
+| Edge-on (20°) at el 20 | 8.2–13.8 | 6.5–11.9 | |
+| Bare core (tubes + crown) | 7.6–13.3 % | 4.9–10.7 % | ≤ 15–30 |
+| Hero tris | 3764 | **3610** | ≤ 3800 |
+| Parts (Large / Medium / Small / Root / BroadLeaf / Rock / GroundLeaf) | 210 / 428 / 214 / 262 / 162 / 30 / 30 | 210 / 428 / 214 / 262 / 162 / 30 / **36** | < 1000 |
+| Hero size | 3.71 × 3.36 × 2.95 | **4.04 × 3.58 × 2.94** | 3.85 ± 0.2 × 3.45 ± 0.2 × 3.0 ± 0.1 |
+| Floating / unchained shells | 0 / 0 | 0 / 0 (all 8 objects) | 0 |
+| Buried > 0.05 | 0 (max 0.029) | 0 (max 0.020; rocks into root1 0.021) | 0 |
+| Leaves lifted by the rock guard | N8 0.30, N6 0.06 | none | |
+| Blade verts inside another blade | ≤ 0.11 | ≤ 0.07 | ≤ 0.25 |
+| Non-manifold / bowtie / winding / self-intersections | 0 | 0 on every object and shell | 0 |
+| Smallest corner | 2.92° | 2.75° (builder's thin check: 2°) | ≥ 3° (numeric) |
+| UV | 0 overlaps / flips | 0 / 0, gap 0.016, border 0.008, p95 1.012 | |
+| Origin | bbox bottom centre, offset (0.009, 0.048) | bottom centre, offset (−0.015, 0.150), sink −0.02 | ≤ 0.15 |
+| `kit_baked_shading` hero / RootCrown | 0.27 / 0.31 | 0.00 / 0.29 | < 0.5 |
+
+### Leftovers and deviations
+- **Tall-rock peaks in the front and f34: not met.**
+  - R5 + R6 are 1.5 % of the front ray grid and 0.6 % at el 20. They read as small grey bits between leaves, not as
+    the sheet's peaks.
+  - The skirt that now hides them from the side and rear also hides them from the front, because they sit under the
+    back arches. This is the §3.9 conflict: the sheet's front / f34 show tall peaks, its side / rear show only low
+    rocks.
+  - **Tried and dropped:**
+    - Raising them to 0.92 / 1.15 and 1.0 / 1.25 under raised N6 / N8: the front stayed at 1.6 %, N7 / N8 were lifted
+      0.18–0.42 and the rear rose to 10.6–12.9 %.
+    - Moving them to the back corners (az 40° / 140°, r 1.1): 3.2 % in the front, but still no readable peak, and the
+      front rock share rose to 12.6.
+    - Lowering the front petioles (0.58 → 0.38): no gain.
+- **Rear / r34 fill 0.584 / 0.564** (target ≥ 0.60), up from 0.557 / 0.506.
+  - What is left is the open band at h 0.4–0.6, between the skirt top and the arching fronds, and the open top corners
+    beside the tall fronds.
+  - The rear width profile is .35 1.00 .98 .88 .64 .50 .62 .89 .45 .52 .61; the sheet's is .63 .86 .91 .93 .86 .62 .81
+    .74 .47 .54 .68.
+- **r34 / f34 W : H 1.06 / 1.10** (sheet 1.367 / 1.305). At el 20 the depth adds to the height. With the decided
+  footprint (4.04 wide, at the tolerance limit; 3.58 deep) a W : H of 1.3 would need about 4.6 wide. The sheet's
+  three-quarters are not consistent with its orthos (§3.2).
+- **Rear and r34 root share fell to 0.9 / 0.4 %** (sheet 4.1 / 5.8). The skirt that was asked to cover the root star
+  now covers the crown too. Only the long back root and the R7 gap show some brown.
+- **Front root** `#52371D`, toward `#684324` but not there. The hub sits in the front skirt's cast shade, and its band
+  is already root_light.
+- **Skirt leaves.**
+  - They are broad and fewer (9) than the sheet's layered mound, so at a distance the back reads as big lobed leaves.
+  - Curtain leaf tips are 88–99° and leaf L : W is 1.15–1.45. The spec asks for 45–60° and 1.5; round 1's accepted
+    deviation was 82°.
+- **f34 mid tone 41 %** (sheet 29). Mid includes `leaf_fresh` (hue 87°, which the study's mask counts as mid); still
+  out by 12.
+- **Rock share without a sheet target:** left side 10.3, az045 12.3, az315 13.7. These come from the front-left rock
+  cluster (R1, R4) plus R5 through the N4 / N6 gap.
+- **The SmallFrond part shot** still sees F5 end-on (presentation, unchanged).
+- No commits or exports.
+
+### Main session ruling after fix round 1 (2026-10-31)
+- **Tall-rock peaks hidden in the front and f34: accepted.** This is the sheet's own §3.9 conflict: its front draws tall peaks, while its side and rear draw only low rocks. Keeping the rocks hidden from the side and rear was the blocker, and that matters more than a peek in front.
+- **Accepted as minors:**
+  - rear and r34 fill at 0.584 / 0.564;
+  - f34 and r34 W : H limited by the width cap.
+- **Next:** a fresh round-2 verifier.
+
+## Verification round 2 (verifier, 2026-10-31)
+A fresh verifier, read-only, in a background Blender on port 9881 on `wip/M060_verify.blend` (the main session's build
+of the fixed `m060.py`; not saved). Renders and comparisons: `renders/models/M060/verify2/` (`cmp_0..2.png` and
+`big_cmp_*.png` put each sheet cell beside ours, `spin_row0/1.png` the eight azimuths, `big_*.png` at 900 × 700,
+`cmp_parts.png` the parts row). Scripts: `<temp>\...\scratchpad\m060_verify2\` (`audit.py`, `contact.py`, `bur2.py`,
+`uvov.py`, `vis.py`, `vis_rock2.py`, `notch.py`, `col.py`); shares use the study's masks through the fix round's
+`meas.py`. My renders measure the same as `fix1/` to within 0.2 points, so the kit-file build matches the fix build.
+
+**Verdict: PASS, 7/10.** Both round-1 blockers are fixed. Nothing is broken, and from every side the model reads as the
+sheet's fern: two tall lobed fronds in a V, lime fronds arching out, a skirt mound to the ground, rocks and roots at the
+foot. The main leftover is visible but not a blocker: the big back "curtain" leaves have lost most of their visible
+lobing.
+
+### Round-1 blockers
+1. **Tall rocks: fixed.** R5 / R6 are now broad blocks (0.70 × 0.60 × 0.80 and 0.80 × 0.65 × 1.00) under the back arches.
+   They read as no more than grey bases peeking under the curtain leaves, never as bare obelisks.
+
+   | View | Rock share, ours | Sheet (±3) |
+   | --- | --- | --- |
+   | Front | 10.8 % | 8.9 |
+   | Side (right) | 8.2 | 6.4 |
+   | Rear | 9.0 | 8.5 |
+   | r34 | 5.8 | 8.3 |
+   | az045 / az135 / az225 / az315 | 12.1 / 9.8 / 7.9 / **13.7** | ≤ ~12 |
+   | Left side | 10.1 | no cell |
+
+   - The ray grid at el 5 shows where the diagonal excess comes from. At az315 (front-left) it is R1 346, R2 223, R4 139
+     and **R5 510 hits through the N4 / N6 gap**; R5 shows there only up to about the skirt line. At az045 it is R1 340,
+     R6 361 and R3 242.
+   - Minor, numeric.
+2. **Rear mound and root star: fixed.** In the rear, r34, az135 and az225 the curtain leaves N4 / N6–N9 drop to the
+   ground all round and cover the root arms. Only the long back root and a stub show.
+   - Rear T is 0.9 % and r34 T 0.4 % (sheet 4.1 / 5.8). The rear is now over-covered (see minor 2).
+   - It reads as a lush mound. It is less lobed than the sheet's (minor 1).
+
+### Extras from the ruling: all done
+- **Lobe ends.** Frond lobes are polygonal scallops, a shoulder, crown and shoulder with a V notch
+  (`big_az135.png`, `big_rear.png`). There is no square ratchet edge any more; from a glancing angle a slight step
+  remains.
+- **Front root.** In the hero, the arms are root_light then a 75 % mix, and the hub's lower bands a 50 % mix then
+  root_light. This is by member and height band.
+  - The front T (v ≥ .25) still renders `#52371D` against the sheet's `#684324`, because of the shade under the front
+    skirt. The rear is right at `#7B5432`.
+- **GroundLeaf.** Three domed, cupped hexagonal pads, 36 tris; they match the parts cell's rounded clump.
+- **MediumFrond part.** Mid green with fresh tips on both blades, as its cell. The hero's F3 / F3b keep their roles.
+- **Eight azimuths.** Every view shows lobed fronds; I found no flat-card flaps or fins at 900 px. Ray grid 0.025
+  (facet normals), % of visible foliage within 20° of edge-on:
+
+  | Azimuth | 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315 |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | el 5 | 8.6 | 8.8 | 7.7 | 9.8 | 5.2 | 8.5 | 8.3 | 8.5 |
+
+  - At el 20 the range is 6.4–11.9.
+  - Bare core (tubes + crown) is 3.1–10.7 %.
+
+### Technical re-measure (all pass unless marked)
+- **Tris.** Hero 3610 (ceiling 3800). Parts: Large 210, Medium 428, Small 214, RootCrown 262, BroadLeaf 162, Rock 30,
+  GroundLeaf 36.
+- **Size.** Hero 4.037 × 3.580 × 2.942.
+  - Height: 3.0 ± 0.1. Depth: 3.45 ± 0.2.
+  - **Width is inside decision 1's 3.85 ± 0.2 by only 0.013** (limit 4.05).
+- **Origin and transforms.** All 8 objects have the origin at the bbox bottom centre, rotation 0, scale 1, identity
+  deltas, no modifiers, no custom normals and flat shading.
+  - The hero sits (−0.015, 0.150) from the crown axis, exactly at the 0.15 limit, and sinks 0.02.
+- **Topology.** All 8 objects have 0 of each of these:
+  - non-manifold, boundary and wire edges;
+  - loose and duplicate verts;
+  - zero-area faces and n-gons (fully triangulated);
+  - bowtie verts and winding errors;
+  - negative-volume shells and self-intersections within a shell.
+  - The hero has 63 shells: 17 blades, 17 tubes, 9 crown pieces, 7 rocks and 13 sprig pads. No rock overlaps another
+    rock or the hub.
+  - The smallest corner is 2.75° on the hero (spec ≥ 3°). Numeric.
+- **Floating.** Tolerance 0.03, chained to the ground: 0 floating and 0 unchained shells. Every blade touches its own
+  tube; every tube sits 0.050–0.078 inside the hub; F3b / F4b seat in their parent tubes. Nothing is below z −0.025.
+- **Buried.** No blade, tube or sprig is inside any rock or the hub (ray parity, 3 rays).
+  - **root4 (az 248°) runs 0.079 into R1.** All 5 verts of its end ring are inside, so its cut-end face is hidden in
+    the rock. The spec allows 0.05.
+  - root1 goes 0.040 into R7 and 0.031 into R6, both inside the limit.
+  - The builder's bury report doesn't test roots against rocks. Visually it reads as a root running under the rock.
+    Numeric minor.
+- **UV.** Rasterised at 1024²: 0 overlapping cells and 0 flipped faces on every object. Density p5 / p95 is within
+  0.997–1.005, and the islands sit inside 0.008–0.992.
+- **Colour code (read).** Nothing is chosen by face normal:
+  - blades by lobe band along u and role (`blade`, `_ramp` / `_tone`);
+  - tubes by segment;
+  - the crown by member and height band;
+  - rocks by noise field, height fraction and position (`q.x < c.x`, top-back dot);
+  - sprigs alternate by pad.
+
+  `kit_baked_shading` is 0.32 on the hero in this build (the fix round reported 0.00) and 0.29 on RootCrown, both under
+  0.5.
+- **Colours on the renders** (sheet in brackets):
+
+  | Region | Ours | Sheet |
+  | --- | --- | --- |
+  | Front all-green | `#63941E` (85°) | `#5D961C` |
+  | Green, v > .7 | `#A1D225` | `#A1D224` |
+  | Light | `#A5D522` (76°) | `#A8D722` |
+  | Mid | `#6D9D20` (**83°**; §5.4 floor 86°, numeric) | `#69A520` |
+  | Dark | `#2A5D17` (**104°**; floor 105°, numeric) | |
+  | Rear all-green | `#437A21` | `#498216` |
+
+  - Not olive. The dark-vs-lime contrast is strong: F1 / F2 and the back curtains dark, the arching fronds and front
+    skirt lime.
+  - **Rocks.** Front median `#807C71` against `#7F7C76`: warm, R ≥ G ≥ B, never lavender. The lit rock
+    `#BEBBA8` (52°) is a little less warm than the sheet's `#D3C5AD`.
+
+### Minors (none blocking)
+1. **Curtain leaves read nearly unlobed** (visible).
+   - N4 / N6–N9 are 5 of the 9 skirt leaves and fill the side, left, rear and back-diagonal views. There they read as
+     big plain heart or arrowhead leaves (`big_cmp_side.png`, `big_cmp_rear.png`, `big_sideL.png`). The sheet draws
+     every skirt leaf with open, rounded lobes.
+   - `notch.py` on `_side_outline`:
+
+     | Outline | Notch depth (of the half-width) | Notch opening |
+     | --- | --- | --- |
+     | Curtain leaves | 0.70 | **about 10°**, mouth 0.066 |
+     | Other leaves | 0.66 | **9–13°**, mouth 0.044 |
+     | Fronds | 0.64 | 17–26° |
+
+   - The slits close up visually on the drooping blades.
+   - Cheap fix if wanted: open the leaf notches (shoulders at about ±0.22 of the pitch instead of ±0.35, or relax the
+     fan clamp on shoulder 2) so they show as rounded V scallops. It costs no extra tris.
+2. **The rear is over-covered.**
+   - Rear T is 0.9 % and r34 T 0.4 % (sheet 4.1 / 5.8).
+   - The sheet's low rock ring and brown roots don't show along the rear foot. One grey block shows under the centre
+     instead.
+   - The top view (e 60) also hides most of the rock ring.
+3. **root4 0.079 inside R1** (above). Shorten it (R 0.80 → about 0.68) or move it a few degrees.
+4. **The front root is still dark:** `#52371D` against `#684324`.
+5. **Tone shares out of ±8.**
+
+   | View | Ours (light / mid / dark) | Sheet |
+   | --- | --- | --- |
+   | f34 | 29 / **41** / 30 | 33 / 29 / 38 |
+   | Side | 29 / **45** / 25 | 38 / 34 / 28 |
+   | r34 | **24** / 34 / 42 | 37 / 26 / 37 |
+   | Front | 27 / 36 / 37 (in) | 31 / 29 / 40 |
+   | Rear | 22 / 36 / 42 (in) | 28 / 28 / 44 |
+
+6. **Silhouette** (accepted in the ruling).
+   - Fill: front 0.577 (sheet 0.649), f34 0.520 (0.621), rear 0.584, r34 0.564.
+   - W : H: f34 1.096 and r34 1.062, held down by the width cap.
+   - W : H in band: front 1.276, rear 1.256, side 1.096.
+7. **At the limit:** width 4.037 (limit 4.05), origin offset 0.150, smallest corner 2.75°.
+8. **az045 shows the bare hub and root arms** between N1 and N3 (T 5.1 %, inside the sheet's T range). The SmallFrond
+   default part shot is end-on; at (−60, 20) it reads as a lobed lime frond.
+
+**Ready for export and commit, with the leftovers above.** Minor 1 is the only one worth a quick optional touch.
+
+### Main session ruling (2026-10-31)
+Round 2 PASSED at 7/10, so the model is committed.
+- **Change before the commit:** verifier minor 3 (root 4 ran 0.079 into R1, past the 0.05 burial limit) was fixed in the main session. `ROOTS[4]` was shortened from 0.80 to 0.68. After the GUI rebuild, a ray-parity check found the deepest root vertex inside any rock at 0.040.
+- **Recorded for polish:** the other minors, chiefly:
+  - the curtain leaves reading nearly unlobed, because their notches are too narrow;
+  - the rear over-covered, with almost no roots or rock ring showing;
+  - tone shares in the f34, side and r34 views;
+  - width and origin offset at their limits.
+
+Export: 8 assets, 4952 tris, 0 problems.

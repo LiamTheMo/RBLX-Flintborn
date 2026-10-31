@@ -1,0 +1,866 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M060",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 1024,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m060_frond_dark",
+    "hex": "#346D2B",
+    "levels": [
+     0.97151,
+     0.98584,
+     0.99044,
+     1.00701,
+     1.01168,
+     1.02259,
+     1.02686,
+     1.0373
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_dark_x_frond_mid_25",
+    "hex": "#3E7628",
+    "levels": [
+     0.97707,
+     0.99107,
+     1.00338,
+     1.01003,
+     1.02561,
+     1.04247,
+     1.04912
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_dark_x_frond_mid_50",
+    "hex": "#498026",
+    "levels": [
+     0.96745,
+     1.00233,
+     1.01859,
+     1.02416,
+     1.04719
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_dark_x_frond_mid_75",
+    "hex": "#548924",
+    "levels": [
+     0.97707,
+     0.99329,
+     1.0017,
+     1.01074,
+     1.01956,
+     1.02888
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_light",
+    "hex": "#9ECA22",
+    "levels": [
+     0.95698,
+     0.97883,
+     0.98037,
+     0.99178,
+     0.99544,
+     1.00683,
+     1.01649,
+     1.01884,
+     1.02121,
+     1.03749
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_mid",
+    "hex": "#5E9221",
+    "levels": [
+     0.98584,
+     1.00432,
+     1.00699,
+     1.01836,
+     1.03572
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_mid_x_leaf_fresh_25",
+    "hex": "#689C24",
+    "levels": [
+     0.96798,
+     0.9852,
+     0.99117,
+     1.00759,
+     1.00919,
+     1.01144,
+     1.01886,
+     1.02993
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_mid_x_leaf_fresh_50",
+    "hex": "#71A626",
+    "levels": [
+     0.96704,
+     0.97975,
+     0.99562,
+     1.0017,
+     1.00462,
+     1.0112,
+     1.01335,
+     1.02975,
+     1.04705
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_frond_mid_x_leaf_fresh_75",
+    "hex": "#7AB128",
+    "levels": [
+     0.96344,
+     0.98327,
+     0.99202,
+     0.99599,
+     1.00389,
+     1.01836,
+     1.02036,
+     1.02409,
+     1.02774
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_green_deep",
+    "hex": "#244C1C",
+    "levels": [
+     0.97534,
+     1.00753,
+     1.02245
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_green_deep_x_frond_dark_25",
+    "hex": "#285420",
+    "levels": [
+     0.9992,
+     1.02416
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_green_deep_x_frond_dark_50",
+    "hex": "#2C5C24",
+    "levels": [
+     0.97534
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_green_deep_x_frond_dark_75",
+    "hex": "#306527",
+    "levels": [
+     0.97112,
+     0.99347,
+     0.9992,
+     1.01678,
+     1.02155,
+     1.02416,
+     1.03215
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_leaf_fresh",
+    "hex": "#84BB2B",
+    "levels": [
+     0.95791,
+     0.98007,
+     0.99599,
+     1.00233,
+     1.02409,
+     1.02688
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_leaf_fresh_x_frond_light_25",
+    "hex": "#8ABF29",
+    "levels": [
+     0.94864,
+     1.00421,
+     1.0218
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_leaf_fresh_x_frond_light_50",
+    "hex": "#91C226",
+    "levels": [
+     0.96529,
+     0.98425,
+     1.00016,
+     1.00876,
+     1.01886
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_leaf_fresh_x_frond_light_75",
+    "hex": "#98C624",
+    "levels": [
+     0.97897,
+     0.98705,
+     1.00372,
+     1.00879,
+     1.02418
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_rock",
+    "hex": "#888582",
+    "levels": [
+     0.96161,
+     0.96306,
+     0.96727,
+     0.97016,
+     0.97268,
+     0.97521,
+     0.97716,
+     0.97981,
+     0.98284,
+     0.98676,
+     0.98937,
+     0.99161,
+     0.99498,
+     0.9993,
+     1.00324,
+     1.00533,
+     1.00834,
+     1.01084,
+     1.01383,
+     1.01568,
+     1.01709,
+     1.02024,
+     1.02489,
+     1.02649,
+     1.03122,
+     1.03329,
+     1.03619,
+     1.03826
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_rock_deep",
+    "hex": "#6E6B68",
+    "levels": [
+     0.96043,
+     0.96653,
+     0.97251,
+     0.9747,
+     0.97894,
+     0.98161,
+     0.98452,
+     0.98736,
+     0.99287,
+     0.99859,
+     1.00066,
+     1.00435,
+     1.00819,
+     1.01178,
+     1.01578,
+     1.01954,
+     1.02496,
+     1.02751,
+     1.03041
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_rock_sage",
+    "hex": "#858C74",
+    "levels": [
+     0.96881,
+     0.97183,
+     0.97428,
+     0.98264,
+     0.98707,
+     0.99549,
+     1.00027,
+     1.00293,
+     1.00838,
+     1.01148,
+     1.01478,
+     1.0187,
+     1.02436,
+     1.0348
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_rock_x_deep_50",
+    "hex": "#7B7875",
+    "levels": [
+     0.96195,
+     0.96648,
+     0.96956,
+     0.97384,
+     0.97666,
+     0.98109,
+     0.98591,
+     0.98831,
+     0.99156,
+     0.99284,
+     0.99742,
+     1.00026,
+     1.00261,
+     1.00492,
+     1.00805,
+     1.01305,
+     1.01716,
+     1.02029,
+     1.02216,
+     1.02478,
+     1.02821,
+     1.03349,
+     1.03605,
+     1.03843
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_rock_x_sage_50",
+    "hex": "#86887B",
+    "levels": [
+     0.9607,
+     0.97025,
+     0.98268,
+     0.98966,
+     0.99205,
+     0.99507,
+     1.00172,
+     1.01429,
+     1.01771,
+     1.02829,
+     1.03228
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root",
+    "hex": "#7A4D27",
+    "levels": [
+     0.971,
+     0.98052,
+     0.98906,
+     0.9936,
+     1.0,
+     1.00595,
+     1.01481,
+     1.02799
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_light",
+    "hex": "#96693C",
+    "levels": [
+     0.971,
+     0.98052,
+     0.9892,
+     0.9936,
+     1.0,
+     1.00595,
+     1.01481,
+     1.02799
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_x_deep_25",
+    "hex": "#6D4421",
+    "levels": [
+     0.971,
+     0.98052,
+     0.98882,
+     0.9936,
+     1.00595,
+     1.01481,
+     1.02799
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_x_deep_50",
+    "hex": "#603C1C",
+    "levels": [
+     0.9893
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_x_light_50",
+    "hex": "#885B32",
+    "levels": [
+     0.9893
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_x_light_75",
+    "hex": "#8F6237",
+    "levels": [
+     0.971,
+     0.98052,
+     0.98882,
+     0.9936,
+     1.00595,
+     1.01481,
+     1.02799
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_root_x_stalk_50",
+    "hex": "#765414",
+    "levels": [
+     0.97151,
+     0.97591,
+     0.99046,
+     0.9963,
+     1.00233,
+     1.00462,
+     1.00753,
+     1.0112,
+     1.02327,
+     1.02688,
+     1.02931
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk",
+    "hex": "#735B00",
+    "levels": [
+     0.97591,
+     0.99599,
+     0.9992,
+     1.00233,
+     1.02415,
+     1.02688
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_frond_dark_50",
+    "hex": "#546416",
+    "levels": [
+     0.97151,
+     0.99046,
+     1.02888
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_frond_dark_x_frond_mid_75_50",
+    "hex": "#647212",
+    "levels": [
+     1.00233,
+     1.02416
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_frond_mid_50",
+    "hex": "#687610",
+    "levels": [
+     0.99646,
+     1.00462,
+     1.0112,
+     1.02975
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_frond_mid_x_leaf_fresh_25_50",
+    "hex": "#6E7C12",
+    "levels": [
+     0.99599,
+     1.00233,
+     1.02409,
+     1.02688
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_green_deep_50",
+    "hex": "#4C540E",
+    "levels": [
+     1.00753,
+     1.02245
+    ],
+    "used": true
+   },
+   {
+    "key": "m060_stalk_x_green_deep_x_frond_dark_75_50",
+    "hex": "#526014",
+    "levels": [
+     0.97591,
+     0.9992,
+     1.02416
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "BroadleafFern",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "hero",
+   "size": [
+    4.037,
+    2.9418,
+    3.5803
+   ],
+   "tris": 3610,
+   "budget": 3800,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFern.glb",
+     "kind": "solid",
+     "tris": 3610,
+     "offset": [
+      0.0,
+      1.4709,
+      0.0
+     ],
+     "size": [
+      4.037,
+      2.9418,
+      3.5803
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broadleaf fern: 8 thick blunt-lobed frond blades on 6 stalks (2 tall dark, 2 arching lime + 2 dark forks, 2 small lime) and a skirt of 8 lobed broad leaves on an orange-brown root crown (hub, peg, 7 roots), 7 warm-grey rocks (2 sage-stained) and 6 lime sprigs. Hip-high walk-through undergrowth (collision none). Sheet 58/132."
+  },
+  {
+   "name": "BroadleafFernBroadLeaf",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    1.0842,
+    0.9705,
+    1.4043
+   ],
+   "tris": 162,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernBroadLeaf.glb",
+     "kind": "solid",
+     "tris": 162,
+     "offset": [
+      0.0,
+      0.4853,
+      0.0
+     ],
+     "size": [
+      1.0842,
+      0.9705,
+      1.4043
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Broad Leaf (single): one lobed skirt leaf (4 lobes a side) on its petiole"
+  },
+  {
+   "name": "BroadleafFernGroundLeaf",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    0.3494,
+    0.0771,
+    0.3286
+   ],
+   "tris": 36,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernGroundLeaf.glb",
+     "kind": "solid",
+     "tris": 36,
+     "offset": [
+      0.0,
+      0.0386,
+      0.0
+     ],
+     "size": [
+      0.3494,
+      0.0771,
+      0.3286
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ground Leaf (small): three small rounded, cupped lime leaves in a low clump"
+  },
+  {
+   "name": "BroadleafFernLargeFrond",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    1.064,
+    2.5448,
+    0.9365
+   ],
+   "tris": 210,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernLargeFrond.glb",
+     "kind": "solid",
+     "tris": 210,
+     "offset": [
+      0.0,
+      1.2724,
+      0.0
+     ],
+     "size": [
+      1.064,
+      2.5448,
+      0.9365
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Fern Frond (large): F1, a dark lobed frond (5 + 4 lobes) on its ochre-brown stalk"
+  },
+  {
+   "name": "BroadleafFernMediumFrond",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    1.9143,
+    1.7738,
+    1.2044
+   ],
+   "tris": 428,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernMediumFrond.glb",
+     "kind": "solid",
+     "tris": 428,
+     "offset": [
+      0.0,
+      0.8869,
+      0.0
+     ],
+     "size": [
+      1.9143,
+      1.7738,
+      1.2044
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Fern Frond (medium): F3 + its fork F3b on one stalk, mid green as the sheet's part cell"
+  },
+  {
+   "name": "BroadleafFernRock",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    0.6602,
+    0.4858,
+    0.5774
+   ],
+   "tris": 30,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernRock.glb",
+     "kind": "solid",
+     "tris": 30,
+     "offset": [
+      0.0,
+      0.2429,
+      0.0
+     ],
+     "size": [
+      0.6602,
+      0.4858,
+      0.5774
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock (reusable): warm-grey faceted block, deeper foot, a sage stain at the top back"
+  },
+  {
+   "name": "BroadleafFernRootCrown",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    1.6206,
+    0.6,
+    2.0404
+   ],
+   "tris": 262,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernRootCrown.glb",
+     "kind": "solid",
+     "tris": 262,
+     "offset": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "size": [
+      1.6206,
+      0.6,
+      2.0404
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Cluster (base): faceted 8-sided hub with a peg and 7 splayed roots with cut ends"
+  },
+  {
+   "name": "BroadleafFernSmallFrond",
+   "sheet": "M060",
+   "subject": "Broadleaf Fern",
+   "role": "part",
+   "size": [
+    0.4933,
+    1.1847,
+    1.5332
+   ],
+   "tris": 214,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/BroadleafFernSmallFrond.glb",
+     "kind": "solid",
+     "tris": 214,
+     "offset": [
+      0.0,
+      0.5923,
+      0.0
+     ],
+     "size": [
+      0.4933,
+      1.1847,
+      1.5332
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Fern Frond (small): F5, a lime lobed frond on its stalk"
+  }
+ ],
+ "stats": {
+  "assets": 8,
+  "pieces": 8,
+  "solid": 8,
+  "water": 0,
+  "glow": 0,
+  "tris": 4952,
+  "vfxSockets": 0,
+  "paletteColours": 36,
+  "paletteLevels": 262,
+  "meshBytes": 504200
+ },
+ "problems": []
+}
