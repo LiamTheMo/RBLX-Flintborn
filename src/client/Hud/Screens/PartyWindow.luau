@@ -109,7 +109,7 @@ local function header(parent: Instance, w: number, text: string, icon, textX: nu
 		iconRect = { icon[2], icon[3] - HEADER_Y, icon[4], icon[5] },
 		textX = textX,
 		count = count,
-		countGap = 25,
+		countGap = 31,
 		ruleRect = { rule[1], rule[2] - HEADER_Y, rule[3], 2 },
 		zIndex = Z + 1,
 	})
@@ -442,6 +442,7 @@ function PartyWindow:_invites(data)
 	local content = self.inviteList:Content()
 	local order, height = 0, 0
 	local w = self.inviteListRect[3]
+	local frameH = PartyWindow.FRAMES.invite.h
 	local function section(text: string)
 		order += 1
 		height += 36
@@ -456,34 +457,31 @@ function PartyWindow:_invites(data)
 			})
 		)
 	end
+	local function rowProps(name: string, userId: number?, level: number?, action)
+		return {
+			userId = userId,
+			name = name,
+			level = level,
+			portraitSize = 52,
+			nameX = 68,
+			nameSize = 17,
+			levelSize = 13,
+			action = action,
+		}
+	end
 	local incoming = data.invites or {}
 	if #incoming > 0 then
 		section("Invitations")
 		for _, entry in incoming do
 			order += 1
-			height += PartyWindow.INVITE_ROW
+			height += frameH
 			-- The row leaves room at its right for the decline ✕.
-			local holder = self:_add(
+			local holder = self:_framed(
 				"invites",
-				Kit.Panel.new(content, {
-					name = "Invitation" .. order,
-					size = { w, PartyWindow.INVITE_ROW },
-					layoutOrder = order,
-					variant = "plain",
-					zIndex = Z + 2,
-				})
-			)
-			local row = Kit.PlayerRow.new(holder.base.visual, {
-				rect = { 0, 0, w - 44, PartyWindow.INVITE_ROW },
-				zIndex = Z + 2,
-				userId = entry.userId,
-				name = entry.from,
-				level = entry.level,
-				portraitSize = 52,
-				nameX = 70,
-				nameSize = 17,
-				levelSize = 14,
-				action = {
+				content,
+				"invite",
+				order,
+				rowProps(entry.from, entry.userId, entry.level, {
 					size = { 108, 45 },
 					label = "Accept",
 					onPress = function()
@@ -491,8 +489,9 @@ function PartyWindow:_invites(data)
 							props.onAccept(entry.partyId)
 						end
 					end,
-				},
-			})
+				}),
+				w - 44
+			)
 			local decline = Kit.IconButton.new(holder.base.visual, {
 				name = "Decline",
 				rect = { w - 40, 14, 38, 38 },
@@ -506,14 +505,13 @@ function PartyWindow:_invites(data)
 				end,
 			})
 			holder.base.maid:Give(function()
-				row:Destroy()
 				decline:Destroy()
 			end)
 			if entry.busy then
-				row.action:SetBusy(true)
+				holder.action:SetBusy(true)
 				decline:SetEnabled(false)
 			end
-			self.selectables["invites:accept:" .. entry.partyId] = row.action.control.hit
+			self.selectables["invites:accept:" .. entry.partyId] = holder.action.control.hit
 			self.selectables["invites:decline:" .. entry.partyId] = decline.control.hit
 		end
 		if #data.inviteRows > 0 then
@@ -522,27 +520,18 @@ function PartyWindow:_invites(data)
 	end
 	for _, entry in data.inviteRows do
 		order += 1
-		height += PartyWindow.INVITE_ROW
-		local row = self:_add(
+		height += frameH
+		local holder = self:_framed(
 			"invites",
-			Kit.PlayerRow.new(content, {
-				size = { w, PartyWindow.INVITE_ROW },
-				layoutOrder = order,
-				zIndex = Z + 2,
-				userId = entry.userId,
-				name = entry.name,
-				level = entry.level,
-				portraitSize = 52,
-				nameX = 70,
-				nameSize = 17,
-				levelSize = 14,
-				action = inviteAction(entry, props.onInvite),
-			})
+			content,
+			"invite",
+			order,
+			rowProps(entry.name, entry.userId, entry.level, inviteAction(entry, props.onInvite))
 		)
 		if entry.state == "pending" then
-			row.action:SetBusy(true)
+			holder.action:SetBusy(true)
 		end
-		self.selectables["invites:player:" .. entry.userId] = row.action.control.hit
+		self.selectables["invites:player:" .. entry.userId] = holder.action.control.hit
 	end
 	self.inviteList:SetContentHeight(height + 2)
 	local note = data.inviteNote
@@ -556,22 +545,16 @@ function PartyWindow:_ready(data)
 	self:_clear("ready")
 	local content = self.readyList:Content()
 	for i, member in data.members do
-		self:_add(
-			"ready",
-			Kit.PlayerRow.new(content, {
-				size = { PartyWindow.LIST_W.ready, PartyWindow.READY_ROW },
-				layoutOrder = i,
-				userId = member.userId,
-				name = member.name,
-				badge = if member.ready then "ready" else "notReady",
-				portraitSize = 48,
-				nameX = 65,
-				nameSize = 16,
-				zIndex = Z + 2,
-			})
-		)
+		self:_framed("ready", content, "ready", i, {
+			userId = member.userId,
+			name = member.name,
+			badge = if member.ready then "ready" else "notReady",
+			portraitSize = 48,
+			nameX = 65,
+			nameSize = 16,
+		})
 	end
-	self.readyList:SetContentHeight(#data.members * PartyWindow.READY_ROW + 2)
+	self.readyList:SetContentHeight(#data.members * PartyWindow.FRAMES.ready.h + 2)
 	local count = 0
 	for _, member in data.members do
 		if member.ready then

@@ -1,121 +1,97 @@
--- Top-right objective panel ("FIND EXTRACTION"): a waypoint icon, title and up to
--- two task lines with a checkbox, distance and progress. Fed by
+-- Top-right objective card ("FIND EXTRACTION"): a Kit.Panel "card" with a
+-- section header (exit icon and the title) and up to two task lines, each the
+-- quest journal's round check (Kit.Checkbox "ring", read only), the task, a
+-- map pin and distance, and the progress at the right. Fed by
 -- HudModel.ExtractionObjective; display only.
 
+local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
-local Widgets = require(script.Parent.Widgets)
 
 local ObjectivePanel = {}
 ObjectivePanel.__index = ObjectivePanel
 
-local function checkbox(parent, x: number, size: number, centreY: number, colorKey: string?)
-	local color = Layout.Color(colorKey or "text")
-	local box = Widgets.Make("Frame", {
-		Name = "Check",
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.fromOffset(x, centreY),
-		Size = UDim2.fromOffset(size, size),
-		BackgroundColor3 = Layout.Color("stamina"),
-		BackgroundTransparency = 1,
-		ZIndex = 4,
-	}, parent)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, box)
-	Widgets.Make("UIStroke", { Color = color, Thickness = 1.5 }, box)
-	local tickMark = Widgets.Make("TextLabel", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		Text = "✓",
-		TextColor3 = color,
-		TextScaled = true,
-		Font = Enum.Font.GothamBold,
-		Visible = false,
-		ZIndex = 5,
-	}, box)
-	return box, tickMark
-end
-
 function ObjectivePanel.new(parent: Instance, layout)
 	local cfg = layout.objective
-	local self = setmetatable({ rows = {} }, ObjectivePanel)
-	self.root = Widgets.Panel(cfg, {
-		Name = "Objective",
-		Size = UDim2.fromOffset(cfg.size[1], cfg.size[2]),
-	}, parent)
+	local self = setmetatable({ cfg = cfg, rows = {}, titleText = nil }, ObjectivePanel)
+	self.root = Instance.new("Frame")
+	self.root.Name = "Objective"
+	self.root.BackgroundTransparency = 1
 	Layout.Place(self.root, cfg)
-	-- The extraction icon: a hollow gold diamond with a walking figure inside.
-	local diamond = cfg.diamond
-	local side = math.min(diamond.rect[3], diamond.rect[4]) / math.sqrt(2)
-	local outline = Widgets.Make("Frame", {
-		Name = "Diamond",
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(diamond.rect[1] + diamond.rect[3] / 2, diamond.rect[2] + diamond.rect[4] / 2),
-		Rotation = 45,
-		Size = UDim2.fromOffset(side, side),
-		ZIndex = 4,
-	}, self.root)
-	Widgets.Make("UICorner", { CornerRadius = UDim.new(0, 2) }, outline)
-	Widgets.Make("UIStroke", { Color = Layout.Color(diamond.color), Thickness = diamond.thickness }, outline)
-	local figure = Widgets.Sprite(cfg.figure.icon, {
-		Name = "Figure",
-		Position = Layout.Position(cfg.figure.rect),
-		Size = Layout.Size(cfg.figure.rect),
-		ZIndex = 4,
-	}, self.root)
-	if figure:IsA("ImageLabel") then
-		figure.ImageColor3 = Layout.Color(cfg.figure.tint)
-	end
-	local dividers = cfg.dividers
-	for _, y in dividers.y do
-		Widgets.Make("Frame", {
-			Name = "Divider",
-			BackgroundColor3 = Layout.Color(dividers.color),
-			BackgroundTransparency = dividers.transparency,
-			BorderSizePixel = 0,
-			Position = UDim2.fromOffset(dividers.x, y),
-			Size = UDim2.fromOffset(dividers.w, 1),
-			ZIndex = 4,
-		}, self.root)
-	end
-	self.title = Widgets.Text(cfg.title, {
-		Name = "Title",
-		Position = Layout.Position(cfg.title.rect),
-		Size = Layout.Size(cfg.title.rect),
-	}, self.root)
-	for index, y in cfg.rows.y do
-		local centreY = y + cfg.rows.h / 2
-		local box, tickMark = checkbox(self.root, cfg.check.x, cfg.check.size, centreY, cfg.check.color)
-		local text = Widgets.Text(cfg.text, {
-			Name = "Task" .. index,
-			Position = UDim2.fromOffset(cfg.text.x, y),
-			Size = UDim2.fromOffset(cfg.text.w, cfg.rows.h),
-		}, self.root)
-		local pin = Widgets.Pin(Layout.Color(cfg.pin.color), {
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.fromOffset(cfg.pin.x, centreY),
-			Size = UDim2.fromOffset(cfg.pin.size[1], cfg.pin.size[2]),
-		}, self.root)
-		local distance = Widgets.Text(cfg.distance, {
-			Name = "Distance",
-			Position = UDim2.fromOffset(cfg.distance.x, y),
-			Size = UDim2.fromOffset(cfg.distance.w, cfg.rows.h),
-		}, self.root)
-		local progress = Widgets.Text(cfg.progress, {
-			Name = "Progress",
-			AnchorPoint = Vector2.new(1, 0),
-			Position = UDim2.fromOffset(cfg.progress.right, y),
-			Size = UDim2.fromOffset(cfg.progress.w, cfg.rows.h),
-			TextXAlignment = Enum.TextXAlignment.Right,
-		}, self.root)
+	self.root.Parent = parent
+	local w, h = cfg.size[1], cfg.size[2]
+	self.panel = Kit.Panel.new(self.root, { name = "Panel", rect = { 0, 0, w, h }, variant = "card", pad = 0 })
+	local body = self.panel:Content()
+	self.header = Kit.SectionHeader.new(body, {
+		name = "Header",
+		rect = cfg.header,
+		text = "Find Extraction",
+		icon = "exit",
+		zIndex = 8,
+	})
+	local x, rowW = cfg.header[1], cfg.header[3]
+	for index = 1, 2 do
+		local y = cfg.rowTop + (index - 1) * cfg.rowHeight
+		local rh = cfg.rowHeight
+		local check = Kit.Checkbox.new(body, {
+			name = "Check" .. index,
+			rect = { x, y + (rh - cfg.check) / 2, cfg.check, cfg.check },
+			variant = "ring",
+			readOnly = true,
+			checked = false,
+			zIndex = 8,
+		})
+		local text = Kit.Text.new(body, {
+			name = "Task" .. index,
+			rect = { x + cfg.check + 8, y, cfg.textW, rh },
+			text = "",
+			role = "rowLabel",
+			textSize = cfg.textSize,
+			scaled = true,
+			zIndex = 8,
+		})
+		local progress = Kit.Text.new(body, {
+			name = "Progress",
+			rect = { x + rowW - cfg.progressW, y, cfg.progressW, rh },
+			text = "",
+			role = "value",
+			textSize = cfg.textSize,
+			align = "Right",
+			scaled = true,
+			zIndex = 8,
+		})
+		local pinX = x + rowW - cfg.progressW - cfg.distanceW - cfg.pin
+		local pin = Kit.Icon.new(body, {
+			name = "Pin",
+			rect = { pinX, y + (rh - cfg.pin) / 2, cfg.pin, cfg.pin },
+			icon = "map_pin",
+			zIndex = 8,
+		})
+		local distance = Kit.Text.new(body, {
+			name = "Distance",
+			rect = { pinX + cfg.pin + 2, y, cfg.distanceW - 4, rh },
+			text = "",
+			role = "small",
+			textSize = cfg.textSize,
+			scaled = true,
+			zIndex = 8,
+		})
+		local rule = Kit.Divider.new(body, {
+			name = "Rule",
+			rect = { x, y + rh - 1, rowW, 2 },
+			variant = "hairline",
+			zIndex = 7,
+		})
+		rule.root.Visible = index == 1
 		self.rows[index] = {
-			box = box,
-			tickMark = tickMark,
+			check = check,
 			text = text,
+			progress = progress,
 			pin = pin,
 			distance = distance,
-			progress = progress,
-			textWidth = cfg.text.w,
-			wideWidth = cfg.progress.right - cfg.progress.w - cfg.text.x,
+			rule = rule,
+			x = x + cfg.check + 8,
+			narrow = cfg.textW,
+			wide = rowW - cfg.check - 8 - cfg.progressW - 6,
 		}
 	end
 	return self
@@ -123,24 +99,33 @@ end
 
 -- model: HudModel.ExtractionObjective(...)
 function ObjectivePanel:Set(model)
-	self.title.Text = model.title
+	if model.title ~= self.titleText then
+		self.titleText = model.title
+		self.header:SetText(model.title)
+		-- The header label was sized for its first text; give it the row.
+		local label = self.header.label
+		label.Size = UDim2.fromOffset(self.cfg.header[3] - label.Position.X.Offset, label.Size.Y.Offset)
+	end
 	for index, row in self.rows do
 		local line = model.lines[index]
 		local visible = line ~= nil
-		row.box.Visible = visible
-		row.text.Visible = visible
-		row.progress.Visible = visible
-		row.pin.Visible = visible and line.distance ~= nil
-		row.distance.Visible = visible and line.distance ~= nil
+		local hasDistance = visible and line.distance ~= nil
+		row.check.root.Visible = visible
+		row.text.root.Visible = visible
+		row.progress.root.Visible = visible
+		row.pin.root.Visible = hasDistance
+		row.distance.root.Visible = hasDistance
 		if line then
-			row.text.Text = line.text
+			row.text:SetText(line.text)
 			-- Without a distance the task text may use the free space.
-			local width = if line.distance then row.textWidth else row.wideWidth
-			row.text.Size = UDim2.fromOffset(width, row.text.Size.Y.Offset)
-			row.distance.Text = line.distance or ""
-			row.progress.Text = line.progress
-			row.tickMark.Visible = line.done
-			row.box.BackgroundTransparency = if line.done then 0 else 1
+			local width = if hasDistance then row.narrow else row.wide
+			row.text.root.Size = UDim2.fromOffset(width, row.text.root.Size.Y.Offset)
+			row.distance:SetText(line.distance or "")
+			row.progress:SetText(line.progress)
+			row.check:SetChecked(line.done == true)
+		end
+		if index == 1 then
+			row.rule.root.Visible = model.lines[2] ~= nil
 		end
 	end
 end
