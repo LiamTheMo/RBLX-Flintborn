@@ -202,7 +202,10 @@ check(window.partyHeader.count.Text == "2/8" and detail(window, "Members") == "2
 check(window.leaveButton.root.Visible, "Leave Party shows in a party of two")
 check(rowNames(window) == "Emberwick,SunnyVale", "members leave the invite list")
 local leaderRow = window:Rows("members")[1]
-check(leaderRow.row.badge == nil and leaderRow.row.content:FindFirstChild("Crown") ~= nil, "the leader has a crown, no tag")
+check(
+	leaderRow.row.badge == nil and leaderRow.row.content:FindFirstChild("Crown") ~= nil,
+	"the leader has a crown, no tag"
+)
 check(window:Rows("members")[2].row.badge == nil, "members carry no Ready tag")
 
 -- A player leaving the server drops out of the list.

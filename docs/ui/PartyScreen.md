@@ -13,8 +13,8 @@ Modal window for managing the party, opened from the HUD Party panel
 (`docs/ui/LobbyScreen.md`, open question 3). Header with a camp emblem and
 "PARTY". Three columns: **Your Party** (leader row and empty slots), **Invite
 Players** (search box and a list of players with Invite buttons), and on the right
-**Party Details** (key/value rows) above **Readied Status** (per-member ready
-pills). A leather CLOSE button sits under the columns and an X button in the top
+**Party Details** (key/value rows; the mockup's Readied Status card under it is
+removed, D24). A leather CLOSE button sits under the columns and an X button in the top
 right. The HUD stays visible under the full-screen dim overlay (#000000 at
 BackgroundTransparency 0.29; measured alpha 0.715 in this mockup, see LobbyScreen).
 
@@ -22,7 +22,11 @@ Owner decisions (deviations from the reference):
 - Party cap is **8**: "1/8" in the Your Party header and "1 / 8" in Members (mockup "1/10").
 - Party Details has **no "Play Style" row**.
 - Join Type shows **"Invite Only"** (as in the mockup; it is now the only value).
-- Readied Status **stays**: one row per member, ready state tracked by the server.
+- **No Ready and no Leader tag (D24).** The Readied Status card, its Ready / Not
+  Ready toggle and the "k of n ready" tally are removed; Party Details takes the
+  whole right column (top y 245, bottom y 693; the space under its rows stays
+  empty). Member rows carry no Ready / Not Ready tags, and the leader is marked
+  only by the crown beside the name.
 
 Typography: Merriweather Bold for all text (evidence in `LobbyScreen.md` →
 Typography). TextSize = Merriweather Bold em size whose rendered ink height
@@ -211,11 +215,10 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
 | Element | Shows / does | Data source | Server validation |
 |---|---|---|---|
 | Header count, Members value | members / 8 | party replica | server owns the cap (8) |
-| Your Party list | leader first (crown + Leader pill), then members, then empty slots up to 8 | party replica | — |
+| Your Party list | leader first (crown only, D24), then members, then empty slots up to 8 | party replica | — |
 | SearchBox + InviteList | players in this lobby server not in the party, filtered by name as the user types | client list of Players, filtered locally | — |
 | InviteButton | sends an invite | remote `InviteToParty(userId)` | server checks the sender is leader (or allowed), the party is not full, the target is valid, rate limit |
 | Party Leader / Join Type / Created | leader name, "Invite Only", time since creation | party replica | — |
-| Readied Status | one row per member with their ready state | party replica (server-tracked, per member) | server owns the ready flags; a player can only toggle their own |
 | CloseX / CloseButton | close the window | client | — |
 
 ## Open questions
@@ -248,7 +251,10 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
 ## Deviations from reference
 
 - Owner decisions: "1/8" and "1 / 8" (cap 8, mockup 10); no Play Style row; Join
-  Type fixed to "Invite Only"; Readied Status kept, per member, server-tracked.
+  Type fixed to "Invite Only"; no Readied Status card, no Ready / Not Ready or
+  Leader tags (D24): Party Details fills the right column and the leader row
+  shows only the crown. The measurements of the mockup's Leader pill and
+  Readied Status rows above record the mockup only.
 - Column headings in the mockup are 9–13 % narrower than Merriweather Bold at the
   same height; they render up to 22 px wider in Roblox. Even then each heading keeps
   ≥ 80 px clear to its panel's right edge (e.g. "PARTY DETAILS" 1111..≈1281 vs edge
@@ -261,13 +267,12 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
 ## Fix round 3
 
 - **Rows update in place** (M3): `SetData` keys every row (member, invite,
-  player, empty slot, detail, ready) by its player or label and keeps a row
+  player, empty slot, detail) by its player or label and keeps a row
   whose contents did not change; only changed rows are rebuilt, gamepad
   targets follow (`PartyWindow:Rows(list)` returns a list in order). Search
   waits 0.3 s after the last keystroke.
-- **Pending state** lives in PartyController (`SetReady`, `Answer`,
-  `ReadyPending`, `ShownReady`, `AnswerBusy`, `Changed`); the HUD and the Play
-  window use it (M2).
+- **Pending state** lives in PartyController (`Answer`, `AnswerBusy`,
+  `Changed`); the HUD uses it (M2).
 - **Phones**: names, levels and button labels at 15 (9 screen px or more);
   long names end in "…"; "Invited" fits its button (V9); a long Party Leader
   value ends in "…" so "Party Leader" keeps its room (R12).

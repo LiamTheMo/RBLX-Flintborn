@@ -1,6 +1,6 @@
 -- The Play window (docs/ui/PlayScreen.md) at 1672 × 941 with the mockup's
--- sample data, placed where art/reference/ui/lobby/05_play.png has it, over the
--- lobby HUD mockup. Compare with:
+-- sample data, placed where the Inventory capture puts its window (same size
+-- and chrome, D25), over the lobby HUD mockup. Mockup 05 for reference:
 --
 --   python3 art/ui/capture/capture.py play --compare art/reference/ui/lobby/05_play.png
 
@@ -28,7 +28,7 @@ window:SetParty({ { userId = 1, name = "LiamTheMo", level = 12, leader = true } 
 window:SetLoadout(PlayModel.LoadoutHotbar(preview))
 window:SetMode("solo")
 window:Open()
--- The mockup's window: 309..1361 × 127..791.
-window.screen.holder.Position = UDim2.fromOffset(309 + PlayWindow.SIZE[1] / 2, 127 + PlayWindow.SIZE[2] / 2)
+-- The mockup's window: 243..1361 × 150..791.
+window.screen.holder.Position = UDim2.fromOffset(243 + PlayWindow.SIZE[1] / 2, 150 + PlayWindow.SIZE[2] / 2)
 window.screen.scale.Scale = 1
 __dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })

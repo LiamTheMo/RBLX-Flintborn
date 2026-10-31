@@ -444,13 +444,15 @@ too) puts "LV. n" and a small XP bar (Bar, `track` frame, `xp` fill,
 follow the player's replicated `Level` / `LevelProgress` attributes while
 they are in the server (attribute signals, no polling), else the props.
 ```lua
-Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = level, leader = isLeader, badge = if ready then "ready" else "notReady" })
+Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = level, leader = isLeader })
 ```
 
 ### Badge
 `Kit.Badge.new(parent, {variant = "leader" | "ready" | "notReady" | "count" | "number" | "new" | "dot", text?, rect = {x, y, 0, h} (0 fits the text), anchor? = "topRight"})`;
-`:SetText`, `:SetVisible`. Ready = green dot + "Ready", Not Ready = grey dot +
-"Not Ready" (D18).
+`:SetText`, `:SetVisible`. "ready" = green dot on the light green pill,
+"notReady" = grey dot on the value pill: generic set / not-set status pills
+(trade lock, save status). The party no longer uses them or the "leader"
+plaque (D24): the leader is marked by the crown alone. `readyPill` is removed.
 
 ### CurrencyPill
 `Kit.CurrencyPill.new(parent, {rect = 112 × 46, currency = "coins" | "gems", value, onPress?})`;
