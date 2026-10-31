@@ -17,6 +17,7 @@
 --       actions = { { id = "store", label = "Store" } } })
 --   window:Open()
 
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -29,9 +30,11 @@ InventoryWindow.__index = InventoryWindow
 -- Design px (the mockup's window is 1187 × 652 at 243, 150).
 InventoryWindow.SIZE = { 1187, 650 }
 
--- Category column icons: the closest kit art (KIT.md §8).
+-- Category column icons: the closest kit art (KIT.md §8). The mockup's All is
+-- a grid the kit lacks; the scroll (a list of everything) stands in, since
+-- the chest read as the Vault.
 InventoryWindow.CATEGORY_ICONS = {
-	All = "chest",
+	All = "scroll",
 	Tools = "hammer",
 	Materials = "stones",
 	Food = "drumstick",
@@ -65,6 +68,10 @@ local CATEGORY_RULES = { 354, 419, 483, 547 }
 local CARD_PAD = 0
 local CARD = { 869 - CARD_PAD, 109 - CARD_PAD, 296 + CARD_PAD * 2, 520 + CARD_PAD * 2 }
 local ROW_TOP, ROW_PITCH = 313, 41
+-- A slot's rarity dot (bottom left, clear of the count, the Permanent star
+-- and the hotkey badge; Uncommon and rarer) and the detail name's (any).
+local SLOT_RARITY = { 9, CELL[2] - 21, 12, 12 }
+local NAME_RARITY = 14
 
 -- A rect in the card, from the mockup card's top-left corner.
 local function inCard(x: number, y: number, w: number, h: number): { number }
@@ -347,7 +354,7 @@ end
 
 function InventoryWindow:_slot(index: number)
 	return pooled(self.slots, index, function()
-		return Kit.Slot.new(self.content, {
+		local slot = Kit.Slot.new(self.content, {
 			name = "Slot" .. index,
 			rect = { 0, 0, CELL[1], CELL[2] },
 			zIndex = 9,
@@ -358,7 +365,22 @@ function InventoryWindow:_slot(index: number)
 				end
 			end,
 		})
+		-- The item's rarity as a small dot (Kit rarity badge).
+		slot.rarity = Kit.Badge.new(slot.root, {
+			name = "Rarity",
+			variant = "rarity",
+			rect = SLOT_RARITY,
+			zIndex = 14,
+		})
+		slot.rarity.root.Visible = false
+		return slot
 	end)
+end
+
+-- The catalog rarity of an item, or nil.
+local function rarityOf(catalogId: string?): string?
+	local def = ItemCatalog.Get(catalogId)
+	return def and def.rarity
 end
 
 -- Lays the visible cells out in rows of six, section by section.
@@ -431,6 +453,13 @@ function InventoryWindow:_layout()
 				permanent = item.permanent,
 			})
 			slot:SetHotkey(cell.hotkey)
+			-- Common is the default and draws no dot (the mockup's slots stay
+			-- clean); the detail card names every item's rarity.
+			local rarity = item and rarityOf(item.catalogId)
+			slot.rarity.root.Visible = rarity ~= nil and rarity ~= "Common"
+			if rarity then
+				slot.rarity:SetRarity(rarity)
+			end
 			slot:SetState(cell.state or "normal")
 			slot:SetSelected(cell.id == self.selectedId)
 			firstHit = firstHit or slot.control.hit
@@ -468,7 +497,18 @@ function InventoryWindow:_layout()
 	end
 	self.grid:SetContentHeight(y - SECTION_GAP + INSET[2])
 	-- Gamepad selection lands on the first slot when the window opens.
-	self.screen:SetDefaultSelection(firstHit or (self.tabs[self.tabId or ""] and self.tabs[self.tabId].control.hit))
+	local default = firstHit or (self.tabs[self.tabId or ""] and self.tabs[self.tabId].control.hit)
+	self.screen:SetDefaultSelection(default)
+	-- The slots arrived after the window opened on a gamepad (the first
+	-- read), or a redraw hid the selected slot: take the first slot rather
+	-- than leaving the ✕ (or nothing) selected.
+	if default and self.screen:IsOpen() and Kit.Input.IsGamepad() then
+		local now = GuiService.SelectedObject
+		local close = self.window.close.control.hit
+		if now == nil or now == close or not now.Visible or not now:IsDescendantOf(self.screen.gui) then
+			GuiService.SelectedObject = default
+		end
+	end
 end
 
 -- Marks cell `id` selected (nil clears it).
@@ -505,6 +545,13 @@ function InventoryWindow:_buildCard()
 		rect = inCard(19, 216, 258, 34),
 		text = "",
 		role = "itemTitle",
+		zIndex = 9,
+	})
+	-- The item's rarity dot just after its name.
+	self.detailRarity = Kit.Badge.new(c, {
+		name = "Rarity",
+		variant = "rarity",
+		rect = inCard(19, 216 + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY),
 		zIndex = 9,
 	})
 	self.detailText = Kit.Text.new(c, {
@@ -552,6 +599,7 @@ function InventoryWindow:SetDetail(detail: Detail?)
 	local showing = detail ~= nil and detail.catalogId ~= nil
 	self.detailIcon.root.Visible = showing
 	self.detailName.root.Visible = showing
+	self.detailRarity.root.Visible = false
 	self.detailText.root.Visible = showing
 	self.detailRule.root.Visible = showing
 	self.hint.root.Visible = not showing
@@ -562,6 +610,14 @@ function InventoryWindow:SetDetail(detail: Detail?)
 	local d = detail :: Detail
 	self.detailIcon:SetItem(d.catalogId)
 	self.detailName:SetText(d.name or "")
+	local rarity = rarityOf(d.catalogId)
+	if rarity then
+		local nameW = math.min(Kit.Text.Width(d.name or "", "itemTitle"), 258 - NAME_RARITY - 8)
+		local at = inCard(19 + nameW + 8, 216 + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY)
+		self.detailRarity.root.Position = UDim2.fromOffset(at[1], at[2])
+		self.detailRarity:SetRarity(rarity)
+		self.detailRarity.root.Visible = true
+	end
 	self.detailText:SetText(d.text or "")
 	local actions = d.actions or {}
 	local extraRow = d.amount ~= nil or #actions > 1

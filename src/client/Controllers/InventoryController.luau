@@ -619,7 +619,8 @@ function InventoryController.Open(tabId: string?, gamepad: boolean?)
 		tab = tabId
 	end
 	selected, moving = nil, nil
-	window:Open(gamepad)
+	-- Drawn once open; a gamepad then lands on the first slot (InventoryWindow).
+	window:Open(gamepad or Kit.Input.IsGamepad())
 	InventoryController.Render()
 	InventoryController.BackpackToggled:Fire(true)
 end

@@ -56,6 +56,8 @@ MapController.MAP_RECT = MapController.LAYOUTS.desktop.map
 MapController.CAMP_COLOR = "toggleOn"
 MapController.PORTAL_COLOR = "blue"
 MapController.SAFE_CHECK_SECONDS = 0.25
+-- Live marker names, design px.
+MapController.MARKER_TEXT = 16
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -120,11 +122,13 @@ local function renderMarkers()
 		})
 	end
 	map:SetMarkers(markers)
-	-- Names over the painting: a paper outline instead of the thin text stroke.
+	-- Names over the painting: a paper outline instead of the thin text stroke,
+	-- one size up so they keep 9 screen px on the smallest phones.
 	for _, holder in map.extra or {} do
 		local label = holder:FindFirstChild("Name")
 		if label and label:IsA("TextLabel") and label:FindFirstChild("Outline") == nil then
 			label.TextStrokeTransparency = 1
+			label.TextSize = MapController.MARKER_TEXT * Kit.Core.TextBoost("hudSmall")
 			local stroke = Instance.new("UIStroke")
 			stroke.Name = "Outline"
 			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
