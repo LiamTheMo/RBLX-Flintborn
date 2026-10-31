@@ -16,9 +16,18 @@
 --   local window = PartyWindow.new({ onInvite = invite, onReady = setReady, ... })
 --   window:SetData(data) -- see SetData
 --   window:Open()
+--
+-- SetData updates rows in place: a row whose player and contents are unchanged
+-- stays as it is (only its order moves); changed rows are redrawn and rows that
+-- left are removed, so a search keystroke or one member's Ready redraws only
+-- what changed. On phones and touch tablets (Kit.Scale.IsSmallTouch) names and
+-- level lines draw larger and long names end in "…" rather than shrinking
+-- below 9 screen px.
 
 local GuiService = game:GetService("GuiService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Kit = require(script.Parent.Parent.Kit)
 
 local PartyWindow = {}
@@ -84,6 +93,40 @@ PartyWindow.LIST_W = { party = 328, invite = 337, ready = 289 }
 
 local Z = 6
 
+-- Text sizes, desktop and phone (phone sizes keep names, levels and button
+-- labels at 9 screen px or more at the phone window scale, about 0.51).
+PartyWindow.TEXT = {
+	desktop = { name = 17, level = 15, inviteLevel = 13, action = nil, detail = 15, emptyName = 14, readyName = 16 },
+	phone = { name = 15, level = 15, inviteLevel = 15, action = 15, detail = 15, emptyName = 15, readyName = 15 },
+}
+-- How long the search box waits after the last keystroke.
+PartyWindow.SEARCH_DEBOUNCE = 0.3
+
+-- `text` cut to fit `width` design px in `role` at `size`, ending in "…".
+local function fitText(text: string, role: string, size: number?, width: number): string
+	if Kit.Text.Width(text, role, size) <= width then
+		return text
+	end
+	local cut = text
+	while #cut > 1 do
+		cut = string.sub(cut, 1, #cut - 1)
+		local candidate = cut .. "…"
+		if Kit.Text.Width(candidate, role, size) <= width then
+			return candidate
+		end
+	end
+	return cut
+end
+
+-- A row's signature: its fields joined, so an unchanged row is kept.
+local function signature(...): string
+	local parts = table.pack(...)
+	for index = 1, parts.n do
+		parts[index] = tostring(parts[index])
+	end
+	return table.concat(parts, "|", 1, parts.n)
+end
+
 export type Props = {
 	onInvite: ((userId: number) -> ())?,
 	onAccept: ((partyId: string) -> ())?,
@@ -131,7 +174,14 @@ local function list(parent: Instance, name: string, rect, gap: number)
 end
 
 function PartyWindow.new(props: Props)
-	local self = setmetatable({ props = props, lists = {}, selectables = {}, data = nil }, PartyWindow)
+	local self = setmetatable({
+		props = props,
+		lists = {},
+		selectables = {},
+		data = nil,
+		phone = Kit.Scale.IsSmallTouch(),
+		maid = KitModel.Maid(),
+	}, PartyWindow)
 	local M = PartyWindow.MOCKUP
 	local screen = Kit.Screen.new("FlintbornParty", { size = PartyWindow.SIZE, parent = props.parent })
 	self.screen = screen
@@ -168,6 +218,7 @@ function PartyWindow.new(props: Props)
 		name = "Search",
 		rect = { 15, 69, 340, 42 },
 		placeholder = "Search players...",
+		debounce = PartyWindow.SEARCH_DEBOUNCE,
 		zIndex = Z + 2,
 		onChanged = function(text)
 			if props.onSearch then
@@ -207,7 +258,9 @@ function PartyWindow.new(props: Props)
 
 	-- Party Details -------------------------------------------------------------------
 	local dv = panel(v, "PartyDetails", M.details)
-	header(dv, 322, "Party Details", { "ink:info", 17, 16, 31, 30 }, 63, { 16, 52, 290 })
+	-- The mockup's circled "i" is not in the kit; the book (a record of the
+	-- party) is the closest neutral glyph (the "!" read as a warning).
+	header(dv, 322, "Party Details", { "ink:book", 18, 16, 30, 30 }, 63, { 16, 52, 290 })
 	-- The rows are drawn by SetData (a line row sizes its value when built).
 	self.detailsVisual = dv
 	self.detailRows = {}
@@ -264,13 +317,30 @@ function PartyWindow.new(props: Props)
 		end,
 	})
 	screen:SetDefaultSelection(self.readyButton.control.hit)
-	screen.Closed:Connect(function()
+	self.maid:Give(screen.Closed:Connect(function()
 		if props.onClosed then
 			props.onClosed()
 		end
-	end)
+	end))
 	screen:Watch()
+	-- Phone and desktop text sizes follow the screen and the input devices.
+	self.maid:Give(Kit.Scale.OnFormFactorChanged(function()
+		local phone = Kit.Scale.IsSmallTouch()
+		if phone ~= self.phone then
+			self.phone = phone
+			for name in self.lists do
+				self:_clear(name)
+			end
+			if self.data then
+				self:SetData(self.data)
+			end
+		end
+	end))
 	return self
+end
+
+function PartyWindow:_text()
+	return if self.phone then PartyWindow.TEXT.phone else PartyWindow.TEXT.desktop
 end
 
 -- The key of the list control gamepad selection is on, so a rebuild can put
@@ -288,43 +358,72 @@ function PartyWindow:_selectedKey(): string?
 	return nil
 end
 
+-- Removes every row of list `name` (and its gamepad targets).
 function PartyWindow:_clear(name: string)
-	for _, component in self.lists[name] or {} do
-		component:Destroy()
+	for _, entry in self.lists[name] or {} do
+		self:_drop(entry)
 	end
 	self.lists[name] = {}
-	for key in self.selectables do
-		if string.sub(key, 1, #name + 1) == name .. ":" then
-			self.selectables[key] = nil
-		end
+end
+
+function PartyWindow:_drop(entry)
+	entry.component:Destroy()
+	for key in entry.selectables do
+		self.selectables[key] = nil
 	end
 end
 
-function PartyWindow:_add(name: string, component)
-	table.insert(self.lists[name], component)
-	return component
+-- Brings list `name` in step with `rows` ({key, sig, build(order) ->
+-- (component, {[selectableKey] = hit}?)}) in order: a row with the same key
+-- and signature is kept and only re-ordered; any other is (re)built; rows no
+-- longer listed are removed.
+function PartyWindow:_sync(name: string, rows)
+	local old = self.lists[name] or {}
+	local new = {}
+	for order, row in rows do
+		local entry = old[row.key]
+		if entry and entry.sig == row.sig then
+			entry.component.root.LayoutOrder = order
+		else
+			if entry then
+				self:_drop(entry)
+			end
+			local component, selectables = row.build(order)
+			entry = { component = component, sig = row.sig, selectables = selectables or {} }
+			for key, hit in entry.selectables do
+				self.selectables[key] = hit
+			end
+		end
+		old[row.key] = nil
+		new[row.key] = entry
+	end
+	for _, entry in old do
+		self:_drop(entry)
+	end
+	self.lists[name] = new
 end
 
--- A framed row (PartyWindow.FRAMES[kind]) added to list `listName`; returns the
--- holder, whose `.row` is the PlayerRow.
-function PartyWindow:_framed(listName: string, content: Instance, kind: string, order: number, rowProps, w: number?)
+-- A framed row (PartyWindow.FRAMES[kind]) in `content`; returns the holder,
+-- whose `.row` is the PlayerRow. On phones long names end in "…" at their
+-- size instead of shrinking past the 9 px floor.
+function PartyWindow:_framed(content: Instance, kind: string, order: number, rowProps, w: number?)
 	local frame = PartyWindow.FRAMES[kind]
 	local width = w or frame.inner[3]
-	local holder = self:_add(
-		listName,
-		Kit.Panel.new(content, {
-			name = "Row" .. order,
-			size = { PartyWindow.LIST_W[if kind == "leader" or kind == "member" then "party" else kind], frame.h },
-			layoutOrder = order,
-			variant = "plain",
-			pad = 0,
-			zIndex = Z + 2,
-		})
-	)
+	local holder = Kit.Panel.new(content, {
+		name = "Row" .. order,
+		size = { PartyWindow.LIST_W[if kind == "leader" or kind == "member" then "party" else kind], frame.h },
+		layoutOrder = order,
+		variant = "plain",
+		pad = 0,
+		zIndex = Z + 2,
+	})
 	local props = table.clone(rowProps)
 	props.rect = { frame.inner[1], frame.inner[2], width, frame.inner[4] }
 	props.rule = false
 	props.zIndex = Z + 2
+	if self.phone then
+		props.shrinkName = false
+	end
 	local row = Kit.PlayerRow.new(holder.base.visual, props)
 	local rule = Kit.Divider.new(holder.base.visual, {
 		name = "Rule",
@@ -343,87 +442,108 @@ function PartyWindow:_framed(listName: string, content: Instance, kind: string, 
 end
 
 function PartyWindow:_members(data)
-	self:_clear("members")
 	local content = self.memberList:Content()
+	local text = self:_text()
+	local rows = {}
 	local height = 0
 	for i, member in data.members do
-		local rowProps = {
-			userId = member.userId,
-			name = member.name,
-			level = member.level,
-			leader = member.leader,
-			badge = if member.leader then "leader" elseif member.ready then "ready" else "notReady",
-			nameX = 75,
-			nameSize = 17,
-			levelSize = 15,
-			crownSize = 26,
-		}
-		if i == 1 then
-			rowProps.portraitSize = 56
-			self:_framed("members", content, "leader", i, rowProps)
-			height += PartyWindow.FRAMES.leader.h
-		else
-			self:_framed("members", content, "member", i, rowProps)
-			height += PartyWindow.ROW
-		end
+		local leaderRow = i == 1
+		local badge = if member.leader then "leader" elseif member.ready then "ready" else "notReady"
+		table.insert(rows, {
+			key = "member:" .. member.userId,
+			sig = signature(member.name, member.level, member.leader, badge, leaderRow),
+			build = function(order: number)
+				local rowProps = {
+					userId = member.userId,
+					name = member.name,
+					level = member.level,
+					leader = member.leader,
+					badge = badge,
+					nameX = 75,
+					nameSize = text.name,
+					levelSize = text.level,
+					crownSize = 26,
+					portraitSize = if leaderRow then 56 else nil,
+				}
+				return self:_framed(content, if leaderRow then "leader" else "member", order, rowProps)
+			end,
+		})
+		height += if leaderRow then PartyWindow.FRAMES.leader.h else PartyWindow.ROW
 	end
 	for i = #data.members + 1, data.maxSize do
-		local h = PartyWindow.ROW
-		self:_add(
-			"members",
-			Kit.PlayerRow.new(content, {
-				name = "EmptySlot",
-				size = { PartyWindow.LIST_W.party, h },
-				layoutOrder = i,
-				empty = true,
-				portraitSize = 52,
-				emptyIndent = 12,
-				nameX = 76,
-				nameSize = 14,
-				zIndex = Z + 2,
-			})
-		)
-		height += h
+		table.insert(rows, {
+			key = "empty:" .. i,
+			sig = "empty",
+			build = function(order: number)
+				return Kit.PlayerRow.new(content, {
+					name = "EmptySlot",
+					size = { PartyWindow.LIST_W.party, PartyWindow.ROW },
+					layoutOrder = order,
+					empty = true,
+					portraitSize = 52,
+					emptyIndent = 12,
+					nameX = 76,
+					nameSize = text.emptyName,
+					zIndex = Z + 2,
+				})
+			end,
+		})
+		height += PartyWindow.ROW
 	end
+	self:_sync("members", rows)
 	self.memberList:SetContentHeight(height + 2)
 end
 
 PartyWindow.DETAILS = { "Party Leader", "Members", "Join Type", "Created" }
+-- A detail row's width and the gap between its label and value.
+PartyWindow.DETAIL_W = 274
 
 function PartyWindow:_details(data)
-	self:_clear("details")
+	local size = self:_text().detail
 	local values = {
 		["Party Leader"] = data.leaderName,
 		Members = data.membersText,
 		["Join Type"] = data.joinType,
 		Created = data.createdText,
 	}
+	local rows = {}
 	for i, label in PartyWindow.DETAILS do
-		self.detailRows[label] = self:_add(
-			"details",
-			Kit.ListRow.new(self.detailsVisual, {
-				name = (label:gsub(" ", "")),
-				rect = { 26, 61 + (i - 1) * 36, 274, 36 },
-				variant = "line",
-				title = label,
-				value = values[label],
-				titleSize = 15,
-				valueSize = 15,
-				zIndex = Z + 1,
-			})
-		)
+		-- A long value (a 20-character leader name) ends in "…" so the label
+		-- keeps its room.
+		local room = PartyWindow.DETAIL_W - Kit.Text.Width(label, "rowLabel", size) - 24
+		local value = fitText(values[label] or "", "value", size, room)
+		table.insert(rows, {
+			key = label,
+			sig = value,
+			build = function()
+				local row = Kit.ListRow.new(self.detailsVisual, {
+					name = (label:gsub(" ", "")),
+					rect = { 26, 61 + (i - 1) * 36, PartyWindow.DETAIL_W, 36 },
+					variant = "line",
+					title = label,
+					value = value,
+					titleSize = size,
+					valueSize = size,
+					zIndex = Z + 1,
+				})
+				self.detailRows[label] = row
+				return row
+			end,
+		})
 	end
+	self:_sync("details", rows)
 end
 
-local function inviteAction(row, onInvite)
+local function inviteAction(row, onInvite, textSize: number?)
 	local state = row.state
 	if state == "invited" then
-		return { label = "Invited", variant = "secondary", enabled = false, size = { 108, 45 } }
+		return { label = "Invited", variant = "secondary", enabled = false, size = { 108, 45 }, textSize = textSize }
 	end
 	return {
 		label = "Invite",
 		variant = "primary",
 		size = { 108, 45 },
+		textSize = textSize,
 		enabled = state ~= "full",
 		onPress = function()
 			if onInvite then
@@ -434,25 +554,28 @@ local function inviteAction(row, onInvite)
 end
 
 function PartyWindow:_invites(data)
-	self:_clear("invites")
 	local props = self.props
+	local text = self:_text()
 	local content = self.inviteList:Content()
-	local order, height = 0, 0
+	local rows = {}
+	local height = 0
 	local w = self.inviteListRect[3]
 	local frameH = PartyWindow.FRAMES.invite.h
-	local function section(text: string)
-		order += 1
+	local function section(title: string)
 		height += 36
-		self:_add(
-			"invites",
-			Kit.SectionHeader.new(content, {
-				name = "Section" .. order,
-				size = { w, 36 },
-				layoutOrder = order,
-				text = text,
-				zIndex = Z + 2,
-			})
-		)
+		table.insert(rows, {
+			key = "section:" .. title,
+			sig = title,
+			build = function(order: number)
+				return Kit.SectionHeader.new(content, {
+					name = "Section" .. order,
+					size = { w, 36 },
+					layoutOrder = order,
+					text = title,
+					zIndex = Z + 2,
+				})
+			end,
+		})
 	end
 	local function rowProps(name: string, userId: number?, level: number?, action)
 		return {
@@ -461,8 +584,8 @@ function PartyWindow:_invites(data)
 			level = level,
 			portraitSize = 52,
 			nameX = 68,
-			nameSize = 17,
-			levelSize = 13,
+			nameSize = text.name,
+			levelSize = text.inviteLevel,
 			action = action,
 		}
 	end
@@ -470,66 +593,79 @@ function PartyWindow:_invites(data)
 	if #incoming > 0 then
 		section("Invitations")
 		for _, entry in incoming do
-			order += 1
 			height += frameH
-			-- The row leaves room at its right for the decline ✕.
-			local holder = self:_framed(
-				"invites",
-				content,
-				"invite",
-				order,
-				rowProps(entry.from, entry.userId, entry.level, {
-					size = { 108, 45 },
-					label = "Accept",
-					onPress = function()
-						if props.onAccept then
-							props.onAccept(entry.partyId)
-						end
-					end,
-				}),
-				w - 44
-			)
-			local decline = Kit.IconButton.new(holder.base.visual, {
-				name = "Decline",
-				rect = { w - 40, 14, 38, 38 },
-				variant = "small",
-				icon = "cross",
-				zIndex = Z + 3,
-				onPress = function()
-					if props.onDecline then
-						props.onDecline(entry.partyId)
+			table.insert(rows, {
+				key = "in:" .. entry.partyId,
+				sig = signature(entry.from, entry.userId, entry.level, entry.busy),
+				build = function(order: number)
+					-- The row leaves room at its right for the decline ✕.
+					local holder = self:_framed(
+						content,
+						"invite",
+						order,
+						rowProps(entry.from, entry.userId, entry.level, {
+							size = { 108, 45 },
+							label = "Accept",
+							textSize = text.action,
+							onPress = function()
+								if props.onAccept then
+									props.onAccept(entry.partyId)
+								end
+							end,
+						}),
+						w - 44
+					)
+					local decline = Kit.IconButton.new(holder.base.visual, {
+						name = "Decline",
+						rect = { w - 40, 14, 38, 38 },
+						variant = "small",
+						icon = "cross",
+						zIndex = Z + 3,
+						onPress = function()
+							if props.onDecline then
+								props.onDecline(entry.partyId)
+							end
+						end,
+					})
+					holder.base.maid:Give(function()
+						decline:Destroy()
+					end)
+					if entry.busy then
+						holder.action:SetBusy(true)
+						decline:SetEnabled(false)
 					end
+					return holder,
+						{
+							["invites:accept:" .. entry.partyId] = holder.action.control.hit,
+							["invites:decline:" .. entry.partyId] = decline.control.hit,
+						}
 				end,
 			})
-			holder.base.maid:Give(function()
-				decline:Destroy()
-			end)
-			if entry.busy then
-				holder.action:SetBusy(true)
-				decline:SetEnabled(false)
-			end
-			self.selectables["invites:accept:" .. entry.partyId] = holder.action.control.hit
-			self.selectables["invites:decline:" .. entry.partyId] = decline.control.hit
 		end
 		if #data.inviteRows > 0 then
 			section("Players")
 		end
 	end
 	for _, entry in data.inviteRows do
-		order += 1
 		height += frameH
-		local holder = self:_framed(
-			"invites",
-			content,
-			"invite",
-			order,
-			rowProps(entry.name, entry.userId, entry.level, inviteAction(entry, props.onInvite))
-		)
-		if entry.state == "pending" then
-			holder.action:SetBusy(true)
-		end
-		self.selectables["invites:player:" .. entry.userId] = holder.action.control.hit
+		table.insert(rows, {
+			key = "player:" .. entry.userId,
+			sig = signature(entry.name, entry.level, entry.state),
+			build = function(order: number)
+				local holder = self:_framed(
+					content,
+					"invite",
+					order,
+					rowProps(entry.name, entry.userId, entry.level, inviteAction(entry, props.onInvite, text.action))
+				)
+				if entry.state == "pending" then
+					holder.action:SetBusy(true)
+				end
+				return holder, { ["invites:player:" .. entry.userId] = holder.action.control.hit }
+			end,
+		})
 	end
+	self:_sync("invites", rows)
 	self.inviteList:SetContentHeight(height + 2)
 	local note = data.inviteNote
 	self.inviteNote:SetText(note or "")
@@ -539,18 +675,27 @@ function PartyWindow:_invites(data)
 end
 
 function PartyWindow:_ready(data)
-	self:_clear("ready")
 	local content = self.readyList:Content()
-	for i, member in data.members do
-		self:_framed("ready", content, "ready", i, {
-			userId = member.userId,
-			name = member.name,
-			badge = if member.ready then "ready" else "notReady",
-			portraitSize = 48,
-			nameX = 65,
-			nameSize = 16,
+	local text = self:_text()
+	local rows = {}
+	for _, member in data.members do
+		local badge = if member.ready then "ready" else "notReady"
+		table.insert(rows, {
+			key = "ready:" .. member.userId,
+			sig = signature(member.name, badge),
+			build = function(order: number)
+				return self:_framed(content, "ready", order, {
+					userId = member.userId,
+					name = member.name,
+					badge = badge,
+					portraitSize = 48,
+					nameX = 65,
+					nameSize = text.readyName,
+				})
+			end,
 		})
 	end
+	self:_sync("ready", rows)
 	self.readyList:SetContentHeight(#data.members * PartyWindow.FRAMES.ready.h + 2)
 	local count = 0
 	for _, member in data.members do
@@ -575,6 +720,7 @@ end
 --   canInvite    false greys the search box
 --   invites      {{partyId, from, userId?, level?, busy?}} waiting for you
 --   canLeave, leaveBusy, friends (show Invite Friends)
+-- Rows whose contents did not change are kept as they are.
 function PartyWindow:SetData(data)
 	local key = self:_selectedKey()
 	self.data = data
@@ -603,6 +749,19 @@ function PartyWindow:SetCreated(text: string)
 		self.data.createdText = text
 		self:_details(self.data)
 	end
+end
+
+-- The components of list `name` ("members", "invites", "details", "ready")
+-- in their shown order (scenes and verifiers).
+function PartyWindow:Rows(name: string)
+	local list = {}
+	for _, entry in self.lists[name] or {} do
+		table.insert(list, entry.component)
+	end
+	table.sort(list, function(a, b)
+		return a.root.LayoutOrder < b.root.LayoutOrder
+	end)
+	return list
 end
 
 function PartyWindow:SearchText(): string
@@ -637,6 +796,7 @@ function PartyWindow:IsOpen(): boolean
 end
 
 function PartyWindow:Destroy()
+	self.maid:Clean()
 	for name in self.lists do
 		self:_clear(name)
 	end

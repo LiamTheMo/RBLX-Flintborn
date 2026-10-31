@@ -234,8 +234,11 @@ end
 -- / item_<id>), ItemInfo.Icon names the kit art that shows it: the exact icon
 -- where the kit has one, otherwise the closest kit art, often tinted (an
 -- ImageColor3 multiply, so tints only darken or shift a hue). Names are kit icon
--- ids (lk_icon_<id>) or full lk_ sprite names for other kit art. Bows have no
--- art that reads as a bow, so they keep the kit's fallback (their name).
+-- ids (lk_icon_<id>) or full lk_ sprite names for other kit art. Only art
+-- that reads as the item is used: bows, swords, daggers and armour have
+-- nothing in the kit that does (a tusk read as a sword, hide as iron armour),
+-- so Icon returns nil for them and the kit draws its neutral kind glyph, with
+-- the name in tooltips and detail cards (docs/ui/ITEM_ART.md).
 
 -- Every kit sprite item art may use. KitModel's role table does not list icons
 -- and specs cannot read the sprite manifest, so the item_info spec checks
@@ -378,13 +381,11 @@ local ART = {
 }
 
 -- Gear by kind: the kit's art for it, and whether the art is already iron.
+-- Swords, daggers and armour are not listed: no kit art reads as them.
 local GEAR = {
 	Axe = { "hatchet", true },
 	Pickaxe = { "pickaxe", true },
 	Spear = { "spear", false },
-	Dagger = { "tusk", false },
-	Sword = { "tusk", false },
-	Armor = { "hide", false },
 }
 
 for id, def in ItemCatalog.Items do
@@ -420,7 +421,7 @@ for id, art in ART do
 end
 
 -- The kit art for an item and its tint, or nil when the kit has nothing that
--- reads as it (bows) or the item is unknown.
+-- reads as it (bows, swords, daggers, armour) or the item is unknown.
 function ItemInfo.Icon(catalogId: string?): (string?, Color3?)
 	if type(catalogId) ~= "string" then
 		return nil, nil

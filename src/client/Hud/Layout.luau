@@ -39,15 +39,30 @@ function Layout.IsPhone(): boolean
 	return KitScale.FormFactor() == "phone"
 end
 
--- `entry` for this screen: on phones the fields of its "phone" table replace
--- the desktop ones (positions, sizes, row heights, text sizes).
+-- True on touch-only phones and tablets (Kit.Scale.IsSmallTouch): the HUD
+-- draws small there and body text is boosted, so text-heavy regions take their
+-- entries' "touch" overrides (bigger text, two-line rows).
+function Layout.IsTouchScreen(): boolean
+	return KitScale.IsSmallTouch()
+end
+
+-- `entry` for this screen: on phones and tablets the fields of its "touch"
+-- table replace the desktop ones (text sizes, row shapes), and on phones those
+-- of its "phone" table too (positions and sizes for the short canvas).
 function Layout.ForScreen(entry)
-	if type(entry) ~= "table" or type(entry.phone) ~= "table" or not Layout.IsPhone() then
+	if type(entry) ~= "table" or (entry.touch == nil and entry.phone == nil) then
+		return entry
+	end
+	local touch = if type(entry.touch) == "table" and Layout.IsTouchScreen() then entry.touch else nil
+	local phone = if type(entry.phone) == "table" and Layout.IsPhone() then entry.phone else nil
+	if touch == nil and phone == nil then
 		return entry
 	end
 	local merged = table.clone(entry)
-	for key, value in entry.phone do
-		merged[key] = value
+	for _, override in { touch or {}, phone or {} } do
+		for key, value in override do
+			merged[key] = value
+		end
 	end
 	return merged
 end

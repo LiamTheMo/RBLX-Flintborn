@@ -52,6 +52,8 @@ local QUEST_TEXT_Y = { 5, 39 }
 local OBJECTIVE_SUBTITLE_Y = 31
 local TILE = { 92, 104 }
 local TILE_PITCH = 98
+-- How wide a reward amount may be before the icon steps aside for it.
+local REWARD_AMOUNT_ROOM = 34
 local MAP = { 51, 108, 991, 512 }
 
 -- parent: where the ScreenGui goes (PlayerGui by default). handlers: onClose(),
@@ -203,6 +205,8 @@ function JournalWindow:_entriesPage(v: Frame)
 		scaled = true,
 		zIndex = Z,
 	})
+	-- Shrinks to fit its box (never into the OBJECTIVES rule below it) when a
+	-- long description or the phone text boost would need a third line.
 	self.description = Kit.Text.new(detail, {
 		name = "Description",
 		rect = { 684, 163, 350, 60 },
@@ -210,6 +214,7 @@ function JournalWindow:_entriesPage(v: Frame)
 		role = "body",
 		textSize = 18,
 		wrap = true,
+		scaled = true,
 		yAlign = "Top",
 		zIndex = Z,
 	})
@@ -465,12 +470,15 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 	row:SetSelected(entry.id == self.selected[tab])
 	local v = row.base.visual
 	if entry.tag then
+		-- Phones and touch tablets: large enough for 9 screen px at the
+		-- window's phone scale.
+		local phone = Kit.Scale.IsSmallTouch()
 		Kit.Text.new(v, {
 			name = "Group",
-			rect = { 240, 3, 104, 16 },
+			rect = if phone then { 224, 1, 120, 20 } else { 240, 3, 104, 16 },
 			text = entry.tag,
 			role = "tag",
-			textSize = 12,
+			textSize = if phone then 15 else 12,
 			color = "inkSoft",
 			align = "Right",
 			zIndex = Z + 3,
@@ -578,7 +586,16 @@ function JournalWindow:_reward(reward, index: number)
 		zIndex = Z,
 	}))
 	local c = tile.base.visual
-	Kit.Icon.new(c, { name = "Icon", rect = { 12, 12, 58, 50 }, icon = reward.icon, zIndex = Z + 1 })
+	-- The amount sits on the icon's lower right corner, as the mockup draws
+	-- it; a long one ("x250") moves the icon up and left so they never overlap.
+	local amountW = Kit.Text.Width(reward.amount or "", "count", 18)
+	local long = amountW > REWARD_AMOUNT_ROOM
+	Kit.Icon.new(c, {
+		name = "Icon",
+		rect = if long then { 6, 6, 50, 44 } else { 12, 12, 58, 50 },
+		icon = reward.icon,
+		zIndex = Z + 1,
+	})
 	Kit.Text.new(c, {
 		name = "Amount",
 		rect = { 4, 55, TILE[1] - 12, 20 },

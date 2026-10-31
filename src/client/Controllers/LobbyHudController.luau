@@ -190,6 +190,8 @@ local function start()
 
 	refreshParty()
 	refreshHotbar()
+	-- Invite answers go through PartyController, which watches the party view.
+	PartyController.Start()
 	-- An invite answer starting or ending (busy buttons).
 	keep(PartyController.Changed:Connect(refreshParty))
 	keep(LobbyController.Changed:Connect(function(what)

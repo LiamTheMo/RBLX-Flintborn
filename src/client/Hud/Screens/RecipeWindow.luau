@@ -19,6 +19,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GuiService = game:GetService("GuiService")
 
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Kit = require(script.Parent.Parent.Kit)
 
@@ -55,6 +56,15 @@ local L = {
 	rowTextX = 101,
 	rowTitleSize = 18,
 	rowSubtitleSize = 15,
+	-- Phones and touch tablets: the handwritten row notes at 9 screen px or
+	-- more at the window's phone scale (about 0.51).
+	rowSubtitlePhone = 18,
+	-- A row note too long for one line wraps onto two under a raised title.
+	rowTwoLine = { titleY = 3, titleH = 28, subtitleY = 29, subtitleH = 38 },
+	-- The Permanent mark on a conversion's icon corner (as a slot's star).
+	rowMark = { 60, 2, 20, 20 },
+	-- Room the lock takes at a locked row's right.
+	rowLockRoom = 34,
 	name = { 418, 128, 330, 38 },
 	nameSize = 30,
 	-- The item art has a margin: this rect puts its ink on the mockup's 243 × 233.
@@ -152,6 +162,8 @@ function RecipeWindow.new(props)
 		selectedId = nil,
 		count = 1,
 		busy = false,
+		phone = Kit.Scale.IsSmallTouch(),
+		maid = KitModel.Maid(),
 	}, RecipeWindow)
 	local screen = Kit.Screen.new(props.name or "FlintbornRecipes", { size = RecipeWindow.SIZE, parent = props.parent })
 	self.screen = screen
@@ -319,6 +331,18 @@ function RecipeWindow.new(props)
 	-- chosen row (set as rows are built); until there are rows, close is first.
 	screen:SetDefaultSelection(window.close.control.hit)
 	self:_renderDetail()
+	-- Phone and desktop row text follows the screen and the input devices.
+	self.maid:Give(Kit.Scale.OnFormFactorChanged(function()
+		local phone = Kit.Scale.IsSmallTouch()
+		if phone ~= self.phone then
+			self.phone = phone
+			for id, row in self.rows do
+				row:Destroy()
+				self.rows[id] = nil
+			end
+			self:_renderList()
+		end
+	end))
 	return self
 end
 
@@ -483,20 +507,63 @@ function RecipeWindow:_rowFor(entry)
 		-- The mockup's row descriptions are handwritten notes (D13).
 		subtitle = entry.subtitle or "",
 		subtitleHand = true,
-		subtitleSize = L.rowSubtitleSize,
+		subtitleSize = if self.phone then L.rowSubtitlePhone else L.rowSubtitleSize,
 		onPress = choose,
 		-- A locked recipe is still chosen, so its unlock text shows.
 		onLocked = choose,
 	})
+	-- A Permanent conversion: the star mark on the icon's corner.
+	if entry.kind == "Permanent" then
+		Kit.Icon.new(row.base.visual, {
+			name = "PermanentMark",
+			rect = L.rowMark,
+			icon = "star",
+			zIndex = row.base.z + 3,
+		})
+	end
+	row.titleRect = { row.title.Position, row.title.Size }
+	row.subtitleRect = { row.subtitle.Position, row.subtitle.Size }
 	-- Gamepad: right goes to the main button.
 	row.control.hit.NextSelectionRight = self.button.control.hit
 	self.rows[entry.id] = row
 	return row
 end
 
+-- One line for a note that fits, else two under a raised title. A locked
+-- row's lines stop short of its lock.
+function RecipeWindow:_fitSubtitle(row, text: string, locked: boolean)
+	local subtitle = row.subtitle
+	local size = if self.phone then L.rowSubtitlePhone else L.rowSubtitleSize
+	local width = row.subtitleRect[2].X.Offset - (if locked then L.rowLockRoom else 0)
+	local wide = Kit.Text.Width(text, "subtitleHand", size) > width
+	local two = L.rowTwoLine
+	subtitle.TextWrapped = wide
+	if wide then
+		row.title.Position = UDim2.fromOffset(row.titleRect[1].X.Offset, two.titleY)
+		row.title.Size = UDim2.fromOffset(width, two.titleH)
+		subtitle.Position = UDim2.fromOffset(row.subtitleRect[1].X.Offset, two.subtitleY)
+		subtitle.Size = UDim2.fromOffset(width, two.subtitleH)
+		subtitle.TextYAlignment = Enum.TextYAlignment.Top
+		subtitle.LineHeight = 0.9
+	else
+		row.title.Position, row.title.Size = row.titleRect[1], row.titleRect[2]
+		subtitle.Position = row.subtitleRect[1]
+		subtitle.Size = UDim2.fromOffset(width, row.subtitleRect[2].Y.Offset)
+		subtitle.TextYAlignment = Enum.TextYAlignment.Center
+		subtitle.LineHeight = 1
+	end
+end
+
 function RecipeWindow:_renderList()
 	local list = RecipeModel.Filter(self.entries, self.category)
 	self.filtered = list
+	-- Gamepad selection on a recipe row that this render removes moves to the
+	-- chosen row instead of being lost.
+	local selected = GuiService.SelectedObject
+	local onRow = false
+	for _, row in self.rows do
+		onRow = onRow or row.control.hit == selected
+	end
 	local used = {}
 	for index, entry in list do
 		local row = self:_rowFor(entry)
@@ -504,6 +571,7 @@ function RecipeWindow:_renderList()
 		row.root.LayoutOrder = index
 		row:SetTitle(entry.name)
 		row:SetSubtitle(entry.subtitle or "")
+		self:_fitSubtitle(row, entry.subtitle or "", entry.locked == true)
 		row:SetState(if entry.locked then "locked" else "normal")
 	end
 	for id, row in self.rows do
@@ -518,8 +586,19 @@ function RecipeWindow:_renderList()
 	local first = list[1]
 	self:Select(if keep then self.selectedId elseif first then first.id else nil)
 	local selectedRow = self.selectedId and self.rows[self.selectedId]
-	self.screen:SetDefaultSelection(if selectedRow then selectedRow.control.hit else self.window.close.control.hit)
+	local default = if selectedRow then selectedRow.control.hit else self.window.close.control.hit
+	self.screen:SetDefaultSelection(default)
 	self.button.control.hit.NextSelectionLeft = if selectedRow then selectedRow.control.hit else nil
+	if self.screen:IsOpen() and selectedRow then
+		local now = GuiService.SelectedObject
+		local lost = onRow and (now == nil or now.Parent == nil or not now:IsDescendantOf(self.screen.gui))
+		-- The rows arrived after the window opened on a gamepad: leave the ✕
+		-- for the chosen recipe.
+		local early = now == self.window.close.control.hit and Kit.Input.IsGamepad()
+		if lost or early then
+			GuiService.SelectedObject = default
+		end
+	end
 end
 
 function RecipeWindow:_renderMaterials()
@@ -529,19 +608,27 @@ function RecipeWindow:_renderMaterials()
 	for index, material in self.materials do
 		local row = self.materialRows[material.catalogId]
 		if row == nil then
+			local catalogId = material.catalogId
 			row = Kit.ListRow.new(self.materialList:Content(), {
-				name = material.catalogId,
+				name = catalogId,
 				size = size,
 				variant = "soft",
-				itemId = material.catalogId,
+				itemId = catalogId,
 				iconRect = L.materialIcon,
 				textX = L.materialTextX,
 				title = material.name,
 				titleSize = L.materialTitleSize,
 				value = tostring(material.quantity),
 				valueSize = L.materialValueSize,
+				-- Selectable (gamepad reaches the counts); a press picks the
+				-- first listed recipe that uses it.
+				onPress = function()
+					self:_pickUsing(catalogId)
+				end,
 			})
-			self.materialRows[material.catalogId] = row
+			-- Gamepad: left goes back to the main button.
+			row.control.hit.NextSelectionLeft = self.button.control.hit
+			self.materialRows[catalogId] = row
 		end
 		used[material.catalogId] = true
 		row.root.LayoutOrder = index
@@ -555,6 +642,19 @@ function RecipeWindow:_renderMaterials()
 		end
 	end
 	self.materialList:SetContentHeight(listHeight(#self.materials, size[2], L.materialGap))
+end
+
+-- Chooses the first listed recipe that needs `catalogId` (a material row's
+-- press); nothing changes when none does.
+function RecipeWindow:_pickUsing(catalogId: string)
+	for _, entry in self.filtered do
+		for _, input in entry.inputs or {} do
+			if input.catalogId == catalogId then
+				self:Select(entry.id)
+				return
+			end
+		end
+	end
 end
 
 function RecipeWindow:_renderDetail()
@@ -772,6 +872,7 @@ function RecipeWindow:ConfirmConversion(entry, onConfirm: (string) -> ())
 end
 
 function RecipeWindow:Destroy()
+	self.maid:Clean()
 	self.screen:Destroy()
 end
 

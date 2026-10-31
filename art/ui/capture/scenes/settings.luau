@@ -61,8 +61,8 @@ local force = Kit.Debug.Force
 force(view.tabs.Audio.root, "hover")
 force(view.tabs.Graphics.root, "pressed")
 local gameplay = view.pages.Gameplay
-force(gameplay.cameraSensitivity, "hover")
-force(gameplay.musicVolume, "pressed")
+force(gameplay.cameraSensitivity, "pressed")
+force(gameplay.invertCamera, "hover")
 local unchecked = table.clone(values)
 unchecked.showNames = false
 view:SetValues(unchecked)
@@ -79,7 +79,7 @@ for _, root in
 		view.tabs.Audio.root,
 		view.tabs.Graphics.root,
 		gameplay.cameraSensitivity,
-		gameplay.musicVolume,
+		gameplay.invertCamera,
 		gameplay.showDamage,
 		gameplay.Key_Interact,
 		gameplay.Key_Backpack,

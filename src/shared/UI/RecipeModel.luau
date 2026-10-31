@@ -51,6 +51,26 @@ local function displayName(name: string, quantity: number?): string
 	return if quantity and quantity > 1 then ("%s ×%d"):format(name, quantity) else name
 end
 
+-- An unlock line in plain English: the server writes counts as "extract 3
+-- time(s)"; this reads "extract 3 times" and "extract once".
+function RecipeModel.Requirement(text: string?): string
+	local line = text or ""
+	line = string.gsub(line, "(%d+) time%(s%)", function(count: string)
+		return if count == "1" then "once" else count .. " times"
+	end)
+	return line
+end
+
+-- A Permanent conversion's row name: the item's own name (the row carries a
+-- Permanent mark instead of the "Permanent " prefix, which left no room for
+-- the name).
+function RecipeModel.RowName(recipe): string
+	if recipe.kind == ForgeRecipes.Kinds.Permanent and recipe.output then
+		return RecipeModel.NameOf(recipe.output)
+	end
+	return recipe.name or RecipeModel.NameOf(recipe.output)
+end
+
 -- The one-line row subtitle: what unlocks a locked recipe, else what it makes.
 function RecipeModel.Subtitle(entry): string
 	if entry.locked then
@@ -216,12 +236,12 @@ function RecipeModel.ForgeEntries(view)
 			id = recipe.id,
 			kind = recipe.kind,
 			category = recipe.category,
-			name = displayName(recipe.name, recipe.quantity),
+			name = displayName(RecipeModel.RowName(recipe), recipe.quantity),
 			output = recipe.output,
 			quantity = recipe.quantity or 1,
 			inputs = inputs,
 			locked = recipe.unlocked == false,
-			requirement = recipe.requirement or "",
+			requirement = RecipeModel.Requirement(recipe.requirement),
 			maxCount = if type(recipe.maxCount) == "number" then recipe.maxCount else can,
 			batch = not permanent and maxBatch > 1,
 			verb = if permanent then "Convert" else "Forge",

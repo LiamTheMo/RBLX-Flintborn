@@ -120,18 +120,24 @@ check(not find("Tutorial").Visible, "a finished tutorial hides its card")
 
 -- Loot: Take asks for that entry; a refusal shows why.
 events.CorpseOpened.OnClientEvent:Fire("body1", {
-	{ index = 1, name = "Stone Axe", rarity = "Common" },
-	{ index = 2, name = "Iron Ore", rarity = "Uncommon", quantity = 6 },
+	{ index = 1, name = "Stone Axe", catalogId = "StoneAxe", key = "item-stoneaxe-8", rarity = "Common" },
+	{ index = 2, name = "Iron Ore", catalogId = "IronOre", key = "stack:IronOre", rarity = "Uncommon", quantity = 6 },
 })
 local loot = find("FlintbornLoot")
 press(find("Take", find("Item2", loot)))
-check(last()[1] == "CorpseTake" and last()[2] == "body1" and last()[3] == 2, "Take asks for that item of that body")
+check(
+	last()[1] == "CorpseTake" and last()[2] == "body1" and last()[3] == 2 and last()[4] == "stack:IronOre",
+	"Take asks for that item of that body, by its key"
+)
 check(string.find(find("Status", loot).Text, "OutOfRange") ~= nil, "a refused take says why")
 Kit.Modal.Back()
 check(not loot.Enabled, "Escape / B closes the loot window")
 
 -- Storage: Store sends the carried slot; Take the chest entry.
-events.ChestOpened.OnClientEvent:Fire("chest1", { { index = 3, name = "Plank", rarity = "Common", quantity = 40 } })
+events.ChestOpened.OnClientEvent:Fire(
+	"chest1",
+	{ { index = 3, name = "Wood", catalogId = "Wood", key = "stack:Wood", rarity = "Common", quantity = 40 } }
+)
 local chest = find("FlintbornStorage")
 press(find("Store", chest))
 check(
@@ -167,11 +173,17 @@ started.TribeController.Toggle()
 local function count()
 	return #gui:GetDescendants()
 end
-events.CorpseOpened.OnClientEvent:Fire("body2", { { index = 1, name = "Stone", rarity = "Common", quantity = 3 } })
+events.CorpseOpened.OnClientEvent:Fire(
+	"body2",
+	{ { index = 1, name = "Stone", catalogId = "Stone", key = "stack:Stone", rarity = "Common", quantity = 3 } }
+)
 Kit.Modal.Back()
 local before = count()
 for _ = 1, 20 do
-	events.CorpseOpened.OnClientEvent:Fire("body2", { { index = 1, name = "Stone", rarity = "Common", quantity = 3 } })
+	events.CorpseOpened.OnClientEvent:Fire(
+		"body2",
+		{ { index = 1, name = "Stone", catalogId = "Stone", key = "stack:Stone", rarity = "Common", quantity = 3 } }
+	)
 	Kit.Modal.Back()
 end
 check(count() == before, ("20 opens leave the PlayerGui as it was (%d -> %d)"):format(before, count()))

@@ -114,7 +114,11 @@ test("every item resolves to kit art", function()
 		local icon = ItemInfo.Icon(id)
 		if icon == nil then
 			table.insert(none, id)
-			expect(def.weapon ~= nil and def.weapon.family == "Bow", id .. " is a bow, the only gear without art")
+			local family = def.weapon and def.weapon.family
+			expect(
+				family == "Bow" or family == "Sword" or family == "Dagger" or def.armor ~= nil,
+				id .. " is a bow, sword, dagger or armour: the only gear without art that reads as it"
+			)
 		else
 			expect(sprites[ItemInfo.Sprite(icon)] == true, id .. " uses listed kit art (" .. icon .. ")")
 		end
@@ -122,7 +126,10 @@ test("every item resolves to kit art", function()
 			expectEq(ItemInfo.TINTS[id], nil, id .. " is exact, so untinted")
 		end
 	end
-	expect(#none <= 7, "only the bows lack art")
+	expectEq(ItemInfo.Icon("IronSword"), nil, "no tusk for a sword")
+	expect(ItemCatalog.Get("IronChest") ~= nil, "iron armour exists")
+	expectEq(ItemInfo.ArtStatus("IronChest"), "none", "no hide for iron armour")
+	expectEq(ItemInfo.Icon("GuardianFang"), "tusk", "the fang keeps the tusk (it is one)")
 end)
 
 test("stat chips describe the item", function()

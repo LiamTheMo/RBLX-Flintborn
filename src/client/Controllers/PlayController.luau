@@ -351,6 +351,8 @@ function PlayController.Start()
 		return
 	end
 	started = true
+	-- The shared ready state settles on the party view PartyController watches.
+	PartyController.Start()
 	LobbyController.Changed:Connect(function(what)
 		if what == "party" then
 			PlayController.RefreshParty()

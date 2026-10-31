@@ -130,7 +130,7 @@
     "pin": 16,
     "distanceW": 46,
     "progressW": 72,
-    "phone": { "size": [315, 162], "rowHeight": 48, "twoLine": true, "progressW": 104 }
+    "touch": { "size": [315, 162], "rowHeight": 48, "twoLine": true, "progressW": 104 }
   },
   "event": {
     "anchor": [1, 0],
@@ -143,7 +143,8 @@
     "descriptionH": 36,
     "descriptionSize": 13,
     "maxLines": 3,
-    "phone": { "anchor": [0, 0], "pos": [0, 39, 0, 238], "descriptionSize": 15 }
+    "touch": { "pos": [1, -53, 0, 511], "descriptionSize": 15 },
+    "phone": { "anchor": [0, 0], "pos": [0, 39, 0, 238] }
   },
   "tiles": {
     "x": 68,
@@ -180,7 +181,7 @@
     "subtitleSize": 13,
     "holdBottom": 12,
     "holdH": 7,
-    "phone": { "size": [230, 70], "titleY": 6, "titleH": 26, "subtitleY": 32, "subtitleH": 22, "subtitleSize": 15 }
+    "touch": { "size": [230, 70], "titleY": 6, "titleH": 26, "subtitleY": 32, "subtitleH": 22, "subtitleSize": 15 }
   },
   "attack": {
     "anchor": [1, 1],

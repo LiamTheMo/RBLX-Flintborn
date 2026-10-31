@@ -275,19 +275,33 @@ end
 
 -- Page 3: loot --------------------------------------------------------------------------
 events.CorpseOpened.OnClientEvent:Fire("body1", {
-	{ index = 1, name = "Stone Axe", rarity = "Common" },
-	{ index = 2, name = "Iron Ore", rarity = "Uncommon", quantity = 6 },
-	{ index = 3, name = "Redberry", rarity = "Common", quantity = 4 },
-	{ index = 4, name = "Basic Medicine", rarity = "Uncommon", quantity = 2 },
+	{ index = 1, name = "Stone Axe", catalogId = "StoneAxe", key = "item-stoneaxe-1", rarity = "Common" },
+	{ index = 2, name = "Iron Ore", catalogId = "IronOre", key = "stack:IronOre", rarity = "Uncommon", quantity = 6 },
+	{ index = 3, name = "Redberry", catalogId = "Redberry", key = "stack:Redberry", rarity = "Common", quantity = 4 },
+	{
+		index = 4,
+		name = "Basic Medicine",
+		catalogId = "BasicMedicine",
+		key = "stack:BasicMedicine",
+		rarity = "Uncommon",
+		quantity = 2,
+	},
 })
 check(find("FlintbornLoot").Enabled, "the loot window opens")
 __dump(gui, W, H, BG)
 
 -- Page 4: storage ------------------------------------------------------------------------
 events.ChestOpened.OnClientEvent:Fire("chest1", {
-	{ index = 1, name = "Plank", rarity = "Common", quantity = 40 },
-	{ index = 2, name = "Iron Bar", rarity = "Uncommon", quantity = 8 },
-	{ index = 3, name = "Stone Spear", rarity = "Common", permanent = true },
+	{ index = 1, name = "Wood", catalogId = "Wood", key = "stack:Wood", rarity = "Common", quantity = 40 },
+	{ index = 2, name = "Iron Bar", catalogId = "IronBar", key = "stack:IronBar", rarity = "Uncommon", quantity = 8 },
+	{
+		index = 3,
+		name = "Stone Spear",
+		catalogId = "StoneSpear",
+		key = "item-stonespear-7",
+		rarity = "Common",
+		permanent = true,
+	},
 })
 check(find("FlintbornStorage").Enabled, "the storage window opens")
 check(not find("FlintbornLoot").Enabled, "opening it closes the loot window")

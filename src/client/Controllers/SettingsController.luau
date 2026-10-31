@@ -256,26 +256,59 @@ local function build()
 
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
-	-- button, so this one stays hidden there.
+	-- button, so this one stays hidden there. It sits in the HUD's top row, left
+	-- of the vitals (clear of the compass, and of Roblox's jump button at the
+	-- bottom right on phones), on a root scaled like the HUD and moved below
+	-- the Roblox top bar where that reaches down (phones).
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
 		DisplayOrder = Kit.Tokens.Order("topStack"),
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		IgnoreGuiInset = true,
 	}, playerGui)
-	local size = math.max(Theme.TOUCH_TARGET, 52)
-	Kit.IconButton.new(gui, {
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+	end)
+	-- Kit.Scale.Hud applies the UI Scale setting itself.
+	gui:SetAttribute("FitsItself", true)
+	local root = make("Frame", {
+		Name = "Root",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+	}, gui)
+	Kit.Scale.Hud(gui, root)
+	local g = SettingsController.GEAR
+	local gear = Kit.IconButton.new(root, {
 		name = "Open",
 		variant = "settings",
-		size = { size, size },
-		position = UDim2.new(1, -12, 1, -12),
-		anchorPoint = Vector2.new(1, 1),
+		size = { g.w, g.h },
+		position = UDim2.new(1, -g.right, 0, g.y),
+		anchorPoint = Vector2.new(1, 0),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
 			SettingsController.Toggle()
 		end,
 	})
+	local uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
+	local function placeGear()
+		local inset = Kit.Scale.TopInset(gui) / math.max(uiScale.Scale, 0.01)
+		local shift = math.max(0, math.ceil(inset + g.gap - g.y))
+		gear.root.Position = UDim2.new(1, -g.right, 0, g.y + shift)
+	end
+	uiScale:GetPropertyChangedSignal("Scale"):Connect(placeGear)
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeGear)
+	pcall(function()
+		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(placeGear)
+	end)
+	placeGear()
+	SettingsController.gear = gear
 end
+
+-- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): right edge 14
+-- px left of the vitals (which end 53 px from the right, 315 wide), on the
+-- vitals' top line; `gap` below the Roblox top bar when it reaches down.
+SettingsController.GEAR = { right = 53 + 315 + 14, y = 60, w = 52, h = 46, gap = 2 }
 
 -- The window (Hud/Screens/SettingsWindow), for scenes and verifiers.
 function SettingsController.View()

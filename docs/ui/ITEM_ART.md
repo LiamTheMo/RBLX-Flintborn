@@ -4,16 +4,21 @@ Which art every catalog item (`ItemCatalog.Items`, generated gear, ores and bars
 included) draws in slots, cards and the hotbar until it has art of its own. The
 source is `ItemInfo.Icon(id) → (name, tint)` in `src/shared/Items/ItemInfo.luau`
 (`ICONS`, `TINTS`, `EXACT`, `ART_SPRITES`); `Kit.ItemIcon` draws an item's own
-`lk_item_<id>` / `item_<id>` sprite first when one exists, then this art, then the
-item's name in ink.
+`lk_item_<id>` / `item_<id>` sprite first when one exists, then this art, then a
+neutral ink glyph for the item's kind (tools and weapons a hammer, armour a
+backpack, food a drumstick, anything else a chest). A slot never prints the
+item's name: the name is in the icon root's `KitItemName` attribute, for
+tooltips and detail cards (`KitStandIn` marks the glyph).
 
 - **exact**: the kit art depicts that very item.
 - **stand-in**: the closest kit art, usually tinted. A tint is an `ImageColor3`
   multiply, so it darkens or shifts a hue; it cannot lighten. These items need
   real icon art.
-- **none**: nothing in the kit reads as the item; the slot shows the item's name.
+- **none**: nothing in the kit reads as the item (a borrowed picture would
+  mislead); the slot shows the neutral kind glyph and the name is in the
+  tooltip and detail card.
 
-Totals: 144 items, 12 exact, 125 stand-in, 7 none.
+Totals: 144 items, 12 exact, 83 stand-in, 49 none.
 
 Kit art used (all in `art/ui/kit/CATALOG.md`, checked against the sprite
 manifest by the `inventory_backpack` capture scene): `lk_icon_berries`, `lk_icon_bone`, `lk_icon_build`, `lk_icon_campfire`, `lk_icon_crystals`, `lk_icon_drumstick`, `lk_icon_hatchet`, `lk_icon_heart`, `lk_icon_hide`, `lk_icon_lightning`, `lk_icon_logs`, `lk_icon_magma_ore`, `lk_icon_mushroom`, `lk_icon_pickaxe`, `lk_icon_plank`, `lk_icon_plant_fiber`, `lk_icon_rocks`, `lk_icon_rope`, `lk_icon_runestone`, `lk_icon_spear`, `lk_icon_star`, `lk_icon_stone`, `lk_icon_stone_axe`, `lk_icon_stones`, `lk_icon_torch`, `lk_icon_tusk`, `lk_icon_warning`.
@@ -100,41 +105,41 @@ spec fails if an item stops resolving to listed art.
 | Item | Id | Art | Tint | Status |
 |---|---|---|---|---|
 | Adamantine Bow | `AdamantineBow` | — | — | none |
-| Adamantine Dagger | `AdamantineDagger` | `lk_icon_tusk` | #BE82D7 | stand-in |
+| Adamantine Dagger | `AdamantineDagger` | — | — | none |
 | Adamantine Spear | `AdamantineSpear` | `lk_icon_spear` | #BE82D7 | stand-in |
-| Adamantine Sword | `AdamantineSword` | `lk_icon_tusk` | #BE82D7 | stand-in |
-| Bone Dagger | `BoneDagger` | `lk_icon_tusk` | #FAF0D7 | stand-in |
+| Adamantine Sword | `AdamantineSword` | — | — | none |
+| Bone Dagger | `BoneDagger` | — | — | none |
 | Bone Spear | `BoneSpear` | `lk_icon_spear` | #FAF0D7 | stand-in |
 | Cobalt Bow | `CobaltBow` | — | — | none |
-| Cobalt Dagger | `CobaltDagger` | `lk_icon_tusk` | #82A0F0 | stand-in |
+| Cobalt Dagger | `CobaltDagger` | — | — | none |
 | Cobalt Spear | `CobaltSpear` | `lk_icon_spear` | #82A0F0 | stand-in |
-| Cobalt Sword | `CobaltSword` | `lk_icon_tusk` | #82A0F0 | stand-in |
+| Cobalt Sword | `CobaltSword` | — | — | none |
 | Copper Bow | `CopperBow` | — | — | none |
-| Copper Dagger | `CopperDagger` | `lk_icon_tusk` | #F0A06E | stand-in |
+| Copper Dagger | `CopperDagger` | — | — | none |
 | Copper Spear | `CopperSpear` | `lk_icon_spear` | #F0A06E | stand-in |
-| Copper Sword | `CopperSword` | `lk_icon_tusk` | #F0A06E | stand-in |
-| Flint Dagger | `FlintDagger` | `lk_icon_tusk` | #9696A5 | stand-in |
+| Copper Sword | `CopperSword` | — | — | none |
+| Flint Dagger | `FlintDagger` | — | — | none |
 | Flint Spear | `FlintSpear` | `lk_icon_spear` | #9696A5 | stand-in |
 | Guardian's Fang | `GuardianFang` | `lk_icon_tusk` | — | stand-in |
 | Iron Bow | `IronBow` | — | — | none |
-| Iron Dagger | `IronDagger` | `lk_icon_tusk` | #C3C8D4 | stand-in |
+| Iron Dagger | `IronDagger` | — | — | none |
 | Iron Spear | `IronSpear` | `lk_icon_spear` | #C3C8D4 | stand-in |
-| Iron Sword | `IronSword` | `lk_icon_tusk` | #C3C8D4 | stand-in |
-| Jade Dagger | `JadeDagger` | `lk_icon_tusk` | #96E1AA | stand-in |
+| Iron Sword | `IronSword` | — | — | none |
+| Jade Dagger | `JadeDagger` | — | — | none |
 | Jade Spear | `JadeSpear` | `lk_icon_spear` | #96E1AA | stand-in |
 | Mithril Bow | `MithrilBow` | — | — | none |
-| Mithril Dagger | `MithrilDagger` | `lk_icon_tusk` | #AAF0EB | stand-in |
+| Mithril Dagger | `MithrilDagger` | — | — | none |
 | Mithril Spear | `MithrilSpear` | `lk_icon_spear` | #AAF0EB | stand-in |
-| Mithril Sword | `MithrilSword` | `lk_icon_tusk` | #AAF0EB | stand-in |
-| Obsidian Dagger | `ObsidianDagger` | `lk_icon_tusk` | #73648C | stand-in |
+| Mithril Sword | `MithrilSword` | — | — | none |
+| Obsidian Dagger | `ObsidianDagger` | — | — | none |
 | Obsidian Spear | `ObsidianSpear` | `lk_icon_spear` | #73648C | stand-in |
 | Silver Bow | `SilverBow` | — | — | none |
-| Silver Dagger | `SilverDagger` | `lk_icon_tusk` | #F0F5FF | stand-in |
+| Silver Dagger | `SilverDagger` | — | — | none |
 | Silver Spear | `SilverSpear` | `lk_icon_spear` | #F0F5FF | stand-in |
-| Silver Sword | `SilverSword` | `lk_icon_tusk` | #F0F5FF | stand-in |
-| Stone Dagger | `StoneDagger` | `lk_icon_tusk` | #CDCDD4 | stand-in |
+| Silver Sword | `SilverSword` | — | — | none |
+| Stone Dagger | `StoneDagger` | — | — | none |
 | Stone Spear | `StoneSpear` | `lk_icon_spear` | — | exact |
-| Stone Sword | `StoneSword` | `lk_icon_tusk` | #CDCDD4 | stand-in |
+| Stone Sword | `StoneSword` | — | — | none |
 | Wooden Bow | `WoodenBow` | — | — | none |
 | Wooden Spear | `WoodenSpear` | `lk_icon_spear` | #E6AF78 | stand-in |
 
@@ -142,30 +147,30 @@ spec fails if an item stops resolving to listed art.
 
 | Item | Id | Art | Tint | Status |
 |---|---|---|---|---|
-| Adamantine Chest | `AdamantineChest` | `lk_icon_hide` | #BE82D7 | stand-in |
-| Adamantine Head | `AdamantineHead` | `lk_icon_hide` | #BE82D7 | stand-in |
-| Adamantine Legs/Boots | `AdamantineLegs` | `lk_icon_hide` | #BE82D7 | stand-in |
-| Bone Chest | `BoneChest` | `lk_icon_hide` | #FAF0D7 | stand-in |
-| Bone Head | `BoneHead` | `lk_icon_hide` | #FAF0D7 | stand-in |
-| Bone Legs/Boots | `BoneLegs` | `lk_icon_hide` | #FAF0D7 | stand-in |
-| Cobalt Chest | `CobaltChest` | `lk_icon_hide` | #82A0F0 | stand-in |
-| Cobalt Head | `CobaltHead` | `lk_icon_hide` | #82A0F0 | stand-in |
-| Cobalt Legs/Boots | `CobaltLegs` | `lk_icon_hide` | #82A0F0 | stand-in |
-| Copper Chest | `CopperChest` | `lk_icon_hide` | #F0A06E | stand-in |
-| Copper Head | `CopperHead` | `lk_icon_hide` | #F0A06E | stand-in |
-| Copper Legs/Boots | `CopperLegs` | `lk_icon_hide` | #F0A06E | stand-in |
-| Hide Chest | `HideChest` | `lk_icon_hide` | #D7A578 | stand-in |
-| Hide Head | `HideHead` | `lk_icon_hide` | #D7A578 | stand-in |
-| Hide Legs/Boots | `HideLegs` | `lk_icon_hide` | #D7A578 | stand-in |
-| Iron Chest | `IronChest` | `lk_icon_hide` | #C3C8D4 | stand-in |
-| Iron Head | `IronHead` | `lk_icon_hide` | #C3C8D4 | stand-in |
-| Iron Legs/Boots | `IronLegs` | `lk_icon_hide` | #C3C8D4 | stand-in |
-| Mithril Chest | `MithrilChest` | `lk_icon_hide` | #AAF0EB | stand-in |
-| Mithril Head | `MithrilHead` | `lk_icon_hide` | #AAF0EB | stand-in |
-| Mithril Legs/Boots | `MithrilLegs` | `lk_icon_hide` | #AAF0EB | stand-in |
-| Silver Chest | `SilverChest` | `lk_icon_hide` | #F0F5FF | stand-in |
-| Silver Head | `SilverHead` | `lk_icon_hide` | #F0F5FF | stand-in |
-| Silver Legs/Boots | `SilverLegs` | `lk_icon_hide` | #F0F5FF | stand-in |
+| Adamantine Chest | `AdamantineChest` | — | — | none |
+| Adamantine Head | `AdamantineHead` | — | — | none |
+| Adamantine Legs/Boots | `AdamantineLegs` | — | — | none |
+| Bone Chest | `BoneChest` | — | — | none |
+| Bone Head | `BoneHead` | — | — | none |
+| Bone Legs/Boots | `BoneLegs` | — | — | none |
+| Cobalt Chest | `CobaltChest` | — | — | none |
+| Cobalt Head | `CobaltHead` | — | — | none |
+| Cobalt Legs/Boots | `CobaltLegs` | — | — | none |
+| Copper Chest | `CopperChest` | — | — | none |
+| Copper Head | `CopperHead` | — | — | none |
+| Copper Legs/Boots | `CopperLegs` | — | — | none |
+| Hide Chest | `HideChest` | — | — | none |
+| Hide Head | `HideHead` | — | — | none |
+| Hide Legs/Boots | `HideLegs` | — | — | none |
+| Iron Chest | `IronChest` | — | — | none |
+| Iron Head | `IronHead` | — | — | none |
+| Iron Legs/Boots | `IronLegs` | — | — | none |
+| Mithril Chest | `MithrilChest` | — | — | none |
+| Mithril Head | `MithrilHead` | — | — | none |
+| Mithril Legs/Boots | `MithrilLegs` | — | — | none |
+| Silver Chest | `SilverChest` | — | — | none |
+| Silver Head | `SilverHead` | — | — | none |
+| Silver Legs/Boots | `SilverLegs` | — | — | none |
 
 ## Ammunition
 
@@ -208,11 +213,13 @@ spec fails if an item stops resolving to listed art.
 
 ## Notes
 
-- Armour: the kit has no helmet, chestpiece or boots art. Every piece uses the
-  hide icon tinted by its material; the Equipped tab labels the slots Head, Chest
-  and Legs. Each needs its own icon.
-- Swords and daggers use the tusk (a blade) tinted by material; only Guardian's
-  Fang is the tusk untinted. Spears use the spear icon; the stone spear is exact.
+- Armour: the kit has no helmet, chestpiece or boots art, and the hide icon read
+  as hide rather than armour, so every piece is "none" (the backpack kind
+  glyph); the Equipped tab labels the slots Head, Chest and Legs. Each needs its
+  own icon.
+- Swords and daggers are "none" (the hammer kind glyph): the tusk read as a tusk,
+  not a blade. Guardian's Fang keeps the untinted tusk (it is a fang). Spears
+  use the spear icon; the stone spear is exact.
 - Bows have no art: nothing in the kit reads as a bow.
 - Ores are the rocks icon tinted per metal (Adamantine Ore uses the magma ore);
   bars are the plank tinted per metal (no ingot art).

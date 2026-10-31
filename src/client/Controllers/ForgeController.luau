@@ -65,12 +65,7 @@ ForgeController.Refresh = refresh
 -- Sends one forge request: `count` crafts of `entry` (a Permanent conversion
 -- always 1, with its source item). One nonce per request; a transport retry
 -- reuses it so the server never charges twice.
-local function submit(entry, count: number, sourceId: string?)
-	if busy then
-		return
-	end
-	busy = true
-	window:SetBusy(true)
+local function send(entry, count: number, sourceId: string?)
 	local nonce = HttpService:GenerateGUID(false)
 	local ok, result = invoke("ForgeCraft", entry.id, sourceId, nonce, count)
 	if not ok and result == "Request failed" then
@@ -87,8 +82,22 @@ local function submit(entry, count: number, sourceId: string?)
 		)
 	end
 	refresh()
+end
+
+local function submit(entry, count: number, sourceId: string?)
+	if busy then
+		return
+	end
+	busy = true
+	window:SetBusy(true)
+	-- Whatever goes wrong after the request (a receipt or a refresh that
+	-- errors), the window never stays busy.
+	local ok, err = pcall(send, entry, count, sourceId)
 	busy = false
 	window:SetBusy(false)
+	if not ok then
+		warn("[Forge] " .. tostring(err))
+	end
 end
 
 local function onForge(entry, count: number)

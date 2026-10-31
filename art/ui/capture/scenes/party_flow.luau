@@ -97,7 +97,7 @@ end
 
 local function rowNames(window)
 	local names = {}
-	for _, component in window.lists.invites do
+	for _, component in window:Rows("invites") do
 		if component.props and component.props.name and component.action then
 			table.insert(names, component.props.name)
 		end
@@ -106,7 +106,7 @@ local function rowNames(window)
 end
 
 local function inviteRow(window, name)
-	for _, component in window.lists.invites do
+	for _, component in window:Rows("invites") do
 		if component.props and component.props.name == name then
 			return component
 		end
@@ -277,6 +277,16 @@ check(window.partyHeader.count.Text == "1/8" and not window.leaveButton.root.Vis
 place(window)
 dump()
 
+-- Rows update in place: redrawing the same data keeps every row.
+local membersBefore, invitesBefore = window:Rows("members"), window:Rows("invites")
+window:SetData(window.data)
+local membersAfter, invitesAfter = window:Rows("members"), window:Rows("invites")
+check(
+	membersAfter[1] == membersBefore[1] and membersAfter[#membersAfter] == membersBefore[#membersBefore],
+	"an unchanged member row is kept, not rebuilt"
+)
+check(invitesAfter[1] == invitesBefore[1], "an unchanged invite row is kept")
+
 -- Close, Toggle and the leak check.
 window.closeX.control:Activate()
 check(not PartyController.IsOpen(), "the ✕ closes the window")
@@ -284,10 +294,81 @@ PartyController.Toggle()
 check(PartyController.IsOpen(), "Toggle opens it")
 PartyController.Toggle()
 check(not PartyController.IsOpen(), "and closes it")
-local before = #player.PlayerGui:GetDescendants()
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
+end
+
+local instances, connections = leakCounts()
 for _ = 1, 20 do
 	PartyController.Open()
 	PartyController.Toggle()
 end
-check(#player.PlayerGui:GetDescendants() == before, ("open/close ×20 leaves %d descendants"):format(before))
+local instancesAfter, connectionsAfter = leakCounts()
+check(instancesAfter == instances, ("open/close ×20 leaves %d descendants (%d)"):format(instances, instancesAfter))
+check(
+	connectionsAfter == connections,
+	("open/close ×20 leaves %d connections (%d)"):format(connections, connectionsAfter)
+)
 print(("party_flow: %d failed"):format(failures))

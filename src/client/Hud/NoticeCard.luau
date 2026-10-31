@@ -17,7 +17,9 @@ NoticeCard.__index = NoticeCard
 
 local PAD_X, PAD_TOP, PAD_BOTTOM = 26, 18, 20
 local ICON = 52
-local TITLE_H = 32
+local TITLE_SIZE = 24
+-- A long title wraps (up to three lines), then ends in "…".
+local TITLE_LINES = 3
 local GAP = 6
 local BAR_H = 26
 local BUTTON_H = 46
@@ -45,6 +47,11 @@ function NoticeCard.Lines(text: string, role: string, width: number, size: numbe
 		count += lines
 	end
 	return math.max(count, 1)
+end
+
+-- One title line, in design px.
+function NoticeCard.TitleLineHeight(): number
+	return math.ceil(TITLE_SIZE * Kit.Core.TextBoost("itemTitle") * 1.3)
 end
 
 -- opts: name, width (design px, default 440), layoutOrder, title (nil for text
@@ -78,15 +85,17 @@ function NoticeCard.new(parent: Instance, opts)
 	self.textW = self.w - textX - right
 	self.titleText = Kit.Text.new(self.body, {
 		name = "Title",
-		rect = { textX, PAD_TOP, self.textW, TITLE_H },
+		rect = { textX, PAD_TOP, self.textW, NoticeCard.TitleLineHeight() },
 		text = opts.title or "",
 		role = "itemTitle",
-		textSize = 24,
+		textSize = TITLE_SIZE,
 		caps = true,
-		scaled = true,
+		wrap = true,
+		yAlign = "Top",
 		zIndex = 7,
 	})
 	self.title = self.titleText.root
+	self.title.TextTruncate = Enum.TextTruncate.AtEnd
 	self.title.Visible = opts.title ~= nil and opts.title ~= ""
 	self.lines = Kit.Text.new(self.body, {
 		name = "Text",
@@ -133,8 +142,14 @@ end
 function NoticeCard:_layout()
 	local y = PAD_TOP
 	if self.title.Visible then
+		local lines = math.min(
+			NoticeCard.Lines(string.upper(self.title.Text), "itemTitle", self.textW * 0.95, TITLE_SIZE),
+			TITLE_LINES
+		)
+		local titleH = lines * NoticeCard.TitleLineHeight()
 		self.title.Position = UDim2.fromOffset(self.textX, y)
-		y += TITLE_H + 2
+		self.title.Size = UDim2.fromOffset(self.textW, titleH)
+		y += titleH + 2
 	end
 	local hasText = self.text.Text ~= ""
 	self.text.Visible = hasText
@@ -308,6 +323,9 @@ function NoticeCard:Show(text: string, title: string?)
 	if title ~= nil then
 		local visible = title ~= ""
 		if self.title.Visible ~= visible then
+			changed = true
+		end
+		if self.title.Text ~= string.upper(title) then
 			changed = true
 		end
 		self.titleText:SetText(title)

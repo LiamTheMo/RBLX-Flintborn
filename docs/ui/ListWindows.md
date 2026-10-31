@@ -33,7 +33,7 @@ Page items, added between `Begin()` and `Finish()`:
 | `Row(spec)` | a soft card (`Kit.Panel` inset, the mockups' soft-card art), at least 84 px tall and growing with its wrapped detail: item art (`Kit.ItemIcon` from `icon` = catalog id) or a `glyph` icon, title, detail, an optional `bar` (`Kit.Bar` on its track: `{value, fill}`), a `value` with a `coin` / `gem` icon, `Kit.Button` "s" buttons (leather; `kind = "paper"` for parchment), and a `Kit.Checkbox` ring (`done = true` ticked, `false` with no buttons empty) |
 | `Player(spec)` | `Kit.PlayerRow` (portrait, name, level, action button), as the Party window's invite list |
 | `Buttons(specs)` | a right-aligned row of `Kit.Button` "s" buttons |
-| `Input(label, placeholder, onSubmit, always?, submit?)` | label, a text field on the `field.value` plate (`Kit.Picture`) and an optional submit button |
+| `Input(label, placeholder, onSubmit, always?, submit?)` | label, a `Kit.TextField` (its touch pad grows to 44 screen px) and an optional submit button; returns the TextBox |
 | `Pair(left, right)` | two `Kit.Panel` inset offer panels with a section header, a lock `Kit.Badge` (Not locked / Locked / Confirmed), `Kit.Slot` items with their names under them, and a gems `Kit.CurrencyPill` |
 | `Confirm(text, yes, delay, onYes, opts?)` | `Kit.ConfirmDialog` over the window. `delay` > 0 makes Confirm a press-and-hold of that many seconds. `opts.rows` gives labelled paragraphs, plus `opts.title` and `opts.size` |
 
@@ -41,6 +41,13 @@ Row heights come from design numbers (`ListWindow.Lines` wraps by measured word
 widths), never from `AbsoluteSize`. After a redraw, `Finish` gives gamepad focus
 back to the same button (row key and button key), else to the first enabled
 button, else to the close button.
+
+A page taller than its area ends between two rows: `Finish` shortens the list
+to the end of the last row that fits whole (never below 60 % of the area), so
+its bottom edge never cuts through a line of text, and the rail shows there is
+more. When a window opens, a gamepad lands on the selected tab, else the first
+enabled button, else Close; `SetDefaultSelection(object)` lets a controller
+choose instead.
 
 | Screen | Controller | Tabs (icons) | Contents |
 |---|---|---|---|
@@ -58,12 +65,15 @@ keeps Coins and Gems pills at the top right.
 The map is a 1000 × 860 `Kit.Screen` with a `Kit.Window` banner (map icon, MAP,
 close, right clasps). The painted island (`Hud/IslandMap`, as in the Journal's
 map tab) sits in a `Kit.Panel` inset at 28, 104, 944, 680, with the map inside
-it at 36, 112, 928, 664:
+it at 36, 112, 928, 664. On phones the window is 1110 × 640 with the panel at
+28, 104, 760, 508 and the legend in a column beside it, so it fits the short
+screen at about 0.5 and its legend and marker names keep 9 screen px; the
+window is rebuilt when the form factor changes. A gamepad lands on Zoom in.
 
 - **Zoom:** the kit's + / − buttons. Each one disables at its limit.
 - **Compass:** at the map's top-left corner (north is up).
 - **Pins:** safe camps and main landmarks. Press a pin for its name plate.
-- **Live markers:** active portals (the `blue` token) and announced events (rarity colour), as tinted dots.
+- **Live markers:** active portals (the `blue` token) and announced events (rarity colour), as tinted dots; their names carry a 2 px paper outline so they read over the painting.
 - **Your position:** the compass arrow, followed while zoomed in until you pan.
 - **Legend:** under the panel (You, Camps and landmarks, Portals, Events).
 
@@ -93,13 +103,19 @@ there:
 - tween motion
 - the background blur
 
+## Other world windows
+
+- **World menu** (`WorldMenuController`): a gamepad lands on Play, or on Return
+  to lobby while Play is loading, and moves to Play when it unlocks. Failures
+  name the reason in words (`Ui/Reasons`), never a raw code or error.
+- **Tribe** (`TribeController`): a gamepad lands on the first action other
+  than Leave tribe, and a redraw keeps the focused action. The key hint follows
+  the input (key, gamepad button, none on touch). "Allied with 1 tribe / 2
+  tribes".
+- **Build palette** (`BuildController`): see HudScreen.md, Gamepad.
+
 ## Kit requests
 
-- A plain text field (`Kit.TextField`): the search box art has its magnifier
-  baked in. The Codes and Gems fields use the `field.value` plate with a
-  TextBox.
-- `Kit.Toast` with two actions: the 430 px toast leaves the title about 90 px
-  beside two buttons, so the trade invite uses one View action and a dialog.
 - A partial ring (sheet 19): only the empty and full rings exist, so progress
   uses bars.
 - A plain coloured map-marker dot: the tinted `dot.yellow` multiplies, so

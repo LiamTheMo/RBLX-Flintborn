@@ -3,9 +3,12 @@
 -- kit window (docs/ui/ListWindows.md): the painted island (Hud/IslandMap, the
 -- Journal's map) in an inset panel with zoom buttons, pins for the safe camps
 -- and main landmarks, the active portals and announced events, and your
--- position, followed while zoomed in, with a legend underneath. An authored
--- map (not the generated island) shows the bare panel with its live markers.
--- Entering a safe camp shows a clear notice. World place only.
+-- position, followed while zoomed in, with a legend underneath (on phones a
+-- wide window with the legend beside the map, so the window draws larger and
+-- its words keep 9 screen px). Marker names carry a paper outline so they read
+-- over the painting. An authored map (not the generated island) shows the bare
+-- panel with its live markers. Entering a safe camp shows a clear notice.
+-- World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local GuiService = game:GetService("GuiService")
@@ -21,16 +24,34 @@ local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local IslandMap = require(script.Parent.Parent.Hud.IslandMap)
 local Kit = require(script.Parent.Parent.Hud.Kit)
+local Layout = require(script.Parent.Parent.Hud.Layout)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local MapController = {}
 
--- The window's design size, the inset panel and the map inside it.
-MapController.SIZE = { 1000, 860 }
-MapController.PANEL_RECT = { 28, 104, 944, 680 }
-MapController.MAP_RECT = { 36, 112, 928, 664 }
+-- The window's design size, the inset panel and the map inside it, and where
+-- the legend starts and runs ("row" under the map, "column" beside it).
+MapController.LAYOUTS = {
+	desktop = {
+		size = { 1000, 860 },
+		panel = { 28, 104, 944, 680 },
+		map = { 36, 112, 928, 664 },
+		legend = { 36, 800 },
+		legendFlow = "row",
+	},
+	phone = {
+		size = { 1110, 640 },
+		panel = { 28, 104, 760, 508 },
+		map = { 36, 112, 744, 492 },
+		legend = { 816, 128 },
+		legendFlow = "column",
+	},
+}
+MapController.SIZE = MapController.LAYOUTS.desktop.size
+MapController.PANEL_RECT = MapController.LAYOUTS.desktop.panel
+MapController.MAP_RECT = MapController.LAYOUTS.desktop.map
 -- Marker colours (kit tokens): camps on an authored map, portals.
 MapController.CAMP_COLOR = "toggleOn"
 MapController.PORTAL_COLOR = "blue"
@@ -43,6 +64,7 @@ local map = nil
 local window = nil
 local safeCard = nil
 local following = true
+local builtPhone = nil
 
 local events = {}
 local safeZones = {}
@@ -98,6 +120,20 @@ local function renderMarkers()
 		})
 	end
 	map:SetMarkers(markers)
+	-- Names over the painting: a paper outline instead of the thin text stroke.
+	for _, holder in map.extra or {} do
+		local label = holder:FindFirstChild("Name")
+		if label and label:IsA("TextLabel") and label:FindFirstChild("Outline") == nil then
+			label.TextStrokeTransparency = 1
+			local stroke = Instance.new("UIStroke")
+			stroke.Name = "Outline"
+			stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+			stroke.Color = Kit.Tokens.Color("paper")
+			stroke.Thickness = 2
+			stroke.Transparency = 0.05
+			stroke.Parent = label
+		end
+	end
 end
 
 local function headingText(): string
@@ -163,6 +199,8 @@ local function watchSafeZones()
 	end)
 end
 
+local buildWindow
+
 local function build()
 	local gui = make("ScreenGui", { Name = "Map", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
 	ui.compass = make("TextLabel", {
@@ -181,7 +219,15 @@ local function build()
 	safeCard.frame.Position = UDim2.new(0.5, 0, 1, -150)
 	safeCard:SetTone("haveEnough")
 
-	screen = Kit.Screen.new("FlintbornMap", { size = MapController.SIZE, parent = player:WaitForChild("PlayerGui") })
+	buildWindow()
+end
+
+-- The map window, in the arrangement for this screen (phone or not).
+function buildWindow()
+	local phone = Layout.IsPhone()
+	builtPhone = phone
+	local spec = if phone then MapController.LAYOUTS.phone else MapController.LAYOUTS.desktop
+	screen = Kit.Screen.new("FlintbornMap", { size = spec.size, parent = player:WaitForChild("PlayerGui") })
 	window = Kit.Window.new(screen, {
 		title = "Map",
 		icon = "map",
@@ -192,9 +238,9 @@ local function build()
 		end,
 	})
 	local v = window.base.visual
-	local panel = MapController.PANEL_RECT
+	local panel = spec.panel
 	Kit.Panel.new(v, { name = "MapPanel", rect = panel, variant = "inset", zIndex = 6 })
-	local r = MapController.MAP_RECT
+	local r = spec.map
 	map = IslandMap.new(v, r, {
 		zIndex = 7,
 		zoomButtons = {
@@ -211,8 +257,7 @@ local function build()
 		{ dot = MapController.PORTAL_COLOR, text = "Portals" },
 		{ dot = "glow", text = "Events (by rarity)" },
 	}
-	local x = panel[1] + 8
-	local y = panel[2] + panel[4] + 16
+	local x, y = spec.legend[1], spec.legend[2]
 	for index, entry in legend do
 		if entry.icon then
 			Kit.Icon.new(
@@ -236,9 +281,14 @@ local function build()
 			role = "rowLabel",
 			zIndex = 8,
 		})
-		x += 40 + tw + 28
+		if spec.legendFlow == "column" then
+			y += 52
+		else
+			x += 40 + tw + 28
+		end
 	end
-	screen:SetDefaultSelection(window.close.control.hit)
+	-- A gamepad lands on Zoom in (the map's own control), not on Close.
+	screen:SetDefaultSelection(if map.zoomIn then map.zoomIn.control.hit else window.close.control.hit)
 	-- The painting is of the generated island; an authored map shows parchment.
 	task.spawn(function()
 		WorldState.WaitUntilReady()
@@ -294,6 +344,17 @@ function MapController.Start()
 		return Enum.ContextActionResult.Pass
 	end)
 	watchSafeZones()
+	-- A screen that becomes (or stops being) a phone gets the other window.
+	Kit.Scale.OnFormFactorChanged(function()
+		if Layout.IsPhone() ~= builtPhone then
+			local wasOpen = screen:IsOpen()
+			screen:Destroy()
+			buildWindow()
+			if wasOpen then
+				MapController.Toggle()
+			end
+		end
+	end)
 	RunService.RenderStepped:Connect(function(dt)
 		sinceSafeCheck += dt
 		update()

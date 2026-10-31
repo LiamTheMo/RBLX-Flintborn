@@ -94,13 +94,14 @@ check(view.screen:IsOpen() and gui.Enabled, "the Settings key opens the window")
 check(view.tab == "Gameplay" and view.pages.Gameplay.Visible, "opens on Gameplay")
 check(state(view.apply) == "disabled", "APPLY is dim with nothing to save")
 
--- Gameplay: a checkbox and two sliders; Music shows on Audio too.
+-- Gameplay: a checkbox and its one slider; the volumes are on Audio only.
+check(view.fields["Gameplay.musicVolume"] == nil, "Gameplay has no Music slider (Audio has it)")
+check(view.fields["Gameplay.effectsVolume"] == nil, "Gameplay has no Effects slider")
 press(view.fields["Gameplay.showDamage"])
 view.fields["Gameplay.cameraSensitivity"]:_change(80)
-view.fields["Gameplay.musicVolume"]:_change(40)
+view.fields["Audio.musicVolume"]:_change(40)
 check(#sent == 0, "nothing is sent before APPLY")
 check(state(view.apply) ~= "disabled", "APPLY lights up with a change")
-check(view.fields["Audio.musicVolume"].value == 40, "Music on the Audio page follows Gameplay")
 check(view.fields["Gameplay.cameraSensitivity"].valueLabel.Text == "1.6", "Camera Sensitivity shows the multiplier")
 press(view.apply)
 check(#sent == 1 and sent[1][1] == "SaveSettings", "APPLY sends one SaveSettings")
@@ -152,11 +153,13 @@ press(view.reset)
 check(view.keycaps.Interact[2].label.Text == "E", "RESET on Controls restores Interact E")
 check(state(view.apply) == "disabled", "the reset keys match what is saved")
 
--- RESET on Gameplay: its settings back to their defaults, in the draft.
+-- RESET on Gameplay: its settings back to their defaults, in the draft (the
+-- Audio page's Music volume is not Gameplay's to reset).
 view:SelectTab("Gameplay")
 press(view.reset)
 check(view.fields["Gameplay.cameraSensitivity"].value == 50, "Camera Sensitivity back to 50")
 check(view.fields["Gameplay.showDamage"].checked == true, "Show Damage back on")
+check(view.fields["Audio.musicVolume"].value == 40, "Music keeps its saved 40")
 press(view.apply)
 local reset = sent[3] and sent[3][2] or {}
 check(
@@ -164,8 +167,7 @@ check(
 		and sent[3][1] == "SaveSettings"
 		and reset.cameraSensitivity == 50
 		and reset.showDamage == true
-		and reset.musicVolume == 75
-		and count(reset) == 3,
+		and count(reset) == 2,
 	"APPLY after RESET saves the defaults that differ"
 )
 player:SetAttribute("ShowDamage", true)
@@ -225,6 +227,19 @@ SettingsController.Toggle()
 check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled")
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
+
+-- The world ⚙ sits in the HUD's top row left of the vitals, on a HUD-scaled
+-- root (not at the bottom right, where Roblox's jump button is on phones).
+local gear = SettingsController.gear
+local gearRoot = gear.root.Parent
+check(
+	gear.root.Position.X.Scale == 1
+		and gear.root.Position.X.Offset == -SettingsController.GEAR.right
+		and gear.root.Position.Y.Scale == 0
+		and gear.root.AnchorPoint.Y == 0,
+	"the world gear is top right, left of the vitals"
+)
+check(gearRoot:FindFirstChildWhichIsA("UIScale") ~= nil, "the gear scales with the HUD")
 
 print(if failures == 0 then "FLOW OK" else ("FLOW FAILED (%d)"):format(failures))
 if failures > 0 then

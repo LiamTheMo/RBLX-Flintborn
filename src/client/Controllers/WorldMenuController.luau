@@ -3,8 +3,11 @@
 -- ready, and the screen says plainly when items become at risk. World place only.
 -- A kit window (no close: the menu leaves only through Play or the lobby) over a
 -- dark backdrop that hides the world while it loads; the warning when items
--- become at risk is a kit toast in the shared top-centre column.
+-- become at risk is a kit toast in the shared top-centre column. A gamepad
+-- lands on Play (on Return to lobby while Play is still loading) and moves to
+-- Play once it unlocks.
 
+local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -22,6 +25,8 @@ local STATE_ATTRIBUTE = "SessionState"
 local TRANSITION_SECONDS = 3
 
 WorldMenuController.SIZE = { 640, 450 }
+-- Shown when a request errors instead of answering (never the raw error).
+WorldMenuController.NO_ANSWER = "the server did not answer"
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -36,9 +41,22 @@ local function setError(text: string)
 	ui.error:SetText(text)
 end
 
+-- Gamepad selection: Play when it can be pressed, else Return to lobby. Only
+-- moves a selection that is missing or still on this menu.
+local function selectDefault()
+	local selected = GuiService.SelectedObject
+	local ours = selected ~= nil and selected:IsDescendantOf(ui.gui)
+	if not ours and not (selected == nil and Kit.Input.IsGamepad()) then
+		return
+	end
+	local target = if ui.play.control.flags.enabled ~= false then ui.play else ui.back
+	GuiService.SelectedObject = target.control.hit
+end
+
 local function refresh()
 	local state = player:GetAttribute(STATE_ATTRIBUTE)
-	ui.gui.Enabled = SessionStates.ShowsWorldMenu(state)
+	local shown = SessionStates.ShowsWorldMenu(state)
+	ui.gui.Enabled = shown
 	ui.status:SetText(STATUS_TEXT[state] or "")
 	if player:GetAttribute("MaintenanceNotice") then
 		setError("Game update: your items were saved and return when you press Play.")
@@ -49,6 +67,11 @@ local function refresh()
 		ui.play:SetEnabled(ready)
 	end
 	ui.play:SetLabel(if ready then "Play" else "Loading…")
+	if shown then
+		selectDefault()
+	elseif GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(ui.gui) then
+		GuiService.SelectedObject = nil
+	end
 	if state == SessionStates.ActiveRun then
 		ui.transition.root.Visible = true
 		task.delay(TRANSITION_SECONDS, function()
@@ -73,7 +96,9 @@ local function play()
 	ui.requesting = false
 	if not ok or not success then
 		setError(
-			"Could not enter the world (" .. Reasons.Text(reason or success) .. "). You are still safe — try again."
+			"Could not enter the world ("
+				.. (if ok then Reasons.Text(reason or success) else WorldMenuController.NO_ANSWER)
+				.. "). You are still safe — try again."
 		)
 	else
 		setError("")
@@ -87,7 +112,11 @@ local function returnToLobby()
 		return Remotes.Get("ReturnToLobby"):InvokeServer()
 	end)
 	if not ok or not success then
-		setError("Could not return to the lobby (" .. tostring(reason or success) .. "). You are still safe.")
+		setError(
+			"Could not return to the lobby ("
+				.. (if ok then Reasons.Text(reason or success) else WorldMenuController.NO_ANSWER)
+				.. "). You are still safe."
+		)
 	end
 end
 
@@ -176,7 +205,7 @@ local function build()
 		sizeClass = "l",
 		onPress = play,
 	})
-	Kit.Button.new(body, {
+	ui.back = Kit.Button.new(body, {
 		name = "ReturnToLobby",
 		rect = { (bw - buttonW) / 2, 188, buttonW, 58 },
 		label = "Return to lobby",

@@ -53,6 +53,26 @@ LobbyHud.INVITE = { 196, 8, 45, 34 }
 -- Spec text sizes (TextSize ≈ cap height ÷ 0.743, LobbyScreen.md).
 LobbyHud.TEXT = { cardName = 19, cardLevel = 16, currency = 18, partyTitle = 20, memberName = 13, barText = 17 }
 
+-- Phones and touch tablets (Kit.Scale.IsSmallTouch): the HUD draws at its
+-- 0.5 floor there, so party names grow to stay at 9 screen px or more, rows
+-- take the panel's width (the add-player button moves up beside the count), the pills widen for long values, the notice
+-- wraps onto two lines and an invite gets one Respond button (opening the
+-- Party window's invitations) instead of two small ✓ / ✕ buttons whose touch
+-- pads would overlap.
+LobbyHud.PHONE = {
+	memberName = 15,
+	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, settings = { 298, 0, 52, 46 }, w = 350 },
+	noticeH = 72,
+	respond = { 118, 6, 105, 40 },
+	-- The add-player button moves into the title row (panel px), so the first
+	-- member's row has the panel's width for the larger name.
+	invite = { 222, 21, 45, 34 },
+}
+LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
+-- The card's level label and XP bar share x 109..320; the bar starts after
+-- the label, which widens when its text needs it (a long level, phone text).
+LobbyHud.CARD_LEVEL = { x = 109, y = 44, w = 48, h = 20, barY = 49, barH = 12, right = 320, gap = 2 }
+
 local function region(parent: Instance, name: string, props): Frame
 	local frame = Instance.new("Frame")
 	frame.Name = name
@@ -76,6 +96,11 @@ function LobbyHud.new(parent: Instance, actions)
 		slots = {},
 		rows = {},
 		parts = {},
+		phone = Kit.Scale.IsSmallTouch(),
+		levelW = LobbyHud.CARD_LEVEL.w,
+		cardFraction = 0,
+		coinValue = 0,
+		gemValue = 0,
 	}, LobbyHud)
 	local function fire(name: string, ...)
 		local fn = actions[name]
@@ -115,9 +140,10 @@ function LobbyHud.new(parent: Instance, actions)
 		textSize = LobbyHud.TEXT.cardName,
 		zIndex = 7,
 	})
+	local cl = LobbyHud.CARD_LEVEL
 	self.level = Kit.Text.new(card.visual, {
 		name = "Level",
-		rect = { 109, 44, 48, 20 },
+		rect = { cl.x, cl.y, cl.w, cl.h },
 		text = "",
 		role = "hudSmall",
 		textSize = LobbyHud.TEXT.cardLevel,
@@ -125,7 +151,7 @@ function LobbyHud.new(parent: Instance, actions)
 		scaled = true,
 		zIndex = 7,
 	})
-	self.cardBar = Kit.Bar.new(card.visual, { name = "XpBar", rect = { 159, 49, 161, 12 }, fill = "xp", zIndex = 7 })
+	self:_cardBar()
 	self.cardControl = Kit.Interact.attach(card, {
 		hoverScale = false,
 		onPress = function()
@@ -143,35 +169,7 @@ function LobbyHud.new(parent: Instance, actions)
 		Position = UDim2.new(1, -(tr.right + tr.w), 0, tr.y),
 		Size = UDim2.fromOffset(tr.w, tr.h),
 	})
-	self.coins = Kit.CurrencyPill.new(self.topRight, {
-		name = "Coins",
-		rect = { 0, 0, 116, 46 },
-		currency = "coins",
-		textSize = LobbyHud.TEXT.currency,
-		iconSize = 30,
-		onPress = function()
-			fire("onCurrency", "coins")
-		end,
-	})
-	self.gems = Kit.CurrencyPill.new(self.topRight, {
-		name = "Gems",
-		rect = { 133, 0, 101, 46 },
-		currency = "gems",
-		textSize = LobbyHud.TEXT.currency,
-		iconSize = 30,
-		onPress = function()
-			fire("onCurrency", "gems")
-		end,
-	})
-	self.settings = Kit.IconButton.new(self.topRight, {
-		name = "Settings",
-		rect = { 250, 0, 52, 46 },
-		variant = "settings",
-		onPress = function()
-			fire("onSettings")
-		end,
-	})
-	self.parts.coins, self.parts.gems, self.parts.settings = self.coins.root, self.gems.root, self.settings.root
+	self:_buildTopRight()
 
 	-- Left: the menu tiles, a vertically centred 2 × 3 group.
 	local t = LobbyHud.TILES
@@ -322,24 +320,146 @@ function LobbyHud.new(parent: Instance, actions)
 
 	-- Above the XP bar: the game-update notice, shown only while it applies
 	-- (status toasts take the top centre).
+	self.noticeText = ""
 	self.noticeRegion = region(self.bottom, "Notice", {
 		Position = UDim2.fromOffset((b.w - 560) / 2, -58),
 		Size = UDim2.fromOffset(560, 46),
 		Visible = false,
 	})
-	self.notice = Kit.Panel.new(self.noticeRegion, {
-		name = "Plaque",
-		rect = { 0, 0, 560, 46 },
-		variant = "plaque",
-		pad = 18,
-		text = "",
-		textRole = "hudSmall",
-	})
+	self:_buildNotice()
 
 	self:_link()
 	self:SetParty(LobbyHudModel.Party(nil, { userId = 0, name = "" }))
 	self:SetHotbar(LobbyHudModel.Hotbar(nil))
+	-- Hotkey badges (1–6) are keyboard keys: shown only while one is in use.
+	self.stopInput = Kit.Input.Watch(function()
+		self:_hotkeys()
+	end)
+	self:_hotkeys()
+	-- Phone and desktop sizes follow the screen and the input devices.
+	self.stopForm = Kit.Scale.OnFormFactorChanged(function()
+		self:_formChanged()
+	end)
 	return self
+end
+
+-- The card's XP bar after the level label (rebuilt when the label widens).
+function LobbyHud:_cardBar()
+	local cl = LobbyHud.CARD_LEVEL
+	if self.cardBar then
+		self.cardBar:Destroy()
+	end
+	local x = cl.x + self.levelW + cl.gap
+	self.cardBar = Kit.Bar.new(self.card.visual, {
+		name = "XpBar",
+		rect = { x, cl.barY, cl.right - x, cl.barH },
+		fill = "xp",
+		zIndex = 7,
+	})
+	self.cardBar:Set(self.cardFraction, true)
+end
+
+-- Widens the card's level label to its text (never below the mockup's 48).
+function LobbyHud:_fitLevel(text: string)
+	local cl = LobbyHud.CARD_LEVEL
+	local need = if text == "" then 0 else math.ceil(Kit.Text.Width(text, "hudSmall", LobbyHud.TEXT.cardLevel)) + 2
+	local w = math.clamp(need, cl.w, 110)
+	if w ~= self.levelW then
+		self.levelW = w
+		self.level.root.Size = UDim2.fromOffset(w, cl.h)
+		self:_cardBar()
+	end
+end
+
+-- Coins, Gems and Settings (rebuilt when the form factor changes).
+function LobbyHud:_buildTopRight()
+	for _, part in { self.coins, self.gems, self.settings } do
+		part:Destroy()
+	end
+	local layout = if self.phone then LobbyHud.PHONE.pills else LobbyHud.PILLS
+	local tr = LobbyHud.TOP_RIGHT
+	local fire = self.fire
+	self.topRight.Size = UDim2.fromOffset(layout.w, tr.h)
+	self.topRight.Position = UDim2.new(1, -(tr.right + layout.w), 0, tr.y + self.shift)
+	self.coins = Kit.CurrencyPill.new(self.topRight, {
+		name = "Coins",
+		rect = layout.coins,
+		currency = "coins",
+		value = self.coinValue,
+		textSize = LobbyHud.TEXT.currency,
+		iconSize = 30,
+		onPress = function()
+			fire("onCurrency", "coins")
+		end,
+	})
+	self.gems = Kit.CurrencyPill.new(self.topRight, {
+		name = "Gems",
+		rect = layout.gems,
+		currency = "gems",
+		value = self.gemValue,
+		textSize = LobbyHud.TEXT.currency,
+		iconSize = 30,
+		onPress = function()
+			fire("onCurrency", "gems")
+		end,
+	})
+	self.settings = Kit.IconButton.new(self.topRight, {
+		name = "Settings",
+		rect = layout.settings,
+		variant = "settings",
+		onPress = function()
+			fire("onSettings")
+		end,
+	})
+	self.coins:SetValue(self.coinValue, true)
+	self.gems:SetValue(self.gemValue, true)
+	self.parts.coins, self.parts.gems, self.parts.settings = self.coins.root, self.gems.root, self.settings.root
+end
+
+-- The game-update plaque: one line on desktop, two on phones.
+function LobbyHud:_buildNotice()
+	if self.notice then
+		self.notice:Destroy()
+	end
+	local b = LobbyHud.BOTTOM
+	local h = if self.phone then LobbyHud.PHONE.noticeH else 46
+	self.noticeRegion.Position = UDim2.fromOffset((b.w - 560) / 2, -12 - h)
+	self.noticeRegion.Size = UDim2.fromOffset(560, h)
+	self.notice = Kit.Panel.new(self.noticeRegion, {
+		name = "Plaque",
+		rect = { 0, 0, 560, h },
+		variant = "plaque",
+		pad = 18,
+		text = self.noticeText,
+		textRole = "hudSmall",
+	})
+	if self.notice.label then
+		-- Shrinks to fit, wrapping onto a second line before it gets small.
+		self.notice.label.root.TextWrapped = self.phone
+	end
+end
+
+-- The hotbar's 1–6 badges while a keyboard or mouse is the input.
+function LobbyHud:_hotkeys()
+	local kind = Kit.Input.Type()
+	local keys = kind == "mouse" or kind == "keyboard"
+	for index, slot in self.slots do
+		slot:SetHotkey(if keys then tostring(index) else nil)
+	end
+end
+
+function LobbyHud:_formChanged()
+	local phone = Kit.Scale.IsSmallTouch()
+	if phone == self.phone then
+		return
+	end
+	self.phone = phone
+	self:_buildTopRight()
+	self:_buildNotice()
+	self:_link()
+	if self.party then
+		self:SetParty(self.party)
+	end
 end
 
 -- Gamepad neighbours: the tile grid, the top-right row, the party column and
@@ -388,7 +508,8 @@ function LobbyHud:SetTopInset(designPx: number)
 	local c = LobbyHud.CARD
 	self.card.root.Position = UDim2.fromOffset(c[1], c[2] + shift)
 	local tr, p = LobbyHud.TOP_RIGHT, LobbyHud.PARTY
-	self.topRight.Position = UDim2.new(1, -(tr.right + tr.w), 0, tr.y + shift)
+	local w = (if self.phone then LobbyHud.PHONE.pills else LobbyHud.PILLS).w
+	self.topRight.Position = UDim2.new(1, -(tr.right + w), 0, tr.y + shift)
 	self.partyRegion.Position = UDim2.new(1, -(p.right + p.w), 0, p.y + shift)
 end
 
@@ -401,6 +522,8 @@ end
 -- view: the progression snapshot {level, xp, xpToNext} (nil while loading).
 function LobbyHud:SetProgress(view, instant: boolean?)
 	local progress = LobbyHudModel.Progress(view)
+	self.cardFraction = progress.fraction
+	self:_fitLevel(progress.level)
 	self.level:SetText(progress.level)
 	self.barLevel:SetText(progress.level)
 	self.barText:SetText(progress.text)
@@ -409,8 +532,10 @@ function LobbyHud:SetProgress(view, instant: boolean?)
 end
 
 function LobbyHud:SetCurrency(coins: number?, gems: number?, instant: boolean?)
-	self.coins:SetValue(math.max(0, math.floor(coins or 0)), instant)
-	self.gems:SetValue(math.max(0, math.floor(gems or 0)), instant)
+	self.coinValue = math.max(0, math.floor(coins or 0))
+	self.gemValue = math.max(0, math.floor(gems or 0))
+	self.coins:SetValue(self.coinValue, instant)
+	self.gems:SetValue(self.gemValue, instant)
 end
 
 function LobbyHud:_clearRows()
@@ -443,9 +568,12 @@ end
 function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 	local fire = self.fire
 	local r = LobbyHud.ROW
+	-- On phones a row takes the panel's width (the add-player button sits in
+	-- the title row there).
+	local w = if self.phone then LobbyHud.RULE_W else r.w
 	-- PlayerRow names its root after the player (`name` is both).
 	local row = Kit.PlayerRow.new(holder, {
-		rect = { 0, 0, r.w, LobbyHud.ROW_H },
+		rect = { 0, 0, w, LobbyHud.ROW_H },
 		userId = member.userId,
 		name = member.name,
 		leader = member.leader,
@@ -453,7 +581,10 @@ function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 		status = if showReady then (if member.ready then "ready" else "notReady") else nil,
 		portraitSize = r.portrait,
 		nameX = r.nameX,
-		nameSize = LobbyHud.TEXT.memberName,
+		nameSize = if self.phone then LobbyHud.PHONE.memberName else LobbyHud.TEXT.memberName,
+		-- Every name at one size (a long one ends in "…" rather than shrinking
+		-- below its neighbours).
+		shrinkName = false,
 		crownSize = r.crown,
 		rule = false,
 		zIndex = 6,
@@ -481,6 +612,7 @@ end
 -- party: LobbyHudModel.Party(...) — members, incoming invites, free rows and
 -- whether you may invite.
 function LobbyHud:SetParty(party)
+	self.party = party
 	self:_clearRows()
 	self.countText:SetText(party.count)
 	local fire = self.fire
@@ -489,9 +621,9 @@ function LobbyHud:SetParty(party)
 	local pinned = region(self.pinned, "Row0", { Size = UDim2.fromScale(1, 1) })
 	pinned:SetAttribute("LobbyRow", true)
 	local first = self:_member(pinned, party.members[1], party.showReady)
-	local invite = Kit.IconButton.new(pinned, {
+	local invite = Kit.IconButton.new(if self.phone then self.partyRegion else pinned, {
 		name = "Invite",
-		rect = LobbyHud.INVITE,
+		rect = if self.phone then LobbyHud.PHONE.invite else LobbyHud.INVITE,
 		variant = "invite",
 		zIndex = 7,
 		onPress = function()
@@ -511,40 +643,62 @@ function LobbyHud:SetParty(party)
 	for _, from in party.invites do
 		order += 1
 		local holder = self:_holder(order, LobbyHud.ROW_H)
+		local respondW = LobbyHud.PHONE.respond[3]
 		local row = Kit.ListRow.new(holder, {
 			name = "InviteFrom",
-			rect = { 0, 0, width - 80, LobbyHud.ROW_H },
+			rect = { 0, 0, width - (if self.phone then respondW + 8 else 80), LobbyHud.ROW_H },
 			variant = "line",
 			icon = "party",
 			title = from.from,
 			subtitle = "Party invite",
 			zIndex = 6,
 		})
-		local accept = Kit.IconButton.new(holder, {
-			name = "Accept",
-			rect = { width - 76, 9, 34, 34 },
-			variant = "small",
-			icon = "check",
-			zIndex = 6,
-			onPress = function()
-				fire("onAnswer", from.partyId, true)
-			end,
-		})
-		local decline = Kit.IconButton.new(holder, {
-			name = "Decline",
-			rect = { width - 36, 9, 34, 34 },
-			variant = "small",
-			icon = "cross",
-			zIndex = 6,
-			onPress = function()
-				fire("onAnswer", from.partyId, false)
-			end,
-		})
 		table.insert(self.rows, row)
-		table.insert(self.rows, accept)
-		table.insert(self.rows, decline)
-		table.insert(self.parts.answers, accept.root)
-		table.insert(self.parts.answers, decline.root)
+		if self.phone then
+			-- One touch-sized button: the Party window's invitations answer it.
+			local respond = Kit.Button.new(holder, {
+				name = "Respond",
+				rect = LobbyHud.PHONE.respond,
+				label = "Respond",
+				variant = "secondary",
+				sizeClass = "s",
+				zIndex = 6,
+				onPress = function()
+					fire("onParty", "invite")
+				end,
+			})
+			respond:SetBusy(from.busy == true)
+			table.insert(self.rows, respond)
+			table.insert(self.parts.answers, respond.root)
+		else
+			local accept = Kit.IconButton.new(holder, {
+				name = "Accept",
+				rect = { width - 76, 9, 34, 34 },
+				variant = "small",
+				icon = "check",
+				zIndex = 6,
+				onPress = function()
+					fire("onAnswer", from.partyId, true)
+				end,
+			})
+			local decline = Kit.IconButton.new(holder, {
+				name = "Decline",
+				rect = { width - 36, 9, 34, 34 },
+				variant = "small",
+				icon = "cross",
+				zIndex = 6,
+				onPress = function()
+					fire("onAnswer", from.partyId, false)
+				end,
+			})
+			-- An answer on its way: neither can be pressed again.
+			accept:SetEnabled(from.busy ~= true)
+			decline:SetEnabled(from.busy ~= true)
+			table.insert(self.rows, accept)
+			table.insert(self.rows, decline)
+			table.insert(self.parts.answers, accept.root)
+			table.insert(self.parts.answers, decline.root)
+		end
 		height += LobbyHud.ROW_H
 	end
 	local r = LobbyHud.ROW
@@ -584,6 +738,7 @@ end
 
 -- The game-update notice plaque (nil hides it).
 function LobbyHud:SetNotice(text: string?)
+	self.noticeText = text or ""
 	self.noticeRegion.Visible = text ~= nil and text ~= ""
 	if self.notice.label then
 		self.notice.label:SetText(text or "")
@@ -591,6 +746,8 @@ function LobbyHud:SetNotice(text: string?)
 end
 
 function LobbyHud:Destroy()
+	self.stopInput()
+	self.stopForm()
 	self:_clearRows()
 	for _, part in
 		{

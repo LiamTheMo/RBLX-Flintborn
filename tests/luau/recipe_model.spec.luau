@@ -89,7 +89,15 @@ test("forge entries: special recipes first, then conversions for vault gear, the
 	expectEq(map.PermanentIronSword.verb, "Convert", "conversions convert")
 	expectEq(map.ForgeIronPickaxe.verb, "Forge", "specials forge")
 	expectEq(map.PermanentIronSword.sources[1].detail, "+2.0%", "source quality")
+	expectEq(map.PermanentIronSword.name, "Iron Sword", "a conversion's row is named after the item, no prefix")
 	expectEq(#RecipeModel.ForgeEntries(nil), 0, "no view, no entries")
+end)
+
+test("unlock lines read as plain English", function()
+	expectEq(RecipeModel.Requirement("Unlock: extract 1 time(s), extract Iron Ore"), "Unlock: extract once, extract Iron Ore", "once")
+	expectEq(RecipeModel.Requirement("Unlock: extract 3 time(s)"), "Unlock: extract 3 times", "plural")
+	expectEq(RecipeModel.Requirement("Unlock: reach level 5"), "Unlock: reach level 5", "untouched")
+	expectEq(RecipeModel.Requirement(nil), "", "missing")
 end)
 
 test("quantity: special recipes step up to the snapshot's maxCount; conversions and locked ones do not", function()

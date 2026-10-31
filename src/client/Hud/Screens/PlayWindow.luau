@@ -14,7 +14,9 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 local IslandMap = require(script.Parent.Parent.IslandMap)
 local Kit = require(script.Parent.Parent.Kit)
@@ -34,11 +36,16 @@ local RECT = {
 	title = { -4, 3, 276, 83 },
 	close = { 985, 9, 54, 52 },
 	map = { 41, 92, 520, 542 },
-	mapInset = 6,
+	-- The painting sits inside the paper sheet with a margin, as the mockup
+	-- draws its map on a sheet of paper.
+	mapInset = 17,
 	marker = 28,
-	-- The rune the mockup paints in the map's top-left corner (sea there).
+	-- The rune the mockup paints in the map's top-left corner (sea there),
+	-- in ink so it reads on the sea.
 	rune = { 76, 154, 41, 69 },
-	status = { 60, 636, 500, 20 },
+	-- Messages sit on a paper plaque over the map's bottom edge, clear of the
+	-- window frame under it.
+	statusPlaque = { 70, 580, 462, 40 },
 	regionPlaque = { 585, 96, 423, 70 },
 	sectionRule = { 588, 339, 419, 2 },
 	partyHeading = { 590, 350, 300, 26 },
@@ -64,6 +71,9 @@ local DETAIL = {
 	icon = { 599, 34, 30 },
 	label = { 658, 160 },
 	value = { 830, 176 },
+	-- Phones and touch tablets: the values start further left, so a long one
+	-- ("10 · Low to Extreme") keeps 9 screen px.
+	phoneValue = { 790, 216 },
 	rule = { 648, 354 },
 	ruleY = { 211, 250, 290 },
 }
@@ -79,6 +89,10 @@ local TEXT_SIZE = {
 	level = 15,
 	play = 40,
 	status = 14,
+	-- "+1 more in your backpack": larger on phones (9 screen px at the
+	-- window's phone scale, about 0.48 on the smallest).
+	more = 13,
+	morePhone = 16,
 }
 
 export type Props = {
@@ -87,6 +101,9 @@ export type Props = {
 	onReady: (() -> ())?,
 	onClose: (() -> ())?,
 }
+
+-- The status plaque's text inset and size.
+local STATUS_PAD = 16
 
 export type PartyRow = {
 	userId: number,
@@ -97,7 +114,17 @@ export type PartyRow = {
 }
 
 function PlayWindow.new(props: Props)
-	local self = setmetatable({ props = props, rows = {}, mode = "solo", ready = false }, PlayWindow)
+	local self = setmetatable({
+		props = props,
+		rows = {},
+		rowMaids = {},
+		loadout = {},
+		mode = "solo",
+		ready = false,
+		moreText = "",
+		phone = Kit.Scale.IsSmallTouch(),
+		maid = KitModel.Maid(),
+	}, PlayWindow)
 	local screen = Kit.Screen.new(PlayWindow.GUI_NAME, {
 		size = PlayWindow.SIZE,
 		parent = props.parent,
@@ -167,16 +194,10 @@ function PlayWindow.new(props: Props)
 		role = "sectionHeader",
 		zIndex = z,
 	})
-	self.more = Kit.Text.new(v, {
-		name = "More",
-		rect = RECT.more,
-		text = "",
-		role = "small",
-		align = "Right",
-		scaled = true,
-		zIndex = z,
-	})
+	self.moreZ = z
+	self:_buildMore()
 	self.slots = {}
+	self.tooltips = {}
 	for index, x in PlayWindow.SLOT_X do
 		local slot = Kit.Slot.new(v, {
 			name = "Slot" .. index,
@@ -185,8 +206,11 @@ function PlayWindow.new(props: Props)
 			hotkey = tostring(index),
 			zIndex = z,
 		})
-		-- Slots only show the loadout: gamepad selection skips them.
-		slot.control.hit.Selectable = false
+		-- Slots show the loadout; a gamepad can select one to read its item
+		-- (the tooltip names it), as a mouse hovers it.
+		self.tooltips[index] = Kit.Tooltip.Attach(slot, function()
+			return self:_slotText(index)
+		end)
 		self.slots[index] = slot
 	end
 	self.play = Kit.Button.new(v, {
@@ -221,25 +245,79 @@ function PlayWindow.new(props: Props)
 			end
 		end,
 	})
+	local sp = RECT.statusPlaque
+	self.statusPlaque = Kit.Panel.new(v, {
+		name = "StatusPlaque",
+		rect = sp,
+		variant = "plaque",
+		pad = 0,
+		zIndex = z + 2,
+		visible = false,
+	})
 	self.status = Kit.Core.Label(v, {
 		name = "Status",
 		text = "",
 		role = "body",
 		size = TEXT_SIZE.status,
 		align = "Center",
+		wrap = true,
 		scaled = true,
-		rect = RECT.status,
-		z = z,
+		rect = { sp[1] + STATUS_PAD, sp[2] + 4, sp[3] - STATUS_PAD * 2, sp[4] - 8 },
+		z = z + 3,
 	})
 	self.status.Visible = false
-	-- Gamepad: PLAY (or Ready) first; up reaches the close button.
+	-- Gamepad: PLAY (or Ready) first; up reaches the loadout slots, then the
+	-- close button.
 	for _, button in { self.play, self.readyButton } do
-		button.control.hit.NextSelectionUp = self.close.control.hit
+		button.control.hit.NextSelectionUp = self.slots[1].control.hit
+	end
+	for index, slot in self.slots do
+		local hit = slot.control.hit
+		hit.NextSelectionLeft = if self.slots[index - 1] then self.slots[index - 1].control.hit else nil
+		hit.NextSelectionRight = if self.slots[index + 1] then self.slots[index + 1].control.hit else nil
+		hit.NextSelectionDown = self.play.control.hit
+		hit.NextSelectionUp = self.close.control.hit
 	end
 	self.close.control.hit.NextSelectionDown = self.play.control.hit
 	screen:SetDefaultSelection(self.play.control.hit)
 	self:SetLoadout({}, 0)
+	-- Phone and desktop text sizes follow the screen and the input devices.
+	self.maid:Give(Kit.Scale.OnFormFactorChanged(function()
+		local phone = Kit.Scale.IsSmallTouch()
+		if phone ~= self.phone then
+			self.phone = phone
+			self:_buildMore()
+			self:_placeValues()
+		end
+	end))
 	return self
+end
+
+-- The "+n more" line (rebuilt when the form factor changes its size).
+function PlayWindow:_buildMore()
+	if self.more then
+		self.more:Destroy()
+	end
+	self.more = Kit.Text.new(self.visual, {
+		name = "More",
+		rect = RECT.more,
+		text = self.moreText,
+		role = "small",
+		textSize = if self.phone then TEXT_SIZE.morePhone else TEXT_SIZE.more,
+		align = "Right",
+		scaled = true,
+		zIndex = self.moreZ,
+	})
+end
+
+-- The detail values' column (further left on phones).
+function PlayWindow:_placeValues()
+	local value = if self.phone then DETAIL.phoneValue else DETAIL.value
+	for index, entry in self.details do
+		local cy = DETAIL.rows[index]
+		entry.value.Position = UDim2.fromOffset(value[1], cy - 11)
+		entry.value.Size = UDim2.fromOffset(value[2], 24)
+	end
 end
 
 -- The island painting in an inset frame, cropped to fill it, with the crater
@@ -263,7 +341,7 @@ function PlayWindow:_map(v: Frame, z: number)
 	-- The game's own island painting (D19), shared with the Journal and Map.
 	self.mapArt =
 		Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
-	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", zIndex = z + 1 })
+	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", tint = "ink", zIndex = z + 1 })
 	local u, vv = PlayModel.MarkerUV(IslandMap.MAP_SPAN)
 	local m = RECT.marker
 	self.marker = Kit.Icon.new(clip, {
@@ -304,6 +382,7 @@ function PlayWindow:_details(v: Frame, z: number)
 		})
 		self.details[index] = { icon = icon, label = label, value = value }
 	end
+	self:_placeValues()
 	for index, y in DETAIL.ruleY do
 		-- The mockup's faint 1 px rules between the rows.
 		Kit.Divider.new(v, {
@@ -335,7 +414,8 @@ function PlayWindow:SetDetails(rows)
 end
 
 -- One party row: crown (leader), headshot, name, ready dot (in a party), level.
-local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean)
+-- Every part goes into `maid`, so cleaning it takes the row apart.
+local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean, maid)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
 	local outer = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
@@ -344,6 +424,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		Size = UDim2.fromOffset(w, h),
 	}, parent)
 	outer:SetAttribute("UserId", row.userId)
+	maid:Give(outer)
 	-- The mockup's row is a light inset box, not the list-row plate.
 	local art = RECT.rowArt
 	w, h = 421, 56
@@ -356,9 +437,11 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		ZIndex = 6,
 	}, outer)
 	if row.leader then
-		Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 })
+		maid:Give(Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 }))
 	end
-	Kit.Portrait.new(holder, { name = "Portrait", rect = { 51, 2, 52, 52 }, userId = row.userId, zIndex = 6 })
+	maid:Give(
+		Kit.Portrait.new(holder, { name = "Portrait", rect = { 51, 2, 52, 52 }, userId = row.userId, zIndex = 6 })
+	)
 	Kit.Core.Label(holder, {
 		name = "Name",
 		text = row.name,
@@ -397,15 +480,17 @@ end
 
 -- The party rows (leader first; PlayModel.Members). `showReady` adds each
 -- member's ready dot (in a party; a solo player has none, as in the mockup).
+-- The old rows are taken apart through their maids (Kit components included).
 function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
 	local content = self.partyList:Content()
-	for _, child in content:GetChildren() do
-		if child:IsA("Frame") then
-			child:Destroy()
-		end
+	for _, maid in self.rowMaids do
+		maid:Clean()
 	end
+	table.clear(self.rowMaids)
 	for order, row in rows do
-		partyRow(content, row, order, showReady)
+		local maid = KitModel.Maid()
+		partyRow(content, row, order, showReady, maid)
+		table.insert(self.rowMaids, maid)
 	end
 	local h = RECT.partyRow[2]
 	self.partyList:SetContentHeight(#rows * h + math.max(0, #rows - 1) * 6)
@@ -415,6 +500,7 @@ end
 -- The run hotbar (slot -> {catalogId, quantity, permanent}) and how many more
 -- stacks go to the backpack.
 function PlayWindow:SetLoadout(hotbar, more: number?)
+	self.loadout = hotbar
 	for index, slot in self.slots do
 		local item = hotbar[index]
 		-- itemId: the slot takes its art and tint from ItemInfo.
@@ -422,7 +508,19 @@ function PlayWindow:SetLoadout(hotbar, more: number?)
 			if item then { itemId = item.catalogId, quantity = item.quantity, permanent = item.permanent } else nil
 		)
 	end
-	self.more:SetText(PlayModel.MoreText(more) or "")
+	self.moreText = PlayModel.MoreText(more) or ""
+	self.more:SetText(self.moreText)
+end
+
+-- A loadout slot's tooltip: the item's name and count, or nil when empty.
+function PlayWindow:_slotText(index: number): string?
+	local item = self.loadout[index]
+	if item == nil then
+		return nil
+	end
+	local def = ItemCatalog.Get(item.catalogId)
+	local name = if def then def.name else tostring(item.catalogId)
+	return if (item.quantity or 1) > 1 then ("%s ×%d"):format(name, item.quantity) else name
 end
 
 -- "solo" / "leader": the PLAY button; "member": the Ready toggle (leather READY
@@ -456,6 +554,7 @@ end
 function PlayWindow:SetStatus(text: string?)
 	local shown = text ~= nil and text ~= ""
 	self.status.Visible = shown
+	self.statusPlaque.root.Visible = shown
 	self.status.Text = text or ""
 	if shown then
 		Kit.Motion.Set(self.status, { TextTransparency = 1 })
@@ -480,6 +579,14 @@ function PlayWindow:IsOpen(): boolean
 end
 
 function PlayWindow:Destroy()
+	self.maid:Clean()
+	self.more:Destroy()
+	for _, maid in self.rowMaids do
+		maid:Clean()
+	end
+	for _, detach in self.tooltips do
+		detach()
+	end
 	for _, slot in self.slots do
 		slot:Destroy()
 	end

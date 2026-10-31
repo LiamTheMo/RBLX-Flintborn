@@ -10,7 +10,10 @@
 -- go to a Kit.ConfirmDialog (press-and-hold where a delay guarded them).
 --
 -- Display only: controllers redraw the page (Begin … Finish) and decide what
--- every press does. Positions are design px in the window (SIZE).
+-- every press does. Positions are design px in the window (SIZE). A page taller
+-- than its area ends between two rows (the list's bottom edge never cuts a
+-- line of text); the rail shows there is more. A gamepad lands on the selected
+-- tab, else the first enabled button (SetDefaultSelection overrides it).
 --
 --   local window = ListWindow.new(playerGui, { name = "FlintbornMarket", title = "Market", icon = "market",
 --       tabs = { { id = "Shop", label = "Shop", icon = "market" } }, onTab = show, onClose = close })
@@ -161,18 +164,11 @@ function ListWindow.new(parent: Instance?, opts)
 			zIndex = Z - 1,
 		})
 		pageX = COLUMN_RIGHT + 14
-		self.screen:SetDefaultSelection(built[1].control.hit)
 	end
 	local pageW = W - PAD - pageX
 	self.pageRect = { pageX, TOP, pageW, PAGE_BOTTOM - TOP }
-	self.scroll = Kit.Scroll.new(v, {
-		name = "List",
-		rect = self.pageRect,
-		gap = 8,
-		padBottom = 10,
-		zIndex = Z,
-	})
-	self.list = self.scroll:Content()
+	self.bottoms = {}
+	self:_makeScroll(self.pageRect[4])
 	self.contentW = pageW - RAIL
 	self.status = Kit.Text.new(v, {
 		name = "Status",
@@ -184,7 +180,77 @@ function ListWindow.new(parent: Instance?, opts)
 		zIndex = Z,
 	})
 	self.screen:Watch()
+	self:_applyDefault()
 	return self
+end
+
+-- The page's scroll list at `height` (at most the page area), keeping the rows
+-- and the scroll position of the one it replaces.
+function ListWindow:_makeScroll(height: number)
+	local old = self.scroll
+	local r = self.pageRect
+	self.scroll = Kit.Scroll.new(self.visual, {
+		name = "List",
+		rect = { r[1], r[2], r[3], height },
+		gap = 8,
+		padBottom = 10,
+		zIndex = Z,
+	})
+	self.scrollH = height
+	local list = self.scroll:Content()
+	if old then
+		local oldList = self.list
+		for _, child in oldList:GetChildren() do
+			if child:IsA("GuiObject") then
+				child.Parent = list
+			end
+		end
+		list.CanvasPosition = oldList.CanvasPosition
+		old.root:Destroy()
+	end
+	self.list = list
+end
+
+-- The list's height for the page drawn: the whole area, or (when the page is
+-- taller) down to the end of the last row that fits whole.
+function ListWindow:_snapHeight(): number
+	local area = self.pageRect[4]
+	if self.height + 14 <= area then
+		return area
+	end
+	local best = 0
+	for _, bottom in self.bottoms do
+		-- 2 px of list padding above the first row, 4 px of air under the last.
+		if 2 + bottom + 4 <= area then
+			best = math.max(best, 2 + bottom + 4)
+		end
+	end
+	-- Very tall rows: keep the whole area rather than a short list.
+	return if best >= area * 0.6 then best else area
+end
+
+-- The control a gamepad lands on when the window opens (nil: the selected
+-- tab, else the first enabled button, else the close button).
+function ListWindow:SetDefaultSelection(object: GuiObject?)
+	self.defaultOverride = object
+	self:_applyDefault()
+end
+
+function ListWindow:_applyDefault()
+	local default = self.defaultOverride
+	if default == nil and self.tabGroup then
+		local tab = self.tabs[self.tabGroup:Selected() or ""]
+		default = tab and tab.control.hit
+	end
+	if default == nil then
+		for _, entry in self.buttons do
+			if entry.button.control.flags.enabled ~= false then
+				default = entry.button.control.hit
+				break
+			end
+		end
+	end
+	self.screen:SetDefaultSelection(default or self.close.control.hit)
 end
 
 -- Header -----------------------------------------------------------------------------------
@@ -197,6 +263,7 @@ function ListWindow:SetTab(id: string?)
 			self.list.CanvasPosition = Vector2.new(0, 0)
 		end
 		self.tabGroup:Select(id)
+		self:_applyDefault()
 	end
 end
 
@@ -261,15 +328,21 @@ function ListWindow:Begin()
 	end
 	self.order = 0
 	self.height = 0
+	table.clear(self.bottoms)
 end
 
 -- After a redraw: the focused button again (same row and key), else the first
 -- one, else the first tab or the close button.
 function ListWindow:Finish()
+	local height = self:_snapHeight()
+	if height ~= self.scrollH then
+		self:_makeScroll(height)
+	end
 	self.scroll:SetContentHeight(self.height)
 	-- The engine measures the canvas itself (AutomaticCanvasSize); this floor
 	-- is the same sum, for where nothing measures (captures).
 	self.list.CanvasSize = UDim2.fromOffset(0, self.height + 14)
+	self:_applyDefault()
 	local first, match = nil, nil
 	for _, entry in self.buttons do
 		if entry.button.control.flags.enabled ~= false then
@@ -288,6 +361,7 @@ end
 function ListWindow:_next(height: number): number
 	self.order += 1
 	self.height += height + (if self.order > 1 then 8 else 0)
+	table.insert(self.bottoms, self.height)
 	return self.order
 end
 
@@ -531,10 +605,10 @@ function ListWindow:Buttons(specs)
 	return holder
 end
 
--- A text field with a label before it (the stepper's value field art with a
--- TextBox on it). onSubmit(text) runs when focus leaves with Enter and text
--- typed (or on any focus loss, even empty, when `always`); `submit` adds a
--- button that submits typed text.
+-- A text field with a label before it (Kit.TextField: the value box with a
+-- TextBox, its touch pad grown to 44 screen px). onSubmit(text) runs when focus
+-- leaves with Enter and text typed (or on any focus loss, even empty, when
+-- `always`); `submit` adds a button that submits typed text. Returns the TextBox.
 function ListWindow:Input(label: string, placeholder: string, onSubmit, always: boolean?, submit: string?): TextBox
 	local holder = self:_holder("Input" .. (self.order + 1), 60)
 	Kit.Text.new(holder, {
@@ -546,22 +620,17 @@ function ListWindow:Input(label: string, placeholder: string, onSubmit, always: 
 		zIndex = Z + 1,
 	})
 	local fieldRect = { 276, 6, 340, 48 }
-	self.parts:Give(Kit.Picture.new(holder, { name = "Field", rect = fieldRect, role = "field.value", zIndex = Z + 1 }))
-	local box = Kit.Core.Make("TextBox", {
-		Name = "Box",
-		BackgroundTransparency = 1,
-		ClearTextOnFocus = false,
-		PlaceholderText = placeholder,
-		Position = UDim2.fromOffset(fieldRect[1] + 16, fieldRect[2]),
-		Size = UDim2.fromOffset(fieldRect[3] - 32, fieldRect[4]),
-		Text = "",
-		TextTruncate = Enum.TextTruncate.AtEnd,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		ZIndex = Z + 3,
-	}, holder) :: TextBox
-	Kit.Core.Style(box, "rowLabel", "ink")
-	box.TextSize = 19
-	box.PlaceholderColor3 = Kit.Tokens.Color("placeholder")
+	local field = Kit.TextField.new(holder, {
+		name = "Field",
+		rect = fieldRect,
+		placeholder = placeholder,
+		textSize = 19,
+		clearButton = false,
+		zIndex = Z + 1,
+	})
+	self.parts:Give(field)
+	local box = field.box :: TextBox
+	box.Name = "Box"
 	self.parts:Give(box.FocusLost:Connect(function(enter)
 		if always or (enter and box.Text ~= "") then
 			onSubmit(box.Text)

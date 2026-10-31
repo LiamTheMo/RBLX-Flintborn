@@ -6,7 +6,7 @@
 --   python3 art/ui/capture/capture.py map_flow
 --
 -- Pages: 1 the map, 2 zoomed in on you with a pin chosen, 3 forced states,
--- 4 phone 844 × 390.
+-- 4 phone 844 × 390 (the wide phone window).
 
 for key, widths in table.clone(__textWidths or {}) do
 	__textWidths["Enum." .. key] = __textWidths["Enum." .. key] or widths
@@ -114,7 +114,15 @@ workspace.CurrentCamera.ViewportSize = Vector2.new(844, 390)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
 UserInputService.MouseEnabled = false
-local k, c = Kit.Scale.WindowFit(844, 390, 58, MapController.SIZE[1], MapController.SIZE[2], 1)
+-- The screen became a phone: MapController rebuilt the window in its phone
+-- arrangement (legend beside the map). Reopen it and fit it as the game does.
+gui = player.PlayerGui:FindFirstChild("FlintbornMap")
+check(gui ~= nil and gui:FindFirstChild("Holder") ~= nil, "a phone gets the wide map window")
+if not gui:GetAttribute("KitState") or gui:GetAttribute("KitState") == "closed" then
+	MapController.Toggle()
+end
+local size = MapController.LAYOUTS.phone.size
+local k, c = Kit.Scale.WindowFit(844, 390, 58, size[1], size[2], 1)
 gui.Holder.Fit.Scale = k
 gui.Holder.Position = UDim2.fromOffset(c.X, c.Y)
 print(("map phone: window scale %.3f"):format(k))

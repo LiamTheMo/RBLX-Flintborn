@@ -15,6 +15,10 @@ local ME = { userId = 1, name = "LiamTheMo" }
 workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
+-- The last input was a touch (Kit.Input: no keyboard hotkey badges).
+UserInputService.GetLastInputType = function()
+	return Enum.UserInputType.Touch
+end
 
 local function page(view)
 	local gui, root = __screen(W, H)

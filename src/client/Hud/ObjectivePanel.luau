@@ -1,8 +1,8 @@
 -- Top-right objective card ("FIND EXTRACTION"): a Kit.Panel "card" with a
 -- section header (exit icon and the title) and up to two task lines, each the
 -- quest journal's round check (Kit.Checkbox "ring", read only), the task, a
--- map pin and distance, and the progress at the right. On phones (the layout's
--- "twoLine") each task takes two lines, so its words keep the 9 px floor: the
+-- map pin and distance, and the progress at the right. On phones and tablets
+-- (the layout's "twoLine") each task takes two lines, so its words keep the 9 px floor: the
 -- task on the first, the pin, distance and progress under it; a task too long
 -- for the line ends in "…". Fed by HudModel.ExtractionObjective; display only.
 
@@ -107,6 +107,20 @@ function ObjectivePanel.new(parent: Instance, layout)
 	return self
 end
 
+-- One-line rows shrink a task to fit, but no further than SHRINK of its size;
+-- a task still too long then keeps that size and ends in "…".
+ObjectivePanel.SHRINK = 0.7
+
+function ObjectivePanel.Fit(label: TextLabel, text: string, width: number, size: number)
+	local least = size * ObjectivePanel.SHRINK
+	local fits = Kit.Text.Width(text, "rowLabel", least) <= width
+	label.TextScaled = fits
+	if not fits then
+		label.TextSize = least * Kit.Core.TextBoost("rowLabel")
+		label.TextTruncate = Enum.TextTruncate.AtEnd
+	end
+end
+
 -- model: HudModel.ExtractionObjective(...)
 function ObjectivePanel:Set(model)
 	if model.title ~= self.titleText then
@@ -130,6 +144,9 @@ function ObjectivePanel:Set(model)
 			-- Without a distance the task text may use the free space.
 			local width = if hasDistance then row.narrow else row.wide
 			row.text.root.Size = UDim2.fromOffset(width, row.text.root.Size.Y.Offset)
+			if not self.twoLine then
+				ObjectivePanel.Fit(row.text.root, line.text, width, self.cfg.textSize)
+			end
 			row.distance:SetText(line.distance or "")
 			row.progress:SetText(line.progress)
 			row.check:SetChecked(line.done == true)

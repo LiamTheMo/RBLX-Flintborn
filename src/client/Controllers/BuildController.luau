@@ -8,17 +8,21 @@
 -- and hovering a structure shows its HP, owner and decay timer. The server decides
 -- every placement. World place only. The palette is a kit card at the bottom
 -- centre: piece tabs, the tier stepper, Rotate and Place buttons, the cost and
--- key caps with the player's own keys; the hover line is a kit tooltip.
+-- key caps with the player's own keys; the hover line is a kit tooltip. With a
+-- gamepad the palette opens with the current piece selected (the D-pad picks
+-- pieces, tiers, Rotate and Place); B leaves the palette so the stick walks
+-- again, and B again goes back into it.
 
 local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local InventoryController = require(script.Parent.InventoryController)
@@ -40,9 +44,9 @@ local BAD_COLOR = Color3.fromRGB(230, 90, 80)
 
 -- The palette in design px: piece tabs in rows of PIECES_PER_ROW, then the tier
 -- row, then the cost and status lines. Controls are touch-sized.
-BuildController.SIZE = { 812, 244 }
+BuildController.SIZE = { 852, 244 }
 local PIECES_PER_ROW = 7
-local PIECE_W, PIECE_H, PIECE_GAP = 104, 42, 6
+local PIECE_W, PIECE_H, PIECE_GAP = 112, 42, 4
 local ROW_HEIGHT = 46
 
 local function make(className: string, props, parent)
@@ -252,6 +256,7 @@ end
 
 local renderPalette
 local refreshKeys
+local selectPalette
 
 local function select(pieceId: string)
 	state.piece = pieceId
@@ -281,6 +286,14 @@ function renderPalette()
 	end
 	ui.cost:SetText("Cost: " .. costLine(tierStats.cost))
 	refreshKeys()
+end
+
+-- Gamepad selection on the current piece's tab.
+function selectPalette()
+	local tab = ui.tabs[state.piece]
+	if tab then
+		GuiService.SelectedObject = tab.control.hit
+	end
 end
 
 local function setActive(active: boolean)
@@ -315,20 +328,49 @@ local function setActive(active: boolean)
 			end
 			return Enum.ContextActionResult.Sink
 		end)
+		-- Gamepad: B steps out of the palette (the stick walks again) and back in.
+		ContextActionService:BindActionAtPriority("FlintbornBuildPalette", function(_, inputState)
+			if inputState ~= Enum.UserInputState.Begin then
+				return Enum.ContextActionResult.Pass
+			end
+			local selected = GuiService.SelectedObject
+			if selected and selected:IsDescendantOf(ui.holder) then
+				GuiService.SelectedObject = nil
+				return Enum.ContextActionResult.Sink
+			elseif selected == nil then
+				selectPalette()
+				return Enum.ContextActionResult.Sink
+			end
+			return Enum.ContextActionResult.Pass
+		end, false, Enum.ContextActionPriority.Medium.Value + 1, Enum.KeyCode.ButtonB)
+		if Kit.Input.IsGamepad() then
+			selectPalette()
+		end
 	else
 		ContextActionService:UnbindAction("FlintbornPlace")
+		ContextActionService:UnbindAction("FlintbornBuildPalette")
 		Binds.Unbind("Rotate")
 		clearVisuals()
+		local selected = GuiService.SelectedObject
+		if selected and selected:IsDescendantOf(ui.holder) then
+			GuiService.SelectedObject = nil
+		end
 	end
 end
 
--- Key caps for the player's own Rotate and Build keys (with a keyboard only).
+-- The hint for a bind with the input in use: its key, its gamepad button's
+-- name, or nil on touch (the palette's buttons do it there).
+local function hint(action: string): string?
+	local bind = Keybinds.Get(action)
+	return Kit.Input.Hint(Binds.Label(action), bind and bind.gamepad[1])
+end
+
+-- Key caps for the player's own Rotate and Build keys (or gamepad buttons;
+-- none on touch).
 function refreshKeys()
-	local keys = { Binds.Label("Rotate"), Binds.Label("Build") }
-	local signature = if UserInputService.KeyboardEnabled then table.concat(keys, ";") else ""
-	if signature == "" then
-		keys = {}
-	end
+	local rotateKey, buildKey = hint("Rotate"), hint("Build")
+	local keys = if rotateKey and buildKey then { rotateKey, buildKey } else {}
+	local signature = table.concat(keys, ";")
 	if signature == ui.keySignature then
 		return
 	end
@@ -391,11 +433,17 @@ local function build()
 				label = pieceId,
 				variant = "horizontal",
 				textSize = 15,
+				-- The whole tab for the label, so "Workbench" keeps 9 px on phones.
+				labelX = 8,
 				zIndex = 6,
 			})
 		)
 	end
 	ui.pieces = Kit.TabGroup.new(tabs, select)
+	ui.tabs = {}
+	for _, tab in tabs do
+		ui.tabs[tab.id or tab.root.Name] = tab
+	end
 	-- Tier stepper: ◀ Copper 3/8 · 1000 HP ▶ (hidden arrows for one-tier pieces).
 	local rowY = 16 + 2 * (PIECE_H + PIECE_GAP) + 4
 	ui.tierDown = Kit.IconButton.new(card, {
@@ -464,6 +512,7 @@ local function build()
 	})
 	refreshKeys()
 	Binds.Changed:Connect(refreshKeys)
+	Kit.Input.Watch(refreshKeys)
 	ui.ghost = make("Part", {
 		Anchored = true,
 		CanCollide = false,

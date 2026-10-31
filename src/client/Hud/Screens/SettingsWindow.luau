@@ -23,18 +23,21 @@ SettingsWindow.__index = SettingsWindow
 SettingsWindow.SIZE = { 1098, 656 }
 
 -- Tab icons: the kit's flat glyphs, dark on parchment and white on the
--- selected leather tab, as the mockup draws its gamepad, speaker, monitor and
--- gears (the kit's gamepad, speaker and monitor are stand-in drawings, D19).
+-- selected leather tab. The mockup draws a gamepad, a speaker, a monitor and
+-- gears; the kit has none of the first three (its stand-ins are a compass, a
+-- speech bubble and a map, which read as something else), so only the tabs
+-- with an honest glyph show one (D19): gears for Gameplay's game options and
+-- the magnifier for Graphics (what you see). The labels keep one column.
 SettingsWindow.TABS = {
-	{ id = "Gameplay", icon = "gamepad" },
-	{ id = "Audio", icon = "speaker" },
-	{ id = "Graphics", icon = "monitor" },
-	{ id = "Controls", icon = "gears" },
+	{ id = "Gameplay", icon = "gears" },
+	{ id = "Audio" },
+	{ id = "Graphics", icon = "magnifier" },
+	{ id = "Controls" },
 }
 
 -- What RESET puts back on each tab: its settings and its keys.
 SettingsWindow.TAB_SETTINGS = {
-	Gameplay = { "cameraSensitivity", "musicVolume", "effectsVolume", "showDamage", "showNames", "invertCamera" },
+	Gameplay = { "cameraSensitivity", "showDamage", "showNames", "invertCamera" },
 	Audio = { "musicVolume", "effectsVolume", "subtitles" },
 	Graphics = { "graphicsQuality", "uiScale", "colourBlindMode", "reducedMotion" },
 	Controls = {},
@@ -177,8 +180,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 			-- Mockup tabs 316–549 × 80, tops 259, 353, 446, 539.
 			rect = { 29, 109 + (index - 1) * 93.33, 234, 80 },
 			label = tab.id,
-			icon = "ink:" .. tab.icon,
-			selectedIcon = "white:" .. tab.icon,
+			icon = if tab.icon then "ink:" .. tab.icon else nil,
+			selectedIcon = if tab.icon then "white:" .. tab.icon else nil,
 			iconSize = 46,
 			iconX = 22,
 			labelX = 92,
@@ -228,10 +231,9 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		rect = { 551, 581, 232, 55 },
 		label = "Reset",
 		variant = "secondary",
-		icon = "ink:refresh",
-		iconSize = 30,
-		iconGap = 11,
-		-- Width-matched to the mockup's RESET (65 px; Merriweather Bold is wider).
+		-- No icon: the kit's "refresh" stand-in is a rune-like compass arrow,
+		-- not a reset arrow (D19). Width-matched to the mockup's RESET (65 px;
+		-- Merriweather Bold is wider).
 		textSize = 20.5,
 		zIndex = 8,
 		onPress = function()
@@ -437,15 +439,17 @@ function SettingsWindow:_keyRow(parent: Instance, page: Instance, y: number, lab
 	return cap
 end
 
+-- Gameplay holds only gameplay controls (the volumes live on Audio, not
+-- twice); its checkboxes follow the one slider at the pitch the Audio page
+-- uses after its sliders.
 function SettingsWindow:_gameplay(page: Instance)
 	leftHeader(page, "Gameplay")
 	self:_slider(page, SLIDER_Y[1], "Camera Sensitivity", "cameraSensitivity", sensitivity)
-	self:_slider(page, SLIDER_Y[2], "Music Volume", "musicVolume", volume)
-	self:_slider(page, SLIDER_Y[3], "Effects Volume", "effectsVolume", volume)
-	sectionRule(page, 377)
-	self:_check(page, 392, "Show Damage Numbers", "Numbers pop up over what you hit", "showDamage")
-	self:_check(page, 392 + CHECK_PITCH, "Show Names", "Name tags above other players", "showNames")
-	self:_check(page, 392 + CHECK_PITCH * 2, "Invert Camera", "Moving up looks down", "invertCamera")
+	local rule = SLIDER_Y[1] + (309 - SLIDER_Y[2])
+	sectionRule(page, rule)
+	self:_check(page, rule + 15, "Show Damage Numbers", "Numbers pop up over what you hit", "showDamage")
+	self:_check(page, rule + 15 + CHECK_PITCH, "Show Names", "Name tags above other players", "showNames")
+	self:_check(page, rule + 15 + CHECK_PITCH * 2, "Invert Camera", "Moving up looks down", "invertCamera")
 	self:_divider(page)
 
 	rightHeader(page, "Key Binds")

@@ -68,8 +68,8 @@ function EventPanel.new(parent: Instance, layout)
 		rect = { x, cfg.nameY, rowW, cfg.nameH },
 		text = "",
 		role = "rowTitle",
-		-- Bigger screens shrink a long name; phones (at the 9 px floor) end it in "…".
-		scaled = not Layout.IsPhone(),
+		-- Desktops shrink a long name; touch screens (at the 9 px floor) end it in "…".
+		scaled = not Layout.IsTouchScreen(),
 		zIndex = 8,
 	})
 	self.description = Kit.Text.new(self.body, {
@@ -135,7 +135,10 @@ function EventPanel:_layout(words: string, place: string?)
 	local lineH = self:_lineHeight()
 	local lines = if words == ""
 		then 0
-		else math.min(NoticeCard.Lines(words, "bodySoft", self.rowW * 0.95, cfg.descriptionSize), cfg.maxLines or 3)
+		else math.min(
+			NoticeCard.Lines(words, "bodySoft", self.rowW * 0.95, cfg.descriptionSize),
+			cfg.maxLines or 3
+		)
 	local y = cfg.descriptionY
 	self.description.root.Visible = lines > 0
 	self.description.root.Size = UDim2.fromOffset(self.rowW, lines * lineH)

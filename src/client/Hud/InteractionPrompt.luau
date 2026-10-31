@@ -8,7 +8,8 @@
 -- input type when the player switches input, so the key cap follows keyboard,
 -- gamepad and touch. Binds retargets prompts authored on E to the player's
 -- Interact key (GDD §46), and the cap redraws whenever that key is rebound.
--- On phones the layout's "phone" sizes keep the object line at 9 screen px.
+-- On phones and tablets the layout's "touch" sizes keep the object line at 9
+-- screen px, and long words end in "…" instead of shrinking.
 
 local Players = game:GetService("Players")
 local ProximityPromptService = game:GetService("ProximityPromptService")
@@ -64,6 +65,7 @@ end
 -- capture scenes call it directly.
 function InteractionPrompt.Draw(content: Instance, texts)
 	local cfg = Layout.Section(Layout.Get(), "prompt")
+	local phone = Layout.IsTouchScreen()
 	local height = cfg.size[2]
 	local cap = cfg.keycap
 	local capW = math.max(cap[3], Kit.KeyCap.Width(texts.key, cap[4]))
@@ -90,7 +92,8 @@ function InteractionPrompt.Draw(content: Instance, texts)
 			text = texts.action,
 			role = "rowTitle",
 			textSize = cfg.titleSize,
-			scaled = true,
+			-- Touch screens are at the 9 px floor already: long words end in "…" there.
+			scaled = not phone,
 			zIndex = 8,
 		})
 	)
@@ -103,7 +106,7 @@ function InteractionPrompt.Draw(content: Instance, texts)
 				text = texts.object,
 				role = "small",
 				textSize = cfg.subtitleSize,
-				scaled = true,
+				scaled = not phone,
 				zIndex = 8,
 			})
 		)

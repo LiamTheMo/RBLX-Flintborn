@@ -119,9 +119,9 @@ RunService.RenderStepped:Fire(0.016)
 find("Tutorial").Visible = false
 find("BoostList").Visible = false
 events.CorpseOpened.OnClientEvent:Fire("body1", {
-	{ index = 1, name = "Stone Axe", rarity = "Common" },
-	{ index = 2, name = "Iron Ore", rarity = "Uncommon", quantity = 6 },
-	{ index = 3, name = "Redberry", rarity = "Common", quantity = 4 },
+	{ index = 1, name = "Stone Axe", catalogId = "StoneAxe", key = "item-stoneaxe-13", rarity = "Common" },
+	{ index = 2, name = "Iron Ore", catalogId = "IronOre", key = "stack:IronOre", rarity = "Uncommon", quantity = 6 },
+	{ index = 3, name = "Redberry", catalogId = "Redberry", key = "stack:Redberry", rarity = "Common", quantity = 4 },
 })
 __dump(gui, W, H, BG)
 

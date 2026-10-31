@@ -592,14 +592,15 @@ function HudController.Widgets()
 	return if gui then widgets else nil
 end
 
+local function openTile(entry)
+	-- Required on use: these controllers start after the HUD.
+	(require(script.Parent[entry[4]]) :: any)[entry[5]]()
+end
+
 local function build()
-	local controllers = script.Parent
 	gui, root = newGui("FlintbornHud", Kit.Tokens.Order("hud"))
 	gui.Enabled = false
-	widgets = HudController.Mount(root, layout, function(entry)
-		-- Required on use: these controllers start after the HUD.
-		(require(controllers[entry[4]]) :: any)[entry[5]]()
-	end)
+	widgets = HudController.Mount(root, layout, openTile)
 	tops = HudController.TopRegions(widgets)
 	gui.Parent = player:WaitForChild("PlayerGui")
 	Kit.Scale.Hud(gui, root)
@@ -633,6 +634,9 @@ end
 -- selection, not the character. Windows' own B (Kit.Modal, higher priority)
 -- still closes them first.
 local releaseBound = false
+local remounted = Signal.new()
+-- The form factor ("phone", "tablet", "desktop") the regions were mounted for.
+local mountedForm = "desktop"
 local function bindRelease(active: boolean)
 	if active == releaseBound then
 		return
@@ -667,11 +671,37 @@ local function refreshVisible()
 	HudMode.SetVisible(visible)
 end
 
+-- Rebuilds the regions when the form factor changes (Kit.Scale.
+-- OnFormFactorChanged): phones arrange the HUD differently and touch screens
+-- use larger text, so the regions are mounted again and refilled from the live
+-- state.
+local function remount()
+	local popups = widgets.popups
+	if widgets.bottom.stopWatching then
+		widgets.bottom.stopWatching()
+	end
+	for _, child in root:GetChildren() do
+		if not child:IsA("UIScale") then
+			child:Destroy()
+		end
+	end
+	mountedForm = Kit.Scale.FormFactor()
+	widgets = HudController.Mount(root, layout, openTile)
+	widgets.popups = popups
+	tops = HudController.TopRegions(widgets)
+	if releaseBound then
+		Kit.Input.SetHudDefault(widgets.tiles[1].control.hit)
+	end
+	remounted:Fire()
+	applyTop()
+end
+
 function HudController.Start()
 	if not HudMode.ReplacesLegacy() then
 		return
 	end
 	layout = Layout.Get()
+	mountedForm = Kit.Scale.FormFactor()
 	build()
 	applyTop()
 	uiScale:GetPropertyChangedSignal("Scale"):Connect(applyTop)
@@ -702,7 +732,6 @@ function HudController.Start()
 	ProgressionController.Changed:Connect(function(view)
 		widgets.bottom:SetProgress(view, instantMotion())
 	end)
-	widgets.bottom:SetProgress(ProgressionController.View(), true)
 	ProgressionController.MountPopups(widgets.popups)
 
 	-- Hotbar: the run inventory's hotbar items. The Hotbar1–6 binds (keys 1–6 by
@@ -711,11 +740,6 @@ function HudController.Start()
 	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot badges name
 	-- the bound keys and follow rebinds.
 	local count = layout.bottom.hotbar.count
-	selectSlot(HudController.Selected)
-	widgets.bottom.SlotPressed:Connect(function(index)
-		selectSlot(index)
-		task.spawn(InventoryController.ActivateHotbar, index)
-	end)
 	local function showItems(snapshot)
 		widgets.bottom:SetSlotItems(HudController.HotbarItems(snapshot, count))
 		if snapshot.equipped and snapshot.equipped ~= HudController.Selected then
@@ -723,8 +747,30 @@ function HudController.Start()
 		end
 	end
 	InventoryController.Changed:Connect(showItems)
-	showItems(InventoryController.Snapshot)
-	widgets.bottom:SetSlotLabels(hotbarLabels(count))
+	-- Fills freshly mounted regions (at start and after a remount).
+	local function fill()
+		widgets.bottom.SlotPressed:Connect(function(index)
+			selectSlot(index)
+			task.spawn(InventoryController.ActivateHotbar, index)
+		end)
+		widgets.bottom:SetProgress(ProgressionController.View(), true)
+		selectSlot(HudController.Selected)
+		showItems(InventoryController.Snapshot)
+		widgets.bottom:SetSlotLabels(hotbarLabels(count))
+		updateHealth(true)
+		updateFraction("stamina", "Stamina", true)
+		updateFraction("food", "Food", true)
+	end
+	fill()
+	remounted:Connect(function()
+		fill()
+		rebuildWaypoints()
+	end)
+	Kit.Scale.OnFormFactorChanged(function()
+		if mountedForm ~= Kit.Scale.FormFactor() then
+			remount()
+		end
+	end)
 	Binds.Changed:Connect(function()
 		widgets.bottom:SetSlotLabels(hotbarLabels(count))
 		if hotbarBound then

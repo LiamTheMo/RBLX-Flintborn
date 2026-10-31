@@ -2,7 +2,7 @@
 -- "TRIBE n" section header) listing up to the layout's row count of tribe-mates
 -- on this server, each a compact Kit.PlayerRow (headshot, name) with a small
 -- Kit health bar under the name. Long names shrink a little on bigger screens;
--- on phones (already at the 9 px floor) they keep their size and end in "…".
+-- on phones and tablets (at the 9 px floor) they keep their size and end in "…".
 -- Hidden while no tribe-mate is here. Display only; HudController feeds the
 -- members. On phones the panel sits at the bottom left and grows upwards.
 
@@ -14,7 +14,7 @@ PartyFrames.__index = PartyFrames
 
 function PartyFrames.new(parent: Instance, layout)
 	local cfg = Layout.Section(layout, "party")
-	local self = setmetatable({ cfg = cfg, rows = {}, shown = 0, shrink = not Layout.IsPhone() }, PartyFrames)
+	local self = setmetatable({ cfg = cfg, rows = {}, shown = 0, shrink = not Layout.IsTouchScreen() }, PartyFrames)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Party"
 	self.root.BackgroundTransparency = 1
