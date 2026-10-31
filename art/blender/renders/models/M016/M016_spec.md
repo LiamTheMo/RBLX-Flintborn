@@ -23,7 +23,7 @@ All pixel boxes are sheet pixels `(x0, y0, x1, y1)`, top-left origin. Paper is `
   mean < 200) separates it. Both masks are quoted below where they differ.
 
 Scratch study material (pure Python, no Blender), in the session scratchpad
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m016_study\`:
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m016_study\`:
 - `png.py` (reader, `crop`, `sample`); `m.py` (masks, view boxes `V`);
 - `measure.py` (bboxes, shares, top / crystal / crystal-bottom / sand / rock profiles), `runs.py` (crystal runs per
   row; `BB` silhouette boxes), `rowruns.py` (runs in any box), `comps.py` (connected parts), `rocks.py` (rock
@@ -1138,7 +1138,7 @@ Minors (for the commit notes; worth doing only if a round 2 happens for another 
     quote the kit file's 1794.
 
 Renders for this verification are in the session scratchpad
-(`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\v016\`):
+(`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\v016\`):
 `renders\M016\` (kit views plus the spec's extras), `renders2\M016\` (parts, underside), `renders3\M016\` (f34 / r34
 from the mirrored side), and the side-by-side comparisons `cmp_*.png`.
 

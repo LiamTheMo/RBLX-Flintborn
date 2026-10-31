@@ -57,7 +57,7 @@ Sheet text:
   Swatches 46 × 48 px at x 36 / 130 / 226 / 329 / 418 / 508, y 1366–1414.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m039_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m039_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy; `m.py` has its own `label()`).
 - **Helpers:** `m.py` (masks `cls()`/`cellcls()`, boxes `V`/`X`, swatches `SW`, `label()`, `preview()`), `zoom.py`,
   `lines.py`, `prev.py` (mask previews `cls_*.png`).

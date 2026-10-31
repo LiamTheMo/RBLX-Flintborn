@@ -84,7 +84,7 @@ ortho frame y 466 / 725, cell dividers x 262, 512, 762; exploded frame x 11–71
     two sage rocks; a little rock creeps into O.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m060_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m060_study\`.
 Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy python <script> < /dev/null` (the
 plain `python3.14.exe` has no Pillow or numpy).
 - **Helpers:** `m.py` (boxes, `background`, `cls`, `hsv`, `clsimg`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png

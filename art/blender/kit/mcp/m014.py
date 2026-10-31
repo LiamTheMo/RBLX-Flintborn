@@ -1267,7 +1267,7 @@ def regions(out_dir=None):
     """REGIONS: the sheet box against the same box mapped through each view's model bbox into our render (from
     report()'s files). Returns [(name, sheet stats, our stats)]; plus the spill: the sheet's teal rock pixels within
     5 px of the crystal (f34) against our spill-key pixels (front_sheet)."""
-    out_dir = out_dir or "C:/Users/Orang/AppData/Local/Temp/claude/D--Projects-Roblox-RBLX-Flintborn/m014_s4"
+    out_dir = out_dir or K.TEMP_ROOT + "m014_s4"
     kit = K.NS["KIT"]
     sheet = _top_down(kit["load_px"](SHEET_PATH))
     ours = {}
@@ -1311,7 +1311,7 @@ def report(views=None, out_dir=None, light=True):
     shade, n)}}."""
     import os
     h = bpy.data.objects["StarstoneNode"]
-    out_dir = out_dir or "C:/Users/Orang/AppData/Local/Temp/claude/D--Projects-Roblox-RBLX-Flintborn/m014_s4"
+    out_dir = out_dir or K.TEMP_ROOT + "m014_s4"
     os.makedirs(out_dir, exist_ok=True)
     kit = K.NS["KIT"]
     old = kit["CELL"]

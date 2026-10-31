@@ -40,7 +40,7 @@ $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages a
 - **Into the kit file.** When a model passes, the main session runs `mNNN.build()` in the GUI kit file (the builder is the source of truth), saves it, checks that the renders match, then exports and commits.
 
 How every numbered model (`art/blender/assets/references/NNN.png`, builders `mNNN.py`) is built. It follows the
-`roblox-blender-model` skill (`.claude/skills/roblox-blender-model/SKILL.md`) and `WorldModeling.md` (read §1, §2,
+`roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) and `WorldModeling.md` (read §1, §2,
 §5, §12, §17 and §18). Agents run on Opus 5.5 at high effort and are grouped as described above. Each Blender
 session (the GUI or a background one) is driven by only one agent at a time.
 

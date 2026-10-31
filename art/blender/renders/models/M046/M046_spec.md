@@ -57,7 +57,7 @@ x 673–1008 with rules at y 977 / 986, 1166 / 1174, 1348. Text is painted out (
   (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m046_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m046_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`, `main_obj`), `zoom.py` (crop with sheet grid),
   `lines.py` (cell borders), `blendall.py` (name search in every `.blend`).

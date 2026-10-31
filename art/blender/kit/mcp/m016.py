@@ -1224,7 +1224,7 @@ SHEET_BOXES = {"f34": (25, 131, 450, 468), "r34": (452, 110, 795, 468), "front":
 REPORT_VIEWS = {"front": ("front_sheet", 0, 9), "side": ("side_sheet", 90, 9), "rear": ("rear_sheet", 180, 9),
                 "f34": ("f34_near", -15, 12), "r34": ("r34_near", 165, 12), "top": ("top", 0, 89)}
 LABEL_RGB = {"crystal": (0.0, 0.0, 1.0), "sand": (1.0, 0.0, 0.0), "pit": (0.0, 1.0, 0.0), "rock": (1.0, 0.0, 1.0)}
-REPORT_DIR = "C:/Users/Orang/AppData/Local/Temp/claude/D--Projects-Roblox-RBLX-Flintborn/m016_s4"
+REPORT_DIR = K.TEMP_ROOT + "m016_s4"
 
 
 def _label_of(key):
