@@ -47,7 +47,16 @@
     "leaderTint": "#FFF0D2",
     "checkTint": "#FFD52A",
     "notReadyTint": "#C8C8C8",
-    "emptyDot": "#DFB791",
+    "emptyDot": "#CC9F77",
+    "photoBackdrop": "#C9B19B",
+    "rarityCommon": "#A99A88",
+    "rarityUncommon": "#5E9C3A",
+    "rarityRare": "#3F7FCF",
+    "rarityEpic": "#8E52C4",
+    "rarityLegendary": "#E09A12",
+    "rarityMythic": "#C9402F",
+    "raritySecret": "#2BB3A8",
+    "rarityExclusive": "#D9599F",
     "hairline": "#EECBA4",
     "railTrack": "#E8C49A",
     "railThumb": "#9F6F4C"
@@ -137,6 +146,7 @@
     "windowMax": 1.4,
     "phoneHeight": 500,
     "phoneHud": 0.9,
+    "phoneHudMin": 0.5,
     "hover": 1.03,
     "pressed": 0.96,
     "windowFrom": 0.94
@@ -165,5 +175,9 @@
     "subtitles": 50
   },
   "blur": { "size": 8, "minQuality": 4 },
+  "phoneText": {
+    "scale": 1.2,
+    "roles": ["body", "bodySoft", "small", "muted", "rowLabel", "rowTitle", "value", "count", "hudName", "hudSmall", "currency", "keycap", "tag", "label", "placeholder", "buttonS", "tab", "badgeNum"]
+  },
   "sounds": { "hover": "", "click": "", "open": "", "close": "", "error": "", "success": "" }
 }

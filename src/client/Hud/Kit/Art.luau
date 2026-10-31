@@ -86,6 +86,9 @@ function Art.IconSprite(id: string, preferGlyph: boolean?): string?
 	return nil
 end
 
+-- True when `sprite` draws as art (uploaded, or previewed in a capture).
+Art.HasArt = Widgets.HasArt
+
 -- The natural size {w, h} of a sprite, or nil when the manifest lacks it.
 function Art.SizeOf(sprite: string?): (number?, number?)
 	local entry = sprite and UiAssets.sprite(sprite)
@@ -245,7 +248,8 @@ end
 
 -- One sprite drawn to fill `parent` at design size w × h (9-sliced with its
 -- corners scaled to fit). `props` override the image's properties.
-function Art.Sprite(sprite: string, w: number, h: number, parent: Instance, props): GuiObject
+-- `sliceScale` overrides the corner scale (a thinner glow ring).
+function Art.Sprite(sprite: string, w: number, h: number, parent: Instance, props, sliceScale: number?): GuiObject
 	local base = {
 		Name = sprite,
 		Size = UDim2.fromOffset(w, h),
@@ -254,7 +258,7 @@ function Art.Sprite(sprite: string, w: number, h: number, parent: Instance, prop
 	for key, value in props or {} do
 		base[key] = value
 	end
-	return Widgets.Sprite(sprite, base, parent, Art.SliceScale(sprite, w, h))
+	return Widgets.Sprite(sprite, base, parent, sliceScale or Art.SliceScale(sprite, w, h))
 end
 
 export type Plate = {
@@ -324,7 +328,14 @@ function Art.Outset(roleName: string, sprite: string, w: number, h: number): { n
 	end
 	-- 9-sliced art keeps its corners at the slice scale; fitted art scales whole.
 	local k = Art.SliceScale(sprite, w, h) or math.min(w / nw, h / nh)
+	k *= Art.Thin(roleName, sprite)
 	return { edge[1] * k, edge[2] * k, edge[3] * k, edge[4] * k }
+end
+
+-- The extra corner scale a role draws a state's art at (role.thin), else 1.
+function Art.Thin(roleName: string, sprite: string): number
+	local role = Art.ROLES[roleName]
+	return role and role.thin and role.thin[sprite] or 1
 end
 
 function PlateMethods:_variant(sprite: string): GuiObject
@@ -340,12 +351,14 @@ function PlateMethods:_variant(sprite: string): GuiObject
 		local out = if self.exact then Art.Outset(self.role, sprite, self.w, self.h) else { 0, 0, 0, 0 }
 		local l, t = grow + out[1], grow + out[2]
 		local dw, dh = grow * 2 + out[1] + out[3], grow * 2 + out[2] + out[4]
+		local thin = Art.Thin(self.role, sprite)
+		local slice = Art.SliceScale(sprite, self.w + dw, self.h + dh)
 		variant = Art.Sprite(sprite, self.w + dw, self.h + dh, self.holder, {
 			Name = sprite,
 			Position = UDim2.fromOffset(-l, -t),
 			Size = UDim2.new(1, dw, 1, dh),
 			ZIndex = self.z,
-		})
+		}, if slice and thin ~= 1 then slice * thin else nil)
 	else
 		variant = standIn(self.role, self.w, self.h, self.holder, self.z)
 		variant.Name = sprite

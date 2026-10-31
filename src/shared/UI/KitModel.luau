@@ -139,7 +139,8 @@ KitModel.ROLES = {
 		sprite = "lk_tile_frame",
 		material = "paper",
 		states = { selected = "lk_slot_item_selected", disabled = "lk_slot_disabled" },
-		grow = { lk_slot_item_selected = 3 },
+		-- The selected glow shares the tile's edge and draws thinner (M07).
+		thin = { lk_slot_item_selected = 0.6 },
 	},
 
 	-- Slots and tiles
@@ -175,6 +176,8 @@ KitModel.ROLES = {
 	["dot.grey"] = { sprite = "lk_dot_brown", material = "dot", fill = "muted" },
 	["dot.red"] = { sprite = "lk_dot_red", material = "dot", fill = "health" },
 	["dot.yellow"] = { sprite = "lk_dot_yellow", material = "dot", fill = "gold" },
+	-- A rarity accent: a small flat dot coloured from the rarity tokens.
+	["dot.rarity"] = { native = true, material = "dot", fill = "rarityCommon" },
 
 	-- Bars
 	["bar.track"] = { sprite = "lk_bar_track", material = "track" },
@@ -196,6 +199,10 @@ KitModel.ROLES = {
 	-- filled when done (a check mark is laid over it).
 	["check.ringOff"] = { sprite = "lk_ring_track", material = "none" },
 	["check.ringOn"] = { sprite = "lk_ring_full", material = "fill", fill = "gold" },
+	-- The progress ring (sheet 19): its empty track and the full fill revealed
+	-- clockwise by Kit.Ring.
+	["ring.track"] = { sprite = "lk_ring_track", material = "none" },
+	["ring.fill"] = { sprite = "lk_ring_full", material = "fill", fill = "xp", edge = false },
 	["toggle.off"] = { sprite = "lk_toggle_off", material = "paper" },
 	["toggle.on"] = { sprite = "lk_toggle_on", material = "fill", fill = "toggleOn" },
 	["slider.track"] = { sprite = "lk_bar_track", material = "track" },
@@ -242,7 +249,8 @@ KitModel.ROLES = {
 		sprite = "lk_panel_inset",
 		material = "paper",
 		states = { selected = "lk_row_hover", disabled = "lk_row_disabled", locked = "lk_row_disabled" },
-		grow = { lk_row_hover = 2 },
+		-- The selected glow sits on the card's own edge, thinner (M06, M07).
+		thin = { lk_row_hover = 0.55 },
 	},
 	["row.bullet"] = { sprite = "lk_row_bullet", material = "paper" },
 
@@ -353,7 +361,9 @@ end
 -- visible edge, in the sprite's own px (middle row and column, alpha > 128).
 -- Plates are drawn outset by it (times their scale), so the art's visible edge
 -- lands exactly on the component's rect. Regenerate with
--- `python3 art/ui/capture/capture.py --edges`.
+-- `python3 art/ui/capture/capture.py --edges`. lk_panel_inset is set by hand:
+-- its parchment is opaque to the image edge and its visible edge is the thin
+-- border line inside it.
 KitModel.EDGES = {
 	lk_badge_count = { 2, 2, 2, 2 },
 	lk_badge_count_wide = { 2, 3, 2, 2 },
@@ -443,7 +453,7 @@ KitModel.EDGES = {
 	lk_medallion_square = { 4, 4, 4, 4 },
 	lk_nail = { 7, 2, 7, 2 },
 	lk_panel = { 4, 3, 3, 3 },
-	lk_panel_inset = { 2, 2, 2, 2 },
+	lk_panel_inset = { 6, 6, 5, 5 },
 	lk_pill_value = { 2, 3, 2, 3 },
 	lk_plaque_capped = { 3, 4, 2, 3 },
 	lk_plaque_leather = { 2, 2, 3, 3 },

@@ -290,6 +290,8 @@ function LobbyHud.new(parent: Instance, actions)
 		rect = { -40, -4, 114, 24 },
 		text = "",
 		role = "hudSmall",
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
 		textSize = LobbyHud.TEXT.barText,
 		align = "Right",
 	})
@@ -299,6 +301,8 @@ function LobbyHud.new(parent: Instance, actions)
 		rect = { 448, -4, 160, 24 },
 		text = "",
 		role = "hudSmall",
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
 		textSize = LobbyHud.TEXT.barText,
 	})
 	for index, x in LobbyHud.SLOT_X do

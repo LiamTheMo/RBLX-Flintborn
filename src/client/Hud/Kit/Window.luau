@@ -46,6 +46,7 @@ export type Props = {
 	ruleVariant: string?,
 	ruleRect: { number }?,
 	ruleFade: boolean?,
+	ruleColor: string?,
 	closeRect: { number }?,
 	plaqueRect: { number }?,
 	bodyTop: number?,
@@ -152,6 +153,7 @@ function Window.new(target, props: Props)
 			rect = rect,
 			variant = variant,
 			fade = props.ruleFade ~= false,
+			color = props.ruleColor,
 			zIndex = z + 2,
 		})
 	end

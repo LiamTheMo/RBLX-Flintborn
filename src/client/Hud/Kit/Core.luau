@@ -9,6 +9,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextService = game:GetService("TextService")
+local UserInputService = game:GetService("UserInputService")
 
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Widgets = require(script.Parent.Parent.Widgets)
@@ -105,11 +106,36 @@ function Core.Root(parent: Instance?, kind: string, role: string, props, w: numb
 	return { root = root, visual = visual, scale = scale, maid = maid, w = w, h = h, z = z }
 end
 
+local phoneRoles: { [string]: boolean } = {}
+for _, role in Tokens.Data.phoneText.roles do
+	phoneRoles[role] = true
+end
+
+-- The text boost for `role` on a short touch screen (a landscape phone, where
+-- windows and the HUD draw small): body and label roles grow by phoneText.scale
+-- so they stay readable; titles keep their size. 1 elsewhere.
+function Core.TextBoost(role: string): number
+	if not phoneRoles[role] then
+		return 1
+	end
+	local camera = workspace.CurrentCamera
+	local height = if camera then camera.ViewportSize.Y else 0
+	if
+		UserInputService.TouchEnabled
+		and not UserInputService.KeyboardEnabled
+		and height > 0
+		and height < Tokens.Scale("phoneHeight")
+	then
+		return Tokens.Data.phoneText.scale
+	end
+	return 1
+end
+
 -- Applies a text role (font, size, colour) to a label.
 function Core.Style(label: TextLabel | TextButton | TextBox, role: string, colorKey: string?)
 	local style = Tokens.TextStyle(role)
 	label.FontFace = style.face
-	label.TextSize = style.size
+	label.TextSize = style.size * Core.TextBoost(role)
 	label.TextColor3 = Tokens.Color(colorKey or style.color)
 	return style
 end
@@ -121,7 +147,8 @@ local ALIGN_Y =
 
 -- A TextLabel in a type role. opts: text, role, rect {x, y, w, h} (or size and
 -- position), align ("Left" | "Center" | "Right"), yAlign, wrap, scaled (shrink
--- to fit, never past the role size), color (token), caps, rich, z, name.
+-- to fit, never past the role size), color (token), caps, rich, outline (true
+-- for a paper outline, or a colour token), outlineThickness, z, name.
 function Core.Label(parent: Instance, opts): TextLabel
 	local role = opts.role or "body"
 	local label = Core.Make("TextLabel", {
@@ -138,7 +165,18 @@ function Core.Label(parent: Instance, opts): TextLabel
 	}, nil)
 	local style = Core.Style(label, role, opts.color)
 	if opts.size then
-		label.TextSize = opts.size
+		label.TextSize = opts.size * Core.TextBoost(role)
+	end
+	if opts.outline then
+		-- Text over the world: a thin outline (paper behind ink, ink behind
+		-- cream) keeps it readable on any background.
+		Core.Make("UIStroke", {
+			Name = "Outline",
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
+			Color = Tokens.Color(if opts.outline == true then "paper" else opts.outline),
+			Thickness = opts.outlineThickness or 1.5,
+			Transparency = 0.1,
+		}, label)
 	end
 	local caps = if opts.caps ~= nil then opts.caps else style.caps
 	label:SetAttribute("KitCaps", caps)
@@ -165,7 +203,7 @@ end
 function Core.TextWidth(text: string, role: string, size: number?): number
 	local style = Tokens.TextStyle(role)
 	local spec = Tokens.Data.fonts[style.font]
-	local px = size or style.size
+	local px = (size or style.size) * Core.TextBoost(role)
 	local shown = if style.caps then string.upper(text) else text
 	local legacy = (Enum.Font :: any)[spec.legacy] or Enum.Font.Merriweather
 	local ok, bounds = pcall(TextService.GetTextSize, TextService, shown, px, legacy, Vector2.new(10000, 10000))

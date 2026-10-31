@@ -65,12 +65,12 @@ function NavController.Start()
 		local button = make("TextButton", {
 			Text = entry[1],
 			Size = UDim2.fromOffset(140, Theme.TOUCH_TARGET - 6),
-			BackgroundColor3 = Theme.Colors.Panel,
+			BackgroundColor3 = Theme.FALLBACK.panel,
 			BackgroundTransparency = 0.2,
-			TextColor3 = Theme.Colors.Text,
+			TextColor3 = Theme.FALLBACK.text,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Font = Theme.Fonts.Bold,
-			TextSize = Theme.TextSize.Small,
+			Font = Theme.FALLBACK.font,
+			TextSize = Theme.FALLBACK.textSize,
 		}, bar)
 		make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
 		make("UIPadding", { PaddingLeft = UDim.new(0, 8) }, button)

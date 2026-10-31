@@ -16,7 +16,8 @@ Stepper.__index = Stepper
 
 -- props: rect | size, min, max, value, step (1), allLabel (adds a button that
 -- sets the max), buttons ("paper" default | "leather": the M06 leather − / +),
--- valueSize, onChange(value), zIndex, name.
+-- valueSize, gap (8: between the buttons and the field), buttonSize (default
+-- the height), onChange(value), zIndex, name.
 function Stepper.new(parent: Instance, props)
 	local w, h = Core.Size(props, 160, 48)
 	local base = Core.Root(parent, "Stepper", "field.value", props, w, h)
@@ -28,15 +29,16 @@ function Stepper.new(parent: Instance, props)
 		step = props.step or 1,
 		onChange = props.onChange,
 	}, Stepper)
-	local bw = h
+	local bw = props.buttonSize or h
+	local gap = props.gap or 8
 	local allW = if props.allLabel then 70 else 0
-	local fieldW = w - bw * 2 - 16 - (if allW > 0 then allW + 8 else 0)
+	local fieldW = w - bw * 2 - gap * 2 - (if allW > 0 then allW + gap else 0)
 	local leather = props.buttons == "leather"
 	self.minus = IconButton.new(base.visual, {
 		name = "Minus",
 		variant = if leather then "leather" else "minus",
 		icon = if leather then "minus" else nil,
-		rect = { 0, 0, bw, h },
+		rect = { 0, (h - bw) / 2, bw, bw },
 		zIndex = base.z + 1,
 		onPress = function()
 			self:_change(self.value - self.step)
@@ -45,7 +47,7 @@ function Stepper.new(parent: Instance, props)
 	local field = Core.Make("Frame", {
 		Name = "Field",
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(bw + 8, 0),
+		Position = UDim2.fromOffset(bw + gap, 0),
 		Size = UDim2.fromOffset(fieldW, h),
 		ZIndex = base.z,
 	}, base.visual)
@@ -64,7 +66,7 @@ function Stepper.new(parent: Instance, props)
 		name = "Plus",
 		variant = if leather then "leather" else "plus",
 		icon = if leather then "plus" else nil,
-		rect = { bw + 16 + fieldW, 0, bw, h },
+		rect = { bw + gap * 2 + fieldW, (h - bw) / 2, bw, bw },
 		zIndex = base.z + 1,
 		onPress = function()
 			self:_change(self.value + self.step)

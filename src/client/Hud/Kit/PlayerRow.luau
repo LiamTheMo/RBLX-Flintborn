@@ -24,7 +24,8 @@ PlayerRow.__index = PlayerRow
 -- props: rect | size, userId, name, level, leader (crown), badge ("leader" |
 -- "ready" | "notReady"), status ("ready" | "notReady": a bare dot, compact
 -- rows), action ({label, onPress, variant, enabled, size = {108, 45}}), empty,
--- emptyText, emptyIndent (px from the left to the disc), nameX (px), nameSize,
+-- emptyText, emptyIndent (px from the left to the disc), nameX, nameY, levelY
+-- (line tops, px), badgeWidth / badgeHeight / badgeTextSize, nameSize,
 -- levelSize, crownSize, portraitSize, shrinkName (true: long names shrink to
 -- fit, down to minTextPx), compact (the HUD party list: smaller crown and
 -- text, no level line), rule ("hairline" default; true = hairline, false,
@@ -152,11 +153,13 @@ function PlayerRow:Set(data)
 		self.badge = Badge.new(self.content, {
 			name = "Tag",
 			variant = data.badge,
-			rect = { 0, 0, 0, 32 },
+			rect = { 0, 0, opt("badgeWidth") or 0, opt("badgeHeight") or 32 },
+			textSize = opt("badgeTextSize"),
 			zIndex = z + 1,
 		})
 		local bw = self.badge.root.Size.X.Offset
-		self.badge.root.Position = UDim2.fromOffset(right - bw, (h - 32) / 2 - 1)
+		local bh = self.badge.root.Size.Y.Offset
+		self.badge.root.Position = UDim2.fromOffset(right - bw, (h - bh) / 2 - 1)
 		right -= bw + 10
 	end
 	local status = data.status
@@ -194,7 +197,10 @@ function PlayerRow:Set(data)
 		size = nameSize,
 		color = "ink",
 		scaled = shrink,
-		rect = if hasLevel then { x, h * 0.1, right - x, h * 0.46 } else { x, 0, right - x, h - 2 },
+		rect = if opt("nameY")
+			then { x, opt("nameY"), right - x, h * 0.46 }
+			elseif hasLevel then { x, h * 0.1, right - x, h * 0.46 }
+			else { x, 0, right - x, h - 2 },
 		z = z,
 	})
 	if hasLevel then
@@ -204,7 +210,7 @@ function PlayerRow:Set(data)
 			role = "small",
 			size = opt("levelSize"),
 			color = "inkBody",
-			rect = { x, h * 0.54, right - x, h * 0.34 },
+			rect = { x, opt("levelY") or h * 0.54, right - x, h * 0.34 },
 			z = z,
 		})
 	end

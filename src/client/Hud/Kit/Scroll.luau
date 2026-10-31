@@ -19,7 +19,7 @@ Scroll.RAIL = 14
 Scroll.THIN = 8
 
 -- props: rect | size, direction ("Y"), gap (list padding; false for no list
--- layout), padBottom (12), contentHeight (design px, used where the engine
+-- layout), padTop (2), padBottom (12), contentHeight (design px, used where the engine
 -- has not measured the canvas yet, as in captures), rail ("kit" default: the
 -- sheet-09 rail and thumb | "thin": the flat 8 px rail of M01's party list),
 -- railOverlay (true: the rail sits over the list's right edge instead of
@@ -27,7 +27,9 @@ Scroll.THIN = 8
 function Scroll.new(parent: Instance, props)
 	local w, h = Core.Size(props, 300, 300)
 	local base = Core.Root(parent, "Scroll", "scroll.track", props, w, h)
-	local thin = props.rail == "thin"
+	-- direction "X": a horizontal strip (reward tiles), with the thin rail under it.
+	local horizontal = props.direction == "X"
+	local thin = props.rail == "thin" or horizontal
 	local rail = if thin then Scroll.THIN else Scroll.RAIL
 	local inset = props.railInset or 0
 	local self = setmetatable({
@@ -36,40 +38,60 @@ function Scroll.new(parent: Instance, props)
 		w = w,
 		h = h,
 		rail = rail,
+		horizontal = horizontal,
 		gap = if props.gap == false then 0 else (props.gap or 6),
 		contentHeight = props.contentHeight,
 	}, Scroll)
 	local frame = Core.Make("ScrollingFrame", {
 		Name = "List",
 		Active = true,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		AutomaticCanvasSize = if horizontal then Enum.AutomaticSize.X else Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		CanvasSize = UDim2.new(0, 0, 0, 0),
 		ElasticBehavior = Enum.ElasticBehavior.WhenScrollable,
 		ScrollBarThickness = 0,
-		ScrollingDirection = Enum.ScrollingDirection.Y,
+		ScrollingDirection = if horizontal then Enum.ScrollingDirection.X else Enum.ScrollingDirection.Y,
 		Selectable = false,
-		Size = if props.railOverlay then UDim2.fromScale(1, 1) else UDim2.new(1, -(rail + 6 + inset), 1, 0),
+		Size = if props.railOverlay
+			then UDim2.fromScale(1, 1)
+			elseif horizontal then UDim2.new(1, 0, 1, -(rail + 6 + inset))
+			else UDim2.new(1, -(rail + 6 + inset), 1, 0),
 		ZIndex = base.z,
 	}, base.visual)
-	Core.Make("UIPadding", { PaddingBottom = UDim.new(0, props.padBottom or 12), PaddingTop = UDim.new(0, 2) }, frame)
+	if horizontal then
+		Core.Make("UIPadding", { PaddingRight = UDim.new(0, props.padBottom or 12), PaddingLeft = UDim.new(0, 2) }, frame)
+	else
+		Core.Make(
+			"UIPadding",
+			{ PaddingBottom = UDim.new(0, props.padBottom or 12), PaddingTop = UDim.new(0, props.padTop or 2) },
+			frame
+		)
+	end
 	if props.gap ~= false then
 		Core.Make("UIListLayout", {
+			FillDirection = if horizontal then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
 			Padding = UDim.new(0, props.gap or 6),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = if horizontal then Enum.VerticalAlignment.Center else Enum.VerticalAlignment.Top,
 		}, frame)
 	end
 	self.frame = frame
 	self.track = Core.Make("Frame", {
 		Name = "Rail",
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(w - rail - inset, 0),
-		Size = UDim2.fromOffset(rail, h),
+		Position = if horizontal then UDim2.fromOffset(0, h - rail - inset) else UDim2.fromOffset(w - rail - inset, 0),
+		Size = if horizontal then UDim2.fromOffset(w, rail) else UDim2.fromOffset(rail, h),
 		ZIndex = base.z + 1,
 	}, base.visual)
-	Art.Plate(self.track, if thin then "scroll.thinTrack" else "scroll.track", rail, h, { z = base.z + 1 })
+	Art.Plate(
+		self.track,
+		if thin then "scroll.thinTrack" else "scroll.track",
+		if horizontal then w else rail,
+		if horizontal then rail else h,
+		{ z = base.z + 1 }
+	)
 	self.thumb = Core.Make("Frame", {
 		Name = "Thumb",
 		BackgroundTransparency = 1,
@@ -91,25 +113,31 @@ end
 
 function Scroll:_sync()
 	local frame = self.frame
-	local window = frame.AbsoluteWindowSize.Y
-	local canvas = frame.AbsoluteCanvasSize.Y
-	local position = frame.CanvasPosition.Y
+	local horizontal = self.horizontal
+	local length = if horizontal then self.w else self.h
+	local window = if horizontal then frame.AbsoluteWindowSize.X else frame.AbsoluteWindowSize.Y
+	local canvas = if horizontal then frame.AbsoluteCanvasSize.X else frame.AbsoluteCanvasSize.Y
+	local position = if horizontal then frame.CanvasPosition.X else frame.CanvasPosition.Y
 	if window <= 0 then
 		-- Not measured yet: use the design numbers.
-		window = self.h
+		window = length
 		canvas = self.contentHeight or 0
-		position = frame.CanvasPosition.Y
 	else
 		-- Absolute sizes are in screen px; the thumb lives in design px.
-		local k = window / self.h
+		local k = window / length
 		canvas /= k
 		position /= k
-		window = self.h
+		window = length
 	end
-	local thumb = KitModel.Thumb(window, canvas, position, self.h, 28)
+	local thumb = KitModel.Thumb(window, canvas, position, length, 28)
 	self.track.Visible = thumb.visible
-	self.thumb.Position = UDim2.fromOffset(0, thumb.y)
-	self.thumb.Size = UDim2.fromOffset(self.rail, thumb.height)
+	if horizontal then
+		self.thumb.Position = UDim2.fromOffset(thumb.y, 0)
+		self.thumb.Size = UDim2.fromOffset(thumb.height, self.rail)
+	else
+		self.thumb.Position = UDim2.fromOffset(0, thumb.y)
+		self.thumb.Size = UDim2.fromOffset(self.rail, thumb.height)
+	end
 	self.root:SetAttribute("KitState", if thumb.visible then "scrollable" else "normal")
 end
 

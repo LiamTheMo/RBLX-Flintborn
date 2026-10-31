@@ -71,7 +71,9 @@ function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
 			player:GetAttribute("UiScale")
 		)
 		if Scale.IsSmallTouch(size.Y) then
-			k *= Tokens.Scale("phoneHud")
+			-- Phones: never below phoneHudMin, so HUD text stays readable; the
+			-- regions are pinned to the screen edges and make room for it.
+			k = math.max(k * Tokens.Scale("phoneHud"), Tokens.Scale("phoneHudMin"))
 		end
 		uiScale.Scale = k
 		root.Size = UDim2.fromScale(1 / k, 1 / k)

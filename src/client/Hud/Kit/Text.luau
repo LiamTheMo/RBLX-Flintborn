@@ -38,7 +38,9 @@ Text.Width = Core.TextWidth
 
 -- props: rect | size (+ layoutOrder), text, role, textSize (overrides the
 -- role's size), align, yAlign, wrap, scaled, color (token), caps (overrides the
--- role), smallCaps, smallCapsSizes ({initials, rest} px), zIndex, name.
+-- role), smallCaps, smallCapsSizes ({initials, rest} px), outline (true for a
+-- paper outline, or a colour token: text over the world), outlineThickness,
+-- zIndex, name.
 function Text.new(parent: Instance, props)
 	local w, h = Core.Size(props, 100, 24)
 	local label = Core.Label(parent, {
@@ -54,6 +56,8 @@ function Text.new(parent: Instance, props)
 		rich = props.smallCaps == true or props.rich == true,
 		z = props.zIndex,
 		name = props.name,
+		outline = props.outline,
+		outlineThickness = props.outlineThickness,
 		rect = { 0, 0, w, h },
 	})
 	Core.Place(label, props, w, h)

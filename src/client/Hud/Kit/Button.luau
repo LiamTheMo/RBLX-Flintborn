@@ -38,6 +38,7 @@ end
 
 -- props: rect | size, label, variant, sizeClass ("s" | "m" | "l"), icon,
 -- textRole, textSize, iconSize (px, default half the height), iconGap (12),
+-- contentOffset ({x, y}: moves icon and label together, e.g. up off a lip),
 -- onPress, zIndex, name. The play variant has no hover art: it lifts (scales
 -- to 1.03) under the pointer.
 function Button.new(parent: Instance, props)
@@ -52,6 +53,7 @@ function Button.new(parent: Instance, props)
 	self.iconId = props.icon
 	self.iconSizeProp = props.iconSize
 	self.iconGap = props.iconGap
+	self.contentOffset = props.contentOffset
 	self.label = Core.Label(base.visual, {
 		name = "Label",
 		text = props.label or "",
@@ -93,10 +95,11 @@ function Button:_layout()
 			name = "Icon",
 		})
 	end
+	local offset = self.contentOffset or { 0, 0 }
 	if self.icon then
-		self.icon.Position = UDim2.fromOffset(left, (h - iconSize) / 2)
+		self.icon.Position = UDim2.fromOffset(left + offset[1], (h - iconSize) / 2 + offset[2])
 	end
-	self.label.Position = UDim2.fromOffset(left + iconSize + gap, 0)
+	self.label.Position = UDim2.fromOffset(left + iconSize + gap + offset[1], offset[2])
 	self.label.Size = UDim2.fromOffset(textW, h - 3)
 end
 

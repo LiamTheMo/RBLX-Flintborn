@@ -15,15 +15,19 @@ local SearchBox = {}
 SearchBox.__index = SearchBox
 
 -- props: rect | size, placeholder, text, debounce (0.15), onChanged(text),
--- zIndex, name.
+-- onSubmit(text) (Enter), maxLength, textSize, clearButton (false hides the ✕),
+-- plain (Kit.TextField: the value-box art, no magnifier), zIndex, name.
 function SearchBox.new(parent: Instance, props)
 	local w, h = Core.Size(props, 215, 41)
-	local base = Core.Root(parent, "SearchBox", "search.field", props, w, h)
+	-- A plain field (Kit.TextField) has the value-box art and no magnifier.
+	local plain = props.plain == true
+	local role = if plain then "field.value" else "search.field"
+	local base = Core.Root(parent, if plain then "TextField" else "SearchBox", role, props, w, h)
 	local self = setmetatable({ root = base.root, base = base, serial = 0 }, SearchBox)
-	self.plate = Art.Plate(base.visual, "search.field", w, h, { z = base.z })
-	-- The magnifier is baked into the art's left inset (44 px at full height).
-	local left = math.floor(44 * math.min(1, h / 53)) + 4
-	local clear = math.floor(h * 0.42)
+	self.plate = Art.Plate(base.visual, role, w, h, { z = base.z })
+	-- The magnifier is baked into the search art's left inset (44 px at full height).
+	local left = if plain then 14 else math.floor(44 * math.min(1, h / 53)) + 4
+	local clear = if props.clearButton == false then 0 else math.floor(h * 0.42)
 	local box = Core.Make("TextBox", {
 		Name = "Input",
 		BackgroundTransparency = 1,
@@ -37,6 +41,24 @@ function SearchBox.new(parent: Instance, props)
 		ZIndex = base.z + 2,
 	}, base.visual)
 	Core.Style(box, "rowLabel", "ink")
+	if props.textSize then
+		box.TextSize = props.textSize * Core.TextBoost("rowLabel")
+	end
+	if props.maxLength then
+		local limit = props.maxLength
+		base.maid:Give(box:GetPropertyChangedSignal("Text"):Connect(function()
+			if utf8.len(box.Text) and utf8.len(box.Text) > limit then
+				box.Text = string.sub(box.Text, 1, utf8.offset(box.Text, limit + 1) - 1)
+			end
+		end))
+	end
+	if props.onSubmit then
+		base.maid:Give(box.FocusLost:Connect(function(enterPressed)
+			if enterPressed then
+				props.onSubmit(box.Text)
+			end
+		end))
+	end
 	box.PlaceholderColor3 = Tokens.Color("placeholder")
 	self.box = box
 	self.clear = Core.Make("TextButton", {
@@ -46,7 +68,7 @@ function SearchBox.new(parent: Instance, props)
 		Position = UDim2.fromOffset(w - clear - 12, (h - clear) / 2),
 		Size = UDim2.fromOffset(clear, clear),
 		Text = "",
-		Visible = box.Text ~= "",
+		Visible = clear > 0 and box.Text ~= "",
 		ZIndex = base.z + 3,
 	}, base.visual)
 	Art.Plate(self.clear, "mark.cross", clear, clear, { z = base.z + 3 })
@@ -55,7 +77,7 @@ function SearchBox.new(parent: Instance, props)
 		box.Text = ""
 	end))
 	maid:Give(box:GetPropertyChangedSignal("Text"):Connect(function()
-		self.clear.Visible = box.Text ~= ""
+		self.clear.Visible = clear > 0 and box.Text ~= ""
 		self.serial += 1
 		local serial = self.serial
 		task.delay(props.debounce or 0.15, function()

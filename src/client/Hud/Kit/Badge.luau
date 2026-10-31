@@ -28,10 +28,19 @@ Badge.VARIANTS = {
 	number = { role = "badge.number", text = "", textRole = "badgeNum", w = 26, h = 26 },
 	new = { role = "badge.countWide", text = "NEW", textRole = "tag", h = 30 },
 	dot = { role = "dot.red", text = nil, w = 18, h = 18 },
+	-- Status / marker dots, drawn untinted from their art.
+	dotRed = { role = "dot.red", text = nil, w = 18, h = 18 },
+	dotYellow = { role = "dot.yellow", text = nil, w = 18, h = 18 },
+	dotGreen = { role = "dot.green", text = nil, w = 18, h = 18 },
+	dotGrey = { role = "dot.grey", text = nil, w = 18, h = 18 },
+	-- A rarity accent: `rarity` names the colour (rarity<Name> token).
+	rarity = { role = "dot.rarity", text = nil, w = 12, h = 12 },
 }
 
--- props: variant, text, rect | size (a rect width of 0 fits the text), anchor
--- ("topRight"), zIndex, name.
+-- props: variant (also "dotRed" | "dotYellow" | "dotGreen" | "dotGrey" |
+-- "rarity"), text, rect | size (a rect width of 0 fits the text), width (a
+-- fixed width for pills), textSize, rarity ("Common" … for the rarity dot),
+-- anchor ("topRight"), zIndex, name.
 function Badge.new(parent: Instance, props)
 	local variant = props.variant or "count"
 	local spec = Badge.VARIANTS[variant] or Badge.VARIANTS.count
@@ -42,6 +51,9 @@ function Badge.new(parent: Instance, props)
 		then props.rect[3]
 		elseif type(props.size) == "table" and props.size[1] > 0 then props.size[1]
 		else nil
+	if w == nil and props.width then
+		w = props.width
+	end
 	if w == nil then
 		if spec.w then
 			w = spec.w
@@ -63,6 +75,9 @@ function Badge.new(parent: Instance, props)
 		z = base.z,
 		tint = if spec.tint then Tokens.Color(spec.tint) else nil,
 	})
+	if variant == "rarity" then
+		self:SetRarity(props.rarity)
+	end
 	local left = 0
 	if spec.dot then
 		local dotHolder = Core.Make("Frame", {
@@ -80,6 +95,7 @@ function Badge.new(parent: Instance, props)
 			name = "Label",
 			text = text,
 			role = spec.textRole,
+			size = props.textSize,
 			align = "Center",
 			scaled = true,
 			rect = { left + 4, 0, w - left - 8, h - 2 },
@@ -93,6 +109,20 @@ function Badge:SetText(text: string)
 	if self.label then
 		Core.SetText(self.label, text)
 	end
+end
+
+-- The rarity dot's colour (rarity<Name> token; unknown names read Common).
+function Badge:SetRarity(rarity: string?)
+	local key = "rarity" .. tostring(rarity or "Common")
+	if Tokens.Data.colors[key] == nil then
+		key = "rarityCommon"
+	end
+	for _, part in self.plate.holder:GetDescendants() do
+		if part:IsA("Frame") and part.Name == "native" then
+			part.BackgroundColor3 = Tokens.Color(key)
+		end
+	end
+	self.root:SetAttribute("KitRarity", rarity)
 end
 
 function Badge:SetVisible(visible: boolean)

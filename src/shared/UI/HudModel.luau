@@ -184,8 +184,7 @@ function HudModel.HudScale(
 end
 
 -- 9-slice corner scale for a sprite of natural size (w, h) drawn at (tw, th), so
--- rope corners shrink with small widgets instead of overlapping. The preview
--- (art/ui/preview_hud.py) uses the same formula.
+-- rope corners shrink with small widgets instead of overlapping.
 function HudModel.SliceScale(width: number, height: number, targetWidth: number, targetHeight: number): number
 	if width <= 0 or height <= 0 then
 		return 1

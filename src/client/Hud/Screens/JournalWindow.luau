@@ -38,19 +38,17 @@ JournalWindow.TAB_SIZE = { 82, 84 }
 JournalWindow.TAB_YS = { quests = 101, progress = 195, map = 288, party = 383 }
 
 local Z = 8
--- The soft row plate draws its edge 4 px (sides) and 5 px (top, bottom) inside
--- its rect, so rows are built that much larger to show the mockup's 357 × 95
--- cards at its 104 px pitch.
-local ROW = { 365, 104 }
-local ROW_GAP = 0
+-- The mockup's 357 × 95 quest cards at a 104 px pitch (the kit's soft row draws
+-- its edge on its rect).
+local ROW = { 357, 95 }
+local ROW_GAP = 9
 -- The thin rail sits on the mockup's scroll rule (x 735).
 local LIST = { 59, 101, 379, 515 }
 local OBJECTIVE = { 594, 62 }
 local OBJECTIVE_GAP = 3
 local OBJECTIVES = { 450, 278, 608, 199 }
--- Where a quest row's title and subtitle sit (the kit row centres them lower
--- than the mockup; it has no prop for their height in the row yet).
-local QUEST_TEXT_Y = { 10, 44 }
+-- Where a quest row's title and subtitle lines start.
+local QUEST_TEXT_Y = { 5, 39 }
 local OBJECTIVE_SUBTITLE_Y = 31
 local TILE = { 92, 104 }
 local TILE_PITCH = 98
@@ -171,6 +169,7 @@ function JournalWindow:_entriesPage(v: Frame)
 		name = "Quests",
 		rect = LIST,
 		gap = ROW_GAP,
+		padTop = 5,
 		padBottom = 6,
 		rail = "thin",
 		zIndex = Z,
@@ -447,27 +446,27 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		layoutOrder = order,
 		variant = "soft",
 		icon = entry.icon,
-		iconRect = { 9, 16, 96, 72 },
-		textX = 123,
+		iconRect = { 5, 11, 96, 72 },
+		textX = 119,
 		title = entry.title,
 		titleSize = 19,
+		titleY = QUEST_TEXT_Y[1],
 		subtitle = entry.subtitle,
 		subtitleSize = 15,
+		subtitleY = QUEST_TEXT_Y[2],
 		chevron = true,
 		zIndex = Z + 1,
 		onPress = function()
 			self:Select(entry.id)
 		end,
 	}))
-	row.title.Position = UDim2.fromOffset(row.title.Position.X.Offset, QUEST_TEXT_Y[1])
-	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, QUEST_TEXT_Y[2])
 	local tab = if self.tab == "map" then "quests" else self.tab
 	row:SetSelected(entry.id == self.selected[tab])
 	local v = row.base.visual
 	if entry.tag then
 		Kit.Text.new(v, {
 			name = "Group",
-			rect = { 244, 8, 104, 16 },
+			rect = { 240, 3, 104, 16 },
 			text = entry.tag,
 			role = "tag",
 			textSize = 12,
@@ -477,9 +476,9 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		})
 	end
 	if entry.status == "ready" then
-		Kit.Badge.new(v, { name = "Ready", variant = "dot", rect = { 92, 12, 16, 16 }, zIndex = Z + 4 })
+		Kit.Badge.new(v, { name = "Ready", variant = "dot", rect = { 88, 7, 16, 16 }, zIndex = Z + 4 })
 	elseif entry.status == "claimed" then
-		Kit.Icon.new(v, { name = "Claimed", rect = { 86, 10, 26, 22 }, icon = "check", zIndex = Z + 4 })
+		Kit.Icon.new(v, { name = "Claimed", rect = { 82, 5, 26, 22 }, icon = "check", zIndex = Z + 4 })
 	end
 	return row
 end

@@ -24,7 +24,8 @@ Slot.__index = Slot
 export type Item = { catalogId: string?, itemId: string?, quantity: number?, permanent: boolean?, icon: string? }
 
 -- props: rect | size (default 90), variant ("item" | "hotbar"), item, count,
--- hotkey (badge text), countStyle ("text" | "plaque"), onPress(slot),
+-- hotkey (badge text), countStyle ("text" | "plaque"), countInset ({right,
+-- bottom} px, default {10, 10}), countSize, onPress(slot),
 -- zIndex, name.
 function Slot.new(parent: Instance, props)
 	local variant = props.variant or "item"
@@ -51,9 +52,11 @@ function Slot.new(parent: Instance, props)
 		name = "Count",
 		text = "",
 		role = "count",
+		size = props.countSize,
 		align = "Right",
 		yAlign = "Bottom",
-		rect = { 8, 6, w - 18, h - 16 },
+		-- countInset {right, bottom}: the count's distance from the slot's edges.
+		rect = { 8, 6, w - 8 - (props.countInset and props.countInset[1] or 10), h - 6 - (props.countInset and props.countInset[2] or 10) },
 		z = base.z + 3,
 	})
 	self.star = Core.Make("Frame", {

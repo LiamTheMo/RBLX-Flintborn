@@ -34,7 +34,8 @@ function SectionHeader.new(parent: Instance, props)
 		text = props.text,
 		role = "sectionHeader",
 		size = size,
-		rect = { x, 0, math.min(textW + 4, w - x), h - 6 },
+		-- The whole width is the label's, so a heavy face never truncates.
+		rect = { x, 0, if props.count then math.min(textW * 1.06 + 8, w - x) else w - x, h - 6 },
 		z = base.z + 1,
 	})
 	if props.count then
@@ -43,7 +44,7 @@ function SectionHeader.new(parent: Instance, props)
 			text = props.count,
 			role = "sectionHeader",
 			size = size,
-			rect = { x + textW + (props.countGap or 22), 0, 120, h - 6 },
+			rect = { x + textW * 1.04 + (props.countGap or 22), 0, 120, h - 6 },
 			z = base.z + 1,
 		})
 	end

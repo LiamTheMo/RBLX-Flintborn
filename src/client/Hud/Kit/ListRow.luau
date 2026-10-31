@@ -25,7 +25,8 @@ ListRow.__index = ListRow
 -- props: rect | size, variant ("row" | "card" | "soft" | "line" | "option"),
 -- icon (icon id), catalogId / itemId (item art instead), iconRect {x, y, w, h}
 -- or iconSize, textX, title, titleSize, subtitle, subtitleSize, subtitleHand
--- (the handwritten face), value, valueColor (token), valueSize, chevron,
+-- (the handwritten face), titleY, subtitleY (line tops, px), value,
+-- valueColor (token), valueSize, chevron,
 -- trailing (width in px of an empty frame after the value: :Trailing()),
 -- rule ("hairline" default for "line"; a Divider variant or false),
 -- onPress(row), onLocked(row) (a press while locked), zIndex, name.
@@ -129,7 +130,12 @@ function ListRow.new(parent: Instance, props)
 		text = props.title or "",
 		role = titleRole,
 		size = props.titleSize or props.textSize,
-		rect = if hasSub then { x, h * 0.12, right - x, h * 0.46 } else { x, 0, right - x, h },
+		-- titleY / subtitleY: the lines' tops (each line is 46 % / 36 % of the
+		-- row tall); default is the two lines centred.
+		rect = if props.titleY
+			then { x, props.titleY, right - x, h * (if hasSub then 0.46 else 0.6) }
+			elseif hasSub then { x, h * 0.12, right - x, h * 0.46 }
+			else { x, 0, right - x, h },
 		z = base.z + 1,
 	})
 	if hasSub then
@@ -139,7 +145,7 @@ function ListRow.new(parent: Instance, props)
 			role = if props.subtitleHand then "subtitleHand" else "small",
 			size = props.subtitleSize,
 			color = if props.subtitleHand then "inkHand" else "inkBody",
-			rect = { x, h * 0.54, right - x, h * 0.36 },
+			rect = { x, props.subtitleY or h * 0.54, right - x, h * 0.36 },
 			z = base.z + 1,
 		})
 	end

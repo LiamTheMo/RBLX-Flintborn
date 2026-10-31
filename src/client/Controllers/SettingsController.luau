@@ -156,7 +156,7 @@ local function startCapture(id: string)
 			local overrides = Keybinds.Assign(keyDraft, id, key)
 			if overrides then
 				keyDraft = overrides
-				keyNote = ("%s → %s"):format(Keybinds.Get(id).label, SettingsWindow.KeyText(key))
+				keyNote = ("%s is now %s"):format(Keybinds.Get(id).label, SettingsWindow.KeyText(key))
 			end
 		else
 			keyNote = ("%s is kept for movement, chat or menus."):format(SettingsWindow.KeyText(key))

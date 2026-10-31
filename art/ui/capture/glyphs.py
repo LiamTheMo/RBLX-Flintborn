@@ -36,12 +36,13 @@ GLYPHS = {
     "check": ("check", "solid"),
     "anvil": ("anvil", "solid"),
     "book": ("journal", "line"),
-    "trophy": ("trophy", "solid"),
+    "trophy": ("trophy", "line"),
     "map_pin": ("map_pin", "solid"),
     "backpack": ("backpack", "solid"),
     "chest": ("chest", "line"),
     "hammer": ("hammer", "solid"),
     "compass": ("compass", "line"),
+    "compass_rose": ("compass_arrow", "line"),
 }
 
 

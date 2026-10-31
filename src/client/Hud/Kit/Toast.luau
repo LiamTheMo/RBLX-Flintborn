@@ -25,7 +25,9 @@ Toast.__index = Toast
 Toast.ICONS = { quest = "scroll", item = "gift", info = "exclamation", warn = "warning" }
 
 -- props: rect | size (430 × 84), kind, title, text, icon, actions ({{label,
--- onPress}}), onPress, onClose, zIndex, name.
+-- onPress, variant}}; two fit beside the text, e.g. Accept (primary) and
+-- Decline (secondary)), actionWidth (96), hideClose (no ✕: the actions answer
+-- it), onPress, onClose, zIndex, name.
 function Toast.new(parent: Instance, props)
 	local w, h = Core.Size(props, Tokens.Space("toastW", 430), Tokens.Space("toastH", 84))
 	local base = Core.Root(parent, "Toast", "toast.frame", props, w, h)
@@ -38,9 +40,9 @@ function Toast.new(parent: Instance, props)
 		name = "Emblem",
 	})
 	local x = 22 + s + 14
-	local right = w - 44
+	local right = w - (if props.hideClose then 20 else 44)
 	for index, action in props.actions or {} do
-		local bw = 96
+		local bw = props.actionWidth or 96
 		table.insert(
 			self.actions,
 			Button.new(base.visual, {
@@ -78,6 +80,7 @@ function Toast.new(parent: Instance, props)
 	end
 	local c = 22
 	self.close = Core.Make("TextButton", {
+		Visible = not props.hideClose,
 		Name = "Close",
 		AutoButtonColor = false,
 		BackgroundTransparency = 1,

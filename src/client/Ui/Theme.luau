@@ -16,21 +16,14 @@ local KitTokens = require(script.Parent.Parent.Hud.Kit.Tokens)
 
 local Theme = {}
 
--- Retired: the old dark palette, still read by NavController's legacy bar. New
--- UI uses the kit's tokens; delete these once nothing reads them.
-Theme.Colors = {
-	Panel = Color3.fromRGB(24, 20, 17),
-	Card = Color3.fromRGB(38, 32, 27),
-	Button = Color3.fromRGB(110, 70, 30),
-	ButtonDisabled = Color3.fromRGB(50, 44, 38),
-	Text = Color3.fromRGB(235, 226, 212),
-	Heading = Color3.fromRGB(255, 214, 150),
-	Good = Color3.fromRGB(160, 230, 160),
-	Warn = Color3.fromRGB(255, 170, 120),
+-- The plain look of UI built without the kit (NavController's fallback bar, used
+-- only if the kit fails to load): literal values, so it needs nothing else.
+Theme.FALLBACK = {
+	panel = Color3.fromRGB(252, 218, 177),
+	text = Color3.fromRGB(34, 10, 1),
+	font = Enum.Font.GothamBold,
+	textSize = 12,
 }
-
-Theme.Fonts = { Body = Enum.Font.GothamMedium, Bold = Enum.Font.GothamBold, Title = Enum.Font.GothamBlack }
-Theme.TextSize = { Small = 12, Body = 14, Heading = 16, Title = 20 }
 -- Roblox mobile guidance: touch targets of at least 44 px.
 Theme.TOUCH_TARGET = 44
 

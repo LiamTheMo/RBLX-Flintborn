@@ -36,6 +36,8 @@ function BottomBar.new(parent: Instance, layout)
 		text = "",
 		role = "hudSmall",
 		textSize = cfg.textSize,
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
 		align = "Right",
 	})
 	self.xpBar = Kit.Bar.new(self.root, { name = "XpBar", rect = cfg.xp, fill = "xp" })
@@ -45,6 +47,8 @@ function BottomBar.new(parent: Instance, layout)
 		text = "",
 		role = "hudSmall",
 		textSize = cfg.textSize,
+		-- Over the world: a paper outline keeps it readable on any scene.
+		outline = true,
 		scaled = true,
 	})
 

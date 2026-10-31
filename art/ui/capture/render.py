@@ -582,6 +582,13 @@ def draw_image(painter, node, box, clip):
         a[..., 3] *= np.asarray(mask, np.float32) / 255
         out = Image.fromarray(a.astype(np.uint8), "RGBA")
     out = tint(out, p.get("ImageColor3"), p.get("ImageTransparency", 0))
+    grad = node.first("UIGradient")
+    if grad and grad.props.get("Enabled") is not False:
+        # The gradient's transparency over the image (a ring's wipe).
+        layer = gradient_layer(node, out.width, out.height, (255, 255, 255, 255))
+        a = np.asarray(out, np.float32).copy()
+        a[..., 3] *= layer[..., 3] / 255
+        out = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
     painter.composite(out, clip, (ox, oy))
 
 

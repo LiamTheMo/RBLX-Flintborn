@@ -8,6 +8,7 @@
 local SpriteLoader = require(script.Parent.Parent.SpriteLoader)
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
+local Tokens = require(script.Parent.Tokens)
 
 local Portrait = {}
 Portrait.__index = Portrait
@@ -17,13 +18,16 @@ Portrait.__index = Portrait
 Portrait.WINDOW = {
 	square = { 0.2, 0.22, 0.6, 0.58 },
 	round = { 0.19, 0.2, 0.62, 0.6 },
+	none = { 0, 0, 1, 1 },
 }
 
 function Portrait.Content(userId: number): string
 	return ("rbxthumb://type=AvatarHeadShot&id=%d&w=150&h=150"):format(userId)
 end
 
--- props: rect | size, userId, frame ("square" | "round"), zIndex, name.
+-- props: rect | size, userId, frame ("square" | "round" | "none": the bare
+-- photo on its backdrop, as the M04 / M05 rows draw it), backdrop (colour
+-- token behind the photo; default photoBackdrop for "none"), zIndex, name.
 function Portrait.new(parent: Instance, props)
 	local frame = props.frame or "square"
 	local role = if frame == "round" then "portrait.round" else "portrait.square"
@@ -40,10 +44,17 @@ function Portrait.new(parent: Instance, props)
 		Size = UDim2.fromScale(window[3], window[4]),
 		ZIndex = base.z,
 	}, base.visual)
+	local backdrop = props.backdrop or (if frame == "none" then "photoBackdrop" else nil)
+	if backdrop then
+		self.headshot.BackgroundTransparency = 0
+		self.headshot.BackgroundColor3 = Tokens.Color(backdrop)
+	end
 	if frame == "round" then
 		Core.Make("UICorner", { CornerRadius = UDim.new(0.5, 0) }, self.headshot)
 	end
-	Art.Plate(base.visual, role, w, h, { z = base.z + 1 })
+	if frame ~= "none" then
+		Art.Plate(base.visual, role, w, h, { z = base.z + 1 })
+	end
 	self:SetUser(props.userId)
 	return self
 end

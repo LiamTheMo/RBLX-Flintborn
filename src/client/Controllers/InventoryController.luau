@@ -95,7 +95,7 @@ end
 local function describe(slot)
 	local def = ItemCatalog.Get(slot.catalogId)
 	local name = def and def.name or slot.catalogId
-	local text = (slot.permanent and "★ " or "") .. name .. (slot.quantity and (" ×" .. slot.quantity) or "")
+	local text = name .. (slot.quantity and (" ×" .. slot.quantity) or "") .. (slot.permanent and " (Permanent)" or "")
 	if slot.qualityRoll and slot.qualityRoll ~= 0 then
 		text ..= ("  (%+.1f%%)"):format(slot.qualityRoll * 100)
 	end

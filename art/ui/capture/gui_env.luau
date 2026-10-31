@@ -611,6 +611,14 @@ local EVENTS = {
 	PlayerAdded = true,
 	PlayerRemoving = true,
 	CharacterAdded = true,
+	CharacterRemoving = true,
+	Move = true,
+	Button1Down = true,
+	Button1Up = true,
+	WheelForward = true,
+	WheelBackward = true,
+	HealthChanged = true,
+	Died = true,
 	OnClientEvent = true,
 	OnClientInvoke = true,
 	RenderStepped = true,
@@ -980,6 +988,14 @@ end
 function Methods:IsKeyDown()
 	return false
 end
+-- Player:GetMouse(): a mouse at the screen's centre with fireable signals.
+function Methods:GetMouse()
+	local mouse = Instance.new("Mouse")
+	rawProps(mouse).X = 836
+	rawProps(mouse).Y = 470
+	rawProps(mouse).Hit = rawProps(rawProps(service("Workspace")).CurrentCamera).CFrame
+	return mouse
+end
 function Methods:GetMouseLocation()
 	return Vector2.new(0, 0)
 end
@@ -1155,6 +1171,19 @@ rawProps(service("GuiService")).TopbarInset = Rect.new(0, 0, 1672, 58)
 rawProps(service("GuiService")).ReducedMotionEnabled = false
 rawProps(service("Workspace")).CurrentCamera = Instance.new("Camera")
 rawProps(rawProps(service("Workspace")).CurrentCamera).ViewportSize = Vector2.new(1672, 941)
+-- A camera looking north from above the island's middle (CFrame, LookVector,
+-- Position), enough for HUD code that reads the view.
+rawProps(rawProps(service("Workspace")).CurrentCamera).CFrame = {
+	__type = "CFrame",
+	Position = Vector3.new(0, 50, 0),
+	LookVector = Vector3.new(0, 0, -1),
+	RightVector = Vector3.new(1, 0, 0),
+	UpVector = Vector3.new(0, 1, 0),
+	X = 0,
+	Y = 50,
+	Z = 0,
+}
+rawProps(rawProps(service("Workspace")).CurrentCamera).FieldOfView = 70
 
 -- Module tree and require ---------------------------------------------------------------
 
