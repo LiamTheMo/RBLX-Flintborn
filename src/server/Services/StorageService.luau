@@ -30,6 +30,7 @@ local function view(chest)
 		local def = ItemCatalog.Get(item.catalogId)
 		table.insert(entries, {
 			index = index,
+			catalogId = item.catalogId,
 			name = def and def.name or item.catalogId,
 			rarity = def and def.rarity or "Common",
 			quantity = item.quantity,

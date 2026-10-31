@@ -67,7 +67,10 @@ local function snapshot(player: Player)
 		view.overflow = {}
 		for catalogId, quantity in overflow.deleted or {} do
 			local def = ItemCatalog.Get(catalogId)
-			table.insert(view.overflow, { name = def and def.name or catalogId, quantity = quantity })
+			table.insert(
+				view.overflow,
+				{ catalogId = catalogId, name = def and def.name or catalogId, quantity = quantity }
+			)
 		end
 	end
 	table.sort(view.materials, function(a, b)

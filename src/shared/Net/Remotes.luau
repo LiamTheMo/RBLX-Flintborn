@@ -38,7 +38,8 @@ local DEFINITIONS = {
 	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
-	CorpseOpened = "RemoteEvent", -- server -> client: (corpseId, contents)
+	-- server -> client: (corpseId, {{index, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
+	CorpseOpened = "RemoteEvent",
 	CorpseTake = "RemoteFunction", -- (corpseId, index) -> ok, reason
 	DeathSummary = "RemoteEvent", -- server -> client: what dropped and what was kept
 	ExtractionEvent = "RemoteEvent", -- server -> all: an extraction countdown started
@@ -57,7 +58,7 @@ local DEFINITIONS = {
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
 	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
 	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach
-	ChestOpened = "RemoteEvent", -- server -> client: (chestId, contents)
+	ChestOpened = "RemoteEvent", -- server -> client: (chestId, {{index, catalogId, name, rarity, quantity?, permanent?}})
 	ChestTake = "RemoteFunction", -- (chestId, index) -> ok, reason
 	ChestPut = "RemoteFunction", -- (chestId, area, index) -> ok, reason
 	EventAnnounced = "RemoteEvent", -- server -> all: (event view, isCatchUp?)
@@ -83,7 +84,8 @@ local DEFINITIONS = {
 	TradeLock = "RemoteFunction", -- (sessionId) -> ok, reason
 	TradeConfirm = "RemoteFunction", -- (sessionId) -> ok, reason
 	TradeCancel = "RemoteFunction", -- (sessionId) -> ok
-	TradeChanged = "RemoteEvent", -- server -> client: invite, session state, closed
+	-- server -> client: invite, session state (offer items {key, catalogId, name, quantity?, permanent?}), closed
+	TradeChanged = "RemoteEvent",
 	SaveCamera = "RemoteEvent", -- client -> server: (zoom) preference, throttled
 	SaveSettings = "RemoteEvent", -- client -> server: {settingKey = value} changes (SettingsRules)
 	SaveKeybinds = "RemoteEvent", -- client -> server: {actionId = keyName} overrides of the default keys

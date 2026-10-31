@@ -12,7 +12,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
@@ -34,10 +33,6 @@ local confirmReady = nil
 local gemsBox = nil
 local invite = nil
 local answering = nil
--- Catalog ids of my lobby-backpack slots ({[key] = catalogId}) from the last
--- vault snapshot, so the offer panels can draw item art.
-local slotItems = {}
-local namedItems = nil
 -- Bumped by every render; a render that yielded and is no longer the latest drops.
 local renderToken = 0
 
@@ -75,32 +70,12 @@ local function sendOffer(keys, materials, gems: number)
 	end
 end
 
--- The catalog id an offered item shows: a vault material's key names it; my
--- backpack slots come from the snapshot; the partner's are found by name
--- (the trade payload carries names only).
-local function itemIdOf(item): string?
-	local material = TradeRules.MaterialOf(item.key)
-	if material then
-		return material
-	end
-	if slotItems[item.key] then
-		return slotItems[item.key]
-	end
-	if namedItems == nil then
-		namedItems = {}
-		for id, def in ItemCatalog.Items do
-			namedItems[def.name] = id
-		end
-	end
-	local name = string.gsub(item.name or "", "^★ ", "")
-	return namedItems[name]
-end
-
 -- One side of the trade for the offer panel.
 local function side(offer, title: string, icon: string, locked: boolean, confirmed: boolean)
 	local items = {}
 	for _, item in offer.items do
-		table.insert(items, { itemId = itemIdOf(item), name = item.name, quantity = item.quantity })
+		-- The server names every offered item by its catalog id (TradeService.describe).
+		table.insert(items, { itemId = item.catalogId, name = item.name, quantity = item.quantity })
 	end
 	return {
 		title = title,
@@ -165,9 +140,6 @@ local function offerables(view)
 	local offered, offeredMaterials = myOffer()
 	local backpack = {}
 	for _, item in view.backpack do
-		if item.key then
-			slotItems[item.key] = item.catalogId
-		end
 		if item.key and TradeRules.IsTradeableSlot(item) then
 			table.insert(backpack, item)
 		end

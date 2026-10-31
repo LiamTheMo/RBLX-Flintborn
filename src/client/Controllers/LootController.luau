@@ -6,7 +6,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Kit = require(script.Parent.Parent.Hud.Kit)
@@ -22,24 +21,9 @@ local player = Players.LocalPlayer
 local ui = {}
 local openBodyId = nil
 
--- The catalog id of an item the server names only by its display name, when
--- exactly one catalog item has that name (for its icon); nil otherwise.
-local byName = nil
-function LootController.CatalogIdFor(name: string?): string?
-	if byName == nil then
-		byName = {}
-		for catalogId, def in ItemCatalog.Items do
-			if type(def) == "table" and def.name then
-				byName[def.name] = if byName[def.name] == nil then catalogId else false
-			end
-		end
-	end
-	local found = name and byName[name]
-	return if type(found) == "string" then found else nil
-end
-
 -- One item row: the item's art, name, rarity and count, and an action button
--- over the row's right end.
+-- over the row's right end. `entry.catalogId` (sent by the server with every body
+-- and chest entry) picks the art.
 function LootController.ItemRow(parent: Instance, order: number, w: number, entry, action: string, onAction)
 	local h = LootController.ROW_H
 	local holder = Kit.Core.Make("Frame", {
@@ -51,7 +35,7 @@ function LootController.ItemRow(parent: Instance, order: number, w: number, entr
 	Kit.ListRow.new(holder, {
 		name = "Row",
 		rect = { 0, 0, w, h },
-		itemId = entry.catalogId or LootController.CatalogIdFor(entry.name) or entry.name,
+		itemId = entry.catalogId,
 		title = entry.name,
 		subtitle = entry.rarity .. (if entry.permanent then " · Permanent" else ""),
 		value = if entry.quantity then "×" .. entry.quantity else nil,

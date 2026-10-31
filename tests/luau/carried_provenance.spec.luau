@@ -307,9 +307,16 @@ local handlers = {}
 Remotes.Handle = function(name, fn)
 	handlers[name] = fn
 end
-local silentRemote = { FireClient = function() end, FireAllClients = function() end }
-Remotes.Get = function()
-	return silentRemote
+-- The last payload each remote sent to each player: sent[name][player] = {...}.
+local sent = {}
+Remotes.Get = function(name)
+	sent[name] = sent[name] or {}
+	return {
+		FireClient = function(_, player, ...)
+			sent[name][player] = table.pack(...)
+		end,
+		FireAllClients = function() end,
+	}
 end
 
 local InventoryService = require(Server.Services.InventoryService)
@@ -450,6 +457,30 @@ test("a body looted by another player keeps each stack's carried units", functio
 	expectEq(held(other, "IronBar").carried, 100, "with the other 100 carried")
 	expect(handlers.CorpseTake(other, bodyId, 1), "the Wood looted")
 	expectEq(held(other, "Wood").carried, nil, "gathered Wood stays eligible")
+end)
+
+test("body and chest listings name each item by its catalog id", function()
+	local alt = inRun({ stack("IronBar", 50), stack("Wood", 40) })
+	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
+	local bodyId = lastGuid
+	local main = inRun({})
+	expect(handlers.CorpseTake(main, bodyId, 1), "looted")
+	local payload = sent.CorpseOpened[main]
+	expectEq(payload and payload[1], bodyId, "the body's id")
+	local entry = payload and payload[2][1]
+	expectEq(entry and entry.catalogId, "Wood", "the remaining entry carries its catalog id")
+	expectEq(entry and entry.name, "Wood", "and its display name")
+	expectEq(entry and entry.index, 1, "and its index")
+
+	local part = { Position = Vector3.new(3, 5, 0) }
+	stubs.BuildingService.Placed:Fire({ id = "chest-ids", pieceId = "Chest", part = part, position = part.Position })
+	local storer = inRun({ stack("IronOre", 5) })
+	expect(handlers.ChestPut(storer, "chest-ids", slotOf(storer, "IronOre")), "stored")
+	payload = sent.ChestOpened[storer]
+	expectEq(payload and payload[1], "chest-ids", "the chest's id")
+	entry = payload and payload[2][1]
+	expectEq(entry and entry.catalogId, "IronOre", "chest entries carry catalog ids")
+	expectEq(entry and entry.quantity, 5, "and quantities")
 end)
 
 test("a chest keeps the carried units of what goes in and comes out", function()
