@@ -1,13 +1,23 @@
--- Shared UI theme and helpers (GDD §11, §25). One palette, type scale and builder
--- for new screens; rarity always shows its name with its colour. Accessibility
--- choices replicate as player attributes (SettingsService): UiScale, ColourBlind,
--- ReducedMotion and Subtitles.
+-- Shared UI helpers (GDD §11, §25): accessibility options, the input check, the
+-- shared top-centre banner column and alert subtitles. Screens take colours,
+-- fonts and sizes from the UI kit's tokens (Hud/Kit, docs/ui/KIT.md); rarity
+-- always shows its name with its colour. Accessibility choices replicate as
+-- player attributes (SettingsService): UiScale, ColourBlind, ReducedMotion and
+-- Subtitles.
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+-- Only the kit's scale and tokens: the kit's components require this module.
+local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
+local KitTokens = require(script.Parent.Parent.Hud.Kit.Tokens)
 
 local Theme = {}
 
+-- Retired: the old dark palette, still read by NavController's legacy bar. New
+-- UI uses the kit's tokens; delete these once nothing reads them.
 Theme.Colors = {
 	Panel = Color3.fromRGB(24, 20, 17),
 	Card = Color3.fromRGB(38, 32, 27),

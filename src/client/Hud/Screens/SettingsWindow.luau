@@ -231,7 +231,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		icon = "ink:refresh",
 		iconSize = 28,
 		iconGap = 17,
-		textSize = 22,
+		-- Width-matched to the mockup's RESET (65 px; Merriweather Bold is wider).
+		textSize = 20.5,
 		zIndex = 8,
 		onPress = function()
 			self:CloseDropdowns()

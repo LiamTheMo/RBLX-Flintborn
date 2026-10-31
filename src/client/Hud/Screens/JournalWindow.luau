@@ -48,8 +48,10 @@ local LIST = { 59, 101, 379, 515 }
 local OBJECTIVE = { 594, 62 }
 local OBJECTIVE_GAP = 3
 local OBJECTIVES = { 450, 278, 608, 199 }
--- Where a row's subtitle sits (the kit row centres it lower than the mockup).
-local SUBTITLE_Y = { quest = 49, objective = 34 }
+-- Where a quest row's title and subtitle sit (the kit row centres them lower
+-- than the mockup; it has no prop for their height in the row yet).
+local QUEST_TEXT_Y = { 10, 44 }
+local OBJECTIVE_SUBTITLE_Y = 31
 local TILE = { 92, 104 }
 local TILE_PITCH = 98
 local MAP = { 51, 108, 991, 512 }
@@ -457,7 +459,8 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 			self:Select(entry.id)
 		end,
 	}))
-	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, SUBTITLE_Y.quest)
+	row.title.Position = UDim2.fromOffset(row.title.Position.X.Offset, QUEST_TEXT_Y[1])
+	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, QUEST_TEXT_Y[2])
 	local tab = if self.tab == "map" then "quests" else self.tab
 	row:SetSelected(entry.id == self.selected[tab])
 	local v = row.base.visual
@@ -551,7 +554,7 @@ function JournalWindow:_objective(content: Instance, objective, index: number)
 		trailing = 44,
 		zIndex = Z + 1,
 	}))
-	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, SUBTITLE_Y.objective)
+	row.subtitle.Position = UDim2.fromOffset(row.subtitle.Position.X.Offset, OBJECTIVE_SUBTITLE_Y)
 	-- A display, not a control: the server decides when an objective is done.
 	Kit.Checkbox.new(row:Trailing(), {
 		name = "Check",

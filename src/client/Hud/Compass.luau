@@ -1,12 +1,14 @@
--- Top-centre compass strip: heading letters and ticks that scroll with the
--- camera's yaw, a fixed centre marker, and a row of waypoint icons below for known
--- points of interest. HudModel does the projection; this only places things.
+-- Top-centre compass on the kit's paper plaque (Kit.Panel "plaque"): heading
+-- letters in the kit's ink type and ink tick rules (Kit.Divider) that scroll
+-- with the camera's yaw, a fixed leather arrow (Kit.Icon) at the centre, and
+-- the waypoint icons of known points of interest (Kit.Icon) under the plaque.
+-- HudModel does the projection; this only places things.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local Kit = require(script.Parent.Kit)
 local Layout = require(script.Parent.Layout)
-local Widgets = require(script.Parent.Widgets)
 
 local Compass = {}
 Compass.__index = Compass
@@ -17,95 +19,79 @@ Compass.FADE_FROM = 0.8
 function Compass.new(parent: Instance, layout)
 	local cfg = layout.compass
 	local self = setmetatable({ cfg = cfg, marks = {}, waypoints = {} }, Compass)
-	self.root = Widgets.Panel(cfg, {
-		Name = "Compass",
-		Size = UDim2.fromOffset(cfg.size[1], cfg.size[2]),
-	}, parent)
+	self.root = Instance.new("Frame")
+	self.root.Name = "Compass"
+	self.root.BackgroundTransparency = 1
 	Layout.Place(self.root, cfg)
-	-- Gold end triangles, as on the compass art.
-	local triangles = cfg.triangles
-	for _, centre in triangles.centres do
-		Widgets.Make("TextLabel", {
-			Name = "EndTriangle",
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(centre[1], centre[2]),
-			Size = UDim2.fromOffset(triangles.size[1], triangles.size[2]),
-			Text = "▲",
-			TextColor3 = Layout.Color(triangles.color),
-			TextScaled = true,
-			TextStrokeColor3 = Layout.Color("outline"),
-			TextStrokeTransparency = 0.3,
-			Font = Enum.Font.GothamBold,
-			ZIndex = 4,
-		}, self.root)
-	end
-	self.track = Widgets.Make("Frame", {
-		Name = "Track",
-		BackgroundTransparency = 1,
-		ClipsDescendants = true,
-		Position = Layout.Position(cfg.track),
-		Size = Layout.Size(cfg.track),
-		-- Above the strip's art (an opaque parchment strip on the parchment HUD).
-		ZIndex = 4,
-	}, self.root)
+	self.root.Parent = parent
+	self.panel = Kit.Panel.new(self.root, {
+		name = "Plaque",
+		rect = { 0, 0, cfg.size[1], cfg.size[2] },
+		variant = "plaque",
+		pad = 0,
+	})
+	self.track = Instance.new("Frame")
+	self.track.Name = "Track"
+	self.track.BackgroundTransparency = 1
+	self.track.ClipsDescendants = true
+	self.track.Position = Layout.Position(cfg.track)
+	self.track.Size = Layout.Size(cfg.track)
+	self.track.ZIndex = 8
+	self.track.Parent = self.root
 	self.centre = cfg.track[3] / 2
 	self.pixelsPerDegree = self.centre / cfg.halfSpan
 	local count = math.floor(cfg.halfSpan * 2 / cfg.minorStep) + 2
 	for index = 1, count do
-		local notch = Widgets.Make("Frame", {
-			Name = "Notch" .. index,
-			AnchorPoint = Vector2.new(0.5, 0),
-			BackgroundColor3 = Layout.Color(cfg.notchColor or "body"),
-			BackgroundTransparency = 0.3,
-			BorderSizePixel = 0,
-			Size = UDim2.fromOffset(2, cfg.minorTick.h),
-			ZIndex = 3,
-		}, self.track)
-		local letter = Widgets.Text(cfg.letter, {
-			Name = "Letter" .. index,
-			AnchorPoint = Vector2.new(0.5, 0),
-			Size = UDim2.fromOffset(44, cfg.letter.h),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextTruncate = Enum.TextTruncate.None,
-		}, self.track)
-		self.marks[index] = { notch = notch, letter = letter }
+		local notch = Kit.Divider.new(self.track, {
+			name = "Notch" .. index,
+			rect = { 0, cfg.minorTick.y, 2, cfg.minorTick.h },
+			variant = "ink",
+			anchorPoint = Vector2.new(0.5, 0),
+			zIndex = 8,
+		})
+		local letter = Kit.Text.new(self.track, {
+			name = "Letter" .. index,
+			rect = { 0, cfg.letter.y, 44, cfg.letter.h },
+			text = "",
+			role = "hudSmall",
+			textSize = cfg.letter.size,
+			align = "Center",
+			anchorPoint = Vector2.new(0.5, 0),
+			zIndex = 9,
+		})
+		self.marks[index] = { notch = notch.root, letter = letter.root }
 	end
-	local marker = Widgets.Sprite(cfg.marker.sprite, {
-		Name = "Marker",
-		Position = Layout.Position(cfg.marker.rect),
-		Size = Layout.Size(cfg.marker.rect),
-		ZIndex = 6,
-	}, self.root)
-	if cfg.marker.tint and marker:IsA("ImageLabel") then
-		marker.ImageColor3 = Layout.Color(cfg.marker.tint)
-	end
-	self.waypointRow = Widgets.Make("Frame", {
-		Name = "Waypoints",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(cfg.track[1], cfg.waypoints.y),
-		Size = UDim2.fromOffset(cfg.track[3], cfg.waypoints.size),
-		ZIndex = 2,
-	}, self.root)
+	self.marker = Kit.Icon.new(self.root, {
+		name = "Marker",
+		rect = cfg.marker,
+		icon = "arrow_down",
+		tint = "leather",
+		zIndex = 10,
+	})
+	self.waypointRow = Instance.new("Frame")
+	self.waypointRow.Name = "Waypoints"
+	self.waypointRow.BackgroundTransparency = 1
+	self.waypointRow.Position = UDim2.fromOffset(cfg.track[1], cfg.waypoints.y)
+	self.waypointRow.Size = UDim2.fromOffset(cfg.track[3], cfg.waypoints.size)
+	self.waypointRow.Parent = self.root
 	return self
 end
 
--- Replaces the waypoint set: array of {id, icon, label?}. Positions come in Update.
+-- Replaces the waypoint set: array of {id, icon, size?}. Positions come in Update.
 function Compass:SetWaypoints(list)
 	local keep = {}
 	for _, waypoint in list do
 		keep[waypoint.id] = true
 		if self.waypoints[waypoint.id] == nil then
 			local size = waypoint.size or self.cfg.waypoints.size
-			local icon = Widgets.Sprite(waypoint.icon, {
-				Name = "Waypoint",
-				AnchorPoint = Vector2.new(0.5, 1),
-				Size = UDim2.fromOffset(size, size),
-				ZIndex = 3,
-			}, self.waypointRow)
-			if icon:IsA("ImageLabel") then
-				icon.ImageColor3 = Layout.Color(self.cfg.waypoints.tint)
-			end
+			local icon = Kit.Icon.new(self.waypointRow, {
+				name = "Waypoint",
+				rect = { 0, 0, size, size },
+				icon = waypoint.icon,
+				anchorPoint = Vector2.new(0.5, 1),
+				zIndex = 6,
+			})
+			icon.root.Visible = false
 			self.waypoints[waypoint.id] = icon
 		end
 	end
@@ -127,17 +113,16 @@ function Compass:Update(heading: number, bearings)
 		slot.letter.Visible = mark ~= nil and mark.label ~= nil
 		if mark then
 			local x = self.centre + mark.offset * self.pixelsPerDegree
-			local tickCfg = if mark.major then cfg.majorTick else cfg.minorTick
-			slot.notch.Position = UDim2.fromOffset(x, tickCfg.y)
-			slot.notch.Size = UDim2.fromOffset(2, tickCfg.h)
+			local tick = if mark.major then cfg.majorTick else cfg.minorTick
+			slot.notch.Position = UDim2.fromOffset(x, tick.y)
+			slot.notch.Size = UDim2.fromOffset(2, tick.h)
 			if mark.label then
 				local edge = math.abs(mark.offset) / cfg.halfSpan
 				local fade = math.clamp((edge - Compass.FADE_FROM) / (1 - Compass.FADE_FROM), 0, 1)
+				local cardinal = #mark.label == 1
 				slot.letter.Text = mark.label
-				local cardinal = mark.label == "N"
-				local raise = if cardinal then cfg.letter.cardinalRaise else 0
-				slot.letter.TextSize = if cardinal then cfg.letter.cardinalTextSize else cfg.letter.textSize
-				slot.letter.Position = UDim2.fromOffset(x, cfg.letter.y - raise)
+				slot.letter.TextSize = if cardinal then cfg.letter.cardinalSize else cfg.letter.size
+				slot.letter.Position = UDim2.fromOffset(x, cfg.letter.y - (if cardinal then cfg.letter.raise else 0))
 				slot.letter.TextTransparency = fade * 0.8
 			end
 		end
@@ -145,9 +130,9 @@ function Compass:Update(heading: number, bearings)
 	for id, icon in self.waypoints do
 		local bearing = bearings[id]
 		local offset = bearing and HudModel.CompassOffset(heading, bearing, cfg.halfSpan)
-		icon.Visible = offset ~= nil
+		icon.root.Visible = offset ~= nil
 		if offset then
-			icon.Position = UDim2.fromOffset(self.centre + offset * self.pixelsPerDegree, self.cfg.waypoints.size)
+			icon.root.Position = UDim2.fromOffset(self.centre + offset * self.pixelsPerDegree, cfg.waypoints.size)
 		end
 	end
 end

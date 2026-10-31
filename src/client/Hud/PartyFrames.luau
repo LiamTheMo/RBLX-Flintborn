@@ -87,16 +87,15 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 				entry.row:Destroy()
 			end
 			entry.row = Kit.PlayerRow.new(entry.holder, {
-				name = "Row",
+				-- PlayerRow names its root after the player (`name` is both).
+				name = member.name,
 				rect = { 0, 0, cfg.header[3], cfg.rowHeight },
 				userId = member.userId,
-				name_ = nil,
 				compact = true,
 				portraitSize = cfg.portrait,
 				rule = if index < count then "hairline" else false,
 				zIndex = 8,
 			})
-			entry.row:Set({ userId = member.userId, name = member.name })
 			-- The name sits over the health bar instead of centred on the row.
 			local label = entry.row.content:FindFirstChild("Name")
 			if label and label:IsA("TextLabel") then
