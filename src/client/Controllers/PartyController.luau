@@ -2,20 +2,20 @@
 -- Builds Hud/Screens/PartyWindow on first open and feeds it from the real
 -- party system: LobbyController's party view (PartyChanged), the players in
 -- this server and their Level attributes. Every action goes to the server
--- through LobbyController (PartyAction: invite, accept, decline, leave,
--- ready), which validates it; the window only shows what the server answered.
+-- through LobbyController (PartyAction: invite, accept, decline, leave), which
+-- validates it; the window only shows what the server answered.
 --
 -- Contract (ARCHITECTURE §4.9): Open(section?), Toggle(), IsOpen().
 --   section "invite" starts gamepad selection on the invite list (the HUD's
---   add-player button), nil on your Ready toggle.
+--   add-player button), nil on the window's first control.
 --
 -- Nothing polls: the window redraws on PartyChanged, players joining or
 -- leaving, a Level change, a search, or an answer to a request. The only timer
 -- is the "Created" clock, which ticks once a minute while the window is open.
 --
--- This is the one place that sends ready toggles and invite answers and keeps
--- their pending state (the HUD and the Play window call SetReady / Answer and
--- read ReadyPending / ShownReady / AnswerBusy; Changed fires when it moves).
+-- This is the one place that sends invite answers and keeps their pending
+-- state (the HUD calls Answer and reads AnswerBusy; Changed fires when it
+-- moves).
 -- A refusal is reported once: here as a toast (or by the caller when it asks
 -- for `quiet`), while Reporting() tells the HUD not to toast the same
 -- LobbyController status line again.
@@ -34,12 +34,10 @@ local PartyWindow = require(Hud.Screens.PartyWindow)
 
 local PartyController = {}
 
--- Fires when a ready toggle or an invite answer starts or ends.
+-- Fires when an invite answer starts or ends.
 PartyController.Changed = Signal.new()
 
 PartyController.CLOCK_SECONDS = 60
--- A ready request whose view never arrives stops waiting after this long.
-PartyController.READY_TIMEOUT = 8
 
 local player = Players.LocalPlayer
 local window = nil
@@ -48,8 +46,6 @@ local query = ""
 -- Requests on their way to the server.
 local pendingInvites: { [number]: boolean } = {}
 local busyInvites: { [string]: boolean } = {}
-local readyPending: boolean? = nil
-local readyToken = 0
 local leaveBusy = false
 -- Requests in flight whose refusal this module reports itself.
 local reporting = 0
@@ -90,7 +86,6 @@ local function data()
 		levels = levels(),
 		pendingInvites = pendingInvites,
 		busyInvites = busyInvites,
-		readyPending = readyPending,
 		leaveBusy = leaveBusy,
 		friends = friendsAllowed,
 	})
@@ -151,42 +146,6 @@ local function answer(partyId: string, accept: boolean)
 			failed(reason)
 		end
 		changed()
-	end)
-end
-
--- Asks for your ready flag; `onFailed(reason)` replaces the toast (the Play
--- window shows refusals under its map instead).
-local function setReady(ready: boolean, onFailed: ((string?) -> ())?)
-	if readyPending ~= nil then
-		return
-	end
-	readyPending = ready
-	readyToken += 1
-	local token = readyToken
-	changed()
-	task.spawn(function()
-		local ok, reason = request(LobbyController.SetReady, ready)
-		if token ~= readyToken then
-			return
-		end
-		if not ok then
-			readyPending = nil
-			if onFailed then
-				onFailed(reason)
-			else
-				failed(reason)
-			end
-		elseif PartyModel.ReadySettled(LobbyController.PartyView(), readyPending) then
-			readyPending = nil
-		end
-		changed()
-	end)
-	-- The server's view normally lands before the answer; never wait forever.
-	task.delay(PartyController.READY_TIMEOUT, function()
-		if token == readyToken and readyPending ~= nil then
-			readyPending = nil
-			changed()
-		end
 	end)
 end
 
@@ -263,9 +222,6 @@ local function ensureWindow()
 				answer(partyId, false)
 			end,
 			onLeave = leave,
-			onReady = function(ready: boolean)
-				setReady(ready)
-			end,
 			onInviteFriends = inviteFriends,
 			onSearch = function(text)
 				query = text
@@ -280,12 +236,7 @@ local function ensureWindow()
 	return window
 end
 
-local function onView(view)
-	if readyPending ~= nil and PartyModel.ReadySettled(view, readyPending) then
-		readyPending = nil
-		changed()
-		return
-	end
+local function onView()
 	refresh()
 end
 
@@ -295,30 +246,9 @@ local function watchLevel(other: Player)
 	end
 end
 
--- Sets your advisory ready flag through the server (one request at a time;
--- the HUD, the Party window and the Play window share it). `onFailed(reason)`
--- reports a refusal instead of the toast.
-function PartyController.SetReady(ready: boolean, onFailed: ((string?) -> ())?)
-	setReady(ready, onFailed)
-end
-
 -- Accepts or declines an invite (one answer per invite at a time).
 function PartyController.Answer(partyId: string, accept: boolean)
 	answer(partyId, accept)
-end
-
--- The ready value on its way to the server, or nil.
-function PartyController.ReadyPending(): boolean?
-	return readyPending
-end
-
--- Your ready flag as the screens show it: the asked value while it is on its
--- way, else the server's.
-function PartyController.ShownReady(): boolean
-	if readyPending ~= nil then
-		return readyPending
-	end
-	return LobbyController.IsReady()
 end
 
 -- The invites whose answer is on its way ({[partyId] = true}).

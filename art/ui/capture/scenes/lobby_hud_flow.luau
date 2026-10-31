@@ -132,19 +132,19 @@ fire(partyChanged.OnClientEvent, {
 		id = "p1",
 		leader = 2,
 		members = {
-			{ userId = 2, name = "ForestRanger", ready = true },
-			{ userId = 1, name = "LiamTheMo", ready = false },
+			{ userId = 2, name = "ForestRanger" },
+			{ userId = 1, name = "LiamTheMo" },
 		},
 		invited = {},
 	},
 	invites = { { partyId = "p9", from = "RiverFox" } },
-	ready = false,
 	maxSize = 8,
 })
 check(hud.countText.root.Text == "2/8", "party count from PartyChanged")
 check(#hud.parts.members == 2 and #hud.parts.empty == 6, "two members, six free")
-check(hud.parts.members[1]:GetAttribute("LobbyReady") == true, "leader's ready flag")
-check(hud.parts.members[2]:GetAttribute("LobbyReady") == false, "your not-ready flag")
+check(hud.parts.members[1]:FindFirstChild("Status", true) == nil, "no ready dots (D24)")
+check(hud.parts.members[1]:FindFirstChild("Crown", true) ~= nil, "the leader has the crown")
+check(hud.parts.members[1]:FindFirstChild("Tag", true) == nil, "and no Leader tag")
 local function rowFor(root)
 	for _, row in hud.rows do
 		if row.root == root then

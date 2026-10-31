@@ -35,14 +35,13 @@ local view = {
 		leader = 1,
 		createdAt = NOW - 12 * 60,
 		members = {
-			{ userId = 1, name = "LiamTheMo", ready = true },
-			{ userId = 2, name = "ForestRanger", ready = false },
-			{ userId = 3, name = "SunnyVale", ready = true },
+			{ userId = 1, name = "LiamTheMo" },
+			{ userId = 2, name = "ForestRanger" },
+			{ userId = 3, name = "SunnyVale" },
 		},
 		invited = { 4 },
 	},
 	invites = { { partyId = "p9", from = "RiverFox", fromUserId = 6 } },
-	ready = true,
 	maxSize = 8,
 }
 local data = PartyModel.WindowData(view, { userId = 1, name = "LiamTheMo" }, {

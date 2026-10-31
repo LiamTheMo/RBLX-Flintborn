@@ -135,7 +135,7 @@ Scripts: `art/ui/kit/analysis/play/measure_play.py` → `measure_log.txt`
 | Map, marker, RegionPlaque, Details | the destination region: name, biome, difficulty, recommended level, map image, marker position | region config (shared module) | — |
 | PartyRow(s) | party members, leader crown, level | party replica | — |
 | EquipSlot ×6 | the player's hotbar loadout, slots 1–6 | equipment replica | — |
-| PlayButton | requests start of the run for the party | remote to the matchmaking/teleport service | server checks leader, party state, readiness (open q. 2), and teleports |
+| PlayButton | requests start of the run for the party | remote to the matchmaking/teleport service | server checks the leader and party state, and teleports (no Ready step, D24) |
 | CloseButton | closes the window | client | — |
 
 There is no server picker (owner decision).
@@ -146,10 +146,9 @@ There is no server picker (owner decision).
    Options: (a) the row area becomes a scroll region one row tall; (b) compact row
    of up to 8 headshots with the leader crown; (c) the section grows and pushes
    "YOUR EQUIPMENT" down. Default: (a).
-2. Who can press PLAY, and when? Options: leader only, enabled when all members are
-   Ready (Ready is tracked per member on the server, see PartyScreen); or anyone
-   solo. Default: enabled for a solo player and for the leader when all members are
-   ready; disabled otherwise.
+2. Who can press PLAY, and when? **Resolved (D24):** a solo player or the party
+   leader, at any time; other members see PLAY disabled with "The party leader
+   starts the run." There is no Ready step and no ready line in the deploy check.
 3. Feedback after PLAY: text change, spinner, or close the window. Default: button
    goes to the disabled look with "STARTING…" until teleport.
 4. Is the map interactive (several regions to pick)? The mockup shows one region
@@ -161,6 +160,16 @@ There is no server picker (owner decision).
 
 ## Deviations from reference
 
+- **Owner decision D25 (window chrome):** the window uses the Inventory
+  window's size (1187 × 650) and chrome instead of mockup 05's plaque style:
+  the portal icon, "PLAY" at Inventory's title size and position, the plain
+  ink underline, Inventory's clasps and close-button corner, and no raised
+  title plaque. The map sits in an inset panel (Inventory's detail-card
+  style) with the real island art and crater marker. The right column opens
+  with a "SHATTERED CRATER" section heading over a hairline (no plaque), then
+  the detail rows with hairlines, YOUR PARTY and YOUR EQUIPMENT as standard
+  section headers, the six slots and the primary leather PLAY button with the
+  play glyph at the bottom right. The element tree above records the mockup.
 - Owner decision: no server picker (the old lobby had one; the mockup has none).
 - Owner decision: the HUD's Play tile opens this window.
 - In the mockup the HUD hotbar and XP bar under the overlay sit 29–33 px lower than
@@ -181,8 +190,8 @@ There is no server picker (owner decision).
 - **Loadout slots** are selectable: a gamepad reaches them (PLAY up → slots →
   ✕) and the tooltip names the item and its count (R20). Their 1–6 badges show
   only with a mouse or keyboard.
-- **Ready** uses PartyController's shared pending state (M2); a refusal shows
-  under the map only (no second toast, M1).
+- **Ready** was removed (D24): members no longer get a Ready button; a refusal
+  of PLAY shows under the map only (no second toast, M1).
 - **Phones**: "+n more in your backpack" at 16; detail values start further
   left so "10 · Low to Extreme" keeps 9 screen px.
 - Party rows are taken apart through maids (Kit components included, L10).

@@ -62,7 +62,7 @@ session (the GUI or a background one) is driven by only one agent at a time.
 - **Foliage reads from every azimuth.** Never turn leaf cards or rosettes toward the front and rear cameras only. Turn them radially outward, or toward the nearest of eight views. 054, 057 and 058 all read as balls with edge-on flaps from the sides.
   - Before reporting, measure all eight azimuths with a ray-grid visibility check (`vis.py`, first written for 054). Targets in every view:
     - bare core at most about 15–30 % of the visible foliage;
-    - edge-on cards at most 10 %;
+    - edge-on **flat** cards at most 10 % (domed puffs and lumps always have an edge-on rim, so judge those by eye: no flaps, fins or slivers);
     - the skeleton showing where the sheet shows it.
   - Clump and rosette **parts** must match their cells' proportions (W : H). They must not be flat tiered tents or single cones.
 - **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps. Run unions with the object at the origin, not at its display slot (x ≈ 500+): float32 matrix error there gave 030 hundreds of self-intersections. `M.union_loose` welds within 0.01, so use a merge-0 union for fine parts (`m021._union_fine`).

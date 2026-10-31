@@ -1,15 +1,17 @@
 -- The Play window (docs/ui/PlayScreen.md, mockup art/reference/ui/lobby/05_play.png):
 -- the island map with the crater marked, the world's name and detail rows, YOUR
--- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, or the Ready toggle
--- for a party member who does not lead (ARCHITECTURE §4.5, D16). There is no
--- server picker (D7). Built only from Kit components at the mockup's 1053 × 665
--- window size, in window design px.
+-- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, which only a solo
+-- player or the party leader can press (ARCHITECTURE §4.5, D24); other members
+-- see it disabled. There is no server picker (D7). Built only from Kit
+-- components with the Inventory window's size and chrome (D25: portal icon,
+-- title, ink underline and close button as in InventoryWindow, the map in an
+-- inset panel, section headings instead of plaques), in window design px.
 --
 -- Display only: PlayController feeds it through the setters and reacts to the
--- callbacks (onPlay, onReady, onClose).
+-- callbacks (onPlay, onClose).
 --
---   local window = PlayWindow.new({ onPlay = play, onReady = toggleReady })
---   window:SetParty(rows, true)
+--   local window = PlayWindow.new({ onPlay = play })
+--   window:SetParty(rows)
 --   window:Open()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,69 +27,76 @@ local PlayWindow = {}
 PlayWindow.__index = PlayWindow
 
 PlayWindow.GUI_NAME = "FlintbornPlay"
--- The mockup's window, outline to outline (309..1361 × 127..791).
-PlayWindow.SIZE = { 1053, 663 }
+-- The Inventory window's size and chrome (D25): the same header (icon, title,
+-- underline), close button and clasps as InventoryWindow, so the Play window
+-- reads as one of the menus rather than mockup 05's plaque style.
+PlayWindow.SIZE = { 1187, 650 }
 
--- Window design px, measured from the mockup (PlayScreen.md element tree, minus
--- the window's top-left 309, 127). Kit plates draw their visible edge on the rect.
+-- Window design px. The header copies InventoryWindow's measured header; the
+-- content sits between its underline and the window's bottom edge (the
+-- Inventory detail card's 109..629).
+local RIGHT_X, RIGHT_W = 575, 590
 local RECT = {
-	titlePlaque = { 47, 30, 276, 87 },
-	-- The title's ink sits a little left of the plaque's centre.
-	title = { -4, 3, 276, 83 },
-	close = { 985, 9, 54, 52 },
-	map = { 41, 92, 520, 542 },
-	-- The painting sits inside the paper sheet with a margin, as the mockup
-	-- draws its map on a sheet of paper.
+	-- InventoryWindow's header: portal icon, title, underline, close button.
+	icon = { 40, 15, 71, 77 },
+	titleX = 138,
+	rule = { 113, 78, 995, 16 },
+	close = { 1103, 18, 60, 57 },
+	-- The map in an inset panel like Inventory's detail card.
+	map = { 23, 109, 520, 520 },
+	-- The painting sits inside the panel with a margin.
 	mapInset = 17,
 	marker = 28,
-	-- The rune the mockup paints in the map's top-left corner (sea there),
-	-- in ink so it reads on the sea.
-	rune = { 76, 154, 41, 69 },
-	-- Messages sit on a paper plaque over the map's bottom edge, clear of the
-	-- window frame under it.
-	statusPlaque = { 70, 580, 462, 40 },
-	regionPlaque = { 585, 96, 423, 70 },
-	sectionRule = { 588, 339, 419, 2 },
-	partyHeading = { 590, 350, 300, 26 },
+	-- The rune in the map's top-left corner (sea there), in ink so it reads on
+	-- the sea; from the map's top-left.
+	rune = { 35, 62, 41, 69 },
+	-- Messages sit on a paper plaque over the map's bottom edge.
+	statusPlaque = { 52, 575, 462, 40 },
+	-- The right column: the region heading, detail rows, party, equipment.
+	region = { RIGHT_X, 106, RIGHT_W, 44 },
+	partyHeading = { RIGHT_X, 302, RIGHT_W, 34 },
 	-- One row tall; more members scroll (the rail sits right of the rows).
-	party = { 585, 375, 444, 63 },
-	-- A row's slot in the list, and where the mockup's 421 × 56 box (896, 507)
-	-- sits in it; the kit draws the box's border on that rect.
-	partyRow = { 424, 61 },
+	party = { RIGHT_X, 343, RIGHT_W, 63 },
+	-- A row's slot in the list, and the light inset box drawn in it.
+	partyRow = { RIGHT_W - 14, 61 },
 	rowArt = { 2, 3 },
-	equipHeading = { 589, 446, 260, 28 },
-	more = { 760, 446, 248, 28 },
-	slotY = 479,
+	rowBox = { RIGHT_W - 20, 56 },
+	equipHeading = { RIGHT_X, 414, RIGHT_W, 34 },
+	more = { RIGHT_X + RIGHT_W - 262, 417, 260, 26 },
+	slotY = 458,
 	slotSize = { 71, 77 },
-	play = { 586, 569, 416, 72 },
-	-- The play glyph: its cream fill is 29 × 35 in the mockup (the art's dark
-	-- outline and margin make the square larger), and its gap to the label.
-	playIcon = 46,
-	playGap = 15,
+	play = { RIGHT_X + RIGHT_W - 360, 556, 360, 72 },
+	-- The play glyph and its gap to the label.
+	playIcon = 40,
+	playGap = 14,
 }
 -- Detail rows: centre y of each row, the icon / label / value columns, rules.
 local DETAIL = {
-	rows = { 191, 230, 269, 308 },
-	icon = { 599, 34, 30 },
-	label = { 658, 160 },
-	value = { 830, 176 },
+	rows = { 173, 207, 241, 275 },
+	icon = { RIGHT_X + 10, 34, 30 },
+	label = { RIGHT_X + 66, 180 },
+	value = { RIGHT_X + 266, 316 },
 	-- Phones and touch tablets: the values start further left, so a long one
 	-- ("10 · Low to Extreme") keeps 9 screen px.
-	phoneValue = { 790, 216 },
-	rule = { 648, 354 },
-	ruleY = { 211, 250, 290 },
+	phoneValue = { RIGHT_X + 230, 352 },
+	rule = { RIGHT_X + 56, RIGHT_W - 56 },
+	ruleY = { 190, 224, 258 },
 }
-PlayWindow.SLOT_X = { 578, 653, 728, 803, 876, 950 }
+PlayWindow.SLOT_X = {}
+for index = 1, 6 do
+	PlayWindow.SLOT_X[index] = RIGHT_X + (index - 1) * 82
+end
 
 -- Mockup text sizes (ink-height matched; PlayScreen.md measurements log).
 local TEXT_SIZE = {
-	title = 64,
-	region = 45,
+	-- InventoryWindow's title size; the region heading as a section heading.
+	title = 44,
+	region = 26,
 	detail = 16,
 	heading = 20,
 	name = 16,
 	level = 15,
-	play = 40,
+	play = 34,
 	status = 14,
 	-- "+1 more in your backpack": larger on phones (9 screen px at the
 	-- window's phone scale, about 0.48 on the smallest).
@@ -98,7 +107,6 @@ local TEXT_SIZE = {
 export type Props = {
 	parent: Instance?,
 	onPlay: (() -> ())?,
-	onReady: (() -> ())?,
 	onClose: (() -> ())?,
 }
 
@@ -110,7 +118,6 @@ export type PartyRow = {
 	name: string,
 	level: number?,
 	leader: boolean,
-	ready: boolean?,
 }
 
 function PlayWindow.new(props: Props)
@@ -120,7 +127,7 @@ function PlayWindow.new(props: Props)
 		rowMaids = {},
 		loadout = {},
 		mode = "solo",
-		ready = false,
+		enabled = true,
 		moreText = "",
 		phone = Kit.Scale.IsSmallTouch(),
 		maid = KitModel.Maid(),
@@ -131,17 +138,24 @@ function PlayWindow.new(props: Props)
 		onClose = props.onClose,
 	})
 	self.screen = screen
+	-- The same header as InventoryWindow (D25): the Play tile's portal icon,
+	-- the title, the plain ink underline and the close button in its corner.
 	local window = Kit.Window.new(screen, {
 		title = "Play",
-		header = "plaque",
-		plaqueRect = RECT.titlePlaque,
-		titleRect = RECT.title,
+		icon = "portal",
+		clasps = "right",
+		claspYs = { 0.18, 0.9 },
+		ruleRect = RECT.rule,
+		iconRect = RECT.icon,
+		titleX = RECT.titleX,
 		titleSize = TEXT_SIZE.title,
 		closeRect = RECT.close,
+		onClose = function()
+			screen:Close()
+		end,
 	})
 	self.window = window
 	self.close = window.close
-	-- Under the title plaque, which overlaps the map's top edge as in the mockup.
 	local v = Kit.Core.Make("Frame", {
 		Name = "Content",
 		BackgroundTransparency = 1,
@@ -151,32 +165,21 @@ function PlayWindow.new(props: Props)
 	self.visual = v
 	local z = window.base.z + 3
 	self:_map(v, z)
-	self.regionPlaque = Kit.Panel.new(v, {
-		name = "RegionPlaque",
-		rect = RECT.regionPlaque,
-		variant = "plaque",
-		pad = 0,
+	-- The world's name as a section heading over a hairline (as Journal and
+	-- Settings head their sections), not a plaque.
+	self.regionHeading = Kit.SectionHeader.new(v, {
+		name = "Region",
+		rect = RECT.region,
+		text = PlayModel.WORLD_NAME,
+		textSize = TEXT_SIZE.region,
+		rule = "hairline",
 		zIndex = z,
 	})
-	local rp = RECT.regionPlaque
-	self.regionTitle = Kit.Core.Label(v, {
-		name = "RegionTitle",
-		text = PlayModel.WORLD_NAME,
-		-- The mockup's region name is Bold, not the display weight.
-		role = "itemTitle",
-		size = TEXT_SIZE.region,
-		align = "Center",
-		-- Centred 4 px left of the plaque's centre, as the mockup draws it.
-		rect = { rp[1] - 4, rp[2] + 1, rp[3], rp[4] - 4 },
-		z = z + 1,
-	})
 	self:_details(v, z)
-	Kit.Divider.new(v, { name = "SectionRule", rect = RECT.sectionRule, variant = "hairline", zIndex = z })
-	self.partyHeading = Kit.Text.new(v, {
+	self.partyHeading = Kit.SectionHeader.new(v, {
 		name = "PartyHeading",
 		rect = RECT.partyHeading,
 		text = "Your Party",
-		role = "sectionHeader",
 		zIndex = z,
 	})
 	self.partyList = Kit.Scroll.new(v, {
@@ -187,11 +190,10 @@ function PlayWindow.new(props: Props)
 		contentHeight = RECT.partyRow[2],
 		zIndex = z,
 	})
-	self.equipHeading = Kit.Text.new(v, {
+	self.equipHeading = Kit.SectionHeader.new(v, {
 		name = "EquipmentHeading",
 		rect = RECT.equipHeading,
 		text = "Your Equipment",
-		role = "sectionHeader",
 		zIndex = z,
 	})
 	self.moreZ = z
@@ -218,7 +220,8 @@ function PlayWindow.new(props: Props)
 		rect = RECT.play,
 		label = "Play",
 		icon = "play",
-		variant = "play",
+		-- The primary leather button, as the other menus' main actions.
+		variant = "primary",
 		sizeClass = "l",
 		textSize = TEXT_SIZE.play,
 		iconSize = RECT.playIcon,
@@ -227,21 +230,6 @@ function PlayWindow.new(props: Props)
 		onPress = function()
 			if props.onPlay then
 				props.onPlay()
-			end
-		end,
-	})
-	self.readyButton = Kit.Button.new(v, {
-		name = "Ready",
-		rect = RECT.play,
-		label = "Ready",
-		variant = "play",
-		sizeClass = "l",
-		textSize = TEXT_SIZE.play,
-		zIndex = z + 1,
-		visible = false,
-		onPress = function()
-			if props.onReady then
-				props.onReady()
 			end
 		end,
 	})
@@ -266,11 +254,8 @@ function PlayWindow.new(props: Props)
 		z = z + 3,
 	})
 	self.status.Visible = false
-	-- Gamepad: PLAY (or Ready) first; up reaches the loadout slots, then the
-	-- close button.
-	for _, button in { self.play, self.readyButton } do
-		button.control.hit.NextSelectionUp = self.slots[1].control.hit
-	end
+	-- Gamepad: PLAY first; up reaches the loadout slots, then the close button.
+	self.play.control.hit.NextSelectionUp = self.slots[1].control.hit
 	for index, slot in self.slots do
 		local hit = slot.control.hit
 		hit.NextSelectionLeft = if self.slots[index - 1] then self.slots[index - 1].control.hit else nil
@@ -354,7 +339,14 @@ function PlayWindow:_map(v: Frame, z: number)
 	-- The game's own island painting (D19), shared with the Journal and Map.
 	self.mapArt =
 		Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
-	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", tint = "ink", zIndex = z + 1 })
+	local rune = RECT.rune
+	Kit.Icon.new(v, {
+		name = "Rune",
+		rect = { r[1] + rune[1], r[2] + rune[2], rune[3], rune[4] },
+		icon = "lk_emblem_rune",
+		tint = "ink",
+		zIndex = z + 1,
+	})
 	local u, vv = PlayModel.MarkerUV(IslandMap.MAP_SPAN)
 	local m = RECT.marker
 	self.marker = Kit.Icon.new(clip, {
@@ -426,9 +418,9 @@ function PlayWindow:SetDetails(rows)
 	end
 end
 
--- One party row: crown (leader), headshot, name, ready dot (in a party), level.
--- Every part goes into `maid`, so cleaning it takes the row apart.
-local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean, maid)
+-- One party row: crown (leader), headshot, name, level. Every part goes into
+-- `maid`, so cleaning it takes the row apart.
+local function partyRow(parent: Instance, row: PartyRow, order: number, maid)
 	local w, h = RECT.partyRow[1], RECT.partyRow[2]
 	local outer = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
@@ -440,7 +432,7 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 	maid:Give(outer)
 	-- The mockup's row is a light inset box, not the list-row plate.
 	local art = RECT.rowArt
-	w, h = 421, 56
+	w, h = RECT.rowBox[1], RECT.rowBox[2]
 	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5, rect = { art[1], art[2], w, h } })
 	local holder = Kit.Core.Make("Frame", {
 		Name = "Inside",
@@ -482,25 +474,12 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 		rect = { w - 120, 2, 101, h - 2 },
 		z = 6,
 	})
-	if showReady then
-		local levelW = Kit.Text.Width(levelText, "hudSmall", TEXT_SIZE.level)
-		local d = 16
-		local dot = Kit.Core.Make("Frame", {
-			Name = if row.ready then "Ready" else "NotReady",
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(w - 20 - levelW - 10 - d, (h - d) / 2 - 1),
-			Size = UDim2.fromOffset(d, d),
-			ZIndex = 6,
-		}, holder)
-		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
-	end
 	return outer
 end
 
--- The party rows (leader first; PlayModel.Members). `showReady` adds each
--- member's ready dot (in a party; a solo player has none, as in the mockup).
--- The old rows are taken apart through their maids (Kit components included).
-function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
+-- The party rows (leader first; PlayModel.Members). The old rows are taken
+-- apart through their maids (Kit components included).
+function PlayWindow:SetParty(rows: { PartyRow })
 	local content = self.partyList:Content()
 	for _, maid in self.rowMaids do
 		maid:Clean()
@@ -508,7 +487,7 @@ function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
 	table.clear(self.rowMaids)
 	for order, row in rows do
 		local maid = KitModel.Maid()
-		partyRow(content, row, order, showReady, maid)
+		partyRow(content, row, order, maid)
 		table.insert(self.rowMaids, maid)
 	end
 	local h = RECT.partyRow[2]
@@ -542,30 +521,21 @@ function PlayWindow:_slotText(index: number): string?
 	return if (item.quantity or 1) > 1 then ("%s ×%d"):format(name, item.quantity) else name
 end
 
--- "solo" / "leader": the PLAY button; "member": the Ready toggle (leather READY
--- while not ready, parchment NOT READY once ready).
-function PlayWindow:SetMode(mode: string, ready: boolean?)
+-- "solo" / "leader": PLAY can be pressed; "member": PLAY shows disabled (only
+-- the leader starts the run; the status line says so).
+function PlayWindow:SetMode(mode: string)
 	self.mode = mode
-	self.ready = ready == true
-	local member = mode == "member"
-	self.play.root.Visible = not member
-	self.readyButton.root.Visible = member
-	if member then
-		self.readyButton:SetVariant(if self.ready then "playSecondary" else "play")
-		self.readyButton:SetLabel(if self.ready then "Not Ready" else "Ready")
-	end
-	self.screen:SetDefaultSelection((if member then self.readyButton else self.play).control.hit)
+	self.play:SetEnabled(self.enabled and mode ~= "member")
 end
 
 -- The big button's busy state (a request in flight).
 function PlayWindow:SetBusy(busy: boolean)
 	self.play:SetBusy(busy)
-	self.readyButton:SetBusy(busy)
 end
 
 function PlayWindow:SetEnabled(enabled: boolean)
-	self.play:SetEnabled(enabled)
-	self.readyButton:SetEnabled(enabled)
+	self.enabled = enabled
+	self.play:SetEnabled(enabled and self.mode ~= "member")
 end
 
 -- The status line under the map (deploy progress, failures, maintenance, the
@@ -610,7 +580,6 @@ function PlayWindow:Destroy()
 		slot:Destroy()
 	end
 	self.play:Destroy()
-	self.readyButton:Destroy()
 	self.close:Destroy()
 	self.partyList:Destroy()
 	self.window:Destroy()

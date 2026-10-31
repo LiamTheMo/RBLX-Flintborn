@@ -4,7 +4,7 @@
 --   1 PLAY hover            2 PLAY pressed          3 PLAY busy (deploying)
 --   4 PLAY disabled while the teleport runs, with the game-update notice
 --   5 empty loadout         6 preview not read yet, a full party (8, scrolls)
---   7 member: READY         8 member: NOT READY     9 close button hover
+--   7 member: PLAY disabled with the leader caption   8 close button hover
 --
 -- It also prints the gamepad order (default selection and neighbours).
 
@@ -23,16 +23,16 @@ local SAMPLE = {
 local NAMES =
 	{ "LiamTheMo", "ForestRanger", "StoneSeeker", "RiverFox", "AshWalker", "MossBeard", "FlintSpark", "TideRunner" }
 
--- A party of `n` (the first `readyCount` ready) led by `leader`, ordered as
--- PlayController orders it (PlayModel.Members: leader first), with levels.
-local function members(n, readyCount, leader)
+-- A party of `n` led by `leader`, ordered as PlayController orders it
+-- (PlayModel.Members: leader first), with levels.
+local function members(n, leader)
 	local list = {}
 	for i = 1, n do
-		table.insert(list, { userId = i, name = NAMES[i], ready = i <= readyCount })
+		table.insert(list, { userId = i, name = NAMES[i] })
 	end
 	local view = { party = { leader = leader, members = list } }
 	if n == 1 then
-		view = { party = nil, ready = readyCount > 0 }
+		view = { party = nil }
 	end
 	local rows = PlayModel.Members(view, { userId = 1, name = NAMES[1] })
 	for _, row in rows do
@@ -47,15 +47,15 @@ local function page(opts)
 	local details = PlayModel.WorldRows()
 	table.insert(details, PlayModel.CarryingRow(preview))
 	window:SetDetails(details)
-	window:SetParty(opts.party or members(1, 0, 1), opts.party ~= nil)
+	window:SetParty(opts.party or members(1, 1))
 	window:SetLoadout(PlayModel.LoadoutHotbar(preview))
-	window:SetMode(opts.mode or "solo", opts.ready)
+	window:SetMode(opts.mode or "solo")
 	window:SetStatus(opts.status)
 	if opts.setup then
 		opts.setup(window)
 	end
 	window:Open()
-	window.screen.holder.Position = UDim2.fromOffset(309 + PlayWindow.SIZE[1] / 2, 127 + PlayWindow.SIZE[2] / 2)
+	window.screen.holder.Position = UDim2.fromOffset(243 + PlayWindow.SIZE[1] / 2, 150 + PlayWindow.SIZE[2] / 2)
 	window.screen.scale.Scale = 1
 	if opts.check then
 		opts.check(window)
@@ -85,9 +85,8 @@ page({
 	status = "Game update: your items were saved and return on your next Play.",
 })
 page({ preview = {} })
-page({ preview = "none", party = members(8, 5, 1), mode = "leader" })
-page({ party = members(3, 1, 2), mode = "member", ready = false, status = PlayModel.MEMBER_CAPTION })
-page({ party = members(3, 2, 2), mode = "member", ready = true, status = PlayModel.MEMBER_READY_CAPTION })
+page({ preview = "none", party = members(8, 1), mode = "leader" })
+page({ party = members(3, 2), mode = "member", status = PlayModel.MEMBER_CAPTION })
 page({
 	setup = function(window)
 		window.close.root:SetAttribute("DebugState", "hover")
