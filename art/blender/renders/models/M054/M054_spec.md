@@ -969,3 +969,984 @@ All 15 recommendations are accepted.
 **Packaging.** 0 winding errors, especially on the hand-built cards. Every shell is manifold. The trunk twists; it must not read as a cone.
 
 **Binding.** The front shares in §1 (canopy green 47, wood 37, each ±4), and wood above h .45 at 10–12 % in every side view.
+
+## Stage 1 — Modelling (modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m054.py` (`build()`), background session port 9880 on `wip/M054.blend` (saved after the
+final build, run in a freshly restarted session). It imports `m047` (tube frames, `_Solids` ray-parity guard), `m033`
+(`_union_fine`, hulls, long lens, close-up framing) and `m012` (sliver forcing, UV unfold); shared helpers untouched.
+Every exploded part has its own function; the hero is assembled from exactly those functions:
+- `trunk_body()`: six twisted rope strands, 18 verts a ring (per strand a groove vertex pulled in 0.42 and two crest
+  verts; alternate strands ±5 %), rings twist 0 → 67° CCW so the front grooves climb "/". Seven rings (z 0, 3, 6, 7,
+  9.4, 10.6, 12.4; Ø 6.6 / 5.6 / 4.9 / **4.7 waist** / 4.7 / 3.8 / 3.0; centre x 0 → 0.7). Flat bottom (part: hexagonal
+  hollow in a pale rim) and flat top cap (part: the top socket). `boss()` ×3 (8-sided collars B_L, B_R, B_UL found by
+  rays from the axis; part: 5-sided socket holes), `root_stub()` ×6 (part only, square socket holes). Knots: front oval
+  hole 0.9 × 1.3 × 0.32 deep, a small hole above, a back hex hole, all exact-difference carves (`_carve`, at the
+  origin), each with a pale rim region (`_knot_rims`: bark faces inside the rim ellipse round the hole). Bark pits: 7 flat
+  insets on strand crests (hero only). Bosses (and stubs on the part) are exact-unioned one at a time at the origin
+  (`m033._union_fine`); near-flat seam verts are merged (`dissolve_limit` 4°, same material only); slivers forced.
+- `module()` ×4 (BM1 big Y, BM2 short upright, BM3 top V, BM4 riser + side branch; table `BM`): 8-sided main runs
+  (BM2 6) seated 0.015 off their boss / top face and 0.02 wider; 5-sided arms; 4-sided bare tines (flat ends, half pale,
+  half hollow); spurs with pale cut ends; a pale knob on the BM1 / BM4 knuckle (the upper half of the knuckle block by
+  its section, `_knuckle_light`); deep rings at the crotches; 8 limb pits. The part BM1 carries a round pale peg.
+- `root()` ×6 (RT1–RT6 at 195 / 240 / 295 / 350 / 45 / 125°, reach 7.2–8.2): a six-sided section (flat bottom, splayed
+  lower flanks, upper flanks, narrow ridge) from inside the trunk foot down the stub axis to the ground (kink at
+  r ≈ 5.3), a low run, then 2–3 blunt splayed toes (4-sided, sunk 0.05). Moss on the ridge facets of RT3 and RT4.
+- `leaf_clump()` ×5 (table `CLUMPS`): a 6-sided core dome; Fibonacci cap cards over polar 0–112° (B 0–96°), tilted
+  14–24° so their outer lobes stand proud; a skirt of 2–4 cards hung from the widest ring on the outer side (lower lobes
+  flared out, turned toward the front / back cameras so they are not edge-on). Each card is seated so 1–2 of its 10
+  verts are inside the core (`_seat_card`, bisection down to 0.005). Hero cards that would cut the trunk shrink or turn
+  (none needed). Twigs (4-sided) run from the feeding arm 0.55 under the core into its underside (one per clump, one
+  per V arm on B). The part also carries the clump's 5-sided stub.
+- `leaf_card()`: a closed bicone card, 16 tris: four lobes with tip radii 1.0 / 0.84 / 0.72 / 0.84 (a long tip lobe, two
+  side lobes and a short base lobe, so a leaf rather than a square), notches 0.6, tips cupped 0.07, rim 0.12 and top
+  0.30 above the bottom centre.
+- `root_base()`: the roots; `rock()` ×7 and `pebble()` ×4 (ring-stack hulls, flat bases, RK4 pointed and leaning to the
+  trunk); `moss_pad()` ×6 (hero only; lobed 8-vert lenses between the roots); `tuft()` ×9 (a 4-sided hub and 4–5 folded
+  lanceolate blades, faces turned to the front / back cameras). All are placed through the `_Solids` ray-parity guard.
+
+Iterations (renders against the sheet cells with scratch `m054w/sbs.py`, measured with `m054w/meas.py`, the study masks):
+1. Small ball clumps on a massive column → wider, flatter cores, larger cards and skirts; L / R lowered and FL / FR
+   raised toward the crown (the sheet's front pair sits at z 14.5–18.7, above L / R).
+2. An umbrella cap (skirts edge-on to the front) → skirts turned to the cameras and hung from the widest ring.
+3. A dark canopy (dark tone 36–45 %) → cores toned by height; new tone thresholds and position patches (Stage 4).
+4. Wood above h .45 at 17 % → a slimmer upper trunk and bosses, FL / FR lowered to 11.8–11.9, side clumps moved in.
+5. Bare forks hidden by skirts → skirt azimuths chosen per clump to leave the BM1 / BM4 forks open.
+
+Final layout (build frame), core bottom → top: B (1.6, 6.3) 14.4 → 20.3; FL (−3.2, −5.9) 11.9 → 18.6; FR (4.0, −5.7)
+11.8 → 18.6; L (−5.2, 1.2) 9.6 → 15.0 with its skirt to 7.8; R (6.9, 0.2) 9.6 → 14.8 with its skirt to 7.4. Cards B 18,
+FL 14, FR 15, L 16, R 14 = 77, radius 2.0 (Ø ≈ 3.4–4.0 tip to tip).
+
+**Deviations from the plan (for the main session):**
+1. Hero roots start inside the trunk foot as one prism (no stub union, no peg). Stubs with square socket holes are on
+   `ShadeTreeTrunkCore`, and pegs on `ShadeTreeRootBase`. Reason: budget (the six stub unions cost about 400 tris).
+2. Knot rims are pale colour regions round carved holes, not raised unioned collars (budget). The holes are real.
+3. Trunk: 7 rings (the 1.5 and 11.6 rings were linear in the table). The upper trunk is slimmer than §2.2 (Ø 4.7 at
+   9.4, 3.8 at 10.6, 3.0 at the top) to bring wood above h .45 down.
+4. Cores are toned by height, not hard `leaf_dark`. With 77 cards the core shows between them, and a dark core gave a
+   36–45 % dark canopy against the sheet's 13 %.
+5. Card radius 2.0 (spec Ø 2–3), needed to cover the cores with 77 cards.
+6. The clump plan and heights changed (above): FL / FR higher and B further back than §2.5, L / R moved toward the
+   trunk, and one twig per clump.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| ShadeTree (hero) | **3608** (ceiling 3800) | 20.54 × 18.84 × 20.00 | 189 |
+| ShadeTreeTrunkCore | 972 | 9.53 × 8.79 × 12.40 | 1 |
+| ShadeTreeBranchModule | 188 | 5.83 × 3.24 × 4.19 | 6 |
+| ShadeTreeLeafClump | 296 | 6.16 × 5.79 × 7.41 | 17 |
+| ShadeTreeRootBase | 980 | 19.52 × 16.23 × 3.33 | 83 |
+
+- Hero tris by shell kind: cards 77 / 1232, cores 5 / 170, trunk 1 / 570, limbs 10 / 400, twigs + tines + spurs 13 / 184,
+  roots 6 / 264, toes 13 / 156, rocks + pebbles 11 / 254, moss pads 6 / 96, hubs 9 / 54, blades 38 / 228.
+- Every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose / zero-area / n-gon / duplicate verts,
+  normals outward, transforms applied, origin at the bottom centre (`o["m054_offset"]`; hero 0.425, 0.492, −0.1). The
+  rocks sink 0.1 below the trunk's z 0, so in Studio the hero's origin sits 0.1 under the ground line. Smallest corner
+  2.59° (trunk union seams; none under 2.5°).
+- Per shell, in all five objects: **0 winding errors** (`shells_report`, `build()["winding"]`), 0 self-intersections,
+  volume > 0. `K.check` is clean and `problems` is empty.
+- **Contact:** 0 floating and 0 unchained shells in all five objects (tol 0.03; hero and root base anchored on the ground
+  shells, parts on their largest shell).
+- **Buried (ray parity, `bury_report`):** 0 of 135 dressing shells (blades, hubs, pads, cards, cores) are more than 0.05
+  inside the trunk, a root, a toe or a rock (max 0.004). Rocks into roots: 0. Cards in their core: none over 25 % (max
+  2 of 10 verts, 0.2), and no card centre inside. Root base: 0 of 47.
+
+## Stage 3 — UV
+
+`M.smart_uv` angle-based (45°, margin 0.008) + `m012._uv_unfold`: all five objects have 0 overlaps, 0 flipped, min island
+gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0 and conformal stretch p95 ≤ 1.037. Islands: hero 1112, trunk 221,
+branch 45, clump 74, root base 498.
+
+## Stage 4 — Materials, colour and texture
+
+1. **`K.calibrate`** (dome, kit studio) to `TARGETS`: leaf_light `#A4B805` (rendered 205, 225, 9), leaf_mid `#5D8A1F`
+   (110, 164, 31), leaf_dark `#3D702D` (69, 130, 45), bark `#8E5A2A` (179, 110, 56), bark_light `#C18745` (245, 165, 82),
+   bark_deep `#61391C`, hollow `#1D0100` (came out red; set `#241003` by hand), rock `#9A928B` (195, 179, 162),
+   rock_light `#A79F98`, rock_deep `#797373` (set warm `#7A746E`), moss `#A7A60C`, grass `#9BA60B`, grass_deep `#436813`.
+2. **Re-measured on the tree renders** (study masks). The tree shades itself, so the families were lifted in linear
+   light: bark ×1.4 → `#A66B32` (bark_light `#D1944C`, deep `#6A3E1D`), leaf_mid ×1.5 → `#74A623`, leaf_light nudged
+   yellower to `#AEB805` (hue 62°), moss `#D6C411` (57°), rock `#9E948A` / `#ADA398`. The final `PALETTE` is in the builder.
+3. **Roles (never facing; no `normal` chooses paint anywhere):**
+   - Cards by height rank in their clump (`TONE_STEPS`: light up to 0.66 of the rank, then mid→light 50 % and 25 %, mid,
+     mid→dark, dark). The rank is shifted per clump (B +0.15, FL / FR +0.05, L / R −0.1) and by broad position noise
+     patches (`TONE_PATCH` 0.9 at scale 0.32). Skirt cards are at least rank 0.93 (mid / mid-dark). Per-card Tint ±0.04.
+   - Cores by height in the core: dark underside, mid band, mid→light 50 % and 75 % at the top.
+   - Bark: grooves (faces on two groove verts) bark→deep 75 %; every other strand bark→light 50 % on the crest facet
+     and 25 % on the flanks (by strand index); the foot below 0.8 deep 25 %; per-plank-column Tint ±0.04 plus mottle;
+     boss collars light 25 %; cut faces bark_light; holes, sockets, pits and dark tine ends hollow; crotch rings deep
+     25 %; knuckle tops light. Roots: bottom and low flanks deep 25 %, upper flanks and ridge light 25 %, moss ridge
+     patches on RT3 / RT4.
+   - Rocks by height in each rock (light top, deep foot). Pads moss, their outer lobes fading to grass. Tufts: tall
+     blades grass, short ones grass→deep or deep, hubs deep.
+4. **Facing correlation** (`kit_baked_shading`): hero 0.21, parts ≤ 0.26 (limit 0.5).
+5. **Finish:** leaves 0.8–0.9 with low spec, bark 0.9 (deep 0.95), cut 0.85, hollow 1.0, rock 0.85–0.9, moss and grass
+   low spec. No emission.
+
+**Measured against the sheet** (`m054w/meas.py`, same masks; ours / sheet):
+
+| View | W : H | G | canopy G | ground G | T | T above h .45 | R | fill | tones L / M / D (ours vs sheet) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet (0, 5) | 0.983 / 1.013 | 51.9 / 53.6 | **46.9 / 46.8** | 4.5 / 6.6 | **38.3 / 37.0** | **14.2** / 11.3 | 9.2 / 6.1 | 0.56 / 0.60 | 58 / 29 / 13 vs 56 / 31 / 13 |
+| f34_sheet (0, 13) | 0.909 / 1.092 | 53.3 / 57.0 | 47.8 / 47.8 | 4.4 / 7.4 | 36.7 / 32.6 | 12.0 / 11.1 | 9.5 / 7.6 | 0.55 / 0.65 | 65 / 24 / 11 vs 55 / 31 / 14 |
+| rear_sheet (180, 5) | 0.966 / 0.978 | 53.7 / 53.5 | 49.2 / 46.9 | 4.4 / 6.4 | 38.9 / 37.8 | 12.8 / 12.3 | 7.4 / 5.5 | 0.57 / 0.59 | 47 / 42 / 11 vs 52 / 38 / 10 |
+| r34_sheet (180, 13) | 0.977 / 0.971 | 56.9 / 53.6 | 51.6 / 46.8 | 4.1 / 6.8 | 35.2 / 38.0 | 10.0 / 12.1 | 7.8 / 5.2 | 0.59 / 0.58 | 52 / 38 / 10 vs 43 / 31 / 26 |
+| side_sheet (90, 5) | 0.903 / 0.903 | 57.7 / 54.7 | 54.6 / 49.3 | 2.7 / 5.4 | 33.2 / 37.2 | 4.3 / 10.9 | 9.1 / 4.8 | 0.47 / 0.61 | 41 / 48 / 10 vs 48 / 34 / 18 |
+| top_sheet (0, 89) | W : D 1.028 / 1.027 | 78.8 / 88.5 | | | 17.5 / 7.7 | | 3.7 / 1.6 | 0.61 / 0.66 | 92 / 8 / 1 vs 59 / 29 / 13 |
+
+- Colours (ours / sheet). Canopy median: front `#84A90F` / `#A5C50B`, f34 `#A7C20F` / `#A7C10A`. Canopy v > .7 (front)
+  `#D6DE10` / `#CEE30A`. Wood median: front `#855329` / `#985F31`, f34 `#925B2C` / `#8B5B31`; wood v > .7 `#E29047` /
+  `#E69646`, R > G > B. Rock v > .7 `#D1C0AA` / `#D6C7AF` (R ≥ G ≥ B). Blades (f34) median `#9B9F0D` / `#749508`, v > .7
+  `#C9CB10` / `#D3D604`. Ground green at h < .05 `#7C8714` / `#C8BF0F` (shaded under the crown in the studio).
+- Front canopy bottom row (every 0.1 W): .50 .50 .51 .55 .64 .66 .60 .50 .46 .44 against .43 .43 .47 .57 .58 .71 .53 .50
+  .42 .41. Top profile (f .1–.9): .70 .86 .91 .91 .99 .98 .95 .87 .71 against .72 .78 .88 .96 .99 .91 .93 .83 .70.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows no emission or light. Studio notes (Requires Manual Validation): under the game sun the canopy
+should keep lime tops and green bodies (not pale, not olive); the bark should stay orange-brown, not red; knots, sockets
+and pits should read dark and cut faces pale; rocks pale grey; moss and tufts lime.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (decision 14). No object has sockets (checked in `build()`).
+
+## Renders
+
+`art/blender/renders/models/M054/`:
+- `M054_views.png` (the contact sheet); kit `front`, `side`, `rear`, `top`, `underside`.
+- `f34_sheet`, `r34_sheet`, `front_sheet`, `side_sheet`, `rear_sheet`, `top_sheet` (floor hidden, 3× lens); `front34` and
+  `rear34`.
+- `part_trunkcore`, `part_branchmodule`, `part_leafclump`, `part_rootbase`.
+- `exploded`: the root base, the trunk core lifted, the four modules drawn out along their boss axes, and the five
+  clumps with their stubs above.
+- `scale`: a 5.5-stud marker at (8.6, 1.2) under the R clump, whose lowest card is at z 7.4.
+- Close-ups: `knot_cu` (front oval hole, pale rim), `trunk_cu` (strand twist, waist, flare), `root_cu` (RT3: section,
+  kink, split toes, moss), `limbs_cu` (crotch, bosses, V leader), `join_cu` (the trunk core's B_L boss socket with BM1
+  and its peg), `underside_part` (hexagonal hollow, six stubs with sockets), `clump_cu` (FL cut open, seen from below).
+
+## §1.5 differences, as measured
+
+| | 054 as built |
+| --- | --- |
+| Size | 20.54 × 18.84 × 20.00; front W : H 0.983 |
+| Silhouette | five card mounds (L / R low at the sides, FL / FR / B on top); canopy G 46.9 %, T 38.3 %, fill 0.56 |
+| Trunk | six strands twisted 67° CCW, waist 4.7 at z 7, flare 6.6, three bosses, knots front (oval) and back (hex) |
+| Limbs | four modules feeding five clumps; the BM1 / BM4 bare forks are seen from the front, f34 and rear |
+| Roots | six, with 13 split toes and moss on RT3 / RT4 |
+| Top | five rosettes round the limb hub, W : D 1.03, T 17.5 % |
+| Ground | 7 pale grey rocks, 4 pebbles, 6 lime moss pads, 9 lime tufts (38 blades); no patch |
+
+## Modeller's notes for the verifier
+
+- Rebuild in a fresh session with `import kit_mcp; kit_mcp.install(); import m054; m054.build()` (about 50 s with the
+  renders). Checks: `m054.shells_report(o)` (per-shell winding), `contact_report`, `bury_report` (dressing in wood or rock,
+  and cards in their cores), and `limb_visibility(hero)` (visible studs per polyline: the module's main run, arms and
+  tines, for LIMB_VIEWS front / rear / f34 / r34). Measuring scripts: scratch `m054w/meas.py` (study masks) and
+  `m054w/sbs.py` (sheet | ours).
+- **Visible bare limb (studs):**
+  - LOW-L (BM1 main + lower arm): front 0.2 + 2.8, f34 0.2 + 2.4, rear 2.4. Both tines 1.4 / 1.3 in the front and f34
+    (rear 0.4 / 1.0).
+  - LOW-R (BM4 main + side branch): front 1.2 + 1.2 (riser 2.0), f34 1.2 + 0.6 (riser 0.3), rear 1.2 + 0.6 (riser 2.9).
+    Tines: front 1.9 / 1.2, f34 1.5 / 0.
+  - LEAD (BM3 main + arms): front 1.2 + 3.3, f34 1.2 + 3.3, **rear 0** (B overhangs it).
+  - UPPER-L (BM2): front 0.9, f34 0.5, r34 0.7.
+- **Known leftovers:**
+  1. Wood above h .45 is **14.2** in the front (band 10–12), 12.8 rear, 12.0 f34, 10.0 r34; side 4.3 (the side is judged
+     for content). Lowering FL / FR further fixes the front but hides the BM4 side branch in the f34.
+  2. LEAD shows 0 from the rear (the B clump's rim hangs to z ≈ 14 over the V). UPPER-L shows 0.5–0.7 (< 1.0) in the
+     f34 / r34, and the BM4 riser 0.3 in the f34 (2.9 from the rear).
+  3. Top-view tones are 92 / 8 / 1 against 59 / 29 / 13: from above only the light top cards show, and the sheet's mid
+     tones there come from its lighting. Top T is 17.5 % against 7.7 % (the hub between the rosettes is wider).
+  4. f34 W : H 0.909 (sheet 1.092; decision 10: the f34 is drawn wider and is not chased). f34 light tone 65 % (+10).
+  5. The front canopy median is `#84A90F` against `#A5C50B` (shaded card undersides pull it down; the v > .7 colour and
+     the f34 median match). The ground moss reads darker, shaded under the crown.
+  6. Front canopy bottom: the inner sides of FL / FR (cols .45 / .65) sit 0.06–0.07 H higher than the sheet, and the L / R
+     outer bottoms are at .50 against .43.
+  7. Cards are 4-lobe leaf shapes of radius 2.0 (decision Ø 2–3), needed to cover the cores with 77 cards. The canopy
+     reads as broad leaves rather than the sheet's many small 5-lobe leaves. There are no 5-lobe cards: the hero is at
+     3608, 192 under the ceiling, so about 40 five-lobe cards (+4 tris each, 160) would fit in a polish pass.
+  8. Deviations 1–6 under Stage 1.
+- No commits, pushes or exports were made.
+
+- **Main session (2026-10-30):** deviations 1–6 are accepted (budget-driven):
+  1. no stub unions in the hero roots;
+  2. knot rims as colour regions;
+  3. slimmer upper trunk;
+  4. cores toned by height;
+  5. card radius 2.0;
+  6. the moved clump plan.
+
+  The wood-above-h-.45 miss and the leader hidden from the rear go to the verifier. So does the origin: the hero's origin sits 0.1 below the trunk foot because the rocks sink below z 0. The verifier should judge whether that makes the tree stand 0.1 proud when placed.
+
+## Verification round 1 (verifier, 2026-10-30)
+
+Fresh stage-7 agent, read-only on port 9880 (`wip/M054_verify.blend`). Nothing was built, edited or saved. Every number
+below comes from my own code: a bmesh audit per shell, BVH contact and ray-parity bury tests, limb-visibility rays and
+mask measurements with this spec's §1 HSV masks. Renders (960 × 720, `_long_lens`, floor hidden) and side-by-side
+strips are in scratchpad `m054_verify/` (`big/*.png`, `cmp_*.png`).
+
+### Measured
+
+**Mesh**
+
+| Object | Tris | Size | Shells | Non-manifold / boundary / wire / loose | Zero-area / n-gons | Bowties | Winding errors | Self-intersections | Negative-volume shells |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ShadeTree | 3608 / 3800 | 20.54 × 18.84 × 20.00 | 189 | 0 / 0 / 0 / 0 | 0 / 0 | 0 | 0 | 0 | 0 |
+| ShadeTreeTrunkCore | 972 | 9.53 × 8.79 × 12.40 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| ShadeTreeBranchModule | 188 | 5.83 × 3.24 × 4.19 | 6 | 0 | 0 | 0 | 0 | 0 | 0 |
+| ShadeTreeLeafClump | 296 | 6.16 × 5.79 × 7.41 | 17 | 0 | 0 | 0 | 0 | 0 | 0 |
+| ShadeTreeRootBase | 980 | 19.52 × 16.23 × 3.33 | 83 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+- **Transforms:** rotation 0 and scale 1 on every object, no custom normals, a UV layer present, no modifiers and no
+  sockets.
+- **Collection and collision:** `Kit / M054 Broadleaf Tree`. Collision is hero, trunk and root base `precise`; branch
+  module and leaf clump `hull`.
+
+**Lowest z of each shell kind in the hero** (local frame, origin at the bbox bottom):
+
+| Shell kind | Lowest z |
+| --- | --- |
+| Rocks | 0.00 |
+| Toes | 0.05 |
+| Roots | 0.07 |
+| Blades and hubs | 0.07 |
+| Moss pads | 0.08 |
+| Trunk foot | 0.10 |
+
+**Contact**
+
+- Floating shells: 0. Unchained shells: 0. Two shells count as touching when their BVHs overlap or they are within
+  0.03; chains run to any shell whose lowest z is ≤ 0.13.
+- Buried dressing (ray parity, three skewed rays, more than 0.05 inside the trunk, a root, a toe or a rock): 0. The
+  deepest such vertex is 0.034 (a core against a twig).
+- Cards against their cores: none with more than 25 % of its verts inside, no card centre inside, and no card more than
+  half inside a neighbour card.
+- Cards pierced by limbs: 3. Each has 1–2 of its 10 verts 0.10–0.25 inside a limb (see m7).
+
+**Visible bare limb, in studs** (front-surface samples every 0.05; a sample counts when its ray clears every other
+shell):
+
+| Limb | Front | f34 | Rear | r34 | Need |
+| --- | --- | --- | --- | --- | --- |
+| LOW-L (BM1 main + lower arm) | 0.7 + 2.4 = **3.1** | 0.4 + 2.2 = **2.6** | 0 + 2.7 = **2.7** | 0.3 | ≥ 1.5 in front, f34, rear |
+| Its tines | 1.3 / 1.3 | 1.3 / 1.2 | 0.3 / 0.8 | 0 / 0 | |
+| LOW-R (BM4 main + side + riser) | 1.4 + 0.8 + 2.6 = **4.8** | 0.9 + 0 + 1.3 = **2.2** | 0.5 + 0.2 + 1.5 = **2.2** | 0.7 | ≥ 1.5 |
+| Its tines | 1.8 / 1.1 | 1.4 / **0** | 0 / 0 | 0 / 0 | |
+| LEAD (BM3 main + arms + spur) | 0 + 2.9 + 0 + 1.1 = **2.9** | 0.1 + 2.9 + 1.2 + 1.1 = **4.0** | 0.6 + 0 + 0 + 0 = **0.6** | 0 | ≥ 1.5 |
+| UPPER-L (BM2) | 2.3 | **1.6** | 0.8 | **1.4** | ≥ 1.0 in f34 or r34 |
+| BM4 riser alone | 2.6 | **1.3** | 1.5 | 0 | ≥ 1.0 in f34 or r34 |
+
+**Shares and colour** (my masks; the sheet is re-measured with the same code, so the two columns compare like for like):
+
+| View | W : H | canopy G | T | T above h .45 | ground G | R | fill | tones L / M / D | canopy median | canopy v > .7 | wood median / v > .7 | rock v > .7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front, ours | 0.981 | **47.4** | **38.4** | 14.0 | 4.6 | 8.4 | 0.56 | 57 / 29 / 14 | `#84AA10` (69°, .89, .67) | `#D6DF10` | `#845129` / `#E49047` | `#D2BFAA` |
+| front, sheet | 0.987 | 46.5 | 36.8 | 12.4 | 6.3 | 6.0 | 0.59 | 56 / 31 / 13 | `#A5C50B` (69°, .93, .77) | `#CEE30A` | `#985F31` / `#E69646` | `#D6C7B0` |
+| f34, ours | 0.909 | 48.3 | 36.7 | 11.9 | 4.5 | 8.8 | 0.55 | 64 / 25 / 11 | `#A9C40F` | `#D8E00F` | `#91592C` / `#E18F47` | |
+| f34, sheet | 1.107 | 47.6 | 32.4 | 11.0 | 7.5 | 7.6 | 0.64 | 55 / 31 / 14 | `#A7C10A` | `#DCE709` | `#8B5B31` / `#EA9849` | |
+| rear, ours | 0.972 | 49.7 | 39.0 | 12.7 | 4.5 | 6.7 | 0.57 | 45 / 43 / 12 | `#90AF18` | `#B7C311` | `#A86A35` | |
+| rear, sheet | 0.961 | 46.7 | 37.7 | 13.0 | 6.2 | 5.5 | 0.58 | 52 / 38 / 10 | `#94B70C` | `#D1E40B` | `#986035` | |
+| r34, ours / sheet | 0.978 / 0.971 | 52.1 / 46.7 | 35.2 / 37.9 | 9.9 / 12.3 | 4.2 / 6.7 | | | 51 / 38 / 11 vs 43 / 31 / 26 | | | | |
+| side, ours / sheet | 0.909 / 0.880 | 55.2 / 48.9 | 33.4 / 36.9 | 4.4 / 12.0 | 2.8 / 5.3 | | 0.47 / 0.59 | 39 / 44 / 17 vs 48 / 34 / 18 | `#779D16` / `#97BD10` | | | |
+| top, ours / sheet | W : D 1.035 / 1.027 | | T 17.6 / 7.6 | | | | | **91 / 8 / 1** vs 59 / 29 / 13 | `#CFD80A` (62°) / `#B1CF10` (69°) | | | |
+
+**Crown outline.** Polar scan of the upper half of the canopy outline, scaled to the sheet:
+
+| View | Lobe peaks, ours / sheet | Roughness, ours / sheet |
+| --- | --- | --- |
+| front | 11 / 13 | 0.99 / 1.88 |
+| f34 | 6 / 14 | 1.04 / 2.17 |
+| rear | 10 / 15 | 0.98 / 1.59 |
+
+**Facing correlation** (normal z against material lightness, area-weighted):
+
+| Family | Correlation |
+| --- | --- |
+| bark | 0.26 |
+| leaf | 0.26 |
+| grass | 0.53 |
+| rock | 0.86 (from height bands) |
+
+`K.check` returns [] (clean).
+
+### Findings
+
+**Blockers**
+
+- **B1. The leader is hidden from the rear: 0.6 studs against ≥ 1.5.**
+  - Decision 4 (the user's tree rule) makes this binding.
+  - From the rear, B's back half covers the whole V (z 14.0–15.7): B's core bottom is at 14.4 and its skirt reaches 12.6.
+    Neither V arm and not the spur shows; only 0.6 of BM3's main run shows between the knuckles.
+  - The sheet's rear shows the upper trunk splitting into two limbs that rise visibly into the crown.
+  - **Fix target:** BM3 main + arms ≥ 1.5 studs visible in `rear_sheet (180, 5)`, keeping front and f34 ≥ 1.5. Either
+    of these would do it:
+    - drop B's skirt on the trunk side (no skirt cards at B's azimuths 225–315°) and raise B's core bottom on that side
+      to ≥ 15.2;
+    - or move the V fork 0.6 lower and splay the bl arm outward so it crosses the gap under B's rim.
+- **B2. The leaf cards read as big pointed diamond plates, not the sheet's many small rounded lobed leaves.**
+  - This breaks decision 8 ("nothing spiky") and §2.5 ("broad rounded lobes … never pointed stars").
+  - **Shape.** Each card is an 8-vertex rim whose lobe tips are single vertices, so the long tip lobe ends in a **73°
+    point**. At radius 2.0 a card is about 4 studs across, against the sheet's 2–2.5.
+  - **Outline.** The upper outline has half the sheet's lobing (peaks 6–11 against 13–15, roughness 1.0 against
+    1.6–2.2). Cards seen edge-on leave thin pointed slivers on the crown top (front and f34). The big dark skirt
+    diamonds hang like spades under L and R.
+  - **Read.** Side by side (`cmp_front`, `cmp_rear`, `cmp_top`), the crown, the defining feature, reads as flat shards
+    where the sheet has fluffy scalloped clumps.
+  - **Fix target:**
+    - Rounded-lobe cards: each lobe gets two tip verts, or a 10–12-vertex rim with shallow notches at 0.75–0.8, so no
+      tip is under about 110°.
+    - Card Ø 2.6–3.0 (radius 1.3–1.5) on the top and rim, more of them on the outline.
+    - Front upper-outline peaks ≥ 12, roughness ≥ 1.5.
+    - No edge-on slivers above the crown.
+  - **Budget.** There is 192 tris of headroom. The 38 blades and 9 hubs cost 282 tris; dropping to 4 blades a tuft or
+    shrinking tuft counts frees about 60–100 more. Keep ≥ 12 cards per clump.
+
+**Minors** (fix during the B1/B2 pass where cheap; otherwise record them as leftovers)
+
+- **m1. Wood above h .45 in the front: 14.0 % (sheet 12.4 with the same mask; spec band 10–12).**
+  - It errs toward the user's tree rule and the T total is within tolerance (38.4 against 36.8 ± 4).
+  - f34 11.9 and rear 12.7 are in band; r34 is 9.9; side 4.4 (the side is judged for content).
+  - **Target:** front ≤ 12.5 after B1/B2, by trimming the BM1/BM4 knuckle blocks (Ø 2.0 → 1.8), not by hiding limbs.
+- **m2. The side cell reads inverted.**
+  - Canopy bottoms at the sides are .58–.73; the sheet's are .41–.49. The high FL/FR and B clumps show at the sides and
+    L/R in the middle. Fill is 0.47 against 0.59.
+  - This follows from the accepted plan (§3.3, deviation 6). Accept it.
+- **m3. The top view is 91 % light** (front top band 95 % against 74 %), and the top hue is 62° against the sheet's 69°.
+  - From above the crown reads yellow.
+  - **Target:** the cap cards about 70 / 25 / 5, using the existing `TONE_PATCH` noise to bring mid-tone patches into the
+    top 0.66 of the rank.
+- **m4. The f34 W : H is 0.909 against 1.107.** The sheet's f34 is drawn wider (§3.2, decision 10). Accept it.
+- **m5. The front canopy median is darker: v .67 against .77** (hue 69° and saturation match; v > .7 `#D6DF10` matches).
+  - The cause is the large dark skirt cards on L and R.
+  - **Target:** skirts mid / mid-dark rather than dark, and smaller (they also feed B2).
+- **m6. The origin and ground contact.**
+  - The rocks reach local z 0, while the trunk foot is at 0.10, roots at 0.07, toes at 0.05 and pads at 0.08.
+  - Roblox sizes a MeshPart to its bbox, so a tree dropped onto flat ground rests on its rocks. The trunk then stands
+    **0.1 proud**, and the root toes and pads 0.05–0.08 proud: a visible light line under the roots at close range.
+  - **Fix in the builder:** raise rocks and pebbles by 0.1 (their bases are flat, so sinking them buys nothing on flat
+    ground), and seat toes, pads and hubs with bottoms at build z 0. Then `m054_offset.z` = 0 and the trunk foot is the
+    bbox bottom.
+  - Failing that, the exporter or placement code must apply a −0.1 pivot offset.
+- **m7. Three cards are pierced by limbs.** In each, 1–2 of 10 verts are 0.10–0.25 inside a limb:
+  - card at (−2.7, 0.2, 11.1) local, on BM1's main run;
+  - card at (5.0, −2.6, 11.1), on the BM4 riser;
+  - card at (0.9, 2.6, 16.5), on BM3's bl arm, hidden inside B.
+  - None is a buried shell (each is under 25 % inside), but the builder's guard only checks the trunk, roots and rocks.
+  - **Fix:** add the module shells to `_seat_card`'s guard.
+- **m8. Bark pits: 15, against decision 7's 20–26** (7 on the trunk, 8 on the modules).
+  - The four trunk pits at z 4.6 are 0.6–0.9 sq studs: long dark slots on the planks (front view, trunk base), not the
+    0.25–0.35 squares the spec asks for.
+  - **Target:** 20+ pits of 0.25–0.35, with a fixed inset size rather than a fraction of the plank.
+- **m9. Paint by facing in effect.**
+  - `_knuckle_light` picks faces whose centre offset from the run's axis points up (`off.z > 0.35 |off|`). On a prism
+    that offset is the face normal's direction, so the pale knob is "faces pointing up" (§9.9).
+  - It is a small region, and the bark family's overall correlation is 0.26.
+  - **Fix:** choose by the convex side of the bend, i.e. `off · (bend outward)` > 0.
+  - The rock height bands correlate 0.86 with normal z. They follow the approved plan (by height in each rock); consider
+    softening them to 15 % so the lighting does the work.
+- **m10. The trunk reads as a straight column** (not a cone; the twist reads only faintly).
+  - Width at h .3 is 0.23 W against the sheet's 0.31.
+  - The roots read as separate pale wedge slabs: the front wood median is `#845129` (trunk dark, roots light) against
+    `#985F31`.
+  - The RT3 / RT4 moss patches read as flat hard yellow stripes.
+  - **Target:** lighten the groove blend (deep 75 % → 50 %), widen the z 3–6 rings about 0.4, and give the moss patches
+    a 50 % edge band.
+- **m11. Smaller read points.**
+  - LOW-R's second tine is hidden in the f34 (0 of 2.65).
+  - In the front, the V reads as one post: BM3's br arm shows 0 there.
+  - The B core apex is the hero's top (z 20.00; the highest card is at 19.82). Check that it doesn't show as a bare dome
+    tip.
+
+**Confirmed against the decisions**
+
+| # | Decision | Result |
+| --- | --- | --- |
+| 1 | Size | 20.0 tall, crown 20.5 × 18.8; the lowest card is at 7.5 build z |
+| 2 | Names, keys, collection | `ShadeTree*`, `m054_*`, `Kit/M054 Broadleaf Tree` |
+| 3 | Crown plan | five clumps from the top cell |
+| 4 | Limbs | four modules feed five clumps; **B1 is open** |
+| 5 | Joints | no pegs in the hero; peg on the BranchModule part; no pale joint rings seen |
+| 6 | Crown shells | ring-stack runs; tines and twigs as separate shells; no booleans in the crown |
+| 7 | Bark pits | **m8 is open (15 pits)**; the knots read as holes: front oval hole in a pale rim, small hole above, back hex hole |
+| 8 | Leaves | 77 cards, 16 tris each, over cores; toned by height; not balls; 0 floating, 0 buried; **B2 is open (pointed)** |
+| 9–10 | Views and cameras | as decided |
+| 11 | Collision | as decided |
+| 12 | Exports | hero plus four parts |
+| 13 | Colour family | canopy lime-green (hue 69° front, not pale or olive in front, f34 or rear); bark orange-brown, hue 27°, R > G > B; rocks warm grey, R ≥ G ≥ B. **m3 is open** (top view yellow) |
+| 14 | Stages 5 and 6 | skipped and recorded |
+| 15 | Budget | 3608 / 3800; parts 972 / 188 / 296 / 980 |
+
+The packaging rules hold: 0 winding errors and every shell manifold.
+
+### Score and verdict
+
+**6 / 10. FAIL (round 1).**
+- **Sound:** the mesh is clean throughout, the budget holds, the contact chain is complete, the binding front shares
+  (canopy 47.4, wood 38.4) are in tolerance, and the low limbs and forks read in front, f34 and rear.
+- **Blocking:** the leader can't be seen from the rear (B1, the user's tree rule), and the canopy's leaf cards read as
+  pointed diamond shards where the sheet has many small rounded lobed leaves (B2, decision 8). Both have concrete,
+  in-budget fixes.
+- **Next:** send B1 and B2, plus the cheap minors m5–m9, to a fresh modeller, then run verification round 2.
+
+## Fix round 1 (fix modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m054.py` edited (it is still the source of truth); background session port 9880 on
+`wip/M054.blend`, saved after the final build, which ran in a freshly restarted session (`build()` with renders, about
+70 s). Measured with the round-1 verifier's own scripts (copied to scratchpad `m054fix/`: `audit.py`, `contact2.py`
+extended with pierced cards and card tip angles, `limbs.py`, `vmeas.py`, `scal.py`; renders 960 × 720, `_long_lens`,
+floor hidden) so the numbers compare like for like with "Verification round 1".
+
+### What changed
+
+**B1, the leader from the rear.**
+- B has no skirt cards at all (round 1 hung four, two of them on its rear side, down to z 12.6), and its core bottom is
+  raised to z 15.2 (was 14.4). B's top is 20.1 (was 20.3), so the hero is 20.38 tall with the cards.
+- The BM3 V fork is lower (13.6, was 14.0) and its arms splay: bl now runs out to (−0.9, 4.3, 15.6) and br to
+  (3.8, 4.3, 15.6), so the V reads as two limbs rising into B's raised underside from the rear and as a V in the f34.
+
+**B2, small rounded lobed leaves.**
+- `leaf_card()` is new: a star-shaped low pyramid (22 tris, closed and outward by construction). Its 12-vert rim has
+  four broad lobes (`CARD_LOBES` 1.0 / 0.92 / 0.96 / 0.92). Each lobe ends in two tip verts at ±8°, a blunt rounded
+  end, and the lobes are split by deep notches at 0.6 rc. The apex sits 0.15 rc over the rim plane. The smallest rim
+  tip angle is 116.7° (round 1: 73°).
+- Card radius is `CARD_R` 1.45 at the top, tapering 10 % toward polar 112° with ±4 % jitter: 1.39–1.49 on the top
+  cards, about 1.28–1.40 on the rim, and skirts 1.33–1.45 (round 1: 2.0).
+- Cards: 67 (B 16, FL 12, FR 12, L 11 + 3 skirt, R 10 + 3 skirt) at 22 tris = 1474 tris (round 1: 77 × 16 = 1232).
+- The outline is scalloped by leaves seen face-on, not edge-on plates. Cards on the front / rear silhouette (dome
+  normal across the view) are turned up to 58° toward ±y (`CARD_TURN`); the turn ramps in from polar 22° over 30° and
+  scales with 1 − |n.y|, and the top cards get 0.6 of it. The rim tilt (outer lobes proud) is 20–32° and halves on
+  the top cards. Together these remove the edge-on slivers on the crown top.
+- No dark spade skirts. FL / FR have none; L / R have three small cards each, hung from the core's lower ring
+  (`zs` 0.18) and toned mid / mid-dark only (x clamped to 0.9–1.0). The lowest card is at z 7.86 (decision 1: 7.8–8.2).
+- Cores are rounder underneath: the bottom ring is at 0.6 of the widest ring (was 0.8). Their underside band
+  (hz ≤ 0.25) is mid→dark 75 %, which gives back the sheet's dark clump bottoms (front dark tone 16 %, sheet 13 %).
+  `CORE_PAD` is 0.9 rc.
+- A card is seated only when its centre is outside the core (`_card_in`) as well as having 1–2 verts inside.
+- Clump plan (to hold the front shares with smaller, turned cards): FL W 6.8 and zc0 11.7, FR W 7.6 and zc0 11.6,
+  L zc0 9.8 and zt 14.4, R zc0 9.8 and zt 14.2. L / R keep their trunk-side cards up to polar 85° (`inner_tmax`), so
+  the BM1 and BM4 limbs show (spec 2.5).
+- Budget to pay for the cards:
+  - grass blades are thin 4-tri tetrahedra (same B-L-T-R lanceolate outline, 38 blades kept; −76);
+  - tuft hubs are 3-sided pyramids (−18);
+  - moss pads have 6-vert lobed rims (−24).
+
+**Minors.**
+- **m5 (front canopy dark):** skirts are mid / mid-dark and small. The front canopy median is `#96B310` (v .70), against
+  `#84AA10` (v .67) in round 1 and the sheet's `#A5C50B` (v .77).
+- **m6 (origin):** `SINK_ROCK`, `SINK_PEB` and `SINK_HUB` are 0. Root runs, root ends, toes and pad bottoms all sit at
+  build z 0. Every object's origin offset z is 0, and the trunk foot is the bbox bottom.
+- **m7 (cards pierced):** the card guard (`CARD_GUARD`) now holds the trunk plus every limb shell. Each module's shells
+  are collected by `_shells_of` after its pits are cut. Each clump also guards its own twigs, which are now built
+  before its cards. A card cutting any of them more than 0.01 shrinks and turns, and is dropped if it still cuts; none
+  is dropped in the final build. One L core vertex sat 0.055 inside BM1's main run; core vertices inside a limb or twig
+  are now drawn toward the core axis until clear.
+- **m8 (pits):** `_pit` cuts a fixed 0.3 × 0.3 square, sunk 0.04–0.05, on a quad facet that holds it with a 0.06
+  margin (`_quad_fits`). The four sloped faces round it keep the facet's own colour, so no dark slot shows. There are 23
+  pits: 13 on the trunk (`TRUNK_PITS` +6) and 10 on the modules (BM1 4, BM2 1, BM3 2, BM4 3).
+- **m9 (knuckle paint):** `_knuckle_light` paints the knuckle block's outer end (every ring face past 0.45 of the
+  block, all round it) bark→light 50 %. It selects by position along the run only; no offset or normal is used.
+- **Wood above h .45:** the BM1 / BM4 knuckle blocks are slimmer (r 0.84 / 0.80 and 0.84 / 0.78, were 1.0 / 0.94 and
+  1.0 / 0.92), the B_L / B_R bosses are r 1.1 (were 1.2), and FL / FR sit lower. Front is 12.6.
+- **Top view (m3):** top cards (rank under 0.66) get mid→light 50 % / 25 % patches from a second position-noise field
+  (`TOP_PATCH`). B's tone shift is +0.3. Top tones are 79 / 21 / 0 (round 1: 91 / 8 / 1).
+- m10 and m11 are not addressed. The trunk groove blend is unchanged, and so is the BM3 br arm, which still shows 0 in
+  the front.
+
+### Before → after
+
+| Check | Target | Round 1 (verifier) | Fix round 1 |
+| --- | --- | --- | --- |
+| Hero tris | ≤ 3800 | 3608 | **3788** |
+| Parts (trunk / branch / clump / base) | < 1000 each | 972 / 188 / 296 / 980 | 964 / 196 / 336 / 886 |
+| Non-manifold, boundary, bowtie, n-gon, zero-area, self-intersections, negative-volume shells, all 5 objects | 0 | 0 | 0 |
+| Winding errors per shell, all 5 objects | 0 | 0 | **0** |
+| Floating / unchained shells (tol 0.03) | 0 | 0 / 0 | **0 / 0** |
+| Dressing > 0.05 inside wood or rock (trunk, roots, limbs, twigs, rocks) | 0 | 0 (max 0.034) | **0** (max 0.03, pad in root) |
+| Cards > 25 % in core / centre in core / half in another card | 0 | 0 | 0 |
+| Cards pierced by wood (any vert inside trunk, root, limb or twig) | 0 | 3 | **0** |
+| `K.check` / `build()` problems | [] | [] | [] / [] |
+| Size (W × D × H) | 20.2 ± 1, 19.5 ± 1.6, 20.0 ± 0.4 | 20.54 × 18.84 × 20.00 | 20.58 × 19.40 × 20.38 |
+| Origin offset z / lowest shell z | 0 / 0 | 0.1 below the trunk foot | **0 / 0** (trunk foot, roots, toes, rocks, hubs all at 0) |
+| LEAD (BM3 main + arms + spur), rear | ≥ 1.5 | **0.6** | **7.50** (0.36 + 3.70 + 3.44) |
+| LEAD, front / f34 | ≥ 1.5 | 2.9 / 4.0 | 3.70 / 5.36 |
+| LOW-L (BM1 main + low), front / f34 / rear | ≥ 1.5 | 3.1 / 2.6 / 2.7 | 4.01 / 3.86 / 3.10 |
+| LOW-R (BM4 main + side + riser), front / f34 / rear | ≥ 1.5 | 4.8 / 2.2 / 2.2 | 4.91 / 3.70 / **1.63** |
+| UPPER-L (BM2), f34 / r34 | ≥ 1.0 in one | 1.6 / 1.4 | 0 / 2.38 |
+| BM4 riser, f34 | ≥ 1.0 | 1.3 | 1.56 |
+| Card shape | rounded lobes, every tip ≥ ~110° | 4 single-vert tips, 73° | 4 two-vert lobe ends, min **116.7°** |
+| Card radius | 1.3–1.5 on the top and rim | 2.0 | 1.39–1.49 top, ~1.28–1.40 rim |
+| Upper-outline lobe peaks, front / f34 / rear (sheet 13 / 14 / 15) | 13–15 | 11 / 6 / 10 | **9 / 9 / 10** |
+| Outline roughness, front / f34 / rear (sheet 1.88 / 2.17 / 1.59) | → 1.6–2.2 | 0.99 / 1.04 / 0.98 | 1.04 / 1.12 / 1.32 |
+| Front canopy G / wood T (sheet 46.5 / 36.8) | ± 4 | 47.4 / 38.4 | 49.4 / 36.9 |
+| Wood above h .45: front / f34 / rear (sheet 12.4 / 11.0 / 13.0) | front ≤ 12.5 | 14.0 / 11.9 / 12.7 | **12.6** / 11.0 / 14.4 |
+| Front tones L / M / D (sheet 56 / 31 / 13) | | 57 / 29 / 14 | 57 / 27 / 16 |
+| f34 tones (sheet 55 / 31 / 14) | | 64 / 25 / 11 | 63 / 24 / 12 |
+| Rear tones (sheet 52 / 38 / 10) | | 45 / 43 / 12 | 36 / 52 / 12 |
+| Top tones (sheet 59 / 29 / 13) | about 70 / 25 / 5 | 91 / 8 / 1 | 79 / 21 / 0 |
+| Top canopy median (sheet `#B1CF10`, 69°) | | `#CFD80A` (62°) | `#B2CB0F` |
+| Front canopy median (sheet `#A5C50B`) | lighter | `#84AA10` (v .67) | `#96B310` (v .70) |
+| Top-view wood T (sheet 7.6) | | 17.6 | 19.0 |
+| Bark pits | 20–26 squares of 0.25–0.35 | 15 (slots up to 0.9 sq) | **23** squares of 0.3 |
+| Knuckle paint | by position | by facing (`off.z`) | by position along the run |
+| Lowest card z | 7.8–8.2 | 7.5 | 7.86 |
+| Facing correlation (`kit_baked_shading`), hero / parts | < 0.5 | 0.21 / ≤ 0.26 | 0.41 / ≤ 0.34 |
+
+### Left over (for the verifier and the main session)
+
+1. **Outline lobes: 9 / 9 / 10 against 13–15, roughness 1.0–1.3 against 1.6–2.2.** The `scal.py` detector counts
+   bumps that drop 2/226 H within ±3°: lobes about 0.6 stud across. That is leaf-lobe scale. With cards of radius
+   ≥ 1.3, four lobes a card are spaced about 2 studs apart. Single-vertex tips can't be both deep and ≥ 110°. Five or
+   six two-vert lobes cost 28–34 tris a card, which the ceiling can't carry at this card count (the hero is at 3788 of
+   3800). Visually the crown now reads as overlapping four-lobed leaves with a lumpy outline (`m054fix/cmp_a.png`,
+   `cmp_b.png`). It doesn't have the sheet's fine scallops.
+2. **Side view:** the turned silhouette cards are edge-on from ±x, so the side cell shows clumps with ragged card edges
+   (judged for content, decision 9). The side canopy share is 48.8 against 48.9.
+3. **Rear / kit rear:** with no skirt and a raised bottom, B shows its flat dark-green underside from the rear, which
+   reads a little like a cap over the V. That is the price of B1. Rear tones are mid-heavy (36 / 52 / 12 against
+   52 / 38 / 10), and rear wood above h .45 is 14.4 against 13.0 (the V and the upper trunk now show).
+4. **LOW-R from the rear is 1.63**, just over 1.5 (riser 0 and side 1.35 from the rear; BM4 tine 1.43).
+5. **Top view:** wood T is 19.0 against 7.6. The clumps' plan footprints are smaller than the sheet's (smaller cards,
+   and the rim cards turned toward the front / back cameras).
+6. **Facing correlation:** the hero's is 0.41 (was 0.21). It comes from the height roles (light top cards, darker core
+   undersides), not from any facing rule. Nothing in the builder reads a normal for paint.
+7. m10 (straight-column trunk, light roots, hard moss stripes) and m11 (the BM3 br arm 0 in the front, LOW-R's second
+   tine in the f34) are as in round 1.
+
+No commits, pushes or exports were made. `FlintbornWorldKit.blend` was not opened.
+
+## Verification round 2 (verifier, 2026-10-30)
+
+A fresh stage-7 agent worked read-only on port 9880 (`wip/M054_verify.blend`, the main session's GUI build of the fixed
+`m054.build()`). Nothing was built, edited or saved, and the session is stopped. The round-1 scripts were read, copied
+to scratchpad `m054_v2/` and re-run (audit, contact2 with ground at z ≤ 0.03, limbs, vmeas, scal). New scripts:
+`xover.py` (card / limb triangle overlaps), `vis.py` (ray-cast foliage exposure per azimuth), `uvc.py` (UVs and
+facing correlation) and `pits.py`. Renders (960 × 720, `_long_lens`, floor hidden) and the sheet | ours strips are in
+`art/blender/renders/models/M054/verify2/`.
+
+### Measured
+
+**Mesh.** All five objects are clean.
+- Every object: 0 non-manifold, 0 boundary, 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 bowties, 0 winding errors,
+  0 self-intersections within a shell, 0 negative-volume shells.
+- Rotation 0, scale 1, no custom normals, `UVMap` present.
+- Origin offset is (0.296, 0.607, **0**). The trunk foot, roots, toes, rocks and hubs all reach z 0 (round-1 m6 fixed).
+- `K.check` returns []. There are no sockets, and collision is hero / trunk / root base precise, branch and clump hull.
+
+| Object | Tris | Size | Shells |
+| --- | --- | --- | --- |
+| ShadeTree | **3788** / 3800 | 20.58 × 19.40 × 20.38 (in tolerance, height at its +0.4 edge) | 179 |
+| ShadeTreeTrunkCore | 964 | 9.53 × 8.79 × 12.40 | 1 |
+| ShadeTreeBranchModule | 196 | 5.83 × 3.24 × 4.19 | 6 |
+| ShadeTreeLeafClump | 336 | 6.89 × 5.65 × 6.40 | 15 |
+| ShadeTreeRootBase | 886 | 19.52 × 16.23 × 3.23 | 83 |
+
+**UV.** All five objects: 0 overlaps (polygons shrunk 2 %), 0 flipped, 0 zero-area, islands inside 0.008–0.992.
+
+**Contact and burial.**
+- Floating: 0. Unchained: 0 (tol 0.03, 46 ground shells).
+- Buried more than 0.05: 0. The deepest is 0.030, a pad in a root.
+- Cards: none more than 25 % inside its core, none with its centre inside, none more than half inside another card.
+- Cards with a vertex inside wood: 0. Card faces crossing wood triangles: **1**. A FR inner card at build
+  (3.3, −3.3, 13.2) has 8 triangle pairs crossing the BM4 riser where it enters FR. No vertex is inside, so the riser
+  passes through the leaf face (minor).
+- Card rims: 8 convex verts each, smallest tip angle **116.7°**. Lowest card z 7.86. 67 cards × 22 tris.
+
+**Pits.** 23 squares of 0.30 × 0.30, plus 10 larger hollows (knots, tine and toe ends).
+
+**Visible bare limb, in studs** (round-1 `limbs.py`):
+
+| Limb | Front | f34 | Rear | r34 |
+| --- | --- | --- | --- | --- |
+| LEAD (BM3 main + bl + br + spur) | 0 + 3.70 + 0 + 0 = 3.70 | 0 + 4.81 + 0 + 0.55 = 5.36 | 0.36 + 3.70 + 3.44 = **7.50** | 0.41 |
+| LOW-L (BM1 main + low) | 1.27 + 2.74 | 1.12 + 2.74 | 0.46 + 2.64 | 0 + 2.18 |
+| LOW-R (BM4 main + side + riser) | 0.84 + 1.30 + 2.77 | 0.84 + 1.30 + 1.56 | 0.28 + 1.35 + 0 = **1.63** | 0.81 |
+| UPPER-L (BM2) | 1.11 | **0** | 0.66 | 1.72 + 0.66 |
+
+**Foliage exposure** (orthographic ray grid, 0.12-stud step, elevation 5°; the share of visible foliage hits that land
+on a bare core, and the share of visible card hits that are edge-on, |n·view| < 0.35):
+
+| View | front 0° | rear 180° | az 45° | az 135° | az 225° | az 315° | side 90° | side 270° | top |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Core share | 35.8 | 36.0 | 49.2 | 50.9 | 46.2 | 50.1 | **66.6** | **65.2** | 40.3 |
+| Edge-on cards | 0.0 | 0.5 | 15.5 | 21.9 | 17.9 | 22.4 | **35.8** | **35.4** | 8.6 |
+
+**Shares and colour** (study masks; the sheet re-measured with the same code; ours / sheet):
+
+| View | W : H | canopy G | T | T > h .45 | ground G | fill | tones L / M / D | canopy median | canopy v > .7 | wood v > .7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front | 0.953 / 0.987 | 49.4 / 46.5 | 36.9 / 36.8 | 12.6 / 12.4 | 4.5 / 6.3 | 0.57 / 0.59 | 57/27/16 vs 56/31/13 | `#96B311` / `#A5C50B` | `#BCDB14` / `#CEE30A` | `#E48F47` / `#E69646` |
+| f34 | 0.883 / 1.107 | 49.1 / 47.6 | 36.0 / 32.4 | 11.0 / 11.0 | 4.6 / 7.5 | 0.55 / 0.64 | 63/24/12 vs 55/31/14 | `#A3C011` / `#A7C10A` | `#BDDB13` / `#DCE709` | `#E28E47` / `#EA9849` |
+| rear | 0.962 / 0.961 | 48.5 / 46.7 | 40.4 / 37.7 | 14.4 / 13.0 | 4.3 / 6.2 | 0.56 / 0.58 | **36/52/12** vs 52/38/10 | `#90B112` / `#94B70C` | **`#A4C012`** / `#D1E40B` | `#C47E3F` / `#E79848` |
+| r34 | 0.978 / 0.971 | 48.3 / 46.7 | 38.7 / 37.9 | 13.4 / 12.3 | 4.1 / 6.7 | 0.58 / 0.58 | 42/49/9 vs 43/31/26 | | | |
+| side | 0.912 / 0.880 | 48.8 / 48.9 | 39.1 / 36.9 | **6.5** / 12.0 | 2.1 / 5.3 | **0.41** / 0.59 | 34/44/22 vs 48/34/18 | `#839612` / `#97BD10` | | |
+| top | W : D 1.019 / 1.027 | 56.0 / 64.0 | **19.0** / 7.6 | | | 0.56 / 0.66 | 79/21/0 vs 59/29/13 | `#B2CB0F` / `#B1CF10` | | |
+
+- **Upper-outline lobe peaks** (`scal.py`), ours / sheet: front 9 / 13, f34 9 / 14, rear 10 / 15. Roughness: 1.04 / 1.88,
+  1.12 / 2.17, 1.32 / 1.59.
+- **Trunk width at h .3:** 0.23 W against 0.31 (m10 unchanged).
+- **Swatches against the palette:** LEAF DARK `#46852D`, MID `#70A81F`, LIGHT `#D6DF06`, BARK MID `#B4672C`, BARK LIGHT
+  `#D88E4B`, ROCK `#998D86`. The rendered families sit in the right hues: canopy 70–72°, wood 27°, R > G > B; rock
+  warm grey.
+
+**Facing correlation** (area-weighted normal z against material lightness):
+- Hero: leaf **0.54**, bark 0.26, rock 0.86, grass −0.04. `kit_baked_shading` 0.41.
+- Parts: ≤ 0.41.
+
+**Code check: no colour is chosen by face normal.**
+- `_knuckle_light` paints by the parameter along the run (`tt > 0.45`).
+- `clump_core` paints by height in the core (`hz` bands).
+- Cards are painted by height rank plus noise patches.
+- Roots are painted by section-edge index and height. Rocks are painted by height in the rock.
+- `f.normal` is used only for pit geometry (`_quad_axes`, `_pit`).
+- The leaf 0.54 comes from the dark `hz ≤ 0.25` band, which sits on the flat, downward-facing core bottoms. That is
+  legal by the code, but it makes the flat undersides read as dark plates (see B3).
+
+### Findings
+
+**B1, leader from the rear: fixed by measure.**
+- From the rear, 7.50 studs of the V show (bl 3.70, br 3.44); front 3.70, f34 5.36.
+- The V reads as two limbs rising into B (`verify2/rear_sheet.png`).
+- The price is that B now sits on the V like a flat dark-bottomed plate (folded into B3).
+
+**B2, pointed leaf cards: fixed only from the sheet angles. Still a blocker.**
+- Fixed: there are no more 73° diamonds and no edge-on slivers on the front / rear / f34 outline (edge-on 0–0.5 % in
+  front and rear).
+- Not fixed, face-on: each card is a truncated four-point star. Lobe ends are only ±8° wide, and straight edges run
+  from the 0.6 notches. Face-on (`part_leafclump.png`, the top cards in `front_sheet`) they read as **four-pointed
+  stars**, not the sheet's rounded scalloped leaves.
+- Not fixed, from other angles: `CARD_TURN` turns the silhouette cards toward ±y, which moves the problem round the
+  tree.
+  - From ±X the clumps read as **bare faceted green balls with edge-on cards sticking out as spikes**: core 66.6 / 65.2 %
+    of the visible foliage, 36 % of visible card area edge-on, side fill 0.41 against 0.59
+    (`verify2/side_sheet.png`, `lside_sheet.png`, `side_r1_r2.png`).
+  - From every diagonal (az 45 / 135 / 225 / 315) half the visible foliage is bare core (46–51 %), and the five clumps
+    read as faceted cabbages on sticks (`verify2/az45.png`, `az135.png`, `az300.png`).
+  - Even from the front a third of the visible foliage is core (35.8 %).
+- That is the user's "balls / spikes / stars" in every view except the four the cards were turned for. The user's
+  rule makes every view count. Decision 9 judges the side cell for content, and here the content itself is wrong.
+- **The defining feature still reads clearly unlike the sheet.**
+
+**B3 (part of B2, the same clump pass): flat dark core bottoms read as plates.**
+- B's core underside is a flat hexagon about 5 across, inside a dark band about 8 across, toned mid→dark 75 %.
+- From the rear, f34 and r34 it reads as a mushroom cap or table top resting on the V (`verify2/cmp_34.png`). L's and R's
+  undersides read as trays.
+- The sheet's clump bottoms are dark too, but rounded and scalloped by leaves.
+
+**Fix targets for a narrow round 3** (clumps only; nothing else may change):
+1. **Rounded card outline at no extra tris.** Widen the lobe ends and make the notches shallower: for example
+   `CARD_HALF` about 18–20° and `CARD_NOTCH` about 0.75–0.8, or five lobes if the budget allows. The face-on outline
+   should read as a rounded quatrefoil or oak-leaf, not a star; keep every tip ≥ 110°.
+2. **Cover the cores from every azimuth.** Drop the ±y-only `CARD_TURN`, or cap it at about 20° and aim it radially
+   outward in plan so it serves every side. Spread the cards over the full azimuth with their outer lobes tilted proud
+   (round 1's tilt was right for this).
+   - Targets with `vis.py`: core ≤ 30 % of visible foliage at front / rear / az 45 / 135 / 225 / 315 / 90 / 270 (el 5°),
+     edge-on cards ≤ 10 % at every azimuth, side fill ≥ 0.50.
+   - Shrinking the cores (a larger `CORE_PAD`) is the cheapest lever; more cards is the other.
+3. **No flat underside plate.**
+   - Taper the core bottom to a low cone or point (the bottom ring is at 0.6 now), or tuck 2–3 underside cards round
+     B's lower ring on the side away from the V.
+   - Keep B's lower rim at or above z 15.2 over the V, so LEAD from the rear stays ≥ 1.5 (it is 7.5 now).
+   - Leaf facing correlation back under 0.5.
+4. **Budget.**
+   - The hero is at 3788 / 3800. Lever 1 is free.
+   - For more cards, free tris from: blades 47 × 4 = 188 (drop to 35 blades: −48); the 4 pebbles (≈ −48); trunk rings
+     (the trunk shell is 610 tris).
+   - Or the main session can raise the ceiling toward 3950 under the 4000 limit.
+
+**Minors** (record as leftovers if round 3 doesn't touch them):
+
+| # | Finding | Measured |
+| --- | --- | --- |
+| m-a | One FR card face crossed by the BM4 riser. | 8 triangle pairs, no vertex inside |
+| m-b | Rear crown dull and mid-heavy. | rear tones 36 / 52 / 12 against 52 / 38 / 10; rear canopy v > .7 `#A4C012` against `#D1E40B`; rear top-band light 48 % against 73 % |
+| m-c | Top view shows too much wood: the clumps don't touch in a ring. | wood 19.0 % against 7.6; canopy 56 against 64 |
+| m-d | Side shows too little wood above h .45. | 6.5 against 12.0 |
+| m-e | m10 unchanged: straight column, pale wedge roots, hard yellow moss stripes on RT3 / RT4, no continuous moss band on the ground. | width at h .3 0.23 W against 0.31; ground G 4.1–4.6 against 6.2–7.5 |
+| m-f | The 0.30 dark pits sit in vertical rows on the strands and read as black rivets in the front and rear views. Consider bark_deep instead of hollow, or a staggered layout. | 23 pits |
+| m-g | Some limbs are hidden. | UPPER-L (BM2) 0 in the f34 (1.72 + 0.66 in the r34, which is enough); BM3 br 0 in the front; LOW-R 1.63 from the rear, just over 1.5 |
+| m-h | Front canopy slightly dark and the top band over-lit. | front canopy median `#96B311` against `#A5C50B`; front top-band light 88 % against 74 % |
+
+**Confirmed as passing:**
+- Decisions 1–3, 5–7, 10–15.
+- Pits 23 of 0.3 (decision 7, m8 fixed).
+- Knuckle paint by position (m9 fixed).
+- Origin and ground (m6 fixed).
+- No pierced card vertices (m7 fixed, apart from m-a).
+- Front binding shares in tolerance: canopy 49.4 against 46.5 ± 4, wood 36.9 against 36.8 ± 4, wood above h .45
+  12.6 (band 10–12, sheet 12.4).
+- Parts match their exploded cells:
+  - the trunk core has its socket top, three bosses, six stubs and a hollow foot;
+  - BM1 is the big Y with a peg;
+  - the root base has its roots, toes, rocks and tufts;
+  - the leaf clump has its stub, though its cards read as stars (B2).
+
+### Score and verdict
+
+**6 / 10. FAIL (round 2).**
+- **Sound:**
+  - the packaging is clean (0 everywhere, 3788 tris, all parts < 1000);
+  - B1 is met with margin (rear 7.5);
+  - all the minors given to the fix round are fixed;
+  - the front binding shares hold.
+- **Blocking:** the defining feature, the five lobed leaf clumps, still reads clearly unlike the sheet:
+  - four-pointed star cards face-on;
+  - bare faceted cores with edge-on spikes from the sides (core 65–67 %) and from every diagonal (46–51 %);
+  - flat dark plates under B, L and R.
+- Per STAGES.md this qualifies for a targeted third round. Send B2 / B3 targets 1–4 to a fresh modeller, change only
+  the leaf clumps, and keep B1's ≥ 1.5 rear lead.
+
+### Main session ruling after round 2 (2026-10-30)
+A targeted **round 3, on the leaf clumps only**, is approved under the STAGES.md exception: from the sides and diagonals the tree's defining feature still reads clearly unlike the sheet (`verify2/side_sheet.png`: green balls with spikes). The main session looked at that render and agrees.
+- **Hero ceiling** is raised to **3950**, under the 4000 limit.
+- **Targets:** verifier round-2 targets 1–3. Measure with `vis.py` at all eight azimuths:
+  - bare core ≤ 30 %;
+  - edge-on cards ≤ 10 %;
+  - side fill ≥ 0.50;
+  - leaf facing correlation < 0.5.
+- **Cards:**
+  - Must read as rounded lobes face-on.
+  - No `CARD_TURN` toward the ±y cameras. Use at most about 20°, aimed outward in plan.
+- **B rim** stays at z 15.2 or above, so the rear leader still shows at least 1.5.
+- **Cheap extras** (do them only if they are cheap):
+  - m-e: soften the yellow moss stripes on the roots into blended bands;
+  - m-f: break the pits' vertical rows.
+- **Everything else** in round 2's minors is noted for later polish.
+- A fresh round-3 verifier checks only the leaf targets and that nothing else regressed. After that the model is committed.
+
+## Fix round 2 (fix modeller, round 3 targets, 2026-10-30)
+
+Scope: the leaf clumps only (hero clumps and `ShadeTreeLeafClump`), per the main session's ruling after round 2. I edited
+the builder `art/blender/kit/mcp/m054.py`, which is still the source of truth. Background session: port 9880 on
+`wip/M054.blend`, saved after the final `build()` with renders. The session was restarted once after a usage-limit
+pause, and the rebuild came out identical. Everything was measured with the round-2 verifier's scripts (`vis.py`,
+`contact2.py`, `audit.py`, `uvc.py`, `xover.py`, `limbs.py`, `vmeas.py`), copied unchanged to scratchpad `m054r3/`. I
+added `vis16.py`: the same ray grid at 16 azimuths (every 22.5°) × elevation 5° and 20°, plus top, as an all-round
+check. Sheet | ours strips and big renders are in `art/blender/renders/models/M054/fix3/`
+(`cmp_a/b/c.png`, `diag_views.png` = az45 / az135 / left side).
+
+### What changed
+
+**Cards: rounded three-lobe leaves.**
+- `leaf_card` is now a 9-vert rim of three broad lobes with a low apex (16 tris, closed, outward).
+- Each lobe ends in two verts at ±22° (`CARD_HALF`, was ±8°). Lobe radii are 1.0 / 0.95 / 0.97.
+- Notches sit at 0.7 rc (`CARD_NOTCH`, was 0.6). The smallest tip angle is 111.9°.
+- `CARD_DOME` is 0.08 (was 0.15), so each card shades as one flat leaf, not a faceted star.
+- Card radius `CARD_R` is 1.6.
+- Face-on a card reads as a rounded clover leaf (see the top cards in `fix3/top_sheet.png`).
+- I tried rounder four-lobe cards first (±16–19°, notch 0.68–0.78, 22 tris). They read well but covered too little
+  for the budget: 72 cards against 102 trefoils. The clumps came out thin.
+
+**No turn toward any camera. Every card is faced for the views all round the tree.**
+- `CARD_TURN` is gone.
+- `_card_normal`: each card is tipped 10–50° off its dome normal (`CARD_TILTS`), toward one of 24 rolls about that
+  normal.
+- It keeps the facing whose projected area is least edge-on (|n·d| < 0.39). The views it weighs are 24 azimuths at
+  elevation 5° and 15°, plus the top view at weight 16.
+- Ties break toward the lower lobe standing proud (shingles) and toward the smaller tilt.
+- No azimuth is favoured. Skirt cards go through the same choice; their old ±y turn is gone too.
+- `_refine_cards` is a visibility pass, run on the hero only, after all five clumps are built.
+  - Rays from 5 points on each card find which views really see it past the other cards, the cores, the limbs and the
+    trunk. The card's facing is then chosen again with those weights.
+  - A card is replaced only if this cuts its edge-on share by at least 0.005 and the new card stays clear of the wood
+    and the cores.
+  - It runs 5 passes: 61 / 28 / 17 / 21 / 9 cards re-faced.
+- `CARD_SEED` is 8: a card-layout seed offset, chosen from a scan of 14 seeds. I ranked the seeds on the all-round
+  edge-on and core shares, side fill and limb visibility, not on the four sheet cameras.
+
+**Cores: smaller, rounder, tapered underneath.**
+- `CORE_PAD` is 1.15 rc (was 0.9). New `CORE_VPAD` is 0.6 rc: the core shrinks from the top as well as round the
+  sides, so it stays round. A tall narrow core acts as a cylinder whose flanks are edge-on to every camera.
+- `CORE_RINGS` gains a bottom cone: the point is at zc0, the rings at 0.12 / 0.32 / 0.7. There is no flat underside
+  plate.
+- Cap cards wrap to polar 128° (`CAP_TMAX`, was 112°), so leaves tuck under the widest ring. B stays at 96°.
+- The core's underside band is now mid→dark 50 % (was 75 %). The tapered cone puts more of that band face-down, and the
+  part's `K.check` flagged it (corr 0.60). It is still chosen by height in the core, never by facing.
+
+**Clump plan** (to keep the binding front shares with smaller cores, and to fill the side view):
+- B: (1.6, 5.6), 12.1 × 11.7, zt 19.85, 27 cards.
+  - Three small skirts hang on its outer rear side (az 20 / 90 / 160 in plan, zs 0.12). Nothing hangs over the V.
+  - B's core bottom stays at z 15.2. Rear LEAD is 4.16.
+- FL: (−3.2, −5.2), zc0 11.1, 8.1 × 9.3, 19 cards.
+- FR: (4.0, −5.0), zc0 11.6, 8.9 × 9.9, 19 cards.
+- L: zt 15.6, 11.1 × 11.7, 18 cards.
+- R: zt 15.4, 9.5 × 10.7, 15 cards.
+
+**Guards:**
+- A card may no longer touch wood (`CARD_CUT` 0, was 0.01).
+- `cuts()` now also rejects a card whose faces cross a trunk, limb or twig face with no vertex inside (m-a).
+- `_clear_cores`: a card that a later clump's core swallowed (more than 2 verts in any core) is moved out along its
+  dome normal. 3 were moved and 1 removed.
+- 4 cap cards are dropped for wood clearance (B, FL, FR, R).
+
+**Budget:**
+- 102 cards × 16 = 1632 tris (round 2: 67 × 22 = 1474).
+- Tufts T5b and T6 have 4 blades (were 5): −8 tris.
+- `build()` now checks against `HERO_CEILING` 3950 (the ruling).
+- The hero is **3948**.
+
+**Not done:**
+- The cheap extras: the moss stripes on RT3 / RT4 and the pit rows (m-e, m-f).
+- The rest of round 2's minors.
+
+### Before → after
+
+| Check | Target | Round 2 (verifier) | Fix round 2 (round 3) |
+| --- | --- | --- | --- |
+| Bare core share of visible foliage (`vis.py`, el 5): front / rear / az45 / az135 / az225 / az315 / side90 / side270 / top | ≤ 30 | 35.8 / 36.0 / 49.2 / 50.9 / 46.2 / 50.1 / 66.6 / 65.2 / 40.3 | **20.4 / 18.9 / 16.6 / 19.0 / 23.5 / 19.2 / 18.5 / 17.1 / 24.9** |
+| Edge-on card share, same views | ≤ 10 | 0.0 / 0.5 / 15.5 / 21.9 / 17.9 / 22.4 / 35.8 / 35.4 / 8.6 | **8.8 / 9.7 / 8.4 / 7.1 / 9.8 / 7.1 / 8.6 / 6.5 / 2.4** |
+| All-round check (`vis16.py`: 16 az × el 5 / 20, plus top): edge-on max / mean, core max | | | 10.6 (az 180, el 20) / 7.0, 24.9. Every el-5 view is ≤ 9.8 |
+| Side fill (`vmeas.py`, sheet 0.593) | ≥ 0.50 | 0.41 | **0.500** |
+| Leaf facing correlation, hero / part (`uvc.py`) | < 0.5 | 0.54 / ≤ 0.41 | **0.37 / 0.33** (baked 0.28 / 0.35) |
+| Card outline | rounded lobes, tips ≥ 110° | four-point star, ±8° ends, 0.6 notches | three rounded lobes, ±22° ends, 0.7 notches, min tip **111.9°** |
+| `CARD_TURN` toward ±y | none (≤ ~20° outward if any) | 58° | **none** (facing chosen all round) |
+| Core underside | tapered or tucked | flat hexagon plate | **cone to a point, cards to polar 128°** |
+| B lower rim over the V / LEAD rear | ≥ 15.2 / ≥ 1.5 | 15.2 / 7.50 | core bottom 15.2; 3 small skirts on the far rear rim / **4.16** |
+| Hero tris / parts | ≤ 3950 / < 1000 | 3788 / 964, 196, 336, 886 | **3948** / 964, 196, 362, 878 |
+| Non-manifold, boundary, bowtie, n-gon, zero-area, winding, self-intersection, negative shells (all 5) | 0 | 0 | **0** |
+| Floating / unchained / buried > 0.05 | 0 | 0 / 0 / 0 (max 0.030) | **0 / 0 / 0** (max 0.030, a pad in a root) |
+| Cards > 25 % in cores / centre in a core / half in a card | 0 | 0 | **0** (max 0.2) |
+| Cards pierced by wood (vertex inside) / card faces crossing wood | 0 | 0 / 1 (m-a) | **0 / 0** |
+| Origin offset z, `K.check` | 0, [] | 0, [] | **0, []** |
+| Size W × D × H (20.2 ± 1, 19.5 ± 1.6, 20.0 ± 0.4) | | 20.58 × 19.40 × 20.38 | 20.08 × 18.36 × 20.33 |
+| Front canopy G / wood T (46.5 ± 4 / 36.8 ± 4) | binding | 49.4 / 36.9 | **49.0 / 37.1** |
+| Wood above h .45: front / f34 / rear / side (sheet 12.4 / 11.0 / 13.0 / 12.0) | | 12.6 / 11.0 / 14.4 / 6.5 | 12.1 / 10.0 / 13.1 / 1.7 |
+| Front / f34 / rear canopy median (sheet `#A5C50B` / `#A7C10A` / `#94B70C`) | | `#96B311` / `#A3C011` / `#90B112` | `#9EB610` / `#A6C910` / `#89B212` |
+| Tones L / M / D: front, rear, top (sheet 56/31/13, 52/38/10, 59/29/13) | | 57/27/16, 36/52/12, 79/21/0 | 58/36/6, 36/58/6, 60/39/1 |
+| Top canopy / top wood (sheet 64.0 / 7.6) | | 56.0 / 19.0 | **64.7 / 10.5** |
+| LEAD (BM3 main + bl + br + spur): front / f34 / rear / r34 | ≥ 1.5 | 3.70 / 5.36 / 7.50 / 0.41 | 4.46 / 5.87 / 4.16 / 0.36 |
+| LOW-L (BM1 main + low): front / f34 / rear | ≥ 1.5 | 4.01 / 3.86 / 3.10 | 3.81 / 2.79 / 3.61 |
+| LOW-R (BM4 main + side + riser): front / f34 / rear | ≥ 1.5 | 4.91 / 3.70 / 1.63 | 5.92 / 4.41 / 2.61 |
+| UPPER-L (BM2): f34 / r34 | ≥ 1.0 in one | 0 / 2.38 | 0.35 / 1.77 |
+| Lowest card z | 7.8–8.2 | 7.86 | 8.16 |
+
+### Left over (for the verifier and the main session)
+
+1. **Edge-on cards sit near a floor of about 7 %.**
+   - A flat card seen from a half circle of views is edge-on in about 6 % of its projected area. That is the
+     |n·d| < 0.35 band at its own silhouette, and no facing removes it.
+   - The 9 verifier views are 6.5–9.8 %. Over 32 all-round views the mean is 7.0 and the worst is 10.6 (az 180,
+     elevation 20).
+   - The margin under 10 % in the verifier's views is therefore small (rear 9.7, az225 9.8).
+2. **Side fill is 0.500 against 0.593.** It is just at the target. From ±x, B still stands out on the BM3 arm, the
+   price of the rear-leader layout (decisions 3 and 9).
+3. **Leaf size against the sheet.** The cards (r 1.6, three lobes) are larger and fewer than the sheet's small
+   oak-like leaves. The crown reads as overlapping rounded leaves from every view, not as balls, spikes or stars, but
+   it doesn't have the sheet's fine scallops.
+4. **The `ShadeTreeLeafClump` part** (FL, 6.0 × 6.6 × 7.5) is taller than wide and reads a little like a pinecone in
+   `part_leafclump.png`. FL's envelope is tall, and the visibility pass runs on the hero only. Widening FL's core broke
+   the front-share and edge-on targets, so I kept it.
+5. **Tones.**
+   - The dark share is lower than the sheet's (front 6 % against 13 %). The cards now cover the dark core bottoms,
+     and the underside band is mid→dark 50 %.
+   - The rear is still mid-heavy (m-b).
+   - The side's wood above h .45 is 1.7 against 12.0 (m-d): the fuller clumps cover the upper trunk from ±x.
+6. **B skirts and the "B rim ≥ 15.2" rule.** B's core bottom stays at 15.2. The three skirts hang below it on B's far
+   rear rim (y ≈ 10, behind the V), and the rear lead measures 4.16. Please confirm this meets the intent.
+7. **Untouched:** m-e (the moss stripes on RT3 / RT4 are still hard) and m-f (the pit rows). I didn't touch anything
+   outside the clumps except the two tuft blade counts.
+8. **The 057 "core is the foliage" option** wasn't needed: the card route meets the round-3 targets within 3950.
+
+No commits, pushes or exports were made. `FlintbornWorldKit.blend` was not opened.
+
+### Main session ruling after fix round 2 (2026-10-31)
+- **B's three rear skirt cards are accepted** below z 15.2. The rule existed to keep the rear leader visible, and it still shows 4.16 studs.
+- **Not done in this round, recorded for polish:**
+  - the cheap extras (moss stripes and pit rows);
+  - the LeafClump part reading a little like a pinecone.
+- **Next:** a fresh round-3 verifier checks the leaf targets and for regressions; then the model is committed.
+
+## Verification round 3 (verifier, 2026-10-31)
+
+A fresh stage-7 agent checked the round-3 leaf targets and looked for regressions. It worked read-only on port 9880
+(`wip/M054_verify.blend`, the main session's build of the fixed `m054.build()`). Nothing was built, edited or saved,
+and the session is stopped. The round-2 scripts (`audit`, `contact2`, `vis`, `xover`, `uvc`, `limbs`, `vmeas`, `scal`)
+and the fixer's `vis16` were read, copied to scratchpad `m054_v3/` and re-run. Three scripts are new:
+- `vis_b.py`: per-card edge-on measured by the card's plane normal, plus core share from below at el −20;
+- `plate.py`: flat, downward-facing core area;
+- `render4.py`: underside and el-5 diagonal renders with the floor hidden.
+
+Renders and the sheet | ours strips (`cmp_fr.png`, `cmp_34.png`) are in `art/blender/renders/models/M054/verify3/`.
+Every number the fixer reported reproduced exactly.
+
+### Round-3 leaf targets
+
+| Check | Target | Measured |
+| --- | --- | --- |
+| Bare core share of visible foliage (`vis.py`, el 5): front / rear / az45 / az135 / az225 / az315 / side90 / side270 / top | ≤ 30 | 20.4 / 18.9 / 16.6 / 19.0 / 23.5 / 19.2 / 18.5 / 17.1 / 24.9 |
+| Edge-on card share, same views (per face, \|n·d\| < 0.35) | ≤ 10 | 8.8 / 9.7 / 8.4 / 7.1 / 9.8 / 7.1 / 8.6 / 6.5 / 2.4 |
+| All-round (`vis16`, 16 az × el 5 / 20 + top) | | edge max 10.6 (az 180 el 20), mean 7.0; core max 24.9 |
+| Side fill (`vmeas`) | ≥ 0.50 | 0.500 (sheet 0.593) |
+| Leaf facing correlation, hero / part | < 0.5 | 0.37 / 0.33 |
+| Card outline | rounded lobes, tips ≥ 110° | 102 three-lobe 16-tri cards; ±22° lobe ends, 0.7 notches; min tip 111.9° |
+| Core undersides | no plate | all five cores end in a cone. B is shallow: 27 % of its core area faces nearly straight down (nz < −0.9; the others 0–14 %) |
+| B rear leader (BM3 main + bl + br) | ≥ 1.5 | 0.36 + 2.69 + 1.11 = 4.16 (front 4.46, f34 5.87) |
+
+**By eye** (`side_sheet`, `lside_sheet`, `az45/135/225/315` at el 5 and 12, `az90_20`, `top_sheet`, `under*_sheet`):
+- **From every azimuth the crown now reads as clumps of overlapping, rounded, flat-shaded leaves.**
+  - There are no bald faceted balls, no cabbages on sticks and no star cards.
+  - Round 2's side view (balls with spikes) is fixed. The cores show only as dark gaps between leaves.
+- The top view gives the sheet's ring of five clumps. Canopy is 64.7 against 64.0.
+- From below (el −25 / −40), the clump undersides read as dark rounded domes rimmed with leaves, not as table tops.
+- **What is still unlike the sheet** (leftovers, not blockers):
+  - **The leaves are big.** About 3.2 studs across, so each clump shows roughly 15–25 leaves where the sheet shows
+    many small scalloped ones. The crown outline is smoother than round 2 and much smoother than the sheet:
+    - upper-outline lobe peaks: front / f34 / rear 8 / 8 / 8 against 13 / 14 / 15;
+    - roughness: 0.54 / 0.70 / 0.52 against 1.88 / 2.17 / 1.59 (round 2: 9–10 peaks, roughness 1.04–1.32).
+  - **Thin edge-on slivers** still poke out of the outline here and there. They are under the target, but they show.
+
+### Regressions: none found
+
+| Check | Limit | Measured |
+| --- | --- | --- |
+| Tris: hero / parts | ≤ 3950 / < 1000 | 3948 / TrunkCore 964, BranchModule 196, LeafClump 362, RootBase 878 |
+| Hero size W × D × H | 20.2 ± 1, 19.5 ± 1.6, 20.0 ± 0.4 | 20.08 × 18.36 × 20.33. Depth is down 1.04 from round 2 and still in tolerance |
+| Origin | z offset 0 | `m054_offset` (0.195, 0.684, **0**); the bbox z starts at 0.000 on all 5 objects |
+| Mesh, all 5 objects | 0 | non-manifold, boundary, wire, loose, zero-area, n-gon, bowtie, winding, negative-volume shells and in-shell self-intersections are all 0. Rotation 0, scale 1, no custom normals, `UVMap` present |
+| UV | | 0 overlaps, 0 flipped, 0 zero-area; islands inside 0.008–0.992 |
+| `K.check` | [] | [] |
+| Floating / unchained / buried > 0.05 | 0 | 0 / 0 / 0. The deepest is 0.030, a pad in a root. The lowest card is at z 8.16 |
+| Cards: > 25 % in a core / centre in a core / half in another card | 0 | 0 / 0 / 0 |
+| Cards pierced by wood / card faces crossing wood | 0 | 0 / 0 (round-2 m-a fixed) |
+| Front shares (binding) | canopy 46.5 ± 4, wood 36.8 ± 4 | 49.0 / 37.1. Wood above h .45: 12.1 |
+| Colour by face normal | never | `f.normal` is used only for pit geometry (`_quad_axes`, `_pit`) and a volume sum. Cards are coloured by height rank plus noise, and cores by height band |
+| Limbs ≥ 1.5 | | LOW-L front / f34 / rear 3.81 / 2.79 / 3.61; LOW-R 5.92 / 4.41 / 2.61; UPPER-L r34 1.77 (f34 0.35) |
+
+### Minors (leftovers for the commit notes)
+
+| # | Finding | Measured |
+| --- | --- | --- |
+| r3-a | The leaves are larger and fewer than the sheet's, so the outline is less scalloped. | outline peaks 8 against 13–15; roughness 0.5–0.7 against 1.6–2.2 |
+| r3-b | Thin margin on edge-on. Measured by each card's plane normal instead of per face (the 0.08 dome tilts the facets), some views exceed 10 %. | per face: rear 9.7, az225 9.8, all-round max 10.6. Plane-based pixel share: front 13.5, az225 10.4, the rest 5.7–8.4. About a quarter to a third of visible cards (by count) sit within 20° of edge-on |
+| r3-c | Side fill only just meets its target, and the upper trunk is hidden from ±x. | fill 0.500 against 0.593; side wood above h .45 1.7 against 12.0 (round 2: 6.5) |
+| r3-d | B's underside is a shallow cone. It shows only from below. | 27 % of B's core area has nz < −0.9 |
+| r3-e | The `ShadeTreeLeafClump` part is tall and reads a little like a pinecone (accepted by the main session). | 6.0 × 6.6 × 7.5 |
+| r3-f | Tones have too little dark, and the rear is mid-heavy. | L / M / D: front 58/36/6 against 56/31/13; rear 36/58/6 against 52/38/10; rear canopy v > .7 `#A0BB13` against `#D1E40B` |
+| r3-g | From the front, the crown reads as one umbrella rather than three distinct clumps with branch gaps. This predates round 3. | |
+| r3-h | Unchanged from earlier rounds: m-e (hard moss stripes on RT3 / RT4), m-f (pit rows), m10 (straight column, trunk width at h .3 0.23 W against 0.31), low ground green. | ground G 4.0–4.5 against 6.2–7.5 |
+| r3-i | From below (el −20), core share is 29–33 %. This is not a target. | |
+
+### Score and verdict
+
+**7 / 10. PASS (round 3).**
+- Every round-3 target is met when measured.
+- From every azimuth and from the top, the crown now reads as rounded broadleaf clumps, not balls with spikes or
+  stars. That was the blocker, and it is cleared.
+- The packaging is clean, with no regressions, 3948 / 3950 tris, and the binding front shares hold.
+- The leftovers above are polish:
+  - the leaves are bigger than the sheet's, with a smoother outline;
+  - the edge-on and side-fill margins are thin;
+  - the tones are short of dark.
+- None of them is breakage, and none makes the crown read clearly unlike the sheet.
+
+### Main session ruling (2026-10-31)
+The targeted round 3 PASSED at 7/10, so the model is committed.
+- **Recorded for polish:** minors r3-a to r3-h. The main ones:
+  - leaves larger and fewer than the sheet's, giving a smoother outline;
+  - a thin edge-on margin;
+  - the upper trunk hidden from the sides;
+  - low dark tones;
+  - the moss stripes, pit rows, straight trunk and ground green left from earlier rounds.
+
+Export: 5 assets, 6348 tris, 0 problems.

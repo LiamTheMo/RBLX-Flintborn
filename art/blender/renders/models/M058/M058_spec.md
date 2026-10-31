@@ -1001,3 +1001,784 @@ All 14 recommendations are accepted.
 **Helpers.** `m054.py` is not committed yet, so copy its helpers rather than importing them, unless it has been committed by the time you build. The committed `m047.py` and `m053.py` may be imported.
 
 **Binding.** The front shares in §1 (green 77, wood 7.6, each ±4) and fill.
+
+## Stage 1 — Modelling (modeller, 2026-10-30)
+
+Builder `art/blender/kit/mcp/m058.py` (`build()`; quick loop `hero_only()` + `preview()`), built in the background
+session on port 9877, work file `art/blender/assets/kit/wip/M058.blend` (saved after the final build).
+
+**Skeleton (decisions 4, 5).**
+- `trunk_shell()`: ONE closed ring-stack shell for trunk + both leaders. The 8-sided planked trunk (rings z 0 / 0.4 /
+  0.8 / 1.15, Ø 0.72 → 0.56 → 0.62 × 0.56 at the fork, verts 1 and 5 pulled in 14 % as grooves) forks at its top ring:
+  each half of the ring plus a shared crotch vertex (z 1.30) becomes a 6-vert ring that runs on as LEAD (right leader,
+  tip (0.2, 0.35, 2.58)) and UP-L (left leader, tip (−0.95, −0.9, 2.22)). It is manifold by construction: each of the
+  two crotch edges is shared by one face of each leader.
+- Three root flares (closed 6-vert wedges at az 200 / 320 / 80, flat on z 0, buried in the trunk foot).
+- Five buried limbs (5-sided, mitred kinks, flat cut tips): UP-R, BACK-L, BACK-R, LOW-L, LOW-R, each starting at least
+  0.25 inside the trunk / fork. The bare SPUR (4-sided) leaves LEAD at z 1.7 and ends at (0.12, −0.5, 2.05) **in the
+  window**. It moved from the spec's (0.85, −0.55, 2.2), which sits inside CR's foliage in this crown.
+- One 4-sided twig per cluster runs from the limb's last segment into the core underside. Three **window sprigs** are
+  twigs off the LOW-L / LOW-R kinks, each carrying one rosette: SR carries F5 above RK1, SL is the dark low rosette left
+  of the trunk, SB fills the rear window.
+
+**Crown.** Seven cluster cores on the seven tips (5-sided flat-bottomed domes, 18 tris, `leaf_under`): CT (0.1, −0.15)
+zb 2.5; CFL (−1.35, −1.05) / CR (1.55, −0.95) zb 1.3; CBL (−1.3, 1.15) / CBR (1.3, 1.2) zb 1.35; CLL (−2.35, −0.05) /
+CLR (2.38, 0.15) zb 0.8. Each limb tip is inside its core (close-up 1: the joint is hidden).
+- **Rosette placement (changed from the plan's per-cluster Fibonacci caps).** `plan_rosettes()` casts 900 rays from
+  outside onto the seven cores and keeps the crown's OUTER surface (faces turned to the ray, no undersides). It then
+  farthest-point-samples 56 seats at least 0.66 apart. Each seat belongs to the core it lies on (CT 11, CFL 8, CR 7,
+  CBL 8, CBR 8, CLL 7, CLR 7). Classes go by height: top 20 % L, next 42 % M, the rest S. Per-cluster caps left the
+  front faces of the cores bare (iterations 3–5) and read as a pile of separate caps; even coverage over the whole dome
+  gives one scalloped crown.
+- Each rosette's axis is the core normal tilted 15–25° toward up. Rosettes on the front / rear silhouette are then
+  turned up to 40° toward that camera (m054's card turn), so the outline is scalloped by rosettes seen face-on.
+- Seating (`seat_rosette`): each rosette sinks along the core normal as far as allowed (at most 25 % of its verts inside
+  ANY core, centroid outside every core). A rosette that would cut the stem by more than 0.03 is turned, shrunk or
+  slid; none was dropped in the final build.
+- Two foot rosettes: FC (M ×1.1) in front of the trunk, FB (S) at the back.
+- **Rosette shape (`rosette()`, hero).** A raised apex over a star outline of n broad blunt lobes. Each lobe has two
+  shoulders at 0.92 R, a tip at R and a notch at 0.66 R (tip corner ≈ 130°), so it is a ridge with a facet each side
+  and a crease to the next lobe. The lobes droop (tips 0.14 h, notches 0.34 h) over a skirt that closes at a bottom
+  point sunk in the core. L R 0.70 n 5, M R 0.58 n 5, S R 0.48 n 4; h ≈ 0.86 R; 8n tris (32–40).
+  Tried and rejected on the way: shallow-notch two-tier mounds (read as smooth balls), flat low stars (read as palm /
+  agave stars and paper parasols), 3-vert squared lobes (spiky).
+- **Parts** (`rosette_part`): the same lobe outline with a domed top (a ridge / crease ring at half radius) and stacked
+  tiers turned half a lobe. Large has 3 tiers (n 6 / 5 / 4), Medium 2 tiers (n 6 / 5), Small one tier (n 5): the
+  parts row's clumps.
+
+**Flowers (decision 6).** Six, on the front half only. Each is placed from the front-view (x, z) of §2.5 on the first
+rosette the line of sight hits. Its axis is 70 % the sheet's facing + 30 % the hit normal, and it is lifted until no
+petal is more than 0.03 inside a rosette (lifts 0.03–0.12). Each flower has a 5-sided yellow centre column reaching
+0.04 below its base into the rosette (18 tris), five broad blunt spoon petals cupped 12° (10 tris each) and one green
+under-leaf (10 tris): 78 tris. Actual seats: F1 (−2.15, −1.70, 1.95), F2 (−0.6, −1.73, 2.35), F3 (0.8, −1.08, 3.45),
+F4 (1.45, 0.24, 2.65), F5 (1.5, −0.85, 1.2, on sprig SR), F6 (2.5, −1.39, 2.4).
+
+**Base.**
+- Rocks (ring-stack hulls, flat base at z 0): RK1 (1.45, −1.25) 1.5 × 1.15 × 0.74; RK2 (−1.85, −1.3) 1.4 × 1.05 × 0.58;
+  RK3 flat stone (0.3, −2.0) 1.3 × 0.9 × 0.25; RK4 (1.95, 1.4) 1.75 × 1.25 × 0.7; RK5 (−0.8, 1.65) 1.6 × 1.15 × 0.62.
+  They are about 15 % smaller than §2.6, because the front rock share ran 9–10 % against the sheet's 6.1.
+- Three pebbles (one tan).
+- Eight lime ground pads (flat 4–5-lobe stars, 22–30 tris), guarded against the rocks and the stem.
+
+**Sizes.** Hero 6.63 × 5.97 × 4.36 (targets 6.4 ± 0.3, 5.6 ± 0.4, 4.5 ± 0.15). Origin offset 0: the trunk foot, rocks
+and pads all sit on z 0 and nothing goes below (decision 10). Scale shot `scale.png`: the crown top is at 0.79 of the
+5.5-stud marker.
+
+## Stage 2 — Optimisation and cleanup
+
+`_post()`: triangulate (BEAUTY), recalc normals per shell, flat shading, no custom normals, origin at the bbox bottom
+centre, `M.fix_bowties`. There are no booleans anywhere (decision 5): every piece is its own closed shell in one object.
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| GladeBush | **3650** (ceiling 3800) | 6.63 × 5.97 × 4.36 | 146 |
+| GladeBushLeafClumpLarge | 180 | 1.42 × 1.48 × 0.74 | 3 |
+| GladeBushLeafClumpMedium | 132 | 1.17 × 1.16 × 0.55 | 2 |
+| GladeBushLeafClumpSmall | 60 | 0.84 × 0.84 × 0.50 | 1 |
+| GladeBushBranchStem | 300 | 4.32 × 2.40 × 2.62 | 10 |
+| GladeBushRock | 30 | 1.52 × 1.09 × 0.74 | 1 |
+| GladeBushGroundLeaves | 72 | 2.17 × 1.75 × 0.30 | 3 |
+| GladeBushFlower | 78 | 0.58 × 0.58 × 0.17 | 7 |
+
+Hero budget by kind: trunk 134, flares 24, limbs 130, twigs 132 (11, including the sprig twigs and the spur), cores 126,
+rosettes 2264 (61 shells: 56 crown + 2 foot + 3 sprig), rocks 142, pebbles 36, pads 194, flower centres 108, petals 300,
+under-leaves 60.
+
+Measured by `build()`:
+- **Topology.** Every object has 0 non-manifold edges and verts (bowties), 0 boundary, wire, loose, zero-area, n-gon
+  and duplicate-vert counts; normals outward; transforms applied. **0 winding errors** and 0 self-intersections in
+  every shell of every object. Smallest corner 2.98° (hero), none under 2°.
+- **Contact.** 0 floating and 0 unchained shells. The hero has 22 ground shells; every other shell chains to them by
+  contact.
+- **Bury.** 0 dressing shells more than 0.05 inside wood or rock (max 0.018: a sprig rosette on its own twig end). Rocks
+  0 into the stem. Rosettes against cores: at most 23 % of verts inside, none with the centroid inside. Rosettes against
+  neighbours: at most 27 % (limit 50 %). Petals and under-leaves: none more than 0.05 inside a rosette (petal depth max
+  0.016).
+- The part rosette seeds are fixed (L 58506, M 58577, S 58583), because some jittered seeds fold a domed lobe over its
+  neighbour (self_hits); the chosen ones report 0.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, ANGLE_BASED, margin 0.008) + `m012._uv_unfold`. Hero: 2090 islands, 0 overlaps, 0 flipped, min
+gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch p95 1.0. All parts: 0 overlaps, 0 flipped, gap
+0.016 (stem p95 1.013, flower 1.056).
+
+## Stage 4 — Materials, colour, texture
+
+**Calibration** (`m058.calibrate()`: K.calibrate on the kit dome, targets §5.4; key → rendered sRGB):
+
+| Key | Calibrated | Rendered |
+| --- | --- | --- |
+| leaf_light | #98B90B | 188, 226, 14 |
+| leaf_mid | #558225 | 99, 154, 37 |
+| leaf_dark | #396831 | 64, 120, 50 |
+| leaf_lime | #93B207 | 182, 217, 10 |
+| bark | #6E3F0E | 138, 80, 37 |
+| bark_light | #AE7329 | 220, 140, 57 |
+| bark_deep | #472401 | 90, 52, 29 |
+| rock | #A19996 | 204, 188, 175 |
+| rock_light / rock_deep | #B0A9A4 / #847F7D | |
+| pebble_tan | #907B59 | 182, 150, 103 |
+| petal | #C6C6CA | 251, 244, 238 |
+| pollen / pollen_deep | #DDAD00 / #C19000 | 255, 211, 34 |
+
+**Adjusted after calibration.**
+- The crown shades itself (054's lesson), so the leaf family was lifted ×1.25–1.3 in linear light: leaf_light
+  **#A8CC0D**, leaf_mid **#60932B**, leaf_dark **#407337**. Bark ×1.3: **#93561F**; bark_deep **#55300C**.
+- leaf_under **#2B4E1F** (104°), set by hand to the spec's 100–108° role, not the 90° sheet disc.
+- petal **#CFCCC8**, a neutral grey instead of the calibrated bluish #C6C6CA; it renders white either way.
+- The final `PALETTE` holds these values.
+
+**Blending (role and position, never facing).**
+- **Rosettes.** Each rosette gets a tone s (0 light … 2 dark) from its height in the crown (s = 1.15 − 1.1 u), −0.2 for
+  the top 35 % of its cluster, the cluster's shift and broad position noise (amplitude 1.35–1.85). s is quantised to
+  quarter-step mixes between the three leaf keys (`_leaf_key`). Drooping lobe skirts get +0.5 and undersides +0.75;
+  both are mostly hidden in the cores.
+- **Bark.** Lit plank crests by strip index (strips 2 / 6 at 50 %, 0 / 4 at 25 % bark_light), grooves 50 % bark_deep,
+  a deep foot band and crotch ring, pale cut faces.
+- **Rocks.** Height bands within each rock.
+- **Pads.** Lime, 25–50 % mid by distance from the trunk (the inner ones sit in the crown's shade).
+- **Flowers.** White petals; pollen with a 50 % pollen_deep column.
+- **Tint.** ±0.04 per rosette; broad mottling 0.02–0.04 on rosettes, bark and rocks; never per triangle.
+- **K.check baked_shading:** hero 0.06, stem 0.14, all parts 0.0. The parts use one tone per module; the first part
+  build scored 0.88–0.99 from darker undersides and was fixed.
+
+**Re-measured on the final renders** (study masks `cls8` / `sil8`, floor hidden; the sheet's values in brackets):
+
+| View | W : H | G | T | R | fill | tones L / M / D | canopy median | wood median |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet (0, 5) | 1.376 (1.425) | 78.4 (77.4) | 8.1 (7.6) | 8.6 (6.1) | 0.655 (0.682) | 31 / 45 / 23 (33 / 40 / 27) | #6E9F15 (#66A40B) | #502B11 (#56320D) |
+| f34_sheet (0, 10) | 1.299 (1.370) | 78.8 (76.8) | 7.6 (8.4) | 9.0 (6.4) | 0.635 (0.680) | 34 / 44 / 21 (31 / 37 / 32) | #78AA16 (#60A211) | #502B11 (#5F3611) |
+| rear_sheet (180, 5) | 1.413 (1.451) | 90.4 (79.3) | 7.4 (9.0) | 0.7 * (6.3) | 0.602 (0.686) | 23 / 56 / 22 (27 / 37 / 36) | #669719 | |
+| r34_sheet (180, 10) | 1.341 (1.516) | 92.3 (80.3) | 6.3 (9.7) | 0.5 * (4.9) | 0.580 (0.685) | 25 / 55 / 21 | | |
+| side_sheet (90, 5) | 1.201 (1.206) | 94.6 (82.1) | 1.8 (8.0) | 3.3 (6.0) | 0.500 (0.635) | 27 / 27 / 45 | | |
+| top (0, 89) | 1.168 W : D (1.122) | 96.2 (88.0) | 0.3 (2.1) | 2.3 (3.1) | 0.667 (0.695) | 42 / 40 / 19 (33 / 54 / 13) | | |
+
+\* The rear rocks are back-lit, so their warm grey falls into the study's soil / shadow class (X), not R. They are
+visible in `rear_sheet.png`.
+
+Other front measurements (sheet in brackets):
+- Tone bands, h .8–1 / .6–.8 / .4–.6 / .15–.4 (L / M / D): 88/12/0, 50/34/16, 13/64/23, 11/48/42 (66/28/6, 40/37/24,
+  28/47/25, 22/40/38).
+- Lit canopy (v > .7): #A8D318 (#B5DB0C). Lit wood: #C6A46D (#CE9A6E). Rock median: #CCBCB0 (lit facets #DBC7AF).
+- Petals: #FFFFF7, v 1.0, s 0.03 (target v ≥ 0.93, s ≤ 0.06).
+- Pollen: #FFCF28 (#FAD306). R and G are within 5; B is +34 from the studio's sky light, with the key already at B 0.
+- Ground green: #ACD717 (#6E9304). The pads stay brighter than the sheet's shaded ground band.
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows no glow or light (§7, decision 11): no emission, no lights. Studio notes (Requires Manual Validation):
+- lime tops and green bodies under the game sun (not olive, not pale);
+- white petals;
+- dark warm-brown bark with pale cut ends;
+- pale warm-grey rocks;
+- walk-through foliage would need `CanCollide = false` set in Studio (the exporter has no non-colliding option).
+
+Collision tags: hero and parts `hull`, GroundLeaves and Flower `box` (decision 8).
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect (decision 11). No object has sockets; `build()` checks this.
+
+## Renders
+
+All in `art/blender/renders/models/M058/`:
+- `M058_views.png`.
+- Kit views: `front34`, `rear34`, `front`, `side`, `rear`, `top`, `underside`.
+- Sheet cameras (long lens, floor hidden): `f34_sheet` (0, 10), `r34_sheet` (180, 10), `front_sheet`, `side_sheet`,
+  `rear_sheet`, `top_sheet`. For the f34 camera, e 10 / 12 / 15 and az ±15 were probed; e 10 matches the sheet's W : H
+  best.
+- Parts: `part_leafclumplarge` / `medium` / `small` / `branchstem` / `rock` / `groundleaves` / `flower`.
+- `exploded`: the stem, rocks and pads below, the seven clusters lifted with their twigs and cores, two flowers.
+- Close-ups: `attach_cu` (the stem part with CFL lifted off its tip), `window_cu`, `rock_cu`, `rosette_cu`,
+  `underside_hero`, `underside_part`.
+- `scale`.
+
+## Modeller's notes for the verifier
+
+- **Decisions followed:** size, names, seven clusters on seven limbs + spur, trunk + leaders one ring-stack shell, limbs
+  buried, no booleans, six front flowers, no soil patch, collision, cameras (f34 at e 10, inside the allowed probe
+  range), sinking 0 (origin offset 0), no VFX, hero + seven parts, colour by role / position, budget 3650 ≤ 3800.
+- **Deviations (with reasons):**
+  1. **61 rosettes, not about 31** (56 crown + 2 foot + 3 sprigs). At about 31 the cores showed as big smooth dark
+     planes and the crown read as a few large parasols; the sheet's crown is a dense mosaic (about 20 scallops on the
+     front outline). To fit the budget, the hero's rosettes are a cheaper single-tier form (32–40 tris). The parts carry
+     the full stacked, domed clump the parts row shows.
+  2. **The rosettes are spread over the whole crown surface and assigned to the core under them**, instead of 4–6 caps
+     per cluster (see Stage 1).
+  3. The spur moved into the window; it now shows 0.67 studs in the front and f34.
+  4. The rocks are about 15 % smaller than §2.6, to bring the rock share toward the sheet's.
+  5. The low clusters (CLL / CLR) sit at x ±2.35 with cores from z 0.8, so the front view's sides reach the ground. As a
+     result **the side view has no real window** (T 1.8 % against 8.0; only the trunk foot shows). Raising them opened
+     holes in the front view's sides. Corner foot rosettes were tried to fill those, but they read as separate tents.
+     The front and rear cells govern (decision 3).
+- **Known gaps against the sheet (please judge):**
+  - The front / rear windows show the pale backdrop around the trunk; the sheet's window interior is near-black.
+  - Our rosettes read as faceted lobed stars on the crown; the sheet's are chunkier, puffier clumps.
+  - The f34 dark-tone share is 21 % against 32. Rear / r34 G is 90–92 % against 79–80 (the rear rocks count as X; see the
+    table note).
+  - Top view: T 0.3 %, because the lead does not show through a central gap. W : D and coverage match.
+  - The ground pads are flat lobed stars, brighter than the sheet's shaded ground band.
+  - The pollen renders a little pale (B +34).
+- **Limb visibility** (studs of bare limb):
+
+  | Limb | Front | Rear | f34 | r34 |
+  | --- | --- | --- | --- | --- |
+  | Trunk | 1.15 | 1.15 | 1.15 | 1.15 |
+  | LEAD | 1.26 | 0.47 | 1.16 | 0.56 |
+  | UP-R | 0.64 | 0.43 | 0.64 | 0.43 |
+  | BACK-L | 0.50 | 0.20 | 0.50 | 0.40 |
+  | BACK-R | 0.63 | 0.63 | 0.53 | 0.21 |
+  | LOW-L | 0.94 | 1.68 | 0.84 | 1.36 |
+  | LOW-R | 1.03 | 0.95 | 0.93 | 0.62 |
+  | UP-L | 0.39 | 0.13 | 0.39 | 0.13 |
+  | SPUR | 0.67 | 0.11 | 0.67 | 0.00 |
+
+  LOW-L, LOW-R and two upper arms show at least 0.5 in the front and f34. In the rear, only LOW-L, LOW-R, BACK-R and the
+  trunk reach 0.5.
+- **Re-run:** `import importlib, kit_models, m058; importlib.reload(kit_models); importlib.reload(m058); m058.build()`
+  (about 10 s to build, about 40 s to render). The measuring script used here is
+  `C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058w\meas.py`
+  (the study's masks), with `sbs.py` in the same folder for side-by-sides.
+
+### Main session ruling on the modeller's deviations (2026-10-30)
+- **Accepted:**
+  - deviation 1: 61 rosettes instead of about 31, with the cheaper single-tier rosettes in the hero;
+  - deviation 2: rosettes spread over the crown;
+  - deviation 3: the spur moved into the window;
+  - deviation 4: rocks about 15 % smaller;
+  - deviation 5: the f34 camera at elevation 10.
+- **The verifier judges these against the sheet:**
+  - deviation 6, the side view having no window;
+  - the leftovers, especially whether the hero rosettes read as faceted stars, the pale window interior, and the f34 dark share.
+
+## Stage 7 verification (round 1)
+
+A fresh verifier ran this read-only, in a background Blender on port 9877 with `wip/M058_verify.blend`, which was not
+saved. It was restarted once after the usage-limit pause and re-checked: the same model, 3650 tris, 6.634 × 5.97 ×
+4.361.
+
+Renders are in `renders/models/M058/verify/`:
+- all eight azimuths at e 5 (`az8.png`) and the sheet cameras;
+- side-by-sides: `sbs1.png` (front / side / rear) and `sbs2.png` (f34 / r34 / top);
+- large renders (`big_*`);
+- parts: `parts.png` against `sheet_parts.png`;
+- close-ups: flowers (`flowers.png`) and the rest (`cus.png`).
+
+The measuring scripts are in `scratchpad/m058v1/`:
+- `s1.py`: topology;
+- `s2.py`: contact and bury;
+- `vis.py`: ray-grid visibility;
+- `col.py`: colour against facing;
+- `uv.py`: UVs;
+- `meas.py`: the study's masks.
+
+**Verdict: FAIL, 5 / 10.**
+- The topology and packaging are clean.
+- The front, rear and f34 views read like the sheet.
+- The side and diagonal views read as a dark ball with edge-on flaps, which is the failure the tree rule names.
+- The three leaf-clump parts read as tiered tents, not as the parts row's round clumps.
+
+### Re-measured (all match the build's own report)
+- **Tris:** hero 3650 (ceiling 3800). Parts L 180, M 132, S 60, stem 300, rock 30, ground leaves 72, flower 78; each is
+  under 1000.
+- **Sizes:** hero 6.63 × 5.97 × 4.36.
+  - W is within 6.4 ± 0.3.
+  - H is within 4.5 ± 0.15 (−0.14).
+  - D is 0.37 over 5.6. That is inside the builder's ± 0.4 but outside the study's ± 0.3.
+- **Origin and transforms:**
+  - Every object has its origin at its bbox bottom centre (z 0), rotation 0 and scale 1. No object has modifiers,
+    children or VFX sockets.
+  - The hero's origin is 0.24 from the trunk axis in Y (offset −0.04, −0.235). The study asked for ≤ 0.1.
+  - The flower part's offset is z −0.023.
+- **Topology (every object):**
+  - 0 non-manifold edges or verts (bowties), 0 boundary, wire or loose elements.
+  - 0 zero-area faces, 0 n-gons, 0 duplicate verts.
+  - 0 winding errors, 0 shells with negative volume, 0 self-intersections in any shell.
+  - Flat shading and no custom normals. The smallest corner is 2.98° (hero).
+- **Shells:** the hero has 146: wood 20, rock 5, pebble 3, core 7, rosette 61, pad 8, flower centre 6, petal 30 and
+  under-leaf 6.
+- **Floating:** 0. Every shell is within 0.03 of a neighbour, and all of them chain to the 22 ground shells. Every
+  flower centre touches a rosette (0.002–0.028), and every petal chains through its centre.
+- **Buried:** 0 shells more than 0.05 inside wood or rock (ray parity, three rays).
+  - The deepest: rosettes 0.018 / 0.017 / 0.016 in wood (the sprig ends) and pads 0.014 / 0.012 in rock.
+  - Rosettes in cores: at most 23 % of verts, and no centroid inside a core.
+- **UVs:** every object has 0 overlaps, 0 flipped, 0 zero-area and 0 out-of-bounds UV faces. Minimum gap 0.016, border
+  0.008, stretch p95 1.0–1.03 (flower 1.16).
+- **Colour code (read and measured):** nothing is chosen from a face normal. What sets each colour:
+  - **Rosettes:** height in the crown, rank in the cluster and position noise. The skirt and underside groups are a
+    structural role painted darker; they are 4–5 % of the visible rosette area in the front and f34, and 11 % from the
+    side.
+  - **Bark:** strip index and role.
+  - **Rocks:** height bands (face-centre z).
+  - **Pads:** distance from the trunk.
+
+  Correlation of base luminance with the face normal's z:
+  - leaf 0.15, bark 0.13;
+  - rock 0.49, because the height bands coincide with the top faces. §5.3 accepts this, and it sits just under
+    K.check's 0.5.
+
+  Checks on the keys and renders:
+  - Every rock key has R ≥ G ≥ B. In the renders no rock pixel has B > R (rocks sampled in the side and front views).
+  - Rendered petals: #FFFFF8 on F1, and #E8DFD0–#FDF2E3 on F2–F6 (shade and leaf bounce).
+
+### Views against the sheet (study masks, floor hidden; the sheet's value in brackets)
+
+| View | W : H | fill | G | T | O | window | tones L / M / D | canopy median |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| front (0, 5) | 1.373 (1.425) | 0.654 (0.682) | 78.4 (77.4) | 8.1 (7.6) | 0.6 (4.0) | 8.4 (10.5) | 31 / 46 / 22 (33 / 40 / 27) | #6FA01B (#66A40B) |
+| f34 (0, 10) | 1.297 (1.370) | 0.633 (0.680) | 78.8 (76.8) | 7.5 (8.4) | 0.6 (3.4) | 7.8 (11.0) | 34 / 45 / **20 (32)** | #7AAB1B (#60A211) |
+| **side (90, 5)** | 1.193 (1.206) | **0.501 (0.635)** | **94.4 (82.1)** | **1.7 (8.0)** | 0.0 (2.4) | **1.5 (9.4)** | 27 / 29 / **44 (24)** | **#487316 (#65A409)** |
+| **side (270, 5)** | 1.203 | **0.513** | **92.5** | **0.8** | 0.7 | **1.0** | 24 / 38 / 37 | #598C1C |
+| rear (180, 5) | 1.414 (1.451) | 0.602 (0.686) | **90.5 (79.3)** | 7.4 (9.0) | 0.0 (4.1) | 7.3 (12.3) | 22 / 57 / 21 (27 / 37 / 36) | #67981D (#4F920D) |
+| r34 (180, 10) | **1.333 (1.516)** | **0.578 (0.685)** | **92.3 (80.3)** | 6.2 (9.7) | 0.0 (4.4) | 6.2 (13.4) | 24 / 56 / 20 (33 / 36 / 31) | #699A1D (#60A30D) |
+| top (0, 89) | 1.162 (1.122) | 0.668 (0.695) | 96.2 (88.0) | 0.3 (2.1) | 0.0 (2.7) | | 41 / 41 / 18 (34 / 52 / 14) | #84B71C (#6FAB05) |
+| az45 / az315 (e 5) | 1.52 / 1.38 | 0.505 / 0.575 | 88 / 87 | 3.4 / 2.9 | | 3.3 / 3.0 | 29 / 37 / 34; 29 / 47 / 24 | #4F7415 / #79AD1E |
+
+- **Ray grid** (`vis.py`, a ray every 0.05 studs over the whole bush). The columns are:
+  - bare core as a % of the visible foliage;
+  - rosette pixels whose rosette axis lies within 25° of the view plane (edge-on);
+  - wood as a % of all hits.
+
+  | Azimuth | Bare core | Edge-on rosettes | Wood |
+  | --- | --- | --- | --- |
+  | front | 14.5 | 8.4 | 7.4 |
+  | 45 | 24.1 | 31.0 | 2.9 |
+  | **90** | **31.7** | **60.5** | **1.8** |
+  | 135 | 26.1 | 37.7 | 1.8 |
+  | rear | 14.4 | 12.7 | 6.6 |
+  | 225 | 26.9 | 32.2 | 3.9 |
+  | **270** | **30.6** | **58.6** | **1.3** |
+  | 315 | 21.1 | 20.7 | 2.8 |
+  | top | 16.9 | 14.5 | 0.1 |
+- **Side width per height** (h .2–.7): 0.58–0.74 of W, against the sheet's 0.85–0.94. The side's W : H matches only
+  because of the rocks and pads at h .1. The crown itself is a narrow ball.
+- **Flowers** (the fraction of petal and centre verts visible from the front / f34):
+  - F1 0.93, F2 0.91, F3 0.91 and F6 0.89 are clearly on the front of their rosettes.
+  - **F4 0.22:** it sits at y +0.21, inside the crown, and can't be seen (`flowers.png`, row 2).
+  - **F5 0.46:** it is half under a rosette in the window.
+  - So the front shows **4 clear flowers and one partly hidden one**, against the sheet's 6. Front Y 0.3 against 0.7.
+
+### Blockers
+1. **The side and diagonal views read as a dark ball with edge-on flaps, not the sheet's bush.** See `az8.png`,
+   `big_side_sheet.png`, `big_az45_sheet.png` and row 2 of `sbs1.png`. This is visible, not just numeric, and it is the
+   tree rule's named failure.
+   - From 90° and 270°:
+     - 31 % of the visible foliage is bare, smooth, dark core (14 % in the front);
+     - 59–61 % of the visible rosette area is edge-on (8 % in the front);
+     - a lime rosette stands up edge-on at the crown top like a fin.
+   - There is no window and no stem: T 1.7 / 0.8 against 8.0, and window 1.5 / 1.0 against 9.4.
+   - The crown is a narrow ball: fill 0.50 against 0.635, and width 0.58–0.74 W at h .2–.7 against 0.85–0.94.
+   - The canopy is dark: median #487316 against #65A409, and D 44 % against 24.
+   - The diagonals are half-way there: core 21–27 %, edge-on 21–38 %, wood 1.8–3.9 %.
+   - **Causes in the builder:**
+     - `_turn()` turns every silhouette rosette toward the front or rear camera only (`sy = ±1`), so the rosettes on
+       the ±X flanks show their edges to the side cameras.
+     - `plan_rosettes()` leaves the CLL / CLR and side flanks thinly covered, so the cores show through.
+     - The low clusters CLL / CLR (ay 1.25–1.3, cores from z 0.8) fill the whole depth at the sides, so there is no
+       side window.
+   - **Fix direction:**
+     - Turn each rosette toward the nearest of all eight view directions (or radially out with an up-tilt), never
+       toward the front and rear only.
+     - Seat enough rosettes on the core flanks that no view shows more than about 15 % core.
+     - Shorten CLL / CLR in Y, or split each into a front and a back cluster, so the side shows a lower window and the
+       trunk. The sheet's side has T 8 % and a window up to h .45.
+2. **The three leaf-clump parts don't read like their parts-row cells** (`parts.png` against `sheet_parts.png`). This
+   is visible.
+   - The sheet's Large, Medium and Small are round, lobed, chunky clumps, about as tall as they are wide: parts-row
+     W : H 0.97 / 1.06 / 1.06.
+   - Ours are flat, tiered tents of drooping flaps, like a spruce: 1.42 × 0.74, 1.17 × 0.55 and 0.84 × 0.50, so W : H
+     1.94 / 2.13 / 1.68. The Small part is a single tent of five flaps.
+   - §3.6 says the parts row governs each part's shape.
+
+### Minors (with the modeller's leftovers judged)
+- **The hero rosettes read as faceted lobed stars or parasols; the sheet's are puffier clumps.** Visible.
+  - Each rosette is one thin bicone (32–40 tris) with strong radiating ridges and a flat outline.
+  - In the front they read as pinwheels or umbrellas rather than chunky domed clumps.
+  - The lobes are blunt and rounded, so they are not spikes, palm stars or cabbages.
+  - On its own this would be a minor. At the silhouettes and from the sides, these thin rosettes are the flaps in
+    blocker 1.
+- **The window interior is pale; the sheet's is near-black.** Visible.
+  - Front O 0.6 % against the sheet's 4.0; rear 0.0 against 4.1. Window 8.4 / 7.3 against 10.5 / 12.3.
+  - Our window shows the backdrop through the bush, where the sheet shows the dark interior and low dark rosettes.
+  - Closing the see-through under the back clusters (lower back skirts, or interior rosettes) would fix it.
+- **The side view has almost no window** (wood 1.8 against 8.0). Visible. It is part of blocker 1, not accepted as a
+  minor.
+- **The f34 dark share is 20 against 32** (front 22 against 27). Partly visible.
+  - The lower crown is lighter and more even than the sheet's: the f34 band at h .4–.6 is 13 / 66 / 21 against
+    26 / 37 / 37.
+  - The top band is 86–89 % light against 63–66.
+  - It reads a little flatter in tone, but this is mostly numeric.
+- **The lead doesn't show in the top view** (T 0.3 against 2.1). Numeric only: the sheet's brown is a tiny fleck, and
+  W : D (1.162 against 1.122) and the coverage match.
+- **The ground pads are bright flat stars.** Visible.
+  - Rendered median #AFD823 against the sheet's ground band #729804.
+  - Ours are sharp, flat 4–5-point pyramids (`pads_cu.png`). The sheet's, and close-up 3's, are rounded, lumpy,
+    clover-lobed pads, partly in shade.
+  - The GroundLeaves part has the same flat stars.
+- **UP-L shows only 0.39 in the front.** Numeric only. The front still reads as a trunk, a fork, left and right arms and
+  two low limbs (T 8.1 against 7.6).
+- **Flowers.** Visible: the front shows fewer flowers than the sheet.
+  - F4 is hidden inside the crown, which wastes 78 tris.
+  - That leaves 4 clear flowers and a half-hidden F5, against the sheet's 6.
+- **Rear and r34 shares:**
+  - G 90–92 against 79–80 (partly the back-lit rock class, R 0.7–0.8);
+  - r34 W : H 1.333 against 1.516, outside ± 0.07;
+  - r34 fill 0.578 against 0.685, outside ± 0.05.
+
+  The r34 reads narrower and rounder than the sheet's wide dome.
+- **Small dark slits** where one rosette's dark face pokes through a neighbour's lit lobe: at the front crown top, at
+  az45 and in the F2 close-up. Cosmetic.
+- **Branch Stem part:** it is the hero's eight-tip stem, not the parts row's simple Y. This follows spec §8, so it is
+  only noted.
+- **Small numbers:**
+  - The pollen renders #FFD62E against #FAD306 (B +40).
+  - The hero's origin is 0.24 from the trunk axis.
+  - The depth is 5.97.
+- **What passes against the sheet:**
+  - The front, f34 and rear read right: W : H within 0.05 except the f34 (−0.07, the edge of tolerance); G and T within
+    ± 1 in the front and f34.
+  - The trunk, fork and low limbs show in the window.
+  - F1, F2, F3 and F6 are seated on rosettes.
+  - The rocks are warm and pale.
+  - The bark is warm brown: median #502B11, hue 25°, R > G > B.
+  - The canopy is green, not olive: front median hue 82°.
+  - The petals are white.
+  - From below, the clusters read as dark discs ringed by lobes.
+  - All packaging checks pass.
+
+## Fix round 1 (fix modeller, 2026-10-30)
+
+A fresh fix modeller worked from the round 1 FAIL. The builder `m058.py` was rebuilt in the background session on port
+9877, the work file `wip/M058.blend` was saved after the final build, and `build()` was re-run with renders. The
+measuring scripts are in `scratchpad/m058fix/`:
+- `v2.py`: the verifier's `vis.py` ray grid, plus a separate class for the new body lumps and a grazing-facet share;
+- `vs.py`: the verifier's `vis.py` unchanged;
+- `meas.py`: the study masks;
+- `r.py`: renders the eight azimuths and the sheet cameras into `renders/models/M058/fix1/`;
+- `sbs.py` / `mont.py`: side-by-sides and montages.
+
+### What changed (all in `m058.py`; the shared helpers are untouched)
+1. **Rosettes face radially out.** `_turn()` no longer turns rosettes toward the front or rear camera.
+   - Every crown rosette now faces radially out from the crown axis (0.1, 0.1).
+   - Its elevation rises from 25° (low) to 52° (top), and 20 % of the core-normal axis is kept for variety.
+   - The top rosettes therefore tilt toward their own azimuth, and the lime fin at the crown top is gone.
+2. **Puffs replace the hero's thin discs.** The new `puff()` is a lobed dome of the same 8n tris:
+   - an outline of blunt lobe tips and shallow notches;
+   - an upper ring of lobe crowns and creases;
+   - a raised apex;
+   - a skirt closing at a bottom point sunk in the body.
+
+   Seen side-on, a puff reads as a chunky lump, not a flap. Sizes: L R 0.66 / H 0.6 / 6 lobes; M 0.56 / 0.52 / 5;
+   S 0.47 / 0.44 / 5.
+3. **Lumpy leaf bodies replace the smooth dark cores** (the main session's 057 option; the rosettes alone could not
+   cover the core flanks within 3800).
+   - Each cluster body is a main flat-bottomed 5-sided lump (18 tris) on the old core's footprint, plus 1–2 smaller
+     lumps on its outer side.
+   - The lumps are toned by height in the crown, a step darker than the rosettes there (the inner body), with broad
+     noise. The flat bottoms are leaf dark (the underside role).
+   - No face is coloured by its normal. `K.check` baked shading is 0.24 on the hero and 0.0 on every part.
+   - Seating tests each lump as its own solid, because overlapping shells break single-BVH parity.
+   - The builder's own checks still call these 18-tri leaf shells "core". The verifier's `vis.py` counts them as
+     rosettes (nf > 16), unless the shell carries the leaf_under key.
+4. **Side window.**
+   - CLL and CLR are each split into a front and a back cluster: CLLF (−2.3, −0.85), CLLB (−2.2, 1.1), CLRF (2.35, −0.75)
+     and CLRB (2.25, 1.2).
+   - LOW-L and LOW-R now end at a fork under the gap, with one twig to each half. Twigs longer than 1.5 get a kinked
+     middle ring, so they make no sliver tris.
+   - No rosette seat is allowed where |y − 0.15| < 0.5, z < 2.0 and |x| > 0.7 (`SIDE_GAP`).
+   - CFL, CR, CBL and CBR moved 0.17–0.23 outward in y, and their limb tips moved with them. This widens the side
+     profile at mid-height.
+   - Two bridge lumps (±1.95, 0.15; z 2.15–2.9) keep the crown round in the top view and give the side window a leafy
+     ceiling.
+5. **Dark window interiors.**
+   - Four inner lumps sit in `leaf_under`, darkened to **#1B3313** (105°, toward the sheet's near-black; it is now used
+     only for this inner role).
+   - Two are behind the trunk's flanks (on BACK-L / BACK-R, z 0.9–2.2) and two in front of them (z 0.6–1.7).
+   - The front window now shows the trunk against dark interior foliage.
+   - The SB sprig was dropped, because the inner lumps fill the rear window.
+6. **Ground pads.** The new `clover()` is a rounded clover of 3–4 lobes, each a low dome with a squared-round end. It
+   has a slight central dip and is flat underneath.
+   - Colour: lime → leaf dark 50–75 % by distance from the trunk, with a shade Tint of ×0.78 (a position role).
+   - The rendered ground median is **#76A31B**, against the sheet's #729804 (round 1: #AFD823).
+   - The GroundLeaves part uses the same clovers.
+7. **Flowers.** `place_flowers()` now seats each flower only where the front camera's first foliage hit (rosettes and
+   body lumps) is a front-half rosette facing the camera. It searches a spiral out to 0.5 around the §2.5 spot.
+   - F4 moved from inside the crown to (1.45, −1.95, 2.65).
+   - F5 moved from half under a rosette to (1.58, −2.2, 1.28).
+   - All six are clear in the front and f34. The hero flowers drop their hidden under-leaf, saving 60 tris; the
+     Flower part keeps it.
+8. **Rosette tone** is a quarter step darker, because the f34 dark share was low: s = 1.32 − 1.1 u, and the top rank
+   is −0.12.
+9. **Rock guard.** Crown rosettes are now guarded against the rocks as well as the stem. A CLRB rosette had sat
+   0.10 into RK4.
+10. **LeafClump parts** are rebuilt by `lobed_clump()` as round balls.
+    - Each part is 9–12 puffs: one on top, an upper ring facing out and up, and a lower ring facing out and down. They
+      sit round a small body lump and are stretched gently to the cell's W : H.
+    - The parts are overlapping closed shells, with no booleans.
+    - Each is painted one tone (leaf 0.5) with mottling.
+11. **Crown top.** CT is now zb 2.45, ax 1.6, hc 1.74 with 2 extra lumps, which sets H 4.42.
+
+### Before → after (the round 1 values are the verifier's; the sheet's are in brackets)
+| Check | Round 1 | Fix round 1 |
+| --- | --- | --- |
+| Hero tris (ceiling 3800) | 3650 | **3788** |
+| Parts L / M / S / stem / rock / GL / flower | 180 / 132 / 60 / 300 / 30 / 72 / 78 | 594 / 418 / 378 / 300 / 30 / 98 / 78 |
+| Hero size | 6.63 × 5.97 × 4.36 | 6.42 × 5.85 × 4.42 |
+| Hero origin offset from the trunk axis (x, y) | −0.04, −0.235 | −0.025, −0.151 |
+| Non-manifold / bowtie / boundary / winding / self-hits (every object) | 0 | 0 |
+| Floating / unchained / buried > 0.05 | 0 / 0 / 0 | 0 / 0 / 0 (max 0.017) |
+| Rosettes in body > 25 % / in a neighbour > 50 % | 0 / 0 | 0 / 0 |
+| Smallest corner (hero) | 2.98° | 2.91° |
+| UVs | 0 overlaps / flipped, gap 0.016 | the same |
+| LeafClump parts W : H (0.97 / 1.06 / 1.06) | 1.94 / 2.13 / 1.68, tiered tents | **0.96 / 1.06 / 1.06**, round lobed clumps |
+| Front: W : H, fill (1.425, 0.682) | 1.373, 0.654 | 1.343, 0.647 |
+| Front: G, T, R (77.4, 7.6, 6.1) | 78.4, 8.1, 8.6 | 78.2, 7.1, 9.1 |
+| Front: O, window (4.0, 10.5) | 0.6, 8.4 | **1.8, 8.5** |
+| Front: tones L / M / D (33 / 40 / 27) | 31 / 46 / 22 | 30 / 52 / 18 |
+| f34: W : H, G, T (1.370, 76.8, 8.4) | 1.297, 78.8, 7.5 | 1.281, 78.9, 6.6 |
+| f34: tones L / M / D (31 / 37 / 32) | 34 / 45 / 20 | 32 / 53 / 15 |
+| **Side 90: T, window (8.0, 9.4)** | 1.7, 1.5 | **5.5, 6.2** |
+| **Side 90: fill (0.635)** | 0.501 | **0.580** |
+| **Side 90: width at h .2–.7 (0.85–0.94)** | 0.58–0.74 | **0.75–0.88** |
+| Side 90: canopy median, D share (#65A409, 24) | #487316, 44 | #588717, 20 |
+| **Side 270: T, window, fill** | 0.8, 1.0, 0.513 | **6.1, 6.3, 0.574** |
+| Rear: G, T, window (79.3, 9.0, 12.3) | 90.5, 7.4, 7.3 | 91.9, 6.3, 6.5 |
+| r34: W : H, fill (1.516, 0.685) | 1.333, 0.578 | 1.295, 0.576 |
+| Top: W : D, fill (1.122, 0.695) | 1.162, 0.668 | 1.110, 0.772 |
+| Ground green median (#729804) | #AFD823 | **#76A31B** |
+| Flowers clear in the front / f34 | 4 + a half-hidden F5 | **6** |
+
+**Ray grid, all eight azimuths at e 5 plus f34 and top.** Columns:
+- **Bare dark core** is the dark core role as a % of the visible foliage.
+- **Body lumps** is the leaf-toned lumps as a % of the visible foliage.
+- **Edge-on puffs** is the % of puff pixels whose axis lies within 25° of the view plane. `vs.py`, which counts the
+  lumps as rosettes, is in brackets.
+- **Grazing** is foliage pixels on facets within 15° of edge-on.
+- **Wood** is wood as a % of all hits.
+
+| View | Bare dark core, round 1 → now | Body lumps | Edge-on puffs, round 1 → now | Grazing | Wood, round 1 → now |
+| --- | --- | --- | --- | --- | --- |
+| front | 14.5 → **5.1** | 31.1 | 8.4 → 25.9 (19.9) | 2.7 | 7.4 → 6.5 |
+| 45 | 24.1 → **3.4** | 34.6 | 31.0 → 43.0 (31.4) | 3.7 | 2.9 → 1.0 |
+| 90 | 31.7 → **1.9** | 25.4 | 60.5 → **24.4** (33.2) | 5.2 | 1.8 → **5.0** |
+| 135 | 26.1 → **2.0** | 35.1 | 37.7 → 38.9 (35.9) | 4.8 | 1.8 → 1.9 |
+| rear | 14.4 → **2.7** | 31.7 | 12.7 → 33.1 (25.1) | 4.3 | 6.6 → 5.5 |
+| 225 | 26.9 → **1.3** | 37.8 | 32.2 → 38.5 (29.9) | 5.3 | 3.9 → 2.5 |
+| 270 | 30.6 → **2.0** | 32.1 | 58.6 → **22.5** (31.9) | 6.1 | 1.3 → **6.1** |
+| 315 | 21.1 → **2.5** | 36.0 | 20.7 → 30.9 (30.4) | 5.3 | 2.8 → 2.0 |
+| f34 | 13.9 → 4.3 | 30.1 | 10.2 → 22.8 (17.9) | 2.9 | 7.3 → 6.2 |
+| top | 16.9 → 0.0 | 28.4 | 14.5 → 5.2 (32.2) | 3.7 | 0.1 → 0.2 |
+
+**Reading the edge-on column.** With rosettes facing radially out, the axis-based edge-on share cannot reach 10 % in
+every view. Any dome of outward-facing cards shows its limb band edge-on, about 25–40 % by axis. Round 1 reached 8 %
+in the front only by turning everything toward the front and rear, which is the failure this fix removes.
+- The visual problem was thin flaps. The puffs are lobed domes, so a puff seen side-on is a lump, and only 2.7–6.1 %
+  of the visible foliage is on near-edge-on facets.
+- In the eight-azimuth montage no view shows flaps or a dark ball.
+- Bare dark core is ≤ 5.1 % in every view, against the ≤ 15 % target.
+- Please judge the edge-on target on the renders.
+
+### Leftovers (numeric minors, left as the ruling asked)
+- **Shares.**
+  - The f34 dark share is 15 against 32, and the front's 18 against 27. The crown's mid tones dominate (M 52–53).
+  - The front and f34 shares are within ± 4 of the sheet: G 78.2 / 78.9, T 7.1 / 6.6, R 9.1 / 9.5.
+  - Front O is 1.8 against 4.0.
+- **W : H.** The f34 is 1.281 against 1.370 and the r34 1.295 against 1.516. The side's 1.161 is −0.045.
+- **Rear windows.** The rear and r34 windows are 6.5 / 4.8 against 12.3 / 13.4. The rear G of 91.9 includes the
+  back-lit rocks, as before.
+- **Wood.**
+  - The diagonals show only 1.0–2.5 % wood. The windows run along x and y, and the sheet has no diagonal cells.
+  - The side wood is 5.5 / 6.1 against 8.0.
+- **Top fill** is 0.772 against 0.695. The crown is denser in plan, and the lead doesn't show (T 0.4 against 2.1).
+- **Dropped seats.** Four planned M seats near limbs could not be placed without cutting the stem: CFL, CBL, CR and
+  CBR, at z 2.0–2.3.
+- **Puffs** still read slightly as faceted parasol caps next to the sheet's rounder clumps. The parts' puff balls
+  are busier than the cells' cleaner lobes.
+- The exploded view shows the lumpy bodies.
+- The pollen B offset and the hero origin (y −0.15 from the trunk axis) are as noted in round 1.
+- **New key value:** `leaf_under` is now #1B3313. It is used only by the four inner lumps.
+- **Renders.**
+  - `build()` re-rendered every view, part and close-up in `renders/models/M058/`.
+  - The eight-azimuth and sheet-camera shots for this round are in `renders/models/M058/fix1/`. They are scratch
+    renders from a new folder, which can be deleted before the commit.
+
+### Main session ruling after fix round 1 (2026-10-31)
+- **Edge-on:** for this domed-puff construction, the 10 % edge-on target applies only to flat cards (STAGES.md now says so). Domes always show an edge-on rim. The verifier judges the puffs by eye: no flaps, fins or slivers. The main session looked at `fix1/side_sheet.png`: the side now shows the trunk through a window and reads as leafy lumps.
+- **Accepted:** the lumpy leaf bodies, following the 057 ruling.
+- **Folder:** `fix1/` is kept as evidence.
+- **Next:** a fresh round-2 verifier.
+
+## Verification round 2 (verifier, 2026-10-31)
+
+A fresh verifier ran this read-only, in a background Blender on port 9877 with `wip/M058_verify.blend`, which was not
+saved. Renders are in `renders/models/M058/verify2/`:
+- the eight azimuths at e 5 plus f34, r34 and top, small (`*_sheet.png`) and large (`big_*`);
+- `az8.png` (the eight azimuths);
+- `sbs1.png` (front / side / rear) and `sbs2.png` (f34 / r34 / top) against the sheet;
+- `parts.png` (each LeafClump at az 0 / 90 / 200, side-on and from the top) against `sheet_parts.png`;
+- close-ups `cu_*.png` and `cus.png`.
+
+The scripts are in `scratchpad/m058v2/`:
+- `vis.py`: ray grid with puff, body-lump and inner classes, a dark-tone share, a grazing share and a thin-path share;
+- `pin.py`: puffs inside bodies or neighbours;
+- `fl.py`: flowers;
+- `r.py`, `cu.py`: renders;
+- `meas.py`: the study masks.
+
+Round 1's `s1.py` (topology), `s2.py` (contact and bury), `col.py` and `uv.py` were re-run unchanged.
+
+**Verdict: PASS, 7 / 10.** Both round-1 blockers are fixed. What is left is style and numbers, listed below; nothing is
+broken.
+
+### The blockers
+1. **Every azimuth: fixed.** `az8.png` shows a leafy, lobed shrub from all eight sides. There is no dark ball and no
+   edge-on flaps, fins or slivers. The lime fin at the crown top is gone.
+   - Both side views show the trunk and a low limb through a window with a dark interior and a leafy ceiling
+     (`big_side_sheet.png`, `cu_window_side*.png`).
+   - Ray grid, % of the visible foliage (wood is % of all hits):
+
+     | View | Puffs | Body lumps | Inner (leaf_under) | Dark tone (≤ leaf_dark, or inner) | Grazing (< 15°) | Wood |
+     | --- | --- | --- | --- | --- | --- | --- |
+     | front | 63.8 | 31.1 | 5.1 | 7.8 | 2.8 | 6.5 |
+     | 45 | 62.1 | 34.6 | 3.4 | 5.4 | 4.0 | 1.0 |
+     | 90 | 72.7 | 25.4 | 1.9 | 2.8 | 5.2 | 5.0 |
+     | 135 | 62.9 | 35.1 | 2.0 | 4.2 | 4.9 | 1.9 |
+     | rear | 65.6 | 31.7 | 2.7 | 6.6 | 4.4 | 5.5 |
+     | 225 | 60.8 | 37.8 | 1.3 | 5.4 | 5.4 | 2.5 |
+     | 270 | 65.9 | 32.1 | 2.0 | 5.9 | 6.1 | 6.1 |
+     | 315 | 61.5 | 36.0 | 2.5 | 6.4 | 5.5 | 2.0 |
+     | f34 | 65.6 | 30.1 | 4.3 | 6.6 | 3.0 | 6.2 |
+     | top | 71.6 | 28.4 | 0.0 | 0.3 | 3.7 | 0.2 |
+
+   - Bare dark core is at most 7.8 % in every view, against the ≤ 15 % target.
+   - The puffs are domes: the height above the outline is 0.69 R. 15–18 % of puff pixels have a path under 0.08
+     through their puff, which is the normal thin rim of a dome. They don't read as flaps in any render.
+   - The sides against the sheet:
+     - side 90: T 5.5 (8.0), window 6.2 (9.4), fill 0.580 (0.635), width at h .2–.7 0.75–0.88 (0.74–0.94);
+     - side 270: T 6.1, window 6.3, fill 0.567.
+2. **LeafClump parts: fixed.**
+   - Measured sizes:
+     - Large 1.305 × 1.290 × 1.345, W : H **0.970** (0.97);
+     - Medium 1.046 × 1.065 × 0.987, W : H **1.060** (1.06);
+     - Small 0.762 × 0.783 × 0.719, W : H **1.060** (1.06).
+   - All three are round lobed clumps from every side (`parts.png`): not tents, not cones.
+
+### The ruled extras
+- **Dark window interiors, chosen by position: yes.**
+  - The four `INNER` lumps sit at fixed positions in `leaf_under` #1B3313.
+  - The front window shows the trunk against dark foliage (`big_front_sheet.png`, `cu_window_front.png`).
+  - Front O is 1.8 (4.0), window 8.5 (10.5).
+- **Ground pads: yes.** They are rounded 3–4-lobe clovers with a flat base (`cu_pads_*.png`). The rendered ground
+  median is #79A521 in the front and #7AA522 in the f34, against the sheet's #729804 and #5D970A.
+- **Flowers: six clear in the front.**
+
+  | Flower | Seat (build frame) | Visible from the front | Gap to its puff | Gap to the nearest body lump |
+  | --- | --- | --- | --- | --- |
+  | F1 | (−2.09, −2.20, 2.04) | 0.93 | 0.007 | 0.19 |
+  | F2 | (−0.68, −1.99, 2.46) | 0.89 | 0.014 | 0.20 |
+  | F3 | (0.93, −1.64, 3.47) | 0.93 | 0.001 | 0.24 |
+  | F4 | (1.45, −1.98, 2.66) | 0.89 | 0.017 | 0.20 |
+  | F5 | (1.58, −2.24, 1.29) | 0.91 | 0.000 | 0.29 |
+  | F6 | (2.52, −1.70, 2.40) | 0.89 | 0.012 | 0.15 |
+
+  - Every flower sits on a puff, never on a body lump.
+  - The f34 visibility is the same, 0.89–0.96.
+  - Rendered petals median #FFF7E8 (sheet #F4EDE0–#F8F5EC). Pollen #FFCE2B (sheet #F5D212–#FBDB15), B +25–31.
+
+### Re-measured
+- **Tris:** hero **3788** (ceiling 3800).
+  - Parts: L 594, M 418, S 378, stem 300, rock 30, ground leaves 98, flower 78. Each is under 1000.
+  - KITSTAT is ok for all eight objects, and `K.check` reports no problems.
+- **Sizes:** hero 6.417 × 5.852 × 4.420.
+  - W is within 6.4 ± 0.3.
+  - D is within 5.6 ± 0.3 (round 1 was 5.97).
+  - H is −0.08 against 4.5.
+- **Origin and transforms:**
+  - Every object: the origin is at its bbox bottom centre (audit offset 0), rotation 0 and scale 1. There are no
+    modifiers, children or VFX sockets.
+  - The hero's origin is (−0.025, −0.151) from the trunk axis, against the study's ≤ 0.1.
+  - The flower part's build offset is z −0.023, as in round 1.
+- **Topology, every object:**
+  - 0 non-manifold edges or verts (bowties), 0 boundary, wire or loose elements, 0 zero-area faces, 0 n-gons and 0
+    duplicate verts;
+  - 0 winding errors, 0 negative-volume shells and 0 self-intersecting shells;
+  - flat shading and no custom normals;
+  - the smallest corner is 2.91° (hero);
+  - the hero has 150 shells: wood 21, rock 5, pebble 3, puffs 48, body lumps 25, inner lumps 4, pads 8, flower centres 6
+    and petals 30.
+- **Floating:** 0, and 0 unchained. There are 22 ground shells.
+- **Buried:** 0 shells more than 0.05 inside wood or rock. The deepest are puffs at 0.017 / 0.016 / 0.016 in wood
+  (sprig and twig ends) and a pad at 0.004 in rock.
+  - Puffs in body lumps: at most 23 % of verts, 0 over 25 %, 0 centroids inside.
+  - Puffs in neighbouring puffs: at most 9 %.
+- **UVs:** every object has 0 overlaps, 0 flipped, 0 zero-area and 0 out-of-bounds UV faces. Minimum gap 0.016, border
+  0.008, stretch p95 1.0 (ground leaves 1.05, flower 1.16).
+- **Front and f34 shares:** all within ± 4 of the sheet.
+
+  | View | G | T | R |
+  | --- | --- | --- | --- |
+  | front | 78.2 (77.4) | 7.1 (7.6) | 9.0 (6.1) |
+  | f34 | 78.9 (76.8) | 6.6 (8.4) | 9.5 (6.4) |
+- **Colours, render (sheet):**
+  - front canopy median #649616 (#66A40B); lit (v > .7) #ACD917 (#B5DB0C);
+  - bark #502C11 (#56320D), lit #D7B070 (#CE9A6E);
+  - rock #CABBAF (#CBB09F), with R ≥ G ≥ B;
+  - side canopy #588718 (#65A409).
+- **Colour code (read):** nothing is chosen from a face normal. What sets each colour:
+  - **puffs:** height in the crown, rank in the cluster and noise (`_tone_of`); the skirt group (`low`) is half a step
+    darker;
+  - **body lumps:** face-centre height and noise (`_paint_body`), with flat bottoms in leaf_dark as the underside role;
+  - **inner lumps:** position (`INNER`);
+  - **bark:** strip index and role;
+  - **rocks:** height bands;
+  - **pads:** distance from the trunk.
+
+  Correlation of base luminance with normal z: leaf **0.32** (round 1 0.15), bark 0.11, rock 0.49. The leaf value rose
+  because the radially turned puffs show more of their darker skirt group and the lump bottoms. These are construction
+  roles, under K.check's 0.5.
+
+### Minors (left for the commit notes)
+- **Puffs read as faceted parasol caps.** Each puff is a dome with strong radiating ridges. The sheet's crown is a
+  denser mosaic of smaller clover-lobed clumps. Visible at close range; at kit scale it reads as the sheet's leafy
+  bush.
+- **Smooth body-lump patches show between puffs**: 25–38 % of the visible foliage. They are leaf-toned, not dark, but
+  broad smooth facets show, for example right of the trunk in the front and at the crown top in the rear. This
+  follows the accepted 057 construction.
+- **The top view's plan is squarish.**
+  - Width per depth is 0.90–1.01 from depth .2 to .9, against the sheet's tapering 0.67–0.98.
+  - Fill is 0.772 (0.695), and the lead doesn't show (T 0.4 against 2.1).
+  - The three flowers face front, so they read edge-on from the top; the sheet's top shows three flowers face-up.
+- **W : H and fill:**
+  - front 1.343 (1.425), f34 1.281 (1.370);
+  - rear 1.356 (1.451), fill 0.577 (0.686);
+  - r34 1.289 (1.516), fill 0.573 (0.685).
+
+  The rear and r34 read narrower and more open than the sheet's wide dome. Rear and r34 windows are 6.5 / 4.8 (12.3 /
+  13.4), with pale backdrop under the back clusters.
+- **Tone shares:** front L / M / D 30 / 52 / 18 (33 / 40 / 27), f34 32 / 53 / 15 (31 / 37 / 32). The lower crown is
+  less dark than the sheet's.
+- **About four tiny bark-light twig or limb cut-ends poke out of the low clusters' outer flanks.** They show as
+  orange specks in the front, rear and side renders. Cosmetic.
+- **The LeafClump parts are busier than their cells.**
+  - Each is 9–12 overlapping star-ridged puffs, so it reads crumpled. Each cell is one clean clump of broad lobes,
+    lime on top and darker below.
+  - The parts are one flat tone (leaf 0.5, #84B01C), so the cells' top-to-bottom shading comes only from the lighting.
+- **Small numbers:**
+  - the hero's origin is 0.15 from the trunk axis in y;
+  - pollen B +25–31;
+  - F6's petals render greyish in shade;
+  - hero tris 3788 leave 12 of headroom under the 3800 ceiling.
+
+### Main session ruling (2026-10-31)
+Round 2 PASSED at 7/10, so the model is committed.
+- **Recorded for polish:** the round-2 minors. The main ones:
+  - puffs reading as faceted parasol caps rather than the sheet's denser clover mosaic;
+  - smooth body-lump patches;
+  - narrow W : H and low fill in the front, f34, rear and r34 views;
+  - small rear windows;
+  - light tone shares;
+  - a few twig cut-ends poking out;
+  - busy LeafClump parts.
+
+Export: 8 assets, 5684 tris, 0 problems.

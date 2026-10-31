@@ -1,0 +1,1069 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M057",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m057_bark",
+    "hex": "#BC7B36",
+    "levels": [
+     0.93885,
+     0.95984,
+     0.9659,
+     0.96957,
+     0.97255,
+     0.97636,
+     0.978,
+     0.98195,
+     0.98564,
+     0.9892,
+     0.9913,
+     0.99325,
+     0.99463,
+     0.99685,
+     0.99845,
+     1.0,
+     1.00024,
+     1.00164,
+     1.00382,
+     1.00646,
+     1.00783,
+     1.00986,
+     1.01176,
+     1.01431,
+     1.01845,
+     1.02106,
+     1.02419,
+     1.02726,
+     1.02964,
+     1.03318,
+     1.03687,
+     1.06728
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_bark_deep",
+    "hex": "#7A4A24",
+    "levels": [
+     0.97684,
+     1.0,
+     1.00352,
+     1.03292
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_bark_light",
+    "hex": "#F0B868",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_bark_x_deep_25",
+    "hex": "#AC6F32",
+    "levels": [
+     0.93807,
+     0.95358,
+     0.95749,
+     0.96451,
+     0.96959,
+     0.9737,
+     0.98135,
+     0.98402,
+     0.98705,
+     0.98886,
+     0.99299,
+     0.99486,
+     0.99634,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00114,
+     1.00284,
+     1.00638,
+     1.00801,
+     1.01071,
+     1.01288,
+     1.01716,
+     1.01849,
+     1.02177,
+     1.03068,
+     1.03202,
+     1.03603,
+     1.07042
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_bark_x_deep_50",
+    "hex": "#9B622D",
+    "levels": [
+     0.94931,
+     0.95774,
+     0.96028,
+     0.97059,
+     0.97283,
+     0.97653,
+     0.98002,
+     0.98226,
+     0.98475,
+     0.98663,
+     0.99076,
+     0.99723,
+     0.99889,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.00323,
+     1.00645,
+     1.00981,
+     1.01192,
+     1.01446,
+     1.01695,
+     1.02137,
+     1.02398,
+     1.0255,
+     1.03155,
+     1.04052,
+     1.05674
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_bark_x_light_25",
+    "hex": "#C98A42",
+    "levels": [
+     0.93692,
+     0.94719,
+     0.95392,
+     0.95732,
+     0.96444,
+     0.96967,
+     0.97262,
+     0.97479,
+     0.97688,
+     0.98016,
+     0.98295,
+     0.98693,
+     0.99151,
+     0.99366,
+     0.996,
+     0.99973,
+     1.00067,
+     1.00643,
+     1.00865,
+     1.0105,
+     1.01822,
+     1.02018,
+     1.02276,
+     1.02602,
+     1.02892,
+     1.03082,
+     1.03558,
+     1.03865,
+     1.05452,
+     1.06113,
+     1.07499
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_cavity",
+    "hex": "#301A0C",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_grass",
+    "hex": "#B4B208",
+    "levels": [
+     0.96145,
+     0.97515,
+     0.97684,
+     0.9804,
+     0.9828,
+     0.98494,
+     0.99716,
+     0.99926,
+     1.00694,
+     1.01088,
+     1.01371,
+     1.02189,
+     1.03289
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_grass_deep",
+    "hex": "#4A6E13",
+    "levels": [
+     0.96177,
+     1.00132,
+     1.00424
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_grass_deep_x_bark_deep_25",
+    "hex": "#566517",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_grass_x_deep_50",
+    "hex": "#7F900E",
+    "levels": [
+     0.97389,
+     0.9822,
+     0.98687,
+     0.99147,
+     1.00439,
+     1.01205,
+     1.02035,
+     1.03166
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_hollow",
+    "hex": "#0E0803",
+    "levels": [
+     0.97684,
+     1.0,
+     1.00352,
+     1.03292
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_dark",
+    "hex": "#3A6A26",
+    "levels": [
+     0.9249,
+     0.94069,
+     0.94393,
+     0.9472,
+     0.95066,
+     0.9533,
+     0.95508,
+     0.95663,
+     0.95839,
+     0.96048,
+     0.9622,
+     0.96338,
+     0.96648,
+     0.96844,
+     0.97051,
+     0.97232,
+     0.97402,
+     0.97705,
+     0.9789,
+     0.98418,
+     0.98834,
+     0.99573,
+     1.00065,
+     1.00394,
+     1.01037,
+     1.01813,
+     1.02317,
+     1.02831,
+     1.03615,
+     1.04797,
+     1.05618,
+     1.07768
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_light",
+    "hex": "#B3C205",
+    "levels": [
+     0.9326,
+     0.94184,
+     0.95711,
+     0.9614,
+     0.96508,
+     0.97114,
+     0.97431,
+     0.97854,
+     0.98206,
+     0.98457,
+     0.98656,
+     0.9906,
+     0.9931,
+     0.99844,
+     1.00118,
+     1.00345,
+     1.00621,
+     1.00814,
+     1.01031,
+     1.01226,
+     1.01466,
+     1.01679,
+     1.01858,
+     1.01993,
+     1.02172,
+     1.02552,
+     1.02846,
+     1.03328,
+     1.03669,
+     1.04178,
+     1.04835,
+     1.07566
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_mid",
+    "hex": "#8AB51B",
+    "levels": [
+     0.93068,
+     0.95218,
+     0.96049,
+     0.96565,
+     0.96993,
+     0.97452,
+     0.97732,
+     0.97926,
+     0.98231,
+     0.9848,
+     0.98812,
+     0.9898,
+     0.9917,
+     0.994,
+     0.9959,
+     0.99939,
+     1.00291,
+     1.00629,
+     1.01098,
+     1.01408,
+     1.01796,
+     1.02115,
+     1.02436,
+     1.02619,
+     1.03109,
+     1.03314,
+     1.0368,
+     1.04017,
+     1.04565,
+     1.05325,
+     1.0624,
+     1.07408
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_mid_x_leaf_dark_25",
+    "hex": "#76A21E",
+    "levels": [
+     0.92926,
+     0.94848,
+     0.95528,
+     0.96102,
+     0.96489,
+     0.96945,
+     0.97241,
+     0.97783,
+     0.9797,
+     0.98175,
+     0.98545,
+     0.98795,
+     0.98989,
+     0.99377,
+     0.99586,
+     0.99897,
+     1.00158,
+     1.00348,
+     1.00674,
+     1.00931,
+     1.01402,
+     1.01724,
+     1.02127,
+     1.02447,
+     1.02747,
+     1.03073,
+     1.03339,
+     1.03621,
+     1.03931,
+     1.04455,
+     1.04919,
+     1.05974
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_mid_x_leaf_dark_50",
+    "hex": "#629020",
+    "levels": [
+     0.92827,
+     0.93614,
+     0.94245,
+     0.94832,
+     0.95328,
+     0.95852,
+     0.96263,
+     0.96741,
+     0.9721,
+     0.97537,
+     0.98261,
+     0.98785,
+     0.99113,
+     0.99488,
+     0.99723,
+     1.00149,
+     1.00637,
+     1.00992,
+     1.01423,
+     1.01764,
+     1.02224,
+     1.02544,
+     1.02799,
+     1.03046,
+     1.03322,
+     1.039,
+     1.04223,
+     1.04724,
+     1.05042,
+     1.05584,
+     1.06345,
+     1.07211
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_mid_x_leaf_light_50",
+    "hex": "#9EBC10",
+    "levels": [
+     0.94081,
+     0.95925,
+     0.96546,
+     0.97248,
+     0.97564,
+     0.97874,
+     0.98181,
+     0.98483,
+     0.98866,
+     0.99165,
+     0.99282,
+     0.99561,
+     0.99903,
+     1.00148,
+     1.00347,
+     1.00686,
+     1.01323,
+     1.01525,
+     1.01865,
+     1.02156,
+     1.02327,
+     1.02747,
+     1.02982,
+     1.03311,
+     1.03481,
+     1.03791,
+     1.04042,
+     1.04548,
+     1.04893,
+     1.05453,
+     1.06023,
+     1.08184
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_leaf_mid_x_leaf_light_75",
+    "hex": "#A9BF0A",
+    "levels": [
+     0.92323,
+     0.94754,
+     0.95663,
+     0.96818,
+     0.97459,
+     0.97725,
+     0.98041,
+     0.98178,
+     0.98526,
+     0.98679,
+     0.98944,
+     0.99461,
+     0.9988,
+     1.00325,
+     1.00497,
+     1.00788,
+     1.01005,
+     1.0117,
+     1.01387,
+     1.01663,
+     1.01973,
+     1.02212,
+     1.02422,
+     1.02667,
+     1.02938,
+     1.03243,
+     1.03572,
+     1.04054,
+     1.04397,
+     1.05109,
+     1.05604,
+     1.06589
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_moss",
+    "hex": "#C2C014",
+    "levels": [
+     0.94804,
+     0.97453,
+     0.97724,
+     0.97892,
+     0.98229,
+     0.98418,
+     0.98623,
+     0.98932,
+     0.9926,
+     0.99397,
+     0.99717,
+     1.00088,
+     1.00439,
+     1.00657,
+     1.00848,
+     1.01187,
+     1.0137,
+     1.01636
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_moss_x_bark_25",
+    "hex": "#C0AF1C",
+    "levels": [
+     0.95873,
+     1.05582
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_moss_x_grass_25",
+    "hex": "#BEBC11",
+    "levels": [
+     0.99077,
+     0.99345,
+     1.00202,
+     1.00732
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_rock",
+    "hex": "#9C9590",
+    "levels": [
+     0.95385,
+     0.9564,
+     0.96296,
+     0.96631,
+     0.97289,
+     0.97578,
+     0.98106,
+     0.98358,
+     0.98689,
+     0.98876,
+     0.99135,
+     0.99338,
+     0.99553,
+     0.99807,
+     0.99927,
+     1.00158,
+     1.00433,
+     1.00608,
+     1.01096,
+     1.01285,
+     1.01791,
+     1.02338,
+     1.02645,
+     1.02789,
+     1.03151,
+     1.03486,
+     1.04251,
+     1.04491
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_rock_slate",
+    "hex": "#576374",
+    "levels": [
+     0.94683,
+     0.95068,
+     0.9551,
+     0.95784,
+     0.96835,
+     0.97081,
+     0.97314,
+     0.98065,
+     0.98489,
+     0.98773,
+     0.99093,
+     0.99411,
+     0.99583,
+     0.9977,
+     1.00107,
+     1.00347,
+     1.0081,
+     1.01096,
+     1.01851
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_rock_slate_x_rock_25",
+    "hex": "#68707B",
+    "levels": [
+     0.94871,
+     0.95112,
+     0.95371,
+     0.96148,
+     0.96319,
+     0.98391,
+     0.98657,
+     0.98958,
+     0.99242,
+     0.99898,
+     1.00224,
+     1.00531,
+     1.00759,
+     1.01092,
+     1.01368,
+     1.01699
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_rock_x_light_50",
+    "hex": "#A7A09A",
+    "levels": [
+     0.94818,
+     0.95569,
+     0.95977,
+     0.96455,
+     0.97332,
+     0.98083,
+     0.99098,
+     0.99596,
+     1.00198,
+     1.00413,
+     1.00965,
+     1.01175,
+     1.01647,
+     1.02227,
+     1.03998
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_rock_x_slate_50",
+    "hex": "#7A7C82",
+    "levels": [
+     0.9373,
+     0.94665,
+     0.95527,
+     0.95909,
+     0.96387,
+     0.96773,
+     0.96925,
+     0.97163,
+     0.97431,
+     0.97778,
+     0.97983,
+     0.9848,
+     0.98759,
+     0.99047,
+     0.99258,
+     0.99634,
+     0.99901,
+     1.00137,
+     1.00565,
+     1.00755,
+     1.01053,
+     1.01342,
+     1.01562,
+     1.01864,
+     1.02284,
+     1.02554,
+     1.02798,
+     1.02953,
+     1.0324,
+     1.0466,
+     1.05549
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_strand",
+    "hex": "#B8B407",
+    "levels": [
+     0.97199,
+     0.98553,
+     0.98987,
+     1.00766,
+     1.01105,
+     1.01398,
+     1.01693,
+     1.02576,
+     1.02936
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_strand_deep",
+    "hex": "#44690D",
+    "levels": [
+     0.97199,
+     0.98553,
+     0.98987,
+     1.00766,
+     1.01105,
+     1.01398,
+     1.01693,
+     1.02576,
+     1.02936
+    ],
+    "used": true
+   },
+   {
+    "key": "m057_strand_deep_x_strand_50",
+    "hex": "#7E8E0A",
+    "levels": [
+     0.97199,
+     0.98553,
+     0.98987,
+     1.00766,
+     1.01105,
+     1.01398,
+     1.01693,
+     1.02576,
+     1.02936
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "MonarchTree",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "hero",
+   "size": [
+    33.4153,
+    32.1719,
+    31.0762
+   ],
+   "tris": 3838,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTree.glb",
+     "kind": "solid",
+     "tris": 3838,
+     "offset": [
+      0.0,
+      16.0859,
+      0.0
+     ],
+     "size": [
+      33.4153,
+      32.1719,
+      31.0762
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ancient Tree: the kit's giant (32 tall). A twisted eight-strand orange-brown bell trunk, hollow at its foot (front slit, pointed back arch, slate rocks and a tuft in the dark cavity), eight high buttress roots with split toes, two side branch modules with bare forks and two Y modules on a pale cut top feeding seven lobed leaf clusters of rounded sub-domes (lime tops, green bodies, dark undersides) round an open hub, a trunk sprout clump, twelve lime moss strands with bulb tips; slate rocks with pale tops, lime moss pads and tall lime tufts at the foot. No VFX"
+  },
+  {
+   "name": "MonarchTreeBranchModule",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    10.1167,
+    7.5125,
+    9.3615
+   ],
+   "tris": 160,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeBranchModule.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      3.7563,
+      0.0
+     ],
+     "size": [
+      10.1167,
+      7.5125,
+      9.3615
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Branch Module: BM1, the left side module - a bored 8-sided base with a pale peg, the main arm, a spur arm and a bare two-tine fork"
+  },
+  {
+   "name": "MonarchTreeCrownModule",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    11.9028,
+    8.1974,
+    11.385
+   ],
+   "tris": 736,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeCrownModule.glb",
+     "kind": "solid",
+     "tris": 736,
+     "offset": [
+      0.0,
+      4.0987,
+      0.0
+     ],
+     "size": [
+      11.9028,
+      8.1974,
+      11.385
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Crown Module: one leaf clump (the TL shape) with its bored stub: a domed cluster of rounded leaf lumps"
+  },
+  {
+   "name": "MonarchTreeRootModuleA",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    8.0601,
+    11.0,
+    8.9783
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeRootModuleA.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      5.5,
+      0.0
+     ],
+     "size": [
+      8.0601,
+      11.0,
+      8.9783
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module A: a high buttress root with a hollow joining end and peg, a long low run and two toes"
+  },
+  {
+   "name": "MonarchTreeRootModuleB",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    8.7123,
+    11.6,
+    7.8005
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeRootModuleB.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      5.8,
+      0.0
+     ],
+     "size": [
+      8.7123,
+      11.6,
+      7.8005
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module B: a longer, steeper buttress root with a hollow joining end and peg and three toes"
+  },
+  {
+   "name": "MonarchTreeRootModuleC",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    6.9496,
+    10.4,
+    7.499
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeRootModuleC.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      5.2,
+      0.0
+     ],
+     "size": [
+      6.9496,
+      10.4,
+      7.499
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Root Module C: a short steep buttress root with a hollow joining end and peg and two toes"
+  },
+  {
+   "name": "MonarchTreeTrunkCore",
+   "sheet": "M057",
+   "subject": "Ancient Tree",
+   "role": "part",
+   "size": [
+    13.6306,
+    19.68,
+    12.1111
+   ],
+   "tris": 844,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MonarchTreeTrunkCore.glb",
+     "kind": "solid",
+     "tris": 844,
+     "offset": [
+      0.0,
+      9.84,
+      0.0
+     ],
+     "size": [
+      13.6306,
+      19.68,
+      12.1111
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Trunk Core: the hollow-footed twisted eight-strand bell with its slit and arch, a pale cut top with two sockets and dark radial cracks, two side bosses with sockets and the sprout stub"
+  }
+ ],
+ "stats": {
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
+  "water": 0,
+  "glow": 0,
+  "tris": 5902,
+  "vfxSockets": 0,
+  "paletteColours": 30,
+  "paletteLevels": 546,
+  "meshBytes": 565276
+ },
+ "problems": []
+}
