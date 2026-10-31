@@ -67,7 +67,7 @@ out (`TITLES` in `m.py`, found with `navy.py`). Masks are M048's `cls()` (HSV, h
   796 / 840 / 884 / 927 / 970, y 1250–1275.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m050_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m050_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy; no scipy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`), `zoom.py` (crop with an optional sheet
   grid), `px.py`, `lines.py` (cell borders), `navy.py` (label boxes), `sampcore.py` (`reg()`: region median / lit /

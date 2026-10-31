@@ -24,7 +24,7 @@ All pixel boxes are sheet pixels `(x0, y0, x1, y1)`, top-left origin. Paper is `
 - **O:** other non-paper (the ground shadow, dark edges). Not counted in the shares.
 
 Scratch study material (pure Python, no Blender), in the session scratchpad
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m017_study\`:
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m017_study\`:
 - `png.py` (reader, `crop`, `sample`); `m.py` (masks, view boxes `V`); `bb.json` (silhouette boxes);
 - `measure.py` (bboxes, shares, top / leaf-bottom / trunk-top profiles, width per height), `comps.py` (berry
   components, trunk runs per height), `expl.py` (exploded and close-up components), `samp.py` / `samp2.py` (median,

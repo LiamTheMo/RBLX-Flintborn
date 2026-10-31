@@ -73,7 +73,7 @@ Sheet text:
   (761,…,813), (824,…,876), (887,…,939), (950,38,1002,79).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m052_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m052_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow, numpy) and `< /dev/null`.
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `TITLES`, `label`, `pxs`, `reg`), `zoom.py` (crop with an optional
   sheet grid), `lines.py` (cell rules), `sw.py` (swatch boxes and hexes).

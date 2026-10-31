@@ -49,9 +49,9 @@ Sheet text:
 - **O, other:** dark contact lines and edges; 1.6–3.0 % of the silhouette; not counted in the shares.
 
 **Scratch study material** (pure Python, Pillow + numpy; no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m029_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m029_study\`.
 Run from that folder with
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\venv22\Scripts\python.exe`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (loader, HSV, view boxes `V`, `crop`), `m_cls.py` (masks, preview colours), `measure_lib.py`
   (components), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` → `measure_out.txt` (bbox, shares, top / root-only top / bottom profiles, width per

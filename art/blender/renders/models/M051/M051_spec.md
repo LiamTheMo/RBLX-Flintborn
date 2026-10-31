@@ -76,7 +76,7 @@ close-up columns 325 / 332, 674 / 683; the parts row 570 / 576, 777 / 784. Title
   718–764, rows y 1336–1382 and 1412–1449.
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m051_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m051_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow, numpy) and `< /dev/null`.
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `TITLES`, `label`, `pxs`), `zoom.py` (crop with an optional sheet
   grid), `lines.py` (cell rules), `sw.py` (swatch boxes and hexes).

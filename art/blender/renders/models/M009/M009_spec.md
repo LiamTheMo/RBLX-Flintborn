@@ -19,7 +19,7 @@ Assets (collection `Kit/M009 Iron Meteor`). The names stay as before, because a 
 - `IronMeteorImpactRock` (Impact Rock, reusable).
 
 Scratch study material (crops, sampler, crack scanner; pure Python, no Blender):
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m009_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m009_study\`.
 It holds `png.py` (`crop`, `sample`), `measure.py` (orange-run scan per view; it prints crack position and width per
 height row) and `mine.py` (the same scan on our renders). The crops there are `hero34.png`, `front.png`, `side.png`,
 `rear.png`, `top.png`, `rear34.png`, `exploded.png`, `junction.png`, `shellpiece.png`, `thickness.png`, `xsec_zoom.png`

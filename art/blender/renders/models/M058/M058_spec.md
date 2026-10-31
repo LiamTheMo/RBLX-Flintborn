@@ -71,7 +71,7 @@ x 277, 503, 767–768; exploded frame y 761 / 1262, x 10 / 638–639; parts fram
   - **Canopy and ground green.** Canopy = G at h ≥ .15; ground green = G below h .15.
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, boxes, `cls8`, `sil8`, `fill_holes`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps_053.py` (`label()`), `woodmap.py` (wood-only maps `w_*.png`), `tonemap.py` (leaf tones light / mid / dark at

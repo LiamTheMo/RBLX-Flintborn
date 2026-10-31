@@ -56,7 +56,7 @@ counted in a share or a bbox.
   shadow can fall into R).
 
 **Scratch study material** (no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m030_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m030_study\`.
 Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks, view boxes `V`, `cls`, `stats`, `preview`), `lab.py` (connected components), `bb.json`
   (silhouette boxes), `crops.py`, `zoom.py`, `probe.py`.

@@ -72,7 +72,7 @@ Sheet text:
 - **Swatch inner boxes** 24 × 22 px at x 834–858, y 858 / 892 / 926 / 961 / 995 / 1030 / 1064 / 1099 (`m.SW`).
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m049_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m049_study\`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes, `silhouette()`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps.py` (connected components), `lines.py` / `lines2.py` (cell rules), `blendall.py` (name search in every

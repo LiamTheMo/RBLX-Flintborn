@@ -26,7 +26,7 @@ WorldModeling.md and the repo contracts win; each is reported here.
 
 1. **PBR maps (Color/Normal/Metalness/Roughness, SurfaceAppearance).** WorldModeling.md §5.2 bans noise textures, bump maps and realistic textures in the baseline style, and the repo's export contract is one multi-material mesh per asset, coloured through the shared `palette.png` and a `Tint` attribute. So models get no per-asset PBR maps. Colour comes from measured palette keys plus Tint texture, roughness and metalness live on the palette keys, and water uses the exporter's tiled 512×512 texture.
 2. **UV unwrapping with consistent texel density.** It doesn't apply in this pipeline: UVs index the palette texture and are written by `export_kit_roblox.py`. No hand-made UV islands exist to pack.
-3. **One subagent per discipline driving Blender.** CLAUDE.md says only the main session drives the open Blender GUI through the MCP. So modelling, optimisation, colour, lighting and VFX run in the main session. Independent subagents do the audits and every verification.
+3. **One subagent per discipline driving Blender.** AGENTS.md says only the main session drives the open Blender GUI through the MCP. So modelling, optimisation, colour, lighting and VFX run in the main session. Independent subagents do the audits and every verification.
 4. **"Matches the reference exactly / no visible differences".** WorldModeling.md §1.1 says the sheets are visual targets, not exact engineering drawings, and their views can disagree. Verifiers judge resemblance and list every discrepancy. Minor view-to-view inconsistencies of the concept art are resolved coherently and noted.
 5. **Triangle budgets.** WorldModeling.md §16 gives prototype envelopes, not limits. The enforced budgets are the repo's (BUILDER_GUIDE.md: hero/variant 3000, part 1500, depleted 2000, drop 300, large terrain/trees/buildings up to 8000; Roblox hard limit 20,000 per mesh).
 6. **Git LFS.** The repo has no LFS set-up (`.gitattributes` absent), so nothing is moved to LFS. Large binaries (renders, exports) are committed sparingly.
@@ -181,7 +181,7 @@ State from the initial audit (2026-10-27, against the existing compare renders):
 
 ## Numbered references (001–172)
 
-From 2026-10-27 the work follows the `roblox-blender-model` skill (`.claude/skills/roblox-blender-model/SKILL.md`) on the single-model production studies in `art/blender/assets/references/NNN.png` (`INDEX.md` there maps numbers to the original names). One model at a time, in number order.
+From 2026-10-27 the work follows the `roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) on the single-model production studies in `art/blender/assets/references/NNN.png` (`INDEX.md` there maps numbers to the original names). One model at a time, in number order.
 
 - **Where:** `FlintbornWorldKit.blend`, collection `Kit/M<NNN> <Name>`, objects tagged `kit_sheet = M<NNN>`; builder `art/blender/kit/mcp/m<NNN>.py`, shared tools `kit_models.py`.
 - **Renders:** `art/blender/renders/models/M<NNN>/` (one PNG per reference view + `M<NNN>_views.png`), spec `M<NNN>_spec.md`.
@@ -192,7 +192,7 @@ From 2026-10-27 the work follows the `roblox-blender-model` skill (`.claude/skil
 Skill vs design doc / repo (design doc wins, reported):
 1. **FBX/OBJ export** → the repo's GLB + palette + manifest export (WorldModeling.md: FBX is not a drop-in substitute). Meshes still carry a Smart-UV layer so an FBX/OBJ export works.
 2. **UVs**: the GLB exporter replaces authored UVs with palette-cell UVs; the authored `UVMap` is kept for other uses.
-3. **Specialist subagents per discipline** → the stages run in the main session (CLAUDE.md: only the main session drives Blender); subagents verify, using read-only MCP inspection while the main session waits.
+3. **Specialist subagents per discipline** → the stages run in the main session (AGENTS.md: only the main session drives Blender); subagents verify, using read-only MCP inspection while the main session waits.
 4. **One mesh per asset** (repo) vs separate part objects (reference sheets): both are delivered — the assembled hero plus each labelled part as its own asset.
 
 | # | Model | Series | Status | Tris (hero; parts) | Verifier | Manual review |

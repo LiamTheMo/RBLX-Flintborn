@@ -13,6 +13,7 @@ import math
 import os
 import random
 import sys
+import tempfile
 
 import bmesh
 import bpy
@@ -854,7 +855,9 @@ def ref_sheet(sheet):
     return d + "/" + next(f for f in os.listdir(d) if f.startswith(sheet + "_") and f.endswith(".png"))
 
 
-SCRATCH = "C:/Users/Orang/AppData/Local/Temp/claude/D--Projects-Roblox-RBLX-Flintborn/kitlook/"
+# Scratch output (renders, reports) goes under the system temp folder.
+TEMP_ROOT = os.path.join(tempfile.gettempdir(), "RBLX-Flintborn").replace("\\", "/") + "/"
+SCRATCH = TEMP_ROOT + "kitlook/"
 
 
 def look(objs, name, views=((-22, 20), (0, 6), (90, 6), (0, 89)), cell=(560, 420), vfx=False, out_dir=None):

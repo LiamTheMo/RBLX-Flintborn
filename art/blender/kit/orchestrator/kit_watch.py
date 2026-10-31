@@ -5,6 +5,9 @@ art/reference/kit/CHECKLIST.md current.
   python kit_watch.py --once     # just rewrite the checklist
   python kit_watch.py --next 4   # print Workflow args for the next batch of sheets (JSON)
   python kit_watch.py --active   # print "running <runId>" or "idle"
+
+Set KIT_WORKFLOW_JOURNALS to a glob matching the orchestrator sessions' workflow
+journal folders before running it.
 """
 import glob
 import json
@@ -15,7 +18,7 @@ import time
 
 REPO = "D:/Projects/Roblox/RBLX-Flintborn"
 # workflow journals from every orchestrator session of this project (history carries across sessions)
-WF = "C:/Users/Orang/.claude/projects/D--Projects-Roblox-RBLX-Flintborn/*/subagents/workflows"
+WF = os.environ.get("KIT_WORKFLOW_JOURNALS", "")
 REF = f"{REPO}/art/reference/kit"
 OUT = f"{REF}/CHECKLIST.md"
 ACTIVE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit_active.json")

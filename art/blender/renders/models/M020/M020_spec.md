@@ -40,7 +40,7 @@ Sheet text:
 - **O, other:** ground shadow and dark edges; not counted in the shares.
 
 **Scratch study material** (pure Python, no Blender), in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m020_study\`.
+`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m020_study\`.
 Run with `C:/Users/Orang/.local/bin/python3.14.exe`.
 - **Helpers:** `png.py` (reader, `crop`), `m.py` (masks, view boxes `V`), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` → `measure_out.txt` (shares, profiles, width per height); `comps2.py` (cut-face and
