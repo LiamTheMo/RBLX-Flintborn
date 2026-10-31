@@ -119,7 +119,12 @@ check(window.category == "All", "All shows everything again")
 press(window.tabs.Vault)
 check(window.tabId == "Vault", "the Vault tab opens")
 check(window:SlotFor("i1") ~= nil and window:SlotFor("mStone") ~= nil, "vault items and materials shown")
-check(string.find(window.tabs.Vault.label.Text, "1/25", 1, true) ~= nil, "the tab carries the vault's capacity")
+check(
+	window.tabs.Vault.label.Text == "Vault"
+		and window.tabs.Vault.countBadge ~= nil
+		and window.tabs.Vault.countBadge.label.Text == "1/25",
+	"the tab carries the vault's capacity on its count plaque"
+)
 press(window:SlotFor("mStone"))
 check(window.amount ~= nil, "a material shows the amount stepper")
 window.amount.plus.control.hit.Activated:Fire()

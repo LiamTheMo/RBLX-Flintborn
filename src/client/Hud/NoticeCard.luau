@@ -154,9 +154,10 @@ function NoticeCard:_layout()
 	local hasText = self.text.Text ~= ""
 	self.text.Visible = hasText
 	if hasText then
+		-- Lines as drawn: touch screens draw body text 1.2 × (Kit.Core.TextBoost).
 		local style = Kit.Tokens.TextStyle(self.textRole)
-		local lineH = math.ceil(style.size * 1.35)
-		local lines = NoticeCard.Lines(self.text.Text, self.textRole, self.textW)
+		local lineH = math.ceil(style.size * Kit.Core.TextBoost(self.textRole) * 1.35)
+		local lines = NoticeCard.Lines(self.text.Text, self.textRole, self.textW * 0.95)
 		self.text.Position = UDim2.fromOffset(self.textX, y)
 		self.text.Size = UDim2.fromOffset(self.textW, lines * lineH)
 		y += lines * lineH

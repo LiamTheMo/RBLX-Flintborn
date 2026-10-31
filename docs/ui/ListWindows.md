@@ -93,6 +93,9 @@ controller with mocked remotes, prints its checks and ends with `FLOW OK`.
 | `progress_flow` | 1 Overview, 2 Perks, 3 Rebirth, 4 Titles, 5 the rebirth dialog, 6 forced states, 7 phone |
 | `map_flow` | 1 the map, 2 zoomed with a pin chosen, 3 forced states, 4 phone |
 
+Each of the four flows also opens and closes its window 20 times and checks
+that the PlayerGui's instances and the live connections are unchanged.
+
 Stock, offers and sale quotes in `market_flow` come from `ShopCatalog`,
 `OfferCatalog` and `EconomyRules`.
 

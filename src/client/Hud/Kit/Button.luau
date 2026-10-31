@@ -53,7 +53,9 @@ function Button.new(parent: Instance, props)
 	self.plate = Art.Plate(base.visual, ROLE[variant] or ROLE.primary, w, h, { z = base.z })
 	-- Leather tone: "bright" (the sprite's own: PLAY, APPLY), "primary"
 	-- (default: EQUIP, CLAIM, Invite), "dark" (FORGE, Party CLOSE).
-	self.plate.tone = Button.TONES[props.tone or "primary"]
+	-- The play plaque defaults to the bright tone (M05 PLAY).
+	local tone = props.tone or (if variant == "play" then "bright" else "primary")
+	self.plate.tone = Button.TONES[tone] or Button.TONES.primary
 	self.plate:Show("normal")
 	self.textRole = props.textRole or class.role
 	self.textSize = props.textSize

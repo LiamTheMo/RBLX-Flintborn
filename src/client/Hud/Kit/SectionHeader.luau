@@ -34,7 +34,9 @@ function SectionHeader.new(parent: Instance, props)
 		text = props.text,
 		role = "sectionHeader",
 		size = size,
-		-- The whole width is the label's, so a heavy face never truncates.
+		-- The whole width is the label's, so a heavy face never truncates; where
+		-- the boosted phone size does not fit, it shrinks to fit.
+		scaled = true,
 		rect = { x, 0, if props.count then math.min(textW * 1.06 + 8, w - x) else w - x, h - 6 },
 		z = base.z + 1,
 	})

@@ -297,6 +297,8 @@ function PartyWindow.new(props: Props)
 		rect = inWindow(M.close),
 		label = "Close",
 		variant = "play",
+		-- M04's CLOSE is the darker leather.
+		tone = "dark",
 		zIndex = Z + 2,
 		onPress = function()
 			screen:Close()

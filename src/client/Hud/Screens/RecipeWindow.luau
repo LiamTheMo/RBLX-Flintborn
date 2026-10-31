@@ -63,7 +63,7 @@ local L = {
 	rowIconPhone = { 6, 10, 50, 48 },
 	rowTextXPhone = 70,
 	-- A row note too long for one line wraps onto two under a raised title.
-	rowTwoLine = { titleY = 1, titleH = 25, subtitleY = 24, subtitleH = 45 },
+	rowTwoLine = { titleY = 4, titleH = 24, subtitleY = 26, subtitleH = 40 },
 	-- The Permanent mark on a conversion's icon corner (as a slot's star).
 	rowMark = { 60, 2, 20, 20 },
 	-- Room the lock takes at a locked row's right.
@@ -302,6 +302,8 @@ function RecipeWindow.new(props)
 		name = "Forge",
 		rect = if crafting then L.craft.button else L.button,
 		label = if crafting then "Craft" else "Forge",
+		-- M06's FORGE is the darker leather.
+		tone = "dark",
 		icon = if crafting then "white:hammer" else "white:anvil",
 		iconSize = L.buttonIcon,
 		iconGap = L.buttonIconGap,
@@ -539,7 +541,9 @@ function RecipeWindow:_fitSubtitle(row, text: string, locked: boolean)
 	local subtitle = row.subtitle
 	local size = if self.phone then L.rowSubtitlePhone else L.rowSubtitleSize
 	local width = row.subtitleRect[2].X.Offset - (if locked then L.rowLockRoom else 0)
-	local wide = Kit.Text.Width(text, "subtitleHand", size) > width
+	-- Phones: the boosted note keeps one line (cut with "…") so it stays inside
+	-- the card; desktop wraps a long note under a raised title.
+	local wide = not self.phone and Kit.Text.Width(text, "subtitleHand", size) > width
 	local two = L.rowTwoLine
 	subtitle.TextWrapped = wide
 	if wide then

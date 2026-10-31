@@ -28,10 +28,12 @@ SettingsWindow.SIZE = { 1098, 656 }
 -- speech bubble and a map, which read as something else), so only the tabs
 -- with an honest glyph show one (D19): gears for Gameplay's game options and
 -- the magnifier for Graphics (what you see). The labels keep one column.
+-- Text-only tabs, labels centred: the kit has no gamepad, speaker or monitor
+-- drawing, and stand-in glyphs misled (KIT.md §8), so no tab has an icon.
 SettingsWindow.TABS = {
-	{ id = "Gameplay", icon = "gears" },
+	{ id = "Gameplay" },
 	{ id = "Audio" },
-	{ id = "Graphics", icon = "magnifier" },
+	{ id = "Graphics" },
 	{ id = "Controls" },
 }
 
@@ -182,9 +184,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 			label = tab.id,
 			icon = if tab.icon then "ink:" .. tab.icon else nil,
 			selectedIcon = if tab.icon then "white:" .. tab.icon else nil,
-			iconSize = 46,
-			iconX = 22,
-			labelX = 92,
+			labelX = 12,
+			align = "Center",
 			variant = "large",
 			zIndex = 8,
 		})
@@ -245,6 +246,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		name = "Apply",
 		rect = { 797, 580, 261, 56 },
 		label = "Apply",
+		-- M03's APPLY is the bright leather.
+		tone = "bright",
 		-- Width-matched to the mockup's APPLY (72 px).
 		textSize = 21.5,
 		zIndex = 8,
@@ -296,6 +299,8 @@ local function header(page: Instance, x: number, w: number, text: string, emblem
 		text = text,
 		role = "sectionHeader",
 		textSize = 22,
+		-- Shrinks to fit beside its emblem (phones boost it), never truncates.
+		scaled = true,
 		zIndex = 7,
 	})
 	Kit.Divider.new(page, {

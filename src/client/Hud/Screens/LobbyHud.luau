@@ -192,6 +192,21 @@ function LobbyHud.new(parent: Instance, actions)
 		self.tiles[tile.id] = button
 		table.insert(self.tiles, button)
 	end
+	-- Gamepad: "RB Menu" over the tiles (LobbyHudController binds RB to step
+	-- into them); shown only while a gamepad is the input.
+	self.menuHint = region(self.tileRegion, "MenuHint", {
+		Position = UDim2.fromOffset(0, -46),
+		Size = UDim2.fromOffset(t.w, 36),
+		Visible = false,
+	})
+	Kit.KeyCap.new(self.menuHint, { name = "Key", rect = { 0, 0, 0, 34 }, text = "RB", variant = "cap" })
+	Kit.Text.new(self.menuHint, {
+		name = "Label",
+		rect = { 58, 0, t.w - 58, 34 },
+		text = "Menu",
+		role = "hudSmall",
+		outline = true,
+	})
 	-- XP pop-ups appear to the right of the tiles (ProgressionController.MountPopups).
 	self.popups = region(self.tileRegion, "XpPopups", {
 		Position = UDim2.fromOffset(t.w + 24, 0),
@@ -503,6 +518,11 @@ function LobbyHud:DefaultSelection(): GuiObject
 	return self.tiles[1].control.hit
 end
 
+-- Shows the gamepad "RB Menu" hint over the tiles.
+function LobbyHud:SetMenuHint(visible: boolean)
+	self.menuHint.Visible = visible
+end
+
 -- How far the Roblox top bar reaches down, in design px: the top regions move
 -- below it when it reaches past the mockup's top margin.
 function LobbyHud:SetTopInset(designPx: number)
@@ -585,9 +605,8 @@ function LobbyHud:_member(holder: Frame, member, showReady: boolean)
 		portraitSize = r.portrait,
 		nameX = r.nameX,
 		nameSize = if self.phone then LobbyHud.PHONE.memberName else LobbyHud.TEXT.memberName,
-		-- Every name at one size (a long one ends in "…" rather than shrinking
-		-- below its neighbours).
-		shrinkName = false,
+		-- Desktop shrinks a long name to fit (down to the text floor); touch
+		-- keeps the size, ends in "…" and shows the whole name in a tooltip.
 		crownSize = r.crown,
 		rule = false,
 		zIndex = 6,
@@ -624,10 +643,14 @@ function LobbyHud:SetParty(party)
 	local pinned = region(self.pinned, "Row0", { Size = UDim2.fromScale(1, 1) })
 	pinned:SetAttribute("LobbyRow", true)
 	local first = self:_member(pinned, party.members[1], party.showReady)
+	-- On phones the list shows few rows: with three or more members a waiting
+	-- invite is below the fold, so the add-player button carries a dot.
+	local hiddenInvite = self.phone and #party.invites > 0 and #party.members >= 3
 	local invite = Kit.IconButton.new(if self.phone then self.partyRegion else pinned, {
 		name = "Invite",
 		rect = if self.phone then LobbyHud.PHONE.invite else LobbyHud.INVITE,
 		variant = "invite",
+		badge = if hiddenInvite then { variant = "dotRed" } else nil,
 		zIndex = 7,
 		onPress = function()
 			fire("onParty", "invite")

@@ -11,6 +11,7 @@
 -- Shop (WalletController), Forge and Trade; the card opens Progress, the pills the
 -- Shop, the gear Settings, the Party panel the Party window (PartyController).
 
+local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -171,11 +172,52 @@ local function watchScale()
 	inset()
 end
 
+-- RB (free in the lobby: no keybind uses it here) moves selection onto the
+-- menu tiles while no window is open; B, below the windows' own B, hands the
+-- stick back to walking. The "RB Menu" hint shows while a gamepad is in use.
+LobbyHudController.MENU_ACTION = "FlintbornLobbyMenu"
+LobbyHudController.LEAVE_ACTION = "FlintbornLobbyMenuLeave"
+local function bindGamepadMenu()
+	ContextActionService:BindAction(LobbyHudController.MENU_ACTION, function(_, state)
+		if state ~= Enum.UserInputState.Begin or Kit.Modal.Count() > 0 then
+			return Enum.ContextActionResult.Pass
+		end
+		return if Kit.Input.EnterHud() then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	end, false, Enum.KeyCode.ButtonR1)
+	ContextActionService:BindActionAtPriority(LobbyHudController.LEAVE_ACTION, function(_, state)
+		local selected = GuiService.SelectedObject
+		if state ~= Enum.UserInputState.Begin or Kit.Modal.Count() > 0 or selected == nil or gui == nil then
+			return Enum.ContextActionResult.Pass
+		end
+		if selected:IsDescendantOf(gui) then
+			GuiService.SelectedObject = nil
+			return Enum.ContextActionResult.Sink
+		end
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.ContextActionPriority.Default.Value, Enum.KeyCode.ButtonB)
+	table.insert(stops, function()
+		ContextActionService:UnbindAction(LobbyHudController.MENU_ACTION)
+		ContextActionService:UnbindAction(LobbyHudController.LEAVE_ACTION)
+	end)
+	hud:SetMenuHint(Kit.Input.IsGamepad())
+	table.insert(
+		stops,
+		Kit.Input.Watch(function(kind)
+			if hud then
+				hud:SetMenuHint(kind == "gamepad")
+			end
+		end)
+	)
+end
+
 local function start()
 	build()
 	watchScale()
-	-- A gamepad picked up with nothing selected lands on the first menu tile.
+	-- Gamepad entry: the first menu tile is registered as the HUD's target
+	-- (it is never selected by itself; the player walks with the stick). RB
+	-- steps into the tiles while no window is open, and B steps back out.
 	Kit.Input.SetHudDefault(hud:DefaultSelection())
+	bindGamepadMenu()
 
 	hud:SetProfile(player.DisplayName, player.UserId)
 	hud:SetProgress(ProgressionController.View(), true)

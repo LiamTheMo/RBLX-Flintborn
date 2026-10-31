@@ -47,6 +47,8 @@ local BAD_COLOR = Color3.fromRGB(230, 90, 80)
 BuildController.SIZE = { 852, 244 }
 local PIECES_PER_ROW = 7
 local PIECE_W, PIECE_H, PIECE_GAP = 112, 42, 4
+-- Between the two rows of pieces: room for the touch pads (44 screen px).
+local ROW_GAP = 8
 local ROW_HEIGHT = 46
 
 local function make(className: string, props, parent)
@@ -429,7 +431,7 @@ local function build()
 			Kit.Tab.new(card, {
 				id = pieceId,
 				name = pieceId,
-				rect = { 20 + column * (PIECE_W + PIECE_GAP), 16 + row * (PIECE_H + PIECE_GAP), PIECE_W, PIECE_H },
+				rect = { 20 + column * (PIECE_W + PIECE_GAP), 16 + row * (PIECE_H + ROW_GAP), PIECE_W, PIECE_H },
 				label = pieceId,
 				variant = "horizontal",
 				textSize = 15,
@@ -445,7 +447,7 @@ local function build()
 		ui.tabs[tab.id or tab.root.Name] = tab
 	end
 	-- Tier stepper: ◀ Copper 3/8 · 1000 HP ▶ (hidden arrows for one-tier pieces).
-	local rowY = 16 + 2 * (PIECE_H + PIECE_GAP) + 4
+	local rowY = 16 + 2 * (PIECE_H + ROW_GAP) + 2
 	ui.tierDown = Kit.IconButton.new(card, {
 		name = "TierDown",
 		rect = { 20, rowY, ROW_HEIGHT, ROW_HEIGHT },

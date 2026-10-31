@@ -36,7 +36,8 @@ local LEATHER_SELECTED = { arrow = true, horizontal = true, large = true }
 -- props: id, rect | size, label, icon, variant, onPress, zIndex, name, and:
 --   selectedIcon  icon shown while selected ("white:gamepad", "backpack_white")
 --   iconTint / selectedIconTint  colour tokens laid over the icon
---   iconSize, iconX, labelX  (design px; defaults per variant), textSize
+--   iconSize, iconX, labelX  (design px; defaults per variant), textSize,
+--   align ("Left" | "Center": a text-only tab centres its label)
 function Tab.new(parent: Instance, props)
 	local variant = props.variant or "horizontal"
 	local role = ROLE[variant] or ROLE.horizontal
@@ -81,6 +82,7 @@ function Tab.new(parent: Instance, props)
 			text = props.label,
 			role = textRole,
 			size = props.textSize,
+			align = props.align,
 			scaled = true,
 			rect = { x, 0, w - x - (if variant == "category" or variant == "arrow" then 34 else 12), h - 2 },
 			z = base.z + 2,

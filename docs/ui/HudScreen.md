@@ -59,8 +59,8 @@ below the top third. The `phone` entries arrange the HUD around them:
 | Region | Phone place |
 |---|---|
 | Menu tiles | top left (39, 60), 3 × 2, 80 × 80 tiles at pitch 88 / 86 (40 screen px; the Kit pads the touch area to 44); their bottom row reaches about 12–17 screen px into the thumbstick zone's top edge |
-| World event | top left under the tiles (39, 238) |
-| Tribe frames | bottom left (39, bottom 24), growing upwards; display only, so touches pass to the thumbstick |
+| World event | top left under the tiles (39, 238); the header title shrinks so it never meets the countdown |
+| Tribe frames | one short strip under the compass (centred, y 142 before the top-bar shift, 50 high): the tribe icon and count, then the members side by side (portrait, name ending in "…", health bar); above the thumbstick zone and clear of the jump button. Banners start below it |
 | Vitals, status, objective | right column as on desktop; the objective ends above the jump button |
 | Touch attack | right 220, bottom 30 |
 | Hotbar, compass | as on desktop; hotbar key badges hidden |

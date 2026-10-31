@@ -205,8 +205,7 @@ function PlayerRow:Set(data)
 	end
 	local nameRight = right
 	self.fullName = data.name or ""
-	self.nameCut = not shrink
-		and Text.Width(self.fullName, "rowTitle", nameSize) > nameRight - x - 2
+	self.nameCut = not shrink and Text.Width(self.fullName, "rowTitle", nameSize) > nameRight - x - 2
 	Core.Label(self.content, {
 		name = "Name",
 		text = data.name or "",
