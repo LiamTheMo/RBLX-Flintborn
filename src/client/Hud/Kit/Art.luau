@@ -120,7 +120,7 @@ end
 
 -- The stand-in's fill token for a material in a state.
 local function standInFill(material: string, leather: boolean, state: string, role): string?
-	if material == "fill" or material == "dot" then
+	if material == "fill" or material == "dot" or material == "pill" then
 		return role.fill or "xp"
 	elseif material == "track" then
 		return "track"
@@ -174,6 +174,8 @@ local function paintStandIn(frame: Frame, roleName: string, state: string, w: nu
 			Tokens.Space("fallbackCornerWindow", 10), "rail", Tokens.Space("fallbackStrokeWindow", 3)
 	elseif material == "slot" then
 		round = Tokens.Space("fallbackCornerSlot", 6)
+	elseif material == "pill" then
+		round, strokeKey, thickness = Tokens.Space("pillCorner", 7), role.stroke or "paperEdge", 1.5
 	elseif leather then
 		strokeKey = "leatherEdge"
 	end

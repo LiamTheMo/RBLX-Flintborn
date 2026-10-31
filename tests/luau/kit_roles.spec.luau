@@ -12,6 +12,7 @@ local MATERIALS = {
 	rule = true,
 	glyph = true,
 	none = true,
+	pill = true,
 }
 
 -- Roles every component draws from; a missing one would draw nothing.

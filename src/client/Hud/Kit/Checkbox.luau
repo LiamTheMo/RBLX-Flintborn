@@ -12,6 +12,7 @@ local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Interact = require(script.Parent.Interact)
+local Scale = require(script.Parent.Scale)
 local Tokens = require(script.Parent.Tokens)
 
 local Checkbox = {}
@@ -61,7 +62,9 @@ function Checkbox.new(parent: Instance, props)
 			text = props.label,
 			role = "rowLabel",
 			size = props.textSize,
-			scaled = true,
+			-- Phones keep the text floor (fixed size, truncated); elsewhere it
+			-- shrinks to fit its line.
+			scaled = not Scale.IsSmallTouch(),
 			rect = { x, 0, w - x, if props.description then box * 0.6 else h },
 			z = base.z + 1,
 		})
@@ -72,7 +75,7 @@ function Checkbox.new(parent: Instance, props)
 			text = props.description,
 			role = "small",
 			size = props.descriptionSize,
-			scaled = true,
+			scaled = not Scale.IsSmallTouch(),
 			rect = { x, box * 0.6, w - x, h - box * 0.6 },
 			z = base.z + 1,
 		})

@@ -73,6 +73,24 @@ function HudModel.Thousands(value: number?): string
 	return (formatted:gsub("^,", ""))
 end
 
+-- A currency amount that fits a pill: separators below 100,000 (2,450), then
+-- one decimal with K, M or B (250K, 1.2M, 3.4B); the decimal drops when it is 0.
+function HudModel.Compact(value: number?): string
+	local n = math.max(0, math.floor(value or 0))
+	if n < 100000 then
+		return HudModel.Thousands(n)
+	end
+	for _, unit in { { 1e9, "B" }, { 1e6, "M" }, { 1e3, "K" } } do
+		if n >= unit[1] then
+			-- Rounded down, so 999,999 never reads 1000K.
+			local tenths = math.floor(n / unit[1] * 10) / 10
+			local text = if tenths >= 100 or tenths % 1 == 0 then ("%d"):format(tenths) else ("%.1f"):format(tenths)
+			return text .. unit[2]
+		end
+	end
+	return HudModel.Thousands(n)
+end
+
 -- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
 -- of one).
 function HudModel.PartyCount(members: number?, maxSize: number): string

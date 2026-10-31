@@ -48,6 +48,7 @@
     "checkTint": "#FFD52A",
     "notReadyTint": "#C8C8C8",
     "leatherTint": "#D1D4FF",
+    "readyEdge": "#9DA35A",
     "emptyDot": "#CC9F77",
     "photoBackdrop": "#C9B19B",
     "rarityCommon": "#A99A88",
@@ -116,6 +117,7 @@
     "touchMin": 44,
     "minTextPx": 9,
     "fallbackCorner": 8,
+    "pillCorner": 7,
     "fallbackCornerSlot": 6,
     "fallbackCornerWindow": 10,
     "fallbackStroke": 2,
@@ -182,7 +184,10 @@
   "phoneFloor": { "hud": 0.5, "overlay": 0.6 },
   "phoneText": {
     "scale": 1.2,
-    "roles": ["body", "bodySoft", "small", "muted", "rowLabel", "rowTitle", "value", "count", "hudName", "hudSmall", "currency", "keycap", "tag", "label", "placeholder", "buttonS", "tab", "badgeNum"]
+    "minPx": 9,
+    "refWindow": [1110, 690],
+    "topInset": 60,
+    "roles": ["sectionHeader", "body", "bodySoft", "small", "muted", "rowLabel", "rowTitle", "value", "count", "hudName", "hudSmall", "currency", "keycap", "tag", "label", "placeholder", "buttonS", "tab", "badgeNum"]
   },
   "sounds": { "hover": "", "click": "", "open": "", "close": "", "error": "", "success": "" }
 }

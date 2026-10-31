@@ -22,7 +22,9 @@ Badge.__index = Badge
 -- role and colour, a tint over the plate, and the default size.
 Badge.VARIANTS = {
 	leader = { role = "badge.pill", text = "Leader", textRole = "tag", tint = "leaderTint", h = 34 },
-	ready = { role = "badge.pill", dot = "dot.green", text = "Ready", textRole = "tag", h = 34 },
+	-- Ready is the green pill (M04); readyPill names it explicitly.
+	ready = { role = "badge.ready", dot = "dot.green", text = "Ready", textRole = "tag", h = 34 },
+	readyPill = { role = "badge.ready", dot = "dot.green", text = "Ready", textRole = "tag", h = 34 },
 	notReady = { role = "badge.pill", dot = "dot.grey", text = "Not Ready", textRole = "tag", h = 34 },
 	count = { role = "badge.count", text = "", textRole = "count", w = 34, h = 31 },
 	number = { role = "badge.number", text = "", textRole = "badgeNum", w = 26, h = 26 },

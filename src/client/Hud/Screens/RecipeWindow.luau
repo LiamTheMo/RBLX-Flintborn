@@ -277,7 +277,8 @@ function RecipeWindow.new(props)
 	self.quantityHead = label(v, {
 		name = "QuantityHead",
 		rect = L.quantityHead,
-		text = "Quantity",
+		-- Phones boost the text; the short word keeps clear of the stepper.
+		text = if Kit.Scale.IsSmallTouch() then "Qty" else "Quantity",
 		role = "sectionHeader",
 		zIndex = z,
 	}, L.smallHeadSize)
@@ -723,20 +724,25 @@ function RecipeWindow:_wideCards(cost)
 		})
 		local c = card.base.visual
 		local z = card.base.z + 1
-		Kit.ItemIcon.new(c, { rect = L.cardIcon, itemId = item.catalogId, zIndex = z })
-		-- hudSmall: Merriweather Bold at 15, shrinking to fit a long name.
+		-- Phones: a smaller icon leaves the boosted text its width.
+		local phone = Kit.Scale.IsSmallTouch()
+		local iconRect = if phone then { 4, (h - 34) / 2, 34, 34 } else L.cardIcon
+		local textX = if phone then 42 else L.cardTextX
+		Kit.ItemIcon.new(c, { rect = iconRect, itemId = item.catalogId, zIndex = z })
+		-- hudSmall: Merriweather Bold at 15, shrinking to fit a long name
+		-- (on phones it keeps the text floor and truncates instead).
 		label(c, {
 			name = "Name",
-			rect = { L.cardTextX, 12, w - L.cardTextX - 6, 24 },
+			rect = { textX, 12, w - textX - 4, 24 },
 			text = item.name,
 			role = "hudSmall",
 			color = "inkLabel",
-			scaled = true,
+			scaled = not phone,
 			zIndex = z,
 		})
 		label(c, {
 			name = "Count",
-			rect = { L.cardTextX, 35, w - L.cardTextX - 6, 28 },
+			rect = { textX, 35, w - textX - 4, 28 },
 			text = countText(item),
 			role = "count",
 			rich = true,

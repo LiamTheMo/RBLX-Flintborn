@@ -61,6 +61,17 @@ function Scale.IsSmallTouch(height: number?, width: number?): boolean
 	return Scale.FormFactor(height, width) ~= "desktop"
 end
 
+-- On phones and tablets: the least design size (px) that draws at
+-- phoneText.minPx screen px in a typical window (phoneText.refWindow) below
+-- the top bar, so boosted body text never drops under that floor.
+function Scale.PhoneTextFloor(): number
+	local camera = workspace.CurrentCamera
+	local size = if camera then camera.ViewportSize else Vector2.new(1672, 941)
+	local spec = Tokens.Data.phoneText
+	local k = Scale.WindowFit(size.X, size.Y, spec.topInset, spec.refWindow[1], spec.refWindow[2], nil, true)
+	return spec.minPx / math.max(k, 0.05)
+end
+
 -- The one phone floor table (tokens "phoneFloor"): the least scale for "hud"
 -- or "overlay" (toasts, tooltips, notice cards) on phones.
 function Scale.PhoneFloor(kind: string): number

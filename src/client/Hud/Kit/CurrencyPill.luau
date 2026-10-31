@@ -1,5 +1,6 @@
 -- The HUD currency pill (sheet 07; M01): plaque, coin or gem icon and the
--- amount with thousands separators, counting up when it changes. Pressable
+-- amount (separators below 100,000, then 250K / 1.2M: HudModel.Compact),
+-- counting up when it changes. Pressable
 -- when onPress is given (opens the Shop).
 --
 --   local coins = Kit.CurrencyPill.new(top, { rect = { 0, 0, 112, 46 }, currency = "coins", value = 2450, onPress = shop })
@@ -42,7 +43,7 @@ function CurrencyPill.new(parent: Instance, props)
 	})
 	self.counter = Core.Make("NumberValue", { Name = "Count", Value = 0 }, base.root)
 	base.maid:Give(self.counter:GetPropertyChangedSignal("Value"):Connect(function()
-		self.label.Text = HudModel.Thousands(self.counter.Value)
+		self.label.Text = HudModel.Compact(self.counter.Value)
 	end))
 	if props.onPress then
 		self.control = Interact.attach(base, {
@@ -65,7 +66,7 @@ function CurrencyPill:SetValue(value: number, instant: boolean?)
 	self.root:SetAttribute("KitValue", value)
 	if instant then
 		Motion.Set(self.counter, { Value = value })
-		self.label.Text = HudModel.Thousands(value)
+		self.label.Text = HudModel.Compact(value)
 	else
 		Motion.Play(self.counter, "count", { Value = value })
 	end

@@ -114,11 +114,17 @@ end
 -- The text boost for `role` on a short touch screen (a landscape phone, where
 -- windows and the HUD draw small): body and label roles grow by phoneText.scale
 -- so they stay readable; titles keep their size. 1 elsewhere.
-function Core.TextBoost(role: string): number
-	if not phoneRoles[role] then
+-- With `size` (design px) the boost also lifts it to the phone text floor
+-- (Scale.PhoneTextFloor: phoneText.minPx screen px in a typical window).
+function Core.TextBoost(role: string, size: number?): number
+	if not phoneRoles[role] or not Scale.IsSmallTouch() then
 		return 1
 	end
-	return if Scale.IsSmallTouch() then Tokens.Data.phoneText.scale else 1
+	local boost = Tokens.Data.phoneText.scale
+	if size and size > 0 then
+		boost = math.max(boost, Scale.PhoneTextFloor() / size)
+	end
+	return boost
 end
 
 -- Boosted labels and their unboosted sizes, so a change of form factor (a
@@ -133,7 +139,7 @@ Scale.OnFormFactorChanged(function()
 	for label, size in boosted do
 		if label.Parent then
 			local role = label:GetAttribute("KitTextRole");
-			(label :: any).TextSize = size * Core.TextBoost(role or "body")
+			(label :: any).TextSize = size * Core.TextBoost(role or "body", size)
 		end
 	end
 end)
@@ -142,7 +148,7 @@ end)
 function Core.Style(label: TextLabel | TextButton | TextBox, role: string, colorKey: string?)
 	local style = Tokens.TextStyle(role)
 	label.FontFace = style.face
-	label.TextSize = style.size * Core.TextBoost(role)
+	label.TextSize = style.size * Core.TextBoost(role, style.size)
 	label:SetAttribute("KitTextRole", role)
 	track(label, role, style.size)
 	label.TextColor3 = Tokens.Color(colorKey or style.color)
@@ -174,7 +180,7 @@ function Core.Label(parent: Instance, opts): TextLabel
 	}, nil)
 	local style = Core.Style(label, role, opts.color)
 	if opts.size then
-		label.TextSize = opts.size * Core.TextBoost(role)
+		label.TextSize = opts.size * Core.TextBoost(role, opts.size)
 		track(label, role, opts.size)
 	end
 	if opts.outline then
@@ -213,7 +219,7 @@ end
 function Core.TextWidth(text: string, role: string, size: number?): number
 	local style = Tokens.TextStyle(role)
 	local spec = Tokens.Data.fonts[style.font]
-	local px = (size or style.size) * Core.TextBoost(role)
+	local px = (size or style.size) * Core.TextBoost(role, size or style.size)
 	local shown = if style.caps then string.upper(text) else text
 	local legacy = (Enum.Font :: any)[spec.legacy] or Enum.Font.Merriweather
 	local ok, bounds = pcall(TextService.GetTextSize, TextService, shown, px, legacy, Vector2.new(10000, 10000))
