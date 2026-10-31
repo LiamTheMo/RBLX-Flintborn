@@ -266,12 +266,28 @@ local function tent(parts, x: number, z: number, alongX: boolean, colors)
 	if alongX then
 		add(
 			parts,
-			part("Block", { length, 0.25, slope }, { x, rise / 2, z + width / 4 }, colors[1], "Fabric", { tilt, 0, 0 }, {
-				name = "TentHide",
-			}),
-			part("Block", { length, 0.25, slope }, { x, rise / 2, z - width / 4 }, colors[2], "Fabric", { -tilt, 0, 0 }, {
-				name = "TentHide",
-			}),
+			part(
+				"Block",
+				{ length, 0.25, slope },
+				{ x, rise / 2, z + width / 4 },
+				colors[1],
+				"Fabric",
+				{ tilt, 0, 0 },
+				{
+					name = "TentHide",
+				}
+			),
+			part(
+				"Block",
+				{ length, 0.25, slope },
+				{ x, rise / 2, z - width / 4 },
+				colors[2],
+				"Fabric",
+				{ -tilt, 0, 0 },
+				{
+					name = "TentHide",
+				}
+			),
 			part("Cylinder", { length + 0.8, 0.3, 0.3 }, { x, rise + 0.05, z }, WOOD_DARK, "Wood", nil, {
 				name = "Ridge",
 			})
@@ -279,12 +295,28 @@ local function tent(parts, x: number, z: number, alongX: boolean, colors)
 	else
 		add(
 			parts,
-			part("Block", { slope, 0.25, length }, { x + width / 4, rise / 2, z }, colors[1], "Fabric", { 0, 0, -tilt }, {
-				name = "TentHide",
-			}),
-			part("Block", { slope, 0.25, length }, { x - width / 4, rise / 2, z }, colors[2], "Fabric", { 0, 0, tilt }, {
-				name = "TentHide",
-			}),
+			part(
+				"Block",
+				{ slope, 0.25, length },
+				{ x + width / 4, rise / 2, z },
+				colors[1],
+				"Fabric",
+				{ 0, 0, -tilt },
+				{
+					name = "TentHide",
+				}
+			),
+			part(
+				"Block",
+				{ slope, 0.25, length },
+				{ x - width / 4, rise / 2, z },
+				colors[2],
+				"Fabric",
+				{ 0, 0, tilt },
+				{
+					name = "TentHide",
+				}
+			),
 			part("Cylinder", { length + 0.8, 0.3, 0.3 }, { x, rise + 0.05, z }, WOOD_DARK, "Wood", { 0, 90, 0 }, {
 				name = "Ridge",
 			})
@@ -327,11 +359,11 @@ local function camp()
 	return parts
 end
 
--- The Fort's watch platform on stilts with a ladder, a rack of spears and a
--- banner pole: 22 parts. It stands at ring point 7 (the far side from the gate).
+-- The Fort's watch platform on stilts with a ladder, a spear rack, crates and a
+-- banner pole: 23 parts. The platform stands inside ring point 6, opposite the gate.
 local function fort()
 	local parts = {}
-	local px, pz = PropModels.RingPoint(7, 11)
+	local px, pz = PropModels.RingPoint(6, 11)
 	for _, sx in { -1.7, 1.7 } do
 		for _, sz in { -1.7, 1.7 } do
 			add(parts, post(7.6, 0.7, { px + sx, 3.8, pz + sz }, WOOD, "Wood", "Stilt"))
@@ -462,7 +494,15 @@ local function ruinGate()
 		part("Block", { 4.6, 1.3, 1.8 }, { -2.2, 7, 0 }, STONE_LIGHT, "Cobblestone", { 0, 0, -6 }, { name = "Lintel" }),
 		part("Block", { 1.4, 1.4, 1.6 }, { 1.2, 0.7, -2.2 }, STONE, "Cobblestone", { 0, 25, 0 }, { name = "Keystone" }),
 		part("Block", { 2.6, 1, 1.6 }, { 2.4, 0.5, 2 }, STONE_DARK, "Cobblestone", { 0, -35, 0 }, { name = "Fallen" }),
-		part("Block", { 1.5, 0.8, 1.2 }, { -1.5, 0.4, -1.6 }, STONE_LIGHT, "Cobblestone", { 0, 15, 0 }, { name = "Rubble" }),
+		part(
+			"Block",
+			{ 1.5, 0.8, 1.2 },
+			{ -1.5, 0.4, -1.6 },
+			STONE_LIGHT,
+			"Cobblestone",
+			{ 0, 15, 0 },
+			{ name = "Rubble" }
+		),
 		part("Block", { 3.4, 0.1, 2.2 }, { -3.9, 3.1, 0 }, MOSS, "Grass", nil, { name = "Moss" }),
 	}
 end
@@ -583,20 +623,38 @@ function PropModels.OreNode(accent: { number })
 	local crystal = shade(accent, 1.1)
 	local parts = {
 		part("Block", { 5.6, 2.6, 5.4 }, { 0, 1.3, 0 }, rock, "Slate", { 0, 12, 0 }, { name = "Boulder" }),
-		part("Block", { 3.8, 2.4, 3.6 }, { -0.7, 3, 0.3 }, shade(rock, 1.15), "Slate", { 0, -18, 0 }, { name = "Boulder" }),
-		part("Block", { 2.6, 1.8, 2.8 }, { 1.9, 1, -1.5 }, shade(rock, 0.9), "Slate", { 0, 25, 0 }, { name = "Boulder" }),
+		part(
+			"Block",
+			{ 3.8, 2.4, 3.6 },
+			{ -0.7, 3, 0.3 },
+			shade(rock, 1.15),
+			"Slate",
+			{ 0, -18, 0 },
+			{ name = "Boulder" }
+		),
+		part(
+			"Block",
+			{ 2.6, 1.8, 2.8 },
+			{ 1.9, 1, -1.5 },
+			shade(rock, 0.9),
+			"Slate",
+			{ 0, 25, 0 },
+			{ name = "Boulder" }
+		),
 		part("Block", { 1, 0.7, 1 }, { 3.2, 0.35, 1.8 }, rock, "Slate", { 0, 40, 0 }, { name = "Rubble" }),
 		part("Block", { 1, 0.7, 1 }, { -3, 0.3, -2 }, shade(rock, 0.85), "Slate", { 0, -25, 0 }, { name = "Rubble" }),
 		part("Block", { 1.2, 0.6, 1 }, { 2.5, 0.3, -3 }, rock, "Slate", { 0, 15, 0 }, { name = "Rubble" }),
 	}
-	for _, spec in {
-		{ { 0.9, 3.2, 0.9 }, { 0.2, 5, 0.2 }, { 0, 0, 6 } },
-		{ { 0.8, 2.4, 0.8 }, { -1.5, 4.5, 0.8 }, { 0, 0, 24 } },
-		{ { 0.7, 2, 0.7 }, { 1.4, 4.1, 0.9 }, { -20, 0, 0 } },
-		{ { 0.8, 2.2, 0.8 }, { 1, 3.4, -1.3 }, { 22, 0, 0 } },
-		{ { 0.6, 1.6, 0.6 }, { -2.4, 2.6, -0.6 }, { 0, 0, 50 } },
-		{ { 0.6, 1.4, 0.6 }, { -0.4, 2.3, -2.4 }, { -35, 0, 0 } },
-	} do
+	for _, spec in
+		{
+			{ { 0.9, 3.2, 0.9 }, { 0.2, 5, 0.2 }, { 0, 0, 6 } },
+			{ { 0.8, 2.4, 0.8 }, { -1.5, 4.5, 0.8 }, { 0, 0, 24 } },
+			{ { 0.7, 2, 0.7 }, { 1.4, 4.1, 0.9 }, { -20, 0, 0 } },
+			{ { 0.8, 2.2, 0.8 }, { 1, 3.4, -1.3 }, { 22, 0, 0 } },
+			{ { 0.6, 1.6, 0.6 }, { -2.4, 2.6, -0.6 }, { 0, 0, 50 } },
+			{ { 0.6, 1.4, 0.6 }, { -0.4, 2.3, -2.4 }, { -35, 0, 0 } },
+		}
+	do
 		add(parts, part("Block", spec[1], spec[2], crystal, "Neon", spec[3], { name = "Crystal" }))
 	end
 	return { parts = lifted(parts, -2.5) }
@@ -620,7 +678,18 @@ local function patch(accent)
 			{ { 1.6, 0.8, 1.4 }, { -0.8, 0.6, -1.1 } },
 		}
 	do
-		add(parts, part("Ball", leaf[1], leaf[2], if index % 2 == 0 then LEAF_DARK else LEAF, "Grass", nil, { name = "Leaves" }))
+		add(
+			parts,
+			part(
+				"Ball",
+				leaf[1],
+				leaf[2],
+				if index % 2 == 0 then LEAF_DARK else LEAF,
+				"Grass",
+				nil,
+				{ name = "Leaves" }
+			)
+		)
 	end
 	for index, bloom in { { -0.9, 0.4 }, { 0.8, 0.3 }, { 0, -0.9 }, { -0.3, 1 }, { 1.3, -0.4 } } do
 		local length = 1.2 + (index % 3) * 0.3
@@ -644,11 +713,19 @@ local function bloom(accent)
 	for index, yaw in { 0, 90, 45, -45 } do
 		add(
 			parts,
-			part("Ball", { 2.4, 0.4, 1 }, { 0, 0.7 + index * 0.05, 0 }, if index % 2 == 0 then LEAF else LEAF_DARK, "Grass", {
-				0,
-				yaw,
-				0,
-			}, { name = "Leaf" })
+			part(
+				"Ball",
+				{ 2.4, 0.4, 1 },
+				{ 0, 0.7 + index * 0.05, 0 },
+				if index % 2 == 0 then LEAF else LEAF_DARK,
+				"Grass",
+				{
+					0,
+					yaw,
+					0,
+				},
+				{ name = "Leaf" }
+			)
 		)
 	end
 	for index = 1, 6 do
@@ -702,7 +779,15 @@ end
 PropModels.LootPile = {
 	parts = lifted({
 		part("Block", { 3.4, 1.4, 3.2 }, { 0, 0.7, 0 }, STONE, "Cobblestone", { 0, 15, 0 }, { name = "Heap" }),
-		part("Block", { 2.2, 1.2, 2 }, { -0.4, 1.9, 0.3 }, STONE_LIGHT, "Cobblestone", { 0, -25, 0 }, { name = "Heap" }),
+		part(
+			"Block",
+			{ 2.2, 1.2, 2 },
+			{ -0.4, 1.9, 0.3 },
+			STONE_LIGHT,
+			"Cobblestone",
+			{ 0, -25, 0 },
+			{ name = "Heap" }
+		),
 		part("Block", { 1.6, 1, 1.4 }, { 1.2, 0.5, -1.6 }, STONE_DARK, "Cobblestone", { 0, 30, 0 }, { name = "Heap" }),
 		part("Block", { 1.6, 1.1, 1.3 }, { -1.5, 0.6, 1.5 }, WOOD, "WoodPlanks", { 0, 35, 0 }, { name = "Crate" }),
 		part("Block", { 1.8, 0.15, 0.4 }, { -1.2, 1.3, 1.3 }, WOOD_LIGHT, "Wood", { 0, 0, 15 }, { name = "Plank" }),
@@ -731,9 +816,17 @@ local function altar()
 		local pos = stone[1]
 		add(
 			parts,
-			part("Block", { 0.9, stone[3], 0.9 }, { pos[1], 1.5 + stone[3] / 2, pos[3] }, STONE, "Slate", { 0, 0, stone[2] }, {
-				name = "Standing",
-			}),
+			part(
+				"Block",
+				{ 0.9, stone[3], 0.9 },
+				{ pos[1], 1.5 + stone[3] / 2, pos[3] },
+				STONE,
+				"Slate",
+				{ 0, 0, stone[2] },
+				{
+					name = "Standing",
+				}
+			),
 			part("Block", { 0.7, 0.35, 0.7 }, { pos[1], 1.5 + stone[3] + 0.2, pos[3] }, EMBER, "Neon", nil, {
 				name = "Glow",
 			})
@@ -742,9 +835,17 @@ local function altar()
 	for index, rune in { { 0, 1.9 }, { 0, -1.9 }, { 1.9, 0 }, { -1.9, 0 } } do
 		add(
 			parts,
-			part("Block", { 1.4, 0.08, 0.35 }, { rune[1], 2.04, rune[2] }, EMBER, "Neon", { 0, if index > 2 then 90 else 0, 0 }, {
-				name = "Glow",
-			})
+			part(
+				"Block",
+				{ 1.4, 0.08, 0.35 },
+				{ rune[1], 2.04, rune[2] },
+				EMBER,
+				"Neon",
+				{ 0, if index > 2 then 90 else 0, 0 },
+				{
+					name = "Glow",
+				}
+			)
 		)
 	end
 	return parts
@@ -785,7 +886,10 @@ function PropModels.Portal(accent: { number })
 		)
 	end
 	for _, yaw in { 45, -45 } do
-		add(parts, part("Block", { 4.4, 0.1, 0.5 }, { 0, 0.35, 0 }, METAL_DARK, "Slate", { 0, yaw, 0 }, { name = "Rune" }))
+		add(
+			parts,
+			part("Block", { 4.4, 0.1, 0.5 }, { 0, 0.35, 0 }, METAL_DARK, "Slate", { 0, yaw, 0 }, { name = "Rune" })
+		)
 	end
 	return { parts = parts }
 end

@@ -1,0 +1,426 @@
+local Shared = game:GetService("ReplicatedStorage").Shared
+local BossCatalog = require(Shared.Bosses.BossCatalog)
+local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
+local EventCatalog = require(Shared.Events.EventCatalog)
+local EventRules = require(Shared.Events.EventRules)
+local GameConstants = require(Shared.GameConstants)
+local HudModel = require(Shared.UI.HudModel)
+local ItemCatalog = require(Shared.Items.ItemCatalog)
+local NodeCatalog = require(Shared.Resources.NodeCatalog)
+local PoiCatalog = require(Shared.World.PoiCatalog)
+local PropModels = require(Shared.Visuals.PropModels)
+local Rarity = require(Shared.Items.Rarity)
+local Recipe = require(Shared.Visuals.Recipe)
+local Tiers = require(Shared.Items.Tiers)
+
+-- What EventDirectorService.start() builds for each kind, and the category each
+-- kind belongs to (kept in step with its populate()).
+local HANDLED = { Node = true, Cache = true, Meteor = true, Npc = true, Structure = true, Boss = true }
+local KIND_OF_CATEGORY = {
+	Vegetation = "Node",
+	Ore = "Node",
+	Npc = "Npc",
+	Cache = "Cache",
+	Meteor = "Meteor",
+	Structure = "Structure",
+	Boss = "Boss",
+}
+
+local function accents()
+	local list = {}
+	for _, rarity in Rarity.Order do
+		table.insert(list, Recipe.Rgb(Rarity.Colors[rarity]))
+	end
+	return list
+end
+
+local function named(recipe, name: string): number
+	local count = 0
+	for _, spec in recipe.parts do
+		if spec.name == name then
+			count += 1
+		end
+	end
+	return count
+end
+
+-- Recipes ------------------------------------------------------------------------
+
+test("every structure style in the catalog has dressing, a gate and walls", function()
+	local used = {}
+	for _, entry in EventCatalog.Entries.Structure do
+		expect(entry.style ~= nil, entry.id .. " names a style")
+		used[entry.style] = true
+		expect(PropModels.Structure[entry.style] ~= nil, entry.id .. " dressing for " .. tostring(entry.style))
+		expect(PropModels.Gate[entry.style] ~= nil, entry.id .. " gate for " .. tostring(entry.style))
+		local wall = PropModels.Wall(entry.style, PropModels.RING.height)
+		expect(#Recipe.Problems(wall, PropModels.MAX_PARTS) == 0, entry.id .. " wall recipe")
+	end
+	for style in used do
+		expect(table.find(PropModels.STYLES, style) ~= nil, style .. " is a listed style")
+	end
+	for _, style in PropModels.STYLES do
+		expect(used[style], style .. " is used by a structure event")
+	end
+end)
+
+test("every prop recipe is buildable and within the part limit", function()
+	local all = PropModels.All(accents())
+	expect(#all > 30, "the recipes were gathered")
+	for _, item in all do
+		local problems = Recipe.Problems(item.recipe, 25)
+		expect(#problems == 0, item.name .. ": " .. table.concat(problems, "; "))
+		for _, spec in item.recipe.parts do
+			expect(spec.pos[2] - spec.size[2] / 2 > -12, item.name .. " stays near its origin")
+		end
+	end
+end)
+
+test("walls cover their gameplay part and ruins keep their stone", function()
+	local ring = PropModels.RING
+	for _, style in PropModels.STYLES do
+		for _, height in { PropModels.RUIN_HEIGHT[1], 5, PropModels.RUIN_HEIGHT[2], ring.height } do
+			local wall = PropModels.Wall(style, height)
+			local low, high = Recipe.Bounds(wall)
+			expect(
+				low[1] >= -ring.width / 2 - 0.2 and high[1] <= ring.width / 2 + 0.2,
+				style .. " wall stays in its segment"
+			)
+			expect(low[2] >= -height / 2 - 0.6, style .. " wall reaches the ground")
+			expect(high[2] <= height / 2 + 1.5, style .. " wall stays near the part's top")
+			expect(type(wall.hostVisible) == "boolean", style .. " says whether the part stays drawn")
+			if not wall.hostVisible and style ~= "Ruin" then
+				-- An invisible wall must be drawn all the way up.
+				expect(high[2] >= height / 2 - 0.1, style .. " draws up to the top of its part")
+			end
+		end
+	end
+	expect(PropModels.Wall("Ruin", 5).hostVisible, "ruin stone stays visible")
+	expect(not PropModels.Wall("Fort", 9).hostVisible, "the palisade replaces the plain wall")
+end)
+
+test("the wall ring is closed except at the doorway and ruin gaps", function()
+	local ring = PropModels.RING
+	-- Neighbouring segments touch: the chord between centres fits the width.
+	local chord = 2 * ring.radius * math.sin(math.pi / ring.segments)
+	expect(ring.width >= chord - 0.2, "walls meet around the ring")
+	expect(ring.doorway >= 1 and ring.doorway <= ring.segments, "the doorway is a segment")
+	for _, style in PropModels.STYLES do
+		expect(not PropModels.HasWall(style, ring.doorway), style .. " leaves its doorway open")
+		local walls = 0
+		for index = 1, ring.segments do
+			walls += if PropModels.HasWall(style, index) then 1 else 0
+		end
+		expect(walls >= 5, style .. " keeps most of its walls")
+	end
+	expectEq(
+		(function()
+			local count = 0
+			for index = 1, ring.segments do
+				count += if PropModels.HasWall("Fort", index) then 1 else 0
+			end
+			return count
+		end)(),
+		ring.segments - 1,
+		"a Fort has one gap: the doorway"
+	)
+	-- The Ruin has a column standing in each crumbled gap.
+	local gaps = 0
+	for index = 1, ring.segments do
+		if index ~= ring.doorway and not PropModels.HasWall("Ruin", index) then
+			gaps += 1
+		end
+	end
+	expectEq(named(PropModels.Structure.Ruin, "Column"), gaps, "a ruin column per crumbled gap")
+end)
+
+test("structure dressing leaves the cache, loot node and boss spots free", function()
+	for style, recipe in PropModels.Structure do
+		for _, spec in recipe.parts do
+			local top = spec.pos[2] + spec.size[2] / 2
+			local reach = math.max(spec.size[1], spec.size[3]) / 2
+			local fromCentre = math.sqrt(spec.pos[1] ^ 2 + spec.pos[3] ^ 2)
+			if top > 0.5 then
+				expect(fromCentre - reach > 1.5, style .. " " .. tostring(spec.name) .. " keeps clear of the cache")
+				-- The Warlord stands 6 studs on (EventDirectorService).
+				if style == "Fort" then
+					local fromBoss = math.sqrt(spec.pos[1] ^ 2 + (spec.pos[3] - 6) ^ 2)
+					expect(fromBoss - reach > 2, style .. " " .. tostring(spec.name) .. " keeps clear of the boss")
+				end
+			end
+		end
+	end
+end)
+
+test("the chest, altar and nodes carry the parts their services drive", function()
+	for _, accent in accents() do
+		local chest = PropModels.Chest(accent)
+		expect(named(chest, "Lid") >= 1, "a lid that opens")
+		expect(named(chest, "Glow") >= 1, "a lit lock")
+		-- Every part a service turns or darkens is named the way the service looks for it.
+		for _, spec in chest.parts do
+			if spec.name == "LidBand" or spec.name == "LidGem" then
+				expect(
+					string.sub(spec.name, 1, #PropModels.LID_PREFIX) == PropModels.LID_PREFIX,
+					spec.name .. " turns with the lid"
+				)
+			end
+		end
+		local low, high = Recipe.Bounds(chest)
+		expect(
+			low[1] >= -2.3 and high[1] <= 2.3 and low[3] >= -1.8 and high[3] <= 1.8,
+			"the chest stays near its 4 x 3 hitbox"
+		)
+		expect(low[2] >= -1.6, "the chest sits on the ground")
+	end
+	local hinge = PropModels.CHEST_HINGE
+	expect(type(hinge[1]) == "number" and type(hinge[2]) == "number" and type(hinge[3]) == "number", "a hinge point")
+	expect(PropModels.CHEST_OPEN_DEGREES > 45 and PropModels.CHEST_OPEN_DEGREES < 180, "the lid swings open")
+	expect(named(PropModels.Altar, PropModels.ALTAR_GLOW) >= 3, "the altar has lit parts to recolour")
+	expect(named(PropModels.Meteor, "Glow") >= 3, "the meteor has glowing cracks")
+	expect(named(PropModels.Meteor, "Rim") >= 6, "the meteor has a crater rim")
+	for _, accent in accents() do
+		expect(named(PropModels.OreNode(accent), "Crystal") >= 4, "ore nodes grow crystals")
+		for variant in { Patch = true, Bloom = true, Sapling = true } do
+			expect(named(PropModels.PlantNode(variant, accent), "Glow") >= 3, variant .. " glows")
+		end
+	end
+end)
+
+test("plant variants name real vegetation events", function()
+	for eventId, variant in PropModels.PLANT_VARIANTS do
+		local entry = EventCatalog.Get(eventId)
+		expect(entry ~= nil and entry.category == "Vegetation", eventId .. " is a vegetation event")
+		expect(variant == "Bloom" or variant == "Sapling", eventId .. " has a known variant")
+	end
+	for _, entry in EventCatalog.Entries.Vegetation do
+		local variant = PropModels.PlantVariant(entry.id)
+		local recipe = PropModels.PlantNode(variant, Recipe.Rgb(Rarity.Colors[entry.rarity]))
+		expect(#Recipe.Problems(recipe, 25) == 0, entry.id .. " plant recipe")
+	end
+	expectEq(PropModels.PlantVariant("WildHerbPatch"), "Patch", "herbs are a patch")
+end)
+
+test("the portal ring fits every extraction zone", function()
+	local smallest = math.huge
+	for _, portal in PoiCatalog.Portals do
+		smallest = math.min(smallest, portal.zoneRadius)
+	end
+	for _, accent in { { 255, 170, 60 }, { 120, 220, 255 } } do
+		local low, high = Recipe.Bounds(PropModels.Portal(accent))
+		for axis in { 1, 3 } do
+			expect(
+				low[axis] > -smallest and high[axis] < smallest,
+				"the portal dressing stays inside the smallest zone"
+			)
+		end
+	end
+end)
+
+-- Catalog cross-references ---------------------------------------------------------
+
+test("every event kind is built by the director, in its own category", function()
+	for category, entries in EventCatalog.Entries do
+		expect(table.find(EventCatalog.Categories, category) ~= nil, category .. " is a director category")
+		expect(#entries > 0, category .. " has entries")
+		for _, entry in entries do
+			expect(HANDLED[entry.kind], entry.id .. " kind " .. tostring(entry.kind) .. " is built by start()")
+			expectEq(entry.kind, KIND_OF_CATEGORY[category], entry.id .. " kind matches its category")
+			expectEq(entry.category, category, entry.id .. " knows its category")
+		end
+	end
+	for _, category in EventCatalog.Categories do
+		expect(EventCatalog.Entries[category] ~= nil, category .. " has an entry list")
+	end
+	for kind in EventCatalog.Kinds do
+		expect(HANDLED[kind], kind .. " is handled")
+	end
+end)
+
+test("each kind carries what its spawner needs", function()
+	for _, entry in EventCatalog.ById do
+		expect(type(entry.name) == "string" and entry.name ~= "", entry.id .. " has a name")
+		expect(entry.lifetime > 0, entry.id .. " expires")
+		expect(entry.footprint > 0, entry.id .. " has a footprint")
+		if entry.kind == "Node" then
+			expect(entry.loot ~= nil and #entry.loot > 0, entry.id .. " pays out")
+			expectEq(entry.minRank ~= nil, entry.category == "Ore", entry.id .. " needs a pickaxe only when it is ore")
+		elseif entry.kind == "Cache" then
+			expect(entry.loot ~= nil and #entry.loot > 0, entry.id .. " has loot")
+		elseif entry.kind == "Meteor" then
+			expect(entry.chunks >= 1 and entry.chunks % 1 == 0, entry.id .. " has chunks")
+			expect(
+				entry.minRank ~= nil and entry.loot ~= nil and #entry.loot > 0,
+				entry.id .. " has a pickaxe gate and loot"
+			)
+		elseif entry.kind == "Npc" then
+			expect(EventRules.NpcCount(entry.group) > 0, entry.id .. " has creatures")
+		elseif entry.kind == "Structure" then
+			expect(entry.cache or entry.loot or entry.boss, entry.id .. " holds something to find")
+			expect(entry.loot == nil or entry.cache == nil, entry.id .. " has one reward node or cache, not both")
+		elseif entry.kind == "Boss" then
+			expect(entry.boss ~= nil, entry.id .. " names its boss")
+		end
+		if entry.cache then
+			local cache = EventCatalog.Get(entry.cache)
+			expect(cache ~= nil and cache.kind == "Cache", entry.id .. " cache resolves to a cache entry")
+			expect(cache == nil or cache.loot ~= nil, entry.id .. " cache has loot")
+		end
+	end
+end)
+
+test("event bosses exist and keep their source", function()
+	for _, entry in EventCatalog.ById do
+		if entry.boss then
+			local def = BossCatalog.Get(entry.boss)
+			expect(def ~= nil, entry.id .. " boss " .. entry.boss)
+			if def then
+				local expected = if entry.kind == "Boss"
+					then BossCatalog.Sources.Event
+					else BossCatalog.Sources.Structure
+				expectEq(def.source, expected, entry.id .. " boss source")
+				for _, row in def.loot or {} do
+					expect(ItemCatalog.Get(row[1]) ~= nil, entry.boss .. " loot " .. row[1])
+				end
+			end
+		end
+	end
+	-- Rituals: every altar zone resolves to a ritual with a real boss and offering.
+	for _, site in PoiCatalog.RitualSites do
+		local ritual = BossCatalog.RitualFor(site.zone)
+		expect(ritual ~= nil and BossCatalog.Get(ritual.boss) ~= nil, site.id .. " summons a real boss")
+		for catalogId in ritual.offering do
+			expect(ItemCatalog.Get(catalogId) ~= nil, site.id .. " offering " .. catalogId)
+		end
+		expect(ritual.summonSeconds > 0, site.id .. " takes time to summon")
+	end
+end)
+
+test("loot rows are well formed, and ore pickaxe gates cover every drop", function()
+	local gate = {}
+	for _, node in NodeCatalog.Nodes do
+		if node.minRank then
+			gate[node.material] = math.max(gate[node.material] or 0, node.minRank)
+		end
+	end
+	local ranks = {}
+	for _, rank in Tiers.ToolRank do
+		ranks[rank] = true
+	end
+	for _, entry in EventCatalog.ById do
+		for _, row in entry.loot or {} do
+			local id, low, high, chance = row[1], row[2], row[3], row[4]
+			expect(type(id) == "string" and ItemCatalog.Get(id) ~= nil, entry.id .. " loot item " .. tostring(id))
+			expect(
+				low % 1 == 0 and high % 1 == 0 and low >= 1 and high >= low,
+				entry.id .. " " .. tostring(id) .. " quantity"
+			)
+			expect(
+				type(chance) == "number" and chance > 0 and chance <= 1,
+				entry.id .. " " .. tostring(id) .. " chance"
+			)
+			if entry.minRank and gate[id] then
+				expect(entry.minRank >= gate[id], entry.id .. " pickaxe can mine its " .. id)
+			end
+		end
+		if entry.minRank then
+			expect(ranks[entry.minRank], entry.id .. " minRank is a real tool rank")
+		end
+		if entry.kind == "Meteor" then
+			expect(entry.minRank >= Tiers.ToolRank.Mithril, entry.id .. " chunks need a Mithril Pickaxe (GDD §51)")
+		end
+		for _, member in entry.group or {} do
+			expect(member.count >= 1, entry.id .. " group count")
+		end
+		for _, member in entry.defenders or {} do
+			expect(EnemyCatalog.Get(member.enemy) ~= nil, entry.id .. " defender " .. member.enemy)
+		end
+	end
+end)
+
+test("every event can be admitted by the budget and rolled", function()
+	for _, entry in EventCatalog.ById do
+		local npcs = EventRules.NpcCount(entry.group) + EventRules.NpcCount(entry.defenders)
+		expect(EventRules.WithinBudget(entry, 0, 0, npcs), entry.id .. " fits an empty server")
+		expect(
+			EventRules.WithinBudget(entry, EventRules.MAX_LARGE_EVENTS - 1, EventRules.MAX_EVENT_NPCS - npcs, npcs),
+			entry.id .. " fits the last free slot"
+		)
+		expect(npcs <= EventRules.MAX_EVENT_NPCS, entry.id .. " is smaller than the whole NPC budget")
+		expect(Rarity.IsValid(entry.rarity), entry.id .. " rarity " .. tostring(entry.rarity))
+		local weight = EventRules.RARITY_WEIGHTS[entry.rarity]
+		expect(entry.rarity == "Common" or (weight ~= nil and weight > 0 and weight < 1), entry.id .. " can roll")
+	end
+	-- A category that triggers with nothing rarer falls back to a Common entry, so
+	-- only categories with one skip; every other rarity must be able to roll.
+	local rng = Random.new(21)
+	local seen = {}
+	for _ = 1, 60000 do
+		for _, entry in EventRules.RollTick(EventCatalog.Entries, EventCatalog.Categories, rng) do
+			seen[entry.id] = true
+		end
+	end
+	for _, entry in EventCatalog.ById do
+		if entry.rarity ~= "Secret" and entry.rarity ~= "Mythic" then
+			expect(seen[entry.id], entry.id .. " rolled in 60,000 ticks")
+		end
+	end
+end)
+
+test("every event finds a spot clear of portals, camps and the Guardian arena", function()
+	-- Worst case: every fixed portal is active, each with its no-build aura.
+	local aura = GameConstants.PORTAL_NO_BUILD_METERS * GameConstants.STUDS_PER_METER
+	local zones = {}
+	for _, portal in PoiCatalog.Portals do
+		table.insert(zones, { center = Vector3.new(portal.x, 0, portal.z), radius = aura })
+	end
+	for _, camp in PoiCatalog.SafeZones do
+		table.insert(zones, { center = Vector3.new(camp.x, 0, camp.z), radius = camp.radius })
+	end
+	local arena = PoiCatalog.GuardianArena
+	table.insert(zones, { center = Vector3.new(arena.x, 0, arena.z), radius = arena.radius })
+	local rng = Random.new(77)
+	for _, entry in EventCatalog.ById do
+		local clear, tries = 0, 200
+		for _ = 1, tries do
+			local point = EventRules.PlacePoint(entry, rng)
+			if point and EventRules.ClearOf(point, entry.footprint, zones) then
+				clear += 1
+			end
+		end
+		-- The director tries ten spots per start, so a few percent is already enough.
+		expect(clear / tries > 0.25, entry.id .. " is placeable (" .. clear .. "/" .. tries .. ")")
+	end
+end)
+
+test("announcements carry what the event feed, map and compass read", function()
+	local sample = nil
+	for _, entry in EventCatalog.ById do
+		expect(Rarity.Colors[entry.rarity] ~= nil, entry.id .. " rarity colour for the beacon, area circle and map pin")
+		expect(HudModel.EVENT_BLURBS[entry.category] ~= nil, entry.category .. " has a HUD blurb")
+		-- The view EventDirectorService announces.
+		local view = {
+			id = "event",
+			name = entry.name,
+			rarity = entry.rarity,
+			category = entry.category,
+			kind = entry.kind,
+			position = Vector3.new(100, 0, -200),
+			radius = entry.footprint,
+			endsAt = 600 + entry.lifetime,
+		}
+		local panel = HudModel.WorldEvent({ view }, 600, 0, 0)
+		expect(panel ~= nil and panel.name == entry.name, entry.id .. " shows on the event panel")
+		expect(
+			panel == nil or string.find(panel.description, entry.rarity, 1, true) ~= nil,
+			entry.id .. " names its rarity in words"
+		)
+		expect(panel == nil or panel.timer ~= "", entry.id .. " has a countdown")
+		sample = panel
+	end
+	expect(sample ~= nil, "panels were built")
+	-- An expired event never shows.
+	local gone =
+		{ id = "g", name = "Gone", rarity = "Rare", category = "Cache", position = Vector3.new(0, 0, 0), endsAt = 5 }
+	expectEq(HudModel.WorldEvent({ gone }, 10, 0, 0), nil, "expired events are hidden")
+end)

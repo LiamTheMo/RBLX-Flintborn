@@ -1,13 +1,16 @@
 -- Meteor crashes (GDD §7.2, §51): a crater of chunks that each take a 30 s channel
 -- to break loose, so harvesting the whole meteor is long and contestable. Chunks
 -- hold Adamantine Ore, so breaking one needs the entry's pickaxe (a Mithril Pickaxe
--- or better). Each chunk pays out once as physical drops, luck included. World
--- place only.
+-- or better). Each chunk pays out once as physical drops, luck included. The crash
+-- site is drawn by PropModels (scorched rock with glowing cracks inside a rim of
+-- rubble) over an invisible solid core. World place only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
+local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
 local Channel = require(script.Parent.Parent.Infrastructure.Channel)
 local CacheService = require(script.Parent.CacheService)
@@ -31,10 +34,11 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 	core.Shape = Enum.PartType.Ball
 	core.Anchored = true
 	core.Size = Vector3.new(14, 14, 14)
-	core.Material = Enum.Material.Basalt
-	core.Color = Color3.fromRGB(60, 44, 40)
+	-- The solid, invisible core; the rock and crater rim are drawn around it.
+	core.Transparency = 1
 	core.CFrame = CFrame.new(position + Vector3.new(0, 4, 0))
 	core.Parent = parent
+	ModelBuilder.Build(PropModels.Meteor, CFrame.new(position), { name = "Crater", parent = parent })
 	local glow = Instance.new("PointLight")
 	glow.Color = Color3.fromRGB(255, 120, 40)
 	glow.Range = 30

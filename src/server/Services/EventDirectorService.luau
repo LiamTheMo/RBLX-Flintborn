@@ -5,7 +5,9 @@
 -- Guardian arena and totem-covered bases, and inside the server's budget —
 -- announced to everyone, and cleaned up when claimed or expired.
 -- Rare nodes pay out once and never regrow; generated ruins are never claimable.
--- The Guardian keeps its own schedule (v0.12). World place only.
+-- The Guardian keeps its own schedule (v0.12). Every event is a gameplay part (the
+-- prompt, hitbox or wall) dressed with placeholder props (PropModels) that live
+-- under the event's model, so finishing the event removes them all. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -15,9 +17,12 @@ local RunService = game:GetService("RunService")
 
 local EventCatalog = require(ReplicatedStorage.Shared.Events.EventCatalog)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
+local Recipe = require(ReplicatedStorage.Shared.Visuals.Recipe)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
@@ -164,21 +169,43 @@ local function spill(loot, position: Vector3, luck: number?)
 	end
 end
 
+-- The hitbox of each node look: size, whether it blocks walking, and the prompt's action.
+local NODE_LOOKS = {
+	Ore = { size = Vector3.new(6, 5, 6), solid = true, action = "Mine" },
+	Plant = { size = Vector3.new(4, 4, 4), solid = false, action = "Harvest" },
+	Pile = { size = Vector3.new(4, 3, 4), solid = true, action = "Search" },
+}
+
+-- The accent colour props are lit in for an event's rarity.
+local function accentOf(entry)
+	return Recipe.Rgb(Rarity.Colors[entry.rarity] or Color3.new(1, 1, 1))
+end
+
 -- A one-time rare node: harvested once, never regrows (Q112). Plant nodes are
--- gathered by hand; ore nodes need a pickaxe of at least `minRank` (GDD §51).
-local function spawnNode(event, loot, position: Vector3, minRank: number?, onClaimed)
+-- gathered by hand; ore nodes need a pickaxe of at least `minRank` (GDD §51). The
+-- plain hitbox part carries the prompt and is drawn by PropModels (an ore cluster,
+-- a glowing plant, or for `pile` a heap of rubble to search); it takes its props
+-- with it when claimed.
+local function spawnNode(event, loot, position: Vector3, minRank: number?, onClaimed, pile: boolean?)
 	local isOre = minRank ~= nil
+	local lookName = if pile then "Pile" elseif isOre then "Ore" else "Plant"
+	local look = NODE_LOOKS[lookName]
 	local part = Instance.new("Part")
 	part.Name = event.entry.name
 	part.Anchored = true
-	part.Shape = if isOre then Enum.PartType.Block else Enum.PartType.Ball
-	part.Size = if isOre then Vector3.new(6, 5, 6) else Vector3.new(4, 4, 4)
-	part.Material = if isOre then Enum.Material.Slate else Enum.Material.Grass
-	part.Color = Rarity.Colors[event.entry.rarity] or Color3.new(1, 1, 1)
+	part.Shape = if lookName == "Plant" then Enum.PartType.Ball else Enum.PartType.Block
+	part.Size = look.size
+	part.Transparency = 1
+	part.CanCollide = look.solid
 	part.CFrame = CFrame.new(position + Vector3.new(0, part.Size.Y / 2, 0))
 	part.Parent = event.model
+	local recipe = if pile
+		then PropModels.LootPile
+		elseif isOre then PropModels.OreNode(accentOf(event.entry))
+		else PropModels.PlantNode(PropModels.PlantVariant(event.entry.id), accentOf(event.entry))
+	ModelBuilder.Decorate(part, recipe)
 	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = if isOre then "Mine" else "Harvest"
+	prompt.ActionText = look.action
 	prompt.ObjectText = if isOre
 		then ("%s · %s · %s+"):format(event.entry.name, event.entry.rarity, NodeCatalog.PickaxeName(minRank))
 		else ("%s · %s"):format(event.entry.name, event.entry.rarity)
@@ -226,34 +253,56 @@ local function spawnGroup(event, group, center: Vector3)
 	end
 end
 
--- Generated raidable structures (Q47): never claimable by players.
+-- Generated raidable structures (Q47): never claimable by players. The gameplay
+-- is a ring of walls with a doorway (tagged GeneratedStructure, Generated); each
+-- wall is drawn by its style (Ruin stone stays visible and is broken up, the Fort's
+-- palisade and the Camp's hide fence are drawn over an invisible part), and the
+-- style's dressing and gate stand inside and at the doorway.
 local function spawnStructure(event, position: Vector3)
 	local entry = event.entry
 	local style = entry.style
+	local ring = PropModels.RING
 	local material = if style == "Ruin" then Enum.Material.Cobblestone else Enum.Material.WoodPlanks
-	local radius, segments = 16, 10
-	for index = 1, segments do
+	for index = 1, ring.segments do
 		-- Leave a doorway gap so the inside is reachable without breaking walls.
-		if index ~= 1 and (style ~= "Ruin" or index % 3 ~= 0) then
-			local angle = (index / segments) * math.pi * 2
+		if PropModels.HasWall(style, index) then
+			local angle = (index / ring.segments) * math.pi * 2
 			local wall = Instance.new("Part")
 			wall.Name = "GeneratedWall"
 			wall.Anchored = true
 			wall.Material = material
 			wall.Color = if style == "Ruin" then Color3.fromRGB(120, 116, 108) else Color3.fromRGB(110, 80, 50)
-			wall.Size = Vector3.new(10, if style == "Ruin" then rng:NextNumber(3, 7) else 9, 1.5)
-			local at = position + Vector3.new(math.cos(angle) * radius, wall.Size.Y / 2, math.sin(angle) * radius)
+			local height = if style == "Ruin"
+				then rng:NextNumber(PropModels.RUIN_HEIGHT[1], PropModels.RUIN_HEIGHT[2])
+				else ring.height
+			wall.Size = Vector3.new(ring.width, height, ring.thickness)
+			local at = position
+				+ Vector3.new(math.cos(angle) * ring.radius, wall.Size.Y / 2, math.sin(angle) * ring.radius)
 			wall.CFrame = CFrame.lookAt(at, Vector3.new(position.X, at.Y, position.Z))
 			wall:SetAttribute("Generated", true)
 			CollectionService:AddTag(wall, EventDirectorService.GENERATED_TAG)
 			wall.Parent = event.model
+			local look = PropModels.Wall(style, height)
+			if not look.hostVisible then
+				wall.Transparency = 1
+			end
+			ModelBuilder.Decorate(wall, look)
 		end
 	end
+	local base = position - Vector3.new(0, PropModels.STRUCTURE_SINK, 0)
+	ModelBuilder.Build(PropModels.Structure[style], CFrame.new(base), { name = "Dressing", parent = event.model })
+	local doorX, doorZ = PropModels.RingPoint(ring.doorway)
+	local door = base + Vector3.new(doorX, 0, doorZ)
+	ModelBuilder.Build(
+		PropModels.Gate[style],
+		CFrame.lookAt(door, Vector3.new(position.X, door.Y, position.Z)),
+		{ name = "Gate", parent = event.model }
+	)
 	if entry.cache then
 		CacheService.Spawn(EventCatalog.Get(entry.cache), position, event.model, function() end)
 	end
 	if entry.loot then
-		spawnNode(event, entry.loot, position, nil, function() end)
+		spawnNode(event, entry.loot, position, nil, function() end, true)
 	end
 	if entry.defenders then
 		spawnGroup(event, entry.defenders, position)
@@ -268,61 +317,23 @@ local function spawnStructure(event, position: Vector3)
 	end
 end
 
-local function start(entry): boolean
-	local large = 0
-	for _, event in events do
-		if event.entry.footprint >= EventRules.LARGE_FOOTPRINT then
-			large += 1
-		end
-	end
-	local npcCount = EventRules.NpcCount(entry.group) + EventRules.NpcCount(entry.defenders)
-	if not EventRules.WithinBudget(entry, large, NpcService.Count(), npcCount) then
-		return false
-	end
-	local position = place(entry)
-	if position == nil then
-		return false
-	end
-	local model = Instance.new("Model")
-	model.Name = entry.name
-	model.Parent = folder
-	local event = {
-		id = HttpService:GenerateGUID(false),
-		entry = entry,
-		position = position,
-		model = model,
-		npcs = {},
-		endsAt = now() + entry.lifetime,
-	}
-	events[event.id] = event
-	local function done()
+-- Spawns what `event` is made of, by kind. False for a kind it does not know.
+local function populate(event, done): boolean
+	local entry, position, model = event.entry, event.position, event.model
+	-- A failure while building (or an unknown kind) takes the half-made event down
+	-- again instead of leaving a silent, unannounced one behind.
+	local built, result = pcall(populate, event, done)
+	if not built or result ~= true then
+		warn(
+			("[EventDirector] Could not build %s: %s"):format(
+				entry.name,
+				if built then "unknown kind" else tostring(result)
+			)
+		)
 		finish(event)
+		return false
 	end
 	local kind = entry.kind
-	if kind == EventCatalog.Kinds.Node then
-		spawnNode(event, entry.loot, position, entry.minRank, done)
-	elseif kind == EventCatalog.Kinds.Cache then
-		CacheService.Spawn(entry, position, model, done)
-	elseif kind == EventCatalog.Kinds.Meteor then
-		MeteorService.Spawn(entry, position, model, done)
-	elseif kind == EventCatalog.Kinds.Npc then
-		spawnGroup(event, entry.group, position)
-	elseif kind == EventCatalog.Kinds.Structure then
-		spawnStructure(event, position)
-	elseif kind == EventCatalog.Kinds.Boss then
-		event.boss = BossService.Spawn(entry.boss, position, {
-			source = "Event",
-			expired = function()
-				return events[event.id] ~= event
-			end,
-			onEnded = function(_, reason)
-				if reason == "Defeated" then
-					event.boss = nil
-					done()
-				end
-			end,
-		})
-	end
 	AnnouncementService.Announce({
 		id = event.id,
 		name = entry.name,
@@ -344,7 +355,11 @@ end
 -- see the footprints and budget the earlier ones took.
 function EventDirectorService.Tick()
 	for _, entry in EventRules.RollTick(EventCatalog.Entries, EventCatalog.Categories, rng) do
-		if not start(entry) then
+		-- One bad event must never stop the director's loop.
+		local ok, started = pcall(start, entry)
+		if not ok then
+			warn(("[EventDirector] %s failed to start: %s"):format(entry.name, tostring(started)))
+		elseif not started then
 			warn(("[EventDirector] Skipped %s: no valid place or over budget"):format(entry.name))
 		end
 	end
