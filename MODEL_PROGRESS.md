@@ -257,7 +257,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 058 | Flintborn Low Bush Study | World & resources | ✅ | 3788 (+7 parts) | V1 FAIL 5/10, V2 PASS 7/10 | puffs read as faceted caps; narrow W:H and low fill off-front; small rear windows; light tones |
 | 059 | Flintborn grass tuft model study | World & resources | ✅ | 704 (+9 parts) | V1 PASS 8/10 | rear reads dark (dark blades in front); root stub shows from side/rear; RootBase part arms short |
 | 060 | Broadleaf Fern Model Study | World & resources | ⬜ | | | |
-| 061 | Flintborn Meadow Herb Study | World & resources | ⬜ | | | |
+| 061 | Flintborn Meadow Herb Study | World & resources | ✅ | 1338 (+5 parts) | V1 PASS 8/10 | rim leaves read as thin dark spikes; left head's stem hidden in front; narrow low rosette |
 | 062 | Flintborn Ground Scatter Study | World & resources | ⬜ | | | |
 | 063 | Flintborn hanging vine model study | World & resources | ⬜ | | | |
 | 064 | Flintborn A-frame tent study | World & resources | ⬜ | | | |
@@ -441,3 +441,4 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-31: 054 Broadleaf Tree built by a parallel modeller: a 20-stud shade tree with a faceted trunk, V-forked leader and limb modules, a five-clump crown of 102 rounded three-lobe leaf cards angled for every view, tapered cores, a root base with rocks, moss and tufts. R1 FAIL, R2 FAIL 6 (balls with spikes from the sides), targeted R3 PASS 7.
 - 2026-10-31: 058 Low Bush built by a parallel modeller: a 4.4-stud glade bush on a forked planked stem with a window to the trunk from the front and sides, leafy lump bodies covered in outward-facing lobed puffs, six white flowers on the front, rocks, pebbles and clover ground pads. R1 FAIL 5 (dark ball from the sides, tent clump parts), R2 PASS 7.
 - 2026-10-31: 057 Ancient Tree built by a parallel modeller: a 32-stud monarch tree with a twisted eight-strand bell trunk, a front slit and pointed back arch into a real cavity, eight buttress roots, four bare forked limbs, and a crown of eight clumps each skinned as lumpy leaf clusters (core is the foliage), with hanging lime strands, slate slabs and rocks. R1 FAIL 6 (plate crown), budget block on cards, crown rebuilt as lump clusters, R2 PASS 7.
+- 2026-10-31: 061 Meadow Herb built by a parallel modeller: a 2.2-stud daisy plant with three five-petal heads at fixed growth facings (broad thick blunt petals, chunky gold beads, flared cups) on crooked hex stems over a rosette of 17 thick ridged kite leaves round a hidden hub; small-prop extended class, 1338 tris. R1 PASS 8 on the first round.

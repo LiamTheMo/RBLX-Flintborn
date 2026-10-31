@@ -1,0 +1,456 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M061",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 256,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m061_centre",
+    "hex": "#EDB600",
+    "levels": [
+     0.99084,
+     1.01827
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_dark",
+    "hex": "#43702B",
+    "levels": [
+     0.96459,
+     0.99033,
+     0.99637,
+     1.0039,
+     1.00817
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_dark_x_leaf_mid_25",
+    "hex": "#437127",
+    "levels": [
+     0.98774,
+     0.99341,
+     0.99621
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_dark_x_leaf_mid_50",
+    "hex": "#447224",
+    "levels": [
+     0.97871,
+     0.98781,
+     0.99203
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_light",
+    "hex": "#80A533",
+    "levels": [
+     0.97252,
+     0.97914,
+     0.99109,
+     1.01988,
+     1.02206,
+     1.03203,
+     1.03751,
+     1.04172
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_mid",
+    "hex": "#44751C",
+    "levels": [
+     0.97084,
+     0.97973,
+     0.98998,
+     0.9992,
+     1.00424,
+     1.01498,
+     1.02281
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_mid_x_leaf_light_25",
+    "hex": "#538122",
+    "levels": [
+     0.9895,
+     0.99606,
+     0.9998,
+     1.01995,
+     1.04336
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_mid_x_leaf_light_50",
+    "hex": "#628D28",
+    "levels": [
+     0.98578,
+     0.98966,
+     0.99401
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_leaf_mid_x_leaf_light_75",
+    "hex": "#71992D",
+    "levels": [
+     0.98515,
+     0.99132,
+     0.99338,
+     1.01252,
+     1.04577
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_petal",
+    "hex": "#E8E0CC",
+    "levels": [
+     0.98247,
+     0.98816,
+     0.99234,
+     0.99754,
+     1.00186,
+     1.00536,
+     1.01025,
+     1.01364
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_petal_base",
+    "hex": "#DED2B8",
+    "levels": [
+     0.98247,
+     0.98816,
+     0.99234,
+     0.99754,
+     1.00186,
+     1.00536,
+     1.01025,
+     1.01364
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_petal_base_x_petal_50",
+    "hex": "#E3D9C2",
+    "levels": [
+     0.98247,
+     0.98816,
+     0.99234,
+     0.99754,
+     1.00186,
+     1.00536,
+     1.01025,
+     1.01364
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_stem",
+    "hex": "#3F681E",
+    "levels": [
+     0.99084,
+     0.99499,
+     1.00153,
+     1.00615,
+     1.01108,
+     1.01347
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_stem_x_leaf_dark_50",
+    "hex": "#416C24",
+    "levels": [
+     1.00153,
+     1.00615,
+     1.01108
+    ],
+    "used": true
+   },
+   {
+    "key": "m061_stem_x_leaf_mid_50",
+    "hex": "#426E1D",
+    "levels": [
+     0.99084,
+     0.99499,
+     1.01347
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "MeadowHerb",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "hero",
+   "size": [
+    2.6446,
+    2.2108,
+    2.03
+   ],
+   "tris": 1338,
+   "budget": 1400,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerb.glb",
+     "kind": "solid",
+     "tris": 1338,
+     "offset": [
+      0.0,
+      1.1054,
+      0.0
+     ],
+     "size": [
+      2.6446,
+      2.2108,
+      2.03
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Meadow herb: three chunky white five-petal daisies (golden faceted beads, faceted green cups) on thick hex stems over a rosette of 17 thick faceted kite leaves round a hidden octagonal hub. Walk-through meadow cover (collision none). Sheet header 62/132."
+  },
+  {
+   "name": "MeadowHerbCenter",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "part",
+   "size": [
+    0.397,
+    0.225,
+    0.397
+   ],
+   "tris": 30,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerbCenter.glb",
+     "kind": "solid",
+     "tris": 30,
+     "offset": [
+      0.0,
+      0.1125,
+      0.0
+     ],
+     "size": [
+      0.397,
+      0.225,
+      0.397
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Center (x1): squat faceted golden bead with an orange-gold lower band"
+  },
+  {
+   "name": "MeadowHerbLeaf",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "part",
+   "size": [
+    0.7534,
+    0.7988,
+    1.0243
+   ],
+   "tris": 34,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerbLeaf.glb",
+     "kind": "solid",
+     "tris": 34,
+     "offset": [
+      0.0,
+      0.3994,
+      0.0
+     ],
+     "size": [
+      0.7534,
+      0.7988,
+      1.0243
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf (x1): big thick faceted kite with a ridge and keel, lime over a mid base"
+  },
+  {
+   "name": "MeadowHerbLeafBase",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "part",
+   "size": [
+    2.6,
+    1.34,
+    1.1272
+   ],
+   "tris": 198,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerbLeafBase.glb",
+     "kind": "solid",
+     "tris": 198,
+     "offset": [
+      0.0,
+      0.67,
+      0.0
+     ],
+     "size": [
+      2.6,
+      1.34,
+      1.1272
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf Base (x1): octagonal hub with the five-leaf fan (three upright, two spreading)"
+  },
+  {
+   "name": "MeadowHerbPetal",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "part",
+   "size": [
+    0.4209,
+    0.1599,
+    0.4984
+   ],
+   "tris": 26,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerbPetal.glb",
+     "kind": "solid",
+     "tris": 26,
+     "offset": [
+      0.0,
+      0.08,
+      0.0
+     ],
+     "size": [
+      0.4209,
+      0.1599,
+      0.4984
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Petal (x5): broad blunt cream lozenge plate with a centre crease and real thickness"
+  },
+  {
+   "name": "MeadowHerbStem",
+   "sheet": "M061",
+   "subject": "Meadow Herb",
+   "role": "part",
+   "size": [
+    0.3251,
+    1.7462,
+    0.5527
+   ],
+   "tris": 100,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/MeadowHerbStem.glb",
+     "kind": "solid",
+     "tris": 100,
+     "offset": [
+      0.0,
+      0.8731,
+      0.0
+     ],
+     "size": [
+      0.3251,
+      1.7462,
+      0.5527
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stem (x1): thick hexagonal stem with a crook under a flared 8-sided green cup"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 1726,
+  "vfxSockets": 0,
+  "paletteColours": 15,
+  "paletteLevels": 77,
+  "meshBytes": 171260
+ },
+ "problems": []
+}
