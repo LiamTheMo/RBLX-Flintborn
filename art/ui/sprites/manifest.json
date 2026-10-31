@@ -2914,8 +2914,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      919,
-      0,
+      659,
+      120,
       101,
       116
     ]
@@ -2927,7 +2927,7 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      0,
+      869,
       120,
       101,
       116
@@ -2940,8 +2940,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      840,
-      240,
+      120,
+      469,
       116,
       101
     ]
@@ -2953,8 +2953,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      0,
-      349,
+      240,
+      469,
       116,
       101
     ]
@@ -2966,8 +2966,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      838,
-      120,
+      0,
+      360,
       116,
       105
     ]
@@ -2979,8 +2979,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      0,
-      240,
+      120,
+      360,
       116,
       105
     ]
@@ -2992,7 +2992,7 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      120,
+      358,
       0,
       114,
       116
@@ -3005,7 +3005,7 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      238,
+      476,
       0,
       114,
       116
@@ -3018,8 +3018,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      224,
-      349,
+      464,
+      469,
       100,
       100
     ]
@@ -3028,7 +3028,14 @@
     "file": "lk_glyph_white_refresh.png",
     "w": 100,
     "h": 100,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      568,
+      469,
+      100,
+      100
+    ]
   },
   "lk_glyph_ink_people": {
     "file": "lk_glyph_ink_people.png",
@@ -3037,8 +3044,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      561,
-      454,
+      464,
+      679,
       116,
       89
     ]
@@ -3050,8 +3057,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      681,
-      454,
+      584,
+      679,
       116,
       89
     ]
@@ -3063,7 +3070,7 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      473,
+      711,
       0,
       111,
       116
@@ -3073,7 +3080,14 @@
     "file": "lk_glyph_white_magnifier.png",
     "w": 111,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      826,
+      0,
+      111,
+      116
+    ]
   },
   "lk_glyph_ink_info": {
     "file": "lk_glyph_ink_info.png",
@@ -3082,8 +3096,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      297,
-      120,
+      192,
+      240,
       57,
       116
     ]
@@ -3092,7 +3106,14 @@
     "file": "lk_glyph_white_info.png",
     "w": 57,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      253,
+      240,
+      57,
+      116
+    ]
   },
   "lk_glyph_ink_check": {
     "file": "lk_glyph_ink_check.png",
@@ -3101,8 +3122,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      97,
-      454,
+      590,
+      575,
       116,
       93
     ]
@@ -3111,13 +3132,27 @@
     "file": "lk_glyph_white_check.png",
     "w": 116,
     "h": 93,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      710,
+      575,
+      116,
+      93
+    ]
   },
   "lk_glyph_ink_anvil": {
     "file": "lk_glyph_ink_anvil.png",
     "w": 116,
     "h": 102,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      840,
+      360,
+      116,
+      102
+    ]
   },
   "lk_glyph_white_anvil": {
     "file": "lk_glyph_white_anvil.png",
@@ -3126,8 +3161,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      720,
-      240,
+      0,
+      469,
       116,
       102
     ]
@@ -3139,8 +3174,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      703,
-      0,
+      230,
+      120,
       104,
       116
     ]
@@ -3152,8 +3187,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      811,
-      0,
+      338,
+      120,
       104,
       116
     ]
@@ -3165,8 +3200,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
+      480,
       360,
-      240,
       116,
       103
     ]
@@ -3178,8 +3213,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      480,
-      240,
+      600,
+      360,
       116,
       103
     ]
@@ -3191,8 +3226,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      723,
-      349,
+      94,
+      575,
       89,
       100
     ]
@@ -3204,8 +3239,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      816,
-      349,
+      187,
+      575,
       89,
       100
     ]
@@ -3214,31 +3249,66 @@
     "file": "lk_glyph_ink_backpack.png",
     "w": 115,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      120,
+      0,
+      115,
+      116
+    ]
   },
   "lk_glyph_white_backpack": {
     "file": "lk_glyph_white_backpack.png",
     "w": 115,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      239,
+      0,
+      115,
+      116
+    ]
   },
   "lk_glyph_ink_chest": {
     "file": "lk_glyph_ink_chest.png",
     "w": 116,
     "h": 91,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      104,
+      679,
+      116,
+      91
+    ]
   },
   "lk_glyph_white_chest": {
     "file": "lk_glyph_white_chest.png",
     "w": 116,
     "h": 91,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      224,
+      679,
+      116,
+      91
+    ]
   },
   "lk_glyph_ink_hammer": {
     "file": "lk_glyph_ink_hammer.png",
     "w": 116,
     "h": 115,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      565,
+      0,
+      116,
+      115
+    ]
   },
   "lk_glyph_white_hammer": {
     "file": "lk_glyph_white_hammer.png",
@@ -3247,8 +3317,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      358,
-      120,
+      314,
+      240,
       116,
       115
     ]
@@ -3257,13 +3327,27 @@
     "file": "lk_glyph_ink_compass.png",
     "w": 101,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      554,
+      120,
+      101,
+      116
+    ]
   },
   "lk_glyph_white_compass": {
     "file": "lk_glyph_white_compass.png",
     "w": 101,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      764,
+      120,
+      101,
+      116
+    ]
   },
   "lk_badge_count": {
     "file": "lk_badge_count.png",
@@ -3272,8 +3356,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      703,
+      817,
+      793,
       48,
       44
     ]
@@ -3290,8 +3374,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      52,
-      703,
+      869,
+      793,
       86,
       42
     ]
@@ -3303,8 +3387,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      142,
-      703,
+      959,
+      793,
       40,
       40
     ]
@@ -3343,8 +3427,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      230,
-      751,
+      0,
+      889,
       169,
       29
     ]
@@ -3361,8 +3445,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      768,
-      751,
+      538,
+      889,
       226,
       28
     ]
@@ -3379,8 +3463,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      674,
-      703,
+      488,
+      853,
       226,
       29
     ]
@@ -3397,8 +3481,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      751,
+      718,
+      853,
       226,
       29
     ]
@@ -3415,8 +3499,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      406,
-      703,
+      220,
+      853,
       226,
       30
     ]
@@ -3433,8 +3517,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      476,
-      641,
+      277,
+      793,
       303,
       55
     ]
@@ -3448,6 +3532,13 @@
       20,
       24,
       20
+    ],
+    "atlas": "atlas_lk_lobby",
+    "rect": [
+      319,
+      724,
+      303,
+      58
     ]
   },
   "lk_bar_frame_thin": {
@@ -3462,8 +3553,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      186,
-      703,
+      0,
+      853,
       182,
       32
     ]
@@ -3480,8 +3571,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      403,
-      751,
+      173,
+      889,
       361,
       28
     ]
@@ -3493,8 +3584,8 @@
     "slice": null,
     "atlas": "atlas_lk_window",
     "rect": [
-      291,
-      423,
+      363,
+      351,
       69,
       67
     ]
@@ -3506,7 +3597,7 @@
     "slice": null,
     "atlas": "atlas_lk_window",
     "rect": [
-      867,
+      216,
       351,
       69,
       68
@@ -3519,8 +3610,8 @@
     "slice": null,
     "atlas": "atlas_lk_window",
     "rect": [
-      364,
-      423,
+      436,
+      351,
       69,
       67
     ]
@@ -3532,8 +3623,8 @@
     "slice": null,
     "atlas": "atlas_lk_window",
     "rect": [
-      217,
-      423,
+      289,
+      351,
       70,
       67
     ]
@@ -3551,7 +3642,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       691,
-      564,
+      493,
       217,
       52
     ]
@@ -3569,7 +3660,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       266,
-      626,
+      555,
       197,
       51
     ]
@@ -3587,7 +3678,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       459,
-      564,
+      493,
       228,
       52
     ]
@@ -3600,7 +3691,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       64,
-      564,
+      493,
       64,
       56
     ]
@@ -3612,8 +3703,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      952,
-      641,
+      753,
+      793,
       60,
       49
     ]
@@ -3636,7 +3727,7 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      220,
+      0,
       351,
       212,
       68
@@ -3654,7 +3745,7 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      694,
+      472,
       251,
       210,
       69
@@ -3672,7 +3763,7 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      478,
+      256,
       251,
       212,
       69
@@ -3690,8 +3781,8 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      0,
-      351,
+      686,
+      251,
       216,
       68
     ]
@@ -3706,10 +3797,10 @@
       26,
       24
     ],
-    "atlas": "atlas_lk_window",
+    "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      423,
+      431,
+      652,
       213,
       67
     ]
@@ -3724,10 +3815,10 @@
       26,
       24
     ],
-    "atlas": "atlas_lk_window",
+    "atlas": "atlas_lk_lobby",
     "rect": [
-      436,
-      351,
+      0,
+      652,
       212,
       68
     ]
@@ -3742,10 +3833,10 @@
       26,
       24
     ],
-    "atlas": "atlas_lk_window",
+    "atlas": "atlas_lk_lobby",
     "rect": [
+      216,
       652,
-      351,
       211,
       68
     ]
@@ -3760,10 +3851,10 @@
       26,
       24
     ],
-    "atlas": "atlas_lk_window",
+    "atlas": "atlas_lk_lobby",
     "rect": [
-      256,
-      251,
+      743,
+      566,
       218,
       69
     ]
@@ -3780,8 +3871,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      783,
-      641,
+      584,
+      793,
       103,
       55
     ]
@@ -3798,8 +3889,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      199,
-      641,
+      0,
+      793,
       104,
       56
     ]
@@ -3816,8 +3907,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      307,
-      641,
+      108,
+      793,
       103,
       56
     ]
@@ -3835,8 +3926,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      641,
+      738,
+      724,
       64,
       58
     ]
@@ -3849,7 +3940,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       467,
-      626,
+      555,
       57,
       51
     ]
@@ -3862,7 +3953,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      564,
+      493,
       60,
       58
     ]
@@ -3874,8 +3965,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      890,
-      641,
+      691,
+      793,
       58,
       51
     ]
@@ -3888,7 +3979,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       710,
-      626,
+      555,
       50,
       48
     ]
@@ -3901,7 +3992,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       818,
-      626,
+      555,
       49,
       48
     ]
@@ -3920,7 +4011,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       871,
-      626,
+      555,
       46,
       45
     ]
@@ -3933,7 +4024,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       921,
-      626,
+      555,
       46,
       45
     ]
@@ -3946,7 +4037,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       214,
-      626,
+      555,
       22,
       52
     ]
@@ -3959,7 +4050,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       240,
-      626,
+      555,
       22,
       52
     ]
@@ -4030,8 +4121,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      68,
-      641,
+      806,
+      724,
       127,
       57
     ]
@@ -4067,7 +4158,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      725,
+      654,
       420,
       22
     ]
@@ -4085,7 +4176,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      751,
+      680,
       476,
       15
     ]
@@ -4098,7 +4189,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       105,
-      682,
+      611,
       476,
       25
     ]
@@ -4128,8 +4219,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      784,
+      768,
+      889,
       28,
       28
     ]
@@ -4141,8 +4232,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      96,
-      784,
+      864,
+      889,
       27,
       28
     ]
@@ -4154,8 +4245,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      32,
-      784,
+      800,
+      889,
       28,
       28
     ]
@@ -4167,8 +4258,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      64,
-      784,
+      832,
+      889,
       28,
       28
     ]
@@ -4186,7 +4277,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      626,
+      555,
       210,
       52
     ]
@@ -4199,7 +4290,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       764,
-      626,
+      555,
       50,
       48
     ]
@@ -4281,8 +4372,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      450,
-      470,
+      881,
+      478,
       82,
       83
     ]
@@ -4346,8 +4437,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      536,
-      470,
+      0,
+      566,
       82,
       82
     ]
@@ -4366,7 +4457,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       591,
-      555,
+      775,
       30,
       32
     ]
@@ -4378,8 +4469,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      625,
-      555,
+      659,
+      775,
       32,
       30
     ]
@@ -4391,8 +4482,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      661,
-      555,
+      695,
+      775,
       32,
       30
     ]
@@ -4401,7 +4492,14 @@
     "file": "lk_glyph_arrow_up.png",
     "w": 30,
     "h": 32,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      625,
+      775,
+      30,
+      32
+    ]
   },
   "lk_glyph_check": {
     "file": "lk_glyph_check.png",
@@ -4410,8 +4508,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      636,
-      703,
+      450,
+      853,
       34,
       30
     ]
@@ -4424,7 +4522,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       551,
-      555,
+      775,
       36,
       32
     ]
@@ -4437,7 +4535,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       435,
-      555,
+      775,
       43,
       38
     ]
@@ -4449,8 +4547,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      697,
-      555,
+      731,
+      775,
       18,
       27
     ]
@@ -4462,8 +4560,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      372,
-      703,
+      186,
+      853,
       30,
       31
     ]
@@ -4476,7 +4574,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       385,
-      555,
+      775,
       46,
       44
     ]
@@ -4488,8 +4586,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      719,
-      555,
+      753,
+      775,
       32,
       13
     ]
@@ -4502,7 +4600,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       518,
-      555,
+      775,
       29,
       34
     ]
@@ -4515,7 +4613,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       482,
-      555,
+      775,
       32,
       34
     ]
@@ -4527,7 +4625,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      225,
+      448,
       270,
       116,
       102
@@ -4546,8 +4644,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      801,
-      454,
+      704,
+      679,
       100,
       89
     ]
@@ -4598,7 +4696,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       328,
-      555,
+      775,
       53,
       55
     ]
@@ -4623,8 +4721,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      337,
-      454,
+      0,
+      679,
       100,
       92
     ]
@@ -4687,8 +4785,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      217,
-      454,
+      830,
+      575,
       116,
       93
     ]
@@ -4700,8 +4798,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      441,
-      454,
+      344,
+      679,
       116,
       91
     ]
@@ -4713,7 +4811,7 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      356,
+      594,
       0,
       113,
       116
@@ -4726,7 +4824,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      565,
+      685,
       0,
       116,
       113
@@ -4739,8 +4837,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      105,
-      120,
+      0,
+      240,
       101,
       116
     ]
@@ -4752,8 +4850,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      328,
-      349,
+      672,
+      469,
       100,
       100
     ]
@@ -4765,8 +4863,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      598,
-      120,
+      674,
+      240,
       116,
       112
     ]
@@ -4778,7 +4876,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      683,
+      906,
       270,
       116,
       97
@@ -4791,8 +4889,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      240,
-      240,
+      360,
+      360,
       116,
       104
     ]
@@ -4849,8 +4947,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      718,
-      120,
+      794,
+      240,
       116,
       106
     ]
@@ -4862,8 +4960,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      0,
-      454,
+      373,
+      575,
       93,
       97
     ]
@@ -4872,7 +4970,14 @@
     "file": "lk_icon_gear.png",
     "w": 116,
     "h": 114,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      554,
+      240,
+      116,
+      114
+    ]
   },
   "lk_icon_gear_alt": {
     "file": "lk_icon_gear_alt.png",
@@ -4900,8 +5005,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      588,
       0,
+      120,
       111,
       116
     ]
@@ -4913,8 +5018,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      478,
-      120,
+      434,
+      240,
       116,
       115
     ]
@@ -4965,8 +5070,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      210,
-      120,
+      105,
+      240,
       83,
       116
     ]
@@ -4987,7 +5092,14 @@
     "file": "lk_icon_journal.png",
     "w": 104,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      446,
+      120,
+      104,
+      116
+    ]
   },
   "lk_icon_lightning": {
     "file": "lk_icon_lightning.png",
@@ -5009,8 +5121,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      120,
-      377,
+      240,
+      380,
       68,
       88
     ]
@@ -5019,7 +5131,14 @@
     "file": "lk_icon_log.png",
     "w": 116,
     "h": 96,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      470,
+      575,
+      116,
+      96
+    ]
   },
   "lk_icon_logs": {
     "file": "lk_icon_logs.png",
@@ -5051,7 +5170,14 @@
     "file": "lk_icon_magnifier.png",
     "w": 111,
     "h": 116,
-    "slice": null
+    "slice": null,
+    "atlas": "atlas_lk_icons",
+    "rect": [
+      115,
+      120,
+      111,
+      116
+    ]
   },
   "lk_icon_mail": {
     "file": "lk_icon_mail.png",
@@ -5061,7 +5187,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       0,
-      555,
+      775,
       116,
       84
     ]
@@ -5073,8 +5199,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      120,
       240,
+      360,
       116,
       105
     ]
@@ -5086,8 +5212,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      909,
-      349,
+      280,
+      575,
       89,
       100
     ]
@@ -5099,7 +5225,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      345,
+      568,
       270,
       116,
       102
@@ -5119,7 +5245,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       120,
-      555,
+      775,
       100,
       82
     ]
@@ -5144,8 +5270,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      377,
+      120,
+      380,
       116,
       89
     ]
@@ -5157,8 +5283,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      432,
-      349,
+      776,
+      469,
       97,
       100
     ]
@@ -5209,8 +5335,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      803,
-      270,
+      0,
+      380,
       116,
       94
     ]
@@ -5254,8 +5380,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      905,
-      454,
+      808,
+      679,
       100,
       86
     ]
@@ -5286,7 +5412,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
+      223,
       270,
       116,
       103
@@ -5395,8 +5521,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      629,
-      349,
+      0,
+      575,
       90,
       100
     ]
@@ -5408,8 +5534,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      470,
+      431,
+      478,
       116,
       84
     ]
@@ -5428,7 +5554,7 @@
     "atlas": "atlas_lk_icons",
     "rect": [
       224,
-      555,
+      775,
       100,
       70
     ]
@@ -5440,8 +5566,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      533,
-      349,
+      877,
+      469,
       92,
       100
     ]
@@ -5453,8 +5579,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      600,
-      240,
+      720,
+      360,
       116,
       103
     ]
@@ -5503,8 +5629,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      414,
-      641,
+      215,
+      793,
       58,
       56
     ]
@@ -5521,8 +5647,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      898,
-      558,
+      626,
+      724,
       108,
       58
     ]
@@ -5569,8 +5695,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      685,
       0,
+      156,
       264,
       110
     ]
@@ -5606,7 +5732,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      682,
+      611,
       101,
       39
     ]
@@ -5656,8 +5782,8 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      437,
-      423,
+      509,
+      351,
       226,
       66
     ]
@@ -5674,8 +5800,8 @@
     ],
     "atlas": "atlas_lk_window",
     "rect": [
-      667,
-      423,
+      739,
+      351,
       226,
       66
     ]
@@ -5693,7 +5819,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       0,
-      494,
+      423,
       225,
       66
     ]
@@ -5710,8 +5836,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      326,
-      558,
+      648,
+      652,
       179,
       66
     ]
@@ -5762,7 +5888,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       229,
-      494,
+      423,
       166,
       64
     ]
@@ -5774,8 +5900,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      192,
-      377,
+      312,
+      380,
       359,
       86
     ]
@@ -5792,7 +5918,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      120,
+      343,
       270,
       101,
       103
@@ -5833,7 +5959,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      586,
+      854,
       156,
       106,
       108
@@ -5852,8 +5978,8 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      809,
-      156,
+      113,
+      270,
       106,
       106
     ]
@@ -5895,7 +6021,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       585,
-      682,
+      611,
       270,
       23
     ]
@@ -5934,8 +6060,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      622,
-      470,
+      86,
+      566,
       327,
       79
     ]
@@ -5952,8 +6078,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      120,
-      470,
+      551,
+      478,
       326,
       83
     ]
@@ -5970,8 +6096,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
-      558,
+      417,
+      566,
       322,
       79
     ]
@@ -5989,7 +6115,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       727,
-      494,
+      423,
       23,
       62
     ]
@@ -6025,7 +6151,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       245,
-      564,
+      493,
       210,
       53
     ]
@@ -6038,7 +6164,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       971,
-      626,
+      555,
       39,
       40
     ]
@@ -6056,7 +6182,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       424,
-      725,
+      654,
       184,
       21
     ]
@@ -6073,7 +6199,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      355,
+      623,
       156,
       113,
       108
@@ -6097,7 +6223,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      122,
+      390,
       156,
       113,
       109
@@ -6115,7 +6241,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      575,
+      798,
       270,
       104,
       101
@@ -6133,8 +6259,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      696,
-      156,
+      0,
+      270,
       109,
       106
     ]
@@ -6146,7 +6272,7 @@
     "slice": null,
     "atlas": "atlas_lk_lobby",
     "rect": [
-      472,
+      740,
       156,
       110,
       108
@@ -6164,7 +6290,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      239,
+      507,
       156,
       112,
       109
@@ -6182,7 +6308,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      0,
+      268,
       156,
       118,
       110
@@ -6206,8 +6332,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      579,
-      558,
+      0,
+      724,
       315,
       65
     ]
@@ -6258,7 +6384,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       559,
-      494,
+      423,
       164,
       63
     ]
@@ -6276,7 +6402,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       399,
-      494,
+      423,
       156,
       64
     ]
@@ -6294,7 +6420,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       754,
-      494,
+      423,
       228,
       59
     ]
@@ -6311,8 +6437,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      509,
-      558,
+      831,
+      652,
       66,
       66
     ]
@@ -6325,7 +6451,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       132,
-      564,
+      493,
       53,
       56
     ]
@@ -6338,7 +6464,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       189,
-      564,
+      493,
       52,
       54
     ]
@@ -6355,7 +6481,7 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      465,
+      688,
       270,
       106,
       102
@@ -6413,8 +6539,8 @@
     ],
     "atlas": "atlas_lk_lobby",
     "rect": [
-      555,
-      377,
+      0,
+      478,
       427,
       84
     ]
@@ -6427,7 +6553,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       528,
-      626,
+      555,
       89,
       49
     ]
@@ -6440,7 +6566,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       621,
-      626,
+      555,
       85,
       49
     ]
@@ -6471,7 +6597,7 @@
     "atlas": "atlas_lk_window",
     "rect": [
       612,
-      725,
+      654,
       32,
       21
     ]
@@ -6507,8 +6633,8 @@
     "slice": null,
     "atlas": "atlas_lk_icons",
     "rect": [
-      120,
-      349,
+      360,
+      469,
       100,
       100
     ]
