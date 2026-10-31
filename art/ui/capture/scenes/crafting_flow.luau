@@ -71,7 +71,10 @@ CraftingController.Toggle()
 local window = CraftingController.window
 check(window:IsOpen(), "the Craft key opens field crafting")
 check(string.find(window.window.title.root.Text, "RAFTING", 1, true) ~= nil, "titled for crafting")
-check(window.materialRows.CopperOre ~= nil and window.materialRows.Wood ~= nil, "YOUR MATERIALS lists the carried materials")
+check(
+	window.materialRows.CopperOre ~= nil and window.materialRows.Wood ~= nil,
+	"YOUR MATERIALS lists the carried materials"
+)
 
 local axe, bar = nil, nil
 for _, recipe in Recipes.List do

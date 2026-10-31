@@ -53,7 +53,10 @@ local function page(view, candidates, opts, after)
 	local window = PartyWindow.new({})
 	window:SetData(PartyModel.WindowData(view, ME, candidates, opts))
 	window:Open()
-	window.screen.holder.Position = UDim2.fromOffset(274 + 1124 / 2, 143 + 637 / 2)
+	window.screen.holder.Position = UDim2.fromOffset(
+		PartyWindow.ORIGIN[1] + PartyWindow.SIZE[1] / 2,
+		PartyWindow.ORIGIN[2] + PartyWindow.SIZE[2] / 2
+	)
 	window.screen.scale.Scale = 1
 	if after then
 		after(window)

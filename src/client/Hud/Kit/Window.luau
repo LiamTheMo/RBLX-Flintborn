@@ -183,7 +183,8 @@ function Window.new(target, props: Props)
 		end
 	elseif header == "centered" then
 		local tw = Text.Width(props.title, "windowTitle", titleSize)
-		local cx = w / 2
+		-- Ornaments flank the title: its rect's centre when given.
+		local cx = if props.titleRect then props.titleRect[1] + props.titleRect[3] / 2 else w / 2
 		local ty = props.titleY or 18
 		self.title = Text.new(base.visual, {
 			name = "Title",

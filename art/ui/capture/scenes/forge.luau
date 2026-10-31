@@ -126,6 +126,7 @@ end
 
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local ForgeController = require(Client.Controllers.ForgeController)
+local RecipeWindow = require(Client.Hud.Screens.RecipeWindow)
 local player = Players.LocalPlayer
 ForgeController.Start()
 ForgeController.Toggle()
@@ -141,7 +142,7 @@ end
 
 -- The mockup's place and size (window 285, 132, 1102 × 682).
 local function pin()
-	screen.holder.Position = UDim2.fromOffset(285 + 1102 / 2, 132 + 682 / 2)
+	screen.holder.Position = UDim2.fromOffset(285 + 1102 / 2, 132 + RecipeWindow.SIZE[2] / 2)
 	screen.scale.Scale = 1
 end
 
@@ -172,7 +173,10 @@ __dump(player.PlayerGui, W, H, BACKGROUND)
 window:Select("ForgeIronPickaxe")
 window.stepper.plus.control:Activate()
 check(window:Count() == 2, "+ raises the quantity")
-check(window.stepper.root.Visible and window.stepper.plus.root:GetAttribute("KitState") == "disabled", "+ disabled at max")
+check(
+	window.stepper.root.Visible and window.stepper.plus.root:GetAttribute("KitState") == "disabled",
+	"+ disabled at max"
+)
 force(window.rows.ForgeIronAxe, "hover")
 force(window.button, "pressed")
 __dump(player.PlayerGui, W, H, BACKGROUND)
@@ -225,7 +229,10 @@ window:SetCategory("Permanent")
 window:Select("PermanentIronPickaxe")
 check(not window.stepper.root.Visible, "no stepper for a Permanent conversion")
 check(window.button.text == "Convert", "the button says CONVERT")
-check(window.rows.PermanentIronPickaxe.root.LayoutOrder < window.rows.PermanentWoodenSpear.root.LayoutOrder, "conversions for vault gear come first")
+check(
+	window.rows.PermanentIronPickaxe.root.LayoutOrder < window.rows.PermanentWoodenSpear.root.LayoutOrder,
+	"conversions for vault gear come first"
+)
 __dump(player.PlayerGui, W, H, BACKGROUND)
 
 -- 8 confirmation -------------------------------------------------------------------------

@@ -656,3 +656,71 @@ weights), `.EnumType` and `typeof(x) == "EnumItem"`; `HttpService:JSONDecode`;
 **Reasons** (`src/client/Ui/Reasons.luau`): MissingMaterials, Locked,
 WrongSource added; BadQuantity and BackpackFull already had text.
 
+
+## 11. Polish round
+
+**Edges.** `lk_panel_inset` now has its border line as its edge (6, 6, 5, 5), so
+inset panels and `row.soft` cards draw their visible border on their rect.
+Selected glows share the normal edge and draw thinner (`role.thin`, a corner
+scale factor): `row.soft` (0.55) and `tab.side` (0.6) no longer grow outside
+the card. Screens dropped their compensations (PartyWindow.PANEL_ART,
+InventoryWindow's card pad, the Journal's 365 × 104 rows, PlayWindow's row
+plate).
+
+**New props**
+- Portrait `frame = "none"` (the bare photo) and `backdrop` (token; default
+  `photoBackdrop` #C9B19B for "none").
+- PlayerRow `badgeWidth`, `badgeHeight`, `badgeTextSize`, `nameY`, `levelY`.
+- ListRow `titleY`, `subtitleY`.
+- Slot `countInset = {right, bottom}` (default {10, 10}), `countSize`.
+- Stepper `gap` (8), `buttonSize`.
+- Button `contentOffset = {x, y}`.
+- Window `ruleColor` (token).
+- Text / Core.Label `outline` (true = paper outline, or a token) and
+  `outlineThickness` (1): HUD text over the world (LV and XP on both HUDs).
+- Badge `width`, `textSize`, variants `dotRed`, `dotYellow`, `dotGreen`,
+  `dotGrey` (untinted art) and `rarity` (`rarity = "Epic"`, `:SetRarity`; the
+  `rarity<Name>` tokens).
+- Toast `hideClose`, `actionWidth`; two actions sit side by side (Accept
+  primary, Decline secondary).
+- Scroll `direction = "X"` (a horizontal strip with the thin rail under it),
+  `padTop`.
+- SearchBox `onSubmit`, `maxLength`, `textSize`, `clearButton`.
+
+**New components**: `Kit.TextField` (a plain field: the value-box art, no
+magnifier; SearchBox's API) and `Kit.Ring` (`{rect, value, text}`, `:Set`,
+`:SetText`; the sheet-19 ring filled clockwise by two hard-edged UIGradient
+wipes; captures draw the wipe too).
+
+**Bars.** A fill is a clipping frame over a plate never narrower than its end
+caps, so low values (under about 21 % on a stat bar) show a short stub instead
+of vanishing.
+
+**SectionHeader** gives its label the whole width (no truncation with heavy
+faces at custom sizes); a count is placed after the measured width.
+
+**Glyphs**: `ink:trophy` is line art now (it read as a blob); new
+`ink:compass_rose` / `white:compass_rose` (from the compass arrow; the sheets
+have no rose).
+
+**Tokens**: `emptyDot` #CC9F77, `photoBackdrop` #C9B19B, `rarityCommon` …
+`rarityExclusive`, `phoneText` (scale 1.2 and the roles it applies to),
+`scale.phoneHudMin` 0.5.
+
+**Phones** (short touch screens: height < 500, no keyboard):
+- The HUD scale never drops below 0.5 (was 0.373 at 844 × 390); the regions
+  stay pinned to the edges. On the world HUD the menu tiles sit at the bottom
+  left and the touch attack button uses HudLayout `attack.phonePos`
+  (`Layout.Place` honours `phonePos` on phones).
+- Body and label roles (`phoneText.roles`) draw 1.2× larger
+  (`Core.TextBoost`); labels that could overflow shrink to fit or truncate.
+- Effective text at 844 × 390: HUD small text 15 × 1.2 × 0.5 = 9 px, HUD names
+  20 × 1.2 × 0.5 = 12 px; windows (scale 0.55–0.61) body 15 × 1.2 × 0.57 ≈
+  10.3 px, row titles 19 × 1.2 × 0.57 ≈ 13 px, window titles 42 × 0.57 ≈ 24 px.
+
+**Capture env**: `CharacterRemoving`, `HealthChanged`, `Died`, mouse events,
+`Player:GetMouse()`, and a camera `CFrame` / `FieldOfView`; `render.py` draws
+an image's UIGradient transparency.
+
+**Strings**: no ★ or → in UI strings (Merriweather has neither): Permanent
+items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".

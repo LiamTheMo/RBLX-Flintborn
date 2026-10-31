@@ -54,7 +54,7 @@ window:SetDetail({
 	},
 })
 window:Open()
-window.screen.holder.Position = UDim2.fromOffset(243 + 1187 / 2, 150 + 652 / 2)
+window.screen.holder.Position = UDim2.fromOffset(243 + 1187 / 2, 150 + InventoryWindow.SIZE[2] / 2)
 window.screen.scale.Scale = 1
 
 local function force(component, state)

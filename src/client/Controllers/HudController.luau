@@ -508,6 +508,13 @@ function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
 	region.BackgroundTransparency = 1
 	region.AnchorPoint = Vector2.new(0, 0.5)
 	region.Position = UDim2.new(0, cfg.x, cfg.centreY, 0)
+	local camera = workspace.CurrentCamera
+	if camera and Kit.Scale.IsSmallTouch(camera.ViewportSize.Y) then
+		-- Phones: the HUD canvas is short, so the grid sits low on the left,
+		-- clear of the party panel above it and left of the hotbar.
+		region.AnchorPoint = Vector2.new(0, 1)
+		region.Position = UDim2.new(0, cfg.x, 1, -24)
+	end
 	region.Size = UDim2.fromOffset(cfg.size[1], cfg.size[2])
 	region.Parent = parent
 	local tiles = {}

@@ -30,10 +30,24 @@ function Layout.Get()
 	return cached
 end
 
--- Places a top-level widget: {anchor = [ax, ay], pos = [sx, ox, sy, oy], size = [w, h]}.
+-- True on a short touch-only screen (a landscape phone), where the HUD canvas
+-- is short and some regions move (an entry's "phonePos").
+function Layout.IsPhone(): boolean
+	local UserInputService = game:GetService("UserInputService")
+	local camera = workspace.CurrentCamera
+	return UserInputService.TouchEnabled
+		and not UserInputService.KeyboardEnabled
+		and camera ~= nil
+		and camera.ViewportSize.Y > 0
+		and camera.ViewportSize.Y < 500
+end
+
+-- Places a top-level widget: {anchor = [ax, ay], pos = [sx, ox, sy, oy], size =
+-- [w, h], phonePos? (the position on phones)}.
 function Layout.Place(object: GuiObject, entry)
 	object.AnchorPoint = Vector2.new(entry.anchor[1], entry.anchor[2])
-	object.Position = UDim2.new(entry.pos[1], entry.pos[2], entry.pos[3], entry.pos[4])
+	local pos = if entry.phonePos and Layout.IsPhone() then entry.phonePos else entry.pos
+	object.Position = UDim2.new(pos[1], pos[2], pos[3], pos[4])
 	object.Size = UDim2.fromOffset(entry.size[1], entry.size[2])
 end
 

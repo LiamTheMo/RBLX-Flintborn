@@ -159,6 +159,7 @@ local function build()
 	ui.attack.Name = "Attack"
 	ui.attack.BackgroundTransparency = 1
 	ui.attack.Visible = false
+	-- On phones the layout's phonePos keeps it clear of the event panel.
 	Layout.Place(ui.attack, cfg)
 	ui.attack.Parent = root
 	local button = Kit.IconButton.new(ui.attack, {

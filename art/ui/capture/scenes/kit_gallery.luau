@@ -663,30 +663,24 @@ do
 		closeRect = { 486, 18, 52, 50 },
 	})
 	caption(root, "iconRect, titleX, smallCapsSizes, rule = full, closeRect", 30, 304, 560)
-	Kit.Window.new(
-		root,
-		{
-			rect = { 620, 50, 420, 250 },
-			title = "Party",
-			header = "centered",
-			titleSize = 40,
-			titleY = 22,
-			ornaments = { "ink:people", "ink:people" },
-			ornamentSize = 40,
-			showClose = false,
-		}
-	)
+	Kit.Window.new(root, {
+		rect = { 620, 50, 420, 250 },
+		title = "Party",
+		header = "centered",
+		titleSize = 40,
+		titleY = 22,
+		ornaments = { "ink:people", "ink:people" },
+		ornamentSize = 40,
+		showClose = false,
+	})
 	caption(root, "centered: titleSize, titleY, ornament glyphs", 620, 304, 420)
-	Kit.Window.new(
-		root,
-		{
-			rect = { 1070, 50, 570, 250 },
-			title = "Play",
-			header = "plaque",
-			plaqueRect = { 40, 22, 240, 80 },
-			titleSize = 52,
-		}
-	)
+	Kit.Window.new(root, {
+		rect = { 1070, 50, 570, 250 },
+		title = "Play",
+		header = "plaque",
+		plaqueRect = { 40, 22, 240, 80 },
+		titleSize = 52,
+	})
 	caption(root, "plaque: plaqueRect, titleSize", 1070, 304, 400)
 
 	heading(root, "Divider ink / hairline / rule", 30, 340)
@@ -726,58 +720,46 @@ do
 	end
 
 	heading(root, "Rows", 30, 520)
-	local soft = Kit.ListRow.new(
-		root,
-		{
-			rect = { 30, 560, 300, 72 },
-			variant = "soft",
-			icon = "pickaxe",
-			title = "Iron Pickaxe",
-			subtitle = "Mine stone and ore.",
-			subtitleHand = true,
-			onPress = function() end,
-		}
-	)
-	local picked = Kit.ListRow.new(
-		root,
-		{
-			rect = { 30, 642, 300, 72 },
-			variant = "soft",
-			icon = "hatchet",
-			title = "Iron Hatchet",
-			subtitle = "Locked: level 5",
-			onPress = function() end,
-		}
-	)
+	local soft = Kit.ListRow.new(root, {
+		rect = { 30, 560, 300, 72 },
+		variant = "soft",
+		icon = "pickaxe",
+		title = "Iron Pickaxe",
+		subtitle = "Mine stone and ore.",
+		subtitleHand = true,
+		onPress = function() end,
+	})
+	local picked = Kit.ListRow.new(root, {
+		rect = { 30, 642, 300, 72 },
+		variant = "soft",
+		icon = "hatchet",
+		title = "Iron Hatchet",
+		subtitle = "Locked: level 5",
+		onPress = function() end,
+	})
 	picked:SetSelected(true)
 	picked:SetState("locked")
-	local objective = Kit.ListRow.new(
-		root,
-		{
-			rect = { 30, 724, 300, 56 },
-			variant = "soft",
-			icon = "logs",
-			iconSize = 40,
-			textX = 70,
-			title = "Collect Wood",
-			value = "12 / 20",
-			trailing = 30,
-		}
-	)
+	local objective = Kit.ListRow.new(root, {
+		rect = { 30, 724, 300, 56 },
+		variant = "soft",
+		icon = "logs",
+		iconSize = 40,
+		textX = 70,
+		title = "Collect Wood",
+		value = "12 / 20",
+		trailing = 30,
+	})
 	Kit.Checkbox.new(objective:Trailing(), { rect = { 0, 13, 30, 30 }, variant = "ring", readOnly = true })
-	local done = Kit.ListRow.new(
-		root,
-		{
-			rect = { 30, 790, 300, 56 },
-			variant = "soft",
-			icon = "stones",
-			iconSize = 40,
-			textX = 70,
-			title = "Collect Stone",
-			value = "15 / 15",
-			trailing = 30,
-		}
-	)
+	local done = Kit.ListRow.new(root, {
+		rect = { 30, 790, 300, 56 },
+		variant = "soft",
+		icon = "stones",
+		iconSize = 40,
+		textX = 70,
+		title = "Collect Stone",
+		value = "15 / 15",
+		trailing = 30,
+	})
 	Kit.Checkbox.new(done:Trailing(), { rect = { 0, 13, 30, 30 }, variant = "ring", readOnly = true, checked = true })
 	local _ = soft
 
@@ -787,50 +769,41 @@ do
 		list.base.visual,
 		{ rect = { 14, 14, 272, 200 }, rail = "thin", railOverlay = true, gap = 2, contentHeight = 400 }
 	)
-	Kit.PlayerRow.new(
-		scroll:Content(),
-		{
-			size = { 250, 40 },
-			layoutOrder = 1,
-			compact = true,
-			userId = 1,
-			name = "LiamTheMo",
-			leader = true,
-			status = "ready",
-		}
-	)
+	Kit.PlayerRow.new(scroll:Content(), {
+		size = { 250, 40 },
+		layoutOrder = 1,
+		compact = true,
+		userId = 1,
+		name = "LiamTheMo",
+		leader = true,
+		status = "ready",
+	})
 	for i = 2, 6 do
 		Kit.PlayerRow.new(
 			scroll:Content(),
 			{ size = { 250, 36 }, layoutOrder = i, compact = true, empty = true, emptyIndent = 10, nameX = 44 }
 		)
 	end
-	Kit.PlayerRow.new(
-		root,
-		{
-			rect = { 690, 560, 360, 56 },
-			userId = 2,
-			name = "ForestRangerWithALongName",
-			level = 15,
-			action = { label = "Invite", size = { 108, 45 } },
-		}
-	)
+	Kit.PlayerRow.new(root, {
+		rect = { 690, 560, 360, 56 },
+		userId = 2,
+		name = "ForestRangerWithALongName",
+		level = 15,
+		action = { label = "Invite", size = { 108, 45 } },
+	})
 	Kit.PlayerRow.new(root, { rect = { 690, 620, 360, 52 }, empty = true, emptyIndent = 14, nameX = 74 })
 
 	heading(root, "Stepper leather, play hover, roles, item art", 1080, 520)
 	Kit.Stepper.new(root, { rect = { 1080, 560, 160, 48 }, min = 1, max = 10, value = 2, buttons = "leather" })
 	force(
-		Kit.Button.new(
-			root,
-			{
-				rect = { 1260, 556, 260, 62 },
-				label = "Forge",
-				icon = "white:anvil",
-				iconSize = 34,
-				iconGap = 14,
-				variant = "play",
-			}
-		),
+		Kit.Button.new(root, {
+			rect = { 1260, 556, 260, 62 },
+			label = "Forge",
+			icon = "white:anvil",
+			iconSize = 34,
+			iconGap = 14,
+			variant = "play",
+		}),
 		"hover"
 	)
 	Kit.Picture.new(root, { rect = { 690, 690, 359, 86 }, role = "hud.playerCard" })
@@ -839,17 +812,116 @@ do
 	Kit.Picture.new(root, { rect = { 1250, 640, 200, 150 }, role = "panel.party" })
 	local items = { "StoneAxe", "StoneSpear", "IronOre", "Clay", "Resin", "Herbs" }
 	for i, id in items do
-		Kit.Slot.new(
-			root,
-			{
-				rect = { 1080 + (i - 1) * 92, 810, 86, 86 },
-				variant = "hotbar",
-				hotkey = tostring(i),
-				item = { itemId = id, quantity = i },
-			}
-		)
+		Kit.Slot.new(root, {
+			rect = { 1080 + (i - 1) * 92, 810, 86, 86 },
+			variant = "hotbar",
+			hotkey = tostring(i),
+			item = { itemId = id, quantity = i },
+		})
 	end
 	scroll:ScrollToRow(3)
+	__dump(gui, W, H)
+	gui:Destroy()
+end
+
+-- Page 8: the polish round -----------------------------------------------------------------
+
+do
+	local gui, root = page()
+	heading(root, "Ring 0 / 30 / 70 / 100 %", 30, 14)
+	for i, value in { 0, 0.3, 0.7, 1 } do
+		Kit.Ring.new(
+			root,
+			{ rect = { 30 + (i - 1) * 110, 50, 90, 90 }, value = value, text = ("%d%%"):format(value * 100) }
+		)
+	end
+	heading(root, "TextField, low stat fill, dots", 500, 14)
+	Kit.TextField.new(root, { rect = { 500, 50, 260, 41 }, placeholder = "Enter a code", clearButton = false })
+	Kit.TextField.new(root, { rect = { 780, 50, 260, 41 }, text = "SUMMER-2026", maxLength = 20 })
+	Kit.Bar.new(
+		root,
+		{ rect = { 500, 110, 315, 65 }, fill = "health", frame = "stat", icon = "heart", text = "8", value = 0.08 }
+	)
+	Kit.Bar.new(root, { rect = { 840, 125, 300, 28 }, fill = "xp", value = 0.12 })
+	for i, variant in { "dotRed", "dotYellow", "dotGreen", "dotGrey" } do
+		Kit.Badge.new(root, { rect = { 1180 + (i - 1) * 30, 60, 18, 18 }, variant = variant })
+	end
+	for i, rarity in { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic" } do
+		Kit.Badge.new(root, { rect = { 1180 + (i - 1) * 24, 100, 12, 12 }, variant = "rarity", rarity = rarity })
+	end
+	caption(root, "status dots, rarity accents", 1180, 120, 300)
+
+	heading(root, "Toast with two actions, no close", 30, 200)
+	Kit.Toast.new(root, {
+		rect = { 30, 240, 520, 84 },
+		kind = "info",
+		title = "Trade request",
+		text = "ForestRanger wants to trade",
+		hideClose = true,
+		actionWidth = 104,
+		actions = { { label = "Accept" }, { label = "Decline", variant = "secondary" } },
+	})
+	heading(root, "Horizontal scroll", 600, 200)
+	local strip = Kit.Panel.new(root, { rect = { 600, 240, 520, 130 }, variant = "inset" })
+	local scroll =
+		Kit.Scroll.new(strip.base.visual, { rect = { 10, 8, 500, 114 }, direction = "X", gap = 8, contentHeight = 900 })
+	for i = 1, 8 do
+		Kit.Slot.new(
+			scroll:Content(),
+			{ size = { 92, 92 }, layoutOrder = i, item = { itemId = "Stone", quantity = i * 5 } }
+		)
+	end
+
+	heading(root, "Portrait none, PlayerRow badge width and lines, ListRow lines", 30, 400)
+	Kit.Portrait.new(root, { rect = { 30, 440, 56, 56 }, userId = 1, frame = "none" })
+	Kit.PlayerRow.new(
+		root,
+		{
+			rect = { 110, 440, 400, 60 },
+			userId = 1,
+			name = "LiamTheMo",
+			level = 12,
+			badge = "ready",
+			badgeWidth = 90,
+			nameY = 6,
+			levelY = 34,
+			frame = "none",
+		}
+	)
+	Kit.ListRow.new(
+		root,
+		{
+			rect = { 540, 436, 330, 72 },
+			variant = "soft",
+			icon = "pickaxe",
+			title = "Iron Pickaxe",
+			titleY = 6,
+			subtitle = "Mine stone and ore.",
+			subtitleY = 40,
+			onPress = function() end,
+		}
+	)
+	local selected = Kit.ListRow.new(
+		root,
+		{
+			rect = { 900, 436, 330, 72 },
+			variant = "soft",
+			icon = "hatchet",
+			title = "Selected card",
+			subtitle = "Thin glow on the edge",
+			onPress = function() end,
+		}
+	)
+	selected:SetSelected(true)
+	local tabs = Kit.Tab.new(root, { rect = { 1260, 430, 82, 84 }, variant = "side", icon = "ink:book" })
+	tabs:SetSelected(true)
+	Kit.Stepper.new(root, { rect = { 1360, 440, 200, 48 }, buttons = "leather", gap = 16, buttonSize = 42 })
+	Kit.Text.new(root, { rect = { 30, 540, 300, 30 }, text = "LV. 12   450/750 XP", role = "hudSmall", outline = true })
+	caption(root, "HUD text with its outline", 30, 572, 300)
+	Kit.Button.new(
+		root,
+		{ rect = { 400, 540, 260, 62 }, label = "Play", icon = "play", variant = "play", contentOffset = { 0, -3 } }
+	)
 	__dump(gui, W, H)
 	gui:Destroy()
 end

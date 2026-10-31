@@ -44,11 +44,12 @@ receipt.Parent = folder
 
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local VaultController = require(Client.Controllers.VaultController)
+local InventoryWindow = require(Client.Hud.Screens.InventoryWindow)
 local player = Players.LocalPlayer
 VaultController.Start()
 local window = VaultController.window
 local function place()
-	window.screen.holder.Position = UDim2.fromOffset(243 + 1187 / 2, 150 + 652 / 2)
+	window.screen.holder.Position = UDim2.fromOffset(243 + 1187 / 2, 150 + InventoryWindow.SIZE[2] / 2)
 	window.screen.scale.Scale = 1
 end
 local function dump()

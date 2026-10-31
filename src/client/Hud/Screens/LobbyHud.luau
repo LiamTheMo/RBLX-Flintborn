@@ -121,6 +121,8 @@ function LobbyHud.new(parent: Instance, actions)
 		text = "",
 		role = "hudSmall",
 		textSize = LobbyHud.TEXT.cardLevel,
+		-- Shrinks to fit when phones boost the text size.
+		scaled = true,
 		zIndex = 7,
 	})
 	self.cardBar = Kit.Bar.new(card.visual, { name = "XpBar", rect = { 159, 49, 161, 12 }, fill = "xp", zIndex = 7 })

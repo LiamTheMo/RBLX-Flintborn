@@ -77,6 +77,7 @@ end
 local Controllers = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Controllers
 local LobbyController = require(Controllers.LobbyController)
 local PartyController = require(Controllers.PartyController)
+local PartyWindow = require(game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud.Screens.PartyWindow)
 
 local failures = 0
 local function check(cond, msg)
@@ -122,7 +123,10 @@ local function dump()
 end
 
 local function place(window)
-	window.screen.holder.Position = UDim2.fromOffset(274 + 1124 / 2, 143 + 637 / 2)
+	window.screen.holder.Position = UDim2.fromOffset(
+		PartyWindow.ORIGIN[1] + PartyWindow.SIZE[1] / 2,
+		PartyWindow.ORIGIN[2] + PartyWindow.SIZE[2] / 2
+	)
 	window.screen.scale.Scale = 1
 end
 

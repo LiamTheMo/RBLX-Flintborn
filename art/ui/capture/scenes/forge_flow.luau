@@ -96,6 +96,7 @@ end
 
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local ForgeController = require(Client.Controllers.ForgeController)
+local RecipeWindow = require(Client.Hud.Screens.RecipeWindow)
 local player = Players.LocalPlayer
 ForgeController.Start()
 
@@ -131,14 +132,20 @@ check(window.button.control.hit.NextSelectionLeft == window.rows.ForgeIronAxe.co
 window.stepper.plus.control:Activate()
 window.stepper.plus.control:Activate()
 check(window:Count() == 2, "+ stops at the snapshot's maxCount")
-check(string.find(window.cards[1].root:FindFirstChild("Count", true).Text, "40 / 32", 1, true) ~= nil, "REQUIRES shows the cost of 2")
+check(
+	string.find(window.cards[1].root:FindFirstChild("Count", true).Text, "40 / 32", 1, true) ~= nil,
+	"REQUIRES shows the cost of 2"
+)
 
 -- Forge 2: one request with the count and a nonce, a receipt, a fresh snapshot.
 replies = { { true, { count = 2, output = { catalogId = "IronAxe" } } } }
 window.button.control:Activate()
 check(#calls == 1, "FORGE sends one request")
 local first = calls[1]
-check(first[1] == "ForgeIronAxe" and first[2] == nil and type(first[3]) == "string" and first[4] == 2, "recipe, no source, nonce, count 2")
+check(
+	first[1] == "ForgeIronAxe" and first[2] == nil and type(first[3]) == "string" and first[4] == 2,
+	"recipe, no source, nonce, count 2"
+)
 check(string.find(toasts(), "Iron Axe ×2", 1, true) ~= nil, "the receipt names what was forged")
 check(snapshots == 2, "the snapshot refreshes after a forge")
 check(window.button.root:GetAttribute("KitState") ~= "busy", "FORGE is ready again")
@@ -177,7 +184,10 @@ window.button.control:Activate()
 dialog = window.confirm.dialog
 local second = dialog.body:FindFirstChild("sword-2", true)
 second:FindFirstChild("Hit", true).Activated:Fire()
-check(string.find(dialog.body:FindFirstChild("Text", true).Text, "-1.0%", 1, true) ~= nil, "picking the other item renames it")
+check(
+	string.find(dialog.body:FindFirstChild("Text", true).Text, "-1.0%", 1, true) ~= nil,
+	"picking the other item renames it"
+)
 -- The capture cannot hold a button for 1.5 s: finish the hold directly.
 replies = { { true, { count = 1, output = { catalogId = "IronSword", permanent = true } } } }
 dialog:_confirm()
@@ -192,7 +202,7 @@ ForgeController.Toggle()
 window.rows.ForgeIronAxe.control.hit.Activated:Fire()
 
 print(__failed and "FLOW FAILED" or "FLOW OK")
-window.screen.holder.Position = UDim2.fromOffset(285 + 1102 / 2, 132 + 682 / 2)
+window.screen.holder.Position = UDim2.fromOffset(285 + 1102 / 2, 132 + RecipeWindow.SIZE[2] / 2)
 window.screen.scale.Scale = 1
 __dump(player.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })
 if __failed then

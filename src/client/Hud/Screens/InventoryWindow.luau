@@ -27,7 +27,7 @@ local InventoryWindow = {}
 InventoryWindow.__index = InventoryWindow
 
 -- Design px (the mockup's window is 1187 × 652 at 243, 150).
-InventoryWindow.SIZE = { 1187, 652 }
+InventoryWindow.SIZE = { 1187, 650 }
 
 -- Category column icons: the closest kit art (KIT.md §8).
 InventoryWindow.CATEGORY_ICONS = {
@@ -60,10 +60,9 @@ local TAB_LAYOUT = { { iconX = 15, iconSize = 40, labelX = 65 }, { iconX = 19, i
 -- middle four.
 local CATEGORY_YS = { 236, 297, 363, 426, 491, 555 }
 local CATEGORY_RULES = { 354, 419, 483, 547 }
--- The detail card: the inset art's visible border sits 4 px inside its rect,
--- so the rect grows by 4 and card contents are placed from the mockup's card
--- corner.
-local CARD_PAD = 4
+-- The detail card at the mockup's rect (the kit draws the inset art's border
+-- on it); contents are placed from the card's corner.
+local CARD_PAD = 0
 local CARD = { 869 - CARD_PAD, 109 - CARD_PAD, 296 + CARD_PAD * 2, 520 + CARD_PAD * 2 }
 local ROW_TOP, ROW_PITCH = 313, 41
 

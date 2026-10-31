@@ -24,7 +24,7 @@ PlayWindow.__index = PlayWindow
 
 PlayWindow.GUI_NAME = "FlintbornPlay"
 -- The mockup's window, outline to outline (309..1361 × 127..791).
-PlayWindow.SIZE = { 1053, 665 }
+PlayWindow.SIZE = { 1053, 663 }
 
 -- Window design px, measured from the mockup (PlayScreen.md element tree, minus
 -- the window's top-left 309, 127). Kit plates draw their visible edge on the rect.
@@ -44,9 +44,8 @@ local RECT = {
 	partyHeading = { 590, 350, 300, 26 },
 	-- One row tall; more members scroll (the rail sits right of the rows).
 	party = { 585, 375, 444, 63 },
-	-- The row's plate: the inset art's border sits 2–3 px inside it, so the
-	-- plate is larger than the mockup's 421 × 56 box (896, 507) by `rowArt`,
-	-- and the row's content keeps the box's own coordinates.
+	-- A row's slot in the list, and where the mockup's 421 × 56 box (896, 507)
+	-- sits in it; the kit draws the box's border on that rect.
 	partyRow = { 424, 61 },
 	rowArt = { 2, 3 },
 	equipHeading = { 589, 446, 260, 28 },
@@ -346,9 +345,9 @@ local function partyRow(parent: Instance, row: PartyRow, order: number, showRead
 	}, parent)
 	outer:SetAttribute("UserId", row.userId)
 	-- The mockup's row is a light inset box, not the list-row plate.
-	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5 })
 	local art = RECT.rowArt
 	w, h = 421, 56
+	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5, rect = { art[1], art[2], w, h } })
 	local holder = Kit.Core.Make("Frame", {
 		Name = "Inside",
 		BackgroundTransparency = 1,

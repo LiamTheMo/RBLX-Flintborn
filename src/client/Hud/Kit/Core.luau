@@ -174,7 +174,7 @@ function Core.Label(parent: Instance, opts): TextLabel
 			Name = "Outline",
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
 			Color = Tokens.Color(if opts.outline == true then "paper" else opts.outline),
-			Thickness = opts.outlineThickness or 1.5,
+			Thickness = opts.outlineThickness or 1,
 			Transparency = 0.1,
 		}, label)
 	end

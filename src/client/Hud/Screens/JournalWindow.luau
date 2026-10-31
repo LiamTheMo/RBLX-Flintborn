@@ -69,9 +69,10 @@ function JournalWindow.new(parent: Instance?, handlers)
 	-- The header as the mockup draws it: the flat compass, QUEST JOURNAL, the
 	-- rule under both the full width, and the ✕.
 	local window = Kit.Window.new(screen.window, {
-		rect = { JournalWindow.MARGIN, 0, JournalWindow.FRAME[1], JournalWindow.FRAME[2] },
+		-- The kit draws the frame on its rect: 3 px shorter matches M07's frame.
+		rect = { JournalWindow.MARGIN, 0, JournalWindow.FRAME[1], JournalWindow.FRAME[2] - 3 },
 		title = "Quest Journal",
-		icon = "ink:compass",
+		icon = "ink:compass_rose",
 		iconRect = { 64, 9, 84, 88 },
 		titleRect = { 155, 16, 700, 70 },
 		titleSize = 47,
@@ -169,7 +170,7 @@ function JournalWindow:_entriesPage(v: Frame)
 		name = "Quests",
 		rect = LIST,
 		gap = ROW_GAP,
-		padTop = 5,
+		padTop = 7,
 		padBottom = 6,
 		rail = "thin",
 		zIndex = Z,

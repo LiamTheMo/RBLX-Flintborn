@@ -60,7 +60,11 @@ function Scroll.new(parent: Instance, props)
 		ZIndex = base.z,
 	}, base.visual)
 	if horizontal then
-		Core.Make("UIPadding", { PaddingRight = UDim.new(0, props.padBottom or 12), PaddingLeft = UDim.new(0, 2) }, frame)
+		Core.Make(
+			"UIPadding",
+			{ PaddingRight = UDim.new(0, props.padBottom or 12), PaddingLeft = UDim.new(0, 2) },
+			frame
+		)
 	else
 		Core.Make(
 			"UIPadding",
@@ -73,7 +77,7 @@ function Scroll.new(parent: Instance, props)
 			FillDirection = if horizontal then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
 			Padding = UDim.new(0, props.gap or 6),
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			HorizontalAlignment = if horizontal then Enum.HorizontalAlignment.Left else Enum.HorizontalAlignment.Center,
 			VerticalAlignment = if horizontal then Enum.VerticalAlignment.Center else Enum.VerticalAlignment.Top,
 		}, frame)
 	end

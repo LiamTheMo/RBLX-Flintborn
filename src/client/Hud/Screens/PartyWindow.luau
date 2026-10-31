@@ -26,8 +26,8 @@ PartyWindow.__index = PartyWindow
 
 -- Rects are measured on the mockup canvas (1672 × 941); ORIGIN is the window's
 -- top-left there. Rects inside a panel are measured from the panel's top-left.
-PartyWindow.ORIGIN = { 274, 143 }
-PartyWindow.SIZE = { 1124, 637 }
+PartyWindow.ORIGIN = { 276, 146 }
+PartyWindow.SIZE = { 1120, 631 }
 PartyWindow.MOCKUP = {
 	closeX = { 1324, 168, 56, 53 },
 	party = { 304, 245, 360, 448 },
@@ -44,10 +44,9 @@ local function inWindow(r: { number }): { number }
 	return { r[1] - o[1], r[2] - o[2], r[3], r[4] }
 end
 
--- The inset panel art still draws its border 4 px inside the rect's left and
--- top and 3 px inside its right and bottom (measured against M04); the plate
--- grows by that much and the panel's contents keep the mockup panel's origin.
-PartyWindow.PANEL_ART = { 4, 4, 3, 3 }
+-- The kit draws the inset panel's border on its rect, so no compensation is
+-- left (kept for callers that read it).
+PartyWindow.PANEL_ART = { 0, 0, 0, 0 }
 
 -- An inset panel on the mockup rect `r`; returns the frame its contents go in
 -- (design px from the mockup panel's top-left).
@@ -140,15 +139,15 @@ function PartyWindow.new(props: Props)
 		title = "Party",
 		header = "centered",
 		titleSize = 48,
-		titleY = 25,
+		titleY = 22,
 		-- The mockup centres its title 7.5 px right of the window's centre.
-		titleRect = { 843.5 - 274 - 120, 25, 240, 60 },
+		titleRect = { 843.5 - PartyWindow.ORIGIN[1] - 120, 22, 240, 60 },
 		-- D19: the mockup's tent and pines are not in the kit; the tree icon is
 		-- the closest kit art (KIT.md §8).
 		ornaments = { "tree", "tree" },
 		ornamentSize = 52,
 		ornamentGap = 26,
-		ruleRect = { 481 - 274, 229 - 143, 781, 3 },
+		ruleRect = { 481 - PartyWindow.ORIGIN[1], 229 - PartyWindow.ORIGIN[2], 781, 3 },
 		clasps = true,
 		claspYs = { 0.856 },
 		closeRect = inWindow(M.closeX),

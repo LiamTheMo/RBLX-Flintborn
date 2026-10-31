@@ -28,7 +28,7 @@ RecipeWindow.__index = RecipeWindow
 -- How long a Permanent conversion's CONVERT is held before it fires.
 RecipeWindow.CONVERT_HOLD = 1.5
 
-RecipeWindow.SIZE = { 1102, 682 }
+RecipeWindow.SIZE = { 1102, 680 }
 
 -- Window-local layout (design px). Kit plates draw their visible edge on their
 -- rect, so these are the mockup's bounds less the window's 285, 132.

@@ -56,7 +56,12 @@ function Slot.new(parent: Instance, props)
 		align = "Right",
 		yAlign = "Bottom",
 		-- countInset {right, bottom}: the count's distance from the slot's edges.
-		rect = { 8, 6, w - 8 - (props.countInset and props.countInset[1] or 10), h - 6 - (props.countInset and props.countInset[2] or 10) },
+		rect = {
+			8,
+			6,
+			w - 8 - (props.countInset and props.countInset[1] or 10),
+			h - 6 - (props.countInset and props.countInset[2] or 10),
+		},
 		z = base.z + 3,
 	})
 	self.star = Core.Make("Frame", {
