@@ -86,6 +86,38 @@ do
 		return __enum("UserInputType.{last}")
 	end
 end
+do
+	local envEnum = Enum
+	Enum = setmetatable({{
+		ContextActionPriority = {{ Low = {{ Value = 1000 }}, Medium = {{ Value = 2000 }}, High = {{ Value = 3000 }} }},
+	}}, {{ __index = envEnum }})
+	local CAS = game:GetService("ContextActionService")
+	QA.actions = {{}}
+	CAS.BindAction = function(_, name, handler, _, ...)
+		QA.actions[name] = {{ handler = handler, keys = {{ ... }} }}
+	end
+	CAS.BindActionAtPriority = function(_, name, handler, _, _, ...)
+		QA.actions[name] = {{ handler = handler, keys = {{ ... }} }}
+	end
+	CAS.UnbindAction = function(_, name)
+		QA.actions[name] = nil
+	end
+end
+-- Presses gamepad B through whatever the Kit bound for it. Returns what happened.
+function QA.back()
+	local action = QA.actions.KitModalBack
+	if action == nil then
+		return "no back action bound"
+	end
+	local bound = false
+	for _, k in action.keys do
+		if tostring(k) == "Enum.KeyCode.ButtonB" or (typeof(k) ~= "string" and k == Enum.KeyCode.ButtonB) then
+			bound = true
+		end
+	end
+	action.handler("KitModalBack", Enum.UserInputState.Begin, {{ KeyCode = Enum.KeyCode.ButtonB, UserInputType = Enum.UserInputType.Gamepad1 }})
+	return if bound then "ButtonB bound and handled" else "handled (ButtonB not in key list?)"
+end
 local function qaPath(object)
 	local parts = {{}}
 	local node = object

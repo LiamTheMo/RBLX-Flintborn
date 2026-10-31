@@ -1020,8 +1020,9 @@ SKIPPED = [
 ]
 
 
-def write_catalog(info, insets, stats):
+def write_catalog(info, insets, stats, manifest=None):
     by_name = {p["name"]: p for p in PARTS}
+    manifest = manifest or {}
     sheets = {p.stem[:2]: p.name for p in KIT.glob("*.png")}
     families = {}
     for name in info:
@@ -1052,7 +1053,9 @@ def write_catalog(info, insets, stats):
         "- Text, numbers and placeholder icons were painted out of the parts that had them; draw them natively.",
         "- Glyphs (`lk_glyph_*`) are dark brown (white for `glyph_play` / `glyph_check_white`); tint with "
         "`ImageColor3` if needed.",
-        "- No atlas groups are assigned yet (`pack_atlas.py` GROUPS is untouched).",
+        "- Sprites the game uses are packed by `art/ui/pack_atlas.py` into the `atlas_lk_*` atlases (\"Atlas\" "
+        "column; manifest `atlas` / `rect`). Unused sprites stay as files in no atlas. Re-running this script keeps "
+        "each placement while the sprite's size is unchanged; run `pack_atlas.py` after any size change.",
         "",
         "### Button and state families",
         "",
@@ -1087,9 +1090,9 @@ def write_catalog(info, insets, stats):
         "",
         "## Sprites",
         "",
-        "| Name | Source sheet + box (x0, y0, x1, y1) | Size | 9-slice [l, t, r, b] | Stretch | Role / where used "
-        "| Notes |",
-        "|---|---|---|---|---|---|---|",
+        "| Name | Source sheet + box (x0, y0, x1, y1) | Size | 9-slice [l, t, r, b] | Stretch | Atlas "
+        "| Role / where used | Notes |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for name in sorted(info):
         p = by_name[name]
@@ -1098,7 +1101,8 @@ def write_catalog(info, insets, stats):
         ins = insets[name]
         stretch = ONE_AXIS.get(short, "X, Y") if ins else ""
         src = f"{sheets.get(p['sid'], p['sid'])} {tuple(p['box'])}"
-        lines.append(f"| `{name}` | {src} | {w}x{h} | {ins if ins else ''} | {stretch} | {p['role']} | "
+        atlas = manifest.get(name, {}).get("atlas", "")
+        lines.append(f"| `{name}` | {src} | {w}x{h} | {ins if ins else ''} | {stretch} | {atlas} | {p['role']} | "
                      f"{p['note']} |".replace("[", "[").replace("  ", " "))
     lines += ["", "## Not exported", "", "| On the sheets | Why / use instead |", "|---|---|"]
     lines += [f"| {a} | {b} |" for a, b in SKIPPED]
@@ -1161,7 +1165,7 @@ def main():
     slice_test(sprites, insets, DOCS / "slice_test.png")
     area = sum(w * h for w, h, _ in info.values())
     total, partial, deep, worst = alpha_report(sprites)
-    write_catalog(info, insets, (total, partial, deep, worst))
+    write_catalog(info, insets, (total, partial, deep, worst), manifest)
     print(f"{len(info)} sprites, {area} px total ({area / 1024 ** 2:.2f} atlases of 1024x1024 before packing gaps)")
     print(f"alpha: {total} visible px, {partial} semi-transparent ({100 * partial / max(1, total):.2f} %), "
           f"{deep} of them more than 2 px inside the silhouette")
