@@ -70,133 +70,116 @@
   },
   "party": {
     "anchor": [0, 0],
-    "pos": [0, 19, 0, 27],
-    "size": [276, 70],
-    "pitch": 76,
+    "pos": [0, 39, 0, 60],
+    "width": 294,
+    "header": [28, 18, 238, 34],
+    "listTop": 58,
+    "rowHeight": 50,
+    "padBottom": 16,
     "maxRows": 3,
-    "frame": "pm_hud_card",
-    "sliceScale": 0.45,
-    "frameOutset": [2, 2, 2, 2],
-    "portrait": { "rect": [20, 10, 50, 50] },
-    "name": { "rect": [82, 10, 176, 24], "font": "serif", "textSize": 17, "color": "ink", "stroke": 1 },
-    "bar": { "rect": [82, 40, 172, 16], "inset": 2, "trackColor": "sliderTrack", "fillColor": "partyHealth" }
+    "portrait": 40,
+    "nameY": 3,
+    "nameH": 22,
+    "barX": 54,
+    "barY": 29,
+    "barH": 11
   },
   "compass": {
     "anchor": [0.5, 0],
-    "pos": [0.5, 0, 0, 34],
-    "size": [481, 40],
-    "frame": "pm_hud_compass",
-    "sliceScale": 1,
-    "frameOutset": [2, 2, 2, 2],
-    "track": [40, 0, 401, 40],
+    "pos": [0.5, 0, 0, 60],
+    "size": [481, 46],
+    "track": [26, 2, 429, 42],
     "halfSpan": 108,
     "minorStep": 15,
     "minorLimit": 90,
-    "notchColor": "inkSoft",
-    "marker": { "sprite": "compass_marker", "rect": [234, -9, 13, 10], "tint": "leather" },
-    "triangles": { "size": [13, 9], "centres": [], "color": "leather" },
-    "majorTick": { "y": 5, "h": 6 },
-    "minorTick": { "y": 17, "h": 8 },
-    "letter": { "y": 10, "h": 22, "font": "serif", "textSize": 15, "cardinalTextSize": 21, "cardinalRaise": 3, "color": "ink", "stroke": 1 },
-    "waypoints": { "y": 46, "size": 30, "tint": "ink" }
-  },
-  "objective": {
-    "anchor": [1, 0],
-    "pos": [1, -30, 0, 262],
-    "size": [334, 112],
-    "frame": "pm_hud_card",
-    "sliceScale": 0.5,
-    "frameOutset": [2, 2, 2, 2],
-    "diamond": { "rect": [22, 24, 46, 46], "color": "leather", "thickness": 2 },
-    "figure": { "rect": [33, 35, 24, 24], "icon": "icon_run", "tint": "leather" },
-    "title": { "rect": [80, 14, 236, 26], "font": "serif", "textSize": 19, "color": "leather", "stroke": 1 },
-    "dividers": { "y": [45, 76], "x": 78, "w": 236, "transparency": 0.2, "color": "line" },
-    "rows": { "y": [51, 82], "h": 20 },
-    "check": { "x": 80, "size": 15, "color": "ink" },
-    "text": { "x": 102, "w": 126, "font": "serif", "textSize": 13, "color": "ink", "stroke": 1 },
-    "pin": { "x": 232, "size": [10, 14], "color": "inkSoft" },
-    "distance": { "x": 245, "w": 44, "font": "serif", "textSize": 13, "color": "inkSoft", "stroke": 1 },
-    "progress": { "right": 318, "w": 76, "font": "serif", "textSize": 13, "color": "ink", "stroke": 1 }
-  },
-  "event": {
-    "anchor": [1, 0],
-    "pos": [1, -30, 0, 384],
-    "size": [334, 98],
-    "frame": "pm_hud_card",
-    "sliceScale": 0.5,
-    "frameOutset": [2, 2, 2, 2],
-    "icon": { "rect": [26, 24, 50, 50], "icon": "icon_storm" },
-    "title": { "rect": [88, 14, 160, 24], "font": "serif", "textSize": 18, "color": "leather", "stroke": 1 },
-    "timer": { "rect": [248, 14, 68, 24], "font": "serif", "textSize": 18, "color": "leather", "stroke": 1 },
-    "name": { "rect": [88, 40, 230, 22], "font": "serif", "textSize": 15, "color": "ink", "stroke": 1 },
-    "description": { "rect": [88, 63, 232, 18], "font": "serif", "textSize": 12, "color": "inkSoft", "stroke": 1 }
+    "majorTick": { "y": 4, "h": 7 },
+    "minorTick": { "y": 16, "h": 10 },
+    "letter": { "y": 10, "h": 24, "size": 15, "cardinalSize": 20, "raise": 1 },
+    "marker": [231, -9, 19, 16],
+    "waypoints": { "y": 52, "size": 30 }
   },
   "vitals": {
     "anchor": [1, 0],
-    "pos": [1, -30, 0, 34],
-    "size": [334, 183],
+    "pos": [1, -53, 0, 60],
+    "size": [315, 65],
+    "pitch": 72,
+    "low": 0.25,
+    "lowMark": [42, 36, 24],
     "rows": [
-      { "key": "health", "label": "Health", "art": "pm_hud_health", "color": "health" },
-      { "key": "stamina", "label": "Stamina", "art": "pm_hud_stamina", "color": "stamina" },
-      { "key": "food", "label": "Food", "art": "pm_hud_food", "color": "food" }
-    ],
-    "rowSize": [334, 57],
-    "rowTop": 0,
-    "rowPitch": 63,
-    "rowHeight": 57,
-    "track": { "x": 70, "w": 247, "h": 19 },
-    "fillBar": { "inset": 0, "w": 247 },
-    "value": { "right": 306, "w": 48, "font": "serif", "textSize": 14, "color": "ink", "stroke": 1 }
-  },
-  "backpack": {
-    "anchor": [0, 0],
-    "pos": [0, 43, 0, 308],
-    "size": [134, 131],
-    "sprite": "pm_tile_inventory"
-  },
-  "menu": {
-    "anchor": [0, 0],
-    "pos": [0, 43, 0, 452],
-    "size": [134, 58],
-    "item": [150, 58],
-    "gap": 10
+      { "key": "health", "label": "Health", "fill": "health", "icon": "heart" },
+      { "key": "stamina", "label": "Stamina", "fill": "stamina", "icon": "lightning" },
+      { "key": "food", "label": "Food", "fill": "food", "icon": "drumstick" }
+    ]
   },
   "status": {
     "anchor": [1, 0],
-    "pos": [1, -30, 0, 222],
-    "size": [334, 32],
-    "panel": "pm_stat_chip",
-    "font": "serif",
+    "pos": [1, -53, 0, 276],
+    "size": [315, 38],
+    "gap": 8
+  },
+  "objective": {
+    "anchor": [1, 0],
+    "pos": [1, -53, 0, 324],
+    "size": [315, 134],
+    "header": [22, 16, 271, 34],
+    "rowTop": 58,
+    "rowHeight": 30,
+    "check": 22,
+    "textW": 110,
     "textSize": 14,
-    "color": "ink",
-    "stroke": 1
+    "pin": 16,
+    "distanceW": 52,
+    "progressW": 58
+  },
+  "event": {
+    "anchor": [1, 0],
+    "pos": [1, -53, 0, 470],
+    "size": [315, 128],
+    "header": [22, 16, 271, 34],
+    "nameY": 56,
+    "nameH": 24,
+    "descriptionY": 82,
+    "descriptionH": 36,
+    "descriptionSize": 13
+  },
+  "tiles": {
+    "x": 68,
+    "centreY": 0.476,
+    "size": [190, 272],
+    "tile": [88, 84],
+    "pitch": [102, 94]
   },
   "bottom": {
     "anchor": [0.5, 1],
-    "pos": [0.5, 0, 1, -37],
-    "size": [823, 176],
-    "badge": { "rect": [66, 5, 84, 34], "sprite": "pm_stat_chip", "font": "serif", "textSize": 17, "color": "ink", "stroke": 1 },
-    "xp": { "rect": [152, 0, 519, 44], "track": "pm_hud_xp", "inset": [42, 15, 11, 15], "fillColor": "xp" },
-    "maxHint": { "font": "serif", "textSize": 12, "color": "ink", "stroke": 1 },
-    "popups": { "rect": [152, -122, 519, 118] },
-    "hotbar": { "x": 0, "y": 56, "slot": [123, 120], "pitch": 140, "count": 6, "frame": "pm_hud_slot", "sliceScale": 1, "frameOutset": [2, 2, 2, 2] },
-    "selected": { "sprite": "pm_hud_slot_selected", "sliceScale": 1, "frameOutset": [2, 2, 2, 2] },
-    "slotNumber": { "rect": [26, 18, 28, 28], "font": "serif", "textSize": 20, "color": "ink", "stroke": 1 },
-    "item": { "color": "ink" }
+    "pos": [0.5, 0, 1, -49],
+    "size": [572, 124],
+    "level": [-40, -4, 114, 24],
+    "xp": [81, 0, 356, 16],
+    "xpText": [448, -4, 220, 24],
+    "textSize": 17,
+    "popups": [81, -122, 356, 118],
+    "hotbar": { "y": 31, "slot": [89, 93], "x": [0, 96, 193, 289, 386, 482], "count": 6 }
   },
   "prompt": {
-    "size": [207, 58],
+    "size": [230, 64],
+    "maxWidth": 420,
     "studsOffset": [0, 2.5, 0],
-    "previewPos": [681, 637],
-    "fill": "promptFill",
-    "fillTransparency": 0.12,
-    "frame": "frame_bar_hollow",
-    "sliceScale": 0.4,
-    "plate": { "rect": [6, 5, 52, 49], "color": "plate", "transparency": 0.1 },
-    "keycap": { "rect": [11, 14, 42, 36], "font": "heading", "textSize": 22, "color": "track" },
-    "title": { "rect": [69, 10, 132, 22], "font": "body", "textSize": 16, "color": "text" },
-    "subtitle": { "rect": [69, 31, 132, 18], "font": "bold", "textSize": 13, "color": "text" },
-    "hold": { "rect": [69, 50, 126, 4], "fillColor": "xp" }
+    "keycap": [12, 9, 46, 46],
+    "gap": 12,
+    "padRight": 18,
+    "titleY": 8,
+    "titleH": 23,
+    "titleSize": 18,
+    "subtitleY": 30,
+    "subtitleH": 17,
+    "subtitleSize": 13,
+    "holdBottom": 12,
+    "holdH": 7
+  },
+  "attack": {
+    "anchor": [1, 1],
+    "pos": [1, -300, 1, -60],
+    "size": [130, 124]
   },
   "lobby": {
     "profile": {
@@ -329,28 +312,5 @@
       "party": [{ "name": "LiamTheMo", "leader": true }],
       "partyMax": 8
     }
-  },
-  "preview": {
-    "party": [
-      { "name": "Kael", "health": 0.9 },
-      { "name": "Mira", "health": 0.9 },
-      { "name": "Thorn", "health": 0.9 }
-    ],
-    "heading": 0,
-    "waypoints": [
-      { "icon": "icon_mountain", "bearing": -62.5 },
-      { "icon": "icon_mountain", "bearing": 0, "size": 28 },
-      { "icon": "icon_tower", "bearing": 62.6 }
-    ],
-    "objective": [
-      { "text": "Reach the extraction site", "distance": "452 m", "progress": "0/1" },
-      { "text": "Hold the zone for 2:00", "progress": "0:00/2:00" }
-    ],
-    "event": { "title": "World Event", "timer": "6:12", "name": "Rising Waters", "description": "Rivers are flooding across the crater." },
-    "vitals": { "health": [1, "100"], "stamina": [1, "100"], "food": [0.72, "72"] },
-    "level": 12,
-    "xp": 0.36,
-    "selectedSlot": 1,
-    "prompt": { "key": "F", "title": "Gather Redberries", "subtitle": "Yields Food" }
   }
 }

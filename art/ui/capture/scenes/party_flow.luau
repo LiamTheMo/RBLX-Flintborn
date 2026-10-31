@@ -149,15 +149,13 @@ check(window.readyButton.text == "Ready", "solo and not ready: the toggle offers
 -- Invite: the button waits for the server, then reads Invited from the view.
 server = function(action, argument)
 	park()
-	broadcast(
-		view({
-			id = "p1",
-			leader = 1,
-			createdAt = NOW,
-			members = { { userId = 1, name = "LiamTheMo" } },
-			invited = { argument },
-		})
-	)
+	broadcast(view({
+		id = "p1",
+		leader = 1,
+		createdAt = NOW,
+		members = { { userId = 1, name = "LiamTheMo" } },
+		invited = { argument },
+	}))
 	return true
 end
 window.selectables["invites:player:2"].Activated:Fire()

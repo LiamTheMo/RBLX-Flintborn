@@ -92,7 +92,7 @@ local function drawShop(view)
 				title = entry.name .. (if entry.quantity then (" ×" .. entry.quantity) else ""),
 				detail = entry.note,
 				icon = entry.catalogId,
-				glyph = if entry.catalogId then nil else "market",
+				glyph = if entry.catalogId then nil elseif category == "Titles" then "crown" else "market",
 				value = if entry.owned then nil else HudModel.Thousands(entry.price),
 				valueIcon = "coin",
 				done = entry.owned,

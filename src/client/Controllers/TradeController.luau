@@ -1,25 +1,29 @@
--- Lobby trading (GDD §10.2, §25.4, §53) in the parchment Trade window
--- (Hud/ListWindow). The Trade navigation button opens it: pick a player in this
--- lobby to invite. During a trade it shows both offers, your
--- tradeable lobby-backpack items to add or remove, your tradeable vault materials
--- (+1, +10, all or remove), a Gem amount (never Coins), a lock, a countdown and
--- confirm. Any change unlocks both sides. Lobby only.
+-- Lobby trading (GDD §10.2, §25.4, §53) in the kit Trade window
+-- (Hud/ListWindow, docs/ui/ListWindows.md). The Trade tile opens it: pick a
+-- player in this lobby to invite. During a trade it shows both offers as slot
+-- panels with their lock state, your tradeable lobby-backpack items to add or
+-- remove, your tradeable vault materials (+1, +10, all or remove), a Gem amount
+-- (never Coins), a lock, a countdown and confirm (which asks once more with
+-- both offers spelled out). Any change unlocks both sides. Invites arrive as a
+-- toast with Accept and Decline. Lobby only.
 
-local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
+local Kit = require(script.Parent.Parent.Hud.Kit)
 local ListWindow = require(script.Parent.Parent.Hud.ListWindow)
-local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
-local Theme = require(script.Parent.Parent.Ui.Theme)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local TradeController = {}
+
+-- An invite toast waits this long for an answer.
+TradeController.INVITE_SECONDS = 60
 
 local player = Players.LocalPlayer
 local window = nil
@@ -29,10 +33,14 @@ local countdown = nil
 local confirmReady = nil
 local gemsBox = nil
 local invite = nil
+local answering = nil
+-- Catalog ids of my lobby-backpack slots ({[key] = catalogId}) from the last
+-- vault snapshot, so the offer panels can draw item art.
+local slotItems = {}
+local namedItems = nil
 -- Bumped by every render; a render that yielded and is no longer the latest drops.
 local renderToken = 0
 
-local CLOSE_ACTION = "FlintbornTradeClose"
 -- A gems change typed while a push arrives waits for the box to lose focus.
 local pending = false
 
@@ -63,8 +71,44 @@ end
 local function sendOffer(keys, materials, gems: number)
 	local ok, reason = invoke("TradeOffer", session.id, keys, gems, materials)
 	if not ok then
-		window:SetStatus("Offer refused: " .. Reasons.Text(reason))
+		window:SetStatus("Offer refused: " .. Reasons.Text(reason), "warn")
 	end
+end
+
+-- The catalog id an offered item shows: a vault material's key names it; my
+-- backpack slots come from the snapshot; the partner's are found by name
+-- (the trade payload carries names only).
+local function itemIdOf(item): string?
+	local material = TradeRules.MaterialOf(item.key)
+	if material then
+		return material
+	end
+	if slotItems[item.key] then
+		return slotItems[item.key]
+	end
+	if namedItems == nil then
+		namedItems = {}
+		for id, def in ItemCatalog.Items do
+			namedItems[def.name] = id
+		end
+	end
+	local name = string.gsub(item.name or "", "^★ ", "")
+	return namedItems[name]
+end
+
+-- One side of the trade for the offer panel.
+local function side(offer, title: string, icon: string, locked: boolean, confirmed: boolean)
+	local items = {}
+	for _, item in offer.items do
+		table.insert(items, { itemId = itemIdOf(item), name = item.name, quantity = item.quantity })
+	end
+	return {
+		title = title,
+		icon = icon,
+		items = items,
+		gems = offer.gems,
+		state = if confirmed then "confirmed" elseif locked then "locked" else "open",
+	}
 end
 
 local function describe(offer): string
@@ -75,37 +119,36 @@ local function describe(offer): string
 	if offer.gems > 0 then
 		table.insert(parts, offer.gems .. " Gems")
 	end
-	return if #parts > 0 then table.concat(parts, "\n") else "Nothing yet."
+	return if #parts > 0 then table.concat(parts, ", ") else "Nothing."
 end
 
 local function countdownText(): string
 	local left = math.ceil(session.confirmAt - workspace:GetServerTimeNow())
-	return ("Both locked — confirm unlocks in %d s"):format(left)
+	return ("Both locked: confirm unlocks in %d s"):format(left)
 end
 
 local function invitePlayers()
 	window:Line("Invite a player in this lobby to trade items and Gems (Coins can't be traded).")
-	window:Section("Players in this lobby")
+	window:Section("Players in this lobby", "party")
 	local any = false
 	for _, other in Players:GetPlayers() do
 		if other ~= player then
 			any = true
-			window:Row({
+			window:Player({
 				key = "Player" .. other.UserId,
-				title = other.DisplayName,
-				detail = "@" .. other.Name,
-				glyph = "pm_glyph_person",
-				buttons = {
-					{
-						label = "INVITE",
-						key = "Invite",
-						onPress = function()
-							local ok, reason = invoke("TradeRequest", other.UserId)
-							window:SetStatus(
-								if ok then "Invite sent." else ("Couldn't invite: " .. Reasons.Text(reason))
-							)
-						end,
-					},
+				userId = other.UserId,
+				name = other.DisplayName,
+				level = other:GetAttribute("Level"),
+				action = {
+					label = "Invite",
+					key = "Invite",
+					onPress = function()
+						local ok, reason = invoke("TradeRequest", other.UserId)
+						window:SetStatus(
+							if ok then "Invite sent." else ("Couldn't invite: " .. Reasons.Text(reason)),
+							if ok then "good" else "warn"
+						)
+					end,
 				},
 			})
 		end
@@ -122,12 +165,15 @@ local function offerables(view)
 	local offered, offeredMaterials = myOffer()
 	local backpack = {}
 	for _, item in view.backpack do
+		if item.key then
+			slotItems[item.key] = item.catalogId
+		end
 		if item.key and TradeRules.IsTradeableSlot(item) then
 			table.insert(backpack, item)
 		end
 	end
 	if #backpack > 0 then
-		window:Section("Your lobby backpack")
+		window:Section("Your lobby backpack", "backpack")
 	end
 	for _, item in backpack do
 		local key = item.key
@@ -136,10 +182,10 @@ local function offerables(view)
 			key = "Slot" .. tostring(key),
 			title = item.name .. (if item.quantity then (" ×" .. item.quantity) else ""),
 			icon = item.catalogId,
-			glyph = "pm_glyph_bag",
+			detail = if inOffer then "In your offer." else nil,
 			buttons = {
 				{
-					label = if inOffer then "REMOVE" else "ADD",
+					label = if inOffer then "Remove" else "Add",
 					key = "Toggle",
 					kind = if inOffer then "paper" else nil,
 					onPress = function()
@@ -163,7 +209,7 @@ local function offerables(view)
 			continue
 		end
 		if not shown then
-			window:Section("Your vault materials")
+			window:Section("Your vault materials", "chest")
 			shown = true
 		end
 		local current = offeredMaterials[catalogId] or 0
@@ -177,10 +223,9 @@ local function offerables(view)
 			title = material.name,
 			detail = ("%d in your vault · offering %d"):format(stock, current),
 			icon = catalogId,
-			glyph = "pm_glyph_weight",
 			buttons = {
 				{
-					label = "REMOVE",
+					label = "Remove",
 					key = "Remove",
 					kind = "paper",
 					enabled = current > 0,
@@ -189,7 +234,7 @@ local function offerables(view)
 					end,
 				},
 				{
-					label = "ALL",
+					label = "All",
 					key = "All",
 					enabled = current < stock,
 					onPress = function()
@@ -254,22 +299,17 @@ function render()
 	confirmReady = nil
 	gemsBox = nil
 	if session == nil then
-		window:SetTitle("TRADE")
+		window:SetTitle("Trade")
 		invitePlayers()
 		window:Finish()
 		return
 	end
-	window:SetTitle("TRADE")
+	window:SetTitle("Trade with " .. session.partner)
 	window:Line(("Trading with %s. Any change unlocks both offers."):format(session.partner), "ink")
-	window:Pair({
-		title = "YOU GIVE" .. (if session.locked.mine then " · LOCKED" else ""),
-		text = describe(session.mine),
-		tone = if session.locked.mine then "good" else "ink",
-	}, {
-		title = "YOU GET" .. (if session.locked.theirs then " · LOCKED" else ""),
-		text = describe(session.theirs),
-		tone = if session.locked.theirs then "good" else "ink",
-	})
+	window:Pair(
+		side(session.mine, "You give", "backpack", session.locked.mine, session.confirmed.mine),
+		side(session.theirs, "You get", "gift", session.locked.theirs, session.confirmed.theirs)
+	)
 	local now = workspace:GetServerTimeNow()
 	if session.confirmAt and now < session.confirmAt then
 		countdown = window:Line(countdownText(), "gold")
@@ -277,7 +317,7 @@ function render()
 	confirmReady = session.confirmAt ~= nil and now >= session.confirmAt
 	window:Buttons({
 		{
-			label = "CANCEL",
+			label = "Cancel",
 			key = "Cancel",
 			kind = "paper",
 			onPress = function()
@@ -285,24 +325,36 @@ function render()
 			end,
 		},
 		{
-			label = "LOCK OFFER",
+			label = if session.locked.mine then "Locked" else "Lock Offer",
 			key = "Lock",
-			width = 200,
+			width = 180,
 			enabled = not session.locked.mine,
 			onPress = function()
 				invoke("TradeLock", session.id)
 			end,
 		},
 		{
-			label = if session.confirmed.mine then "CONFIRMED" else "CONFIRM",
+			label = if session.confirmed.mine then "Confirmed" else "Confirm",
 			key = "Confirm",
-			width = 200,
+			width = 180,
 			enabled = confirmReady and not session.confirmed.mine,
 			onPress = function()
-				local ok, reason = invoke("TradeConfirm", session.id)
-				if not ok then
-					window:SetStatus("Not yet: " .. Reasons.Text(reason))
-				end
+				local current = session
+				window:Confirm("", "Trade", 0, function()
+					if session ~= current then
+						return
+					end
+					local ok, reason = invoke("TradeConfirm", current.id)
+					if not ok then
+						window:SetStatus("Not yet: " .. Reasons.Text(reason), "warn")
+					end
+				end, {
+					title = "Confirm this trade?",
+					rows = {
+						{ label = "You give", text = describe(current.mine) },
+						{ label = "You get", text = describe(current.theirs) },
+					},
+				})
 			end,
 		},
 	})
@@ -323,48 +375,71 @@ function render()
 	window:Finish()
 end
 
+-- Escape and gamepad B close the question first, then the window (Kit.Modal).
 local function close()
-	ContextActionService:UnbindAction(CLOSE_ACTION)
 	window:Close()
 end
 
 local function open()
 	window:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
-	ContextActionService:BindAction(CLOSE_ACTION, function(_, state)
-		if state == Enum.UserInputState.Begin then
-			close()
-		end
-		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.ButtonB)
 	render()
+end
+
+local function hideInvite()
+	if invite then
+		invite.Close()
+		invite = nil
+	end
+end
+
+-- The invite: a toast (KitToasts sits above the windows, so it can be answered
+-- with a menu open) whose View opens the question with Accept and Decline.
+local function showInvite(from: string)
+	hideInvite()
+	local function answer(accept: boolean)
+		if inviteId then
+			invoke("TradeRespond", inviteId, accept)
+			inviteId = nil
+		end
+	end
+	local function ask()
+		hideInvite()
+		if answering then
+			answering.Close()
+		end
+		answering = Kit.ConfirmDialog.Show({
+			title = "Trade invite",
+			text = from .. " wants to trade with you.",
+			confirmLabel = "Accept",
+			cancelLabel = "Decline",
+			onConfirm = function()
+				answering = nil
+				answer(true)
+			end,
+			onCancel = function()
+				answering = nil
+				answer(false)
+			end,
+		})
+	end
+	invite = Kit.Toast.Show({
+		kind = "info",
+		icon = "trade",
+		title = "Trade invite",
+		text = from .. " wants to trade.",
+		duration = TradeController.INVITE_SECONDS,
+		onPress = ask,
+		actions = { { label = "View", onPress = ask } },
+	})
 end
 
 local function build()
 	window = ListWindow.new(player:WaitForChild("PlayerGui"), {
 		name = "FlintbornTrade",
-		title = "TRADE",
+		title = "Trade",
+		icon = "trade",
 		onClose = close,
 	})
-	window.screen:Watch()
-	-- Its own gui above the parchment windows (their veils would cover the
-	-- banner column), so an invite can be answered with a menu open.
-	local inviteGui = Theme.Make(
-		"ScreenGui",
-		{ Name = "TradeInvite", ResetOnSpawn = false, DisplayOrder = 30 },
-		player:WaitForChild("PlayerGui")
-	)
-	invite = NoticeCard.new(inviteGui, { name = "Card", width = 420, title = "Trade invite" })
-	invite.frame.AnchorPoint = Vector2.new(0.5, 0)
-	invite.frame.Position = UDim2.new(0.5, 0, 0, 16)
-	for _, choice in { { "ACCEPT", true }, { "DECLINE", false } } do
-		invite:AddButton(choice[1], if choice[2] then nil else "paper", function()
-			invite:Hide()
-			if inviteId then
-				invoke("TradeRespond", inviteId, choice[2])
-				inviteId = nil
-			end
-		end)
-	end
 end
 
 -- Opens or closes this panel (keys, and the on-screen navigation bar).
@@ -385,7 +460,7 @@ function TradeController.Start()
 	Remotes.Get("TradeChanged").OnClientEvent:Connect(function(payload)
 		if payload.kind == "Invite" then
 			inviteId = payload.id
-			invite:Show(payload.from .. " wants to trade with you.")
+			showInvite(payload.from)
 		elseif payload.kind == "Session" then
 			if session == nil then
 				-- A new trade: the invite's outcome line is old news.
@@ -399,7 +474,12 @@ function TradeController.Start()
 			end
 		elseif payload.kind == "Closed" then
 			session = nil
-			invite:Hide()
+			hideInvite()
+			if answering then
+				answering.Close()
+				answering = nil
+			end
+			window:HideConfirm()
 			window:SetStatus("Trade " .. string.lower(payload.reason) .. ".")
 			-- Always re-render (cheap with no session) so an in-flight render drops.
 			render()

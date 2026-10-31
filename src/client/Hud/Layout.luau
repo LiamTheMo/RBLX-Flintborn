@@ -1,7 +1,9 @@
 -- Reads the HUD layout (src/shared/UI/HudLayout.json) and turns its entries into
--- UDim2s, colours and fonts. Every position is in reference pixels on a
--- 1672×941 canvas; the HUD root's UIScale maps them to the real screen. The
--- preview compositor (art/ui/preview_hud.py) reads the same JSON.
+-- UDim2s, colours and fonts. Every position is in design px on the 1672×941
+-- canvas the Kit is built at; the HUD root's UIScale (Kit.Scale.Hud) maps them
+-- to the real screen. The world HUD's sections hold only places and sizes: its
+-- art, type and colours come from the Kit (docs/ui/HudScreen.md). The colour
+-- and font tables still serve the older Widgets and Parchment screens.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 

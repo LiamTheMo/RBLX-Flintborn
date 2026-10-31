@@ -76,7 +76,8 @@ end
 -- slots keep their 52.4 px pitch as plain PlayerRows.
 PartyWindow.ROW = 52.4
 PartyWindow.FRAMES = {
-	leader = { h = 74, inner = { 0, 6, 332, 59 }, rule = { 0, 71, 328 } },
+	leader = { h = 74, inner = { 0, 7, 334, 59 }, rule = { 0, 71, 328 } },
+	member = { h = 52.4, inner = { 0, 0, 334, 52.4 }, rule = { 0, 50.4, 328 } },
 	invite = { h = 66, inner = { 0, 8, 337, 51 }, rule = { 0, 65, 334 } },
 	ready = { h = 64, inner = { 0, 0, 295, 64 }, rule = { 0, 62, 289 } },
 }
@@ -314,7 +315,7 @@ function PartyWindow:_framed(listName: string, content: Instance, kind: string, 
 		listName,
 		Kit.Panel.new(content, {
 			name = "Row" .. order,
-			size = { PartyWindow.LIST_W[if kind == "leader" then "party" else kind], frame.h },
+			size = { PartyWindow.LIST_W[if kind == "leader" or kind == "member" then "party" else kind], frame.h },
 			layoutOrder = order,
 			variant = "plain",
 			pad = 0,
@@ -363,10 +364,7 @@ function PartyWindow:_members(data)
 			self:_framed("members", content, "leader", i, rowProps)
 			height += PartyWindow.FRAMES.leader.h
 		else
-			rowProps.size = { PartyWindow.LIST_W.party, PartyWindow.ROW }
-			rowProps.layoutOrder = i
-			rowProps.zIndex = Z + 2
-			self:_add("members", Kit.PlayerRow.new(content, rowProps))
+			self:_framed("members", content, "member", i, rowProps)
 			height += PartyWindow.ROW
 		end
 	end

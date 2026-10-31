@@ -243,6 +243,8 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		name = "Apply",
 		rect = { 797, 580, 261, 56 },
 		label = "Apply",
+		-- Width-matched to the mockup's APPLY (72 px).
+		textSize = 21.5,
 		zIndex = 8,
 		onPress = function()
 			self:CloseDropdowns()

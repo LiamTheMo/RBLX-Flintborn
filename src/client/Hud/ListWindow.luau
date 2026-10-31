@@ -481,6 +481,36 @@ function ListWindow:Row(spec)
 	return card.root
 end
 
+-- A player row (portrait, name, level and an action button), as the Party
+-- window's invite list: {key, userId, name, level?, action? = {label, key?,
+-- onPress, enabled?}}.
+function ListWindow:Player(spec)
+	local order = self:_next(64)
+	local row = Kit.PlayerRow.new(self.list, {
+		size = { self.contentW - 8, 64 },
+		layoutOrder = order,
+		userId = spec.userId,
+		name = spec.name,
+		level = spec.level,
+		action = spec.action and {
+			label = spec.action.label,
+			enabled = spec.action.enabled,
+			onPress = function()
+				spec.action.onPress()
+			end,
+		},
+		zIndex = Z,
+	})
+	self.parts:Give(row)
+	-- `name` is the player's; the instance takes the row's key.
+	row.root.Name = spec.key
+	if row.action then
+		row.action.root.Name = spec.action.key or spec.action.label
+		table.insert(self.buttons, { id = spec.key .. "/" .. row.action.root.Name, button = row.action })
+	end
+	return row.root
+end
+
 -- A row of buttons, right-aligned: {{label, key, enabled, onPress, kind, width?}}.
 function ListWindow:Buttons(specs)
 	local holder = self:_holder("Buttons" .. (self.order + 1), BUTTON_H + 6)

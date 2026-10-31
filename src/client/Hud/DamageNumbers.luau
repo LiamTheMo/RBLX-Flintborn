@@ -1,13 +1,13 @@
 -- Floating damage numbers (GDD §25 "Show Damage"): a hit's damage rises from where
 -- it landed and fades. CombatController shows one for each hit the server confirms
 -- while the player's ShowDamage setting is on. With reduced motion the number
--- stays put and only fades. Drawn in the parchment kit's serif ink on a light
--- outline so it reads against snow, grass and night alike.
+-- stays put and only fades. Drawn in the kit's tokens: the display face
+-- (Merriweather Heavy) in gold with an ink outline, so it reads against snow,
+-- grass and night alike.
 
-local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
-local Layout = require(script.Parent.Layout)
+local Kit = require(script.Parent.Kit)
 
 local DamageNumbers = {}
 
@@ -15,6 +15,9 @@ DamageNumbers.SECONDS = 0.9
 DamageNumbers.RISE = 2.5 -- studs
 -- At most this many on screen; the oldest goes first.
 DamageNumbers.MAX = 12
+-- Colour tokens for the number and its outline.
+DamageNumbers.COLOR = "gold"
+DamageNumbers.OUTLINE = "ink"
 
 local live = {}
 
@@ -50,17 +53,13 @@ function DamageNumbers.Show(position: Vector3, amount: number)
 	label.Size = UDim2.fromScale(1, 1)
 	label.Text = tostring(math.round(amount))
 	label.TextScaled = true
-	label.Font = Layout.Font("serif")
-	local face = Layout.FontFace("serif")
-	if face then
-		label.FontFace = face
-	end
-	label.TextColor3 = Layout.Color("damage")
-	label.TextStrokeColor3 = Layout.Color("ink")
+	label.FontFace = Kit.Tokens.Font("display")
+	label.TextColor3 = Kit.Tokens.Color(DamageNumbers.COLOR)
+	label.TextStrokeColor3 = Kit.Tokens.Color(DamageNumbers.OUTLINE)
 	label.TextStrokeTransparency = 0.1
 	label.Parent = board
 	table.insert(live, anchor)
-	local steady = Players.LocalPlayer:GetAttribute("ReducedMotion") == true
+	local steady = Kit.Motion.Reduced()
 	local info = TweenInfo.new(DamageNumbers.SECONDS, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	if not steady then
 		TweenService:Create(board, info, { StudsOffsetWorldSpace = Vector3.new(0, DamageNumbers.RISE, 0) }):Play()
