@@ -142,10 +142,7 @@ local shown = texts(gui)
 check(string.find(shown, "ForestRanger", 1, true) ~= nil, "member names come from the party view")
 check(string.find(shown, "LV. 15", 1, true) ~= nil, "levels come from each player's Level attribute")
 check(string.find(shown, "4 items, 3 at risk", 1, true) ~= nil, "Carrying reads the deploy preview")
-check(
-	window.slots[1].item and window.slots[1].item.catalogId == "StoneAxe",
-	"slot 1 holds the axe, as the run packs it"
-)
+check(window.slots[1].item and window.slots[1].item.itemId == "StoneAxe", "slot 1 holds the axe, as the run packs it")
 check(window.slots[4].item == nil, "wood goes to the run backpack, not the hotbar")
 check(string.find(shown, "+1 more in your backpack", 1, true) ~= nil, "the leftover is counted")
 dump()

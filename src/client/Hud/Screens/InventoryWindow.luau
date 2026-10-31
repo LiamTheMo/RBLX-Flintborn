@@ -120,6 +120,8 @@ function InventoryWindow.new(props)
 		icon = "backpack",
 		clasps = "right",
 		claspYs = { 0.18, 0.9 },
+		-- The mockup's underline: 370–1323 at y 235 on screen.
+		ruleRect = { 127, 78, 953, 16 },
 		onClose = function()
 			screen:Close()
 		end,
