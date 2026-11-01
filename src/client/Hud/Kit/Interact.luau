@@ -69,7 +69,21 @@ export type Options = {
 	debounce: number?,
 	hit: GuiButton?,
 	z: number?,
+	padLimit: { left: number?, top: number?, right: number?, bottom: number? }?,
 }
+
+-- A hit pad of `need` design px per side, each side capped by `limit` (a
+-- side with no limit grows freely): neighbouring controls pass half the gap
+-- between them, so their pads meet instead of overlapping.
+function Interact.PadSides(need: number, limit): (number, number, number, number)
+	if limit == nil then
+		return need, need, need, need
+	end
+	local function side(cap: number?): number
+		return if cap then math.max(0, math.min(need, cap)) else need
+	end
+	return side(limit.left), side(limit.top), side(limit.right), side(limit.bottom)
+end
 
 -- Attaches the state machine to a component base (Core.Root). Returns the
 -- controller: :SetEnabled, :SetSelected, :SetBusy, :SetLocked, :Set(flag, v),
@@ -90,13 +104,14 @@ function Interact.attach(base, opts: Options)
 	local pad = math.max(opts.pad or 0, (touchMin - math.min(w, h)) / 2, 0)
 	local hit = opts.hit
 	if hit == nil then
+		local l, t, r, b = Interact.PadSides(pad, opts.padLimit)
 		hit = Core.Make("TextButton", {
 			Name = "Hit",
 			AutoButtonColor = false,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Position = UDim2.fromOffset(-pad, -pad),
-			Size = UDim2.new(1, pad * 2, 1, pad * 2),
+			Position = UDim2.fromOffset(-l, -t),
+			Size = UDim2.new(1, l + r, 1, t + b),
 			Text = "",
 			ZIndex = (opts.z or base.z) + 8,
 		}, root)
@@ -121,8 +136,9 @@ function Interact.attach(base, opts: Options)
 	}, ring)
 	local function placeRing(p: number)
 		local out = Tokens.Space("focusOutset", 3)
-		ring.Position = UDim2.fromOffset(p - out, p - out)
-		ring.Size = UDim2.new(1, -2 * p + 2 * out, 1, -2 * p + 2 * out)
+		local l, t, r, b = Interact.PadSides(p, opts.padLimit)
+		ring.Position = UDim2.fromOffset(l - out, t - out)
+		ring.Size = UDim2.new(1, -(l + r) + 2 * out, 1, -(t + b) + 2 * out)
 	end
 	placeRing(if opts.hit then 0 else pad)
 	self.placeRing = placeRing
@@ -145,8 +161,9 @@ function Interact.attach(base, opts: Options)
 			local need = math.max(pad, (touchMin / k - math.min(w, h)) / 2, 0)
 			self.touchPad = need
 			placeRing(need)
-			hitButton.Position = UDim2.fromOffset(-need, -need)
-			hitButton.Size = UDim2.new(1, need * 2, 1, need * 2)
+			local l, t, r, b = Interact.PadSides(need, opts.padLimit)
+			hitButton.Position = UDim2.fromOffset(-l, -t)
+			hitButton.Size = UDim2.new(1, l + r, 1, t + b)
 		end
 		maid:Give(root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitTouch))
 		fitTouch()

@@ -46,8 +46,30 @@ def module_entries():
     return entries
 
 
+# How server services and shared rules refuse a request: `return false, "Code"`,
+# `return nil, "Code"` or `fail("Code")` (admission). reasons.spec.luau checks
+# that every such code has player-facing text in shared/UI/ReasonText.
+REFUSAL_PATTERNS = (
+    re.compile(r'\b(?:false|nil),\s*"([A-Z][A-Za-z]+)"'),
+    re.compile(r'\bfail\(\s*"([A-Z][A-Za-z]+)"'),
+)
+
+
+def refusal_codes() -> list:
+    """Every refusal code written in src/server and src/shared, sorted."""
+    codes = set()
+    for folder in (ROOT / "src" / "server", ROOT / "src" / "shared"):
+        for file in folder.rglob("*.luau"):
+            text = file.read_text(encoding="utf-8")
+            for pattern in REFUSAL_PATTERNS:
+                codes.update(pattern.findall(text))
+    return sorted(codes)
+
+
 def build_bundle(spec: Path) -> str:
     chunks = [(HERE / "prelude.luau").read_text(encoding="utf-8")]
+    # The scanned refusal codes, for reasons.spec.luau.
+    chunks.append("__SERVER_REFUSAL_CODES = {" + ", ".join(json.dumps(c) for c in refusal_codes()) + "}\n")
     for path, source in module_entries():
         chunks.append(
             "__defineModule({path}, function(script)\n{source}\nend)\n".format(

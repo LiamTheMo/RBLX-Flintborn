@@ -323,3 +323,21 @@ Each has the default that will be used if unanswered.
   the Roblox top bar where it reaches down; it no longer sits on the phone
   jump button. `SettingsController.GEAR` holds its place.
 - Opens with the gamepad flag when the last input is a gamepad.
+
+## Final audit fixes (phones)
+
+- **Checkbox rows on touch** (phones and touch tablets): 50 px tall at a 64 px
+  pitch (desktop 40 at 56), with a 34 px box and the row reaching the column
+  divider, so the boosted title and its description each get a line instead of
+  touching. Descriptions are short enough to fit whole at 667 × 375: "Numbers
+  over what you hit", "Name tags above players", "Moving up looks down",
+  "Alert sounds as text on screen", "Clearer rarity colours", "Menus and
+  effects move less".
+- **Graphics** labels its dropdown "Quality" (under the GRAPHICS header), so it
+  draws at the same size as "UI Scale" instead of shrinking to fit 130 px.
+- **Key caps on touch** are 116 wide (ending at the same x) so "Left Shift"
+  fits at the boosted size.
+- **Gameplay's rebind note** (KeyNote) is `bodySoft`, wrapping in the room
+  under the key rows, instead of a shrinking `small` line.
+- **Controls' Tutorial**: the text has room for three boosted lines (158, 86
+  tall) above REPLAY TUTORIAL (250, 50 tall); CHANGING KEYS follows at 314.

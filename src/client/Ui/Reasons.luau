@@ -1,29 +1,29 @@
--- Player-facing text for server refusal codes that need explaining. Codes not
--- listed here are shown as they are.
+-- Player-facing text for server refusal codes (shared/UI/ReasonText: a short
+-- lower-case clause for every code the server returns). A code without a line
+-- reads as the generic "that didn't work", never as the raw code.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ReasonText = require(ReplicatedStorage.Shared.UI.ReasonText)
 
 local Reasons = {}
 
-local TEXT = {
-	WorldLoading = "the island is still being built — try again in a few seconds",
-	RecoveringItems = "your items from a crashed server are still being recovered — try again in a minute",
-	TradeSettling = "a recent trade is still being saved — try again shortly",
-	PartnerVaultFull = "their vault has no room for that many",
-	BadQuantity = "that amount isn't allowed",
-	BoostActive = "a boost at least as strong is already running",
-	BackpackFull = "your lobby backpack has no room for that",
-	NotEnough = "your vault doesn't hold that many",
-	VaultWouldOverflow = "your vault can't hold all of that material",
-	MissingMaterials = "you don't have enough materials for that",
-	Locked = "that recipe is still locked",
-	WrongSource = "that item can't be used for this",
-	TooFast = "slow down a little and try again",
-	PlayerNotHere = "that player isn't in this server any more",
-	Rejected = "the request was turned down",
-	NotReady = "not everyone is ready yet",
-}
+Reasons.FALLBACK = ReasonText.FALLBACK
 
+-- True when `code` has its own line (screens with their own wording for some
+-- codes ask before falling back to the generic one).
+function Reasons.Has(code: any): boolean
+	return ReasonText.Has(code)
+end
+
+-- The clause for `code` ("you're too far away").
 function Reasons.Text(code: any): string
-	return TEXT[code] or tostring(code)
+	return ReasonText.Text(code)
+end
+
+-- The clause as a sentence ("You're too far away.").
+function Reasons.Sentence(code: any): string
+	return ReasonText.Sentence(code)
 end
 
 return Reasons

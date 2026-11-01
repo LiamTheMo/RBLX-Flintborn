@@ -76,6 +76,7 @@ function Button.new(parent: Instance, props)
 	self.text = props.label or ""
 	self:_layout()
 	self.control = Interact.attach(base, {
+		padLimit = props.padLimit,
 		hoverScale = variant == "play" or variant == "playSecondary",
 		onPress = function()
 			if props.onPress then
@@ -125,7 +126,7 @@ function Button:_render(state: string)
 	local shown = if state == "busy" then "…" else self.text
 	Core.SetText(self.label, shown)
 	if self.icon and self.icon:IsA("ImageLabel") then
-		(self.icon :: ImageLabel).ImageTransparency = if state == "disabled" then 0.35 else 0
+		Core.Dim(self.icon, if state == "disabled" then 0.35 else 0)
 	end
 end
 

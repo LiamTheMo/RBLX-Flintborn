@@ -817,7 +817,6 @@ do
 		}),
 		"hover"
 	)
-	Kit.Picture.new(root, { rect = { 690, 690, 359, 86 }, role = "hud.playerCard" })
 	Kit.Picture.new(root, { rect = { 1000, 700, 39, 76 }, role = "hud.leaf" })
 	Kit.Picture.new(root, { rect = { 1080, 640, 150, 150 }, role = "map.island" })
 	Kit.Picture.new(root, { rect = { 1250, 640, 200, 150 }, role = "panel.party" })

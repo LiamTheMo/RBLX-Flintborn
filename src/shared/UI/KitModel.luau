@@ -31,8 +31,8 @@ KitModel.ROLES = {
 	["panel.plaque"] = { sprite = "lk_plaque_small", material = "paper" },
 	-- The HUD's party panel (M01): the window frame's parchment and corners.
 	["panel.party"] = { sprite = "lk_window_frame", material = "window" },
-	["hud.playerCard"] = { sprite = "lk_player_card", material = "paper" },
 	["hud.leaf"] = { sprite = "lk_emblem_leaf", material = "glyph", glyph = "❦", edge = false },
+	["hud.rune"] = { sprite = "lk_emblem_rune", material = "glyph", glyph = "◆", edge = false },
 	-- The painted island (Play window, Journal map page, world map).
 	["map.island"] = { sprite = "pm_map_island", material = "paper", edge = false },
 
@@ -748,6 +748,14 @@ function KitModel.WindowScale(
 	local scale
 	if touchSmall then
 		scale = fitRoom
+		-- A small window (a dialog, the world menu) would blow up far past the
+		-- big windows' scale: it draws at most `touchMax` × the scale of a
+		-- typical window (`touchRef` {w, h}) on the same screen.
+		local ref = opts.touchRef
+		if ref then
+			local refFit = math.min((screenW - margin * 2) / ref[1], (screenH - topInset - margin * 2) / ref[2])
+			scale = math.min(scale, refFit * (opts.touchMax or 1))
+		end
 	else
 		local canvasFit = math.min(screenW / refW, screenH / refH)
 		scale = math.min(fitRoom, canvasFit * (userScale or 1))

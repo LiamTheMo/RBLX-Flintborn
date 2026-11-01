@@ -210,9 +210,108 @@ function Core.Label(parent: Instance, opts): TextLabel
 	return label :: TextLabel
 end
 
+-- The least text size (design px) the kit draws a label at when it picks the
+-- size or takes one from a screen (space.minTextDesign, 12): a smaller size
+-- is raised to it; nil (the role's size) stays nil.
+function Core.TextFloor(size: number?): number?
+	if size == nil then
+		return nil
+	end
+	return math.max(size, Tokens.Space("minTextDesign", 12))
+end
+
 -- Sets a label's text, upper-cased when its role is in capitals.
 function Core.SetText(label: TextLabel, text: string)
 	label.Text = if label:GetAttribute("KitCaps") and not label.RichText then string.upper(text) else text
+end
+
+-- Room kept beside fitted text (a share of the box), so it still fits where
+-- the drawn size rounds up to a whole screen pixel.
+Core.FIT_SLACK = 0.04
+
+-- The least size (design px) Core.FitText shrinks text to: space.minTextDesign
+-- (12), and on phones and touch tablets the phone text floor
+-- (Scale.PhoneTextFloor: 9 screen px in a typical window).
+function Core.FitFloor(): number
+	local floor = Tokens.Space("minTextDesign", 12)
+	if Scale.IsSmallTouch() then
+		floor = math.max(floor, Scale.PhoneTextFloor())
+	end
+	return floor
+end
+
+-- How many lines `text` wraps onto in a box `w` design px wide, drawn at
+-- `ratio` times its role size `size` (widths scale with the size); math.huge
+-- when one word alone is wider than the box.
+function Core.LineCount(text: string, role: string, size: number, ratio: number, w: number): number
+	local line, lines = "", 1
+	for _, word in string.split(text, " ") do
+		local next = if line == "" then word else line .. " " .. word
+		if line ~= "" and Core.TextWidth(next, role, size) * ratio > w then
+			lines += 1
+			line = word
+		else
+			line = next
+		end
+		if Core.TextWidth(line, role, size) * ratio > w then
+			return math.huge
+		end
+	end
+	return lines
+end
+
+-- Fits `text` to a label's box (STYLE_GUIDE §4.6): at its role size (`size`,
+-- design px before the phone boost) when it fits, else shrunk to fit, never
+-- below Core.FitFloor(); past that, with `lines` = 2, wrapped onto two lines
+-- at the largest size the box holds; only then cut with "…". Sets the text,
+-- TextSize and TextWrapped; returns true when the text shows whole.
+function Core.FitText(label: TextLabel, text: string, role: string, size: number?, lines: number?): boolean
+	local base = size or Tokens.TextStyle(role).size
+	local drawn = base * Core.TextBoost(role, base)
+	local floor = math.min(drawn, Core.FitFloor())
+	local w = label.Size.X.Offset * (1 - Core.FIT_SLACK)
+	local h = label.Size.Y.Offset
+	local full = Core.TextWidth(text, role, base)
+	Core.SetText(label, text)
+	label.TextScaled = false
+	label.TextWrapped = false
+	label.TextTruncate = Enum.TextTruncate.AtEnd
+	if full <= w then
+		label.TextSize = drawn
+		return true
+	end
+	local shrunk = drawn * w / full
+	if shrunk >= floor then
+		label.TextSize = math.floor(shrunk * 10) / 10
+		return true
+	end
+	if (lines or 1) >= 2 then
+		-- Two lines of about the same length (the word break that makes the
+		-- longer line shortest; no lone word on the second line), at the
+		-- largest size, in half-pixel steps, where both fit the box.
+		local words = string.split(text, " ")
+		local best, split = math.huge, nil
+		for k = 1, #words - 1 do
+			local first = Core.TextWidth(table.concat(words, " ", 1, k), role, base)
+			local second = Core.TextWidth(table.concat(words, " ", k + 1), role, base)
+			if math.max(first, second) < best then
+				best, split = math.max(first, second), k
+			end
+		end
+		if split then
+			local px = math.min(drawn, drawn * w / best)
+			px = math.floor(px * 2) / 2
+			if px >= floor and px * 2.5 * label.LineHeight <= h then
+				local shown = table.concat(words, " ", 1, split) .. "\n" .. table.concat(words, " ", split + 1)
+				Core.SetText(label, shown)
+				label.TextWrapped = true
+				label.TextSize = px
+				return true
+			end
+		end
+	end
+	label.TextSize = floor
+	return false
 end
 
 -- The width in design px of `text` in a type role (at `size`, or the role's).
@@ -225,6 +324,56 @@ function Core.TextWidth(text: string, role: string, size: number?): number
 	local ok, bounds = pcall(TextService.GetTextSize, TextService, shown, px, legacy, Vector2.new(10000, 10000))
 	local width = if ok and bounds then bounds.X else #shown * px * 0.6
 	return width * (Tokens.Data.weightWidth[spec.weight] or 1)
+end
+
+-- Dimming that keeps a part's own fade. Images and text labels rest at the
+-- transparency they were drawn with (the "picture missing" stand-in glyph at
+-- Art.STAND_IN_FADE, 0.6); a dim of `amount` composes with that rest value
+-- (1 − (1 − rest) × (1 − amount)) instead of overwriting it, so undimming
+-- returns the glyph to its fade, never to solid ink. The rest value is read
+-- from the part's KitRestFade attribute, else recorded from the part the first
+-- time it is dimmed (a fresh part, so its drawn transparency). Applies to
+-- `target` and every image and text label under it.
+--
+--   Kit.Core.Dim(slot.icon.root, if locked then 0.4 else 0)
+Core.REST_FADE = "KitRestFade"
+
+local function restFade(object: Instance, current: number): number
+	local rest = object:GetAttribute(Core.REST_FADE)
+	if type(rest) ~= "number" then
+		rest = current
+		object:SetAttribute(Core.REST_FADE, rest)
+	end
+	return rest
+end
+
+function Core.Dim(target: Instance?, amount: number?)
+	if target == nil then
+		return
+	end
+	local keep = 1 - math.clamp(amount or 0, 0, 1)
+	local parts = target:GetDescendants()
+	table.insert(parts, target)
+	for _, part in parts do
+		if part:IsA("ImageLabel") or part:IsA("ImageButton") then
+			local rest = restFade(part, part.ImageTransparency)
+			part.ImageTransparency = 1 - (1 - rest) * keep
+		elseif part:IsA("TextLabel") then
+			local rest = restFade(part, part.TextTransparency)
+			part.TextTransparency = 1 - (1 - rest) * keep
+		end
+	end
+end
+
+-- Sets the transparency a part rests at (what Core.Dim composes with), for a
+-- part whose fade is set after it is drawn.
+function Core.SetRestFade(object: Instance, rest: number)
+	object:SetAttribute(Core.REST_FADE, rest)
+	if object:IsA("ImageLabel") or object:IsA("ImageButton") then
+		object.ImageTransparency = rest
+	elseif object:IsA("TextLabel") then
+		object.TextTransparency = rest
+	end
 end
 
 -- A tiny signal for component events (Opened, Closed).

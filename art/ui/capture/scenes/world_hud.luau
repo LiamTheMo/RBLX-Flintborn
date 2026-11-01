@@ -84,7 +84,7 @@ do
 		title = "World Event",
 		timer = "6:12",
 		name = "Bloodroot Bloom",
-		description = "Rare · Rare plants have sprouted · NE, 312 m",
+		description = "Rare · Prized plants have sprouted · NE, 312 m",
 	}, "Vegetation")
 	hud.bottom:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hotbar(hud, {

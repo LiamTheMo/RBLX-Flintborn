@@ -2,7 +2,9 @@
 -- "TRIBE n" section header) listing up to the layout's row count of tribe-mates
 -- on this server, each a compact Kit.PlayerRow (headshot, name) with a small
 -- Kit health bar under the name. Long names shrink a little on bigger screens;
--- on phones and tablets (at the 9 px floor) they keep their size and end in "…".
+-- on phones and tablets (at the 9 px floor) they keep their size and the strip's
+-- cells widen for the longest name (up to the layout's cellMaxW; only a name
+-- longer than that ends in "…").
 -- Hidden while no tribe-mate is here. Display only; HudController feeds the
 -- members. On phones (the layout's "strip") the members sit side by side in
 -- one short card under the compass, with the tribe icon and count at its left,
@@ -16,7 +18,10 @@ PartyFrames.__index = PartyFrames
 
 function PartyFrames.new(parent: Instance, layout)
 	local cfg = Layout.Section(layout, "party")
-	local self = setmetatable({ cfg = cfg, rows = {}, shown = 0, shrink = not Layout.IsTouchScreen() }, PartyFrames)
+	local self = setmetatable(
+		{ cfg = cfg, rows = {}, shown = 0, cellW = cfg.cellW, shrink = not Layout.IsTouchScreen() },
+		PartyFrames
+	)
 	self.root = Instance.new("Frame")
 	self.root.Name = "Party"
 	self.root.BackgroundTransparency = 1
@@ -24,7 +29,7 @@ function PartyFrames.new(parent: Instance, layout)
 	Layout.Place(self.root, {
 		anchor = cfg.anchor,
 		pos = cfg.pos,
-		size = { PartyFrames.Width(cfg, 1), PartyFrames.Height(cfg, 1) },
+		size = { PartyFrames.Width(cfg, 1, cfg.cellW), PartyFrames.Height(cfg, 1) },
 	})
 	self.root.Parent = parent
 	return self
@@ -38,23 +43,43 @@ function PartyFrames.Height(cfg, count: number): number
 	return cfg.listTop + count * cfg.rowHeight + cfg.padBottom
 end
 
--- The panel's width for `count` members (a strip grows sideways).
-function PartyFrames.Width(cfg, count: number): number
+-- The panel's width for `count` members `cellW` wide each (a strip grows
+-- sideways; cellW defaults to the layout's).
+function PartyFrames.Width(cfg, count: number, cellW: number?): number
 	if cfg.strip then
-		return cfg.cellX + count * cfg.cellW + 10
+		return cfg.cellX + count * (cellW or cfg.cellW) + 10
 	end
 	return cfg.width
 end
 
+-- A strip cell's width for `members`' names: the layout's, widened so the
+-- longest name shows whole at its size beside the headshot (with the kit's
+-- fit slack), up to cellMaxW.
+function PartyFrames.CellWidth(cfg, members, count: number): number
+	if not cfg.strip then
+		return cfg.cellW
+	end
+	local need = 0
+	for index = 1, count do
+		local name = members[index].name or ""
+		need = math.max(need, Kit.Text.Width(name, "rowTitle", Kit.Core.TextFloor(15)) / (1 - Kit.Core.FIT_SLACK))
+	end
+	-- The cell's gap (8), the row's right margin (4) and the name's x
+	-- (headshot + 14).
+	local width = math.ceil(need) + 8 + 4 + cfg.portrait + 14
+	return math.clamp(width, cfg.cellW, cfg.cellMaxW or cfg.cellW)
+end
+
 -- Rebuilds the card for `count` rows (the plate is drawn at its size).
-function PartyFrames:_build(count: number)
+function PartyFrames:_build(count: number, cellW: number)
 	local cfg = self.cfg
+	self.cellW = cellW
 	if self.panel then
 		self.panel:Destroy()
 	end
 	table.clear(self.rows)
 	local h = PartyFrames.Height(cfg, count)
-	local width = PartyFrames.Width(cfg, count)
+	local width = PartyFrames.Width(cfg, count, cellW)
 	self.root.Size = UDim2.fromOffset(width, h)
 	self.panel = Kit.Panel.new(self.root, { name = "Panel", rect = { 0, 0, width, h }, variant = "card", pad = 0 })
 	local body = self.panel:Content()
@@ -71,7 +96,7 @@ function PartyFrames:_build(count: number)
 			zIndex = 8,
 		})
 		self.header = nil
-		w = cfg.cellW - 8
+		w = cellW - 8
 	else
 		self.countText = nil
 		self.header = Kit.SectionHeader.new(body, {
@@ -86,7 +111,7 @@ function PartyFrames:_build(count: number)
 	for index = 1, count do
 		local rx, y = x, cfg.listTop + (index - 1) * cfg.rowHeight
 		if cfg.strip then
-			rx, y = cfg.cellX + (index - 1) * cfg.cellW, 0
+			rx, y = cfg.cellX + (index - 1) * cellW, 0
 		end
 		local holder = Instance.new("Frame")
 		holder.Name = "Member" .. index
@@ -113,8 +138,9 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 	if count == 0 then
 		return
 	end
-	if count ~= self.shown then
-		self:_build(count)
+	local cellW = PartyFrames.CellWidth(self.cfg, members, count)
+	if count ~= self.shown or cellW ~= self.cellW then
+		self:_build(count, cellW)
 	end
 	if self.header then
 		self.header:SetCount(tostring(total or #members))
@@ -133,7 +159,7 @@ function PartyFrames:Set(members, instant: boolean?, total: number?)
 				-- PlayerRow names its root after the player (`name` is both).
 				name = member.name,
 				rect = if cfg.strip
-					then { 0, 0, cfg.cellW - 8, cfg.height }
+					then { 0, 0, self.cellW - 8, cfg.height }
 					else { 0, 0, cfg.header[3], cfg.rowHeight },
 				userId = member.userId,
 				compact = true,

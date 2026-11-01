@@ -18,6 +18,8 @@ workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
 UserInputService.MouseEnabled = false
+-- A phone's top bar: Roblox's menu and chat buttons take its left end.
+game:GetService("GuiService").TopbarInset = Rect.new(112, 0, W - 12, 58)
 workspace:SetAttribute("FlintbornPlaceRole", "World")
 game:GetService("Debris").AddItem = function() end
 
@@ -96,6 +98,18 @@ check(
 find("Transition").Visible = false
 
 player:SetAttribute("SaveStatus", "Saving")
+-- On touch the save tag sits in the top bar's free area, clear of the jump
+-- button (bottom right) and the thumbstick (bottom left).
+local saveHolder = gui:FindFirstChild("SaveStatus"):FindFirstChild("Holder", true)
+local saveScale = saveHolder.Parent:FindFirstChildWhichIsA("UIScale").Scale
+check(
+	saveHolder.Visible
+		and saveHolder.AnchorPoint.X == 1
+		and saveHolder.AnchorPoint.Y == 0.5
+		and math.abs(saveHolder.Position.Y.Offset * saveScale - 29) < 0.5
+		and math.abs(saveHolder.Position.X.Offset * saveScale - (W - 20)) < 0.5,
+	"the save tag sits in the top bar on touch"
+)
 events.TutorialChanged.OnClientEvent:Fire({
 	id = "Gather",
 	index = 3,

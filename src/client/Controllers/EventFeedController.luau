@@ -192,10 +192,14 @@ function EventFeedController.Start()
 			EventFeedController.Changed:Fire()
 		end
 	end)
+	-- The list's countdowns tick once a second while an event runs; with none
+	-- the list is already hidden (EventEnded redraws it), so the tick skips.
 	task.spawn(function()
 		while true do
 			task.wait(1)
-			refreshList()
+			if next(events) ~= nil then
+				refreshList()
+			end
 		end
 	end)
 end

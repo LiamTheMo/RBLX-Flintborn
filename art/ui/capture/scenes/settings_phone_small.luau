@@ -52,8 +52,40 @@ view.screen:Open()
 view.screen:Fit(667, 375, 58, 1)
 view:SetValues(SettingsRules.Resolve(nil))
 view:SetKeys(Keybinds.Resolve(nil), nil, nil, true)
+-- Section headers shrink to fit and never end in "…" (STYLE_GUIDE §4.6): each
+-- one's box holds the whole header at its full (boosted) size, so it needs no
+-- shrink at all.
+local TextService = game:GetService("TextService")
+local headersOk = true
+local function headers(gui, tag)
+	for _, item in gui:GetDescendants() do
+		if item.Name == "Header" and item:IsA("TextLabel") and item.Text ~= "" then
+			local shown = item.Visible
+			local node = item.Parent
+			while shown and node and node:IsA("GuiObject") do
+				shown = node.Visible
+				node = node.Parent
+			end
+			local need = TextService:GetTextSize(
+				item.Text,
+				item.TextSize,
+				Enum.Font.Merriweather,
+				Vector2.new(1e4, 1e4)
+			).X * 1.02
+			if shown and need > item.Size.X.Offset then
+				headersOk = false
+				print(("  FAIL header %s %q needs %.0f px, box %.0f"):format(tag, item.Text, need, item.Size.X.Offset))
+			end
+		end
+	end
+end
 for _, tab in SettingsWindow.TABS do
 	view:SelectTab(tab.id)
 	report(view.screen.gui, view.screen.scale.Scale, "settings_phone_small " .. tab.id)
+	headers(view.screen.gui, tab.id)
 	__dump(Players.LocalPlayer.PlayerGui, 667, 375)
+end
+print(if headersOk then "  ok every section header fits whole at its size" else "  FAIL a section header does not fit")
+if not headersOk then
+	error("settings_phone_small: a section header does not fit")
 end
