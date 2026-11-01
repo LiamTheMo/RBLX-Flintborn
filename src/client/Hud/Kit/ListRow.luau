@@ -27,7 +27,10 @@ ListRow.__index = ListRow
 -- icon (icon id), catalogId / itemId (item art instead), iconRect {x, y, w, h}
 -- or iconSize, textX, title, titleSize, subtitle, subtitleSize, subtitleHand
 -- (the handwritten face), titleY, subtitleY (line tops, px), value,
--- valueColor (token), valueSize, chevron,
+-- valueColor (token), valueSize, chevron, fitTitle (the title shrinks to fit
+-- its box down to the text floor instead of ending in "…": Core.FitText),
+-- titleLines (2: a fitted title may wrap onto two lines where the box is tall
+-- enough),
 -- trailing (width in px of an empty frame after the value: :Trailing()),
 -- rule ("hairline" default for "line"; a Divider variant or false),
 -- onPress(row), onLocked(row) (a press while locked), zIndex, name.
@@ -43,7 +46,17 @@ function ListRow.new(parent: Instance, props)
 	)
 	local role = if plated then plateRole else "row.line"
 	local base = Core.Root(parent, "ListRow", role, props, w, h)
-	local self = setmetatable({ root = base.root, base = base, variant = variant, w = w, h = h }, ListRow)
+	local self = setmetatable({
+		root = base.root,
+		base = base,
+		variant = variant,
+		w = w,
+		h = h,
+		fitTitle = props.fitTitle == true,
+		titleLines = props.titleLines or 1,
+		titleSize = props.titleSize or props.textSize,
+		fullTitle = props.title or "",
+	}, ListRow)
 	if plated then
 		self.plate = Art.Plate(base.visual, plateRole, w, h, { z = base.z })
 	elseif props.rule ~= false then
@@ -126,6 +139,7 @@ function ListRow.new(parent: Instance, props)
 	end
 	local hasSub = props.subtitle ~= nil
 	local titleRole = if variant == "line" then "rowLabel" else "rowTitle"
+	self.titleRole = titleRole
 	self.title = Core.Label(base.visual, {
 		name = "Title",
 		text = props.title or "",
@@ -170,16 +184,34 @@ function ListRow.new(parent: Instance, props)
 			self.control.hit.Active = false
 		else
 			-- A title cut short ("…", phones) shows whole in a tooltip.
-			local titleW = self.title.Size.X.Offset
-			local full = props.title or ""
-			self.titleCut = Text.Width(full, titleRole, props.titleSize or props.textSize) > titleW - 2
-			self.fullTitle = full
+			self:_measureTitle()
 			base.maid:Give(Tooltip.Attach(self, function()
 				return if self.titleCut then self.fullTitle else nil
 			end))
 		end
 	end
+	if self.fitTitle then
+		self:FitTitle()
+	end
 	return self
+end
+
+-- Whether the title is cut short at its box (it then shows in a tooltip).
+function ListRow:_measureTitle()
+	if self.fitTitle then
+		return
+	end
+	self.titleCut = Text.Width(self.fullTitle, self.titleRole, self.titleSize) > self.title.Size.X.Offset - 2
+end
+
+-- Fits a `fitTitle` row's title to its box again (after a screen moves or
+-- resizes the title); other rows only re-measure it for the tooltip.
+function ListRow:FitTitle()
+	if not self.fitTitle then
+		self:_measureTitle()
+		return
+	end
+	self.titleCut = not Core.FitText(self.title, self.fullTitle, self.titleRole, self.titleSize, self.titleLines)
 end
 
 -- The frame reserved by the `trailing` prop (a badge, a check), or nil.
@@ -207,13 +239,18 @@ function ListRow:_render(state: string)
 	end
 	local dim = drawn == "disabled" or drawn == "locked"
 	self.title.TextColor3 = Tokens.Color(if dim then "inkSoft" else "inkLabel")
-	if self.icon and self.icon:IsA("ImageLabel") then
-		(self.icon :: ImageLabel).ImageTransparency = if dim then 0.4 else 0
-	end
+	-- The icon (an item's art, or its faded stand-in glyph) keeps its own fade.
+	Core.Dim(self.icon, if dim then 0.4 else 0)
 end
 
 function ListRow:SetTitle(text: string)
-	Core.SetText(self.title, text)
+	self.fullTitle = text
+	if self.fitTitle then
+		self:FitTitle()
+	else
+		Core.SetText(self.title, text)
+		self:_measureTitle()
+	end
 end
 
 function ListRow:SetSubtitle(text: string)

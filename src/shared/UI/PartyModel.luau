@@ -7,6 +7,8 @@
 --   { party = nil | {id, leader, createdAt, members = {{userId, name}},
 --     invited = {userId}}, invites = {{partyId, from, fromUserId}}, maxSize }
 
+local ReasonText = require(script.Parent.ReasonText)
+
 local PartyModel = {}
 
 PartyModel.MAX_SIZE = 8
@@ -264,9 +266,10 @@ local REASONS = {
 	RequestFailed = "The server did not answer. Try again.",
 }
 
--- Player-facing text for a party refusal code.
+-- Player-facing text for a party refusal code: the party's own wording, else
+-- the shared line for the code (ReasonText), never the raw code.
 function PartyModel.ReasonText(code: string?): string
-	return REASONS[code or "RequestFailed"] or "The party could not be changed right now."
+	return REASONS[code or "RequestFailed"] or ReasonText.Sentence(code)
 end
 
 return PartyModel

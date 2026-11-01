@@ -64,6 +64,14 @@ local L = {
 	rowTextXPhone = 70,
 	-- A row note too long for one line wraps onto two under a raised title.
 	rowTwoLine = { titleY = 4, titleH = 24, subtitleY = 26, subtitleH = 40 },
+	-- Anything longer (a name that needs two lines even shrunk to the text
+	-- floor, a note of three lines, a boosted note on a phone) stacks the
+	-- lines from rowStackTop and the row grows to hold them (rowStackPad
+	-- under the last line): nothing ends in "…". Line heights per px of text.
+	rowStackTop = 5,
+	rowStackPad = 6,
+	titleLineH = 1.27,
+	noteLineH = 1.37 * 0.85,
 	-- The Permanent mark on a conversion's icon corner (as a slot's star).
 	rowMark = { 60, 2, 20, 20 },
 	-- Room the lock takes at a locked row's right.
@@ -109,6 +117,10 @@ local L = {
 		job = { 782, 472, 276, 24 },
 		bar = { 782, 502, 190, 20 },
 		stop = { 984, 492, 74, 40 },
+		-- Phones and touch tablets: the boosted "Stop" needs a wider plate, so
+		-- the bar gives it room.
+		barPhone = { 782, 502, 156, 20 },
+		stopPhone = { 950, 490, 108, 44 },
 		stationsHead = { 782, 538, 276, 26 },
 		stations = { 782, 564, 276, 24 },
 	},
@@ -135,15 +147,11 @@ local function listHeight(count: number, rowH: number, gap: number): number
 end
 
 -- Dims the big item picture for a locked recipe, as ListRow dims its icon.
+-- Kit.Dim composes with the picture's own fade, so an item without art keeps
+-- its faded stand-in glyph (Art.STAND_IN_FADE, STYLE_GUIDE §6.5).
 local function dimIcon(icon, dim: boolean)
-	local image = icon and icon.image
-	if image == nil then
-		return
-	end
-	if image:IsA("ImageLabel") then
-		(image :: ImageLabel).ImageTransparency = if dim then 0.4 else 0
-	elseif image:IsA("TextLabel") then
-		(image :: TextLabel).TextTransparency = if dim then 0.4 else 0
+	if icon then
+		Kit.Dim(icon.root, if dim then 0.4 else 0)
 	end
 end
 
@@ -245,7 +253,8 @@ function RecipeWindow.new(props)
 		caps = true,
 		zIndex = z,
 	}, L.nameSize)
-	self.picture = Kit.ItemIcon.new(v, { name = "Picture", rect = L.picture, zIndex = z })
+	-- A hero box: the item fills it (its hero copy keeps it sharp).
+	self.picture = Kit.ItemIcon.new(v, { name = "Picture", rect = L.picture, zIndex = z, maxScale = false })
 	self.description = label(v, {
 		name = "Description",
 		rect = L.description,
@@ -356,10 +365,14 @@ function RecipeWindow:_buildCraftingExtras(v, z: number)
 	local c = L.craft
 	label(v, { name = "SmeltHead", rect = c.smeltHead, text = "Smelting", role = "sectionHeader", zIndex = z }, 18)
 	self.jobText = label(v, { name = "Job", rect = c.job, text = "", role = "bodySoft", zIndex = z })
-	self.jobBar = Kit.Bar.new(v, { name = "JobBar", rect = c.bar, fill = "orange", frame = "track", zIndex = z })
+	local phone = Kit.Scale.IsSmallTouch()
+	self.jobBar = Kit.Bar.new(
+		v,
+		{ name = "JobBar", rect = if phone then c.barPhone else c.bar, fill = "orange", frame = "track", zIndex = z }
+	)
 	self.stop = Kit.Button.new(v, {
 		name = "Stop",
-		rect = c.stop,
+		rect = if phone then c.stopPhone else c.stop,
 		label = "Stop",
 		variant = "secondary",
 		sizeClass = "s",
@@ -493,23 +506,72 @@ end
 
 -- Rendering ---------------------------------------------------------------------------------
 
-function RecipeWindow:_rowFor(entry)
+-- How a recipe row lays out `entry`: {h, width, kind ("one" | "two" |
+-- "stack"), and for a stack the title's and note's lines and boxes}. The
+-- lines stop short of a locked row's lock.
+function RecipeWindow:_rowLayout(entry)
+	local w, h = L.recipeRow[1], L.recipeRow[2]
+	local textX = if self.phone then L.rowTextXPhone else L.rowTextX
+	local width = w - 14 - textX - (if entry.locked then L.rowLockRoom else 0)
+	local room = width * (1 - Kit.Core.FIT_SLACK)
+	local note = entry.subtitle or ""
+	local noteSize = if self.phone then L.rowSubtitlePhone else L.rowSubtitleSize
+	local noteDrawn = noteSize * Kit.Core.TextBoost("subtitleHand", noteSize)
+	local titleSize = L.rowTitleSize
+	local titleDrawn = titleSize * Kit.Core.TextBoost("rowTitle", titleSize)
+	-- The name takes one line when it fits shrunk to the floor, else two.
+	local floorRatio = math.min(titleDrawn, Kit.Core.FitFloor()) / titleDrawn
+	local titleLines = if Kit.Text.Width(entry.name or "", "rowTitle", titleSize) * floorRatio <= room then 1 else 2
+	local noteLines = if note == "" then 1 else Kit.Core.LineCount(note, "subtitleHand", noteSize, 1, width)
+	noteLines = math.min(noteLines, 4)
+	local layout = { h = h, width = width, titleLines = titleLines, noteLines = noteLines }
+	if titleLines == 1 and noteLines == 1 then
+		layout.kind = "one"
+		return layout
+	end
+	if titleLines == 1 and noteLines == 2 and not self.phone then
+		layout.kind = "two"
+		return layout
+	end
+	layout.kind = "stack"
+	local titleH = math.ceil(titleDrawn * L.titleLineH * titleLines)
+	local noteH = math.ceil(noteDrawn * L.noteLineH * noteLines) + 2
+	layout.titleY = L.rowStackTop
+	layout.titleH = titleH
+	layout.noteY = L.rowStackTop + titleH
+	layout.noteH = noteH
+	layout.h = math.max(h, L.rowStackTop + titleH + noteH + L.rowStackPad)
+	return layout
+end
+
+function RecipeWindow:_rowFor(entry, layout)
 	local row = self.rows[entry.id]
-	if row then
+	if row and row.h == layout.h then
 		return row
+	elseif row then
+		-- The row's plate is drawn at its height: a taller or shorter layout
+		-- builds it again.
+		row:Destroy()
+		self.rows[entry.id] = nil
 	end
 	local function choose()
 		self:Select(entry.id, true)
 	end
+	local icon = table.clone(if self.phone then L.rowIconPhone else L.rowIcon)
+	icon[2] += math.floor((layout.h - L.recipeRow[2]) / 2)
 	row = Kit.ListRow.new(self.recipeList:Content(), {
 		name = entry.id,
-		size = L.recipeRow,
+		size = { L.recipeRow[1], layout.h },
 		variant = "soft",
 		itemId = entry.output,
-		iconRect = if self.phone then L.rowIconPhone else L.rowIcon,
+		iconRect = icon,
 		textX = if self.phone then L.rowTextXPhone else L.rowTextX,
 		title = entry.name,
 		titleSize = L.rowTitleSize,
+		-- A long name shrinks to fit (two lines where the row stacks them)
+		-- rather than ending in "…".
+		fitTitle = true,
+		titleLines = 2,
 		-- The mockup's row descriptions are handwritten notes (D13).
 		subtitle = entry.subtitle or "",
 		subtitleHand = true,
@@ -520,9 +582,11 @@ function RecipeWindow:_rowFor(entry)
 	})
 	-- A Permanent conversion: the star mark on the icon's corner.
 	if entry.kind == "Permanent" then
+		local mark = table.clone(L.rowMark)
+		mark[2] += icon[2] - (if self.phone then L.rowIconPhone else L.rowIcon)[2]
 		Kit.Icon.new(row.base.visual, {
 			name = "PermanentMark",
-			rect = L.rowMark,
+			rect = mark,
 			icon = "star",
 			zIndex = row.base.z + 3,
 		})
@@ -535,31 +599,36 @@ function RecipeWindow:_rowFor(entry)
 	return row
 end
 
--- One line for a note that fits, else two under a raised title. A locked
--- row's lines stop short of its lock.
-function RecipeWindow:_fitSubtitle(row, text: string, locked: boolean)
+-- Places a row's name and note for its layout (RecipeWindow:_rowLayout): one
+-- line each; a two-line note under a raised title; or the stacked lines.
+function RecipeWindow:_fitSubtitle(row, layout)
 	local subtitle = row.subtitle
-	local size = if self.phone then L.rowSubtitlePhone else L.rowSubtitleSize
-	local width = row.subtitleRect[2].X.Offset - (if locked then L.rowLockRoom else 0)
-	-- Phones: the boosted note keeps one line (cut with "…") so it stays inside
-	-- the card; desktop wraps a long note under a raised title.
-	local wide = not self.phone and Kit.Text.Width(text, "subtitleHand", size) > width
-	local two = L.rowTwoLine
-	subtitle.TextWrapped = wide
-	if wide then
-		row.title.Position = UDim2.fromOffset(row.titleRect[1].X.Offset, two.titleY)
-		row.title.Size = UDim2.fromOffset(width, two.titleH)
-		subtitle.Position = UDim2.fromOffset(row.subtitleRect[1].X.Offset, two.subtitleY)
-		subtitle.Size = UDim2.fromOffset(width, two.subtitleH)
-		subtitle.TextYAlignment = Enum.TextYAlignment.Top
-		subtitle.LineHeight = 0.85
-	else
-		row.title.Position, row.title.Size = row.titleRect[1], row.titleRect[2]
+	local width = layout.width
+	local x = row.titleRect[1].X.Offset
+	subtitle.TextWrapped = layout.kind ~= "one"
+	if layout.kind == "one" then
+		row.title.Position = row.titleRect[1]
+		row.title.Size = UDim2.fromOffset(width, row.titleRect[2].Y.Offset)
 		subtitle.Position = row.subtitleRect[1]
 		subtitle.Size = UDim2.fromOffset(width, row.subtitleRect[2].Y.Offset)
 		subtitle.TextYAlignment = Enum.TextYAlignment.Center
 		subtitle.LineHeight = 1
+	else
+		local two = L.rowTwoLine
+		local titleY, titleH = two.titleY, two.titleH
+		local noteY, noteH = two.subtitleY, two.subtitleH
+		if layout.kind == "stack" then
+			titleY, titleH, noteY, noteH = layout.titleY, layout.titleH, layout.noteY, layout.noteH
+		end
+		row.title.Position = UDim2.fromOffset(x, titleY)
+		row.title.Size = UDim2.fromOffset(width, titleH)
+		subtitle.Position = UDim2.fromOffset(row.subtitleRect[1].X.Offset, noteY)
+		subtitle.Size = UDim2.fromOffset(width, noteH)
+		subtitle.TextYAlignment = Enum.TextYAlignment.Top
+		subtitle.LineHeight = 0.85
 	end
+	-- The title's box may have changed: fit the name to it again.
+	row:FitTitle()
 end
 
 function RecipeWindow:_renderList()
@@ -573,14 +642,17 @@ function RecipeWindow:_renderList()
 		onRow = onRow or row.control.hit == selected
 	end
 	local used = {}
+	local height = 0
 	for index, entry in list do
-		local row = self:_rowFor(entry)
+		local layout = self:_rowLayout(entry)
+		local row = self:_rowFor(entry, layout)
 		used[entry.id] = true
 		row.root.LayoutOrder = index
 		row:SetTitle(entry.name)
 		row:SetSubtitle(entry.subtitle or "")
-		self:_fitSubtitle(row, entry.subtitle or "", entry.locked == true)
+		self:_fitSubtitle(row, layout)
 		row:SetState(if entry.locked then "locked" else "normal")
+		height += layout.h + (if index > 1 then L.recipeGap else 0)
 	end
 	for id, row in self.rows do
 		if not used[id] then
@@ -588,7 +660,7 @@ function RecipeWindow:_renderList()
 			self.rows[id] = nil
 		end
 	end
-	self.recipeList:SetContentHeight(listHeight(#list, L.recipeRow[2], L.recipeGap))
+	self.recipeList:SetContentHeight(if #list > 0 then height + 14 else 0)
 	-- Keep the chosen recipe when it is still listed, else take the first.
 	local keep = self.selectedId and used[self.selectedId]
 	local first = list[1]
@@ -626,6 +698,8 @@ function RecipeWindow:_renderMaterials()
 				textX = L.materialTextX,
 				title = material.name,
 				titleSize = L.materialTitleSize,
+				-- A long name shrinks to fit rather than ending in "…".
+				fitTitle = true,
 				value = tostring(material.quantity),
 				valueSize = L.materialValueSize,
 				-- Selectable (gamepad reaches the counts); a press picks the

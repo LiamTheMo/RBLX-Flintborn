@@ -83,9 +83,6 @@ local ListWindow = require(Client.Hud.ListWindow)
 local ProgressionController = require(Client.Controllers.ProgressionController)
 ProgressionController.Start()
 folder.ProgressionChanged.OnClientEvent:Fire(view)
-folder.XpGained.OnClientEvent:Fire({ amount = 40, reason = "Gathered" })
-ProgressionController.Toggle()
-local gui = player.PlayerGui:FindFirstChild("FlintbornProgress")
 local function check(cond, msg)
 	print((cond and "  ok " or "  FAIL ") .. msg)
 	if not cond then
@@ -95,6 +92,29 @@ end
 local function find(root: Instance?, name: string): Instance?
 	return root and root:FindFirstChild(name, true)
 end
+-- The toast lines showing now, as "TITLE / line".
+local function toasts(): { string }
+	local out = {}
+	local lane = player.PlayerGui:FindFirstChild("KitToasts")
+	for _, item in if lane then lane:GetDescendants() else {} do
+		if item.Name == "Line" and item:IsA("TextLabel") then
+			local title = item.Parent and item.Parent:FindFirstChild("Title")
+			table.insert(out, (if title then title.Text else "") .. " / " .. item.Text)
+		end
+	end
+	return out
+end
+folder.XpGained.OnClientEvent:Fire({ amount = 40, reason = "Gathered" })
+check(find(player.PlayerGui, "Popup") ~= nil, "an XP pop-up shows above the XP bar")
+ProgressionController.Toggle()
+local gui = player.PlayerGui:FindFirstChild("FlintbornProgress")
+check(find(player.PlayerGui, "Popup") == nil, "opening a window lifts the pop-up off the lane under its veil")
+check(table.find(toasts(), "EXPERIENCE / +40 XP · Gathered") ~= nil, "the gain moves to the toast lane")
+folder.XpGained.OnClientEvent:Fire({ amount = 120, reason = "Quest", levelUp = true })
+check(
+	table.find(toasts(), "LEVEL UP / +120 XP · Quest") ~= nil,
+	"a level-up over a window is a toast that says it once"
+)
 local function press(component: Instance?)
 	local hit = component and component:FindFirstChild("Hit")
 	assert(hit, "nothing to press")
@@ -118,7 +138,6 @@ check(find(gui, "Mining") ~= nil, "masteries are listed")
 check(find(find(gui, "Mining"), "Bar"):GetAttribute("KitValue") == 0.3, "a mastery bar shows its real fraction")
 check(find(find(gui, "Crafting"), "Done") ~= nil, "a finished mastery shows a tick")
 check(find(find(gui, "Mining"), "Done") == nil, "a mastery in progress shows its bar, no ring")
-check(find(player.PlayerGui, "Popup") ~= nil, "an XP pop-up shows")
 press(find(gui, "Perks"))
 press(find(find(gui, "Scholar"), "Buy"))
 check(dialog() ~= nil and #calls == 0, "Buy asks first")

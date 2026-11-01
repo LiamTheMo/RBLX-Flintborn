@@ -26,9 +26,9 @@ PlayModel.RISK_ORDER = { "Low", "Medium", "High", "Extreme" }
 
 PlayModel.TITLE_CHECK = "Take these into the run?"
 PlayModel.TITLE_UNREAD = "Could not read your backpack"
-PlayModel.LINE_AT_RISK = "Everything except ★ Permanent items can be lost in the run."
+PlayModel.LINE_AT_RISK = "Everything except Permanent items can be lost in the run."
 PlayModel.LINE_UNREAD =
-	"The item list did not load. Everything you carry except ★ Permanent items can be lost in the run."
+	"The item list did not load. Everything you carry except Permanent items can be lost in the run."
 PlayModel.LINE_VAULT = "Items in your vault always stay safe."
 PlayModel.MEMBER_CAPTION = "The party leader starts the run."
 
@@ -179,12 +179,13 @@ function PlayModel.Members(view, me): { { userId: number, name: string, leader: 
 	return rows
 end
 
--- One line per item in the deploy check: "★ Stone Axe", "• Wood ×20".
+-- One line per item in the deploy check: "• Stone Axe (Permanent)", "• Wood ×20"
+-- (plain words: Merriweather has no star glyph, STYLE_GUIDE §1.3).
 function PlayModel.ItemLine(item): string
 	local def = ItemCatalog.Get(item.catalogId)
 	local name = def and def.name or tostring(item.catalogId)
 	local count = if item.quantity and item.quantity > 1 then " ×" .. item.quantity else ""
-	return (if item.permanent then "★ " else "• ") .. name .. count
+	return "• " .. name .. (if item.permanent then " (Permanent)" else "") .. count
 end
 
 -- What Play asks before deploying (GDD Q155), or nil to deploy at once:

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SPRITES = ROOT / "art" / "ui" / "sprites"
 FONTS = ROOT / "art" / "ui" / "fonts"
 IDS = json.loads((ROOT / "src" / "shared" / "UI" / "UiAssetIds.json").read_text(encoding="utf-8"))
-BY_ID = {str(v): k for k, v in IDS.items()}
+BY_ID = {str(v): k for k, v in IDS.items() if v}
 SS = 2  # supersampling for anti-aliased shapes
 
 # Font files per (family, weight class). Roblox draws Merriweather Heavy

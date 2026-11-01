@@ -1,6 +1,6 @@
 -- The lobby's always-on HUD (GDD §11, §25; docs/ui/LobbyScreen.md, ARCHITECTURE
--- §4.1): the player card, Coins, Gems and Settings, the menu tiles, the Party
--- panel, the XP bar and the hotbar that shows the deploy loadout, drawn by
+-- §4.1): Coins, Gems and Settings, the menu tiles, the Party panel, the XP bar
+-- and the hotbar that shows the deploy loadout, drawn by
 -- Hud/Screens/LobbyHud from the shared Kit. There is no Enter button or server
 -- choice here: the Play tile opens the Play window, which deploys.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
@@ -8,8 +8,9 @@
 --
 -- Everything acts through the existing controllers: the tiles open the
 -- Inventory (VaultController), Play (PlayController), Quests (JournalController),
--- Shop (WalletController), Forge and Trade; the card opens Progress, the pills the
--- Shop, the gear Settings, the Party panel the Party window (PartyController).
+-- Shop (WalletController), Forge and Trade; the level/XP bar opens Progress
+-- (ProgressionController), the pills the Shop, the gear Settings, the Party
+-- panel the Party window (PartyController).
 
 local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
@@ -148,6 +149,9 @@ local function build()
 			PartyController.Answer(partyId, accept)
 		end,
 		onSlot = openInventory,
+		onProgress = function()
+			ProgressionController.Toggle()
+		end,
 	})
 	ProgressionController.MountPopups(hud.popups)
 	gui.Parent = player:WaitForChild("PlayerGui")

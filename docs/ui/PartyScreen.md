@@ -278,3 +278,18 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
   value ends in "…" so "Party Leader" keeps its room (R12).
 - **Party Details icon**: the book glyph (the "!" read as a warning, V15).
 - Opens with the gamepad flag when the last input is a gamepad (R6).
+
+## Final audit fixes
+
+- **List section headings** in the invite column (INVITATIONS, PLAYERS) are
+  drawn like the window's column headings: a flat ink glyph (`ink:people`,
+  `ink:magnifier`) before the capitals and the ink rule at their foot.
+- **Phones and touch tablets**: every member row, the leader's included, is
+  64 tall (`PartyWindow.FRAMES_PHONE`; the leader keeps the regular portrait
+  there), so the boosted name and "LV." lines do not crowd and the list reads
+  at one pitch; the Empty Slot rows take the same 64. Desktop keeps the
+  mockup's 74 / 52.4.
+- **Gamepad**: selection starts on the window's first control in reading
+  order (`Kit.Modal.FirstControl`: the first member row, else the invite
+  column), not on the footer CLOSE; `Open("invite")` still starts on the first
+  invitation or the search box.

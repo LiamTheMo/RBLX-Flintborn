@@ -33,7 +33,7 @@ local calls = {}
 local vault = {
 	backpack = {
 		{ key = "b1", catalogId = "Redberry", name = "Redberry", quantity = 3, tradeable = true },
-		{ key = "b2", catalogId = "StoneSpear", name = "★ Stone Spear", tradeable = true, permanent = true },
+		{ key = "b2", catalogId = "StoneSpear", name = "Stone Spear", tradeable = true, permanent = true },
 	},
 	materials = {
 		{ catalogId = "Amethyst", name = "Amethyst", quantity = 24 },
@@ -210,7 +210,7 @@ list.CanvasPosition = Vector2.new(0, 0)
 session.mine = {
 	items = {
 		{ key = "b1", name = "Redberry", quantity = 3 },
-		{ key = "b2", name = "★ Stone Spear" },
+		{ key = "b2", catalogId = "StoneSpear", name = "Stone Spear", permanent = true },
 		{ key = "mat:Amethyst", name = "Amethyst", quantity = 10 },
 	},
 	gems = 25,
@@ -218,6 +218,14 @@ session.mine = {
 session.locked = { mine = true, theirs = true }
 session.confirmAt = workspace:GetServerTimeNow() - 1
 changed.OnClientEvent:Fire(session)
+-- A Permanent item is marked with the star art, never a star in its name
+-- (Merriweather has no star glyph).
+local starred, starText = false, false
+for _, part in find(gui, "Left"):GetDescendants() do
+	starred = starred or (part.Name == "Permanent" and part.Visible)
+	starText = starText or (part:IsA("TextLabel") and string.find(part.Text, "★", 1, true) ~= nil)
+end
+check(starred and not starText, "a Permanent item in the offer shows the star art, not a star glyph")
 press(find(find(gui, "Buttons"), "Confirm"))
 check(dialog() ~= nil, "Confirm asks first")
 centre(dialog())

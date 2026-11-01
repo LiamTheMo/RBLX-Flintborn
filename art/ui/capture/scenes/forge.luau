@@ -238,6 +238,25 @@ check(
 	window.rows.PermanentIronPickaxe.root.LayoutOrder < window.rows.PermanentWoodenSpear.root.LayoutOrder,
 	"conversions for vault gear come first"
 )
+-- Names shrink to fit (two lines where a row stacks them), notes wrap inside
+-- their card: no recipe or material row ends in "…".
+do
+	local whole = true
+	for id, row in window.rows do
+		local sub = row.subtitle
+		if row.titleCut or sub.Position.Y.Offset + sub.Size.Y.Offset > row.h then
+			whole = false
+			print("  cut: recipe " .. id)
+		end
+	end
+	for id, row in window.materialRows do
+		if row.titleCut then
+			whole = false
+			print("  cut: material " .. id)
+		end
+	end
+	check(whole, "every recipe and material row shows its name and note whole")
+end
 __dump(player.PlayerGui, W, H, BACKGROUND)
 
 -- 8 confirmation -------------------------------------------------------------------------

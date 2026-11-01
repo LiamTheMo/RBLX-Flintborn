@@ -196,13 +196,17 @@ function JournalWindow:_entriesPage(v: Frame)
 	}, page)
 	self.detail = detail
 	self.illustration = Kit.Icon.new(detail, { name = "Illustration", rect = { 466, 112, 197, 122 }, zIndex = Z })
+	-- Shrinks to fit, and a long heading ("Gather 100 times in the Ancient
+	-- Grove") wraps onto a second line rather than shrinking past the 9 px
+	-- floor on phones; a short one keeps one line at the largest size.
 	self.heading = Kit.Text.new(detail, {
 		name = "Heading",
-		rect = { 679, 112, 350, 50 },
+		rect = { 679, 108, 350, 54 },
 		text = "",
 		role = "detailTitle",
 		textSize = 36,
 		scaled = true,
+		wrap = true,
 		zIndex = Z,
 	})
 	-- Shrinks to fit its box (never into the OBJECTIVES rule below it) when a
@@ -459,6 +463,8 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		textX = 119,
 		title = entry.title,
 		titleSize = 19,
+		-- A long title shrinks to fit rather than ending in "…".
+		fitTitle = true,
 		titleY = QUEST_TEXT_Y[1],
 		subtitle = entry.subtitle,
 		subtitleSize = if phone then 16 else 15,
