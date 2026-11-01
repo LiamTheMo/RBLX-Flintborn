@@ -443,3 +443,11 @@ Skill vs design doc / repo (design doc wins, reported):
 - 2026-10-31: 057 Ancient Tree built by a parallel modeller: a 32-stud monarch tree with a twisted eight-strand bell trunk, a front slit and pointed back arch into a real cavity, eight buttress roots, four bare forked limbs, and a crown of eight clumps each skinned as lumpy leaf clusters (core is the foliage), with hanging lime strands, slate slabs and rocks. R1 FAIL 6 (plate crown), budget block on cards, crown rebuilt as lump clusters, R2 PASS 7.
 - 2026-10-31: 061 Meadow Herb built by a parallel modeller: a 2.2-stud daisy plant with three five-petal heads at fixed growth facings (broad thick blunt petals, chunky gold beads, flared cups) on crooked hex stems over a rosette of 17 thick ridged kite leaves round a hidden hub; small-prop extended class, 1338 tris. R1 PASS 8 on the first round.
 - 2026-10-31: 060 Broadleaf Fern built by a parallel modeller: a 2.9-stud fern of eight V-folded lobed frond blades on six stalks (two tall dark, arching lime with dark forks), a mound of drooping curtain leaves to the ground, a root crown with seven cut-end roots, seven warm rocks (two tall sage-stained ones tucked under the back skirt) and sprigs. R1 FAIL 5 (bare tall rocks, thin back skirt), R2 PASS 7.
+- 2026-11-01: PAUSED at the owner's request. In-progress work is committed but not yet passed:
+  - 062 Ground Scatter: R1 FAIL 6 (four petioles cut off from their leaves; pinecone top reads as a lid). Fix round 1 was in progress in `m062.py`; resume by re-running `build()` and finishing the fix list in the spec.
+  - 063 Hanging Vine: R1 FAIL 6 (clusters edge-on between the eight test views; LeafCluster part layout). Fix round 1 was in progress in `m063.py`.
+  - 064 A-Frame Tent: stage 1 modelling in progress (`m064.py` partly written, not yet built cleanly).
+  - 065 Wildflowers: stage 1 just started (`m065.py` partly written).
+  - 066 Canvas Shelter: studied with decisions; not started.
+  - 067 Table and Seating: study started, no spec written yet.
+  - Passed since the last PR (#98): 060 and 061. They are on `feat/world-kit-rebuild`, not yet merged into v0.18.

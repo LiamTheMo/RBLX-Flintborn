@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/063.png` (1024 × 1536 px). INDEX.md row 63: "Flintborn hanging vine model
 study". The sheet's own header reads **"PAGE 59/132"** (top left), title **"HANGING VINE"**, footer "FLINTBORN —
 INDIVIDUAL MODEL STUDY" (our number is INDEX's 063, §3.1).
-Builder: `art/blender/kit/mcp/m063.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m063.py` → `build()`. Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -84,7 +84,7 @@ palette / notes panel y 1347–1491, divider x 484; footer rule y 1512.
     whole frame there as "stone").
 
 **Scratch study material** (no Blender) in
-`C:\Users\Orang\AppData\Local\Temp\claude\D--Projects-Roblox-RBLX-Flintborn\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m063_study\`.
+`<temp>\...\scratchpad\m063_study\`.
 Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `cls`, `gtone`, `clsimg`, `hsv`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `probe2.py` (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw.py` (swatches), `man.py` (manifest
@@ -874,3 +874,347 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - The vine bark is warm brown, not red.
     - The pad stone is warm beige, never lavender.
 14. **Budget.** Light full asset: hero ceiling 2500 (plan 1970–2300), every part under 1000.
+
+## Stage 1 — Modelling (modeller, 2026-10-31)
+
+Builder `art/blender/kit/mcp/m063.py` → `build()`; work file `art/blender/assets/kit/wip/M063.blend` (background Blender,
+port 9882). Every exploded-view part has its own function and the hero is assembled from the same functions:
+`pad_geom()` (pad), `stub_geom()`, `strand_geom()` (the twisted pair), `spur()`, `leaf_pts()` (one leaf), `cluster_geom()`
+(stalk + leaves), `single_geom()`, `tendril_geom()`; parts `part_pad`, `part_segment`, `part_fork`, `part_cluster`.
+
+**What was built.**
+- **Pad:** a convex hull of 29 points (a footprint of 8 with chamfered corners, a mid-height fold on the front and side
+  faces, a top-edge ring and an inset top whose facets slope down to the front-left), flat back on y = 0 (max |y|
+  0.0000) and flat underside at z 5.75. The **socket groove** is cut by one exact boolean: a prism x ±0.207, back wall
+  y −0.766, open at the bottom and the front, its top a slope parallel to the stub's cut, 0.02 above it. Two V crack
+  creases (front face, top x 0.45 → bottom x 0.70; across the right face at z ≈ 6.7), each a 0.08 strip pushed in 0.03.
+- **Stub:** 6-sided Ø 0.39, one flat facing −Y, z 5.55 → 7.31 with the 35° oblique cut facing up-forward and a 0.06
+  band under the cut; the bottom flares to Ø 0.54 so both strand tops sit inside it (deviation 7). Its sides sit 0.012
+  off the groove walls and its back flat 0.010 off the groove's back wall (a socket fit, no boolean).
+- **Strands A / B:** 6-sided tubes Ø 0.24 (taper to 0.12 below z 1.5, pointed tips at z ≈ 0.26), each centred
+  r·cos30 + 0.003 (+0–0.008 jitter) off the S-swaying axis (Catmull-Rom through spec 2.2's stations), flats facing each
+  other, a right-handed twist with a full turn every 2.2 (crossings every 1.1), a mitred station **every 45°** (19
+  pieces each). Their tops sit 0.04 into the stub's bottom cap. Tube sides are emitted as triangles with a fixed
+  diagonal, so the placement guard tests exactly the faces that ship (twisted quads are far from planar).
+- **Leaves:** one closed-slab function: a 12-point broad fig / grape outline (pointed main lobe, two broad side lobes
+  with blunt two-point ends, small basal lobes, a heart notch), 0.055 thick, a raised midrib and side-lobe veins, a
+  gentle cup and pleat; top 18 tris, underside ear-clipped 10, rim 24 = **52 tris**.
+- **Clusters** (9: J1, J2, C1–C7): a 3-sided stalk from a seat 0.02 inside the wood (stub, strand or the spur's end), out
+  and down 25°, then along the cluster normal n0 through its leaves, which are stacked 0.08–0.20 apart along n0 and
+  each threaded on it (the stalk axis passes 0.05 inside the leaf from its notch, so every leaf touches its stalk).
+  Layers stack away from the rope: forward for clusters in front of it, back toward the wall for clusters behind it,
+  the centre leaf always outermost. Side leaves at ±80–100° from straight down, the centre leaf hanging.
+- **Singles** S1, S3 on short 3-sided stalks; **tendrils** T1–T3: 3-sided green tubes, out and down, then one shrinking
+  curl; **fork spur** on strand A at z 3.6, 45° from vertical toward az 230, Ø 0.18 → 0.15, flat cut end; C3 hangs from
+  its end.
+- **Placement guard:** every candidate (stalk + leaves, single, tendril) is tested against everything already placed
+  (triangle intersections; leaf verts within 0.006; leaf centre inside the pad; any vert at y > −0.01). Variants are tried
+  in order (stalk azimuth ±12 / 24 — the leaves' facing never turns — stalk length ×1.2 / 0.85, size ×0.93 / 0.86,
+  height ±0.12 / 0.25). A piece that cannot fit is dropped and reported, never forced. Final variants: C2 az −24 / size
+  0.93; C4 stalk 0.85 / size 0.93; J2 stalk 1.2 / size 0.93; S1, S3 small shifts; nothing dropped.
+
+**Final layout** (z = stalk root height; spans = width across the side lobes):
+
+| Cluster | Host | z | Stalk az | n0 az | Spans | Role |
+| --- | --- | --- | --- | --- | --- | --- |
+| J1 | stub | 6.10 | 222 | 247 | 1.24 / 1.13 / 1.08 | under |
+| J2 | stub | 6.60 | 318 | 292 | 1.19 / 1.08 / 1.03 (×0.93) | outer |
+| C1 | strand | 4.95 | 35 | 337 | 1.19 / 1.13 / 1.07 | under |
+| C2 | strand | 4.50 | 318 | 337 | 0.65 / 0.59 (×0.93) | young |
+| C3 | spur end | ≈ 3.85 | 232 | 247 | 1.19 / 1.08 / 1.03 | outer |
+| C4 | strand | 2.65 | 58 | 295 | 1.10 / 1.04 / 0.98 (×0.93) | under |
+| C5 | strand | 2.00 | 212 | 202 | 1.13 / 1.07 / 1.01 | outer |
+| C6 | strand | 1.10 | 35 | 337 | 1.09 / 1.01 / 0.95 | under |
+| C7 | strand | 0.70 | 275 | 292 | 0.89 / 0.78 / 0.71 | young |
+| S1 / S3 | strand | 5.32 / 2.45 | 340 / 300 | 337 / 202 | 0.50 / 0.56 | young |
+
+**Why the leaves face where they do.** For the five front-half cameras (az 0, ±45, ±90) the edge-on normal directions
+fall every 45° (0, 45, 90 … 315), so no flat leaf is off-band for all five; the only azimuths at least 20.5° (the
+|n·d| < 0.35 test) from all of them are the bisectors 22.5 + 45k, with a 2° margin. Every cluster faces one of 202 /
+247 / 292 (295) / 337 — all in the front half, away from the wall — and the four groups are balanced so each view sees
+few marginal leaves. Leaf variety is pitch only (side leaves roll 5–12°, the centre leaf tips 4–9° forward), which keeps
+leaves off the bands. The back-right clusters have their stalks toward the wall and their leaves turned out to the
+front-right, so they peek out on both sides of the rope as on the front cell, never facing the wall.
+
+**Stage 1 measurements** (renders with the floor hidden, the study's masks: `<temp>\...\scratchpad\m063_mod\meas.py`,
+the pad window = the top 27 %):
+
+| View | W : H (sheet) | G / B / P (sheet) | Quarters G/B/P, top → bottom | Tones D / M / Br / L |
+| --- | --- | --- | --- | --- |
+| front_sheet | 0.302 (0.306) | 64.2 / 22.3 / 13.5 (72.3 / 18.9 / 8.8) | 52/10/38, 64/35/0, 67/33/0, 81/19/0 | 35 / 46 / 16 / 2 (37 / 41 / 20 / 3) |
+| side_sheet | 0.276 (0.269) | 59.7 / 16.9 / 23.4 (67.5 / 19.8 / 12.7) | 27/7/65, 83/16/1, 67/33/0, 83/17/0 | 59 / 35 / 6 / 0 |
+| rear_sheet | 0.314 (0.309) | 46.0 / 20.0 / 34.0 (70.1 / 19.5 / 10.4) | the pad hides the stub from behind (spec 3.2) | 39 / 49 / 11 / 0 |
+
+Front width profile per tenth, top → bottom: 0.66 0.83 0.92 0.51 0.91 0.66 0.63 0.76 0.88 0.58 (sheet 0.80 0.92 0.89
+0.83 0.83 0.88 0.68 0.79 0.66 0.56). Hero size 2.27 × 2.00 × 7.36 (target 2.3 × 2.0 × 7.5).
+
+**Eight-azimuth ray grid** (`vis_report`, e 5, step 0.03; binding in the five front-half views). Wood = strands, stub
+and spur as a share of wood + foliage; edge-on = leaf faces within 20° of edge-on as a share of the visible leaf faces;
+rims (the slab's 0.055 thickness band, edge-on by construction) are counted apart:
+
+| Camera az | 0 | 45 | 90 | 270 | 315 | 135 | 180 | 225 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Wood % (≤ 30) | 26.7 | 21.7 | 23.2 | 27.2 | 22.6 | 30.6 | 30.6 | 29.8 |
+| Edge-on leaf % (≤ 10) | 6.0 | 8.0 | 7.2 | 7.8 | 5.7 | 19.6 | 9.1 | 9.1 |
+| Rims, % of leaf pixels | 14.3 | 13.2 | 17.7 | 17.9 | 15.6 | 23.6 | 17.5 | 16.8 |
+| Rope bins with wood (z 0.6–5.5) | 19/20 | 20/20 | 17/20 | 20/20 | 16/20 | 20/20 | 18/20 | 20/20 |
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Notes |
+| --- | --- | --- | --- | --- |
+| TwistedVine | **2434** / 2500 | 2.27 × 2.00 × 7.36 | 47 | pad 140, stub 56, strands 476, spur 32, 11 stalks 142, 28 leaves 1456, 3 tendrils 132 |
+| TwistedVinePad | 140 | 1.49 × 0.98 × 1.75 | 1 | |
+| TwistedVineSegment | 80 | 0.55 × 0.31 × 1.82 | 1 | |
+| TwistedVineFork | 284 | 1.44 × 0.31 × 1.72 | 1 | three sticks unioned (exact boolean at the origin, merge 0.002) |
+| TwistedVineLeafCluster | 188 | 1.11 × 0.53 × 1.10 | 5 | stalk, cross-stalk, 3 leaves |
+
+- Every object: 0 non-manifold edges, **0 bowties**, 0 boundary / wire edges, 0 loose verts, 0 zero-area faces, 0 n-gons,
+  0 duplicate verts, normals outward, transforms applied, origin at the bbox bottom centre; **0 winding errors** and 0
+  self-intersections in every shell (`shells_report`).
+- **Contact** (`contact_report`, tol 0.03, anchored on the pad, which sits on the wall): 0 floating, 0 unchained in the
+  hero and every part. **Clash** (`clash_report`): no shell pairs pass through each other other than the designed seats
+  (a leaf on its own stalk, stalk / tendril / spur roots in their wood, strand on strand along the twist, strand tops in
+  the stub).
+- **Bury** (`bury_report`, ray parity against the pad, stub, strands and spur): deepest per kind — stub 0.025 (the strand
+  tops inside it), strand 0.044, spur root 0.049, stalk root 0.031, tendril root 0.027, leaves 0; none over its limit.
+- **Wall plane** (`wall_report`): the pad's back face on y = 0 exactly; the largest y of anything else −0.011 (a C1
+  leaf); nothing behind the wall.
+- **Attach:** `m063_attach` = the pad's back-face centre (build (0.24, 0.00, 6.57); object (0.3245, 1.0013, 6.4261));
+  `m063_offset` (−0.084, −1.001, 0.144); `m063_socket` (the groove top) object (0.0845, 0.2351, 7.1861). The parts carry
+  `m063_attach` (pad back-face centre, segment top end, fork junction, cluster stalk top).
+
+## Stage 3 — UV
+
+`M.smart_uv` angle-based (margin 0.008, angle 45), then `m012._uv_unfold`: every object 0 overlapping pairs, 0 flipped,
+min island gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.055 (the fork; 12 faces cut
+free at its union seams). The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+Targets as spec 5.4; `K.calibrate` (6 rounds, the kit's faceted dome) gave:
+
+| Key | Target | Calibrated | Final in `PALETTE` | Rendered on the dome |
+| --- | --- | --- | --- | --- |
+| leaf_dark | #4E7B33 | #436832 | **#45702F** | (77, 120, 51) |
+| leaf_mid | #6EA522 | #5B8822 | **#5E9320** | (107, 162, 34) |
+| leaf_bright | #ADC90F | #89A30D | **#8EAD0C** | (168, 197, 15) |
+| leaf_light | #CBD738 | #A3B036 | #A3B036 | (203, 214, 56) |
+| stalk | #95C61B | #78A11A | #78A11A | (146, 195, 27) |
+| vine | #956432 | #765227 | **#8A5B24** | (148, 100, 54) |
+| vine_deep | #6E4520 | #57340C | **#67400F** | (110, 69, 36) |
+| vine_light | #A8743C | #855F31 | **#9C6A2E** | (167, 115, 62) |
+| vine_cut | #C88A3A | #9D712E | #9D712E | (198, 137, 61) |
+| stone | #C4B0A0 | #9A8E89 | #9A8E89 | (195, 173, 159): warm, R > G > B |
+| stone_deep | #A39286 | #807773 | #807773 | (161, 145, 133) |
+| moss (lichen) | #C2B676 | #989365 | #989365 | (192, 180, 117) |
+
+The bold keys were corrected once after re-measuring the hero's own front render (spec 5.7): with the calibrated greens
+the front measured G median #66931C and tones D 47 / M 37 / Br 15 / L 0, the wood B median #5B3F21. After the correction
+(greens a little greener and brighter, wood more saturated, leaf roles one quarter-step brighter) the front render
+measures:
+- **Green** median **#6B9F1A** (sheet #67A416, Δ ≤ 10), lit #9BC01D (sheet #9AC812); tones **35 / 46 / 16 / 2** (sheet
+  37 / 41 / 20 / 3, each within ±10).
+- **Brown** median **#67421E** (sheet #70491A, Δ ≤ 9), lit #97612D (the sheet's lit flank #C7832C is brighter: the kit
+  studio lights the strands less than the illustration's warm key).
+- **Stone** median **#B19E91** (sheet front #A4938A: ΔR 13, ΔG 11, ΔB 7), lit #CBB7A8 (sheet #DFC7B0); warm beige, hue
+  ≈ 24°, never lavender.
+
+How it is applied (never by facing): **leaves** by role (under: J1, C1, C4, C6; outer: J2, C3, C5; young: C2, C7, the
+singles) and by radial band along each leaf from the stalk notch (base → body → lobe ends on a dark–mid–bright–light
+ladder in quarter steps; one leaf per cluster a half-step lighter or darker); **wood** by height (deeper old wood above
+z 4.3, the young light taper below z 1.5), one quarter-step deeper on the faces within 0.19 of the other strand's
+centreline (where the strands lie together); the stub one step deeper, its cut cap vine_cut with a 0.06 band; the spur's
+end vine_cut with a band; **stone** by position (the groove faces stone_deep; the underside and the lower facets under
+the mid fold half-way to stone_deep), the crack strips lichen. **Tint:** leaves ±0.03 per leaf and ±0.02 per band;
+strands ±0.03 per strand with a ±0.02 lengthwise noise; pad 0.04 broad noise. Finish matte (leaves 0.8–0.85, wood 0.9,
+cut ends 0.85, stone 0.9, foliage low specular). `kit_shading_ok` is set (material regions by role and height; baked
+shading reads 0.42 on the hero and the pad).
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows no glow, light or emissive part (spec 7). No emission anywhere. Studio notes for Manual
+Validation as spec 7: leaves bright mid-green with lime outer leaves on a wall in game sun; the pad warm beige; the twist
+readable at 20–30 studs.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (decision 11); no sockets on the hero or any part. Collision `none` everywhere.
+
+## Modeller's notes for the verifier
+
+**Renders** (`art/blender/renders/models/M063/`): `M063_views.png` (front34, rear34, front, side, rear, top, underside,
+front / side / rear / top `_sheet`, the four parts, exploded, context, scale, wall); `M063_spin.png` and
+`spin000…315_sheet.png` (e 10, floor hidden); close-ups `junction_cu` (the stub in its groove, the junction leaves),
+`stub_cu` (the stub's cut end in the socket from above), `socket_cu` (the pad part from below: flat underside, the groove
+notch), `underside_cu`, `pivot_cu` (C3's stalk on the spur end), `twist_cu` (the pair at z 2–4), `cluster_cu` (C5),
+`leaf_edge` (J2's leaves edge-on: the slab thickness), `leafpart_cu`, `thumb` (the front at ~140 px). `context` puts two
+hero copies on the front face and one on the right face of a plain 6 × 3 × 7 stone block (not exported); `scale` puts
+the vine on a 7.7-stud wall (pad top 7.5) beside two 5.5-stud markers; `wall` is the side view against a thin plane on
+y = 0.
+
+**Deviations from the Decisions and the study, with reasons.**
+1. **Leaf outline:** 12 points with blunt two-point side lobes, tip angles ≈ 85°, notches 0.55–0.64 R (study: 10–12
+   points, tips 45–60°, notches 0.50–0.55 R). The study's outline rendered as spiky stars at sheet scale; the sheet's
+   close-ups 1–2 and the cluster cell show broad fig-like leaves with blunt lobes.
+2. **28 leaves** (26 in clusters + 2 singles; study ≈ 31 with 4 singles): two singles were dropped so the twist could
+   keep a station every 45° within 2500 (spec 4.3's lean alternative drops the singles; the floor of 26 is kept).
+3. **Twist stations every 45°** (study 60°): at 60° the pair read as one zigzag stick in the sheet-scale renders.
+4. **Gentle leaf folds** (vein +0.008, pleat ≤ 0.008 L): at the bisector azimuths a facet has a 2° margin before the
+   edge-on test counts it; stronger folds put 12–20 % of the leaf pixels into the side views' edge-on band.
+5. **One facing per cluster** (leaves stacked on near-parallel planes, variety by pitch only). A 45° wrap of the side
+   leaves round the rope was tried; its leaves cut through each other in every cluster. From oblique angles a cluster
+   can read as two or three layered leaves.
+6. **Leaf spans 0.50–1.24** (study 0.62–0.95): "span" here is the width across the side lobes (the fig leaf is wider
+   than long), and the leaves were enlarged until the front coverage and width approached the sheet.
+7. **Stub bottom flare Ø 0.54** (spec option Ø 0.46): needed for both Ø 0.24 strand tops to sit fully inside the cap.
+8. **Stalks and tendrils 3-sided** (study 4-sided): spec 4.3's first budget step; the cluster part keeps 4 sides.
+9. **The spur** 45° from vertical at z 3.6 (study 60° at 3.95), and **C2** front-right (az 318, n0 337) instead of left:
+   a left-hand C2 facing out made a hairpin stalk, and the higher spur pushed C3 to y −2.28 (depth over 2.2).
+10. **Pad** 1.49 × 0.98 (study 1.40 × 0.95): the mid-height fold bulges its faces 0.03–0.05.
+11. **Colour:** the greens and the wood were corrected after calibration from the hero render's own medians (Stage 4).
+12. **The cluster part** has a short cross-stalk holding the two side leaves apart, and its centre leaf is longer and
+    narrower (aspect 0.6), as the cell draws it; W : H 1.01 (cell 0.97).
+13. **Scale shot:** the wall is 7.7 tall so the vine hangs from its own pad top at 7.5 (the spec's 7-stud wall would put
+    the leaves below the ground).
+
+**Leftovers (not met, for the ruling).**
+- Front shares G 64.2 / B 22.3 / P 13.5 against 72.3 / 18.9 / 8.8 (G 2 points outside ±6, P 1 point outside ±4); the pad
+  shows more in the top quarter (P 38 vs 28) and the rope more in z 3.7–5.5 (quarter 2, B 35 vs 23); width-profile
+  tenths 4 and 6 are narrow (0.51 / 0.66 vs 0.83 / 0.88). Side G 59.7 vs 67.5 and P 23.4 vs 12.7: from +X the kit studio
+  leaves the pad's right face in shade (#857972 vs the sheet's lit #C8B09A) and it reads large.
+- The leaves are less face-on to the front than the sheet's (the sheet draws every leaf face-on in every ortho, which the
+  every-azimuth rule forbids), so the front reads a little sparser than the sheet.
+- Rims are 13–18 % of the visible leaf pixels in the front views (the slab thickness), counted apart from edge-on.
+- Rear-half views are content only: az 135 has 19.6 % edge-on leaf faces (the wall side).
+- The exploded shot is small in its cell (the chain is about 11 studs tall).
+- Stone median ΔR 13 against the front pad median (tolerance 12).
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063_verify.blend` (the kit file right after
+the main session's `m063.build()`), nothing rebuilt or saved. Renders in `art/blender/renders/models/M063/verify/`;
+scripts in `<temp>\...\scratchpad\m063_ver\` (`v1.py` audit, `v2.py` shells / contact / bury / wall, `v3.py` slivers /
+UV / `K.check`, `v4.py` strand gaps and socket fit, `vis.py` ray grid every 10°, `leafn.py` leaf facing every 5°,
+`cmp.py` / `mont.py` / `m2.py` montages, `sheetcol.py` / `partcol.py` colour samples; the modeller's `meas.py` for the
+shares).
+
+**Verdict: FAIL (6/10).** Clean and well built (geometry, contact, wall, attach, colour code all pass, and the twisted
+pair reads well), but the leaf clusters are three leaves on parallel planes, which makes whole clusters go edge-on as
+combs of slivers at front-half azimuths between the eight tested ones, and the LeafCluster part does not read like its
+cell.
+
+### Measured (all re-measured here)
+
+| Check | Result |
+| --- | --- |
+| Tris | hero **2434** / 2500 (pad 140, wood 564 = stub 56 + strands 2 × 238 + spur 32, stalks + tendrils 274, 28 leaves × 52 = 1456); Pad 140, Segment 80, Fork 284, LeafCluster 188 (all < 1000) |
+| Sizes | hero 2.270 × 2.003 × 7.356 (target 2.3 / 2.0 / 7.5 ± 0.2 / 0.2 / 0.3: in); Pad 1.488 × 0.981 × 1.750; Segment 0.555 × 0.312 × 1.819 (Ø 0.36 across corners, single stick); Fork 1.435 × 0.312 × 1.724 (single-stick Y); LeafCluster 1.109 × 0.530 × 1.104 |
+| Origin / transforms | bbox bottom centre at (0, 0, 0) local on all five; rotation 0, scale 1; no modifiers, no children, no VFX sockets |
+| Attach | pad back face: 4 verts, deviation 0.0000 from y = 0; centre build (0.24, 0, 6.57) = object (0.3245, 1.0013, 6.4261) = stored `m063_attach` exactly; Pad part (−0.0094, 0.4907, 0.82) matches too; `m063_socket` (0.0845, 0.2351, 7.1861) = build (0, −0.766, 7.33), the groove top |
+| Wall plane | max build y: pad 0.0000, leaf −0.0111 (C4), stalk −0.177, wood −0.708: nothing behind y = 0 |
+| Topology | every object: 0 non-manifold edges / verts (bowties), 0 boundary, 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 dup verts, normals outward; per shell (47 hero shells) 0 winding errors, 0 self-intersections, every volume positive |
+| Slivers (corner < 3°) | hero 8 / Pad 8 (the crack-2 strip on the pad's right face, worst 0.43°, area 0.0026), Fork 13 (union seams, worst 0.31°, area 0.00024); Segment and LeafCluster 0. Spec 4.5 asks ≥ 3° (minor) |
+| Floating / chain | 0 floating, 0 unchained (≤ 0.03 chain to the pad); every one of the 28 leaves within 0.03 of a stalk (they intersect their own stalk); no leaf–leaf, leaf–wood, leaf–pad or stalk–pad intersections |
+| Buried | deepest: spur root 0.049 in strand A (limit 0.05), stalk root 0.031 (C2 single, limit 0.035), leaves 0, stub in the pad 0; none over its limit. Stub to groove walls 0.008–0.011 (socket fit) |
+| Strands | the two strands intersect along the twist (143 tri pairs); per 0.25 band the closest approach is 0.000–0.021 except one band, z 1.75–2.0, at 0.112 (a little daylight; minor) |
+| UV | 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0, conformal p95 1.001 (Fork 1.055) |
+| `K.check` | [] (KITSTAT ok on all five); baked shading 0.42 hero / pad |
+
+**Shares on my renders** (`big_*_sheet`, 360 × 600, the study's masks; sheet in brackets):
+
+| View | W : H | fill | G / B / P | Quarters G/B/P | Width profile per tenth | Tones D/M/Br/L |
+| --- | --- | --- | --- | --- | --- | --- |
+| front (0, 6) | 0.304 (0.306) | 0.474 (0.534) | **64.2** / 22.6 / **13.1** (72.3 / 18.9 / 8.8) | 53/10/37, 64/**36**/0, 67/33/0, 81/19/0 | .66 .84 .91 **.51** .90 **.66** .63 .75 **.87** .57 (.80 .92 .89 .83 .83 .88 .68 .79 .66 .56) | 36 / 46 / 16 / 3 (37 / 41 / 20 / 3) |
+| side (90, 6) | 0.277 (0.269) | 0.510 | **59.8** / 17.1 / **23.1** (67.5 / 19.8 / 12.7) | 28/7/**65**, 83/16/0, 67/33/0, 83/17/0 | | 59 / 34 / 7 / 0 (53 / 28 / 13 / 5) |
+| rear (180, 6) | 0.314 (0.309) | 0.482 | 45.9 / 20.1 / 34.0 (content) | | | |
+
+Out of tolerance: front G −8.1 (±6), P +4.3 (±4), quarter 2 B +13 (±10), tenths 4 / 6 / 9 (Δ 0.32 / 0.22 / 0.21, ±0.12);
+side G −7.7, P +10.4. These match the modeller's numbers to within 0.5.
+
+**Colour** (my samples; sheet first): front green `#67A416` (h86) → ours `#6DA020` (h84), not olive; tones in. Front wood
+`#70491A` (h33) → `#65411D` (h30, warm brown, not red); lit quartile `#C7832C` → `#97602C` (Δ48, the studio lights the
+strands less than the illustration). Pad: front (my box) `#B9A599` → `#B19E91` (Δ 8 / 7 / 8; against the study's
+`#A4938A` ΔR 13); side `#C8B09B` → `#857972` (the +X face in studio shade, still R > G > B, hue 22°); 0.0 % of pad pixels
+have B > G in either view: never lavender. Part sticks `#945C2D` / `#905A2C` → `#9B622C` (Δ ≤ 11). Part cluster
+`#6AA821` → `#7EB51E` (ΔR 20, over the 12 of spec 5.7; minor).
+
+**Colour code** (read, `m063.py`): leaves by role and radial band from the stalk notch (`leaf_keys`, `LEAF_FR`); wood by z
+and by distance to the other strand's centreline (`strand_keys`); stub by ring index; spur and stick caps by cap index;
+pad by height plus the groove's material from the boolean; the lichen strips by distance to the crack planes. The crack
+predicates use a face normal only to pick which block face carries the crack strip (where the crack is), not to light or
+darken anything. **Nothing is coloured by face normal.**
+
+### Views against the sheet
+
+- **Front / side / rear (`V_compare.png`), spin (`V_spin.png`).** The defining feature passes: two faceted brown strands
+  visibly twisting round each other down the whole length in every view, with a gentle sway. The pad sits top
+  right-behind with the stub's tan cut end in its socket, clusters alternate, tendrils curl, a tip cluster closes it.
+  Against the sheet the column is clearly sparser: the sheet shows three distinct leaves per cluster stacked down a dense
+  column; ours shows one big leaf per cluster with a few lobes peeking out, a bare rope from z 3.7 to 5.5 on the right
+  and between C3 and C5, and the pad larger and barer in the top quarter.
+- **Leaves.** Face-on (`V_leaves.png`: `c3_faceon`, `c5_faceon`) a leaf is a chunky broad fig/grape slab with a pointed
+  tip, broad side lobes and a heart base, with visible thickness (`leaf_edge.png`): close to the sheet's close-ups 1–2,
+  not a flat card. Foreshortened at ±45–90° the 12-point outline looks spikier than the sheet's but not a star.
+- **Clusters from oblique angles: FAIL.** Each cluster's three leaves lie on parallel planes 0.08–0.20 apart
+  (deviation 5). Face-on they cover each other, so a cluster reads as one leaf. Edge-on, all three go at once and read
+  as a comb of vertical slivers. Every cluster faces one of 202 / 247 / 292 / 337°, the bisectors of the eight tested
+  azimuths, so the eight-azimuth check passes (my `vis.py`: wood 21.5–27.2 %, edge-on 5.5–9.0 % at 0 / ±45 / ±90). In
+  between, counting leaves whose main normal is within 15° of edge-on (`leafn.py`, e 5):
+  - az −35 … −15: 9 of 28 leaves (29 % of the leaf area);
+  - az −80 … −55: 8–9 leaves (25–29 %);
+  - az +55 … +80: 6 leaves (28 %);
+  - az +10 … +35: 4 leaves (14 %);
+  - 0 only at −90, −45, −5…0, 40…50 and 85…90.
+  The pixel metric hides this (az −70: edge-on 4.6 %) because an edge-on leaf covers few pixels and its rim is counted
+  apart, but the combs are plain in `V_midazimuths.png` (az −65: C5 and C6; −25: C1, C4 and C6; +25: C5; +65: J1 and
+  C3), in `V_oblique.png` (±70, e 15) and in the modeller's own `context.png` (−35, 15). This is the "balls with edge-on
+  flaps" failure of 054 / 057 / 058. The sheet fans its three leaves, which is the reason the rule exists.
+- **Parts (`V_parts.png`).** Pad: a chunky faceted block with the socket slot and one lichen crack (the cell shows more
+  crack facets; minor). Segment: a single 6-sided stick with one bend and tan caps, matches. Fork: a single-stick Y with
+  cut ends, matches. **LeafCluster: does not read like its cell.** The cell shows a stalk on top, two side leaves spread
+  out and up, and one long centre leaf hanging clearly below them. Ours is a spiky pile in which the centre leaf (×1.3,
+  aspect 0.6) sits in front of and over the side leaves, so the outline is a star of points (`part_leafcluster_sheet.png`,
+  `leafpart_cu.png`). W : H 0.89 (cell 0.97, in tolerance).
+
+### Blockers (round 2)
+
+1. **Fan the clusters** (`cluster_geom`, the hero's 9 clusters): give each leaf of a cluster its own facing (normal
+   azimuths spread ±25–35° round n0: side leaves turned out to their sides, the centre leaf hanging below the hub), so
+   that no two leaves of one cluster share a plane. Keep the outward / never-into-the-wall rule. Then measure edge-on
+   leaves **every 5° over the front half** (`leafn.py`): at most 2 leaves (≤ 10 % of the leaf area) within 15° of
+   edge-on at any azimuth, and no comb of slivers in renders at ±25 and ±65. Facing everything at the bisectors of the
+   tested azimuths isn't a fix. Fanning should also widen the front (tenths 4 / 6), raise front G toward 72 and hide
+   more of the pad.
+2. **LeafCluster part** (`part_cluster`): lay it out like the cell: the side leaves spread out and up from the hub,
+   clear of the centre leaf, and the centre leaf hanging below the hub, overlapping the side leaves ≤ 20 %, with no star
+   outline. Check it beside the cell from (−15, 15).
+
+### Minors (fix if cheap, else note)
+
+- Front G 64.2 / P 13.1 and quarter 2 B 36; width tenths 4 / 6 / 9; side G 59.8 / P 23.1 (above). Blocker 1 should
+  improve most of these.
+- Slivers under 3°: 8 on the pad's crack-2 strip, 13 on the Fork's union seams (spec 4.5).
+- A 0.11 gap between the strands in the z 1.75–2.0 band.
+- Part cluster green ΔR 20; wood lit quartile Δ48 (studio light, as noted by the modeller).
+- Pad part: only one crack reads against the cell's crack network.
+
+### The modeller's deviations and leftovers
+
+| # | Item | Visible against the sheet? | Ruling |
+| --- | --- | --- | --- |
+| 1 | 12-point fig outline, blunt side lobes | visible: face-on it matches the sheet's broad close-up leaves better than a five-point star would; spikier when foreshortened | accepted |
+| 2 | 28 leaves (2 singles dropped) | numeric (floor 26 kept); the sparseness seen comes from the stacking, not the count | accepted |
+| 3 | twist stations every 45° | visible, for the better: the pair reads as two strands, not a zigzag | accepted |
+| 4 | gentle folds | visible a little: leaves are flatter-faceted than the sheet's creased lobes | accepted |
+| 5 | one facing per cluster | **visible: one leaf face-on, combs edge-on between the tested azimuths** | **blocker 1** |
+| 6 | larger leaves (span 0.50–1.24) | visible: each cluster reads as one big leaf; fine once fanned (may shrink a little then) | accepted |
+| 7 | stub foot flare Ø 0.54 | numeric only (under the junction leaves) | accepted |
+| 8 | 3-sided stalks / tendrils | numeric only at sheet scale | accepted |
+| 9 | spur 45° at z 3.6; C2 front-right | numeric only (C2 is small; C3 still hangs from the spur end) | accepted |
+| 10 | pad 1.49 × 0.98 | numeric only | accepted |
+| 11 | front G 64.2 / B 22.3 / P 13.5 vs 72.3 / 18.9 / 8.8 | visible as a sparser column and a barer pad | via blocker 1 |
+| 12 | pad in the top quarter (P 37 vs 28), rope at z 3.7–5.5 (B 36 vs 23) | visible: bare rope right of the vine under J2, narrow tenth 4 | via blocker 1 |
+| 13 | side view pad in shade | visible, but it is the studio light on the +X face; the key is warm beige (`#B19E91` from the front) | accepted, Studio note |
+| 14 | pad red channel 13 off | numeric only; against my own front-pad box `#B9A599` it is within (Δ 8 / 7 / 8) | accepted |
+| 15 | az 135 edge-on 19.6 % | rear, content only (my 135: 19.6 %, rims 23.6 %); no floating pieces from behind | accepted (fanning helps) |
