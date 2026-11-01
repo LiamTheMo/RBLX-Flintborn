@@ -5,7 +5,13 @@
 -- armor EHP. Nobody inside a safe zone deals damage to anything (§3.2). Arrows
 -- leave from the head, and draw time is capped at what the server saw. Swings and
 -- shots only count near the player's last server-validated position. With a siege
--- item equipped the attack input throws or sets it instead (SiegeService). World only.
+-- item equipped the attack input throws or sets it instead (SiegeService).
+-- The same swing also chops, mines and gathers (GDD §4.1, §53): after players and
+-- creatures, gathering gear and empty hands try the node in front before a
+-- structure, weapons the structure first (HarvestRules.TargetOrder); a node only
+-- beats a structure when the tool can gather it and it is nearer. Inside a safe
+-- zone a swing can only gather, as the old node prompt allowed. Every character
+-- gets a server-made Animator so the client's swing animation replicates. World only.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -13,6 +19,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -44,6 +51,12 @@ CombatService.VALIDATED_SLACK = 12
 -- item (Fire Bomb, Breaching Charge) is equipped. Kept as a hook so CombatService
 -- does not require SiegeService (which uses ApplyHit).
 CombatService.SiegeAttack = nil :: ((Player, Vector3) -> ())?
+-- Set by ResourceService: `(player, origin, flatAim, reach, canSee,
+-- structureDistance?)` harvests the node a swing lands on (only one nearer than
+-- that structure) and returns true when one took it. A hook because
+-- ResourceService → ProgressionService → CombatService would otherwise be a
+-- require cycle.
+CombatService.HarvestHit = nil :: ((Player, Vector3, Vector3, number, (BasePart) -> boolean, number?) -> boolean)?
 
 local lastAttack = {}
 local lastSequence = {}
@@ -188,38 +201,8 @@ local function inSafeZone(player: Player): boolean
 	return root ~= nil and SafeZoneService.Contains(root.Position)
 end
 
-local function melee(player: Player, sequence: any, direction: any)
-	local aim = validDirection(direction)
-	local root = rootOf(player)
-	local head = player.Character and player.Character:FindFirstChild("Head")
-	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
-		return
-	end
-	-- A held siege item is thrown or set, never swung (SiegeService validates it).
-	local held = InventoryService.Equipped(player)
-	if CombatService.SiegeAttack and SiegeRules.Kind(held and held.catalogId) then
-		CombatService.SiegeAttack(player, aim)
-		return
-	end
-	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) or inSafeZone(player) then
-		return
-	end
-	-- Reach is measured from the client-owned root, so it must also sit near where
-	-- the server last validated the player (no teleport, swing, teleport back).
-	local validated = AntiExploitService.ValidatedPosition(player)
-	if not MovementRules.NearValidated(root.Position, validated, CombatService.VALIDATED_SLACK) then
-		return
-	end
-	local equipped = InventoryService.Equipped(player)
-	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
-	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
-		return
-	end
-	local ignore = characters()
-	local function canSee(part: BasePart): boolean
-		return clearLine(head.Position, part.Position, ignore, part)
-	end
-	local flatAim = Vector3.new(aim.X, 0, aim.Z)
+-- The closest player in reach and arc this swing could actually hurt.
+local function bestPlayer(player: Player, root: BasePart, flatAim: Vector3, profile, canSee): Player?
 	local attacker = actor(player)
 	local best, bestDistance = nil, math.huge
 	for _, other in Players:GetPlayers() do
@@ -240,12 +223,98 @@ local function melee(player: Player, sequence: any, direction: any)
 			end
 		end
 	end
+	return best
+end
+
+-- How far away the structure this swing would otherwise hit is (BuildingService's
+-- own pick), or nil when there is none.
+local function structureDistance(player: Player, origin: Vector3, flatAim: Vector3, reach: number, canSee): number?
+	local record, distance = BuildingService.Pick(player, origin, flatAim, reach, canSee)
+	return if record then distance else nil
+end
+
+local function melee(player: Player, sequence: any, direction: any)
+	local aim = validDirection(direction)
+	local root = rootOf(player)
+	local head = player.Character and player.Character:FindFirstChild("Head")
+	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
+		return
+	end
+	-- A held siege item is thrown or set, never swung (SiegeService validates it).
+	local equipped = InventoryService.Equipped(player)
+	if CombatService.SiegeAttack and SiegeRules.Kind(equipped and equipped.catalogId) then
+		CombatService.SiegeAttack(player, aim)
+		return
+	end
+	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) then
+		return
+	end
+	-- Reach is measured from the client-owned root, so it must also sit near where
+	-- the server last validated the player (no teleport, swing, teleport back).
+	local validated = AntiExploitService.ValidatedPosition(player)
+	if not MovementRules.NearValidated(root.Position, validated, CombatService.VALIDATED_SLACK) then
+		return
+	end
+	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
+	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
+		return
+	end
+	local ignore = characters()
+	local function canSee(part: BasePart): boolean
+		return clearLine(head.Position, part.Position, ignore, part)
+	end
+	local flatAim = Vector3.new(aim.X, 0, aim.Z)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
-	if best then
-		CombatService.ApplyHit(player, best, damage)
-	elseif not NpcService.Hit(root.Position, flatAim, profile.reach, damage, player, canSee) then
-		-- Raiding: the same swing damages another tribe's structures (GDD Q38).
-		BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage, canSee)
+	-- Each kind of target returns true when it took the swing. Inside a safe zone
+	-- only Node is tried: nobody deals damage there (§3.2), but gathering is fine.
+	-- True while a structure is still to be tried after the current kind.
+	local structureNext = false
+	local targets = {
+		Player = function(): boolean
+			local best = bestPlayer(player, root, flatAim, profile, canSee)
+			if best then
+				CombatService.ApplyHit(player, best, damage)
+			end
+			return best ~= nil
+		end,
+		Npc = function(): boolean
+			return NpcService.Hit(root.Position, flatAim, profile.reach, damage, player, canSee)
+		end,
+		Node = function(): boolean
+			-- ResourceService enforces its own harvest cadence, range and tool gates.
+			-- Before a structure (gathering gear), a node must be gatherable and
+			-- nearer than the structure, so an ore beside a wall never shields it.
+			local harvestHit = CombatService.HarvestHit
+			if harvestHit == nil then
+				return false
+			end
+			local beyond = if structureNext
+				then structureDistance(player, root.Position, flatAim, profile.reach, canSee)
+				else nil
+			return harvestHit(player, root.Position, flatAim, profile.reach, canSee, beyond)
+		end,
+		Structure = function(): boolean
+			-- Raiding: the same swing damages another tribe's structures (GDD Q38).
+			return BuildingService.Hit(player, root.Position, flatAim, profile.reach, damage, canSee) == true
+		end,
+	}
+	local isWeapon = profile ~= WeaponCatalog.Hand
+	local order = HarvestRules.TargetOrder(isWeapon, inSafeZone(player))
+	for index, kind in order do
+		structureNext = table.find(order, "Structure", index) ~= nil
+		if targets[kind]() then
+			return
+		end
+	end
+end
+
+-- The client plays swing and hold animations on its own character; they only
+-- replicate through an Animator the server made.
+local function ensureAnimator(character: Model)
+	local humanoid = character:FindFirstChildOfClass("Humanoid") or character:WaitForChild("Humanoid", 10)
+	if humanoid and humanoid:IsA("Humanoid") and humanoid:FindFirstChildOfClass("Animator") == nil then
+		local animator = Instance.new("Animator")
+		animator.Parent = humanoid
 	end
 end
 
@@ -304,6 +373,16 @@ function CombatService.Start()
 	WorldAdmissionService.RunStarted:Connect(function(player)
 		runStartedAt[player] = os.clock()
 	end)
+	local function watch(player: Player)
+		player.CharacterAdded:Connect(ensureAnimator)
+		if player.Character then
+			task.spawn(ensureAnimator, player.Character)
+		end
+	end
+	Players.PlayerAdded:Connect(watch)
+	for _, player in Players:GetPlayers() do
+		watch(player)
+	end
 	Players.PlayerRemoving:Connect(function(player)
 		lastAttack[player] = nil
 		lastSequence[player] = nil

@@ -35,8 +35,11 @@ local function targets(stepId: string?)
 	if stepId == "Gather" then
 		local folder = workspace:FindFirstChild("ResourceNodes")
 		if folder then
+			-- Depleted nodes are regrowing: point at one that can be hit.
 			for _, part in folder:GetChildren() do
-				table.insert(list, part)
+				if part:IsA("BasePart") and part:GetAttribute("Active") ~= false then
+					table.insert(list, part)
+				end
 			end
 		end
 	elseif stepId == "Events" then

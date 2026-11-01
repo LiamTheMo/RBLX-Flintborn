@@ -31,7 +31,7 @@ JournalModel.ACTIONS = {
 		illustration = "logs",
 		line = "Gather resources.",
 		objective = "Gather Resources",
-		hint = "Chop trees and mine rocks around the island.",
+		hint = "Swing at trees, rocks and plants to gather.",
 	},
 	Extract = {
 		icon = "portal",

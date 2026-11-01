@@ -35,6 +35,8 @@ WildlifeRules.MAX_CREATURES = 60
 WildlifeRules.TICK_SECONDS = 5
 WildlifeRules.RETRY_SECONDS = 20
 WildlifeRules.PLACEMENT_ATTEMPTS = 8
+-- At most this many groups spawn per tick (every slot fills within a few ticks).
+WildlifeRules.MAX_FILLS_PER_TICK = 5
 -- Members spread this far (studs) around the group's spot.
 WildlifeRules.GROUP_SPREAD = 8
 -- A group with no player within FAR_RADIUS for FAR_IDLE_SECONDS may be despawned
