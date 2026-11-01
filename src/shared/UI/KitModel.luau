@@ -33,6 +33,7 @@ KitModel.ROLES = {
 	["panel.party"] = { sprite = "lk_window_frame", material = "window" },
 	["hud.playerCard"] = { sprite = "lk_player_card", material = "paper" },
 	["hud.leaf"] = { sprite = "lk_emblem_leaf", material = "glyph", glyph = "❦", edge = false },
+	["hud.rune"] = { sprite = "lk_emblem_rune", material = "glyph", glyph = "◆", edge = false },
 	-- The painted island (Play window, Journal map page, world map).
 	["map.island"] = { sprite = "pm_map_island", material = "paper", edge = false },
 

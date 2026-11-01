@@ -226,7 +226,7 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		color = "inkSoft",
 		zIndex = 7,
 	})
-	Kit.Icon.new(visual, { name = "Sketch", rect = { 70, 522, 44, 118 }, icon = "lk_emblem_leaf", zIndex = 7 })
+	Kit.Icon.new(visual, { name = "Sketch", rect = { 70, 522, 44, 118 }, icon = "hud.leaf", zIndex = 7 })
 	self.reset = Kit.Button.new(visual, {
 		name = "Reset",
 		rect = { 551, 581, 232, 55 },
@@ -320,7 +320,7 @@ local function leftHeader(page: Instance, text: string)
 end
 
 local function rightHeader(page: Instance, text: string)
-	header(page, RIGHT_X, 188, text, { "lk_emblem_rune", { 966, 92, 26, 70 } })
+	header(page, RIGHT_X, 188, text, { "hud.rune", { 966, 92, 26, 70 } })
 end
 
 -- A row label in the mockup's book weight (Merriweather Regular, 17 px).
