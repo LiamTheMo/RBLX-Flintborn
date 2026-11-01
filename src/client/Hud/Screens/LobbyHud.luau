@@ -42,6 +42,7 @@ LobbyHud.PIN = { 28, 57, 242, 51 }
 -- The title row's parts in the title row's px (the row starts at 26, 18).
 LobbyHud.TITLE = { label = { 5, 4, 90, 30 }, count = { 92, 4, 70, 30 }, rule = { 3, 35, 235, 2 } }
 LobbyHud.LIST = { 28, 106, 243, 113 }
+LobbyHud.LIST_BLEED = 6
 -- Row heights (member row, empty-slot row; mockup pitch 51 / 35.6), the rule
 -- width (the rules stop short of the rail) and the member row's layout.
 LobbyHud.ROW_H = 51
@@ -263,12 +264,17 @@ function LobbyHud.new(parent: Instance, actions)
 		Size = UDim2.fromOffset(pin[3], pin[4]),
 		ZIndex = 6,
 	})
+	-- The list reaches LIST_BLEED px further left than its rows, which keep
+	-- their place: a row's hover and pressed plate is drawn a few px past the
+	-- row, and the list clips whatever crosses its edge.
 	local l = LobbyHud.LIST
+	local bleed = LobbyHud.LIST_BLEED
 	self.list = Kit.Scroll.new(body, {
 		name = "List",
-		rect = l,
+		rect = { l[1] - bleed, l[2], l[3] + bleed, l[4] },
 		gap = 0,
 		padBottom = 0,
+		padLeft = bleed,
 		rail = "thin",
 		railOverlay = true,
 		zIndex = 6,
