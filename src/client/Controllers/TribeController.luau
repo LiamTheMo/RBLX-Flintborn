@@ -120,22 +120,27 @@ local function choice(icon: string, title: string, label: string, onPress)
 	remember(("choice/%s/%s"):format(title, label), action.control)
 end
 
+-- The button keeps BUTTON_PAD clear on every side inside the scrolling list:
+-- its art reaches a few px past its rect (and grows a little as it springs back
+-- from a press), and the list clips whatever crosses its edge.
+local BUTTON_PAD = 8
+
 local function button(label: string, variant: string, onPress, noDefault: boolean?)
 	local holder = Kit.Core.Make("Frame", {
 		Name = "Action" .. #ui.parts,
 		BackgroundTransparency = 1,
 		LayoutOrder = #ui.parts + 1,
-		Size = UDim2.fromOffset(ui.listW, BUTTON_H),
+		Size = UDim2.fromOffset(ui.listW, BUTTON_H + 2 * BUTTON_PAD),
 	}, ui.list)
 	local action = Kit.Button.new(holder, {
 		name = label,
-		rect = { 0, 0, 260, BUTTON_H },
+		rect = { BUTTON_PAD, BUTTON_PAD, 260, BUTTON_H },
 		label = label,
 		variant = variant,
 		sizeClass = "s",
 		onPress = onPress,
 	})
-	add(holder, BUTTON_H)
+	add(holder, BUTTON_H + 2 * BUTTON_PAD)
 	remember("button/" .. label, action.control, noDefault)
 end
 
