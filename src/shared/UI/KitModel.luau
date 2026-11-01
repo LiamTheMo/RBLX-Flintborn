@@ -83,6 +83,8 @@ KitModel.ROLES = {
 		sprite = "lk_button_close_normal",
 		material = "leather",
 		glyph = "✕",
+		-- Drawn in the sprite's own colours: warm leather and a cream ✕.
+		tone = "leatherBright",
 		states = {
 			hover = "lk_button_close_hover",
 			pressed = "lk_button_close_pressed",
