@@ -210,6 +210,16 @@ function Core.Label(parent: Instance, opts): TextLabel
 	return label :: TextLabel
 end
 
+-- The least text size (design px) the kit draws a label at when it picks the
+-- size or takes one from a screen (space.minTextDesign, 12): a smaller size
+-- is raised to it; nil (the role's size) stays nil.
+function Core.TextFloor(size: number?): number?
+	if size == nil then
+		return nil
+	end
+	return math.max(size, Tokens.Space("minTextDesign", 12))
+end
+
 -- Sets a label's text, upper-cased when its role is in capitals.
 function Core.SetText(label: TextLabel, text: string)
 	label.Text = if label:GetAttribute("KitCaps") and not label.RichText then string.upper(text) else text
@@ -225,6 +235,56 @@ function Core.TextWidth(text: string, role: string, size: number?): number
 	local ok, bounds = pcall(TextService.GetTextSize, TextService, shown, px, legacy, Vector2.new(10000, 10000))
 	local width = if ok and bounds then bounds.X else #shown * px * 0.6
 	return width * (Tokens.Data.weightWidth[spec.weight] or 1)
+end
+
+-- Dimming that keeps a part's own fade. Images and text labels rest at the
+-- transparency they were drawn with (the "picture missing" stand-in glyph at
+-- Art.STAND_IN_FADE, 0.6); a dim of `amount` composes with that rest value
+-- (1 − (1 − rest) × (1 − amount)) instead of overwriting it, so undimming
+-- returns the glyph to its fade, never to solid ink. The rest value is read
+-- from the part's KitRestFade attribute, else recorded from the part the first
+-- time it is dimmed (a fresh part, so its drawn transparency). Applies to
+-- `target` and every image and text label under it.
+--
+--   Kit.Core.Dim(slot.icon.root, if locked then 0.4 else 0)
+Core.REST_FADE = "KitRestFade"
+
+local function restFade(object: Instance, current: number): number
+	local rest = object:GetAttribute(Core.REST_FADE)
+	if type(rest) ~= "number" then
+		rest = current
+		object:SetAttribute(Core.REST_FADE, rest)
+	end
+	return rest
+end
+
+function Core.Dim(target: Instance?, amount: number?)
+	if target == nil then
+		return
+	end
+	local keep = 1 - math.clamp(amount or 0, 0, 1)
+	local parts = target:GetDescendants()
+	table.insert(parts, target)
+	for _, part in parts do
+		if part:IsA("ImageLabel") or part:IsA("ImageButton") then
+			local rest = restFade(part, part.ImageTransparency)
+			part.ImageTransparency = 1 - (1 - rest) * keep
+		elseif part:IsA("TextLabel") then
+			local rest = restFade(part, part.TextTransparency)
+			part.TextTransparency = 1 - (1 - rest) * keep
+		end
+	end
+end
+
+-- Sets the transparency a part rests at (what Core.Dim composes with), for a
+-- part whose fade is set after it is drawn.
+function Core.SetRestFade(object: Instance, rest: number)
+	object:SetAttribute(Core.REST_FADE, rest)
+	if object:IsA("ImageLabel") or object:IsA("ImageButton") then
+		object.ImageTransparency = rest
+	elseif object:IsA("TextLabel") then
+		object.TextTransparency = rest
+	end
 end
 
 -- A tiny signal for component events (Opened, Closed).

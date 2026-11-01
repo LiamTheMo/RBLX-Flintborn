@@ -36,12 +36,12 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `Kit/init.luau` | Re-exports everything below |
 | `Kit/Tokens.luau` | `Color(key)`, `Tint(key)`, `Font(key)`, `TextStyle(role)`, `Space(key)`, `Scale(key)`, `Motion(key)` (TweenInfo), `Order(key)`, `Veil()`, `Sound(key)` |
 | `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemSprite`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
-| `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `Signal`, `Maid` |
+| `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `TextFloor`, `Dim` (also `Kit.Dim`), `SetRestFade`, `Signal`, `Maid` |
 | `Kit/Interact.luau` | The shared state machine (`attach`) |
 | `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Stop`, `Pulse`, `Reduced()` |
 | `Kit/Sound.luau` | `Play(key)` (silent while the token id is empty, D14) |
-| `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)`, `Window(screen)`, `IsSmallTouch(h)` |
-| `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore, blur |
+| `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)` (small windows capped on phones, §16), `Window(screen)`, `IsSmallTouch(h)` |
+| `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore (a window's ✕ gives way to its first content control), blur, Roblox touch controls hidden while open |
 | `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)`, `Find(root, role)` |
 | Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Picture Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
 
@@ -109,8 +109,8 @@ Flows can also fire real events (the capture env's signals are fireable):
 - `colors`: the palette of ARCHITECTURE §3.2, plus `veil` `#050403`,
   `white`/`black`, and tints laid over art: `leaderTint` (the Badge "leader"
   plaque, unused by the party since D24), `checkTint` (M03 gold checkbox),
-  `notReadyTint` (no reader left), the leather tones and the later additions
-  (STYLE_GUIDE.md §3 lists every token with its use).
+  `emptyIconTint` (#78746E, an empty vital's greyed icon), the leather tones
+  and the later additions (STYLE_GUIDE.md §3 lists every token with its use).
 - `veil`: colour key and `BackgroundTransparency` **0.30** (D8, as updated).
 - `tints`: grey multipliers for borrowed state art (hover 0.93, pressed 0.80,
   disabled / locked 0.72).
@@ -138,10 +138,12 @@ Flows can also fire real events (the capture env's signals are fireable):
   wider than the mockup face (the specs' "width-matched" sizes). A screen that
   must hit a spec number passes `textSize` / `size` to the component.
 - `space`: windowPad 24, colGap 14, sectionHeaderH 34, row heights (52, 64, 72,
-  36), slot 90 / pitch 99, hotbar 86 / 97, tile 86, touchMin 44, window header
+  36), slot 90 / pitch 99, hotbar 86 / 97, tile 86, touchMin 44, minTextPx 9
+  (screen px), minTextDesign 12 (design px, `Core.TextFloor`), window header
   100, close button 60 inset 22, toast 430 × 84, tooltip max 300 …
 - `scale`: HUD 0.34–1.6, windows 0.3–1.4, phone height 500 (× 0.9 for the HUD),
-  hover 1.03, pressed 0.96, window pop from 0.94.
+  touchSmallMax 1.25 (a small window's scale on phones, §16), hover 1.03,
+  pressed 0.96, window pop from 0.94.
 - `motion`: hover 0.12 Quad Out, press 0.07, release 0.18 Back Out, windowOpen
   0.22 Quint Out, windowClose 0.15 Quad In, toastIn 0.25 / toastOut 0.2, bar
   0.25, count 0.4, knob 0.12, pulse 0.6, reducedFade 0.1.
@@ -201,7 +203,7 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `dropdown.list` | `lk_tooltip` | — | paper |
 | `field.value` | `lk_button_paper_small_normal` | — | paper |
 | `hud.leaf` | `lk_emblem_leaf` | — | glyph |
-| `hud.playerCard` | `lk_player_card` | — | paper |
+| `hud.rune` | `lk_emblem_rune` | — | glyph ◆ (placed as stored) |
 | `iconButton.close` | `lk_button_close_normal` | disabled `lk_button_close_disabled`, hover `lk_button_close_hover`, pressed `lk_button_close_pressed` | leather |
 | `iconButton.dropdown` | `lk_dropdown_button` | — | paper |
 | `iconButton.hud` | `lk_button_hud` | selected `lk_button_paper_small_hover` | paper |
@@ -325,6 +327,8 @@ local window = Kit.Window.new(screen, { title = "Ancestral Forge", smallCaps = t
 (columns, detail card); card = leather corners; plaque = paper title plaque
 (`text` centred in `detailTitle`, M05 "Shattered Crater").
 `Kit.SectionHeader.new(parent, {rect, text, icon?, count?, rule = true})` → `:SetText`, `:SetCount`.
+The label keeps its (phone-boosted) size when it fits the header's width, else
+it shrinks to fit; it never ends in "…" (STYLE_GUIDE §4.6). `:SetText` fits again.
 ```lua
 local party = Kit.Panel.new(body, { rect = { 0, 0, 360, 445 }, title = "Your Party", icon = "party", count = "1/8", scroll = true })
 ```
@@ -422,7 +426,9 @@ Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1,
 
 ### Stepper
 `Kit.Stepper.new(parent, {rect, min = 1, max, value, step = 1, allLabel?, onChange(v)})`;
-`:SetValue`, `:SetRange(min, max)`. − / + disable at the limits.
+`:SetValue`, `:SetRange(min, max)`. − / + disable at the limits. On touch their
+hit pads grow only halfway to the next button (`padLimit`), so −, + and All
+never overlap.
 
 ### KeyCap
 `Kit.KeyCap.new(parent, {text, rect = {x, y, 0, h} (0 fits the text) | height, variant = "cap" | "flat", onPress?})`;
@@ -448,7 +454,11 @@ Kit.ListRow.new(list, { size = { 300, 72 }, layoutOrder = i, variant = "card", i
 
 ### PlayerRow
 `Kit.PlayerRow.new(parent, {rect | size, userId?, name?, level?, leader?, badge? ("leader" | "ready" | "notReady"), action? ({label, onPress, variant?, enabled?}), empty?, emptyText?, rule = true, frame?, onPress?})`;
-`:Set(data)` redraws, `:SetSelected`, `:SetLevel(level?, progress?)`. The
+`:Set(data)` redraws, `:SetSelected`, `:SetLevel(level?, progress?)`.
+`nameSize` / `levelSize` never go under 12 design px (`Core.TextFloor`); when
+the (phone-boosted) name and level overflow their lines at 10 % / 54 % of the
+row, the two lines sit as one block centred in the row, so every row has the
+same name-to-level pitch. The
 empty row is a muted disc and "Empty Slot". The headshot fills its box with no
 frame or backdrop (`frame = "none"`, `backdrop = false` by default; pass
 `frame = "square"` for the old framed look). `levelBar = true` (compact rows
@@ -492,10 +502,16 @@ the RichText small caps; `Kit.Text.Width(text, role, size?)` measures.
 The kit rail and thumb follow `CanvasPosition`; the native bar is hidden.
 
 ### Toast
-`Kit.Toast.Show({kind = "quest" | "item" | "info" | "warn", title, text?, icon?, duration = 4, onPress?, onClose?, actions? = {{label, onPress, variant?}}})`
+`Kit.Toast.Show({kind = "quest" | "item" | "info" | "warn", title, text?, icon?, duration = 4, onPress?, onClose?, actions? = {{label, onPress, variant?}}, actionsBelow?})`
 → handle `{Close, toast}`. Up to three stacked top-centre in `KitToasts`
-(DisplayOrder 40); the oldest goes first; each slides 24 px and fades.
-`Kit.Toast.new(parent, props)` draws one card in place.
+(DisplayOrder 40); the oldest goes first; each slides 24 px and fades part by
+part (no CanvasGroup: a group draws its text through a texture, soft under the
+column's fractional scale). The line is body text at `Toast.LINE_SIZE` (15,
+boosted on phones) and never shrinks: a long line wraps to a second line and
+the card grows. Actions sit beside the text when the line fits there, else on a
+row under it, right-aligned (the first action rightmost); `actionsBelow`
+forces either. `toast.h` is the card's height; `Toast.Layout(props, w, h)`
+gives the layout. `Kit.Toast.new(parent, props)` draws one card in place.
 
 ### ConfirmDialog
 `Kit.ConfirmDialog.Show({title, text? | build?(body, w, h), confirmLabel = "Confirm", cancelLabel = "Cancel", danger?, holdSeconds?, onConfirm(dialog), onCancel?, size? = {560, 330}})`
@@ -517,12 +533,27 @@ Shows on mouse hover, a 0.5 s touch hold and gamepad selection, in `KitTooltip`
 ### Modal, Scale, Interact (for screen code that needs them)
 - `Kit.Modal.Open(entry, layer, gamepad?)`, `Closed(entry)`, `Top()`, `Count()`,
   `IsOpen(entry)`, `Back()`. Screens do this themselves; call `Back()` from a
-  custom back button.
+  custom back button. `DefaultFor(entry)` is the control gamepad selection
+  opens on: the screen's default, except that a window's ✕ (`KitWindowClose`)
+  gives way to `FirstControl(window)`, the first shown, selectable button in
+  reading order. While anything is open on a touch screen,
+  `GuiService.TouchControlsEnabled` is false (the prior value comes back when
+  the stack empties; `TouchControlsHidden()`).
 - `Kit.Scale.Hud(gui, root, {refW?, refH?})` → stop function; sizes `root` to
   1/scale and keeps the HUD scale (`HudModel.HudScale`, × 0.9 on short touch
   screens). `Kit.Scale.TopInset(gui)` replaces `Parchment.TopInset`.
-- `Kit.Interact.attach(base, {onPress, onLocked, render(state, ctrl), pad, hoverScale, pressScale, selectable, sound, debounce, hit})`
-  for a custom interactive part built on `Kit.Core.Root`.
+- `Kit.Interact.attach(base, {onPress, onLocked, render(state, ctrl), pad, padLimit, hoverScale, pressScale, selectable, sound, debounce, hit})`
+  for a custom interactive part built on `Kit.Core.Root`. `padLimit = {left?,
+  top?, right?, bottom?}` caps how far the touch pad grows on each side (design
+  px; half the gap to a neighbour), also a prop of Button and IconButton.
+- `Kit.Dim(target, amount)` (`Kit.Core.Dim`) dims a picture and every image
+  and text label under it by `amount` (0 undims), composed with the
+  transparency each part rests at, so the faded "picture missing" glyph
+  (`Art.STAND_IN_FADE`) stays faded: `1 − (1 − rest) × (1 − amount)`. The rest
+  value is the part's `KitRestFade` attribute, else its transparency when first
+  dimmed (`Core.SetRestFade` sets one). Use it instead of writing
+  `ImageTransparency` on item art (Slot, ListRow, Tab, Button and IconButton
+  do).
 
 ## 7. Before upload: stand-ins
 
@@ -568,8 +599,7 @@ from `art/ui/sprites/manifest.json` until then.
   (side by side) and `_overlay.png` (50 % blend) and prints the mean difference;
   `--page n` writes one page; `--suffix` tags outputs.
 - **Not drawn in captures:** `Rotation` (the tooltip's top tail is the bottom
-  tail rotated: it draws pointing down), CanvasGroup `GroupTransparency` (toast
-  fades), BlurEffect, tween motion (tweens finish at once), and symbol glyphs
+  tail rotated: it draws pointing down), CanvasGroup `GroupTransparency`, BlurEffect, tween motion (tweens finish at once), and symbol glyphs
   Merriweather lacks (★ draws as a box; Roblox falls back to another font in
   game). Absolute sizes are zero, so `Scroll` sizes its thumb from
   `contentHeight` and the slider drag maths runs only in game.
@@ -638,13 +668,13 @@ slots). Art and tint always come from `ItemInfo.Icon`.
 untinted only when ItemInfo has no art.
 
 **Picture** (new): `Kit.Picture.new(parent, {rect, role, tint?, exact?})`,
-`:SetState`. Draws a role as a picture: `hud.playerCard` (lk_player_card),
-`hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
+`:SetState`. Draws a role as a picture: `hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
 lk_window_frame), `map.island` (pm_map_island).
 
 **New roles**: `divider.ink`, `divider.hairline`, `row.soft`, `check.ringOff`
 (lk_ring_track), `check.ringOn` (lk_ring_full), `scroll.thinTrack`,
-`scroll.thinThumb`, `hud.playerCard`, `hud.leaf`, `panel.party`, `map.island`;
+`scroll.thinThumb`, `hud.playerCard` (removed in §16: never drawn in game),
+`hud.leaf`, `panel.party`, `map.island`;
 `portrait.empty` is now the native tan disc. Native roles (`native = true`)
 draw as flat kit shapes by design. New colour tokens: `emptyDot` (now #CC9F77, §11),
 `hairline` #EECBA4, `railTrack`, `railThumb` (sampled from M01 / M04).
@@ -838,3 +868,36 @@ plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
   their own so the uploaded atlases keep their rects and bytes.
 - Usage and measurements: PlayScreen.md "Play rune art (D26)", LobbyScreen.md;
   gallery page 9 (`kit_gallery_9.png`, `_fallback`).
+
+## 16. Fix round 5
+
+- **Stand-in fade kept**: dimming item art (a disabled slot, a locked row, a
+  locked recipe's big picture) composes with the "picture missing" glyph's
+  fade through `Kit.Dim` (§6 Modal, Scale, Interact) instead of resetting
+  `ImageTransparency` to 0, which drew the glyph solid black. Screens that dim
+  item art call `Kit.Dim(icon.root or icon.image, if dim then 0.4 else 0)`.
+- **Toast**: no CanvasGroup (per-part fades); the line is 15 design px (phone
+  boost on top), wraps to two lines instead of shrinking; the answer pair moves
+  under the line when it does not fit beside it (the trade invite).
+- **SectionHeader** shrinks to fit its width and never truncates (the world
+  HUD's FIND EXTRACTION on phones).
+- **Modal**: Roblox's thumbstick and jump button are hidden while any layer is
+  open on a touch screen; gamepad selection opens on a window's first content
+  control rather than its ✕.
+- **Phones**: a small window (ConfirmDialog 560 × 330, the world menu) draws at
+  most `scale.touchSmallMax` (1.25) × the scale of a typical window
+  (`phoneText.refWindow`) on the same screen, so it is not blown up to fill the
+  phone (ConfirmDialog at 844 × 390: 0.59, was 0.98; big windows unchanged).
+  `kit_gallery_flow_2.png` shows it.
+- **Text floor**: sizes the kit picks or takes from a screen (PlayerRow name
+  and level, the toast line, key caps) are at least 12 design px
+  (`space.minTextDesign`, `Core.TextFloor`); PlayerRow keeps one name-to-level
+  pitch in every row.
+- **Touch pads**: `padLimit` (Interact, Button, IconButton); Stepper's −, +
+  and All pads no longer overlap.
+- **Tokens and roles**: `emptyIconTint` (the empty vital icon, was a literal in
+  `Vitals`); `leaderTag` and `notReadyTint` removed (no reader); the
+  `hud.playerCard` role removed (the player card is not drawn in game; the
+  `lk_player_card` sprite stays sliced). HudLayout.json no longer carries
+  `colors`, `fonts` or `fontFaces`, and `Hud/Layout` no longer has `Color`,
+  `Font` or `FontFace` (nothing read them).

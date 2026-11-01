@@ -183,6 +183,92 @@ do
 	second:Destroy()
 end
 
+-- Touch screens: Roblox's thumbstick and jump button hide while a layer is
+-- open and come back as they were when the stack empties.
+do
+	local GuiService = game:GetService("GuiService")
+	local touch = UserInputService.TouchEnabled
+	UserInputService.TouchEnabled = true
+	GuiService.TouchControlsEnabled = true
+	local screen = Kit.Screen.new("KitFlowTouch", { size = { 600, 400 } })
+	screen:Open()
+	check(GuiService.TouchControlsEnabled == false, "touch controls hide while a window is open")
+	local dialog = Kit.ConfirmDialog.Show({ title = "Sure?" })
+	dialog.Close()
+	check(GuiService.TouchControlsEnabled == false, "a dialog closing over a window keeps them hidden")
+	screen:Close()
+	check(GuiService.TouchControlsEnabled == true, "touch controls come back when the stack empties")
+	screen:Destroy()
+	UserInputService.TouchEnabled = touch
+end
+
+-- Gamepad: a window whose default is its ✕ opens on its first content control.
+do
+	local screen = Kit.Screen.new("KitFlowPad", { size = { 600, 400 } })
+	local window = Kit.Window.new(screen, { title = "Pad", icon = "chest" })
+	check(screen.defaultSelection == window.close.control.hit, "the ✕ is the window's fallback default")
+	local first = Kit.Button.new(window:Body(), { rect = { 0, 0, 200, 58 }, label = "First" })
+	Kit.Button.new(window:Body(), { rect = { 0, 80, 200, 58 }, label = "Second" })
+	check(Kit.Modal.DefaultFor(screen) == first.control.hit, "gamepad selection skips the ✕ for content")
+	screen:Destroy()
+end
+
+-- Dimming keeps the "picture missing" glyph's own fade.
+do
+	local slot = Kit.Slot.new(root, { rect = { 10, 600, 92, 99 }, item = { catalogId = "IronSword" } })
+	local function glyph()
+		for _, part in slot.icon.root:GetDescendants() do
+			if part:IsA("ImageLabel") then
+				return part
+			end
+		end
+		return nil
+	end
+	local image = glyph()
+	check(image ~= nil and slot.icon.root:GetAttribute("KitStandIn") == true, "an item without art shows a stand-in")
+	if image then
+		check(math.abs(image.ImageTransparency - Kit.Art.STAND_IN_FADE) < 1e-6, "the stand-in rests faded")
+		slot:SetEnabled(false)
+		check(image.ImageTransparency > Kit.Art.STAND_IN_FADE, "dimming fades it further")
+		slot:SetEnabled(true)
+		check(math.abs(image.ImageTransparency - Kit.Art.STAND_IN_FADE) < 1e-6, "undimming returns to the fade")
+	end
+	slot:Destroy()
+end
+
+-- Toasts: an answer pair moves under a line that does not fit beside it, and
+-- the line keeps its size (wrapping, never shrinking).
+do
+	local toast = Kit.Toast.new(root, {
+		rect = { 10, 720, 430, 84 },
+		title = "Trade invite",
+		text = "SunnyVale wants to trade.",
+		hideClose = true,
+		actions = { { label = "Accept" }, { label = "Decline", variant = "secondary" } },
+	})
+	check(toast.layout.below and toast.h > 84, "two actions go on a row under a long line")
+	check(toast.text.TextScaled == false and toast.text.TextSize >= 12, "the toast line keeps at least 12 px")
+	toast:Destroy()
+end
+
+-- Section headers shrink to fit and never end in "…".
+do
+	local header = Kit.SectionHeader.new(root, { rect = { 10, 820, 150, 34 }, text = "Find Extraction", icon = "exit" })
+	check(header.label.TextTruncate == Enum.TextTruncate.None, "a section header never truncates")
+	check(
+		Kit.Text.Width(header.label.Text, "sectionHeader", header.label.TextSize) <= header.label.Size.X.Offset + 1,
+		"a long header shrinks to its width"
+	)
+	header:Destroy()
+end
+
+-- Phones: a small dialog stays near the big windows' scale.
+do
+	local small = Kit.Scale.WindowFit(844, 390, 58, 560, 330, nil, true)
+	local big = Kit.Scale.WindowFit(844, 390, 58, 1187, 650, nil, true)
+	check(small <= big * 1.3 and small >= big, ("a phone dialog draws at %.2f, windows at %.2f"):format(small, big))
+end
+
 -- Leak check: build and destroy each component 20 times.
 local function handlerCount()
 	local total = 0
@@ -290,8 +376,10 @@ local window = Kit.Window.new(screen, {
 Kit.Panel.new(window:Body(), { rect = { 0, 10, 330, 520 }, title = "Recipes" })
 screen:Open()
 screen:Fit(W, H, 58, 1)
-Kit.Toast.Show({ kind = "quest", title = "Quest Complete", text = "Gather Supplies" })
-Kit.Toast.Show({ kind = "item", title = "Item Received", text = "Iron Pickaxe" })
+local pageToasts = {
+	Kit.Toast.Show({ kind = "quest", title = "Quest Complete", text = "Gather Supplies" }),
+	Kit.Toast.Show({ kind = "item", title = "Item Received", text = "Iron Pickaxe" }),
+}
 Kit.ConfirmDialog.Show({
 	title = "Forge Iron Pickaxe?",
 	text = "Uses 4 Iron Ore and 3 Wood from your vault.",
@@ -300,3 +388,43 @@ Kit.ConfirmDialog.Show({
 check(Kit.Modal.Count() == 2, "the dialog stacks above the window")
 assert(failures == 0, "dialog stacking failed")
 __dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })
+
+-- Page 2: the same on a phone held sideways (844 × 390, touch only): the window
+-- fills the room under the top bar, the dialog stays near the window's scale
+-- (not blown up to fill the phone) and the trade invite toast puts its answers
+-- under its line. (The toast lane cannot keep below the dialog here: the
+-- harness has no absolute positions, KIT.md §9.)
+Kit.Modal.Back()
+screen:Close()
+for _, toast in pageToasts do
+	toast.Close()
+end
+local PW, PH = 844, 390
+workspace.CurrentCamera.ViewportSize = Vector2.new(PW, PH)
+UserInputService.TouchEnabled = true
+UserInputService.KeyboardEnabled = false
+screen:Open()
+screen:Fit(PW, PH, 58)
+local phoneDialog = Kit.ConfirmDialog.Show({
+	title = "Forge Iron Pickaxe?",
+	text = "Uses 4 Iron Ore and 3 Wood from your vault.",
+	confirmLabel = "Forge",
+})
+phoneDialog.screen:Fit(PW, PH, 58)
+Kit.Toast.Show({
+	kind = "info",
+	icon = "trade",
+	title = "Trade invite",
+	text = "SunnyVale wants to trade.",
+	hideClose = true,
+	actions = { { label = "Accept" }, { label = "Decline", variant = "secondary" } },
+})
+-- The harness gives the toast gui no size, so the column cannot measure the
+-- phone: set the scale it takes there (the HUD scale, raised to the overlay
+-- phone floor).
+local column = Players.LocalPlayer.PlayerGui.KitToasts.Column
+column:FindFirstChildWhichIsA("UIScale").Scale = Kit.Scale.PhoneFloor("overlay")
+print(
+	("kit flow phone: window scale %.3f, dialog scale %.3f"):format(screen.scale.Scale, phoneDialog.screen.scale.Scale)
+)
+__dump(Players.LocalPlayer.PlayerGui, PW, PH, { background = "art/reference/ui/lobby/01_hud.png" })

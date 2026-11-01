@@ -25,25 +25,89 @@ Toast.__index = Toast
 -- Emblem icon per kind.
 Toast.ICONS = { quest = "scroll", item = "gift", info = "exclamation", warn = "warning" }
 
--- props: rect | size (430 × 84), kind, title, text, icon, actions ({{label,
--- onPress, variant}}; two fit beside the text, e.g. Accept (primary) and
--- Decline (secondary)), actionWidth (96), hideClose (no ✕: the actions answer
--- it), onPress, onClose, zIndex, name.
-function Toast.new(parent: Instance, props)
-	local w, h = Core.Size(props, Tokens.Space("toastW", 430), Tokens.Space("toastH", 84))
-	local base = Core.Root(parent, "Toast", "toast.frame", props, w, h)
-	base.root:SetAttribute("KitVariant", props.kind or "info")
-	local self = setmetatable({ root = base.root, base = base, onClose = props.onClose, actions = {} }, Toast)
-	self.plate = Art.Plate(base.visual, "toast.frame", w, h, { z = base.z })
-	local s = math.floor(h * 0.62)
-	Art.Icon(base.visual, props.icon or Toast.ICONS[props.kind or "info"] or "exclamation", { 22, (h - s) / 2, s, s }, {
-		z = base.z + 1,
-		name = "Emblem",
-	})
+-- The line's text size (design px, the body role's 15; boosted on phones). It
+-- never shrinks: a long line wraps to a second line and the card grows.
+Toast.LINE_SIZE = 15
+Toast.LINE_MAX = 2
+-- The action buttons' height and the row they take under the text when the
+-- line does not fit beside them.
+Toast.ACTION_H = 40
+Toast.ACTION_ROW = 48
+
+-- The card's layout for `props` at width `w` and base height `h0` (the toast
+-- token height): where the text ends, whether the actions sit beside the text
+-- or on a row under it, how many lines the line takes and the card's height.
+function Toast.Layout(props, w: number, h0: number)
+	local s = math.floor(h0 * 0.62)
 	local x = 22 + s + 14
-	local right = w - (if props.hideClose then 20 else 44)
+	local closeRight = w - (if props.hideClose then 20 else 44)
+	local actions = props.actions or {}
+	local bw = props.actionWidth or 96
+	local actionsW = if #actions > 0 then #actions * bw + (#actions - 1) * 8 else 0
+	local lineW = if props.text then Core.TextWidth(props.text, "body", Toast.LINE_SIZE) * 1.04 else 0
+	local besideRight = closeRight - (if actionsW > 0 then actionsW + 8 else 0)
+	local below = actionsW > 0
+		and (props.actionsBelow == true or (props.actionsBelow == nil and lineW > besideRight - x))
+	local right = if below then closeRight else besideRight
+	local lines = if props.text and lineW > right - x then Toast.LINE_MAX else 1
+	local px = Toast.LINE_SIZE * Core.TextBoost("body", Toast.LINE_SIZE)
+	local extra = (lines - 1) * math.ceil(px * 1.3)
+	local textH = h0 + extra
+	return {
+		emblem = s,
+		x = x,
+		right = right,
+		closeRight = closeRight,
+		actionWidth = bw,
+		below = below,
+		lines = lines,
+		textH = textH,
+		h = textH + (if below then Toast.ACTION_ROW else 0),
+	}
+end
+
+-- props: rect | size (430 × 84; the height is the card's least: a two-line
+-- line and a row of actions add to it, see .h), kind, title, text, icon,
+-- actions ({{label, onPress, variant}}: beside the text when the line fits
+-- there at its size, else on a row under it, right-aligned, e.g. Accept
+-- (primary) and Decline (secondary)), actionsBelow (true / false forces it),
+-- actionWidth (96), hideClose (no ✕: the actions answer it), onPress,
+-- onClose, zIndex, name.
+function Toast.new(parent: Instance, props)
+	local w, h0 = Core.Size(props, Tokens.Space("toastW", 430), Tokens.Space("toastH", 84))
+	local layout = Toast.Layout(props, w, h0)
+	local h = layout.h
+	local placed = table.clone(props)
+	if props.rect then
+		placed.rect = { props.rect[1], props.rect[2], w, h }
+	else
+		placed.size = { w, h }
+	end
+	local base = Core.Root(parent, "Toast", "toast.frame", placed, w, h)
+	base.root:SetAttribute("KitVariant", props.kind or "info")
+	local self = setmetatable(
+		{ root = base.root, base = base, onClose = props.onClose, actions = {}, w = w, h = h, layout = layout },
+		Toast
+	)
+	self.plate = Art.Plate(base.visual, "toast.frame", w, h, { z = base.z })
+	local s = layout.emblem
+	local textH = layout.textH
+	Art.Icon(
+		base.visual,
+		props.icon or Toast.ICONS[props.kind or "info"] or "exclamation",
+		{ 22, (textH - s) / 2, s, s },
+		{
+			z = base.z + 1,
+			name = "Emblem",
+		}
+	)
+	local x = layout.x
+	local right = layout.right
+	-- Right to left: the first action is the rightmost.
+	local actionRight = layout.closeRight
+	local actionY = if layout.below then textH - 6 else (textH - Toast.ACTION_H) / 2
 	for index, action in props.actions or {} do
-		local bw = props.actionWidth or 96
+		local bw = layout.actionWidth
 		table.insert(
 			self.actions,
 			Button.new(base.visual, {
@@ -51,12 +115,12 @@ function Toast.new(parent: Instance, props)
 				sizeClass = "s",
 				label = action.label,
 				variant = action.variant or "primary",
-				rect = { right - bw, (h - 40) / 2, bw, 40 },
+				rect = { actionRight - bw, actionY, bw, Toast.ACTION_H },
 				zIndex = base.z + 2,
 				onPress = action.onPress,
 			})
 		)
-		right -= bw + 8
+		actionRight -= bw + 8
 	end
 	local hasText = props.text ~= nil
 	self.title = Core.Label(base.visual, {
@@ -66,18 +130,22 @@ function Toast.new(parent: Instance, props)
 		caps = true,
 		size = 22,
 		scaled = true,
-		rect = if hasText then { x, h * 0.16, right - x, h * 0.4 } else { x, 0, right - x, h },
+		rect = if hasText then { x, h0 * 0.16, right - x, h0 * 0.4 } else { x, 0, right - x, textH },
 		z = base.z + 1,
 	})
 	if hasText then
+		-- At its size (never shrunk below it): a second line when it is long,
+		-- "…" only past that.
 		self.text = Core.Label(base.visual, {
 			name = "Line",
 			text = props.text,
 			role = "body",
-			scaled = true,
-			rect = { x, h * 0.54, right - x, h * 0.32 },
+			size = Toast.LINE_SIZE,
+			wrap = layout.lines > 1,
+			rect = { x, h0 * 0.54, right - x, h0 * 0.32 + (textH - h0) },
 			z = base.z + 1,
 		})
+		self.text.TextTruncate = Enum.TextTruncate.AtEnd
 	end
 	-- The ✕ mark is 22 px; its button pads it to touchMin.
 	local c = 22
@@ -227,6 +295,38 @@ end
 
 local order = 0
 
+-- Every faded part of a card and the transparency it rests at: images, text,
+-- strokes and filled frames. A toast fades part by part (no CanvasGroup: a
+-- group draws its text through a texture, soft under the column's fractional
+-- UIScale).
+local FADE_PROPS = {
+	ImageLabel = "ImageTransparency",
+	TextLabel = "TextTransparency",
+	UIStroke = "Transparency",
+	Frame = "BackgroundTransparency",
+}
+function Toast.FadeParts(root: Instance): { { object: Instance, prop: string, rest: number } }
+	local parts = {}
+	for _, object in root:GetDescendants() do
+		local prop = FADE_PROPS[object.ClassName]
+		if prop then
+			local rest = (object :: any)[prop]
+			if type(rest) == "number" and rest < 1 then
+				table.insert(parts, { object = object, prop = prop, rest = rest })
+			end
+		end
+	end
+	return parts
+end
+
+local function fade(parts, key: string, show: boolean)
+	for _, part in parts do
+		if part.object.Parent then
+			Motion.Play(part.object, key, { [part.prop] = if show then part.rest else 1 })
+		end
+	end
+end
+
 -- Shows a toast. props as Toast.new plus duration (seconds, default 4).
 -- Returns a handle with Close().
 function Toast.Show(props)
@@ -236,16 +336,15 @@ function Toast.Show(props)
 	end
 	order += 1
 	local w, h = Tokens.Space("toastW", 430), Tokens.Space("toastH", 84)
-	-- A CanvasGroup so the whole card fades as one.
-	local slot = Core.Make("CanvasGroup", {
+	local slot = Core.Make("Frame", {
 		Name = "Toast" .. order,
 		BackgroundTransparency = 1,
-		GroupTransparency = 1,
 		LayoutOrder = order,
 		Size = UDim2.fromOffset(w, h),
 	}, parent)
 	local handle = {}
 	local card
+	local parts
 	local closed = false
 	function handle.Close()
 		if closed then
@@ -256,11 +355,16 @@ function Toast.Show(props)
 		if index then
 			table.remove(shown, index)
 		end
-		Motion.Play(card.root, "toastOut", { Position = UDim2.fromOffset(0, -Tokens.Space("toastSlide", 24)) })
-		Motion.Play(slot, "toastOut", { GroupTransparency = 1 }, function()
-			card:Destroy()
-			slot:Destroy()
-		end)
+		fade(parts, "toastOut", false)
+		Motion.Play(
+			card.root,
+			"toastOut",
+			{ Position = UDim2.fromOffset(0, -Tokens.Space("toastSlide", 24)) },
+			function()
+				card:Destroy()
+				slot:Destroy()
+			end
+		)
 	end
 	local cardProps = table.clone(props)
 	cardProps.rect = { 0, 0, w, h }
@@ -272,9 +376,15 @@ function Toast.Show(props)
 	end
 	card = Toast.new(slot, cardProps)
 	handle.toast = card
+	-- A long line or a row of actions makes the card taller.
+	slot.Size = UDim2.fromOffset(w, card.h)
+	parts = Toast.FadeParts(card.root)
+	for _, part in parts do
+		Motion.Set(part.object, { [part.prop] = 1 })
+	end
 	card.root.Position = UDim2.fromOffset(0, -Tokens.Space("toastSlide", 24))
 	Motion.Play(card.root, "toastIn", { Position = UDim2.fromOffset(0, 0) })
-	Motion.Play(slot, "toastIn", { GroupTransparency = 0 })
+	fade(parts, "toastIn", true)
 	for _, old in KitModel.PushToast(shown, handle, Tokens.Space("toastMax", 3)) do
 		old.Close()
 	end

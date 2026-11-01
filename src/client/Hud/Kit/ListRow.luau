@@ -207,9 +207,8 @@ function ListRow:_render(state: string)
 	end
 	local dim = drawn == "disabled" or drawn == "locked"
 	self.title.TextColor3 = Tokens.Color(if dim then "inkSoft" else "inkLabel")
-	if self.icon and self.icon:IsA("ImageLabel") then
-		(self.icon :: ImageLabel).ImageTransparency = if dim then 0.4 else 0
-	end
+	-- The icon (an item's art, or its faded stand-in glyph) keeps its own fade.
+	Core.Dim(self.icon, if dim then 0.4 else 0)
 end
 
 function ListRow:SetTitle(text: string)

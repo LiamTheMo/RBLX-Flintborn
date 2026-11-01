@@ -102,7 +102,6 @@ local USED = {
 	"check.ringOn",
 	"scroll.thinTrack",
 	"scroll.thinThumb",
-	"hud.playerCard",
 	"hud.leaf",
 	"panel.party",
 	"map.island",
