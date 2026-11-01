@@ -89,11 +89,8 @@ function Slot.new(parent: Instance, props)
 			self.star.Visible = not locked and self.item ~= nil and self.item.permanent == true
 			self.count.Visible = not locked
 			self.count.TextTransparency = if dim then 0.4 else 0
-			for _, part in self.icon.root:GetDescendants() do
-				if part:IsA("ImageLabel") then
-					part.ImageTransparency = if dim then 0.4 else 0
-				end
-			end
+			-- Composes with the item art's own fade (the stand-in glyph's).
+			Core.Dim(self.icon.root, if dim then 0.4 else 0)
 		end,
 	})
 	if props.hotkey then

@@ -83,7 +83,7 @@ function Vitals:Set(key: string, fraction: number, valueText: string, instant: b
 	end
 	local images = Vitals.IconImages(row.bar.icon)
 	for _, image in images do
-		image.ImageColor3 = if state == "empty" then Vitals.EMPTY_TINT else Color3.new(1, 1, 1)
+		image.ImageColor3 = Kit.Tokens.Color(if state == "empty" then Vitals.EMPTY_TINT else "white")
 		image.ImageTransparency = if state == "empty" then Vitals.EMPTY_FADE else 0
 	end
 	if state == "low" and images[1] then
@@ -91,8 +91,9 @@ function Vitals:Set(key: string, fraction: number, valueText: string, instant: b
 	end
 end
 
--- An empty bar's icon: darkened toward grey and faded.
-Vitals.EMPTY_TINT = Color3.fromRGB(120, 116, 110)
+-- An empty bar's icon: darkened toward grey (the emptyIconTint token, a
+-- multiply) and faded.
+Vitals.EMPTY_TINT = "emptyIconTint"
 Vitals.EMPTY_FADE = 0.35
 
 -- The image labels that draw a stat icon: the icon itself, or the pieces of a

@@ -34,7 +34,13 @@ function Stepper.new(parent: Instance, props)
 	local allW = if props.allLabel then 70 else 0
 	local fieldW = w - bw * 2 - gap * 2 - (if allW > 0 then allW + gap else 0)
 	local leather = props.buttons == "leather"
+	-- Touch pads grow only halfway to the next button (over the field to its
+	-- middle), so −, + and All never take each other's presses; the outer
+	-- edges grow freely.
+	local half = gap / 2
+	local overField = gap + fieldW / 2
 	self.minus = IconButton.new(base.visual, {
+		padLimit = { right = overField },
 		name = "Minus",
 		variant = if leather then "leather" else "minus",
 		icon = if leather then "minus" else nil,
@@ -63,6 +69,7 @@ function Stepper.new(parent: Instance, props)
 		z = base.z + 1,
 	})
 	self.plus = IconButton.new(base.visual, {
+		padLimit = { left = overField, right = if props.allLabel then half else nil },
 		name = "Plus",
 		variant = if leather then "leather" else "plus",
 		icon = if leather then "plus" else nil,
@@ -74,6 +81,7 @@ function Stepper.new(parent: Instance, props)
 	})
 	if props.allLabel then
 		self.all = Button.new(base.visual, {
+			padLimit = { left = half },
 			name = "All",
 			variant = "secondary",
 			sizeClass = "s",

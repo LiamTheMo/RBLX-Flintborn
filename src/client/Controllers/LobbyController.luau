@@ -11,9 +11,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
@@ -107,14 +107,9 @@ local function refreshPreview()
 	if #items == 0 then
 		label("Nothing in your backpack will enter the run.", ui.preview)
 	else
-		label("⚠ These items go with you; all but ★ Permanent ones can be lost:", ui.preview)
+		label("These items go with you; all but Permanent ones can be lost:", ui.preview)
 		for _, item in items do
-			local def = ItemCatalog.Get(item.catalogId)
-			local name = def and def.name or tostring(item.catalogId)
-			label(
-				(item.permanent and "★ " or "• ") .. name .. (item.quantity and (" ×" .. item.quantity) or ""),
-				ui.preview
-			)
+			label(PlayModel.ItemLine(item), ui.preview)
 		end
 	end
 	label("Items in your vault always stay safe. Materials you bring never get the Center ×2.", ui.preview)
@@ -123,7 +118,12 @@ end
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,
 -- with one more pass if something changed while a fetch was in flight.
 local previewBusy, previewAgain = false, false
+-- When the preview was last asked for (os.clock): the backup timer re-reads it
+-- only once that is PREVIEW_REFRESH_SECONDS old.
+local previewAskedAt = -math.huge
+
 local function requestPreview()
+	previewAskedAt = os.clock()
 	if previewBusy then
 		previewAgain = true
 		return
@@ -188,7 +188,7 @@ local function refreshParty()
 	if party then
 		label("Your party (" .. #party.members .. "/" .. PartyRules.MAX_SIZE .. "):", ui.party)
 		for _, member in party.members do
-			label((member.userId == party.leader and "★ " or "• ") .. member.name, ui.party)
+			label("• " .. member.name .. (if member.userId == party.leader then " (leader)" else ""), ui.party)
 		end
 		button("Leave party", ui.party, function()
 			partyAction("leave")
@@ -421,13 +421,19 @@ function LobbyController.Start()
 	end)
 	-- Never block later controllers' Start on a server round trip. The profile may
 	-- still be loading now, and every vault, shop or trade change marks a save, so
-	-- the save status changing is the cue to re-read; a slow timer backs it up.
+	-- the save status changing is the cue to re-read; a slow timer backs it up,
+	-- asking only when no other read has happened for PREVIEW_REFRESH_SECONDS
+	-- (so the preview is never older than that, without extra round trips).
 	requestPreview()
 	player:GetAttributeChangedSignal("SaveStatus"):Connect(requestPreview)
 	task.spawn(function()
 		while true do
-			task.wait(LobbyController.PREVIEW_REFRESH_SECONDS)
-			requestPreview()
+			local due = previewAskedAt + LobbyController.PREVIEW_REFRESH_SECONDS - os.clock()
+			if due > 0 then
+				task.wait(due)
+			else
+				requestPreview()
+			end
 		end
 	end)
 	local function notice()

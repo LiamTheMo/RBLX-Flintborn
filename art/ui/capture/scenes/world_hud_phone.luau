@@ -52,7 +52,7 @@ hud.event:Set({
 	title = "World Event",
 	timer = "6:12",
 	name = "Bloodroot Bloom",
-	description = "Rare · Rare plants have sprouted · NE, 312 m",
+	description = "Rare · Prized plants have sprouted · NE, 312 m",
 }, "Vegetation")
 hud.bottom:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 hud.bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })
@@ -71,6 +71,33 @@ holder.Position = UDim2.new(0.55, 0, 0.55, 0)
 holder.Parent = root
 local drawn = InteractionPrompt.Draw(holder, { key = "TAP", action = "Gather", object = "Redberry Bush" })
 holder.Size = UDim2.fromOffset(drawn.width, drawn.height)
+
+-- Tribe names and the prompt's lines show whole at their (phone floor) size:
+-- the strip's cells and the plaque widen for them.
+do
+	local whole = true
+	local function fits(label: Instance?)
+		if label and label:IsA("TextLabel") and label.Text ~= "" then
+			local role = label:GetAttribute("KitTextRole") or "body"
+			local base = label.TextSize / Kit.Core.TextBoost(role, label.TextSize)
+			if Kit.Text.Width(label.Text, role, base) > label.Size.X.Offset then
+				whole = false
+				print(("  FAIL world_hud_phone: %q is cut (%s)"):format(label.Text, label.Name))
+			end
+		end
+	end
+	for _, item in hud.party.root:GetDescendants() do
+		if item.Name == "Name" then
+			fits(item)
+		end
+	end
+	fits(holder:FindFirstChild("Action", true))
+	fits(holder:FindFirstChild("Object", true))
+	print(if whole then "  ok world_hud_phone: tribe names and the prompt show whole" else "  FAIL world_hud_phone")
+	if not whole then
+		error("world_hud_phone: text is cut")
+	end
+end
 
 if UserInputService.TouchEnabled then
 	-- The touch attack button, as CombatController places it.

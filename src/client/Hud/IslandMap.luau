@@ -18,7 +18,10 @@ local IslandMap = {}
 IslandMap.__index = IslandMap
 
 IslandMap.MAP_SPAN = 4400
--- The 1,000 px painting stays sharp to about twice its size.
+-- Zoom levels. The map draws the 1,000 px painting where it is shown small (the
+-- Journal) and its 2,040 px copy where it is magnified (map.island's `hi`
+-- tiles, once uploaded), which stays at or under 1x at zoom 1 on the world map
+-- even at 1440p.
 IslandMap.ZOOMS = { 1, 1.4, 2 }
 IslandMap.PIN = 50
 -- Extra touch room round a pin, in map pixels.

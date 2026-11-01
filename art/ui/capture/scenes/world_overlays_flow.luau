@@ -2,7 +2,8 @@
 -- what reaches the (mocked) server: the tutorial's Got it, Take and Store in the
 -- loot and chest windows, the tribe's Invite and Kick, the build palette's
 -- piece tabs, tier arrows and Rotate, Escape / B closing the window, the
--- server notice's ✕, and a 20× open / close leak check. Captures the end state
+-- server notice's ✕, and 20× open / close leak checks (instances and
+-- connections: loot, storage chest, tribe, build palette). Captures the end state
 -- (the build palette after picking a Floor one tier up).
 --
 --   python3 art/ui/capture/capture.py world_overlays_flow
@@ -24,7 +25,7 @@ for _, name in { "Notice", "TutorialChanged", "CorpseOpened", "DeathSummary", "C
 	events[name] = remote
 end
 local calls = {}
-local answers = { CorpseTake = { false, "OutOfRange" } }
+local answers = { CorpseTake = { false, "TooFar" } }
 for _, name in { "TutorialAction", "CorpseTake", "ChestTake", "ChestPut", "TribeAction", "Build", "BuildInfo" } do
 	local remote = Instance.new("RemoteFunction")
 	remote.Name = name
@@ -129,7 +130,11 @@ check(
 	last()[1] == "CorpseTake" and last()[2] == "body1" and last()[3] == 2 and last()[4] == "stack:IronOre",
 	"Take asks for that item of that body, by its key"
 )
-check(string.find(find("Status", loot).Text, "OutOfRange") ~= nil, "a refused take says why")
+check(
+	string.find(find("Status", loot).Text, "too far away", 1, true) ~= nil
+		and string.find(find("Status", loot).Text, "TooFar", 1, true) == nil,
+	"a refused take says why in words, not the server's code"
+)
 Kit.Modal.Back()
 check(not loot.Enabled, "Escape / B closes the loot window")
 
@@ -169,24 +174,112 @@ check(last()[2] == "kick" and last()[3] == 7, "Kick asks for that member")
 check(find("Status", tribe).Text == "Done", "the server's answer shows")
 started.TribeController.Toggle()
 
--- Leak check: open and close the loot window 20 times.
-local function count()
-	return #gui:GetDescendants()
+-- Leak checks: open and close each window 20 times; the PlayerGui's instances
+-- and the live connections must come back to where they were.
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
 end
-events.CorpseOpened.OnClientEvent:Fire(
-	"body2",
-	{ { index = 1, name = "Stone", catalogId = "Stone", key = "stack:Stone", rarity = "Common", quantity = 3 } }
-)
-Kit.Modal.Back()
-local before = count()
-for _ = 1, 20 do
+
+local function leakCheck(label: string, cycle: () -> ())
+	cycle()
+	local instances, connections = leakCounts()
+	for _ = 1, 20 do
+		cycle()
+	end
+	local instancesAfter, connectionsAfter = leakCounts()
+	check(
+		instancesAfter == instances,
+		("%s open/close ×20 leaves %d descendants (%d)"):format(label, instances, instancesAfter)
+	)
+	check(
+		connectionsAfter == connections,
+		("%s open/close ×20 leaves %d connections (%d)"):format(label, connections, connectionsAfter)
+	)
+end
+leakCheck("loot", function()
 	events.CorpseOpened.OnClientEvent:Fire(
 		"body2",
 		{ { index = 1, name = "Stone", catalogId = "Stone", key = "stack:Stone", rarity = "Common", quantity = 3 } }
 	)
 	Kit.Modal.Back()
-end
-check(count() == before, ("20 opens leave the PlayerGui as it was (%d -> %d)"):format(before, count()))
+end)
+leakCheck("storage chest", function()
+	events.ChestOpened.OnClientEvent:Fire(
+		"chest2",
+		{ { index = 1, name = "Wood", catalogId = "Wood", key = "stack:Wood", rarity = "Common", quantity = 5 } }
+	)
+	Kit.Modal.Back()
+end)
+leakCheck("tribe", function()
+	started.TribeController.Toggle()
+	started.TribeController.Toggle()
+end)
+leakCheck("build palette", function()
+	started.BuildController.Toggle()
+	started.BuildController.Toggle()
+end)
 
 -- Notice: the ✕ dismisses.
 events.Notice.OnClientEvent:Fire({ title = "Items recovered", text = "Recovered to your vault." })

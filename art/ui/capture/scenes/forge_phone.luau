@@ -1,5 +1,6 @@
 -- The Forge window on a phone held sideways (844 x 390, touch only, the top
 -- bar 58 px down), fitted as in game; prints the smallest text it draws.
+-- Page 2 chooses the locked Iron Legs/Boots (its two-line unlock note).
 local UserInputService = game:GetService("UserInputService")
 workspace.CurrentCamera.ViewportSize = Vector2.new(844, 390)
 UserInputService.TouchEnabled = true
@@ -161,4 +162,35 @@ end
 
 screen:Fit(844, 390, 58, 1)
 report(screen.gui, screen.scale.Scale, "forge_phone")
+__dump(Players.LocalPlayer.PlayerGui, 844, 390)
+
+-- 2: the locked Iron Legs/Boots chosen and scrolled into view: its unlock
+-- note wraps onto two lines inside the taller phone row, and no recipe or
+-- material name ends in "…" (they shrink to fit).
+window:Select("ForgeIronLegs")
+local fits = true
+for id, row in window.rows do
+	local sub = row.subtitle
+	if row.titleCut or sub.Position.Y.Offset + sub.Size.Y.Offset > row.h then
+		fits = false
+		print("  FAIL forge_phone: row " .. id .. " does not fit its card")
+	end
+end
+for id, row in window.materialRows do
+	if row.titleCut then
+		fits = false
+		print("  FAIL forge_phone: material " .. id .. " is cut")
+	end
+end
+local legs = window.rows.ForgeIronLegs
+print(
+	if fits
+			and legs
+			and legs.subtitle.TextWrapped
+		then "  ok forge_phone: names whole, the unlock note on two lines inside its row"
+		else "  FAIL forge_phone: a name or note does not fit"
+)
+if not (fits and legs and legs.subtitle.TextWrapped) then
+	error("forge_phone: a row does not fit")
+end
 __dump(Players.LocalPlayer.PlayerGui, 844, 390)

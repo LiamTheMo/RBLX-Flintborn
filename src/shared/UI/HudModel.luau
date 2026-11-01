@@ -19,8 +19,10 @@ HudModel.OBJECTIVE_TITLE = "FIND EXTRACTION"
 HudModel.EVENT_TITLE = "World Event"
 
 -- One line per event category; names and rarities come from the server view.
+-- The card writes "<rarity> · <blurb>", so no blurb names a rarity ("Rare ·
+-- Rare plants…" read twice, and an Epic event's "Rare plants" contradicted it).
 HudModel.EVENT_BLURBS = {
-	Vegetation = "Rare plants have sprouted",
+	Vegetation = "Prized plants have sprouted",
 	Ore = "A rich ore vein is exposed",
 	Npc = "Hostile creatures are gathering",
 	Cache = "A supply cache is up for grabs",
@@ -201,13 +203,23 @@ function HudModel.HudScale(
 	return math.min(scaled, math.max(fit, minScale))
 end
 
--- 9-slice corner scale for a sprite of natural size (w, h) drawn at (tw, th), so
--- rope corners shrink with small widgets instead of overlapping.
-function HudModel.SliceScale(width: number, height: number, targetWidth: number, targetHeight: number): number
+-- 9-slice corner scale for a sprite of natural (design) size (w, h) drawn at
+-- (tw, th), so rope corners shrink with small widgets instead of overlapping.
+-- `artScale` is the drawn image's pixels per design pixel (a high-resolution
+-- copy at 2x has corner insets twice as many pixels): the result scales those
+-- pixel insets, so the corners keep their design size.
+function HudModel.SliceScale(
+	width: number,
+	height: number,
+	targetWidth: number,
+	targetHeight: number,
+	artScale: number?
+): number
+	local k = if artScale and artScale > 0 then artScale else 1
 	if width <= 0 or height <= 0 then
-		return 1
+		return 1 / k
 	end
-	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1)
+	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1) / k
 end
 
 -- Next hotbar slot for a step (the right bumper = +1), wrapping around. The mouse
@@ -217,8 +229,10 @@ function HudModel.HotbarStep(current: number, step: number, count: number): numb
 end
 
 -- What each HUD hotbar slot shows for an inventory snapshot ({slots, equipped}):
--- index -> {name, count, rarity, equipped}, or nil for an empty slot. `count` is
--- "" for unique items and "×n" for stacks; Permanent items carry a star.
+-- index -> {name, count, rarity, equipped, permanent}, or nil for an empty
+-- slot. `count` is "" for unique items and "×n" for stacks; `permanent` marks
+-- Permanent items (drawn with the star art; the name stays plain, as the
+-- game's fonts have no star glyph).
 function HudModel.HotbarSlots(snapshot, count: number)
 	local views = {}
 	for _, slot in (snapshot and snapshot.slots) or {} do
@@ -226,7 +240,8 @@ function HudModel.HotbarSlots(snapshot, count: number)
 		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
 			local def = ItemCatalog.Get(slot.catalogId)
 			views[index] = {
-				name = (if slot.permanent then "★ " else "") .. (if def then def.name else tostring(slot.catalogId)),
+				name = if def then def.name else tostring(slot.catalogId),
+				permanent = slot.permanent == true,
 				count = if slot.quantity and slot.quantity > 1 then ("×%d"):format(slot.quantity) else "",
 				rarity = if def then def.rarity else "Common",
 				equipped = snapshot.equipped == index,

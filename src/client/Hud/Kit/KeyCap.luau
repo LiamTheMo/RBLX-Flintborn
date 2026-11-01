@@ -49,7 +49,7 @@ function KeyCap.new(parent: Instance, props)
 		name = "Key",
 		text = props.text or "",
 		role = "keycap",
-		size = if variant == "flat" then nil else math.floor(h * 0.42),
+		size = if variant == "flat" then nil else Core.TextFloor(math.floor(h * 0.42)),
 		align = "Center",
 		scaled = true,
 		rect = { 6, 0, w - 12, h - lift * 2 },

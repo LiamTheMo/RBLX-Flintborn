@@ -368,7 +368,7 @@ function PlayWindow:_map(v: Frame, z: number)
 	Kit.Icon.new(v, {
 		name = "Rune",
 		rect = { r[1] + rune[1], r[2] + rune[2], rune[3], rune[4] },
-		icon = "lk_emblem_rune",
+		icon = "hud.rune",
 		tint = "ink",
 		zIndex = z + 1,
 	})

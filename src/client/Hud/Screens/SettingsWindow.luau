@@ -101,11 +101,18 @@ local HEADER_H = 42
 local SLIDER_Y = { 208, 276, 344 }
 local SLIDER_W = 376
 local CHECK_PITCH = 56
+-- Phones and touch tablets boost the row text (STYLE_GUIDE §4.5), so a
+-- checkbox row there is taller and its pitch wider: the title and its
+-- description each get their own line instead of touching.
+local TOUCH_CHECK_H = 50
+local TOUCH_CHECK_PITCH = 64
 -- Key rows: 36 px apart from y 162, caps 101 × 27 at x 950.
 local KEY_Y = 162
 local KEY_PITCH = 36
 local KEY_X = 950
 local KEY_W = 101
+-- Touch: wider caps (ending at the same x) so the boosted "Left Shift" fits.
+local TOUCH_KEY_W = 116
 local KEY_H = 27
 
 local function volume(value: number): string
@@ -226,7 +233,7 @@ function SettingsWindow.new(parent: Instance?, handlers)
 		color = "inkSoft",
 		zIndex = 7,
 	})
-	Kit.Icon.new(visual, { name = "Sketch", rect = { 70, 522, 44, 118 }, icon = "lk_emblem_leaf", zIndex = 7 })
+	Kit.Icon.new(visual, { name = "Sketch", rect = { 70, 522, 44, 118 }, icon = "hud.leaf", zIndex = 7 })
 	self.reset = Kit.Button.new(visual, {
 		name = "Reset",
 		rect = { 551, 581, 232, 55 },
@@ -287,15 +294,18 @@ end
 -- A section header with its rule (GAMEPLAY, KEY BINDS) and the line-art emblem
 -- the mockup draws beside it.
 -- The heading is the spec's size (cap 16–17 px); its rule is Rule.Heading
--- (#C49061, 2 px), 40 px under the header's top.
-local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?, y: number?)
+-- (#C49061, 2 px), 40 px under the header's top. The label's box runs past
+-- the rule up to the emblem (or `textW`), so a long header on a phone keeps
+-- room to shrink into instead of ending in "…".
+local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?, y: number?, textW: number?)
 	local top = y or HEADER_Y
+	local labelW = textW or if emblem then emblem[2][1] - 8 - x else w
 	-- A Kit.Text heading rather than a SectionHeader: the header sizes its label
 	-- to a measured width that comes out short for Merriweather Bold at 22 px
 	-- and cuts the word off ("GAMEP…").
 	Kit.Text.new(page, {
 		name = "Header",
-		rect = { x, top, w, HEADER_H - 6 },
+		rect = { x, top, labelW, HEADER_H - 6 },
 		text = text,
 		role = "sectionHeader",
 		textSize = 22,
@@ -320,7 +330,7 @@ local function leftHeader(page: Instance, text: string)
 end
 
 local function rightHeader(page: Instance, text: string)
-	header(page, RIGHT_X, 188, text, { "lk_emblem_rune", { 966, 92, 26, 70 } })
+	header(page, RIGHT_X, 188, text, { "hud.rune", { 966, 92, 26, 70 } })
 end
 
 -- A row label in the mockup's book weight (Merriweather Regular, 17 px).
@@ -362,14 +372,17 @@ end
 
 -- A checkbox row with its description; the box's top is at window y `top`.
 function SettingsWindow:_check(page: Instance, top: number, label: string, description: string, key: string)
+	local touch = Kit.Scale.IsSmallTouch()
 	local box = Kit.Checkbox.new(page, {
 		name = key,
-		rect = { LABEL_X + 2, top - 2, LEFT_W - 24, 40 },
+		-- On touch the row reaches the column divider so the boosted
+		-- description fits whole.
+		rect = { LABEL_X + 2, top - 2, if touch then LEFT_W - 10 else LEFT_W - 24, if touch then TOUCH_CHECK_H else 40 },
 		label = label,
 		description = description,
 		checked = self.values[key] == true,
 		variant = "gold",
-		boxSize = 33,
+		boxSize = if touch then 34 else 33,
 		textSize = 17,
 		descriptionSize = 14,
 		zIndex = 7,
@@ -382,6 +395,11 @@ function SettingsWindow:_check(page: Instance, top: number, label: string, descr
 	end)
 	self:_control(page, box, key)
 	return box
+end
+
+-- The pitch between checkbox rows (wider on touch, where the rows are taller).
+local function checkPitch(): number
+	return if Kit.Scale.IsSmallTouch() then TOUCH_CHECK_PITCH else CHECK_PITCH
 end
 
 -- The thin rule between a page's sliders and its checkboxes (Rule.Section, 1 px).
@@ -414,7 +432,8 @@ end
 -- (nil for the fixed movement keys, whose caps take no presses).
 function SettingsWindow:_keyRow(parent: Instance, page: Instance, y: number, label: string, id: string?, fixed: string?)
 	local x = if parent == page then 744 else 10
-	local capX = if parent == page then KEY_X else LEFT_W - 22 - KEY_W
+	local capW = if Kit.Scale.IsSmallTouch() then TOUCH_KEY_W else KEY_W
+	local capX = if parent == page then KEY_X + KEY_W - capW else LEFT_W - 22 - capW
 	rowLabel(parent, label, { x, y, capX - x - 14, KEY_H }, "Label_" .. (id or label), 15)
 	-- Rule.Key: a faint 1 px line under the label, 31 px below the row's top.
 	Kit.Divider.new(parent, {
@@ -426,7 +445,7 @@ function SettingsWindow:_keyRow(parent: Instance, page: Instance, y: number, lab
 	})
 	local cap = Kit.KeyCap.new(parent, {
 		name = "Key_" .. (id or label),
-		rect = { capX, y, KEY_W, KEY_H },
+		rect = { capX, y, capW, KEY_H },
 		text = if fixed then SettingsWindow.KeyText(fixed) else "",
 		variant = "flat",
 		zIndex = 7,
@@ -452,9 +471,10 @@ function SettingsWindow:_gameplay(page: Instance)
 	self:_slider(page, SLIDER_Y[1], "Camera Sensitivity", "cameraSensitivity", sensitivity)
 	local rule = SLIDER_Y[1] + (309 - SLIDER_Y[2])
 	sectionRule(page, rule)
-	self:_check(page, rule + 15, "Show Damage Numbers", "Numbers pop up over what you hit", "showDamage")
-	self:_check(page, rule + 15 + CHECK_PITCH, "Show Names", "Name tags above other players", "showNames")
-	self:_check(page, rule + 15 + CHECK_PITCH * 2, "Invert Camera", "Moving up looks down", "invertCamera")
+	local pitch = checkPitch()
+	self:_check(page, rule + 15, "Show Damage Numbers", "Numbers over what you hit", "showDamage")
+	self:_check(page, rule + 15 + pitch, "Show Names", "Name tags above players", "showNames")
+	self:_check(page, rule + 15 + pitch * 2, "Invert Camera", "Moving up looks down", "invertCamera")
 	self:_divider(page)
 
 	rightHeader(page, "Key Binds")
@@ -467,12 +487,16 @@ function SettingsWindow:_gameplay(page: Instance)
 		self:_keyRow(page, page, KEY_Y + row * KEY_PITCH, entry[1], entry[2])
 		row += 1
 	end
+	-- The rebind note wraps in the room left under the key rows (to the
+	-- column's foot at y 551) in the notes' size, so it stays readable on phones.
+	local noteY = KEY_Y + row * KEY_PITCH + 4
 	self.notes.Gameplay = Kit.Text.new(page, {
 		name = "KeyNote",
-		rect = { 744, KEY_Y + row * KEY_PITCH, 307, KEY_H },
+		rect = { 744, noteY, 307, 551 - noteY },
 		text = "",
-		role = "small",
-		scaled = true,
+		role = "bodySoft",
+		wrap = true,
+		yAlign = "Top",
 		zIndex = 7,
 	})
 end
@@ -482,7 +506,7 @@ function SettingsWindow:_audio(page: Instance)
 	self:_slider(page, SLIDER_Y[1], "Music Volume", "musicVolume", volume)
 	self:_slider(page, SLIDER_Y[2], "Effects Volume", "effectsVolume", volume)
 	sectionRule(page, 309)
-	self:_check(page, 324, "Subtitles", "Show alert sounds as text on screen", "subtitles")
+	self:_check(page, 324, "Subtitles", "Alert sounds as text on screen", "subtitles")
 	self:_divider(page)
 	notes(
 		page,
@@ -496,7 +520,9 @@ end
 function SettingsWindow:_graphics(page: Instance)
 	leftHeader(page, "Graphics")
 	local setting = SettingsRules.Get("graphicsQuality") :: any
-	rowLabel(page, "Graphics Quality", { LABEL_X, 176, 130, 43 }, "Graphics Quality")
+	-- "Quality" under the GRAPHICS header: "Graphics Quality" had to shrink far
+	-- below the other row labels to fit beside the dropdown on phones.
+	rowLabel(page, "Quality", { LABEL_X, 176, 130, 43 }, "Graphics Quality")
 	local dropdown = Kit.Dropdown.new(page, {
 		name = "graphicsQuality",
 		rect = { 447, 176, 236, 43 },
@@ -515,8 +541,8 @@ function SettingsWindow:_graphics(page: Instance)
 	self:_control(page, dropdown, "graphicsQuality")
 	self:_slider(page, SLIDER_Y[2], "UI Scale", "uiScale", times)
 	sectionRule(page, 309)
-	self:_check(page, 324, "Colour-blind Palette", "Rarity colours that are easier to tell apart", "colourBlindMode")
-	self:_check(page, 324 + CHECK_PITCH, "Reduced Motion", "Menus and effects move less", "reducedMotion")
+	self:_check(page, 324, "Colour-blind Palette", "Clearer rarity colours", "colourBlindMode")
+	self:_check(page, 324 + checkPitch(), "Reduced Motion", "Menus and effects move less", "reducedMotion")
 	self:_divider(page)
 	notes(
 		page,
@@ -560,9 +586,10 @@ function SettingsWindow:_controlsPage(page: Instance)
 	self:_divider(page)
 
 	rightHeader(page, "Tutorial")
+	-- Room for three lines of the phone-boosted text above the button.
 	Kit.Text.new(page, {
 		name = "TutorialText",
-		rect = { RIGHT_X + 12, 162, RIGHT_W - 12, 66 },
+		rect = { RIGHT_X + 12, 158, RIGHT_W - 12, 86 },
 		text = "Walk through the first steps again: gathering, crafting and getting out alive.",
 		role = "bodySoft",
 		wrap = true,
@@ -571,7 +598,7 @@ function SettingsWindow:_controlsPage(page: Instance)
 	})
 	local replay = Kit.Button.new(page, {
 		name = "ReplayTutorial",
-		rect = { RIGHT_X + 12, 236, 260, 55 },
+		rect = { RIGHT_X + 12, 250, 260, 50 },
 		label = "Replay Tutorial",
 		variant = "secondary",
 		textSize = 20,
@@ -581,10 +608,10 @@ function SettingsWindow:_controlsPage(page: Instance)
 		end,
 	})
 	self:_control(page, replay, "replayTutorial")
-	header(page, RIGHT_X, 263, "Changing Keys", nil, 310)
+	header(page, RIGHT_X, 263, "Changing Keys", nil, 314, RIGHT_W)
 	self.notes.Controls = Kit.Text.new(page, {
 		name = "KeyNote",
-		rect = { RIGHT_X + 12, 364, RIGHT_W - 12, 180 },
+		rect = { RIGHT_X + 12, 368, RIGHT_W - 12, 176 },
 		text = "",
 		role = "bodySoft",
 		wrap = true,

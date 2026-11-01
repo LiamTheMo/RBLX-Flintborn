@@ -3,7 +3,7 @@
 -- size: Coins, Gems and Settings, the 2 × 3 menu tiles, the Party panel (each
 -- member with their level and XP bar), the level/XP bar and the six-slot
 -- hotbar that shows the deploy loadout. (The mockup's top-left player card is
--- left out.)
+-- left out; the level/XP bar opens Progress instead.)
 --
 -- Display only: LobbyHudController feeds it through the setters and handles the
 -- presses it reports through `actions`. Regions are pinned to the screen edges
@@ -13,7 +13,9 @@
 --   hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Kit = require(script.Parent.Parent.Kit)
 
@@ -61,7 +63,9 @@ LobbyHud.TEXT = { currency = 18, partyTitle = 20, memberName = 13, barText = 17 
 -- pads would overlap.
 LobbyHud.PHONE = {
 	memberName = 15,
-	memberLevel = 13,
+	-- 14: at a touch tablet's HUD scale (1024 × 768) "LV. n" still draws at
+	-- 9 screen px or more.
+	memberLevel = 14,
 	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, settings = { 298, 0, 52, 46 }, w = 350 },
 	noticeH = 72,
 	respond = { 98, 6, 125, 40 },
@@ -70,6 +74,43 @@ LobbyHud.PHONE = {
 	invite = { 222, 21, 45, 34 },
 }
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
+
+-- The XP pop-up lane in the bottom region's px: over the bar's width, its
+-- foot `gap` above the bar (or above the notice plaque while it shows).
+LobbyHud.POPUPS = { x = 81, w = 356, h = 118, gap = 4 }
+
+-- The level/XP bar's press area in the bottom region's px: the level, the bar
+-- and the XP text.
+LobbyHud.XP_PRESS = { -40, -4, 648, 24 }
+
+-- A hit button for a short control whose touch pad may only grow upwards (the
+-- party title over the first member row, the XP bar over the hotbar): on
+-- touch screens it reaches up until the control is touchMin screen px tall,
+-- and never covers what lies under it.
+local function upwardHit(base): TextButton
+	local hit = Kit.Core.Make("TextButton", {
+		Name = "Hit",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromScale(1, 1),
+		Text = "",
+		ZIndex = base.z + 8,
+	}, base.root)
+	local function fit()
+		local shown = base.root.AbsoluteSize
+		if not UserInputService.TouchEnabled or shown.X <= 0 or base.w <= 0 then
+			return
+		end
+		local k = shown.X / base.w
+		local need = math.max(0, Kit.Tokens.Space("touchMin", 44) / k - base.h)
+		hit.Position = UDim2.fromOffset(0, -need)
+		hit.Size = UDim2.new(1, 0, 1, need)
+	end
+	base.maid:Give(base.root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit))
+	fit()
+	return hit
+end
 
 local function region(parent: Instance, name: string, props): Frame
 	local frame = Instance.new("Frame")
@@ -84,7 +125,7 @@ local function region(parent: Instance, name: string, props): Frame
 end
 
 -- actions: onCurrency(id), onSettings, onTile(id), onParty(section?),
--- onAnswer(partyId, accept), onSlot(index). Every one is optional.
+-- onAnswer(partyId, accept), onSlot(index), onProgress(). Every one is optional.
 function LobbyHud.new(parent: Instance, actions)
 	actions = actions or {}
 	local self = setmetatable({
@@ -150,11 +191,6 @@ function LobbyHud.new(parent: Instance, actions)
 		role = "hudSmall",
 		outline = true,
 	})
-	-- XP pop-ups appear to the right of the tiles (ProgressionController.MountPopups).
-	self.popups = region(self.tileRegion, "XpPopups", {
-		Position = UDim2.fromOffset(t.w + 24, 0),
-		Size = UDim2.fromOffset(320, t.h),
-	})
 
 	-- Right: the Party panel (the 01 frame). The title row opens the Party
 	-- window (D17). The first member's row (with the add-player button) stays
@@ -206,6 +242,8 @@ function LobbyHud.new(parent: Instance, actions)
 	local lit = Kit.Art.Plate(title.visual, "row.plate", 242, 40, { z = title.z })
 	lit.holder.Visible = false
 	self.titleControl = Kit.Interact.attach(title, {
+		-- Its touch pad grows up, off the first member's row.
+		hit = upwardHit(title),
 		pressScale = false,
 		onPress = function()
 			fire("onParty", nil)
@@ -243,9 +281,21 @@ function LobbyHud.new(parent: Instance, actions)
 		Position = UDim2.new(0.5, 0, 1, -b.bottom),
 		Size = UDim2.fromOffset(b.w, b.h),
 	})
-	self.barLevel = Kit.Text.new(self.bottom, {
+	-- The level, bar and XP text open Progress (touch players have no other
+	-- way there in the lobby; gamepad reaches it from the hotbar). They sit in
+	-- the press area's visual, so the kit's press feedback moves them together:
+	-- a touch larger on hover and gamepad focus (with the gold focus ring),
+	-- smaller while held, and the bar's art at the hover / pressed tints.
+	local px, py = LobbyHud.XP_PRESS[1], LobbyHud.XP_PRESS[2]
+	local xp = Kit.Core.Root(self.bottom, "XpPress", "bar.track", {
+		name = "XpPress",
+		rect = LobbyHud.XP_PRESS,
+		zIndex = 4,
+	}, LobbyHud.XP_PRESS[3], LobbyHud.XP_PRESS[4])
+	self.xpPress = xp
+	self.barLevel = Kit.Text.new(xp.visual, {
 		name = "Level",
-		rect = { -40, -4, 114, 24 },
+		rect = { -40 - px, -4 - py, 114, 24 },
 		text = "",
 		role = "hudSmall",
 		-- Over the world: a paper outline keeps it readable on any scene.
@@ -253,16 +303,42 @@ function LobbyHud.new(parent: Instance, actions)
 		textSize = LobbyHud.TEXT.barText,
 		align = "Right",
 	})
-	self.bar = Kit.Bar.new(self.bottom, { name = "XpBar", rect = { 81, 0, 356, 16 }, fill = "xp" })
-	self.barText = Kit.Text.new(self.bottom, {
+	self.bar = Kit.Bar.new(xp.visual, { name = "XpBar", rect = { 81 - px, 0 - py, 356, 16 }, fill = "xp" })
+	self.barText = Kit.Text.new(xp.visual, {
 		name = "Xp",
-		rect = { 448, -4, 160, 24 },
+		rect = { 448 - px, -4 - py, 160, 24 },
 		text = "",
 		role = "hudSmall",
 		-- Over the world: a paper outline keeps it readable on any scene.
 		outline = true,
 		textSize = LobbyHud.TEXT.barText,
 	})
+	-- The bar's own colours, recorded the first time a state tints them.
+	local barColours: { [ImageLabel]: Color3 } = setmetatable({}, { __mode = "k" }) :: any
+	local function tintBar(state: string)
+		local key = KitModel.STATE_TINT[state]
+		local tint = if key then Kit.Tokens.Tint(key) else Color3.new(1, 1, 1)
+		for _, image in self.bar.root:GetDescendants() do
+			if image:IsA("ImageLabel") then
+				local own = barColours[image]
+				if own == nil then
+					own = image.ImageColor3
+					barColours[image] = own
+				end
+				image.ImageColor3 = Kit.Tokens.Multiply(own, tint)
+			end
+		end
+	end
+	self.xpControl = Kit.Interact.attach(xp, {
+		-- Its touch pad grows up, off the hotbar.
+		hit = upwardHit(xp),
+		hoverScale = true,
+		render = tintBar,
+		onPress = function()
+			fire("onProgress")
+		end,
+	})
+	self.parts.xp = xp.root
 	for index, x in LobbyHud.SLOT_X do
 		local slot = Kit.Slot.new(self.bottom, {
 			name = "Slot" .. index,
@@ -275,6 +351,14 @@ function LobbyHud.new(parent: Instance, actions)
 		})
 		self.slots[index] = slot
 	end
+
+	-- XP pop-ups stack just above the XP bar, where the run's HUD shows them
+	-- (HudLayout bottom.popups; ProgressionController.MountPopups), and above
+	-- the game-update notice while it shows (_placePopups).
+	self.popups = region(self.bottom, "XpPopups", {
+		Position = UDim2.fromOffset(LobbyHud.POPUPS.x, -LobbyHud.POPUPS.gap - LobbyHud.POPUPS.h),
+		Size = UDim2.fromOffset(LobbyHud.POPUPS.w, LobbyHud.POPUPS.h),
+	})
 
 	-- Above the XP bar: the game-update notice, shown only while it applies
 	-- (status toasts take the top centre).
@@ -367,6 +451,19 @@ function LobbyHud:_buildNotice()
 		-- Shrinks to fit, wrapping onto a second line before it gets small.
 		self.notice.label.root.TextWrapped = self.phone
 	end
+	self:_placePopups()
+end
+
+-- The XP pop-up lane ends just above the XP bar, or above the notice plaque
+-- while it shows (its height differs on phones), so a pop-up never runs
+-- under the plaque.
+function LobbyHud:_placePopups()
+	local p = LobbyHud.POPUPS
+	local bottom = -p.gap
+	if self.noticeRegion.Visible then
+		bottom = self.noticeRegion.Position.Y.Offset - p.gap
+	end
+	self.popups.Position = UDim2.fromOffset(p.x, bottom - p.h)
 end
 
 -- The hotbar's 1–6 badges while a keyboard or mouse is the input.
@@ -403,7 +500,7 @@ function LobbyHud:_link()
 		local n = LobbyHudModel.TileNeighbours(index)
 		local button = hit(tile) :: GuiButton
 		button.NextSelectionUp = if n.up then hit(self.tiles[n.up]) else hit(self.coins)
-		button.NextSelectionDown = if n.down then hit(self.tiles[n.down]) else hit(self.slots[1])
+		button.NextSelectionDown = if n.down then hit(self.tiles[n.down]) else self.xpControl.hit
 		button.NextSelectionLeft = if n.left then hit(self.tiles[n.left]) else nil
 		button.NextSelectionRight = if n.right then hit(self.tiles[n.right]) else self.titleControl.hit
 	end
@@ -415,12 +512,17 @@ function LobbyHud:_link()
 	end
 	self.titleControl.hit.NextSelectionUp = top[3]
 	self.titleControl.hit.NextSelectionLeft = hit(self.tiles[2])
+	-- The XP bar sits between the tiles and the hotbar.
+	local xp = self.xpControl.hit
 	for index, slot in self.slots do
 		local button = hit(slot) :: GuiButton
 		button.NextSelectionLeft = hit(self.slots[index - 1])
 		button.NextSelectionRight = hit(self.slots[index + 1])
-		button.NextSelectionUp = hit(self.tiles[#self.tiles - 1])
+		button.NextSelectionUp = xp
 	end
+	xp.NextSelectionUp = hit(self.tiles[#self.tiles - 1])
+	xp.NextSelectionDown = hit(self.slots[1])
+	xp.NextSelectionLeft = hit(self.tiles[#self.tiles - 1])
 end
 
 -- The control a gamepad selects first: the Inventory tile.
@@ -517,6 +619,18 @@ function LobbyHud:_member(holder: Frame, member)
 		end,
 	})
 	row.root:SetAttribute("LobbyUserId", member.userId)
+	-- "LV. n" shows once the member's level is known (their replicated Level
+	-- attribute); until then the XP bar hides too, so no row shows a bar
+	-- without its level.
+	local function levelKnown()
+		if row.levelBar and row.levelLabel then
+			row.levelBar.root.Visible = row.levelLabel.Text ~= ""
+		end
+	end
+	if row.levelLabel then
+		row.levelLabel:GetPropertyChangedSignal("Text"):Connect(levelKnown)
+		levelKnown()
+	end
 	-- The rule runs on under the add-player button.
 	table.insert(
 		self.rows,
@@ -670,6 +784,7 @@ function LobbyHud:SetNotice(text: string?)
 	if self.notice.label then
 		self.notice.label:SetText(text or "")
 	end
+	self:_placePopups()
 end
 
 function LobbyHud:Destroy()
@@ -695,6 +810,7 @@ function LobbyHud:Destroy()
 		slot:Destroy()
 	end
 	self.bar:Destroy()
+	self.xpPress.maid:Clean()
 	self.list:Destroy()
 	self.panel:Destroy()
 	self.pinned:Destroy()

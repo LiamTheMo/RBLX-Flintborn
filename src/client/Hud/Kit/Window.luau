@@ -123,6 +123,9 @@ function Window.new(target, props: Props)
 				end
 			end,
 		})
+		-- Marked, so gamepad selection prefers the first content control
+		-- (Kit.Modal.DefaultFor) when a screen leaves the ✕ as its default.
+		self.close.control.hit:SetAttribute("KitWindowClose", true)
 		if screen and screen.defaultSelection == nil then
 			screen:SetDefaultSelection(self.close.control.hit)
 		end
