@@ -34,6 +34,27 @@ Toast.LINE_MAX = 2
 Toast.ACTION_H = 40
 Toast.ACTION_ROW = 48
 
+-- The width (design px, at most `room`) that wraps `text` onto two lines of
+-- about the same length: the word break that makes the longer line shortest,
+-- so a second line never holds one orphaned word. A wrap at this width puts
+-- the same words on the first line (every longer first line is wider).
+function Toast.BalancedWidth(text: string, room: number): number
+	local words = string.split(text, " ")
+	local best = room
+	for k = 1, #words - 1 do
+		local first = table.concat(words, " ", 1, k)
+		local second = table.concat(words, " ", k + 1)
+		local wide = math.max(
+			Core.TextWidth(first, "body", Toast.LINE_SIZE),
+			Core.TextWidth(second, "body", Toast.LINE_SIZE)
+		) * 1.04
+		if wide < best then
+			best = wide
+		end
+	end
+	return math.min(room, math.ceil(best) + 2)
+end
+
 -- The card's layout for `props` at width `w` and base height `h0` (the toast
 -- token height): where the text ends, whether the actions sit beside the text
 -- or on a row under it, how many lines the line takes and the card's height.
@@ -50,6 +71,8 @@ function Toast.Layout(props, w: number, h0: number)
 		and (props.actionsBelow == true or (props.actionsBelow == nil and lineW > besideRight - x))
 	local right = if below then closeRight else besideRight
 	local lines = if props.text and lineW > right - x then Toast.LINE_MAX else 1
+	-- Two lines wrap at the balanced width, not the full room.
+	local wrapW = if lines > 1 then Toast.BalancedWidth(props.text, right - x) else right - x
 	local px = Toast.LINE_SIZE * Core.TextBoost("body", Toast.LINE_SIZE)
 	local extra = (lines - 1) * math.ceil(px * 1.3)
 	local textH = h0 + extra
@@ -57,6 +80,7 @@ function Toast.Layout(props, w: number, h0: number)
 		emblem = s,
 		x = x,
 		right = right,
+		wrapW = wrapW,
 		closeRight = closeRight,
 		actionWidth = bw,
 		below = below,
@@ -142,7 +166,7 @@ function Toast.new(parent: Instance, props)
 			role = "body",
 			size = Toast.LINE_SIZE,
 			wrap = layout.lines > 1,
-			rect = { x, h0 * 0.54, right - x, h0 * 0.32 + (textH - h0) },
+			rect = { x, h0 * 0.54, layout.wrapW, h0 * 0.32 + (textH - h0) },
 			z = base.z + 1,
 		})
 		self.text.TextTruncate = Enum.TextTruncate.AtEnd

@@ -309,8 +309,14 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
   party rows' level and XP bars carry the progression. The XP bar (its level,
   bar and XP text) is pressable and opens Progress, the lobby's only way there
   on touch; its touch pad grows upwards, off the hotbar, and gamepad reaches it
-  between the bottom tiles and the hotbar. XP pop-ups stack just above it, as
-  in the run's HUD (while a window is open they show in the toast lane).
+  between the bottom tiles and the hotbar. It draws the kit's press feedback:
+  1.03 on hover and gamepad focus (with the gold focus ring), 0.96 while held,
+  the bar's art at the hover / pressed tints. XP pop-ups stack just above it,
+  as in the run's HUD, and above the game-update notice while it shows
+  (`LobbyHud.POPUPS`, `_placePopups`), on desktop and phones. A window opening
+  moves the pop-ups still showing to the toast lane for the rest of their
+  time, and gains while a window is open go there directly; a level-up toast
+  is titled "Level Up" and its line does not repeat it.
 - The PARTY title row's touch pad also grows upwards only, so it never covers
   the first member's row. A member row whose level is not known yet (no
   replicated `Level` attribute) shows neither "LV." nor its XP bar.

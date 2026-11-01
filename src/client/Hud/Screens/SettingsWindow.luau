@@ -294,15 +294,18 @@ end
 -- A section header with its rule (GAMEPLAY, KEY BINDS) and the line-art emblem
 -- the mockup draws beside it.
 -- The heading is the spec's size (cap 16–17 px); its rule is Rule.Heading
--- (#C49061, 2 px), 40 px under the header's top.
-local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?, y: number?)
+-- (#C49061, 2 px), 40 px under the header's top. The label's box runs past
+-- the rule up to the emblem (or `textW`), so a long header on a phone keeps
+-- room to shrink into instead of ending in "…".
+local function header(page: Instance, x: number, w: number, text: string, emblem: { any }?, y: number?, textW: number?)
 	local top = y or HEADER_Y
+	local labelW = textW or if emblem then emblem[2][1] - 8 - x else w
 	-- A Kit.Text heading rather than a SectionHeader: the header sizes its label
 	-- to a measured width that comes out short for Merriweather Bold at 22 px
 	-- and cuts the word off ("GAMEP…").
 	Kit.Text.new(page, {
 		name = "Header",
-		rect = { x, top, w, HEADER_H - 6 },
+		rect = { x, top, labelW, HEADER_H - 6 },
 		text = text,
 		role = "sectionHeader",
 		textSize = 22,
@@ -605,7 +608,7 @@ function SettingsWindow:_controlsPage(page: Instance)
 		end,
 	})
 	self:_control(page, replay, "replayTutorial")
-	header(page, RIGHT_X, 263, "Changing Keys", nil, 314)
+	header(page, RIGHT_X, 263, "Changing Keys", nil, 314, RIGHT_W)
 	self.notes.Controls = Kit.Text.new(page, {
 		name = "KeyNote",
 		rect = { RIGHT_X + 12, 368, RIGHT_W - 12, 176 },

@@ -274,26 +274,43 @@ end
 ProgressionController.POPUP_SECONDS = 2.5
 
 -- The words for an XP gain (no glyph Merriweather lacks: a level-up says so).
-function ProgressionController.PopupText(payload): string
+-- A toast's title already says "Level Up", so its line (`titled`) leaves
+-- that out.
+function ProgressionController.PopupText(payload, titled: boolean?): string
 	local text = if payload.amount > 0 then ("+%d XP · %s"):format(payload.amount, payload.reason) else payload.reason
-	if payload.levelUp and payload.amount > 0 then
+	if payload.levelUp and payload.amount > 0 and not titled then
 		text = "Level up! " .. text
 	end
 	return text
 end
 
+-- The toast's title for a gain shown in the toast lane.
+function ProgressionController.ToastTitle(payload): string
+	if payload.levelUp ~= true then
+		return "Experience"
+	end
+	return if payload.amount > 0 then "Level Up" else "Mastery"
+end
+
+-- A gain in the toast lane over an open window, for `duration` seconds.
+local function toast(payload, duration: number)
+	Kit.Toast.Show({
+		kind = "info",
+		title = ProgressionController.ToastTitle(payload),
+		text = ProgressionController.PopupText(payload, true),
+		duration = duration,
+	})
+end
+
+-- Pop-ups showing above the XP bar: {label, payload, ends}.
+local live = {}
+
 local function popup(payload)
-	local text = ProgressionController.PopupText(payload)
 	local levelUp = payload.levelUp == true
 	-- A window is open: the HUD's pop-up lane above the XP bar is under its veil,
 	-- so the gain shows in the toast lane over it instead.
 	if Kit.Modal.Count() > 0 then
-		Kit.Toast.Show({
-			kind = "info",
-			title = if not levelUp then "Experience" elseif payload.amount > 0 then "Level Up" else "Mastery",
-			text = text,
-			duration = ProgressionController.POPUP_SECONDS,
-		})
+		toast(payload, ProgressionController.POPUP_SECONDS)
 		return
 	end
 	-- Above the XP bar (the HUD's pop-up lane, else the fallback bar's): HUD
@@ -303,16 +320,37 @@ local function popup(payload)
 	local label = Kit.Text.new(ui.popups, {
 		name = "Popup",
 		size = { 320, h },
-		text = text,
+		text = ProgressionController.PopupText(payload),
 		role = "hudSmall",
 		textSize = if levelUp then 18 else 15,
 		color = if levelUp then "gold" else "cream",
 		outline = "ink",
 	}).root
 	label.Size = UDim2.new(1, 0, 0, h)
+	local entry = { label = label, payload = payload, ends = os.clock() + ProgressionController.POPUP_SECONDS }
+	table.insert(live, entry)
 	task.delay(ProgressionController.POPUP_SECONDS, function()
+		local index = table.find(live, entry)
+		if index then
+			table.remove(live, index)
+		end
 		label:Destroy()
 	end)
+end
+
+-- A window opening puts its veil over the pop-up lane: the gains still
+-- showing there move to the toast lane for the rest of their time (oldest
+-- first, as they stacked).
+local function liftPopups()
+	if Kit.Modal.Count() == 0 or #live == 0 then
+		return
+	end
+	local moving = live
+	live = {}
+	for _, entry in moving do
+		entry.label:Destroy()
+		toast(entry.payload, math.max(1, entry.ends - os.clock()))
+	end
 end
 
 local function build()
@@ -399,6 +437,7 @@ function ProgressionController.Start()
 		end
 	end)
 	Remotes.Get("XpGained").OnClientEvent:Connect(popup)
+	Kit.Modal.OnChanged(liftPopups)
 	task.spawn(function()
 		local snapshot = invoke("ProgressionSnapshot")
 		if type(snapshot) == "table" then

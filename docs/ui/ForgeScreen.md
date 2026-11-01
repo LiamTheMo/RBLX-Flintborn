@@ -273,6 +273,11 @@ sourceId?, nonce)`. Counts come from the vault only (`ForgeRules.Owned`).
   "time(s)").
 - **Phones** (R9): row notes at 20 with a smaller icon (9 screen px or more at
   the phone window scale, 0.46–0.51).
+- **Nothing ends in "…"**: recipe and material names shrink to fit
+  (`fitTitle`, floor 12 design px, the phone floor on phones). A name that
+  still does not fit takes two balanced lines, and a note longer than two
+  lines (or a two-line note on a phone) stacks under the name: the row grows
+  to hold them (`RecipeWindow:_rowLayout`; the mockup's 69 px row otherwise).
 - **Gamepad**: the window opens on the chosen recipe once the snapshot arrives
   (not on ✕, R23); a re-render that removes the selected row moves selection
   to the chosen recipe (R15); material rows are selectable and a press picks

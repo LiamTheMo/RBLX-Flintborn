@@ -73,7 +73,11 @@ function InteractionPrompt.Draw(content: Instance, texts)
 	local hasObject = texts.object ~= nil and texts.object ~= ""
 	local titleW = Kit.Text.Width(texts.action, "rowTitle", cfg.titleSize)
 	local objectW = if hasObject then Kit.Text.Width(texts.object, "small", cfg.subtitleSize) else 0
-	local width = math.clamp(math.ceil(textX + math.max(titleW, objectW) + cfg.padRight), cfg.size[1], cfg.maxWidth)
+	-- The plaque grows to the longer line with the kit's fit slack, so the
+	-- line still fits where its drawn size rounds up a pixel (touch screens
+	-- keep the size: nothing ends in "…" under maxWidth).
+	local textNeed = math.max(titleW, objectW) / (1 - Kit.Core.FIT_SLACK)
+	local width = math.clamp(math.ceil(textX + textNeed + cfg.padRight), cfg.size[1], cfg.maxWidth)
 	local textW = width - textX - cfg.padRight
 	local parts = {}
 	table.insert(

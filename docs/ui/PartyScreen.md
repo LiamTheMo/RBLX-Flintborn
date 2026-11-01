@@ -287,7 +287,8 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
 - **Phones and touch tablets**: every member row, the leader's included, is
   64 tall (`PartyWindow.FRAMES_PHONE`; the leader keeps the regular portrait
   there), so the boosted name and "LV." lines do not crowd and the list reads
-  at one pitch. Desktop keeps the mockup's 74 / 52.4.
+  at one pitch; the Empty Slot rows take the same 64. Desktop keeps the
+  mockup's 74 / 52.4.
 - **Gamepad**: selection starts on the window's first control in reading
   order (`Kit.Modal.FirstControl`: the first member row, else the invite
   column), not on the footer CLOSE; `Open("invite")` still starts on the first

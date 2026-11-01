@@ -24,6 +24,7 @@
       "height": 50,
       "cellX": 76,
       "cellW": 150,
+      "cellMaxW": 250,
       "portrait": 32,
       "nameY": 3,
       "nameH": 22,

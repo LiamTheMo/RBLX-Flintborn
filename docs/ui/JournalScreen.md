@@ -246,4 +246,6 @@ gems?, booster?, count, needed, claimed, repeats ("Daily" | "Once"), action`.
   OBJECTIVES rule.
 - **Phones** (R9): the Daily / Main tag at 16, row lines at 16 and objective
   lines at 16 (9 screen px or more at the phone window scale).
+- Quest titles shrink to fit their row (`fitTitle`) instead of ending in "…";
+  the one-line row note still ends in "…" (the detail shows it whole).
 - Opens with the gamepad flag when the last input is a gamepad.

@@ -60,6 +60,17 @@ local function page(opts)
 	if opts.check then
 		opts.check(window)
 	end
+	-- The party rail shows its thumb only while the rows overflow it (one row
+	-- fits the rail's height; a party of two or more scrolls).
+	local party = opts.party or members(1, 1)
+	local scrolls = window.partyList.root:GetAttribute("KitState") == "scrollable"
+	print(
+		("  %s the party rail's thumb follows its overflow (%d row(s))"):format(
+			if scrolls == (#party > 1) then "ok" else "FAIL",
+			#party
+		)
+	)
+	assert(scrolls == (#party > 1), "the party rail's thumb does not follow its overflow")
 	__dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })
 	window:Destroy()
 end

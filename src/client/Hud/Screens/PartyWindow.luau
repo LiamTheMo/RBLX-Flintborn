@@ -80,7 +80,8 @@ end
 -- Rows (M04). A framed row is a slot of `h` in its list holding a PlayerRow at
 -- `inner` ({x, y, w, h}; its name and level lines sit where the mockup's do)
 -- and the hairline `rule` ({x, y, w}) the mockup draws under it. The empty
--- slots keep their 52.4 px pitch as plain PlayerRows.
+-- slots are plain PlayerRows at the member rows' pitch (52.4 px; the taller
+-- phone pitch on phones), so the list reads evenly.
 PartyWindow.ROW = 52.4
 PartyWindow.FRAMES = {
 	leader = { h = 74, inner = { 0, 7, 314, 59 }, rule = { 0, 71, 328 } },
@@ -466,14 +467,15 @@ function PartyWindow:_members(data)
 		})
 		height += if leaderRow then self:_frames().leader.h else self:_frames().member.h
 	end
+	local emptyH = self:_frames().member.h
 	for i = #data.members + 1, data.maxSize do
 		table.insert(rows, {
 			key = "empty:" .. i,
-			sig = "empty",
+			sig = "empty:" .. emptyH,
 			build = function(order: number)
 				return Kit.PlayerRow.new(content, {
 					name = "EmptySlot",
-					size = { PartyWindow.LIST_W.party, PartyWindow.ROW },
+					size = { PartyWindow.LIST_W.party, emptyH },
 					layoutOrder = order,
 					empty = true,
 					portraitSize = 52,
@@ -484,7 +486,7 @@ function PartyWindow:_members(data)
 				})
 			end,
 		})
-		height += PartyWindow.ROW
+		height += emptyH
 	end
 	self:_sync("members", rows)
 	self.memberList:SetContentHeight(height + 2)

@@ -249,6 +249,26 @@ do
 	check(toast.layout.below and toast.h > 84, "two actions go on a row under a long line")
 	check(toast.text.TextScaled == false and toast.text.TextSize >= 12, "the toast line keeps at least 12 px")
 	toast:Destroy()
+	-- A two-line line wraps at its balanced width: no lone word on line 2.
+	local text = "Your lobby backpack has no room for that."
+	toast = Kit.Toast.new(root, { rect = { 10, 720, 430, 84 }, kind = "warn", title = "Not possible", text = text })
+	local wrapW = toast.text.Size.X.Offset
+	local second = 0
+	local line = ""
+	for _, word in string.split(text, " ") do
+		local next = if line == "" then word else line .. " " .. word
+		if Kit.Text.Width(next, "body", Kit.Toast.LINE_SIZE) * 1.04 > wrapW and line ~= "" then
+			line = word
+		else
+			line = next
+		end
+		second = Kit.Text.Width(line, "body", Kit.Toast.LINE_SIZE)
+	end
+	check(
+		toast.layout.lines == 1 or (wrapW < toast.layout.right - toast.layout.x and second > wrapW * 0.4),
+		"a two-line toast balances its lines"
+	)
+	toast:Destroy()
 end
 
 -- Section headers shrink to fit and never end in "…".

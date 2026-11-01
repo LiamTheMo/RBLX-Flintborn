@@ -225,6 +225,95 @@ function Core.SetText(label: TextLabel, text: string)
 	label.Text = if label:GetAttribute("KitCaps") and not label.RichText then string.upper(text) else text
 end
 
+-- Room kept beside fitted text (a share of the box), so it still fits where
+-- the drawn size rounds up to a whole screen pixel.
+Core.FIT_SLACK = 0.04
+
+-- The least size (design px) Core.FitText shrinks text to: space.minTextDesign
+-- (12), and on phones and touch tablets the phone text floor
+-- (Scale.PhoneTextFloor: 9 screen px in a typical window).
+function Core.FitFloor(): number
+	local floor = Tokens.Space("minTextDesign", 12)
+	if Scale.IsSmallTouch() then
+		floor = math.max(floor, Scale.PhoneTextFloor())
+	end
+	return floor
+end
+
+-- How many lines `text` wraps onto in a box `w` design px wide, drawn at
+-- `ratio` times its role size `size` (widths scale with the size); math.huge
+-- when one word alone is wider than the box.
+function Core.LineCount(text: string, role: string, size: number, ratio: number, w: number): number
+	local line, lines = "", 1
+	for _, word in string.split(text, " ") do
+		local next = if line == "" then word else line .. " " .. word
+		if line ~= "" and Core.TextWidth(next, role, size) * ratio > w then
+			lines += 1
+			line = word
+		else
+			line = next
+		end
+		if Core.TextWidth(line, role, size) * ratio > w then
+			return math.huge
+		end
+	end
+	return lines
+end
+
+-- Fits `text` to a label's box (STYLE_GUIDE §4.6): at its role size (`size`,
+-- design px before the phone boost) when it fits, else shrunk to fit, never
+-- below Core.FitFloor(); past that, with `lines` = 2, wrapped onto two lines
+-- at the largest size the box holds; only then cut with "…". Sets the text,
+-- TextSize and TextWrapped; returns true when the text shows whole.
+function Core.FitText(label: TextLabel, text: string, role: string, size: number?, lines: number?): boolean
+	local base = size or Tokens.TextStyle(role).size
+	local drawn = base * Core.TextBoost(role, base)
+	local floor = math.min(drawn, Core.FitFloor())
+	local w = label.Size.X.Offset * (1 - Core.FIT_SLACK)
+	local h = label.Size.Y.Offset
+	local full = Core.TextWidth(text, role, base)
+	Core.SetText(label, text)
+	label.TextScaled = false
+	label.TextWrapped = false
+	label.TextTruncate = Enum.TextTruncate.AtEnd
+	if full <= w then
+		label.TextSize = drawn
+		return true
+	end
+	local shrunk = drawn * w / full
+	if shrunk >= floor then
+		label.TextSize = math.floor(shrunk * 10) / 10
+		return true
+	end
+	if (lines or 1) >= 2 then
+		-- Two lines of about the same length (the word break that makes the
+		-- longer line shortest; no lone word on the second line), at the
+		-- largest size, in half-pixel steps, where both fit the box.
+		local words = string.split(text, " ")
+		local best, split = math.huge, nil
+		for k = 1, #words - 1 do
+			local first = Core.TextWidth(table.concat(words, " ", 1, k), role, base)
+			local second = Core.TextWidth(table.concat(words, " ", k + 1), role, base)
+			if math.max(first, second) < best then
+				best, split = math.max(first, second), k
+			end
+		end
+		if split then
+			local px = math.min(drawn, drawn * w / best)
+			px = math.floor(px * 2) / 2
+			if px >= floor and px * 2.5 * label.LineHeight <= h then
+				local shown = table.concat(words, " ", 1, split) .. "\n" .. table.concat(words, " ", split + 1)
+				Core.SetText(label, shown)
+				label.TextWrapped = true
+				label.TextSize = px
+				return true
+			end
+		end
+	end
+	label.TextSize = floor
+	return false
+end
+
 -- The width in design px of `text` in a type role (at `size`, or the role's).
 function Core.TextWidth(text: string, role: string, size: number?): number
 	local style = Tokens.TextStyle(role)

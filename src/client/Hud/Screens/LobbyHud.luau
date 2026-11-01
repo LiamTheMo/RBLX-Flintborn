@@ -15,6 +15,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Kit = require(script.Parent.Parent.Kit)
 
@@ -73,6 +74,10 @@ LobbyHud.PHONE = {
 	invite = { 222, 21, 45, 34 },
 }
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
+
+-- The XP pop-up lane in the bottom region's px: over the bar's width, its
+-- foot `gap` above the bar (or above the notice plaque while it shows).
+LobbyHud.POPUPS = { x = 81, w = 356, h = 118, gap = 4 }
 
 -- The level/XP bar's press area in the bottom region's px: the level, the bar
 -- and the XP text.
@@ -276,9 +281,21 @@ function LobbyHud.new(parent: Instance, actions)
 		Position = UDim2.new(0.5, 0, 1, -b.bottom),
 		Size = UDim2.fromOffset(b.w, b.h),
 	})
-	self.barLevel = Kit.Text.new(self.bottom, {
+	-- The level, bar and XP text open Progress (touch players have no other
+	-- way there in the lobby; gamepad reaches it from the hotbar). They sit in
+	-- the press area's visual, so the kit's press feedback moves them together:
+	-- a touch larger on hover and gamepad focus (with the gold focus ring),
+	-- smaller while held, and the bar's art at the hover / pressed tints.
+	local px, py = LobbyHud.XP_PRESS[1], LobbyHud.XP_PRESS[2]
+	local xp = Kit.Core.Root(self.bottom, "XpPress", "bar.track", {
+		name = "XpPress",
+		rect = LobbyHud.XP_PRESS,
+		zIndex = 4,
+	}, LobbyHud.XP_PRESS[3], LobbyHud.XP_PRESS[4])
+	self.xpPress = xp
+	self.barLevel = Kit.Text.new(xp.visual, {
 		name = "Level",
-		rect = { -40, -4, 114, 24 },
+		rect = { -40 - px, -4 - py, 114, 24 },
 		text = "",
 		role = "hudSmall",
 		-- Over the world: a paper outline keeps it readable on any scene.
@@ -286,28 +303,37 @@ function LobbyHud.new(parent: Instance, actions)
 		textSize = LobbyHud.TEXT.barText,
 		align = "Right",
 	})
-	self.bar = Kit.Bar.new(self.bottom, { name = "XpBar", rect = { 81, 0, 356, 16 }, fill = "xp" })
-	self.barText = Kit.Text.new(self.bottom, {
+	self.bar = Kit.Bar.new(xp.visual, { name = "XpBar", rect = { 81 - px, 0 - py, 356, 16 }, fill = "xp" })
+	self.barText = Kit.Text.new(xp.visual, {
 		name = "Xp",
-		rect = { 448, -4, 160, 24 },
+		rect = { 448 - px, -4 - py, 160, 24 },
 		text = "",
 		role = "hudSmall",
 		-- Over the world: a paper outline keeps it readable on any scene.
 		outline = true,
 		textSize = LobbyHud.TEXT.barText,
 	})
-	-- The level, bar and XP text open Progress (touch players have no other
-	-- way there in the lobby; gamepad reaches it from the hotbar).
-	local xp = Kit.Core.Root(self.bottom, "XpPress", "bar.track", {
-		name = "XpPress",
-		rect = LobbyHud.XP_PRESS,
-		zIndex = 4,
-	}, LobbyHud.XP_PRESS[3], LobbyHud.XP_PRESS[4])
-	self.xpPress = xp
+	-- The bar's own colours, recorded the first time a state tints them.
+	local barColours: { [ImageLabel]: Color3 } = setmetatable({}, { __mode = "k" }) :: any
+	local function tintBar(state: string)
+		local key = KitModel.STATE_TINT[state]
+		local tint = if key then Kit.Tokens.Tint(key) else Color3.new(1, 1, 1)
+		for _, image in self.bar.root:GetDescendants() do
+			if image:IsA("ImageLabel") then
+				local own = barColours[image]
+				if own == nil then
+					own = image.ImageColor3
+					barColours[image] = own
+				end
+				image.ImageColor3 = Kit.Tokens.Multiply(own, tint)
+			end
+		end
+	end
 	self.xpControl = Kit.Interact.attach(xp, {
 		-- Its touch pad grows up, off the hotbar.
 		hit = upwardHit(xp),
-		pressScale = false,
+		hoverScale = true,
+		render = tintBar,
 		onPress = function()
 			fire("onProgress")
 		end,
@@ -327,10 +353,11 @@ function LobbyHud.new(parent: Instance, actions)
 	end
 
 	-- XP pop-ups stack just above the XP bar, where the run's HUD shows them
-	-- (HudLayout bottom.popups; ProgressionController.MountPopups).
+	-- (HudLayout bottom.popups; ProgressionController.MountPopups), and above
+	-- the game-update notice while it shows (_placePopups).
 	self.popups = region(self.bottom, "XpPopups", {
-		Position = UDim2.fromOffset(81, -122),
-		Size = UDim2.fromOffset(356, 118),
+		Position = UDim2.fromOffset(LobbyHud.POPUPS.x, -LobbyHud.POPUPS.gap - LobbyHud.POPUPS.h),
+		Size = UDim2.fromOffset(LobbyHud.POPUPS.w, LobbyHud.POPUPS.h),
 	})
 
 	-- Above the XP bar: the game-update notice, shown only while it applies
@@ -424,6 +451,19 @@ function LobbyHud:_buildNotice()
 		-- Shrinks to fit, wrapping onto a second line before it gets small.
 		self.notice.label.root.TextWrapped = self.phone
 	end
+	self:_placePopups()
+end
+
+-- The XP pop-up lane ends just above the XP bar, or above the notice plaque
+-- while it shows (its height differs on phones), so a pop-up never runs
+-- under the plaque.
+function LobbyHud:_placePopups()
+	local p = LobbyHud.POPUPS
+	local bottom = -p.gap
+	if self.noticeRegion.Visible then
+		bottom = self.noticeRegion.Position.Y.Offset - p.gap
+	end
+	self.popups.Position = UDim2.fromOffset(p.x, bottom - p.h)
 end
 
 -- The hotbar's 1–6 badges while a keyboard or mouse is the input.
@@ -744,6 +784,7 @@ function LobbyHud:SetNotice(text: string?)
 	if self.notice.label then
 		self.notice.label:SetText(text or "")
 	end
+	self:_placePopups()
 end
 
 function LobbyHud:Destroy()

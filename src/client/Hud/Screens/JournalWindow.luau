@@ -463,6 +463,8 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 		textX = 119,
 		title = entry.title,
 		titleSize = 19,
+		-- A long title shrinks to fit rather than ending in "…".
+		fitTitle = true,
 		titleY = QUEST_TEXT_Y[1],
 		subtitle = entry.subtitle,
 		subtitleSize = if phone then 16 else 15,

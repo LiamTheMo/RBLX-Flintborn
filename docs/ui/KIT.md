@@ -446,7 +446,13 @@ The art keeps its own thickness, centred on the rect's mid-line.
 `:SetEnabled`, `:SetState("normal" | "locked" | "disabled")`. Selected = gold
 glow plate (M06 / M07); locked = disabled plate + lock. "line" has no plate:
 label left, value right, a rule under (detail rows). Not-enough counts:
-`valueColor = "short"`.
+`valueColor = "short"`. `fitTitle = true` fits the title to its box with
+`Kit.Core.FitText` instead of ending it in "…": its role size when it fits,
+else shrunk, never below `Kit.Core.FitFloor()` (`space.minTextDesign` 12,
+and the phone text floor on phones); with `titleLines = 2` it then wraps onto
+two balanced lines where the box is tall enough; only past that is it cut
+(the tooltip shows it whole). `:FitTitle()` fits it again after a screen
+moves or resizes the title.
 ```lua
 Kit.ListRow.new(list, { size = { 300, 72 }, layoutOrder = i, variant = "card", icon = "pickaxe",
     title = "Iron Pickaxe", subtitle = "Pickaxe · Tier 3", chevron = true, onPress = pick })
@@ -508,7 +514,8 @@ The kit rail and thumb follow `CanvasPosition`; the native bar is hidden.
 part (no CanvasGroup: a group draws its text through a texture, soft under the
 column's fractional scale). The line is body text at `Toast.LINE_SIZE` (15,
 boosted on phones) and never shrinks: a long line wraps to a second line and
-the card grows. Actions sit beside the text when the line fits there, else on a
+the card grows; two lines wrap at the balanced width
+(`Toast.BalancedWidth`), so line 2 never holds one lone word. Actions sit beside the text when the line fits there, else on a
 row under it, right-aligned (the first action rightmost); `actionsBelow`
 forces either. `toast.h` is the card's height; `Toast.Layout(props, w, h)`
 gives the layout. `Kit.Toast.new(parent, props)` draws one card in place.
