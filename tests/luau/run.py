@@ -50,7 +50,8 @@ def module_entries():
 # `return nil, "Code"` or `fail("Code")` (admission). reasons.spec.luau checks
 # that every such code has player-facing text in shared/UI/ReasonText.
 REFUSAL_PATTERNS = (
-    re.compile(r'\b(?:false|nil),\s*"([A-Z][A-Za-z]+)"'),
+    # Only after `return`, so a model part's name (`..., nil, "Trunk")`) is not one.
+    re.compile(r'\breturn\s+(?:false|nil),\s*"([A-Z][A-Za-z]+)"'),
     re.compile(r'\bfail\(\s*"([A-Z][A-Za-z]+)"'),
 )
 
