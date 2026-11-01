@@ -859,6 +859,13 @@ for new glyphs.
   rects are live: adding a sprite to its group moves other sprites. New art goes
   into a new group (as `atlas_lk_play` did); check the old atlases' sha1 is
   unchanged after packing.
+- **High-resolution sheets are additive.** `Widgets` draws a `__hi` copy only
+  once its sheet has actually loaded on that client (`SpriteLoader.State`);
+  until then, and for good if it never loads, the 1x art draws, and the sheet is
+  fetched in the background. The high-resolution sheet ids are blank in
+  `UiAssetIds.json` (their uploads are recorded in `uploaded_decals.json`):
+  after they were switched on, the UI on a phone lost its parchment art, so they
+  stay off until they are re-enabled and checked on a phone.
 - An empty id `""` in `UiAssetIds.json` is a placeholder for an atlas not
   uploaded yet; the game and captures draw the 1× art meanwhile, and
   `--dry-run --atlases` lists the pending atlases. `pack_atlas.py` refuses to

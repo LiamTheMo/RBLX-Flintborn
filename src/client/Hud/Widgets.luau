@@ -19,6 +19,48 @@ local SpriteLoader = require(script.Parent.SpriteLoader)
 
 local Widgets = {}
 
+-- The atlases that hold high-resolution copies (entries named `…__hi…`). A copy
+-- is drawn only once its atlas has actually loaded on this client: until then
+-- (and for good if it never loads) the sprite draws its 1x art, which every
+-- screen already fetches, so a slow or refused new upload can never leave a
+-- screen on stand-ins. The first time a copy is wanted its atlas is fetched in
+-- the background (after every image a label is waiting on); screens built after
+-- it arrives draw the copy.
+local HI_ATLASES: { [string]: boolean } = {}
+for name, entry in UiAssets.Sprites do
+	if type(name) == "string" and string.find(name, "__hi", 1, true) and type(entry) == "table" then
+		if type(entry.atlas) == "string" then
+			HI_ATLASES[entry.atlas] = true
+		else
+			HI_ATLASES[name] = true
+		end
+	end
+end
+local warming: { [string]: () -> () } = {}
+
+local function readyImage(name: string): string?
+	local id = UiAssets.image(name)
+	if id == nil or not HI_ATLASES[name] then
+		return id
+	end
+	if SpriteLoader.State(id) == "loaded" then
+		return id
+	end
+	if warming[id] == nil then
+		warming[id] = SpriteLoader.OnState(id, function(state)
+			if state == "loaded" and warming[id] then
+				warming[id]()
+			end
+		end)
+	end
+	return nil
+end
+
+local function placement(name: string, mag: number?)
+	return UiAssets.Placement(name, mag, nil, readyImage)
+end
+Widgets._readyImage = readyImage
+
 local function apply(object: Instance, props)
 	if props then
 		for key, value in props do
@@ -145,16 +187,16 @@ end
 -- its own uploaded image; nil when it has neither (tiled art reports its first
 -- tile).
 function Widgets.ImageId(name: string, mag: number?): string?
-	local placement = UiAssets.Placement(name, mag)
-	if placement == nil then
+	local art = placement(name, mag)
+	if art == nil then
 		return nil
 	end
-	local tiles = placement.entry.tiles
+	local tiles = art.entry.tiles
 	if type(tiles) == "table" and tiles[1] then
 		local tile = tiles[1][1]
 		return atlasImage(tile) or UiAssets.image(tile)
 	end
-	return placement.image
+	return art.image
 end
 
 -- True when sprite `name` can draw as art (an uploaded image or an uploaded
@@ -162,7 +204,7 @@ end
 -- Widgets.Sprite would draw a stand-in. The kit (Hud/Kit/Art) draws its own
 -- stand-ins in the kit's style.
 function Widgets.HasArt(name: string): boolean
-	return UiAssets.Placement(name) ~= nil
+	return placement(name) ~= nil
 end
 
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
@@ -290,7 +332,7 @@ end
 -- passes it, other callers leave it to the drawn size in `props`.
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?, mag: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	local art = whole and UiAssets.Placement(name, mag or magnification(whole, props, sliceScale))
+	local art = whole and placement(name, mag or magnification(whole, props, sliceScale))
 	if whole == nil or art == nil then
 		return fallback(name, props, parent)
 	end
