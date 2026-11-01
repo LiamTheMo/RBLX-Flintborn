@@ -499,7 +499,9 @@ function PlateMethods:Show(state: string)
 		-- CLAIM, Invite), with leatherDark for the darkest (FORGE, Party
 		-- CLOSE). A plate's tone (Plate:SetTone, Button `tone`) picks one.
 		if isLeather(sprite, "") then
-			color = Tokens.Multiply(color, Tokens.Color(self.tone or "leatherTint"))
+			-- A role may set its own default tone: the close button's art carries
+			-- its cream ✕, which the cool leatherTint would turn blue-grey.
+			color = Tokens.Multiply(color, Tokens.Color(self.tone or (role and role.tone) or "leatherTint"))
 		end
 		shown.ImageColor3 = color
 		shown.ImageTransparency = self.alpha
