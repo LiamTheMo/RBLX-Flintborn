@@ -159,7 +159,8 @@ local function describe(profile, offer)
 				table.insert(list, {
 					key = entry.key,
 					catalogId = item.catalogId,
-					name = (item.permanent and "★ " or "") .. (def and def.name or item.catalogId),
+					-- The plain name: screens mark Permanent items with the star art.
+					name = def and def.name or item.catalogId,
 					quantity = entry.quantity,
 					permanent = item.permanent,
 				})

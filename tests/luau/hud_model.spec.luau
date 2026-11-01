@@ -141,6 +141,9 @@ test("slice scale shrinks corners for small widgets", function()
 	expectEq(HudModel.SliceScale(400, 100, 800, 200), 1, "never enlarges")
 	expectNear(HudModel.SliceScale(400, 100, 272, 68), 0.68, 1e-9, "follows the tighter axis")
 	expectEq(HudModel.SliceScale(400, 100, 800, 5), 0.15, "has a floor")
+	expectEq(HudModel.SliceScale(400, 100, 800, 200, 2), 0.5, "a 2x image's pixel corners draw at half")
+	expectNear(HudModel.SliceScale(400, 100, 272, 68, 2), 0.34, 1e-9, "the shrink applies on top")
+	expectEq(HudModel.SliceScale(400, 100, 800, 200, nil), 1, "no art scale: as before")
 end)
 
 test("hotbar stepping wraps", function()
@@ -163,7 +166,8 @@ test("hotbar slots show their items, stacks and the equipped one", function()
 	expectEq(views[1].name, "Flint Arrow", "item name")
 	expectEq(views[1].count, "×24", "stack count")
 	expectEq(views[1].equipped, false, "not equipped")
-	expectEq(views[2].name, "★ Iron Sword", "Permanent items carry a star")
+	expectEq(views[2].name, "Iron Sword", "the name stays plain (no star glyph)")
+	expectEq(views[2].permanent, true, "Permanent items are marked for the star art")
 	expectEq(views[2].count, "", "unique items show no count")
 	expectEq(views[2].equipped, true, "the equipped slot")
 	expectEq(views[3].count, "", "a single item shows no count")
@@ -248,6 +252,16 @@ test("the world event panel shows the soonest event", function()
 	expect(string.find(panel.description, "(+1 more)", 1, true) ~= nil, "other running events counted")
 	expectEq(HudModel.WorldEvent({}, 100), nil, "hidden with no events")
 	expectEq(HudModel.WorldEvent({ views[3] }, 100), nil, "ended events are ignored")
+	-- The card reads "<rarity> · <blurb>": no blurb names a rarity again.
+	local Rarity = require(Shared.Items.Rarity)
+	for category, blurb in HudModel.EVENT_BLURBS do
+		for _, rarity in Rarity.Order do
+			expect(
+				not string.find(" " .. string.lower(blurb) .. " ", " " .. string.lower(rarity) .. " ", 1, true),
+				category .. "'s blurb does not repeat a rarity (" .. rarity .. ")"
+			)
+		end
+	end
 end)
 
 test("currency amounts compact past 100,000", function()

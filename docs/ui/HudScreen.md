@@ -44,7 +44,7 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 | Menu tiles | left, x 68, centred at y 0.476, the lobby's 2 × 3 grid (88 × 84, pitch 102 / 94) | `IconButton` tile: backpack, hammer (Craft), build, party (Tribe), map, trophy (Progress); `Tooltip` names the bound key, the gamepad button ("Backpack (Y)") or nothing on touch (`Kit.Input.Hint`) | `HudController.MENU` |
 | Level and XP | bottom centre, 49 up, 572 × 124 (as the lobby) | "LV. n" `Text`, `Bar` xp on the track (356 × 16), "450/750 XP" `Text`; at the cap a full bar, the real level and "Max level" | progression snapshots (`ProgressionController.Changed`) |
 | Hotbar | under the XP bar, 6 × `Slot` hotbar 89 × 93 at the lobby's x | `Slot` with `ItemIcon` art via itemId, count, Permanent star, leather number badge (keyboard and mouse only), gold glow when selected | run inventory `area == "hotbar"`; badges read `Binds.Label("HotbarN")` and follow `Kit.Input.Watch`; the selection follows the equipped slot |
-| Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; on touch long texts end in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
+| Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; the plaque widens for the longer line (with `Kit.Core.FIT_SLACK`), so on touch only a text past 420 ends in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
 | Damage numbers | world billboards | display font (`fonts.display`), `gold` with an `ink` outline | `CombatFeedback` hits, when Show Damage is on |
 | Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon; the Kit pads its hit area | press = swing or start the bow draw, release fires |
 | Hit marker, bow draw | screen centre (−70 / +48) | `Panel` plaque with `Text` ("Hit 12" in ink, "Hurt -8" in `short`); `Bar` well with "Range 60%" | `CombatFeedback`; draw time |
@@ -60,7 +60,7 @@ below the top third. The `phone` entries arrange the HUD around them:
 |---|---|
 | Menu tiles | top left (39, 60), 3 × 2, 80 × 80 tiles at pitch 88 / 86 (40 screen px; the Kit pads the touch area to 44); their bottom row reaches about 12–17 screen px into the thumbstick zone's top edge |
 | World event | top left under the tiles (39, 238); the header title shrinks so it never meets the countdown |
-| Tribe frames | one short strip under the compass (centred, y 142 before the top-bar shift, 50 high): the tribe icon and count, then the members side by side (portrait, name ending in "…", health bar); above the thumbstick zone and clear of the jump button. Banners start below it |
+| Tribe frames | one short strip under the compass (centred, y 142 before the top-bar shift, 50 high): the tribe icon and count, then the members side by side (portrait, name, health bar; the cells widen from 150 up to `cellMaxW` 250 for the longest name, so only a longer one ends in "…"); above the thumbstick zone and clear of the jump button. Banners start below it |
 | Vitals, status, objective | right column as on desktop; the objective ends above the jump button |
 | Touch attack | right 220, bottom 30 |
 | Hotbar, compass | as on desktop; hotbar key badges hidden |
@@ -119,3 +119,21 @@ the lobby never shows it.
   kind glyph.
 - Needs a device: the real jump button and thumbstick geometry, and whether
   ButtonSelect reaches Roblox's own selection mode while bound to Progress.
+
+## Final audit fixes
+
+- **Save status** (`SaveStatusController`): on desktop at the bottom right as
+  before; on phones and touch tablets the bottom corners belong to the Roblox
+  thumbstick and jump button, so the tag sits at the right end of the top bar's
+  free area (`GuiService.TopbarInset`), centred on its height.
+- **XP pop-ups** ("+40 XP · Gathered") stack above the XP bar in both HUDs (the
+  lobby HUD moved them there from beside the tiles), in cream (gold for a
+  level-up, which also says "Level up!") with an ink outline. While a window is
+  open the HUD lane is under the veil, so a gain shows in the toast lane
+  instead.
+- **World event card**: the Vegetation blurb is "Prized plants have sprouted"
+  (the card reads "<rarity> · <blurb>", and "Rare · Rare plants…" repeated
+  itself); `hud_model.spec` checks no blurb names a rarity.
+- **Downed card** redraws on its replicated attributes instead of every frame;
+  the boss card ticks at 0.25 s only while a boss or the horn can show (1 s
+  otherwise); the legacy event list skips its 1 s tick with no event running.

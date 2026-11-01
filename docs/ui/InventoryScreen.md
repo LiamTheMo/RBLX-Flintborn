@@ -53,8 +53,8 @@ Colours are medians of flat areas (`col.py`) or glyph cores (`ink2.py`, pixels
 
 ## Typography
 
-Font family: **Merriweather** (the repo's `serif`, `HudLayout.json`
-`fontFaces.serif` = Merriweather Bold). Confirmed as the closest family by
+Font family: **Merriweather** (the Kit's `KitTokens.json` `fonts`: `heading` =
+Merriweather Bold, STYLE_GUIDE §4.1). Confirmed as the closest family by
 letter shape (R leg, Y, S, a, g, numerals) in 3× side-by-side crops
 (`art/ui/kit/analysis/inventory/font_sbs1.png`) and by width: at matched cap
 height, Merriweather Bold sets "Stone Axe" at 131 px (mock 131) and "INVENTORY"

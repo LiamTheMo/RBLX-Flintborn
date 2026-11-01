@@ -47,10 +47,17 @@ local function canAct(player: Player): boolean
 		and not DownedService.IsDowned(player)
 end
 
-local function label(item): string
+local function itemName(item): string
 	local def = ItemCatalog.Get(item.catalogId)
-	local name = def and def.name or item.catalogId
-	return (item.permanent and "★ " or "") .. name .. (item.quantity and (" ×" .. item.quantity) or "")
+	return def and def.name or item.catalogId
+end
+
+-- The prompt's line: "Stone Axe (Permanent)", "Wood ×20" (plain words: the
+-- game's fonts have no star glyph).
+local function label(item): string
+	return itemName(item)
+		.. (if item.permanent then " (Permanent)" else "")
+		.. (item.quantity and (" ×" .. item.quantity) or "")
 end
 
 local function updateLedger(player: Player, kind: string, apply)
@@ -94,7 +101,7 @@ function DropService.FinishClaim(player: Player, copy, previousOwnerId: number?)
 		profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
 	end)
 	if previousOwnerId ~= player.UserId then
-		InventoryService.Notify(player, "You now own this Permanent " .. label(copy):gsub("^★ ", "") .. ".")
+		InventoryService.Notify(player, "You now own this Permanent " .. itemName(copy) .. ".")
 	end
 end
 

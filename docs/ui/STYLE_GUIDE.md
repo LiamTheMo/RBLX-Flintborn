@@ -257,7 +257,7 @@ PLAY 4.5 are limited by the art).
 | `toggleOn` | `#698010` | Toggle green | Toggle on stand-in; "on" accents in lists and notices |
 | `readyFill` / `readyDot` / `readyEdge` | `#E7E9A2` / `#0CE01A` / `#9DA35A` | Status green | The generic set-status pill (`badge.ready`) and green dot (trade lock, save status); not used by the party since D24 |
 | `leaderTint` | `#FFF0D2` | Leader gold (multiply) | Badge "leader" plaque tint; not used by the party since D24 |
-| `leaderTag` / `notReadyTint` | `#FDD18A` / `#C8C8C8` | — | Kept from the Ready era; no reader |
+| `emptyIconTint` | `#78746E` | Empty grey (multiply) | The icon of an empty stat bar (Vitals), darkened toward grey |
 | `veil` | `#050403` | Veil | Full-screen dim behind windows, at transparency 0.30 (D8; `veil.transparency`) |
 
 ### 3.5 Bars
@@ -408,9 +408,9 @@ upper-cases (`caps` in the role, applied by `Core.SetText`).
 |---|---|
 | Plain labels (`Core.Label`, `Kit.Text` without `scaled`) | One line, truncated with "…" (`TextTruncate.AtEnd`); `wrap = true` wraps instead |
 | Labels that must stay whole (values, detail rows, PLAY, "+n more") | `scaled = true`: shrink to fit, floor 9 screen px |
-| Section headers | Shrink to fit (the phone boost never truncates them) |
-| Player names (PlayerRow) | Desktop: shrink to fit (`shrinkName`, default true). Touch: keep the size, end in "…", and a pressable row shows the whole name in a tooltip. The lobby HUD keeps one size for every row on phones |
-| List row titles | Truncate; a pressable row whose title is cut shows it whole in a tooltip |
+| Section headers | Shrink to fit (the phone boost never truncates them); give the box room past its rule where a phone boost needs it (Settings' headers reach their emblem) |
+| Player names (PlayerRow) | Desktop: shrink to fit (`shrinkName`, default true). Touch: keep the size, end in "…", and a pressable row shows the whole name in a tooltip. The lobby HUD keeps one size for every row on phones; the world HUD's tribe strip widens its cells for the longest name (`party.phone.cellMaxW`), so only a very long name is cut |
+| List row titles | Truncate; a pressable row whose title is cut shows it whole in a tooltip. Rows whose names must read whole (Forge and Crafting recipes and materials, Journal quests) pass `fitTitle`: shrink to fit down to `Kit.Core.FitFloor()` (12 design px; the phone text floor on phones), then two balanced lines where the row has room (recipe rows grow to hold them) |
 | Button labels | Centred with the icon; the room is the plate minus its rivet margins (`max(16, 0.35 × height)` each side) |
 
 ---
@@ -476,6 +476,10 @@ banner header.
 | glowStroke / focusStroke / focusOutset | 3 / 3 / 3 | windowMargin / phoneMargin | 8 / 4 |
 | pillCorner | 7 | topInsetMin | 52 |
 | slotGlowOutset | 3 | debounce | 0.15 s |
+| minTextDesign | 12 (design px) | | |
+
+`minTextDesign` is the least size the kit draws a label at when it picks the
+size or a screen passes one (`Core.TextFloor`); a smaller size is raised to it.
 
 Screens use these defaults unless their spec measured something else (the
 built grids: Inventory slots 91 × 99 at a 99.6 × 107.3 pitch; HUD tiles
@@ -523,7 +527,7 @@ lobby HUD moves its top regions down only when the inset plus 2 px
 | Surface | Scale |
 |---|---|
 | HUD | `HudModel.HudScale`: `min(W / 1672, H / 941)` × the player's UI scale, clamped to 0.34–1.6 (`hudMin`, `hudMax`). On phones and touch tablets × 0.9 (`phoneHud`) and never below 0.5 (`phoneFloor.hud`) |
-| Windows | Desktop: `min(fitRoom, canvasFit × UiScale)`, so at 1672 × 941 a window draws at its mockup size; phones and touch tablets: `fitRoom` (fill the room below the top bar, 4 px margin). Clamped to 0.3–1.4 (`windowMin`, `windowMax`). `fitRoom = min((W − 2m) / w, (H − top − 2m) / h)` |
+| Windows | Desktop: `min(fitRoom, canvasFit × UiScale)`, so at 1672 × 941 a window draws at its mockup size; phones and touch tablets: `fitRoom` (fill the room below the top bar, 4 px margin), but a small window (a dialog) draws at most `scale.touchSmallMax` = 1.25 × the scale of a typical window (`phoneText.refWindow`), so it is not blown up to fill the screen (`KitModel.WindowScale`). Clamped to 0.3–1.4 (`windowMin`, `windowMax`). `fitRoom = min((W − 2m) / w, (H − top − 2m) / h)` |
 | Toasts, tooltips, notice cards | HUD scale, never below 0.6 on phones (`phoneFloor.overlay`) |
 
 **Form factors** (`Kit.Scale.FormFactor`): `phone` = touch only and the viewport
@@ -653,6 +657,10 @@ pressed > open > focused > hover > empty > normal. Force any state with the
   weapons, a backpack for armour, a chest for everything else. It reads as
   "picture missing", never as a real item; the item's name is in the
   `KitItemName` attribute for tooltips and detail cards (`KitStandIn` marks it).
+- **Dimming** (a locked slot, row or recipe picture) uses `Kit.Dim(root,
+  amount)`, which composes with each part's resting fade (`KitRestFade`) instead
+  of overwriting it, so a dimmed and then undimmed stand-in returns to its 0.6
+  fade, never to solid ink. Never set `ImageTransparency` to 0 to undim.
 - Rarity: a flat rarity dot (§3.6) plus the rarity name in text.
 
 ---
@@ -764,6 +772,37 @@ contact sheets and CATALOG.md. For every part:
    into the transparent pixels (bilinear filtering never pulls in black or
    red), and keep a 2 px transparent margin (`EDGE_PAD`).
 
+**High-resolution copies.** Parts listed in `HIRES` also write
+`lk_<name>__hi.png` at f = min(2, the sheet's headroom over the 1× export):
+corners and edges at f, a nine-slice's stretched middle kept at its 1× length.
+The 1× sprite's manifest entry gains `"hi": "<name>__hi"`; the copy's entry
+holds its own `w`/`h`/`slice`/`rect` in its own pixels plus `scale` (f) and
+`of`. `Widgets` draws the copy only where the art is magnified (more than 0.75
+design px per art px) and the copy's atlas has an id, so pieces keep their
+design size and a stale id never draws the wrong rects (`UiAssets.Placement`).
+`Kit.Icon` and `Kit.ItemIcon` never draw an icon past 1.0 design px per pixel
+of the art that draws at that size (`maxScale`, `Art.Capped`: the 1× art and
+the copies that take over below that limit; pass `false` to opt out), so in
+slots, rows, tiles and the Journal illustration a box bigger than the art
+centres it.
+
+**Hero copies.** The hero boxes (the Forge and Crafting picture, 254 design px,
+and the Inventory detail card's 152 × 166 icon) pass `maxScale = false`: every
+item fills the box, the same size as any other. Parts in `HERO` (the item art,
+`ItemInfo.ART_SPRITES`) write a copy 356 px on its long side (`HERO_PX`: the
+Forge box at the 1440p window scale 1.4), named `lk_<name>__hi`, or
+`lk_<name>__hi2` after a `HIRES` copy, which it follows in the chain (the
+`__hi` entry's own `hi`). The sheets hold fewer pixels than that, so the copy
+is resampled from the cleaned sheet crop with premultiplied Lanczos plus a light
+unsharp mask (sigma 0.5 copy px per unit of upscale, amount 0.5), drops the
+faint Lanczos ringing outside the silhouette, then gets the same alpha snap, rim
+decontamination and colour bleed. `glyphs.py` writes the
+armour stand-in's `lk_glyph_ink_backpack__hi` the same way (0.62 of the box).
+A copy of scale s ≤ 2.1 draws once the art is magnified past 0.75; a sharper
+one past `UiAssets.HiFrom(s)` = max(1, s / 2.8), so it is never shrunk more
+than 2× at 1440p: the hero copies draw in the hero boxes only, and slots, rows
+and the Journal illustration keep their 1× (or 2×) art.
+
 Re-running writes identical files; existing sprites stay byte-identical when
 only new parts are added. `python3 art/ui/slice_lobby_kit.py <name>` builds one
 part without touching the manifest (for trying a box).
@@ -773,7 +812,8 @@ part without touching the manifest (for trying a box).
 - `slice_ = [l, t, r, b]` in output px is the 9-slice inset (corners, rivets and
   ornaments lie inside it); it goes to the manifest `slice`. In Roblox:
   `ScaleType = Slice`, `SliceCenter = Rect(l, t, w − r, h − b)`; the corner scale is
-  `clamp(min(drawn / stored), 0.15, 1)` (`HudModel.SliceScale`). Atlas sprites are
+  `clamp(min(drawn / stored), 0.15, 1)` (`HudModel.SliceScale`; its optional
+  `artScale` divides by a high-resolution copy's f). Atlas sprites are
   drawn as nine plain pieces with whole-pixel corners (phones mis-draw Roblox's
   slice of an atlas rectangle).
 - Some parts stretch along one axis only (`ONE_AXIS`: search, dropdown, bars,
@@ -808,11 +848,21 @@ for new glyphs.
 | `atlas_lk_items` | Item art (`ItemInfo.ART_SPRITES`) | uploaded |
 | `atlas_lk_play` | The sheet-21 Play art (D26), 1024 × 256 | new: uploaded by the owner |
 | `atlas_island` | The island painting | uploaded |
+| `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
+| `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
+| `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
+| `atlas_lk_items_hi_1` | Hero copies of the tools the Forge and Crafting pictures show (hatchet, pickaxe, spear, stone axe, torch, campfire, build) and the armour stand-in glyph | new: to upload |
+| `atlas_lk_items_hi_2` … `_4` | Hero copies of the other item art | new: to upload |
+| `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
 - **Never change an uploaded atlas.** Once an atlas is uploaded its bytes and
   rects are live: adding a sprite to its group moves other sprites. New art goes
   into a new group (as `atlas_lk_play` did); check the old atlases' sha1 is
   unchanged after packing.
+- An empty id `""` in `UiAssetIds.json` is a placeholder for an atlas not
+  uploaded yet; the game and captures draw the 1× art meanwhile, and
+  `--dry-run --atlases` lists the pending atlases. `pack_atlas.py` refuses to
+  change an atlas that has an id.
 - `python3 scripts/roblox_upload_ui_assets.py --sprites` syncs sizes, insets,
   atlas and rect from the manifest into
   [`src/shared/UI/UiSprites.json`](../../src/shared/UI/UiSprites.json) (local, no

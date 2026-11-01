@@ -166,7 +166,10 @@ end
 -- belong to the Roblox top bar.
 -- On a touch phone or tablet a window takes all the room below the top bar
 -- (over the HUD) at the largest scale that fits, so its text is as large as it
--- can be; it never draws under the Roblox top bar.
+-- can be; it never draws under the Roblox top bar. A small window (a dialog)
+-- draws at most scale.touchSmallMax × the scale of a typical window
+-- (phoneText.refWindow) there, so it is not blown up (and blurred) to fill
+-- the screen.
 function Scale.WindowFit(
 	screenW: number,
 	screenH: number,
@@ -185,6 +188,9 @@ function Scale.WindowFit(
 		refH = ref.height,
 		minScale = Tokens.Scale("windowMin"),
 		maxScale = Tokens.Scale("windowMax"),
+		-- Phones and tablets: small dialogs stay near the big windows' scale.
+		touchRef = Tokens.Data.phoneText.refWindow,
+		touchMax = Tokens.Scale("touchSmallMax"),
 	})
 	-- Centred on the screen, its top edge kept below the top inset.
 	local y = math.max(screenH / 2, top + margin + h * k / 2)

@@ -74,8 +74,12 @@ end
 local function side(offer, title: string, icon: string, locked: boolean, confirmed: boolean)
 	local items = {}
 	for _, item in offer.items do
-		-- The server names every offered item by its catalog id (TradeService.describe).
-		table.insert(items, { itemId = item.catalogId, name = item.name, quantity = item.quantity })
+		-- The server names every offered item by its catalog id (TradeService.describe);
+		-- a Permanent item's slot carries the star art.
+		table.insert(
+			items,
+			{ itemId = item.catalogId, name = item.name, quantity = item.quantity, permanent = item.permanent == true }
+		)
 	end
 	return {
 		title = title,
@@ -89,7 +93,12 @@ end
 local function describe(offer): string
 	local parts = {}
 	for _, item in offer.items do
-		table.insert(parts, item.name .. (item.quantity and (" ×" .. item.quantity) or ""))
+		table.insert(
+			parts,
+			item.name
+				.. (if item.permanent then " (Permanent)" else "")
+				.. (item.quantity and (" ×" .. item.quantity) or "")
+		)
 	end
 	if offer.gems > 0 then
 		table.insert(parts, offer.gems .. " Gems")
@@ -152,7 +161,9 @@ local function offerables(view)
 		local inOffer = table.find(offered, key) ~= nil
 		window:Row({
 			key = "Slot" .. tostring(key),
-			title = item.name .. (if item.quantity then (" ×" .. item.quantity) else ""),
+			title = item.name .. (if item.permanent then " (Permanent)" else "") .. (if item.quantity
+				then (" ×" .. item.quantity)
+				else ""),
 			icon = item.catalogId,
 			detail = if inOffer then "In your offer." else nil,
 			buttons = {
