@@ -87,6 +87,14 @@ PartyWindow.FRAMES = {
 	member = { h = 52.4, inner = { 0, 0, 314, 52.4 }, rule = { 0, 50.4, 328 } },
 	invite = { h = 66, inner = { 0, 8, 323, 51 }, rule = { 0, 65, 334 } },
 }
+-- Phones and touch tablets: the boosted name and "LV." line need a taller row,
+-- and every member row (the leader's included) takes the same pitch, so the
+-- list reads evenly.
+PartyWindow.FRAMES_PHONE = {
+	leader = { h = 64, inner = { 0, 4, 314, 56 }, rule = { 0, 62, 328 } },
+	member = { h = 64, inner = { 0, 4, 314, 56 }, rule = { 0, 62, 328 } },
+	invite = PartyWindow.FRAMES.invite,
+}
 PartyWindow.LIST_W = { party = 328, invite = 337 }
 
 local Z = 6
@@ -289,7 +297,7 @@ function PartyWindow.new(props: Props)
 			end
 		end,
 	})
-	screen:SetDefaultSelection(self.closeButton.control.hit)
+	screen:SetDefaultSelection(self:_firstControl())
 	self.maid:Give(screen.Closed:Connect(function()
 		if props.onClosed then
 			props.onClosed()
@@ -310,6 +318,18 @@ function PartyWindow.new(props: Props)
 		end
 	end))
 	return self
+end
+
+-- The row frames for the form factor.
+function PartyWindow:_frames()
+	return if self.phone then PartyWindow.FRAMES_PHONE else PartyWindow.FRAMES
+end
+
+-- Where gamepad selection starts: the window's first control in reading order
+-- (the first member row, else the invite column), not the footer's CLOSE;
+-- CLOSE only when nothing else can be selected.
+function PartyWindow:_firstControl(): GuiObject
+	return Kit.Modal.FirstControl(self.screen.window) or self.closeButton.control.hit
 end
 
 function PartyWindow:_text()
@@ -380,7 +400,7 @@ end
 -- whose `.row` is the PlayerRow. On phones long names end in "…" at their
 -- size instead of shrinking past the 9 px floor.
 function PartyWindow:_framed(content: Instance, kind: string, order: number, rowProps, w: number?)
-	local frame = PartyWindow.FRAMES[kind]
+	local frame = self:_frames()[kind]
 	local width = w or frame.inner[3]
 	local holder = Kit.Panel.new(content, {
 		name = "Row" .. order,
@@ -438,12 +458,13 @@ function PartyWindow:_members(data)
 					levelBar = true,
 					barHeight = 8,
 					crownSize = 26,
-					portraitSize = if leaderRow then 56 else nil,
+					-- The mockup's larger leader portrait; phones keep one size.
+					portraitSize = if leaderRow and not self.phone then 56 else nil,
 				}
 				return self:_framed(content, if leaderRow then "leader" else "member", order, rowProps)
 			end,
 		})
-		height += if leaderRow then PartyWindow.FRAMES.leader.h else PartyWindow.ROW
+		height += if leaderRow then self:_frames().leader.h else self:_frames().member.h
 	end
 	for i = #data.members + 1, data.maxSize do
 		table.insert(rows, {
@@ -535,8 +556,10 @@ function PartyWindow:_invites(data)
 	local rows = {}
 	local height = 0
 	local w = self.inviteListRect[3]
-	local frameH = PartyWindow.FRAMES.invite.h
-	local function section(title: string)
+	local frameH = self:_frames().invite.h
+	-- A list section heading drawn like the window's column headings: a flat ink
+	-- glyph before the capitals and the ink rule at its foot.
+	local function section(title: string, icon: string)
 		height += 36
 		table.insert(rows, {
 			key = "section:" .. title,
@@ -547,6 +570,9 @@ function PartyWindow:_invites(data)
 					size = { w, 36 },
 					layoutOrder = order,
 					text = title,
+					icon = icon,
+					iconRect = { 2, 2, 26, 26 },
+					textX = 40,
 					zIndex = Z + 2,
 				})
 			end,
@@ -566,7 +592,7 @@ function PartyWindow:_invites(data)
 	end
 	local incoming = data.invites or {}
 	if #incoming > 0 then
-		section("Invitations")
+		section("Invitations", "ink:people")
 		for _, entry in incoming do
 			height += frameH
 			table.insert(rows, {
@@ -618,7 +644,7 @@ function PartyWindow:_invites(data)
 			})
 		end
 		if #data.inviteRows > 0 then
-			section("Players")
+			section("Players", "ink:magnifier")
 		end
 	end
 	for _, entry in data.inviteRows do
@@ -676,7 +702,7 @@ function PartyWindow:SetData(data)
 	self.leaveButton:SetBusy(data.leaveBusy == true)
 	if key and GuiService.SelectedObject == nil and self.screen:IsOpen() then
 		local again = self.selectables[key]
-		GuiService.SelectedObject = if again then again else self.closeButton.control.hit
+		GuiService.SelectedObject = if again then again else self:_firstControl()
 	end
 end
 
@@ -706,9 +732,9 @@ function PartyWindow:SearchText(): string
 end
 
 -- Opens the window. `section` ("invite" | "party") picks the control gamepad
--- selection starts on (CLOSE otherwise).
+-- selection starts on (the window's first control otherwise).
 function PartyWindow:Open(section: string?, gamepad: boolean?)
-	local default = self.closeButton.control.hit
+	local default = self:_firstControl()
 	if section == "invite" then
 		local first = nil
 		for key, hit in self.selectables do
@@ -717,8 +743,6 @@ function PartyWindow:Open(section: string?, gamepad: boolean?)
 			end
 		end
 		default = if first then self.selectables[first] else self.search.box
-	elseif section == "party" then
-		default = self.closeButton.control.hit
 	end
 	self.screen:SetDefaultSelection(default)
 	self.screen:Open(gamepad)

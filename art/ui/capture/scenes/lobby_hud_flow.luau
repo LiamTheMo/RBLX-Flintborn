@@ -164,6 +164,19 @@ check(
 	rangerRow.levelLabel.Text == "LV. 16" and math.abs(rangerRow.levelBar.fraction - 0.5) < 1e-6,
 	"a member's level and XP follow their attribute changes"
 )
+-- A member whose level is not known yet shows neither "LV." nor a bare bar.
+local meRow = rowFor(hud.parts.members[2])
+check(
+	meRow.levelLabel.Text == "" and meRow.levelBar.root.Visible == false,
+	"a member without a known level shows no bar"
+)
+player:SetAttribute("Level", 12)
+player:SetAttribute("LevelProgress", 0.6)
+meRow = rowFor(hud.parts.members[2])
+check(
+	meRow.levelLabel.Text == "LV. 12" and meRow.levelBar.root.Visible == true,
+	"the level and bar show once it is known"
+)
 check(hud.invite.control.flags.enabled == false, "a non-leader's add button is disabled")
 check(#hud.parts.answers == 2, "the incoming invite offers accept and decline")
 
@@ -192,6 +205,15 @@ check(last() == "PartyController.Open" and opened[#opened][2] == nil, "the Party
 local before = #opened
 press(hud.invite)
 check(#opened == before, "a non-leader's disabled add-player button does nothing")
+-- The level/XP bar is the lobby's way into Progress (touch has no other).
+hud.xpControl:Activate()
+check(last() == "Progress.Toggle", "the XP bar opens Progress")
+-- The party title's touch pad grows up, never over the first member's row.
+local titleHit = hud.titleControl.hit
+check(
+	titleHit.Position.Y.Offset <= 0 and titleHit.Position.Y.Offset + titleHit.Size.Y.Offset <= 40,
+	"the Party title's pad stays off the first row"
+)
 press(hud.slots[1])
 check(last() == "Vault.Open", "a hotbar slot opens the Inventory")
 preview = { { catalogId = "StoneSpear", quantity = 1 } }
@@ -213,6 +235,14 @@ check(action and action[2] == "accept" and action[3] == "p9", "accept sends Part
 LobbyController.PartyAction("leave")
 local toasts = player.PlayerGui:FindFirstChild("KitToasts")
 check(toasts ~= nil and #toasts:GetDescendants() > 0, "a status message shows as a toast")
+local rawCode, worded = false, false
+for _, part in toasts and toasts:GetDescendants() or {} do
+	if part:IsA("TextLabel") then
+		rawCode = rawCode or string.find(part.Text, "NotInParty", 1, true) ~= nil
+		worded = worded or string.find(part.Text, "you're not in a party", 1, true) ~= nil
+	end
+end
+check(worded and not rawCode, "the refusal reads as words, not the server's code")
 player:SetAttribute("MaintenanceNotice", true)
 check(hud.noticeRegion.Visible == true, "the update notice shows while it applies")
 player:SetAttribute("MaintenanceNotice", nil)
@@ -229,7 +259,9 @@ check(#gui:GetDescendants() == count, "20 party redraws leave the instance count
 local tile1 = hud.tiles[1].control.hit
 check(tile1.NextSelectionRight == hud.tiles[2].control.hit, "Inventory -> Play")
 check(tile1.NextSelectionDown == hud.tiles[3].control.hit, "Inventory v Quests")
-check(hud.tiles[5].control.hit.NextSelectionDown == hud.slots[1].control.hit, "Forge v hotbar")
+check(hud.tiles[5].control.hit.NextSelectionDown == hud.xpControl.hit, "Forge v the XP bar")
+check(hud.xpControl.hit.NextSelectionDown == hud.slots[1].control.hit, "the XP bar v hotbar")
+check(hud.slots[3].control.hit.NextSelectionUp == hud.xpControl.hit, "hotbar ^ the XP bar")
 check(hud:DefaultSelection() == tile1, "default selection is the Inventory tile")
 
 assert(not __failed, "lobby_hud_flow: a check failed")

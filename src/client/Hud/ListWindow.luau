@@ -651,8 +651,9 @@ function ListWindow:Input(label: string, placeholder: string, onSubmit, always: 
 end
 
 -- Two offer panels side by side (a trade). Each side: {title, icon?, items =
--- {{itemId?, name, quantity?}}, gems, state = "open" | "locked" | "confirmed",
--- emptyText?}. Items are slots with their names under them; Gems a pill.
+-- {{itemId?, name, quantity?, permanent?}}, gems, state = "open" | "locked" |
+-- "confirmed", emptyText?}. Items are slots (a Permanent one with the star art)
+-- with their names under them; Gems a pill.
 function ListWindow:Pair(left, right)
 	local gap = 14
 	local pw = math.floor((self.contentW - gap) / 2)
@@ -710,7 +711,7 @@ function ListWindow:Pair(left, right)
 				rect = { x, y, SLOT, SLOT },
 				zIndex = Z + 1,
 			})
-			slot:SetItem({ itemId = item.itemId, quantity = item.quantity })
+			slot:SetItem({ itemId = item.itemId, quantity = item.quantity, permanent = item.permanent == true })
 			self.parts:Give(slot)
 			Kit.Text.new(c, {
 				name = "Name" .. i,

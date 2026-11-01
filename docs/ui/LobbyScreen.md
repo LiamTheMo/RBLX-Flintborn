@@ -306,7 +306,14 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
   tile at the menu icons' share (0.72 of the tile, 60 px), fitted, so it draws
   46 × 60.
 - Owner decision: no player card (top left). The XP bar at the bottom and the
-  party rows' level and XP bars carry the progression.
+  party rows' level and XP bars carry the progression. The XP bar (its level,
+  bar and XP text) is pressable and opens Progress, the lobby's only way there
+  on touch; its touch pad grows upwards, off the hotbar, and gamepad reaches it
+  between the bottom tiles and the hotbar. XP pop-ups stack just above it, as
+  in the run's HUD (while a window is open they show in the toast lane).
+- The PARTY title row's touch pad also grows upwards only, so it never covers
+  the first member's row. A member row whose level is not known yet (no
+  replicated `Level` attribute) shows neither "LV." nor its XP bar.
 - No ready dots and no Leader tag in the Party panel (D24): the crown alone
   marks the leader.
 - Hotbar and XP bar keep their `01_hud.png` positions under modals (q. 2 default).

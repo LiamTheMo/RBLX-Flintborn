@@ -239,7 +239,7 @@ Studio and live checks (desktop, touch and controller):
 - [ ] The marker points at the nearest node, event or portal and does not bob with reduced motion on.
 - [ ] The first extraction pays 250 Coins once; replaying the tutorial from settings pays nothing again.
 - [ ] ⚙ / O opens settings: UI scale applies to every screen at once; the colour-blind palette changes rarity colours everywhere (names still shown); subtitles caption event, extraction and Guardian alerts; choices persist after rejoining.
-- [ ] Without a keyboard, the lobby HUD's tiles and buttons open every window (Inventory with its Vault tab, Play, Journal, Market, Forge, Trade; Progress from the player card; Party from the party panel; Settings from the gear), and the in-run navigation tiles open backpack, craft, build, tribe, map and progress.
+- [ ] Without a keyboard, the lobby HUD's tiles and buttons open every window (Inventory with its Vault tab, Play, Journal, Market, Forge, Trade; Progress from the XP bar above the hotbar (a tap on the level, the bar or the XP text); Party from the party panel; Settings from the gear), and the in-run navigation tiles open backpack, craft, build, tribe, map and progress.
 - [ ] Testers can explain Vaulted vs Permanent; a colour-blind simulation pass over every screen.
 
 ## v0.17 — Live-ops hardening

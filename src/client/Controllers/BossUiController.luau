@@ -20,6 +20,9 @@ local BossUiController = {}
 BossUiController.SHOW_DISTANCE = 250
 BossUiController.CUE_SOUND = "rbxasset://sounds/electronicpingshort.wav"
 BossUiController.CUE_SECONDS = 5
+-- Seconds between redraws while a boss or the horn can show, and while neither can.
+BossUiController.TICK = 0.25
+BossUiController.IDLE_TICK = 1
 
 local PHASE_TEXT = {
 	Pillars = "Shielded — destroy the energy pillars",
@@ -164,10 +167,15 @@ function BossUiController.Start()
 		end
 		update()
 	end)
+	-- The bar follows the distance to the nearest boss (the player moves) and the
+	-- horn counts down, so the card redraws on a short tick while either can
+	-- show; with no boss in the world and no horn running there is nothing to
+	-- draw, so it checks only once a second (BossAlert redraws at once anyway).
 	task.spawn(function()
 		while true do
 			update()
-			task.wait(0.25)
+			local active = hornSpawnAt ~= nil or workspace:FindFirstChild("Bosses") ~= nil
+			task.wait(if active then BossUiController.TICK else BossUiController.IDLE_TICK)
 		end
 	end)
 end

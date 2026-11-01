@@ -257,7 +257,7 @@ PLAY 4.5 are limited by the art).
 | `toggleOn` | `#698010` | Toggle green | Toggle on stand-in; "on" accents in lists and notices |
 | `readyFill` / `readyDot` / `readyEdge` | `#E7E9A2` / `#0CE01A` / `#9DA35A` | Status green | The generic set-status pill (`badge.ready`) and green dot (trade lock, save status); not used by the party since D24 |
 | `leaderTint` | `#FFF0D2` | Leader gold (multiply) | Badge "leader" plaque tint; not used by the party since D24 |
-| `leaderTag` / `notReadyTint` | `#FDD18A` / `#C8C8C8` | — | Kept from the Ready era; no reader |
+| `emptyIconTint` | `#78746E` | Empty grey (multiply) | The icon of an empty stat bar (Vitals), darkened toward grey |
 | `veil` | `#050403` | Veil | Full-screen dim behind windows, at transparency 0.30 (D8; `veil.transparency`) |
 
 ### 3.5 Bars
@@ -476,6 +476,10 @@ banner header.
 | glowStroke / focusStroke / focusOutset | 3 / 3 / 3 | windowMargin / phoneMargin | 8 / 4 |
 | pillCorner | 7 | topInsetMin | 52 |
 | slotGlowOutset | 3 | debounce | 0.15 s |
+| minTextDesign | 12 (design px) | | |
+
+`minTextDesign` is the least size the kit draws a label at when it picks the
+size or a screen passes one (`Core.TextFloor`); a smaller size is raised to it.
 
 Screens use these defaults unless their spec measured something else (the
 built grids: Inventory slots 91 × 99 at a 99.6 × 107.3 pitch; HUD tiles
@@ -523,7 +527,7 @@ lobby HUD moves its top regions down only when the inset plus 2 px
 | Surface | Scale |
 |---|---|
 | HUD | `HudModel.HudScale`: `min(W / 1672, H / 941)` × the player's UI scale, clamped to 0.34–1.6 (`hudMin`, `hudMax`). On phones and touch tablets × 0.9 (`phoneHud`) and never below 0.5 (`phoneFloor.hud`) |
-| Windows | Desktop: `min(fitRoom, canvasFit × UiScale)`, so at 1672 × 941 a window draws at its mockup size; phones and touch tablets: `fitRoom` (fill the room below the top bar, 4 px margin). Clamped to 0.3–1.4 (`windowMin`, `windowMax`). `fitRoom = min((W − 2m) / w, (H − top − 2m) / h)` |
+| Windows | Desktop: `min(fitRoom, canvasFit × UiScale)`, so at 1672 × 941 a window draws at its mockup size; phones and touch tablets: `fitRoom` (fill the room below the top bar, 4 px margin), but a small window (a dialog) draws at most `scale.touchSmallMax` = 1.25 × the scale of a typical window (`phoneText.refWindow`), so it is not blown up to fill the screen (`KitModel.WindowScale`). Clamped to 0.3–1.4 (`windowMin`, `windowMax`). `fitRoom = min((W − 2m) / w, (H − top − 2m) / h)` |
 | Toasts, tooltips, notice cards | HUD scale, never below 0.6 on phones (`phoneFloor.overlay`) |
 
 **Form factors** (`Kit.Scale.FormFactor`): `phone` = touch only and the viewport
@@ -653,6 +657,10 @@ pressed > open > focused > hover > empty > normal. Force any state with the
   weapons, a backpack for armour, a chest for everything else. It reads as
   "picture missing", never as a real item; the item's name is in the
   `KitItemName` attribute for tooltips and detail cards (`KitStandIn` marks it).
+- **Dimming** (a locked slot, row or recipe picture) uses `Kit.Dim(root,
+  amount)`, which composes with each part's resting fade (`KitRestFade`) instead
+  of overwriting it, so a dimmed and then undimmed stand-in returns to its 0.6
+  fade, never to solid ink. Never set `ImageTransparency` to 0 to undim.
 - Rarity: a flat rarity dot (§3.6) plus the rarity name in text.
 
 ---

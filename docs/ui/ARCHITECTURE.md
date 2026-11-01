@@ -295,7 +295,6 @@ token as it is now.
 | divider | `#6B3A14` | footer divider (M03) |
 | glow | `#FDAA09` | selected slot or row glow (M02; M06 `#F7A102`) |
 | gold | `#FDBC07` | crown, checkbox fill (M03 `#FCBB0F`) |
-| leaderTag | `#FDD18A` | Leader plaque (M04) |
 | readyFill / readyDot | `#E7E9A2` / `#0CE01A` | Ready pill (M04) |
 | badge | `#7B2E0D` | number badge plate (05) |
 | xp | `#FCA502` | XP fill (M01; kit yellow `#FDB20F`) |
@@ -313,8 +312,9 @@ with the rarity name.
 
 ### 3.3 Fonts
 
-The repo uses Merriweather Bold through `HudLayout.fontFaces.serif`, and the capture
-ships `art/ui/fonts/Merriweather-{Regular,Bold}.woff`.
+The Kit's fonts are `KitTokens.json` `fonts` (`display`, `heading`, `body`: Merriweather
+Heavy, Bold and Regular; `Kit.Tokens.Font`), and the capture ships them in
+`art/ui/fonts/`.
 
 | Use | Roblox family | Why |
 |---|---|---|

@@ -119,3 +119,21 @@ the lobby never shows it.
   kind glyph.
 - Needs a device: the real jump button and thumbstick geometry, and whether
   ButtonSelect reaches Roblox's own selection mode while bound to Progress.
+
+## Final audit fixes
+
+- **Save status** (`SaveStatusController`): on desktop at the bottom right as
+  before; on phones and touch tablets the bottom corners belong to the Roblox
+  thumbstick and jump button, so the tag sits at the right end of the top bar's
+  free area (`GuiService.TopbarInset`), centred on its height.
+- **XP pop-ups** ("+40 XP · Gathered") stack above the XP bar in both HUDs (the
+  lobby HUD moved them there from beside the tiles), in cream (gold for a
+  level-up, which also says "Level up!") with an ink outline. While a window is
+  open the HUD lane is under the veil, so a gain shows in the toast lane
+  instead.
+- **World event card**: the Vegetation blurb is "Prized plants have sprouted"
+  (the card reads "<rarity> · <blurb>", and "Rare · Rare plants…" repeated
+  itself); `hud_model.spec` checks no blurb names a rarity.
+- **Downed card** redraws on its replicated attributes instead of every frame;
+  the boss card ticks at 0.25 s only while a boss or the horn can show (1 s
+  otherwise); the legacy event list skips its 1 s tick with no event running.

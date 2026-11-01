@@ -109,6 +109,10 @@ local L = {
 		job = { 782, 472, 276, 24 },
 		bar = { 782, 502, 190, 20 },
 		stop = { 984, 492, 74, 40 },
+		-- Phones and touch tablets: the boosted "Stop" needs a wider plate, so
+		-- the bar gives it room.
+		barPhone = { 782, 502, 156, 20 },
+		stopPhone = { 950, 490, 108, 44 },
 		stationsHead = { 782, 538, 276, 26 },
 		stations = { 782, 564, 276, 24 },
 	},
@@ -135,15 +139,11 @@ local function listHeight(count: number, rowH: number, gap: number): number
 end
 
 -- Dims the big item picture for a locked recipe, as ListRow dims its icon.
+-- Kit.Dim composes with the picture's own fade, so an item without art keeps
+-- its faded stand-in glyph (Art.STAND_IN_FADE, STYLE_GUIDE §6.5).
 local function dimIcon(icon, dim: boolean)
-	local image = icon and icon.image
-	if image == nil then
-		return
-	end
-	if image:IsA("ImageLabel") then
-		(image :: ImageLabel).ImageTransparency = if dim then 0.4 else 0
-	elseif image:IsA("TextLabel") then
-		(image :: TextLabel).TextTransparency = if dim then 0.4 else 0
+	if icon then
+		Kit.Dim(icon.root, if dim then 0.4 else 0)
 	end
 end
 
@@ -356,10 +356,14 @@ function RecipeWindow:_buildCraftingExtras(v, z: number)
 	local c = L.craft
 	label(v, { name = "SmeltHead", rect = c.smeltHead, text = "Smelting", role = "sectionHeader", zIndex = z }, 18)
 	self.jobText = label(v, { name = "Job", rect = c.job, text = "", role = "bodySoft", zIndex = z })
-	self.jobBar = Kit.Bar.new(v, { name = "JobBar", rect = c.bar, fill = "orange", frame = "track", zIndex = z })
+	local phone = Kit.Scale.IsSmallTouch()
+	self.jobBar = Kit.Bar.new(
+		v,
+		{ name = "JobBar", rect = if phone then c.barPhone else c.bar, fill = "orange", frame = "track", zIndex = z }
+	)
 	self.stop = Kit.Button.new(v, {
 		name = "Stop",
-		rect = c.stop,
+		rect = if phone then c.stopPhone else c.stop,
 		label = "Stop",
 		variant = "secondary",
 		sizeClass = "s",

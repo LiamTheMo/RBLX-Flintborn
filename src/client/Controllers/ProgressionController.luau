@@ -270,24 +270,47 @@ function renderPanel()
 	window:Finish()
 end
 
-local function popup(payload)
+-- How long an XP pop-up stays.
+ProgressionController.POPUP_SECONDS = 2.5
+
+-- The words for an XP gain (no glyph Merriweather lacks: a level-up says so).
+function ProgressionController.PopupText(payload): string
 	local text = if payload.amount > 0 then ("+%d XP · %s"):format(payload.amount, payload.reason) else payload.reason
-	if payload.levelUp then
-		text = "▲ " .. text
+	if payload.levelUp and payload.amount > 0 then
+		text = "Level up! " .. text
 	end
-	-- Kit type on the world: cream (gold for a level-up) with an ink outline.
+	return text
+end
+
+local function popup(payload)
+	local text = ProgressionController.PopupText(payload)
+	local levelUp = payload.levelUp == true
+	-- A window is open: the HUD's pop-up lane above the XP bar is under its veil,
+	-- so the gain shows in the toast lane over it instead.
+	if Kit.Modal.Count() > 0 then
+		Kit.Toast.Show({
+			kind = "info",
+			title = if not levelUp then "Experience" elseif payload.amount > 0 then "Level Up" else "Mastery",
+			text = text,
+			duration = ProgressionController.POPUP_SECONDS,
+		})
+		return
+	end
+	-- Above the XP bar (the HUD's pop-up lane, else the fallback bar's): HUD
+	-- text over the world, cream (gold for a level-up) with an ink outline
+	-- (STYLE_GUIDE §4.4).
+	local h = if levelUp then 24 else 20
 	local label = Kit.Text.new(ui.popups, {
 		name = "Popup",
-		size = { 320, if payload.levelUp then 22 else 18 },
+		size = { 320, h },
 		text = text,
 		role = "hudSmall",
-		textSize = if payload.levelUp then 17 else 14,
-		color = if payload.levelUp then "gold" else "cream",
+		textSize = if levelUp then 18 else 15,
+		color = if levelUp then "gold" else "cream",
+		outline = "ink",
 	}).root
-	label.Size = UDim2.new(1, 0, 0, if payload.levelUp then 22 else 18)
-	label.TextStrokeColor3 = Kit.Tokens.Color("ink")
-	label.TextStrokeTransparency = 0.3
-	task.delay(2.5, function()
+	label.Size = UDim2.new(1, 0, 0, h)
+	task.delay(ProgressionController.POPUP_SECONDS, function()
 		label:Destroy()
 	end)
 end
@@ -330,7 +353,7 @@ local function build()
 	make("UIListLayout", { VerticalAlignment = Enum.VerticalAlignment.Bottom, Padding = UDim.new(0, 2) }, ui.popups)
 	-- The new HUD replaces the level bar while it is on screen and hosts the
 	-- pop-ups; whenever it is hidden (world menu, protected, dead) this bar shows.
-	-- In the lobby the lobby HUD's profile panel always shows the level instead.
+	-- In the lobby the lobby HUD's XP bar always shows the level instead.
 	local function refreshBar()
 		ui.barHolder.Visible = not ((HudMode.ReplacesLegacy() and HudMode.IsVisible()) or HudMode.ReplacesLobby())
 	end

@@ -52,7 +52,7 @@ hud.event:Set({
 	title = "World Event",
 	timer = "6:12",
 	name = "Bloodroot Bloom",
-	description = "Rare · Rare plants have sprouted · NE, 312 m",
+	description = "Rare · Prized plants have sprouted · NE, 312 m",
 }, "Vegetation")
 hud.bottom:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 hud.bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })

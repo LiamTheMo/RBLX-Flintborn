@@ -4,6 +4,7 @@
 --   1 loading (Play disabled)    2 ready              3 Play pressed: the request
 --   fails, the reason shows      4 game-update notice 5 Play hover
 --   6 entering the world: the menu closes and the at-risk toast shows
+--   then a 20× open / close leak check (instances and connections)
 --
 --   python3 art/ui/capture/capture.py world_menu
 
@@ -71,6 +72,90 @@ player:SetAttribute("SessionState", "ActiveRun")
 check(not menu.Enabled, "the menu closes in the run")
 check(gui:FindFirstChild("Transition", true).Visible, "the at-risk warning shows")
 __dump(gui, W, H, BG)
+
+-- Leak check: the menu shown and closed 20 times (back to the menu, into the
+-- run) leaves the PlayerGui's instances and the live connections as they were.
+-- Leak check counts: the PlayerGui's instances, and the live connections on
+-- every instance still in the game (a destroyed one drops out with its
+-- connections, as in Roblox) plus those on the shared Core.Signal objects.
+local leakCounts
+do
+	local SignalMeta = getmetatable(Instance.new("Frame"):GetPropertyChangedSignal("Name"))
+	local CoreSignal = require(game:GetService("ReplicatedStorage").Shared.Core.Signal)
+	local coreLive = setmetatable({}, { __mode = "k" })
+	local connect = CoreSignal.Connect
+	CoreSignal.Connect = function(signal, fn)
+		local connection = connect(signal, fn)
+		coreLive[connection] = true
+		return connection
+	end
+	local ROOTS = {
+		"Players",
+		"UserInputService",
+		"GuiService",
+		"RunService",
+		"Lighting",
+		"ReplicatedStorage",
+		"StarterPlayer",
+		"SoundService",
+		"ContextActionService",
+		"SocialService",
+		"TweenService",
+	}
+	function leakCounts(): (number, number)
+		local count = 0
+		local seen = {}
+		local function signals(map)
+			for _, value in map or {} do
+				if type(value) == "table" and getmetatable(value) == SignalMeta then
+					count += #value.handlers
+				end
+			end
+		end
+		local function visit(instance)
+			if instance == nil or seen[instance] then
+				return
+			end
+			seen[instance] = true
+			signals(rawget(instance, "__props"))
+			signals(rawget(instance, "__changed"))
+			signals(rawget(instance, "__attrChanged"))
+			for _, child in rawget(instance, "__children") or {} do
+				visit(child)
+			end
+		end
+		visit(game)
+		visit(workspace)
+		visit(workspace.CurrentCamera)
+		for _, name in ROOTS do
+			visit(game:GetService(name))
+		end
+		local player = game:GetService("Players").LocalPlayer
+		visit(player)
+		for connection in coreLive do
+			if connection.Connected then
+				count += 1
+			end
+		end
+		return #player.PlayerGui:GetDescendants(), count
+	end
+end
+
+local function cycle()
+	player:SetAttribute("SessionState", "WorldMainMenuReady")
+	player:SetAttribute("SessionState", "ActiveRun")
+end
+cycle()
+local instances, connections = leakCounts()
+for _ = 1, 20 do
+	cycle()
+end
+local instancesAfter, connectionsAfter = leakCounts()
+check(instancesAfter == instances, ("open/close ×20 leaves %d descendants (%d)"):format(instances, instancesAfter))
+check(
+	connectionsAfter == connections,
+	("open/close ×20 leaves %d connections (%d)"):format(connections, connectionsAfter)
+)
 
 print(__failed and "SCENE FAILED" or "SCENE OK")
 if __failed then

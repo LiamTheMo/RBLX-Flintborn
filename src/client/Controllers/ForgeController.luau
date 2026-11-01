@@ -38,10 +38,9 @@ end
 
 -- Player-facing text for a refusal code, as a sentence.
 local function reasonText(code: any): string
-	local text = Reasons.Text(code)
-	if text == tostring(code) and RecipeModel.REASONS[code] then
-		text = RecipeModel.REASONS[code]
-	end
+	local text = if not Reasons.Has(code) and RecipeModel.REASONS[code]
+		then RecipeModel.REASONS[code]
+		else Reasons.Text(code)
 	return (string.gsub(text, "^%l", string.upper)) .. (if string.find(text, "[%.!?]$") then "" else ".")
 end
 

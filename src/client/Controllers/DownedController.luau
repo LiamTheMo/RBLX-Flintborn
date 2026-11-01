@@ -7,7 +7,6 @@
 local GameConstants = require(game:GetService("ReplicatedStorage").Shared.GameConstants)
 local PlaceConfig = require(game:GetService("ReplicatedStorage").Shared.Config.PlaceConfig)
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
@@ -52,12 +51,19 @@ local function update()
 	ui.card:Show(table.concat(lines, "\n"), ("Downed — %d HP left"):format(health))
 end
 
+-- The server replicates everything the card shows as attributes, so it redraws
+-- when one of them changes (not every frame).
+DownedController.ATTRIBUTES = { "Downed", "DownedRemaining", "DownedHealth", "DownedReviver", "DownedReviveProgress" }
+
 function DownedController.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
 	build()
-	RunService.RenderStepped:Connect(update)
+	for _, name in DownedController.ATTRIBUTES do
+		player:GetAttributeChangedSignal(name):Connect(update)
+	end
+	update()
 end
 
 return DownedController

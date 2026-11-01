@@ -106,7 +106,7 @@ test("deploy check", function()
 		{ catalogId = "Wood", quantity = 20 },
 	})
 	expectEq(check.title, PlayModel.TITLE_CHECK, "lists the items")
-	expectEq(check.lines[1], "★ Stone Axe", "permanent star")
+	expectEq(check.lines[1], "• Stone Axe (Permanent)", "a Permanent item says so in words")
 	expectEq(check.lines[2], "• Wood ×20", "quantity")
 	expectEq(check.notes[1], PlayModel.LINE_AT_RISK, "risk warning")
 	expectEq(#check.notes, 2, "the risk warning and the vault line only")
