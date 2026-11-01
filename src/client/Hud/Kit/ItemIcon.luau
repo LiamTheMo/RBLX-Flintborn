@@ -4,6 +4,10 @@
 -- then a neutral glyph for the item's kind (KitItemName carries the name for
 -- tooltips), so nothing reads blank and no slot prints text.
 --
+-- The picture is never drawn larger than its art (MAX_SCALE design px per pixel
+-- of the sharpest art): in a big box (the Forge's 254 px picture, the Inventory
+-- detail card) it is centred at that size instead of blurred.
+--
 --   Kit.ItemIcon.new(slot, { rect = { 10, 10, 70, 70 }, catalogId = "StoneAxe" })
 
 local Art = require(script.Parent.Art)
@@ -13,12 +17,17 @@ local Tokens = require(script.Parent.Tokens)
 local ItemIcon = {}
 ItemIcon.__index = ItemIcon
 
+-- The largest an item picture is drawn: design px per pixel of its art.
+ItemIcon.MAX_SCALE = 1
+
 -- props: rect | size, catalogId (or itemId), icon (an icon id shown untinted
--- only when ItemInfo has no art for the item), zIndex, name.
+-- only when ItemInfo has no art for the item), zIndex, name, maxScale
+-- (default MAX_SCALE; false draws the art at the full box).
 function ItemIcon.new(parent: Instance, props)
 	local w, h = Core.Size(props, 70, 70)
 	local base = Core.Root(parent, "ItemIcon", "item", props, w, h)
 	local self = setmetatable({ root = base.root, base = base, w = w, h = h, image = nil }, ItemIcon)
+	self.maxScale = if props.maxScale == false then nil else props.maxScale or ItemIcon.MAX_SCALE
 	self:SetItem(props.catalogId or props.itemId, props.icon)
 	return self
 end
@@ -29,6 +38,7 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 		self.image = nil
 	end
 	self.catalogId = catalogId
+	self.root:SetAttribute("KitStandIn", nil)
 	local z = self.base.z + 1
 	-- ItemInfo.Icon is the one item-to-art source (owned with the item data);
 	-- its optional tint recolours shared art (an ore drawn from the stone icon).
@@ -42,11 +52,14 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 			color = if artIcon then tint else nil,
 			-- While the art is not served: a small letter, not a slot-filling one.
 			standInScale = 0.45,
+			maxScale = self.maxScale,
 		})
 	elseif sprite then
-		self.image = Art.Sprite(sprite, self.w, self.h, self.base.visual, {
+		local r = Art.Capped(sprite, { 0, 0, self.w, self.h }, self.maxScale)
+		self.image = Art.Sprite(sprite, r[3], r[4], self.base.visual, {
 			Name = "Item",
-			Size = UDim2.fromScale(1, 1),
+			Position = UDim2.fromOffset(r[1], r[2]),
+			Size = if r[3] == self.w and r[4] == self.h then UDim2.fromScale(1, 1) else UDim2.fromOffset(r[3], r[4]),
 			ZIndex = z,
 			ScaleType = Enum.ScaleType.Fit,
 		})
@@ -59,7 +72,7 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 			(self.h - s) / 2,
 			s,
 			s,
-		}, { z = z, name = "Item", tint = "inkSoft", transparency = Art.STAND_IN_FADE })
+		}, { z = z, name = "Item", tint = "inkSoft", transparency = Art.STAND_IN_FADE, maxScale = self.maxScale })
 		self.root:SetAttribute("KitStandIn", true)
 	end
 	self.root:SetAttribute("KitItemName", if catalogId then Art.ItemName(catalogId) else nil)

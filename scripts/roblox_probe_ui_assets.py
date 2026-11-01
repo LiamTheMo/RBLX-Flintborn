@@ -140,7 +140,8 @@ def main(argv=None):
     names = [n.strip() for n in args.names.split(",") if n.strip()] or SAMPLE
     entries = []
     for name in names:
-        if name in ids:
+        # An empty id is a placeholder for an atlas not uploaded yet.
+        if str(ids.get(name) or "").isdigit():
             entries.append((name, int(ids[name])))
     # A decal id is not an image: it should fail, which shows the probe can tell.
     if "pm_panel" in decals:

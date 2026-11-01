@@ -772,6 +772,18 @@ contact sheets and CATALOG.md. For every part:
    into the transparent pixels (bilinear filtering never pulls in black or
    red), and keep a 2 px transparent margin (`EDGE_PAD`).
 
+**High-resolution copies.** Parts listed in `HIRES` also write
+`lk_<name>__hi.png` at f = min(2, the sheet's headroom over the 1× export):
+corners and edges at f, a nine-slice's stretched middle kept at its 1× length.
+The 1× sprite's manifest entry gains `"hi": "<name>__hi"`; the copy's entry
+holds its own `w`/`h`/`slice`/`rect` in its own pixels plus `scale` (f) and
+`of`. `Widgets` draws the copy only where the art is magnified (more than 0.75
+design px per art px) and the copy's atlas has an id, so pieces keep their
+design size and a stale id never draws the wrong rects (`UiAssets.Placement`).
+`Kit.Icon` and `Kit.ItemIcon` never draw an icon past 1.0 design px per art px
+(`maxScale`; pass `false` to opt out); item art with no headroom draws smaller
+until higher-resolution art exists.
+
 Re-running writes identical files; existing sprites stay byte-identical when
 only new parts are added. `python3 art/ui/slice_lobby_kit.py <name>` builds one
 part without touching the manifest (for trying a box).
@@ -781,7 +793,8 @@ part without touching the manifest (for trying a box).
 - `slice_ = [l, t, r, b]` in output px is the 9-slice inset (corners, rivets and
   ornaments lie inside it); it goes to the manifest `slice`. In Roblox:
   `ScaleType = Slice`, `SliceCenter = Rect(l, t, w − r, h − b)`; the corner scale is
-  `clamp(min(drawn / stored), 0.15, 1)` (`HudModel.SliceScale`). Atlas sprites are
+  `clamp(min(drawn / stored), 0.15, 1)` (`HudModel.SliceScale`; its optional
+  `artScale` divides by a high-resolution copy's f). Atlas sprites are
   drawn as nine plain pieces with whole-pixel corners (phones mis-draw Roblox's
   slice of an atlas rectangle).
 - Some parts stretch along one axis only (`ONE_AXIS`: search, dropdown, bars,
@@ -816,11 +829,19 @@ for new glyphs.
 | `atlas_lk_items` | Item art (`ItemInfo.ART_SPRITES`) | uploaded |
 | `atlas_lk_play` | The sheet-21 Play art (D26), 1024 × 256 | new: uploaded by the owner |
 | `atlas_island` | The island painting | uploaded |
+| `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
+| `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
+| `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
+| `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
 - **Never change an uploaded atlas.** Once an atlas is uploaded its bytes and
   rects are live: adding a sprite to its group moves other sprites. New art goes
   into a new group (as `atlas_lk_play` did); check the old atlases' sha1 is
   unchanged after packing.
+- An empty id `""` in `UiAssetIds.json` is a placeholder for an atlas not
+  uploaded yet; the game and captures draw the 1× art meanwhile, and
+  `--dry-run --atlases` lists the pending atlases. `pack_atlas.py` refuses to
+  change an atlas that has an id.
 - `python3 scripts/roblox_upload_ui_assets.py --sprites` syncs sizes, insets,
   atlas and rect from the manifest into
   [`src/shared/UI/UiSprites.json`](../../src/shared/UI/UiSprites.json) (local, no

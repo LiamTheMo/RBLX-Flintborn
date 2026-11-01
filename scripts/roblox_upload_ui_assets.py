@@ -15,7 +15,12 @@ is an outward action: it needs --upload plus these environment variables:
 --sprites regenerates src/shared/UI/UiSprites.json (sizes and 9-slice insets)
 from art/ui/sprites/manifest.json. It is local only and needs no key.
 
+An empty id ("") in UiAssetIds.json is a placeholder for an atlas that is packed
+but not uploaded yet: the game treats it as missing (its sprites draw their 1x
+art, UiAssets.Placement) and this script uploads it like any new name.
+
   python scripts/roblox_upload_ui_assets.py               # dry run
+  python scripts/roblox_upload_ui_assets.py --dry-run --atlases   # atlases only
   python scripts/roblox_upload_ui_assets.py --sprites     # refresh UiSprites.json
   python scripts/roblox_upload_ui_assets.py --upload --only frame_slot,icon_heart
 """
@@ -68,13 +73,15 @@ def write_json(path, data):
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
 
 
-def pending(files, ids, only):
+def pending(files, ids, only, atlases=False):
     chosen = []
     for file in files:
         name = file.stem
         if only and name not in only:
             continue
-        if name in ids:
+        if atlases and not name.startswith("atlas_"):
+            continue
+        if ids.get(name):
             continue
         chosen.append(file)
     return chosen
@@ -93,7 +100,8 @@ def creator_from_env():
 
 def sync_sprites():
     """UiSprites.json = {name: {w, h, slice}} copied from the slicer's manifest,
-    with "atlas" and "rect" for sprites packed into an atlas (pack_atlas.py)."""
+    with "atlas" and "rect" for sprites packed into an atlas (pack_atlas.py),
+    and "hi" / "scale" / "of" linking a sprite and its high-resolution copy."""
     manifest = load_json(MANIFEST)
     if not manifest:
         raise ValueError(f"No manifest at {MANIFEST}")
@@ -110,6 +118,13 @@ def sync_sprites():
             # Also drawn from an atlas image at rect [x, y, w, h].
             out[name]["atlas"] = entry["atlas"]
             out[name]["rect"] = entry["rect"]
+        if entry.get("hi"):
+            # Its high-resolution copy (another entry, sized in its own pixels).
+            out[name]["hi"] = entry["hi"]
+        if entry.get("of"):
+            # A high-resolution copy: `scale` of its pixels per design pixel of `of`.
+            out[name]["of"] = entry["of"]
+            out[name]["scale"] = entry["scale"]
     write_json(SPRITES_FILE, out)
     sliced = sum(1 for v in out.values() if v["slice"])
     print(f"Wrote {SPRITES_FILE.relative_to(ROOT)}: {len(out)} sprites ({sliced} 9-sliced)")
@@ -210,6 +225,7 @@ def main(argv=None):
     mode.add_argument("--dry-run", action="store_true", help="list what would upload (default)")
     mode.add_argument("--upload", action="store_true", help="upload for real and write UiAssetIds.json")
     parser.add_argument("--only", default="", help="comma-separated sprite names to consider")
+    parser.add_argument("--atlases", action="store_true", help="consider only atlas images (atlas_*)")
     parser.add_argument("--sprites", action="store_true", help="regenerate UiSprites.json from the manifest")
     parser.add_argument("--inspect", default="", help="print Open Cloud details for an asset id and exit")
     parser.add_argument("--resolve", action="store_true",
@@ -244,14 +260,15 @@ def main(argv=None):
     decals = load_json(DECALS_FILE)
     # A sprite counts as uploaded once its decal exists, even before the image id
     # behind it is known; --resolve fills those in without uploading twice.
-    todo = pending(files, {**decals, **ids}, only)
+    todo = pending(files, {**decals, **ids}, only, args.atlases)
     too_big = [f for f in todo if f.stat().st_size > MAX_BYTES]
     if too_big:
         raise ValueError("Over 20 MB: " + ", ".join(f.name for f in too_big))
 
     if not args.upload:
-        print(f"DRY RUN: {len(files)} sprites found, {len({**decals, **ids})} already uploaded "
-              f"({len(ids)} with image ids), {len(todo)} would upload")
+        done = {name for name, value in {**decals, **ids}.items() if value}
+        print(f"DRY RUN: {len(files)} sprites found, {len(done)} already uploaded "
+              f"({sum(1 for value in ids.values() if value)} with image ids), {len(todo)} would upload")
         for file in todo:
             print(f"  would upload {file.stem:28s} {file.stat().st_size:>8d} bytes")
         if not os.environ.get("ROBLOX_API_KEY"):
@@ -285,7 +302,7 @@ def resolve_decals(cloud):
     decals = load_json(DECALS_FILE)
     resolved = failed = 0
     for name, decal_id in sorted(decals.items()):
-        if name in ids:
+        if ids.get(name):
             continue
         image_id, how = cloud.image_id(decal_id)
         if how in ("resolved from decal", "already an image"):

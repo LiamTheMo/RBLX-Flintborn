@@ -4,8 +4,10 @@ Inputs : art/reference/ui/lobby/kit/NN_*.png (the owner's kit sheets, RGBA on
          transparent backgrounds). The screen mockups next to them
          (art/reference/ui/lobby/0N_*.png, 1672x941) set each part's size.
 Outputs: art/ui/sprites/lk_<name>.png
+         art/ui/sprites/lk_<name>__hi.png for the HIRES parts: the same design
+         rectangle at up to 2x the pixels, drawn where the art is magnified
          the lk_* entries of art/ui/sprites/manifest.json (other entries are kept
-         exactly as they are)
+         exactly as they are); run art/ui/pack_atlas.py afterwards
          art/ui/kit/contact_dark.png, contact_light.png, slice_test.png
 
 Plain Python with numpy and Pillow:
@@ -365,21 +367,24 @@ def clean_alpha(a, box, keep="inside", min_area=40, fill="small", hole_max=150):
     return a
 
 
-def resize(a, w, h):
-    """Premultiplied Lanczos resize of a float RGBA array."""
-    if (a.shape[1], a.shape[0]) == (w, h):
+def resize(a, w, h, box=None):
+    """Premultiplied Lanczos resize of a float RGBA array (of the source region
+    `box` = (x0, y0, x1, y1) in source pixels when given)."""
+    if box is None and (a.shape[1], a.shape[0]) == (w, h):
         return a.copy()
     pm = a[..., :3] * a[..., 3:4]
     chans = [pm[..., 0], pm[..., 1], pm[..., 2], a[..., 3]]
-    out = [np.asarray(Image.fromarray(np.ascontiguousarray(c, np.float32), "F").resize((w, h), Image.LANCZOS))
+    out = [np.asarray(Image.fromarray(np.ascontiguousarray(c, np.float32), "F").resize((w, h), Image.LANCZOS, box))
            for c in chans]
     alpha = np.clip(out[3], 0, 1)
     rgb = np.stack(out[:3], -1) / np.maximum(alpha, 1e-4)[..., None]
     return np.concatenate([np.clip(rgb, 0, 1), alpha[..., None]], -1).astype(np.float32)
 
 
-def finish(a):
-    """Snap alpha, decontaminate faint rims, bleed colour outward, trim."""
+def finish(a, origin=None):
+    """Snap alpha, decontaminate faint rims, bleed colour outward, trim.
+    `origin` (a list) receives where the trimmed sprite's top-left pixel lies in
+    `a` (it can be negative: the EDGE_PAD margin may reach past `a`)."""
     a = a.copy()
     alpha = a[..., 3]
     alpha[alpha < 3 / 255] = 0
@@ -389,6 +394,8 @@ def finish(a):
     weak = (alpha > 0) & ~strong
     a[..., :3] = np.where(weak[..., None], rgb, a[..., :3])
     ys, xs = np.nonzero(alpha > 0)
+    if origin is not None:
+        origin[:] = [int(xs.min()) - EDGE_PAD, int(ys.min()) - EDGE_PAD]
     y0, y1 = max(0, ys.min() - EDGE_PAD), min(a.shape[0], ys.max() + 1 + EDGE_PAD)
     x0, x1 = max(0, xs.min() - EDGE_PAD), min(a.shape[1], xs.max() + 1 + EDGE_PAD)
     a = a[y0:y1, x0:x1]
@@ -804,7 +811,9 @@ def recolor_fill(a, box, target, sigma):
     return a
 
 
-def build_part(p):
+def build_part(p, ctx=None):
+    """The part's sprite and export scale. `ctx` (a dict) receives what
+    build_hires needs: the cleaned source crop, the export size and the trim."""
     src = sheet(p["sid"])
     H, W = src.shape[:2]
     x0, y0, x1, y1 = p["box"]
@@ -869,13 +878,127 @@ def build_part(p):
     h, w = a.shape[:2]
     scale = p["scale"] if p["scale"] is not None else p["size"] / max(w, h)
     ow, oh = max(1, round(w * scale)), max(1, round(h * scale))
+    source = a
     a = resize(a, ow, oh)
     if p["recolor"]:
         a = recolor_fill(a, *p["recolor"])
-    a = finish(a)
+    origin = [0, 0]
+    a = finish(a, origin)
     if max(a.shape[:2]) > MAX_SIDE:
         raise ValueError(f"{p['name']} is larger than {MAX_SIDE} px")
+    if ctx is not None:
+        ctx.update(source=source, size=(ow, oh), origin=tuple(origin))
     return a, scale
+
+
+# ---------------------------------------------------------------------------
+# high-resolution copies
+# ---------------------------------------------------------------------------
+
+# Windows draw at UIScale 1.15 (1080p) to 1.4 (1440p) and the HUD up to 1.53, so
+# art stored at its design size is magnified and soft. These parts also get a
+# copy `lk_<name>__hi` exported at f = min(HI_MAX, the sheet's headroom) times
+# the design size, cut from the same sheet pixels and aligned to the 1x sprite
+# (the same design rectangle, its EDGE_PAD margin included), so the game draws
+# it at exactly the 1x sprite's design size and only gets sharper. The 1x
+# sprite stays as it is: it is drawn where the art is not magnified, and until
+# the copy's atlas is uploaded (Widgets / UiAssets.Placement).
+HI_MAX = 2.0
+HIRES = {
+    # frames and plaques
+    "window_frame", "dialog_frame", "panel", "panel_inset", "plaque_paper", "toast_frame", "plaque_small",
+    "plaque_notched_leather", "plaque_notched_paper", "plaque_notched_disabled", "pill_value",
+    # buttons
+    *(f"button_{kind}_{state}" for kind in ("leather", "paper") for state in ("normal", "hover", "pressed",
+                                                                                "disabled")),
+    *(f"button_paper_small_{state}" for state in ("normal", "hover", "disabled")),
+    # slots, tabs, tiles, pills
+    *(f"slot_{state}" for state in ("normal", "selected", "hover", "disabled", "locked", "item_normal",
+                                     "item_selected")),
+    "tab_category", "tab_arrow_paper", "tab_arrow_leather", "tile_frame", "currency_pill",
+    # bars
+    "bar_track", "bar_frame", "bar_frame_plain", "bar_frame_thin", "statbar_frame",
+    *(f"bar_fill_{c}" for c in ("red", "green", "orange", "yellow", "blue")),
+    # small controls drawn larger than stored
+    "frame_round", "button_stepper_plus", "button_stepper_minus", "clasp_left", "clasp_right", "glyph_play",
+    # the Quest Journal's detail illustrations (197 x 122)
+    *(f"icon_{n}" for n in ("portal", "scroll", "crown", "trophy", "anvil_hammer", "totem", "treasure", "paw",
+                            "tusk", "berry_bush")),
+}
+HI_SUFFIX = "__hi"
+
+
+def finish_hires(a, f):
+    """finish() for a high-resolution copy: the same alpha snap, rim
+    decontamination and colour bleed, but no trim (its frame is fixed)."""
+    a = a.copy()
+    alpha = a[..., 3]
+    alpha[alpha < 3 / 255] = 0
+    alpha[alpha > 0.96] = 1
+    strong = alpha >= 0.5
+    rgb, _ = bleed_into(a[..., :3], strong, 3)
+    weak = (alpha > 0) & ~strong
+    a[..., :3] = np.where(weak[..., None], rgb, a[..., :3])
+    known = a[..., 3] > 0
+    rgb, known = bleed_into(a[..., :3], known, int(round(24 * f)))
+    if not known.all():
+        rgb[~known] = rgb[known].mean(0)
+    a[..., :3] = np.where((a[..., 3] > 0)[..., None], a[..., :3], rgb)
+    return a
+
+
+def shorten(a, axis, start, end, length):
+    """Resamples a[start:end] along `axis` to `length` px (premultiplied Lanczos)."""
+    band = a[:, start:end] if axis == 1 else a[start:end]
+    h, w = band.shape[:2]
+    band = resize(band, length, h) if axis == 1 else resize(band, w, length)
+    if axis == 1:
+        return np.concatenate([a[:, :start], band, a[:, end:]], 1)
+    return np.concatenate([a[:start], band, a[end:]], 0)
+
+
+def build_hires(p, base, ctx):
+    """The high-resolution copy of a part: (sprite, f, pixel insets), or None
+    when the sheet has no more detail than the 1x sprite.
+
+    The copy covers the 1x sprite's design rectangle exactly: pixel X of the 1x
+    sprite is source x (X + origin) * source / export, so the copy samples that
+    same source region at f times the pixels. A 9-sliced copy keeps corners and
+    edge widths at f and resamples its stretched middle back to the 1x length
+    (the middle is stretched on screen anyway; its density along the stretch
+    stays what the 1x sprite has), which keeps the atlases small."""
+    source, (ow, oh), (ox, oy) = ctx["source"], ctx["size"], ctx["origin"]
+    hs, ws = source.shape[:2]
+    H, W = base.shape[:2]
+    f = min(HI_MAX, ws / ow, hs / oh)
+    if f < 1.2:
+        return None
+    PW, PH = round(W * f), round(H * f)
+    sx, sy = ws / ow, hs / oh
+    pad = int(np.ceil(4 * max(sx, sy))) + 8
+    padded = np.pad(source, ((pad, pad), (pad, pad), (0, 0)))
+    box = (pad + ox * sx, pad + oy * sy, pad + (ox + W) * sx, pad + (oy + H) * sy)
+    a = resize(padded, PW, PH, box)
+    if p["recolor"]:
+        a = recolor_fill(a, *p["recolor"])
+    a = finish_hires(a, f)
+    insets = None
+    if p["slice"]:
+        l, t, r, b = p["slice"]
+        fx, fy = PW / W, PH / H
+        lp, tp, rp, bp = round(l * fx), round(t * fy), round(r * fx), round(b * fy)
+        stretch = ONE_AXIS.get(p["name"][len(PREFIX):], "XY")
+        if "X" in stretch and PW - lp - rp > W - l - r:
+            a = shorten(a, 1, lp, PW - rp, W - l - r)
+        if "Y" in stretch and PH - tp - bp > H - t - b:
+            a = shorten(a, 0, tp, PH - bp, H - t - b)
+        insets = [lp, tp, rp, bp]
+        h2, w2 = a.shape[:2]
+        if lp + rp >= w2 or tp + bp >= h2:
+            raise ValueError(f"{p['name']}{HI_SUFFIX}: insets {insets} do not fit {w2}x{h2}")
+    if max(a.shape[:2]) > MAX_SIDE:
+        raise ValueError(f"{p['name']}{HI_SUFFIX} is larger than {MAX_SIDE} px")
+    return a, f, insets
 
 
 def to_u8(a):
@@ -1064,9 +1187,10 @@ SKIPPED = [
 ]
 
 
-def write_catalog(info, insets, stats, manifest=None):
+def write_catalog(info, insets, stats, manifest=None, hires=None):
     by_name = {p["name"]: p for p in PARTS}
     manifest = manifest or {}
+    hires = {base: (w, h, f, ins) for w, h, f, ins, base in (hires or {}).values()}
     sheets = {p.stem[:2]: p.name for p in KIT.glob("*.png")}
     families = {}
     for name in info:
@@ -1100,6 +1224,10 @@ def write_catalog(info, insets, stats, manifest=None):
         "- Sprites the game uses are packed by `art/ui/pack_atlas.py` into the `atlas_lk_*` atlases (\"Atlas\" "
         "column; manifest `atlas` / `rect`). Unused sprites stay as files in no atlas. Re-running this script keeps "
         "each placement while the sprite's size is unchanged; run `pack_atlas.py` after any size change.",
+        "- \"Hi-res\" = the sprite's high-resolution copy `<name>__hi` (`HIRES`): the same design rectangle at f "
+        "times the pixels (f = min(2, the sheet's headroom)), 9-slice insets in its own pixels and its stretched "
+        "middle kept at the 1x length. The game draws it at the 1x sprite's design size wherever the art is "
+        "magnified, once its atlas is uploaded (manifest `hi`, `scale`; `UiAssets.Placement`).",
         "",
         "### Button and state families",
         "",
@@ -1134,9 +1262,9 @@ def write_catalog(info, insets, stats, manifest=None):
         "",
         "## Sprites",
         "",
-        "| Name | Source sheet + box (x0, y0, x1, y1) | Size | 9-slice [l, t, r, b] | Stretch | Atlas "
+        "| Name | Source sheet + box (x0, y0, x1, y1) | Size | 9-slice [l, t, r, b] | Stretch | Atlas | Hi-res "
         "| Role / where used | Notes |",
-        "|---|---|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for name in sorted(info):
         p = by_name[name]
@@ -1146,8 +1274,13 @@ def write_catalog(info, insets, stats, manifest=None):
         stretch = ONE_AXIS.get(short, "X, Y") if ins else ""
         src = f"{sheets.get(p['sid'], p['sid'])} {tuple(p['box'])}"
         atlas = manifest.get(name, {}).get("atlas", "")
-        lines.append(f"| `{name}` | {src} | {w}x{h} | {ins if ins else ''} | {stretch} | {atlas} | {p['role']} | "
-                     f"{p['note']} |".replace("[", "[").replace("  ", " "))
+        hi = ""
+        if name in hires:
+            hw, hh, f, hins = hires[name]
+            hi_atlas = manifest.get(name + HI_SUFFIX, {}).get("atlas", "")
+            hi = f"x{f:.2f} {hw}x{hh}" + (f" {hins}" if hins else "") + (f" {hi_atlas}" if hi_atlas else "")
+        lines.append(f"| `{name}` | {src} | {w}x{h} | {ins if ins else ''} | {stretch} | {atlas} | {hi} | "
+                     f"{p['role']} | {p['note']} |".replace("[", "[").replace("  ", " "))
     lines += ["", "## Not exported", "", "| On the sheets | Why / use instead |", "|---|---|"]
     lines += [f"| {a} | {b} |" for a, b in SKIPPED]
     (DOCS / "CATALOG.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -1161,11 +1294,15 @@ def main():
     dupes = {n for n in names if names.count(n) > 1}
     if dupes:
         raise ValueError(f"duplicate part names: {sorted(dupes)}")
-    sprites, insets, info = [], {}, {}
+    unknown = HIRES - {p["name"][len(PREFIX):] for p in PARTS}
+    if unknown:
+        raise ValueError(f"HIRES names no part: {sorted(unknown)}")
+    sprites, insets, info, hires = [], {}, {}, {}
     for p in PARTS:
         if only and p["name"] not in only and p["name"][len(PREFIX):] not in only:
             continue
-        a, scale = build_part(p)
+        ctx = {}
+        a, scale = build_part(p, ctx)
         h, w = a.shape[:2]
         ins = p["slice"]
         if ins is not None:
@@ -1177,6 +1314,12 @@ def main():
         insets[p["name"]] = ins
         info[p["name"]] = (w, h, scale)
         print(f"{p['name']:34s} {w:4d}x{h:<4d} scale={scale:.3f} slice={ins}")
+        hi = build_hires(p, a, ctx) if p["name"][len(PREFIX):] in HIRES else None
+        if hi:
+            ha, f, hins = hi
+            save(ha, OUT / f"{p['name']}{HI_SUFFIX}.png")
+            hires[p["name"] + HI_SUFFIX] = (ha.shape[1], ha.shape[0], f, hins, p["name"])
+            print(f"{'  ' + HI_SUFFIX:34s} {ha.shape[1]:4d}x{ha.shape[0]:<4d} x{f:.3f}  slice={hins}")
     if only:
         return
     # Manifest: every non-lk entry is kept as it is (same order, same values).
@@ -1185,12 +1328,22 @@ def main():
     # art/ui/capture/glyphs.py, which owns their files and entries.
     owned = lambda n: n.startswith(PREFIX) and not n.startswith(GLYPH_PREFIXES)  # noqa: E731
     for old in OUT.glob(f"{PREFIX}*.png"):
-        if old.stem not in info and owned(old.stem):
+        if old.stem not in info and old.stem not in hires and owned(old.stem):
             old.unlink()
+    hi_of = {base: name for name, (*_, base) in hires.items()}
 
     def entry(name):
-        w, h, _ = info[name]
-        out = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets[name]}
+        if name in hires:
+            w, h, f, ins, base = hires[name]
+            # Pixel size and pixel insets of the copy; `scale` = its pixels per
+            # design pixel of `of` (the 1x sprite, whose w / h / slice the game
+            # lays out with).
+            out = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": ins, "scale": round(f, 4), "of": base}
+        else:
+            w, h, _ = info[name]
+            out = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets[name]}
+            if name in hi_of:
+                out["hi"] = hi_of[name]
         prev = manifest.get(name, {})
         if prev.get("atlas") and prev.get("w") == w and prev.get("h") == h:
             # Keep an atlas placement pack_atlas.py made for this sprite.
@@ -1199,8 +1352,9 @@ def main():
 
     # Owned entries are rewritten in place (dropped when their part is gone),
     # new parts are appended in name order, so re-runs keep the file's order.
-    manifest = {n: (entry(n) if owned(n) else e) for n, e in manifest.items() if not owned(n) or n in info}
-    for name in sorted(info):
+    made = set(info) | set(hires)
+    manifest = {n: (entry(n) if owned(n) else e) for n, e in manifest.items() if not owned(n) or n in made}
+    for name in sorted(made):
         if name not in manifest:
             manifest[name] = entry(name)
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -1209,8 +1363,10 @@ def main():
     slice_test(sprites, insets, DOCS / "slice_test.png")
     area = sum(w * h for w, h, _ in info.values())
     total, partial, deep, worst = alpha_report(sprites)
-    write_catalog(info, insets, (total, partial, deep, worst), manifest)
+    write_catalog(info, insets, (total, partial, deep, worst), manifest, hires)
     print(f"{len(info)} sprites, {area} px total ({area / 1024 ** 2:.2f} atlases of 1024x1024 before packing gaps)")
+    hi_area = sum(w * h for w, h, *_ in hires.values())
+    print(f"{len(hires)} high-resolution copies, {hi_area} px ({hi_area / 1024 ** 2:.2f} atlases)")
     print(f"alpha: {total} visible px, {partial} semi-transparent ({100 * partial / max(1, total):.2f} %), "
           f"{deep} of them more than 2 px inside the silhouette")
     if worst:
