@@ -145,30 +145,29 @@ function Art.Mag(sprite: string, w: number, h: number, sliceScale: number?): num
 	return math.min(w / nw, h / nh)
 end
 
--- The pixel size of `sprite`'s sharpest art (its high-resolution copy when it
--- has one), uploaded or not; nil when the manifest lacks it.
-function Art.PixelSize(sprite: string?): (number?, number?)
-	if sprite == nil then
-		return nil, nil
-	end
-	return UiAssets.PixelSize(sprite)
-end
-
 -- `rect` {x, y, w, h} shrunk, centred, so `sprite` fitted in it is drawn at no
--- more than `maxScale` design px per pixel of its sharpest art (an item picture
--- larger than its art would only be blurred). The rect itself when the art is
--- small enough, unknown, or `maxScale` is nil.
+-- more than `maxScale` design px per pixel of the art that draws at that size
+-- (an icon larger than its art would only be blurred): its 1x art up to
+-- maxScale, then each high-resolution copy up to maxScale × its scale when it
+-- takes over below that (UiAssets.Copies; uploaded or not, so the layout never
+-- moves on upload). A hero copy, which starts past it, serves only boxes that
+-- opt out of the cap (Kit.ItemIcon `maxScale = false`). The rect itself when
+-- the art is small enough, unknown, or `maxScale` is nil.
 function Art.Capped(sprite: string?, rect, maxScale: number?)
 	if maxScale == nil or sprite == nil then
 		return rect
 	end
 	local nw, nh = Art.SizeOf(sprite)
-	local pw = Art.PixelSize(sprite)
-	if nw == nil or nh == nil or pw == nil or nw <= 0 or nh <= 0 then
+	if nw == nil or nh == nil or nw <= 0 or nh <= 0 then
 		return rect
 	end
 	local fit = math.min(rect[3] / nw, rect[4] / nh)
-	local most = maxScale * pw / nw
+	local most = maxScale
+	for _, copy in UiAssets.Copies(sprite) do
+		if copy.from < most then
+			most = math.max(most, maxScale * copy.scale)
+		end
+	end
 	if fit <= most then
 		return rect
 	end
@@ -606,9 +605,9 @@ Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_
 -- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
 -- recolours), glyph (prefer the flat glyph), transparency, standInScale (the
 -- ink glyph's size as a share of the rect, 0.8), z, name, maxScale (draw the
--- art at no more than this many design px per pixel of its sharpest art,
--- centred in the rect: Art.Capped). Before upload, or while its uploaded image
--- is not served, it is its glyph in ink.
+-- art at no more than this many design px per pixel of the art that draws at
+-- that size, centred in the rect: Art.Capped). Before upload, or while its
+-- uploaded image is not served, it is its glyph in ink.
 local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
 	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
 	short = string.gsub(short, "^%a+_", function(prefix)

@@ -927,6 +927,59 @@ HIRES = {
 }
 HI_SUFFIX = "__hi"
 
+# Item art drawn in the hero boxes (the Forge and Crafting picture, 254 design
+# px, and the Inventory detail card's 152 x 166) fills the box, so it is
+# magnified up to 3x (4.2x on a 1440p screen). These parts get a copy whose
+# long side is the Forge box at the 1440p window scale (KitTokens windowMax
+# 1.4): 356 px. The sheets hold fewer pixels than that for every item, so the
+# copy is upscaled from the cleaned sheet crop (premultiplied Lanczos plus a
+# light unsharp mask scaled to the upscale, the faint ringing it leaves outside
+# the silhouette dropped), then gets the same alpha snap, rim decontamination
+# and colour bleed as every copy. It is named `__hi`, or `__hi2` after a HIRES
+# copy, which it follows in the chain (manifest `hi` of the `__hi` entry). The
+# game draws it only where the art is magnified past 1 and its scale / 2.8
+# (UiAssets.HiFrom), so slots, rows and tiles keep their 1x art.
+HERO_BOX = 254
+HERO_UI = 1.4
+HERO_PX = int(np.ceil(HERO_BOX * HERO_UI))
+HERO = {
+    # ItemInfo.ART_SPRITES
+    *(f"icon_{n}" for n in ("berries", "bone", "build", "campfire", "crystals", "drumstick", "hatchet", "heart",
+                            "hide", "lightning", "logs", "magma_ore", "mushroom", "pickaxe", "plank", "plant_fiber",
+                            "rocks", "rope", "runestone", "spear", "star", "stone", "stone_axe", "stones", "torch",
+                            "tusk", "warning")),
+}
+HERO_SUFFIX = "__hi2"
+# Unsharp mask of an upscaled copy: Gaussian sigma per unit of upscale (copy
+# pixels) and amount.
+SHARPEN_SIGMA, SHARPEN_AMOUNT = 0.5, 0.5
+
+
+def gauss_blur(x, sigma):
+    """Separable Gaussian blur with edge clamping; x is HxW or HxWxC."""
+    r = int(np.ceil(3 * sigma))
+    if r <= 0:
+        return x
+    t = np.arange(-r, r + 1, dtype=np.float32)
+    k = np.exp(-t * t / (2 * sigma * sigma))
+    k /= k.sum()
+    for axis in (0, 1):
+        pad = [(0, 0)] * x.ndim
+        pad[axis] = (r, r)
+        xp = np.pad(x, pad, mode="edge")
+        n = x.shape[axis]
+        x = sum(k[i] * np.take(xp, range(i, i + n), axis=axis) for i in range(2 * r + 1))
+    return x.astype(np.float32)
+
+
+def unsharp(a, sigma, amount):
+    """Unsharp mask of a float RGBA array, on premultiplied colour and alpha."""
+    pm = np.concatenate([a[..., :3] * a[..., 3:4], a[..., 3:4]], -1)
+    pm = pm + amount * (pm - gauss_blur(pm, sigma))
+    alpha = np.clip(pm[..., 3], 0, 1)
+    rgb = np.clip(pm[..., :3], 0, None) / np.maximum(alpha, 1e-4)[..., None]
+    return np.concatenate([np.clip(rgb, 0, 1), alpha[..., None]], -1).astype(np.float32)
+
 
 def finish_hires(a, f):
     """finish() for a high-resolution copy: the same alpha snap, rim
@@ -967,18 +1020,45 @@ def build_hires(p, base, ctx):
     edge widths at f and resamples its stretched middle back to the 1x length
     (the middle is stretched on screen anyway; its density along the stretch
     stays what the 1x sprite has), which keeps the atlases small."""
-    source, (ow, oh), (ox, oy) = ctx["source"], ctx["size"], ctx["origin"]
+    source, (ow, oh) = ctx["source"], ctx["size"]
     hs, ws = source.shape[:2]
-    H, W = base.shape[:2]
     f = min(HI_MAX, ws / ow, hs / oh)
     if f < 1.2:
         return None
+    return build_copy(p, base, ctx, f)
+
+
+def build_hero(p, base, ctx):
+    """The hero copy of a part (HERO): (sprite, f, None) at HERO_PX on its long
+    side, upscaled past the sheet's headroom with a light unsharp mask."""
+    source, (ow, oh) = ctx["source"], ctx["size"]
+    hs, ws = source.shape[:2]
+    H, W = base.shape[:2]
+    f = HERO_PX / max(W, H)
+    up = f / min(ws / ow, hs / oh)
+    return build_copy(p, base, ctx, f, sharpen=up if up > 1 else None)
+
+
+def build_copy(p, base, ctx, f, sharpen=None):
+    """The part's 1x design rectangle resampled from the sheet at f times the
+    pixels: (sprite, f, pixel insets). `sharpen` (the upscale over the sheet's
+    pixels) adds an unsharp mask sized to it."""
+    source, (ow, oh), (ox, oy) = ctx["source"], ctx["size"], ctx["origin"]
+    hs, ws = source.shape[:2]
+    H, W = base.shape[:2]
     PW, PH = round(W * f), round(H * f)
     sx, sy = ws / ow, hs / oh
     pad = int(np.ceil(4 * max(sx, sy))) + 8
     padded = np.pad(source, ((pad, pad), (pad, pad), (0, 0)))
     box = (pad + ox * sx, pad + oy * sy, pad + (ox + W) * sx, pad + (oy + H) * sy)
     a = resize(padded, PW, PH, box)
+    if sharpen:
+        a = unsharp(a, SHARPEN_SIGMA * sharpen, SHARPEN_AMOUNT)
+        # Lanczos rings: faint alpha (up to ~10 %) a few px outside the
+        # silhouette, a dotted halo on parchment. Keep alpha only within the
+        # upscaled edge's own width of the solid body.
+        body = a[..., 3] >= 0.5
+        a[..., 3] = np.where(dilate(body, int(np.ceil(sharpen / 2)) + 1), a[..., 3], 0.0)
     if p["recolor"]:
         a = recolor_fill(a, *p["recolor"])
     a = finish_hires(a, f)
@@ -1190,7 +1270,9 @@ SKIPPED = [
 def write_catalog(info, insets, stats, manifest=None, hires=None):
     by_name = {p["name"]: p for p in PARTS}
     manifest = manifest or {}
-    hires = {base: (w, h, f, ins) for w, h, f, ins, base in (hires or {}).values()}
+    copies_of = {}
+    for copy, (w, h, f, ins, base) in sorted((hires or {}).items(), key=lambda item: item[1][2]):
+        copies_of.setdefault(base, []).append((copy, w, h, f, ins))
     sheets = {p.stem[:2]: p.name for p in KIT.glob("*.png")}
     families = {}
     for name in info:
@@ -1228,6 +1310,10 @@ def write_catalog(info, insets, stats, manifest=None, hires=None):
         "times the pixels (f = min(2, the sheet's headroom)), 9-slice insets in its own pixels and its stretched "
         "middle kept at the 1x length. The game draws it at the 1x sprite's design size wherever the art is "
         "magnified, once its atlas is uploaded (manifest `hi`, `scale`; `UiAssets.Placement`).",
+        f"- Item art (`HERO`) also has a hero copy, `<name>__hi` (`__hi2` after a HIRES copy), {HERO_PX} px on its "
+        "long side: the Forge / Crafting picture and the Inventory detail card at 1440p. The sheets hold fewer "
+        "pixels, so it is upscaled (premultiplied Lanczos plus a light unsharp mask) and drawn only where the art "
+        "is magnified past 1 and its scale / 2.8 (`UiAssets.HiFrom`).",
         "",
         "### Button and state families",
         "",
@@ -1274,11 +1360,11 @@ def write_catalog(info, insets, stats, manifest=None, hires=None):
         stretch = ONE_AXIS.get(short, "X, Y") if ins else ""
         src = f"{sheets.get(p['sid'], p['sid'])} {tuple(p['box'])}"
         atlas = manifest.get(name, {}).get("atlas", "")
-        hi = ""
-        if name in hires:
-            hw, hh, f, hins = hires[name]
-            hi_atlas = manifest.get(name + HI_SUFFIX, {}).get("atlas", "")
-            hi = f"x{f:.2f} {hw}x{hh}" + (f" {hins}" if hins else "") + (f" {hi_atlas}" if hi_atlas else "")
+        cells = []
+        for copy, hw, hh, f, hins in copies_of.get(name, []):
+            hi_atlas = manifest.get(copy, {}).get("atlas", "")
+            cells.append(f"x{f:.2f} {hw}x{hh}" + (f" {hins}" if hins else "") + (f" {hi_atlas}" if hi_atlas else ""))
+        hi = "; ".join(cells)
         lines.append(f"| `{name}` | {src} | {w}x{h} | {ins if ins else ''} | {stretch} | {atlas} | {hi} | "
                      f"{p['role']} | {p['note']} |".replace("[", "[").replace("  ", " "))
     lines += ["", "## Not exported", "", "| On the sheets | Why / use instead |", "|---|---|"]
@@ -1314,12 +1400,15 @@ def main():
         insets[p["name"]] = ins
         info[p["name"]] = (w, h, scale)
         print(f"{p['name']:34s} {w:4d}x{h:<4d} scale={scale:.3f} slice={ins}")
-        hi = build_hires(p, a, ctx) if p["name"][len(PREFIX):] in HIRES else None
-        if hi:
-            ha, f, hins = hi
-            save(ha, OUT / f"{p['name']}{HI_SUFFIX}.png")
-            hires[p["name"] + HI_SUFFIX] = (ha.shape[1], ha.shape[0], f, hins, p["name"])
-            print(f"{'  ' + HI_SUFFIX:34s} {ha.shape[1]:4d}x{ha.shape[0]:<4d} x{f:.3f}  slice={hins}")
+        short = p["name"][len(PREFIX):]
+        hi = build_hires(p, a, ctx) if short in HIRES else None
+        hero = build_hero(p, a, ctx) if short in HERO else None
+        for suffix, copy in ((HI_SUFFIX, hi), (HERO_SUFFIX if hi else HI_SUFFIX, hero)):
+            if copy:
+                ha, f, hins = copy
+                save(ha, OUT / f"{p['name']}{suffix}.png")
+                hires[p["name"] + suffix] = (ha.shape[1], ha.shape[0], f, hins, p["name"])
+                print(f"{'  ' + suffix:34s} {ha.shape[1]:4d}x{ha.shape[0]:<4d} x{f:.3f}  slice={hins}")
     if only:
         return
     # Manifest: every non-lk entry is kept as it is (same order, same values).
@@ -1330,7 +1419,15 @@ def main():
     for old in OUT.glob(f"{PREFIX}*.png"):
         if old.stem not in info and old.stem not in hires and owned(old.stem):
             old.unlink()
-    hi_of = {base: name for name, (*_, base) in hires.items()}
+    # Each sprite's copies form a chain, least sharp first: the sprite's `hi`
+    # names its first copy, and a copy's `hi` the next (a HIRES copy's hero copy).
+    chains = {}
+    for name, (*_, f, _, base) in sorted(hires.items(), key=lambda item: item[1][2]):
+        chains.setdefault(base, []).append(name)
+    hi_of = {}
+    for base, copies in chains.items():
+        for before, after in zip([base] + copies, copies):
+            hi_of[before] = after
 
     def entry(name):
         if name in hires:
@@ -1342,8 +1439,8 @@ def main():
         else:
             w, h, _ = info[name]
             out = {"file": f"{name}.png", "w": int(w), "h": int(h), "slice": insets[name]}
-            if name in hi_of:
-                out["hi"] = hi_of[name]
+        if name in hi_of:
+            out["hi"] = hi_of[name]
         prev = manifest.get(name, {})
         if prev.get("atlas") and prev.get("w") == w and prev.get("h") == h:
             # Keep an atlas placement pack_atlas.py made for this sprite.

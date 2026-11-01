@@ -408,9 +408,9 @@ upper-cases (`caps` in the role, applied by `Core.SetText`).
 |---|---|
 | Plain labels (`Core.Label`, `Kit.Text` without `scaled`) | One line, truncated with "…" (`TextTruncate.AtEnd`); `wrap = true` wraps instead |
 | Labels that must stay whole (values, detail rows, PLAY, "+n more") | `scaled = true`: shrink to fit, floor 9 screen px |
-| Section headers | Shrink to fit (the phone boost never truncates them) |
-| Player names (PlayerRow) | Desktop: shrink to fit (`shrinkName`, default true). Touch: keep the size, end in "…", and a pressable row shows the whole name in a tooltip. The lobby HUD keeps one size for every row on phones |
-| List row titles | Truncate; a pressable row whose title is cut shows it whole in a tooltip |
+| Section headers | Shrink to fit (the phone boost never truncates them); give the box room past its rule where a phone boost needs it (Settings' headers reach their emblem) |
+| Player names (PlayerRow) | Desktop: shrink to fit (`shrinkName`, default true). Touch: keep the size, end in "…", and a pressable row shows the whole name in a tooltip. The lobby HUD keeps one size for every row on phones; the world HUD's tribe strip widens its cells for the longest name (`party.phone.cellMaxW`), so only a very long name is cut |
+| List row titles | Truncate; a pressable row whose title is cut shows it whole in a tooltip. Rows whose names must read whole (Forge and Crafting recipes and materials, Journal quests) pass `fitTitle`: shrink to fit down to `Kit.Core.FitFloor()` (12 design px; the phone text floor on phones), then two balanced lines where the row has room (recipe rows grow to hold them) |
 | Button labels | Centred with the icon; the room is the plate minus its rivet margins (`max(16, 0.35 × height)` each side) |
 
 ---
@@ -780,9 +780,28 @@ holds its own `w`/`h`/`slice`/`rect` in its own pixels plus `scale` (f) and
 `of`. `Widgets` draws the copy only where the art is magnified (more than 0.75
 design px per art px) and the copy's atlas has an id, so pieces keep their
 design size and a stale id never draws the wrong rects (`UiAssets.Placement`).
-`Kit.Icon` and `Kit.ItemIcon` never draw an icon past 1.0 design px per art px
-(`maxScale`; pass `false` to opt out); item art with no headroom draws smaller
-until higher-resolution art exists.
+`Kit.Icon` and `Kit.ItemIcon` never draw an icon past 1.0 design px per pixel
+of the art that draws at that size (`maxScale`, `Art.Capped`: the 1× art and
+the copies that take over below that limit; pass `false` to opt out), so in
+slots, rows, tiles and the Journal illustration a box bigger than the art
+centres it.
+
+**Hero copies.** The hero boxes (the Forge and Crafting picture, 254 design px,
+and the Inventory detail card's 152 × 166 icon) pass `maxScale = false`: every
+item fills the box, the same size as any other. Parts in `HERO` (the item art,
+`ItemInfo.ART_SPRITES`) write a copy 356 px on its long side (`HERO_PX`: the
+Forge box at the 1440p window scale 1.4), named `lk_<name>__hi`, or
+`lk_<name>__hi2` after a `HIRES` copy, which it follows in the chain (the
+`__hi` entry's own `hi`). The sheets hold fewer pixels than that, so the copy
+is resampled from the cleaned sheet crop with premultiplied Lanczos plus a light
+unsharp mask (sigma 0.5 copy px per unit of upscale, amount 0.5), drops the
+faint Lanczos ringing outside the silhouette, then gets the same alpha snap, rim
+decontamination and colour bleed. `glyphs.py` writes the
+armour stand-in's `lk_glyph_ink_backpack__hi` the same way (0.62 of the box).
+A copy of scale s ≤ 2.1 draws once the art is magnified past 0.75; a sharper
+one past `UiAssets.HiFrom(s)` = max(1, s / 2.8), so it is never shrunk more
+than 2× at 1440p: the hero copies draw in the hero boxes only, and slots, rows
+and the Journal illustration keep their 1× (or 2×) art.
 
 Re-running writes identical files; existing sprites stay byte-identical when
 only new parts are added. `python3 art/ui/slice_lobby_kit.py <name>` builds one
@@ -832,6 +851,8 @@ for new glyphs.
 | `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
 | `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
 | `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
+| `atlas_lk_items_hi_1` | Hero copies of the tools the Forge and Crafting pictures show (hatchet, pickaxe, spear, stone axe, torch, campfire, build) and the armour stand-in glyph | new: to upload |
+| `atlas_lk_items_hi_2` … `_4` | Hero copies of the other item art | new: to upload |
 | `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
 - **Never change an uploaded atlas.** Once an atlas is uploaded its bytes and

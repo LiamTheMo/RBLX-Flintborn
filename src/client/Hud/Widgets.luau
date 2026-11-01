@@ -5,9 +5,11 @@
 -- returns an empty frame in its place: the kit (Hud/Kit/Art) checks HasArt and
 -- draws its own stand-ins, so nothing here needs a look of its own.
 --
--- A sprite with a high-resolution copy (UiSprites `hi`) draws the copy where it
--- is magnified and the copy's atlas is uploaded (UiAssets.Placement), always at
--- the sprite's own design size and insets: only the pixels behind it change.
+-- A sprite with high-resolution copies (UiSprites `hi`, a chain: the hero item
+-- art's 356 px copy follows a 2x one) draws the sharpest copy whose
+-- magnification is reached and whose atlas is uploaded (UiAssets.Placement),
+-- always at the sprite's own design size and insets: only the pixels behind it
+-- change.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 

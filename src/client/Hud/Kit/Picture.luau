@@ -14,8 +14,8 @@ Picture.__index = Picture
 
 -- props: rect | size, role, tint (colour token), exact (false: the sprite at
 -- the rect, transparent margin inside), zIndex, name, maxScale (a picture that
--- is not 9-sliced is drawn at no more than this many design px per pixel of its
--- sharpest art, centred: Art.Capped; default none).
+-- is not 9-sliced is drawn at no more than this many design px per pixel of the
+-- art that draws at that size, centred: Art.Capped; default none).
 function Picture.new(parent: Instance, props)
 	local sprite = Art.ROLES[props.role] and Art.ROLES[props.role].sprite
 	local nw, nh = Art.SizeOf(sprite)

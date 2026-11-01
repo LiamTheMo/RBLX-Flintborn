@@ -13,6 +13,7 @@ Contact sheets: `contact_dark.png` (on #202020) and `contact_light.png` (on #F0E
 - Glyphs (`lk_glyph_*`) are dark brown (white for `glyph_play` / `glyph_check_white`); tint with `ImageColor3` if needed.
 - Sprites the game uses are packed by `art/ui/pack_atlas.py` into the `atlas_lk_*` atlases ("Atlas" column; manifest `atlas` / `rect`). Unused sprites stay as files in no atlas. Re-running this script keeps each placement while the sprite's size is unchanged; run `pack_atlas.py` after any size change.
 - "Hi-res" = the sprite's high-resolution copy `<name>__hi` (`HIRES`): the same design rectangle at f times the pixels (f = min(2, the sheet's headroom)), 9-slice insets in its own pixels and its stretched middle kept at the 1x length. The game draws it at the 1x sprite's design size wherever the art is magnified, once its atlas is uploaded (manifest `hi`, `scale`; `UiAssets.Placement`).
+- Item art (`HERO`) also has a hero copy, `<name>__hi` (`__hi2` after a HIRES copy), 356 px on its long side: the Forge / Crafting picture and the Inventory detail card at 1440p. The sheets hold fewer pixels, so it is upscaled (premultiplied Lanczos plus a light unsharp mask) and drawn only where the art is magnified past 1 and its scale / 2.8 (`UiAssets.HiFrom`).
 
 ### Button and state families
 
@@ -194,12 +195,12 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_backpack_alt` | 11_icons_extra.png (45, 63, 265, 297) | 109x116 | | | | | Menu / side-tab icon | |
 | `lk_icon_backpack_small` | 16_icons_status_items.png (878, 605, 1106, 833) | 116x116 | | | atlas_lk_icons | | Status / stat / item icon | |
 | `lk_icon_backpack_white` | 10_inventory_parts.png (1209, 55, 1512, 145) | 53x55 | | | atlas_lk_icons | | White backpack for the active Backpack tab | Lifted off the active tab. |
-| `lk_icon_berries` | 02_hollow_frames_hud_buttons.png (1117, 824, 1242, 914) | 78x73 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_berries` | 02_hollow_frames_hud_buttons.png (1117, 824, 1242, 914) | 78x73 | | | atlas_lk_items | x4.56 356x333 atlas_lk_items_hi_3 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_berry_bush` | 17_icons_world.png (849, 330, 1082, 546) | 100x92 | | | atlas_lk_icons | x2.00 200x184 atlas_lk_journal_hi | World / map icon | |
-| `lk_icon_bone` | 02_hollow_frames_hud_buttons.png (1522, 824, 1646, 914) | 87x79 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_bone` | 02_hollow_frames_hud_buttons.png (1522, 824, 1646, 914) | 87x79 | | | atlas_lk_items | x4.09 356x323 atlas_lk_items_hi_3 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_bridge` | 17_icons_world.png (559, 879, 852, 1059) | 100x63 | | | | | World / map icon | |
-| `lk_icon_build` | 19_progress_bars_badges.png (1019, 767, 1218, 949) | 108x97 | | | atlas_lk_items | | Status icon | Lifted off its framed tile. |
-| `lk_icon_campfire` | 17_icons_world.png (852, 70, 1071, 303) | 95x100 | | | atlas_lk_items | | World / map icon | |
+| `lk_icon_build` | 19_progress_bars_badges.png (1019, 767, 1218, 949) | 108x97 | | | atlas_lk_items | x3.30 356x320 atlas_lk_items_hi_1 | Status icon | Lifted off its framed tile. |
+| `lk_icon_campfire` | 17_icons_world.png (852, 70, 1071, 303) | 95x100 | | | atlas_lk_items | x3.56 338x356 atlas_lk_items_hi_1 | World / map icon | |
 | `lk_icon_cave` | 17_icons_world.png (557, 101, 825, 296) | 100x74 | | | | | World / map icon | |
 | `lk_icon_check` | 16_icons_status_items.png (597, 365, 837, 557) | 116x93 | | | atlas_lk_icons | | Status / stat / item icon | |
 | `lk_icon_chest` | 11_icons_extra.png (307, 607, 567, 808) | 116x91 | | | atlas_lk_icons | | Menu / side-tab icon | |
@@ -210,9 +211,9 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_cross` | 16_icons_status_items.png (886, 352, 1105, 563) | 116x112 | | | atlas_lk_icons | | Status / stat / item icon | |
 | `lk_icon_crown` | 06_menu_icons.png (945, 721, 1138, 881) | 116x97 | | | atlas_lk_lobby | x1.72 200x167 atlas_lk_journal_hi | Menu / currency icon | |
 | `lk_icon_crown_gem` | 16_icons_status_items.png (1156, 81, 1373, 273) | 116x104 | | | atlas_lk_icons | | Status / stat / item icon | |
-| `lk_icon_crystals` | 17_icons_world.png (325, 327, 532, 547) | 94x100 | | | atlas_lk_items | | World / map icon | |
+| `lk_icon_crystals` | 17_icons_world.png (325, 327, 532, 547) | 94x100 | | | atlas_lk_items | x3.56 335x356 atlas_lk_items_hi_3 | World / map icon | |
 | `lk_icon_cursor` | 13_popups_notices.png (1543, 802, 1608, 893) | 70x96 | | | | | Pointer cursor | |
-| `lk_icon_drumstick` | 16_icons_status_items.png (575, 78, 808, 284) | 116x103 | | | atlas_lk_items | | Status / stat / item icon | |
+| `lk_icon_drumstick` | 16_icons_status_items.png (575, 78, 808, 284) | 116x103 | | | atlas_lk_items | x3.07 356x316 atlas_lk_items_hi_3 | Status / stat / item icon | |
 | `lk_icon_exclamation` | 16_icons_status_items.png (85, 336, 189, 562) | 57x116 | | | atlas_lk_lobby | | Status / stat / item icon | |
 | `lk_icon_exit` | 11_icons_extra.png (577, 833, 833, 1066) | 116x106 | | | atlas_lk_icons | | Menu / side-tab icon | |
 | `lk_icon_flag` | 19_progress_bars_badges.png (773, 767, 970, 949) | 93x97 | | | atlas_lk_icons | | Status icon | Lifted off its framed tile. |
@@ -221,18 +222,18 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_gem` | 06_menu_icons.png (605, 700, 764, 915) | 87x116 | | | atlas_lk_lobby | | Menu / currency icon | |
 | `lk_icon_gift` | 16_icons_status_items.png (601, 607, 815, 832) | 111x116 | | | atlas_lk_icons | | Status / stat / item icon | |
 | `lk_icon_hammer` | 11_icons_extra.png (605, 591, 832, 816) | 116x115 | | | atlas_lk_icons | | Menu / side-tab icon | |
-| `lk_icon_hatchet` | 12_quest_forge_parts.png (1021, 644, 1149, 766) | 133x127 | | | atlas_lk_items | | Tool icon (forge recipes) | |
-| `lk_icon_heart` | 16_icons_status_items.png (32, 83, 254, 278) | 116x103 | | | atlas_lk_items | | Status / stat / item icon | |
-| `lk_icon_hide` | 02_hollow_frames_hud_buttons.png (1387, 824, 1514, 914) | 79x75 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_hatchet` | 12_quest_forge_parts.png (1021, 644, 1149, 766) | 133x127 | | | atlas_lk_items | x2.68 356x340 atlas_lk_items_hi_1 | Tool icon (forge recipes) | |
+| `lk_icon_heart` | 16_icons_status_items.png (32, 83, 254, 278) | 116x103 | | | atlas_lk_items | x3.07 356x316 atlas_lk_items_hi_4 | Status / stat / item icon | |
+| `lk_icon_hide` | 02_hollow_frames_hud_buttons.png (1387, 824, 1514, 914) | 79x75 | | | atlas_lk_items | x4.51 356x338 atlas_lk_items_hi_2 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_hourglass` | 16_icons_status_items.png (1184, 336, 1342, 560) | 83x116 | | | atlas_lk_icons | | Status / stat / item icon | |
 | `lk_icon_house` | 11_icons_extra.png (42, 835, 301, 1067) | 116x104 | | | | | Menu / side-tab icon | |
 | `lk_icon_hut` | 17_icons_world.png (1130, 834, 1370, 1065) | 100x96 | | | | | World / map icon | |
 | `lk_icon_journal` | 11_icons_extra.png (881, 831, 1101, 1076) | 104x116 | | | atlas_lk_icons | | Menu / side-tab icon | |
-| `lk_icon_lightning` | 16_icons_status_items.png (343, 73, 503, 293) | 86x116 | | | atlas_lk_items | | Status / stat / item icon | |
+| `lk_icon_lightning` | 16_icons_status_items.png (343, 73, 503, 293) | 86x116 | | | atlas_lk_items | x3.07 264x356 atlas_lk_items_hi_3 | Status / stat / item icon | |
 | `lk_icon_lock` | 13_popups_notices.png (1136, 805, 1200, 888) | 68x88 | | | atlas_lk_lobby | | Locked status | |
 | `lk_icon_log` | 16_icons_status_items.png (30, 883, 275, 1083) | 116x96 | | | atlas_lk_icons | | Status / stat / item icon | |
-| `lk_icon_logs` | 10_inventory_parts.png (763, 830, 868, 921) | 110x95 | | | atlas_lk_items | | Material icon (inventory, forge, rewards) | |
-| `lk_icon_magma_ore` | 17_icons_world.png (575, 346, 810, 549) | 100x87 | | | atlas_lk_items | | World / map icon | |
+| `lk_icon_logs` | 10_inventory_parts.png (763, 830, 868, 921) | 110x95 | | | atlas_lk_items | x3.24 356x307 atlas_lk_items_hi_2 | Material icon (inventory, forge, rewards) | |
+| `lk_icon_magma_ore` | 17_icons_world.png (575, 346, 810, 549) | 100x87 | | | atlas_lk_items | x3.56 356x310 atlas_lk_items_hi_2 | World / map icon | |
 | `lk_icon_magnifier` | 11_icons_extra.png (1144, 837, 1359, 1064) | 111x116 | | | atlas_lk_icons | | Menu / side-tab icon | |
 | `lk_icon_mail` | 11_icons_extra.png (50, 625, 273, 784) | 116x84 | | | atlas_lk_icons | | Menu / side-tab icon | |
 | `lk_icon_map` | 11_icons_extra.png (850, 334, 1103, 561) | 116x105 | | | atlas_lk_icons | | Menu / side-tab icon | |
@@ -240,39 +241,39 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_market` | 06_menu_icons.png (1276, 59, 1621, 363) | 116x102 | | | atlas_lk_lobby | | Menu / currency icon | |
 | `lk_icon_market_alt` | 11_icons_extra.png (837, 72, 1100, 297) | 116x100 | | | | | Menu / side-tab icon | |
 | `lk_icon_mountain` | 17_icons_world.png (42, 87, 294, 292) | 100x82 | | | atlas_lk_icons | | World / map icon | |
-| `lk_icon_mushroom` | 02_hollow_frames_hud_buttons.png (1250, 824, 1378, 914) | 72x73 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_mushroom` | 02_hollow_frames_hud_buttons.png (1250, 824, 1378, 914) | 72x73 | | | atlas_lk_items | x4.88 351x356 atlas_lk_items_hi_2 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_party` | 11_icons_extra.png (572, 354, 839, 557) | 116x89 | | | atlas_lk_lobby | | Menu / side-tab icon | |
 | `lk_icon_paw` | 17_icons_world.png (881, 593, 1088, 808) | 97x100 | | | atlas_lk_icons | x2.00 194x200 atlas_lk_journal_hi | World / map icon | |
-| `lk_icon_pickaxe` | 12_quest_forge_parts.png (1170, 648, 1300, 768) | 135x124 | | | atlas_lk_items | | Tool icon (forge recipes / detail) | |
-| `lk_icon_plank` | 10_inventory_parts.png (1040, 826, 1141, 924) | 106x102 | | | atlas_lk_items | | Material icon (inventory, forge, rewards) | |
-| `lk_icon_plant_fiber` | 16_icons_status_items.png (594, 862, 831, 1090) | 116x113 | | | atlas_lk_items | | Status / stat / item icon | |
+| `lk_icon_pickaxe` | 12_quest_forge_parts.png (1170, 648, 1300, 768) | 135x124 | | | atlas_lk_items | x2.64 356x327 atlas_lk_items_hi_1 | Tool icon (forge recipes / detail) | |
+| `lk_icon_plank` | 10_inventory_parts.png (1040, 826, 1141, 924) | 106x102 | | | atlas_lk_items | x3.36 356x343 atlas_lk_items_hi_4 | Material icon (inventory, forge, rewards) | |
+| `lk_icon_plant_fiber` | 16_icons_status_items.png (594, 862, 831, 1090) | 116x113 | | | atlas_lk_items | x3.07 356x347 atlas_lk_items_hi_2 | Status / stat / item icon | |
 | `lk_icon_play_rune` | 21_play_rune_stones.png (559, 317, 967, 853) | 89x116 | | | atlas_lk_play | | Play icon: the HUD Play tile and the Play window's header (icon.playRune) | Full colour; replaces lk_icon_portal for Play. |
 | `lk_icon_play_rune_small` | 21_play_rune_stones.png (559, 317, 967, 853) | 50x64 | | | atlas_lk_play | | Crystal play glyph on the PLAY button (mark.playRune) | Full colour; replaces the white lk_glyph_play on the PLAY button. |
 | `lk_icon_portal` | 06_menu_icons.png (438, 48, 843, 372) | 116x94 | | | atlas_lk_lobby | x2.00 232x188 atlas_lk_journal_hi | Menu / currency icon | |
 | `lk_icon_portal_alt` | 11_icons_extra.png (281, 57, 562, 297) | 116x100 | | | | | Menu / side-tab icon | |
-| `lk_icon_rocks` | 17_icons_world.png (42, 339, 291, 542) | 100x83 | | | atlas_lk_items | | World / map icon | |
-| `lk_icon_rope` | 02_hollow_frames_hud_buttons.png (855, 824, 983, 914) | 76x75 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_rocks` | 17_icons_world.png (42, 339, 291, 542) | 100x83 | | | atlas_lk_items | x3.56 356x295 atlas_lk_items_hi_4 | World / map icon | |
+| `lk_icon_rope` | 02_hollow_frames_hud_buttons.png (855, 824, 983, 914) | 76x75 | | | atlas_lk_items | x4.68 356x351 atlas_lk_items_hi_3 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_ruin` | 17_icons_world.png (1103, 79, 1357, 296) | 100x86 | | | atlas_lk_icons | | World / map icon | |
-| `lk_icon_runestone` | 11_icons_extra.png (325, 833, 549, 1068) | 112x116 | | | atlas_lk_items | | Menu / side-tab icon | |
+| `lk_icon_runestone` | 11_icons_extra.png (325, 833, 549, 1068) | 112x116 | | | atlas_lk_items | x3.07 344x356 atlas_lk_items_hi_2 | Menu / side-tab icon | |
 | `lk_icon_runestone_world` | 17_icons_world.png (308, 581, 541, 816) | 99x100 | | | | | World / map icon | |
 | `lk_icon_scroll` | 06_menu_icons.png (872, 70, 1205, 365) | 116x103 | | | atlas_lk_lobby | x2.00 232x206 atlas_lk_journal_hi | Menu / currency icon | |
 | `lk_icon_scroll_alt` | 11_icons_extra.png (584, 67, 811, 292) | 116x115 | | | | | Menu / side-tab icon | |
 | `lk_icon_scroll_small` | 16_icons_status_items.png (305, 604, 540, 827) | 116x110 | | | | | Status / stat / item icon | |
-| `lk_icon_spear` | 02_hollow_frames_hud_buttons.png (992, 735, 1109, 817) | 85x76 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
+| `lk_icon_spear` | 02_hollow_frames_hud_buttons.png (992, 735, 1109, 817) | 85x76 | | | atlas_lk_items | x4.19 356x318 atlas_lk_items_hi_1 | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_speech` | 16_icons_status_items.png (1144, 882, 1375, 1081) | 116x101 | | | | | Status / stat / item icon | |
-| `lk_icon_star` | 16_icons_status_items.png (881, 74, 1092, 280) | 116x113 | | | atlas_lk_items | | Status / stat / item icon | |
-| `lk_icon_stone` | 16_icons_status_items.png (309, 869, 553, 1083) | 116x103 | | | atlas_lk_items | | Status / stat / item icon | |
-| `lk_icon_stone_axe` | 16_icons_status_items.png (1177, 593, 1373, 842) | 156x196 | | | atlas_lk_items | | Stone axe (hotbar, inventory detail art ~170 px) | |
-| `lk_icon_stones` | 10_inventory_parts.png (903, 829, 1001, 917) | 102x92 | | | atlas_lk_items | | Material icon (inventory, forge, rewards) | |
-| `lk_icon_torch` | 11_icons_extra.png (883, 578, 1058, 828) | 83x116 | | | atlas_lk_items | | Menu / side-tab icon | |
+| `lk_icon_star` | 16_icons_status_items.png (881, 74, 1092, 280) | 116x113 | | | atlas_lk_items | x3.07 356x347 atlas_lk_items_hi_4 | Status / stat / item icon | |
+| `lk_icon_stone` | 16_icons_status_items.png (309, 869, 553, 1083) | 116x103 | | | atlas_lk_items | x3.07 356x316 atlas_lk_items_hi_3 | Status / stat / item icon | |
+| `lk_icon_stone_axe` | 16_icons_status_items.png (1177, 593, 1373, 842) | 156x196 | | | atlas_lk_items | x1.82 283x356 atlas_lk_items_hi_1 | Stone axe (hotbar, inventory detail art ~170 px) | |
+| `lk_icon_stones` | 10_inventory_parts.png (903, 829, 1001, 917) | 102x92 | | | atlas_lk_items | x3.49 356x321 atlas_lk_items_hi_4 | Material icon (inventory, forge, rewards) | |
+| `lk_icon_torch` | 11_icons_extra.png (883, 578, 1058, 828) | 83x116 | | | atlas_lk_items | x3.07 255x356 atlas_lk_items_hi_1 | Menu / side-tab icon | |
 | `lk_icon_totem` | 17_icons_world.png (61, 575, 278, 817) | 90x100 | | | atlas_lk_icons | x2.00 180x200 atlas_lk_journal_hi | World / map icon | |
 | `lk_icon_trade` | 06_menu_icons.png (487, 409, 857, 673) | 116x84 | | | atlas_lk_lobby | | Menu / currency icon | |
 | `lk_icon_trade_alt` | 11_icons_extra.png (29, 339, 283, 544) | 116x94 | | | | | Menu / side-tab icon | |
 | `lk_icon_treasure` | 17_icons_world.png (562, 608, 844, 802) | 100x70 | | | atlas_lk_icons | x2.00 200x140 atlas_lk_journal_hi | World / map icon | |
 | `lk_icon_tree` | 17_icons_world.png (312, 58, 531, 296) | 92x100 | | | atlas_lk_icons | | World / map icon | |
 | `lk_icon_trophy` | 11_icons_extra.png (1125, 341, 1374, 560) | 116x103 | | | atlas_lk_icons | x2.00 232x206 atlas_lk_journal_hi | Menu / side-tab icon | |
-| `lk_icon_tusk` | 17_icons_world.png (1151, 577, 1344, 820) | 80x100 | | | atlas_lk_items | x2.00 160x200 atlas_lk_journal_hi | World / map icon | |
-| `lk_icon_warning` | 16_icons_status_items.png (285, 342, 532, 555) | 116x101 | | | atlas_lk_items | | Status / stat / item icon | |
+| `lk_icon_tusk` | 17_icons_world.png (1151, 577, 1344, 820) | 80x100 | | | atlas_lk_items | x2.00 160x200 atlas_lk_journal_hi; x3.56 285x356 atlas_lk_items_hi_2 | World / map icon | |
+| `lk_icon_warning` | 16_icons_status_items.png (285, 342, 532, 555) | 116x101 | | | atlas_lk_items | x3.07 356x310 atlas_lk_items_hi_4 | Status / stat / item icon | |
 | `lk_icon_wave` | 17_icons_world.png (862, 876, 1108, 1060) | 100x76 | | | | | World / map icon | |
 | `lk_keycap` | 09_controls.png (736, 605, 855, 721) | 58x56 | [16, 14, 16, 20] | X, Y | atlas_lk_lobby | | Key cap (key prompts) | Letter painted out. |
 | `lk_keycap_wide` | 09_controls.png (1039, 604, 1270, 721) | 108x58 | [16, 14, 16, 20] | X, Y | atlas_lk_lobby | | Wide key cap (SHIFT, TAB) | Label painted out. |

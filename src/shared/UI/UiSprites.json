@@ -39,6 +39,26 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_lk_items_hi_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_items_hi_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_items_hi_3": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_items_hi_4": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lk_journal_hi": {
     "h": 1024,
     "slice": null,
@@ -2507,6 +2527,7 @@
   "lk_glyph_ink_backpack": {
     "atlas": "atlas_lk_icons",
     "h": 116,
+    "hi": "lk_glyph_ink_backpack__hi",
     "rect": [
       120,
       0,
@@ -2515,6 +2536,20 @@
     ],
     "slice": null,
     "w": 115
+  },
+  "lk_glyph_ink_backpack__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 220,
+    "of": "lk_glyph_ink_backpack",
+    "rect": [
+      720,
+      704,
+      218,
+      220
+    ],
+    "scale": 1.8966,
+    "slice": null,
+    "w": 218
   },
   "lk_glyph_ink_book": {
     "atlas": "atlas_lk_icons",
@@ -3073,6 +3108,7 @@
   "lk_icon_berries": {
     "atlas": "atlas_lk_items",
     "h": 73,
+    "hi": "lk_icon_berries__hi",
     "rect": [
       771,
       307,
@@ -3081,6 +3117,20 @@
     ],
     "slice": null,
     "w": 78
+  },
+  "lk_icon_berries__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 333,
+    "of": "lk_icon_berries",
+    "rect": [
+      0,
+      360,
+      356,
+      333
+    ],
+    "scale": 4.5641,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_berry_bush": {
     "atlas": "atlas_lk_icons",
@@ -3112,6 +3162,7 @@
   "lk_icon_bone": {
     "atlas": "atlas_lk_items",
     "h": 79,
+    "hi": "lk_icon_bone__hi",
     "rect": [
       428,
       307,
@@ -3121,6 +3172,20 @@
     "slice": null,
     "w": 87
   },
+  "lk_icon_bone__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 323,
+    "of": "lk_icon_bone",
+    "rect": [
+      360,
+      360,
+      356,
+      323
+    ],
+    "scale": 4.092,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_bridge": {
     "h": 63,
     "slice": null,
@@ -3129,6 +3194,7 @@
   "lk_icon_build": {
     "atlas": "atlas_lk_items",
     "h": 97,
+    "hi": "lk_icon_build__hi",
     "rect": [
       871,
       200,
@@ -3138,9 +3204,24 @@
     "slice": null,
     "w": 108
   },
+  "lk_icon_build__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 320,
+    "of": "lk_icon_build",
+    "rect": [
+      0,
+      704,
+      356,
+      320
+    ],
+    "scale": 3.2963,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_campfire": {
     "atlas": "atlas_lk_items",
     "h": 100,
+    "hi": "lk_icon_campfire__hi",
     "rect": [
       590,
       200,
@@ -3149,6 +3230,20 @@
     ],
     "slice": null,
     "w": 95
+  },
+  "lk_icon_campfire__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 356,
+    "of": "lk_icon_campfire",
+    "rect": [
+      0,
+      0,
+      338,
+      356
+    ],
+    "scale": 3.56,
+    "slice": null,
+    "w": 338
   },
   "lk_icon_cave": {
     "h": 74,
@@ -3281,6 +3376,7 @@
   "lk_icon_crystals": {
     "atlas": "atlas_lk_items",
     "h": 100,
+    "hi": "lk_icon_crystals__hi",
     "rect": [
       689,
       200,
@@ -3290,6 +3386,20 @@
     "slice": null,
     "w": 94
   },
+  "lk_icon_crystals__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 356,
+    "of": "lk_icon_crystals",
+    "rect": [
+      0,
+      0,
+      335,
+      356
+    ],
+    "scale": 3.56,
+    "slice": null,
+    "w": 335
+  },
   "lk_icon_cursor": {
     "h": 96,
     "slice": null,
@@ -3298,6 +3408,7 @@
   "lk_icon_drumstick": {
     "atlas": "atlas_lk_items",
     "h": 103,
+    "hi": "lk_icon_drumstick__hi",
     "rect": [
       0,
       200,
@@ -3306,6 +3417,20 @@
     ],
     "slice": null,
     "w": 116
+  },
+  "lk_icon_drumstick__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 316,
+    "of": "lk_icon_drumstick",
+    "rect": [
+      0,
+      697,
+      356,
+      316
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_exclamation": {
     "atlas": "atlas_lk_lobby",
@@ -3399,6 +3524,7 @@
   "lk_icon_hatchet": {
     "atlas": "atlas_lk_items",
     "h": 127,
+    "hi": "lk_icon_hatchet__hi",
     "rect": [
       160,
       0,
@@ -3408,9 +3534,24 @@
     "slice": null,
     "w": 133
   },
+  "lk_icon_hatchet__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 340,
+    "of": "lk_icon_hatchet",
+    "rect": [
+      0,
+      360,
+      356,
+      340
+    ],
+    "scale": 2.6767,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_heart": {
     "atlas": "atlas_lk_items",
     "h": 103,
+    "hi": "lk_icon_heart__hi",
     "rect": [
       120,
       200,
@@ -3420,9 +3561,24 @@
     "slice": null,
     "w": 116
   },
+  "lk_icon_heart__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 316,
+    "of": "lk_icon_heart",
+    "rect": [
+      360,
+      351,
+      356,
+      316
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_hide": {
     "atlas": "atlas_lk_items",
     "h": 75,
+    "hi": "lk_icon_hide__hi",
     "rect": [
       608,
       307,
@@ -3431,6 +3587,20 @@
     ],
     "slice": null,
     "w": 79
+  },
+  "lk_icon_hide__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 338,
+    "of": "lk_icon_hide",
+    "rect": [
+      360,
+      360,
+      356,
+      338
+    ],
+    "scale": 4.5063,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_hourglass": {
     "atlas": "atlas_lk_icons",
@@ -3469,6 +3639,7 @@
   "lk_icon_lightning": {
     "atlas": "atlas_lk_items",
     "h": 116,
+    "hi": "lk_icon_lightning__hi",
     "rect": [
       552,
       0,
@@ -3477,6 +3648,20 @@
     ],
     "slice": null,
     "w": 86
+  },
+  "lk_icon_lightning__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 356,
+    "of": "lk_icon_lightning",
+    "rect": [
+      339,
+      0,
+      264,
+      356
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 264
   },
   "lk_icon_lock": {
     "atlas": "atlas_lk_lobby",
@@ -3505,6 +3690,7 @@
   "lk_icon_logs": {
     "atlas": "atlas_lk_items",
     "h": 95,
+    "hi": "lk_icon_logs__hi",
     "rect": [
       0,
       307,
@@ -3514,9 +3700,24 @@
     "slice": null,
     "w": 110
   },
+  "lk_icon_logs__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 307,
+    "of": "lk_icon_logs",
+    "rect": [
+      360,
+      711,
+      356,
+      307
+    ],
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_magma_ore": {
     "atlas": "atlas_lk_items",
     "h": 87,
+    "hi": "lk_icon_magma_ore__hi",
     "rect": [
       220,
       307,
@@ -3525,6 +3726,20 @@
     ],
     "slice": null,
     "w": 100
+  },
+  "lk_icon_magma_ore__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 310,
+    "of": "lk_icon_magma_ore",
+    "rect": [
+      0,
+      711,
+      356,
+      310
+    ],
+    "scale": 3.56,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_magnifier": {
     "atlas": "atlas_lk_icons",
@@ -3606,6 +3821,7 @@
   "lk_icon_mushroom": {
     "atlas": "atlas_lk_items",
     "h": 73,
+    "hi": "lk_icon_mushroom__hi",
     "rect": [
       853,
       307,
@@ -3614,6 +3830,20 @@
     ],
     "slice": null,
     "w": 72
+  },
+  "lk_icon_mushroom__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 356,
+    "of": "lk_icon_mushroom",
+    "rect": [
+      0,
+      0,
+      351,
+      356
+    ],
+    "scale": 4.8767,
+    "slice": null,
+    "w": 351
   },
   "lk_icon_party": {
     "atlas": "atlas_lk_lobby",
@@ -3657,6 +3887,7 @@
   "lk_icon_pickaxe": {
     "atlas": "atlas_lk_items",
     "h": 124,
+    "hi": "lk_icon_pickaxe__hi",
     "rect": [
       297,
       0,
@@ -3666,9 +3897,24 @@
     "slice": null,
     "w": 135
   },
+  "lk_icon_pickaxe__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 327,
+    "of": "lk_icon_pickaxe",
+    "rect": [
+      360,
+      360,
+      356,
+      327
+    ],
+    "scale": 2.637,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_plank": {
     "atlas": "atlas_lk_items",
     "h": 102,
+    "hi": "lk_icon_plank__hi",
     "rect": [
       360,
       200,
@@ -3678,9 +3924,24 @@
     "slice": null,
     "w": 106
   },
+  "lk_icon_plank__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 343,
+    "of": "lk_icon_plank",
+    "rect": [
+      360,
+      0,
+      356,
+      343
+    ],
+    "scale": 3.3585,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_plant_fiber": {
     "atlas": "atlas_lk_items",
     "h": 113,
+    "hi": "lk_icon_plant_fiber__hi",
     "rect": [
       729,
       0,
@@ -3689,6 +3950,20 @@
     ],
     "slice": null,
     "w": 116
+  },
+  "lk_icon_plant_fiber__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 347,
+    "of": "lk_icon_plant_fiber",
+    "rect": [
+      0,
+      360,
+      356,
+      347
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_play_rune": {
     "atlas": "atlas_lk_play",
@@ -3749,6 +4024,7 @@
   "lk_icon_rocks": {
     "atlas": "atlas_lk_items",
     "h": 83,
+    "hi": "lk_icon_rocks__hi",
     "rect": [
       324,
       307,
@@ -3758,9 +4034,24 @@
     "slice": null,
     "w": 100
   },
+  "lk_icon_rocks__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 295,
+    "of": "lk_icon_rocks",
+    "rect": [
+      360,
+      676,
+      356,
+      295
+    ],
+    "scale": 3.56,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_rope": {
     "atlas": "atlas_lk_items",
     "h": 75,
+    "hi": "lk_icon_rope__hi",
     "rect": [
       691,
       307,
@@ -3769,6 +4060,20 @@
     ],
     "slice": null,
     "w": 76
+  },
+  "lk_icon_rope__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 351,
+    "of": "lk_icon_rope",
+    "rect": [
+      607,
+      0,
+      356,
+      351
+    ],
+    "scale": 4.6842,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_ruin": {
     "atlas": "atlas_lk_icons",
@@ -3785,6 +4090,7 @@
   "lk_icon_runestone": {
     "atlas": "atlas_lk_items",
     "h": 116,
+    "hi": "lk_icon_runestone__hi",
     "rect": [
       436,
       0,
@@ -3793,6 +4099,20 @@
     ],
     "slice": null,
     "w": 112
+  },
+  "lk_icon_runestone__hi": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 356,
+    "of": "lk_icon_runestone",
+    "rect": [
+      355,
+      0,
+      344,
+      356
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 344
   },
   "lk_icon_runestone_world": {
     "h": 100,
@@ -3839,6 +4159,7 @@
   "lk_icon_spear": {
     "atlas": "atlas_lk_items",
     "h": 76,
+    "hi": "lk_icon_spear__hi",
     "rect": [
       519,
       307,
@@ -3848,6 +4169,20 @@
     "slice": null,
     "w": 85
   },
+  "lk_icon_spear__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 318,
+    "of": "lk_icon_spear",
+    "rect": [
+      360,
+      704,
+      356,
+      318
+    ],
+    "scale": 4.1882,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_speech": {
     "h": 101,
     "slice": null,
@@ -3856,6 +4191,7 @@
   "lk_icon_star": {
     "atlas": "atlas_lk_items",
     "h": 113,
+    "hi": "lk_icon_star__hi",
     "rect": [
       849,
       0,
@@ -3865,9 +4201,24 @@
     "slice": null,
     "w": 116
   },
+  "lk_icon_star__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 347,
+    "of": "lk_icon_star",
+    "rect": [
+      0,
+      0,
+      356,
+      347
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_stone": {
     "atlas": "atlas_lk_items",
     "h": 103,
+    "hi": "lk_icon_stone__hi",
     "rect": [
       240,
       200,
@@ -3877,9 +4228,24 @@
     "slice": null,
     "w": 116
   },
+  "lk_icon_stone__hi": {
+    "atlas": "atlas_lk_items_hi_3",
+    "h": 316,
+    "of": "lk_icon_stone",
+    "rect": [
+      360,
+      697,
+      356,
+      316
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_stone_axe": {
     "atlas": "atlas_lk_items",
     "h": 196,
+    "hi": "lk_icon_stone_axe__hi",
     "rect": [
       0,
       0,
@@ -3889,9 +4255,24 @@
     "slice": null,
     "w": 156
   },
+  "lk_icon_stone_axe__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 356,
+    "of": "lk_icon_stone_axe",
+    "rect": [
+      342,
+      0,
+      283,
+      356
+    ],
+    "scale": 1.8163,
+    "slice": null,
+    "w": 283
+  },
   "lk_icon_stones": {
     "atlas": "atlas_lk_items",
     "h": 92,
+    "hi": "lk_icon_stones__hi",
     "rect": [
       114,
       307,
@@ -3901,9 +4282,24 @@
     "slice": null,
     "w": 102
   },
+  "lk_icon_stones__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 321,
+    "of": "lk_icon_stones",
+    "rect": [
+      0,
+      351,
+      356,
+      321
+    ],
+    "scale": 3.4902,
+    "slice": null,
+    "w": 356
+  },
   "lk_icon_torch": {
     "atlas": "atlas_lk_items",
     "h": 116,
+    "hi": "lk_icon_torch__hi",
     "rect": [
       642,
       0,
@@ -3912,6 +4308,20 @@
     ],
     "slice": null,
     "w": 83
+  },
+  "lk_icon_torch__hi": {
+    "atlas": "atlas_lk_items_hi_1",
+    "h": 356,
+    "of": "lk_icon_torch",
+    "rect": [
+      629,
+      0,
+      255,
+      356
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 255
   },
   "lk_icon_totem": {
     "atlas": "atlas_lk_icons",
@@ -4039,6 +4449,7 @@
   "lk_icon_tusk__hi": {
     "atlas": "atlas_lk_journal_hi",
     "h": 200,
+    "hi": "lk_icon_tusk__hi2",
     "of": "lk_icon_tusk",
     "rect": [
       854,
@@ -4050,9 +4461,24 @@
     "slice": null,
     "w": 160
   },
+  "lk_icon_tusk__hi2": {
+    "atlas": "atlas_lk_items_hi_2",
+    "h": 356,
+    "of": "lk_icon_tusk",
+    "rect": [
+      703,
+      0,
+      285,
+      356
+    ],
+    "scale": 3.56,
+    "slice": null,
+    "w": 285
+  },
   "lk_icon_warning": {
     "atlas": "atlas_lk_items",
     "h": 101,
+    "hi": "lk_icon_warning__hi",
     "rect": [
       470,
       200,
@@ -4061,6 +4487,20 @@
     ],
     "slice": null,
     "w": 116
+  },
+  "lk_icon_warning__hi": {
+    "atlas": "atlas_lk_items_hi_4",
+    "h": 310,
+    "of": "lk_icon_warning",
+    "rect": [
+      0,
+      676,
+      356,
+      310
+    ],
+    "scale": 3.069,
+    "slice": null,
+    "w": 356
   },
   "lk_icon_wave": {
     "h": 76,

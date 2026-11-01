@@ -1,8 +1,9 @@
 -- An icon by id: lk_icon_<id> (menu, status and world icons, sheets 06, 11, 16,
 -- 17) or lk_glyph_<id> (flat glyphs, sheet 03), fitted into its rect, and never
--- drawn larger than its art (MAX_SCALE design px per pixel of its sharpest art;
--- a big box, the Journal's illustration, centres it at that size). Before
--- upload it is a glyph in ink. Item art goes through Kit.ItemIcon.
+-- drawn larger than its art (MAX_SCALE design px per pixel of the art that draws
+-- at that size, its high-resolution copy included: Art.Capped; a big box, the
+-- Journal's illustration, centres it at that size). Before upload it is a glyph
+-- in ink. Item art goes through Kit.ItemIcon.
 --
 --   Kit.Icon.new(row, { rect = { 8, 8, 40, 40 }, icon = "backpack" })
 --   Kit.Icon.new(plate, { rect = r, icon = "play", tint = "cream" })
@@ -13,7 +14,7 @@ local Core = require(script.Parent.Core)
 local Icon = {}
 Icon.__index = Icon
 
--- The largest an icon is drawn: design px per pixel of its art.
+-- The largest an icon is drawn: design px per pixel of its art (Art.Capped).
 Icon.MAX_SCALE = 1
 
 -- props: rect | size, icon (id), tint (colour token), zIndex, name, maxScale

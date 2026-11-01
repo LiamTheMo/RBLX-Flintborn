@@ -9,11 +9,13 @@
 --
 -- High-resolution copies: a sprite's `hi` names another entry, the same art at
 -- `scale` times the pixels (w, h, slice and rect of the copy are in its own
--- pixels; `of` names the sprite). The sprite's own w, h and slice stay the design
--- size every layout uses. Placement picks the copy where the art is magnified and
--- the copy's image is uploaded, else the sprite's own (1x) art, so an atlas that
--- is not uploaded yet never draws: its sprites keep drawing their 1x art from
--- the atlases already uploaded, each with its own rects.
+-- pixels; `of` names the sprite). A copy's own `hi` names a sharper copy (the
+-- tusk: its 2x copy, then its hero copy for the Forge picture). The sprite's own
+-- w, h and slice stay the design size every layout uses. Placement picks the
+-- sharpest copy whose magnification is reached (HiFrom) and whose image is
+-- uploaded, else the sprite's own (1x) art, so an atlas that is not uploaded yet
+-- never draws: its sprites keep drawing their 1x art from the atlases already
+-- uploaded, each with its own rects.
 
 local UiAssets = {}
 
@@ -85,6 +87,26 @@ end
 -- than 2x.
 UiAssets.HI_FROM = 0.75
 
+-- Copies up to HI_MAX times the pixels (the slicer's 2x copies of frames,
+-- buttons and icons, the island map's 2.04x) draw past HI_FROM. A sharper copy
+-- (an item's hero copy, 2.6x to 4.9x) draws only where the art is magnified
+-- past HERO_FROM and past scale / HI_SHRINK, so it is never shrunk more than 2x
+-- at 1440p (windows draw at 1.4 there: HI_SHRINK = 2 x 1.4): in the Forge
+-- picture and the Inventory detail card, never in slots, rows or the Journal
+-- illustration (Kit.Icon caps those at 1).
+UiAssets.HI_MAX = 2.1
+UiAssets.HERO_FROM = 1
+UiAssets.HI_SHRINK = 2.8
+
+-- The magnification (design px drawn per design px of the sprite) past which a
+-- copy of `scale` draws.
+function UiAssets.HiFrom(scale: number): number
+	if scale <= UiAssets.HI_MAX then
+		return UiAssets.HI_FROM
+	end
+	return math.max(UiAssets.HERO_FROM, scale / UiAssets.HI_SHRINK)
+end
+
 export type Placement = {
 	name: string, -- the entry drawn: the sprite or its copy
 	entry: any, -- that entry (w, h, slice, rect in its own pixels)
@@ -119,11 +141,38 @@ local function placementOf(sprites, imageOf, name: string, entry): Placement?
 	return nil
 end
 
+export type Copy = {
+	name: string, -- the copy's entry name
+	entry: any, -- its entry (w, h, slice, rect in its own pixels)
+	scale: number, -- its pixels per design pixel of the sprite
+	from: number, -- the magnification past which it draws (HiFrom)
+}
+
+-- The high-resolution copies of sprite `name`, least sharp first (its `hi`,
+-- then that copy's `hi`, ...), uploaded or not; empty when it has none.
+function UiAssets.Copies(name: string, sprites: any?): { Copy }
+	sprites = sprites or UiAssets.Sprites
+	local copies = {}
+	local base = entryOf(sprites, name)
+	local link = base and base.hi
+	while type(link) == "string" and #copies < 4 do
+		local copy = entryOf(sprites, link)
+		if copy == nil then
+			break
+		end
+		local scale = if type(copy.scale) == "number" and copy.scale > 0 then copy.scale else copy.w / base.w
+		table.insert(copies, { name = link, entry = copy, scale = scale, from = UiAssets.HiFrom(scale) })
+		link = copy.hi
+	end
+	return copies
+end
+
 -- The art sprite `name` draws from when it is magnified `mag` times (design px
--- drawn per design px of the sprite; nil when unknown, which prefers the copy):
--- its high-resolution copy when it has one whose image is uploaded and mag >
--- HI_FROM, else its own art; nil when neither is uploaded. `sprites` and
--- `imageOf(name) -> id?` default to UiSprites.json and UiAssetIds.json.
+-- drawn per design px of the sprite; nil when unknown, which prefers the
+-- sharpest copy): the sharpest copy whose image is uploaded and whose `from`
+-- the magnification exceeds, else its own art; nil when none is uploaded.
+-- `sprites` and `imageOf(name) -> id?` default to UiSprites.json and
+-- UiAssetIds.json.
 function UiAssets.Placement(name: string, mag: number?, sprites: any?, imageOf: ((string) -> string?)?): Placement?
 	sprites = sprites or UiAssets.Sprites
 	local lookup: (string) -> string? = imageOf or UiAssets.image
@@ -131,32 +180,18 @@ function UiAssets.Placement(name: string, mag: number?, sprites: any?, imageOf: 
 	if base == nil then
 		return nil
 	end
-	local hi = type(base.hi) == "string" and entryOf(sprites, base.hi)
-	if hi and (mag == nil or mag > UiAssets.HI_FROM) then
-		local placement = placementOf(sprites, lookup, base.hi, hi)
-		if placement then
-			placement.scale = if type(hi.scale) == "number" and hi.scale > 0 then hi.scale else hi.w / base.w
-			return placement
+	local copies = UiAssets.Copies(name, sprites)
+	for index = #copies, 1, -1 do
+		local copy = copies[index]
+		if mag == nil or mag > copy.from then
+			local placement = placementOf(sprites, lookup, copy.name, copy.entry)
+			if placement then
+				placement.scale = copy.scale
+				return placement
+			end
 		end
 	end
 	return placementOf(sprites, lookup, name, base)
-end
-
--- The pixel size {w, h} of a sprite's sharpest art (its high-resolution copy's
--- full size when it has one, else its own), uploaded or not; nil when unknown.
-function UiAssets.PixelSize(name: string, sprites: any?): (number?, number?)
-	sprites = sprites or UiAssets.Sprites
-	local base = entryOf(sprites, name)
-	if base == nil then
-		return nil, nil
-	end
-	local hi = type(base.hi) == "string" and entryOf(sprites, base.hi)
-	if hi and type(hi.scale) == "number" then
-		-- A 9-sliced copy's middle is stored short: its full size is the design
-		-- size at its scale.
-		return base.w * hi.scale, base.h * hi.scale
-	end
-	return base.w, base.h
 end
 
 return UiAssets

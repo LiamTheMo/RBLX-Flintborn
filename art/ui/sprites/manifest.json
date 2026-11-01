@@ -3251,6 +3251,7 @@
     "w": 115,
     "h": 116,
     "slice": null,
+    "hi": "lk_glyph_ink_backpack__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       120,
@@ -4736,6 +4737,7 @@
     "w": 78,
     "h": 73,
     "slice": null,
+    "hi": "lk_icon_berries__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       771,
@@ -4763,6 +4765,7 @@
     "w": 87,
     "h": 79,
     "slice": null,
+    "hi": "lk_icon_bone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       428,
@@ -4782,6 +4785,7 @@
     "w": 108,
     "h": 97,
     "slice": null,
+    "hi": "lk_icon_build__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       871,
@@ -4795,6 +4799,7 @@
     "w": 95,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_campfire__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       590,
@@ -4932,6 +4937,7 @@
     "w": 94,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_crystals__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       689,
@@ -4951,6 +4957,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_drumstick__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5061,6 +5068,7 @@
     "w": 133,
     "h": 127,
     "slice": null,
+    "hi": "lk_icon_hatchet__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       160,
@@ -5074,6 +5082,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_heart__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       120,
@@ -5087,6 +5096,7 @@
     "w": 79,
     "h": 75,
     "slice": null,
+    "hi": "lk_icon_hide__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       608,
@@ -5138,6 +5148,7 @@
     "w": 86,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_lightning__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       552,
@@ -5177,6 +5188,7 @@
     "w": 110,
     "h": 95,
     "slice": null,
+    "hi": "lk_icon_logs__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5190,6 +5202,7 @@
     "w": 100,
     "h": 87,
     "slice": null,
+    "hi": "lk_icon_magma_ore__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       220,
@@ -5287,6 +5300,7 @@
     "w": 72,
     "h": 73,
     "slice": null,
+    "hi": "lk_icon_mushroom__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       853,
@@ -5327,6 +5341,7 @@
     "w": 135,
     "h": 124,
     "slice": null,
+    "hi": "lk_icon_pickaxe__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       297,
@@ -5340,6 +5355,7 @@
     "w": 106,
     "h": 102,
     "slice": null,
+    "hi": "lk_icon_plank__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       360,
@@ -5353,6 +5369,7 @@
     "w": 116,
     "h": 113,
     "slice": null,
+    "hi": "lk_icon_plant_fiber__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       729,
@@ -5386,6 +5403,7 @@
     "w": 100,
     "h": 83,
     "slice": null,
+    "hi": "lk_icon_rocks__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       324,
@@ -5399,6 +5417,7 @@
     "w": 76,
     "h": 75,
     "slice": null,
+    "hi": "lk_icon_rope__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       691,
@@ -5425,6 +5444,7 @@
     "w": 112,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_runestone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       436,
@@ -5470,6 +5490,7 @@
     "w": 85,
     "h": 76,
     "slice": null,
+    "hi": "lk_icon_spear__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       519,
@@ -5489,6 +5510,7 @@
     "w": 116,
     "h": 113,
     "slice": null,
+    "hi": "lk_icon_star__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       849,
@@ -5502,6 +5524,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_stone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       240,
@@ -5515,6 +5538,7 @@
     "w": 156,
     "h": 196,
     "slice": null,
+    "hi": "lk_icon_stone_axe__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5528,6 +5552,7 @@
     "w": 102,
     "h": 92,
     "slice": null,
+    "hi": "lk_icon_stones__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       114,
@@ -5541,6 +5566,7 @@
     "w": 83,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_torch__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       642,
@@ -5642,6 +5668,7 @@
     "w": 116,
     "h": 101,
     "slice": null,
+    "hi": "lk_icon_warning__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       470,
@@ -7460,6 +7487,7 @@
     "slice": null,
     "scale": 2.0,
     "of": "lk_icon_tusk",
+    "hi": "lk_icon_tusk__hi2",
     "atlas": "atlas_lk_journal_hi",
     "rect": [
       854,
@@ -8031,6 +8059,450 @@
   },
   "atlas_island_hi_2_2": {
     "file": "atlas_island_hi_2_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "lk_icon_berries__hi": {
+    "file": "lk_icon_berries__hi.png",
+    "w": 356,
+    "h": 333,
+    "slice": null,
+    "scale": 4.5641,
+    "of": "lk_icon_berries",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      360,
+      356,
+      333
+    ]
+  },
+  "lk_icon_bone__hi": {
+    "file": "lk_icon_bone__hi.png",
+    "w": 356,
+    "h": 323,
+    "slice": null,
+    "scale": 4.092,
+    "of": "lk_icon_bone",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      360,
+      360,
+      356,
+      323
+    ]
+  },
+  "lk_icon_build__hi": {
+    "file": "lk_icon_build__hi.png",
+    "w": 356,
+    "h": 320,
+    "slice": null,
+    "scale": 3.2963,
+    "of": "lk_icon_build",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      704,
+      356,
+      320
+    ]
+  },
+  "lk_icon_campfire__hi": {
+    "file": "lk_icon_campfire__hi.png",
+    "w": 338,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_campfire",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      0,
+      338,
+      356
+    ]
+  },
+  "lk_icon_crystals__hi": {
+    "file": "lk_icon_crystals__hi.png",
+    "w": 335,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_crystals",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      0,
+      335,
+      356
+    ]
+  },
+  "lk_icon_drumstick__hi": {
+    "file": "lk_icon_drumstick__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_drumstick",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      697,
+      356,
+      316
+    ]
+  },
+  "lk_icon_hatchet__hi": {
+    "file": "lk_icon_hatchet__hi.png",
+    "w": 356,
+    "h": 340,
+    "slice": null,
+    "scale": 2.6767,
+    "of": "lk_icon_hatchet",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      360,
+      356,
+      340
+    ]
+  },
+  "lk_icon_heart__hi": {
+    "file": "lk_icon_heart__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_heart",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      351,
+      356,
+      316
+    ]
+  },
+  "lk_icon_hide__hi": {
+    "file": "lk_icon_hide__hi.png",
+    "w": 356,
+    "h": 338,
+    "slice": null,
+    "scale": 4.5063,
+    "of": "lk_icon_hide",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      360,
+      360,
+      356,
+      338
+    ]
+  },
+  "lk_icon_lightning__hi": {
+    "file": "lk_icon_lightning__hi.png",
+    "w": 264,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_lightning",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      339,
+      0,
+      264,
+      356
+    ]
+  },
+  "lk_icon_logs__hi": {
+    "file": "lk_icon_logs__hi.png",
+    "w": 356,
+    "h": 307,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_icon_logs",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      360,
+      711,
+      356,
+      307
+    ]
+  },
+  "lk_icon_magma_ore__hi": {
+    "file": "lk_icon_magma_ore__hi.png",
+    "w": 356,
+    "h": 310,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_magma_ore",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      711,
+      356,
+      310
+    ]
+  },
+  "lk_icon_mushroom__hi": {
+    "file": "lk_icon_mushroom__hi.png",
+    "w": 351,
+    "h": 356,
+    "slice": null,
+    "scale": 4.8767,
+    "of": "lk_icon_mushroom",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      0,
+      351,
+      356
+    ]
+  },
+  "lk_icon_pickaxe__hi": {
+    "file": "lk_icon_pickaxe__hi.png",
+    "w": 356,
+    "h": 327,
+    "slice": null,
+    "scale": 2.637,
+    "of": "lk_icon_pickaxe",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      360,
+      360,
+      356,
+      327
+    ]
+  },
+  "lk_icon_plank__hi": {
+    "file": "lk_icon_plank__hi.png",
+    "w": 356,
+    "h": 343,
+    "slice": null,
+    "scale": 3.3585,
+    "of": "lk_icon_plank",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      0,
+      356,
+      343
+    ]
+  },
+  "lk_icon_plant_fiber__hi": {
+    "file": "lk_icon_plant_fiber__hi.png",
+    "w": 356,
+    "h": 347,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_plant_fiber",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      360,
+      356,
+      347
+    ]
+  },
+  "lk_icon_rocks__hi": {
+    "file": "lk_icon_rocks__hi.png",
+    "w": 356,
+    "h": 295,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_rocks",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      676,
+      356,
+      295
+    ]
+  },
+  "lk_icon_rope__hi": {
+    "file": "lk_icon_rope__hi.png",
+    "w": 356,
+    "h": 351,
+    "slice": null,
+    "scale": 4.6842,
+    "of": "lk_icon_rope",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      607,
+      0,
+      356,
+      351
+    ]
+  },
+  "lk_icon_runestone__hi": {
+    "file": "lk_icon_runestone__hi.png",
+    "w": 344,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_runestone",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      355,
+      0,
+      344,
+      356
+    ]
+  },
+  "lk_icon_spear__hi": {
+    "file": "lk_icon_spear__hi.png",
+    "w": 356,
+    "h": 318,
+    "slice": null,
+    "scale": 4.1882,
+    "of": "lk_icon_spear",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      360,
+      704,
+      356,
+      318
+    ]
+  },
+  "lk_icon_star__hi": {
+    "file": "lk_icon_star__hi.png",
+    "w": 356,
+    "h": 347,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_star",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      0,
+      356,
+      347
+    ]
+  },
+  "lk_icon_stone__hi": {
+    "file": "lk_icon_stone__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_stone",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      360,
+      697,
+      356,
+      316
+    ]
+  },
+  "lk_icon_stone_axe__hi": {
+    "file": "lk_icon_stone_axe__hi.png",
+    "w": 283,
+    "h": 356,
+    "slice": null,
+    "scale": 1.8163,
+    "of": "lk_icon_stone_axe",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      342,
+      0,
+      283,
+      356
+    ]
+  },
+  "lk_icon_stones__hi": {
+    "file": "lk_icon_stones__hi.png",
+    "w": 356,
+    "h": 321,
+    "slice": null,
+    "scale": 3.4902,
+    "of": "lk_icon_stones",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      351,
+      356,
+      321
+    ]
+  },
+  "lk_icon_torch__hi": {
+    "file": "lk_icon_torch__hi.png",
+    "w": 255,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_torch",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      629,
+      0,
+      255,
+      356
+    ]
+  },
+  "lk_icon_tusk__hi2": {
+    "file": "lk_icon_tusk__hi2.png",
+    "w": 285,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_tusk",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      703,
+      0,
+      285,
+      356
+    ]
+  },
+  "lk_icon_warning__hi": {
+    "file": "lk_icon_warning__hi.png",
+    "w": 356,
+    "h": 310,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_warning",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      676,
+      356,
+      310
+    ]
+  },
+  "lk_glyph_ink_backpack__hi": {
+    "file": "lk_glyph_ink_backpack__hi.png",
+    "w": 218,
+    "h": 220,
+    "slice": null,
+    "scale": 1.8966,
+    "of": "lk_glyph_ink_backpack",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      720,
+      704,
+      218,
+      220
+    ]
+  },
+  "atlas_lk_items_hi_1": {
+    "file": "atlas_lk_items_hi_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_2": {
+    "file": "atlas_lk_items_hi_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_3": {
+    "file": "atlas_lk_items_hi_3.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_4": {
+    "file": "atlas_lk_items_hi_4.png",
     "w": 1024,
     "h": 1024,
     "slice": null

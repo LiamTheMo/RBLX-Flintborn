@@ -191,6 +191,26 @@ GROUPS = {
         "lk_icon_portal__hi", "lk_icon_scroll__hi", "lk_icon_totem__hi", "lk_icon_treasure__hi",
         "lk_icon_trophy__hi", "lk_icon_tusk__hi",
     ],
+    # Item art's hero copies (slice_lobby_kit.py HERO, 356 px on the long side;
+    # the armour stand-in glyph from glyphs.py): the Forge / Crafting picture and
+    # the Inventory detail card. The tools the Forge and Crafting pictures show
+    # first, then the other items in three atlases.
+    "atlas_lk_items_hi_1": [
+        "lk_glyph_ink_backpack__hi", "lk_icon_build__hi", "lk_icon_campfire__hi", "lk_icon_hatchet__hi",
+        "lk_icon_pickaxe__hi", "lk_icon_spear__hi", "lk_icon_stone_axe__hi", "lk_icon_torch__hi",
+    ],
+    "atlas_lk_items_hi_2": [
+        "lk_icon_hide__hi", "lk_icon_logs__hi", "lk_icon_magma_ore__hi", "lk_icon_mushroom__hi",
+        "lk_icon_plant_fiber__hi", "lk_icon_runestone__hi", "lk_icon_tusk__hi2",
+    ],
+    "atlas_lk_items_hi_3": [
+        "lk_icon_berries__hi", "lk_icon_bone__hi", "lk_icon_crystals__hi", "lk_icon_drumstick__hi",
+        "lk_icon_lightning__hi", "lk_icon_rope__hi", "lk_icon_stone__hi",
+    ],
+    "atlas_lk_items_hi_4": [
+        "lk_icon_heart__hi", "lk_icon_plank__hi", "lk_icon_rocks__hi", "lk_icon_star__hi", "lk_icon_stones__hi",
+        "lk_icon_warning__hi",
+    ],
     # The island painting at 2040 px (render_island.py), 2 x 2 tiles of at most
     # 1024 px, each an atlas of its own: the world map draws it up to 2600 design
     # px wide, so the 1,000 px painting was magnified.

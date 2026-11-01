@@ -549,7 +549,9 @@ function InventoryWindow:_buildCard()
 	self.card = card
 	local c = card.base.visual
 	self.cardVisual = c
-	self.detailIcon = Kit.ItemIcon.new(c, { name = "DetailIcon", rect = inCard(73, 38, 152, 166), zIndex = 9 })
+	-- A hero box: the item fills it (its hero copy keeps it sharp).
+	self.detailIcon =
+		Kit.ItemIcon.new(c, { name = "DetailIcon", rect = inCard(73, 38, 152, 166), zIndex = 9, maxScale = false })
 	self.detailName = Kit.Text.new(c, {
 		name = "ItemName",
 		rect = inCard(19, 216, 258, 34),

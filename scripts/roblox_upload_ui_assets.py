@@ -119,7 +119,8 @@ def sync_sprites():
             out[name]["atlas"] = entry["atlas"]
             out[name]["rect"] = entry["rect"]
         if entry.get("hi"):
-            # Its high-resolution copy (another entry, sized in its own pixels).
+            # Its high-resolution copy (another entry, sized in its own pixels;
+            # a copy's own "hi" names a sharper copy, as the hero item art).
             out[name]["hi"] = entry["hi"]
         if entry.get("of"):
             # A high-resolution copy: `scale` of its pixels per design pixel of `of`.
