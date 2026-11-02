@@ -67,6 +67,8 @@ session (the GUI or a background one) is driven by only one agent at a time.
     - the skeleton showing where the sheet shows it.
   - **Check between the eight views too.** Leaves can be aimed at the gaps between the eight test angles and still turn edge-on there; 063's clusters faced exactly between them and showed combs of slivers at ±25° and ±65°.
     - Sweep the azimuth in 5° steps and count whole leaves within 15° of edge-on: at most about 10 % of the leaf area at any step.
+      - A **whole leaf** is edge-on when at least 75 % of its lobe facets are within 15° of edge-on, or when its projected area falls under about 0.26 of its face-on area (a sliver). Both counts bind.
+      - The share of leaves whose mean plane is within 15° of edge-on is reported only, not a limit: for flat leaves at any facings it averages about 1/6 of the leaf area (ruling on 063, 2026-11-01).
     - Pixel shares hide edge-on leaves, because they cover few pixels.
     - Leaves in one cluster must not share a plane. Give each its own facing.
   - Clump and rosette **parts** must match their cells' proportions (W : H). They must not be flat tiered tents or single cones.
