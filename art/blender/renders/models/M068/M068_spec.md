@@ -1045,3 +1045,30 @@ and the candidates:
 10. **Name `TimberCabin`.**
 11. **Sheet mirroring:** the f34 governs; the front-to-back mirroring of the f34 and front cells against the other four is
     recorded, and verifiers compare mirrored cells with a mirrored render.
+
+## Paused (2026-11-02)
+
+Stopped on request before any build ran. State for the next modeller:
+- **Done:** read the study, decisions and builders; stage 1 design worked out (below). `art/blender/kit/mcp/m068.py`
+  holds the first half of the builder: palette and calibration targets, helpers copied from m064 / m066 (no mNNN
+  imports), and part functions for every piece: foundation runs and corner blocks, floor and threshold, plank walls
+  (6-sided V-seam planks, staggered joints, window and door cuts), window, posts, plates with bracket plates, rafters,
+  purlins, trimmers, ridge beam with rope bands, crossed bargeboards (half-lap X built from three non-overlapping
+  pieces plus a saddle), collars, back frame posts, gable infill, door frame and leaf (hinged at (-1.80, -7.59), open
+  95 deg), two canvas slabs (5 x 2 sagging panels, chimney hole), U tie straps, chimney, stairs, lanterns with
+  brackets, banner set, barrel, crate, stones.
+- **Not done:** the second half (hero_all assembly, the 12 part wrappers, NOTES / COLLISION, _new / _post / UV,
+  shell / contact / bury / pierce / rope-end / walk / placement reports, build(), renders and mirrored renders). It was
+  written but the append failed (the command was too long), so it is not in the file. Nothing has been run or rendered:
+  no numbers yet. Stages 2-6 all open.
+- **Deviations from the spec (needed for consistency, to confirm):** pitch 32 deg, not 34 (at 34 the canvas line
+  passes through the 11.20 plates); canvas eave at |x| 7.45 (0.25 past the plates, at plate-top height, so the U ties
+  wrap the canvas edge and plate); bargeboards 0.90 x 0.92 at |y| 9.25-10.15, 0.80 proud of the canvas, heels seated on
+  the plates; plates run to |y| 10.20; ridge beam ends at |y| 10.75; corner blocks 1.64 square (inner faces under the
+  posts, so the wall and floor planks do not sink into them); chimney centre y -3.45 (clear of the rafter);
+  banner pole (-9.55, 10.55) (0.5 clear of the bargeboard foot); door lanterns at x +-4.70; no apex rope lashing (it
+  would pierce the canvas apex; the golden saddle stands in), recorded.
+- **Next:** write the second half by porting m066's build / report / render section (rename the m066 keys to m068, a
+  4-socket hero check, walk proxy over stairs and doorway). Run `build()` on port 9877 against
+  `art/blender/assets/kit/wip/M068.blend`, then fix contact and bury issues, calibrate, render, and record stages 1-6
+  here.
