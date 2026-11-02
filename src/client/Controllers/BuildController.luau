@@ -29,6 +29,7 @@ local InventoryController = require(script.Parent.InventoryController)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
+local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local BuildController = {}
 
@@ -246,7 +247,7 @@ local function place()
 		return Remotes.Get("Build"):InvokeServer(state.piece, currentTier(), state.base, state.steps)
 	end)
 	if not ok or not success then
-		ui.status:SetText("Can't build here (" .. tostring(reason or success) .. ")")
+		ui.status:SetText("Can't build here: " .. Reasons.Text(if ok then reason else "RequestFailed"))
 	elseif state.piece == "Totem" then
 		drawZones()
 	end

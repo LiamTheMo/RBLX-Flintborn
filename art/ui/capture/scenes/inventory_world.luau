@@ -2,7 +2,9 @@
 -- through real presses: open, choose, EQUIP to the hotbar, MOVE onto another
 -- slot, WEAR armour, the Equipped tab (hotbar keys, armour), TAKE OFF, USE,
 -- DROP, search and close. Remotes are mocked; the server's snapshots are pushed
--- through InventoryChanged as in game. The page is the Equipped tab.
+-- through InventoryChanged as in game. Pages: 1 the Backpack tab under All
+-- (everything carried: the backpack's items, the hotbar and worn armour), 2 the
+-- Equipped tab.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 workspace:SetAttribute("FlintbornPlaceRole", "World")
@@ -66,7 +68,14 @@ local gui = player.PlayerGui:FindFirstChild("FlintbornInventory")
 local window = InventoryController.window
 check(gui and gui.Enabled and InventoryController.IsOpen(), "the Backpack key opens the window")
 check(toggled[1] == true, "BackpackToggled reports it")
-check(window:SlotFor("backpack:50") ~= nil, "all fifty backpack slots shown")
+check(
+	window:SlotFor("backpack:1") ~= nil and window:SlotFor("backpack:6") ~= nil and window:SlotFor("backpack:7") == nil,
+	"the backpack shows its items, then empty slots to the end of the row"
+)
+check(
+	window:SlotFor("hotbar:1") ~= nil and window:SlotFor("armor:1") ~= nil,
+	"the Backpack tab also shows the hotbar and worn armour: everything carried"
+)
 check(window.hint.root.Visible, "the card explains what to do before a choice")
 
 local function press(component)
@@ -80,14 +89,14 @@ press(window:ActionButton("toHotbar"))
 local last = calls[#calls]
 check(last[1] == "MoveItem" and last[4] == "hotbar" and last[5] == 3, "EQUIP moves it to the first free hotbar slot")
 check(not window.busy, "the buttons are live again after the reply")
--- MOVE the spear onto backpack slot 7.
+-- MOVE the spear onto backpack slot 5.
 press(window:SlotFor("backpack:3"))
 press(window:ActionButton("move"))
 check(window:ActionButton("cancelMove") ~= nil, "MOVE waits for a slot")
-press(window:SlotFor("backpack:7"))
+press(window:SlotFor("backpack:5"))
 last = calls[#calls]
 check(
-	last[1] == "MoveItem" and last[2] == "backpack" and last[3] == 3 and last[5] == 7,
+	last[1] == "MoveItem" and last[2] == "backpack" and last[3] == 3 and last[5] == 5,
 	"the next press moves it there"
 )
 -- WEAR the chest piece.
@@ -104,6 +113,8 @@ check(last[1] == "DropItem" and last[2] == "backpack" and last[3] == 1, "DROP dr
 window:SetQuery("spear")
 check(window:SlotFor("backpack:3") ~= nil and window:SlotFor("backpack:1") == nil, "search filters the grid")
 window:SetQuery("")
+press(window:SlotFor("hotbar:1"))
+__dump(player.PlayerGui, 1672, 941, { background = "art/reference/ui/lobby/01_hud.png" })
 
 -- The Equipped tab: hotbar with keys, armour with captions.
 window.tabs.Equipped.control.hit.Activated:Fire()

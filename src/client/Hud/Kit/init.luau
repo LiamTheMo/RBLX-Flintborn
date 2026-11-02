@@ -12,6 +12,9 @@ local Kit = {}
 Kit.Tokens = require(script.Tokens)
 Kit.Art = require(script.Art)
 Kit.Core = require(script.Core)
+-- Dims a picture (and everything under it) without losing its own fade: the
+-- "picture missing" stand-in glyph stays faded (Core.Dim).
+Kit.Dim = Kit.Core.Dim
 Kit.Interact = require(script.Interact)
 Kit.Input = require(script.Input)
 Kit.Motion = require(script.Motion)

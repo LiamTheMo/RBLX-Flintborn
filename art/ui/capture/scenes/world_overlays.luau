@@ -2,7 +2,7 @@
 -- remotes and attributes with sample data, over the island backdrop:
 --
 --   1 in a run: tutorial hint with key caps, downed (bleeding out), boss bar,
---     Horn of War, an event banner, two boosts (one ending soon), save status
+--     Horn of War, an event banner, two boosts (one ending soon)
 --   2 revived / shielded / legacy lists: downed while revived, shielded boss,
 --     the extraction and event lists, the boss cue plaque and a subtitle
 --   3 body loot window        4 storage chest window
@@ -131,7 +131,6 @@ InventoryController.Snapshot.slots = {
 local started = {}
 for _, name in
 	{
-		"SaveStatusController",
 		"TutorialController",
 		"DownedController",
 		"BossUiController",
@@ -148,9 +147,10 @@ do
 	controller.Start()
 	started[name] = controller
 end
--- In game the world HUD puts the column under its compass.
+-- In game the world HUD puts the column under its compass and waypoints
+-- (the compass sits in Roblox's top bar, ARCHITECTURE D28).
 local stack = Theme.TopStack()
-stack.Position = UDim2.new(0.5, 0, 0, 126)
+stack.Position = UDim2.new(0.5, 0, 0, 100)
 
 local gui = player.PlayerGui
 local function find(name)
@@ -164,7 +164,9 @@ local function check(cond, msg)
 end
 
 -- Page 1 ----------------------------------------------------------------------------
+-- The profile's save state draws no indicator (the server still saves).
 player:SetAttribute("SaveStatus", "Saved")
+check(find("SaveStatus") == nil, "no save-status indicator")
 events.TutorialChanged.OnClientEvent:Fire({
 	id = "Gather",
 	index = 3,
@@ -210,6 +212,18 @@ check(find("BossBar").Visible and find("Horn").Visible, "the boss bar and the ho
 check(find("EventBanner") ~= nil, "the event banner shows")
 check(find("Tutorial").Visible, "the tutorial card shows")
 check(find("BoostList").Visible, "the boosts show")
+-- The boosts grow up from the bottom-left corner beside the world ⚙
+-- (SettingsController places it there on the HUD's scale, ARCHITECTURE D30):
+-- G right of it (or its touch pad) and M above the bottom edge.
+do
+	local Kit = require(Client.Hud.Kit)
+	local SettingsController = require(Controllers.SettingsController)
+	local hudGui, hudRoot = __screen(1672, 941)
+	Kit.Scale.Hud(hudGui, hudRoot)
+	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
+	local at = SettingsController.GearPosition(__hudScreen(1672, 941, k, false))
+	__checkBoosts("world_overlays", find("BoostList"), at, k, Theme.HudScale(gui), 1672, 941, check)
+end
 -- The alert caption belongs to page 2.
 find("Caption").Visible = false
 __dump(gui, W, H, BG)

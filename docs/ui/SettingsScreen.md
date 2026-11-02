@@ -12,8 +12,8 @@ the reference image. The old parchment spec this file replaces described
 
 ## Overview
 
-The modal Settings window, opened by the HUD gear button (top right), the ⚙
-button in the world, or the Settings key (O). A dark overlay covers the whole
+The modal Settings window, opened by the lobby HUD's gear button or the ⚙
+button in the world (both in the HUD grid's bottom-left corner, D30), or the Settings key (O). A dark overlay covers the whole
 screen, including the HUD (same overlay as the Inventory screen, see
 [`InventoryScreen.md` → Dim overlay](InventoryScreen.md#dim-overlay); 03 measures
 k ≈ 0.30, overlay ≈ #080807 at 70 % opacity). Tabs down the left choose a page;
@@ -318,8 +318,48 @@ Each has the default that will be used if unanswered.
   Gameplay (gears) and Graphics (magnifier) show a glyph; Audio and Controls
   show their label in the same column. RESET has no icon (the "refresh"
   stand-in read as a rune).
-- **World ⚙** (R4): on a HUD-scaled root (Kit.Scale.Hud, so it follows the HUD
-  and UI Scale) in the HUD's top row, 14 px left of the vitals, moved below
-  the Roblox top bar where it reaches down; it no longer sits on the phone
-  jump button. `SettingsController.GEAR` holds its place.
+- **World ⚙** (R4, moved by D27–D30): on a HUD-scaled root
+  (Kit.Scale.Hud, so it follows the HUD and UI Scale) in its own gui that
+  covers the whole screen (`Kit.Scale.FullScreen`: `ScreenInsets = None`),
+  in the HUD grid's bottom-left corner (D30, `HudModel.GearCorner`): the
+  grid's margin M (24 design px; 12 pt on a phone) from the physical screen's
+  left and bottom edges, its foot level with the hotbar's (desktop x 24–76,
+  y 871–917; a notched 844 × 390 iPhone x 12–38, y 355–378, its 44 pt touch
+  pad 25 pt clear of Roblox's thumbstick ring, which sits 25 pt inside the
+  47 pt safe inset, from x 72). Only where the ring reaches the corner (a
+  phone without a side inset: 667 × 375, x 12–38, y 250–273) its foot stands
+  12 screen px above the ring. Its size, ring gap and pad are HudLayout's
+  `gear`, which the lobby's button shares (`SettingsController.GearSize`);
+  `SettingsController.GearPosition(screen)` places it (re-placed when the
+  screen, touch, the form factor or the device safe area changes). The run's
+  boost list starts G right of it (`BoostHudController.Position`). Gamepad
+  reaches it left of the first hotbar slot and down from the bottom-left tile
+  (Map; `SettingsController.LinkGear`). The lobby's own button sits in the
+  same place (LobbyScreen.md).
 - Opens with the gamepad flag when the last input is a gamepad.
+
+## Final audit fixes (phones)
+
+- **Checkbox rows on touch** (phones and touch tablets): 50 px tall at a 64 px
+  pitch (desktop 40 at 56), with a 34 px box and the row reaching the column
+  divider, so the boosted title and its description each get a line instead of
+  touching. Descriptions are short enough to fit whole at 667 × 375: "Numbers
+  over what you hit", "Name tags above players", "Moving up looks down",
+  "Alert sounds as text on screen", "Clearer rarity colours", "Menus and
+  effects move less".
+- **Graphics** labels its dropdown "Quality" (under the GRAPHICS header), so it
+  draws at the same size as "UI Scale" instead of shrinking to fit 130 px.
+- **Key caps on touch** are 116 wide (ending at the same x) so "Left Shift"
+  fits at the boosted size.
+- **Gameplay's rebind note** (KeyNote) is `bodySoft`, wrapping in the room
+  under the key rows, instead of a shrinking `small` line.
+- **Controls' Tutorial**: the text has room for three boosted lines (158, 86
+  tall) above REPLAY TUTORIAL (250, 50 tall); CHANGING KEYS follows at 314.
+
+## Owner feedback round (sliders)
+
+- The slider knob is the square parchment knob with leather corners
+  (`lk_button_square_paper`) drawn whole at its own aspect, 31 × 30, standing
+  8 px past the 14 px track above and below; the old 23 × 26 knob was a
+  9-sliced small paper button whose rim squashed at that size. Every
+  `Kit.Slider` has this one look (KIT.md Slider).

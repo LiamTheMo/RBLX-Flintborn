@@ -3,6 +3,9 @@
 Reference: `art/reference/ui/lobby/05_play.png`; kit sheets in `art/reference/ui/lobby/kit/`
 (index: `art/reference/ui/lobby/README.md`).
 Design resolution: 1672 × 941. Status: Draft (measured; open questions at the end).
+The built window follows ARCHITECTURE D25 (Inventory chrome) and D26 (the
+sheet-21 rune art); see "Deviations from reference" and "Play rune art (D26)"
+below. The look and tokens in general: [STYLE_GUIDE.md](STYLE_GUIDE.md).
 Source of truth for build: the reference. Raw measurements and crops:
 `art/ui/kit/analysis/play/` (scripts shared from `art/ui/kit/analysis/lobby/tools/`).
 
@@ -135,7 +138,7 @@ Scripts: `art/ui/kit/analysis/play/measure_play.py` → `measure_log.txt`
 | Map, marker, RegionPlaque, Details | the destination region: name, biome, difficulty, recommended level, map image, marker position | region config (shared module) | — |
 | PartyRow(s) | party members, leader crown, level | party replica | — |
 | EquipSlot ×6 | the player's hotbar loadout, slots 1–6 | equipment replica | — |
-| PlayButton | requests start of the run for the party | remote to the matchmaking/teleport service | server checks leader, party state, readiness (open q. 2), and teleports |
+| PlayButton | requests start of the run for the party | remote to the matchmaking/teleport service | server checks the leader and party state, and teleports (no Ready step, D24) |
 | CloseButton | closes the window | client | — |
 
 There is no server picker (owner decision).
@@ -145,11 +148,11 @@ There is no server picker (owner decision).
 1. Party list with up to 8 members. The mockup has room for one 56 px row.
    Options: (a) the row area becomes a scroll region one row tall; (b) compact row
    of up to 8 headshots with the leader crown; (c) the section grows and pushes
-   "YOUR EQUIPMENT" down. Default: (a).
-2. Who can press PLAY, and when? Options: leader only, enabled when all members are
-   Ready (Ready is tracked per member on the server, see PartyScreen); or anyone
-   solo. Default: enabled for a solo player and for the leader when all members are
-   ready; disabled otherwise.
+   "YOUR EQUIPMENT" down. **Resolved (owner feedback):** every member shows
+   at once as tiles in up to two rows, no scrolling (see "Owner feedback round").
+2. Who can press PLAY, and when? **Resolved (D24):** a solo player or the party
+   leader, at any time; other members see PLAY disabled with "The party leader
+   starts the run." There is no Ready step and no ready line in the deploy check.
 3. Feedback after PLAY: text change, spinner, or close the window. Default: button
    goes to the disabled look with "STARTING…" until teleport.
 4. Is the map interactive (several regions to pick)? The mockup shows one region
@@ -161,6 +164,19 @@ There is no server picker (owner decision).
 
 ## Deviations from reference
 
+- **Owner decision D25 (window chrome):** the window uses the Inventory
+  window's size (1187 × 650) and chrome instead of mockup 05's plaque style:
+  the header icon (the portal until D26, now the rune play icon), "PLAY" at
+  Inventory's title size and position, the plain
+  ink underline, Inventory's clasps and close-button corner, and no raised
+  title plaque. The map sits in an inset panel (Inventory's detail-card
+  style) with the real island art and crater marker. The right column opens
+  with a "SHATTERED CRATER" section heading over a hairline (no plaque), then
+  the detail rows with hairlines, YOUR PARTY and YOUR EQUIPMENT as standard
+  section headers, the six slots and the primary leather PLAY button at the bottom
+  right (its glyph and pillars: D26). The element tree above records the
+  mockup.
+- **Owner decision D26 (Play rune art):** see the next section.
 - Owner decision: no server picker (the old lobby had one; the mockup has none).
 - Owner decision: the HUD's Play tile opens this window.
 - In the mockup the HUD hotbar and XP bar under the overlay sit 29–33 px lower than
@@ -181,8 +197,77 @@ There is no server picker (owner decision).
 - **Loadout slots** are selectable: a gamepad reaches them (PLAY up → slots →
   ✕) and the tooltip names the item and its count (R20). Their 1–6 badges show
   only with a mouse or keyboard.
-- **Ready** uses PartyController's shared pending state (M2); a refusal shows
-  under the map only (no second toast, M1).
+- **Ready** was removed (D24): members no longer get a Ready button; a refusal
+  of PLAY shows under the map only (no second toast, M1).
 - **Phones**: "+n more in your backpack" at 16; detail values start further
   left so "10 · Low to Extreme" keeps 9 screen px.
 - Party rows are taken apart through maids (Kit components included, L10).
+
+## Play rune art (D26)
+
+The owner's kit sheet `art/reference/ui/lobby/kit/21_play_rune_stones.png`
+supplies the Play art, used in full:
+
+| Part | Sprite (stored size) | Role | Where | Window px |
+|---|---|---|---|---|
+| Header icon | `lk_icon_play_rune` (89 × 116) | `icon.playRune` | the Play window's header (replaces the portal); also the HUD's Play tile | icon rect 40, 15, 71, 77 (fitted: 59 × 77) |
+| PLAY glyph | `lk_icon_play_rune_small` (50 × 64) | `mark.playRune` | left of "PLAY" on the button (replaces the white play glyph) | 40 px tall, 12 px gap to the label |
+| Left pillar | `lk_pillar_rune_left` (88 × 160) | `deco.pillarLeft` | the button's left end | 790, 541, 53, 96 |
+| Right pillar | `lk_pillar_rune_right` (87 × 160) | `deco.pillarRight` | the button's right end | 1107, 541, 53, 96 |
+| PLAY button | `lk_button_leather_*` (primary) | `button.primary` | between the pillars | 826, 562, 298, 60 |
+
+- The pillars are 1.6 × the button's height and overlap each end by 17 px,
+  drawn in front of the button like posts holding a banner. They are
+  decoration only: the button keeps its own rect as its hit area (the pillars
+  take no input), and its touch pad (44 screen px) stays clear of the slots'
+  pads at the 844 × 390 phone's window scale (0.51) and the 667 × 375
+  phone's (0.48).
+- They stand under the loadout slots (slot bottoms at 535, 538 with a selected
+  slot's glow), end at 637 inside the frame's paper margin (the rail starts at
+  about 642) and keep 5 px inside the right column (1165), clear of the
+  frame's lower right clasp and corner.
+- States: hover, pressed and busy change only the button; disabled (member
+  view, a deploy running) dims the pillars with it (`tints.disabled` 0.72) and
+  fades the crystal glyph (transparency 0.35).
+- Before `atlas_lk_play` is uploaded the header and the Play tile show the
+  portal icon, the button the white play glyph, and the pillars draw nothing
+  (`fallback` and material `deco` in `KitModel.ROLES`), which is the D25 look.
+  Once it is uploaded, an image that fails or is slow shows the Kit's ink ▶
+  stand-in on the tile, header and button, and still no pillars
+  (`lobby_hud_failed`).
+- Captures: `play`, `play_states` (every state), `play_phone` (844 × 390 and
+  2000 × 924), `play_flow`, `kit_gallery` page 9; `--uploaded-only` for the
+  fallback.
+
+## Owner feedback round (whole party, square slots)
+
+- **The whole party at once** (resolves open question 1, replacing option
+  (a)): the one-row scrolling list showed half rows and cut the row box's
+  rim, so it is gone, rail included. YOUR PARTY shows every member (1 to 8)
+  as tiles in at most two rows, left aligned in the column (x 575..1165,
+  y 334..414): two tiles to a row (292 wide) for up to 4 members, four to a
+  row (143 wide) for 5 to 8. Nothing sits in a scrolling or clipping frame,
+  so no tile, headshot or text is cut.
+- **A tile** (38 tall; 37 on phones, rows 4 / 2 px apart) is a light inset
+  box (`panel.inset`) with the square headshot on its left (30 px; 29 on
+  phones; no frame or backdrop, as the HUD party list draws it), the name on
+  the first line and "LV. n" on the second, and the leader's crown just after
+  the level. Names shrink to fit (15 down to the 12 design px floor; on phones
+  the phone text floor, about 19 design px or 9.8 screen px at 844 × 390),
+  then end in "…"; names that fit whole share one size. At 8 members on an
+  844 × 390 phone a name keeps about 7 characters (the phone floor rules, as
+  in the lobby HUD's touch rows); with up to 4 members the wide tiles show
+  12-character names whole on phones, and on desktop every name up to about
+  17 characters fits at 8 members.
+- **Layout:** YOUR PARTY moves up 8 px (heading 294..328) and YOUR EQUIPMENT
+  down 4 px (418..452, "+n more" at 421), so the two rows fit between them
+  with the slots (458..535) and PLAY unchanged.
+- **Square loadout slots:** the six slots are 77 × 77 (were 71 × 77) at an
+  85 px pitch (x 575, 660, 745, 830, 915, 1000; y 458, bottom 535 as before),
+  so a selected slot's 3 px glow stays clear of its neighbours. Every hotbar's
+  slots are square (the lobby HUD and the run's HUD: 89 × 89).
+- **Checks:** `play_states` (1, 3 and 8 members, one with a 20-character
+  name), `play_phone` (pages 3 and 4: 3 and 8 members at 844 × 390) and
+  `play_flow` assert no scrolling list, no clipping frame over the tiles, a
+  tile per member inside the column and square headshots; `play_phone` also
+  checks the party text is at least 9 screen px.

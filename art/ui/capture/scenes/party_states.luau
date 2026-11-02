@@ -1,15 +1,15 @@
--- The Party window's states (docs/ui/PartyScreen.md → States; D5, D18), each
+-- The Party window's states (docs/ui/PartyScreen.md → States; D5, D24), each
 -- page over the lobby mockup at 1672 × 941. States are forced through the
 -- DebugState attribute, as verifiers do; data comes through PartyModel.
 --
 --   1 leader of three: Invite hover / pressed, an invite on its way (busy),
---     Invited (D18), Ready / Not Ready tags, Leave Party, CloseX hover,
---     CLOSE pressed, the Ready toggle waiting for the server
+--     Invited, the leader's crown (no tags), Leave Party, CloseX hover, CLOSE
+--     pressed
 --   2 a full party (8/8): the 8th row scrolls (D5), Invite disabled, gamepad
---     focus on the Ready toggle
+--     focus on CLOSE
 --   3 a member (not the leader): an incoming invitation (Accept / ✕), the
 --     search greyed, "Only the party leader can invite players."
---   4 alone with nobody else in the lobby, not ready, Created "—"
+--   4 alone with nobody else in the lobby, Created "—"
 --   5 a search with no match, the search box focused, Invite Friends shown
 --
 --   python3 art/ui/capture/capture.py party_states
@@ -52,8 +52,8 @@ local function candidate(id)
 	return { userId = id, name = NAMES[id], userName = NAMES[id] }
 end
 
-local function member(id, ready)
-	return { userId = id, name = NAMES[id], ready = ready }
+local function member(id)
+	return { userId = id, name = NAMES[id] }
 end
 
 -- Builds the window for `view`, lets `after(window)` force states, dumps a page.
@@ -95,15 +95,13 @@ page({
 		id = "p1",
 		leader = 1,
 		createdAt = NOW - 5 * 60 - 10,
-		members = { member(1, true), member(4, false), member(5, true) },
+		members = { member(1), member(4), member(5) },
 		invited = { 3 },
 	},
 	invites = {},
-	ready = true,
 	maxSize = 8,
 }, { candidate(2), candidate(3), candidate(6), candidate(7) }, {
 	pendingInvites = { [6] = true },
-	readyPending = false,
 }, function(window)
 	force({ root = inviteButton(window, 2) }, "hover")
 	force({ root = inviteButton(window, 7) }, "pressed")
@@ -114,15 +112,14 @@ end)
 -- 2. Full party ----------------------------------------------------------------------------
 local full = {}
 for id = 1, 8 do
-	table.insert(full, member(id, id % 3 ~= 0))
+	table.insert(full, member(id))
 end
 page({
 	party = { id = "p1", leader = 1, createdAt = NOW - 2 * 3600 - 5, members = full, invited = {} },
 	invites = {},
-	ready = true,
 	maxSize = 8,
 }, { candidate(9), candidate(10) }, {}, function(window)
-	force(window.readyButton, "focused")
+	force(window.closeButton, "focused")
 end)
 
 -- 3. A member, with an invitation from another party ------------------------------------
@@ -131,20 +128,19 @@ page({
 		id = "p2",
 		leader = 2,
 		createdAt = NOW - 40,
-		members = { member(2, true), member(1, false) },
+		members = { member(2), member(1) },
 		invited = {},
 	},
 	invites = { { partyId = "p3", from = "Emberwick", fromUserId = 4 } },
-	ready = false,
 	maxSize = 8,
 }, {}, {})
 
 -- 4. Alone, nobody else here ---------------------------------------------------------------
-page({ party = nil, invites = {}, ready = false, maxSize = 8 }, {}, {})
+page({ party = nil, invites = {}, maxSize = 8 }, {}, {})
 
 -- 5. Search with no match, Invite Friends --------------------------------------------------
 page(
-	{ party = nil, invites = {}, ready = false, maxSize = 8 },
+	{ party = nil, invites = {}, maxSize = 8 },
 	{ candidate(2), candidate(3) },
 	{ query = "zz", friends = true },
 	function(window)

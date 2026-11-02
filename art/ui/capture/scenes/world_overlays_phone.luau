@@ -1,5 +1,5 @@
 -- The world overlays on a phone held sideways (844 × 390, touch only): the
--- banner column, boosts and save status at the HUD's phone scale, the loot and
+-- banner column and boosts at the HUD's phone scale, the loot and
 -- tribe windows fitted to the whole height, the build palette, and the world
 -- menu. Real controllers, mocked remotes, sample data as in world_overlays.
 --
@@ -18,6 +18,8 @@ workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
 UserInputService.MouseEnabled = false
+-- A phone's top bar: Roblox's menu and chat buttons take its left end.
+game:GetService("GuiService").TopbarInset = Rect.new(112, 0, W - 12, 58)
 workspace:SetAttribute("FlintbornPlaceRole", "World")
 game:GetService("Debris").AddItem = function() end
 
@@ -63,7 +65,6 @@ local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
 local started = {}
 for _, name in
 	{
-		"SaveStatusController",
 		"TutorialController",
 		"DownedController",
 		"BoostHudController",
@@ -95,7 +96,9 @@ check(
 -- Shown for three seconds when the run starts (the world menu's toast).
 find("Transition").Visible = false
 
+-- The profile's save state draws no indicator (the server still saves).
 player:SetAttribute("SaveStatus", "Saving")
+check(find("SaveStatus") == nil, "no save-status indicator")
 events.TutorialChanged.OnClientEvent:Fire({
 	id = "Gather",
 	index = 3,
@@ -112,6 +115,19 @@ local xpAmount, xpUntil = BoostRules.Attributes("XP")
 player:SetAttribute(xpAmount, 0.25)
 player:SetAttribute(xpUntil, 581)
 RunService.Heartbeat:Fire(1)
+check(find("BoostList").Visible, "the boosts show")
+-- The boosts grow up from the bottom-left corner beside the world ⚙
+-- (SettingsController places it there on the HUD's scale, ARCHITECTURE D30):
+-- G right of it (or its touch pad) and M above the bottom edge.
+do
+	local Kit = require(Client.Hud.Kit)
+	local SettingsController = require(Controllers.SettingsController)
+	local hudGui, hudRoot = __screen(W, H)
+	Kit.Scale.Hud(hudGui, hudRoot)
+	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
+	local at = SettingsController.GearPosition(__hudScreen(W, H, k, true))
+	__checkBoosts("world_overlays_phone", find("BoostList"), at, k, Theme.HudScale(gui), W, H, check)
+end
 __dump(gui, W, H, BG)
 
 player:SetAttribute("Downed", false)

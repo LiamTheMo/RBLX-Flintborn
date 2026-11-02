@@ -1,5 +1,7 @@
 # The UI kit (`src/client/Hud/Kit`)
 
+> New here? Read [STYLE_GUIDE.md](STYLE_GUIDE.md) first: the look, tokens, components, art pipeline and QA in one place; this file is the API reference.
+
 Every screen is built from these components and nothing else (ARCHITECTURE §12
 D15). Screens never name sprites, colours or fonts: they pick components, roles
 and tokens. This document is the API reference; `docs/ui/ARCHITECTURE.md` §2 is
@@ -14,8 +16,8 @@ screen:Watch()
 screen:Open()
 ```
 
-Galleries: `art/ui/captures/kit_gallery.png` and `kit_gallery_2.png` … `_6.png`
-(every component in every state), `kit_gallery_*_fallback.png` (the stand-ins
+Galleries: `art/ui/captures/kit_gallery.png` and `kit_gallery_2.png` … `_9.png`
+(every component in every state; page 9 the sheet-21 Play art, §15), `kit_gallery_*_fallback.png` (the stand-ins
 drawn before upload) and `kit_gallery_flow.png` (a window with a dialog and the
 toast column). Rebuild them with:
 
@@ -34,12 +36,12 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `Kit/init.luau` | Re-exports everything below |
 | `Kit/Tokens.luau` | `Color(key)`, `Tint(key)`, `Font(key)`, `TextStyle(role)`, `Space(key)`, `Scale(key)`, `Motion(key)` (TweenInfo), `Order(key)`, `Veil()`, `Sound(key)` |
 | `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemSprite`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
-| `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `Signal`, `Maid` |
+| `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `TextFloor`, `Dim` (also `Kit.Dim`), `SetRestFade`, `Signal`, `Maid` |
 | `Kit/Interact.luau` | The shared state machine (`attach`) |
 | `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Stop`, `Pulse`, `Reduced()` |
 | `Kit/Sound.luau` | `Play(key)` (silent while the token id is empty, D14) |
-| `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)`, `Window(screen)`, `IsSmallTouch(h)` |
-| `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore, blur |
+| `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)` (small windows capped on phones, §16), `Window(screen)`, `IsSmallTouch(h)` |
+| `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore (a window's ✕ gives way to its first content control), blur, Roblox touch controls hidden while open |
 | `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)`, `Find(root, role)` |
 | Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Picture Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
 
@@ -76,7 +78,7 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 |---|---|---|
 | `normal` | — | normal art |
 | `hover` | MouseEnter while the mouse is the input (`Interact.UsingMouse`) | hover art, else normal art tinted `tints.hover` (0.93); tiles, slots, icon buttons and pills scale to 1.03 |
-| `focused` | gamepad `SelectionGained` | as hover (the selection image is an empty frame) |
+| `focused` | gamepad `SelectionGained` | normal art with the gold focus ring (the selection image, §12); scales to 1.03 where hover does |
 | `pressed` | `InputBegan` (MouseButton1, Touch, ButtonA) until its `InputEnded`; leaving the button or releasing anywhere else cancels | pressed art, else tint 0.80; scale 0.96, Back-out release |
 | `selected` | `:SetSelected(true)` | selected art (gold glow on slots, rows, side tabs; leather on tabs) |
 | `disabled` | `:SetEnabled(false)` | disabled art, else tint 0.72; `Interactable = false`, `Selectable = false` |
@@ -105,8 +107,10 @@ Flows can also fire real events (the capture env's signals are fireable):
 ## 4. Tokens (`KitTokens.json`)
 
 - `colors`: the palette of ARCHITECTURE §3.2, plus `veil` `#050403`,
-  `white`/`black`, and tints laid over art: `leaderTint` (Leader tag gold),
-  `checkTint` (M03 gold checkbox), `notReadyTint`.
+  `white`/`black`, and tints laid over art: `leaderTint` (the Badge "leader"
+  plaque, unused by the party since D24), `checkTint` (M03 gold checkbox),
+  `emptyIconTint` (#78746E, an empty vital's greyed icon), the leather tones
+  and the later additions (STYLE_GUIDE.md §3 lists every token with its use).
 - `veil`: colour key and `BackgroundTransparency` **0.30** (D8, as updated).
 - `tints`: grey multipliers for borrowed state art (hover 0.93, pressed 0.80,
   disabled / locked 0.72).
@@ -134,10 +138,12 @@ Flows can also fire real events (the capture env's signals are fireable):
   wider than the mockup face (the specs' "width-matched" sizes). A screen that
   must hit a spec number passes `textSize` / `size` to the component.
 - `space`: windowPad 24, colGap 14, sectionHeaderH 34, row heights (52, 64, 72,
-  36), slot 90 / pitch 99, hotbar 86 / 97, tile 86, touchMin 44, window header
+  36), slot 90 / pitch 99, hotbar 86 / 97, tile 86, touchMin 44, minTextPx 9
+  (screen px), minTextDesign 12 (design px, `Core.TextFloor`), window header
   100, close button 60 inset 22, toast 430 × 84, tooltip max 300 …
 - `scale`: HUD 0.34–1.6, windows 0.3–1.4, phone height 500 (× 0.9 for the HUD),
-  hover 1.03, pressed 0.96, window pop from 0.94.
+  touchSmallMax 1.25 (a small window's scale on phones, §16), hover 1.03,
+  pressed 0.96, window pop from 0.94.
 - `motion`: hover 0.12 Quad Out, press 0.07, release 0.18 Back Out, windowOpen
   0.22 Quint Out, windowClose 0.15 Quad In, toastIn 0.25 / toastOut 0.2, bar
   0.25, count 0.4, knob 0.12, pulse 0.6, reducedFade 0.1.
@@ -149,7 +155,7 @@ Flows can also fire real events (the capture env's signals are fireable):
 ## 5. Roles (`KitModel.ROLES`)
 
 The one place a role names its art. States without their own sprite borrow
-(`KitModel.ART_FALLBACK`: focused / capturing / open → hover, locked / busy →
+(`KitModel.ART_FALLBACK`: capturing / open → hover, locked / busy →
 disabled) or draw the normal sprite tinted. `grow` draws a state's sprite larger
 per side (glow rings outside the plate: slot and side-tab selected +3 px, row
 selected +2 px, tile selected +3 px). `material` picks the stand-in.
@@ -197,7 +203,7 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `dropdown.list` | `lk_tooltip` | — | paper |
 | `field.value` | `lk_button_paper_small_normal` | — | paper |
 | `hud.leaf` | `lk_emblem_leaf` | — | glyph |
-| `hud.playerCard` | `lk_player_card` | — | paper |
+| `hud.rune` | `lk_emblem_rune` | — | glyph ◆ (placed as stored) |
 | `iconButton.close` | `lk_button_close_normal` | disabled `lk_button_close_disabled`, hover `lk_button_close_hover`, pressed `lk_button_close_pressed` | leather |
 | `iconButton.dropdown` | `lk_dropdown_button` | — | paper |
 | `iconButton.hud` | `lk_button_hud` | selected `lk_button_paper_small_hover` | paper |
@@ -238,10 +244,8 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `scroll.track` | `lk_scroll_track` | — | track |
 | `search.field` | `lk_search` | — | paper |
 | `slider.fill` | `lk_bar_fill_yellow` | — | fill |
-| `slider.knob` | `lk_button_paper_small_normal` | — | paper |
-| `slider.knobRound` | `lk_slider_knob` | — | dot |
+| `slider.knob` | `lk_button_square_paper` | — | paper |
 | `slider.track` | `lk_bar_track` | — | track |
-| `slider.trackPaper` | `lk_slider_track` | — | paper |
 | `slot.hotbar` | `lk_slot_normal` | disabled `lk_slot_disabled`, hover `lk_slot_hover`, locked `lk_slot_locked`, selected `lk_slot_selected` | slot |
 | `slot.item` | `lk_slot_item_normal` | disabled `lk_slot_disabled`, locked `lk_slot_locked`, selected `lk_slot_item_selected` | slot |
 | `slot.tile` | `lk_tile_blank` | — | slot |
@@ -260,8 +264,16 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `window.plaque` | `lk_plaque_paper` | — | paper |
 | `window.rule` | `lk_divider_line` | — | rule |
 
-Icons are not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, then
-`lk_glyph_<id>` (square buttons prefer the glyph). `"ink:<id>"` and
+| `icon.playRune` | `lk_icon_play_rune` (fallback icon `portal`) | — | glyph ▶ |
+| `mark.playRune` | `lk_icon_play_rune_small` (fallback `lk_glyph_play`) | — | glyph ▶ |
+| `deco.pillarLeft` | `lk_pillar_rune_left` | — | deco (nothing) |
+| `deco.pillarRight` | `lk_pillar_rune_right` | — | deco (nothing) |
+
+Icons are mostly not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, then
+`lk_glyph_<id>` (square buttons prefer the glyph). A role name is also an icon
+id (`icon = "icon.playRune"` on Kit.Icon, IconButton, Window or Button): it
+draws the role's sprite, or the role's `fallback` icon while that sprite has
+no art yet (§15). `"ink:<id>"` and
 `"white:<id>"` name the flat glyphs (§10). Item art comes from
 `ItemInfo.Icon(itemId)` (icon name and optional tint, the one item-to-art
 source) through `ItemInfo.Sprite`, then `lk_item_<id>` / `item_<id>`, then the
@@ -298,12 +310,13 @@ screen.Closed:Connect(function() PartyController.OnClosed() end)
 `:Body()`, `.bodyRect`, `:SetTitle(text)`, `.close` (IconButton), `.title`.
 Banner: icon 76 px at (40, 12), title at x 140 in `windowTitle`, subtitle in
 `subtitleHand`, underline rule at y 80 up to the close button. Plaque (M05): the
-title on `window.plaque` at top left. Centered (M04): the title centred with two
+title on `window.plaque` at top left (no screen uses it since D25: the Play
+window has Inventory's banner header). Centered (M04): the title centred with two
 ornament icons (`tree` by default, D19) and a full rule. The close button sits
 22 px in from the top-right corner and closes the screen (or calls `onClose`).
 ```lua
 local window = Kit.Window.new(screen, { title = "Ancestral Forge", smallCaps = true,
-    subtitle = "Turn raw materials into tools for the island.", icon = "anvil_hammer", clasps = true })
+    subtitle = "Turn raw materials into tools for the island.", icon = "anvil", clasps = true })
 ```
 
 ### Panel / SectionHeader
@@ -312,6 +325,8 @@ local window = Kit.Window.new(screen, { title = "Ancestral Forge", smallCaps = t
 (columns, detail card); card = leather corners; plaque = paper title plaque
 (`text` centred in `detailTitle`, M05 "Shattered Crater").
 `Kit.SectionHeader.new(parent, {rect, text, icon?, count?, rule = true})` → `:SetText`, `:SetCount`.
+The label keeps its (phone-boosted) size when it fits the header's width, else
+it shrinks to fit; it never ends in "…" (STYLE_GUIDE §4.6). `:SetText` fits again.
 ```lua
 local party = Kit.Panel.new(body, { rect = { 0, 0, 360, 445 }, title = "Your Party", icon = "party", count = "1/8", scroll = true })
 ```
@@ -387,10 +402,24 @@ Kit.Checkbox.new(page, { rect = { 0, 230, 380, 50 }, label = "Show Damage Number
 `Kit.Toggle.new(parent, {rect = 89 × 49, on, onToggle(on)})`; `:Set(on)`, `:SetEnabled`.
 
 ### Slider
-`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, knob = "plate" | "round", track = "dark" | "paper", onChange(v)})`;
-`:SetValue(v)` (no callback), `:SetEnabled`. Dark track with the yellow fill
-and a paper knob (M03); drag, track press, or gamepad left / right while
-selected.
+`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, onChange(v), selectable = true, touchBand = false})`;
+`:SetValue(v)` (no callback), `:SetEnabled`. Every slider has one look: the
+dark track (14 px) with the yellow fill, and the square parchment knob with
+leather corners (`lk_button_square_paper`, 60 × 58) drawn whole at its own
+aspect, 8 px past the track above and below (31 × 30; a slider shorter than
+30 px keeps it inside its height). The knob is never 9-sliced or stretched,
+so its rim and corners keep their shape at any size. The older `knob` and
+`track` props are still accepted and ignored. Drag, track press, or gamepad
+left / right while selected. `selectable = false` keeps it out of gamepad
+selection (a stepper beside it does the job: the Market's Sell rows);
+`touchBand = true` grows the drag band to 44 screen px tall on touch screens
+at the slider's real scale (the layout must leave room). Inside a scrolling
+list a touch waits until it has moved `Slider.DRAG_SLOP` (10) screen px
+(`KitModel.DragAxis`): mostly sideways, the slider takes the drag and turns
+the list's `ScrollingEnabled` off (and puts back the scroll the list had when
+the finger landed) until the finger lifts; mostly up or down, the list
+scrolls and the value stays; a tap sets the value where it lands. The mouse
+drags at once.
 ```lua
 Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1, value = 50,
     format = function(v) return ("%.1f"):format(SettingsRules.MouseSensitivity(v)) end, onChange = set })
@@ -409,7 +438,9 @@ Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1,
 
 ### Stepper
 `Kit.Stepper.new(parent, {rect, min = 1, max, value, step = 1, allLabel?, onChange(v)})`;
-`:SetValue`, `:SetRange(min, max)`. − / + disable at the limits.
+`:SetValue`, `:SetRange(min, max)`. − / + disable at the limits. On touch their
+hit pads grow only halfway to the next button (`padLimit`), so −, + and All
+never overlap.
 
 ### KeyCap
 `Kit.KeyCap.new(parent, {text, rect = {x, y, 0, h} (0 fits the text) | height, variant = "cap" | "flat", onPress?})`;
@@ -427,7 +458,13 @@ The art keeps its own thickness, centred on the rect's mid-line.
 `:SetEnabled`, `:SetState("normal" | "locked" | "disabled")`. Selected = gold
 glow plate (M06 / M07); locked = disabled plate + lock. "line" has no plate:
 label left, value right, a rule under (detail rows). Not-enough counts:
-`valueColor = "short"`.
+`valueColor = "short"`. `fitTitle = true` fits the title to its box with
+`Kit.Core.FitText` instead of ending it in "…": its role size when it fits,
+else shrunk, never below `Kit.Core.FitFloor()` (`space.minTextDesign` 12,
+and the phone text floor on phones); with `titleLines = 2` it then wraps onto
+two balanced lines where the box is tall enough; only past that is it cut
+(the tooltip shows it whole). `:FitTitle()` fits it again after a screen
+moves or resizes the title.
 ```lua
 Kit.ListRow.new(list, { size = { 300, 72 }, layoutOrder = i, variant = "card", icon = "pickaxe",
     title = "Iron Pickaxe", subtitle = "Pickaxe · Tier 3", chevron = true, onPress = pick })
@@ -435,7 +472,11 @@ Kit.ListRow.new(list, { size = { 300, 72 }, layoutOrder = i, variant = "card", i
 
 ### PlayerRow
 `Kit.PlayerRow.new(parent, {rect | size, userId?, name?, level?, leader?, badge? ("leader" | "ready" | "notReady"), action? ({label, onPress, variant?, enabled?}), empty?, emptyText?, rule = true, frame?, onPress?})`;
-`:Set(data)` redraws, `:SetSelected`, `:SetLevel(level?, progress?)`. The
+`:Set(data)` redraws, `:SetSelected`, `:SetLevel(level?, progress?)`.
+`nameSize` / `levelSize` never go under 12 design px (`Core.TextFloor`); when
+the (phone-boosted) name and level overflow their lines at 10 % / 54 % of the
+row, the two lines sit as one block centred in the row, so every row has the
+same name-to-level pitch. The
 empty row is a muted disc and "Empty Slot". The headshot fills its box with no
 frame or backdrop (`frame = "none"`, `backdrop = false` by default; pass
 `frame = "square"` for the old framed look). `levelBar = true` (compact rows
@@ -444,13 +485,15 @@ too) puts "LV. n" and a small XP bar (Bar, `track` frame, `xp` fill,
 follow the player's replicated `Level` / `LevelProgress` attributes while
 they are in the server (attribute signals, no polling), else the props.
 ```lua
-Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = level, leader = isLeader, badge = if ready then "ready" else "notReady" })
+Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = level, leader = isLeader })
 ```
 
 ### Badge
 `Kit.Badge.new(parent, {variant = "leader" | "ready" | "notReady" | "count" | "number" | "new" | "dot", text?, rect = {x, y, 0, h} (0 fits the text), anchor? = "topRight"})`;
-`:SetText`, `:SetVisible`. Ready = green dot + "Ready", Not Ready = grey dot +
-"Not Ready" (D18).
+`:SetText`, `:SetVisible`. "ready" = green dot on the light green pill,
+"notReady" = grey dot on the value pill: generic set / not-set status pills
+(trade lock). The party no longer uses them or the "leader"
+plaque (D24): the leader is marked by the crown alone. `readyPill` is removed.
 
 ### CurrencyPill
 `Kit.CurrencyPill.new(parent, {rect = 112 × 46, currency = "coins" | "gems", value, onPress?})`;
@@ -477,10 +520,17 @@ the RichText small caps; `Kit.Text.Width(text, role, size?)` measures.
 The kit rail and thumb follow `CanvasPosition`; the native bar is hidden.
 
 ### Toast
-`Kit.Toast.Show({kind = "quest" | "item" | "info" | "warn", title, text?, icon?, duration = 4, onPress?, onClose?, actions? = {{label, onPress, variant?}}})`
+`Kit.Toast.Show({kind = "quest" | "item" | "info" | "warn", title, text?, icon?, duration = 4, onPress?, onClose?, actions? = {{label, onPress, variant?}}, actionsBelow?})`
 → handle `{Close, toast}`. Up to three stacked top-centre in `KitToasts`
-(DisplayOrder 40); the oldest goes first; each slides 24 px and fades.
-`Kit.Toast.new(parent, props)` draws one card in place.
+(DisplayOrder 40); the oldest goes first; each slides 24 px and fades part by
+part (no CanvasGroup: a group draws its text through a texture, soft under the
+column's fractional scale). The line is body text at `Toast.LINE_SIZE` (15,
+boosted on phones) and never shrinks: a long line wraps to a second line and
+the card grows; two lines wrap at the balanced width
+(`Toast.BalancedWidth`), so line 2 never holds one lone word. Actions sit beside the text when the line fits there, else on a
+row under it, right-aligned (the first action rightmost); `actionsBelow`
+forces either. `toast.h` is the card's height; `Toast.Layout(props, w, h)`
+gives the layout. `Kit.Toast.new(parent, props)` draws one card in place.
 
 ### ConfirmDialog
 `Kit.ConfirmDialog.Show({title, text? | build?(body, w, h), confirmLabel = "Confirm", cancelLabel = "Cancel", danger?, holdSeconds?, onConfirm(dialog), onCancel?, size? = {560, 330}})`
@@ -502,12 +552,31 @@ Shows on mouse hover, a 0.5 s touch hold and gamepad selection, in `KitTooltip`
 ### Modal, Scale, Interact (for screen code that needs them)
 - `Kit.Modal.Open(entry, layer, gamepad?)`, `Closed(entry)`, `Top()`, `Count()`,
   `IsOpen(entry)`, `Back()`. Screens do this themselves; call `Back()` from a
-  custom back button.
+  custom back button. `DefaultFor(entry)` is the control gamepad selection
+  opens on: the screen's default, except that a window's ✕ (`KitWindowClose`)
+  gives way to `FirstControl(window)`, the first shown, selectable button in
+  reading order. While anything is open on a touch screen,
+  `GuiService.TouchControlsEnabled` is false (the prior value comes back when
+  the stack empties; `TouchControlsHidden()`).
 - `Kit.Scale.Hud(gui, root, {refW?, refH?})` → stop function; sizes `root` to
   1/scale and keeps the HUD scale (`HudModel.HudScale`, × 0.9 on short touch
-  screens). `Kit.Scale.TopInset(gui)` replaces `Parchment.TopInset`.
-- `Kit.Interact.attach(base, {onPress, onLocked, render(state, ctrl), pad, hoverScale, pressScale, selectable, sound, debounce, hit})`
-  for a custom interactive part built on `Kit.Core.Root`.
+  screens; `Kit.Scale.HudScaleOf(gui)` returns that scale without a root, for
+  a gui that lines up with the HUD, such as the run's boost list).
+  `Kit.Scale.TopInset(gui)` replaces `Parchment.TopInset`. The HUD grid's
+  placement (margin, gap, columns; ARCHITECTURE D30) is `Hud/Layout`'s, not
+  the Kit's.
+- `Kit.Interact.attach(base, {onPress, onLocked, render(state, ctrl), pad, padLimit, hoverScale, pressScale, selectable, sound, debounce, hit})`
+  for a custom interactive part built on `Kit.Core.Root`. `padLimit = {left?,
+  top?, right?, bottom?}` caps how far the touch pad grows on each side (design
+  px; half the gap to a neighbour), also a prop of Button and IconButton.
+- `Kit.Dim(target, amount)` (`Kit.Core.Dim`) dims a picture and every image
+  and text label under it by `amount` (0 undims), composed with the
+  transparency each part rests at, so the faded "picture missing" glyph
+  (`Art.STAND_IN_FADE`) stays faded: `1 − (1 − rest) × (1 − amount)`. The rest
+  value is the part's `KitRestFade` attribute, else its transparency when first
+  dimmed (`Core.SetRestFade` sets one). Use it instead of writing
+  `ImageTransparency` on item art (Slot, ListRow, Tab, Button and IconButton
+  do).
 
 ## 7. Before upload: stand-ins
 
@@ -527,11 +596,11 @@ from `art/ui/sprites/manifest.json` until then.
 
 | Where | Mockup | Kit |
 |---|---|---|
-| Slider knob (M03) | small paper knob | `lk_button_paper_small_normal` at 23 × 26 (`knob = "round"` for the sheet-09 ball) |
+| Slider knob (M03) | small paper knob (23 × 26) | `lk_button_square_paper` drawn whole at 31 × 30: a larger parchment knob with leather corners that never squashes (owner feedback) |
 | Slider track (M03) | dark track, yellow fill | `lk_bar_track` + `lk_bar_fill_yellow` |
 | Ticked checkbox (M03) | gold box | `lk_checkbox_on` tinted `checkTint` (variant "gold") |
-| Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` |
-| Ready tag (M04) | yellow-green pill | `lk_pill_value` (untinted: a multiply tint cannot lighten green) + `lk_dot_green` |
+| Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` (Badge "leader"; the party no longer shows it, D24) |
+| Ready tag (M04) | yellow-green pill | flat `badge.ready` pill + `lk_dot_green` (generic status pill; no party Ready since D24) |
 | Not Ready dot | grey dot | `lk_dot_brown` |
 | Empty party slot dot | muted disc | native flat tan disc (`portrait.empty`, by request) |
 | Party header trees (M04) | tent and trees | `lk_icon_tree` ornaments |
@@ -553,8 +622,7 @@ from `art/ui/sprites/manifest.json` until then.
   (side by side) and `_overlay.png` (50 % blend) and prints the mean difference;
   `--page n` writes one page; `--suffix` tags outputs.
 - **Not drawn in captures:** `Rotation` (the tooltip's top tail is the bottom
-  tail rotated: it draws pointing down), CanvasGroup `GroupTransparency` (toast
-  fades), BlurEffect, tween motion (tweens finish at once), and symbol glyphs
+  tail rotated: it draws pointing down), CanvasGroup `GroupTransparency`, BlurEffect, tween motion (tweens finish at once), and symbol glyphs
   Merriweather lacks (★ draws as a box; Roblox falls back to another font in
   game). Absolute sizes are zero, so `Scroll` sizes its thumb from
   `contentHeight` and the slider drag maths runs only in game.
@@ -623,15 +691,15 @@ slots). Art and tint always come from `ItemInfo.Icon`.
 untinted only when ItemInfo has no art.
 
 **Picture** (new): `Kit.Picture.new(parent, {rect, role, tint?, exact?})`,
-`:SetState`. Draws a role as a picture: `hud.playerCard` (lk_player_card),
-`hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
+`:SetState`. Draws a role as a picture: `hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
 lk_window_frame), `map.island` (pm_map_island).
 
 **New roles**: `divider.ink`, `divider.hairline`, `row.soft`, `check.ringOff`
 (lk_ring_track), `check.ringOn` (lk_ring_full), `scroll.thinTrack`,
-`scroll.thinThumb`, `hud.playerCard`, `hud.leaf`, `panel.party`, `map.island`;
+`scroll.thinThumb`, `hud.playerCard` (removed in §16: never drawn in game),
+`hud.leaf`, `panel.party`, `map.island`;
 `portrait.empty` is now the native tan disc. Native roles (`native = true`)
-draw as flat kit shapes by design. New colour tokens: `emptyDot` #DFB791,
+draw as flat kit shapes by design. New colour tokens: `emptyDot` (now #CC9F77, §11),
 `hairline` #EECBA4, `railTrack`, `railThumb` (sampled from M01 / M04).
 
 **Flat glyphs** (`"ink:<id>"`, `"white:<id>"`; built from lk_ icons by
@@ -639,9 +707,8 @@ draw as flat kit shapes by design. New colour tokens: `emptyDot` #DFB791,
 gears, people, magnifier, check, anvil, book, trophy, map_pin, backpack, chest,
 hammer, compass, and stand-ins where the sheets have no such drawing:
 `gamepad` (compass), `speaker` (speech bubble), `monitor` (map), `refresh`
-(compass arrow), `info` ("!", no circled i). The asset artist still has to add
-these 34 PNGs to `manifest.json` and an atlas group (the script prints the
-entries).
+(compass arrow), `info` ("!", no circled i). They are in `manifest.json` and
+packed in `atlas_lk_icons` (`glyphs.py` prints the entries for new ones).
 
 **Touch**: on touch screens each control's invisible hit pad grows until it
 covers at least 44 screen px at the window's real scale (no visual change).
@@ -650,7 +717,9 @@ covers at least 44 screen px at the window's real scale (no visual change).
 the whole screen height, over the top bar and HUD, at the largest scale that
 fits (4 px margin). At 844 × 390: Inventory 0.586, Journal (1172 × 688) 0.555,
 Party (1136 × 642) 0.595, Play (1064 × 675) 0.566, Forge (1102 × 682) 0.560,
-Settings (1110 × 666) 0.574, ConfirmDialog (560 × 330) 1.158. A 15 px body
+Settings (1110 × 666) 0.574, ConfirmDialog (560 × 330) 1.158. (Sizes of this
+round; Play is 1187 × 650 since D25 and windows stay below the top bar since
+fix round 3, so today's phone scales are lower: Play 0.508 at 844 × 390.) A 15 px body
 line is then about 8.5 screen px; the 9 px floor applies to scaled labels only,
 so phone-critical text should use `scaled = true` or larger sizes.
 
@@ -759,7 +828,7 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   a gold focus ring (the selection image, inset to the visible control) over the
   normal art. Dropdowns move selection into their options and back.
 - **Touch**: SearchBox / TextField boxes grow to 44 screen px tall on touch.
-- **Colour**: leather sprites draw under `leatherTint` (#D1D4FF; buttons now
+- **Colour**: leather sprites draw under `leatherTint` (then #D1D4FF, now #DEFFFF, §14; buttons now
   ΔE ≈ 1 vs M04's CLOSE). The HUD card, currency pill and XP track differ in
   blue (the art is more saturated than the mockup); a multiply tint cannot add
   blue, so those need recoloured art.
@@ -782,7 +851,7 @@ The value text is centred in the track, over the fill and the empty part, in
 cream with a 2 px ink outline (`textSize` overrides its size). The baked value
 plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
 
-## 13. Fix round 4
+## 14. Fix round 4
 
 - **Items without art**: the kind glyph (tools and weapons a hammer, armour a
   backpack, the rest a chest) draws faded (`Art.STAND_IN_FADE`, 0.6) in ink,
@@ -804,3 +873,54 @@ plaque (`lk_statbar_frame`, role `bar.stat`) is no longer drawn.
   shows it whole in a tooltip.
 - **SectionHeader** labels shrink to fit (the phone boost no longer truncates).
 - **Art.Icon** `transparency`; **Plate** `:SetTone`.
+
+## 15. Play rune art (sheet 21, ARCHITECTURE D26)
+
+- **Roles**: `icon.playRune` (`lk_icon_play_rune`, 89 × 116) is the Play
+  tile's and the Play window header's icon; `mark.playRune`
+  (`lk_icon_play_rune_small`, 50 × 64) the PLAY button's crystal glyph;
+  `deco.pillarLeft` / `deco.pillarRight` (`lk_pillar_rune_left` 88 × 160 /
+  `_right` 87 × 160) the rune pillars at the button's ends, drawn with
+  `Kit.Picture` and dimmed with `:SetState("disabled")`.
+- **`fallback`** (role field): the icon id drawn while the role's sprite has no
+  art (not uploaded): `portal` for `icon.playRune`, `lk_glyph_play` for
+  `mark.playRune`. `Art.IconSprite` resolves role names and applies it.
+- **Material `deco`**: decorations draw no stand-in at all (no plate, stroke or
+  glyph) until their art arrives, and are placed as stored (`edge = false`).
+- **Atlas**: the four sprites are `atlas_lk_play` (1024 × 256), a group of
+  their own so the uploaded atlases keep their rects and bytes.
+- Usage and measurements: PlayScreen.md "Play rune art (D26)", LobbyScreen.md;
+  gallery page 9 (`kit_gallery_9.png`, `_fallback`).
+
+## 16. Fix round 5
+
+- **Stand-in fade kept**: dimming item art (a disabled slot, a locked row, a
+  locked recipe's big picture) composes with the "picture missing" glyph's
+  fade through `Kit.Dim` (§6 Modal, Scale, Interact) instead of resetting
+  `ImageTransparency` to 0, which drew the glyph solid black. Screens that dim
+  item art call `Kit.Dim(icon.root or icon.image, if dim then 0.4 else 0)`.
+- **Toast**: no CanvasGroup (per-part fades); the line is 15 design px (phone
+  boost on top), wraps to two lines instead of shrinking; the answer pair moves
+  under the line when it does not fit beside it (the trade invite).
+- **SectionHeader** shrinks to fit its width and never truncates (the world
+  HUD's FIND EXTRACTION on phones).
+- **Modal**: Roblox's thumbstick and jump button are hidden while any layer is
+  open on a touch screen; gamepad selection opens on a window's first content
+  control rather than its ✕.
+- **Phones**: a small window (ConfirmDialog 560 × 330, the world menu) draws at
+  most `scale.touchSmallMax` (1.25) × the scale of a typical window
+  (`phoneText.refWindow`) on the same screen, so it is not blown up to fill the
+  phone (ConfirmDialog at 844 × 390: 0.59, was 0.98; big windows unchanged).
+  `kit_gallery_flow_2.png` shows it.
+- **Text floor**: sizes the kit picks or takes from a screen (PlayerRow name
+  and level, the toast line, key caps) are at least 12 design px
+  (`space.minTextDesign`, `Core.TextFloor`); PlayerRow keeps one name-to-level
+  pitch in every row.
+- **Touch pads**: `padLimit` (Interact, Button, IconButton); Stepper's −, +
+  and All pads no longer overlap.
+- **Tokens and roles**: `emptyIconTint` (the empty vital icon, was a literal in
+  `Vitals`); `leaderTag` and `notReadyTint` removed (no reader); the
+  `hud.playerCard` role removed (the player card is not drawn in game; the
+  `lk_player_card` sprite stays sliced). HudLayout.json no longer carries
+  `colors`, `fonts` or `fontFaces`, and `Hud/Layout` no longer has `Color`,
+  `Font` or `FontFace` (nothing read them).

@@ -1,10 +1,16 @@
 -- Wallet, shops, merchant, offers and codes (GDD §10, §25.4.1, §36) in the
 -- kit Market window (Hud/ListWindow, docs/ui/ListWindows.md). The lobby shows
 -- Coins and Gems at all times (the window's header too); the Market tile opens
--- the window on a category tab: Shop, Sell, Offers (vault upgrades, perk
--- respec and Robux offers, each with its earnable equivalent next to it) and
--- Codes. Spending Coins, Gems or tokens asks first in a confirm dialog. Quests
--- live in the Journal. Lobby place only.
+-- the window on a category tab: Buy (the shop's stock), Sell, Offers (vault
+-- upgrades, perk respec and Robux offers, each with its earnable equivalent next
+-- to it) and Codes. Every Buy row has one Buy button; it opens a quantity
+-- dialog (a stepper and a slider kept in step, the total live) clamped to what
+-- the player can afford and carry (the server's maxQuantity). Every Sell row
+-- carries its own slider and stepper (1 to what it holds, the whole stack by
+-- default) with the total live beside its one Sell button, which sells that
+-- amount at once (a Forge reagent asks first). The server checks every amount
+-- again. Spending Gems or tokens asks first in a confirm dialog. Quests live in
+-- the Journal. Lobby place only.
 
 local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
@@ -23,9 +29,8 @@ local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local WalletController = {}
 
-WalletController.SELL_STEP = 10
 WalletController.TABS = {
-	{ id = "Shop", label = "Shop", icon = "market" },
+	{ id = "Buy", label = "Buy", icon = "market" },
 	{ id = "Sell", label = "Sell", icon = "coin" },
 	{ id = "Offers", label = "Offers", icon = "gem" },
 	{ id = "Codes", label = "Codes", icon = "gift" },
@@ -34,7 +39,7 @@ WalletController.TABS = {
 local player = Players.LocalPlayer
 local window = nil
 local wallet = nil
-local tab = "Shop"
+local tab = "Buy"
 -- Bumped by every render; a render that yielded and is no longer the latest drops.
 local renderToken = 0
 
@@ -70,6 +75,69 @@ local function updateWallet()
 	end
 end
 
+-- Asks how many packs of shop entry `entry` (at most `max`) and buys them.
+local function buyDialog(entry, max: number)
+	local pack = entry.quantity or 1
+	window:Quantity({
+		title = "Buy " .. entry.name .. "?",
+		itemId = entry.catalogId,
+		glyph = "market",
+		name = entry.name .. (if pack > 1 then (" ×" .. pack) else ""),
+		detail = ("%s Coins each%s. Goes to your lobby backpack."):format(
+			HudModel.Thousands(entry.price),
+			if pack > 1 then " pack" else ""
+		),
+		max = max,
+		each = entry.price,
+		currency = "coins",
+		confirmLabel = "Buy",
+		onConfirm = function(quantity)
+			local what = if pack > 1 or quantity > 1 then (" ×" .. pack * quantity) else ""
+			act(("Bought %s%s."):format(entry.name, what), "ShopBuy", entry.id, nonce(), quantity)
+		end,
+	})
+end
+
+-- How many each Sell row is set to sell, by row key, while the Sell tab stays
+-- open: {catalogId, quantity}. A redraw keeps a row's choice (within what is
+-- left); a sale resets its own row to everything left.
+local chosen = {}
+-- A sale in flight: further Sell presses wait for it.
+local selling = false
+
+local function sellKey(entry): string
+	return entry.source .. tostring(entry.key)
+end
+
+-- Sells `quantity` of sellable `entry` at once, then shows the outcome and
+-- redraws from the server's view. `button` shows busy meanwhile.
+local function sell(entry, quantity: number, button)
+	if selling then
+		return
+	end
+	selling = true
+	if button then
+		button:SetBusy(true)
+	end
+	-- A backpack sale names the slot's item, so a slot that changed meanwhile
+	-- sells nothing (the server checks).
+	local ok, result = invoke(
+		"MerchantSell",
+		entry.source,
+		entry.key,
+		quantity,
+		nonce(),
+		if entry.source == "backpack" then entry.catalogId else nil
+	)
+	selling = false
+	chosen[sellKey(entry)] = nil
+	window:SetStatus(
+		if ok then ("Sold %s ×%d."):format(entry.name, quantity) else ("Not done: " .. tostring(result)),
+		if ok then "good" else "warn"
+	)
+	render()
+end
+
 local function drawShop(view)
 	local coins = player:GetAttribute("Coins") or 0
 	window:Line("Starter supplies. Purchases go to your lobby backpack.")
@@ -86,10 +154,18 @@ local function drawShop(view)
 	for _, category in categories do
 		window:Section(category)
 		for _, entry in byCategory[category] do
+			-- The most one purchase can buy: the server's figure (Coins, backpack
+			-- room, its limit), never more than the Coins shown now cover.
+			local afford = math.floor(coins / entry.price)
+			local max = math.min(entry.maxQuantity or afford, afford, view.maxBuy or afford)
+			local detail = entry.note
+			if not entry.owned and afford >= 1 and max < 1 then
+				detail = (if detail then detail .. " " else "") .. "No room in your lobby backpack."
+			end
 			window:Row({
 				key = entry.id,
 				title = entry.name .. (if (entry.quantity or 1) > 1 then (" ×" .. entry.quantity) else ""),
-				detail = entry.note,
+				detail = detail,
 				icon = entry.catalogId,
 				glyph = if entry.catalogId then nil elseif category == "Titles" then "crown" else "market",
 				value = if entry.owned then nil else HudModel.Thousands(entry.price),
@@ -101,19 +177,19 @@ local function drawShop(view)
 						{
 							label = "Buy",
 							key = "Buy",
-							enabled = coins >= entry.price,
+							enabled = max >= 1,
 							onPress = function()
-								local what = entry.name
-									.. (if (entry.quantity or 1) > 1 then (" ×" .. entry.quantity) else "")
+								if entry.catalogId then
+									buyDialog(entry, max)
+									return
+								end
+								-- A title is bought once: a plain question.
 								window:Confirm(
-									("Buy %s for %s Coins? It goes to your lobby backpack."):format(
-										what,
-										HudModel.Thousands(entry.price)
-									),
+									("Buy %s for %s Coins?"):format(entry.name, HudModel.Thousands(entry.price)),
 									"Buy",
 									0,
 									function()
-										act("Bought " .. entry.name .. ".", "ShopBuy", entry.id, nonce())
+										act("Bought " .. entry.name .. ".", "ShopBuy", entry.id, nonce(), 1)
 									end,
 									{ title = "Buy " .. entry.name .. "?" }
 								)
@@ -135,57 +211,65 @@ local function drawSell(view)
 			heading = entry.source
 			window:Section(if heading == "vault" then "From your vault" else "From your lobby backpack")
 		end
-		local buttons, detail, value
-		if entry.source == "vault" then
-			-- The next SELL_STEP, and the whole stack (never for a Forge reagent,
-			-- which warns).
-			local step = math.min(WalletController.SELL_STEP, entry.quantity)
-			buttons = {
-				{
-					label = ("Sell %d"):format(step),
-					key = "Step",
-					onPress = function()
-						act("Sold.", "MerchantSell", "vault", entry.key, step, nonce())
-					end,
-				},
-			}
-			if entry.quantity > step and not entry.warning then
-				table.insert(buttons, {
-					label = "Sell All",
-					key = "All",
-					kind = "paper",
-					onPress = function()
-						act("Sold.", "MerchantSell", "vault", entry.key, entry.quantity, nonce())
-					end,
-				})
-			end
-			detail = ("%d in your vault"):format(entry.quantity)
-			value = ("%d each"):format(entry.each)
-		else
-			buttons = {
-				{
-					label = "Sell",
-					key = "Sell",
-					onPress = function()
-						act("Sold.", "MerchantSell", entry.source, entry.key, nil, nonce())
-					end,
-				},
-			}
-			value = tostring(entry.coins)
-		end
+		-- Each row picks its own amount (a slider and a stepper, from 1 to the
+		-- whole stack; whole by default, as one press sold before) and shows the
+		-- total by its one Sell button, which sells that amount at once.
+		local key = sellKey(entry)
+		local owned = entry.quantity or 1
+		local each = entry.each or entry.coins or 0
+		local kept = chosen[key]
+		local value = if kept and kept.catalogId == entry.catalogId then math.min(kept.quantity, owned) else owned
+		local detail = if owned > 1
+			then ("%s Coins each · %d %s"):format(
+				HudModel.Thousands(each),
+				owned,
+				if entry.source == "vault" then "in your vault" else "in your backpack"
+			)
+			else nil
 		if entry.warning then
 			detail = (if detail then detail .. ". " else "") .. entry.warning
 		end
-		window:Row({
-			key = entry.source .. tostring(entry.key),
-			title = entry.name
-				.. (if entry.source == "backpack" and entry.quantity then (" ×" .. entry.quantity) else ""),
+		window:QuantityRow({
+			key = key,
+			title = entry.name,
 			detail = detail,
 			icon = entry.catalogId,
 			glyph = "coin",
+			max = owned,
 			value = value,
-			valueIcon = "coin",
-			buttons = buttons,
+			each = each,
+			currency = "coins",
+			onChange = function(quantity)
+				chosen[key] = { catalogId = entry.catalogId, quantity = quantity }
+			end,
+			action = {
+				label = "Sell",
+				key = "Sell",
+				onPress = function(quantity, button)
+					if selling then
+						return
+					end
+					if entry.warning == nil then
+						sell(entry, quantity, button)
+						return
+					end
+					-- Something a Forge recipe needs (the server's warning): ask first.
+					window:Confirm(
+						("Sell %s ×%d for %s Coins? %s"):format(
+							entry.name,
+							quantity,
+							HudModel.Thousands(each * quantity),
+							entry.warning
+						),
+						"Sell",
+						0,
+						function()
+							sell(entry, quantity, button)
+						end,
+						{ title = "Sell " .. entry.name .. "?" }
+					)
+				end,
+			},
 		})
 	end
 	if heading == nil then
@@ -306,7 +390,7 @@ function render()
 		drawCodes()
 	elseif type(view) ~= "table" then
 		window:Line("Your data is still loading.", "ink")
-	elseif shown == "Shop" then
+	elseif shown == "Buy" then
 		drawShop(view)
 	elseif shown == "Sell" then
 		drawSell(view)
@@ -322,6 +406,7 @@ local function close()
 end
 
 local function open()
+	table.clear(chosen)
 	window:SetStatus("")
 	window:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
 	render()
@@ -336,11 +421,14 @@ local function build()
 		tabs = WalletController.TABS,
 		onTab = function(id)
 			tab = id
+			table.clear(chosen)
 			window:SetStatus("")
 			render()
 		end,
 		onClose = close,
 	})
+	-- For flows and verifiers (the Market window and its open question).
+	WalletController.window = window
 	-- Outside the new lobby HUD (which has its own currency pills), the kit's
 	-- Coins and Gems pills stay on screen at the top right.
 	if not HudMode.ReplacesLobby() then
@@ -375,9 +463,13 @@ function WalletController.Toggle()
 	end
 end
 
--- Opens the window on one tab ("Shop", "Sell", "Offers" or "Codes"), as the
--- lobby HUD's Shop tile does; pressing it again on that tab closes it.
+-- Opens the window on one tab ("Buy", "Sell", "Offers" or "Codes"; "Shop", the
+-- lobby HUD tile's id, opens Buy), as the lobby HUD's Market tile does; pressing
+-- it again on that tab closes it.
 function WalletController.Open(name: string)
+	if name == "Shop" then
+		name = "Buy"
+	end
 	if window.screen:IsOpen() and tab == name then
 		close()
 		return
@@ -388,6 +480,7 @@ function WalletController.Open(name: string)
 		end
 	end
 	if window.screen:IsOpen() then
+		table.clear(chosen)
 		window:SetStatus("")
 		render()
 	else

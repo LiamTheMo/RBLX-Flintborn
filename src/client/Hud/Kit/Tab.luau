@@ -126,7 +126,7 @@ function Tab:_render(state: string)
 			end
 			-- Art icons draw as given (a leather tab passes a white icon such as
 			-- "backpack_white"); a glyph stand-in turns cream on leather.
-			(self.icon :: ImageLabel).ImageTransparency = if state == "disabled" then 0.45 else 0
+			Core.Dim(self.icon, if state == "disabled" then 0.45 else 0)
 		elseif self.icon:IsA("TextLabel") then
 			(self.icon :: TextLabel).TextColor3 = Tokens.Color(if onLeather then "cream" else "ink")
 		end

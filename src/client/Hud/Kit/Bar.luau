@@ -18,6 +18,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
+local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Motion = require(script.Parent.Motion)
@@ -137,9 +138,9 @@ function Bar.new(parent: Instance, props)
 	local _, fh = Art.SizeOf(fillSprite)
 	local fillScale = well[4] / (fh or well[4])
 	self.minWidth = 24 * fillScale
-	-- The fill is a clipping frame as wide as the value over a sliced plate
-	-- never narrower than its two end caps: a low value (under about a fifth)
-	-- shows a short clipped stub instead of vanishing.
+	-- The fill is the full-length plate behind a clipping frame as wide as the
+	-- value: the bar is cut at the value, never squeezed, so its end caps and
+	-- texture keep their shape at every value.
 	self.fill = Core.Make("Frame", {
 		Name = "Fill",
 		BackgroundTransparency = 1,
@@ -156,6 +157,29 @@ function Bar.new(parent: Instance, props)
 	}, self.fill)
 	-- Built at the full well size, so the fill's caps scale with the bar's height.
 	Art.Plate(self.fillPlate, fillRole, well[3], well[4], { z = base.z + 1 })
+	-- The fill's own rounded, outlined right end, drawn at the cut so a clipped
+	-- fill still ends in an edge: a window onto the last `capW` px of a second
+	-- full-length plate.
+	local entry = fillSprite and UiAssets.sprite(fillSprite)
+	local sliceScale = fillSprite and Art.SliceScale(fillSprite, well[3], well[4])
+	local rightInset = entry and type(entry.slice) == "table" and entry.slice[3] or 12
+	self.capW = math.max(2, math.floor(rightInset * (sliceScale or fillScale) + 0.5))
+	self.cap = Core.Make("Frame", {
+		Name = "FillEnd",
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		Position = UDim2.fromOffset(well[1] + well[3] - self.capW, well[2]),
+		Size = UDim2.fromOffset(self.capW, well[4]),
+		ZIndex = base.z + 2,
+	}, base.visual)
+	self.capPlate = Core.Make("Frame", {
+		Name = "Plate",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(self.capW - well[3], 0),
+		Size = UDim2.fromOffset(well[3], well[4]),
+		ZIndex = base.z + 2,
+	}, self.cap)
+	Art.Plate(self.capPlate, fillRole, well[3], well[4], { z = base.z + 2 })
 	if props.text and frameKey ~= "stat" then
 		self.label = Core.Label(base.visual, {
 			name = "Value",
@@ -182,18 +206,30 @@ function Bar:Set(fraction: number, instant: boolean?)
 	self.root:SetAttribute("KitValue", fraction)
 	local width = KitModel.FillWidth(fraction, self.well[3], self.minWidth)
 	local visible = fraction > 0
-	local goal = { Size = UDim2.fromOffset(width, self.well[4]) }
-	local plateGoal = { Size = UDim2.fromOffset(math.max(width, self.minWidth), self.well[4]) }
+	-- The end piece shows the plate's last `cw` px, right-aligned to the cut;
+	-- the body stops inside it, so nothing shows past its rounded corners.
+	local cw = math.min(self.capW, width)
+	local goal = { Size = UDim2.fromOffset(math.max(0, width - math.ceil(cw * 0.6)), self.well[4]) }
+	local capGoal = {
+		Position = UDim2.fromOffset(self.well[1] + width - cw, self.well[2]),
+		Size = UDim2.fromOffset(cw, self.well[4]),
+	}
+	local capPlateGoal = { Position = UDim2.fromOffset(cw - self.well[3], 0) }
 	if instant then
 		Motion.Set(self.fill, goal)
-		Motion.Set(self.fillPlate, plateGoal)
+		Motion.Set(self.cap, capGoal)
+		Motion.Set(self.capPlate, capPlateGoal)
 		self.fill.Visible = visible
+		self.cap.Visible = visible
 		return
 	end
 	self.fill.Visible = true
-	Motion.Play(self.fillPlate, "bar", plateGoal)
+	self.cap.Visible = true
+	Motion.Play(self.cap, "bar", capGoal)
+	Motion.Play(self.capPlate, "bar", capPlateGoal)
 	Motion.Play(self.fill, "bar", goal, function()
 		self.fill.Visible = visible
+		self.cap.Visible = visible
 	end)
 end
 

@@ -61,14 +61,25 @@ Art.GLYPHS = {
 	invite = "+",
 	chevron_right = "›",
 	tree = "♣",
+	play_rune = "▶",
+	play_rune_small = "▶",
 }
 
 -- The sprite of an icon id: lk_icon_<id>, else lk_glyph_<id> (the flat glyph
 -- first when `preferGlyph`, as on square buttons), else the id itself when it
 -- already names a sprite. "ink:<id>" and "white:<id>" name the flat glyphs
 -- built by art/ui/capture/glyphs.py (lk_glyph_ink_<id>, lk_glyph_white_<id>).
--- nil when the kit has no such art.
+-- A role name ("icon.playRune") gives the role's sprite, or its `fallback`
+-- icon while that sprite has no art (not uploaded yet). nil when the kit has
+-- no such art.
 function Art.IconSprite(id: string, preferGlyph: boolean?): string?
+	local role = KitModel.ROLES[id]
+	if role and role.sprite then
+		if role.fallback and not Widgets.HasArt(role.sprite) then
+			return Art.IconSprite(role.fallback, preferGlyph) or role.sprite
+		end
+		return role.sprite
+	end
 	if string.sub(id, 1, 3) == "lk_" then
 		return id
 	end
@@ -118,6 +129,52 @@ function Art.SliceScale(sprite: string, w: number, h: number): number?
 	return HudModel.SliceScale(entry.w, entry.h, w, h)
 end
 
+-- How much `sprite` is magnified drawn at design size w × h: its corner scale
+-- when 9-sliced (`sliceScale` when given), else the fitted scale. It picks the
+-- sprite's 1x art or its high-resolution copy (UiAssets.Placement). nil when the
+-- manifest lacks the sprite.
+function Art.Mag(sprite: string, w: number, h: number, sliceScale: number?): number?
+	local slice = sliceScale or Art.SliceScale(sprite, w, h)
+	if slice then
+		return slice
+	end
+	local nw, nh = Art.SizeOf(sprite)
+	if nw == nil or nh == nil or nw <= 0 or nh <= 0 then
+		return nil
+	end
+	return math.min(w / nw, h / nh)
+end
+
+-- `rect` {x, y, w, h} shrunk, centred, so `sprite` fitted in it is drawn at no
+-- more than `maxScale` design px per pixel of the art that draws at that size
+-- (an icon larger than its art would only be blurred): its 1x art up to
+-- maxScale, then each high-resolution copy up to maxScale × its scale when it
+-- takes over below that (UiAssets.Copies; uploaded or not, so the layout never
+-- moves on upload). A hero copy, which starts past it, serves only boxes that
+-- opt out of the cap (Kit.ItemIcon `maxScale = false`). The rect itself when
+-- the art is small enough, unknown, or `maxScale` is nil.
+function Art.Capped(sprite: string?, rect, maxScale: number?)
+	if maxScale == nil or sprite == nil then
+		return rect
+	end
+	local nw, nh = Art.SizeOf(sprite)
+	if nw == nil or nh == nil or nw <= 0 or nh <= 0 then
+		return rect
+	end
+	local fit = math.min(rect[3] / nw, rect[4] / nh)
+	local most = maxScale
+	for _, copy in UiAssets.Copies(sprite) do
+		if copy.from < most then
+			most = math.max(most, maxScale * copy.scale)
+		end
+	end
+	if fit <= most then
+		return rect
+	end
+	local w, h = math.round(nw * most), math.round(nh * most)
+	return { rect[1] + math.round((rect[3] - w) / 2), rect[2] + math.round((rect[4] - h) / 2), w, h }
+end
+
 local function isLeather(sprite: string?, material: string): boolean
 	if sprite == nil then
 		return material == "leather"
@@ -135,7 +192,7 @@ local function standInFill(material: string, leather: boolean, state: string, ro
 		return role.fill or "xp"
 	elseif material == "track" then
 		return "track"
-	elseif material == "rule" or material == "glyph" or material == "none" then
+	elseif material == "rule" or material == "glyph" or material == "none" or material == "deco" then
 		return nil
 	elseif leather then
 		return ({
@@ -198,8 +255,13 @@ local function paintStandIn(frame: Frame, roleName: string, state: string, w: nu
 	-- Hover, focus and selection add the gold glow; tracks, fills, dots, rules and
 	-- glyphs carry no edge.
 	local glowing = state == "hover" or state == "focused" or state == "selected" or state == "capturing"
-	local edged = material ~= "fill" and material ~= "dot" and material ~= "rule" and material ~= "glyph"
-	stroke.Enabled = edged or glowing
+	-- Decorations (pillars) draw nothing at all until their art arrives.
+	local edged = material ~= "fill"
+		and material ~= "dot"
+		and material ~= "rule"
+		and material ~= "glyph"
+		and material ~= "deco"
+	stroke.Enabled = edged or (glowing and material ~= "deco")
 	stroke.Color = Tokens.Color(if glowing then "glow" else strokeKey)
 	stroke.Thickness = if glowing then Tokens.Space("glowStroke", 3) else thickness
 	if material == "none" and not glowing then
@@ -261,7 +323,8 @@ end
 
 -- One sprite drawn to fill `parent` at design size w × h (9-sliced with its
 -- corners scaled to fit). `props` override the image's properties.
--- `sliceScale` overrides the corner scale (a thinner glow ring).
+-- `sliceScale` overrides the corner scale (a thinner glow ring). Where the art
+-- is magnified, its high-resolution copy draws once uploaded (Art.Mag).
 function Art.Sprite(sprite: string, w: number, h: number, parent: Instance, props, sliceScale: number?): GuiObject
 	local base = {
 		Name = sprite,
@@ -271,7 +334,8 @@ function Art.Sprite(sprite: string, w: number, h: number, parent: Instance, prop
 	for key, value in props or {} do
 		base[key] = value
 	end
-	return Widgets.Sprite(sprite, base, parent, sliceScale or Art.SliceScale(sprite, w, h))
+	local slice = sliceScale or Art.SliceScale(sprite, w, h)
+	return Widgets.Sprite(sprite, base, parent, slice, Art.Mag(sprite, w, h, slice))
 end
 
 export type Plate = {
@@ -327,7 +391,7 @@ end
 
 -- Materials whose art is placed as stored (lines, fills, dots and glyphs
 -- sit inside their rect by design).
-local AS_STORED = { rule = true, fill = true, dot = true, glyph = true }
+local AS_STORED = { rule = true, fill = true, dot = true, glyph = true, deco = true }
 
 -- How far (design px per side) a sprite is drawn outside the plate so its
 -- visible edge lands on the plate's rect: KitModel.EDGES at the sprite's scale.
@@ -353,27 +417,40 @@ function Art.Thin(roleName: string, sprite: string): number
 	return role and role.thin and role.thin[sprite] or 1
 end
 
+-- Where a state's sprite is drawn: its offset {l, t} and growth {dw, dh} past
+-- the plate, and its corner scale when the role thins it (else nil). A state's
+-- art may be drawn larger than the plate (a slot's glow ring), and every plate
+-- is outset so its visible edge sits on the rect.
+function PlateMethods:_place(sprite: string): (number, number, number, number, number?)
+	local role = Art.ROLES[self.role]
+	local grow = role and role.grow and role.grow[sprite] or 0
+	local out = if self.exact then Art.Outset(self.role, sprite, self.w, self.h) else { 0, 0, 0, 0 }
+	local l, t = grow + out[1], grow + out[2]
+	local dw, dh = grow * 2 + out[1] + out[3], grow * 2 + out[2] + out[4]
+	local thin = Art.Thin(self.role, sprite)
+	local slice = Art.SliceScale(sprite, self.w + dw, self.h + dh)
+	return l, t, dw, dh, if slice and thin ~= 1 then slice * thin else nil
+end
+
+-- How much a state's sprite is magnified on this plate (Art.Mag).
+function PlateMethods:_mag(sprite: string): number?
+	local _, _, dw, dh, slice = self:_place(sprite)
+	return Art.Mag(sprite, self.w + dw, self.h + dh, slice)
+end
+
 function PlateMethods:_variant(sprite: string): GuiObject
 	local variant = self.variants[sprite]
 	if variant then
 		return variant
 	end
 	if sprite ~= "native" and Widgets.HasArt(sprite) then
-		-- A state's art may be drawn larger than the plate (a slot's glow ring),
-		-- and every plate is outset so its visible edge sits on the rect.
-		local role = Art.ROLES[self.role]
-		local grow = role and role.grow and role.grow[sprite] or 0
-		local out = if self.exact then Art.Outset(self.role, sprite, self.w, self.h) else { 0, 0, 0, 0 }
-		local l, t = grow + out[1], grow + out[2]
-		local dw, dh = grow * 2 + out[1] + out[3], grow * 2 + out[2] + out[4]
-		local thin = Art.Thin(self.role, sprite)
-		local slice = Art.SliceScale(sprite, self.w + dw, self.h + dh)
+		local l, t, dw, dh, slice = self:_place(sprite)
 		variant = Art.Sprite(sprite, self.w + dw, self.h + dh, self.holder, {
 			Name = sprite,
 			Position = UDim2.fromOffset(-l, -t),
 			Size = UDim2.new(1, dw, 1, dh),
 			ZIndex = self.z,
-		}, if slice and thin ~= 1 then slice * thin else nil)
+		}, slice)
 	else
 		variant = standIn(self.role, self.w, self.h, self.holder, self.z)
 		variant.Name = sprite
@@ -422,7 +499,9 @@ function PlateMethods:Show(state: string)
 		-- CLAIM, Invite), with leatherDark for the darkest (FORGE, Party
 		-- CLOSE). A plate's tone (Plate:SetTone, Button `tone`) picks one.
 		if isLeather(sprite, "") then
-			color = Tokens.Multiply(color, Tokens.Color(self.tone or "leatherTint"))
+			-- A role may set its own default tone: the close button's art carries
+			-- its cream ✕, which the cool leatherTint would turn blue-grey.
+			color = Tokens.Multiply(color, Tokens.Color(self.tone or (role and role.tone) or "leatherTint"))
 		end
 		shown.ImageColor3 = color
 		shown.ImageTransparency = self.alpha
@@ -447,7 +526,7 @@ function PlateMethods:SetRole(roleName: string)
 	self:Show(self.state)
 end
 
--- A colour laid over the art in every state (Leader tag gold), or nil.
+-- A colour laid over the art in every state, or nil.
 function PlateMethods:SetTint(color: Color3?)
 	self.tint = color
 	self:Show(self.state)
@@ -483,7 +562,7 @@ end
 -- Whether `sprite`'s image may be drawn now (Art.ArtReady); watches the
 -- image so the plate redraws when it loads or fails.
 function PlateMethods:_artReady(sprite: string): boolean
-	local id = Widgets.ImageId(sprite)
+	local id = Widgets.ImageId(sprite, self:_mag(sprite))
 	if id == nil then
 		return true
 	end
@@ -527,8 +606,10 @@ Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_
 -- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>")
 -- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
 -- recolours), glyph (prefer the flat glyph), transparency, standInScale (the
--- ink glyph's size as a share of the rect, 0.8), z, name. Before upload, or
--- while its uploaded image is not served, it is its glyph in ink.
+-- ink glyph's size as a share of the rect, 0.8), z, name, maxScale (draw the
+-- art at no more than this many design px per pixel of the art that draws at
+-- that size, centred in the rect: Art.Capped). Before upload, or while its
+-- uploaded image is not served, it is its glyph in ink.
 local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
 	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
 	short = string.gsub(short, "^%a+_", function(prefix)
@@ -547,6 +628,10 @@ local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, o
 	}, parent)
 	glyph.FontFace = Tokens.Font("symbol")
 	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * (opts.standInScale or 0.8))))
+	if opts.transparency then
+		-- The same resting fade as the art it stands in for (Core.Dim keeps it).
+		Core.SetRestFade(glyph, opts.transparency)
+	end
 	return glyph
 end
 
@@ -554,6 +639,7 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
 	local sprite = Art.IconSprite(id, opts.glyph)
 	local z = opts.z or 5
+	rect = Art.Capped(sprite, rect, opts.maxScale)
 	if sprite and Widgets.HasArt(sprite) then
 		local image = Art.Sprite(sprite, rect[3], rect[4], parent, {
 			Name = opts.name or "Icon",
@@ -568,12 +654,12 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 				image.ImageColor3 = opts.color
 			end
 			if opts.transparency then
-				image.ImageTransparency = opts.transparency
+				Core.SetRestFade(image, opts.transparency)
 			end
 		end
 		-- An image not loaded yet: its ink glyph stands in (after the grace, or at
 		-- once when the fetch failed) until the art arrives.
-		local imageId = Widgets.ImageId(sprite)
+		local imageId = Widgets.ImageId(sprite, Art.Mag(sprite, rect[3], rect[4]))
 		if imageId and SpriteLoader.State(imageId) ~= "loaded" then
 			local born = os.clock()
 			local glyph = glyphLabel(parent, sprite, id, rect, opts, z)

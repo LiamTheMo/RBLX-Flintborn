@@ -1,15 +1,19 @@
 -- The Play window (docs/ui/PlayScreen.md, mockup art/reference/ui/lobby/05_play.png):
 -- the island map with the crater marked, the world's name and detail rows, YOUR
--- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, or the Ready toggle
--- for a party member who does not lead (ARCHITECTURE §4.5, D16). There is no
--- server picker (D7). Built only from Kit components at the mockup's 1053 × 665
--- window size, in window design px.
+-- PARTY, YOUR EQUIPMENT (the run hotbar) and the PLAY button, which only a solo
+-- player or the party leader can press (ARCHITECTURE §4.5, D24); other members
+-- see it disabled. There is no server picker (D7). Built only from Kit
+-- components with the Inventory window's size and chrome (D25: header icon,
+-- title, ink underline and close button as in InventoryWindow, the map in an
+-- inset panel, section headings instead of plaques), in window design px. The
+-- owner's Play rune art (sheet 21, D26) is the header icon and the PLAY
+-- button's crystal glyph, and two rune pillars stand at the button's ends.
 --
 -- Display only: PlayController feeds it through the setters and reacts to the
--- callbacks (onPlay, onReady, onClose).
+-- callbacks (onPlay, onClose).
 --
---   local window = PlayWindow.new({ onPlay = play, onReady = toggleReady })
---   window:SetParty(rows, true)
+--   local window = PlayWindow.new({ onPlay = play })
+--   window:SetParty(rows)
 --   window:Open()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,69 +29,91 @@ local PlayWindow = {}
 PlayWindow.__index = PlayWindow
 
 PlayWindow.GUI_NAME = "FlintbornPlay"
--- The mockup's window, outline to outline (309..1361 × 127..791).
-PlayWindow.SIZE = { 1053, 663 }
+-- The Inventory window's size and chrome (D25): the same header (icon, title,
+-- underline), close button and clasps as InventoryWindow, so the Play window
+-- reads as one of the menus rather than mockup 05's plaque style.
+PlayWindow.SIZE = { 1187, 650 }
 
--- Window design px, measured from the mockup (PlayScreen.md element tree, minus
--- the window's top-left 309, 127). Kit plates draw their visible edge on the rect.
+-- Window design px. The header copies InventoryWindow's measured header; the
+-- content sits between its underline and the window's bottom edge (the
+-- Inventory detail card's 109..629).
+local RIGHT_X, RIGHT_W = 575, 590
 local RECT = {
-	titlePlaque = { 47, 30, 276, 87 },
-	-- The title's ink sits a little left of the plaque's centre.
-	title = { -4, 3, 276, 83 },
-	close = { 985, 9, 54, 52 },
-	map = { 41, 92, 520, 542 },
-	-- The painting sits inside the paper sheet with a margin, as the mockup
-	-- draws its map on a sheet of paper.
+	-- InventoryWindow's header: the rune play icon, title, underline, close button.
+	icon = { 40, 15, 71, 77 },
+	titleX = 138,
+	rule = { 113, 78, 995, 16 },
+	close = { 1103, 18, 60, 57 },
+	-- The map in an inset panel like Inventory's detail card.
+	map = { 23, 109, 520, 520 },
+	-- The painting sits inside the panel with a margin.
 	mapInset = 17,
 	marker = 28,
-	-- The rune the mockup paints in the map's top-left corner (sea there),
-	-- in ink so it reads on the sea.
-	rune = { 76, 154, 41, 69 },
-	-- Messages sit on a paper plaque over the map's bottom edge, clear of the
-	-- window frame under it.
-	statusPlaque = { 70, 580, 462, 40 },
-	regionPlaque = { 585, 96, 423, 70 },
-	sectionRule = { 588, 339, 419, 2 },
-	partyHeading = { 590, 350, 300, 26 },
-	-- One row tall; more members scroll (the rail sits right of the rows).
-	party = { 585, 375, 444, 63 },
-	-- A row's slot in the list, and where the mockup's 421 × 56 box (896, 507)
-	-- sits in it; the kit draws the box's border on that rect.
-	partyRow = { 424, 61 },
-	rowArt = { 2, 3 },
-	equipHeading = { 589, 446, 260, 28 },
-	more = { 760, 446, 248, 28 },
-	slotY = 479,
-	slotSize = { 71, 77 },
-	play = { 586, 569, 416, 72 },
-	-- The play glyph: its cream fill is 29 × 35 in the mockup (the art's dark
-	-- outline and margin make the square larger), and its gap to the label.
-	playIcon = 46,
-	playGap = 15,
+	-- The rune in the map's top-left corner (sea there), in ink so it reads on
+	-- the sea; from the map's top-left.
+	rune = { 35, 62, 41, 69 },
+	-- Messages sit on a paper plaque over the map's bottom edge.
+	statusPlaque = { 52, 575, 462, 40 },
+	-- The right column: the region heading, detail rows, party, equipment.
+	region = { RIGHT_X, 106, RIGHT_W, 44 },
+	-- 8 px higher than the mockup's 302, so the party's two rows of tiles fit
+	-- above YOUR EQUIPMENT.
+	partyHeading = { RIGHT_X, 294, RIGHT_W, 34 },
+	-- The whole party at once (1 to 8 members) in up to two rows of four
+	-- tiles under its heading: no scrolling and no clipping frame (see PARTY).
+	party = { RIGHT_X, 334, RIGHT_W, 80 },
+	-- 4 px lower than before the party tiles (rule at about 451, 7 px above
+	-- the slots), so the tiles keep clear of the heading on phones too.
+	equipHeading = { RIGHT_X, 418, RIGHT_W, 34 },
+	more = { RIGHT_X + RIGHT_W - 262, 421, 260, 26 },
+	-- Square loadout slots (every hotbar's slots are square) at an 85 px
+	-- pitch, so a selected slot's glow (3 px) keeps clear of its neighbours.
+	slotY = 458,
+	slotSize = { 77, 77 },
+	slotPitch = 85,
+	-- The PLAY button between its two rune pillars (D26). The pillars
+	-- (lk_pillar_rune_*, 88 x 160 stored) are about 1.6x the button's height
+	-- and overlap each end by 17 px, like posts holding a banner. They stand
+	-- under the loadout slots (bottom 535, 538 with a selected slot's glow),
+	-- end inside the window's paper margin (637; the rail starts at about
+	-- 642) and keep 5 px inside the right column (1165), clear of the frame's
+	-- lower right clasp and corner. The button keeps its own rect as its hit
+	-- area; it sits low enough that its touch pad (44 screen px at the
+	-- 844 x 390 phone's 0.51 window scale) does not reach the slots' pads.
+	play = { 826, 562, 298, 60 },
+	pillarLeft = { 790, 541, 53, 96 },
+	pillarRight = { 1107, 541, 53, 96 },
+	-- The crystal glyph and its gap to the label.
+	playIcon = 40,
+	playGap = 12,
 }
 -- Detail rows: centre y of each row, the icon / label / value columns, rules.
 local DETAIL = {
-	rows = { 191, 230, 269, 308 },
-	icon = { 599, 34, 30 },
-	label = { 658, 160 },
-	value = { 830, 176 },
+	rows = { 173, 207, 241, 275 },
+	icon = { RIGHT_X + 10, 34, 30 },
+	label = { RIGHT_X + 66, 180 },
+	value = { RIGHT_X + 266, 316 },
 	-- Phones and touch tablets: the values start further left, so a long one
 	-- ("10 · Low to Extreme") keeps 9 screen px.
-	phoneValue = { 790, 216 },
-	rule = { 648, 354 },
-	ruleY = { 211, 250, 290 },
+	phoneValue = { RIGHT_X + 230, 352 },
+	rule = { RIGHT_X + 56, RIGHT_W - 56 },
+	ruleY = { 190, 224, 258 },
 }
-PlayWindow.SLOT_X = { 578, 653, 728, 803, 876, 950 }
+PlayWindow.SLOT_X = {}
+for index = 1, 6 do
+	PlayWindow.SLOT_X[index] = RIGHT_X + (index - 1) * RECT.slotPitch
+end
 
 -- Mockup text sizes (ink-height matched; PlayScreen.md measurements log).
 local TEXT_SIZE = {
-	title = 64,
-	region = 45,
+	-- InventoryWindow's title size; the region heading as a section heading.
+	title = 44,
+	region = 26,
 	detail = 16,
 	heading = 20,
 	name = 16,
 	level = 15,
-	play = 40,
+	play = 34,
 	status = 14,
 	-- "+1 more in your backpack": larger on phones (9 screen px at the
 	-- window's phone scale, about 0.48 on the smallest).
@@ -98,19 +124,43 @@ local TEXT_SIZE = {
 export type Props = {
 	parent: Instance?,
 	onPlay: (() -> ())?,
-	onReady: (() -> ())?,
 	onClose: (() -> ())?,
 }
 
 -- The status plaque's text inset and size.
 local STATUS_PAD = 16
 
+-- The party tiles: every member at once in two rows at most, left aligned in
+-- the column: two to a row for up to 4 members (wide tiles, whole names even
+-- on phones), four to a row for 5 to 8 (the cap). A tile is a light inset box with the
+-- square headshot on its left, the name on the first line and "LV. n" on the
+-- second, the leader's crown at the end of the level line. The name shrinks
+-- to fit down to the text floor (Kit.Core.FitFloor: 12 design px; the phone
+-- text floor on phones), then ends in "…". Nothing is drawn inside a clipping
+-- frame, so no tile, headshot or text is ever cut. `desktop` / `phone` place
+-- the parts in a tile ({x, y, size} of the headshot, {y, height} of the two
+-- text lines): phones draw text at the phone floor (about 19 design px).
+local PARTY = {
+	-- Tiles per row: `few` for up to `few * 2` members, else `many`.
+	few = 2,
+	many = 4,
+	gap = 6,
+	-- Tile height and the gap between the two rows ({desktop, phone}).
+	tileH = { 38, 37 },
+	rowGap = { 4, 2 },
+	crown = { 17, 14 },
+	desktop = { portrait = { 5, 4, 30 }, name = { 3, 18 }, level = { 20, 15 } },
+	phone = { portrait = { 4, 4, 29 }, name = { 0, 19 }, level = { 18, 19 } },
+	nameSize = 15,
+	levelSize = 13,
+}
+PlayWindow.PARTY = PARTY
+
 export type PartyRow = {
 	userId: number,
 	name: string,
 	level: number?,
 	leader: boolean,
-	ready: boolean?,
 }
 
 function PlayWindow.new(props: Props)
@@ -120,7 +170,7 @@ function PlayWindow.new(props: Props)
 		rowMaids = {},
 		loadout = {},
 		mode = "solo",
-		ready = false,
+		enabled = true,
 		moreText = "",
 		phone = Kit.Scale.IsSmallTouch(),
 		maid = KitModel.Maid(),
@@ -131,17 +181,25 @@ function PlayWindow.new(props: Props)
 		onClose = props.onClose,
 	})
 	self.screen = screen
+	-- The same header as InventoryWindow (D25): the Play tile's rune icon
+	-- (D26), the title, the plain ink underline and the close button in its
+	-- corner.
 	local window = Kit.Window.new(screen, {
 		title = "Play",
-		header = "plaque",
-		plaqueRect = RECT.titlePlaque,
-		titleRect = RECT.title,
+		icon = "icon.playRune",
+		clasps = "right",
+		claspYs = { 0.18, 0.9 },
+		ruleRect = RECT.rule,
+		iconRect = RECT.icon,
+		titleX = RECT.titleX,
 		titleSize = TEXT_SIZE.title,
 		closeRect = RECT.close,
+		onClose = function()
+			screen:Close()
+		end,
 	})
 	self.window = window
 	self.close = window.close
-	-- Under the title plaque, which overlaps the map's top edge as in the mockup.
 	local v = Kit.Core.Make("Frame", {
 		Name = "Content",
 		BackgroundTransparency = 1,
@@ -151,47 +209,36 @@ function PlayWindow.new(props: Props)
 	self.visual = v
 	local z = window.base.z + 3
 	self:_map(v, z)
-	self.regionPlaque = Kit.Panel.new(v, {
-		name = "RegionPlaque",
-		rect = RECT.regionPlaque,
-		variant = "plaque",
-		pad = 0,
+	-- The world's name as a section heading over a hairline (as Journal and
+	-- Settings head their sections), not a plaque.
+	self.regionHeading = Kit.SectionHeader.new(v, {
+		name = "Region",
+		rect = RECT.region,
+		text = PlayModel.WORLD_NAME,
+		textSize = TEXT_SIZE.region,
+		rule = "hairline",
 		zIndex = z,
 	})
-	local rp = RECT.regionPlaque
-	self.regionTitle = Kit.Core.Label(v, {
-		name = "RegionTitle",
-		text = PlayModel.WORLD_NAME,
-		-- The mockup's region name is Bold, not the display weight.
-		role = "itemTitle",
-		size = TEXT_SIZE.region,
-		align = "Center",
-		-- Centred 4 px left of the plaque's centre, as the mockup draws it.
-		rect = { rp[1] - 4, rp[2] + 1, rp[3], rp[4] - 4 },
-		z = z + 1,
-	})
 	self:_details(v, z)
-	Kit.Divider.new(v, { name = "SectionRule", rect = RECT.sectionRule, variant = "hairline", zIndex = z })
-	self.partyHeading = Kit.Text.new(v, {
+	self.partyHeading = Kit.SectionHeader.new(v, {
 		name = "PartyHeading",
 		rect = RECT.partyHeading,
 		text = "Your Party",
-		role = "sectionHeader",
 		zIndex = z,
 	})
-	self.partyList = Kit.Scroll.new(v, {
-		name = "Party",
-		rect = RECT.party,
-		gap = 6,
-		padBottom = 0,
-		contentHeight = RECT.partyRow[2],
-		zIndex = z,
-	})
-	self.equipHeading = Kit.Text.new(v, {
+	local party = RECT.party
+	self.partyZ = z
+	self.party = Kit.Core.Make("Frame", {
+		Name = "Party",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(party[1], party[2]),
+		Size = UDim2.fromOffset(party[3], party[4]),
+		ZIndex = z,
+	}, v)
+	self.equipHeading = Kit.SectionHeader.new(v, {
 		name = "EquipmentHeading",
 		rect = RECT.equipHeading,
 		text = "Your Equipment",
-		role = "sectionHeader",
 		zIndex = z,
 	})
 	self.moreZ = z
@@ -217,8 +264,10 @@ function PlayWindow.new(props: Props)
 		name = "Play",
 		rect = RECT.play,
 		label = "Play",
-		icon = "play",
-		variant = "play",
+		-- The crystal arrow (D26); the white play glyph until it is uploaded.
+		icon = "mark.playRune",
+		-- The primary leather button, as the other menus' main actions.
+		variant = "primary",
 		sizeClass = "l",
 		textSize = TEXT_SIZE.play,
 		iconSize = RECT.playIcon,
@@ -230,21 +279,16 @@ function PlayWindow.new(props: Props)
 			end
 		end,
 	})
-	self.readyButton = Kit.Button.new(v, {
-		name = "Ready",
-		rect = RECT.play,
-		label = "Ready",
-		variant = "play",
-		sizeClass = "l",
-		textSize = TEXT_SIZE.play,
-		zIndex = z + 1,
-		visible = false,
-		onPress = function()
-			if props.onReady then
-				props.onReady()
-			end
-		end,
-	})
+	-- The rune pillars stand in front of the button's ends (decoration only:
+	-- not interactive, so presses on them reach nothing and the button keeps
+	-- its own hit area). They draw nothing until their art is loaded.
+	self.pillars = {
+		Kit.Picture.new(v, { name = "PillarLeft", rect = RECT.pillarLeft, role = "deco.pillarLeft", zIndex = z + 3 }),
+		Kit.Picture.new(
+			v,
+			{ name = "PillarRight", rect = RECT.pillarRight, role = "deco.pillarRight", zIndex = z + 3 }
+		),
+	}
 	local sp = RECT.statusPlaque
 	self.statusPlaque = Kit.Panel.new(v, {
 		name = "StatusPlaque",
@@ -266,11 +310,8 @@ function PlayWindow.new(props: Props)
 		z = z + 3,
 	})
 	self.status.Visible = false
-	-- Gamepad: PLAY (or Ready) first; up reaches the loadout slots, then the
-	-- close button.
-	for _, button in { self.play, self.readyButton } do
-		button.control.hit.NextSelectionUp = self.slots[1].control.hit
-	end
+	-- Gamepad: PLAY first; up reaches the loadout slots, then the close button.
+	self.play.control.hit.NextSelectionUp = self.slots[1].control.hit
 	for index, slot in self.slots do
 		local hit = slot.control.hit
 		hit.NextSelectionLeft = if self.slots[index - 1] then self.slots[index - 1].control.hit else nil
@@ -293,6 +334,7 @@ function PlayWindow.new(props: Props)
 			self.phone = phone
 			self:_buildMore()
 			self:_placeValues()
+			self:SetParty(self.rows)
 		end
 	end))
 	return self
@@ -354,7 +396,14 @@ function PlayWindow:_map(v: Frame, z: number)
 	-- The game's own island painting (D19), shared with the Journal and Map.
 	self.mapArt =
 		Kit.Picture.new(clip, { name = "Island", rect = { left, top, side, side }, role = "map.island", zIndex = z })
-	Kit.Icon.new(v, { name = "Rune", rect = RECT.rune, icon = "lk_emblem_rune", tint = "ink", zIndex = z + 1 })
+	local rune = RECT.rune
+	Kit.Icon.new(v, {
+		name = "Rune",
+		rect = { r[1] + rune[1], r[2] + rune[2], rune[3], rune[4] },
+		icon = "hud.rune",
+		tint = "ink",
+		zIndex = z + 1,
+	})
 	local u, vv = PlayModel.MarkerUV(IslandMap.MAP_SPAN)
 	local m = RECT.marker
 	self.marker = Kit.Icon.new(clip, {
@@ -426,93 +475,105 @@ function PlayWindow:SetDetails(rows)
 	end
 end
 
--- One party row: crown (leader), headshot, name, ready dot (in a party), level.
--- Every part goes into `maid`, so cleaning it takes the row apart.
-local function partyRow(parent: Instance, row: PartyRow, order: number, showReady: boolean, maid)
-	local w, h = RECT.partyRow[1], RECT.partyRow[2]
-	local outer = Kit.Core.Make("Frame", {
+-- One party tile `w` px wide at `x`, `y` (returns its name label and whether
+-- the name fits whole): the light inset box, the square
+-- headshot (no frame or backdrop, as the HUD party list draws it), the name
+-- (shrunk to fit down to the text floor, then "…"), "LV. n" and the leader's
+-- crown. Every part goes into `maid`, so cleaning it takes the tile apart.
+local function partyTile(parent: Instance, row: PartyRow, order: number, at, maid)
+	local x, y, w, h = at.x, at.y, at.w, at.h
+	local place = if at.phone then PARTY.phone else PARTY.desktop
+	local z = parent.ZIndex
+	local tile = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
 		BackgroundTransparency = 1,
-		LayoutOrder = order,
+		Position = UDim2.fromOffset(x, y),
 		Size = UDim2.fromOffset(w, h),
+		ZIndex = z,
 	}, parent)
-	outer:SetAttribute("UserId", row.userId)
-	maid:Give(outer)
-	-- The mockup's row is a light inset box, not the list-row plate.
-	local art = RECT.rowArt
-	w, h = 421, 56
-	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5, rect = { art[1], art[2], w, h } })
-	local holder = Kit.Core.Make("Frame", {
-		Name = "Inside",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(art[1], art[2]),
-		Size = UDim2.fromOffset(w, h),
-		ZIndex = 6,
-	}, outer)
-	if row.leader then
-		maid:Give(Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 }))
-	end
-	maid:Give(Kit.Portrait.new(holder, {
+	tile:SetAttribute("UserId", row.userId)
+	maid:Give(tile)
+	Kit.Art.Plate(tile, "panel.inset", w, h, { z = z })
+	local p = place.portrait
+	maid:Give(Kit.Portrait.new(tile, {
 		name = "Portrait",
-		rect = { 51, 2, 52, 52 },
+		rect = { p[1], p[2], p[3], p[3] },
 		userId = row.userId,
-		-- The headshot fills its box over the row's paper.
 		frame = "none",
 		backdrop = false,
-		zIndex = 6,
+		zIndex = z + 1,
 	}))
-	Kit.Core.Label(holder, {
+	local textX = p[1] + p[3] + 5
+	local textW = w - textX - 5
+	local name = Kit.Core.Label(tile, {
 		name = "Name",
-		text = row.name,
+		text = "",
 		role = "rowTitle",
 		color = "ink",
-		size = TEXT_SIZE.name,
-		scaled = true,
-		rect = { 120, 2, 200, h - 2 },
-		z = 6,
+		rect = { textX, place.name[1], textW, place.name[2] },
+		z = z + 1,
+	})
+	local fits = Kit.Core.FitText(name, row.name, "rowTitle", PARTY.nameSize)
+	local level = Kit.Core.Label(tile, {
+		name = "Level",
+		text = "",
+		role = "hudSmall",
+		rect = { textX, place.level[1], textW, place.level[2] },
+		z = z + 1,
 	})
 	local levelText = if row.level then HudModel.LevelText(row.level) else ""
-	Kit.Core.Label(holder, {
-		name = "Level",
-		text = levelText,
-		role = "hudSmall",
-		size = TEXT_SIZE.level,
-		scaled = true,
-		align = "Right",
-		rect = { w - 120, 2, 101, h - 2 },
-		z = 6,
-	})
-	if showReady then
-		local levelW = Kit.Text.Width(levelText, "hudSmall", TEXT_SIZE.level)
-		local d = 16
-		local dot = Kit.Core.Make("Frame", {
-			Name = if row.ready then "Ready" else "NotReady",
-			BackgroundTransparency = 1,
-			Position = UDim2.fromOffset(w - 20 - levelW - 10 - d, (h - d) / 2 - 1),
-			Size = UDim2.fromOffset(d, d),
-			ZIndex = 6,
-		}, holder)
-		Kit.Art.Plate(dot, if row.ready then "dot.green" else "dot.grey", d, d, { z = 6 })
+	Kit.Core.FitText(level, levelText, "hudSmall", PARTY.levelSize)
+	if row.leader then
+		-- Just after "LV. n" (the level line always has room for it).
+		local cw, ch = PARTY.crown[1], PARTY.crown[2]
+		local drawn = Kit.Core.TextWidth(levelText, "hudSmall", PARTY.levelSize) * level.TextSize / PARTY.levelSize
+		local cx = math.min(textX + drawn + 6, w - cw - 6)
+		maid:Give(Kit.Icon.new(tile, {
+			name = "Crown",
+			rect = { cx, place.level[1] + (place.level[2] - ch) / 2, cw, ch },
+			icon = "crown",
+			zIndex = z + 2,
+		}))
 	end
-	return outer
+	return name, fits
 end
 
--- The party rows (leader first; PlayModel.Members). `showReady` adds each
--- member's ready dot (in a party; a solo player has none, as in the mockup).
--- The old rows are taken apart through their maids (Kit components included).
-function PlayWindow:SetParty(rows: { PartyRow }, showReady: boolean)
-	local content = self.partyList:Content()
+-- Where member `order` of `count` sits in the party section ({x, y, w, h}):
+-- two or four tiles to a row (PARTY.few / many), sharing the column.
+function PlayWindow.TileRect(order: number, count: number, phone: boolean?): { number }
+	local k = if phone then 2 else 1
+	local h, gap = PARTY.tileH[k], PARTY.rowGap[k]
+	local columns = if count <= PARTY.few * 2 then PARTY.few else PARTY.many
+	local w = math.floor((RECT.party[3] - (columns - 1) * PARTY.gap) / columns)
+	local col = (order - 1) % columns
+	local line = (order - 1) // columns
+	return { col * (w + PARTY.gap), line * (h + gap), w, h }
+end
+
+-- The party tiles (leader first; PlayModel.Members), the whole party at once.
+-- The old tiles are taken apart through their maids (Kit components included).
+function PlayWindow:SetParty(rows: { PartyRow })
 	for _, maid in self.rowMaids do
 		maid:Clean()
 	end
 	table.clear(self.rowMaids)
+	-- Names that fit whole share one size (the smallest of them), so the tiles
+	-- read as one list; a name cut with "…" keeps the floor size.
+	local whole, size = {}, math.huge
 	for order, row in rows do
 		local maid = KitModel.Maid()
-		partyRow(content, row, order, showReady, maid)
+		local r = PlayWindow.TileRect(order, #rows, self.phone)
+		local name, fits =
+			partyTile(self.party, row, order, { x = r[1], y = r[2], w = r[3], h = r[4], phone = self.phone }, maid)
+		if fits then
+			table.insert(whole, name)
+			size = math.min(size, name.TextSize)
+		end
 		table.insert(self.rowMaids, maid)
 	end
-	local h = RECT.partyRow[2]
-	self.partyList:SetContentHeight(#rows * h + math.max(0, #rows - 1) * 6)
+	for _, name in whole do
+		name.TextSize = size
+	end
 	self.rows = rows
 end
 
@@ -542,30 +603,30 @@ function PlayWindow:_slotText(index: number): string?
 	return if (item.quantity or 1) > 1 then ("%s ×%d"):format(name, item.quantity) else name
 end
 
--- "solo" / "leader": the PLAY button; "member": the Ready toggle (leather READY
--- while not ready, parchment NOT READY once ready).
-function PlayWindow:SetMode(mode: string, ready: boolean?)
+-- "solo" / "leader": PLAY can be pressed; "member": PLAY shows disabled (only
+-- the leader starts the run; the status line says so).
+function PlayWindow:SetMode(mode: string)
 	self.mode = mode
-	self.ready = ready == true
-	local member = mode == "member"
-	self.play.root.Visible = not member
-	self.readyButton.root.Visible = member
-	if member then
-		self.readyButton:SetVariant(if self.ready then "playSecondary" else "play")
-		self.readyButton:SetLabel(if self.ready then "Not Ready" else "Ready")
+	self:_syncPlay()
+end
+
+-- PLAY's enabled state; its pillars dim with it.
+function PlayWindow:_syncPlay()
+	local enabled = self.enabled and self.mode ~= "member"
+	self.play:SetEnabled(enabled)
+	for _, pillar in self.pillars do
+		pillar:SetState(if enabled then "normal" else "disabled")
 	end
-	self.screen:SetDefaultSelection((if member then self.readyButton else self.play).control.hit)
 end
 
 -- The big button's busy state (a request in flight).
 function PlayWindow:SetBusy(busy: boolean)
 	self.play:SetBusy(busy)
-	self.readyButton:SetBusy(busy)
 end
 
 function PlayWindow:SetEnabled(enabled: boolean)
-	self.play:SetEnabled(enabled)
-	self.readyButton:SetEnabled(enabled)
+	self.enabled = enabled
+	self:_syncPlay()
 end
 
 -- The status line under the map (deploy progress, failures, maintenance, the
@@ -610,9 +671,11 @@ function PlayWindow:Destroy()
 		slot:Destroy()
 	end
 	self.play:Destroy()
-	self.readyButton:Destroy()
+	for _, pillar in self.pillars do
+		pillar:Destroy()
+	end
 	self.close:Destroy()
-	self.partyList:Destroy()
+	self.party:Destroy()
 	self.window:Destroy()
 	self.screen:Destroy()
 end

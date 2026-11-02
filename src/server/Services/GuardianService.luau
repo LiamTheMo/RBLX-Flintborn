@@ -5,7 +5,9 @@
 -- encounter, tagged with its encounter id, and whoever carries it is highlighted.
 -- Player structures near the arena are destroyed and the arena is a no-build
 -- aura while an encounter runs, so it cannot be cheesed. Everything stays
--- contested. World place only.
+-- contested. World place only. The Guardian and its energy pillars are invisible
+-- hitboxes wearing placeholder models (CreatureModels); a pillar blocks the way
+-- like a column but is only ever hit as the hitbox it stands in.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -15,6 +17,8 @@ local RunService = game:GetService("RunService")
 
 local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
+local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
@@ -29,6 +33,7 @@ local GuardianService = {}
 GuardianService.ARENA_TAG = "GuardianArena"
 GuardianService.ARENA_RADIUS = 80
 GuardianService.PILLAR_RING = 30
+GuardianService.PILLAR_SIZE = Vector3.new(4, 16, 4)
 GuardianService.HORN_SOUND = "rbxasset://sounds/electronicpingshort.wav"
 -- Studio compresses the schedule so the encounter can be tried quickly.
 GuardianService.STUDIO_FIRST_HORN = 30
@@ -91,17 +96,19 @@ local function spawnPillars(encounter, center: Vector3)
 		local body = Instance.new("Part")
 		body.Name = "Energy Pillar"
 		body.Anchored = true
-		body.Size = Vector3.new(4, 16, 4)
-		body.Material = Enum.Material.Neon
+		body.CanQuery = true
+		body.Transparency = 1
+		body.Size = GuardianService.PILLAR_SIZE
 		body.Color = Color3.fromRGB(120, 200, 255)
 		body.CFrame = CFrame.new(
 			center
 				+ Vector3.new(
 					math.cos(angle) * GuardianService.PILLAR_RING,
-					8,
+					GuardianService.PILLAR_SIZE.Y / 2,
 					math.sin(angle) * GuardianService.PILLAR_RING
 				)
 		)
+		ModelBuilder.Decorate(body, CreatureModels.ForPillar())
 		body.Parent = encounter.folder
 		local health = spec.health * encounter.boss.multiplier
 		encounter.pillars[index] = NpcService.Register({

@@ -10,10 +10,10 @@ local HudModel = require(script.Parent.HudModel)
 local LobbyHudModel = {}
 
 -- The 2 × 3 menu grid, left to right and top to bottom (M01): what each tile
--- opens and its icon id.
+-- opens and its icon id (a role name for the Play tile's rune art, D26).
 LobbyHudModel.TILES = {
 	{ id = "Inventory", icon = "backpack" },
-	{ id = "Play", icon = "portal" },
+	{ id = "Play", icon = "icon.playRune" },
 	{ id = "Quests", icon = "scroll" },
 	{ id = "Shop", icon = "market" },
 	{ id = "Forge", icon = "anvil" },
@@ -43,15 +43,12 @@ function LobbyHudModel.Progress(view): { level: string, fraction: number, text: 
 	}
 end
 
-export type Member = { userId: number, name: string, leader: boolean, ready: boolean, self: boolean }
+export type Member = { userId: number, name: string, leader: boolean, self: boolean }
 
 -- The party panel from LobbyController.PartyView() and you ({userId, name}):
 -- {count = "1/8", members = {Member}, free = empty rows, invites = {{partyId,
--- from, busy}}, canInvite, showReady}. Ready dots show only in a party of two
--- or more, where the leader reads them before Play (alone the row matches
--- M01). Alone you are a party of one, led by you; your ready flag counts then
--- too (it works without a party). Only the leader (or a solo player) can
--- invite, and only while there is room. `busy` maps the partyIds whose answer
+-- from, busy}}, canInvite}. Alone you are a party of one, led by you. Only
+-- the leader (or a solo player) can invite, and only while there is room. `busy` maps the partyIds whose answer
 -- is on its way (PartyController.AnswerBusy); those invites are marked busy.
 function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: { [string]: boolean }?)
 	view = view or {}
@@ -64,7 +61,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 				userId = member.userId,
 				name = member.name or tostring(member.userId),
 				leader = member.userId == party.leader,
-				ready = member.ready == true,
 				self = member.userId == me.userId,
 			})
 		end
@@ -74,7 +70,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 			userId = me.userId,
 			name = me.name,
 			leader = true,
-			ready = view.ready == true,
 			self = true,
 		})
 	end
@@ -92,7 +87,6 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 		free = math.max(0, maxSize - #members),
 		invites = invites,
 		canInvite = leads and #members < maxSize,
-		showReady = #members > 1,
 	}
 end
 
@@ -121,16 +115,21 @@ function LobbyHudModel.Hotbar(items): { any }
 	return slots
 end
 
--- Gamepad neighbours in the 2 × 3 tile grid: {up, down, left, right} as tile
--- indices (nil at an edge).
-function LobbyHudModel.TileNeighbours(index: number): { up: number?, down: number?, left: number?, right: number? }
+-- Gamepad neighbours in the tile grid, `columns` tiles to a row (2 by
+-- default: the 2 × 3 grid; phones draw 3 × 2, HudLayout "tiles"): {up, down,
+-- left, right} as tile indices (nil at an edge).
+function LobbyHudModel.TileNeighbours(
+	index: number,
+	columns: number?
+): { up: number?, down: number?, left: number?, right: number? }
 	local count = #LobbyHudModel.TILES
-	local column = (index - 1) % 2
+	local n = columns or 2
+	local column = (index - 1) % n
 	return {
-		up = if index - 2 >= 1 then index - 2 else nil,
-		down = if index + 2 <= count then index + 2 else nil,
-		left = if column == 1 then index - 1 else nil,
-		right = if column == 0 and index + 1 <= count then index + 1 else nil,
+		up = if index - n >= 1 then index - n else nil,
+		down = if index + n <= count then index + n else nil,
+		left = if column > 0 then index - 1 else nil,
+		right = if column < n - 1 and index + 1 <= count then index + 1 else nil,
 	}
 end
 

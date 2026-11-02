@@ -2,7 +2,10 @@
 -- run starts (SessionState), Humanoid health and the Stamina/Food attributes
 -- change, progression and inventory snapshots arrive through their signals, a
 -- tribe-mate joins, the backpack opens, a hotbar slot and a menu tile are
--- pressed through their buttons. Ends with a capture of the whole PlayerGui.
+-- pressed through their buttons; the live placement follows the owner's
+-- layout (ARCHITECTURE D28, D30) under stand-ins for Roblox's top-bar buttons,
+-- and moves with the device safe area its probes measure. Ends
+-- with a capture of the whole PlayerGui.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 workspace:SetAttribute("FlintbornPlaceRole", "World")
@@ -56,6 +59,12 @@ local player = Players.LocalPlayer
 player.CharacterRemoving = Instance.new("BindableEvent").Event
 player:SetAttribute("TribeId", "t1")
 local humanoid = character(player, 100)
+-- Roblox's top-bar buttons (stand-ins; GuiService.TopbarInset follows them).
+local chromeGui = Instance.new("ScreenGui")
+chromeGui.Name = "RobloxChrome"
+chromeGui.DisplayOrder = 100
+chromeGui.Parent = player.PlayerGui
+local chrome = __robloxChrome(chromeGui, 1672, 941)
 HudController.Start()
 local gui = player.PlayerGui:FindFirstChild("FlintbornHud")
 local hud = HudController.Widgets()
@@ -132,6 +141,78 @@ check(math.abs(hud.party.rows[1].bar.fraction - 0.7) < 1e-6, "with their health"
 check(#hud.vitals.chips == 3, "medicine, food healing and hunger plaques")
 check(hud.objective.titleText ~= nil, "the objective refreshed")
 
+-- The live placement (HudController's applyTop): the compass in the top bar's
+-- row, the right-hand column in the top-right corner, the tiles at the left
+-- edge; banners in the shared top column start under the compass waypoints.
+do
+	local root = gui:FindFirstChild("Root")
+	local k = root:FindFirstChildWhichIsA("UIScale").Scale
+	__checkWorldHud({ scene = "world_hud_flow", hud = hud, root = root, W = 1672, H = 941, k = k, chrome = chrome })
+	local compass = __rect(hud.compass.root, root, 1672, 941, k)
+	local stack = require(Client.Ui.Theme).TopStack()
+	check(
+		stack.Position.Y.Offset >= compass[2] + (hud.compass.cfg.waypoints.y + hud.compass.cfg.waypoints.size) * k,
+		("banners start under the compass waypoints (y %d)"):format(stack.Position.Y.Offset)
+	)
+end
+
+-- The device safe area (ARCHITECTURE D29) as Kit.Scale's probe guis measure
+-- it: with 47 px side insets (a notched phone's, here on the desktop-size
+-- screen) the live placement moves the regions that reach the middle band
+-- inside them, while the corner regions keep the 24 px margin.
+do
+	local Kit = require(Client.Hud.Kit)
+	local full = player.PlayerGui:FindFirstChild("FlintbornScreenProbe")
+	local safe = player.PlayerGui:FindFirstChild("FlintbornSafeAreaProbe")
+	check(
+		full ~= nil and safe ~= nil and full.ScreenInsets == Enum.ScreenInsets.None,
+		"the safe-area probes are in the PlayerGui"
+	)
+	check(
+		gui.ScreenInsets == Enum.ScreenInsets.None and gui.ClipToDeviceSafeArea == false,
+		"the HUD draws on the whole screen (ScreenInsets None, not clipped to the safe area)"
+	)
+	full.AbsolutePosition = Vector2.new(0, -58)
+	full.AbsoluteSize = Vector2.new(1672, 941)
+	safe.AbsolutePosition = Vector2.new(47, -58)
+	safe.AbsoluteSize = Vector2.new(1672 - 94, 941)
+	local insets = Kit.Scale.SafeInsets()
+	check(
+		insets.left == 47 and insets.right == 47 and insets.top == 0 and insets.bottom == 0,
+		("the probes measure the safe area's insets (left %d, top %d, right %d, bottom %d)"):format(
+			insets.left,
+			insets.top,
+			insets.right,
+			insets.bottom
+		)
+	)
+	local root = gui:FindFirstChild("Root")
+	local k = root:FindFirstChildWhichIsA("UIScale").Scale
+	local notched = table.clone(chrome)
+	notched.insets = insets
+	__checkWorldHud({
+		scene = "world_hud_flow (47 px side insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = notched,
+	})
+	-- Back to a screen without insets: the regions return to the margin.
+	safe.AbsolutePosition = Vector2.new(0, -58)
+	safe.AbsoluteSize = Vector2.new(1672, 941)
+	__checkWorldHud({
+		scene = "world_hud_flow (no insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = chrome,
+	})
+end
+
 -- Leaving the run hides it again.
 player:SetAttribute("SessionState", "Lobby")
 check(not gui.Enabled and not HudMode.IsVisible(), "hidden when the run ends")
@@ -140,4 +221,5 @@ player:SetAttribute("SessionState", "ActiveRun")
 -- repo has no in-world screenshot). The world HUD never shows in the lobby: it
 -- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
 -- a run (SessionStates.IsAtRisk).
+__hudChecksDone("world_hud_flow")
 __dump(player.PlayerGui, 1672, 941, { background = "art/reference/lobby_map.png" })

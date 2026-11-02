@@ -9,7 +9,7 @@ local KitModel = {}
 -- Role -> art. `sprite` is the normal art and `states` the art of other states
 -- (lk_* names from art/ui/kit/CATALOG.md). `material` picks the drawn stand-in
 -- while the art is not uploaded (paper, leather, slot, window, track, fill,
--- glyph, rule, none); `fill` is the stand-in colour of a bar fill and `glyph` the
+-- glyph, rule, pill, dot, none; deco draws nothing); `fill` is the stand-in colour of a bar fill and `glyph` the
 -- text of a glyph stand-in; `grow` draws a state's sprite that many px larger
 -- per side (glow rings sit outside the plate). `native` roles are drawn as
 -- flat kit shapes by design (the mockups' plain discs and rails), never as a
@@ -31,8 +31,8 @@ KitModel.ROLES = {
 	["panel.plaque"] = { sprite = "lk_plaque_small", material = "paper" },
 	-- The HUD's party panel (M01): the window frame's parchment and corners.
 	["panel.party"] = { sprite = "lk_window_frame", material = "window" },
-	["hud.playerCard"] = { sprite = "lk_player_card", material = "paper" },
 	["hud.leaf"] = { sprite = "lk_emblem_leaf", material = "glyph", glyph = "❦", edge = false },
+	["hud.rune"] = { sprite = "lk_emblem_rune", material = "glyph", glyph = "◆", edge = false },
 	-- The painted island (Play window, Journal map page, world map).
 	["map.island"] = { sprite = "pm_map_island", material = "paper", edge = false },
 
@@ -83,6 +83,8 @@ KitModel.ROLES = {
 		sprite = "lk_button_close_normal",
 		material = "leather",
 		glyph = "✕",
+		-- Drawn in the sprite's own colours: warm leather and a cream ✕.
+		tone = "leatherBright",
 		states = {
 			hover = "lk_button_close_hover",
 			pressed = "lk_button_close_pressed",
@@ -172,7 +174,7 @@ KitModel.ROLES = {
 	["badge.count"] = { sprite = "lk_badge_count", material = "paper" },
 	["badge.countWide"] = { sprite = "lk_badge_count_wide", material = "paper" },
 	["badge.pill"] = { sprite = "lk_pill_value", material = "paper" },
-	-- The Ready pill (M04 Readied Status): a light green fill with a green
+	-- The green status pill (M04's look): a light green fill with a green
 	-- edge; the kit's pill art cannot be tinted lighter, so it is flat.
 	["badge.ready"] = { native = true, material = "pill", fill = "readyFill", stroke = "readyEdge" },
 	["dot.green"] = { sprite = "lk_dot_green", material = "dot", fill = "readyDot" },
@@ -210,11 +212,12 @@ KitModel.ROLES = {
 	["ring.fill"] = { sprite = "lk_ring_full", material = "fill", fill = "xp", edge = false },
 	["toggle.off"] = { sprite = "lk_toggle_off", material = "paper" },
 	["toggle.on"] = { sprite = "lk_toggle_on", material = "fill", fill = "toggleOn" },
+	-- Every slider has one look (Kit.Slider): the dark track, the yellow fill
+	-- and the square parchment knob with leather corners, drawn whole at its
+	-- own aspect (not 9-sliced: its rim and corners never squash).
 	["slider.track"] = { sprite = "lk_bar_track", material = "track" },
-	["slider.trackPaper"] = { sprite = "lk_slider_track", material = "paper" },
 	["slider.fill"] = { sprite = "lk_bar_fill_yellow", material = "fill", fill = "xp" },
-	["slider.knob"] = { sprite = "lk_button_paper_small_normal", material = "paper" },
-	["slider.knobRound"] = { sprite = "lk_slider_knob", material = "dot", fill = "gold" },
+	["slider.knob"] = { sprite = "lk_button_square_paper", material = "paper" },
 	["field.value"] = { sprite = "lk_button_paper_small_normal", material = "paper" },
 	["dropdown.field"] = { sprite = "lk_dropdown", material = "paper" },
 	["dropdown.list"] = { sprite = "lk_tooltip", material = "paper" },
@@ -275,6 +278,21 @@ KitModel.ROLES = {
 	["mark.check"] = { sprite = "lk_glyph_checkmark", material = "glyph", glyph = "✓" },
 	["mark.play"] = { sprite = "lk_glyph_play", material = "glyph", glyph = "▶" },
 	["mark.confirm"] = { sprite = "lk_glyph_check_white", material = "glyph", glyph = "✓" },
+
+	-- The Play rune art (sheet 21, ARCHITECTURE D26). Icon roles are passed as
+	-- an icon id (Kit.Icon, IconButton, Window, Button `icon`); `fallback` is
+	-- the icon drawn while the role's own art is not uploaded yet (the portal
+	-- tile icon, the white play glyph). Decorations (`deco`) draw nothing
+	-- until their art arrives: they are never a stand-in shape.
+	["icon.playRune"] = { sprite = "lk_icon_play_rune", material = "glyph", glyph = "▶", fallback = "portal" },
+	["mark.playRune"] = {
+		sprite = "lk_icon_play_rune_small",
+		material = "glyph",
+		glyph = "▶",
+		fallback = "lk_glyph_play",
+	},
+	["deco.pillarLeft"] = { sprite = "lk_pillar_rune_left", material = "deco", edge = false },
+	["deco.pillarRight"] = { sprite = "lk_pillar_rune_right", material = "deco", edge = false },
 }
 
 -- Every state a component can draw, from strongest to weakest: when several
@@ -689,6 +707,17 @@ function KitModel.Fraction(value: number, min: number, max: number): number
 	return math.clamp((value - min) / (max - min), 0, 1)
 end
 
+-- Which way a touch that began on a control in a scrolling list is going, once
+-- it has moved `slop` px from where it began: "x" (mostly sideways: the control
+-- takes the drag) or "y" (mostly up or down: the list scrolls). nil until then.
+function KitModel.DragAxis(dx: number, dy: number, slop: number): string?
+	local ax, ay = math.abs(dx), math.abs(dy)
+	if ax < slop and ay < slop then
+		return nil
+	end
+	return if ax > ay then "x" else "y"
+end
+
 -- A bar fill's width for `fraction` of `maxWidth`; a sliced fill narrower than its
 -- two end caps (`minWidth`) would fold over itself, so it is hidden instead.
 function KitModel.FillWidth(fraction: number, maxWidth: number, minWidth: number): (number, boolean)
@@ -733,6 +762,14 @@ function KitModel.WindowScale(
 	local scale
 	if touchSmall then
 		scale = fitRoom
+		-- A small window (a dialog, the world menu) would blow up far past the
+		-- big windows' scale: it draws at most `touchMax` × the scale of a
+		-- typical window (`touchRef` {w, h}) on the same screen.
+		local ref = opts.touchRef
+		if ref then
+			local refFit = math.min((screenW - margin * 2) / ref[1], (screenH - topInset - margin * 2) / ref[2])
+			scale = math.min(scale, refFit * (opts.touchMax or 1))
+		end
 	else
 		local canvasFit = math.min(screenW / refW, screenH / refH)
 		scale = math.min(fitRoom, canvasFit * (userScale or 1))

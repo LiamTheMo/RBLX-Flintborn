@@ -43,6 +43,9 @@ local function view(player: Player)
 			category = entry.category,
 			note = entry.note,
 			owned = entry.title ~= nil and profile.progression.titles[entry.title] == true,
+			-- The most one purchase can buy now (Coins, backpack room, the limit);
+			-- the client's quantity picker stops here and ShopBuy checks again.
+			maxQuantity = EconomyRules.MaxBuy(profile, entry.id),
 		})
 	end
 	local sellable = {}
@@ -56,6 +59,7 @@ local function view(player: Player)
 				name = nameOf(item.catalogId),
 				quantity = item.quantity,
 				coins = coins,
+				each = (EconomyRules.Quote(item, 1)),
 				warning = warning,
 			})
 		end
@@ -95,6 +99,7 @@ local function view(player: Player)
 		stock = stock,
 		sellable = sellable,
 		offers = offers,
+		maxBuy = EconomyRules.MAX_BUY_QUANTITY,
 		vaultTier = profile.vault.upgradeTier or 0,
 		vaultPrice = EconomyRules.VaultUpgradePrice(profile.vault.upgradeTier or 0),
 		maxVaultTier = EconomyRules.MAX_VAULT_TIER,
@@ -107,7 +112,13 @@ function ShopService.Start()
 		return
 	end
 	Remotes.Handle("ShopView", view)
-	Remotes.Handle("ShopBuy", function(player, stockId, nonce)
+	-- `quantity` (optional, default 1): how many of the entry to buy at once.
+	-- EconomyRules.Buy refuses anything but a whole number within the limit and
+	-- buys all of them or none.
+	Remotes.Handle("ShopBuy", function(player, stockId, nonce, quantity)
+		if quantity ~= nil and type(quantity) ~= "number" then
+			return false, "BadQuantity"
+		end
 		-- Backpack changes wait until an open trade ends (its offers stay exact).
 		if TradeService.InSession(player) then
 			return false, "InTrade"
@@ -115,10 +126,13 @@ function ShopService.Start()
 		return CurrencyService.Run(player, "buy:", nonce, "ShopBuy", function(profile)
 			return EconomyRules.Buy(profile, stockId, function()
 				return HttpService:GenerateGUID(false)
-			end, player.UserId)
+			end, player.UserId, quantity)
 		end)
 	end)
-	Remotes.Handle("MerchantSell", function(player, source, key, quantity, nonce)
+	-- `quantity`: how many to sell (a backpack stack may sell in part; nil sells
+	-- the whole slot). `expected` (optional): the backpack slot's catalogId as the
+	-- client saw it, so a slot that changed meanwhile sells nothing.
+	Remotes.Handle("MerchantSell", function(player, source, key, quantity, nonce, expected)
 		if source ~= "backpack" and source ~= "vault" then
 			return false, "BadRequest"
 		end
@@ -128,6 +142,12 @@ function ShopService.Start()
 		if source == "vault" and ItemCatalog.Get(key) == nil then
 			return false, "BadRequest"
 		end
+		if quantity ~= nil and type(quantity) ~= "number" then
+			return false, "BadQuantity"
+		end
+		if expected ~= nil and type(expected) ~= "string" then
+			return false, "BadRequest"
+		end
 		if TradeService.InSession(player) then
 			return false, "InTrade"
 		end
@@ -135,7 +155,7 @@ function ShopService.Start()
 			if profile.transit ~= nil then
 				return false, "InTransit"
 			end
-			return EconomyRules.Sell(profile, source, key, quantity, "sale:" .. nonce, os.time())
+			return EconomyRules.Sell(profile, source, key, quantity, "sale:" .. nonce, os.time(), expected)
 		end)
 	end)
 	Remotes.Handle("VaultUpgrade", function(player, nonce)

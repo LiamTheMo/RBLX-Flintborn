@@ -88,7 +88,7 @@ local function check(cond, msg)
 end
 
 local function view(party, extra)
-	local v = { party = party, invites = {}, ready = false, maxSize = 8 }
+	local v = { party = party, invites = {}, maxSize = 8 }
 	for key, value in extra or {} do
 		v[key] = value
 	end
@@ -141,7 +141,11 @@ check(window.partyHeader.count.Text == "1/8", "solo reads 1/8")
 check(detail(window, "Created") == "—", "no party yet: Created reads —")
 check(rowNames(window) == "Emberwick,ForestRanger,SunnyVale", "everyone else is invitable, sorted")
 check(inviteRow(window, "ForestRanger").props.level == 15, "levels come from the Level attribute")
-check(window.readyButton.text == "Ready", "solo and not ready: the toggle offers Ready")
+check(window.readyButton == nil and window.tally == nil, "no Ready toggle or tally (D24)")
+local gui = window.screen.gui
+check(gui:FindFirstChild("ReadiedStatus", true) == nil, "no Readied Status card")
+local details = gui:FindFirstChild("PartyDetails", true)
+check(details ~= nil and details.Size.Y.Offset == 448, "Party Details takes the right column")
 
 -- Invite: the button waits for the server, then reads Invited from the view.
 server = function(action, argument)
@@ -163,7 +167,7 @@ check(
 )
 resume()
 local forest = inviteRow(window, "ForestRanger").action
-check(forest.text == "Invited" and forest.root:GetAttribute("KitState") == "disabled", "then Invited, disabled (D18)")
+check(forest.text == "Invited" and forest.root:GetAttribute("KitState") == "disabled", "then Invited, disabled")
 check(forest.root:GetAttribute("KitRole") == "button.secondary", "Invited is the paper button")
 check(detail(window, "Created") == "Just now", "Created from createdAt")
 place(window)
@@ -176,35 +180,12 @@ check(rowNames(window) == "SunnyVale", "search filters the list")
 window.search:SetText("")
 window.props.onSearch("")
 
--- Ready: pending until the server's view arrives (D18).
-server = function()
-	park()
-	return true
-end
-window.readyButton.control:Activate()
-check(calls[#calls][1] == "ready" and calls[#calls][2] == true, "Ready sends PartyAction ready true")
-check(window.readyButton.root:GetAttribute("KitState") == "busy", "the toggle waits for the server")
-broadcast(view({
-	id = "p1",
-	leader = 1,
-	createdAt = NOW,
-	members = { { userId = 1, name = "LiamTheMo", ready = true } },
-	invited = { 2 },
-}, { ready = true }))
-check(window.readyButton.root:GetAttribute("KitState") ~= "busy", "the view settles it")
-check(window.readyButton.text == "Not Ready", "now offers Not Ready")
-resume()
-check(window.tally.root.Text == "1 of 1 ready", "the tally counts you")
-
 -- A refused request shows a toast and leaves the state as the server has it.
 server = function()
-	return false, "BadRequest"
+	return false, "PartyFull"
 end
-window.readyButton.control:Activate()
-check(
-	window.readyButton.text == "Not Ready" and window.readyButton.root:GetAttribute("KitState") ~= "busy",
-	"a refusal leaves you ready"
-)
+window.selectables["invites:player:3"].Activated:Fire()
+check(inviteRow(window, "SunnyVale").action.text == "Invite", "a refusal leaves the row as it was")
 local toasts = player.PlayerGui:FindFirstChild("KitToasts")
 check(toasts ~= nil and #toasts:GetDescendants() > 0, "and explains it in a toast")
 
@@ -214,13 +195,18 @@ broadcast(view({
 	id = "p1",
 	leader = 1,
 	createdAt = NOW,
-	members = { { userId = 1, name = "LiamTheMo", ready = false }, { userId = 2, name = "ForestRanger", ready = true } },
+	members = { { userId = 1, name = "LiamTheMo" }, { userId = 2, name = "ForestRanger" } },
 	invited = {},
 }))
 check(window.partyHeader.count.Text == "2/8" and detail(window, "Members") == "2 / 8", "counts follow the view")
 check(window.leaveButton.root.Visible, "Leave Party shows in a party of two")
 check(rowNames(window) == "Emberwick,SunnyVale", "members leave the invite list")
-check(window.readyButton.text == "Ready", "ready was cleared by the join")
+local leaderRow = window:Rows("members")[1]
+check(
+	leaderRow.row.badge == nil and leaderRow.row.content:FindFirstChild("Crown") ~= nil,
+	"the leader has a crown, no tag"
+)
+check(window:Rows("members")[2].row.badge == nil, "members carry no Ready tag")
 
 -- A player leaving the server drops out of the list.
 others[3].Parent = nil
@@ -244,7 +230,7 @@ server = function(action, argument)
 		id = argument,
 		leader = 4,
 		createdAt = NOW - 300,
-		members = { { userId = 4, name = "Emberwick", ready = true }, { userId = 1, name = "LiamTheMo" } },
+		members = { { userId = 4, name = "Emberwick" }, { userId = 1, name = "LiamTheMo" } },
 		invited = {},
 	}))
 	return true

@@ -12,9 +12,11 @@ sheets and an Enter button with a server dropdown. Neither exists in the new UI.
 
 ## Overview
 
-The lobby place's always-on, non-modal HUD. Top left: the player card (portrait,
-name, level, XP bar, leaf emblem). Top right: Coins pill, Gems pill, settings
-button. Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
+The lobby place's always-on, non-modal HUD. Top left in the mockup: the player
+card (portrait, name, level, XP bar, leaf emblem); **the game leaves it out**
+(owner decision: each Party panel row shows the member's level and XP bar
+instead). Top right: Coins pill, Gems pill, settings button (**the game moves
+the settings button to the bottom-left corner**, D27–D30). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
 the Party panel (title with count, member rows, empty-slot rows, scrollbar).
 Bottom centre: the level/XP bar and the six-slot hotbar.
 
@@ -105,16 +107,44 @@ XP bar instead. The table below records the mockup only.
 
 Gaps: Coins → Gems 17 px, Gems → Settings 16 px; right margin 53 px; top margin 70 px.
 
+As built (D30, the HUD grid shared with the run's HUD, STYLE_GUIDE §5.6):
+the Settings button is not in this row. Coins and Gems are the right-hand
+column's first piece: one row the column's width (315: Coins 165, Gems 138,
+G 12 between; `LobbyHud.PILLS`), M (24 design px) from the screen's top and,
+while the column stays in the corner bands, from its right edge (desktop
+x 1333–1648, y 24–70; below the bar only when its right-hand area reaches
+over them, `LobbyHudController.BarReachesRight`); the same top, right edge
+and width as the run's vitals. The HUD draws on the whole screen
+(`Kit.Scale.FullScreen`) and `LobbyHud:_place` (SetTopInset, SetScreen)
+places every region with the run's placement (`Hud/Layout.PlaceColumns`, the
+edge rule applied to the whole column, STYLE_GUIDE §5.7). The Settings button
+sits in the bottom-left corner, the run's ⚙ (HudLayout `gear`, 52 × 46,
+`HudModel.GearCorner`): M from the left and the bottom (desktop x 24–76,
+y 871–917; a notched 844 × 390 iPhone x 12–38, y 355–378, the thumbstick ring
+from x 72); only where Roblox's thumbstick ring reaches the corner (a phone
+without a side inset) its foot stands 12 screen px above the ring (667 × 375:
+x 12–38, y 250–273). Gamepad: Settings is under the tiles' bottom-left tile
+(Forge; on phones Shop) and left of the first hotbar slot; the other bottom
+tiles' down goes to the XP bar; the PARTY title's up goes to Gems, and
+nothing is right of Gems.
+
 ### Left: menu grid (anchor: left, vertically centred group)
 
 Tiles are 88 × 84 (±1), columns at x 68 and 170 (pitch 102, gap 14), rows at
 y 312, 406, 500 (pitch 94, gap 10). Group bounds 68,312,190,273; group centre
 y 448.5 (screen centre 470.5).
 
+As built (D30): the run's tile grid (HudLayout `tiles`, `Layout.TileGrid`):
+the mockup's 88 × 84 tiles at its 102 × 94 pitch, 2 × 3, centred at 0.476 of
+the screen's height, at the left-hand column's edge (M: desktop x 24–214,
+y 312–584; on a notched phone the 47 pt inset). On phones the run's 3 × 2
+(80 × 80 at 88 × 86), G under Roblox's top-bar buttons (844 × 390: y 62–145),
+so the lobby and the run put the same tiles in the same place.
+
 | Element | Bounds | Icon (approx. bounds, ±4) | Opens | Kit part (tile / icon) |
 |---|---|---|---|---|
 | Tile.Inventory | 68,312,88,84 | backpack 84,326,55,61 | Inventory window | 07 tile (771,239,203,196) / 06 backpack (47,41,339,342) |
-| Tile.Play | 170,312,88,84 | stone portal with orange play triangle 182,322,64,68 | Play window | 07 tile (1011,239,205,196) / 06 portal (438,48,405,324) |
+| Tile.Play | 170,312,88,84 | stone portal with orange play triangle 182,322,64,68 (the game draws the sheet-21 crystal play arrow instead, D26) | Play window | 07 tile (1011,239,205,196); icon `lk_icon_play_rune` (role `icon.playRune`, 21 (559,317,408,536)), the 06 portal (438,48,405,324) until `atlas_lk_play` is uploaded |
 | Tile.Quests | 68,406,88,84 | rolled scroll 80,420,61,58 | Quest Journal | 07 tile (1253,239,204,196) / 06 scroll (872,70,333,295) |
 | Tile.Shop | 170,406,88,84 | striped market stall 182,420,64,59 | Shop | 07 tile (771,462,203,188) / 06 market (1276,59,345,304) |
 | Tile.Forge | 68,500,88,84 | anvil and hammer 77,512,68,62 | Forge | 07 tile (1009,462,205,189) / 06 anvil (62,399,340,296) |
@@ -128,6 +158,15 @@ one frame for all six, slice an empty frame from 01 slot frames
 (28..880 × 763..862) or 05 slot normal (64,45,271,260) and layer the 06 icon.
 
 ### Right: Party panel (anchor: right, top-aligned at y 258)
+
+As built (D30): the right-hand column's second piece, G (12 design px) under
+Coins and Gems, the column's width (315 × 244; its rows, rules, list and
+add-player button widen with it, `LobbyHud.PartyParts`), on the column's one
+edge: desktop x 1333–1648, y 82–326, the run's objective's edge and width.
+The column reaches the middle band, so on a notched 844 × 390 iPhone the
+pills and the panel both stand at the 47 pt safe inset (x 640–797, y 12–35
+and 41–163; D29 had the pills at 832 and the panel at 797), without a notch
+M from the edge (x 674–832). The bounds below are the mockup's.
 
 | Element | Parent | Bounds | Appearance | Content / data | Kit part |
 |---|---|---|---|---|---|
@@ -145,6 +184,9 @@ one frame for all six, slice an empty frame from 01 slot frames
 | EmptyRow.Dot | EmptyRow | 1358,377,13,13 / 1358,412,13,13 / 1358,448,13,13 | flat circle Color.SlotDot | — | native (UICorner 0.5); 09 list row dot is the same idea |
 | Scrollbar.Track | PartyPanel | 1588,366,8,111 | Color.ScrollTrack, fully rounded | — | 09 scrollbar track (1520,461,47,266) is a framed version; mockup is flat |
 | Scrollbar.Thumb | Track | 1588,366,8,63 at the mock position | Color.ScrollThumb, fully rounded | list scroll position | 09 thumb (1601,477,47,144) is leather; mockup is flat |
+
+Member rows show no ready dot and no Leader tag: the crown alone marks the
+leader (D24).
 
 The list area (member row + empty rows) is a scroll region from y 313 to the
 panel's inner bottom (≈ y 489): 1 member row (51 px) + 3 visible empty rows
@@ -254,11 +296,11 @@ components; `tsize.py`: Merriweather render matching). Full output in
 
 | Asset | Source (sheet: x,y,w,h in sheet px) | Shown at (design px) | Notes |
 |---|---|---|---|
-| Player card | 07: 95,33,771,178 | 359 × 81 | portrait window must be cut out for the live headshot |
+| Player card | 07: 95,33,771,178 | 359 × 81 | not drawn in the game (owner decision); sliced as `lk_player_card` |
 | Pill frame | 07: 915,85,245,105 (coins) | 116 × 46 / 101 × 46 | 9-slice; same frame for Gems |
 | Square HUD button | 07: 1458,82,118,108 | 52 × 46 | settings |
 | Menu tile frame | 07 tiles (771..1457 × 239..650) or 05 slot normal | 88 × 84 | icon layered on top if the frame is shared |
-| Menu icons | 06: backpack, portal, scroll, market, anvil, trade | ≈ 55–71 px | also in 11 (row 1) |
+| Menu icons | 06: backpack, portal, scroll, market, anvil, trade; 21: the crystal play arrow for Play (D26) | ≈ 55–71 px | also in 11 (row 1) |
 | Party panel frame | 07: 153,235,549,428 | 294 × 244 | 9-slice (taller than kit) |
 | Crown | 06: 945,721,193,160 | 19 × 14 | |
 | Add-friend button | 15: 955,764,124,100 | 45 × 34 | |
@@ -286,15 +328,47 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 4. Add-friend button for non-leaders and a full party: hide, or show disabled?
    Default: disabled (kit 03 disabled look).
 5. Play tile icon. In `04`/`05` the dimmed Play tile shows a bare play triangle
-   instead of the portal. Default: keep the portal from `01` (one icon).
+   instead of the portal. **Resolved (D26):** the owner's sheet-21 crystal play
+   arrow on every screen (tile and Play window header); the portal shows only
+   until its atlas is uploaded.
 6. Should the tile of the open window stay highlighted? Default: no.
 7. XP fills in the mockup (0.74 card, 0.67 bar) do not match 450/750 (0.60).
    Default: both bars use the real fraction.
 
 ## Deviations from reference
 
+- Owner decisions (D27–D30): the lobby HUD shares the run's grid (D30): Coins
+  and Gems (one 315 px row) and the Party panel (315 wide) are the right-hand
+  column, M from the top and on one edge, G apart; the tiles are the run's
+  grid at the left-hand column's edge (phones: the run's 3 × 2 under the top
+  bar); the Settings button moves from the top-right row to the bottom-left
+  corner, M from the left and the bottom; the level/XP bar and hotbar stand
+  M above the bottom edge with the XP bar centred over the hotbar. Before
+  D30 the Settings button stood left of the thumbstick ring on touch (D29),
+  above it 39 px in (D28) and beside the jump button (D27).
 - Owner decision: party count shows the real cap, **"1/8"**, not "1/10".
 - Owner decision: the Play tile opens the Play window.
+- Owner decision (D26): the Play tile's icon is the stone-framed crystal play
+  arrow from kit sheet 21 (`icon.playRune`), not the portal. It sits in the
+  tile at the menu icons' share (0.72 of the tile, 60 px), fitted, so it draws
+  46 × 60.
+- Owner decision: no player card (top left). The XP bar at the bottom and the
+  party rows' level and XP bars carry the progression. The XP bar (its level,
+  bar and XP text) is pressable and opens Progress, the lobby's only way there
+  on touch; its touch pad grows upwards, off the hotbar, and gamepad reaches it
+  between the bottom tiles and the hotbar. It draws the kit's press feedback:
+  1.03 on hover and gamepad focus (with the gold focus ring), 0.96 while held,
+  the bar's art at the hover / pressed tints. XP pop-ups stack just above it,
+  as in the run's HUD, and above the game-update notice while it shows
+  (`LobbyHud.POPUPS`, `_placePopups`), on desktop and phones. A window opening
+  moves the pop-ups still showing to the toast lane for the rest of their
+  time, and gains while a window is open go there directly; a level-up toast
+  is titled "Level Up" and its line does not repeat it.
+- The PARTY title row's touch pad also grows upwards only, so it never covers
+  the first member's row. A member row whose level is not known yet (no
+  replicated `Level` attribute) shows neither "LV." nor its XP bar.
+- No ready dots and no Leader tag in the Party panel (D24): the crown alone
+  marks the leader.
 - Hotbar and XP bar keep their `01_hud.png` positions under modals (q. 2 default).
 - The mockup's text has a soft dark halo from the image generator; TextLabels have
   none. No UIStroke on HUD text.
@@ -326,3 +400,41 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
   (`Reporting()`) the HUD does not toast LobbyController's "Party: …" status.
 - A failed start disconnects everything it connected and destroys the HUD
   before falling back (L9).
+
+## Owner feedback round (square hotbar)
+
+- The hotbar slots are square: 89 × 89 (the mockup's 89 × 93 less 4 px of
+  height), at the mockup's x and pitch, their foot on the bottom region's
+  edge (y 35 in the 124 px region; HudLayout `bottom.hotbar`, D30). The run's HUD hotbar
+  matches (`HudLayout.json` `bottom.hotbar`).
+
+## Owner edges round (D29)
+
+(Its placements are superseded by D30, "Owner grid round" below.)
+
+From the owner's second annotated phone screenshot
+(`art/ui/verify/owner/lobby_move_request_2.jpg`, the D28 build on a notched
+844 × 390 iPhone; pink boxes and arrows):
+
+| Drawing | Built (844 × 390 notched iPhone; desktop 1672 × 941) |
+|---|---|
+| Coins and Gems, arrow up and right, box in the top-right corner level with Roblox's buttons | x 689–832, y 12–35: level with the buttons' top, 12 pt from the screen's edge (D28: x 629–770, y 65–87); desktop x 1414–1648, y 12–58 |
+| Party panel, arrow up and right, box at the right edge under the pills | Right under the pills (y 43–165; D28: 159–281). It reaches the middle band of the screen, where the notch can be, so its right edge keeps the 47 pt safe inset (x 650–797; D28: 623–770) rather than reaching the very edge the box shows; it would take the margin only if it fitted wholly in the top 30 %. Desktop x 1354–1648, y 74–318 |
+| Settings, arrow down, box left of the thumbstick ring near the bottom | Left of the ring, centred on its height: x 23–49, y 323–347 (D28: x 55–81, y 265–288); desktop 24 px from the left and the bottom |
+| Tiles, hotbar, XP bar (not marked) | Unchanged (the tiles 68 design px inside the safe area) |
+
+## Owner grid round (D30)
+
+The owner on the live D29 HUD: both HUDs should put their shared pieces in the
+same place, everything as close to the screen's edges as possible and lined
+up, Settings exactly in the corner. Built on the HUD grid (STYLE_GUIDE §5.6,
+ARCHITECTURE D30); 844 × 390 notched iPhone / desktop 1672 × 941:
+
+| Piece | Built |
+|---|---|
+| Coins and Gems | the right-hand column's first piece, 315 wide: x 640–797, y 12–35 / x 1333–1648, y 24–70 (the run's vitals: the same top, edge and width) |
+| Party panel | G under them, 315 × 244, the same edge: x 640–797, y 41–163 / x 1333–1648, y 82–326 (the run's objective: the same edge and width) |
+| Menu tiles | the run's grid: phones 3 × 2 under the top bar, x 47–175, y 62–145 (D29: 2 × 3, x 81–169, 68 px inside the safe area); desktop 2 × 3 centred, x 24–214, y 312–584 (D29: x 68) |
+| Settings | the corner, M from the left and the bottom: x 12–38, y 355–378 / x 24–76, y 871–917 |
+| Level/XP bar and hotbar | the run's group, M above the bottom edge (D29: 49), the XP bar centred over the hotbar: hotbar y 334–378 / 828–917; the update notice centred, G above the bar |
+

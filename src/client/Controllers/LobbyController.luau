@@ -4,16 +4,16 @@
 --
 -- With the lobby HUD (HudMode.ReplacesLobby) this keeps the logic and the HUD and
 -- the Party and Play windows draw it: Deploy(), PartyAction() and its wrappers
--- (Invite, Accept, Decline, Leave, SetReady), PartyView(), IsReady(), IsInvited(),
+-- (Invite, Accept, Decline, Leave), PartyView(), IsInvited(),
 -- Preview(), Invitable(), Status(), Changed and PartyChanged. Otherwise it also
 -- builds its own panel.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local PlayModel = require(ReplicatedStorage.Shared.UI.PlayModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
@@ -27,7 +27,7 @@ LobbyController.Changed = Signal.new()
 LobbyController.PartyChanged = Signal.new()
 
 local player = Players.LocalPlayer
-local partyView = { party = nil, invites = {}, ready = false, maxSize = PartyRules.MAX_SIZE }
+local partyView = { party = nil, invites = {}, maxSize = PartyRules.MAX_SIZE }
 -- The deploy preview: {catalogId, quantity, permanent}[] once read, or nil.
 local previewItems = nil
 local statusText = "You are safe in the lobby."
@@ -107,14 +107,9 @@ local function refreshPreview()
 	if #items == 0 then
 		label("Nothing in your backpack will enter the run.", ui.preview)
 	else
-		label("⚠ These items go with you; all but ★ Permanent ones can be lost:", ui.preview)
+		label("These items go with you; all but Permanent ones can be lost:", ui.preview)
 		for _, item in items do
-			local def = ItemCatalog.Get(item.catalogId)
-			local name = def and def.name or tostring(item.catalogId)
-			label(
-				(item.permanent and "★ " or "• ") .. name .. (item.quantity and (" ×" .. item.quantity) or ""),
-				ui.preview
-			)
+			label(PlayModel.ItemLine(item), ui.preview)
 		end
 	end
 	label("Items in your vault always stay safe. Materials you bring never get the Center ×2.", ui.preview)
@@ -123,7 +118,12 @@ end
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,
 -- with one more pass if something changed while a fetch was in flight.
 local previewBusy, previewAgain = false, false
+-- When the preview was last asked for (os.clock): the backup timer re-reads it
+-- only once that is PREVIEW_REFRESH_SECONDS old.
+local previewAskedAt = -math.huge
+
 local function requestPreview()
+	previewAskedAt = os.clock()
 	if previewBusy then
 		previewAgain = true
 		return
@@ -188,7 +188,7 @@ local function refreshParty()
 	if party then
 		label("Your party (" .. #party.members .. "/" .. PartyRules.MAX_SIZE .. "):", ui.party)
 		for _, member in party.members do
-			label((member.userId == party.leader and "★ " or "• ") .. member.name, ui.party)
+			label("• " .. member.name .. (if member.userId == party.leader then " (leader)" else ""), ui.party)
 		end
 		button("Leave party", ui.party, function()
 			partyAction("leave")
@@ -246,7 +246,7 @@ function LobbyController.IsDeploying(): boolean
 	return deploying
 end
 
--- "invite" + userId, "accept"/"decline" + partyId, "leave", or "ready" + bool.
+-- "invite" + userId, "accept"/"decline" + partyId, or "leave".
 -- Yields; returns (success, reason?). A failure also shows in Status().
 function LobbyController.PartyAction(action: string, argument: any?): (boolean, string?)
 	return partyAction(action, argument)
@@ -268,38 +268,16 @@ function LobbyController.Leave(): (boolean, string?)
 	return partyAction("leave")
 end
 
--- Sets your own advisory ready flag (works without a party). The view updates
--- when the server confirms. Yields.
-function LobbyController.SetReady(ready: boolean): (boolean, string?)
-	return partyAction("ready", ready == true)
-end
-
 -- {
 --   party = nil | {id, leader, createdAt (server os.time, or nil), members =
---     {{userId, name, ready}}, invited = {userId} (the leader's pending invites;
+--     {{userId, name}}, invited = {userId} (the leader's pending invites;
 --     empty for other members)},
 --   invites = {{partyId, from, fromUserId}} (invites waiting for you; from is
 --     the inviting leader's display name),
---   ready = boolean (yours, also when solo),
 --   maxSize = 8,
 -- }
 function LobbyController.PartyView()
 	return partyView
-end
-
--- Whether `userId` (default: you) is ready. Only you and your party's members
--- are known; anyone else reads false.
-function LobbyController.IsReady(userId: number?): boolean
-	if userId == nil or userId == player.UserId then
-		return partyView.ready == true
-	end
-	local party = partyView.party
-	for _, member in party and party.members or {} do
-		if member.userId == userId then
-			return member.ready == true
-		end
-	end
-	return false
 end
 
 -- True while your party has an unanswered invite out to `userId` (leader only).
@@ -443,13 +421,19 @@ function LobbyController.Start()
 	end)
 	-- Never block later controllers' Start on a server round trip. The profile may
 	-- still be loading now, and every vault, shop or trade change marks a save, so
-	-- the save status changing is the cue to re-read; a slow timer backs it up.
+	-- the save status changing is the cue to re-read; a slow timer backs it up,
+	-- asking only when no other read has happened for PREVIEW_REFRESH_SECONDS
+	-- (so the preview is never older than that, without extra round trips).
 	requestPreview()
 	player:GetAttributeChangedSignal("SaveStatus"):Connect(requestPreview)
 	task.spawn(function()
 		while true do
-			task.wait(LobbyController.PREVIEW_REFRESH_SECONDS)
-			requestPreview()
+			local due = previewAskedAt + LobbyController.PREVIEW_REFRESH_SECONDS - os.clock()
+			if due > 0 then
+				task.wait(due)
+			else
+				requestPreview()
+			end
 		end
 	end)
 	local function notice()

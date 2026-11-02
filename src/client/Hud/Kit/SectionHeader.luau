@@ -6,7 +6,9 @@
 local Art = require(script.Parent.Art)
 local Core = require(script.Parent.Core)
 local Divider = require(script.Parent.Divider)
+local Scale = require(script.Parent.Scale)
 local Text = require(script.Parent.Text)
+local Tokens = require(script.Parent.Tokens)
 
 local SectionHeader = {}
 SectionHeader.__index = SectionHeader
@@ -27,29 +29,40 @@ function SectionHeader.new(parent: Instance, props)
 		x = rect[1] + rect[3] + 10
 	end
 	x = props.textX or x
-	local size = props.textSize
-	local textW = Text.Width(props.text or "", "sectionHeader", size)
+	self.x, self.w, self.h = x, w, h
+	self.size = props.textSize
+	self.countGap = props.countGap or 22
+	-- Never truncated (STYLE_GUIDE §4.6): the label keeps its (phone-boosted)
+	-- size when the text fits the width, else it shrinks to fit (`_fit`).
 	self.label = Core.Label(base.visual, {
 		name = "Label",
 		text = props.text,
 		role = "sectionHeader",
-		size = size,
-		-- The whole width is the label's, so a heavy face never truncates; where
-		-- the boosted phone size does not fit, it shrinks to fit.
-		scaled = true,
-		rect = { x, 0, if props.count then math.min(textW * 1.06 + 8, w - x) else w - x, h - 6 },
+		size = self.size,
+		rect = { x, 0, w - x, h - 6 },
 		z = base.z + 1,
 	})
+	self.label.TextTruncate = Enum.TextTruncate.None
 	if props.count then
 		self.count = Core.Label(base.visual, {
 			name = "Count",
 			text = props.count,
 			role = "sectionHeader",
-			size = size,
-			rect = { x + textW * 1.04 + (props.countGap or 22), 0, 120, h - 6 },
+			size = self.size,
+			rect = { x, 0, 120, h - 6 },
 			z = base.z + 1,
 		})
+		self.count.TextTruncate = Enum.TextTruncate.None
 	end
+	self:_fit()
+	-- The phone boost changes with the form factor: fit again after it.
+	base.maid:Give(Scale.OnFormFactorChanged(function()
+		task.defer(function()
+			if self.label.Parent then
+				self:_fit()
+			end
+		end)
+	end))
 	if props.rule ~= false then
 		local variant = if type(props.rule) == "string" then props.rule else "ink"
 		local native = variant == "ink" or variant == "hairline"
@@ -59,13 +72,42 @@ function SectionHeader.new(parent: Instance, props)
 	return self
 end
 
+-- Sizes the label (and the count after it) to the header's width: the role
+-- size (or textSize), boosted on phones, or smaller when that does not fit.
+-- The width is measured with a little room to spare (the heavy face runs a
+-- touch wider than measured), so the text is never cut.
+function SectionHeader:_fit()
+	local style = Tokens.TextStyle("sectionHeader")
+	local size = self.size or style.size
+	local shown = size * Core.TextBoost("sectionHeader", size)
+	local room = self.w - self.x
+	local textW = Text.Width(self.label.Text, "sectionHeader", self.size) * 1.04
+	local countW = 0
+	if self.count and self.count.Text ~= "" then
+		countW = Text.Width(self.count.Text, "sectionHeader", self.size) * 1.04 + self.countGap
+	end
+	local k = math.min(1, room / math.max(textW + 2 + countW, 1), (self.h - 6) / math.max(shown, 1))
+	self.label.TextSize = shown * k
+	self.label.Size = UDim2.fromOffset(math.min(room, math.ceil(textW * k) + 4), self.h - 6)
+	if self.count then
+		self.count.TextSize = shown * k
+		-- A right-aligned count was pinned to the header's end by its owner (the
+		-- event card's timer): it keeps its place.
+		if self.count.TextXAlignment ~= Enum.TextXAlignment.Right then
+			self.count.Position = UDim2.fromOffset(self.x + (textW + self.countGap) * k, 0)
+		end
+	end
+end
+
 function SectionHeader:SetText(text: string)
 	Core.SetText(self.label, text)
+	self:_fit()
 end
 
 function SectionHeader:SetCount(text: string)
 	if self.count then
 		Core.SetText(self.count, text)
+		self:_fit()
 	end
 end
 

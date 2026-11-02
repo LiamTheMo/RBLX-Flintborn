@@ -1,6 +1,6 @@
--- Advisory party Ready (UI rebuild D3): a lobby-only per-player flag set through
--- PartyAction("ready", bool). Covers the pure rules and what PartyService sends
--- each client (ready flags, createdAt, the leader's pending invites, the cap).
+-- Lobby party views: the pure rules behind them (createdAt, pending invites)
+-- and what PartyService sends each client (members, createdAt, the leader's
+-- pending invites, the cap). There is no Ready flag (ARCHITECTURE D24).
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
@@ -9,70 +9,28 @@ local PartyRules = require(Shared.Admission.PartyRules)
 
 -- Pure rules ------------------------------------------------------------------------
 
-test("a solo player can be ready without creating a party", function()
+test("a party state holds parties and memberships only", function()
 	local state = PartyRules.NewState()
-	expect(PartyRules.SetReady(state, 1, true), "set")
-	expect(PartyRules.IsReady(state, 1), "ready")
-	expectEq(PartyRules.PartyOf(state, 1), nil, "no party created")
-	expectEq(next(state.parties), nil, "no party record at all")
-	expect(PartyRules.SetReady(state, 1, false), "unset")
-	expect(not PartyRules.IsReady(state, 1), "not ready")
-	expectEq(state.ready[1], nil, "no entry kept for false")
-end)
-
-test("only a boolean sets ready", function()
-	local state = PartyRules.NewState()
-	for _, bad in { 1, "true", {} } do
-		local ok, reason = PartyRules.SetReady(state, 1, bad)
-		expect(not ok and reason == "BadRequest", "refused " .. tostring(bad))
+	expectEq(PartyRules.SetReady, nil, "no ready rule")
+	expectEq(PartyRules.IsReady, nil, "no ready query")
+	local keys = {}
+	for key in state do
+		table.insert(keys, key)
 	end
-	local ok, reason = PartyRules.SetReady(state, 1, nil)
-	expect(not ok and reason == "BadRequest", "refused nil")
-	expect(not PartyRules.IsReady(state, 1), "unchanged")
+	table.sort(keys)
+	expectEq(table.concat(keys, ","), "memberOf,parties", "no per-player ready state")
 end)
 
-test("accept clears ready for every member of both parties", function()
+test("leave and forget take the player out and clear their invites", function()
 	local state = PartyRules.NewState()
 	PartyRules.Invite(state, 1, 2, "a", 100)
 	PartyRules.Accept(state, 2, "a")
-	PartyRules.Invite(state, 3, 4, "b", 100)
-	PartyRules.Accept(state, 4, "b")
 	PartyRules.Invite(state, 1, 4, "x", 100)
-	for userId = 1, 5 do
-		PartyRules.SetReady(state, userId, true)
-	end
-	expect(PartyRules.Accept(state, 4, "a"), "4 moves to party a")
-	for _, userId in { 1, 2, 3, 4 } do
-		expect(not PartyRules.IsReady(state, userId), userId .. " cleared")
-	end
-	expect(PartyRules.IsReady(state, 5), "a bystander keeps ready")
-end)
-
-test("leave and forget clear the whole party; invite and decline do not", function()
-	local state = PartyRules.NewState()
-	PartyRules.Invite(state, 1, 2, "a", 100)
-	PartyRules.Accept(state, 2, "a")
-	PartyRules.Invite(state, 1, 3, "x", 100)
-	PartyRules.Invite(state, 1, 4, "x", 100)
-	for userId = 1, 4 do
-		PartyRules.SetReady(state, userId, true)
-	end
-	PartyRules.Decline(state, 3, "a")
-	PartyRules.Invite(state, 1, 5, "x", 100)
-	expect(PartyRules.IsReady(state, 1) and PartyRules.IsReady(state, 3), "invite and decline keep ready")
 	PartyRules.Leave(state, 2)
-	expect(not PartyRules.IsReady(state, 1) and not PartyRules.IsReady(state, 2), "leave clears leaver and party")
-	expect(PartyRules.IsReady(state, 4), "an invitee outside the party is untouched")
-
-	PartyRules.Invite(state, 1, 2, "x", 100)
-	PartyRules.Accept(state, 2, "a")
-	PartyRules.SetReady(state, 1, true)
-	PartyRules.SetReady(state, 2, true)
-	PartyRules.Forget(state, 1)
-	expect(not PartyRules.IsReady(state, 2), "a member leaving the server clears the rest")
+	expectEq(PartyRules.PartyOf(state, 2), nil, "the leaver has no party")
+	expectEq(#PartyRules.PartyOf(state, 1).members, 1, "the leader stays")
 	PartyRules.Forget(state, 4)
-	expectEq(state.ready[4], nil, "a solo player's flag is forgotten too")
-	expectEq(PartyRules.PartyOf(state, 2).invites[4], nil, "and their invites")
+	expectEq(PartyRules.PartyOf(state, 1).invites[4], nil, "a forgotten player's invites go")
 end)
 
 test("a party records when it was created and lists pending invites", function()
@@ -173,44 +131,37 @@ end
 
 local leader, member, invitee, solo = newPlayer(1), newPlayer(2), newPlayer(3), newPlayer(4)
 
-test("ready rides PartyAction with a type check and reaches every view", function()
-	expectEq(sent[4].ready, false, "not ready at first")
+test("ready is not a party action any more", function()
+	expectEq(sent[4].ready, nil, "no ready flag in the view")
 	expectEq(sent[4].maxSize, 8, "the cap is sent")
-	expect(handlers.PartyAction(solo, "ready", true), "solo ready")
-	expectEq(sent[4].ready, true, "solo sees ready")
-	expectEq(sent[4].party, nil, "solo still has no party")
-	expectEq(PartyService.PartyIdOf(solo), nil, "no party to deploy with")
-	for _, bad in { "yes", 1, {} } do
-		local ok, reason = handlers.PartyAction(solo, "ready", bad)
-		expect(not ok and reason == "BadRequest", "refused " .. tostring(bad))
+	for _, value in { true, false } do
+		local ok, reason = handlers.PartyAction(solo, "ready", value)
+		expect(not ok and reason == "BadRequest", "refused ready " .. tostring(value))
 	end
-	local ok, reason = handlers.PartyAction(solo, "ready")
-	expect(not ok and reason == "BadRequest", "refused a missing flag")
-	expectEq(sent[4].ready, true, "bad requests change nothing")
+	expectEq(sent[4].party, nil, "solo still has no party")
+	expectEq(PartyService.ClearReady, nil, "no ready clearing on deploy")
 end)
 
-test("the party view carries ready flags, createdAt, cap and the leader's invites", function()
+test("the party view carries members, createdAt, cap and the leader's invites", function()
 	local before = os.time()
 	handlers.PartyAction(leader, "invite", 2)
 	handlers.PartyAction(leader, "invite", 3)
 	local partyId = PartyService.PartyIdOf(leader)
 	handlers.PartyAction(member, "accept", partyId)
-	handlers.PartyAction(member, "ready", true)
 
 	local view = sent[1]
 	expect(view.party ~= nil, "leader has a party")
 	expect(type(view.party.createdAt) == "number" and view.party.createdAt >= before, "createdAt is server os.time")
 	expectEq(#view.party.members, 2, "two members")
 	expectEq(view.party.members[2].userId, 2, "member listed")
-	expectEq(view.party.members[2].ready, true, "member ready")
-	expectEq(view.party.members[1].ready, false, "leader not ready")
-	expectEq(view.ready, false, "own flag")
+	expectEq(view.party.members[2].name, "Name2", "by display name")
+	expectEq(view.party.members[2].ready, nil, "no member ready flag")
+	expectEq(view.ready, nil, "no own ready flag")
 	expect(#view.party.invited == 1 and view.party.invited[1] == 3, "the leader sees the pending invite")
 	expectEq(view.maxSize, 8, "cap")
 
 	local memberView = sent[2]
 	expectEq(#memberView.party.invited, 0, "other members do not see who was invited")
-	expectEq(memberView.ready, true, "member's own flag")
 
 	local inviteeView = sent[3]
 	expectEq(inviteeView.party, nil, "an invitee sees no party details")
@@ -225,42 +176,25 @@ test("the party view carries ready flags, createdAt, cap and the leader's invite
 	expectEq(#soloView.invites, 0, "and no invites")
 end)
 
-test("accept, leave and disconnect clear ready for the parties involved", function()
+test("accept, leave and disconnect update the views of the parties involved", function()
 	local partyId = PartyService.PartyIdOf(leader)
-	handlers.PartyAction(leader, "ready", true)
-	handlers.PartyAction(member, "ready", true)
-	handlers.PartyAction(invitee, "ready", true)
 	handlers.PartyAction(invitee, "accept", partyId)
-	expect(not sent[1].ready and not sent[2].ready and not sent[3].ready, "accept clears all three")
-	expectEq(sent[4].ready, true, "the solo player is untouched")
-
-	handlers.PartyAction(leader, "ready", true)
-	handlers.PartyAction(member, "ready", true)
+	expectEq(#sent[1].party.members, 3, "accept adds the invitee")
+	expectEq(#sent[2].party.members, 3, "every member sees it")
+	expectEq(sent[4].party, nil, "the solo player is untouched")
 	handlers.PartyAction(invitee, "leave")
-	expect(not sent[1].ready and not sent[2].ready, "leave clears the party")
-
-	handlers.PartyAction(leader, "ready", true)
-	handlers.PartyAction(member, "ready", true)
+	expectEq(sent[3].party, nil, "the leaver has no party")
+	expectEq(#sent[1].party.members, 2, "leave updates the party")
 	removePlayer(member)
-	expect(not sent[1].ready, "a disconnect clears the rest of the party")
-	expectEq(#sent[1].party.members, 1, "member gone")
+	expectEq(#sent[1].party.members, 1, "a disconnect removes the member")
 end)
 
-test("a starting deploy clears its group's ready flags", function()
-	handlers.PartyAction(leader, "ready", true)
-	handlers.PartyAction(invitee, "ready", true)
-	PartyService.ClearReady({ leader, solo })
-	expect(not sent[1].ready and not sent[4].ready, "deploying group cleared")
-	expectEq(sent[3].ready, true, "others keep theirs")
-end)
-
-test("the per-player cooldown still applies to ready", function()
+test("the per-player cooldown applies to party actions", function()
 	PartyService.REQUEST_COOLDOWN_SECONDS = COOLDOWN
 	local fresh = newPlayer(5)
-	expect(handlers.PartyAction(fresh, "ready", true), "first request")
-	local ok, reason = handlers.PartyAction(fresh, "ready", false)
+	expect(handlers.PartyAction(fresh, "leave"), "first request")
+	local ok, reason = handlers.PartyAction(fresh, "leave")
 	expect(not ok and reason == "TooFast", "spam refused")
-	expectEq(sent[5].ready, true, "the refused request changed nothing")
 	PartyService.REQUEST_COOLDOWN_SECONDS = -1
 end)
 
@@ -271,20 +205,11 @@ test("only players whose view changed are sent one; no-ops send nothing", functi
 	local function delta(before, userId)
 		return (fires[userId] or 0) - (before[userId] or 0)
 	end
-	-- leader (1) and invitee (3) are in one party; solo (4) and 5 are alone.
-	handlers.PartyAction(invitee, "ready", false)
+	-- leader (1) leads a party of one; invitee (3), solo (4) and 5 are alone.
 	local before = snapshot()
-	handlers.PartyAction(invitee, "ready", false)
-	expectEq(delta(before, 3), 0, "an unchanged ready flag sends nothing")
 	handlers.PartyAction(solo, "leave")
 	handlers.PartyAction(solo, "decline", "no-such-party")
 	expectEq(delta(before, 4), 0, "a leave or decline that changes nothing sends nothing")
-
-	before = snapshot()
-	handlers.PartyAction(leader, "ready", true)
-	expectEq(delta(before, 1), 1, "the player who changed hears once")
-	expectEq(delta(before, 4), 0, "a stranger hears nothing")
-	expectEq(delta(before, 5), 0, "nor does anyone else outside the party")
 
 	before = snapshot()
 	handlers.PartyAction(leader, "invite", 4)
@@ -322,7 +247,7 @@ test("a client that missed its first view gets it again on request", function()
 	end
 	-- Later broadcasts still skip the unchanged view.
 	before = fires[7]
-	handlers.PartyAction(solo, "ready", not sent[4].ready)
+	handlers.PartyAction(leader, "invite", 5)
 	expectEq(fires[7], before, "a change elsewhere does not resend it")
 	local bad, reason = handlers.PartyAction(late, "view", "extra")
 	expect(not bad and reason == "BadRequest", "a view request takes no argument")

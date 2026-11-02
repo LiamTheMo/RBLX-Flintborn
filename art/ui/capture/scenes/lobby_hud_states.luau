@@ -1,8 +1,8 @@
 -- Every interactive part of the lobby HUD forced into one state per page through
 -- the DebugState attribute (as verifiers do): 1 hover, 2 pressed, 3 disabled,
 -- 4 focused (gamepad selection), 5 selected. The pills, gear, tiles,
--- Party title, member and empty rows, the add-player button, the invite answers
--- and the hotbar slots.
+-- Party title, the level / XP bar, member and empty rows, the add-player
+-- button, the invite answers and the hotbar slots.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 -- Members' replicated level and progress (PlayerRow levelBar reads them).
 for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
@@ -24,14 +24,13 @@ for _, state in { "hover", "pressed", "disabled", "focused", "selected" } do
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party({
-		party = { id = "p1", leader = 1, members = { { userId = 1, name = "LiamTheMo", ready = true } } },
+		party = { id = "p1", leader = 1, members = { { userId = 1, name = "LiamTheMo" } } },
 		invites = { { partyId = "p9", from = "RiverFox" } },
-		ready = true,
 		maxSize = 8,
 	}, ME))
 	hud:SetHotbar(LobbyHudModel.Hotbar({ { catalogId = "StoneAxe", quantity = 1 } }))
 	local parts = hud.parts
-	local roots = { parts.coins, parts.gems, parts.settings, parts.partyTitle, parts.invite }
+	local roots = { parts.coins, parts.gems, parts.settings, parts.partyTitle, parts.invite, parts.xp }
 	for _, tile in ipairs(hud.tiles) do
 		table.insert(roots, tile.root)
 	end

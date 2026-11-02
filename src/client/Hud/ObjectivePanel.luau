@@ -125,18 +125,9 @@ end
 function ObjectivePanel:Set(model)
 	if model.title ~= self.titleText then
 		self.titleText = model.title
+		-- The kit's section header shrinks a title that does not fit its row
+		-- (never "…").
 		self.header:SetText(model.title)
-		-- The header label was sized for its first text; give it the row, and a
-		-- smaller size when the title (1.2 × on touch screens) would not fit.
-		local label = self.header.label
-		local room = self.cfg.header[3] - label.Position.X.Offset
-		label.Size = UDim2.fromOffset(room, label.Size.Y.Offset)
-		local size = Kit.Tokens.TextStyle("sectionHeader").size
-		local need = Kit.Text.Width(model.title, "sectionHeader", size) * 1.04 + 4
-		if need > room then
-			size = math.floor(size * room / need)
-		end
-		label.TextSize = size * Kit.Core.TextBoost("sectionHeader")
 	end
 	for index, row in self.rows do
 		local line = model.lines[index]

@@ -19,6 +19,7 @@ tiles, each at full resolution.
 
 slice_parchment.py runs this after slicing, since it rewrites the manifest.
 """
+import io
 import json
 from pathlib import Path
 
@@ -27,6 +28,7 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 SPRITES = HERE / "sprites"
 MANIFEST = SPRITES / "manifest.json"
+IDS_FILE = HERE.parents[1] / "src" / "shared" / "UI" / "UiAssetIds.json"
 SIDE = 1024
 # Space between sprites; their edges are already bled into transparent pixels,
 # so filtering at a rectangle's border never reaches a neighbour.
@@ -151,6 +153,68 @@ GROUPS = {
         "lk_icon_star", "lk_icon_stone", "lk_icon_stone_axe", "lk_icon_stones", "lk_icon_torch", "lk_icon_tusk",
         "lk_icon_warning",
     ],
+    # The Play rune art (sheet 21, ARCHITECTURE D26): the Play tile and Play
+    # window icon, the PLAY button's crystal glyph and its two pillars. An atlas
+    # of its own, so the four uploaded lk_ atlases keep their rects and bytes;
+    # until it is uploaded the Kit draws the portal icon and the white play
+    # glyph (KitModel.ROLES `fallback`) and no pillars.
+    "atlas_lk_play": [
+        "lk_icon_play_rune", "lk_icon_play_rune_small", "lk_pillar_rune_left", "lk_pillar_rune_right",
+    ],
+    # High-resolution copies (slice_lobby_kit.py HIRES, `<name>__hi`): the same
+    # parts at up to 2x, drawn where the 1x art would be magnified. New atlases,
+    # so every uploaded atlas keeps its bytes and rects; until one is uploaded
+    # its sprites draw their 1x art from the uploaded atlases (UiAssets.Placement).
+    # What the lobby HUD and every window share (frames, bars, slots, pills).
+    "atlas_lk_lobby_hi": [
+        "lk_bar_fill_blue__hi", "lk_bar_fill_green__hi", "lk_bar_fill_orange__hi", "lk_bar_fill_red__hi",
+        "lk_bar_fill_yellow__hi", "lk_bar_frame__hi", "lk_bar_frame_plain__hi", "lk_bar_frame_thin__hi",
+        "lk_bar_track__hi", "lk_button_paper_disabled__hi", "lk_button_paper_hover__hi", "lk_button_paper_normal__hi",
+        "lk_button_paper_pressed__hi", "lk_button_paper_small_disabled__hi", "lk_button_paper_small_hover__hi",
+        "lk_button_paper_small_normal__hi", "lk_currency_pill__hi", "lk_frame_round__hi", "lk_panel__hi",
+        "lk_plaque_paper__hi", "lk_slot_disabled__hi", "lk_slot_hover__hi", "lk_slot_item_normal__hi",
+        "lk_slot_item_selected__hi", "lk_slot_locked__hi", "lk_slot_normal__hi", "lk_slot_selected__hi",
+        "lk_statbar_frame__hi", "lk_tile_frame__hi", "lk_toast_frame__hi", "lk_window_frame__hi",
+    ],
+    # Window parts and controls.
+    "atlas_lk_window_hi": [
+        "lk_button_leather_disabled__hi", "lk_button_leather_hover__hi", "lk_button_leather_normal__hi",
+        "lk_button_leather_pressed__hi", "lk_button_stepper_minus__hi", "lk_button_stepper_plus__hi",
+        "lk_clasp_left__hi", "lk_clasp_right__hi", "lk_dialog_frame__hi", "lk_glyph_play__hi", "lk_panel_inset__hi",
+        "lk_pill_value__hi", "lk_plaque_notched_disabled__hi", "lk_plaque_notched_leather__hi",
+        "lk_plaque_notched_paper__hi", "lk_plaque_small__hi", "lk_tab_arrow_leather__hi", "lk_tab_arrow_paper__hi",
+        "lk_tab_category__hi",
+    ],
+    # The Quest Journal's detail illustrations (drawn 197 x 122).
+    "atlas_lk_journal_hi": [
+        "lk_icon_anvil_hammer__hi", "lk_icon_berry_bush__hi", "lk_icon_crown__hi", "lk_icon_paw__hi",
+        "lk_icon_portal__hi", "lk_icon_scroll__hi", "lk_icon_totem__hi", "lk_icon_treasure__hi",
+        "lk_icon_trophy__hi", "lk_icon_tusk__hi",
+    ],
+    # Item art's hero copies (slice_lobby_kit.py HERO, 356 px on the long side;
+    # the armour stand-in glyph from glyphs.py): the Forge / Crafting picture and
+    # the Inventory detail card. The tools the Forge and Crafting pictures show
+    # first, then the other items in three atlases.
+    "atlas_lk_items_hi_1": [
+        "lk_glyph_ink_backpack__hi", "lk_icon_build__hi", "lk_icon_campfire__hi", "lk_icon_hatchet__hi",
+        "lk_icon_pickaxe__hi", "lk_icon_spear__hi", "lk_icon_stone_axe__hi", "lk_icon_torch__hi",
+    ],
+    "atlas_lk_items_hi_2": [
+        "lk_icon_hide__hi", "lk_icon_logs__hi", "lk_icon_magma_ore__hi", "lk_icon_mushroom__hi",
+        "lk_icon_plant_fiber__hi", "lk_icon_runestone__hi", "lk_icon_tusk__hi2",
+    ],
+    "atlas_lk_items_hi_3": [
+        "lk_icon_berries__hi", "lk_icon_bone__hi", "lk_icon_crystals__hi", "lk_icon_drumstick__hi",
+        "lk_icon_lightning__hi", "lk_icon_rope__hi", "lk_icon_stone__hi",
+    ],
+    "atlas_lk_items_hi_4": [
+        "lk_icon_heart__hi", "lk_icon_plank__hi", "lk_icon_rocks__hi", "lk_icon_star__hi", "lk_icon_stones__hi",
+        "lk_icon_warning__hi",
+    ],
+    # The island painting at 2040 px (render_island.py), 2 x 2 tiles of at most
+    # 1024 px, each an atlas of its own: the world map draws it up to 2600 design
+    # px wide, so the 1,000 px painting was magnified.
+    **{f"atlas_island_hi_{row}_{col}": [f"pm_map_island__hi__{row}_{col}"] for row in (1, 2) for col in (1, 2)},
 }
 
 
@@ -199,7 +263,16 @@ def pack_tight(sizes):
     return placed, bottom
 
 
+def uploaded():
+    """Atlas names with an uploaded image id (an empty id is a placeholder: not
+    uploaded yet)."""
+    if not IDS_FILE.is_file():
+        return set()
+    return {name for name, value in json.loads(IDS_FILE.read_text(encoding="utf-8")).items() if value}
+
+
 def build(manifest):
+    live = uploaded()
     for entry in manifest.values():
         entry.pop("atlas", None)
         entry.pop("rect", None)
@@ -218,7 +291,16 @@ def build(manifest):
             w, h = sizes[name]
             manifest[name]["atlas"] = group
             manifest[name]["rect"] = [x, y, w, h]
-        canvas.save(SPRITES / f"{group}.png", optimize=True)
+        path = SPRITES / f"{group}.png"
+        if group in live and path.is_file():
+            # An uploaded atlas is live: its id draws the rects recorded here, so
+            # its image may never change. New or changed art goes into a new
+            # group (a new name, uploaded on its own).
+            buffer = io.BytesIO()
+            canvas.save(buffer, "PNG", optimize=True)
+            if buffer.getvalue() != path.read_bytes():
+                raise ValueError(f"{group} is uploaded and its packing changed: put the new art in a new group")
+        canvas.save(path, optimize=True)
         manifest[group] = {"file": f"{group}.png", "w": canvas.width, "h": canvas.height, "slice": None}
         print(f"{group}: {len(placed)} sprites, {canvas.width}x{canvas.height}")
     return manifest

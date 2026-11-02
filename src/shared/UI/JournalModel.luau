@@ -31,7 +31,7 @@ JournalModel.ACTIONS = {
 		illustration = "logs",
 		line = "Gather resources.",
 		objective = "Gather Resources",
-		hint = "Chop trees and mine rocks around the island.",
+		hint = "Swing at trees, rocks and plants to gather.",
 	},
 	Extract = {
 		icon = "portal",
@@ -42,7 +42,7 @@ JournalModel.ACTIONS = {
 	},
 	Craft = {
 		icon = "hammer",
-		illustration = "anvil_hammer",
+		illustration = "anvil",
 		line = "Make items at a bench.",
 		objective = "Craft Items",
 		hint = "Every item you craft counts.",
@@ -92,7 +92,7 @@ JournalModel.TRACK_ICONS = {
 	Mining = "pickaxe",
 	Woodcutting = "hatchet",
 	Farming = "berry_bush",
-	Crafting = "anvil_hammer",
+	Crafting = "anvil",
 	PvP = "spear",
 }
 

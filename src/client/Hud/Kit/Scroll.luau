@@ -19,7 +19,8 @@ Scroll.RAIL = 14
 Scroll.THIN = 8
 
 -- props: rect | size, direction ("Y"), gap (list padding; false for no list
--- layout), padTop (2), padBottom (12), contentHeight (design px, used where the engine
+-- layout), padTop (2), padBottom (12), padLeft (0; room for rows whose art
+-- reaches past their left edge, which the list would clip), contentHeight (design px, used where the engine
 -- has not measured the canvas yet, as in captures), rail ("kit" default: the
 -- sheet-09 rail and thumb | "thin": the flat 8 px rail of M01's party list),
 -- railOverlay (true: the rail sits over the list's right edge instead of
@@ -66,11 +67,11 @@ function Scroll.new(parent: Instance, props)
 			frame
 		)
 	else
-		Core.Make(
-			"UIPadding",
-			{ PaddingBottom = UDim.new(0, props.padBottom or 12), PaddingTop = UDim.new(0, props.padTop or 2) },
-			frame
-		)
+		Core.Make("UIPadding", {
+			PaddingBottom = UDim.new(0, props.padBottom or 12),
+			PaddingTop = UDim.new(0, props.padTop or 2),
+			PaddingLeft = UDim.new(0, props.padLeft or 0),
+		}, frame)
 	end
 	if props.gap ~= false then
 		Core.Make("UIListLayout", {

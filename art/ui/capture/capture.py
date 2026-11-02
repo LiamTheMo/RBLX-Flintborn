@@ -53,9 +53,10 @@ PREVIEW_BASE = 990000000
 
 
 def preview_ids():
-    """{name: id} for every sprite PNG without an uploaded id."""
+    """{name: id} for every sprite PNG without an uploaded id (an empty id is a
+    placeholder for an atlas not uploaded yet)."""
     ids = json.loads(IDS_FILE.read_text(encoding="utf-8"))
-    missing = sorted(p.stem for p in SPRITES.glob("*.png") if not p.stem.startswith("_") and p.stem not in ids)
+    missing = sorted(p.stem for p in SPRITES.glob("*.png") if not p.stem.startswith("_") and not ids.get(p.stem))
     return {name: PREVIEW_BASE + i for i, name in enumerate(missing)}
 
 
@@ -114,6 +115,8 @@ def bundle(scene: Path, extra_ids) -> str:
     for path, source in module_entries(extra_ids):
         chunks.append("__defineModule({%s}, function(script)\n%s\nend)\n"
                       % (", ".join(json.dumps(p) for p in path), source))
+    # Layout checks the HUD scenes share (they run after the modules exist).
+    chunks.append((HERE / "hud_checks.luau").read_text(encoding="utf-8"))
     chunks.append(scene.read_text(encoding="utf-8"))
     return "\n".join(chunks)
 
@@ -151,6 +154,10 @@ def edges():
     lines = []
     for name in sorted(manifest):
         if not name.startswith("lk_") or name.startswith(("lk_icon_", "lk_glyph_", "lk_dot_", "lk_item_")):
+            continue
+        if manifest[name].get("of"):
+            # A high-resolution copy: drawn in its sprite's design rect, whose
+            # margins these are.
             continue
         alpha = np.asarray(Image.open(SPRITES / f"{name}.png").convert("RGBA"))[..., 3]
         h, w = alpha.shape

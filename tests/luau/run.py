@@ -5,7 +5,8 @@ Game modules are written for Roblox: they `require(script.Parent.X)` and use
 datatypes like Color3 and Vector3. The CLI has neither, so each spec runs in a
 generated bundle: prelude.luau (minimal datatype stubs, a fake `script`/`game`
 instance tree, and a require that resolves it) followed by every module under
-src/shared as a loader function, followed by the spec itself.
+src/shared as a loader function (a JSON file as a module returning its
+table, as Rojo builds it), followed by the spec itself.
 
 Only pure-logic modules are testable this way -- anything touching Instances,
 services, or the network still needs a Studio playtest.
@@ -30,10 +31,28 @@ MOUNTS = {
 }
 
 
+def lua_literal(value):
+    """A JSON value as a Luau table constructor."""
+    if value is None:
+        return "nil"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, list):
+        return "{" + ", ".join(lua_literal(v) for v in value) + "}"
+    items = ", ".join("[%s] = %s" % (json.dumps(k), lua_literal(v)) for k, v in value.items())
+    return "{" + items + "}"
+
+
 def module_entries():
     entries = []
     for prefix, folder in MOUNTS.items():
-        for file in sorted(folder.rglob("*.luau")):
+        for file in sorted(folder.rglob("*")):
+            if file.suffix not in (".luau", ".json"):
+                continue
             # Entry-point scripts (init.server/init.client) are not requirable modules.
             if file.name.endswith((".server.luau", ".client.luau")):
                 continue
@@ -42,12 +61,40 @@ def module_entries():
             if parts[-1] == "init":
                 parts = parts[:-1]
             path = list(prefix) + parts
-            entries.append((path, file.read_text(encoding="utf-8")))
+            if file.suffix == ".json":
+                # Rojo turns a JSON file into a module returning its table.
+                source = "return " + lua_literal(json.loads(file.read_text(encoding="utf-8")))
+            else:
+                source = file.read_text(encoding="utf-8")
+            entries.append((path, source))
     return entries
+
+
+# How server services and shared rules refuse a request: `return false, "Code"`,
+# `return nil, "Code"` or `fail("Code")` (admission). reasons.spec.luau checks
+# that every such code has player-facing text in shared/UI/ReasonText.
+REFUSAL_PATTERNS = (
+    # Only after `return`, so a model part's name (`..., nil, "Trunk")`) is not one.
+    re.compile(r'\breturn\s+(?:false|nil),\s*"([A-Z][A-Za-z]+)"'),
+    re.compile(r'\bfail\(\s*"([A-Z][A-Za-z]+)"'),
+)
+
+
+def refusal_codes() -> list:
+    """Every refusal code written in src/server and src/shared, sorted."""
+    codes = set()
+    for folder in (ROOT / "src" / "server", ROOT / "src" / "shared"):
+        for file in folder.rglob("*.luau"):
+            text = file.read_text(encoding="utf-8")
+            for pattern in REFUSAL_PATTERNS:
+                codes.update(pattern.findall(text))
+    return sorted(codes)
 
 
 def build_bundle(spec: Path) -> str:
     chunks = [(HERE / "prelude.luau").read_text(encoding="utf-8")]
+    # The scanned refusal codes, for reasons.spec.luau.
+    chunks.append("__SERVER_REFUSAL_CODES = {" + ", ".join(json.dumps(c) for c in refusal_codes()) + "}\n")
     for path, source in module_entries():
         chunks.append(
             "__defineModule({path}, function(script)\n{source}\nend)\n".format(

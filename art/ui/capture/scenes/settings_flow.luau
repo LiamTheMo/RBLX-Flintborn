@@ -228,18 +228,93 @@ check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
 
--- The world ⚙ sits in the HUD's top row left of the vitals, on a HUD-scaled
--- root (not at the bottom right, where Roblox's jump button is on phones).
+-- The world ⚙ sits in the HUD grid's bottom-left corner on a HUD-scaled root
+-- that covers the whole screen (ARCHITECTURE D30): M from the left and the
+-- bottom, on touch screens too, or above Roblox's thumbstick ring where the
+-- ring reaches the corner (a phone without a side inset).
 local gear = SettingsController.gear
 local gearRoot = gear.root.Parent
+local gearGui = gearRoot.Parent
 check(
-	gear.root.Position.X.Scale == 1
-		and gear.root.Position.X.Offset == -SettingsController.GEAR.right
-		and gear.root.Position.Y.Scale == 0
-		and gear.root.AnchorPoint.Y == 0,
-	"the world gear is top right, left of the vitals"
+	gear.root.Position.X.Scale == 0
+		and gear.root.Position.X.Offset == 24
+		and gear.root.Position.Y.Scale == 1
+		and gear.root.Position.Y.Offset == -24
+		and gear.root.AnchorPoint.X == 0
+		and gear.root.AnchorPoint.Y == 1,
+	"desktop: the world gear is in the bottom-left corner, 24 px from both edges"
 )
 check(gearRoot:FindFirstChildWhichIsA("UIScale") ~= nil, "the gear scales with the HUD")
+check(
+	gearGui.ScreenInsets == Enum.ScreenInsets.None and gearGui.IgnoreGuiInset == true,
+	"its gui covers the whole screen (ScreenInsets None)"
+)
+do
+	local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
+	local Layout = require(Client.Hud.Layout)
+	local grid, spec = Layout.Grid(), Layout.Gear()
+	local g = { w = spec.size[1], h = spec.size[2], gap = spec.ringGap, pad = spec.pad }
+	-- The grid's corner (D30): M from the left and the bottom wherever the
+	-- thumbstick ring leaves it free; above the ring where it reaches the corner.
+	for _, screen in
+		{
+			{ 844, 390, 0.5, __NOTCHED_PHONE, "corner" },
+			{ 667, 375, 0.5, __NO_INSETS, "above" },
+			{ 2000, 924, 0.884, __NO_INSETS, "corner" },
+		}
+	do
+		local w, h, k, insets, want = screen[1], screen[2], screen[3], screen[4], screen[5]
+		local at = SettingsController.GearPosition(__hudScreen(w, h, k, true, insets))
+		local _, _, where = HudModel.GearCorner(grid, spec, __hudScreen(w, h, k, true, insets))
+		local stick = HudModel.Thumbstick(w, h, insets)
+		local left, foot = at.X.Offset * k, h + at.Y.Offset * k
+		local right, top = left + g.w * k, foot - g.h * k
+		local half = math.max(0, g.pad - g.w * k) / 2
+		local ok
+		if want == "corner" then
+			ok = math.abs(left - grid.margin * k) <= 1
+				and math.abs(h - foot - grid.margin * k) <= 1
+				and (
+					right + half + g.gap <= stick.x + 0.01
+					or top - math.max(0, g.pad - g.h * k) / 2 >= stick.y + stick.size + g.gap - 0.01
+				)
+		else
+			ok = foot + g.gap <= stick.y + 0.01 and left - half >= -0.01
+		end
+		check(
+			ok and where == want,
+			("touch %dx%d (insets %d / %d): the world gear (x %d..%d, y %d..%d) sits %s the thumbstick ring (x %d, y %d)"):format(
+				w,
+				h,
+				insets.left,
+				insets.right,
+				left,
+				right,
+				top,
+				foot,
+				if want == "corner" then "in the corner, clear of" else "above",
+				stick.x,
+				stick.y
+			)
+		)
+	end
+	local desk = SettingsController.GearPosition(__hudScreen(1672, 941, 1, false))
+	check(desk.X.Offset == 24 and desk.Y.Offset == -24, "desktop: the gear 24 px from the left and the bottom")
+end
+-- Gamepad: the world gear sits left of the hotbar's first slot and under the
+-- tiles' bottom-left tile (Map in the 2 × 3 grid).
+do
+	local HudController = require(Client.Controllers.HudController)
+	local holder = Instance.new("Frame")
+	local mounted = HudController.Mount(holder, require(Client.Hud.Layout).Get(), function() end)
+	local hit = gear.control.hit
+	SettingsController.LinkGear(hit, mounted)
+	local first = mounted.bottom.slots[1].control.hit
+	local corner = mounted.tiles[5].control.hit
+	check(hit.NextSelectionRight == first and first.NextSelectionLeft == hit, "gamepad: gear <-> the first hotbar slot")
+	check(hit.NextSelectionUp == corner and corner.NextSelectionDown == hit, "gamepad: the Map tile v the gear ^ it")
+	holder:Destroy()
+end
 
 -- Leak check counts: the PlayerGui's instances, and the live connections on
 -- every instance still in the game (a destroyed one drops out with its

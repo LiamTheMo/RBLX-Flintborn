@@ -38,10 +38,9 @@ end
 
 -- Player-facing text for a refusal code, as a sentence.
 local function reasonText(code: any): string
-	local text = Reasons.Text(code)
-	if text == tostring(code) and RecipeModel.REASONS[code] then
-		text = RecipeModel.REASONS[code]
-	end
+	local text = if not Reasons.Has(code) and RecipeModel.REASONS[code]
+		then RecipeModel.REASONS[code]
+		else Reasons.Text(code)
 	return (string.gsub(text, "^%l", string.upper)) .. (if string.find(text, "[%.!?]$") then "" else ".")
 end
 
@@ -123,7 +122,9 @@ local function build()
 		name = "FlintbornForge",
 		title = "Ancestral Forge",
 		subtitle = "Turn raw materials into tools for the island.",
-		icon = "anvil_hammer",
+		-- The Forge tile's anvil (LobbyHudModel.TILES), so the window and the
+		-- button that opens it show one icon.
+		icon = "anvil",
 		categories = categories,
 		parent = player:WaitForChild("PlayerGui"),
 		onForge = onForge,

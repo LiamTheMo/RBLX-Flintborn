@@ -78,7 +78,14 @@ local gui = player.PlayerGui:FindFirstChild("FlintbornInventory")
 local window = VaultController.window
 check(gui and gui.Enabled and VaultController.IsOpen(), 'Open("Backpack") opens the window')
 check(snapshots == 1 and changed == 1, "opening fetches one snapshot and fires Changed")
-check(window:SlotFor("b1") ~= nil and window:SlotFor("be50") ~= nil, "fifty backpack slots, filled and empty")
+check(
+	window:SlotFor("b1") ~= nil and window:SlotFor("be6") ~= nil and window:SlotFor("be7") == nil,
+	"the backpack's items, then empty slots to the end of the row"
+)
+check(
+	window:SlotFor("i1") ~= nil and window:SlotFor("mStone") ~= nil,
+	"the Backpack tab's All also shows the vault's items and materials: everything owned"
+)
 check(window.selectedId == "b1" and window.detailName.root.Text == "Stone Axe", "the first item is chosen on open")
 
 local function press(component)
@@ -108,7 +115,7 @@ check(#calls == before + 1 and last[3] == "Wood" and last[4] == 40, "deposit any
 
 -- Search and categories filter the grid.
 window:SetQuery("fib")
-check(window:SlotFor("b1") ~= nil and window:SlotFor("be50") == nil, "search keeps the match and hides empties")
+check(window:SlotFor("b1") ~= nil and window:SlotFor("be6") == nil, "search keeps the match and hides empties")
 window:SetQuery("")
 window.categories.tabs[2].control.hit.Activated:Fire() -- Tools
 check(window.category == "Tools" and window:SlotFor("b1") == nil, "the Tools category hides plant fiber")

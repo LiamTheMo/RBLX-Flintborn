@@ -517,6 +517,7 @@ local function defaults(className)
 		p.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 		p.ScrollBarImageTransparency = 0
 		p.ScrollingDirection = __enum("ScrollingDirection.XY")
+		p.ScrollingEnabled = true
 		p.VerticalScrollBarInset = __enum("ScrollBarInset.None")
 		p.AbsoluteCanvasSize = Vector2.new(0, 0)
 		p.AbsoluteWindowSize = Vector2.new(0, 0)
@@ -1370,6 +1371,151 @@ function __screen(width, height)
 	root.BackgroundTransparency = 1
 	root.Size = UDim2.fromScale(1, 1)
 	return gui, root
+end
+
+-- `object`'s rectangle {x1, y1, x2, y2} in screen px, from the Positions,
+-- Sizes and AnchorPoints up to `root` (a HUD root drawn at UIScale k over a
+-- width × height screen; Absolute sizes are zero here). UIScales below the
+-- root are ignored.
+function __rect(object, root, width, height, k)
+	k = k or 1
+	local function box(item)
+		if item == root then
+			return 0, 0, width / k, height / k
+		end
+		local px, py, pw, ph = box(item.Parent)
+		local size, pos, anchor = item.Size, item.Position, item.AnchorPoint
+		local w = size.X.Scale * pw + size.X.Offset
+		local h = size.Y.Scale * ph + size.Y.Offset
+		local x = px + pos.X.Scale * pw + pos.X.Offset - anchor.X * w
+		local y = py + pos.Y.Scale * ph + pos.Y.Offset - anchor.Y * h
+		return x, y, w, h
+	end
+	local x, y, w, h = box(object)
+	return { x * k, y * k, (x + w) * k, (y + h) * k }
+end
+
+-- True when screen rectangles a and b ({x1, y1, x2, y2}) keep at least `gap`
+-- px apart (they may touch at gap 0).
+function __apart(a, b, gap)
+	gap = gap or 0
+	return a[3] + gap <= b[1] or b[3] + gap <= a[1] or a[4] + gap <= b[2] or b[4] + gap <= a[2]
+end
+
+-- A rectangle grown to a touch pad of at least `min` px each way (Kit.Interact
+-- pads every pressable control to 44 screen px).
+function __pad(rect, min)
+	min = min or 44
+	local dx = math.max(0, min - (rect[3] - rect[1])) / 2
+	local dy = math.max(0, min - (rect[4] - rect[2])) / 2
+	return { rect[1] - dx, rect[2] - dy, rect[3] + dx, rect[4] + dy }
+end
+
+-- A notched iPhone held sideways (844 × 390 pt, the iPhone 12–14 size the
+-- owner's screenshots come from): Roblox's DeviceSafeInsets keep 47 pt from
+-- the left and the right edge (the notch can be on either side); landscape has
+-- none at the top, and the touch controls sit on the screen's bottom edge as
+-- if it had none there either (the owner's screenshots). The notch itself is
+-- about 30 pt deep and 162–210 pt long, centred on the side edge.
+__NOTCHED_PHONE = { left = 47, top = 0, right = 47, bottom = 0 }
+__NO_INSETS = { left = 0, top = 0, right = 0, bottom = 0 }
+
+-- The screen a HUD scene draws on, as Kit.Scale.HudScreen gives it in game:
+-- {width, height, scale, touch, insets}.
+function __hudScreen(W, H, k, touch, insets)
+	return { width = W, height = H, scale = k, touch = touch == true, insets = insets or __NO_INSETS }
+end
+
+-- Stand-ins for Roblox's own controls, drawn over a capture so a page shows
+-- what the HUD keeps clear of, and their rectangles in screen px. The top bar
+-- (58 px): the Roblox logo and the menu / chat pill at the top left (sized as
+-- an 844 × 390 iPhone draws them, notch included: they reach x 212), and
+-- GuiService.TopbarInset set to the bar's free area. opts.touch adds the
+-- touch jump button and the classic thumbstick ring (the PlayerModule's
+-- geometry) and returns the dynamic thumbstick's zone (the left 40 % below
+-- the top third; not drawn). opts.insets (e.g. __NOTCHED_PHONE) models the
+-- device safe area: Roblox's buttons, the jump button and the thumbstick sit
+-- inside it, a notch stand-in is drawn at the left edge and the side strips
+-- beside the middle band (D29: the HUD keeps out of them) are shaded. They
+-- are drawn into `parent`; opts.k is its UIScale (a HUD root), so they keep
+-- their screen size. Returns {bar, buttons, jump?, stick?, zone?, insets,
+-- notch?, keepOut?} in screen px.
+function __robloxChrome(parent, width, height, opts)
+	opts = opts or {}
+	local bar = opts.bar or 58
+	local k = opts.k or 1
+	local insets = opts.insets or __NO_INSETS
+	local layer = Instance.new("Frame", parent)
+	rawProps(layer).Name = "RobloxChrome"
+	layer.BackgroundTransparency = 1
+	layer.Size = UDim2.fromScale(1, 1)
+	layer.ZIndex = 1000
+	local function shape(name, x, y, w, h, radius, colour, transparency)
+		local frame = Instance.new("Frame", layer)
+		rawProps(frame).Name = name
+		frame.Position = UDim2.fromOffset(x / k, y / k)
+		frame.Size = UDim2.fromOffset(w / k, h / k)
+		frame.BackgroundColor3 = colour or Color3.new(1, 1, 1)
+		frame.BackgroundTransparency = transparency or 0.08
+		frame.BorderSizePixel = 0
+		frame.ZIndex = 1000
+		local corner = Instance.new("UICorner", frame)
+		corner.CornerRadius = UDim.new(0, radius / k)
+		return frame
+	end
+	local dark = Color3.new(0, 0, 0)
+	local chrome = { bar = bar, insets = insets }
+	if insets.left > 0 or insets.right > 0 then
+		-- The side strips beside the middle band, where a notch can be.
+		local band0, band1 = height * 0.30, height * 0.75
+		chrome.keepOut = {
+			{ 0, band0, insets.left, band1 },
+			{ width - insets.right, band0, width, band1 },
+		}
+		for index, strip in chrome.keepOut do
+			shape("SafeInset" .. index, strip[1], strip[2], strip[3] - strip[1], strip[4] - strip[2], 1, dark, 0.6)
+		end
+		-- An iPhone 13 / 14 notch (162 pt long, 30 deep) at the left edge.
+		local long = 162
+		chrome.notch = { 0, (height - long) / 2, 30, (height + long) / 2 }
+		shape("Notch", -20, chrome.notch[2], 50, long, 16, dark, 0)
+	end
+	local top = bar - 46
+	local left = insets.left + 16
+	local reach = math.max(212, left + 140)
+	shape("Logo", left, top, 44, 44, 22)
+	shape("LogoMark", left + 14, top + 14, 16, 16, 3, Color3.fromRGB(30, 30, 30), 0)
+	shape("Pill", left + 56, top, reach - left - 56, 44, 22)
+	local icons = math.max(1, math.floor((reach - left - 56) / 44))
+	for index = 0, icons - 1 do
+		shape("Icon" .. index, left + 74 + index * 44, top + 15, 18, 14, 3, Color3.fromRGB(30, 30, 30), 0)
+	end
+	game:GetService("GuiService").TopbarInset = Rect.new(reach + 12, 0, width, bar)
+	chrome.buttons = { left, top, reach, top + 44 }
+	if opts.touch then
+		local grey = Color3.fromRGB(30, 30, 30)
+		local small = math.min(width, height) <= 500
+		local size = if small then 70 else 120
+		local jx = width - insets.right - (size * 1.5 - 10)
+		local jy = height - insets.bottom - (if small then size + 20 else size * 1.75)
+		local sx = insets.left + (if small then size / 2 - 10 else size / 2)
+		for _, ring in
+			{
+				shape("Jump", jx, jy, size, size, size / 2, grey, 0.55),
+				shape("Thumbstick", sx, jy, size, size, size / 2, grey, 0.55),
+			}
+		do
+			local stroke = Instance.new("UIStroke", ring)
+			stroke.Color = Color3.new(1, 1, 1)
+			stroke.Thickness = 3 / k
+			stroke.Transparency = 0.2
+		end
+		chrome.jump = { jx, jy, jx + size, jy + size }
+		chrome.stick = { sx, jy, sx + size, jy + size }
+		local safeW, safeH = width - insets.left - insets.right, height - insets.top - insets.bottom
+		chrome.zone = { insets.left, insets.top + safeH / 3, insets.left + safeW * 0.4, height - insets.bottom }
+	end
+	return chrome
 end
 
 LocalPlayer.Parent = Players

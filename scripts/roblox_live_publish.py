@@ -27,6 +27,8 @@ ANCHORS = (
 # and the next deploy removes it.
 RETIRED = (
     ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "AssetProbeController"),
+    # The save-status pill (owner removed it from the HUD).
+    ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "SaveStatusController"),
     # The parchment UI, replaced by the shared kit (docs/ui/ARCHITECTURE.md §9).
     *(("StarterPlayer", "StarterPlayerScripts", "Client", "Hud", name) for name in (
         "CraftingPanel", "InventoryPanel", "ItemSlot", "JournalPanel", "LobbyHud", "LobbyPopups",

@@ -19,8 +19,10 @@ HudModel.OBJECTIVE_TITLE = "FIND EXTRACTION"
 HudModel.EVENT_TITLE = "World Event"
 
 -- One line per event category; names and rarities come from the server view.
+-- The card writes "<rarity> · <blurb>", so no blurb names a rarity ("Rare ·
+-- Rare plants…" read twice, and an Epic event's "Rare plants" contradicted it).
 HudModel.EVENT_BLURBS = {
-	Vegetation = "Rare plants have sprouted",
+	Vegetation = "Prized plants have sprouted",
 	Ore = "A rich ore vein is exposed",
 	Npc = "Hostile creatures are gathering",
 	Cache = "A supply cache is up for grabs",
@@ -201,13 +203,186 @@ function HudModel.HudScale(
 	return math.min(scaled, math.max(fit, minScale))
 end
 
--- 9-slice corner scale for a sprite of natural size (w, h) drawn at (tw, th), so
--- rope corners shrink with small widgets instead of overlapping.
-function HudModel.SliceScale(width: number, height: number, targetWidth: number, targetHeight: number): number
+-- 9-slice corner scale for a sprite of natural (design) size (w, h) drawn at
+-- (tw, th), so rope corners shrink with small widgets instead of overlapping.
+-- `artScale` is the drawn image's pixels per design pixel (a high-resolution
+-- copy at 2x has corner insets twice as many pixels): the result scales those
+-- pixel insets, so the corners keep their design size.
+function HudModel.SliceScale(
+	width: number,
+	height: number,
+	targetWidth: number,
+	targetHeight: number,
+	artScale: number?
+): number
+	local k = if artScale and artScale > 0 then artScale else 1
 	if width <= 0 or height <= 0 then
-		return 1
+		return 1 / k
 	end
-	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1)
+	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1) / k
+end
+
+-- The device safe area (ARCHITECTURE D29): how far notches, the Dynamic
+-- Island and rounded corners reach in from each edge of the screen, in screen
+-- px ({left, top, right, bottom}; Kit.Scale.SafeInsets measures it). Roblox's
+-- own touch controls sit inside it; the HUDs draw on the whole screen
+-- (ScreenInsets None) and keep to it themselves (HudModel.EdgeGap).
+HudModel.NO_INSETS = table.freeze({ left = 0, top = 0, right = 0, bottom = 0 })
+
+local function safe(insets)
+	return insets or HudModel.NO_INSETS
+end
+
+-- The HUD layout grid (ARCHITECTURE D30; HudLayout.json "grid", read by both
+-- HUDs through Hud/Layout): `margin` (M) design px between the screen's edge
+-- and every region pinned to it, `gap` (G) between stacked or neighbouring
+-- regions, `column` the width of the right-hand column's pieces, and the
+-- corner bands, the top `topBand` and the bottom `bottomBand` of the screen's
+-- height, where a phone held sideways has no notch or island. The helpers
+-- below take the grid as their first argument, so the specs and both HUDs
+-- share one copy of the numbers.
+
+-- True when a region spanning y top..bottom (screen px) on a screen `height`
+-- px tall lies wholly in the top or the bottom corner band.
+function HudModel.InCornerBand(grid, top: number, bottom: number, height: number): boolean
+	return bottom <= height * grid.topBand + 0.5 or top >= height * (1 - grid.bottomBand) - 0.5
+end
+
+-- The edge rule (D29, applied per column by D30): the gap (design px, at HUD
+-- scale k) between a column spanning y top..bottom (screen px, every piece of
+-- it) and its side edge, whose device safe inset is `safeInset` screen px:
+-- the margin when the whole column lies in a corner band, else the margin or
+-- the safe inset, whichever is larger, for the whole column, so its pieces
+-- keep one edge.
+function HudModel.EdgeGap(grid, top: number, bottom: number, height: number, safeInset: number?, k: number): number
+	if HudModel.InCornerBand(grid, top, bottom, height) then
+		return grid.margin
+	end
+	return math.max(grid.margin, (safeInset or 0) / math.max(k, 0.01))
+end
+
+-- Stacks a column's pieces from `top` (design px) with `gap` between them:
+-- `heights[i]` is piece i's height, or false for a hidden piece (it takes no
+-- room). Returns each shown piece's top (nil for a hidden one) and the
+-- column's foot (`top` when nothing shows).
+function HudModel.Stack(top: number, heights: { number | false }, gap: number): ({ number? }, number)
+	local tops, y, foot = {}, top, top
+	for index, height in heights do
+		if height then
+			tops[index] = y
+			foot = y + height
+			y = foot + gap
+		end
+	end
+	return tops, foot
+end
+-- Roblox's touch jump button on a screen w × h (screen px), as the default
+-- PlayerModule (TouchJump) places it inside the safe area (`insets`, screen
+-- px): 70 px square, 95 px from the right and 90 from the bottom when the
+-- short side is 500 px or less; otherwise 120 px square, 170 from the right
+-- and 210 from the bottom. Returns {x, y, size}, its top-left corner and side,
+-- on the whole screen.
+function HudModel.JumpButton(width: number, height: number, insets: any?)
+	local i = safe(insets)
+	local small = math.min(width, height) <= 500
+	local size = if small then 70 else 120
+	return {
+		x = width - i.right - (size * 1.5 - 10),
+		y = height - i.bottom - (if small then size + 20 else size * 1.75),
+		size = size,
+	}
+end
+
+-- Roblox's classic touch thumbstick (the ring the "Thumbstick" movement mode
+-- draws) on a screen w × h (screen px), as the default PlayerModule
+-- (ClassicThumbstick) places it inside the safe area, the mirror of the jump
+-- button: 70 px square, 25 px from the left and 90 from the bottom when the
+-- short side is 500 px or less; otherwise 120 px square, 60 from the left and
+-- 210 from the bottom. Returns {x, y, size}, its top-left corner and side.
+function HudModel.Thumbstick(width: number, height: number, insets: any?)
+	local i = safe(insets)
+	local small = math.min(width, height) <= 500
+	local size = if small then 70 else 120
+	return {
+		x = i.left + (if small then size / 2 - 10 else size / 2),
+		y = height - i.bottom - (if small then size + 20 else size * 1.75),
+		size = size,
+	}
+end
+
+-- Where the default dynamic thumbstick starts on a landscape screen w × h
+-- (screen px): a touch landing anywhere in the left 40 % (of the safe area)
+-- below the top third (DynamicThumbstick's frame). Returns {x, y, w, h}.
+function HudModel.ThumbstickZone(width: number, height: number, insets: any?)
+	local i = safe(insets)
+	local w, h = width - i.left - i.right, height - i.top - i.bottom
+	return { x = i.left, y = i.top + h / 3, w = w * 0.4, h = h * 2 / 3 }
+end
+
+-- Where the HUDs' bottom-left corner button (the ⚙: `gear`, HudLayout's
+-- {size = {w, h}, ringGap, pad}) sits, as its distance from the HUD root's
+-- left and bottom edges in design px. `screen`: {width, height (screen px),
+-- scale (the HUD's UIScale), touch, insets}. The corner (D30): the grid's
+-- margin from the screen's left and bottom edges, in both HUDs, on every
+-- screen where its touch pad (`pad` screen px) keeps `ringGap` px from
+-- Roblox's thumbstick ring (desktops, notched phones, whose ring stands 25 px
+-- inside the 47 px inset, tablets and large touch screens, whose ring stands
+-- high). Where the ring reaches the corner (a phone without a side inset) it
+-- stands above the ring instead, its foot `ringGap` px over it, at the edge
+-- rule's gap from the left. Returns left, bottom and where it went ("corner"
+-- or "above").
+function HudModel.GearCorner(grid, gear, screen): (number, number, string)
+	local margin = grid.margin
+	local width, height = screen.width or 0, screen.height or 0
+	if not screen.touch or width <= 0 or height <= 0 then
+		return margin, margin, "corner"
+	end
+	local k = math.max(screen.scale or 1, 0.01)
+	local insets = safe(screen.insets)
+	local stick = HudModel.Thumbstick(width, height, insets)
+	local w, h = gear.size[1] * k, gear.size[2] * k
+	local pad = gear.pad or 44
+	local padW, padH = math.max(pad, w), math.max(pad, h)
+	local cx, cy = margin * k + w / 2, height - margin * k - h / 2
+	local gap = gear.ringGap or 12
+	local clear = cx + padW / 2 + gap <= stick.x + 0.01
+		or cy + padH / 2 + gap <= stick.y + 0.01
+		or cx - padW / 2 >= stick.x + stick.size + gap - 0.01
+		or cy - padH / 2 >= stick.y + stick.size + gap - 0.01
+	if clear then
+		return margin, margin, "corner"
+	end
+	local bottom = math.max(margin, math.ceil((height - stick.y + gap) / k))
+	local foot = height - bottom * k
+	return HudModel.EdgeGap(grid, foot - h, foot, height, insets.left, k), bottom, "above"
+end
+
+-- Roblox's top-bar buttons (the Roblox logo, then the menu and chat pill) are
+-- 44 px tall and end 2 px above the bar's inset. TOP_ROW_MIN keeps a row 12 px
+-- from the screen's top edge when the bar is shorter or hidden.
+HudModel.TOP_BUTTON = 44
+HudModel.TOP_BUTTON_FOOT = 2
+HudModel.TOP_ROW_MIN = 12
+
+-- The top bar's button row for a bar reaching `inset` screen px down: its top
+-- and its centre line, in screen px (inset 58: 12 and 34).
+function HudModel.TopRow(inset: number): (number, number)
+	local top = math.max(HudModel.TOP_ROW_MIN, inset - HudModel.TOP_BUTTON - HudModel.TOP_BUTTON_FOOT)
+	return top, top + HudModel.TOP_BUTTON / 2
+end
+
+-- The centre x of an item `itemW` wide in the top bar's row of a screen
+-- `width` wide: the screen's centre, moved just enough to keep `gap` from
+-- Roblox's left-hand buttons (reaching x `left`) and from what starts at x
+-- `right` (the right-hand column or the bar's right end). nil when it fits in
+-- neither (it then goes below the bar). All in one unit (design px).
+function HudModel.RowCentre(width: number, itemW: number, left: number, right: number, gap: number): number?
+	local lo = left + gap + itemW / 2
+	local hi = right - gap - itemW / 2
+	if lo > hi then
+		return nil
+	end
+	return math.clamp(width / 2, lo, hi)
 end
 
 -- Next hotbar slot for a step (the right bumper = +1), wrapping around. The mouse
@@ -217,8 +392,10 @@ function HudModel.HotbarStep(current: number, step: number, count: number): numb
 end
 
 -- What each HUD hotbar slot shows for an inventory snapshot ({slots, equipped}):
--- index -> {name, count, rarity, equipped}, or nil for an empty slot. `count` is
--- "" for unique items and "×n" for stacks; Permanent items carry a star.
+-- index -> {name, count, rarity, equipped, permanent}, or nil for an empty
+-- slot. `count` is "" for unique items and "×n" for stacks; `permanent` marks
+-- Permanent items (drawn with the star art; the name stays plain, as the
+-- game's fonts have no star glyph).
 function HudModel.HotbarSlots(snapshot, count: number)
 	local views = {}
 	for _, slot in (snapshot and snapshot.slots) or {} do
@@ -226,7 +403,8 @@ function HudModel.HotbarSlots(snapshot, count: number)
 		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
 			local def = ItemCatalog.Get(slot.catalogId)
 			views[index] = {
-				name = (if slot.permanent then "★ " else "") .. (if def then def.name else tostring(slot.catalogId)),
+				name = if def then def.name else tostring(slot.catalogId),
+				permanent = slot.permanent == true,
 				count = if slot.quantity and slot.quantity > 1 then ("×%d"):format(slot.quantity) else "",
 				rarity = if def then def.rarity else "Common",
 				equipped = snapshot.equipped == index,

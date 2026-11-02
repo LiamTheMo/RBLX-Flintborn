@@ -499,20 +499,19 @@ function BuildingService.PlaceFromItem(player: Player, pieceId: string, position
 	end)
 end
 
--- Melee hits on structures, called by CombatService when no player was hit.
+-- The structure a swing from `origin` along `aim` would hit, and its distance, or nil.
 -- Only pieces near the swing are considered (a spatial query, not every piece in
--- the world); `canSee(part)` (optional) rejects pieces behind walls. Returns true
--- when a structure took damage.
-function BuildingService.Hit(
+-- the world); `canSee(part)` (optional) rejects pieces behind walls. CombatService
+-- also asks this to decide whether a resource node is nearer than the structure.
+function BuildingService.Pick(
 	player: Player,
 	origin: Vector3,
 	aim: Vector3,
 	reach: number,
-	rawDamage: number,
 	canSee: ((BasePart) -> boolean)?
 )
 	if SafeZoneService.Contains(origin) then
-		return false
+		return nil, math.huge
 	end
 	local params = OverlapParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
@@ -537,6 +536,20 @@ function BuildingService.Hit(
 			best, bestDistance = record, distance
 		end
 	end
+	return best, bestDistance
+end
+
+-- Melee hits on structures, called by CombatService when no player was hit.
+-- Returns true when a structure took damage.
+function BuildingService.Hit(
+	player: Player,
+	origin: Vector3,
+	aim: Vector3,
+	reach: number,
+	rawDamage: number,
+	canSee: ((BasePart) -> boolean)?
+)
+	local best = BuildingService.Pick(player, origin, aim, reach, canSee)
 	if best == nil then
 		return false
 	end

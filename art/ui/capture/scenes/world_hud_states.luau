@@ -10,6 +10,7 @@ local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
 local HudController = require(Client.Controllers.HudController)
 local Layout = require(Client.Hud.Layout)
+local Vitals = require(Client.Hud.Vitals)
 
 local W, H = 1672, 941
 -- Stand-in background: art/reference/lobby_map.png is the lobby village (the
@@ -26,9 +27,20 @@ local function check(cond, msg)
 	end
 end
 
+-- The layout checks (hud_checks.luau) on a page, then its capture.
+local function finish(root, hud)
+	__checkWorldHud({ scene = "world_hud_states", hud = hud, root = root, W = W, H = H, k = 1, chrome = hud.chrome })
+	__dump(root, W, H, BACKGROUND)
+end
+
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
+	-- Laid out under stand-ins for Roblox's top-bar buttons (ARCHITECTURE D28,
+	-- D29: the regions at the screen's edges).
+	local chrome = __robloxChrome(root, W, H)
+	__placeWorldHud(hud, W, H, 1, chrome, false)
+	hud.chrome = chrome
 	hud.bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })
 	hud.bottom:SetProgress({ level = 7, xp = 120, xpToNext = 400 }, true)
 	hud.compass:SetWaypoints({})
@@ -47,7 +59,30 @@ do
 	check(hud.vitals.rows.health.bar.root:GetAttribute("HudLow") == true, "health 18% reads low")
 	check(hud.vitals.rows.health.mark.root.Visible, "the low mark shows over the heart")
 	check(hud.vitals.rows.stamina.mark.root.Visible, "spent stamina shows the mark")
+	check(hud.vitals.rows.stamina.bar.root:GetAttribute("HudEmpty") == true, "spent stamina reads empty")
+	local spent = Vitals.IconImages(hud.vitals.rows.stamina.bar.icon)
+	check(#spent > 0 and spent[1].ImageTransparency == Vitals.EMPTY_FADE, "the spent stamina icon is greyed out")
+	check(hud.vitals.rows.health.bar.root:GetAttribute("HudEmpty") == false, "low health is not empty")
 	check(#hud.vitals.chips == 2, "hunger slow and food healing plaques")
+	-- The values stay at or above the 12 design px floor and show whole, the
+	-- widest one ("100/100") included.
+	for key, row in hud.vitals.rows do
+		local label = row.bar.label
+		local before = label.Text
+		label.Text = "100/100"
+		local width = require(Client.Hud.Kit).Text.Width(label.Text, "value", label.TextSize)
+		check(
+			label.TextSize >= 12 and width <= label.Size.X.Offset,
+			("%s value at %d design px, %q fits (%d <= %d)"):format(
+				key,
+				label.TextSize,
+				label.Text,
+				width,
+				label.Size.X.Offset
+			)
+		)
+		label.Text = before
+	end
 	hud.objective:Set(HudModel.ExtractionObjective({
 		name = "Old Quarry",
 		kind = "Fixed",
@@ -63,7 +98,7 @@ do
 	hud.vitals:Set("health", 0.6, "60/100", true)
 	check(not hud.vitals.rows.health.mark.root.Visible, "the mark clears when health recovers")
 	hud.vitals:Set("health", 0.18, "18/100", true)
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
 
 -- 2: forced states.
@@ -96,7 +131,7 @@ do
 			"slot " .. index .. " draws " .. slotStates[index]
 		)
 	end
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
 
 -- 3: done and ending.
@@ -127,5 +162,6 @@ do
 	}, "Boss")
 	hud.bottom:SetSlotItems({})
 	hud.bottom:Select(6)
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
+__hudChecksDone("world_hud_states")

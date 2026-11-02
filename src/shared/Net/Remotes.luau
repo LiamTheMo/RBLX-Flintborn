@@ -15,10 +15,10 @@ local DEFINITIONS = {
 	-- Diagnostics
 	ReportUiImages = "RemoteEvent", -- client -> server: (summary, lines) how HUD images are loading
 	-- Lobby
-	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave") | ("ready", bool)
+	-- ("invite", userId) | ("accept" | "decline", partyId) | ("leave")
 	-- | ("view": resend my party view on PartyChanged) -> ok, reason
 	PartyAction = "RemoteFunction",
-	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, ready, maxSize}
+	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, maxSize}
 	Deploy = "RemoteFunction", -- () -> ok, reason
 	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run
 	-- World
@@ -36,7 +36,8 @@ local DEFINITIONS = {
 	UnequipArmor = "RemoteFunction", -- (slot) -> ok, reason
 	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection); also throws/sets a held siege item
 	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
-	CombatFeedback = "RemoteEvent", -- server -> client: (kind, amount, hitPosition?)
+	-- server -> client: ("Hit" | "Hurt", amount, hitPosition?) | ("Harvest", quantity, nodeCenter, catalogId)
+	CombatFeedback = "RemoteEvent",
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
 	-- server -> client: (corpseId, {{index, key, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
@@ -72,8 +73,8 @@ local DEFINITIONS = {
 	Rebirth = "RemoteFunction", -- (nonce) -> ok, reason
 	BuyPerk = "RemoteFunction", -- (perkId, nonce) -> ok, reason
 	ShopView = "RemoteFunction", -- () -> stock, sellables, offers, vault tier
-	ShopBuy = "RemoteFunction", -- (stockId, nonce) -> ok, reason
-	MerchantSell = "RemoteFunction", -- (source, key, quantity, nonce) -> ok, coinsOrReason
+	ShopBuy = "RemoteFunction", -- (stockId, nonce, quantity?) -> ok, reason
+	MerchantSell = "RemoteFunction", -- (source, key, quantity, nonce, expectedCatalogId?) -> ok, coinsOrReason
 	VaultUpgrade = "RemoteFunction", -- (nonce) -> ok, reason
 	PerkRespec = "RemoteFunction", -- (nonce) -> ok, reason
 	RedeemCode = "RemoteFunction", -- (code) -> ok, reason

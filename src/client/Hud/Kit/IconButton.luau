@@ -64,6 +64,7 @@ function IconButton.new(parent: Instance, props)
 		self.badge = Badge.new(base.visual, badgeProps)
 	end
 	self.control = Interact.attach(base, {
+		padLimit = props.padLimit,
 		hoverScale = variant ~= "close",
 		onPress = function()
 			if props.onPress then
@@ -74,8 +75,7 @@ function IconButton.new(parent: Instance, props)
 			self.plate:Show(state)
 			if self.icon and self.icon:IsA("ImageLabel") then
 				local disabled = state == "disabled" or state == "locked"
-				local icon = self.icon :: ImageLabel
-				icon.ImageTransparency = if disabled then 0.45 else 0
+				Core.Dim(self.icon, if disabled then 0.45 else 0)
 			end
 		end,
 	})

@@ -18,12 +18,14 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Kit = require(script.Parent.Parent.Hud.Kit)
+local Layout = require(script.Parent.Parent.Hud.Layout)
 local SettingsWindow = require(script.Parent.Parent.Hud.Screens.SettingsWindow)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
@@ -256,10 +258,10 @@ local function build()
 
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
-	-- button, so this one stays hidden there. It sits in the HUD's top row, left
-	-- of the vitals (clear of the compass, and of Roblox's jump button at the
-	-- bottom right on phones), on a root scaled like the HUD and moved below
-	-- the Roblox top bar where that reaches down (phones).
+	-- button, so this one stays hidden there. It sits in the bottom-left corner
+	-- of the HUD grid (D30), the same place, size and spec (HudLayout "gear")
+	-- as the lobby's, on a root scaled like the HUD that covers the whole
+	-- screen (HudModel.GearCorner).
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
@@ -267,9 +269,7 @@ local function build()
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		IgnoreGuiInset = true,
 	}, playerGui)
-	pcall(function()
-		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
-	end)
+	Kit.Scale.FullScreen(gui)
 	-- Kit.Scale.Hud applies the UI Scale setting itself.
 	gui:SetAttribute("FitsItself", true)
 	local root = make("Frame", {
@@ -278,13 +278,14 @@ local function build()
 		Size = UDim2.fromScale(1, 1),
 	}, gui)
 	Kit.Scale.Hud(gui, root)
-	local g = SettingsController.GEAR
+	local size = SettingsController.GearSize()
+	local margin = SettingsController.MARGIN
 	local gear = Kit.IconButton.new(root, {
 		name = "Open",
 		variant = "settings",
-		size = { g.w, g.h },
-		position = UDim2.new(1, -g.right, 0, g.y),
-		anchorPoint = Vector2.new(1, 0),
+		size = { size[1], size[2] },
+		position = UDim2.new(0, margin, 1, -margin),
+		anchorPoint = Vector2.new(0, 1),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
 			SettingsController.Toggle()
@@ -292,23 +293,73 @@ local function build()
 	})
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function placeGear()
-		local inset = Kit.Scale.TopInset(gui) / math.max(uiScale.Scale, 0.01)
-		local shift = math.max(0, math.ceil(inset + g.gap - g.y))
-		gear.root.Position = UDim2.new(1, -g.right, 0, g.y + shift)
+		gear.root.Position = SettingsController.GearPosition(Kit.Scale.HudScreen(gui, uiScale.Scale))
 	end
 	uiScale:GetPropertyChangedSignal("Scale"):Connect(placeGear)
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeGear)
-	pcall(function()
-		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(placeGear)
-	end)
+	UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(placeGear)
+	Kit.Scale.OnFormFactorChanged(placeGear)
+	Kit.Scale.OnSafeInsetsChanged(placeGear)
 	placeGear()
 	SettingsController.gear = gear
+	-- Gamepad: the gear sits left of the world hotbar's first slot and under
+	-- the menu tiles' bottom-left tile (the HUD's regions are mounted again
+	-- when the form factor changes).
+	if not HudMode.ReplacesLobby() then
+		local HudController = require(script.Parent.HudController) :: any
+		local function link()
+			SettingsController.LinkGear(gear.control.hit, HudController.Widgets())
+		end
+		HudController.Remounted:Connect(link)
+		link()
+	end
 end
 
--- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): right edge 14
--- px left of the vitals (which end 53 px from the right, 315 wide), on the
--- vitals' top line; `gap` below the Roblox top bar when it reaches down.
-SettingsController.GEAR = { right = 53 + 315 + 14, y = 60, w = 52, h = 46, gap = 2 }
+-- The world ⚙ button in HUD design px (HudLayout's 1672 × 941), in the
+-- grid's bottom-left corner (D30; HudModel.GearCorner): the grid's margin from
+-- the left and bottom edges, on touch screens too unless Roblox's thumbstick
+-- ring reaches the corner (then above the ring). Its size and spec are
+-- HudLayout's "gear", which the lobby's ⚙ shares. MARGIN is where it waits
+-- when the layout is missing.
+SettingsController.MARGIN = 24
+
+-- The ⚙'s size in design px (HudLayout "gear").
+function SettingsController.GearSize(): { number }
+	local gear = Layout.Gear()
+	return if gear then gear.size else { 52, 46 }
+end
+
+-- The world ⚙'s position on its HUD root (anchored at its bottom-left corner)
+-- for a screen (Kit.Scale.HudScreen: {width, height, scale, touch, insets}).
+function SettingsController.GearPosition(screen): UDim2
+	local grid, gear = Layout.Grid(), Layout.Gear()
+	if grid == nil or gear == nil then
+		return UDim2.new(0, SettingsController.MARGIN, 1, -SettingsController.MARGIN)
+	end
+	local left, bottom = HudModel.GearCorner(grid, gear, screen)
+	return UDim2.new(0, left, 1, -bottom)
+end
+
+-- Gamepad neighbours of the world ⚙ (`hit`) in the mounted HUD `widgets`
+-- (HudController.Mount): right to the hotbar's first slot, up to the menu
+-- tiles' bottom-left tile, and back.
+function SettingsController.LinkGear(hit: GuiButton, widgets)
+	local slots = widgets and widgets.bottom and widgets.bottom.slots
+	local first = slots and slots[1]
+	if first then
+		first.control.hit.NextSelectionLeft = hit
+		hit.NextSelectionRight = first.control.hit
+	end
+	local tiles = widgets and widgets.tiles
+	if tiles and #tiles > 0 then
+		local columns = widgets.tileColumns or 2
+		local corner = tiles[(math.ceil(#tiles / columns) - 1) * columns + 1]
+		if corner then
+			corner.control.hit.NextSelectionDown = hit
+			hit.NextSelectionUp = corner.control.hit
+		end
+	end
+end
 
 -- The window (Hud/Screens/SettingsWindow), for scenes and verifiers.
 function SettingsController.View()

@@ -2219,6 +2219,7 @@
     "w": 1000,
     "h": 1000,
     "slice": null,
+    "hi": "pm_map_island__hi",
     "atlas": "atlas_island",
     "rect": [
       0,
@@ -3250,6 +3251,7 @@
     "w": 115,
     "h": 116,
     "slice": null,
+    "hi": "lk_glyph_ink_backpack__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       120,
@@ -3425,6 +3427,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_fill_blue__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -3443,6 +3446,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_fill_green__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       538,
@@ -3461,6 +3465,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_fill_orange__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       488,
@@ -3479,6 +3484,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_fill_red__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       718,
@@ -3497,6 +3503,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_fill_yellow__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       220,
@@ -3515,6 +3522,7 @@
       24,
       20
     ],
+    "hi": "lk_bar_frame__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       277,
@@ -3533,6 +3541,7 @@
       24,
       20
     ],
+    "hi": "lk_bar_frame_plain__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       319,
@@ -3551,6 +3560,7 @@
       16,
       12
     ],
+    "hi": "lk_bar_frame_thin__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -3569,6 +3579,7 @@
       12,
       10
     ],
+    "hi": "lk_bar_track__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       173,
@@ -3725,6 +3736,7 @@
       26,
       24
     ],
+    "hi": "lk_button_leather_disabled__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       0,
@@ -3743,6 +3755,7 @@
       26,
       24
     ],
+    "hi": "lk_button_leather_hover__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       472,
@@ -3761,6 +3774,7 @@
       26,
       24
     ],
+    "hi": "lk_button_leather_normal__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       256,
@@ -3779,6 +3793,7 @@
       26,
       24
     ],
+    "hi": "lk_button_leather_pressed__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       686,
@@ -3797,6 +3812,7 @@
       26,
       24
     ],
+    "hi": "lk_button_paper_disabled__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       431,
@@ -3815,6 +3831,7 @@
       26,
       24
     ],
+    "hi": "lk_button_paper_hover__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -3833,6 +3850,7 @@
       26,
       24
     ],
+    "hi": "lk_button_paper_normal__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       216,
@@ -3851,6 +3869,7 @@
       26,
       24
     ],
+    "hi": "lk_button_paper_pressed__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       743,
@@ -3869,6 +3888,7 @@
       18,
       18
     ],
+    "hi": "lk_button_paper_small_disabled__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       584,
@@ -3887,6 +3907,7 @@
       18,
       18
     ],
+    "hi": "lk_button_paper_small_hover__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -3905,6 +3926,7 @@
       18,
       18
     ],
+    "hi": "lk_button_paper_small_normal__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       108,
@@ -3976,6 +3998,7 @@
     "w": 50,
     "h": 48,
     "slice": null,
+    "hi": "lk_button_stepper_minus__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       710,
@@ -3989,6 +4012,7 @@
     "w": 49,
     "h": 48,
     "slice": null,
+    "hi": "lk_button_stepper_plus__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       818,
@@ -4034,6 +4058,7 @@
     "w": 22,
     "h": 52,
     "slice": null,
+    "hi": "lk_clasp_left__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       214,
@@ -4047,6 +4072,7 @@
     "w": 22,
     "h": 52,
     "slice": null,
+    "hi": "lk_clasp_right__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       240,
@@ -4119,6 +4145,7 @@
       18,
       18
     ],
+    "hi": "lk_currency_pill__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       806,
@@ -4137,6 +4164,7 @@
       46,
       42
     ],
+    "hi": "lk_dialog_frame__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       0,
@@ -4435,6 +4463,7 @@
     "w": 82,
     "h": 82,
     "slice": null,
+    "hi": "lk_frame_round__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -4597,6 +4626,7 @@
     "w": 29,
     "h": 34,
     "slice": null,
+    "hi": "lk_glyph_play__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       518,
@@ -4642,6 +4672,7 @@
     "w": 100,
     "h": 89,
     "slice": null,
+    "hi": "lk_icon_anvil_hammer__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       704,
@@ -4706,6 +4737,7 @@
     "w": 78,
     "h": 73,
     "slice": null,
+    "hi": "lk_icon_berries__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       771,
@@ -4719,6 +4751,7 @@
     "w": 100,
     "h": 92,
     "slice": null,
+    "hi": "lk_icon_berry_bush__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       0,
@@ -4732,6 +4765,7 @@
     "w": 87,
     "h": 79,
     "slice": null,
+    "hi": "lk_icon_bone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       428,
@@ -4751,6 +4785,7 @@
     "w": 108,
     "h": 97,
     "slice": null,
+    "hi": "lk_icon_build__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       871,
@@ -4764,6 +4799,7 @@
     "w": 95,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_campfire__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       590,
@@ -4874,6 +4910,7 @@
     "w": 116,
     "h": 97,
     "slice": null,
+    "hi": "lk_icon_crown__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       906,
@@ -4900,6 +4937,7 @@
     "w": 94,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_crystals__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       689,
@@ -4919,6 +4957,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_drumstick__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5029,6 +5068,7 @@
     "w": 133,
     "h": 127,
     "slice": null,
+    "hi": "lk_icon_hatchet__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       160,
@@ -5042,6 +5082,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_heart__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       120,
@@ -5055,6 +5096,7 @@
     "w": 79,
     "h": 75,
     "slice": null,
+    "hi": "lk_icon_hide__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       608,
@@ -5106,6 +5148,7 @@
     "w": 86,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_lightning__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       552,
@@ -5145,6 +5188,7 @@
     "w": 110,
     "h": 95,
     "slice": null,
+    "hi": "lk_icon_logs__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5158,6 +5202,7 @@
     "w": 100,
     "h": 87,
     "slice": null,
+    "hi": "lk_icon_magma_ore__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       220,
@@ -5255,6 +5300,7 @@
     "w": 72,
     "h": 73,
     "slice": null,
+    "hi": "lk_icon_mushroom__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       853,
@@ -5281,6 +5327,7 @@
     "w": 97,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_paw__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       776,
@@ -5294,6 +5341,7 @@
     "w": 135,
     "h": 124,
     "slice": null,
+    "hi": "lk_icon_pickaxe__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       297,
@@ -5307,6 +5355,7 @@
     "w": 106,
     "h": 102,
     "slice": null,
+    "hi": "lk_icon_plank__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       360,
@@ -5320,6 +5369,7 @@
     "w": 116,
     "h": 113,
     "slice": null,
+    "hi": "lk_icon_plant_fiber__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       729,
@@ -5333,6 +5383,7 @@
     "w": 116,
     "h": 94,
     "slice": null,
+    "hi": "lk_icon_portal__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -5352,6 +5403,7 @@
     "w": 100,
     "h": 83,
     "slice": null,
+    "hi": "lk_icon_rocks__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       324,
@@ -5365,6 +5417,7 @@
     "w": 76,
     "h": 75,
     "slice": null,
+    "hi": "lk_icon_rope__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       691,
@@ -5391,6 +5444,7 @@
     "w": 112,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_runestone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       436,
@@ -5410,6 +5464,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_scroll__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       223,
@@ -5435,6 +5490,7 @@
     "w": 85,
     "h": 76,
     "slice": null,
+    "hi": "lk_icon_spear__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       519,
@@ -5454,6 +5510,7 @@
     "w": 116,
     "h": 113,
     "slice": null,
+    "hi": "lk_icon_star__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       849,
@@ -5467,6 +5524,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_stone__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       240,
@@ -5480,6 +5538,7 @@
     "w": 156,
     "h": 196,
     "slice": null,
+    "hi": "lk_icon_stone_axe__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       0,
@@ -5493,6 +5552,7 @@
     "w": 102,
     "h": 92,
     "slice": null,
+    "hi": "lk_icon_stones__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       114,
@@ -5506,6 +5566,7 @@
     "w": 83,
     "h": 116,
     "slice": null,
+    "hi": "lk_icon_torch__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       642,
@@ -5519,6 +5580,7 @@
     "w": 90,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_totem__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       0,
@@ -5551,6 +5613,7 @@
     "w": 100,
     "h": 70,
     "slice": null,
+    "hi": "lk_icon_treasure__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       224,
@@ -5577,6 +5640,7 @@
     "w": 116,
     "h": 103,
     "slice": null,
+    "hi": "lk_icon_trophy__hi",
     "atlas": "atlas_lk_icons",
     "rect": [
       720,
@@ -5590,6 +5654,7 @@
     "w": 80,
     "h": 100,
     "slice": null,
+    "hi": "lk_icon_tusk__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       787,
@@ -5603,6 +5668,7 @@
     "w": 116,
     "h": 101,
     "slice": null,
+    "hi": "lk_icon_warning__hi",
     "atlas": "atlas_lk_items",
     "rect": [
       470,
@@ -5693,6 +5759,7 @@
       30,
       28
     ],
+    "hi": "lk_panel__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -5711,6 +5778,7 @@
       14,
       14
     ],
+    "hi": "lk_panel_inset__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       598,
@@ -5729,6 +5797,7 @@
       14,
       12
     ],
+    "hi": "lk_pill_value__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       0,
@@ -5780,6 +5849,7 @@
       28,
       24
     ],
+    "hi": "lk_plaque_notched_disabled__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       509,
@@ -5798,6 +5868,7 @@
       28,
       24
     ],
+    "hi": "lk_plaque_notched_leather__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       739,
@@ -5816,6 +5887,7 @@
       28,
       24
     ],
+    "hi": "lk_plaque_notched_paper__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       0,
@@ -5834,6 +5906,7 @@
       30,
       26
     ],
+    "hi": "lk_plaque_paper__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       648,
@@ -5885,6 +5958,7 @@
       20,
       20
     ],
+    "hi": "lk_plaque_small__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       229,
@@ -6197,6 +6271,7 @@
       24,
       24
     ],
+    "hi": "lk_slot_disabled__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       623,
@@ -6221,6 +6296,7 @@
       24,
       24
     ],
+    "hi": "lk_slot_hover__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       390,
@@ -6239,6 +6315,7 @@
       20,
       20
     ],
+    "hi": "lk_slot_item_normal__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       798,
@@ -6257,6 +6334,7 @@
       24,
       24
     ],
+    "hi": "lk_slot_item_selected__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -6270,6 +6348,7 @@
     "w": 110,
     "h": 108,
     "slice": null,
+    "hi": "lk_slot_locked__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       740,
@@ -6288,6 +6367,7 @@
       24,
       24
     ],
+    "hi": "lk_slot_normal__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       507,
@@ -6306,6 +6386,7 @@
       24,
       24
     ],
+    "hi": "lk_slot_selected__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       268,
@@ -6330,6 +6411,7 @@
       84,
       20
     ],
+    "hi": "lk_statbar_frame__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -6381,6 +6463,7 @@
       40,
       20
     ],
+    "hi": "lk_tab_arrow_leather__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       559,
@@ -6399,6 +6482,7 @@
       40,
       20
     ],
+    "hi": "lk_tab_arrow_paper__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       399,
@@ -6417,6 +6501,7 @@
       34,
       16
     ],
+    "hi": "lk_tab_category__hi",
     "atlas": "atlas_lk_window",
     "rect": [
       754,
@@ -6479,6 +6564,7 @@
       22,
       22
     ],
+    "hi": "lk_tile_frame__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       688,
@@ -6537,6 +6623,7 @@
       36,
       30
     ],
+    "hi": "lk_toast_frame__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -6618,6 +6705,7 @@
       40,
       38
     ],
+    "hi": "lk_window_frame__hi",
     "atlas": "atlas_lk_lobby",
     "rect": [
       0,
@@ -6667,6 +6755,1756 @@
     "file": "atlas_lk_items.png",
     "w": 1024,
     "h": 512,
+    "slice": null
+  },
+  "lk_icon_play_rune": {
+    "file": "lk_icon_play_rune.png",
+    "w": 89,
+    "h": 116,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      183,
+      0,
+      89,
+      116
+    ]
+  },
+  "lk_icon_play_rune_small": {
+    "file": "lk_icon_play_rune_small.png",
+    "w": 50,
+    "h": 64,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      276,
+      0,
+      50,
+      64
+    ]
+  },
+  "lk_pillar_rune_left": {
+    "file": "lk_pillar_rune_left.png",
+    "w": 88,
+    "h": 160,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      0,
+      0,
+      88,
+      160
+    ]
+  },
+  "lk_pillar_rune_right": {
+    "file": "lk_pillar_rune_right.png",
+    "w": 87,
+    "h": 160,
+    "slice": null,
+    "atlas": "atlas_lk_play",
+    "rect": [
+      92,
+      0,
+      87,
+      160
+    ]
+  },
+  "atlas_lk_play": {
+    "file": "atlas_lk_play.png",
+    "w": 1024,
+    "h": 256,
+    "slice": null
+  },
+  "lk_bar_fill_blue__hi": {
+    "file": "lk_bar_fill_blue__hi.png",
+    "w": 193,
+    "h": 58,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_fill_blue",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      508,
+      827,
+      193,
+      58
+    ]
+  },
+  "lk_bar_fill_green__hi": {
+    "file": "lk_bar_fill_green__hi.png",
+    "w": 250,
+    "h": 56,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_fill_green",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      389,
+      889,
+      250,
+      56
+    ]
+  },
+  "lk_bar_fill_orange__hi": {
+    "file": "lk_bar_fill_orange__hi.png",
+    "w": 250,
+    "h": 58,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_fill_orange",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      827,
+      250,
+      58
+    ]
+  },
+  "lk_bar_fill_red__hi": {
+    "file": "lk_bar_fill_red__hi.png",
+    "w": 250,
+    "h": 58,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_fill_red",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      254,
+      827,
+      250,
+      58
+    ]
+  },
+  "lk_bar_fill_yellow__hi": {
+    "file": "lk_bar_fill_yellow__hi.png",
+    "w": 250,
+    "h": 60,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_fill_yellow",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      705,
+      731,
+      250,
+      60
+    ]
+  },
+  "lk_bar_frame__hi": {
+    "file": "lk_bar_frame__hi.png",
+    "w": 351,
+    "h": 95,
+    "slice": [
+      48,
+      40,
+      48,
+      40
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_frame",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      355,
+      629,
+      351,
+      95
+    ]
+  },
+  "lk_bar_frame_plain__hi": {
+    "file": "lk_bar_frame_plain__hi.png",
+    "w": 351,
+    "h": 98,
+    "slice": [
+      48,
+      40,
+      48,
+      40
+    ],
+    "scale": 1.9815,
+    "of": "lk_bar_frame_plain",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      629,
+      351,
+      98
+    ]
+  },
+  "lk_bar_frame_thin__hi": {
+    "file": "lk_bar_frame_thin__hi.png",
+    "w": 204,
+    "h": 48,
+    "slice": [
+      27,
+      20,
+      27,
+      20
+    ],
+    "scale": 1.6629,
+    "of": "lk_bar_frame_thin",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      643,
+      889,
+      204,
+      48
+    ]
+  },
+  "lk_bar_track__hi": {
+    "file": "lk_bar_track__hi.png",
+    "w": 385,
+    "h": 56,
+    "slice": [
+      24,
+      20,
+      24,
+      20
+    ],
+    "scale": 2.0,
+    "of": "lk_bar_track",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      889,
+      385,
+      56
+    ]
+  },
+  "lk_button_leather_disabled__hi": {
+    "file": "lk_button_leather_disabled__hi.png",
+    "w": 246,
+    "h": 100,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6562,
+    "of": "lk_button_leather_disabled",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      254,
+      533,
+      246,
+      100
+    ]
+  },
+  "lk_button_leather_hover__hi": {
+    "file": "lk_button_leather_hover__hi.png",
+    "w": 244,
+    "h": 101,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6615,
+    "of": "lk_button_leather_hover",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      556,
+      425,
+      244,
+      101
+    ]
+  },
+  "lk_button_leather_normal__hi": {
+    "file": "lk_button_leather_normal__hi.png",
+    "w": 246,
+    "h": 101,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6615,
+    "of": "lk_button_leather_normal",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      306,
+      425,
+      246,
+      101
+    ]
+  },
+  "lk_button_leather_pressed__hi": {
+    "file": "lk_button_leather_pressed__hi.png",
+    "w": 250,
+    "h": 100,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6651,
+    "of": "lk_button_leather_pressed",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      0,
+      533,
+      250,
+      100
+    ]
+  },
+  "lk_button_paper_disabled__hi": {
+    "file": "lk_button_paper_disabled__hi.png",
+    "w": 247,
+    "h": 99,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6651,
+    "of": "lk_button_paper_disabled",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      722,
+      525,
+      247,
+      99
+    ]
+  },
+  "lk_button_paper_hover__hi": {
+    "file": "lk_button_paper_hover__hi.png",
+    "w": 246,
+    "h": 100,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6635,
+    "of": "lk_button_paper_hover",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      525,
+      246,
+      100
+    ]
+  },
+  "lk_button_paper_normal__hi": {
+    "file": "lk_button_paper_normal__hi.png",
+    "w": 245,
+    "h": 100,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6667,
+    "of": "lk_button_paper_normal",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      250,
+      525,
+      245,
+      100
+    ]
+  },
+  "lk_button_paper_pressed__hi": {
+    "file": "lk_button_paper_pressed__hi.png",
+    "w": 252,
+    "h": 101,
+    "slice": [
+      43,
+      40,
+      43,
+      40
+    ],
+    "scale": 1.6615,
+    "of": "lk_button_paper_pressed",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      754,
+      387,
+      252,
+      101
+    ]
+  },
+  "lk_button_paper_small_disabled__hi": {
+    "file": "lk_button_paper_small_disabled__hi.png",
+    "w": 139,
+    "h": 91,
+    "slice": [
+      36,
+      36,
+      36,
+      36
+    ],
+    "scale": 2.0,
+    "of": "lk_button_paper_small_disabled",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      562,
+      731,
+      139,
+      91
+    ]
+  },
+  "lk_button_paper_small_hover__hi": {
+    "file": "lk_button_paper_small_hover__hi.png",
+    "w": 140,
+    "h": 92,
+    "slice": [
+      36,
+      36,
+      36,
+      36
+    ],
+    "scale": 2.0,
+    "of": "lk_button_paper_small_hover",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      877,
+      629,
+      140,
+      92
+    ]
+  },
+  "lk_button_paper_small_normal__hi": {
+    "file": "lk_button_paper_small_normal__hi.png",
+    "w": 139,
+    "h": 92,
+    "slice": [
+      36,
+      36,
+      36,
+      36
+    ],
+    "scale": 2.0,
+    "of": "lk_button_paper_small_normal",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      731,
+      139,
+      92
+    ]
+  },
+  "lk_button_stepper_minus__hi": {
+    "file": "lk_button_stepper_minus__hi.png",
+    "w": 100,
+    "h": 96,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_button_stepper_minus",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      504,
+      533,
+      100,
+      96
+    ]
+  },
+  "lk_button_stepper_plus__hi": {
+    "file": "lk_button_stepper_plus__hi.png",
+    "w": 98,
+    "h": 96,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_button_stepper_plus",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      608,
+      533,
+      98,
+      96
+    ]
+  },
+  "lk_clasp_left__hi": {
+    "file": "lk_clasp_left__hi.png",
+    "w": 44,
+    "h": 104,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_clasp_left",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      210,
+      425,
+      44,
+      104
+    ]
+  },
+  "lk_clasp_right__hi": {
+    "file": "lk_clasp_right__hi.png",
+    "w": 44,
+    "h": 104,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_clasp_right",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      258,
+      425,
+      44,
+      104
+    ]
+  },
+  "lk_currency_pill__hi": {
+    "file": "lk_currency_pill__hi.png",
+    "w": 163,
+    "h": 93,
+    "slice": [
+      36,
+      36,
+      36,
+      36
+    ],
+    "scale": 2.0,
+    "of": "lk_currency_pill",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      710,
+      629,
+      163,
+      93
+    ]
+  },
+  "lk_dialog_frame__hi": {
+    "file": "lk_dialog_frame__hi.png",
+    "w": 510,
+    "h": 303,
+    "slice": [
+      77,
+      70,
+      77,
+      70
+    ],
+    "scale": 1.6667,
+    "of": "lk_dialog_frame",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      0,
+      0,
+      510,
+      303
+    ]
+  },
+  "lk_frame_round__hi": {
+    "file": "lk_frame_round__hi.png",
+    "w": 163,
+    "h": 163,
+    "slice": null,
+    "scale": 1.9872,
+    "of": "lk_frame_round",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      220,
+      163,
+      163
+    ]
+  },
+  "lk_glyph_play__hi": {
+    "file": "lk_glyph_play__hi.png",
+    "w": 58,
+    "h": 68,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_glyph_play",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      955,
+      533,
+      58,
+      68
+    ]
+  },
+  "lk_icon_anvil_hammer__hi": {
+    "file": "lk_icon_anvil_hammer__hi.png",
+    "w": 200,
+    "h": 178,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_anvil_hammer",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      440,
+      210,
+      200,
+      178
+    ]
+  },
+  "lk_icon_berry_bush__hi": {
+    "file": "lk_icon_berry_bush__hi.png",
+    "w": 200,
+    "h": 184,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_berry_bush",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      236,
+      210,
+      200,
+      184
+    ]
+  },
+  "lk_icon_crown__hi": {
+    "file": "lk_icon_crown__hi.png",
+    "w": 200,
+    "h": 167,
+    "slice": null,
+    "scale": 1.7232,
+    "of": "lk_icon_crown",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      644,
+      210,
+      200,
+      167
+    ]
+  },
+  "lk_icon_paw__hi": {
+    "file": "lk_icon_paw__hi.png",
+    "w": 194,
+    "h": 200,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_paw",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      472,
+      0,
+      194,
+      200
+    ]
+  },
+  "lk_icon_portal__hi": {
+    "file": "lk_icon_portal__hi.png",
+    "w": 232,
+    "h": 188,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_portal",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      0,
+      210,
+      232,
+      188
+    ]
+  },
+  "lk_icon_scroll__hi": {
+    "file": "lk_icon_scroll__hi.png",
+    "w": 232,
+    "h": 206,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_scroll",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      0,
+      0,
+      232,
+      206
+    ]
+  },
+  "lk_icon_totem__hi": {
+    "file": "lk_icon_totem__hi.png",
+    "w": 180,
+    "h": 200,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_totem",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      670,
+      0,
+      180,
+      200
+    ]
+  },
+  "lk_icon_treasure__hi": {
+    "file": "lk_icon_treasure__hi.png",
+    "w": 200,
+    "h": 140,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_treasure",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      0,
+      402,
+      200,
+      140
+    ]
+  },
+  "lk_icon_trophy__hi": {
+    "file": "lk_icon_trophy__hi.png",
+    "w": 232,
+    "h": 206,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_trophy",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      236,
+      0,
+      232,
+      206
+    ]
+  },
+  "lk_icon_tusk__hi": {
+    "file": "lk_icon_tusk__hi.png",
+    "w": 160,
+    "h": 200,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_icon_tusk",
+    "hi": "lk_icon_tusk__hi2",
+    "atlas": "atlas_lk_journal_hi",
+    "rect": [
+      854,
+      0,
+      160,
+      200
+    ]
+  },
+  "lk_panel__hi": {
+    "file": "lk_panel__hi.png",
+    "w": 324,
+    "h": 166,
+    "slice": [
+      60,
+      56,
+      60,
+      56
+    ],
+    "scale": 1.9962,
+    "of": "lk_panel",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      544,
+      0,
+      324,
+      166
+    ]
+  },
+  "lk_panel_inset__hi": {
+    "file": "lk_panel_inset__hi.png",
+    "w": 214,
+    "h": 118,
+    "slice": [
+      19,
+      19,
+      19,
+      19
+    ],
+    "scale": 1.3269,
+    "of": "lk_panel_inset",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      514,
+      0,
+      214,
+      118
+    ]
+  },
+  "lk_pill_value__hi": {
+    "file": "lk_pill_value__hi.png",
+    "w": 119,
+    "h": 55,
+    "slice": [
+      23,
+      20,
+      23,
+      20
+    ],
+    "scale": 1.6571,
+    "of": "lk_pill_value",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      0,
+      637,
+      119,
+      55
+    ]
+  },
+  "lk_plaque_notched_disabled__hi": {
+    "file": "lk_plaque_notched_disabled__hi.png",
+    "w": 282,
+    "h": 114,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "scale": 1.9839,
+    "of": "lk_plaque_notched_disabled",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      732,
+      0,
+      282,
+      114
+    ]
+  },
+  "lk_plaque_notched_leather__hi": {
+    "file": "lk_plaque_notched_leather__hi.png",
+    "w": 282,
+    "h": 114,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "scale": 1.9839,
+    "of": "lk_plaque_notched_leather",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      0,
+      307,
+      282,
+      114
+    ]
+  },
+  "lk_plaque_notched_paper__hi": {
+    "file": "lk_plaque_notched_paper__hi.png",
+    "w": 281,
+    "h": 114,
+    "slice": [
+      56,
+      48,
+      56,
+      48
+    ],
+    "scale": 1.9839,
+    "of": "lk_plaque_notched_paper",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      286,
+      307,
+      281,
+      114
+    ]
+  },
+  "lk_plaque_paper__hi": {
+    "file": "lk_plaque_paper__hi.png",
+    "w": 219,
+    "h": 100,
+    "slice": [
+      50,
+      43,
+      50,
+      43
+    ],
+    "scale": 1.6613,
+    "of": "lk_plaque_paper",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      499,
+      525,
+      219,
+      100
+    ]
+  },
+  "lk_plaque_small__hi": {
+    "file": "lk_plaque_small__hi.png",
+    "w": 206,
+    "h": 104,
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "scale": 2.0,
+    "of": "lk_plaque_small",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      0,
+      425,
+      206,
+      104
+    ]
+  },
+  "lk_slot_disabled__hi": {
+    "file": "lk_slot_disabled__hi.png",
+    "w": 161,
+    "h": 156,
+    "slice": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "scale": 2.0,
+    "of": "lk_slot_disabled",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      666,
+      220,
+      161,
+      156
+    ]
+  },
+  "lk_slot_hover__hi": {
+    "file": "lk_slot_hover__hi.png",
+    "w": 161,
+    "h": 157,
+    "slice": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "scale": 2.0,
+    "of": "lk_slot_hover",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      337,
+      220,
+      161,
+      157
+    ]
+  },
+  "lk_slot_item_normal__hi": {
+    "file": "lk_slot_item_normal__hi.png",
+    "w": 128,
+    "h": 125,
+    "slice": [
+      32,
+      32,
+      32,
+      32
+    ],
+    "scale": 1.6082,
+    "of": "lk_slot_item_normal",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      143,
+      387,
+      128,
+      125
+    ]
+  },
+  "lk_slot_item_selected__hi": {
+    "file": "lk_slot_item_selected__hi.png",
+    "w": 139,
+    "h": 134,
+    "slice": [
+      39,
+      38,
+      39,
+      38
+    ],
+    "scale": 1.6078,
+    "of": "lk_slot_item_selected",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      387,
+      139,
+      134
+    ]
+  },
+  "lk_slot_locked__hi": {
+    "file": "lk_slot_locked__hi.png",
+    "w": 220,
+    "h": 216,
+    "slice": null,
+    "scale": 2.0,
+    "of": "lk_slot_locked",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      0,
+      0,
+      220,
+      216
+    ]
+  },
+  "lk_slot_normal__hi": {
+    "file": "lk_slot_normal__hi.png",
+    "w": 160,
+    "h": 157,
+    "slice": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "scale": 2.0,
+    "of": "lk_slot_normal",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      502,
+      220,
+      160,
+      157
+    ]
+  },
+  "lk_slot_selected__hi": {
+    "file": "lk_slot_selected__hi.png",
+    "w": 166,
+    "h": 158,
+    "slice": [
+      48,
+      48,
+      48,
+      48
+    ],
+    "scale": 2.0,
+    "of": "lk_slot_selected",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      167,
+      220,
+      166,
+      158
+    ]
+  },
+  "lk_statbar_frame__hi": {
+    "file": "lk_statbar_frame__hi.png",
+    "w": 415,
+    "h": 91,
+    "slice": [
+      110,
+      33,
+      140,
+      33
+    ],
+    "scale": 1.6688,
+    "of": "lk_statbar_frame",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      143,
+      731,
+      415,
+      91
+    ]
+  },
+  "lk_tab_arrow_leather__hi": {
+    "file": "lk_tab_arrow_leather__hi.png",
+    "w": 210,
+    "h": 105,
+    "slice": [
+      50,
+      33,
+      66,
+      33
+    ],
+    "scale": 1.661,
+    "of": "lk_tab_arrow_leather",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      778,
+      307,
+      210,
+      105
+    ]
+  },
+  "lk_tab_arrow_paper__hi": {
+    "file": "lk_tab_arrow_paper__hi.png",
+    "w": 203,
+    "h": 107,
+    "slice": [
+      50,
+      33,
+      67,
+      33
+    ],
+    "scale": 1.6645,
+    "of": "lk_tab_arrow_paper",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      571,
+      307,
+      203,
+      107
+    ]
+  },
+  "lk_tab_category__hi": {
+    "file": "lk_tab_category__hi.png",
+    "w": 241,
+    "h": 74,
+    "slice": [
+      25,
+      20,
+      42,
+      20
+    ],
+    "scale": 1.25,
+    "of": "lk_tab_category",
+    "atlas": "atlas_lk_window_hi",
+    "rect": [
+      710,
+      533,
+      241,
+      74
+    ]
+  },
+  "lk_tile_frame__hi": {
+    "file": "lk_tile_frame__hi.png",
+    "w": 150,
+    "h": 146,
+    "slice": [
+      44,
+      44,
+      44,
+      44
+    ],
+    "scale": 1.9902,
+    "of": "lk_tile_frame",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      831,
+      220,
+      150,
+      146
+    ]
+  },
+  "lk_toast_frame__hi": {
+    "file": "lk_toast_frame__hi.png",
+    "w": 475,
+    "h": 124,
+    "slice": [
+      60,
+      50,
+      60,
+      50
+    ],
+    "scale": 1.6667,
+    "of": "lk_toast_frame",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      275,
+      387,
+      475,
+      124
+    ]
+  },
+  "lk_window_frame__hi": {
+    "file": "lk_window_frame__hi.png",
+    "w": 316,
+    "h": 176,
+    "slice": [
+      53,
+      50,
+      53,
+      50
+    ],
+    "scale": 1.3322,
+    "of": "lk_window_frame",
+    "atlas": "atlas_lk_lobby_hi",
+    "rect": [
+      224,
+      0,
+      316,
+      176
+    ]
+  },
+  "pm_map_island__hi__1_1": {
+    "file": "pm_map_island__hi__1_1.png",
+    "w": 1022,
+    "h": 1022,
+    "slice": null,
+    "atlas": "atlas_island_hi_1_1",
+    "rect": [
+      0,
+      0,
+      1022,
+      1022
+    ]
+  },
+  "pm_map_island__hi__1_2": {
+    "file": "pm_map_island__hi__1_2.png",
+    "w": 1022,
+    "h": 1022,
+    "slice": null,
+    "atlas": "atlas_island_hi_1_2",
+    "rect": [
+      0,
+      0,
+      1022,
+      1022
+    ]
+  },
+  "pm_map_island__hi__2_1": {
+    "file": "pm_map_island__hi__2_1.png",
+    "w": 1022,
+    "h": 1022,
+    "slice": null,
+    "atlas": "atlas_island_hi_2_1",
+    "rect": [
+      0,
+      0,
+      1022,
+      1022
+    ]
+  },
+  "pm_map_island__hi__2_2": {
+    "file": "pm_map_island__hi__2_2.png",
+    "w": 1022,
+    "h": 1022,
+    "slice": null,
+    "atlas": "atlas_island_hi_2_2",
+    "rect": [
+      0,
+      0,
+      1022,
+      1022
+    ]
+  },
+  "pm_map_island__hi": {
+    "file": null,
+    "w": 2040,
+    "h": 2040,
+    "slice": null,
+    "tiles": [
+      [
+        "pm_map_island__hi__1_1",
+        0,
+        0,
+        1022,
+        1022
+      ],
+      [
+        "pm_map_island__hi__1_2",
+        1018,
+        0,
+        1022,
+        1022
+      ],
+      [
+        "pm_map_island__hi__2_1",
+        0,
+        1018,
+        1022,
+        1022
+      ],
+      [
+        "pm_map_island__hi__2_2",
+        1018,
+        1018,
+        1022,
+        1022
+      ]
+    ],
+    "scale": 2.04,
+    "of": "pm_map_island"
+  },
+  "atlas_lk_lobby_hi": {
+    "file": "atlas_lk_lobby_hi.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_window_hi": {
+    "file": "atlas_lk_window_hi.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_journal_hi": {
+    "file": "atlas_lk_journal_hi.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_island_hi_1_1": {
+    "file": "atlas_island_hi_1_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_island_hi_1_2": {
+    "file": "atlas_island_hi_1_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_island_hi_2_1": {
+    "file": "atlas_island_hi_2_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_island_hi_2_2": {
+    "file": "atlas_island_hi_2_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "lk_icon_berries__hi": {
+    "file": "lk_icon_berries__hi.png",
+    "w": 356,
+    "h": 333,
+    "slice": null,
+    "scale": 4.5641,
+    "of": "lk_icon_berries",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      360,
+      356,
+      333
+    ]
+  },
+  "lk_icon_bone__hi": {
+    "file": "lk_icon_bone__hi.png",
+    "w": 356,
+    "h": 323,
+    "slice": null,
+    "scale": 4.092,
+    "of": "lk_icon_bone",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      360,
+      360,
+      356,
+      323
+    ]
+  },
+  "lk_icon_build__hi": {
+    "file": "lk_icon_build__hi.png",
+    "w": 356,
+    "h": 320,
+    "slice": null,
+    "scale": 3.2963,
+    "of": "lk_icon_build",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      704,
+      356,
+      320
+    ]
+  },
+  "lk_icon_campfire__hi": {
+    "file": "lk_icon_campfire__hi.png",
+    "w": 338,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_campfire",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      0,
+      338,
+      356
+    ]
+  },
+  "lk_icon_crystals__hi": {
+    "file": "lk_icon_crystals__hi.png",
+    "w": 335,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_crystals",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      0,
+      335,
+      356
+    ]
+  },
+  "lk_icon_drumstick__hi": {
+    "file": "lk_icon_drumstick__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_drumstick",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      0,
+      697,
+      356,
+      316
+    ]
+  },
+  "lk_icon_hatchet__hi": {
+    "file": "lk_icon_hatchet__hi.png",
+    "w": 356,
+    "h": 340,
+    "slice": null,
+    "scale": 2.6767,
+    "of": "lk_icon_hatchet",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      0,
+      360,
+      356,
+      340
+    ]
+  },
+  "lk_icon_heart__hi": {
+    "file": "lk_icon_heart__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_heart",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      351,
+      356,
+      316
+    ]
+  },
+  "lk_icon_hide__hi": {
+    "file": "lk_icon_hide__hi.png",
+    "w": 356,
+    "h": 338,
+    "slice": null,
+    "scale": 4.5063,
+    "of": "lk_icon_hide",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      360,
+      360,
+      356,
+      338
+    ]
+  },
+  "lk_icon_lightning__hi": {
+    "file": "lk_icon_lightning__hi.png",
+    "w": 264,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_lightning",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      339,
+      0,
+      264,
+      356
+    ]
+  },
+  "lk_icon_logs__hi": {
+    "file": "lk_icon_logs__hi.png",
+    "w": 356,
+    "h": 307,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_icon_logs",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      360,
+      711,
+      356,
+      307
+    ]
+  },
+  "lk_icon_magma_ore__hi": {
+    "file": "lk_icon_magma_ore__hi.png",
+    "w": 356,
+    "h": 310,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_magma_ore",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      711,
+      356,
+      310
+    ]
+  },
+  "lk_icon_mushroom__hi": {
+    "file": "lk_icon_mushroom__hi.png",
+    "w": 351,
+    "h": 356,
+    "slice": null,
+    "scale": 4.8767,
+    "of": "lk_icon_mushroom",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      0,
+      351,
+      356
+    ]
+  },
+  "lk_icon_pickaxe__hi": {
+    "file": "lk_icon_pickaxe__hi.png",
+    "w": 356,
+    "h": 327,
+    "slice": null,
+    "scale": 2.637,
+    "of": "lk_icon_pickaxe",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      360,
+      360,
+      356,
+      327
+    ]
+  },
+  "lk_icon_plank__hi": {
+    "file": "lk_icon_plank__hi.png",
+    "w": 356,
+    "h": 343,
+    "slice": null,
+    "scale": 3.3585,
+    "of": "lk_icon_plank",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      0,
+      356,
+      343
+    ]
+  },
+  "lk_icon_plant_fiber__hi": {
+    "file": "lk_icon_plant_fiber__hi.png",
+    "w": 356,
+    "h": 347,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_plant_fiber",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      0,
+      360,
+      356,
+      347
+    ]
+  },
+  "lk_icon_rocks__hi": {
+    "file": "lk_icon_rocks__hi.png",
+    "w": 356,
+    "h": 295,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_rocks",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      360,
+      676,
+      356,
+      295
+    ]
+  },
+  "lk_icon_rope__hi": {
+    "file": "lk_icon_rope__hi.png",
+    "w": 356,
+    "h": 351,
+    "slice": null,
+    "scale": 4.6842,
+    "of": "lk_icon_rope",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      607,
+      0,
+      356,
+      351
+    ]
+  },
+  "lk_icon_runestone__hi": {
+    "file": "lk_icon_runestone__hi.png",
+    "w": 344,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_runestone",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      355,
+      0,
+      344,
+      356
+    ]
+  },
+  "lk_icon_spear__hi": {
+    "file": "lk_icon_spear__hi.png",
+    "w": 356,
+    "h": 318,
+    "slice": null,
+    "scale": 4.1882,
+    "of": "lk_icon_spear",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      360,
+      704,
+      356,
+      318
+    ]
+  },
+  "lk_icon_star__hi": {
+    "file": "lk_icon_star__hi.png",
+    "w": 356,
+    "h": 347,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_star",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      0,
+      356,
+      347
+    ]
+  },
+  "lk_icon_stone__hi": {
+    "file": "lk_icon_stone__hi.png",
+    "w": 356,
+    "h": 316,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_stone",
+    "atlas": "atlas_lk_items_hi_3",
+    "rect": [
+      360,
+      697,
+      356,
+      316
+    ]
+  },
+  "lk_icon_stone_axe__hi": {
+    "file": "lk_icon_stone_axe__hi.png",
+    "w": 283,
+    "h": 356,
+    "slice": null,
+    "scale": 1.8163,
+    "of": "lk_icon_stone_axe",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      342,
+      0,
+      283,
+      356
+    ]
+  },
+  "lk_icon_stones__hi": {
+    "file": "lk_icon_stones__hi.png",
+    "w": 356,
+    "h": 321,
+    "slice": null,
+    "scale": 3.4902,
+    "of": "lk_icon_stones",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      351,
+      356,
+      321
+    ]
+  },
+  "lk_icon_torch__hi": {
+    "file": "lk_icon_torch__hi.png",
+    "w": 255,
+    "h": 356,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_torch",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      629,
+      0,
+      255,
+      356
+    ]
+  },
+  "lk_icon_tusk__hi2": {
+    "file": "lk_icon_tusk__hi2.png",
+    "w": 285,
+    "h": 356,
+    "slice": null,
+    "scale": 3.56,
+    "of": "lk_icon_tusk",
+    "atlas": "atlas_lk_items_hi_2",
+    "rect": [
+      703,
+      0,
+      285,
+      356
+    ]
+  },
+  "lk_icon_warning__hi": {
+    "file": "lk_icon_warning__hi.png",
+    "w": 356,
+    "h": 310,
+    "slice": null,
+    "scale": 3.069,
+    "of": "lk_icon_warning",
+    "atlas": "atlas_lk_items_hi_4",
+    "rect": [
+      0,
+      676,
+      356,
+      310
+    ]
+  },
+  "lk_glyph_ink_backpack__hi": {
+    "file": "lk_glyph_ink_backpack__hi.png",
+    "w": 218,
+    "h": 220,
+    "slice": null,
+    "scale": 1.8966,
+    "of": "lk_glyph_ink_backpack",
+    "atlas": "atlas_lk_items_hi_1",
+    "rect": [
+      720,
+      704,
+      218,
+      220
+    ]
+  },
+  "atlas_lk_items_hi_1": {
+    "file": "atlas_lk_items_hi_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_2": {
+    "file": "atlas_lk_items_hi_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_3": {
+    "file": "atlas_lk_items_hi_3.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items_hi_4": {
+    "file": "atlas_lk_items_hi_4.png",
+    "w": 1024,
+    "h": 1024,
     "slice": null
   }
 }

@@ -35,14 +35,13 @@ local view = {
 		leader = 1,
 		createdAt = NOW - 12 * 60,
 		members = {
-			{ userId = 1, name = "LiamTheMo", ready = true },
-			{ userId = 2, name = "ForestRanger", ready = false },
-			{ userId = 3, name = "SunnyVale", ready = true },
+			{ userId = 1, name = "LiamTheMo" },
+			{ userId = 2, name = "ForestRanger" },
+			{ userId = 3, name = "SunnyVale" },
 		},
 		invited = { 4 },
 	},
 	invites = { { partyId = "p9", from = "RiverFox", fromUserId = 6 } },
-	ready = true,
 	maxSize = 8,
 }
 local data = PartyModel.WindowData(view, { userId = 1, name = "LiamTheMo" }, {
@@ -58,5 +57,22 @@ local screen = window.screen
 screen:Fit(W, H, 58, 1)
 local k = screen.scale.Scale
 print(("party_phone: window scale %.3f -> %d x %d screen px"):format(k, 1124 * k, 637 * k))
+-- Empty slots take the member rows' pitch, so the list reads evenly.
+do
+	local heights = {}
+	for _, child in window.memberList:Content():GetChildren() do
+		if child:IsA("GuiObject") and child.Name ~= "UIListLayout" then
+			heights[child.Size.Y.Offset] = true
+		end
+	end
+	local count = 0
+	for _ in heights do
+		count += 1
+	end
+	print(if count == 1 then "  ok party_phone: one row pitch" else "  FAIL party_phone: rows differ in pitch")
+	if count ~= 1 then
+		error("party_phone: rows differ in pitch")
+	end
+end
 __dump(Players.LocalPlayer.PlayerGui, W, H)
 window:Destroy()

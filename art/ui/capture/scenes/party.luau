@@ -1,6 +1,6 @@
 -- The Party window (docs/ui/PartyScreen.md) at 1672 × 941 over the lobby
 -- mockup, with the mockup's sample data: LiamTheMo (LV 12) leads a party of
--- one formed just now and is ready; ForestRanger (LV 15) and SunnyVale (LV 8)
+-- one formed just now; ForestRanger (LV 15) and SunnyVale (LV 8)
 -- can be invited. Compare with art/reference/ui/lobby/04_party.png:
 --
 --   python3 art/ui/capture/capture.py party --compare art/reference/ui/lobby/04_party.png
@@ -25,11 +25,10 @@ local view = {
 		id = "p1",
 		leader = 1,
 		createdAt = NOW - 12,
-		members = { { userId = 1, name = "LiamTheMo", ready = true } },
+		members = { { userId = 1, name = "LiamTheMo" } },
 		invited = {},
 	},
 	invites = {},
-	ready = true,
 	maxSize = 8,
 }
 local candidates = {

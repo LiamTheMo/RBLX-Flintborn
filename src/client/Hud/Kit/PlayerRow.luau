@@ -1,10 +1,10 @@
 -- A player row (sheets 01, 15; M04 party and invite lists, M05 party):
--- portrait, name, "LV. n" under it, a crown for the leader, a tag (Leader,
--- Ready, Not Ready) and an optional action button (Invite). The empty variant
+-- portrait, name, "LV. n" under it, a crown for the leader, an optional tag
+-- (a Badge) and an optional action button (Invite). The empty variant
 -- is a muted disc and "Empty Slot". A rule runs under each row.
 --
 --   local row = Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = "LiamTheMo",
---       level = 12, leader = true, badge = "leader" })
+--       level = 12, leader = true })
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, name = "ForestRanger", level = 15,
 --       action = { label = "Invite", onPress = invite } })
 --   Kit.PlayerRow.new(list, { size = { 330, 52 }, empty = true })
@@ -23,13 +23,14 @@ local Motion = require(script.Parent.Motion)
 local Portrait = require(script.Parent.Portrait)
 local Scale = require(script.Parent.Scale)
 local Text = require(script.Parent.Text)
+local Tokens = require(script.Parent.Tokens)
 local Tooltip = require(script.Parent.Tooltip)
 
 local PlayerRow = {}
 PlayerRow.__index = PlayerRow
 
--- props: rect | size, userId, name, level, leader (crown), badge ("leader" |
--- "ready" | "notReady"), status ("ready" | "notReady": a bare dot, compact
+-- props: rect | size, userId, name, level, leader (crown), badge (a Badge
+-- variant), status ("ready" | "notReady": a bare dot, compact
 -- rows), action ({label, onPress, variant, enabled, size = {108, 45}}), empty,
 -- emptyText, emptyIndent (px from the left to the disc), nameX, nameY, levelY
 -- (line tops, px), badgeWidth / badgeHeight / badgeTextSize, nameSize,
@@ -120,7 +121,8 @@ function PlayerRow:Set(data)
 	self.empty = data.empty == true
 	self.root:SetAttribute("KitState", if self.empty then "empty" else "normal")
 	local ps = opt("portraitSize") or (h - 6)
-	local nameSize = opt("nameSize") or (if compact then 15 else nil)
+	-- Sizes a screen passes never go under the kit's text floor (12 design px).
+	local nameSize = Core.TextFloor(opt("nameSize") or (if compact then 15 else nil))
 	if self.empty then
 		local d = math.floor(ps * (if compact then 0.6 else 0.66))
 		local indent = opt("emptyIndent") or ((ps - d) / 2 + 2)
@@ -222,6 +224,25 @@ function PlayerRow:Set(data)
 		shrink = not Scale.IsSmallTouch()
 	end
 	local nameRight = right
+	local levelSize = Core.TextFloor(opt("levelSize"))
+	-- The name and level lines: at 10 % and 54 % of the row, unless their
+	-- (phone-boosted) text overflows those boxes; then the two lines sit as one
+	-- block centred in the row, a line height each, so every row has the same
+	-- name-to-level pitch whatever its height.
+	local nameTop, nameH = h * 0.1, h * 0.46
+	local levelTop, levelH = h * 0.54, h * 0.34
+	if hasLevel then
+		local namePx = (nameSize or Tokens.TextStyle("rowTitle").size)
+		namePx *= Core.TextBoost("rowTitle", namePx)
+		local levelPx = (levelSize or Tokens.TextStyle("small").size)
+		levelPx *= Core.TextBoost("small", levelPx)
+		if namePx > nameH * 0.95 or levelPx > levelH * 0.95 then
+			nameH = math.ceil(namePx * 1.2)
+			levelH = math.max(math.ceil(levelPx * 1.2), (opt("barHeight") or 8) + 2)
+			nameTop = math.max(0, (h - nameH - levelH) / 2)
+			levelTop = nameTop + nameH
+		end
+	end
 	self.fullName = data.name or ""
 	self.nameCut = not shrink and Text.Width(self.fullName, "rowTitle", nameSize) > nameRight - x - 2
 	Core.Label(self.content, {
@@ -232,25 +253,25 @@ function PlayerRow:Set(data)
 		color = "ink",
 		scaled = shrink,
 		rect = if opt("nameY")
-			then { x, opt("nameY"), right - x, h * 0.46 }
-			elseif hasLevel then { x, h * 0.1, right - x, h * 0.46 }
+			then { x, opt("nameY"), right - x, nameH }
+			elseif hasLevel then { x, nameTop, right - x, nameH }
 			else { x, 0, right - x, h - 2 },
 		z = z,
 	})
 	if hasLevel then
-		local ly, lh = opt("levelY") or h * 0.54, h * 0.34
+		local ly, lh = opt("levelY") or levelTop, levelH
 		self.levelLabel = Core.Label(self.content, {
 			name = "Level",
 			text = if data.level then ("LV. %d"):format(data.level) else "",
 			role = "small",
-			size = opt("levelSize"),
+			size = levelSize,
 			color = "inkBody",
 			rect = { x, ly, right - x, lh },
 			z = z,
 		})
 		if withBar then
 			self.barHeight = opt("barHeight") or 8
-			self.levelSize = opt("levelSize")
+			self.levelSize = levelSize
 			self.level, self.progress = data.level, opt("progress") or 0
 			self:_buildBar()
 			self:_follow(data.userId)

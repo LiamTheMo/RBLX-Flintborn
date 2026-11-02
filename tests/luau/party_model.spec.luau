@@ -5,7 +5,6 @@ local function partyView(members, leader, extra)
 	local view = {
 		party = { id = "p1", leader = leader, createdAt = 1000, members = members, invited = {} },
 		invites = {},
-		ready = false,
 		maxSize = 8,
 	}
 	for key, value in extra or {} do
@@ -15,20 +14,19 @@ local function partyView(members, leader, extra)
 end
 
 test("alone you are listed as the leader of a party of one", function()
-	local view = { party = nil, invites = {}, ready = true, maxSize = 8 }
+	local view = { party = nil, invites = {}, maxSize = 8 }
 	local members = PartyModel.Members(view, 1, "LiamTheMo")
 	expectEq(#members, 1, "one row")
 	expectEq(members[1].name, "LiamTheMo", "your name")
 	expect(members[1].leader, "leads")
-	expect(members[1].ready, "your own ready flag counts when solo")
 	expect(members[1].isSelf, "marked as you")
 	expectEq(PartyModel.LeaderName(members), "LiamTheMo", "leader name")
 end)
 
 test("the leader is listed first, then members in joining order", function()
 	local view = partyView({
-		{ userId = 2, name = "ForestRanger", ready = true },
-		{ userId = 1, name = "LiamTheMo", ready = false },
+		{ userId = 2, name = "ForestRanger" },
+		{ userId = 1, name = "LiamTheMo" },
 		{ userId = 3, name = "SunnyVale" },
 	}, 1)
 	local members = PartyModel.Members(view, 3, "SunnyVale")
@@ -37,10 +35,7 @@ test("the leader is listed first, then members in joining order", function()
 	expectEq(members[3].userId, 3, "then the next")
 	expect(members[3].isSelf, "you are marked")
 	expect(not members[1].isSelf, "others are not")
-	expect(members[2].ready and not members[3].ready, "ready flags carried, missing is false")
-	local ready, total = PartyModel.ReadyCount(members)
-	expectEq(ready, 1, "one ready")
-	expectEq(total, 3, "of three")
+	expectEq(members[2].ready, nil, "no ready flags")
 end)
 
 test("counts read n/8 and n / 8 within the cap", function()
@@ -127,20 +122,15 @@ test("the invite list explains why it is empty", function()
 	expectEq(PartyModel.InviteNote({ party = nil }, 1, 3, ""), nil, "nothing to explain")
 end)
 
-test("the ready toggle reads the next action and waits for the server", function()
-	local b = PartyModel.ReadyButton(false, nil)
-	expectEq(b.label, "Ready", "not ready offers Ready")
-	expectEq(b.variant, "primary", "leather")
-	expect(not b.busy, "idle")
-	b = PartyModel.ReadyButton(true, nil)
-	expectEq(b.label, "Not Ready", "ready offers Not Ready")
-	expectEq(b.variant, "secondary", "paper")
-	b = PartyModel.ReadyButton(false, true)
-	expectEq(b.label, "Not Ready", "shows the asked state while pending")
-	expect(b.busy, "busy while pending")
-	expect(PartyModel.ReadySettled({ ready = true }, true), "settled when the view agrees")
-	expect(not PartyModel.ReadySettled({ ready = false }, true), "still pending")
-	expect(PartyModel.ReadySettled({ ready = false }, nil), "nothing pending")
+test("there is no ready toggle or tally (D24)", function()
+	expectEq(PartyModel.ReadyButton, nil, "no ready toggle")
+	expectEq(PartyModel.ReadyCount, nil, "no ready tally")
+	local data = PartyModel.WindowData(partyView({ { userId = 1, name = "LiamTheMo" } }, 1), {
+		userId = 1,
+		name = "LiamTheMo",
+	}, {})
+	expectEq(data.readyButton, nil, "no toggle data")
+	expectEq(data.selfReady, nil, "no own ready flag")
 end)
 
 test("leave shows only in a party with someone else", function()

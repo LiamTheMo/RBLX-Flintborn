@@ -1,6 +1,8 @@
 # Lobby UI references
 
-The source of truth for the lobby UI rebuild. Every screen is a full-screen
+The source of truth for the lobby UI rebuild. Start with
+[`docs/ui/STYLE_GUIDE.md`](../../../../docs/ui/STYLE_GUIDE.md) for how these
+references are used. Every screen is a full-screen
 mockup at the design resolution of 1672 × 941. These replace the earlier
 parchment reference sheets, which have been removed.
 
@@ -9,8 +11,8 @@ parchment reference sheets, which have been removed.
 | `01_hud.png` | Lobby HUD: player card, currencies, settings button, menu grid, party panel, XP bar, six-slot hotbar |
 | `02_inventory.png` | Inventory (Backpack / Vault tabs, category list, item grid, item details, Equip) |
 | `03_settings.png` | Settings (Gameplay / Audio / Graphics / Controls tabs, sliders, toggles, language, key binds, Reset / Apply) |
-| `04_party.png` | Party (your party, invite players, party details, readied status) |
-| `05_play.png` | Play (island map, region details, your party, your equipment, Play) |
+| `04_party.png` | Party (your party, invite players, party details, readied status; the game has no Ready, D24) |
+| `05_play.png` | Play (island map, region details, your party, your equipment, Play; the game uses the Inventory chrome, D25, and the sheet-21 rune art, D26) |
 | `06_forge.png` | Ancestral Forge (recipes, selected recipe, requirements, quantity, your materials, Forge) |
 | `07_quest_journal.png` | Quest Journal (side tabs, quest list, quest details, objectives, rewards, Claim, quest progress) |
 
@@ -41,6 +43,7 @@ assets from these. Use the screen mockups above for layout and size.
 | `18_stat_bars_states.png` | Health, stamina, food and XP bars at 0, 50 and 100 %; empty and plain bar frames; the four fills |
 | `19_progress_bars_badges.png` | Progress bars (XP, plant, wood timer, trade), empty bar, five fill colours, ring progress at 0/50/100 %, framed status tiles (check, hourglass, clock, flag, build, search) |
 | `20_stat_bars_widths.png` | Health, stamina, food and XP bars at three widths; framed stat icon tiles |
+| `21_play_rune_stones.png` | The Play art (1448 × 1086): two stone pillars with glowing blue runes (left and right, near mirror images) and a stone-framed crystal play arrow. The arrow is the Play tile's and the Play window's icon and the PLAY button's glyph; the pillars stand at the PLAY button's ends (ARCHITECTURE D26) |
 
 These sheets came from background removal. Two consequences for slicing:
 - Fills sit at alpha 250–254 rather than 255.
@@ -48,4 +51,6 @@ These sheets came from background removal. Two consequences for slicing:
 
 Clean both up when slicing so the parts don't draw see-through or with halos.
 
-More references are coming. Add each one here with the next number.
+More references are coming. Add each one here with the next number, slice it in
+`art/ui/slice_lobby_kit.py` and record what it is for in `docs/ui/ARCHITECTURE.md`
+§12 (the steps are in `docs/ui/STYLE_GUIDE.md` §9).

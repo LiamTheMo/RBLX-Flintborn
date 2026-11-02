@@ -28,6 +28,16 @@ function WorldState.IsGenerated(): boolean
 	return workspace:GetAttribute(WorldState.GENERATED_ATTRIBUTE) == true
 end
 
+-- The generated island's decorative scenery (WorldBuildService), or nil. Its trunks,
+-- boulders and logs are solid and queryable so players stand on them and builds
+-- avoid them, so ground rays that place creatures and events exclude this folder.
+WorldState.MAP_NAME = "ShatteredCrater"
+WorldState.SCENERY_FOLDER = "Scenery"
+function WorldState.Scenery(): Instance?
+	local map = workspace:FindFirstChild(WorldState.MAP_NAME)
+	return map and map:FindFirstChild(WorldState.SCENERY_FOLDER)
+end
+
 -- Where a creature stands at a column: always the ground, the bed under any water
 -- (nothing swims, GDD §55), and whether that spot is in water. One extra ray only
 -- over water.

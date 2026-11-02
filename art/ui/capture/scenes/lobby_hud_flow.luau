@@ -132,19 +132,19 @@ fire(partyChanged.OnClientEvent, {
 		id = "p1",
 		leader = 2,
 		members = {
-			{ userId = 2, name = "ForestRanger", ready = true },
-			{ userId = 1, name = "LiamTheMo", ready = false },
+			{ userId = 2, name = "ForestRanger" },
+			{ userId = 1, name = "LiamTheMo" },
 		},
 		invited = {},
 	},
 	invites = { { partyId = "p9", from = "RiverFox" } },
-	ready = false,
 	maxSize = 8,
 })
 check(hud.countText.root.Text == "2/8", "party count from PartyChanged")
 check(#hud.parts.members == 2 and #hud.parts.empty == 6, "two members, six free")
-check(hud.parts.members[1]:GetAttribute("LobbyReady") == true, "leader's ready flag")
-check(hud.parts.members[2]:GetAttribute("LobbyReady") == false, "your not-ready flag")
+check(hud.parts.members[1]:FindFirstChild("Status", true) == nil, "no ready dots (D24)")
+check(hud.parts.members[1]:FindFirstChild("Crown", true) ~= nil, "the leader has the crown")
+check(hud.parts.members[1]:FindFirstChild("Tag", true) == nil, "and no Leader tag")
 local function rowFor(root)
 	for _, row in hud.rows do
 		if row.root == root then
@@ -163,6 +163,19 @@ ranger:SetAttribute("Level", 16)
 check(
 	rangerRow.levelLabel.Text == "LV. 16" and math.abs(rangerRow.levelBar.fraction - 0.5) < 1e-6,
 	"a member's level and XP follow their attribute changes"
+)
+-- A member whose level is not known yet shows neither "LV." nor a bare bar.
+local meRow = rowFor(hud.parts.members[2])
+check(
+	meRow.levelLabel.Text == "" and meRow.levelBar.root.Visible == false,
+	"a member without a known level shows no bar"
+)
+player:SetAttribute("Level", 12)
+player:SetAttribute("LevelProgress", 0.6)
+meRow = rowFor(hud.parts.members[2])
+check(
+	meRow.levelLabel.Text == "LV. 12" and meRow.levelBar.root.Visible == true,
+	"the level and bar show once it is known"
 )
 check(hud.invite.control.flags.enabled == false, "a non-leader's add button is disabled")
 check(#hud.parts.answers == 2, "the incoming invite offers accept and decline")
@@ -192,6 +205,15 @@ check(last() == "PartyController.Open" and opened[#opened][2] == nil, "the Party
 local before = #opened
 press(hud.invite)
 check(#opened == before, "a non-leader's disabled add-player button does nothing")
+-- The level/XP bar is the lobby's way into Progress (touch has no other).
+hud.xpControl:Activate()
+check(last() == "Progress.Toggle", "the XP bar opens Progress")
+-- The party title's touch pad grows up, never over the first member's row.
+local titleHit = hud.titleControl.hit
+check(
+	titleHit.Position.Y.Offset <= 0 and titleHit.Position.Y.Offset + titleHit.Size.Y.Offset <= 40,
+	"the Party title's pad stays off the first row"
+)
 press(hud.slots[1])
 check(last() == "Vault.Open", "a hotbar slot opens the Inventory")
 preview = { { catalogId = "StoneSpear", quantity = 1 } }
@@ -213,6 +235,14 @@ check(action and action[2] == "accept" and action[3] == "p9", "accept sends Part
 LobbyController.PartyAction("leave")
 local toasts = player.PlayerGui:FindFirstChild("KitToasts")
 check(toasts ~= nil and #toasts:GetDescendants() > 0, "a status message shows as a toast")
+local rawCode, worded = false, false
+for _, part in toasts and toasts:GetDescendants() or {} do
+	if part:IsA("TextLabel") then
+		rawCode = rawCode or string.find(part.Text, "NotInParty", 1, true) ~= nil
+		worded = worded or string.find(part.Text, "you're not in a party", 1, true) ~= nil
+	end
+end
+check(worded and not rawCode, "the refusal reads as words, not the server's code")
 player:SetAttribute("MaintenanceNotice", true)
 check(hud.noticeRegion.Visible == true, "the update notice shows while it applies")
 player:SetAttribute("MaintenanceNotice", nil)
@@ -229,8 +259,68 @@ check(#gui:GetDescendants() == count, "20 party redraws leave the instance count
 local tile1 = hud.tiles[1].control.hit
 check(tile1.NextSelectionRight == hud.tiles[2].control.hit, "Inventory -> Play")
 check(tile1.NextSelectionDown == hud.tiles[3].control.hit, "Inventory v Quests")
-check(hud.tiles[5].control.hit.NextSelectionDown == hud.slots[1].control.hit, "Forge v hotbar")
+-- Settings sits in the bottom-left corner under the tiles (ARCHITECTURE D28,
+-- D30).
+local gearHit = hud.settings.control.hit
+local slot1 = hud.slots[1].control.hit
+check(hud.tiles[5].control.hit.NextSelectionDown == gearHit, "Forge v Settings")
+check(gearHit.NextSelectionUp == hud.tiles[5].control.hit, "Settings ^ Forge")
+check(gearHit.NextSelectionRight == slot1 and slot1.NextSelectionLeft == gearHit, "Settings <-> the first hotbar slot")
+check(hud.slots[6].control.hit.NextSelectionRight == nil, "nothing right of the last slot")
+check(hud.tiles[6].control.hit.NextSelectionDown == hud.xpControl.hit, "Trade v the XP bar")
+check(hud.xpControl.hit.NextSelectionDown == slot1, "the XP bar v hotbar")
+check(hud.slots[3].control.hit.NextSelectionUp == hud.xpControl.hit, "hotbar ^ the XP bar")
+check(hud.gems.control.hit.NextSelectionRight == nil, "nothing right of Gems (Settings left the top row)")
 check(hud:DefaultSelection() == tile1, "default selection is the Inventory tile")
+
+-- The live placement (ARCHITECTURE D30): the HUD draws on the whole screen;
+-- with the 47 px side insets Kit.Scale's probe guis measure on a notched
+-- phone (here on the desktop-size screen) the right-hand column (the pills
+-- and the Party panel, which reaches the middle band) keeps the safe inset
+-- as one edge.
+do
+	local Kit = require(Client.Hud.Kit)
+	check(
+		gui.ScreenInsets == Enum.ScreenInsets.None and gui.ClipToDeviceSafeArea == false,
+		"the lobby HUD draws on the whole screen (ScreenInsets None, not clipped to the safe area)"
+	)
+	local chromeGui = Instance.new("ScreenGui")
+	chromeGui.Name = "RobloxChrome"
+	chromeGui.DisplayOrder = 100
+	local chrome = __robloxChrome(chromeGui, 1672, 941)
+	local root = gui:FindFirstChild("Root")
+	local k = root:FindFirstChildWhichIsA("UIScale").Scale
+	local full = player.PlayerGui:FindFirstChild("FlintbornScreenProbe")
+	local safe = player.PlayerGui:FindFirstChild("FlintbornSafeAreaProbe")
+	full.AbsolutePosition = Vector2.new(0, -58)
+	full.AbsoluteSize = Vector2.new(1672, 941)
+	safe.AbsolutePosition = Vector2.new(47, -58)
+	safe.AbsoluteSize = Vector2.new(1672 - 94, 941)
+	local notched = table.clone(chrome)
+	notched.insets = Kit.Scale.SafeInsets()
+	__checkLobbyHud({
+		scene = "lobby_hud_flow (47 px side insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = notched,
+	})
+	safe.AbsolutePosition = Vector2.new(0, -58)
+	safe.AbsoluteSize = Vector2.new(1672, 941)
+	__checkLobbyHud({
+		scene = "lobby_hud_flow (no insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = chrome,
+	})
+	chromeGui:Destroy()
+end
+__hudChecksDone("lobby_hud_flow")
 
 assert(not __failed, "lobby_hud_flow: a check failed")
 __dump(player.PlayerGui, 1672, 941)

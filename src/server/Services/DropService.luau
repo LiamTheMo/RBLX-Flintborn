@@ -14,9 +14,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local GearModels = require(ReplicatedStorage.Shared.Visuals.GearModels)
 local GroundDrops = require(ReplicatedStorage.Shared.Resources.GroundDrops)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
 local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
@@ -45,10 +47,17 @@ local function canAct(player: Player): boolean
 		and not DownedService.IsDowned(player)
 end
 
-local function label(item): string
+local function itemName(item): string
 	local def = ItemCatalog.Get(item.catalogId)
-	local name = def and def.name or item.catalogId
-	return (item.permanent and "★ " or "") .. name .. (item.quantity and (" ×" .. item.quantity) or "")
+	return def and def.name or item.catalogId
+end
+
+-- The prompt's line: "Stone Axe (Permanent)", "Wood ×20" (plain words: the
+-- game's fonts have no star glyph).
+local function label(item): string
+	return itemName(item)
+		.. (if item.permanent then " (Permanent)" else "")
+		.. (item.quantity and (" ×" .. item.quantity) or "")
 end
 
 local function updateLedger(player: Player, kind: string, apply)
@@ -92,7 +101,7 @@ function DropService.FinishClaim(player: Player, copy, previousOwnerId: number?)
 		profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
 	end)
 	if previousOwnerId ~= player.UserId then
-		InventoryService.Notify(player, "You now own this Permanent " .. label(copy):gsub("^★ ", "") .. ".")
+		InventoryService.Notify(player, "You now own this Permanent " .. itemName(copy) .. ".")
 	end
 end
 
@@ -117,6 +126,13 @@ function DropService.Spawn(item, position: Vector3, gathered: { ownerId: number,
 	-- Many small gathered drops never block rays, placement or line of sight.
 	part.CanQuery = gathered == nil
 	part.Parent = workspace
+	-- Dropped gear shows its placeholder model; the box stays as the pickup hitbox
+	-- (a faint glow for a Permanent item, invisible otherwise).
+	local look = if gathered then nil else GearModels.Drop(item.catalogId)
+	if look then
+		ModelBuilder.Decorate(part, look)
+		part.Transparency = if item.permanent then 0.75 else 1
+	end
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText = "Pick up"
 	prompt.ObjectText = label(item)

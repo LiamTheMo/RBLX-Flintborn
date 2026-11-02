@@ -119,32 +119,41 @@ local function viewport(gui: GuiBase2d): Vector2
 	return size
 end
 
+-- The HUD's scale (its root's UIScale) on `gui`'s screen: HudModel.HudScale
+-- of the canvas (opts.refW/refH override it) with the player's UI scale, and
+-- on phones and touch tablets × phoneHud, never below the HUD phone floor.
+-- Both HUDs, the ⚙ and the boost list (which lines up with the ⚙) use it.
+function Scale.HudScaleOf(gui: GuiBase2d, opts): number
+	opts = opts or {}
+	local ref = Tokens.Data.reference
+	local size = viewport(gui)
+	local k = HudModel.HudScale(
+		size.X,
+		size.Y,
+		opts.refW or ref.width,
+		opts.refH or ref.height,
+		Tokens.Scale("hudMin"),
+		Tokens.Scale("hudMax"),
+		Players.LocalPlayer:GetAttribute("UiScale")
+	)
+	if Scale.IsSmallTouch(size.Y, size.X) then
+		-- Phones and touch tablets: never below the HUD phone floor, so HUD
+		-- text stays readable; the regions are pinned to the screen edges.
+		k = math.max(k * Tokens.Scale("phoneHud"), Scale.PhoneFloor("hud"))
+	end
+	return k
+end
+
 -- The HUD root's scale for a screen, and keeps it current. `root` is a frame
 -- holding the HUD regions; it is sized to 1/scale of the screen so regions
 -- pinned by Scale keep to the edges. opts.refW/refH override the canvas.
 -- Returns a function that stops watching.
 function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
-	opts = opts or {}
-	local ref = Tokens.Data.reference
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") or Instance.new("UIScale")
 	uiScale.Parent = root
 	local player = Players.LocalPlayer
 	local function apply()
-		local size = viewport(gui)
-		local k = HudModel.HudScale(
-			size.X,
-			size.Y,
-			opts.refW or ref.width,
-			opts.refH or ref.height,
-			Tokens.Scale("hudMin"),
-			Tokens.Scale("hudMax"),
-			player:GetAttribute("UiScale")
-		)
-		if Scale.IsSmallTouch(size.Y, size.X) then
-			-- Phones and touch tablets: never below the HUD phone floor, so HUD
-			-- text stays readable; the regions are pinned to the screen edges.
-			k = math.max(k * Tokens.Scale("phoneHud"), Scale.PhoneFloor("hud"))
-		end
+		local k = Scale.HudScaleOf(gui, opts)
 		uiScale.Scale = k
 		root.Size = UDim2.fromScale(1 / k, 1 / k)
 	end
@@ -162,11 +171,115 @@ function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
 	end
 end
 
+-- Safe areas and screen edges (ARCHITECTURE D29) ------------------------------
+
+-- Makes a HUD ScreenGui draw on the whole screen (ScreenInsets None, not
+-- clipped to the device safe area), so its corner regions can reach the
+-- screen's edges; the regions keep out of notches themselves (the grid's edge
+-- rule: Hud/Layout.PlaceColumns, HudModel.EdgeGap). Windows keep
+-- DeviceSafeInsets (Kit.Screen).
+function Scale.FullScreen(gui: ScreenGui)
+	gui.IgnoreGuiInset = true
+	pcall(function()
+		gui.ScreenInsets = Enum.ScreenInsets.None
+	end)
+	pcall(function()
+		(gui :: any).ClipToDeviceSafeArea = false
+	end)
+end
+
+-- Two hidden probe guis, one on the whole screen and one inside the device
+-- safe area: the difference of their rectangles is the safe area's insets.
+local probes: { full: ScreenGui, safe: ScreenGui }? = nil
+local function probe()
+	if probes == nil then
+		local player = Players.LocalPlayer
+		local parent = player and player:FindFirstChildOfClass("PlayerGui")
+		if parent == nil then
+			return nil
+		end
+		local function make(name: string, insets: string): ScreenGui
+			local gui = Instance.new("ScreenGui")
+			gui.Name = name
+			gui.ResetOnSpawn = false
+			gui.IgnoreGuiInset = true
+			pcall(function()
+				gui.ScreenInsets = (Enum.ScreenInsets :: any)[insets]
+			end)
+			gui.Parent = parent
+			return gui
+		end
+		probes = {
+			full = make("FlintbornScreenProbe", "None"),
+			safe = make("FlintbornSafeAreaProbe", "DeviceSafeInsets"),
+		}
+	end
+	return probes
+end
+
+-- The device safe area's insets in screen px ({left, top, right, bottom}),
+-- measured by the probes; all 0 until they are laid out and on screens
+-- without cut-outs.
+function Scale.SafeInsets()
+	local p = probe()
+	if p == nil then
+		return HudModel.NO_INSETS
+	end
+	local fp, fs = p.full.AbsolutePosition, p.full.AbsoluteSize
+	local sp, ss = p.safe.AbsolutePosition, p.safe.AbsoluteSize
+	if fs.X <= 0 or fs.Y <= 0 or ss.X <= 0 or ss.Y <= 0 then
+		return HudModel.NO_INSETS
+	end
+	return {
+		left = math.max(0, sp.X - fp.X),
+		top = math.max(0, sp.Y - fp.Y),
+		right = math.max(0, fp.X + fs.X - (sp.X + ss.X)),
+		bottom = math.max(0, fp.Y + fs.Y - (sp.Y + ss.Y)),
+	}
+end
+
+-- Calls `fn` when the safe area changes (rotation, a resized window).
+-- Returns a function that stops watching.
+function Scale.OnSafeInsetsChanged(fn: () -> ()): () -> ()
+	local p = probe()
+	if p == nil then
+		return function() end
+	end
+	local connections = {}
+	for _, gui in { p.full, p.safe } do
+		for _, property in { "AbsoluteSize", "AbsolutePosition" } do
+			table.insert(connections, gui:GetPropertyChangedSignal(property):Connect(fn))
+		end
+	end
+	return function()
+		for _, connection in connections do
+			connection:Disconnect()
+		end
+	end
+end
+
+-- The screen a HUD gui (Scale.FullScreen) draws on at HUD scale `k`: {width,
+-- height (screen px), scale, touch, insets (Scale.SafeInsets)}; the input
+-- HudModel.EdgeGap, HudModel.GearCorner and Hud/Layout.PlaceColumns take.
+function Scale.HudScreen(gui: GuiBase2d, k: number)
+	local size = viewport(gui)
+	return {
+		width = size.X,
+		height = size.Y,
+		scale = k,
+		touch = UserInputService.TouchEnabled,
+		insets = Scale.SafeInsets(),
+	}
+end
+
 -- The scale and centre of a window w × h on a screen W × H whose top `top` px
 -- belong to the Roblox top bar.
 -- On a touch phone or tablet a window takes all the room below the top bar
 -- (over the HUD) at the largest scale that fits, so its text is as large as it
--- can be; it never draws under the Roblox top bar.
+-- can be; it never draws under the Roblox top bar. A small window (a dialog)
+-- draws at most scale.touchSmallMax × the scale of a typical window
+-- (phoneText.refWindow) there, so it is not blown up (and blurred) to fill
+-- the screen.
 function Scale.WindowFit(
 	screenW: number,
 	screenH: number,
@@ -185,6 +298,9 @@ function Scale.WindowFit(
 		refH = ref.height,
 		minScale = Tokens.Scale("windowMin"),
 		maxScale = Tokens.Scale("windowMax"),
+		-- Phones and tablets: small dialogs stay near the big windows' scale.
+		touchRef = Tokens.Data.phoneText.refWindow,
+		touchMax = Tokens.Scale("touchSmallMax"),
 	})
 	-- Centred on the screen, its top edge kept below the top inset.
 	local y = math.max(screenH / 2, top + margin + h * k / 2)

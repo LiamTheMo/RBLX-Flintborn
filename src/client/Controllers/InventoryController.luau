@@ -4,8 +4,10 @@
 -- Attack button then throws it) or sets a Breaching Charge on the wall or door in
 -- the crosshair (with none in reach it is held instead, and the attack input sets
 -- it once one is). The Backpack key (B, Y on a gamepad) opens the Inventory
--- window (Hud/Screens/InventoryWindow) on two tabs: Backpack, and Equipped (the
--- hotbar and worn armour). Choose a slot to see it in the detail card: EQUIP puts
+-- window (Hud/Screens/InventoryWindow) on two tabs: Backpack (everything the
+-- player carries: the backpack, the hotbar and worn armour), and Equipped (the
+-- hotbar and armour alone; InventoryModel.RunSections). Choose a slot to see it
+-- in the detail card: EQUIP puts
 -- a backpack item on the hotbar (WEAR for armour), USE / EQUIP / PUT AWAY act on
 -- a hotbar slot as its key does, TAKE OFF removes worn armour, MOVE then any
 -- other slot moves or swaps it there (no precise dragging), and DROP drops it.
@@ -20,6 +22,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local InventoryModel = require(ReplicatedStorage.Shared.UI.InventoryModel)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
@@ -44,7 +47,7 @@ InventoryController.BackpackToggled = Signal.new()
 local player = Players.LocalPlayer
 local ui = {}
 local slotButtons = { hotbar = {} }
-local ARMOR_SLOTS = { "Head", "Chest", "Legs" }
+local ARMOR_SLOTS = InventoryModel.ARMOR_SLOTS
 -- The chosen slot in the inventory window: {area, index}; `moving` is the slot
 -- MOVE picked up, waiting for the slot to put it in.
 local selected = nil
@@ -150,7 +153,7 @@ local function activateSiege(index: number, kind: string)
 	local equipping = InventoryController.Snapshot.equipped ~= index
 	local ok, reason = invoke("EquipSlot", index)
 	if not ok then
-		toast("Can't equip that (" .. tostring(reason) .. ")")
+		toast("Can't equip that (" .. Reasons.Text(reason) .. ")")
 	elseif equipping then
 		toast(SiegeRules.Message("BombReady"))
 	end
@@ -174,10 +177,10 @@ local function activateHotbar(index: number)
 		activateSiege(index, def.siege.kind)
 	elseif def and def.placeable == "ExtractionRune" then
 		local ok, reason = invoke("PlaceRune", index)
-		toast(ok and "Rune placed: 30 s to extract." or ("Can't place a rune here (" .. tostring(reason) .. ")"))
+		toast(ok and "Rune placed: 30 s to extract." or ("Can't place a rune here (" .. Reasons.Text(reason) .. ")"))
 	elseif def and def.placeable then
 		local ok, reason = invoke("PlaceItem", index)
-		toast(ok and (def.name .. " placed.") or ("Can't place that here (" .. tostring(reason) .. ")"))
+		toast(ok and (def.name .. " placed.") or ("Can't place that here (" .. Reasons.Text(reason) .. ")"))
 	else
 		invoke("EquipSlot", index)
 	end
@@ -284,9 +287,7 @@ local function itemOf(slot)
 		}
 end
 
-local function cellId(area: string, index: number): string
-	return area .. ":" .. index
-end
+local cellId = InventoryModel.RunCellId
 
 local function parseCell(id: string): (string?, number?)
 	local area, index = string.match(id, "^(%a+):(%d+)$")
@@ -407,7 +408,7 @@ local function showDetail()
 	if slot == nil then
 		window:SetDetail({
 			hint = if tab == "Backpack"
-				then "Choose an item to equip, move or drop it."
+				then "Everything you carry. Choose an item to equip, move or drop it."
 				else "Your hotbar (keys 1–6) and worn armour. Choose a slot to use, move or take it off.",
 		})
 		return
@@ -468,30 +469,10 @@ end
 
 -- Redraws the window from the latest snapshot.
 local function renderWindow()
-	local backpack, hotbar, armor = {}, {}, {}
-	for index = 1, GameConstants.BACKPACK_SLOTS do
-		local slot = slotAt("backpack", index)
-		table.insert(backpack, { id = cellId("backpack", index), item = itemOf(slot) })
-	end
-	for index = 1, GameConstants.HOTBAR_SLOTS do
-		table.insert(hotbar, {
-			id = cellId("hotbar", index),
-			item = itemOf(slotAt("hotbar", index)),
-			hotkey = Binds.Label("Hotbar" .. index),
-		})
-	end
-	for index, name in ARMOR_SLOTS do
-		table.insert(armor, { id = cellId("armor", index), item = itemOf(slotAt("armor", index)), caption = name })
-	end
 	window:SelectTab(tab)
-	if tab == "Backpack" then
-		window:SetSections({ { id = "backpack", cells = backpack } })
-	else
-		window:SetSections({
-			{ id = "hotbar", title = "Hotbar", cells = hotbar },
-			{ id = "armor", title = "Armour", cells = armor },
-		})
-	end
+	window:SetSections(InventoryModel.RunSections(InventoryController.Snapshot.slots, tab, function(index)
+		return Binds.Label("Hotbar" .. index)
+	end))
 	showDetail()
 end
 

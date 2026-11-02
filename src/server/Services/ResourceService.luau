@@ -2,11 +2,17 @@
 -- tagged "ResourceNode" (attribute NodeType) when present; otherwise scatters
 -- placeholder nodes over each map zone from its pool, on dry ground in a fitting
 -- habitat (clay by water, frost shrubs up high, cave nodes inside Emberhollow),
--- until the real map arrives. Each hit is
--- validated for range, cadence, tool and node state; ores and gems need their
--- pickaxe tier, plants are gathered by hand. Every hit drops its material on the
--- ground beside the node (the hitter's for 10 s, DropService) and takes as much
--- from the node's health; depleted nodes regrow after their tier's time. World only.
+-- until the real map arrives. Scattered nodes take their look from NodeModels
+-- (an invisible upright hitbox with the model welded on, ModelBuilder) or, for a
+-- type without a model yet, NodeCatalog.Looks; authored nodes keep their own.
+-- Nodes are hit with the attack input (GDD §5.1): CombatService hands a swing
+-- that hit no player or creature to Hit, which picks the closest active node in
+-- front by its hitbox surface (HarvestRules). Each hit is validated for range,
+-- cadence, tool and node state; ores and gems need their pickaxe tier, plants are
+-- gathered by hand. Every hit drops its material on the ground beside the node
+-- (the hitter's for 10 s, DropService) and takes as much from the node's health;
+-- depleted nodes regrow after their tier's time. The hitbox carries NodeType,
+-- NodeLabel, NodeAction and Active for the client's hover plaque. World only.
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -14,10 +20,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
+local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
 local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
+local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
+local NodeModels = require(ReplicatedStorage.Shared.Visuals.NodeModels)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
+local CombatService = require(script.Parent.CombatService)
 local DropService = require(script.Parent.DropService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -28,6 +39,8 @@ local ResourceService = {}
 
 ResourceService.TAG = "ResourceNode"
 ResourceService.DEFAULT_MAP_RADIUS = 2048
+-- Placeholder nodes built per frame while scattering.
+ResourceService.NODES_PER_FRAME = 40
 
 local nodes = {}
 local lastHit = {}
@@ -40,8 +53,13 @@ end
 
 local function setActive(node, active: boolean)
 	node.active = active
-	node.prompt.Enabled = active
-	node.part.Transparency = if active then 0 else 1
+	node.part:SetAttribute("Active", active)
+	if node.look then
+		-- A modelled node's hitbox stays invisible; its look shows or hides.
+		ModelBuilder.SetVisible(node.look, active)
+	else
+		node.part.Transparency = if active then 0 else 1
+	end
 	node.part.CanCollide = active
 	-- A depleted node is gone: no invisible blocker for rays or spatial queries.
 	node.part.CanQuery = active
@@ -86,6 +104,11 @@ local function dropPoint(node, from: Vector3): Vector3
 			table.insert(ignore, folder)
 		end
 	end
+	-- Nor on a boulder or trunk of the island's scenery.
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
+	end
 	for _, other in Players:GetPlayers() do
 		if other.Character then
 			table.insert(ignore, other.Character)
@@ -101,12 +124,16 @@ local function harvest(player: Player, node)
 	if not node.active or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
+	-- Range is to the hitbox's surface, so a big node is reached at its side.
 	local root = rootOf(player)
-	if root == nil or (root.Position - node.part.Position).Magnitude > NodeCatalog.HARVEST_RANGE then
+	if
+		root == nil
+		or HarvestRules.SurfaceDistance(root.Position, node.center, node.half) > NodeCatalog.HARVEST_RANGE
+	then
 		return
 	end
 	local now = os.clock()
-	if lastHit[player] and now - lastHit[player] < NodeCatalog.HARVEST_INTERVAL then
+	if not HarvestRules.CadenceReady(lastHit[player], now) then
 		return
 	end
 	lastHit[player] = now
@@ -132,6 +159,8 @@ local function harvest(player: Player, node)
 	for _, stack in hit.stacks do
 		DropService.Spawn(stack, dropPoint(node, root.Position), { ownerId = player.UserId, color = colorOf(stack) })
 	end
+	-- The hitter's hit marker confirms the gather ("+2 Wood").
+	Remotes.Get("CombatFeedback"):FireClient(player, "Harvest", material.quantity, node.center, material.catalogId)
 	if hit.depleted then
 		setActive(node, false)
 		task.delay(NodeCatalog.RegrowSeconds(node.nodeType), function()
@@ -141,32 +170,66 @@ local function harvest(player: Player, node)
 	end
 end
 
-local function register(part: BasePart, nodeType: string)
+-- Makes `part` a node. `look` is the decoration of a modelled node (hidden while
+-- it regrows); without one the part itself is the look.
+local function register(part: BasePart, nodeType: string, look: { BasePart }?)
 	local def = NodeCatalog.Nodes[nodeType]
 	if def == nil then
 		warn("[ResourceService] Unknown node type " .. tostring(nodeType))
 		return
 	end
-	local prompt = Instance.new("ProximityPrompt")
-	prompt.ActionText = if def.minRank or def.tool == "Pickaxe"
-		then "Mine"
-		elseif def.tool == "Axe" then "Chop"
-		else "Gather"
-	-- "Iron Deposit · Copper Pickaxe+" so the gate shows before the first swing.
-	local label = (nodeType:gsub("(%l)(%u)", "%1 %2"))
-	prompt.ObjectText = if def.minRank then ("%s · %s+"):format(label, NodeCatalog.PickaxeName(def.minRank)) else label
-	prompt.HoldDuration = 0
-	prompt.MaxActivationDistance = NodeCatalog.HARVEST_RANGE - 2
-	prompt.RequiresLineOfSight = false
-	prompt.Parent = part
-	local node = { part = part, nodeType = nodeType, health = def.health, prompt = prompt, active = true }
-	prompt.Triggered:Connect(function(player)
-		harvest(player, node)
-	end)
-	table.insert(nodes, node)
+	-- What the client's hover plaque shows: "Mine" over "Iron Deposit · Copper
+	-- Pickaxe+", so the gate shows before the first swing.
+	part:SetAttribute("NodeType", nodeType)
+	part:SetAttribute("NodeLabel", HarvestRules.Label(nodeType))
+	part:SetAttribute("NodeAction", HarvestRules.Action(nodeType))
+	part:SetAttribute("Active", true)
+	-- Nodes are anchored, so their box is measured once.
+	local frame = part.CFrame
+	table.insert(nodes, {
+		part = part,
+		nodeType = nodeType,
+		health = def.health,
+		active = true,
+		look = look,
+		center = part.Position,
+		half = HarvestRules.WorldHalf(frame.RightVector, frame.UpVector, frame.LookVector, part.Size),
+	})
+end
+
+-- A modelled node: an invisible upright hitbox standing on `position` with the
+-- model welded on in a "Look" model. Returns the hitbox, or nil without a model.
+local function makeModelled(folder: Folder, nodeType: string, position: Vector3): BasePart?
+	local entry = NodeModels.Get(nodeType)
+	if entry == nil or entry.hitbox == nil or entry.recipe == nil then
+		return nil
+	end
+	local box = entry.hitbox
+	local size = Vector3.new(box[1] or box.x, box[2] or box.y, box[3] or box.z)
+	local hitbox = Instance.new("Part")
+	hitbox.Name = nodeType
+	hitbox.Anchored = true
+	hitbox.Size = size
+	hitbox.Transparency = 1
+	hitbox.CanCollide = true
+	hitbox.CanQuery = true
+	hitbox.CanTouch = false
+	hitbox.CastShadow = false
+	hitbox.CFrame = CFrame.new(position + Vector3.new(0, size.Y / 2, 0))
+	local model = Instance.new("Model")
+	model.Name = HarvestRules.LOOK_MODEL
+	-- Nodes never move: anchored decoration needs no welds.
+	local look = ModelBuilder.Decorate(hitbox, entry.recipe, { parent = model, anchored = true })
+	model.Parent = hitbox
+	hitbox.Parent = folder
+	register(hitbox, nodeType, look)
+	return hitbox
 end
 
 local function makeNode(folder: Folder, nodeType: string, position: Vector3)
+	if makeModelled(folder, nodeType, position) then
+		return
+	end
 	local look = NodeCatalog.Looks[nodeType]
 	if look == nil then
 		warn("[ResourceService] No look for node type " .. nodeType)
@@ -185,7 +248,6 @@ local function makeNode(folder: Folder, nodeType: string, position: Vector3)
 	if look.shape == Enum.PartType.Cylinder then
 		part.Size = Vector3.new(look.size.Y, look.size.X, look.size.Z)
 	end
-	part:SetAttribute("NodeType", nodeType)
 	part.Parent = folder
 	register(part, nodeType)
 end
@@ -255,22 +317,65 @@ local function scatter()
 	local generated = WorldState.IsGenerated()
 	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
 	local scale = radius / BiomeCatalog.MAP_RADIUS
+	local made = 0
 	for _, zoneId in BiomeCatalog.ZONE_IDS do
 		for nodeType, count in BiomeCatalog.Zones[zoneId].resources do
 			for _ = 1, count do
 				local position = if generated then generatedSpot(zoneId, nodeType) else authoredSpot(zoneId, scale)
 				if position then
 					makeNode(folder, nodeType, position)
+					-- About 1,000 nodes: spread the build over frames, not one long hitch.
+					made += 1
+					if made % ResourceService.NODES_PER_FRAME == 0 then
+						task.wait()
+					end
 				end
 			end
 		end
 	end
 end
 
+-- A swing from `origin` along `flatAim` (CombatService, after players and
+-- creatures): harvests the closest active node in front within `reach` (the held
+-- item's, HarvestRules.Reach) of its surface that `canSee(part)` allows and the
+-- held tool can gather, when it is nearer than `structureDistance` (the structure
+-- the swing would otherwise hit, nil for none; HarvestRules.Choose). With no
+-- structure in the way, a node the tool cannot gather takes the swing for its
+-- gate notice ("Needs a Copper Pickaxe or better"). True when a node took it.
+function ResourceService.Hit(
+	player: Player,
+	origin: Vector3,
+	flatAim: Vector3,
+	reach: number,
+	canSee: ((BasePart) -> boolean)?,
+	structureDistance: number?
+): boolean
+	local tool = InventoryService.EquippedTool(player)
+	local function canHarvest(node): boolean
+		return NodeCatalog.CanHarvest(node.nodeType, tool)
+	end
+	local visible = if canSee
+		then function(node)
+			return canSee(node.part)
+		end
+		else nil
+	local node, gated =
+		HarvestRules.Choose(origin, flatAim, HarvestRules.Reach(reach), nodes, canHarvest, visible, structureDistance)
+	-- harvest() validates everything again and gives a gated node its notice.
+	local target = node or gated
+	if target == nil then
+		return false
+	end
+	harvest(player, target)
+	return true
+end
+
 function ResourceService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
+	-- The attack input harvests through CombatService (a hook: no require cycle).
+	CombatService.HarvestHit = ResourceService.Hit
 	-- Nodes sit on the map's ground, so placement waits for the map.
 	task.spawn(function()
 		WorldState.WaitUntilReady()

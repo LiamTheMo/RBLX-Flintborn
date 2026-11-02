@@ -4,6 +4,12 @@
 -- too big for one upload is laid together from tiles. Without art, Sprite
 -- returns an empty frame in its place: the kit (Hud/Kit/Art) checks HasArt and
 -- draws its own stand-ins, so nothing here needs a look of its own.
+--
+-- A sprite with high-resolution copies (UiSprites `hi`, a chain: the hero item
+-- art's 356 px copy follows a 2x one) draws the sharpest copy whose
+-- magnification is reached and whose atlas is uploaded (UiAssets.Placement),
+-- always at the sprite's own design size and insets: only the pixels behind it
+-- change.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -12,6 +18,48 @@ local UiAssets = require(ReplicatedStorage.Shared.UI.UiAssets)
 local SpriteLoader = require(script.Parent.SpriteLoader)
 
 local Widgets = {}
+
+-- The atlases that hold high-resolution copies (entries named `…__hi…`). A copy
+-- is drawn only once its atlas has actually loaded on this client: until then
+-- (and for good if it never loads) the sprite draws its 1x art, which every
+-- screen already fetches, so a slow or refused new upload can never leave a
+-- screen on stand-ins. The first time a copy is wanted its atlas is fetched in
+-- the background (after every image a label is waiting on); screens built after
+-- it arrives draw the copy.
+local HI_ATLASES: { [string]: boolean } = {}
+for name, entry in UiAssets.Sprites do
+	if type(name) == "string" and string.find(name, "__hi", 1, true) and type(entry) == "table" then
+		if type(entry.atlas) == "string" then
+			HI_ATLASES[entry.atlas] = true
+		else
+			HI_ATLASES[name] = true
+		end
+	end
+end
+local warming: { [string]: () -> () } = {}
+
+local function readyImage(name: string): string?
+	local id = UiAssets.image(name)
+	if id == nil or not HI_ATLASES[name] then
+		return id
+	end
+	if SpriteLoader.State(id) == "loaded" then
+		return id
+	end
+	if warming[id] == nil then
+		warming[id] = SpriteLoader.OnState(id, function(state)
+			if state == "loaded" and warming[id] then
+				warming[id]()
+			end
+		end)
+	end
+	return nil
+end
+
+local function placement(name: string, mag: number?)
+	return UiAssets.Placement(name, mag, nil, readyImage)
+end
+Widgets._readyImage = readyImage
 
 local function apply(object: Instance, props)
 	if props then
@@ -59,9 +107,6 @@ end
 -- The capture harness (art/ui/capture) applies text caps in layout pixels.
 local CAPTURE = (__FlintbornCapture :: any) == true
 
--- The capture harness (art/ui/capture) applies text caps in layout pixels.
-local CAPTURE = (__FlintbornCapture :: any) == true
-
 -- Caps scaled text at `maxSize` layout pixels (and keeps it at least `minSize`
 -- screen pixels). Roblox applies a UITextSizeConstraint in screen pixels, after
 -- any UIScale, so on a window drawn smaller (phones) a cap in layout pixels let
@@ -100,6 +145,27 @@ local function targetSize(props): (number, number)
 	return 0, 0
 end
 
+-- How much sprite `sprite` (its design size) is magnified when drawn with
+-- `props`, or nil when its drawn size is not known here (a scale-sized image).
+local function magnification(sprite, props, sliceScale: number?): number?
+	if type(sprite.slice) == "table" then
+		if sliceScale then
+			return sliceScale
+		end
+		local width, height = targetSize(props)
+		return if width > 0 and height > 0 then HudModel.SliceScale(sprite.w, sprite.h, width, height) else 1
+	end
+	local size = props and props.Size
+	if typeof(size) ~= "UDim2" or size.X.Scale ~= 0 or size.Y.Scale ~= 0 then
+		return nil
+	end
+	local width, height = size.X.Offset, size.Y.Offset
+	if width <= 0 or height <= 0 then
+		return nil
+	end
+	return math.min(width / sprite.w, height / sprite.h)
+end
+
 -- Without art: an empty frame where the sprite would be (callers that want a
 -- look of their own check HasArt first, as the kit does).
 local function fallback(name: string, props, parent: Instance?)
@@ -116,31 +182,29 @@ local function atlasImage(name: string): string?
 	return nil
 end
 
--- The image id sprite `name` draws from: its uploaded atlas, else its own
--- uploaded image; nil when it has neither (tiled art reports its first tile).
-function Widgets.ImageId(name: string): string?
-	local whole = UiAssets.sprite(name)
-	if whole and type(whole.tiles) == "table" and whole.tiles[1] then
-		local tile = whole.tiles[1][1]
+-- The image id sprite `name` draws from at magnification `mag` (see
+-- UiAssets.Placement; nil: the sharpest uploaded art): its uploaded atlas, else
+-- its own uploaded image; nil when it has neither (tiled art reports its first
+-- tile).
+function Widgets.ImageId(name: string, mag: number?): string?
+	local art = placement(name, mag)
+	if art == nil then
+		return nil
+	end
+	local tiles = art.entry.tiles
+	if type(tiles) == "table" and tiles[1] then
+		local tile = tiles[1][1]
 		return atlasImage(tile) or UiAssets.image(tile)
 	end
-	return atlasImage(name) or UiAssets.image(name)
+	return art.image
 end
 
 -- True when sprite `name` can draw as art (an uploaded image or an uploaded
--- atlas holding it, or uploaded tiles); false means Widgets.Sprite would draw a
--- stand-in. The kit (Hud/Kit/Art) draws its own stand-ins in the kit's style.
+-- atlas holding it or its high-resolution copy, or uploaded tiles); false means
+-- Widgets.Sprite would draw a stand-in. The kit (Hud/Kit/Art) draws its own
+-- stand-ins in the kit's style.
 function Widgets.HasArt(name: string): boolean
-	local whole = UiAssets.sprite(name)
-	if whole and type(whole.tiles) == "table" then
-		for _, tile in whole.tiles do
-			if atlasImage(tile[1]) == nil and UiAssets.image(tile[1]) == nil then
-				return false
-			end
-		end
-		return true
-	end
-	return atlasImage(name) ~= nil or UiAssets.image(name) ~= nil
+	return placement(name) ~= nil
 end
 
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
@@ -153,15 +217,29 @@ local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
 -- rectangles draw right everywhere. The holder is an ImageLabel without an image
 -- of its own whose tint, transparency and ZIndex pass on to the pieces, so callers
 -- treat it as any sprite.
-local function nineSlice(name: string, sprite, id: string, props, parent: Instance?, sliceScale: number?): GuiObject
+--
+-- `sprite` is the design entry (its insets size the pieces on screen); `art` is
+-- the placement drawn (UiAssets.Placement: the sprite's own rect, or its
+-- high-resolution copy's, whose pixel insets cut the pieces).
+local function nineSlice(
+	name: string,
+	sprite,
+	art: UiAssets.Placement,
+	props,
+	parent: Instance?,
+	sliceScale: number?
+): GuiObject
 	local holder = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = "" }, parent)
 	local width, height = targetSize(props)
 	local scale = sliceScale
 		or (if width > 0 and height > 0 then HudModel.SliceScale(sprite.w, sprite.h, width, height) else 1)
 	local l, t, r, b = sprite.slice[1], sprite.slice[2], sprite.slice[3], sprite.slice[4]
-	local rx, ry = sprite.rect[1], sprite.rect[2]
-	local xs = { 0, l, sprite.w - r, sprite.w }
-	local ys = { 0, t, sprite.h - b, sprite.h }
+	local id = art.image :: string
+	local rect = art.rect :: { number }
+	local inset = if type(art.entry.slice) == "table" then art.entry.slice else sprite.slice
+	local rx, ry, pw, ph = rect[1], rect[2], rect[3], rect[4]
+	local xs = { 0, inset[1], pw - inset[3], pw }
+	local ys = { 0, inset[2], ph - inset[4], ph }
 	-- Each column (row): {scale, offset} of its position and of its size.
 	-- Corners are whole pixels and the edge and centre pieces reach 1 px under
 	-- their neighbours, so no seam opens at a fractional slice scale.
@@ -212,6 +290,8 @@ end
 -- Art larger than Roblox's 1024 px upload limit goes up as tiles (manifest
 -- "tiles": [tile name, x, y, w, h]); a Frame lays them back together, each at its
 -- share of the whole, so the sprite still resizes as one image.
+-- `sprite` is the tiled entry (the sprite or its high-resolution copy); tile
+-- positions are in its pixels.
 local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	local ids = {}
 	for _, tile in sprite.tiles do
@@ -247,36 +327,43 @@ end
 -- rectangle of the atlas, so a screen fetches one image for many sprites (phones
 -- refuse bursts of separate downloads); otherwise it is its own image.
 -- `sliceScale` overrides the automatic 9-slice corner scale (layout "sliceScale").
-function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?): GuiObject
+-- `mag` is how much the sprite is magnified (design px drawn per design px of
+-- the sprite), which picks its 1x art or its high-resolution copy; the kit
+-- passes it, other callers leave it to the drawn size in `props`.
+function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?, mag: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	-- Art too big for one image is laid together from its tiles.
-	if whole and type(whole.tiles) == "table" then
-		return tiled(name, whole, props, parent) or fallback(name, props, parent)
-	end
-	local atlas = atlasImage(name)
-	local id = atlas or UiAssets.image(name)
-	if id == nil then
+	local art = whole and placement(name, mag or magnification(whole, props, sliceScale))
+	if whole == nil or art == nil then
 		return fallback(name, props, parent)
 	end
-	local center = UiAssets.sliceCenter(name)
-	if atlas and center then
-		return nineSlice(name, whole, atlas, props, parent, sliceScale)
+	-- Art too big for one image is laid together from its tiles.
+	if type(art.entry.tiles) == "table" then
+		return tiled(name, art.entry, props, parent) or fallback(name, props, parent)
+	end
+	local id = art.image :: string
+	local sliced = type(whole.slice) == "table" and #whole.slice == 4
+	if art.rect and sliced then
+		return nineSlice(name, whole, art, props, parent, sliceScale)
 	end
 	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
-	if atlas then
-		image.ImageRectOffset = Vector2.new(whole.rect[1], whole.rect[2])
-		image.ImageRectSize = Vector2.new(whole.rect[3], whole.rect[4])
+	if art.rect then
+		image.ImageRectOffset = Vector2.new(art.rect[1], art.rect[2])
+		image.ImageRectSize = Vector2.new(art.rect[3], art.rect[4])
 	end
 	SpriteLoader.Assign(image, id)
-	local sprite = UiAssets.sprite(name)
-	if center and sprite then
+	local center = sliced and UiAssets.sliceCenter(art.name)
+	if center then
+		-- The drawn image's own pixel insets, scaled so the corners keep the
+		-- sprite's design size.
 		image.ScaleType = Enum.ScaleType.Slice
 		image.SliceCenter = center
 		local width, height = targetSize(props)
 		if sliceScale then
-			image.SliceScale = sliceScale
+			image.SliceScale = sliceScale / art.scale
 		elseif width > 0 and height > 0 then
-			image.SliceScale = HudModel.SliceScale(sprite.w, sprite.h, width, height)
+			image.SliceScale = HudModel.SliceScale(whole.w, whole.h, width, height, art.scale)
+		elseif art.scale ~= 1 then
+			image.SliceScale = 1 / art.scale
 		end
 	elseif string.sub(name, 1, 5) == "fill_" then
 		image.ScaleType = Enum.ScaleType.Stretch

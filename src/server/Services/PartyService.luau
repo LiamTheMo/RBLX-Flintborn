@@ -2,9 +2,7 @@
 -- so a group deploys into the same world, where it starts as one tribe. Invitees
 -- see a party's id, so a deploy also writes who actually went to a short-lived
 -- MemoryStore record under a fresh token; the world trusts only that record and
--- treats anything it cannot verify as solo. Party state is lobby only. Each player
--- also has an advisory Ready flag ("ready", bool); solo players can set it too,
--- and it never blocks a deploy.
+-- treats anything it cannot verify as solo. Party state is lobby only.
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -30,15 +28,14 @@ local function newPartyId()
 	return HttpService:GenerateGUID(false)
 end
 
--- What one player sees: their party (members with their ready flags, when it was
--- created, and for the leader only the invites still pending), the invites waiting
--- for them, their own ready flag (solo players can be ready) and the size cap.
+-- What one player sees: their party (members, when it was created, and for the
+-- leader only the invites still pending), the invites waiting for them and the
+-- size cap.
 -- Nothing about players outside their party is included beyond who invited them.
 local function viewFor(player: Player)
 	local view = {
 		party = nil,
 		invites = {},
-		ready = PartyRules.IsReady(state, player.UserId),
 		maxSize = PartyRules.MAX_SIZE,
 	}
 	local party = PartyRules.PartyOf(state, player.UserId)
@@ -49,7 +46,6 @@ local function viewFor(player: Player)
 			table.insert(members, {
 				userId = userId,
 				name = member and member.DisplayName or tostring(userId),
-				ready = PartyRules.IsReady(state, userId),
 			})
 		end
 		view.party = {
@@ -92,7 +88,7 @@ local function same(a: any, b: any): boolean
 end
 
 -- Sends each player their view when it differs from the last one they were sent.
--- A no-op (an unchanged ready flag, a decline with no invite) sends nothing, and a
+-- A no-op (a decline with no invite, leaving with no party) sends nothing, and a
 -- change inside one party reaches only the players it shows to: its members, and
 -- whoever it invited or who invited it.
 local function broadcast()
@@ -113,17 +109,6 @@ local function resend(player: Player)
 	local view = viewFor(player)
 	lastSent[player] = view
 	Remotes.Get("PartyChanged"):FireClient(player, view)
-end
-
--- Clears the ready flag of everyone in `group` (a deploy is starting) and tells
--- the players whose view changed.
-function PartyService.ClearReady(group: { Player })
-	local userIds = {}
-	for _, member in group do
-		table.insert(userIds, member.UserId)
-	end
-	PartyRules.ClearReady(state, userIds)
-	broadcast()
 end
 
 -- The party ID a deploy carries into the world, where the party becomes a tribe.
@@ -237,8 +222,6 @@ local function handle(player: Player, action: any, argument: any)
 		ok, reason = PartyRules.Decline(state, player.UserId, argument)
 	elseif action == "leave" then
 		ok, reason = PartyRules.Leave(state, player.UserId)
-	elseif action == "ready" and type(argument) == "boolean" then
-		ok, reason = PartyRules.SetReady(state, player.UserId, argument)
 	elseif action == "view" and argument == nil then
 		-- Changes nothing: only this player hears, whatever was sent before.
 		resend(player)

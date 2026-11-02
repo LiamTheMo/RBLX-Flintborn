@@ -32,16 +32,22 @@ function RecipeModel.NameOf(catalogId: string?): string
 	return def and def.name or tostring(catalogId)
 end
 
+-- Shorter stat labels for a recipe row's one-line note, which shares its line
+-- with the station ("Workbench · Harvest 4 per hit" fits a row; "Harvest
+-- Power" pushed the last word onto a line of its own).
+local SHORT_LABELS = { ["Harvest Power"] = "Harvest" }
+
 -- The item's stat line from ItemInfo.StatRows, at most `max` rows
--- ("Harvest Power 5 per hit · Tool Tier 3").
-function RecipeModel.StatLine(catalogId: string?, max: number?): string
+-- ("Harvest Power 5 per hit · Tool Tier 3"); `short` uses the row labels.
+function RecipeModel.StatLine(catalogId: string?, max: number?, short: boolean?): string
 	if catalogId == nil then
 		return ""
 	end
 	local parts = {}
 	for _, row in ItemInfo.StatRows({ catalogId = catalogId }) do
 		if #parts < (max or 2) then
-			table.insert(parts, row.label .. " " .. row.value)
+			local name = if short then SHORT_LABELS[row.label] or row.label else row.label
+			table.insert(parts, name .. " " .. row.value)
 		end
 	end
 	return table.concat(parts, " · ")
@@ -79,7 +85,7 @@ function RecipeModel.Subtitle(entry): string
 	if entry.kind == "Permanent" then
 		return "Permanent: kept when you die"
 	end
-	local line = RecipeModel.StatLine(entry.output, 1)
+	local line = RecipeModel.StatLine(entry.output, 1, true)
 	if entry.kind == "Craft" then
 		local where = if entry.station then entry.station else "By hand"
 		if entry.timed then
