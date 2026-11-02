@@ -18,6 +18,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
@@ -256,10 +257,10 @@ local function build()
 
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
-	-- button, so this one stays hidden there. It sits in the HUD's top row, left
-	-- of the vitals (clear of the compass, and of Roblox's jump button at the
-	-- bottom right on phones), on a root scaled like the HUD and moved below
-	-- the Roblox top bar where that reaches down (phones).
+	-- button, so this one stays hidden there. It sits at the bottom right, its
+	-- foot on the hotbar's bottom line, on a root scaled like the HUD; on touch
+	-- screens it moves up to stand above Roblox's jump button
+	-- (HudModel.CornerButton), under the right-hand column.
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
@@ -283,8 +284,8 @@ local function build()
 		name = "Open",
 		variant = "settings",
 		size = { g.w, g.h },
-		position = UDim2.new(1, -g.right, 0, g.y),
-		anchorPoint = Vector2.new(1, 0),
+		position = UDim2.new(1, -g.right, 1, -g.bottom),
+		anchorPoint = Vector2.new(1, 1),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
 			SettingsController.Toggle()
@@ -292,23 +293,44 @@ local function build()
 	})
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function placeGear()
-		local inset = Kit.Scale.TopInset(gui) / math.max(uiScale.Scale, 0.01)
-		local shift = math.max(0, math.ceil(inset + g.gap - g.y))
-		gear.root.Position = UDim2.new(1, -g.right, 0, g.y + shift)
+		local size = gui.AbsoluteSize
+		gear.root.Position =
+			SettingsController.GearPosition(size.X, size.Y, uiScale.Scale, UserInputService.TouchEnabled)
 	end
 	uiScale:GetPropertyChangedSignal("Scale"):Connect(placeGear)
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeGear)
-	pcall(function()
-		GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(placeGear)
-	end)
+	UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(placeGear)
 	placeGear()
 	SettingsController.gear = gear
+	-- Gamepad: the gear follows the world hotbar's last slot (the HUD's
+	-- regions are mounted again when the form factor changes).
+	if not HudMode.ReplacesLobby() then
+		local HudController = require(script.Parent.HudController) :: any
+		local function link()
+			local widgets = HudController.Widgets()
+			local slots = widgets and widgets.bottom and widgets.bottom.slots
+			local last = slots and slots[#slots]
+			if last then
+				last.control.hit.NextSelectionRight = gear.control.hit
+				gear.control.hit.NextSelectionLeft = last.control.hit
+			end
+		end
+		HudController.Remounted:Connect(link)
+		link()
+	end
 end
 
--- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): right edge 14
--- px left of the vitals (which end 53 px from the right, 315 wide), on the
--- vitals' top line; `gap` below the Roblox top bar when it reaches down.
-SettingsController.GEAR = { right = 53 + 315 + 14, y = 60, w = 52, h = 46, gap = 2 }
+-- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): at the bottom
+-- right, 53 px in like the vitals and its foot on the hotbar's bottom line (49
+-- up). On touch screens it stands `gap` screen px above Roblox's jump button.
+SettingsController.GEAR = { right = 53, bottom = 49, w = 52, h = 46, gap = 12 }
+
+-- The world ⚙'s position on its HUD root for a screen w × h (screen px) at HUD
+-- scale k (HudModel.CornerButton).
+function SettingsController.GearPosition(width: number, height: number, k: number, touch: boolean): UDim2
+	local right, bottom = HudModel.CornerButton(width, height, k, touch, SettingsController.GEAR)
+	return UDim2.new(1, -right, 1, -bottom)
+end
 
 -- The window (Hud/Screens/SettingsWindow), for scenes and verifiers.
 function SettingsController.View()

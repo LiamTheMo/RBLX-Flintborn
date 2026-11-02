@@ -15,7 +15,8 @@ sheets and an Enter button with a server dropdown. Neither exists in the new UI.
 The lobby place's always-on, non-modal HUD. Top left in the mockup: the player
 card (portrait, name, level, XP bar, leaf emblem); **the game leaves it out**
 (owner decision: each Party panel row shows the member's level and XP bar
-instead). Top right: Coins pill, Gems pill, settings button. Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
+instead). Top right: Coins pill, Gems pill, settings button (**the game moves
+the settings button to the bottom right**, D27). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
 the Party panel (title with count, member rows, empty-slot rows, scrollbar).
 Bottom centre: the level/XP bar and the six-slot hotbar.
 
@@ -105,6 +106,19 @@ XP bar instead. The table below records the mockup only.
 | Settings.Glyph | Settings | 1579,80,26,25 | dark brown gear #2E1004 | — | part of the 07 button; 06 gear (907,411,286,280) is a grey 3-D gear, not the flat glyph |
 
 Gaps: Coins → Gems 17 px, Gems → Settings 16 px; right margin 53 px; top margin 70 px.
+
+As built (D27): the Settings button is not in this row. Coins and Gems close up
+to the right margin (`LobbyHud.PILLS`, 234 wide: Coins at x 1385, Gems at
+1518; phones 286 wide), so their right edge lines up with the Party panel's.
+The Settings button sits at the bottom right (`LobbyHud.GEAR`: 52 × 46, right
+edge 53 px in, its foot on the hotbar's bottom line 49 px up). On touch screens
+`LobbyHudController` passes the screen to `LobbyHud:SetScreen`, which moves it
+12 screen px left of Roblox's jump button, centred on its height
+(`HudModel.CornerButton`): on an 844 × 390 phone it draws at x 711–737,
+y 323–346, between the hotbar (ending at x 565) and the jump button (x 749),
+below the Party panel (ending at y 280). Gamepad: Settings is right of the
+last hotbar slot, and up goes to the PARTY title; the PARTY title's up goes to
+Gems.
 
 ### Left: menu grid (anchor: left, vertically centred group)
 
@@ -299,6 +313,10 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 
 ## Deviations from reference
 
+- Owner decision (D27): the Settings button moves from the top-right row to the
+  bottom right of the screen (beside the hotbar's end on desktop, left of
+  Roblox's jump button on touch screens); Coins and Gems close up to the right
+  margin.
 - Owner decision: party count shows the real cap, **"1/8"**, not "1/10".
 - Owner decision: the Play tile opens the Play window.
 - Owner decision (D26): the Play tile's icon is the stone-framed crystal play

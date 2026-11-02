@@ -492,7 +492,7 @@ Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = 
 `Kit.Badge.new(parent, {variant = "leader" | "ready" | "notReady" | "count" | "number" | "new" | "dot", text?, rect = {x, y, 0, h} (0 fits the text), anchor? = "topRight"})`;
 `:SetText`, `:SetVisible`. "ready" = green dot on the light green pill,
 "notReady" = grey dot on the value pill: generic set / not-set status pills
-(trade lock, save status). The party no longer uses them or the "leader"
+(trade lock). The party no longer uses them or the "leader"
 plaque (D24): the leader is marked by the crown alone. `readyPill` is removed.
 
 ### CurrencyPill

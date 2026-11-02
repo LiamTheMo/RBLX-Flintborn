@@ -3,7 +3,8 @@
 -- art/reference/lobby_map.png; see below).
 --   1 a run in a tribe of four: three tribe-mates, the compass with waypoints,
 --     vitals, a medicine lock, the extraction objective, a world event, LV 12
---     450/750 XP, the hotbar with slot 1 selected, and an interaction prompt
+--     450/750 XP, the hotbar with slot 1 selected, an interaction prompt and
+--     the Settings button at the bottom right
 --   2 alone: no tribe frames, no event, the objective searching, hotbar slot 3
 --     selected, a hold prompt with a gamepad key, and the level cap
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
@@ -24,6 +25,17 @@ local layout = Layout.Get()
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
+	-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
+	-- game), at the bottom right.
+	local SettingsController = require(Client.Controllers.SettingsController)
+	local g = SettingsController.GEAR
+	require(Hud.Kit).IconButton.new(root, {
+		name = "Settings",
+		variant = "settings",
+		size = { g.w, g.h },
+		position = SettingsController.GearPosition(W, H, 1, false),
+		anchorPoint = Vector2.new(1, 1),
+	})
 	return gui, root, hud
 end
 
