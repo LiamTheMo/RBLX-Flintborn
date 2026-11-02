@@ -560,7 +560,11 @@ Shows on mouse hover, a 0.5 s touch hold and gamepad selection, in `KitTooltip`
   the stack empties; `TouchControlsHidden()`).
 - `Kit.Scale.Hud(gui, root, {refW?, refH?})` → stop function; sizes `root` to
   1/scale and keeps the HUD scale (`HudModel.HudScale`, × 0.9 on short touch
-  screens). `Kit.Scale.TopInset(gui)` replaces `Parchment.TopInset`.
+  screens; `Kit.Scale.HudScaleOf(gui)` returns that scale without a root, for
+  a gui that lines up with the HUD, such as the run's boost list).
+  `Kit.Scale.TopInset(gui)` replaces `Parchment.TopInset`. The HUD grid's
+  placement (margin, gap, columns; ARCHITECTURE D30) is `Hud/Layout`'s, not
+  the Kit's.
 - `Kit.Interact.attach(base, {onPress, onLocked, render(state, ctrl), pad, padLimit, hoverScale, pressScale, selectable, sound, debounce, hit})`
   for a custom interactive part built on `Kit.Core.Root`. `padLimit = {left?,
   top?, right?, bottom?}` caps how far the touch pad grows on each side (design

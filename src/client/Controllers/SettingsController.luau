@@ -25,6 +25,7 @@ local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Kit = require(script.Parent.Parent.Hud.Kit)
+local Layout = require(script.Parent.Parent.Hud.Layout)
 local SettingsWindow = require(script.Parent.Parent.Hud.Screens.SettingsWindow)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Theme = require(script.Parent.Parent.Ui.Theme)
@@ -258,9 +259,9 @@ local function build()
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
 	-- button, so this one stays hidden there. It sits in the bottom-left corner
-	-- (D29) on a root scaled like the HUD that covers the whole screen; on touch
-	-- screens it goes left of Roblox's thumbstick ring, between it and the
-	-- screen's edge (HudModel.GearCorner).
+	-- of the HUD grid (D30), the same place, size and spec (HudLayout "gear")
+	-- as the lobby's, on a root scaled like the HUD that covers the whole
+	-- screen (HudModel.GearCorner).
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
@@ -277,12 +278,13 @@ local function build()
 		Size = UDim2.fromScale(1, 1),
 	}, gui)
 	Kit.Scale.Hud(gui, root)
-	local g = SettingsController.GEAR
+	local size = SettingsController.GearSize()
+	local margin = SettingsController.MARGIN
 	local gear = Kit.IconButton.new(root, {
 		name = "Open",
 		variant = "settings",
-		size = { g.w, g.h },
-		position = UDim2.new(0, HudModel.EDGE.margin, 1, -HudModel.EDGE.margin),
+		size = { size[1], size[2] },
+		position = UDim2.new(0, margin, 1, -margin),
 		anchorPoint = Vector2.new(0, 1),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
@@ -314,16 +316,27 @@ local function build()
 end
 
 -- The world ⚙ button in HUD design px (HudLayout's 1672 × 941), in the
--- bottom-left corner (D29; HudModel.GearCorner): the corner margin from the
--- left and bottom edges; on touch screens left of Roblox's thumbstick ring,
--- centred on its height, its touch pad (`pad` screen px) `gap` px clear of
--- the ring, or above the ring where the screen has no room beside it.
-SettingsController.GEAR = { w = 52, h = 46, gap = 12, pad = 44 }
+-- grid's bottom-left corner (D30; HudModel.GearCorner): the grid's margin from
+-- the left and bottom edges, on touch screens too unless Roblox's thumbstick
+-- ring reaches the corner (then above the ring). Its size and spec are
+-- HudLayout's "gear", which the lobby's ⚙ shares. MARGIN is where it waits
+-- when the layout is missing.
+SettingsController.MARGIN = 24
+
+-- The ⚙'s size in design px (HudLayout "gear").
+function SettingsController.GearSize(): { number }
+	local gear = Layout.Gear()
+	return if gear then gear.size else { 52, 46 }
+end
 
 -- The world ⚙'s position on its HUD root (anchored at its bottom-left corner)
 -- for a screen (Kit.Scale.HudScreen: {width, height, scale, touch, insets}).
 function SettingsController.GearPosition(screen): UDim2
-	local left, bottom = HudModel.GearCorner(screen, SettingsController.GEAR)
+	local grid, gear = Layout.Grid(), Layout.Gear()
+	if grid == nil or gear == nil then
+		return UDim2.new(0, SettingsController.MARGIN, 1, -SettingsController.MARGIN)
+	end
+	local left, bottom = HudModel.GearCorner(grid, gear, screen)
 	return UDim2.new(0, left, 1, -bottom)
 end
 

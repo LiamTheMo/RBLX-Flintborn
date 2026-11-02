@@ -2,9 +2,10 @@
   "reference": { "width": 1672, "height": 941 },
   "scale": { "min": 0.34, "max": 1.6 },
   "frameOutset": [4, 4, 5, 5],
+  "grid": { "margin": 24, "gap": 12, "column": 315, "topBand": 0.3, "bottomBand": 0.25 },
+  "gear": { "size": [52, 46], "ringGap": 12, "pad": 44 },
   "party": {
-    "anchor": [0, 0],
-    "pos": [0, 24, 0, 60],
+    "column": "left",
     "width": 294,
     "header": [28, 18, 238, 34],
     "listTop": 58,
@@ -18,6 +19,7 @@
     "barY": 29,
     "barH": 11,
     "phone": {
+      "column": false,
       "anchor": [0.5, 0],
       "pos": [0.5, 0, 0, 96],
       "strip": true,
@@ -48,9 +50,8 @@
     "waypoints": { "y": 52, "size": 30 }
   },
   "vitals": {
-    "anchor": [1, 0],
-    "pos": [1, -24, 0, 12],
-    "size": [240, 50],
+    "column": "right",
+    "height": 50,
     "pitch": 58,
     "low": 0.25,
     "lowMark": [32, 28, 18],
@@ -61,15 +62,13 @@
     ]
   },
   "status": {
-    "anchor": [1, 0],
-    "pos": [1, -24, 0, 188],
-    "size": [315, 38],
+    "column": "right",
+    "height": 38,
     "gap": 8
   },
   "objective": {
-    "anchor": [1, 0],
-    "pos": [1, -24, 0, 236],
-    "size": [315, 134],
+    "column": "right",
+    "height": 134,
     "header": [22, 16, 271, 34],
     "rowTop": 58,
     "rowHeight": 30,
@@ -79,12 +78,11 @@
     "pin": 16,
     "distanceW": 46,
     "progressW": 72,
-    "touch": { "size": [315, 162], "rowHeight": 48, "twoLine": true, "progressW": 104 }
+    "touch": { "height": 162, "rowHeight": 48, "twoLine": true, "progressW": 104 }
   },
   "event": {
-    "anchor": [1, 0],
-    "pos": [1, -24, 0, 382],
-    "size": [315, 128],
+    "column": "right",
+    "height": 128,
     "header": [22, 16, 271, 34],
     "nameY": 56,
     "nameH": 24,
@@ -92,27 +90,25 @@
     "descriptionH": 36,
     "descriptionSize": 13,
     "maxLines": 3,
-    "touch": { "pos": [1, -24, 0, 410], "descriptionSize": 15 },
-    "phone": { "anchor": [0, 0], "pos": [0, 24, 0, 238] }
+    "touch": { "descriptionSize": 15 },
+    "phone": { "column": "left" }
   },
   "tiles": {
-    "x": 24,
+    "column": "left",
     "centreY": 0.476,
-    "size": [190, 272],
     "tile": [88, 84],
     "pitch": [102, 94],
     "columns": 2,
-    "phone": { "anchor": [0, 0], "pos": [0, 24, 0, 60], "columns": 3, "tile": [80, 80], "pitch": [88, 86] }
+    "phone": { "centreY": false, "columns": 3, "tile": [80, 80], "pitch": [88, 86] }
   },
   "bottom": {
-    "anchor": [0.5, 1],
-    "pos": [0.5, 0, 1, -49],
+    "column": "bottom",
     "size": [572, 124],
-    "level": [-40, -4, 114, 24],
-    "xp": [81, 0, 356, 16],
-    "xpText": [448, -4, 220, 24],
+    "level": [-13, -4, 114, 24],
+    "xp": [108, 0, 356, 16],
+    "xpText": [475, -4, 220, 24],
     "textSize": 17,
-    "popups": [81, -122, 356, 118],
+    "popups": [108, -122, 356, 118],
     "hotbar": { "y": 35, "slot": [89, 89], "x": [0, 96, 193, 289, 386, 482], "count": 6 }
   },
   "prompt": {

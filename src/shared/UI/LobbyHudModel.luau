@@ -115,16 +115,21 @@ function LobbyHudModel.Hotbar(items): { any }
 	return slots
 end
 
--- Gamepad neighbours in the 2 × 3 tile grid: {up, down, left, right} as tile
--- indices (nil at an edge).
-function LobbyHudModel.TileNeighbours(index: number): { up: number?, down: number?, left: number?, right: number? }
+-- Gamepad neighbours in the tile grid, `columns` tiles to a row (2 by
+-- default: the 2 × 3 grid; phones draw 3 × 2, HudLayout "tiles"): {up, down,
+-- left, right} as tile indices (nil at an edge).
+function LobbyHudModel.TileNeighbours(
+	index: number,
+	columns: number?
+): { up: number?, down: number?, left: number?, right: number? }
 	local count = #LobbyHudModel.TILES
-	local column = (index - 1) % 2
+	local n = columns or 2
+	local column = (index - 1) % n
 	return {
-		up = if index - 2 >= 1 then index - 2 else nil,
-		down = if index + 2 <= count then index + 2 else nil,
-		left = if column == 1 then index - 1 else nil,
-		right = if column == 0 and index + 1 <= count then index + 1 else nil,
+		up = if index - n >= 1 then index - n else nil,
+		down = if index + n <= count then index + n else nil,
+		left = if column > 0 then index - 1 else nil,
+		right = if column < n - 1 and index + 1 <= count then index + 1 else nil,
 	}
 end
 

@@ -12,9 +12,11 @@ local RunService = game:GetService("RunService")
 
 local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
 local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
+local Layout = require(script.Parent.Parent.Hud.Layout)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -24,17 +26,27 @@ BoostHudController.ENDING_SECONDS = 30
 BoostHudController.REFRESH_SECONDS = 0.25
 
 BoostHudController.WIDTH = 340
--- The list's left edge: right of the world ⚙ in the bottom-left corner
--- (SettingsController.GEAR, HudModel.GearCorner: 24 + 52, and 12 px between;
--- on phones without a notch its touch pad ends 47 screen px in, and this list
--- draws at 0.6: 90 starts it 54 px in), so the corner button and the boosts
--- never cover each other.
-BoostHudController.LEFT = 88
-BoostHudController.PHONE_LEFT = 90
 
--- The list's left edge for the current form factor.
-function BoostHudController.Left(): number
-	return if KitScale.FormFactor() == "phone" then BoostHudController.PHONE_LEFT else BoostHudController.LEFT
+-- Where the list starts on its gui (a whole-screen gui whose root draws at
+-- `listScale`, the overlay scale): the HUD grid's gap right of the world ⚙ in
+-- the bottom-left corner (HudModel.GearCorner, as SettingsController places
+-- it; right of its touch pad where that reaches further), its foot the grid's
+-- margin above the screen's bottom edge, level with the ⚙'s and the hotbar's
+-- (D30). So the corner button and the boosts never cover each other.
+function BoostHudController.Position(gui: GuiBase2d, listScale: number): UDim2
+	local grid, gear = Layout.Grid(), Layout.Gear()
+	local k = KitScale.HudScaleOf(gui)
+	local margin = if grid then grid.margin else 24
+	local gap = if grid then grid.gap else 12
+	local size = if gear then gear.size else { 52, 46 }
+	local left = margin
+	if grid and gear then
+		left = HudModel.GearCorner(grid, gear, KitScale.HudScreen(gui, k))
+	end
+	local w = size[1] * k
+	local right = left * k + w + math.max(0, (if gear then gear.pad else 44) - w) / 2
+	local x = right + gap * k
+	return UDim2.new(0, x / listScale, 1, -margin * k / listScale)
 end
 
 local ICONS = { XP = "star", Luck = "treasure" }
@@ -70,12 +82,15 @@ local function build()
 		DisplayOrder = 4,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, player:WaitForChild("PlayerGui"))
+	-- The whole screen, like the HUD and its ⚙, so the list lines up with them.
+	KitScale.FullScreen(gui)
+	ui.gui = gui
 	-- Bottom left, growing upwards beside the world ⚙: clear of the party
 	-- frames and menu tiles above and of the XP bar and hotbar to the right.
 	ui.root = make("Frame", {
 		Name = "BoostList",
 		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, BoostHudController.Left(), 1, -20),
+		Position = UDim2.new(0, 0, 1, 0),
 		Size = UDim2.fromOffset(BoostHudController.WIDTH, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
@@ -126,7 +141,8 @@ local function update()
 	end
 	ui.root.Visible = any
 	if any then
-		ui.root.Position = UDim2.new(0, BoostHudController.Left(), 1, -20)
+		local fit = ui.root.Parent:FindFirstChildWhichIsA("UIScale")
+		ui.root.Position = BoostHudController.Position(ui.gui, if fit then fit.Scale else 1)
 	end
 end
 

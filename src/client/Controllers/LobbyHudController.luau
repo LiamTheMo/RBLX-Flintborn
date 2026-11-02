@@ -122,9 +122,9 @@ local function build()
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = Kit.Tokens.Order("hud")
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses the mockup's coordinates on the whole screen and keeps
-	-- clear of the top bar (LobbyHud:SetTopInset) and of notches
-	-- (LobbyHud:SetScreen, D29) itself.
+	-- The layout uses the HUD grid on the whole screen and keeps clear of the
+	-- top bar (LobbyHud:SetTopInset) and of notches (LobbyHud:SetScreen, D30)
+	-- itself.
 	Kit.Scale.FullScreen(gui)
 	root = Instance.new("Frame")
 	root.Name = "Root"
@@ -159,17 +159,24 @@ end
 
 -- True when the Roblox top bar's right-hand area reaches over Coins and Gems
 -- in the top-right corner: its free area (GuiService.TopbarInset) ends before
--- their right edge (the corner margin in, at HUD scale k) and before the safe
--- area's (`safeRight` screen px in; Roblox's own right-hand items sit inside
--- it), on a screen `width` px wide whose gui starts at `originX`.
-function LobbyHudController.BarReachesRight(width: number, originX: number, k: number, safeRight: number?): boolean
+-- their right edge (the grid's margin in, `margin` design px at HUD scale k)
+-- and before the safe area's (`safeRight` screen px in; Roblox's own
+-- right-hand items sit inside it), on a screen `width` px wide whose gui
+-- starts at `originX`.
+function LobbyHudController.BarReachesRight(
+	width: number,
+	originX: number,
+	k: number,
+	safeRight: number?,
+	margin: number?
+): boolean
 	local ok, bar = pcall(function()
 		return GuiService.TopbarInset
 	end)
 	if not ok or typeof(bar) ~= "Rect" or bar.Max.Y <= 0 or bar.Max.X <= bar.Min.X then
 		return false
 	end
-	return bar.Max.X - originX < math.min(width - HudModel.EDGE.margin * k, width - (safeRight or 0)) - 0.5
+	return bar.Max.X - originX < math.min(width - (margin or 24) * k, width - (safeRight or 0)) - 0.5
 end
 
 -- Root scale (HudModel.HudScale, × 0.9 on short touch screens), the top bar's
@@ -184,7 +191,13 @@ local function watchScale()
 		hud:SetTopInset(
 			Kit.Scale.WindowTop(gui) / k,
 			HudModel.TopRow(Kit.Scale.TopInset(gui)) / k,
-			LobbyHudController.BarReachesRight(screen.width, gui.AbsolutePosition.X, k, screen.insets.right)
+			LobbyHudController.BarReachesRight(
+				screen.width,
+				gui.AbsolutePosition.X,
+				k,
+				screen.insets.right,
+				hud.grid.margin
+			)
 		)
 		hud:SetScreen(screen)
 	end

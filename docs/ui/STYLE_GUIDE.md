@@ -6,7 +6,7 @@ is the authority, this guide summarises it and links to it:
 
 | Document | Authority for |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D29) override everything else**, this guide included |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D30) override everything else**, this guide included |
 | [KIT.md](KIT.md) | The Kit's API: every component's constructor, props, methods and states; roles; stand-ins; capture limits |
 | Screen specs: [LobbyScreen](LobbyScreen.md), [InventoryScreen](InventoryScreen.md), [SettingsScreen](SettingsScreen.md), [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md), [ForgeScreen](ForgeScreen.md), [CraftingScreen](CraftingScreen.md), [JournalScreen](JournalScreen.md), [ListWindows](ListWindows.md), [HudScreen](HudScreen.md) | Per-screen measurements, element trees, data and deviations |
 | [ITEM_ART.md](ITEM_ART.md) | Which art and tint every catalog item draws |
@@ -106,7 +106,7 @@ cleaned by the slicer (§9.1), never cut by hand.
 
 | File | Source of truth for | Built as |
 |---|---|---|
-| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies (top-right corner, D29; the settings button moved to the bottom-left corner, D27 / D28 / D29), 2 × 3 menu tiles (left), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
+| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies (top-right corner; the settings button moved to the bottom-left corner, D27–D30), 2 × 3 menu tiles (left; on phones the run's 3 × 2, D30), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
 | [`02_inventory.png`](../../art/reference/ui/lobby/02_inventory.png) | The model window: frame, banner header (icon, title, ink underline, close), category column, slot grid, detail card, primary action; also the Play window's chrome (D25) | `Screens/InventoryWindow` |
 | [`03_settings.png`](../../art/reference/ui/lobby/03_settings.png) | Large notched tabs, sliders, checkboxes with descriptions, key-bind boxes, Reset / Apply footer | `Screens/SettingsWindow` (D1, D2, D21) |
 | [`04_party.png`](../../art/reference/ui/lobby/04_party.png) | Centred header with ornaments, member rows, invite search and list, Party Details | `Screens/PartyWindow` (D5, D6, D17, D24: no Readied Status) |
@@ -178,7 +178,8 @@ the specs and every other section. Full text:
 | D26 | Play rune art | Sheet 21: the crystal arrow is the Play tile's and the Play header's icon and the PLAY button's glyph; two rune pillars stand at the PLAY button's ends; own atlas `atlas_lk_play`; portal and white glyph until it is uploaded | [PlayScreen](PlayScreen.md#play-rune-art-d26), §9.6 |
 | D27 | HUD corner round | World vitals 240 × 50 at pitch 58; no client save-status tag; Coins and Gems alone at the top right (its Settings placement, bottom right by the jump button, is superseded by D28) | [LobbyScreen](LobbyScreen.md), [HudScreen](HudScreen.md) |
 | D28 | HUD layout round | World HUD: the compass in Roblox's top bar, level with its buttons and clear of them; vitals, status, objective and world event from the top-right corner down; menu tiles at the left edge. Both HUDs: Settings at the bottom left (its horizontal places and the Settings place are superseded by D29) | [HudScreen](HudScreen.md), [LobbyScreen](LobbyScreen.md) |
-| D29 | HUD edges round | The HUD guis draw on the whole screen; the edge rule (24 design px from the screen's edge in the top 30 % / bottom 25 %, at least the device safe inset beside the middle band); lobby Coins and Gems in the top-right corner level with Roblox's buttons, the Party panel under them; world vitals, column and tiles at the edges; both HUDs' Settings in the bottom-left corner, on touch left of the thumbstick ring (§5.7) | [HudScreen](HudScreen.md), [LobbyScreen](LobbyScreen.md), [SettingsScreen](SettingsScreen.md) |
+| D29 | HUD edges round | The HUD guis draw on the whole screen; the edge rule (24 design px from the screen's edge in the top 30 % / bottom 25 %, at least the device safe inset beside the middle band). Its placements are superseded by D30 | [HudScreen](HudScreen.md), [LobbyScreen](LobbyScreen.md), [SettingsScreen](SettingsScreen.md) |
+| D30 | HUD grid round | One grid for both HUDs (§5.6): margin M 24, gap G 12, right-hand column 315 wide; each column stacks with G and keeps one edge by the edge rule applied to the whole column; the shared pieces (tiles, Settings, level/XP bar and hotbar, the right-hand column's top, edge and width) in the same place in both HUDs; Settings M from the left and the bottom; the hotbar M above the bottom edge | [HudScreen](HudScreen.md), [LobbyScreen](LobbyScreen.md), [SettingsScreen](SettingsScreen.md) |
 
 Other recorded deviations (not numbered): the lobby HUD has no player card
 (each party row shows level and XP instead; [LobbyScreen](LobbyScreen.md)),
@@ -499,47 +500,49 @@ built grids: Inventory slots 91 × 91 (square) at a 99.6 pitch; HUD tiles
 | `plain` | none | Grouping without a frame |
 | `SectionHeader` | text + `divider.ink` (default) or `divider.hairline` | Column headings in caps over a rule |
 
-### 5.6 HUD regions and anchoring
+### 5.6 HUD regions and anchoring: the HUD grid (D30)
 
-The lobby HUD (`Screens/LobbyHud`) pins its regions to the screen edges inside
-a root sized to 1/scale of the whole screen (`Kit.Scale.Hud`; the gui draws on
-the whole screen, D29). "Edge rule" below is the rule in "Screen edges and
-safe areas" (§5.7): 24 from the edge in a corner band, at least the device
-safe inset beside the middle band.
+Both HUDs (the lobby's `Screens/LobbyHud` and the run's `HudController`)
+place their regions on **one grid**, defined once in
+[`HudLayout.json`](../../src/shared/UI/HudLayout.json):
 
-| Region | Anchor | Place and size (design px) |
+| Token (`grid`, `gear`) | Value (design px) | Means |
 |---|---|---|
-| Coins, Gems | top-right corner | 24 from the right (edge rule), level with Roblox's buttons' top (y 12 under a 58 px bar; below the bar only when its right-hand area reaches over them); 234 × 46 (phones: 286 wide, pills 150 / 124) |
-| Party panel | right edge, under the pills | 16 under the pills (y 74), 24 from the right by the edge rule (on a notched phone it reaches the middle band, so its right edge stands at the safe inset); 294 × 244 |
-| Menu tiles 2 × 3 | left, vertically centred | x 68 from the safe area's left edge, centre at 448 / 941 of the height; 190 × 272; tiles 88 × 84 at a 102 × 94 pitch |
-| XP bar and hotbar | bottom centre | 49 from the bottom; 572 × 124; slot lefts 0, 96, 193, 289, 386, 482 |
-| Settings (D29) | bottom-left corner | 24 from the left and the bottom; 52 × 46; on touch left of Roblox's thumbstick ring, centred on its height, its touch pad 12 screen px clear of the ring, or (no room beside the ring) its foot 12 screen px above it, and the tiles move up as far as its touch pad needs (`HudModel.GearCorner`) |
+| `grid.margin` (**M**) | 24 (12 screen px on a phone at HUD scale 0.5) | between the screen's edge and every region pinned to it: top, left, right, bottom |
+| `grid.gap` (**G**) | 12 (6 on a phone) | between stacked or neighbouring HUD pieces |
+| `grid.column` | 315 | the width of the right-hand column's pieces in both HUDs |
+| `grid.topBand` / `bottomBand` | 0.30 / 0.25 | the corner bands of the edge rule (§5.7) |
+| `gear` | 52 × 46, ring gap 12, pad 44 | the ⚙ both HUDs draw |
 
-The run's HUD uses the same parts and measures from
-[`HudLayout.json`](../../src/shared/UI/HudLayout.json) ([HudScreen](HudScreen.md)):
-tribe frames top left (24, 60), the compass in Roblox's top bar (481 × 46,
-centred on the bar's button line and clear of its buttons, D28), vitals in the
-top-right corner (24 in, level with the bar's buttons: y 12 under a 58 px bar,
-240 × 50 rows at a 58 pitch), status, objective and event cards under them
-(y 188, 236, 382; right edge by the edge rule), tiles at the left edge (edge
-rule), the same bottom bar, the touch attack button and the Settings button in
-the bottom-left corner (as the lobby's).
+A region names its column (`"column": "right"`, `"left"` or `"bottom"`)
+instead of carrying offsets; `Hud/Layout.ForScreen` resolves it, and
+`Hud/Layout.PlaceColumns` (the one placement both HUDs call) stacks each
+column's shown pieces from its top with G between them (a hidden piece takes
+no room) and keeps the whole column to one edge (§5.7). The rects are the
+art's visible edges (kit plates are drawn outset by their sprites' margins,
+§5.1).
+
+| Region | Lobby | Run | Place |
+|---|---|---|---|
+| Right-hand column | Coins + Gems row (165 + G + 138), Party panel (315 × 244) | vitals (315 × 50 rows, pitch 58), status plaques (right-aligned), FIND EXTRACTION, world event (desktop and tablets) | from M below the screen's top (below the bar only when its right-hand area reaches over), G apart, 315 wide, one right edge: the first piece is the top-right corner piece |
+| Left-hand column | menu tiles | tribe frames (desktop), menu tiles, world event (phones) | one left edge; stacked pieces from G under Roblox's top-bar buttons, G apart |
+| Menu tiles | the run's grid | `tiles` | desktop and tablets 2 × 3, 88 × 84 at a 102 × 94 pitch, centred at 0.476 of the height; phones 3 × 2, 80 × 80 at 88 × 86, G under Roblox's buttons |
+| Level/XP bar and hotbar | the run's group | `bottom` | 572 × 124, centred, M above the bottom edge; the XP bar (356) centred over the hotbar, level text 7 px left of it, XP text 11 px right, XP pop-ups over it; the lobby's update notice centred, G above it |
+| Settings | the run's ⚙ | `gear` | the bottom-left corner: M from the left and M from the bottom; above Roblox's thumbstick ring only where the ring reaches the corner (a phone without a side inset) (`HudModel.GearCorner`) |
+| Compass | — | `compass` | centred in Roblox's top bar's row, clear of its buttons and the right-hand column (D28); the phone tribe strip centred under it |
+| Boost list | — | `BoostHudController.Position` | G right of the ⚙ (or its touch pad), its foot M above the bottom edge |
 
 While a window is open the HUD stays where M01 has it (D8) under the veil
 (`#050403` at 0.30) and, on Medium and High graphics, a size 8 blur.
 
 **Top bar.** `Kit.Scale.TopInset(gui)` measures how far the Roblox top bar
-reaches; windows keep below `max(inset, topInsetMin 52)` plus their margin. The
-lobby HUD puts Coins and Gems level with the bar's buttons' top
-(`HudModel.TopRow`, D29; below the bar only when the bar's right-hand area,
-`GuiService.TopbarInset`, ends before them and before the safe area's right
-edge) with the Party panel under them, and keeps its tiles below the bar's
-inset plus 2 px (`TOP_GAP`) or the mockup's top margin (`TOP_Y` 60). The
-world HUD (D28) uses the bar's row itself: `HudController.TopBar` reads the
-inset and `GuiService.TopbarInset` (where Roblox's left-hand buttons end), and
-`HudController.PlaceTop` puts the compass on the buttons' centre line clear of
-them, the right-hand column level with their top, the left-hand regions below
-the bar, and every side region at its edge by the edge rule (§5.7, D29).
+reaches; windows keep below `max(inset, topInsetMin 52)` plus their margin.
+`HudModel.TopRow` gives the bar's button row (44 px buttons ending 2 px above
+the inset: y 12–56 under a 58 px bar). The right-hand columns start M from
+the top (on a phone that is level with the buttons' top), below the bar only
+when the bar's right-hand area (`GuiService.TopbarInset`) ends before them;
+the left-hand stacks start G under the buttons' foot; the compass sits on the
+buttons' centre line (`HudController.PlaceTop`, `LobbyHud:_place`).
 
 ### 5.7 Scaling, form factors and safe areas
 
@@ -568,23 +571,27 @@ desktop: 1.
 subtitles 50. The veil reaches past the safe area. Real notches and the
 thumbstick and jump zones stay device checks.
 
-**Screen edges and safe areas (D29).** The HUD guis (`FlintbornHud`,
+**Screen edges and safe areas (D29, per column since D30).** The HUD guis (`FlintbornHud`,
 `FlintbornHudOverlay`, `FlintbornLobbyHud`, `FlintbornSettingsButton`) draw on
 the whole screen (`Kit.Scale.FullScreen`: `ScreenInsets = None`,
 `ClipToDeviceSafeArea = false`), so their corner regions can reach the
 screen's edges. `Kit.Scale.SafeInsets()` measures the device safe area (two
 hidden probe guis, one `None`, one `DeviceSafeInsets`) and
 `Kit.Scale.OnSafeInsetsChanged` re-places the HUDs when it changes. The edge
-rule (`HudModel.EDGE`, `HudModel.EdgeGap`, `Kit.Scale.PinToEdge`), for every
-region pinned to the left or right edge:
+rule (`HudModel.EdgeGap` with the grid, applied by `Hud/Layout.PlaceColumns`
+to a whole column, so its pieces keep one edge):
 
-| Where the region lies (its whole height) | Gap from the screen's physical edge |
+| Where the column lies (every shown piece, its whole height) | Gap from the screen's physical edge, for the whole column |
 |---|---|
-| In the top 30 % or the bottom 25 % of the screen (the corner bands: no notch or island there on a phone held sideways) | the corner margin, 24 design px (12 pt on a phone at HUD scale 0.5) |
-| Reaching the middle band anywhere | at least the device safe inset on that side (47 pt on a notched 844 × 390 iPhone), never less than the margin |
+| In the top 30 % or the bottom 25 % of the screen (the corner bands: no notch or island there on a phone held sideways) | M, 24 design px (12 pt on a phone at HUD scale 0.5) |
+| Reaching the middle band anywhere | M or the device safe inset on that side, whichever is larger (47 pt on a notched 844 × 390 iPhone) |
 
-Desktop and wide screens have no insets, so every edge region sits at the
-margin there. Roblox's own buttons and touch controls sit inside the safe area
+So a column never splits: on a notched iPhone the vitals stand at the 47 pt
+inset with the objective under them (D29 had the vitals at the edge and the
+objective at the inset), and the lobby's pills with the Party panel. Corner
+pieces that stand alone (Settings, the hotbar group) are in a corner band and
+keep M. Desktop and wide screens have no insets, so every edge region sits at
+M there. Roblox's own buttons and touch controls sit inside the safe area
 (`HudModel.Thumbstick` / `JumpButton` / `ThumbstickZone` take the insets).
 
 **Touch hit pads.** Every interactive component's invisible hit button grows
@@ -989,7 +996,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 
 | Screen | File | Controller | Spec | Capture scenes | Capture |
 |---|---|---|---|---|---|
-| Lobby HUD (M01) | `src/client/Hud/Screens/LobbyHud.luau` | `LobbyHudController` | [LobbyScreen](LobbyScreen.md) | `lobby_hud`, `lobby_hud_states`, `lobby_hud_phone` (844 × 390 notched, 667 × 375, 2000 × 924), `lobby_hud_wide`, `lobby_hud_flow`, `lobby_hud_failed` | `art/ui/captures/lobby_hud.png` |
+| Lobby HUD (M01; the HUD grid, §5.6) | `src/client/Hud/Screens/LobbyHud.luau`, `Hud/Layout.luau` (grid placement shared with the run) | `LobbyHudController` | [LobbyScreen](LobbyScreen.md) | `lobby_hud`, `lobby_hud_states`, `lobby_hud_phone` (844 × 390 notched, 667 × 375, 2000 × 924), `lobby_hud_wide`, `lobby_hud_flow`, `lobby_hud_failed` | `art/ui/captures/lobby_hud.png` |
 | Inventory and Vault (M02) | `Screens/InventoryWindow.luau` | `VaultController` (lobby), `InventoryController` (run) | [InventoryScreen](InventoryScreen.md) | `inventory_backpack`, `inventory_vault`, `inventory_states`, `inventory_world`, `inventory_flow`, `inventory_phone` | `art/ui/captures/inventory_backpack.png` |
 | Settings (M03) | `Screens/SettingsWindow.luau` | `SettingsController` | [SettingsScreen](SettingsScreen.md) | `settings`, `settings_phone`, `settings_phone_small`, `settings_flow` | `art/ui/captures/settings.png` |
 | Party (M04) | `Screens/PartyWindow.luau` | `PartyController` | [PartyScreen](PartyScreen.md) | `party`, `party_states`, `party_phone`, `party_flow` | `art/ui/captures/party.png` |
@@ -999,7 +1006,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 | Quest Journal (M07) | `Screens/JournalWindow.luau`, `Hud/IslandMap.luau` | `JournalController` | [JournalScreen](JournalScreen.md) | `journal`, `journal_phone`, `journal_flow` | `art/ui/captures/journal.png` |
 | Market, Trade, Progress | `src/client/Hud/ListWindow.luau` | `WalletController`, `TradeController`, `ProgressionController` | [ListWindows](ListWindows.md) | `market_flow`, `trade_flow`, `progress_flow` | `art/ui/captures/market_flow.png` |
 | World map | `MapController` + `Hud/IslandMap.luau` | `MapController` | [ListWindows](ListWindows.md#world-map-mapcontroller) | `map_flow` | `art/ui/captures/map_flow.png` |
-| In-world HUD | `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers` | `HudController` | [HudScreen](HudScreen.md) | `world_hud`, `world_hud_states`, `world_hud_phone` (844 × 390 notched, 667 × 375, 2000 × 924), `world_hud_wide`, `world_hud_flow` | `art/ui/captures/world_hud.png`, `world_hud_phone.png` |
+| In-world HUD (the HUD grid, §5.6) | `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers`, `Hud/Layout.luau`; the ⚙ (`SettingsController`) and boost list (`BoostHudController`) on the same grid | `HudController` | [HudScreen](HudScreen.md) | `world_hud`, `world_hud_states`, `world_hud_phone` (844 × 390 notched, 667 × 375, 2000 × 924), `world_hud_wide`, `world_hud_flow` (each world page also builds the lobby HUD at its screen and checks the shared pieces match) | `art/ui/captures/world_hud.png`, `world_hud_phone.png` |
 | Overlays, notices, loot, storage, world menu | `Hud/NoticeCard.luau`, overlay controllers | `NoticeController`, `LootController`, `StorageController`, `WorldMenuController`, … | ARCHITECTURE §4.8 | `notices`, `world_overlays`, `world_overlays_phone`, `world_overlays_flow`, `world_menu` | `art/ui/captures/world_overlays.png` |
 | Kit gallery | `src/client/Hud/Kit/*` | — | [KIT](KIT.md) | `kit_gallery` (9 pages), `kit_gallery_failed`, `kit_gallery_flow`, `sprite_loader_flow` | `art/ui/captures/kit_gallery.png` … `kit_gallery_9.png` |
 
@@ -1050,11 +1057,18 @@ python3 art/ui/capture/capture.py journal --out x.png --bg none
   feed the same insets through Kit.Scale's probe guis.
   `art/ui/capture/hud_checks.luau` (bundled with every scene) places the HUDs
   as the controllers do (`__placeWorldHud`, `__worldGear`, `__placeLobbyHud`)
-  and checks the D28 / D29 placements, the edge rule for every edge region,
-  that every region reaching the middle band keeps inside the insets, and that
-  no HUD region overlaps another, leaves the screen or meets those controls or
-  a notch (`__checkWorldHud`, `__checkLobbyHud`); a failed check fails the
-  scene.
+  and checks the HUD grid (D30, ±1 px): the corner pieces M from both their
+  edges (the top-right column's first piece, Settings, the hotbar's foot),
+  every column's pieces on one edge (the edge rule for the whole column) with
+  the widths the spec names and G between stacked pieces, the desktop tiles
+  centred, the XP bar centred over the hotbar; that every region reaching the
+  middle band keeps inside the insets; that no HUD region overlaps another,
+  leaves the screen or meets those controls or a notch (`__checkWorldHud`,
+  `__checkLobbyHud`); and, on every world page, that a lobby HUD built at the
+  same screen puts the shared pieces (tile grid, Settings, bottom group, the
+  right-hand column's top piece and the second piece's edge and width) in the
+  same place. `__checkBoosts` checks the boost list beside the ⚙. A failed
+  check fails the scene.
 - **Failed-art pages**: `lobby_hud_failed`, `kit_gallery_failed`
   (`__failImages = true` makes every image report a failed load).
 - **States**: set `DebugState` on a component root (`Kit.Debug.Force`); flow
