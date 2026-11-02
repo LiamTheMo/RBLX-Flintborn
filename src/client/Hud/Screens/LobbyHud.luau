@@ -33,8 +33,11 @@ LobbyHud.PARTY = { right = 53, y = 258, w = 294, h = 244 }
 LobbyHud.BOTTOM = { bottom = 49, w = 572, h = 124 }
 LobbyHud.TOP_GAP = 2
 
--- Hotbar slot lefts in the bottom region (mockup pitch 96.4).
+-- Hotbar slot lefts in the bottom region (mockup pitch 96.4), and the square
+-- slot (every hotbar's slots are square: the mockup's 89 x 93 less 4 px of
+-- height, its foot kept on the region's bottom edge).
 LobbyHud.SLOT_X = { 0, 96, 193, 289, 386, 482 }
+LobbyHud.SLOT = { y = 35, size = 89 }
 
 -- Party panel parts in the panel's px: the pinned first row and the scrolling
 -- list under it (its thin rail at x 1588..1596 of the mockup).
@@ -348,7 +351,7 @@ function LobbyHud.new(parent: Instance, actions)
 	for index, x in LobbyHud.SLOT_X do
 		local slot = Kit.Slot.new(self.bottom, {
 			name = "Slot" .. index,
-			rect = { x, 31, 89, 93 },
+			rect = { x, LobbyHud.SLOT.y, LobbyHud.SLOT.size, LobbyHud.SLOT.size },
 			variant = "hotbar",
 			hotkey = tostring(index),
 			onPress = function()

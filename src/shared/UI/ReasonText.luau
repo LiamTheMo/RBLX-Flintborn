@@ -62,6 +62,7 @@ ReasonText.TEXT = {
 	BadQuantity = "that amount isn't allowed",
 	Empty = "there's nothing there",
 	Gone = "that's no longer there",
+	SlotChanged = "that slot changed — check it again",
 	Expired = "that has gone",
 	NotYours = "that isn't yours",
 	NoItem = "you don't have that item",

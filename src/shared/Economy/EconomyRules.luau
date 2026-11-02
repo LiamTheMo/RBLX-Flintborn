@@ -3,6 +3,7 @@
 -- drops. Every change runs inside a once-only profile operation in the services.
 
 local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PerkCatalog = require(script.Parent.Parent.Progression.PerkCatalog)
 local QuestCatalog = require(script.Parent.QuestCatalog)
@@ -85,42 +86,100 @@ function EconomyRules.Respec(profile)
 	return true, nil
 end
 
--- Buys one shop entry; items land in the lobby backpack, titles in the profile.
-function EconomyRules.Buy(profile, stockId: any, newId: () -> string, ownerId: number)
+-- The most of one shop entry a single purchase may buy (a pack counts once).
+EconomyRules.MAX_BUY_QUANTITY = 50
+
+-- Whether `quantity` is a whole number from 1 to `max` (never NaN or infinite).
+local function wholeCount(quantity: any, max: number): boolean
+	return type(quantity) == "number"
+		and quantity == quantity
+		and quantity >= 1
+		and quantity <= max
+		and quantity % 1 == 0
+end
+
+-- How many of shop entry `entry` (packs) the lobby backpack has room for: a
+-- stackable item fills its one stack up to the cap (Q128), anything else takes
+-- a free slot per copy; a title fits once.
+function EconomyRules.BuyRoom(profile, entry): number
+	if entry.catalogId == nil then
+		return if profile.progression.titles[entry.title] then 0 else 1
+	end
+	local slots = profile.lobbyBackpack.slots
+	local cap = ItemCatalog.StackCap(entry.catalogId)
+	if cap == nil then
+		return math.max(0, GameConstants.BACKPACK_SLOTS - #slots)
+	end
+	local pack = math.max(1, entry.quantity or 1)
+	for _, slot in slots do
+		if slot.instanceId == nil and slot.catalogId == entry.catalogId then
+			return math.max(0, cap - (slot.quantity or 0)) // pack
+		end
+	end
+	return if #slots >= GameConstants.BACKPACK_SLOTS then 0 else cap // pack
+end
+
+-- The most of shop entry `stockId` one purchase can buy now: the per-purchase
+-- limit, what the player's Coins cover and what the backpack holds (0: none).
+function EconomyRules.MaxBuy(profile, stockId: any): number
+	local entry = ShopCatalog.ById[stockId]
+	if entry == nil then
+		return 0
+	end
+	local limit = if entry.title then 1 else EconomyRules.MAX_BUY_QUANTITY
+	local afford = math.floor(profile.currency.coins / entry.price)
+	return math.max(0, math.min(limit, afford, EconomyRules.BuyRoom(profile, entry)))
+end
+
+-- Buys `quantity` (default 1) of one shop entry, all or nothing: every copy must
+-- fit the lobby backpack and the Coins must cover them all. Items land in the
+-- lobby backpack, titles (one only) in the profile. `quantity` comes from the
+-- client, so anything but a whole number in 1..MAX_BUY_QUANTITY is refused.
+function EconomyRules.Buy(profile, stockId: any, newId: () -> string, ownerId: number, quantity: any?)
 	local entry = ShopCatalog.ById[stockId]
 	if entry == nil then
 		return false, "UnknownItem"
 	end
+	local count = if quantity == nil then 1 else quantity
+	if not wholeCount(count, if entry.title then 1 else EconomyRules.MAX_BUY_QUANTITY) then
+		return false, "BadQuantity"
+	end
 	if entry.title and profile.progression.titles[entry.title] then
 		return false, "AlreadyOwned"
 	end
-	local item = nil
+	local items = {}
 	if entry.catalogId then
 		if ItemCatalog.IsStackable(entry.catalogId) then
-			item = { catalogId = entry.catalogId, quantity = entry.quantity }
+			table.insert(items, { catalogId = entry.catalogId, quantity = (entry.quantity or 1) * count })
 		else
-			item = {
-				instanceId = newId(),
-				catalogId = entry.catalogId,
-				ownerId = ownerId,
-				location = "LobbyBackpack",
-				qualityRoll = 0,
-			}
+			for _ = 1, count do
+				table.insert(items, {
+					instanceId = newId(),
+					catalogId = entry.catalogId,
+					ownerId = ownerId,
+					location = "LobbyBackpack",
+					qualityRoll = 0,
+				})
+			end
 		end
 		local trial = table.clone(profile.lobbyBackpack.slots)
 		for index, slot in trial do
 			trial[index] = table.clone(slot)
 		end
-		if ExtractionRules.AddToLobbyBackpack(trial, table.clone(item)) > 0 then
-			return false, "BackpackFull"
+		for _, item in items do
+			if ExtractionRules.AddToLobbyBackpack(trial, table.clone(item)) > 0 then
+				return false, "BackpackFull"
+			end
 		end
 	end
-	local ok, reason = EconomyRules.Spend(profile, entry.price, 0)
+	local ok, reason = EconomyRules.Spend(profile, entry.price * count, 0)
 	if not ok then
 		return false, reason
 	end
-	if item then
-		ExtractionRules.AddToLobbyBackpack(profile.lobbyBackpack.slots, item)
+	if entry.catalogId then
+		for _, item in items do
+			ExtractionRules.AddToLobbyBackpack(profile.lobbyBackpack.slots, item)
+		end
 	else
 		profile.progression.titles[entry.title] = true
 	end
@@ -145,9 +204,22 @@ function EconomyRules.Quote(item, quantity: number?)
 end
 
 -- Sells from the lobby backpack (`source` = "backpack", key = slot index) or the
--- vault's materials ("vault", key = catalogId) at fixed prices. Waits while a
--- trade settles: a rollback could not take back what was sold.
-function EconomyRules.Sell(profile, source: string, key: any, quantity: any, receiptId: string, now: number)
+-- vault's materials ("vault", key = catalogId) at fixed prices. A backpack sale
+-- takes `quantity` of the slot's stack (nil: the whole slot; a unique item is
+-- always one), and `expected` (the slot's catalogId as the client saw it, when
+-- given) must still match, so a backpack that changed meanwhile sells nothing.
+-- Quantities come from the client: anything but a whole number from 1 to what is
+-- owned is refused. Waits while a trade settles: a rollback could not take back
+-- what was sold.
+function EconomyRules.Sell(
+	profile,
+	source: string,
+	key: any,
+	quantity: any,
+	receiptId: string,
+	now: number,
+	expected: any?
+)
 	if TradeRules.IsSettling(profile) then
 		return false, TradeRules.SETTLING
 	end
@@ -157,11 +229,23 @@ function EconomyRules.Sell(profile, source: string, key: any, quantity: any, rec
 		if item == nil then
 			return false, "Empty"
 		end
-		coins, reason = EconomyRules.Quote(item, nil)
+		if expected ~= nil and item.catalogId ~= expected then
+			return false, "SlotChanged"
+		end
+		local owned = if item.instanceId then 1 else (item.quantity or 1)
+		local amount = if quantity == nil then owned else quantity
+		if not wholeCount(amount, owned) then
+			return false, "BadQuantity"
+		end
+		coins, reason = EconomyRules.Quote(item, amount)
 		if coins == nil then
 			return false, reason
 		end
-		table.remove(profile.lobbyBackpack.slots, key)
+		if amount >= owned then
+			table.remove(profile.lobbyBackpack.slots, key)
+		else
+			item.quantity = owned - amount
+		end
 	elseif source == "vault" then
 		local owned = profile.vault.materials[key] or 0
 		if type(quantity) ~= "number" or quantity % 1 ~= 0 or quantity <= 0 or quantity > owned then

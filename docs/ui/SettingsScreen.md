@@ -341,3 +341,11 @@ Each has the default that will be used if unanswered.
   under the key rows, instead of a shrinking `small` line.
 - **Controls' Tutorial**: the text has room for three boosted lines (158, 86
   tall) above REPLAY TUTORIAL (250, 50 tall); CHANGING KEYS follows at 314.
+
+## Owner feedback round (sliders)
+
+- The slider knob is the square parchment knob with leather corners
+  (`lk_button_square_paper`) drawn whole at its own aspect, 31 × 30, standing
+  8 px past the 14 px track above and below; the old 23 × 26 knob was a
+  9-sliced small paper button whose rim squashed at that size. Every
+  `Kit.Slider` has this one look (KIT.md Slider).

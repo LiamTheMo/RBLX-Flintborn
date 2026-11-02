@@ -36,6 +36,7 @@ Page items, added between `Begin()` and `Finish()`:
 | `Input(label, placeholder, onSubmit, always?, submit?)` | label, a `Kit.TextField` (its touch pad grows to 44 screen px) and an optional submit button; returns the TextBox |
 | `Pair(left, right)` | two `Kit.Panel` inset offer panels with a section header, a lock `Kit.Badge` (Not locked / Locked / Confirmed), `Kit.Slot` items with their names under them, and a gems `Kit.CurrencyPill` |
 | `Confirm(text, yes, delay, onYes, opts?)` | `Kit.ConfirmDialog` over the window. `delay` > 0 makes Confirm a press-and-hold of that many seconds. `opts.rows` gives labelled paragraphs, plus `opts.title` and `opts.size` |
+| `Quantity(opts)` | the quantity dialog: a `Kit.ConfirmDialog` (620 × 480, `ListWindow.QUANTITY_SIZE`) whose body holds the item's art (64 px) with its name and a line under it, a `Kit.Stepper` (− value + and Max; 330 × 48 at body y 74) and a `Kit.Slider` (knob, no value box; body y 174) kept in step, and the live total (Total, a coin or gem, the amount) at body y 222. `opts`: title, itemId / glyph, name, detail, min, max, value, each, currency, confirmLabel, onConfirm(quantity). The quantity is clamped to min..max; the slider is off when there is only one to choose. The stepper's and slider's 44 px touch pads do not overlap down to a dialog scale of 0.5. Returns the handle (`Quantity()`, `SetQuantity(n)`, `stepper`, `slider`) |
 
 Row heights come from design numbers (`ListWindow.Lines` wraps by measured word
 widths), never from `AbsoluteSize`. After a redraw, `Finish` gives gamepad focus
@@ -51,7 +52,7 @@ choose instead.
 
 | Screen | Controller | Tabs (icons) | Contents |
 |---|---|---|---|
-| Market (lobby) | `WalletController` (`Open(tab)`, `Toggle()`) | Shop (market), Sell (coin), Offers (gem), Codes (gift) | Coins and Gems pills in the header. Stock by category with item art, price and Buy, which asks in a dialog first. Owned titles show a ticked ring. Backpack and vault sales: Sell, Sell 10, Sell All (never for a Forge reagent). Vault upgrade (asks first), perk respec (asks first) and Robux offers with their earnable route (MarketplaceService prompt unchanged). Code field with Enter or Redeem. |
+| Market (lobby) | `WalletController` (`Open(tab)`, `Toggle()`; `Open("Shop")`, the HUD tile's id, opens Buy) | Buy (market), Sell (coin), Offers (gem), Codes (gift) | The window is the Market; its tabs read Buy / Sell / Offers / Codes. Coins and Gems pills in the header. Buy: stock by category with item art, price and one Buy button, which opens the quantity dialog (how many packs, from 1 to `maxQuantity`: what the Coins cover, what the lobby backpack holds and `EconomyRules.MAX_BUY_QUANTITY`, all computed by the server in `ShopView`); a row that is affordable but has no room says "No room in your lobby backpack." and its Buy is off. Titles are bought once (a plain question). Owned titles show a ticked ring. Sell: backpack slots and vault materials, each with one Sell button and its price each; the quantity dialog picks 1 to the whole stack (a Forge reagent shows its warning there). Vault upgrade (asks first), perk respec (asks first) and Robux offers with their earnable route (MarketplaceService prompt unchanged). Code field with Enter or Redeem. |
 | Progress | `ProgressionController` (`Toggle()`, `View()`, `Changed`, `MountPopups`) | Overview (trophy), Perks (star), Rebirth (totem), Titles (crown) | Level card with the XP bar. Mastery cards with green bars (track icons from `JournalModel.TRACK_ICONS`) and a ring when mastered. Perk cards with rank bars, a token price and Buy (asks first). Rebirth requirements with rings, then Review Rebirth: Reset / Kept / Gained in a dialog, confirmed by holding Rebirth for 1.5 s. Titles. Perks and Rebirth are lobby-only. |
 | Trade (lobby) | `TradeController` (`Toggle()`) | — | Lobby players as player rows with Invite. During a trade the title names the partner, and You give / You get show as slot panels with their lock badges and gems. Below them: the countdown, Cancel / Lock Offer / Confirm (Confirm asks with both offers spelled out), the Gems field, backpack items (Add / Remove) and tradeable vault materials (Remove, All, +10, +1). An invite arrives as a `Kit.Toast` whose View opens Accept / Decline. |
 
@@ -88,7 +89,7 @@ controller with mocked remotes, prints its checks and ends with `FLOW OK`.
 
 | Scene | Pages (`art/ui/captures/<scene>[_n].png`) |
 |---|---|
-| `market_flow` | 1 Shop, 2 Sell, 3 Offers, 4 Codes, 5 the Buy dialog, 6 forced states (hover, pressed, busy buttons; hovered tab), 7 phone 844 × 390 |
+| `market_flow` | 1 Buy, 2 Sell, 3 Offers, 4 Codes, 5 the Buy quantity dialog, 6 the Sell quantity dialog, 7 forced states (hover, pressed, busy buttons; hovered tab), 8 phone 844 × 390 (Sell), 9 the phone's Sell quantity dialog, 10 the 667 × 375 phone's Buy quantity dialog (both phone dialogs print their scale and smallest text and check the touch pads) |
 | `trade_flow` | 1 invite list, 2 invite toast, 3 running trade, 4 scrolled to your items, 5 both locked with the confirm dialog, 6 forced states, 7 phone |
 | `progress_flow` | 1 Overview, 2 Perks, 3 Rebirth, 4 Titles, 5 the rebirth dialog, 6 forced states, 7 phone |
 | `map_flow` | 1 the map, 2 zoomed with a pin chosen, 3 forced states, 4 phone |
@@ -98,6 +99,29 @@ that the PlayerGui's instances and the live connections are unchanged.
 
 Stock, offers and sale quotes in `market_flow` come from `ShopCatalog`,
 `OfferCatalog` and `EconomyRules`.
+
+### Market quantities on the server
+
+The client's quantity is never trusted. `ShopBuy(stockId, nonce, quantity?)`
+and `MerchantSell(source, key, quantity, nonce, expectedCatalogId?)` run as
+once-only operations (`CurrencyService.Run`, keyed by the nonce) over
+`EconomyRules`:
+
+- **Buy** (`EconomyRules.Buy(..., quantity)`): no quantity buys one, as
+  before. Anything but a whole number from 1 to `MAX_BUY_QUANTITY` (50; 1 for a
+  title) is refused with `BadQuantity`. All or nothing: every copy must fit the
+  lobby backpack (a stack up to its cap, a unique item a free slot each;
+  `BackpackFull`) and the Coins must cover the whole price (`NotEnoughCoins`)
+  before anything changes. `EconomyRules.MaxBuy` is the limit `ShopView` sends
+  as `maxQuantity`.
+- **Sell** (`EconomyRules.Sell`): a backpack stack may sell in part (`quantity`
+  from 1 to the stack, else `BadQuantity`; nil sells the whole slot, as before;
+  a unique item is one). `expectedCatalogId` (sent by the Market) must still
+  match the slot, so a backpack that changed meanwhile sells nothing
+  (`SlotChanged`). Vault sales still refuse more than is stored (`NotEnough`).
+  Sales still wait while a trade is open or settling.
+
+Specs: `tests/luau/market_quantity.spec.luau`.
 
 These are checked in game, not in the captures, because time does not pass
 there:

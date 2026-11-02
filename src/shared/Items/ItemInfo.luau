@@ -1,5 +1,6 @@
 -- What the item screens say about an item (GDD §25.4; docs/ui/ARCHITECTURE.md
--- D10, D11): its category tab (All / Tools / Materials / Food / Plants / Misc),
+-- D10, D11): its category tab (All / Tools / Materials / Consumables / Plants /
+-- Misc),
 -- a short description (authored here, in the UI layer, or derived from the
 -- catalog), labelled stat rows for detail cards, the kit art (and tint) that
 -- shows it while it has no art of its own, and the older stat chips. Pure functions over
@@ -14,7 +15,9 @@ local WeaponCatalog = require(script.Parent.Parent.Combat.WeaponCatalog)
 
 local ItemInfo = {}
 
-ItemInfo.CATEGORIES = { "All", "Tools", "Materials", "Food", "Plants", "Misc" }
+-- Category ids are the labels players read. They are UI-only (never saved), so
+-- the consumables tab (once "Food") could take its new name as its id.
+ItemInfo.CATEGORIES = { "All", "Tools", "Materials", "Consumables", "Plants", "Misc" }
 
 local F = ItemCatalog.Families
 
@@ -22,12 +25,12 @@ local FAMILY_CATEGORY = {
 	[F.Tool] = "Tools",
 	[F.Weapon] = "Tools",
 	[F.Material] = "Materials",
-	[F.Consumable] = "Food",
+	[F.Consumable] = "Consumables",
 }
 
 -- Plants are the materials picked from plants (the resource nodes gathered with
 -- the Farming mastery: fiber, herbs, shrubs, mushrooms). Berries that are food
--- stay under Food.
+-- stay under Consumables.
 local PLANTS = {}
 for _, node in NodeCatalog.Nodes do
 	if node.mastery == "Farming" and ItemCatalog.IsMaterial(node.material) then
