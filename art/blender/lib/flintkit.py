@@ -241,6 +241,8 @@ def _water_texture(mat, name, hexcol):
         safe = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in name)
         path = kitwater.cached_png(os.path.join(WATER_PREVIEW_DIR, safe + ".png"), hexcol, name)
         image = bpy.data.images.load(path, check_existing=True)
+        if bpy.data.filepath:  # relative, so the saved kit file opens on any checkout
+            image.filepath = bpy.path.relpath(path)
     except Exception as exc:  # noqa: BLE001  (never break a build over the preview)
         print(f"flintkit: water preview texture for {name} failed, flat colour kept: {exc!r}")
         return

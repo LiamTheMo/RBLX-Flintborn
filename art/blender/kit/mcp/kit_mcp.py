@@ -959,9 +959,44 @@ def restore_palette():
     return added
 
 
+def relink_images():
+    """Fix image paths after the kit file moves between checkouts: point paths under another repo root at this one
+    (relative), and repaint water previews missing from the gitignored assets/kit/water_preview/ cache from each
+    material's stored flintkit_key / flintkit_hex. Missing images otherwise render pink."""
+    import kitwater
+    import flintkit
+    fixed = []
+    for mat in bpy.data.materials:
+        node = mat.node_tree.nodes.get("FB_WaterTex") if mat.node_tree else None
+        im = node.image if node is not None else None
+        if im is None or im.packed_file or os.path.exists(bpy.path.abspath(im.filepath)):
+            continue
+        key, hexcol = mat.get("flintkit_key"), mat.get("flintkit_hex")
+        if key and hexcol:
+            stem = os.path.splitext(im.name)[0]
+            path = kitwater.cached_png(os.path.join(flintkit.WATER_PREVIEW_DIR, stem + ".png"), hexcol, key)
+            im.filepath = bpy.path.relpath(path) if bpy.data.filepath else path
+            im.reload()
+            fixed.append(im.name)
+    for im in bpy.data.images:
+        if im.source != "FILE" or im.packed_file or os.path.exists(bpy.path.abspath(im.filepath)):
+            continue
+        p = im.filepath.replace("\\", "/")
+        i = p.find("/art/")
+        tries = [REPO + p[i:]] if i >= 0 else []
+        tries += [REPO + d + os.path.basename(p) for d in ("/art/reference/kit/", "/art/blender/assets/references/")]
+        new = next((t for t in tries if os.path.exists(t)), None)
+        if new:
+            im.filepath = bpy.path.relpath(new) if bpy.data.filepath else new
+            im.reload()
+            fixed.append(im.name)
+    return fixed
+
+
 def install():
     load_kit()
     restore_palette()
+    relink_images()
     NS.update(set_colour=set_colour, sheet_coll=sheet_coll, socket=socket, hull_rock=hull_rock, tag=tag,
               mk=mk, row_objs=row_objs, render_row=render_row, check=check, stats=stats, DOME=DOME,
               crop=crop, ref_sheet=ref_sheet, sample=sample, calibrate=calibrate, pebble=pebble, drape=drape, leaf=leaf, clover=clover, daisy=daisy,
