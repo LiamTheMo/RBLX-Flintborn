@@ -1,5 +1,5 @@
 """062 Ground Scatter (references/062.png): a knee-low forest-floor litter pile of loose closed solids. Two big green
-lobed leaves, two orange maples (one propped on the long twig), a rust maple under the twigs, two yellow maples, three
+lobed leaves, two orange maples (one caught behind the twig X), a rust maple under the twigs, two yellow maples, three
 small green leaves, two square-section twigs crossed in an X (the lifted one is the top of the pile) with a small twig
 under them, one upright shingled pinecone, two faceted warm-grey stones and four wood chips. No base plate, no glow,
 no VFX.
@@ -9,7 +9,7 @@ no VFX.
 Build frame: studs, front -Y, +X right, ground z 0 (spec 2). Every object ends with its origin at its bbox bottom
 centre; o["m062_offset"] is that origin in the build frame. W07 owns every GroundScatter* name, so the names are
 ForestLitter* (decision 2):
-- ForestLitter (hero): 10 leaves (6 with petioles), 3 twigs, the pinecone (core + 40 scales), 2 stones, 4 chips, one
+- ForestLitter (hero): 10 leaves (5 with petioles), 3 twigs, the pinecone (core + 58 scales), 2 stones, 4 chips, one
   object of separate closed shells, every one resting on the ground or on the piece under it (no booleans).
 - ForestLitterLeafLarge / LeafMedium / LeafSmall / LeafVariant / TwigLarge / TwigSmall / Pinecone / StoneLarge /
   StoneSmall: the part list's pieces at hero size.
@@ -600,10 +600,11 @@ LEAVES = {
                droop=0.055, roles=_role_big, pet=(0.26, 0.0, DEEP), seed=62102),
     "O1": dict(kind="maple", c=(-1.12, -0.94), span=1.68, az=225.0, thick=0.07, cham=0.022, cup=0.045, fold=0.045,
                droop=0.05, roles=_role_orange(True), pet=(0.24, 0.0, (ORANGE, RUST, 0.75)), seed=62103),
-    # O2 (fix round 1): its main-lobe tip on the ground behind T1 at c, tip toward the back (az), the base end lifted
-    # onto T1 so its top face turns to the front cameras; no petiole (spec 2.2 lists none for O2)
-    "O2": dict(kind="maple", c=(0.03, 1.83), span=1.15, az=80.0, thick=0.07, cham=0.02, cup=0.035, fold=0.04,
-               droop=0.04, roles=_role_orange(False), pet=None, seed=62104),
+    # O2 (fix round 1): caught behind the crossing, tilted 26 deg with its face toward the front-right (tilt az 320)
+    # and dropped onto what lies under it: it rests on T1's back-top edge and on Y2 (tilt_leaf). Propped on the back
+    # of T1 it faced the back and was edge-on from the front cameras. No petiole (spec 2.2 lists none for O2).
+    "O2": dict(kind="maple", c=(0.15, 1.48), span=1.02, az=60.0, thick=0.07, cham=0.02, cup=0.035, fold=0.04,
+               droop=0.04, roles=_role_orange(False), pet=None, tilt=(320.0, 26.0), seed=62104),
     "V1": dict(kind="variant", c=(0.64, 0.44), span=1.36, az=20.0, thick=0.07, cham=0.02, cup=0.04, fold=0.04,
                droop=0.045, roles=_role_rust((0, 4)), pet=None, curl={0: 16.0, 4: 18.0}, seed=62105),
     "Y1": dict(kind="maple_small", c=(-1.92, 0.62), span=0.86, az=160.0, thick=0.06, cham=0.018, cup=0.03, fold=0.032,
@@ -614,7 +615,8 @@ LEAVES = {
                droop=0.03, roles=_role_small(PALE, OLIVE, 0.5), pet=None, seed=62108),
     "G2": dict(kind="ivy3", c=(-1.93, -0.32), span=0.78, az=190.0, thick=0.06, cham=0.0, cup=0.03, fold=0.03,
                droop=0.03, roles=_role_small(LIME, GREEN, 1.0), pet=None, seed=62109),
-    "G3": dict(kind="ivy3", c=(1.74, 0.42), span=0.70, az=350.0, thick=0.06, cham=0.0, cup=0.03, fold=0.03,
+    # G3 (fix round 1): out from behind S1 and T1 to the right edge (front share 1.0 -> 1.5 %, the sheet's ~1.9 %)
+    "G3": dict(kind="ivy3", c=(1.85, 0.60), span=0.64, az=20.0, thick=0.06, cham=0.0, cup=0.03, fold=0.03,
                droop=0.03, roles=_role_small(GREEN, DEEP, 1.0), pet=None, seed=62110),
 }
 LEAF_INFO = {}
@@ -849,7 +851,7 @@ def place_twig_lifted(a, pile, name, rest_names, foot_names=()):
     onto T1 (or T2's other supports): the first pitch that touches, pressed ~0.01 in."""
     s = TWIGS[name]
     p0, p1, u, side, L_plan = _twig_axis(name)
-    L = 1.82
+    L = 1.72                    # fix round 1: 1.82 put the top at z 1.18 (H at the 1.2 limit) once T1 lay lower
     sup_foot = pile.vs(names=foot_names) if foot_names else []
     ft = _tree(sup_foot) if sup_foot else None
     zfoot = _support_z(ft, [p0 + side * dx * s["s"] / 2 + u * dy for dx in (-0.9, 0.9) for dy in (0.0, 0.15)])
@@ -887,68 +889,60 @@ def place_twig_lifted(a, pile, name, rest_names, foot_names=()):
     return vs
 
 
-def prop_leaf(a, pile, name, rest_names, sup_names=()):
-    """O2: a maple fallen against the back of the twig X: its main-lobe tip rests on the ground behind T1 (az points
-    to the back), and the leaf is tipped up about that tip until its base end lies on the twig (the first angle that
-    touches). Its top face then looks toward the front cameras (fix round 1: tipped the other way it showed its edge)."""
+def tilt_leaf(a, pile, name, sup_names, keep=True):
+    """O2 (fix round 1): a maple caught in the twig X with its face toward the front. The leaf is turned to its tip
+    az, centred on its plan point, tilted `tilt` deg so its face looks toward `tilt_az` (LEAVES[name]["tilt"]), then
+    dropped straight down onto the twigs / leaves / ground under it (pressing PEN into the first one it meets).
+    Leaning on the back of T1 it could only face the back (its face edge-on from the front cameras); lying in the
+    crook between T1 and the lifted T2 it faces the front. Returns (verts, info with the rest and the contacts: per
+    support, the smallest vertex distance to it)."""
     s = LEAVES[name]
-    rt = _tree(pile.vs(names=rest_names))
-    probe = {}
-
-    def build(q):
-        vs, info = leaf_local(a, name)
-        info.pop("cols", None)
-        pet = []
-        allv = vs + pet
-        tip = max(v.co.x for v in vs)
-        _move(allv, (-tip, 0, 0))
-        _xform(allv, Matrix.Rotation(q, 4, "Y"))           # lifts the base end (x < 0)
-        _xform(allv, Matrix.Rotation(math.radians(s["az"]), 4, "Z"))
-        # the tip on the plan point
-        piv = Vector((*s["c"], 0.0))
-        rp = min(vs, key=lambda v: v.co.z).co
-        _move(allv, (piv.x - rp.x, piv.y - rp.y, -_zmin(allv) - 0.004))
-        probe["info"] = info
-        return vs, pet
-
-    lo, hi = math.radians(4.0), math.radians(75.0)
-    for _ in range(20):
-        mid = (lo + hi) / 2
-        vs, pet = build(mid)
-        hit = bool(rt.overlap(_tree(vs)))
-        bmesh.ops.delete(a.bm, geom=vs + pet, context="VERTS")
-        if hit:
-            lo = mid
-        else:
-            hi = mid
-    q = hi - 0.015
-    vs, pet = build(q)
-    info = probe["info"]
-    info.update(prop_deg=round(math.degrees(q), 1), tip_z=round(max(v.co.z for v in vs), 3),
+    vs, info = leaf_local(a, name)
+    info.pop("cols", None)
+    _xform(vs, Matrix.Rotation(math.radians(s["az"]), 4, "Z"))
+    c = _centre(vs)
+    _move(vs, (s["c"][0] - c.x, s["c"][1] - c.y, 0.0))
+    t_az, t = s["tilt"]
+    h = _u(t_az)
+    c = _centre(vs)
+    m = Matrix.Translation(c) @ Matrix.Rotation(math.radians(t), 4, Vector((0, 0, 1)).cross(h)) @ \
+        Matrix.Translation(-c)
+    _xform(vs, m)
+    sup = pile.vs(names=sup_names)
+    dz, what = _drop(vs, sup)
+    contacts = {}
+    for nm in sup_names:
+        if nm in pile.p:
+            tr = _tree([v for v in pile.p[nm][1] if v.is_valid])
+            ds = [tr.find_nearest(v.co, 1.0) for v in vs]
+            ds = [d[3] for d in ds if d[0] is not None]
+            if ds:
+                contacts[nm] = round(min(ds), 3)
+    contacts["ground"] = round(_zmin(vs), 3)
+    info.update(rests_on=what, contacts=contacts, tip_z=round(max(v.co.z for v in vs), 3),
                 centre=[round(x, 3) for x in _centre(vs)])
-    LEAF_INFO[name] = info
-    pile.add(name, "leaf", vs)
-    if pet:
-        pile.add(name + "_pet", "petiole", pet)
-    return vs
+    if keep:
+        LEAF_INFO[name] = info
+        pile.add(name, "leaf", vs)
+    return vs, info
 
 
 # ---- pinecone (spec 1.4: dark egg core + shingled lozenge scales, every scale rooted in the core) ------------------
-# fix round 1: a rounded egg tip (the old core ended in a near-flat cone under a lifted crown ring + flat cap that read
-# as a lid); 6 sides, since only the gaps between the scales show it
-CORE_PROF = ((-0.02, 0.15), (0.15, 0.32), (0.38, 0.40), (0.60, 0.395), (0.75, 0.32), (0.85, 0.18))
-CORE_TOP = 0.915
-CORE_SIDES = 6
-# scale rings, every one pointing down the egg like shingles, shrinking toward the apex: root position as an arc
-# length from the apex down the profile (each ring's roots tuck under the tips of the ring above), count, tip lift
-# off the surface, arc length L, W, thickness at the tip. Each plate is the chord from its root to its lifted tip, so
-# it follows the egg's curve.
-CONE_RINGS = ((0.115, 5, 0.025, 0.22, 0.27, 0.065), (0.275, 7, 0.03, 0.27, 0.32, 0.075),
-              (0.455, 8, 0.035, 0.30, 0.36, 0.08), (0.645, 8, 0.035, 0.31, 0.37, 0.085),
-              (0.84, 8, 0.035, 0.29, 0.35, 0.08), (1.03, 6, 0.025, 0.20, 0.29, 0.07))
-# cap: small scales whose roots meet (and cross) at the apex, lying on the rounded tip and pointing down its slope
-# (count, tip lift, arc L, W, thickness)
-CONE_CAP = (4, 0.01, 0.18, 0.23, 0.045)
+# fix round 1: a rounded egg (widest at 0.47-0.65 H, a broad domed top, the old core ended in a near-flat cone under a
+# lifted crown ring + flat cap that read as a lid); 8 sides, so scales lying on it stay within 0.03 of a round egg
+CORE_PROF = ((-0.02, 0.12), (0.14, 0.30), (0.36, 0.425), (0.58, 0.435), (0.76, 0.35), (0.88, 0.18))
+CORE_TOP = 0.93
+CORE_SIDES = 8
+# scales: faceted lozenge (diamond) scales lying ON the egg, tiled like the sheet's (z_cone_f34 / part cell: chunky
+# diamonds hugging a round egg, separated by thin dark lines, smaller toward the top and the foot). Ring j+1's roots
+# sit at ring j's side corners, between two of its scales (half a scale round), so the rings interlock with no holes;
+# each scale is shrunk a little about its centre so the dark core shows only as thin lines. Per ring: root as an arc
+# length from the apex down the profile, count, arc length L (side corners at 0.5 L), crest height T, tip lift. The
+# first ring is the cap: its roots meet at the apex, so the top is a dome of small scales, not a lid.
+CONE_RINGS = ((0.0, 4, 0.26, 0.036, 0.008), (0.13, 8, 0.28, 0.040, 0.014), (0.27, 8, 0.30, 0.046, 0.020),
+              (0.42, 8, 0.32, 0.050, 0.024), (0.58, 8, 0.32, 0.052, 0.026), (0.74, 8, 0.32, 0.050, 0.024),
+              (0.90, 8, 0.30, 0.046, 0.018), (1.05, 6, 0.26, 0.040, 0.008))
+CONE_SHRINK = 0.93         # each scale's half-width and length as a fraction of its tile (the dark gap lines)
 CONE_INFO = {}
 
 
@@ -979,28 +973,40 @@ def cone_core(a):
     return vs
 
 
-def scale_shell(a, root, d, w, L, W, T, out=None, seed=0):
-    """One closed scale (fix round 1: a flat shingle plate, not a pyramid): a lozenge outline (a narrow root, widest
-    at 0.45 L, a blunt tip) whose flat top plane rises from the root to the tip, lifted T there along the scale's
-    outward normal: a wedge, thin at its root and thick at its exposed end (7 verts, 10 tris). Colour by part of the
-    plate: the flat top the scale colour, the rim and the inner face mid brown; the near-black gaps are the core
-    (cone_core) showing between the plates."""
-    m = d.cross(w).normalized()
-    if m.dot(out if out is not None else Vector((root.x, root.y, 0.0))) < 0:
-        m = -m
+def scale_gem(a, th, s0, L, dth, T, lift, cap=False, seed=0):
+    """One closed scale lying on the egg (fix round 1: a faceted lozenge tile, not a flat plate standing off the egg).
+    Its tile is a diamond on the core's surface: the root at arc s0 below the apex, the side corners at s0 + 0.5 L and
+    +-dth round the egg, the tip at s0 + L. The scale is that tile shrunk to CONE_SHRINK about its centre (the dark
+    gap lines), the root 0.012 inside the core and the tip lifted `lift` off it (a shadow line under each scale). Two
+    crest verts across the scale just above its middle, raised T along the surface normal, fold the top into an upper
+    facet that catches the light and a lower one that turns down to the tip, like the sheet's chunky scales. 6 verts,
+    8 tris. Colour by position along the scale: the root facets one step toward mid brown and the underside mid brown,
+    the rest the scale colour; the near-black lines are the core between the scales."""
+    def at(s, d=0.0, off=0.0):
+        z = _z_at_arc(th + d, s)
+        p, nrm = _cone_pt(th + d, z)
+        return p + nrm * off, nrm
+    sc, hl, hw = s0 + 0.5 * L, 0.5 * CONE_SHRINK * L, CONE_SHRINK * dth
+    if cap:                                   # the cap's roots meet just over the apex (no hole, no stub)
+        root = Vector((0.0, 0.0, CORE_TOP + 0.004)) + Vector((math.cos(th), math.sin(th), 0.0)) * 0.015
+    else:
+        root, _ = at(sc - hl, 0.0, -0.012)
+    lf, _ = at(sc, -hw, 0.0)
+    rt, _ = at(sc, hw, 0.0)
+    tp, _ = at(sc + hl, 0.0, lift)
+    pl, nl = at(sc - 0.1 * hl, -0.42 * hw)
+    pr, nr = at(sc - 0.1 * hl, 0.42 * hw)
     bm = a.bm
-    base = [root, root + d * (0.45 * L) - w * (W / 2), root + d * L, root + d * (0.45 * L) + w * (W / 2)]
-    B = [bm.verts.new(p) for p in base]
-    Tv = [bm.verts.new(base[1] + m * (0.45 * T)), bm.verts.new(base[2] + m * T - d * (0.25 * T)),
-          bm.verts.new(base[3] + m * (0.45 * T))]
-    top = [bm.faces.new((B[0], Tv[0], Tv[1])), bm.faces.new((B[0], Tv[1], Tv[2]))]
-    rim = [bm.faces.new((B[1], B[2], Tv[1], Tv[0])), bm.faces.new((B[2], B[3], Tv[2], Tv[1])),
-           bm.faces.new((B[0], B[1], Tv[0])), bm.faces.new((B[3], B[0], Tv[2]))]
-    fb = bm.faces.new(list(reversed(B)))
-    vs = B + Tv
+    R, Lf, Tp, Rt = (bm.verts.new(p) for p in (root, lf, tp, rt))
+    CL, CR = bm.verts.new(pl + nl * T), bm.verts.new(pr + nr * T)
+    upper = [bm.faces.new((R, CR, CL)), bm.faces.new((R, CL, Lf)), bm.faces.new((Rt, CR, R))]
+    lower = [bm.faces.new((Lf, CL, Tp)), bm.faces.new((Tp, CL, CR)), bm.faces.new((Tp, CR, Rt))]
+    bot = [bm.faces.new((R, Lf, Tp)), bm.faces.new((R, Tp, Rt))]
+    vs = [R, Lf, Tp, Rt, CL, CR]
     rng = random.Random(seed)
-    _close(a, vs, top + rim + [fb], CONE_S, tint=1.0 + rng.uniform(-0.05, 0.05))
-    _paint(a, rim + [fb], CONE_M)
+    _close(a, vs, upper + lower + bot, CONE_S, tint=1.0 + rng.uniform(-0.05, 0.05))
+    _paint(a, upper[1:], _mix(CONE_M, CONE_S, 0.5))
+    _paint(a, bot, CONE_M)
     return vs
 
 
@@ -1030,53 +1036,19 @@ def _z_at_arc(th, s):
     return zz
 
 
-def _scale_on_egg(th, z, L, lift, inset=0.02):
-    """Root on the core at (th, z), 0.02 inside it; tip on the surface an arc L further down the profile (or, for
-    the cap, from the apex), lifted `lift` off it: the plate is the chord, so it follows the egg's curve instead of
-    sticking out of the rounded tip. Returns root, unit direction, chord length, outward normal at the tip."""
-    root, _ = _cone_pt(th, z, inset)
-    zz, prev, arc = z, _cone_pt(th, z)[0], 0.0
-    while arc < L and zz > -0.02:
-        zz -= 0.004
-        p = _cone_pt(th, zz)[0]
-        arc += (p - prev).length
-        prev = p
-    tip, nrm = _cone_pt(th, zz)
-    tip = tip + nrm * lift
-    d = tip - root
-    return root, d.normalized(), d.length, nrm
-
-
 def pinecone(a, pile=None, at=(-0.25, -0.45), lean=5.0, lean_az=45.0):
-    """The core egg and its 40 scales (6 / 8 / 8 / 8 / 6 + a 4-scale cap), rings staggered by half a scale; every scale
-    root 0.025 inside the core. Upright with a slight lean, foot sunk 0.02."""
+    """The core egg and its lozenge scales (CONE_RINGS: a 4-scale cap meeting at the apex, then rings down to the
+    foot), each ring's roots between the scales of the ring above; every scale root inside the core. Upright with a
+    slight lean, foot sunk 0.02."""
     core = cone_core(a)
     scales = []
-    for j, (s_root, n, lift, L, W, T) in enumerate(CONE_RINGS):
-        ph = (j % 2) * math.pi / n + 0.21 + 0.37 * j
+    ph = 0.21
+    for j, (s_root, n, L, T, lift) in enumerate(CONE_RINGS):
         for k in range(n):
             th = ph + 2 * math.pi * k / n
-            z = _z_at_arc(th, s_root)
-            ew = Vector((-math.sin(th), math.cos(th), 0.0))
-            root, d, Lc, nrm = _scale_on_egg(th, z, L, lift)
-            w = (ew - d * ew.dot(d)).normalized()
-            vs = scale_shell(a, root, d, w, Lc, W, T, out=nrm, seed=6230 + j * 10 + k)
+            vs = scale_gem(a, th, s_root, L, math.pi / n, T, lift, cap=(j == 0), seed=6230 + j * 10 + k)
             scales.append(vs)
-    # the cap: roots meeting at the apex (so no hole), each plate lying on the rounded tip and pointing down its slope
-    n, lift, L, W, T = CONE_CAP
-    for k in range(n):
-        th = 2 * math.pi * k / n + 0.55
-        er = Vector((math.cos(th), math.sin(th), 0.0))
-        ew = Vector((-math.sin(th), math.cos(th), 0.0))
-        root0, d0, L0, nrm = _scale_on_egg(th, CORE_TOP - 0.002, L, lift)
-        tip = root0 + d0 * L0
-        # just over the apex (a zero-thickness root seated in the core let the apex poke through as a hex hole), each
-        # root 0.012 out on its own side; each plate spans ~110 deg at its root, so the four overlap over the apex
-        root = Vector((0, 0, CORE_TOP + 0.002)) + er * 0.012
-        d = tip - root
-        w = (ew - d.normalized() * ew.dot(d.normalized())).normalized()
-        vs = scale_shell(a, root, d.normalized(), w, d.length, W, T, out=nrm + Vector((0, 0, 0.5)), seed=6290 + k)
-        scales.append(vs)
+        ph += math.pi / n                     # the next ring's roots between this ring's scales
     allv = core + [v for s in scales for v in s]
     # bottom-ring tips must stay above the ground: lift so the lowest point is at -0.02 (the sunk foot)
     _move(allv, (0, 0, -0.02 - _zmin(allv)))
@@ -1228,7 +1200,7 @@ def hero_all(a):
     place_twig_ground(a, pile, "Ts", sup_names=("V1", "L1", "Y2", "L2"))
     place_twig_ground(a, pile, "T1", sup_names=("L2", "V1", "Y2", "L1", "O1"))
     place_twig_lifted(a, pile, "T2", rest_names=("T1",), foot_names=("V1", "Ts", "L2", "Y2"))
-    prop_leaf(a, pile, "O2", rest_names=("T1", "T2"))
+    tilt_leaf(a, pile, "O2", tuple(n for n in pile.p if pile.p[n][0] not in ("scale", "petiole")))
     _aim_petiole(a, pile, "L1")
     if EXPLODE["on"]:
         _explode(pile)
@@ -1307,7 +1279,7 @@ def part_stone(name):
 
 
 NOTES = {
-    HERO: "Forest litter pile: two big green lobed leaves, orange maples (one propped on the long twig), a rust maple, "
+    HERO: "Forest litter pile: two big green lobed leaves, orange maples (one caught behind the twig X), a rust maple, "
           "two yellow maples, three small green leaves, two square twigs crossed in an X with a small twig under them, "
           "one shingled pinecone, two warm-grey stones, four chips. Walk-through floor dressing (collision none). "
           "Sheet page 64/132.",
@@ -1317,7 +1289,7 @@ NOTES = {
     LEAF_V_P: "Leaf (variant): rust-brown jagged maple slab, two lobes curled up",
     TWIG_L_P: "Twig (large): chamfered square-section beam, knot, skewed flat cut ends",
     TWIG_S_P: "Twig (small): chamfered square-section beam",
-    CONE_P: "Pinecone: upright egg of 40 shingled lozenge scales on a dark core",
+    CONE_P: "Pinecone: round egg of 58 faceted lozenge scales tiled in rings on a dark core",
     STONE_L_P: "Ground Stone (large): squat faceted warm-grey boulder",
     STONE_S_P: "Ground Stone (small): faceted warm-grey stone",
 }
@@ -1709,6 +1681,42 @@ def vis_report(o, el=25.0, step=0.025):
     return out
 
 
+def sweep_report(o, el=25.0, step=5):
+    """STAGES "check between the eight views too": sweep the azimuth in `step` degree steps at elevation `el` and, per
+    step, the share of leaf area (top facets, n.z > 0.5, of every leaf shell) belonging to whole leaves within 15 deg of
+    edge-on (|mean top normal . view| < sin 15), and the share of top-face area itself within 15 deg of edge-on.
+    Returns the worst step of each and the leaves that ever turn edge-on."""
+    bm, groups, names, kinds = _shells(o)
+    leaves = []
+    for k, fs in enumerate(groups):
+        if kinds[k] != "leaf":
+            continue
+        top = [(f.normal.copy(), f.calc_area()) for f in fs if f.normal.z > 0.5]     # the slab top, not its rim
+        n = sum((nn * a_ for nn, a_ in top), Vector())
+        area = sum(a_ for _, a_ in top)
+        leaves.append((names[k], n.normalized(), area, top))
+    bm.free()
+    tot = sum(l[2] for l in leaves)
+    lim = math.sin(math.radians(15.0))
+    worst_leaf, worst_face, ever = (0.0, None), (0.0, None), set()
+    for az in range(0, 360, step):
+        a_, e_ = math.radians(az), math.radians(el)
+        d = Vector((math.sin(a_) * math.cos(e_), -math.cos(a_) * math.cos(e_), math.sin(e_)))
+        wl = sum(l[2] for l in leaves if abs(l[1].dot(d)) < lim)
+        for l in leaves:
+            if abs(l[1].dot(d)) < lim:
+                ever.add(l[0])
+        wf = sum(a2 for l in leaves for nn, a2 in l[3] if abs(nn.dot(d)) < lim)
+        if wl / tot > worst_leaf[0]:
+            worst_leaf = (wl / tot, az)
+        if wf / tot > worst_face[0]:
+            worst_face = (wf / tot, az)
+    return {"whole_leaf_edge_on_max_pct": round(100 * worst_leaf[0], 1), "at_az": worst_leaf[1],
+            "face_area_edge_on_max_pct": round(100 * worst_face[0], 1), "face_at_az": worst_face[1],
+            "leaves_ever_edge_on": sorted(ever),
+            "leaf_tilt_deg": {l[0]: round(math.degrees(math.acos(max(-1.0, min(1.0, l[1].z)))), 1) for l in leaves}}
+
+
 def screen_report(o, views=None):
     """Projected piece centroids (x from the left, h from the bottom, fractions of the projected hero bbox) for the
     sheet's front, f34 and top cameras (near-orthographic), to compare with the spec's piece-centroid table."""
@@ -1851,6 +1859,10 @@ def build(render=True, parts=True, close=True):
     for n_, u in uv.items():
         if u.get("overlap_pairs") or u.get("flipped"):
             problems.append(f"{n_}: UV overlaps {u.get('overlap_pairs')} flipped {u.get('flipped')}")
+    sweep = sweep_report(h)
+    if sweep["whole_leaf_edge_on_max_pct"] > 10.0:
+        problems.append(f"{HERO}: {sweep['whole_leaf_edge_on_max_pct']} % of the leaf area edge-on at az "
+                        f"{sweep['at_az']} (STAGES: at most about 10 %)")
     kinds = {}
     for s in shells[HERO]:
         kk = kinds.setdefault(s["kind"], {"n": 0, "tris": 0})
@@ -1866,7 +1878,7 @@ def build(render=True, parts=True, close=True):
            "offsets": {o.name: [round(x, 3) for x in o[OFF]] for o in order},
            "materials": {o.name: [m.name[3:] for m in o.data.materials] for o in order},
            "baked_shading": {o.name: o.get("kit_baked_shading") for o in order},
-           "vis": vis_report(h), "screen": screen_report(h),
+           "vis": vis_report(h), "sweep": sweep, "screen": screen_report(h),
            "build_s": round(time.time() - t0, 1)}
     if render:
         out["views"] = render_views(order, close=close)
