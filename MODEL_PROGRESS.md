@@ -259,7 +259,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 060 | Broadleaf Fern Model Study | World & resources | ✅ | 3610 (+7 parts) | V1 FAIL 5/10, V2 PASS 7/10 | back curtain leaves read nearly unlobed; rear over-covered (no roots/rock ring); tone shares off-front; width at limit |
 | 061 | Flintborn Meadow Herb Study | World & resources | ✅ | 1338 (+5 parts) | V1 PASS 8/10 | rim leaves read as thin dark spikes; left head's stem hidden in front; narrow low rosette |
 | 062 | Flintborn Ground Scatter Study | World & resources | ✅ | 2118 (+9 parts) | V1 FAIL 6/10, V2 PASS 8/10 | pinecone scales small pointed diamonds vs broad lozenges; stones rounder and lighter; looser pile (fill 0.57 vs 0.65); top-view yellow high; wood lighter; rear X weak |
-| 063 | Flintborn hanging vine model study | World & resources | ⬜ | | | |
+| 063 | Flintborn hanging vine model study | World & resources | ✅ | 2122 (+4 parts) | V1 FAIL 6, V2 FAIL 7 (crumpled leaves), targeted V3 FAIL 6 — committed by main session after the green fix | leftover (polish pass): leaves read as pointed ivy stars, not the sheet's broad round lobes (recipe in spec); sweep tuned at e5 only (worst 18.3 % at e20); depth 1.82 at tolerance edge; LeafCluster side leaves level, not out and up |
 | 064 | Flintborn A-frame tent study | World & resources | ✅ | 3892 (+8 parts) | V1 PASS 8/10 | Studio checks: walk-in with precise collision, canvas tone in daylight; lashing thinner than the sheet; lit canvas clips white in the studio; hem ties faint; corner-knot tails read as nuts; hanging lantern 1.3 forward; door roll a flat slab; plain barrel |
 | 065 | Flintborn wildflowers model study | World & resources | ⬜ | | | |
 | 066 | Canvas Shelter Model Study | World & resources | ⬜ | | | |
@@ -461,3 +461,4 @@ Skill vs design doc / repo (design doc wins, reported):
   - 067 Table and Seating: `m067.py` drafted, never built. Next: first build, then stages 1–6.
   - 069 Palisade Wall: study not started (no spec written).
   - Passed since the last PR (#98): 060, 061, 062, 064. PRs target v0.19; merge origin/v0.19 first (three one-line `<temp>` path conflicts in the M058/M062/M063 specs: take v0.19's lines).
+- 2026-11-02: resumed. 063 Hanging Vine committed after its targeted round 3: a 7.3-stud wall vine of twisted strands on a stone pad, nine fanned three-leaf clusters on stalks with a single leaf, smooth vein-folded leaves with facings spread in pitch and yaw. R1 FAIL 6, R2 FAIL 7 (crumpled star leaves), R3 FAIL 6 (pointed lobes, darker greens); the main session raised the leaf tones half a band (front median back to round 2's level); the leaf outline is left for a polish pass.

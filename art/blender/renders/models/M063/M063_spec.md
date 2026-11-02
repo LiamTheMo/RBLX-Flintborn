@@ -1566,3 +1566,153 @@ Paused on request, mid-round. Work file `art/blender/assets/kit/wip/M063.blend` 
 
 **Next:** compare `cluster_cu` / `leafpart_cu` / spin with the sheet; if the leaves read too dark, raise the lobe tones
 (`leaf_keys` positions) and re-measure front G with the study's masks; then a fresh verifier (round 3).
+
+## Stage 7 verification (round 3)
+
+Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063v.blend` (the kit file right after the
+main session built the round-3 fix into it). Nothing rebuilt or saved, and `m063.build()` was not called. Scripts and
+renders are in `<temp>\...\scratchpad\v063r3\`: `va.py` (audit, shells, slivers, UV), `vb.py` (contact, bury, wall,
+clusters), `vc.py` / `vc2.py` (sweep plus facet tilt and outline points), `vd.py` (ray grid), `ve2.py` (renders and
+cluster close-ups), `vf.py` / `vg.py` (the study's masks and the montages `C_leaf1-3`, `C_cl_a-d`, `C_spin_*`, `C_obl`,
+`C_worst`, `C_parts1/2`). Shells, clusters and leaf planes were read from the mesh, not from the builder's records.
+
+**Verdict: FAIL (6/10).** The crumple is gone. Facet tilt is down to a mean of 14–16° and each leaf has 10 clean outline
+points. But the round-2 blocker is only half fixed: the leaves still read as **pointed stars**, not the sheet's broad,
+round-lobed leaves. The fix also made the foliage noticeably darker than the sheet, which is a regression on a colour
+target that passed in round 2. Geometry, contact, wall, attach, UVs, the ray grid and the e5 sweep all pass. The T-bar
+on the LeafCluster part is fixed.
+
+### Measured (all re-measured here)
+
+| Check | Result |
+| --- | --- |
+| Tris | hero **2122** / 2500 (pad 140, wood 564 in 4 shells, 22 stalk / tendril shells 338, 27 leaves × 40 = 1080); Pad 140, Segment 80, Fork 284, LeafCluster 160 (all < 1000) |
+| Sizes | hero 2.40 × 1.82 × **7.29** (height floor 7.2: in; depth 1.82 at the low edge of 2.0 ± 0.2); Pad 1.49 × 0.98 × 1.75; Segment 0.55 × 0.31 × 1.82; Fork 1.44 × 0.31 × 1.72; LeafCluster 1.50 × 0.37 × 1.52 (W : H 0.99, cell 0.97) |
+| Origin / transforms | bbox bottom centre on all five; rotation 0, scale 1; no modifiers; no custom normals |
+| Topology | every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose, 0 zero-area, 0 n-gons, 0 duplicate verts, normals outward; 54 hero shells and 5 part shells: 0 winding errors, 0 self-intersections, every volume positive |
+| Slivers (corner < 3°) | hero / Pad 8 (worst 0.43°, the crack strip), Fork 21 (union seams); Segment, LeafCluster 0 (unchanged) |
+| UV | 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0; conformal p95 1.026 (Fork 1.055) |
+| Wall / attach | pad back face: 4 verts on build y = 0 (deviation 0); largest y of anything else: leaf −0.011, stalk −0.285, wood −0.708; 0 verts past 0.005; `m063_attach` = build − offset exactly |
+| Floating / chain / bury | 0 floating, 0 unchained (hero and LeafCluster); deepest: strand in stub 0.044, stalk in wood 0.031, stalk through its leaf 0.027; none over 0.05; no leaf touches another leaf, the pad or the wood |
+| Leaves on own stalks | all 27 hero leaves and 3 part leaves touch a stalk (0.000). The contact groups give 9 clusters (3,3,3,2,3,3,3,3,3) plus single S1, with no cross-cluster contact. Closest plane pair per cluster 23.0–38.7° |
+| Leaf shape | 10 outline points on every leaf; top facets tilt a mean **15.7°** from the leaf plane (area-weighted 13.9°, worst facet 20.9°; round 2 19.5–25° / 35°); 10 facets per side fanned from one hub |
+
+**Edge-on sweep** (72 azimuths, 5° steps, binding front half |az| ≤ 90):
+
+| Measure | e 0 | e 5 | e 10 | e 20 |
+| --- | --- | --- | --- | --- |
+| whole leaves (≥ 75 % of top facets within 15°), worst step | 14.7 % (4, az −35) | **9.6 %** (3, az −35) | 13.5 % (4, az −5) | 18.3 % (5, az −40) |
+| front steps over 10 % (whole) | 3 | 0 | 6 | 13 |
+| sliver leaves (< 0.26 of face-on), worst step | 4.7 % (1) | 0 % | 0 % | 4.7 % (1) |
+| two of one cluster together (whole or sliver) | never | never | never | never |
+| plane band (reported only) | 27.2 %, mean 17.1 | 26.3 %, mean 16.8 | 26.5 %, mean 17.1 | 26.3 %, mean 17.7 |
+
+The sliver measure no longer finds anything. The 12° dome keeps a leaf's projection above 0.26 of its face-on area even
+when the leaf is fully edge-on, so the whole-leaf count is the measure that matters here. That count was tuned at e 5
+only and is above 10 % at e 0, e 10 (the spin elevation) and e 20.
+
+**Ray grid** (e 5, step 0.025; wood % / edge-on leaf % / rims %): 0: 21.2 / 6.2 / 11.8; 45: 20.2 / 3.3 / 12.5; 90:
+27.0 / 6.6 / 16.0; 270: 21.6 / 5.8 / 12.5; 315: 22.1 / 4.5 / 12.8; ±25 and ±65: 4.0–6.3 % edge-on. Rear (content only):
+135: 32.1 / 10.0; 180: 32.2 / 6.2; 225: 27.6 / 6.4. Pass.
+
+**Shares and colour on my renders** (360 × 600, floor hidden, the study's masks; my sheet numbers reproduce round 2's):
+
+| View | W : H | G / B / P | Tones D / M / Br / L | Green median / lit / shade |
+| --- | --- | --- | --- | --- |
+| front sheet | 0.306 | 71.8 / 18.9 / 9.2 | 37 / 39 / 19 / 4 | `#67A416` / `#9AC812` / `#2C6816` |
+| front ours | 0.329 | 65.8 / 16.7 / 17.5 | **54** / 35 / **7** / 4 | **`#5D8A18`** / `#84B720` / `#3D5D0D` |
+| side sheet | 0.269 | 67.1 / 19.8 / 13.1 | 52 / 29 / 12 / 7 | `#4F9116` / `#9AC610` |
+| side ours | 0.257 | 53.4 / 18.9 / 27.7 | 78 / 21 / 1 / 0 | `#4D7513` / `#6C991F` |
+
+Round 2's front was `#629418` with tones 44 / 40 / 12 / 4, so the modeller's guess is right: the greens got darker.
+Against the sheet, front G is −26 on the median and −17 on the lit quartile, and the D and Br tones are both outside
+±10. Wood `#67431F` (sheet `#744D1C`) and pad `#B29E91` (sheet `#AFA092`) are as in round 2.
+
+### Views against the sheet
+
+- **Leaves: FAIL, still star-like** (`C_leaf1.png`: sheet close-up 2 beside clusters C5 and C6 face-on; `C_leaf2.png`:
+  the cluster cell beside the part; `C_leaf3.png`: the front-cell head and body beside ours; `C_cl_a-d.png`: every
+  cluster at az 0 and −30).
+  - **What improved:** the crumple is gone. Each lobe is two planar facets, so leaves read as smooth slabs rather than
+    origami.
+  - **What still looks like a star:**
+    - The outline is a 4–5-pointed star. Every lobe ends in a sharp point (main tip 83°, side lobes 67°) with straight
+      or concave flanks into the notches.
+    - All 20 facets fan from one hub near the middle of the leaf, so the 12° dome looks like a faceted pyramid, with
+      ridges radiating out to the points.
+  - **What the sheet draws:** broad fig / grape leaves. The lobes are wide and round-ended with convex flanks and
+    shallow notches, and the cluster cell's centre leaf is a plain broad oval with one tip. The facets are long and
+    follow the midrib and the veins from the stalk end, with no apex in the middle.
+  - The difference shows in every spin frame (`C_spin_neg.png`, `C_spin_pos.png`, `C_obl.png`) and in the front ortho.
+    At sheet scale the vine reads as ivy hung with green stars, not as the sheet's fig-leaf vine. The modeller
+    flagged the same ivy look as open.
+- **Between the eight views (±25, ±45, ±65, ±90 at e 10; ±35, ±75 at e 20):** no comb of slivers. A view shows at most
+  two or three thin leaves, from different clusters (upper right at −65 and +65). At the worst sweep steps (`C_worst.png`:
+  −35 e 0, −35 e 5, −5 e 10, −40 e 20) three or four edge-on leaves stand out on the right of the rope near z 5–6, but
+  none share a cluster.
+- **Darker greens:** the front reads as a deeper, olive-leaning green than the sheet's bright mid-green. The lit lime
+  outer leaves hardly show apart from the bottom (young) cluster.
+- **Rope, pad, stub, tendrils, Fork:** unchanged from round 2 and pass.
+- **LeafCluster part** (`C_parts2.png`): the T-bar is fixed. Only a small green V shows above the centre leaf's top
+  edge. The leaves are stars like the hero's. The cell's side leaves sit out and up beside the stalk with rounded lobes;
+  ours hang level with the hub.
+
+### Blockers (round 3)
+
+1. **The leaves still read as pointed stars** (`LEAF_RIGHT`, `HUB_V`, `DOME`, `DROP`, `_leaf_top`; every hero leaf and
+   the part).
+   - **Measured:** 10 points, every lobe a sharp point (tips 67–83°), concave flanks; 20 facets fanned from one central
+     hub (the pyramid read). Facet tilt 15.7° is now fine.
+   - **Target:** the sheet's broad leaf (close-up 2, the cluster cell, the front cell). It has three main lobes (main
+     plus two side) with round or blunt ends and convex flanks. Basal lobes are small or absent, notches shallow. Facets
+     run along the midrib and veins from the stalk end, with no apex in the middle.
+   - **Where it shows:** `C_leaf1-3`, every spin frame, `C_cl_a-d`.
+   - **Fix:**
+     - Move the fan hub to the stalk notch (v ≈ 0), so the veins radiate from the base as drawn. Optionally add one
+       midrib vertex at v ≈ 0.55, so the main lobe is two long facets along a ridge.
+     - Replace the radial dome with a gentle V-fold across the midrib plus a 10° droop of the side lobes.
+     - Make each lobe end blunt: two points about 0.1 L apart, or one point at ≥ 110° with the flanks bowed outward.
+       Round 1's 12-point blunt outline (`verify/c5_faceon.png`) was much closer to the sheet's shape. Its problem was
+       only the pleat.
+     - Make the notches shallow (≥ 0.75 of the lobe radius), and drop or shrink the basal lobes to pay for the points.
+       Budget: 12 points cost 48 tris a leaf, so the hero comes to about 2340 of 2500.
+     - Re-run the sweep at **e 0, 5, 10 and 20**, not e 5 only: the current facings fail at e 10 and e 20 (see
+       Minors).
+2. **Front greens darker than the sheet** (a regression from round 2; `ROLE` / `leaf_keys` / `PALETTE` greens).
+   - **Measured:** front green median `#5D8A18` against `#67A416` (G −26; round 2 `#629418`), lit `#84B720` against
+     `#9AC812`; tones D 54 / Br 7 against 37 / 19, both outside ±10.
+   - **Fix:** raise the per-lobe tones half to one band (e.g. `ROLE` positions +0.5, or the lobe `pos` toward the tip
+     band). Re-measure the front with the study's masks: G median within ±10, D / M / Br / L within ±10 of
+     37 / 39 / 19 / 4.
+
+### Minors
+
+- **Whole-leaf sweep away from e 5** (shows a little, as three or four edge-on leaves on the upper right at −35 / −40):
+  the worst steps are 14.7 % at e 0, 13.5 % at e 10 and 18.3 % at e 20. 6 front steps are over 10 % at e 10 and 13 at
+  e 20, but never two leaves of one cluster together. Re-tune the facings over all four elevations after the leaf
+  change.
+- **Front shares** (shows slightly): G 65.8 against 71.8 (−6, the star outlines cover less than broad leaves would),
+  width tenths 1 and 6 narrow (0.61 / 0.57 against 0.87 / 0.88). B 16.7 against 18.9 is now in.
+- **Side:** G 53.4 against 67.1 and the pad's +X face in studio shade, as in rounds 1–2 (accepted Studio note).
+- **Wood** `#67431F` against `#744D1C`: a little deeper (shows slightly; unchanged).
+- **Hero depth** 1.82: in, but at the low edge of 2.0 ± 0.2 (numeric only).
+- **LeafCluster part:** the small V of stalk above the centre leaf (barely shows), and side leaves level with the hub
+  rather than out and up (shows against the cell).
+- **Pad part** (one crack against the cell's network) and **Segment part** (gentler bend): unchanged from round 2
+  (show a little).
+- **Slivers under 3°:** Pad 8 and Fork 21, unchanged (numeric only).
+
+## Ruling (main session, 2026-11-02): committed after round 3
+
+Round 3 failed 6/10 on two items. The workflow caps a model at a targeted third round, so 063 is committed with its
+leftovers recorded, as 018 was.
+- **Green regression: fixed by the main session.** Fix round 3's lobe tones sat between the ladder steps, darkening the
+  front (verifier: D 54 / M 35 / Br 7 / L 4, median `#5D8A18`). Every `ROLE` moved up half a band. On one green mask
+  applied to all three front renders: round 2 `#AECF63` (passed), round 3 `#9EC154`, now `#AECA4D`.
+- **Leaf shape: left for a polish pass.** The leaves are smooth vein-folded facets now, but still read as pointed,
+  ivy-like stars where the sheet draws broad, round-lobed leaves. The recipe from the round-3 verification: hub at the
+  stalk notch (v ≈ 0) with a midrib vertex near v 0.55; a gentle V-fold across the midrib plus about 10° side-lobe droop
+  instead of the radial dome; blunt lobe ends (two points, or one at ≥ 110°), shallow notches (≥ 0.75 of the lobe
+  radius), basal lobes dropped or shrunk; round 1's 12-point blunt outline as the starting point (about 2340 tris).
+  Re-tune facings and sweep at e0, e5, e10 and e20 (round 3 tuned at e5 only: worst whole-leaf 14.7 / 9.6 / 13.5 /
+  18.3 %).

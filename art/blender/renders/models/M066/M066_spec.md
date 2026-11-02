@@ -1067,3 +1067,15 @@ after the last good build.
      - FR canvas corner at 9.1 (the spec has 9.2), so the FR lashing stack fits;
      - ridge at z 10.40–11.20 (the spec has 10.2–11.0), with the tips 0.8 above it;
      - banner 1.9 wide.
+
+## Rulings (main session, 2026-11-02)
+
+1. **Thin corners:** the 330 faces with a corner under 3° (smallest 0.41°) are long strips, as on 064; accepted, and
+   `build()` fails only corners under 0.3°.
+2. **Hero width 17.9** against the spec's 17.3: accepted. The extra width is the 35° pegs and the rod knob, not the
+   shelter body.
+3. **Front-right canvas corner at 9.1** (spec 9.2) so the lashings stacked on that post fit: accepted.
+4. **Ridge pole at 10.4–11.2** (spec 10.2–11.0), with the post tops 0.8 above it: accepted.
+5. **Banner 1.9 wide:** inside the spec's 2.0 ± 0.2.
+6. **Canvas colour:** the hue-correct cream stays, as ruled on 064; the verifier judges canvas share on views that do
+   not face the key light.

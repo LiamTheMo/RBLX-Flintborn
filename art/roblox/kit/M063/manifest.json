@@ -1,0 +1,659 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M063",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m063_leaf_bright",
+    "hex": "#8EAD0C",
+    "levels": [
+     0.96948,
+     0.97633,
+     0.98395,
+     0.98906,
+     0.99178,
+     0.9952,
+     0.99902,
+     1.00132,
+     1.01081
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_bright_x_leaf_light_50",
+    "hex": "#98AE21",
+    "levels": [
+     0.97188,
+     0.98622,
+     0.99754,
+     1.04351
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_dark_x_leaf_mid_50",
+    "hex": "#528228",
+    "levels": [
+     1.01711
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_dark_x_leaf_mid_75",
+    "hex": "#588A24",
+    "levels": [
+     0.98691
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_light",
+    "hex": "#A3B036",
+    "levels": [
+     0.96856,
+     0.97171,
+     0.97591,
+     0.98584,
+     0.98893,
+     1.0157,
+     1.02017,
+     1.0438
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_mid",
+    "hex": "#5E9320",
+    "levels": [
+     0.95586,
+     0.9786,
+     0.98651,
+     0.99389,
+     1.0044,
+     1.00768,
+     1.01048,
+     1.01924,
+     1.03085
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_mid_x_leaf_bright_25",
+    "hex": "#6A9A1B",
+    "levels": [
+     0.96393,
+     0.97202,
+     0.97806,
+     0.98672,
+     0.99059,
+     1.00012,
+     1.00372,
+     1.00757,
+     1.01042,
+     1.03901
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_mid_x_leaf_bright_50",
+    "hex": "#76A016",
+    "levels": [
+     0.96117,
+     0.96486,
+     0.96884,
+     0.98077,
+     0.9869,
+     0.98977,
+     0.99339,
+     0.99753,
+     1.0011,
+     1.00519,
+     1.00726,
+     1.01098,
+     1.0168,
+     1.02676,
+     1.03139
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_leaf_mid_x_leaf_bright_75",
+    "hex": "#82A611",
+    "levels": [
+     0.97899,
+     0.9873,
+     0.99487,
+     0.99733,
+     1.00868,
+     1.01417,
+     1.01769,
+     1.0223
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_moss",
+    "hex": "#989365",
+    "levels": [
+     0.99182,
+     1.00531,
+     1.0093,
+     1.01683
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stalk",
+    "hex": "#78A11A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stalk_x_leaf_bright_50",
+    "hex": "#83A713",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stone",
+    "hex": "#9A8E89",
+    "levels": [
+     0.98354,
+     0.98586,
+     0.98823,
+     0.99083,
+     0.99619,
+     0.9972,
+     1.00015,
+     1.00175,
+     1.00476,
+     1.00719,
+     1.00989,
+     1.01158,
+     1.01584,
+     1.01875,
+     1.0226,
+     1.02542,
+     1.03054,
+     1.0332,
+     1.03558,
+     1.03743,
+     1.04093
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stone_deep",
+    "hex": "#807773",
+    "levels": [
+     0.98071,
+     0.99935,
+     1.00451
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stone_x_deep_25",
+    "hex": "#948884",
+    "levels": [
+     0.98493,
+     0.99049,
+     0.99341,
+     1.00629,
+     1.01676,
+     1.01919,
+     1.02962
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_stone_x_deep_50",
+    "hex": "#8D827E",
+    "levels": [
+     0.97473,
+     0.98524,
+     0.99253,
+     0.99605,
+     1.00167,
+     1.00385,
+     1.01237,
+     1.01805
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine",
+    "hex": "#8A5B24",
+    "levels": [
+     0.95505,
+     0.96045,
+     0.96484,
+     0.97007,
+     0.97331,
+     0.98156,
+     0.98333,
+     0.98533,
+     0.9888,
+     0.99172,
+     0.99429,
+     0.99635,
+     0.997,
+     0.99883,
+     1.00177,
+     1.00227,
+     1.00334,
+     1.00357,
+     1.00401,
+     1.00474,
+     1.00537,
+     1.00598,
+     1.00734,
+     1.00819,
+     1.00922,
+     1.01192,
+     1.01784,
+     1.025,
+     1.03329,
+     1.04009,
+     1.04706,
+     1.05009
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_cut",
+    "hex": "#9D712E",
+    "levels": [
+     0.98,
+     0.98202,
+     0.99521,
+     0.99724,
+     1.00139,
+     1.00909,
+     1.01125
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_deep_x_vine_cut_50",
+    "hex": "#82581E",
+    "levels": [
+     0.98
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_cut_50",
+    "hex": "#946629",
+    "levels": [
+     0.97932,
+     0.98199,
+     0.98445,
+     0.9878,
+     0.9897,
+     0.99203,
+     0.99469,
+     0.99698,
+     0.99928,
+     1.00061,
+     1.00271,
+     1.00563,
+     1.00819,
+     1.01022,
+     1.0118,
+     1.01569,
+     1.01693
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_deep_25",
+    "hex": "#81541F",
+    "levels": [
+     0.95537,
+     0.95776,
+     0.96029,
+     0.96261,
+     0.96509,
+     0.96794,
+     0.97022,
+     0.97142,
+     0.97651,
+     0.97939,
+     0.98071,
+     0.98316,
+     1.0,
+     1.00796,
+     1.01037,
+     1.01408,
+     1.01745,
+     1.0207,
+     1.02274,
+     1.02774,
+     1.02982,
+     1.03291,
+     1.03469,
+     1.03788,
+     1.03999,
+     1.04337,
+     1.04568,
+     1.04906
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_deep_50",
+    "hex": "#784E1A",
+    "levels": [
+     0.95716,
+     0.95884,
+     0.96088,
+     0.96505,
+     0.96863,
+     0.97082,
+     0.98,
+     1.01772,
+     1.02379,
+     1.02787,
+     1.03519,
+     1.03763,
+     1.03982,
+     1.04239
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_deep_75",
+    "hex": "#704714",
+    "levels": [
+     0.95655,
+     0.95877,
+     0.96092,
+     0.96408,
+     0.96825,
+     0.98,
+     1.03627,
+     1.03872,
+     1.04252
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_light_25",
+    "hex": "#8E5F26",
+    "levels": [
+     0.96621,
+     0.96921,
+     0.97284,
+     1.04605,
+     1.04995,
+     1.05312
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_light_50",
+    "hex": "#936229",
+    "levels": [
+     0.96673,
+     0.96884,
+     0.97215,
+     0.97411,
+     0.9821,
+     0.98452,
+     1.03503,
+     1.03745,
+     1.0422,
+     1.04535,
+     1.04941,
+     1.05308
+    ],
+    "used": true
+   },
+   {
+    "key": "m063_vine_x_light_75",
+    "hex": "#98662C",
+    "levels": [
+     0.98144,
+     0.98412,
+     0.98495,
+     1.03493,
+     1.03752,
+     1.04226
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TwistedVine",
+   "sheet": "M063",
+   "subject": "Hanging Vine",
+   "role": "hero",
+   "size": [
+    2.4005,
+    7.2855,
+    1.8157
+   ],
+   "tris": 2122,
+   "budget": 2500,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedVine.glb",
+     "kind": "solid",
+     "tris": 2122,
+     "offset": [
+      0.0,
+      3.6427,
+      0.0
+     ],
+     "size": [
+      2.4005,
+      7.2855,
+      1.8157
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "063 Hanging Vine hero: a 2.3 x 2.0 x 7.5 wall-mounted vine: a cracked faceted stone pad with a socket groove, a woody stub, two twisted 6-sided strands with a fork spur, nine fanned five-point-leaf clusters, one single leaf and three tendril curls. Dressing: no collision. No VFX (the sheet shows none). attach: the pad's back-face centre, normal +Y into the wall, up +Z; put it on a wall, cliff, ruin or trunk face with the object's -Y facing out; nothing lies behind the wall plane"
+  },
+  {
+   "name": "TwistedVineFork",
+   "sheet": "M063",
+   "subject": "Hanging Vine",
+   "role": "part",
+   "size": [
+    1.435,
+    1.724,
+    0.3118
+   ],
+   "tris": 284,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedVineFork.glb",
+     "kind": "solid",
+     "tris": 284,
+     "offset": [
+      0.0,
+      0.862,
+      0.0
+     ],
+     "size": [
+      1.435,
+      1.724,
+      0.3118
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "063 Hanging Vine part. attach: the junction, the leg hanging along -Z, arms up-left and up-right. No collision: dressing."
+  },
+  {
+   "name": "TwistedVineLeafCluster",
+   "sheet": "M063",
+   "subject": "Hanging Vine",
+   "role": "part",
+   "size": [
+    1.5037,
+    1.5173,
+    0.3744
+   ],
+   "tris": 160,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedVineLeafCluster.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.7586,
+      0.0
+     ],
+     "size": [
+      1.5037,
+      1.5173,
+      0.3744
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "063 Hanging Vine part. attach: the stalk's top end (the pivot); seat it 0.02 into a stick, leaves hanging below. No collision: dressing."
+  },
+  {
+   "name": "TwistedVinePad",
+   "sheet": "M063",
+   "subject": "Hanging Vine",
+   "role": "part",
+   "size": [
+    1.4882,
+    1.75,
+    0.9813
+   ],
+   "tris": 140,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedVinePad.glb",
+     "kind": "solid",
+     "tris": 140,
+     "offset": [
+      0.0,
+      0.875,
+      0.0
+     ],
+     "size": [
+      1.4882,
+      1.75,
+      0.9813
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "063 Hanging Vine part. attach: the back-face centre, normal +Y into the wall; the socket groove takes a Segment end. No collision: dressing."
+  },
+  {
+   "name": "TwistedVineSegment",
+   "sheet": "M063",
+   "subject": "Hanging Vine",
+   "role": "part",
+   "size": [
+    0.5549,
+    1.8187,
+    0.3118
+   ],
+   "tris": 80,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TwistedVineSegment.glb",
+     "kind": "solid",
+     "tris": 80,
+     "offset": [
+      0.0,
+      0.9094,
+      0.0
+     ],
+     "size": [
+      0.5549,
+      1.8187,
+      0.3118
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "063 Hanging Vine part. attach: the top end centre, the stick hanging along -Z; chain under a Pad socket or another stick's end. No collision: dressing."
+  }
+ ],
+ "stats": {
+  "assets": 5,
+  "pieces": 5,
+  "solid": 5,
+  "water": 0,
+  "glow": 0,
+  "tris": 2786,
+  "vfxSockets": 0,
+  "paletteColours": 26,
+  "paletteLevels": 242,
+  "meshBytes": 270236
+ },
+ "problems": []
+}

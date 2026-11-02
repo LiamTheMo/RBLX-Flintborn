@@ -685,7 +685,9 @@ def leaf_pts(N, d, n, L, thick=0.055, dome=None, drop=None, aspect=1.0):
 
 # ladder positions (base, body, lobe ends) per role; one step brighter than spec 5.3's first plan after the hero
 # render measured D 47 / M 37 / Br 15 / L 0 against the sheet's 37 / 41 / 20 / 3 (stage 4 re-measure)
-ROLE = {"under": (0.25, 0.75, 1.25), "outer": (0.5, 1.25, 2.0), "young": (1.25, 2.0, 2.75)}
+# Round-3 verification measured the planar-lobe leaf at D 54 / M 35 / Br 7 / L 4 (front median #5D8A18 vs #67A416):
+# every role moves up half a band (main session, 2026-11-02).
+ROLE = {"under": (0.75, 1.25, 1.75), "outer": (1.0, 1.75, 2.5), "young": (1.75, 2.5, 3.25)}
 
 
 def leaf_keys(role, shift=0.0):
