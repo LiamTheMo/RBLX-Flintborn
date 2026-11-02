@@ -1,7 +1,8 @@
 -- An ultrawide screen (2560 × 1080): regions stay pinned to their edges.
 -- Built with the real scaling (Kit.Scale.Hud, as LobbyHudController does) and the
 -- mockup's sample data; page 2 is the same screen in a party of three with an
--- invite waiting.
+-- invite waiting. Stand-ins for Roblox's top-bar buttons are drawn at the top
+-- left; the layout checks (hud_checks.luau, ARCHITECTURE D28) run on both.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 -- Members' replicated level and progress (PlayerRow levelBar reads them).
 for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
@@ -28,6 +29,8 @@ local function page(view)
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 	hud:SetTopInset(TOP_BAR / scale)
+	hud:SetScreen(W, H, scale, false)
+	local chrome = __robloxChrome(gui, W, H)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party(view, ME))
@@ -37,6 +40,7 @@ local function page(view)
 		{ catalogId = "Redberry", quantity = 5 },
 	}))
 	print(("lobby_hud_wide: scale %.3f, root %d x %d design px"):format(scale, W / scale, H / scale))
+	__checkLobbyHud({ scene = "lobby_hud_wide", hud = hud, root = root, W = W, H = H, k = scale, chrome = chrome })
 	__dump(gui, W, H)
 end
 
@@ -54,3 +58,4 @@ page({
 	invites = { { partyId = "p9", from = "RiverFox" } },
 	maxSize = 8,
 })
+__hudChecksDone("lobby_hud_wide")

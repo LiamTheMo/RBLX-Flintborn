@@ -1,6 +1,6 @@
 -- The lobby's always-on HUD (GDD §11, §25; docs/ui/LobbyScreen.md, ARCHITECTURE
 -- §4.1): Coins and Gems, the menu tiles, the Party panel, the XP bar, the
--- hotbar that shows the deploy loadout and Settings (bottom right), drawn by
+-- hotbar that shows the deploy loadout and Settings (bottom left), drawn by
 -- Hud/Screens/LobbyHud from the shared Kit. There is no Enter button or server
 -- choice here: the Play tile opens the Play window, which deploys.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
@@ -159,7 +159,7 @@ local function build()
 end
 
 -- Root scale (HudModel.HudScale, × 0.9 on short touch screens), the top bar's
--- reach in design px and, on touch screens, the jump button's corner.
+-- reach in design px and, on touch screens, the thumbstick's corner.
 local function watchScale()
 	table.insert(stops, Kit.Scale.Hud(gui, root))
 	local scale = root:FindFirstChildWhichIsA("UIScale") :: UIScale

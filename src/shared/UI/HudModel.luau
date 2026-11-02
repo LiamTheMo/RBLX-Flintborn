@@ -237,24 +237,70 @@ function HudModel.JumpButton(width: number, height: number)
 	}
 end
 
--- Where a bottom-right corner button (the HUDs' ⚙) sits, as its distance from
--- the HUD root's right and bottom edges in design px, on a screen w × h
--- (screen px) at HUD scale k. Without touch: spec.right and spec.bottom. With
--- touch it keeps `spec.gap` screen px from Roblox's jump button: above it
--- (its right edge kept at spec.right), or with `spec.beside` left of it and
--- centred on its height. spec: {right, bottom, h, gap, beside?}.
-function HudModel.CornerButton(width: number, height: number, k: number, touch: boolean, spec): (number, number)
+-- Roblox's classic touch thumbstick (the ring the "Thumbstick" movement mode
+-- draws) on a screen w × h (screen px), as the default PlayerModule
+-- (ClassicThumbstick) places it, the mirror of the jump button: 70 px square,
+-- 25 px from the left and 90 from the bottom when the short side is 500 px or
+-- less; otherwise 120 px square, 60 from the left and 210 from the bottom.
+-- Returns {x, y, size}, its top-left corner and side.
+function HudModel.Thumbstick(width: number, height: number)
+	local small = math.min(width, height) <= 500
+	local size = if small then 70 else 120
+	return {
+		x = if small then size / 2 - 10 else size / 2,
+		y = height - (if small then size + 20 else size * 1.75),
+		size = size,
+	}
+end
+
+-- Where the default dynamic thumbstick starts on a landscape screen w × h
+-- (screen px): a touch landing anywhere in the left 40 % below the top third
+-- (DynamicThumbstick's frame). Returns {x, y, w, h}.
+function HudModel.ThumbstickZone(width: number, height: number)
+	return { x = 0, y = height / 3, w = width * 0.4, h = height * 2 / 3 }
+end
+
+-- Where a bottom-left corner button (the HUDs' ⚙) sits, as its distance from
+-- the HUD root's left and bottom edges in design px, on a screen w × h (screen
+-- px) at HUD scale k. Without touch: spec.left and spec.bottom. With touch its
+-- foot stays `spec.gap` screen px above Roblox's thumbstick ring (where the
+-- classic thumbstick draws, the bottom of the dynamic thumbstick's zone), so
+-- it keeps to the zone's outer edge, above where a thumb lands. spec: {left,
+-- bottom, gap}.
+function HudModel.ThumbstickCorner(width: number, height: number, k: number, touch: boolean, spec): (number, number)
 	if not touch or width <= 0 or height <= 0 then
-		return spec.right, spec.bottom
+		return spec.left, spec.bottom
 	end
-	k = math.max(k, 0.01)
-	local jump = HudModel.JumpButton(width, height)
-	if spec.beside then
-		local right = math.ceil((width - jump.x + spec.gap) / k)
-		local bottom = math.floor((height - jump.y - jump.size / 2) / k - spec.h / 2)
-		return math.max(spec.right, right), math.max(0, bottom)
+	local stick = HudModel.Thumbstick(width, height)
+	return spec.left, math.max(spec.bottom, math.ceil((height - stick.y + spec.gap) / math.max(k, 0.01)))
+end
+
+-- Roblox's top-bar buttons (the Roblox logo, then the menu and chat pill) are
+-- 44 px tall and end 2 px above the bar's inset. TOP_ROW_MIN keeps a row 12 px
+-- from the screen's top edge when the bar is shorter or hidden.
+HudModel.TOP_BUTTON = 44
+HudModel.TOP_BUTTON_FOOT = 2
+HudModel.TOP_ROW_MIN = 12
+
+-- The top bar's button row for a bar reaching `inset` screen px down: its top
+-- and its centre line, in screen px (inset 58: 12 and 34).
+function HudModel.TopRow(inset: number): (number, number)
+	local top = math.max(HudModel.TOP_ROW_MIN, inset - HudModel.TOP_BUTTON - HudModel.TOP_BUTTON_FOOT)
+	return top, top + HudModel.TOP_BUTTON / 2
+end
+
+-- The centre x of an item `itemW` wide in the top bar's row of a screen
+-- `width` wide: the screen's centre, moved just enough to keep `gap` from
+-- Roblox's left-hand buttons (reaching x `left`) and from what starts at x
+-- `right` (the right-hand column or the bar's right end). nil when it fits in
+-- neither (it then goes below the bar). All in one unit (design px).
+function HudModel.RowCentre(width: number, itemW: number, left: number, right: number, gap: number): number?
+	local lo = left + gap + itemW / 2
+	local hi = right - gap - itemW / 2
+	if lo > hi then
+		return nil
 	end
-	return spec.right, math.max(spec.bottom, math.ceil((height - jump.y + spec.gap) / k))
+	return math.clamp(width / 2, lo, hi)
 end
 
 -- Next hotbar slot for a step (the right bumper = +1), wrapping around. The mouse

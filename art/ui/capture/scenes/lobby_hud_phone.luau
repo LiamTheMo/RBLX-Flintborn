@@ -1,7 +1,12 @@
--- A phone held sideways (844 × 390, touch only): the HUD scale × 0.9 and the top bar 58 px down.
--- Built with the real scaling (Kit.Scale.Hud, as LobbyHudController does) and the
--- mockup's sample data; page 2 is the same screen in a party of three with an
--- invite waiting, the game-update notice and XP pop-ups stacked above it.
+-- A phone held sideways (844 × 390, touch only): the HUD scale × 0.9 and the top
+-- bar 58 px down, with stand-ins for Roblox's top-bar buttons, the touch jump
+-- button and the thumbstick ring. Built with the real scaling (Kit.Scale.Hud,
+-- as LobbyHudController does) and the mockup's sample data; page 2 is the same
+-- screen in a party of three with an invite waiting, the game-update notice
+-- and XP pop-ups stacked above it; pages 3 and 4 are a 667 × 375 phone (the
+-- tiles move up for the Settings button's touch pad) and a 2000 × 924 touch
+-- screen. The layout checks (hud_checks.luau, ARCHITECTURE D28: Settings at
+-- the bottom left above the thumbstick, not beside the pills) run on each.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 -- Members' replicated level and progress (PlayerRow levelBar reads them).
 for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
@@ -15,10 +20,8 @@ local Kit = require(Hud.Kit)
 local LobbyHud = require(Hud.Screens.LobbyHud)
 local LobbyHudModel = require(Shared.UI.LobbyHudModel)
 
-local W, H = 844, 390
 local TOP_BAR = 58
 local ME = { userId = 1, name = "LiamTheMo" }
-workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
 -- The last input was a touch (Kit.Input: no keyboard hotkey badges).
@@ -61,46 +64,15 @@ local function xpPopups(hud)
 	end
 end
 
--- The Settings button sits left of where Roblox puts the jump button, centred
--- on its height, clear of the Party panel above and the hotbar to its left.
-local function gearClear(hud, scale)
-	local HudModel = require(Shared.UI.HudModel)
-	local g = LobbyHud.GEAR
-	local at = hud.settingsRegion.Position
-	-- Screen rectangles {x1, y1, x2, y2}.
-	local x2, y2 = W + at.X.Offset * scale, H + at.Y.Offset * scale
-	local gear = { x2 - g.w * scale, y2 - g.h * scale, x2, y2 }
-	local jumpAt = HudModel.JumpButton(W, H)
-	local party = hud.partyRegion
-	local partyFoot = (party.Position.Y.Offset + party.Size.Y.Offset) * scale
-	local bottom = hud.bottom
-	local hotbarRight = W / 2 + bottom.Size.X.Offset / 2 * scale
-	local ok = gear[3] + g.gap <= jumpAt.x and gear[2] > partyFoot and gear[1] > hotbarRight
-	print(
-		("  %s lobby_hud_phone: the gear (%d..%d x %d..%d) clears the jump button (x %d), the Party panel (foot %d) and the hotbar (right %d)"):format(
-			if ok then "ok" else "FAIL",
-			gear[1],
-			gear[3],
-			gear[2],
-			gear[4],
-			jumpAt.x,
-			partyFoot,
-			hotbarRight
-		)
-	)
-	if not ok then
-		error("lobby_hud_phone: the settings gear overlaps")
-	end
-end
-
-local function page(view, notice)
+local function page(W, H, view, notice)
+	workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 	local gui, root = __screen(W, H)
 	local hud = LobbyHud.new(root, {})
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 	hud:SetTopInset(TOP_BAR / scale)
-	hud:SetScreen(W, H, scale, true)
-	gearClear(hud, scale)
+	local lift = hud:SetScreen(W, H, scale, true)
+	local chrome = __robloxChrome(gui, W, H, { touch = true })
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party(view, ME))
@@ -113,12 +85,32 @@ local function page(view, notice)
 		hud:SetNotice(notice)
 		xpPopups(hud)
 	end
-	print(("lobby_hud_phone: scale %.3f, root %d x %d design px"):format(scale, W / scale, H / scale))
+	print(
+		("lobby_hud_phone %dx%d: scale %.3f, root %d x %d design px, tiles lifted %d design px"):format(
+			W,
+			H,
+			scale,
+			W / scale,
+			H / scale,
+			lift
+		)
+	)
+	__checkLobbyHud({
+		scene = ("lobby_hud_phone %dx%d"):format(W, H),
+		hud = hud,
+		root = root,
+		W = W,
+		H = H,
+		k = scale,
+		chrome = chrome,
+		phone = Kit.Scale.FormFactor() == "phone",
+	})
 	__dump(gui, W, H)
 end
 
-page({ party = nil, invites = {}, maxSize = 8 })
-page({
+local SOLO = { party = nil, invites = {}, maxSize = 8 }
+page(844, 390, SOLO)
+page(844, 390, {
 	party = {
 		id = "p1",
 		leader = 1,
@@ -131,3 +123,6 @@ page({
 	invites = { { partyId = "p9", from = "RiverFox" } },
 	maxSize = 8,
 }, "Game update: your items were saved and return on your next Play.")
+page(667, 375, SOLO)
+page(2000, 924, SOLO)
+__hudChecksDone("lobby_hud_phone")

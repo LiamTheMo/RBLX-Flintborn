@@ -1373,4 +1373,108 @@ function __screen(width, height)
 	return gui, root
 end
 
+-- `object`'s rectangle {x1, y1, x2, y2} in screen px, from the Positions,
+-- Sizes and AnchorPoints up to `root` (a HUD root drawn at UIScale k over a
+-- width × height screen; Absolute sizes are zero here). UIScales below the
+-- root are ignored.
+function __rect(object, root, width, height, k)
+	k = k or 1
+	local function box(item)
+		if item == root then
+			return 0, 0, width / k, height / k
+		end
+		local px, py, pw, ph = box(item.Parent)
+		local size, pos, anchor = item.Size, item.Position, item.AnchorPoint
+		local w = size.X.Scale * pw + size.X.Offset
+		local h = size.Y.Scale * ph + size.Y.Offset
+		local x = px + pos.X.Scale * pw + pos.X.Offset - anchor.X * w
+		local y = py + pos.Y.Scale * ph + pos.Y.Offset - anchor.Y * h
+		return x, y, w, h
+	end
+	local x, y, w, h = box(object)
+	return { x * k, y * k, (x + w) * k, (y + h) * k }
+end
+
+-- True when screen rectangles a and b ({x1, y1, x2, y2}) keep at least `gap`
+-- px apart (they may touch at gap 0).
+function __apart(a, b, gap)
+	gap = gap or 0
+	return a[3] + gap <= b[1] or b[3] + gap <= a[1] or a[4] + gap <= b[2] or b[4] + gap <= a[2]
+end
+
+-- A rectangle grown to a touch pad of at least `min` px each way (Kit.Interact
+-- pads every pressable control to 44 screen px).
+function __pad(rect, min)
+	min = min or 44
+	local dx = math.max(0, min - (rect[3] - rect[1])) / 2
+	local dy = math.max(0, min - (rect[4] - rect[2])) / 2
+	return { rect[1] - dx, rect[2] - dy, rect[3] + dx, rect[4] + dy }
+end
+
+-- Stand-ins for Roblox's own controls, drawn over a capture so a page shows
+-- what the HUD keeps clear of, and their rectangles in screen px. The top bar
+-- (58 px): the Roblox logo and the menu / chat pill at the top left (sized as
+-- an 844 × 390 iPhone draws them, notch included: they reach x 212), and
+-- GuiService.TopbarInset set to the bar's free area. opts.touch adds the
+-- touch jump button and the classic thumbstick ring (the PlayerModule's
+-- geometry) and returns the dynamic thumbstick's zone (the left 40 % below
+-- the top third; not drawn). They are drawn into `parent`; opts.k is its
+-- UIScale (a HUD root), so they keep their screen size. Returns {bar,
+-- buttons, jump?, stick?, zone?} in screen px.
+function __robloxChrome(parent, width, height, opts)
+	opts = opts or {}
+	local bar = opts.bar or 58
+	local k = opts.k or 1
+	local layer = Instance.new("Frame", parent)
+	rawProps(layer).Name = "RobloxChrome"
+	layer.BackgroundTransparency = 1
+	layer.Size = UDim2.fromScale(1, 1)
+	layer.ZIndex = 1000
+	local function shape(name, x, y, w, h, radius, colour, transparency)
+		local frame = Instance.new("Frame", layer)
+		rawProps(frame).Name = name
+		frame.Position = UDim2.fromOffset(x / k, y / k)
+		frame.Size = UDim2.fromOffset(w / k, h / k)
+		frame.BackgroundColor3 = colour or Color3.new(1, 1, 1)
+		frame.BackgroundTransparency = transparency or 0.08
+		frame.BorderSizePixel = 0
+		frame.ZIndex = 1000
+		local corner = Instance.new("UICorner", frame)
+		corner.CornerRadius = UDim.new(0, radius / k)
+		return frame
+	end
+	local dark = Color3.fromRGB(30, 30, 30)
+	local top = bar - 46
+	shape("Logo", 16, top, 44, 44, 22)
+	shape("LogoMark", 30, top + 14, 16, 16, 3, dark, 0)
+	shape("Pill", 72, top, 140, 44, 22)
+	for index = 0, 2 do
+		shape("Icon" .. index, 90 + index * 44, top + 15, 18, 14, 3, dark, 0)
+	end
+	local left = 212 + 12
+	game:GetService("GuiService").TopbarInset = Rect.new(left, 0, width, bar)
+	local chrome = { bar = bar, buttons = { 16, top, 212, top + 44 } }
+	if opts.touch then
+		local small = math.min(width, height) <= 500
+		local size = if small then 70 else 120
+		local jx, jy = width - (size * 1.5 - 10), height - (if small then size + 20 else size * 1.75)
+		local sx = if small then size / 2 - 10 else size / 2
+		for _, ring in
+			{
+				shape("Jump", jx, jy, size, size, size / 2, dark, 0.55),
+				shape("Thumbstick", sx, jy, size, size, size / 2, dark, 0.55),
+			}
+		do
+			local stroke = Instance.new("UIStroke", ring)
+			stroke.Color = Color3.new(1, 1, 1)
+			stroke.Thickness = 3 / k
+			stroke.Transparency = 0.2
+		end
+		chrome.jump = { jx, jy, jx + size, jy + size }
+		chrome.stick = { sx, jy, sx + size, jy + size }
+		chrome.zone = { 0, height / 3, width * 0.4, height }
+	end
+	return chrome
+end
+
 LocalPlayer.Parent = Players

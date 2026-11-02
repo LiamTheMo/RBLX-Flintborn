@@ -146,7 +146,7 @@ test("slice scale shrinks corners for small widgets", function()
 	expectEq(HudModel.SliceScale(400, 100, 800, 200, nil), 1, "no art scale: as before")
 end)
 
-test("the corner settings button keeps clear of the touch jump button", function()
+test("Roblox's touch jump button", function()
 	local phone = HudModel.JumpButton(844, 390)
 	expectEq(phone.size, 70, "a phone's jump button is 70 px")
 	expectEq(phone.x, 749, "95 px from the right")
@@ -155,26 +155,47 @@ test("the corner settings button keeps clear of the touch jump button", function
 	expectEq(tablet.size, 120, "a tablet's is 120 px")
 	expectEq(tablet.x, 854, "170 px from the right")
 	expectEq(tablet.y, 558, "210 px from the bottom")
+end)
 
-	local spec = { right = 53, bottom = 49, h = 46, gap = 12 }
-	local right, bottom = HudModel.CornerButton(1672, 941, 1, false, spec)
-	expectEq(right, 53, "desktop: the corner margin")
+test("the corner settings button keeps above the touch thumbstick", function()
+	local phone = HudModel.Thumbstick(844, 390)
+	expectEq(phone.size, 70, "a phone's thumbstick ring is 70 px")
+	expectEq(phone.x, 25, "25 px from the left")
+	expectEq(phone.y, 300, "90 px from the bottom, level with the jump button")
+	local tablet = HudModel.Thumbstick(1024, 768)
+	expectEq(tablet.size, 120, "a tablet's is 120 px")
+	expectEq(tablet.x, 60, "60 px from the left")
+	expectEq(tablet.y, 558, "210 px from the bottom")
+	local zone = HudModel.ThumbstickZone(844, 390)
+	expectEq(zone.y, 130, "the dynamic thumbstick starts below the top third")
+	expect(math.abs(zone.w - 337.6) < 1e-6, "in the left 40 %")
+
+	local spec = { left = 39, bottom = 49, gap = 12 }
+	local left, bottom = HudModel.ThumbstickCorner(1672, 941, 1, false, spec)
+	expectEq(left, 39, "desktop: the left margin")
 	expectEq(bottom, 49, "desktop: the hotbar's bottom margin")
 
-	-- Above the jump button: its foot `gap` screen px over the button's top.
-	right, bottom = HudModel.CornerButton(844, 390, 0.5, true, spec)
-	expectEq(right, 53, "above: the right margin stays")
-	expectEq(bottom, 204, "above: (90 + 12) / 0.5")
-	expect(390 - bottom * 0.5 + 12 <= phone.y, "above: clear of the phone's jump button")
-	right, bottom = HudModel.CornerButton(1024, 768, 0.55, true, spec)
-	expect(768 - bottom * 0.55 + 12 <= tablet.y + 0.01, "above: clear of the tablet's jump button")
+	-- Touch: its foot `gap` screen px over the thumbstick ring's top.
+	left, bottom = HudModel.ThumbstickCorner(844, 390, 0.5, true, spec)
+	expectEq(left, 39, "touch: the left margin stays")
+	expectEq(bottom, 204, "touch: (90 + 12) / 0.5")
+	expect(390 - bottom * 0.5 + 12 <= phone.y, "touch: clear of the phone's thumbstick")
+	left, bottom = HudModel.ThumbstickCorner(1024, 768, 0.55, true, spec)
+	expect(768 - bottom * 0.55 + 12 <= tablet.y + 0.01, "touch: clear of the tablet's thumbstick")
+end)
 
-	-- Beside it: `gap` px to its left, centred on its height.
-	local beside = { right = 53, bottom = 49, h = 46, gap = 12, beside = true }
-	right, bottom = HudModel.CornerButton(844, 390, 0.5, true, beside)
-	expectEq(right, 214, "beside: (95 + 12) / 0.5")
-	expectEq(bottom, 87, "beside: centred on the button (55 / 0.5 - 23)")
-	expect(844 - right * 0.5 + 12 <= phone.x + 0.01, "beside: clear of the jump button")
+test("the top bar's row and an item centred in it", function()
+	local top, centre = HudModel.TopRow(58)
+	expectEq(top, 12, "Roblox's 44 px buttons start 12 px down a 58 px bar")
+	expectEq(centre, 34, "their centre line")
+	top = HudModel.TopRow(0)
+	expectEq(top, 12, "no bar: 12 px from the top")
+	top = HudModel.TopRow(72)
+	expectEq(top, 26, "a taller bar moves the row down")
+
+	expectEq(HudModel.RowCentre(1672, 481, 180, 1379, 16), 836, "room on both sides: the screen's centre")
+	expectEq(HudModel.RowCentre(1334, 481, 446, 1041, 16), 702.5, "moved right off Roblox's buttons")
+	expectEq(HudModel.RowCentre(1334, 481, 560, 1041, 16), nil, "no room: nil (below the bar)")
 end)
 
 test("hotbar stepping wraps", function()

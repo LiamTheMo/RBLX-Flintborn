@@ -259,9 +259,17 @@ check(#gui:GetDescendants() == count, "20 party redraws leave the instance count
 local tile1 = hud.tiles[1].control.hit
 check(tile1.NextSelectionRight == hud.tiles[2].control.hit, "Inventory -> Play")
 check(tile1.NextSelectionDown == hud.tiles[3].control.hit, "Inventory v Quests")
-check(hud.tiles[5].control.hit.NextSelectionDown == hud.xpControl.hit, "Forge v the XP bar")
-check(hud.xpControl.hit.NextSelectionDown == hud.slots[1].control.hit, "the XP bar v hotbar")
+-- Settings sits at the bottom left under the tiles (ARCHITECTURE D28).
+local gearHit = hud.settings.control.hit
+local slot1 = hud.slots[1].control.hit
+check(hud.tiles[5].control.hit.NextSelectionDown == gearHit, "Forge v Settings")
+check(gearHit.NextSelectionUp == hud.tiles[5].control.hit, "Settings ^ Forge")
+check(gearHit.NextSelectionRight == slot1 and slot1.NextSelectionLeft == gearHit, "Settings <-> the first hotbar slot")
+check(hud.slots[6].control.hit.NextSelectionRight == nil, "nothing right of the last slot")
+check(hud.tiles[6].control.hit.NextSelectionDown == hud.xpControl.hit, "Trade v the XP bar")
+check(hud.xpControl.hit.NextSelectionDown == slot1, "the XP bar v hotbar")
 check(hud.slots[3].control.hit.NextSelectionUp == hud.xpControl.hit, "hotbar ^ the XP bar")
+check(hud.gems.control.hit.NextSelectionRight == nil, "nothing right of Gems (Settings left the top row)")
 check(hud:DefaultSelection() == tile1, "default selection is the Inventory tile")
 
 assert(not __failed, "lobby_hud_flow: a check failed")

@@ -27,9 +27,22 @@ local function check(cond, msg)
 	end
 end
 
+-- The layout checks (hud_checks.luau) on a page, then its capture.
+local function finish(root, hud)
+	__checkWorldHud({ scene = "world_hud_states", hud = hud, root = root, W = W, H = H, k = 1, chrome = hud.chrome })
+	__dump(root, W, H, BACKGROUND)
+end
+
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
+	-- Laid out under stand-ins for Roblox's top-bar buttons (ARCHITECTURE D28).
+	local chrome = __robloxChrome(root, W, H)
+	HudController.PlaceTop(
+		HudController.TopRegions(hud),
+		HudController.TopBar(chrome.bar, W, 1, game:GetService("GuiService").TopbarInset, 0)
+	)
+	hud.chrome = chrome
 	hud.bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })
 	hud.bottom:SetProgress({ level = 7, xp = 120, xpToNext = 400 }, true)
 	hud.compass:SetWaypoints({})
@@ -87,7 +100,7 @@ do
 	hud.vitals:Set("health", 0.6, "60/100", true)
 	check(not hud.vitals.rows.health.mark.root.Visible, "the mark clears when health recovers")
 	hud.vitals:Set("health", 0.18, "18/100", true)
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
 
 -- 2: forced states.
@@ -120,7 +133,7 @@ do
 			"slot " .. index .. " draws " .. slotStates[index]
 		)
 	end
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
 
 -- 3: done and ending.
@@ -151,5 +164,6 @@ do
 	}, "Boss")
 	hud.bottom:SetSlotItems({})
 	hud.bottom:Select(6)
-	__dump(root, W, H, BACKGROUND)
+	finish(root, hud)
 end
+__hudChecksDone("world_hud_states")

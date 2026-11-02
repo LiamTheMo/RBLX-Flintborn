@@ -2,10 +2,10 @@
 -- ARCHITECTURE §4.1), built only from Kit components at the 1672 × 941 design
 -- size: Coins and Gems, the 2 × 3 menu tiles, the Party panel (each member
 -- with their level and XP bar), the level/XP bar, the six-slot hotbar that
--- shows the deploy loadout and the Settings button at the bottom right. (The
+-- shows the deploy loadout and the Settings button at the bottom left. (The
 -- mockup's top-left player card is left out; the level/XP bar opens Progress
 -- instead. The mockup's Settings button beside the pills moved to the bottom
--- right: owner decision, ARCHITECTURE D27.)
+-- left, under the menu tiles: owner decisions, ARCHITECTURE D27 and D28.)
 --
 -- Display only: LobbyHudController feeds it through the setters and handles the
 -- presses it reports through `actions`. Regions are pinned to the screen edges
@@ -82,12 +82,15 @@ LobbyHud.PHONE = {
 }
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, w = 234 }
 
--- The Settings button (the kit's square HUD button) at the bottom right: its
--- foot on the hotbar's bottom line, its right edge on the pills' and the Party
--- panel's. On touch screens it sits `gap` screen px left of Roblox's jump
--- button, centred on its height (HudModel.CornerButton; the Party panel takes
--- the room above the button on phones).
-LobbyHud.GEAR = { right = 53, bottom = 49, w = 52, h = 46, gap = 12, beside = true }
+-- The Settings button (the kit's square HUD button) at the bottom left (D28),
+-- where the world's is (SettingsController.GEAR): 39 px from the left edge
+-- (phones 16), its foot on the hotbar's bottom line. On touch screens its
+-- foot stands `gap` screen px above Roblox's thumbstick ring
+-- (HudModel.ThumbstickCorner), at the outer edge of the dynamic thumbstick's
+-- zone; the tiles move up when its touch pad would meet theirs (SetScreen).
+LobbyHud.GEAR = { left = 39, phoneLeft = 16, bottom = 49, w = 52, h = 46, gap = 12 }
+-- Screen px kept between the Settings button's touch pad and the tiles'.
+LobbyHud.PAD_GAP = 2
 
 -- The XP pop-up lane in the bottom region's px: over the bar's width, its
 -- foot `gap` above the bar (or above the notice plaque while it shows).
@@ -371,11 +374,11 @@ function LobbyHud.new(parent: Instance, actions)
 		self.slots[index] = slot
 	end
 
-	-- Bottom right: Settings (SetScreen keeps it clear of the touch jump button).
+	-- Bottom left: Settings (SetScreen keeps it above the touch thumbstick).
 	local g = LobbyHud.GEAR
 	self.settingsRegion = region(parent, "Settings", {
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(1, -g.right, 1, -g.bottom),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, g.left, 1, -g.bottom),
 		Size = UDim2.fromOffset(g.w, g.h),
 	})
 	self.settings = Kit.IconButton.new(self.settingsRegion, {
@@ -518,17 +521,21 @@ function LobbyHud:_formChanged()
 end
 
 -- Gamepad neighbours: the tile grid, the top-right row, the party column, the
--- hotbar and the Settings button after it, joined where they face each other.
+-- hotbar and the Settings button under the tiles, joined where they face each
+-- other.
 function LobbyHud:_link()
 	local function hit(component): GuiButton?
 		local control = component and component.control
 		return control and control.hit
 	end
+	local gear = hit(self.settings) :: GuiButton
 	for index, tile in ipairs(self.tiles) do
 		local n = LobbyHudModel.TileNeighbours(index)
 		local button = hit(tile) :: GuiButton
 		button.NextSelectionUp = if n.up then hit(self.tiles[n.up]) else hit(self.coins)
-		button.NextSelectionDown = if n.down then hit(self.tiles[n.down]) else self.xpControl.hit
+		-- Down from the bottom row: the left tile to Settings under it, the
+		-- right one to the XP bar.
+		button.NextSelectionDown = if n.down then hit(self.tiles[n.down]) elseif n.left then self.xpControl.hit else gear
 		button.NextSelectionLeft = if n.left then hit(self.tiles[n.left]) else nil
 		button.NextSelectionRight = if n.right then hit(self.tiles[n.right]) else self.titleControl.hit
 	end
@@ -551,12 +558,13 @@ function LobbyHud:_link()
 	xp.NextSelectionUp = hit(self.tiles[#self.tiles - 1])
 	xp.NextSelectionDown = hit(self.slots[1])
 	xp.NextSelectionLeft = hit(self.tiles[#self.tiles - 1])
-	-- Settings sits right of the last slot, under the Party panel.
-	local gear = hit(self.settings) :: GuiButton
-	local last = hit(self.slots[#self.slots]) :: GuiButton
-	last.NextSelectionRight = gear
-	gear.NextSelectionLeft = last
-	gear.NextSelectionUp = self.titleControl.hit
+	-- Settings sits under the tiles' bottom-left tile, left of the hotbar.
+	local first = hit(self.slots[1]) :: GuiButton
+	first.NextSelectionLeft = gear
+	gear.NextSelectionRight = first
+	gear.NextSelectionUp = hit(self.tiles[#self.tiles - 1])
+	gear.NextSelectionLeft = nil
+	gear.NextSelectionDown = nil
 end
 
 -- The control a gamepad selects first: the Inventory tile.
@@ -570,11 +578,32 @@ function LobbyHud:SetMenuHint(visible: boolean)
 end
 
 -- The screen (w × h screen px) and the HUD's scale: on touch screens the
--- Settings button moves beside Roblox's jump button (LobbyHud.GEAR).
-function LobbyHud:SetScreen(width: number, height: number, scale: number, touch: boolean)
-	local g = LobbyHud.GEAR
-	local right, bottom = HudModel.CornerButton(width, height, scale, touch, g)
-	self.settingsRegion.Position = UDim2.new(1, -right, 1, -bottom)
+-- Settings button stands above Roblox's thumbstick ring (LobbyHud.GEAR), and
+-- the menu tiles move up as far as its touch pad needs (never under the top
+-- bar's margin). Returns the tiles' lift in design px.
+function LobbyHud:SetScreen(width: number, height: number, scale: number, touch: boolean): number
+	local g, t = LobbyHud.GEAR, LobbyHud.TILES
+	local phone = Kit.Scale.FormFactor(height, width) == "phone"
+	local spec = { left = if phone then g.phoneLeft else g.left, bottom = g.bottom, gap = g.gap }
+	local left, bottom = HudModel.ThumbstickCorner(width, height, scale, touch, spec)
+	self.settingsRegion.Position = UDim2.new(0, left, 1, -bottom)
+	local lift = 0
+	if touch and width > 0 and height > 0 then
+		local k = math.max(scale, 0.01)
+		local touchMin = Kit.Tokens.Space("touchMin", 44)
+		local rootH = height / k
+		-- Touch pads grow to touchMin screen px around the art (Kit.Interact).
+		local gearPadTop = (rootH - bottom - g.h) * k - math.max(0, touchMin - g.h * k) / 2
+		local tilesFoot = (t.centreY * rootH + t.h / 2) * k + math.max(0, touchMin - t.tileH * k) / 2
+		local need = tilesFoot + LobbyHud.PAD_GAP - gearPadTop
+		if need > 0 then
+			local room = t.centreY * rootH - t.h / 2 - (LobbyHud.TOP_Y + self.shift)
+			lift = math.clamp(math.ceil(need / k), 0, math.max(0, math.floor(room)))
+		end
+	end
+	self.tileLift = lift
+	self.tileRegion.Position = UDim2.new(0, t.x, t.centreY, -lift)
+	return lift
 end
 
 -- How far the Roblox top bar reaches down, in design px: the top regions move

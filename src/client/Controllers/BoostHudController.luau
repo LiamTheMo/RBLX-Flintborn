@@ -14,6 +14,7 @@ local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
 local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
 local Theme = require(script.Parent.Parent.Ui.Theme)
 
@@ -23,6 +24,17 @@ BoostHudController.ENDING_SECONDS = 30
 BoostHudController.REFRESH_SECONDS = 0.25
 
 BoostHudController.WIDTH = 340
+-- The list's left edge: right of the world ⚙ in the bottom-left corner
+-- (SettingsController.GEAR: 39 + 52, and 12 px between; on phones 16 + 52 at
+-- the HUD's 0.5 against this list's 0.6), so the corner button and the boosts
+-- never cover each other.
+BoostHudController.LEFT = 103
+BoostHudController.PHONE_LEFT = 70
+
+-- The list's left edge for the current form factor.
+function BoostHudController.Left(): number
+	return if KitScale.FormFactor() == "phone" then BoostHudController.PHONE_LEFT else BoostHudController.LEFT
+end
 
 local ICONS = { XP = "star", Luck = "treasure" }
 local FILLS = { XP = "xp", Luck = "green" }
@@ -57,12 +69,12 @@ local function build()
 		DisplayOrder = 4,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	}, player:WaitForChild("PlayerGui"))
-	-- Bottom left, growing upwards: clear of the party frames and menu tiles above
-	-- and of the XP bar and hotbar to the right.
+	-- Bottom left, growing upwards beside the world ⚙: clear of the party
+	-- frames and menu tiles above and of the XP bar and hotbar to the right.
 	ui.root = make("Frame", {
 		Name = "BoostList",
 		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, 16, 1, -20),
+		Position = UDim2.new(0, BoostHudController.Left(), 1, -20),
 		Size = UDim2.fromOffset(BoostHudController.WIDTH, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
@@ -112,6 +124,9 @@ local function update()
 		end
 	end
 	ui.root.Visible = any
+	if any then
+		ui.root.Position = UDim2.new(0, BoostHudController.Left(), 1, -20)
+	end
 end
 
 function BoostHudController.Start()

@@ -13,7 +13,7 @@ the reference image. The old parchment spec this file replaces described
 ## Overview
 
 The modal Settings window, opened by the lobby HUD's gear button or the ⚙
-button in the world (both at the bottom right, D27), or the Settings key (O). A dark overlay covers the whole
+button in the world (both at the bottom left, D28), or the Settings key (O). A dark overlay covers the whole
 screen, including the HUD (same overlay as the Inventory screen, see
 [`InventoryScreen.md` → Dim overlay](InventoryScreen.md#dim-overlay); 03 measures
 k ≈ 0.30, overlay ≈ #080807 at 70 % opacity). Tabs down the left choose a page;
@@ -318,12 +318,18 @@ Each has the default that will be used if unanswered.
   Gameplay (gears) and Graphics (magnifier) show a glyph; Audio and Controls
   show their label in the same column. RESET has no icon (the "refresh"
   stand-in read as a rune).
-- **World ⚙** (R4, moved by D27): on a HUD-scaled root (Kit.Scale.Hud, so it
-  follows the HUD and UI Scale) at the bottom right, 53 px in with its foot on
-  the hotbar's bottom line; on touch screens 12 screen px above Roblox's jump
-  button (`HudModel.CornerButton`). `SettingsController.GEAR` holds its place
-  and `SettingsController.GearPosition` places it; gamepad reaches it right of
-  the last hotbar slot.
+- **World ⚙** (R4, moved by D27 and D28): on a HUD-scaled root (Kit.Scale.Hud,
+  so it follows the HUD and UI Scale) at the bottom left, in the menu tiles'
+  column (39 px in, 16 on phones) with its foot on the hotbar's bottom line;
+  on touch screens its foot stands 12 screen px above Roblox's classic
+  thumbstick ring (`HudModel.ThumbstickCorner`), at the outer edge of the
+  dynamic thumbstick's start zone (844 × 390: x 8–34, y 265–288; the ring
+  starts at y 300). `SettingsController.GEAR` holds its place and
+  `SettingsController.GearPosition` places it (re-placed when the screen,
+  touch or the form factor changes); gamepad reaches it left of the first
+  hotbar slot and down from the bottom-left tile (Map;
+  `SettingsController.LinkGear`). The lobby's own button sits in the same
+  place (LobbyScreen.md).
 - Opens with the gamepad flag when the last input is a gamepad.
 
 ## Final audit fixes (phones)
