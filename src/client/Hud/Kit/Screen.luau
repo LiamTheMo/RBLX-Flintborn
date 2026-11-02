@@ -2,7 +2,8 @@
 -- window holder fitted to the screen (Kit.Scale.Window). Opening registers it
 -- with Kit.Modal (one window at a time; Escape / B close it), fades the veil in
 -- and pops the window from 0.94 to 1; closing reverses that and then disables
--- the gui.
+-- the gui. A click or tap on the veil, outside the window, closes the top layer
+-- the way Escape does (`dismissOutside = false` turns that off).
 --
 --   local screen = Kit.Screen.new("FlintbornInventory", { size = { 1187, 652 } })
 --   local window = Kit.Window.new(screen, { title = "Inventory", icon = "backpack" })
@@ -28,6 +29,7 @@ export type Props = {
 	parent: Instance?,
 	layer: string?,
 	onClose: (() -> ())?,
+	dismissOutside: boolean?,
 }
 
 function Screen.new(name: string, props: Props)
@@ -100,7 +102,34 @@ function Screen.new(name: string, props: Props)
 		maid = Core.Maid(),
 	}, Screen)
 	self.maid:Give(gui)
+	-- A press on the veil (anywhere outside the window) closes the top layer.
+	self.dismissOutside = props.dismissOutside ~= false
+	self.maid:Give(veil.InputBegan:Connect(function(input: InputObject)
+		local kind = input.UserInputType
+		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
+			self:PressOutside(Vector2.new(input.Position.X, input.Position.Y))
+		end
+	end))
 	return self
+end
+
+-- Whether screen point `point` lies on the window (its fitted holder).
+function Screen:Covers(point: Vector2): boolean
+	local at, size = self.holder.AbsolutePosition, self.holder.AbsoluteSize
+	return point.X >= at.X and point.Y >= at.Y and point.X <= at.X + size.X and point.Y <= at.Y + size.Y
+end
+
+-- A press at `point` on the veil: closes the top layer as Escape would, when
+-- this screen is that layer, the press missed the window and the screen allows
+-- it. Returns whether it closed something.
+function Screen:PressOutside(point: Vector2): boolean
+	if not (self.isOpen and self.dismissOutside) or Modal.Top() ~= self then
+		return false
+	end
+	if self:Covers(point) then
+		return false
+	end
+	return Modal.Back()
 end
 
 -- Keeps the window fitted to the screen (call once after building).

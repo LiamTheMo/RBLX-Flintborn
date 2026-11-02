@@ -183,6 +183,32 @@ do
 	second:Destroy()
 end
 
+-- A press outside the window (on the veil) closes the top layer like Escape:
+-- a dialog first, then the window under it; a press on the window does not.
+do
+	local screen = Kit.Screen.new("KitFlowOutside", { size = { 600, 400 } })
+	screen:Open()
+	local dialog = Kit.ConfirmDialog.Show({ title = "Sure?" })
+	check(not screen:PressOutside(Vector2.new(-20, -20)), "the window under a dialog ignores the press")
+	local top = Kit.Modal.Top()
+	check(top.PressOutside and top:PressOutside(Vector2.new(-20, -20)), "a press outside closes the dialog")
+	check(screen:IsOpen() and Kit.Modal.Count() == 1, "the window stays open under it")
+	local at, size = screen.holder.AbsolutePosition, screen.holder.AbsoluteSize
+	local inside = Vector2.new(at.X + size.X * 0.5, at.Y + size.Y * 0.5)
+	if screen.holder.AbsoluteSize.X > 0 then
+		check(not screen:PressOutside(inside), "a press on the window keeps it open")
+	end
+	check(screen:PressOutside(Vector2.new(-20, -20)), "a press outside closes the window")
+	check(not screen:IsOpen() and Kit.Modal.Count() == 0, "nothing left open")
+	local fixed = Kit.Screen.new("KitFlowFixed", { size = { 600, 400 }, dismissOutside = false })
+	fixed:Open()
+	check(not fixed:PressOutside(Vector2.new(-20, -20)) and fixed:IsOpen(), "dismissOutside = false stays open")
+	fixed:Close()
+	fixed:Destroy()
+	screen:Destroy()
+	dialog.Close()
+end
+
 -- Touch screens: Roblox's thumbstick and jump button hide while a layer is
 -- open and come back as they were when the stack empties.
 do

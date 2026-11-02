@@ -722,7 +722,9 @@ used last). Components and screens adapt to it live (`Kit.Input.Watch`).
 - **One window at a time.** `Kit.Modal` opens one window layer: opening a
   window closes the one before; a ConfirmDialog stacks on the dialog layer
   above it. Escape and gamepad B close the top layer (the dialog first). The
-  veil sinks clicks to the world and HUD.
+  veil sinks clicks to the world and HUD; a click or tap on it, outside the
+  window, closes the top layer the same way (`Kit.Screen` prop
+  `dismissOutside = false` keeps a layer that must not close by accident).
 - **Default selection.** When a window opens and the last input is a gamepad,
   its default control is selected (Play: the PLAY button); closing it restores
   the selection that was there before.
