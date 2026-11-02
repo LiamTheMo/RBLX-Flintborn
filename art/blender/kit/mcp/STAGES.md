@@ -25,7 +25,8 @@ running session holds; check with `Get-CimInstance Win32_Process -Filter "Name='
 same tris, sizes and renders as the GUI, mean pixel difference 0.02/255.
 
 ```bash
-PY=C:/Users/Orang/.local/bin/python3.14.exe
+PY=C:/Users/Orang/.local/bin/python3.14.exe   # or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
+export BLENDER_PATH=...                         # if blender.exe is not at D:/Steam/steamapps/common/Blender/
 $PY art/blender/kit/mcp/bgmcp.py start <port> art/blender/assets/kit/wip/MNNN.blend   # once, at the start
 $PY art/blender/kit/mcp/bgmcp.py run <port> <code.py>       # or `run <port> -` with a heredoc; prints the JSON response
 $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages are done
@@ -51,7 +52,7 @@ session (the GUI or a background one) is driven by only one agent at a time.
     `import importlib, kit_models, mNNN; importlib.reload(kit_models); importlib.reload(mNNN); mNNN.build()`.
   - Never hand-edit meshes that the builder would overwrite.
   - Load the helpers once if `NS` is empty:
-    `import sys; sys.path.insert(0, "D:/Projects/Roblox/RBLX-Flintborn/art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`.
+    `import sys; sys.path.insert(0, "<repo>/art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`, where `<repo>` is this checkout's root.
 - **Shared tools** live in `kit_models.py` (M) and `kit_mcp.py` (K). Read them before writing new code.
   - M: `mk`, `union_loose`, `carve`, `merge_in`, `finish`, `audit`, `views`, `display`, `sample`, `raw_sample`, `drop_specks`.
   - K: `hull_rock`, `blend`, `mix_key`, `noise_field`, `texture`, `refine`, `set_colour`, `calibrate`, `socket`, `check`.

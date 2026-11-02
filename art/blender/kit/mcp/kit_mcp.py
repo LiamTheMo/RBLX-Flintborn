@@ -4,7 +4,7 @@ The kit is re-modelled by hand in the open Blender (art/blender/assets/kit/Flint
 Helpers defined only inside an MCP call vanish when Blender restarts, so the shared ones live here.
 Load once per Blender session (each MCP call can then use NS["..."]):
 
-    import sys; sys.path.insert(0, "D:/Projects/Roblox/RBLX-Flintborn/art/blender/kit/mcp")
+    import sys; sys.path.insert(0, "<repo>/art/blender/kit/mcp")
     import importlib, kit_mcp; importlib.reload(kit_mcp); kit_mcp.install()
 
 Per-model shape builders stay in the MCP calls; only generic tools belong here.
@@ -19,7 +19,8 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-REPO = "D:/Projects/Roblox/RBLX-Flintborn"
+# Repo root from this file's place (art/blender/kit/mcp), so the kit works on any machine.
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")).replace("\\", "/")
 LIB = REPO + "/art/blender/lib"
 NS = bpy.app.driver_namespace
 
