@@ -2,7 +2,7 @@
 -- the compass in Roblox's top bar (stand-ins for its buttons at the top left).
 -- Built with the real scaling (Kit.Scale.Hud and HudController.PlaceTop, as
 -- HudController does) and the world_hud sample data; the layout checks
--- (hud_checks.luau, ARCHITECTURE D28) run on it.
+-- (hud_checks.luau, ARCHITECTURE D28, D29) run on it.
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local UserInputService = game:GetService("UserInputService")
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
@@ -27,10 +27,7 @@ local hud = HudController.Mount(root, layout, function() end)
 Kit.Scale.Hud(gui, root)
 local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 local chrome = __robloxChrome(gui, W, H)
-local placed = HudController.PlaceTop(
-	HudController.TopRegions(hud),
-	HudController.TopBar(chrome.bar, W, scale, game:GetService("GuiService").TopbarInset, 0)
-)
+local placed = __placeWorldHud(hud, W, H, scale, chrome, false)
 print(
 	("world_hud_wide: scale %.3f, root %d x %d design px, left shift %d, compass top %d, in the bar's row: %s"):format(
 		scale,
@@ -94,17 +91,9 @@ if UserInputService.TouchEnabled then
 	attack.Parent = root
 	Kit.IconButton.new(attack, { rect = { 0, 0, cfg.size[1], cfg.size[2] }, variant = "round", icon = "spear" })
 end
--- The world ⚙ as SettingsController places it, at the bottom left.
+-- The world ⚙ as SettingsController places it, in the bottom-left corner.
 do
-	local SettingsController = require(Client.Controllers.SettingsController)
-	local g = SettingsController.GEAR
-	local gear = Kit.IconButton.new(root, {
-		name = "Settings",
-		variant = "settings",
-		size = { g.w, g.h },
-		position = SettingsController.GearPosition(W, H, scale, false),
-		anchorPoint = Vector2.new(0, 1),
-	})
+	local gear = __worldGear(root, W, H, scale, chrome, false)
 	__checkWorldHud({
 		scene = "world_hud_wide",
 		hud = hud,

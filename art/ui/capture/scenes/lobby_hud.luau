@@ -6,8 +6,9 @@
 --   2 a party of three with an incoming invite, a non-leader's view, the
 --     game-update notice with XP pop-ups stacked above it, and a full hotbar
 -- Stand-ins for Roblox's top-bar buttons are drawn at the top left; the layout
--- checks (hud_checks.luau, ARCHITECTURE D28: Settings at the bottom left, the
--- pills alone at the top right) run on both pages.
+-- checks (hud_checks.luau, ARCHITECTURE D28, D29: the pills alone in the
+-- top-right corner level with Roblox's buttons, the Party panel under them,
+-- Settings in the bottom-left corner) run on both pages.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 -- Members' replicated level and progress (PlayerRow levelBar reads them).
 for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
@@ -26,9 +27,8 @@ local ME = { userId = 1, name = "LiamTheMo" }
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = LobbyHud.new(root, {})
-	hud:SetTopInset(58)
-	hud:SetScreen(W, H, 1, false)
 	hud.chrome = __robloxChrome(root, W, H)
+	__placeLobbyHud(hud, W, H, 1, hud.chrome, false)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	return gui, root, hud

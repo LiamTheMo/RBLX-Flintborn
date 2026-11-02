@@ -228,47 +228,71 @@ check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
 
--- The world ⚙ sits at the bottom left on a HUD-scaled root (ARCHITECTURE
--- D28); on touch screens it stands above Roblox's thumbstick ring, at the
--- screen's left edge.
+-- The world ⚙ sits in the bottom-left corner on a HUD-scaled root that covers
+-- the whole screen (ARCHITECTURE D29); on touch screens it goes left of
+-- Roblox's thumbstick ring, centred on its height, or above the ring where the
+-- screen has no room beside it (no side inset).
 local gear = SettingsController.gear
 local gearRoot = gear.root.Parent
+local gearGui = gearRoot.Parent
 check(
 	gear.root.Position.X.Scale == 0
-		and gear.root.Position.X.Offset == SettingsController.GEAR.left
+		and gear.root.Position.X.Offset == 24
 		and gear.root.Position.Y.Scale == 1
+		and gear.root.Position.Y.Offset == -24
 		and gear.root.AnchorPoint.X == 0
 		and gear.root.AnchorPoint.Y == 1,
-	"the world gear is at the bottom left"
+	"desktop: the world gear is in the bottom-left corner, 24 px from both edges"
 )
 check(gearRoot:FindFirstChildWhichIsA("UIScale") ~= nil, "the gear scales with the HUD")
+check(
+	gearGui.ScreenInsets == Enum.ScreenInsets.None and gearGui.IgnoreGuiInset == true,
+	"its gui covers the whole screen (ScreenInsets None)"
+)
 do
 	local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
-	for _, screen in { { 844, 390, 0.5, true }, { 667, 375, 0.5, true }, { 2000, 924, 0.982, false } } do
-		local w, h, k, phone = screen[1], screen[2], screen[3], screen[4]
-		local at = SettingsController.GearPosition(w, h, k, true, phone)
-		local stick = HudModel.Thumbstick(w, h)
-		local zone = HudModel.ThumbstickZone(w, h)
-		local foot = h + at.Y.Offset * k
-		local right = (at.X.Offset + SettingsController.GEAR.w) * k
+	local g = SettingsController.GEAR
+	for _, screen in
+		{
+			{ 844, 390, 0.5, __NOTCHED_PHONE, "beside" },
+			{ 667, 375, 0.5, __NO_INSETS, "above" },
+			{ 2000, 924, 0.884, __NO_INSETS, "above" },
+		}
+	do
+		local w, h, k, insets, want = screen[1], screen[2], screen[3], screen[4], screen[5]
+		local at = SettingsController.GearPosition(__hudScreen(w, h, k, true, insets))
+		local _, _, where = HudModel.GearCorner(__hudScreen(w, h, k, true, insets), g)
+		local stick = HudModel.Thumbstick(w, h, insets)
+		local left, foot = at.X.Offset * k, h + at.Y.Offset * k
+		local right, top = left + g.w * k, foot - g.h * k
+		local half = math.max(0, g.pad - g.w * k) / 2
+		local ok
+		if want == "beside" then
+			ok = right + half + g.gap <= stick.x + 0.01
+				and math.abs((top + foot) / 2 - (stick.y + stick.size / 2)) <= 0.5
+				and left >= 12 - 0.01
+		else
+			ok = foot + g.gap <= stick.y + 0.01 and left - half >= -0.01
+		end
 		check(
-			foot + SettingsController.GEAR.gap <= stick.y + 0.01 and at.X.Offset == (if phone then 16 else 39),
-			("touch %dx%d: the world gear's foot (%d) stands above the thumbstick ring (%d), at the left edge (x %d..%d of the thumbstick zone's %d)"):format(
+			ok and where == want,
+			("touch %dx%d (insets %d / %d): the world gear (x %d..%d, y %d..%d) sits %s the thumbstick ring (x %d, y %d)"):format(
 				w,
 				h,
-				foot,
-				stick.y,
-				at.X.Offset * k,
+				insets.left,
+				insets.right,
+				left,
 				right,
-				zone.w
+				top,
+				foot,
+				if want == "beside" then "left of" else "above",
+				stick.x,
+				stick.y
 			)
 		)
 	end
-	local desk = SettingsController.GearPosition(1672, 941, 1, false, false)
-	check(
-		desk.X.Offset == 39 and desk.Y.Offset == -49,
-		"desktop: the gear's foot on the hotbar's bottom line, 39 px in"
-	)
+	local desk = SettingsController.GearPosition(__hudScreen(1672, 941, 1, false))
+	check(desk.X.Offset == 24 and desk.Y.Offset == -24, "desktop: the gear 24 px from the left and the bottom")
 end
 -- Gamepad: the world gear sits left of the hotbar's first slot and under the
 -- tiles' bottom-left tile (Map in the 2 × 3 grid).

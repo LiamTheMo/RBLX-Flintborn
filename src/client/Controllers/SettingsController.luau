@@ -257,11 +257,10 @@ local function build()
 
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
-	-- button, so this one stays hidden there. It sits at the bottom left (D28),
-	-- in the menu tiles' column with its foot on the hotbar's bottom line, on a
-	-- root scaled like the HUD; on touch screens it moves up to stand above
-	-- Roblox's thumbstick ring (HudModel.ThumbstickCorner), at the outer edge
-	-- of the dynamic thumbstick's zone.
+	-- button, so this one stays hidden there. It sits in the bottom-left corner
+	-- (D29) on a root scaled like the HUD that covers the whole screen; on touch
+	-- screens it goes left of Roblox's thumbstick ring, between it and the
+	-- screen's edge (HudModel.GearCorner).
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
@@ -269,9 +268,7 @@ local function build()
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		IgnoreGuiInset = true,
 	}, playerGui)
-	pcall(function()
-		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
-	end)
+	Kit.Scale.FullScreen(gui)
 	-- Kit.Scale.Hud applies the UI Scale setting itself.
 	gui:SetAttribute("FitsItself", true)
 	local root = make("Frame", {
@@ -285,7 +282,7 @@ local function build()
 		name = "Open",
 		variant = "settings",
 		size = { g.w, g.h },
-		position = UDim2.new(0, g.left, 1, -g.bottom),
+		position = UDim2.new(0, HudModel.EDGE.margin, 1, -HudModel.EDGE.margin),
 		anchorPoint = Vector2.new(0, 1),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
@@ -294,19 +291,13 @@ local function build()
 	})
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function placeGear()
-		local size = gui.AbsoluteSize
-		gear.root.Position = SettingsController.GearPosition(
-			size.X,
-			size.Y,
-			uiScale.Scale,
-			UserInputService.TouchEnabled,
-			Kit.Scale.FormFactor() == "phone"
-		)
+		gear.root.Position = SettingsController.GearPosition(Kit.Scale.HudScreen(gui, uiScale.Scale))
 	end
 	uiScale:GetPropertyChangedSignal("Scale"):Connect(placeGear)
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeGear)
 	UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(placeGear)
 	Kit.Scale.OnFormFactorChanged(placeGear)
+	Kit.Scale.OnSafeInsetsChanged(placeGear)
 	placeGear()
 	SettingsController.gear = gear
 	-- Gamepad: the gear sits left of the world hotbar's first slot and under
@@ -322,25 +313,17 @@ local function build()
 	end
 end
 
--- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): at the bottom
--- left (D28), in the menu tiles' column (HudLayout tiles.x; on phones
--- tiles.phone, `phoneLeft`) with its foot on the hotbar's bottom line (49 up).
--- On touch screens its foot stands `gap` screen px above Roblox's thumbstick
--- ring (HudModel.ThumbstickCorner).
-SettingsController.GEAR = { left = 39, phoneLeft = 16, bottom = 49, w = 52, h = 46, gap = 12 }
+-- The world ⚙ button in HUD design px (HudLayout's 1672 × 941), in the
+-- bottom-left corner (D29; HudModel.GearCorner): the corner margin from the
+-- left and bottom edges; on touch screens left of Roblox's thumbstick ring,
+-- centred on its height, its touch pad (`pad` screen px) `gap` px clear of
+-- the ring, or above the ring where the screen has no room beside it.
+SettingsController.GEAR = { w = 52, h = 46, gap = 12, pad = 44 }
 
 -- The world ⚙'s position on its HUD root (anchored at its bottom-left corner)
--- for a screen w × h (screen px) at HUD scale k.
-function SettingsController.GearPosition(
-	width: number,
-	height: number,
-	k: number,
-	touch: boolean,
-	phone: boolean?
-): UDim2
-	local g = SettingsController.GEAR
-	local spec = { left = if phone then g.phoneLeft else g.left, bottom = g.bottom, gap = g.gap }
-	local left, bottom = HudModel.ThumbstickCorner(width, height, k, touch, spec)
+-- for a screen (Kit.Scale.HudScreen: {width, height, scale, touch, insets}).
+function SettingsController.GearPosition(screen): UDim2
+	local left, bottom = HudModel.GearCorner(screen, SettingsController.GEAR)
 	return UDim2.new(0, left, 1, -bottom)
 end
 
