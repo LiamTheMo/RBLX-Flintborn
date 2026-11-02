@@ -5,11 +5,13 @@
 -- shows the deploy loadout and the Settings button at the bottom left. (The
 -- mockup's top-left player card is left out; the level/XP bar opens Progress
 -- instead. The mockup's Settings button beside the pills moved to the bottom
--- left, under the menu tiles: owner decisions, ARCHITECTURE D27 and D28.)
+-- left, under the menu tiles: owner decisions, ARCHITECTURE D27 and D28. The
+-- pills, the Party panel and Settings sit in the screen's corners, D29.)
 --
 -- Display only: LobbyHudController feeds it through the setters and handles the
 -- presses it reports through `actions`. Regions are pinned to the screen edges
--- inside `parent`, which Kit.Scale.Hud sizes to 1/scale of the screen.
+-- inside `parent`, which Kit.Scale.Hud sizes to 1/scale of the whole screen
+-- (Kit.Scale.FullScreen); SetScreen keeps them out of notches (D29).
 --
 --   local hud = LobbyHud.new(root, { onTile = open, onSettings = SettingsController.Toggle })
 --   hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
@@ -26,13 +28,15 @@ local LobbyHud = {}
 LobbyHud.__index = LobbyHud
 
 -- Region origins and sizes in design px (measured on the mockup; the spec's
--- element tree). Top regions move down together when the Roblox top bar
--- reaches past the mockup's top margin TOP_Y (phones), keeping TOP_GAP below
--- it.
+-- element tree). The tiles keep below TOP_Y, or TOP_GAP below the Roblox top
+-- bar where it reaches further (phones). Coins and Gems sit in the top-right
+-- corner level with the top bar's buttons, the Party panel `gap` under them
+-- (D29); `right` is the corner margin (HudModel.EDGE), which SetScreen keeps
+-- to the edge rule.
 LobbyHud.TOP_Y = 60
-LobbyHud.TOP_RIGHT = { right = 53, y = 70, w = 234, h = 46 }
+LobbyHud.TOP_RIGHT = { right = HudModel.EDGE.margin, y = HudModel.TOP_ROW_MIN, w = 234, h = 46 }
 LobbyHud.TILES = { x = 68, centreY = 448 / 941, w = 190, h = 272, pitchX = 102, pitchY = 94, tileW = 88, tileH = 84 }
-LobbyHud.PARTY = { right = 53, y = 258, w = 294, h = 244 }
+LobbyHud.PARTY = { right = HudModel.EDGE.margin, gap = 16, w = 294, h = 244 }
 LobbyHud.BOTTOM = { bottom = 49, w = 572, h = 124 }
 LobbyHud.TOP_GAP = 2
 
@@ -82,13 +86,14 @@ LobbyHud.PHONE = {
 }
 LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, w = 234 }
 
--- The Settings button (the kit's square HUD button) at the bottom left (D28),
--- where the world's is (SettingsController.GEAR): 39 px from the left edge
--- (phones 16), its foot on the hotbar's bottom line. On touch screens its
--- foot stands `gap` screen px above Roblox's thumbstick ring
--- (HudModel.ThumbstickCorner), at the outer edge of the dynamic thumbstick's
--- zone; the tiles move up when its touch pad would meet theirs (SetScreen).
-LobbyHud.GEAR = { left = 39, phoneLeft = 16, bottom = 49, w = 52, h = 46, gap = 12 }
+-- The Settings button (the kit's square HUD button) in the bottom-left corner
+-- (D29), where the world's is (SettingsController.GEAR; HudModel.GearCorner):
+-- the corner margin from the left and bottom edges; on touch screens left of
+-- Roblox's thumbstick ring, centred on its height, its touch pad (`pad`
+-- screen px) `gap` px clear of the ring, or above the ring where there is no
+-- room beside it; the tiles move up when its touch pad would meet theirs
+-- (SetScreen).
+LobbyHud.GEAR = { w = 52, h = 46, gap = 12, pad = 44 }
 -- Screen px kept between the Settings button's touch pad and the tiles'.
 LobbyHud.PAD_GAP = 2
 
@@ -209,13 +214,13 @@ function LobbyHud.new(parent: Instance, actions)
 		outline = true,
 	})
 
-	-- Right: the Party panel (the 01 frame). The title row opens the Party
-	-- window (D17). The first member's row (with the add-player button) stays
-	-- put; the rest of the party, invites and free places scroll beside the
-	-- thin rail under it, as the mockup draws the rail.
+	-- Right: the Party panel (the 01 frame), right under the pills. The title
+	-- row opens the Party window (D17). The first member's row (with the
+	-- add-player button) stays put; the rest of the party, invites and free
+	-- places scroll beside the thin rail under it, as the mockup draws the rail.
 	local p = LobbyHud.PARTY
 	self.partyRegion = region(parent, "Party", {
-		Position = UDim2.new(1, -(p.right + p.w), 0, p.y),
+		Position = UDim2.new(1, -(p.right + p.w), 0, tr.y + tr.h + p.gap),
 		Size = UDim2.fromOffset(p.w, p.h),
 	})
 	self.panel = Kit.Picture.new(self.partyRegion, { name = "Panel", rect = { 0, 0, p.w, p.h }, role = "panel.party" })
@@ -374,11 +379,11 @@ function LobbyHud.new(parent: Instance, actions)
 		self.slots[index] = slot
 	end
 
-	-- Bottom left: Settings (SetScreen keeps it above the touch thumbstick).
+	-- Bottom left: Settings (SetScreen moves it beside the touch thumbstick).
 	local g = LobbyHud.GEAR
 	self.settingsRegion = region(parent, "Settings", {
 		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0, g.left, 1, -g.bottom),
+		Position = UDim2.new(0, HudModel.EDGE.margin, 1, -HudModel.EDGE.margin),
 		Size = UDim2.fromOffset(g.w, g.h),
 	})
 	self.settings = Kit.IconButton.new(self.settingsRegion, {
@@ -433,7 +438,7 @@ function LobbyHud:_buildTopRight()
 	local tr = LobbyHud.TOP_RIGHT
 	local fire = self.fire
 	self.topRight.Size = UDim2.fromOffset(layout.w, tr.h)
-	self.topRight.Position = UDim2.new(1, -(tr.right + layout.w), 0, tr.y + self.shift)
+	self.topRight.Position = UDim2.new(1, -(tr.right + layout.w), 0, self.topY or tr.y)
 	self.coins = Kit.CurrencyPill.new(self.topRight, {
 		name = "Coins",
 		rect = layout.coins,
@@ -518,6 +523,10 @@ function LobbyHud:_formChanged()
 	if self.party then
 		self:SetParty(self.party)
 	end
+	if self.screen then
+		-- The pills' width changed: back to their edge.
+		Kit.Scale.PinToEdge(self.topRight, "right", self.screen)
+	end
 end
 
 -- Gamepad neighbours: the tile grid, the top-right row, the party column, the
@@ -577,44 +586,68 @@ function LobbyHud:SetMenuHint(visible: boolean)
 	self.menuHint.Visible = visible
 end
 
--- The screen (w × h screen px) and the HUD's scale: on touch screens the
--- Settings button stands above Roblox's thumbstick ring (LobbyHud.GEAR), and
--- the menu tiles move up as far as its touch pad needs (never under the top
--- bar's margin). Returns the tiles' lift in design px.
-function LobbyHud:SetScreen(width: number, height: number, scale: number, touch: boolean): number
+-- The screen (Kit.Scale.HudScreen: {width, height, scale, touch, insets}):
+-- Coins and Gems and the Party panel keep to the right edge by the edge rule
+-- (Kit.Scale.PinToEdge: the corner margin in the top band, at least the
+-- device safe inset where a region reaches the middle band; D29), the tiles
+-- keep their place inside the safe area, and Settings goes into the
+-- bottom-left corner (HudModel.GearCorner: on touch screens left of Roblox's
+-- thumbstick ring, or above it where there is no room beside it). When its
+-- touch pad would meet the tiles' the tiles move up as far as it needs (never
+-- under the top bar's margin). Returns the tiles' lift in design px.
+function LobbyHud:SetScreen(screen): number
+	self.screen = screen
 	local g, t = LobbyHud.GEAR, LobbyHud.TILES
-	local phone = Kit.Scale.FormFactor(height, width) == "phone"
-	local spec = { left = if phone then g.phoneLeft else g.left, bottom = g.bottom, gap = g.gap }
-	local left, bottom = HudModel.ThumbstickCorner(width, height, scale, touch, spec)
+	local k = math.max(screen.scale or 1, 0.01)
+	local insets = screen.insets or HudModel.NO_INSETS
+	Kit.Scale.PinToEdge(self.topRight, "right", screen)
+	Kit.Scale.PinToEdge(self.partyRegion, "right", screen)
+	local left, bottom = HudModel.GearCorner(screen, g)
 	self.settingsRegion.Position = UDim2.new(0, left, 1, -bottom)
+	local width, height = screen.width or 0, screen.height or 0
+	local tileX = t.x + insets.left / k
 	local lift = 0
-	if touch and width > 0 and height > 0 then
-		local k = math.max(scale, 0.01)
+	if screen.touch and width > 0 and height > 0 then
 		local touchMin = Kit.Tokens.Space("touchMin", 44)
 		local rootH = height / k
 		-- Touch pads grow to touchMin screen px around the art (Kit.Interact).
-		local gearPadTop = (rootH - bottom - g.h) * k - math.max(0, touchMin - g.h * k) / 2
+		local gearPad = {
+			left * k - math.max(0, touchMin - g.w * k) / 2,
+			(rootH - bottom - g.h) * k - math.max(0, touchMin - g.h * k) / 2,
+			(left + g.w) * k + math.max(0, touchMin - g.w * k) / 2,
+		}
 		local tilesFoot = (t.centreY * rootH + t.h / 2) * k + math.max(0, touchMin - t.tileH * k) / 2
-		local need = tilesFoot + LobbyHud.PAD_GAP - gearPadTop
-		if need > 0 then
+		local tilesLeft = tileX * k - math.max(0, touchMin - t.tileW * k) / 2
+		local tilesRight = (tileX + t.w) * k + math.max(0, touchMin - t.tileW * k) / 2
+		local need = tilesFoot + LobbyHud.PAD_GAP - gearPad[2]
+		local beside = gearPad[3] + LobbyHud.PAD_GAP <= tilesLeft or tilesRight + LobbyHud.PAD_GAP <= gearPad[1]
+		if need > 0 and not beside then
 			local room = t.centreY * rootH - t.h / 2 - (LobbyHud.TOP_Y + self.shift)
 			lift = math.clamp(math.ceil(need / k), 0, math.max(0, math.floor(room)))
 		end
 	end
 	self.tileLift = lift
-	self.tileRegion.Position = UDim2.new(0, t.x, t.centreY, -lift)
+	self.tileRegion.Position = UDim2.new(0, tileX, t.centreY, -lift)
 	return lift
 end
 
--- How far the Roblox top bar reaches down, in design px: the top regions move
--- below it when it reaches past the mockup's top margin.
-function LobbyHud:SetTopInset(designPx: number)
+-- The Roblox top bar: `designPx` how far it reaches down (the tiles keep
+-- below it) and `rowTop` the top of its button row, in design px (default:
+-- the row under a standard bar). Coins and Gems sit level with the buttons'
+-- top in the top-right corner, below the bar only when its right-hand area
+-- reaches over them (`reachesOver`); the Party panel follows them.
+function LobbyHud:SetTopInset(designPx: number, rowTop: number?, reachesOver: boolean?)
 	local tr, p = LobbyHud.TOP_RIGHT, LobbyHud.PARTY
-	local shift = math.max(0, math.ceil(designPx + LobbyHud.TOP_GAP - LobbyHud.TOP_Y))
-	self.shift = shift
-	local w = (if self.phone then LobbyHud.PHONE.pills else LobbyHud.PILLS).w
-	self.topRight.Position = UDim2.new(1, -(tr.right + w), 0, tr.y + shift)
-	self.partyRegion.Position = UDim2.new(1, -(p.right + p.w), 0, p.y + shift)
+	self.shift = math.max(0, math.ceil(designPx + LobbyHud.TOP_GAP - LobbyHud.TOP_Y))
+	local y = rowTop or tr.y
+	if reachesOver then
+		y = math.max(y, math.ceil(designPx + LobbyHud.TOP_GAP))
+	end
+	self.topY = y
+	local x = self.topRight.Position.X
+	self.topRight.Position = UDim2.new(x.Scale, x.Offset, 0, y)
+	local px = self.partyRegion.Position.X
+	self.partyRegion.Position = UDim2.new(px.Scale, px.Offset, 0, y + tr.h + p.gap)
 end
 
 -- view: the progression snapshot {level, xp, xpToNext} (nil while loading).

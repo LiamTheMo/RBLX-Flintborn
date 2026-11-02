@@ -222,57 +222,119 @@ function HudModel.SliceScale(
 	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1) / k
 end
 
+-- The device safe area (ARCHITECTURE D29): how far notches, the Dynamic
+-- Island and rounded corners reach in from each edge of the screen, in screen
+-- px ({left, top, right, bottom}; Kit.Scale.SafeInsets measures it). Roblox's
+-- own touch controls sit inside it; the HUDs draw on the whole screen
+-- (ScreenInsets None) and keep to it themselves (HudModel.EdgeGap).
+HudModel.NO_INSETS = table.freeze({ left = 0, top = 0, right = 0, bottom = 0 })
+
+local function safe(insets)
+	return insets or HudModel.NO_INSETS
+end
+
+-- The HUDs' edge rule (D29): a region pinned to the left or right edge keeps
+-- `margin` design px from the screen's edge while it lies wholly in a corner
+-- band (the top `topBand` or the bottom `bottomBand` of the screen's height,
+-- where a phone held sideways has no notch or island); a region reaching the
+-- middle band keeps at least the device safe inset on that side.
+HudModel.EDGE = table.freeze({ margin = 24, topBand = 0.30, bottomBand = 0.25 })
+
+-- True when a region spanning y top..bottom (screen px) on a screen `height`
+-- px tall lies wholly in the top or the bottom corner band.
+function HudModel.InCornerBand(top: number, bottom: number, height: number): boolean
+	local e = HudModel.EDGE
+	return bottom <= height * e.topBand + 0.5 or top >= height * (1 - e.bottomBand) - 0.5
+end
+
+-- The gap (design px, at HUD scale k) between a region spanning y top..bottom
+-- (screen px) and its side edge, whose device safe inset is `safeInset` screen
+-- px: the corner margin in a corner band, else at least the safe inset.
+function HudModel.EdgeGap(top: number, bottom: number, height: number, safeInset: number?, k: number): number
+	local margin = HudModel.EDGE.margin
+	if HudModel.InCornerBand(top, bottom, height) then
+		return margin
+	end
+	return math.max(margin, (safeInset or 0) / math.max(k, 0.01))
+end
+
 -- Roblox's touch jump button on a screen w × h (screen px), as the default
--- PlayerModule (TouchJump) places it: 70 px square, 95 px from the right and
--- 90 from the bottom when the short side is 500 px or less; otherwise 120 px
--- square, 170 from the right and 210 from the bottom. Returns {x, y, size},
--- its top-left corner and side.
-function HudModel.JumpButton(width: number, height: number)
+-- PlayerModule (TouchJump) places it inside the safe area (`insets`, screen
+-- px): 70 px square, 95 px from the right and 90 from the bottom when the
+-- short side is 500 px or less; otherwise 120 px square, 170 from the right
+-- and 210 from the bottom. Returns {x, y, size}, its top-left corner and side,
+-- on the whole screen.
+function HudModel.JumpButton(width: number, height: number, insets: any?)
+	local i = safe(insets)
 	local small = math.min(width, height) <= 500
 	local size = if small then 70 else 120
 	return {
-		x = width - (size * 1.5 - 10),
-		y = height - (if small then size + 20 else size * 1.75),
+		x = width - i.right - (size * 1.5 - 10),
+		y = height - i.bottom - (if small then size + 20 else size * 1.75),
 		size = size,
 	}
 end
 
 -- Roblox's classic touch thumbstick (the ring the "Thumbstick" movement mode
 -- draws) on a screen w × h (screen px), as the default PlayerModule
--- (ClassicThumbstick) places it, the mirror of the jump button: 70 px square,
--- 25 px from the left and 90 from the bottom when the short side is 500 px or
--- less; otherwise 120 px square, 60 from the left and 210 from the bottom.
--- Returns {x, y, size}, its top-left corner and side.
-function HudModel.Thumbstick(width: number, height: number)
+-- (ClassicThumbstick) places it inside the safe area, the mirror of the jump
+-- button: 70 px square, 25 px from the left and 90 from the bottom when the
+-- short side is 500 px or less; otherwise 120 px square, 60 from the left and
+-- 210 from the bottom. Returns {x, y, size}, its top-left corner and side.
+function HudModel.Thumbstick(width: number, height: number, insets: any?)
+	local i = safe(insets)
 	local small = math.min(width, height) <= 500
 	local size = if small then 70 else 120
 	return {
-		x = if small then size / 2 - 10 else size / 2,
-		y = height - (if small then size + 20 else size * 1.75),
+		x = i.left + (if small then size / 2 - 10 else size / 2),
+		y = height - i.bottom - (if small then size + 20 else size * 1.75),
 		size = size,
 	}
 end
 
 -- Where the default dynamic thumbstick starts on a landscape screen w × h
--- (screen px): a touch landing anywhere in the left 40 % below the top third
--- (DynamicThumbstick's frame). Returns {x, y, w, h}.
-function HudModel.ThumbstickZone(width: number, height: number)
-	return { x = 0, y = height / 3, w = width * 0.4, h = height * 2 / 3 }
+-- (screen px): a touch landing anywhere in the left 40 % (of the safe area)
+-- below the top third (DynamicThumbstick's frame). Returns {x, y, w, h}.
+function HudModel.ThumbstickZone(width: number, height: number, insets: any?)
+	local i = safe(insets)
+	local w, h = width - i.left - i.right, height - i.top - i.bottom
+	return { x = i.left, y = i.top + h / 3, w = w * 0.4, h = h * 2 / 3 }
 end
 
--- Where a bottom-left corner button (the HUDs' ⚙) sits, as its distance from
--- the HUD root's left and bottom edges in design px, on a screen w × h (screen
--- px) at HUD scale k. Without touch: spec.left and spec.bottom. With touch its
--- foot stays `spec.gap` screen px above Roblox's thumbstick ring (where the
--- classic thumbstick draws, the bottom of the dynamic thumbstick's zone), so
--- it keeps to the zone's outer edge, above where a thumb lands. spec: {left,
--- bottom, gap}.
-function HudModel.ThumbstickCorner(width: number, height: number, k: number, touch: boolean, spec): (number, number)
-	if not touch or width <= 0 or height <= 0 then
-		return spec.left, spec.bottom
+-- Where the HUDs' bottom-left corner button (the ⚙, `spec.w` × `spec.h`
+-- design px) sits, as its distance from the HUD root's left and bottom edges
+-- in design px. `screen`: {width, height (screen px), scale (the HUD's
+-- UIScale), touch, insets}. Without touch: the corner margin from both edges
+-- (HudModel.EDGE). On touch screens it goes into the corner left of Roblox's
+-- thumbstick ring, centred on the ring's height and in the room between the
+-- screen's edge and the ring, with its touch pad (`spec.pad` screen px)
+-- `spec.gap` px clear of the ring; a screen without that room (no side
+-- inset) puts it above the ring instead, its foot `spec.gap` px over it, at
+-- the edge gap the band rule gives (HudModel.EdgeGap). Returns left, bottom
+-- and where it went ("corner", "beside" or "above").
+function HudModel.GearCorner(screen, spec): (number, number, string)
+	local margin = HudModel.EDGE.margin
+	local width, height = screen.width or 0, screen.height or 0
+	if not screen.touch or width <= 0 or height <= 0 then
+		return margin, margin, "corner"
 	end
-	local stick = HudModel.Thumbstick(width, height)
-	return spec.left, math.max(spec.bottom, math.ceil((height - stick.y + spec.gap) / math.max(k, 0.01)))
+	local k = math.max(screen.scale or 1, 0.01)
+	local insets = safe(screen.insets)
+	local stick = HudModel.Thumbstick(width, height, insets)
+	local w, h = spec.w * k, spec.h * k
+	local half = math.max(spec.pad or 44, w) / 2
+	-- Centre x (screen px): the art at least `margin` in and its pad on the
+	-- screen, the pad `gap` clear of the ring.
+	local lo = math.max(margin * k + w / 2, half)
+	local hi = stick.x - spec.gap - half
+	if lo <= hi then
+		local cx = math.clamp(stick.x / 2, lo, hi)
+		local foot = stick.y + stick.size / 2 + h / 2
+		return (cx - w / 2) / k, (height - foot) / k, "beside"
+	end
+	local bottom = math.max(margin, math.ceil((height - stick.y + spec.gap) / k))
+	local foot = height - bottom * k
+	return HudModel.EdgeGap(foot - h, foot, height, insets.left, k), bottom, "above"
 end
 
 -- Roblox's top-bar buttons (the Roblox logo, then the menu and chat pill) are

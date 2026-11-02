@@ -157,7 +157,7 @@ test("Roblox's touch jump button", function()
 	expectEq(tablet.y, 558, "210 px from the bottom")
 end)
 
-test("the corner settings button keeps above the touch thumbstick", function()
+test("Roblox's touch controls sit inside the device safe area", function()
 	local phone = HudModel.Thumbstick(844, 390)
 	expectEq(phone.size, 70, "a phone's thumbstick ring is 70 px")
 	expectEq(phone.x, 25, "25 px from the left")
@@ -170,18 +170,52 @@ test("the corner settings button keeps above the touch thumbstick", function()
 	expectEq(zone.y, 130, "the dynamic thumbstick starts below the top third")
 	expect(math.abs(zone.w - 337.6) < 1e-6, "in the left 40 %")
 
-	local spec = { left = 39, bottom = 49, gap = 12 }
-	local left, bottom = HudModel.ThumbstickCorner(1672, 941, 1, false, spec)
-	expectEq(left, 39, "desktop: the left margin")
-	expectEq(bottom, 49, "desktop: the hotbar's bottom margin")
+	-- A notched phone held sideways: 47 px side insets.
+	local notched = { left = 47, top = 0, right = 47, bottom = 0 }
+	expectEq(HudModel.Thumbstick(844, 390, notched).x, 72, "the ring 25 px inside the left inset")
+	expectEq(HudModel.JumpButton(844, 390, notched).x, 702, "the jump button 95 px inside the right inset")
+	expectEq(HudModel.ThumbstickZone(844, 390, notched).x, 47, "the zone starts at the inset")
+end)
 
-	-- Touch: its foot `gap` screen px over the thumbstick ring's top.
-	left, bottom = HudModel.ThumbstickCorner(844, 390, 0.5, true, spec)
-	expectEq(left, 39, "touch: the left margin stays")
-	expectEq(bottom, 204, "touch: (90 + 12) / 0.5")
-	expect(390 - bottom * 0.5 + 12 <= phone.y, "touch: clear of the phone's thumbstick")
-	left, bottom = HudModel.ThumbstickCorner(1024, 768, 0.55, true, spec)
-	expect(768 - bottom * 0.55 + 12 <= tablet.y + 0.01, "touch: clear of the tablet's thumbstick")
+test("the edge rule: corner margin in the corner bands, the safe inset beside the middle", function()
+	expectEq(HudModel.EDGE.margin, 24, "24 design px from the edge")
+	-- 844 × 390: the top band ends at y 117, the bottom band starts at 292.5.
+	expect(HudModel.InCornerBand(12, 95, 390), "the vitals' rows fit the top band")
+	expect(not HudModel.InCornerBand(43, 165, 390), "the Party panel reaches the middle band")
+	expect(HudModel.InCornerBand(323, 347, 390), "a button beside the thumbstick is in the bottom band")
+	expect(not HudModel.InCornerBand(265, 288, 390), "one above the thumbstick is not")
+	expectEq(HudModel.EdgeGap(12, 95, 390, 47, 0.5), 24, "corner band: the margin, inset or not")
+	expectEq(HudModel.EdgeGap(124, 205, 390, 47, 0.5), 94, "middle band: the 47 px inset (94 design px at 0.5)")
+	expectEq(HudModel.EdgeGap(124, 205, 390, 0, 0.5), 24, "middle band without an inset: the margin")
+	expectEq(HudModel.EdgeGap(124, 205, 390, 5, 0.5), 24, "never closer than the margin")
+end)
+
+test("the corner settings button: the corner, beside the thumbstick or above it", function()
+	local g = { w = 52, h = 46, gap = 12, pad = 44 }
+	local left, bottom, where = HudModel.GearCorner({ width = 1672, height = 941, scale = 1, touch = false }, g)
+	expectEq(left, 24, "desktop: the corner margin from the left")
+	expectEq(bottom, 24, "desktop: and from the bottom")
+	expectEq(where, "corner", "desktop: the corner")
+
+	-- A notched phone: room between the screen's edge and the ring (x 72).
+	local notched = { left = 47, top = 0, right = 47, bottom = 0 }
+	local screen = { width = 844, height = 390, scale = 0.5, touch = true, insets = notched }
+	left, bottom, where = HudModel.GearCorner(screen, g)
+	expectEq(where, "beside", "notched phone: beside the ring")
+	local x1, x2 = left * 0.5, (left + g.w) * 0.5
+	local foot = 390 - bottom * 0.5
+	expect(math.abs((x1 + x2) / 2 - 36) < 1e-6, "centred between the edge and the ring")
+	expect(x2 + (44 - 26) / 2 + g.gap <= 72 + 1e-6, "its touch pad 12 px clear of the ring")
+	expect(math.abs(foot - 23 / 2 - 335) < 1e-6, "centred on the ring's height")
+	expect(HudModel.InCornerBand(foot - 23, foot, 390), "in the bottom band")
+
+	-- No inset (a 667 × 375 phone): the ring starts 25 px in, so above it.
+	left, bottom, where = HudModel.GearCorner({ width = 667, height = 375, scale = 0.5, touch = true }, g)
+	expectEq(where, "above", "no room beside the ring: above it")
+	expectEq(bottom, 204, "its foot (90 + 12) / 0.5 up")
+	expectEq(left, 24, "at the margin (no inset)")
+	left, bottom = HudModel.GearCorner({ width = 1024, height = 768, scale = 0.55, touch = true }, g)
+	expect(768 - bottom * 0.55 + 12 <= HudModel.Thumbstick(1024, 768).y + 0.01, "a tablet: clear of its ring")
 end)
 
 test("the top bar's row and an item centred in it", function()

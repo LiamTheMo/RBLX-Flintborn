@@ -18,6 +18,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local ForgeController = require(script.Parent.ForgeController)
 local JournalController = require(script.Parent.JournalController)
@@ -121,12 +122,10 @@ local function build()
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = Kit.Tokens.Order("hud")
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses the mockup's full-screen coordinates and keeps clear of the
-	-- top bar itself (LobbyHud:SetTopInset); device cut-outs stay excluded.
-	gui.IgnoreGuiInset = true
-	pcall(function()
-		gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
-	end)
+	-- The layout uses the mockup's coordinates on the whole screen and keeps
+	-- clear of the top bar (LobbyHud:SetTopInset) and of notches
+	-- (LobbyHud:SetScreen, D29) itself.
+	Kit.Scale.FullScreen(gui)
 	root = Instance.new("Frame")
 	root.Name = "Root"
 	root.BackgroundTransparency = 1
@@ -158,15 +157,36 @@ local function build()
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
 
+-- True when the Roblox top bar's right-hand area reaches over Coins and Gems
+-- in the top-right corner: its free area (GuiService.TopbarInset) ends before
+-- their right edge (the corner margin in, at HUD scale k) and before the safe
+-- area's (`safeRight` screen px in; Roblox's own right-hand items sit inside
+-- it), on a screen `width` px wide whose gui starts at `originX`.
+function LobbyHudController.BarReachesRight(width: number, originX: number, k: number, safeRight: number?): boolean
+	local ok, bar = pcall(function()
+		return GuiService.TopbarInset
+	end)
+	if not ok or typeof(bar) ~= "Rect" or bar.Max.Y <= 0 or bar.Max.X <= bar.Min.X then
+		return false
+	end
+	return bar.Max.X - originX < math.min(width - HudModel.EDGE.margin * k, width - (safeRight or 0)) - 0.5
+end
+
 -- Root scale (HudModel.HudScale, × 0.9 on short touch screens), the top bar's
--- reach in design px and, on touch screens, the thumbstick's corner.
+-- reach and button row in design px and the screen's edges and, on touch
+-- screens, the thumbstick's corner.
 local function watchScale()
 	table.insert(stops, Kit.Scale.Hud(gui, root))
 	local scale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function inset()
-		hud:SetTopInset(Kit.Scale.WindowTop(gui) / math.max(scale.Scale, 0.01))
-		local size = gui.AbsoluteSize
-		hud:SetScreen(size.X, size.Y, scale.Scale, UserInputService.TouchEnabled)
+		local k = math.max(scale.Scale, 0.01)
+		local screen = Kit.Scale.HudScreen(gui, scale.Scale)
+		hud:SetTopInset(
+			Kit.Scale.WindowTop(gui) / k,
+			HudModel.TopRow(Kit.Scale.TopInset(gui)) / k,
+			LobbyHudController.BarReachesRight(screen.width, gui.AbsolutePosition.X, k, screen.insets.right)
+		)
+		hud:SetScreen(screen)
 	end
 	keep(scale:GetPropertyChangedSignal("Scale"):Connect(inset))
 	keep(gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(inset))
@@ -174,6 +194,7 @@ local function watchScale()
 	pcall(function()
 		keep(GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(inset))
 	end)
+	table.insert(stops, Kit.Scale.OnSafeInsetsChanged(inset))
 	inset()
 end
 

@@ -4,7 +4,7 @@
   "frameOutset": [4, 4, 5, 5],
   "party": {
     "anchor": [0, 0],
-    "pos": [0, 39, 0, 60],
+    "pos": [0, 24, 0, 60],
     "width": 294,
     "header": [28, 18, 238, 34],
     "listTop": 58,
@@ -49,7 +49,7 @@
   },
   "vitals": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 12],
+    "pos": [1, -24, 0, 12],
     "size": [240, 50],
     "pitch": 58,
     "low": 0.25,
@@ -62,13 +62,13 @@
   },
   "status": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 188],
+    "pos": [1, -24, 0, 188],
     "size": [315, 38],
     "gap": 8
   },
   "objective": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 236],
+    "pos": [1, -24, 0, 236],
     "size": [315, 134],
     "header": [22, 16, 271, 34],
     "rowTop": 58,
@@ -83,7 +83,7 @@
   },
   "event": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 382],
+    "pos": [1, -24, 0, 382],
     "size": [315, 128],
     "header": [22, 16, 271, 34],
     "nameY": 56,
@@ -92,17 +92,17 @@
     "descriptionH": 36,
     "descriptionSize": 13,
     "maxLines": 3,
-    "touch": { "pos": [1, -53, 0, 410], "descriptionSize": 15 },
-    "phone": { "anchor": [0, 0], "pos": [0, 16, 0, 238] }
+    "touch": { "pos": [1, -24, 0, 410], "descriptionSize": 15 },
+    "phone": { "anchor": [0, 0], "pos": [0, 24, 0, 238] }
   },
   "tiles": {
-    "x": 39,
+    "x": 24,
     "centreY": 0.476,
     "size": [190, 272],
     "tile": [88, 84],
     "pitch": [102, 94],
     "columns": 2,
-    "phone": { "anchor": [0, 0], "pos": [0, 16, 0, 60], "columns": 3, "tile": [80, 80], "pitch": [88, 86] }
+    "phone": { "anchor": [0, 0], "pos": [0, 24, 0, 60], "columns": 3, "tile": [80, 80], "pitch": [88, 86] }
   },
   "bottom": {
     "anchor": [0.5, 1],
