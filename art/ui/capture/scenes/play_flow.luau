@@ -139,7 +139,14 @@ check(window.play.root.Visible and window.readyButton == nil, "the leader gets P
 check(window.play.root:GetAttribute("KitState") == "normal", "PLAY can be pressed")
 check(gui:FindFirstChild("Ready", true) == nil and gui:FindFirstChild("NotReady", true) == nil, "no ready dots")
 check(gui:FindFirstChild("Tag", true) == nil, "no Leader tag")
-check(#window.partyList:Content():GetChildren() >= 3, "three party rows")
+check(window.party:FindFirstChild("Member3") ~= nil, "three party tiles")
+local scrollers = 0
+for _, object in gui:GetDescendants() do
+	if object:IsA("ScrollingFrame") then
+		scrollers += 1
+	end
+end
+check(scrollers == 0, "the whole party shows at once (no scrolling list)")
 local shown = texts(gui)
 check(string.find(shown, "ForestRanger", 1, true) ~= nil, "member names come from the party view")
 check(string.find(shown, "LV. 15", 1, true) ~= nil, "levels come from each player's Level attribute")

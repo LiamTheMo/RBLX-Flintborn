@@ -80,7 +80,7 @@ for _, part in window.screen.gui:GetDescendants() do
 		part:SetAttribute("DebugState", "")
 	end
 end
-window:SetCategory("Food")
+window:SetCategory("Consumables")
 window:SetQuery("axe")
 window:SetBusy(true)
 __dump(Players.LocalPlayer.PlayerGui, 1672, 941, { background = "art/reference/ui/lobby/01_hud.png" })

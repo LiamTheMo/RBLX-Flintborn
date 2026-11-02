@@ -20,6 +20,7 @@
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local InventoryModel = require(ReplicatedStorage.Shared.UI.InventoryModel)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local Kit = require(script.Parent.Parent.Kit)
@@ -37,15 +38,17 @@ InventoryWindow.CATEGORY_ICONS = {
 	All = "scroll",
 	Tools = "hammer",
 	Materials = "stones",
-	Food = "drumstick",
+	Consumables = "drumstick",
 	Plants = "plant_fiber",
 	Misc = "gift",
 }
 
--- Slots 91 × 99 at a 99.6 × 107.33 pitch, the first at (250, 181).
-local COLUMNS = 6
-local CELL = { 91, 99 }
-local PITCH = { 99.6, 107.33 }
+-- Square slots, 91 × 91 at a 99.6 pitch both ways (the mockup's 91 × 99 were
+-- taller than wide; the owner asked for squares like the hotbar's), the first
+-- at (250, 181).
+local COLUMNS = InventoryModel.COLUMNS
+local CELL = { 91, 91 }
+local PITCH = { 99.6, 99.6 }
 -- The grid's scroll area: the slots start a few px in, so the selected glow
 -- (3 px outside a slot) is not clipped, and the thin rail lands on the column
 -- divider. Four rows show; more scroll.
@@ -63,11 +66,28 @@ local TAB_LAYOUT = { { iconX = 15, iconSize = 40, labelX = 65 }, { iconX = 19, i
 -- middle four.
 local CATEGORY_YS = { 236, 297, 363, 426, 491, 555 }
 local CATEGORY_RULES = { 354, 419, 483, 547 }
+-- A category row's icon and label: the mockup's places on desktop; on phones and
+-- touch tablets a smaller icon further left and a wider label box (it ends
+-- `labelRight` before the row's arrow tip), so the longest label
+-- ("Consumables") stays whole at the phone text floor (STYLE_GUIDE §4.5).
+local CATEGORY_LAYOUT = {
+	desktop = { iconX = 16, iconSize = 33, labelX = 73 },
+	touch = { iconX = 8, iconSize = 30, labelX = 46, labelRight = 22 },
+}
 -- The detail card at the mockup's rect (the kit draws the inset art's border
 -- on it); contents are placed from the card's corner.
 local CARD_PAD = 0
 local CARD = { 869 - CARD_PAD, 109 - CARD_PAD, 296 + CARD_PAD * 2, 520 + CARD_PAD * 2 }
 local ROW_TOP, ROW_PITCH = 313, 41
+-- The card's picture, name and description: the mockup's on desktop. On phones
+-- and touch tablets the boosted description needs more lines (it may not shrink
+-- below the phone text floor), so the picture is smaller and the text box
+-- reaches down to the rule; the stat rows drop their icons so a label such as
+-- "Harvest Power" stays whole beside its value.
+local CARD_LAYOUT = {
+	desktop = { icon = { 73, 38, 152, 166 }, nameY = 216, textY = 256, textH = 50, rowIcons = true },
+	touch = { icon = { 89, 16, 120, 120 }, nameY = 140, textY = 178, textH = ROW_TOP - 8 - 178, rowIcons = false },
+}
 -- A slot's rarity dot (bottom left, clear of the count, the Permanent star
 -- and the hotkey badge; Uncommon and rarer) and the detail name's (any).
 local SLOT_RARITY = { 9, CELL[2] - 21, 12, 12 }
@@ -101,6 +121,9 @@ export type Detail = {
 	actions: { Action }?,
 	amount: { min: number, max: number, value: number, allLabel: string? }?,
 }
+
+InventoryWindow.CELL = CELL
+InventoryWindow.PITCH = PITCH
 
 -- props: tabs ({{id, label, icon, iconSelected?}}), onTab(id), onSlot(cellId),
 -- onAction(actionId), onAmount(value), onToolbar(id), onClose(), name, parent.
@@ -154,35 +177,22 @@ function InventoryWindow.new(props)
 		end,
 	})
 
-	local categories = {}
-	for index, id in ItemInfo.CATEGORIES do
-		local y = CATEGORY_YS[index] or (CATEGORY_YS[#CATEGORY_YS] + (index - #CATEGORY_YS) * 64)
-		table.insert(
-			categories,
-			Kit.Tab.new(v, {
-				id = id,
-				name = "Category" .. id,
-				rect = { 24, y, 219, 54 },
-				label = id,
-				icon = InventoryWindow.CATEGORY_ICONS[id] or "chest",
-				iconX = 16,
-				labelX = 73,
-				variant = "category",
-				zIndex = 8,
-			})
-		)
-	end
+	self:_buildCategories()
+	-- Phones lay the category rows out tighter (CATEGORY_LAYOUT); the rows are
+	-- rebuilt when the form factor changes.
+	self.stopForm = Kit.Scale.OnFormFactorChanged(function()
+		self:_buildCategories()
+		if self.card and self.cardTouch ~= Kit.Scale.IsSmallTouch() then
+			self:_buildCard()
+			self:SetDetail(self.detail)
+		end
+	end)
 	for index, y in CATEGORY_RULES do
 		Kit.Divider.new(
 			v,
 			{ name = "CategoryRule" .. index, rect = { 27, y - 8, 203, 16 }, variant = "hairline", zIndex = 7 }
 		)
 	end
-	self.categories = Kit.TabGroup.new(categories, function(id)
-		self.category = id
-		self:_layout()
-	end)
-	self.categories:Select("All")
 
 	self.grid = Kit.Scroll.new(v, {
 		name = "Grid",
@@ -203,6 +213,45 @@ function InventoryWindow.new(props)
 		screen.Closed:Connect(props.onClose)
 	end
 	return self
+end
+
+-- The category column (ItemInfo.CATEGORIES), laid out for the form factor in
+-- use; the chosen category stays chosen.
+function InventoryWindow:_buildCategories()
+	local touch = Kit.Scale.IsSmallTouch()
+	if self.categories and self.categoryTouch == touch then
+		return
+	end
+	self.categoryTouch = touch
+	if self.categories then
+		self.categories:Destroy()
+	end
+	local spec = if touch then CATEGORY_LAYOUT.touch else CATEGORY_LAYOUT.desktop
+	local tabs = {}
+	for index, id in ItemInfo.CATEGORIES do
+		local y = CATEGORY_YS[index] or (CATEGORY_YS[#CATEGORY_YS] + (index - #CATEGORY_YS) * 64)
+		local tab = Kit.Tab.new(self.visual, {
+			id = id,
+			name = "Category" .. id,
+			rect = { 24, y, 219, 54 },
+			label = id,
+			icon = InventoryWindow.CATEGORY_ICONS[id] or "chest",
+			iconX = spec.iconX,
+			iconSize = spec.iconSize,
+			labelX = spec.labelX,
+			variant = "category",
+			zIndex = 8,
+		})
+		if spec.labelRight and tab.label then
+			tab.label.Size = UDim2.fromOffset(219 - spec.labelX - spec.labelRight, tab.label.Size.Y.Offset)
+		end
+		table.insert(tabs, tab)
+	end
+	self.categories = Kit.TabGroup.new(tabs, function(id)
+		self.category = id
+		self:_layout()
+	end)
+	self.categories:Select(self.category)
 end
 
 -- Tabs ------------------------------------------------------------------------------------
@@ -324,24 +373,13 @@ function InventoryWindow:Filter(): (string, string)
 end
 
 function InventoryWindow:_filtering(): boolean
-	return self.category ~= "All" or self.query ~= ""
+	return InventoryModel.Filtering(self.category, self.query)
 end
 
-local function cellName(cell: Cell): string
-	if cell.name then
-		return cell.name
-	end
-	local def = cell.item and ItemCatalog.Get(cell.item.catalogId)
-	return def and def.name or (cell.item and cell.item.catalogId) or ""
-end
-
+-- Under All with no search every cell shows (empty slots too); otherwise only
+-- the items of the category whose names match (InventoryModel.Visible).
 function InventoryWindow:_visible(cell: Cell): boolean
-	if not self:_filtering() then
-		return true
-	end
-	return cell.item ~= nil
-		and ItemInfo.InCategory(cell.item.catalogId, self.category)
-		and ItemInfo.Matches(cellName(cell), self.query)
+	return InventoryModel.Visible(cell, self.category, self.query)
 end
 
 -- Grid ------------------------------------------------------------------------------------
@@ -398,8 +436,38 @@ function InventoryWindow:_layout()
 	local y = INSET[2]
 	local used, headersUsed, captionsUsed, hintsUsed = 0, 0, 0, 0
 	local firstHit = nil
+	local filtering = self:_filtering()
+	local anyShown = false
 	table.clear(self.slotCells)
+	local function hintAt(text: string)
+		hintsUsed += 1
+		local hint = pooled(self.hints, hintsUsed, function()
+			return Kit.Text.new(self.content, {
+				name = "Hint" .. hintsUsed,
+				rect = { 0, 0, GRID_W, 40 },
+				text = "",
+				role = "muted",
+				zIndex = 9,
+			})
+		end)
+		hint:SetText(text)
+		hint.root.Position = UDim2.fromOffset(INSET[1] + 2, y)
+		hint.root.Visible = true
+		y += 40 + SECTION_GAP
+	end
 	for _, section in self.sections do
+		local shown = {}
+		for _, cell in section.cells do
+			if self:_visible(cell) then
+				table.insert(shown, cell)
+			end
+		end
+		-- While a category or search filters, a section with no match is left
+		-- out (one hint below says when nothing matches at all).
+		if filtering and #shown == 0 then
+			continue
+		end
+		anyShown = anyShown or #shown > 0
 		if section.title then
 			headersUsed += 1
 			local header = pooled(self.headers, headersUsed, function()
@@ -417,29 +485,8 @@ function InventoryWindow:_layout()
 			header.root.Visible = true
 			y += HEADER_H + 6
 		end
-		local shown = {}
-		for _, cell in section.cells do
-			if self:_visible(cell) then
-				table.insert(shown, cell)
-			end
-		end
 		if #shown == 0 then
-			hintsUsed += 1
-			local hint = pooled(self.hints, hintsUsed, function()
-				return Kit.Text.new(self.content, {
-					name = "Hint" .. hintsUsed,
-					rect = { 0, 0, GRID_W, 40 },
-					text = "",
-					role = "muted",
-					zIndex = 9,
-				})
-			end)
-			hint:SetText(
-				if self:_filtering() then "Nothing here matches." else section.emptyText or "Nothing here yet."
-			)
-			hint.root.Position = UDim2.fromOffset(INSET[1] + 2, y)
-			hint.root.Visible = true
-			y += 40 + SECTION_GAP
+			hintAt(section.emptyText or "Nothing here yet.")
 			continue
 		end
 		local captioned = false
@@ -493,6 +540,9 @@ function InventoryWindow:_layout()
 		local rows = (#shown + COLUMNS - 1) // COLUMNS
 		y += rows * rowH - (PITCH[2] - CELL[2]) + SECTION_GAP
 	end
+	if filtering and not anyShown then
+		hintAt("Nothing here matches.")
+	end
 	for index = used + 1, #self.slots do
 		self.slots[index].root.Visible = false
 	end
@@ -544,17 +594,33 @@ end
 
 -- Detail card -------------------------------------------------------------------------------
 
+-- (Re)builds the card for the form factor in use (CARD_LAYOUT); SetDetail fills it.
 function InventoryWindow:_buildCard()
+	if self.card then
+		for _, part in self.rows do
+			part:Destroy()
+		end
+		for _, part in self.extras do
+			part:Destroy()
+		end
+		self.card:Destroy()
+	end
+	self.cardTouch = Kit.Scale.IsSmallTouch()
+	local layout = if self.cardTouch then CARD_LAYOUT.touch else CARD_LAYOUT.desktop
+	self.cardLayout = layout
 	local card = Kit.Panel.new(self.visual, { name = "Detail", rect = CARD, variant = "inset", zIndex = 7 })
 	self.card = card
 	local c = card.base.visual
 	self.cardVisual = c
 	-- A hero box: the item fills it (its hero copy keeps it sharp).
-	self.detailIcon =
-		Kit.ItemIcon.new(c, { name = "DetailIcon", rect = inCard(73, 38, 152, 166), zIndex = 9, maxScale = false })
+	local icon = layout.icon
+	self.detailIcon = Kit.ItemIcon.new(
+		c,
+		{ name = "DetailIcon", rect = inCard(icon[1], icon[2], icon[3], icon[4]), zIndex = 9, maxScale = false }
+	)
 	self.detailName = Kit.Text.new(c, {
 		name = "ItemName",
-		rect = inCard(19, 216, 258, 34),
+		rect = inCard(19, layout.nameY, 258, 34),
 		text = "",
 		role = "itemTitle",
 		zIndex = 9,
@@ -563,12 +629,12 @@ function InventoryWindow:_buildCard()
 	self.detailRarity = Kit.Badge.new(c, {
 		name = "Rarity",
 		variant = "rarity",
-		rect = inCard(19, 216 + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY),
+		rect = inCard(19, layout.nameY + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY),
 		zIndex = 9,
 	})
 	self.detailText = Kit.Text.new(c, {
 		name = "ItemText",
-		rect = inCard(19, 256, 258, 50),
+		rect = inCard(19, layout.textY, 258, layout.textH),
 		text = "",
 		role = "bodySoft",
 		wrap = true,
@@ -625,7 +691,7 @@ function InventoryWindow:SetDetail(detail: Detail?)
 	local rarity = rarityOf(d.catalogId)
 	if rarity then
 		local nameW = math.min(Kit.Text.Width(d.name or "", "itemTitle"), 258 - NAME_RARITY - 8)
-		local at = inCard(19 + nameW + 8, 216 + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY)
+		local at = inCard(19 + nameW + 8, self.cardLayout.nameY + (34 - NAME_RARITY) / 2, NAME_RARITY, NAME_RARITY)
 		self.detailRarity.root.Position = UDim2.fromOffset(at[1], at[2])
 		self.detailRarity:SetRarity(rarity)
 		self.detailRarity.root.Visible = true
@@ -644,9 +710,9 @@ function InventoryWindow:SetDetail(detail: Detail?)
 				name = "Stat" .. index,
 				rect = inCard(19, ROW_TOP + (index - 1) * ROW_PITCH, 258, 40),
 				variant = "line",
-				icon = stat.icon,
+				icon = if self.cardLayout.rowIcons then stat.icon else nil,
 				iconRect = { 12, 10, 23, 23 },
-				textX = 50,
+				textX = if self.cardLayout.rowIcons then 50 else 8,
 				titleSize = 15,
 				title = stat.label,
 				value = stat.value,
@@ -750,6 +816,10 @@ function InventoryWindow:IsOpen(): boolean
 end
 
 function InventoryWindow:Destroy()
+	if self.stopForm then
+		self.stopForm()
+		self.stopForm = nil
+	end
 	self.screen:Destroy()
 end
 

@@ -3,7 +3,8 @@
 --
 --   1 PLAY hover            2 PLAY pressed          3 PLAY busy (deploying)
 --   4 PLAY disabled while the teleport runs, with the game-update notice
---   5 empty loadout         6 preview not read yet, a full party (8, scrolls)
+--   5 empty loadout         6 preview not read yet, a full party (8 tiles,
+--                             one with a 20-character name)
 --   7 member: PLAY disabled with the leader caption   8 close button hover
 --
 -- It also prints the gamepad order (default selection and neighbours).
@@ -20,8 +21,61 @@ local SAMPLE = {
 	{ catalogId = "StoneSpear" },
 	{ catalogId = "BasicMedicine", quantity = 3 },
 }
-local NAMES =
-	{ "LiamTheMo", "ForestRanger", "StoneSeeker", "RiverFox", "AshWalker", "MossBeard", "FlintSpark", "TideRunner" }
+local NAMES = {
+	"LiamTheMo",
+	"ForestRanger",
+	"StoneSeeker",
+	"RiverFox",
+	"AshWalker",
+	"MossBeard",
+	"FlintSparkTheBrave20",
+	"TideRunner",
+}
+
+-- The party section shows every member at once: no scrolling list, no
+-- clipping frame, every tile inside the column, square headshots.
+local function checkParty(window, rows)
+	local section = window.party
+	local scrolls, clips = 0, 0
+	for _, object in window.screen.gui:GetDescendants() do
+		if object:IsA("ScrollingFrame") then
+			scrolls += 1
+		end
+	end
+	local object = section
+	while object and object ~= window.screen.gui do
+		if object:IsA("GuiObject") and object.ClipsDescendants then
+			clips += 1
+		end
+		object = object.Parent
+	end
+	local tiles, inside, square = 0, true, true
+	local columnW = section.Size.X.Offset
+	for _, tile in section:GetChildren() do
+		if tile:IsA("Frame") and tile.Name:match("^Member") then
+			tiles += 1
+			local x, w = tile.Position.X.Offset, tile.Size.X.Offset
+			local y, h = tile.Position.Y.Offset, tile.Size.Y.Offset
+			inside = inside and x >= 0 and x + w <= columnW and y >= 0 and y + h <= section.Size.Y.Offset
+			for _, child in tile:GetDescendants() do
+				if child:IsA("GuiObject") and child.ClipsDescendants then
+					clips += 1
+				end
+			end
+			local portrait = tile:FindFirstChild("Portrait")
+			square = square and portrait ~= nil and portrait.Size.X.Offset == portrait.Size.Y.Offset
+		end
+	end
+	local function report(ok, text)
+		print(("  %s %s"):format(if ok then "ok" else "FAIL", text))
+		assert(ok, text)
+	end
+	report(scrolls == 0, "the window has no scrolling list")
+	report(clips == 0, "no clipping frame holds or cuts the party tiles")
+	report(tiles == #rows, ("every member has a tile (%d of %d)"):format(tiles, #rows))
+	report(inside, "every tile lies inside the party column")
+	report(square, "every headshot is square")
+end
 
 -- A party of `n` led by `leader`, ordered as PlayController orders it
 -- (PlayModel.Members: leader first), with levels.
@@ -60,17 +114,7 @@ local function page(opts)
 	if opts.check then
 		opts.check(window)
 	end
-	-- The party rail shows its thumb only while the rows overflow it (one row
-	-- fits the rail's height; a party of two or more scrolls).
-	local party = opts.party or members(1, 1)
-	local scrolls = window.partyList.root:GetAttribute("KitState") == "scrollable"
-	print(
-		("  %s the party rail's thumb follows its overflow (%d row(s))"):format(
-			if scrolls == (#party > 1) then "ok" else "FAIL",
-			#party
-		)
-	)
-	assert(scrolls == (#party > 1), "the party rail's thumb does not follow its overflow")
+	checkParty(window, opts.party or members(1, 1))
 	__dump(Players.LocalPlayer.PlayerGui, W, H, { background = "art/reference/ui/lobby/01_hud.png" })
 	window:Destroy()
 end

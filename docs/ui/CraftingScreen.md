@@ -13,7 +13,7 @@ Design px are the 1102 × 680 window's. Status: Built.
 |---|---|---|
 | Controller | `CraftingController` (Craft key, HUD Craft tile) | `ForgeController` (Forge tile) |
 | Header | build icon, "Field Crafting" in small caps, hand subtitle "Make tools and supplies from what you carry." | anvil, "Ancestral Forge", its subtitle |
-| Categories (the RECIPES dropdown) | All, Weapons, Tools, Armor, Smelting, Food & potions, Siege & stations (`CraftingRules.CATEGORIES`) | All, Tools, Weapons, Armor, Supplies, Permanent (`ForgeRecipes.Categories`) |
+| Categories (the RECIPES dropdown) | All, Weapons, Tools, Armor, Smelting, Consumables, Siege & stations (`CraftingRules.CATEGORIES`) | All, Tools, Weapons, Armor, Supplies, Permanent (`ForgeRecipes.Categories`) |
 | Counts | what you carry (`InventoryController.Count`) | the vault (`ForgeSnapshot`) |
 | Row note | the station ("Workbench", "By hand"), plus the first stat in short form ("Workbench · Harvest 4 per hit"), or the smelt time ("Furnace · 2 s each") | the first stat, or the unlock line of a locked recipe |
 | QUANTITY | smelting only, with **All** (as many as the ore allows); other recipes make one per request (`CraftingRules.BatchCount`) | special recipes, up to the snapshot's `maxCount` |

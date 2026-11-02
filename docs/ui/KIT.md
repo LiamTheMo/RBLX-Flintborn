@@ -244,10 +244,8 @@ selected +2 px, tile selected +3 px). `material` picks the stand-in.
 | `scroll.track` | `lk_scroll_track` | — | track |
 | `search.field` | `lk_search` | — | paper |
 | `slider.fill` | `lk_bar_fill_yellow` | — | fill |
-| `slider.knob` | `lk_button_paper_small_normal` | — | paper |
-| `slider.knobRound` | `lk_slider_knob` | — | dot |
+| `slider.knob` | `lk_button_square_paper` | — | paper |
 | `slider.track` | `lk_bar_track` | — | track |
-| `slider.trackPaper` | `lk_slider_track` | — | paper |
 | `slot.hotbar` | `lk_slot_normal` | disabled `lk_slot_disabled`, hover `lk_slot_hover`, locked `lk_slot_locked`, selected `lk_slot_selected` | slot |
 | `slot.item` | `lk_slot_item_normal` | disabled `lk_slot_disabled`, locked `lk_slot_locked`, selected `lk_slot_item_selected` | slot |
 | `slot.tile` | `lk_tile_blank` | — | slot |
@@ -318,7 +316,7 @@ ornament icons (`tree` by default, D19) and a full rule. The close button sits
 22 px in from the top-right corner and closes the screen (or calls `onClose`).
 ```lua
 local window = Kit.Window.new(screen, { title = "Ancestral Forge", smallCaps = true,
-    subtitle = "Turn raw materials into tools for the island.", icon = "anvil_hammer", clasps = true })
+    subtitle = "Turn raw materials into tools for the island.", icon = "anvil", clasps = true })
 ```
 
 ### Panel / SectionHeader
@@ -404,10 +402,15 @@ Kit.Checkbox.new(page, { rect = { 0, 230, 380, 50 }, label = "Show Damage Number
 `Kit.Toggle.new(parent, {rect = 89 × 49, on, onToggle(on)})`; `:Set(on)`, `:SetEnabled`.
 
 ### Slider
-`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, knob = "plate" | "round", track = "dark" | "paper", onChange(v)})`;
-`:SetValue(v)` (no callback), `:SetEnabled`. Dark track with the yellow fill
-and a paper knob (M03); drag, track press, or gamepad left / right while
-selected.
+`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, onChange(v)})`;
+`:SetValue(v)` (no callback), `:SetEnabled`. Every slider has one look: the
+dark track (14 px) with the yellow fill, and the square parchment knob with
+leather corners (`lk_button_square_paper`, 60 × 58) drawn whole at its own
+aspect, 8 px past the track above and below (31 × 30; a slider shorter than
+30 px keeps it inside its height). The knob is never 9-sliced or stretched,
+so its rim and corners keep their shape at any size. The older `knob` and
+`track` props are still accepted and ignored. Drag, track press, or gamepad
+left / right while selected.
 ```lua
 Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1, value = 50,
     format = function(v) return ("%.1f"):format(SettingsRules.MouseSensitivity(v)) end, onChange = set })
@@ -580,7 +583,7 @@ from `art/ui/sprites/manifest.json` until then.
 
 | Where | Mockup | Kit |
 |---|---|---|
-| Slider knob (M03) | small paper knob | `lk_button_paper_small_normal` at 23 × 26 (`knob = "round"` for the sheet-09 ball) |
+| Slider knob (M03) | small paper knob (23 × 26) | `lk_button_square_paper` drawn whole at 31 × 30: a larger parchment knob with leather corners that never squashes (owner feedback) |
 | Slider track (M03) | dark track, yellow fill | `lk_bar_track` + `lk_bar_fill_yellow` |
 | Ticked checkbox (M03) | gold box | `lk_checkbox_on` tinted `checkTint` (variant "gold") |
 | Leader tag (M04) | gold plaque | `lk_pill_value` tinted `leaderTint` (Badge "leader"; the party no longer shows it, D24) |

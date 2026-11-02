@@ -148,7 +148,8 @@ There is no server picker (owner decision).
 1. Party list with up to 8 members. The mockup has room for one 56 px row.
    Options: (a) the row area becomes a scroll region one row tall; (b) compact row
    of up to 8 headshots with the leader crown; (c) the section grows and pushes
-   "YOUR EQUIPMENT" down. Default: (a).
+   "YOUR EQUIPMENT" down. **Resolved (owner feedback):** every member shows
+   at once as tiles in up to two rows, no scrolling (see "Owner feedback round").
 2. Who can press PLAY, and when? **Resolved (D24):** a solo player or the party
    leader, at any time; other members see PLAY disabled with "The party leader
    starts the run." There is no Ready step and no ready line in the deploy check.
@@ -237,3 +238,36 @@ supplies the Play art, used in full:
 - Captures: `play`, `play_states` (every state), `play_phone` (844 × 390 and
   2000 × 924), `play_flow`, `kit_gallery` page 9; `--uploaded-only` for the
   fallback.
+
+## Owner feedback round (whole party, square slots)
+
+- **The whole party at once** (resolves open question 1, replacing option
+  (a)): the one-row scrolling list showed half rows and cut the row box's
+  rim, so it is gone, rail included. YOUR PARTY shows every member (1 to 8)
+  as tiles in at most two rows, left aligned in the column (x 575..1165,
+  y 334..414): two tiles to a row (292 wide) for up to 4 members, four to a
+  row (143 wide) for 5 to 8. Nothing sits in a scrolling or clipping frame,
+  so no tile, headshot or text is cut.
+- **A tile** (38 tall; 37 on phones, rows 4 / 2 px apart) is a light inset
+  box (`panel.inset`) with the square headshot on its left (30 px; 29 on
+  phones; no frame or backdrop, as the HUD party list draws it), the name on
+  the first line and "LV. n" on the second, and the leader's crown just after
+  the level. Names shrink to fit (15 down to the 12 design px floor; on phones
+  the phone text floor, about 19 design px or 9.8 screen px at 844 × 390),
+  then end in "…"; names that fit whole share one size. At 8 members on an
+  844 × 390 phone a name keeps about 7 characters (the phone floor rules, as
+  in the lobby HUD's touch rows); with up to 4 members the wide tiles show
+  12-character names whole on phones, and on desktop every name up to about
+  17 characters fits at 8 members.
+- **Layout:** YOUR PARTY moves up 8 px (heading 294..328) and YOUR EQUIPMENT
+  down 4 px (418..452, "+n more" at 421), so the two rows fit between them
+  with the slots (458..535) and PLAY unchanged.
+- **Square loadout slots:** the six slots are 77 × 77 (were 71 × 77) at an
+  85 px pitch (x 575, 660, 745, 830, 915, 1000; y 458, bottom 535 as before),
+  so a selected slot's 3 px glow stays clear of its neighbours. Every hotbar's
+  slots are square (the lobby HUD and the run's HUD: 89 × 89).
+- **Checks:** `play_states` (1, 3 and 8 members, one with a 20-character
+  name), `play_phone` (pages 3 and 4: 3 and 8 members at 844 × 390) and
+  `play_flow` assert no scrolling list, no clipping frame over the tiles, a
+  tile per member inside the column and square headshots; `play_phone` also
+  checks the party text is at least 9 screen px.

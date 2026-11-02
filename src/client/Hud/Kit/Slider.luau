@@ -1,7 +1,8 @@
--- A slider (M03): dark track with the yellow fill up to the knob, a paper
--- knob, and the value in a small paper box to its right. Dragging (mouse or
--- touch) or a press on the track sets the value, snapped to `step`; with a
--- gamepad, left / right step it while it is selected.
+-- A slider (M03): dark track with the yellow fill up to the knob, a
+-- parchment knob with leather corners, and the value in a small paper box to
+-- its right. Every slider has this one look. Dragging (mouse or touch) or a
+-- press on the track sets the value, snapped to `step`; with a gamepad, left /
+-- right step it while it is selected.
 --
 --   Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1, value = 50,
 --       format = function(v) return ("%.1f"):format(v / 50) end, onChange = set })
@@ -22,12 +23,20 @@ Slider.__index = Slider
 
 Slider.TRACK_H = 14
 Slider.BOX_W = 74
+-- The knob: the square parchment button with leather corners (sheet 03,
+-- lk_button_square_paper, 60 × 58) drawn whole at its own aspect, never
+-- 9-sliced or stretched, so its rim and corners keep their shape. It stands
+-- KNOB_OVER px past the track above and below (14 + 2 × 8 = 30 tall); a
+-- slider shorter than that keeps the knob inside its own height.
+Slider.KNOB_ASPECT = 60 / 58
+Slider.KNOB_OVER = 8
 
 local count = 0
 
--- props: rect | size, min, max, step, value, valueBox (true), format(value)
--- -> string, knob ("plate" | "round"), track ("dark" | "paper"),
--- onChange(value), zIndex, name.
+-- props: rect | size, min, max, step, value, valueBox (true), boxWidth (74),
+-- format(value) -> string, onChange(value), zIndex, name. `knob` and `track`
+-- are still accepted for older callers but no longer change the look: every
+-- slider draws the same track and knob.
 function Slider.new(parent: Instance, props)
 	local w, h = Core.Size(props, 375, 34)
 	local base = Core.Root(parent, "Slider", "slider.track", props, w, h)
@@ -43,8 +52,8 @@ function Slider.new(parent: Instance, props)
 	local boxW = if props.valueBox == false then 0 else (props.boxWidth or Slider.BOX_W)
 	local trackW = w - (if boxW > 0 then boxW + 16 else 0)
 	local th = Slider.TRACK_H
-	local knobRound = props.knob == "round"
-	local kw, kh = if knobRound then 30 else 23, if knobRound then 30 else 26
+	local kh = math.min(th + Slider.KNOB_OVER * 2, h)
+	local kw = math.floor(kh * Slider.KNOB_ASPECT + 0.5)
 	self.trackW = trackW
 	self.inset = kw / 2
 	local trackRect = { 0, (h - th) / 2, trackW, th }
@@ -55,13 +64,7 @@ function Slider.new(parent: Instance, props)
 		Size = UDim2.fromOffset(trackW, th),
 		ZIndex = base.z,
 	}, base.visual)
-	Art.Plate(
-		self.track,
-		if props.track == "paper" then "slider.trackPaper" else "slider.track",
-		trackW,
-		th,
-		{ z = base.z }
-	)
+	Art.Plate(self.track, "slider.track", trackW, th, { z = base.z })
 	-- The full-length fill behind a clipping frame as wide as the value: cut at
 	-- the knob, never squeezed.
 	self.fill = Core.Make("Frame", {
@@ -88,8 +91,7 @@ function Slider.new(parent: Instance, props)
 		ZIndex = base.z + 3,
 	}, base.visual)
 	self.knobScale = Core.Make("UIScale", { Scale = 1 }, self.knob)
-	self.knobPlate =
-		Art.Plate(self.knob, if knobRound then "slider.knobRound" else "slider.knob", kw, kh, { z = base.z + 3 })
+	self.knobPlate = Art.Plate(self.knob, "slider.knob", kw, kh, { z = base.z + 3 })
 	if boxW > 0 then
 		local box = Core.Make("Frame", {
 			Name = "ValueBox",

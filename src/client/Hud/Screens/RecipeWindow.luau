@@ -11,7 +11,7 @@
 -- window (mockup position minus the window's 285, 132).
 --
 --   local window = RecipeWindow.new({ mode = "forge", name = "FlintbornForge", title = "Ancestral Forge",
---       subtitle = "Turn raw materials into tools for the island.", icon = "anvil_hammer",
+--       subtitle = "Turn raw materials into tools for the island.", icon = "anvil",
 --       categories = { { id = "Tools", label = "Tools" } }, onForge = function(entry, count) end })
 --   window:SetEntries(RecipeModel.ForgeEntries(view), materials)
 --   window:Open()
@@ -34,7 +34,8 @@ RecipeWindow.SIZE = { 1102, 680 }
 -- Window-local layout (design px). Kit plates draw their visible edge on their
 -- rect, so these are the mockup's bounds less the window's 285, 132.
 local L = {
-	-- The anvil art has a margin: this rect puts its ink on the mockup's 101 × 95.
+	-- The Forge tile's anvil (lk_icon_anvil, 116 × 102) fitted in the mockup's
+	-- icon box: about 107 × 94.
 	icon = { 50, 8, 107, 97 },
 	title = { 184, 17, 560, 64 },
 	titleSizes = { 46, 40 },
@@ -184,7 +185,7 @@ function RecipeWindow.new(props)
 	local window = Kit.Window.new(screen, {
 		title = props.title or "Ancestral Forge",
 		subtitle = props.subtitle,
-		icon = props.icon or "anvil_hammer",
+		icon = props.icon or "anvil",
 		iconRect = L.icon,
 		titleRect = L.title,
 		smallCaps = true,

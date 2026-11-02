@@ -353,3 +353,10 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
   (`Reporting()`) the HUD does not toast LobbyController's "Party: …" status.
 - A failed start disconnects everything it connected and destroys the HUD
   before falling back (L9).
+
+## Owner feedback round (square hotbar)
+
+- The hotbar slots are square: 89 × 89 (the mockup's 89 × 93 less 4 px of
+  height), at the mockup's x and pitch, their foot on the bottom region's
+  edge (y 35 in the 124 px region; `LobbyHud.SLOT`). The run's HUD hotbar
+  matches (`HudLayout.json` `bottom.hotbar`).

@@ -56,17 +56,21 @@ local RECT = {
 	statusPlaque = { 52, 575, 462, 40 },
 	-- The right column: the region heading, detail rows, party, equipment.
 	region = { RIGHT_X, 106, RIGHT_W, 44 },
-	partyHeading = { RIGHT_X, 302, RIGHT_W, 34 },
-	-- One row tall; more members scroll (the rail sits right of the rows).
-	party = { RIGHT_X, 343, RIGHT_W, 63 },
-	-- A row's slot in the list, and the light inset box drawn in it.
-	partyRow = { RIGHT_W - 14, 61 },
-	rowArt = { 2, 3 },
-	rowBox = { RIGHT_W - 20, 56 },
-	equipHeading = { RIGHT_X, 414, RIGHT_W, 34 },
-	more = { RIGHT_X + RIGHT_W - 262, 417, 260, 26 },
+	-- 8 px higher than the mockup's 302, so the party's two rows of tiles fit
+	-- above YOUR EQUIPMENT.
+	partyHeading = { RIGHT_X, 294, RIGHT_W, 34 },
+	-- The whole party at once (1 to 8 members) in up to two rows of four
+	-- tiles under its heading: no scrolling and no clipping frame (see PARTY).
+	party = { RIGHT_X, 334, RIGHT_W, 80 },
+	-- 4 px lower than before the party tiles (rule at about 451, 7 px above
+	-- the slots), so the tiles keep clear of the heading on phones too.
+	equipHeading = { RIGHT_X, 418, RIGHT_W, 34 },
+	more = { RIGHT_X + RIGHT_W - 262, 421, 260, 26 },
+	-- Square loadout slots (every hotbar's slots are square) at an 85 px
+	-- pitch, so a selected slot's glow (3 px) keeps clear of its neighbours.
 	slotY = 458,
-	slotSize = { 71, 77 },
+	slotSize = { 77, 77 },
+	slotPitch = 85,
 	-- The PLAY button between its two rune pillars (D26). The pillars
 	-- (lk_pillar_rune_*, 88 x 160 stored) are about 1.6x the button's height
 	-- and overlap each end by 17 px, like posts holding a banner. They stand
@@ -97,7 +101,7 @@ local DETAIL = {
 }
 PlayWindow.SLOT_X = {}
 for index = 1, 6 do
-	PlayWindow.SLOT_X[index] = RIGHT_X + (index - 1) * 82
+	PlayWindow.SLOT_X[index] = RIGHT_X + (index - 1) * RECT.slotPitch
 end
 
 -- Mockup text sizes (ink-height matched; PlayScreen.md measurements log).
@@ -125,6 +129,32 @@ export type Props = {
 
 -- The status plaque's text inset and size.
 local STATUS_PAD = 16
+
+-- The party tiles: every member at once in two rows at most, left aligned in
+-- the column: two to a row for up to 4 members (wide tiles, whole names even
+-- on phones), four to a row for 5 to 8 (the cap). A tile is a light inset box with the
+-- square headshot on its left, the name on the first line and "LV. n" on the
+-- second, the leader's crown at the end of the level line. The name shrinks
+-- to fit down to the text floor (Kit.Core.FitFloor: 12 design px; the phone
+-- text floor on phones), then ends in "…". Nothing is drawn inside a clipping
+-- frame, so no tile, headshot or text is ever cut. `desktop` / `phone` place
+-- the parts in a tile ({x, y, size} of the headshot, {y, height} of the two
+-- text lines): phones draw text at the phone floor (about 19 design px).
+local PARTY = {
+	-- Tiles per row: `few` for up to `few * 2` members, else `many`.
+	few = 2,
+	many = 4,
+	gap = 6,
+	-- Tile height and the gap between the two rows ({desktop, phone}).
+	tileH = { 38, 37 },
+	rowGap = { 4, 2 },
+	crown = { 17, 14 },
+	desktop = { portrait = { 5, 4, 30 }, name = { 3, 18 }, level = { 20, 15 } },
+	phone = { portrait = { 4, 4, 29 }, name = { 0, 19 }, level = { 18, 19 } },
+	nameSize = 15,
+	levelSize = 13,
+}
+PlayWindow.PARTY = PARTY
 
 export type PartyRow = {
 	userId: number,
@@ -196,14 +226,15 @@ function PlayWindow.new(props: Props)
 		text = "Your Party",
 		zIndex = z,
 	})
-	self.partyList = Kit.Scroll.new(v, {
-		name = "Party",
-		rect = RECT.party,
-		gap = 6,
-		padBottom = 0,
-		contentHeight = RECT.partyRow[2],
-		zIndex = z,
-	})
+	local party = RECT.party
+	self.partyZ = z
+	self.party = Kit.Core.Make("Frame", {
+		Name = "Party",
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(party[1], party[2]),
+		Size = UDim2.fromOffset(party[3], party[4]),
+		ZIndex = z,
+	}, v)
 	self.equipHeading = Kit.SectionHeader.new(v, {
 		name = "EquipmentHeading",
 		rect = RECT.equipHeading,
@@ -303,6 +334,7 @@ function PlayWindow.new(props: Props)
 			self.phone = phone
 			self:_buildMore()
 			self:_placeValues()
+			self:SetParty(self.rows)
 		end
 	end))
 	return self
@@ -443,80 +475,105 @@ function PlayWindow:SetDetails(rows)
 	end
 end
 
--- One party row: crown (leader), headshot, name, level. Every part goes into
--- `maid`, so cleaning it takes the row apart.
-local function partyRow(parent: Instance, row: PartyRow, order: number, maid)
-	local w, h = RECT.partyRow[1], RECT.partyRow[2]
-	local outer = Kit.Core.Make("Frame", {
+-- One party tile `w` px wide at `x`, `y` (returns its name label and whether
+-- the name fits whole): the light inset box, the square
+-- headshot (no frame or backdrop, as the HUD party list draws it), the name
+-- (shrunk to fit down to the text floor, then "…"), "LV. n" and the leader's
+-- crown. Every part goes into `maid`, so cleaning it takes the tile apart.
+local function partyTile(parent: Instance, row: PartyRow, order: number, at, maid)
+	local x, y, w, h = at.x, at.y, at.w, at.h
+	local place = if at.phone then PARTY.phone else PARTY.desktop
+	local z = parent.ZIndex
+	local tile = Kit.Core.Make("Frame", {
 		Name = "Member" .. order,
 		BackgroundTransparency = 1,
-		LayoutOrder = order,
+		Position = UDim2.fromOffset(x, y),
 		Size = UDim2.fromOffset(w, h),
+		ZIndex = z,
 	}, parent)
-	outer:SetAttribute("UserId", row.userId)
-	maid:Give(outer)
-	-- The mockup's row is a light inset box, not the list-row plate.
-	local art = RECT.rowArt
-	w, h = RECT.rowBox[1], RECT.rowBox[2]
-	Kit.Art.Plate(outer, "panel.inset", w, h, { z = 5, rect = { art[1], art[2], w, h } })
-	local holder = Kit.Core.Make("Frame", {
-		Name = "Inside",
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(art[1], art[2]),
-		Size = UDim2.fromOffset(w, h),
-		ZIndex = 6,
-	}, outer)
-	if row.leader then
-		maid:Give(Kit.Icon.new(holder, { name = "Crown", rect = { 15, 16, 27, 23 }, icon = "crown", zIndex = 6 }))
-	end
-	maid:Give(Kit.Portrait.new(holder, {
+	tile:SetAttribute("UserId", row.userId)
+	maid:Give(tile)
+	Kit.Art.Plate(tile, "panel.inset", w, h, { z = z })
+	local p = place.portrait
+	maid:Give(Kit.Portrait.new(tile, {
 		name = "Portrait",
-		rect = { 51, 2, 52, 52 },
+		rect = { p[1], p[2], p[3], p[3] },
 		userId = row.userId,
-		-- The headshot fills its box over the row's paper.
 		frame = "none",
 		backdrop = false,
-		zIndex = 6,
+		zIndex = z + 1,
 	}))
-	Kit.Core.Label(holder, {
+	local textX = p[1] + p[3] + 5
+	local textW = w - textX - 5
+	local name = Kit.Core.Label(tile, {
 		name = "Name",
-		text = row.name,
+		text = "",
 		role = "rowTitle",
 		color = "ink",
-		size = TEXT_SIZE.name,
-		scaled = true,
-		rect = { 120, 2, 200, h - 2 },
-		z = 6,
+		rect = { textX, place.name[1], textW, place.name[2] },
+		z = z + 1,
+	})
+	local fits = Kit.Core.FitText(name, row.name, "rowTitle", PARTY.nameSize)
+	local level = Kit.Core.Label(tile, {
+		name = "Level",
+		text = "",
+		role = "hudSmall",
+		rect = { textX, place.level[1], textW, place.level[2] },
+		z = z + 1,
 	})
 	local levelText = if row.level then HudModel.LevelText(row.level) else ""
-	Kit.Core.Label(holder, {
-		name = "Level",
-		text = levelText,
-		role = "hudSmall",
-		size = TEXT_SIZE.level,
-		scaled = true,
-		align = "Right",
-		rect = { w - 120, 2, 101, h - 2 },
-		z = 6,
-	})
-	return outer
+	Kit.Core.FitText(level, levelText, "hudSmall", PARTY.levelSize)
+	if row.leader then
+		-- Just after "LV. n" (the level line always has room for it).
+		local cw, ch = PARTY.crown[1], PARTY.crown[2]
+		local drawn = Kit.Core.TextWidth(levelText, "hudSmall", PARTY.levelSize) * level.TextSize / PARTY.levelSize
+		local cx = math.min(textX + drawn + 6, w - cw - 6)
+		maid:Give(Kit.Icon.new(tile, {
+			name = "Crown",
+			rect = { cx, place.level[1] + (place.level[2] - ch) / 2, cw, ch },
+			icon = "crown",
+			zIndex = z + 2,
+		}))
+	end
+	return name, fits
 end
 
--- The party rows (leader first; PlayModel.Members). The old rows are taken
--- apart through their maids (Kit components included).
+-- Where member `order` of `count` sits in the party section ({x, y, w, h}):
+-- two or four tiles to a row (PARTY.few / many), sharing the column.
+function PlayWindow.TileRect(order: number, count: number, phone: boolean?): { number }
+	local k = if phone then 2 else 1
+	local h, gap = PARTY.tileH[k], PARTY.rowGap[k]
+	local columns = if count <= PARTY.few * 2 then PARTY.few else PARTY.many
+	local w = math.floor((RECT.party[3] - (columns - 1) * PARTY.gap) / columns)
+	local col = (order - 1) % columns
+	local line = (order - 1) // columns
+	return { col * (w + PARTY.gap), line * (h + gap), w, h }
+end
+
+-- The party tiles (leader first; PlayModel.Members), the whole party at once.
+-- The old tiles are taken apart through their maids (Kit components included).
 function PlayWindow:SetParty(rows: { PartyRow })
-	local content = self.partyList:Content()
 	for _, maid in self.rowMaids do
 		maid:Clean()
 	end
 	table.clear(self.rowMaids)
+	-- Names that fit whole share one size (the smallest of them), so the tiles
+	-- read as one list; a name cut with "…" keeps the floor size.
+	local whole, size = {}, math.huge
 	for order, row in rows do
 		local maid = KitModel.Maid()
-		partyRow(content, row, order, maid)
+		local r = PlayWindow.TileRect(order, #rows, self.phone)
+		local name, fits =
+			partyTile(self.party, row, order, { x = r[1], y = r[2], w = r[3], h = r[4], phone = self.phone }, maid)
+		if fits then
+			table.insert(whole, name)
+			size = math.min(size, name.TextSize)
+		end
 		table.insert(self.rowMaids, maid)
 	end
-	local h = RECT.partyRow[2]
-	self.partyList:SetContentHeight(#rows * h + math.max(0, #rows - 1) * 6)
+	for _, name in whole do
+		name.TextSize = size
+	end
 	self.rows = rows
 end
 
@@ -618,7 +675,7 @@ function PlayWindow:Destroy()
 		pillar:Destroy()
 	end
 	self.close:Destroy()
-	self.partyList:Destroy()
+	self.party:Destroy()
 	self.window:Destroy()
 	self.screen:Destroy()
 end
