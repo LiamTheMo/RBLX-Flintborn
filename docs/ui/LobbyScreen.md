@@ -16,7 +16,7 @@ The lobby place's always-on, non-modal HUD. Top left in the mockup: the player
 card (portrait, name, level, XP bar, leaf emblem); **the game leaves it out**
 (owner decision: each Party panel row shows the member's level and XP bar
 instead). Top right: Coins pill, Gems pill, settings button (**the game moves
-the settings button to the bottom right**, D27). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
+the settings button to the bottom left**, D27 and D28). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
 the Party panel (title with count, member rows, empty-slot rows, scrollbar).
 Bottom centre: the level/XP bar and the six-slot hotbar.
 
@@ -107,18 +107,21 @@ XP bar instead. The table below records the mockup only.
 
 Gaps: Coins → Gems 17 px, Gems → Settings 16 px; right margin 53 px; top margin 70 px.
 
-As built (D27): the Settings button is not in this row. Coins and Gems close up
-to the right margin (`LobbyHud.PILLS`, 234 wide: Coins at x 1385, Gems at
-1518; phones 286 wide), so their right edge lines up with the Party panel's.
-The Settings button sits at the bottom right (`LobbyHud.GEAR`: 52 × 46, right
-edge 53 px in, its foot on the hotbar's bottom line 49 px up). On touch screens
-`LobbyHudController` passes the screen to `LobbyHud:SetScreen`, which moves it
-12 screen px left of Roblox's jump button, centred on its height
-(`HudModel.CornerButton`): on an 844 × 390 phone it draws at x 711–737,
-y 323–346, between the hotbar (ending at x 565) and the jump button (x 749),
-below the Party panel (ending at y 280). Gamepad: Settings is right of the
-last hotbar slot, and up goes to the PARTY title; the PARTY title's up goes to
-Gems.
+As built (D27, D28): the Settings button is not in this row. Coins and Gems
+close up to the right margin (`LobbyHud.PILLS`, 234 wide: Coins at x 1385,
+Gems at 1518; phones 286 wide), so their right edge lines up with the Party
+panel's. The Settings button sits at the bottom left (D28; `LobbyHud.GEAR`:
+52 × 46, 39 px from the left edge, 16 on phones, as the world's, its foot on
+the hotbar's bottom line 49 px up). On touch screens `LobbyHudController`
+passes the screen to `LobbyHud:SetScreen`, which raises its foot to 12 screen
+px above Roblox's classic thumbstick ring (`HudModel.ThumbstickCorner`), at the
+outer edge of the dynamic thumbstick's start zone, and moves the tiles up just
+enough that their touch pads keep 2 screen px from the button's: on an
+844 × 390 phone it draws at x 8–34, y 265–288 (the tiles lifted 5 design px,
+ending at y 251; the ring starts at y 300), on 667 × 375 at y 250–273 (tiles
+lifted 21). Gamepad: Settings is under the Forge tile (Forge's down) and left
+of the first hotbar slot; Trade's down goes to the XP bar; the PARTY title's
+up goes to Gems, and nothing is right of Gems.
 
 ### Left: menu grid (anchor: left, vertically centred group)
 
@@ -313,9 +316,10 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 
 ## Deviations from reference
 
-- Owner decision (D27): the Settings button moves from the top-right row to the
-  bottom right of the screen (beside the hotbar's end on desktop, left of
-  Roblox's jump button on touch screens); Coins and Gems close up to the right
+- Owner decisions (D27, D28): the Settings button moves from the top-right row
+  to the bottom left of the screen (39 px in, its foot level with the
+  hotbar's; on touch screens above Roblox's thumbstick ring; D28 replaced
+  D27's bottom-right place beside the jump button); Coins and Gems close up to the right
   margin.
 - Owner decision: party count shows the real cap, **"1/8"**, not "1/10".
 - Owner decision: the Play tile opens the Play window.

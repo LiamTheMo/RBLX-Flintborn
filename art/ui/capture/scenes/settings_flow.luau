@@ -228,28 +228,61 @@ check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
 
--- The world ⚙ sits at the bottom right on a HUD-scaled root; on touch screens
--- it stands above Roblox's jump button.
+-- The world ⚙ sits at the bottom left on a HUD-scaled root (ARCHITECTURE
+-- D28); on touch screens it stands above Roblox's thumbstick ring, at the
+-- screen's left edge.
 local gear = SettingsController.gear
 local gearRoot = gear.root.Parent
 check(
-	gear.root.Position.X.Scale == 1
-		and gear.root.Position.X.Offset == -SettingsController.GEAR.right
+	gear.root.Position.X.Scale == 0
+		and gear.root.Position.X.Offset == SettingsController.GEAR.left
 		and gear.root.Position.Y.Scale == 1
-		and gear.root.AnchorPoint.X == 1
+		and gear.root.AnchorPoint.X == 0
 		and gear.root.AnchorPoint.Y == 1,
-	"the world gear is at the bottom right"
+	"the world gear is at the bottom left"
 )
 check(gearRoot:FindFirstChildWhichIsA("UIScale") ~= nil, "the gear scales with the HUD")
 do
 	local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
-	local at = SettingsController.GearPosition(844, 390, 0.5, true)
-	local jump = HudModel.JumpButton(844, 390)
-	local foot = 390 + at.Y.Offset * 0.5
+	for _, screen in { { 844, 390, 0.5, true }, { 667, 375, 0.5, true }, { 2000, 924, 0.982, false } } do
+		local w, h, k, phone = screen[1], screen[2], screen[3], screen[4]
+		local at = SettingsController.GearPosition(w, h, k, true, phone)
+		local stick = HudModel.Thumbstick(w, h)
+		local zone = HudModel.ThumbstickZone(w, h)
+		local foot = h + at.Y.Offset * k
+		local right = (at.X.Offset + SettingsController.GEAR.w) * k
+		check(
+			foot + SettingsController.GEAR.gap <= stick.y + 0.01 and at.X.Offset == (if phone then 16 else 39),
+			("touch %dx%d: the world gear's foot (%d) stands above the thumbstick ring (%d), at the left edge (x %d..%d of the thumbstick zone's %d)"):format(
+				w,
+				h,
+				foot,
+				stick.y,
+				at.X.Offset * k,
+				right,
+				zone.w
+			)
+		)
+	end
+	local desk = SettingsController.GearPosition(1672, 941, 1, false, false)
 	check(
-		foot + SettingsController.GEAR.gap <= jump.y,
-		("touch: the world gear's foot (%d) stands above the jump button (%d)"):format(foot, jump.y)
+		desk.X.Offset == 39 and desk.Y.Offset == -49,
+		"desktop: the gear's foot on the hotbar's bottom line, 39 px in"
 	)
+end
+-- Gamepad: the world gear sits left of the hotbar's first slot and under the
+-- tiles' bottom-left tile (Map in the 2 × 3 grid).
+do
+	local HudController = require(Client.Controllers.HudController)
+	local holder = Instance.new("Frame")
+	local mounted = HudController.Mount(holder, require(Client.Hud.Layout).Get(), function() end)
+	local hit = gear.control.hit
+	SettingsController.LinkGear(hit, mounted)
+	local first = mounted.bottom.slots[1].control.hit
+	local corner = mounted.tiles[5].control.hit
+	check(hit.NextSelectionRight == first and first.NextSelectionLeft == hit, "gamepad: gear <-> the first hotbar slot")
+	check(hit.NextSelectionUp == corner and corner.NextSelectionDown == hit, "gamepad: the Map tile v the gear ^ it")
+	holder:Destroy()
 end
 
 -- Leak check counts: the PlayerGui's instances, and the live connections on

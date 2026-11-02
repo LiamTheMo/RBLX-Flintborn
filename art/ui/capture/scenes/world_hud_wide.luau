@@ -1,6 +1,8 @@
--- An ultrawide screen (2560 × 1080): the regions stay pinned to their edges.
+-- An ultrawide screen (2560 × 1080): the regions stay pinned to their edges,
+-- the compass in Roblox's top bar (stand-ins for its buttons at the top left).
 -- Built with the real scaling (Kit.Scale.Hud and HudController.PlaceTop, as
--- HudController does) and the world_hud sample data.
+-- HudController does) and the world_hud sample data; the layout checks
+-- (hud_checks.luau, ARCHITECTURE D28) run on it.
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local UserInputService = game:GetService("UserInputService")
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
@@ -10,7 +12,6 @@ local Kit = require(Client.Hud.Kit)
 local Layout = require(Client.Hud.Layout)
 
 local W, H = 2560, 1080
-local TOP_BAR = 58
 -- Stand-in background: art/reference/lobby_map.png is the lobby village (the
 -- repo has no in-world screenshot). The world HUD never shows in the lobby: it
 -- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
@@ -25,8 +26,21 @@ local gui, root = __screen(W, H)
 local hud = HudController.Mount(root, layout, function() end)
 Kit.Scale.Hud(gui, root)
 local scale = root:FindFirstChildWhichIsA("UIScale").Scale
-local shift = HudController.PlaceTop(HudController.TopRegions(hud), TOP_BAR / scale)
-print(("world_hud_wide: scale %.3f, root %d x %d design px, top shift %d"):format(scale, W / scale, H / scale, shift))
+local chrome = __robloxChrome(gui, W, H)
+local placed = HudController.PlaceTop(
+	HudController.TopRegions(hud),
+	HudController.TopBar(chrome.bar, W, scale, game:GetService("GuiService").TopbarInset, 0)
+)
+print(
+	("world_hud_wide: scale %.3f, root %d x %d design px, left shift %d, compass top %d, in the bar's row: %s"):format(
+		scale,
+		W / scale,
+		H / scale,
+		placed.shift,
+		placed.compassTop,
+		tostring(placed.inRow)
+	)
+)
 
 hud.party:Set({
 	{ userId = 2, name = "ForestRanger", health = 0.9 },
@@ -80,16 +94,27 @@ if UserInputService.TouchEnabled then
 	attack.Parent = root
 	Kit.IconButton.new(attack, { rect = { 0, 0, cfg.size[1], cfg.size[2] }, variant = "round", icon = "spear" })
 end
--- The world ⚙ as SettingsController places it, at the bottom right.
+-- The world ⚙ as SettingsController places it, at the bottom left.
 do
 	local SettingsController = require(Client.Controllers.SettingsController)
 	local g = SettingsController.GEAR
-	Kit.IconButton.new(root, {
+	local gear = Kit.IconButton.new(root, {
 		name = "Settings",
 		variant = "settings",
 		size = { g.w, g.h },
 		position = SettingsController.GearPosition(W, H, scale, false),
-		anchorPoint = Vector2.new(1, 1),
+		anchorPoint = Vector2.new(0, 1),
+	})
+	__checkWorldHud({
+		scene = "world_hud_wide",
+		hud = hud,
+		root = root,
+		W = W,
+		H = H,
+		k = scale,
+		chrome = chrome,
+		gear = gear.root,
 	})
 end
+__hudChecksDone("world_hud_wide")
 __dump(gui, W, H, BACKGROUND)

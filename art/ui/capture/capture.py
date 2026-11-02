@@ -115,6 +115,8 @@ def bundle(scene: Path, extra_ids) -> str:
     for path, source in module_entries(extra_ids):
         chunks.append("__defineModule({%s}, function(script)\n%s\nend)\n"
                       % (", ".join(json.dumps(p) for p in path), source))
+    # Layout checks the HUD scenes share (they run after the modules exist).
+    chunks.append((HERE / "hud_checks.luau").read_text(encoding="utf-8"))
     chunks.append(scene.read_text(encoding="utf-8"))
     return "\n".join(chunks)
 

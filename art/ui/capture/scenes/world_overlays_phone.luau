@@ -115,6 +115,27 @@ local xpAmount, xpUntil = BoostRules.Attributes("XP")
 player:SetAttribute(xpAmount, 0.25)
 player:SetAttribute(xpUntil, 581)
 RunService.Heartbeat:Fire(1)
+check(find("BoostList").Visible, "the boosts show")
+-- The boosts grow up from the bottom-left corner beside the world ⚙
+-- (SettingsController places it there on the HUD's scale), never over it.
+do
+	local Kit = require(Client.Hud.Kit)
+	local SettingsController = require(Controllers.SettingsController)
+	local hudGui, hudRoot = __screen(W, H)
+	Kit.Scale.Hud(hudGui, hudRoot)
+	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
+	local at = SettingsController.GearPosition(W, H, k, true, Kit.Scale.FormFactor() == "phone")
+	local gearRight = (at.X.Offset + SettingsController.GEAR.w) * k
+	local list = find("BoostList")
+	local boostLeft = list.Position.X.Offset * Theme.HudScale(gui)
+	check(
+		boostLeft >= gearRight + 6,
+		("the boosts start right of the world settings button (x %d, the button ends at x %d)"):format(
+			boostLeft,
+			gearRight
+		)
+	)
+end
 __dump(gui, W, H, BG)
 
 player:SetAttribute("Downed", false)

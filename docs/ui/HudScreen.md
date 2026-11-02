@@ -20,10 +20,21 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
   also show outside a run.
 - Root scale `Kit.Scale.Hud` (HudModel.HudScale, × 0.9 on touch phones and
   tablets, never below the `phoneFloor.hud` 0.5).
-  The top-pinned regions move down together when the Roblox top bar reaches past
-  y 60 (`HudController.PlaceTop`, as the lobby HUD's `SetTopInset`); regions
-  pinned to the bottom stay. Theme's banner column starts below the compass
-  waypoints.
+- The top bar (D28, `HudController.TopBar` / `PlaceTop`, re-run when the scale,
+  the screen or `GuiService.TopbarInset` changes): the compass sits in Roblox's
+  top bar, its plaque centred on the bar's button line (`HudModel.TopRow`:
+  Roblox's 44 px buttons end 2 px above the inset, so under a 58 px bar the row
+  is y 12–56 and its centre 34 screen px; the plaque never above design y 14,
+  so its arrow stays on screen) and on the screen's centre, moved right just
+  enough to keep 16 design px from Roblox's left-hand buttons
+  (`TopbarInset.Min.X`; 230 screen px when the engine does not say) and from
+  the vitals (`HudModel.RowCentre`); with no room there it drops below the bar.
+  The right-hand column (vitals, status, objective, world event) starts level
+  with the buttons' top (below the bar only when the bar's right-hand area
+  reaches over it). The left-hand regions (tribe frames; on phones the tiles
+  and the world event) move down together below the bar. Regions pinned to
+  the bottom stay. Theme's banner column starts below the compass waypoints
+  (on phones below the tribe strip).
 - Form factors (`Kit.Scale.FormFactor`): each HudLayout entry may carry a
   `touch` table (phones and tablets: larger text, two-line objective rows) and a
   `phone` table (phones: places for the short canvas); `Layout.ForScreen`
@@ -35,19 +46,19 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 | Region | Place (design px) | Kit parts | Data |
 |---|---|---|---|
 | Tribe frames | top left (39, 60), 294 wide, 58 + 50 per row | `Panel` card, `SectionHeader` "TRIBE n" (party icon), per member a compact `PlayerRow` (portrait 40, name) and a `Bar` health fill on the track | tribe-mates on this server (`TribeId`), alphabetical, up to 3 rows; n counts them all; hidden when none |
-| Compass | top centre, y 60, 481 × 46 | `Panel` plaque, ink `Divider` ticks, `Text` letters (`hudSmall`, cardinals 20), leather `Icon` arrow_down marker, waypoint `Icon`s under it | camera yaw; landmarks (mountain), camps (campfire), portals (portal), extraction countdowns (exit), events (category icon) |
-| Vitals | top right (right 53, y 60), 240 × 50, pitch 58 (D27; was 315 × 65 at 76); the value draws at 19 design px (22.8 on touch: 11.4 screen px on a phone) | `Bar` frame "stat": one paper plate across the bar (`lk_bar_frame_plain`, as sheets 08 / 18 without the value plaque) with the icon at its left and the dark track (`lk_bar_track`) and fill after it; the value ("85/100") is centred in the track in cream with an ink outline: heart/health, lightning/stamina, drumstick/food | Humanoid `Health`/`MaxHealth` ("85/100"); `Stamina`, `Food` fractions shown out of 100 |
+| Compass | in Roblox's top bar: centred on its button line (desktop y 14–60, phones 22–46 screen px) and on the screen, clear of Roblox's buttons (D28), 481 × 46; waypoints just under it (+52) | `Panel` plaque, ink `Divider` ticks, `Text` letters (`hudSmall`, cardinals 20), leather `Icon` arrow_down marker, waypoint `Icon`s under it | camera yaw; landmarks (mountain), camps (campfire), portals (portal), extraction countdowns (exit), events (category icon) |
+| Vitals | top-right corner (right 53, level with Roblox's buttons' top: design y 12 under a 58 px bar on desktop, 12 screen px on every screen; D28), 240 × 50, pitch 58 (D27; was 315 × 65 at 76); the value draws at 19 design px (22.8 on touch: 11.4 screen px on a phone) | `Bar` frame "stat": one paper plate across the bar (`lk_bar_frame_plain`, as sheets 08 / 18 without the value plaque) with the icon at its left and the dark track (`lk_bar_track`) and fill after it; the value ("85/100") is centred in the track in cream with an ink outline: heart/health, lightning/stamina, drumstick/food | Humanoid `Health`/`MaxHealth` ("85/100"); `Stamina`, `Food` fractions shown out of 100 |
 | Low state | on a stat bar at ≤ 25 % | warning `Icon` on the icon tile, the icon pulses (`Motion.Pulse`; steady with reduced motion) | same values |
-| Status | right-aligned under the vitals, y 236, 38 high | one `Panel` plaque per line with an `Icon` and `Text` | medicine lock (hourglass, "Medicine ready in 12.4 s"), `FoodHealing` (heart), hunger slow (warning) |
-| Objective | right, y 284, 315 × 134 (touch: 315 × 162, each task on two lines: the task, then pin, distance and progress) | `Panel` card, `SectionHeader` (exit icon, "FIND EXTRACTION"), per task a `Checkbox` ring (read only), `Text`, map_pin `Icon` + distance, progress; a task too long shrinks to 70 % and then ends in "…" | `HudModel.ExtractionObjective` (nearest countdown, else nearest portal) |
-| World event | right, y 430 (touch: y 458), 315 wide, at least 128 high and growing with its text | `Panel` card, `SectionHeader` (category icon, "WORLD EVENT", countdown at its right), name (`rowTitle`), wrapped rarity and blurb (`bodySoft`, up to 3 lines, 15 on touch), the place ("NE, 312 m") after a map_pin on its own line | `HudModel.WorldEvent`; hidden while none runs |
-| Menu tiles | left, x 68, centred at y 0.476, the lobby's 2 × 3 grid (88 × 84, pitch 102 / 94) | `IconButton` tile: backpack, hammer (Craft), build, party (Tribe), map, trophy (Progress); `Tooltip` names the bound key, the gamepad button ("Backpack (Y)") or nothing on touch (`Kit.Input.Hint`) | `HudController.MENU` |
+| Status | right-aligned under the vitals, y 188 (the column's top + 176), 38 high | one `Panel` plaque per line with an `Icon` and `Text` | medicine lock (hourglass, "Medicine ready in 12.4 s"), `FoodHealing` (heart), hunger slow (warning) |
+| Objective | right, right under the status row, y 236 (column top + 224), 315 × 134 (touch: 315 × 162, each task on two lines: the task, then pin, distance and progress) | `Panel` card, `SectionHeader` (exit icon, "FIND EXTRACTION"), per task a `Checkbox` ring (read only), `Text`, map_pin `Icon` + distance, progress; a task too long shrinks to 70 % and then ends in "…" | `HudModel.ExtractionObjective` (nearest countdown, else nearest portal) |
+| World event | right, under the objective, y 382 (touch: y 410), 315 wide, at least 128 high and growing with its text | `Panel` card, `SectionHeader` (category icon, "WORLD EVENT", countdown at its right), name (`rowTitle`), wrapped rarity and blurb (`bodySoft`, up to 3 lines, 15 on touch), the place ("NE, 312 m") after a map_pin on its own line | `HudModel.WorldEvent`; hidden while none runs |
+| Menu tiles | the left edge, x 39 (the tribe frames' edge; D28, was 68), centred at y 0.476, the lobby's 2 × 3 grid (88 × 84, pitch 102 / 94) | `IconButton` tile: backpack, hammer (Craft), build, party (Tribe), map, trophy (Progress); `Tooltip` names the bound key, the gamepad button ("Backpack (Y)") or nothing on touch (`Kit.Input.Hint`) | `HudController.MENU` |
 | Level and XP | bottom centre, 49 up, 572 × 124 (as the lobby) | "LV. n" `Text`, `Bar` xp on the track (356 × 16), "450/750 XP" `Text`; at the cap a full bar, the real level and "Max level" | progression snapshots (`ProgressionController.Changed`) |
 | Hotbar | under the XP bar, 6 × `Slot` hotbar 89 × 89 (square) at the lobby's x, y 35 in the bottom group | `Slot` with `ItemIcon` art via itemId, count, Permanent star, leather number badge (keyboard and mouse only), gold glow when selected | run inventory `area == "hotbar"`; badges read `Binds.Label("HotbarN")` and follow `Kit.Input.Watch`; the selection follows the equipped slot |
 | Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; the plaque widens for the longer line (with `Kit.Core.FIT_SLACK`), so on touch only a text past 420 ends in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
 | Damage numbers | world billboards | display font (`fonts.display`), `gold` with an `ink` outline | `CombatFeedback` hits, when Show Damage is on |
 | Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon; the Kit pads its hit area | press = swing or start the bow draw, release fires |
-| Settings | bottom right (right 53, its foot 49 up, on the hotbar's bottom line), 52 × 46; touch screens: 12 screen px above Roblox's jump button (`HudModel.CornerButton`) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GEAR` / `GearPosition`); gamepad: right of the last hotbar slot | opens Settings (also the Settings key, O by default) |
+| Settings | bottom left (D28): x 39 (phones 16, the tiles' column), its foot 49 up on the hotbar's bottom line, 52 × 46; touch screens: its foot 12 screen px above Roblox's thumbstick ring (`HudModel.ThumbstickCorner`; see Phones) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GEAR` / `GearPosition`); gamepad: left of the first hotbar slot, under the bottom-left tile (Map; `SettingsController.LinkGear`) | opens Settings (also the Settings key, O by default) |
 | Hit marker, bow draw | screen centre (−70 / +48) | `Panel` plaque with `Text` ("Hit 12" in ink, "Hurt -8" in `short`); `Bar` well with "Range 60%" | `CombatFeedback`; draw time |
 
 ## Phones (touch, viewport under 500 px high)
@@ -59,13 +70,14 @@ below the top third. The `phone` entries arrange the HUD around them:
 
 | Region | Phone place |
 |---|---|
-| Menu tiles | top left (39, 60), 3 × 2, 80 × 80 tiles at pitch 88 / 86 (40 screen px; the Kit pads the touch area to 44); their bottom row reaches about 12–17 screen px into the thumbstick zone's top edge |
-| World event | top left under the tiles (39, 238); the header title shrinks so it never meets the countdown |
-| Tribe frames | one short strip under the compass (centred, y 142 before the top-bar shift, 50 high): the tribe icon and count, then the members side by side (portrait, name, health bar; the cells widen from 150 up to `cellMaxW` 250 for the longest name, so only a longer one ends in "…"); above the thumbstick zone and clear of the jump button. Banners start below it |
-| Vitals, status, objective | right column as on desktop; the objective ends above the jump button |
+| Compass | in the top bar's row, 22–46 screen px; on 844 × 390 centred (x 301–543, Roblox's buttons end at about x 212), on 667 × 375 moved 38 design px right (x 232–473) to keep 8 screen px from them |
+| Menu tiles | top left at the left edge (16, 60: 8 screen px in from the safe area; D28, was 39), below the top bar, 3 × 2, 80 × 80 tiles at pitch 88 / 86 (40 screen px; the Kit pads the touch area to 44); their bottom row reaches about 12 screen px into the thumbstick zone's top edge |
+| World event | top left under the tiles (16, 238): the right-hand column has no room for it above the jump button on phones (the card grows to about 94 screen px); the header title shrinks so it never meets the countdown |
+| Tribe frames | one short strip hanging under the compass waypoints (centred, the compass top + 82, 50 high; 63–88 screen px under a 58 px bar): the tribe icon and count, then the members side by side (portrait, name, health bar; the cells widen from 150 up to `cellMaxW` 250 for the longest name, so only a longer one ends in "…"); above the thumbstick zone and clear of the jump button. Banners start below it |
+| Vitals, status, objective | right column from the top-right corner (844 × 390: vitals y 12–95, status 100–119, objective 124–205), ending far above the jump button (y 300) |
 | Touch attack | right 220, bottom 30 |
-| Settings | above the jump button: right 53, its foot 204 up (844 × 390: x 791–817, y 265–288; the objective ends at y 252, the jump button starts at y 300) |
-| Hotbar, compass | as on desktop; hotbar key badges hidden |
+| Settings | bottom left, x 16 (8–34 screen px), its foot 204 design px up: 12 screen px above where Roblox's classic thumbstick ring starts (y 300 on 844 × 390, 285 on 667 × 375; `HudModel.Thumbstick`, the mirror of the jump button). It draws at y 265–288 (844 × 390) / 250–273 (667 × 375); its 44 px touch pad (x −1…43) stays off the ring and inside the outer tenth of the screen, where the dynamic thumbstick's start zone (the left 40 % below the top third, `HudModel.ThumbstickZone`) begins and a thumb rarely lands; the code reserves nothing else on the left there (the tiles keep above the zone's top edge, the event card ends about 20 px above the button). Clear of the hotbar (from x 259 / 170) and of the boost list, which starts right of it (`BoostHudController.PHONE_LEFT`) |
+| Hotbar | as on desktop; hotbar key badges hidden |
 
 All world HUD text is at least 9 screen px on phones (body roles 1.2 ×, the
 compass letters included).
@@ -97,12 +109,23 @@ compass letters included).
 ## Verification
 
 ```bash
-python3 art/ui/capture/capture.py world_hud          # two sample runs (tribe, solo at the level cap)
+python3 art/ui/capture/capture.py world_hud          # two sample runs (tribe, solo at the level cap), Roblox's top-bar buttons drawn
 python3 art/ui/capture/capture.py world_hud_states   # low vitals, forced tile and slot states, done objective
-python3 art/ui/capture/capture.py world_hud_phone    # 844 × 390 touch, top bar 58 px, attack button, gear clear of the jump button
+python3 art/ui/capture/capture.py world_hud_phone    # 844 × 390, 667 × 375, 2000 × 924 touch: top bar 58 px, jump button and thumbstick drawn
 python3 art/ui/capture/capture.py world_hud_wide     # 2560 × 1080
-python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks)
+python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks, the live placement)
 ```
+
+Every scene runs the layout checks in `art/ui/capture/hud_checks.luau`
+(`__checkWorldHud`): the compass in the top bar's row (its centre within
+10 px of the buttons' centre line) and 8 px or more from Roblox's buttons, its
+waypoints under it, the vitals in the top-right corner level with the buttons'
+top, the objective right under the vitals and status (within 70 design px of
+the vitals' foot) with the event under it, the tiles at the left edge below
+the bar, Settings at the bottom left in the tiles' column, left of the hotbar
+and on touch above the thumbstick ring, and no region overlapping another,
+leaving the screen or meeting Roblox's buttons, the jump button or the
+thumbstick ring.
 
 The scenes draw over `art/reference/lobby_map.png`, a stand-in: it is the lobby
 village, because the repo has no in-world screenshot. In game the world HUD
@@ -138,3 +161,20 @@ the lobby never shows it.
 - **Downed card** redraws on its replicated attributes instead of every frame;
   the boss card ticks at 0.25 s only while a boss or the horn can show (1 s
   otherwise); the legacy event list skips its 1 s tick with no event running.
+
+## Owner layout round (D28)
+
+From the owner's annotated phone screenshot (`art/ui/verify/owner/hud_move_request.jpg`,
+an 844 × 390 iPhone; pink boxes and arrows):
+
+| Drawing | Built |
+|---|---|
+| Box at the top centre, level with Roblox's buttons | The compass moves up into the top bar's row (desktop y 60 → 14–60, phones 59 → 22–46 screen px), centred and clear of Roblox's buttons (`HudController.PlaceTop`); its waypoints follow it |
+| Vitals bracketed, arrow up to where the "Saved" pill was | The vitals start level with the buttons' top in the top-right corner (y 60 → 12; phones 59 → 12 screen px) |
+| Objective, arrow up | Status, objective and world event move up with them (y 236 / 284 / 430 → 188 / 236 / 382; phones: the objective from y 171 to 124 screen px) |
+| Tile grid bracketed, arrow left | The grid moves to the left edge: x 68 → 39 (desktop, the tribe frames' edge), 39 → 16 on phones (8 screen px in from the safe area: on a notched iPhone the 47 pt left of it is the notch side's safe area, so the grid cannot reach the screen's edge the arrow points at) |
+| (owner message) Settings to the bottom left, in both places | Both HUDs' Settings button: bottom left, above the thumbstick ring on touch (see Phones) |
+
+The "Sprint" button, attack button, hotbar, XP bar and interaction prompt keep
+their places.
+

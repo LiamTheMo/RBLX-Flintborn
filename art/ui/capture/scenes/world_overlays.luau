@@ -147,9 +147,10 @@ do
 	controller.Start()
 	started[name] = controller
 end
--- In game the world HUD puts the column under its compass.
+-- In game the world HUD puts the column under its compass and waypoints
+-- (the compass sits in Roblox's top bar, ARCHITECTURE D28).
 local stack = Theme.TopStack()
-stack.Position = UDim2.new(0.5, 0, 0, 126)
+stack.Position = UDim2.new(0.5, 0, 0, 100)
 
 local gui = player.PlayerGui
 local function find(name)
@@ -211,6 +212,26 @@ check(find("BossBar").Visible and find("Horn").Visible, "the boss bar and the ho
 check(find("EventBanner") ~= nil, "the event banner shows")
 check(find("Tutorial").Visible, "the tutorial card shows")
 check(find("BoostList").Visible, "the boosts show")
+-- The boosts grow up from the bottom-left corner beside the world ⚙
+-- (SettingsController places it there on the HUD's scale), never over it.
+do
+	local Kit = require(Client.Hud.Kit)
+	local SettingsController = require(Controllers.SettingsController)
+	local hudGui, hudRoot = __screen(1672, 941)
+	Kit.Scale.Hud(hudGui, hudRoot)
+	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
+	local at = SettingsController.GearPosition(1672, 941, k, false, Kit.Scale.FormFactor() == "phone")
+	local gearRight = (at.X.Offset + SettingsController.GEAR.w) * k
+	local list = find("BoostList")
+	local boostLeft = list.Position.X.Offset * Theme.HudScale(gui)
+	check(
+		boostLeft >= gearRight + 6,
+		("the boosts start right of the world settings button (x %d, the button ends at x %d)"):format(
+			boostLeft,
+			gearRight
+		)
+	)
+end
 -- The alert caption belongs to page 2.
 find("Caption").Visible = false
 __dump(gui, W, H, BG)

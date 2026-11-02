@@ -4,7 +4,11 @@
 --   1 a run in a tribe of four: three tribe-mates, the compass with waypoints,
 --     vitals, a medicine lock, the extraction objective, a world event, LV 12
 --     450/750 XP, the hotbar with slot 1 selected, an interaction prompt and
---     the Settings button at the bottom right
+--     the Settings button at the bottom left
+-- Laid out as the owner asked (ARCHITECTURE D28): the compass in Roblox's top
+-- bar (stand-ins for its buttons drawn at the top left), the vitals in the
+-- top-right corner with the objective and event under them, the tiles at the
+-- left edge; the layout checks (hud_checks.luau) run on both pages.
 --   2 alone: no tribe frames, no event, the objective searching, hotbar slot 3
 --     selected, a hold prompt with a gamepad key, and the level cap
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
@@ -25,18 +29,42 @@ local layout = Layout.Get()
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
+	local chrome = __robloxChrome(root, W, H)
+	local placed = HudController.PlaceTop(
+		HudController.TopRegions(hud),
+		HudController.TopBar(chrome.bar, W, 1, game:GetService("GuiService").TopbarInset, 0)
+	)
+	print(
+		("world_hud: compass top %d, centre %+d from the middle, in the bar's row: %s"):format(
+			placed.compassTop,
+			placed.compassX,
+			tostring(placed.inRow)
+		)
+	)
 	-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
-	-- game), at the bottom right.
+	-- game), at the bottom left.
 	local SettingsController = require(Client.Controllers.SettingsController)
 	local g = SettingsController.GEAR
-	require(Hud.Kit).IconButton.new(root, {
+	local gear = require(Hud.Kit).IconButton.new(root, {
 		name = "Settings",
 		variant = "settings",
 		size = { g.w, g.h },
 		position = SettingsController.GearPosition(W, H, 1, false),
-		anchorPoint = Vector2.new(1, 1),
+		anchorPoint = Vector2.new(0, 1),
 	})
-	return gui, root, hud
+	local function check()
+		__checkWorldHud({
+			scene = "world_hud",
+			hud = hud,
+			root = root,
+			W = W,
+			H = H,
+			k = 1,
+			chrome = chrome,
+			gear = gear.root,
+		})
+	end
+	return gui, root, hud, check
 end
 
 local function prompt(root, x: number, y: number, texts)
@@ -74,7 +102,7 @@ end
 
 -- 1: a run in a tribe.
 do
-	local _, root, hud = page()
+	local _, root, hud, check = page()
 	hud.party:Set({
 		{ userId = 2, name = "ForestRanger", health = 0.9 },
 		{ userId = 3, name = "Mira", health = 0.46 },
@@ -106,12 +134,13 @@ do
 	})
 	hud.bottom:Select(1)
 	prompt(root, 900, 520, { key = "E", action = "Gather", object = "Redberry Bush" })
+	check()
 	__dump(root, W, H, BACKGROUND)
 end
 
 -- 2: alone, searching, at the level cap, holding a gamepad prompt.
 do
-	local _, root, hud = page()
+	local _, root, hud, check = page()
 	hud.party:Set({}, true, 0)
 	compass(hud, 205)
 	hud.vitals:Set("health", 1, "100/100", true)
@@ -132,5 +161,7 @@ do
 	hud.bottom:Select(3)
 	local drawn = prompt(root, 880, 520, { key = "X", action = "Open", object = "Supply Cache", hold = true })
 	drawn.hold:Set(0.4, true)
+	check()
 	__dump(root, W, H, BACKGROUND)
 end
+__hudChecksDone("world_hud")
