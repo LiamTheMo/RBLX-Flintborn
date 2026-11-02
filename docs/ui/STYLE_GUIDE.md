@@ -6,7 +6,7 @@ is the authority, this guide summarises it and links to it:
 
 | Document | Authority for |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D27) override everything else**, this guide included |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D28) override everything else**, this guide included |
 | [KIT.md](KIT.md) | The Kit's API: every component's constructor, props, methods and states; roles; stand-ins; capture limits |
 | Screen specs: [LobbyScreen](LobbyScreen.md), [InventoryScreen](InventoryScreen.md), [SettingsScreen](SettingsScreen.md), [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md), [ForgeScreen](ForgeScreen.md), [CraftingScreen](CraftingScreen.md), [JournalScreen](JournalScreen.md), [ListWindows](ListWindows.md), [HudScreen](HudScreen.md) | Per-screen measurements, element trees, data and deviations |
 | [ITEM_ART.md](ITEM_ART.md) | Which art and tint every catalog item draws |
@@ -106,7 +106,7 @@ cleaned by the slicer (§9.1), never cut by hand.
 
 | File | Source of truth for | Built as |
 |---|---|---|
-| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies (top right; the settings button moved to the bottom right, D27), 2 × 3 menu tiles (left), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
+| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies (top right; the settings button moved to the bottom left, D27 / D28), 2 × 3 menu tiles (left), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
 | [`02_inventory.png`](../../art/reference/ui/lobby/02_inventory.png) | The model window: frame, banner header (icon, title, ink underline, close), category column, slot grid, detail card, primary action; also the Play window's chrome (D25) | `Screens/InventoryWindow` |
 | [`03_settings.png`](../../art/reference/ui/lobby/03_settings.png) | Large notched tabs, sliders, checkboxes with descriptions, key-bind boxes, Reset / Apply footer | `Screens/SettingsWindow` (D1, D2, D21) |
 | [`04_party.png`](../../art/reference/ui/lobby/04_party.png) | Centred header with ornaments, member rows, invite search and list, Party Details | `Screens/PartyWindow` (D5, D6, D17, D24: no Readied Status) |
@@ -176,7 +176,8 @@ the specs and every other section. Full text:
 | D24 | Ready removed | No Ready anywhere (server, Party window, HUD dots, Play); only a solo player or the leader presses Play; the leader is marked by the crown alone (no Leader tag) | [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md) |
 | D25 | Play window chrome | Inventory's size (1187 × 650), header, clasps and close corner; map in an inset panel; section headings instead of plaques; primary leather PLAY at the bottom right | [PlayScreen](PlayScreen.md) |
 | D26 | Play rune art | Sheet 21: the crystal arrow is the Play tile's and the Play header's icon and the PLAY button's glyph; two rune pillars stand at the PLAY button's ends; own atlas `atlas_lk_play`; portal and white glyph until it is uploaded | [PlayScreen](PlayScreen.md#play-rune-art-d26), §9.6 |
-| D27 | HUD corner round | Both HUDs' Settings button at the bottom right (beside the hotbar's end; on touch clear of Roblox's jump button: above it in the world, left of it in the lobby); world vitals 240 × 50 at pitch 58; no client save-status tag | [LobbyScreen](LobbyScreen.md), [HudScreen](HudScreen.md) |
+| D27 | HUD corner round | World vitals 240 × 50 at pitch 58; no client save-status tag; Coins and Gems alone at the top right (its Settings placement, bottom right by the jump button, is superseded by D28) | [LobbyScreen](LobbyScreen.md), [HudScreen](HudScreen.md) |
+| D28 | HUD layout round | World HUD: the compass in Roblox's top bar, level with its buttons and clear of them; vitals, status, objective and world event from the top-right corner down; menu tiles at the left edge. Both HUDs: Settings at the bottom left (on touch above Roblox's thumbstick ring, at the edge of its zone) | [HudScreen](HudScreen.md), [LobbyScreen](LobbyScreen.md) |
 
 Other recorded deviations (not numbered): the lobby HUD has no player card
 (each party row shows level and XP instead; [LobbyScreen](LobbyScreen.md)),
@@ -508,15 +509,17 @@ a root sized to 1/scale of the screen (`Kit.Scale.Hud`):
 | Menu tiles 2 × 3 | left, vertically centred | x 68, centre at 448 / 941 of the height; 190 × 272; tiles 88 × 84 at a 102 × 94 pitch |
 | Party panel | top right | 53 from the right, y 258; 294 × 244 |
 | XP bar and hotbar | bottom centre | 49 from the bottom; 572 × 124; slot lefts 0, 96, 193, 289, 386, 482 |
-| Settings (D27) | bottom right | 53 from the right, 49 from the bottom; 52 × 46; on touch 12 screen px left of Roblox's jump button, centred on its height (`HudModel.CornerButton`) |
+| Settings (D28) | bottom left | 39 from the left (phones 16), 49 from the bottom; 52 × 46; on touch its foot 12 screen px above Roblox's thumbstick ring (`HudModel.ThumbstickCorner`), and the tiles move up as far as its touch pad needs |
 
 The run's HUD uses the same parts and measures from
 [`HudLayout.json`](../../src/shared/UI/HudLayout.json) ([HudScreen](HudScreen.md)):
-party frames top left (39, 60), compass top centre (y 60, 481 × 46), vitals top
-right (53 in, y 60, 240 × 50 rows at a 58 pitch, D27), status, objective and
-event cards under them (y 236, 284, 430), tiles at x 68, the same bottom bar,
-the touch attack button and the Settings button bottom right (on touch 12
-screen px above Roblox's jump button).
+party frames top left (39, 60), the compass in Roblox's top bar (481 × 46,
+centred on the bar's button line and clear of its buttons, D28), vitals in the
+top-right corner (53 in, level with the bar's buttons: y 12 under a 58 px bar,
+240 × 50 rows at a 58 pitch), status, objective and event cards under them
+(y 188, 236, 382), tiles at the left edge (x 39; phones 16), the same bottom
+bar, the touch attack button and the Settings button bottom left (on touch 12
+screen px above Roblox's thumbstick ring).
 
 While a window is open the HUD stays where M01 has it (D8) under the veil
 (`#050403` at 0.30) and, on Medium and High graphics, a size 8 blur.
@@ -524,7 +527,12 @@ While a window is open the HUD stays where M01 has it (D8) under the veil
 **Top bar.** `Kit.Scale.TopInset(gui)` measures how far the Roblox top bar
 reaches; windows keep below `max(inset, topInsetMin 52)` plus their margin. The
 lobby HUD moves its top regions down only when the inset plus 2 px
-(`TOP_GAP`) passes the mockup's top margin (`TOP_Y` 60).
+(`TOP_GAP`) passes the mockup's top margin (`TOP_Y` 60). The world HUD (D28)
+uses the bar's row itself: `HudController.TopBar` reads the inset and
+`GuiService.TopbarInset` (where Roblox's left-hand buttons end), and
+`HudController.PlaceTop` puts the compass on the buttons' centre line clear of
+them, the right-hand column level with their top, and the left-hand regions
+below the bar.
 
 ### 5.7 Scaling, form factors and safe areas
 
@@ -954,7 +962,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 
 | Screen | File | Controller | Spec | Capture scenes | Capture |
 |---|---|---|---|---|---|
-| Lobby HUD (M01) | `src/client/Hud/Screens/LobbyHud.luau` | `LobbyHudController` | [LobbyScreen](LobbyScreen.md) | `lobby_hud`, `lobby_hud_states`, `lobby_hud_phone`, `lobby_hud_wide`, `lobby_hud_flow`, `lobby_hud_failed` | `art/ui/captures/lobby_hud.png` |
+| Lobby HUD (M01) | `src/client/Hud/Screens/LobbyHud.luau` | `LobbyHudController` | [LobbyScreen](LobbyScreen.md) | `lobby_hud`, `lobby_hud_states`, `lobby_hud_phone` (844 × 390, 667 × 375, 2000 × 924), `lobby_hud_wide`, `lobby_hud_flow`, `lobby_hud_failed` | `art/ui/captures/lobby_hud.png` |
 | Inventory and Vault (M02) | `Screens/InventoryWindow.luau` | `VaultController` (lobby), `InventoryController` (run) | [InventoryScreen](InventoryScreen.md) | `inventory_backpack`, `inventory_vault`, `inventory_states`, `inventory_world`, `inventory_flow`, `inventory_phone` | `art/ui/captures/inventory_backpack.png` |
 | Settings (M03) | `Screens/SettingsWindow.luau` | `SettingsController` | [SettingsScreen](SettingsScreen.md) | `settings`, `settings_phone`, `settings_phone_small`, `settings_flow` | `art/ui/captures/settings.png` |
 | Party (M04) | `Screens/PartyWindow.luau` | `PartyController` | [PartyScreen](PartyScreen.md) | `party`, `party_states`, `party_phone`, `party_flow` | `art/ui/captures/party.png` |
@@ -964,7 +972,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 | Quest Journal (M07) | `Screens/JournalWindow.luau`, `Hud/IslandMap.luau` | `JournalController` | [JournalScreen](JournalScreen.md) | `journal`, `journal_phone`, `journal_flow` | `art/ui/captures/journal.png` |
 | Market, Trade, Progress | `src/client/Hud/ListWindow.luau` | `WalletController`, `TradeController`, `ProgressionController` | [ListWindows](ListWindows.md) | `market_flow`, `trade_flow`, `progress_flow` | `art/ui/captures/market_flow.png` |
 | World map | `MapController` + `Hud/IslandMap.luau` | `MapController` | [ListWindows](ListWindows.md#world-map-mapcontroller) | `map_flow` | `art/ui/captures/map_flow.png` |
-| In-world HUD | `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers` | `HudController` | [HudScreen](HudScreen.md) | `world_hud`, `world_hud_states`, `world_hud_phone`, `world_hud_wide`, `world_hud_flow` | `art/ui/captures/world_hud.png` |
+| In-world HUD | `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers` | `HudController` | [HudScreen](HudScreen.md) | `world_hud`, `world_hud_states`, `world_hud_phone` (844 × 390, 667 × 375, 2000 × 924), `world_hud_wide`, `world_hud_flow` | `art/ui/captures/world_hud.png`, `world_hud_phone.png` |
 | Overlays, notices, loot, storage, world menu | `Hud/NoticeCard.luau`, overlay controllers | `NoticeController`, `LootController`, `StorageController`, `WorldMenuController`, … | ARCHITECTURE §4.8 | `notices`, `world_overlays`, `world_overlays_phone`, `world_overlays_flow`, `world_menu` | `art/ui/captures/world_overlays.png` |
 | Kit gallery | `src/client/Hud/Kit/*` | — | [KIT](KIT.md) | `kit_gallery` (9 pages), `kit_gallery_failed`, `kit_gallery_flow`, `sprite_loader_flow` | `art/ui/captures/kit_gallery.png` … `kit_gallery_9.png` |
 
@@ -998,10 +1006,19 @@ python3 art/ui/capture/capture.py journal --out x.png --bg none
 - **Phone pages**: `lobby_hud_phone`, `play_phone`, `party_phone`, `inventory_phone`,
   `journal_phone`, `forge_phone`, `settings_phone`, `world_hud_phone`,
   `world_overlays_phone` (844 × 390, touch only, the top bar 58 px down; `play_phone`
-  page 2 is a 2000 × 924 phone), `settings_phone_small` and `forge_phone_small`
+  page 2 is a 2000 × 924 phone; `world_hud_phone` and `lobby_hud_phone` add
+  667 × 375 and 2000 × 924 pages), `settings_phone_small` and `forge_phone_small`
   (667 × 375); wide: `lobby_hud_wide`, `world_hud_wide` (2560 × 1080). There is
   no tablet scene: copy a phone scene with a touch-only 1024 × 768 or 1280 × 800
   viewport.
+- **Roblox's own controls** (`__robloxChrome` in `gui_env.luau`): the HUD scenes
+  draw stand-ins for the top-bar buttons (the logo and the menu / chat pill,
+  reaching x 212 as on a notched 844 × 390 iPhone) and set
+  `GuiService.TopbarInset` to match; touch pages add the jump button and the
+  classic thumbstick ring. `art/ui/capture/hud_checks.luau` (bundled with every
+  scene) checks the D28 placements and that no HUD region overlaps another,
+  leaves the screen or meets those controls (`__checkWorldHud`,
+  `__checkLobbyHud`); a failed check fails the scene.
 - **Failed-art pages**: `lobby_hud_failed`, `kit_gallery_failed`
   (`__failImages = true` makes every image report a failed load).
 - **States**: set `DebugState` on a component root (`Kit.Debug.Force`); flow

@@ -257,10 +257,11 @@ local function build()
 
 	-- A small always-visible ⚙ button (the kit's settings button), so touch
 	-- players can reach settings in the world too. The lobby HUD has its own gear
-	-- button, so this one stays hidden there. It sits at the bottom right, its
-	-- foot on the hotbar's bottom line, on a root scaled like the HUD; on touch
-	-- screens it moves up to stand above Roblox's jump button
-	-- (HudModel.CornerButton), under the right-hand column.
+	-- button, so this one stays hidden there. It sits at the bottom left (D28),
+	-- in the menu tiles' column with its foot on the hotbar's bottom line, on a
+	-- root scaled like the HUD; on touch screens it moves up to stand above
+	-- Roblox's thumbstick ring (HudModel.ThumbstickCorner), at the outer edge
+	-- of the dynamic thumbstick's zone.
 	local gui = make("ScreenGui", {
 		Name = "FlintbornSettingsButton",
 		ResetOnSpawn = false,
@@ -284,8 +285,8 @@ local function build()
 		name = "Open",
 		variant = "settings",
 		size = { g.w, g.h },
-		position = UDim2.new(1, -g.right, 1, -g.bottom),
-		anchorPoint = Vector2.new(1, 1),
+		position = UDim2.new(0, g.left, 1, -g.bottom),
+		anchorPoint = Vector2.new(0, 1),
 		visible = not HudMode.ReplacesLobby(),
 		onPress = function()
 			SettingsController.Toggle()
@@ -294,26 +295,27 @@ local function build()
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function placeGear()
 		local size = gui.AbsoluteSize
-		gear.root.Position =
-			SettingsController.GearPosition(size.X, size.Y, uiScale.Scale, UserInputService.TouchEnabled)
+		gear.root.Position = SettingsController.GearPosition(
+			size.X,
+			size.Y,
+			uiScale.Scale,
+			UserInputService.TouchEnabled,
+			Kit.Scale.FormFactor() == "phone"
+		)
 	end
 	uiScale:GetPropertyChangedSignal("Scale"):Connect(placeGear)
 	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeGear)
 	UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(placeGear)
+	Kit.Scale.OnFormFactorChanged(placeGear)
 	placeGear()
 	SettingsController.gear = gear
-	-- Gamepad: the gear follows the world hotbar's last slot (the HUD's
-	-- regions are mounted again when the form factor changes).
+	-- Gamepad: the gear sits left of the world hotbar's first slot and under
+	-- the menu tiles' bottom-left tile (the HUD's regions are mounted again
+	-- when the form factor changes).
 	if not HudMode.ReplacesLobby() then
 		local HudController = require(script.Parent.HudController) :: any
 		local function link()
-			local widgets = HudController.Widgets()
-			local slots = widgets and widgets.bottom and widgets.bottom.slots
-			local last = slots and slots[#slots]
-			if last then
-				last.control.hit.NextSelectionRight = gear.control.hit
-				gear.control.hit.NextSelectionLeft = last.control.hit
-			end
+			SettingsController.LinkGear(gear.control.hit, HudController.Widgets())
 		end
 		HudController.Remounted:Connect(link)
 		link()
@@ -321,15 +323,46 @@ local function build()
 end
 
 -- The world ⚙ button in HUD design px (HudLayout's 1672 × 941): at the bottom
--- right, 53 px in like the vitals and its foot on the hotbar's bottom line (49
--- up). On touch screens it stands `gap` screen px above Roblox's jump button.
-SettingsController.GEAR = { right = 53, bottom = 49, w = 52, h = 46, gap = 12 }
+-- left (D28), in the menu tiles' column (HudLayout tiles.x; on phones
+-- tiles.phone, `phoneLeft`) with its foot on the hotbar's bottom line (49 up).
+-- On touch screens its foot stands `gap` screen px above Roblox's thumbstick
+-- ring (HudModel.ThumbstickCorner).
+SettingsController.GEAR = { left = 39, phoneLeft = 16, bottom = 49, w = 52, h = 46, gap = 12 }
 
--- The world ⚙'s position on its HUD root for a screen w × h (screen px) at HUD
--- scale k (HudModel.CornerButton).
-function SettingsController.GearPosition(width: number, height: number, k: number, touch: boolean): UDim2
-	local right, bottom = HudModel.CornerButton(width, height, k, touch, SettingsController.GEAR)
-	return UDim2.new(1, -right, 1, -bottom)
+-- The world ⚙'s position on its HUD root (anchored at its bottom-left corner)
+-- for a screen w × h (screen px) at HUD scale k.
+function SettingsController.GearPosition(
+	width: number,
+	height: number,
+	k: number,
+	touch: boolean,
+	phone: boolean?
+): UDim2
+	local g = SettingsController.GEAR
+	local spec = { left = if phone then g.phoneLeft else g.left, bottom = g.bottom, gap = g.gap }
+	local left, bottom = HudModel.ThumbstickCorner(width, height, k, touch, spec)
+	return UDim2.new(0, left, 1, -bottom)
+end
+
+-- Gamepad neighbours of the world ⚙ (`hit`) in the mounted HUD `widgets`
+-- (HudController.Mount): right to the hotbar's first slot, up to the menu
+-- tiles' bottom-left tile, and back.
+function SettingsController.LinkGear(hit: GuiButton, widgets)
+	local slots = widgets and widgets.bottom and widgets.bottom.slots
+	local first = slots and slots[1]
+	if first then
+		first.control.hit.NextSelectionLeft = hit
+		hit.NextSelectionRight = first.control.hit
+	end
+	local tiles = widgets and widgets.tiles
+	if tiles and #tiles > 0 then
+		local columns = widgets.tileColumns or 2
+		local corner = tiles[(math.ceil(#tiles / columns) - 1) * columns + 1]
+		if corner then
+			corner.control.hit.NextSelectionDown = hit
+			hit.NextSelectionUp = corner.control.hit
+		end
+	end
 end
 
 -- The window (Hud/Screens/SettingsWindow), for scenes and verifiers.

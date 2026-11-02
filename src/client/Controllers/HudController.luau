@@ -169,47 +169,164 @@ end
 
 -- Scale and top inset ----------------------------------------------------------
 
--- The regions pinned to the top edge, with their layout positions:
--- {{object, base}}. They move down together below the Roblox top bar. Regions
--- pinned to the bottom (on phones the tribe frames) stay where they are.
+-- The top bar row (owner decision D28): the compass sits in Roblox's top bar,
+-- level with its buttons and clear of them, and the right-hand column (the
+-- vitals, status plaques, objective and world event) starts level with the
+-- buttons' top in the top-right corner. Regions on the left (the tribe
+-- frames; on phones the menu tiles and the world event) stay below the bar.
+-- Design px kept between the compass and Roblox's buttons or the vitals.
+HudController.TOP_ROW_GAP = 16
+-- Where Roblox's left-hand top-bar buttons end (screen px) when the engine
+-- does not report it (GuiService.TopbarInset): an 844 × 390 iPhone's, notch
+-- included, with room to spare.
+HudController.TOP_BUTTONS_REACH = 230
+
+-- Roblox's top bar in the HUD root's design px: `inset` how far down it
+-- reaches, `left` how far right its left-hand buttons reach, `right` where its
+-- right-hand area starts and `width` the root's width; `scale` is the root's
+-- UIScale. From the bar's reach and the gui's width in screen px, the
+-- engine's GuiService.TopbarInset (the bar's free area, or nil) and the gui's
+-- left edge on the screen.
+function HudController.TopBar(insetPx: number, widthPx: number, k: number, topbar: Rect?, originX: number?)
+	k = math.max(k, 0.01)
+	local left, right = HudController.TOP_BUTTONS_REACH, widthPx
+	if topbar and topbar.Max.Y > 0 and topbar.Max.X > topbar.Min.X then
+		left = math.max(0, topbar.Min.X - (originX or 0))
+		right = math.min(widthPx, topbar.Max.X - (originX or 0))
+	end
+	return { inset = insetPx / k, left = left / k, right = right / k, width = widthPx / k, scale = k }
+end
+
+-- The top regions with their layout positions ({object, base}): the compass
+-- (in the bar's row), the phone tribe strip (hanging under the compass), the
+-- right-hand column (level with the bar's buttons) and the regions that keep
+-- below the bar (the tribe frames; on phones the tiles and the world event).
 function HudController.TopRegions(mounted)
-	local regions = {}
-	for _, object in
-		{
-			mounted.party.root,
-			mounted.compass.root,
-			mounted.vitals.root,
-			mounted.vitals.status,
-			mounted.objective.root,
-			mounted.event.root,
-			mounted.tileRegion,
-		}
-	do
-		if object and object.Position.Y.Scale == 0 and object.AnchorPoint.Y == 0 then
-			table.insert(regions, { object = object, base = object.Position })
+	local regions = { column = {}, below = {} }
+	local compass = mounted.compass
+	regions.compass = {
+		object = compass.root,
+		base = compass.root.Position,
+		size = compass.root.Size,
+		-- The leather arrow pokes above the plaque: keep it on screen.
+		minTop = math.max(0, -compass.cfg.marker[2]) + HudController.TOP_GAP,
+		depth = compass.cfg.waypoints.y + compass.cfg.waypoints.size,
+	}
+	local function pinnedTop(object: GuiObject?): boolean
+		return object ~= nil and object.Position.Y.Scale == 0 and object.AnchorPoint.Y == 0
+	end
+	local party = mounted.party.root
+	if pinnedTop(party) then
+		if mounted.party.cfg.strip then
+			regions.strip = { object = party, base = party.Position, height = mounted.party.cfg.height }
+		else
+			table.insert(regions.below, { object = party, base = party.Position })
 		end
 	end
+	for _, object in { mounted.vitals.root, mounted.vitals.status, mounted.objective.root, mounted.event.root } do
+		if pinnedTop(object) then
+			local list = if object.AnchorPoint.X == 1 then regions.column else regions.below
+			table.insert(list, { object = object, base = object.Position })
+		end
+	end
+	if pinnedTop(mounted.tileRegion) then
+		table.insert(regions.below, { object = mounted.tileRegion, base = mounted.tileRegion.Position })
+	end
+	regions.vitals = mounted.vitals.root
 	return regions
 end
 
--- Moves the top regions down so the Roblox top bar, reaching `insetDesignPx`
--- into the screen, never covers them (phones), as the lobby HUD does. Returns
--- the shift in design px.
-function HudController.PlaceTop(regions, insetDesignPx: number): number
-	local top = math.huge
-	for _, entry in regions do
-		top = math.min(top, entry.base.Y.Offset)
+-- A region's left and right edges in design px on a root `width` wide.
+local function edges(object: GuiObject, width: number): (number, number)
+	local w = object.Size.X.Offset
+	local left = object.Position.X.Scale * width + object.Position.X.Offset - object.AnchorPoint.X * w
+	return left, left + w
+end
+
+-- Places the top regions for the Roblox top bar `bar` (HudController.TopBar):
+-- the right-hand column level with the bar's buttons (below the bar when the
+-- bar's right-hand area reaches it), the compass centred on the buttons'
+-- line between them and the column (below the bar when it does not fit), the
+-- phone tribe strip under the compass and the left-hand regions below the
+-- bar. Returns {shift (left regions), column (its shift), compassTop,
+-- compassX (its centre's offset from the screen's centre), inRow}.
+function HudController.PlaceTop(regions, bar)
+	local k = bar.scale or 1
+	local rowTop, rowCentre = HudModel.TopRow(bar.inset * k)
+	local placed = { shift = 0, column = 0, inRow = false }
+	local function move(entry, dx: number, dy: number)
+		entry.object.Position = entry.base + UDim2.fromOffset(dx, dy)
 	end
-	local shift = if top == math.huge then 0 else math.max(0, math.ceil(insetDesignPx + HudController.TOP_GAP - top))
-	for _, entry in regions do
-		entry.object.Position = entry.base + UDim2.fromOffset(0, shift)
+	local function lowest(list): number
+		local top = math.huge
+		for _, entry in list do
+			top = math.min(top, entry.base.Y.Offset)
+		end
+		return top
 	end
-	return shift
+	local belowBar = bar.inset + HudController.TOP_GAP
+
+	-- Left-hand regions: below the bar.
+	local top = lowest(regions.below)
+	if top < math.huge then
+		placed.shift = math.max(0, math.ceil(belowBar - top))
+	end
+	for _, entry in regions.below do
+		move(entry, 0, placed.shift)
+	end
+
+	-- The right-hand column: level with the buttons' top, unless the bar's
+	-- right-hand area reaches over it.
+	local columnLeft = bar.width
+	top = lowest(regions.column)
+	if top < math.huge then
+		local vitalsLeft, vitalsRight = edges(regions.vitals, bar.width)
+		columnLeft = vitalsLeft
+		local target = if bar.right < vitalsRight then belowBar else rowTop / k
+		placed.column = math.round(target - top)
+	end
+	for _, entry in regions.column do
+		move(entry, 0, placed.column)
+	end
+
+	-- The compass: centred on the buttons' line, clear of them and the column.
+	local compass = regions.compass
+	if compass then
+		local w, h = compass.size.X.Offset, compass.size.Y.Offset
+		local rightLimit = math.min(bar.right, columnLeft)
+		local centre = HudModel.RowCentre(bar.width, w, bar.left, rightLimit, HudController.TOP_ROW_GAP)
+		local y
+		if centre then
+			placed.inRow = true
+			y = math.max(compass.minTop, math.round(rowCentre / k - h / 2))
+		else
+			centre = bar.width / 2
+			y = math.max(compass.minTop, math.ceil(belowBar))
+		end
+		placed.compassX = math.round(centre - bar.width / 2)
+		placed.compassTop = y
+		compass.object.Position = UDim2.new(0.5, placed.compassX, 0, y)
+		if regions.strip then
+			move(regions.strip, 0, y - compass.base.Y.Offset)
+		end
+	end
+	return placed
+end
+
+-- GuiService.TopbarInset (the top bar's free area), or nil on an engine
+-- without it.
+local function topbarInset(): Rect?
+	local ok, value = pcall(function()
+		return GuiService.TopbarInset
+	end)
+	return if ok and typeof(value) == "Rect" then value else nil
 end
 
 local function applyTop()
 	scale = uiScale.Scale
-	local shift = HudController.PlaceTop(tops, Kit.Scale.TopInset(gui) / math.max(scale, 0.01))
+	local bar =
+		HudController.TopBar(Kit.Scale.TopInset(gui), gui.AbsoluteSize.X, scale, topbarInset(), gui.AbsolutePosition.X)
+	local placed = HudController.PlaceTop(tops, bar)
 	-- While the HUD shows, banners in the shared top column start below the
 	-- compass and its waypoints; otherwise they keep their usual place.
 	local stack = Theme.TopStack()
@@ -220,12 +337,10 @@ local function applyTop()
 	local stackGui = stack:FindFirstAncestorWhichIsA("ScreenGui")
 	local stackScale = stackGui and stackGui:FindFirstChild("FlintbornScale")
 	local factor = if stackScale and stackScale:IsA("UIScale") and stackScale.Scale > 0 then stackScale.Scale else 1
-	local compass = layout.compass
-	local below = compass.pos[4] + shift + compass.waypoints.y + compass.waypoints.size + 4
+	local below = (placed.compassTop or 0) + tops.compass.depth + 4
 	-- Phones: the tribe strip sits under the compass, so banners start below it.
-	local party = Layout.Section(layout, "party")
-	if party.strip then
-		below = math.max(below, party.pos[4] + shift + party.height + 6)
+	if tops.strip then
+		below = math.max(below, tops.strip.object.Position.Y.Offset + tops.strip.height + 6)
 	end
 	stack.Position = UDim2.new(0.5, 0, 0, below * scale / factor)
 end
@@ -523,8 +638,8 @@ function HudController.TileHint(entry): string
 	return if hint then ("%s (%s)"):format(entry[1], hint) else entry[1]
 end
 
--- The menu tiles in the lobby's grid (2 × 3 at the left; on phones 3 × 2 at the
--- top left, above the thumbstick's touch zone). Each tile's tooltip names its
+-- The menu tiles in the lobby's grid (2 × 3 at the left edge; on phones 3 × 2
+-- at the top left, above the thumbstick's touch zone). Each tile's tooltip names its
 -- key or gamepad button, which follows the player's rebinds. `open(entry)`
 -- runs a tile's action.
 function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
@@ -578,7 +693,8 @@ function HudController.BuildTiles(parent: Instance, cfg, open: (any) -> ())
 end
 
 -- Builds every HUD region into `parent` (a design-px root) and returns them:
--- {party, compass, vitals, objective, event, bottom, tileRegion, tiles}.
+-- {party, compass, vitals, objective, event, bottom, tileRegion, tiles,
+-- tileColumns}.
 -- `open(entry)` runs a menu tile; the capture scenes build the HUD this way.
 function HudController.Mount(parent: Instance, hudLayout, open: (any) -> ())
 	local mounted = {}
@@ -589,6 +705,7 @@ function HudController.Mount(parent: Instance, hudLayout, open: (any) -> ())
 	mounted.event = EventPanel.new(parent, hudLayout)
 	mounted.bottom = BottomBar.new(parent, hudLayout)
 	mounted.tileRegion, mounted.tiles = HudController.BuildTiles(parent, hudLayout.tiles, open)
+	mounted.tileColumns = Layout.ForScreen(hudLayout.tiles).columns or 2
 	return mounted
 end
 
