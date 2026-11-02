@@ -2,12 +2,16 @@
 -- 58 px down with stand-ins for its buttons, the touch jump button and the
 -- thumbstick ring, the Kit touch attack button beside the jump button, and a
 -- prompt reading TAP.
---   1 844 × 390 (an iPhone; the owner's layout request was drawn on one)
---   2 667 × 375 (a small phone: the compass moves right off Roblox's buttons)
+--   1 844 × 390, a notched iPhone (the owner's layout requests were drawn on
+--     one): the device safe area keeps 47 px at each side (__NOTCHED_PHONE;
+--     the notch drawn at the left, the side strips beside the middle band
+--     shaded), Roblox's buttons and touch controls sit inside it
+--   2 667 × 375 (a small phone without a notch: the compass moves right off
+--     Roblox's buttons, Settings stands above the thumbstick ring)
 --   3 2000 × 924 (a large touch screen with the desktop arrangement)
 -- Built with the real scaling (Kit.Scale.Hud and HudController.PlaceTop, as
 -- HudController does) and the world_hud sample data; the layout checks
--- (hud_checks.luau, ARCHITECTURE D28) run on every page.
+-- (hud_checks.luau, ARCHITECTURE D28, D29: the edge rule) run on every page.
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local UserInputService = game:GetService("UserInputService")
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
@@ -26,7 +30,7 @@ UserInputService.TouchEnabled = true
 UserInputService.KeyboardEnabled = false
 local layout = Layout.Get()
 
-local function page(W: number, H: number)
+local function page(W: number, H: number, insets)
 	local scene = ("world_hud_phone %dx%d"):format(W, H)
 	workspace.CurrentCamera.ViewportSize = Vector2.new(W, H)
 	local phone = Kit.Scale.FormFactor() == "phone"
@@ -34,11 +38,8 @@ local function page(W: number, H: number)
 	local hud = HudController.Mount(root, layout, function() end)
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
-	local chrome = __robloxChrome(gui, W, H, { touch = true })
-	local placed = HudController.PlaceTop(
-		HudController.TopRegions(hud),
-		HudController.TopBar(chrome.bar, W, scale, game:GetService("GuiService").TopbarInset, 0)
-	)
+	local chrome = __robloxChrome(gui, W, H, { touch = true, insets = insets })
+	local placed = __placeWorldHud(hud, W, H, scale, chrome, true)
 	print(
 		("%s: %s, scale %.3f, root %d x %d design px, left shift %d, compass top %d (%+d from the middle), in the bar's row: %s"):format(
 			scene,
@@ -123,12 +124,14 @@ local function page(W: number, H: number)
 		__hudCheck(scene, whole, "tribe names and the prompt show whole")
 	end
 
-	-- The touch attack button, as CombatController places it.
+	-- The touch attack button, as CombatController places it (its own gui
+	-- inside the device safe area, beside the jump button).
 	local cfg = layout.attack
 	local attack = Instance.new("Frame")
 	attack.Name = "Attack"
 	attack.BackgroundTransparency = 1
 	Layout.Place(attack, cfg)
+	attack.Position -= UDim2.fromOffset(chrome.insets.right / scale, chrome.insets.bottom / scale)
 	attack.Parent = root
 	Kit.IconButton.new(attack, { rect = { 0, 0, cfg.size[1], cfg.size[2] }, variant = "round", icon = "spear" })
 
@@ -152,15 +155,9 @@ local function page(W: number, H: number)
 	end
 
 	-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
-	-- game): at the bottom left, above the thumbstick ring.
-	local g = SettingsController.GEAR
-	local gear = Kit.IconButton.new(root, {
-		name = "Settings",
-		variant = "settings",
-		size = { g.w, g.h },
-		position = SettingsController.GearPosition(W, H, scale, true, phone),
-		anchorPoint = Vector2.new(0, 1),
-	})
+	-- game): in the bottom-left corner, left of the thumbstick ring (above it
+	-- where there is no room beside it).
+	local gear = __worldGear(root, W, H, scale, chrome, true)
 	__checkWorldHud({
 		scene = scene,
 		hud = hud,
@@ -176,7 +173,7 @@ local function page(W: number, H: number)
 	__dump(gui, W, H, BACKGROUND)
 end
 
-page(844, 390)
+page(844, 390, __NOTCHED_PHONE)
 page(667, 375)
 page(2000, 924)
 __hudChecksDone("world_hud_phone")

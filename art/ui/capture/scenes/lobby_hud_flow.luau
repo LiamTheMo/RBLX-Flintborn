@@ -259,7 +259,8 @@ check(#gui:GetDescendants() == count, "20 party redraws leave the instance count
 local tile1 = hud.tiles[1].control.hit
 check(tile1.NextSelectionRight == hud.tiles[2].control.hit, "Inventory -> Play")
 check(tile1.NextSelectionDown == hud.tiles[3].control.hit, "Inventory v Quests")
--- Settings sits at the bottom left under the tiles (ARCHITECTURE D28).
+-- Settings sits in the bottom-left corner under the tiles (ARCHITECTURE D28,
+-- D29).
 local gearHit = hud.settings.control.hit
 local slot1 = hud.slots[1].control.hit
 check(hud.tiles[5].control.hit.NextSelectionDown == gearHit, "Forge v Settings")
@@ -271,6 +272,54 @@ check(hud.xpControl.hit.NextSelectionDown == slot1, "the XP bar v hotbar")
 check(hud.slots[3].control.hit.NextSelectionUp == hud.xpControl.hit, "hotbar ^ the XP bar")
 check(hud.gems.control.hit.NextSelectionRight == nil, "nothing right of Gems (Settings left the top row)")
 check(hud:DefaultSelection() == tile1, "default selection is the Inventory tile")
+
+-- The live placement (ARCHITECTURE D29): the HUD draws on the whole screen;
+-- with the 47 px side insets Kit.Scale's probe guis measure on a notched
+-- phone (here on the desktop-size screen) the pills keep the corner margin
+-- and the Party panel, which reaches the middle band, keeps the safe inset.
+do
+	local Kit = require(Client.Hud.Kit)
+	check(
+		gui.ScreenInsets == Enum.ScreenInsets.None and gui.ClipToDeviceSafeArea == false,
+		"the lobby HUD draws on the whole screen (ScreenInsets None, not clipped to the safe area)"
+	)
+	local chromeGui = Instance.new("ScreenGui")
+	chromeGui.Name = "RobloxChrome"
+	chromeGui.DisplayOrder = 100
+	local chrome = __robloxChrome(chromeGui, 1672, 941)
+	local root = gui:FindFirstChild("Root")
+	local k = root:FindFirstChildWhichIsA("UIScale").Scale
+	local full = player.PlayerGui:FindFirstChild("FlintbornScreenProbe")
+	local safe = player.PlayerGui:FindFirstChild("FlintbornSafeAreaProbe")
+	full.AbsolutePosition = Vector2.new(0, -58)
+	full.AbsoluteSize = Vector2.new(1672, 941)
+	safe.AbsolutePosition = Vector2.new(47, -58)
+	safe.AbsoluteSize = Vector2.new(1672 - 94, 941)
+	local notched = table.clone(chrome)
+	notched.insets = Kit.Scale.SafeInsets()
+	__checkLobbyHud({
+		scene = "lobby_hud_flow (47 px side insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = notched,
+	})
+	safe.AbsolutePosition = Vector2.new(0, -58)
+	safe.AbsoluteSize = Vector2.new(1672, 941)
+	__checkLobbyHud({
+		scene = "lobby_hud_flow (no insets)",
+		hud = hud,
+		root = root,
+		W = 1672,
+		H = 941,
+		k = k,
+		chrome = chrome,
+	})
+	chromeGui:Destroy()
+end
+__hudChecksDone("lobby_hud_flow")
 
 assert(not __failed, "lobby_hud_flow: a check failed")
 __dump(player.PlayerGui, 1672, 941)

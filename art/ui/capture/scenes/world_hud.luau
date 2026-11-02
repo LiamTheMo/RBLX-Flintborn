@@ -5,10 +5,11 @@
 --     vitals, a medicine lock, the extraction objective, a world event, LV 12
 --     450/750 XP, the hotbar with slot 1 selected, an interaction prompt and
 --     the Settings button at the bottom left
--- Laid out as the owner asked (ARCHITECTURE D28): the compass in Roblox's top
--- bar (stand-ins for its buttons drawn at the top left), the vitals in the
+-- Laid out as the owner asked (ARCHITECTURE D28, D29): the compass in Roblox's
+-- top bar (stand-ins for its buttons drawn at the top left), the vitals in the
 -- top-right corner with the objective and event under them, the tiles at the
--- left edge; the layout checks (hud_checks.luau) run on both pages.
+-- left edge and Settings in the bottom-left corner, 24 px from the edges; the
+-- layout checks (hud_checks.luau) run on both pages.
 --   2 alone: no tribe frames, no event, the objective searching, hotbar slot 3
 --     selected, a hold prompt with a gamepad key, and the level cap
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
@@ -30,10 +31,7 @@ local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
 	local chrome = __robloxChrome(root, W, H)
-	local placed = HudController.PlaceTop(
-		HudController.TopRegions(hud),
-		HudController.TopBar(chrome.bar, W, 1, game:GetService("GuiService").TopbarInset, 0)
-	)
+	local placed = __placeWorldHud(hud, W, H, 1, chrome, false)
 	print(
 		("world_hud: compass top %d, centre %+d from the middle, in the bar's row: %s"):format(
 			placed.compassTop,
@@ -42,16 +40,8 @@ local function page()
 		)
 	)
 	-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
-	-- game), at the bottom left.
-	local SettingsController = require(Client.Controllers.SettingsController)
-	local g = SettingsController.GEAR
-	local gear = require(Hud.Kit).IconButton.new(root, {
-		name = "Settings",
-		variant = "settings",
-		size = { g.w, g.h },
-		position = SettingsController.GearPosition(W, H, 1, false),
-		anchorPoint = Vector2.new(0, 1),
-	})
+	-- game), in the bottom-left corner.
+	local gear = __worldGear(root, W, H, 1, chrome, false)
 	local function check()
 		__checkWorldHud({
 			scene = "world_hud",

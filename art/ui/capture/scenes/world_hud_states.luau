@@ -36,12 +36,10 @@ end
 local function page()
 	local gui, root = __screen(W, H)
 	local hud = HudController.Mount(root, layout, function() end)
-	-- Laid out under stand-ins for Roblox's top-bar buttons (ARCHITECTURE D28).
+	-- Laid out under stand-ins for Roblox's top-bar buttons (ARCHITECTURE D28,
+	-- D29: the regions at the screen's edges).
 	local chrome = __robloxChrome(root, W, H)
-	HudController.PlaceTop(
-		HudController.TopRegions(hud),
-		HudController.TopBar(chrome.bar, W, 1, game:GetService("GuiService").TopbarInset, 0)
-	)
+	__placeWorldHud(hud, W, H, 1, chrome, false)
 	hud.chrome = chrome
 	hud.bottom:SetSlotLabels({ "1", "2", "3", "4", "5", "6" })
 	hud.bottom:SetProgress({ level = 7, xp = 120, xpToNext = 400 }, true)

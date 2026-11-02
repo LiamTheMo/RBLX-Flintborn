@@ -25,11 +25,12 @@ BoostHudController.REFRESH_SECONDS = 0.25
 
 BoostHudController.WIDTH = 340
 -- The list's left edge: right of the world ⚙ in the bottom-left corner
--- (SettingsController.GEAR: 39 + 52, and 12 px between; on phones 16 + 52 at
--- the HUD's 0.5 against this list's 0.6), so the corner button and the boosts
+-- (SettingsController.GEAR, HudModel.GearCorner: 24 + 52, and 12 px between;
+-- on phones without a notch its touch pad ends 47 screen px in, and this list
+-- draws at 0.6: 90 starts it 54 px in), so the corner button and the boosts
 -- never cover each other.
-BoostHudController.LEFT = 103
-BoostHudController.PHONE_LEFT = 70
+BoostHudController.LEFT = 88
+BoostHudController.PHONE_LEFT = 90
 
 -- The list's left edge for the current form factor.
 function BoostHudController.Left(): number
