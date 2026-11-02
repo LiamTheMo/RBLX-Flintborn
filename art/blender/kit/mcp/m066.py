@@ -620,6 +620,7 @@ TAB_T = 0.06                # tab thickness
 TAB_GAP = 0.003             # tabs stand this far off the timber faces (no coplanar faces between shells)
 SAG = 1.15                  # edge sag at the middle (centre 2 x SAG)
 NU, NV = 7, 5
+HEM = 0.35                  # hem strip width (spec 5.3: faces within 0.35 of the sheet's outer edge)
 CORNER_Z = {"FL": 9.00, "BL": 9.00, "FR": 9.10, "BR": 10.60}
 TAB_DZ = (-0.15, 0.40)      # tab z range round the canvas corner height
 BR_TAB_Y = (3.98, 5.10)
@@ -663,50 +664,60 @@ def _canvas_tris():
 def canvas_sheet(a, corners=None, name="canvas"):
     """The canvas: one closed slab (spec 2.4). A 7 x 5 top grid bilinear between the corner anchors, sagging SAG at
     each edge middle and 2 SAG at the centre; each quad split along the diagonal pointing at the grid centre (the
-    sheet's X of creases); the underside CT below along the vertex normals; rim faces round the edge (the darker
-    hem strip of close-up 3: canvas_deep). 136 tris."""
+    sheet's X of creases), set HEM inside the outer edge; a hem strip of quads (split into two tris each) between
+    that grid's border and the true edge; the underside CT below along the vertex normals; rim faces round the
+    edge. Hem colour by distance from the edge, three steps toward canvas_deep (close-up 3's darker rim strip): rim
+    75 %, hem strip 50 %, the inner grid's corner facets 20 %. 216 tris."""
     C = corners or canvas_corners()
-    T = {(i, j): canvas_top(i / (NU - 1), j / (NV - 1), C) for i in range(NU) for j in range(NV)}
-    tris = _canvas_tris()
-    nrm = {k: Vector() for k in T}
-    for t in tris:
-        p0, p1, p2 = (T[k] for k in t)
+    du = HEM / (C["FR"] - C["FL"]).length
+    dv = HEM / (C["BL"] - C["FL"]).length
+    T = {(i, j): canvas_top(du + (1 - 2 * du) * i / (NU - 1), dv + (1 - 2 * dv) * j / (NV - 1), C)
+         for i in range(NU) for j in range(NV)}
+    loop = ([(i, 0) for i in range(NU)] + [(NU - 1, j) for j in range(1, NV)] +
+            [(i, NV - 1) for i in range(NU - 2, -1, -1)] + [(0, j) for j in range(NV - 2, 0, -1)])
+    O = {("o", k): canvas_top(k[0] / (NU - 1), k[1] / (NV - 1), C) for k in loop}
+    P = dict(T)
+    P.update(O)
+    tris = [(t, CANVAS) for t in _canvas_tris()]
+    ring = {(i, j) for i in range(NU) for j in range(NV) if i in (0, NU - 1) or j in (0, NV - 1)}
+    tris = [(t, _mix(CANVAS, CANVAS_DEEP, 0.20) if sum(1 for k in t if k in ring) == 3 else key) for t, key in tris]
+    hem = _mix(CANVAS, CANVAS_DEEP, 0.50)
+    for k in range(len(loop)):
+        a0, a1 = ("o", loop[k]), ("o", loop[(k + 1) % len(loop)])
+        b0, b1 = loop[k], loop[(k + 1) % len(loop)]
+        if (P[a0] - P[b1]).length <= (P[a1] - P[b0]).length:
+            tris += [((a0, a1, b1), hem), ((a0, b1, b0), hem)]
+        else:
+            tris += [((a0, a1, b0), hem), ((a1, b1, b0), hem)]
+    nrm = {k: Vector() for k in P}
+    for t, _ in tris:
+        p0, p1, p2 = (P[k] for k in t)
         n = (p1 - p0).cross(p2 - p0)
         if n.z < 0:
             n = -n
         for k in t:
             nrm[k] += n
-    keys = list(T)
+    keys = list(P)
     idx = {k: i for i, k in enumerate(keys)}
-    pts = [T[k] for k in keys] + [T[k] - nrm[k].normalized() * CT for k in keys]
+    pts = [P[k] for k in keys] + [P[k] - nrm[k].normalized() * CT for k in keys]
     nb = len(keys)
     faces, fkeys = [], []
-    for t in tris:
+    for t, key in tris:
         faces.append([idx[k] for k in t])
-        fkeys.append(CANVAS)
+        fkeys.append(key)
         faces.append([nb + idx[k] for k in reversed(t)])
-        fkeys.append(CANVAS)
-    loop = ([(i, 0) for i in range(NU)] + [(NU - 1, j) for j in range(1, NV)] +
-            [(i, NV - 1) for i in range(NU - 2, -1, -1)] + [(0, j) for j in range(NV - 2, 0, -1)])
+        fkeys.append(key)
     for k in range(len(loop)):
-        u_, v_ = loop[k], loop[(k + 1) % len(loop)]
+        u_, v_ = ("o", loop[k]), ("o", loop[(k + 1) % len(loop)])
         faces.append([idx[u_], idx[v_], nb + idx[v_], nb + idx[u_]])
         fkeys.append(_mix(CANVAS, CANVAS_DEEP, 0.75))
     vs, fs = _shell(a, pts, faces, CANVAS, _rt(name, 0.02))
     for f, k in zip(fs, fkeys):
         if k != CANVAS:
             f.material_index = a._mi(k)
-    # the top's outer ring of facets one step toward canvas_deep next to the hem (by position in the sheet)
-    ring = {(i, j) for i in range(NU) for j in range(NV) if i in (0, NU - 1) or j in (0, NV - 1)}
-    for f, t in zip(fs[0:2 * len(tris):2], tris):
-        if sum(1 for k in t if k in ring) == 3:
-            f.material_index = a._mi(_mix(CANVAS, CANVAS_DEEP, 0.25))
-    for f, t in zip(fs[1:2 * len(tris):2], tris):
-        if sum(1 for k in t if k in ring) == 3:
-            f.material_index = a._mi(_mix(CANVAS, CANVAS_DEEP, 0.25))
     _texture(a, vs, 0.03, 6620, scale=0.18)
     _reg("canvas", name, vs)
-    GEO["canvas_low_top"] = round(min(p.z for p in T.values()), 3)
+    GEO["canvas_low_top"] = round(min(p.z for p in P.values()), 3)
     GEO["canvas_low_under"] = round(min(p.z for p in pts[nb:]), 3)
     GEO["canvas_centre_top"] = round(T[((NU - 1) // 2, (NV - 1) // 2)].z, 3)
     return vs, T
@@ -2314,7 +2325,9 @@ def build(render=True, parts=True, close=True):
 
 # ---- renders -------------------------------------------------------------------------------------------------------------
 SHEET_LENS = 3.0
-SHEET_VIEWS = {"front_sheet": (0, 3), "side_sheet": (90, 0), "rear_sheet": (180, 0), "f34_sheet": (-45, 20),
+# f34_sheet: probed az -25 ... -45 x e 15 / 20 / 25 (spec 2.13, Stage 4 record); (-30, 15) gives the sheet's front
+# edge : left edge ratio (about 2.3) and W : H 1.31 (sheet 1.33-1.37)
+SHEET_VIEWS = {"front_sheet": (0, 3), "side_sheet": (90, 0), "rear_sheet": (180, 0), "f34_sheet": (-30, 15),
                "r34_sheet": (135, 20), "top_sheet": (0, 89.9)}
 VIEW_NAMES = ("front34", "rear34", "front", "side", "rear", "top")
 PARTS_SHOT = (-20, 15)
@@ -2557,7 +2570,7 @@ def render_close_ups(objs):
     try:
         orig, kit["render_group"] = _long_lens(kit)
         try:
-            out["thumb"] = kit["render_group"]([h], f"{d}/thumb_sheet.png", -45, 20)
+            out["thumb"] = kit["render_group"]([h], f"{d}/thumb_sheet.png", *SHEET_VIEWS["f34_sheet"])
         finally:
             kit["render_group"] = orig
     finally:

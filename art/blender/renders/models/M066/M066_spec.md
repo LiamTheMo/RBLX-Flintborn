@@ -4,7 +4,7 @@ Reference: `art/blender/assets/references/066.png` (1024 × 1536 px). INDEX.md r
 The sheet's own header reads **"PAGE 65/132"** (top right), title **"CANVAS SHELTER"**, subtitle "OPEN WOODEN SHELTER WITH
 CANVAS CANOPY", header tag "FLINTBORN / ASSET PRODUCTION REFERENCE", footer "FLINTBORN — INDIVIDUAL MODEL STUDY" (our
 number is INDEX's 066, §3.1).
-Builder: `art/blender/kit/mcp/m066.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m066.py` → `build()` (stages 1–6 done; see the Stage headings at the end). Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -1042,6 +1042,9 @@ All 16 recommendations are accepted. The open questions are ruled as follows:
 
 ## Paused (2026-11-01)
 
+(Resumed and finished on 2026-11-02: see the Stage 1–6 headings below. The numbers in this note are from before the
+hem strip and the f34 camera change.)
+
 Paused on request after the modeller's first full pass. The wip file (`art/blender/assets/kit/wip/M066.blend`) was saved
 after the last good build.
 - **Done:** builder `art/blender/kit/mcp/m066.py` (`build()`), stages 1–3 and most of 4–6. `build()` returns
@@ -1079,3 +1082,339 @@ after the last good build.
 5. **Banner 1.9 wide:** inside the spec's 2.0 ± 0.2.
 6. **Canvas colour:** the hue-correct cream stays, as ruled on 064; the verifier judges canvas share on views that do
    not face the key light.
+
+## Stage 1 — Modelling
+
+Resumed on 2026-11-02 by a second modeller from the saved wip file; `build()` re-ran clean before any change. All
+geometry comes from `m066.py`, one function per exploded part, and the hero is assembled from those functions
+(`hero_all`). Low-poly planes only: no subdivision, no booleans, every piece a closed shell that touches its neighbour.
+
+- **Frame.** Four chamfered square posts (8-sided prisms, 1.0 wide, 60 tris each) on faceted stone bases (convex hulls
+  with a flat level octagon top, broken outer corners, 36 tris each). Post tops FL / BL **10.40**, FR / BR **12.00**;
+  centres **12.8 × 9.2**. The 0.80 ridge pole lies on the tall posts' inner faces at x 5.5, **z 10.40–11.20** (ruling 4),
+  11.8 long, 0.8 past both posts, with the post tips 0.8 above it. Crossbars (0.5 square × 2.6) on the outer faces of
+  FL, BL and FR.
+- **Canvas.** One closed 0.10 slab: a 7 × 5 grid (bilinear between the corner anchors, edge sag 1.15, centre 2.3),
+  each quad split along the diagonal toward the centre for the X of creases; a 0.35 hem strip round it (stage 4); rim
+  faces round the edge. Corners **9.00 / 9.00 / 9.10 / 10.60** (FL / BL / FR / BR, ruling 3). L-shaped 0.06 tabs wrap the
+  inner corner of FL, BL and FR under the lashings; at BR the apex tab folds up the ridge's inner face and over its
+  top (close-up 1). A small rope nub at the sheet's centre.
+- **Rope.** Five X-lashings: a turn above and below the bound timber, round the post and its tab, and two diagonals
+  crossing over the timber's outer face (L1 FL, L2 BL, L3 FR lower with the crossbar, L4 FR upper and L5 BR with the
+  ridge). Two dangling tails (FL, BL), four two-turn foot collars, four peg bands, four peg ropes, a rod band. Turns
+  are 6-sided spiral-strand tubes (a twisted 4-sided tube read as a flat plate); diagonals, tails and ropes twisted
+  antiprism tubes.
+- **Pegs.** A square 0.36 stake per post leaning 35° on its base's outer X face, foot cut level on the ground, pale
+  end-grain top, a band 0.25 below the top, roped up to the lower collar turn (close-up 2).
+- **Banner and lantern.** A 6-sided iron rod with a knob under the FR crossbar; the banner (1.90 × 6.09, three
+  tongues 0.9 deep, tips at z 3.30) hangs from a 6-sided sleeve round the rod; the white emblem (diamond outline, inner
+  diamond, two dots) on both faces, 0.015 proud. The hexagonal lantern (flared plate, Neon glass core, six corner bars,
+  band, domed roof, cap, ring) hangs from the FR crossbar's inner end by its ring; body z 7.165–9.205, ring top 9.61.
+- **Furniture and dressing** (§2.9 positions): plank table 7.20 × 2.86 × 2.60 (four planks, cleats, legs, stretchers) with
+  two Neon candle jars, a bottle, a paper and a pot; long bench 6.0 and short bench 3.6 (seat 1.50); stool; an open
+  barrel (8 staves, two iron hoops, pale contents disc; the spec's 10 staves cut for budget); two open crates
+  (frame, X braces, dark corner plates, straw mound); two faceted stones.
+- **Placement measured** (`build()["placement"]`): post tops 10.4 / 10.4 / 12.0 / 12.0; spacing 12.8 × 9.2; canvas corners
+  9.0 / 9.1 / 9.0 / 10.6; canvas lowest top 7.105, underside 7.005, centre top 7.125; ridge 10.4–11.2, 11.8 long, tips
+  0.8 above; banner 1.9 × 6.09, top 9.39, tip 3.30; lantern glass (4.85, −5.35, 7.915); table 7.2 × 2.86, top 2.6.
+- **Against the sheet (front ortho fractions of the tall post):** left / right post 0.867 (0.87 ± 0.04); post-centre span
+  1.067 (1.07 ± 0.08); canvas ties 0.750 / 0.758 (0.75 / 0.77 ± 0.04); table length 0.60 (0.60 ± 0.05), top 0.217 (0.22 ±
+  0.02); banner bottom 0.275 (0.28 ± 0.04); lantern glass 0.66 (0.65 ± 0.04); side span 9.2 / 12.0 = 0.767 (0.77 ± 0.06).
+  Whole-silhouette W : H (my masks, render background removed by its own colour): front **1.469** (1.40 ± 0.08; the
+  sheet cell measures 1.36–1.43), rear **1.41** (sheet 1.43), side 0.972 (sheet 0.977–1.01), f34 1.313 (stage 4).
+- **Hero 17.94 × 12.49 × 12.00** (ruling 2: the pegs and the rod knob widen it past 17.3; `TARGET_SIZE` 17.6 ± 0.5 W,
+  12.3 ± 0.4 D, 12.0 ± 0.3 H).
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells | Collision |
+| --- | --- | --- | --- | --- |
+| CanvasShelter | **3876 / 4000** | 17.94 × 12.49 × 12.00 | 157 | precise |
+| CanvasShelterPost | 176 | 1.60 × 1.58 × 12.00 | 4 | hull |
+| CanvasShelterRidgePole | 124 | 1.24 × 11.80 × 1.24 | 3 | box |
+| CanvasShelterCanopy | 236 | 11.74 × 8.18 × 3.59 | 2 | none |
+| CanvasShelterBanner | 256 | 2.64 × 0.32 × 6.37 | 12 | none |
+| CanvasShelterLantern | 188 | 1.20 × 1.04 × 2.42 | 11 | none |
+| CanvasShelterTable | 156 | 7.20 × 2.86 × 2.60 | 13 | box |
+| CanvasShelterBench | 96 | 6.00 × 1.22 × 1.50 | 8 | box |
+| CanvasShelterStool | 72 | 1.20 × 1.22 × 1.50 | 6 | box |
+| CanvasShelterCrate | 260 | 2.30 × 2.30 × 2.55 | 14 | box |
+| CanvasShelterBarrel | 204 | 2.04 × 2.04 × 2.80 | 1 | hull |
+| CanvasShelterPeg | 44 | 1.16 × 0.56 × 1.23 | 2 | none |
+
+- Hero tris by kind: rope 1304 (39 shells), planks 708, canvas 216 + tabs 80, barrel 204, crates 184 + straw 48, lantern
+  metal 168 + glass 20, base 144, post 240, emblem 136, banner 80, jars / lids / items 152, peg 48, rod 40, stones 40,
+  crossbars 36, ridge 28. The hem strip (stage 4) cost 80 tris (3796 → 3876).
+- Every object: 0 non-manifold edges, **0 bowtie verts**, 0 boundary / wire / loose, 0 zero-area faces, 0 n-gons, 0
+  duplicate verts, normals outward, **0 winding errors per shell**, every shell positive volume, no self-hits.
+- Origin at the bbox bottom centre on every object, transforms applied. `m066_offset` (hero) = (0.648, −0.217, 0).
+- **Thin corners:** hero 330 faces under 3°, smallest 0.41° (long strips: rope, ridge and post chamfers, emblem
+  strokes); ruling 1 accepts them, `build()` fails only corners under 0.3°. Canopy part smallest 2.4°.
+- Stored points (hero, object space): `m066_centre` (−0.648, 0.217, 0); `m066_seat_back` (−1.448, 2.917, 1.5);
+  `m066_seat_front` (−0.448, −1.683, 1.5); `m066_seat_stool` (3.252, 0.617, 1.5); `m066_lantern` (4.202, −5.133, 7.915).
+  Parts: Lantern `m066_hang` (0, 0, 2.445); Banner `m066_hang` (−1.32, 0, 6.30); Post `m066_top` (0, 0, 12.0).
+- **Contact** (`contact_report`, tolerance 0.03, chained to the ground): hero **floating 0, unchained 0**, sink 0.000;
+  every part 0 / 0. Stated seats: posts on bases 0.000; ridge and crossbars on posts 0.000; tabs on posts / ridge 0.003
+  (`TAB_GAP`, no coplanar faces); canvas on the four tabs 0.000; rod on crossbar 0.000; sleeve on rod 0.013; banner on
+  sleeve 0.000; lantern ring on crossbar 0.018; pegs on bases 0.000–0.005; jar on the table 0.002; straw on its crate
+  0.002; nub on canvas 0.000.
+- **Buried:** 0 over the limit, 0 fully hidden (ray parity against posts, bases, ridge, table, crates and barrel).
+  **Through the canvas / banner:** none (`pierce_report` empty). **Rope ends:** 16 open runs, every end touching.
+
+## Stage 3 — UV
+
+Smart UV Project (angle 45°, margin 0.008) per object, then a short unfold pass (`_uv_unfold`). Hero: 1537 islands, **0
+overlaps, 0 flipped**, minimum island gap 0.016, border 0.008, density even (1.0), conformal stretch p95 1.005. Canopy part
+17 islands, p95 1.017. Every part 0 overlaps and 0 flipped. The exporter writes its own palette UVs; the `UVMap` layer
+exists and is clean.
+
+## Stage 4 — Materials, colour and texture
+
+**Keys** (`PALETTE`, calibrated on the studio dome with `m066.calibrate()` and then corrected on the hero and part
+renders against the same sheet regions; the pale keys kept their sheet hue, ruling 6):
+
+| Key | Base | Rendered (ours) | Sheet |
+| --- | --- | --- | --- |
+| `m066_timber` | `#9A4C17` | post part `#A74913`; front FL post `#AC4B13`; ridge part `#AA4B17` | exploded post `#A0480F`; front post `#B95A1B`; exploded ridge `#924213` |
+| `m066_plank` | `#9C582B` | bench part `#AD5825`; table part `#AC5624` | exploded bench `#AD5E27`; table `#C4672C` (its top lit) |
+| `m066_wood_dark` | `#6E3A20` | crate part `#86411E`; barrel part `#7A3A1D` | crate `#894322`; barrel `#7D3C1B` |
+| `m066_canvas` / `_deep` | `#FDE8C0` / `#E6C49C` | key-lit top clips to `#FFFFEB`; underside in shade: rear `#D9C1A3`, side `#D0B58F` | swatch `#FDE9C1`; f34 `#FEF2CB`; close-up 3 underside `#DEB88D` |
+| `m066_rope` / `_deep` | `#C99E50` / `#A6732E` | f34 `#D99842`; front `#CD9142` (shaded) | f34 `#DFA447`; front `#DD9E42` |
+| `m066_banner` | `#C01417` | f34 `#D71213`; front `#D71213` | f34 `#D81315`; front `#DC1418` |
+| `m066_banner_white` | `#F2EAE6` | emblem reads off-white | `#FDF4F3` / `#F3F3EF` |
+| `m066_stone` / `_deep` | `#A09594` / `#807674` | f34 S `#AB9890`; front `#A39289` (R > G > B) | exploded `#AA9794`; f34 `#B39F9B` |
+| `m066_metal` | `#4E3F3A` | front K `#473D3A` | lantern frame `#5C4738`; plates `#433938` |
+| `m066_iron` | `#7F7F88` | hoops and rod cool grey | hoops `#878285` |
+| `m066_glow` (Neon) | `#E8AA0A`, emission 1.0 | glass f34 `#FBB307` | glass `#F6B009` |
+| `m066_straw` / `_deep`, `end_grain`, `pale`, `bottle` | `#F5D398` / `#E5BE7C`, `#C9B08E`, `#C9C1B8`, `#5D6930` | as the sheet's regions | `#F7D69A`, `#E0CCAD`, `#D3CAC1`, `#707B37` |
+
+**Re-measure on the final renders** (spec §2.13 masks, ported into a Blender-side script; render background removed by
+its own colour; class `c` = warm near-white lit canvas, s < 0.13, which the sheet's background rule would drop):
+
+| View | W : H (sheet / ours) | C (+ c) | W | R | B | Y | S |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| f34 (−30, 15) | 1.327 / **1.313** | 24.1 / 7.5 + 17.1 = **24.6** | 48.1 / 53.2 | 5.3 / 5.7 | 7.0 / 5.8 | 0.7 / 0.8 | 6.1 / 7.1 |
+| front (0, 3) | 1.362 / 1.469 | 21.8 / 6.1 + 7.8 | 50.1 / 57.1 | 4.0 / 5.5 | 9.7 / 10.8 | 1.1 / 1.3 | 6.2 / 7.1 |
+| side (90, 0) | 1.011 / 0.972 | 17.5 / 4.0 + 0.6 (+ 9.2 shaded canvas unclassed) | 65.2 / 72.2 | 7.5 / 6.3 | 0 / 1.4 | 0.8 / 0.6 | 3.6 / 5.6 |
+| rear (180, 0) | 1.43 / 1.41 | 29.9 / 5.9 + 0.4 (+ 16.0 shaded canvas unclassed) | 59.4 / 57.5 | 4.2 / 4.5 | 1.3 / 8.0 | 0.4 / 1.0 | 1.4 / 6.3 |
+| top | 0.99 / 1.40 (content only, §3.5) | 58.7 / 76.4 | 28.2 / 14.7 | 2.2 / 5.3 | 0 / 0.6 | 0 / 0 | 1.7 / 1.9 |
+
+- **Canvas.** Counting the clipped lit top as canvas, the f34 canvas share matches the sheet (24.6 against 24.1). The
+  views that do not face the key light (side, rear, front at e 0–3) see mostly the underside in shade: hue 36–40°,
+  s 0.28–0.30, `#D0B58F`–`#D9C1A3`, close to close-up 3's underside `#DEB88D` and darker than the orthos' flat
+  `#F6DEB7`–`#F8E3BB` (the sheet draws the orthos nearly unshaded). The base is already at the swatch; brighter would be
+  white. Ruling 6 holds; the canvas tone in Studio daylight is a manual check. The rear's banner share is higher than
+  the sheet's because our banner shows its emblem face-on from behind (decision 9: emblem on both faces; the sheet
+  draws a thin edge-on strip there).
+- **f34 camera (spec §2.13 probe):** az −25 … −45 × e 15 / 20 / 25. W : H 1.08–1.32 (it falls with az and e); f34 shares
+  barely move (C + c 25–34, W 46–52, R 5.5–6.1, B 3.5–5.8, Y 0.5–0.7). The sheet's front edge is about 2.3 × its left
+  edge, which is az ≈ −31°; its edge slopes give e ≈ 20°, where our W : H is 1.23. **(−30, 15)** is kept: W : H 1.31
+  inside 1.37 ± 0.10, the sheet's edge ratio. `SHEET_VIEWS["f34_sheet"]` and the thumb use it.
+- **S share:** 7.1 on the f34 against the spec's 4.6 ± 2.5 (my mask measures the sheet's f34 at 6.1); four bases and two
+  stones, all on the sheet.
+- **Blending (by position and role, never by facing):** post feet two bands (z 1.75 / 2.30) at 50 % and 25 % `wood_dark`;
+  canvas hem by distance from the edge, three steps: rim faces 75 %, a new **0.35 hem strip** (top and underside) 50 %,
+  the inner grid's corner facets and the tabs 20–25 % `canvas_deep` (close-up 3's darker rim strip, now visible along
+  the front edge on the f34 and from below in `underside_cu`); rope one strand in four (twisted) or six (turns)
+  `rope_deep`; stone lowest band toward `stone_deep`; furniture legs and stretchers 35 % toward `timber`; crate frame
+  and braces 25–35 % toward `plank`, plates `metal`; straw mound foot 40–75 % `straw_deep`; banner hem band 10 % and the
+  sleeve 15 % toward `metal`. `K.check`'s facing correlation passes.
+- **Texture:** per-piece Tint (`_rt`, 0.02–0.05), broad `K.texture` mottling on canvas (0.03, scale 0.18), posts, stones;
+  per-plank and per-stave Tint. No per-triangle confetti.
+- **Finish:** wood rough 0.85–0.9, canvas, rope and straw 0.95 (low spec), stone 0.92, metal 0.55 / 0.4, iron 0.5 / 0.5,
+  glass Neon; no emission anywhere else.
+
+## Stage 5 — Lighting
+
+The sheet shows a glowing lantern and two glowing candle jars.
+- The lantern glass and both jars are `m066_glow` at **emission 1.0** (spec `[0.5, 0.0, 1.0]`), so they export as Neon
+  glow pieces; the Blender preview shows them unshaded (`_glow_mats`). The f34 glow share is 0.8 % (sheet 0.7).
+- No light painted on the canvas or table.
+- **Studio notes (Requires Manual Validation):** the canvas reads pale cream in daylight and darker underneath by
+  shadow, not paint; posts saturated orange-brown, furniture a step lighter, crates and barrel darker; at night the
+  lantern's PointLight (range 14) reaches the table and both benches.
+
+## Stage 6 — VFX
+
+One `heat_glow` socket at the lantern's glass centre, overridden to a steady warm halo (no lantern kind in
+`lib/vfx.py`; 064's settings): emitter `Halo` (`glow_soft`, `#FFC23A` → `#FF9A1E`), size 1.4–1.7, transparency 0.65–1.0,
+lifetime 1.0–1.5, rate 2, speed 0–0.05, spread 0, light_emission 1; PointLight `#FFB347`, brightness 1, range 14,
+flicker. Hero socket local (4.202, −5.133, 7.915); the Lantern part has one at (0, 0, 0.75). `export_stats()`: hero 1
+socket, Lantern 1, glow key `m066_glow` on both; no other object has a socket. The candle jars are Neon only. The real
+exporter's STATS line is the main session's to check.
+
+## Walk-under clearance (spec 2.10)
+
+| Measure | Value | Target |
+| --- | --- | --- |
+| Proxy minimum clearance (front lane x −2.0, short-bench leg, y −3.06) | **0.155** | ≥ 0.05 |
+| Other lanes (front x +0.2, back x −2.0 / +0.2) | 0.17 / 0.17 / 0.17 | ≥ 0.05 |
+| Canvas underside minimum over the floor inside the posts | **7.010** (at −1.85, −0.05) | ≥ 6.9 |
+| Head room over a 5.5 head | 1.51 | — |
+| Lantern bottom | 7.165 (outside the canopy line) | ≥ 6.95 |
+
+`walk.png` shows the proxies in the lanes (front, side, three-quarter). The Studio walk-under with `precise` collision is
+**Requires Manual Validation** (fallback `none` plus Studio colliders, §7).
+
+## Modeller's notes for the verifier
+
+- Run `m066.build()` (about 8 s build, 45 s renders); `problems` is empty. It also returns `placement`, `walk`,
+  `contact` (with seats), `bury`, `pierce`, `rope_ends`, `thin`, `uv`, `export_stats`, `sockets`, `stored`.
+- **Renders** in `art/blender/renders/models/M066/`: `*_sheet.png` (floor hidden; f34 now at (−30, 15)), `front34` /
+  `rear34` / `front` / `side` / `rear` / `top`, `part_*.png`, `exploded.png`, `scale.png`, `M066_spin.png` (eight
+  azimuths), `junction_cu`, `junction_fr_cu`, `base_cu`, `lash_cu`, `lantern_cu`, `underside_cu`, `walk.png`,
+  `thumb_sheet.png`, `M066_views.png`.
+- **Canvas share:** judge it with the lit (clipped) canvas counted as canvas, or on views not facing the key light
+  (ruling 6). The sheet's background mask drops the clipped top (f34 C 7.5 % alone; 24.6 % with it).
+- **Known gaps against the sheet:**
+  - The lashings read thinner and flatter than close-up 1's fat knot (Ø 0.24 turns, the X a pair of thin diagonals);
+    the BR junction in `junction_cu` shows the turns and the tab folded over the ridge, but not the bulk of the sheet's
+    knot. Same family as 064's minor 1.
+  - The canvas sags 2.3 at the centre (lowest 7.0, walkability, decision 1), shallower than the front and rear cells
+    draw it (§3.6).
+  - Barrel 8 staves (spec 10), for budget.
+  - One lantern and one banner (decisions 8, 9); no grass, cabinet or chest (decision 3).
+  - The rear view shows the banner's emblem from behind (both faces), where the sheet draws a thin red strip.
+  - Front W : H 1.469 sits near the top of 1.40 ± 0.08 (the rod knob and the 35° pegs, ruling 2).
+  - The lantern hangs from the FR crossbar's inner end in front of the canopy edge, so the front view puts it just
+    left of the FR post (as the front cell), not inside the canopy.
+- **Thin faces:** ruling 1. **Hero budget:** 3876 / 4000, so fixes that add geometry have about 120 tris; the cut order in
+  §4.3 frees more (table items, crate plates, L1 / L2 diagonals).
+- The scratch measurement scripts (`meas.py`: class shares and medians per view; the f34 probe renders) were in
+  `<temp>\` (the session scratchpad), not in the repo.
+
+## Rulings (main session, 2026-11-02, after stages 4–6)
+
+7. **f34 camera at (−30, 15)** replaces (−45, 20): the sheet's front edge is about 2.3 times its left edge, which puts
+   its camera near az −31°, and W : H then measures 1.31 (target 1.37 ± 0.10). The verifier uses the same camera.
+8. **f34 stone share** is judged against the sheet's own f34 measured with the same mask (6.1 %), not the spec's 4.6 %
+   estimate; 7.1 % is inside ±2.5 of that.
+9. **Hem strip kept** (80 tris, hero 3876): it reads along the f34 front edge and under the canopy; the remaining
+   124-tri headroom is enough for a fix round.
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only, in a background Blender on a copy of the kit file taken after 066 was built into it (not
+saved; `build()` not run). Every number below was re-measured with the verifier's own bmesh / BVH / ray code, not taken
+from `build()`. Renders came from the builder's cameras (f34 at (−30, 15), ruling 7) written to a scratch folder
+(`<temp>\v066\`), compared side by side with the sheet cells (sheet crop left, render right), and sampled with the
+study's HSV masks (render background removed by its own colour).
+
+**Result: PASS, 7/10.** No blockers. Minors below; "shows" means visible against the sheet.
+
+### Technical (all objects)
+
+| Object | Tris | Size (studs) | Shells | Notes |
+| --- | --- | --- | --- | --- |
+| CanvasShelter | 3876 / 4000 | 17.94 × 12.49 × 12.00 | 157 | precise; 1 `heat_glow` socket at local (4.202, −5.133, 7.915) |
+| CanvasShelterPost | 176 | 1.60 × 1.58 × 12.00 | 4 | hull |
+| CanvasShelterRidgePole | 124 | 1.24 × 11.80 × 1.24 | 3 | box |
+| CanvasShelterCanopy | 236 | 11.74 × 8.18 × 3.59 | 2 | none |
+| CanvasShelterBanner | 256 | 2.64 × 0.32 × 6.37 | 12 | none |
+| CanvasShelterLantern | 188 | 1.20 × 1.04 × 2.42 | 11 | none; 1 `heat_glow` socket at (0, 0, 0.75) |
+| CanvasShelterTable | 156 | 7.20 × 2.86 × 2.60 | 13 | box |
+| CanvasShelterBench | 96 | 6.00 × 1.22 × 1.50 | 8 | box |
+| CanvasShelterStool | 72 | 1.20 × 1.22 × 1.50 | 6 | box |
+| CanvasShelterCrate | 260 | 2.30 × 2.30 × 2.55 | 14 | box |
+| CanvasShelterBarrel | 204 | 2.04 × 2.04 × 2.80 | 1 | hull |
+| CanvasShelterPeg | 44 | 1.16 × 0.56 × 1.23 | 2 | none |
+
+- Every object: all triangles (0 n-gons), 0 non-manifold edges, 0 boundary / wire edges, 0 loose verts, **0 bowtie
+  verts**, **0 edges wound against a neighbour**, every shell positive volume, 0 zero-area faces (smallest 0.0016), 0
+  duplicate verts, no custom normals, flat shading, no modifiers. Origin at the bbox bottom centre (error 0.0), rotation
+  0, scale 1. Thin corners: hero 330 faces under 3°, smallest 0.41°, none under 0.3° (ruling 1).
+- UV (`UVMap` on every object), rasterised at 2048: 0 overlapping pixels between islands, 0 flipped triangles, no two
+  islands within 20 px (gap > 0.0098), UVs inside 0.008–0.992. Hero 1537 islands.
+- Materials: 33 `FB_m066_*` keys on the hero, all from `PALETTE` or its `_x_` blends. `m066_glow` emission 1.0 (black
+  base, Neon) on exactly three shells: the lantern glass and both candle jars. Metal rough 0.55 / metal 0.4, iron 0.5 /
+  0.5, wood 0.85–0.9, canvas / rope / straw 0.95, stone 0.92.
+- Sockets: the hero's and the Lantern part's carry the steady-halo override (`glow_soft`, rate 2, PointLight `#FFB347`
+  range 14). No other object has one.
+
+### Placement, contact, burial
+
+- Posts 1.00 square; tops FL / BL 10.40, FR / BR 12.00; centres ±6.4 × ±4.6 (12.8 × 9.2). Bases 1.6 × 1.6 × 1.2. Ridge
+  0.8 × 11.8 at z 10.40–11.20 on the posts' inner faces (ruling 4). Canvas corners 9.00 / 9.00 / 9.10 / 10.60, lowest
+  vertex 7.005, slab 0.099–0.125 thick. Banner 1.90 × 6.09 (tips z 3.30). Lantern plate bottom 7.165, ring top 9.582
+  against the crossbar's underside 9.60. Table top 2.60, both bench seats and the stool 1.50 (shared with 067).
+- **Floating 0, unchained 0** (tolerance 0.03, chained to the ground); every shell's nearest neighbour within 0.018.
+- **Rope ends:** all 16 open runs touch at both ends (largest end gap 0.031 is the FR diagonal sunk into the tab turn).
+- **Buried:** nothing fully inside anything. Deepest seats are rope into rope: FR diagonal into the tab turn 0.067,
+  FL / BL diagonals into the low turn 0.063, FR diagonals into the mid turn 0.055; the canvas nub 0.044; every non-rope
+  seat ≤ 0.03.
+- **Through the canvas / banner:** the canvas intersects only its four tabs and the centre nub; the tabs only their
+  lashing turns; the banner only its sleeve and the emblem insets. No post, crossbar, ridge, lantern or dressing
+  triangle crosses the canvas or the banner.
+- Dressing gaps: crate B to the BR base 0.092, crate A to the FR base 0.181, benches to the table 0.395; pegs on their
+  bases 0.000–0.005. Lantern to the FR post 0.558, to the FR tab 0.58, to the canvas 0.785.
+
+### Walk-under (own sweep)
+
+Obstacles rasterised from the hero's triangles at 0.025 in two bands (body z 0.02–4.4, head 4.4–5.5), proxies swept at
+0.05 and flood-filled from all four sides at 0.1:
+- **Head room:** no geometry at all between z 5.5 and 6.9 inside the posts. Lowest geometry above a 5.5 head: 7.006
+  (canvas over the table), **7.21 over every floor point a character can reach**.
+- **Front lane** (spec proxy and a full 2 × 1 × 5.5 box give the same result): free entry centres x −4.5 … +2.3 at the
+  canopy edge; reaches the short bench front (0.075 clearance at the stop). Stones S1 / S2 and crate A block the outer
+  strips of the spec's x −5.6 … +3.3 range (deliberate obstacles, §2.10).
+- **Back lane:** free x −4.5 … +2.2; reaches the long bench back.
+- **Sides:** a sideways proxy enters from the left at y −2.7 … −0.1 and from the right between the crates at y −0.3 …
+  +0.4. All four sides connect to the same 1279-cell area under the canopy; the canopy centre itself is the table.
+- Studio walk-under with `precise` collision stays **Requires Manual Validation**.
+
+### Views against the sheet (shares in %, sheet / ours; `c` = clipped lit canvas)
+
+| View | Read | Measured |
+| --- | --- | --- |
+| f34 (−30, 15) | four posts on stone bases, the ridge from the far post to the tall right post, the cream hammock with the apex at the far post, banner and lantern at the right post, table with jars and bottle, benches, barrel by the left post, crates, stones: matches | W : H 1.38 / 1.31; C 24.3 / 7.4 + c 17.7; W 48.1 / 53.3; R 5.4 / 5.8; B 7.0 / 5.8; Y 0.7 / 0.8; S 5.8 / 7.1 |
+| front (0, 3) | post ratio 0.867, ties at 0.75 / 0.76 H, banner face-on right, lantern left of FR, table, bench, crate: matches; the canvas is a thin crescent (shallower sag, decision 1) | W : H 1.36 / **1.47**; W 49.4 / 57.2; B 9.7 / 10.9; Y 1.1 / 1.3 |
+| side (90, 0) | a level ridge on two equal tall posts with a U of canvas, where the sheet slopes to a short back post (decision 4, §3.4) | W : H 0.99 / 0.97 |
+| rear (180, 0) | posts, canvas, the lantern behind the right post; our banner shows its emblem face-on | W : H 1.41 / 1.41; B 1.3 / 8.0 |
+| r34 | content only (§3.3): ridge side, banner, lantern, crates, bench, barrel | — |
+| top | content only (§3.5): rectangle not square, lashings at the corners, ridge along the right | — |
+| exploded | every labelled part present; presentation weak (minor 11) | — |
+| close-ups 1 / 2 / 3, VFX | junction, base and peg, solid underside, hexagonal lantern with Neon glass: present (minors 1, 10) | — |
+| spin (8 az) | the canvas is solid from every side; nothing floats | — |
+
+**Colours** (class medians, sheet / ours): f34 rope `#DFA448` / `#D99943`; f34 banner `#D81315` / `#D71213`; glass
+`#F6B009` / `#FBB307`; post part `#9A440E` / `#A74913`; bench `#A25525` / `#AD5825`; crate `#7D3E20` / `#86411E`; barrel
+`#7B3B1B` / `#7A3A1D`; ridge `#873A0F` / `#A94A15`; front timber `#84441A` / `#9B4A15`; f34 stone `#8F8483` / `#AB9991`
+(R > G > B); lantern metal `#363234` / `#48372F`. Canvas: lit f34 `#FEF2CB` / `#FFFFCB` (clipped), side `#F9E4BB` /
+`#CFB48F`, rear `#F6DEB7` / `#D8C0A2` (shade). Hues are right everywhere; the canvas stays cream-hued, never salmon.
+
+### Blockers
+
+None.
+
+### Minors
+
+1. **Lashings are flat, angular and thin.** The turns read as flat square plates and the diagonals as folded strips,
+   not close-up 1's fat round X-knot; the ridge part's bands are flat square frames and the foot collars stacked flat
+   plates. Shows in close-up 1 (`junction_cu`, `lash_cu`) and at the post tops in the f34. Fix if touched: rounder
+   6–8-sided turns about Ø 0.3 with visible bulk at the cross.
+2. **Canvas tone in the studio** (ruling 6): the lit top clips to `#FFFFCB`–`#FFFFE9`; the views away from the key read
+   `#CFB48F`–`#D8C0A2` against the sheet's flat cream. Counting shade as canvas, side ≈ 13 % (sheet 17) and rear ≈ 22 %
+   (sheet 30) are inside ±8. Shows in every view; Studio daylight is a manual check.
+3. **Shallower sag than the front and rear cells** (decision 1, §3.6): the front reads as a thin crescent where the
+   sheet draws a deep hammock. Shows on the front and rear.
+4. **Front W : H 1.47**, at the top of 1.40 ± 0.08 (the sheet cell measures 1.36 with the same mask): the pegs and the
+   rod knob (ruling 2). Shows slightly.
+5. **Rear banner** shows its emblem face-on (B 8.0 % against 1.3 %; emblem on both faces, decision 9). Shows on the rear.
+6. **Crates have no dark corner plates** (spec §1.4; the sheet draws them on every corner) and their frame edges barely
+   read. Shows on the crate part, the exploded shot and slightly in the f34. Fix if touched: four L-plates per crate
+   (the §4.3 cut order allows 4, not 0).
+7. **Barrel** is eight smooth staves with no seams, straighter than the sheet's planked barrel. Shows on the part and
+   the f34.
+8. **Furniture reads thinner than the sheet:** slim bench and table legs; the plank gaps on the table, benches and stool
+   are too fine to see. Shows slightly on the parts and the f34.
+9. **Post part** has its base and collar but not the top X-lashing the exploded post shows. Shows on the part shot.
+10. **Lantern** has a flat base plate, not the VFX panel's flared foot; its ring reads as a small finial from the front.
+    Shows slightly in `lantern_cu`.
+11. **Exploded / canopy part presentation:** the canopy part renders near-white and barely readable at (−30, 35), the
+    exploded canopy is a pale sliver, and the exploded shot has no stones. Presentation only.
+12. **Ruled differences:** the side view is a level rectangle with the ridge across the top (decision 4); the top is a
+    rectangle, not the sheet's square (§3.5); one lantern, one banner, no grass or cabinet (decisions 3, 8, 9). Shows.
+13. **Ridge pole** renders a step lighter than the exploded ridge (`#A94A15` against `#873A0F`). Shows slightly.
+14. The lantern clears the canvas by 0.785 and its tab by 0.58 (spec §2.6 asked ≥ 1.0). Does not show.
+15. Rope-into-rope seats 0.055–0.067 (STAGES 0.05; builder limit 0.08), hidden inside the lashings. Does not show.
+16. Thin corners 0.41° (ruling 1). Does not show.
