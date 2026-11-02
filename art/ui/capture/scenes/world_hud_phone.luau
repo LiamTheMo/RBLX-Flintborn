@@ -11,7 +11,8 @@
 --   3 2000 × 924 (a large touch screen with the desktop arrangement)
 -- Built with the real scaling (Kit.Scale.Hud and HudController.PlaceTop, as
 -- HudController does) and the world_hud sample data; the layout checks
--- (hud_checks.luau, ARCHITECTURE D28, D29: the edge rule) run on every page.
+-- (hud_checks.luau, ARCHITECTURE D30: the HUD grid, and the lobby's shared
+-- pieces at the same screen) run on every page.
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local UserInputService = game:GetService("UserInputService")
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
@@ -41,13 +42,14 @@ local function page(W: number, H: number, insets)
 	local chrome = __robloxChrome(gui, W, H, { touch = true, insets = insets })
 	local placed = __placeWorldHud(hud, W, H, scale, chrome, true)
 	print(
-		("%s: %s, scale %.3f, root %d x %d design px, left shift %d, compass top %d (%+d from the middle), in the bar's row: %s"):format(
+		("%s: %s, scale %.3f, root %d x %d design px, column edges right %d / left %d design px, compass top %d (%+d from the middle), in the bar's row: %s"):format(
 			scene,
 			Kit.Scale.FormFactor(),
 			scale,
 			W / scale,
 			H / scale,
-			placed.shift,
+			placed.right,
+			placed.left,
 			placed.compassTop,
 			placed.compassX,
 			tostring(placed.inRow)
@@ -155,8 +157,8 @@ local function page(W: number, H: number, insets)
 	end
 
 	-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
-	-- game): in the bottom-left corner, left of the thumbstick ring (above it
-	-- where there is no room beside it).
+	-- game): in the grid's bottom-left corner (above the thumbstick ring where
+	-- the ring reaches the corner).
 	local gear = __worldGear(root, W, H, scale, chrome, true)
 	__checkWorldHud({
 		scene = scene,

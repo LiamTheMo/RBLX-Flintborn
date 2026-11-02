@@ -260,7 +260,7 @@ local tile1 = hud.tiles[1].control.hit
 check(tile1.NextSelectionRight == hud.tiles[2].control.hit, "Inventory -> Play")
 check(tile1.NextSelectionDown == hud.tiles[3].control.hit, "Inventory v Quests")
 -- Settings sits in the bottom-left corner under the tiles (ARCHITECTURE D28,
--- D29).
+-- D30).
 local gearHit = hud.settings.control.hit
 local slot1 = hud.slots[1].control.hit
 check(hud.tiles[5].control.hit.NextSelectionDown == gearHit, "Forge v Settings")
@@ -273,10 +273,11 @@ check(hud.slots[3].control.hit.NextSelectionUp == hud.xpControl.hit, "hotbar ^ t
 check(hud.gems.control.hit.NextSelectionRight == nil, "nothing right of Gems (Settings left the top row)")
 check(hud:DefaultSelection() == tile1, "default selection is the Inventory tile")
 
--- The live placement (ARCHITECTURE D29): the HUD draws on the whole screen;
+-- The live placement (ARCHITECTURE D30): the HUD draws on the whole screen;
 -- with the 47 px side insets Kit.Scale's probe guis measure on a notched
--- phone (here on the desktop-size screen) the pills keep the corner margin
--- and the Party panel, which reaches the middle band, keeps the safe inset.
+-- phone (here on the desktop-size screen) the right-hand column (the pills
+-- and the Party panel, which reaches the middle band) keeps the safe inset
+-- as one edge.
 do
 	local Kit = require(Client.Hud.Kit)
 	check(

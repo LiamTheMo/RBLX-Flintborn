@@ -3,7 +3,7 @@
 -- change, progression and inventory snapshots arrive through their signals, a
 -- tribe-mate joins, the backpack opens, a hotbar slot and a menu tile are
 -- pressed through their buttons; the live placement follows the owner's
--- layout (ARCHITECTURE D28, D29) under stand-ins for Roblox's top-bar buttons,
+-- layout (ARCHITECTURE D28, D30) under stand-ins for Roblox's top-bar buttons,
 -- and moves with the device safe area its probes measure. Ends
 -- with a capture of the whole PlayerGui.
 local Players = game:GetService("Players")

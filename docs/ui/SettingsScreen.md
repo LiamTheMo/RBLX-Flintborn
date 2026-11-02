@@ -13,7 +13,7 @@ the reference image. The old parchment spec this file replaces described
 ## Overview
 
 The modal Settings window, opened by the lobby HUD's gear button or the ⚙
-button in the world (both in the bottom-left corner, D29), or the Settings key (O). A dark overlay covers the whole
+button in the world (both in the HUD grid's bottom-left corner, D30), or the Settings key (O). A dark overlay covers the whole
 screen, including the HUD (same overlay as the Inventory screen, see
 [`InventoryScreen.md` → Dim overlay](InventoryScreen.md#dim-overlay); 03 measures
 k ≈ 0.30, overlay ≈ #080807 at 70 % opacity). Tabs down the left choose a page;
@@ -318,22 +318,24 @@ Each has the default that will be used if unanswered.
   Gameplay (gears) and Graphics (magnifier) show a glyph; Audio and Controls
   show their label in the same column. RESET has no icon (the "refresh"
   stand-in read as a rune).
-- **World ⚙** (R4, moved by D27, D28 and D29): on a HUD-scaled root
+- **World ⚙** (R4, moved by D27–D30): on a HUD-scaled root
   (Kit.Scale.Hud, so it follows the HUD and UI Scale) in its own gui that
   covers the whole screen (`Kit.Scale.FullScreen`: `ScreenInsets = None`),
-  in the bottom-left corner (`HudModel.GearCorner`): without touch 24 design
-  px from the left and the bottom; on touch screens left of Roblox's
-  thumbstick ring, centred on the ring's height and in the room between the
-  screen's edge and the ring, its 44 px touch pad 12 screen px clear of the
-  ring (a notched 844 × 390 iPhone: x 23–49, y 323–347; the ring sits 25 pt
-  inside the 47 pt safe inset, from x 72); where there is no room beside the
-  ring (no side inset: 667 × 375, x 12–38, y 250–273; a large touch screen)
-  its foot stands 12 screen px above the ring. `SettingsController.GEAR`
-  holds its size, gap and pad and `SettingsController.GearPosition(screen)`
-  places it (re-placed when the screen, touch, the form factor or the device
-  safe area changes); gamepad reaches it left of the first hotbar slot and
-  down from the bottom-left tile (Map; `SettingsController.LinkGear`). The
-  lobby's own button sits in the same place (LobbyScreen.md).
+  in the HUD grid's bottom-left corner (D30, `HudModel.GearCorner`): the
+  grid's margin M (24 design px; 12 pt on a phone) from the physical screen's
+  left and bottom edges, its foot level with the hotbar's (desktop x 24–76,
+  y 871–917; a notched 844 × 390 iPhone x 12–38, y 355–378, its 44 pt touch
+  pad 25 pt clear of Roblox's thumbstick ring, which sits 25 pt inside the
+  47 pt safe inset, from x 72). Only where the ring reaches the corner (a
+  phone without a side inset: 667 × 375, x 12–38, y 250–273) its foot stands
+  12 screen px above the ring. Its size, ring gap and pad are HudLayout's
+  `gear`, which the lobby's button shares (`SettingsController.GearSize`);
+  `SettingsController.GearPosition(screen)` places it (re-placed when the
+  screen, touch, the form factor or the device safe area changes). The run's
+  boost list starts G right of it (`BoostHudController.Position`). Gamepad
+  reaches it left of the first hotbar slot and down from the bottom-left tile
+  (Map; `SettingsController.LinkGear`). The lobby's own button sits in the
+  same place (LobbyScreen.md).
 - Opens with the gamepad flag when the last input is a gamepad.
 
 ## Final audit fixes (phones)

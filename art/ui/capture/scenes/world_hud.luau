@@ -5,7 +5,7 @@
 --     vitals, a medicine lock, the extraction objective, a world event, LV 12
 --     450/750 XP, the hotbar with slot 1 selected, an interaction prompt and
 --     the Settings button at the bottom left
--- Laid out as the owner asked (ARCHITECTURE D28, D29): the compass in Roblox's
+-- Laid out on the HUD grid (ARCHITECTURE D28, D30): the compass in Roblox's
 -- top bar (stand-ins for its buttons drawn at the top left), the vitals in the
 -- top-right corner with the objective and event under them, the tiles at the
 -- left edge and Settings in the bottom-left corner, 24 px from the edges; the

@@ -117,8 +117,8 @@ player:SetAttribute(xpUntil, 581)
 RunService.Heartbeat:Fire(1)
 check(find("BoostList").Visible, "the boosts show")
 -- The boosts grow up from the bottom-left corner beside the world ⚙
--- (SettingsController places it there on the HUD's scale, ARCHITECTURE D29),
--- never over it or its touch pad.
+-- (SettingsController places it there on the HUD's scale, ARCHITECTURE D30):
+-- G right of it (or its touch pad) and M above the bottom edge.
 do
 	local Kit = require(Client.Hud.Kit)
 	local SettingsController = require(Controllers.SettingsController)
@@ -126,18 +126,7 @@ do
 	Kit.Scale.Hud(hudGui, hudRoot)
 	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
 	local at = SettingsController.GearPosition(__hudScreen(W, H, k, true))
-	-- Its right edge, or its touch pad's where that reaches further.
-	local g = SettingsController.GEAR
-	local gearRight = (at.X.Offset + g.w) * k + math.max(0, g.pad - g.w * k) / 2
-	local list = find("BoostList")
-	local boostLeft = list.Position.X.Offset * Theme.HudScale(gui)
-	check(
-		boostLeft >= gearRight + 6,
-		("the boosts start right of the world settings button (x %d, the button ends at x %d)"):format(
-			boostLeft,
-			gearRight
-		)
-	)
+	__checkBoosts("world_overlays_phone", find("BoostList"), at, k, Theme.HudScale(gui), W, H, check)
 end
 __dump(gui, W, H, BG)
 

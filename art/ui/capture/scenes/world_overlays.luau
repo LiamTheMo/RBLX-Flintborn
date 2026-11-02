@@ -213,8 +213,8 @@ check(find("EventBanner") ~= nil, "the event banner shows")
 check(find("Tutorial").Visible, "the tutorial card shows")
 check(find("BoostList").Visible, "the boosts show")
 -- The boosts grow up from the bottom-left corner beside the world ⚙
--- (SettingsController places it there on the HUD's scale, ARCHITECTURE D29),
--- never over it or its touch pad.
+-- (SettingsController places it there on the HUD's scale, ARCHITECTURE D30):
+-- G right of it (or its touch pad) and M above the bottom edge.
 do
 	local Kit = require(Client.Hud.Kit)
 	local SettingsController = require(Controllers.SettingsController)
@@ -222,18 +222,7 @@ do
 	Kit.Scale.Hud(hudGui, hudRoot)
 	local k = hudRoot:FindFirstChildWhichIsA("UIScale").Scale
 	local at = SettingsController.GearPosition(__hudScreen(1672, 941, k, false))
-	-- Its right edge, or its touch pad's where that reaches further.
-	local g = SettingsController.GEAR
-	local gearRight = (at.X.Offset + g.w) * k + math.max(0, g.pad - g.w * k) / 2
-	local list = find("BoostList")
-	local boostLeft = list.Position.X.Offset * Theme.HudScale(gui)
-	check(
-		boostLeft >= gearRight + 6,
-		("the boosts start right of the world settings button (x %d, the button ends at x %d)"):format(
-			boostLeft,
-			gearRight
-		)
-	)
+	__checkBoosts("world_overlays", find("BoostList"), at, k, Theme.HudScale(gui), 1672, 941, check)
 end
 -- The alert caption belongs to page 2.
 find("Caption").Visible = false

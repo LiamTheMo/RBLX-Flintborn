@@ -233,31 +233,49 @@ local function safe(insets)
 	return insets or HudModel.NO_INSETS
 end
 
--- The HUDs' edge rule (D29): a region pinned to the left or right edge keeps
--- `margin` design px from the screen's edge while it lies wholly in a corner
--- band (the top `topBand` or the bottom `bottomBand` of the screen's height,
--- where a phone held sideways has no notch or island); a region reaching the
--- middle band keeps at least the device safe inset on that side.
-HudModel.EDGE = table.freeze({ margin = 24, topBand = 0.30, bottomBand = 0.25 })
+-- The HUD layout grid (ARCHITECTURE D30; HudLayout.json "grid", read by both
+-- HUDs through Hud/Layout): `margin` (M) design px between the screen's edge
+-- and every region pinned to it, `gap` (G) between stacked or neighbouring
+-- regions, `column` the width of the right-hand column's pieces, and the
+-- corner bands, the top `topBand` and the bottom `bottomBand` of the screen's
+-- height, where a phone held sideways has no notch or island. The helpers
+-- below take the grid as their first argument, so the specs and both HUDs
+-- share one copy of the numbers.
 
 -- True when a region spanning y top..bottom (screen px) on a screen `height`
 -- px tall lies wholly in the top or the bottom corner band.
-function HudModel.InCornerBand(top: number, bottom: number, height: number): boolean
-	local e = HudModel.EDGE
-	return bottom <= height * e.topBand + 0.5 or top >= height * (1 - e.bottomBand) - 0.5
+function HudModel.InCornerBand(grid, top: number, bottom: number, height: number): boolean
+	return bottom <= height * grid.topBand + 0.5 or top >= height * (1 - grid.bottomBand) - 0.5
 end
 
--- The gap (design px, at HUD scale k) between a region spanning y top..bottom
--- (screen px) and its side edge, whose device safe inset is `safeInset` screen
--- px: the corner margin in a corner band, else at least the safe inset.
-function HudModel.EdgeGap(top: number, bottom: number, height: number, safeInset: number?, k: number): number
-	local margin = HudModel.EDGE.margin
-	if HudModel.InCornerBand(top, bottom, height) then
-		return margin
+-- The edge rule (D29, applied per column by D30): the gap (design px, at HUD
+-- scale k) between a column spanning y top..bottom (screen px, every piece of
+-- it) and its side edge, whose device safe inset is `safeInset` screen px:
+-- the margin when the whole column lies in a corner band, else the margin or
+-- the safe inset, whichever is larger, for the whole column, so its pieces
+-- keep one edge.
+function HudModel.EdgeGap(grid, top: number, bottom: number, height: number, safeInset: number?, k: number): number
+	if HudModel.InCornerBand(grid, top, bottom, height) then
+		return grid.margin
 	end
-	return math.max(margin, (safeInset or 0) / math.max(k, 0.01))
+	return math.max(grid.margin, (safeInset or 0) / math.max(k, 0.01))
 end
 
+-- Stacks a column's pieces from `top` (design px) with `gap` between them:
+-- `heights[i]` is piece i's height, or false for a hidden piece (it takes no
+-- room). Returns each shown piece's top (nil for a hidden one) and the
+-- column's foot (`top` when nothing shows).
+function HudModel.Stack(top: number, heights: { number | false }, gap: number): ({ number? }, number)
+	local tops, y, foot = {}, top, top
+	for index, height in heights do
+		if height then
+			tops[index] = y
+			foot = y + height
+			y = foot + gap
+		end
+	end
+	return tops, foot
+end
 -- Roblox's touch jump button on a screen w × h (screen px), as the default
 -- PlayerModule (TouchJump) places it inside the safe area (`insets`, screen
 -- px): 70 px square, 95 px from the right and 90 from the bottom when the
@@ -301,19 +319,20 @@ function HudModel.ThumbstickZone(width: number, height: number, insets: any?)
 	return { x = i.left, y = i.top + h / 3, w = w * 0.4, h = h * 2 / 3 }
 end
 
--- Where the HUDs' bottom-left corner button (the ⚙, `spec.w` × `spec.h`
--- design px) sits, as its distance from the HUD root's left and bottom edges
--- in design px. `screen`: {width, height (screen px), scale (the HUD's
--- UIScale), touch, insets}. Without touch: the corner margin from both edges
--- (HudModel.EDGE). On touch screens it goes into the corner left of Roblox's
--- thumbstick ring, centred on the ring's height and in the room between the
--- screen's edge and the ring, with its touch pad (`spec.pad` screen px)
--- `spec.gap` px clear of the ring; a screen without that room (no side
--- inset) puts it above the ring instead, its foot `spec.gap` px over it, at
--- the edge gap the band rule gives (HudModel.EdgeGap). Returns left, bottom
--- and where it went ("corner", "beside" or "above").
-function HudModel.GearCorner(screen, spec): (number, number, string)
-	local margin = HudModel.EDGE.margin
+-- Where the HUDs' bottom-left corner button (the ⚙: `gear`, HudLayout's
+-- {size = {w, h}, ringGap, pad}) sits, as its distance from the HUD root's
+-- left and bottom edges in design px. `screen`: {width, height (screen px),
+-- scale (the HUD's UIScale), touch, insets}. The corner (D30): the grid's
+-- margin from the screen's left and bottom edges, in both HUDs, on every
+-- screen where its touch pad (`pad` screen px) keeps `ringGap` px from
+-- Roblox's thumbstick ring (desktops, notched phones, whose ring stands 25 px
+-- inside the 47 px inset, tablets and large touch screens, whose ring stands
+-- high). Where the ring reaches the corner (a phone without a side inset) it
+-- stands above the ring instead, its foot `ringGap` px over it, at the edge
+-- rule's gap from the left. Returns left, bottom and where it went ("corner"
+-- or "above").
+function HudModel.GearCorner(grid, gear, screen): (number, number, string)
+	local margin = grid.margin
 	local width, height = screen.width or 0, screen.height or 0
 	if not screen.touch or width <= 0 or height <= 0 then
 		return margin, margin, "corner"
@@ -321,20 +340,21 @@ function HudModel.GearCorner(screen, spec): (number, number, string)
 	local k = math.max(screen.scale or 1, 0.01)
 	local insets = safe(screen.insets)
 	local stick = HudModel.Thumbstick(width, height, insets)
-	local w, h = spec.w * k, spec.h * k
-	local half = math.max(spec.pad or 44, w) / 2
-	-- Centre x (screen px): the art at least `margin` in and its pad on the
-	-- screen, the pad `gap` clear of the ring.
-	local lo = math.max(margin * k + w / 2, half)
-	local hi = stick.x - spec.gap - half
-	if lo <= hi then
-		local cx = math.clamp(stick.x / 2, lo, hi)
-		local foot = stick.y + stick.size / 2 + h / 2
-		return (cx - w / 2) / k, (height - foot) / k, "beside"
+	local w, h = gear.size[1] * k, gear.size[2] * k
+	local pad = gear.pad or 44
+	local padW, padH = math.max(pad, w), math.max(pad, h)
+	local cx, cy = margin * k + w / 2, height - margin * k - h / 2
+	local gap = gear.ringGap or 12
+	local clear = cx + padW / 2 + gap <= stick.x + 0.01
+		or cy + padH / 2 + gap <= stick.y + 0.01
+		or cx - padW / 2 >= stick.x + stick.size + gap - 0.01
+		or cy - padH / 2 >= stick.y + stick.size + gap - 0.01
+	if clear then
+		return margin, margin, "corner"
 	end
-	local bottom = math.max(margin, math.ceil((height - stick.y + spec.gap) / k))
+	local bottom = math.max(margin, math.ceil((height - stick.y + gap) / k))
 	local foot = height - bottom * k
-	return HudModel.EdgeGap(foot - h, foot, height, insets.left, k), bottom, "above"
+	return HudModel.EdgeGap(grid, foot - h, foot, height, insets.left, k), bottom, "above"
 end
 
 -- Roblox's top-bar buttons (the Roblox logo, then the menu and chat pill) are

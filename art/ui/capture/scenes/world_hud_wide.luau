@@ -2,7 +2,7 @@
 -- the compass in Roblox's top bar (stand-ins for its buttons at the top left).
 -- Built with the real scaling (Kit.Scale.Hud and HudController.PlaceTop, as
 -- HudController does) and the world_hud sample data; the layout checks
--- (hud_checks.luau, ARCHITECTURE D28, D29) run on it.
+-- (hud_checks.luau, ARCHITECTURE D30) run on it.
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local UserInputService = game:GetService("UserInputService")
 local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
@@ -29,11 +29,12 @@ local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 local chrome = __robloxChrome(gui, W, H)
 local placed = __placeWorldHud(hud, W, H, scale, chrome, false)
 print(
-	("world_hud_wide: scale %.3f, root %d x %d design px, left shift %d, compass top %d, in the bar's row: %s"):format(
+	("world_hud_wide: scale %.3f, root %d x %d design px, column edges right %d / left %d design px, compass top %d, in the bar's row: %s"):format(
 		scale,
 		W / scale,
 		H / scale,
-		placed.shift,
+		placed.right,
+		placed.left,
 		placed.compassTop,
 		tostring(placed.inRow)
 	)
