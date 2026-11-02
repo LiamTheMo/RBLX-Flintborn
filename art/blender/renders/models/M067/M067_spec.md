@@ -926,3 +926,357 @@ Paused by the main session (user request) before the first build.
   then `problems`; check the tris (plan about 2300–2600 with the colour-band rings). Save the wip, then run
   `calibrate()`, render, and compare each view and part with the sheet using `measure()`. Record stages 1–6 here and
   add "Modeller's notes for the verifier".
+- **Resumed 2026-11-02** by a new modeller (background Blender, port 9879, `art/blender/assets/kit/wip/M067.blend`).
+  Stages 1–6 are recorded below.
+
+## Stage 1 — Modelling
+
+The draft builder ran first time with four problems, all fixed in `m067.py`:
+1. **Table part 1204 tris (over 1000).** The colour-band rings were the cost: every band edge is a full 8-sided ring
+   (16 tris), and the top's seven pieces carried 352 tris of rings. Stage 4 below settles the bands; the Table part is
+   now 980.
+2. **Crossbar part: the stubs were unchained.** In the hero the stubs sit on the cleats' outer faces; alone, the cleat
+   gap left them floating. `crossbar(alone=True)` (the part only) runs each tenon stub from the body's end face out to
+   its bolt, the exploded cell's "pin at its end". The hero keeps body + stubs on the cleat faces (no bar through a
+   cleat).
+3. **Hero H 2.67 against the target 2.64.** The top bolts are 0.05 proud with a 0.02 dome, as §1.4 sets them, so the
+   bbox top is 2.67. The target in `TARGET_SIZE` is now 2.67 ± 0.02; the table top stays 2.60.
+4. **Stool turned a quarter.** The draft ran the stool's planks along X, so the f34 showed three plank ends on the −X
+   face and one long plank side on the front. The f34 (`z_f34_stool.png`, the "narrow / wide / narrow" front face) and
+   §3.11 show the plank ends on the front face: `stool()` now builds `_stool()` inside a 90° frame. The stool is
+   square, so its size, legs, aprons, bolts and seat point are unchanged; the cross seam now runs left to right across
+   the middle plank, as on the f34.
+
+Also: the f34 comparison camera is **(−30, 20)**, probed over az −25 … −40 × e 15 / 20 (§2.9): W : H 1.79 there
+(sheet 1.86, target 1.80 ± 0.12); (−35, 20) gave 1.68, at the edge. The trestle part's shot looks from **(60, 15)**: from
+the shared (−20, 15) the A-frame (in the YZ plane) is edge-on.
+
+**Built (build frame; every piece its own closed shell; 92 shells in the hero):** the top's seven pieces (four rows, joints
+R1 x −1.92 / R3 +2.10 / R4 −0.84), two A-frame trestles (cleat, two 10.06° legs, tie, tie stub + peg on the front leg,
+diagonal at 46°), the crossbar with its two stubs, two knee braces at 42.8°, two benches (three seat pieces, two cleats,
+four legs splayed 5° / 4°, two stretchers each), the stool (four seat pieces, four 7° legs, four aprons, two stretchers),
+30 bolts.
+
+**Against the sheet (front / side fractions are by construction, checked on the renders):**
+
+| Check | Target | Ours |
+| --- | --- | --- |
+| Top | 6.00 × 2.82, top face 2.60, planks 0.44 | 6.00 × 2.82 (bbox 6.05 with the ±0.03 end jitter), 2.600, 0.44 |
+| Front: top thickness / band / leg centres | 0.17 H / 0.72–0.83 H / ±0.73 | 0.169 / 0.715–0.831 / ±0.733 |
+| Front: brace upper ends / angle | ±0.16 L / 42 ± 6° | ±0.167 L / 42.8° |
+| Front: bench length / bench-leg centres | 0.967 L / ±0.84 | 0.967 / ±0.845 |
+| Side: cleat / leg centres / tie | 0.86 W / ∓0.30 W / 0.15–0.29 H | 0.862 / ∓0.305 / 0.154–0.288 |
+| Top: joints / bench gap | 0.18 / 0.36 / 0.85 L; 0.15 W | 0.18 / 0.36 / 0.85; 0.39 = 0.138 W |
+| Splay: trestle / bench / stool | 10° / 5°, 4° / 7° | 10.06° / 5°, 4° / 7° |
+| Seat tops (benches, stool) / table top | 1.50 ± 0.01 / 2.60 | 1.500–1.500 / 2.600–2.600 |
+| Stool | (−4.95, −1.30), 1.40 square | (−4.95, −1.30), 1.40 (bbox 1.58 with the splayed feet) |
+| f34 W : H | 1.80 ± 0.12 (sheet 1.86) | 1.79 at (−30, 20) |
+| Recorded, not scored: front / rear W : H, r34 W : H | sheet 1.86 / 1.68 / 1.51 | 2.28 / 2.29 / 1.65 |
+
+**View by view** (renders in `art/blender/renders/models/M067/`, all in `M067_views.png`):
+- **f34_sheet:** the long four-plank top over the left trestle's A, the right knee brace under the top, the near bench
+  poking out right, the far bench out left, the stool front-left square to the table with three plank ends on its front
+  face. Matches the cell's layout; the sheet's top looks a little deeper on screen (its mild perspective).
+- **r34_sheet:** the stool at the far right behind the near bench, the +X trestle's A and diagonal, the far bench out
+  left: the same layout as the cell.
+- **front_sheet / rear_sheet** (stool hidden): top, cleat-end band with bolts, legs, the V of the knee braces from near
+  the middle down to the legs, the bench in front with bolts over each frame. Our table is longer for its height (the
+  decided L 6.0, §3.2).
+- **side_sheet:** four equal plank ends, the cleat with three bolts, the splayed legs, the diagonal from the front
+  (screen-left) leg low up to the centre, the tie, the tie stub and peg past the front leg, both benches end-on. The
+  sheet's legs are nearly vertical (10° splay decided, §3.7), and our knee braces show end-on as a vertical bar at the
+  centre, which the sheet's side cell doesn't draw (they are the front cell's V; §3.6 decision).
+- **top_sheet:** four rows with the three joints, bolt dots on R1 and R4 over the trestles, the benches with a seam and
+  an end dot each, the stool off the −X end (the sheet's top cell puts it off the +X end, §3.4).
+- **Parts against their exploded cells:** `part_top` (four rows, staggered joints), `part_trestle` (A-frame, cleat with
+  bolts, diagonal, tie with the pegged stub, bolts near the feet), `part_crossbar` (long square beam with a tenon and
+  bolt at each end), `part_bench` (two-plank seat with one joint, splayed frames, stretchers), `part_stool` (three-plank
+  seat, splayed legs, aprons, stretchers), `part_table`, and `exploded.png` laid out like the cell.
+- **Close-ups:** `join_cu` (cleat end and bolt, crossbar stub with its bolt; close-up A), `tie_cu` (the pegged tie stub and the leg bolt, from a fixed camera in the gap past the near bench's −X end: the
+  bench hides the stub from every orbit angle),
+  `plank_cu` (plank ends with V gaps and chamfers over the cleat end face and bolt; close-up B), `under_cu` (from below,
+  dark: the studio has no light from below), `stool_cu`, `seat` (seated proxies at all five points, front and side),
+  `thumb_sheet` (the f34 at 140 px: top, trestles, benches, stool and the plank gaps still read), `M067_spin.png` (eight
+  azimuths at e 10: nothing floats, every leg reaches the ground), `scale.png`.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| `TrestleTableSet` (hero) | **2540** / 4000 | 8.77 × 6.14 × 2.67 | 92 |
+| `TrestleTableSetTable` | 980 | 6.05 × 2.99 × 2.67 | 44 |
+| `TrestleTableSetTop` | 380 | 6.05 × 2.82 × 0.51 | 11 |
+| `TrestleTableSetTrestle` | 248 | 0.57 × 2.99 × 2.16 | 13 |
+| `TrestleTableSetCrossbar` | 80 | 5.59 × 0.36 × 0.30 | 5 |
+| `TrestleTableSetBench` | 524 | 5.80 × 1.30 × 1.57 | 15 |
+| `TrestleTableSetStool` | 512 | 1.58 × 1.58 × 1.50 | 18 |
+
+- Hero tris by kind: planks 1020 (17 pieces, the band rings included), legs 704, bolts 420, the rest 396. The headroom
+  is unspent (no noise, §4.3).
+- Every object: 0 non-manifold edges and verts (bowties), 0 boundary, wire or loose elements, 0 zero-area faces, 0
+  n-gons, 0 duplicate verts, normals outward, transforms applied, origin at the bbox bottom centre. Per shell: 0 winding
+  errors, 0 faces failing the parity test (a point 0.002 out along each normal must be outside by ray parity), 0
+  self-intersections, positive volume. 0 non-planar quads; the smallest corner on any face 33.7°.
+- **Contact** (`contact_report`, tolerance 0.03): 0 floating, 0 unchained, worst gap 0.000 in every object; hero feet at
+  z 0.000.
+- **Bury** (`bury_report`, ray parity, limit 0.05): 0 buried, 0 hidden in every object; the deepest sink of any kind is
+  the bolts' stated 0.03.
+- **Clearances:** knee braces to the trestle diagonals 0.50; bench legs to the trestle (nearest: the tie stub) 0.235;
+  benches to the top 0.81 (3D) / 0.39 (plan); stool to the near bench 1.35, to the table end 1.25.
+- **Seats** (`seat_report`): bench and stool plank tops 1.500–1.500, table top 2.600–2.600; **knee clearance 0.15** at
+  all four bench points (target ≥ 0.10); walk loop clearance 0.304.
+- **Stored points** (hero; build frame = object + `m067_offset` (−1.357, 0, 0)): `m067_seat_f1` (−1.20, −2.40, 1.50) and
+  `_f2` (+1.20, −2.40, 1.50) facing (0, 1, 0); `_b1` / `_b2` at y +2.40 facing (0, −1, 0); `m067_seat_stool` (−4.95,
+  −1.30, 1.50) facing (1, 0, 0); `m067_centre` (1.357, 0, 0) in object space. Re-checked after the origin move. The
+  Table part stores the four bench points, the Bench part two, the Stool part one (relative to each part's origin).
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle-based, angle 45°, margin 0.008) plus the overlap pass (`_uv_unfold`, 0 faces needed cutting). Every
+object: 0 overlapping pairs, 0 flipped, smallest island gap 0.016, border 0.008, texel density ratio 1.0, conformal
+stretch p95 ≤ 1.024. Hero 652 islands. The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.** `m067.calibrate()` (the `K.calibrate` dome, targets §5.4) gave wood `#92591E` (rendered 180, 101, 30),
+light `#B97C3E`, deep `#734218`, iron `#49525F` (71, 78, 86). On the hero those woods rendered a step too dark (f34
+median `#A25B1B` against the sheet's `#BE6D29`, front `#9E5819` against `#B4641E`): the dome is lit more fully than the
+table's faces. As for M052, the final wood hexes were then set from the hero renders: the three wood keys scaled in
+linear light by the measured render / sheet ratio (R 1.33, G 1.4, B 1.7), and the light and deep keys nudged back into
+their hue / saturation bands. Iron keeps the dome value's finish: on `plank_cu` the bolt heads render `#474C55` (71, 76,
+85) against the target `#474E56` (rough 0.45, metal 0.5; rough 0.6 / metal 0.2 rendered too pale, (80, 85, 92)).
+
+| Key | Final hex in `PALETTE` | Hue / sat | Finish |
+| --- | --- | --- | --- |
+| `m067_wood` | **`#A66829`** | 30°, 0.75 | rough 0.8, low spec |
+| `m067_wood_light` | **`#D48F44`** | 31°, 0.68 | rough 0.8, low spec |
+| `m067_wood_deep` | **`#844A1A`** | 27°, 0.80 | rough 0.85, low spec |
+| `m067_iron` | **`#49525F`** | 215°, 0.23 | rough 0.45, metal 0.5 |
+
+Blend keys in use (`K.mix_key`): `wood_x_deep_24` / `_44` (plank-end band, two steps), `wood_x_deep_30` (leg feet),
+`wood_x_light_18` / `_36` (bench streak, two steps).
+
+**Re-measured** (`m067.measure()`, the §1.2 masks, final renders):
+
+| View | Sheet wood median / lit Q / shade Q | Ours | Value shares lit / mid / shade (sheet → ours) |
+| --- | --- | --- | --- |
+| f34_sheet | `#BE6D29` / `#F9A74A` / `#643411` | `#BC6D26` / `#D57F34` / `#9B581F` | 40 / 27 / 33 → 3 / 86 / 11 |
+| r34_sheet | `#B96927` / `#F8A547` / `#643411` | `#AB6423` / `#D68138` / `#8C511B` | 39 / 28 / 33 → 4 / 82 / 13 |
+| front_sheet | `#B4641E` / `#DA8B35` / `#5F2F0D` | `#B66823` / `#C16F26` / `#5A310D` | 14 / 57 / 29 → 1 / 64 / 35 |
+| rear_sheet | `#B5641D` | `#A96322` | 13 / 59 / 28 → 0 / 89 / 11 |
+| side_sheet | `#A45D20` | `#8D521B` | 7 / 62 / 31 → 0 / 57 / 43 |
+| top_sheet | `#CB7A2D` | `#D37B2B` | 17 / 76 / 7 → 5 / 87 / 8 |
+
+- Medians: f34 within 3, front within 5, top within 8 (targets 15 / 12 / 12). Hue 28–29°, saturation 0.79–0.81 in
+  every view (sheet 27–29°, 0.76–0.83): orange, not red or brown.
+- **Not met: the value spread.** The sheet's lit quartile is 36 units brighter and its shade quartile 55 darker than ours
+  in the f34 (lit share 40 % against 3 %). That is the illustration's hard key light against the kit studio's soft
+  light; the only way to reach it here would be painting tops lighter and sides darker, which is colour by facing
+  (forbidden). Recorded, as in M052. The side view's median (`#8D521B` against `#A45D20`) is the same effect: its faces
+  look at +X, away from the studio key.
+- K share (dark pixels) 0.7–1.4 % against the sheet's 1.9–5.5 %: our bolt heads render v ≈ 0.30–0.33, just over the
+  K threshold (the sheet's own bolt median `#474E56` is v 0.34 too); the sheet's K also counts its ink outlines.
+
+**Colour by role and position only, never by facing.** No paint choice reads a normal. Measured on the hero's 1060 wood
+faces: the correlation between each face's key luminance and its normal is x 0.00, y 0.00, z 0.12 (|n| components
+−0.06 … 0.02), far under 0.5.
+- Every wooden piece is `m067_wood` with a **per-piece Tint ±0.05** (seeded by the piece's name): the plank-to-plank
+  value steps of the sheet.
+- **Plank-end bands:** on each plank piece with a band, the last 0.35 at one end (seeded coin) in two steps toward
+  `wood_deep` (44 % within 0.15 of the end, 24 % to 0.35), by distance along the plank. Top: R1b, R2a, R3a, R4b (the
+  four pieces longer than 2.5); benches: all three seat pieces; stool: all four seat pieces.
+- **Light streak:** a 1.3-long streak near mid-length on each bench's outer plank, two steps toward `wood_light` (36 %
+  within 0.35 of its centre, 18 % to 0.65). **None on the top** (deviation from §5.3): a two-step streak costs 64 tris
+  per plank, and the Table part (top + trestles + crossbar + braces) must stay under 1000 (it is 980). A one-step streak
+  (32 tris) rendered as a hard light rectangle, so it was dropped rather than kept hard.
+- **Leg feet:** the lowest 0.25 of every leg 30 % toward `wood_deep`, by height (one step; the legs still read as the
+  same wood as the planks).
+- **Bolts:** `m067_iron`, Tint ±0.02, hard edge against the wood (two materials).
+- The first band strengths (t 0.12–0.24) moved a band only 4–8 units with the calibrated partners: invisible (M050
+  finding 6). The final 0.24–0.44 moves it 8–15 units: visible on `top_sheet` and `plank_cu`, still soft.
+- Finish: wood matte (rough 0.8 / 0.85, low specular), iron rough 0.45 / metal 0.5, no emission.
+
+## Stage 5 — Lighting
+
+**Skipped.** The sheet shows nothing emissive and no light source; its highlights and cast shadows are the
+illustration's lighting. 0 glow keys (export stats). Studio notes (Requires Manual Validation): in daylight the top and
+seats should read light orange with darker undersides from shadow, not paint; the bolts read as dark dots at gameplay
+distance; a default character can sit at each stored seat point (Studio `Seat` parts) and jump onto the top.
+
+## Stage 6 — VFX
+
+**Skipped.** No smoke, dust, sparkle or glow on the sheet. 0 sockets on every object (`export_stats`: `vfx_sockets` 0,
+`glow_keys` []).
+
+## Modeller's notes for the verifier
+
+- **Rebuild:** `import importlib, kit_models, m067; importlib.reload(kit_models); importlib.reload(m067); r =
+  m067.build()` returns `problems: []` plus `audit`, `contact`, `bury`, `seats` (seat levels, knee room), `walk`,
+  `winding`, `bowties`, `thin`, `uv`, `placement`, `export_stats`. `m067.preview()` renders only the sheet views;
+  `m067.measure(path, box)` applies the §1.2 masks to a sheet cell or a render; `m067.calibrate()` re-runs the dome.
+- **Comparison cameras:** `f34_sheet` is (−30, 20), not the spec's (−35, 20) (probed, Stage 1). `front_sheet` and
+  `rear_sheet` hide the stool (the sheet's cells have none).
+- **Deliberate differences from the sheet** (all decided or recorded): table L / H longer than the front and rear cells
+  (decision 1); seats 1.50 not the front cell's 1.32 (decision 2); stool front-left, not the top cell's +X end (decision
+  3); knee braces show end-on in the side view (decision 4); 10° splay where the side cell draws near-vertical legs
+  (decision 5); the f34 value spread and K share (studio lighting, Stage 4).
+- **Budget-driven colour choice:** no light streak on the table top and no end band on its three short pieces (R1a,
+  R3b, R4a), so the Table part stays at 980 / 1000. The hero alone has room for both (2540 / 4000) but would then differ
+  from its parts.
+- **The Crossbar part differs from the hero's crossbar on purpose:** alone, its tenon stubs run from the body's end
+  faces (through where the cleats would be), so the part is one chained piece; in the hero the stubs sit on the cleats'
+  outer faces.
+- **Stool orientation:** the stool is built turned 90° (planks front to back); its seat point still faces +X (toward the
+  table end).
+- `under_cu` is dark because the studio has no light from below; it shows the plank undersides, both cleats, the
+  crossbar and the knee braces, but reads poorly against close-up C.
+- Scratch files: `<temp>\build.json` (the last `build()` report), `<temp>\calib\` (dome renders).
+
+## Rulings (main session, 2026-11-02)
+
+1. **Table top bands:** keep it as built. The Table part stays under 1000 with no light streak and no end band on the
+   three short pieces; the hero carries the same top, so hero and part match. Per-piece tint separates the planks.
+2. **Value spread** (f34 lit / mid / shade 3 / 86 / 11 against 40 / 27 / 33) comes from the studio's soft light; fixing
+   it would mean colouring faces by facing, which STAGES.md forbids. Accepted; the verifier judges hue and the medians.
+3. **Dark-pixel share and the dark `under_cu`:** studio and ink-outline effects, accepted.
+4. **f34 camera at (−30, 20)**, trestle part shot at (60, 15) and the fixed `tie_cu` camera: accepted.
+
+## Stage 7 verification (round 1)
+
+Independent verifier, read-only, background Blender on a copy of the kit file taken after the main session built 067
+into it (`build()` not called). Every number below was re-measured with the verifier's own bmesh / BVH / raster code,
+and every view was rendered by the verifier into `<temp>\v067\r\` and set beside the matching sheet cell.
+
+**Result: PASS, 8/10.** No blockers.
+
+### Technical (all objects)
+
+| Object | Tris | Size (studs) | Shells | Floating / unchained | Worst gap | Deepest sink |
+| --- | --- | --- | --- | --- | --- | --- |
+| `TrestleTableSet` | 2540 / 4000 | 8.767 × 6.140 × 2.670 | 92 | 0 / 0 | 0.002 | 0.030 (bolts only) |
+| `…Table` | 980 / 1000 | 6.054 × 2.988 × 2.670 | 44 | 0 / 0 | 0.002 | 0.030 (bolts) |
+| `…Top` | 380 | 6.054 × 2.820 × 0.510 | 11 | 0 / 0 | 0.002 | 0.030 (bolts) |
+| `…Trestle` | 248 | 0.570 × 2.988 × 2.160 | 13 | 0 / 0 | 0.002 | 0.030 (bolts) |
+| `…Crossbar` | 80 | 5.590 × 0.360 × 0.300 | 5 | 0 / 0 | 0.002 | 0.030 (bolts) |
+| `…Bench` | 524 | 5.800 × 1.296 × 1.570 | 15 | 0 / 0 | 0.002 | 0.030 (bolts) |
+| `…Stool` | 512 | 1.580 × 1.580 × 1.500 | 18 | 0 / 0 | 0.002 | 0.030 (bolts) |
+
+- Every object: 0 non-manifold edges, 0 boundary, 0 wire, 0 loose verts, 0 bowtie verts, 0 zero-area faces, 0 n-gons,
+  0 duplicate verts, 0 winding errors (edge direction test), 0 negative-volume shells, 0 faces failing the parity test,
+  0 non-planar quads, smallest corner 33.7°. Origin at the bbox bottom centre (error 0.0000 on x, y and z), rotation 0,
+  scale 1, no modifiers, no custom normals, no unused material slots.
+- Bury, by ray parity on every touching pair: the only sinks are the bolt heads' stated 0.03 (and the plank / cleat face
+  points under them). No leg, cleat, tie, stub, peg, brace or plank passes into another piece. No shell's centre lies
+  inside another shell.
+- UV: one `UVMap`. Hero 652 islands; every object has 0 overlapping pixels (2048² raster), 0 flipped faces, smallest
+  island gap 0.016, border 0.008 (meets ≥ 0.008), texel density ratio 1.00 (p5 and p95).
+- Materials: `m067_wood` `#A66829` (rough 0.8, spec 0.06), blend keys `wood_x_deep_24 / _44 / _30`, `wood_x_light_18 /
+  _36`, `m067_iron` `#49525F` (rough 0.45, metal 0.5), all no emission; Tint 0.954–1.047. Correlation between face colour
+  and normal: x 0.00, y 0.00, z 0.12, |z| 0.01, so no colour comes from facing.
+
+### Sizes, joinery, furniture use (build frame)
+
+- **Top:** 6.00 (bbox 6.054 with end jitter) × 2.82, every plank top at 2.600 (flat to 0.000), underside 2.16. Every
+  plank is 0.44 thick. Joints at R1 −1.92 (0.18 L), R3 +2.10 (0.85 L), R4 −0.84 (0.36 L). Four bolts on R1 and R4 over
+  the trestles.
+- **Trestles:** legs 0.50 × 0.46 with a 10.06° splay. Tops at y ±0.86 (z 1.86), feet at ±1.19, outer faces ±1.42 (top
+  edge ±1.41). Cleat 2.43 × 0.45 × 0.30. Tie z 0.40–0.75. Tie stub y −1.29 … −1.57 with a peg on top. The diagonal runs
+  from the front leg on the tie top up to y 0 under the cleat (53°). Six bolts per trestle.
+- **Crossbar:** y ±0.18, z 1.86–2.16, between the cleat faces; stubs protrude 0.30, each with a bolt.
+- **Knee braces:** 42.8° from (±1.0, 1.86) to the tie top at x ±2.2.
+- **Benches:** 5.80 × 1.20 at y ±2.40, seat tops 1.500. Legs splay 5° (X) and 4° (Y). Plan gap to the top 0.39 (0.36 to
+  the splayed feet).
+- **Stool:** 1.40 square at (−4.95, −1.30), seat top 1.500, legs 7° both ways. It stands 1.25 off the top's end and 1.26
+  off the near bench.
+- **Bolts:** 30 heads, each 0.18 × 0.18 × 0.10 (0.03 sunk, 0.05 proud, 0.02 dome), all `m067_iron`.
+- **Front fractions:** top 0.169 H, band 0.715–0.831 H, leg centres ±0.733, brace upper ends ±0.167 L, bench 0.967 L,
+  bench legs ±0.845.
+- **Side fractions:** cleat 0.862 W, legs ∓0.305 W, tie 0.154–0.288 H.
+- **Top view:** bench gap 0.138 W. Every value is in tolerance.
+- **Seat points:** the five stored points (hero object space + `m067_offset` (−1.357, 0, 0)) land at f1 / f2
+  (∓1.20, −2.40, 1.50) facing +Y, b1 / b2 (∓1.20, +2.40, 1.50) facing −Y, and the stool point (−4.95, −1.30, 1.50) facing
+  +X. The Table, Bench and Stool parts carry their own points, which resolve to the same build positions.
+- **Knee room:** box 1.2 × 1.2 × 1.75 from each bench's inner edge toward the table; minimum clearance 0.15 at all four
+  points (the trestle leg foot; target ≥ 0.10).
+- **Walk-around:** a plan occupancy grid at 0.05, dilated by 0.5 and by 0.8, leaves one connected free region. There is
+  no enclosed pocket. The bench gaps (0.39) are closed to a character.
+- Hero size: 8.77 × 6.14 × 2.67, matching the spec's 8.75 ± 0.15 × 6.10 ± 0.12 × 2.67 ± 0.02.
+
+### Views against the sheet (masks of §1.2; sheet → ours)
+
+| View | W : H | Wood median | Hue / sat | lit / mid / shade % | K % |
+| --- | --- | --- | --- | --- | --- |
+| f34 (−30, 20) | 1.858 → **1.787** | `#BE6D29` → `#BB6C25` | 28.2° / .76 → 28.2° / .80 | 40/27/33 → 3/86/11 | 2.4 → 0.9 |
+| r34 (145, 20) | 1.514 → 1.653 (155: 1.76) | `#B96927` → `#AB6423` | 28.3 / .77 → 28.4 / .79 | 39/28/33 → 4/82/14 | 2.5 → 1.1 |
+| front (stool hidden) | 1.860 → 2.286 | `#B4641E` → `#B66823` | 27.7 / .83 → 28.4 / .81 | 14/57/29 → 1/64/35 | 3.9 → 0.9 |
+| rear (stool hidden) | 1.684 → 2.286 | `#B5641D` → `#A96322` | 27.9 / .83 → 28.9 / .80 | 13/59/28 → 0/88/12 | 4.1 → 0.6 |
+| side | 1.800 → 2.309 | `#A45D20` → `#8D521B` | 27.0 / .80 → 28.7 / .81 | 7/62/31 → 0/58/42 | 5.5 → 1.6 |
+| top | 1.509 → 1.455 | `#CB7A2D` → `#D37B2B` | 29.0 / .78 → 28.6 / .80 | 17/76/7 → 5/87/8 | 1.9 → 0.1 |
+
+- Within tolerance: the f34 W : H (1.80 ± 0.12) and the wood medians (f34 within 4, front within 5, top within 8). Hue
+  and saturation are orange in every view.
+- Bolt colour: the side-facing heads render `#3B4148`–`#40464E` against the sheet's `#454C54` (palette render) and
+  `#464D55` (close-up B).
+- The value spread, K share, dark `under_cu` and front / rear W : H are the settled rulings and decisions.
+- **f34:** the layout matches:
+  - the stool front-left, square to the table;
+  - the far bench poking out left, the near bench poking out right;
+  - three plank ends with the back row's short piece;
+  - the left trestle's A with its diagonal and the right knee brace under the top.
+- **r34:** the same layout turned 180°, with the +X trestle's A and diagonal.
+- **front / rear:** the top, the cleat-end band with bolts over the legs, the knee-brace V and the bench with face bolts.
+- **side:** four equal plank ends, the cleat with bolts, the A legs, the diagonal from the front leg to the centre, the
+  tie, leg bolts at tie height, and the benches end-on.
+- **top:** four rows, three joints, bolt dots on R1 and R4, the bench seams with end dots, trestle feet at the edges.
+- **Parts against their exploded cells:**
+  - Top: four rows, staggered joints.
+  - Trestle: cleat, legs, diagonal, tie with the pegged stub, bolts near the feet.
+  - Crossbar: beam with tenon ends.
+  - Bench: two planks with a joint, splayed frames, stretchers.
+  - Stool: three planks with a seam, splayed legs, aprons, stretchers.
+- **Close-ups:**
+  - A: cleat end and bolt, crossbar stub with bolt.
+  - Tie: stub through the front leg, peg block on top, leg bolt.
+  - B: chamfered plank ends with gaps over the cleat end and its bolt.
+  - C: dark from below (ruling 3).
+- Spin (eight azimuths at e 10): every leg on the ground, nothing floats. Thumb (170 × 140): the table, trestles, benches
+  and stool read.
+
+### Blockers
+
+None.
+
+### Minors
+
+1. **Upward-facing bolt heads glint pale (shows).** The four table-top bolts and the bench seat-seam bolts render
+   `#DBE0E7`–`#FFFFFF` in the r34 and `#5D646E`–`#858D99` in the f34. Every drawn bolt on the sheet is dark slate
+   (`#454C54` / `#464D55`). The cause is the iron's rough 0.45 / metal 0.5 picking up the studio's sky. Fix if wanted:
+   iron rough about 0.7 and metal about 0.2–0.3, with the side-facing heads re-checked against `#474E56` on `plank_cu`.
+2. **Trestle part reads as a wide trapezoid (shows on the part).** The exploded cell draws a tall, narrow A whose legs
+   nearly meet under the cleat. This follows from decision 5 (10° splay) and the decided 2.82 width. Recorded.
+3. **Crossbar part reads slender (shows on the part).** It is 5.59 long with a 0.36 × 0.30 section; the exploded cell
+   draws a short, chunky beam about as thick as a leg. The section follows §2.3 and the front band (0.26 H), and the length
+   follows the decided table. Recorded.
+4. **Side view (shows):**
+   - The knee braces appear end-on as a vertical bar at the centre (decision 4, already recorded).
+   - The tie stub and peg have little contrast, because the benches end-on behind them are the same wood. The sheet
+     cell has no near bench there.
+5. **r34 camera (shows, slightly).** At (145, 20) the stool overlaps the table's far end. The sheet shows it standing
+   clear to the right. At (155, 20) it separates, but W : H goes from 1.65 to 1.76 against the sheet's 1.51. Content
+   check only, so no change is needed.
+6. **Bench plank-end bands (shows, slightly).** On `top_sheet` the back bench's inner plank carries the table's cast
+   shadow (studio lighting, not paint). The light streak on the outer plank reads as a soft lighter rectangle. Both are
+   acceptable.
+7. **Seat points sit over seams (does not show).** All five stored seat points lie over a 0.04 seam: the bench centre
+   seam at y ±2.40 and the stool's cross seam. A vertical ray at the point hits nothing. A Studio `Seat` part placed at
+   z 1.50 is unaffected, so this needs no fix. It is noted for anyone who ray-casts down to the seat.
+8. **Stool corridor (does not show).** The stool sits 1.13–1.25 off the table's −X end and 1.26 off the near bench's
+   end. This is a corridor open at both ends, not a dead-end pocket; the 0.5- and 0.8-radius walk tests pass. Studio
+   validation (Requires Manual Validation) should confirm that a character walks through it without snagging.
+9. **Hero Y 6.14 against §2.7's 6.06 (does not show).** The bench outer-face bolts add 0.04 a side. This is within
+   the 6.10 ± 0.12 target.
+
+## Main session after round 1 (2026-11-02)
+
+Minor 1 fixed: the iron finish goes from rough 0.45 / metal 0.5 to rough 0.7 / metal 0.25, so the up-facing bolt heads
+no longer glint pale; in the regenerated r34 and f34 they read dark slate like the sheet. Base colour unchanged.

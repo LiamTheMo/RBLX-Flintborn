@@ -46,19 +46,22 @@ BURY = 0.05
 # key -> (hex, roughness, metal, emission, low specular). Stage 4 (spec "Stage 4"): see calibrate() and the spec for how
 # these were reached (K.calibrate on the studio dome, then checked on the hero renders against the sheet's regions).
 PALETTE = {
-    WOOD: ("#B26C2B", 0.8, 0.0, 0.0, True),
-    WOOD_LIGHT: ("#E59241", 0.8, 0.0, 0.0, True),
-    WOOD_DEEP: ("#8E4A18", 0.85, 0.0, 0.0, True),
-    IRON: ("#474E56", 0.45, 0.5, 0.0, False),
+    WOOD: ("#A66829", 0.8, 0.0, 0.0, True),
+    WOOD_LIGHT: ("#D48F44", 0.8, 0.0, 0.0, True),
+    WOOD_DEEP: ("#844A1A", 0.85, 0.0, 0.0, True),
+    IRON: ("#49525F", 0.7, 0.25, 0.0, False),   # was rough 0.45 / metal 0.5: up-facing heads glinted pale (V1 minor 1)
 }
 # calibration targets (spec 5.4: rendered sRGB of the sheet's regions) and K.sample kinds ("all" = paper filtered)
 TARGETS = {WOOD: ((0xB8, 0x67, 0x1F), "brown"), WOOD_LIGHT: ((0xE5, 0x92, 0x41), "brown"),
            WOOD_DEEP: ((0x8E, 0x4A, 0x18), "brown"), IRON: ((0x47, 0x4E, 0x56), "all")}
 
 # colour bands (spec 5.3 / 5.5): blend fractions toward the partner key, by position
-END_BAND = ((0.15, 0.24), (0.35, 0.12))            # (distance from the chosen plank end, t toward wood_deep)
-LIGHT_BAND = ((0.15, 0.30), (0.45, 0.15))          # (distance from the streak centre, t toward wood_light)
-LEG_BAND = (0.25, 0.20)                            # (height of the foot band, t toward wood_deep)
+# (the calibrated partners are 34 / 46 units from wood in R, so t 0.12-0.24 moved a band only 4-8 units: invisible on
+# the renders, M050 finding 6; these steps move it 8-15 units, visible but soft)
+END_BAND = ((0.15, 0.45), (0.35, 0.25))            # (distance from the chosen plank end, t toward wood_deep)
+LIGHT_BAND = ((0.35, 0.35), (0.65, 0.18))         # (distance from the streak centre, t toward wood_light): a long
+#                                                    streak along the plank in two steps, not a hard square patch
+LEG_BAND = (0.25, 0.30)                            # (height of the foot band, t toward wood_deep)
 PIECE_TINT = 0.05
 BOLT_TINT = 0.02
 
@@ -265,8 +268,8 @@ def _plank(a, x0, x1, yc, zc, hw, name, light=None, end=None):
     return _prism(a, rings, "plank", name, colour)
 
 
-def _plank_bands(name, x0, x1, streak):
-    """The seeded coin for a plank piece's darker end, and its lighter streak centre (or None)."""
+def _plank_bands(name, x0, x1, streak, end_band=True):
+    """The seeded coin for a plank piece's darker end (or None), and its lighter streak centre (or None)."""
     rng = _rng(name)
     end = x0 if rng.random() < 0.5 else x1
     light = None
@@ -275,9 +278,9 @@ def _plank_bands(name, x0, x1, streak):
         light = (x0 + x1) / 2 + rng.uniform(-0.2, 0.2) * L
         light = max(x0 + 0.8, min(x1 - 0.8, light))
         # keep the streak clear of the end band
-        if abs(light - end) < END_BAND[-1][0] + LIGHT_BAND[-1][0] + 0.1:
+        if end_band and abs(light - end) < END_BAND[-1][0] + LIGHT_BAND[-1][0] + 0.1:
             light = None
-    return end, light
+    return (end if end_band else None), light
 
 
 # ---- legs (sheared chamfered prisms with horizontal caps) -----------------------------------------------------------
@@ -320,7 +323,11 @@ ROWS = (1.08, 0.36, -0.36, -1.08)              # R1 (back) .. R4 (front), y cent
 JOINTS = {0: -1.92, 2: 2.10, 3: -0.84}         # butt joint centres (R1 0.18 L, R3 0.85 L, R4 0.36 L)
 JOINT_GAP = 0.04
 END_JIT = 0.03
-STREAK_ROWS = {"R2a", "R4b"}                   # pieces with a lighter streak (about one in three)
+STREAK_ROWS = set()                            # no light streak on the top: a soft (two-step) streak costs 64 tris
+END_MIN = 2.5                                  # top pieces longer than this get a darker end band (R1b, R2a, R3a,
+#                                                R4b): the Table part (top + trestles + crossbar) must stay under 1000
+#                                                tris, and each band ring costs 16 tris. The short pieces (R1a, R3b,
+#                                                R4a) differ from their neighbours by the per-piece Tint only
 
 
 def top_pieces():
@@ -340,7 +347,8 @@ def top_pieces():
 def top(a):
     zc = (TOP_Z0 + TOP_Z1) / 2
     for nm, x0, x1, yc in top_pieces():
-        end, light = _plank_bands("top" + nm, x0, x1, nm in STREAK_ROWS)
+        end, light = _plank_bands("top" + nm, x0, x1, nm in STREAK_ROWS,
+                                  end_band=nm not in STREAK_ROWS and x1 - x0 > END_MIN)
         _plank(a, x0, x1, yc, zc, ROW_HW, "top_" + nm, light=light, end=end)
     for yc in (ROWS[0], ROWS[3]):
         for x in (-TR_X, TR_X):
@@ -438,12 +446,16 @@ KNEE_BOT = (2.03, 2.37)                         # on the tie top (z 0.75)
 KNEE_TOP_C, KNEE_TOP_HW = 1.00, 0.17            # under the crossbar (z 1.86)
 
 
-def crossbar(a, bolts=True):
+def crossbar(a, bolts=True, alone=False):
+    """The crossbar body between the cleats' inner faces and a tenon stub with a bolt past each cleat. In the hero the
+    stubs sit on the cleats' outer faces (no bar through the cleat). alone (the Crossbar part, no cleats to bridge):
+    each stub runs from the body's end face through where the cleat would be, so the part is one chained piece."""
     sec = _sec(CB_HY, CB_HZ, CH)
     _prism(a, [[(x, u, CLEAT_ZC + v) for u, v in sec] for x in (-CB_X, CB_X)], "cross", "crossbar")
     x_out = TR_X + CLEAT_HX
+    x_in = CB_X if alone else x_out
     for s in (-1, 1):
-        lo, hi = sorted((s * x_out, s * (x_out + CSTUB_L)))
+        lo, hi = sorted((s * x_in, s * (x_out + CSTUB_L)))
         _box(a, (lo, -CSTUB_HY, CSTUB_Z[0]), (hi, CSTUB_HY, CSTUB_Z[1]), "cstub", f"cross_stub{s:+d}")
         if bolts:
             _bolt(a, (s * (x_out + CSTUB_L), 0.0, sum(CSTUB_Z) / 2), (s, 0, 0), (0, 0, 1), f"bolt_cstub{s:+d}")
@@ -529,6 +541,14 @@ def sleg_c(sx, sy, z):
 
 
 def stool(a):
+    """The stool turned a quarter (its local X is the build frame's Y): the seat planks run front to back, so the
+    front face (-Y, toward the f34 camera) shows the three plank ends narrow / wide / narrow as the f34 draws them,
+    and the -X face one long plank side."""
+    with _Frame(Matrix.Rotation(math.pi / 2, 4, "Z")):
+        _stool(a)
+
+
+def _stool(a):
     """The stool in stool-local coordinates (centre 0): three seat planks along X (the middle one in two halves), four
     legs splayed 7 deg both ways, aprons on all four sides, stretchers on the +-X sides, a bolt on each seat side."""
     zc = (SEAT_Z0 + SEAT_Z1) / 2
@@ -592,7 +612,7 @@ def trestle_part(a):
 
 
 def crossbar_part(a):
-    crossbar(a)
+    crossbar(a, alone=True)
 
 
 def bench_part(a):
@@ -1099,7 +1119,8 @@ def placement_report(o):
 # ---- build ---------------------------------------------------------------------------------------------------------------
 PARTS = ((TABLE_P, table_all), (TOP_P, top_part), (TRESTLE_P, trestle_part), (CROSS_P, crossbar_part),
          (BENCH_P, bench_part), (STOOL_P, stool_part))
-TARGET_SIZE = ((8.75, 0.15), (6.10, 0.12), (2.64, 0.02))   # hero W (X), D (Y), H (Z) +- tolerance (spec 2.7)
+# hero W (X), D (Y), H (Z) +- tolerance (spec 2.7; H is the top at 2.60 plus the top bolts' 0.05 head and 0.02 dome)
+TARGET_SIZE = ((8.75, 0.15), (6.10, 0.12), (2.67, 0.02))
 HERO_BUDGET = 4000
 
 
@@ -1238,14 +1259,19 @@ def build(render=True, parts=True, close=True):
 
 
 # ---- renders -------------------------------------------------------------------------------------------------------------
-# spec 2.9: front_sheet (0, 0) and rear_sheet (180, 0) with the stool hidden, side_sheet (90, 0), f34_sheet (-35, 20),
-# r34_sheet (145, 20), top_sheet (0, 89.9); floor hidden and a 3x lens in every *_sheet shot
-SHEET_VIEWS = {"front_sheet": (0, 0), "side_sheet": (90, 0), "rear_sheet": (180, 0), "f34_sheet": (-35, 20),
+# spec 2.9: front_sheet (0, 0) and rear_sheet (180, 0) with the stool hidden, side_sheet (90, 0), f34_sheet (probed az
+# -25 ... -40 x e 15 / 20: (-30, 20) gives W : H 1.79, sheet 1.86; (-35, 20) 1.68), r34_sheet (145, 20), top_sheet
+# (0, 89.9); floor hidden and a 3x lens in every *_sheet shot
+F34 = (-30, 20)
+SHEET_VIEWS = {"front_sheet": (0, 0), "side_sheet": (90, 0), "rear_sheet": (180, 0), "f34_sheet": F34,
                "r34_sheet": (145, 20), "top_sheet": (0, 89.9)}
 NOSTOOL = ("front_sheet", "rear_sheet")
 VIEW_NAMES = ("front34", "rear34", "front", "side", "rear", "top")
 SHEET_LENS = 3.0
 PARTS_SHOT = (-20, 15)
+# the trestle is an A-frame in the YZ plane: from (-20, 15) it is edge-on, so its shot looks from the +X side as the
+# exploded cell draws it
+PART_SHOTS = {TRESTLE_P: (60, 15)}
 SPIN = tuple(range(0, 360, 45))
 SPIN_EL = 10
 
@@ -1366,7 +1392,7 @@ def render_views(objs, close=True):
     try:
         extra = {k: ([ns] if k in NOSTOOL else [h], az, el) for k, (az, el) in SHEET_VIEWS.items()}
         for o in objs[1:]:
-            extra["part_" + o.name.replace(HERO, "").lower()] = ([o], *PARTS_SHOT)
+            extra["part_" + o.name.replace(HERO, "").lower()] = ([o], *PART_SHOTS.get(o.name, PARTS_SHOT))
         if shown:
             extra["exploded"] = (shown, -20, 15)
         extra["scale"] = ([h] + markers, -25, 8)
@@ -1459,7 +1485,9 @@ def render_close_ups(objs):
     h = objs[0]
     out = {}
     out["join_cu"] = render_close([h], f"{d}/join_cu.png", 35, 12, _at(h, (2.45, -0.6, 1.9)), 0.95)
-    out["tie_cu"] = render_close([h], f"{d}/tie_cu.png", -40, 14, _at(h, (-2.25, -1.30, 0.65)), 0.75)
+    # the near bench hides the tie stub from every orbit angle: a fixed camera in the gap past the bench's -X end
+    out["tie_cu"] = render_cam([h], f"{d}/tie_cu.png", _at(h, (-3.9, -1.75, 1.05)), _at(h, (-2.2, -1.40, 0.6)),
+                               lens=30.0)
     out["plank_cu"] = render_close([h], f"{d}/plank_cu.png", 30, 24, _at(h, (2.65, -1.15, 2.25)), 0.8)
     out["stool_cu"] = render_close([h], f"{d}/stool_cu.png", -35, 20, _at(h, (STOOL_C[0], STOOL_C[1], 0.85)), 1.1)
     out["under_cu"] = render_cam([h], f"{d}/under_cu.png", _at(h, (0.0, -1.1, 0.35)), _at(h, (0.0, 0.3, 2.2)),
@@ -1485,7 +1513,7 @@ def render_close_ups(objs):
     try:
         orig, kit["render_group"] = _long_lens(kit)
         try:
-            out["thumb"] = kit["render_group"]([h], f"{d}/thumb_sheet.png", -35, 20)
+            out["thumb"] = kit["render_group"]([h], f"{d}/thumb_sheet.png", *F34)
         finally:
             kit["render_group"] = orig
     finally:
