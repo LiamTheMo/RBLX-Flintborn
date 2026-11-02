@@ -707,6 +707,17 @@ function KitModel.Fraction(value: number, min: number, max: number): number
 	return math.clamp((value - min) / (max - min), 0, 1)
 end
 
+-- Which way a touch that began on a control in a scrolling list is going, once
+-- it has moved `slop` px from where it began: "x" (mostly sideways: the control
+-- takes the drag) or "y" (mostly up or down: the list scrolls). nil until then.
+function KitModel.DragAxis(dx: number, dy: number, slop: number): string?
+	local ax, ay = math.abs(dx), math.abs(dy)
+	if ax < slop and ay < slop then
+		return nil
+	end
+	return if ax > ay then "x" else "y"
+end
+
 -- A bar fill's width for `fraction` of `maxWidth`; a sliced fill narrower than its
 -- two end caps (`minWidth`) would fold over itself, so it is hidden instead.
 function KitModel.FillWidth(fraction: number, maxWidth: number, minWidth: number): (number, boolean)
